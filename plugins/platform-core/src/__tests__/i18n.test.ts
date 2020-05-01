@@ -16,7 +16,7 @@
 
 import { translate, loadStrings, IntlStringId } from '../i18n'
 
-describe('core', () => {
+describe('i18n', () => {
 
   it('should return original string', () => {
     expect(translate('does not exists' as IntlStringId)).toBe('does not exists')

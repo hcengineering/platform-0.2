@@ -13,6 +13,7 @@
   "license": "EPL-2.0",
   "devDependencies": {
     "@babel/core": "^7.9.6",
+    "@babel/plugin-proposal-decorators": "^7.8.3",
     "@babel/preset-env": "^7.9.6",
     "@babel/preset-typescript": "^7.9.0",
     "@types/jest": "^25.2.1",
@@ -21,6 +22,7 @@
     "typescript": "^3.8.3"
   },
   "dependencies": {
-    "intl-messageformat": "^8.3.9"
+    "intl-messageformat": "^8.3.9",
+    "reflect-metadata": "^0.1.13"
   }
 }

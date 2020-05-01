@@ -14,19 +14,19 @@
 // 
 
 import { IntlStringId } from './i18n'
-import { Extension } from './plugin'
+import { Extension, identify } from './plugin'
 
-export type PropertyType = undefined | Extension<any> | Ref<Doc> | { [key: string]: PropertyType }
+export type PropertyType = undefined | Extension<any> | Ref<Doc> | IntlStringId | Struct | { [key: string]: PropertyType }
 export type MethodType = (...args: any[]) => any
 type DocId = string
 
-export interface Bag<T> { [key: string]: T }
+export interface Bag<T extends PropertyType> { [key: string]: T }
 export type Ref<T extends Doc> = DocId & { __ref: T }
 
 // S E R I A L I Z E D
 
-export type AsNumber<T> = number | { __as_number: T }
-// export interface Struct { __struct: void }
+type AsNumber<T> = number | { __as_number: T }
+interface Struct { __struct: void }
 
 // S E S S I O N
 
@@ -60,9 +60,9 @@ export interface Doc extends Obj {
 
 export interface Type extends Obj { }
 
-export interface Attribute {
+export interface Attribute extends Struct {
   label: IntlStringId
-  type: Type
+  // type: Type
 }
 
 export type Konstructor<T extends Obj> = new () => T
@@ -81,3 +81,11 @@ export interface Mixin<T extends Obj> extends Class<T> { }
 export interface BusinessObject extends Doc {
   createdOn: AsNumber<Date>
 }
+
+export const pluginId = 'core'
+
+export default identify(pluginId, {
+  class: {
+    Class: '' as Ref<Class<Class<Obj>>>
+  }
+})
