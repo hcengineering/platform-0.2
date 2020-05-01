@@ -1,4 +1,4 @@
-//
+/*! Antierp Platform
 // Copyright © 2020 Andrey Platov <andrey.v.platov@gmail.com>
 // 
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
@@ -11,7 +11,6 @@
 // 
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// 
-//
+*/
 
 console.log('index')
