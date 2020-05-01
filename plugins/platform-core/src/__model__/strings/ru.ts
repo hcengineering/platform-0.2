@@ -13,12 +13,3 @@
 // limitations under the License.
 //
 
-import { Ref, Obj, Class } from './types'
-import { IntlStringId } from './i18n'
-import { Extension } from './extension'
-
-export function classLabelId(clazz: Ref<Class<Obj>>): IntlStringId {
-  return clazz as string as IntlStringId
-}
-
-

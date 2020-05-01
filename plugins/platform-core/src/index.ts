@@ -25,7 +25,7 @@ export class TObject implements Obj {
 
   getSession(): Session { throw new Error('object not attached to a session') }
   getClass(): Class<this> { return this.getSession().getInstance(this._class) }
-  toIntlString(plural?: number): string { return this.getClass().toIntlString() }
+  toIntlString(plural?: number): string { return this.getClass().toIntlString(plural) }
 }
 
 @Model(core.class.Doc)
@@ -46,8 +46,6 @@ export class TClass<T extends Obj> extends TDoc implements Class<T> {
 
   toIntlString(plural?: number): string { return translate(classLabelId(this._id), { n: plural }) }
 }
-
-export const konstructors: Konstructor<Obj>[] = [TDoc]
 
 export default new Plugin(pluginId, () => {
   loadConstructors(core.class, {

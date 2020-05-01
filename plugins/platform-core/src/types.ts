@@ -51,7 +51,7 @@ export interface Obj {
   getSession(): Session
   getClass(): Class<this>
 
-  toIntlString(): string
+  toIntlString(plural?: number): string
 }
 
 export interface Embedded extends Obj {
