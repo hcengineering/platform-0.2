@@ -14,8 +14,8 @@
 // 
 
 import { Session, Query } from './types'
-import { Obj, Doc, Ref, Bag, Class, PropertyType, Layout } from './types'
-import registry from './extension'
+import core, { Obj, Doc, Ref, Bag, Class, PropertyType, Layout, Konstructor } from './types'
+import registry, { Extension } from './extension'
 
 type ObjLayout = Layout<Obj>
 type DocLayout = Layout<Doc>
@@ -41,7 +41,7 @@ function findAll(docs: DocLayout[], query: Partial<Doc>): DocLayout[] {
   return result as DocLayout[]
 }
 
-class MemDb {
+export class MemDb {
   private objects = new Map<Ref<Doc>, DocLayout>()
   private byClass = new Map<Ref<Class<Doc>>, DocLayout[]>()
 
@@ -100,7 +100,8 @@ class Instantiator implements ProxyHandler<ObjLayout> {
   get(target: ObjLayout, key: PropertyKey): any {
     const value = Reflect.get(target, key)
     if (!value) {
-      return this.memdb.getPrototype(target._class)
+      const proto = this.memdb.getPrototype(target._class)
+      return Reflect.get(proto, key, target)
     }
     if (typeof value === 'object' && value.hasOwnProperty('_class')) {
       return new Proxy(value, this.memdb.instantiator)
@@ -109,10 +110,10 @@ class Instantiator implements ProxyHandler<ObjLayout> {
   }
 }
 
-class MemSession implements Session {
+export class MemSession implements Session {
 
   private memdb: MemDb
-  private prototypes = new Map<Ref<Class<Obj>>, object>()
+  private prototypes = new Map<Ref<Class<Obj>>, Object>()
   readonly instantiator: Instantiator
 
   constructor(memdb: MemDb) {
@@ -120,16 +121,30 @@ class MemSession implements Session {
     this.instantiator = new Instantiator(this)
   }
 
-  getPrototype(clazz: Ref<Class<Obj>>): object {
+  getPrototype(clazz: Ref<Class<Obj>>): Object {
     const proto = this.prototypes.get(clazz)
     if (proto) {
       return proto
     }
     const classInstance = this.memdb.get(clazz) as ClassLayout
     if (classInstance.konstructor) {
-      const konstructor = registry.get(classInstance.konstructor)
-      this.prototypes.set(clazz, konstructor.prototype)
-      return konstructor.prototype
+      const extend = classInstance.extends ?? core.class.Object
+      const proto = Object.create(clazz === core.class.Object ? Object : this.getPrototype(extend))
+
+      // copy properties
+      const source = registry.get(classInstance.konstructor).prototype
+      Object.getOwnPropertyNames(source).forEach(key => {
+        const value = key === 'getSession' ? () => this : source[key]
+        Object.defineProperty(proto, key, {
+          value,
+          enumerable: true,
+          writable: false,
+          configurable: false
+        })
+      })
+
+      this.prototypes.set(clazz, proto)
+      return proto
     }
     throw new Error('TODO: no constructor for ' + clazz)
   }

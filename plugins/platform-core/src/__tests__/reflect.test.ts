@@ -36,8 +36,9 @@ class TObject implements Obj {
 describe('reflect', () => {
 
   it('should get class metadata', () => {
-    const meta = getClassMetadata(TObject)
-    expect(meta._id).toBe(core.class.Object)
+    const meta = getClassMetadata([TObject])
+    expect(meta.length).toBe(1)
+    expect(meta[0]._id).toBe(core.class.Object)
   })
 
   it('should load constructors', () => {

@@ -20,7 +20,7 @@ export type IntlStringId = string & { __intl_string: void }
 const strings: Map<IntlStringId, string> = new Map()
 const imfCache: Map<IntlStringId, IntlMessageFormat> = new Map()
 
-export function translate(string: IntlStringId, params?: Record<string, PrimitiveType> | undefined) {
+export function translate(string: IntlStringId, params?: Record<string, PrimitiveType> | undefined): string {
   const translation = strings.get(string)
   if (!translation) {
     return string
@@ -31,7 +31,7 @@ export function translate(string: IntlStringId, params?: Record<string, Primitiv
       imf = new IntlMessageFormat(translation, 'ru-RU')
       imfCache.set(string, imf)
     }
-    return imf.format(params)
+    return imf.format(params) as string
   }
   return translation
 }

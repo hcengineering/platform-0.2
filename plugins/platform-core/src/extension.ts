@@ -97,7 +97,6 @@ export class Plugin {
   }
 
   start(): void {
-    console.log('starting plugin: ' + this.id)
     this.extensions()
   }
 }

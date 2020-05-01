@@ -71,7 +71,7 @@ export interface Type extends Embedded { }
 export type Konstructor<T extends Obj> = new () => T
 
 export interface Class<T extends Obj> extends Doc {
-  label: IntlStringId
+  // label: IntlStringId
   konstructor?: Extension<Konstructor<T>>
   extends?: Ref<Class<Obj>>
   attributes?: Bag<Type>
@@ -88,6 +88,7 @@ export const pluginId = 'core'
 export default identify(pluginId, {
   class: {
     Object: '' as Ref<Class<Obj>>,
+    Doc: '' as Ref<Class<Doc>>,
     Class: '' as Ref<Class<Class<Obj>>>
   }
 })

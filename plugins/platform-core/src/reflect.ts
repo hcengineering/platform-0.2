@@ -17,44 +17,46 @@ import 'reflect-metadata'
 
 import registry, { Extension } from './extension'
 import { IntlStringId } from './i18n'
-import core, { Class, Ref, Obj, Konstructor, Bag, Layout } from './types'
+import core, { Class, Ref, Obj, Doc, Konstructor, Bag, Layout } from './types'
 
 const metadataKey = 'erp:model'
 
-type ClassLayout = Layout<Class<Obj>>
+// function getOrCreateMetadata(target: any) {
+//   let clazz = Reflect.getOwnMetadata(metadataKey, target)
+//   if (!clazz) {
+//     clazz = {}
+//     Reflect.defineMetadata(metadataKey, clazz, target)
+//   }
+//   return clazz
+// }
 
-function getOrCreateMetadata(target: any) {
-  let clazz = Reflect.getOwnMetadata(metadataKey, target)
-  if (!clazz) {
-    clazz = {}
-    Reflect.defineMetadata(metadataKey, clazz, target)
-  }
-  return clazz
+// interface ClassOptions<T extends Doc> {
+//   label?: IntlStringId
+//   konstructor?: Extension<Konstructor<T>>
+// }
+
+export function konstructorId<T extends Obj>(clazz: Ref<Class<T>>): Extension<Konstructor<T>> {
+  const id = (clazz as string) + '_Constructor'
+  return id as Extension<Konstructor<T>>
 }
 
-interface ClassOptions<T extends E, E extends Obj> {
-  extends?: Ref<Class<E>>
-  label?: IntlStringId
-  konstructor?: Extension<Konstructor<T>>
-}
-
-export function Model<T extends E, E extends Obj>(_id: Ref<Class<T>>, options?: ClassOptions<T, E>) {
+export function Model<T extends E, E extends Obj>(_id: Ref<Class<T>>, extend?: Ref<Class<E>>, konstructor?: Extension<Konstructor<T>>) {
   return function (target: Konstructor<T>) {
-    const clazz: ClassLayout = {
+    const clazz: Layout<Class<Obj>> = {
       _id,
       _class: core.class.Class,
-      label: options?.label ?? _id as string as IntlStringId,
-      extends: options?.extends,
-      konstructor: options?.konstructor ?? _id as string as Extension<Konstructor<T>>,
-      attributes: getOrCreateMetadata(target.prototype)
+      // label: options?.label ?? _id as string as IntlStringId,
+      extends: extend,
+      konstructor: konstructor ?? konstructorId(_id),
+      attributes: Reflect.getOwnMetadata(metadataKey, target)
     }
-    Reflect.defineMetadata(metadataKey, clazz, target.prototype)
+    Reflect.defineMetadata(metadataKey, clazz, target)
     // registry.set(_id, target)
   }
 }
 
-export function getClassMetadata<T extends Obj>(konstructor: Konstructor<T>): ClassLayout {
-  return Reflect.getOwnMetadata(metadataKey, konstructor.prototype)
+export function getClassMetadata(konstructors: Konstructor<Obj>[]): Layout<Class<Obj>>[] {
+  return konstructors.map(ctor => Reflect.getOwnMetadata(metadataKey, ctor))
 }
 
 ///////
@@ -67,6 +69,6 @@ export function loadConstructors<T extends Bag<Ref<Class<Obj>>>>(ids: T, constru
   for (const key in constructors) {
     const id = ids[key]
     const konstructor = constructors[key]
-    registry.set(id, konstructor)
+    registry.set(konstructorId(id), konstructor)
   }
 }

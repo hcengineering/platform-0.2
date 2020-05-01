@@ -13,21 +13,46 @@
 // limitations under the License.
 */
 
-import { Plugin } from './extension'
-import core, { pluginId, Obj, Ref, Class, Session } from './types'
+import { Plugin, Extension } from './extension'
+import core, { pluginId, Obj, Doc, Ref, Class, Mixin, Session, Type, Konstructor, Bag } from './types'
 import { Model, loadConstructors } from './reflect'
+import { translate } from './i18n'
+import { classLabelId } from './utils'
 
 @Model(core.class.Object)
-class TObject implements Obj {
+export class TObject implements Obj {
   _class!: Ref<Class<this>>
 
   getSession(): Session { throw new Error('object not attached to a session') }
   getClass(): Class<this> { return this.getSession().getInstance(this._class) }
-  toIntlString(): string { return this.getClass().toIntlString() }
+  toIntlString(plural?: number): string { return this.getClass().toIntlString() }
 }
+
+@Model(core.class.Doc)
+export class TDoc extends TObject implements Doc {
+  _id!: Ref<this>
+  _mixins?: Obj[]
+
+  as<T extends Obj>(mixin: Ref<Mixin<T>>): T { return {} as T }
+  mixin<T extends Obj>(doc: Doc, mixin: Ref<Mixin<T>>): T { return {} as T }
+}
+
+@Model(core.class.Class, core.class.Doc)
+export class TClass<T extends Obj> extends TDoc implements Class<T> {
+  // label!: IntlStringId
+  konstructor?: Extension<Konstructor<T>>
+  extends?: Ref<Class<Obj>>
+  attributes?: Bag<Type>
+
+  toIntlString(plural?: number): string { return translate(classLabelId(this._id), { n: plural }) }
+}
+
+export const konstructors: Konstructor<Obj>[] = [TDoc]
 
 export default new Plugin(pluginId, () => {
   loadConstructors(core.class, {
-    Object: TObject
+    Object: TObject,
+    Doc: TDoc,
+    Class: TClass
   })
 })
