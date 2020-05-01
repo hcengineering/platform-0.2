@@ -13,19 +13,13 @@
 // limitations under the License.
 //
 
-import core from '../../types'
-import { modelTranslation } from '../utils'
+import ru from './strings/ru'
+import { TObject, TDoc, TClass } from '../index'
+import { getClassMetadata } from '../reflect'
 
-const translation = modelTranslation(core.class, {
-  Object: {
-    $label: 'Объект'
+export default {
+  strings: {
+    ru
   },
-  Doc: {
-    $label: 'Документ'
-  },
-  Class: {
-    $label: 'Класс'
-  }
-})
-
-export default translation
+  model: getClassMetadata([TObject, TDoc, TClass])
+}
