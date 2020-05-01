@@ -13,9 +13,9 @@
 // limitations under the License.
 */
 
-import { Plugin } from './plugin'
+import { Plugin } from './extension'
 import core, { pluginId, Obj, Ref, Class, Session } from './types'
-import { Model, loadConstructors } from './__model__/reflect'
+import { Model, loadConstructors } from './reflect'
 
 @Model(core.class.Object)
 class TObject implements Obj {

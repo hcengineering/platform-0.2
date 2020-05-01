@@ -15,9 +15,9 @@
 
 import 'reflect-metadata'
 
-import registry, { Extension } from '../plugin'
-import { IntlStringId } from '../i18n'
-import core, { Class, Ref, Doc, Obj, Konstructor, PropertyType, Bag, Type } from '../types'
+import registry, { Extension } from './extension'
+import { IntlStringId } from './i18n'
+import core, { Class, Ref, Doc, Obj, Konstructor, PropertyType, Bag, Type } from './types'
 
 const metadataKey = 'erp:model'
 

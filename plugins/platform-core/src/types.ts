@@ -14,7 +14,7 @@
 // 
 
 import { IntlStringId } from './i18n'
-import { Extension, identify } from './plugin'
+import { Extension, identify } from './extension'
 
 export type PropertyType = undefined | Extension<any> | Ref<Doc> | IntlStringId | Embedded | { [key: string]: PropertyType }
 // type MethodType = (...args: any[]) => any

@@ -13,9 +13,9 @@
 // limitations under the License.
 //
 
-import { Model, getClassMetadata, loadConstructors } from '../__model__/reflect'
+import { Model, getClassMetadata, loadConstructors } from '../reflect'
 import { Class, Ref, Obj, Session } from '../types'
-import { identify } from '../plugin'
+import { identify } from '../extension'
 
 const core = identify('test-reflect', {
   class: {
