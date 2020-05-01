@@ -14,11 +14,13 @@
 // 
 
 import { Session, Query } from './types'
-import { Obj, Doc, Ref, Class, PropertyType, Konstructor } from './types'
+import { Obj, Doc, Ref, Bag, Class, PropertyType, Konstructor } from './types'
 import registry, { Extension } from './plugin'
 
 interface ObjLayout {
   _class: Ref<Class<Obj>>
+
+  [key: string]: PropertyType
 }
 
 interface DocLayout extends ObjLayout {
@@ -45,7 +47,7 @@ function findAll(docs: DocLayout[], query: Partial<Doc>): DocLayout[] {
   let result = docs
 
   for (const propertyKey in query) {
-    result = filterEq(result, propertyKey, query[propertyKey])
+    result = filterEq(result, propertyKey, (query as Bag<PropertyType>)[propertyKey])
   }
 
   return result
@@ -63,7 +65,11 @@ class MemDb {
   }
 
   get(doc: Ref<Doc>): DocLayout {
-    return this.objects.get(doc)
+    const result = this.objects.get(doc)
+    if (!result) {
+      throw new Error('no document with id ' + doc)
+    }
+    return result
   }
 
   getAllOfClass(clazz: Ref<Class<Doc>>): DocLayout[] {
@@ -103,11 +109,15 @@ class Instantiator implements ProxyHandler<ObjLayout> {
     this.memdb = memdb
   }
 
-  get(target: ObjLayout, key: PropertyKey) {
+  get(target: ObjLayout, key: PropertyKey): any {
     const value = Reflect.get(target, key)
     if (!value) {
       return this.memdb.getPrototype(target._class)
     }
+    if (typeof value === 'object' && value.hasOwnProperty('_class')) {
+      return new Proxy(value, this.memdb.instantiator)
+    }
+    return value
   }
 }
 
@@ -115,7 +125,7 @@ class MemSession implements Session {
 
   private memdb: MemDb
   private prototypes = new Map<Ref<Class<Obj>>, object>()
-  private instantiator: Instantiator
+  readonly instantiator: Instantiator
 
   constructor(memdb: MemDb) {
     this.memdb = memdb
@@ -128,9 +138,6 @@ class MemSession implements Session {
       return proto
     }
     const classInstance = this.memdb.get(clazz) as ClassLayout
-    if (classInstance) {
-      return classInstance
-    }
     if (classInstance.konstructor) {
       const konstructor = registry.get(classInstance.konstructor)
       this.prototypes.set(clazz, konstructor.prototype)
@@ -140,7 +147,7 @@ class MemSession implements Session {
   }
 
   private instantiate(obj: ObjLayout): Obj {
-    return new Proxy(obj, this.instantiator) as Obj
+    return new Proxy(obj, this.instantiator) as unknown as Obj
   }
 
   getInstance<T extends Doc>(ref: Ref<T>): T {

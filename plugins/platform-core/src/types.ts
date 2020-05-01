@@ -16,7 +16,7 @@
 import { IntlStringId } from './i18n'
 import { Extension } from './plugin'
 
-export type PropertyType = Extension<any> | Ref<Doc> | { [key: string]: PropertyType }
+export type PropertyType = undefined | Extension<any> | Ref<Doc> | { [key: string]: PropertyType }
 export type MethodType = (...args: any[]) => any
 type DocId = string
 

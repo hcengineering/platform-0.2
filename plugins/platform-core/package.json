@@ -5,6 +5,7 @@
   "private": true,
   "main": "./src/index.ts",
   "scripts": {
+    "build": "tsc",
     "test": "jest --coverage",
     "docs": "typedoc"
   },
