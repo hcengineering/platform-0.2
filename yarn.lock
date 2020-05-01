@@ -3817,6 +3817,11 @@ signal-exit@^3.0.0, signal-exit@^3.0.2:
   resolved "https://registry.yarnpkg.com/signal-exit/-/signal-exit-3.0.3.tgz#a1410c2edd8f077b08b4e253c8eacfcaf057461c"
   integrity sha512-VUJ49FC8U1OxwZLxIbTTrDvLnf/6TDgxZcK8wxR8zs13xpx7xbG60ndBlhNrFi2EMuFRoeDoJO7wthSLq42EjA==
 
+simplytyped@^3.3.0:
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/simplytyped/-/simplytyped-3.3.0.tgz#ed46eef05ebb348ca67ca79df759c49130fd7569"
+  integrity sha512-mz4RaNdKTZiaKXgi6P1k/cdsxV3gz+y1Wh2NXHWD40dExktLh4Xx/h6MFakmQWODZHj/2rKe59acacpL74ZhQA==
+
 sisteransi@^1.0.4:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/sisteransi/-/sisteransi-1.0.5.tgz#134d681297756437cc05ca01370d3a7a571075ed"

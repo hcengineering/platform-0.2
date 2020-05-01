@@ -17,27 +17,11 @@ import 'reflect-metadata'
 
 import registry, { Extension } from './extension'
 import { IntlStringId } from './i18n'
-import core, { Class, Ref, Doc, Obj, Konstructor, PropertyType, Bag, Type } from './types'
+import core, { Class, Ref, Obj, Konstructor, Bag, Layout } from './types'
 
 const metadataKey = 'erp:model'
 
-interface ObjLayout {
-  _class: Ref<Class<Obj>>
-
-  [key: string]: PropertyType
-}
-
-interface DocLayout extends ObjLayout {
-  _class: Ref<Class<Doc>>
-  _id: Ref<Doc>
-}
-
-interface ClassLayout extends DocLayout {
-  label: IntlStringId
-  extends?: Ref<Class<Obj>>
-  konstructor?: Extension<Konstructor<Obj>>
-  attributes?: Bag<Type>
-}
+type ClassLayout = Layout<Class<Obj>>
 
 function getOrCreateMetadata(target: any) {
   let clazz = Reflect.getOwnMetadata(metadataKey, target)

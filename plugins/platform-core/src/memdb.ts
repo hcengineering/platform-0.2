@@ -14,26 +14,14 @@
 // 
 
 import { Session, Query } from './types'
-import { Obj, Doc, Ref, Bag, Class, PropertyType, Konstructor } from './types'
-import registry, { Extension } from './extension'
+import { Obj, Doc, Ref, Bag, Class, PropertyType, Layout } from './types'
+import registry from './extension'
 
-interface ObjLayout {
-  _class: Ref<Class<Obj>>
+type ObjLayout = Layout<Obj>
+type DocLayout = Layout<Doc>
+type ClassLayout = Layout<Class<Obj>>
 
-  [key: string]: PropertyType
-}
-
-interface DocLayout extends ObjLayout {
-  _class: Ref<Class<Doc>>
-  _id: Ref<Doc>
-}
-
-interface ClassLayout extends DocLayout {
-  extends?: Ref<Class<Obj>>
-  konstructor?: Extension<Konstructor<Obj>>
-}
-
-function filterEq(docs: DocLayout[], propertyKey: string, value: PropertyType): DocLayout[] {
+function filterEq(docs: Bag<PropertyType>[], propertyKey: string, value: PropertyType): Bag<PropertyType>[] {
   const result = []
   for (const doc of docs) {
     if (value === doc[propertyKey]) {
@@ -44,13 +32,13 @@ function filterEq(docs: DocLayout[], propertyKey: string, value: PropertyType): 
 }
 
 function findAll(docs: DocLayout[], query: Partial<Doc>): DocLayout[] {
-  let result = docs
+  let result = docs as Bag<PropertyType>[]
 
   for (const propertyKey in query) {
     result = filterEq(result, propertyKey, (query as Bag<PropertyType>)[propertyKey])
   }
 
-  return result
+  return result as DocLayout[]
 }
 
 class MemDb {

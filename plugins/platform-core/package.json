@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "intl-messageformat": "^8.3.9",
-    "reflect-metadata": "^0.1.13"
+    "reflect-metadata": "^0.1.13",
+    "simplytyped": "^3.3.0"
   }
 }

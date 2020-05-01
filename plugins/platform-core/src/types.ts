@@ -13,6 +13,8 @@
 // limitations under the License.
 // 
 
+import { KeysByType, AnyFunc } from 'simplytyped'
+
 import { IntlStringId } from './i18n'
 import { Extension, identify } from './extension'
 
@@ -22,6 +24,8 @@ type DocId = string
 
 export interface Bag<T extends PropertyType> { [key: string]: T }
 export type Ref<T extends Doc> = DocId & { __ref: T }
+
+export type Layout<T extends Obj> = Omit<T, KeysByType<T, AnyFunc>>
 
 // S E R I A L I Z E D
 
