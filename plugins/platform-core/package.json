@@ -1,0 +1,20 @@
+{
+  "name": "@antierp/platform-core",
+  "version": "0.1.0",
+  "description": "Antierp Platform Core",
+  "private": true,
+  "main": "./src/index.ts",
+  "scripts": {
+    "test": "jest --coverage",
+    "docs": "typedoc"
+  },
+  "author": "Andrey Platov <andrey.v.platov@gmail.com>",
+  "license": "EPL-2.0",
+  "devDependencies": {
+    "jest": "^25.5.2",
+    "typescript": "^3.8.3"
+  },
+  "dependencies": {
+    "intl-messageformat": "^8.3.9"
+  }
+}
