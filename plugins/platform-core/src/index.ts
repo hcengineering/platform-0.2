@@ -13,4 +13,21 @@
 // limitations under the License.
 */
 
-console.log('index')
+import { Plugin } from './plugin'
+import core, { pluginId, Obj, Ref, Class, Session } from './types'
+import { Model, loadConstructors } from './__model__/reflect'
+
+@Model(core.class.Object)
+class TObject implements Obj {
+  _class!: Ref<Class<this>>
+
+  getSession(): Session { throw new Error('object not attached to a session') }
+  getClass(): Class<this> { return this.getSession().getInstance(this._class) }
+  toIntlString(): string { return this.getClass().toIntlString() }
+}
+
+export default new Plugin(pluginId, () => {
+  loadConstructors(core.class, {
+    Object: TObject
+  })
+})

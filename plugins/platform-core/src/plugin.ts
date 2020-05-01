@@ -68,7 +68,40 @@ class ExtensionRegistry {
   }
 }
 
-export default new ExtensionRegistry()
+const registry = new ExtensionRegistry()
 
+//////
 
-//export default registry
+type Extend<X extends { [key: string]: any }> = { [P in keyof X]: Extension<X[P]> }
+
+export function loadExtensions<X extends { [key: string]: any }>(ids: Extend<X>, extensions: X) {
+  for (const key in ids) {
+    const id = ids[key]
+    const extension = extensions[key]
+    if (!extension) {
+      throw new Error(`no extension provided, key: ${key}, id: ${id}`)
+    }
+    registry.set(id, extension)
+  }
+}
+
+//////
+
+export class Plugin {
+  readonly id: string
+  private extensions: () => void
+
+  constructor(id: string, extensions: () => void) {
+    this.id = id
+    this.extensions = extensions
+  }
+
+  start(): void {
+    console.log('starting plugin: ' + this.id)
+    this.extensions()
+  }
+}
+
+//////
+
+export default registry

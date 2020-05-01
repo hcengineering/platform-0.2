@@ -15,9 +15,9 @@
 
 import 'reflect-metadata'
 
-import { Extension } from '../plugin'
+import registry, { Extension } from '../plugin'
 import { IntlStringId } from '../i18n'
-import core, { Class, Ref, Doc, Obj, Konstructor, PropertyType, Bag, Attribute } from '../types'
+import core, { Class, Ref, Doc, Obj, Konstructor, PropertyType, Bag, Type } from '../types'
 
 const metadataKey = 'erp:model'
 
@@ -36,7 +36,7 @@ interface ClassLayout extends DocLayout {
   label: IntlStringId
   extends?: Ref<Class<Obj>>
   konstructor?: Extension<Konstructor<Obj>>
-  attributes?: Bag<Attribute>
+  attributes?: Bag<Type>
 }
 
 function getOrCreateMetadata(target: any) {
@@ -70,4 +70,18 @@ export function Model<T extends E, E extends Obj>(_id: Ref<Class<T>>, options?: 
 
 export function getClassMetadata<T extends Obj>(konstructor: Konstructor<T>): ClassLayout {
   return Reflect.getOwnMetadata(metadataKey, konstructor.prototype)
+}
+
+///////
+
+type Konstructors<T extends Bag<Ref<Class<Obj>>>> = {
+  [P in keyof T]: T[P] extends Ref<Class<infer X>> ? Konstructor<X> : never
+}
+
+export function loadConstructors<T extends Bag<Ref<Class<Obj>>>>(ids: T, constructors: Partial<Konstructors<T>>) {
+  for (const key in constructors) {
+    const id = ids[key]
+    const konstructor = constructors[key]
+    registry.set(id, konstructor)
+  }
 }

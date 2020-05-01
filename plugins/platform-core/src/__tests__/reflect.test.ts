@@ -13,28 +13,37 @@
 // limitations under the License.
 //
 
-import { Model, getClassMetadata } from '../__model__/reflect'
-
+import { Model, getClassMetadata, loadConstructors } from '../__model__/reflect'
 import { Class, Ref, Obj, Session } from '../types'
+import { identify } from '../plugin'
 
-const id = 'myClass' as Ref<Class<X>>
+const core = identify('test-reflect', {
+  class: {
+    Object: '' as Ref<Class<Obj>>,
+    Class: '' as Ref<Class<Class<Obj>>>
+  }
+})
 
-@Model(id)
-class X implements Obj {
+@Model(core.class.Object)
+class TObject implements Obj {
   _class!: Ref<Class<this>>
-  x!: string
 
-  getSession(): Session { return {} as Session }
-  getClass(): Class<this> { return {} as Class<this> }
-
-  toIntlString(): string { return '' }
+  getSession(): Session { throw new Error('object not attached to a session') }
+  getClass(): Class<this> { return this.getSession().getInstance(this._class) }
+  toIntlString(): string { return this.getClass().toIntlString() }
 }
 
 describe('reflect', () => {
 
   it('should get class metadata', () => {
-    const meta = getClassMetadata(X)
-    expect(meta._id).toBe(id)
+    const meta = getClassMetadata(TObject)
+    expect(meta._id).toBe(core.class.Object)
+  })
+
+  it('should load constructors', () => {
+    loadConstructors(core.class, {
+      Object: TObject
+    })
   })
 
 })

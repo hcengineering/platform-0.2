@@ -16,8 +16,8 @@
 import { IntlStringId } from './i18n'
 import { Extension, identify } from './plugin'
 
-export type PropertyType = undefined | Extension<any> | Ref<Doc> | IntlStringId | Struct | { [key: string]: PropertyType }
-export type MethodType = (...args: any[]) => any
+export type PropertyType = undefined | Extension<any> | Ref<Doc> | IntlStringId | Embedded | { [key: string]: PropertyType }
+// type MethodType = (...args: any[]) => any
 type DocId = string
 
 export interface Bag<T extends PropertyType> { [key: string]: T }
@@ -26,7 +26,7 @@ export type Ref<T extends Doc> = DocId & { __ref: T }
 // S E R I A L I Z E D
 
 type AsNumber<T> = number | { __as_number: T }
-interface Struct { __struct: void }
+// interface Struct { __struct: void }
 
 // S E S S I O N
 
@@ -50,6 +50,10 @@ export interface Obj {
   toIntlString(): string
 }
 
+export interface Embedded extends Obj {
+  __embedded?: void
+}
+
 export interface Doc extends Obj {
   _id: Ref<this>
   _mixins?: Obj[]
@@ -58,12 +62,7 @@ export interface Doc extends Obj {
   mixin<T extends Obj>(doc: Doc, mixin: Ref<Mixin<T>>): T
 }
 
-export interface Type extends Obj { }
-
-export interface Attribute extends Struct {
-  label: IntlStringId
-  // type: Type
-}
+export interface Type extends Embedded { }
 
 export type Konstructor<T extends Obj> = new () => T
 
@@ -71,9 +70,7 @@ export interface Class<T extends Obj> extends Doc {
   label: IntlStringId
   konstructor?: Extension<Konstructor<T>>
   extends?: Ref<Class<Obj>>
-  attributes?: Bag<Attribute>
-
-  getExtendedAttributes(): Bag<Attribute>
+  attributes?: Bag<Type>
 }
 
 export interface Mixin<T extends Obj> extends Class<T> { }
@@ -86,6 +83,7 @@ export const pluginId = 'core'
 
 export default identify(pluginId, {
   class: {
+    Object: '' as Ref<Class<Obj>>,
     Class: '' as Ref<Class<Class<Obj>>>
   }
 })
