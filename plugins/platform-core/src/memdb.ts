@@ -15,7 +15,7 @@
 
 import { Session, Query } from './types'
 import { Obj, Doc, Ref, Bag, Class, PropertyType, Konstructor } from './types'
-import registry, { Extension } from './plugin'
+import registry, { Extension } from './extension'
 
 interface ObjLayout {
   _class: Ref<Class<Obj>>

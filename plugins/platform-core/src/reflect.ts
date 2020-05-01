@@ -65,6 +65,7 @@ export function Model<T extends E, E extends Obj>(_id: Ref<Class<T>>, options?: 
       attributes: getOrCreateMetadata(target.prototype)
     }
     Reflect.defineMetadata(metadataKey, clazz, target.prototype)
+    // registry.set(_id, target)
   }
 }
 
