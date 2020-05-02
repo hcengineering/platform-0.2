@@ -14,7 +14,7 @@
 */
 
 import platform, { Plugin, Extension } from './platform'
-import core, { pluginId, Obj, Doc, Ref, Class, Mixin, Session, Type, Konstructor, Bag } from './types'
+import core, { pluginId, Obj, Doc, Ref, Class, Mixin, Session, Type, Konstructor, Bag, Layout } from './types'
 import { model, loadConstructors } from './reflect'
 import { classLabelId } from './utils'
 
@@ -31,10 +31,10 @@ export class TObject implements Obj {
 @model.Class(core.class.Doc)
 export class TDoc extends TObject implements Doc {
   _id!: Ref<this>
-  _mixins?: Obj[]
+  _mixins?: Layout<Obj>[]
 
-  as<T extends Obj>(mixin: Ref<Mixin<T>>): T { return {} as T }
-  mixin<T extends Obj>(mixin: Ref<Mixin<T>>): T { return {} as T }
+  as<T extends this>(mixin: Ref<Mixin<T>>): T { return {} as T }
+  mixin<T extends this>(mixin: Ref<Mixin<T>>): T { return {} as T }
 }
 
 @model.Class(core.class.Class, core.class.Doc)

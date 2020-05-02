@@ -79,8 +79,7 @@ describe('session', () => {
   it('should mix object in', () => {
     const session = new MemSession(memdb)
     const mixin = session.mixin(core.class.Object, test.class.ToBeMixed)
-    console.log(mixin)
-    // expect(mixin.toIntlString()).toBe(test.class.ToBeMixed)
+    // console.log(mixin)
     expect(mixin._id).toBe(core.class.Object)
     expect(mixin._class).toBe(test.class.ToBeMixed)
     expect(mixin.getClass()._id).toBe(test.class.ToBeMixed)

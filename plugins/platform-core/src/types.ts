@@ -67,8 +67,8 @@ export interface Doc extends Obj {
   _id: Ref<this>
   _mixins?: Layout<Obj>[] // Hide?
 
-  as<T extends Obj>(mixin: Ref<Mixin<T>>): T
-  mixin<T extends Obj>(mixin: Ref<Mixin<T>>): T
+  as<T extends this>(mixin: Ref<Mixin<T>>): T
+  mixin<T extends this>(mixin: Ref<Mixin<T>>): T
 }
 
 export interface Type extends Embedded { }
