@@ -18,7 +18,7 @@ import { getClassMetadata, model, loadConstructors } from '../reflect'
 import { MemDb } from '../memdb'
 import { MemSession } from '../session'
 import corePlugin, { TObject, TDoc, TClass } from '..'
-import { identify } from '../extension'
+import platform from '../platform'
 
 corePlugin.start()
 
@@ -60,7 +60,7 @@ describe('session', () => {
     expect(objectClass.getClass()._id).toBe(core.class.Class)
   })
 
-  const test = identify('test', {
+  const test = platform.identify('test', {
     class: {
       ToBeMixed: '' as Ref<Class<ToBeMixed>>
     }

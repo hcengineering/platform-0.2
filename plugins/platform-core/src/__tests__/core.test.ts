@@ -19,9 +19,9 @@ import coreModel from '../__model__'
 
 import { MemDb } from '../memdb'
 import { MemSession } from '../session'
-import { loadStrings } from '../i18n'
+import platform from '../platform'
 
-loadStrings(coreModel.strings.ru)
+platform.loadStrings(coreModel.strings.ru)
 corePlugin.start()
 
 describe('core', () => {

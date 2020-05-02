@@ -13,9 +13,7 @@
 // limitations under the License.
 // 
 
-import { Session, Query } from './types'
-import core, { Obj, Doc, Ref, Bag, Class, PropertyType, Layout, Mixin } from './types'
-import registry, { Extension } from './extension'
+import { Obj, Doc, Ref, Bag, Class, PropertyType, Layout, Mixin } from './types'
 
 type ObjLayout = Layout<Obj>
 type DocLayout = Layout<Doc>

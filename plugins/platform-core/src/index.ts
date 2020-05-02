@@ -13,10 +13,9 @@
 // limitations under the License.
 */
 
-import { Plugin, Extension } from './extension'
+import platform, { Plugin, Extension } from './platform'
 import core, { pluginId, Obj, Doc, Ref, Class, Mixin, Session, Type, Konstructor, Bag } from './types'
 import { model, loadConstructors } from './reflect'
-import { translate } from './i18n'
 import { classLabelId } from './utils'
 
 @model.Class(core.class.Object)
@@ -44,7 +43,7 @@ export class TClass<T extends Obj> extends TDoc implements Class<T> {
   extends?: Ref<Class<Obj>>
   attributes?: Bag<Type>
 
-  toIntlString(plural?: number): string { return translate(classLabelId(this._id), { n: plural }) }
+  toIntlString(plural?: number): string { return platform.translate(classLabelId(this._id), { n: plural }) }
 }
 
 @model.Mixin(core.class.Mixin, core.class.Class)

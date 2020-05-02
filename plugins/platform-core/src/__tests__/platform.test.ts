@@ -13,32 +13,32 @@
 // limitations under the License.
 // 
 
-import { translate, loadStrings, IntlStringId } from '../i18n'
+import platform, { IntlStringId } from '../platform'
 
 describe('i18n', () => {
 
   it('should return original string', () => {
-    expect(translate('does not exists' as IntlStringId)).toBe('does not exists')
+    expect(platform.translate('does not exists' as IntlStringId)).toBe('does not exists')
   })
 
   it('should translate simple', () => {
-    loadStrings({
+    platform.loadStrings({
       idSimple: 'Русский'
     })
-    expect(translate('idSimple' as IntlStringId)).toBe('Русский')
+    expect(platform.translate('idSimple' as IntlStringId)).toBe('Русский')
   })
 
   it('should translate plurals', () => {
-    loadStrings({
+    platform.loadStrings({
       idPlural: '{count, plural, =1 {секунду} few {# секунды} many {# секунд} other {# секунду} } назад'
     })
     const message = 'idPlural' as IntlStringId
-    expect(translate(message, { count: 1 })).toBe('секунду назад')
-    expect(translate(message, { count: 2 })).toBe('2 секунды назад')
-    expect(translate(message, { count: 5 })).toBe('5 секунд назад')
-    expect(translate(message, { count: 11 })).toBe('11 секунд назад')
-    expect(translate(message, { count: 21 })).toBe('21 секунду назад')
-    expect(translate(message, { count: 22 })).toBe('22 секунды назад')
-    expect(translate(message, { count: 25 })).toBe('25 секунд назад')
+    expect(platform.translate(message, { count: 1 })).toBe('секунду назад')
+    expect(platform.translate(message, { count: 2 })).toBe('2 секунды назад')
+    expect(platform.translate(message, { count: 5 })).toBe('5 секунд назад')
+    expect(platform.translate(message, { count: 11 })).toBe('11 секунд назад')
+    expect(platform.translate(message, { count: 21 })).toBe('21 секунду назад')
+    expect(platform.translate(message, { count: 22 })).toBe('22 секунды назад')
+    expect(platform.translate(message, { count: 25 })).toBe('25 секунд назад')
   })
 })

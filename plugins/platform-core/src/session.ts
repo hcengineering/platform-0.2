@@ -15,7 +15,7 @@
 
 import { Session, Query } from './types'
 import core, { Obj, Doc, Ref, Bag, Class, PropertyType, Layout, Mixin } from './types'
-import registry, { Extension } from './extension'
+import platform, { Extension } from './platform'
 import { MemDb } from './memdb'
 
 function toHex(value: number, chars: number): string {
@@ -119,7 +119,7 @@ export class MemSession implements Session {
       const proto = Object.create(clazz === core.class.Object ? Object : this.getPrototype(extend))
 
       // copy properties
-      const source = registry.get(classInstance.konstructor).prototype
+      const source = platform.getExtension(classInstance.konstructor).prototype
       Object.getOwnPropertyNames(source).forEach(key => {
         const value = key === 'getSession' ? () => this : source[key]
         Object.defineProperty(proto, key, {

@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { IntlStringId } from '../i18n'
+import { IntlStringId } from '../platform'
 import { Ref, Class, Obj } from '../types'
 import { classLabelId } from '../utils'
 

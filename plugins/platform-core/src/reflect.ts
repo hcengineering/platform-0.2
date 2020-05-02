@@ -15,7 +15,7 @@
 
 import 'reflect-metadata'
 
-import registry, { Extension } from './extension'
+import platform, { Extension } from './platform'
 import core, { Class, Ref, Obj, Konstructor, Bag, Layout } from './types'
 
 const metadataKey = 'erp:model'
@@ -69,7 +69,7 @@ type Konstructors<T extends Bag<Ref<Class<Obj>>>> = {
 export function loadConstructors<T extends Bag<Ref<Class<Obj>>>>(ids: T, constructors: Partial<Konstructors<T>>) {
   for (const key in constructors) {
     const id = ids[key]
-    const konstructor = constructors[key]
-    registry.set(konstructorId(id), konstructor)
+    const konstructor = constructors[key] as Konstructor<Obj>
+    platform.setExtension(konstructorId(id), konstructor)
   }
 }

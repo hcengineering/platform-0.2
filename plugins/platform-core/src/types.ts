@@ -15,8 +15,7 @@
 
 import { KeysByType, AnyFunc } from 'simplytyped'
 
-import { IntlStringId } from './i18n'
-import { Extension, identify } from './extension'
+import platform, { Extension, IntlStringId } from './platform'
 
 export type PropertyType = undefined | Extension<any> | Ref<Doc> | IntlStringId | Embedded
   | { [key: string]: PropertyType }
@@ -91,7 +90,7 @@ export interface BusinessObject extends Doc {
 
 export const pluginId = 'core'
 
-export default identify(pluginId, {
+export default platform.identify(pluginId, {
   class: {
     Object: '' as Ref<Class<Obj>>,
     Doc: '' as Ref<Class<Doc>>,

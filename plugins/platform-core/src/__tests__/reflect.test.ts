@@ -15,9 +15,9 @@
 
 import { model, getClassMetadata, loadConstructors } from '../reflect'
 import { Class, Ref, Obj, Session } from '../types'
-import { identify } from '../extension'
+import platform from '../platform'
 
-const core = identify('test-reflect', {
+const core = platform.identify('test-reflect', {
   class: {
     Object: '' as Ref<Class<Obj>>,
     Class: '' as Ref<Class<Class<Obj>>>

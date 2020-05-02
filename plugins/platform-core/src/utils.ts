@@ -14,11 +14,9 @@
 //
 
 import { Ref, Obj, Class } from './types'
-import { IntlStringId } from './i18n'
-import { Extension } from './extension'
+import { IntlStringId, Extension } from './platform'
 
 export function classLabelId(clazz: Ref<Class<Obj>>): IntlStringId {
   return clazz as string as IntlStringId
 }
-
 
