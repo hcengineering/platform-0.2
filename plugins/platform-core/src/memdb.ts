@@ -14,7 +14,7 @@
 // 
 
 import { Session, Query } from './types'
-import core, { Obj, Doc, Ref, Bag, Class, PropertyType, Layout, Konstructor } from './types'
+import core, { Obj, Doc, Ref, Bag, Class, PropertyType, Layout, Mixin } from './types'
 import registry, { Extension } from './extension'
 
 type ObjLayout = Layout<Obj>
@@ -29,16 +29,6 @@ function filterEq(docs: Bag<PropertyType>[], propertyKey: string, value: Propert
     }
   }
   return result
-}
-
-function findAll(docs: DocLayout[], query: Partial<Doc>): DocLayout[] {
-  let result = docs as Bag<PropertyType>[]
-
-  for (const propertyKey in query) {
-    result = filterEq(result, propertyKey, (query as Bag<PropertyType>)[propertyKey])
-  }
-
-  return result as DocLayout[]
 }
 
 export class MemDb {
@@ -60,7 +50,7 @@ export class MemDb {
     return result
   }
 
-  getAllOfClass(clazz: Ref<Class<Doc>>): DocLayout[] {
+  private getAllOfClass(clazz: Ref<Class<Doc>>): DocLayout[] {
     let docs = this.byClass.get(clazz)
     if (!docs) {
       docs = []
@@ -70,7 +60,7 @@ export class MemDb {
   }
 
   private getClassLayout(clazz: Ref<Class<Obj>>): ClassLayout {
-    return this.objects.get(clazz) as ClassLayout
+    return this.get(clazz) as ClassLayout
   }
 
   private index(doc: DocLayout) {
@@ -81,6 +71,17 @@ export class MemDb {
     }
   }
 
+  findAll(clazz: Ref<Class<Doc>>, query: Partial<Doc>): DocLayout[] {
+    const docs = this.getAllOfClass(clazz)
+    let result = docs as Bag<PropertyType>[]
+
+    for (const propertyKey in query) {
+      result = filterEq(result, propertyKey, (query as Bag<PropertyType>)[propertyKey])
+    }
+
+    return result as DocLayout[]
+  }
+
   load(docs: DocLayout[]) {
     docs.forEach(doc => this.add(doc))
     docs.forEach(doc => this.index(doc))
@@ -88,85 +89,3 @@ export class MemDb {
 
 }
 
-////////////////////////////////
-
-class Instantiator implements ProxyHandler<ObjLayout> {
-  private memdb: MemSession
-
-  constructor(memdb: MemSession) {
-    this.memdb = memdb
-  }
-
-  get(target: ObjLayout, key: PropertyKey): any {
-    const value = Reflect.get(target, key)
-    if (!value) {
-      const proto = this.memdb.getPrototype(target._class)
-      return Reflect.get(proto, key, target)
-    }
-    if (typeof value === 'object' && value.hasOwnProperty('_class')) {
-      return new Proxy(value, this.memdb.instantiator)
-    }
-    return value
-  }
-}
-
-export class MemSession implements Session {
-
-  private memdb: MemDb
-  private prototypes = new Map<Ref<Class<Obj>>, Object>()
-  readonly instantiator: Instantiator
-
-  constructor(memdb: MemDb) {
-    this.memdb = memdb
-    this.instantiator = new Instantiator(this)
-  }
-
-  getPrototype(clazz: Ref<Class<Obj>>): Object {
-    const proto = this.prototypes.get(clazz)
-    if (proto) {
-      return proto
-    }
-    const classInstance = this.memdb.get(clazz) as ClassLayout
-    if (classInstance.konstructor) {
-      const extend = classInstance.extends ?? core.class.Object
-      const proto = Object.create(clazz === core.class.Object ? Object : this.getPrototype(extend))
-
-      // copy properties
-      const source = registry.get(classInstance.konstructor).prototype
-      Object.getOwnPropertyNames(source).forEach(key => {
-        const value = key === 'getSession' ? () => this : source[key]
-        Object.defineProperty(proto, key, {
-          value,
-          enumerable: true,
-          writable: false,
-          configurable: false
-        })
-      })
-
-      this.prototypes.set(clazz, proto)
-      return proto
-    }
-    throw new Error('TODO: no constructor for ' + clazz)
-  }
-
-  private instantiate(obj: ObjLayout): Obj {
-    return new Proxy(obj, this.instantiator) as unknown as Obj
-  }
-
-  getInstance<T extends Doc>(ref: Ref<T>): T {
-    return this.instantiate(this.memdb.get(ref)) as T
-  }
-
-  ////
-
-  find<T extends Doc>(clazz: Ref<Class<T>>, query: Query<T>): T[] {
-    const layouts = findAll(this.memdb.getAllOfClass(clazz), query)
-    return layouts.map(layout => this.instantiate(layout)) as T[]
-  }
-
-  findOne<T extends Doc>(clazz: Ref<Class<T>>, query: Query<T>): T | undefined {
-    const result = this.find(clazz, query)
-    return result.length > 0 ? result[0] : undefined
-  }
-
-}

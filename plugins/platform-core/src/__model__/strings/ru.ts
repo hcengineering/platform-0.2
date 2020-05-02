@@ -25,6 +25,9 @@ const translation = modelTranslation(core.class, {
   },
   Class: {
     $label: 'Класс'
+  },
+  Mixin: {
+    $label: 'Миксин'
   }
 })
 

@@ -15,11 +15,11 @@
 
 import { Plugin, Extension } from './extension'
 import core, { pluginId, Obj, Doc, Ref, Class, Mixin, Session, Type, Konstructor, Bag } from './types'
-import { Model, loadConstructors } from './reflect'
+import { model, loadConstructors } from './reflect'
 import { translate } from './i18n'
 import { classLabelId } from './utils'
 
-@Model(core.class.Object)
+@model.Class(core.class.Object)
 export class TObject implements Obj {
   _class!: Ref<Class<this>>
 
@@ -28,7 +28,7 @@ export class TObject implements Obj {
   toIntlString(plural?: number): string { return this.getClass().toIntlString(plural) }
 }
 
-@Model(core.class.Doc)
+@model.Class(core.class.Doc)
 export class TDoc extends TObject implements Doc {
   _id!: Ref<this>
   _mixins?: Obj[]
@@ -37,7 +37,7 @@ export class TDoc extends TObject implements Doc {
   mixin<T extends Obj>(doc: Doc, mixin: Ref<Mixin<T>>): T { return {} as T }
 }
 
-@Model(core.class.Class, core.class.Doc)
+@model.Class(core.class.Class, core.class.Doc)
 export class TClass<T extends Obj> extends TDoc implements Class<T> {
   // label!: IntlStringId
   konstructor?: Extension<Konstructor<T>>
@@ -47,10 +47,15 @@ export class TClass<T extends Obj> extends TDoc implements Class<T> {
   toIntlString(plural?: number): string { return translate(classLabelId(this._id), { n: plural }) }
 }
 
+@model.Mixin(core.class.Mixin, core.class.Class)
+export class TMixin<T extends Obj> extends TClass<T> implements Mixin<T> {
+}
+
 export default new Plugin(pluginId, () => {
   loadConstructors(core.class, {
     Object: TObject,
     Doc: TDoc,
-    Class: TClass
+    Class: TClass,
+    Mixin: TMixin,
   })
 })

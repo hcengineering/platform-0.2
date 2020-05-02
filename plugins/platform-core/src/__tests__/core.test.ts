@@ -17,7 +17,8 @@ import core from '../types'
 import corePlugin from '..'
 import coreModel from '../__model__'
 
-import { MemDb, MemSession } from '../memdb'
+import { MemDb } from '../memdb'
+import { MemSession } from '../session'
 import { loadStrings } from '../i18n'
 
 loadStrings(coreModel.strings.ru)

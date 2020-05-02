@@ -13,21 +13,22 @@
 // limitations under the License.
 //
 
-import core from '../types'
-
-import { getClassMetadata, Model } from '../reflect'
-import { MemDb, MemSession } from '../memdb'
+import core, { Ref, Class } from '../types'
+import { getClassMetadata, model } from '../reflect'
+import { MemDb } from '../memdb'
+import { MemSession } from '../session'
 import corePlugin, { TObject, TDoc, TClass } from '..'
+import { identify } from '../extension'
 
 corePlugin.start()
 
 describe('session', () => {
 
   const memdb = new MemDb()
+  const classes = getClassMetadata([TObject, TDoc, TClass])
+  memdb.load(classes)
 
   it('should load classes', () => {
-    const classes = getClassMetadata([TObject, TDoc, TClass])
-    memdb.load(classes)
     const object = memdb.get(core.class.Object)
     expect(object._id).toBe(core.class.Object)
     expect(object._class).toBe(core.class.Class)
@@ -58,5 +59,31 @@ describe('session', () => {
     expect(objectClass.getSession()).toBe(session)
     expect(objectClass.getClass()._id).toBe(core.class.Class)
   })
+
+  const test = identify('test', {
+    class: {
+      ToBeMixed: '' as Ref<Class<ToBeMixed>>
+    }
+  })
+
+  @model.Mixin(test.class.ToBeMixed, core.class.Object)
+  class ToBeMixed extends TObject {
+    dummy!: number
+  }
+
+  memdb.load(getClassMetadata([ToBeMixed]))
+
+  // it('should mix object in', () => {
+  //   const session = new MemSession(memdb)
+
+
+  //   const objectClass = session.getInstance(core.class.Object)
+  //   expect(objectClass._id).toBe(core.class.Object)
+  //   expect(typeof objectClass.toIntlString).toBe('function')
+  //   expect(typeof objectClass.getSession).toBe('function')
+
+  //   expect(objectClass.getSession()).toBe(session)
+  //   expect(objectClass.getClass()._id).toBe(core.class.Class)
+  // })
 
 })

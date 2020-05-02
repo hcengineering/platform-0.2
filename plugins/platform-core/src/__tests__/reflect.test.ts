@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Model, getClassMetadata, loadConstructors } from '../reflect'
+import { model, getClassMetadata, loadConstructors } from '../reflect'
 import { Class, Ref, Obj, Session } from '../types'
 import { identify } from '../extension'
 
@@ -24,7 +24,7 @@ const core = identify('test-reflect', {
   }
 })
 
-@Model(core.class.Object)
+@model.Class(core.class.Object)
 class TObject implements Obj {
   _class!: Ref<Class<this>>
 

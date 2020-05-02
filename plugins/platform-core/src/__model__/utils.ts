@@ -37,7 +37,7 @@ type Labels<T extends Obj> = {
 type ClassRefs = { [key: string]: Ref<Class<Obj>> }
 
 type RefsToLabels<T extends ClassRefs> = {
-  [P in keyof T]: T[P] extends Ref<Class<infer X>> ? Labels<X> : { [key: string]: string }
+  [P in keyof T]: T[P] extends Ref<Class<infer X>> ? Labels<X> : never
 }
 
 export function modelTranslation<T extends ClassRefs>(refs: T, translations: RefsToLabels<T>): Record<string, string> {

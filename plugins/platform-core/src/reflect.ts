@@ -16,19 +16,9 @@
 import 'reflect-metadata'
 
 import registry, { Extension } from './extension'
-import { IntlStringId } from './i18n'
-import core, { Class, Ref, Obj, Doc, Konstructor, Bag, Layout } from './types'
+import core, { Class, Ref, Obj, Konstructor, Bag, Layout } from './types'
 
 const metadataKey = 'erp:model'
-
-// function getOrCreateMetadata(target: any) {
-//   let clazz = Reflect.getOwnMetadata(metadataKey, target)
-//   if (!clazz) {
-//     clazz = {}
-//     Reflect.defineMetadata(metadataKey, clazz, target)
-//   }
-//   return clazz
-// }
 
 // interface ClassOptions<T extends Doc> {
 //   label?: IntlStringId
@@ -40,7 +30,7 @@ export function konstructorId<T extends Obj>(clazz: Ref<Class<T>>): Extension<Ko
   return id as Extension<Konstructor<T>>
 }
 
-export function Model<T extends E, E extends Obj>(_id: Ref<Class<T>>, extend?: Ref<Class<E>>, konstructor?: Extension<Konstructor<T>>) {
+function structuralDecorator<T extends E, E extends Obj>(kind: Ref<Class<Class<Obj>>>, _id: Ref<Class<T>>, extend?: Ref<Class<E>>, konstructor?: Extension<Konstructor<T>>) {
   return function (target: Konstructor<T>) {
     const clazz: Layout<Class<Obj>> = {
       _id,
@@ -54,6 +44,17 @@ export function Model<T extends E, E extends Obj>(_id: Ref<Class<T>>, extend?: R
     // registry.set(_id, target)
   }
 }
+
+export const model = {
+  Class<T extends E, E extends Obj>(_id: Ref<Class<T>>, extend?: Ref<Class<E>>, konstructor?: Extension<Konstructor<T>>) {
+    return structuralDecorator(core.class.Class, _id, extend, konstructor)
+  },
+  Mixin<T extends E, E extends Obj>(_id: Ref<Class<T>>, extend?: Ref<Class<E>>, konstructor?: Extension<Konstructor<T>>) {
+    return structuralDecorator(core.class.Mixin, _id, extend, konstructor)
+  },
+}
+
+/////
 
 export function getClassMetadata(konstructors: Konstructor<Obj>[]): Layout<Class<Obj>>[] {
   return konstructors.map(ctor => Reflect.getOwnMetadata(metadataKey, ctor))

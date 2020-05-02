@@ -38,9 +38,12 @@ export type Query<T extends Doc> = Partial<T>
 
 export interface Session {
   getInstance<T extends Doc>(ref: Ref<T>): T
+  newInstance<T extends Obj>(clazz: Ref<Class<T>>): T
 
   find<T extends Doc>(clazz: Ref<Class<T>>, query: Query<T>): T[]
   findOne<T extends Doc>(clazz: Ref<Class<T>>, query: Query<T>): T | undefined
+
+  mixin<T extends Obj>(doc: Doc, mixin: Ref<Mixin<T>>): T
 }
 
 // M E T A M O D E L
@@ -89,6 +92,7 @@ export default identify(pluginId, {
   class: {
     Object: '' as Ref<Class<Obj>>,
     Doc: '' as Ref<Class<Doc>>,
-    Class: '' as Ref<Class<Class<Obj>>>
+    Class: '' as Ref<Class<Class<Obj>>>,
+    Mixin: '' as Ref<Class<Mixin<Obj>>>,
   }
 })
