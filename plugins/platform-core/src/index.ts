@@ -34,7 +34,7 @@ export class TDoc extends TObject implements Doc {
   _mixins?: Obj[]
 
   as<T extends Obj>(mixin: Ref<Mixin<T>>): T { return {} as T }
-  mixin<T extends Obj>(doc: Doc, mixin: Ref<Mixin<T>>): T { return {} as T }
+  mixin<T extends Obj>(mixin: Ref<Mixin<T>>): T { return {} as T }
 }
 
 @model.Class(core.class.Class, core.class.Doc)

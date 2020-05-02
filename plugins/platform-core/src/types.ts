@@ -18,7 +18,10 @@ import { KeysByType, AnyFunc } from 'simplytyped'
 import { IntlStringId } from './i18n'
 import { Extension, identify } from './extension'
 
-export type PropertyType = undefined | Extension<any> | Ref<Doc> | IntlStringId | Embedded | { [key: string]: PropertyType }
+export type PropertyType = undefined | Extension<any> | Ref<Doc> | IntlStringId | Embedded
+  | { [key: string]: PropertyType }
+  | PropertyType[]
+
 // type MethodType = (...args: any[]) => any
 type DocId = string
 
@@ -43,7 +46,7 @@ export interface Session {
   find<T extends Doc>(clazz: Ref<Class<T>>, query: Query<T>): T[]
   findOne<T extends Doc>(clazz: Ref<Class<T>>, query: Query<T>): T | undefined
 
-  mixin<T extends Obj>(doc: Doc, mixin: Ref<Mixin<T>>): T
+  mixin<T extends Obj>(doc: Ref<Doc>, mixin: Ref<Mixin<T>>): T
 }
 
 // M E T A M O D E L
@@ -63,10 +66,10 @@ export interface Embedded extends Obj {
 
 export interface Doc extends Obj {
   _id: Ref<this>
-  _mixins?: Obj[]
+  _mixins?: Layout<Obj>[] // Hide?
 
   as<T extends Obj>(mixin: Ref<Mixin<T>>): T
-  mixin<T extends Obj>(doc: Doc, mixin: Ref<Mixin<T>>): T
+  mixin<T extends Obj>(mixin: Ref<Mixin<T>>): T
 }
 
 export interface Type extends Embedded { }

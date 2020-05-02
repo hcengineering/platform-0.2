@@ -14,7 +14,7 @@
 //
 
 import core, { Ref, Class } from '../types'
-import { getClassMetadata, model } from '../reflect'
+import { getClassMetadata, model, loadConstructors } from '../reflect'
 import { MemDb } from '../memdb'
 import { MemSession } from '../session'
 import corePlugin, { TObject, TDoc, TClass } from '..'
@@ -72,18 +72,15 @@ describe('session', () => {
   }
 
   memdb.load(getClassMetadata([ToBeMixed]))
+  loadConstructors(test.class, {
+    ToBeMixed
+  })
 
-  // it('should mix object in', () => {
-  //   const session = new MemSession(memdb)
-
-
-  //   const objectClass = session.getInstance(core.class.Object)
-  //   expect(objectClass._id).toBe(core.class.Object)
-  //   expect(typeof objectClass.toIntlString).toBe('function')
-  //   expect(typeof objectClass.getSession).toBe('function')
-
-  //   expect(objectClass.getSession()).toBe(session)
-  //   expect(objectClass.getClass()._id).toBe(core.class.Class)
-  // })
+  it('should mix object in', () => {
+    const session = new MemSession(memdb)
+    const mixin = session.mixin(core.class.Object, test.class.ToBeMixed)
+    console.log(mixin)
+    console.log(mixin.toIntlString())
+  })
 
 })

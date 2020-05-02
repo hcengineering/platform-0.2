@@ -45,23 +45,53 @@ function generateId(): string {
 
 ////////////////////////////////
 
-class Instantiator implements ProxyHandler<Layout<Obj>> {
+class InstanceProxy {
+  __layout: Layout<Obj>
+  __proto: Object
+
+  constructor(layout: Layout<Obj>, proto: Object) {
+    this.__layout = layout
+    this.__proto = proto
+  }
+}
+
+class InstanceProxyHandler implements ProxyHandler<InstanceProxy> {
   private memdb: MemSession
 
   constructor(memdb: MemSession) {
     this.memdb = memdb
   }
 
-  get(target: Layout<Obj>, key: PropertyKey): any {
-    const value = Reflect.get(target, key)
+  get(target: InstanceProxy, key: PropertyKey): any {
+    const value = Reflect.get(target.__layout, key)
     if (!value) {
-      const proto = this.memdb.getPrototype(target._class)
-      return Reflect.get(proto, key, target)
+      return Reflect.get(target.__proto, key, target)
     }
     if (typeof value === 'object' && value.hasOwnProperty('_class')) {
-      return new Proxy(value, this.memdb.instantiator)
+      return this.memdb.instantiate(value)
     }
     return value
+  }
+}
+
+class MixinProxy extends InstanceProxy {
+  __attached: InstanceProxy
+
+  constructor(layout: Layout<Obj>, proto: Object, attached: InstanceProxy) {
+    super(layout, proto)
+    this.__attached = attached
+  }
+}
+
+class MixinProxyHandler extends InstanceProxyHandler implements ProxyHandler<MixinProxy> {
+
+  constructor(memdb: MemSession) {
+    super(memdb)
+  }
+
+  get(target: MixinProxy, key: PropertyKey): any {
+    const value = super.get(target, key)
+    return value ?? super.get(target.__attached, key)
   }
 }
 
@@ -69,11 +99,13 @@ export class MemSession implements Session {
 
   private memdb: MemDb
   private prototypes = new Map<Ref<Class<Obj>>, Object>()
-  readonly instantiator: Instantiator
+  readonly instanceProxy: InstanceProxyHandler
+  readonly mixinProxy: MixinProxyHandler
 
   constructor(memdb: MemDb) {
     this.memdb = memdb
-    this.instantiator = new Instantiator(this)
+    this.instanceProxy = new InstanceProxyHandler(this)
+    this.mixinProxy = new MixinProxyHandler(this)
   }
 
   getPrototype(clazz: Ref<Class<Obj>>): Object {
@@ -104,8 +136,13 @@ export class MemSession implements Session {
     throw new Error('TODO: no constructor for ' + clazz)
   }
 
-  private instantiate(obj: Layout<Obj>): Obj {
-    return new Proxy(obj, this.instantiator) as unknown as Obj
+  private newLayout<T extends Obj>(_class: Ref<Class<T>>): Layout<Obj> {
+    return { _class }
+  }
+
+  instantiate(obj: Layout<Obj>): Obj {
+    const proxy = new InstanceProxy(obj, this.getPrototype(obj._class))
+    return new Proxy(proxy, this.instanceProxy) as unknown as Obj
   }
 
   getInstance<T extends Doc>(ref: Ref<T>): T {
@@ -128,14 +165,19 @@ export class MemSession implements Session {
     return result.length > 0 ? result[0] : undefined
   }
 
-  mixin<T extends Obj>(doc: Doc, mixin: Ref<Mixin<T>>): T {
-    throw new Error('not implemented')
-    // const layout = this.memdb.get(doc._id)
-    // let mixins = layout._mixins
-    // if (!mixins) {
-    //   mixins = []
-    //   layout._mixins = mixins
-    // }
+  mixin<T extends Obj>(doc: Ref<Doc>, mixinClass: Ref<Mixin<T>>): T {
+    const layout = this.memdb.get(doc)
+    let mixins = layout._mixins // TODO: hide _mixin or make Layout recursive
+    if (!mixins) {
+      mixins = []
+      layout._mixins = mixins
+    }
+    const mixin = this.newLayout(mixinClass)
+    mixins.push(mixin)
+
+    const instanace = new InstanceProxy(layout, this.getPrototype(layout._class))
+    const proxy = new MixinProxy(mixin, this.getPrototype(mixin._class), instanace)
+    return new Proxy(proxy, this.mixinProxy) as unknown as T
   }
 
 }
