@@ -62,10 +62,14 @@ class InstanceProxyHandler implements ProxyHandler<InstanceProxy> {
     this.memdb = memdb
   }
 
-  get(target: InstanceProxy, key: PropertyKey): any {
-    const value = Reflect.get(target.__layout, key)
+  protected getFromLayout(target: InstanceProxy, key: PropertyKey, receiver: any) {
+    return Reflect.get(target.__layout, key, receiver)
+  }
+
+  get(target: InstanceProxy, key: PropertyKey, receiver: any): any {
+    const value = this.getFromLayout(target, key, receiver)
     if (!value) {
-      return Reflect.get(target.__proto, key, target)
+      return Reflect.get(target.__proto, key, receiver)
     }
     if (typeof value === 'object' && value.hasOwnProperty('_class')) {
       return this.memdb.instantiate(value)
@@ -75,11 +79,11 @@ class InstanceProxyHandler implements ProxyHandler<InstanceProxy> {
 }
 
 class MixinProxy extends InstanceProxy {
-  __attached: InstanceProxy
+  __instance: Layout<Obj>
 
-  constructor(layout: Layout<Obj>, proto: Object, attached: InstanceProxy) {
+  constructor(layout: Layout<Obj>, proto: Object, instance: Layout<Obj>) {
     super(layout, proto)
-    this.__attached = attached
+    this.__instance = instance
   }
 }
 
@@ -89,9 +93,9 @@ class MixinProxyHandler extends InstanceProxyHandler implements ProxyHandler<Mix
     super(memdb)
   }
 
-  get(target: MixinProxy, key: PropertyKey): any {
-    const value = super.get(target, key)
-    return value ?? super.get(target.__attached, key)
+  protected getFromLayout(target: MixinProxy, key: PropertyKey, receiver: any) {
+    return super.getFromLayout(target, key, receiver) ??
+      Reflect.get(target.__instance, key, receiver)
   }
 }
 
@@ -175,8 +179,7 @@ export class MemSession implements Session {
     const mixin = this.newLayout(mixinClass)
     mixins.push(mixin)
 
-    const instanace = new InstanceProxy(layout, this.getPrototype(layout._class))
-    const proxy = new MixinProxy(mixin, this.getPrototype(mixin._class), instanace)
+    const proxy = new MixinProxy(mixin, this.getPrototype(mixin._class), layout)
     return new Proxy(proxy, this.mixinProxy) as unknown as T
   }
 

@@ -41,7 +41,7 @@ describe('core', () => {
     const classClass = session.getInstance(core.class.Class)
     expect(objectClass.getSession()).toBe(session)
     expect(objectClass.getClass()._id).toBe(classClass._id)
-    expect(objectClass.toIntlString()).toBe('Объект')
+    expect(objectClass.toIntlString()).toBe('Класс')
   })
 
 })

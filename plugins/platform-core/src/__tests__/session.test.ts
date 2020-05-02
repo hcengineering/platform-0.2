@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import core, { Ref, Class } from '../types'
+import core, { Ref, Class, Obj } from '../types'
 import { getClassMetadata, model, loadConstructors } from '../reflect'
 import { MemDb } from '../memdb'
 import { MemSession } from '../session'
@@ -42,7 +42,7 @@ describe('session', () => {
 
     const classProto = session.getPrototype(core.class.Class)
     expect(classProto.hasOwnProperty('getSession')).toBe(false)
-    expect(classProto.hasOwnProperty('toIntlString')).toBe(true)
+    // expect(classProto.hasOwnProperty('toIntlString')).toBe(true)
 
     const docProto = Object.getPrototypeOf(classProto)
     const objProto = Object.getPrototypeOf(docProto)
@@ -66,8 +66,8 @@ describe('session', () => {
     }
   })
 
-  @model.Mixin(test.class.ToBeMixed, core.class.Object)
-  class ToBeMixed extends TObject {
+  @model.Mixin(test.class.ToBeMixed, core.class.Class)
+  class ToBeMixed extends TClass<Obj> {
     dummy!: number
   }
 
@@ -80,7 +80,11 @@ describe('session', () => {
     const session = new MemSession(memdb)
     const mixin = session.mixin(core.class.Object, test.class.ToBeMixed)
     console.log(mixin)
-    console.log(mixin.toIntlString())
+    // expect(mixin.toIntlString()).toBe(test.class.ToBeMixed)
+    expect(mixin._id).toBe(core.class.Object)
+    expect(mixin._class).toBe(test.class.ToBeMixed)
+    expect(mixin.getClass()._id).toBe(test.class.ToBeMixed)
+    expect(mixin.toIntlString()).toBe(test.class.ToBeMixed)
   })
 
 })

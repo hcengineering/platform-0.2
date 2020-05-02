@@ -24,7 +24,8 @@ export class TObject implements Obj {
 
   getSession(): Session { throw new Error('object not attached to a session') }
   getClass(): Class<this> { return this.getSession().getInstance(this._class) }
-  toIntlString(plural?: number): string { return this.getClass().toIntlString(plural) }
+  // toIntlString(plural?: number): string { return this.getClass().toIntlString(plural) }
+  toIntlString(plural?: number): string { return platform.translate(classLabelId(this._class), { n: plural }) }
 }
 
 @model.Class(core.class.Doc)
@@ -43,7 +44,7 @@ export class TClass<T extends Obj> extends TDoc implements Class<T> {
   extends?: Ref<Class<Obj>>
   attributes?: Bag<Type>
 
-  toIntlString(plural?: number): string { return platform.translate(classLabelId(this._id), { n: plural }) }
+  // toIntlString(plural?: number): string { return platform.translate(classLabelId(this._id), { n: plural }) }
 }
 
 @model.Mixin(core.class.Mixin, core.class.Class)
