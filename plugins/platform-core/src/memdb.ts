@@ -13,9 +13,8 @@
 // limitations under the License.
 // 
 
-import { Obj, Doc, Ref, Class, PropertyType, Layout, Mixin } from './types'
+import { Obj, Doc, Ref, Class, PropertyType, Layout } from './types'
 
-type ObjLayout = Layout<Obj>
 type DocLayout = Layout<Doc>
 type ClassLayout = Layout<Class<Obj>>
 

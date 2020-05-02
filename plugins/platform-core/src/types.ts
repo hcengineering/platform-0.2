@@ -46,7 +46,7 @@ export interface Session {
   find<T extends Doc>(clazz: Ref<Class<T>>, query: Query<T>): T[]
   findOne<T extends Doc>(clazz: Ref<Class<T>>, query: Query<T>): T | undefined
 
-  mixin<T extends Obj>(doc: Ref<Doc>, mixin: Ref<Mixin<T>>): T
+  mixin<T extends Doc, E extends T>(doc: Ref<T>, mixin: Ref<Mixin<E>>): E
 }
 
 // M E T A M O D E L

@@ -34,7 +34,7 @@ export class TDoc extends TObject implements Doc {
   _mixins?: Layout<Obj>[]
 
   as<T extends this>(mixin: Ref<Mixin<T>>): T { return {} as T }
-  mixin<T extends this>(mixin: Ref<Mixin<T>>): T { return {} as T }
+  mixin<T extends this>(mixin: Ref<Mixin<T>>): T { return this.getSession().mixin(this._id, mixin) }
 }
 
 @model.Class(core.class.Class, core.class.Doc)

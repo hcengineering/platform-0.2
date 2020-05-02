@@ -169,7 +169,7 @@ export class MemSession implements Session {
     return result.length > 0 ? result[0] : undefined
   }
 
-  mixin<T extends Obj>(doc: Ref<Doc>, mixinClass: Ref<Mixin<T>>): T {
+  mixin<T extends Doc, E extends T>(doc: Ref<T>, mixinClass: Ref<Mixin<E>>): E {
     const layout = this.memdb.get(doc)
     let mixins = layout._mixins // TODO: hide _mixin or make Layout recursive
     if (!mixins) {
@@ -180,7 +180,7 @@ export class MemSession implements Session {
     mixins.push(mixin)
 
     const proxy = new MixinProxy(mixin, this.getPrototype(mixin._class), layout)
-    return new Proxy(proxy, this.mixinProxy) as unknown as T
+    return new Proxy(proxy, this.mixinProxy) as unknown as E
   }
 
 }
