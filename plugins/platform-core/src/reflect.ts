@@ -13,12 +13,8 @@
 // limitations under the License.
 // 
 
-import 'reflect-metadata'
-
 import platform, { Extension } from './platform'
-import core, { Class, Ref, Obj, Konstructor, Bag, Layout } from './types'
-
-const metadataKey = 'erp:model'
+import core, { Class, Ref, Obj, Konstructor, Layout } from './types'
 
 // interface ClassOptions<T extends Doc> {
 //   label?: IntlStringId
@@ -38,9 +34,10 @@ function structuralDecorator<T extends E, E extends Obj>(kind: Ref<Class<Class<O
       // label: options?.label ?? _id as string as IntlStringId,
       extends: extend,
       konstructor: konstructor ?? konstructorId(_id),
-      attributes: Reflect.getOwnMetadata(metadataKey, target)
+      attributes: platform.getMetadata(target)
     }
-    Reflect.defineMetadata(metadataKey, clazz, target)
+    platform.setMetadata(target, clazz)
+    // Reflect.defineMetadata(metadataKey, clazz, target)
     // registry.set(_id, target)
   }
 }
@@ -57,7 +54,7 @@ export const model = {
 /////
 
 export function getClassMetadata(konstructors: Konstructor<Obj>[]): Layout<Class<Obj>>[] {
-  return konstructors.map(ctor => Reflect.getOwnMetadata(metadataKey, ctor))
+  return konstructors.map(ctor => platform.getMetadata(ctor))
 }
 
 ///////

@@ -52,6 +52,8 @@ class Platform {
 
   private strings: Map<IntlStringId, string> = new Map()
   private imfCache: Map<IntlStringId, IntlMessageFormat> = new Map()
+  private extensions = new Map<string, any>()
+  private metadata = new Map<object, any>()
 
   private COMPRESS_IDS = false
 
@@ -68,6 +70,16 @@ class Platform {
 
   identify<N extends Namespace>(pluginId: string, namespace: N): N {
     return transform(pluginId, namespace, (id: string, value) => value === '' ? this.compressId(id) : value)
+  }
+
+  /////////////////
+
+  setMetadata(object: object, metadata: any) {
+    this.metadata.set(object, metadata)
+  }
+
+  getMetadata(object: object) {
+    return this.metadata.get(object)
   }
 
   /////////////////
@@ -95,8 +107,6 @@ class Platform {
   }
 
   /////////////////
-
-  private extensions = new Map<string, any>()
 
   setExtension<T>(id: Extension<T>, object: T): void {
     this.extensions.set(id, object)
