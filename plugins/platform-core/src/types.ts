@@ -18,13 +18,14 @@ import { KeysByType, AnyFunc } from 'simplytyped'
 import platform, { Extension, IntlStringId } from './platform'
 
 export type PropertyType = undefined | Extension<any> | Ref<Doc> | IntlStringId | Embedded
-  | { [key: string]: PropertyType }
+  | { __bag: void } //{ [key: string]: PropertyType }
   | PropertyType[]
+// | Bag<PropertyType>
 
 // type MethodType = (...args: any[]) => any
 type DocId = string
 
-export interface Bag<T extends PropertyType> { [key: string]: T }
+export type Bag<T extends PropertyType> = { [key: string]: T } & { __bag: void }
 export type Ref<T extends Doc> = DocId & { __ref: T }
 
 export type Layout<T extends Obj> = Omit<T, KeysByType<T, AnyFunc>>
@@ -60,7 +61,7 @@ export interface Obj {
 }
 
 export interface Embedded extends Obj {
-  __embedded?: void
+  __embedded: void
 }
 
 export interface Doc extends Obj {

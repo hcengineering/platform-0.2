@@ -13,13 +13,13 @@
 // limitations under the License.
 // 
 
-import { Obj, Doc, Ref, Bag, Class, PropertyType, Layout, Mixin } from './types'
+import { Obj, Doc, Ref, Class, PropertyType, Layout, Mixin } from './types'
 
 type ObjLayout = Layout<Obj>
 type DocLayout = Layout<Doc>
 type ClassLayout = Layout<Class<Obj>>
 
-function filterEq(docs: Bag<PropertyType>[], propertyKey: string, value: PropertyType): Bag<PropertyType>[] {
+function filterEq(docs: Record<string, PropertyType>[], propertyKey: string, value: PropertyType): Record<string, PropertyType>[] {
   const result = []
   for (const doc of docs) {
     if (value === doc[propertyKey]) {
@@ -71,10 +71,10 @@ export class MemDb {
 
   findAll(clazz: Ref<Class<Doc>>, query: Partial<Doc>): DocLayout[] {
     const docs = this.getAllOfClass(clazz)
-    let result = docs as Bag<PropertyType>[]
+    let result = docs as Record<string, PropertyType>[]
 
     for (const propertyKey in query) {
-      result = filterEq(result, propertyKey, (query as Bag<PropertyType>)[propertyKey])
+      result = filterEq(result, propertyKey, (query as Record<string, PropertyType>)[propertyKey])
     }
 
     return result as DocLayout[]

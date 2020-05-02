@@ -62,11 +62,13 @@ export function getClassMetadata(konstructors: Konstructor<Obj>[]): Layout<Class
 
 ///////
 
-type Konstructors<T extends Bag<Ref<Class<Obj>>>> = {
+type ClassRefs = Record<string, Ref<Class<Obj>>>
+
+type Konstructors<T extends ClassRefs> = {
   [P in keyof T]: T[P] extends Ref<Class<infer X>> ? Konstructor<X> : never
 }
 
-export function loadConstructors<T extends Bag<Ref<Class<Obj>>>>(ids: T, constructors: Partial<Konstructors<T>>) {
+export function loadConstructors<T extends ClassRefs>(ids: T, constructors: Partial<Konstructors<T>>) {
   for (const key in constructors) {
     const id = ids[key]
     const konstructor = constructors[key] as Konstructor<Obj>
