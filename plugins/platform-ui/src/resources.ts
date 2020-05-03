@@ -18,8 +18,12 @@ import { Platform } from '@anticrm/platform-core/src/platform'
 import ui from './types'
 
 export default (platform: Platform) => {
-  const icons = require('../assets/icons.svg')
+  const spritesUrl = require('../assets/icons.svg')
   platform.loadResources(ui.resource, {
-    Icons: icons,
+    AddGroup: spritesUrl + '#add-group',
+    Add: spritesUrl + '#add',
+    Checked: spritesUrl + '#checked',
+    Edit: spritesUrl + '#edit',
+    Search: spritesUrl + '#search',
   })
 }
