@@ -13,7 +13,9 @@
 // limitations under the License.
 // 
 
-import platform, { IntlString } from '../platform'
+import { IntlString, Platform } from '../platform'
+
+const platform = new Platform()
 
 describe('platform', () => {
 

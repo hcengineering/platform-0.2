@@ -19,9 +19,11 @@ import { MemDb } from '../memdb'
 import { MemSession } from '../session'
 import coreModel from '../__model__'
 import corePlugin from '..'
-import platform from '../platform'
 
-corePlugin.start()
+import { Platform } from '../platform'
+
+const platform = new Platform()
+corePlugin.start(platform)
 
 describe('session', () => {
 

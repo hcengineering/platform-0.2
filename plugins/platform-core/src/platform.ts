@@ -19,59 +19,19 @@ export type AnyFunc = (...args: any[]) => any
 export type IntlString = string & { __intl_string: void }
 export type Extension<T> = string & { __extension: T }
 
-type Namespace = { [key: string]: { [key: string]: any } }
 type Extend<X extends { [key: string]: any }> = { [P in keyof X]: Extension<X[P]> }
 
-function transform<N extends Namespace>(prefix: string, namespaces: N, f: (id: string, value: any) => any): N {
-  const result = {} as Namespace
-  for (const namespace in namespaces) {
-    const extensions = namespaces[namespace]
-    const transformed = {} as { [key: string]: any }
-    for (const key in extensions) {
-      transformed[key] = f(prefix + '.' + namespace + '.' + key, extensions[key])
-    }
-    result[namespace] = transformed
-  }
-  return result as N
-}
+// interface Plugin {
+//   pluginId: string
+//   start: (platform: Platform) => void
+// }
 
-export class Plugin {
-  readonly id: string
-  private extensions: () => void
-
-  constructor(id: string, extensions: () => void) {
-    this.id = id
-    this.extensions = extensions
-  }
-
-  start(): void {
-    this.extensions()
-  }
-}
-
-class Platform {
+export class Platform {
 
   private strings: Map<IntlString, string> = new Map()
   private imfCache: Map<IntlString, IntlMessageFormat> = new Map()
   private extensions = new Map<string, any>()
   // private metadata = new Map<object, any>()
-
-  private COMPRESS_IDS = false
-
-  private compressId(id: string): string {
-    if (this.COMPRESS_IDS) {
-      let h = 0
-      for (let i = 0; i < id.length; i++)
-        h = Math.imul(17, h) + id.charCodeAt(i) | 0
-
-      return Math.abs(h).toString(36)
-    }
-    return id
-  }
-
-  identify<N extends Namespace>(pluginId: string, namespace: N): N {
-    return transform(pluginId, namespace, (id: string, value) => value === '' ? this.compressId(id) : value)
-  }
 
   /////////////////
 
@@ -137,5 +97,3 @@ class Platform {
   }
 
 }
-
-export default new Platform()

@@ -13,24 +13,27 @@
 // limitations under the License.
 */
 
-import platform, { Plugin } from './platform'
+import { Platform } from './platform'
 import core, { pluginId, Instance, Obj, Class } from './types'
 import { classLabelId } from './utils'
 
-function Obj_toIntlString(this: Instance<Obj>, plural?: number): string {
-  const m = this.getClass().toIntlString // temp
-  if (m)
-    return platform.invoke(this, m, plural)
-  return 'todo'
-}
+export default {
+  pluginId,
+  start(platform: Platform) {
+    function Obj_toIntlString(this: Instance<Obj>, plural?: number): string {
+      const m = this.getClass().toIntlString // temp
+      if (m)
+        return platform.invoke(this, m, plural)
+      return 'todo'
+    }
 
-function Class_toIntlString(this: Instance<Class<Obj>>, plural?: number): string {
-  return platform.translate(classLabelId(this._id), { n: plural })
-}
+    function Class_toIntlString(this: Instance<Class<Obj>>, plural?: number): string {
+      return platform.translate(classLabelId(this._id), { n: plural })
+    }
 
-export default new Plugin(pluginId, () => {
-  platform.loadExtensions(core.method, {
-    Obj_toIntlString,
-    Class_toIntlString
-  })
-})
+    platform.loadExtensions(core.method, {
+      Obj_toIntlString,
+      Class_toIntlString
+    })
+  }
+}

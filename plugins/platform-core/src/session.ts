@@ -15,7 +15,6 @@
 
 import { Session, Query } from './types'
 import core, { Obj, Doc, Ref, Bag, Class, PropertyType, Mixin, Instance, InstanceIntf } from './types'
-import platform, { Extension } from './platform'
 import { MemDb } from './memdb'
 
 function toHex(value: number, chars: number): string {

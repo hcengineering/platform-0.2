@@ -14,10 +14,11 @@
 //
 
 import core, { pluginId, Ref, Class, Doc, Obj, Mixin, Type, PropertyType, RefTo, BagOf, InstanceOf, Embedded } from '../types'
-import platform, { IntlString, Extension } from '../platform'
+import { IntlString, Extension } from '../platform'
 import { mergeIds } from './utils'
+import id from '../id'
 
-export default mergeIds(core, platform.identify(pluginId, {
+export default mergeIds(core, id(pluginId, {
   class: {
     Doc: '' as Ref<Class<Doc>>,
     Mixin: '' as Ref<Class<Mixin<Doc>>>,

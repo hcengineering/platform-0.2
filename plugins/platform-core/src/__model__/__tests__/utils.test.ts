@@ -13,11 +13,12 @@
 // limitations under the License.
 //
 
-import platform, { IntlString } from '../../platform'
+import { IntlString } from '../../platform'
 import { Ref, Class, Obj } from '../../types'
 import { verifyTranslation, modelTranslation } from '../utils'
+import id from '../../id'
 
-const ids = platform.identify('test', {
+const ids = id('test', {
   strings: {
     MyString: '' as IntlString
   },
