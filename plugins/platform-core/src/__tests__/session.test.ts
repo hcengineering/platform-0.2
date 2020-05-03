@@ -18,7 +18,7 @@ import core, { Ref, Class, Obj } from '../types'
 import { MemDb } from '../memdb'
 import { MemSession } from '../session'
 import coreModel from '../__model__'
-import corePlugin from '..'
+import corePlugin from '../plugin'
 
 import { Platform } from '../platform'
 

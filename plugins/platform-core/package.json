@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Anticrm Platform Core",
   "private": true,
-  "main": "./src/index.ts",
+  "main": "./src/types.ts",
   "scripts": {
     "test": "jest",
     "docs": "typedoc"
