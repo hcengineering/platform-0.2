@@ -59,6 +59,8 @@ describe('session', () => {
     expect(objectClass._id).toBe(core.class.Object)
     expect(typeof objectClass.getSession).toBe('function')
     expect(objectClass.getSession() === session).toBe(true)
+    expect(typeof objectClass.getClass).toBe('function')
+    expect(objectClass.getClass()._id).toBe(core.class.Class)
 
     const method = objectClass.toIntlString // temp
     if (method) {

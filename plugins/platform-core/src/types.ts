@@ -28,10 +28,13 @@ export type Bag<T extends PropertyType> = { [key: string]: T } //& { __bag: void
 export type Ref<T extends Doc> = DocId & { __ref: T }
 
 // export type Layout<T extends Obj> = Omit<T, KeysByType<T, AnyFunc>>
-export type Instance<T extends Obj> = T & {
+
+export interface InstanceIntf<T extends Obj> {
   getSession(): Session
-  getClass(): Class<T>
+  getClass(): Instance<Class<T>>
 }
+
+export type Instance<T extends Obj> = T & InstanceIntf<T>
 
 // S E R I A L I Z E D
 
@@ -45,7 +48,7 @@ export type Method<T extends AnyFunc> = Extension<T> & { __method: T }
 export type Query<T extends Doc> = Partial<T>
 
 export interface Session {
-  getInstance<T extends Doc>(ref: Ref<T>): T
+  getInstance<T extends Doc>(ref: Ref<T>): Instance<T>
   newInstance<T extends Obj>(clazz: Ref<Class<T>>): T
 
   find<T extends Doc>(clazz: Ref<Class<T>>, query: Query<T>): T[]

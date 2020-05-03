@@ -14,7 +14,7 @@
 //
 
 import { Session, Query } from './types'
-import core, { Obj, Doc, Ref, Bag, Class, PropertyType, Mixin, Instance } from './types'
+import core, { Obj, Doc, Ref, Bag, Class, PropertyType, Mixin, Instance, InstanceIntf } from './types'
 import platform, { Extension } from './platform'
 import { MemDb } from './memdb'
 
@@ -99,6 +99,13 @@ class MixinProxyHandler extends InstanceProxyHandler implements ProxyHandler<Mix
   }
 }
 
+function createRootPrototype(session: Session): InstanceIntf<Obj> {
+  return {
+    getSession() { return session },
+    getClass(this: Instance<Obj>) { return this.getSession().getInstance(this._class) }
+  }
+}
+
 export class MemSession implements Session {
 
   private memdb: MemDb
@@ -120,7 +127,7 @@ export class MemSession implements Session {
       const classInstance = this.memdb.get(clazz) as Class<Obj>
       const extend = classInstance.extends ?? core.class.Object
       const proto = clazz === core.class.Object ?
-        { getSession: () => this } :
+        createRootPrototype(this) :
         Object.create(this.getPrototype(extend))
       for (const key in classInstance.attributes) {
         const attribute = classInstance.attributes[key]
