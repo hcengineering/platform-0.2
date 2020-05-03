@@ -2,6 +2,7 @@
   "name": "root",
   "private": true,
   "workspaces": [
-    "plugins/*"
+    "plugins/*",
+    "dev/*"
   ]
 }

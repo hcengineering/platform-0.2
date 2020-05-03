@@ -20,11 +20,11 @@
     "@types/lodash": "^4.14.150",
     "babel-jest": "^25.5.1",
     "jest": "^25.5.2",
+    "lodash": "^4.17.15",
     "typescript": "^3.8.3"
   },
   "dependencies": {
     "intl-messageformat": "^8.3.9",
-    "lodash": "^4.17.15",
     "simplytyped": "^3.3.0"
   }
 }
