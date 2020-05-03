@@ -1,4 +1,4 @@
-<!--
+//
 // Copyright © 2020 Andrey Platov <andrey.v.platov@gmail.com>
 // 
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
@@ -11,27 +11,11 @@
 // 
 // See the License for the specific language governing permissions and
 // limitations under the License.
--->
+//
 
-<script lang="ts">
-import Vue from 'vue'
+import { addons } from '@storybook/addons'
+import { themes } from '@storybook/theming'
 
-export default Vue.extend({})
-</script>
-
-<template>
-  <div class="storybook-theme">
-    <slot />
-  </div>
-</template>
-
-<style lang="scss">
-@import "~@anticrm/sparkling-theme/css/_globals.scss";
-
-.storybook-theme {
-  padding: 16px;
-  background-color: $content-bg-color;
-
-  @include root-style;
-}
-</style>
+addons.setConfig({
+  theme: themes.dark,
+})
