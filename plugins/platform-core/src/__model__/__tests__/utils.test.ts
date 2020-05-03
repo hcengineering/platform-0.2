@@ -13,9 +13,9 @@
 // limitations under the License.
 //
 
-import platform, { IntlString } from '../platform'
-import { Ref, Class, Obj } from '../types'
-import { verifyTranslation, modelTranslation } from '../__model__/utils'
+import platform, { IntlString } from '../../platform'
+import { Ref, Class, Obj } from '../../types'
+import { verifyTranslation, modelTranslation } from '../utils'
 
 const ids = platform.identify('test', {
   strings: {
