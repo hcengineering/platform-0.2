@@ -1,7 +1,7 @@
 {
-  "name": "@anticrm/sparkling-controls",
+  "name": "@anticrm/platform-ui",
   "version": "0.1.0",
-  "description": "Sparkling Design System Controls",
+  "description": "AntiCRM Platform UI",
   "author": "Andrey Platov <andrey.v.platov@gmail.com>",
   "license": "EPL-2.0"
 }

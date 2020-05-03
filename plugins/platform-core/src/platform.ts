@@ -15,10 +15,9 @@
 
 import { IntlMessageFormat, PrimitiveType } from 'intl-messageformat'
 
-export type AnyFunc = (...args: any[]) => any
-export type IntlString = string & { __intl_string: void }
-export type Extension<T> = string & { __extension: T }
+import { Extension, IntlString, AnyFunc, Resource } from './extension'
 
+type ClearType<X extends { [key: string]: Resource }> = { [P in keyof X]: string }
 type Extend<X extends { [key: string]: any }> = { [P in keyof X]: Extension<X[P]> }
 
 // interface Plugin {
@@ -31,17 +30,7 @@ export class Platform {
   private strings: Map<IntlString, string> = new Map()
   private imfCache: Map<IntlString, IntlMessageFormat> = new Map()
   private extensions = new Map<string, any>()
-  // private metadata = new Map<object, any>()
-
-  /////////////////
-
-  // setMetadata(object: object, metadata: any) {
-  //   this.metadata.set(object, metadata)
-  // }
-
-  // getMetadata(object: object) {
-  //   return this.metadata.get(object)
-  // }
+  private resources = new Map<Resource, string>()
 
   /////////////////
 
@@ -69,7 +58,28 @@ export class Platform {
 
   /////////////////
 
-  setExtension<T>(id: Extension<T>, object: T): void {
+  getResource<T>(resource: Resource): string {
+    const result = this.resources.get(resource)
+    if (!result) {
+      throw new Error('resource not found: ' + resource)
+    }
+    return result
+  }
+
+  loadResources<T extends { [key: string]: Resource }>(ids: T, resources: ClearType<T>) {
+    for (const key in ids) {
+      const id = ids[key]
+      const resource = resources[key]
+      if (!resource) {
+        throw new Error(`no resource provided, key: ${key}, id: ${id}`)
+      }
+      this.resources.set(id, resource)
+    }
+  }
+
+  /////////////////
+
+  private setExtension<T>(id: Extension<T>, object: T): void {
     this.extensions.set(id, object)
   }
 

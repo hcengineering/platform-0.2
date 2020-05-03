@@ -15,8 +15,11 @@
 
 // import { KeysByType, AnyFunc } from 'simplytyped'
 
-import { Extension, IntlString, AnyFunc } from './platform'
+import { Extension, IntlString, AnyFunc } from './extension'
 import id from './id'
+
+export { Extension, IntlString, id }
+export { Resource } from './extension'
 
 export type PropertyType = undefined | Extension<any> | Ref<Doc> | IntlString | Embedded
   // | { __bag: void } // Bag<PropertyType>
