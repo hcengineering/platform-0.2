@@ -14,12 +14,52 @@
 //
 
 import ru from './strings/ru'
-import { TObject, TDoc, TClass } from '../index'
-import { getClassMetadata } from '../reflect'
+
+import { _class, ref, intl, bag, instance, extension, Attibutes } from './dsl'
+import { Obj, Ref, Class, Doc } from '../types'
+import core from './id'
+
+const attributes: Attibutes<Obj> = {
+  _class: ref(core.class.Class),
+  toIntlString: extension(core.method.Obj_toIntlString)
+}
+
+const objectClass: Class<Obj> = {
+  _class: core.class.Class,
+  _id: core.class.Object,
+  // label: '' as IntlString,
+  attributes
+}
 
 export default {
   strings: {
     ru
   },
-  model: getClassMetadata([TObject, TDoc, TClass])
+  model: [
+    objectClass,
+
+    _class(core.class.Doc, core.class.Object, {
+      attributes: {
+        _id: ref(core.class.Doc)
+      }
+    }),
+
+    _class(core.class.RefTo, core.class.Object, {
+      attributes: {
+        _default: ref(core.class.Doc),
+        to: ref(core.class.Class)
+      }
+    }),
+
+    _class(core.class.Class, core.class.Doc, {
+      attributes: {
+        // label: intl(),
+        extends: ref(core.class.Class),
+        attributes: bag(instance(core.class.Type)),
+      },
+      override: {
+        toIntlString: extension(core.method.Class_toIntlString)
+      }
+    }),
+  ]
 }

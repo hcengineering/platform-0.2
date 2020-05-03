@@ -13,49 +13,24 @@
 // limitations under the License.
 */
 
-import platform, { Plugin, Extension } from './platform'
-import core, { pluginId, Obj, Doc, Ref, Class, Mixin, Session, Type, Konstructor, Bag, Layout } from './types'
-import { model, loadConstructors } from './reflect'
+import platform, { Plugin } from './platform'
+import core, { pluginId, Instance, Obj, Class } from './types'
 import { classLabelId } from './utils'
 
-@model.Class(core.class.Object)
-export class TObject implements Obj {
-  _class!: Ref<Class<this>>
-
-  getSession(): Session { throw new Error('object not attached to a session') }
-  getClass(): Class<this> { return this.getSession().getInstance(this._class) }
-  // toIntlString(plural?: number): string { return this.getClass().toIntlString(plural) }
-  toIntlString(plural?: number): string { return platform.translate(classLabelId(this._class), { n: plural }) }
+function Obj_toIntlString(this: Instance<Obj>, plural?: number): string {
+  const m = this.getClass().toIntlString // temp
+  if (m)
+    return platform.invoke(this, m, plural)
+  return 'todo'
 }
 
-@model.Class(core.class.Doc)
-export class TDoc extends TObject implements Doc {
-  _id!: Ref<this>
-  _mixins?: Layout<Obj>[]
-
-  as<T extends this>(mixin: Ref<Mixin<T>>): T { return {} as T }
-  mixin<T extends this>(mixin: Ref<Mixin<T>>): T { return this.getSession().mixin(this._id, mixin) }
-}
-
-@model.Class(core.class.Class, core.class.Doc)
-export class TClass<T extends Obj> extends TDoc implements Class<T> {
-  // label!: IntlStringId
-  konstructor?: Extension<Konstructor<T>>
-  extends?: Ref<Class<Obj>>
-  attributes?: Bag<Type>
-
-  // toIntlString(plural?: number): string { return platform.translate(classLabelId(this._id), { n: plural }) }
-}
-
-@model.Mixin(core.class.Mixin, core.class.Class)
-export class TMixin<T extends Obj> extends TClass<T> implements Mixin<T> {
+function Class_toIntlString(this: Instance<Class<Obj>>, plural?: number): string {
+  return platform.translate(classLabelId(this._id), { n: plural })
 }
 
 export default new Plugin(pluginId, () => {
-  loadConstructors(core.class, {
-    Object: TObject,
-    Doc: TDoc,
-    Class: TClass,
-    Mixin: TMixin,
+  platform.loadExtensions(core.method, {
+    Obj_toIntlString,
+    Class_toIntlString
   })
 })

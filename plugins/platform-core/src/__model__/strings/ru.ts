@@ -20,15 +20,9 @@ const translation = modelTranslation(core.class, {
   Object: {
     $label: 'Объект'
   },
-  Doc: {
-    $label: 'Документ'
-  },
   Class: {
     $label: 'Класс'
   },
-  Mixin: {
-    $label: 'Миксин'
-  }
 })
 
 export default translation

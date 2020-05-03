@@ -13,26 +13,26 @@
 // limitations under the License.
 // 
 
-import platform, { IntlStringId } from '../platform'
+import platform, { IntlString } from '../platform'
 
-describe('i18n', () => {
+describe('platform', () => {
 
   it('should return original string', () => {
-    expect(platform.translate('does not exists' as IntlStringId)).toBe('does not exists')
+    expect(platform.translate('does not exists' as IntlString)).toBe('does not exists')
   })
 
   it('should translate simple', () => {
     platform.loadStrings({
       idSimple: 'Русский'
     })
-    expect(platform.translate('idSimple' as IntlStringId)).toBe('Русский')
+    expect(platform.translate('idSimple' as IntlString)).toBe('Русский')
   })
 
   it('should translate plurals', () => {
     platform.loadStrings({
       idPlural: '{count, plural, =1 {секунду} few {# секунды} many {# секунд} other {# секунду} } назад'
     })
-    const message = 'idPlural' as IntlStringId
+    const message = 'idPlural' as IntlString
     expect(platform.translate(message, { count: 1 })).toBe('секунду назад')
     expect(platform.translate(message, { count: 2 })).toBe('2 секунды назад')
     expect(platform.translate(message, { count: 5 })).toBe('5 секунд назад')

@@ -14,10 +14,11 @@
 //
 
 import core, { Ref, Class, Obj } from '../types'
-import { getClassMetadata, model, loadConstructors } from '../reflect'
+// import { getClassMetadata, model, loadConstructors } from '../reflect'
 import { MemDb } from '../memdb'
 import { MemSession } from '../session'
-import corePlugin, { TObject, TDoc, TClass } from '..'
+import coreModel from '../__model__'
+import corePlugin from '..'
 import platform from '../platform'
 
 corePlugin.start()
@@ -25,8 +26,8 @@ corePlugin.start()
 describe('session', () => {
 
   const memdb = new MemDb()
-  const classes = getClassMetadata([TObject, TDoc, TClass])
-  memdb.load(classes)
+  console.log(JSON.stringify(coreModel.model))//, undefined, 2))
+  memdb.load(coreModel.model)
 
   it('should load classes', () => {
     const object = memdb.get(core.class.Object)
@@ -39,51 +40,59 @@ describe('session', () => {
     const objectProto = session.getPrototype(core.class.Object)
     expect(objectProto).toBeDefined()
     expect(objectProto.hasOwnProperty('getSession')).toBe(true)
+    expect(objectProto.hasOwnProperty('toIntlString')).toBe(true)
+    expect(objectProto.toIntlString).toBe(core.method.Obj_toIntlString)
 
     const classProto = session.getPrototype(core.class.Class)
     expect(classProto.hasOwnProperty('getSession')).toBe(false)
-    // expect(classProto.hasOwnProperty('toIntlString')).toBe(true)
+    expect(classProto.hasOwnProperty('toIntlString')).toBe(true)
+    expect(classProto.toIntlString).toBe(core.method.Class_toIntlString)
 
     const docProto = Object.getPrototypeOf(classProto)
     const objProto = Object.getPrototypeOf(docProto)
     expect(objProto).toBe(objectProto)
   })
 
-  it('should get instance', () => {
+  it('should get instances', () => {
     const session = new MemSession(memdb)
     const objectClass = session.getInstance(core.class.Object)
     expect(objectClass._id).toBe(core.class.Object)
-    expect(typeof objectClass.toIntlString).toBe('function')
     expect(typeof objectClass.getSession).toBe('function')
+    expect(objectClass.getSession() === session).toBe(true)
 
-    expect(objectClass.getSession()).toBe(session)
-    expect(objectClass.getClass()._id).toBe(core.class.Class)
-  })
-
-  const test = platform.identify('test', {
-    class: {
-      ToBeMixed: '' as Ref<Class<ToBeMixed>>
+    const method = objectClass.toIntlString // temp
+    if (method) {
+      expect(platform.invoke(objectClass, method)).toBe(core.class.Object)
+    } else {
+      expect(true).toBe(false)
     }
+
   })
 
-  @model.Mixin(test.class.ToBeMixed, core.class.Class)
-  class ToBeMixed extends TClass<Obj> {
-    dummy!: number
-  }
+  // const test = platform.identify('test', {
+  //   class: {
+  //     ToBeMixed: '' as Ref<Class<ToBeMixed>>
+  //   }
+  // })
 
-  memdb.load(getClassMetadata([ToBeMixed]))
-  loadConstructors(test.class, {
-    ToBeMixed
-  })
+  // @model.Mixin(test.class.ToBeMixed, core.class.Class)
+  // class ToBeMixed extends TClass<Obj> {
+  //   dummy!: number
+  // }
 
-  it('should mix object in', () => {
-    const session = new MemSession(memdb)
-    const mixin = session.mixin(core.class.Object, test.class.ToBeMixed)
-    // console.log(mixin)
-    expect(mixin._id).toBe(core.class.Object)
-    expect(mixin._class).toBe(test.class.ToBeMixed)
-    expect(mixin.getClass()._id).toBe(test.class.ToBeMixed)
-    expect(mixin.toIntlString()).toBe(test.class.ToBeMixed)
-  })
+  // memdb.load(getClassMetadata([ToBeMixed]))
+  // loadConstructors(test.class, {
+  //   ToBeMixed
+  // })
+
+  // it('should mix object in', () => {
+  //   const session = new MemSession(memdb)
+  //   const mixin = session.mixin(core.class.Object, test.class.ToBeMixed)
+  //   // console.log(mixin)
+  //   expect(mixin._id).toBe(core.class.Object)
+  //   expect(mixin._class).toBe(test.class.ToBeMixed)
+  //   // expect(mixin.getClass()._id).toBe(test.class.ToBeMixed)
+  //   // expect(mixin.toIntlString()).toBe(test.class.ToBeMixed)
+  // })
 
 })

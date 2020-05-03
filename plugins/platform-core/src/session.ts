@@ -14,7 +14,7 @@
 //
 
 import { Session, Query } from './types'
-import core, { Obj, Doc, Ref, Bag, Class, PropertyType, Layout, Mixin } from './types'
+import core, { Obj, Doc, Ref, Bag, Class, PropertyType, Mixin, Instance } from './types'
 import platform, { Extension } from './platform'
 import { MemDb } from './memdb'
 
@@ -45,28 +45,28 @@ function generateId(): string {
 
 ////////////////////////////////
 
-class InstanceProxy {
-  __layout: Layout<Obj>
-  __proto: Object
+class InstanceProxy<T extends Obj> {
+  __layout: Obj
+  __proto: T
 
-  constructor(layout: Layout<Obj>, proto: Object) {
+  constructor(layout: Obj, proto: T) {
     this.__layout = layout
     this.__proto = proto
   }
 }
 
-class InstanceProxyHandler implements ProxyHandler<InstanceProxy> {
+class InstanceProxyHandler implements ProxyHandler<InstanceProxy<Obj>> {
   private memdb: MemSession
 
   constructor(memdb: MemSession) {
     this.memdb = memdb
   }
 
-  protected getFromLayout(target: InstanceProxy, key: PropertyKey, receiver: any) {
+  protected getFromLayout(target: InstanceProxy<Obj>, key: PropertyKey, receiver: any) {
     return Reflect.get(target.__layout, key, receiver)
   }
 
-  get(target: InstanceProxy, key: PropertyKey, receiver: any): any {
+  get(target: InstanceProxy<Obj>, key: PropertyKey, receiver: any): any {
     const value = this.getFromLayout(target, key, receiver)
     if (!value) {
       return Reflect.get(target.__proto, key, receiver)
@@ -78,22 +78,22 @@ class InstanceProxyHandler implements ProxyHandler<InstanceProxy> {
   }
 }
 
-class MixinProxy extends InstanceProxy {
-  __instance: Layout<Obj>
+class MixinProxy<M extends I, I extends Doc> extends InstanceProxy<M> {
+  __instance: I
 
-  constructor(layout: Layout<Obj>, proto: Object, instance: Layout<Obj>) {
+  constructor(layout: Obj, proto: M, instance: I) {
     super(layout, proto)
     this.__instance = instance
   }
 }
 
-class MixinProxyHandler extends InstanceProxyHandler implements ProxyHandler<MixinProxy> {
+class MixinProxyHandler extends InstanceProxyHandler implements ProxyHandler<MixinProxy<Doc, Doc>> {
 
   constructor(memdb: MemSession) {
     super(memdb)
   }
 
-  protected getFromLayout(target: MixinProxy, key: PropertyKey, receiver: any) {
+  protected getFromLayout(target: MixinProxy<Doc, Doc>, key: PropertyKey, receiver: any) {
     return super.getFromLayout(target, key, receiver) ??
       Reflect.get(target.__instance, key, receiver)
   }
@@ -112,45 +112,40 @@ export class MemSession implements Session {
     this.mixinProxy = new MixinProxyHandler(this)
   }
 
-  getPrototype(clazz: Ref<Class<Obj>>): Object {
+  getPrototype<T extends Obj>(clazz: Ref<Class<T>>): T {
     const proto = this.prototypes.get(clazz)
     if (proto) {
-      return proto
-    }
-    const classInstance = this.memdb.get(clazz) as Layout<Class<Obj>>
-    if (classInstance.konstructor) {
+      return proto as T
+    } else {
+      const classInstance = this.memdb.get(clazz) as Class<Obj>
       const extend = classInstance.extends ?? core.class.Object
-      const proto = Object.create(clazz === core.class.Object ? Object : this.getPrototype(extend))
-
-      // copy properties
-      const source = platform.getExtension(classInstance.konstructor).prototype
-      Object.getOwnPropertyNames(source).forEach(key => {
-        const value = key === 'getSession' ? () => this : source[key]
-        Object.defineProperty(proto, key, {
-          value,
-          enumerable: true,
-          writable: false,
-          configurable: false
-        })
-      })
-
+      const proto = clazz === core.class.Object ?
+        { getSession: () => this } :
+        Object.create(this.getPrototype(extend))
+      for (const key in classInstance.attributes) {
+        const attribute = classInstance.attributes[key]
+        if (attribute._default !== undefined) {
+          Object.defineProperty(proto, key, {
+            value: attribute._default,
+            enumerable: true,
+            writable: false,
+            configurable: false
+          })
+        }
+      }
       this.prototypes.set(clazz, proto)
       return proto
     }
-    throw new Error('TODO: no constructor for ' + clazz)
   }
 
-  private newLayout<T extends Obj>(_class: Ref<Class<T>>): Layout<Obj> {
-    return { _class }
-  }
 
-  instantiate(obj: Layout<Obj>): Obj {
+  instantiate<T extends Obj>(obj: T): Instance<T> {
     const proxy = new InstanceProxy(obj, this.getPrototype(obj._class))
-    return new Proxy(proxy, this.instanceProxy) as unknown as Obj
+    return new Proxy(proxy, this.instanceProxy) as unknown as Instance<T>
   }
 
-  getInstance<T extends Doc>(ref: Ref<T>): T {
-    return this.instantiate(this.memdb.get(ref)) as T
+  getInstance<T extends Doc>(ref: Ref<T>): Instance<T> {
+    return this.instantiate(this.memdb.get(ref))
   }
 
   newInstance<T extends Obj>(clazz: Ref<Class<T>>): T {
@@ -169,18 +164,19 @@ export class MemSession implements Session {
     return result.length > 0 ? result[0] : undefined
   }
 
-  mixin<T extends Doc, E extends T>(doc: Ref<T>, mixinClass: Ref<Mixin<E>>): E {
-    const layout = this.memdb.get(doc)
-    let mixins = layout._mixins // TODO: hide _mixin or make Layout recursive
-    if (!mixins) {
-      mixins = []
-      layout._mixins = mixins
-    }
-    const mixin = this.newLayout(mixinClass)
-    mixins.push(mixin)
+  mixin<M extends I, I extends Doc>(doc: Ref<I>, mixinClass: Ref<Mixin<M>>): M {
+    // const layout = this.memdb.get(doc) as I
+    // let mixins = layout._mixins // TODO: hide _mixin or make Layout recursive
+    // if (!mixins) {
+    //   mixins = []
+    //   layout._mixins = mixins
+    // }
+    // const mixin = { _class: mixinClass }
+    // mixins.push(mixin)
 
-    const proxy = new MixinProxy(mixin, this.getPrototype(mixin._class), layout)
-    return new Proxy(proxy, this.mixinProxy) as unknown as E
+    // const proxy = new MixinProxy(mixin, this.getPrototype(mixinClass) as M, layout)
+    // return new Proxy(proxy, this.mixinProxy) as unknown as M
+    return {} as M
   }
 
 }

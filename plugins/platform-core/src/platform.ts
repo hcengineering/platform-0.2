@@ -15,7 +15,8 @@
 
 import { IntlMessageFormat, PrimitiveType } from 'intl-messageformat'
 
-export type IntlStringId = string & { __intl_string: void }
+export type AnyFunc = (...args: any[]) => any
+export type IntlString = string & { __intl_string: void }
 export type Extension<T> = string & { __extension: T }
 
 type Namespace = { [key: string]: { [key: string]: any } }
@@ -50,10 +51,10 @@ export class Plugin {
 
 class Platform {
 
-  private strings: Map<IntlStringId, string> = new Map()
-  private imfCache: Map<IntlStringId, IntlMessageFormat> = new Map()
+  private strings: Map<IntlString, string> = new Map()
+  private imfCache: Map<IntlString, IntlMessageFormat> = new Map()
   private extensions = new Map<string, any>()
-  private metadata = new Map<object, any>()
+  // private metadata = new Map<object, any>()
 
   private COMPRESS_IDS = false
 
@@ -74,17 +75,17 @@ class Platform {
 
   /////////////////
 
-  setMetadata(object: object, metadata: any) {
-    this.metadata.set(object, metadata)
-  }
+  // setMetadata(object: object, metadata: any) {
+  //   this.metadata.set(object, metadata)
+  // }
 
-  getMetadata(object: object) {
-    return this.metadata.get(object)
-  }
+  // getMetadata(object: object) {
+  //   return this.metadata.get(object)
+  // }
 
   /////////////////
 
-  translate(string: IntlStringId, params?: Record<string, PrimitiveType> | undefined): string {
+  translate(string: IntlString, params?: Record<string, PrimitiveType> | undefined): string {
     const translation = this.strings.get(string)
     if (!translation) {
       return string
@@ -102,7 +103,7 @@ class Platform {
 
   loadStrings(translations: { [key: string]: string }) {
     for (const key in translations) {
-      this.strings.set(key as IntlStringId, translations[key])
+      this.strings.set(key as IntlString, translations[key])
     }
   }
 
@@ -129,6 +130,10 @@ class Platform {
       }
       this.setExtension(id, extension)
     }
+  }
+
+  invoke<M extends AnyFunc>(_this: object, method: Extension<M>, ...args: any[]): ReturnType<M> {
+    return this.getExtension(method).apply(_this, args)
   }
 
 }

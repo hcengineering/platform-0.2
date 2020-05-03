@@ -14,9 +14,9 @@
 //
 
 import { Ref, Obj, Class } from './types'
-import { IntlStringId, Extension } from './platform'
+import { IntlString } from './platform'
 
-export function classLabelId(clazz: Ref<Class<Obj>>): IntlStringId {
-  return clazz as string as IntlStringId
+export function classLabelId(clazz: Ref<Class<Obj>>): IntlString {
+  return clazz as string as IntlString
 }
 

@@ -13,22 +13,11 @@
 // limitations under the License.
 //
 
-import { IntlStringId } from '../platform'
+import { IntlString } from '../platform'
 import { Ref, Class, Obj } from '../types'
 import { classLabelId } from '../utils'
 
-export function verifyTranslation(ids: Record<string, IntlStringId>, translations: Record<string, string>): Record<string, string> {
-  const result = {} as Record<string, string>
-  for (const key in ids) {
-    const translated = translations[key]
-    if (translated) {
-      const id = ids[key]
-      result[id] = translated
-    } else
-      throw new Error(`no translation for ${key}`)
-  }
-  return result
-}
+import { mergeWith } from 'lodash'
 
 type Labels<T extends Obj> = {
   [P in keyof T]?: string
@@ -54,4 +43,27 @@ export function modelTranslation<T extends ClassRefs>(refs: T, translations: Ref
     }
   }
   return result
+}
+
+export function verifyTranslation(ids: Record<string, IntlString>, translations: Record<string, string>): Record<string, string> {
+  const result = {} as Record<string, string>
+  for (const key in ids) {
+    const translated = translations[key]
+    if (translated) {
+      const id = ids[key]
+      result[id] = translated
+    } else
+      throw new Error(`no translation for ${key}`)
+  }
+  return result
+}
+
+type PluginIds = { [key: string]: { [key: string]: any } }
+
+export function mergeIds<A extends PluginIds, B extends PluginIds>(a: A, b: B): A & B {
+  return mergeWith({}, a, b, (value) => {
+    if (typeof value === 'string') {
+      throw new Error('attempting to overwrite ' + value)
+    }
+  })
 }

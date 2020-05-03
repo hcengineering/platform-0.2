@@ -13,12 +13,9 @@
 // limitations under the License.
 // 
 
-import { Obj, Doc, Ref, Class, PropertyType, Layout } from './types'
+import { Obj, Doc, Ref, Class, PropertyType } from './types'
 
-type DocLayout = Layout<Doc>
-type ClassLayout = Layout<Class<Obj>>
-
-function filterEq(docs: Record<string, PropertyType>[], propertyKey: string, value: PropertyType): Record<string, PropertyType>[] {
+function filterEq(docs: any, propertyKey: string, value: PropertyType): any[] {
   const result = []
   for (const doc of docs) {
     if (value === doc[propertyKey]) {
@@ -29,26 +26,26 @@ function filterEq(docs: Record<string, PropertyType>[], propertyKey: string, val
 }
 
 export class MemDb {
-  private objects = new Map<Ref<Doc>, DocLayout>()
-  private byClass = new Map<Ref<Class<Doc>>, DocLayout[]>()
+  private objects = new Map<Ref<Doc>, Doc>()
+  private byClass = new Map<Ref<Class<Doc>>, Doc[]>()
 
-  private add(doc: DocLayout) {
+  private add(doc: Doc) {
     const id = doc._id
     if (this.objects.get(id))
       throw new Error('object already loaded: ' + id.toString())
     this.objects.set(id, doc)
   }
 
-  get(doc: Ref<Doc>): DocLayout {
+  get<D extends Doc>(doc: Ref<D>): D {
     const result = this.objects.get(doc)
     if (!result) {
       throw new Error('no document with id ' + doc)
     }
-    return result
+    return result as D
   }
 
-  private getAllOfClass(clazz: Ref<Class<Doc>>): DocLayout[] {
-    let docs = this.byClass.get(clazz)
+  private getAllOfClass<D extends Doc>(clazz: Ref<Class<D>>): D[] {
+    let docs = this.byClass.get(clazz) as D[]
     if (!docs) {
       docs = []
       this.byClass.set(clazz, docs)
@@ -56,30 +53,26 @@ export class MemDb {
     return docs
   }
 
-  private getClassLayout(clazz: Ref<Class<Obj>>): ClassLayout {
-    return this.get(clazz) as ClassLayout
-  }
-
-  private index(doc: DocLayout) {
+  private index(doc: Doc) {
     let clazz: Ref<Class<Doc>> | undefined = doc._class
     while (clazz) {
       this.getAllOfClass(clazz).push(doc)
-      clazz = this.getClassLayout(clazz).extends as Ref<Class<Doc>> // TODO: do not index by Obj
+      clazz = this.get(clazz).extends as Ref<Class<Doc>> // TODO: do not index by Obj
     }
   }
 
-  findAll(clazz: Ref<Class<Doc>>, query: Partial<Doc>): DocLayout[] {
+  findAll<D extends Doc>(clazz: Ref<Class<D>>, query: Partial<D>): D[] {
     const docs = this.getAllOfClass(clazz)
-    let result = docs as Record<string, PropertyType>[]
+    let result = docs
 
     for (const propertyKey in query) {
       result = filterEq(result, propertyKey, (query as Record<string, PropertyType>)[propertyKey])
     }
 
-    return result as DocLayout[]
+    return result
   }
 
-  load(docs: DocLayout[]) {
+  load(docs: Doc[]) {
     docs.forEach(doc => this.add(doc))
     docs.forEach(doc => this.index(doc))
   }

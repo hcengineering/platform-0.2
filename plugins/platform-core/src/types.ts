@@ -13,27 +13,32 @@
 // limitations under the License.
 // 
 
-import { KeysByType, AnyFunc } from 'simplytyped'
+// import { KeysByType, AnyFunc } from 'simplytyped'
 
-import platform, { Extension, IntlStringId } from './platform'
+import platform, { Extension, IntlString, AnyFunc } from './platform'
 
-export type PropertyType = undefined | Extension<any> | Ref<Doc> | IntlStringId | Embedded
-  | { __bag: void } //{ [key: string]: PropertyType }
+export type PropertyType = undefined | Extension<any> | Ref<Doc> | IntlString | Embedded
+  // | { __bag: void } // Bag<PropertyType>
+  | { [key: string]: PropertyType }
   | PropertyType[]
-// | Bag<PropertyType>
 
-// type MethodType = (...args: any[]) => any
 type DocId = string
 
-export type Bag<T extends PropertyType> = { [key: string]: T } & { __bag: void }
+export type Bag<T extends PropertyType> = { [key: string]: T } //& { __bag: void }
 export type Ref<T extends Doc> = DocId & { __ref: T }
 
-export type Layout<T extends Obj> = Omit<T, KeysByType<T, AnyFunc>>
+// export type Layout<T extends Obj> = Omit<T, KeysByType<T, AnyFunc>>
+export type Instance<T extends Obj> = T & {
+  getSession(): Session
+  getClass(): Class<T>
+}
 
 // S E R I A L I Z E D
 
 type AsNumber<T> = number | { __as_number: T }
 // interface Struct { __struct: void }
+
+export type Method<T extends AnyFunc> = Extension<T> & { __method: T }
 
 // S E S S I O N
 
@@ -54,36 +59,46 @@ export interface Session {
 export interface Obj {
   _class: Ref<Class<this>>
 
-  getSession(): Session
-  getClass(): Class<this>
-
-  toIntlString(plural?: number): string
-}
-
-export interface Embedded extends Obj {
-  __embedded: void
+  toIntlString?: Extension<(this: Obj, plural?: number) => string>
 }
 
 export interface Doc extends Obj {
   _id: Ref<this>
-  _mixins?: Layout<Obj>[] // Hide?
+  // _mixins?: Obj[] // Hide?
 
-  as<T extends this>(mixin: Ref<Mixin<T>>): T
-  mixin<T extends this>(mixin: Ref<Mixin<T>>): T
+  // as<T extends this>(mixin: Ref<Mixin<T>>): T
+  // mixin<T extends this>(mixin: Ref<Mixin<T>>): T
 }
 
-export interface Type extends Embedded { }
+export interface Embedded extends Obj {
+}
+
+export interface Type<T extends PropertyType> extends Embedded {
+  _default?: T
+}
+
+export interface RefTo<T extends Doc> extends Type<Ref<T>> {
+  to: Ref<Class<T>>
+}
+
+export interface InstanceOf<T extends Embedded> extends Type<T> {
+  of: Ref<Class<T>>
+}
+
+export interface BagOf<T extends PropertyType> extends Type<Bag<T>> {
+  of: Type<T>
+}
 
 export type Konstructor<T extends Obj> = new () => T
 
 export interface Class<T extends Obj> extends Doc {
-  // label: IntlStringId
-  konstructor?: Extension<Konstructor<T>>
+  // label: IntlString
+  // konstructor?: Extension<Konstructor<T>>
   extends?: Ref<Class<Obj>>
-  attributes?: Bag<Type>
+  attributes: Bag<Type<PropertyType>>
 }
 
-export interface Mixin<T extends Obj> extends Class<T> { }
+export interface Mixin<T extends Doc> extends Class<T> { }
 
 export interface BusinessObject extends Doc {
   createdOn: AsNumber<Date>
@@ -92,10 +107,12 @@ export interface BusinessObject extends Doc {
 export const pluginId = 'core'
 
 export default platform.identify(pluginId, {
+  method: {
+    Obj_toIntlString: '' as Extension<(this: Obj, plural?: number) => string>,
+    Class_toIntlString: '' as Extension<(this: Obj, plural?: number) => string>
+  },
   class: {
     Object: '' as Ref<Class<Obj>>,
-    Doc: '' as Ref<Class<Doc>>,
     Class: '' as Ref<Class<Class<Obj>>>,
-    Mixin: '' as Ref<Class<Mixin<Obj>>>,
   }
 })
