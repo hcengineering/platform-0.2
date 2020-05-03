@@ -1,26 +1,20 @@
 import { action } from '@storybook/addon-actions'
-import { linkTo } from '@storybook/addon-links'
 
-import MyButton from '../components/MyButton.vue'
+import Theme from '../components/Theme.vue'
+import Button from '@anticrm/sparkling-controls/src/Button.vue'
 
 export default {
-  component: MyButton,
-  title: 'Button'
+  title: 'Controls'
 }
 
 export const withText = () => ({
-  components: { MyButton },
-  template: '<my-button @click="action">Hello Button</my-button>',
+  components: { Button, Theme },
+  template: '<Theme><Button @click="action">Hello Button</Button></Theme>',
   methods: { action: action('clicked') }
 })
 
 export const withJSX = () => ({
   render() {
-    return <MyButton onClick={linkTo('Button', 'With Some Emoji')}>With JSX</MyButton>;
+    return <Theme><Button onClick={action('clicked')}>With JSX</Button></Theme>;
   }
-})
-
-export const withSomeEmoji = () => ({
-  components: { MyButton },
-  template: '<my-button>😀 😎 👍 💯</my-button>'
 })
