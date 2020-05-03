@@ -1,7 +1,7 @@
 import { action } from '@storybook/addon-actions'
 
 import Theme from '../components/Theme.vue'
-import Button from '@anticrm/sparkling-controls/src/Button.vue'
+import Button from '@anticrm/platform-ui-controls/src/Button.vue'
 
 export default {
   title: 'Controls'

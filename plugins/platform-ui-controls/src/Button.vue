@@ -31,7 +31,7 @@ export default Vue.extend({
 </template>
 
 <style lang="scss">
-@import "~@anticrm/sparkling-theme/css/_variables.scss";
+@import "~@anticrm/platform-ui-theme/css/_variables.scss";
 
 .erp-button {
   display: inline-block;
