@@ -2,7 +2,6 @@
   "name": "@anticrm/sparkling-controls",
   "version": "0.1.0",
   "description": "Sparkling Design System Controls",
-  "main": "src/index.ts",
   "author": "Z2SXhzErKLyk7ZgeTHHUMY8gJqI= <z2sxhz@gmail.com>",
   "license": "EPL-2.0"
 }

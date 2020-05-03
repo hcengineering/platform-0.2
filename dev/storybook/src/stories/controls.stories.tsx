@@ -9,6 +9,6 @@ export default {
 
 export const button = () => ({
   render() {
-    return <Theme><Button on-click={action('clicked')}>Hello Button</Button></Theme>;
+    return <Theme><Button on-click={action('clicked')}>Hello Button</Button></Theme>
   }
 })
