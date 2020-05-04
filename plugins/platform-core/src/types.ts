@@ -15,7 +15,7 @@
 
 // import { KeysByType, AnyFunc } from 'simplytyped'
 
-import { Extension, IntlString, AnyFunc } from './extension'
+import { Extension, IntlString, AnyFunc, AsString } from './extension'
 import id from './id'
 
 export { Extension, IntlString, id }
@@ -43,7 +43,6 @@ export type Instance<T extends Obj> = T & InstanceIntf<T>
 // S E R I A L I Z E D
 
 type AsNumber<T> = number & { __as_number: T }
-export type AsString<T> = string & { __as_number: T }
 // interface Struct { __struct: void }
 
 export type Method<T extends AnyFunc> = Extension<T> & { __method: T }

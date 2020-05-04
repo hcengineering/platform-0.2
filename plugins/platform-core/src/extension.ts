@@ -14,7 +14,8 @@
 //
 
 export type AnyFunc = (...args: any[]) => any
-export type IntlString = string & { __intl_string: void }
-export type Resource = string & { __resource: void }
-export type Extension<T> = string & { __extension: T }
 
+export type AsString<T> = string | { __as_string: T }
+export type Extension<T> = AsString<T> & { __extension: void }
+export type IntlString = AsString<string> & { __intl_string: void }
+export type Resource = AsString<string> & { __resource: void }
