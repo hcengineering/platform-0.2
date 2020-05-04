@@ -14,6 +14,17 @@
 //
 
 import platform from '@anticrm/platform-ui/src/platform'
+
 import uiResources from '@anticrm/platform-ui/src/resources'
 
+import coreModel from '@anticrm/platform-core/src/__model__'
+import contactCoreModel from '@anticrm/contact-core/src/__model__'
+
 uiResources(platform)
+
+const model = [
+  ...coreModel.model,
+  ...contactCoreModel.model,
+]
+
+platform.loadModel(model)
