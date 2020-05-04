@@ -34,7 +34,7 @@ export const icon = () => ({
 })
 
 const contact = platform.session.getInstance(contact1)
-const props = ['phone']
+const props = ['phone', 'email']
 
 export const properties = () => ({
   render() {
