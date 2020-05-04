@@ -22,3 +22,7 @@ export function classLabelId(clazz: Ref<Class<Obj>>): IntlString {
 export function attributeLabelId(clazz: Ref<Class<Obj>>, key: string): IntlString {
   return clazz + '.' + key as IntlString
 }
+
+export function mixinPropertyKey(clazz: Ref<Class<Obj>>): string {
+  return '$' + clazz
+}

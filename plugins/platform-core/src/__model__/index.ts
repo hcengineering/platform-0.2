@@ -18,6 +18,7 @@ import ru from './strings/ru'
 import { _class, ref, intl, bag, instance, extension, Attibutes } from './dsl'
 import { Obj, Ref, Class, Doc } from '../types'
 import core from './id'
+import { create } from './operations'
 
 const attributes: Attibutes<Obj> = {
   _class: ref(core.class.Class),
@@ -35,23 +36,23 @@ export default {
   strings: {
     ru
   },
-  model: [
-    objectClass,
+  events: [
+    create(objectClass),
 
-    _class(core.class.Doc, core.class.Object, {
+    create(_class(core.class.Doc, core.class.Object, {
       attributes: {
         _id: ref(core.class.Doc)
       }
-    }),
+    })),
 
-    _class(core.class.RefTo, core.class.Object, {
+    create(_class(core.class.RefTo, core.class.Object, {
       attributes: {
         _default: ref(core.class.Doc),
         to: ref(core.class.Class)
       }
-    }),
+    })),
 
-    _class(core.class.Class, core.class.Doc, {
+    create(_class(core.class.Class, core.class.Doc, {
       attributes: {
         // label: intl(),
         extends: ref(core.class.Class),
@@ -60,6 +61,6 @@ export default {
       override: {
         toIntlString: extension(core.method.Class_toIntlString)
       }
-    }),
+    })),
   ]
 }

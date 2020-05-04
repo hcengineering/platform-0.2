@@ -13,24 +13,15 @@
 // limitations under the License.
 //
 
-import { execute, THIS, DUP, GET, APPLY0, APPLY1, ARG0 } from '../easyscript'
+import model from '../__model__'
+import { loadModel } from '../__model__/operations'
 
-describe('easyscript', () => {
+
+describe('operations', () => {
 
   it('should execure easyscript', () => {
-    const code = `${THIS},${DUP},getClass,${GET},${APPLY0},${DUP},toString,${GET},${ARG0},${APPLY1}`
-    console.log(code)
-
-    const _class = {
-      toString: function (plural: string) { return 'Hello ' + plural }
-    }
-
-    const _this = {
-      getClass: function () { return _class }
-    }
-
-    const result = execute(code, _this, ['World!'])
-    console.log(result)
-    expect(result).toBe('Hello World!')
+    const loaded = loadModel(model.events)
+    expect(true).toBe(true)
   })
+
 })
