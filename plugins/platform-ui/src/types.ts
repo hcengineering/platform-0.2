@@ -17,7 +17,7 @@ import { id, Resource } from '@anticrm/platform-core'
 
 export const pluginId = 'ui'
 export default id(pluginId, {
-  resource: {
+  icon: {
     AddGroup: '' as Resource,
     Add: '' as Resource,
     Checked: '' as Resource,

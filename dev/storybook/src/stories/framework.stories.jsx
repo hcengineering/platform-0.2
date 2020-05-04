@@ -24,6 +24,6 @@ export default {
 
 export const icon = () => ({
   render() {
-    return <Theme><Icon icon={ui.resource.Add}>Hello Button</Icon></Theme>
+    return <Theme><Icon icon={ui.icon.Add}>Hello Button</Icon></Theme>
   }
 })

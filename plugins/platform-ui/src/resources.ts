@@ -19,7 +19,7 @@ import ui from './types'
 
 export default (platform: Platform) => {
   const spritesUrl = require('../assets/icons.svg')
-  platform.loadResources(ui.resource, {
+  platform.loadResources(ui.icon, {
     AddGroup: spritesUrl + '#add-group',
     Add: spritesUrl + '#add',
     Checked: spritesUrl + '#checked',
