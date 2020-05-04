@@ -13,24 +13,39 @@
 // limitations under the License.
 //
 
-import { Doc } from '@anticrm/platform-core'
+import { Doc, Session, Instance, Obj, Type, PropertyType } from '@anticrm/platform-core'
 import { Platform } from '@anticrm/platform-core/src/platform'
 import { MemSession } from '@anticrm/platform-core/src/session'
 import { MemDb } from '@anticrm/platform-core/src/memdb'
+import { attributeLabelId } from '@anticrm/platform-core/src/utils'
 
 class UIPlatform extends Platform {
 
-  readonly session: MemSession
+  private memSession: MemSession
   private memdb: MemDb
 
   constructor() {
     super()
     this.memdb = new MemDb()
-    this.session = new MemSession(this.memdb)
+    this.memSession = new MemSession(this.memdb)
   }
+
+  get session(): Session { return this.memSession }
 
   loadModel(docs: Doc[]) {
     this.memdb.load
+  }
+
+  ///
+
+  getAttrModel(object: Instance<Obj>, props: string[]) {
+    const attributes = object.getClass().attributes
+    return props.map(key => ({
+      key,
+      type: attributes[key],
+      label: this.translate(attributeLabelId(object._class, key)),
+      placeholder: 'Placeholder',
+    }))
   }
 }
 

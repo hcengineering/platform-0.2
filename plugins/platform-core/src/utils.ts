@@ -13,10 +13,12 @@
 // limitations under the License.
 //
 
-import { Ref, Obj, Class } from './types'
-import { IntlString } from './platform'
+import { Ref, Obj, Class, IntlString } from './types'
 
 export function classLabelId(clazz: Ref<Class<Obj>>): IntlString {
   return clazz as string as IntlString
 }
 
+export function attributeLabelId(clazz: Ref<Class<Obj>>, key: string): IntlString {
+  return clazz + '.' + key as IntlString
+}

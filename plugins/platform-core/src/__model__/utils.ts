@@ -13,9 +13,8 @@
 // limitations under the License.
 //
 
-import { IntlString } from '../platform'
-import { Ref, Class, Obj } from '../types'
-import { classLabelId } from '../utils'
+import { Ref, Class, Obj, IntlString } from '../types'
+import { classLabelId, attributeLabelId } from '../utils'
 
 import { mergeWith } from 'lodash'
 
@@ -38,7 +37,7 @@ export function modelTranslation<T extends ClassRefs>(refs: T, translations: Ref
     result[rootId] = classTranslations.$label
     for (const key in classTranslations) {
       if (!key.startsWith('$')) {
-        result[classId + '.' + key] = classTranslations[key]
+        result[attributeLabelId(classId, key)] = classTranslations[key]
       }
     }
   }
