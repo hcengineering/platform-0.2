@@ -13,9 +13,9 @@
 // limitations under the License.
 //
 
-import { BusinessObject, id, Ref, Class, Type, AsString } from '@anticrm/platform-core'
+import { Doc, id, Ref, Class, Type, AsString } from '@anticrm/platform-core'
 
-export interface Contact extends BusinessObject {
+export interface Contact extends Doc {
   email?: AsString<string>
   phone?: AsString<string>
   phoneWork?: AsString<string>
@@ -27,5 +27,6 @@ export interface Contact extends BusinessObject {
 export const pluginId = 'contact-core'
 export default id(pluginId, {
   class: {
+    Contact: '' as Ref<Class<Contact>>,
   }
 })

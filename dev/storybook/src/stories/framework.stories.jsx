@@ -13,10 +13,15 @@
 // limitations under the License.
 //
 
-import ui from '@anticrm/platform-ui/src/types'
 import Theme from '../components/Theme.vue'
-import Icon from '@anticrm/platform-ui/src/components/Icon.vue'
 
+import ui from '@anticrm/platform-ui/src/types'
+import platform from '@anticrm/platform-ui/src/platform'
+
+import Icon from '@anticrm/platform-ui/src/components/Icon.vue'
+import PropPanel from '@anticrm/platform-ui/src/components/PropPanel.vue'
+
+import { contact1 } from '../test-data'
 
 export default {
   title: 'Framework'
@@ -25,5 +30,13 @@ export default {
 export const icon = () => ({
   render() {
     return <Theme><Icon icon={ui.icon.Add}>Hello Button</Icon></Theme>
+  }
+})
+
+const contact = platform.session.getInstance(contact1)
+
+export const properties = () => ({
+  render() {
+    return <Theme><PropPanel object={contact} props={['phone']}></PropPanel></Theme>
   }
 })

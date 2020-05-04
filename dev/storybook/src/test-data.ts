@@ -13,22 +13,16 @@
 // limitations under the License.
 //
 
-import platform from '@anticrm/platform-ui/src/platform'
+import contact from '@anticrm/contact-core'
 
-import uiResources from '@anticrm/platform-ui/src/resources'
+export const contact1 = 'test.contact.1'
 
-import coreModel from '@anticrm/platform-core/src/__model__'
-import contactCoreModel from '@anticrm/contact-core/src/__model__'
-import testModel from '../../src/test-data'
-
-uiResources(platform)
-
-
-const model = [
-  ...coreModel.model,
-  ...contactCoreModel.model,
-
-  ...testModel.model
-]
-
-platform.loadModel(model)
+export default {
+  model: [
+    {
+      _class: contact.class.Contact,
+      _id: contact1,
+      phone: '+7 913 333 5555'
+    }
+  ]
+}

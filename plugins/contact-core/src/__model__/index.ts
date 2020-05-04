@@ -28,11 +28,11 @@ export default {
     _class(contact.class.Twitter, core.class.Type, {
       attributes: {}
     }),
-    _class(contact.class.Twitter, core.class.Type, {
+    _class(contact.class.Address, core.class.Type, {
       attributes: {}
     }),
 
-    _class(contact.class.Contact, core.class.BusinessObject, {
+    _class(contact.class.Contact, core.class.Doc, {
       attributes: {
         email: { _class: contact.class.Email },
         phone: { _class: contact.class.Phone },

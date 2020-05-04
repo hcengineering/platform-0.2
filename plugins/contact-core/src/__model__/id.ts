@@ -24,6 +24,5 @@ export default mergeIds(contact, id(pluginId, {
     Twitter: '' as Ref<Class<Type<AsString<string>>>>,
     Address: '' as Ref<Class<Type<AsString<string>>>>,
 
-    Contact: '' as Ref<Class<Contact>>,
   }
 }))
