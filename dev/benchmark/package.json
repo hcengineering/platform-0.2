@@ -1,0 +1,17 @@
+{
+  "name": "benchmark",
+  "version": "0.1.0",
+  "main": "index.js",
+  "author": "Andrey Platov <andrey.v.platov@gmail.com>",
+  "license": "EPL-2.0",
+  "private": true,
+  "dependencies": {
+    "benchmark": "^2.1.4"
+  },
+  "devDependencies": {
+    "ts-node": "^8.10.1"
+  },
+  "scripts": {
+    "bench": "ts-node index.ts"
+  }
+}
