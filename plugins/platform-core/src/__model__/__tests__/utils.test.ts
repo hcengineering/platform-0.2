@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { IntlString } from '../../platform'
+import { IntlString } from '../../extension'
 import { Ref, Class, Obj } from '../../types'
 import { verifyTranslation, modelTranslation } from '../utils'
 import id from '../../id'

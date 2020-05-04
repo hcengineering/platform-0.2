@@ -33,11 +33,11 @@ export function modelTranslation<T extends ClassRefs>(refs: T, translations: Ref
   for (const clazz in translations) {
     const classId = refs[clazz]
     const classTranslations = translations[clazz] as Record<string, string>
-    const rootId = classLabelId(classId)
+    const rootId = classLabelId(classId) as string
     result[rootId] = classTranslations.$label
     for (const key in classTranslations) {
       if (!key.startsWith('$')) {
-        result[attributeLabelId(classId, key)] = classTranslations[key]
+        result[attributeLabelId(classId, key) as string] = classTranslations[key]
       }
     }
   }
@@ -50,7 +50,7 @@ export function verifyTranslation(ids: Record<string, IntlString>, translations:
     const translated = translations[key]
     if (translated) {
       const id = ids[key]
-      result[id] = translated
+      result[id as string] = translated
     } else
       throw new Error(`no translation for ${key}`)
   }

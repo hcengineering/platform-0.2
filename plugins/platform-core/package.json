@@ -6,7 +6,7 @@
   "main": "./src/types.ts",
   "scripts": {
     "test": "jest",
-    "docs": "typedoc"
+    "doc": "typedoc --out ./generated_docs --readme none"
   },
   "author": "Andrey Platov <andrey.v.platov@gmail.com>",
   "license": "EPL-2.0",
@@ -20,6 +20,7 @@
     "babel-jest": "^25.5.1",
     "jest": "^25.5.2",
     "lodash": "^4.17.15",
+    "typedoc": "^0.17.6",
     "typescript": "^3.8.3"
   },
   "dependencies": {

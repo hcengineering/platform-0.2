@@ -14,7 +14,7 @@
 //
 
 import {
-  Obj, Class, Ref, Doc, Type, RefTo, AsString,
+  Obj, Class, Ref, Doc, Type, RefTo,
   PropertyType, BagOf, Embedded, InstanceOf, IntlString, Extension
 } from '../types'
 import core from './id'

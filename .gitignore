@@ -1,4 +1,5 @@
 .DS_Store
 node_modules
+generated_docs
 coverage
 yarn-error.log

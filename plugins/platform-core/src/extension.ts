@@ -13,9 +13,14 @@
 // limitations under the License.
 //
 
+export type AsString<T> = string | { __as_string: T }
+// export type AsNumber<T> = number | { __as_number: T }
+
+// export type PropertyType = AsNumber<any> | AsString<any> | { [key: string]: PropertyType } | PropertyType[]
+
+/** Function */
 export type AnyFunc = (...args: any[]) => any
 
-export type AsString<T> = string | { __as_string: T }
 export type Extension<T> = AsString<T> & { __extension: void }
 export type IntlString = AsString<string> & { __intl_string: void }
 export type Resource = AsString<string> & { __resource: void }
