@@ -25,10 +25,10 @@ export default Vue.extend({
   components: { InlineEdit },
   props: {
     object: Object as PropType<Instance<Obj>>,
-    props: Array as PropType<string[]>
+    filter: Array as PropType<string[]>
   },
   computed: {
-    model() { return platform.getAttrModel(this.object, this.props) }
+    model() { return platform.getAttrModel(this.object, this.filter) }
   }
 })
 </script>

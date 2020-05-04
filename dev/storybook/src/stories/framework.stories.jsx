@@ -34,9 +34,10 @@ export const icon = () => ({
 })
 
 const contact = platform.session.getInstance(contact1)
+const props = ['phone']
 
 export const properties = () => ({
   render() {
-    return <Theme><PropPanel object={contact} props={['phone']}></PropPanel></Theme>
+    return <Theme><PropPanel object={contact} filter={props}></PropPanel></Theme>
   }
 })
