@@ -17,6 +17,7 @@ import core, { Ref, Class, Obj } from '../types'
 // import { getClassMetadata, model, loadConstructors } from '../reflect'
 import { MemDb } from '../memdb'
 import { MemSession } from '../session'
+import { modelFromEvents } from '../__model__/operations'
 import coreModel from '../__model__'
 import corePlugin from '../plugin'
 
@@ -28,8 +29,9 @@ corePlugin.start(platform)
 describe('session', () => {
 
   const memdb = new MemDb()
-  console.log(JSON.stringify(coreModel.model))//, undefined, 2))
-  memdb.load(coreModel.model)
+  const model = modelFromEvents(coreModel.events)
+  console.log(JSON.stringify(model))//, undefined, 2))
+  memdb.load(model)
 
   it('should load classes', () => {
     const object = memdb.get(core.class.Object)

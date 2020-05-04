@@ -16,23 +16,24 @@
 import contact from './id'
 import core from '@anticrm/platform-core/src/__model__/id'
 import { _class, ref, intl, bag, instance, extension, Attibutes } from '@anticrm/platform-core/src/__model__/dsl'
+import { create } from '@anticrm/platform-core/src/__model__/operations'
 
 export default {
-  model: [
-    _class(contact.class.Email, core.class.Type, {
+  events: [
+    create(_class(contact.class.Email, core.class.Type, {
       attributes: {}
-    }),
-    _class(contact.class.Phone, core.class.Type, {
+    })),
+    create(_class(contact.class.Phone, core.class.Type, {
       attributes: {}
-    }),
-    _class(contact.class.Twitter, core.class.Type, {
+    })),
+    create(_class(contact.class.Twitter, core.class.Type, {
       attributes: {}
-    }),
-    _class(contact.class.Address, core.class.Type, {
+    })),
+    create(_class(contact.class.Address, core.class.Type, {
       attributes: {}
-    }),
+    })),
 
-    _class(contact.class.Contact, core.class.Doc, {
+    create(_class(contact.class.Contact, core.class.Doc, {
       attributes: {
         email: { _class: contact.class.Email },
         phone: { _class: contact.class.Phone },
@@ -41,6 +42,6 @@ export default {
         address: { _class: contact.class.Address },
         addressDelivery: { _class: contact.class.Address },
       }
-    })
+    }))
   ]
 }

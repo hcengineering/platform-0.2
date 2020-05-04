@@ -42,7 +42,7 @@ export function mixin<T extends Obj>(_id: Ref<Doc>, obj: T): Event<T> {
   return { op: Operation.Mixin, payload: { obj } }
 }
 
-export function loadModel(events: Event<Obj>[]): Doc[] {
+export function modelFromEvents(events: Event<Obj>[]): Doc[] {
   const docs = new Map<Ref<Doc>, Doc>()
   events.forEach(event => {
     if (event.op === Operation.Create) {

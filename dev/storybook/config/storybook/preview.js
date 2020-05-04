@@ -14,6 +14,7 @@
 //
 
 import platform from '@anticrm/platform-ui/src/platform'
+import { modelFromEvents } from '@anticrm/platform-core/src/__model__/operations'
 
 import uiResources from '@anticrm/platform-ui/src/resources'
 
@@ -23,12 +24,13 @@ import testModel from '../../src/test-data'
 
 uiResources(platform)
 
+const model = modelFromEvents([
+  ...coreModel.events,
+  ...contactCoreModel.events,
 
-const model = [
-  ...coreModel.model,
-  ...contactCoreModel.model,
+  ...testModel.events
+])
 
-  ...testModel.model
-]
+console.log(JSON.stringify(model, undefined, 2))
 
 platform.loadModel(model)
