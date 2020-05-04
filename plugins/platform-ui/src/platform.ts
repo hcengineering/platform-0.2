@@ -33,16 +33,16 @@ class UIPlatform extends Platform {
   get session(): Session { return this.memSession }
 
   loadModel(docs: Doc[]) {
-    this.memdb.load
+    this.memdb.load(docs)
   }
 
   ///
 
   getAttrModel(object: Instance<Obj>, props: string[]) {
-    const attributes = object.getClass().attributes
+    const clazz = object.getClass()
     return props.map(key => ({
       key,
-      type: attributes[key],
+      type: clazz.attributes[key],
       label: this.translate(attributeLabelId(object._class, key)),
       placeholder: 'Placeholder',
     }))
