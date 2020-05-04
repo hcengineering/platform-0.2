@@ -13,7 +13,8 @@
 // limitations under the License.
 // 
 
-import { IntlString, Platform } from '../platform'
+import { IntlString } from '../extension'
+import { Platform } from '../platform'
 
 const platform = new Platform()
 
