@@ -15,7 +15,7 @@
 
 import { execute, THIS, DUP, GET, APPLY0, APPLY1, ARG0 } from '../easyscript'
 
-describe('platform', () => {
+describe('easyscript', () => {
 
   it('should execure easyscript', () => {
     const code = `${THIS},${DUP},getClass,${GET},${APPLY0},${DUP},toString,${GET},${ARG0},${APPLY1}`

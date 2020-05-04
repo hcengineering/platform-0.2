@@ -13,24 +13,15 @@
 // limitations under the License.
 //
 
-import platform from '@anticrm/platform-ui/src/platform'
-import { modelFromEvents } from '@anticrm/platform-core/src/__model__/operations'
+import model from '../__model__'
+import { modelFromEvents } from '../__model__/operations'
 
-import uiResources from '@anticrm/platform-ui/src/resources'
 
-import coreModel from '@anticrm/platform-core/src/__model__'
-import contactCoreModel from '@anticrm/contact-core/src/__model__'
-import testModel from '../../src/test-data'
+describe('operations', () => {
 
-uiResources(platform)
+  it('should execure easyscript', () => {
+    const loaded = modelFromEvents(model.events)
+    expect(true).toBe(true)
+  })
 
-const model = modelFromEvents([
-  ...coreModel.events,
-  ...contactCoreModel.events,
-
-  ...testModel.events
-])
-
-console.log(JSON.stringify(model, undefined, 2))
-
-platform.loadModel(model)
+})

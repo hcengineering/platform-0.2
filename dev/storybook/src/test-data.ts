@@ -14,15 +14,18 @@
 //
 
 import contact from '@anticrm/contact-core'
+import { create } from '@anticrm/platform-core/src/__model__/operations'
+import { Ref, Doc, AsString } from '@anticrm/platform-core'
+import { Contact } from '@anticrm/contact-core'
 
-export const contact1 = 'test.contact.1'
+export const contact1 = 'test.contact.1' as Ref<Contact>
 
 export default {
-  model: [
-    {
+  events: [
+    create<Contact>({
       _class: contact.class.Contact,
       _id: contact1,
-      phone: '+7 913 333 5555'
-    }
+      phone: '+7 913 333 5555' as AsString<string>
+    })
   ]
 }
