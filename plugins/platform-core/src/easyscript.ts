@@ -35,12 +35,12 @@ APPLY1 // stack [<result>]
 
 */
 
-export const THIS = '$0'
-export const DUP = '$1'
-export const GET = '$2'
-export const APPLY0 = '$3'
-export const APPLY1 = '$4'
-export const ARG0 = '$5'
+export const THIS = '#0'
+export const DUP = '#1'
+export const GET = '#2'
+export const APPLY0 = '#3'
+export const APPLY1 = '#4'
+export const ARG0 = '#5'
 
 export function execute(code: string, thisArg: object, args: any[]) {
   const split = code.split(',')
@@ -91,6 +91,6 @@ export function execute(code: string, thisArg: object, args: any[]) {
   if (stack.length !== 1) {
     throw new Error('stack size != 1')
   }
-  return stack[0]
+  return stack.pop()
 
 }
