@@ -22,7 +22,8 @@ import { Resource } from '@anticrm/platform-core'
 export default Vue.extend({
   props: {
     icon: {
-      type: String
+      type: String,
+      required: true
     }
   },
   computed: {
