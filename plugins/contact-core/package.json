@@ -1,0 +1,8 @@
+{
+  "name": "@anticrm/contact-core",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./src/types.ts",
+  "author": "Andrey Platov <andrey.v.platov@gmail.com>",
+  "license": "EPL-2.0"
+}

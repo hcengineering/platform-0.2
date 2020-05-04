@@ -13,8 +13,12 @@
 // limitations under the License.
 //
 
-import core, { pluginId, Ref, Class, Doc, Obj, Mixin, Type, PropertyType, RefTo, BagOf, InstanceOf, Embedded } from '../types'
-import { IntlString, Extension } from '../platform'
+import core, {
+  pluginId, Ref, Class, Doc, Mixin, Type,
+  PropertyType, RefTo, BagOf,
+  InstanceOf, Embedded, IntlString, Extension, BusinessObject
+} from '../types'
+
 import { mergeIds } from './utils'
 import id from '../id'
 
@@ -28,5 +32,6 @@ export default mergeIds(core, id(pluginId, {
     InstanceOf: '' as Ref<Class<InstanceOf<Embedded>>>,
     IntlString: '' as Ref<Class<Type<IntlString>>>,
     Extension: '' as Ref<Class<Type<Extension<any>>>>,
+    BusinessObject: '' as Ref<Class<BusinessObject>>
   }
 }))

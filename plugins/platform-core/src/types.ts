@@ -22,7 +22,7 @@ export { Extension, IntlString, id }
 export { Resource } from './extension'
 
 export type PropertyType = undefined | Extension<any> | Ref<Doc> | IntlString | Embedded
-  // | { __bag: void } // Bag<PropertyType>
+  | AsString<any>
   | { [key: string]: PropertyType }
   | PropertyType[]
 
@@ -42,7 +42,8 @@ export type Instance<T extends Obj> = T & InstanceIntf<T>
 
 // S E R I A L I Z E D
 
-type AsNumber<T> = number | { __as_number: T }
+type AsNumber<T> = number & { __as_number: T }
+export type AsString<T> = string & { __as_number: T }
 // interface Struct { __struct: void }
 
 export type Method<T extends AnyFunc> = Extension<T> & { __method: T }

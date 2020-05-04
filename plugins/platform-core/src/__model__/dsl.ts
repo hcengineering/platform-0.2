@@ -13,10 +13,9 @@
 // limitations under the License.
 //
 
-import { IntlString, Extension } from '../platform'
 import {
-  Obj, Class, Ref, Doc, Type, RefTo,
-  PropertyType, BagOf, Embedded, InstanceOf
+  Obj, Class, Ref, Doc, Type, RefTo, AsString,
+  PropertyType, BagOf, Embedded, InstanceOf, IntlString, Extension
 } from '../types'
 import core from './id'
 
@@ -60,3 +59,7 @@ export function intl(_default?: IntlString): Type<IntlString> {
 export function extension<T>(_default?: Extension<T>): Type<Extension<T>> {
   return { _class: core.class.Extension, _default }
 }
+
+// export function as_string<T>(_class: Ref<Class<Type<AsString<T>>>>, _default?: AsString<T>): Type<AsString<T>> {
+//   return { _class, _default }
+// }
