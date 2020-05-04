@@ -29,7 +29,7 @@ export class Platform {
 
   private strings: Map<IntlString, string> = new Map()
   private imfCache: Map<IntlString, IntlMessageFormat> = new Map()
-  private extensions = new Map<string, any>()
+  private extensions = new Map<Extension<any>, any>()
   private resources = new Map<Resource, string>()
 
   /////////////////
@@ -37,7 +37,7 @@ export class Platform {
   translate(string: IntlString, params?: Record<string, PrimitiveType> | undefined): string {
     const translation = this.strings.get(string)
     if (!translation) {
-      return string
+      return string as string
     }
     if (params) {
       let imf = this.imfCache.get(string)

@@ -1,7 +1,6 @@
 {
   "name": "benchmark",
   "version": "0.1.0",
-  "main": "index.js",
   "author": "Andrey Platov <andrey.v.platov@gmail.com>",
   "license": "EPL-2.0",
   "private": true,
