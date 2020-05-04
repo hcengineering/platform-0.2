@@ -58,7 +58,7 @@ export class Platform {
 
   /////////////////
 
-  getResource<T>(resource: Resource): string {
+  getResource(resource: Resource): string {
     const result = this.resources.get(resource)
     if (!result) {
       throw new Error('resource not found: ' + resource)
@@ -107,3 +107,5 @@ export class Platform {
   }
 
 }
+
+export default new Platform() // TODO: decide later
