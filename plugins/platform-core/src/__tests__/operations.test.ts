@@ -14,13 +14,13 @@
 //
 
 import model from '../__model__'
-import { loadModel } from '../__model__/operations'
+import { modelFromEvents } from '../__model__/operations'
 
 
 describe('operations', () => {
 
   it('should execure easyscript', () => {
-    const loaded = loadModel(model.events)
+    const loaded = modelFromEvents(model.events)
     expect(true).toBe(true)
   })
 
