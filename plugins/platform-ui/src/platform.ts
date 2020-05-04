@@ -1,4 +1,4 @@
-<!--
+//
 // Copyright © 2020 Andrey Platov <andrey.v.platov@gmail.com>
 // 
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
@@ -11,29 +11,27 @@
 // 
 // See the License for the specific language governing permissions and
 // limitations under the License.
--->
+//
 
-<script lang="ts">
+import { Doc } from '@anticrm/platform-core'
+import { Platform } from '@anticrm/platform-core/src/platform'
+import { MemSession } from '@anticrm/platform-core/src/session'
+import { MemDb } from '@anticrm/platform-core/src/memdb'
 
-import Vue from 'vue'
-import platform from '../platform'
-import { Resource } from '@anticrm/platform-core'
+class UIPlatform extends Platform {
 
-export default Vue.extend({
-  props: {
-    icon: {
-      type: String,
-      required: true
-    }
-  },
-  computed: {
-    url(): string { return platform.getResource(this.icon as Resource) },
+  readonly session: MemSession
+  private memdb: MemDb
+
+  constructor() {
+    super()
+    this.memdb = new MemDb()
+    this.session = new MemSession(this.memdb)
   }
-})
-</script>
 
-<template>
-  <svg>
-    <use :xlink:href="url" />
-  </svg>
-</template>
+  loadModel(docs: Doc[]) {
+    this.memdb.load
+  }
+}
+
+export default new UIPlatform()

@@ -108,4 +108,4 @@ export class Platform {
 
 }
 
-export default new Platform() // TODO: decide later
+// export default new Platform() // TODO: decide later

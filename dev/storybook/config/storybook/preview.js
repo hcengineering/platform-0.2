@@ -13,8 +13,7 @@
 // limitations under the License.
 //
 
-import platform from '@anticrm/platform-core/src/platform'
-
+import platform from '@anticrm/platform-ui/src/platform'
 import uiResources from '@anticrm/platform-ui/src/resources'
 
 uiResources(platform)
