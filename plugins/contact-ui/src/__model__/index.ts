@@ -13,4 +13,9 @@
 // limitations under the License.
 //
 
-// Looks like we have to have at least one .ts file for a package
+import { _class, ref, intl, bag, instance, extension, Attibutes } from '@anticrm/platform-core/src/__model__/dsl'
+
+export default {
+  model: [
+  ]
+}
