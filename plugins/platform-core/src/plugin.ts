@@ -13,27 +13,23 @@
 // limitations under the License.
 */
 
-import { Platform } from './platform'
-import core, { pluginId, Instance, Obj, Class } from './types'
-import { classLabelId } from './utils'
+import { Platform } from '@anticrm/platform'
 
-export default {
-  pluginId,
-  start(platform: Platform) {
-    function Obj_toIntlString(this: Instance<Obj>, plural?: number): string {
-      const m = this.getClass().toIntlString // temp
-      if (m)
-        return platform.invoke(this, m, plural)
-      return 'todo'
-    }
+export default function start(platform: Platform) {
+  //   function Obj_toIntlString(this: Instance<Obj>, plural?: number): string {
+  //     const m = this.getClass().toIntlString // temp
+  //     if (m)
+  //       return platform.invoke(this, m, plural)
+  //     return 'todo'
+  //   }
 
-    function Class_toIntlString(this: Instance<Class<Obj>>, plural?: number): string {
-      return platform.translate(classLabelId(this._id), { n: plural })
-    }
+  //   function Class_toIntlString(this: Instance<Class<Obj>>, plural?: number): string {
+  //     return platform.translate(classLabelId(this._id), { n: plural })
+  //   }
 
-    platform.loadExtensions(core.method, {
-      Obj_toIntlString,
-      Class_toIntlString
-    })
-  }
+  //   platform.loadExtensions(core.method, {
+  //     Obj_toIntlString,
+  //     Class_toIntlString
+  //   })
+  // }
 }

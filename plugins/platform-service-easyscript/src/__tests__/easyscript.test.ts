@@ -13,7 +13,8 @@
 // limitations under the License.
 //
 
-import { execute, THIS, DUP, GET, APPLY0, APPLY1, ARG0 } from '../easyscript'
+import { THIS, DUP, GET, APPLY0, APPLY1, ARG0 } from '..'
+import { execute } from '../service'
 
 describe('easyscript', () => {
 

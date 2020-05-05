@@ -13,7 +13,8 @@
 // limitations under the License.
 //
 
-import { Ref, Class, Obj, IntlString } from '../types'
+import { Ref, Class, Obj } from '@anticrm/platform-service-data'
+import { IntlString } from '@anticrm/platform-service-i18n'
 import { classLabelId, attributeLabelId } from '../utils'
 
 import { mergeWith } from 'lodash'

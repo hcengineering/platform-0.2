@@ -13,7 +13,9 @@
 // limitations under the License.
 //
 
-import { Ref, Obj, Class, IntlString } from './types'
+import { Obj, Class, Ref } from '@anticrm/platform-service-data'
+
+import { IntlString } from '@anticrm/platform-service-i18n'
 
 export function classLabelId(clazz: Ref<Class<Obj>>): IntlString {
   return clazz as string as IntlString

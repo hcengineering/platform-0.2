@@ -15,21 +15,22 @@
 
 import ru from './strings/ru'
 
-import { _class, ref, intl, bag, instance, extension, Attibutes } from './dsl'
-import { Obj, Ref, Class, Doc } from '../types'
+import { _class, ref, intl, bag, instance, extension, Attibutes, create, embed } from './dsl'
+import { Obj, Ref, Class, Doc } from '@anticrm/platform-service-data'
 import core from './id'
-import { create } from './operations'
 
 const attributes: Attibutes<Obj> = {
   _class: ref(core.class.Class),
   toIntlString: extension(core.method.Obj_toIntlString)
 }
 
+const x = {} as Attibutes<Obj>
+
 const objectClass: Class<Obj> = {
   _class: core.class.Class,
   _id: core.class.Object,
   // label: '' as IntlString,
-  attributes
+  attributes: embed(attributes)
 }
 
 export default {
@@ -46,10 +47,10 @@ export default {
     })),
 
     create(_class(core.class.RefTo, core.class.Object, {
-      attributes: {
+      attributes: embed({
         _default: ref(core.class.Doc),
         to: ref(core.class.Class)
-      }
+      })
     })),
 
     create(_class(core.class.Class, core.class.Doc, {

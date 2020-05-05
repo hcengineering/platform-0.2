@@ -13,14 +13,14 @@
 // limitations under the License.
 //
 
-export type AsString<T> = string | { __as_string: T }
-// export type AsNumber<T> = number | { __as_number: T }
+import model from '..'
+import { modelFromEvents } from '../dsl'
 
-// export type PropertyType = AsNumber<any> | AsString<any> | { [key: string]: PropertyType } | PropertyType[]
+describe('operations', () => {
 
-/** Function */
-export type AnyFunc = (...args: any[]) => any
+  it('should execure easyscript', () => {
+    const loaded = modelFromEvents(model.events)
+    expect(true).toBe(true)
+  })
 
-export type Extension<T> = AsString<T> & { __extension: void }
-export type IntlString = AsString<string> & { __intl_string: void }
-export type Resource = AsString<string> & { __resource: void }
+})

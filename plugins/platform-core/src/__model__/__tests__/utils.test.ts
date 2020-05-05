@@ -13,12 +13,12 @@
 // limitations under the License.
 //
 
-import { IntlString } from '../../extension'
-import { Ref, Class, Obj } from '../../types'
+import { IntlString } from '@anticrm/platform-service-i18n'
+import { Ref, Class, Obj } from '@anticrm/platform-service-data'
 import { verifyTranslation, modelTranslation } from '../utils'
-import id from '../../id'
+import { identify } from '@anticrm/platform'
 
-const ids = id('test', {
+const ids = identify('test', {
   strings: {
     MyString: '' as IntlString
   },

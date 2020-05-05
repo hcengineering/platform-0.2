@@ -15,14 +15,17 @@
 
 import core, {
   pluginId, Ref, Class, Doc, Mixin, Type,
-  PropertyType, RefTo, BagOf,
-  InstanceOf, Embedded, IntlString, Extension, BusinessObject
-} from '../types'
+  PropertyType, RefTo, BagOf, Obj,
+  InstanceOf, Embedded, BusinessObject
+} from '@anticrm/platform-service-data'
+
+import { IntlString } from '@anticrm/platform-service-i18n'
+import { Extension } from '@anticrm/platform-service-extension'
 
 import { mergeIds } from './utils'
-import id from '../id'
+import { identify } from '@anticrm/platform'
 
-export default mergeIds(core, id(pluginId, {
+export default mergeIds(core, identify(pluginId, {
   class: {
     Doc: '' as Ref<Class<Doc>>,
     Mixin: '' as Ref<Class<Mixin<Doc>>>,
@@ -33,5 +36,9 @@ export default mergeIds(core, id(pluginId, {
     IntlString: '' as Ref<Class<Type<IntlString>>>,
     Extension: '' as Ref<Class<Type<Extension<any>>>>,
     BusinessObject: '' as Ref<Class<BusinessObject>>
+  },
+  method: {
+    Obj_toIntlString: '' as Extension<(this: Obj, plural?: number) => string>,
+    Class_toIntlString: '' as Extension<(this: Obj, plural?: number) => string>
   }
 }))

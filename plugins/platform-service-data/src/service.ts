@@ -13,8 +13,8 @@
 // limitations under the License.
 //
 
-import { Session, Query } from './types'
-import core, { Obj, Doc, Ref, Bag, Class, PropertyType, Mixin, Instance, InstanceIntf } from './types'
+import { Session, Query } from '..'
+import core, { Obj, Doc, Ref, Bag, Class, PropertyType, Mixin, Instance, InstanceIntf } from '..'
 import { MemDb } from './memdb'
 
 function toHex(value: number, chars: number): string {
@@ -186,3 +186,5 @@ export class MemSession implements Session {
   }
 
 }
+
+//export default (platform: Platform): Session => new MemSession()

@@ -13,35 +13,9 @@
 // limitations under the License.
 //
 
+import { EasyScriptService, EasyScript, AnyFunc, THIS, DUP, GET, APPLY0, APPLY1, ARG0 } from '..'
 
-/*
-
-function toString(this: Obj, plural?: number) { 
-  return this.getClass().toString(plural)
-}
-
-translates to:
-
-THIS // [this]
-DUP // [this, this]
-getClass // [this, this, getClass]
-GET  // stack: [this, <function>getClass]
-APPLY0 // stack: [<class' this>]
-DUP // stack: [<class' this>, <class' this>]
-toString // stack: [<class' this>, <class' this>, 'toString']
-GET // stack [<class' this>, <function>toString]
-ARG0 // stack [<class' this>, <function>toString, plural]
-APPLY1 // stack [<result>]
-
-*/
-
-export const THIS = '#0'
-export const DUP = '#1'
-export const GET = '#2'
-export const APPLY0 = '#3'
-export const APPLY1 = '#4'
-export const ARG0 = '#5'
-
+// Exported for Tests & Benchmarks
 export function execute(code: string, thisArg: object, args: any[]) {
   const split = code.split(',')
   const stack: any[] = []
@@ -94,3 +68,13 @@ export function execute(code: string, thisArg: object, args: any[]) {
   return stack.pop()
 
 }
+
+class EasyScriptServiceImpl implements EasyScriptService {
+  get<M extends AnyFunc>(code: EasyScript<M>): M {
+    return function (...args: any[]) {
+      return execute(code as string, this, args)
+    } as M
+  }
+}
+
+export default (platform: Platform): EasyScriptService => new EasyScriptServiceImpl()

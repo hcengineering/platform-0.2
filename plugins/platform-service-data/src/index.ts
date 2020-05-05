@@ -15,21 +15,29 @@
 
 // import { KeysByType, AnyFunc } from 'simplytyped'
 
-import { Extension, IntlString, AnyFunc, AsString } from './extension'
-import id from './id'
-
-export { Extension, IntlString, id }
-export { Resource } from './extension'
-
-export type PropertyType = undefined | Extension<any> | Ref<Doc> | IntlString | Embedded
-  | AsString<any>
-  | { [key: string]: PropertyType }
-  | PropertyType[]
+import { PropType, AsNumber, AsString } from '@anticrm/platform'
+import { identify, PlatformService } from '@anticrm/platform'
 
 type DocId = string
 
-export type Bag<T extends PropertyType> = { [key: string]: T } //& { __bag: void }
-export type Ref<T extends Doc> = DocId & { __ref: T }
+export type PropertyType = PropType<any>// PropType<any> | Obj | { [key: string]: PropertyType } | undefined
+
+
+type A<T> = {
+  [P in keyof T]: T[P] extends PropType<any> ? Type<T[P]> : never
+}
+
+type R<T> = A<Required<T>>
+
+const o = {} as Obj
+
+const x = {} as R<Obj>
+
+// export type Bag<T extends PropertyType> = { [key: string]: T } & PropType<Record<string, T>>
+
+export type Bag<X extends PropertyType> = Record<string, X> & PropType<Record<string, X>>
+
+export type Ref<T extends Doc> = AsString<T> & { __ref: void }
 
 // export type Layout<T extends Obj> = Omit<T, KeysByType<T, AnyFunc>>
 
@@ -40,18 +48,11 @@ export interface InstanceIntf<T extends Obj> {
 
 export type Instance<T extends Obj> = T & InstanceIntf<T>
 
-// S E R I A L I Z E D
-
-type AsNumber<T> = number & { __as_number: T }
-// interface Struct { __struct: void }
-
-export type Method<T extends AnyFunc> = Extension<T> & { __method: T }
-
 // S E S S I O N
 
 export type Query<T extends Doc> = Partial<T>
 
-export interface Session {
+export interface Session extends PlatformService {
   getInstance<T extends Doc>(ref: Ref<T>): Instance<T>
   newInstance<T extends Obj>(clazz: Ref<Class<T>>): T
 
@@ -66,7 +67,7 @@ export interface Session {
 export interface Obj {
   _class: Ref<Class<this>>
 
-  toIntlString?: Extension<(this: Obj, plural?: number) => string>
+  toIntlString?: PropType<(this: Obj, plural?: number) => string>
 }
 
 export interface Doc extends Obj {
@@ -77,8 +78,7 @@ export interface Doc extends Obj {
   // mixin<T extends this>(mixin: Ref<Mixin<T>>): T
 }
 
-export interface Embedded extends Obj {
-}
+export type Embedded = Obj & PropType<Obj>
 
 export interface Type<T extends PropertyType> extends Embedded {
   _default?: T
@@ -113,13 +113,14 @@ export interface BusinessObject extends Doc {
 
 export const pluginId = 'core'
 
-export default id(pluginId, {
+export default identify(pluginId, {
   method: {
-    Obj_toIntlString: '' as Extension<(this: Obj, plural?: number) => string>,
-    Class_toIntlString: '' as Extension<(this: Obj, plural?: number) => string>
   },
   class: {
     Object: '' as Ref<Class<Obj>>,
     Class: '' as Ref<Class<Class<Obj>>>,
   }
 })
+
+
+
