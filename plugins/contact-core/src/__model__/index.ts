@@ -15,33 +15,26 @@
 
 import contact from './id'
 import core from '@anticrm/platform-core/src/__model__/id'
-import { _class, ref, intl, bag, instance, extension, Attibutes } from '@anticrm/platform-core/src/__model__/dsl'
-import { create } from '@anticrm/platform-core/src/__model__/operations'
+
+import { Class, Type } from '@anticrm/platform-core'
+import { createDocs } from '@anticrm/platform-core/src/__model__/utils'
+
+const model = [
+  Class.createClass(contact.class.Email, core.class.Type, {}),
+  Class.createClass(contact.class.Phone, core.class.Type, {}),
+  Class.createClass(contact.class.Twitter, core.class.Type, {}),
+  Class.createClass(contact.class.Address, core.class.Type, {}),
+
+  Class.createClass(contact.class.Contact, core.class.Doc, {
+    email: new Type(contact.class.Email),
+    phone: new Type(contact.class.Phone),
+    phoneWork: new Type(contact.class.Phone),
+    twitter: new Type(contact.class.Twitter),
+    address: new Type(contact.class.Address),
+    addressDelivery: new Type(contact.class.Address),
+  })
+]
 
 export default {
-  events: [
-    create(_class(contact.class.Email, core.class.Type, {
-      attributes: {}
-    })),
-    create(_class(contact.class.Phone, core.class.Type, {
-      attributes: {}
-    })),
-    create(_class(contact.class.Twitter, core.class.Type, {
-      attributes: {}
-    })),
-    create(_class(contact.class.Address, core.class.Type, {
-      attributes: {}
-    })),
-
-    create(_class(contact.class.Contact, core.class.Doc, {
-      attributes: {
-        email: { _class: contact.class.Email },
-        phone: { _class: contact.class.Phone },
-        phoneWork: { _class: contact.class.Phone },
-        twitter: { _class: contact.class.Twitter },
-        address: { _class: contact.class.Address },
-        addressDelivery: { _class: contact.class.Address },
-      }
-    }))
-  ]
+  events: createDocs(model)
 }

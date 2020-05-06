@@ -13,16 +13,18 @@
 // limitations under the License.
 //
 
+import { Ref, Class, Type } from '@anticrm/platform-core'
 import { mergeIds } from '@anticrm/platform-core/src/__model__/utils'
-import { id, Ref, Class, Type, AsString } from '@anticrm/platform-core'
-import contact, { pluginId, Contact } from '../types'
+import { identify } from '@anticrm/platform/'
 
-export default mergeIds(contact, id(pluginId, {
+import contact, { pluginId } from '..'
+
+export default mergeIds(contact, identify(pluginId, {
   class: {
-    Email: '' as Ref<Class<Type<AsString<string>>>>,
-    Phone: '' as Ref<Class<Type<AsString<string>>>>,
-    Twitter: '' as Ref<Class<Type<AsString<string>>>>,
-    Address: '' as Ref<Class<Type<AsString<string>>>>,
+    Email: '' as Ref<Class<Type<string>>>,
+    Phone: '' as Ref<Class<Type<string>>>,
+    Twitter: '' as Ref<Class<Type<string>>>,
+    Address: '' as Ref<Class<Type<string>>>,
 
   }
 }))

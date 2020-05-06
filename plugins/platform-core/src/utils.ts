@@ -15,7 +15,7 @@
 
 import { Obj, Class, Ref } from '.'
 
-import { IntlString } from '@anticrm/platform-service-i18n'
+import { IntlString } from '@anticrm/platform-core-i18n'
 
 export function classLabelId(clazz: Ref<Class<Obj>>): IntlString {
   return clazz as string as IntlString

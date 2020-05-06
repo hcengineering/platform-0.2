@@ -13,11 +13,11 @@
 // limitations under the License.
 //
 
-import { Platform, Metadata } from '@anticrm/platform'
+import { Platform } from '@anticrm/platform'
 import { CorePlugin, Query, pluginId } from '.'
 import core, {
   Obj, Doc, Ref, Bag, Class, Type, RefTo, SessionProto,
-  PropertyType, TypeMetadata, BagOf, InstanceOf, Embedded,
+  PropertyType, BagOf, InstanceOf, Embedded,
 } from '.'
 import { MemDb } from './memdb'
 
@@ -143,7 +143,7 @@ export default (platform: Platform): CorePlugin => {
 
   platform.setMetadata(core.native.Object, Obj.prototype)
   platform.setMetadata(core.native.RefTo, RefTo.prototype)
-  platform.setMetadata(core.native.Metadata, TypeMetadata.prototype)
+  platform.setMetadata(core.native.Type, Type.prototype)
   platform.setMetadata(core.native.BagOf, BagOf.prototype)
   platform.setMetadata(core.native.InstanceOf, InstanceOf.prototype)
 

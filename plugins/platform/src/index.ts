@@ -88,6 +88,6 @@ function transform<N extends Namespace>(prefix: string, namespaces: N, f: (id: s
   return result as N
 }
 
-export function identify<N extends Namespace>(pluginId: string, namespace: N): N {
+export function identify<N extends Namespace>(pluginId: PluginId<Plugin>, namespace: N): N {
   return transform(pluginId, namespace, (id: string, value) => value === '' ? id : value)
 }

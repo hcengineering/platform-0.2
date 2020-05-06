@@ -15,29 +15,9 @@
 
 import ru from './strings/ru'
 
-import { Obj, Ref, Class, Doc, BagOf, InstanceOf, RefTo, TypeMetadata } from '..'
+import { Obj, Ref, Class, Doc, BagOf, InstanceOf, RefTo, Type } from '..'
 import { createDocs } from './utils'
 import core from './id'
-
-// const core = identify(pluginId, {
-//   native: {
-//     Object: '' as Metadata<Obj>,
-//     Metadata: '' as Metadata<TypeMetadata<any>>,
-//     RefTo: '' as Metadata<RefTo<Doc>>,
-//     BagOf: '' as Metadata<BagOf<PropertyType>>,
-//     InstanceOf: '' as Metadata<InstanceOf<Embedded>>,
-//   },
-//   class: {
-//     Object: '' as Ref<Class<Obj>>,
-//     Class: '' as Ref<Class<Class<Obj>>>,
-//     RefTo: '' as Ref<Class<RefTo<Doc>>>,
-//     Doc: '' as Ref<Class<Doc>>,
-//     Type: '' as Ref<Class<Type<PropertyType>>>,
-//     BagOf: '' as Ref<Class<BagOf<PropertyType>>>,
-//     InstanceOf: '' as Ref<Class<InstanceOf<Embedded>>>,
-//     Metadata: '' as Ref<Class<Type<Metadata<any>>>>,
-//   },
-// })
 
 const model = [
   new Class(core.class.Class, core.class.Object, {
@@ -46,9 +26,9 @@ const model = [
   Class.createClass(core.class.Doc, core.class.Object, {
     _id: new RefTo(core.class.Doc)
   }),
-  Class.createClass(core.class.Type, core.class.Object, {}),
+  Class.createClass(core.class.Type, core.class.Object, {}, core.native.Type),
   Class.createClass(core.class.Metadata, core.class.Type, {
-  }, core.native.Metadata),
+  }),
   Class.createClass(core.class.RefTo, core.class.Type, {
     to: new RefTo(core.class.Class as Ref<Class<Class<Doc>>>),
   }, core.native.RefTo),
@@ -61,7 +41,7 @@ const model = [
   Class.createClass(core.class.Class, core.class.Doc, {
     attributes: new BagOf(new InstanceOf(core.class.Type)),
     extends: new RefTo(core.class.Class),
-    native: new TypeMetadata()
+    native: new Type(core.class.Metadata)
   })
 ]
 

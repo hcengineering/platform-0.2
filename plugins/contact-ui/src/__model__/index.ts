@@ -13,9 +13,7 @@
 // limitations under the License.
 //
 
-import { _class, ref, intl, bag, instance, extension, Attibutes } from '@anticrm/platform-core/src/__model__/dsl'
-
 export default {
-  model: [
+  events: [
   ]
 }

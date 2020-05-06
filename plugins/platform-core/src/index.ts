@@ -21,7 +21,8 @@ import { identify, Plugin, PluginId } from '@anticrm/platform'
 export type AnyFunc = (...args: any[]) => any
 export type Ref<T extends Doc> = AsString<T> & { __ref: void }
 
-export type PropertyType = PropType<any> | Embedded | { [key: string]: PropertyType }
+export type PropertyType = PropType<any> | Embedded | { [key: string]: PropertyType } | string
+
 export type Bag<X extends PropertyType> = { [key: string]: X }
 
 export class SessionProto {
@@ -51,13 +52,13 @@ export abstract class Embedded extends Obj {
   // __embedded!: void
 }
 
-export abstract class Type<T extends PropertyType> extends Embedded {
+export class Type<T extends PropertyType> extends Embedded {
   _default?: T
-  protected constructor(_class: Ref<Class<Type<T>>>, _default?: T) {
+  constructor(_class: Ref<Class<Type<T>>>, _default?: T) {
     super(_class)
     this._default = _default
   }
-  abstract exert(value: T): any
+  exert(value: T) { return value ?? this._default }
 }
 export type AnyType = Type<PropertyType>
 
@@ -67,7 +68,7 @@ export class RefTo<T extends Doc> extends Type<Ref<T>> {
     super(core.class.RefTo as Ref<Class<RefTo<T>>>, _default)
     this.to = to
   }
-  exert(value: Ref<T>) { return value ?? this._default }
+  // exert(value: Ref<T>) { return value ?? this._default }
 }
 
 export class InstanceOf<T extends Embedded> extends Type<T> {
@@ -101,19 +102,18 @@ export class BagOf<T extends PropertyType> extends Type<Bag<T>> {
     this.of = of
   }
   exert(value: Bag<T>) {
-    return new Proxy(value, new BagProxyHandler(this.of))
+    return new Proxy(value, new BagProxyHandler(this.of)) as Bag<T>
   }
 }
 
-export class TypeMetadata<T> extends Type<Metadata<T>> {
-  constructor(_default?: Metadata<T>) {
-    super(core.class.Metadata, _default)
-  }
-  exert(value: Metadata<any>) {
-    return value ?? this._default
-    //return this.getSession().platform.getMetadata(value ?? this._default)
-  }
-}
+// export class TypeMetadata<T> extends Type<Metadata<T>> {
+//   constructor(_default?: Metadata<T>) {
+//     super(core.class.Metadata, _default)
+//   }
+//   exert(value: Metadata<any>) {
+//     return this.getSession().platform.getMetadata(value ?? this._default)
+//   }
+// }
 
 type RemoveMethods<T extends object> = Omit<T, KeysByType<T, AnyFunc>>
 type Clear<T> = RemoveMethods<Omit<T, '__embedded' | '_default'>>
@@ -158,7 +158,7 @@ export const pluginId = 'core' as PluginId<CorePlugin>
 const core = identify(pluginId, {
   native: {
     Object: '' as Metadata<Obj>,
-    Metadata: '' as Metadata<TypeMetadata<any>>,
+    Type: '' as Metadata<Type<PropertyType>>,
     RefTo: '' as Metadata<RefTo<Doc>>,
     BagOf: '' as Metadata<BagOf<PropertyType>>,
     InstanceOf: '' as Metadata<InstanceOf<Embedded>>,
