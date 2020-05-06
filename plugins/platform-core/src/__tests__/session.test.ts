@@ -66,6 +66,7 @@ describe('session', () => {
     expect(objectClass.getClass()._id).toBe(core.class.Class)
 
     console.log(objectClass.toIntlString())
+    console.log(objectClass.attributes)
 
     // const method = objectClass.toIntlString
     // console.log(method)

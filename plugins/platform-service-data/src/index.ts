@@ -113,6 +113,7 @@ export default identify(pluginId, {
     RefTo: '' as Metadata<object>,
     Object: '' as Metadata<object>
   },
-  class: {
+  method: {
+    Bag_excert: '' as Metadata<(this: Instance<BagOf<PropertyType>>, value: Bag<PropertyType>) => Bag<PropertyType>>,
   }
 })

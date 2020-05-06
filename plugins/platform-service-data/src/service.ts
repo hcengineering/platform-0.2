@@ -18,102 +18,32 @@ import { Session, Query } from '..'
 import core, { Obj, Doc, Ref, Bag, Class, Type, Mixin, Instance, RefTo, AnyFunc, Layout, PropertyType, SessionProto } from '..'
 import { MemDb } from './memdb'
 
-class InstanceProxy<T extends Obj> {
-  __layout: Obj
-  __proto: T
+class BagProxyHandler implements ProxyHandler<Bag<PropertyType>> {
+  private type: Instance<Type<PropertyType>>
 
-  constructor(layout: Obj, proto: T) {
-    this.__layout = layout
-    this.__proto = proto
-  }
-}
-
-class InstanceProxyHandler implements ProxyHandler<InstanceProxy<Obj>> {
-  private session: MemSession
-
-  constructor(session: MemSession) {
-    this.session = session
+  constructor(type: Instance<Type<PropertyType>>) {
+    this.type = type
   }
 
-  protected getFromLayout(target: InstanceProxy<Obj>, key: PropertyKey, receiver: any) {
-    return Reflect.get(target.__layout, key, receiver)
-  }
-
-  get(target: InstanceProxy<Obj>, key: string, receiver: any): any {
-    let value = this.getFromLayout(target, key, receiver)
-    if (!value) {
-      value = Reflect.get(target.__proto, key, receiver)
-    }
-    if (!value) return value
-
-    /// instantiate type
-
-    //    const clazz = this.session.memdb.get(this.getFromLayout(target, '_class', receiver))
-
-    if (!key.startsWith('_')) {
-      // const _class = this.getFromLayout(target, '_class', receiver)
-      // const clazz = this.session.memdb.get(_class) as Class<Obj>
-      // console.log('get key: ', key, ' class: ', _class)
-      // const attributes = clazz.attributes
-      // const attr = attributes[key]
-      // if (attr) {
-      //   console.log(attr)
-      //   const type = this.session.memdb.get(attr._class)
-      //   console.log(type)
-      //   console.log('exert:')
-      //   console.log(type.attributes.exert)
-      // } else {
-      //   console.log('UNDEFINED')
-      // }
-    }
-
-    ///
-
-    if (typeof value === 'object' && value.hasOwnProperty('_class')) {
-      return this.session.instantiate(value)
-    }
-    return value
-  }
-}
-
-class MixinProxy<M extends I, I extends Doc> extends InstanceProxy<M> {
-  __instance: I
-
-  constructor(layout: Obj, proto: M, instance: I) {
-    super(layout, proto)
-    this.__instance = instance
-  }
-}
-
-class MixinProxyHandler extends InstanceProxyHandler implements ProxyHandler<MixinProxy<Doc, Doc>> {
-
-  constructor(memdb: MemSession) {
-    super(memdb)
-  }
-
-  protected getFromLayout(target: MixinProxy<Doc, Doc>, key: PropertyKey, receiver: any) {
-    return super.getFromLayout(target, key, receiver) ??
-      Reflect.get(target.__instance, key, receiver)
+  get(target: Bag<PropertyType>, key: string): any {
+    const value = Reflect.get(target, key)
+    return this.type.exert(value)
   }
 }
 
 //////////
 
-class MemSession implements Session {
+/// Export FOR TEST
+export class MemSession implements Session {
 
   readonly platform: Platform
   private memdb: MemDb
   private prototypes = new Map<Ref<Class<Obj>>, Object>()
-  readonly instanceProxy: InstanceProxyHandler
-  readonly mixinProxy: MixinProxyHandler
-
   private sessionProto: SessionProto<Obj>
 
   constructor(platform: Platform) {
     this.platform = platform
     this.memdb = new MemDb()
-    this.instanceProxy = new InstanceProxyHandler(this)
-    this.mixinProxy = new MixinProxyHandler(this)
 
     this.sessionProto = {
       getSession: () => this,
@@ -249,9 +179,14 @@ export default (platform: Platform): Session => {
     }
   }
 
+  const BagExcert = function (this: Instance<Type<Bag<PropertyType>>>, value: Bag<PropertyType>): Bag<PropertyType> {
+    return new Proxy(value, new BagProxyHandler(this))
+  }
+
   platform.setMetadata(core.native.Object, ObjectType)
   platform.setMetadata(core.native.RefTo, RefType)
   platform.setMetadata(core.native.Metadata, MetadataType)
+  platform.setMetadata(core.method.Bag_excert, BagExcert)
 
   return new MemSession(platform)
 }

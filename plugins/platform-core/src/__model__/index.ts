@@ -16,7 +16,7 @@
 import ru from './strings/ru'
 
 import { _class, ref, bag, instance, create, metadata } from './dsl'
-import { Obj, Ref, Class, Doc, Type, PropertyType, Descriptors } from '@anticrm/platform-service-data'
+import { Obj, Ref, Class, Doc, Type, PropertyType, Descriptors, BagOf } from '@anticrm/platform-service-data'
 import core from './id'
 
 const attributes: Descriptors<Obj> = {
@@ -30,6 +30,9 @@ const objectClass: Class<Obj> = {
   native: core.native.Object,
   attributes
 }
+
+const z = {} as Descriptors<BagOf<PropertyType>>
+
 
 export default {
   strings: {
@@ -68,7 +71,7 @@ export default {
       attributes: {
         _default: bag(metadata(undefined)), // ?????? TODO undefined type
         of: instance(core.class.Type),
-        exert: metadata(core.method.SysCall_NotImplemented),
+        exert: metadata(core.method.Bag_excert),
       }
     })),
 
