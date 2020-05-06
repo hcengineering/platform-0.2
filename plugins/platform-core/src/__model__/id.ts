@@ -16,11 +16,8 @@
 import core, {
   pluginId, Ref, Class, Doc, Mixin, Type,
   PropertyType, RefTo, BagOf, Obj, SysCall,
-  InstanceOf, Embedded, BusinessObject, Instance
+  InstanceOf, Embedded, Instance
 } from '@anticrm/platform-service-data'
-
-import { IntlString } from '@anticrm/platform-service-i18n'
-// import { Extension } from '@anticrm/platform-service-extension'
 
 import { mergeIds } from './utils'
 import { identify } from '@anticrm/platform'
@@ -28,13 +25,9 @@ import { identify } from '@anticrm/platform'
 export default mergeIds(core, identify(pluginId, {
   class: {
     Doc: '' as Ref<Class<Doc>>,
-    Mixin: '' as Ref<Class<Mixin<Doc>>>,
     Type: '' as Ref<Class<Type<PropertyType>>>,
     BagOf: '' as Ref<Class<BagOf<PropertyType>>>,
     InstanceOf: '' as Ref<Class<InstanceOf<Embedded>>>,
-    IntlString: '' as Ref<Class<Type<IntlString>>>,
-    // Extension: '' as Ref<Class<Type<Extension<any>>>>,
-    BusinessObject: '' as Ref<Class<BusinessObject>>
   },
   method: {
     SysCall_NotImplemented: '' as SysCall<(...args: any[]) => any>,

@@ -41,7 +41,7 @@ export default {
 
     create(_class(core.class.Doc, core.class.Object, {
       attributes: {
-        _id: ref(core.class.Doc)
+        // _id: ref(core.class.Doc)
       }
     })),
 

@@ -13,16 +13,16 @@
 // limitations under the License.
 // 
 
-import { KeysByType, Required, CombineObjects } from 'simplytyped'
+import { KeysByType, Required, AllRequired } from 'simplytyped'
 
-import { PropType, AsNumber, AsString, Metadata } from '@anticrm/platform'
+import { PropType, AsString, Metadata } from '@anticrm/platform'
 import { identify, PlatformService } from '@anticrm/platform'
 
 export type AnyFunc = (...args: any[]) => any
 export type SysCall<M extends AnyFunc> = Metadata<M> //& { __sys_call: void }
 export type Ref<T extends Doc> = AsString<T> & { __ref: void }
 
-export type PropertyType = AsString<any> | Obj | { [key: string]: PropertyType }
+export type PropertyType = PropType<any> | Obj | { [key: string]: PropertyType }
 export type Bag<X extends PropertyType> = Record<string, X>
 
 export interface SessionProto {
@@ -56,6 +56,15 @@ export interface Session extends PlatformService {
 
 // M E T A M O D E L
 
+type AsDescrtiptors<T> = { [P in keyof T]: T[P] extends PropertyType ? Type<T[P]> : never }
+type FilterInternal<T> = Omit<T, '_default' | '_class' | '_id'>
+
+export type Descriptors<T> = AsDescrtiptors<AllRequired<FilterInternal<T>>>
+export type DiffDescriptors<T extends E, E> = Descriptors<Omit<T, keyof E>>
+
+const x = {} as DiffDescriptors<AnyType, Obj>
+x
+
 export interface Obj {
   _class: Ref<Class<this>>
 
@@ -86,22 +95,15 @@ export interface BagOf<T extends PropertyType> extends Type<Bag<T>> {
   of: Type<T>
 }
 
-export type Konstructor<T extends Obj> = new () => T
-
 export interface Class<T extends Obj> extends Doc {
+  attributes: Bag<Type<PropertyType>>
   native?: Metadata<Partial<Proto<T>>>
   extends?: Ref<Class<Obj>>
-  attributes: Bag<Type<PropertyType>>
 }
 
 export interface Mixin<T extends Doc> extends Class<T> { }
 
-export interface BusinessObject extends Doc {
-  createdOn: AsNumber<Date>
-}
-
 export const pluginId = 'core'
-
 export default identify(pluginId, {
   native: {
     Object: '' as Metadata<object>,
