@@ -48,7 +48,7 @@ describe('session', () => {
 
     const baseProto = Object.getPrototypeOf(objectProto)
     expect(baseProto.hasOwnProperty('getSession')).toBe(true)
-    expect(baseProto.hasOwnProperty('getClass')).toBe(true)
+    // expect(baseProto.hasOwnProperty('getClass')).toBe(true)
     expect(baseProto.getSession() === session).toBe(true)
 
     expect(objectProto.hasOwnProperty('_class')).toBe(true)
@@ -62,8 +62,8 @@ describe('session', () => {
     expect(objectClass._id).toBe(core.class.Object)
     expect(typeof objectClass.getSession).toBe('function')
     expect(objectClass.getSession() === session).toBe(true)
-    expect(typeof objectClass.getClass).toBe('function')
-    expect(objectClass.getClass()._id).toBe(core.class.Class)
+    // expect(typeof objectClass.getClass).toBe('function')
+    // expect(objectClass.getClass()._id).toBe(core.class.Class)
     expect(objectClass.attributes['toIntlString']._class).toBe('core.class.Metadata')
 
     const classClass = session.getInstance(core.class.Class)

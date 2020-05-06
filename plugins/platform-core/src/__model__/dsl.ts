@@ -19,22 +19,20 @@ import { Metadata } from '@anticrm/platform'
 
 import {
   Obj, Class, Ref, Doc, Type, RefTo, Bag, AnyFunc, DiffDescriptors, Descriptors,
-  PropertyType, BagOf, Embedded, InstanceOf
+  PropertyType, BagOf, Embedded, InstanceOf, H
 } from '@anticrm/platform-service-data'
 // import { mixinPropertyKey } from '../utils'
 
 import core from './id'
 
 type DefClass<T extends E, E extends Obj> = {
-  native?: Metadata<object>
+  native?: Metadata<T>
   attributes: DiffDescriptors<T, E>
   override?: Partial<Descriptors<E>>
 }
 
-const x = {} as Descriptors<Type<PropertyType>>
-
 export function _class<T extends E, E extends Obj>(
-  _id: Ref<Class<T>>, extend: Ref<Class<E>>, def: DefClass<T, E>): Class<T> {
+  _id: Ref<Class<T>>, extend: Ref<Class<E>>, def: DefClass<T, E>): H<Class<T>> {
   return {
     _class: core.class.Class as Ref<Class<Class<T>>>,
     _id,
@@ -44,20 +42,21 @@ export function _class<T extends E, E extends Obj>(
   }
 }
 
-export function ref<T extends Doc>(to: Ref<Class<T>>): RefTo<T> {
+export function ref<T extends Doc>(to: Ref<Class<T>>): H<RefTo<T>> {
   return { _class: core.class.RefTo as Ref<Class<RefTo<T>>>, to }
 }
 
 export function bag<T extends PropertyType>(of: Type<T>): BagOf<T> {
-  return { _class: core.class.BagOf as Ref<Class<BagOf<T>>>, of }
+  const bag = new TBag
+  return { _class: core.class.BagOf as Ref<Class<BagOf<T>>>, of: of as Type<T> }
 }
 
-export function instance<T extends Embedded>(of: Ref<Class<T>>): InstanceOf<T> {
+export function instance<T extends Obj>(of: Ref<Class<T>>): H<InstanceOf<T>> {
   return { _class: core.class.InstanceOf as Ref<Class<InstanceOf<T>>>, of }
 }
 
-export function metadata<T extends AnyFunc>(_default?: Metadata<T>): Type<Metadata<T>> {
-  return { _class: core.class.Metadata as Ref<Class<Type<Metadata<T>>>>, _default }
+export function metadata<T>(_default?: Metadata<T>): H<Type<Metadata<T>>> {
+  return { _class: core.class.Metadata, _default }
 }
 
 //////// OPS
@@ -68,7 +67,7 @@ export enum Operation {
 }
 
 export interface Payload<T extends Obj> {
-  obj: T
+  obj: H<T>
 }
 
 export interface Mixin<T extends Obj> extends Payload<T> {
@@ -80,16 +79,16 @@ export interface Event<T extends Obj> {
   payload: Payload<T>
 }
 
-export function create<T extends Doc>(doc: T): Event<T> {
+export function create<T extends Doc>(doc: H<T>): Event<T> {
   return { op: Operation.Create, payload: { obj: doc } }
 }
 
-export function mixin<T extends Obj>(_id: Ref<Doc>, obj: T): Event<T> {
+export function mixin<T extends Obj>(_id: Ref<Doc>, obj: H<T>): Event<T> {
   return { op: Operation.Mixin, payload: { obj } }
 }
 
 export function modelFromEvents(events: Event<Obj>[]): Doc[] {
-  const docs = new Map<Ref<Doc>, Doc>()
+  const docs = new Map<Ref<Doc>, H<Doc>>()
   events.forEach(event => {
     if (event.op === Operation.Create) {
       const payload = event.payload as Payload<Doc>
@@ -103,9 +102,9 @@ export function modelFromEvents(events: Event<Obj>[]): Doc[] {
   //     doc[mixinPropertyKey(payload.obj._class)] = payload.obj
   //   }
   // })
-  const result: Doc[] = []
+  const result: H<Doc>[] = []
   for (const doc of docs) {
     result.push(doc[1])
   }
-  return result
+  return result as Doc[]
 }

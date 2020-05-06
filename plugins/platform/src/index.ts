@@ -17,20 +17,6 @@ export type PropType<T> = { __property: T }
 export type AsString<T> = string & PropType<T>
 export type AsNumber<T> = number & PropType<T>
 
-// let x = {} as PropType<string>
-// let y = {} as AsString<string>
-
-// x = y
-// y = x
-
-// type Ex<T> = AsString<string> & { __ex: void }
-
-// let z = {} as Ex<string>
-// x = z
-// y = z
-// z = x
-// z = y
-
 export interface Platform { }
 export interface PlatformService { }
 
@@ -48,7 +34,7 @@ export class Platform {
   private COMPRESS_IDS = false
   private metadata = new Map<string, any>()
 
-  private compressId(id: string): string {
+  compressId(id: string): string {
     if (this.COMPRESS_IDS) {
       let h = 0
       for (let i = 0; i < id.length; i++)

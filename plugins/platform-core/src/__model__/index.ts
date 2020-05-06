@@ -16,19 +16,21 @@
 import ru from './strings/ru'
 
 import { _class, ref, bag, instance, create, metadata } from './dsl'
-import { Obj, Ref, Class, Doc, Type, PropertyType, Descriptors, BagOf } from '@anticrm/platform-service-data'
+import { Obj, Ref, Class, Doc, Type, PropertyType, Descriptors, Bag, AnyType, H } from '@anticrm/platform-service-data'
 import core from './id'
+
+const x = {} as Descriptors<Obj>
+
 
 const attributes: Descriptors<Obj> = {
   _class: ref(core.class.Class),
-  toIntlString: metadata(core.method.Obj_toIntlString),
 }
 
-const objectClass: Class<Obj> = {
+const objectClass: H<Class<Obj>> = {
   _class: core.class.Class,
   _id: core.class.Object,
   native: core.native.Object,
-  attributes
+  attributes: attributes as unknown as { [key: string]: Type<PropertyType> }
 }
 
 export default {
@@ -49,7 +51,6 @@ export default {
       attributes: {
         _default: ref(core.class.Doc),
         to: ref(core.class.Class),
-        exert: {} as any, // native
       }
     })),
 
@@ -59,16 +60,12 @@ export default {
         extends: ref(core.class.Class),
         attributes: bag(instance(core.class.Type)),
       },
-      override: {
-        toIntlString: metadata(core.method.Class_toIntlString)
-      }
     })),
 
     create(_class(core.class.BagOf, core.class.Object, {
       attributes: {
         _default: bag(metadata(undefined)), // ?????? TODO undefined type
         of: instance(core.class.Type),
-        exert: metadata(core.method.BagOf_excert),
       }
     })),
 
@@ -76,7 +73,6 @@ export default {
       attributes: {
         _default: {} as Type<Obj>,
         of: ref(core.class.Class),
-        exert: metadata(core.method.InstanceOf_excert),
       }
     })),
 
@@ -84,7 +80,6 @@ export default {
       native: core.native.Metadata,
       attributes: {
         _default: metadata(undefined),
-        exert: metadata(undefined),
       }
     })),
   ]

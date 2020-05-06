@@ -16,25 +16,14 @@
 import { Platform, Metadata } from '@anticrm/platform'
 import { Session, Query } from '..'
 import core, {
-  Obj, Doc, Ref, Bag, Class, Type, Mixin, Instance, RefTo,
-  AnyFunc, Layout, PropertyType, SessionProto, AnyType, BagOf, InstanceOf, Embedded, Proto
+  Obj, Doc, Ref, Bag, Class, Type, Mixin, RefTo, SessionProto,
+  PropertyType, AnyType, BagOf, InstanceOf, Embedded,
 } from '..'
 import { MemDb } from './memdb'
 
-class BagProxyHandler implements ProxyHandler<Bag<PropertyType>> {
-  private type: Instance<Type<PropertyType>>
-
-  constructor(type: Instance<Type<PropertyType>>) {
-    this.type = type
-  }
-
-  get(target: Bag<PropertyType>, key: string): any {
-    const value = Reflect.get(target, key)
-    return this.type.exert(value)
-  }
-}
-
 //////////
+
+type Layout<T extends Obj> = T & { __layout: any } & SessionProto
 
 /// Export FOR TEST
 export class MemSession implements Session {
@@ -42,7 +31,7 @@ export class MemSession implements Session {
   readonly platform: Platform
   private memdb: MemDb
   private prototypes = new Map<Ref<Class<Obj>>, Object>()
-  private sessionProto: SessionProto<Obj>
+  private sessionProto: SessionProto
 
   constructor(platform: Platform) {
     this.platform = platform
@@ -50,37 +39,31 @@ export class MemSession implements Session {
 
     this.sessionProto = {
       getSession: () => this,
-      getClass(this: Instance<Obj>) { return this.getSession().getInstance(this._class) }
+      // getClass(this: Instance<Obj>) { return this.getSession().getInstance(this._class) }
     }
   }
 
-  private createPropertyDescriptors(attributes: Bag<Type<PropertyType>>, native: boolean) {
+  private createPropertyDescriptors(attributes: Bag<Type<PropertyType>>) {
     const result = {} as { [key: string]: PropertyDescriptor }
     for (const key in attributes) {
-      // console.log('attribute: ' + key)
       if (key.startsWith('_')) {
         result[key] = {
-          get(this: Instance<Obj>) {
-            return (this.__layout as any)[key]
+          get(this: Layout<Obj>) {
+            return this.__layout[key]
           },
           enumerable: true,
         }
       } else {
-        if (!native) {
-          const attribute = attributes[key]
-          const instance = this.instantiate(attribute)
-
-          result[key] = {
-            get(this: Instance<Obj>) {
-              const value = (this.__layout as any)[key] ?? attribute._default
-              if (!value) {
-                console.log('getter ' + key)
-                console.log(this)
-              }
-              return instance.exert(value)
-            },
-            enumerable: true,
-          }
+        const attribute = attributes[key]
+        const exert = this.instantiate(attribute).exert
+        console.log('exert, ' + key)
+        console.log(attribute)
+        result[key] = {
+          get(this: Layout<Obj>) {
+            const value = this.__layout[key] ?? attribute._default
+            return exert(value)
+          },
+          enumerable: true,
         }
       }
     }
@@ -88,23 +71,19 @@ export class MemSession implements Session {
   }
 
   private createPrototype<T extends Obj>(clazz: Ref<Class<T>>) {
-    // console.log('createPrototype: ' + clazz)
+    console.log('create prototype: ' + clazz)
     const classInstance = this.memdb.get(clazz) as Class<Obj>
     const extend = classInstance.extends
     const parent = extend ? this.getPrototype(extend) : this.sessionProto
     const proto = Object.create(parent)
+    this.prototypes.set(clazz, proto)
 
-    let descriptors: Record<string, PropertyDescriptor>
+    const descriptors = this.createPropertyDescriptors(classInstance.attributes)
     if (classInstance.native) {
-      descriptors = this.createPropertyDescriptors(classInstance.attributes, true)
-      const nativeImpl = this.platform.getMetadata(classInstance.native)
-      Object.assign(descriptors, Object.getOwnPropertyDescriptors(nativeImpl))
-    } else {
-      descriptors = this.createPropertyDescriptors(classInstance.attributes, false)
+      const proto = this.platform.getMetadata(classInstance.native)
+      Object.assign(descriptors, Object.getOwnPropertyDescriptors(proto))
     }
     Object.defineProperties(proto, descriptors)
-    this.prototypes.set(clazz, proto)
-    // console.log('created prototype: ' + clazz)
     return proto
   }
 
@@ -112,13 +91,13 @@ export class MemSession implements Session {
     return this.prototypes.get(clazz) ?? this.createPrototype(clazz)
   }
 
-  instantiate<T extends Obj>(obj: T): Instance<T> {
+  instantiate<T extends Obj>(obj: T): T {
     const instance = Object.create(this.getPrototype(obj._class)) as Layout<T>
     instance.__layout = obj
-    return instance as Instance<T>
+    return instance
   }
 
-  getInstance<T extends Doc>(ref: Ref<T>): Instance<T> {
+  getInstance<T extends Doc>(ref: Ref<T>): T {
     return this.instantiate(this.memdb.get(ref))
   }
 
@@ -128,12 +107,12 @@ export class MemSession implements Session {
 
   ////
 
-  find<T extends Doc>(clazz: Ref<Class<T>>, query: Query<T>): Instance<T>[] {
+  find<T extends Doc>(clazz: Ref<Class<T>>, query: Query<T>): T[] {
     const layouts = this.memdb.findAll(clazz, query)
     return layouts.map(layout => this.instantiate(layout))
   }
 
-  findOne<T extends Doc>(clazz: Ref<Class<T>>, query: Query<T>): Instance<T> | undefined {
+  findOne<T extends Doc>(clazz: Ref<Class<T>>, query: Query<T>): T | undefined {
     const result = this.find(clazz, query)
     return result.length > 0 ? result[0] : undefined
   }
@@ -160,42 +139,77 @@ export class MemSession implements Session {
     // return new Proxy(proxy, this.mixinProxy) as unknown as M
     return {} as M
   }
-
 }
 
 export default (platform: Platform): Session => {
-  const ObjectImpl = {
-    toIntlString(this: Instance<Obj>, plural?: number): string {
-      return this.getClass().toIntlString(plural)
+
+  class BagProxyHandler implements ProxyHandler<Bag<PropertyType>> {
+    private type: Type<PropertyType>
+
+    constructor(type: Type<PropertyType>) {
+      this.type = type
+    }
+
+    get(target: Bag<PropertyType>, key: string): any {
+      const value = Reflect.get(target, key)
+      return this.type.exert(value)
     }
   }
 
-  const RefToImpl = {
-    exert(this: Instance<RefTo<Doc>>, value: Ref<Doc>) { return value }
+  ///
+
+  class TSession {
+    getSession(): Session { throw new Error('not implemented') }
   }
 
-  const MetadataImpl = {
-    exert(this: Instance<Type<Metadata<AnyFunc>>>, value: Metadata<AnyFunc>) {
+  class TObj extends TSession implements Obj {
+    _class!: Ref<Class<this>>
+    toIntlString(plural?: number): string {
+      return this.getSession().getInstance(this._class).toIntlString(plural)
+    }
+  }
+
+  abstract class TType<T extends PropertyType> extends TObj implements Type<T> {
+    _default?: T
+    abstract exert(value: T): any
+  }
+
+  class TRefTo<T extends Doc> extends TType<Ref<T>> implements RefTo<T> {
+    to!: Ref<Class<T>>
+    exert(value: Ref<T>) { return value ?? this._default }
+  }
+
+  class TMetadata extends TType<Metadata<any>> {
+    exert(value: Metadata<any>) {
       const session = this.getSession() as MemSession
-      return session.platform.getMetadata(value ?? this._default) // TODO
+      return session.platform.getMetadata(value ?? this._default)
     }
   }
 
-  const BagOf_excert = function (this: Instance<AnyType>, value: PropertyType): any {
-    const _this = this as Instance<BagOf<PropertyType>>
-    return new Proxy(value as Bag<PropertyType>, new BagProxyHandler(_this.of))
+  class TBagOf<T extends PropertyType> extends TType<Bag<T>> implements BagOf<T> {
+    of: Type<T>
+    constructor(of: Type<T>) {
+      super()
+      this.of = of
+    }
+    exert(value: Bag<T>) {
+      return new Proxy(value, new BagProxyHandler(this.of))
+    }
   }
 
-  const InstanceOf_excert = function (this: Instance<AnyType>, value: PropertyType): any {
-    const session = this.getSession() as MemSession
-    return session.instantiate(value as Obj)
+  class TInstanceOf<T extends Embedded> extends TType<T> implements InstanceOf<T> {
+    of!: Ref<Class<T>>
+    exert(value: T): any {
+      const session = this.getSession() as MemSession
+      return session.instantiate(value)
+    }
   }
 
-  platform.setMetadata(core.native.Object, ObjectImpl)
-  platform.setMetadata(core.native.RefTo, RefToImpl)
-  platform.setMetadata(core.native.Metadata, MetadataImpl)
-  platform.setMetadata(core.method.BagOf_excert, BagOf_excert)
-  platform.setMetadata(core.method.InstanceOf_excert, InstanceOf_excert)
+  platform.setMetadata(core.native.Object, TObj.prototype)
+  platform.setMetadata(core.native.RefTo, TRefTo.prototype)
+  platform.setMetadata(core.native.Metadata, TMetadata.prototype)
+  platform.setMetadata(core.native.BagOf, TBagOf.prototype)
+  platform.setMetadata(core.native.InstanceOf, TInstanceOf.prototype)
 
   return new MemSession(platform)
 }

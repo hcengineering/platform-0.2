@@ -16,7 +16,7 @@
 import core, {
   pluginId, Ref, Class, Doc, Mixin, Type,
   PropertyType, RefTo, BagOf, Obj,
-  InstanceOf, Embedded, Instance, AnyFunc
+  InstanceOf, Embedded, AnyFunc
 } from '@anticrm/platform-service-data'
 
 import { mergeIds } from './utils'
@@ -31,11 +31,11 @@ export default mergeIds(core, identify(pluginId, {
     Type: '' as Ref<Class<Type<PropertyType>>>,
     BagOf: '' as Ref<Class<BagOf<PropertyType>>>,
     InstanceOf: '' as Ref<Class<InstanceOf<Embedded>>>,
-    Metadata: '' as Ref<Class<Type<Metadata<AnyFunc>>>>,
+    Metadata: '' as Ref<Class<Type<Metadata<any>>>>,
   },
   method: {
-    SysCall_NotImplemented: '' as Metadata<(...args: any[]) => any>,
-    Obj_toIntlString: '' as Metadata<(this: Instance<Obj>, plural?: number) => string>,
-    Class_toIntlString: '' as Metadata<(this: Instance<Obj>, plural?: number) => string>
+    // SysCall_NotImplemented: '' as Metadata<(...args: any[]) => any>,
+    // Obj_toIntlString: '' as Metadata<(this: Instance<Obj>, plural?: number) => string>,
+    // Class_toIntlString: '' as Metadata<(this: Instance<Obj>, plural?: number) => string>
   }
 }))
