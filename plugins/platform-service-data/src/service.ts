@@ -163,26 +163,6 @@ export class MemSession implements Session {
 
 }
 
-abstract class SessionImpl<T extends Obj> implements SessionProto<T>, Layout<T> {
-  abstract __layout: T
-  abstract getSession(): Session
-  abstract getClass(): Instance<Class<T>>
-}
-
-abstract class TObj<T extends Obj> extends SessionImpl<T> implements Proto<Obj> {
-  abstract _class: Ref<Class<T>>
-  toIntlString(): string { return '' }
-}
-
-type MetadataType = Type<Metadata<any>>
-
-abstract class TMetadata<T extends MetadataType> extends TObj<MetadataType> implements Proto<MetadataType> {
-  _default?: T
-  exert(value: PropertyType) { return value }
-}
-
-console.log(TMetadata.prototype.exert)
-
 export default (platform: Platform): Session => {
   const ObjectImpl = {
     toIntlString(this: Instance<Obj>, plural?: number): string {

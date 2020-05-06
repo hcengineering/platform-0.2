@@ -13,7 +13,7 @@
 // limitations under the License.
 // 
 
-import { KeysByType, Required, AllRequired } from 'simplytyped'
+import { KeysByType, Required, AllRequired, Merge } from 'simplytyped'
 
 import { PropType, AsString, Metadata } from '@anticrm/platform'
 import { identify, PlatformService } from '@anticrm/platform'
@@ -30,19 +30,37 @@ export interface SessionProto<T extends Obj> {
   getClass(): Instance<Class<T>>
 }
 
-type Transform<T extends Obj> = {
-  [P in keyof T]:
-  T[P] extends Obj ? Instance<T[P]> :
-  T[P] extends (PropType<infer X> | undefined) ? X extends AnyFunc ? X : T[P] : T[P]
-}
-type RequireMethods<T extends object> = Required<T, KeysByType<Required<T, keyof T>, AnyFunc>>
+// type Transform<T extends Obj> = {
+//   [P in keyof T]:
+//   T[P] extends Obj ? Instance<T[P]> :
+//   T[P] extends (PropType<infer X> | undefined) ? X extends AnyFunc ? X : T[P] : T[P]
+// }
+type RequireMethods<T extends object> = Required<T, KeysByType<T, AnyFunc>>
 
-export type Proto<T extends Obj> = RequireMethods<Transform<T>>
+type LiftMethods<T> = {
+  [P in keyof T]: T[P] extends (PropType<infer X> | undefined) ? X extends AnyFunc ? X : T[P] : T[P]
+}
+
+type InstantiateObjects<T> = {
+  [P in keyof T]: T[P] extends Obj ? Instance<T[P]> : never
+}
+
+type DoTransform<T extends object> =
+  AllRequired<LiftMethods<T>> &
+  InstantiateObjects<Pick<T, KeysByType<T, Obj>>>
+
+type Transform<T extends object> = DoTransform<Omit<T, '_default'>>
+
+export type Proto<T extends Obj> = Merge<T, Transform<T>>  // RequireMethods<Transform<T>>
 export type Layout<T extends Obj> = { __layout: T }
 export type Instance<T extends Obj> = Proto<T> & Layout<T> & SessionProto<T>
 
-// const x = {} as Instance<InstanceOf<Obj>>
-// x.
+// const xx = {} as Instance<Class<Obj>>
+// xx.
+
+const tt = {} as Instance<Type<Metadata<AnyFunc>>>
+
+
 
 // S E S S I O N
 
@@ -105,7 +123,7 @@ export interface BagOf<T extends PropertyType> extends Type<Bag<T>> {
 
 export interface Class<T extends Obj> extends Doc {
   attributes: Bag<Type<PropertyType>>
-  native?: Metadata<Partial<Proto<T>>>
+  native?: Metadata<object>
   extends?: Ref<Class<Obj>>
 }
 
