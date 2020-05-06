@@ -16,13 +16,15 @@
 import core from '@anticrm/platform-service-data'
 import { modelTranslation } from '../utils'
 
-const translation = modelTranslation(core.class, {
-  Object: {
-    $label: 'Объект'
-  },
-  Class: {
-    $label: 'Класс'
-  },
-})
+// const translation = modelTranslation(core.class, {
+//   Object: {
+//     $label: 'Объект'
+//   },
+//   Class: {
+//     $label: 'Класс'
+//   },
+// })
+
+const translation = {}
 
 export default translation

@@ -15,7 +15,10 @@
 
 import { Platform, Metadata } from '@anticrm/platform'
 import { Session, Query } from '..'
-import core, { Obj, Doc, Ref, Bag, Class, Type, Mixin, Instance, RefTo, AnyFunc, Layout, PropertyType, SessionProto } from '..'
+import core, {
+  Obj, Doc, Ref, Bag, Class, Type, Mixin, Instance, RefTo,
+  AnyFunc, Layout, PropertyType, SessionProto, AnyType, BagOf, InstanceOf, Embedded, Proto
+} from '..'
 import { MemDb } from './memdb'
 
 class BagProxyHandler implements ProxyHandler<Bag<PropertyType>> {
@@ -70,6 +73,10 @@ export class MemSession implements Session {
           result[key] = {
             get(this: Instance<Obj>) {
               const value = (this.__layout as any)[key] ?? attribute._default
+              if (!value) {
+                console.log('getter ' + key)
+                console.log(this)
+              }
               return instance.exert(value)
             },
             enumerable: true,
@@ -91,12 +98,7 @@ export class MemSession implements Session {
     if (classInstance.native) {
       descriptors = this.createPropertyDescriptors(classInstance.attributes, true)
       const nativeImpl = this.platform.getMetadata(classInstance.native)
-      // console.log('created descs')
-      console.log(descriptors)
-      // console.log('native desc')
-      console.log(nativeImpl)
       Object.assign(descriptors, Object.getOwnPropertyDescriptors(nativeImpl))
-      console.log(descriptors)
     } else {
       descriptors = this.createPropertyDescriptors(classInstance.attributes, false)
     }
@@ -161,32 +163,59 @@ export class MemSession implements Session {
 
 }
 
+abstract class SessionImpl<T extends Obj> implements SessionProto<T>, Layout<T> {
+  abstract __layout: T
+  abstract getSession(): Session
+  abstract getClass(): Instance<Class<T>>
+}
+
+abstract class TObj<T extends Obj> extends SessionImpl<T> implements Proto<Obj> {
+  abstract _class: Ref<Class<T>>
+  toIntlString(): string { return '' }
+}
+
+type MetadataType = Type<Metadata<any>>
+
+abstract class TMetadata<T extends MetadataType> extends TObj<MetadataType> implements Proto<MetadataType> {
+  _default?: T
+  exert(value: PropertyType) { return value }
+}
+
+console.log(TMetadata.prototype.exert)
+
 export default (platform: Platform): Session => {
-  const ObjectType = {
+  const ObjectImpl = {
     toIntlString(this: Instance<Obj>, plural?: number): string {
       return this.getClass().toIntlString(plural)
     }
   }
 
-  const RefType = {
+  const RefToImpl = {
     exert(this: Instance<RefTo<Doc>>, value: Ref<Doc>) { return value }
   }
 
-  const MetadataType = {
+  const MetadataImpl = {
     exert(this: Instance<Type<Metadata<AnyFunc>>>, value: Metadata<AnyFunc>) {
       const session = this.getSession() as MemSession
-      return session.platform.getMetadata(value ?? this._default)
+      return session.platform.getMetadata(value ?? this._default) // TODO
     }
   }
 
-  const BagExcert = function (this: Instance<Type<Bag<PropertyType>>>, value: Bag<PropertyType>): Bag<PropertyType> {
-    return new Proxy(value, new BagProxyHandler(this))
+  const BagOf_excert = function (this: Instance<AnyType>, value: PropertyType): any {
+    const _this = this as Instance<BagOf<PropertyType>>
+    return new Proxy(value as Bag<PropertyType>, new BagProxyHandler(_this.of))
   }
 
-  platform.setMetadata(core.native.Object, ObjectType)
-  platform.setMetadata(core.native.RefTo, RefType)
-  platform.setMetadata(core.native.Metadata, MetadataType)
-  platform.setMetadata(core.method.Bag_excert, BagExcert)
+  const InstanceOf_excert = function (this: Instance<AnyType>, value: PropertyType): any {
+    const session = this.getSession() as MemSession
+    return session.instantiate(value as Obj)
+  }
+
+  platform.setMetadata(core.native.Object, ObjectImpl)
+  platform.setMetadata(core.native.RefTo, RefToImpl)
+  platform.setMetadata(core.native.Metadata, MetadataImpl)
+  platform.setMetadata(core.method.BagOf_excert, BagOf_excert)
+  platform.setMetadata(core.method.InstanceOf_excert, InstanceOf_excert)
 
   return new MemSession(platform)
 }

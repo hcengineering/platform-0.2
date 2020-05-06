@@ -30,14 +30,19 @@ export interface SessionProto<T extends Obj> {
   getClass(): Instance<Class<T>>
 }
 
-type LiftMethods<T extends Obj> = {
-  [P in keyof T]: T[P] extends (PropType<infer X> | undefined) ? X extends AnyFunc ? X : T[P] : T[P]
+type Transform<T extends Obj> = {
+  [P in keyof T]:
+  T[P] extends Obj ? Instance<T[P]> :
+  T[P] extends (PropType<infer X> | undefined) ? X extends AnyFunc ? X : T[P] : T[P]
 }
 type RequireMethods<T extends object> = Required<T, KeysByType<Required<T, keyof T>, AnyFunc>>
 
-export type Proto<T extends Obj> = RequireMethods<LiftMethods<T>>
+export type Proto<T extends Obj> = RequireMethods<Transform<T>>
 export type Layout<T extends Obj> = { __layout: T }
 export type Instance<T extends Obj> = Proto<T> & Layout<T> & SessionProto<T>
+
+// const x = {} as Instance<InstanceOf<Obj>>
+// x.
 
 // S E S S I O N
 
@@ -114,6 +119,7 @@ export default identify(pluginId, {
     Object: '' as Metadata<object>
   },
   method: {
-    Bag_excert: '' as Metadata<(this: Instance<BagOf<PropertyType>>, value: Bag<PropertyType>) => Bag<PropertyType>>,
+    BagOf_excert: '' as Metadata<(this: Instance<AnyType>, value: PropertyType) => any>,
+    InstanceOf_excert: '' as Metadata<(this: Instance<AnyType>, value: PropertyType) => any>,
   }
 })

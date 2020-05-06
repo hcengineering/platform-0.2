@@ -31,7 +31,7 @@ describe('session', () => {
   corePlugin(platform)
 
   const model = modelFromEvents(coreModel.events)
-  console.log(JSON.stringify(model))//, undefined, 2))
+  console.log(JSON.stringify(model, undefined, 2))
   session.loadModel(model)
 
   it('should load classes into memdb', () => {
@@ -64,9 +64,10 @@ describe('session', () => {
     expect(objectClass.getSession() === session).toBe(true)
     expect(typeof objectClass.getClass).toBe('function')
     expect(objectClass.getClass()._id).toBe(core.class.Class)
+    expect(objectClass.attributes['toIntlString']._class).toBe('core.class.Metadata')
 
-    console.log(objectClass.toIntlString())
-    console.log(objectClass.attributes)
+    const classClass = session.getInstance(core.class.Class)
+    console.log(classClass.extends)
 
     // const method = objectClass.toIntlString
     // console.log(method)

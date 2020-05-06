@@ -31,9 +31,6 @@ const objectClass: Class<Obj> = {
   attributes
 }
 
-const z = {} as Descriptors<BagOf<PropertyType>>
-
-
 export default {
   strings: {
     ru
@@ -52,7 +49,7 @@ export default {
       attributes: {
         _default: ref(core.class.Doc),
         to: ref(core.class.Class),
-        exert: metadata(core.method.SysCall_NotImplemented),
+        exert: {} as any, // native
       }
     })),
 
@@ -71,7 +68,7 @@ export default {
       attributes: {
         _default: bag(metadata(undefined)), // ?????? TODO undefined type
         of: instance(core.class.Type),
-        exert: metadata(core.method.Bag_excert),
+        exert: metadata(core.method.BagOf_excert),
       }
     })),
 
@@ -79,7 +76,7 @@ export default {
       attributes: {
         _default: {} as Type<Obj>,
         of: ref(core.class.Class),
-        exert: metadata(core.method.SysCall_NotImplemented),
+        exert: metadata(core.method.InstanceOf_excert),
       }
     })),
 
