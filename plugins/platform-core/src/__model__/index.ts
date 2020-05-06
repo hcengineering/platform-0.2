@@ -15,13 +15,13 @@
 
 import ru from './strings/ru'
 
-import { _class, ref, intl, bag, instance, extension, Attibutes, create, embed } from './dsl'
-import { Obj, Ref, Class, Doc } from '@anticrm/platform-service-data'
+import { _class, ref, intl, bag, instance, Attibutes, create, syscall } from './dsl'
+import { Obj, Ref, Class, Doc, Type, PropertyType } from '@anticrm/platform-service-data'
 import core from './id'
 
 const attributes: Attibutes<Obj> = {
   _class: ref(core.class.Class),
-  toIntlString: extension(core.method.Obj_toIntlString)
+  toIntlString: syscall(core.method.Obj_toIntlString),
 }
 
 const x = {} as Attibutes<Obj>
@@ -29,8 +29,7 @@ const x = {} as Attibutes<Obj>
 const objectClass: Class<Obj> = {
   _class: core.class.Class,
   _id: core.class.Object,
-  // label: '' as IntlString,
-  attributes: embed(attributes)
+  attributes: attributes as unknown as Record<string, Type<PropertyType>>
 }
 
 export default {
@@ -47,20 +46,39 @@ export default {
     })),
 
     create(_class(core.class.RefTo, core.class.Object, {
-      attributes: embed({
-        _default: ref(core.class.Doc),
-        to: ref(core.class.Class)
-      })
+      attributes: {
+        to: ref(core.class.Class),
+        exert: syscall(core.method.SysCall_NotImplemented),
+      }
     })),
 
     create(_class(core.class.Class, core.class.Doc, {
       attributes: {
-        // label: intl(),
         extends: ref(core.class.Class),
         attributes: bag(instance(core.class.Type)),
       },
       override: {
-        toIntlString: extension(core.method.Class_toIntlString)
+        toIntlString: syscall(core.method.Class_toIntlString)
+      }
+    })),
+
+    create(_class(core.class.BagOf, core.class.Object, {
+      attributes: {
+        of: instance(core.class.Type),
+        exert: syscall(core.method.SysCall_NotImplemented),
+      }
+    })),
+
+    create(_class(core.class.InstanceOf, core.class.Object, {
+      attributes: {
+        of: ref(core.class.Class),
+        exert: syscall(core.method.SysCall_NotImplemented),
+      }
+    })),
+
+    create(_class(core.class.SysCall, core.class.Object, {
+      attributes: {
+        exert: syscall(core.method.SysCall_NotImplemented),
       }
     })),
   ]

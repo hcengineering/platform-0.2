@@ -15,12 +15,12 @@
 
 import core, {
   pluginId, Ref, Class, Doc, Mixin, Type,
-  PropertyType, RefTo, BagOf, Obj,
-  InstanceOf, Embedded, BusinessObject
+  PropertyType, RefTo, BagOf, Obj, SysCall,
+  InstanceOf, Embedded, BusinessObject, Instance
 } from '@anticrm/platform-service-data'
 
 import { IntlString } from '@anticrm/platform-service-i18n'
-import { Extension } from '@anticrm/platform-service-extension'
+// import { Extension } from '@anticrm/platform-service-extension'
 
 import { mergeIds } from './utils'
 import { identify } from '@anticrm/platform'
@@ -30,15 +30,15 @@ export default mergeIds(core, identify(pluginId, {
     Doc: '' as Ref<Class<Doc>>,
     Mixin: '' as Ref<Class<Mixin<Doc>>>,
     Type: '' as Ref<Class<Type<PropertyType>>>,
-    RefTo: '' as Ref<Class<RefTo<Doc>>>,
     BagOf: '' as Ref<Class<BagOf<PropertyType>>>,
     InstanceOf: '' as Ref<Class<InstanceOf<Embedded>>>,
     IntlString: '' as Ref<Class<Type<IntlString>>>,
-    Extension: '' as Ref<Class<Type<Extension<any>>>>,
+    // Extension: '' as Ref<Class<Type<Extension<any>>>>,
     BusinessObject: '' as Ref<Class<BusinessObject>>
   },
   method: {
-    Obj_toIntlString: '' as Extension<(this: Obj, plural?: number) => string>,
-    Class_toIntlString: '' as Extension<(this: Obj, plural?: number) => string>
+    SysCall_NotImplemented: '' as SysCall<(...args: any[]) => any>,
+    Obj_toIntlString: '' as SysCall<(this: Instance<Obj>, plural?: number) => string>,
+    Class_toIntlString: '' as SysCall<(this: Obj, plural?: number) => string>
   }
 }))

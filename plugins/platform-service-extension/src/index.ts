@@ -15,7 +15,7 @@
 
 /////////////////
 
-import { AsString, PlatformService, Platform } from '@anticrm/platform-core/src/extension'
+import { AsString, PlatformService, Platform } from '@anticrm/platform'
 
 export type Extension<T> = AsString<T> & { __extension: void }
 

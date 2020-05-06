@@ -13,40 +13,30 @@
 // limitations under the License.
 // 
 
-// import { KeysByType, AnyFunc } from 'simplytyped'
+import { KeysByType, Required, CombineObjects } from 'simplytyped'
 
-import { PropType, AsNumber, AsString } from '@anticrm/platform'
+import { PropType, AsNumber, AsString, Metadata } from '@anticrm/platform'
 import { identify, PlatformService } from '@anticrm/platform'
 
-type DocId = string
-
-export type PropertyType = PropType<any>// PropType<any> | Obj | { [key: string]: PropertyType } | undefined
-
-
-type A<T> = {
-  [P in keyof T]: T[P] extends PropType<any> ? Type<T[P]> : never
-}
-
-type R<T> = A<Required<T>>
-
-const o = {} as Obj
-
-const x = {} as R<Obj>
-
-// export type Bag<T extends PropertyType> = { [key: string]: T } & PropType<Record<string, T>>
-
-export type Bag<X extends PropertyType> = Record<string, X> & PropType<Record<string, X>>
-
+export type AnyFunc = (...args: any[]) => any
+export type SysCall<M extends AnyFunc> = Metadata<M> //& { __sys_call: void }
 export type Ref<T extends Doc> = AsString<T> & { __ref: void }
 
-// export type Layout<T extends Obj> = Omit<T, KeysByType<T, AnyFunc>>
+export type PropertyType = AsString<any> | Obj | { [key: string]: PropertyType }
+export type Bag<X extends PropertyType> = Record<string, X>
 
-export interface InstanceIntf<T extends Obj> {
+export interface SessionProto {
   getSession(): Session
-  getClass(): Instance<Class<T>>
 }
 
-export type Instance<T extends Obj> = T & InstanceIntf<T>
+type LiftMethods<T extends Obj> = {
+  [P in keyof T]: T[P] extends (PropType<infer X> | undefined) ? X extends AnyFunc ? X : T[P] : T[P]
+}
+type RequireMethods<T extends object> = Required<T, KeysByType<Required<T, keyof T>, AnyFunc>>
+
+export type Proto<T extends Obj> = RequireMethods<LiftMethods<T>>
+export type Layout<T extends Obj> = { __layout: T }
+export type Instance<T extends Obj> = Proto<T> & Layout<T> & SessionProto
 
 // S E S S I O N
 
@@ -56,8 +46,10 @@ export interface Session extends PlatformService {
   getInstance<T extends Doc>(ref: Ref<T>): Instance<T>
   newInstance<T extends Obj>(clazz: Ref<Class<T>>): T
 
-  find<T extends Doc>(clazz: Ref<Class<T>>, query: Query<T>): T[]
-  findOne<T extends Doc>(clazz: Ref<Class<T>>, query: Query<T>): T | undefined
+  find<T extends Doc>(clazz: Ref<Class<T>>, query: Query<T>): Instance<T>[]
+  findOne<T extends Doc>(clazz: Ref<Class<T>>, query: Query<T>): Instance<T> | undefined
+
+  loadModel(docs: Doc[]): void
 
   mixin<T extends Doc, E extends T>(doc: Ref<T>, mixin: Ref<Mixin<E>>): E
 }
@@ -67,22 +59,20 @@ export interface Session extends PlatformService {
 export interface Obj {
   _class: Ref<Class<this>>
 
-  toIntlString?: PropType<(this: Obj, plural?: number) => string>
+  toIntlString?: PropType<(this: Instance<Obj>, plural?: number) => string>
 }
 
 export interface Doc extends Obj {
   _id: Ref<this>
-  // _mixins?: Obj[] // Hide?
-
-  // as<T extends this>(mixin: Ref<Mixin<T>>): T
-  // mixin<T extends this>(mixin: Ref<Mixin<T>>): T
 }
 
-export type Embedded = Obj & PropType<Obj>
+export type Embedded = Obj //& PropType<Obj>
 
 export interface Type<T extends PropertyType> extends Embedded {
   _default?: T
+  exert?: AsString<(value: PropertyType) => any>
 }
+export type AnyType = Type<PropertyType>
 
 export interface RefTo<T extends Doc> extends Type<Ref<T>> {
   to: Ref<Class<T>>
@@ -99,8 +89,7 @@ export interface BagOf<T extends PropertyType> extends Type<Bag<T>> {
 export type Konstructor<T extends Obj> = new () => T
 
 export interface Class<T extends Obj> extends Doc {
-  // label: IntlString
-  // konstructor?: Extension<Konstructor<T>>
+  native?: Metadata<Partial<Proto<T>>>
   extends?: Ref<Class<Obj>>
   attributes: Bag<Type<PropertyType>>
 }
@@ -114,11 +103,19 @@ export interface BusinessObject extends Doc {
 export const pluginId = 'core'
 
 export default identify(pluginId, {
+  native: {
+    Object: '' as Metadata<object>,
+    RefTo: '' as Metadata<object>,
+    SysCall: '' as Metadata<object>
+  },
   method: {
+    SysCall_exert: '' as SysCall<(value: PropertyType) => any>
   },
   class: {
     Object: '' as Ref<Class<Obj>>,
     Class: '' as Ref<Class<Class<Obj>>>,
+    RefTo: '' as Ref<Class<RefTo<Doc>>>,
+    SysCall: '' as Ref<Class<Type<SysCall<AnyFunc>>>>
   }
 })
 

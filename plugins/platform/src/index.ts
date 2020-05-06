@@ -14,14 +14,27 @@
 //
 
 export type PropType<T> = { __property: T }
-export type AsString<T> = PropType<T> & string
-export type AsNumber<T> = PropType<T> & number
-export type AsRecord<T> = { [key: string]: PropType<any> } & PropType<T>
+export type AsString<T> = string & PropType<T>
+export type AsNumber<T> = number & PropType<T>
+
+// let x = {} as PropType<string>
+// let y = {} as AsString<string>
+
+// x = y
+// y = x
+
+// type Ex<T> = AsString<string> & { __ex: void }
+
+// let z = {} as Ex<string>
+// x = z
+// y = z
+// z = x
+// z = y
 
 export interface Platform { }
 export interface PlatformService { }
 
-export type Metadata<T> = AsString<T> | { __metadata: void }
+export type Metadata<T> = AsString<T> & { __metadata: void }
 export type Service<S extends PlatformService> = Metadata<S>
 
 /////
@@ -51,6 +64,10 @@ export class Platform {
     if (!result)
       throw new Error('metadata not found: ' + id)
     return result
+  }
+
+  setMetadata<T>(id: Metadata<T>, value: T): void {
+    this.metadata.set(id as string, value)
   }
 
   loadMetadata<T, X extends Record<string, Metadata<T>>>(ids: X, resources: ExtractType<T, X>) {

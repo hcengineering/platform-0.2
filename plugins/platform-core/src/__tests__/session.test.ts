@@ -28,29 +28,33 @@ corePlugin(platform)
 
 describe('session', () => {
 
-  const memdb = new MemDb()
   const model = modelFromEvents(coreModel.events)
   console.log(JSON.stringify(model))//, undefined, 2))
-  memdb.load(model)
 
-  it('should load classes', () => {
+  it('should load classes into memdb', () => {
+    const memdb = new MemDb()
+    memdb.load(model)
     const object = memdb.get(core.class.Object)
     expect(object._id).toBe(core.class.Object)
     expect(object._class).toBe(core.class.Class)
   })
 
   it('should get prototype', () => {
-    const session = new MemSession(memdb)
+    const session = new MemSession(platform)
+    session.loadModel(model)
     const objectProto = session.getPrototype(core.class.Object)
     expect(objectProto).toBeDefined()
+
+    const baseProto = Object.getPrototypeOf(objectProto)
+
     expect(objectProto.hasOwnProperty('getSession')).toBe(true)
     expect(objectProto.hasOwnProperty('toIntlString')).toBe(true)
-    expect(objectProto.toIntlString).toBe(core.method.Obj_toIntlString)
+    // expect(objectProto.toIntlString).toBe(core.method.Obj_toIntlString)
 
     const classProto = session.getPrototype(core.class.Class)
     expect(classProto.hasOwnProperty('getSession')).toBe(false)
     expect(classProto.hasOwnProperty('toIntlString')).toBe(true)
-    expect(classProto.toIntlString).toBe(core.method.Class_toIntlString)
+    // expect(classProto.toIntlString).toBe(core.method.Class_toIntlString)
 
     const docProto = Object.getPrototypeOf(classProto)
     const objProto = Object.getPrototypeOf(docProto)
@@ -58,7 +62,8 @@ describe('session', () => {
   })
 
   it('should get instances', () => {
-    const session = new MemSession(memdb)
+    const session = new MemSession(platform)
+    session.loadModel(model)
     const objectClass = session.getInstance(core.class.Object)
     expect(objectClass._id).toBe(core.class.Object)
     expect(typeof objectClass.getSession).toBe('function')
@@ -68,7 +73,8 @@ describe('session', () => {
 
     console.log(objectClass)
 
-    // const method = objectClass.toIntlString // temp
+    const method = objectClass.toIntlString
+    console.log(method)
     // if (method) {
     //   expect(platform.invoke(objectClass, method)).toBe(core.class.Object)
     // } else {

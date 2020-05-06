@@ -13,11 +13,11 @@
 // limitations under the License.
 //
 
-import { PropType } from '@anticrm/platform'
+// import { PropType } from '@anticrm/platform'
 
 import {
-  Obj, Class, Ref, Doc, Type, RefTo, Bag,
-  PropertyType, BagOf, Embedded, InstanceOf,
+  Obj, Class, Ref, Doc, Type, RefTo, Bag, AnyFunc,
+  PropertyType, BagOf, Embedded, InstanceOf, SysCall
 } from '@anticrm/platform-service-data'
 
 import { IntlString } from '@anticrm/platform-service-i18n'
@@ -32,25 +32,26 @@ import { mixinPropertyKey } from '../utils'
 // }>
 
 export type Attributes<T> = {
-  [P in keyof T]: T[P] extends PropType<any> ? Type<T[P]> : never
+  [P in keyof T]: T[P] extends PropertyType ? Type<T[P]> : PropertyType
 }
 
 export type Attibutes<T> = Attributes<Required<T>>
 
 type DefClass<T extends E, E extends Obj> = {
   // label?: IntlString
-  attributes: Attibutes<Omit<T, keyof E>>
+  attributes: Attibutes<Omit<Omit<T, '_default'>, keyof E>>
   override?: Partial<Attibutes<E>>
 }
 
+const x = {} as Attibutes<Type<PropertyType>>
 
 //export type Bag<X extends PropertyType> = Record<string, X> & PropType<Record<string, X>>
 
-type Clear<X extends PropertyType> = Omit<X, '__property'>
+// type Clear<X extends PropertyType> = Omit<X, '__property'>
 
-export function embed<X extends PropertyType>(x: Clear<X>): X {
-  return x as X
-}
+// export function embed<X extends PropertyType>(x: Clear<X>): X {
+//   return x as X
+// }
 
 export function _class<T extends E, E extends Obj>(
   _id: Ref<Class<T>>, extend: Ref<Class<E>>, def: DefClass<T, E>): Class<T> {
@@ -59,32 +60,37 @@ export function _class<T extends E, E extends Obj>(
     _id,
     extends: extend,
     // label: def.label ?? '' as IntlString,
-    attributes: embed({ ...def.attributes, ...def.override })
+    // attributes: embed({ ...def.attributes, ...def.override })
+    attributes: { ...def.attributes as Bag<Type<PropertyType>>, ...def.override }
   }
 }
 
-function i<T extends Embedded>(obj: Omit<T, '__property'>): T {
-  return obj as T
-}
+// function i<T extends Embedded>(obj: Omit<T, '__property'>): T {
+//   return obj as T
+// }
 
 export function ref<T extends Doc>(to: Ref<Class<T>>): RefTo<T> {
-  return embed({ _class: core.class.RefTo, to })
+  return { _class: core.class.RefTo, to }
 }
 
 export function bag<T extends PropertyType>(of: Type<T>): BagOf<T> {
-  return embed({ _class: core.class.BagOf, of })
+  return { _class: core.class.BagOf, of }
 }
 
 export function instance<T extends Embedded>(of: Ref<Class<T>>): InstanceOf<T> {
-  return i({ _class: core.class.InstanceOf, of })
+  return { _class: core.class.InstanceOf, of }
 }
 
 export function intl(_default?: IntlString): Type<IntlString> {
-  return i({ _class: core.class.IntlString, _default })
+  return { _class: core.class.IntlString, _default }
 }
 
-export function extension<T>(_default?: Extension<T>): Type<Extension<T>> {
-  return i({ _class: core.class.Extension, _default })
+// export function extension<T>(_default?: Extension<T>): Type<Extension<T>> {
+//   return { _class: core.class.Extension, _default }
+// }
+
+export function syscall<T extends AnyFunc>(_default?: SysCall<T>): Type<SysCall<T>> {
+  return { _class: core.class.SysCall, _default }
 }
 
 // export function as_string<T>(_class: Ref<Class<Type<AsString<T>>>>, _default?: AsString<T>): Type<AsString<T>> {
