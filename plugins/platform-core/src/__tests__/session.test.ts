@@ -15,7 +15,7 @@
 
 import { Ref, Class, Obj } from '@anticrm/platform-service-data'
 import { MemDb } from '@anticrm/platform-service-data/src/memdb'
-import { MemSession } from '@anticrm/platform-service-data/src/service'
+import createSession from '@anticrm/platform-service-data/src/service'
 import { modelFromEvents } from '../__model__/dsl'
 import core from '../__model__/id'
 import coreModel from '../__model__'
@@ -23,13 +23,16 @@ import corePlugin from '../plugin'
 
 import { Platform } from '@anticrm/platform'
 
-const platform = new Platform()
-corePlugin(platform)
 
 describe('session', () => {
 
+  const platform = new Platform()
+  const session = createSession(platform)
+  corePlugin(platform)
+
   const model = modelFromEvents(coreModel.events)
   console.log(JSON.stringify(model))//, undefined, 2))
+  session.loadModel(model)
 
   it('should load classes into memdb', () => {
     const memdb = new MemDb()
@@ -40,30 +43,21 @@ describe('session', () => {
   })
 
   it('should get prototype', () => {
-    const session = new MemSession(platform)
-    session.loadModel(model)
     const objectProto = session.getPrototype(core.class.Object)
     expect(objectProto).toBeDefined()
 
     const baseProto = Object.getPrototypeOf(objectProto)
+    expect(baseProto.hasOwnProperty('getSession')).toBe(true)
+    expect(baseProto.hasOwnProperty('getClass')).toBe(true)
+    expect(baseProto.getSession() === session).toBe(true)
 
-    expect(objectProto.hasOwnProperty('getSession')).toBe(true)
+    expect(objectProto.hasOwnProperty('_class')).toBe(true)
+    expect(objectProto.hasOwnProperty('getSession')).toBe(false)
     expect(objectProto.hasOwnProperty('toIntlString')).toBe(true)
-    // expect(objectProto.toIntlString).toBe(core.method.Obj_toIntlString)
-
-    const classProto = session.getPrototype(core.class.Class)
-    expect(classProto.hasOwnProperty('getSession')).toBe(false)
-    expect(classProto.hasOwnProperty('toIntlString')).toBe(true)
-    // expect(classProto.toIntlString).toBe(core.method.Class_toIntlString)
-
-    const docProto = Object.getPrototypeOf(classProto)
-    const objProto = Object.getPrototypeOf(docProto)
-    expect(objProto).toBe(objectProto)
+    expect(typeof objectProto.toIntlString).toBe('function')
   })
 
   it('should get instances', () => {
-    const session = new MemSession(platform)
-    session.loadModel(model)
     const objectClass = session.getInstance(core.class.Object)
     expect(objectClass._id).toBe(core.class.Object)
     expect(typeof objectClass.getSession).toBe('function')
@@ -71,10 +65,10 @@ describe('session', () => {
     expect(typeof objectClass.getClass).toBe('function')
     expect(objectClass.getClass()._id).toBe(core.class.Class)
 
-    console.log(objectClass)
+    console.log(objectClass.toIntlString())
 
-    const method = objectClass.toIntlString
-    console.log(method)
+    // const method = objectClass.toIntlString
+    // console.log(method)
     // if (method) {
     //   expect(platform.invoke(objectClass, method)).toBe(core.class.Object)
     // } else {

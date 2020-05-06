@@ -14,6 +14,8 @@
 */
 
 import { Platform } from '@anticrm/platform'
+import { Instance, Class, Obj } from '@anticrm/platform-service-data'
+import core from './__model__/id'
 
 export default function start(platform: Platform) {
   //   function Obj_toIntlString(this: Instance<Obj>, plural?: number): string {
@@ -23,13 +25,16 @@ export default function start(platform: Platform) {
   //     return 'todo'
   //   }
 
-  //   function Class_toIntlString(this: Instance<Class<Obj>>, plural?: number): string {
-  //     return platform.translate(classLabelId(this._id), { n: plural })
-  //   }
+  function Class_toIntlString(this: Instance<Obj>, plural?: number): string {
+    return 'hey there ' + (this as Instance<Class<Obj>>)._id
+    // return platform.translate(classLabelId(this._id), { n: plural })
+  }
 
-  //   platform.loadExtensions(core.method, {
-  //     Obj_toIntlString,
-  //     Class_toIntlString
-  //   })
-  // }
+  platform.setMetadata(core.method.Class_toIntlString, Class_toIntlString)
+
+  // platform.loadMetadata(core.method, {
+  //   // Obj_toIntlString,
+  //   Class_toIntlString
+  // })
 }
+

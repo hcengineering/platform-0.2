@@ -15,19 +15,18 @@
 
 // import { PropType } from '@anticrm/platform'
 
+import { Metadata } from '@anticrm/platform'
+
 import {
   Obj, Class, Ref, Doc, Type, RefTo, Bag, AnyFunc, DiffDescriptors, Descriptors,
-  PropertyType, BagOf, Embedded, InstanceOf, SysCall
+  PropertyType, BagOf, Embedded, InstanceOf
 } from '@anticrm/platform-service-data'
-
-import { IntlString } from '@anticrm/platform-service-i18n'
-import { Extension } from '@anticrm/platform-service-extension'
+// import { mixinPropertyKey } from '../utils'
 
 import core from './id'
 
-import { mixinPropertyKey } from '../utils'
-
 type DefClass<T extends E, E extends Obj> = {
+  native?: Metadata<object>
   attributes: DiffDescriptors<T, E>
   override?: Partial<Descriptors<E>>
 }
@@ -40,6 +39,7 @@ export function _class<T extends E, E extends Obj>(
     _class: core.class.Class as Ref<Class<Class<T>>>,
     _id,
     extends: extend,
+    native: def.native,
     attributes: { ...def.attributes, ...def.override }
   }
 }
@@ -56,8 +56,8 @@ export function instance<T extends Embedded>(of: Ref<Class<T>>): InstanceOf<T> {
   return { _class: core.class.InstanceOf as Ref<Class<InstanceOf<T>>>, of }
 }
 
-export function syscall<T extends AnyFunc>(_default?: SysCall<T>): Type<SysCall<T>> {
-  return { _class: core.class.SysCall as Ref<Class<Type<SysCall<T>>>>, _default }
+export function metadata<T extends AnyFunc>(_default?: Metadata<T>): Type<Metadata<T>> {
+  return { _class: core.class.Metadata as Ref<Class<Type<Metadata<T>>>>, _default }
 }
 
 //////// OPS
@@ -96,13 +96,13 @@ export function modelFromEvents(events: Event<Obj>[]): Doc[] {
       docs.set(payload.obj._id, payload.obj)
     }
   })
-  events.forEach(event => {
-    if (event.op === Operation.Mixin) {
-      const payload = event.payload as Mixin<Obj>
-      const doc = docs.get(payload._id) as any
-      doc[mixinPropertyKey(payload.obj._class)] = payload.obj
-    }
-  })
+  // events.forEach(event => {
+  //   if (event.op === Operation.Mixin) {
+  //     const payload = event.payload as Mixin<Obj>
+  //     const doc = docs.get(payload._id) as any
+  //     doc[mixinPropertyKey(payload.obj._class)] = payload.obj
+  //   }
+  // })
   const result: Doc[] = []
   for (const doc of docs) {
     result.push(doc[1])

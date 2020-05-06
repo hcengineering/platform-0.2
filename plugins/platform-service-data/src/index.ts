@@ -19,14 +19,15 @@ import { PropType, AsString, Metadata } from '@anticrm/platform'
 import { identify, PlatformService } from '@anticrm/platform'
 
 export type AnyFunc = (...args: any[]) => any
-export type SysCall<M extends AnyFunc> = Metadata<M> //& { __sys_call: void }
+//export type SysCall<M extends AnyFunc> = Metadata<M> //& { __sys_call: void }
 export type Ref<T extends Doc> = AsString<T> & { __ref: void }
 
 export type PropertyType = PropType<any> | Obj | { [key: string]: PropertyType }
 export type Bag<X extends PropertyType> = Record<string, X>
 
-export interface SessionProto {
+export interface SessionProto<T extends Obj> {
   getSession(): Session
+  getClass(): Instance<Class<T>>
 }
 
 type LiftMethods<T extends Obj> = {
@@ -36,7 +37,7 @@ type RequireMethods<T extends object> = Required<T, KeysByType<Required<T, keyof
 
 export type Proto<T extends Obj> = RequireMethods<LiftMethods<T>>
 export type Layout<T extends Obj> = { __layout: T }
-export type Instance<T extends Obj> = Proto<T> & Layout<T> & SessionProto
+export type Instance<T extends Obj> = Proto<T> & Layout<T> & SessionProto<T>
 
 // S E S S I O N
 
@@ -51,13 +52,15 @@ export interface Session extends PlatformService {
 
   loadModel(docs: Doc[]): void
 
+  getPrototype<T extends Obj>(clazz: Ref<Class<T>>): T // FOR TESTS
+
   mixin<T extends Doc, E extends T>(doc: Ref<T>, mixin: Ref<Mixin<E>>): E
 }
 
 // M E T A M O D E L
 
 type AsDescrtiptors<T> = { [P in keyof T]: T[P] extends PropertyType ? Type<T[P]> : never }
-type FilterInternal<T> = Omit<T, '_default' | '_class' | '_id'>
+type FilterInternal<T> = Omit<T, 'xxxx'> //'_default' | '_class' | '_id'>
 
 export type Descriptors<T> = AsDescrtiptors<AllRequired<FilterInternal<T>>>
 export type DiffDescriptors<T extends E, E> = Descriptors<Omit<T, keyof E>>
@@ -106,20 +109,10 @@ export interface Mixin<T extends Doc> extends Class<T> { }
 export const pluginId = 'core'
 export default identify(pluginId, {
   native: {
-    Object: '' as Metadata<object>,
+    Metadata: '' as Metadata<object>,
     RefTo: '' as Metadata<object>,
-    SysCall: '' as Metadata<object>
-  },
-  method: {
-    SysCall_exert: '' as SysCall<(value: PropertyType) => any>
+    Object: '' as Metadata<object>
   },
   class: {
-    Object: '' as Ref<Class<Obj>>,
-    Class: '' as Ref<Class<Class<Obj>>>,
-    RefTo: '' as Ref<Class<RefTo<Doc>>>,
-    SysCall: '' as Ref<Class<Type<SysCall<AnyFunc>>>>
   }
 })
-
-
-

@@ -15,7 +15,7 @@
 
 import { Platform, Metadata } from '@anticrm/platform'
 import { Session, Query } from '..'
-import core, { Obj, Doc, Ref, Bag, Class, Type, Mixin, Instance, AnyType, SysCall, AnyFunc, Layout, PropertyType, SessionProto } from '..'
+import core, { Obj, Doc, Ref, Bag, Class, Type, Mixin, Instance, RefTo, AnyFunc, Layout, PropertyType, SessionProto } from '..'
 import { MemDb } from './memdb'
 
 class InstanceProxy<T extends Obj> {
@@ -99,7 +99,7 @@ class MixinProxyHandler extends InstanceProxyHandler implements ProxyHandler<Mix
 
 //////////
 
-export class MemSession implements Session {
+class MemSession implements Session {
 
   readonly platform: Platform
   private memdb: MemDb
@@ -107,16 +107,24 @@ export class MemSession implements Session {
   readonly instanceProxy: InstanceProxyHandler
   readonly mixinProxy: MixinProxyHandler
 
+  private sessionProto: SessionProto<Obj>
+
   constructor(platform: Platform) {
     this.platform = platform
     this.memdb = new MemDb()
     this.instanceProxy = new InstanceProxyHandler(this)
     this.mixinProxy = new MixinProxyHandler(this)
+
+    this.sessionProto = {
+      getSession: () => this,
+      getClass(this: Instance<Obj>) { return this.getSession().getInstance(this._class) }
+    }
   }
 
-  private createPropertyDescriptors(attributes: Bag<Type<PropertyType>>) {
+  private createPropertyDescriptors(attributes: Bag<Type<PropertyType>>, native: boolean) {
     const result = {} as { [key: string]: PropertyDescriptor }
     for (const key in attributes) {
+      // console.log('attribute: ' + key)
       if (key.startsWith('_')) {
         result[key] = {
           get(this: Instance<Obj>) {
@@ -125,15 +133,17 @@ export class MemSession implements Session {
           enumerable: true,
         }
       } else {
-        const attribute = attributes[key]
-        const instance = this.instantiate(attribute)
+        if (!native) {
+          const attribute = attributes[key]
+          const instance = this.instantiate(attribute)
 
-        result[key] = {
-          get(this: Instance<Obj>) {
-            const value = (this.__layout as any)[key] ?? attribute._default
-            return instance.exert(value)
-          },
-          enumerable: true,
+          result[key] = {
+            get(this: Instance<Obj>) {
+              const value = (this.__layout as any)[key] ?? attribute._default
+              return instance.exert(value)
+            },
+            enumerable: true,
+          }
         }
       }
     }
@@ -141,21 +151,28 @@ export class MemSession implements Session {
   }
 
   private createPrototype<T extends Obj>(clazz: Ref<Class<T>>) {
-    console.log('createPrototype:' + clazz)
+    // console.log('createPrototype: ' + clazz)
     const classInstance = this.memdb.get(clazz) as Class<Obj>
     const extend = classInstance.extends
-    const parent = extend ? this.getPrototype(extend) : Object.prototype // TODO: some proto in case of missed `extends`
+    const parent = extend ? this.getPrototype(extend) : this.sessionProto
     const proto = Object.create(parent)
 
     let descriptors: Record<string, PropertyDescriptor>
     if (classInstance.native) {
+      descriptors = this.createPropertyDescriptors(classInstance.attributes, true)
       const nativeImpl = this.platform.getMetadata(classInstance.native)
-      descriptors = Object.getOwnPropertyDescriptors(nativeImpl)
+      // console.log('created descs')
+      console.log(descriptors)
+      // console.log('native desc')
+      console.log(nativeImpl)
+      Object.assign(descriptors, Object.getOwnPropertyDescriptors(nativeImpl))
+      console.log(descriptors)
     } else {
-      descriptors = this.createPropertyDescriptors(classInstance.attributes)
+      descriptors = this.createPropertyDescriptors(classInstance.attributes, false)
     }
-
+    Object.defineProperties(proto, descriptors)
     this.prototypes.set(clazz, proto)
+    // console.log('created prototype: ' + clazz)
     return proto
   }
 
@@ -214,37 +231,27 @@ export class MemSession implements Session {
 
 }
 
-/// Native Prototypes
-
-class SessionProtoImpl implements SessionProto {
-  getSession(): Session { throw new Error('not implemented') }
-}
-
-class ObjProto extends SessionProtoImpl implements Instance<Obj> {
-  __layout!: Obj
-  get _class() { return this.__layout._class }
-  toIntlString(plural?: number) { return 'hey ' + plural }
-}
-
-class RefToProto extends ObjProto implements Instance<AnyType> {
-  __layout!: AnyType
-  get _default() { return this.__layout._default }
-  exert(value: PropertyType) { return value ?? this._default }
-}
-
-class SysCallProto extends ObjProto implements Instance<AnyType> {
-  __layout!: AnyType
-  get _default() { return this.__layout._default }
-  exert(value: PropertyType) {
-    const session = this.getSession() as MemSession
-    return session.platform.getMetadata((value as SysCall<AnyFunc>) ?? this._default)
-  }
-}
-
 export default (platform: Platform): Session => {
-  platform.setMetadata(core.native.Object, ObjProto.prototype)
-  platform.setMetadata(core.native.RefTo, RefToProto.prototype)
-  platform.setMetadata(core.native.SysCall, SysCallProto.prototype)
+  const ObjectType = {
+    toIntlString(this: Instance<Obj>, plural?: number): string {
+      return this.getClass().toIntlString(plural)
+    }
+  }
+
+  const RefType = {
+    exert(this: Instance<RefTo<Doc>>, value: Ref<Doc>) { return value }
+  }
+
+  const MetadataType = {
+    exert(this: Instance<Type<Metadata<AnyFunc>>>, value: Metadata<AnyFunc>) {
+      const session = this.getSession() as MemSession
+      return session.platform.getMetadata(value ?? this._default)
+    }
+  }
+
+  platform.setMetadata(core.native.Object, ObjectType)
+  platform.setMetadata(core.native.RefTo, RefType)
+  platform.setMetadata(core.native.Metadata, MetadataType)
 
   return new MemSession(platform)
 }
