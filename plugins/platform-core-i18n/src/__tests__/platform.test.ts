@@ -13,12 +13,14 @@
 // limitations under the License.
 // 
 
-import { IntlString } from '../extension'
-import { Platform } from '../platform'
-
-const platform = new Platform()
+import { Platform } from '@anticrm/platform'
+import { IntlString } from '..'
+import i18nPlugin from '../plugin'
 
 describe('platform', () => {
+
+  const _ = new Platform()
+  const platform = i18nPlugin(_)
 
   it('should return original string', () => {
     expect(platform.translate('does not exists' as IntlString)).toBe('does not exists')

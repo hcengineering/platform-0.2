@@ -14,18 +14,17 @@
 //
 
 import { IntlMessageFormat, PrimitiveType } from 'intl-messageformat'
-import { AsString, PlatformService, Platform } from '@anticrm/platform-core/src/extension'
+import { Platform } from '@anticrm/platform'
+import { I18nPlugin, IntlString, pluginId } from '..'
 
-export type IntlString = AsString<string> & { __intl_string: void }
+class I18nPluginImpl implements I18nPlugin {
+  readonly pluginId = pluginId
+  readonly platform: Platform
 
-export interface I18nService extends PlatformService {
-  translate(string: IntlString, params?: Record<string, PrimitiveType> | undefined): string
-  loadStrings(translations: { [key: string]: string }): void
-}
-
-class I18nServiceImpl implements I18nService {
   private strings: Map<IntlString, string> = new Map()
   private imfCache: Map<IntlString, IntlMessageFormat> = new Map()
+
+  constructor(platform: Platform) { this.platform = platform }
 
   translate(string: IntlString, params?: Record<string, PrimitiveType> | undefined): string {
     const translation = this.strings.get(string)
@@ -50,4 +49,4 @@ class I18nServiceImpl implements I18nService {
   }
 }
 
-export default (platform: Platform): I18nService => { return new I18nServiceImpl() }
+export default (platform: Platform): I18nPlugin => new I18nPluginImpl(platform)

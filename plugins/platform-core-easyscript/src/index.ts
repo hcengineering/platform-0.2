@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { AsString, PlatformService } from '@anticrm/platform'
+import { AsString, Plugin, PluginId } from '@anticrm/platform'
 
 /*
 
@@ -46,7 +46,8 @@ export const ARG0 = '#5'
 export type AnyFunc = (...args: any[]) => any
 export type EasyScript<M extends AnyFunc> = AsString<M> & { __easyscript: void }
 
-export interface EasyScriptService extends PlatformService {
+export const pluginId = 'easyscript' as PluginId<EasyScriptPlugin>
+export interface EasyScriptPlugin extends Plugin {
   get<M extends AnyFunc>(code: EasyScript<M>): M
 }
 

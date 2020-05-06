@@ -13,7 +13,8 @@
 // limitations under the License.
 //
 
-import { EasyScriptService, EasyScript, AnyFunc, THIS, DUP, GET, APPLY0, APPLY1, ARG0 } from '..'
+import { Platform } from '@anticrm/platform'
+import { EasyScriptPlugin, pluginId, EasyScript, AnyFunc, THIS, DUP, GET, APPLY0, APPLY1, ARG0 } from '..'
 
 // Exported for Tests & Benchmarks
 export function execute(code: string, thisArg: object, args: any[]) {
@@ -69,12 +70,12 @@ export function execute(code: string, thisArg: object, args: any[]) {
 
 }
 
-class EasyScriptServiceImpl implements EasyScriptService {
+export default (platform: Platform): EasyScriptPlugin => ({
+  platform,
+  pluginId,
   get<M extends AnyFunc>(code: EasyScript<M>): M {
-    return function (...args: any[]) {
+    return function (this: any, ...args: any[]) {
       return execute(code as string, this, args)
     } as M
   }
-}
-
-export default (platform: Platform): EasyScriptService => new EasyScriptServiceImpl()
+})

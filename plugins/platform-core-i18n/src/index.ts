@@ -13,25 +13,14 @@
 // limitations under the License.
 //
 
-import { THIS, DUP, GET, APPLY0, APPLY1, ARG0 } from '..'
-import { execute } from '../service'
+import { PrimitiveType } from 'intl-messageformat'
+import { AsString, Plugin, PluginId } from '@anticrm/platform'
 
-describe('easyscript', () => {
+export type IntlString = AsString<string> & { __intl_string: void }
 
-  it('should execure easyscript', () => {
-    const code = `${THIS},${DUP},getClass,${GET},${APPLY0},${DUP},toString,${GET},${ARG0},${APPLY1}`
-    console.log(code)
+export const pluginId = 'i18n' as PluginId<I18nPlugin>
 
-    const _class = {
-      toString: function (plural: string) { return 'Hello ' + plural }
-    }
-
-    const _this = {
-      getClass: function () { return _class }
-    }
-
-    const result = execute(code, _this, ['World!'])
-    console.log(result)
-    expect(result).toBe('Hello World!')
-  })
-})
+export interface I18nPlugin extends Plugin {
+  translate(string: IntlString, params?: Record<string, PrimitiveType> | undefined): string
+  loadStrings(translations: { [key: string]: string }): void
+}

@@ -13,7 +13,8 @@
 // limitations under the License.
 //
 
-import { execute, THIS, DUP, GET, APPLY0, APPLY1, ARG0 } from '@anticrm/platform-core/src/easyscript'
+import { THIS, DUP, GET, APPLY0, APPLY1, ARG0 } from '@anticrm/platform-core-easyscript'
+import { execute } from '@anticrm/platform-core-easyscript/src/plugin'
 
 const Benchmark = require('benchmark')
 

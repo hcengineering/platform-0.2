@@ -1,7 +1,0 @@
-{
-  "name": "@anticrm/platform-service-easyscript",
-  "version": "0.1.0",
-  "main": "src/index.ts",
-  "author": "Andrey Platov <andrey.v.platov@gmail.com>",
-  "license": "EPL-2.0"
-}
