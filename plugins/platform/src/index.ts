@@ -17,13 +17,16 @@ export type PropType<T> = { __property: T }
 export type AsString<T> = string & PropType<T>
 export type AsNumber<T> = number & PropType<T>
 
-export interface Platform { }
-export interface PlatformService { }
-
 export type Metadata<T> = AsString<T> & { __metadata: void }
-export type Service<S extends PlatformService> = Metadata<S>
 
-/////
+export type PluginId<S extends Plugin> = Metadata<S>
+export interface Platform { }
+export interface Plugin {
+  readonly platform: Platform
+  readonly pluginId: PluginId<Plugin>
+}
+
+//////////////
 
 type ExtractType<T, X extends Record<string, Metadata<T>>> = { [P in keyof X]:
   X[P] extends Metadata<infer Z> ? Z : never

@@ -13,7 +13,7 @@
 // limitations under the License.
 // 
 
-import { Obj, Doc, Ref, Class, PropertyType } from '..'
+import { Obj, Doc, Ref, Class, PropertyType } from '.'
 
 function filterEq(docs: any, propertyKey: string, value: PropertyType): any[] {
   const result = []

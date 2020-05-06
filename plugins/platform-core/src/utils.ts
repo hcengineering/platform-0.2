@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Obj, Class, Ref } from '@anticrm/platform-service-data'
+import { Obj, Class, Ref } from '.'
 
 import { IntlString } from '@anticrm/platform-service-i18n'
 

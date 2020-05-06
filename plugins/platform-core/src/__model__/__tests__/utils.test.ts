@@ -14,7 +14,7 @@
 //
 
 import { IntlString } from '@anticrm/platform-service-i18n'
-import { Ref, Class, Obj } from '@anticrm/platform-service-data'
+import { Ref, Class, Obj } from '../..'
 import { verifyTranslation, modelTranslation } from '../utils'
 import { identify } from '@anticrm/platform'
 

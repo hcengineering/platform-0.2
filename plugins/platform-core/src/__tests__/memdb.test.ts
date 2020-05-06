@@ -13,14 +13,21 @@
 // limitations under the License.
 //
 
-import model from '..'
-import { modelFromEvents } from '../dsl'
+import { MemDb } from '../memdb'
+import { modelFromEvents } from '../__model__/utils'
+import coreModel from '../__model__'
+import core from '../__model__/id'
 
-describe('operations', () => {
+describe('memdb', () => {
 
-  it('should execure easyscript', () => {
-    const loaded = modelFromEvents(model.events)
-    expect(true).toBe(true)
+  const model = modelFromEvents(coreModel.events)
+  console.log(JSON.stringify(model))
+
+  it('should load classes into memdb', () => {
+    const memdb = new MemDb()
+    memdb.load(model)
+    const object = memdb.get(core.class.Object)
+    expect(object._id).toBe(core.class.Object)
+    expect(object._class).toBe(core.class.Class)
   })
-
 })

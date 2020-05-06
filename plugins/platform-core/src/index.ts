@@ -16,7 +16,7 @@
 import { KeysByType } from 'simplytyped'
 
 import { PropType, AsString, Metadata } from '@anticrm/platform'
-import { identify, PlatformService } from '@anticrm/platform'
+import { identify, Plugin, PluginId } from '@anticrm/platform'
 
 export type AnyFunc = (...args: any[]) => any
 export type Ref<T extends Doc> = AsString<T> & { __ref: void }
@@ -24,29 +24,8 @@ export type Ref<T extends Doc> = AsString<T> & { __ref: void }
 export type PropertyType = PropType<any> | Embedded | { [key: string]: PropertyType }
 export type Bag<X extends PropertyType> = { [key: string]: X }
 
-export const pluginId = 'core'
-const core = identify(pluginId, {
-  native: {
-    Object: '' as Metadata<Obj>,
-    Metadata: '' as Metadata<Type<Metadata<any>>>,
-    RefTo: '' as Metadata<RefTo<Doc>>,
-    BagOf: '' as Metadata<BagOf<PropertyType>>,
-    InstanceOf: '' as Metadata<InstanceOf<Embedded>>,
-  },
-  class: {
-    Object: '' as Ref<Class<Obj>>,
-    Class: '' as Ref<Class<Class<Obj>>>,
-    RefTo: '' as Ref<Class<RefTo<Doc>>>,
-    Doc: '' as Ref<Class<Doc>>,
-    Type: '' as Ref<Class<Type<PropertyType>>>,
-    BagOf: '' as Ref<Class<BagOf<PropertyType>>>,
-    InstanceOf: '' as Ref<Class<InstanceOf<Embedded>>>,
-    Metadata: '' as Ref<Class<Type<Metadata<any>>>>,
-  },
-})
-
 export class SessionProto {
-  getSession(): Session { throw new Error('not implemented') }
+  getSession(): CorePlugin { throw new Error('detached object') }
 }
 
 export abstract class Obj extends SessionProto {
@@ -67,8 +46,9 @@ export abstract class Doc extends Obj {
     this._id = _id as Ref<this>
   }
 }
+
 export abstract class Embedded extends Obj {
-  __embedded!: void
+  // __embedded!: void
 }
 
 export abstract class Type<T extends PropertyType> extends Embedded {
@@ -125,8 +105,18 @@ export class BagOf<T extends PropertyType> extends Type<Bag<T>> {
   }
 }
 
+export class TypeMetadata<T> extends Type<Metadata<T>> {
+  constructor(_default?: Metadata<T>) {
+    super(core.class.Metadata, _default)
+  }
+  exert(value: Metadata<any>) {
+    return value ?? this._default
+    //return this.getSession().platform.getMetadata(value ?? this._default)
+  }
+}
+
 type RemoveMethods<T extends object> = Omit<T, KeysByType<T, AnyFunc>>
-type Clear<T> = RemoveMethods<Omit<T, '__embedded'>>
+type Clear<T> = RemoveMethods<Omit<T, '__embedded' | '_default'>>
 
 type AsDescrtiptors<T> = { [P in keyof T]: T[P] extends PropertyType ? Type<T[P]> : never }
 type Descriptors<T extends object> = AsDescrtiptors<Required<Clear<T>>>
@@ -136,7 +126,7 @@ export class Class<T extends Obj> extends Doc {
   attributes: Bag<Type<PropertyType>>
   extends?: Ref<Class<Obj>>
   native?: Metadata<T>
-  protected constructor(_class: Ref<Class<Class<T>>>, _id: Ref<Class<T>>, attributes: Bag<Type<PropertyType>>, _extends: Ref<Class<Obj>>, native?: Metadata<T>) {
+  constructor(_class: Ref<Class<Class<T>>>, _id: Ref<Class<T>>, attributes: Bag<Type<PropertyType>>, _extends: Ref<Class<Obj>>, native?: Metadata<T>) {
     super(_class, _id)
     this.attributes = attributes
     this.extends = _extends
@@ -147,20 +137,11 @@ export class Class<T extends Obj> extends Doc {
   }
 }
 
-Class.createClass(core.class.Doc, core.class.Object, {
-  _id: new RefTo(core.class.Doc)
-})
-
-Class.createClass(core.class.BagOf, core.class.Object, {
-  of: new InstanceOf(core.class.Type),
-  _default: new BagOf(new InstanceOf(core.class.Type))
-}, core.native.BagOf)
-
-// S E S S I O N
+// C O R E  P L U G I N
 
 export type Query<T extends Doc> = Partial<T>
 
-export interface Session extends PlatformService {
+export interface CorePlugin extends Plugin {
   getInstance<T extends Doc>(ref: Ref<T>): T
   newInstance<T extends Obj>(clazz: Ref<Class<T>>): T
   instantiate<T extends Obj>(obj: T): T
@@ -171,3 +152,24 @@ export interface Session extends PlatformService {
   loadModel(docs: Doc[]): void
   // mixin<T extends Doc, E extends T>(doc: Ref<T>, mixin: Ref<Mixin<E>>): E
 }
+
+export const pluginId = 'core' as PluginId<CorePlugin>
+
+const core = identify(pluginId, {
+  native: {
+    Object: '' as Metadata<Obj>,
+    Metadata: '' as Metadata<TypeMetadata<any>>,
+    RefTo: '' as Metadata<RefTo<Doc>>,
+    BagOf: '' as Metadata<BagOf<PropertyType>>,
+    InstanceOf: '' as Metadata<InstanceOf<Embedded>>,
+  },
+  class: {
+    Class: '' as Ref<Class<Class<Obj>>>,
+    RefTo: '' as Ref<Class<RefTo<Doc>>>,
+    BagOf: '' as Ref<Class<BagOf<PropertyType>>>,
+    InstanceOf: '' as Ref<Class<InstanceOf<Embedded>>>,
+    Metadata: '' as Ref<Class<Type<Metadata<any>>>>,
+  },
+})
+
+export default core

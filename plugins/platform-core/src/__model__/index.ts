@@ -15,72 +15,59 @@
 
 import ru from './strings/ru'
 
-import { _class, ref, bag, instance, create, metadata } from './dsl'
-import { Obj, Ref, Class, Doc, Type, PropertyType, Descriptors, Bag, AnyType, H } from '@anticrm/platform-service-data'
+import { Obj, Ref, Class, Doc, BagOf, InstanceOf, RefTo, TypeMetadata } from '..'
+import { createDocs } from './utils'
 import core from './id'
 
-const x = {} as Descriptors<Obj>
+// const core = identify(pluginId, {
+//   native: {
+//     Object: '' as Metadata<Obj>,
+//     Metadata: '' as Metadata<TypeMetadata<any>>,
+//     RefTo: '' as Metadata<RefTo<Doc>>,
+//     BagOf: '' as Metadata<BagOf<PropertyType>>,
+//     InstanceOf: '' as Metadata<InstanceOf<Embedded>>,
+//   },
+//   class: {
+//     Object: '' as Ref<Class<Obj>>,
+//     Class: '' as Ref<Class<Class<Obj>>>,
+//     RefTo: '' as Ref<Class<RefTo<Doc>>>,
+//     Doc: '' as Ref<Class<Doc>>,
+//     Type: '' as Ref<Class<Type<PropertyType>>>,
+//     BagOf: '' as Ref<Class<BagOf<PropertyType>>>,
+//     InstanceOf: '' as Ref<Class<InstanceOf<Embedded>>>,
+//     Metadata: '' as Ref<Class<Type<Metadata<any>>>>,
+//   },
+// })
 
-
-const attributes: Descriptors<Obj> = {
-  _class: ref(core.class.Class),
-}
-
-const objectClass: H<Class<Obj>> = {
-  _class: core.class.Class,
-  _id: core.class.Object,
-  native: core.native.Object,
-  attributes: attributes as unknown as { [key: string]: Type<PropertyType> }
-}
+const model = [
+  new Class(core.class.Class, core.class.Object, {
+    _class: new RefTo(core.class.Class)
+  }, undefined as unknown as Ref<Class<Obj>>, core.native.Object),
+  Class.createClass(core.class.Doc, core.class.Object, {
+    _id: new RefTo(core.class.Doc)
+  }),
+  Class.createClass(core.class.Type, core.class.Object, {}),
+  Class.createClass(core.class.Metadata, core.class.Type, {
+  }, core.native.Metadata),
+  Class.createClass(core.class.RefTo, core.class.Type, {
+    to: new RefTo(core.class.Class as Ref<Class<Class<Doc>>>),
+  }, core.native.RefTo),
+  Class.createClass(core.class.BagOf, core.class.Type, {
+    of: new InstanceOf(core.class.Type),
+  }, core.native.BagOf),
+  Class.createClass(core.class.InstanceOf, core.class.Type, {
+    of: new RefTo(core.class.Class),
+  }, core.native.InstanceOf),
+  Class.createClass(core.class.Class, core.class.Doc, {
+    attributes: new BagOf(new InstanceOf(core.class.Type)),
+    extends: new RefTo(core.class.Class),
+    native: new TypeMetadata()
+  })
+]
 
 export default {
   strings: {
     ru
   },
-  events: [
-    create(objectClass),
-
-    create(_class(core.class.Doc, core.class.Object, {
-      attributes: {
-        _id: ref(core.class.Doc)
-      }
-    })),
-
-    create(_class(core.class.RefTo, core.class.Object, {
-      native: core.native.RefTo,
-      attributes: {
-        _default: ref(core.class.Doc),
-        to: ref(core.class.Class),
-      }
-    })),
-
-    create(_class(core.class.Class, core.class.Doc, {
-      attributes: {
-        native: metadata(undefined),
-        extends: ref(core.class.Class),
-        attributes: bag(instance(core.class.Type)),
-      },
-    })),
-
-    create(_class(core.class.BagOf, core.class.Object, {
-      attributes: {
-        _default: bag(metadata(undefined)), // ?????? TODO undefined type
-        of: instance(core.class.Type),
-      }
-    })),
-
-    create(_class(core.class.InstanceOf, core.class.Object, {
-      attributes: {
-        _default: {} as Type<Obj>,
-        of: ref(core.class.Class),
-      }
-    })),
-
-    create(_class(core.class.Metadata, core.class.Object, {
-      native: core.native.Metadata,
-      attributes: {
-        _default: metadata(undefined),
-      }
-    })),
-  ]
+  events: createDocs(model)
 }

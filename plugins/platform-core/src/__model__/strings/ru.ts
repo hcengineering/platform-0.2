@@ -13,8 +13,8 @@
 // limitations under the License.
 //
 
-import core from '@anticrm/platform-service-data'
-import { modelTranslation } from '../utils'
+// // import core from '@anticrm/platform-service-data'
+// import { modelTranslation } from '../utils'
 
 // const translation = modelTranslation(core.class, {
 //   Object: {
@@ -25,6 +25,7 @@ import { modelTranslation } from '../utils'
 //   },
 // })
 
-const translation = {}
+// const translation = {}
 
-export default translation
+export default {}
+

@@ -13,37 +13,27 @@
 // limitations under the License.
 //
 
-import { Ref, Class, Obj } from '@anticrm/platform-service-data'
-import { MemDb } from '@anticrm/platform-service-data/src/memdb'
-import createSession from '@anticrm/platform-service-data/src/service'
-import { modelFromEvents } from '../__model__/dsl'
+import { Platform } from '@anticrm/platform'
+import { Ref, Class, Obj } from '..'
+import { modelFromEvents } from '../__model__/utils'
+
 import core from '../__model__/id'
 import coreModel from '../__model__'
 import corePlugin from '../plugin'
-
-import { Platform } from '@anticrm/platform'
 
 
 describe('session', () => {
 
   const platform = new Platform()
-  const session = createSession(platform)
+  const session = corePlugin(platform)
   corePlugin(platform)
 
   const model = modelFromEvents(coreModel.events)
-  console.log(JSON.stringify(model, undefined, 2))
+  // console.log(JSON.stringify(model, undefined, 2))
   session.loadModel(model)
 
-  it('should load classes into memdb', () => {
-    const memdb = new MemDb()
-    memdb.load(model)
-    const object = memdb.get(core.class.Object)
-    expect(object._id).toBe(core.class.Object)
-    expect(object._class).toBe(core.class.Class)
-  })
-
   it('should get prototype', () => {
-    const objectProto = session.getPrototype(core.class.Object)
+    const objectProto = (session as any).getPrototype(core.class.Object)
     expect(objectProto).toBeDefined()
 
     const baseProto = Object.getPrototypeOf(objectProto)
@@ -59,41 +49,16 @@ describe('session', () => {
 
   it('should get instances', () => {
     const objectClass = session.getInstance(core.class.Object)
-    expect(objectClass._id).toBe(core.class.Object)
     expect(typeof objectClass.getSession).toBe('function')
     expect(objectClass.getSession() === session).toBe(true)
-    // expect(typeof objectClass.getClass).toBe('function')
-    // expect(objectClass.getClass()._id).toBe(core.class.Class)
-    expect(objectClass.attributes['toIntlString']._class).toBe('core.class.Metadata')
+    expect(objectClass._id).toBe(core.class.Object)
+    expect(objectClass.native).toBe(core.native.Object)
+
+    console.log(objectClass.attributes)
 
     const classClass = session.getInstance(core.class.Class)
-    console.log(classClass.extends)
-
-    // const method = objectClass.toIntlString
-    // console.log(method)
-    // if (method) {
-    //   expect(platform.invoke(objectClass, method)).toBe(core.class.Object)
-    // } else {
-    //   expect(true).toBe(false)
-    // }
-
+    expect(classClass.extends).toBe(core.class.Doc)
   })
-
-  // const test = platform.identify('test', {
-  //   class: {
-  //     ToBeMixed: '' as Ref<Class<ToBeMixed>>
-  //   }
-  // })
-
-  // @model.Mixin(test.class.ToBeMixed, core.class.Class)
-  // class ToBeMixed extends TClass<Obj> {
-  //   dummy!: number
-  // }
-
-  // memdb.load(getClassMetadata([ToBeMixed]))
-  // loadConstructors(test.class, {
-  //   ToBeMixed
-  // })
 
   // it('should mix object in', () => {
   //   const session = new MemSession(memdb)
