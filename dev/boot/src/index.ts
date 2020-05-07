@@ -13,17 +13,18 @@
 // limitations under the License.
 //
 
-import { Platform } from '@anticrm/platform-core/src/platform'
+import { pluginId as corePluginId } from '@anticrm/platform-core'
+import startCore from '@anticrm/platform-core/src/plugin'
 
-import ui from './types'
+import { pluginId as uiPluginId } from '@anticrm/platform-ui'
+import startUI from '@anticrm/platform-ui/src/plugin'
 
-export default (platform: Platform) => {
-  const spritesUrl = require('../assets/icons.svg')
-  platform.loadResources(ui.icon, {
-    AddGroup: spritesUrl + '#add-group',
-    Add: spritesUrl + '#add',
-    Checked: spritesUrl + '#checked',
-    Edit: spritesUrl + '#edit',
-    Search: spritesUrl + '#search',
-  })
-}
+import platform from '@anticrm/platform'
+import model from './model'
+
+platform.setPlugin(corePluginId, startCore(platform))
+const uiPlugin = startUI(platform)
+platform.setPlugin(uiPluginId, uiPlugin)
+uiPlugin.loadModel(model)
+
+

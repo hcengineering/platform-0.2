@@ -35,8 +35,11 @@ export abstract class Obj extends SessionProto {
     super()
     this._class = _class as Ref<Class<this>>
   }
+  getClass(this: Obj): Class<this> {
+    return this.getSession().getInstance(this._class) as Class<this>
+  }
   toIntlString(plural?: number): string {
-    return this.getSession().getInstance(this._class).toIntlString(plural)
+    return this.getClass().toIntlString(plural)
   }
 }
 
@@ -68,7 +71,6 @@ export class RefTo<T extends Doc> extends Type<Ref<T>> {
     super(core.class.RefTo as Ref<Class<RefTo<T>>>, _default)
     this.to = to
   }
-  // exert(value: Ref<T>) { return value ?? this._default }
 }
 
 export class InstanceOf<T extends Embedded> extends Type<T> {
@@ -106,15 +108,6 @@ export class BagOf<T extends PropertyType> extends Type<Bag<T>> {
   }
 }
 
-// export class TypeMetadata<T> extends Type<Metadata<T>> {
-//   constructor(_default?: Metadata<T>) {
-//     super(core.class.Metadata, _default)
-//   }
-//   exert(value: Metadata<any>) {
-//     return this.getSession().platform.getMetadata(value ?? this._default)
-//   }
-// }
-
 type RemoveMethods<T extends object> = Omit<T, KeysByType<T, AnyFunc>>
 type Clear<T> = RemoveMethods<Omit<T, '__embedded' | '_default'>>
 
@@ -132,6 +125,7 @@ export class Class<T extends Obj> extends Doc {
     this.extends = _extends
     this.native = native
   }
+  toIntlString(plural?: number): string { return 'Класс' }
   static createClass<T extends E, E extends Obj>(_id: Ref<Class<T>>, _extends: Ref<Class<E>>, attributes: DiffDescriptors<T, E>, native?: Metadata<T>): Class<T> {
     return new Class(core.class.Class as Ref<Class<Class<T>>>, _id, attributes, _extends, native)
   }

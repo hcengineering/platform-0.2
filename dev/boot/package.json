@@ -1,0 +1,13 @@
+{
+  "name": "@anticrm/dev-boot",
+  "version": "0.1.0",
+  "main": "src/index.ts",
+  "author": "Andrey Platov <andrey.v.platov@gmail.com>",
+  "license": "EPL-2.0",
+  "devDependencies": {
+    "ts-node": "^8.10.1"
+  },
+  "scripts": {
+    "show": "ts-node src/model.ts"
+  }
+}

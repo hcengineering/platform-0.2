@@ -14,7 +14,7 @@
 //
 
 import { Ref, Class, Obj, Doc } from '..'
-import { IntlString } from '@anticrm/platform-service-i18n'
+import { IntlString } from '@anticrm/platform-core-i18n'
 import { classLabelId, attributeLabelId } from '../utils'
 import { mixinPropertyKey } from '../utils'
 import { mergeWith } from 'lodash'

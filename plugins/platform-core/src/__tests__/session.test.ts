@@ -14,7 +14,6 @@
 //
 
 import { Platform } from '@anticrm/platform'
-import { Ref, Class, Obj } from '..'
 import { modelFromEvents } from '../__model__/utils'
 
 import core from '../__model__/id'
@@ -38,12 +37,12 @@ describe('session', () => {
 
     const baseProto = Object.getPrototypeOf(objectProto)
     expect(baseProto.hasOwnProperty('getSession')).toBe(true)
-    // expect(baseProto.hasOwnProperty('getClass')).toBe(true)
     expect(baseProto.getSession() === session).toBe(true)
 
     expect(objectProto.hasOwnProperty('_class')).toBe(true)
     expect(objectProto.hasOwnProperty('getSession')).toBe(false)
     expect(objectProto.hasOwnProperty('toIntlString')).toBe(true)
+    expect(objectProto.hasOwnProperty('getClass')).toBe(true)
     expect(typeof objectProto.toIntlString).toBe('function')
   })
 
@@ -54,10 +53,11 @@ describe('session', () => {
     expect(objectClass._id).toBe(core.class.Object)
     expect(objectClass.native).toBe(core.native.Object)
 
-    console.log(objectClass.attributes)
+    expect(objectClass.attributes._class._class).toBe(core.class.RefTo)
 
     const classClass = session.getInstance(core.class.Class)
     expect(classClass.extends).toBe(core.class.Doc)
+    expect(objectClass.getClass()._id).toBe(core.class.Class)
   })
 
   // it('should mix object in', () => {

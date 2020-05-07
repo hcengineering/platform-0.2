@@ -21,7 +21,6 @@ import core from '../__model__/id'
 describe('memdb', () => {
 
   const model = modelFromEvents(coreModel.events)
-  console.log(JSON.stringify(model))
 
   it('should load classes into memdb', () => {
     const memdb = new MemDb()

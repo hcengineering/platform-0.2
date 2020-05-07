@@ -35,7 +35,6 @@ type ExtractType<T, X extends Record<string, Metadata<T>>> = { [P in keyof X]:
 export class Platform {
 
   private COMPRESS_IDS = false
-  private metadata = new Map<string, any>()
 
   compressId(id: string): string {
     if (this.COMPRESS_IDS) {
@@ -47,6 +46,24 @@ export class Platform {
     }
     return id
   }
+
+  /////
+
+  private plugins = new Map<PluginId<Plugin>, Plugin>()
+
+  getPlugin<T extends Plugin>(id: PluginId<T>): T {
+    const plugin = this.plugins.get(id)
+    if (plugin) return plugin as T
+    throw new Error('plugin not loaded: ' + id)
+  }
+
+  setPlugin<T extends Plugin>(id: PluginId<T>, plugin: T): void {
+    this.plugins.set(id, plugin)
+  }
+
+  /////
+
+  private metadata = new Map<string, any>()
 
   getMetadata<T>(id: Metadata<T>): T {
     const result = this.metadata.get(id as string)
@@ -91,3 +108,5 @@ function transform<N extends Namespace>(prefix: string, namespaces: N, f: (id: s
 export function identify<N extends Namespace>(pluginId: PluginId<Plugin>, namespace: N): N {
   return transform(pluginId, namespace, (id: string, value) => value === '' ? id : value)
 }
+
+export default new Platform()
