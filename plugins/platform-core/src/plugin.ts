@@ -52,6 +52,9 @@ export class TCodePlugin implements CorePlugin {
           get(this: Layout<Obj>) {
             return this.__layout[key] ?? attributes[key]._default
           },
+          set(this: Layout<Obj>, value) {
+            this.__layout[key] = value
+          },
           enumerable: true,
         }
       } else {
@@ -61,6 +64,9 @@ export class TCodePlugin implements CorePlugin {
           get(this: Layout<Obj>) {
             const value = this.__layout[key]
             return instance.exert(value)
+          },
+          set(this: Layout<Obj>, value) {
+            this.__layout[key] = instance.hibernate(value)
           },
           enumerable: true,
         }
