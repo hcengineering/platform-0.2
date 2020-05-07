@@ -142,14 +142,18 @@ export class TCodePlugin implements CorePlugin {
     return this.prototypes.get(clazz) ?? this.createPrototype(clazz)
   }
 
-  instantiate<T extends Obj>(obj: T): T {
-    const instance = Object.create(this.getPrototype(obj._class)) as Layout<T>
-    instance.__layout = obj
-    return instance
+  // instantiate<T extends Obj>(obj: T): T {
+  //   const instance = Object.create(this.getPrototype(obj._class)) as Layout<T>
+  //   instance.__layout = obj
+  //   return instance
+  // }
+
+  private instanceDoc(container: Container, _class: Ref<Class<Obj>>) {
+
   }
 
-  getInstance<T extends Doc>(ref: Ref<T>): T {
-    return this.instantiate(this.memdb.get(ref))
+  getInstance<T extends Doc>(_class: Ref<Class<Obj>>, ref: Ref<T>): T {
+    return this.instantiateDoc(this.memdb.get(ref))
   }
 
   newInstance<T extends Obj>(clazz: Ref<Class<T>>): T {
