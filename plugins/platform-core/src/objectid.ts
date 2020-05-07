@@ -34,6 +34,6 @@ function count(): string {
   return toHex(val, 6)
 }
 
-function generateId(): string {
+export function generateId(): string {
   return timestamp() + random + count()
 }

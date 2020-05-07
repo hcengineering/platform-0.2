@@ -16,10 +16,13 @@
 import { modelFromEvents } from '@anticrm/platform-core/src/__model__/utils'
 import coreModel from '@anticrm/platform-core/src/__model__'
 import contactCoreModel from '@anticrm/contact-core/src/__model__'
+import testModel from './testModel'
 
 const events = [
   ...coreModel.events,
-  ...contactCoreModel.events
+  ...contactCoreModel.events,
+
+  ...testModel
 ]
 const model = modelFromEvents(events)
 

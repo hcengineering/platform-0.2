@@ -15,8 +15,7 @@
 
 import { KeysByType } from 'simplytyped'
 
-import { PropType, AsString, Metadata } from '@anticrm/platform'
-import { identify, Plugin, PluginId } from '@anticrm/platform'
+import { PropType, AsString, Metadata, identify, Plugin, PluginId } from '@anticrm/platform'
 
 export type AnyFunc = (...args: any[]) => any
 export type Ref<T extends Doc> = AsString<T> & { __ref: void }
@@ -134,6 +133,7 @@ export class Class<T extends Obj> extends Doc {
 // C O R E  P L U G I N
 
 export type Query<T extends Doc> = Partial<T>
+export type Content<T extends Doc> = RemoveMethods<Omit<T, '_id' | '_class' | '__embedded'>> & { _id?: Ref<T> }
 
 export interface CorePlugin extends Plugin {
   getInstance<T extends Doc>(ref: Ref<T>): T

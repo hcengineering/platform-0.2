@@ -13,10 +13,11 @@
 // limitations under the License.
 //
 
-import { Ref, Class, Obj, Doc } from '..'
+import { Ref, Class, Obj, Doc, Content } from '..'
 import { IntlString } from '@anticrm/platform-core-i18n'
 import { classLabelId, attributeLabelId } from '../utils'
 import { mixinPropertyKey } from '../utils'
+import { generateId } from '../objectid'
 import { mergeWith } from 'lodash'
 
 type Labels<T extends Obj> = {
@@ -68,6 +69,12 @@ export function mergeIds<A extends PluginIds, B extends PluginIds>(a: A, b: B): 
   })
 }
 
+////////
+
+export function newInstance<T extends Doc>(_class: Ref<Class<T>>, data: Content<T>): T {
+  // this is very dirty thing, let's see how it will work for now
+  return { _id: generateId(), ...data, _class } as T
+}
 
 //////// OPS
 

@@ -17,7 +17,7 @@ import { Platform } from '@anticrm/platform'
 import { CorePlugin, Query, pluginId } from '.'
 import core, {
   Obj, Doc, Ref, Bag, Class, Type, RefTo, SessionProto,
-  PropertyType, BagOf, InstanceOf, Embedded,
+  PropertyType, BagOf, InstanceOf,
 } from '.'
 import { MemDb } from './memdb'
 
