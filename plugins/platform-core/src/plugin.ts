@@ -17,7 +17,7 @@ import { Platform, Metadata } from '@anticrm/platform'
 import { CorePlugin, Query, pluginId } from '.'
 import core, {
   Obj, Doc, Ref, Bag, Class, Type, RefTo, SessionProto,
-  PropertyType, BagOf, InstanceOf, Mixin, ArrayOf
+  PropertyType, BagOf, InstanceOf, Mixin, ArrayOf, Container
 } from '.'
 import { MemDb } from './memdb'
 
@@ -106,7 +106,7 @@ export class TCodePlugin implements CorePlugin {
         }
       } else {
         const attribute = attributes[key]
-        const instance = this.instantiate(attribute)
+        const instance = this.instantiateEmbedded(attribute)
         result[key] = {
           get(this: Layout<Obj>) {
             const value = this.__layout[key]
@@ -123,15 +123,16 @@ export class TCodePlugin implements CorePlugin {
   }
 
   private createPrototype<T extends Obj>(clazz: Ref<Class<T>>) {
-    const classInstance = this.memdb.get(clazz) as Class<Obj>
-    const extend = classInstance.extends
+    const classContainer = this.memdb.get(clazz)
+    const extend = classContainer.extends as Ref<Class<Obj>>
     const parent = extend ? this.getPrototype(extend) : this.sessionProto
     const proto = Object.create(parent)
     this.prototypes.set(clazz, proto)
 
-    const descriptors = this.createPropertyDescriptors(classInstance.attributes)
-    if (classInstance.native) {
-      const proto = this.platform.getMetadata(classInstance.native)
+    const attributes = classContainer.attributes as Bag<Type<PropertyType>>
+    const descriptors = this.createPropertyDescriptors(attributes)
+    if (classContainer.native) {
+      const proto = this.platform.getMetadata(classContainer.native as Metadata<Class<Obj>>)
       Object.assign(descriptors, Object.getOwnPropertyDescriptors(proto))
     }
     Object.defineProperties(proto, descriptors)
@@ -142,18 +143,23 @@ export class TCodePlugin implements CorePlugin {
     return this.prototypes.get(clazz) ?? this.createPrototype(clazz)
   }
 
-  // instantiate<T extends Obj>(obj: T): T {
-  //   const instance = Object.create(this.getPrototype(obj._class)) as Layout<T>
-  //   instance.__layout = obj
-  //   return instance
-  // }
-
-  private instanceDoc(container: Container, _class: Ref<Class<Obj>>) {
-
+  instantiateEmbedded<T extends Obj>(obj: T): T {
+    const _class = obj._class
+    const instance = Object.create(this.getPrototype(_class)) as Layout<T>
+    instance._class = _class
+    instance.__layout = obj
+    return instance
   }
 
-  getInstance<T extends Doc>(_class: Ref<Class<Obj>>, ref: Ref<T>): T {
-    return this.instantiateDoc(this.memdb.get(ref))
+  private instantiateDoc<T extends Doc>(_class: Ref<Class<T>>, container: Container): T {
+    const instance = Object.create(this.getPrototype(_class)) as Layout<T>
+    instance._class = _class
+    instance.__layout = container
+    return instance
+  }
+
+  getInstance<T extends Doc>(ref: Ref<T>, as: Ref<Class<T>>): T {
+    return this.instantiateDoc(as, this.memdb.get(ref))
   }
 
   newInstance<T extends Obj>(clazz: Ref<Class<T>>): T {
@@ -164,7 +170,7 @@ export class TCodePlugin implements CorePlugin {
 
   find<T extends Doc>(clazz: Ref<Class<T>>, query: Query<T>): T[] {
     const layouts = this.memdb.findAll(clazz, query)
-    return layouts.map(layout => this.instantiate(layout))
+    return layouts.map(layout => this.instantiateDoc(clazz, layout))
   }
 
   findOne<T extends Doc>(clazz: Ref<Class<T>>, query: Query<T>): T | undefined {
@@ -174,21 +180,21 @@ export class TCodePlugin implements CorePlugin {
 
   ////
 
-  loadModel(docs: Doc[]): void {
+  loadModel(docs: Container[]): void {
     this.memdb.load(docs)
   }
 
   ////
 
   mixin<M extends I, I extends Doc>(doc: Ref<I>, mixinClass: Ref<Mixin<M>>): M {
-    const layout = this.memdb.get(doc) as I
-    let mixins = layout._mixins
-    if (!mixins) {
-      mixins = []
-      layout._mixins = mixins
-    }
-    mixins.push(mixinClass as string)
-      ; (layout as any)['$' + mixinClass] = { _class: mixinClass }
+    // const layout = this.memdb.get(doc) as I
+    // let mixins = layout._mixins
+    // if (!mixins) {
+    //   mixins = []
+    //   layout._mixins = mixins
+    // }
+    // mixins.push(mixinClass as string)
+    //   ; (layout as any)['$' + mixinClass] = { _class: mixinClass }
 
     throw new Error('not implemented')
   }

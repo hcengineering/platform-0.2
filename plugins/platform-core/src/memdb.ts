@@ -13,15 +13,7 @@
 // limitations under the License.
 // 
 
-import { Obj, Doc, Ref, Class, PropertyType } from '.'
-
-type ContainerId = Ref<Doc>
-
-interface Container {
-  _id: ContainerId
-  _classes: Ref<Class<Obj>>[]
-  [key: string]: PropertyType
-}
+import { Obj, Doc, Ref, Class, PropertyType, Container, ContainerId } from '.'
 
 function filterEq(docs: any, propertyKey: string, value: PropertyType): any[] {
   const result = []

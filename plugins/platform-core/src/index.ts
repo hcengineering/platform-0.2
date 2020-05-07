@@ -24,6 +24,14 @@ export type PropertyType = PropType<any> | Embedded | { [key: string]: PropertyT
 
 export type Bag<X extends PropertyType> = { [key: string]: X }
 
+export type ContainerId = Ref<Doc>
+
+export interface Container {
+  _id: ContainerId
+  _classes: Ref<Class<Obj>>[]
+  [key: string]: PropertyType
+}
+
 export class SessionProto {
   getSession(): CorePlugin { throw new Error('detached object') }
 }
@@ -35,7 +43,8 @@ export abstract class Obj extends SessionProto {
     this._class = _class as Ref<Class<this>>
   }
   getClass(this: Obj): Class<this> {
-    return this.getSession().getInstance(this._class) as Class<this>
+    // return this.getSession().getInstance(this._class, core.class.Class) as Class<this>
+    throw new Error('not implemented')
   }
   toIntlString(plural?: number): string {
     return this.getClass().toIntlString(plural)
@@ -79,7 +88,7 @@ export class InstanceOf<T extends Embedded> extends Type<T> {
     this.of = of
   }
   exert(value: T) {
-    return this.getSession().instantiate(value)
+    return this.getSession().instantiateEmbedded(value)
   }
 }
 
@@ -153,14 +162,14 @@ export type RemoveMethods<T extends object> = Omit<T, KeysByType<T, AnyFunc>>
 export type Content<T extends Doc> = RemoveMethods<Omit<T, '_id' | '_class' | '__embedded'>> & { _id?: Ref<T> }
 
 export interface CorePlugin extends Plugin {
-  getInstance<T extends Doc>(ref: Ref<T>): T
+  getInstance<T extends Doc>(ref: Ref<T>, as: Ref<Class<T>>): T
   newInstance<T extends Obj>(clazz: Ref<Class<T>>): T
-  instantiate<T extends Obj>(obj: T): T
+  instantiateEmbedded<T extends Obj>(obj: T): T
 
   find<T extends Doc>(clazz: Ref<Class<T>>, query: Query<T>): T[]
   findOne<T extends Doc>(clazz: Ref<Class<T>>, query: Query<T>): T | undefined
 
-  loadModel(docs: Doc[]): void
+  loadModel(docs: Container[]): void
   // mixin<T extends Doc, E extends T>(doc: Ref<T>, mixin: Ref<Mixin<E>>): E
 }
 
