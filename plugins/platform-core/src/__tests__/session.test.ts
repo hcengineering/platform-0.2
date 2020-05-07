@@ -78,6 +78,8 @@ describe('session', () => {
     const classClass = session.getInstance(core.class.Class)
     expect(classClass.extends).toBe(core.class.Doc)
     expect(objectClass.getClass()._id).toBe(core.class.Class)
+    expect(objectClass.toIntlString()).toBe('core.class.Object')
+    expect(classClass.toIntlString()).toBe('core.class.Class')
   })
 
   it('should work with arrays', () => {

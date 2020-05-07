@@ -30,29 +30,45 @@ type AsDescrtiptors<T> = { [P in keyof T]: T[P] extends PropertyType ? Type<T[P]
 type Descriptors<T extends object> = AsDescrtiptors<Required<Clear<T>>>
 type DiffDescriptors<T extends E, E> = Descriptors<Omit<T, keyof E>>
 
+export function newInstance<T extends Doc>(_class: Ref<Class<T>>, data: Content<T>): T {
+  return { _id: generateId(), ...data, _class } as T
+}
+
 export function createClass<T extends E, E extends Obj>(
   _id: Ref<Class<T>>, _extends: Ref<Class<E>>,
   attributes: DiffDescriptors<T, E>, native?: Metadata<T>): Class<T> {
-  return new Class(core.class.Class as Ref<Class<Class<T>>>, _id, attributes, _extends, native)
+
+  return newInstance(core.class.Class, {
+    _id,
+    attributes,
+    extends: _extends,
+    native
+  }) as Class<T>
 }
 
 export function createMixin<T extends E, E extends Obj>(
   _id: Ref<Class<T>>, _extends: Ref<Class<E>>,
   attributes: DiffDescriptors<T, E>, native?: Metadata<T>): Class<T> {
-  return new Class(core.class.Class as Ref<Class<Class<T>>>, _id, attributes, _extends, native)
+  // return new Class(core.class.Class as Ref<Class<Class<T>>>, _id, attributes, _extends, native)
+  throw new Error('not implemented')
 }
 
 export function typeString(): Type<string> { return new Type(core.class.String) }
 export function typeMixins(): Type<string[]> { return new Type(core.class.Mixins) }
 
-export function newInstance<T extends Doc>(_class: Ref<Class<T>>, data: Content<T>): T {
-  return { _id: generateId(), ...data, _class } as T
+
+const objectAttributes: Descriptors<Obj> = {
+  _class: new RefTo(core.class.Class)
 }
+const objectClass = newInstance(core.class.Class, {
+  _id: core.class.Object,
+  attributes: objectAttributes,
+  native: core.native.Object
+})
 
 const model = [
-  new Class(core.class.Class, core.class.Object, {
-    _class: new RefTo(core.class.Class)
-  }, undefined as unknown as Ref<Class<Obj>>, core.native.Object),
+  objectClass,
+
   createClass(core.class.Doc, core.class.Object, {
     _id: new RefTo(core.class.Doc)
   }),
@@ -80,7 +96,7 @@ const model = [
     attributes: new BagOf(new InstanceOf(core.class.Type)),
     extends: new RefTo(core.class.Class),
     native: new Type(core.class.Metadata)
-  })
+  }, core.native.ClassDocument)
 ]
 
 export default {

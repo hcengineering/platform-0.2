@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Platform } from '@anticrm/platform'
+import { Platform, Metadata } from '@anticrm/platform'
 import { CorePlugin, Query, pluginId } from '.'
 import core, {
   Obj, Doc, Ref, Bag, Class, Type, RefTo, SessionProto,
@@ -48,6 +48,20 @@ class Mixins extends Type<PropertyType> {
     return new Proxy(value, new MixinProxyHandler(target as Doc))
   }
 }
+
+class ClassDocument<T extends Obj> extends Doc implements Class<T> {
+  attributes: Bag<Type<PropertyType>>
+  extends?: Ref<Class<Obj>>
+  native?: Metadata<T>
+  constructor(_class: Ref<Class<Class<T>>>, _id: Ref<Class<T>>, attributes: Bag<Type<PropertyType>>, _extends: Ref<Class<Obj>>, native?: Metadata<T>) {
+    super(_class, _id)
+    this.attributes = attributes
+    this.extends = _extends
+    this.native = native
+  }
+  toIntlString(plural?: number): string { return this._id }
+}
+
 
 export class TCodePlugin implements CorePlugin {
 
@@ -175,7 +189,9 @@ export default (platform: Platform): CorePlugin => {
   platform.setMetadata(core.native.BagOf, BagOf.prototype)
   platform.setMetadata(core.native.ArrayOf, ArrayOf.prototype)
   platform.setMetadata(core.native.InstanceOf, InstanceOf.prototype)
+
   platform.setMetadata(core.native.Mixins, Mixins.prototype)
+  platform.setMetadata(core.native.ClassDocument, ClassDocument.prototype)
 
   return new TCodePlugin(platform)
 }

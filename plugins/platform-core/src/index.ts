@@ -141,19 +141,10 @@ export class BagOf<T extends PropertyType> extends Type<Bag<T>> {
 
 // C L A S S E S  &  M I X I N S
 
-
-
-export class Class<T extends Obj> extends Doc {
+export interface Class<T extends Obj> extends Doc {
   attributes: Bag<Type<PropertyType>>
   extends?: Ref<Class<Obj>>
   native?: Metadata<T>
-  constructor(_class: Ref<Class<Class<T>>>, _id: Ref<Class<T>>, attributes: Bag<Type<PropertyType>>, _extends: Ref<Class<Obj>>, native?: Metadata<T>) {
-    super(_class, _id)
-    this.attributes = attributes
-    this.extends = _extends
-    this.native = native
-  }
-  toIntlString(plural?: number): string { return 'Класс' }
 }
 
 export interface Mixin<T extends Doc> extends Class<T> { }
@@ -188,6 +179,7 @@ const core = identify(pluginId, {
     ArrayOf: '' as Metadata<ArrayOf<PropertyType>>,
     InstanceOf: '' as Metadata<InstanceOf<Embedded>>,
     Mixins: '' as Metadata<Type<PropertyType>>,
+    ClassDocument: '' as Metadata<Class<Obj>>
   },
   class: {
     RefTo: '' as Ref<Class<RefTo<Doc>>>,
