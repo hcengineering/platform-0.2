@@ -13,15 +13,18 @@
 // limitations under the License.
 //
 
-import model from '../__model__'
-import { modelFromEvents } from '../__model__/operations'
+import contact from '@anticrm/contact-core'
+import { Ref } from '@anticrm/platform-core'
+import { newInstance, createDocs } from '@anticrm/platform-core/src/__model__/utils'
+import { Contact } from '@anticrm/contact-core'
 
+export const contact1 = 'test.contact.1' as Ref<Contact>
 
-describe('operations', () => {
-
-  it('should execure easyscript', () => {
-    const loaded = modelFromEvents(model.events)
-    expect(true).toBe(true)
+const model = [
+  newInstance(contact.class.Contact, {
+    _id: contact1,
+    phone: '+7 913 333 5555'
   })
+]
 
-})
+export default createDocs(model)

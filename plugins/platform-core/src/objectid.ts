@@ -13,17 +13,27 @@
 // limitations under the License.
 //
 
-import { Platform } from '@anticrm/platform-core/src/platform'
+function toHex(value: number, chars: number): string {
+  const result = value.toString(16)
+  if (result.length < chars) {
+    return '0'.repeat(chars - result.length) + result
+  }
+  return result
+}
 
-import ui from './types'
+let counter = Math.random() * (1 << 24) | 0
+const random = toHex(Math.random() * (1 << 24) | 0, 6) + toHex(Math.random() * (1 << 16) | 0, 4)
 
-export default (platform: Platform) => {
-  const spritesUrl = require('../assets/icons.svg')
-  platform.loadResources(ui.icon, {
-    AddGroup: spritesUrl + '#add-group',
-    Add: spritesUrl + '#add',
-    Checked: spritesUrl + '#checked',
-    Edit: spritesUrl + '#edit',
-    Search: spritesUrl + '#search',
-  })
+function timestamp(): string {
+  const time = (Date.now() / 1000) | 0
+  return toHex(time, 8)
+}
+
+function count(): string {
+  const val = counter++ & 0xffffff
+  return toHex(val, 6)
+}
+
+export function generateId(): string {
+  return timestamp() + random + count()
 }

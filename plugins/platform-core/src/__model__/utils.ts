@@ -13,9 +13,11 @@
 // limitations under the License.
 //
 
-import { Ref, Class, Obj, IntlString } from '../types'
+import { Ref, Class, Obj, Doc, Content } from '..'
+import { IntlString } from '@anticrm/platform-core-i18n'
 import { classLabelId, attributeLabelId } from '../utils'
-
+import { mixinPropertyKey } from '../utils'
+import { generateId } from '../objectid'
 import { mergeWith } from 'lodash'
 
 type Labels<T extends Obj> = {
@@ -65,4 +67,65 @@ export function mergeIds<A extends PluginIds, B extends PluginIds>(a: A, b: B): 
       throw new Error('attempting to overwrite ' + value)
     }
   })
+}
+
+////////
+
+export function newInstance<T extends Doc>(_class: Ref<Class<T>>, data: Content<T>): T {
+  // this is very dirty thing, let's see how it will work for now
+  return { _id: generateId(), ...data, _class } as T
+}
+
+//////// OPS
+
+export enum Operation {
+  Create,
+  Mixin,
+}
+
+export interface Payload<T extends Obj> {
+  obj: T
+}
+
+export interface Mixin<T extends Obj> extends Payload<T> {
+  _id: Ref<Doc>
+}
+
+export interface Event<T extends Obj> {
+  op: Operation
+  payload: Payload<T>
+}
+
+export function create<T extends Doc>(doc: T): Event<T> {
+  return { op: Operation.Create, payload: { obj: doc } }
+}
+
+export function mixin<T extends Obj>(_id: Ref<Doc>, obj: T): Event<T> {
+  return { op: Operation.Mixin, payload: { obj } }
+}
+
+export function createDocs(docs: Doc[]): Event<Doc>[] {
+  return docs.map(doc => create(doc))
+}
+
+export function modelFromEvents(events: Event<Obj>[]): Doc[] {
+  const docs = new Map<Ref<Doc>, Doc>()
+  events.forEach(event => {
+    if (event.op === Operation.Create) {
+      const payload = event.payload as Payload<Doc>
+      docs.set(payload.obj._id, payload.obj)
+    }
+  })
+  events.forEach(event => {
+    if (event.op === Operation.Mixin) {
+      const payload = event.payload as Mixin<Obj>
+      const doc = docs.get(payload._id) as any
+      doc[mixinPropertyKey(payload.obj._class)] = payload.obj
+    }
+  })
+  const result: Doc[] = []
+  for (const doc of docs) {
+    result.push(doc[1])
+  }
+  return result as Doc[]
 }

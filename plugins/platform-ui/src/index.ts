@@ -13,18 +13,32 @@
 // limitations under the License.
 //
 
-import { Obj, Class, Ref } from '.'
+import { identify, Metadata, Plugin, PluginId } from '@anticrm/platform'
+import { Doc, Obj, AnyType } from '@anticrm/platform-core'
 
-import { IntlString } from '@anticrm/platform-core-i18n'
+export type Asset = Metadata<string>
 
-export function classLabelId(clazz: Ref<Class<Obj>>): IntlString {
-  return clazz as string as IntlString
+export interface AttrModel {
+  key: string
+  type: AnyType
+  label: string
+  placeholder: string
 }
 
-export function attributeLabelId(clazz: Ref<Class<Obj>>, key: string): IntlString {
-  return clazz + '.' + key as IntlString
+export interface UIPlugin extends Plugin {
+  loadModel(docs: Doc[]): void
+
+  getAttrModel(object: Obj, props: string[]): AttrModel[]
 }
 
-export function mixinPropertyKey(clazz: Ref<Class<Obj>>): string {
-  return '$' + clazz
-}
+export const pluginId = 'ui' as PluginId<UIPlugin>
+
+export default identify(pluginId, {
+  icon: {
+    AddGroup: '' as Asset,
+    Add: '' as Asset,
+    Checked: '' as Asset,
+    Edit: '' as Asset,
+    Search: '' as Asset,
+  }
+})

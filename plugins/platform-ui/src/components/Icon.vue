@@ -16,8 +16,8 @@
 <script lang="ts">
 
 import Vue from 'vue'
-import platform from '../platform'
-import { Resource } from '@anticrm/platform-core'
+import platform from '@anticrm/platform'
+import { Asset } from '@anticrm/platform-ui'
 
 export default Vue.extend({
   props: {
@@ -27,7 +27,7 @@ export default Vue.extend({
     }
   },
   computed: {
-    url(): string { return platform.getResource(this.icon as Resource) },
+    url(): string { return platform.getMetadata(this.icon) },
   }
 })
 </script>

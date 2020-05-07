@@ -13,16 +13,19 @@
 // limitations under the License.
 //
 
-import core from '../../types'
-import { modelTranslation } from '../utils'
+// // import core from '@anticrm/platform-service-data'
+// import { modelTranslation } from '../utils'
 
-const translation = modelTranslation(core.class, {
-  Object: {
-    $label: 'Объект'
-  },
-  Class: {
-    $label: 'Класс'
-  },
-})
+// const translation = modelTranslation(core.class, {
+//   Object: {
+//     $label: 'Объект'
+//   },
+//   Class: {
+//     $label: 'Класс'
+//   },
+// })
 
-export default translation
+// const translation = {}
+
+export default {}
+

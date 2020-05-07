@@ -13,20 +13,18 @@
 // limitations under the License.
 //
 
-import { Doc, id, Ref, Class, Type, AsString } from '@anticrm/platform-core'
+import { pluginId as corePluginId } from '@anticrm/platform-core'
+import startCore from '@anticrm/platform-core/src/plugin'
 
-export interface Contact extends Doc {
-  email?: AsString<string>
-  phone?: AsString<string>
-  phoneWork?: AsString<string>
-  twitter?: AsString<string>
-  address?: AsString<string>
-  addressDelivery?: AsString<string>
-}
+import { pluginId as uiPluginId } from '@anticrm/platform-ui'
+import startUI from '@anticrm/platform-ui/src/plugin'
 
-export const pluginId = 'contact-core'
-export default id(pluginId, {
-  class: {
-    Contact: '' as Ref<Class<Contact>>,
-  }
-})
+import platform from '@anticrm/platform'
+import model from './model'
+
+platform.setPlugin(corePluginId, startCore(platform))
+const uiPlugin = startUI(platform)
+platform.setPlugin(uiPluginId, uiPlugin)
+uiPlugin.loadModel(model)
+
+

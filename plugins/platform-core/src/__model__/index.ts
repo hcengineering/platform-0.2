@@ -15,52 +15,39 @@
 
 import ru from './strings/ru'
 
-import { _class, ref, intl, bag, instance, extension, Attibutes } from './dsl'
-import { Obj, Ref, Class, Doc } from '../types'
+import { Obj, Ref, Class, Doc, BagOf, InstanceOf, RefTo, Type } from '..'
+import { createDocs } from './utils'
 import core from './id'
-import { create } from './operations'
 
-const attributes: Attibutes<Obj> = {
-  _class: ref(core.class.Class),
-  toIntlString: extension(core.method.Obj_toIntlString)
-}
-
-const objectClass: Class<Obj> = {
-  _class: core.class.Class,
-  _id: core.class.Object,
-  // label: '' as IntlString,
-  attributes
-}
+const model = [
+  new Class(core.class.Class, core.class.Object, {
+    _class: new RefTo(core.class.Class)
+  }, undefined as unknown as Ref<Class<Obj>>, core.native.Object),
+  Class.createClass(core.class.Doc, core.class.Object, {
+    _id: new RefTo(core.class.Doc)
+  }),
+  Class.createClass(core.class.Type, core.class.Object, {}, core.native.Type),
+  Class.createClass(core.class.Metadata, core.class.Type, {
+  }),
+  Class.createClass(core.class.RefTo, core.class.Type, {
+    to: new RefTo(core.class.Class as Ref<Class<Class<Doc>>>),
+  }, core.native.RefTo),
+  Class.createClass(core.class.BagOf, core.class.Type, {
+    of: new InstanceOf(core.class.Type),
+  }, core.native.BagOf),
+  Class.createClass(core.class.InstanceOf, core.class.Type, {
+    of: new RefTo(core.class.Class),
+  }, core.native.InstanceOf),
+  Class.createClass(core.class.Class, core.class.Doc, {
+    attributes: new BagOf(new InstanceOf(core.class.Type)),
+    extends: new RefTo(core.class.Class),
+    native: new Type(core.class.Metadata)
+  })
+]
 
 export default {
   strings: {
     ru
   },
-  events: [
-    create(objectClass),
-
-    create(_class(core.class.Doc, core.class.Object, {
-      attributes: {
-        _id: ref(core.class.Doc)
-      }
-    })),
-
-    create(_class(core.class.RefTo, core.class.Object, {
-      attributes: {
-        _default: ref(core.class.Doc),
-        to: ref(core.class.Class)
-      }
-    })),
-
-    create(_class(core.class.Class, core.class.Doc, {
-      attributes: {
-        // label: intl(),
-        extends: ref(core.class.Class),
-        attributes: bag(instance(core.class.Type)),
-      },
-      override: {
-        toIntlString: extension(core.method.Class_toIntlString)
-      }
-    })),
-  ]
+  events: createDocs(model)
 }

@@ -13,7 +13,7 @@
 // limitations under the License.
 // 
 
-import { Obj, Doc, Ref, Class, PropertyType } from './types'
+import { Obj, Doc, Ref, Class, PropertyType } from '.'
 
 function filterEq(docs: any, propertyKey: string, value: PropertyType): any[] {
   const result = []
@@ -66,7 +66,7 @@ export class MemDb {
     let result = docs
 
     for (const propertyKey in query) {
-      result = filterEq(result, propertyKey, (query as Record<string, PropertyType>)[propertyKey])
+      result = filterEq(result, propertyKey, (query as any)[propertyKey])
     }
 
     return result

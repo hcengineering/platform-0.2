@@ -1,8 +1,7 @@
 {
-  "name": "@anticrm/contact-core",
+  "name": "@anticrm/platform-core-extension",
   "version": "0.1.0",
-  "private": true,
-  "main": "./src/index.ts",
+  "main": "src/index.ts",
   "author": "Andrey Platov <andrey.v.platov@gmail.com>",
   "license": "EPL-2.0"
 }

@@ -13,83 +13,52 @@
 // limitations under the License.
 //
 
-import core, { Ref, Class, Obj } from '../types'
-// import { getClassMetadata, model, loadConstructors } from '../reflect'
-import { MemDb } from '../memdb'
-import { MemSession } from '../session'
-import { modelFromEvents } from '../__model__/operations'
+import { Platform } from '@anticrm/platform'
+import { modelFromEvents } from '../__model__/utils'
+
+import core from '../__model__/id'
 import coreModel from '../__model__'
 import corePlugin from '../plugin'
 
-import { Platform } from '../platform'
-
-const platform = new Platform()
-corePlugin.start(platform)
 
 describe('session', () => {
 
-  const memdb = new MemDb()
-  const model = modelFromEvents(coreModel.events)
-  console.log(JSON.stringify(model))//, undefined, 2))
-  memdb.load(model)
+  const platform = new Platform()
+  const session = corePlugin(platform)
+  corePlugin(platform)
 
-  it('should load classes', () => {
-    const object = memdb.get(core.class.Object)
-    expect(object._id).toBe(core.class.Object)
-    expect(object._class).toBe(core.class.Class)
-  })
+  const model = modelFromEvents(coreModel.events)
+  // console.log(JSON.stringify(model, undefined, 2))
+  session.loadModel(model)
 
   it('should get prototype', () => {
-    const session = new MemSession(memdb)
-    const objectProto = session.getPrototype(core.class.Object)
+    const objectProto = (session as any).getPrototype(core.class.Object)
     expect(objectProto).toBeDefined()
-    expect(objectProto.hasOwnProperty('getSession')).toBe(true)
+
+    const baseProto = Object.getPrototypeOf(objectProto)
+    expect(baseProto.hasOwnProperty('getSession')).toBe(true)
+    expect(baseProto.getSession() === session).toBe(true)
+
+    expect(objectProto.hasOwnProperty('_class')).toBe(true)
+    expect(objectProto.hasOwnProperty('getSession')).toBe(false)
     expect(objectProto.hasOwnProperty('toIntlString')).toBe(true)
-    expect(objectProto.toIntlString).toBe(core.method.Obj_toIntlString)
-
-    const classProto = session.getPrototype(core.class.Class)
-    expect(classProto.hasOwnProperty('getSession')).toBe(false)
-    expect(classProto.hasOwnProperty('toIntlString')).toBe(true)
-    expect(classProto.toIntlString).toBe(core.method.Class_toIntlString)
-
-    const docProto = Object.getPrototypeOf(classProto)
-    const objProto = Object.getPrototypeOf(docProto)
-    expect(objProto).toBe(objectProto)
+    expect(objectProto.hasOwnProperty('getClass')).toBe(true)
+    expect(typeof objectProto.toIntlString).toBe('function')
   })
 
   it('should get instances', () => {
-    const session = new MemSession(memdb)
     const objectClass = session.getInstance(core.class.Object)
-    expect(objectClass._id).toBe(core.class.Object)
     expect(typeof objectClass.getSession).toBe('function')
     expect(objectClass.getSession() === session).toBe(true)
-    expect(typeof objectClass.getClass).toBe('function')
+    expect(objectClass._id).toBe(core.class.Object)
+    expect(objectClass.native).toBe(core.native.Object)
+
+    expect(objectClass.attributes._class._class).toBe(core.class.RefTo)
+
+    const classClass = session.getInstance(core.class.Class)
+    expect(classClass.extends).toBe(core.class.Doc)
     expect(objectClass.getClass()._id).toBe(core.class.Class)
-
-    const method = objectClass.toIntlString // temp
-    if (method) {
-      expect(platform.invoke(objectClass, method)).toBe(core.class.Object)
-    } else {
-      expect(true).toBe(false)
-    }
-
   })
-
-  // const test = platform.identify('test', {
-  //   class: {
-  //     ToBeMixed: '' as Ref<Class<ToBeMixed>>
-  //   }
-  // })
-
-  // @model.Mixin(test.class.ToBeMixed, core.class.Class)
-  // class ToBeMixed extends TClass<Obj> {
-  //   dummy!: number
-  // }
-
-  // memdb.load(getClassMetadata([ToBeMixed]))
-  // loadConstructors(test.class, {
-  //   ToBeMixed
-  // })
 
   // it('should mix object in', () => {
   //   const session = new MemSession(memdb)

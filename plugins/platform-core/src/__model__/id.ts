@@ -14,24 +14,17 @@
 //
 
 import core, {
-  pluginId, Ref, Class, Doc, Mixin, Type,
-  PropertyType, RefTo, BagOf,
-  InstanceOf, Embedded, IntlString, Extension, BusinessObject
-} from '../types'
+  pluginId, Ref, Class, Doc, Type,
+  PropertyType, Obj,
+} from '..'
 
 import { mergeIds } from './utils'
-import id from '../id'
+import { identify } from '@anticrm/platform'
 
-export default mergeIds(core, id(pluginId, {
+export default mergeIds(core, identify(pluginId, {
   class: {
+    Object: '' as Ref<Class<Obj>>,
     Doc: '' as Ref<Class<Doc>>,
-    Mixin: '' as Ref<Class<Mixin<Doc>>>,
     Type: '' as Ref<Class<Type<PropertyType>>>,
-    RefTo: '' as Ref<Class<RefTo<Doc>>>,
-    BagOf: '' as Ref<Class<BagOf<PropertyType>>>,
-    InstanceOf: '' as Ref<Class<InstanceOf<Embedded>>>,
-    IntlString: '' as Ref<Class<Type<IntlString>>>,
-    Extension: '' as Ref<Class<Type<Extension<any>>>>,
-    BusinessObject: '' as Ref<Class<BusinessObject>>
-  }
+  },
 }))

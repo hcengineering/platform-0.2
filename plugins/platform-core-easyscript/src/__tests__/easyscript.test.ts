@@ -13,19 +13,25 @@
 // limitations under the License.
 //
 
-import contact from '@anticrm/contact-core'
-import { create } from '@anticrm/platform-core/src/__model__/operations'
-import { Ref, Doc, AsString } from '@anticrm/platform-core'
-import { Contact } from '@anticrm/contact-core'
+import { THIS, DUP, GET, APPLY0, APPLY1, ARG0 } from '..'
+import { execute } from '../plugin'
 
-export const contact1 = 'test.contact.1' as Ref<Contact>
+describe('easyscript', () => {
 
-export default {
-  events: [
-    create<Contact>({
-      _class: contact.class.Contact,
-      _id: contact1,
-      phone: '+7 913 333 5555' as AsString<string>
-    })
-  ]
-}
+  it('should execure easyscript', () => {
+    const code = `${THIS},${DUP},getClass,${GET},${APPLY0},${DUP},toString,${GET},${ARG0},${APPLY1}`
+    console.log(code)
+
+    const _class = {
+      toString: function (plural: string) { return 'Hello ' + plural }
+    }
+
+    const _this = {
+      getClass: function () { return _class }
+    }
+
+    const result = execute(code, _this, ['World!'])
+    console.log(result)
+    expect(result).toBe('Hello World!')
+  })
+})

@@ -13,15 +13,19 @@
 // limitations under the License.
 //
 
-import { id, Resource } from '@anticrm/platform-core'
+import { modelFromEvents } from '@anticrm/platform-core/src/__model__/utils'
+import coreModel from '@anticrm/platform-core/src/__model__'
+import contactCoreModel from '@anticrm/contact-core/src/__model__'
+import testModel from './testModel'
 
-export const pluginId = 'ui'
-export default id(pluginId, {
-  icon: {
-    AddGroup: '' as Resource,
-    Add: '' as Resource,
-    Checked: '' as Resource,
-    Edit: '' as Resource,
-    Search: '' as Resource,
-  }
-})
+const events = [
+  ...coreModel.events,
+  ...contactCoreModel.events,
+
+  ...testModel
+]
+const model = modelFromEvents(events)
+
+console.log(JSON.stringify(model))
+
+export default model

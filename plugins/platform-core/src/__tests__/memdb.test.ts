@@ -13,24 +13,20 @@
 // limitations under the License.
 //
 
-import { execute, THIS, DUP, GET, APPLY0, APPLY1, ARG0 } from '../easyscript'
+import { MemDb } from '../memdb'
+import { modelFromEvents } from '../__model__/utils'
+import coreModel from '../__model__'
+import core from '../__model__/id'
 
-describe('easyscript', () => {
+describe('memdb', () => {
 
-  it('should execure easyscript', () => {
-    const code = `${THIS},${DUP},getClass,${GET},${APPLY0},${DUP},toString,${GET},${ARG0},${APPLY1}`
-    console.log(code)
+  const model = modelFromEvents(coreModel.events)
 
-    const _class = {
-      toString: function (plural: string) { return 'Hello ' + plural }
-    }
-
-    const _this = {
-      getClass: function () { return _class }
-    }
-
-    const result = execute(code, _this, ['World!'])
-    console.log(result)
-    expect(result).toBe('Hello World!')
+  it('should load classes into memdb', () => {
+    const memdb = new MemDb()
+    memdb.load(model)
+    const object = memdb.get(core.class.Object)
+    expect(object._id).toBe(core.class.Object)
+    expect(object._class).toBe(core.class.Class)
   })
 })

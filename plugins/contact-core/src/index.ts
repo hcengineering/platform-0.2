@@ -13,18 +13,22 @@
 // limitations under the License.
 //
 
-import { Obj, Class, Ref } from '.'
+import { identify, Plugin, PluginId } from '@anticrm/platform'
+import { Doc, Ref, Class } from '@anticrm/platform-core'
 
-import { IntlString } from '@anticrm/platform-core-i18n'
-
-export function classLabelId(clazz: Ref<Class<Obj>>): IntlString {
-  return clazz as string as IntlString
+export interface Contact extends Doc {
+  email?: string
+  phone?: string
+  phoneWork?: string
+  twitter?: string
+  address?: string
+  addressDelivery?: string
 }
 
-export function attributeLabelId(clazz: Ref<Class<Obj>>, key: string): IntlString {
-  return clazz + '.' + key as IntlString
-}
+export const pluginId = 'contact-core' as PluginId<Plugin>
 
-export function mixinPropertyKey(clazz: Ref<Class<Obj>>): string {
-  return '$' + clazz
-}
+export default identify(pluginId, {
+  class: {
+    Contact: '' as Ref<Class<Contact>>,
+  }
+})
