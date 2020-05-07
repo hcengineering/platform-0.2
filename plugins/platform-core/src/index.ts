@@ -63,7 +63,7 @@ export class Type<T extends PropertyType> extends Embedded {
     super(_class)
     this._default = _default
   }
-  exert(value: T): any { return value ?? this._default }
+  exert(value: T, target?: PropertyType, key?: PropertyKey): any { return value ?? this._default }
   hibernate(value: any): T { return value }
 }
 export type AnyType = Type<PropertyType>

@@ -63,7 +63,7 @@ export class TCodePlugin implements CorePlugin {
         result[key] = {
           get(this: Layout<Obj>) {
             const value = this.__layout[key]
-            return instance.exert(value)
+            return instance.exert(value, this, key)
           },
           set(this: Layout<Obj>, value) {
             this.__layout[key] = instance.hibernate(value)
