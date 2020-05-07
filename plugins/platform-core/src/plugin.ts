@@ -49,7 +49,16 @@ class Mixins extends Type<PropertyType> {
   }
 }
 
-class ClassDocument<T extends Obj> extends Doc implements Class<T> {
+abstract class TDoc extends Obj implements Doc {
+  _id: Ref<this>
+  _mixins?: string[]
+  protected constructor(_class: Ref<Class<Doc>>, _id: Ref<Doc>) {
+    super(_class)
+    this._id = _id as Ref<this>
+  }
+}
+
+class ClassDocument<T extends Obj> extends TDoc implements Class<T> {
   attributes: Bag<Type<PropertyType>>
   extends?: Ref<Class<Obj>>
   native?: Metadata<T>

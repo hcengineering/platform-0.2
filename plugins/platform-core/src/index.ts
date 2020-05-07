@@ -42,13 +42,9 @@ export abstract class Obj extends SessionProto {
   }
 }
 
-export abstract class Doc extends Obj {
+export interface Doc extends Obj {
   _id: Ref<this>
   _mixins?: string[]
-  protected constructor(_class: Ref<Class<Doc>>, _id: Ref<Doc>) {
-    super(_class)
-    this._id = _id as Ref<this>
-  }
 }
 
 // T Y P E S
