@@ -16,19 +16,24 @@
 <script lang="ts">
 
 import Vue, { PropType } from 'vue'
-import platform from '../platform'
+import platform from '@anticrm/platform'
 
-import { Instance, Obj } from '@anticrm/platform-core'
+import { Obj } from '@anticrm/platform-core'
+
+import { UIPlugin, pluginId } from '@anticrm/platform-ui'
 import InlineEdit from '@anticrm/platform-ui-controls/src/InlineEdit.vue'
 
 export default Vue.extend({
   components: { InlineEdit },
   props: {
-    object: Object as PropType<Instance<Obj>>,
+    object: Object as PropType<Obj>,
     filter: Array as PropType<string[]>
   },
   computed: {
-    model() { return platform.getAttrModel(this.object, this.filter) }
+    model() {
+      const uiPlugin = platform.getPlugin(pluginId)
+      return uiPlugin.getAttrModel(this.object, this.filter)
+    }
   }
 })
 </script>

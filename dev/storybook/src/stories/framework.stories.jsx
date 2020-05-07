@@ -15,13 +15,15 @@
 
 import Theme from '../components/Theme.vue'
 
-import ui from '@anticrm/platform-ui/src/types'
-import platform from '@anticrm/platform-ui/src/platform'
+import ui from '@anticrm/platform-ui'
+import platform from '@anticrm/platform'
 
 import Icon from '@anticrm/platform-ui/src/components/Icon.vue'
 import PropPanel from '@anticrm/platform-ui/src/components/PropPanel.vue'
 
-import { contact1 } from '../test-data'
+import { contact1 } from '@anticrm/dev-boot/src/testModel'
+
+import { pluginId as corePluginId } from '@anticrm/platform-core'
 
 export default {
   title: 'Framework'
@@ -33,7 +35,8 @@ export const icon = () => ({
   }
 })
 
-const contact = platform.session.getInstance(contact1)
+const corePlugin = platform.getPlugin(corePluginId)
+const contact = corePlugin.getInstance(contact1)
 const props = ['phone', 'email']
 
 export const properties = () => ({
