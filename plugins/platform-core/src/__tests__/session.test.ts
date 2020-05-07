@@ -14,12 +14,29 @@
 //
 
 import { Platform } from '@anticrm/platform'
+import { Ref, Class, Doc, ArrayOf } from '@anticrm/platform-core'
 import { modelFromEvents } from '../__model__/utils'
 
 import core from '../__model__/id'
-import coreModel from '../__model__'
+import coreModel, { createClass, typeString, newInstance } from '../__model__'
 import corePlugin from '../plugin'
 
+interface MyClass extends Doc {
+  arrayOfStrings: string[]
+}
+
+const myClassId = 'test.myClass' as Ref<Class<MyClass>>
+const myClass = createClass(myClassId, core.class.Doc, {
+  arrayOfStrings: new ArrayOf(typeString())
+})
+
+const myClassInstanceId = 'test.myClass.instance' as Ref<MyClass>
+const myClassInstance = newInstance(myClassId, {
+  _id: myClassInstanceId,
+  arrayOfStrings: ['hey', 'there']
+})
+
+const myModel = [myClass, myClassInstance]
 
 describe('session', () => {
 
@@ -60,14 +77,12 @@ describe('session', () => {
     expect(objectClass.getClass()._id).toBe(core.class.Class)
   })
 
-  // it('should mix object in', () => {
-  //   const session = new MemSession(memdb)
-  //   const mixin = session.mixin(core.class.Object, test.class.ToBeMixed)
-  //   // console.log(mixin)
-  //   expect(mixin._id).toBe(core.class.Object)
-  //   expect(mixin._class).toBe(test.class.ToBeMixed)
-  //   // expect(mixin.getClass()._id).toBe(test.class.ToBeMixed)
-  //   // expect(mixin.toIntlString()).toBe(test.class.ToBeMixed)
-  // })
+  it('should work with arrays', () => {
+    session.loadModel(myModel)
+    const myInstance = session.getInstance(myClassInstanceId)
+    expect(myInstance._id).toBe(myClassInstanceId)
+    expect(myInstance.arrayOfStrings[0]).toBe('hey')
+    expect(myInstance.arrayOfStrings[1]).toBe('there')
+  })
 
 })

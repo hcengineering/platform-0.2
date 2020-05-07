@@ -16,16 +16,18 @@
 import contact from './id'
 import core from '@anticrm/platform-core/src/__model__/id'
 
-import { Class, Type } from '@anticrm/platform-core'
+import { Type } from '@anticrm/platform-core'
+import { createClass } from '@anticrm/platform-core/src/__model__/'
 import { createDocs } from '@anticrm/platform-core/src/__model__/utils'
 
-const model = [
-  Class.createClass(contact.class.Email, core.class.Type, {}),
-  Class.createClass(contact.class.Phone, core.class.Type, {}),
-  Class.createClass(contact.class.Twitter, core.class.Type, {}),
-  Class.createClass(contact.class.Address, core.class.Type, {}),
 
-  Class.createClass(contact.class.Contact, core.class.Doc, {
+const model = [
+  createClass(contact.class.Email, core.class.Type, {}),
+  createClass(contact.class.Phone, core.class.Type, {}),
+  createClass(contact.class.Twitter, core.class.Type, {}),
+  createClass(contact.class.Address, core.class.Type, {}),
+
+  createClass(contact.class.Contact, core.class.Doc, {
     email: new Type(contact.class.Email),
     phone: new Type(contact.class.Phone),
     phoneWork: new Type(contact.class.Phone),

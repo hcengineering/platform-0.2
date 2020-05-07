@@ -17,7 +17,7 @@ import { Platform } from '@anticrm/platform'
 import { CorePlugin, Query, pluginId } from '.'
 import core, {
   Obj, Doc, Ref, Bag, Class, Type, RefTo, SessionProto,
-  PropertyType, BagOf, InstanceOf,
+  PropertyType, BagOf, InstanceOf, Mixin, ArrayOf
 } from '.'
 import { MemDb } from './memdb'
 
@@ -129,20 +129,18 @@ export class TCodePlugin implements CorePlugin {
 
   ////
 
-  // mixin<M extends I, I extends Doc>(doc: Ref<I>, mixinClass: Ref<Mixin<M>>): M {
-  // const layout = this.memdb.get(doc) as I
-  // let mixins = layout._mixins // TODO: hide _mixin or make Layout recursive
-  // if (!mixins) {
-  //   mixins = []
-  //   layout._mixins = mixins
-  // }
-  // const mixin = { _class: mixinClass }
-  // mixins.push(mixin)
+  mixin<M extends I, I extends Doc>(doc: Ref<I>, mixinClass: Ref<Mixin<M>>): M {
+    const layout = this.memdb.get(doc) as I
+    let mixins = layout._mixins
+    if (!mixins) {
+      mixins = []
+      layout._mixins = mixins
+    }
+    mixins.push(mixinClass as string)
+      ; (layout as any)['$' + mixinClass] = { _class: mixinClass }
 
-  // const proxy = new MixinProxy(mixin, this.getPrototype(mixinClass) as M, layout)
-  // return new Proxy(proxy, this.mixinProxy) as unknown as M
-  //   return {} as M
-  // }
+    throw new Error('not implemented')
+  }
 }
 
 export default (platform: Platform): CorePlugin => {
@@ -151,6 +149,7 @@ export default (platform: Platform): CorePlugin => {
   platform.setMetadata(core.native.RefTo, RefTo.prototype)
   platform.setMetadata(core.native.Type, Type.prototype)
   platform.setMetadata(core.native.BagOf, BagOf.prototype)
+  platform.setMetadata(core.native.ArrayOf, ArrayOf.prototype)
   platform.setMetadata(core.native.InstanceOf, InstanceOf.prototype)
 
   return new TCodePlugin(platform)

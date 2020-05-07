@@ -20,7 +20,7 @@ import { PropType, AsString, Metadata, identify, Plugin, PluginId } from '@antic
 export type AnyFunc = (...args: any[]) => any
 export type Ref<T extends Doc> = AsString<T> & { __ref: void }
 
-export type PropertyType = PropType<any> | Embedded | { [key: string]: PropertyType } | string
+export type PropertyType = PropType<any> | Embedded | { [key: string]: PropertyType } | PropertyType[] | string
 
 export type Bag<X extends PropertyType> = { [key: string]: X }
 
@@ -44,11 +44,14 @@ export abstract class Obj extends SessionProto {
 
 export abstract class Doc extends Obj {
   _id: Ref<this>
+  _mixins?: string[]
   protected constructor(_class: Ref<Class<Doc>>, _id: Ref<Doc>) {
     super(_class)
     this._id = _id as Ref<this>
   }
 }
+
+// T Y P E S
 
 export abstract class Embedded extends Obj {
   // __embedded!: void
@@ -84,6 +87,34 @@ export class InstanceOf<T extends Embedded> extends Type<T> {
   }
 }
 
+// C O L L E C T I O N S : A R R A Y
+
+class ArrayProxyHandler implements ProxyHandler<PropertyType[]> {
+  private type: Type<PropertyType>
+
+  constructor(type: Type<PropertyType>) {
+    this.type = type
+  }
+
+  get(target: PropertyType[], key: PropertyKey): any {
+    const value = Reflect.get(target, key)
+    return this.type.exert(value)
+  }
+}
+
+export class ArrayOf<T extends PropertyType> extends Type<T[]> {
+  of: Type<T>
+  constructor(of: Type<T>, _default?: T[]) {
+    super(core.class.ArrayOf as Ref<Class<ArrayOf<T>>>, _default)
+    this.of = of
+  }
+  exert(value: T[]) {
+    return new Proxy(value, new ArrayProxyHandler(this.of))
+  }
+}
+
+// C O L L E C T I O N S : B A G
+
 class BagProxyHandler implements ProxyHandler<Bag<PropertyType>> {
   private type: Type<PropertyType>
 
@@ -104,16 +135,11 @@ export class BagOf<T extends PropertyType> extends Type<Bag<T>> {
     this.of = of
   }
   exert(value: Bag<T>) {
-    return new Proxy(value, new BagProxyHandler(this.of)) as Bag<T>
+    return new Proxy(value, new BagProxyHandler(this.of))
   }
 }
 
-type RemoveMethods<T extends object> = Omit<T, KeysByType<T, AnyFunc>>
-type Clear<T> = RemoveMethods<Omit<T, '__embedded' | '_default'>>
-
-type AsDescrtiptors<T> = { [P in keyof T]: T[P] extends PropertyType ? Type<T[P]> : never }
-type Descriptors<T extends object> = AsDescrtiptors<Required<Clear<T>>>
-type DiffDescriptors<T extends E, E> = Descriptors<Omit<T, keyof E>>
+// C L A S S E S  &  M I X I N S
 
 export class Class<T extends Obj> extends Doc {
   attributes: Bag<Type<PropertyType>>
@@ -126,14 +152,15 @@ export class Class<T extends Obj> extends Doc {
     this.native = native
   }
   toIntlString(plural?: number): string { return 'Класс' }
-  static createClass<T extends E, E extends Obj>(_id: Ref<Class<T>>, _extends: Ref<Class<E>>, attributes: DiffDescriptors<T, E>, native?: Metadata<T>): Class<T> {
-    return new Class(core.class.Class as Ref<Class<Class<T>>>, _id, attributes, _extends, native)
-  }
 }
+
+export interface Mixin<T extends Doc> extends Class<T> { }
 
 // C O R E  P L U G I N
 
 export type Query<T extends Doc> = Partial<T>
+
+export type RemoveMethods<T extends object> = Omit<T, KeysByType<T, AnyFunc>>
 export type Content<T extends Doc> = RemoveMethods<Omit<T, '_id' | '_class' | '__embedded'>> & { _id?: Ref<T> }
 
 export interface CorePlugin extends Plugin {
@@ -156,14 +183,14 @@ const core = identify(pluginId, {
     Type: '' as Metadata<Type<PropertyType>>,
     RefTo: '' as Metadata<RefTo<Doc>>,
     BagOf: '' as Metadata<BagOf<PropertyType>>,
+    ArrayOf: '' as Metadata<ArrayOf<PropertyType>>,
     InstanceOf: '' as Metadata<InstanceOf<Embedded>>,
   },
   class: {
-    Class: '' as Ref<Class<Class<Obj>>>,
     RefTo: '' as Ref<Class<RefTo<Doc>>>,
     BagOf: '' as Ref<Class<BagOf<PropertyType>>>,
+    ArrayOf: '' as Ref<Class<ArrayOf<PropertyType>>>,
     InstanceOf: '' as Ref<Class<InstanceOf<Embedded>>>,
-    Metadata: '' as Ref<Class<Type<Metadata<any>>>>,
   },
 })
 

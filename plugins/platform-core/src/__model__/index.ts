@@ -15,30 +15,67 @@
 
 import ru from './strings/ru'
 
-import { Obj, Ref, Class, Doc, BagOf, InstanceOf, RefTo, Type } from '..'
+import { Metadata } from '@anticrm/platform'
+
+import { BagOf, InstanceOf, RefTo } from '..'
+import { Ref, Class, Obj, Doc, Content, RemoveMethods, PropertyType, Type } from '..'
 import { createDocs } from './utils'
+import { generateId } from '../objectid'
+
 import core from './id'
+
+type Clear<T> = RemoveMethods<Omit<T, '__embedded' | '_default' | '_mixins'>>
+
+type AsDescrtiptors<T> = { [P in keyof T]: T[P] extends PropertyType ? Type<T[P]> : never }
+type Descriptors<T extends object> = AsDescrtiptors<Required<Clear<T>>>
+type DiffDescriptors<T extends E, E> = Descriptors<Omit<T, keyof E>>
+
+export function createClass<T extends E, E extends Obj>(
+  _id: Ref<Class<T>>, _extends: Ref<Class<E>>,
+  attributes: DiffDescriptors<T, E>, native?: Metadata<T>): Class<T> {
+  return new Class(core.class.Class as Ref<Class<Class<T>>>, _id, attributes, _extends, native)
+}
+
+export function createMixin<T extends E, E extends Obj>(
+  _id: Ref<Class<T>>, _extends: Ref<Class<E>>,
+  attributes: DiffDescriptors<T, E>, native?: Metadata<T>): Class<T> {
+  return new Class(core.class.Class as Ref<Class<Class<T>>>, _id, attributes, _extends, native)
+}
+
+export function typeString(): Type<string> { return new Type(core.class.String) }
+
+export function newInstance<T extends Doc>(_class: Ref<Class<T>>, data: Content<T>): T {
+  return { _id: generateId(), ...data, _class } as T
+}
 
 const model = [
   new Class(core.class.Class, core.class.Object, {
     _class: new RefTo(core.class.Class)
   }, undefined as unknown as Ref<Class<Obj>>, core.native.Object),
-  Class.createClass(core.class.Doc, core.class.Object, {
+  createClass(core.class.Doc, core.class.Object, {
     _id: new RefTo(core.class.Doc)
   }),
-  Class.createClass(core.class.Type, core.class.Object, {}, core.native.Type),
-  Class.createClass(core.class.Metadata, core.class.Type, {
-  }),
-  Class.createClass(core.class.RefTo, core.class.Type, {
+  createClass(core.class.Type, core.class.Object, {}, core.native.Type),
+
+  createClass(core.class.RefTo, core.class.Type, {
     to: new RefTo(core.class.Class as Ref<Class<Class<Doc>>>),
   }, core.native.RefTo),
-  Class.createClass(core.class.BagOf, core.class.Type, {
+  createClass(core.class.BagOf, core.class.Type, {
     of: new InstanceOf(core.class.Type),
   }, core.native.BagOf),
-  Class.createClass(core.class.InstanceOf, core.class.Type, {
+  createClass(core.class.ArrayOf, core.class.Type, {
+    of: new InstanceOf(core.class.Type),
+  }, core.native.ArrayOf),
+  createClass(core.class.InstanceOf, core.class.Type, {
     of: new RefTo(core.class.Class),
   }, core.native.InstanceOf),
-  Class.createClass(core.class.Class, core.class.Doc, {
+
+  createClass(core.class.Metadata, core.class.Type, {
+  }),
+  createClass(core.class.String, core.class.Type, {
+  }),
+
+  createClass(core.class.Class, core.class.Doc, {
     attributes: new BagOf(new InstanceOf(core.class.Type)),
     extends: new RefTo(core.class.Class),
     native: new Type(core.class.Metadata)
