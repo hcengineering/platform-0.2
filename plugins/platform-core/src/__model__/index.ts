@@ -43,6 +43,7 @@ export function createMixin<T extends E, E extends Obj>(
 }
 
 export function typeString(): Type<string> { return new Type(core.class.String) }
+export function typeMixins(): Type<string[]> { return new Type(core.class.Mixins) }
 
 export function newInstance<T extends Doc>(_class: Ref<Class<T>>, data: Content<T>): T {
   return { _id: generateId(), ...data, _class } as T
@@ -55,6 +56,7 @@ const model = [
   createClass(core.class.Doc, core.class.Object, {
     _id: new RefTo(core.class.Doc)
   }),
+
   createClass(core.class.Type, core.class.Object, {}, core.native.Type),
 
   createClass(core.class.RefTo, core.class.Type, {
@@ -69,11 +71,10 @@ const model = [
   createClass(core.class.InstanceOf, core.class.Type, {
     of: new RefTo(core.class.Class),
   }, core.native.InstanceOf),
+  createClass(core.class.Mixins, core.class.Type, {}, core.native.Mixins),
 
-  createClass(core.class.Metadata, core.class.Type, {
-  }),
-  createClass(core.class.String, core.class.Type, {
-  }),
+  createClass(core.class.Metadata, core.class.Type, {}),
+  createClass(core.class.String, core.class.Type, {}),
 
   createClass(core.class.Class, core.class.Doc, {
     attributes: new BagOf(new InstanceOf(core.class.Type)),

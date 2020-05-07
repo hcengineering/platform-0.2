@@ -25,6 +25,30 @@ import { MemDb } from './memdb'
 
 type Layout<T extends Obj> = T & { __layout: any } & SessionProto
 
+
+class MixinProxyHandler implements ProxyHandler<string[]> {
+  private doc: Doc
+
+  constructor(doc: Doc) {
+    this.doc = doc
+  }
+
+  get(target: string[], key: PropertyKey): any {
+    const value = Reflect.get(target, key)
+    return value
+  }
+}
+
+class Mixins extends Type<PropertyType> {
+  constructor(_class: Ref<Class<Type<PropertyType>>>) {
+    super(_class)
+    console.log('constructed mixins: ' + _class)
+  }
+  exert(value: string[], target: PropertyType, key: PropertyKey) {
+    return new Proxy(value, new MixinProxyHandler(target as Doc))
+  }
+}
+
 export class TCodePlugin implements CorePlugin {
 
   readonly platform: Platform
@@ -151,6 +175,7 @@ export default (platform: Platform): CorePlugin => {
   platform.setMetadata(core.native.BagOf, BagOf.prototype)
   platform.setMetadata(core.native.ArrayOf, ArrayOf.prototype)
   platform.setMetadata(core.native.InstanceOf, InstanceOf.prototype)
+  platform.setMetadata(core.native.Mixins, Mixins.prototype)
 
   return new TCodePlugin(platform)
 }

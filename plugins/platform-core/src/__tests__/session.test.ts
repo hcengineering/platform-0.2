@@ -18,22 +18,25 @@ import { Ref, Class, Doc, ArrayOf } from '@anticrm/platform-core'
 import { modelFromEvents } from '../__model__/utils'
 
 import core from '../__model__/id'
-import coreModel, { createClass, typeString, newInstance } from '../__model__'
+import coreModel, { createClass, typeString, newInstance, typeMixins } from '../__model__'
 import corePlugin from '../plugin'
 
 interface MyClass extends Doc {
   arrayOfStrings: string[]
+  mixins: string[]
 }
 
 const myClassId = 'test.myClass' as Ref<Class<MyClass>>
 const myClass = createClass(myClassId, core.class.Doc, {
-  arrayOfStrings: new ArrayOf(typeString())
+  arrayOfStrings: new ArrayOf(typeString()),
+  mixins: typeMixins()
 })
 
 const myClassInstanceId = 'test.myClass.instance' as Ref<MyClass>
 const myClassInstance = newInstance(myClassId, {
   _id: myClassInstanceId,
-  arrayOfStrings: ['hey', 'there']
+  arrayOfStrings: ['hey', 'there'],
+  mixins: ['mix1', 'mix2']
 })
 
 const myModel = [myClass, myClassInstance]
@@ -83,6 +86,11 @@ describe('session', () => {
     expect(myInstance._id).toBe(myClassInstanceId)
     expect(myInstance.arrayOfStrings[0]).toBe('hey')
     expect(myInstance.arrayOfStrings[1]).toBe('there')
+  })
+
+  it('should work with mixins', () => {
+    const myInstance = session.getInstance(myClassInstanceId)
+    console.log(myInstance.mixins[0])
   })
 
 })

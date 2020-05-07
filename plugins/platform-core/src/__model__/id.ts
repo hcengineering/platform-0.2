@@ -14,7 +14,7 @@
 //
 
 import core, {
-  pluginId, Ref, Class, Doc, Type, PropertyType, Obj, Mixin
+  pluginId, Ref, Class, Doc, Type, PropertyType, Obj
 } from '..'
 
 import { mergeIds } from './utils'
@@ -27,9 +27,9 @@ export default mergeIds(core, identify(pluginId, {
     Type: '' as Ref<Class<Type<PropertyType>>>,
 
     String: '' as Ref<Class<Type<string>>>,
+    Mixins: '' as Ref<Class<Type<string[]>>>,
 
     Metadata: '' as Ref<Class<Type<Metadata<any>>>>,
     Class: '' as Ref<Class<Class<Obj>>>,
-    // Mixin: '' as Ref<Class<Mixin<Doc>>>,
   },
 }))

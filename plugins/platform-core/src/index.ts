@@ -141,6 +141,8 @@ export class BagOf<T extends PropertyType> extends Type<Bag<T>> {
 
 // C L A S S E S  &  M I X I N S
 
+
+
 export class Class<T extends Obj> extends Doc {
   attributes: Bag<Type<PropertyType>>
   extends?: Ref<Class<Obj>>
@@ -185,6 +187,7 @@ const core = identify(pluginId, {
     BagOf: '' as Metadata<BagOf<PropertyType>>,
     ArrayOf: '' as Metadata<ArrayOf<PropertyType>>,
     InstanceOf: '' as Metadata<InstanceOf<Embedded>>,
+    Mixins: '' as Metadata<Type<PropertyType>>,
   },
   class: {
     RefTo: '' as Ref<Class<RefTo<Doc>>>,
