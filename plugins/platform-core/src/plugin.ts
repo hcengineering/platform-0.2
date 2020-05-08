@@ -16,191 +16,185 @@
 import { Platform, Metadata } from '@anticrm/platform'
 import { CorePlugin, Query, pluginId } from '.'
 import core, {
-  Obj, Doc, Ref, Bag, Class, Type, RefTo, SessionProto,
-  PropertyType, BagOf, InstanceOf, Mixin, ArrayOf
+  Obj, Doc, Ref, Bag, Class, Type, RefTo, Embedded,
+  PropertyType, BagOf, InstanceOf, ArrayOf, Container, Session, Content
 } from '.'
-import { MemDb } from './memdb'
+import { TSession, SessionProto, Konstructor } from './session'
 
 //////////
 
-type Layout<T extends Obj> = T & { __layout: any } & SessionProto
-
-
-class MixinProxyHandler implements ProxyHandler<string[]> {
-  private doc: Doc
-
-  constructor(doc: Doc) {
-    this.doc = doc
-  }
-
-  get(target: string[], key: PropertyKey): any {
-    const value = Reflect.get(target, key)
-    return value
-  }
-}
-
-class Mixins extends Type<PropertyType> {
-  constructor(_class: Ref<Class<Type<PropertyType>>>) {
-    super(_class)
-    console.log('constructed mixins: ' + _class)
-  }
-  exert(value: string[], target: PropertyType, key: PropertyKey) {
-    return new Proxy(value, new MixinProxyHandler(target as Doc))
-  }
-}
-
-abstract class TDoc extends Obj implements Doc {
-  _id: Ref<this>
-  _mixins?: string[]
-  protected constructor(_class: Ref<Class<Doc>>, _id: Ref<Doc>) {
-    super(_class)
-    this._id = _id as Ref<this>
-  }
-}
-
-class ClassDocument<T extends Obj> extends TDoc implements Class<T> {
-  attributes: Bag<Type<PropertyType>>
-  extends?: Ref<Class<Obj>>
-  native?: Metadata<T>
-  constructor(_class: Ref<Class<Class<T>>>, _id: Ref<Class<T>>, attributes: Bag<Type<PropertyType>>, _extends: Ref<Class<Obj>>, native?: Metadata<T>) {
-    super(_class, _id)
-    this.attributes = attributes
-    this.extends = _extends
-    this.native = native
-  }
-  toIntlString(plural?: number): string { return this._id }
-}
-
-
-export class TCodePlugin implements CorePlugin {
+class TCorePlugin implements CorePlugin {
 
   readonly platform: Platform
   readonly pluginId = pluginId
 
-  private memdb: MemDb
-  private prototypes = new Map<Ref<Class<Obj>>, Object>()
-  private sessionProto: SessionProto
-
   constructor(platform: Platform) {
     this.platform = platform
-    this.memdb = new MemDb()
-
-    this.sessionProto = {
-      getSession: () => this,
-    }
   }
 
-  private createPropertyDescriptors(attributes: Bag<Type<PropertyType>>) {
-    const result = {} as { [key: string]: PropertyDescriptor }
-    for (const key in attributes) {
-      const passForward = key.startsWith('_')
-      if (passForward) {
-        result[key] = {
-          get(this: Layout<Obj>) {
-            return this.__layout[key] ?? attributes[key]._default
-          },
-          set(this: Layout<Obj>, value) {
-            this.__layout[key] = value
-          },
-          enumerable: true,
-        }
-      } else {
-        const attribute = attributes[key]
-        const instance = this.instantiate(attribute)
-        result[key] = {
-          get(this: Layout<Obj>) {
-            const value = this.__layout[key]
-            return instance.exert(value, this, key)
-          },
-          set(this: Layout<Obj>, value) {
-            this.__layout[key] = instance.hibernate(value)
-          },
-          enumerable: true,
-        }
-      }
-    }
-    return result
-  }
-
-  private createPrototype<T extends Obj>(clazz: Ref<Class<T>>) {
-    const classInstance = this.memdb.get(clazz) as Class<Obj>
-    const extend = classInstance.extends
-    const parent = extend ? this.getPrototype(extend) : this.sessionProto
-    const proto = Object.create(parent)
-    this.prototypes.set(clazz, proto)
-
-    const descriptors = this.createPropertyDescriptors(classInstance.attributes)
-    if (classInstance.native) {
-      const proto = this.platform.getMetadata(classInstance.native)
-      Object.assign(descriptors, Object.getOwnPropertyDescriptors(proto))
-    }
-    Object.defineProperties(proto, descriptors)
-    return proto
-  }
-
-  getPrototype<T extends Obj>(clazz: Ref<Class<T>>): T {
-    return this.prototypes.get(clazz) ?? this.createPrototype(clazz)
-  }
-
-  instantiate<T extends Obj>(obj: T): T {
-    const instance = Object.create(this.getPrototype(obj._class)) as Layout<T>
-    instance.__layout = obj
-    return instance
-  }
-
-  getInstance<T extends Doc>(ref: Ref<T>): T {
-    return this.instantiate(this.memdb.get(ref))
-  }
-
-  newInstance<T extends Obj>(clazz: Ref<Class<T>>): T {
-    throw new Error('not implemented')
-  }
-
-  ////
-
-  find<T extends Doc>(clazz: Ref<Class<T>>, query: Query<T>): T[] {
-    const layouts = this.memdb.findAll(clazz, query)
-    return layouts.map(layout => this.instantiate(layout))
-  }
-
-  findOne<T extends Doc>(clazz: Ref<Class<T>>, query: Query<T>): T | undefined {
-    const result = this.find(clazz, query)
-    return result.length > 0 ? result[0] : undefined
-  }
-
-  ////
-
-  loadModel(docs: Doc[]): void {
-    this.memdb.load(docs)
-  }
-
-  ////
-
-  mixin<M extends I, I extends Doc>(doc: Ref<I>, mixinClass: Ref<Mixin<M>>): M {
-    const layout = this.memdb.get(doc) as I
-    let mixins = layout._mixins
-    if (!mixins) {
-      mixins = []
-      layout._mixins = mixins
-    }
-    mixins.push(mixinClass as string)
-      ; (layout as any)['$' + mixinClass] = { _class: mixinClass }
-
-    throw new Error('not implemented')
-  }
+  newSession(): Session { return new TSession(this.platform) }
 }
 
 export default (platform: Platform): CorePlugin => {
 
-  platform.setMetadata(core.native.Object, Obj.prototype)
-  platform.setMetadata(core.native.RefTo, RefTo.prototype)
-  platform.setMetadata(core.native.Type, Type.prototype)
-  platform.setMetadata(core.native.BagOf, BagOf.prototype)
-  platform.setMetadata(core.native.ArrayOf, ArrayOf.prototype)
-  platform.setMetadata(core.native.InstanceOf, InstanceOf.prototype)
+  class TSessionProto implements SessionProto {
+    getSession(): TSession { throw new Error('session provide the implementation') }
+    __mapKey(_class: Ref<Class<Obj>>, key: string): string | null { return null }
+  }
 
-  platform.setMetadata(core.native.Mixins, Mixins.prototype)
-  platform.setMetadata(core.native.ClassDocument, ClassDocument.prototype)
+  class TEmbedded extends TSessionProto implements Embedded {
+    _class!: Ref<Class<this>>
+    toIntlString(plural?: number): string { return this.getClass().toIntlString(plural) }
+    getClass(): Class<this> {
+      return this.getSession().getInstance(this._class, core.class.Struct as Ref<Class<Class<this>>>)
+    }
 
-  return new TCodePlugin(platform)
+    __mapKey(_class: Ref<Class<Obj>>, key: string) { return key }
+  }
+
+  class TDoc extends TSessionProto implements Doc {
+    _class!: Ref<Class<this>>
+    _id!: Ref<this>
+    toIntlString(plural?: number): string { return this.getClass().toIntlString(plural) }
+    getClass(): Class<this> {
+      return this.getSession().getInstance(this._class, core.class.Document as Ref<Class<Class<this>>>)
+    }
+
+    __mapKey(_class: Ref<Class<Obj>>, key: string) { return key.startsWith('_') ? key : _class + ':' + key }
+  }
+
+  // T Y P E S 
+
+  class TType<T extends PropertyType> extends TEmbedded implements Type<T> {
+    _default?: T
+    exert(value: T, target?: PropertyType, key?: PropertyKey): any { return value ?? this._default }
+    hibernate(value: any): T { return value }
+  }
+
+  class TInstanceOf<T extends Embedded> extends TType<T> {
+    of!: Ref<Class<T>>
+    exert(value: T) {
+      // console.log('instanceof instantiating: ')
+      // console.log(value)
+      return this.getSession().instantiate(value._class, value)
+    }
+  }
+
+  // C O L L E C T I O N S : A R R A Y
+
+  class ArrayProxyHandler implements ProxyHandler<PropertyType[]> {
+    private type: Type<PropertyType>
+
+    constructor(type: Type<PropertyType>) {
+      this.type = type
+    }
+
+    get(target: PropertyType[], key: PropertyKey): any {
+      const value = Reflect.get(target, key)
+      return this.type.exert(value)
+    }
+  }
+
+  class TArrayOf<T extends PropertyType> extends TType<T[]> {
+    of!: Type<T>
+    exert(value: T[]) {
+      return new Proxy(value, new ArrayProxyHandler(this.of))
+    }
+  }
+
+  // C O L L E C T I O N S : B A G
+
+  class BagProxyHandler implements ProxyHandler<Bag<PropertyType>> {
+    private type: Type<PropertyType>
+
+    constructor(type: Type<PropertyType>) {
+      this.type = type
+    }
+
+    get(target: Bag<PropertyType>, key: string): any {
+      const value = Reflect.get(target, key)
+      return this.type.exert(value)
+    }
+  }
+
+  class TBagOf<T extends PropertyType> extends TType<Bag<T>> implements BagOf<T> {
+    of!: Type<T>
+    exert(value: Bag<T>) {
+      return new Proxy(value, new BagProxyHandler(this.of))
+    }
+  }
+
+  // S T R U C T U R A L  F E A T U R E S
+
+  class Struct<T extends Obj> extends TDoc implements Class<T> {
+    _attributes!: Bag<Type<PropertyType>>
+    _extends?: Ref<Class<Obj>>
+    _native?: Metadata<T>
+
+    toIntlString(plural?: number): string { return 'struct: ' + this._id }
+
+    createConstructor(): Konstructor<T> {
+      const session = this.getSession()
+      const _class = this._id
+      return data => {
+        const instance = session.instantiate(_class, data)
+        Object.assign(instance, data)
+        return instance as T
+      }
+    }
+
+    newInstance(data: Content<T>): T {
+      const session = this.getSession()
+      let ctor = session.constructors.get(this._id) as Konstructor<T>
+      if (!ctor) {
+        ctor = this.createConstructor()
+        session.constructors.set(this._id, ctor)
+      }
+      return ctor(data)
+    }
+  }
+
+  class Document<T extends Doc> extends TDoc implements Class<T> {
+    _attributes!: Bag<Type<PropertyType>>
+    _extends?: Ref<Class<Obj>>
+    _native?: Metadata<T>
+
+    toIntlString(plural?: number): string { return 'doc: ' + this._id }
+
+    createConstructor(): Konstructor<T> {
+      const session = this.getSession()
+      const _class = this._id
+      return data => {
+        const _id = (data as Content<Doc>)._id
+        const container = session.getContainer(_id, true)
+        container._classes.push(_class)
+        const instance = session.instantiate(_class, container)
+        Object.assign(instance, data)
+        return instance as T
+      }
+    }
+
+    newInstance(data: Content<T>): T {
+      const session = this.getSession()
+      let ctor = session.constructors.get(this._id)
+      if (!ctor) {
+        ctor = this.createConstructor()
+        session.constructors.set(this._id, ctor)
+      }
+      return ctor(data) as T
+    }
+  }
+
+  platform.setMetadata(core.native.Embedded, TEmbedded.prototype)
+  platform.setMetadata(core.native.Doc, TDoc.prototype)
+
+  platform.setMetadata(core.native.Type, TType.prototype)
+  platform.setMetadata(core.native.BagOf, TBagOf.prototype)
+  platform.setMetadata(core.native.ArrayOf, TArrayOf.prototype)
+  platform.setMetadata(core.native.InstanceOf, TInstanceOf.prototype)
+
+  platform.setMetadata(core.native.Document, Document.prototype)
+  platform.setMetadata(core.native.Struct, Struct.prototype)
+
+  return new TCorePlugin(platform)
 }

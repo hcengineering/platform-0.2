@@ -13,7 +13,7 @@
 // limitations under the License.
 // 
 
-import { Obj, Doc, Ref, Class, PropertyType } from '.'
+import { Obj, Doc, Ref, Class, PropertyType, Container, ContainerId } from '.'
 
 function filterEq(docs: any, propertyKey: string, value: PropertyType): any[] {
   const result = []
@@ -26,26 +26,36 @@ function filterEq(docs: any, propertyKey: string, value: PropertyType): any[] {
 }
 
 export class MemDb {
-  private objects = new Map<Ref<Doc>, Doc>()
-  private byClass = new Map<Ref<Class<Doc>>, Doc[]>()
+  private objects = new Map<Ref<Doc>, Container>()
+  private byClass = new Map<Ref<Class<Obj>>, Container[]>()
 
-  private add(doc: Doc) {
+  private add(doc: Container) {
     const id = doc._id
     if (this.objects.get(id))
-      throw new Error('object already loaded: ' + id.toString())
+      throw new Error('container already loaded: ' + id.toString())
     this.objects.set(id, doc)
   }
 
-  get<D extends Doc>(doc: Ref<D>): D {
-    const result = this.objects.get(doc)
+  get(_id: ContainerId, create?: boolean): Container {
+    const result = this.objects.get(_id)
     if (!result) {
-      throw new Error('no document with id ' + doc)
+      if (create) {
+        return {
+          _id,
+          _classes: []
+        }
+      }
+      throw new Error('no container with id ' + _id)
     }
-    return result as D
+    return result
   }
 
-  private getAllOfClass<D extends Doc>(clazz: Ref<Class<D>>): D[] {
-    let docs = this.byClass.get(clazz) as D[]
+  pick(id: ContainerId): Container | undefined {
+    return this.objects.get(id)
+  }
+
+  private getAllOfClass(clazz: Ref<Class<Obj>>): Container[] {
+    let docs = this.byClass.get(clazz)
     if (!docs) {
       docs = []
       this.byClass.set(clazz, docs)
@@ -53,15 +63,13 @@ export class MemDb {
     return docs
   }
 
-  private index(doc: Doc) {
-    let clazz: Ref<Class<Doc>> | undefined = doc._class
-    while (clazz) {
-      this.getAllOfClass(clazz).push(doc)
-      clazz = this.get(clazz).extends as Ref<Class<Doc>> // TODO: do not index by Obj
-    }
+  private index(container: Container) {
+    container._classes.forEach(clazz => {
+      this.getAllOfClass(clazz).push(container)
+    })
   }
 
-  findAll<D extends Doc>(clazz: Ref<Class<D>>, query: Partial<D>): D[] {
+  findAll<D extends Doc>(clazz: Ref<Class<D>>, query: Partial<D>): Container[] {
     const docs = this.getAllOfClass(clazz)
     let result = docs
 
@@ -72,7 +80,7 @@ export class MemDb {
     return result
   }
 
-  load(docs: Doc[]) {
+  load(docs: Container[]) {
     docs.forEach(doc => this.add(doc))
     docs.forEach(doc => this.index(doc))
   }
