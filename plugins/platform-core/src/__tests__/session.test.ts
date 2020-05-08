@@ -69,14 +69,14 @@ describe('session', () => {
   })
 
   it('should get instances', () => {
-    const objectClass = session.getInstance(core.class.Embedded, core.class.Class)
+    const objectClass = session.getInstance(core.class.Emb, core.class.Class)
     expect(typeof objectClass.getSession).toBe('function')
     expect(objectClass.getSession() === session).toBe(true)
 
-    expect(objectClass._id).toBe(core.class.Embedded)
+    expect(objectClass._id).toBe(core.class.Emb)
     expect(objectClass._native).toBe(core.native.Emb)
     expect(objectClass.getClass()._id).toBe(core.class.Class)
-    expect(objectClass.toIntlString()).toBe('doc: core.class.Embedded')
+    expect(objectClass.toIntlString()).toBe('doc: core.class.Emb')
 
     const classClass = session.getInstance(core.class.Class, core.class.Class)
     expect(classClass._extends).toBe(core.class.Doc)

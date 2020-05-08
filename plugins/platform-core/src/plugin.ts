@@ -126,7 +126,7 @@ export default (platform: Platform): CorePlugin => {
 
   // S T R U C T U R A L  F E A T U R E S
 
-  class Struct<T extends Obj> extends TDoc implements Class<T> {
+  class TStruct<T extends Obj> extends TDoc implements Class<T> {
     _attributes!: Bag<Type<PropertyType>>
     _extends?: Ref<Class<Obj>>
     _native?: Metadata<T>
@@ -154,7 +154,7 @@ export default (platform: Platform): CorePlugin => {
     }
   }
 
-  class Document<T extends Doc> extends TDoc implements Class<T> {
+  class TClass<T extends Doc> extends TDoc implements Class<T> {
     _attributes!: Bag<Type<PropertyType>>
     _extends?: Ref<Class<Obj>>
     _native?: Metadata<T>
@@ -193,8 +193,8 @@ export default (platform: Platform): CorePlugin => {
   platform.setMetadata(core.native.ArrayOf, TArrayOf.prototype)
   platform.setMetadata(core.native.InstanceOf, TInstanceOf.prototype)
 
-  platform.setMetadata(core.native.Document, Document.prototype)
-  platform.setMetadata(core.native.Struct, Struct.prototype)
+  platform.setMetadata(core.native.Class, TClass.prototype)
+  platform.setMetadata(core.native.Struct, TStruct.prototype)
 
   return new TCorePlugin(platform)
 }

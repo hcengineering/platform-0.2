@@ -71,7 +71,7 @@ export function array<T extends PropertyType>(of: Type<T>): ArrayOf<T> {
 
 const model = [
   newContainer(core.class.Class, {
-    _id: core.class.Embedded,
+    _id: core.class.Emb,
     _native: core.native.Emb,
     _attributes: {}
   }),
@@ -82,7 +82,7 @@ const model = [
       _id: ref(core.class.Doc)
     }
   }),
-  createStruct(core.class.Type, core.class.Embedded, {}, core.native.Type),
+  createStruct(core.class.Type, core.class.Emb, {}, core.native.Type),
   createStruct(core.class.Metadata, core.class.Type, {}, core.native.Type),
   createStruct(core.class.String, core.class.Type, {}, core.native.Type),
 
@@ -109,7 +109,7 @@ const model = [
     _attributes: bag(obj(core.class.Type)),
     _extends: ref(core.class.Class),
     _native: meta()
-  }, core.native.Document)
+  }, core.native.Class)
 ]
 
 export default {

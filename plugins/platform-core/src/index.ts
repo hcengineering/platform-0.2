@@ -125,22 +125,9 @@ const core = identify(pluginId, {
     InstanceOf: '' as Metadata<InstanceOf<Emb>>,
 
     Struct: '' as Metadata<Class<Emb>>,
-    Document: '' as Metadata<Class<Doc>>,
+    Class: '' as Metadata<Class<Doc>>,
   },
   class: {
-    Embedded: '' as Ref<Class<Emb>>,
-    Doc: '' as Ref<Class<Doc>>,
-
-    Type: '' as Ref<Class<Type<PropertyType>>>,
-
-    String: '' as Ref<Class<Type<string>>>,
-    Metadata: '' as Ref<Class<Type<Metadata<any>>>>,
-
-    RefTo: '' as Ref<Class<RefTo<Doc>>>,
-    BagOf: '' as Ref<Class<BagOf<PropertyType>>>,
-    ArrayOf: '' as Ref<Class<ArrayOf<PropertyType>>>,
-    InstanceOf: '' as Ref<Class<InstanceOf<Emb>>>,
-
     Class: '' as Ref<Class<Class<Obj>>>,
     Struct: '' as Ref<Class<Class<Obj>>>,
   },

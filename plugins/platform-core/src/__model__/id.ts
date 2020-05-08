@@ -14,7 +14,7 @@
 //
 
 import core, {
-  pluginId, Ref, Class, Doc, Type, PropertyType, Obj, RefTo, BagOf, ArrayOf, InstanceOf, Embedded
+  pluginId, Ref, Class, Doc, Type, PropertyType, Obj, RefTo, BagOf, ArrayOf, InstanceOf, Emb
 } from '..'
 
 import { mergeIds } from './utils'
@@ -22,5 +22,17 @@ import { identify, Metadata } from '@anticrm/platform'
 
 export default mergeIds(core, identify(pluginId, {
   class: {
+    Emb: '' as Ref<Class<Emb>>,
+    Doc: '' as Ref<Class<Doc>>,
+
+    Type: '' as Ref<Class<Type<PropertyType>>>,
+
+    String: '' as Ref<Class<Type<string>>>,
+    Metadata: '' as Ref<Class<Type<Metadata<any>>>>,
+
+    RefTo: '' as Ref<Class<RefTo<Doc>>>,
+    BagOf: '' as Ref<Class<BagOf<PropertyType>>>,
+    ArrayOf: '' as Ref<Class<ArrayOf<PropertyType>>>,
+    InstanceOf: '' as Ref<Class<InstanceOf<Emb>>>,
   },
 }))
