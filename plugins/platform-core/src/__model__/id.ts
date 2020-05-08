@@ -22,17 +22,5 @@ import { identify, Metadata } from '@anticrm/platform'
 
 export default mergeIds(core, identify(pluginId, {
   class: {
-    Object: '' as Ref<Class<Obj>>,
-    Type: '' as Ref<Class<Type<PropertyType>>>,
-
-    String: '' as Ref<Class<Type<string>>>,
-    Mixins: '' as Ref<Class<Type<string[]>>>,
-
-    Metadata: '' as Ref<Class<Type<Metadata<any>>>>,
-
-    RefTo: '' as Ref<Class<RefTo<Doc>>>,
-    BagOf: '' as Ref<Class<BagOf<PropertyType>>>,
-    ArrayOf: '' as Ref<Class<ArrayOf<PropertyType>>>,
-    InstanceOf: '' as Ref<Class<InstanceOf<Embedded>>>,
   },
 }))

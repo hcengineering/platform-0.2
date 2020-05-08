@@ -15,10 +15,9 @@
 
 import { Platform } from '@anticrm/platform'
 import { Ref, Class, Doc, ArrayOf } from '@anticrm/platform-core'
-import { modelFromEvents } from '../__model__/utils'
 
 import core from '../__model__/id'
-import coreModel, { createClass, newContainer, array, str } from '../__model__'
+import coreModel, { createDocument, newContainer, array, str } from '../__model__'
 import startCorePlugin from '../plugin'
 
 interface SimpleClass extends Doc {
@@ -26,7 +25,7 @@ interface SimpleClass extends Doc {
 }
 
 const simpleClassId = 'test.simpleClass' as Ref<Class<SimpleClass>>
-const simpleClass = createClass(simpleClassId, core.class.Doc, {
+const simpleClass = createDocument(simpleClassId, core.class.Doc, {
   s: str(),
 })
 
@@ -35,7 +34,7 @@ interface MyClass extends Doc {
 }
 
 const myClassId = 'test.myClass' as Ref<Class<MyClass>>
-const myClass = createClass(myClassId, core.class.Doc, {
+const myClass = createDocument(myClassId, core.class.Doc, {
   arrayOfStrings: array(str()),
 })
 
@@ -54,7 +53,7 @@ describe('session', () => {
   session.loadModel(coreModel.model)
 
   it('should get prototype', () => {
-    const objectProto = (session as any).getPrototype(core.class.Object)
+    const objectProto = (session as any).getPrototype(core.class.Doc)
     expect(objectProto).toBeDefined()
 
     const baseProto = Object.getPrototypeOf(objectProto)
@@ -69,28 +68,31 @@ describe('session', () => {
   })
 
   it('should get instances', () => {
-    const objectClass = session.getInstance(core.class.Object, core.class.Class)
+    const objectClass = session.getInstance(core.class.Embedded, core.class.Document)
     expect(typeof objectClass.getSession).toBe('function')
     expect(objectClass.getSession() === session).toBe(true)
-    expect(objectClass._id).toBe(core.class.Object)
-    expect(objectClass._native).toBe(core.native.Object)
 
-    expect(objectClass._attributes._class._class).toBe(core.class.RefTo)
+    expect(objectClass._id).toBe(core.class.Embedded)
+    expect(objectClass._native).toBe(core.native.Embedded)
+    expect(objectClass.getClass()._id).toBe(core.class.Document)
+    expect(objectClass.toIntlString()).toBe('doc: core.class.Embedded')
 
-    const classClass = session.getInstance(core.class.Class, core.class.Class)
+    const classClass = session.getInstance(core.class.Document, core.class.Document)
     expect(classClass._extends).toBe(core.class.Doc)
-    expect(objectClass.getClass()._id).toBe(core.class.Class)
-    expect(objectClass.toIntlString()).toBe('core.class.Object')
-    expect(classClass.toIntlString()).toBe('core.class.Class')
+    expect(classClass.toIntlString()).toBe('doc: core.class.Document')
+
+    expect(classClass._attributes._extends._class).toBe(core.class.RefTo)
+    const refTo = classClass._attributes._extends.getClass()
+    expect(refTo._class).toBe(core.class.Struct)
   })
 
   it('should create instance', () => {
     session.loadModel(myModel)
-    const s = session.newInstance(simpleClassId, {
+    const simpleClass = session.getClass(simpleClassId)
+    const s = simpleClass.newInstance({
       _id: 'xxx' as Ref<SimpleClass>,
       s: 'hey there'
     })
-    console.log(s)
     expect(s._id).toBe('xxx')
     expect(s._class).toBe(simpleClassId)
     expect(s.s).toBe('hey there')
@@ -100,10 +102,10 @@ describe('session', () => {
     interface X extends Doc {
       x: string
     }
-    const xClass = session.createClass('x.class' as Ref<Class<X>>, core.class.Doc, {
+    const xClass = session.createDocument('x.class' as Ref<Class<X>>, core.class.Doc, {
       x: str()
     })
-    console.log(xClass)
+    expect(xClass._id).toBe('x.class')
   })
 
   // it('should work with arrays', () => {

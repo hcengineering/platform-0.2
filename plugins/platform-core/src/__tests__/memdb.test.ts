@@ -22,8 +22,8 @@ describe('memdb', () => {
   it('should load classes into memdb', () => {
     const memdb = new MemDb()
     memdb.load(coreModel.model)
-    const object = memdb.get(core.class.Object)
-    expect(object._id).toBe(core.class.Object)
-    expect(object._classes).toContain(core.class.Class)
+    const object = memdb.get(core.class.Embedded)
+    expect(object._id).toBe(core.class.Embedded)
+    expect(object._classes).toContain(core.class.Document)
   })
 })
