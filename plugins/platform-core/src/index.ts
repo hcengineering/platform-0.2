@@ -96,13 +96,14 @@ export interface Session {
 
   find<T extends Doc>(clazz: Ref<Class<T>>, query: Query<T>): T[]
   findOne<T extends Doc>(clazz: Ref<Class<T>>, query: Query<T>): T | undefined
+
+  loadModel(docs: Container[]): void
 }
 
 // C O R E  P L U G I N
 
 export interface CorePlugin extends Plugin {
-  loadModel(docs: Container[]): void
-  getSession(): Session
+  newSession(): Session
 }
 
 export const pluginId = 'core' as PluginId<CorePlugin>

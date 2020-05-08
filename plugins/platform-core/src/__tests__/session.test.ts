@@ -41,9 +41,8 @@ describe('session', () => {
 
   const platform = new Platform()
   const corePlugin = startCorePlugin(platform)
-  corePlugin.loadModel(coreModel.model)
-
-  const session = corePlugin.getSession()
+  const session = corePlugin.newSession()
+  session.loadModel(coreModel.model)
 
   it('should get prototype', () => {
     const objectProto = (session as any).getPrototype(core.class.Object)
