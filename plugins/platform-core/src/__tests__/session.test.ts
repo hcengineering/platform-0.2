@@ -14,7 +14,7 @@
 //
 
 import { Platform } from '@anticrm/platform'
-import { Ref, Class, Doc, ArrayOf } from '@anticrm/platform-core'
+import { Ref, Class, Doc, Emb } from '@anticrm/platform-core'
 
 import core from '../__model__/id'
 import coreModel, { createClass, newContainer, array, str } from '../__model__'
@@ -50,7 +50,7 @@ describe('session', () => {
 
   const platform = new Platform()
   const corePlugin = startCorePlugin(platform)
-  const session = corePlugin.newSession()
+  const session = corePlugin.getSession()
   session.loadModel(coreModel.model)
 
   it('should get prototype', () => {
@@ -100,13 +100,15 @@ describe('session', () => {
   })
 
   it('should create class', () => {
-    interface X extends Doc {
+    interface X extends Emb {
       x: string
     }
-    const xClass = session.createClass('x.class' as Ref<Class<X>>, core.class.Doc, {
+    const xClass = session.createStruct('x.class' as Ref<Class<X>>, core.class.Emb, {
       x: str()
     })
     expect(xClass._id).toBe('x.class')
+    const x = xClass.newInstance({ x: 'hallo' })
+    expect(x.x).toBe('hallo')
   })
 
   // it('should work with arrays', () => {

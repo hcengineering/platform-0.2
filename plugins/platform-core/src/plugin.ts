@@ -28,11 +28,14 @@ class TCorePlugin implements CorePlugin {
   readonly platform: Platform
   readonly pluginId = pluginId
 
+  private session: TSession
+
   constructor(platform: Platform) {
     this.platform = platform
+    this.session = new TSession(this.platform)
   }
 
-  newSession(): Session { return new TSession(this.platform) }
+  getSession() { return this.session }
 }
 
 export default (platform: Platform): CorePlugin => {

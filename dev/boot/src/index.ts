@@ -20,11 +20,18 @@ import { pluginId as uiPluginId } from '@anticrm/platform-ui'
 import startUI from '@anticrm/platform-ui/src/plugin'
 
 import platform from '@anticrm/platform'
-import model from './model'
+import build from './model'
 
+const corePlugin = startCore(platform)
+const session = corePlugin.getSession()
 platform.setPlugin(corePluginId, startCore(platform))
-const uiPlugin = startUI(platform)
-platform.setPlugin(uiPluginId, uiPlugin)
-uiPlugin.loadModel(model)
+
+build(session)
+
+console.log(session.dump())
+
+// const uiPlugin = startUI(platform)
+// platform.setPlugin(uiPluginId, uiPlugin)
+// uiPlugin.loadModel(model)
 
 

@@ -16,27 +16,25 @@
 import contact from './id'
 import core from '@anticrm/platform-core/src/__model__/id'
 
-import { Type } from '@anticrm/platform-core'
-import { createClass } from '@anticrm/platform-core/src/__model__/'
-import { createDocs } from '@anticrm/platform-core/src/__model__/utils'
+import { Session } from '@anticrm/platform-core'
 
+function builder(S: Session) {
 
-const model = [
-  createClass(contact.class.Email, core.class.Type, {}),
-  createClass(contact.class.Phone, core.class.Type, {}),
-  createClass(contact.class.Twitter, core.class.Type, {}),
-  createClass(contact.class.Address, core.class.Type, {}),
+  const email = S.createStruct(contact.class.Email, core.class.Type, {})
+  const phone = S.createStruct(contact.class.Phone, core.class.Type, {})
+  const twitter = S.createStruct(contact.class.Twitter, core.class.Type, {})
+  const address = S.createStruct(contact.class.Address, core.class.Type, {})
 
-  createClass(contact.class.Contact, core.class.Doc, {
-    email: new Type(contact.class.Email),
-    phone: new Type(contact.class.Phone),
-    phoneWork: new Type(contact.class.Phone),
-    twitter: new Type(contact.class.Twitter),
-    address: new Type(contact.class.Address),
-    addressDelivery: new Type(contact.class.Address),
+  S.createClass(contact.class.Contact, core.class.Doc, {
+    email: email.newInstance({}),
+    phone: phone.newInstance({}),
+    phoneWork: phone.newInstance({}),
+    twitter: twitter.newInstance({}),
+    address: address.newInstance({}),
+    addressDelivery: address.newInstance({}),
   })
-]
+}
 
 export default {
-  events: createDocs(model)
+  builder
 }

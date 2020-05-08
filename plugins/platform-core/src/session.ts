@@ -16,7 +16,7 @@
 import { Platform, Metadata } from '@anticrm/platform'
 import { MemDb } from './memdb'
 import core, {
-  Obj, Doc, Ref, Bag, Class, Type,
+  Obj, Doc, Ref, Bag, Class, Type, Emb,
   PropertyType, DiffDescriptors, Container, Session, ContainerId
 } from '.'
 
@@ -107,6 +107,9 @@ export class TSession implements Session {
   getClass<T extends Doc>(_class: Ref<Class<T>>): Class<T> {
     return this.getInstance(_class, core.class.Class) as Class<T>
   }
+  getStruct<T extends Emb>(_class: Ref<Class<T>>): Class<T> {
+    return this.getInstance(_class, core.class.Struct) as Class<T>
+  }
 
   getContainer(id: ContainerId, create?: boolean): Container {
     return this.memdb.get(id, create)
@@ -134,6 +137,18 @@ export class TSession implements Session {
     })
   }
 
+  createStruct<T extends E, E extends Emb>(
+    _id: Ref<Class<T>>, _extends: Ref<Class<E>>,
+    _attributes: DiffDescriptors<T, E>, _native?: Metadata<T>): Class<T> {
+    const structClass = this.getInstance(core.class.Struct, core.class.Class) as Class<Class<T>>
+    return structClass.newInstance({
+      _id,
+      _attributes,
+      _extends,
+      _native
+    })
+  }
+
   ////
 
   // find<T extends Doc>(clazz: Ref<Class<T>>, query: Query<T>): T[] {
@@ -150,6 +165,10 @@ export class TSession implements Session {
 
   loadModel(docs: Container[]): void {
     this.memdb.load(docs)
+  }
+
+  dump(): Container[] {
+    return this.memdb.dump()
   }
 }
 

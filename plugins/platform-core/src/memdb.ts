@@ -40,10 +40,12 @@ export class MemDb {
     const result = this.objects.get(_id)
     if (!result) {
       if (create) {
-        return {
+        const container = {
           _id,
           _classes: []
         }
+        this.objects.set(_id, container) // TODO: update indexes
+        return container
       }
       throw new Error('no container with id ' + _id)
     }
@@ -85,5 +87,10 @@ export class MemDb {
     docs.forEach(doc => this.index(doc))
   }
 
+  dump(): Container[] {
+    const result = [] as Container[]
+    this.objects.forEach(doc => result.push(doc))
+    return result
+  }
 }
 

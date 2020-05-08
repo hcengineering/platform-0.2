@@ -13,19 +13,13 @@
 // limitations under the License.
 //
 
-import { modelFromEvents } from '@anticrm/platform-core/src/__model__/utils'
+import { Session } from '@anticrm/platform-core'
+
 import coreModel from '@anticrm/platform-core/src/__model__'
 import contactCoreModel from '@anticrm/contact-core/src/__model__'
 import testModel from './testModel'
 
-const events = [
-  ...coreModel.events,
-  ...contactCoreModel.events,
-
-  ...testModel
-]
-const model = modelFromEvents(events)
-
-console.log(JSON.stringify(model))
-
-export default model
+export default function loadModel(session: Session) {
+  session.loadModel(coreModel.model)
+  contactCoreModel.builder(session)
+}

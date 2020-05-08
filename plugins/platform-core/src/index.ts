@@ -97,19 +97,24 @@ export type DiffDescriptors<T extends E, E> = Descriptors<Omit<T, keyof E>>
 export interface Session {
   getInstance<T extends Doc>(ref: Ref<T>, as: Ref<Class<T>>): T
 
+  loadModel(docs: Container[]): void
+  dump(): Container[]
+
   // Class Helpers
+  getStruct<T extends Emb>(_struct: Ref<Class<T>>): Class<T>
   getClass<T extends Doc>(_class: Ref<Class<T>>): Class<T>
   createClass<T extends E, E extends Doc>(
     _id: Ref<Class<T>>, _extends: Ref<Class<E>>,
     _attributes: DiffDescriptors<T, E>, _native?: Metadata<T>): Class<T>
-
-  loadModel(docs: Container[]): void
+  createStruct<T extends E, E extends Emb>(
+    _id: Ref<Class<T>>, _extends: Ref<Class<E>>,
+    _attributes: DiffDescriptors<T, E>, _native?: Metadata<T>): Class<T>
 }
 
 // C O R E  P L U G I N
 
 export interface CorePlugin extends Plugin {
-  newSession(): Session
+  getSession(): Session
 }
 
 export const pluginId = 'core' as PluginId<CorePlugin>
