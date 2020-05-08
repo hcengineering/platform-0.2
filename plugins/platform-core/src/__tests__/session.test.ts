@@ -21,6 +21,15 @@ import core from '../__model__/id'
 import coreModel, { createClass, newContainer, array, str } from '../__model__'
 import startCorePlugin from '../plugin'
 
+interface SimpleClass extends Doc {
+  s: string
+}
+
+const simpleClassId = 'test.simpleClass' as Ref<Class<SimpleClass>>
+const simpleClass = createClass(simpleClassId, core.class.Doc, {
+  s: str(),
+})
+
 interface MyClass extends Doc {
   arrayOfStrings: string[]
 }
@@ -35,7 +44,7 @@ const myClassInstance = newContainer(myClassId, myClassInstanceId, {
   arrayOfStrings: ['hey', 'there'],
 })
 
-const myModel = [myClass, myClassInstance]
+const myModel = [simpleClass, myClass, myClassInstance]
 
 describe('session', () => {
 
@@ -73,6 +82,18 @@ describe('session', () => {
     expect(objectClass.getClass()._id).toBe(core.class.Class)
     expect(objectClass.toIntlString()).toBe('core.class.Object')
     expect(classClass.toIntlString()).toBe('core.class.Class')
+  })
+
+  it('should create instance', () => {
+    session.loadModel(myModel)
+    const s = session.newInstance(simpleClassId, {
+      _id: 'xxx' as Ref<SimpleClass>,
+      s: 'hey there'
+    })
+    console.log(s)
+    expect(s._id).toBe('xxx')
+    expect(s._class).toBe(simpleClassId)
+    expect(s.s).toBe('hey there')
   })
 
   // it('should work with arrays', () => {

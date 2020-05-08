@@ -36,12 +36,22 @@ export class MemDb {
     this.objects.set(id, doc)
   }
 
-  get(id: ContainerId): Container {
-    const result = this.objects.get(id)
+  get(_id: ContainerId, create?: boolean): Container {
+    const result = this.objects.get(_id)
     if (!result) {
-      throw new Error('no container with id ' + id)
+      if (create) {
+        return {
+          _id,
+          _classes: []
+        }
+      }
+      throw new Error('no container with id ' + _id)
     }
     return result
+  }
+
+  pick(id: ContainerId): Container | undefined {
+    return this.objects.get(id)
   }
 
   private getAllOfClass(clazz: Ref<Class<Obj>>): Container[] {

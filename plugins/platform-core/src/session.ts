@@ -17,9 +17,11 @@ import { Platform, Metadata } from '@anticrm/platform'
 import { CorePlugin, Query, pluginId } from '.'
 import core, {
   Obj, Doc, Ref, Bag, Class, Type, RefTo, SessionProto, Embedded,
-  PropertyType, BagOf, InstanceOf, Mixin, ArrayOf, Container, Session, Content
+  PropertyType, BagOf, InstanceOf, DocContent, ArrayOf, Container, Session, Content
 } from '.'
 import { MemDb } from './memdb'
+import { generateId } from './objectid'
+import { objectKeys } from 'simplytyped'
 
 type Layout<T extends Obj> = T & { __layout: any } & SessionProto
 
@@ -45,33 +47,20 @@ export class TSession implements Session {
     for (const key in attributes) {
       if (key === '_class')
         continue
-      const passForward = false // key.startsWith('_')
-      if (passForward) {
-        result[key] = {
-          get(this: Layout<Obj>) {
-            return this.__layout[key] ?? (attributes[key] as any)._default // TODO
-          },
-          set(this: Layout<Obj>, value) {
-            this.__layout[key] = value
-          },
-          enumerable: true,
-        }
-      } else {
-        const attribute = attributes[key]
-        const instance = this.instantiateEmbedded(attribute)
-        let keyPath = key
-        if (keyPrefix && !keyPath.startsWith('_'))
-          keyPath = keyPrefix + '/' + key
-        result[key] = {
-          get(this: Layout<Obj>) {
-            const value = this.__layout[keyPath]
-            return instance.exert(value, this, keyPath)
-          },
-          set(this: Layout<Obj>, value) {
-            this.__layout[keyPath] = instance.hibernate(value)
-          },
-          enumerable: true,
-        }
+      const attribute = attributes[key]
+      const instance = this.instantiateEmbedded(attribute)
+      let keyPath = key
+      if (keyPrefix && !keyPath.startsWith('_'))
+        keyPath = keyPrefix + ':' + key
+      result[key] = {
+        get(this: Layout<Obj>) {
+          const value = this.__layout[keyPath]
+          return instance.exert(value, this, keyPath)
+        },
+        set(this: Layout<Obj>, value) {
+          this.__layout[keyPath] = instance.hibernate(value)
+        },
+        enumerable: true,
       }
     }
     return result
@@ -120,8 +109,47 @@ export class TSession implements Session {
     return this.instantiateDoc(as, this.memdb.get(ref))
   }
 
+  private extends<T extends E, E extends Obj>(_class: Ref<Class<T>>, _extends: Ref<Class<E>>): boolean {
+    let clazz: Ref<Class<Obj>> | undefined = _class
+    while (clazz) {
+      if (clazz === _extends)
+        return true
+      clazz = (this.memdb.get(clazz) as Pick<Class<Obj>, '_extends'>)._extends
+    }
+    return false
+  }
+
+  private isDoc(_class: Ref<Class<Doc>>): boolean { return this.extends(_class, core.class.Doc) }
+
+  private newInstanceDoc<T extends Doc>(_class: Ref<Class<T>>, data: DocContent<T>): T {
+    const instance = Object.create(this.getPrototype(_class, true)) as Layout<T>
+    Object.defineProperty(instance, '_class', {
+      value: _class,
+      enumerable: true
+    })
+    const _id = data._id ?? generateId() as Ref<T>
+    const container = this.memdb.get(_id, true)
+    container._classes.push(_class)
+    instance.__layout = container
+
+    Object.assign(instance, data)
+
+    return instance
+  }
+
+  private newInstanceEmbedded<T extends Doc>(_class: Ref<Class<T>>, data: Content<T>): T {
+    const instance = Object.create(this.getPrototype(_class, false)) as Layout<T>
+    Object.defineProperty(instance, '_class', {
+      value: _class,
+      enumerable: true
+    })
+    instance.__layout = { _class, ...data }
+    return instance
+  }
+
   newInstance<T extends Doc>(_class: Ref<Class<T>>, data: Content<T>): T {
-    throw new Error('not implemented')
+    return this.isDoc(_class) ?
+      this.newInstanceDoc(_class, data as DocContent<T>) : this.newInstanceEmbedded(_class, data)
   }
 
   ////
@@ -142,10 +170,5 @@ export class TSession implements Session {
     this.memdb.load(docs)
   }
 
-  ////
-
-  mixin<M extends I, I extends Doc>(doc: Ref<I>, mixinClass: Ref<Mixin<M>>): M {
-    throw new Error('not implemented')
-  }
 }
 

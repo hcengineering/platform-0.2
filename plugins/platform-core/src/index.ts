@@ -82,12 +82,11 @@ export interface Class<T extends Obj> extends Doc {
   _native?: Metadata<T>
 }
 
-export interface Mixin<T extends Doc> extends Class<T> { }
-
 export type Query<T extends Doc> = Partial<T>
 
 export type RemoveMethods<T extends object> = Omit<T, KeysByType<T, AnyFunc>>
-export type Content<T extends Doc> = RemoveMethods<Omit<T, '_class' | '__embedded'>>
+export type Content<T extends Obj> = RemoveMethods<Omit<T, '_class'>>
+export type DocContent<T extends Doc> = RemoveMethods<Omit<T, '_class' | '_id'>> & { _id?: Ref<T> }
 
 export interface Session {
   getInstance<T extends Doc>(ref: Ref<T>, as: Ref<Class<T>>): T
@@ -120,6 +119,7 @@ const core = identify(pluginId, {
     ClassDocument: '' as Metadata<Class<Obj>>
   },
   class: {
+    Doc: '' as Ref<Class<Doc>>,
     Class: '' as Ref<Class<Class<Obj>>>,
   },
 })

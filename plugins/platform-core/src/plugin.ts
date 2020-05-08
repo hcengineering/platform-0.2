@@ -17,7 +17,7 @@ import { Platform, Metadata } from '@anticrm/platform'
 import { CorePlugin, Query, pluginId } from '.'
 import core, {
   Obj, Doc, Ref, Bag, Class, Type, RefTo, SessionProto, Embedded,
-  PropertyType, BagOf, InstanceOf, Mixin, ArrayOf, Container, Session, Content
+  PropertyType, BagOf, InstanceOf, ArrayOf, Container, Session, Content
 } from '.'
 import { TSession } from './session'
 
@@ -57,14 +57,6 @@ export default (platform: Platform): CorePlugin => {
     exert(value: T, target?: PropertyType, key?: PropertyKey): any { return value ?? this._default }
     hibernate(value: any): T { return value }
   }
-
-  // class TRefTo<T extends Doc> extends Type<Ref<T>> {
-  //   to: Ref<Class<T>>
-  //   constructor(to: Ref<Class<T>>, _default?: Ref<T>) {
-  //     super(core.class.RefTo as Ref<Class<RefTo<T>>>, _default)
-  //     this.to = to
-  //   }
-  // }
 
   class TInstanceOf<T extends Embedded> extends TType<T> {
     of!: Ref<Class<T>>
