@@ -14,19 +14,16 @@
 //
 
 import { MemDb } from '../memdb'
-import { modelFromEvents } from '../__model__/utils'
 import coreModel from '../__model__'
 import core from '../__model__/id'
 
 describe('memdb', () => {
 
-  const model = modelFromEvents(coreModel.events)
-
   it('should load classes into memdb', () => {
     const memdb = new MemDb()
-    memdb.load(model)
+    memdb.load(coreModel.model)
     const object = memdb.get(core.class.Object)
     expect(object._id).toBe(core.class.Object)
-    expect(object._class).toBe(core.class.Class)
+    expect(object._classes).toContain(core.class.Class)
   })
 })

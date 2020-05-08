@@ -32,145 +32,77 @@ export interface Container {
   [key: string]: PropertyType
 }
 
-export class SessionProto {
-  getSession(): CorePlugin { throw new Error('detached object') }
+// export const CurrentSession = 'core.currentSession' as Metadata<Session>
+
+export interface SessionProto {
+  getSession(): Session
 }
 
-export abstract class Obj extends SessionProto {
+export interface Obj extends SessionProto {
   _class: Ref<Class<this>>
-  protected constructor(_class: Ref<Class<Obj>>) {
-    super()
-    this._class = _class as Ref<Class<this>>
-  }
-  getClass(this: Obj): Class<this> {
-    // return this.getSession().getInstance(this._class, core.class.Class) as Class<this>
-    throw new Error('not implemented')
-  }
-  toIntlString(plural?: number): string {
-    return this.getClass().toIntlString(plural)
-  }
+  getClass(): Class<this>
+  toIntlString(plural?: number): string
+}
+
+export interface Embedded extends Obj {
 }
 
 export interface Doc extends Obj {
   _id: Ref<this>
-  _mixins?: string[]
 }
 
-// T Y P E S
-
-export abstract class Embedded extends Obj {
-  // __embedded!: void
+export interface Type<T extends PropertyType> extends Embedded {
+  exert(value: T, target?: PropertyType, key?: PropertyKey): any
+  hibernate(value: any): T
 }
 
-export class Type<T extends PropertyType> extends Embedded {
-  _default?: T
-  constructor(_class: Ref<Class<Type<T>>>, _default?: T) {
-    super(_class)
-    this._default = _default
-  }
-  exert(value: T, target?: PropertyType, key?: PropertyKey): any { return value ?? this._default }
-  hibernate(value: any): T { return value }
-}
 export type AnyType = Type<PropertyType>
 
-export class RefTo<T extends Doc> extends Type<Ref<T>> {
+export interface RefTo<T extends Doc> extends Type<Ref<T>> {
   to: Ref<Class<T>>
-  constructor(to: Ref<Class<T>>, _default?: Ref<T>) {
-    super(core.class.RefTo as Ref<Class<RefTo<T>>>, _default)
-    this.to = to
-  }
 }
 
-export class InstanceOf<T extends Embedded> extends Type<T> {
+export interface InstanceOf<T extends Embedded> extends Type<T> {
   of: Ref<Class<T>>
-  constructor(of: Ref<Class<T>>, _default?: T) {
-    super(core.class.InstanceOf as Ref<Class<InstanceOf<T>>>, _default)
-    this.of = of
-  }
-  exert(value: T) {
-    return this.getSession().instantiateEmbedded(value)
-  }
 }
 
-// C O L L E C T I O N S : A R R A Y
-
-class ArrayProxyHandler implements ProxyHandler<PropertyType[]> {
-  private type: Type<PropertyType>
-
-  constructor(type: Type<PropertyType>) {
-    this.type = type
-  }
-
-  get(target: PropertyType[], key: PropertyKey): any {
-    const value = Reflect.get(target, key)
-    return this.type.exert(value)
-  }
-}
-
-export class ArrayOf<T extends PropertyType> extends Type<T[]> {
+export interface ArrayOf<T extends PropertyType> extends Type<T[]> {
   of: Type<T>
-  constructor(of: Type<T>, _default?: T[]) {
-    super(core.class.ArrayOf as Ref<Class<ArrayOf<T>>>, _default)
-    this.of = of
-  }
-  exert(value: T[]) {
-    return new Proxy(value, new ArrayProxyHandler(this.of))
-  }
 }
 
-// C O L L E C T I O N S : B A G
-
-class BagProxyHandler implements ProxyHandler<Bag<PropertyType>> {
-  private type: Type<PropertyType>
-
-  constructor(type: Type<PropertyType>) {
-    this.type = type
-  }
-
-  get(target: Bag<PropertyType>, key: string): any {
-    const value = Reflect.get(target, key)
-    return this.type.exert(value)
-  }
-}
-
-export class BagOf<T extends PropertyType> extends Type<Bag<T>> {
+export interface BagOf<T extends PropertyType> extends Type<Bag<T>> {
   of: Type<T>
-  constructor(of: Type<T>, _default?: Bag<T>) {
-    super(core.class.BagOf as Ref<Class<BagOf<T>>>, _default)
-    this.of = of
-  }
-  exert(value: Bag<T>) {
-    return new Proxy(value, new BagProxyHandler(this.of))
-  }
 }
 
 // C L A S S E S  &  M I X I N S
 
 export interface Class<T extends Obj> extends Doc {
-  attributes: Bag<Type<PropertyType>>
-  extends?: Ref<Class<Obj>>
-  native?: Metadata<T>
+  _attributes: Bag<Type<PropertyType>>
+  _extends?: Ref<Class<Obj>>
+  _native?: Metadata<T>
 }
 
 export interface Mixin<T extends Doc> extends Class<T> { }
 
-// C O R E  P L U G I N
-
 export type Query<T extends Doc> = Partial<T>
 
 export type RemoveMethods<T extends object> = Omit<T, KeysByType<T, AnyFunc>>
-export type Content<T extends Doc> = RemoveMethods<Omit<T, '_id' | '_class' | '__embedded'>> & { _id?: Ref<T> }
+export type Content<T extends Doc> = RemoveMethods<Omit<T, '_class' | '__embedded'>>
 
-export interface CorePlugin extends Plugin {
+export interface Session {
   getInstance<T extends Doc>(ref: Ref<T>, as: Ref<Class<T>>): T
-  newInstance<T extends Obj>(clazz: Ref<Class<T>>): T
+  newInstance<T extends Doc>(_class: Ref<Class<T>>, data: Content<T>): T
   instantiateEmbedded<T extends Obj>(obj: T): T
 
   find<T extends Doc>(clazz: Ref<Class<T>>, query: Query<T>): T[]
   findOne<T extends Doc>(clazz: Ref<Class<T>>, query: Query<T>): T | undefined
+}
 
+// C O R E  P L U G I N
+
+export interface CorePlugin extends Plugin {
   loadModel(docs: Container[]): void
-  // mixin<T extends Doc, E extends T>(doc: Ref<T>, mixin: Ref<Mixin<E>>): E
+  getSession(): Session
 }
 
 export const pluginId = 'core' as PluginId<CorePlugin>
@@ -179,11 +111,11 @@ const core = identify(pluginId, {
   native: {
     Object: '' as Metadata<Obj>,
     Type: '' as Metadata<Type<PropertyType>>,
-    RefTo: '' as Metadata<RefTo<Doc>>,
+    // RefTo: '' as Metadata<RefTo<Doc>>,
     BagOf: '' as Metadata<BagOf<PropertyType>>,
     ArrayOf: '' as Metadata<ArrayOf<PropertyType>>,
     InstanceOf: '' as Metadata<InstanceOf<Embedded>>,
-    Mixins: '' as Metadata<Type<PropertyType>>,
+    // Mixins: '' as Metadata<Type<PropertyType>>,
     ClassDocument: '' as Metadata<Class<Obj>>
   },
   class: {
