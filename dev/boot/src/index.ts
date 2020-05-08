@@ -13,25 +13,35 @@
 // limitations under the License.
 //
 
+import platform from '@anticrm/platform'
+
 import { pluginId as corePluginId } from '@anticrm/platform-core'
 import startCore from '@anticrm/platform-core/src/plugin'
 
 import { pluginId as uiPluginId } from '@anticrm/platform-ui'
 import startUI from '@anticrm/platform-ui/src/plugin'
 
-import platform from '@anticrm/platform'
-import build from './model'
+
+import coreModel from '@anticrm/platform-core/src/__model__'
+import contactCoreModel from '@anticrm/contact-core/src/__model__'
+import contactCore, { Contact } from '@anticrm/contact-core'
+
+import { Ref } from '@anticrm/platform-core'
+
+export const contact1 = 'test.contact.1' as Ref<Contact>
 
 const corePlugin = startCore(platform)
 const session = corePlugin.getSession()
-platform.setPlugin(corePluginId, startCore(platform))
+platform.setPlugin(corePluginId, corePlugin)
 
-build(session)
+session.loadModel(coreModel.model)
+contactCoreModel.builder(session)
 
-console.log(session.dump())
+const contactClass = session.getClass(contactCore.class.Contact)
+contactClass.newInstance({
+  _id: contact1,
+  phone: '+7 913 333 5555'
+})
 
-// const uiPlugin = startUI(platform)
-// platform.setPlugin(uiPluginId, uiPlugin)
-// uiPlugin.loadModel(model)
-
-
+const uiPlugin = startUI(platform)
+platform.setPlugin(uiPluginId, uiPlugin)

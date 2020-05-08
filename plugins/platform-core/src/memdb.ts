@@ -65,7 +65,7 @@ export class MemDb {
     return docs
   }
 
-  private index(container: Container) {
+  index(container: Container) {
     container._classes.forEach(clazz => {
       this.getAllOfClass(clazz).push(container)
     })

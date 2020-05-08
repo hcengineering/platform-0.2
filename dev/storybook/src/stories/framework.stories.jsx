@@ -21,9 +21,10 @@ import platform from '@anticrm/platform'
 import Icon from '@anticrm/platform-ui/src/components/Icon.vue'
 import PropPanel from '@anticrm/platform-ui/src/components/PropPanel.vue'
 
-import { contact1 } from '@anticrm/dev-boot/src/testModel'
-
 import { pluginId as corePluginId } from '@anticrm/platform-core'
+
+import contactCore from '@anticrm/contact-core'
+import { contact1 } from '@anticrm/dev-boot'
 
 export default {
   title: 'Framework'
@@ -34,9 +35,13 @@ export const icon = () => ({
     return <Theme><Icon icon={ui.icon.Add}>Hello Button</Icon></Theme>
   }
 })
-
 const corePlugin = platform.getPlugin(corePluginId)
-const contact = corePlugin.getInstance(contact1)
+const session = corePlugin.getSession()
+
+console.log('story session dump')
+console.log(session.dump())
+
+const contact = session.getInstance(contact1, contactCore.class.Contact)
 const props = ['phone', 'email']
 
 export const properties = () => ({

@@ -34,8 +34,6 @@ export interface AttrModel {
 }
 
 export interface UIPlugin extends Plugin {
-  loadModel(docs: Doc[]): void
-
   getAttrModel(object: Obj, props: string[]): AttrModel[]
 }
 

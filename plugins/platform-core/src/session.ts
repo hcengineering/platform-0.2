@@ -115,6 +115,10 @@ export class TSession implements Session {
     return this.memdb.get(id, create)
   }
 
+  reindexContainer(container: Container) {
+    this.memdb.index(container)
+  }
+
   private extends<T extends Obj>(_class: Ref<Class<T>>, _extends: Ref<Class<Obj>>): boolean {
     let clazz: Ref<Class<Obj>> | undefined = _class
     while (clazz) {

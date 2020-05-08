@@ -13,8 +13,8 @@
 // limitations under the License.
 //
 
-import { Platform } from '@anticrm/platform'
-import { Ref, Class, Doc, Emb } from '@anticrm/platform-core'
+import { Platform, identify, Plugin, PluginId } from '@anticrm/platform'
+import { Ref, Class, Doc, Emb, Type } from '@anticrm/platform-core'
 
 import core from '../__model__/id'
 import coreModel, { createClass, newContainer, array, str } from '../__model__'
@@ -99,7 +99,7 @@ describe('session', () => {
     expect(s.s).toBe('hey there')
   })
 
-  it('should create class', () => {
+  it('should create struct', () => {
     interface X extends Emb {
       x: string
     }
@@ -109,6 +109,58 @@ describe('session', () => {
     expect(xClass._id).toBe('x.class')
     const x = xClass.newInstance({ x: 'hallo' })
     expect(x.x).toBe('hallo')
+  })
+
+  it('should create class', () => {
+    const S = session
+
+    interface Contact extends Doc {
+      email?: string
+      phone?: string
+      phoneWork?: string
+      twitter?: string
+      address?: string
+      addressDelivery?: string
+    }
+
+    const contact = identify('contact-test' as PluginId<Plugin>, {
+      class: {
+        Contact: '' as Ref<Class<Contact>>,
+        Email: '' as Ref<Class<Type<string>>>,
+        Phone: '' as Ref<Class<Type<string>>>,
+        Twitter: '' as Ref<Class<Type<string>>>,
+        Address: '' as Ref<Class<Type<string>>>,
+      }
+    })
+
+    const email = S.createStruct(contact.class.Email, core.class.Type, {})
+    const phone = S.createStruct(contact.class.Phone, core.class.Type, {})
+    const twitter = S.createStruct(contact.class.Twitter, core.class.Type, {})
+    const address = S.createStruct(contact.class.Address, core.class.Type, {})
+
+    S.createClass(contact.class.Contact, core.class.Doc, {
+      email: email.newInstance({}),
+      phone: phone.newInstance({}),
+      phoneWork: phone.newInstance({}),
+      twitter: twitter.newInstance({}),
+      address: address.newInstance({}),
+      addressDelivery: address.newInstance({}),
+    })
+
+    const contact1Id = 'test.contact.1' as Ref<Contact>
+    const contactClass = session.getClass(contact.class.Contact)
+    contactClass.newInstance({
+      _id: contact1Id,
+      phone: '+7 913 333 5555'
+    })
+
+    const contact1 = session.getInstance(contact1Id, contact.class.Contact)
+    expect(contact1.phone).toBe('+7 913 333 5555')
+    contact1.phone = '+1 646 667 88 77'
+    expect(contact1.phone).toBe('+1 646 667 88 77')
+    expect(contact1.email).toBeUndefined()
+    contact1.email = 'hey@hey.com'
+    expect(contact1.email).toBe('hey@hey.com')
   })
 
   // it('should work with arrays', () => {

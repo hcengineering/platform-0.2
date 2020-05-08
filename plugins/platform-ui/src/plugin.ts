@@ -25,15 +25,9 @@ class UIPluginImpl implements UIPlugin {
 
   readonly pluginId = pluginId
   readonly platform: Platform
-  private corePlugin: CorePlugin
 
-  constructor(platform: Platform, corePlugin: CorePlugin) {
+  constructor(platform: Platform) {
     this.platform = platform
-    this.corePlugin = corePlugin
-  }
-
-  loadModel(docs: Doc[]) {
-    this.corePlugin.loadModel(docs)
   }
 
   ///
@@ -42,7 +36,7 @@ class UIPluginImpl implements UIPlugin {
     const clazz = object.getClass()
     return props.map(key => ({
       key,
-      type: clazz.attributes[key],
+      type: clazz._attributes[key],
       // label: this.translate(attributeLabelId(object._class, key)),
       label: object._class + '.' + key,
       placeholder: 'Placeholder',
@@ -60,6 +54,5 @@ export default (platform: Platform): UIPlugin => {
     Search: spritesUrl + '#search',
   })
 
-  const corePlugin = platform.getPlugin(corePluginId)
-  return new UIPluginImpl(platform, corePlugin)
+  return new UIPluginImpl(platform)
 }

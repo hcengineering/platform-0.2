@@ -17,9 +17,9 @@ import { Platform, Metadata } from '@anticrm/platform'
 import { CorePlugin, pluginId } from '.'
 import core, {
   Obj, Doc, Ref, Bag, Class, Type, Emb,
-  PropertyType, BagOf, Session, Content
+  PropertyType, BagOf, Content
 } from '.'
-import { TSession, SessionProto, Konstructor } from './session'
+import { TSession, SessionProto, Konstructor, Layout } from './session'
 
 //////////
 
@@ -140,8 +140,9 @@ export default (platform: Platform): CorePlugin => {
       const session = this.getSession()
       const _class = this._id
       return data => {
-        const instance = session.instantiate(_class, data)
+        const instance = session.instantiate(_class, data) as Layout<T>
         Object.assign(instance, data)
+        instance.__layout._class = _class
         return instance as T
       }
     }
@@ -173,6 +174,7 @@ export default (platform: Platform): CorePlugin => {
         container._classes.push(_class)
         const instance = session.instantiate(_class, container)
         Object.assign(instance, data)
+        session.reindexContainer(container)
         return instance as T
       }
     }
