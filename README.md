@@ -15,3 +15,27 @@ Resource identifier either known statically e.g. `client-ui:component.Button` Vu
 `mongo:0fbfaaddbbccff` or `calc:2+2`.
 
 Plugins are loaded asynchonously, on-demand thus everything in the `Platform` wired together via asynchronous communications.
+
+### Plugin package structure
+
+Following is not a mandatory. In the meantime I tend to use following package structure for every Anticrm Plugin.
+
+```
+__tests__ <- tests :)
+__resources__
+  model.ts
+  meta.ts
+  strings/*.ts
+*.ts <- implementation-related stuff
+plugin.ts <- plugin entry point, exports plugin start function
+index.ts <- A Plugin's API and PRI's. 
+```
+
+Plugin API defined in `index.ts`. It should not export any code (including internal) and should not have any side effects.
+Only API and plugin's PRIs.
+
+Basically, if a plugin depends on another, importing dependant's `index.ts` must be sufficient to start communicating with a plugin.
+
+A `plugin.ts` available to `Platform` only. So you should never import anything from another plugin besides `index.ts`.
+
+Runtime code not allowed to import anything from `__resources__` folder. This is solely for tooling/configuration purposes, and does not exists at runtime.
