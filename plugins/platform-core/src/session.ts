@@ -17,7 +17,7 @@ import { Platform, Metadata } from '@anticrm/platform'
 import { CorePlugin, Query, pluginId } from '.'
 import core, {
   Obj, Doc, Ref, Bag, Class, Type, RefTo, SessionProto, Embedded,
-  PropertyType, BagOf, DiffDescriptors, DocContent, ArrayOf, Container, Session, Content
+  PropertyType, BagOf, DiffDescriptors, DocContent, Container, Session, Content
 } from '.'
 import { MemDb } from './memdb'
 import { generateId } from './objectid'
@@ -25,12 +25,18 @@ import { objectKeys } from 'simplytyped'
 
 type Layout<T extends Obj> = T & { __layout: any } & SessionProto
 
+interface Konstructor<T extends Obj> {
+  prototype: Object
+  newInstance: (data: object) => T
+}
+
 export class TSession implements Session {
 
   readonly platform: Platform
 
   private memdb: MemDb
   private prototypes = new Map<Ref<Class<Obj>>, Object>()
+  private constructors = new Map<Ref<Class<Obj>>, Konstructor<Obj>>()
   private sessionProto: SessionProto
 
   constructor(platform: Platform) {
@@ -109,7 +115,7 @@ export class TSession implements Session {
     return this.instantiateDoc(as, this.memdb.get(ref))
   }
 
-  private extends<T extends E, E extends Obj>(_class: Ref<Class<T>>, _extends: Ref<Class<E>>): boolean {
+  private extends<T extends Obj>(_class: Ref<Class<T>>, _extends: Ref<Class<Obj>>): boolean {
     let clazz: Ref<Class<Obj>> | undefined = _class
     while (clazz) {
       if (clazz === _extends)
@@ -119,43 +125,71 @@ export class TSession implements Session {
     return false
   }
 
-  private isDoc(_class: Ref<Class<Doc>>): boolean { return this.extends(_class, core.class.Doc) }
+  private createDocumentConstructor<T extends Obj>(_class: Ref<Class<T>>, prototype: Object): (data: object) => T {
+    return data => {
+      const instance = Object.create(prototype) as Layout<T>
+      Object.defineProperty(instance, '_class', {
+        value: _class,
+        enumerable: true
+      })
+      const _id = (data as Content<Doc>)._id
+      const container = this.memdb.get(_id, true)
+      container._classes.push(_class)
+      instance.__layout = container
 
-  private newInstanceDoc<T extends Doc>(_class: Ref<Class<T>>, data: DocContent<T>): T {
-    const instance = Object.create(this.getPrototype(_class, true)) as Layout<T>
-    Object.defineProperty(instance, '_class', {
-      value: _class,
-      enumerable: true
-    })
-    const _id = data._id ?? generateId() as Ref<T>
-    const container = this.memdb.get(_id, true)
-    container._classes.push(_class)
-    instance.__layout = container
+      Object.assign(instance, data)
 
-    Object.assign(instance, data)
-
-    return instance
+      return instance
+    }
   }
 
-  private newInstanceEmbedded<T extends Doc>(_class: Ref<Class<T>>, data: Content<T>): T {
-    const instance = Object.create(this.getPrototype(_class, false)) as Layout<T>
-    Object.defineProperty(instance, '_class', {
-      value: _class,
-      enumerable: true
-    })
-    instance.__layout = { _class, ...data }
-    return instance
+  private createEmbeddedConstructor<T extends Obj>(_class: Ref<Class<T>>, prototype: Object): (data: object) => T {
+    return data => {
+      const instance = Object.create(prototype) as Layout<T>
+      Object.defineProperty(instance, '_class', {
+        value: _class,
+        enumerable: true
+      })
+      instance.__layout = { _class, ...data }
+      return instance
+    }
   }
 
-  newInstance<T extends Doc>(_class: Ref<Class<T>>, data: Content<T>): T {
-    return this.isDoc(_class) ?
-      this.newInstanceDoc(_class, data as DocContent<T>) : this.newInstanceEmbedded(_class, data)
+  private isDoc(_class: Ref<Class<Obj>>): boolean { return this.extends(_class, core.class.Doc) }
+
+  getConstructor<T extends Obj>(_class: Ref<Class<T>>): Konstructor<T> {
+    /// CLASS instance exists here!
+    let ctor = this.constructors.get(_class)
+    if (!ctor) {
+      if (this.isDoc(_class)) {
+        const prototype = this.getPrototype(_class, true)
+        const newInstance = this.createDocumentConstructor(_class, prototype)
+        ctor = {
+          prototype,
+          newInstance
+        }
+        this.constructors.set(_class, ctor)
+      } else {
+        const prototype = this.getPrototype(_class, false)
+        const newInstance = this.createEmbeddedConstructor(_class, prototype)
+        ctor = {
+          prototype,
+          newInstance
+        }
+        this.constructors.set(_class, ctor)
+      }
+    }
+    return ctor as Konstructor<T>
+  }
+
+  newInstance<T extends Obj>(_class: Ref<Class<T>>, data: Content<T>): T {
+    return this.getConstructor(_class).newInstance(data)
   }
 
   createClass<T extends E, E extends Obj>(
     _id: Ref<Class<T>>, _extends: Ref<Class<E>>,
     _attributes: DiffDescriptors<T, E>, _native?: Metadata<T>): Class<T> {
-    return this.newInstanceDoc(core.class.Class as Ref<Class<Class<T>>>, {
+    return this.newInstance(core.class.Class as Ref<Class<Class<T>>>, {
       _id,
       _attributes,
       _extends,

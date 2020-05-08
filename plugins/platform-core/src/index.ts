@@ -86,9 +86,8 @@ export type Query<T extends Doc> = Partial<T>
 
 export type RemoveMethods<T extends object> = Omit<T, KeysByType<T, AnyFunc>>
 export type Content<T extends Obj> = RemoveMethods<Omit<T, '_class'>>
-export type DocContent<T extends Doc> = RemoveMethods<Omit<T, '_class' | '_id'>> & { _id?: Ref<T> }
-
-
+export type DocContent<T extends Doc> = RemoveMethods<Omit<T, '_class'>>
+//export type DocContent<T extends Doc> = RemoveMethods<Omit<T, '_class' | '_id'>> & { _id?: Ref<T> }
 
 type Clear<T> = RemoveMethods<Omit<T, '_default' | '_class' | '_id' | '_attributes' | '_extends' | '_native'>>
 type AsDescrtiptors<T> = { [P in keyof T]: T[P] extends PropertyType ? Type<T[P]> : never }
