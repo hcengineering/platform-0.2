@@ -14,14 +14,11 @@
 //
 
 import { Platform, Metadata } from '@anticrm/platform'
-import { CorePlugin, Query, pluginId } from '.'
-import core, {
-  Obj, Doc, Ref, Bag, Class, Type, RefTo, Embedded,
-  PropertyType, BagOf, DiffDescriptors, DocContent, Container, Session, Content, ContainerId
-} from '.'
 import { MemDb } from './memdb'
-import { generateId } from './objectid'
-import { objectKeys } from 'simplytyped'
+import core, {
+  Obj, Doc, Ref, Bag, Class, Type,
+  PropertyType, DiffDescriptors, Container, Session, ContainerId
+} from '.'
 
 export type Layout<T extends Obj> = T & { __layout: any } & SessionProto
 
@@ -115,7 +112,6 @@ export class TSession implements Session {
     return this.memdb.get(id, create)
   }
 
-
   private extends<T extends Obj>(_class: Ref<Class<T>>, _extends: Ref<Class<Obj>>): boolean {
     let clazz: Ref<Class<Obj>> | undefined = _class
     while (clazz) {
@@ -126,20 +122,7 @@ export class TSession implements Session {
     return false
   }
 
-  // getConstructor<T extends Obj>(_class: Ref<Class<T>>): Konstructor<T> {
-  //   /// CLASS instance exists here!
-  //   const ctor = this.constructors.get(_class)
-  //   if (!ctor) {
-  //     const ctor = 
-  //   }
-  //   return ctor as Konstructor<T>
-  // }
-
-  // newInstance<T extends Obj>(_class: Ref<Class<T>>, data: Content<T>): T {
-  //   return this.getConstructor(_class).newInstance(data)
-  // }
-
-  createDocument<T extends E, E extends Doc>(
+  createClass<T extends E, E extends Doc>(
     _id: Ref<Class<T>>, _extends: Ref<Class<E>>,
     _attributes: DiffDescriptors<T, E>, _native?: Metadata<T>): Class<T> {
     const classClass = this.getInstance(core.class.Document, core.class.Document) as Class<Class<T>>
@@ -168,6 +151,5 @@ export class TSession implements Session {
   loadModel(docs: Container[]): void {
     this.memdb.load(docs)
   }
-
 }
 

@@ -17,21 +17,26 @@ import { KeysByType } from 'simplytyped'
 import { PropType, AsString, Metadata, identify, Plugin, PluginId } from '@anticrm/platform'
 
 export type AnyFunc = (...args: any[]) => any
+export type RemoveMethods<T extends object> = Omit<T, KeysByType<T, AnyFunc>>
+
+type PrimitiveType = string
+export type PropertyType = PrimitiveType
+  | PropType<any>
+  | Emb
+  | { [key: string]: PropertyType }
+  | PropertyType[]
+
 export type Ref<T extends Doc> = AsString<T> & { __ref: void }
-
-export type PropertyType = PropType<any> | Embedded | { [key: string]: PropertyType } | PropertyType[] | string
-
 export type Bag<X extends PropertyType> = { [key: string]: X }
 
 export type ContainerId = Ref<Doc>
-
 export interface Container {
   _id: ContainerId
   _classes: Ref<Class<Obj>>[]
   [key: string]: PropertyType
 }
 
-// C L A S S E S
+// O B J E C T S
 
 export interface Obj {
   _class: Ref<Class<this>>
@@ -40,34 +45,24 @@ export interface Obj {
   toIntlString(plural?: number): string
 }
 
-export interface Embedded extends Obj {
-}
-
+export interface Emb extends Obj { }
 export interface Doc extends Obj {
   _id: Ref<this>
 }
 
-export interface Class<T extends Obj> extends Doc {
-  _attributes: Bag<Type<PropertyType>>
-  _extends?: Ref<Class<Obj>>
-  _native?: Metadata<T>
-  newInstance(data: Content<T>): T
-}
-
 // T Y P E S
 
-export interface Type<T extends PropertyType> extends Embedded {
+export interface Type<T extends PropertyType> extends Emb {
   exert(value: T, target?: PropertyType, key?: PropertyKey): any
   hibernate(value: any): T
 }
-
 export type AnyType = Type<PropertyType>
 
 export interface RefTo<T extends Doc> extends Type<Ref<T>> {
   to: Ref<Class<T>>
 }
 
-export interface InstanceOf<T extends Embedded> extends Type<T> {
+export interface InstanceOf<T extends Emb> extends Type<T> {
   of: Ref<Class<T>>
 }
 
@@ -79,16 +74,22 @@ export interface BagOf<T extends PropertyType> extends Type<Bag<T>> {
   of: Type<T>
 }
 
-// C L A S S E S  &  M I X I N S
+// C L A S S E S
+
+export type Content<T extends Obj> = RemoveMethods<Omit<T, '_class'>>
+
+export interface Class<T extends Obj> extends Doc {
+  _attributes: Bag<Type<PropertyType>>
+  _extends?: Ref<Class<Obj>>
+  _native?: Metadata<T>
+  newInstance(data: Content<T>): T
+}
+
+// S E S S I O N
 
 export type Query<T extends Doc> = Partial<T>
 
-export type RemoveMethods<T extends object> = Omit<T, KeysByType<T, AnyFunc>>
-export type Content<T extends Obj> = RemoveMethods<Omit<T, '_class'>>
-export type DocContent<T extends Doc> = RemoveMethods<Omit<T, '_class'>>
-//export type DocContent<T extends Doc> = RemoveMethods<Omit<T, '_class' | '_id'>> & { _id?: Ref<T> }
-
-type Clear<T> = RemoveMethods<Omit<T, '_default' | '_class' | '_id' | '_attributes' | '_extends' | '_native'>>
+type Clear<T> = RemoveMethods<Omit<T, '_class'>>
 type AsDescrtiptors<T> = { [P in keyof T]: T[P] extends PropertyType ? Type<T[P]> : never }
 type Descriptors<T extends object> = AsDescrtiptors<Required<Clear<T>>>
 export type DiffDescriptors<T extends E, E> = Descriptors<Omit<T, keyof E>>
@@ -96,21 +97,13 @@ export type DiffDescriptors<T extends E, E> = Descriptors<Omit<T, keyof E>>
 export interface Session {
   getInstance<T extends Doc>(ref: Ref<T>, as: Ref<Class<T>>): T
 
+  // Class Helpers
   getClass<T extends Doc>(_class: Ref<Class<T>>): Class<T>
-
-  // newInstance<T extends Doc>(_class: Ref<Class<T>>, data: Content<T>): T
-  // instantiate<T extends Obj>(_class: Ref<Class<T>>, __layout: any): T
-
-  // getContainer(id: ContainerId, create?: boolean): Container
-
-  // find<T extends Doc>(clazz: Ref<Class<T>>, query: Query<T>): T[]
-  // findOne<T extends Doc>(clazz: Ref<Class<T>>, query: Query<T>): T | undefined
-
-  loadModel(docs: Container[]): void
-
-  createDocument<T extends E, E extends Doc>(
+  createClass<T extends E, E extends Doc>(
     _id: Ref<Class<T>>, _extends: Ref<Class<E>>,
     _attributes: DiffDescriptors<T, E>, _native?: Metadata<T>): Class<T>
+
+  loadModel(docs: Container[]): void
 }
 
 // C O R E  P L U G I N
@@ -123,19 +116,19 @@ export const pluginId = 'core' as PluginId<CorePlugin>
 
 const core = identify(pluginId, {
   native: {
-    Embedded: '' as Metadata<Embedded>,
+    Emb: '' as Metadata<Emb>,
     Doc: '' as Metadata<Doc>,
 
     Type: '' as Metadata<Type<PropertyType>>,
     BagOf: '' as Metadata<BagOf<PropertyType>>,
     ArrayOf: '' as Metadata<ArrayOf<PropertyType>>,
-    InstanceOf: '' as Metadata<InstanceOf<Embedded>>,
+    InstanceOf: '' as Metadata<InstanceOf<Emb>>,
 
-    Struct: '' as Metadata<Class<Embedded>>,
+    Struct: '' as Metadata<Class<Emb>>,
     Document: '' as Metadata<Class<Doc>>,
   },
   class: {
-    Embedded: '' as Ref<Class<Embedded>>,
+    Embedded: '' as Ref<Class<Emb>>,
     Doc: '' as Ref<Class<Doc>>,
 
     Type: '' as Ref<Class<Type<PropertyType>>>,
@@ -146,7 +139,7 @@ const core = identify(pluginId, {
     RefTo: '' as Ref<Class<RefTo<Doc>>>,
     BagOf: '' as Ref<Class<BagOf<PropertyType>>>,
     ArrayOf: '' as Ref<Class<ArrayOf<PropertyType>>>,
-    InstanceOf: '' as Ref<Class<InstanceOf<Embedded>>>,
+    InstanceOf: '' as Ref<Class<InstanceOf<Emb>>>,
 
     // Class: '' as Ref<Class<Class<Obj>>>,
     Struct: '' as Ref<Class<Class<Obj>>>,

@@ -14,10 +14,10 @@
 //
 
 import { Platform, Metadata } from '@anticrm/platform'
-import { CorePlugin, Query, pluginId } from '.'
+import { CorePlugin, pluginId } from '.'
 import core, {
-  Obj, Doc, Ref, Bag, Class, Type, RefTo, Embedded,
-  PropertyType, BagOf, InstanceOf, ArrayOf, Container, Session, Content
+  Obj, Doc, Ref, Bag, Class, Type, Emb,
+  PropertyType, BagOf, Session, Content
 } from '.'
 import { TSession, SessionProto, Konstructor } from './session'
 
@@ -42,7 +42,7 @@ export default (platform: Platform): CorePlugin => {
     __mapKey(_class: Ref<Class<Obj>>, key: string): string | null { return null }
   }
 
-  class TEmbedded extends TSessionProto implements Embedded {
+  class TEmb extends TSessionProto implements Emb {
     _class!: Ref<Class<this>>
     toIntlString(plural?: number): string { return this.getClass().toIntlString(plural) }
     getClass(): Class<this> {
@@ -65,13 +65,13 @@ export default (platform: Platform): CorePlugin => {
 
   // T Y P E S 
 
-  class TType<T extends PropertyType> extends TEmbedded implements Type<T> {
+  class TType<T extends PropertyType> extends TEmb implements Type<T> {
     _default?: T
     exert(value: T, target?: PropertyType, key?: PropertyKey): any { return value ?? this._default }
     hibernate(value: any): T { return value }
   }
 
-  class TInstanceOf<T extends Embedded> extends TType<T> {
+  class TInstanceOf<T extends Emb> extends TType<T> {
     of!: Ref<Class<T>>
     exert(value: T) {
       // console.log('instanceof instantiating: ')
@@ -185,7 +185,7 @@ export default (platform: Platform): CorePlugin => {
     }
   }
 
-  platform.setMetadata(core.native.Embedded, TEmbedded.prototype)
+  platform.setMetadata(core.native.Emb, TEmb.prototype)
   platform.setMetadata(core.native.Doc, TDoc.prototype)
 
   platform.setMetadata(core.native.Type, TType.prototype)

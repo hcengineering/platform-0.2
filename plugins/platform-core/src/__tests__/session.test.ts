@@ -17,7 +17,7 @@ import { Platform } from '@anticrm/platform'
 import { Ref, Class, Doc, ArrayOf } from '@anticrm/platform-core'
 
 import core from '../__model__/id'
-import coreModel, { createDocument, newContainer, array, str } from '../__model__'
+import coreModel, { createClass, newContainer, array, str } from '../__model__'
 import startCorePlugin from '../plugin'
 
 interface SimpleClass extends Doc {
@@ -25,7 +25,7 @@ interface SimpleClass extends Doc {
 }
 
 const simpleClassId = 'test.simpleClass' as Ref<Class<SimpleClass>>
-const simpleClass = createDocument(simpleClassId, core.class.Doc, {
+const simpleClass = createClass(simpleClassId, core.class.Doc, {
   s: str(),
 })
 
@@ -34,12 +34,13 @@ interface MyClass extends Doc {
 }
 
 const myClassId = 'test.myClass' as Ref<Class<MyClass>>
-const myClass = createDocument(myClassId, core.class.Doc, {
+const myClass = createClass(myClassId, core.class.Doc, {
   arrayOfStrings: array(str()),
 })
 
 const myClassInstanceId = 'test.myClass.instance' as Ref<MyClass>
-const myClassInstance = newContainer(myClassId, myClassInstanceId, {
+const myClassInstance = newContainer(myClassId, {
+  _id: myClassInstanceId,
   arrayOfStrings: ['hey', 'there'],
 })
 
@@ -73,7 +74,7 @@ describe('session', () => {
     expect(objectClass.getSession() === session).toBe(true)
 
     expect(objectClass._id).toBe(core.class.Embedded)
-    expect(objectClass._native).toBe(core.native.Embedded)
+    expect(objectClass._native).toBe(core.native.Emb)
     expect(objectClass.getClass()._id).toBe(core.class.Document)
     expect(objectClass.toIntlString()).toBe('doc: core.class.Embedded')
 
@@ -102,7 +103,7 @@ describe('session', () => {
     interface X extends Doc {
       x: string
     }
-    const xClass = session.createDocument('x.class' as Ref<Class<X>>, core.class.Doc, {
+    const xClass = session.createClass('x.class' as Ref<Class<X>>, core.class.Doc, {
       x: str()
     })
     expect(xClass._id).toBe('x.class')

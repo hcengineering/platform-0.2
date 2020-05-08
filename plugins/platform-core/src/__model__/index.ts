@@ -18,41 +18,36 @@ import ru from './strings/ru'
 import { Metadata } from '@anticrm/platform'
 
 import { BagOf, InstanceOf, RefTo } from '..'
-import { Ref, Class, Obj, Doc, Content, RemoveMethods, PropertyType, Type, Container, Embedded, ArrayOf } from '..'
+import { Ref, Class, Obj, Doc, Content, DiffDescriptors, PropertyType, Type, Container, Emb, ArrayOf } from '..'
 
 import core from './id'
 
-export function newContainer<T extends Doc>(_class: Ref<Class<T>>, _id: Ref<T>, data: ClearInstance<T>): Container {
-  return { _classes: [_class], _id, ...data }
+export function newContainer<T extends Doc>(_class: Ref<Class<T>>, data: Content<T>): Container {
+  return { _classes: [_class], ...(data as unknown as Content<Doc>) }
 }
 
-type ClearInstance<T> = RemoveMethods<Omit<T, '_class' | '_id'>>
-
-export function newStruct<T extends Embedded>(_class: Ref<Class<T>>, data: ClearInstance<T>): T {
+export function newStruct<T extends Emb>(_class: Ref<Class<T>>, data: Content<T>): T {
   return { ...data, _class } as T
 }
-
-type Clear<T> = RemoveMethods<Omit<T, '_class'>>
-type AsDescrtiptors<T> = { [P in keyof T]: T[P] extends PropertyType ? Type<T[P]> : never }
-type Descriptors<T extends object> = AsDescrtiptors<Required<Clear<T>>>
-type DiffDescriptors<T extends E, E> = Descriptors<Omit<T, keyof E>>
 
 export function createStruct<T extends E, E extends Obj>(
   _id: Ref<Class<T>>, _extends: Ref<Class<E>>,
   _attributes: DiffDescriptors<T, E>, _native?: Metadata<T>) {
 
-  return newContainer(core.class.Struct, _id, {
+  return newContainer(core.class.Struct, {
+    _id,
     _attributes,
     _extends,
     _native
   })
 }
 
-export function createDocument<T extends E, E extends Obj>(
+export function createClass<T extends E, E extends Obj>(
   _id: Ref<Class<T>>, _extends: Ref<Class<E>>,
   _attributes: DiffDescriptors<T, E>, _native?: Metadata<T>) {
 
-  return newContainer(core.class.Document, _id, {
+  return newContainer(core.class.Document, {
+    _id,
     _attributes,
     _extends,
     _native
@@ -60,44 +55,33 @@ export function createDocument<T extends E, E extends Obj>(
 }
 
 export function str(): Type<string> { return newStruct(core.class.String, {}) }
-
 function meta<T>(): Type<Metadata<T>> { return newStruct(core.class.Metadata, {}) }
-
 function ref<T extends Doc>(to: Ref<Class<T>>): RefTo<T> {
   return newStruct(core.class.RefTo as unknown as Ref<Class<RefTo<T>>>, { to })
 }
-
-function obj<T extends Embedded>(of: Ref<Class<T>>): InstanceOf<T> {
+function obj<T extends Emb>(of: Ref<Class<T>>): InstanceOf<T> {
   return newStruct(core.class.InstanceOf as Ref<Class<InstanceOf<T>>>, { of })
 }
-
 function bag<T extends PropertyType>(of: Type<T>): BagOf<T> {
   return newStruct(core.class.BagOf as Ref<Class<BagOf<T>>>, { of })
 }
-
 export function array<T extends PropertyType>(of: Type<T>): ArrayOf<T> {
   return newStruct(core.class.ArrayOf as Ref<Class<ArrayOf<T>>>, { of })
 }
 
-const embeddedAttributes: Descriptors<Embedded> = {
-}
-const embeddedClass = newContainer(core.class.Document, core.class.Embedded, {
-  _attributes: embeddedAttributes,
-  _native: core.native.Embedded
-})
-
-const docAttributes: Descriptors<Doc> = {
-  _id: ref(core.class.Doc)
-}
-const docClass = newContainer(core.class.Document, core.class.Doc, {
-  _attributes: docAttributes,
-  _native: core.native.Doc
-})
-
 const model = [
-  embeddedClass,
-  docClass,
-
+  newContainer(core.class.Document, {
+    _id: core.class.Embedded,
+    _native: core.native.Emb,
+    _attributes: {}
+  }),
+  newContainer(core.class.Document, {
+    _id: core.class.Doc,
+    _native: core.native.Doc,
+    _attributes: {
+      _id: ref(core.class.Doc)
+    }
+  }),
   createStruct(core.class.Type, core.class.Embedded, {}, core.native.Type),
   createStruct(core.class.Metadata, core.class.Type, {}, core.native.Type),
   createStruct(core.class.String, core.class.Type, {}, core.native.Type),
@@ -115,13 +99,13 @@ const model = [
     of: ref(core.class.Document),
   }, core.native.InstanceOf),
 
-  createDocument(core.class.Struct, core.class.Doc, {
+  createClass(core.class.Struct, core.class.Doc, {
     _attributes: bag(obj(core.class.Type)),
     _extends: ref(core.class.Struct),
     _native: meta()
   }, core.native.Struct),
 
-  createDocument(core.class.Document, core.class.Doc, {
+  createClass(core.class.Document, core.class.Doc, {
     _attributes: bag(obj(core.class.Type)),
     _extends: ref(core.class.Document),
     _native: meta()
