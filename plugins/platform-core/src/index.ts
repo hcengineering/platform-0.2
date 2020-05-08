@@ -120,10 +120,7 @@ const core = identify(pluginId, {
     ClassDocument: '' as Metadata<Class<Obj>>
   },
   class: {
-    RefTo: '' as Ref<Class<RefTo<Doc>>>,
-    BagOf: '' as Ref<Class<BagOf<PropertyType>>>,
-    ArrayOf: '' as Ref<Class<ArrayOf<PropertyType>>>,
-    InstanceOf: '' as Ref<Class<InstanceOf<Embedded>>>,
+    Class: '' as Ref<Class<Class<Obj>>>,
   },
 })
 

@@ -23,7 +23,7 @@ import { TSession } from './session'
 
 //////////
 
-export class TCorePlugin implements CorePlugin {
+class TCorePlugin implements CorePlugin {
 
   readonly platform: Platform
   readonly pluginId = pluginId
@@ -43,15 +43,13 @@ export class TCorePlugin implements CorePlugin {
 export default (platform: Platform): CorePlugin => {
 
   class TSessionProto {
-    getSession(): Session {
-      throw new Error('session override this...')
-    }
+    getSession(): Session { throw new Error('session provide the implementation') }
   }
 
   class TObj extends TSessionProto {
     _class!: Ref<Class<this>>
-    getClass(): Class<this> { return this.getSession().getInstance(this._class, 'core.class.Class' as Ref<Class<Class<this>>>) }
-    toIntlString(plural?: number): string { throw new Error('not implemented') }
+    getClass(): Class<this> { return this.getSession().getInstance(this._class, core.class.Class as Ref<Class<Class<this>>>) }
+    toIntlString(plural?: number): string { return this.getClass().toIntlString(plural) }
   }
 
   class TType<T extends PropertyType> extends TObj implements Embedded {
