@@ -46,7 +46,7 @@ export function createClass<T extends E, E extends Obj>(
   _id: Ref<Class<T>>, _extends: Ref<Class<E>>,
   _attributes: DiffDescriptors<T, E>, _native?: Metadata<T>) {
 
-  return newContainer(core.class.Document, {
+  return newContainer(core.class.Class, {
     _id,
     _attributes,
     _extends,
@@ -70,12 +70,12 @@ export function array<T extends PropertyType>(of: Type<T>): ArrayOf<T> {
 }
 
 const model = [
-  newContainer(core.class.Document, {
+  newContainer(core.class.Class, {
     _id: core.class.Embedded,
     _native: core.native.Emb,
     _attributes: {}
   }),
-  newContainer(core.class.Document, {
+  newContainer(core.class.Class, {
     _id: core.class.Doc,
     _native: core.native.Doc,
     _attributes: {
@@ -87,7 +87,7 @@ const model = [
   createStruct(core.class.String, core.class.Type, {}, core.native.Type),
 
   createStruct(core.class.RefTo, core.class.Type, {
-    to: ref(core.class.Document),
+    to: ref(core.class.Class),
   }, core.native.Type),
   createStruct(core.class.BagOf, core.class.Type, {
     of: obj(core.class.Type),
@@ -96,7 +96,7 @@ const model = [
     of: obj(core.class.Type),
   }, core.native.ArrayOf),
   createStruct(core.class.InstanceOf, core.class.Type, {
-    of: ref(core.class.Document),
+    of: ref(core.class.Struct),
   }, core.native.InstanceOf),
 
   createClass(core.class.Struct, core.class.Doc, {
@@ -105,9 +105,9 @@ const model = [
     _native: meta()
   }, core.native.Struct),
 
-  createClass(core.class.Document, core.class.Doc, {
+  createClass(core.class.Class, core.class.Doc, {
     _attributes: bag(obj(core.class.Type)),
-    _extends: ref(core.class.Document),
+    _extends: ref(core.class.Class),
     _native: meta()
   }, core.native.Document)
 ]

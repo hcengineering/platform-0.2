@@ -141,9 +141,8 @@ const core = identify(pluginId, {
     ArrayOf: '' as Ref<Class<ArrayOf<PropertyType>>>,
     InstanceOf: '' as Ref<Class<InstanceOf<Emb>>>,
 
-    // Class: '' as Ref<Class<Class<Obj>>>,
+    Class: '' as Ref<Class<Class<Obj>>>,
     Struct: '' as Ref<Class<Class<Obj>>>,
-    Document: '' as Ref<Class<Class<Obj>>>,
   },
 })
 

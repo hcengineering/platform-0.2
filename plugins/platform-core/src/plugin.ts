@@ -57,7 +57,7 @@ export default (platform: Platform): CorePlugin => {
     _id!: Ref<this>
     toIntlString(plural?: number): string { return this.getClass().toIntlString(plural) }
     getClass(): Class<this> {
-      return this.getSession().getInstance(this._class, core.class.Document as Ref<Class<Class<this>>>)
+      return this.getSession().getInstance(this._class, core.class.Class as Ref<Class<Class<this>>>)
     }
 
     __mapKey(_class: Ref<Class<Obj>>, key: string) { return key.startsWith('_') ? key : _class + ':' + key }

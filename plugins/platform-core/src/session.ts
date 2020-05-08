@@ -105,7 +105,7 @@ export class TSession implements Session {
   }
 
   getClass<T extends Doc>(_class: Ref<Class<T>>): Class<T> {
-    return this.getInstance(_class, core.class.Document) as Class<T>
+    return this.getInstance(_class, core.class.Class) as Class<T>
   }
 
   getContainer(id: ContainerId, create?: boolean): Container {
@@ -125,7 +125,7 @@ export class TSession implements Session {
   createClass<T extends E, E extends Doc>(
     _id: Ref<Class<T>>, _extends: Ref<Class<E>>,
     _attributes: DiffDescriptors<T, E>, _native?: Metadata<T>): Class<T> {
-    const classClass = this.getInstance(core.class.Document, core.class.Document) as Class<Class<T>>
+    const classClass = this.getInstance(core.class.Class, core.class.Class) as Class<Class<T>>
     return classClass.newInstance({
       _id,
       _attributes,

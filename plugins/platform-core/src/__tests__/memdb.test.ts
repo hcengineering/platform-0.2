@@ -24,6 +24,6 @@ describe('memdb', () => {
     memdb.load(coreModel.model)
     const object = memdb.get(core.class.Embedded)
     expect(object._id).toBe(core.class.Embedded)
-    expect(object._classes).toContain(core.class.Document)
+    expect(object._classes).toContain(core.class.Class)
   })
 })
