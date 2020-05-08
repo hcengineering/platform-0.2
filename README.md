@@ -14,7 +14,8 @@ For any `resource` there is a known `plugin`, which can *resolve* resource ident
 Resource identifier either known statically e.g. `client-ui:component.Button` Vue component, or some dynamic string e.g. 
 `mongo:0fbfaaddbbccff` or `calc:2+2`.
 
-Plugins are loaded asynchonously, on-demand thus everything in the `Platform` wired together via asynchronous communications.
+Plugins are loaded asynchonously, on-demand thus everything in the `Platform` wired together via asynchronous communications. 
+A `Plugin` itself is also a Platform `Resource`, so you can request access to a plugin's API using same approach.
 
 ### Plugin package structure
 

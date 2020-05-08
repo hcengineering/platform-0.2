@@ -45,14 +45,5 @@ class UIPluginImpl implements UIPlugin {
 }
 
 export default (platform: Platform): UIPlugin => {
-  const spritesUrl = require('../assets/icons.svg')
-  platform.loadMetadata(ui.icon, {
-    AddGroup: spritesUrl + '#add-group',
-    Add: spritesUrl + '#add',
-    Checked: spritesUrl + '#checked',
-    Edit: spritesUrl + '#edit',
-    Search: spritesUrl + '#search',
-  })
-
   return new UIPluginImpl(platform)
 }

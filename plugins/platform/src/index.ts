@@ -76,6 +76,7 @@ export class Platform {
     this.metadata.set(id as string, value)
   }
 
+  // TODO: remove
   loadMetadata<T, X extends Record<string, Metadata<T>>>(ids: X, resources: ExtractType<T, X>) {
     for (const key in ids) {
       const id = ids[key]
@@ -86,6 +87,23 @@ export class Platform {
       this.metadata.set(id as string, resource)
     }
   }
+
+  loadMeta(map: Map<string, string>) {
+    map.forEach((value, key) => this.metadata.set(key, value))
+  }
+}
+
+export function loadMetadata<T, X extends Record<string, Metadata<T>>>(ids: X, resources: ExtractType<T, X>): Map<string, string> {
+  const result = new Map()
+  for (const key in ids) {
+    const id = ids[key]
+    const resource = resources[key]
+    if (!resource) {
+      throw new Error(`no resource provided, key: ${key}, id: ${id}`)
+    }
+    result.set(id as string, resource)
+  }
+  return result
 }
 
 //////

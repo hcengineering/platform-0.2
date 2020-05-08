@@ -13,9 +13,15 @@
 // limitations under the License.
 //
 
-import platform from '@anticrm/platform'
-import uiMeta from '@anticrm/platform-ui/src/__resources__/meta'
-platform.loadMeta(uiMeta)
+import { loadMetadata } from '@anticrm/platform'
+import ui from '..'
 
-import '@anticrm/dev-boot'
+const spritesUrl = require('../../assets/icons.svg')
 
+export default loadMetadata(ui.icon, {
+  AddGroup: spritesUrl + '#add-group',
+  Add: spritesUrl + '#add',
+  Checked: spritesUrl + '#checked',
+  Edit: spritesUrl + '#edit',
+  Search: spritesUrl + '#search',
+})
