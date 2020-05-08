@@ -88,6 +88,13 @@ export type RemoveMethods<T extends object> = Omit<T, KeysByType<T, AnyFunc>>
 export type Content<T extends Obj> = RemoveMethods<Omit<T, '_class'>>
 export type DocContent<T extends Doc> = RemoveMethods<Omit<T, '_class' | '_id'>> & { _id?: Ref<T> }
 
+
+
+type Clear<T> = RemoveMethods<Omit<T, '_default' | '_class' | '_id' | '_attributes' | '_extends' | '_native'>>
+type AsDescrtiptors<T> = { [P in keyof T]: T[P] extends PropertyType ? Type<T[P]> : never }
+type Descriptors<T extends object> = AsDescrtiptors<Required<Clear<T>>>
+export type DiffDescriptors<T extends E, E> = Descriptors<Omit<T, keyof E>>
+
 export interface Session {
   getInstance<T extends Doc>(ref: Ref<T>, as: Ref<Class<T>>): T
   newInstance<T extends Doc>(_class: Ref<Class<T>>, data: Content<T>): T
@@ -97,6 +104,10 @@ export interface Session {
   findOne<T extends Doc>(clazz: Ref<Class<T>>, query: Query<T>): T | undefined
 
   loadModel(docs: Container[]): void
+
+  createClass<T extends E, E extends Obj>(
+    _id: Ref<Class<T>>, _extends: Ref<Class<E>>,
+    _attributes: DiffDescriptors<T, E>, _native?: Metadata<T>): Class<T>
 }
 
 // C O R E  P L U G I N

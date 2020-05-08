@@ -17,7 +17,7 @@ import { Platform, Metadata } from '@anticrm/platform'
 import { CorePlugin, Query, pluginId } from '.'
 import core, {
   Obj, Doc, Ref, Bag, Class, Type, RefTo, SessionProto, Embedded,
-  PropertyType, BagOf, InstanceOf, DocContent, ArrayOf, Container, Session, Content
+  PropertyType, BagOf, DiffDescriptors, DocContent, ArrayOf, Container, Session, Content
 } from '.'
 import { MemDb } from './memdb'
 import { generateId } from './objectid'
@@ -150,6 +150,17 @@ export class TSession implements Session {
   newInstance<T extends Doc>(_class: Ref<Class<T>>, data: Content<T>): T {
     return this.isDoc(_class) ?
       this.newInstanceDoc(_class, data as DocContent<T>) : this.newInstanceEmbedded(_class, data)
+  }
+
+  createClass<T extends E, E extends Obj>(
+    _id: Ref<Class<T>>, _extends: Ref<Class<E>>,
+    _attributes: DiffDescriptors<T, E>, _native?: Metadata<T>): Class<T> {
+    return this.newInstanceDoc(core.class.Class as Ref<Class<Class<T>>>, {
+      _id,
+      _attributes,
+      _extends,
+      _native
+    })
   }
 
   ////

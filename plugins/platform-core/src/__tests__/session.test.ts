@@ -96,6 +96,16 @@ describe('session', () => {
     expect(s.s).toBe('hey there')
   })
 
+  it('should create class', () => {
+    interface X extends Doc {
+      x: string
+    }
+    const xClass = session.createClass('x.class' as Ref<Class<X>>, core.class.Doc, {
+      x: str()
+    })
+    console.log(xClass)
+  })
+
   // it('should work with arrays', () => {
   //   session.loadModel(myModel)
   //   const myInstance = session.getInstance(myClassInstanceId)
