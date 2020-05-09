@@ -17,12 +17,12 @@ import platform from '@anticrm/platform'
 
 import { pluginId as corePluginId } from '@anticrm/platform-core'
 import startCore from '@anticrm/platform-core/src/plugin'
+import coreModel from '@anticrm/platform-core/src/__model__'
 
 import { pluginId as uiPluginId } from '@anticrm/platform-ui'
 import startUI from '@anticrm/platform-ui/src/plugin'
+// import uiModel from '@anticrm/platform-ui/src/__resources__'
 
-
-import coreModel from '@anticrm/platform-core/src/__model__'
 import contactCoreModel from '@anticrm/contact-core/src/__model__'
 import contactCore, { Contact } from '@anticrm/contact-core'
 

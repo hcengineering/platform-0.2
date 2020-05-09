@@ -15,6 +15,7 @@
 
 import { identify, Metadata, Plugin, PluginId } from '@anticrm/platform'
 import { Doc, Obj, AnyType, Ref, Class } from '@anticrm/platform-core'
+import i18n from '@anticrm/platform-core-i18n'
 
 export type Asset = Metadata<string>
 
@@ -39,6 +40,13 @@ export interface UIPlugin extends Plugin {
 
 export const pluginId = 'ui' as PluginId<UIPlugin>
 
+export const pluginDescriptor = {
+  id: pluginId,
+  dependencies: {
+    i18n: ''
+  }
+}
+
 const ui = identify(pluginId, {
   icon: {
     AddGroup: '' as Asset,
@@ -47,7 +55,7 @@ const ui = identify(pluginId, {
     Edit: '' as Asset,
     Search: '' as Asset,
   },
-  mixin: {
+  class: {
     UIDecorator: '' as Ref<Class<UIDecorator>>
   }
 })

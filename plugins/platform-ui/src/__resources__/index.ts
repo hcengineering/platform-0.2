@@ -13,4 +13,13 @@
 // limitations under the License.
 //
 
+import core from '@anticrm/platform-core/src/__model__/id'
+import ui from '..'
 
+import { Builder } from '@anticrm/platform-core/src/__model__/builder'
+
+export function build(_: Builder) {
+  _.createClass(ui.class.UIDecorator, core.class.Doc, {
+    icon: _.meta()
+  })
+}

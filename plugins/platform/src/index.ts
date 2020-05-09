@@ -26,6 +26,11 @@ export interface Plugin {
   readonly pluginId: PluginId<Plugin>
 }
 
+export interface PluginDescriptor<P extends Plugin> {
+  id: PluginId<P>,
+  deps?: PluginId<Plugin>[]
+}
+
 //////////////
 
 type ExtractType<T, X extends Record<string, Metadata<T>>> = { [P in keyof X]:
@@ -127,4 +132,28 @@ export function identify<N extends Namespace>(pluginId: PluginId<Plugin>, namesp
   return transform(pluginId, namespace, (id: string, value) => value === '' ? id : value)
 }
 
+export function plugin<P extends Plugin, N extends Namespace>(id: PluginId<P>, namespace: N): PluginDescriptor<P> & N {
+  return { id, ...identify(id, namespace) }
+}
+
 export default new Platform()
+
+// const pluginId = 'zzz' as PluginId<Plugin>
+// type Asset = Metadata<string>
+
+// const ui = plugin(
+//   'zzz' as PluginId<Plugin>,
+//   {
+//     icon: {
+//       AddGroup: '' as Asset,
+//       Add: '' as Asset,
+//       Checked: '' as Asset,
+//       Edit: '' as Asset,
+//       Search: '' as Asset,
+//     },
+//     class: {
+//       UIDecorator: '' as Metadata<number>,
+//     }
+//   }
+// )
+

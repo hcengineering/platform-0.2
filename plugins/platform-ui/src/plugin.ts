@@ -30,8 +30,6 @@ class UIPluginImpl implements UIPlugin {
     this.platform = platform
   }
 
-  ///
-
   getAttrModel(object: Obj, props: string[]) {
     const clazz = object.getClass()
     return props.map(key => ({
