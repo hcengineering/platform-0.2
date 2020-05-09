@@ -104,15 +104,9 @@ export const metaModel = [
   }, core.native.StructuralFeature),
 
   createClass(core.class.Struct, core.class.StructuralFeature, {
-    _attributes: bag(obj(core.class.Type)),
-    _extends: ref(core.class.Struct),
-    _native: meta()
   }, core.native.Struct),
 
   createClass(core.class.Class, core.class.StructuralFeature, {
-    _attributes: bag(obj(core.class.Type)),
-    _extends: ref(core.class.Class),
-    _native: meta()
   }, core.native.Class)
 ]
 

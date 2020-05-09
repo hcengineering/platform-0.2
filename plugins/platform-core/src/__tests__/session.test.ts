@@ -78,9 +78,9 @@ describe('session', () => {
     expect(objectClass.getClass()._id).toBe(core.class.Class)
     expect(objectClass.toIntlString()).toBe('doc: core.class.Emb')
 
-    const classClass = session.getInstance(core.class.Class, core.class.Class)
-    expect(classClass._extends).toBe(core.class.StructuralFeature)
-    expect(classClass.toIntlString()).toBe('doc: core.class.Class')
+    const classClass = session.getInstance(core.class.StructuralFeature, core.class.Class)
+    expect(classClass._extends).toBe(core.class.Doc)
+    expect(classClass.toIntlString()).toBe('doc: core.class.StructuralFeature')
 
     expect(classClass._attributes._extends._class).toBe(core.class.RefTo)
     const refTo = classClass._attributes._extends.getClass()
