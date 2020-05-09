@@ -13,10 +13,9 @@
 // limitations under the License.
 //
 
-import { Ref, Class, Obj, Doc, Content } from '..'
+import { Ref, Class, Obj } from '..'
 import { IntlString } from '@anticrm/platform-core-i18n'
 import { classLabelId, attributeLabelId } from '../utils'
-import { mixinPropertyKey } from '../utils'
 import { mergeWith } from 'lodash'
 import { PluginDescriptor, Plugin, identify } from '@anticrm/platform'
 

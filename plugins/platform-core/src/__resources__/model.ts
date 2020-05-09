@@ -13,14 +13,12 @@
 // limitations under the License.
 //
 
-import ru from './strings/ru'
-
 import { Metadata } from '@anticrm/platform'
 
 import { BagOf, InstanceOf, RefTo } from '..'
-import { Ref, Class, Obj, Doc, Content, DiffDescriptors, PropertyType, Type, Container, Emb, ArrayOf } from '..'
+import { Ref, Class, Obj, Doc, Content, DiffDescriptors, PropertyType, Type, Container, Emb, ArrayOf, Session } from '..'
 
-import core from './id'
+import core from '.'
 
 export function newContainer<T extends Doc>(_class: Ref<Class<T>>, data: Content<T>): Container {
   return { _classes: [_class], ...(data as unknown as Content<Doc>) }
@@ -69,7 +67,7 @@ export function array<T extends PropertyType>(of: Type<T>): ArrayOf<T> {
   return newStruct(core.class.ArrayOf as Ref<Class<ArrayOf<T>>>, { of })
 }
 
-const model = [
+export const metaModel = [
   newContainer(core.class.Class, {
     _id: core.class.Emb,
     _native: core.native.Emb,
@@ -112,9 +110,6 @@ const model = [
   }, core.native.Class)
 ]
 
-export default {
-  strings: {
-    ru
-  },
-  model
+export default (session: Session) => {
+  session.loadModel(metaModel)
 }

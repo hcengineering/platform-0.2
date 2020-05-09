@@ -16,8 +16,8 @@
 import { Platform, identify, Plugin, PluginId } from '@anticrm/platform'
 import { Ref, Class, Doc, Emb, Type } from '@anticrm/platform-core'
 
-import core from '../__model__/id'
-import coreModel, { createClass, newContainer, array, str } from '../__model__'
+import core from '../__resources__'
+import { metaModel, createClass, newContainer, array, str } from '../__resources__/model'
 import startCorePlugin from '../plugin'
 
 interface SimpleClass extends Doc {
@@ -51,7 +51,7 @@ describe('session', () => {
   const platform = new Platform()
   const corePlugin = startCorePlugin(platform)
   const session = corePlugin.getSession()
-  session.loadModel(coreModel.model)
+  session.loadModel(metaModel)
 
   it('should get prototype', () => {
     const objectProto = (session as any).getPrototype(core.class.Doc)

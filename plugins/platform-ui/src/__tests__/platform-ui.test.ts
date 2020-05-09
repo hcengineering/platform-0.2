@@ -13,17 +13,17 @@
 // limitations under the License.
 //
 
-import { MemDb } from '../memdb'
-import core from '../__resources__/'
-import { metaModel } from '../__resources__/model'
+import platform from '@anticrm/platform'
+import startCorePlugin from '@anticrm/platform-core/src/plugin'
 
-describe('memdb', () => {
+describe('session', () => {
 
-  it('should load classes into memdb', () => {
-    const memdb = new MemDb()
-    memdb.load(metaModel)
-    const object = memdb.get(core.class.Emb)
-    expect(object._id).toBe(core.class.Emb)
-    expect(object._classes).toContain(core.class.Class)
+  const corePlugin = startCorePlugin(platform)
+  const session = corePlugin.getSession()
+  session.loadModel(coreModel.model)
+
+  it('should get prototype', () => {
+    const objectProto = (session as any).getPrototype(core.class.Doc)
+    expect(objectProto).toBeDefined()
   })
 })

@@ -15,7 +15,7 @@
 
 import { Metadata } from '@anticrm/platform'
 import { Session, Doc, Ref, Emb, Class, DiffDescriptors, Type, PropertyType, BagOf, Container, InstanceOf } from '..'
-import core from './id'
+import core from '.'
 
 export class Builder implements Session {
 

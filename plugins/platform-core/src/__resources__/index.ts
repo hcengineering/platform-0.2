@@ -14,13 +14,13 @@
 //
 
 import core, {
-  pluginId, Ref, Class, Doc, Type, PropertyType, Obj, RefTo, BagOf, ArrayOf, InstanceOf, Emb
+  Ref, Class, Doc, Type, PropertyType, Obj, RefTo, BagOf, ArrayOf, InstanceOf, Emb
 } from '..'
 
-import { mergeIds } from './utils'
-import { identify, Metadata } from '@anticrm/platform'
+import { extendIds } from './utils'
+import { Metadata } from '@anticrm/platform'
 
-export default mergeIds(core, identify(pluginId, {
+export default extendIds(core, {
   class: {
     Emb: '' as Ref<Class<Emb>>,
     Doc: '' as Ref<Class<Doc>>,
@@ -35,4 +35,4 @@ export default mergeIds(core, identify(pluginId, {
     ArrayOf: '' as Ref<Class<ArrayOf<PropertyType>>>,
     InstanceOf: '' as Ref<Class<InstanceOf<Emb>>>,
   },
-}))
+})

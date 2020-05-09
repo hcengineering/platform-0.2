@@ -14,7 +14,7 @@
 // 
 
 import { KeysByType } from 'simplytyped'
-import { PropType, AsString, Metadata, identify, Plugin, PluginId } from '@anticrm/platform'
+import { plugin, PropType, AsString, Metadata, identify, Plugin, PluginId } from '@anticrm/platform'
 
 export type AnyFunc = (...args: any[]) => any
 export type RemoveMethods<T extends object> = Omit<T, KeysByType<T, AnyFunc>>
@@ -118,25 +118,25 @@ export interface CorePlugin extends Plugin {
   getSession(): Session
 }
 
-export const pluginId = 'core' as PluginId<CorePlugin>
+export default plugin(
+  'core' as PluginId<CorePlugin>,
+  [],
+  {
+    native: {
+      Emb: '' as Metadata<Emb>,
+      Doc: '' as Metadata<Doc>,
 
-const core = identify(pluginId, {
-  native: {
-    Emb: '' as Metadata<Emb>,
-    Doc: '' as Metadata<Doc>,
+      Type: '' as Metadata<Type<PropertyType>>,
+      BagOf: '' as Metadata<BagOf<PropertyType>>,
+      ArrayOf: '' as Metadata<ArrayOf<PropertyType>>,
+      InstanceOf: '' as Metadata<InstanceOf<Emb>>,
 
-    Type: '' as Metadata<Type<PropertyType>>,
-    BagOf: '' as Metadata<BagOf<PropertyType>>,
-    ArrayOf: '' as Metadata<ArrayOf<PropertyType>>,
-    InstanceOf: '' as Metadata<InstanceOf<Emb>>,
+      Struct: '' as Metadata<Class<Emb>>,
+      Class: '' as Metadata<Class<Doc>>,
+    },
+    class: {
+      Class: '' as Ref<Class<Class<Obj>>>,
+      Struct: '' as Ref<Class<Class<Obj>>>,
+    },
+  })
 
-    Struct: '' as Metadata<Class<Emb>>,
-    Class: '' as Metadata<Class<Doc>>,
-  },
-  class: {
-    Class: '' as Ref<Class<Class<Obj>>>,
-    Struct: '' as Ref<Class<Class<Obj>>>,
-  },
-})
-
-export default core
