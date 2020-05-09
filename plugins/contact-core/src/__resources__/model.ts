@@ -16,22 +16,27 @@
 import contact from '.'
 import core from '@anticrm/platform-core/src/__resources__'
 
-import { Session } from '@anticrm/platform-core'
+import { Builder } from '@anticrm/platform-ui/src/__resources__/builder'
+import { IntlString } from '@anticrm/platform-core-i18n'
 
-export default (S: Session) => {
+export default (S: Builder) => {
 
   const email = S.createStruct(contact.class.Email, core.class.Type, {})
   const phone = S.createStruct(contact.class.Phone, core.class.Type, {})
   const twitter = S.createStruct(contact.class.Twitter, core.class.Type, {})
   const address = S.createStruct(contact.class.Address, core.class.Type, {})
 
-  S.createClass(contact.class.Contact, core.class.Doc, {
+  const contactClass = S.createClass(contact.class.Contact, core.class.Doc, {
     email: email.newInstance({}),
     phone: phone.newInstance({}),
     phoneWork: phone.newInstance({}),
     twitter: twitter.newInstance({}),
     address: address.newInstance({}),
     addressDelivery: address.newInstance({}),
+  })
+
+  S.decorateClass(contact.class.Contact, {
+    phone: S.typeDeco({ label: 'Телефон' as IntlString })
   })
 }
 

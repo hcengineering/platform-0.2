@@ -42,7 +42,8 @@ uiModel(new CoreBuilder(session))
 
 // Contact
 import contactCoreModel from '@anticrm/contact-core/src/__resources__/model'
-contactCoreModel(session)
+import { Builder as UIBuilder } from '@anticrm/platform-ui/src/__resources__/builder'
+contactCoreModel(new UIBuilder(session))
 
 // Test
 import { Ref } from '@anticrm/platform-core'

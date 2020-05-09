@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Session, Type, Ref, Class, Doc, Bag } from '@anticrm/platform-core'
+import { Session, Type, Ref, Class, Doc, Bag, Content } from '@anticrm/platform-core'
 import { IntlString } from '@anticrm/platform-core-i18n'
 
 import { Builder as CoreBuilder } from '@anticrm/platform-core/src/__resources__/builder'
@@ -34,7 +34,7 @@ export class Builder extends CoreBuilder {
     return meta.newInstance({})
   }
 
-  typeDeco(deco: TypeUIDecorator) {
+  typeDeco(deco: Content<TypeUIDecorator>) {
     const typeDecorator = this.session.getStruct(ui.class.TypeUIDecorator)
     return typeDecorator.newInstance(deco)
   }

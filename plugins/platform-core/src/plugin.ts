@@ -80,9 +80,9 @@ export default (platform: Platform): CorePlugin => {
   class TInstanceOf<T extends Emb> extends TType<T> {
     of!: Ref<Class<T>>
     exert(value: T) {
-      // console.log('instanceof instantiating: ')
-      // console.log(value)
-      return this.getSession().instantiate(value._class, value)
+      if (typeof value === 'object')
+        return this.getSession().instantiate(value._class, value)
+      return undefined
     }
   }
 
