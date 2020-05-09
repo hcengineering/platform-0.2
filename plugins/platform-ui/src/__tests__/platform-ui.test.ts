@@ -16,6 +16,9 @@
 import platform from '@anticrm/platform'
 import startCorePlugin from '@anticrm/platform-core/src/plugin'
 
+import { Class, Obj, Ref, Doc } from '@anticrm/platform-core'
+import { ClassUIDecorator } from '@anticrm/platform-ui'
+
 import core from '@anticrm/platform-core/src/__resources__'
 import ui from '../__resources__'
 
@@ -39,6 +42,11 @@ describe('session', () => {
   })
 
   it('should add ui decorator to Class<Class>', () => {
-    const decorator = session.getClass(ui.class.ClassUIDecorator)
+    const classClass = session.getClass(core.class.Class) as Doc
+    console.log(classClass)
+    // session.mixin(classClass, ui.class.ClassUIDecorator as Ref<Class<ClassUIDecorator<Obj>>>, {
+
+    // })
+    //const decorator = session.getClass(ui.class.ClassUIDecorator)
   })
 })

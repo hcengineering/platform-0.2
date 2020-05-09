@@ -14,10 +14,9 @@
 //
 
 import { Platform, Metadata } from '@anticrm/platform'
-import { CorePlugin, pluginId } from '.'
 import core, {
   Obj, Doc, Ref, Bag, Class, Type, Emb,
-  PropertyType, BagOf, Content
+  PropertyType, BagOf, Content, CorePlugin, DiffDescriptors
 } from '.'
 import { TSession, SessionProto, Konstructor, Layout } from './session'
 
@@ -26,7 +25,7 @@ import { TSession, SessionProto, Konstructor, Layout } from './session'
 class TCorePlugin implements CorePlugin {
 
   readonly platform: Platform
-  readonly pluginId = pluginId
+  readonly pluginId = core.id
 
   private session: TSession
 
@@ -175,16 +174,8 @@ export default (platform: Platform): CorePlugin => {
 
     createConstructor(): Konstructor<T> {
       const session = this.getSession()
-      const _class = this._id
-      return data => {
-        const _id = (data as Content<Doc>)._id
-        const container = session.getContainer(_id, true)
-        container._classes.push(_class)
-        const instance = session.instantiate(_class, container)
-        Object.assign(instance, data)
-        session.reindexContainer(container)
-        return instance as T
-      }
+      const _class = this._id as Ref<Class<T>>
+      return data => session.createDocument(_class, data)
     }
 
     newInstance(data: Content<T>): T {

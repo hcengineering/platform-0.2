@@ -16,7 +16,7 @@
 import { Platform, Metadata } from '@anticrm/platform'
 import { MemDb } from './memdb'
 import core, {
-  Obj, Doc, Ref, Bag, Class, Type, Emb,
+  Obj, Doc, Ref, Bag, Class, Type, Emb, Content,
   PropertyType, DiffDescriptors, Container, Session, ContainerId
 } from '.'
 
@@ -100,6 +100,21 @@ export class TSession implements Session {
     return instance
   }
 
+  createDocument<T extends Doc>(_class: Ref<Class<T>>, data: object): T {
+    const _id = (data as Content<Doc>)._id
+    const container = this.memdb.get(_id, true) // TODO: must be create! raise error if container exists
+    container._classes.push(_class)
+    const instance = this.instantiate(_class, container)
+    Object.assign(instance, data)
+    this.memdb.index(container)
+    return instance as T
+  }
+
+  mixin<T extends E, E extends Doc>(obj: E, _class: Ref<Class<T>>, data: DiffDescriptors<T, E>): T {
+    const _id = obj._id as Ref<T>
+    return this.createDocument(_class, { _id, ...data })
+  }
+
   getInstance<T extends Doc>(ref: Ref<T>, as: Ref<Class<T>>): T {
     return this.instantiate(as, this.memdb.get(ref))
   }
@@ -107,16 +122,9 @@ export class TSession implements Session {
   getClass<T extends Doc>(_class: Ref<Class<T>>): Class<T> {
     return this.getInstance(_class, core.class.Class) as Class<T>
   }
+
   getStruct<T extends Emb>(_class: Ref<Class<T>>): Class<T> {
     return this.getInstance(_class, core.class.Struct) as Class<T>
-  }
-
-  getContainer(id: ContainerId, create?: boolean): Container {
-    return this.memdb.get(id, create)
-  }
-
-  reindexContainer(container: Container) {
-    this.memdb.index(container)
   }
 
   private extends<T extends Obj>(_class: Ref<Class<T>>, _extends: Ref<Class<Obj>>): boolean {

@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { identify, Metadata, Plugin, PluginId, plugin } from '@anticrm/platform'
+import { Metadata, Plugin, PluginId, plugin } from '@anticrm/platform'
 import { Doc, Emb, Obj, AnyType, Ref, Class, Bag } from '@anticrm/platform-core'
 import { IntlString } from '@anticrm/platform-core-i18n'
 
@@ -30,7 +30,7 @@ export interface TypeUIDecorator extends UIDecorator {
   placeholder?: IntlString
 }
 
-export interface ClassUIDecorator extends Class<Obj> {
+export interface ClassUIDecorator<T extends Obj> extends Class<T> {
   decorators: Bag<TypeUIDecorator>
 }
 
@@ -69,7 +69,7 @@ export default plugin(
       Search: '' as Asset,
     },
     class: {
-      ClassUIDecorator: '' as Ref<Class<ClassUIDecorator>>
+      ClassUIDecorator: '' as Ref<Class<ClassUIDecorator<Obj>>>
     }
   }
 )

@@ -101,6 +101,8 @@ export interface Session {
   loadModel(docs: Container[]): void
   dump(): Container[]
 
+  mixin<T extends E, E extends Doc>(obj: E, _class: Ref<Class<T>>, data: DiffDescriptors<T, E>): T
+
   // Class Helpers
   getStruct<T extends Emb>(_struct: Ref<Class<T>>): Class<T>
   getClass<T extends Doc>(_class: Ref<Class<T>>): Class<T>
