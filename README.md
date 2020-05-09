@@ -1,5 +1,7 @@
 # Anticrm Platform
 
+![CI](https://github.com/anticrm/platform/workflows/CI/badge.svg)
+
 Any Anticrm application is nothing but a set of installed Anticrm `plugins`. 
 At the very core `Platform` is a simple piece of code, which connects plugins together.
 
