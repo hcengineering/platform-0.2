@@ -30,7 +30,7 @@ export interface TypeUIDecorator extends UIDecorator {
   placeholder?: IntlString
 }
 
-export interface ClassUIDecorator<T extends Obj> extends Class<T> {
+export interface ClassUIDecorator<T extends Doc> extends Class<T> {
   decorators: Bag<TypeUIDecorator>
 }
 
@@ -69,7 +69,7 @@ export default plugin(
       Search: '' as Asset,
     },
     class: {
-      ClassUIDecorator: '' as Ref<Class<ClassUIDecorator<Obj>>>
+      ClassUIDecorator: '' as Ref<Class<ClassUIDecorator<Doc>>>
     }
   }
 )
