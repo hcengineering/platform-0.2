@@ -134,14 +134,12 @@ export default (platform: Platform): CorePlugin => {
 
   // S T R U C T U R A L  F E A T U R E S
 
-  class TStructuralFeature<T extends Obj> extends TDoc implements Class<T> {
+  abstract class TStructuralFeature<T extends Obj> extends TDoc implements Class<T> {
     _attributes!: Bag<Type<PropertyType>>
     _extends?: Ref<Class<Obj>>
     _native?: Metadata<T>
 
-    createConstructor(): Konstructor<T> {
-      throw new Error('abstract')
-    }
+    abstract createConstructor(): Konstructor<T>
 
     newInstance(data: Content<T>): T {
       const session = this.getSession()
