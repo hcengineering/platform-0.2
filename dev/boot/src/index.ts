@@ -21,7 +21,7 @@ import coreModel from '@anticrm/platform-core/src/__model__'
 
 import { pluginId as uiPluginId } from '@anticrm/platform-ui'
 import startUI from '@anticrm/platform-ui/src/plugin'
-// import uiModel from '@anticrm/platform-ui/src/__resources__'
+import uiMeta from '@anticrm/platform-ui/src/__resources__/meta'
 
 import contactCoreModel from '@anticrm/contact-core/src/__model__'
 import contactCore, { Contact } from '@anticrm/contact-core'
@@ -42,6 +42,8 @@ contactClass.newInstance({
   _id: contact1,
   phone: '+7 913 333 5555'
 })
+
+platform.loadMeta(uiMeta)
 
 const uiPlugin = startUI(platform)
 platform.setPlugin(uiPluginId, uiPlugin)

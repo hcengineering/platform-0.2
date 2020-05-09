@@ -20,20 +20,22 @@ import platform from '@anticrm/platform'
 
 import { Obj } from '@anticrm/platform-core'
 
-import { UIPlugin, pluginId } from '@anticrm/platform-ui'
+import { UIPlugin, pluginId, AttrModel } from '@anticrm/platform-ui'
 import InlineEdit from '@anticrm/platform-ui-controls/src/InlineEdit.vue'
 
 export default Vue.extend({
   components: { InlineEdit },
   props: {
-    object: Object as PropType<Obj>,
+    object: Object as PropType<Promise<Obj>>,
     filter: Array as PropType<string[]>
   },
-  computed: {
-    model() {
-      const uiPlugin = platform.getPlugin(pluginId)
-      return uiPlugin.getAttrModel(this.object, this.filter)
+  data() {
+    return {
+      model: this.$uiPlugin.getDefaultAttrModel(this.filter)
     }
+  },
+  created() {
+    this.$uiPlugin.getAttrModel(this.object, this.filter).then(result => this.model = result)
   }
 })
 </script>

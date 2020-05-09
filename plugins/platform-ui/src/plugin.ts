@@ -13,11 +13,12 @@
 // limitations under the License.
 //
 
+import Vue from 'vue'
 
 import { Doc, Obj } from '@anticrm/platform-core'
 import { Platform } from '@anticrm/platform'
 import { CorePlugin, pluginId as corePluginId } from '@anticrm/platform-core'
-import ui, { pluginId, UIPlugin } from '.'
+import ui, { pluginId, UIPlugin, AttrModel } from '.'
 
 // import { attributeLabelId } from '@anticrm/platform-core/src/utils'
 
@@ -30,7 +31,11 @@ class UIPluginImpl implements UIPlugin {
     this.platform = platform
   }
 
-  getAttrModel(object: Obj, props: string[]) {
+  getDefaultAttrModel(props: string[]): AttrModel[] {
+    return []
+  }
+
+  async getAttrModel(object: Obj, props: string[]): Promise<AttrModel[]> {
     const clazz = object.getClass()
     return props.map(key => ({
       key,
@@ -43,5 +48,7 @@ class UIPluginImpl implements UIPlugin {
 }
 
 export default (platform: Platform): UIPlugin => {
-  return new UIPluginImpl(platform)
+  const uiPlugin = new UIPluginImpl(platform)
+  Vue.prototype.$uiPlugin = uiPlugin
+  return uiPlugin
 }

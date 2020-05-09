@@ -15,17 +15,17 @@
 
 import { identify, Metadata, Plugin, PluginId } from '@anticrm/platform'
 import { Doc, Obj, AnyType, Ref, Class } from '@anticrm/platform-core'
-import i18n from '@anticrm/platform-core-i18n'
+//import i18n from '@anticrm/platform-core-i18n'
 
 export type Asset = Metadata<string>
 
-/////
+// M O D E L
 
 export interface UIDecorator extends Doc {
   icon: Asset
 }
 
-/////
+// P L U G I N
 
 export interface AttrModel {
   key: string
@@ -35,8 +35,11 @@ export interface AttrModel {
 }
 
 export interface UIPlugin extends Plugin {
-  getAttrModel(object: Obj, props: string[]): AttrModel[]
+  getDefaultAttrModel(props: string[]): AttrModel[]
+  getAttrModel(object: Obj, props: string[]): Promise<AttrModel[]>
 }
+
+// D E S C R I P T O R
 
 export const pluginId = 'ui' as PluginId<UIPlugin>
 

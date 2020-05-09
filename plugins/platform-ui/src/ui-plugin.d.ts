@@ -13,5 +13,11 @@
 // limitations under the License.
 //
 
-import '@anticrm/dev-boot'
+import Vue from 'vue'
+import { UIPlugin } from '.'
 
+declare module 'vue/types/vue' {
+  interface Vue {
+    $uiPlugin: UIPlugin
+  }
+}

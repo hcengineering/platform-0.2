@@ -137,23 +137,3 @@ export function plugin<P extends Plugin, N extends Namespace>(id: PluginId<P>, n
 }
 
 export default new Platform()
-
-// const pluginId = 'zzz' as PluginId<Plugin>
-// type Asset = Metadata<string>
-
-// const ui = plugin(
-//   'zzz' as PluginId<Plugin>,
-//   {
-//     icon: {
-//       AddGroup: '' as Asset,
-//       Add: '' as Asset,
-//       Checked: '' as Asset,
-//       Edit: '' as Asset,
-//       Search: '' as Asset,
-//     },
-//     class: {
-//       UIDecorator: '' as Metadata<number>,
-//     }
-//   }
-// )
-
