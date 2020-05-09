@@ -110,6 +110,16 @@ export class TSession implements Session {
     return instance as T
   }
 
+  as<T extends Doc>(doc: Layout<Doc>, _class: Ref<Class<T>>): T | undefined {
+    const layout = doc.__layout
+    if (!layout)
+      throw new Error('layout not found')
+    const classes = layout._classes as string[]
+    if (classes.includes(_class))
+      return this.instantiate(_class, layout)
+    return undefined
+  }
+
   mixin<T extends E, E extends Doc>(obj: E, _class: Ref<Class<T>>, data: Omit<T, keyof E>): T {
     const _id = obj._id as Ref<T>
     return this.createDocument(_class, { _id, ...data })

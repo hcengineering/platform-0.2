@@ -48,6 +48,10 @@ export class Builder implements Session {
     return this.session.getClass(_class)
   }
 
+  mixin<T extends E, E extends Doc>(obj: E, _class: Ref<Class<T>>, data: Omit<T, keyof E>): T {
+    return this.session.mixin(obj, _class, data)
+  }
+
   createClass<T extends E, E extends Doc>(
     _id: Ref<Class<T>>, _extends: Ref<Class<E>>,
     _attributes: DiffDescriptors<T, E>, _native?: Metadata<T>): Class<T> {

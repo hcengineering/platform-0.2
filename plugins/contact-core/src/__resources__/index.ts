@@ -14,12 +14,11 @@
 //
 
 import { Ref, Class, Type } from '@anticrm/platform-core'
-import { mergeIds } from '@anticrm/platform-core/src/__model__/utils'
-import { identify } from '@anticrm/platform/'
+import { extendIds } from '@anticrm/platform-core/src/__resources__/utils'
 
-import contact, { pluginId } from '..'
+import contact from '..'
 
-export default mergeIds(contact, identify(pluginId, {
+export default extendIds(contact, {
   class: {
     Email: '' as Ref<Class<Type<string>>>,
     Phone: '' as Ref<Class<Type<string>>>,
@@ -27,4 +26,4 @@ export default mergeIds(contact, identify(pluginId, {
     Address: '' as Ref<Class<Type<string>>>,
 
   }
-}))
+})

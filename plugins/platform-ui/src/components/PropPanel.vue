@@ -20,7 +20,7 @@ import platform from '@anticrm/platform'
 
 import { Obj } from '@anticrm/platform-core'
 
-import { UIPlugin, pluginId, AttrModel } from '@anticrm/platform-ui'
+import ui, { UIPlugin, AttrModel } from '@anticrm/platform-ui'
 import InlineEdit from '@anticrm/platform-ui-controls/src/InlineEdit.vue'
 
 export default Vue.extend({

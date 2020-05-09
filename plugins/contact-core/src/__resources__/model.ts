@@ -13,12 +13,12 @@
 // limitations under the License.
 //
 
-import contact from './id'
-import core from '@anticrm/platform-core/src/__model__/id'
+import contact from '.'
+import core from '@anticrm/platform-core/src/__resources__'
 
 import { Session } from '@anticrm/platform-core'
 
-function builder(S: Session) {
+export default (S: Session) => {
 
   const email = S.createStruct(contact.class.Email, core.class.Type, {})
   const phone = S.createStruct(contact.class.Phone, core.class.Type, {})
@@ -35,6 +35,3 @@ function builder(S: Session) {
   })
 }
 
-export default {
-  builder
-}

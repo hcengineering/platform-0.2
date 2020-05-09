@@ -17,32 +17,32 @@ import platform from '@anticrm/platform'
 
 // S E T  M E T A D A T A
 
-// import uiMeta from '@anticrm/platform-ui/src/__resources__/meta'
-// platform.loadMeta(uiMeta)
+import uiMeta from '@anticrm/platform-ui/src/__resources__/meta'
+platform.loadMeta(uiMeta)
 
 // S T A R T  C O R E  P L U G I N
 
-import { pluginId as corePluginId } from '@anticrm/platform-core'
+import core from '@anticrm/platform-core'
 import startCore from '@anticrm/platform-core/src/plugin'
 
 const corePlugin = startCore(platform)
 const session = corePlugin.getSession()
-platform.setPlugin(corePluginId, corePlugin)
+platform.setPlugin(core.id, corePlugin)
 
 // B U I L D  M O D E L S
 
 // Core
-import coreModel from '@anticrm/platform-core/src/__model__'
-session.loadModel(coreModel.model)
+import { metaModel } from '@anticrm/platform-core/src/__resources__/model'
+session.loadModel(metaModel)
 
 // UI 
 import uiModel from '@anticrm/platform-ui/src/__resources__/model'
-import { Builder as CoreBuilder } from '@anticrm/platform-core/src/__model__/builder'
+import { Builder as CoreBuilder } from '@anticrm/platform-core/src/__resources__/builder'
 uiModel(new CoreBuilder(session))
 
 // Contact
-import contactCoreModel from '@anticrm/contact-core/src/__model__'
-contactCoreModel.builder(session)
+import contactCoreModel from '@anticrm/contact-core/src/__resources__/model'
+contactCoreModel(session)
 
 // Test
 import { Ref } from '@anticrm/platform-core'
@@ -61,10 +61,10 @@ contactClass.newInstance({
 import ui from '@anticrm/platform-ui'
 import startUI from '@anticrm/platform-ui/src/plugin'
 
-// const uiPlugin = startUI(platform)
-// platform.setPlugin(ui.id, uiPlugin)
+const uiPlugin = startUI(platform)
+platform.setPlugin(ui.id, uiPlugin)
 
 // D U M P
 
-console.log(session.dump())
-console.log(JSON.stringify(session.dump(), null, 2))
+// console.log(session.dump())
+// console.log(JSON.stringify(session.dump(), null, 2))

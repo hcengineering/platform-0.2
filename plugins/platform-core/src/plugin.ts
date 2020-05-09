@@ -63,11 +63,7 @@ export default (platform: Platform): CorePlugin => {
     }
 
     as<T extends Doc>(_class: Ref<Class<T>>): T | undefined {
-      const session = this.getSession()
-      const layout = (this as unknown as Layout<T>).__layout
-      if (!layout)
-        throw new Error('layout not found')
-      return session.instantiate(_class, layout)
+      return this.getSession().as(this as unknown as Layout<Doc>, _class)
     }
 
     __mapKey(_class: Ref<Class<Obj>>, key: string) { return key.startsWith('_') ? key : _class + ':' + key }
@@ -130,7 +126,9 @@ export default (platform: Platform): CorePlugin => {
   class TBagOf<T extends PropertyType> extends TType<Bag<T>> implements BagOf<T> {
     of!: Type<T>
     exert(value: Bag<T>) {
-      return new Proxy(value, new BagProxyHandler(this.of))
+      if (typeof value === 'object')
+        return new Proxy(value, new BagProxyHandler(this.of))
+      return undefined
     }
   }
 

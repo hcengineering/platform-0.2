@@ -17,7 +17,6 @@ import Vue from 'vue'
 
 import { Doc, Obj, Type, PropertyType, Class } from '@anticrm/platform-core'
 import { Platform } from '@anticrm/platform'
-import { CorePlugin, pluginId as corePluginId } from '@anticrm/platform-core'
 import ui, { UIPlugin, AttrModel } from '.'
 import { IntlString } from '@anticrm/platform-core-i18n'
 
