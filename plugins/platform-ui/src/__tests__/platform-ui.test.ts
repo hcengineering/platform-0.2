@@ -27,6 +27,8 @@ import { Builder } from '@anticrm/platform-core/src/__resources__/builder'
 
 import uiModel from '../__resources__/model'
 
+import { IntlString } from '@anticrm/platform-core-i18n'
+
 describe('session', () => {
 
   const corePlugin = startCorePlugin(platform)
@@ -42,11 +44,14 @@ describe('session', () => {
   })
 
   it('should add ui decorator to Class<Class>', () => {
-    const classClass = session.getClass(core.class.Class) as Doc
-    console.log(classClass)
-    // session.mixin(classClass, ui.class.ClassUIDecorator as Ref<Class<ClassUIDecorator<Obj>>>, {
-
-    // })
-    //const decorator = session.getClass(ui.class.ClassUIDecorator)
+    const typeDecorator = session.getStruct(ui.class.TypeUIDecorator)
+    const classClass = session.getClass(core.class.Class)
+    const decoClass = session.mixin(classClass, ui.class.ClassUIDecorator as Ref<Class<ClassUIDecorator<Class<Obj>>>>, {
+      decorators: {
+        _attributes: typeDecorator.newInstance({ label: 'The Label' as IntlString })
+      }
+    })
+    expect(decoClass.decorators._attributes.label).toBe('The Label')
+    expect(decoClass._native).toBe(core.native.Class)
   })
 })

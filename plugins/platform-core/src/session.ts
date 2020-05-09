@@ -110,7 +110,7 @@ export class TSession implements Session {
     return instance as T
   }
 
-  mixin<T extends E, E extends Doc>(obj: E, _class: Ref<Class<T>>, data: DiffDescriptors<T, E>): T {
+  mixin<T extends E, E extends Doc>(obj: E, _class: Ref<Class<T>>, data: Omit<T, keyof E>): T {
     const _id = obj._id as Ref<T>
     return this.createDocument(_class, { _id, ...data })
   }
