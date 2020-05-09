@@ -133,10 +133,12 @@ export default plugin(
       ArrayOf: '' as Metadata<ArrayOf<PropertyType>>,
       InstanceOf: '' as Metadata<InstanceOf<Emb>>,
 
+      StructuralFeature: '' as Metadata<Class<Obj>>,
       Struct: '' as Metadata<Class<Emb>>,
       Class: '' as Metadata<Class<Doc>>,
     },
     class: {
+      StructuralFeature: '' as Ref<Class<Class<Obj>>>,
       Class: '' as Ref<Class<Class<Obj>>>,
       Struct: '' as Ref<Class<Class<Obj>>>,
     },

@@ -134,22 +134,13 @@ export default (platform: Platform): CorePlugin => {
 
   // S T R U C T U R A L  F E A T U R E S
 
-  class TStruct<T extends Obj> extends TDoc implements Class<T> {
+  class TStructuralFeature<T extends Obj> extends TDoc implements Class<T> {
     _attributes!: Bag<Type<PropertyType>>
     _extends?: Ref<Class<Obj>>
     _native?: Metadata<T>
 
-    toIntlString(plural?: number): string { return 'struct: ' + this._id }
-
     createConstructor(): Konstructor<T> {
-      const session = this.getSession()
-      const _class = this._id
-      return data => {
-        const instance = session.instantiate(_class, data) as Layout<T>
-        Object.assign(instance, data)
-        instance.__layout._class = _class
-        return instance as T
-      }
+      throw new Error('abstract')
     }
 
     newInstance(data: Content<T>): T {
@@ -163,27 +154,28 @@ export default (platform: Platform): CorePlugin => {
     }
   }
 
-  class TClass<T extends Doc> extends TDoc implements Class<T> {
-    _attributes!: Bag<Type<PropertyType>>
-    _extends?: Ref<Class<Obj>>
-    _native?: Metadata<T>
+  class TStruct<T extends Obj> extends TStructuralFeature<T> {
+    toIntlString(plural?: number): string { return 'struct: ' + this._id }
 
+    createConstructor(): Konstructor<T> {
+      const session = this.getSession()
+      const _class = this._id
+      return data => {
+        const instance = session.instantiate(_class, data) as Layout<T>
+        Object.assign(instance, data)
+        instance.__layout._class = _class
+        return instance as T
+      }
+    }
+  }
+
+  class TClass<T extends Doc> extends TStructuralFeature<T> {
     toIntlString(plural?: number): string { return 'doc: ' + this._id }
 
     createConstructor(): Konstructor<T> {
       const session = this.getSession()
       const _class = this._id as Ref<Class<T>>
       return data => session.createDocument(_class, data)
-    }
-
-    newInstance(data: Content<T>): T {
-      const session = this.getSession()
-      let ctor = session.constructors.get(this._id)
-      if (!ctor) {
-        ctor = this.createConstructor()
-        session.constructors.set(this._id, ctor)
-      }
-      return ctor(data) as T
     }
   }
 
@@ -195,6 +187,7 @@ export default (platform: Platform): CorePlugin => {
   platform.setMetadata(core.native.ArrayOf, TArrayOf.prototype)
   platform.setMetadata(core.native.InstanceOf, TInstanceOf.prototype)
 
+  platform.setMetadata(core.native.StructuralFeature, TStructuralFeature.prototype)
   platform.setMetadata(core.native.Class, TClass.prototype)
   platform.setMetadata(core.native.Struct, TStruct.prototype)
 
