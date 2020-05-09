@@ -31,6 +31,8 @@ export interface TypeUIDecorator extends UIDecorator {
 }
 
 export interface ClassUIDecorator<T extends Doc> extends Class<T> {
+  label?: IntlString
+  icon?: Asset
   decorators: Bag<TypeUIDecorator>
 }
 

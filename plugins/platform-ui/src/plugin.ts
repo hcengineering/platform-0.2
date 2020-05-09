@@ -43,7 +43,8 @@ class UIPluginImpl implements UIPlugin {
     return props.map(key => {
       const decorator = clazz.as(ui.class.ClassUIDecorator)
       const type = decorator?.decorators[key]
-      const label = type?.label ?? clazz._id + '_' + key as IntlString
+      const typeClassDeco = type?.getClass().as(ui.class.ClassUIDecorator)
+      const label = type?.label ?? typeClassDeco?.label ?? clazz._id + '_' + key as IntlString
       const placeholder = type?.placeholder ?? 'Placeholder'
       return {
         key,
