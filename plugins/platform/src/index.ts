@@ -28,7 +28,7 @@ export interface Plugin {
 
 export interface PluginDescriptor<P extends Plugin> {
   id: PluginId<P>,
-  deps?: PluginId<Plugin>[]
+  deps: PluginId<Plugin>[]
 }
 
 //////////////
@@ -132,8 +132,8 @@ export function identify<N extends Namespace>(pluginId: PluginId<Plugin>, namesp
   return transform(pluginId, namespace, (id: string, value) => value === '' ? id : value)
 }
 
-export function plugin<P extends Plugin, N extends Namespace>(id: PluginId<P>, namespace: N): PluginDescriptor<P> & N {
-  return { id, ...identify(id, namespace) }
+export function plugin<P extends Plugin, N extends Namespace>(id: PluginId<P>, deps: PluginId<Plugin>[], namespace: N): PluginDescriptor<P> & N {
+  return { id, deps, ...identify(id, namespace) }
 }
 
 export default new Platform()

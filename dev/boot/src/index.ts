@@ -15,27 +15,40 @@
 
 import platform from '@anticrm/platform'
 
+// S E T  M E T A D A T A
+
+// import uiMeta from '@anticrm/platform-ui/src/__resources__/meta'
+// platform.loadMeta(uiMeta)
+
+// S T A R T  C O R E  P L U G I N
+
 import { pluginId as corePluginId } from '@anticrm/platform-core'
 import startCore from '@anticrm/platform-core/src/plugin'
-import coreModel from '@anticrm/platform-core/src/__model__'
-
-import { pluginId as uiPluginId } from '@anticrm/platform-ui'
-import startUI from '@anticrm/platform-ui/src/plugin'
-import uiMeta from '@anticrm/platform-ui/src/__resources__/meta'
-
-import contactCoreModel from '@anticrm/contact-core/src/__model__'
-import contactCore, { Contact } from '@anticrm/contact-core'
-
-import { Ref } from '@anticrm/platform-core'
-
-export const contact1 = 'test.contact.1' as Ref<Contact>
 
 const corePlugin = startCore(platform)
 const session = corePlugin.getSession()
 platform.setPlugin(corePluginId, corePlugin)
 
+// B U I L D  M O D E L S
+
+// Core
+import coreModel from '@anticrm/platform-core/src/__model__'
 session.loadModel(coreModel.model)
+
+// UI 
+import uiModel from '@anticrm/platform-ui/src/__resources__/model'
+import { Builder as CoreBuilder } from '@anticrm/platform-core/src/__model__/builder'
+uiModel(new CoreBuilder(session))
+
+// Contact
+import contactCoreModel from '@anticrm/contact-core/src/__model__'
 contactCoreModel.builder(session)
+
+// Test
+import { Ref } from '@anticrm/platform-core'
+import contactCore, { Contact } from '@anticrm/contact-core'
+
+export const contact1 = 'test.contact.1' as Ref<Contact>
 
 const contactClass = session.getClass(contactCore.class.Contact)
 contactClass.newInstance({
@@ -43,7 +56,15 @@ contactClass.newInstance({
   phone: '+7 913 333 5555'
 })
 
-platform.loadMeta(uiMeta)
+// S T A R T  U I  P L U G I N
 
-const uiPlugin = startUI(platform)
-platform.setPlugin(uiPluginId, uiPlugin)
+import ui from '@anticrm/platform-ui'
+import startUI from '@anticrm/platform-ui/src/plugin'
+
+// const uiPlugin = startUI(platform)
+// platform.setPlugin(ui.id, uiPlugin)
+
+// D U M P
+
+console.log(session.dump())
+console.log(JSON.stringify(session.dump(), null, 2))

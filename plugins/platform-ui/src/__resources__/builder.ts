@@ -13,19 +13,24 @@
 // limitations under the License.
 //
 
-import ui, { TypeUIDecorator, UIDecorator } from '..'
-
-import { Ref, Class, Type } from '@anticrm/platform-core'
+import { Session, Type } from '@anticrm/platform-core'
 import { IntlString } from '@anticrm/platform-core-i18n'
 
-import { extendIds } from '@anticrm/platform-core/src/__model__/utils'
+import { Builder as CoreBuilder } from '@anticrm/platform-core/src/__model__/builder'
+import ui from '.'
 
-export default extendIds(ui, {
-  class: {
-    IntlString: '' as Ref<Class<Type<IntlString>>>,
+export class Builder extends CoreBuilder {
 
-    UIDecorator: '' as Ref<Class<UIDecorator>>,
-    TypeUIDecorator: '' as Ref<Class<TypeUIDecorator>>,
+  protected session: Session
+
+  constructor(session: Session) {
+    super(session)
+    this.session = session
   }
-})
 
+  i18n(): Type<IntlString> {
+    const meta = this.session.getStruct(ui.class.IntlString)
+    return meta.newInstance({})
+  }
+
+}

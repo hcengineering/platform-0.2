@@ -13,5 +13,6 @@
 // limitations under the License.
 //
 
+import '@anticrm/dev-boot/src/meta'
 import '@anticrm/dev-boot'
 

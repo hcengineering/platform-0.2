@@ -18,6 +18,7 @@ import { IntlString } from '@anticrm/platform-core-i18n'
 import { classLabelId, attributeLabelId } from '../utils'
 import { mixinPropertyKey } from '../utils'
 import { mergeWith } from 'lodash'
+import { PluginDescriptor, Plugin, identify } from '@anticrm/platform'
 
 type Labels<T extends Obj> = {
   [P in keyof T]?: string
@@ -62,6 +63,16 @@ type PluginIds = { [key: string]: { [key: string]: any } }
 
 export function mergeIds<A extends PluginIds, B extends PluginIds>(a: A, b: B): A & B {
   return mergeWith({}, a, b, (value) => {
+    if (typeof value === 'string') {
+      throw new Error('attempting to overwrite ' + value)
+    }
+  })
+}
+
+type Namespace = Record<string, Record<string, any>>
+
+export function extendIds<P extends Plugin, D extends PluginDescriptor<P>, N extends Namespace>(a: D, b: N): D & N {
+  return mergeWith({}, a, identify(a.id, b), (value) => {
     if (typeof value === 'string') {
       throw new Error('attempting to overwrite ' + value)
     }

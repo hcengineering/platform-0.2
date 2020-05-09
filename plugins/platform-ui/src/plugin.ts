@@ -15,16 +15,15 @@
 
 import Vue from 'vue'
 
-import { Doc, Obj } from '@anticrm/platform-core'
+import { Doc, Obj, Type, PropertyType, Class } from '@anticrm/platform-core'
 import { Platform } from '@anticrm/platform'
 import { CorePlugin, pluginId as corePluginId } from '@anticrm/platform-core'
-import ui, { pluginId, UIPlugin, AttrModel } from '.'
-
-// import { attributeLabelId } from '@anticrm/platform-core/src/utils'
+import ui, { UIPlugin, AttrModel } from '.'
+import { IntlString } from '@anticrm/platform-core-i18n'
 
 class UIPluginImpl implements UIPlugin {
 
-  readonly pluginId = pluginId
+  readonly pluginId = ui.id
   readonly platform: Platform
 
   constructor(platform: Platform) {
@@ -35,15 +34,25 @@ class UIPluginImpl implements UIPlugin {
     return []
   }
 
+  /** 
+    Here is a summary on an attribute label search order
+      1. Type's UI Decorator `label` attribute
+      2. If (1) missed, construct IntlString Id synthetically
+  */
   async getAttrModel(object: Obj, props: string[]): Promise<AttrModel[]> {
     const clazz = object.getClass()
-    return props.map(key => ({
-      key,
-      type: clazz._attributes[key],
-      // label: this.translate(attributeLabelId(object._class, key)),
-      label: object._class + '.' + key,
-      placeholder: 'Placeholder',
-    }))
+    return props.map(key => {
+      const decorator = clazz.as(ui.class.ClassUIDecorator)
+      const type = decorator?.decorators[key]
+      const label = type?.label ?? clazz._id + '_' + key as IntlString
+      const placeholder = type?.placeholder ?? 'Placeholder'
+      return {
+        key,
+        type: clazz._attributes[key],
+        label,
+        placeholder
+      }
+    })
   }
 }
 

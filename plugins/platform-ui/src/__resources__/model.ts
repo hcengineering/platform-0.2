@@ -13,19 +13,25 @@
 // limitations under the License.
 //
 
-import ui, { TypeUIDecorator, UIDecorator } from '..'
+import core from '@anticrm/platform-core/src/__model__/id'
+import ui from '.'
 
-import { Ref, Class, Type } from '@anticrm/platform-core'
-import { IntlString } from '@anticrm/platform-core-i18n'
+import { Builder } from '@anticrm/platform-core/src/__model__/builder'
 
-import { extendIds } from '@anticrm/platform-core/src/__model__/utils'
+export default (B: Builder) => {
+  const i18n = B.createStruct(ui.class.IntlString, core.class.Type, {})
 
-export default extendIds(ui, {
-  class: {
-    IntlString: '' as Ref<Class<Type<IntlString>>>,
+  B.createStruct(ui.class.UIDecorator, core.class.Emb, {
+    label: i18n.newInstance({}),
+    icon: B.meta()
+  })
 
-    UIDecorator: '' as Ref<Class<UIDecorator>>,
-    TypeUIDecorator: '' as Ref<Class<TypeUIDecorator>>,
-  }
-})
+  B.createStruct(ui.class.TypeUIDecorator, ui.class.UIDecorator, {
+    placeholder: i18n.newInstance({}),
+  })
 
+  B.createClass(ui.class.ClassUIDecorator, core.class.Class, {
+    decorators: B.bag(B.struct(ui.class.TypeUIDecorator))
+  })
+
+}

@@ -14,7 +14,7 @@
 //
 
 import { Metadata } from '@anticrm/platform'
-import { Session, Doc, Ref, Emb, Class, DiffDescriptors, Type } from '..'
+import { Session, Doc, Ref, Emb, Class, DiffDescriptors, Type, PropertyType, BagOf, Container, InstanceOf } from '..'
 import core from './id'
 
 export class Builder implements Session {
@@ -24,14 +24,20 @@ export class Builder implements Session {
   constructor(session: Session) {
     this.session = session
   }
-  getInstance<T extends Doc>(ref: Ref<T>, as: Ref<Class<T>>): T {
-    throw new Error("Method not implemented.")
+
+  meta<T>(): Type<Metadata<T>> {
+    const meta = this.session.getStruct(core.class.Metadata)
+    return meta.newInstance({})
   }
-  loadModel(docs: import("..").Container[]): void {
-    throw new Error("Method not implemented.")
+
+  bag<T extends PropertyType>(of: Type<T>): BagOf<T> {
+    const bagOf = this.session.getStruct(core.class.BagOf)
+    return bagOf.newInstance({ of }) as BagOf<T>
   }
-  dump(): import("..").Container[] {
-    throw new Error("Method not implemented.")
+
+  struct<T extends Emb>(of: Ref<Class<T>>): InstanceOf<T> {
+    const instanceOf = this.session.getStruct(core.class.InstanceOf)
+    return instanceOf.newInstance({ of }) as InstanceOf<T>
   }
 
   getStruct<T extends Emb>(_struct: Ref<Class<T>>): Class<T> {
@@ -54,9 +60,14 @@ export class Builder implements Session {
     return this.session.createStruct(_id, _extends, _attributes, _native)
   }
 
-  meta<T>(): Type<Metadata<T>> {
-    const meta = this.session.getStruct(core.class.Metadata)
-    return meta.newInstance({})
+  getInstance<T extends Doc>(ref: Ref<T>, as: Ref<Class<T>>): T {
+    throw new Error("Method not implemented.")
+  }
+  loadModel(docs: Container[]): void {
+    throw new Error("Method not implemented.")
+  }
+  dump(): Container[] {
+    throw new Error("Method not implemented.")
   }
 
 }

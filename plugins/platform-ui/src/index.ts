@@ -13,16 +13,25 @@
 // limitations under the License.
 //
 
-import { identify, Metadata, Plugin, PluginId } from '@anticrm/platform'
-import { Doc, Obj, AnyType, Ref, Class } from '@anticrm/platform-core'
-//import i18n from '@anticrm/platform-core-i18n'
+import { identify, Metadata, Plugin, PluginId, plugin } from '@anticrm/platform'
+import { Doc, Emb, Obj, AnyType, Ref, Class, Bag } from '@anticrm/platform-core'
+import { IntlString } from '@anticrm/platform-core-i18n'
 
 export type Asset = Metadata<string>
 
 // M O D E L
 
-export interface UIDecorator extends Doc {
-  icon: Asset
+export interface UIDecorator extends Emb {
+  label?: IntlString
+  icon?: Asset
+}
+
+export interface TypeUIDecorator extends UIDecorator {
+  placeholder?: IntlString
+}
+
+export interface ClassUIDecorator extends Class<Obj> {
+  decorators: Bag<TypeUIDecorator>
 }
 
 // P L U G I N
@@ -41,26 +50,26 @@ export interface UIPlugin extends Plugin {
 
 // D E S C R I P T O R
 
-export const pluginId = 'ui' as PluginId<UIPlugin>
+// export const pluginDescriptor = {
+//   id: pluginId,
+//   dependencies: {
+//     i18n: ''
+//   }
+// }
 
-export const pluginDescriptor = {
-  id: pluginId,
-  dependencies: {
-    i18n: ''
+export default plugin(
+  'ui' as PluginId<UIPlugin>,
+  [],
+  {
+    icon: {
+      AddGroup: '' as Asset,
+      Add: '' as Asset,
+      Checked: '' as Asset,
+      Edit: '' as Asset,
+      Search: '' as Asset,
+    },
+    class: {
+      ClassUIDecorator: '' as Ref<Class<ClassUIDecorator>>
+    }
   }
-}
-
-const ui = identify(pluginId, {
-  icon: {
-    AddGroup: '' as Asset,
-    Add: '' as Asset,
-    Checked: '' as Asset,
-    Edit: '' as Asset,
-    Search: '' as Asset,
-  },
-  class: {
-    UIDecorator: '' as Ref<Class<UIDecorator>>
-  }
-})
-
-export default ui
+)

@@ -63,6 +63,14 @@ export default (platform: Platform): CorePlugin => {
       return this.getSession().getInstance(this._class, core.class.Class as Ref<Class<Class<this>>>)
     }
 
+    as<T extends Doc>(_class: Ref<Class<T>>): T | undefined {
+      const session = this.getSession()
+      const layout = (this as unknown as Layout<T>).__layout
+      if (!layout)
+        throw new Error('layout not found')
+      return session.instantiate(_class, layout)
+    }
+
     __mapKey(_class: Ref<Class<Obj>>, key: string) { return key.startsWith('_') ? key : _class + ':' + key }
   }
 
