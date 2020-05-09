@@ -16,14 +16,29 @@
 import platform from '@anticrm/platform'
 import startCorePlugin from '@anticrm/platform-core/src/plugin'
 
+import core from '@anticrm/platform-core/src/__resources__'
+import ui from '../__resources__'
+
+import coreModel from '@anticrm/platform-core/src/__resources__/model'
+import { Builder } from '@anticrm/platform-core/src/__resources__/builder'
+
+import uiModel from '../__resources__/model'
+
 describe('session', () => {
 
   const corePlugin = startCorePlugin(platform)
   const session = corePlugin.getSession()
-  session.loadModel(coreModel.model)
+  coreModel(session)
 
-  it('should get prototype', () => {
-    const objectProto = (session as any).getPrototype(core.class.Doc)
-    expect(objectProto).toBeDefined()
+  const builder = new Builder(session)
+  uiModel(builder)
+
+  it('should load ui model', () => {
+    const uiDecorator = session.getInstance(ui.class.ClassUIDecorator, core.class.Class)
+    expect(uiDecorator._id).toBe(ui.class.ClassUIDecorator)
+  })
+
+  it('should add ui decorator to Class<Class>', () => {
+    const decorator = session.getClass(ui.class.ClassUIDecorator)
   })
 })

@@ -5,6 +5,9 @@
   "description": "AntiCRM Platform UI",
   "author": "Andrey Platov <andrey.v.platov@gmail.com>",
   "license": "EPL-2.0",
+  "scripts": {
+    "test": "jest"
+  },
   "devDependencies": {
     "@babel/core": "^7.9.6",
     "@babel/plugin-proposal-decorators": "^7.8.3",

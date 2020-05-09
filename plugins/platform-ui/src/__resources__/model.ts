@@ -13,10 +13,10 @@
 // limitations under the License.
 //
 
-import core from '@anticrm/platform-core/src/__model__/id'
+import core from '@anticrm/platform-core/src/__resources__'
 import ui from '.'
 
-import { Builder } from '@anticrm/platform-core/src/__model__/builder'
+import { Builder } from '@anticrm/platform-core/src/__resources__/builder'
 
 export default (B: Builder) => {
   const i18n = B.createStruct(ui.class.IntlString, core.class.Type, {})
