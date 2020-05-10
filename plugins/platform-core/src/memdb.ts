@@ -28,6 +28,7 @@ function filterEq(docs: any, propertyKey: string, value: PropertyType): any[] {
 export class MemDb {
   private objects = new Map<Ref<Doc>, Container>()
   private byClass = new Map<Ref<Class<Obj>>, Container[]>()
+  hierarchy = new Map<Ref<Class<Obj>>, Ref<Class<Obj>>[]>()
 
   private add(doc: Container) {
     const id = doc._id
@@ -65,9 +66,43 @@ export class MemDb {
     return docs
   }
 
+  private getSubclasses(clazz: Ref<Class<Obj>>): Ref<Class<Obj>>[] {
+    let result = this.hierarchy.get(clazz)
+    if (!result) {
+      result = [] as Ref<Class<Obj>>[]
+      this.hierarchy.set(clazz, result)
+    }
+    return result
+  }
+
+  private addSubclass(clazz: Ref<Class<Obj>>, subclass: Ref<Class<Obj>>) {
+    const subclasses = this.getSubclasses(clazz)
+    if (!subclasses.includes(subclass)) {
+      subclasses.push(subclass)
+    }
+  }
+
+  narrow<T extends Obj>(clazz: Ref<Class<T>>): Ref<Class<T>> {
+    while (true) {
+      const subclasses = this.getSubclasses(clazz)
+      if (subclasses.length === 1)
+        clazz = subclasses[0] as Ref<Class<T>>
+      else
+        return clazz
+    }
+  }
+
   index(container: Container) {
     container._classes.forEach(clazz => {
-      this.getAllOfClass(clazz).push(container)
+      let _class = clazz as Ref<Class<Obj>> | undefined
+      while (_class) {
+        this.getAllOfClass(_class).push(container)
+        const superClass = this.objects.get(_class)?._extends as Ref<Class<Obj>>
+        if (superClass) {
+          this.addSubclass(superClass, _class)
+        }
+        _class = superClass
+      }
     })
   }
 

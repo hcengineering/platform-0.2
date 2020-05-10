@@ -33,7 +33,7 @@ export class TSession implements Session {
 
   readonly platform: Platform
 
-  private memdb: MemDb
+  memdb: MemDb
   private prototypes = new Map<Ref<Class<Obj>>, Object>()
   private sessionProto: SessionProto
 
@@ -103,7 +103,7 @@ export class TSession implements Session {
   createDocument<T extends Doc>(_class: Ref<Class<T>>, data: object): T {
     const _id = (data as Content<Doc>)._id
     const container = this.memdb.get(_id, true) // TODO: must be create! raise error if container exists
-    container._classes.push(_class)
+    container._classes.push(_class as unknown as Ref<Class<Doc>>)
     const instance = this.instantiate(_class, container)
     Object.assign(instance, data)
     this.memdb.index(container)
@@ -126,7 +126,22 @@ export class TSession implements Session {
   }
 
   getInstance<T extends Doc>(ref: Ref<T>, as: Ref<Class<T>>): T {
-    return this.instantiate(as, this.memdb.get(ref))
+    const container = this.memdb.get(ref)
+    const narrow = this.narrow(as, container._classes)
+    if (narrow)
+      return this.instantiate(narrow, container)
+    else
+      throw new Error('narrow failed')
+  }
+
+  narrow<T extends Doc>(as: Ref<Class<T>>, classes: Ref<Class<Doc>>[]): Ref<Class<T>> | undefined {
+    for (const _class of classes) {
+      const c = _class as unknown as Ref<Class<T>>
+      if (c !== as && this.extends(c, as)) {
+        return this.narrow(c, classes)
+      }
+    }
+    return as
   }
 
   getClass<T extends Doc>(_class: Ref<Class<T>>): Class<T> {
@@ -137,7 +152,7 @@ export class TSession implements Session {
     return this.getInstance(_class, core.class.Struct) as Class<T>
   }
 
-  private extends<T extends Obj>(_class: Ref<Class<T>>, _extends: Ref<Class<Obj>>): boolean {
+  extends<T extends Obj>(_class: Ref<Class<T>>, _extends: Ref<Class<Obj>>): boolean {
     let clazz: Ref<Class<Obj>> | undefined = _class
     while (clazz) {
       if (clazz === _extends)

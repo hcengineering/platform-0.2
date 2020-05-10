@@ -32,7 +32,7 @@ export type Bag<X extends PropertyType> = { [key: string]: X }
 export type ContainerId = Ref<Doc>
 export interface Container {
   _id: ContainerId
-  _classes: Ref<Class<Obj>>[]
+  _classes: Ref<Class<Doc>>[]
   [key: string]: PropertyType
 }
 

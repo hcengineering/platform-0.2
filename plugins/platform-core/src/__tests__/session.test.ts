@@ -20,6 +20,8 @@ import core from '../__resources__'
 import { metaModel, createClass, newContainer, array, str } from '../__resources__/model'
 import startCorePlugin from '../plugin'
 
+import { TSession } from '../session'
+
 interface SimpleClass extends Doc {
   s: string
 }
@@ -50,8 +52,10 @@ describe('session', () => {
 
   const platform = new Platform()
   const corePlugin = startCorePlugin(platform)
-  const session = corePlugin.getSession()
+  const session = corePlugin.getSession() as TSession
   session.loadModel(metaModel)
+  console.log(metaModel)
+  console.log((session as any).memdb.hierarchy)
 
   it('should get prototype', () => {
     const objectProto = (session as any).getPrototype(core.class.Doc)
@@ -85,6 +89,13 @@ describe('session', () => {
     expect(classClass._attributes._extends._class).toBe(core.class.RefTo)
     const refTo = classClass._attributes._extends.getClass()
     expect(refTo._class).toBe(core.class.Struct)
+  })
+
+  it('should narrow class', () => {
+    expect(session.extends(core.class.Class, core.class.StructuralFeature)).toBe(true)
+    expect(session.extends(core.class.StructuralFeature, core.class.Class)).toBe(false)
+    expect(session.narrow(core.class.StructuralFeature, [core.class.Class])).toBe(core.class.Class)
+    expect(session.narrow(core.class.Doc, [core.class.Class])).toBe(core.class.Class)
   })
 
   it('should create instance', () => {
