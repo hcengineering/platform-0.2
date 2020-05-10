@@ -30,7 +30,9 @@ export default (B: Builder) => {
     placeholder: i18n.newInstance({}),
   })
 
-  B.createClass(ui.class.ClassUIDecorator, core.class.Class, {
+  B.createClass(ui.class.ClassUIDecorator, core.class.StructuralFeature, {
+    label: i18n.newInstance({}),
+    icon: B.meta(),
     decorators: B.bag(B.struct(ui.class.TypeUIDecorator))
   })
 

@@ -13,11 +13,11 @@
 // limitations under the License.
 //
 
-import { Session, Type, Ref, Class, Doc, Bag, Content } from '@anticrm/platform-core'
+import { Session, Type, Ref, Class, Doc, Bag, Content, Obj } from '@anticrm/platform-core'
 import { IntlString } from '@anticrm/platform-core-i18n'
 
 import { Builder as CoreBuilder } from '@anticrm/platform-core/src/__resources__/builder'
-import { TypeUIDecorator, ClassUIDecorator } from '..'
+import { Asset, TypeUIDecorator, ClassUIDecorator } from '..'
 import ui from '.'
 
 export class Builder extends CoreBuilder {
@@ -30,18 +30,20 @@ export class Builder extends CoreBuilder {
   }
 
   i18n(): Type<IntlString> {
-    const meta = this.session.getStruct(ui.class.IntlString)
+    const meta = this.session.getClass(ui.class.IntlString)
     return meta.newInstance({})
   }
 
   typeDeco(deco: Content<TypeUIDecorator>) {
-    const typeDecorator = this.session.getStruct(ui.class.TypeUIDecorator)
+    const typeDecorator = this.session.getClass(ui.class.TypeUIDecorator)
     return typeDecorator.newInstance(deco)
   }
 
-  decorateClass<T extends Doc>(_class: Ref<Class<T>>, decorators: Bag<TypeUIDecorator>) {
+  decorateClass<T extends Obj>(_class: Ref<Class<T>>, decorators: Bag<TypeUIDecorator>, label?: IntlString, icon?: Asset) {
     const classClass = this.session.getClass(_class)
     return this.session.mixin(classClass, ui.class.ClassUIDecorator as Ref<Class<ClassUIDecorator<Class<T>>>>, {
+      label,
+      icon,
       decorators
     })
   }

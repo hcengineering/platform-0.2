@@ -14,7 +14,7 @@
 //
 
 import { Metadata, Plugin, PluginId, plugin } from '@anticrm/platform'
-import { Doc, Emb, Obj, AnyType, Ref, Class, Bag } from '@anticrm/platform-core'
+import { Doc, Emb, Obj, AnyType, Ref, Class, Bag, } from '@anticrm/platform-core'
 import { IntlString } from '@anticrm/platform-core-i18n'
 
 export type Asset = Metadata<string>
@@ -30,7 +30,7 @@ export interface TypeUIDecorator extends UIDecorator {
   placeholder?: IntlString
 }
 
-export interface ClassUIDecorator<T extends Doc> extends Class<T> {
+export interface ClassUIDecorator<T extends Obj> extends Class<T> {
   label?: IntlString
   icon?: Asset
   decorators: Bag<TypeUIDecorator>

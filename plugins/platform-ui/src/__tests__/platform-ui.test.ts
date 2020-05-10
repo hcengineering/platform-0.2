@@ -44,7 +44,7 @@ describe('session', () => {
   })
 
   it('should add ui decorator to Class<Class>', () => {
-    const typeDecorator = session.getStruct(ui.class.TypeUIDecorator)
+    const typeDecorator = session.getClass(ui.class.TypeUIDecorator)
     const classClass = session.getClass(core.class.Class)
     const decoClass = session.mixin(classClass, ui.class.ClassUIDecorator as Ref<Class<ClassUIDecorator<Class<Obj>>>>, {
       decorators: {

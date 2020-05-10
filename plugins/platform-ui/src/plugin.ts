@@ -40,12 +40,13 @@ class UIPluginImpl implements UIPlugin {
   */
   async getAttrModel(object: Obj, props: string[]): Promise<AttrModel[]> {
     const clazz = object.getClass()
+    const decorator = clazz.as(ui.class.ClassUIDecorator)
     return props.map(key => {
-      const decorator = clazz.as(ui.class.ClassUIDecorator)
-      const type = decorator?.decorators[key]
-      const typeClassDeco = type?.getClass().as(ui.class.ClassUIDecorator)
-      const label = type?.label ?? typeClassDeco?.label ?? clazz._id + '_' + key as IntlString
-      const placeholder = type?.placeholder ?? 'Placeholder'
+      const typeDeco = decorator?.decorators[key]
+      const typeClassDeco = clazz._attributes[key]?.getClass().as(ui.class.ClassUIDecorator)
+
+      const label = typeDeco?.label ?? typeClassDeco?.label ?? clazz._id + '_' + key as IntlString
+      const placeholder = typeDeco?.placeholder ?? 'Placeholder'
       return {
         key,
         type: clazz._attributes[key],

@@ -144,13 +144,13 @@ export class TSession implements Session {
     return as
   }
 
-  getClass<T extends Doc>(_class: Ref<Class<T>>): Class<T> {
-    return this.getInstance(_class, core.class.Class) as Class<T>
+  getClass<T extends Obj>(_class: Ref<Class<T>>): Class<T> {
+    return this.getInstance(_class, core.class.StructuralFeature) as Class<T>
   }
 
-  getStruct<T extends Emb>(_class: Ref<Class<T>>): Class<T> {
-    return this.getInstance(_class, core.class.Struct) as Class<T>
-  }
+  // getStruct<T extends Emb>(_class: Ref<Class<T>>): Class<T> {
+  //   return this.getInstance(_class, core.class.Struct) as Class<T>
+  // }
 
   extends<T extends Obj>(_class: Ref<Class<T>>, _extends: Ref<Class<Obj>>): boolean {
     let clazz: Ref<Class<Obj>> | undefined = _class

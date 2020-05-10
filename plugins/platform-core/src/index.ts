@@ -104,8 +104,8 @@ export interface Session {
   mixin<T extends E, E extends Doc>(obj: E, _class: Ref<Class<T>>, data: Omit<T, keyof E>): T
 
   // Class Helpers
-  getStruct<T extends Emb>(_struct: Ref<Class<T>>): Class<T>
-  getClass<T extends Doc>(_class: Ref<Class<T>>): Class<T>
+  // getStruct<T extends Emb>(_struct: Ref<Class<T>>): Class<T>
+  getClass<T extends Obj>(_class: Ref<Class<T>>): Class<T>
   createClass<T extends E, E extends Doc>(
     _id: Ref<Class<T>>, _extends: Ref<Class<E>>,
     _attributes: DiffDescriptors<T, E>, _native?: Metadata<T>): Class<T>

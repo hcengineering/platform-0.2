@@ -35,6 +35,8 @@ export default (S: Builder) => {
     addressDelivery: address.newInstance({}),
   })
 
+  S.decorateClass(contact.class.Email, {}, 'Email' as IntlString)
+
   S.decorateClass(contact.class.Contact, {
     phone: S.typeDeco({ label: 'Телефон' as IntlString })
   })

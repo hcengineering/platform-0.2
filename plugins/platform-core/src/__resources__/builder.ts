@@ -14,7 +14,7 @@
 //
 
 import { Metadata } from '@anticrm/platform'
-import { Session, Doc, Ref, Emb, Class, DiffDescriptors, Type, PropertyType, BagOf, Container, InstanceOf } from '..'
+import { Session, Doc, Ref, Emb, Class, DiffDescriptors, Type, PropertyType, BagOf, Container, InstanceOf, Obj } from '..'
 import core from '.'
 
 export class Builder implements Session {
@@ -26,25 +26,21 @@ export class Builder implements Session {
   }
 
   meta<T>(): Type<Metadata<T>> {
-    const meta = this.session.getStruct(core.class.Metadata)
+    const meta = this.session.getClass(core.class.Metadata)
     return meta.newInstance({})
   }
 
   bag<T extends PropertyType>(of: Type<T>): BagOf<T> {
-    const bagOf = this.session.getStruct(core.class.BagOf)
+    const bagOf = this.session.getClass(core.class.BagOf)
     return bagOf.newInstance({ of }) as BagOf<T>
   }
 
   struct<T extends Emb>(of: Ref<Class<T>>): InstanceOf<T> {
-    const instanceOf = this.session.getStruct(core.class.InstanceOf)
+    const instanceOf = this.session.getClass(core.class.InstanceOf)
     return instanceOf.newInstance({ of }) as InstanceOf<T>
   }
 
-  getStruct<T extends Emb>(_struct: Ref<Class<T>>): Class<T> {
-    return this.session.getStruct(_struct)
-  }
-
-  getClass<T extends Doc>(_class: Ref<Class<T>>): Class<T> {
+  getClass<T extends Obj>(_class: Ref<Class<T>>): Class<T> {
     return this.session.getClass(_class)
   }
 
