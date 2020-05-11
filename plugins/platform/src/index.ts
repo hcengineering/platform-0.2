@@ -93,23 +93,23 @@ export class Platform {
     }
   }
 
-  loadMeta(map: Map<string, string>) {
-    map.forEach((value, key) => this.metadata.set(key, value))
-  }
+  // loadMeta(map: Map<string, string>) {
+  //   map.forEach((value, key) => this.metadata.set(key, value))
+  // }
 }
 
-export function loadMetadata<T, X extends Record<string, Metadata<T>>>(ids: X, resources: ExtractType<T, X>): Map<string, string> {
-  const result = new Map()
-  for (const key in ids) {
-    const id = ids[key]
-    const resource = resources[key]
-    if (!resource) {
-      throw new Error(`no resource provided, key: ${key}, id: ${id}`)
-    }
-    result.set(id as string, resource)
-  }
-  return result
-}
+// export function loadMetadata<T, X extends Record<string, Metadata<T>>>(ids: X, resources: ExtractType<T, X>): Map<string, string> {
+//   const result = new Map()
+//   for (const key in ids) {
+//     const id = ids[key]
+//     const resource = resources[key]
+//     if (!resource) {
+//       throw new Error(`no resource provided, key: ${key}, id: ${id}`)
+//     }
+//     result.set(id as string, resource)
+//   }
+//   return result
+// }
 
 //////
 

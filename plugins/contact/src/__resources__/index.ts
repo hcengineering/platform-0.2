@@ -38,5 +38,10 @@ export default extendIds(contact, {
     Phone: '' as IntlString,
     Twitter: '' as IntlString,
     Address: '' as IntlString,
+
+    Email_placeholder: '' as IntlString,
+    Phone_placeholder: '' as IntlString,
+    Twitter_placeholder: '' as IntlString,
+    Address_placeholder: '' as IntlString,
   }
 })

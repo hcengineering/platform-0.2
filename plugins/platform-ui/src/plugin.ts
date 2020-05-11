@@ -15,18 +15,25 @@
 
 import Vue from 'vue'
 
-import { Doc, Obj, Type, PropertyType, Class } from '@anticrm/platform-core'
+import { Doc, Obj, Type, PropertyType, Class, Ref } from '@anticrm/platform-core'
 import { Platform } from '@anticrm/platform'
-import ui, { UIPlugin, AttrModel } from '.'
-import { IntlString } from '@anticrm/platform-core-i18n'
+import ui, { UIPlugin, AttrModel, UIDecorator, ClassUIDecorator, TypeUIDecorator } from '.'
+import i18n, { I18nPlugin, IntlString } from '@anticrm/platform-core-i18n'
+
+export function synthIntlStringId(clazz: Ref<Class<Obj>>, propertyKey: string, attribute?: string): IntlString {
+  return (attribute ? clazz + '.' + attribute + '_' + propertyKey : clazz + '_' + propertyKey) as IntlString
+}
 
 class UIPluginImpl implements UIPlugin {
 
   readonly pluginId = ui.id
   readonly platform: Platform
 
+  readonly i18n: I18nPlugin
+
   constructor(platform: Platform) {
     this.platform = platform
+    this.i18n = platform.getPlugin(i18n.id)
   }
 
   getDefaultAttrModel(props: string[]): AttrModel[] {
@@ -34,24 +41,36 @@ class UIPluginImpl implements UIPlugin {
   }
 
   /** 
-    Here is a summary on an attribute label search order
-      1. Type's UI Decorator `label` attribute
-      2. If (1) missed, construct IntlString Id synthetically
+    Attribute label search order
+      1. Property `Type`'s UI Decorator `label` attribute
+      2. Property `Type`'s sythetic id
+
+      3. Property `Type`'s Class UI Decorator `label` attribute
+      4. Property `Type`'s Class synthetic id
   */
   async getAttrModel(object: Obj, props: string[]): Promise<AttrModel[]> {
     const clazz = object.getClass()
     const decorator = clazz.as(ui.class.ClassUIDecorator)
     return props.map(key => {
-      const typeDeco = decorator?.decorators[key]
-      const typeClassDeco = clazz._attributes[key]?.getClass().as(ui.class.ClassUIDecorator)
+      const type = clazz._attributes[key]
+      const typeDecorator = decorator?.decorators?.[key]
+      const typeClass = type.getClass()
+      const typeClassDecorator = typeClass.as(ui.class.ClassUIDecorator)
 
-      const label = typeDeco?.label ?? typeClassDeco?.label ?? clazz._id + '_' + key as IntlString
-      const placeholder = typeDeco?.placeholder ?? 'Placeholder'
+      const l1 = typeDecorator?.label ?? synthIntlStringId(clazz._id, 'label', key)
+      const l2 = typeClassDecorator?.label ?? synthIntlStringId(typeClass._id, 'label')
+      const label = this.i18n.translate(l1) ?? this.i18n.translate(l2) ?? key
+
+      const p1 = typeDecorator?.placeholder ?? synthIntlStringId(clazz._id, 'placeholder', key)
+      const placeholder = this.i18n.translate(p1) ?? key
+
+      const icon = typeDecorator?.icon ?? typeClassDecorator?.icon
       return {
         key,
         type: clazz._attributes[key],
         label,
-        placeholder
+        placeholder,
+        icon
       }
     })
   }

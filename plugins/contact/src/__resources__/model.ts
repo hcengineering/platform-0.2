@@ -35,13 +35,13 @@ export default (S: Builder) => {
     addressDelivery: address.newInstance({}),
   })
 
-  S.decorateClass(contact.class.Email, {}, contact.string.Email, contact.icon.Email)
-  S.decorateClass(contact.class.Phone, {}, contact.string.Phone, contact.icon.Phone)
-  S.decorateClass(contact.class.Twitter, {}, contact.string.Twitter, contact.icon.Twitter)
-  S.decorateClass(contact.class.Address, {}, contact.string.Address, contact.icon.Address)
+  // S.decorateClass(contact.class.Email, { label: contact.string.Email, icon: contact.icon.Email })
+  // S.decorateClass(contact.class.Phone, { label: contact.string.Phone, icon: contact.icon.Phone })
+  // S.decorateClass(contact.class.Twitter, { label: contact.string.Twitter, icon: contact.icon.Twitter })
+  // S.decorateClass(contact.class.Address, { label: contact.string.Address, icon: contact.icon.Address })
 
-  S.decorateClass(contact.class.Contact, {
-    phone: S.typeDeco({ label: 'Телефон' as IntlString })
-  })
+  // S.decorateClass(contact.class.Contact, {
+  //   decorators: { phone: S.typeDeco({ placeholder: '+7 913 333 5555' as IntlString }) }
+  // })
 }
 

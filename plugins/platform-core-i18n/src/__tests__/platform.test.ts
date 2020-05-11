@@ -13,9 +13,20 @@
 // limitations under the License.
 // 
 
-import { Platform } from '@anticrm/platform'
+import { Platform, identify, Plugin, PluginId } from '@anticrm/platform'
 import { IntlString } from '..'
 import i18nPlugin from '../plugin'
+import { verifyTranslation } from '../__resources__/utils'
+
+const ids = identify('test' as PluginId<Plugin>, {
+  strings: {
+    MyString: '' as IntlString
+  },
+})
+
+const ru = {
+  MyString: 'Перевод',
+}
 
 describe('platform', () => {
 
@@ -23,7 +34,12 @@ describe('platform', () => {
   const platform = i18nPlugin(_)
 
   it('should return original string', () => {
-    expect(platform.translate('does not exists' as IntlString)).toBe('does not exists')
+    expect(platform.translate('does not exists' as IntlString)).toBeUndefined()
+  })
+
+  it('should verify translation', () => {
+    const translations = verifyTranslation(ids.strings, ru)
+    expect(translations['test.strings.MyString']).toBe(ru.MyString)
   })
 
   it('should translate simple', () => {

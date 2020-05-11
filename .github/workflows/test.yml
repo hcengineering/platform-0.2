@@ -18,4 +18,5 @@ jobs:
       run: |
         yarn install
         yarn workspace @anticrm/platform-core run test
+        yarn workspace @anticrm/platform-core-i18n run test
         yarn workspace @anticrm/platform-ui run test

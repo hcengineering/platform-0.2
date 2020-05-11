@@ -33,7 +33,7 @@ export interface TypeUIDecorator extends UIDecorator {
 export interface ClassUIDecorator<T extends Obj> extends Class<T> {
   label?: IntlString
   icon?: Asset
-  decorators: Bag<TypeUIDecorator>
+  decorators?: Bag<TypeUIDecorator>
 }
 
 // P L U G I N
@@ -42,6 +42,7 @@ export interface AttrModel {
   key: string
   type: AnyType
   label: string
+  icon?: Asset
   placeholder: string
 }
 

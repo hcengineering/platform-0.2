@@ -39,13 +39,18 @@ export class Builder extends CoreBuilder {
     return typeDecorator.newInstance(deco)
   }
 
-  decorateClass<T extends Obj>(_class: Ref<Class<T>>, decorators: Bag<TypeUIDecorator>, label?: IntlString, icon?: Asset) {
+  // decorateClass<T extends Obj>(_class: Ref<Class<T>>, decorators: Bag<TypeUIDecorator>, label?: IntlString, icon?: Asset) {
+  //   const classClass = this.session.getClass(_class)
+  //   return this.session.mixin(classClass, ui.class.ClassUIDecorator as Ref<Class<ClassUIDecorator<Class<T>>>>, {
+  //     label,
+  //     icon,
+  //     decorators
+  //   })
+  // }
+
+  decorateClass<T extends Obj>(_class: Ref<Class<T>>, decorators: Omit<ClassUIDecorator<Class<T>>, keyof Class<T>>) {
     const classClass = this.session.getClass(_class)
-    return this.session.mixin(classClass, ui.class.ClassUIDecorator as Ref<Class<ClassUIDecorator<Class<T>>>>, {
-      label,
-      icon,
-      decorators
-    })
+    return this.session.mixin(classClass, ui.class.ClassUIDecorator as Ref<Class<ClassUIDecorator<Class<T>>>>, decorators)
   }
 
 }

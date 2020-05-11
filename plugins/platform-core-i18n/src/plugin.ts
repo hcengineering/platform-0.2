@@ -26,10 +26,10 @@ class I18nPluginImpl implements I18nPlugin {
 
   constructor(platform: Platform) { this.platform = platform }
 
-  translate(string: IntlString, params?: Record<string, PrimitiveType> | undefined): string {
+  translate(string: IntlString, params?: Record<string, PrimitiveType> | undefined): string | undefined {
     const translation = this.strings.get(string)
     if (!translation) {
-      return string as string
+      return undefined
     }
     if (params) {
       let imf = this.imfCache.get(string)

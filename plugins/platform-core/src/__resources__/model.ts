@@ -21,7 +21,7 @@ import { Ref, Class, Obj, Doc, Content, DiffDescriptors, PropertyType, Type, Con
 import core from '.'
 
 export function newContainer<T extends Doc>(_class: Ref<Class<T>>, data: Content<T>): Container {
-  return { _classes: [_class], ...(data as unknown as Content<Doc>) }
+  return { _classes: [_class as unknown as Ref<Class<Doc>>], ...(data as unknown as Content<Doc>) }
 }
 
 export function newStruct<T extends Emb>(_class: Ref<Class<T>>, data: Content<T>): T {

@@ -13,18 +13,20 @@
 // limitations under the License.
 //
 
-import { Obj, Class, Ref } from '.'
+import { IntlString } from '..'
 
-import { IntlString } from '@anticrm/platform-core-i18n'
+type StringIds = { [key: string]: IntlString }
+type AsStrings<T> = { [P in keyof T]: string }
 
-export function classLabelId(clazz: Ref<Class<Obj>>): IntlString {
-  return clazz as string as IntlString
-}
-
-export function attributeLabelId(clazz: Ref<Class<Obj>>, key: string): IntlString {
-  return clazz + '.' + key as IntlString
-}
-
-export function mixinPropertyKey(clazz: Ref<Class<Obj>>): string {
-  return '$' + clazz
+export function verifyTranslation<T extends StringIds>(ids: T, translations: AsStrings<T>): { [key: string]: string } {
+  const result = {} as Record<string, string>
+  for (const key in ids) {
+    const translated = translations[key]
+    if (translated) {
+      const id = ids[key]
+      result[id] = translated
+    } else
+      throw new Error(`no translation for ${key}`)
+  }
+  return result as AsStrings<T>
 }

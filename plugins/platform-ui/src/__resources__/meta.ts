@@ -13,15 +13,16 @@
 // limitations under the License.
 //
 
-import { loadMetadata } from '@anticrm/platform'
+import { Platform } from '@anticrm/platform'
 import ui from '..'
 
-const spritesUrl = require('../../assets/icons.svg')
-
-export default loadMetadata(ui.icon, {
-  AddGroup: spritesUrl + '#add-group',
-  Add: spritesUrl + '#add',
-  Checked: spritesUrl + '#checked',
-  Edit: spritesUrl + '#edit',
-  Search: spritesUrl + '#search',
-})
+export default (platform: Platform) => {
+  const spritesUrl = require('../../assets/icons.svg')
+  platform.loadMetadata(ui.icon, {
+    AddGroup: spritesUrl + '#add-group',
+    Add: spritesUrl + '#add',
+    Checked: spritesUrl + '#checked',
+    Edit: spritesUrl + '#edit',
+    Search: spritesUrl + '#search',
+  })
+}

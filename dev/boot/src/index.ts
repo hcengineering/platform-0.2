@@ -15,10 +15,23 @@
 
 import platform from '@anticrm/platform'
 
+const show = (process.argv.length > 2 && process.argv[2] === '--show')
+
 // S E T  M E T A D A T A
 
 import uiMeta from '@anticrm/platform-ui/src/__resources__/meta'
-platform.loadMeta(uiMeta)
+if (!show) {
+  uiMeta(platform)
+}
+
+// S T A R T  I 1 8 N  P L U G I N
+
+import i18n from '@anticrm/platform-core-i18n'
+import starti18n from '@anticrm/platform-core-i18n/src/plugin'
+
+const i18nPlugin = starti18n(platform)
+platform.setPlugin(i18n.id, i18nPlugin)
+
 
 // S T A R T  C O R E  P L U G I N
 
@@ -44,6 +57,8 @@ uiModel(new CoreBuilder(session))
 import contactCoreModel from '@anticrm/contact/src/__resources__/model'
 import { Builder as UIBuilder } from '@anticrm/platform-ui/src/__resources__/builder'
 contactCoreModel(new UIBuilder(session))
+import contactStrings from '@anticrm/contact/src/__resources__/strings/ru'
+i18nPlugin.loadStrings(contactStrings)
 
 // Test
 import { Ref } from '@anticrm/platform-core'
@@ -62,10 +77,15 @@ contactClass.newInstance({
 import ui from '@anticrm/platform-ui'
 import startUI from '@anticrm/platform-ui/src/plugin'
 
-const uiPlugin = startUI(platform)
-platform.setPlugin(ui.id, uiPlugin)
+if (!show) {
+  const uiPlugin = startUI(platform)
+  platform.setPlugin(ui.id, uiPlugin)
+}
 
 // D U M P
 
-// console.log(session.dump())
-// console.log(JSON.stringify(session.dump(), null, 2))
+if (show) {
+  console.log(session.dump())
+  console.log(JSON.stringify(session.dump()))
+  console.log(JSON.stringify(contactStrings, null, 2))
+}
