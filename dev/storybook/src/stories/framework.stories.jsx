@@ -20,11 +20,11 @@ import platform from '@anticrm/platform'
 
 import Icon from '@anticrm/platform-ui/src/components/Icon.vue'
 import PropPanel from '@anticrm/platform-ui/src/components/PropPanel.vue'
+import ObjectPanel from '@anticrm/platform-ui/src/components/ObjectPanel.vue'
 
 import core from '@anticrm/platform-core'
 
 import contact from '@anticrm/contact'
-import { contact1 } from '@anticrm/dev-boot'
 
 export default {
   title: 'Framework'
@@ -32,7 +32,10 @@ export default {
 
 export const icon = () => ({
   render() {
-    return <Theme><Icon icon={ui.icon.Add}>Hello Button</Icon></Theme>
+    return <Theme>
+      <Icon icon={ui.icon.Add} class="icon-embed" />
+      <Icon icon={ui.icon.AddGroup} class="icon-embed" />
+    </Theme>
   }
 })
 const corePlugin = platform.getPlugin(core.id)
@@ -41,11 +44,22 @@ const session = corePlugin.getSession()
 console.log('story session dump')
 console.log(session.dump())
 
-const contactInstance = session.getInstance(contact1, contact.class.Contact)
+const contactClass = session.getClass(contact.class.Contact)
+const contactInstance = contactClass.newInstance({})
 const props = ['phone', 'email']
 
 export const properties = () => ({
   render() {
-    return <Theme><PropPanel object={contactInstance} filter={props}></PropPanel></Theme>
+    return <Theme><PropPanel clazz={contactClass} object={contactInstance}></PropPanel></Theme>
+    //    return <Theme><PropPanel object={contactInstance} filter={props}></PropPanel></Theme>
+  }
+})
+
+const personClass = session.getClass(contact.class.Person)
+const personInstance = personClass.newInstance({})
+
+export const object = () => ({
+  render() {
+    return <Theme><ObjectPanel object={personInstance}></ObjectPanel></Theme>
   }
 })

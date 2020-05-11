@@ -46,9 +46,16 @@ export interface AttrModel {
   placeholder: string
 }
 
+export interface ClassUIModel {
+  label: string
+  icon?: Asset
+}
+
 export interface UIPlugin extends Plugin {
+  getClassModel(clazz: Class<Obj>): ClassUIModel
   getDefaultAttrModel(props: string[]): AttrModel[]
-  getAttrModel(object: Obj, props: string[]): Promise<AttrModel[]>
+  groupByType(model: AttrModel[]): { [key: string]: AttrModel[] }
+  getAttrModel(clazz: Class<Obj>, object: Obj, props?: string[]): Promise<AttrModel[]>
 }
 
 // D E S C R I P T O R

@@ -23,7 +23,6 @@ import { Metadata } from '@anticrm/platform'
 export default extendIds(core, {
   class: {
     Emb: '' as Ref<Class<Emb>>,
-    Doc: '' as Ref<Class<Doc>>,
 
     Type: '' as Ref<Class<Type<PropertyType>>>,
 

@@ -17,7 +17,7 @@ import Vue from 'vue'
 
 import { Doc, Obj, Type, PropertyType, Class, Ref, Session } from '@anticrm/platform-core'
 import { Platform } from '@anticrm/platform'
-import ui, { UIPlugin, AttrModel, UIDecorator, ClassUIDecorator, TypeUIDecorator } from '.'
+import ui, { UIPlugin, AttrModel, UIDecorator, ClassUIDecorator, ClassUIModel } from '.'
 import i18n, { I18nPlugin, IntlString } from '@anticrm/platform-core-i18n'
 
 export function synthIntlStringId(clazz: Ref<Class<Obj>>, propertyKey: string, attribute?: string): IntlString {
@@ -36,8 +36,31 @@ class UIPluginImpl implements UIPlugin {
     this.i18n = platform.getPlugin(i18n.id)
   }
 
+  getClassModel(clazz: Class<Obj>): ClassUIModel {
+    const decorator = clazz.as(ui.class.ClassUIDecorator)
+    const label = decorator?.label ?? synthIntlStringId(clazz._id, 'label')
+    return {
+      label: this.i18n.translate(label) ?? label,
+      icon: decorator?.icon
+    }
+  }
+
   getDefaultAttrModel(props: string[]): AttrModel[] {
     return []
+  }
+
+  groupByType(model: AttrModel[]): { [key: string]: AttrModel[] } {
+    const result = {} as { [key: string]: AttrModel[] }
+    model.forEach(attr => {
+      const type = attr.type._class
+      let byType = result[type]
+      if (!byType) {
+        byType = [] as AttrModel[]
+        result[type] = byType
+      }
+      byType.push(attr)
+    })
+    return result
   }
 
   /** 
@@ -48,10 +71,12 @@ class UIPluginImpl implements UIPlugin {
       3. Property `Type`'s Class UI Decorator `label` attribute
       4. Property `Type`'s Class synthetic id
   */
-  async getAttrModel(object: Obj, props: string[]): Promise<AttrModel[]> {
-    const clazz = object.getClass()
+  async getAttrModel(clazz: Class<Obj>, object: Obj, props?: string[]): Promise<AttrModel[]> {
+    //const clazz = object.getClass()
     const decorator = clazz.as(ui.class.ClassUIDecorator)
-    return props.map(key => {
+    const keys = props ?? Object.getOwnPropertyNames(clazz._attributes)
+
+    return keys.map(key => {
       const type = clazz._attributes[key]
       const typeDecorator = decorator?.decorators?.[key]
       const typeClass = type.getClass()

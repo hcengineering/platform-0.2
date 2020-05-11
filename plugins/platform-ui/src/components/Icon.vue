@@ -36,4 +36,5 @@ export default Vue.extend({
   <svg>
     <use :xlink:href="url" />
   </svg>
+  <!-- <div>{{url}}</div> -->
 </template>

@@ -19,8 +19,8 @@ import contact from '.'
 export default (platform: Platform) => {
   const spritesUrl = require('../../assets/icons.svg')
   platform.loadMetadata(contact.icon, {
-    Phone: spritesUrl + '#add-group',
-    Email: spritesUrl + '#add',
+    Phone: spritesUrl + '#phone',
+    Email: spritesUrl + '#email',
     Twitter: spritesUrl + '#checked',
     Address: spritesUrl + '#edit',
   })

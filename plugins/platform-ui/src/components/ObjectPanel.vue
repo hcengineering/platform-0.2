@@ -18,47 +18,52 @@
 import Vue, { PropType } from 'vue'
 import platform from '@anticrm/platform'
 
-import { Obj, Class } from '@anticrm/platform-core'
+import core, { Obj, Ref, Class } from '@anticrm/platform-core'
 
 import ui, { UIPlugin, AttrModel } from '@anticrm/platform-ui'
-import InlineEdit from '@anticrm/platform-ui-controls/src/InlineEdit.vue'
-import Icon from './Icon.vue'
+import PropPanel from './PropPanel.vue'
 
 export default Vue.extend({
-  components: { InlineEdit, Icon },
+  components: { PropPanel },
   props: {
     object: Object as PropType<Obj>,
-    clazz: Object as PropType<Class<Obj>>,
     filter: Array as PropType<string[]>
   },
   data() {
     return {
-      model: this.$uiPlugin.groupByType(this.$uiPlugin.getDefaultAttrModel(this.filter)),
-      classModel: this.$uiPlugin.getClassModel(this.clazz)
+      // classes: this.$uiPlugin.groupByType(this.$uiPlugin.getDefaultAttrModel(this.filter)),
+      // classModel: this.$uiPlugin.getClassModel(this.object.getClass())
+    }
+  },
+  computed: {
+    classes(): Class<Obj>[] {
+      const result = [] as Class<Obj>[]
+      let clazz = this.object.getClass() as Class<Obj> | undefined
+      while (true) {
+        result.push(clazz)
+        const _extends = clazz._extends
+        if (!_extends || _extends === core.class.Doc)
+          break
+        clazz = clazz.getSession().getInstance(_extends, core.class.Class) // TODO: getInstance(unknown) fails
+      }
+      return result
     }
   },
   created() {
-    this.$uiPlugin.getAttrModel(this.clazz, this.object, this.filter)
+    this.$uiPlugin.getAttrModel(this.object, this.filter)
       .then(result => this.model = this.$uiPlugin.groupByType(result))
   }
 })
 </script>
 
 <template>
-  <div>
-    <div class="caption-4" style="margin-bottom: 1em">{{classModel.label}}</div>
-    <div v-for="(attrs, type) in model" :key="type" class="container">
-      <div style="margin-right: 0.5em">
-        <Icon :icon="attrs[0].icon" class="icon-embed-2x" />
-      </div>
-      <div style="margin-right: 1em; margin-bottom: 1em">
-        <div v-for="prop in attrs" :key="prop.key">
-          <div class="caption-4">{{ prop.label }}</div>
-          <InlineEdit v-model="object[prop.key]" :placeholder="prop.placeholder" />
-        </div>
-      </div>
-    </div>
-  </div>
+  <table>
+    <tr>
+      <td valign="top" v-for="clazz in classes" :key="clazz._id">
+        <PropPanel :clazz="clazz" :object="object" />
+      </td>
+    </tr>
+  </table>
 </template>
 
 

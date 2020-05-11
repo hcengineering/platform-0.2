@@ -71,10 +71,7 @@ export class Platform {
   private metadata = new Map<string, any>()
 
   getMetadata<T>(id: Metadata<T>): T {
-    const result = this.metadata.get(id as string)
-    if (!result)
-      throw new Error('metadata not found: ' + id)
-    return result
+    return this.metadata.get(id as string)
   }
 
   setMetadata<T>(id: Metadata<T>, value: T): void {

@@ -75,16 +75,16 @@ import contactStrings from '@anticrm/contact/src/__resources__/strings/ru'
 i18nPlugin.loadStrings(contactStrings)
 
 // Test
-import { Ref } from '@anticrm/platform-core'
-import contactCore, { Contact } from '@anticrm/contact'
+// import { Ref } from '@anticrm/platform-core'
+// import contactCore, { Contact } from '@anticrm/contact'
 
-export const contact1 = 'test.contact.1' as Ref<Contact>
+// export const contact1 = 'test.contact.1' as Ref<Contact>
 
-const contactClass = session.getClass(contactCore.class.Contact)
-contactClass.newInstance({
-  _id: contact1,
-  phone: '+7 913 333 5555'
-})
+// const contactClass = session.getClass(contactCore.class.Contact)
+// contactClass.newInstance({
+//   _id: contact1,
+//   phone: '+7 913 333 5555'
+// })
 
 
 // D U M P

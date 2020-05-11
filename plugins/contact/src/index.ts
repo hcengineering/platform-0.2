@@ -25,11 +25,19 @@ export interface Contact extends Doc {
   addressDelivery?: string
 }
 
+export interface Person extends Contact {
+  firstName?: string
+  lastName?: string
+
+  birthDate?: string
+}
+
 export default plugin(
   'contact' as PluginId<Plugin>,
   [],
   {
     class: {
       Contact: '' as Ref<Class<Contact>>,
+      Person: '' as Ref<Class<Person>>,
     }
   })

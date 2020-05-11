@@ -30,6 +30,11 @@ export class Builder implements Session {
     return meta.newInstance({})
   }
 
+  string(): Type<string> {
+    const type = this.session.getClass(core.class.Type) as Class<Type<string>>
+    return type.newInstance({})
+  }
+
   bag<T extends PropertyType>(of: Type<T>): BagOf<T> {
     const bagOf = this.session.getClass(core.class.BagOf)
     return bagOf.newInstance({ of }) as BagOf<T>

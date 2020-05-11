@@ -37,16 +37,21 @@ export default modelTranslation(contact.class, {
     $label: 'Email',
     $placeholder: 'andrey.v.platov@gmail.com'
   },
-
   Phone: {
     $label: 'Телефон',
     $placeholder: '+7 913 333 5555'
   },
-
-  // Twitter: 'Twitter',
-  // Twitter_placeholder: '@twitter',
-
-  // Address: 'Адрес',
-  // Address_placeholder: 'Новосибирск, Красный проспект, 15',
-
+  Twitter: {
+    $label: 'Twitter',
+    $placeholder: '@twitter',
+  },
+  Address: {
+    $label: 'Адрес',
+    $placeholder: 'Новосибирск, Красный проспект, 15',
+  },
+  Contact: {
+    $label: 'Контактная информация',
+    phoneWork: 'Рабочий',
+    addressDelivery: 'Адрес доставки'
+  }
 })

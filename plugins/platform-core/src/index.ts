@@ -138,6 +138,8 @@ export default plugin(
       Class: '' as Metadata<Class<Doc>>,
     },
     class: {
+      Doc: '' as Ref<Class<Doc>>,
+
       StructuralFeature: '' as Ref<Class<Class<Obj>>>,
       Class: '' as Ref<Class<Class<Obj>>>,
       Struct: '' as Ref<Class<Class<Obj>>>,

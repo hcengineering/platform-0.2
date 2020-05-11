@@ -35,6 +35,12 @@ export default (S: Builder) => {
     addressDelivery: address.newInstance({}),
   })
 
+  S.createClass(contact.class.Person, contact.class.Contact, {
+    firstName: S.string(),
+    lastName: S.string(),
+    birthDate: S.string(),
+  })
+
   S.decorateClass(contact.class.Email, { icon: contact.icon.Email })
   S.decorateClass(contact.class.Phone, { icon: contact.icon.Phone })
   S.decorateClass(contact.class.Twitter, { icon: contact.icon.Twitter })
