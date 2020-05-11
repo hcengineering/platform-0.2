@@ -15,7 +15,7 @@
 
 import Vue from 'vue'
 
-import { Doc, Obj, Type, PropertyType, Class, Ref } from '@anticrm/platform-core'
+import { Doc, Obj, Type, PropertyType, Class, Ref, Session } from '@anticrm/platform-core'
 import { Platform } from '@anticrm/platform'
 import ui, { UIPlugin, AttrModel, UIDecorator, ClassUIDecorator, TypeUIDecorator } from '.'
 import i18n, { I18nPlugin, IntlString } from '@anticrm/platform-core-i18n'
@@ -62,7 +62,8 @@ class UIPluginImpl implements UIPlugin {
       const label = this.i18n.translate(l1) ?? this.i18n.translate(l2) ?? key
 
       const p1 = typeDecorator?.placeholder ?? synthIntlStringId(clazz._id, 'placeholder', key)
-      const placeholder = this.i18n.translate(p1) ?? key
+      const p2 = synthIntlStringId(typeClass._id, 'placeholder')
+      const placeholder = this.i18n.translate(p1) ?? this.i18n.translate(p2) ?? key
 
       const icon = typeDecorator?.icon ?? typeClassDecorator?.icon
       return {
@@ -77,6 +78,24 @@ class UIPluginImpl implements UIPlugin {
 }
 
 export default (platform: Platform): UIPlugin => {
+
+  abstract class TIntlString implements Type<IntlString> {
+    _class!: Ref<Class<this>>
+    abstract getSession(): Session
+    abstract getClass(): Class<this>
+    abstract toIntlString(plural?: number | undefined): string
+
+    exert(value: IntlString, target?: PropertyType, key?: PropertyKey): any {
+      // console.log('TIntlString.exert')
+      // console.log(target)
+      // console.log(key)
+      return value
+    }
+    hibernate(value: any): IntlString { return value }
+  }
+
+  platform.setMetadata(ui.native.IntlString, TIntlString.prototype)
+
   const uiPlugin = new UIPluginImpl(platform)
   Vue.prototype.$uiPlugin = uiPlugin
   return uiPlugin

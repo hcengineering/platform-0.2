@@ -13,14 +13,15 @@
 // limitations under the License.
 //
 
-import { loadMetadata } from '@anticrm/platform'
+import { Platform } from '@anticrm/platform'
 import contact from '.'
 
-const spritesUrl = require('../../assets/icons.svg')
-
-export default loadMetadata(contact.icon, {
-  Phone: spritesUrl + '#add-group',
-  Email: spritesUrl + '#add',
-  Twitter: spritesUrl + '#checked',
-  Address: spritesUrl + '#edit',
-})
+export default (platform: Platform) => {
+  const spritesUrl = require('../../assets/icons.svg')
+  platform.loadMetadata(contact.icon, {
+    Phone: spritesUrl + '#add-group',
+    Email: spritesUrl + '#add',
+    Twitter: spritesUrl + '#checked',
+    Address: spritesUrl + '#edit',
+  })
+} 

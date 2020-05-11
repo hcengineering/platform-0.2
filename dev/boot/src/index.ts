@@ -23,6 +23,10 @@ import uiMeta from '@anticrm/platform-ui/src/__resources__/meta'
 if (!show) {
   uiMeta(platform)
 }
+import contactMeta from '@anticrm/contact/src/__resources__/meta'
+if (!show) {
+  contactMeta(platform)
+}
 
 // S T A R T  I 1 8 N  P L U G I N
 
@@ -41,6 +45,16 @@ import startCore from '@anticrm/platform-core/src/plugin'
 const corePlugin = startCore(platform)
 const session = corePlugin.getSession()
 platform.setPlugin(core.id, corePlugin)
+
+// S T A R T  U I  P L U G I N
+
+import ui from '@anticrm/platform-ui'
+import startUI from '@anticrm/platform-ui/src/plugin'
+
+if (!show) {
+  const uiPlugin = startUI(platform)
+  platform.setPlugin(ui.id, uiPlugin)
+}
 
 // B U I L D  M O D E L S
 
@@ -72,15 +86,6 @@ contactClass.newInstance({
   phone: '+7 913 333 5555'
 })
 
-// S T A R T  U I  P L U G I N
-
-import ui from '@anticrm/platform-ui'
-import startUI from '@anticrm/platform-ui/src/plugin'
-
-if (!show) {
-  const uiPlugin = startUI(platform)
-  platform.setPlugin(ui.id, uiPlugin)
-}
 
 // D U M P
 

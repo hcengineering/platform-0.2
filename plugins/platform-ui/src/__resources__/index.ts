@@ -13,6 +13,7 @@
 // limitations under the License.
 //
 
+import { Metadata } from '@anticrm/platform'
 import ui, { TypeUIDecorator, UIDecorator } from '..'
 
 import { Ref, Class, Type } from '@anticrm/platform-core'

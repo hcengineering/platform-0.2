@@ -19,7 +19,7 @@ import ui from '.'
 import { Builder } from '@anticrm/platform-core/src/__resources__/builder'
 
 export default (B: Builder) => {
-  const i18n = B.createStruct(ui.class.IntlString, core.class.Type, {})
+  const i18n = B.createStruct(ui.class.IntlString, core.class.Type, {}, ui.native.IntlString)
 
   B.createStruct(ui.class.UIDecorator, core.class.Emb, {
     label: i18n.newInstance({}),

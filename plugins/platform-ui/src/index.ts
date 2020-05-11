@@ -14,7 +14,7 @@
 //
 
 import { Metadata, Plugin, PluginId, plugin } from '@anticrm/platform'
-import { Doc, Emb, Obj, AnyType, Ref, Class, Bag, } from '@anticrm/platform-core'
+import { Doc, Emb, Obj, AnyType, Ref, Class, Bag, Type } from '@anticrm/platform-core'
 import { IntlString } from '@anticrm/platform-core-i18n'
 
 export type Asset = Metadata<string>
@@ -73,6 +73,9 @@ export default plugin(
     },
     class: {
       ClassUIDecorator: '' as Ref<Class<ClassUIDecorator<Doc>>>
-    }
+    },
+    native: {
+      IntlString: '' as Metadata<Type<IntlString>>,
+    },
   }
 )

@@ -15,6 +15,9 @@
 
 import platform from '@anticrm/platform'
 import startCorePlugin from '@anticrm/platform-core/src/plugin'
+import i18n from '@anticrm/platform-core-i18n'
+import startI18nPlugin from '@anticrm/platform-core-i18n/src/plugin'
+import startUIPlugin from '@anticrm/platform-ui/src/plugin'
 
 import { Class, Obj, Ref, Doc } from '@anticrm/platform-core'
 import { ClassUIDecorator } from '@anticrm/platform-ui'
@@ -35,6 +38,10 @@ describe('session', () => {
   const session = corePlugin.getSession()
   coreModel(session)
 
+  const i18nPlugin = startI18nPlugin(platform)
+  platform.setPlugin(i18n.id, i18nPlugin)
+  startUIPlugin(platform)
+
   const builder = new Builder(session)
   uiModel(builder)
 
@@ -51,7 +58,7 @@ describe('session', () => {
         _attributes: typeDecorator.newInstance({ label: 'The Label' as IntlString })
       }
     })
-    expect(decoClass.decorators._attributes.label).toBe('The Label')
+    expect(decoClass.decorators?._attributes.label).toBe('The Label')
     expect(decoClass._native).toBe(core.native.Class)
   })
 })

@@ -38,8 +38,10 @@ export default modelTranslation(contact.class, {
     $placeholder: 'andrey.v.platov@gmail.com'
   },
 
-  // Phone: 'Телефон',
-  // Phone_placeholder: '+7 913 333 5555',
+  Phone: {
+    $label: 'Телефон',
+    $placeholder: '+7 913 333 5555'
+  },
 
   // Twitter: 'Twitter',
   // Twitter_placeholder: '@twitter',
