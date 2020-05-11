@@ -26,7 +26,7 @@ export default (S: Builder) => {
   const twitter = S.createStruct(contact.class.Twitter, core.class.Type, {})
   const address = S.createStruct(contact.class.Address, core.class.Type, {})
 
-  const contactClass = S.createClass(contact.class.Contact, core.class.Doc, {
+  S.createClass(contact.class.Contact, core.class.Doc, {
     email: email.newInstance({}),
     phone: phone.newInstance({}),
     phoneWork: phone.newInstance({}),
@@ -35,7 +35,10 @@ export default (S: Builder) => {
     addressDelivery: address.newInstance({}),
   })
 
-  S.decorateClass(contact.class.Email, {}, 'Email' as IntlString)
+  S.decorateClass(contact.class.Email, {}, contact.string.Email, contact.icon.Email)
+  S.decorateClass(contact.class.Phone, {}, contact.string.Phone, contact.icon.Phone)
+  S.decorateClass(contact.class.Twitter, {}, contact.string.Twitter, contact.icon.Twitter)
+  S.decorateClass(contact.class.Address, {}, contact.string.Address, contact.icon.Address)
 
   S.decorateClass(contact.class.Contact, {
     phone: S.typeDeco({ label: 'Телефон' as IntlString })

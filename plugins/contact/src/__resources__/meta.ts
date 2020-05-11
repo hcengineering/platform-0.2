@@ -13,7 +13,14 @@
 // limitations under the License.
 //
 
-export default {
-  events: [
-  ]
-}
+import { loadMetadata } from '@anticrm/platform'
+import contact from '.'
+
+const spritesUrl = require('../../assets/icons.svg')
+
+export default loadMetadata(contact.icon, {
+  Phone: spritesUrl + '#add-group',
+  Email: spritesUrl + '#add',
+  Twitter: spritesUrl + '#checked',
+  Address: spritesUrl + '#edit',
+})

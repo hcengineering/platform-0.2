@@ -41,13 +41,13 @@ import { Builder as CoreBuilder } from '@anticrm/platform-core/src/__resources__
 uiModel(new CoreBuilder(session))
 
 // Contact
-import contactCoreModel from '@anticrm/contact-core/src/__resources__/model'
+import contactCoreModel from '@anticrm/contact/src/__resources__/model'
 import { Builder as UIBuilder } from '@anticrm/platform-ui/src/__resources__/builder'
 contactCoreModel(new UIBuilder(session))
 
 // Test
 import { Ref } from '@anticrm/platform-core'
-import contactCore, { Contact } from '@anticrm/contact-core'
+import contactCore, { Contact } from '@anticrm/contact'
 
 export const contact1 = 'test.contact.1' as Ref<Contact>
 

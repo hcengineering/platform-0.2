@@ -23,7 +23,7 @@ import PropPanel from '@anticrm/platform-ui/src/components/PropPanel.vue'
 
 import core from '@anticrm/platform-core'
 
-import contactCore from '@anticrm/contact-core'
+import contact from '@anticrm/contact'
 import { contact1 } from '@anticrm/dev-boot'
 
 export default {
@@ -41,11 +41,11 @@ const session = corePlugin.getSession()
 console.log('story session dump')
 console.log(session.dump())
 
-const contact = session.getInstance(contact1, contactCore.class.Contact)
+const contactInstance = session.getInstance(contact1, contact.class.Contact)
 const props = ['phone', 'email']
 
 export const properties = () => ({
   render() {
-    return <Theme><PropPanel object={contact} filter={props}></PropPanel></Theme>
+    return <Theme><PropPanel object={contactInstance} filter={props}></PropPanel></Theme>
   }
 })
