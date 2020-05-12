@@ -1,5 +1,5 @@
 <!--
-// Copyright © 2020 Andrey Platov <andrey.v.platov@gmail.com>
+// Copyright © 2020 Anticrm Platform Contributors.
 // 
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
