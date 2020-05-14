@@ -13,24 +13,8 @@
 // limitations under the License.
 //
 
-// import { verifyTranslation } from '@anticrm/platform-core-i18n/src/__resources__/utils'
 import { modelTranslation } from '@anticrm/platform-ui/src/__resources__/utils'
 import contact from '..'
-
-// export default verifyTranslation(contact.string, {
-//   Email: 'Email',
-//   Email_placeholder: 'andrey.v.platov@gmail.com',
-
-//   Phone: 'Телефон',
-//   Phone_placeholder: '+7 913 333 5555',
-
-//   Twitter: 'Twitter',
-//   Twitter_placeholder: '@twitter',
-
-//   Address: 'Адрес',
-//   Address_placeholder: 'Новосибирск, Красный проспект, 15',
-
-// })
 
 export default modelTranslation(contact.class, {
   Email: {
@@ -53,5 +37,11 @@ export default modelTranslation(contact.class, {
     $label: 'Контактная информация',
     phoneWork: 'Рабочий',
     addressDelivery: 'Адрес доставки'
+  },
+  Person: {
+    $label: 'Общая информация',
+    firstName: 'Имя',
+    lastName: 'Фамилия',
+    birthDate: 'День рождения'
   }
 })
