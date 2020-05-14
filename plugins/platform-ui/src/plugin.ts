@@ -111,7 +111,7 @@ class UIPluginImpl implements UIPlugin {
         break
       clazz = clazz.getSession().getInstance(_extends, core.class.Class) // TODO: getInstance(unknown) fails
     }
-    return result
+    return result.reverse()
   }
 
   async getAttrModel(_class: Class<Obj>, props?: string[]): Promise<AttrModel[]> {

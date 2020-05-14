@@ -20,29 +20,28 @@ import platform from '@anticrm/platform'
 
 import core, { Obj, Ref, Class } from '@anticrm/platform-core'
 
+import { Person } from '..'
+
 import ui, { UIPlugin, AttrModel } from '@anticrm/platform-ui'
-import PropPanel from './PropPanel.vue'
+
+import ObjectPanel from '@anticrm/platform-ui/src/components/ObjectPanel.vue'
+import InlineEdit from '@anticrm/platform-ui-controls/src/InlineEdit.vue'
 
 export default Vue.extend({
-  components: { PropPanel },
+  components: { ObjectPanel, InlineEdit },
   props: {
-    object: Object as PropType<Obj>,
-    filter: Array as PropType<string[] | undefined>,
+    object: Object as PropType<Person>,
   },
-  computed: {
-    classes(): Class<Obj>[] { return this.$uiPlugin.getClassHierarchy(this.object.getClass()) }
-  }
 })
 </script>
 
 <template>
-  <table>
-    <tr>
-      <td valign="top" v-for="clazz in classes" :key="clazz._id">
-        <PropPanel :clazz="clazz" :object="object" />
-      </td>
-    </tr>
-  </table>
+  <div>
+    <InlineEdit class="caption-1" v-model="object.firstName" placeholder="Фамилия" />
+    <br />
+    <InlineEdit class="caption-2" v-model="object.lastName" placeholder="Имя Отчество" />
+    <ObjectPanel :object="object" style="margin-top: 2em" />
+  </div>
 </template>
 
 
