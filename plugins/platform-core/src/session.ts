@@ -105,7 +105,7 @@ export class TSession implements Session {
     let _id = (data as Content<Doc>)._id
     console.log('Creating Document: ' + _id)
     if (_id === undefined) {
-      _id = generateId()
+      _id = generateId() as Ref<Doc>
     }
     const container = this.memdb.get(_id, true) // TODO: must be create! raise error if container exists
     container._classes.push(_class as unknown as Ref<Class<Doc>>)
