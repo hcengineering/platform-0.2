@@ -55,7 +55,8 @@ export interface UIPlugin extends Plugin {
   getClassModel(clazz: Class<Obj>): ClassUIModel
   getDefaultAttrModel(props: string[]): AttrModel[]
   groupByType(model: AttrModel[]): { [key: string]: AttrModel[] }
-  getAttrModel(clazz: Class<Obj>, object: Obj, props?: string[]): Promise<AttrModel[]>
+  getOwnAttrModel(clazz: Class<Obj>, props?: string[]): Promise<AttrModel[]>
+  getAttrModel(clazz: Class<Obj>, props?: string[]): Promise<AttrModel[]>
 }
 
 // D E S C R I P T O R

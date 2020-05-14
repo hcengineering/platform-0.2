@@ -15,6 +15,7 @@
 
 import { Platform, Metadata } from '@anticrm/platform'
 import { MemDb } from './memdb'
+import { generateId } from './objectid'
 import core, {
   Obj, Doc, Ref, Bag, Class, Type, Emb, Content,
   PropertyType, DiffDescriptors, Container, Session, ContainerId
@@ -101,7 +102,11 @@ export class TSession implements Session {
   }
 
   createDocument<T extends Doc>(_class: Ref<Class<T>>, data: object): T {
-    const _id = (data as Content<Doc>)._id
+    let _id = (data as Content<Doc>)._id
+    console.log('Creating Document: ' + _id)
+    if (_id === undefined) {
+      _id = generateId()
+    }
     const container = this.memdb.get(_id, true) // TODO: must be create! raise error if container exists
     container._classes.push(_class as unknown as Ref<Class<Doc>>)
     const instance = this.instantiate(_class, container)

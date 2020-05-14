@@ -38,7 +38,7 @@ export default Vue.extend({
     }
   },
   created() {
-    this.$uiPlugin.getAttrModel(this.clazz, this.object, this.filter)
+    this.$uiPlugin.getOwnAttrModel(this.clazz, this.filter)
       .then(result => this.model = this.$uiPlugin.groupByType(result))
   }
 })

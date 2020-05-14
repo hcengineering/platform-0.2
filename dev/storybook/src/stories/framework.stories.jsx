@@ -21,6 +21,7 @@ import platform from '@anticrm/platform'
 import Icon from '@anticrm/platform-ui/src/components/Icon.vue'
 import PropPanel from '@anticrm/platform-ui/src/components/PropPanel.vue'
 import ObjectPanel from '@anticrm/platform-ui/src/components/ObjectPanel.vue'
+import Table from '@anticrm/platform-ui/src/components/Table.vue'
 
 import core from '@anticrm/platform-core'
 
@@ -61,5 +62,23 @@ const personInstance = personClass.newInstance({})
 export const object = () => ({
   render() {
     return <Theme><ObjectPanel object={personInstance}></ObjectPanel></Theme>
+  }
+})
+
+const person1 = personClass.newInstance({})
+person1.firstName = 'Валентин Генрихович'
+person1.lastName = 'Либерзон'
+person1.email = 'lyberzone@gmail.com'
+
+const person2 = personClass.newInstance({})
+person2.firstName = 'John'
+person2.lastName = 'Carmack'
+person2.email = 'carmack@acm.org'
+
+const persons = [person1, person2]
+
+export const table = () => ({
+  render() {
+    return <Theme><Table clazz={personClass} objects={persons}></Table></Theme>
   }
 })

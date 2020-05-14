@@ -15,7 +15,7 @@
 
 import Vue from 'vue'
 
-import { Doc, Obj, Type, PropertyType, Class, Ref, Session } from '@anticrm/platform-core'
+import core, { Doc, Obj, Type, PropertyType, Class, Ref, Session } from '@anticrm/platform-core'
 import { Platform } from '@anticrm/platform'
 import ui, { UIPlugin, AttrModel, UIDecorator, ClassUIDecorator, ClassUIModel } from '.'
 import i18n, { I18nPlugin, IntlString } from '@anticrm/platform-core-i18n'
@@ -71,7 +71,7 @@ class UIPluginImpl implements UIPlugin {
       3. Property `Type`'s Class UI Decorator `label` attribute
       4. Property `Type`'s Class synthetic id
   */
-  async getAttrModel(clazz: Class<Obj>, object: Obj, props?: string[]): Promise<AttrModel[]> {
+  async getOwnAttrModel(clazz: Class<Obj>, props?: string[]): Promise<AttrModel[]> {
     //const clazz = object.getClass()
     const decorator = clazz.as(ui.class.ClassUIDecorator)
     const keys = props ?? Object.getOwnPropertyNames(clazz._attributes)
@@ -100,6 +100,25 @@ class UIPluginImpl implements UIPlugin {
       }
     })
   }
+
+  getClassHierarchy(_class: Class<Obj>): Class<Obj>[] {
+    const result = [] as Class<Obj>[]
+    let clazz = _class as Class<Obj> | undefined
+    while (clazz) {
+      result.push(clazz)
+      const _extends = clazz._extends
+      if (!_extends || _extends === core.class.Doc)
+        break
+      clazz = clazz.getSession().getInstance(_extends, core.class.Class) // TODO: getInstance(unknown) fails
+    }
+    return result
+  }
+
+  async getAttrModel(_class: Class<Obj>, props?: string[]): Promise<AttrModel[]> {
+    const ownModels = this.getClassHierarchy(_class).map(clazz => this.getOwnAttrModel(clazz, props))
+    return Promise.all(ownModels).then(result => result.flat())
+  }
+
 }
 
 export default (platform: Platform): UIPlugin => {

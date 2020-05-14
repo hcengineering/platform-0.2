@@ -49,10 +49,10 @@ export default Vue.extend({
       return result
     }
   },
-  created() {
-    this.$uiPlugin.getAttrModel(this.object, this.filter)
-      .then(result => this.model = this.$uiPlugin.groupByType(result))
-  }
+  // created() {
+  //   this.$uiPlugin.getAttrModel(this.object, this.filter)
+  //     .then(result => this.model = this.$uiPlugin.groupByType(result))
+  // }
 })
 </script>
 
