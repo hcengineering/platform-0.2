@@ -21,7 +21,7 @@ export default (platform: Platform) => {
   platform.loadMetadata(contact.icon, {
     Phone: spritesUrl + '#phone',
     Email: spritesUrl + '#email',
-    Twitter: spritesUrl + '#checked',
-    Address: spritesUrl + '#edit',
+    Twitter: spritesUrl + '#date',
+    Address: spritesUrl + '#address',
   })
 } 
