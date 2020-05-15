@@ -16,7 +16,8 @@
 import { Metadata } from '@anticrm/platform'
 
 import { BagOf, InstanceOf, RefTo } from '..'
-import { Ref, Class, Obj, Doc, Content, DiffDescriptors, PropertyType, Type, Container, Emb, ArrayOf, Session } from '..'
+import { Ref, Class, Obj, Doc, Content, DiffDescriptors, PropertyType, Type, Emb, ArrayOf, Session } from '..'
+import { Container } from '../memdb'
 
 import core from '.'
 
@@ -111,5 +112,6 @@ export const metaModel = [
 ]
 
 export default (session: Session) => {
-  session.loadModel(metaModel)
+  throw new Error('switched off')
+  // session.loadModel(metaModel)
 }

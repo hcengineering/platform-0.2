@@ -20,6 +20,7 @@ import { metaModel } from '../__resources__/model'
 describe('memdb', () => {
 
   it('should load classes into memdb', () => {
+    console.log(metaModel)
     const memdb = new MemDb()
     memdb.load(metaModel)
     const object = memdb.get(core.class.Emb)
