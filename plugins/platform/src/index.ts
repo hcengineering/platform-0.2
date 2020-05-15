@@ -23,7 +23,7 @@ export type PluginId<S extends Plugin> = Metadata<S>
 export interface Platform { }
 export interface Plugin {
   readonly platform: Platform
-  readonly pluginId: PluginId<Plugin>
+  // readonly pluginId: PluginId<Plugin>
 }
 
 export interface PluginDescriptor<P extends Plugin> {
@@ -31,9 +31,9 @@ export interface PluginDescriptor<P extends Plugin> {
   deps: PluginId<Plugin>[]
 }
 
-interface PluginModule<P extends Plugin> {
+type PluginModule<P extends Plugin> = Promise<{
   default: (platform: Platform) => P
-}
+}>
 
 //////////////
 
@@ -59,7 +59,7 @@ export class Platform {
   /////
 
   private plugins = new Map<PluginId<Plugin>, Plugin>()
-  private locations = new Map<PluginId<Plugin>, Plugin>()
+  private locations = [] as [PluginDescriptor<Plugin>, PluginModule<Plugin>][]
 
   // temporary method for testing purposes
   getPluginSync<T extends Plugin>(id: PluginId<T>): T {
@@ -70,6 +70,27 @@ export class Platform {
 
   setPlugin<T extends Plugin>(id: PluginId<T>, plugin: T): void {
     this.plugins.set(id, plugin)
+  }
+
+  private getLocation<T extends Plugin>(id: PluginId<T>): [PluginDescriptor<T>, PluginModule<T>] {
+    for (const location of this.locations) {
+      if (location[0].id === id)
+        return location as [PluginDescriptor<T>, PluginModule<T>]
+    }
+    throw new Error('no descriptor for: ' + id)
+  }
+
+  async getPlugin<T extends Plugin>(id: PluginId<T>): Promise<T> {
+    const plugin = this.plugins.get(id)
+    if (plugin) return plugin as T
+    const location = this.getLocation(id)
+    const descriptor = location[0]
+    const deps = await Promise.all(descriptor.deps.map(plugin => this.getPlugin(plugin)))
+    return location[1].then(module => module.default).then(f => f(this))
+  }
+
+  addLocation<P extends Plugin>(plugin: PluginDescriptor<P>, module: PluginModule<P>) {
+    this.locations.push([plugin, module])
   }
 
   /////
