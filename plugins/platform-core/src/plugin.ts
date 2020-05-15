@@ -35,9 +35,9 @@ export default (platform: Platform): CorePlugin => {
 
     private session: TSession
 
-    constructor(platform: Platform) {
+    constructor(platform: Platform, session: TSession) {
       this.platform = platform
-      this.session = new TSession(this.platform)
+      this.session = session
     }
 
     getSession() { return this.session }
@@ -193,5 +193,13 @@ export default (platform: Platform): CorePlugin => {
   platform.setMetadata(core.native.Class, TClass.prototype)
   platform.setMetadata(core.native.Struct, TStruct.prototype)
 
-  return new TCorePlugin(platform)
+  // B O O T  S E S S I O N -- temporarily
+
+  const session = new TSession(platform)
+  const bootFunc = platform.getMetadata(core.func.Boot)
+  if (bootFunc) {
+    bootFunc(session)
+  }
+
+  return new TCorePlugin(platform, session)
 }

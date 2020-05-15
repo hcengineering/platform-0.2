@@ -144,5 +144,8 @@ export default plugin(
       Class: '' as Ref<Class<Class<Obj>>>,
       Struct: '' as Ref<Class<Class<Obj>>>,
     },
+    func: {
+      Boot: '' as Metadata<(session: Session) => void>
+    }
   })
 

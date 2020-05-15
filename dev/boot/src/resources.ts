@@ -30,18 +30,15 @@ import { Builder as UIBuilder } from '@anticrm/platform-ui/src/__resources__/bui
 import i18n from '@anticrm/platform-core-i18n'
 import contactStrings from '@anticrm/contact/src/__resources__/strings/ru'
 
-export async function loadModel(platform: Platform): Promise<[Session, void]> {
-  await platform.getPlugin(ui.id)
-  return Promise.all([
-    platform.getPlugin(core.id).then(plugin => {
-      const session = plugin.getSession()
-      session.loadModel(metaModel)
+export function bootModel(session: Session) {
+  session.loadModel(metaModel)
+  uiModel(new CoreBuilder(session))
+  contactCoreModel(new UIBuilder(session))
+}
 
-      uiModel(new CoreBuilder(session))
-      contactCoreModel(new UIBuilder(session))
-      return session
-    }),
-    platform.getPlugin(i18n.id).then(plugin => {
-      plugin.loadStrings(contactStrings)
-    })])
+export async function loadStrings(platform: Platform): Promise<void> {
+  await platform.getPlugin(ui.id)
+  return platform.getPlugin(i18n.id).then(plugin => {
+    plugin.loadStrings(contactStrings)
+  })
 }

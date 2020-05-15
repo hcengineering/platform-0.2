@@ -15,8 +15,8 @@
 
 import platform from '@anticrm/dev-boot'
 import { setup } from '@anticrm/dev-boot/src/setup'
+import { loadMetadata } from '@anticrm/dev-boot/src/meta'
 import { loadModel } from '@anticrm/dev-boot/src/model'
-import { loadMetadata } from '@anticrm/dev-boot/src/model'
 
 setup(platform)
 loadMetadata(platform)

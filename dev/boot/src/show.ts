@@ -14,14 +14,18 @@
 //
 
 import { Platform } from '@anticrm/platform'
+import core from '@anticrm/platform-core'
 
 import { setup } from './setup'
-import { loadModel } from './model'
+import { loadStrings, bootModel } from './resources'
 
 const platform = new Platform()
 
 setup(platform)
-loadModel(platform).then(_ => {
-  const containers = _[0].dump()
+platform.setMetadata(core.func.Boot, bootModel)
+loadStrings(platform)
+
+platform.getPlugin(core.id).then(plugin => {
+  const containers = plugin.getSession().dump()
   console.log(JSON.stringify(containers))
 })

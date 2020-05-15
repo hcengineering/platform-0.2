@@ -16,7 +16,6 @@
 import Theme from '../components/Theme.vue'
 
 import ui from '@anticrm/platform-ui'
-import platform from '@anticrm/platform'
 
 import Icon from '@anticrm/platform-ui/src/components/Icon.vue'
 import PropPanel from '@anticrm/platform-ui/src/components/PropPanel.vue'
@@ -26,6 +25,8 @@ import Table from '@anticrm/platform-ui/src/components/Table.vue'
 import core from '@anticrm/platform-core'
 
 import contact from '@anticrm/contact'
+
+import platform from '@anticrm/dev-boot'
 
 export default {
   title: 'Framework'
@@ -39,7 +40,10 @@ export const icon = () => ({
     </Theme>
   }
 })
-const corePlugin = platform.getPluginSync(core.id)
+
+const corePlugin = platform.getPlugin(core.id)
+console.log('core plugin')
+console.log(corePlugin)
 const session = corePlugin.getSession()
 
 console.log('story session dump')
