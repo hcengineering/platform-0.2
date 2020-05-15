@@ -13,10 +13,11 @@
 // limitations under the License.
 // 
 
-import { Platform, identify, AnyPlugin, Resource, Plugin, PluginId, plugin } from '..'
+import { Platform, identify, AnyPlugin, Resource, Metadata } from '..'
 
 import { plugin1, descriptor1, plugin1State } from './shared'
 import { plugin2, descriptor2, plugin2State } from './shared'
+import { plugin3, descriptor3, plugin3State } from './shared'
 
 
 describe('platform', () => {
@@ -26,10 +27,12 @@ describe('platform', () => {
   it('should identify resources', () => {
     const ids = identify('test' as AnyPlugin, {
       resource: {
-        MyString: '' as Resource<string>
+        MyString: '' as Resource<string>,
+        FixedId: 'my-id' as Resource<string>
       },
     })
     expect(ids.resource.MyString).toBe('resource:test.MyString')
+    expect(ids.resource.FixedId).toBe('my-id')
   })
 
   it('should raise exception for unknown location', () => {
@@ -51,12 +54,12 @@ describe('platform', () => {
     })
   })
 
-  it('should not resolve resource', () => {
+  it('should not resolve resource (no provider specified)', () => {
     const resolve = () => platform.resolve('resource:My.Resource' as Resource<string>)
     expect(resolve).toThrowError('no provider')
   })
 
-  it('should not resolve resource', () => {
+  it('should not resolve resource (plugin does not have resolve method)', () => {
     // @ts-expect-error
     platform.setResolver('resource', plugin1)
     const resolved = platform.resolve('resource:My.Resource' as Resource<string>)
@@ -78,8 +81,28 @@ describe('platform', () => {
     })
   })
 
-  it('should inject dependencies', () => {
+  it('should resolve resource second time', () => {
+    const resolved = platform.resolve('resource2:My.Resource2' as Resource<string>)
+    expect(resolved).toBeInstanceOf(Promise)
+    return resolved.then(resource => {
+      expect(resource).toBe('hello resource2:My.Resource2')
+    })
+  })
 
+  it('should inject dependencies', () => {
+    platform.addLocation(descriptor3, () => import('./plugin3'))
+    const p3 = platform.getPlugin(plugin3)
+    return p3.then(plugin => {
+      const deps = (plugin as any).deps
+      expect(deps.plugin1.id).toBe('plugin1')
+      expect(deps.plugin2.id).toBe('plugin2')
+      expect(typeof deps.plugin2.resolve === 'function').toBeTruthy()
+    })
+  })
+
+  it('should set metadata', () => {
+    platform.setMetadata('xxx' as Metadata<string>, 'meta-xxx')
+    expect(platform.getMetadata('xxx' as Metadata<string>)).toBe('meta-xxx')
   })
 
 })

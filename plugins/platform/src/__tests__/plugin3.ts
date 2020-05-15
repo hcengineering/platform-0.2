@@ -15,14 +15,16 @@
 
 import { plugin, Resource, ResourcePlugin, Platform } from '..'
 
-import { plugin3State } from './shared'
+import { plugin3State, TestPlugin } from './shared'
 
 plugin3State.parsed = true
 
 export default (platform: Platform, deps: {
-  plugin1: Plugin,
-  plugin2: Plugin
+  plugin1: TestPlugin,
+  plugin2: ResourcePlugin
 }) => {
   plugin3State.started = true
-  return {}
+  return {
+    deps
+  }
 }

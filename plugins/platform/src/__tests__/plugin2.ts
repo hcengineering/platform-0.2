@@ -15,13 +15,14 @@
 
 import { plugin, Resource, ResourcePlugin, Platform } from '..'
 
-import { plugin2State } from './shared'
+import { plugin2State, TestPlugin } from './shared'
 
 plugin2State.parsed = true
 
 export default (platform: Platform, deps: {}) => {
   plugin2State.started = true
-  const plugin: ResourcePlugin = {
+  const plugin = {
+    id: 'plugin2',
     resolve(resource: Resource<any>): any {
       return 'hello ' + resource
     }

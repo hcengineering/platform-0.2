@@ -43,5 +43,7 @@ export const descriptor3 = plugin(plugin3, {
 
 export const plugin3State = {
   parsed: false,
-  started: false
+  started: false,
+  dep1: '',
+  dep2: ''
 }

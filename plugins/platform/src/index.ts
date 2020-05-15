@@ -165,16 +165,16 @@ export class Platform {
     this.metadata.set(id as string, value)
   }
 
-  loadMetadata<T, X extends Record<string, Metadata<T>>>(ids: X, resources: ExtractType<T, X>) {
-    for (const key in ids) {
-      const id = ids[key]
-      const resource = resources[key]
-      if (!resource) {
-        throw new Error(`no resource provided, key: ${key}, id: ${id}`)
-      }
-      this.metadata.set(id as string, resource)
-    }
-  }
+  // loadMetadata<T, X extends Record<string, Metadata<T>>>(ids: X, resources: ExtractType<T, X>) {
+  //   for (const key in ids) {
+  //     const id = ids[key]
+  //     const resource = resources[key]
+  //     if (!resource) {
+  //       throw new Error(`no resource provided, key: ${key}, id: ${id}`)
+  //     }
+  //     this.metadata.set(id as string, resource)
+  //   }
+  // }
 }
 
 //////
