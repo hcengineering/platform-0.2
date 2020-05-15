@@ -16,6 +16,7 @@
 import { Platform, identify, AnyPlugin, Resource, Plugin, PluginId, plugin } from '..'
 
 import { plugin1, descriptor1, plugin1State } from './shared'
+import { plugin2, descriptor2, plugin2State } from './shared'
 
 
 describe('platform', () => {
@@ -29,6 +30,11 @@ describe('platform', () => {
       },
     })
     expect(ids.resource.MyString).toBe('resource:test.MyString')
+  })
+
+  it('should raise exception for unknown location', () => {
+    const p1 = platform.getPlugin(plugin1)
+    expect(p1).rejects.toThrowError('no descriptor for: plugin1')
   })
 
   it('should resolve plugin', () => {
@@ -50,12 +56,30 @@ describe('platform', () => {
     expect(resolve).toThrowError('no provider')
   })
 
-  it('should resolve resource', () => {
+  it('should not resolve resource', () => {
+    // @ts-expect-error
     platform.setResolver('resource', plugin1)
     const resolved = platform.resolve('resource:My.Resource' as Resource<string>)
     expect(resolved).toBeInstanceOf(Promise)
+    return expect(resolved).rejects.toThrowError('plugin.resolve is not a function')
+  })
+
+  it('should resolve resource', () => {
+    platform.addLocation(descriptor2, () => import('./plugin2'))
+    platform.setResolver('resource2', plugin2)
+    expect(plugin2State.parsed).toBe(false)
+    expect(plugin2State.started).toBe(false)
+    const resolved = platform.resolve('resource2:My.Resource' as Resource<string>)
+    expect(resolved).toBeInstanceOf(Promise)
     return resolved.then(resource => {
-      console.log(resource)
+      expect(resource).toBe('hello resource2:My.Resource')
+      expect(plugin2State.parsed).toBe(true)
+      expect(plugin2State.started).toBe(true)
     })
   })
+
+  it('should inject dependencies', () => {
+
+  })
+
 })

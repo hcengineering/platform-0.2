@@ -44,7 +44,7 @@ export type AnyPlugin = PluginId<Plugin>
 export interface Plugin { }
 
 export interface ResourcePlugin extends Plugin {
-  resolve<T>(resource: Resource<T>): T
+  resolve(resource: Resource<any>): any
 }
 
 /**
@@ -123,6 +123,7 @@ export class Platform {
     throw new Error('no descriptor for: ' + id)
   }
 
+  // TODO #3 `PluginModule` type does not check against `PluginDescriptor` 
   addLocation<P extends Plugin, X extends PluginDependencies>(plugin: PluginDescriptor<P, X>, module: PluginModule<P, X>) {
     this.locations.push([plugin, module as any])
   }

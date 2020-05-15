@@ -15,10 +15,33 @@
 
 import { Plugin, PluginId, plugin, ResourcePlugin } from '..'
 
-export const plugin1 = 'plugin1' as PluginId<ResourcePlugin>
+export interface TestPlugin {
+  id: PluginId<Plugin>
+}
+
+export const plugin1 = 'plugin1' as PluginId<TestPlugin>
 export const descriptor1 = plugin(plugin1, {}, {})
 
 export const plugin1State = {
+  parsed: false,
+  started: false
+}
+
+export const plugin2 = 'plugin2' as PluginId<ResourcePlugin>
+export const descriptor2 = plugin(plugin2, {}, {})
+
+export const plugin2State = {
+  parsed: false,
+  started: false
+}
+
+export const plugin3 = 'plugin3' as PluginId<Plugin>
+export const descriptor3 = plugin(plugin3, {
+  plugin1,
+  plugin2
+}, {})
+
+export const plugin3State = {
   parsed: false,
   started: false
 }
