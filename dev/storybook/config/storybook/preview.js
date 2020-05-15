@@ -13,6 +13,11 @@
 // limitations under the License.
 //
 
-// import '@anticrm/dev-boot/src/meta'
-import '@anticrm/dev-boot'
+import platform from '@anticrm/dev-boot'
+import { setup } from '@anticrm/dev-boot/src/setup'
+import { loadModel } from '@anticrm/dev-boot/src/model'
+import { loadMetadata } from '@anticrm/dev-boot/src/model'
 
+setup(platform)
+loadMetadata(platform)
+loadModel(platform).then(_ => { })

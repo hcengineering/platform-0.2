@@ -14,7 +14,7 @@
 //
 
 import { mergeWith } from 'lodash'
-import { PluginDescriptor, Plugin, identify } from '@anticrm/platform'
+import { PluginDescriptor, Plugin, identify, PluginDependencies } from '@anticrm/platform'
 
 type PluginIds = { [key: string]: { [key: string]: any } }
 
@@ -28,7 +28,7 @@ export function mergeIds<A extends PluginIds, B extends PluginIds>(a: A, b: B): 
 
 type Namespace = Record<string, Record<string, any>>
 
-export function extendIds<P extends Plugin, D extends PluginDescriptor<P>, N extends Namespace>(a: D, b: N): D & N {
+export function extendIds<P extends Plugin, X extends PluginDependencies, D extends PluginDescriptor<P, X>, N extends Namespace>(a: D, b: N): D & N {
   return mergeWith({}, a, identify(a.id, b), (value) => {
     if (typeof value === 'string') {
       throw new Error('attempting to overwrite ' + value)

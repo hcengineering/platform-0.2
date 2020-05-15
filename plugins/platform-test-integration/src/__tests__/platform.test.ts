@@ -15,15 +15,26 @@
 
 import { Platform } from '@anticrm/platform'
 import core from '@anticrm/platform-core'
+import ui from '@anticrm/platform-ui'
+import i18n from '@anticrm/platform-core-i18n'
 
 describe('platfrom', () => {
 
   const platform = new Platform()
 
   it('should load core plugin', () => {
-    platform.addLocation(core, import('@anticrm/platform-core/src/plugin'))
+    platform.addLocation(core, () => import('@anticrm/platform-core/src/plugin'))
     const plugin = platform.getPlugin(core.id)
 
     return plugin.then(plugin => { expect(plugin.platform === platform).toBe(true) })
   })
+
+  it('should load ui plugin', () => {
+    platform.addLocation(i18n, () => import('@anticrm/platform-core-i18n/src/plugin'))
+    platform.addLocation(ui, () => import('@anticrm/platform-ui/src/plugin'))
+    const plugin = platform.getPlugin(ui.id)
+
+    return plugin.then(plugin => { expect(plugin.platform === platform).toBe(true) })
+  })
+
 })

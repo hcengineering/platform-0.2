@@ -82,6 +82,9 @@ export class TSession implements Session {
     const attributes = classContainer._attributes as Bag<Type<PropertyType>>
     if (classContainer._native) {
       const native = this.platform.getMetadata(classContainer._native as Metadata<Class<Obj>>)
+      if (native === undefined) {
+        throw new Error('no native prototype: ' + classContainer._native)
+      }
       Object.defineProperties(proto, Object.getOwnPropertyDescriptors(native))
     }
 

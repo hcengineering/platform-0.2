@@ -22,22 +22,26 @@ import { TSession, SessionProto, Konstructor, Layout } from './session'
 
 //////////
 
-class TCorePlugin implements CorePlugin {
-
-  readonly platform: Platform
-  readonly pluginId = core.id
-
-  private session: TSession
-
-  constructor(platform: Platform) {
-    this.platform = platform
-    this.session = new TSession(this.platform)
-  }
-
-  getSession() { return this.session }
-}
+console.log('PLUGIN: parsed core')
 
 export default (platform: Platform): CorePlugin => {
+
+  console.log('PLUGIN: started core')
+
+  class TCorePlugin implements CorePlugin {
+
+    readonly platform: Platform
+    readonly pluginId = core.id
+
+    private session: TSession
+
+    constructor(platform: Platform) {
+      this.platform = platform
+      this.session = new TSession(this.platform)
+    }
+
+    getSession() { return this.session }
+  }
 
   class TSessionProto implements SessionProto {
     getSession(): TSession { throw new Error('session provide the implementation') }

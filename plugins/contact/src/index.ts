@@ -34,7 +34,7 @@ export interface Person extends Contact {
 
 export default plugin(
   'contact' as PluginId<Plugin>,
-  [],
+  {},
   {
     class: {
       Contact: '' as Ref<Class<Contact>>,

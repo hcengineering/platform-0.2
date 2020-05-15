@@ -17,36 +17,43 @@ import { IntlMessageFormat, PrimitiveType } from 'intl-messageformat'
 import { Platform } from '@anticrm/platform'
 import { I18nPlugin, IntlString, pluginId } from '..'
 
-class I18nPluginImpl implements I18nPlugin {
-  readonly pluginId = pluginId
-  readonly platform: Platform
+console.log('PLUGIN: parsed i18n')
 
-  private strings: Map<IntlString, string> = new Map()
-  private imfCache: Map<IntlString, IntlMessageFormat> = new Map()
+export default (platform: Platform, deps: {}): I18nPlugin => {
 
-  constructor(platform: Platform) { this.platform = platform }
+  console.log('PLUGIN: started i18n')
 
-  translate(string: IntlString, params?: Record<string, PrimitiveType> | undefined): string | undefined {
-    const translation = this.strings.get(string)
-    if (!translation) {
-      return undefined
-    }
-    if (params) {
-      let imf = this.imfCache.get(string)
-      if (!imf) {
-        imf = new IntlMessageFormat(translation, 'ru-RU')
-        this.imfCache.set(string, imf)
+  class I18nPluginImpl implements I18nPlugin {
+    readonly pluginId = pluginId
+    readonly platform: Platform
+
+    private strings: Map<IntlString, string> = new Map()
+    private imfCache: Map<IntlString, IntlMessageFormat> = new Map()
+
+    constructor(platform: Platform) { this.platform = platform }
+
+    translate(string: IntlString, params?: Record<string, PrimitiveType> | undefined): string | undefined {
+      const translation = this.strings.get(string)
+      if (!translation) {
+        return undefined
       }
-      return imf.format(params) as string
+      if (params) {
+        let imf = this.imfCache.get(string)
+        if (!imf) {
+          imf = new IntlMessageFormat(translation, 'ru-RU')
+          this.imfCache.set(string, imf)
+        }
+        return imf.format(params) as string
+      }
+      return translation
     }
-    return translation
+
+    loadStrings(translations: { [key: string]: string }) {
+      for (const key in translations) {
+        this.strings.set(key as IntlString, translations[key])
+      }
+    }
   }
 
-  loadStrings(translations: { [key: string]: string }) {
-    for (const key in translations) {
-      this.strings.set(key as IntlString, translations[key])
-    }
-  }
+  return new I18nPluginImpl(platform)
 }
-
-export default (platform: Platform): I18nPlugin => new I18nPluginImpl(platform)

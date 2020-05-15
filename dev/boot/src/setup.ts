@@ -16,13 +16,11 @@
 import { Platform } from '@anticrm/platform'
 
 import core from '@anticrm/platform-core'
-// import CorePlugin from '@anticrm/platform-core/src/plugin'
+import ui from '@anticrm/platform-ui'
+import i18n from '@anticrm/platform-core-i18n'
 
-const platform = new Platform()
-
-const x = import('@anticrm/platform-core/src/plugin')
-
-declare const t: typeof import("/Users/z2sx/platform/plugins/platform-core/src/plugin")
-
-
-// platform.addLoader(core.id, import('@anticrm/platform-core/src/plugin'))
+export function setup(platform: Platform) {
+  platform.addLocation(core, () => import('@anticrm/platform-core/src/plugin'))
+  platform.addLocation(i18n, () => import('@anticrm/platform-core-i18n/src/plugin'))
+  platform.addLocation(ui, () => import('@anticrm/platform-ui/src/plugin'))
+}

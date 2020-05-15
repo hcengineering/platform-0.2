@@ -14,8 +14,8 @@
 //
 
 import { Metadata, Plugin, PluginId, plugin } from '@anticrm/platform'
-import { Doc, Emb, Obj, AnyType, Ref, Class, Bag, Type } from '@anticrm/platform-core'
-import { IntlString } from '@anticrm/platform-core-i18n'
+import core, { Doc, Emb, Obj, AnyType, Ref, Class, Bag, Type } from '@anticrm/platform-core'
+import i18n, { IntlString } from '@anticrm/platform-core-i18n'
 
 export type Asset = Metadata<string>
 
@@ -70,7 +70,10 @@ export interface UIPlugin extends Plugin {
 
 export default plugin(
   'ui' as PluginId<UIPlugin>,
-  [],
+  {
+    i18n: i18n.id,
+    core: core.id
+  },
   {
     icon: {
       AddGroup: '' as Asset,

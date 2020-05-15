@@ -13,16 +13,15 @@
 // limitations under the License.
 //
 
-import { PrimitiveType } from 'intl-messageformat'
-import { AsString, Plugin, PluginId, plugin } from '@anticrm/platform'
+import { Platform } from '@anticrm/platform'
 
-export type IntlString = AsString<string> & { __intl_string: void }
+import { setup } from './setup'
+import { loadModel } from './model'
 
-export const pluginId = 'i18n' as PluginId<I18nPlugin>
+const platform = new Platform()
 
-export interface I18nPlugin extends Plugin {
-  translate(string: IntlString, params?: Record<string, PrimitiveType> | undefined): string | undefined
-  loadStrings(translations: { [key: string]: string }): void
-}
-
-export default plugin('i18n' as PluginId<I18nPlugin>, {}, {})
+setup(platform)
+loadModel(platform).then(_ => {
+  const containers = _[0].dump()
+  console.log(JSON.stringify(containers))
+})

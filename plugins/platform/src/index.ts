@@ -26,13 +26,19 @@ export interface Plugin {
   // readonly pluginId: PluginId<Plugin>
 }
 
-export interface PluginDescriptor<P extends Plugin> {
-  id: PluginId<P>,
-  deps: PluginId<Plugin>[]
+export interface PluginDependencies { [key: string]: PluginId<Plugin> }
+
+type InferPlugins<T extends PluginDependencies> = {
+  [P in keyof T]: T[P] extends PluginId<infer Plugin> ? Plugin : T[P]
 }
 
-type PluginModule<P extends Plugin> = Promise<{
-  default: (platform: Platform) => P
+export interface PluginDescriptor<P extends Plugin, D extends PluginDependencies> {
+  id: PluginId<P>,
+  deps: D
+}
+
+type PluginModule<P extends Plugin, D extends PluginDependencies> = () => Promise<{
+  default: (platform: Platform, deps: InferPlugins<D>) => P
 }>
 
 //////////////
@@ -59,7 +65,7 @@ export class Platform {
   /////
 
   private plugins = new Map<PluginId<Plugin>, Plugin>()
-  private locations = [] as [PluginDescriptor<Plugin>, PluginModule<Plugin>][]
+  private locations = [] as [PluginDescriptor<Plugin, PluginDependencies>, PluginModule<Plugin, PluginDependencies>][]
 
   // temporary method for testing purposes
   getPluginSync<T extends Plugin>(id: PluginId<T>): T {
@@ -72,32 +78,48 @@ export class Platform {
     this.plugins.set(id, plugin)
   }
 
-  private getLocation<T extends Plugin>(id: PluginId<T>): [PluginDescriptor<T>, PluginModule<T>] {
+  private getLocation(id: PluginId<Plugin>): [PluginDescriptor<Plugin, PluginDependencies>, PluginModule<Plugin, PluginDependencies>] {
     for (const location of this.locations) {
       if (location[0].id === id)
-        return location as [PluginDescriptor<T>, PluginModule<T>]
+        return location
     }
     throw new Error('no descriptor for: ' + id)
   }
 
-  async getPlugin<T extends Plugin>(id: PluginId<T>): Promise<T> {
-    const plugin = this.plugins.get(id)
-    if (plugin) return plugin as T
-    const location = this.getLocation(id)
-    const descriptor = location[0]
-    const deps = await Promise.all(descriptor.deps.map(plugin => this.getPlugin(plugin)))
-    return location[1].then(module => module.default).then(f => f(this))
+  private loading = new Map<PluginId<Plugin>, Promise<Plugin>>()
+
+  async resolveDependencies(deps: PluginDependencies): Promise<{ [key: string]: Plugin }> {
+    const result = {} as { [key: string]: Plugin }
+    for (const key in deps) {
+      const id = deps[key]
+      result[key] = await this.getPlugin(id)
+    }
+    return result
   }
 
-  addLocation<P extends Plugin>(plugin: PluginDescriptor<P>, module: PluginModule<P>) {
-    this.locations.push([plugin, module])
+  async getPlugin<T extends Plugin>(id: PluginId<T>): Promise<T> {
+    const plugin = this.loading.get(id)
+    if (plugin) {
+      return plugin as Promise<T>
+    } else {
+      const location = this.getLocation(id)
+      const deps = await this.resolveDependencies(location[0].deps)
+      const module = location[1] as PluginModule<T, PluginDependencies>
+      const plugin = module().then(module => module.default).then(f => f(this, deps))
+      this.loading.set(id, plugin)
+      return plugin
+    }
+  }
+
+  addLocation<P extends Plugin, X extends PluginDependencies>(plugin: PluginDescriptor<P, X>, module: PluginModule<P, X>) {
+    this.locations.push([plugin, module as any])
   }
 
   /////
 
   private metadata = new Map<string, any>()
 
-  getMetadata<T>(id: Metadata<T>): T {
+  getMetadata<T>(id: Metadata<T>): T | undefined {
     return this.metadata.get(id as string)
   }
 
@@ -139,8 +161,8 @@ export function identify<N extends Namespace>(pluginId: PluginId<Plugin>, namesp
   return transform(pluginId, namespace, (id: string, value) => value === '' ? id : value)
 }
 
-export function plugin<P extends Plugin, N extends Namespace>(id: PluginId<P>, deps: PluginId<Plugin>[], namespace: N): PluginDescriptor<P> & N {
+export function plugin<P extends Plugin, D extends PluginDependencies, N extends Namespace>(id: PluginId<P>, deps: D, namespace: N): PluginDescriptor<P, D> & N {
   return { id, deps, ...identify(id, namespace) }
 }
 
-export default new Platform()
+// export default new Platform()

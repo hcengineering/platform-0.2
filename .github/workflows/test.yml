@@ -20,3 +20,4 @@ jobs:
         yarn workspace @anticrm/platform-core run test
         yarn workspace @anticrm/platform-core-i18n run test
         yarn workspace @anticrm/platform-ui run test
+        yarn workspace @anticrm/platform-test-integration run test

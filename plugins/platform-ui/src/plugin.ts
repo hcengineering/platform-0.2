@@ -26,14 +26,12 @@ export function synthIntlStringId(clazz: Ref<Class<Obj>>, propertyKey: string, a
 
 class UIPluginImpl implements UIPlugin {
 
-  readonly pluginId = ui.id
   readonly platform: Platform
-
   readonly i18n: I18nPlugin
 
-  constructor(platform: Platform) {
+  constructor(platform: Platform, deps: { i18n: I18nPlugin }) {
     this.platform = platform
-    this.i18n = platform.getPluginSync(i18n.id)
+    this.i18n = deps.i18n
   }
 
   getClassModel(clazz: Class<Obj>): ClassUIModel {
@@ -121,7 +119,11 @@ class UIPluginImpl implements UIPlugin {
 
 }
 
-export default (platform: Platform): UIPlugin => {
+console.log('PLUGIN: parsed ui')
+
+export default (platform: Platform, deps: { i18n: I18nPlugin }): UIPlugin => {
+
+  console.log('PLUGIN: started ui')
 
   abstract class TIntlString implements Type<IntlString> {
     _class!: Ref<Class<this>>
@@ -140,7 +142,9 @@ export default (platform: Platform): UIPlugin => {
 
   platform.setMetadata(ui.native.IntlString, TIntlString.prototype)
 
-  const uiPlugin = new UIPluginImpl(platform)
-  Vue.prototype.$uiPlugin = uiPlugin
+  const uiPlugin = new UIPluginImpl(platform, deps)
+  if (Vue) {
+    Vue.prototype.$uiPlugin = uiPlugin
+  }
   return uiPlugin
 }

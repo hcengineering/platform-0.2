@@ -122,7 +122,7 @@ export interface CorePlugin extends Plugin {
 
 export default plugin(
   'core' as PluginId<CorePlugin>,
-  [],
+  {},
   {
     native: {
       Emb: '' as Metadata<Emb>,
