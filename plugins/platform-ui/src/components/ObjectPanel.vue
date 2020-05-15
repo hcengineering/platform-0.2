@@ -16,7 +16,6 @@
 <script lang="ts">
 
 import Vue, { PropType } from 'vue'
-import platform from '@anticrm/platform'
 
 import core, { Obj, Ref, Class } from '@anticrm/platform-core'
 

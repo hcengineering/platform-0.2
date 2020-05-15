@@ -13,7 +13,8 @@
 // limitations under the License.
 //
 
-import platform from '@anticrm/platform'
+import { Platform } from '@anticrm/platform'
+
 import startCorePlugin from '@anticrm/platform-core/src/plugin'
 import i18n from '@anticrm/platform-core-i18n'
 import startI18nPlugin from '@anticrm/platform-core-i18n/src/plugin'
@@ -34,6 +35,7 @@ import { IntlString } from '@anticrm/platform-core-i18n'
 
 describe('session', () => {
 
+  const platform = new Platform()
   const corePlugin = startCorePlugin(platform)
   const session = corePlugin.getSession()
   coreModel(session)

@@ -16,7 +16,6 @@
 <script lang="ts">
 
 import Vue from 'vue'
-import platform from '@anticrm/platform'
 import { Asset } from '@anticrm/platform-ui'
 
 export default Vue.extend({
@@ -27,7 +26,7 @@ export default Vue.extend({
     }
   },
   computed: {
-    url(): string { return platform.getMetadata(this.icon) },
+    url(): string { return this.$uiPlugin.platform.getMetadata(this.icon) },
   }
 })
 </script>
