@@ -13,19 +13,9 @@
 // limitations under the License.
 //
 
-import { Platform } from '@anticrm/platform'
-import core from '@anticrm/platform-core'
+import { session } from '.'
 
-import { setup } from './setup'
-import { loadStrings, bootModel } from './resources'
-
-const platform = new Platform()
-
-setup(platform)
-platform.setMetadata(core.func.Boot, bootModel)
-loadStrings(platform)
-
-platform.getPlugin(core.id).then(plugin => {
-  const containers = plugin.getSession().dump()
+session.then(session => {
+  const containers = session.dump()
   console.log(JSON.stringify(containers))
 })

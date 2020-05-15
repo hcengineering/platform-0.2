@@ -15,7 +15,7 @@
 
 import Vue from 'vue'
 
-import core, { Doc, Obj, Type, PropertyType, Class, Ref, Session } from '@anticrm/platform-core'
+import core, { Doc, Obj, Type, PropertyType, Class, Ref, Session, CorePlugin } from '@anticrm/platform-core'
 import { Platform } from '@anticrm/platform'
 import ui, { UIPlugin, AttrModel, UIDecorator, ClassUIDecorator, ClassUIModel } from '.'
 import i18n, { I18nPlugin, IntlString } from '@anticrm/platform-core-i18n'
@@ -28,13 +28,16 @@ class UIPluginImpl implements UIPlugin {
 
   readonly platform: Platform
   readonly i18n: I18nPlugin
+  readonly core: CorePlugin
 
-  constructor(platform: Platform, deps: { i18n: I18nPlugin }) {
+  constructor(platform: Platform, deps: { i18n: I18nPlugin, core: CorePlugin }) {
     this.platform = platform
     this.i18n = deps.i18n
+    this.core = deps.core
   }
 
-  getClassModel(clazz: Class<Obj>): ClassUIModel {
+  getClassModel(_class: Ref<Class<Obj>>): ClassUIModel {
+    const clazz = this.core.getSession().getInstance(_class, core.class.Class)
     const decorator = clazz.as(ui.class.ClassUIDecorator)
     const label = decorator?.label ?? synthIntlStringId(clazz._id, 'label')
     return {
@@ -69,8 +72,8 @@ class UIPluginImpl implements UIPlugin {
       3. Property `Type`'s Class UI Decorator `label` attribute
       4. Property `Type`'s Class synthetic id
   */
-  async getOwnAttrModel(clazz: Class<Obj>, props?: string[]): Promise<AttrModel[]> {
-    //const clazz = object.getClass()
+  async getOwnAttrModel(_class: Ref<Class<Obj>>, props?: string[]): Promise<AttrModel[]> {
+    const clazz = this.core.getSession().getInstance(_class, core.class.Class)
     const decorator = clazz.as(ui.class.ClassUIDecorator)
     const keys = props ?? Object.getOwnPropertyNames(clazz._attributes)
 
@@ -112,16 +115,17 @@ class UIPluginImpl implements UIPlugin {
     return result.reverse()
   }
 
-  async getAttrModel(_class: Class<Obj>, props?: string[]): Promise<AttrModel[]> {
-    const ownModels = this.getClassHierarchy(_class).map(clazz => this.getOwnAttrModel(clazz, props))
-    return Promise.all(ownModels).then(result => result.flat())
+  async getAttrModel(_class: Ref<Class<Obj>>, props?: string[]): Promise<AttrModel[]> {
+    // const ownModels = this.getClassHierarchy(_class).map(clazz => this.getOwnAttrModel(clazz, props))
+    // return Promise.all(ownModels).then(result => result.flat())
+    return {} as Promise<AttrModel[]>
   }
 
 }
 
 console.log('PLUGIN: parsed ui')
 
-export default (platform: Platform, deps: { i18n: I18nPlugin }): UIPlugin => {
+export default (platform: Platform, deps: { i18n: I18nPlugin, core: CorePlugin }): UIPlugin => {
 
   console.log('PLUGIN: started ui')
 

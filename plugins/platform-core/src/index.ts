@@ -49,6 +49,7 @@ export interface Emb extends Obj { }
 export interface Doc extends Obj {
   _id: Ref<this>
   as<T extends Doc>(_class: Ref<Class<T>>): T | undefined
+  mixins(): Ref<Class<Doc>>[]
 }
 
 // T Y P E S
@@ -144,8 +145,5 @@ export default plugin(
       Class: '' as Ref<Class<Class<Obj>>>,
       Struct: '' as Ref<Class<Class<Obj>>>,
     },
-    func: {
-      Boot: '' as Metadata<(session: Session) => void>
-    }
   })
 

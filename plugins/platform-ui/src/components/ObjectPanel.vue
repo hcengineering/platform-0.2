@@ -17,7 +17,7 @@
 
 import Vue, { PropType } from 'vue'
 
-import core, { Obj, Ref, Class } from '@anticrm/platform-core'
+import core, { Obj, Doc, Ref, Class } from '@anticrm/platform-core'
 
 import ui, { UIPlugin, AttrModel } from '@anticrm/platform-ui'
 import PropPanel from './PropPanel.vue'
@@ -25,11 +25,16 @@ import PropPanel from './PropPanel.vue'
 export default Vue.extend({
   components: { PropPanel },
   props: {
-    object: Object as PropType<Obj>,
+    object: Promise as PropType<Promise<Doc>>,
     filter: Array as PropType<string[] | undefined>,
   },
-  computed: {
-    classes(): Class<Obj>[] { return this.$uiPlugin.getClassHierarchy(this.object.getClass()) }
+  data() {
+    return {
+      classes: [] as Ref<Class<Obj>>[]
+    }
+  },
+  created() {
+    this.object.then(object => this.classes = object.mixins())
   }
 })
 </script>
@@ -43,7 +48,6 @@ export default Vue.extend({
     </tr>
   </table>
 </template>
-
 
 <style scoped lang="scss">
 @import "~@anticrm/platform-ui-theme/css/_variables.scss";

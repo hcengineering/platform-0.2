@@ -52,11 +52,11 @@ export interface ClassUIModel {
 }
 
 export interface UIPlugin extends Plugin {
-  getClassModel(clazz: Class<Obj>): ClassUIModel
+  getClassModel(_class: Ref<Class<Obj>>): ClassUIModel
   getDefaultAttrModel(props: string[]): AttrModel[]
   groupByType(model: AttrModel[]): { [key: string]: AttrModel[] }
-  getOwnAttrModel(clazz: Class<Obj>, props?: string[]): Promise<AttrModel[]>
-  getAttrModel(clazz: Class<Obj>, props?: string[]): Promise<AttrModel[]>
+  getOwnAttrModel(clazz: Ref<Class<Obj>>, props?: string[]): Promise<AttrModel[]>
+  getAttrModel(clazz: Ref<Class<Obj>>, props?: string[]): Promise<AttrModel[]>
 }
 
 // D E S C R I P T O R

@@ -15,4 +15,12 @@
 
 import { Platform } from '@anticrm/platform'
 
-export default new Platform()
+import { setup } from './setup'
+import { getSession } from './resources'
+
+const platform = new Platform()
+
+setup(platform)
+export const session = getSession(platform)
+
+export default platform

@@ -26,7 +26,7 @@ import core from '@anticrm/platform-core'
 
 import contact from '@anticrm/contact'
 
-import platform from '@anticrm/dev-boot'
+import { session } from '@anticrm/dev-boot'
 
 export default {
   title: 'Framework'
@@ -41,27 +41,26 @@ export const icon = () => ({
   }
 })
 
-const corePlugin = platform.getPlugin(core.id)
-console.log('core plugin')
-console.log(corePlugin)
-const session = corePlugin.getSession()
+const contactInstance = session.then(session => {
+  const contactClass = session.getClass(contact.class.Contact)
+  const contactInstance = contactClass.newInstance({ email: 'xxx@gmail.com' })
+  return contactInstance
+})
 
-console.log('story session dump')
-console.log(session.dump())
-
-const contactClass = session.getClass(contact.class.Contact)
-const contactInstance = contactClass.newInstance({})
 const props = ['phone', 'email']
 
 export const properties = () => ({
   render() {
-    return <Theme><PropPanel clazz={contactClass} object={contactInstance}></PropPanel></Theme>
+    return <Theme><PropPanel clazz={contact.class.Contact} object={contactInstance}></PropPanel></Theme>
     //    return <Theme><PropPanel object={contactInstance} filter={props}></PropPanel></Theme>
   }
 })
 
-const personClass = session.getClass(contact.class.Person)
-const personInstance = personClass.newInstance({})
+// const personClass = session.getClass(contact.class.Person)
+const personInstance = session.then(session => {
+  const clazz = session.getClass(contact.class.Person)
+  return clazz.newInstance({})
+})
 
 export const object = () => ({
   render() {
@@ -69,20 +68,20 @@ export const object = () => ({
   }
 })
 
-const person1 = personClass.newInstance({})
-person1.firstName = 'Валентин Генрихович'
-person1.lastName = 'Либерзон'
-person1.email = 'lyberzone@gmail.com'
+// const person1 = personClass.newInstance({})
+// person1.firstName = 'Валентин Генрихович'
+// person1.lastName = 'Либерзон'
+// person1.email = 'lyberzone@gmail.com'
 
-const person2 = personClass.newInstance({})
-person2.firstName = 'John'
-person2.lastName = 'Carmack'
-person2.email = 'carmack@acm.org'
+// const person2 = personClass.newInstance({})
+// person2.firstName = 'John'
+// person2.lastName = 'Carmack'
+// person2.email = 'carmack@acm.org'
 
-const persons = [person1, person2]
+// const persons = [person1, person2]
 
-export const table = () => ({
-  render() {
-    return <Theme><Table clazz={personClass} objects={persons}></Table></Theme>
-  }
-})
+// export const table = () => ({
+//   render() {
+//     return <Theme><Table clazz={personClass} objects={persons}></Table></Theme>
+//   }
+// })

@@ -17,7 +17,7 @@
 
 import Vue, { PropType } from 'vue'
 
-import { Obj, Class } from '@anticrm/platform-core'
+import { Obj, Class, Ref } from '@anticrm/platform-core'
 
 import ui, { UIPlugin, AttrModel } from '@anticrm/platform-ui'
 import InlineEdit from '@anticrm/platform-ui-controls/src/InlineEdit.vue'
@@ -26,19 +26,21 @@ import Icon from './Icon.vue'
 export default Vue.extend({
   components: { InlineEdit, Icon },
   props: {
-    object: Object as PropType<Obj>,
-    clazz: Object as PropType<Class<Obj>>,
+    object: Promise as PropType<Promise<Obj>>,
+    clazz: String as unknown as PropType<Ref<Class<Obj>>>,
     filter: Array as PropType<string[]>
   },
   data() {
     return {
       model: this.$uiPlugin.groupByType(this.$uiPlugin.getDefaultAttrModel(this.filter)),
-      classModel: this.$uiPlugin.getClassModel(this.clazz)
+      classModel: this.$uiPlugin.getClassModel(this.clazz),
+      content: {}
     }
   },
   created() {
     this.$uiPlugin.getOwnAttrModel(this.clazz, this.filter)
       .then(result => this.model = this.$uiPlugin.groupByType(result))
+    this.object.then(res => this.content = res)
   }
 })
 </script>
@@ -53,7 +55,7 @@ export default Vue.extend({
       <div style="margin-right: 1em; margin-bottom: 1em">
         <div v-for="prop in attrs" :key="prop.key">
           <div class="caption-4">{{ prop.label }}</div>
-          <InlineEdit v-model="object[prop.key]" :placeholder="prop.placeholder" />
+          <InlineEdit v-model="content[prop.key]" :placeholder="prop.placeholder" />
         </div>
       </div>
     </div>

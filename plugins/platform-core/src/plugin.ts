@@ -69,6 +69,10 @@ export default (platform: Platform): CorePlugin => {
     as<T extends Doc>(_class: Ref<Class<T>>): T | undefined {
       return this.getSession().as(this as unknown as Layout<Doc>, _class)
     }
+    mixins(): Ref<Class<Doc>>[] {
+      const layout = this as unknown as Layout<Doc>
+      return layout.__layout._classes as Ref<Class<Doc>>[]
+    }
 
     __mapKey(_class: Ref<Class<Obj>>, key: string) { return key.startsWith('_') ? key : _class + ':' + key }
   }
@@ -193,13 +197,8 @@ export default (platform: Platform): CorePlugin => {
   platform.setMetadata(core.native.Class, TClass.prototype)
   platform.setMetadata(core.native.Struct, TStruct.prototype)
 
-  // B O O T  S E S S I O N -- temporarily
+  // B O O T  S E S S I O N
 
   const session = new TSession(platform)
-  const bootFunc = platform.getMetadata(core.func.Boot)
-  if (bootFunc) {
-    bootFunc(session)
-  }
-
   return new TCorePlugin(platform, session)
 }
