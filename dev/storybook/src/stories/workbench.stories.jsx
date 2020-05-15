@@ -26,7 +26,7 @@ export default {
   title: 'Workbench'
 }
 
-const corePlugin = platform.getPlugin(core.id)
+const corePlugin = platform.getPluginSync(core.id)
 const session = corePlugin.getSession()
 
 export const workbench = () => ({

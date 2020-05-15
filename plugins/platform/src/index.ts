@@ -31,6 +31,10 @@ export interface PluginDescriptor<P extends Plugin> {
   deps: PluginId<Plugin>[]
 }
 
+interface PluginModule<P extends Plugin> {
+  default: (platform: Platform) => P
+}
+
 //////////////
 
 type ExtractType<T, X extends Record<string, Metadata<T>>> = { [P in keyof X]:
@@ -55,8 +59,10 @@ export class Platform {
   /////
 
   private plugins = new Map<PluginId<Plugin>, Plugin>()
+  private locations = new Map<PluginId<Plugin>, Plugin>()
 
-  getPlugin<T extends Plugin>(id: PluginId<T>): T {
+  // temporary method for testing purposes
+  getPluginSync<T extends Plugin>(id: PluginId<T>): T {
     const plugin = this.plugins.get(id)
     if (plugin) return plugin as T
     throw new Error('plugin not loaded: ' + id)
@@ -78,7 +84,6 @@ export class Platform {
     this.metadata.set(id as string, value)
   }
 
-  // TODO: remove
   loadMetadata<T, X extends Record<string, Metadata<T>>>(ids: X, resources: ExtractType<T, X>) {
     for (const key in ids) {
       const id = ids[key]
@@ -90,23 +95,7 @@ export class Platform {
     }
   }
 
-  // loadMeta(map: Map<string, string>) {
-  //   map.forEach((value, key) => this.metadata.set(key, value))
-  // }
 }
-
-// export function loadMetadata<T, X extends Record<string, Metadata<T>>>(ids: X, resources: ExtractType<T, X>): Map<string, string> {
-//   const result = new Map()
-//   for (const key in ids) {
-//     const id = ids[key]
-//     const resource = resources[key]
-//     if (!resource) {
-//       throw new Error(`no resource provided, key: ${key}, id: ${id}`)
-//     }
-//     result.set(id as string, resource)
-//   }
-//   return result
-// }
 
 //////
 

@@ -39,7 +39,7 @@ export const icon = () => ({
     </Theme>
   }
 })
-const corePlugin = platform.getPlugin(core.id)
+const corePlugin = platform.getPluginSync(core.id)
 const session = corePlugin.getSession()
 
 console.log('story session dump')

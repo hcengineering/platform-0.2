@@ -13,30 +13,16 @@
 // limitations under the License.
 //
 
-import Theme from '../components/Theme.vue'
-
-import ui from '@anticrm/platform-ui'
-import platform from '@anticrm/platform'
-
-import ContactForm from '@anticrm/contact/src/components/ContactForm.vue'
+import { Platform } from '@anticrm/platform'
 
 import core from '@anticrm/platform-core'
+// import CorePlugin from '@anticrm/platform-core/src/plugin'
 
-import contact from '@anticrm/contact'
+const platform = new Platform()
 
-export default {
-  title: 'Contact'
-}
+const x = import('@anticrm/platform-core/src/plugin')
 
-const corePlugin = platform.getPluginSync(core.id)
-const session = corePlugin.getSession()
+declare const t: typeof import("/Users/z2sx/platform/plugins/platform-core/src/plugin")
 
-const personClass = session.getClass(contact.class.Person)
-const personInstance = personClass.newInstance({})
 
-export const Form = () => ({
-  render() {
-    return <Theme><ContactForm object={personInstance}></ContactForm></Theme>
-  }
-})
-
+// platform.addLoader(core.id, import('@anticrm/platform-core/src/plugin'))

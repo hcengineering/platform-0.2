@@ -33,7 +33,7 @@ class UIPluginImpl implements UIPlugin {
 
   constructor(platform: Platform) {
     this.platform = platform
-    this.i18n = platform.getPlugin(i18n.id)
+    this.i18n = platform.getPluginSync(i18n.id)
   }
 
   getClassModel(clazz: Class<Obj>): ClassUIModel {
