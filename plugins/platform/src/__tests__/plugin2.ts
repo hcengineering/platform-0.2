@@ -24,6 +24,9 @@ export default (platform: Platform, deps: {}) => {
   const plugin = {
     id: 'plugin2',
     resolve(resource: Resource<any>): any {
+      if (resource === 'resource2:undefined') {
+        return undefined
+      }
       return 'hello ' + resource
     }
   }

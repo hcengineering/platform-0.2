@@ -89,6 +89,14 @@ describe('platform', () => {
     })
   })
 
+  it('should resolve resource to undefined', () => {
+    const resolved = platform.resolve('resource2:undefined' as Resource<string>)
+    expect(resolved).toBeInstanceOf(Promise)
+    return resolved.then(resource => {
+      expect(resource).toBeUndefined()
+    })
+  })
+
   it('should inject dependencies', () => {
     platform.addLocation(descriptor3, () => import('./plugin3'))
     const p3 = platform.getPlugin(plugin3)
