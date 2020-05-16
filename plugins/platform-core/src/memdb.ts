@@ -24,8 +24,12 @@ export interface Container {
   _mixins?: ClassId[]
 }
 
+interface Attribute { }
+
 interface ContainerClass extends Container {
+  _attributes: { [key: string]: Attribute }
   _extends?: ClassId
+  _native?: string
 }
 
 function filterEq(docs: any, propertyKey: string, value: LayoutType): any[] {
@@ -50,7 +54,7 @@ export class MemDb {
     this.objects.set(id, doc)
   }
 
-  get(_id: ContainerId, create?: boolean): Container {
+  get(_id: ContainerId): Container {
     const result = this.objects.get(_id)
     if (!result) {
       throw new Error('no container with id ' + _id)
@@ -113,15 +117,15 @@ export class MemDb {
     }
   }
 
-  private getClass(_class: ClassId): ContainerClass | undefined {
-    return this.objects.get(_class)
+  getClass(_class: ClassId): ContainerClass {
+    return this.get(_class) as ContainerClass
   }
 
   index(container: Container) {
     let _class = container._class as ClassId | undefined
     while (_class) {
       this.getAllOfClass(_class).push(container)
-      const superClass = this.getClass(_class)?._extends
+      const superClass = this.getClass(_class)._extends
       if (superClass) {
         this.addSubclass(superClass, _class)
       }

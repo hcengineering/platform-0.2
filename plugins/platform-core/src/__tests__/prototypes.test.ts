@@ -17,14 +17,26 @@ import { MemDb } from '../memdb'
 import core from '../__resources__/'
 import { metaModel } from '../__resources__/model'
 
-describe('memdb', () => {
+import { Platform } from '@anticrm/platform'
+import { Prototypes } from '../prototypes'
 
-  it('should load classes into memdb', () => {
-    console.log(metaModel)
-    const memdb = new MemDb()
+describe('prototypes', () => {
+
+  const platform = new Platform()
+  const memdb = new MemDb()
+  const prototypes = new Prototypes(platform, memdb, {})
+
+  it('should load metamodel', () => {
     memdb.load(metaModel)
+
     const object = memdb.get(core.class.Emb)
     expect(object._id).toBe(core.class.Emb)
     expect(object._class).toBe(core.class.Class)
   })
+
+  it('should create prototype', () => {
+    const proto = prototypes.getPrototype(core.class.Doc)
+    console.log(proto)
+  })
+
 })
