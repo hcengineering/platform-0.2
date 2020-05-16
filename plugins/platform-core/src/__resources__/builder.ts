@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Resource } from '@anticrm/platform'
+import { Resource, Metadata } from '@anticrm/platform'
 import { Session, Doc, Ref, Emb, Class, DiffDescriptors, Type, PropertyType, BagOf, InstanceOf, Obj } from '..'
 import core from '.'
 
@@ -25,8 +25,13 @@ class CoreBuilder implements Session {
     this.session = session
   }
 
-  async meta<T>(): Promise<Type<Resource<T>>> {
+  async resource<T>(): Promise<Type<Resource<T>>> {
     const meta = await this.session.getClass(core.class.Resource)
+    return meta.newInstance({})
+  }
+
+  async metadata<T>(): Promise<Type<Metadata<T>>> {
+    const meta = await this.session.getClass(core.class.Metadata)
     return meta.newInstance({})
   }
 

@@ -54,7 +54,7 @@ export function createClass<T extends E, E extends Obj>(
 }
 
 export function str(): Type<string> { return newStruct(core.class.String, {}) }
-function meta<T>(): Type<Resource<T>> { return newStruct(core.class.Resource, {}) }
+function resource<T>(): Type<Resource<T>> { return newStruct(core.class.Resource, {}) }
 function ref<T extends Doc>(to: Ref<Class<T>>): RefTo<T> {
   return newStruct(core.class.RefTo as unknown as Ref<Class<RefTo<T>>>, { to })
 }
@@ -83,6 +83,7 @@ export const metaModel = [
   }),
   createStruct(core.class.Type, core.class.Emb, {}, core.native.Type),
   createStruct(core.class.Resource, core.class.Type, {}, core.native.Type),
+  createStruct(core.class.Metadata, core.class.Type, {}, core.native.Type),
   createStruct(core.class.String, core.class.Type, {}, core.native.Type),
 
   createStruct(core.class.RefTo, core.class.Type, {
@@ -101,7 +102,7 @@ export const metaModel = [
   createClass(core.class.StructuralFeature, core.class.Doc, {
     _attributes: bag(obj(core.class.Type)),
     _extends: ref(core.class.Struct),
-    _native: meta()
+    _native: resource()
   }, core.native.StructuralFeature),
 
   createClass(core.class.Struct, core.class.StructuralFeature, {

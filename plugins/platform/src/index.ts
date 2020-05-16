@@ -120,7 +120,7 @@ export class Platform {
       if (location[0].id === id)
         return location
     }
-    throw new Error('no descriptor for: ' + id)
+    throw new Error('no location provided for plugin: ' + id)
   }
 
   // TODO #3 `PluginModule` type does not check against `PluginDescriptor` 

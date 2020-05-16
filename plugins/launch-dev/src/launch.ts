@@ -22,7 +22,9 @@ import { LaunchPlugin } from '..'
 import { metaModel } from '@anticrm/platform-core/src/__resources__/model'
 
 import CoreBuilder from '@anticrm/platform-core/src/__resources__/builder'
+
 import i18nModel from '@anticrm/platform-core-i18n/src/__resources__/model'
+import uiModel from '@anticrm/platform-ui/src/__resources__/model'
 
 export default async (platform: Platform, deps: { core: CorePlugin, db: Db }): Promise<LaunchPlugin> => {
   const db = deps.db
@@ -32,6 +34,7 @@ export default async (platform: Platform, deps: { core: CorePlugin, db: Db }): P
 
   const coreBuilder = new CoreBuilder(session)
   const i18n = await coreBuilder.build(i18nModel)
+  const ui = await coreBuilder.build(uiModel)
 
   return {
     db
