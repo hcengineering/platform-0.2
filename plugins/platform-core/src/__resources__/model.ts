@@ -13,11 +13,11 @@
 // limitations under the License.
 //
 
-import { Metadata } from '@anticrm/platform'
+import { Resource } from '@anticrm/platform'
 
 import { BagOf, InstanceOf, RefTo } from '..'
 import { Ref, Class, Obj, Doc, Content, DiffDescriptors, PropertyType, Type, Emb, ArrayOf, Session } from '..'
-import { Container } from '../memdb'
+import { Container } from '@anticrm/platform-db'
 
 import core from '.'
 
@@ -31,7 +31,7 @@ export function newStruct<T extends Emb>(_class: Ref<Class<T>>, data: Content<T>
 
 export function createStruct<T extends E, E extends Obj>(
   _id: Ref<Class<T>>, _extends: Ref<Class<E>>,
-  _attributes: DiffDescriptors<T, E>, _native?: Metadata<T>) {
+  _attributes: DiffDescriptors<T, E>, _native?: Resource<T>) {
 
   return newContainer(core.class.Struct, {
     _id,
@@ -43,7 +43,7 @@ export function createStruct<T extends E, E extends Obj>(
 
 export function createClass<T extends E, E extends Obj>(
   _id: Ref<Class<T>>, _extends: Ref<Class<E>>,
-  _attributes: DiffDescriptors<T, E>, _native?: Metadata<T>) {
+  _attributes: DiffDescriptors<T, E>, _native?: Resource<T>) {
 
   return newContainer(core.class.Class, {
     _id,
@@ -54,7 +54,7 @@ export function createClass<T extends E, E extends Obj>(
 }
 
 export function str(): Type<string> { return newStruct(core.class.String, {}) }
-function meta<T>(): Type<Metadata<T>> { return newStruct(core.class.Metadata, {}) }
+function meta<T>(): Type<Resource<T>> { return newStruct(core.class.Resource, {}) }
 function ref<T extends Doc>(to: Ref<Class<T>>): RefTo<T> {
   return newStruct(core.class.RefTo as unknown as Ref<Class<RefTo<T>>>, { to })
 }
@@ -82,7 +82,7 @@ export const metaModel = [
     }
   }),
   createStruct(core.class.Type, core.class.Emb, {}, core.native.Type),
-  createStruct(core.class.Metadata, core.class.Type, {}, core.native.Type),
+  createStruct(core.class.Resource, core.class.Type, {}, core.native.Type),
   createStruct(core.class.String, core.class.Type, {}, core.native.Type),
 
   createStruct(core.class.RefTo, core.class.Type, {

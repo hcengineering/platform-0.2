@@ -18,7 +18,7 @@ import core, {
 } from '..'
 
 import { extendIds } from './utils'
-import { Metadata } from '@anticrm/platform'
+import { Resource } from '@anticrm/platform'
 
 export default extendIds(core, {
   class: {
@@ -27,7 +27,7 @@ export default extendIds(core, {
     Type: '' as Ref<Class<Type<PropertyType>>>,
 
     String: '' as Ref<Class<Type<string>>>,
-    Metadata: '' as Ref<Class<Type<Metadata<any>>>>,
+    Resource: '' as Ref<Class<Type<Resource<any>>>>,
 
     RefTo: '' as Ref<Class<RefTo<Doc>>>,
     BagOf: '' as Ref<Class<BagOf<PropertyType>>>,
