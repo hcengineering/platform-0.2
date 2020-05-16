@@ -52,7 +52,7 @@ export default (platform: Platform): CorePlugin => {
     _class!: Ref<Class<this>>
     toIntlString(plural?: number): string { return this.getClass().toIntlString(plural) }
     getClass(): Class<this> {
-      return this.getSession().getInstance(this._class, core.class.StructuralFeature as Ref<Class<Class<this>>>)
+      return this.getSession().getInstance(this._class)
     }
 
     __mapKey(_class: Ref<Class<Obj>>, key: string) { return key }
@@ -63,7 +63,7 @@ export default (platform: Platform): CorePlugin => {
     _id!: Ref<this>
     toIntlString(plural?: number): string { return this.getClass().toIntlString(plural) }
     getClass(): Class<this> {
-      return this.getSession().getInstance(this._class, core.class.StructuralFeature as Ref<Class<Class<this>>>)
+      return this.getSession().getInstance(this._class)
     }
 
     as<T extends Doc>(_class: Ref<Class<T>>): T | undefined {
