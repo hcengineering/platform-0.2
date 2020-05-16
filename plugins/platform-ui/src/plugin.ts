@@ -100,9 +100,9 @@ class UIPluginImpl implements UIPlugin {
   }
 
   async getAttrModel(_class: Ref<Class<Obj>>, props?: string[]): Promise<AttrModel[]> {
-    // const ownModels = this.getClassHierarchy(_class).map(clazz => this.getOwnAttrModel(clazz, props))
-    // return Promise.all(ownModels).then(result => result.flat())
-    return {} as Promise<AttrModel[]>
+    const hierarchy = await this.core.getClassHierarchy(_class)
+    const ownModels = hierarchy.map(clazz => this.getOwnAttrModel(clazz, props))
+    return Promise.all(ownModels).then(result => result.flat())
   }
 
 }

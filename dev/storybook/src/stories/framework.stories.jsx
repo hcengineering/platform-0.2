@@ -68,20 +68,26 @@ export const object = () => ({
   }
 })
 
-// const person1 = personClass.newInstance({})
-// person1.firstName = 'Валентин Генрихович'
-// person1.lastName = 'Либерзон'
-// person1.email = 'lyberzone@gmail.com'
 
-// const person2 = personClass.newInstance({})
-// person2.firstName = 'John'
-// person2.lastName = 'Carmack'
-// person2.email = 'carmack@acm.org'
+async function createTableConent() {
+  const session = await getSession()
+  const personClass = await session.getInstance(contact.class.Person)
 
-// const persons = [person1, person2]
+  const person1 = await personClass.newInstance({})
+  person1.firstName = 'Валентин Генрихович'
+  person1.lastName = 'Либерзон'
+  person1.email = 'lyberzone@gmail.com'
 
-// export const table = () => ({
-//   render() {
-//     return <Theme><Table clazz={personClass} objects={persons}></Table></Theme>
-//   }
-// })
+  const person2 = await personClass.newInstance({})
+  person2.firstName = 'John'
+  person2.lastName = 'Carmack'
+  person2.email = 'carmack@acm.org'
+
+  return [person1, person2]
+}
+
+export const table = () => ({
+  render() {
+    return <Theme><Table clazz={contact.class.Person} objects={createTableConent()}></Table></Theme>
+  }
+})

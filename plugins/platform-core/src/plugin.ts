@@ -50,7 +50,7 @@ export default async (platform: Platform, deps: { db: Db }): Promise<CorePlugin>
       return this.getSession().getInstanceSync(this._class)
     }
 
-    as<T extends Doc>(_class: Ref<Class<T>>): Promise<T> {
+    as<T extends Doc>(_class: Ref<Class<T>>): Promise<T | undefined> {
       return this.getSession().as(this as unknown as Layout<Doc>, _class)
     }
     mixins(): Ref<Class<Doc>>[] {

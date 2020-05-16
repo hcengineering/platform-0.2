@@ -218,9 +218,9 @@ describe('session', () => {
     expect(contact1.getClass()._id).toBe(contact.class.Contact)
 
     const mix = await contact1.as(mixinClass)
-    expect(mix.xxx).toBe('hey there!')
-    expect(mix.email).toBe('hey@hey.com')
-    expect(mix.getClass()._id).toBe(mixinClass)
+    expect(mix?.xxx).toBe('hey there!')
+    expect(mix?.email).toBe('hey@hey.com')
+    expect(mix?.getClass()._id).toBe(mixinClass)
   })
 
   it('should provide class hierarchy', async () => {

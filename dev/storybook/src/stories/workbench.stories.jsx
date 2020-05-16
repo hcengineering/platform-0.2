@@ -13,21 +13,11 @@
 // limitations under the License.
 //
 
-import Theme from '../components/Theme.vue'
-
-import ui from '@anticrm/platform-ui'
-import platform from '@anticrm/platform'
-
 import Workbench from '@anticrm/platform-workbench/src/components/Workbench.vue'
-
-import core from '@anticrm/platform-core'
 
 export default {
   title: 'Workbench'
 }
-
-const corePlugin = platform.getPluginSync(core.id)
-const session = corePlugin.getSession()
 
 export const workbench = () => ({
   render() {

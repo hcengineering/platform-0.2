@@ -42,7 +42,7 @@ export interface Obj {
 export interface Emb extends Obj { }
 export interface Doc extends Obj {
   _id: Ref<this>
-  as<T extends Doc>(_class: Ref<Class<T>>): Promise<T>
+  as<T extends Doc>(_class: Ref<Class<T>>): Promise<T | undefined>
   mixins(): Ref<Class<Doc>>[]
 }
 
