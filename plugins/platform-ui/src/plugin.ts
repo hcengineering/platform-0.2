@@ -29,16 +29,18 @@ class UIPluginImpl implements UIPlugin {
   readonly platform: Platform
   readonly i18n: I18nPlugin
   readonly core: CorePlugin
+  readonly session: Session
 
   constructor(platform: Platform, deps: { i18n: I18nPlugin, core: CorePlugin }) {
     this.platform = platform
     this.i18n = deps.i18n
     this.core = deps.core
+    this.session = deps.core.getSession()
   }
 
-  getClassModel(_class: Ref<Class<Obj>>): ClassUIModel {
-    const clazz = this.core.getSession().getInstance(_class, core.class.Class)
-    const decorator = clazz.as(ui.class.ClassUIDecorator)
+  async getClassModel(_class: Ref<Class<Obj>>): Promise<ClassUIModel> {
+    const clazz = await this.session.getInstance(_class)
+    const decorator = await clazz.as(ui.class.ClassUIDecorator)
     const label = decorator?.label ?? synthIntlStringId(clazz._id, 'label')
     return {
       label: this.i18n.translate(label) ?? label,
@@ -73,15 +75,15 @@ class UIPluginImpl implements UIPlugin {
       4. Property `Type`'s Class synthetic id
   */
   async getOwnAttrModel(_class: Ref<Class<Obj>>, props?: string[]): Promise<AttrModel[]> {
-    const clazz = this.core.getSession().getInstance(_class, core.class.Class)
-    const decorator = clazz.as(ui.class.ClassUIDecorator)
+    const clazz = await this.session.getInstance(_class)
+    const decorator = await clazz.as(ui.class.ClassUIDecorator)
     const keys = props ?? Object.getOwnPropertyNames(clazz._attributes)
 
-    return keys.map(key => {
+    const attrs = keys.map(async key => {
       const type = clazz._attributes[key]
       const typeDecorator = decorator?.decorators?.[key]
       const typeClass = type.getClass()
-      const typeClassDecorator = typeClass.as(ui.class.ClassUIDecorator)
+      const typeClassDecorator = await typeClass.as(ui.class.ClassUIDecorator)
 
       const l1 = typeDecorator?.label ?? synthIntlStringId(clazz._id, 'label', key)
       const l2 = typeClassDecorator?.label ?? synthIntlStringId(typeClass._id, 'label')
@@ -100,9 +102,10 @@ class UIPluginImpl implements UIPlugin {
         icon
       }
     })
+    return Promise.all(attrs)
   }
 
-  getClassHierarchy(_class: Class<Obj>): Class<Obj>[] {
+  async getClassHierarchy(_class: Class<Obj>): Promise<Class<Obj>[]> {
     const result = [] as Class<Obj>[]
     let clazz = _class as Class<Obj> | undefined
     while (clazz) {
@@ -110,7 +113,7 @@ class UIPluginImpl implements UIPlugin {
       const _extends = clazz._extends
       if (!_extends || _extends === core.class.Doc)
         break
-      clazz = clazz.getSession().getInstance(_extends, core.class.Class) // TODO: getInstance(unknown) fails
+      clazz = await clazz.getSession().getInstance(_extends) // TODO: getInstance(unknown) fails
     }
     return result.reverse()
   }

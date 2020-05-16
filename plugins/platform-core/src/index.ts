@@ -91,7 +91,7 @@ type Descriptors<T extends object> = AsDescrtiptors<Required<Clear<T>>>
 export type DiffDescriptors<T extends E, E> = Descriptors<Omit<T, keyof E>>
 
 export interface Session {
-  getInstance<T extends Doc>(ref: Ref<T>, as: Ref<Class<T>>): Promise<T>
+  getInstance<T extends Doc>(ref: Ref<T>): Promise<T>
 
   // loadModel(docs: Container[]): void
   // dump(): Container[]

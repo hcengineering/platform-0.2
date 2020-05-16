@@ -54,7 +54,7 @@ class CoreBuilder implements Session {
     return this.session.getClass(_class)
   }
 
-  mixin<T extends E, E extends Doc>(obj: E, _class: Ref<Class<T>>, data: Omit<T, keyof E>): T {
+  mixin<T extends E, E extends Doc>(obj: E, _class: Ref<Class<T>>, data: Omit<T, keyof E>): Promise<T> {
     return this.session.mixin(obj, _class, data)
   }
 
@@ -70,7 +70,7 @@ class CoreBuilder implements Session {
     return this.session.createStruct(_id, _extends, _attributes, _native)
   }
 
-  getInstance<T extends Doc>(ref: Ref<T>, as: Ref<Class<T>>): Promise<T> {
+  getInstance<T extends Doc>(ref: Ref<T>): Promise<T> {
     throw new Error("Method not implemented.")
   }
   // loadModel(docs: Container[]): void {
@@ -80,7 +80,7 @@ class CoreBuilder implements Session {
   //   throw new Error("Method not implemented.")
   // }
 
-  build(f: (builder: CoreBuilder) => Promise<Obj[]>): Promise<Obj[]> {
+  build(f: (builder: this) => Promise<Obj[]>): Promise<Obj[]> {
     return f(this)
   }
 }

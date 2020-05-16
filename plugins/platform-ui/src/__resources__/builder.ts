@@ -16,11 +16,11 @@
 import { Session, Type, Ref, Class, Doc, Bag, Content, Obj } from '@anticrm/platform-core'
 import { IntlString } from '@anticrm/platform-core-i18n'
 
-import { Builder as CoreBuilder } from '@anticrm/platform-core/src/__resources__/builder'
-import { Asset, TypeUIDecorator, ClassUIDecorator } from '..'
+import CoreBuilder from '@anticrm/platform-core-i18n/src/__resources__/builder'
+import { TypeUIDecorator, ClassUIDecorator } from '..'
 import ui from '.'
 
-export class Builder extends CoreBuilder {
+export default class extends CoreBuilder {
 
   protected session: Session
 
@@ -29,13 +29,8 @@ export class Builder extends CoreBuilder {
     this.session = session
   }
 
-  i18n(): Type<IntlString> {
-    const meta = this.session.getClass(ui.class.IntlString)
-    return meta.newInstance({})
-  }
-
-  typeDeco(deco: Content<TypeUIDecorator>) {
-    const typeDecorator = this.session.getClass(ui.class.TypeUIDecorator)
+  async typeDeco(deco: Content<TypeUIDecorator>) {
+    const typeDecorator = await this.session.getClass(ui.class.TypeUIDecorator)
     return typeDecorator.newInstance(deco)
   }
 
@@ -48,9 +43,14 @@ export class Builder extends CoreBuilder {
   //   })
   // }
 
-  decorateClass<T extends Obj>(_class: Ref<Class<T>>, decorators: Omit<ClassUIDecorator<Class<T>>, keyof Class<T>>) {
-    const classClass = this.session.getClass(_class)
-    return this.session.mixin(classClass, ui.class.ClassUIDecorator as Ref<Class<ClassUIDecorator<Class<T>>>>, decorators)
+  async decorateClass(_class: Ref<Class<Obj>>, decorators: Omit<ClassUIDecorator<Class<Obj>>, keyof Class<Obj>>): Promise<ClassUIDecorator<Obj>> {
+    const classClass = await this.session.getClass(_class)
+    return this.session.mixin(classClass, ui.class.ClassUIDecorator, decorators)
   }
+
+
+  // build(f: (builder: this) => Promise<Obj[]>): Promise<Obj[]> {
+  //   return f(this)
+  // }
 
 }

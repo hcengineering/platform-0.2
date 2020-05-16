@@ -37,6 +37,8 @@ describe('launch-dev', () => {
     const dump = launchPlugin.db.dump()
     console.log(dump)
 
+    console.log(JSON.stringify(dump))
+
     expect(true).toBe(true)
   })
 })
