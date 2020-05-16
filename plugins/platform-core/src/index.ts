@@ -30,13 +30,6 @@ export type PropertyType = PrimitiveType
 export type Ref<T extends Doc> = AsString<T> & { __ref: void }
 export type Bag<X extends PropertyType> = { [key: string]: X }
 
-// export type ContainerId = Ref<Doc>
-// export interface Container {
-//   _id: ContainerId
-//   _classes: Ref<Class<Doc>>[]
-//   [key: string]: PropertyType
-// }
-
 // O B J E C T S
 
 export interface Obj {

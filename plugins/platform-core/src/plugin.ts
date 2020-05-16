@@ -150,13 +150,8 @@ export default (platform: Platform): CorePlugin => {
 
     createConstructor(): Konstructor<T> {
       const session = this.getSession()
-      const _class = this._id
-      return async data => {
-        const instance = (await session.instantiate(_class, data)) as Layout<T>
-        Object.assign(instance, data)
-        instance.__layout._class = _class
-        return instance
-      }
+      const _class = this._id as Ref<Class<T>>
+      return data => session.createEmb(_class, data)
     }
   }
 
@@ -166,7 +161,7 @@ export default (platform: Platform): CorePlugin => {
     createConstructor(): Konstructor<T> {
       const session = this.getSession()
       const _class = this._id as Ref<Class<T>>
-      return data => session.createDocument(_class, data)
+      return data => session.createDoc(_class, data)
     }
   }
 

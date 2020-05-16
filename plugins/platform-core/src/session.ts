@@ -123,7 +123,7 @@ export class TSession implements Session {
     return this.instantiateSync(container._class as Ref<Class<T>>, container)
   }
 
-  async createDocument<T extends Doc>(_class: Ref<Class<T>>, data: object): Promise<T> {
+  async createDoc<T extends Doc>(_class: Ref<Class<T>>, data: object): Promise<T> {
     let _id = (data as Content<Doc>)._id
     console.log('Creating Document: ' + _id)
     if (_id === undefined) {
@@ -134,6 +134,13 @@ export class TSession implements Session {
     Object.assign(instance, data)
     this.memdb.index(container)
     return instance as T
+  }
+
+  async createEmb<T extends Emb>(_class: Ref<Class<T>>, data: object) {
+    const instance = (await this.instantiate(_class, data)) as Layout<T>
+    Object.assign(instance, data)
+    instance.__layout._class = _class
+    return instance
   }
 
   as<T extends Doc>(doc: Layout<Doc>, _class: Ref<Class<T>>): T | undefined {
