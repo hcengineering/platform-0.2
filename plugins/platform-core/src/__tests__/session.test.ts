@@ -14,12 +14,11 @@
 //
 
 import { Platform, identify, Plugin, PluginId } from '@anticrm/platform'
+import db from '@anticrm/platform-db'
 import { Ref, Class, Doc, Emb, Type } from '@anticrm/platform-core'
 
 import core from '../__resources__'
 import { metaModel, createClass, newContainer, array, str } from '../__resources__/model'
-import startCorePlugin from '../plugin'
-
 import { TSession } from '../session'
 
 interface SimpleClass extends Doc {
@@ -51,6 +50,7 @@ const myModel = [simpleClass, myClass, myClassInstance]
 describe('session', () => {
 
   const platform = new Platform()
+  platform.addLocation(db, () => import('@anticrm/platform-db/src/memdb'))
   platform.addLocation(core, () => import('../plugin'))
   platform.setResolver('native', core.id)
   const corePlugin = platform.getPlugin(core.id)

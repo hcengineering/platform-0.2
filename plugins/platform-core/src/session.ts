@@ -14,7 +14,7 @@
 //
 
 import { Platform, Resource, allValues } from '@anticrm/platform'
-import { MemDb, Container } from './memdb'
+import { Db, Container } from '@anticrm/platform-db'
 import { generateId } from './objectid'
 import core, {
   Obj, Doc, Ref, Bag, Class, Type, Emb, Content,
@@ -34,15 +34,15 @@ export class TSession implements Session {
 
   readonly platform: Platform
 
-  memdb: MemDb
+  private memdb: Db
   private prototypes = new Map<Ref<Class<Obj>>, Object>()
   private sessionProto: SessionProto
 
   readonly constructors = new Map<Ref<Class<Obj>>, Konstructor<Obj>>()
 
-  constructor(platform: Platform) {
+  constructor(platform: Platform, memdb: Db) {
     this.platform = platform
-    this.memdb = new MemDb()
+    this.memdb = memdb
 
     this.sessionProto = {
       getSession: () => this,

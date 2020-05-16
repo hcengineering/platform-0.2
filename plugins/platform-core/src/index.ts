@@ -15,7 +15,7 @@
 
 import { KeysByType } from 'simplytyped'
 import { plugin, PropType, AsString, Resource, ResourcePlugin, PluginId } from '@anticrm/platform'
-import { Container } from './memdb'
+import db, { Container } from '@anticrm/platform-db'
 
 export type AnyFunc = (...args: any[]) => any
 export type RemoveMethods<T extends object> = Omit<T, KeysByType<T, AnyFunc>>
@@ -118,7 +118,9 @@ export interface CorePlugin extends ResourcePlugin {
 
 export default plugin(
   'core' as PluginId<CorePlugin>,
-  {},
+  {
+    db: db.id
+  },
   {
     native: {
       Emb: '' as Resource<Emb>,

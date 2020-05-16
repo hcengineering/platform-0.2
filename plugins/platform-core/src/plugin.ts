@@ -14,6 +14,7 @@
 //
 
 import { Platform, Resource, AnyPlugin } from '@anticrm/platform'
+import { Db } from '@anticrm/platform-db'
 import core, {
   Obj, Doc, Ref, Bag, Class, Type, Emb,
   PropertyType, BagOf, Content, CorePlugin, DiffDescriptors
@@ -24,7 +25,7 @@ import { TSession, SessionProto, Konstructor, Layout } from './session'
 
 console.log('PLUGIN: parsed core')
 
-export default (platform: Platform): CorePlugin => {
+export default (platform: Platform, deps: { db: Db }): CorePlugin => {
 
   console.log('PLUGIN: started core')
 
@@ -204,7 +205,7 @@ export default (platform: Platform): CorePlugin => {
     getSession() { return this.session }
   }
 
-  const session = new TSession(platform)
+  const session = new TSession(platform, deps.db)
   const plugin = new TCorePlugin(platform, session)
 
   plugin.registerPrototype(core.native.Emb, TEmb.prototype)

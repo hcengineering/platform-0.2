@@ -13,24 +13,11 @@
 // limitations under the License.
 // 
 
-type ContainerId = string
-type ClassId = ContainerId
+import { Platform } from '@anticrm/platform'
+
+import { Db, Container, ClassId, ContainerId, ContainerClass } from '.'
 
 type LayoutType = string | number | ContainerId
-
-export interface Container {
-  _id: ContainerId
-  _class: ClassId
-  _mixins?: ClassId[]
-}
-
-interface Attribute { }
-
-interface ContainerClass extends Container {
-  _attributes: { [key: string]: Attribute }
-  _extends?: ClassId
-  _native?: string
-}
 
 function filterEq(docs: any, propertyKey: string, value: LayoutType): any[] {
   const result = []
@@ -42,7 +29,7 @@ function filterEq(docs: any, propertyKey: string, value: LayoutType): any[] {
   return result
 }
 
-export class MemDb {
+export class MemDb implements Db {
   private objects = new Map<ContainerId, Container>()
   private byClass = new Map<ClassId, Container[]>()
   private hierarchy = new Map<ClassId, ClassId[]>()
@@ -161,5 +148,9 @@ export class MemDb {
     this.objects.forEach(doc => result.push(doc))
     return result
   }
+}
+
+export default (platform: Platform, deps: {}) => {
+  return new MemDb()
 }
 
