@@ -127,14 +127,10 @@ class UIPluginImpl implements UIPlugin {
 }
 
 console.log('PLUGIN: parsed ui')
-
 export default async (platform: Platform, deps: { i18n: I18nPlugin, core: CorePlugin }) => {
-
   console.log('PLUGIN: started ui')
 
   const uiPlugin = new UIPluginImpl(platform, deps)
-  if (Vue) {
-    Vue.prototype.$uiPlugin = uiPlugin
-  }
+  Vue.prototype.$uiPlugin = uiPlugin
   return uiPlugin
 }

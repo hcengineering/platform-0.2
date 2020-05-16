@@ -26,7 +26,7 @@ import core from '@anticrm/platform-core'
 
 import contact from '@anticrm/contact'
 
-import { session } from '@anticrm/dev-boot'
+import { getSession } from '@anticrm/dev-boot'
 
 export default {
   title: 'Framework'
@@ -41,10 +41,10 @@ export const icon = () => ({
   }
 })
 
-const contactInstance = session.then(session => {
-  const contactClass = session.getClass(contact.class.Contact)
-  const contactInstance = contactClass.newInstance({ email: 'xxx@gmail.com' })
-  return contactInstance
+const contactInstance = getSession().then(session => {
+  return session.getClass(contact.class.Contact).then(clazz => {
+    return clazz.newInstance({ email: 'xxx@gmail.com' })
+  })
 })
 
 const props = ['phone', 'email']
@@ -52,12 +52,11 @@ const props = ['phone', 'email']
 export const properties = () => ({
   render() {
     return <Theme><PropPanel clazz={contact.class.Contact} object={contactInstance}></PropPanel></Theme>
-    //    return <Theme><PropPanel object={contactInstance} filter={props}></PropPanel></Theme>
   }
 })
 
 // const personClass = session.getClass(contact.class.Person)
-const personInstance = session.then(session => {
+const personInstance = getSession().then(session => {
   const clazz = session.getClass(contact.class.Person)
   return clazz.newInstance({})
 })

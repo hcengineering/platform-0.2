@@ -15,10 +15,11 @@
 
 import { plugin, Plugin, PluginId } from '@anticrm/platform'
 import db, { Db } from '@anticrm/platform-db'
-import core from '@anticrm/platform-core'
+import core, { Session } from '@anticrm/platform-core'
 
 export interface LaunchPlugin extends Plugin {
   readonly db: Db
+  readonly session: Session
 }
 
 export default plugin('launch-dev' as PluginId<LaunchPlugin>, {

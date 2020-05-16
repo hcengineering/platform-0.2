@@ -42,6 +42,7 @@ export default async (platform: Platform, deps: { core: CorePlugin, db: Db }): P
   const contact = await uiBuilder.build(contactModel)
 
   return {
-    db
+    db,
+    session: deps.core.getSession()
   }
 }

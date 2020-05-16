@@ -14,6 +14,8 @@
 //
 
 import platform from '@anticrm/dev-boot'
-import { loadMetadata } from '@anticrm/dev-boot/src/meta'
+// import { loadMetadata } from '@anticrm/dev-boot/src/meta'
 
-loadMetadata(platform)
+// loadMetadata(platform)
+
+// console.log(platform)

@@ -19,9 +19,7 @@ import { Type, Ref, Class, Session, PropertyType, CorePlugin } from '@anticrm/pl
 import i18n, { I18nPlugin, IntlString, pluginId } from '..'
 
 console.log('PLUGIN: parsed i18n')
-
 export default async (platform: Platform, deps: { core: CorePlugin }): Promise<I18nPlugin> => {
-
   console.log('PLUGIN: started i18n')
 
   class I18nPluginImpl implements I18nPlugin {

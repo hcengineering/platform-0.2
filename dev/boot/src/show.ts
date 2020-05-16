@@ -13,9 +13,26 @@
 // limitations under the License.
 //
 
-import { session } from '.'
 
-session.then(session => {
-  const containers = session.dump()
-  console.log(JSON.stringify(containers))
+import { Platform } from '@anticrm/platform'
+
+import db from '@anticrm/platform-db'
+import core from '@anticrm/platform-core'
+import i18n from '@anticrm/platform-core-i18n'
+import ui from '@anticrm/platform-ui'
+import launch from '@anticrm/launch-dev'
+
+const platform = new Platform()
+platform.addLocation(db, () => import('@anticrm/platform-db/src/memdb'))
+platform.addLocation(core, () => import('@anticrm/platform-core/src/plugin'))
+platform.addLocation(i18n, () => import('@anticrm/platform-core-i18n/src/plugin'))
+platform.addLocation(ui, () => import('@anticrm/platform-ui/src/plugin'))
+platform.addLocation(launch, () => import('@anticrm/launch-dev/src/launch'))
+
+platform.setResolver('native', core.id)
+
+platform.getPlugin(launch.id).then(plugin => {
+  const dump = plugin.db.dump()
+  console.log(dump)
+  console.log(JSON.stringify(dump))
 })

@@ -24,9 +24,7 @@ import { TSession, SessionProto, Konstructor, Layout } from './session'
 //////////
 
 console.log('PLUGIN: parsed core')
-
 export default async (platform: Platform, deps: { db: Db }): Promise<CorePlugin> => {
-
   console.log('PLUGIN: started core')
 
   class TSessionProto implements SessionProto {

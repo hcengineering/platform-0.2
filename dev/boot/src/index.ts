@@ -15,12 +15,29 @@
 
 import { Platform } from '@anticrm/platform'
 
-import { setup } from './setup'
-import { getSession } from './resources'
+import db from '@anticrm/platform-db'
+import core, { Session } from '@anticrm/platform-core'
+import i18n from '@anticrm/platform-core-i18n'
+import ui from '@anticrm/platform-ui'
+import launch from '@anticrm/launch-dev'
+
+import uiMeta from '@anticrm/platform-ui/src/__resources__/meta'
+import contactMeta from '@anticrm/contact/src/__resources__/meta'
 
 const platform = new Platform()
+platform.addLocation(db, () => import('@anticrm/platform-db/src/memdb'))
+platform.addLocation(core, () => import('@anticrm/platform-core/src/plugin'))
+platform.addLocation(i18n, () => import('@anticrm/platform-core-i18n/src/plugin'))
+platform.addLocation(ui, () => import('@anticrm/platform-ui/src/plugin'))
+platform.addLocation(launch, () => import('@anticrm/launch-dev/src/launch'))
 
-setup(platform)
-export const session = getSession(platform)
+platform.setResolver('native', core.id)
+
+uiMeta(platform)
+contactMeta(platform)
 
 export default platform
+
+export function getSession(): Promise<Session> {
+  return platform.getPlugin(launch.id).then(plugin => plugin.session)
+}

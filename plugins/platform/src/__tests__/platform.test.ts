@@ -113,4 +113,21 @@ describe('platform', () => {
     expect(platform.getMetadata('xxx' as Metadata<string>)).toBe('meta-xxx')
   })
 
+  it('should load metadata', () => {
+    const ids = identify('test' as AnyPlugin, {
+      meta: {
+        M1: '' as Metadata<string>,
+        M2: 'my-id' as Metadata<string>
+      },
+    })
+
+    platform.loadMetadata(ids.meta, {
+      M1: 'hey',
+      M2: 'there',
+    })
+
+    expect(platform.getMetadata(ids.meta.M1)).toBe('hey')
+    expect(platform.getMetadata(ids.meta.M2)).toBe('there')
+  })
+
 })

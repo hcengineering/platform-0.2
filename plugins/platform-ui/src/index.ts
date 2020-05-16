@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Metadata, Plugin, PluginId, plugin } from '@anticrm/platform'
+import { Metadata, Plugin, PluginId, plugin, Platform } from '@anticrm/platform'
 import core, { Doc, Emb, Obj, AnyType, Ref, Class, Bag, Type } from '@anticrm/platform-core'
 import i18n, { IntlString } from '@anticrm/platform-core-i18n'
 
@@ -52,6 +52,8 @@ export interface ClassUIModel {
 }
 
 export interface UIPlugin extends Plugin {
+  readonly platform: Platform
+
   getClassModel(_class: Ref<Class<Obj>>): Promise<ClassUIModel>
   getDefaultAttrModel(props: string[]): AttrModel[]
   groupByType(model: AttrModel[]): { [key: string]: AttrModel[] }
