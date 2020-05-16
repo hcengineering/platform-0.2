@@ -85,7 +85,7 @@ export interface Class<T extends Obj> extends Doc {
   _attributes: Bag<Type<PropertyType>>
   _extends?: Ref<Class<Obj>>
   _native?: Resource<T>
-  newInstance(data: Content<T>): T
+  newInstance(data: Content<T>): Promise<T>
 }
 
 // S E S S I O N

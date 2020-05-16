@@ -23,7 +23,7 @@ import core, {
 
 export type Layout<T extends Obj> = T & { __layout: any } & SessionProto
 
-export type Konstructor<T extends Obj> = (data: object) => T
+export type Konstructor<T extends Obj> = (data: object) => Promise<T>
 
 export interface SessionProto {
   getSession(): Session
@@ -102,10 +102,25 @@ export class TSession implements Session {
   }
 
   async instantiate<T extends Obj>(_class: Ref<Class<T>>, __layout: any): Promise<T> {
-    const instance = Object.create(await this.getPrototype(_class))
+    const instance = Object.create(await this.getPrototype(_class)) as Layout<T>
     instance._class = _class
     instance.__layout = __layout
     return instance
+  }
+
+  instantiateSync<T extends Obj>(_class: Ref<Class<T>>, __layout: any): T {
+    const proto = this.prototypes.get(_class)
+    if (!proto)
+      throw new Error('instanceSync failed, no prototype for class: ' + _class)
+    const instance = Object.create(proto)
+    instance._class = _class
+    instance.__layout = __layout
+    return instance
+  }
+
+  getInstanceSync<T extends Doc>(ref: Ref<T>): T {
+    const container = this.memdb.get(ref)
+    return this.instantiateSync(container._class as Ref<Class<T>>, container)
   }
 
   async createDocument<T extends Doc>(_class: Ref<Class<T>>, data: object): Promise<T> {
@@ -139,6 +154,12 @@ export class TSession implements Session {
   }
 
   async getInstance<T extends Doc>(ref: Ref<T>): Promise<T> {
+
+    // preload Struct here
+
+    const structProto = this.getPrototype(core.class.Struct)
+    // console.log(structProto)
+
     const container = this.memdb.get(ref)
     return this.instantiate(container._class as Ref<Class<T>>, container)
     // const narrow = this.narrow(as, container._class)

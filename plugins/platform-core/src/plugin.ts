@@ -37,7 +37,7 @@ export default (platform: Platform): CorePlugin => {
     _class!: Ref<Class<this>>
     toIntlString(plural?: number): string { return this.getClass().toIntlString(plural) }
     getClass(): Class<this> {
-      return this.getSession().getInstance(this._class)
+      return this.getSession().getInstanceSync(this._class)
     }
 
     __mapKey(_class: Ref<Class<Obj>>, key: string) { return key }
@@ -48,7 +48,7 @@ export default (platform: Platform): CorePlugin => {
     _id!: Ref<this>
     toIntlString(plural?: number): string { return this.getClass().toIntlString(plural) }
     getClass(): Class<this> {
-      return this.getSession().getInstance(this._class)
+      return this.getSession().getInstanceSync(this._class)
     }
 
     as<T extends Doc>(_class: Ref<Class<T>>): T | undefined {
@@ -74,7 +74,7 @@ export default (platform: Platform): CorePlugin => {
     of!: Ref<Class<T>>
     exert(value: T) {
       if (typeof value === 'object')
-        return this.getSession().instantiate(value._class, value)
+        return this.getSession().instantiateSync(value._class, value)
       return undefined
     }
   }
@@ -134,7 +134,7 @@ export default (platform: Platform): CorePlugin => {
 
     abstract createConstructor(): Konstructor<T>
 
-    newInstance(data: Content<T>): T {
+    newInstance(data: Content<T>): Promise<T> {
       const session = this.getSession()
       let ctor = session.constructors.get(this._id) as Konstructor<T>
       if (!ctor) {
@@ -151,11 +151,11 @@ export default (platform: Platform): CorePlugin => {
     createConstructor(): Konstructor<T> {
       const session = this.getSession()
       const _class = this._id
-      return data => {
-        const instance = session.instantiate(_class, data) as Layout<T>
+      return async data => {
+        const instance = (await session.instantiate(_class, data)) as Layout<T>
         Object.assign(instance, data)
         instance.__layout._class = _class
-        return instance as T
+        return instance
       }
     }
   }
