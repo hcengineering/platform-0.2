@@ -20,6 +20,5 @@ import { UIPlugin } from '.'
 declare module 'vue/types/vue' {
   interface Vue {
     $platform: Platform
-    $uiPlugin: UIPlugin
   }
 }

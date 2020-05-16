@@ -16,11 +16,18 @@
 <script lang="ts">
 
 import Vue, { PropType } from 'vue'
+import { Platform } from '@anticrm/platform'
 
 import core, { Obj, Doc, Ref, Class } from '@anticrm/platform-core'
 
 import ui, { UIPlugin, AttrModel } from '@anticrm/platform-ui'
 import PropPanel from './PropPanel.vue'
+
+async function getClassHierarchy(platform: Platform, object: Promise<Obj>): Promise<Ref<Class<Obj>>[]> {
+  const corePlugin = await platform.getPlugin(core.id)
+  const clazz = (await object)._class
+  return corePlugin.getClassHierarchy(clazz)
+}
 
 export default Vue.extend({
   components: { PropPanel },
@@ -34,7 +41,7 @@ export default Vue.extend({
     }
   },
   created() {
-    this.object.then(object => this.classes = object.mixins())
+    getClassHierarchy(this.$platform, this.object).then(classes => this.classes = classes)
   }
 })
 </script>
@@ -42,7 +49,7 @@ export default Vue.extend({
 <template>
   <table>
     <tr>
-      <td valign="top" v-for="clazz in classes" :key="clazz._id">
+      <td valign="top" v-for="clazz in classes" :key="clazz">
         <PropPanel :clazz="clazz" :object="object" />
       </td>
     </tr>

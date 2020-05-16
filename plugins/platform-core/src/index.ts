@@ -114,6 +114,7 @@ export interface Session {
 export interface CorePlugin extends ResourcePlugin {
   getSession(): Session
   registerPrototype<T extends Obj>(id: Resource<T>, proto: T): void
+  getClassHierarchy(_class: Ref<Class<Obj>>): Promise<Ref<Class<Obj>>[]>
 }
 
 export default plugin(

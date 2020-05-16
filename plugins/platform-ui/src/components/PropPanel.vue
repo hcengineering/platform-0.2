@@ -16,6 +16,7 @@
 <script lang="ts">
 
 import Vue, { PropType } from 'vue'
+import { Platform } from '@anticrm/platform'
 
 import { Obj, Class, Ref } from '@anticrm/platform-core'
 
@@ -32,22 +33,27 @@ export default Vue.extend({
   },
   data() {
     return {
-      model: this.$uiPlugin.groupByType(this.$uiPlugin.getDefaultAttrModel(this.filter)),
-      classModel: this.$uiPlugin.getClassModel(this.clazz),
+      model: [],
+      classModel: { label: this.clazz },
       content: {}
     }
   },
   created() {
-    this.$uiPlugin.getOwnAttrModel(this.clazz, this.filter)
-      .then(result => this.model = this.$uiPlugin.groupByType(result))
+    this.$platform.getPlugin(ui.id).then(plugin => {
+      plugin.getOwnAttrModel(this.clazz, this.filter)
+        .then(result => this.model = plugin.groupByType(result))
+    })
     this.object.then(res => this.content = res)
+    this.$platform.getPlugin(ui.id).then(plugin => {
+      plugin.getClassModel(this.clazz).then(model => this.classModel = model)
+    })
   }
 })
 </script>
 
 <template>
   <div>
-    <div class="caption-4" style="margin-bottom: 1em">{{classModel.label}}</div>
+    <div class="caption-4" style="margin-bottom: 1em">{{ classModel.label }}</div>
     <div v-for="(attrs, type) in model" :key="type" class="container">
       <div style="margin-right: 0.5em">
         <Icon :icon="attrs[0].icon" class="icon-embed-2x" />

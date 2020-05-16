@@ -13,12 +13,10 @@
 // limitations under the License.
 //
 
-import Vue from 'vue'
-
-import core, { Doc, Obj, Type, PropertyType, Class, Ref, Session, CorePlugin } from '@anticrm/platform-core'
+import core, { Obj, Class, Ref, Session, CorePlugin } from '@anticrm/platform-core'
 import { Platform } from '@anticrm/platform'
-import ui, { UIPlugin, AttrModel, UIDecorator, ClassUIDecorator, ClassUIModel } from '.'
-import i18n, { I18nPlugin, IntlString } from '@anticrm/platform-core-i18n'
+import ui, { UIPlugin, AttrModel, ClassUIModel } from '.'
+import { I18nPlugin } from '@anticrm/platform-core-i18n'
 
 class UIPluginImpl implements UIPlugin {
 
@@ -42,6 +40,10 @@ class UIPluginImpl implements UIPlugin {
       label,
       icon: decorator?.icon
     }
+  }
+
+  getDefaultClassModel(): ClassUIModel {
+    return { label: 'The Class' }
   }
 
   getDefaultAttrModel(props: string[]): AttrModel[] {
@@ -97,19 +99,6 @@ class UIPluginImpl implements UIPlugin {
     return Promise.all(attrs)
   }
 
-  async getClassHierarchy(_class: Class<Obj>): Promise<Class<Obj>[]> {
-    const result = [] as Class<Obj>[]
-    let clazz = _class as Class<Obj> | undefined
-    while (clazz) {
-      result.push(clazz)
-      const _extends = clazz._extends
-      if (!_extends || _extends === core.class.Doc)
-        break
-      clazz = await clazz.getSession().getInstance(_extends) // TODO: getInstance(unknown) fails
-    }
-    return result.reverse()
-  }
-
   async getAttrModel(_class: Ref<Class<Obj>>, props?: string[]): Promise<AttrModel[]> {
     // const ownModels = this.getClassHierarchy(_class).map(clazz => this.getOwnAttrModel(clazz, props))
     // return Promise.all(ownModels).then(result => result.flat())
@@ -123,8 +112,5 @@ export default async (platform: Platform, deps: { i18n: I18nPlugin, core: CorePl
   console.log('PLUGIN: started ui')
 
   const uiPlugin = new UIPluginImpl(platform, deps)
-  if (Vue) {
-    Vue.prototype.$uiPlugin = uiPlugin
-  }
   return uiPlugin
 }

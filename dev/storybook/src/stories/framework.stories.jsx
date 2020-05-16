@@ -57,8 +57,9 @@ export const properties = () => ({
 
 // const personClass = session.getClass(contact.class.Person)
 const personInstance = getSession().then(session => {
-  const clazz = session.getClass(contact.class.Person)
-  return clazz.newInstance({})
+  return session.getClass(contact.class.Person).then(clazz => {
+    return clazz.newInstance({ phone: '555 777 8888', firstName: 'John' })
+  })
 })
 
 export const object = () => ({

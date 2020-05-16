@@ -223,6 +223,14 @@ describe('session', () => {
     expect(mix.getClass()._id).toBe(mixinClass)
   })
 
+  it('should provide class hierarchy', async () => {
+    const corePlugin = await platform.getPlugin(core.id)
+    const hierarchy = await corePlugin.getClassHierarchy(core.class.Class)
+    expect(hierarchy[0]).toBe(core.class.Doc)
+    expect(hierarchy[1]).toBe(core.class.StructuralFeature)
+    expect(hierarchy[2]).toBe(core.class.Class)
+  })
+
   // it('should work with arrays', async () => {
   //   const sess = await session
   //   const myInstance = await sess.getInstance(myClassInstanceId)

@@ -113,20 +113,6 @@ export class MemDb implements Db {
     }
   }
 
-  // index(container: Container) {
-  //   container._classes.forEach(clazz => {
-  //     let _class = clazz as ClassId | undefined
-  //     while (_class) {
-  //       this.getAllOfClass(_class).push(container)
-  //       const superClass = this.getClass(_class)?._extends
-  //       if (superClass) {
-  //         this.addSubclass(superClass, _class)
-  //       }
-  //       _class = superClass
-  //     }
-  //   })
-  // }
-
   findAll(clazz: ClassId, query: { [key: string]: LayoutType }): Container[] {
     const docs = this.getAllOfClass(clazz)
     let result = docs

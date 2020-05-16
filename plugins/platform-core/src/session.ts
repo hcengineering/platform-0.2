@@ -152,15 +152,13 @@ export class TSession implements Session {
     return instance as T
   }
 
-  async as<T extends Doc>(doc: Layout<Doc>, _class: Ref<Class<T>>): Promise<T> {
+  async as<T extends Doc>(doc: Layout<Doc>, _class: Ref<Class<T>>): Promise<T | undefined> {
     const layout = doc.__layout
     if (!layout)
       throw new Error('layout not found')
     const classes = layout._mixins as string[]
     if (classes && classes.includes(_class))
       return this.instantiate(_class, layout)
-    console.log(doc)
-    throw new Error('not implemented: ' + _class)
   }
 
   async createEmb<T extends Emb>(_class: Ref<Class<T>>, data: object) {

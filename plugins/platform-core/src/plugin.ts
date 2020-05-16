@@ -203,6 +203,19 @@ export default async (platform: Platform, deps: { db: Db }): Promise<CorePlugin>
     }
 
     getSession() { return this.session }
+
+    // U T I L I T Y
+
+    async getClassHierarchy(_class: Ref<Class<Obj>>): Promise<Ref<Class<Obj>>[]> {
+      const result = [] as Ref<Class<Obj>>[]
+      let clazz = _class as Ref<Class<Obj>> | undefined
+      while (clazz) {
+        result.push(clazz)
+        const instance = await this.getSession().getInstance(clazz)
+        clazz = instance._extends
+      }
+      return result.reverse()
+    }
   }
 
   const session = new TSession(platform, deps.db)

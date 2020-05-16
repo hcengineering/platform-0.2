@@ -54,6 +54,7 @@ export interface ClassUIModel {
 export interface UIPlugin extends Plugin {
   readonly platform: Platform
 
+  getDefaultClassModel(): ClassUIModel
   getClassModel(_class: Ref<Class<Obj>>): Promise<ClassUIModel>
   getDefaultAttrModel(props: string[]): AttrModel[]
   groupByType(model: AttrModel[]): { [key: string]: AttrModel[] }
