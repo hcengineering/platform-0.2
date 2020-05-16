@@ -19,7 +19,7 @@ import { plugin1State } from './shared'
 
 plugin1State.parsed = true
 
-export default (platform: Platform, deps: {}) => {
+export default async (platform: Platform, deps: {}) => {
   plugin1State.started = true
   return {
     id: 'plugin1',

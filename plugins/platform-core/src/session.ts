@@ -125,7 +125,6 @@ export class TSession implements Session {
 
   async createDoc<T extends Doc>(_class: Ref<Class<T>>, data: object): Promise<T> {
     let _id = (data as Content<Doc>)._id
-    console.log('Creating Document: ' + _id)
     if (_id === undefined) {
       _id = generateId() as Ref<Doc>
     }
@@ -136,28 +135,38 @@ export class TSession implements Session {
     return instance as T
   }
 
+  async mixin<T extends E, E extends Doc>(obj: E, _class: Ref<Class<T>>, data: Omit<T, keyof E>): Promise<T> {
+    const _id = obj._id as Ref<T>
+    if (_id === undefined) {
+      throw new Error('no id')
+    }
+
+    const container = this.memdb.get(_id)
+    const mixins = container._mixins ?? []
+    mixins.push(_class)
+    container._mixins = mixins
+
+    const instance = await this.instantiate(_class, container)
+    Object.assign(instance, data)
+    this.memdb.index(container)
+    return instance as T
+  }
+
+  async as<T extends Doc>(doc: Layout<Doc>, _class: Ref<Class<T>>): Promise<T> {
+    const layout = doc.__layout
+    if (!layout)
+      throw new Error('layout not found')
+    const classes = layout._mixins as string[]
+    if (classes.includes(_class))
+      return this.instantiate(_class, layout)
+    throw new Error('not implemented')
+  }
+
   async createEmb<T extends Emb>(_class: Ref<Class<T>>, data: object) {
     const instance = (await this.instantiate(_class, data)) as Layout<T>
     Object.assign(instance, data)
     instance.__layout._class = _class
     return instance
-  }
-
-  as<T extends Doc>(doc: Layout<Doc>, _class: Ref<Class<T>>): T | undefined {
-    throw new Error('not implemented')
-    // const layout = doc.__layout
-    // if (!layout)
-    //   throw new Error('layout not found')
-    // const classes = layout._classes as string[]
-    // if (classes.includes(_class))
-    //   return this.instantiate(_class, layout)
-    // return undefined
-  }
-
-  mixin<T extends E, E extends Doc>(obj: E, _class: Ref<Class<T>>, data: Omit<T, keyof E>): T {
-    throw new Error('not implemented')
-    // const _id = obj._id as Ref<T>
-    // return this.createDocument(_class, { _id, ...data })
   }
 
   async getInstance<T extends Doc>(ref: Ref<T>): Promise<T> {

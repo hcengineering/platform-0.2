@@ -37,7 +37,7 @@ describe('platform', () => {
 
   it('should raise exception for unknown location', () => {
     const p1 = platform.getPlugin(plugin1)
-    expect(p1).rejects.toThrowError('no descriptor for: plugin1')
+    expect(p1).rejects.toThrowError('plugin1')
   })
 
   it('should resolve plugin', () => {

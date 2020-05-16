@@ -19,7 +19,7 @@ import { plugin3State, TestPlugin } from './shared'
 
 plugin3State.parsed = true
 
-export default (platform: Platform, deps: {
+export default async (platform: Platform, deps: {
   plugin1: TestPlugin,
   plugin2: ResourcePlugin
 }) => {

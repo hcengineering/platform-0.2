@@ -17,8 +17,9 @@ import { Platform, identify, Plugin, PluginId } from '@anticrm/platform'
 import db from '@anticrm/platform-db'
 import core from '@anticrm/platform-core'
 import i18n from '@anticrm/platform-core-i18n'
+import ui from '@anticrm/platform-ui'
 
-import launch, { LaunchPlugin } from '..'
+import launch from '..'
 
 describe('launch-dev', () => {
 
@@ -26,6 +27,7 @@ describe('launch-dev', () => {
   platform.addLocation(db, () => import('@anticrm/platform-db/src/memdb'))
   platform.addLocation(core, () => import('@anticrm/platform-core/src/plugin'))
   platform.addLocation(i18n, () => import('@anticrm/platform-core-i18n/src/plugin'))
+  platform.addLocation(ui, () => import('@anticrm/platform-ui/src/plugin'))
   platform.addLocation(launch, () => import('../launch'))
 
   platform.setResolver('native', core.id)

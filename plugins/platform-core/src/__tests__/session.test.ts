@@ -59,9 +59,6 @@ describe('session', () => {
   it('should load model', async () => {
     const memdb = await platform.getPlugin(db.id)
     memdb.load(metaModel)
-    // return session.then(session => {
-    //   session.loadModel(metaModel)
-    // })
   })
 
   it('should get prototype', () => {
@@ -142,27 +139,29 @@ describe('session', () => {
     expect(x.x).toBe('hallo')
   })
 
+  interface Contact extends Doc {
+    email?: string
+    phone?: string
+    phoneWork?: string
+    twitter?: string
+    address?: string
+    addressDelivery?: string
+  }
+
+  const contact = identify('contact-test' as PluginId<Plugin>, {
+    class: {
+      Contact: '' as Ref<Class<Contact>>,
+      Email: '' as Ref<Class<Type<string>>>,
+      Phone: '' as Ref<Class<Type<string>>>,
+      Twitter: '' as Ref<Class<Type<string>>>,
+      Address: '' as Ref<Class<Type<string>>>,
+    }
+  })
+
+  const contact1Id = 'test.contact.1' as Ref<Contact>
+
   it('should create class', async () => {
     const S = await session
-
-    interface Contact extends Doc {
-      email?: string
-      phone?: string
-      phoneWork?: string
-      twitter?: string
-      address?: string
-      addressDelivery?: string
-    }
-
-    const contact = identify('contact-test' as PluginId<Plugin>, {
-      class: {
-        Contact: '' as Ref<Class<Contact>>,
-        Email: '' as Ref<Class<Type<string>>>,
-        Phone: '' as Ref<Class<Type<string>>>,
-        Twitter: '' as Ref<Class<Type<string>>>,
-        Address: '' as Ref<Class<Type<string>>>,
-      }
-    })
 
     const email = await S.createStruct(contact.class.Email, core.class.Type, {})
     const phone = await S.createStruct(contact.class.Phone, core.class.Type, {})
@@ -178,7 +177,6 @@ describe('session', () => {
       addressDelivery: await address.newInstance({}),
     })
 
-    const contact1Id = 'test.contact.1' as Ref<Contact>
     const contactClass = await S.getClass(contact.class.Contact)
     contactClass.newInstance({
       _id: contact1Id,
@@ -194,17 +192,44 @@ describe('session', () => {
     expect(contact1.email).toBe('hey@hey.com')
   })
 
-  // it('should work with arrays', () => {
-  //   session.loadModel(myModel)
-  //   const myInstance = session.getInstance(myClassInstanceId)
+  interface ContactMixin extends Contact {
+    xxx?: string
+  }
+  const mixinClass = 'mixinClass' as Ref<Class<ContactMixin>>
+
+  it('should mix in', async () => {
+    const S = await session
+    const email = await S.getClass(contact.class.Email)
+    await S.createClass(mixinClass, contact.class.Contact, {
+      xxx: await email.newInstance({}),
+    })
+
+    const contact1 = await S.getInstance(contact1Id)
+
+    const mix = await S.mixin(contact1, mixinClass, { xxx: 'hey there!' })
+    expect(mix.xxx).toBe('hey there!')
+    expect(mix.email).toBe('hey@hey.com')
+    expect(mix.getClass()._id).toBe(mixinClass)
+  })
+
+  it('should narrow to mixin', async () => {
+    const S = await session
+    const contact1 = await S.getInstance(contact1Id)
+    expect(contact1.getClass()._id).toBe(contact.class.Contact)
+
+    const mix = await contact1.as(mixinClass)
+    expect(mix.xxx).toBe('hey there!')
+    expect(mix.email).toBe('hey@hey.com')
+    expect(mix.getClass()._id).toBe(mixinClass)
+  })
+
+  // it('should work with arrays', async () => {
+  //   const sess = await session
+  //   const myInstance = await sess.getInstance(myClassInstanceId)
+  //   console.log(myInstance)
   //   expect(myInstance._id).toBe(myClassInstanceId)
   //   expect(myInstance.arrayOfStrings[0]).toBe('hey')
   //   expect(myInstance.arrayOfStrings[1]).toBe('there')
-  // })
-
-  // it('should work with mixins', () => {
-  //   const myInstance = session.getInstance(myClassInstanceId)
-  //   console.log(myInstance.mixins[0])
   // })
 
 })

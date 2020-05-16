@@ -125,7 +125,7 @@ class UIPluginImpl implements UIPlugin {
 
 console.log('PLUGIN: parsed ui')
 
-export default (platform: Platform, deps: { i18n: I18nPlugin, core: CorePlugin }): UIPlugin => {
+export default async (platform: Platform, deps: { i18n: I18nPlugin, core: CorePlugin }) => {
 
   console.log('PLUGIN: started ui')
 

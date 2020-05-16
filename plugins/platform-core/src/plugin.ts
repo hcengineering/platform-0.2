@@ -52,7 +52,7 @@ export default async (platform: Platform, deps: { db: Db }): Promise<CorePlugin>
       return this.getSession().getInstanceSync(this._class)
     }
 
-    as<T extends Doc>(_class: Ref<Class<T>>): T | undefined {
+    as<T extends Doc>(_class: Ref<Class<T>>): Promise<T> {
       return this.getSession().as(this as unknown as Layout<Doc>, _class)
     }
     mixins(): Ref<Class<Doc>>[] {
@@ -98,6 +98,8 @@ export default async (platform: Platform, deps: { db: Db }): Promise<CorePlugin>
   class TArrayOf<T extends PropertyType> extends TType<T[]> {
     of!: Type<T>
     exert(value: T[]) {
+      console.log('array')
+      console.log(value)
       return new Proxy(value, new ArrayProxyHandler(this.of))
     }
   }

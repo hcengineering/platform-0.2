@@ -42,7 +42,7 @@ export interface Obj {
 export interface Emb extends Obj { }
 export interface Doc extends Obj {
   _id: Ref<this>
-  as<T extends Doc>(_class: Ref<Class<T>>): T | undefined
+  as<T extends Doc>(_class: Ref<Class<T>>): Promise<T>
   mixins(): Ref<Class<Doc>>[]
 }
 
@@ -96,7 +96,7 @@ export interface Session {
   // loadModel(docs: Container[]): void
   // dump(): Container[]
 
-  mixin<T extends E, E extends Doc>(obj: E, _class: Ref<Class<T>>, data: Omit<T, keyof E>): T
+  mixin<T extends E, E extends Doc>(obj: E, _class: Ref<Class<T>>, data: Omit<T, keyof E>): Promise<T>
 
   // Class Helpers
   // getStruct<T extends Emb>(_struct: Ref<Class<T>>): Class<T>
