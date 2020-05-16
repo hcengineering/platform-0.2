@@ -1,5 +1,5 @@
 {
-  "name": "@anticrm/platform",
+  "name": "@anticrm/launch-dev",
   "version": "0.1.0",
   "main": "src/index.ts",
   "author": "Andrey Platov <andrey.v.platov@gmail.com>",

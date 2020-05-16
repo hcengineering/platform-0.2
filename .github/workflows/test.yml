@@ -2,11 +2,10 @@
 
 name: CI
 
-on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+on: push
+#    branches: [ master ]
+#  pull_request:
+#    branches: [ master ]
 
 jobs:
   build:
@@ -17,6 +16,6 @@ jobs:
     - name: Run tests
       run: |
         yarn install
+        yarn workspace @anticrm/platform run test
         yarn workspace @anticrm/platform-core run test
         yarn workspace @anticrm/platform-core-i18n run test
-        yarn workspace @anticrm/platform-ui run test

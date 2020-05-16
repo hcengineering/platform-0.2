@@ -13,14 +13,16 @@
 // limitations under the License.
 //
 
-
 import { Platform } from '@anticrm/platform'
 
 import db from '@anticrm/platform-db'
-import core from '@anticrm/platform-core'
+import core, { Session } from '@anticrm/platform-core'
 import i18n from '@anticrm/platform-core-i18n'
-import ui from '@anticrm/platform-ui'
+import ui, { UIPlugin } from '@anticrm/platform-ui'
 import launch from '@anticrm/launch-dev'
+
+import uiMeta from '@anticrm/platform-ui/src/__resources__/meta'
+import contactMeta from '@anticrm/contact/src/__resources__/meta'
 
 const platform = new Platform()
 platform.addLocation(db, () => import('@anticrm/platform-db/src/memdb'))
@@ -31,8 +33,11 @@ platform.addLocation(launch, () => import('@anticrm/launch-dev/src/launch'))
 
 platform.setResolver('native', core.id)
 
-platform.getPlugin(launch.id).then(plugin => {
-  const dump = plugin.db.dump()
-  console.log(dump)
-  console.log(JSON.stringify(dump))
-})
+uiMeta(platform)
+contactMeta(platform)
+
+export default platform
+
+export function getSession(): Promise<Session> {
+  return platform.getPlugin(launch.id).then(plugin => plugin.session)
+}

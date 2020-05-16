@@ -14,26 +14,30 @@
 //
 
 import core from '@anticrm/platform-core/src/__resources__'
+import i18n from '@anticrm/platform-core-i18n/src/__resources__'
 import ui from '.'
 
-import { Builder } from '@anticrm/platform-core/src/__resources__/builder'
+import Builder from '@anticrm/platform-core/src/__resources__/builder'
 
-export default (B: Builder) => {
-  const i18n = B.createStruct(ui.class.IntlString, core.class.Type, {}, ui.native.IntlString)
+export default async (B: Builder) => {
 
-  B.createStruct(ui.class.UIDecorator, core.class.Emb, {
-    label: i18n.newInstance({}),
-    icon: B.meta()
-  })
+  const i18nString = await B.getClass(i18n.class.IntlString)
 
-  B.createStruct(ui.class.TypeUIDecorator, ui.class.UIDecorator, {
-    placeholder: i18n.newInstance({}),
-  })
+  return Promise.all([
+    B.createStruct(ui.class.UIDecorator, core.class.Emb, {
+      label: await i18nString.newInstance({}),
+      icon: await B.metadata()
+    }),
 
-  B.createClass(ui.class.ClassUIDecorator, core.class.StructuralFeature, {
-    label: i18n.newInstance({}),
-    icon: B.meta(),
-    decorators: B.bag(B.struct(ui.class.TypeUIDecorator))
-  })
+    B.createStruct(ui.class.TypeUIDecorator, ui.class.UIDecorator, {
+      placeholder: await i18nString.newInstance({}),
+    }),
+
+    B.createClass(ui.class.ClassUIDecorator, core.class.StructuralFeature, {
+      label: await i18nString.newInstance({}),
+      icon: await B.metadata(),
+      decorators: await B.bag(await B.struct(ui.class.TypeUIDecorator))
+    })
+  ])
 
 }

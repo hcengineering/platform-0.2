@@ -13,12 +13,13 @@
 // limitations under the License.
 //
 
+import { Resource, Metadata } from '@anticrm/platform'
+
 import core, {
   Ref, Class, Doc, Type, PropertyType, Obj, RefTo, BagOf, ArrayOf, InstanceOf, Emb
 } from '..'
 
 import { extendIds } from './utils'
-import { Metadata } from '@anticrm/platform'
 
 export default extendIds(core, {
   class: {
@@ -27,6 +28,7 @@ export default extendIds(core, {
     Type: '' as Ref<Class<Type<PropertyType>>>,
 
     String: '' as Ref<Class<Type<string>>>,
+    Resource: '' as Ref<Class<Type<Resource<any>>>>,
     Metadata: '' as Ref<Class<Type<Metadata<any>>>>,
 
     RefTo: '' as Ref<Class<RefTo<Doc>>>,

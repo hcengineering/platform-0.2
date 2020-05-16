@@ -17,7 +17,7 @@
 
 import Vue, { PropType } from 'vue'
 
-import { Obj, Class } from '@anticrm/platform-core'
+import { Obj, Ref, Class } from '@anticrm/platform-core'
 
 import ui, { UIPlugin, AttrModel } from '@anticrm/platform-ui'
 import InlineEdit from '@anticrm/platform-ui-controls/src/InlineEdit.vue'
@@ -26,19 +26,22 @@ import Icon from './Icon.vue'
 export default Vue.extend({
   components: { InlineEdit, Icon },
   props: {
-    clazz: Object as PropType<Class<Obj>>,
-    objects: Object as PropType<Obj[]>,
+    clazz: Object as PropType<Ref<Class<Obj>>>,
+    objects: Object as PropType<Promise<Obj[]>>,
     filter: Array as PropType<string[] | undefined>,
   },
   data() {
     return {
-      model: this.$uiPlugin.getDefaultAttrModel(this.filter),
-      // classModel: this.$uiPlugin.getClassModel(this.clazz)
+      model: [],
+      content: []
     }
   },
   created() {
-    this.$uiPlugin.getAttrModel(this.clazz, this.object, this.filter)
-      .then(result => this.model = result)
+    this.$platform.getPlugin(ui.id).then(plugin => {
+      plugin.getAttrModel(this.clazz, this.filter)
+        .then(result => this.model = result)
+    })
+    this.objects.then(obj => this.content = obj)
   }
 })
 </script>
@@ -51,7 +54,7 @@ export default Vue.extend({
       </div>
     </div>
     <div class="tbody">
-      <div class="tr" v-for="object in objects" :key="object._id">
+      <div class="tr" v-for="object in content" :key="object._id">
         <div class="td" v-for="attr in model" :key="attr.key">
           {{ object[attr.key] }}
           <!-- <component :is="getPresenters()[propertyKey]" :value="object[propertyKey]"></component> -->

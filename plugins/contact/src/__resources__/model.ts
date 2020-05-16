@@ -16,38 +16,41 @@
 import contact from '.'
 import core from '@anticrm/platform-core/src/__resources__'
 
-import { Builder } from '@anticrm/platform-ui/src/__resources__/builder'
-import { IntlString } from '@anticrm/platform-core-i18n'
+import UIBuilder from '@anticrm/platform-ui/src/__resources__/builder'
 
-export default (S: Builder) => {
+export default async (S: UIBuilder) => {
 
-  const email = S.createStruct(contact.class.Email, core.class.Type, {})
-  const phone = S.createStruct(contact.class.Phone, core.class.Type, {})
-  const twitter = S.createStruct(contact.class.Twitter, core.class.Type, {})
-  const address = S.createStruct(contact.class.Address, core.class.Type, {})
+  const email = await S.createStruct(contact.class.Email, core.class.Type, {})
+  const phone = await S.createStruct(contact.class.Phone, core.class.Type, {})
+  const twitter = await S.createStruct(contact.class.Twitter, core.class.Type, {})
+  const address = await S.createStruct(contact.class.Address, core.class.Type, {})
 
-  S.createClass(contact.class.Contact, core.class.Doc, {
-    email: email.newInstance({}),
-    phone: phone.newInstance({}),
-    phoneWork: phone.newInstance({}),
-    twitter: twitter.newInstance({}),
-    address: address.newInstance({}),
-    addressDelivery: address.newInstance({}),
-  })
+  return Promise.all([
+    S.createClass(contact.class.Contact, core.class.Doc, {
+      email: await email.newInstance({}),
+      phone: await phone.newInstance({}),
+      phoneWork: await phone.newInstance({}),
+      twitter: await twitter.newInstance({}),
+      address: await address.newInstance({}),
+      addressDelivery: await address.newInstance({}),
+    }),
 
-  S.createClass(contact.class.Person, contact.class.Contact, {
-    firstName: S.string(),
-    lastName: S.string(),
-    birthDate: S.string(),
-  })
+    S.createClass(contact.class.Person, contact.class.Contact, {
+      firstName: await S.string(),
+      lastName: await S.string(),
+      birthDate: await S.string(),
+    }),
 
-  S.decorateClass(contact.class.Email, { icon: contact.icon.Email })
-  S.decorateClass(contact.class.Phone, { icon: contact.icon.Phone })
-  S.decorateClass(contact.class.Twitter, { icon: contact.icon.Twitter })
-  S.decorateClass(contact.class.Address, { icon: contact.icon.Address })
+    S.decorateClass(contact.class.Email, { icon: contact.icon.Email }),
+    S.decorateClass(contact.class.Phone, { icon: contact.icon.Phone }),
+    S.decorateClass(contact.class.Twitter, { icon: contact.icon.Twitter }),
+    S.decorateClass(contact.class.Address, { icon: contact.icon.Address }),
 
-  // S.decorateClass(contact.class.Contact, {
-  //   decorators: { phone: S.typeDeco({ placeholder: '+7 913 333 5555' as IntlString }) }
-  // })
+    S.decorateClass(contact.class.Contact, {
+      decorators: { phone: await S.typeDeco({ placeholder: '+7 913 333 5555' as any }) }
+    })
+
+  ])
+
 }
 

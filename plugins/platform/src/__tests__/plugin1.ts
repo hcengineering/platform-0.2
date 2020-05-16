@@ -13,17 +13,15 @@
 // limitations under the License.
 //
 
-import { Platform } from '@anticrm/platform'
-import core from '@anticrm/platform-core'
+import { plugin, Plugin, PluginId, Platform } from '..'
 
-describe('platfrom', () => {
+import { plugin1State } from './shared'
 
-  const platform = new Platform()
+plugin1State.parsed = true
 
-  it('should load core plugin', () => {
-    platform.addLocation(core, import('@anticrm/platform-core/src/plugin'))
-    const plugin = platform.getPlugin(core.id)
-
-    return plugin.then(plugin => { expect(plugin.platform === platform).toBe(true) })
-  })
-})
+export default async (platform: Platform, deps: {}) => {
+  plugin1State.started = true
+  return {
+    id: 'plugin1',
+  }
+}

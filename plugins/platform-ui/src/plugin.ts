@@ -13,36 +13,37 @@
 // limitations under the License.
 //
 
-import Vue from 'vue'
-
-import core, { Doc, Obj, Type, PropertyType, Class, Ref, Session } from '@anticrm/platform-core'
+import core, { Obj, Class, Ref, Session, CorePlugin } from '@anticrm/platform-core'
 import { Platform } from '@anticrm/platform'
-import ui, { UIPlugin, AttrModel, UIDecorator, ClassUIDecorator, ClassUIModel } from '.'
-import i18n, { I18nPlugin, IntlString } from '@anticrm/platform-core-i18n'
-
-export function synthIntlStringId(clazz: Ref<Class<Obj>>, propertyKey: string, attribute?: string): IntlString {
-  return (attribute ? clazz + '.' + attribute + '_' + propertyKey : clazz + '_' + propertyKey) as IntlString
-}
+import ui, { UIPlugin, AttrModel, ClassUIModel } from '.'
+import { I18nPlugin } from '@anticrm/platform-core-i18n'
 
 class UIPluginImpl implements UIPlugin {
 
-  readonly pluginId = ui.id
   readonly platform: Platform
-
   readonly i18n: I18nPlugin
+  readonly core: CorePlugin
+  readonly session: Session
 
-  constructor(platform: Platform) {
+  constructor(platform: Platform, deps: { i18n: I18nPlugin, core: CorePlugin }) {
     this.platform = platform
-    this.i18n = platform.getPluginSync(i18n.id)
+    this.i18n = deps.i18n
+    this.core = deps.core
+    this.session = deps.core.getSession()
   }
 
-  getClassModel(clazz: Class<Obj>): ClassUIModel {
-    const decorator = clazz.as(ui.class.ClassUIDecorator)
-    const label = decorator?.label ?? synthIntlStringId(clazz._id, 'label')
+  async getClassModel(_class: Ref<Class<Obj>>): Promise<ClassUIModel> {
+    const clazz = await this.session.getInstance(_class)
+    const decorator = await clazz.as(ui.class.ClassUIDecorator)
+    const label = decorator?.label ?? _class
     return {
-      label: this.i18n.translate(label) ?? label,
+      label,
       icon: decorator?.icon
     }
+  }
+
+  getDefaultClassModel(): ClassUIModel {
+    return { label: 'The Class' }
   }
 
   getDefaultAttrModel(props: string[]): AttrModel[] {
@@ -71,76 +72,45 @@ class UIPluginImpl implements UIPlugin {
       3. Property `Type`'s Class UI Decorator `label` attribute
       4. Property `Type`'s Class synthetic id
   */
-  async getOwnAttrModel(clazz: Class<Obj>, props?: string[]): Promise<AttrModel[]> {
-    //const clazz = object.getClass()
-    const decorator = clazz.as(ui.class.ClassUIDecorator)
+  async getOwnAttrModel(_class: Ref<Class<Obj>>, props?: string[]): Promise<AttrModel[]> {
+    const clazz = await this.session.getInstance(_class)
+    const decorator = await clazz.as(ui.class.ClassUIDecorator)
     const keys = props ?? Object.getOwnPropertyNames(clazz._attributes)
 
-    return keys.map(key => {
+    const attrs = keys.map(async (key) => {
       const type = clazz._attributes[key]
       const typeDecorator = decorator?.decorators?.[key]
+
       const typeClass = type.getClass()
-      const typeClassDecorator = typeClass.as(ui.class.ClassUIDecorator)
+      const typeClassDecorator = await typeClass.as(ui.class.ClassUIDecorator)
 
-      const l1 = typeDecorator?.label ?? synthIntlStringId(clazz._id, 'label', key)
-      const l2 = typeClassDecorator?.label ?? synthIntlStringId(typeClass._id, 'label')
-      const label = this.i18n.translate(l1) ?? this.i18n.translate(l2) ?? key
-
-      const p1 = typeDecorator?.placeholder ?? synthIntlStringId(clazz._id, 'placeholder', key)
-      const p2 = synthIntlStringId(typeClass._id, 'placeholder')
-      const placeholder = this.i18n.translate(p1) ?? this.i18n.translate(p2) ?? key
+      const label = typeDecorator?.label ?? typeClassDecorator?.label ?? key
+      const placeholder = typeDecorator?.placeholder ?? label
 
       const icon = typeDecorator?.icon ?? typeClassDecorator?.icon
       return {
         key,
-        type: clazz._attributes[key],
+        type,
         label,
         placeholder,
         icon
       }
     })
+    return Promise.all(attrs)
   }
 
-  getClassHierarchy(_class: Class<Obj>): Class<Obj>[] {
-    const result = [] as Class<Obj>[]
-    let clazz = _class as Class<Obj> | undefined
-    while (clazz) {
-      result.push(clazz)
-      const _extends = clazz._extends
-      if (!_extends || _extends === core.class.Doc)
-        break
-      clazz = clazz.getSession().getInstance(_extends, core.class.Class) // TODO: getInstance(unknown) fails
-    }
-    return result.reverse()
-  }
-
-  async getAttrModel(_class: Class<Obj>, props?: string[]): Promise<AttrModel[]> {
-    const ownModels = this.getClassHierarchy(_class).map(clazz => this.getOwnAttrModel(clazz, props))
+  async getAttrModel(_class: Ref<Class<Obj>>, props?: string[]): Promise<AttrModel[]> {
+    const hierarchy = await this.core.getClassHierarchy(_class)
+    const ownModels = hierarchy.map(clazz => this.getOwnAttrModel(clazz, props))
     return Promise.all(ownModels).then(result => result.flat())
   }
 
 }
 
-export default (platform: Platform): UIPlugin => {
+console.log('PLUGIN: parsed ui')
+export default async (platform: Platform, deps: { i18n: I18nPlugin, core: CorePlugin }) => {
+  console.log('PLUGIN: started ui')
 
-  abstract class TIntlString implements Type<IntlString> {
-    _class!: Ref<Class<this>>
-    abstract getSession(): Session
-    abstract getClass(): Class<this>
-    abstract toIntlString(plural?: number | undefined): string
-
-    exert(value: IntlString, target?: PropertyType, key?: PropertyKey): any {
-      // console.log('TIntlString.exert')
-      // console.log(target)
-      // console.log(key)
-      return value
-    }
-    hibernate(value: any): IntlString { return value }
-  }
-
-  platform.setMetadata(ui.native.IntlString, TIntlString.prototype)
-
-  const uiPlugin = new UIPluginImpl(platform)
-  Vue.prototype.$uiPlugin = uiPlugin
+  const uiPlugin = new UIPluginImpl(platform, deps)
   return uiPlugin
 }

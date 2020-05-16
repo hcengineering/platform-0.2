@@ -13,16 +13,22 @@
 // limitations under the License.
 //
 
-import { Platform } from '@anticrm/platform'
+import { plugin, Resource, ResourcePlugin, Platform } from '..'
 
-import core from '@anticrm/platform-core'
-// import CorePlugin from '@anticrm/platform-core/src/plugin'
+import { plugin2State, TestPlugin } from './shared'
 
-const platform = new Platform()
+plugin2State.parsed = true
 
-const x = import('@anticrm/platform-core/src/plugin')
-
-declare const t: typeof import("/Users/z2sx/platform/plugins/platform-core/src/plugin")
-
-
-// platform.addLoader(core.id, import('@anticrm/platform-core/src/plugin'))
+export default async (platform: Platform, deps: {}) => {
+  plugin2State.started = true
+  const plugin = {
+    id: 'plugin2',
+    async resolve(resource: Resource<any>): Promise<any> {
+      if (resource === 'resource2:undefined') {
+        return undefined
+      }
+      return 'hello ' + resource
+    }
+  }
+  return plugin
+}

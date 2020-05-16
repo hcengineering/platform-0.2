@@ -13,6 +13,9 @@
 // limitations under the License.
 //
 
+import { Obj, Doc, Ref, Class } from '@anticrm/platform-core'
+import { synthIntlString } from '../plugin'
+
 import { IntlString } from '..'
 
 type StringIds = { [key: string]: IntlString }
@@ -29,4 +32,30 @@ export function verifyTranslation<T extends StringIds>(ids: T, translations: AsS
       throw new Error(`no translation for ${key}`)
   }
   return result as AsStrings<T>
+}
+
+// M O D E L  T R A N S L A T I O N S
+
+type Labels<T extends Obj> = {
+  [P in keyof T]?: string
+}
+
+type ClassRefs = { [key: string]: Ref<Class<Obj>> }
+
+type RefsToLabels<T extends ClassRefs, AS extends Obj> = {
+  [P in keyof T]: T[P] extends Ref<Class<infer X>> ? Labels<AS> : never
+}
+
+export function modelTranslation<AS extends Obj, T extends ClassRefs>(refs: T, as: Ref<Class<AS>>, translations: Partial<RefsToLabels<T, AS>>): Record<string, string> {
+  const result = {} as Record<string, string>
+  for (const clazz in translations) {
+    const classId = refs[clazz]
+    const classTranslations = translations[clazz] as Record<string, string>
+
+    for (const key in classTranslations) {
+      const intl = synthIntlString(classId, key)
+      result[intl] = classTranslations[key]
+    }
+  }
+  return result
 }

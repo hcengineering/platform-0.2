@@ -16,20 +16,32 @@
 <script lang="ts">
 
 import Vue, { PropType } from 'vue'
+import { Platform } from '@anticrm/platform'
 
-import core, { Obj, Ref, Class } from '@anticrm/platform-core'
+import core, { Obj, Doc, Ref, Class } from '@anticrm/platform-core'
 
 import ui, { UIPlugin, AttrModel } from '@anticrm/platform-ui'
 import PropPanel from './PropPanel.vue'
 
+async function getClassHierarchy(platform: Platform, object: Promise<Obj>): Promise<Ref<Class<Obj>>[]> {
+  const corePlugin = await platform.getPlugin(core.id)
+  const clazz = (await object)._class
+  return corePlugin.getClassHierarchy(clazz)
+}
+
 export default Vue.extend({
   components: { PropPanel },
   props: {
-    object: Object as PropType<Obj>,
+    object: Promise as PropType<Promise<Doc>>,
     filter: Array as PropType<string[] | undefined>,
   },
-  computed: {
-    classes(): Class<Obj>[] { return this.$uiPlugin.getClassHierarchy(this.object.getClass()) }
+  data() {
+    return {
+      classes: [] as Ref<Class<Obj>>[]
+    }
+  },
+  created() {
+    getClassHierarchy(this.$platform, this.object).then(classes => this.classes = classes)
   }
 })
 </script>
@@ -37,13 +49,12 @@ export default Vue.extend({
 <template>
   <table>
     <tr>
-      <td valign="top" v-for="clazz in classes" :key="clazz._id">
+      <td valign="top" v-for="clazz in classes" :key="clazz">
         <PropPanel :clazz="clazz" :object="object" />
       </td>
     </tr>
   </table>
 </template>
-
 
 <style scoped lang="scss">
 @import "~@anticrm/platform-ui-theme/css/_variables.scss";

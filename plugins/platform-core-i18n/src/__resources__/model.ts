@@ -13,17 +13,13 @@
 // limitations under the License.
 //
 
-import { MemDb } from '../memdb'
-import core from '../__resources__/'
-import { metaModel } from '../__resources__/model'
+import core from '@anticrm/platform-core/src/__resources__'
+import Builder from '@anticrm/platform-core/src/__resources__/builder'
 
-describe('memdb', () => {
+import i18n from '.'
 
-  it('should load classes into memdb', () => {
-    const memdb = new MemDb()
-    memdb.load(metaModel)
-    const object = memdb.get(core.class.Emb)
-    expect(object._id).toBe(core.class.Emb)
-    expect(object._classes).toContain(core.class.Class)
-  })
-})
+export default async (B: Builder) => {
+  return Promise.all([
+    B.createStruct(i18n.class.IntlString, core.class.Type, {}, i18n.native.IntlString)
+  ])
+}

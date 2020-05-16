@@ -15,51 +15,99 @@
 
 import { Platform, identify, Plugin, PluginId } from '@anticrm/platform'
 import { IntlString } from '..'
-import i18nPlugin from '../plugin'
-import { verifyTranslation } from '../__resources__/utils'
+import { verifyTranslation, modelTranslation } from '../__resources__/utils'
+
+import db from '@anticrm/platform-db'
+import core, { Ref, Class, Obj } from '@anticrm/platform-core'
+import i18n from '../__resources__'
+import contact from '@anticrm/contact/src/__resources__'
+import ui from '@anticrm/platform-ui/src/__resources__'
 
 const ids = identify('test' as PluginId<Plugin>, {
-  strings: {
+  string: {
     MyString: '' as IntlString
   },
+  class: {
+    Class: '' as Ref<Class<Class<Obj>>>
+  }
 })
 
 const ru = {
   MyString: 'Перевод',
 }
 
-describe('platform', () => {
+describe('i18n', () => {
 
-  const _ = new Platform()
-  const platform = i18nPlugin(_)
+  const platform = new Platform()
+  platform.addLocation(db, () => import('@anticrm/platform-db/src/memdb'))
+  platform.addLocation(core, () => import('@anticrm/platform-core/src/plugin'))
+  platform.addLocation(i18n, () => import('../plugin'))
+  platform.setResolver('native', core.id)
 
-  it('should return original string', () => {
-    expect(platform.translate('does not exists' as IntlString)).toBeUndefined()
+
+  it('should return original string', async () => {
+    const plugin = await platform.getPlugin(i18n.id)
+    expect(plugin.translate('does not exists' as IntlString)).toBe('does not exists')
   })
 
   it('should verify translation', () => {
-    const translations = verifyTranslation(ids.strings, ru)
-    expect(translations['test.strings.MyString']).toBe(ru.MyString)
+    const translations = verifyTranslation(ids.string, ru)
+    expect(translations['string:test.MyString']).toBe(ru.MyString)
   })
 
-  it('should translate simple', () => {
-    platform.loadStrings({
+  it('should translate simple', async () => {
+    const plugin = await platform.getPlugin(i18n.id)
+    plugin.loadStrings({
       idSimple: 'Русский'
     })
-    expect(platform.translate('idSimple' as IntlString)).toBe('Русский')
+    expect(plugin.translate('idSimple' as IntlString)).toBe('Русский')
   })
 
-  it('should translate plurals', () => {
-    platform.loadStrings({
+  it('should translate plurals', async () => {
+    const plugin = await platform.getPlugin(i18n.id)
+    plugin.loadStrings({
       idPlural: '{count, plural, =1 {секунду} few {# секунды} many {# секунд} other {# секунду} } назад'
     })
     const message = 'idPlural' as IntlString
-    expect(platform.translate(message, { count: 1 })).toBe('секунду назад')
-    expect(platform.translate(message, { count: 2 })).toBe('2 секунды назад')
-    expect(platform.translate(message, { count: 5 })).toBe('5 секунд назад')
-    expect(platform.translate(message, { count: 11 })).toBe('11 секунд назад')
-    expect(platform.translate(message, { count: 21 })).toBe('21 секунду назад')
-    expect(platform.translate(message, { count: 22 })).toBe('22 секунды назад')
-    expect(platform.translate(message, { count: 25 })).toBe('25 секунд назад')
+    expect(plugin.translate(message, { count: 1 })).toBe('секунду назад')
+    expect(plugin.translate(message, { count: 2 })).toBe('2 секунды назад')
+    expect(plugin.translate(message, { count: 5 })).toBe('5 секунд назад')
+    expect(plugin.translate(message, { count: 11 })).toBe('11 секунд назад')
+    expect(plugin.translate(message, { count: 21 })).toBe('21 секунду назад')
+    expect(plugin.translate(message, { count: 22 })).toBe('22 секунды назад')
+    expect(plugin.translate(message, { count: 25 })).toBe('25 секунд назад')
   })
+
+
+  it('should translate model', () => {
+    const translations = modelTranslation(contact.class, ui.class.TypeUIDecorator, {
+      Email: {
+        label: 'Email',
+        placeholder: 'andrey.v.platov@gmail.com',
+      },
+      Phone: {
+        label: 'Телефон',
+        placeholder: '+7 913 333 5555'
+      },
+      Twitter: {
+        label: 'Twitter',
+        placeholder: '@twitter',
+      },
+      Address: {
+        label: 'Адрес',
+        placeholder: 'Новосибирск, Красный проспект, 15',
+      },
+      Contact: {
+        label: 'Контактная информация',
+      },
+      Person: {
+        label: 'Общая информация',
+      }
+    })
+    // console.log(translations)
+    expect(translations['string:contact.Email/label']).toBe('Email')
+    expect(translations['string:contact.Phone/placeholder']).toBe('+7 913 333 5555')
+    expect(translations['string:contact.Contact/label']).toBe('Контактная информация')
+  })
+
 })

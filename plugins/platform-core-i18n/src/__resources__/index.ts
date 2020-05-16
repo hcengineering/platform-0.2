@@ -13,12 +13,16 @@
 // limitations under the License.
 //
 
-import Vue from 'vue'
-import { Platform } from '@anticrm/platform'
-import { UIPlugin } from '.'
+import i18n from '..'
 
-declare module 'vue/types/vue' {
-  interface Vue {
-    $platform: Platform
+import { Ref, Class, Type } from '@anticrm/platform-core'
+import { IntlString } from '@anticrm/platform-core-i18n'
+
+import { extendIds } from '@anticrm/platform-core/src/__resources__/utils'
+
+export default extendIds(i18n, {
+  class: {
+    IntlString: '' as Ref<Class<Type<IntlString>>>,
   }
-}
+})
+

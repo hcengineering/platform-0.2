@@ -13,12 +13,19 @@
 // limitations under the License.
 //
 
-import Vue from 'vue'
-import { Platform } from '@anticrm/platform'
-import { UIPlugin } from '.'
+import { plugin, Plugin, PluginId } from '@anticrm/platform'
+import db, { Db } from '@anticrm/platform-db'
+import core, { Session } from '@anticrm/platform-core'
+import ui, { UIPlugin } from '@anticrm/platform-ui'
 
-declare module 'vue/types/vue' {
-  interface Vue {
-    $platform: Platform
-  }
+export interface LaunchPlugin extends Plugin {
+  readonly db: Db
+  // readonly ui: UIPlugin
+  readonly session: Session
 }
+
+export default plugin('launch-dev' as PluginId<LaunchPlugin>, {
+  core: core.id,
+  db: db.id,
+  // ui: ui.id
+}, {})

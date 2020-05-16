@@ -14,12 +14,11 @@
 //
 
 import { Platform, identify, Plugin, PluginId } from '@anticrm/platform'
+import db from '@anticrm/platform-db'
 import { Ref, Class, Doc, Emb, Type } from '@anticrm/platform-core'
 
 import core from '../__resources__'
 import { metaModel, createClass, newContainer, array, str } from '../__resources__/model'
-import startCorePlugin from '../plugin'
-
 import { TSession } from '../session'
 
 interface SimpleClass extends Doc {
@@ -51,57 +50,74 @@ const myModel = [simpleClass, myClass, myClassInstance]
 describe('session', () => {
 
   const platform = new Platform()
-  const corePlugin = startCorePlugin(platform)
-  const session = corePlugin.getSession() as TSession
-  session.loadModel(metaModel)
-  console.log(metaModel)
-  console.log((session as any).memdb.hierarchy)
+  platform.addLocation(db, () => import('@anticrm/platform-db/src/memdb'))
+  platform.addLocation(core, () => import('../plugin'))
+  platform.setResolver('native', core.id)
+  const corePlugin = platform.getPlugin(core.id)
+  const session = corePlugin.then(plugin => plugin.getSession() as TSession)
+
+  it('should load model', async () => {
+    const memdb = await platform.getPlugin(db.id)
+    memdb.load(metaModel)
+  })
 
   it('should get prototype', () => {
-    const objectProto = (session as any).getPrototype(core.class.Doc)
-    expect(objectProto).toBeDefined()
+    return session.then(session => {
+      const objectProto = session.getPrototype(core.class.Doc)
+      return objectProto.then(objectProto => {
+        expect(objectProto).toBeDefined()
 
-    const baseProto = Object.getPrototypeOf(objectProto)
-    expect(baseProto.hasOwnProperty('getSession')).toBe(true)
-    expect(baseProto.getSession() === session).toBe(true)
+        const baseProto = Object.getPrototypeOf(objectProto)
+        expect(baseProto.hasOwnProperty('getSession')).toBe(true)
+        expect(baseProto.getSession() === session).toBe(true)
 
-    // expect(objectProto.hasOwnProperty('_class')).toBe(true)
-    expect(objectProto.hasOwnProperty('getSession')).toBe(false)
-    expect(objectProto.hasOwnProperty('toIntlString')).toBe(true)
-    expect(objectProto.hasOwnProperty('getClass')).toBe(true)
-    expect(typeof objectProto.toIntlString).toBe('function')
+        // expect(objectProto.hasOwnProperty('_class')).toBe(true)
+        expect(objectProto.hasOwnProperty('getSession')).toBe(false)
+        expect(objectProto.hasOwnProperty('toIntlString')).toBe(true)
+        expect(objectProto.hasOwnProperty('getClass')).toBe(true)
+        expect(typeof (objectProto as any)['toIntlString']).toBe('function')
+      })
+    })
   })
 
   it('should get instances', () => {
-    const objectClass = session.getInstance(core.class.Emb, core.class.Class)
-    expect(typeof objectClass.getSession).toBe('function')
-    expect(objectClass.getSession() === session).toBe(true)
+    return session.then(session => {
+      return Promise.all([
+        session.getInstance(core.class.Emb).then(objectClass => {
+          expect(typeof objectClass.getSession).toBe('function')
+          expect(objectClass.getSession() === session).toBe(true)
 
-    expect(objectClass._id).toBe(core.class.Emb)
-    expect(objectClass._native).toBe(core.native.Emb)
-    expect(objectClass.getClass()._id).toBe(core.class.Class)
-    expect(objectClass.toIntlString()).toBe('doc: core.class.Emb')
+          expect(objectClass._id).toBe(core.class.Emb)
+          expect(objectClass._native).toBe(core.native.Emb)
+          expect(objectClass.getClass()._id).toBe(core.class.Class)
+          expect(objectClass.toIntlString()).toBe('doc: class:core.Emb')
+        }),
+        session.getInstance(core.class.StructuralFeature).then(classClass => {
+          expect(classClass._extends).toBe(core.class.Doc)
+          expect(classClass.toIntlString()).toBe('doc: class:core.StructuralFeature')
 
-    const classClass = session.getInstance(core.class.StructuralFeature, core.class.Class)
-    expect(classClass._extends).toBe(core.class.Doc)
-    expect(classClass.toIntlString()).toBe('doc: core.class.StructuralFeature')
-
-    expect(classClass._attributes._extends._class).toBe(core.class.RefTo)
-    const refTo = classClass._attributes._extends.getClass()
-    expect(refTo._class).toBe(core.class.Struct)
+          expect(classClass._attributes._extends._class).toBe(core.class.RefTo)
+          const refTo = classClass._attributes._extends.getClass()
+          expect(refTo._class).toBe(core.class.Struct)
+        }),
+      ])
+    })
   })
 
-  it('should narrow class', () => {
-    expect(session.extends(core.class.Class, core.class.StructuralFeature)).toBe(true)
-    expect(session.extends(core.class.StructuralFeature, core.class.Class)).toBe(false)
-    expect(session.narrow(core.class.StructuralFeature, [core.class.Class])).toBe(core.class.Class)
-    expect(session.narrow(core.class.Doc, [core.class.Class])).toBe(core.class.Class)
-  })
+  // it('should narrow class', () => {
+  //   expect(session.extends(core.class.Class, core.class.StructuralFeature)).toBe(true)
+  //   expect(session.extends(core.class.StructuralFeature, core.class.Class)).toBe(false)
+  //   expect(session.narrow(core.class.StructuralFeature, [core.class.Class])).toBe(core.class.Class)
+  //   expect(session.narrow(core.class.Doc, [core.class.Class])).toBe(core.class.Class)
+  // })
 
-  it('should create instance', () => {
-    session.loadModel(myModel)
-    const simpleClass = session.getClass(simpleClassId)
-    const s = simpleClass.newInstance({
+  it('should create instance', async () => {
+    const memdb = await platform.getPlugin(db.id)
+    memdb.load(myModel)
+
+    const sess = await session
+    const simpleClass = await sess.getClass(simpleClassId)
+    const s = await simpleClass.newInstance({
       _id: 'xxx' as Ref<SimpleClass>,
       s: 'hey there'
     })
@@ -110,62 +126,64 @@ describe('session', () => {
     expect(s.s).toBe('hey there')
   })
 
-  it('should create struct', () => {
+  it('should create struct', async () => {
     interface X extends Emb {
       x: string
     }
-    const xClass = session.createStruct('x.class' as Ref<Class<X>>, core.class.Emb, {
+    const s = await session
+    const xClass = await s.createStruct('x.class' as Ref<Class<X>>, core.class.Emb, {
       x: str()
     })
     expect(xClass._id).toBe('x.class')
-    const x = xClass.newInstance({ x: 'hallo' })
+    const x = await xClass.newInstance({ x: 'hallo' })
     expect(x.x).toBe('hallo')
   })
 
-  it('should create class', () => {
-    const S = session
+  interface Contact extends Doc {
+    email?: string
+    phone?: string
+    phoneWork?: string
+    twitter?: string
+    address?: string
+    addressDelivery?: string
+  }
 
-    interface Contact extends Doc {
-      email?: string
-      phone?: string
-      phoneWork?: string
-      twitter?: string
-      address?: string
-      addressDelivery?: string
+  const contact = identify('contact-test' as PluginId<Plugin>, {
+    class: {
+      Contact: '' as Ref<Class<Contact>>,
+      Email: '' as Ref<Class<Type<string>>>,
+      Phone: '' as Ref<Class<Type<string>>>,
+      Twitter: '' as Ref<Class<Type<string>>>,
+      Address: '' as Ref<Class<Type<string>>>,
     }
+  })
 
-    const contact = identify('contact-test' as PluginId<Plugin>, {
-      class: {
-        Contact: '' as Ref<Class<Contact>>,
-        Email: '' as Ref<Class<Type<string>>>,
-        Phone: '' as Ref<Class<Type<string>>>,
-        Twitter: '' as Ref<Class<Type<string>>>,
-        Address: '' as Ref<Class<Type<string>>>,
-      }
+  const contact1Id = 'test.contact.1' as Ref<Contact>
+
+  it('should create class', async () => {
+    const S = await session
+
+    const email = await S.createStruct(contact.class.Email, core.class.Type, {})
+    const phone = await S.createStruct(contact.class.Phone, core.class.Type, {})
+    const twitter = await S.createStruct(contact.class.Twitter, core.class.Type, {})
+    const address = await S.createStruct(contact.class.Address, core.class.Type, {})
+
+    await S.createClass(contact.class.Contact, core.class.Doc, {
+      email: await email.newInstance({}),
+      phone: await phone.newInstance({}),
+      phoneWork: await phone.newInstance({}),
+      twitter: await twitter.newInstance({}),
+      address: await address.newInstance({}),
+      addressDelivery: await address.newInstance({}),
     })
 
-    const email = S.createStruct(contact.class.Email, core.class.Type, {})
-    const phone = S.createStruct(contact.class.Phone, core.class.Type, {})
-    const twitter = S.createStruct(contact.class.Twitter, core.class.Type, {})
-    const address = S.createStruct(contact.class.Address, core.class.Type, {})
-
-    S.createClass(contact.class.Contact, core.class.Doc, {
-      email: email.newInstance({}),
-      phone: phone.newInstance({}),
-      phoneWork: phone.newInstance({}),
-      twitter: twitter.newInstance({}),
-      address: address.newInstance({}),
-      addressDelivery: address.newInstance({}),
-    })
-
-    const contact1Id = 'test.contact.1' as Ref<Contact>
-    const contactClass = session.getClass(contact.class.Contact)
+    const contactClass = await S.getClass(contact.class.Contact)
     contactClass.newInstance({
       _id: contact1Id,
       phone: '+7 913 333 5555'
     })
 
-    const contact1 = session.getInstance(contact1Id, contact.class.Contact)
+    const contact1 = await S.getInstance(contact1Id)
     expect(contact1.phone).toBe('+7 913 333 5555')
     contact1.phone = '+1 646 667 88 77'
     expect(contact1.phone).toBe('+1 646 667 88 77')
@@ -174,17 +192,52 @@ describe('session', () => {
     expect(contact1.email).toBe('hey@hey.com')
   })
 
-  // it('should work with arrays', () => {
-  //   session.loadModel(myModel)
-  //   const myInstance = session.getInstance(myClassInstanceId)
+  interface ContactMixin extends Contact {
+    xxx?: string
+  }
+  const mixinClass = 'mixinClass' as Ref<Class<ContactMixin>>
+
+  it('should mix in', async () => {
+    const S = await session
+    const email = await S.getClass(contact.class.Email)
+    await S.createClass(mixinClass, contact.class.Contact, {
+      xxx: await email.newInstance({}),
+    })
+
+    const contact1 = await S.getInstance(contact1Id)
+
+    const mix = await S.mixin(contact1, mixinClass, { xxx: 'hey there!' })
+    expect(mix.xxx).toBe('hey there!')
+    expect(mix.email).toBe('hey@hey.com')
+    expect(mix.getClass()._id).toBe(mixinClass)
+  })
+
+  it('should narrow to mixin', async () => {
+    const S = await session
+    const contact1 = await S.getInstance(contact1Id)
+    expect(contact1.getClass()._id).toBe(contact.class.Contact)
+
+    const mix = await contact1.as(mixinClass)
+    expect(mix?.xxx).toBe('hey there!')
+    expect(mix?.email).toBe('hey@hey.com')
+    expect(mix?.getClass()._id).toBe(mixinClass)
+  })
+
+  it('should provide class hierarchy', async () => {
+    const corePlugin = await platform.getPlugin(core.id)
+    const hierarchy = await corePlugin.getClassHierarchy(core.class.Class)
+    expect(hierarchy[0]).toBe(core.class.Doc)
+    expect(hierarchy[1]).toBe(core.class.StructuralFeature)
+    expect(hierarchy[2]).toBe(core.class.Class)
+  })
+
+  // it('should work with arrays', async () => {
+  //   const sess = await session
+  //   const myInstance = await sess.getInstance(myClassInstanceId)
+  //   console.log(myInstance)
   //   expect(myInstance._id).toBe(myClassInstanceId)
   //   expect(myInstance.arrayOfStrings[0]).toBe('hey')
   //   expect(myInstance.arrayOfStrings[1]).toBe('there')
-  // })
-
-  // it('should work with mixins', () => {
-  //   const myInstance = session.getInstance(myClassInstanceId)
-  //   console.log(myInstance.mixins[0])
   // })
 
 })

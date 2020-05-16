@@ -16,7 +16,6 @@
 import Theme from '../components/Theme.vue'
 
 import ui from '@anticrm/platform-ui'
-import platform from '@anticrm/platform'
 
 import Icon from '@anticrm/platform-ui/src/components/Icon.vue'
 import PropPanel from '@anticrm/platform-ui/src/components/PropPanel.vue'
@@ -26,6 +25,8 @@ import Table from '@anticrm/platform-ui/src/components/Table.vue'
 import core from '@anticrm/platform-core'
 
 import contact from '@anticrm/contact'
+
+import { getSession } from '..'
 
 export default {
   title: 'Framework'
@@ -39,25 +40,27 @@ export const icon = () => ({
     </Theme>
   }
 })
-const corePlugin = platform.getPluginSync(core.id)
-const session = corePlugin.getSession()
 
-console.log('story session dump')
-console.log(session.dump())
+const contactInstance = getSession().then(session => {
+  return session.getClass(contact.class.Contact).then(clazz => {
+    return clazz.newInstance({ email: 'xxx@gmail.com' })
+  })
+})
 
-const contactClass = session.getClass(contact.class.Contact)
-const contactInstance = contactClass.newInstance({})
 const props = ['phone', 'email']
 
 export const properties = () => ({
   render() {
-    return <Theme><PropPanel clazz={contactClass} object={contactInstance}></PropPanel></Theme>
-    //    return <Theme><PropPanel object={contactInstance} filter={props}></PropPanel></Theme>
+    return <Theme><PropPanel clazz={contact.class.Contact} object={contactInstance}></PropPanel></Theme>
   }
 })
 
-const personClass = session.getClass(contact.class.Person)
-const personInstance = personClass.newInstance({})
+// const personClass = session.getClass(contact.class.Person)
+const personInstance = getSession().then(session => {
+  return session.getClass(contact.class.Person).then(clazz => {
+    return clazz.newInstance({ phone: '555 777 8888', firstName: 'John' })
+  })
+})
 
 export const object = () => ({
   render() {
@@ -65,20 +68,26 @@ export const object = () => ({
   }
 })
 
-const person1 = personClass.newInstance({})
-person1.firstName = 'Валентин Генрихович'
-person1.lastName = 'Либерзон'
-person1.email = 'lyberzone@gmail.com'
 
-const person2 = personClass.newInstance({})
-person2.firstName = 'John'
-person2.lastName = 'Carmack'
-person2.email = 'carmack@acm.org'
+async function createTableConent() {
+  const session = await getSession()
+  const personClass = await session.getInstance(contact.class.Person)
 
-const persons = [person1, person2]
+  const person1 = await personClass.newInstance({})
+  person1.firstName = 'Валентин Генрихович'
+  person1.lastName = 'Либерзон'
+  person1.email = 'lyberzone@gmail.com'
+
+  const person2 = await personClass.newInstance({})
+  person2.firstName = 'John'
+  person2.lastName = 'Carmack'
+  person2.email = 'carmack@acm.org'
+
+  return [person1, person2]
+}
 
 export const table = () => ({
   render() {
-    return <Theme><Table clazz={personClass} objects={persons}></Table></Theme>
+    return <Theme><Table clazz={contact.class.Person} objects={createTableConent()}></Table></Theme>
   }
 })

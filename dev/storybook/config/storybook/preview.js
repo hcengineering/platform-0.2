@@ -13,6 +13,7 @@
 // limitations under the License.
 //
 
-// import '@anticrm/dev-boot/src/meta'
-import '@anticrm/dev-boot'
+import Vue from 'vue'
+import platform from '../../src'
 
+Vue.prototype.$platform = platform

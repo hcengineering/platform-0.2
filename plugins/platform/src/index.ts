@@ -19,21 +19,53 @@ export type AsNumber<T> = number & PropType<T>
 
 export type Metadata<T> = AsString<T> & { __metadata: void }
 
-export type PluginId<S extends Plugin> = Metadata<S>
-export interface Platform { }
-export interface Plugin {
-  readonly platform: Platform
-  // readonly pluginId: PluginId<Plugin>
+/**
+ * Platform Resource Identifier (PRI). 
+ * 
+ * PRI is a `string` in the `kind:...` format.
+ * The Platform use `kind` part to delegate resource resolution to the plugin 
+ * that is registered as a resolver for `Resources` of such a kind.
+ * 
+ * Examples of PRIs:
+ * ```typescript
+ *   `class:contact.Person` as Resource<Class<Person>> // database object with id === `class:contact.Person`
+ *   `string:class.ClassLabel` as Resource<string> // translated string according to current language and i18n settings
+ *   `asset:ui.Icons` as Resource<URL> // URL to SVG sprites
+ *   `easyscript:2+2` as Resource<() => number> // function
+ * ```
+ * 
+ * {@link ResourcePlugin}
+ * {@link Platform.resolve}
+ */
+export type Resource<T> = AsString<T> & { __resource: void }
+export type PluginId<P extends Plugin> = Resource<P>
+export type AnyPlugin = PluginId<Plugin>
+
+export interface Plugin { }
+
+export interface ResourcePlugin extends Plugin {
+  resolve(resource: Resource<any>): Promise<any>
 }
 
-export interface PluginDescriptor<P extends Plugin> {
+/**
+ * A plugin may request platform to inject resolved references to plugins it depends on.
+ */
+export interface PluginDependencies { [key: string]: PluginId<Plugin> }
+
+type InferPlugins<T extends PluginDependencies> = {
+  [P in keyof T]: T[P] extends PluginId<infer Plugin> ? Plugin : T[P]
+}
+
+export interface PluginDescriptor<P extends Plugin, D extends PluginDependencies> {
   id: PluginId<P>,
-  deps: PluginId<Plugin>[]
+  deps: D
 }
+type AnyDescriptor = PluginDescriptor<Plugin, PluginDependencies>
 
-type PluginModule<P extends Plugin> = Promise<{
-  default: (platform: Platform) => P
+type PluginModule<P extends Plugin, D extends PluginDependencies> = () => Promise<{
+  default: (platform: Platform, deps: InferPlugins<D>) => Promise<P>
 }>
+type AnyModule = PluginModule<Plugin, PluginDependencies>
 
 //////////////
 
@@ -43,61 +75,89 @@ type ExtractType<T, X extends Record<string, Metadata<T>>> = { [P in keyof X]:
 
 export class Platform {
 
-  private COMPRESS_IDS = false
+  // private COMPRESS_IDS = false
 
-  compressId(id: string): string {
-    if (this.COMPRESS_IDS) {
-      let h = 0
-      for (let i = 0; i < id.length; i++)
-        h = Math.imul(17, h) + id.charCodeAt(i) | 0
+  // compressId(id: string): string {
+  //   if (this.COMPRESS_IDS) {
+  //     let h = 0
+  //     for (let i = 0; i < id.length; i++)
+  //       h = Math.imul(17, h) + id.charCodeAt(i) | 0
 
-      return Math.abs(h).toString(36)
+  //     return Math.abs(h).toString(36)
+  //   }
+  //   return id
+  // }
+
+  // P L A T F O R M  R E S O U R C E  I D E N T I F I E R S
+
+  private resolvers = new Map<string, AnyPlugin>()
+  private resolvedProviders = new Map<string, Promise<ResourcePlugin>>()
+
+  resolve<T>(resource: Resource<T>): Promise<T> {
+    const kind = resource.substring(0, resource.indexOf(':'))
+    let provider = this.resolvedProviders.get(kind)
+    if (!provider) {
+      const resourcePlugin = this.resolvers.get(kind)
+      if (!resourcePlugin)
+        throw new Error('no provider associated with resource kind: ' + kind)
+      provider = this.getPlugin(resourcePlugin as PluginId<ResourcePlugin>)
+      this.resolvedProviders.set(kind, provider)
     }
-    return id
+    return provider.then(plugin => plugin.resolve(resource))
   }
 
-  /////
-
-  private plugins = new Map<PluginId<Plugin>, Plugin>()
-  private locations = [] as [PluginDescriptor<Plugin>, PluginModule<Plugin>][]
-
-  // temporary method for testing purposes
-  getPluginSync<T extends Plugin>(id: PluginId<T>): T {
-    const plugin = this.plugins.get(id)
-    if (plugin) return plugin as T
-    throw new Error('plugin not loaded: ' + id)
+  setResolver(kind: string, resolver: PluginId<ResourcePlugin>) {
+    this.resolvers.set(kind, resolver)
   }
 
-  setPlugin<T extends Plugin>(id: PluginId<T>, plugin: T): void {
-    this.plugins.set(id, plugin)
-  }
+  // P L U G I N S
 
-  private getLocation<T extends Plugin>(id: PluginId<T>): [PluginDescriptor<T>, PluginModule<T>] {
+  private plugins = new Map<AnyPlugin, Promise<Plugin>>()
+  private locations = [] as [AnyDescriptor, AnyModule][]
+
+  private getLocation(id: PluginId<Plugin>): [AnyDescriptor, AnyModule] {
     for (const location of this.locations) {
       if (location[0].id === id)
-        return location as [PluginDescriptor<T>, PluginModule<T>]
+        return location
     }
-    throw new Error('no descriptor for: ' + id)
+    throw new Error('no location provided for plugin: ' + id)
+  }
+
+  // TODO #3 `PluginModule` type does not check against `PluginDescriptor` 
+  addLocation<P extends Plugin, X extends PluginDependencies>(plugin: PluginDescriptor<P, X>, module: PluginModule<P, X>) {
+    this.locations.push([plugin, module as any])
   }
 
   async getPlugin<T extends Plugin>(id: PluginId<T>): Promise<T> {
     const plugin = this.plugins.get(id)
-    if (plugin) return plugin as T
-    const location = this.getLocation(id)
-    const descriptor = location[0]
-    const deps = await Promise.all(descriptor.deps.map(plugin => this.getPlugin(plugin)))
-    return location[1].then(module => module.default).then(f => f(this))
+    if (plugin) {
+      return plugin as Promise<T>
+    } else {
+      const location = this.getLocation(id)
+      const plugin = this.resolveDependencies(location[0].deps).then(deps =>
+        location[1]().then(module => module.default).then(f => f(this, deps))
+      )
+      this.plugins.set(id, plugin)
+      return plugin as Promise<T>
+    }
   }
 
-  addLocation<P extends Plugin>(plugin: PluginDescriptor<P>, module: PluginModule<P>) {
-    this.locations.push([plugin, module])
+  // D E P E N D E N C I E S
+
+  private async resolveDependencies(deps: PluginDependencies): Promise<{ [key: string]: Plugin }> {
+    const result = {} as { [key: string]: Plugin }
+    for (const key in deps) {
+      const id = deps[key]
+      result[key] = await this.getPlugin(id)
+    }
+    return result
   }
 
-  /////
+  // M E T A D A T A
 
   private metadata = new Map<string, any>()
 
-  getMetadata<T>(id: Metadata<T>): T {
+  getMetadata<T>(id: Metadata<T>): T | undefined {
     return this.metadata.get(id as string)
   }
 
@@ -115,32 +175,42 @@ export class Platform {
       this.metadata.set(id as string, resource)
     }
   }
-
 }
 
 //////
 
 type Namespace = Record<string, Record<string, any>>
 
-function transform<N extends Namespace>(prefix: string, namespaces: N, f: (id: string, value: any) => any): N {
+function transform<N extends Namespace>(plugin: AnyPlugin, namespaces: N, f: (id: string, value: any) => any): N {
   const result = {} as Namespace
   for (const namespace in namespaces) {
     const extensions = namespaces[namespace]
     const transformed = {} as Record<string, any>
     for (const key in extensions) {
-      transformed[key] = f(prefix + '.' + namespace + '.' + key, extensions[key])
+      transformed[key] = f(namespace + ':' + plugin + '.' + key, extensions[key])
     }
     result[namespace] = transformed
   }
   return result as N
 }
 
-export function identify<N extends Namespace>(pluginId: PluginId<Plugin>, namespace: N): N {
+export function identify<N extends Namespace>(pluginId: AnyPlugin, namespace: N): N {
   return transform(pluginId, namespace, (id: string, value) => value === '' ? id : value)
 }
 
-export function plugin<P extends Plugin, N extends Namespace>(id: PluginId<P>, deps: PluginId<Plugin>[], namespace: N): PluginDescriptor<P> & N {
+export function plugin<P extends Plugin, D extends PluginDependencies, N extends Namespace>(id: PluginId<P>, deps: D, namespace: N): PluginDescriptor<P, D> & N {
   return { id, deps, ...identify(id, namespace) }
 }
 
-export default new Platform()
+export function allValues(object: { [key: string]: Promise<any> }): Promise<{ [key: string]: any }> {
+  const keys = Object.keys(object)
+  const values = Object.values(object)
+  const all = Promise.all(values)
+  return all.then(values => {
+    const result = []
+    for (let i = 0; i < keys.length; i++) {
+      result.push([keys[i], values[i]])
+    }
+    return Object.fromEntries(result) as { [key: string]: any }
+  })
+}

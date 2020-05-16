@@ -13,35 +13,36 @@
 // limitations under the License.
 //
 
-import { modelTranslation } from '@anticrm/platform-ui/src/__resources__/utils'
+import { modelTranslation } from '@anticrm/platform-core-i18n/src/__resources__/utils'
+import ui from '@anticrm/platform-ui/src/__resources__'
 import contact from '..'
 
-export default modelTranslation(contact.class, {
+export default modelTranslation(contact.class, ui.class.ClassUIDecorator, {
   Email: {
-    $label: 'Email',
-    $placeholder: 'andrey.v.platov@gmail.com'
+    label: 'Email',
+    // placeholder: 'andrey.v.platov@gmail.com',
   },
   Phone: {
-    $label: 'Телефон',
-    $placeholder: '+7 913 333 5555'
+    label: 'Телефон',
+    // placeholder: '+7 913 333 5555'
   },
   Twitter: {
-    $label: 'Twitter',
-    $placeholder: '@twitter',
+    label: 'Twitter',
+    // placeholder: '@twitter',
   },
   Address: {
-    $label: 'Адрес',
-    $placeholder: 'Новосибирск, Красный проспект, 15',
+    label: 'Адрес',
+    // placeholder: 'Новосибирск, Красный проспект, 15',
   },
   Contact: {
-    $label: 'Контактная информация',
-    phoneWork: 'Рабочий',
-    addressDelivery: 'Адрес доставки'
+    label: 'Контактная информация',
+    // phoneWork: 'Рабочий',
+    // addressDelivery: 'Адрес доставки'
   },
   Person: {
-    $label: 'Общая информация',
-    firstName: 'Имя',
-    lastName: 'Фамилия',
-    birthDate: 'День рождения'
+    label: 'Общая информация',
+    // firstName: 'Имя',
+    // lastName: 'Фамилия',
+    // birthDate: 'День рождения'
   }
 })

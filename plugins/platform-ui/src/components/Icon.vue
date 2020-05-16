@@ -26,7 +26,7 @@ export default Vue.extend({
     }
   },
   computed: {
-    url(): string { return this.$uiPlugin.platform.getMetadata(this.icon) },
+    url(): string { return this.$platform.getMetadata(this.icon) },
   }
 })
 </script>

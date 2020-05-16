@@ -13,12 +13,23 @@
 // limitations under the License.
 //
 
-import Vue from 'vue'
-import { Platform } from '@anticrm/platform'
-import { UIPlugin } from '.'
+import { Session, Type } from '@anticrm/platform-core'
+import { IntlString } from '..'
 
-declare module 'vue/types/vue' {
-  interface Vue {
-    $platform: Platform
+import CoreBuilder from '@anticrm/platform-core/src/__resources__/builder'
+import i18n from '.'
+
+export default class extends CoreBuilder {
+
+  protected session: Session
+
+  constructor(session: Session) {
+    super(session)
+    this.session = session
+  }
+
+  async i18n(): Promise<Type<IntlString>> {
+    const meta = await this.session.getClass(i18n.class.IntlString)
+    return meta.newInstance({})
   }
 }

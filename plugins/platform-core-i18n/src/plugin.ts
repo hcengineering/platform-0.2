@@ -15,38 +15,83 @@
 
 import { IntlMessageFormat, PrimitiveType } from 'intl-messageformat'
 import { Platform } from '@anticrm/platform'
-import { I18nPlugin, IntlString, pluginId } from '..'
+import { Doc, Obj, Type, Ref, Class, Session, PropertyType, CorePlugin } from '@anticrm/platform-core'
+import i18n, { I18nPlugin, IntlString, pluginId } from '..'
 
-class I18nPluginImpl implements I18nPlugin {
-  readonly pluginId = pluginId
-  readonly platform: Platform
+// export function synthIntlStringId(clazz: Ref<Class<Obj>>, propertyKey: string, attribute?: string): IntlString {
+//   return (attribute ? clazz + '.' + attribute + '_' + propertyKey : clazz + '_' + propertyKey) as IntlString
+// }
 
-  private strings: Map<IntlString, string> = new Map()
-  private imfCache: Map<IntlString, IntlMessageFormat> = new Map()
-
-  constructor(platform: Platform) { this.platform = platform }
-
-  translate(string: IntlString, params?: Record<string, PrimitiveType> | undefined): string | undefined {
-    const translation = this.strings.get(string)
-    if (!translation) {
-      return undefined
-    }
-    if (params) {
-      let imf = this.imfCache.get(string)
-      if (!imf) {
-        imf = new IntlMessageFormat(translation, 'ru-RU')
-        this.imfCache.set(string, imf)
-      }
-      return imf.format(params) as string
-    }
-    return translation
+export function synthIntlString(_id: Ref<Doc>, key: string): IntlString {
+  const index = _id.indexOf(':')
+  const kind = _id.substring(0, index)
+  if (kind !== 'class')
+    throw new Error('hmm, do we have a case?')
+  const keyIndex = key.indexOf('/')
+  if (keyIndex !== -1) {
+    key = key.substring(keyIndex + 1)
   }
-
-  loadStrings(translations: { [key: string]: string }) {
-    for (const key in translations) {
-      this.strings.set(key as IntlString, translations[key])
-    }
-  }
+  return 'string' + _id.substring(index) + '/' + key as IntlString
 }
 
-export default (platform: Platform): I18nPlugin => new I18nPluginImpl(platform)
+console.log('PLUGIN: parsed i18n')
+export default async (platform: Platform, deps: { core: CorePlugin }): Promise<I18nPlugin> => {
+  console.log('PLUGIN: started i18n')
+
+  class I18nPluginImpl implements I18nPlugin {
+    readonly pluginId = pluginId
+    readonly platform: Platform
+
+    private strings: Map<IntlString, string> = new Map()
+    private imfCache: Map<IntlString, IntlMessageFormat> = new Map()
+
+    constructor(platform: Platform) { this.platform = platform }
+
+    translate(string: IntlString, params?: Record<string, PrimitiveType> | undefined): string | undefined {
+      const translation = this.strings.get(string)
+      if (!translation) {
+        return string
+      }
+      if (params) {
+        let imf = this.imfCache.get(string)
+        if (!imf) {
+          imf = new IntlMessageFormat(translation, 'ru-RU')
+          this.imfCache.set(string, imf)
+        }
+        return imf.format(params) as string
+      }
+      return translation
+    }
+
+    loadStrings(translations: { [key: string]: string }) {
+      for (const key in translations) {
+        this.strings.set(key as IntlString, translations[key])
+      }
+    }
+  }
+
+  const plugin = new I18nPluginImpl(platform)
+
+  abstract class TIntlString implements Type<IntlString> {
+    _class!: Ref<Class<this>>
+    abstract getSession(): Session
+    abstract getClass(): Class<this>
+    abstract toIntlString(plural?: number | undefined): string
+
+    exert(value: IntlString, target?: any, key?: string): any {
+      if (value === undefined) {
+        if (target?._id && key) {
+          const id = target._id as Ref<Doc>
+          const intl = synthIntlString(id, key)
+          return plugin.translate(intl)
+        }
+      }
+      return value
+    }
+    hibernate(value: any): IntlString { return value }
+  }
+
+  deps.core.registerPrototype(i18n.native.IntlString, TIntlString.prototype)
+
+  return plugin
+}

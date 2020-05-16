@@ -13,15 +13,16 @@
 // limitations under the License.
 //
 
-import { Metadata } from '@anticrm/platform'
+import { Resource } from '@anticrm/platform'
 
 import { BagOf, InstanceOf, RefTo } from '..'
-import { Ref, Class, Obj, Doc, Content, DiffDescriptors, PropertyType, Type, Container, Emb, ArrayOf, Session } from '..'
+import { Ref, Class, Obj, Doc, Content, DiffDescriptors, PropertyType, Type, Emb, ArrayOf, Session } from '..'
+import { Container } from '@anticrm/platform-db'
 
 import core from '.'
 
 export function newContainer<T extends Doc>(_class: Ref<Class<T>>, data: Content<T>): Container {
-  return { _classes: [_class as unknown as Ref<Class<Doc>>], ...(data as unknown as Content<Doc>) }
+  return { _class, ...(data as unknown as Content<Doc>) }
 }
 
 export function newStruct<T extends Emb>(_class: Ref<Class<T>>, data: Content<T>): T {
@@ -30,7 +31,7 @@ export function newStruct<T extends Emb>(_class: Ref<Class<T>>, data: Content<T>
 
 export function createStruct<T extends E, E extends Obj>(
   _id: Ref<Class<T>>, _extends: Ref<Class<E>>,
-  _attributes: DiffDescriptors<T, E>, _native?: Metadata<T>) {
+  _attributes: DiffDescriptors<T, E>, _native?: Resource<T>) {
 
   return newContainer(core.class.Struct, {
     _id,
@@ -42,7 +43,7 @@ export function createStruct<T extends E, E extends Obj>(
 
 export function createClass<T extends E, E extends Obj>(
   _id: Ref<Class<T>>, _extends: Ref<Class<E>>,
-  _attributes: DiffDescriptors<T, E>, _native?: Metadata<T>) {
+  _attributes: DiffDescriptors<T, E>, _native?: Resource<T>) {
 
   return newContainer(core.class.Class, {
     _id,
@@ -53,7 +54,7 @@ export function createClass<T extends E, E extends Obj>(
 }
 
 export function str(): Type<string> { return newStruct(core.class.String, {}) }
-function meta<T>(): Type<Metadata<T>> { return newStruct(core.class.Metadata, {}) }
+function resource<T>(): Type<Resource<T>> { return newStruct(core.class.Resource, {}) }
 function ref<T extends Doc>(to: Ref<Class<T>>): RefTo<T> {
   return newStruct(core.class.RefTo as unknown as Ref<Class<RefTo<T>>>, { to })
 }
@@ -81,6 +82,7 @@ export const metaModel = [
     }
   }),
   createStruct(core.class.Type, core.class.Emb, {}, core.native.Type),
+  createStruct(core.class.Resource, core.class.Type, {}, core.native.Type),
   createStruct(core.class.Metadata, core.class.Type, {}, core.native.Type),
   createStruct(core.class.String, core.class.Type, {}, core.native.Type),
 
@@ -100,7 +102,7 @@ export const metaModel = [
   createClass(core.class.StructuralFeature, core.class.Doc, {
     _attributes: bag(obj(core.class.Type)),
     _extends: ref(core.class.Struct),
-    _native: meta()
+    _native: resource()
   }, core.native.StructuralFeature),
 
   createClass(core.class.Struct, core.class.StructuralFeature, {
@@ -111,5 +113,6 @@ export const metaModel = [
 ]
 
 export default (session: Session) => {
-  session.loadModel(metaModel)
+  throw new Error('switched off')
+  // session.loadModel(metaModel)
 }

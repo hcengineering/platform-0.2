@@ -13,12 +13,18 @@
 // limitations under the License.
 //
 
-import Vue from 'vue'
-import { Platform } from '@anticrm/platform'
-import { UIPlugin } from '.'
+import { MemDb } from '../memdb'
+import core from '../__resources__/'
+import { metaModel } from '../__resources__/model'
 
-declare module 'vue/types/vue' {
-  interface Vue {
-    $platform: Platform
-  }
-}
+describe('memdb', () => {
+
+  it('should load classes into memdb', () => {
+    console.log(metaModel)
+    const memdb = new MemDb()
+    memdb.load(metaModel)
+    const object = memdb.get(core.class.Emb)
+    expect(object._id).toBe(core.class.Emb)
+    expect(object._class).toBe(core.class.Class)
+  })
+})

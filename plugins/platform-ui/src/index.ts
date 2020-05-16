@@ -13,9 +13,9 @@
 // limitations under the License.
 //
 
-import { Metadata, Plugin, PluginId, plugin } from '@anticrm/platform'
-import { Doc, Emb, Obj, AnyType, Ref, Class, Bag, Type } from '@anticrm/platform-core'
-import { IntlString } from '@anticrm/platform-core-i18n'
+import { Metadata, Plugin, PluginId, plugin, Platform } from '@anticrm/platform'
+import core, { Doc, Emb, Obj, AnyType, Ref, Class, Bag, Type } from '@anticrm/platform-core'
+import i18n, { IntlString } from '@anticrm/platform-core-i18n'
 
 export type Asset = Metadata<string>
 
@@ -52,11 +52,14 @@ export interface ClassUIModel {
 }
 
 export interface UIPlugin extends Plugin {
-  getClassModel(clazz: Class<Obj>): ClassUIModel
+  readonly platform: Platform
+
+  getDefaultClassModel(): ClassUIModel
+  getClassModel(_class: Ref<Class<Obj>>): Promise<ClassUIModel>
   getDefaultAttrModel(props: string[]): AttrModel[]
   groupByType(model: AttrModel[]): { [key: string]: AttrModel[] }
-  getOwnAttrModel(clazz: Class<Obj>, props?: string[]): Promise<AttrModel[]>
-  getAttrModel(clazz: Class<Obj>, props?: string[]): Promise<AttrModel[]>
+  getOwnAttrModel(clazz: Ref<Class<Obj>>, props?: string[]): Promise<AttrModel[]>
+  getAttrModel(clazz: Ref<Class<Obj>>, props?: string[]): Promise<AttrModel[]>
 }
 
 // D E S C R I P T O R
@@ -70,7 +73,10 @@ export interface UIPlugin extends Plugin {
 
 export default plugin(
   'ui' as PluginId<UIPlugin>,
-  [],
+  {
+    i18n: i18n.id,
+    core: core.id
+  },
   {
     icon: {
       AddGroup: '' as Asset,
@@ -81,9 +87,6 @@ export default plugin(
     },
     class: {
       ClassUIDecorator: '' as Ref<Class<ClassUIDecorator<Doc>>>
-    },
-    native: {
-      IntlString: '' as Metadata<Type<IntlString>>,
     },
   }
 )

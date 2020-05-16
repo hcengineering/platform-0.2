@@ -13,9 +13,13 @@
 // limitations under the License.
 // 
 
-import { Obj, Doc, Ref, Class, PropertyType, Container, ContainerId } from '.'
+import { Platform } from '@anticrm/platform'
 
-function filterEq(docs: any, propertyKey: string, value: PropertyType): any[] {
+import { Db, Container, ClassId, ContainerId, ContainerClass } from '.'
+
+type LayoutType = string | number | ContainerId
+
+function filterEq(docs: any, propertyKey: string, value: LayoutType): any[] {
   const result = []
   for (const doc of docs) {
     if (value === doc[propertyKey]) {
@@ -25,10 +29,10 @@ function filterEq(docs: any, propertyKey: string, value: PropertyType): any[] {
   return result
 }
 
-export class MemDb {
-  private objects = new Map<Ref<Doc>, Container>()
-  private byClass = new Map<Ref<Class<Obj>>, Container[]>()
-  hierarchy = new Map<Ref<Class<Obj>>, Ref<Class<Obj>>[]>()
+export class MemDb implements Db {
+  private objects = new Map<ContainerId, Container>()
+  private byClass = new Map<ClassId, Container[]>()
+  private hierarchy = new Map<ClassId, ClassId[]>()
 
   private add(doc: Container) {
     const id = doc._id
@@ -37,27 +41,28 @@ export class MemDb {
     this.objects.set(id, doc)
   }
 
-  get(_id: ContainerId, create?: boolean): Container {
+  get(_id: ContainerId): Container {
     const result = this.objects.get(_id)
     if (!result) {
-      if (create) {
-        const container = {
-          _id,
-          _classes: []
-        }
-        this.objects.set(_id, container) // TODO: update indexes
-        return container
-      }
       throw new Error('no container with id ' + _id)
     }
     return result
+  }
+
+  createContainer(_id: ContainerId, _class: ClassId): Container {
+    const container = {
+      _id,
+      _class
+    }
+    this.objects.set(_id, container) // TODO: update index
+    return container
   }
 
   pick(id: ContainerId): Container | undefined {
     return this.objects.get(id)
   }
 
-  private getAllOfClass(clazz: Ref<Class<Obj>>): Container[] {
+  private getAllOfClass(clazz: ClassId): Container[] {
     let docs = this.byClass.get(clazz)
     if (!docs) {
       docs = []
@@ -66,47 +71,49 @@ export class MemDb {
     return docs
   }
 
-  private getSubclasses(clazz: Ref<Class<Obj>>): Ref<Class<Obj>>[] {
+  private getSubclasses(clazz: ClassId): ClassId[] {
     let result = this.hierarchy.get(clazz)
     if (!result) {
-      result = [] as Ref<Class<Obj>>[]
+      result = [] as ClassId[]
       this.hierarchy.set(clazz, result)
     }
     return result
   }
 
-  private addSubclass(clazz: Ref<Class<Obj>>, subclass: Ref<Class<Obj>>) {
+  private addSubclass(clazz: ClassId, subclass: ClassId): void {
     const subclasses = this.getSubclasses(clazz)
     if (!subclasses.includes(subclass)) {
       subclasses.push(subclass)
     }
   }
 
-  narrow<T extends Obj>(clazz: Ref<Class<T>>): Ref<Class<T>> {
+  narrow(clazz: ClassId): ClassId {
     while (true) {
       const subclasses = this.getSubclasses(clazz)
       if (subclasses.length === 1)
-        clazz = subclasses[0] as Ref<Class<T>>
+        clazz = subclasses[0]
       else
         return clazz
     }
   }
 
-  index(container: Container) {
-    container._classes.forEach(clazz => {
-      let _class = clazz as Ref<Class<Obj>> | undefined
-      while (_class) {
-        this.getAllOfClass(_class).push(container)
-        const superClass = this.objects.get(_class)?._extends as Ref<Class<Obj>>
-        if (superClass) {
-          this.addSubclass(superClass, _class)
-        }
-        _class = superClass
-      }
-    })
+  getClass(_class: ClassId): ContainerClass {
+    return this.get(_class) as ContainerClass
   }
 
-  findAll<D extends Doc>(clazz: Ref<Class<D>>, query: Partial<D>): Container[] {
+  index(container: Container) {
+    let _class = container._class as ClassId | undefined
+    while (_class) {
+      this.getAllOfClass(_class).push(container)
+      const superClass = this.getClass(_class)._extends
+      if (superClass) {
+        this.addSubclass(superClass, _class)
+      }
+      _class = superClass
+    }
+  }
+
+  findAll(clazz: ClassId, query: { [key: string]: LayoutType }): Container[] {
     const docs = this.getAllOfClass(clazz)
     let result = docs
 
@@ -127,5 +134,9 @@ export class MemDb {
     this.objects.forEach(doc => result.push(doc))
     return result
   }
+}
+
+export default async (platform: Platform, deps: {}) => {
+  return new MemDb()
 }
 

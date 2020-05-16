@@ -13,12 +13,18 @@
 // limitations under the License.
 //
 
-import Vue from 'vue'
-import { Platform } from '@anticrm/platform'
-import { UIPlugin } from '.'
+import { plugin, Resource, ResourcePlugin, Platform } from '..'
 
-declare module 'vue/types/vue' {
-  interface Vue {
-    $platform: Platform
+import { plugin3State, TestPlugin } from './shared'
+
+plugin3State.parsed = true
+
+export default async (platform: Platform, deps: {
+  plugin1: TestPlugin,
+  plugin2: ResourcePlugin
+}) => {
+  plugin3State.started = true
+  return {
+    deps
   }
 }

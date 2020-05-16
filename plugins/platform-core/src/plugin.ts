@@ -13,7 +13,8 @@
 // limitations under the License.
 //
 
-import { Platform, Metadata } from '@anticrm/platform'
+import { Platform, Resource, AnyPlugin } from '@anticrm/platform'
+import { Db } from '@anticrm/platform-db'
 import core, {
   Obj, Doc, Ref, Bag, Class, Type, Emb,
   PropertyType, BagOf, Content, CorePlugin, DiffDescriptors
@@ -22,22 +23,9 @@ import { TSession, SessionProto, Konstructor, Layout } from './session'
 
 //////////
 
-class TCorePlugin implements CorePlugin {
-
-  readonly platform: Platform
-  readonly pluginId = core.id
-
-  private session: TSession
-
-  constructor(platform: Platform) {
-    this.platform = platform
-    this.session = new TSession(this.platform)
-  }
-
-  getSession() { return this.session }
-}
-
-export default (platform: Platform): CorePlugin => {
+console.log('PLUGIN: parsed core')
+export default async (platform: Platform, deps: { db: Db }): Promise<CorePlugin> => {
+  console.log('PLUGIN: started core')
 
   class TSessionProto implements SessionProto {
     getSession(): TSession { throw new Error('session provide the implementation') }
@@ -48,7 +36,7 @@ export default (platform: Platform): CorePlugin => {
     _class!: Ref<Class<this>>
     toIntlString(plural?: number): string { return this.getClass().toIntlString(plural) }
     getClass(): Class<this> {
-      return this.getSession().getInstance(this._class, core.class.StructuralFeature as Ref<Class<Class<this>>>)
+      return this.getSession().getInstanceSync(this._class)
     }
 
     __mapKey(_class: Ref<Class<Obj>>, key: string) { return key }
@@ -59,14 +47,18 @@ export default (platform: Platform): CorePlugin => {
     _id!: Ref<this>
     toIntlString(plural?: number): string { return this.getClass().toIntlString(plural) }
     getClass(): Class<this> {
-      return this.getSession().getInstance(this._class, core.class.StructuralFeature as Ref<Class<Class<this>>>)
+      return this.getSession().getInstanceSync(this._class)
     }
 
-    as<T extends Doc>(_class: Ref<Class<T>>): T | undefined {
+    as<T extends Doc>(_class: Ref<Class<T>>): Promise<T | undefined> {
       return this.getSession().as(this as unknown as Layout<Doc>, _class)
     }
+    mixins(): Ref<Class<Doc>>[] {
+      const layout = this as unknown as Layout<Doc>
+      return layout.__layout._classes as Ref<Class<Doc>>[]
+    }
 
-    __mapKey(_class: Ref<Class<Obj>>, key: string) { return key.startsWith('_') ? key : _class + ':' + key }
+    __mapKey(_class: Ref<Class<Obj>>, key: string) { return key.startsWith('_') ? key : _class + '/' + key }
   }
 
   // T Y P E S 
@@ -81,7 +73,7 @@ export default (platform: Platform): CorePlugin => {
     of!: Ref<Class<T>>
     exert(value: T) {
       if (typeof value === 'object')
-        return this.getSession().instantiate(value._class, value)
+        return this.getSession().instantiateSync(value._class, value)
       return undefined
     }
   }
@@ -104,6 +96,8 @@ export default (platform: Platform): CorePlugin => {
   class TArrayOf<T extends PropertyType> extends TType<T[]> {
     of!: Type<T>
     exert(value: T[]) {
+      console.log('array')
+      console.log(value)
       return new Proxy(value, new ArrayProxyHandler(this.of))
     }
   }
@@ -137,11 +131,11 @@ export default (platform: Platform): CorePlugin => {
   abstract class TStructuralFeature<T extends Obj> extends TDoc implements Class<T> {
     _attributes!: Bag<Type<PropertyType>>
     _extends?: Ref<Class<Obj>>
-    _native?: Metadata<T>
+    _native?: Resource<T>
 
     abstract createConstructor(): Konstructor<T>
 
-    newInstance(data: Content<T>): T {
+    newInstance(data: Content<T>): Promise<T> {
       const session = this.getSession()
       let ctor = session.constructors.get(this._id) as Konstructor<T>
       if (!ctor) {
@@ -157,13 +151,8 @@ export default (platform: Platform): CorePlugin => {
 
     createConstructor(): Konstructor<T> {
       const session = this.getSession()
-      const _class = this._id
-      return data => {
-        const instance = session.instantiate(_class, data) as Layout<T>
-        Object.assign(instance, data)
-        instance.__layout._class = _class
-        return instance as T
-      }
+      const _class = this._id as Ref<Class<T>>
+      return data => session.createEmb(_class, data)
     }
   }
 
@@ -173,21 +162,76 @@ export default (platform: Platform): CorePlugin => {
     createConstructor(): Konstructor<T> {
       const session = this.getSession()
       const _class = this._id as Ref<Class<T>>
-      return data => session.createDocument(_class, data)
+      return data => session.createDoc(_class, data)
     }
   }
 
-  platform.setMetadata(core.native.Emb, TEmb.prototype)
-  platform.setMetadata(core.native.Doc, TDoc.prototype)
+  // B O O T  S E S S I O N  &  P L U G I N
 
-  platform.setMetadata(core.native.Type, TType.prototype)
-  platform.setMetadata(core.native.BagOf, TBagOf.prototype)
-  platform.setMetadata(core.native.ArrayOf, TArrayOf.prototype)
-  platform.setMetadata(core.native.InstanceOf, TInstanceOf.prototype)
+  class TCorePlugin implements CorePlugin {
 
-  platform.setMetadata(core.native.StructuralFeature, TStructuralFeature.prototype)
-  platform.setMetadata(core.native.Class, TClass.prototype)
-  platform.setMetadata(core.native.Struct, TStruct.prototype)
+    readonly platform: Platform
+    readonly pluginId = core.id
 
-  return new TCorePlugin(platform)
+    private session: TSession
+    private prototypes = new Map<Resource<object>, object>()
+
+    constructor(platform: Platform, session: TSession) {
+      this.platform = platform
+      this.session = session
+    }
+
+    async resolve(resource: Resource<object>): Promise<object> {
+      const proto = this.prototypes.get(resource)
+      if (proto)
+        return proto
+      const index = resource.indexOf(':') + 1
+      const dot = resource.indexOf('.', index)
+      const plugin = resource.substring(index, dot) as AnyPlugin
+      return platform.getPlugin(plugin).then(plugin => {
+        const proto = this.prototypes.get(resource)
+        if (proto)
+          return proto
+        throw new Error('plugin ' + plugin + ' does not provide resource: ' + resource)
+      })
+    }
+
+    registerPrototype<T extends Obj>(id: Resource<T>, proto: T): void {
+      if (this.prototypes.get(id))
+        throw new Error('prototype ' + id + ' already registered')
+      this.prototypes.set(id, proto)
+    }
+
+    getSession() { return this.session }
+
+    // U T I L I T Y
+
+    async getClassHierarchy(_class: Ref<Class<Obj>>): Promise<Ref<Class<Obj>>[]> {
+      const result = [] as Ref<Class<Obj>>[]
+      let clazz = _class as Ref<Class<Obj>> | undefined
+      while (clazz) {
+        result.push(clazz)
+        const instance = await this.getSession().getInstance(clazz)
+        clazz = instance._extends
+      }
+      return result.reverse()
+    }
+  }
+
+  const session = new TSession(platform, deps.db)
+  const plugin = new TCorePlugin(platform, session)
+
+  plugin.registerPrototype(core.native.Emb, TEmb.prototype)
+  plugin.registerPrototype(core.native.Doc, TDoc.prototype)
+
+  plugin.registerPrototype(core.native.Type, TType.prototype)
+  plugin.registerPrototype(core.native.BagOf, TBagOf.prototype)
+  plugin.registerPrototype(core.native.ArrayOf, TArrayOf.prototype)
+  plugin.registerPrototype(core.native.InstanceOf, TInstanceOf.prototype)
+
+  plugin.registerPrototype(core.native.StructuralFeature, TStructuralFeature.prototype)
+  plugin.registerPrototype(core.native.Class, TClass.prototype)
+  plugin.registerPrototype(core.native.Struct, TStruct.prototype)
+
+  return plugin
 }
