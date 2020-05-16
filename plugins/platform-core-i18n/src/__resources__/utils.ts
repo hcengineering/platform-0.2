@@ -13,8 +13,8 @@
 // limitations under the License.
 //
 
-import { Obj, Ref, Class } from '@anticrm/platform-core'
-import { synthIntlStringId } from '../plugin'
+import { Obj, Doc, Ref, Class } from '@anticrm/platform-core'
+import { synthIntlString } from '../plugin'
 
 import { IntlString } from '..'
 
@@ -36,43 +36,25 @@ export function verifyTranslation<T extends StringIds>(ids: T, translations: AsS
 
 // M O D E L  T R A N S L A T I O N S
 
-type AttributeTranslation = {
-  label?: string
-  placeholder?: string
-}
-
 type Labels<T extends Obj> = {
-  [P in keyof T]?: string | AttributeTranslation
-} & { $label?: string, $placeholder?: string }
+  [P in keyof T]?: string
+}
 
 type ClassRefs = { [key: string]: Ref<Class<Obj>> }
 
-type RefsToLabels<T extends ClassRefs> = {
-  [P in keyof T]: T[P] extends Ref<Class<infer X>> ? Labels<X> : never
+type RefsToLabels<T extends ClassRefs, AS extends Obj> = {
+  [P in keyof T]: T[P] extends Ref<Class<infer X>> ? Labels<AS> : never
 }
 
-export function modelTranslation<T extends ClassRefs>(refs: T, translations: Partial<RefsToLabels<T>>): Record<string, string> {
+export function modelTranslation<AS extends Obj, T extends ClassRefs>(refs: T, as: Ref<Class<AS>>, translations: Partial<RefsToLabels<T, AS>>): Record<string, string> {
   const result = {} as Record<string, string>
   for (const clazz in translations) {
     const classId = refs[clazz]
     const classTranslations = translations[clazz] as Record<string, string>
-    if (classTranslations.$label)
-      result[synthIntlStringId(classId, 'label') as string] = classTranslations.$label
-    if (classTranslations.$placeholder)
-      result[synthIntlStringId(classId, 'placeholder') as string] = classTranslations.$placeholder
+
     for (const key in classTranslations) {
-      if (!key.startsWith('$')) {
-        const translation = classTranslations[key]
-        if (typeof translation === 'object') {
-          const attributeTranslation = translation as AttributeTranslation
-          if (attributeTranslation.label)
-            result[synthIntlStringId(classId, 'label', key) as string] = attributeTranslation.label
-          if (attributeTranslation.placeholder)
-            result[synthIntlStringId(classId, 'placeholder', key) as string] = attributeTranslation.placeholder
-        } else {
-          result[synthIntlStringId(classId, 'label', key) as string] = classTranslations[key]
-        }
-      }
+      const intl = synthIntlString(classId, key)
+      result[intl] = classTranslations[key]
     }
   }
   return result

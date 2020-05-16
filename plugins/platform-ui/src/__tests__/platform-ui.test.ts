@@ -20,6 +20,7 @@ import i18n from '@anticrm/platform-core-i18n'
 import launch from '@anticrm/launch-dev'
 import contact, { Contact } from '@anticrm/contact'
 import ui from '../__resources__/'
+import ru from '@anticrm/contact/src/__resources__/strings/ru'
 
 describe('session', () => {
 
@@ -41,13 +42,30 @@ describe('session', () => {
     const sess = await session
     const uiPlugin = await platform.getPlugin(ui.id)
     const classModel = await uiPlugin.getClassModel(contact.class.Contact)
-    console.log(classModel)
+    // console.log(classModel)
   })
 
-  it('should build AttrUIModel', async () => {
+  it('should build AttrUIModel without strings loaded', async () => {
     const uiPlugin = await platform.getPlugin(ui.id)
     const ownModel = await uiPlugin.getOwnAttrModel(contact.class.Contact)
-    console.log(ownModel)
+    // console.log(ownModel)
+    expect(ownModel[0].placeholder).toBe('string:contact.Email/label')
+    expect(ownModel[0].label).toBe('string:contact.Email/label')
+    expect(ownModel[1].placeholder).toBe('+7 913 333 5555')
+    expect(ownModel[2].label).toBe('string:contact.Phone/label')
+  })
+
+  it('should build AttrUIModel with strings loaded', async () => {
+    const i18nPlugin = await platform.getPlugin(i18n.id)
+    i18nPlugin.loadStrings(ru)
+
+    const uiPlugin = await platform.getPlugin(ui.id)
+    const ownModel = await uiPlugin.getOwnAttrModel(contact.class.Contact)
+    // console.log(ownModel)
+    expect(ownModel[0].placeholder).toBe('Email')
+    expect(ownModel[0].label).toBe('Email')
+    expect(ownModel[1].placeholder).toBe('+7 913 333 5555')
+    expect(ownModel[2].label).toBe('Телефон')
   })
 
   it('should add ui decorator to Class<Class>', () => {

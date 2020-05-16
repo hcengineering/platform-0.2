@@ -24,7 +24,6 @@ export const pluginId = 'i18n' as PluginId<I18nPlugin>
 export interface I18nPlugin extends Plugin {
   translate(string: IntlString, params?: Record<string, PrimitiveType> | undefined): string | undefined
   loadStrings(translations: { [key: string]: string }): void
-  synthIntlStringId(clazz: Ref<Class<Obj>>, propertyKey: string, attribute?: string): IntlString
 }
 
 export default plugin('i18n' as PluginId<I18nPlugin>, { core: core.id }, {

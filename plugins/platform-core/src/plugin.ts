@@ -58,7 +58,7 @@ export default async (platform: Platform, deps: { db: Db }): Promise<CorePlugin>
       return layout.__layout._classes as Ref<Class<Doc>>[]
     }
 
-    __mapKey(_class: Ref<Class<Obj>>, key: string) { return key.startsWith('_') ? key : _class + ':' + key }
+    __mapKey(_class: Ref<Class<Obj>>, key: string) { return key.startsWith('_') ? key : _class + '/' + key }
   }
 
   // T Y P E S 

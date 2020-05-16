@@ -15,11 +15,23 @@
 
 import { IntlMessageFormat, PrimitiveType } from 'intl-messageformat'
 import { Platform } from '@anticrm/platform'
-import { Obj, Type, Ref, Class, Session, PropertyType, CorePlugin } from '@anticrm/platform-core'
+import { Doc, Obj, Type, Ref, Class, Session, PropertyType, CorePlugin } from '@anticrm/platform-core'
 import i18n, { I18nPlugin, IntlString, pluginId } from '..'
 
-export function synthIntlStringId(clazz: Ref<Class<Obj>>, propertyKey: string, attribute?: string): IntlString {
-  return (attribute ? clazz + '.' + attribute + '_' + propertyKey : clazz + '_' + propertyKey) as IntlString
+// export function synthIntlStringId(clazz: Ref<Class<Obj>>, propertyKey: string, attribute?: string): IntlString {
+//   return (attribute ? clazz + '.' + attribute + '_' + propertyKey : clazz + '_' + propertyKey) as IntlString
+// }
+
+export function synthIntlString(_id: Ref<Doc>, key: string): IntlString {
+  const index = _id.indexOf(':')
+  const kind = _id.substring(0, index)
+  if (kind !== 'class')
+    throw new Error('hmm, do we have a case?')
+  const keyIndex = key.indexOf('/')
+  if (keyIndex !== -1) {
+    key = key.substring(keyIndex + 1)
+  }
+  return 'string' + _id.substring(index) + '/' + key as IntlString
 }
 
 console.log('PLUGIN: parsed i18n')
@@ -38,7 +50,7 @@ export default async (platform: Platform, deps: { core: CorePlugin }): Promise<I
     translate(string: IntlString, params?: Record<string, PrimitiveType> | undefined): string | undefined {
       const translation = this.strings.get(string)
       if (!translation) {
-        return undefined
+        return string
       }
       if (params) {
         let imf = this.imfCache.get(string)
@@ -56,12 +68,9 @@ export default async (platform: Platform, deps: { core: CorePlugin }): Promise<I
         this.strings.set(key as IntlString, translations[key])
       }
     }
-
-    synthIntlStringId(clazz: Ref<Class<Obj>>, propertyKey: string, attribute?: string): IntlString {
-      return synthIntlStringId(clazz, propertyKey, attribute)
-    }
-
   }
+
+  const plugin = new I18nPluginImpl(platform)
 
   abstract class TIntlString implements Type<IntlString> {
     _class!: Ref<Class<this>>
@@ -69,10 +78,14 @@ export default async (platform: Platform, deps: { core: CorePlugin }): Promise<I
     abstract getClass(): Class<this>
     abstract toIntlString(plural?: number | undefined): string
 
-    exert(value: IntlString, target?: PropertyType, key?: PropertyKey): any {
-      // console.log('TIntlString.exert')
-      // console.log(target)
-      // console.log(key)
+    exert(value: IntlString, target?: any, key?: string): any {
+      if (value === undefined) {
+        if (target?._id && key) {
+          const id = target._id as Ref<Doc>
+          const intl = synthIntlString(id, key)
+          return plugin.translate(intl)
+        }
+      }
       return value
     }
     hibernate(value: any): IntlString { return value }
@@ -80,5 +93,5 @@ export default async (platform: Platform, deps: { core: CorePlugin }): Promise<I
 
   deps.core.registerPrototype(i18n.native.IntlString, TIntlString.prototype)
 
-  return new I18nPluginImpl(platform)
+  return plugin
 }

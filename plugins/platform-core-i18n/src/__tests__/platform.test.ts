@@ -20,6 +20,8 @@ import { verifyTranslation, modelTranslation } from '../__resources__/utils'
 import db from '@anticrm/platform-db'
 import core, { Ref, Class, Obj } from '@anticrm/platform-core'
 import i18n from '../__resources__'
+import contact from '@anticrm/contact/src/__resources__'
+import ui from '@anticrm/platform-ui/src/__resources__'
 
 const ids = identify('test' as PluginId<Plugin>, {
   string: {
@@ -42,12 +44,10 @@ describe('i18n', () => {
   platform.addLocation(i18n, () => import('../plugin'))
   platform.setResolver('native', core.id)
 
-  const i18nPlugin = platform.getPlugin(i18n.id)
 
-  it('should return original string', () => {
-    i18nPlugin.then(plugin => {
-      expect(plugin.translate('does not exists' as IntlString)).toBeUndefined()
-    })
+  it('should return original string', async () => {
+    const plugin = await platform.getPlugin(i18n.id)
+    expect(plugin.translate('does not exists' as IntlString)).toBe('does not exists')
   })
 
   it('should verify translation', () => {
@@ -55,49 +55,59 @@ describe('i18n', () => {
     expect(translations['string:test.MyString']).toBe(ru.MyString)
   })
 
-  it('should translate simple', () => {
-    i18nPlugin.then(plugin => {
-      plugin.loadStrings({
-        idSimple: 'Русский'
-      })
-      expect(plugin.translate('idSimple' as IntlString)).toBe('Русский')
+  it('should translate simple', async () => {
+    const plugin = await platform.getPlugin(i18n.id)
+    plugin.loadStrings({
+      idSimple: 'Русский'
     })
+    expect(plugin.translate('idSimple' as IntlString)).toBe('Русский')
   })
 
-  it('should translate plurals', () => {
-    i18nPlugin.then(plugin => {
-      plugin.loadStrings({
-        idPlural: '{count, plural, =1 {секунду} few {# секунды} many {# секунд} other {# секунду} } назад'
-      })
-      const message = 'idPlural' as IntlString
-      expect(plugin.translate(message, { count: 1 })).toBe('секунду назад')
-      expect(plugin.translate(message, { count: 2 })).toBe('2 секунды назад')
-      expect(plugin.translate(message, { count: 5 })).toBe('5 секунд назад')
-      expect(plugin.translate(message, { count: 11 })).toBe('11 секунд назад')
-      expect(plugin.translate(message, { count: 21 })).toBe('21 секунду назад')
-      expect(plugin.translate(message, { count: 22 })).toBe('22 секунды назад')
-      expect(plugin.translate(message, { count: 25 })).toBe('25 секунд назад')
+  it('should translate plurals', async () => {
+    const plugin = await platform.getPlugin(i18n.id)
+    plugin.loadStrings({
+      idPlural: '{count, plural, =1 {секунду} few {# секунды} many {# секунд} other {# секунду} } назад'
     })
+    const message = 'idPlural' as IntlString
+    expect(plugin.translate(message, { count: 1 })).toBe('секунду назад')
+    expect(plugin.translate(message, { count: 2 })).toBe('2 секунды назад')
+    expect(plugin.translate(message, { count: 5 })).toBe('5 секунд назад')
+    expect(plugin.translate(message, { count: 11 })).toBe('11 секунд назад')
+    expect(plugin.translate(message, { count: 21 })).toBe('21 секунду назад')
+    expect(plugin.translate(message, { count: 22 })).toBe('22 секунды назад')
+    expect(plugin.translate(message, { count: 25 })).toBe('25 секунд назад')
   })
 
 
   it('should translate model', () => {
-    const translations = modelTranslation(ids.class, {
-      Class: {
-        $label: 'Объект',
-        toIntlString: 'В строку',
-        _attributes: 'Аттрибуты',
-        _native: {
-          label: 'Имплементация',
-          placeholder: 'Placeholder'
-        }
+    const translations = modelTranslation(contact.class, ui.class.TypeUIDecorator, {
+      Email: {
+        label: 'Email',
+        placeholder: 'andrey.v.platov@gmail.com',
+      },
+      Phone: {
+        label: 'Телефон',
+        placeholder: '+7 913 333 5555'
+      },
+      Twitter: {
+        label: 'Twitter',
+        placeholder: '@twitter',
+      },
+      Address: {
+        label: 'Адрес',
+        placeholder: 'Новосибирск, Красный проспект, 15',
+      },
+      Contact: {
+        label: 'Контактная информация',
+      },
+      Person: {
+        label: 'Общая информация',
       }
     })
-    expect(translations['class:test.Class_label']).toBe('Объект')
-    expect(translations['class:test.Class.toIntlString_label']).toBe('В строку')
-    expect(translations['class:test.Class._attributes_label']).toBe('Аттрибуты')
-    expect(translations['class:test.Class._native_label']).toBe('Имплементация')
-    expect(translations['class:test.Class._native_placeholder']).toBe('Placeholder')
+    // console.log(translations)
+    expect(translations['string:contact.Email/label']).toBe('Email')
+    expect(translations['string:contact.Phone/placeholder']).toBe('+7 913 333 5555')
+    expect(translations['string:contact.Contact/label']).toBe('Контактная информация')
   })
 
 })
