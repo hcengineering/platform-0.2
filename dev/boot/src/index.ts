@@ -18,7 +18,7 @@ import { Platform } from '@anticrm/platform'
 import db from '@anticrm/platform-db'
 import core, { Session } from '@anticrm/platform-core'
 import i18n from '@anticrm/platform-core-i18n'
-import ui from '@anticrm/platform-ui'
+import ui, { UIPlugin } from '@anticrm/platform-ui'
 import launch from '@anticrm/launch-dev'
 
 import uiMeta from '@anticrm/platform-ui/src/__resources__/meta'
@@ -40,4 +40,8 @@ export default platform
 
 export function getSession(): Promise<Session> {
   return platform.getPlugin(launch.id).then(plugin => plugin.session)
+}
+
+export function getUI(): Promise<UIPlugin> {
+  return platform.getPlugin(launch.id).then(plugin => plugin.ui)
 }

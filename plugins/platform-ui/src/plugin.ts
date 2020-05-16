@@ -131,6 +131,8 @@ export default async (platform: Platform, deps: { i18n: I18nPlugin, core: CorePl
   console.log('PLUGIN: started ui')
 
   const uiPlugin = new UIPluginImpl(platform, deps)
-  Vue.prototype.$uiPlugin = uiPlugin
+  if (Vue) {
+    Vue.prototype.$uiPlugin = uiPlugin
+  }
   return uiPlugin
 }
