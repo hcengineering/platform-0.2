@@ -26,7 +26,7 @@ import core from '@anticrm/platform-core'
 
 import contact from '@anticrm/contact'
 
-import { getSession } from '@anticrm/dev-boot'
+import { getSession } from '..'
 
 export default {
   title: 'Framework'

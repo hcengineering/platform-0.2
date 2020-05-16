@@ -13,9 +13,6 @@
 // limitations under the License.
 //
 
-import platform from '@anticrm/dev-boot'
-// import { loadMetadata } from '@anticrm/dev-boot/src/meta'
+// import { getUI } from '../../src'
 
-// loadMetadata(platform)
-
-// console.log(platform)
+// console.log(getUI)
