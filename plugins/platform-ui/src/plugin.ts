@@ -37,7 +37,7 @@ class UIPluginImpl implements UIPlugin {
   async getClassModel(_class: Ref<Class<Obj>>): Promise<ClassUIModel> {
     const clazz = await this.session.getInstance(_class)
     const decorator = await clazz.as(ui.class.ClassUIDecorator)
-    const label = decorator?.label ?? synthIntlStringId(clazz._id, 'label')
+    const label = decorator?.label ?? this.i18n.synthIntlStringId(clazz._id, 'label')
     return {
       label: this.i18n.translate(label) ?? label,
       icon: decorator?.icon
@@ -81,12 +81,12 @@ class UIPluginImpl implements UIPlugin {
       const typeClass = type.getClass()
       const typeClassDecorator = await typeClass.as(ui.class.ClassUIDecorator)
 
-      const l1 = typeDecorator?.label ?? synthIntlStringId(clazz._id, 'label', key)
-      const l2 = typeClassDecorator?.label ?? synthIntlStringId(typeClass._id, 'label')
+      const l1 = typeDecorator?.label ?? this.i18n.synthIntlStringId(clazz._id, 'label', key)
+      const l2 = typeClassDecorator?.label ?? this.i18n.synthIntlStringId(typeClass._id, 'label')
       const label = this.i18n.translate(l1) ?? this.i18n.translate(l2) ?? key
 
-      const p1 = typeDecorator?.placeholder ?? synthIntlStringId(clazz._id, 'placeholder', key)
-      const p2 = synthIntlStringId(typeClass._id, 'placeholder')
+      const p1 = typeDecorator?.placeholder ?? this.i18n.synthIntlStringId(clazz._id, 'placeholder', key)
+      const p2 = this.i18n.synthIntlStringId(typeClass._id, 'placeholder')
       const placeholder = this.i18n.translate(p1) ?? this.i18n.translate(p2) ?? key
 
       const icon = typeDecorator?.icon ?? typeClassDecorator?.icon

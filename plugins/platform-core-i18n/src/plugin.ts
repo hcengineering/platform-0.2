@@ -56,6 +56,11 @@ export default async (platform: Platform, deps: { core: CorePlugin }): Promise<I
         this.strings.set(key as IntlString, translations[key])
       }
     }
+
+    synthIntlStringId(clazz: Ref<Class<Obj>>, propertyKey: string, attribute?: string): IntlString {
+      return synthIntlStringId(clazz, propertyKey, attribute)
+    }
+
   }
 
   abstract class TIntlString implements Type<IntlString> {

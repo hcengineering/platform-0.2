@@ -15,17 +15,19 @@
 
 import { Platform, identify, Plugin, PluginId } from '@anticrm/platform'
 import { IntlString } from '..'
-import i18nPlugin from '../plugin'
-import { verifyTranslation } from '../__resources__/utils'
+import { verifyTranslation, modelTranslation } from '../__resources__/utils'
 
 import db from '@anticrm/platform-db'
-import core from '@anticrm/platform-core'
+import core, { Ref, Class, Obj } from '@anticrm/platform-core'
 import i18n from '../__resources__'
 
 const ids = identify('test' as PluginId<Plugin>, {
   string: {
     MyString: '' as IntlString
   },
+  class: {
+    Class: '' as Ref<Class<Class<Obj>>>
+  }
 })
 
 const ru = {
@@ -77,4 +79,25 @@ describe('i18n', () => {
       expect(plugin.translate(message, { count: 25 })).toBe('25 секунд назад')
     })
   })
+
+
+  it('should translate model', () => {
+    const translations = modelTranslation(ids.class, {
+      Class: {
+        $label: 'Объект',
+        toIntlString: 'В строку',
+        _attributes: 'Аттрибуты',
+        _native: {
+          label: 'Имплементация',
+          placeholder: 'Placeholder'
+        }
+      }
+    })
+    expect(translations['class:test.Class_label']).toBe('Объект')
+    expect(translations['class:test.Class.toIntlString_label']).toBe('В строку')
+    expect(translations['class:test.Class._attributes_label']).toBe('Аттрибуты')
+    expect(translations['class:test.Class._native_label']).toBe('Имплементация')
+    expect(translations['class:test.Class._native_placeholder']).toBe('Placeholder')
+  })
+
 })
