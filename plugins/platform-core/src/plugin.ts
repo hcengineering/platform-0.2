@@ -25,7 +25,7 @@ import { TSession, SessionProto, Konstructor, Layout } from './session'
 
 console.log('PLUGIN: parsed core')
 
-export default (platform: Platform, deps: { db: Db }): CorePlugin => {
+export default async (platform: Platform, deps: { db: Db }): Promise<CorePlugin> => {
 
   console.log('PLUGIN: started core')
 

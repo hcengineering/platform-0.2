@@ -246,12 +246,12 @@ export class TSession implements Session {
 
   ////
 
-  loadModel(docs: Container[]): void {
-    this.memdb.load(docs)
-  }
+  // loadModel(docs: Container[]): void {
+  //   this.memdb.load(docs)
+  // }
 
-  dump(): Container[] {
-    return this.memdb.dump()
-  }
+  // dump(): Container[] {
+  //   return this.memdb.dump()
+  // }
 }
 

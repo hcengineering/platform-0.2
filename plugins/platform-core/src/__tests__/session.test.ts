@@ -56,10 +56,12 @@ describe('session', () => {
   const corePlugin = platform.getPlugin(core.id)
   const session = corePlugin.then(plugin => plugin.getSession() as TSession)
 
-  it('should load model', () => {
-    return session.then(session => {
-      session.loadModel(metaModel)
-    })
+  it('should load model', async () => {
+    const memdb = await platform.getPlugin(db.id)
+    memdb.load(metaModel)
+    // return session.then(session => {
+    //   session.loadModel(metaModel)
+    // })
   })
 
   it('should get prototype', () => {
@@ -113,8 +115,10 @@ describe('session', () => {
   // })
 
   it('should create instance', async () => {
+    const memdb = await platform.getPlugin(db.id)
+    memdb.load(myModel)
+
     const sess = await session
-    sess.loadModel(myModel)
     const simpleClass = await sess.getClass(simpleClassId)
     const s = await simpleClass.newInstance({
       _id: 'xxx' as Ref<SimpleClass>,

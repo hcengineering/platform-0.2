@@ -85,8 +85,5 @@ export default plugin(
     class: {
       ClassUIDecorator: '' as Ref<Class<ClassUIDecorator<Doc>>>
     },
-    native: {
-      IntlString: '' as Metadata<Type<IntlString>>,
-    },
   }
 )

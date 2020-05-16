@@ -129,23 +129,6 @@ export default (platform: Platform, deps: { i18n: I18nPlugin, core: CorePlugin }
 
   console.log('PLUGIN: started ui')
 
-  abstract class TIntlString implements Type<IntlString> {
-    _class!: Ref<Class<this>>
-    abstract getSession(): Session
-    abstract getClass(): Class<this>
-    abstract toIntlString(plural?: number | undefined): string
-
-    exert(value: IntlString, target?: PropertyType, key?: PropertyKey): any {
-      // console.log('TIntlString.exert')
-      // console.log(target)
-      // console.log(key)
-      return value
-    }
-    hibernate(value: any): IntlString { return value }
-  }
-
-  platform.setMetadata(ui.native.IntlString, TIntlString.prototype)
-
   const uiPlugin = new UIPluginImpl(platform, deps)
   if (Vue) {
     Vue.prototype.$uiPlugin = uiPlugin

@@ -93,8 +93,8 @@ export type DiffDescriptors<T extends E, E> = Descriptors<Omit<T, keyof E>>
 export interface Session {
   getInstance<T extends Doc>(ref: Ref<T>, as: Ref<Class<T>>): Promise<T>
 
-  loadModel(docs: Container[]): void
-  dump(): Container[]
+  // loadModel(docs: Container[]): void
+  // dump(): Container[]
 
   mixin<T extends E, E extends Doc>(obj: E, _class: Ref<Class<T>>, data: Omit<T, keyof E>): T
 

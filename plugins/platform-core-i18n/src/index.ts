@@ -14,9 +14,10 @@
 //
 
 import { PrimitiveType } from 'intl-messageformat'
-import { AsString, Plugin, PluginId, plugin } from '@anticrm/platform'
+import { Plugin, PluginId, plugin, Resource } from '@anticrm/platform'
+import core, { Type } from '@anticrm/platform-core'
 
-export type IntlString = AsString<string> & { __intl_string: void }
+export type IntlString = Resource<string> & { __intl_string: void }
 
 export const pluginId = 'i18n' as PluginId<I18nPlugin>
 
@@ -25,4 +26,8 @@ export interface I18nPlugin extends Plugin {
   loadStrings(translations: { [key: string]: string }): void
 }
 
-export default plugin('i18n' as PluginId<I18nPlugin>, {}, {})
+export default plugin('i18n' as PluginId<I18nPlugin>, { core: core.id }, {
+  native: {
+    IntlString: '' as Resource<Type<IntlString>>,
+  },
+})

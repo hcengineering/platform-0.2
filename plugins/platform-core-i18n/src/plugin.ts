@@ -15,11 +15,12 @@
 
 import { IntlMessageFormat, PrimitiveType } from 'intl-messageformat'
 import { Platform } from '@anticrm/platform'
-import { I18nPlugin, IntlString, pluginId } from '..'
+import { Type, Ref, Class, Session, PropertyType, CorePlugin } from '@anticrm/platform-core'
+import i18n, { I18nPlugin, IntlString, pluginId } from '..'
 
 console.log('PLUGIN: parsed i18n')
 
-export default (platform: Platform, deps: {}): I18nPlugin => {
+export default (platform: Platform, deps: { core: CorePlugin }): I18nPlugin => {
 
   console.log('PLUGIN: started i18n')
 
@@ -54,6 +55,23 @@ export default (platform: Platform, deps: {}): I18nPlugin => {
       }
     }
   }
+
+  abstract class TIntlString implements Type<IntlString> {
+    _class!: Ref<Class<this>>
+    abstract getSession(): Session
+    abstract getClass(): Class<this>
+    abstract toIntlString(plural?: number | undefined): string
+
+    exert(value: IntlString, target?: PropertyType, key?: PropertyKey): any {
+      // console.log('TIntlString.exert')
+      // console.log(target)
+      // console.log(key)
+      return value
+    }
+    hibernate(value: any): IntlString { return value }
+  }
+
+  deps.core.registerPrototype(i18n.native.IntlString, TIntlString.prototype)
 
   return new I18nPluginImpl(platform)
 }

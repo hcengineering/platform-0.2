@@ -150,7 +150,7 @@ export class MemDb implements Db {
   }
 }
 
-export default (platform: Platform, deps: {}) => {
+export default async (platform: Platform, deps: {}) => {
   return new MemDb()
 }
 
