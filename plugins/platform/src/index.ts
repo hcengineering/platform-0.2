@@ -128,15 +128,15 @@ export class Platform {
     this.locations.push([plugin, module as any])
   }
 
-  async getPlugin<T extends Plugin>(id: PluginId<T>): Promise<T> {
+  getPlugin<T extends Plugin>(id: PluginId<T>): Promise<T> {
     const plugin = this.plugins.get(id)
     if (plugin) {
       return plugin as Promise<T>
     } else {
       const location = this.getLocation(id)
-      const deps = await this.resolveDependencies(location[0].deps)
-      const module = location[1]
-      const plugin = module().then(module => module.default).then(f => f(this, deps))
+      const plugin = this.resolveDependencies(location[0].deps).then(deps =>
+        location[1]().then(module => module.default).then(f => f(this, deps))
+      )
       this.plugins.set(id, plugin)
       return plugin as Promise<T>
     }
