@@ -128,7 +128,7 @@ export class Platform {
     this.locations.push([plugin, module as any])
   }
 
-  getPlugin<T extends Plugin>(id: PluginId<T>): Promise<T> {
+  async getPlugin<T extends Plugin>(id: PluginId<T>): Promise<T> {
     const plugin = this.plugins.get(id)
     if (plugin) {
       return plugin as Promise<T>

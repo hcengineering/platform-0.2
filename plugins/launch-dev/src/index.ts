@@ -20,12 +20,12 @@ import ui, { UIPlugin } from '@anticrm/platform-ui'
 
 export interface LaunchPlugin extends Plugin {
   readonly db: Db
-  readonly ui: UIPlugin
+  // readonly ui: UIPlugin
   readonly session: Session
 }
 
 export default plugin('launch-dev' as PluginId<LaunchPlugin>, {
   core: core.id,
   db: db.id,
-  ui: ui.id
+  // ui: ui.id
 }, {})

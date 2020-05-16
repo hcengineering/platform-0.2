@@ -29,7 +29,11 @@ import i18nModel from '@anticrm/platform-core-i18n/src/__resources__/model'
 import uiModel from '@anticrm/platform-ui/src/__resources__/model'
 import contactModel from '@anticrm/contact/src/__resources__/model'
 
-export default async (platform: Platform, deps: { core: CorePlugin, db: Db, ui: UIPlugin }): Promise<LaunchPlugin> => {
+export default async (platform: Platform, deps: {
+  core: CorePlugin,
+  db: Db,
+  // ui: UIPlugin 
+}): Promise<LaunchPlugin> => {
   const db = deps.db
   db.load(metaModel)
 
@@ -44,7 +48,7 @@ export default async (platform: Platform, deps: { core: CorePlugin, db: Db, ui: 
 
   return {
     db,
-    ui: deps.ui,
+    // ui: deps.ui,
     session: deps.core.getSession()
   }
 }
