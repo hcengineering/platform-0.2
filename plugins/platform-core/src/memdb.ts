@@ -20,7 +20,8 @@ type LayoutType = string | number | ContainerId
 
 export interface Container {
   _id: ContainerId
-  _classes: ContainerId[]
+  _class: ClassId
+  _mixins?: ClassId[]
 }
 
 interface ContainerClass extends Container {
@@ -52,18 +53,26 @@ export class MemDb {
   get(_id: ContainerId, create?: boolean): Container {
     const result = this.objects.get(_id)
     if (!result) {
-      if (create) {
-        const container = {
-          _id,
-          _classes: []
-        }
-        this.objects.set(_id, container) // TODO: update indexes
-        return container
-      }
       throw new Error('no container with id ' + _id)
     }
     return result
   }
+
+  // get(_id: ContainerId, create?: boolean): Container {
+  //   const result = this.objects.get(_id)
+  //   if (!result) {
+  //     if (create) {
+  //       const container = {
+  //         _id,
+  //         _classes: []
+  //       }
+  //       this.objects.set(_id, container) // TODO: update indexes
+  //       return container
+  //     }
+  //     throw new Error('no container with id ' + _id)
+  //   }
+  //   return result
+  // }
 
   pick(id: ContainerId): Container | undefined {
     return this.objects.get(id)
@@ -109,18 +118,30 @@ export class MemDb {
   }
 
   index(container: Container) {
-    container._classes.forEach(clazz => {
-      let _class = clazz as ClassId | undefined
-      while (_class) {
-        this.getAllOfClass(_class).push(container)
-        const superClass = this.getClass(_class)?._extends
-        if (superClass) {
-          this.addSubclass(superClass, _class)
-        }
-        _class = superClass
+    let _class = container._class as ClassId | undefined
+    while (_class) {
+      this.getAllOfClass(_class).push(container)
+      const superClass = this.getClass(_class)?._extends
+      if (superClass) {
+        this.addSubclass(superClass, _class)
       }
-    })
+      _class = superClass
+    }
   }
+
+  // index(container: Container) {
+  //   container._classes.forEach(clazz => {
+  //     let _class = clazz as ClassId | undefined
+  //     while (_class) {
+  //       this.getAllOfClass(_class).push(container)
+  //       const superClass = this.getClass(_class)?._extends
+  //       if (superClass) {
+  //         this.addSubclass(superClass, _class)
+  //       }
+  //       _class = superClass
+  //     }
+  //   })
+  // }
 
   findAll(clazz: ClassId, query: { [key: string]: LayoutType }): Container[] {
     const docs = this.getAllOfClass(clazz)
