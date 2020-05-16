@@ -44,7 +44,7 @@ export type AnyPlugin = PluginId<Plugin>
 export interface Plugin { }
 
 export interface ResourcePlugin extends Plugin {
-  resolve(resource: Resource<any>): any
+  resolve(resource: Resource<any>): Promise<any>
 }
 
 /**
@@ -202,3 +202,15 @@ export function plugin<P extends Plugin, D extends PluginDependencies, N extends
   return { id, deps, ...identify(id, namespace) }
 }
 
+export function allValues(object: { [key: string]: Promise<any> }): Promise<{ [key: string]: any }> {
+  const keys = Object.keys(object)
+  const values = Object.values(object)
+  const all = Promise.all(values)
+  return all.then(values => {
+    const result = []
+    for (let i = 0; i < keys.length; i++) {
+      result.push([keys[i], values[i]])
+    }
+    return Object.fromEntries(result) as { [key: string]: any }
+  })
+}

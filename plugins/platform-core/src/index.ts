@@ -14,7 +14,8 @@
 // 
 
 import { KeysByType } from 'simplytyped'
-import { plugin, PropType, AsString, Metadata, identify, Plugin, PluginId } from '@anticrm/platform'
+import { plugin, PropType, AsString, Resource, ResourcePlugin, PluginId } from '@anticrm/platform'
+import { Container } from './memdb'
 
 export type AnyFunc = (...args: any[]) => any
 export type RemoveMethods<T extends object> = Omit<T, KeysByType<T, AnyFunc>>
@@ -83,7 +84,7 @@ export type Content<T extends Obj> = RemoveMethods<Omit<T, '_class'>>
 export interface Class<T extends Obj> extends Doc {
   _attributes: Bag<Type<PropertyType>>
   _extends?: Ref<Class<Obj>>
-  _native?: Metadata<T>
+  _native?: Resource<T>
   newInstance(data: Content<T>): T
 }
 
@@ -97,28 +98,29 @@ type Descriptors<T extends object> = AsDescrtiptors<Required<Clear<T>>>
 export type DiffDescriptors<T extends E, E> = Descriptors<Omit<T, keyof E>>
 
 export interface Session {
-  getInstance<T extends Doc>(ref: Ref<T>, as: Ref<Class<T>>): T
+  getInstance<T extends Doc>(ref: Ref<T>, as: Ref<Class<T>>): Promise<T>
 
-  // loadModel(docs: Container[]): void
-  // dump(): Container[]
+  loadModel(docs: Container[]): void
+  dump(): Container[]
 
   mixin<T extends E, E extends Doc>(obj: E, _class: Ref<Class<T>>, data: Omit<T, keyof E>): T
 
   // Class Helpers
   // getStruct<T extends Emb>(_struct: Ref<Class<T>>): Class<T>
-  getClass<T extends Obj>(_class: Ref<Class<T>>): Class<T>
+  getClass<T extends Obj>(_class: Ref<Class<T>>): Promise<Class<T>>
   createClass<T extends E, E extends Doc>(
     _id: Ref<Class<T>>, _extends: Ref<Class<E>>,
-    _attributes: DiffDescriptors<T, E>, _native?: Metadata<T>): Class<T>
+    _attributes: DiffDescriptors<T, E>, _native?: Resource<T>): Promise<Class<T>>
   createStruct<T extends E, E extends Emb>(
     _id: Ref<Class<T>>, _extends: Ref<Class<E>>,
-    _attributes: DiffDescriptors<T, E>, _native?: Metadata<T>): Class<T>
+    _attributes: DiffDescriptors<T, E>, _native?: Resource<T>): Promise<Class<T>>
 }
 
 // C O R E  P L U G I N
 
-export interface CorePlugin extends Plugin {
+export interface CorePlugin extends ResourcePlugin {
   getSession(): Session
+  registerPrototype<T extends Obj>(id: Resource<T>, proto: T): void
 }
 
 export default plugin(
@@ -126,17 +128,17 @@ export default plugin(
   {},
   {
     native: {
-      Emb: '' as Metadata<Emb>,
-      Doc: '' as Metadata<Doc>,
+      Emb: '' as Resource<Emb>,
+      Doc: '' as Resource<Doc>,
 
-      Type: '' as Metadata<Type<PropertyType>>,
-      BagOf: '' as Metadata<BagOf<PropertyType>>,
-      ArrayOf: '' as Metadata<ArrayOf<PropertyType>>,
-      InstanceOf: '' as Metadata<InstanceOf<Emb>>,
+      Type: '' as Resource<Type<PropertyType>>,
+      BagOf: '' as Resource<BagOf<PropertyType>>,
+      ArrayOf: '' as Resource<ArrayOf<PropertyType>>,
+      InstanceOf: '' as Resource<InstanceOf<Emb>>,
 
-      StructuralFeature: '' as Metadata<Class<Obj>>,
-      Struct: '' as Metadata<Class<Emb>>,
-      Class: '' as Metadata<Class<Doc>>,
+      StructuralFeature: '' as Resource<Class<Obj>>,
+      Struct: '' as Resource<Class<Emb>>,
+      Class: '' as Resource<Class<Doc>>,
     },
     class: {
       Doc: '' as Ref<Class<Doc>>,

@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Platform, Metadata } from '@anticrm/platform'
+import { Platform, Resource, AnyPlugin } from '@anticrm/platform'
 import core, {
   Obj, Doc, Ref, Bag, Class, Type, Emb,
   PropertyType, BagOf, Content, CorePlugin, DiffDescriptors
@@ -27,21 +27,6 @@ console.log('PLUGIN: parsed core')
 export default (platform: Platform): CorePlugin => {
 
   console.log('PLUGIN: started core')
-
-  class TCorePlugin implements CorePlugin {
-
-    readonly platform: Platform
-    readonly pluginId = core.id
-
-    private session: TSession
-
-    constructor(platform: Platform, session: TSession) {
-      this.platform = platform
-      this.session = session
-    }
-
-    getSession() { return this.session }
-  }
 
   class TSessionProto implements SessionProto {
     getSession(): TSession { throw new Error('session provide the implementation') }
@@ -145,7 +130,7 @@ export default (platform: Platform): CorePlugin => {
   abstract class TStructuralFeature<T extends Obj> extends TDoc implements Class<T> {
     _attributes!: Bag<Type<PropertyType>>
     _extends?: Ref<Class<Obj>>
-    _native?: Metadata<T>
+    _native?: Resource<T>
 
     abstract createConstructor(): Konstructor<T>
 
@@ -185,20 +170,59 @@ export default (platform: Platform): CorePlugin => {
     }
   }
 
-  platform.setMetadata(core.native.Emb, TEmb.prototype)
-  platform.setMetadata(core.native.Doc, TDoc.prototype)
+  // B O O T  S E S S I O N  &  P L U G I N
 
-  platform.setMetadata(core.native.Type, TType.prototype)
-  platform.setMetadata(core.native.BagOf, TBagOf.prototype)
-  platform.setMetadata(core.native.ArrayOf, TArrayOf.prototype)
-  platform.setMetadata(core.native.InstanceOf, TInstanceOf.prototype)
+  class TCorePlugin implements CorePlugin {
 
-  platform.setMetadata(core.native.StructuralFeature, TStructuralFeature.prototype)
-  platform.setMetadata(core.native.Class, TClass.prototype)
-  platform.setMetadata(core.native.Struct, TStruct.prototype)
+    readonly platform: Platform
+    readonly pluginId = core.id
 
-  // B O O T  S E S S I O N
+    private session: TSession
+    private prototypes = new Map<Resource<object>, object>()
+
+    constructor(platform: Platform, session: TSession) {
+      this.platform = platform
+      this.session = session
+    }
+
+    async resolve(resource: Resource<object>): Promise<object> {
+      const proto = this.prototypes.get(resource)
+      if (proto)
+        return proto
+      const index = resource.indexOf(':') + 1
+      const dot = resource.indexOf('.', index)
+      const plugin = resource.substring(index, dot) as AnyPlugin
+      return platform.getPlugin(plugin).then(plugin => {
+        const proto = this.prototypes.get(resource)
+        if (proto)
+          return proto
+        throw new Error('plugin ' + plugin + ' does not provide resource: ' + resource)
+      })
+    }
+
+    registerPrototype<T extends Obj>(id: Resource<T>, proto: T): void {
+      if (this.prototypes.get(id))
+        throw new Error('prototype ' + id + ' already registered')
+      this.prototypes.set(id, proto)
+    }
+
+    getSession() { return this.session }
+  }
 
   const session = new TSession(platform)
-  return new TCorePlugin(platform, session)
+  const plugin = new TCorePlugin(platform, session)
+
+  plugin.registerPrototype(core.native.Emb, TEmb.prototype)
+  plugin.registerPrototype(core.native.Doc, TDoc.prototype)
+
+  plugin.registerPrototype(core.native.Type, TType.prototype)
+  plugin.registerPrototype(core.native.BagOf, TBagOf.prototype)
+  plugin.registerPrototype(core.native.ArrayOf, TArrayOf.prototype)
+  plugin.registerPrototype(core.native.InstanceOf, TInstanceOf.prototype)
+
+  plugin.registerPrototype(core.native.StructuralFeature, TStructuralFeature.prototype)
+  plugin.registerPrototype(core.native.Class, TClass.prototype)
+  plugin.registerPrototype(core.native.Struct, TStruct.prototype)
+
+  return plugin
 }

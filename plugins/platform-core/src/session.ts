@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Platform, Metadata } from '@anticrm/platform'
+import { Platform, Resource, allValues } from '@anticrm/platform'
 import { MemDb, Container } from './memdb'
 import { generateId } from './objectid'
 import core, {
@@ -50,89 +50,95 @@ export class TSession implements Session {
     }
   }
 
-  private createPropertyDescriptors(attributes: Bag<Type<PropertyType>>, mapKey: (key: string) => string | null) {
-    const result = {} as { [key: string]: PropertyDescriptor }
+  private async createPropertyDescriptors(attributes: Bag<Type<PropertyType>>, mapKey: (key: string) => string | null):
+    Promise<{ [key: string]: PropertyDescriptor }> {
+    const result = {} as { [key: string]: Promise<PropertyDescriptor> }
     for (const key in attributes) {
       const keyPath = mapKey(key)
       if (keyPath) {
         const attribute = attributes[key]
         const instance = this.instantiate(attribute._class, attribute)
-        result[key] = {
+        result[key] = instance.then(type => ({
           get(this: Layout<Obj>) {
             const value = this.__layout[keyPath]
-            return instance.exert(value, this, keyPath)
+            return type.exert(value, this, keyPath)
           },
           set(this: Layout<Obj>, value) {
-            this.__layout[keyPath] = instance.hibernate(value)
+            this.__layout[keyPath] = type.hibernate(value)
           },
           enumerable: true,
-        }
+        }))
       }
     }
-    return result
+    return allValues(result)
   }
 
-  private createPrototype<T extends Obj>(clazz: Ref<Class<T>>) {
+  private async createPrototype<T extends Obj>(clazz: Ref<Class<T>>): Promise<object> {
     const classContainer = this.memdb.getClass(clazz)
     const extend = classContainer._extends as Ref<Class<Obj>>
-    const parent = extend ? this.getPrototype(extend) : this.sessionProto
+    const parent = extend ? await this.getPrototype(extend) : this.sessionProto
     const proto = Object.create(parent) as SessionProto & T
     this.prototypes.set(clazz, proto)
 
     const attributes = classContainer._attributes as Bag<Type<PropertyType>>
     if (classContainer._native) {
-      const native = this.platform.getMetadata(classContainer._native as Metadata<Class<Obj>>)
-      if (native === undefined) {
-        throw new Error('no native prototype: ' + classContainer._native)
-      }
-      Object.defineProperties(proto, Object.getOwnPropertyDescriptors(native))
+      const native = this.platform.resolve(classContainer._native as Resource<object>)
+      const desc = await native.then(native => {
+        if (native === undefined) {
+          throw new Error('no native prototype: ' + classContainer._native)
+        }
+        return Object.getOwnPropertyDescriptors(native)
+      })
+      Object.defineProperties(proto, desc)
     }
 
-    const descriptors = this.createPropertyDescriptors(attributes, key => proto.__mapKey(clazz, key))
+    const descriptors = await this.createPropertyDescriptors(attributes, key => proto.__mapKey(clazz, key))
     Object.defineProperties(proto, descriptors)
     return proto
   }
 
-  getPrototype<T extends Obj>(clazz: Ref<Class<T>>) {
+  async getPrototype<T extends Obj>(clazz: Ref<Class<T>>): Promise<object> {
     return this.prototypes.get(clazz) ?? this.createPrototype(clazz)
   }
 
-  instantiate<T extends Obj>(_class: Ref<Class<T>>, __layout: any): T {
-    const instance = Object.create(this.getPrototype(_class))
+  async instantiate<T extends Obj>(_class: Ref<Class<T>>, __layout: any): Promise<T> {
+    const instance = Object.create(await this.getPrototype(_class))
     instance._class = _class
     instance.__layout = __layout
     return instance
   }
 
-  createDocument<T extends Doc>(_class: Ref<Class<T>>, data: object): T {
+  async createDocument<T extends Doc>(_class: Ref<Class<T>>, data: object): Promise<T> {
     let _id = (data as Content<Doc>)._id
     console.log('Creating Document: ' + _id)
     if (_id === undefined) {
       _id = generateId() as Ref<Doc>
     }
     const container = this.memdb.createContainer(_id, _class)
-    const instance = this.instantiate(_class, container)
+    const instance = await this.instantiate(_class, container)
     Object.assign(instance, data)
     this.memdb.index(container)
     return instance as T
   }
 
   as<T extends Doc>(doc: Layout<Doc>, _class: Ref<Class<T>>): T | undefined {
-    const layout = doc.__layout
-    if (!layout)
-      throw new Error('layout not found')
-    const classes = layout._classes as string[]
-    if (classes.includes(_class))
-      return this.instantiate(_class, layout)
-    return undefined
+    throw new Error('not implemented')
+    // const layout = doc.__layout
+    // if (!layout)
+    //   throw new Error('layout not found')
+    // const classes = layout._classes as string[]
+    // if (classes.includes(_class))
+    //   return this.instantiate(_class, layout)
+    // return undefined
   }
 
   mixin<T extends E, E extends Doc>(obj: E, _class: Ref<Class<T>>, data: Omit<T, keyof E>): T {
-    const _id = obj._id as Ref<T>
-    return this.createDocument(_class, { _id, ...data })
+    throw new Error('not implemented')
+    // const _id = obj._id as Ref<T>
+    // return this.createDocument(_class, { _id, ...data })
   }
 
-  getInstance<T extends Doc>(ref: Ref<T>): T {
+  async getInstance<T extends Doc>(ref: Ref<T>): Promise<T> {
     const container = this.memdb.get(ref)
     return this.instantiate(container._class as Ref<Class<T>>, container)
     // const narrow = this.narrow(as, container._class)
@@ -152,8 +158,8 @@ export class TSession implements Session {
     return as
   }
 
-  getClass<T extends Obj>(_class: Ref<Class<T>>): Class<T> {
-    return this.getInstance(_class) as Class<T>
+  async getClass<T extends Obj>(_class: Ref<Class<T>>): Promise<Class<T>> {
+    return this.getInstance(_class)
   }
 
   // getStruct<T extends Emb>(_class: Ref<Class<T>>): Class<T> {
@@ -172,26 +178,30 @@ export class TSession implements Session {
 
   createClass<T extends E, E extends Doc>(
     _id: Ref<Class<T>>, _extends: Ref<Class<E>>,
-    _attributes: DiffDescriptors<T, E>, _native?: Metadata<T>): Class<T> {
-    const classClass = this.getInstance(core.class.Class) as Class<Class<T>>
-    return classClass.newInstance({
-      _id,
-      _attributes,
-      _extends,
-      _native
-    })
+    _attributes: DiffDescriptors<T, E>, _native?: Resource<T>): Promise<Class<T>> {
+    const classClass = this.getInstance(core.class.Class as Ref<Class<Class<T>>>)
+    return classClass.then(clazz =>
+      clazz.newInstance({
+        _id,
+        _attributes,
+        _extends,
+        _native
+      })
+    )
   }
 
-  createStruct<T extends E, E extends Emb>(
+  createStruct<T extends E, E extends Obj>(
     _id: Ref<Class<T>>, _extends: Ref<Class<E>>,
-    _attributes: DiffDescriptors<T, E>, _native?: Metadata<T>): Class<T> {
-    const structClass = this.getInstance(core.class.Struct) as Class<Class<T>>
-    return structClass.newInstance({
-      _id,
-      _attributes,
-      _extends,
-      _native
-    })
+    _attributes: DiffDescriptors<T, E>, _native?: Resource<T>): Promise<Class<T>> {
+    const classClass = this.getInstance(core.class.Struct as Ref<Class<Class<T>>>)
+    return classClass.then(clazz =>
+      clazz.newInstance({
+        _id,
+        _attributes,
+        _extends,
+        _native
+      })
+    )
   }
 
   ////

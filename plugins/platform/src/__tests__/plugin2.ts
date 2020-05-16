@@ -23,7 +23,7 @@ export default (platform: Platform, deps: {}) => {
   plugin2State.started = true
   const plugin = {
     id: 'plugin2',
-    resolve(resource: Resource<any>): any {
+    async resolve(resource: Resource<any>): Promise<any> {
       if (resource === 'resource2:undefined') {
         return undefined
       }
