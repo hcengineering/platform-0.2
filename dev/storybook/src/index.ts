@@ -41,7 +41,3 @@ export default platform
 export function getSession(): Promise<Session> {
   return platform.getPlugin(launch.id).then(plugin => plugin.session)
 }
-
-// export function getUI(): Promise<UIPlugin> {
-//   return platform.getPlugin(launch.id).then(plugin => plugin.ui)
-// }

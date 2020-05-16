@@ -13,6 +13,7 @@
 // limitations under the License.
 //
 
-// import { getUI } from '../../src'
+import Vue from 'vue'
+import platform from '../../src'
 
-// console.log(getUI)
+Vue.prototype.$platform = platform

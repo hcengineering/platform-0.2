@@ -14,10 +14,12 @@
 //
 
 import Vue from 'vue'
+import { Platform } from '@anticrm/platform'
 import { UIPlugin } from '.'
 
 declare module 'vue/types/vue' {
   interface Vue {
+    $platform: Platform
     $uiPlugin: UIPlugin
   }
 }
