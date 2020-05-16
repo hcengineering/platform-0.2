@@ -157,9 +157,10 @@ export class TSession implements Session {
     if (!layout)
       throw new Error('layout not found')
     const classes = layout._mixins as string[]
-    if (classes.includes(_class))
+    if (classes && classes.includes(_class))
       return this.instantiate(_class, layout)
-    throw new Error('not implemented')
+    console.log(doc)
+    throw new Error('not implemented: ' + _class)
   }
 
   async createEmb<T extends Emb>(_class: Ref<Class<T>>, data: object) {

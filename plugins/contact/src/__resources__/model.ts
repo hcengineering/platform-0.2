@@ -45,10 +45,12 @@ export default async (S: UIBuilder) => {
     S.decorateClass(contact.class.Phone, { icon: contact.icon.Phone }),
     S.decorateClass(contact.class.Twitter, { icon: contact.icon.Twitter }),
     S.decorateClass(contact.class.Address, { icon: contact.icon.Address }),
+
+    S.decorateClass(contact.class.Contact, {
+      decorators: { phone: await S.typeDeco({ placeholder: '+7 913 333 5555' as any }) }
+    })
+
   ])
 
-  // S.decorateClass(contact.class.Contact, {
-  //   decorators: { phone: S.typeDeco({ placeholder: '+7 913 333 5555' as IntlString }) }
-  // })
 }
 

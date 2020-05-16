@@ -14,10 +14,40 @@
 //
 
 import { Platform } from '@anticrm/platform'
+import db from '@anticrm/platform-db'
+import core, { Ref } from '@anticrm/platform-core'
+import i18n from '@anticrm/platform-core-i18n'
+import launch from '@anticrm/launch-dev'
+import contact, { Contact } from '@anticrm/contact'
+import ui from '../__resources__/'
 
 describe('session', () => {
 
-  it('should load ui model', () => {
+  const platform = new Platform()
+  platform.addLocation(db, () => import('@anticrm/platform-db/src/memdb'))
+  platform.addLocation(i18n, () => import('@anticrm/platform-core-i18n/src/plugin'))
+  platform.addLocation(core, () => import('@anticrm/platform-core/src/plugin'))
+  platform.addLocation(ui, () => import('@anticrm/platform-ui/src/plugin'))
+  platform.addLocation(launch, () => import('@anticrm/launch-dev/src/launch'))
+  platform.setResolver('native', core.id)
+
+  const session = platform.getPlugin(launch.id).then(plugin => plugin.session)
+
+  // const clazz = await sess.getClass(contact.class.Contact)
+  // const inst = await clazz.newInstance({ _id: 'xxxxddd' as Ref<Contact>, email: 'xxx@gmail.com' })
+  // console.log(inst)
+
+  it('should build ClassUIModel', async () => {
+    const sess = await session
+    const uiPlugin = await platform.getPlugin(ui.id)
+    const classModel = await uiPlugin.getClassModel(contact.class.Contact)
+    console.log(classModel)
+  })
+
+  it('should build AttrUIModel', async () => {
+    const uiPlugin = await platform.getPlugin(ui.id)
+    const ownModel = await uiPlugin.getOwnAttrModel(contact.class.Contact)
+    console.log(ownModel)
   })
 
   it('should add ui decorator to Class<Class>', () => {
