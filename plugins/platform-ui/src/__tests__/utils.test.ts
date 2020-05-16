@@ -17,8 +17,7 @@ import { identify, Plugin, PluginId } from '@anticrm/platform'
 import { Ref, Class, Obj } from '@anticrm/platform-core'
 
 import { IntlString } from '@anticrm/platform-core-i18n'
-import { verifyTranslation } from '@anticrm/platform-core-i18n/src/__resources__/utils'
-import { modelTranslation } from '../__resources__/utils'
+import { verifyTranslation, modelTranslation } from '@anticrm/platform-core-i18n/src/__resources__/utils'
 
 const ids = identify('test' as PluginId<Plugin>, {
   class: {

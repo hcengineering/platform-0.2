@@ -18,8 +18,12 @@ import { IntlString } from '..'
 import i18nPlugin from '../plugin'
 import { verifyTranslation } from '../__resources__/utils'
 
+import db from '@anticrm/platform-db'
+import core from '@anticrm/platform-core'
+import i18n from '../__resources__'
+
 const ids = identify('test' as PluginId<Plugin>, {
-  strings: {
+  string: {
     MyString: '' as IntlString
   },
 })
@@ -28,38 +32,49 @@ const ru = {
   MyString: 'Перевод',
 }
 
-describe('platform', () => {
+describe('i18n', () => {
 
-  const _ = new Platform()
-  const platform = i18nPlugin(_)
+  const platform = new Platform()
+  platform.addLocation(db, () => import('@anticrm/platform-db/src/memdb'))
+  platform.addLocation(core, () => import('@anticrm/platform-core/src/plugin'))
+  platform.addLocation(i18n, () => import('../plugin'))
+  platform.setResolver('native', core.id)
+
+  const i18nPlugin = platform.getPlugin(i18n.id)
 
   it('should return original string', () => {
-    expect(platform.translate('does not exists' as IntlString)).toBeUndefined()
+    i18nPlugin.then(plugin => {
+      expect(plugin.translate('does not exists' as IntlString)).toBeUndefined()
+    })
   })
 
   it('should verify translation', () => {
-    const translations = verifyTranslation(ids.strings, ru)
-    expect(translations['test.strings.MyString']).toBe(ru.MyString)
+    const translations = verifyTranslation(ids.string, ru)
+    expect(translations['string:test.MyString']).toBe(ru.MyString)
   })
 
   it('should translate simple', () => {
-    platform.loadStrings({
-      idSimple: 'Русский'
+    i18nPlugin.then(plugin => {
+      plugin.loadStrings({
+        idSimple: 'Русский'
+      })
+      expect(plugin.translate('idSimple' as IntlString)).toBe('Русский')
     })
-    expect(platform.translate('idSimple' as IntlString)).toBe('Русский')
   })
 
   it('should translate plurals', () => {
-    platform.loadStrings({
-      idPlural: '{count, plural, =1 {секунду} few {# секунды} many {# секунд} other {# секунду} } назад'
+    i18nPlugin.then(plugin => {
+      plugin.loadStrings({
+        idPlural: '{count, plural, =1 {секунду} few {# секунды} many {# секунд} other {# секунду} } назад'
+      })
+      const message = 'idPlural' as IntlString
+      expect(plugin.translate(message, { count: 1 })).toBe('секунду назад')
+      expect(plugin.translate(message, { count: 2 })).toBe('2 секунды назад')
+      expect(plugin.translate(message, { count: 5 })).toBe('5 секунд назад')
+      expect(plugin.translate(message, { count: 11 })).toBe('11 секунд назад')
+      expect(plugin.translate(message, { count: 21 })).toBe('21 секунду назад')
+      expect(plugin.translate(message, { count: 22 })).toBe('22 секунды назад')
+      expect(plugin.translate(message, { count: 25 })).toBe('25 секунд назад')
     })
-    const message = 'idPlural' as IntlString
-    expect(platform.translate(message, { count: 1 })).toBe('секунду назад')
-    expect(platform.translate(message, { count: 2 })).toBe('2 секунды назад')
-    expect(platform.translate(message, { count: 5 })).toBe('5 секунд назад')
-    expect(platform.translate(message, { count: 11 })).toBe('11 секунд назад')
-    expect(platform.translate(message, { count: 21 })).toBe('21 секунду назад')
-    expect(platform.translate(message, { count: 22 })).toBe('22 секунды назад')
-    expect(platform.translate(message, { count: 25 })).toBe('25 секунд назад')
   })
 })

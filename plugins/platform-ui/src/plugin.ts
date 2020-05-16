@@ -20,10 +20,6 @@ import { Platform } from '@anticrm/platform'
 import ui, { UIPlugin, AttrModel, UIDecorator, ClassUIDecorator, ClassUIModel } from '.'
 import i18n, { I18nPlugin, IntlString } from '@anticrm/platform-core-i18n'
 
-export function synthIntlStringId(clazz: Ref<Class<Obj>>, propertyKey: string, attribute?: string): IntlString {
-  return (attribute ? clazz + '.' + attribute + '_' + propertyKey : clazz + '_' + propertyKey) as IntlString
-}
-
 class UIPluginImpl implements UIPlugin {
 
   readonly platform: Platform

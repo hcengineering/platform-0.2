@@ -15,8 +15,12 @@
 
 import { IntlMessageFormat, PrimitiveType } from 'intl-messageformat'
 import { Platform } from '@anticrm/platform'
-import { Type, Ref, Class, Session, PropertyType, CorePlugin } from '@anticrm/platform-core'
+import { Obj, Type, Ref, Class, Session, PropertyType, CorePlugin } from '@anticrm/platform-core'
 import i18n, { I18nPlugin, IntlString, pluginId } from '..'
+
+export function synthIntlStringId(clazz: Ref<Class<Obj>>, propertyKey: string, attribute?: string): IntlString {
+  return (attribute ? clazz + '.' + attribute + '_' + propertyKey : clazz + '_' + propertyKey) as IntlString
+}
 
 console.log('PLUGIN: parsed i18n')
 export default async (platform: Platform, deps: { core: CorePlugin }): Promise<I18nPlugin> => {
