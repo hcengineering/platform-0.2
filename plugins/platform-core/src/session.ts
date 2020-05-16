@@ -14,11 +14,11 @@
 //
 
 import { Platform, Metadata } from '@anticrm/platform'
-import { MemDb } from './memdb'
+import { MemDb, Container } from './memdb'
 import { generateId } from './objectid'
 import core, {
   Obj, Doc, Ref, Bag, Class, Type, Emb, Content,
-  PropertyType, DiffDescriptors, Container, Session, ContainerId
+  PropertyType, DiffDescriptors, Session
 } from '.'
 
 export type Layout<T extends Obj> = T & { __layout: any } & SessionProto
@@ -73,7 +73,7 @@ export class TSession implements Session {
   }
 
   private createPrototype<T extends Obj>(clazz: Ref<Class<T>>) {
-    const classContainer = this.memdb.get(clazz)
+    const classContainer = this.memdb.getClass(clazz)
     const extend = classContainer._extends as Ref<Class<Obj>>
     const parent = extend ? this.getPrototype(extend) : this.sessionProto
     const proto = Object.create(parent) as SessionProto & T
@@ -110,8 +110,7 @@ export class TSession implements Session {
     if (_id === undefined) {
       _id = generateId() as Ref<Doc>
     }
-    const container = this.memdb.get(_id, true) // TODO: must be create! raise error if container exists
-    container._classes.push(_class as unknown as Ref<Class<Doc>>)
+    const container = this.memdb.createContainer(_id, _class)
     const instance = this.instantiate(_class, container)
     Object.assign(instance, data)
     this.memdb.index(container)
@@ -133,13 +132,14 @@ export class TSession implements Session {
     return this.createDocument(_class, { _id, ...data })
   }
 
-  getInstance<T extends Doc>(ref: Ref<T>, as: Ref<Class<T>>): T {
+  getInstance<T extends Doc>(ref: Ref<T>): T {
     const container = this.memdb.get(ref)
-    const narrow = this.narrow(as, container._classes)
-    if (narrow)
-      return this.instantiate(narrow, container)
-    else
-      throw new Error('narrow failed')
+    return this.instantiate(container._class as Ref<Class<T>>, container)
+    // const narrow = this.narrow(as, container._class)
+    // if (narrow)
+    //   return this.instantiate(narrow, container)
+    // else
+    //   throw new Error('narrow failed')
   }
 
   narrow<T extends Doc>(as: Ref<Class<T>>, classes: Ref<Class<Doc>>[]): Ref<Class<T>> | undefined {
@@ -153,7 +153,7 @@ export class TSession implements Session {
   }
 
   getClass<T extends Obj>(_class: Ref<Class<T>>): Class<T> {
-    return this.getInstance(_class, core.class.StructuralFeature) as Class<T>
+    return this.getInstance(_class) as Class<T>
   }
 
   // getStruct<T extends Emb>(_class: Ref<Class<T>>): Class<T> {
@@ -173,7 +173,7 @@ export class TSession implements Session {
   createClass<T extends E, E extends Doc>(
     _id: Ref<Class<T>>, _extends: Ref<Class<E>>,
     _attributes: DiffDescriptors<T, E>, _native?: Metadata<T>): Class<T> {
-    const classClass = this.getInstance(core.class.Class, core.class.Class) as Class<Class<T>>
+    const classClass = this.getInstance(core.class.Class) as Class<Class<T>>
     return classClass.newInstance({
       _id,
       _attributes,
@@ -185,7 +185,7 @@ export class TSession implements Session {
   createStruct<T extends E, E extends Emb>(
     _id: Ref<Class<T>>, _extends: Ref<Class<E>>,
     _attributes: DiffDescriptors<T, E>, _native?: Metadata<T>): Class<T> {
-    const structClass = this.getInstance(core.class.Struct, core.class.Class) as Class<Class<T>>
+    const structClass = this.getInstance(core.class.Struct) as Class<Class<T>>
     return structClass.newInstance({
       _id,
       _attributes,

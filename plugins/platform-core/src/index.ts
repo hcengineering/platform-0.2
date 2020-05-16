@@ -29,12 +29,12 @@ export type PropertyType = PrimitiveType
 export type Ref<T extends Doc> = AsString<T> & { __ref: void }
 export type Bag<X extends PropertyType> = { [key: string]: X }
 
-export type ContainerId = Ref<Doc>
-export interface Container {
-  _id: ContainerId
-  _classes: Ref<Class<Doc>>[]
-  [key: string]: PropertyType
-}
+// export type ContainerId = Ref<Doc>
+// export interface Container {
+//   _id: ContainerId
+//   _classes: Ref<Class<Doc>>[]
+//   [key: string]: PropertyType
+// }
 
 // O B J E C T S
 
@@ -99,8 +99,8 @@ export type DiffDescriptors<T extends E, E> = Descriptors<Omit<T, keyof E>>
 export interface Session {
   getInstance<T extends Doc>(ref: Ref<T>, as: Ref<Class<T>>): T
 
-  loadModel(docs: Container[]): void
-  dump(): Container[]
+  // loadModel(docs: Container[]): void
+  // dump(): Container[]
 
   mixin<T extends E, E extends Doc>(obj: E, _class: Ref<Class<T>>, data: Omit<T, keyof E>): T
 

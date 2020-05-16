@@ -73,18 +73,18 @@ describe('session', () => {
   })
 
   it('should get instances', () => {
-    const objectClass = session.getInstance(core.class.Emb, core.class.Class)
+    const objectClass = session.getInstance(core.class.Emb)
     expect(typeof objectClass.getSession).toBe('function')
     expect(objectClass.getSession() === session).toBe(true)
 
     expect(objectClass._id).toBe(core.class.Emb)
     expect(objectClass._native).toBe(core.native.Emb)
     expect(objectClass.getClass()._id).toBe(core.class.Class)
-    expect(objectClass.toIntlString()).toBe('doc: core.class.Emb')
+    expect(objectClass.toIntlString()).toBe('doc: class:core.Emb')
 
-    const classClass = session.getInstance(core.class.StructuralFeature, core.class.Class)
+    const classClass = session.getInstance(core.class.StructuralFeature)
     expect(classClass._extends).toBe(core.class.Doc)
-    expect(classClass.toIntlString()).toBe('doc: core.class.StructuralFeature')
+    expect(classClass.toIntlString()).toBe('doc: class:core.StructuralFeature')
 
     expect(classClass._attributes._extends._class).toBe(core.class.RefTo)
     const refTo = classClass._attributes._extends.getClass()
@@ -165,7 +165,7 @@ describe('session', () => {
       phone: '+7 913 333 5555'
     })
 
-    const contact1 = session.getInstance(contact1Id, contact.class.Contact)
+    const contact1 = session.getInstance(contact1Id)
     expect(contact1.phone).toBe('+7 913 333 5555')
     contact1.phone = '+1 646 667 88 77'
     expect(contact1.phone).toBe('+1 646 667 88 77')

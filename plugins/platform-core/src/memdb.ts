@@ -62,21 +62,14 @@ export class MemDb {
     return result
   }
 
-  // get(_id: ContainerId, create?: boolean): Container {
-  //   const result = this.objects.get(_id)
-  //   if (!result) {
-  //     if (create) {
-  //       const container = {
-  //         _id,
-  //         _classes: []
-  //       }
-  //       this.objects.set(_id, container) // TODO: update indexes
-  //       return container
-  //     }
-  //     throw new Error('no container with id ' + _id)
-  //   }
-  //   return result
-  // }
+  createContainer(_id: ContainerId, _class: ClassId): Container {
+    const container = {
+      _id,
+      _class
+    }
+    this.objects.set(_id, container) // TODO: update index
+    return container
+  }
 
   pick(id: ContainerId): Container | undefined {
     return this.objects.get(id)
