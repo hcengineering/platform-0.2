@@ -16,12 +16,7 @@
 <script lang="ts">
 
 import Vue, { PropType } from 'vue'
-
-import core, { Obj, Ref, Class } from '@anticrm/platform-core'
-
 import { Person } from '..'
-
-import ui, { UIPlugin, AttrModel } from '@anticrm/platform-ui'
 
 import ObjectPanel from '@anticrm/platform-ui/src/components/ObjectPanel.vue'
 import InlineEdit from '@anticrm/platform-ui-controls/src/InlineEdit.vue'
@@ -29,16 +24,24 @@ import InlineEdit from '@anticrm/platform-ui-controls/src/InlineEdit.vue'
 export default Vue.extend({
   components: { ObjectPanel, InlineEdit },
   props: {
-    object: Object as PropType<Person>,
+    object: Promise as PropType<Promise<Person>>,
   },
+  data() {
+    return {
+      content: {}
+    }
+  },
+  created() {
+    this.object.then(obj => this.content = obj)
+  }
 })
 </script>
 
 <template>
   <div>
-    <InlineEdit class="caption-1" v-model="object.firstName" placeholder="Фамилия" />
+    <InlineEdit class="caption-1" v-model="content.firstName" placeholder="Фамилия" />
     <br />
-    <InlineEdit class="caption-2" v-model="object.lastName" placeholder="Имя Отчество" />
+    <InlineEdit class="caption-2" v-model="content.lastName" placeholder="Имя Отчество" />
     <ObjectPanel :object="object" style="margin-top: 2em" />
   </div>
 </template>

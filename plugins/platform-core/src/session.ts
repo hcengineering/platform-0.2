@@ -167,7 +167,7 @@ export class TSession implements Session {
   async getInstance<T extends Doc> (ref: Ref<T>): Promise<T> {
     // preload Struct here
     // TODO we need to deal with this
-    this.getPrototype(core.class.Struct)
+    await this.getPrototype(core.class.Struct)
     // console.log(structProto)
 
     const container = this.memdb.get(ref)

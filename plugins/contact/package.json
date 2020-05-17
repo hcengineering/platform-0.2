@@ -4,5 +4,9 @@
   "private": true,
   "main": "./src/index.ts",
   "author": "Andrey Platov <andrey.v.platov@gmail.com>",
-  "license": "EPL-2.0"
+  "license": "EPL-2.0",
+  "dependencies": {
+    "@anticrm/platform-ui": "0.1.0",
+    "@anticrm/platform-ui-controls": "0.1.0"
+  }
 }

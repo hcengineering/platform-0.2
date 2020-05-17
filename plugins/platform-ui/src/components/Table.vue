@@ -19,15 +19,15 @@ import Vue, { PropType } from 'vue'
 
 import { Obj, Ref, Class } from '@anticrm/platform-core'
 
-import ui, { UIPlugin, AttrModel } from '@anticrm/platform-ui'
 import InlineEdit from '@anticrm/platform-ui-controls/src/InlineEdit.vue'
 import Icon from './Icon.vue'
+import ui from '..'
 
 export default Vue.extend({
   components: { InlineEdit, Icon },
   props: {
-    clazz: Object as PropType<Ref<Class<Obj>>>,
-    objects: Object as PropType<Promise<Obj[]>>,
+    clazz: String as unknown as PropType<Ref<Class<Obj>>>,
+    objects: Promise as PropType<Promise<Obj[]>>,
     filter: Array as PropType<string[] | undefined>,
   },
   data() {

@@ -13,30 +13,28 @@
 // limitations under the License.
 //
 
+import Vue from 'vue'
 import Theme from '../components/Theme.vue'
 
-import ui from '@anticrm/platform-ui'
-import platform from '@anticrm/platform'
+import platform from '..'
+import core from '@anticrm/platform-core'
+import contact from '@anticrm/contact'
 
 import ContactForm from '@anticrm/contact/src/components/ContactForm.vue'
-
-import core from '@anticrm/platform-core'
-
-import contact from '@anticrm/contact'
 
 export default {
   title: 'Contact'
 }
 
-const corePlugin = platform.getPluginSync(core.id)
-const session = corePlugin.getSession()
+async function createPerson() {
+  const corePlugin = await platform.getPlugin(core.id)
+  const session = corePlugin.getSession()
+  const personClass = await session.getInstance(contact.class.Person)
+  return personClass.newInstance({ phone: '555 777 8888', firstName: 'John' })
+}
 
-const personClass = session.getClass(contact.class.Person)
-const personInstance = personClass.newInstance({})
-
-export const Form = () => ({
+export const form = () => ({
   render() {
-    return <Theme><ContactForm object={personInstance}></ContactForm></Theme>
+    return <Theme><ContactForm object={createPerson()}/></Theme>
   }
 })
-

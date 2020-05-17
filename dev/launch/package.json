@@ -8,7 +8,8 @@
   },
   "dependencies": {
     "core-js": "^3.6.4",
-    "vue": "^2.6.11"
+    "vue": "^2.6.11",
+    "@anticrm/platform-workbench": "0.1.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.3.0",

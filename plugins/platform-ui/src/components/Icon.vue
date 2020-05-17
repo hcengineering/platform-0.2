@@ -16,7 +16,8 @@
 <script lang="ts">
 
 import Vue from 'vue'
-import { Asset } from '@anticrm/platform-ui'
+import {Metadata} from '@anticrm/platform'
+import ui from '..'
 
 export default Vue.extend({
   props: {
@@ -26,7 +27,10 @@ export default Vue.extend({
     }
   },
   computed: {
-    url(): string { return this.$platform.getMetadata(this.icon) },
+    url(): string {
+      return this.$platform.getMetadata(this.icon as Metadata<string>) ??
+              this.$platform.getMetadata(ui.icon.Search) ?? 'https://salesforce.com'
+    }
   }
 })
 </script>
@@ -35,5 +39,4 @@ export default Vue.extend({
   <svg>
     <use :xlink:href="url" />
   </svg>
-  <!-- <div>{{url}}</div> -->
 </template>
