@@ -15,6 +15,7 @@
 
 import { plugin, Plugin, PluginId } from '@anticrm/platform'
 import { Doc, Ref, Class } from '@anticrm/platform-core'
+import { Asset } from '@anticrm/platform-ui'
 
 export interface Contact extends Doc {
   email?: string
@@ -36,6 +37,12 @@ export default plugin(
   'contact' as PluginId<Plugin>,
   {},
   {
+    icon: {
+      Email: '' as Asset,
+      Phone: '' as Asset,
+      Twitter: '' as Asset,
+      Address: '' as Asset,
+    },
     class: {
       Contact: '' as Ref<Class<Contact>>,
       Person: '' as Ref<Class<Person>>
