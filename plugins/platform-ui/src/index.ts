@@ -13,11 +13,14 @@
 // limitations under the License.
 //
 
-import { Metadata, Plugin, PluginId, plugin, Platform } from '@anticrm/platform'
+import { Metadata, Plugin, PluginId, plugin, Platform, Resource } from '@anticrm/platform'
 import core, { Doc, Emb, Obj, AnyType, Ref, Class, Bag, Type } from '@anticrm/platform-core'
-import i18n, { IntlString } from '@anticrm/platform-core-i18n'
+import { IntlString } from '@anticrm/platform-core-i18n'
+import { VueConstructor } from 'vue'
 
 export type Asset = Metadata<string>
+
+export type Component<C extends VueConstructor> = Resource<C>
 
 // M O D E L
 
@@ -52,11 +55,7 @@ export interface ClassUIModel {
 }
 
 export interface UIPlugin extends Plugin {
-  readonly platform: Platform
-
-  getDefaultClassModel(): ClassUIModel
   getClassModel(_class: Ref<Class<Obj>>): Promise<ClassUIModel>
-  getDefaultAttrModel(props: string[]): AttrModel[]
   groupByType(model: AttrModel[]): { [key: string]: AttrModel[] }
   getOwnAttrModel(clazz: Ref<Class<Obj>>, props?: string[]): Promise<AttrModel[]>
   getAttrModel(clazz: Ref<Class<Obj>>, props?: string[]): Promise<AttrModel[]>
@@ -74,10 +73,12 @@ export interface UIPlugin extends Plugin {
 export default plugin(
   'ui' as PluginId<UIPlugin>,
   {
-    i18n: i18n.id,
     core: core.id
   },
   {
+    component: {
+      Icon: '' as Component<VueConstructor>
+    },
     icon: {
       AddGroup: '' as Asset,
       Add: '' as Asset,

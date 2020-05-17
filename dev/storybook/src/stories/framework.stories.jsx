@@ -37,6 +37,8 @@ export const icon = () => ({
     return <Theme>
       <Icon icon={ui.icon.Add} class="icon-embed" />
       <Icon icon={ui.icon.AddGroup} class="icon-embed" />
+      <br/>
+      Default: <Icon class="icon-embed"/>
     </Theme>
   }
 })

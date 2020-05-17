@@ -23,14 +23,22 @@ import Vue from 'vue'
 import Workbench from '@anticrm/platform-workbench/src/components/Workbench.vue'
 import ErrorPage from './components/ErrorPage.vue'
 
-async function boot(): Promise<void> {
-  const platform = new Platform()
-  platform.addLocation(db, () => import(/* webpackChunkName: "platform-db" */ '@anticrm/platform-db/src/memdb'))
-  platform.addLocation(core, () => import(/* webpackChunkName: "platform-core" */ '@anticrm/platform-core/src/plugin'))
-  platform.addLocation(i18n, () => import(/* webpackChunkName: "platform-core-i18n" */ '@anticrm/platform-core-i18n/src/plugin'))
-  platform.addLocation(ui, () => import(/* webpackChunkName: "platform-ui" */ '@anticrm/platform-ui/src/plugin'))
+import uiMeta from '@anticrm/platform-ui/src/__resources__/meta'
+import contactMeta from '@anticrm/contact/src/__resources__/meta'
 
-  // const uiPlugin = await platform.getPlugin(ui.id)
+const platform = new Platform()
+platform.addLocation(db, () => import(/* webpackChunkName: "platform-db" */ '@anticrm/platform-db/src/memdb'))
+platform.addLocation(core, () => import(/* webpackChunkName: "platform-core" */ '@anticrm/platform-core/src/plugin'))
+platform.addLocation(i18n, () => import(/* webpackChunkName: "platform-core-i18n" */ '@anticrm/platform-core-i18n/src/plugin'))
+platform.addLocation(ui, () => import(/* webpackChunkName: "platform-ui" */ '@anticrm/platform-ui/src/plugin'))
+
+platform.setResolver('native', core.id)
+
+uiMeta(platform)
+contactMeta(platform)
+
+async function boot(): Promise<void> {
+  await platform.getPlugin(ui.id) // initialize Vue instance in `ui` plugin before first use.
 
   Vue.config.productionTip = false
   Vue.prototype.$platform = platform

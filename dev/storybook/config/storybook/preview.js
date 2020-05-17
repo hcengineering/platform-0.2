@@ -15,5 +15,4 @@
 
 import Vue from 'vue'
 import platform from '../../src'
-
 Vue.prototype.$platform = platform

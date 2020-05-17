@@ -24,7 +24,7 @@
     </nav>
 
     <main>
-      <router-view></router-view>
+      <widget component="component:ui.Icon"/>
     </main>
 
     <aside>

@@ -13,27 +13,52 @@
 // limitations under the License.
 //
 
+import Vue, { VueConstructor } from 'vue'
 import core, { Obj, Class, Ref, Session, CorePlugin } from '@anticrm/platform-core'
-import { Platform } from '@anticrm/platform'
-import ui, { UIPlugin, AttrModel, ClassUIModel } from '.'
-import { I18nPlugin } from '@anticrm/platform-core-i18n'
+import { Platform, PropType } from '@anticrm/platform'
+import ui, { UIPlugin, AttrModel, ClassUIModel, Component } from '.'
 
-class UIPluginImpl implements UIPlugin {
+import Icon from './components/Icon.vue'
 
-  readonly platform: Platform
-  readonly i18n: I18nPlugin
-  readonly core: CorePlugin
-  readonly session: Session
+console.log('PLUGIN: ui loaded')
 
-  constructor(platform: Platform, deps: { i18n: I18nPlugin, core: CorePlugin }) {
-    this.platform = platform
-    this.i18n = deps.i18n
-    this.core = deps.core
-    this.session = deps.core.getSession()
+/*!
+ * Anticrm Platform™ UI Plugin
+ * © 2020 Anticrm Platform Contributors. All Rights Reserved.
+ * Licensed under the Eclipse Public License, Version 2.0
+ */
+export default async (platform: Platform, deps: { core: CorePlugin }): Promise<UIPlugin> => {
+  console.log('PLUGIN: ui started')
+
+  const core = deps.core
+  const session = deps.core.getSession()
+
+  // C O M P O N E N T S
+
+  const components = new Map<Component<VueConstructor>, VueConstructor>()
+
+  function getComponent(id: Component<VueConstructor>): VueConstructor {
+    const result = components.get(id)
+    if (result) {
+      return result
+    }
+    throw new Error('no Vue component: ' + id)
   }
 
-  async getClassModel(_class: Ref<Class<Obj>>): Promise<ClassUIModel> {
-    const clazz = await this.session.getInstance(_class)
+  Vue.component('widget', {
+    components: {},
+    props: {
+      component: String // as PropType<Component<VueConstructor>>
+    },
+    render (h) {
+      return h(getComponent(this.component as Component<VueConstructor>))
+    }
+  })
+
+  // U I  M O D E L S
+
+  async function getClassModel(_class: Ref<Class<Obj>>): Promise<ClassUIModel> {
+    const clazz = await session.getInstance(_class)
     const decorator = await clazz.as(ui.class.ClassUIDecorator)
     const label = decorator?.label ?? _class
     return {
@@ -42,15 +67,7 @@ class UIPluginImpl implements UIPlugin {
     }
   }
 
-  getDefaultClassModel(): ClassUIModel {
-    return { label: 'The Class' }
-  }
-
-  getDefaultAttrModel(props: string[]): AttrModel[] {
-    return []
-  }
-
-  groupByType(model: AttrModel[]): { [key: string]: AttrModel[] } {
+  function groupByType(model: AttrModel[]): { [key: string]: AttrModel[] } {
     const result = {} as { [key: string]: AttrModel[] }
     model.forEach(attr => {
       const type = attr.type._class
@@ -64,16 +81,16 @@ class UIPluginImpl implements UIPlugin {
     return result
   }
 
-  /** 
-    Attribute label search order
-      1. Property `Type`'s UI Decorator `label` attribute
-      2. Property `Type`'s sythetic id
+  /**
+   Attribute label search order
+   1. Property `Type`'s UI Decorator `label` attribute
+   2. Property `Type`'s synthetic id
 
-      3. Property `Type`'s Class UI Decorator `label` attribute
-      4. Property `Type`'s Class synthetic id
-  */
-  async getOwnAttrModel(_class: Ref<Class<Obj>>, props?: string[]): Promise<AttrModel[]> {
-    const clazz = await this.session.getInstance(_class)
+   3. Property `Type`'s Class UI Decorator `label` attribute
+   4. Property `Type`'s Class synthetic id
+   */
+  async function getOwnAttrModel(_class: Ref<Class<Obj>>, props?: string[]): Promise<AttrModel[]> {
+    const clazz = await session.getInstance(_class)
     const decorator = await clazz.as(ui.class.ClassUIDecorator)
     const keys = props ?? Object.getOwnPropertyNames(clazz._attributes)
 
@@ -99,25 +116,20 @@ class UIPluginImpl implements UIPlugin {
     return Promise.all(attrs)
   }
 
-  async getAttrModel(_class: Ref<Class<Obj>>, props?: string[]): Promise<AttrModel[]> {
-    const hierarchy = await this.core.getClassHierarchy(_class)
-    const ownModels = hierarchy.map(clazz => this.getOwnAttrModel(clazz, props))
+  async function getAttrModel(_class: Ref<Class<Obj>>, props?: string[]): Promise<AttrModel[]> {
+    const hierarchy = await core.getClassHierarchy(_class)
+    const ownModels = hierarchy.map(clazz => getOwnAttrModel(clazz, props))
     return Promise.all(ownModels).then(result => result.flat())
   }
 
-}
+  // R E G I S T E R  C O M P O N E N T S
 
-console.log('PLUGIN: parsed ui')
-export default async (platform: Platform, deps: { i18n: I18nPlugin, core: CorePlugin }) => {
+  components.set(ui.component.Icon, Icon)
 
-  /*!
-   * Anticrm Platform UI Plugin
-   * Copyright © 2020 Anticrm Platform Contributors. All Rights Reserved.
-   * Licensed under the Eclipse Public License, Version 2.0
-   */
-
-  console.log('PLUGIN: started ui')
-
-  const uiPlugin = new UIPluginImpl(platform, deps)
-  return uiPlugin
+  return {
+    getClassModel,
+    groupByType,
+    getOwnAttrModel,
+    getAttrModel
+  }
 }
