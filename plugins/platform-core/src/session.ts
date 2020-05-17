@@ -165,10 +165,8 @@ export class TSession implements Session {
   }
 
   async getInstance<T extends Doc> (ref: Ref<T>): Promise<T> {
-    // preload Struct here
-    // TODO we need to deal with this
-    await this.getPrototype(core.class.Struct)
-    // console.log(structProto)
+    // TODO https://github.com/anticrm/platform/issues/5
+    this.getPrototype(core.class.Struct)
 
     const container = this.memdb.get(ref)
     return this.instantiate(container._class as Ref<Class<T>>, container)
