@@ -1,6 +1,6 @@
 # Anticrm Platform
 
-[![Gitter](https://badges.gitter.im/anticrm/community.svg)](https://gitter.im/anticrm/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge) ![CI](https://github.com/anticrm/platform/workflows/CI/badge.svg)
+[![Gitter](https://badges.gitter.im/anticrm/community.svg)](https://gitter.im/anticrm/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge) ![CI](https://github.com/anticrm/platform/workflows/CI/badge.svg) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
 Any Anticrm application is nothing but a set of installed Anticrm `plugins`. 
 At the very core `Platform` is a simple piece of code, which connects plugins together.

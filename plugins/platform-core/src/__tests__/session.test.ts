@@ -1,17 +1,19 @@
 //
 // Copyright © 2020 Anticrm Platform Contributors.
-// 
+//
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
 // obtain a copy of the License at https://www.eclipse.org/legal/epl-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// 
+//
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
+
+/* eslint-env jest */
 
 import { Platform, identify, Plugin, PluginId } from '@anticrm/platform'
 import db from '@anticrm/platform-db'
@@ -27,7 +29,7 @@ interface SimpleClass extends Doc {
 
 const simpleClassId = 'test.simpleClass' as Ref<Class<SimpleClass>>
 const simpleClass = createClass(simpleClassId, core.class.Doc, {
-  s: str(),
+  s: str()
 })
 
 interface MyClass extends Doc {
@@ -36,19 +38,18 @@ interface MyClass extends Doc {
 
 const myClassId = 'test.myClass' as Ref<Class<MyClass>>
 const myClass = createClass(myClassId, core.class.Doc, {
-  arrayOfStrings: array(str()),
+  arrayOfStrings: array(str())
 })
 
 const myClassInstanceId = 'test.myClass.instance' as Ref<MyClass>
 const myClassInstance = newContainer(myClassId, {
   _id: myClassInstanceId,
-  arrayOfStrings: ['hey', 'there'],
+  arrayOfStrings: ['hey', 'there']
 })
 
 const myModel = [simpleClass, myClass, myClassInstance]
 
 describe('session', () => {
-
   const platform = new Platform()
   platform.addLocation(db, () => import('@anticrm/platform-db/src/memdb'))
   platform.addLocation(core, () => import('../plugin'))
@@ -68,6 +69,7 @@ describe('session', () => {
         expect(objectProto).toBeDefined()
 
         const baseProto = Object.getPrototypeOf(objectProto)
+        /* eslint-disable no-prototype-builtins */
         expect(baseProto.hasOwnProperty('getSession')).toBe(true)
         expect(baseProto.getSession() === session).toBe(true)
 
@@ -75,7 +77,8 @@ describe('session', () => {
         expect(objectProto.hasOwnProperty('getSession')).toBe(false)
         expect(objectProto.hasOwnProperty('toIntlString')).toBe(true)
         expect(objectProto.hasOwnProperty('getClass')).toBe(true)
-        expect(typeof (objectProto as any)['toIntlString']).toBe('function')
+        /* eslint-enable no-prototype-builtins */
+        expect(typeof (objectProto as any).toIntlString).toBe('function')
       })
     })
   })
@@ -99,7 +102,7 @@ describe('session', () => {
           expect(classClass._attributes._extends._class).toBe(core.class.RefTo)
           const refTo = classClass._attributes._extends.getClass()
           expect(refTo._class).toBe(core.class.Struct)
-        }),
+        })
       ])
     })
   })
@@ -154,7 +157,7 @@ describe('session', () => {
       Email: '' as Ref<Class<Type<string>>>,
       Phone: '' as Ref<Class<Type<string>>>,
       Twitter: '' as Ref<Class<Type<string>>>,
-      Address: '' as Ref<Class<Type<string>>>,
+      Address: '' as Ref<Class<Type<string>>>
     }
   })
 
@@ -174,7 +177,7 @@ describe('session', () => {
       phoneWork: await phone.newInstance({}),
       twitter: await twitter.newInstance({}),
       address: await address.newInstance({}),
-      addressDelivery: await address.newInstance({}),
+      addressDelivery: await address.newInstance({})
     })
 
     const contactClass = await S.getClass(contact.class.Contact)
@@ -201,7 +204,7 @@ describe('session', () => {
     const S = await session
     const email = await S.getClass(contact.class.Email)
     await S.createClass(mixinClass, contact.class.Contact, {
-      xxx: await email.newInstance({}),
+      xxx: await email.newInstance({})
     })
 
     const contact1 = await S.getInstance(contact1Id)
@@ -239,5 +242,4 @@ describe('session', () => {
   //   expect(myInstance.arrayOfStrings[0]).toBe('hey')
   //   expect(myInstance.arrayOfStrings[1]).toBe('there')
   // })
-
 })

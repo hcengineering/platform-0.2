@@ -66,7 +66,7 @@ export default async (platform: Platform, deps: { db: Db }): Promise<CorePlugin>
 
   class TType<T extends PropertyType> extends TEmb implements Type<T> {
     _default?: T
-    exert (value: T, target?: PropertyType, key?: PropertyKey): any { return value ?? this._default }
+    exert (value: T, target?: PropertyType, key?: PropertyKey): any { return value ?? this._default } // eslint-disable-line
     hibernate (value: any): T { return value }
   }
 
@@ -146,7 +146,7 @@ export default async (platform: Platform, deps: { db: Db }): Promise<CorePlugin>
   }
 
   class TStruct<T extends Obj> extends TStructuralFeature<T> {
-    toIntlString (plural?: number): string { return 'struct: ' + this._id }
+    toIntlString (plural?: number): string { return 'struct: ' + this._id } // eslint-disable-line
 
     createConstructor (): Konstructor<T> {
       const session = this.getSession()
@@ -156,7 +156,7 @@ export default async (platform: Platform, deps: { db: Db }): Promise<CorePlugin>
   }
 
   class TClass<T extends Doc> extends TStructuralFeature<T> {
-    toIntlString (plural?: number): string { return 'doc: ' + this._id }
+    toIntlString (plural?: number): string { return 'doc: ' + this._id } // eslint-disable-line
 
     createConstructor (): Konstructor<T> {
       const session = this.getSession()

@@ -1,11 +1,6 @@
-# This is a basic workflow to help you get started with Actions
-
 name: CI
 
 on: push
-#    branches: [ master ]
-#  pull_request:
-#    branches: [ master ]
 
 jobs:
   build:
@@ -19,3 +14,7 @@ jobs:
         yarn workspace @anticrm/platform run test
         yarn workspace @anticrm/platform-core run test
         yarn workspace @anticrm/platform-core-i18n run test
+    - name: Run lint
+      run: |
+        yarn workspace @anticrm/platform run lint
+        yarn workspace @anticrm/platform-core run lint

@@ -39,7 +39,7 @@ export class TSession implements Session {
 
   readonly constructors = new Map<Ref<Class<Obj>>, Konstructor<Obj>>()
 
-  constructor(platform: Platform, memdb: Db) {
+  constructor (platform: Platform, memdb: Db) {
     this.platform = platform
     this.memdb = memdb
 

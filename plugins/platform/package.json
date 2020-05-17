@@ -8,7 +8,7 @@
     "build": "tsc",
     "test": "jest",
     "doc": "typedoc --out ./generated_docs",
-    "lint": "eslint src/*.ts"
+    "lint": "eslint src/**/*.ts"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^2.33.0",
