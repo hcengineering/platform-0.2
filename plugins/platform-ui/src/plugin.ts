@@ -14,11 +14,11 @@
 //
 
 import Vue, { VueConstructor } from 'vue'
-import core, { Obj, Class, Ref, Session, CorePlugin } from '@anticrm/platform-core'
-import { Platform, PropType } from '@anticrm/platform'
+import { Obj, Class, Ref, CorePlugin } from '@anticrm/platform-core'
+import { Platform } from '@anticrm/platform'
 import ui, { UIPlugin, AttrModel, ClassUIModel, Component } from '.'
 
-import Icon from './components/Icon.vue'
+// import Icon from './components/Icon.vue'
 
 console.log('PLUGIN: ui loaded')
 
@@ -124,7 +124,7 @@ export default async (platform: Platform, deps: { core: CorePlugin }): Promise<U
 
   // R E G I S T E R  C O M P O N E N T S
 
-  components.set(ui.component.Icon, Icon)
+  // components.set(ui.component.Icon, Icon)
 
   return {
     getClassModel,
