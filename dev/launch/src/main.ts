@@ -20,11 +20,10 @@ import i18n from '@anticrm/platform-core-i18n'
 import ui from '@anticrm/platform-ui'
 
 import { createApp } from 'vue';
-import Workbench from '@anticrm/platform-workbench/src/components/Workbench.vue'
 import ErrorPage from './components/ErrorPage.vue'
 
-// import uiMeta from '@anticrm/platform-ui/src/__resources__/meta'
-// import contactMeta from '@anticrm/contact/src/__resources__/meta'
+import uiMeta from '@anticrm/platform-ui/src/__resources__/meta'
+import contactMeta from '@anticrm/contact/src/__resources__/meta'
 
 const platform = new Platform()
 platform.addLocation(db, () => import(/* webpackChunkName: "platform-db" */ '@anticrm/platform-db/src/memdb'))
@@ -34,8 +33,8 @@ platform.addLocation(ui, () => import(/* webpackChunkName: "platform-ui" */ '@an
 
 platform.setResolver('native', core.id)
 
-// uiMeta(platform)
-// contactMeta(platform)
+uiMeta(platform)
+contactMeta(platform)
 
 async function boot (): Promise<void> {
   const uiPlugin = await platform.getPlugin(ui.id)
