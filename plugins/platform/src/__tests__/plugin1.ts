@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { plugin, Plugin, PluginId, Platform } from '..'
+import { Platform } from '..'
 
 import { plugin1State } from './shared'
 

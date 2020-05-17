@@ -17,7 +17,7 @@ import { Platform, identify, AnyPlugin, Resource, Metadata } from '..'
 
 import { plugin1, descriptor1, plugin1State } from './shared'
 import { plugin2, descriptor2, plugin2State } from './shared'
-import { plugin3, descriptor3, plugin3State } from './shared'
+import { plugin3, descriptor3 } from './shared'
 
 
 describe('platform', () => {

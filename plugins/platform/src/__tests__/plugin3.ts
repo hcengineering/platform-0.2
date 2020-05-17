@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { plugin, Resource, ResourcePlugin, Platform } from '..'
+import { ResourcePlugin, Platform } from '..'
 
 import { plugin3State, TestPlugin } from './shared'
 

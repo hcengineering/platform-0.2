@@ -16,7 +16,7 @@
 import { Resource } from '@anticrm/platform'
 
 import { BagOf, InstanceOf, RefTo } from '..'
-import { Ref, Class, Obj, Doc, Content, DiffDescriptors, PropertyType, Type, Emb, ArrayOf, Session } from '..'
+import { Ref, Class, Obj, Doc, Content, DiffDescriptors, PropertyType, Type, Emb, ArrayOf } from '..'
 import { Container } from '@anticrm/platform-db'
 
 import core from '.'
@@ -111,8 +111,3 @@ export const metaModel = [
   createClass(core.class.Class, core.class.StructuralFeature, {
   }, core.native.Class)
 ]
-
-export default (session: Session) => {
-  throw new Error('switched off')
-  // session.loadModel(metaModel)
-}

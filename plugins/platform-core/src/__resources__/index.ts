@@ -16,7 +16,7 @@
 import { Resource, Metadata } from '@anticrm/platform'
 
 import core, {
-  Ref, Class, Doc, Type, PropertyType, Obj, RefTo, BagOf, ArrayOf, InstanceOf, Emb
+  Ref, Class, Doc, Type, PropertyType, RefTo, BagOf, ArrayOf, InstanceOf, Emb
 } from '..'
 
 import { extendIds } from './utils'

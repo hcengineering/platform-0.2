@@ -70,8 +70,8 @@ class CoreBuilder implements Session {
     return this.session.createStruct(_id, _extends, _attributes, _native)
   }
 
-  getInstance<T extends Doc>(ref: Ref<T>): Promise<T> {
-    throw new Error("Method not implemented.")
+  getInstance<T extends Doc>(): Promise<T> {
+    throw new Error('Method not implemented.')
   }
   // loadModel(docs: Container[]): void {
   //   throw new Error("Method not implemented.")

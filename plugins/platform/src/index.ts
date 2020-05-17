@@ -1,14 +1,14 @@
 //
 // Copyright © 2020 Anticrm Platform Contributors.
-// 
+//
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
 // obtain a copy of the License at https://www.eclipse.org/legal/epl-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// 
+//
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
@@ -20,12 +20,12 @@ export type AsNumber<T> = number & PropType<T>
 export type Metadata<T> = AsString<T> & { __metadata: void }
 
 /**
- * Platform Resource Identifier (PRI). 
- * 
+ * Platform Resource Identifier (PRI).
+ *
  * PRI is a `string` in the `kind:...` format.
- * The Platform use `kind` part to delegate resource resolution to the plugin 
+ * The Platform use `kind` part to delegate resource resolution to the plugin
  * that is registered as a resolver for `Resources` of such a kind.
- * 
+ *
  * Examples of PRIs:
  * ```typescript
  *   `class:contact.Person` as Resource<Class<Person>> // database object with id === `class:contact.Person`
@@ -33,7 +33,7 @@ export type Metadata<T> = AsString<T> & { __metadata: void }
  *   `asset:ui.Icons` as Resource<URL> // URL to SVG sprites
  *   `easyscript:2+2` as Resource<() => number> // function
  * ```
- * 
+ *
  * {@link ResourcePlugin}
  * {@link Platform.resolve}
  */
@@ -67,14 +67,13 @@ type PluginModule<P extends Plugin, D extends PluginDependencies> = () => Promis
 }>
 type AnyModule = PluginModule<Plugin, PluginDependencies>
 
-//////////////
+/// ///////////
 
 type ExtractType<T, X extends Record<string, Metadata<T>>> = { [P in keyof X]:
   X[P] extends Metadata<infer Z> ? Z : never
 }
 
 export class Platform {
-
   // private COMPRESS_IDS = false
 
   // compressId(id: string): string {
@@ -93,20 +92,19 @@ export class Platform {
   private resolvers = new Map<string, AnyPlugin>()
   private resolvedProviders = new Map<string, Promise<ResourcePlugin>>()
 
-  resolve<T>(resource: Resource<T>): Promise<T> {
+  resolve<T> (resource: Resource<T>): Promise<T> {
     const kind = resource.substring(0, resource.indexOf(':'))
     let provider = this.resolvedProviders.get(kind)
     if (!provider) {
       const resourcePlugin = this.resolvers.get(kind)
-      if (!resourcePlugin)
-        throw new Error('no provider associated with resource kind: ' + kind)
+      if (!resourcePlugin) { throw new Error('no provider associated with resource kind: ' + kind) }
       provider = this.getPlugin(resourcePlugin as PluginId<ResourcePlugin>)
       this.resolvedProviders.set(kind, provider)
     }
     return provider.then(plugin => plugin.resolve(resource))
   }
 
-  setResolver(kind: string, resolver: PluginId<ResourcePlugin>) {
+  setResolver (kind: string, resolver: PluginId<ResourcePlugin>) {
     this.resolvers.set(kind, resolver)
   }
 
@@ -115,20 +113,19 @@ export class Platform {
   private plugins = new Map<AnyPlugin, Promise<Plugin>>()
   private locations = [] as [AnyDescriptor, AnyModule][]
 
-  private getLocation(id: PluginId<Plugin>): [AnyDescriptor, AnyModule] {
+  private getLocation (id: PluginId<Plugin>): [AnyDescriptor, AnyModule] {
     for (const location of this.locations) {
-      if (location[0].id === id)
-        return location
+      if (location[0].id === id) { return location }
     }
     throw new Error('no location provided for plugin: ' + id)
   }
 
-  // TODO #3 `PluginModule` type does not check against `PluginDescriptor` 
-  addLocation<P extends Plugin, X extends PluginDependencies>(plugin: PluginDescriptor<P, X>, module: PluginModule<P, X>) {
+  // TODO #3 `PluginModule` type does not check against `PluginDescriptor`
+  addLocation<P extends Plugin, X extends PluginDependencies> (plugin: PluginDescriptor<P, X>, module: PluginModule<P, X>) {
     this.locations.push([plugin, module as any])
   }
 
-  async getPlugin<T extends Plugin>(id: PluginId<T>): Promise<T> {
+  async getPlugin<T extends Plugin> (id: PluginId<T>): Promise<T> {
     const plugin = this.plugins.get(id)
     if (plugin) {
       return plugin as Promise<T>
@@ -144,7 +141,7 @@ export class Platform {
 
   // D E P E N D E N C I E S
 
-  private async resolveDependencies(deps: PluginDependencies): Promise<{ [key: string]: Plugin }> {
+  private async resolveDependencies (deps: PluginDependencies): Promise<{ [key: string]: Plugin }> {
     const result = {} as { [key: string]: Plugin }
     for (const key in deps) {
       const id = deps[key]
@@ -157,15 +154,15 @@ export class Platform {
 
   private metadata = new Map<string, any>()
 
-  getMetadata<T>(id: Metadata<T>): T | undefined {
+  getMetadata<T> (id: Metadata<T>): T | undefined {
     return this.metadata.get(id as string)
   }
 
-  setMetadata<T>(id: Metadata<T>, value: T): void {
+  setMetadata<T> (id: Metadata<T>, value: T): void {
     this.metadata.set(id as string, value)
   }
 
-  loadMetadata<T, X extends Record<string, Metadata<T>>>(ids: X, resources: ExtractType<T, X>) {
+  loadMetadata<T, X extends Record<string, Metadata<T>>> (ids: X, resources: ExtractType<T, X>) {
     for (const key in ids) {
       const id = ids[key]
       const resource = resources[key]
@@ -177,11 +174,11 @@ export class Platform {
   }
 }
 
-//////
+/// ///
 
 type Namespace = Record<string, Record<string, any>>
 
-function transform<N extends Namespace>(plugin: AnyPlugin, namespaces: N, f: (id: string, value: any) => any): N {
+function transform<N extends Namespace> (plugin: AnyPlugin, namespaces: N, f: (id: string, value: any) => any): N {
   const result = {} as Namespace
   for (const namespace in namespaces) {
     const extensions = namespaces[namespace]
@@ -194,15 +191,15 @@ function transform<N extends Namespace>(plugin: AnyPlugin, namespaces: N, f: (id
   return result as N
 }
 
-export function identify<N extends Namespace>(pluginId: AnyPlugin, namespace: N): N {
+export function identify<N extends Namespace> (pluginId: AnyPlugin, namespace: N): N {
   return transform(pluginId, namespace, (id: string, value) => value === '' ? id : value)
 }
 
-export function plugin<P extends Plugin, D extends PluginDependencies, N extends Namespace>(id: PluginId<P>, deps: D, namespace: N): PluginDescriptor<P, D> & N {
+export function plugin<P extends Plugin, D extends PluginDependencies, N extends Namespace> (id: PluginId<P>, deps: D, namespace: N): PluginDescriptor<P, D> & N {
   return { id, deps, ...identify(id, namespace) }
 }
 
-export function allValues(object: { [key: string]: Promise<any> }): Promise<{ [key: string]: any }> {
+export function allValues (object: { [key: string]: Promise<any> }): Promise<{ [key: string]: any }> {
   const keys = Object.keys(object)
   const values = Object.values(object)
   const all = Promise.all(values)

@@ -13,9 +13,9 @@
 // limitations under the License.
 //
 
-import { plugin, Resource, ResourcePlugin, Platform } from '..'
+import { Resource, Platform } from '..'
 
-import { plugin2State, TestPlugin } from './shared'
+import { plugin2State } from './shared'
 
 plugin2State.parsed = true
 

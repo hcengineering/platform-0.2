@@ -1,14 +1,14 @@
 //
 // Copyright © 2020 Anticrm Platform Contributors.
-// 
+//
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
 // obtain a copy of the License at https://www.eclipse.org/legal/epl-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// 
+//
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
@@ -17,63 +17,63 @@ import { Platform, Resource, AnyPlugin } from '@anticrm/platform'
 import { Db } from '@anticrm/platform-db'
 import core, {
   Obj, Doc, Ref, Bag, Class, Type, Emb,
-  PropertyType, BagOf, Content, CorePlugin, DiffDescriptors
+  PropertyType, BagOf, Content, CorePlugin
 } from '.'
 import { TSession, SessionProto, Konstructor, Layout } from './session'
 
-//////////
+/// ///////
 
 console.log('PLUGIN: parsed core')
 export default async (platform: Platform, deps: { db: Db }): Promise<CorePlugin> => {
   console.log('PLUGIN: started core')
 
-  class TSessionProto implements SessionProto {
-    getSession(): TSession { throw new Error('session provide the implementation') }
-    __mapKey(_class: Ref<Class<Obj>>, key: string): string | null { return null }
+  abstract class TSessionProto implements SessionProto {
+    getSession (): TSession { throw new Error('session provide the implementation') }
+    abstract __mapKey (_class: Ref<Class<Obj>>, key: string): string | null
   }
 
   class TEmb extends TSessionProto implements Emb {
     _class!: Ref<Class<this>>
-    toIntlString(plural?: number): string { return this.getClass().toIntlString(plural) }
-    getClass(): Class<this> {
+    toIntlString (plural?: number): string { return this.getClass().toIntlString(plural) }
+    getClass (): Class<this> {
       return this.getSession().getInstanceSync(this._class)
     }
 
-    __mapKey(_class: Ref<Class<Obj>>, key: string) { return key }
+    __mapKey (_class: Ref<Class<Obj>>, key: string) { return key }
   }
 
   class TDoc extends TSessionProto implements Doc {
     _class!: Ref<Class<this>>
     _id!: Ref<this>
-    toIntlString(plural?: number): string { return this.getClass().toIntlString(plural) }
-    getClass(): Class<this> {
+    toIntlString (plural?: number): string { return this.getClass().toIntlString(plural) }
+    getClass (): Class<this> {
       return this.getSession().getInstanceSync(this._class)
     }
 
-    as<T extends Doc>(_class: Ref<Class<T>>): Promise<T | undefined> {
+    as<T extends Doc> (_class: Ref<Class<T>>): Promise<T | undefined> {
       return this.getSession().as(this as unknown as Layout<Doc>, _class)
     }
-    mixins(): Ref<Class<Doc>>[] {
+
+    mixins (): Ref<Class<Doc>>[] {
       const layout = this as unknown as Layout<Doc>
       return layout.__layout._classes as Ref<Class<Doc>>[]
     }
 
-    __mapKey(_class: Ref<Class<Obj>>, key: string) { return key.startsWith('_') ? key : _class + '/' + key }
+    __mapKey (_class: Ref<Class<Obj>>, key: string) { return key.startsWith('_') ? key : _class + '/' + key }
   }
 
-  // T Y P E S 
+  // T Y P E S
 
   class TType<T extends PropertyType> extends TEmb implements Type<T> {
     _default?: T
-    exert(value: T, target?: PropertyType, key?: PropertyKey): any { return value ?? this._default }
-    hibernate(value: any): T { return value }
+    exert (value: T, target?: PropertyType, key?: PropertyKey): any { return value ?? this._default }
+    hibernate (value: any): T { return value }
   }
 
   class TInstanceOf<T extends Emb> extends TType<T> {
     of!: Ref<Class<T>>
-    exert(value: T) {
-      if (typeof value === 'object')
-        return this.getSession().instantiateSync(value._class, value)
+    exert (value: T) {
+      if (typeof value === 'object') { return this.getSession().instantiateSync(value._class, value) }
       return undefined
     }
   }
@@ -83,11 +83,11 @@ export default async (platform: Platform, deps: { db: Db }): Promise<CorePlugin>
   class ArrayProxyHandler implements ProxyHandler<PropertyType[]> {
     private type: Type<PropertyType>
 
-    constructor(type: Type<PropertyType>) {
+    constructor (type: Type<PropertyType>) {
       this.type = type
     }
 
-    get(target: PropertyType[], key: PropertyKey): any {
+    get (target: PropertyType[], key: PropertyKey): any {
       const value = Reflect.get(target, key)
       return this.type.exert(value)
     }
@@ -95,7 +95,7 @@ export default async (platform: Platform, deps: { db: Db }): Promise<CorePlugin>
 
   class TArrayOf<T extends PropertyType> extends TType<T[]> {
     of!: Type<T>
-    exert(value: T[]) {
+    exert (value: T[]) {
       console.log('array')
       console.log(value)
       return new Proxy(value, new ArrayProxyHandler(this.of))
@@ -107,11 +107,11 @@ export default async (platform: Platform, deps: { db: Db }): Promise<CorePlugin>
   class BagProxyHandler implements ProxyHandler<Bag<PropertyType>> {
     private type: Type<PropertyType>
 
-    constructor(type: Type<PropertyType>) {
+    constructor (type: Type<PropertyType>) {
       this.type = type
     }
 
-    get(target: Bag<PropertyType>, key: string): any {
+    get (target: Bag<PropertyType>, key: string): any {
       const value = Reflect.get(target, key)
       return this.type.exert(value)
     }
@@ -119,9 +119,8 @@ export default async (platform: Platform, deps: { db: Db }): Promise<CorePlugin>
 
   class TBagOf<T extends PropertyType> extends TType<Bag<T>> implements BagOf<T> {
     of!: Type<T>
-    exert(value: Bag<T>) {
-      if (typeof value === 'object')
-        return new Proxy(value, new BagProxyHandler(this.of))
+    exert (value: Bag<T>) {
+      if (typeof value === 'object') { return new Proxy(value, new BagProxyHandler(this.of)) }
       return undefined
     }
   }
@@ -133,9 +132,9 @@ export default async (platform: Platform, deps: { db: Db }): Promise<CorePlugin>
     _extends?: Ref<Class<Obj>>
     _native?: Resource<T>
 
-    abstract createConstructor(): Konstructor<T>
+    abstract createConstructor (): Konstructor<T>
 
-    newInstance(data: Content<T>): Promise<T> {
+    newInstance (data: Content<T>): Promise<T> {
       const session = this.getSession()
       let ctor = session.constructors.get(this._id) as Konstructor<T>
       if (!ctor) {
@@ -147,9 +146,9 @@ export default async (platform: Platform, deps: { db: Db }): Promise<CorePlugin>
   }
 
   class TStruct<T extends Obj> extends TStructuralFeature<T> {
-    toIntlString(plural?: number): string { return 'struct: ' + this._id }
+    toIntlString (plural?: number): string { return 'struct: ' + this._id }
 
-    createConstructor(): Konstructor<T> {
+    createConstructor (): Konstructor<T> {
       const session = this.getSession()
       const _class = this._id as Ref<Class<T>>
       return data => session.createEmb(_class, data)
@@ -157,9 +156,9 @@ export default async (platform: Platform, deps: { db: Db }): Promise<CorePlugin>
   }
 
   class TClass<T extends Doc> extends TStructuralFeature<T> {
-    toIntlString(plural?: number): string { return 'doc: ' + this._id }
+    toIntlString (plural?: number): string { return 'doc: ' + this._id }
 
-    createConstructor(): Konstructor<T> {
+    createConstructor (): Konstructor<T> {
       const session = this.getSession()
       const _class = this._id as Ref<Class<T>>
       return data => session.createDoc(_class, data)
@@ -169,44 +168,40 @@ export default async (platform: Platform, deps: { db: Db }): Promise<CorePlugin>
   // B O O T  S E S S I O N  &  P L U G I N
 
   class TCorePlugin implements CorePlugin {
-
     readonly platform: Platform
     readonly pluginId = core.id
 
     private session: TSession
     private prototypes = new Map<Resource<object>, object>()
 
-    constructor(platform: Platform, session: TSession) {
+    constructor (platform: Platform, session: TSession) {
       this.platform = platform
       this.session = session
     }
 
-    async resolve(resource: Resource<object>): Promise<object> {
+    async resolve (resource: Resource<object>): Promise<object> {
       const proto = this.prototypes.get(resource)
-      if (proto)
-        return proto
+      if (proto) { return proto }
       const index = resource.indexOf(':') + 1
       const dot = resource.indexOf('.', index)
       const plugin = resource.substring(index, dot) as AnyPlugin
       return platform.getPlugin(plugin).then(plugin => {
         const proto = this.prototypes.get(resource)
-        if (proto)
-          return proto
+        if (proto) { return proto }
         throw new Error('plugin ' + plugin + ' does not provide resource: ' + resource)
       })
     }
 
-    registerPrototype<T extends Obj>(id: Resource<T>, proto: T): void {
-      if (this.prototypes.get(id))
-        throw new Error('prototype ' + id + ' already registered')
+    registerPrototype<T extends Obj> (id: Resource<T>, proto: T): void {
+      if (this.prototypes.get(id)) { throw new Error('prototype ' + id + ' already registered') }
       this.prototypes.set(id, proto)
     }
 
-    getSession() { return this.session }
+    getSession () { return this.session }
 
     // U T I L I T Y
 
-    async getClassHierarchy(_class: Ref<Class<Obj>>): Promise<Ref<Class<Obj>>[]> {
+    async getClassHierarchy (_class: Ref<Class<Obj>>): Promise<Ref<Class<Obj>>[]> {
       const result = [] as Ref<Class<Obj>>[]
       let clazz = _class as Ref<Class<Obj>> | undefined
       while (clazz) {

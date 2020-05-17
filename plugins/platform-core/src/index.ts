@@ -1,21 +1,21 @@
 //
 // Copyright © 2020 Anticrm Platform Contributors.
-// 
+//
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
 // obtain a copy of the License at https://www.eclipse.org/legal/epl-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// 
+//
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// 
+//
 
 import { KeysByType } from 'simplytyped'
 import { plugin, PropType, AsString, Resource, ResourcePlugin, PluginId } from '@anticrm/platform'
-import db, { Container } from '@anticrm/platform-db'
+import db from '@anticrm/platform-db'
 
 export type AnyFunc = (...args: any[]) => any
 export type RemoveMethods<T extends object> = Omit<T, KeysByType<T, AnyFunc>>
@@ -134,14 +134,13 @@ export default plugin(
 
       StructuralFeature: '' as Resource<Class<Obj>>,
       Struct: '' as Resource<Class<Emb>>,
-      Class: '' as Resource<Class<Doc>>,
+      Class: '' as Resource<Class<Doc>>
     },
     class: {
       Doc: '' as Ref<Class<Doc>>,
 
       StructuralFeature: '' as Ref<Class<Class<Obj>>>,
       Class: '' as Ref<Class<Class<Obj>>>,
-      Struct: '' as Ref<Class<Class<Obj>>>,
-    },
+      Struct: '' as Ref<Class<Class<Obj>>>
+    }
   })
-
