@@ -14,5 +14,91 @@
 -->
 
 <template>
-  <div>Desktop!</div>
+  <div id="desktop">
+    <div class="center">
+      <svg>
+        <use xlink:href="../../assets/tiger.svg#tiger" />
+      </svg>
+    </div>
+  </div>
 </template>
+
+<style lang="scss">
+@import "~@anticrm/platform-ui-theme/css/_globals.scss";
+
+#desktop {
+  // display: grid;
+
+  // grid-template-columns: $pictogram-size 250px 1fr auto;
+  // grid-template-rows: $pictogram-size 1fr 24px;
+
+  height: 100vh;
+  background-color: $content-bg-color;
+
+  .center {
+    margin: auto;
+    width: 300px;
+    height: 300px;
+    padding-top: 200px;
+  }
+
+  svg {
+    fill: #000;
+    width: 100%;
+    height: 100%;
+  }
+
+  // header {
+  //   grid-column-start: 1;
+  //   grid-column-end: 5;
+
+  //   grid-row-start: 1;
+  //   grid-row-end: 2;
+
+  //   background-color: $header-bg-color;
+  //   border-bottom: 1px solid $workspace-separator-color;
+  // }
+
+  // nav {
+  //   grid-column-start: 1;
+  //   grid-column-end: 2;
+
+  //   grid-row-start: 2;
+  //   grid-row-end: 3;
+
+  //   background-color: $nav-bg-color;
+  // }
+
+  // main {
+  //   grid-column-start: 2;
+  //   grid-column-end: 4;
+
+  //   grid-row-start: 2;
+  //   grid-row-end: 3;
+
+  //   background-color: $content-bg-color;
+  //   padding: 0em 1em;
+  // }
+
+  // aside {
+  //   grid-column-start: 4;
+  //   grid-column-end: 5;
+
+  //   grid-row-start: 2;
+  //   grid-row-end: 3;
+
+  //   background-color: $header-bg-color;
+  //   border-left: 1px solid $workspace-separator-color;
+  // }
+
+  // footer {
+  //   grid-column-start: 1;
+  //   grid-column-end: 5;
+
+  //   grid-row-start: 3;
+  //   grid-row-end: 4;
+
+  //   background-color: purple;
+  // }
+}
+</style>
