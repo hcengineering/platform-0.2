@@ -13,12 +13,12 @@
 // limitations under the License.
 //
 
-import Vue, { VueConstructor } from 'vue'
 import { Obj, Class, Ref, CorePlugin } from '@anticrm/platform-core'
 import { Platform } from '@anticrm/platform'
-import ui, { UIPlugin, AttrModel, ClassUIModel, Component } from '.'
+import ui, { UIPlugin, AttrModel, ClassUIModel, VueConstructor, AnyComponent } from '.'
 
-// import Icon from './components/Icon.vue'
+import { createApp } from 'vue'
+import Desktop from './components/Desktop.vue'
 
 console.log('PLUGIN: ui loaded')
 
@@ -33,11 +33,16 @@ export default async (platform: Platform, deps: { core: CorePlugin }): Promise<U
   const core = deps.core
   const session = deps.core.getSession()
 
+  // V U E  A P P
+
+  const app = createApp(Desktop)
+  app.config.globalProperties.$platform = platform
+
   // C O M P O N E N T S
 
-  const components = new Map<Component<VueConstructor>, VueConstructor>()
+  const components = new Map<AnyComponent, VueConstructor>()
 
-  function getComponent(id: Component<VueConstructor>): VueConstructor {
+  function getComponent (id: AnyComponent): VueConstructor {
     const result = components.get(id)
     if (result) {
       return result
@@ -45,19 +50,19 @@ export default async (platform: Platform, deps: { core: CorePlugin }): Promise<U
     throw new Error('no Vue component: ' + id)
   }
 
-  Vue.component('widget', {
+  app.component('widget', {
     components: {},
     props: {
       component: String // as PropType<Component<VueConstructor>>
     },
-    render (h) {
-      return h(getComponent(this.component as Component<VueConstructor>))
+    render (h: any) {
+      return h(getComponent(this.component as AnyComponent))
     }
   })
 
   // U I  M O D E L S
 
-  async function getClassModel(_class: Ref<Class<Obj>>): Promise<ClassUIModel> {
+  async function getClassModel (_class: Ref<Class<Obj>>): Promise<ClassUIModel> {
     const clazz = await session.getInstance(_class)
     const decorator = await clazz.as(ui.class.ClassUIDecorator)
     const label = decorator?.label ?? _class
@@ -67,7 +72,7 @@ export default async (platform: Platform, deps: { core: CorePlugin }): Promise<U
     }
   }
 
-  function groupByType(model: AttrModel[]): { [key: string]: AttrModel[] } {
+  function groupByType (model: AttrModel[]): { [key: string]: AttrModel[] } {
     const result = {} as { [key: string]: AttrModel[] }
     model.forEach(attr => {
       const type = attr.type._class
@@ -89,7 +94,7 @@ export default async (platform: Platform, deps: { core: CorePlugin }): Promise<U
    3. Property `Type`'s Class UI Decorator `label` attribute
    4. Property `Type`'s Class synthetic id
    */
-  async function getOwnAttrModel(_class: Ref<Class<Obj>>, props?: string[]): Promise<AttrModel[]> {
+  async function getOwnAttrModel (_class: Ref<Class<Obj>>, props?: string[]): Promise<AttrModel[]> {
     const clazz = await session.getInstance(_class)
     const decorator = await clazz.as(ui.class.ClassUIDecorator)
     const keys = props ?? Object.getOwnPropertyNames(clazz._attributes)
@@ -116,7 +121,7 @@ export default async (platform: Platform, deps: { core: CorePlugin }): Promise<U
     return Promise.all(attrs)
   }
 
-  async function getAttrModel(_class: Ref<Class<Obj>>, props?: string[]): Promise<AttrModel[]> {
+  async function getAttrModel (_class: Ref<Class<Obj>>, props?: string[]): Promise<AttrModel[]> {
     const hierarchy = await core.getClassHierarchy(_class)
     const ownModels = hierarchy.map(clazz => getOwnAttrModel(clazz, props))
     return Promise.all(ownModels).then(result => result.flat())
@@ -130,6 +135,7 @@ export default async (platform: Platform, deps: { core: CorePlugin }): Promise<U
     getClassModel,
     groupByType,
     getOwnAttrModel,
-    getAttrModel
+    getAttrModel,
+    getApp () { return app }
   }
 }

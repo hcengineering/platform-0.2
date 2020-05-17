@@ -15,6 +15,17 @@
   -
   -->
 
+<script lang="ts">
+import { defineComponent } from 'vue'
+
+export default defineComponent({
+  name: 'ErrorPage',
+  props: {
+    msg: String,
+  },
+})
+</script>
+
 <template>
   <div>Error: UI Plugin did not load...</div>
 </template>

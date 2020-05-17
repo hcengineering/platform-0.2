@@ -19,7 +19,7 @@ import core from '@anticrm/platform-core'
 import i18n from '@anticrm/platform-core-i18n'
 import ui from '@anticrm/platform-ui'
 
-import Vue from 'vue'
+import { createApp } from 'vue';
 import Workbench from '@anticrm/platform-workbench/src/components/Workbench.vue'
 import ErrorPage from './components/ErrorPage.vue'
 
@@ -37,18 +37,11 @@ platform.setResolver('native', core.id)
 uiMeta(platform)
 contactMeta(platform)
 
-async function boot(): Promise<void> {
-  await platform.getPlugin(ui.id) // initialize Vue instance in `ui` plugin before first use.
-
-  Vue.config.productionTip = false
-  Vue.prototype.$platform = platform
-  new Vue({
-    render: h => h(Workbench)
-  }).$mount('#app')
+async function boot (): Promise<void> {
+  const uiPlugin = await platform.getPlugin(ui.id)
+  uiPlugin.getApp().mount('#app')
 }
 
 boot().catch(err => {
-  new Vue({
-    render: h => h(ErrorPage)
-  }).$mount('#app')
+  createApp(ErrorPage).mount('#app')
 })

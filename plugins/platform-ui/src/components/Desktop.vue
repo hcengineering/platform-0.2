@@ -13,30 +13,6 @@
 // limitations under the License.
 -->
 
-<script lang="ts">
-
-import { defineComponent } from 'vue'
-import { Metadata } from '@anticrm/platform'
-import ui from '..'
-
-export default defineComponent({
-  props: {
-    icon: {
-      type: String,
-      required: true
-    }
-  },
-  computed: {
-    url (): string {
-      return this.$platform.getMetadata(this.icon as Metadata<string>) ??
-        this.$platform.getMetadata(ui.icon.Search) ?? 'https://salesforce.com'
-    }
-  }
-})
-</script>
-
 <template>
-  <svg>
-    <use :xlink:href="url" />
-  </svg>
+  <div>Desktop!</div>
 </template>

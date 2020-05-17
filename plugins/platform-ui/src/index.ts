@@ -16,11 +16,14 @@
 import { Metadata, Plugin, PluginId, plugin, Platform, Resource } from '@anticrm/platform'
 import core, { Doc, Emb, Obj, AnyType, Ref, Class, Bag, Type } from '@anticrm/platform-core'
 import { IntlString } from '@anticrm/platform-core-i18n'
-import { VueConstructor } from 'vue'
+import { App } from 'vue'
 
 export type Asset = Metadata<string>
 
+export type VueConstructor = object
 export type Component<C extends VueConstructor> = Resource<C>
+export type AnyComponent = Component<VueConstructor>
+
 
 // M O D E L
 
@@ -55,10 +58,11 @@ export interface ClassUIModel {
 }
 
 export interface UIPlugin extends Plugin {
-  getClassModel(_class: Ref<Class<Obj>>): Promise<ClassUIModel>
-  groupByType(model: AttrModel[]): { [key: string]: AttrModel[] }
-  getOwnAttrModel(clazz: Ref<Class<Obj>>, props?: string[]): Promise<AttrModel[]>
-  getAttrModel(clazz: Ref<Class<Obj>>, props?: string[]): Promise<AttrModel[]>
+  getApp (): App
+  getClassModel (_class: Ref<Class<Obj>>): Promise<ClassUIModel>
+  groupByType (model: AttrModel[]): { [key: string]: AttrModel[] }
+  getOwnAttrModel (clazz: Ref<Class<Obj>>, props?: string[]): Promise<AttrModel[]>
+  getAttrModel (clazz: Ref<Class<Obj>>, props?: string[]): Promise<AttrModel[]>
 }
 
 // D E S C R I P T O R
@@ -77,7 +81,7 @@ export default plugin(
   },
   {
     component: {
-      Icon: '' as Component<VueConstructor>
+      Icon: '' as AnyComponent
     },
     icon: {
       AddGroup: '' as Asset,
