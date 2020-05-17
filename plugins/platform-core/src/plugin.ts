@@ -24,6 +24,12 @@ import { TSession, SessionProto, Konstructor, Layout } from './session'
 /// ///////
 
 console.log('PLUGIN: parsed core')
+
+/*!
+ * Anticrm Platform™ Core Plugin
+ * © 2020 Anticrm Platform Contributors. All Rights Reserved.
+ * Licensed under the Eclipse Public License, Version 2.0
+ */
 export default async (platform: Platform, deps: { db: Db }): Promise<CorePlugin> => {
   console.log('PLUGIN: started core')
 

@@ -36,6 +36,13 @@ export function synthIntlString(_id: Ref<Doc>, key: string): IntlString {
 
 console.log('PLUGIN: parsed i18n')
 export default async (platform: Platform, deps: { core: CorePlugin }): Promise<I18nPlugin> => {
+
+  /*!
+   * Anticrm Platform Core Internationalization Plugin
+   * Copyright © 2020 Anticrm Platform Contributors. All Rights Reserved.
+   * Licensed under the Eclipse Public License, Version 2.0
+   */
+
   console.log('PLUGIN: started i18n')
 
   class I18nPluginImpl implements I18nPlugin {

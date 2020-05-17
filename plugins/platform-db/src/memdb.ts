@@ -137,6 +137,11 @@ export class MemDb implements Db {
 }
 
 export default async (platform: Platform, deps: {}) => {
+  /*!
+   * Anticrm Platform Database Plugin
+   * Copyright © 2020 Anticrm Platform Contributors. All Rights Reserved.
+   * Licensed under the Eclipse Public License, Version 2.0
+   */
   return new MemDb()
 }
 

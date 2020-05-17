@@ -13,14 +13,34 @@
 // limitations under the License.
 //
 
-import Vue from 'vue'
 import { Platform } from '@anticrm/platform'
+import db from '@anticrm/platform-db'
+import core from '@anticrm/platform-core'
+import i18n from '@anticrm/platform-core-i18n'
+import ui from '@anticrm/platform-ui'
+
+import Vue from 'vue'
 import Workbench from '@anticrm/platform-workbench/src/components/Workbench.vue'
+import ErrorPage from './components/ErrorPage.vue'
 
-Vue.config.productionTip = false
+async function boot(): Promise<void> {
+  const platform = new Platform()
+  platform.addLocation(db, () => import(/* webpackChunkName: "platform-db" */ '@anticrm/platform-db/src/memdb'))
+  platform.addLocation(core, () => import(/* webpackChunkName: "platform-core" */ '@anticrm/platform-core/src/plugin'))
+  platform.addLocation(i18n, () => import(/* webpackChunkName: "platform-core-i18n" */ '@anticrm/platform-core-i18n/src/plugin'))
+  platform.addLocation(ui, () => import(/* webpackChunkName: "platform-ui" */ '@anticrm/platform-ui/src/plugin'))
 
-const platform = new Platform()
+  // const uiPlugin = await platform.getPlugin(ui.id)
 
-new Vue({
-  render: h => h(Workbench)
-}).$mount('#app')
+  Vue.config.productionTip = false
+  Vue.prototype.$platform = platform
+  new Vue({
+    render: h => h(Workbench)
+  }).$mount('#app')
+}
+
+boot().catch(err => {
+  new Vue({
+    render: h => h(ErrorPage)
+  }).$mount('#app')
+})

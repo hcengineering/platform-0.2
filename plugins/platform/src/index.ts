@@ -73,7 +73,13 @@ type ExtractType<T, X extends Record<string, Metadata<T>>> = { [P in keyof X]:
   X[P] extends Metadata<infer Z> ? Z : never
 }
 
+/*!
+ * Built on Anticrm Platform™
+ * Copyright © 2020 Anticrm Platform Contributors. All Rights Reserved.
+ * Licensed under the Eclipse Public License, Version 2.0
+ */
 export class Platform {
+
   // private COMPRESS_IDS = false
 
   // compressId(id: string): string {

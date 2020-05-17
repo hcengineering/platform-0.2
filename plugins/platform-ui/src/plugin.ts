@@ -109,6 +109,13 @@ class UIPluginImpl implements UIPlugin {
 
 console.log('PLUGIN: parsed ui')
 export default async (platform: Platform, deps: { i18n: I18nPlugin, core: CorePlugin }) => {
+
+  /*!
+   * Anticrm Platform UI Plugin
+   * Copyright © 2020 Anticrm Platform Contributors. All Rights Reserved.
+   * Licensed under the Eclipse Public License, Version 2.0
+   */
+
   console.log('PLUGIN: started ui')
 
   const uiPlugin = new UIPluginImpl(platform, deps)

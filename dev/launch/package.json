@@ -7,9 +7,10 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
+    "@anticrm/platform": "0.1.0",
+    "@anticrm/platform-workbench": "0.1.0",
     "core-js": "^3.6.4",
-    "vue": "^2.6.11",
-    "@anticrm/platform-workbench": "0.1.0"
+    "vue": "^2.6.11"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.3.0",
