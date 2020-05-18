@@ -13,6 +13,8 @@
 // limitations under the License.
 //
 
+import { identify, AnyPlugin } from '@anticrm/platform'
+
 /** This is the only allowed type for an object property */
 type Property<T> = { __property: T }
 
@@ -41,7 +43,6 @@ interface Doc extends Obj {
 }
 
 interface Type<T> extends Obj {
-
 }
 
 /////
@@ -73,32 +74,60 @@ type Class<T extends Obj> = EClass<T, Obj>
 /////
 
 interface Session {
+  // mixin<D extends T, M extends T, T extends Doc> (doc: D, clazz: Ref<EClass<M, T>>, values: Omit<M, keyof T>): M 
   // newInstance       <M extends T, T extends Doc>         (clazz: Ref<EClass<M, T>>, values: Omit<M, keyof T>): M 
   //     newInstance === mixin, where D = Doc & T = Doc
-  // mixin<D extends T, M extends T, T extends Doc> (doc: D, clazz: Ref<EClass<M, T>>, values: Omit<M, keyof T>): M 
+  // newClass
+  //     newClass === newInstance, where M === EClass<T, E> // clazz: Ref<Class<EClass<T, E>>>,
 
-  newInstance<M extends Obj> (clazz: Ref<Class<M>>, values: Omit<M, keyof Obj>): M
   mixin<D extends T, M extends T, T extends Doc> (doc: D, clazz: Ref<EClass<M, T>>, values: Omit<M, keyof T>): M
+  newInstance<M extends Obj> (clazz: Ref<Class<M>>, values: Omit<M, keyof Obj>): M
+  newClass<T extends E, E extends Obj> (values: Omit<EClass<T, E>, keyof Obj>): EClass<T, E>
 }
 
-interface Person extends Doc {
-  firstName: Str
-  lastName: Str
-}
 
-const x = {} as EClass<Person, Doc>
+// interface Person extends Doc {
+//   firstName: Str
+//   lastName: Str
+// }
 
-x._attributes.firstName
-
-const y = {} as Class<Class<Obj>>
-
-const refPerson = '' as Ref<Class<Person>>
-const refClassClass = '' as Ref<Class<EClass<Person, Doc>>>
-const refTypeString = '' as Ref<Class<Type<string>>>
+const core = identify('core' as AnyPlugin, {
+  class: {
+    Obj: '' as Ref<Class<Obj>>,
+    Doc: '' as Ref<Class<Doc>>,
+    Class: '' as Ref<Class<Class<Obj>>>,
+    // Person: '' as Ref<Class<Person>>,
+  }
+})
 
 const S = {} as Session
 
-const z = S.newInstance(refPerson, { firstName: 'John' as Str, lastName: 'Carmack' as Str, _id: '' as Ref<Person> })
+
+const classObj = S.newClass<Obj, Obj>({
+  _id: '' as Ref<Class<Obj>>,
+  _attributes: {}
+})
+
+const classDoc = S.newClass<Doc, Obj>({
+  _id: '' as Ref<Class<Doc>>,
+  _attributes: {
+    _id: ''
+  }
+})
+
+// const x = {} as EClass<Person, Doc>
+
+// x._attributes.firstName
+
+// const y = {} as Class<Class<Obj>>
+
+// const refPerson = '' as Ref<Class<Person>>
+// const refClassClass = '' as Ref<Class<EClass<Person, Doc>>> (!)
+// const refTypeString = '' as Ref<Class<Type<string>>>
+
+// const S = {} as Session
+
+// const z = S.newInstance(refPerson, { firstName: 'John' as Str, lastName: 'Carmack' as Str, _id: '' as Ref<Person> })
 // const v = S.newInstance(refClassClass, {
 //   _attributes: {
 //     firstName: S.newInstance(refTypeString, {}),
