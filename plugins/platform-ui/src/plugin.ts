@@ -77,6 +77,10 @@ export default async (platform: Platform, deps: {}): Promise<BootService> => {
       }
     },
     render () {
+      const cached = components.get(this.component)
+      if (cached) {
+        return h(cached)
+      }
       if (this.component !== this.resolved) {
         resolve(this.component as AnyComponent).then(resolved => {
           this.resolved = this.component
