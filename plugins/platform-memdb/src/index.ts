@@ -54,11 +54,22 @@ type PropertyTypes<T> = { [P in keyof T]:
 }
 export type Attributes<T extends E, E extends Obj> = PropertyTypes<Omit<T, keyof E>>
 
-interface EClass<T extends E, E extends Obj> extends Doc {
+export interface EClass<T extends E, E extends Obj> extends Doc {
   _attributes: Attributes<T, E>
 }
 
 export type Class<T extends Obj> = EClass<T, Obj>
+
+//////
+
+export type Instance<T extends Obj> = { [P in keyof T]:
+  T[P] extends Property<infer X> ? X :
+  T[P] extends { [key: string]: PropertyType } ? Bag<PropertyType> :
+  never
+}
+
+// const zzz = {} as Instance<Class<Obj>>
+// zzz._attributes
 
 export interface Session {
   // -- Here is a single fundamental signature: `mixin`:

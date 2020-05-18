@@ -14,23 +14,36 @@
 //
 
 import { Platform } from '@anticrm/platform'
-import { Session, Obj, Ref, Class, Doc } from '.'
+import { Session, Obj, Ref, Class, Doc, EClass } from '.'
 
-export default async (platform: Platform): Promise<Session> => {
 
-  const objects = new Map<Ref<Doc>, Doc>()
-  const byClass = new Map<Ref<Class<Doc>>, Doc[]>()
+class Tx implements Session {
 
-  function newDocument<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Doc>): M {
+  private objects = new Map<Ref<Doc>, Doc>()
+  private byClass = new Map<Ref<Class<Doc>>, Doc[]>()
+
+  mixin<D extends T, M extends T, T extends Doc> (doc: D, clazz: Ref<EClass<M, T>>, values: Pick<M, Exclude<keyof M, keyof T>>): M {
+    throw new Error("Method not implemented.")
+  }
+  newInstance<M extends Obj> (clazz: Ref<Class<M>>, values: Pick<M, Exclude<keyof M, "_class">>): M {
+    throw new Error("Method not implemented.")
+  }
+
+  newDocument<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Doc>): M {
     const _id = '' as Ref<M>
     const instance = { _class, _id, ...values } as M
-    objects.set(_id, instance)
+    this.objects.set(_id, instance)
 
     return instance
   }
 
+  newClass<T extends E, E extends Obj> (values: Pick<EClass<T, E>, "_id" | "_mixins" | "_attributes">): EClass<T, E> {
+    throw new Error("Method not implemented.")
+  }
 
-  return {
-    newDocument
-  } as Session
+}
+
+
+export default async (platform: Platform): Promise<Session> => {
+  return new Tx()
 }
