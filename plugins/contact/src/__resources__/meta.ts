@@ -14,7 +14,8 @@
 //
 
 import { Platform } from '@anticrm/platform'
-import contact from '.'
+
+import contact from '..'
 
 export default (platform: Platform) => {
   const spritesUrl = require('../../assets/icons.svg')
@@ -24,4 +25,4 @@ export default (platform: Platform) => {
     Twitter: spritesUrl + '#date',
     Address: spritesUrl + '#address',
   })
-} 
+}

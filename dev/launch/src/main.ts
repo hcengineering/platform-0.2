@@ -18,37 +18,36 @@ import db from '@anticrm/platform-db'
 import core from '@anticrm/platform-core'
 import i18n from '@anticrm/platform-core-i18n'
 import ui from '@anticrm/platform-ui'
+import uiModel from '@anticrm/platform-ui-model'
+import workbench from '@anticrm/platform-workbench'
 
-import Vue from 'vue'
-import Workbench from '@anticrm/platform-workbench/src/components/Workbench.vue'
+import { createApp } from 'vue'
 import ErrorPage from './components/ErrorPage.vue'
 
-import uiMeta from '@anticrm/platform-ui/src/__resources__/meta'
+import uiMeta from '@anticrm/platform-ui-model/src/__resources__/meta'
 import contactMeta from '@anticrm/contact/src/__resources__/meta'
 
 const platform = new Platform()
+platform.setMetadata(ui.metadata.DefaultApplication, workbench.component.Workbench)
+
 platform.addLocation(db, () => import(/* webpackChunkName: "platform-db" */ '@anticrm/platform-db/src/memdb'))
 platform.addLocation(core, () => import(/* webpackChunkName: "platform-core" */ '@anticrm/platform-core/src/plugin'))
 platform.addLocation(i18n, () => import(/* webpackChunkName: "platform-core-i18n" */ '@anticrm/platform-core-i18n/src/plugin'))
 platform.addLocation(ui, () => import(/* webpackChunkName: "platform-ui" */ '@anticrm/platform-ui/src/plugin'))
+platform.addLocation(uiModel, () => import(/* webpackChunkName: "platform-ui-model" */ '@anticrm/platform-ui-model/src/plugin'))
+platform.addLocation(workbench, () => import(/* webpackChunkName: "platform-workbench" */ '@anticrm/platform-workbench/src/plugin'))
 
 platform.setResolver('native', core.id)
+platform.setResolver('component', ui.id)
 
 uiMeta(platform)
 contactMeta(platform)
 
-async function boot(): Promise<void> {
-  await platform.getPlugin(ui.id) // initialize Vue instance in `ui` plugin before first use.
-
-  Vue.config.productionTip = false
-  Vue.prototype.$platform = platform
-  new Vue({
-    render: h => h(Workbench)
-  }).$mount('#app')
+async function boot (): Promise<void> {
+  const uiPlugin = await platform.getPlugin(ui.id)
+  uiPlugin.getApp().mount('#app')
 }
 
 boot().catch(err => {
-  new Vue({
-    render: h => h(ErrorPage)
-  }).$mount('#app')
+  createApp(ErrorPage).mount('#app')
 })

@@ -15,7 +15,6 @@
 
 import { Ref, Class, Type } from '@anticrm/platform-core'
 import { extendIds } from '@anticrm/platform-core/src/__resources__/utils'
-import { Asset } from '@anticrm/platform-ui'
 import { IntlString } from '@anticrm/platform-core-i18n'
 
 import contact from '..'
@@ -26,12 +25,6 @@ export default extendIds(contact, {
     Phone: '' as Ref<Class<Type<string>>>,
     Twitter: '' as Ref<Class<Type<string>>>,
     Address: '' as Ref<Class<Type<string>>>,
-  },
-  icon: {
-    Email: '' as Asset,
-    Phone: '' as Asset,
-    Twitter: '' as Asset,
-    Address: '' as Asset,
   },
   string: {
     Email: '' as IntlString,

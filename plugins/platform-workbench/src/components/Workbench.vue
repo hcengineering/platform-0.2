@@ -24,7 +24,7 @@
     </nav>
 
     <main>
-      <widget component="component:ui.Icon"/>
+<!--      <widget component="component:ui.Icon"/>-->
     </main>
 
     <aside>

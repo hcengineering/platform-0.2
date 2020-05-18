@@ -16,16 +16,35 @@
   -->
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+  import { defineComponent } from 'vue'
+  import { PluginInfo, PluginStatus } from '@anticrm/platform'
 
-export default defineComponent({
-  name: 'ErrorPage',
-  props: {
-    msg: String,
-  },
-})
+  export default defineComponent({
+    props: {
+      plugins: Array
+    },
+    setup() {
+      return {
+        status(info: PluginInfo) {
+          return (info.status === PluginStatus.RUNNING) ? '☀︎' : '&nbsp;'
+        }
+      }
+    }
+  })
 </script>
 
 <template>
-  <div>Error: UI Plugin did not load...</div>
+  <table class="container">
+    <tr v-for="config in plugins">
+      <td>platform-{{config.id}}</td>&nbsp;
+      <td>{{config.version}}</td>
+      <td v-html="status(config)"/>
+    </tr>
+  </table>
 </template>
+
+<style scoped lang="scss">
+.container {
+  border-spacing: 0;
+}
+</style>

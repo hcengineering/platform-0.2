@@ -20,7 +20,7 @@ import { Platform } from '@anticrm/platform'
 
 import core, { Obj, Doc, Ref, Class } from '@anticrm/platform-core'
 
-import ui, { UIPlugin, AttrModel } from '@anticrm/platform-ui'
+import ui, { UIPlugin, AttrModel } from '@anticrm/platform-ui-model'
 import PropPanel from './PropPanel.vue'
 
 async function getClassHierarchy(platform: Platform, object: Promise<Obj>): Promise<Ref<Class<Obj>>[]> {

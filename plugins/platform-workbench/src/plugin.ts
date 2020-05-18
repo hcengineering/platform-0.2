@@ -13,22 +13,23 @@
 // limitations under the License.
 //
 
-import { Resource, PluginId, plugin, Plugin, Metadata, ResourcePlugin } from '@anticrm/platform'
-import { App } from 'vue'
+import { Platform, Plugin } from '@anticrm/platform'
+import { BootService } from '@anticrm/platform-ui'
 
-export type Asset = Metadata<string>
+import workbench from '.'
+import Workbench from './components/Workbench.vue'
 
-export type VueConstructor = object
-export type Component<C extends VueConstructor> = Resource<C>
-export type AnyComponent = Component<VueConstructor>
+console.log('Plugin `workbench` loaded')
 
-export interface BootService extends ResourcePlugin {
-  getApp (): App
-  registerComponent(id: AnyComponent, component: VueConstructor): void
+/*!
+ * Anticrm Platform™ Workbench Plugin
+ * © 2020 Anticrm Platform Contributors. All Rights Reserved.
+ * Licensed under the Eclipse Public License, Version 2.0
+ */
+export default async (platform: Platform, deps: { ui: BootService}): Promise<Plugin> => {
+  console.log('Plugin `workbench` started')
+
+  deps.ui.registerComponent(workbench.component.Workbench, Workbench)
+
+  return {}
 }
-
-export default plugin('boot' as PluginId<BootService>, {}, {
-  metadata: {
-    DefaultApplication: '' as Metadata<AnyComponent>
-  }
-})

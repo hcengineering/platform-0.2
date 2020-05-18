@@ -21,7 +21,7 @@ import db from '@anticrm/platform-db'
 import core, { Ref, Class, Obj } from '@anticrm/platform-core'
 import i18n from '../__resources__'
 import contact from '@anticrm/contact/src/__resources__'
-import ui from '@anticrm/platform-ui/src/__resources__'
+import ui from '@anticrm/platform-ui-model/src/__resources__'
 
 const ids = identify('test' as PluginId<Plugin>, {
   string: {

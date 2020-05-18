@@ -16,17 +16,17 @@
 import { Platform } from '@anticrm/platform'
 import { Db } from '@anticrm/platform-db'
 import { CorePlugin } from '@anticrm/platform-core'
-import { UIPlugin } from '@anticrm/platform-ui'
+import { UIPlugin } from '@anticrm/platform-ui-model'
 
 import { LaunchPlugin } from '..'
 
 import { metaModel } from '@anticrm/platform-core/src/__resources__/model'
 
 import CoreBuilder from '@anticrm/platform-core/src/__resources__/builder'
-import UIBuilder from '@anticrm/platform-ui/src/__resources__/builder'
+import UIBuilder from '@anticrm/platform-ui-model/src/__resources__/builder'
 
 import i18nModel from '@anticrm/platform-core-i18n/src/__resources__/model'
-import uiModel from '@anticrm/platform-ui/src/__resources__/model'
+import uiModel from '@anticrm/platform-ui-model/src/__resources__/model'
 import contactModel from '@anticrm/contact/src/__resources__/model'
 
 export default async (platform: Platform, deps: {

@@ -17,7 +17,7 @@ import { Platform, identify, Plugin, PluginId } from '@anticrm/platform'
 import db from '@anticrm/platform-db'
 import core from '@anticrm/platform-core'
 import i18n from '@anticrm/platform-core-i18n'
-import ui from '@anticrm/platform-ui'
+import ui from '@anticrm/platform-ui-model'
 
 import launch from '..'
 

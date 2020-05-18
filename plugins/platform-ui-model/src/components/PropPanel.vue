@@ -20,7 +20,7 @@ import { Platform } from '@anticrm/platform'
 
 import { Obj, Class, Ref } from '@anticrm/platform-core'
 
-import ui, { UIPlugin, AttrModel } from '@anticrm/platform-ui'
+import ui, { UIPlugin, AttrModel } from '@anticrm/platform-ui-model'
 import InlineEdit from '@anticrm/platform-ui-controls/src/InlineEdit.vue'
 import Icon from './Icon.vue'
 

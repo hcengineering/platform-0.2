@@ -14,7 +14,7 @@
 //
 
 import { modelTranslation } from '@anticrm/platform-core-i18n/src/__resources__/utils'
-import ui from '@anticrm/platform-ui/src/__resources__'
+import ui from '@anticrm/platform-ui-model/src/__resources__'
 import contact from '..'
 
 export default modelTranslation(contact.class, ui.class.ClassUIDecorator, {
