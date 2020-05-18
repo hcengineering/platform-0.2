@@ -16,7 +16,7 @@
 import { Platform } from '@anticrm/platform'
 import { Db } from '@anticrm/platform-db'
 import { CorePlugin } from '@anticrm/platform-core'
-import { UIPlugin } from '@anticrm/platform-ui'
+import { UIPlugin } from '@anticrm/platform-ui-model'
 
 import { LaunchPlugin } from '..'
 

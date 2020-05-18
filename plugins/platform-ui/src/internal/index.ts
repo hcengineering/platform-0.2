@@ -13,3 +13,9 @@
 // limitations under the License.
 //
 
+import { reactive } from 'vue'
+import { AnyComponent } from '..'
+
+export const platformConfig = reactive({
+  app: undefined as (AnyComponent | undefined)
+})

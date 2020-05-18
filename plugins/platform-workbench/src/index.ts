@@ -13,3 +13,13 @@
 // limitations under the License.
 //
 
+import { plugin, PluginId, Plugin } from '@anticrm/platform'
+import ui, { AnyComponent } from '@anticrm/platform-ui'
+
+export default plugin('workbench' as PluginId<Plugin>, {
+  ui: ui.id
+}, {
+  component: {
+    Workbench: '' as AnyComponent
+  }
+})

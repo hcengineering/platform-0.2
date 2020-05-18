@@ -18,20 +18,25 @@ import db from '@anticrm/platform-db'
 import core from '@anticrm/platform-core'
 import i18n from '@anticrm/platform-core-i18n'
 import ui from '@anticrm/platform-ui'
+import workbench from '@anticrm/platform-workbench'
 
-import { createApp } from 'vue';
+import { createApp } from 'vue'
 import ErrorPage from './components/ErrorPage.vue'
 
-import uiMeta from '@anticrm/platform-ui/src/__resources__/meta'
+import uiMeta from '@anticrm/platform-ui-model/src/__resources__/meta'
 import contactMeta from '@anticrm/contact/src/__resources__/meta'
 
 const platform = new Platform()
+platform.setMetadata(ui.metadata.DefaultApplication, workbench.component.Workbench)
+
 platform.addLocation(db, () => import(/* webpackChunkName: "platform-db" */ '@anticrm/platform-db/src/memdb'))
 platform.addLocation(core, () => import(/* webpackChunkName: "platform-core" */ '@anticrm/platform-core/src/plugin'))
 platform.addLocation(i18n, () => import(/* webpackChunkName: "platform-core-i18n" */ '@anticrm/platform-core-i18n/src/plugin'))
 platform.addLocation(ui, () => import(/* webpackChunkName: "platform-ui" */ '@anticrm/platform-ui/src/plugin'))
+platform.addLocation(workbench, () => import(/* webpackChunkName: "platform-workbench" */ '@anticrm/platform-workbench/src/plugin'))
 
 platform.setResolver('native', core.id)
+platform.setResolver('component', ui.id)
 
 uiMeta(platform)
 contactMeta(platform)

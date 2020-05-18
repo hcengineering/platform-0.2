@@ -14,10 +14,9 @@
 -->
 
 <script lang="ts">
+import { defineComponent } from 'vue'
 
-import Vue from 'vue'
-
-export default Vue.extend({
+export default defineComponent({
   props: {
     disabled: Boolean
   }
@@ -25,7 +24,7 @@ export default Vue.extend({
 </script>
 
 <template>
-  <button type="button" class="erp-button" :disabled="disabled" @click="$emit('click')">
+  <button type="button" class="erp-button" :disabled="disabled">
     <slot />
   </button>
 </template>

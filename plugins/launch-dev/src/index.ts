@@ -16,7 +16,7 @@
 import { plugin, Plugin, PluginId } from '@anticrm/platform'
 import db, { Db } from '@anticrm/platform-db'
 import core, { Session } from '@anticrm/platform-core'
-import ui, { UIPlugin } from '@anticrm/platform-ui'
+import ui, { UIPlugin } from '@anticrm/platform-ui-model'
 
 export interface LaunchPlugin extends Plugin {
   readonly db: Db

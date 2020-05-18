@@ -73,13 +73,23 @@ type ExtractType<T, X extends Record<string, Metadata<T>>> = { [P in keyof X]:
   X[P] extends Metadata<infer Z> ? Z : never
 }
 
+export enum PluginStatus {
+  STOPPED,
+  RUNNING,
+}
+
+export interface PluginInfo {
+  id: AnyPlugin
+  version: string,
+  status: PluginStatus
+}
+
 /*!
  * Built on Anticrm Platform™
  * Copyright © 2020 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */
 export class Platform {
-
   // private COMPRESS_IDS = false
 
   // compressId(id: string): string {
@@ -143,6 +153,19 @@ export class Platform {
       this.plugins.set(id, plugin)
       return plugin as Promise<T>
     }
+  }
+
+  getPluginInfos (): PluginInfo[] {
+    return this.locations.map(location => {
+      const id = location[0].id
+      const plugin = this.plugins.get(id)
+      const info: PluginInfo = {
+        id,
+        version: '0.1.0',
+        status: plugin ? PluginStatus.RUNNING : PluginStatus.STOPPED
+      }
+      return info
+    })
   }
 
   // D E P E N D E N C I E S

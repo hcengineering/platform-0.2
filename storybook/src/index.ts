@@ -18,7 +18,7 @@ import { Platform } from '@anticrm/platform'
 import db from '@anticrm/platform-db'
 import core, { Session } from '@anticrm/platform-core'
 import i18n from '@anticrm/platform-core-i18n'
-import ui, { UIPlugin } from '@anticrm/platform-ui'
+import ui, { UIPlugin } from '@anticrm/platform-ui-model'
 import launch from '@anticrm/launch-dev'
 
 import uiMeta from '@anticrm/platform-ui/src/__resources__/meta'
