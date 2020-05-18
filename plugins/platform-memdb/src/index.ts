@@ -97,6 +97,7 @@ const core = identify('core' as AnyPlugin, {
     Doc: '' as Ref<Class<Doc>>,
     Class: '' as Ref<Class<Class<Obj>>>,
     // Person: '' as Ref<Class<Person>>,
+    Type: '' as Ref<Class<Type<PropertyType>>>
   }
 })
 
@@ -111,7 +112,14 @@ const classObj = S.newClass<Obj, Obj>({
 const classDoc = S.newClass<Doc, Obj>({
   _id: '' as Ref<Class<Doc>>,
   _attributes: {
-    _id: ''
+    _id: S.newInstance(core.class.Type, {})
+  }
+})
+
+const classClass = S.newClass<Class<Obj>, Doc>({
+  _id: '' as Ref<Class<Class<Obj>>>,
+  _attributes: {
+    _attributes: S.newInstance(core.class.Type, {})
   }
 })
 
