@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { identify, AnyPlugin } from '@anticrm/platform'
+import { plugin, AnyPlugin } from '@anticrm/platform'
 
 /** This is the only allowed type for an object property */
 type Property<T> = { __property: T }
@@ -29,15 +29,15 @@ type Str = StringProperty<string>
 
 type Resource<T> = { __resource: T }
 
-type Ref<T> = StringProperty<T> & { __ref: true }
+export type Ref<T> = StringProperty<T> & { __ref: true }
 
-type Bag<T extends PropertyType> = { [key: string]: T }
+type Bag<T extends PropertyType> = { [key: string]: T } // & Property<{ [key: string]: T }>
 
-interface Obj {
+export interface Obj {
   _class: Ref<Class<this>>
 }
 
-interface Doc extends Obj {
+export interface Doc extends Obj {
   _id: Ref<this>
   _mixins?: Ref<Class<Doc>>[]
 }
@@ -47,41 +47,33 @@ interface Type<T> extends Obj {
 
 /////
 
-type AsDescrtiptors<T> = { [P in keyof T]:
+type PropertyTypes<T> = { [P in keyof T]:
   T[P] extends Property<infer X> ? Type<X> :
   T[P] extends { [key: string]: PropertyType } ? Type<Bag<PropertyType>> :
   never
 }
-type Descriptors<T extends object> = AsDescrtiptors<T>
-export type Attributes<T extends E, E extends Obj> = Descriptors<Omit<T, keyof E>>
+export type Attributes<T extends E, E extends Obj> = PropertyTypes<Omit<T, keyof E>>
 
 interface EClass<T extends E, E extends Obj> extends Doc {
   _attributes: Attributes<T, E>
 }
 
-type Class<T extends Obj> = EClass<T, Obj>
+export type Class<T extends Obj> = EClass<T, Obj>
 
-////////////
-
-// type Instantiate<O> = {
-//   [P in keyof O]: O[P] extends Property<infer T> ? T : never
-// }
-
-// function newInstance<I extends object, X extends { [key: string]: PropertyType }> (intf: Ref<I>, object: X): Instantiate<X> {
-//   return {} as Instantiate<X>
-// }
-
-/////
-
-interface Session {
+export interface Session {
+  // -- Here is a single fundamental signature: `mixin`:
   // mixin<D extends T, M extends T, T extends Doc> (doc: D, clazz: Ref<EClass<M, T>>, values: Omit<M, keyof T>): M 
-  // newInstance       <M extends T, T extends Doc>         (clazz: Ref<EClass<M, T>>, values: Omit<M, keyof T>): M 
+
+  // newInstance       <M        extends       Obj>         (clazz: Ref<Class<M>>,     values: Omit<M, keyof Obj>): M 
+  //     newInstance === mixin, where D = Doc & T = Doc
+  // newDocument       <M        extends       Doc>         (clazz: Ref<Class<M>>,     values: Omit<M, keyof Doc>): M 
   //     newInstance === mixin, where D = Doc & T = Doc
   // newClass
   //     newClass === newInstance, where M === EClass<T, E> // clazz: Ref<Class<EClass<T, E>>>,
 
   mixin<D extends T, M extends T, T extends Doc> (doc: D, clazz: Ref<EClass<M, T>>, values: Omit<M, keyof T>): M
   newInstance<M extends Obj> (clazz: Ref<Class<M>>, values: Omit<M, keyof Obj>): M
+  newDocument<M extends Doc> (clazz: Ref<Class<M>>, values: Omit<M, keyof Doc>): M
   newClass<T extends E, E extends Obj> (values: Omit<EClass<T, E>, keyof Obj>): EClass<T, E>
 }
 
@@ -91,7 +83,7 @@ interface Session {
 //   lastName: Str
 // }
 
-const core = identify('core' as AnyPlugin, {
+const core = plugin('core' as AnyPlugin, {}, {
   class: {
     Obj: '' as Ref<Class<Obj>>,
     Doc: '' as Ref<Class<Doc>>,
@@ -101,8 +93,9 @@ const core = identify('core' as AnyPlugin, {
   }
 })
 
-const S = {} as Session
+export default core
 
+const S = {} as Session
 
 const classObj = S.newClass<Obj, Obj>({
   _id: '' as Ref<Class<Obj>>,
@@ -122,6 +115,8 @@ const classClass = S.newClass<Class<Obj>, Doc>({
     _attributes: S.newInstance(core.class.Type, {})
   }
 })
+
+
 
 // const x = {} as EClass<Person, Doc>
 
