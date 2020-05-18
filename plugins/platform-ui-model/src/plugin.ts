@@ -20,7 +20,7 @@ import ui, { UIPlugin, AttrModel, ClassUIModel } from '.'
 console.log('PLUGIN: ui loaded')
 
 /*!
- * Anticrm Platform™ UI Plugin
+ * Anticrm Platform™ UI Model Plugin
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */

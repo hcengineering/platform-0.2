@@ -14,6 +14,7 @@ jobs:
         yarn workspace @anticrm/platform run test
         yarn workspace @anticrm/platform-core run test
         yarn workspace @anticrm/platform-core-i18n run test
+        yarn workspace @anticrm/platform-ui-model run test
     - name: Run lint
       run: |
         yarn workspace @anticrm/platform run lint

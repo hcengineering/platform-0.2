@@ -23,10 +23,10 @@ import { LaunchPlugin } from '..'
 import { metaModel } from '@anticrm/platform-core/src/__resources__/model'
 
 import CoreBuilder from '@anticrm/platform-core/src/__resources__/builder'
-import UIBuilder from '@anticrm/platform-ui/src/__resources__/builder'
+import UIBuilder from '@anticrm/platform-ui-model/src/__resources__/builder'
 
 import i18nModel from '@anticrm/platform-core-i18n/src/__resources__/model'
-import uiModel from '@anticrm/platform-ui/src/__resources__/model'
+import uiModel from '@anticrm/platform-ui-model/src/__resources__/model'
 import contactModel from '@anticrm/contact/src/__resources__/model'
 
 export default async (platform: Platform, deps: {

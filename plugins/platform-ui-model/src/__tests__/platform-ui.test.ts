@@ -19,7 +19,7 @@ import core, { Ref } from '@anticrm/platform-core'
 import i18n from '@anticrm/platform-core-i18n'
 import launch from '@anticrm/launch-dev'
 import contact, { Contact } from '@anticrm/contact'
-import ui from '../__resources__/'
+import uiModel from '../__resources__/'
 import ru from '@anticrm/contact/src/__resources__/strings/ru'
 
 describe('session', () => {
@@ -28,7 +28,7 @@ describe('session', () => {
   platform.addLocation(db, () => import('@anticrm/platform-db/src/memdb'))
   platform.addLocation(i18n, () => import('@anticrm/platform-core-i18n/src/plugin'))
   platform.addLocation(core, () => import('@anticrm/platform-core/src/plugin'))
-  platform.addLocation(ui, () => import('@anticrm/platform-ui/src/plugin'))
+  platform.addLocation(uiModel, () => import('../plugin'))
   platform.addLocation(launch, () => import('@anticrm/launch-dev/src/launch'))
   platform.setResolver('native', core.id)
 
@@ -40,13 +40,13 @@ describe('session', () => {
 
   it('should build ClassUIModel', async () => {
     const sess = await session
-    const uiPlugin = await platform.getPlugin(ui.id)
+    const uiPlugin = await platform.getPlugin(uiModel.id)
     const classModel = await uiPlugin.getClassModel(contact.class.Contact)
     // console.log(classModel)
   })
 
   it('should build AttrUIModel without strings loaded', async () => {
-    const uiPlugin = await platform.getPlugin(ui.id)
+    const uiPlugin = await platform.getPlugin(uiModel.id)
     const ownModel = await uiPlugin.getOwnAttrModel(contact.class.Contact)
     // console.log(ownModel)
     expect(ownModel[0].placeholder).toBe('string:contact.Email/label')
@@ -59,7 +59,7 @@ describe('session', () => {
     const i18nPlugin = await platform.getPlugin(i18n.id)
     i18nPlugin.loadStrings(ru)
 
-    const uiPlugin = await platform.getPlugin(ui.id)
+    const uiPlugin = await platform.getPlugin(uiModel.id)
     const ownModel = await uiPlugin.getOwnAttrModel(contact.class.Contact)
     // console.log(ownModel)
     expect(ownModel[0].placeholder).toBe('Email')
