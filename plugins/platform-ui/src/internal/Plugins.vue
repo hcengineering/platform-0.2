@@ -26,7 +26,7 @@
     setup() {
       return {
         status(info: PluginInfo) {
-          return (info.status === PluginStatus.RUNNING) ? '☀︎' : ' '
+          return (info.status === PluginStatus.RUNNING) ? '☀︎' : '&nbsp;'
         }
       }
     }
@@ -38,7 +38,7 @@
     <tr v-for="config in plugins">
       <td>platform-{{config.id}}</td>&nbsp;
       <td>{{config.version}}</td>
-      <td>{{ status(config) }}︎︎</td>
+      <td v-html="status(config)"/>
     </tr>
   </table>
 </template>
