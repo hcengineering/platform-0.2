@@ -23,7 +23,7 @@ type StringProperty<T> = string & Property<T>
 /** Object property serialized as Number */
 type NumberProperty<T> = number & Property<T>
 
-type PropertyType = Property<any> | undefined
+export type PropertyType = Property<any> | undefined
 
 type Str = StringProperty<string>
 
@@ -42,7 +42,20 @@ export interface Doc extends Obj {
   _mixins?: Ref<Class<Doc>>[]
 }
 
-interface Type<T> extends Obj {
+export interface Type<T> extends Obj {
+  exert?: Resource<(value: PropertyType) => T>
+}
+
+export interface RefTo<T extends Doc> extends Type<T> {
+  to: Ref<Class<Doc>>
+}
+
+export interface BagOf<T extends PropertyType> extends Type<Bag<T>> {
+  of: Type<T>
+}
+
+export interface InstanceOf<T extends Obj> extends Type<T> {
+  of: Ref<Class<T>>
 }
 
 /////
@@ -84,7 +97,7 @@ export interface Session {
 
   mixin<D extends T, M extends T, T extends Doc> (doc: D, clazz: Ref<EClass<M, T>>, values: Omit<M, keyof T>): M
   newInstance<M extends Obj> (clazz: Ref<Class<M>>, values: Omit<M, keyof Obj>): M
-  newDocument<M extends Doc> (clazz: Ref<Class<M>>, values: Omit<M, keyof Doc>): M
+  newDocument<M extends Doc> (clazz: Ref<Class<M>>, values: Omit<M, keyof Doc>): Instance<M>
   newClass<T extends E, E extends Obj> (values: Omit<EClass<T, E>, keyof Obj>): EClass<T, E>
 }
 
@@ -100,7 +113,10 @@ const core = plugin('core' as AnyPlugin, {}, {
     Doc: '' as Ref<Class<Doc>>,
     Class: '' as Ref<Class<Class<Obj>>>,
     // Person: '' as Ref<Class<Person>>,
-    Type: '' as Ref<Class<Type<PropertyType>>>
+    Type: '' as Ref<Class<Type<PropertyType>>>,
+    RefTo: '' as Ref<Class<RefTo<Doc>>>,
+    BagOf: '' as Ref<Class<BagOf<PropertyType>>>,
+    InstanceOf: '' as Ref<Class<InstanceOf<Obj>>>
   }
 })
 
@@ -116,14 +132,20 @@ const classObj = S.newClass<Obj, Obj>({
 const classDoc = S.newClass<Doc, Obj>({
   _id: '' as Ref<Class<Doc>>,
   _attributes: {
-    _id: S.newInstance(core.class.Type, {})
+    _id: S.newInstance(core.class.RefTo, {
+      to: core.class.Doc,
+    })
   }
 })
+
+const fff = S.newInstance(core.class.InstanceOf, { of: core.class.Type })
 
 const classClass = S.newClass<Class<Obj>, Doc>({
   _id: '' as Ref<Class<Class<Obj>>>,
   _attributes: {
-    _attributes: S.newInstance(core.class.Type, {})
+    _attributes: S.newInstance(core.class.BagOf, {
+      of: S.newInstance(core.class.InstanceOf, { of: core.class.Type })
+    })
   }
 })
 
