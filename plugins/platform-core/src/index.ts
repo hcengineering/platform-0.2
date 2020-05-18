@@ -141,6 +141,6 @@ export default plugin(
 
       StructuralFeature: '' as Ref<Class<Class<Obj>>>,
       Class: '' as Ref<Class<Class<Obj>>>,
-      Struct: '' as Ref<Class<Class<Obj>>>
+      Struct: '' as Ref<Class<Class<Emb>>>
     }
   })

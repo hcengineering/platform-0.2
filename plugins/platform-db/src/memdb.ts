@@ -16,6 +16,7 @@
 import { Platform } from '@anticrm/platform'
 
 import { Db, Container, ClassId, ContainerId, ContainerClass } from '.'
+import { UIPlugin } from '@anticrm/platform-ui-model/src'
 
 type LayoutType = string | number | ContainerId
 
@@ -136,12 +137,14 @@ export class MemDb implements Db {
   }
 }
 
+/*!
+ * Anticrm™ Platform Database Plugin
+ * Copyright © 2020 Anticrm Platform Contributors. All Rights Reserved.
+ * Licensed under the Eclipse Public License, Version 2.0
+ */
 export default async (platform: Platform, deps: {}) => {
-  /*!
-   * Anticrm Platform Database Plugin
-   * Copyright © 2020 Anticrm Platform Contributors. All Rights Reserved.
-   * Licensed under the Eclipse Public License, Version 2.0
-   */
+  console.log('Plugin `db` started')
   return new MemDb()
 }
 
+console.log('Plugin `db` parsed')

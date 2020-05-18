@@ -14,7 +14,21 @@
 //
 
 import { Resource, Metadata } from '@anticrm/platform'
-import { Session, Doc, Ref, Emb, Class, DiffDescriptors, Type, PropertyType, BagOf, InstanceOf, Obj } from '..'
+import {
+  Session,
+  Doc,
+  Ref,
+  Emb,
+  Class,
+  DiffDescriptors,
+  Type,
+  PropertyType,
+  BagOf,
+  InstanceOf,
+  Obj,
+  RefTo,
+  ArrayOf
+} from '..'
 import core from '.'
 
 class CoreBuilder implements Session {
@@ -44,11 +58,21 @@ class CoreBuilder implements Session {
     return bagOf.newInstance({ of }) as Promise<BagOf<T>>
   }
 
+  async array<T extends PropertyType> (of: Type<T>): Promise<ArrayOf<T>> {
+    const arrayOf = await this.session.getClass(core.class.ArrayOf)
+    return arrayOf.newInstance({of}) as Promise<ArrayOf<T>>
+  }
+
   async struct<T extends Emb> (of: Ref<Class<T>>): Promise<InstanceOf<T>> {
     const instanceOf = await this.session.getClass(core.class.InstanceOf)
     return instanceOf.newInstance({ of }) as Promise<InstanceOf<T>>
   }
 
+  async ref<T extends Doc> (to: Ref<Class<T>>): Promise<RefTo<T>> {
+    const refTo = await this.session.getClass(core.class.RefTo) as unknown as Class<RefTo<T>>
+    return refTo.newInstance({ to })
+  }
+  
   getClass<T extends Obj> (_class: Ref<Class<T>>): Promise<Class<T>> {
     return this.session.getClass(_class)
   }

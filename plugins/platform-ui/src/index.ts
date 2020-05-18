@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Resource, PluginId, plugin, Plugin, Metadata, ResourcePlugin } from '@anticrm/platform'
+import { Resource, PluginId, plugin, Metadata, ResourcePlugin } from '@anticrm/platform'
 import { App } from 'vue'
 
 export type Asset = Metadata<string>

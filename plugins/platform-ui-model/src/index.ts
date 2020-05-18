@@ -37,6 +37,12 @@ export interface ClassUIDecorator<T extends Obj> extends Class<T> {
   decorators?: Bag<TypeUIDecorator>
 }
 
+export interface Query<T extends Doc> extends Doc {
+  clazz: Ref<Class<T>>
+  exclude: string[]
+  order: string[]
+}
+
 // P L U G I N
 
 export interface AttrModel {

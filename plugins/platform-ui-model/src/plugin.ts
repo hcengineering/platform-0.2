@@ -17,7 +17,7 @@ import { Obj, Class, Ref, CorePlugin } from '@anticrm/platform-core'
 import { Platform } from '@anticrm/platform'
 import ui, { UIPlugin, AttrModel, ClassUIModel } from '.'
 
-console.log('PLUGIN: ui loaded')
+console.log('PLUGIN: ui-model loaded')
 
 /*!
  * Anticrm Platform™ UI Model Plugin
@@ -25,7 +25,7 @@ console.log('PLUGIN: ui loaded')
  * Licensed under the Eclipse Public License, Version 2.0
  */
 export default async (platform: Platform, deps: { core: CorePlugin }): Promise<UIPlugin> => {
-  console.log('PLUGIN: ui started')
+  console.log('PLUGIN: ui-model started')
 
   const core = deps.core
   const session = deps.core.getSession()

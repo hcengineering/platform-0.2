@@ -204,10 +204,10 @@ export class TSession implements Session {
     return false
   }
 
-  createClass<T extends E, E extends Doc> (
+  createClass<T extends E, E extends Obj> (
     _id: Ref<Class<T>>, _extends: Ref<Class<E>>,
     _attributes: DiffDescriptors<T, E>, _native?: Resource<T>): Promise<Class<T>> {
-    const classClass = this.getInstance(core.class.Class as Ref<Class<Class<T>>>)
+    const classClass = this.getInstance(core.class.Class as unknown as Ref<Class<Class<T>>>)
     return classClass.then(clazz =>
       clazz.newInstance({
         _id,

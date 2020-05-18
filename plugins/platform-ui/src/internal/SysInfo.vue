@@ -73,10 +73,14 @@
 <style scoped lang="scss">
   @import "~@anticrm/platform-ui-theme/css/_variables.scss";
 
-//  $f: "Montserrat";
+  // $f: "Montserrat";
 //  $f: "Open Sans";
 //  $f: "Manrope";
-  $f: "IBM Plex Sans";
+//  $f: "IBM Plex Sans";
+   $f: "IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto;
+   //$f: -apple-system,system-ui,BlinkMacSystemFont;
+
+//  $f: "Inter";
 
     .info {
 

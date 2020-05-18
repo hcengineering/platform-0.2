@@ -38,7 +38,7 @@ console.log('PLUGIN: parsed i18n')
 export default async (platform: Platform, deps: { core: CorePlugin }): Promise<I18nPlugin> => {
 
   /*!
-   * Anticrm Platform Core Internationalization Plugin
+   * Anticrm Platform™ Core Internationalization Plugin
    * Copyright © 2020 Anticrm Platform Contributors. All Rights Reserved.
    * Licensed under the Eclipse Public License, Version 2.0
    */

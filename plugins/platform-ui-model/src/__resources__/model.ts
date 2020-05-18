@@ -17,9 +17,10 @@ import core from '@anticrm/platform-core/src/__resources__'
 import i18n from '@anticrm/platform-core-i18n/src/__resources__'
 import ui from '.'
 
-import Builder from '@anticrm/platform-core/src/__resources__/builder'
+import CoreBuilder from '@anticrm/platform-core/src/__resources__/builder'
+import { Class, Doc, Ref } from '@anticrm/platform-core'
 
-export default async (B: Builder) => {
+export default async (B: CoreBuilder) => {
 
   const i18nString = await B.getClass(i18n.class.IntlString)
 
@@ -37,6 +38,12 @@ export default async (B: Builder) => {
       label: await i18nString.newInstance({}),
       icon: await B.metadata(),
       decorators: await B.bag(await B.struct(ui.class.TypeUIDecorator))
+    }),
+
+    B.createClass(ui.class.Query, core.class.Doc, {
+      clazz: await B.ref(core.class.Class as Ref<Class<Class<Doc>>>),
+      exclude: await B.array(await B.string()),
+      order: await B.array(await B.string())
     })
   ])
 

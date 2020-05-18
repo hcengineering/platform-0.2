@@ -21,7 +21,7 @@ import { Container } from '@anticrm/platform-db'
 
 import core from '.'
 
-export function newContainer<T extends Doc> (_class: Ref<Class<T>>, data: Content<T>): Container {
+export function newContainer<T extends Obj> (_class: Ref<Class<T>>, data: Content<T>): Container {
   return { _class, ...(data as unknown as Content<Doc>) }
 }
 
@@ -40,10 +40,10 @@ export function createStruct<T extends E, E extends Obj> (
   })
 }
 
-export function createClass<T extends E, E extends Obj> (
+export function createClass<T extends E, E extends Doc> (
   _id: Ref<Class<T>>, _extends: Ref<Class<E>>,
   _attributes: DiffDescriptors<T, E>, _native?: Resource<T>) {
-  return newContainer(core.class.Class, {
+  return newContainer(core.class.Class as unknown as Ref<Class<Class<T>>>, {
     _id,
     _attributes,
     _extends,

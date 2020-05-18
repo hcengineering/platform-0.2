@@ -16,8 +16,11 @@
 import { plugin, PluginId, Plugin } from '@anticrm/platform'
 import ui, { AnyComponent } from '@anticrm/platform-ui'
 
+import lauchDev from '@anticrm/launch-dev' // TODO Dirty hack, get rid of this later.
+
 export default plugin('workbench' as PluginId<Plugin>, {
-  ui: ui.id
+  ui: ui.id,
+  launch: lauchDev.id
 }, {
   component: {
     Workbench: '' as AnyComponent

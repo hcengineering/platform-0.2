@@ -18,6 +18,7 @@ import { BootService } from '@anticrm/platform-ui'
 
 import workbench from '.'
 import Workbench from './components/Workbench.vue'
+import { LaunchPlugin } from '@anticrm/launch-dev'
 
 console.log('Plugin `workbench` loaded')
 
@@ -26,10 +27,14 @@ console.log('Plugin `workbench` loaded')
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */
-export default async (platform: Platform, deps: { ui: BootService}): Promise<Plugin> => {
+export default async (platform: Platform,
+                      deps: { ui: BootService, launch: LaunchPlugin}): Promise<Plugin> => {
   console.log('Plugin `workbench` started')
 
   deps.ui.registerComponent(workbench.component.Workbench, Workbench)
+
+  console.log('launch-dev:')
+  console.log(deps.launch)
 
   return {}
 }

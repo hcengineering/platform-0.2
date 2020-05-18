@@ -13,20 +13,17 @@
 // limitations under the License.
 //
 
-import { Metadata } from '@anticrm/platform'
-import ui, { TypeUIDecorator, UIDecorator } from '..'
-
-import { Ref, Class, Type } from '@anticrm/platform-core'
-import { IntlString } from '@anticrm/platform-core-i18n'
+import ui, { Query, TypeUIDecorator, UIDecorator } from '..'
+import { Ref, Class, Type, Doc } from '@anticrm/platform-core'
 
 import { extendIds } from '@anticrm/platform-core/src/__resources__/utils'
 
 export default extendIds(ui, {
   class: {
-    IntlString: '' as Ref<Class<Type<IntlString>>>,
-
     UIDecorator: '' as Ref<Class<UIDecorator>>,
     TypeUIDecorator: '' as Ref<Class<TypeUIDecorator>>,
+
+    Query: '' as Ref<Class<Query<Doc>>>
   }
 })
 

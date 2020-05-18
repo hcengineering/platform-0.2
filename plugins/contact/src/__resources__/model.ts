@@ -16,7 +16,7 @@
 import contact from '.'
 import core from '@anticrm/platform-core/src/__resources__'
 
-import UIBuilder from '@anticrm/platform-ui/src/__resources__/builder'
+import UIBuilder from '@anticrm/platform-ui-model/src/__resources__/builder'
 
 export default async (S: UIBuilder) => {
 

@@ -15,8 +15,8 @@
 
 import { Platform } from '@anticrm/platform'
 import { Db } from '@anticrm/platform-db'
-import { CorePlugin } from '@anticrm/platform-core'
-import { UIPlugin } from '@anticrm/platform-ui-model'
+import { Class, CorePlugin, Doc, Ref } from '@anticrm/platform-core'
+import { Query } from '@anticrm/platform-ui-model'
 
 import { LaunchPlugin } from '..'
 
@@ -29,22 +29,38 @@ import i18nModel from '@anticrm/platform-core-i18n/src/__resources__/model'
 import uiModel from '@anticrm/platform-ui-model/src/__resources__/model'
 import contactModel from '@anticrm/contact/src/__resources__/model'
 
+import ui from '@anticrm/platform-ui-model/src/__resources__'
+import contact from '@anticrm/contact/src/__resources__'
+
+
 export default async (platform: Platform, deps: {
   core: CorePlugin,
   db: Db,
   // ui: UIPlugin 
 }): Promise<LaunchPlugin> => {
+  console.log('Plugin `launch-dev` started')
+
   const db = deps.db
   db.load(metaModel)
 
   const session = deps.core.getSession()
 
   const coreBuilder = new CoreBuilder(session)
-  const i18n = await coreBuilder.build(i18nModel)
-  const ui = await coreBuilder.build(uiModel)
+  await coreBuilder.build(i18nModel)
+  await coreBuilder.build(uiModel)
 
   const uiBuilder = new UIBuilder(session)
-  const contact = await uiBuilder.build(contactModel)
+  await uiBuilder.build(contactModel)
+
+  const B = coreBuilder
+
+  const queryClass = await B.getClass(ui.class.Query)
+  const clientQuery = queryClass.newInstance({
+    _id: 'xxxxx' as Ref<Query<Doc>>,
+    clazz: contact.class.Person,
+    exclude: [],
+    order: []
+  })
 
   return {
     db,
@@ -52,3 +68,5 @@ export default async (platform: Platform, deps: {
     session: deps.core.getSession()
   }
 }
+
+console.log('Plugin `launch-dev` parsed')
