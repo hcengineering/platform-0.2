@@ -1,0 +1,109 @@
+[
+  {
+    "_class": "class:core.Class",
+    "_id": "class:core.Obj",
+    "_attributes": {}
+  },
+  {
+    "_class": "class:core.Class",
+    "_id": "class:core.Emb",
+    "_attributes": {},
+    "_extends": "class:core.Obj"
+  },
+  {
+    "_class": "class:core.Class",
+    "_id": "class:core.Doc",
+    "_attributes": {
+      "_id": {
+        "_class": "class:core.RefTo",
+        "to": "class:core.Doc"
+      },
+      "_mixins": {
+        "_class": "class:core.ArrayOf",
+        "of": {
+          "_class": "class:core.RefTo",
+          "to": "class:core.Doc"
+        }
+      }
+    },
+    "_extends": "class:core.Obj"
+  },
+  {
+    "_class": "class:core.Class",
+    "_id": "class:core.Class",
+    "_attributes": {
+      "_attributes": {
+        "_class": "class:core.BagOf",
+        "of": {
+          "_class": "class:core.InstanceOf",
+          "of": "class:core.Type"
+        }
+      },
+      "_overrides": {
+        "_class": "class:core.BagOf",
+        "of": {
+          "_class": "class:core.InstanceOf",
+          "of": "class:core.Type"
+        }
+      },
+      "_extends": {
+        "_class": "class:core.RefTo",
+        "to": "class:core.Class"
+      }
+    },
+    "_extends": "class:core.Doc"
+  },
+  {
+    "_class": "class:core.Class",
+    "_id": "class:core.Type",
+    "_attributes": {
+      "_default": {
+        "_class": "class:core.Type"
+      },
+      "exert": {
+        "_class": "class:core.Type",
+        "_default": "identity"
+      }
+    },
+    "_extends": "class:core.Emb"
+  },
+  {
+    "_class": "class:core.Class",
+    "_id": "class:core.BagOf",
+    "_attributes": {
+      "of": {
+        "_class": "class:core.InstanceOf",
+        "of": "class:core.Type"
+      }
+    },
+    "_extends": "class:core.Type"
+  },
+  {
+    "_class": "class:core.Class",
+    "_id": "class:core.InstanceOf",
+    "_attributes": {
+      "of": {
+        "_class": "class:core.RefTo",
+        "to": "class:core.Class"
+      }
+    },
+    "_extends": "class:core.Type"
+  },
+  {
+    "_class": "class:core.Class",
+    "_id": "class:core.RefTo",
+    "_attributes": {
+      "to": {
+        "_class": "class:core.RefTo",
+        "to": "class:core.Class"
+      }
+    },
+    "_extends": "class:core.Type"
+  },
+  {
+    "_class": "class:core.Class",
+    "_id": "class:core.ResourceType",
+    "_attributes": {},
+    "_extends": "class:core.Type"
+  }
+]

@@ -24,31 +24,32 @@ describe('core', () => {
     const tx = new Tx()
     const loaded = model(tx)
     expect(true).toBe(true)
+    // console.log(JSON.stringify(loaded, null, 2))
   })
 
-  // it('should create prototype', () => {
-  //   const tx = new Tx()
-  //   const loaded = model(tx)
+  it('should create prototype', () => {
+    const tx = new Tx()
+    const loaded = model(tx)
 
-  //   const proto = tx.getPrototype(core.class.Type)
-  //   console.log(proto)
+    const proto = tx.getPrototype(core.class.Type)
+    console.log(proto)
 
-  // })
+  })
 
   it('should get RefTo prototype', () => {
     const tx = new Tx()
     const loaded = model(tx)
 
-    const classRefTo = tx.get(core.class.RefTo)
-    const to = classRefTo._attributes.to
+    const classRefTo = tx.get(core.class.InstanceOf)
+    const to = classRefTo._attributes.of
 
     const inst = tx.instantiate(to)
     console.log(inst)
 
-    // const proto = tx.getPrototype(core.class.ResourceType)
+    // const proto = tx.getPrototype(core.class.InstanceOf)
     // console.log(proto)
 
-    // console.log(Object.getPrototypeOf(proto))
+    //    console.log(Object.getPrototypeOf(proto))
 
   })
 
