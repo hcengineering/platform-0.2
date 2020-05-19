@@ -25,8 +25,8 @@ interface InstanceProxy {
   __layout: any
 }
 
-const identity = function (val: Property<any>): any {
-  return val ?? identity
+const identity = function (this: Type<any>, val: Property<any>): any {
+  return val ?? (this.__layout._default === 'identity' ? identity : undefined)
 }
 
 export class Tx implements CoreService {
@@ -53,7 +53,7 @@ export class Tx implements CoreService {
       (clazz._extends ? this.getAttribute(this.get(clazz._extends), key) : undefined)
   }
 
-  ///// I N S A N T I A T I O N
+  ///// I N S T A N T I A T I O N
 
   private konstructors = new Map<Ref<Class<Obj>>, Konstructor<Obj>>()
   private prototypes = new Map<Ref<Class<Obj>>, Object>()
@@ -66,7 +66,6 @@ export class Tx implements CoreService {
       // console.log(prototype)
       return prototype
     }
-
 
     const clazz = this.get(_class) as Class<Obj>
     const parent = clazz._extends ? this.getPrototype(clazz._extends) : Object.prototype
