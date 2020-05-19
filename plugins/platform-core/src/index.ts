@@ -13,134 +13,103 @@
 // limitations under the License.
 //
 
-import { KeysByType } from 'simplytyped'
-import { plugin, PropType, AsString, Resource, ResourcePlugin, PluginId } from '@anticrm/platform'
-import db from '@anticrm/platform-db'
+import { plugin, Plugin, Service, Resource } from '@anticrm/platform'
 
-export type AnyFunc = (...args: any[]) => any
-export type RemoveMethods<T extends object> = Omit<T, KeysByType<T, AnyFunc>>
+/** This is the only allowed type for an object property */
+export interface Property<T> { __property: T }
 
-type PrimitiveType = string
-export type PropertyType = PrimitiveType
-  | PropType<any>
-  | Emb
-  | { [key: string]: PropertyType }
-  | PropertyType[]
+/** Object property serialized as String */
+export type StringProperty<T> = string & Property<T>
+/** Object property serialized as Number */
+export type NumberProperty<T> = number & Property<T>
 
-export type Ref<T extends Doc> = AsString<T> & { __ref: void }
-export type Bag<X extends PropertyType> = { [key: string]: X }
+export type ResourceProperty<T> = Property<T> & Resource<T>
 
-// O B J E C T S
+export type Ref<T> = StringProperty<T> & { __ref: true }
 
-export interface Obj {
-  _class: Ref<Class<this>>
-  getSession(): Session
-  getClass(): Class<this>
-  toIntlString(plural?: number): string
-}
-
-export interface Emb extends Obj { }
+export interface Obj { _class: Ref<Class<this>> }
+export interface Emb extends Obj { __embedded: this }
 export interface Doc extends Obj {
   _id: Ref<this>
-  as<T extends Doc>(_class: Ref<Class<T>>): Promise<T | undefined>
-  mixins(): Ref<Class<Doc>>[]
+  _mixins?: Ref<Class<Doc>>[]
 }
-
-// T Y P E S
-
-export interface Type<T extends PropertyType> extends Emb {
-  exert(value: T, target?: PropertyType, key?: PropertyKey): any
-  hibernate(value: any): T
+export interface Type<A> extends Emb {
+  _default?: Property<A>
+  exert?: Property<(value: Property<any>) => any>
 }
-export type AnyType = Type<PropertyType>
-
-export interface RefTo<T extends Doc> extends Type<Ref<T>> {
-  to: Ref<Class<T>>
+// export interface Identity extends Type<(value: Property<any>) => any> { }
+export interface RefTo<T extends Doc> extends Type<T> { to: Ref<Class<T>> }
+export interface InstanceOf<T extends Emb> extends Type<T> { of: Ref<Class<T>> }
+export interface BagOf<A> extends Type<{ [key: string]: A }> {
+  of: Type<A>
 }
+export interface ArrayOf<A> extends Type<A[]> { of: Type<A> }
+export interface ResourceType<T> extends Type<T> { }
 
-export interface InstanceOf<T extends Emb> extends Type<T> {
-  of: Ref<Class<T>>
+/////
+
+type PropertyTypes<T> = { [P in keyof T]:
+  T[P] extends Property<infer X> ? Type<X> :
+  T[P] extends { __embedded: infer X } ? (X extends Emb ? X : never) :
+  T[P] extends { [key: string]: Property<infer X> } ? Type<{ [key: string]: X }> :
+  T[P] extends Property<infer X>[] ? Type<X[]> :
+  never
 }
+export type Attributes<T extends E, E extends Obj> = PropertyTypes<Required<Omit<T, keyof E>>>
 
-export interface ArrayOf<T extends PropertyType> extends Type<T[]> {
-  of: Type<T>
-}
-
-export interface BagOf<T extends PropertyType> extends Type<Bag<T>> {
-  of: Type<T>
-}
-
-// C L A S S E S
-
-export type Content<T extends Obj> = RemoveMethods<Omit<T, '_class'>>
-
-export interface Class<T extends Obj> extends Doc {
-  _attributes: Bag<Type<PropertyType>>
+export interface EClass<T extends E, E extends Obj> extends Doc {
+  _attributes: Attributes<T, E>
+  _overrides?: Partial<Attributes<T, Obj>>
   _extends?: Ref<Class<Obj>>
-  _native?: Resource<T>
-  newInstance(data: Content<T>): Promise<T>
 }
 
-// S E S S I O N
+export type Class<T extends Obj> = EClass<T, Obj>
 
-export type Query<T extends Doc> = Partial<T>
+//////
 
-type Clear<T> = RemoveMethods<Omit<T, '_class'>>
-type AsDescrtiptors<T> = { [P in keyof T]: T[P] extends PropertyType ? Type<T[P]> : never }
-type Descriptors<T extends object> = AsDescrtiptors<Required<Clear<T>>>
-export type DiffDescriptors<T extends E, E> = Descriptors<Omit<T, keyof E>>
+export type Instance<T extends Obj> = { [P in keyof T]:
+  T[P] extends Property<infer X> ? X :
+  T[P] extends Property<infer X> | undefined ? X :
+  T[P] extends { __embedded: infer X } ? (X extends Obj ? Instance<X> : never) :
+  T[P] extends { [key: string]: Property<infer X> } ? { [key: string]: X } :
+  T[P] extends Property<infer X>[] ? X[] :
+  never
+} & { __layout: T }
 
-export interface Session {
-  getInstance<T extends Doc>(ref: Ref<T>): Promise<T>
+export interface CoreService extends Service {
 
-  // loadModel(docs: Container[]): void
-  // dump(): Container[]
+  // -- Here is a single fundamental signature: `mixin`:
+  // mixin<D extends T, M extends T, T extends Doc> (doc: D, clazz: Ref<EClass<M, T>>, values: Omit<M, keyof T>): M 
 
-  mixin<T extends E, E extends Doc>(obj: E, _class: Ref<Class<T>>, data: Omit<T, keyof E>): Promise<T>
+  // newInstance       <M        extends       Obj>         (clazz: Ref<Class<M>>,     values: Omit<M, keyof Obj>): M 
+  //     newInstance === mixin, where D = Doc & T = Doc
+  // newDocument       <M        extends       Doc>         (clazz: Ref<Class<M>>,     values: Omit<M, keyof Doc>): M 
+  //     newInstance === mixin, where D = Doc & T = Doc
+  // newClass
+  //     newClass === newInstance, where M === EClass<T, E> // clazz: Ref<Class<EClass<T, E>>>,
 
-  // Class Helpers
-  // getStruct<T extends Emb>(_struct: Ref<Class<T>>): Class<T>
-  getClass<T extends Obj>(_class: Ref<Class<T>>): Promise<Class<T>>
-  createClass<T extends E, E extends Doc>(
-    _id: Ref<Class<T>>, _extends: Ref<Class<E>>,
-    _attributes: DiffDescriptors<T, E>, _native?: Resource<T>): Promise<Class<T>>
-  createStruct<T extends E, E extends Emb>(
-    _id: Ref<Class<T>>, _extends: Ref<Class<E>>,
-    _attributes: DiffDescriptors<T, E>, _native?: Resource<T>): Promise<Class<T>>
+  mixin<D extends T, M extends T, T extends Doc> (doc: D, clazz: Ref<EClass<M, T>>, values: Omit<M, keyof T>): M
+
+  newInstance<M extends Emb> (clazz: Ref<Class<M>>, values: Omit<M, keyof Emb>): M
+
+  newDocument<M extends Doc> (clazz: Ref<Class<M>>, values: Omit<M, keyof Doc>): Instance<M>
+  newClass<T extends E, E extends Obj> (values: Omit<EClass<T, E>, keyof Obj>): Instance<EClass<T, E>>
+
+  loadDocument<M extends Doc> (clazz: Ref<Class<M>>, values: Omit<M, keyof Doc>): M
+  loadClass<T extends E, E extends Obj> (values: Omit<EClass<T, E>, keyof Obj>): EClass<T, E>
 }
 
-// C O R E  P L U G I N
-
-export interface CorePlugin extends ResourcePlugin {
-  getSession(): Session
-  registerPrototype<T extends Obj>(id: Resource<T>, proto: T): void
-  getClassHierarchy(_class: Ref<Class<Obj>>): Promise<Ref<Class<Obj>>[]>
-}
-
-export default plugin(
-  'core' as PluginId<CorePlugin>,
-  {
-    db: db.id
+export default plugin('core' as Plugin<CoreService>, {}, {
+  class: {
+    Class: '' as Ref<Class<Class<Obj>>>,
+    // Identity: '' as Ref<Class<Identity>>,
+    ResourceType: '' as Ref<Class<ResourceType<any>>>,
+    RefTo: '' as Ref<Class<RefTo<Doc>>>,
   },
-  {
-    native: {
-      Emb: '' as Resource<Emb>,
-      Doc: '' as Resource<Doc>,
+  method: {
+    BagOf_exert: '' as ResourceProperty<(value: { [key: string]: Property<any> }) => { [key: string]: any }>,
+    InstanceOf_exert: '' as ResourceProperty<(value: Emb) => Instance<Emb>>,
+  }
+})
 
-      Type: '' as Resource<Type<PropertyType>>,
-      BagOf: '' as Resource<BagOf<PropertyType>>,
-      ArrayOf: '' as Resource<ArrayOf<PropertyType>>,
-      InstanceOf: '' as Resource<InstanceOf<Emb>>,
 
-      StructuralFeature: '' as Resource<Class<Obj>>,
-      Struct: '' as Resource<Class<Emb>>,
-      Class: '' as Resource<Class<Doc>>
-    },
-    class: {
-      Doc: '' as Ref<Class<Doc>>,
-
-      StructuralFeature: '' as Ref<Class<Class<Obj>>>,
-      Class: '' as Ref<Class<Class<Obj>>>,
-      Struct: '' as Ref<Class<Class<Emb>>>
-    }
-  })

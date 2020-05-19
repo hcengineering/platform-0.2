@@ -16,32 +16,32 @@
   -->
 
 <script lang="ts">
-  import { defineComponent } from 'vue'
+import { defineComponent } from 'vue'
 
-  export default defineComponent({
-    setup() {
-      return {
-        credits: [
-          { name: "Andrey Platov",  f: "Project Sponsor" },
-          { name: "",  f: "Project Manager" },
-          { name: "",  f: "Product Owner" },
-          { name: "",  f: "Product Manager" },
-          { name: "",  f: "System Architect" },
-          { name: "",  f: "Senior Frontend Engineer" },
-          { name: "",  f: "Senior Backend Engineer" },
-          { name: "",  f: "Senior DevOps" },
-          { name: "",  f: "Release Manager" },
-          { name: "",  f: "UI/UX Lead" },
-          { name: "",  f: "QA Lead" },
-        ]
-      }
+export default defineComponent({
+  setup () {
+    return {
+      credits: [
+        { name: "Andrey Platov", f: "Project Sponsor" },
+        { name: "", f: "Project Manager" },
+        { name: "", f: "Product Owner" },
+        { name: "", f: "Product Manager" },
+        { name: "", f: "System Architect" },
+        { name: "", f: "Senior Frontend Engineer" },
+        { name: "", f: "Senior Backend Engineer" },
+        { name: "", f: "Senior DevOps" },
+        { name: "", f: "Release Manager" },
+        { name: "", f: "UI/UX Lead" },
+        { name: "", f: "QA Lead" },
+      ]
     }
-  })
+  }
+})
 </script>
 
 <template>
   <table class="container">
-    <tr v-for="person in credits">
+    <tr v-for="person in credits" :key="person.f">
       <td style="white-space:nowrap">{{person.name}}</td>&nbsp;
       <td>{{person.f}}</td>
     </tr>

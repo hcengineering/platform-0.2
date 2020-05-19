@@ -13,22 +13,21 @@
 // limitations under the License.
 //
 
-import { Resource, PluginId, plugin, Metadata, ResourcePlugin } from '@anticrm/platform'
+import { Resource, plugin, Plugin, Service } from '@anticrm/platform'
 import { App } from 'vue'
 
-export type Asset = Metadata<string>
+export type Asset = Resource<string>
 
 export type VueConstructor = object
 export type Component<C extends VueConstructor> = Resource<C>
 export type AnyComponent = Component<VueConstructor>
 
-export interface BootService extends ResourcePlugin {
+export interface UIService extends Service {
   getApp (): App
-  registerComponent(id: AnyComponent, component: VueConstructor): void
 }
 
-export default plugin('boot' as PluginId<BootService>, {}, {
+export default plugin('boot' as Plugin<UIService>, {}, {
   metadata: {
-    DefaultApplication: '' as Metadata<AnyComponent>
+    DefaultApplication: '' as Resource<AnyComponent>
   }
 })
