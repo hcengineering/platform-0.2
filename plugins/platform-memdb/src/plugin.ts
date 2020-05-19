@@ -14,7 +14,7 @@
 //
 
 import { Platform } from '@anticrm/platform'
-import { Session, Obj, Ref, Class, Doc, EClass, Instance, Type, PropertyType } from '.'
+import { Session, Obj, Ref, Class, Doc, EClass, Instance, Type, PropertyType, Emb } from '.'
 
 
 type Konstructor<T extends Obj> = (obj: T) => Instance<T>
@@ -41,7 +41,7 @@ class Tx implements Session {
       const attributes = clazz._attributes as { [key: string]: Type<PropertyType> }
       for (const key in attributes) {
         const attr = attributes[key]
-
+        attr.
       }
     }
     return {} as Konstructor<T>
@@ -52,7 +52,8 @@ class Tx implements Session {
   mixin<D extends T, M extends T, T extends Doc> (doc: D, clazz: Ref<EClass<M, T>>, values: Pick<M, Exclude<keyof M, keyof T>>): M {
     throw new Error("Method not implemented.")
   }
-  newInstance<M extends Obj> (clazz: Ref<Class<M>>, values: Pick<M, Exclude<keyof M, "_class">>): M {
+
+  newInstance<M extends Emb> (clazz: Ref<Class<M>>, values: Omit<M, keyof Emb>): M {
     throw new Error("Method not implemented.")
   }
 

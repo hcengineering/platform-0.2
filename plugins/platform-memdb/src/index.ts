@@ -16,7 +16,7 @@
 import { plugin, AnyPlugin } from '@anticrm/platform'
 
 /** This is the only allowed type for an object property */
-type Property<T> = { __property: T }
+interface Property<T> { __property: T }
 
 /** Object property serialized as String */
 type StringProperty<T> = string & Property<T>
@@ -37,12 +37,16 @@ export interface Obj {
   _class: Ref<Class<this>>
 }
 
+export interface Emb extends Obj {
+  __property: this
+}
+
 export interface Doc extends Obj {
   _id: Ref<this>
   _mixins?: Ref<Class<Doc>>[]
 }
 
-export interface Type<T> extends Obj {
+export interface Type<T> extends Emb {
   exert?: Resource<(value: PropertyType) => T>
 }
 
@@ -54,7 +58,7 @@ export interface BagOf<T extends PropertyType> extends Type<Bag<T>> {
   of: Type<T>
 }
 
-export interface InstanceOf<T extends Obj> extends Type<T> {
+export interface InstanceOf<T extends Emb> extends Type<T> {
   of: Ref<Class<T>>
 }
 
@@ -96,7 +100,7 @@ export interface Session {
   //     newClass === newInstance, where M === EClass<T, E> // clazz: Ref<Class<EClass<T, E>>>,
 
   mixin<D extends T, M extends T, T extends Doc> (doc: D, clazz: Ref<EClass<M, T>>, values: Omit<M, keyof T>): M
-  newInstance<M extends Obj> (clazz: Ref<Class<M>>, values: Omit<M, keyof Obj>): M
+  newInstance<M extends Emb> (clazz: Ref<Class<M>>, values: Omit<M, keyof Emb>): M
   newDocument<M extends Doc> (clazz: Ref<Class<M>>, values: Omit<M, keyof Doc>): Instance<M>
   newClass<T extends E, E extends Obj> (values: Omit<EClass<T, E>, keyof Obj>): EClass<T, E>
 }
@@ -116,7 +120,7 @@ const core = plugin('core' as AnyPlugin, {}, {
     Type: '' as Ref<Class<Type<PropertyType>>>,
     RefTo: '' as Ref<Class<RefTo<Doc>>>,
     BagOf: '' as Ref<Class<BagOf<PropertyType>>>,
-    InstanceOf: '' as Ref<Class<InstanceOf<Obj>>>
+    InstanceOf: '' as Ref<Class<InstanceOf<Emb>>>
   }
 })
 
@@ -149,6 +153,11 @@ const classClass = S.newClass<Class<Obj>, Doc>({
   }
 })
 
+const typeClass = S.newClass<Type<PropertyType>, Emb>({
+  _id: '' as Ref<Class<Class<Obj>>>,
+  _attributes: {
+  }
+})
 
 
 // const x = {} as EClass<Person, Doc>
