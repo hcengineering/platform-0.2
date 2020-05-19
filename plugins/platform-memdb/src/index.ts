@@ -72,7 +72,7 @@ export type Instance<T extends Obj> = { [P in keyof T]:
   T[P] extends { [key: string]: Property<infer X> } ? { [key: string]: X } :
   T[P] extends Property<infer X>[] ? X[] :
   never
-}
+} & { __layout: T }
 
 export interface CoreService extends Service {
 

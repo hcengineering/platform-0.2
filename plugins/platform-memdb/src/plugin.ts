@@ -72,33 +72,26 @@ export default async (platform: Platform) => {
   const prototypes = new Map<Ref<Class<Obj>>, Object>()
 
   function getPrototype<T extends Obj> (_class: Ref<Class<T>>): Object {
-    // console.log('requesting prototype for ' + _class)
     const prototype = prototypes.get(_class)
     if (prototype) {
-      // console.log('cached proto: ')
-      // console.log(prototype)
       return prototype
     }
 
     const clazz = get(_class) as Class<Obj>
     const parent = clazz._extends ? getPrototype(clazz._extends) : Object.prototype
-    // console.log('parent for ' + _class)
-    // console.log(parent)
     const proto = Object.create(parent)
     prototypes.set(_class, proto)
 
-    // console.log('constructing prototype ' + _class)
-
     if (_class as string === core.class.ResourceType) {
-      proto.exert = function (this: ResourceType<any>, value: Property<any>): any {
-        const proxy = this as unknown as InstanceProxy
-        const funcName = (value ?? proxy.__layout._default) as any as string
+      proto.exert = function (this: Instance<ResourceType<any>>, value: Property<any>): any {
+        const funcName = (value ?? this.__layout._default) as any as string
         const func = (funcs as any)[funcName]
         if (!func)
           throw new Error('no resourcetype: ' + funcName)
         return func
       }
     }
+
     const attributes: { [key: string]: Type<any> } = { ...clazz._attributes, ...clazz._overrides }
     for (const key in attributes) {
       if (key === '_default') { continue } // we do not define `_default`'s type, it's infinitevely recursive :)
