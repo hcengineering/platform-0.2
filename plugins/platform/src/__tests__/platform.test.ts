@@ -15,7 +15,7 @@
 
 /* eslint-env jest */
 
-import { Platform, identify, AnyPlugin, Resource, Metadata } from '..'
+import { Platform, identify, AnyPlugin, Resource } from '..'
 
 import { plugin1, descriptor1, plugin1State, plugin2, descriptor2, plugin2State, plugin3, descriptor3 } from './shared'
 
@@ -52,9 +52,14 @@ describe('platform', () => {
     })
   })
 
-  it('should not resolve resource (no provider specified)', () => {
-    const resolve = () => platform.resolve('resource:My.Resource' as Resource<string>)
-    expect(resolve).toThrowError('no provider')
+  it('should not resolve resource (no plugin location)', (done) => {
+    platform.resolve('resource:NotExists.Resource' as Resource<string>).then(res => {
+      expect(true).toBe(false)
+      done()
+    }).catch(err => {
+      expect(err).toBeInstanceOf(Error)
+      done()
+    })
   })
 
   it('should not resolve resource (plugin does not have resolve method)', () => {
@@ -107,24 +112,24 @@ describe('platform', () => {
   })
 
   it('should set metadata', () => {
-    platform.setMetadata('xxx' as Metadata<string>, 'meta-xxx')
-    expect(platform.getMetadata('xxx' as Metadata<string>)).toBe('meta-xxx')
+    platform.setResource('xxx' as Resource<string>, 'meta-xxx')
+    expect(platform.getResource('xxx' as Resource<string>)).toBe('meta-xxx')
   })
 
   it('should load metadata', () => {
     const ids = identify('test' as AnyPlugin, {
       meta: {
-        M1: '' as Metadata<string>,
-        M2: 'my-id' as Metadata<string>
+        M1: '' as Resource<string>,
+        M2: 'my-id' as Resource<string>
       }
     })
 
-    platform.loadMetadata(ids.meta, {
+    platform.loadResources(ids.meta, {
       M1: 'hey',
       M2: 'there'
     })
 
-    expect(platform.getMetadata(ids.meta.M1)).toBe('hey')
-    expect(platform.getMetadata(ids.meta.M2)).toBe('there')
+    expect(platform.getResource(ids.meta.M1)).toBe('hey')
+    expect(platform.getResource(ids.meta.M2)).toBe('there')
   })
 })

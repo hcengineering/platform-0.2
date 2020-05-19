@@ -32,8 +32,7 @@
  * {@link Platform.resolve}
  */
 
-export type Metadata<T> = string & { __metadata: T }
-export type Resource<T> = Metadata<T> & { __resource: true }
+export type Resource<T> = string & { __resource: T }
 
 export interface Service { }
 export type Plugin<S extends Service> = Resource<S>
@@ -65,8 +64,8 @@ type AnyModule = PluginModule<Service, PluginDependencies>
 
 /// ///////////
 
-type ExtractType<T, X extends Record<string, Metadata<T>>> = { [P in keyof X]:
-  X[P] extends Metadata<infer Z> ? Z : never
+type ExtractType<T, X extends Record<string, Resource<T>>> = { [P in keyof X]:
+  X[P] extends Resource<infer Z> ? Z : never
 }
 
 export enum PluginStatus {
@@ -99,25 +98,64 @@ export class Platform {
   //   return id
   // }
 
-  // P L A T F O R M  R E S O U R C E  I D E N T I F I E R S
+  // R E S O U R C E S
 
-  private resolvers = new Map<string, AnyPlugin>()
+  private resources = new Map<Resource<any>, any>()
+  private resolvers = new Map<string, Plugin<ResourceProvider>>()
   private resolvedProviders = new Map<string, Promise<ResourceProvider>>()
+
+  getResource<T> (id: Resource<T>): T | undefined {
+    return this.resources.get(id)
+  }
+
+  setResource<T> (id: Resource<T>, value: T): void {
+    this.resources.set(id, value)
+  }
+
+  loadResources<T, X extends Record<string, Resource<T>>> (ids: X, resources: ExtractType<T, X>) {
+    for (const key in ids) {
+      const id = ids[key]
+      const resource = resources[key]
+      if (!resource) {
+        throw new Error(`no resource provided, key: ${key}, id: ${id}`)
+      }
+      this.resources.set(id, resource)
+    }
+  }
 
   resolve<T> (resource: Resource<T>): Promise<T> {
     const kind = resource.substring(0, resource.indexOf(':'))
     let provider = this.resolvedProviders.get(kind)
     if (!provider) {
       const resourcePlugin = this.resolvers.get(kind)
-      if (!resourcePlugin) { throw new Error('no provider associated with resource kind: ' + kind) }
-      provider = this.getPlugin(resourcePlugin as Plugin<ResourceProvider>)
-      this.resolvedProviders.set(kind, provider)
+      if (!resourcePlugin) {
+        return this.resolveStatic(resource)
+      } else {
+        provider = this.getPlugin(resourcePlugin)
+        this.resolvedProviders.set(kind, provider)
+      }
     }
     return provider.then(plugin => plugin.resolve(resource))
   }
 
   setResolver (kind: string, resolver: Plugin<ResourceProvider>) {
     this.resolvers.set(kind, resolver)
+  }
+
+  async resolveStatic (resource: Resource<any>): Promise<any> {
+    console.log('resolve resource: ' + resource)
+    const resolved = this.resources.get(resource)
+    if (resolved) { return resolved }
+    else {
+      const index = resource.indexOf(':') + 1
+      const dot = resource.indexOf('.', index)
+      const id = resource.substring(index, dot) as AnyPlugin
+      console.log('loading from ' + id)
+      const plugin = await this.getPlugin(id)
+      const resolved = this.resources.get(resource)
+      if (resolved) { return resolved }
+    }
+    throw new Error(`Plugin '${plugin}' did not provide resource '${resource}' as expected.`)
   }
 
   // P L U G I N S
@@ -175,31 +213,9 @@ export class Platform {
     return result
   }
 
-  // M E T A D A T A
-
-  private metadata = new Map<string, any>()
-
-  getMetadata<T> (id: Metadata<T>): T | undefined {
-    return this.metadata.get(id as string)
-  }
-
-  setMetadata<T> (id: Metadata<T>, value: T): void {
-    this.metadata.set(id as string, value)
-  }
-
-  loadMetadata<T, X extends Record<string, Metadata<T>>> (ids: X, resources: ExtractType<T, X>) {
-    for (const key in ids) {
-      const id = ids[key]
-      const resource = resources[key]
-      if (!resource) {
-        throw new Error(`no resource provided, key: ${key}, id: ${id}`)
-      }
-      this.metadata.set(id as string, resource)
-    }
-  }
 }
 
-/// ///
+// I D E N T I T Y
 
 type Namespace = Record<string, Record<string, any>>
 
@@ -223,6 +239,8 @@ export function identify<N extends Namespace> (pluginId: AnyPlugin, namespace: N
 export function plugin<P extends Service, D extends PluginDependencies, N extends Namespace> (id: Plugin<P>, deps: D, namespace: N): PluginDescriptor<P, D> & N {
   return { id, deps, ...identify(id, namespace) }
 }
+
+// P R O M I S E
 
 export function allValues (object: { [key: string]: Promise<any> }): Promise<{ [key: string]: any }> {
   const keys = Object.keys(object)
