@@ -15,8 +15,8 @@
 
 import { Platform } from '@anticrm/platform'
 import core, {
-  CoreService, Obj, Ref, Class, Doc, EClass,
-  Instance, Type, Emb, ResourceType, Property
+  CoreService, Obj, Ref, Class, Doc, EClass, BagOf, InstanceOf,
+  Instance, Type, Emb, ResourceType, Property, ResourceProperty
 } from '.'
 
 export default async (platform: Platform) => {
@@ -84,7 +84,11 @@ export default async (platform: Platform) => {
 
     if (_class as string === core.class.ResourceType) {
       proto.exert = function (this: Instance<ResourceType<any>>, value: Property<any>): any {
-        const funcName = (value ?? this.__layout._default) as any as string
+        const funcName = (value ?? this.__layout._default) as ResourceProperty<() => any>
+
+        const f = platform.getResource(funcName)
+        if (f) return f
+
         const func = (funcs as any)[funcName]
         if (!func)
           throw new Error('no resourcetype: ' + funcName)
@@ -167,6 +171,36 @@ export default async (platform: Platform) => {
   function newClass<T extends E, E extends Obj> (values: Omit<EClass<T, E>, keyof Obj>): Instance<EClass<T, E>> {
     return newDocument(core.class.Class as Ref<Class<EClass<T, E>>>, values)
   }
+
+  // T Y P E S : B A G
+
+  class BagProxyHandler implements ProxyHandler<any> {
+    private exert: (value: Property<any>) => any
+
+    constructor(type: Instance<Type<any>>) {
+      if (!type.exert) {
+        throw new Error('bagof: no exert')
+      }
+      this.exert = type.exert
+    }
+
+    get (target: any, key: string): any {
+      return this.exert(Reflect.get(target, key))
+    }
+  }
+
+  const BagOf_exert = function (this: Instance<BagOf<any>>, value: { [key: string]: Property<any> }): { [key: string]: any } {
+    console.log('@@@@@ BGOF')
+    return new Proxy(value, new BagProxyHandler(this.of))
+  }
+
+  const InstanceOf_exert = function (this: Instance<InstanceOf<Emb>>, value: Emb): Instance<Emb> {
+    console.log('@@@@@ IOF')
+    return instantiate(value)
+  }
+
+  platform.setResource(core.method.BagOf_exert, BagOf_exert)
+  platform.setResource(core.method.InstanceOf_exert, InstanceOf_exert)
 
   return {
     mixin, newInstance, loadDocument, newDocument, loadClass, newClass,

@@ -59,7 +59,7 @@ describe('core', () => {
 
     const inst = tx.instantiate(classRefTo)
     console.log(inst)
-
+    console.log(inst._attributes)
   })
 
 })

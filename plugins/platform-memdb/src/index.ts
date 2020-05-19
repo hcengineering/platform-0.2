@@ -28,7 +28,7 @@ export type ResourceProperty<T> = Property<T> & Resource<T>
 export type Ref<T> = StringProperty<T> & { __ref: true }
 
 export interface Obj { _class: Ref<Class<this>> }
-export interface Emb extends Obj { __property: this }
+export interface Emb extends Obj { __embedded: this }
 export interface Doc extends Obj {
   _id: Ref<this>
   _mixins?: Ref<Class<Doc>>[]
@@ -50,6 +50,7 @@ export interface ResourceType<T> extends Type<T> { }
 
 type PropertyTypes<T> = { [P in keyof T]:
   T[P] extends Property<infer X> ? Type<X> :
+  T[P] extends { __embedded: infer X } ? (X extends Emb ? InstanceOf<X> : never) :
   T[P] extends { [key: string]: Property<infer X> } ? Type<{ [key: string]: X }> :
   T[P] extends Property<infer X>[] ? Type<X[]> :
   never
@@ -69,6 +70,7 @@ export type Class<T extends Obj> = EClass<T, Obj>
 export type Instance<T extends Obj> = { [P in keyof T]:
   T[P] extends Property<infer X> ? X :
   T[P] extends Property<infer X> | undefined ? X :
+  T[P] extends { __embedded: infer X } ? (X extends Obj ? Instance<X> : never) :
   T[P] extends { [key: string]: Property<infer X> } ? { [key: string]: X } :
   T[P] extends Property<infer X>[] ? X[] :
   never
@@ -105,7 +107,8 @@ export default plugin('core' as Plugin<CoreService>, {}, {
     RefTo: '' as Ref<Class<RefTo<Doc>>>,
   },
   method: {
-    ResourceType_exert: '' as Ref<Resource<(value: Property<any>) => any>>,
+    BagOf_exert: '' as ResourceProperty<(value: { [key: string]: Property<any> }) => { [key: string]: any }>,
+    InstanceOf_exert: '' as ResourceProperty<(value: Emb) => Instance<Emb>>,
   }
 })
 

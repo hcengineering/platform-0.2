@@ -80,7 +80,7 @@ export default (S: CoreService): Doc[] => {
       },
       _overrides: {
         exert: S.newInstance(core.class.ResourceType, {
-          _default: 'bagOf' as ResourceProperty<(value: Property<any>) => any>
+          _default: core.method.BagOf_exert
         })
       },
       _extends: core.class.Type,
@@ -104,7 +104,7 @@ export default (S: CoreService): Doc[] => {
       },
       _overrides: {
         exert: S.newInstance(core.class.ResourceType, {
-          _default: 'instanceOf' as ResourceProperty<(value: Property<any>) => any>
+          _default: core.method.InstanceOf_exert
         })
       },
       _extends: core.class.Type,
