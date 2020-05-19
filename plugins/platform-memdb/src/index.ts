@@ -58,6 +58,7 @@ export type Attributes<T extends E, E extends Obj> = PropertyTypes<Required<Omit
 
 export interface EClass<T extends E, E extends Obj> extends Doc {
   _attributes: Attributes<T, E>
+  _overrides?: Attributes<T, Obj>
   _extends?: Ref<Class<Obj>>
 }
 
@@ -101,6 +102,7 @@ const core = plugin('core' as Plugin<CoreService>, {}, {
     Class: '' as Ref<Class<Class<Obj>>>,
     // Identity: '' as Ref<Class<Identity>>,
     ResourceType: '' as Ref<Class<ResourceType<any>>>,
+    RefTo: '' as Ref<Class<RefTo<Doc>>>,
   }
 })
 

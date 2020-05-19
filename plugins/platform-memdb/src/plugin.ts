@@ -40,7 +40,8 @@ export class Tx implements CoreService {
   /// C L A S S E S
 
   getOwnAttribute (clazz: Class<Obj>, key: string): Type<any> | undefined {
-    return (clazz._attributes as any)[key]
+    return (clazz._attributes as any)[key] ??
+      (clazz._overrides ? (clazz._overrides as any)[key] : undefined)
   }
 
   getAttribute (clazz: Class<Obj>, key: string): Type<any> | undefined {
@@ -67,7 +68,7 @@ export class Tx implements CoreService {
     //     enumerable: true
     //   })
     // } else {
-    const attributes = clazz._attributes as { [key: string]: Type<any> }
+    const attributes: { [key: string]: Type<any> } = { ...clazz._attributes, ...clazz._overrides }
     for (const key in attributes) {
       const attr = attributes[key]
       const attrInstance = this.instantiate(attr)
@@ -80,6 +81,8 @@ export class Tx implements CoreService {
         if (dflt === 'identity' || key === '_default') {
           exert = (val: any) => val
         } else {
+          console.log(attrInstance)
+          console.log(Object.getPrototypeOf(attrInstance))
           throw new Error("No excert")
         }
       }

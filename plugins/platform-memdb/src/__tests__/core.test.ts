@@ -26,25 +26,29 @@ describe('core', () => {
     expect(true).toBe(true)
   })
 
+  // it('should create prototype', () => {
+  //   const tx = new Tx()
+  //   const loaded = model(tx)
 
+  //   const proto = tx.getPrototype(core.class.Type)
+  //   console.log(proto)
 
-  it('should create prototype', () => {
-    const tx = new Tx()
-    const loaded = model(tx)
-
-    const proto = tx.getPrototype(core.class.Type)
-    console.log(proto)
-
-  })
+  // })
 
   it('should get RefTo prototype', () => {
     const tx = new Tx()
     const loaded = model(tx)
 
-    const proto = tx.getPrototype(core.class.ResourceType)
-    console.log(proto)
+    const classRefTo = tx.get(core.class.RefTo)
+    const to = classRefTo._attributes.to
 
-    console.log(Object.getPrototypeOf(proto))
+    const inst = tx.instantiate(to)
+    console.log(inst)
+
+    // const proto = tx.getPrototype(core.class.ResourceType)
+    // console.log(proto)
+
+    // console.log(Object.getPrototypeOf(proto))
 
   })
 
