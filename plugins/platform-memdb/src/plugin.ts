@@ -14,7 +14,7 @@
 //
 
 import { Platform } from '@anticrm/platform'
-import { Session, Obj, Ref, Class, Doc, EClass, Instance, Type, PropertyType, Emb } from '.'
+import { Session, Obj, Ref, Class, Doc, EClass, Instance, Type, Emb } from '.'
 
 
 type Konstructor<T extends Obj> = (obj: T) => Instance<T>
@@ -38,7 +38,7 @@ class Tx implements Session {
     if (konstructor) { return konstructor as unknown as Konstructor<T> }
     else {
       const clazz = this.get(_class) as Class<Obj>
-      const attributes = clazz._attributes as { [key: string]: Type<PropertyType> }
+      const attributes = clazz._attributes as { [key: string]: Type<any> }
       for (const key in attributes) {
         const attr = attributes[key]
         const attrInstance = this.instantiate(attr)
@@ -76,7 +76,6 @@ class Tx implements Session {
   }
 
 }
-
 
 export default async (platform: Platform): Promise<Session> => {
   return new Tx()
