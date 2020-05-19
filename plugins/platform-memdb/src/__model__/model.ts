@@ -26,6 +26,12 @@ export default (S: CoreService): Doc[] => {
       _attributes: {}
     }),
 
+    S.loadClass<Emb, Emb>({
+      _id: core.class.Emb,
+      _attributes: {},
+      _extends: core.class.Obj
+    }),
+
     S.loadClass<Doc, Obj>({
       _id: core.class.Doc,
       _attributes: {
@@ -55,8 +61,10 @@ export default (S: CoreService): Doc[] => {
     S.loadClass<Type<any>, Emb>({
       _id: core.class.Type,
       _attributes: {
-        default: S.newInstance(core.class.Type, {}),
-        exert: S.newInstance(core.class.Identity, {})
+        _default: S.newInstance(core.class.Type, {}),
+        exert: S.newInstance(core.class.Type as Ref<Class<Type<(value: Property<any>) => any>>>, {
+          _default: 'identity' as ResourceProperty<(value: Property<any>) => any>
+        })
       }, _extends: core.class.Emb,
     }),
 
@@ -93,11 +101,11 @@ export default (S: CoreService): Doc[] => {
       _extends: core.class.Type,
     }),
 
-    S.loadClass<Identity, Type<any>>({
-      _id: core.class.Identity,
-      _attributes: {},
-      _extends: core.class.Type,
-    })
+    // S.loadClass<Identity, Type<any>>({
+    //   _id: core.class.Identity,
+    //   _attributes: {},
+    //   _extends: core.class.Type,
+    // })
 
   ]
 

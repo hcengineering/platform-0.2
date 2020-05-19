@@ -19,9 +19,9 @@ import { plugin, Plugin, Service, Resource } from '@anticrm/platform'
 export interface Property<T> { __property: T }
 
 /** Object property serialized as String */
-type StringProperty<T> = string & Property<T>
+export type StringProperty<T> = string & Property<T>
 /** Object property serialized as Number */
-type NumberProperty<T> = number & Property<T>
+export type NumberProperty<T> = number & Property<T>
 
 export type ResourceProperty<T> = Property<T> & Resource<T>
 
@@ -34,7 +34,7 @@ export interface Doc extends Obj {
   _mixins?: Ref<Class<Doc>>[]
 }
 export interface Type<A> extends Emb {
-  default?: Property<A>
+  _default?: Property<A>
   exert?: Property<(value: Property<any>) => any>
 }
 export interface Identity extends Type<any> { }
@@ -99,7 +99,8 @@ export interface CoreService extends Service {
 const core = plugin('core' as Plugin<CoreService>, {}, {
   class: {
     Class: '' as Ref<Class<Class<Obj>>>,
-    Identity: '' as Ref<Class<Identity>>,
+    // Identity: '' as Ref<Class<Identity>>,
+    ResourceType: '' as Ref<Class<ResourceType<any>>>,
   }
 })
 

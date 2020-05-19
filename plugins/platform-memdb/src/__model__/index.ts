@@ -30,6 +30,5 @@ export default extendIds(core, {
     BagOf: '' as Ref<Class<BagOf<any>>>,
     ArrayOf: '' as Ref<Class<ArrayOf<any>>>,
     InstanceOf: '' as Ref<Class<InstanceOf<Emb>>>,
-    ResourceType: '' as Ref<Class<ResourceType<any>>>,
   }
 })

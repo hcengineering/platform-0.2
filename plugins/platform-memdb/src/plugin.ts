@@ -19,33 +19,10 @@ import core, {
   Instance, Type, Emb, ResourceType, Property
 } from '.'
 
+type Konstructor<T extends Obj> = new (obj: Omit<T, '__property' | '_class'>) => Instance<T>
+
 interface InstanceProxy {
-  __tx: Tx
-  __layout: Obj
-  __class: Class<Obj>
-}
-
-class InstanceProxyHandler implements ProxyHandler<InstanceProxy> {
-  get (target: InstanceProxy, key: string, receiver: any): any {
-    if (key.startsWith('__')) {
-      return Reflect.get(target, key)
-    } else {
-      const attr = target.__tx.getAttribute(target.__class, key)
-      if (!attr) {
-        throw new Error('attribute not found: ' + target.__class._id + ' ' + key)
-      }
-      const instance = target.__tx.instantiate(attr)
-      if (!instance.exert) {
-        console.log('getting ' + key)
-        console.log(target)
-        console.log(attr)
-        console.log(instance)
-
-        throw new Error('exert is not defined')
-      }
-      return instance.exert(Reflect.get(target.__layout, key))
-    }
-  }
+  __layout: any
 }
 
 export class Tx implements CoreService {
@@ -63,8 +40,6 @@ export class Tx implements CoreService {
   /// C L A S S E S
 
   getOwnAttribute (clazz: Class<Obj>, key: string): Type<any> | undefined {
-    // console.log('getOwnAttribute: ' + key)
-    // console.log(clazz)
     return (clazz._attributes as any)[key]
   }
 
@@ -75,28 +50,69 @@ export class Tx implements CoreService {
 
   ///// I N S A N T I A T I O N
 
-  instantiate<T extends Obj> (obj: T): Instance<T> {
-    // console.log('instantiating: ')
-    // console.log(obj)
+  private konstructors = new Map<Ref<Class<Obj>>, Konstructor<Obj>>()
+  private prototypes = new Map<Ref<Class<Obj>>, Object>()
 
-    if (obj._class as string === core.class.Identity) {
-      return {
-        __layout: obj,
-        exert (this: { __layout: any }, value: Property<any>): any {
-          // console.log('EXEEEEERRT:')
-          // console.log(value)
-          // console.log(this.__layout)
-          return value
+  getPrototype<T extends Obj> (_class: Ref<Class<T>>): Object {
+    const prototype = this.prototypes.get(_class)
+    if (prototype) { return prototype }
+
+    const clazz = this.get(_class) as Class<Obj>
+    const proto = Object.create(clazz._extends ? this.getPrototype(clazz._extends) : Object.prototype)
+    this.prototypes.set(_class, proto)
+
+    // if (_class as string === core.class.Identity) {
+    //   Object.defineProperty(proto, 'exert', {
+    //     value: (value: Property<any>): any => value,
+    //     enumerable: true
+    //   })
+    // } else {
+    const attributes = clazz._attributes as { [key: string]: Type<any> }
+    for (const key in attributes) {
+      const attr = attributes[key]
+      const attrInstance = this.instantiate(attr)
+
+      let exert = attrInstance.exert as (value: Property<any>) => any
+      if (!exert) {
+        console.log('no exert for ' + _class + '[' + key + ']')
+        // console.log('default: ' + attrInstance._default)
+        const dflt = attrInstance._default
+        if (dflt === 'identity' || key === '_default') {
+          exert = (val: any) => val
+        } else {
+          throw new Error("No excert")
         }
-      } as unknown as Instance<T>
+      }
+      Object.defineProperty(proto, key, {
+        get (this: InstanceProxy) {
+          return exert(this.__layout[key])
+        },
+        enumerable: true
+      })
     }
+    // }
+    return proto
+  }
 
-    return new Proxy({
-      __tx: this,
-      __layout: obj,
-      __class: this.get(obj._class)
-    }, new InstanceProxyHandler()) as unknown as Instance<T>
-    // return this.getKonstructor(obj._class)(obj)
+  getKonstructor<T extends Obj> (_class: Ref<Class<T>>): Konstructor<T> {
+    const konstructor = this.konstructors.get(_class)
+    if (konstructor) { return konstructor as unknown as Konstructor<T> }
+    else {
+      // build ctor for _class
+      const proto = this.getPrototype(_class)
+      const ctor = function (this: InstanceProxy, obj: Obj) {
+        this.__layout = obj
+      }
+      proto.constructor = ctor
+      ctor.prototype = proto
+      this.konstructors.set(_class, ctor as unknown as Konstructor<Obj>)
+      return ctor as unknown as Konstructor<T>
+    }
+  }
+
+  instantiate<T extends Obj> (obj: T): Instance<T> {
+    const ctor = this.getKonstructor(obj._class)
+    return new ctor(obj)
   }
 
   // C O R E  A P I
@@ -136,27 +152,3 @@ export default async (platform: Platform): Promise<CoreService> => {
   return new Tx()
 }
 
-  // private konstructors = new Map<Ref<Class<Obj>>, Konstructor<Obj>>()
-
-  // getKonstructor<T extends Obj> (_class: Ref<Class<T>>): Konstructor<T> {
-  //   console.log('need constructor for ' + _class)
-  //   const konstructor = this.konstructors.get(_class)
-  //   if (konstructor) { return konstructor as unknown as Konstructor<T> }
-  //   else {
-  //     const clazz = this.get(_class) as Class<Obj>
-  //     const attributes = clazz._attributes as { [key: string]: Type<any> }
-  //     for (const key in attributes) {
-  //       const attr = attributes[key]
-  //       const attrInstance = this.instantiate(attr)
-  //       attrInstance.exert
-  //       const exert = attrInstance.exert
-  //     }
-  //   }
-  //   return {} as Konstructor<T>
-  // }
-
-  // C O R E  A P I
-
-  // instantiate<T extends Obj> (obj: T): Instance<T> {
-  //   return this.getKonstructor(obj._class)(obj)
-  // }

@@ -16,6 +16,7 @@
 import { Tx } from '../plugin'
 import model from '../__model__/model'
 import core from '../__model__'
+import { NumberProperty } from '..'
 
 describe('core', () => {
 
@@ -25,14 +26,38 @@ describe('core', () => {
     expect(true).toBe(true)
   })
 
-  it('should instantiate class', () => {
+
+
+  it('should create prototype', () => {
     const tx = new Tx()
     const loaded = model(tx)
 
-    const objClass = tx.get(core.class.Obj)
-    const instance = tx.instantiate(objClass)
-    console.log(instance)
-    console.log(instance._id)
+    const proto = tx.getPrototype(core.class.Type)
+    console.log(proto)
+
   })
+
+  it('should get RefTo prototype', () => {
+    const tx = new Tx()
+    const loaded = model(tx)
+
+    const proto = tx.getPrototype(core.class.ResourceType)
+    console.log(proto)
+
+    console.log(Object.getPrototypeOf(proto))
+
+  })
+
+  // it('should create konstructor', () => {
+  //   const tx = new Tx()
+  //   const loaded = model(tx)
+
+  //   const ctor = tx.getKonstructor(core.class.Type)
+
+  //   const type = new ctor({ _default: 55 as NumberProperty<number> })
+  //   console.log(type)
+  //   console.log(type._default)
+
+  // })
 
 })
