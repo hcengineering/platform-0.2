@@ -51,6 +51,11 @@ describe('core', () => {
 
     console.log(Object.getPrototypeOf(proto))
 
+    const i = tx.instantiate(classRefTo)
+    console.log(i)
+    console.log(i._attributes)
+    console.log((i._attributes as any)['of'])
+
   })
 
   // it('should create konstructor', () => {
@@ -66,3 +71,4 @@ describe('core', () => {
   // })
 
 })
+

@@ -25,8 +25,20 @@ interface InstanceProxy {
   __layout: any
 }
 
-const identity = function (this: Type<any>, val: Property<any>): any {
-  return val ?? (this.__layout._default === 'identity' ? identity : undefined)
+const funcs = {
+  identity: function (this: Type<any>, val: Property<any>): any {
+    if (this.__layout._default !== undefined && this.__layout._default !== 'identity')
+      console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ' + this.__layout._default + '    VAL: ' + val)
+    return val ?? (funcs as any)[this.__layout._default as string]//  === 'identity' ? identity : undefined)
+  },
+  instanceOf: function (this: Type<any>, val: Property<any>): any {
+    console.log('!!!!!!!!!!!!!!!!!!!&&&&&&&&&&&&&INSTANCEOF')
+    return val ?? (funcs as any)[this.__layout._default as string]//  === 'identity' ? identity : undefined)
+  },
+  bagOf: function (this: Type<any>, val: Property<any>): any {
+    console.log('!!!!!!!!!!!!!!!!!!!&&&&&&&&&&&&&BAGOF')
+    return val ?? (funcs as any)[this.__layout._default as string]//  === 'identity' ? identity : undefined)
+  }
 }
 
 export class Tx implements CoreService {
@@ -77,7 +89,7 @@ export class Tx implements CoreService {
     // console.log('constructing prototype ' + _class)
 
     if (_class as string === core.class.ResourceType) {
-      proto.exert = identity
+      proto.exert = funcs.identity
     }
     const attributes: { [key: string]: Type<any> } = { ...clazz._attributes, ...clazz._overrides }
     for (const key in attributes) {

@@ -16,7 +16,7 @@
 import core from '.'
 import {
   CoreService, Obj, Doc, Class, BagOf, InstanceOf, ResourceType,
-  Property, Type, Emb, ResourceProperty, Ref, RefTo
+  Property, Type, Emb, ResourceProperty, Ref, RefTo, ArrayOf
 } from '..'
 
 export default (S: CoreService): Doc[] => {
@@ -77,6 +77,21 @@ export default (S: CoreService): Doc[] => {
         of: S.newInstance(core.class.InstanceOf as Ref<Class<InstanceOf<Type<any>>>>, {
           of: core.class.Type
         })
+      },
+      _overrides: {
+        exert: S.newInstance(core.class.ResourceType, {
+          _default: 'bagOf' as ResourceProperty<(value: Property<any>) => any>
+        })
+      },
+      _extends: core.class.Type,
+    }),
+
+    S.loadClass<ArrayOf<any>, Type<any>>({
+      _id: core.class.ArrayOf,
+      _attributes: {
+        of: S.newInstance(core.class.InstanceOf as Ref<Class<InstanceOf<Type<any>>>>, {
+          of: core.class.Type
+        })
       }, _extends: core.class.Type,
     }),
 
@@ -88,8 +103,9 @@ export default (S: CoreService): Doc[] => {
         }),
       },
       _overrides: {
-        // exert: S.newInstance(core.class.ResourceType, {
-        // })
+        exert: S.newInstance(core.class.ResourceType, {
+          _default: 'instanceOf' as ResourceProperty<(value: Property<any>) => any>
+        })
       },
       _extends: core.class.Type,
     }),

@@ -108,3 +108,11 @@ const core = plugin('core' as Plugin<CoreService>, {}, {
 
 export default core
 
+
+// const x = {} as Class<InstanceOf<Emb>>
+
+// x._attributes
+
+// const z = {} as Instance<Class<InstanceOf<Emb>>>
+
+// z._attributes.
