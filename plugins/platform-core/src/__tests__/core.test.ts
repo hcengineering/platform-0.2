@@ -26,7 +26,8 @@ describe('core', () => {
     const tx = await startPlugin(platform)
     const loaded = model(tx)
     expect(true).toBe(true)
-    // console.log(JSON.stringify(loaded, null, 2))
+    console.log(JSON.stringify(loaded, null, 2))
+    console.log(JSON.stringify(loaded))
   })
 
   it('should create prototype', async () => {

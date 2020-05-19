@@ -13,12 +13,12 @@
 // limitations under the License.
 //
 
-import { Platform, Plugin } from '@anticrm/platform'
-import { BootService } from '@anticrm/platform-ui'
+import { Platform, Service } from '@anticrm/platform'
+import { UIService } from '@anticrm/platform-ui'
 
 import workbench from '.'
 import Workbench from './components/Workbench.vue'
-import { LaunchPlugin } from '@anticrm/launch-dev'
+// import { LaunchPlugin } from '@anticrm/launch-dev'
 
 console.log('Plugin `workbench` loaded')
 
@@ -28,13 +28,13 @@ console.log('Plugin `workbench` loaded')
  * Licensed under the Eclipse Public License, Version 2.0
  */
 export default async (platform: Platform,
-                      deps: { ui: BootService, launch: LaunchPlugin}): Promise<Plugin> => {
+  deps: { ui: UIService, }): Promise<Service> => {
   console.log('Plugin `workbench` started')
 
-  deps.ui.registerComponent(workbench.component.Workbench, Workbench)
+  platform.setResource(workbench.component.Workbench, Workbench)
 
-  console.log('launch-dev:')
-  console.log(deps.launch)
+  // console.log('launch-dev:')
+  // console.log(deps.launch)
 
   return {}
 }

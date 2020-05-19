@@ -13,14 +13,14 @@
 // limitations under the License.
 //
 
-import { plugin, PluginId, Plugin } from '@anticrm/platform'
+import { plugin, Service, Plugin } from '@anticrm/platform'
 import ui, { AnyComponent } from '@anticrm/platform-ui'
 
-import lauchDev from '@anticrm/launch-dev' // TODO Dirty hack, get rid of this later.
+// import lauchDev from '@anticrm/launch-dev' // TODO Dirty hack, get rid of this later.
 
-export default plugin('workbench' as PluginId<Plugin>, {
+export default plugin('workbench' as Plugin<Service>, {
   ui: ui.id,
-  launch: lauchDev.id
+  // launch: lauchDev.id
 }, {
   component: {
     Workbench: '' as AnyComponent

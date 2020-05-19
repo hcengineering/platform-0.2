@@ -15,7 +15,7 @@
 
 /* eslint-env jest */
 
-import { Platform, identify, AnyPlugin, Resource } from '..'
+import { Platform, identify, AnyPlugin, Resource, Metadata } from '..'
 
 import { plugin1, descriptor1, plugin1State, plugin2, descriptor2, plugin2State, plugin3, descriptor3 } from './shared'
 
@@ -25,8 +25,8 @@ describe('platform', () => {
   it('should identify resources', () => {
     const ids = identify('test' as AnyPlugin, {
       resource: {
-        MyString: '' as Resource<string>,
-        FixedId: 'my-id' as Resource<string>
+        MyString: '' as Metadata<string>,
+        FixedId: 'my-id' as Metadata<string>
       }
     })
     expect(ids.resource.MyString).toBe('resource:test.MyString')
@@ -119,17 +119,17 @@ describe('platform', () => {
   it('should load metadata', () => {
     const ids = identify('test' as AnyPlugin, {
       meta: {
-        M1: '' as Resource<string>,
-        M2: 'my-id' as Resource<string>
+        M1: '' as Metadata<string>,
+        M2: 'my-id' as Metadata<string>
       }
     })
 
-    platform.loadResources(ids.meta, {
+    platform.loadMetadata(ids.meta, {
       M1: 'hey',
       M2: 'there'
     })
 
-    expect(platform.getResource(ids.meta.M1)).toBe('hey')
-    expect(platform.getResource(ids.meta.M2)).toBe('there')
+    expect(platform.getMetadata(ids.meta.M1)).toBe('hey')
+    expect(platform.getMetadata(ids.meta.M2)).toBe('there')
   })
 })

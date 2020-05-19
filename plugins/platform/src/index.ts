@@ -32,7 +32,8 @@
  * {@link Platform.resolve}
  */
 
-export type Resource<T> = string & { __resource: T }
+export type Metadata<T> = string & { __metadata: T }
+export type Resource<T> = Metadata<T> & { __resource: true }
 
 export interface Service { }
 export type Plugin<S extends Service> = Resource<S>
@@ -64,8 +65,8 @@ type AnyModule = PluginModule<Service, PluginDependencies>
 
 /// ///////////
 
-type ExtractType<T, X extends Record<string, Resource<T>>> = { [P in keyof X]:
-  X[P] extends Resource<infer Z> ? Z : never
+type ExtractType<T, X extends Record<string, Metadata<T>>> = { [P in keyof X]:
+  X[P] extends Metadata<infer Z> ? Z : never
 }
 
 export enum PluginStatus {
@@ -98,9 +99,31 @@ export class Platform {
   //   return id
   // }
 
+  // M E T A D A T A
+
+  private resources = new Map<Metadata<any>, any>()
+
+  getMetadata<T> (id: Metadata<T>): T | undefined {
+    return this.resources.get(id)
+  }
+
+  setMetadata<T> (id: Metadata<T>, value: T): void {
+    this.resources.set(id, value)
+  }
+
+  loadMetadata<T, X extends Record<string, Metadata<T>>> (ids: X, resources: ExtractType<T, X>) {
+    for (const key in ids) {
+      const id = ids[key]
+      const resource = resources[key]
+      if (!resource) {
+        throw new Error(`no resource provided, key: ${key}, id: ${id}`)
+      }
+      this.resources.set(id, resource)
+    }
+  }
+
   // R E S O U R C E S
 
-  private resources = new Map<Resource<any>, any>()
   private resolvers = new Map<string, Plugin<ResourceProvider>>()
   private resolvedProviders = new Map<string, Promise<ResourceProvider>>()
 
@@ -112,16 +135,6 @@ export class Platform {
     this.resources.set(id, value)
   }
 
-  loadResources<T, X extends Record<string, Resource<T>>> (ids: X, resources: ExtractType<T, X>) {
-    for (const key in ids) {
-      const id = ids[key]
-      const resource = resources[key]
-      if (!resource) {
-        throw new Error(`no resource provided, key: ${key}, id: ${id}`)
-      }
-      this.resources.set(id, resource)
-    }
-  }
 
   resolve<T> (resource: Resource<T>): Promise<T> {
     const kind = resource.substring(0, resource.indexOf(':'))

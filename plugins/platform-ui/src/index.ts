@@ -13,10 +13,10 @@
 // limitations under the License.
 //
 
-import { Resource, plugin, Plugin, Service } from '@anticrm/platform'
+import { Resource, Metadata, plugin, Plugin, Service } from '@anticrm/platform'
 import { App } from 'vue'
 
-export type Asset = Resource<string>
+export type Asset = Metadata<string>
 
 export type VueConstructor = object
 export type Component<C extends VueConstructor> = Resource<C>
@@ -28,6 +28,6 @@ export interface UIService extends Service {
 
 export default plugin('boot' as Plugin<UIService>, {}, {
   metadata: {
-    DefaultApplication: '' as Resource<AnyComponent>
+    DefaultApplication: '' as Metadata<AnyComponent>
   }
 })
