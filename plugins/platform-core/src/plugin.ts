@@ -156,7 +156,7 @@ export default async (platform: Platform) => {
     return obj
   }
 
-  function loadDocument<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Doc>): M {
+  function createDocument<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Doc>): M {
     const obj = { _class, ...values } as M
     objects.set(obj._id, obj)
 
@@ -168,8 +168,10 @@ export default async (platform: Platform) => {
     //return this.getKonstructor(_class)(this.loadDocument(_class, values))
   }
 
-  function loadClass<T extends E, E extends Obj> (values: Omit<EClass<T, E>, keyof Obj>): EClass<T, E> {
-    return loadDocument(core.class.Class as Ref<Class<EClass<T, E>>>, values)
+  // better API for `Class`
+
+  function createClass<T extends E, E extends Obj> (values: Omit<EClass<T, E>, keyof Obj>): EClass<T, E> {
+    return createDocument(core.class.Class as Ref<Class<EClass<T, E>>>, values)
   }
 
   function newClass<T extends E, E extends Obj> (values: Omit<EClass<T, E>, keyof Obj>): Instance<EClass<T, E>> {
@@ -205,7 +207,7 @@ export default async (platform: Platform) => {
   platform.setResource(core.method.InstanceOf_exert, InstanceOf_exert)
 
   return {
-    mixin, newInstance, loadDocument, newDocument, loadClass, newClass,
+    mixin, newInstance, createDocument, newDocument, createClass, newClass,
 
     getPrototype, get, instantiate
   }

@@ -37,7 +37,6 @@ export interface Type<A> extends Emb {
   _default?: Property<A>
   exert?: Property<(value: Property<any>) => any>
 }
-// export interface Identity extends Type<(value: Property<any>) => any> { }
 export interface RefTo<T extends Doc> extends Type<T> { to: Ref<Class<T>> }
 export interface InstanceOf<T extends Emb> extends Type<T> { of: Ref<Class<T>> }
 export interface BagOf<A> extends Type<{ [key: string]: A }> {
@@ -76,10 +75,12 @@ export type Instance<T extends Obj> = { [P in keyof T]:
   never
 } & { __layout: T }
 
-export interface CoreService extends Service {
-
-  // -- Here is a single fundamental signature: `mixin`:
+/** 
+  -- Here is a single fundamental signature: `mixin`:
+    
   // mixin<D extends T, M extends T, T extends Doc> (doc: D, clazz: Ref<EClass<M, T>>, values: Omit<M, keyof T>): M 
+
+  Below are convenient API calls for `new` operation, depending on base class of an object being created
 
   // newInstance       <M        extends       Obj>         (clazz: Ref<Class<M>>,     values: Omit<M, keyof Obj>): M 
   //     newInstance === mixin, where D = Doc & T = Doc
@@ -87,6 +88,8 @@ export interface CoreService extends Service {
   //     newInstance === mixin, where D = Doc & T = Doc
   // newClass
   //     newClass === newInstance, where M === EClass<T, E> // clazz: Ref<Class<EClass<T, E>>>,
+*/
+export interface CoreService extends Service {
 
   mixin<D extends T, M extends T, T extends Doc> (doc: D, clazz: Ref<EClass<M, T>>, values: Omit<M, keyof T>): M
 
@@ -95,14 +98,13 @@ export interface CoreService extends Service {
   newDocument<M extends Doc> (clazz: Ref<Class<M>>, values: Omit<M, keyof Doc>): Instance<M>
   newClass<T extends E, E extends Obj> (values: Omit<EClass<T, E>, keyof Obj>): Instance<EClass<T, E>>
 
-  loadDocument<M extends Doc> (clazz: Ref<Class<M>>, values: Omit<M, keyof Doc>): M
-  loadClass<T extends E, E extends Obj> (values: Omit<EClass<T, E>, keyof Obj>): EClass<T, E>
+  createDocument<M extends Doc> (clazz: Ref<Class<M>>, values: Omit<M, keyof Doc>): M
+  createClass<T extends E, E extends Obj> (values: Omit<EClass<T, E>, keyof Obj>): EClass<T, E>
 }
 
 export default plugin('core' as Plugin<CoreService>, {}, {
   class: {
     Class: '' as Ref<Class<Class<Obj>>>,
-    // Identity: '' as Ref<Class<Identity>>,
     ResourceType: '' as Ref<Class<ResourceType<any>>>,
     RefTo: '' as Ref<Class<RefTo<Doc>>>,
   },
