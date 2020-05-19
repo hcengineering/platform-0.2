@@ -13,62 +13,54 @@
 // limitations under the License.
 //
 
-import { Tx } from '../plugin'
+import { Platform } from '@anticrm/platform'
+import startPlugin from '../plugin'
 import model from '../__model__/model'
 import core from '../__model__'
 import { NumberProperty } from '..'
 
 describe('core', () => {
 
-  it('should ...', () => {
-    const tx = new Tx()
+  const platform = new Platform()
+
+  it('should ...', async () => {
+    const tx = await startPlugin(platform)
     const loaded = model(tx)
     expect(true).toBe(true)
     // console.log(JSON.stringify(loaded, null, 2))
   })
 
-  it('should create prototype', () => {
-    const tx = new Tx()
+  it('should create prototype', async () => {
+    const tx = await startPlugin(platform)
     const loaded = model(tx)
 
-    const proto = tx.getPrototype(core.class.Type)
-    console.log(proto)
+    const typeProto = tx.getPrototype(core.class.Type)
+    console.log(typeProto)
 
-  })
+    const rtProto = tx.getPrototype(core.class.ResourceType)
+    console.log(rtProto)
 
-  it('should get RefTo prototype', () => {
-    const tx = new Tx()
-    const loaded = model(tx)
+    const rtProtoProto = Object.getPrototypeOf(rtProto)
+    expect(typeProto).toBe(rtProtoProto)
 
     const classRefTo = tx.get(core.class.InstanceOf)
     const to = classRefTo._attributes.of
 
     const inst = tx.instantiate(to)
-    console.log(inst)
-
-    const proto = tx.getPrototype(core.class.InstanceOf)
-    console.log(proto)
-
-    console.log(Object.getPrototypeOf(proto))
-
-    const i = tx.instantiate(classRefTo)
-    console.log(i)
-    console.log(i._attributes)
-    console.log((i._attributes as any)['of'])
-
+    const refToProto = Object.getPrototypeOf(inst)
+    expect(refToProto).toBe(tx.getPrototype(core.class.RefTo))
   })
 
-  // it('should create konstructor', () => {
-  //   const tx = new Tx()
-  //   const loaded = model(tx)
+  it('should instantiate class', async () => {
+    const tx = await startPlugin(platform)
+    const loaded = model(tx)
 
-  //   const ctor = tx.getKonstructor(core.class.Type)
+    const classRefTo = tx.get(core.class.RefTo)
 
-  //   const type = new ctor({})
-  //   console.log(type)
-  //   // console.log(type._default)
+    const inst = tx.instantiate(classRefTo)
+    console.log(inst)
 
-  // })
+  })
 
 })
 

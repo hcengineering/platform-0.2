@@ -97,22 +97,16 @@ export interface CoreService extends Service {
   loadClass<T extends E, E extends Obj> (values: Omit<EClass<T, E>, keyof Obj>): EClass<T, E>
 }
 
-const core = plugin('core' as Plugin<CoreService>, {}, {
+export default plugin('core' as Plugin<CoreService>, {}, {
   class: {
     Class: '' as Ref<Class<Class<Obj>>>,
     // Identity: '' as Ref<Class<Identity>>,
     ResourceType: '' as Ref<Class<ResourceType<any>>>,
     RefTo: '' as Ref<Class<RefTo<Doc>>>,
+  },
+  method: {
+    ResourceType_exert: '' as Ref<Resource<(value: Property<any>) => any>>,
   }
 })
 
-export default core
 
-
-// const x = {} as Class<InstanceOf<Emb>>
-
-// x._attributes
-
-// const z = {} as Instance<Class<InstanceOf<Emb>>>
-
-// z._attributes.
