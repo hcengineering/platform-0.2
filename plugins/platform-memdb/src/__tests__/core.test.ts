@@ -13,23 +13,27 @@
 // limitations under the License.
 //
 
-import core, {
-  Obj, Ref, Class, Doc, Type, RefTo, BagOf, ArrayOf, InstanceOf, Emb, ResourceType
-} from '..'
+import { Tx } from '../plugin'
+import model from '../__model__/model'
+import core from '../__model__'
 
-import { extendIds } from './utils'
+describe('core', () => {
 
-export default extendIds(core, {
-  class: {
-    Obj: '' as Ref<Class<Obj>>,
-    Emb: '' as Ref<Class<Emb>>,
-    Doc: '' as Ref<Class<Doc>>,
+  it('should ...', () => {
+    const tx = new Tx()
+    const loaded = model(tx)
+    console.log(loaded)
+    expect(true).toBe(true)
+  })
 
-    Type: '' as Ref<Class<Type<any>>>,
-    RefTo: '' as Ref<Class<RefTo<Doc>>>,
-    BagOf: '' as Ref<Class<BagOf<any>>>,
-    ArrayOf: '' as Ref<Class<ArrayOf<any>>>,
-    InstanceOf: '' as Ref<Class<InstanceOf<Emb>>>,
-    ResourceType: '' as Ref<Class<ResourceType<any>>>,
-  }
+  it('should instantiate class', () => {
+    const tx = new Tx()
+    const loaded = model(tx)
+
+    const objClass = tx.get(core.class.Obj)
+    console.log(objClass)
+    const instance = tx.instantiate(objClass)
+    console.log(instance)
+  })
+
 })

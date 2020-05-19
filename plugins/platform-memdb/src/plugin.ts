@@ -14,65 +14,95 @@
 //
 
 import { Platform } from '@anticrm/platform'
-import { CoreService, Obj, Ref, Class, Doc, EClass, Instance, Type, Emb } from '.'
+import core, { CoreService, Obj, Ref, Class, Doc, EClass, Instance, Type, Emb } from '.'
 
+interface InstanceProxy {
+  __tx: Tx
+  __layout: Obj
+  __class: Class<Obj>
+}
 
-type Konstructor<T extends Obj> = (obj: T) => Instance<T>
+class InstanceProxyHandler implements ProxyHandler<InstanceProxy> {
+  get (target: InstanceProxy, key: string, receiver: any): any {
+    if (key.startsWith('__')) {
+      return Reflect.get(target, key)
+    } else {
+      const attr = target.__tx.getAttribute(target.__class, key)
+      if (!attr) {
+        throw new Error('attribute not found: ' + target.__class._id + ' ' + key)
+      }
+      const instance = target.__tx.instantiate(attr)
+      if (!instance.exert) {
+        throw new Error('exert is not defined')
+      }
+      return instance.exert(Reflect.get(target.__layout, key))
+    }
+  }
+}
 
-class Tx implements CoreService {
+export class Tx implements CoreService {
 
   private objects = new Map<Ref<Doc>, Doc>()
   private byClass = new Map<Ref<Class<Doc>>, Doc[]>()
 
 
   get<T extends Doc> (_id: Ref<T>): T {
-    return this.objects.get(_id) as T
+    const result = this.objects.get(_id)
+    if (result) { return result as T }
+    throw new Error('oops! object not found: ' + _id)
+  }
+
+  /// C L A S S E S
+
+  getOwnAttribute (clazz: Class<Obj>, key: string): Type<any> | undefined {
+    return (clazz._attributes as any)[key]
+  }
+
+  getAttribute (clazz: Class<Obj>, key: string): Type<any> | undefined {
+    return this.getOwnAttribute(clazz, key) ??
+      (clazz._extends ? this.getAttribute(this.get(clazz._extends), key) : undefined)
   }
 
   ///// I N S A N T I A T I O N
 
-  private konstructors = new Map<Ref<Class<Obj>>, Konstructor<Obj>>()
-
-  getKonstructor<T extends Obj> (_class: Ref<Class<T>>): Konstructor<T> {
-    const konstructor = this.konstructors.get(_class)
-    if (konstructor) { return konstructor as unknown as Konstructor<T> }
-    else {
-      const clazz = this.get(_class) as Class<Obj>
-      const attributes = clazz._attributes as { [key: string]: Type<any> }
-      for (const key in attributes) {
-        const attr = attributes[key]
-        const attrInstance = this.instantiate(attr)
-        attrInstance.exert
-        const exert = attrInstance.exert
-      }
-    }
-    return {} as Konstructor<T>
+  instantiate<T extends Obj> (obj: T): Instance<T> {
+    return new Proxy({
+      __tx: this,
+      __layout: obj,
+      __class: this.get(obj._class)
+    }, new InstanceProxyHandler()) as unknown as Instance<T>
+    // return this.getKonstructor(obj._class)(obj)
   }
 
-  private instantiate<T extends Obj> (obj: T): Instance<T> {
-    return this.getKonstructor(obj._class)(obj)
-  }
-
-  // S E S S I O N  A P I
+  // C O R E  A P I
 
   mixin<D extends T, M extends T, T extends Doc> (doc: D, clazz: Ref<EClass<M, T>>, values: Pick<M, Exclude<keyof M, keyof T>>): M {
     throw new Error("Method not implemented.")
   }
 
-  newInstance<M extends Emb> (clazz: Ref<Class<M>>, values: Omit<M, keyof Emb>): M {
-    throw new Error("Method not implemented.")
+  newInstance<M extends Emb> (_class: Ref<Class<M>>, values: Omit<M, keyof Emb>): M {
+    const obj = { _class, ...values } as M
+    return obj
+  }
+
+  loadDocument<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Doc>): M {
+    const obj = { _class, ...values } as M
+    this.objects.set(obj._id, obj)
+
+    return obj
   }
 
   newDocument<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Doc>): Instance<M> {
-    const _id = '' as Ref<M>
-    const obj = { _class, _id, ...values } as M
-    this.objects.set(_id, obj)
-
-    return this.getKonstructor(_class)(obj)
+    throw new Error("Method not implemented.")
+    //return this.getKonstructor(_class)(this.loadDocument(_class, values))
   }
 
-  newClass<T extends E, E extends Obj> (values: Pick<EClass<T, E>, "_id" | "_mixins" | "_attributes">): EClass<T, E> {
-    throw new Error("Method not implemented.")
+  loadClass<T extends E, E extends Obj> (values: Omit<EClass<T, E>, keyof Obj>): EClass<T, E> {
+    return this.loadDocument(core.class.Class as Ref<Class<EClass<T, E>>>, values)
+  }
+
+  newClass<T extends E, E extends Obj> (values: Omit<EClass<T, E>, keyof Obj>): Instance<EClass<T, E>> {
+    return this.newDocument(core.class.Class as Ref<Class<EClass<T, E>>>, values)
   }
 
 }
@@ -80,3 +110,28 @@ class Tx implements CoreService {
 export default async (platform: Platform): Promise<CoreService> => {
   return new Tx()
 }
+
+  // private konstructors = new Map<Ref<Class<Obj>>, Konstructor<Obj>>()
+
+  // getKonstructor<T extends Obj> (_class: Ref<Class<T>>): Konstructor<T> {
+  //   console.log('need constructor for ' + _class)
+  //   const konstructor = this.konstructors.get(_class)
+  //   if (konstructor) { return konstructor as unknown as Konstructor<T> }
+  //   else {
+  //     const clazz = this.get(_class) as Class<Obj>
+  //     const attributes = clazz._attributes as { [key: string]: Type<any> }
+  //     for (const key in attributes) {
+  //       const attr = attributes[key]
+  //       const attrInstance = this.instantiate(attr)
+  //       attrInstance.exert
+  //       const exert = attrInstance.exert
+  //     }
+  //   }
+  //   return {} as Konstructor<T>
+  // }
+
+  // C O R E  A P I
+
+  // instantiate<T extends Obj> (obj: T): Instance<T> {
+  //   return this.getKonstructor(obj._class)(obj)
+  // }

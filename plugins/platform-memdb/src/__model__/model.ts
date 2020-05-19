@@ -14,17 +14,19 @@
 //
 
 import core from '.'
-import { CoreService, Obj, Doc, Class, Property, Type, Emb, ResourceProperty } from '..'
+import {
+  CoreService, Obj, Doc, Class, BagOf, InstanceOf,
+  Property, Type, Emb, ResourceProperty, Ref, RefTo
+} from '..'
 
-
-function build (S: CoreService): Doc[] {
+export default (S: CoreService): Doc[] => {
   return [
-    S.newClass<Obj, Obj>({
+    S.loadClass<Obj, Obj>({
       _id: core.class.Obj,
       _attributes: {}
     }),
 
-    S.newClass<Doc, Obj>({
+    S.loadClass<Doc, Obj>({
       _id: core.class.Doc,
       _attributes: {
         _id: S.newInstance(core.class.RefTo, {
@@ -36,16 +38,16 @@ function build (S: CoreService): Doc[] {
       }
     }),
 
-    S.newClass<Class<Obj>, Doc>({
+    S.loadClass<Class<Obj>, Doc>({
       _id: core.class.Class,
       _attributes: {
         _attributes: S.newInstance(core.class.BagOf, {
           of: S.newInstance(core.class.InstanceOf, { of: core.class.Type })
         })
-      }
+      },
     }),
 
-    S.newClass<Type<any>, Emb>({
+    S.loadClass<Type<any>, Emb>({
       _id: core.class.Type,
       _attributes: {
         default: S.newInstance(core.class.Type, {}),
@@ -53,6 +55,35 @@ function build (S: CoreService): Doc[] {
           default: 'func: type.exert' as ResourceProperty<(value: Property<any>) => any>
         })
       }
+    }),
+
+    S.loadClass<BagOf<any>, Type<any>>({
+      _id: core.class.BagOf,
+      _attributes: {
+        of: S.newInstance(core.class.InstanceOf as Ref<Class<InstanceOf<Type<any>>>>, {
+          of: core.class.Type
+        })
+      }
+    }),
+
+    S.loadClass<InstanceOf<any>, Type<any>>({
+      _id: core.class.InstanceOf,
+      _attributes: {
+        of: S.newInstance(core.class.RefTo as Ref<Class<RefTo<Class<Obj>>>>, {
+          to: core.class.Class
+        })
+      }
+    }),
+
+    S.loadClass<RefTo<any>, Type<any>>({
+      _id: core.class.RefTo,
+      _attributes: {
+        to: S.newInstance(core.class.RefTo as Ref<Class<RefTo<Class<Obj>>>>, {
+          to: core.class.Class
+        })
+      }
     })
+
   ]
+
 }
