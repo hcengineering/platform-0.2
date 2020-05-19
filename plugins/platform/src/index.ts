@@ -13,12 +13,6 @@
 // limitations under the License.
 //
 
-export type PropType<T> = { __property: T }
-export type AsString<T> = string & PropType<T>
-export type AsNumber<T> = number & PropType<T>
-
-export type Metadata<T> = AsString<T> & { __metadata: void }
-
 /**
  * Platform Resource Identifier (PRI).
  *
@@ -37,35 +31,37 @@ export type Metadata<T> = AsString<T> & { __metadata: void }
  * {@link ResourcePlugin}
  * {@link Platform.resolve}
  */
-export type Resource<T> = AsString<T> & { __resource: void }
-export type PluginId<P extends Plugin> = Resource<P>
-export type AnyPlugin = PluginId<Plugin>
 
-export interface Plugin { }
+export type Metadata<T> = string & { __metadata: T }
+export type Resource<T> = Metadata<T> & { __resource: true }
 
-export interface ResourcePlugin extends Plugin {
-  resolve(resource: Resource<any>): Promise<any>
+export interface Service { }
+export type Plugin<S extends Service> = Resource<S>
+export type AnyPlugin = Plugin<Service>
+
+export interface ResourceProvider extends Service {
+  resolve (resource: Resource<any>): Promise<any>
 }
 
 /**
  * A plugin may request platform to inject resolved references to plugins it depends on.
  */
-export interface PluginDependencies { [key: string]: PluginId<Plugin> }
+export interface PluginDependencies { [key: string]: AnyPlugin }
 
 type InferPlugins<T extends PluginDependencies> = {
-  [P in keyof T]: T[P] extends PluginId<infer Plugin> ? Plugin : T[P]
+  [P in keyof T]: T[P] extends Plugin<infer Service> ? Service : T[P]
 }
 
-export interface PluginDescriptor<P extends Plugin, D extends PluginDependencies> {
-  id: PluginId<P>,
+export interface PluginDescriptor<P extends Service, D extends PluginDependencies> {
+  id: Plugin<P>,
   deps: D
 }
-type AnyDescriptor = PluginDescriptor<Plugin, PluginDependencies>
+type AnyDescriptor = PluginDescriptor<Service, PluginDependencies>
 
-type PluginModule<P extends Plugin, D extends PluginDependencies> = () => Promise<{
+type PluginModule<P extends Service, D extends PluginDependencies> = () => Promise<{
   default: (platform: Platform, deps: InferPlugins<D>) => Promise<P>
 }>
-type AnyModule = PluginModule<Plugin, PluginDependencies>
+type AnyModule = PluginModule<Service, PluginDependencies>
 
 /// ///////////
 
@@ -106,7 +102,7 @@ export class Platform {
   // P L A T F O R M  R E S O U R C E  I D E N T I F I E R S
 
   private resolvers = new Map<string, AnyPlugin>()
-  private resolvedProviders = new Map<string, Promise<ResourcePlugin>>()
+  private resolvedProviders = new Map<string, Promise<ResourceProvider>>()
 
   resolve<T> (resource: Resource<T>): Promise<T> {
     const kind = resource.substring(0, resource.indexOf(':'))
@@ -114,22 +110,22 @@ export class Platform {
     if (!provider) {
       const resourcePlugin = this.resolvers.get(kind)
       if (!resourcePlugin) { throw new Error('no provider associated with resource kind: ' + kind) }
-      provider = this.getPlugin(resourcePlugin as PluginId<ResourcePlugin>)
+      provider = this.getPlugin(resourcePlugin as Plugin<ResourceProvider>)
       this.resolvedProviders.set(kind, provider)
     }
     return provider.then(plugin => plugin.resolve(resource))
   }
 
-  setResolver (kind: string, resolver: PluginId<ResourcePlugin>) {
+  setResolver (kind: string, resolver: Plugin<ResourceProvider>) {
     this.resolvers.set(kind, resolver)
   }
 
   // P L U G I N S
 
-  private plugins = new Map<AnyPlugin, Promise<Plugin>>()
+  private plugins = new Map<AnyPlugin, Promise<Service>>()
   private locations = [] as [AnyDescriptor, AnyModule][]
 
-  private getLocation (id: PluginId<Plugin>): [AnyDescriptor, AnyModule] {
+  private getLocation (id: AnyPlugin): [AnyDescriptor, AnyModule] {
     for (const location of this.locations) {
       if (location[0].id === id) { return location }
     }
@@ -137,11 +133,11 @@ export class Platform {
   }
 
   // TODO #3 `PluginModule` type does not check against `PluginDescriptor`
-  addLocation<P extends Plugin, X extends PluginDependencies> (plugin: PluginDescriptor<P, X>, module: PluginModule<P, X>) {
+  addLocation<P extends Service, X extends PluginDependencies> (plugin: PluginDescriptor<P, X>, module: PluginModule<P, X>) {
     this.locations.push([plugin, module as any])
   }
 
-  async getPlugin<T extends Plugin> (id: PluginId<T>): Promise<T> {
+  async getPlugin<T extends Service> (id: Plugin<T>): Promise<T> {
     const plugin = this.plugins.get(id)
     if (plugin) {
       return plugin as Promise<T>
@@ -170,8 +166,8 @@ export class Platform {
 
   // D E P E N D E N C I E S
 
-  private async resolveDependencies (deps: PluginDependencies): Promise<{ [key: string]: Plugin }> {
-    const result = {} as { [key: string]: Plugin }
+  private async resolveDependencies (deps: PluginDependencies): Promise<{ [key: string]: Service }> {
+    const result = {} as { [key: string]: Service }
     for (const key in deps) {
       const id = deps[key]
       result[key] = await this.getPlugin(id)
@@ -224,7 +220,7 @@ export function identify<N extends Namespace> (pluginId: AnyPlugin, namespace: N
   return transform(pluginId, namespace, (id: string, value) => value === '' ? id : value)
 }
 
-export function plugin<P extends Plugin, D extends PluginDependencies, N extends Namespace> (id: PluginId<P>, deps: D, namespace: N): PluginDescriptor<P, D> & N {
+export function plugin<P extends Service, D extends PluginDependencies, N extends Namespace> (id: Plugin<P>, deps: D, namespace: N): PluginDescriptor<P, D> & N {
   return { id, deps, ...identify(id, namespace) }
 }
 

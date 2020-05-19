@@ -13,17 +13,17 @@
 // limitations under the License.
 //
 
-import { plugin, AnyPlugin } from '@anticrm/platform'
+import { plugin, Plugin, Service, Resource } from '@anticrm/platform'
 
 /** This is the only allowed type for an object property */
-interface Property<T> { __property: T }
+export interface Property<T> { __property: T }
 
 /** Object property serialized as String */
 type StringProperty<T> = string & Property<T>
 /** Object property serialized as Number */
 type NumberProperty<T> = number & Property<T>
 
-type Resource<T> = StringProperty<T> & { __resource: T } // TODO related to `Resource`
+export type ResourceProperty<T> = Property<T> & Resource<T>
 
 export type Ref<T> = StringProperty<T> & { __ref: true }
 
@@ -70,7 +70,7 @@ export type Instance<T extends Obj> = { [P in keyof T]:
 }
 
 
-export interface Session {
+export interface CoreService extends Service {
   // -- Here is a single fundamental signature: `mixin`:
   // mixin<D extends T, M extends T, T extends Doc> (doc: D, clazz: Ref<EClass<M, T>>, values: Omit<M, keyof T>): M 
 
@@ -87,57 +87,8 @@ export interface Session {
   newClass<T extends E, E extends Obj> (values: Omit<EClass<T, E>, keyof Obj>): EClass<T, E>
 }
 
-const core = plugin('core' as AnyPlugin, {}, {
-  class: {
-    Obj: '' as Ref<Class<Obj>>,
-    Doc: '' as Ref<Class<Doc>>,
-    Class: '' as Ref<Class<Class<Obj>>>,
-
-    Type: '' as Ref<Class<Type<any>>>,
-    RefTo: '' as Ref<Class<RefTo<Doc>>>,
-    BagOf: '' as Ref<Class<BagOf<any>>>,
-    ArrayOf: '' as Ref<Class<ArrayOf<any>>>,
-    InstanceOf: '' as Ref<Class<InstanceOf<Emb>>>,
-    ResourceType: '' as Ref<Class<ResourceType<any>>>,
-  }
+const core = plugin('core' as Plugin<CoreService>, {}, {
 })
 
 export default core
 
-const S = {} as Session
-
-const classObj = S.newClass<Obj, Obj>({
-  _id: core.class.Obj,
-  _attributes: {}
-})
-
-const classDoc = S.newClass<Doc, Obj>({
-  _id: core.class.Doc,
-  _attributes: {
-    _id: S.newInstance(core.class.RefTo, {
-      to: core.class.Doc,
-    }),
-    _mixins: S.newInstance(core.class.ArrayOf, {
-      of: S.newInstance(core.class.RefTo, { to: core.class.Doc })
-    })
-  }
-})
-
-const classClass = S.newClass<Class<Obj>, Doc>({
-  _id: core.class.Class,
-  _attributes: {
-    _attributes: S.newInstance(core.class.BagOf, {
-      of: S.newInstance(core.class.InstanceOf, { of: core.class.Type })
-    })
-  }
-})
-
-const typeClass = S.newClass<Type<any>, Emb>({
-  _id: core.class.Type,
-  _attributes: {
-    default: S.newInstance(core.class.Type, {}),
-    exert: S.newInstance(core.class.ResourceType, {
-      default: 'func: type.exert' as Resource<(value: Property<any>) => any>
-    })
-  }
-})

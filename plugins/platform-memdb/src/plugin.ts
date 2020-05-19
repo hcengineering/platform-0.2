@@ -14,12 +14,12 @@
 //
 
 import { Platform } from '@anticrm/platform'
-import { Session, Obj, Ref, Class, Doc, EClass, Instance, Type, Emb } from '.'
+import { CoreService, Obj, Ref, Class, Doc, EClass, Instance, Type, Emb } from '.'
 
 
 type Konstructor<T extends Obj> = (obj: T) => Instance<T>
 
-class Tx implements Session {
+class Tx implements CoreService {
 
   private objects = new Map<Ref<Doc>, Doc>()
   private byClass = new Map<Ref<Class<Doc>>, Doc[]>()
@@ -77,6 +77,6 @@ class Tx implements Session {
 
 }
 
-export default async (platform: Platform): Promise<Session> => {
+export default async (platform: Platform): Promise<CoreService> => {
   return new Tx()
 }
