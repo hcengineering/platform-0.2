@@ -16,7 +16,7 @@
 import core from '.'
 import {
   CoreService, Obj, Doc, Class, BagOf, InstanceOf, ResourceType,
-  Property, Type, Emb, ResourceProperty, Ref, RefTo, Identity
+  Property, Type, Emb, ResourceProperty, Ref, RefTo
 } from '..'
 
 export default (S: CoreService): Doc[] => {
@@ -64,8 +64,9 @@ export default (S: CoreService): Doc[] => {
     S.loadClass<Type<any>, Emb>({
       _id: core.class.Type,
       _attributes: {
-        // _default: S.newInstance(core.class.Type, {}),
-        exert: S.newInstance(core.class.Identity, {
+        _default: S.newInstance(core.class.Type, {}),
+        exert: S.newInstance(core.class.ResourceType, {
+          _default: 'identity' as ResourceProperty<(value: Property<any>) => any>
         })
       }, _extends: core.class.Emb,
     }),
@@ -84,8 +85,13 @@ export default (S: CoreService): Doc[] => {
       _attributes: {
         of: S.newInstance(core.class.RefTo as Ref<Class<RefTo<Class<Obj>>>>, {
           to: core.class.Class
-        })
-      }, _extends: core.class.Type,
+        }),
+      },
+      _overrides: {
+        // exert: S.newInstance(core.class.ResourceType, {
+        // })
+      },
+      _extends: core.class.Type,
     }),
 
     S.loadClass<RefTo<any>, Type<any>>({
@@ -103,11 +109,11 @@ export default (S: CoreService): Doc[] => {
       _extends: core.class.Type,
     }),
 
-    S.loadClass<Identity, Type<(value: Property<any>) => any>>({
-      _id: core.class.Identity,
-      _attributes: {},
-      _extends: core.class.Type,
-    })
+    // S.loadClass<Identity, Type<(value: Property<any>) => any>>({
+    //   _id: core.class.Identity,
+    //   _attributes: {},
+    //   _extends: core.class.Type,
+    // })
 
   ]
 

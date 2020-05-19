@@ -34,10 +34,10 @@ export interface Doc extends Obj {
   _mixins?: Ref<Class<Doc>>[]
 }
 export interface Type<A> extends Emb {
-  // _default?: Property<A>
+  _default?: Property<A>
   exert?: Property<(value: Property<any>) => any>
 }
-export interface Identity extends Type<(value: Property<any>) => any> { }
+// export interface Identity extends Type<(value: Property<any>) => any> { }
 export interface RefTo<T extends Doc> extends Type<T> { to: Ref<Class<T>> }
 export interface InstanceOf<T extends Emb> extends Type<T> { of: Ref<Class<T>> }
 export interface BagOf<A> extends Type<{ [key: string]: A }> {
@@ -58,7 +58,7 @@ export type Attributes<T extends E, E extends Obj> = PropertyTypes<Required<Omit
 
 export interface EClass<T extends E, E extends Obj> extends Doc {
   _attributes: Attributes<T, E>
-  _overrides?: Attributes<T, Obj>
+  _overrides?: Partial<Attributes<T, Obj>>
   _extends?: Ref<Class<Obj>>
 }
 
@@ -100,7 +100,7 @@ export interface CoreService extends Service {
 const core = plugin('core' as Plugin<CoreService>, {}, {
   class: {
     Class: '' as Ref<Class<Class<Obj>>>,
-    Identity: '' as Ref<Class<Identity>>,
+    // Identity: '' as Ref<Class<Identity>>,
     ResourceType: '' as Ref<Class<ResourceType<any>>>,
     RefTo: '' as Ref<Class<RefTo<Doc>>>,
   }

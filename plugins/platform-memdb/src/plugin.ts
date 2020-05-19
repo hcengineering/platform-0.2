@@ -25,6 +25,10 @@ interface InstanceProxy {
   __layout: any
 }
 
+const identity = function (val: Property<any>): any {
+  return val ?? identity
+}
+
 export class Tx implements CoreService {
 
   private objects = new Map<Ref<Doc>, Doc>()
@@ -73,47 +77,48 @@ export class Tx implements CoreService {
 
     // console.log('constructing prototype ' + _class)
 
-    if (_class as string === core.class.Identity) {
-      const identity = function (val: Property<any>): any {
-        return val ?? identity
-      }
+    if (_class as string === core.class.ResourceType) {
       proto.exert = identity
     }
-    else {
-      const attributes: { [key: string]: Type<any> } = { ...clazz._attributes, ...clazz._overrides }
-      for (const key in attributes) {
-        const attr = attributes[key]
-        const attrInstance = this.instantiate(attr)
+    const attributes: { [key: string]: Type<any> } = { ...clazz._attributes, ...clazz._overrides }
+    for (const key in attributes) {
+      const attr = attributes[key]
+      const attrInstance = this.instantiate(attr)
 
-        let exert = attrInstance.exert as (value: Property<any>) => any
-        if (!exert) {
-          console.log('no exert for ' + _class + '[' + key + ']')
-          // console.log('default: ' + attrInstance._default)
-          // const dflt = attrInstance._default
-          // if (dflt === 'identity' || key === '_default' || _class === core.class.RefTo as string) {
-          //   exert = function (this: Type<any>, val: Property<any>): any {
-          //     return val ?? this._default
-          //   }
-          // } else {
-          //   console.log(attrInstance)
-          //   const p1 = Object.getPrototypeOf(attrInstance)
-          //   console.log(p1)
-          //   console.log(Object.getPrototypeOf(p1))
-          //   throw new Error("No excert")
-          // }
-          throw new Error('no excert')
+      let exert = attrInstance.exert as (value: Property<any>) => any
+      if (!exert) {
+        console.log('no exert for ' + _class + '[' + key + ']')
+        if (key === '_default') {
+          console.log('skip _default')
+          continue
         }
-        if (typeof exert !== 'function') {
-          throw new Error('exert must be a function, ' + exert)
-        }
-        const e = exert.bind(attrInstance)
-        Object.defineProperty(proto, key, {
-          get (this: InstanceProxy) {
-            return e(this.__layout[key])
-          },
-          enumerable: true
-        })
+        console.log(attrInstance)
+
+        // console.log('default: ' + attrInstance._default)
+        // const dflt = attrInstance._default
+        // if (dflt === 'identity' || key === '_default' || _class === core.class.RefTo as string) {
+        //   exert = function (this: Type<any>, val: Property<any>): any {
+        //     return val ?? this._default
+        //   }
+        // } else {
+        //   console.log(attrInstance)
+        //   const p1 = Object.getPrototypeOf(attrInstance)
+        //   console.log(p1)
+        //   console.log(Object.getPrototypeOf(p1))
+        //   throw new Error("No excert")
+        // }
+        throw new Error('no excert')
       }
+      if (typeof exert !== 'function') {
+        throw new Error('exert must be a function, ' + exert)
+      }
+      const e = exert.bind(attrInstance)
+      Object.defineProperty(proto, key, {
+        get (this: InstanceProxy) {
+          return e(this.__layout[key])
+        },
+        enumerable: true
+      })
     }
     console.log('constructed prototype ' + _class)
     console.log(proto)

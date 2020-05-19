@@ -46,23 +46,23 @@ describe('core', () => {
     const inst = tx.instantiate(to)
     console.log(inst)
 
-    // const proto = tx.getPrototype(core.class.InstanceOf)
-    // console.log(proto)
+    const proto = tx.getPrototype(core.class.InstanceOf)
+    console.log(proto)
 
-    //    console.log(Object.getPrototypeOf(proto))
+    console.log(Object.getPrototypeOf(proto))
 
   })
 
-  // it('should create konstructor', () => {
-  //   const tx = new Tx()
-  //   const loaded = model(tx)
+  it('should create konstructor', () => {
+    const tx = new Tx()
+    const loaded = model(tx)
 
-  //   const ctor = tx.getKonstructor(core.class.Type)
+    const ctor = tx.getKonstructor(core.class.Type)
 
-  //   const type = new ctor({ _default: 55 as NumberProperty<number> })
-  //   console.log(type)
-  //   console.log(type._default)
+    const type = new ctor({})
+    console.log(type)
+    // console.log(type._default)
 
-  // })
+  })
 
 })
