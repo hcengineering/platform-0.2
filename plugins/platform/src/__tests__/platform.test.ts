@@ -53,7 +53,7 @@ describe('platform', () => {
   })
 
   it('should not resolve resource (no plugin location)', (done) => {
-    platform.resolve('resource:NotExists.Resource' as Resource<string>).then(res => {
+    platform.resolve('resource:NotExists.Resource' as Resource<string>).then(res => { // eslint-disable-line
       expect(true).toBe(false)
       done()
     }).catch(err => {
