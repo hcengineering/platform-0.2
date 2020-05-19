@@ -57,7 +57,7 @@ export type Attributes<T extends E, E extends Obj> = PropertyTypes<Required<Omit
 
 export interface EClass<T extends E, E extends Obj> extends Doc {
   _attributes: Attributes<T, E>
-  _extends?: Ref<Class<E>>
+  _extends?: Ref<Class<Obj>>
 }
 
 export type Class<T extends Obj> = EClass<T, Obj>
