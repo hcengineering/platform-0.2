@@ -29,11 +29,11 @@ class Tx implements Session {
     return this.objects.get(_id) as T
   }
 
-  /////
+  ///// I N S A N T I A T I O N
 
   private konstructors = new Map<Ref<Class<Obj>>, Konstructor<Obj>>()
 
-  getKonstructor<T extends Doc> (_class: Ref<Class<T>>): Konstructor<T> {
+  getKonstructor<T extends Obj> (_class: Ref<Class<T>>): Konstructor<T> {
     const konstructor = this.konstructors.get(_class)
     if (konstructor) { return konstructor as unknown as Konstructor<T> }
     else {
@@ -41,10 +41,16 @@ class Tx implements Session {
       const attributes = clazz._attributes as { [key: string]: Type<PropertyType> }
       for (const key in attributes) {
         const attr = attributes[key]
-        attr.
+        const attrInstance = this.instantiate(attr)
+        attrInstance.exert
+        const exert = attrInstance.exert
       }
     }
     return {} as Konstructor<T>
+  }
+
+  private instantiate<T extends Obj> (obj: T): Instance<T> {
+    return this.getKonstructor(obj._class)(obj)
   }
 
   // S E S S I O N  A P I
@@ -59,10 +65,10 @@ class Tx implements Session {
 
   newDocument<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Doc>): Instance<M> {
     const _id = '' as Ref<M>
-    const instance = { _class, _id, ...values } as M
-    this.objects.set(_id, instance)
+    const obj = { _class, _id, ...values } as M
+    this.objects.set(_id, obj)
 
-    return this.getKonstructor(_class)(instance)
+    return this.getKonstructor(_class)(obj)
   }
 
   newClass<T extends E, E extends Obj> (values: Pick<EClass<T, E>, "_id" | "_mixins" | "_attributes">): EClass<T, E> {

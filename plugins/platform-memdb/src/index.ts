@@ -27,7 +27,7 @@ export type PropertyType = Property<any> | undefined
 
 type Str = StringProperty<string>
 
-type Resource<T> = { __resource: T }
+type Resource<T> = StringProperty<T> & { __resource: T }
 
 export type Ref<T> = StringProperty<T> & { __ref: true }
 
@@ -46,8 +46,9 @@ export interface Doc extends Obj {
   _mixins?: Ref<Class<Doc>>[]
 }
 
-export interface Type<T> extends Emb {
-  exert?: Resource<(value: PropertyType) => T>
+export interface Type<A> extends Emb {
+  default?: Property<A>
+  exert?: Property<(value: PropertyType) => A>
 }
 
 export interface RefTo<T extends Doc> extends Type<T> {
@@ -62,6 +63,9 @@ export interface InstanceOf<T extends Emb> extends Type<T> {
   of: Ref<Class<T>>
 }
 
+export interface ResourceType<T> extends Type<T> {
+}
+
 /////
 
 type PropertyTypes<T> = { [P in keyof T]:
@@ -69,7 +73,7 @@ type PropertyTypes<T> = { [P in keyof T]:
   T[P] extends { [key: string]: PropertyType } ? Type<Bag<PropertyType>> :
   never
 }
-export type Attributes<T extends E, E extends Obj> = PropertyTypes<Omit<T, keyof E>>
+export type Attributes<T extends E, E extends Obj> = PropertyTypes<Required<Omit<T, keyof E>>>
 
 export interface EClass<T extends E, E extends Obj> extends Doc {
   _attributes: Attributes<T, E>
@@ -81,12 +85,10 @@ export type Class<T extends Obj> = EClass<T, Obj>
 
 export type Instance<T extends Obj> = { [P in keyof T]:
   T[P] extends Property<infer X> ? X :
+  T[P] extends Property<infer X> | undefined ? X :
   T[P] extends { [key: string]: PropertyType } ? Bag<PropertyType> :
   never
 }
-
-// const zzz = {} as Instance<Class<Obj>>
-// zzz._attributes
 
 export interface Session {
   // -- Here is a single fundamental signature: `mixin`:
@@ -117,10 +119,11 @@ const core = plugin('core' as AnyPlugin, {}, {
     Doc: '' as Ref<Class<Doc>>,
     Class: '' as Ref<Class<Class<Obj>>>,
     // Person: '' as Ref<Class<Person>>,
-    Type: '' as Ref<Class<Type<PropertyType>>>,
+    Type: '' as Ref<Class<Type<any>>>,
     RefTo: '' as Ref<Class<RefTo<Doc>>>,
     BagOf: '' as Ref<Class<BagOf<PropertyType>>>,
-    InstanceOf: '' as Ref<Class<InstanceOf<Emb>>>
+    InstanceOf: '' as Ref<Class<InstanceOf<Emb>>>,
+    ResourceType: '' as Ref<Class<ResourceType<any>>>,
   }
 })
 
@@ -129,23 +132,24 @@ export default core
 const S = {} as Session
 
 const classObj = S.newClass<Obj, Obj>({
-  _id: '' as Ref<Class<Obj>>,
+  _id: core.class.Obj,
   _attributes: {}
 })
 
 const classDoc = S.newClass<Doc, Obj>({
-  _id: '' as Ref<Class<Doc>>,
+  _id: core.class.Doc,
   _attributes: {
     _id: S.newInstance(core.class.RefTo, {
       to: core.class.Doc,
-    })
+    }),
+    _mixins: ''
   }
 })
 
 const fff = S.newInstance(core.class.InstanceOf, { of: core.class.Type })
 
 const classClass = S.newClass<Class<Obj>, Doc>({
-  _id: '' as Ref<Class<Class<Obj>>>,
+  _id: core.class.Class,
   _attributes: {
     _attributes: S.newInstance(core.class.BagOf, {
       of: S.newInstance(core.class.InstanceOf, { of: core.class.Type })
@@ -154,8 +158,12 @@ const classClass = S.newClass<Class<Obj>, Doc>({
 })
 
 const typeClass = S.newClass<Type<PropertyType>, Emb>({
-  _id: '' as Ref<Class<Class<Obj>>>,
+  _id: core.class.Type,
   _attributes: {
+    default: S.newInstance(core.class.Type, {}),
+    exert: S.newInstance(core.class.ResourceType, {
+      default: 'func: type.exert' as Resource<(value: PropertyType) => any>
+    })
   }
 })
 
