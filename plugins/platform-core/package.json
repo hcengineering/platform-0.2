@@ -1,16 +1,39 @@
 {
   "name": "@anticrm/platform-core",
   "version": "0.1.0",
-  "main": "src/index.ts",
+  "description": "Anticrm Platform Core",
+  "private": true,
+  "main": "./src/index.ts",
+  "scripts": {
+    "test": "jest",
+    "doc": "typedoc --out ./generated_docs --readme none",
+    "lint": "eslint src/**/*.ts"
+  },
   "author": "Andrey Platov <andrey.v.platov@gmail.com>",
   "license": "EPL-2.0",
-  "scripts": {
-    "build": "tsc",
-    "test": "jest",
-    "doc": "typedoc --out ./generated_docs"
-  },
   "devDependencies": {
+    "@babel/core": "^7.9.6",
+    "@babel/plugin-proposal-decorators": "^7.8.3",
+    "@babel/preset-env": "^7.9.6",
+    "@babel/preset-typescript": "^7.9.0",
+    "@types/jest": "^25.2.1",
+    "@types/lodash": "^4.14.150",
+    "@typescript-eslint/eslint-plugin": "^2.33.0",
+    "@typescript-eslint/parser": "^2.33.0",
+    "babel-jest": "^25.5.1",
+    "eslint": "^7.0.0",
+    "eslint-config-standard": "^14.1.1",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "jest": "^25.5.2",
+    "lodash": "^4.17.15",
     "typedoc": "^0.17.6",
     "typescript": "~3.8.3"
+  },
+  "dependencies": {
+    "intl-messageformat": "^8.3.9",
+    "simplytyped": "^3.3.0"
   }
 }
