@@ -86,6 +86,12 @@ export default async (platform: Platform) => {
     const proto = Object.create(parent)
     prototypes.set(_class, proto)
 
+    if (clazz._native) {
+      const native = platform.getResource(clazz._native)
+      const descriptors = Object.getOwnPropertyDescriptors(native)
+      Object.defineProperties(proto, descriptors)
+    }
+
     if (_class as string === core.class.ResourceType) {
       proto.exert = function (this: Instance<ResourceType<any>>, value: Property<any>): any {
         const funcName = (value ?? this.__layout._default) as ResourceProperty<() => any>

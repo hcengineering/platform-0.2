@@ -60,6 +60,7 @@ export interface EClass<T extends E, E extends Obj> extends Doc {
   _attributes: Attributes<T, E>
   _overrides?: Partial<Attributes<T, Obj>>
   _extends?: Ref<Class<Obj>>
+  _native?: ResourceProperty<Object>
 }
 
 export type Class<T extends Obj> = EClass<T, Obj>
@@ -111,6 +112,9 @@ export default plugin('core' as Plugin<CoreService>, {}, {
   method: {
     BagOf_exert: '' as ResourceProperty<(value: { [key: string]: Property<any> }) => { [key: string]: any }>,
     InstanceOf_exert: '' as ResourceProperty<(value: Emb) => Instance<Emb>>,
+  },
+  native: {
+    BagOf: '' as Resource<Object>
   }
 })
 
