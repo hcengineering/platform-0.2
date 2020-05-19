@@ -15,8 +15,8 @@
 
 import core from '.'
 import {
-  CoreService, Obj, Doc, Class, BagOf, InstanceOf,
-  Property, Type, Emb, ResourceProperty, Ref, RefTo
+  CoreService, Obj, Doc, Class, BagOf, InstanceOf, ResourceType,
+  Property, Type, Emb, ResourceProperty, Ref, RefTo, Identity
 } from '..'
 
 export default (S: CoreService): Doc[] => {
@@ -35,7 +35,8 @@ export default (S: CoreService): Doc[] => {
         _mixins: S.newInstance(core.class.ArrayOf, {
           of: S.newInstance(core.class.RefTo, { to: core.class.Doc })
         })
-      }
+      },
+      _extends: core.class.Obj
     }),
 
     S.loadClass<Class<Obj>, Doc>({
@@ -48,16 +49,15 @@ export default (S: CoreService): Doc[] => {
           to: core.class.Class
         })
       },
+      _extends: core.class.Doc,
     }),
 
     S.loadClass<Type<any>, Emb>({
       _id: core.class.Type,
       _attributes: {
         default: S.newInstance(core.class.Type, {}),
-        exert: S.newInstance(core.class.ResourceType, {
-          default: 'func: type.exert' as ResourceProperty<(value: Property<any>) => any>
-        })
-      }
+        exert: S.newInstance(core.class.Identity, {})
+      }, _extends: core.class.Emb,
     }),
 
     S.loadClass<BagOf<any>, Type<any>>({
@@ -66,7 +66,7 @@ export default (S: CoreService): Doc[] => {
         of: S.newInstance(core.class.InstanceOf as Ref<Class<InstanceOf<Type<any>>>>, {
           of: core.class.Type
         })
-      }
+      }, _extends: core.class.Type,
     }),
 
     S.loadClass<InstanceOf<any>, Type<any>>({
@@ -75,7 +75,7 @@ export default (S: CoreService): Doc[] => {
         of: S.newInstance(core.class.RefTo as Ref<Class<RefTo<Class<Obj>>>>, {
           to: core.class.Class
         })
-      }
+      }, _extends: core.class.Type,
     }),
 
     S.loadClass<RefTo<any>, Type<any>>({
@@ -84,7 +84,19 @@ export default (S: CoreService): Doc[] => {
         to: S.newInstance(core.class.RefTo as Ref<Class<RefTo<Class<Obj>>>>, {
           to: core.class.Class
         })
-      }
+      }, _extends: core.class.Type,
+    }),
+
+    S.loadClass<ResourceType<any>, Type<any>>({
+      _id: core.class.ResourceType,
+      _attributes: {},
+      _extends: core.class.Type,
+    }),
+
+    S.loadClass<Identity, Type<any>>({
+      _id: core.class.Identity,
+      _attributes: {},
+      _extends: core.class.Type,
     })
 
   ]

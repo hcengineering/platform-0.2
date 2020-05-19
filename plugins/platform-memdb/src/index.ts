@@ -37,6 +37,7 @@ export interface Type<A> extends Emb {
   default?: Property<A>
   exert?: Property<(value: Property<any>) => any>
 }
+export interface Identity extends Type<any> { }
 export interface RefTo<T extends Doc> extends Type<T> { to: Ref<Class<T>> }
 export interface InstanceOf<T extends Emb> extends Type<T> { of: Ref<Class<T>> }
 export interface BagOf<A> extends Type<{ [key: string]: A }> {
@@ -85,7 +86,9 @@ export interface CoreService extends Service {
   //     newClass === newInstance, where M === EClass<T, E> // clazz: Ref<Class<EClass<T, E>>>,
 
   mixin<D extends T, M extends T, T extends Doc> (doc: D, clazz: Ref<EClass<M, T>>, values: Omit<M, keyof T>): M
+
   newInstance<M extends Emb> (clazz: Ref<Class<M>>, values: Omit<M, keyof Emb>): M
+
   newDocument<M extends Doc> (clazz: Ref<Class<M>>, values: Omit<M, keyof Doc>): Instance<M>
   newClass<T extends E, E extends Obj> (values: Omit<EClass<T, E>, keyof Obj>): Instance<EClass<T, E>>
 
@@ -96,6 +99,7 @@ export interface CoreService extends Service {
 const core = plugin('core' as Plugin<CoreService>, {}, {
   class: {
     Class: '' as Ref<Class<Class<Obj>>>,
+    Identity: '' as Ref<Class<Identity>>,
   }
 })
 

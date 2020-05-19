@@ -22,7 +22,6 @@ describe('core', () => {
   it('should ...', () => {
     const tx = new Tx()
     const loaded = model(tx)
-    console.log(loaded)
     expect(true).toBe(true)
   })
 
@@ -31,9 +30,9 @@ describe('core', () => {
     const loaded = model(tx)
 
     const objClass = tx.get(core.class.Obj)
-    console.log(objClass)
     const instance = tx.instantiate(objClass)
     console.log(instance)
+    console.log(instance._id)
   })
 
 })

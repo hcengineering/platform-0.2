@@ -14,7 +14,10 @@
 //
 
 import { Platform } from '@anticrm/platform'
-import core, { CoreService, Obj, Ref, Class, Doc, EClass, Instance, Type, Emb } from '.'
+import core, {
+  CoreService, Obj, Ref, Class, Doc, EClass,
+  Instance, Type, Emb, ResourceType, Property
+} from '.'
 
 interface InstanceProxy {
   __tx: Tx
@@ -33,6 +36,11 @@ class InstanceProxyHandler implements ProxyHandler<InstanceProxy> {
       }
       const instance = target.__tx.instantiate(attr)
       if (!instance.exert) {
+        console.log('getting ' + key)
+        console.log(target)
+        console.log(attr)
+        console.log(instance)
+
         throw new Error('exert is not defined')
       }
       return instance.exert(Reflect.get(target.__layout, key))
@@ -55,6 +63,8 @@ export class Tx implements CoreService {
   /// C L A S S E S
 
   getOwnAttribute (clazz: Class<Obj>, key: string): Type<any> | undefined {
+    // console.log('getOwnAttribute: ' + key)
+    // console.log(clazz)
     return (clazz._attributes as any)[key]
   }
 
@@ -66,6 +76,21 @@ export class Tx implements CoreService {
   ///// I N S A N T I A T I O N
 
   instantiate<T extends Obj> (obj: T): Instance<T> {
+    // console.log('instantiating: ')
+    // console.log(obj)
+
+    if (obj._class as string === core.class.Identity) {
+      return {
+        __layout: obj,
+        exert (this: { __layout: any }, value: Property<any>): any {
+          // console.log('EXEEEEERRT:')
+          // console.log(value)
+          // console.log(this.__layout)
+          return value
+        }
+      } as unknown as Instance<T>
+    }
+
     return new Proxy({
       __tx: this,
       __layout: obj,
