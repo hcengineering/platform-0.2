@@ -50,7 +50,7 @@ export interface ResourceType<T> extends Type<T> { }
 
 type PropertyTypes<T> = { [P in keyof T]:
   T[P] extends Property<infer X> ? Type<X> :
-  T[P] extends { __embedded: infer X } ? (X extends Emb ? InstanceOf<X> : never) :
+  T[P] extends { __embedded: infer X } ? (X extends Emb ? X : never) :
   T[P] extends { [key: string]: Property<infer X> } ? Type<{ [key: string]: X }> :
   T[P] extends Property<infer X>[] ? Type<X[]> :
   never

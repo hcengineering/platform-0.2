@@ -17,7 +17,6 @@ import { Platform } from '@anticrm/platform'
 import startPlugin from '../plugin'
 import model from '../__model__/model'
 import core from '../__model__'
-import { NumberProperty } from '..'
 
 describe('core', () => {
 
@@ -60,6 +59,8 @@ describe('core', () => {
     const inst = tx.instantiate(classRefTo)
     console.log(inst)
     console.log(inst._attributes)
+    console.log(inst._attributes.to)
+    expect(inst._attributes.to._class).toBe(core.class.RefTo)
   })
 
 })

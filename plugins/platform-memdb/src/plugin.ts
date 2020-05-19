@@ -71,6 +71,10 @@ export default async (platform: Platform) => {
   const konstructors = new Map<Ref<Class<Obj>>, Konstructor<Obj>>()
   const prototypes = new Map<Ref<Class<Obj>>, Object>()
 
+  const CoreRoot = {
+    get _class (this: Instance<Obj>) { return this.__layout._class }
+  }
+
   function getPrototype<T extends Obj> (_class: Ref<Class<T>>): Object {
     const prototype = prototypes.get(_class)
     if (prototype) {
@@ -78,7 +82,7 @@ export default async (platform: Platform) => {
     }
 
     const clazz = get(_class) as Class<Obj>
-    const parent = clazz._extends ? getPrototype(clazz._extends) : Object.prototype
+    const parent = clazz._extends ? getPrototype(clazz._extends) : CoreRoot
     const proto = Object.create(parent)
     prototypes.set(_class, proto)
 
