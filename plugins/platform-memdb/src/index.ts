@@ -23,54 +23,32 @@ type StringProperty<T> = string & Property<T>
 /** Object property serialized as Number */
 type NumberProperty<T> = number & Property<T>
 
-export type PropertyType = Property<any> | undefined
-
-type Str = StringProperty<string>
-
-type Resource<T> = StringProperty<T> & { __resource: T }
+type Resource<T> = StringProperty<T> & { __resource: T } // TODO related to `Resource`
 
 export type Ref<T> = StringProperty<T> & { __ref: true }
 
-type Bag<T extends PropertyType> = { [key: string]: T } // & Property<{ [key: string]: T }>
-
-export interface Obj {
-  _class: Ref<Class<this>>
-}
-
-export interface Emb extends Obj {
-  __property: this
-}
-
+export interface Obj { _class: Ref<Class<this>> }
+export interface Emb extends Obj { __property: this }
 export interface Doc extends Obj {
   _id: Ref<this>
   _mixins?: Ref<Class<Doc>>[]
 }
-
 export interface Type<A> extends Emb {
   default?: Property<A>
-  exert?: Property<(value: PropertyType) => A>
+  exert?: Property<(value: Property<A>) => A>
 }
-
-export interface RefTo<T extends Doc> extends Type<T> {
-  to: Ref<Class<Doc>>
-}
-
-export interface BagOf<T extends PropertyType> extends Type<Bag<T>> {
-  of: Type<T>
-}
-
-export interface InstanceOf<T extends Emb> extends Type<T> {
-  of: Ref<Class<T>>
-}
-
-export interface ResourceType<T> extends Type<T> {
-}
+export interface RefTo<T extends Doc> extends Type<T> { to: Ref<Class<Doc>> }
+export interface InstanceOf<T extends Emb> extends Type<T> { of: Ref<Class<T>> }
+export interface BagOf<A> extends Type<{ [key: string]: A }> { of: Type<A> }
+export interface ArrayOf<A> extends Type<A[]> { of: Type<A> }
+export interface ResourceType<T> extends Type<T> { }
 
 /////
 
 type PropertyTypes<T> = { [P in keyof T]:
   T[P] extends Property<infer X> ? Type<X> :
-  T[P] extends { [key: string]: PropertyType } ? Type<Bag<PropertyType>> :
+  T[P] extends { [key: string]: Property<infer X> } ? Type<{ [key: string]: X }> :
+  T[P] extends Property<infer X>[] ? Type<X[]> :
   never
 }
 export type Attributes<T extends E, E extends Obj> = PropertyTypes<Required<Omit<T, keyof E>>>
@@ -86,9 +64,11 @@ export type Class<T extends Obj> = EClass<T, Obj>
 export type Instance<T extends Obj> = { [P in keyof T]:
   T[P] extends Property<infer X> ? X :
   T[P] extends Property<infer X> | undefined ? X :
-  T[P] extends { [key: string]: PropertyType } ? Bag<PropertyType> :
+  T[P] extends { [key: string]: Property<infer X> } ? { [key: string]: X } :
+  T[P] extends Property<infer X>[] ? X[] :
   never
 }
+
 
 export interface Session {
   // -- Here is a single fundamental signature: `mixin`:
@@ -107,21 +87,16 @@ export interface Session {
   newClass<T extends E, E extends Obj> (values: Omit<EClass<T, E>, keyof Obj>): EClass<T, E>
 }
 
-
-// interface Person extends Doc {
-//   firstName: Str
-//   lastName: Str
-// }
-
 const core = plugin('core' as AnyPlugin, {}, {
   class: {
     Obj: '' as Ref<Class<Obj>>,
     Doc: '' as Ref<Class<Doc>>,
     Class: '' as Ref<Class<Class<Obj>>>,
-    // Person: '' as Ref<Class<Person>>,
+
     Type: '' as Ref<Class<Type<any>>>,
     RefTo: '' as Ref<Class<RefTo<Doc>>>,
-    BagOf: '' as Ref<Class<BagOf<PropertyType>>>,
+    BagOf: '' as Ref<Class<BagOf<any>>>,
+    ArrayOf: '' as Ref<Class<ArrayOf<any>>>,
     InstanceOf: '' as Ref<Class<InstanceOf<Emb>>>,
     ResourceType: '' as Ref<Class<ResourceType<any>>>,
   }
@@ -142,11 +117,11 @@ const classDoc = S.newClass<Doc, Obj>({
     _id: S.newInstance(core.class.RefTo, {
       to: core.class.Doc,
     }),
-    _mixins: ''
+    _mixins: S.newInstance(core.class.ArrayOf, {
+      of: S.newInstance(core.class.RefTo, { to: core.class.Doc })
+    })
   }
 })
-
-const fff = S.newInstance(core.class.InstanceOf, { of: core.class.Type })
 
 const classClass = S.newClass<Class<Obj>, Doc>({
   _id: core.class.Class,
@@ -157,79 +132,12 @@ const classClass = S.newClass<Class<Obj>, Doc>({
   }
 })
 
-const typeClass = S.newClass<Type<PropertyType>, Emb>({
+const typeClass = S.newClass<Type<any>, Emb>({
   _id: core.class.Type,
   _attributes: {
     default: S.newInstance(core.class.Type, {}),
     exert: S.newInstance(core.class.ResourceType, {
-      default: 'func: type.exert' as Resource<(value: PropertyType) => any>
+      default: 'func: type.exert' as Resource<(value: Property<any>) => any>
     })
   }
 })
-
-
-// const x = {} as EClass<Person, Doc>
-
-// x._attributes.firstName
-
-// const y = {} as Class<Class<Obj>>
-
-// const refPerson = '' as Ref<Class<Person>>
-// const refClassClass = '' as Ref<Class<EClass<Person, Doc>>> (!)
-// const refTypeString = '' as Ref<Class<Type<string>>>
-
-// const S = {} as Session
-
-// const z = S.newInstance(refPerson, { firstName: 'John' as Str, lastName: 'Carmack' as Str, _id: '' as Ref<Person> })
-// const v = S.newInstance(refClassClass, {
-//   _attributes: {
-//     firstName: S.newInstance(refTypeString, {}),
-//     lastName: S.newInstance(refTypeString, {})
-//   }
-// })
-
-//////
-
-// export const metaModel = [
-//   newContainer(core.class.Class, {
-//     _id: core.class.Emb,
-//     _native: core.native.Emb,
-//     _attributes: {}
-//   }),
-//   newContainer(core.class.Class, {
-//     _id: core.class.Doc,
-//     _native: core.native.Doc,
-//     _attributes: {
-//       _id: ref(core.class.Doc)
-//     }
-//   }),
-//   createStruct(core.class.Type, core.class.Emb, {}, core.native.Type),
-//   createStruct(core.class.Resource, core.class.Type, {}, core.native.Type),
-//   createStruct(core.class.Metadata, core.class.Type, {}, core.native.Type),
-//   createStruct(core.class.String, core.class.Type, {}, core.native.Type),
-
-//   createStruct(core.class.RefTo, core.class.Type, {
-//     to: ref(core.class.Class)
-//   }, core.native.Type),
-//   createStruct(core.class.BagOf, core.class.Type, {
-//     of: obj(core.class.Type)
-//   }, core.native.BagOf),
-//   createStruct(core.class.ArrayOf, core.class.Type, {
-//     of: obj(core.class.Type)
-//   }, core.native.ArrayOf),
-//   createStruct(core.class.InstanceOf, core.class.Type, {
-//     of: ref(core.class.Struct)
-//   }, core.native.InstanceOf),
-
-//   createClass(core.class.StructuralFeature, core.class.Doc, {
-//     _attributes: bag(obj(core.class.Type)),
-//     _extends: ref(core.class.Struct),
-//     _native: resource()
-//   }, core.native.StructuralFeature),
-
-//   createClass(core.class.Struct, core.class.StructuralFeature, {
-//   }, core.native.Struct),
-
-//   createClass(core.class.Class, core.class.StructuralFeature, {
-//   }, core.native.Class)
-// ]
