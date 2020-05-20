@@ -51,9 +51,9 @@ export default (S: CoreService): Doc[] => {
         _attributes: S.newInstance(core.class.BagOf, {
           of: S.newInstance(core.class.InstanceOf, { of: core.class.Type })
         }),
-        _overrides: S.newInstance(core.class.BagOf, {
-          of: S.newInstance(core.class.InstanceOf, { of: core.class.Type })
-        }),
+        // _overrides: S.newInstance(core.class.BagOf, {
+        //   of: S.newInstance(core.class.InstanceOf, { of: core.class.Type })
+        // }),
         _extends: S.newInstance(core.class.RefTo as Ref<Class<RefTo<Class<Obj>>>>, {
           to: core.class.Class
         }),
@@ -78,9 +78,7 @@ export default (S: CoreService): Doc[] => {
       _attributes: {
         of: S.newInstance(core.class.InstanceOf as Ref<Class<InstanceOf<Type<any>>>>, {
           of: core.class.Type
-        })
-      },
-      _overrides: {
+        }),
         exert: S.newInstance(core.class.ResourceType, {
           _default: core.method.BagOf_exert
         })
@@ -103,9 +101,7 @@ export default (S: CoreService): Doc[] => {
       _attributes: {
         of: S.newInstance(core.class.RefTo as Ref<Class<RefTo<Class<Obj>>>>, {
           to: core.class.Class
-        })
-      },
-      _overrides: {
+        }),
         exert: S.newInstance(core.class.ResourceType, {
           _default: core.method.InstanceOf_exert
         })

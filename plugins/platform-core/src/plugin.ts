@@ -57,8 +57,7 @@ export default async (platform: Platform) => {
   // C L A S S E S
 
   function getOwnAttribute (clazz: Class<Obj>, key: string): Type<any> | undefined {
-    return (clazz._attributes as any)[key] ??
-      (clazz._overrides ? (clazz._overrides as any)[key] : undefined)
+    return (clazz._attributes as any)[key]
   }
 
   function getAttribute (clazz: Class<Obj>, key: string): Type<any> | undefined {
@@ -106,7 +105,7 @@ export default async (platform: Platform) => {
       }
     }
 
-    const attributes: { [key: string]: Type<any> } = { ...clazz._attributes, ...clazz._overrides }
+    const attributes = clazz._attributes as { [key: string]: Type<any> }
     for (const key in attributes) {
       if (key === '_default') { continue } // we do not define `_default`'s type, it's infinitevely recursive :)
       const attr = attributes[key]

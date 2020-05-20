@@ -57,8 +57,7 @@ type PropertyTypes<T> = { [P in keyof T]:
 export type Attributes<T extends E, E extends Obj> = PropertyTypes<Required<Omit<T, keyof E>>>
 
 export interface EClass<T extends E, E extends Obj> extends Doc {
-  _attributes: Attributes<T, E>
-  _overrides?: Partial<Attributes<T, Obj>>
+  _attributes: Attributes<T, E> & Partial<Attributes<E, Obj>>
   _extends?: Ref<Class<Obj>>
   _native?: ResourceProperty<Object>
 }
