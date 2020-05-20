@@ -27,6 +27,12 @@ export type ResourceProperty<T> = Property<T> & Resource<T>
 
 export type Ref<T> = StringProperty<T> & { __ref: true }
 
+export type PropertyType = Property<any>
+  | Emb
+  | undefined
+  | PropertyType[]
+  | { [key: string]: PropertyType }
+
 export interface Obj { _class: Ref<Class<this>> }
 export interface Emb extends Obj { __embedded: this }
 export interface Doc extends Obj {
