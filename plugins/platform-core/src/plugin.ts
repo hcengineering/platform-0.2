@@ -15,7 +15,7 @@
 
 import { Platform } from '@anticrm/platform'
 import core, {
-  CoreService, Obj, Ref, Class, Doc, EClass, BagOf, InstanceOf,
+  CoreService, Obj, Ref, Class, Doc, EClass, BagOf, InstanceOf, PropertyType,
   Instance, Type, Emb, ResourceType, Property, ResourceProperty
 } from '.'
 
@@ -173,7 +173,7 @@ export default async (platform: Platform) => {
     return value
   }
 
-  const BagOf_exert = function (this: Instance<BagOf<any>>, value: { [key: string]: Property<any> }): { [key: string]: any } {
+  const BagOf_exert = function (this: Instance<BagOf<any>>, value: { [key: string]: PropertyType }): { [key: string]: any } {
     return new Proxy(value, new BagProxyHandler(this.of))
   }
 

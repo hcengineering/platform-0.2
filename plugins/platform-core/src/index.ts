@@ -41,7 +41,7 @@ export interface Doc extends Obj {
 }
 export interface Type<A> extends Emb {
   _default?: Property<A>
-  exert?: Property<(value: Property<any>) => any>
+  exert?: Property<(this: Instance<Type<any>>, value: PropertyType) => any>
 }
 export interface RefTo<T extends Doc> extends Type<T> { to: Ref<Class<T>> }
 export interface InstanceOf<T extends Emb> extends Type<T> { of: Ref<Class<T>> }
@@ -115,9 +115,9 @@ export default plugin('core' as Plugin<CoreService>, {}, {
     RefTo: '' as Ref<Class<RefTo<Doc>>>,
   },
   method: {
-    Type_exert: '' as ResourceProperty<(value: Property<any>) => any>,
-    BagOf_exert: '' as ResourceProperty<(value: { [key: string]: Property<any> }) => { [key: string]: any }>,
-    InstanceOf_exert: '' as ResourceProperty<(value: Emb) => Instance<Emb>>,
+    Type_exert: '' as ResourceProperty<(this: Instance<Type<any>>, value: PropertyType) => any>,
+    BagOf_exert: '' as ResourceProperty<(this: Instance<BagOf<any>>, value: { [key: string]: PropertyType }) => any>,
+    InstanceOf_exert: '' as ResourceProperty<(this: Instance<InstanceOf<any>>, value: Emb) => Instance<Emb>>,
   },
   native: {
     ResourceType: '' as ResourceProperty<Object>
