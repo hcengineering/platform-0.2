@@ -1,6 +1,6 @@
 
 import { Scene } from 'three'
-import { CSS3DObject } from '../lib/CSS3DRenderer.js'
+import { CSS3DObject } from '../css3d/CSS3DRenderer'
 
 import { RendererOptions } from '@vue/runtime-core'
 

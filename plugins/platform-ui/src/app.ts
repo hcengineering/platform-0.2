@@ -21,7 +21,7 @@ import { nodeOps, scene } from './render/nodeOps'
 import { patchProp } from './render/patchProp'
 
 import { PerspectiveCamera } from 'three'
-import { CSS3DRenderer } from './lib/CSS3DRenderer.js'
+import { CSS3DRenderer } from './css3d/CSS3DRenderer'
 
 const create3DApp = ((root: any) => {
 
