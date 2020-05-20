@@ -14,25 +14,30 @@
 //
 
 import contact from '.'
-import core from '@anticrm/platform-core/src/__resources__'
+import core from '@anticrm/platform-core/src/__model__'
 
-import UIBuilder from '@anticrm/platform-ui-model/src/__resources__/builder'
 
-export default async (S: UIBuilder) => {
+import { Builder } from '@anticrm/platform-ui/src/__model__/builder'
 
-  const email = await S.createStruct(contact.class.Email, core.class.Type, {})
+export default async (S: Builder) => {
+
+  const email = S.createStruct(contact.class.Email, core.class.Type, {})
   const phone = await S.createStruct(contact.class.Phone, core.class.Type, {})
   const twitter = await S.createStruct(contact.class.Twitter, core.class.Type, {})
   const address = await S.createStruct(contact.class.Address, core.class.Type, {})
 
   return Promise.all([
-    S.createClass(contact.class.Contact, core.class.Doc, {
-      email: await email.newInstance({}),
-      phone: await phone.newInstance({}),
-      phoneWork: await phone.newInstance({}),
-      twitter: await twitter.newInstance({}),
-      address: await address.newInstance({}),
-      addressDelivery: await address.newInstance({}),
+    S.createClass({
+      _id: contact.class.Contact,
+      _extends: core.class.Doc,
+      _attributes: {
+        email: email.newInstance({}),
+        phone: await phone.newInstance({}),
+        phoneWork: await phone.newInstance({}),
+        twitter: await twitter.newInstance({}),
+        address: await address.newInstance({}),
+        addressDelivery: await address.newInstance({}),
+      }
     }),
 
     S.createClass(contact.class.Person, contact.class.Contact, {
