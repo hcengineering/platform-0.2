@@ -109,6 +109,7 @@ export default plugin('core' as Plugin<CoreService>, {}, {
     RefTo: '' as Ref<Class<RefTo<Doc>>>,
   },
   method: {
+    Type_exert: '' as ResourceProperty<(value: Property<any>) => any>,
     BagOf_exert: '' as ResourceProperty<(value: { [key: string]: Property<any> }) => { [key: string]: any }>,
     InstanceOf_exert: '' as ResourceProperty<(value: Emb) => Instance<Emb>>,
   },

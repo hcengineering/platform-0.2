@@ -27,23 +27,6 @@ export default async (platform: Platform) => {
     __layout: any
   }
 
-  const funcs = {
-    identity: function (value: Property<any>): any {
-      console.log('!!!!!! IDENTITY')
-      return value
-    },
-    instanceOf: function (value: Property<any>): any {
-      console.log('!!!!!! INSTANCEOF')
-      return value
-    },
-    bagOf: function (value: Property<any>): any {
-      console.log('!!!!!! BAGOF')
-      return value
-    }
-  }
-
-  // const ResourceType_exert = 
-
   const objects = new Map<Ref<Doc>, Doc>()
   const byClass = new Map<Ref<Class<Doc>>, Doc[]>()
 
@@ -186,6 +169,10 @@ export default async (platform: Platform) => {
     }
   }
 
+  const Type_exert = function (this: Instance<Type<any>>, value: Property<any>): any {
+    return value
+  }
+
   const BagOf_exert = function (this: Instance<BagOf<any>>, value: { [key: string]: Property<any> }): { [key: string]: any } {
     return new Proxy(value, new BagProxyHandler(this.of))
   }
@@ -201,14 +188,12 @@ export default async (platform: Platform) => {
       const f = platform.getResource(funcName)
       if (f) return f
 
-      const func = (funcs as any)[funcName]
-      if (!func)
-        throw new Error('no resourcetype: ' + funcName)
-      return func
+      throw new Error('no resourcetype: ' + funcName)
     }
   }
 
   platform.setResource(core.native.ResourceType, TResourceType)
+  platform.setResource(core.method.Type_exert, Type_exert)
   platform.setResource(core.method.BagOf_exert, BagOf_exert)
   platform.setResource(core.method.InstanceOf_exert, InstanceOf_exert)
 

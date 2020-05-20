@@ -67,7 +67,7 @@ export default (S: CoreService): Doc[] => {
       _attributes: {
         _default: S.newInstance(core.class.Type, {}),
         exert: S.newInstance(core.class.ResourceType, {
-          _default: 'identity' as ResourceProperty<(value: Property<any>) => any>
+          _default: core.method.Type_exert
         })
       },
       _extends: core.class.Emb
