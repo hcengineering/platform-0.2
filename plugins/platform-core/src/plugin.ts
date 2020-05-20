@@ -81,13 +81,9 @@ export default async (platform: Platform) => {
       const attrInstance = instantiate(attr)
 
       if (typeof attrInstance.exert !== 'function') {
-        console.log('not a function')
-        console.log(attrInstance)
-        console.log(attrInstance.exert)
+        throw new Error('exert is not a function')
       }
       const exert = attrInstance.exert()
-      // console.log('use factory')
-      // console.log(factory.x.toString())
 
       Object.defineProperty(proto, key, {
         get (this: InstanceProxy) {
@@ -158,14 +154,13 @@ export default async (platform: Platform) => {
   // T Y P E S : B A G
 
   class BagProxyHandler implements ProxyHandler<any> {
-    private exert: (value: Property<any>) => any
+    private exert: Exert
 
     constructor(type: Instance<Type<any>>) {
       if (!type.exert) {
         throw new Error('bagof: no exert')
       }
-      const factory = type.exert()
-      this.exert = factory
+      this.exert = type.exert()
     }
 
     get (target: any, key: string): any {
@@ -187,13 +182,8 @@ export default async (platform: Platform) => {
 
   const TResourceType = {
     exert: function (this: Instance<ResourceType<any>>): Exert {
-      const funcName = (this.__layout._default) as ResourceProperty<() => Exert>
-
-      const f = platform.getResource(funcName)
-      if (f) return (value: PropertyType) => f
-
-      console.log(this)
-      throw new Error('no resourcetype: ' + funcName)
+      const resource = (this.__layout._default) as ResourceProperty<(this: Instance<Type<any>>) => Exert>
+      return (value: PropertyType) => platform.getResource(resource)
     }
   }
 
