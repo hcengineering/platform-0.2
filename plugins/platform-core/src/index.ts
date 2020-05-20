@@ -33,19 +33,16 @@ export type PropertyType = Property<any>
   | PropertyType[]
   | { [key: string]: PropertyType }
 
-export type Factory = {
-  x: (value: PropertyType) => any
-}
-
 export interface Obj { _class: Ref<Class<this>> }
 export interface Emb extends Obj { __embedded: this }
 export interface Doc extends Obj {
   _id: Ref<this>
   _mixins?: Ref<Class<Doc>>[]
 }
+export type Exert = (value: PropertyType) => any
 export interface Type<A> extends Emb {
   _default?: Property<A>
-  exert?: Property<(this: Instance<Type<any>>) => Factory>
+  exert?: Property<(this: Instance<Type<any>>) => Exert>
 }
 export interface RefTo<T extends Doc> extends Type<T> { to: Ref<Class<T>> }
 export interface InstanceOf<T extends Emb> extends Type<T> { of: Ref<Class<T>> }
@@ -119,9 +116,9 @@ export default plugin('core' as Plugin<CoreService>, {}, {
     RefTo: '' as Ref<Class<RefTo<Doc>>>,
   },
   method: {
-    Type_exert: '' as ResourceProperty<(this: Instance<Type<any>>) => Factory>,
-    BagOf_exert: '' as ResourceProperty<(this: Instance<BagOf<any>>) => Factory>,
-    InstanceOf_exert: '' as ResourceProperty<(this: Instance<InstanceOf<any>>) => Factory>,
+    Type_exert: '' as ResourceProperty<(this: Instance<Type<any>>) => Exert>,
+    BagOf_exert: '' as ResourceProperty<(this: Instance<BagOf<any>>) => Exert>,
+    InstanceOf_exert: '' as ResourceProperty<(this: Instance<InstanceOf<any>>) => Exert>,
   },
   native: {
     ResourceType: '' as ResourceProperty<Object>

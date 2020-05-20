@@ -16,7 +16,7 @@
 import { Platform } from '@anticrm/platform'
 import core, {
   CoreService, Obj, Ref, Class, Doc, EClass, BagOf, InstanceOf, PropertyType,
-  Instance, Type, Emb, ResourceType, Property, ResourceProperty, Factory
+  Instance, Type, Emb, ResourceType, Property, ResourceProperty, Exert
 } from '.'
 
 export default async (platform: Platform) => {
@@ -85,13 +85,13 @@ export default async (platform: Platform) => {
         console.log(attrInstance)
         console.log(attrInstance.exert)
       }
-      const factory = attrInstance.exert()
+      const exert = attrInstance.exert()
       // console.log('use factory')
       // console.log(factory.x.toString())
 
       Object.defineProperty(proto, key, {
         get (this: InstanceProxy) {
-          return factory.x(this.__layout[key])
+          return exert(this.__layout[key])
         },
         enumerable: true
       })
@@ -165,7 +165,7 @@ export default async (platform: Platform) => {
         throw new Error('bagof: no exert')
       }
       const factory = type.exert()
-      this.exert = factory.x
+      this.exert = factory
     }
 
     get (target: any, key: string): any {
@@ -173,32 +173,25 @@ export default async (platform: Platform) => {
     }
   }
 
-  const Type_exert = function (this: Instance<Type<any>>): Factory {
-    return {
-      x: value => value
-    }
+  const Type_exert = function (this: Instance<Type<any>>): Exert {
+    return value => value
   }
 
-  const BagOf_exert = function (this: Instance<BagOf<any>>): Factory {
-    return {
-      x: (value: PropertyType) => new Proxy(value, new BagProxyHandler(this.of))
-    }
+  const BagOf_exert = function (this: Instance<BagOf<any>>): Exert {
+    return (value: PropertyType) => new Proxy(value, new BagProxyHandler(this.of))
   }
 
-  const InstanceOf_exert = function (this: Instance<InstanceOf<Emb>>): Factory {
-    return {
-      x: ((value: Emb) => instantiate(value)) as (value: PropertyType) => any
-    }
+  const InstanceOf_exert = function (this: Instance<InstanceOf<Emb>>): Exert {
+    return ((value: Emb) => instantiate(value)) as Exert
   }
 
   const TResourceType = {
-    exert: function (this: Instance<ResourceType<any>>): Factory {
-      const funcName = (this.__layout._default) as ResourceProperty<() => Factory>
+    exert: function (this: Instance<ResourceType<any>>): Exert {
+      const funcName = (this.__layout._default) as ResourceProperty<() => Exert>
 
       const f = platform.getResource(funcName)
-      if (f) return {
-        x: (value: PropertyType) => f
-      }
+      if (f) return (value: PropertyType) => f
+
       console.log(this)
       throw new Error('no resourcetype: ' + funcName)
     }
