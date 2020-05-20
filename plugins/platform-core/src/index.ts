@@ -123,9 +123,6 @@ export default plugin('core' as Plugin<CoreService>, {}, {
   native: {
     ResourceType: '' as ResourceProperty<Object>
   },
-  proto: {
-    Native: '' as ResourceProperty<Object>
-  }
 })
 
 

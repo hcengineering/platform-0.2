@@ -51,15 +51,10 @@ export default (S: CoreService): Doc[] => {
         _attributes: S.newInstance(core.class.BagOf, {
           of: S.newInstance(core.class.InstanceOf, { of: core.class.Type })
         }),
-        // _overrides: S.newInstance(core.class.BagOf, {
-        //   of: S.newInstance(core.class.InstanceOf, { of: core.class.Type })
-        // }),
         _extends: S.newInstance(core.class.RefTo as Ref<Class<RefTo<Class<Obj>>>>, {
           to: core.class.Class
         }),
-        _native: S.newInstance(core.class.ResourceType, {
-          _default: core.proto.Native
-        })
+        _native: S.newInstance(core.class.ResourceType, {})
       },
       _extends: core.class.Doc
     }),

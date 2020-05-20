@@ -183,11 +183,10 @@ export default async (platform: Platform) => {
   const TResourceType = {
     exert: function (this: Instance<ResourceType<any>>): Exert {
       const resource = (this.__layout._default) as ResourceProperty<(this: Instance<Type<any>>) => Exert>
-      return (value: PropertyType) => platform.getResource(resource)
+      return (value: PropertyType) => resource ? platform.getResource(resource) : undefined
     }
   }
 
-  platform.setResource(core.proto.Native, { native: 'object' })
   platform.setResource(core.native.ResourceType, TResourceType)
   platform.setResource(core.method.Type_exert, Type_exert)
   platform.setResource(core.method.BagOf_exert, BagOf_exert)
