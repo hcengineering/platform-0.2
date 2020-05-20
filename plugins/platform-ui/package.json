@@ -29,6 +29,7 @@
     "typescript": "~3.8.3"
   },
   "dependencies": {
-    "@anticrm/platform": "0.1.0"
+    "@anticrm/platform": "0.1.0",
+    "three": "^0.116.1"
   }
 }

@@ -17,9 +17,10 @@
 import { Platform } from '@anticrm/platform'
 import { AnyComponent, UIService, VueConstructor, Component } from '.'
 import { h, ref, createApp, defineComponent } from 'vue'
+import { createPlatformApp } from './app'
 
 import Root from './internal/Root.vue'
-import BootLoader from './internal/SysInfo.vue'
+import Root3D from './3d/Root3D.vue'
 
 console.log('Plugin `ui` loaded')
 
@@ -33,8 +34,8 @@ export default async (platform: Platform, deps: {}): Promise<UIService> => {
 
   // V U E  A P P
 
-  const app = createApp(Root)
-  app.config.globalProperties.$platform = platform
+  //  const app = createPlatformApp(platform, Root)
+  const app = createPlatformApp(platform, Root3D, true)
 
   // C O M P O N E N T  R E N D E R E R
 
