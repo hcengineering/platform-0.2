@@ -19,12 +19,14 @@ import { Platform } from '@anticrm/platform'
 import startPlugin from '../plugin'
 import model from '../__model__/model'
 import core from '../__model__'
+import { TSession } from '../session'
 
 describe('core', () => {
   const platform = new Platform()
 
   it('should ...', async () => {
-    const tx = await startPlugin(platform)
+    await startPlugin(platform)
+    const tx = new TSession(platform)
     const loaded = model(tx)
     expect(true).toBe(true)
     // console.log(JSON.stringify(loaded, null, 2))
@@ -32,7 +34,7 @@ describe('core', () => {
   })
 
   it('should create prototype', async () => {
-    const tx = await startPlugin(platform)
+    const tx = new TSession(platform)
     const loaded = model(tx) // eslint-disable-line
 
     const typeProto = tx.getPrototype(core.class.Type)
@@ -56,7 +58,7 @@ describe('core', () => {
   })
 
   it('should instantiate class', async () => {
-    const tx = await startPlugin(platform)
+    const tx = new TSession(platform)
     const loaded = model(tx) // eslint-disable-line
 
     const classRefTo = tx.get(core.class.RefTo)

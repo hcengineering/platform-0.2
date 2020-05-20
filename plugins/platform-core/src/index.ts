@@ -80,7 +80,10 @@ export type Instance<T extends Obj> = { [P in keyof T]:
   T[P] extends { [key: string]: Property<infer X> } ? { [key: string]: X } :
   T[P] extends Property<infer X>[] ? X[] :
   never
-} & { __layout: T }
+} & {
+  __layout: T
+  getSession (): Session
+}
 
 /** 
   -- Here is a single fundamental signature: `mixin`:
@@ -96,7 +99,9 @@ export type Instance<T extends Obj> = { [P in keyof T]:
   // newClass
   //     newClass === newInstance, where M === EClass<T, E> // clazz: Ref<Class<EClass<T, E>>>,
 */
-export interface CoreService extends Service {
+export interface Session {
+
+  instantiateEmb (value: Emb): Instance<Emb>
 
   mixin<D extends T, M extends T, T extends Doc> (doc: D, clazz: Ref<EClass<M, T>>, values: Omit<M, keyof T>): M
 
@@ -107,6 +112,10 @@ export interface CoreService extends Service {
 
   createDocument<M extends Doc> (clazz: Ref<Class<M>>, values: Omit<M, keyof Doc>): M
   createClass<T extends E, E extends Obj> (values: Omit<EClass<T, E>, keyof Obj>): EClass<T, E>
+}
+
+export interface CoreService {
+  newSession (): Session
 }
 
 export default plugin('core' as Plugin<CoreService>, {}, {

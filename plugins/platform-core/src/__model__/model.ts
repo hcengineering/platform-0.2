@@ -15,11 +15,11 @@
 
 import core from '.'
 import {
-  CoreService, Obj, Doc, Class, BagOf, InstanceOf, ResourceType,
+  Session, Obj, Doc, Class, BagOf, InstanceOf, ResourceType,
   Property, Type, Emb, ResourceProperty, Ref, RefTo, ArrayOf
 } from '..'
 
-export default (S: CoreService): Doc[] => {
+export default (S: Session): Doc[] => {
   return [
     S.createClass<Obj, Obj>({
       _id: core.class.Obj,
