@@ -162,15 +162,8 @@ class CSS3DRenderer {
     if (scene.autoUpdate === true) scene.updateMatrixWorld()
     if (camera.parent === null) camera.updateMatrixWorld()
 
-    if (camera.isOrthographicCamera) {
-
-      var tx = - (camera.right + camera.left) / 2
-      var ty = (camera.top + camera.bottom) / 2
-
-    }
-
     var cameraCSSMatrix = camera.isOrthographicCamera ?
-      'scale(' + fov + ')' + 'translate(' + epsilon(tx) + 'px,' + epsilon(ty) + 'px)' + getCameraCSSMatrix(camera.matrixWorldInverse) :
+      'scale(' + fov + ')' + 'translate(' + epsilon(- (camera.right + camera.left) / 2) + 'px,' + epsilon((camera.top + camera.bottom) / 2) + 'px)' + getCameraCSSMatrix(camera.matrixWorldInverse) :
       'translateZ(' + fov + 'px)' + getCameraCSSMatrix(camera.matrixWorldInverse)
 
     var style = cameraCSSMatrix +
@@ -190,13 +183,13 @@ class CSS3DRenderer {
 
 }
 
-function epsilon (value) {
+function epsilon (value: number) {
 
   return Math.abs(value) < 1e-10 ? 0 : value
 
 }
 
-function getCameraCSSMatrix (matrix) {
+function getCameraCSSMatrix (matrix: any) {
 
   var elements = matrix.elements
 
@@ -221,7 +214,7 @@ function getCameraCSSMatrix (matrix) {
 
 }
 
-function getObjectCSSMatrix (matrix, cameraCSSMatrix) {
+function getObjectCSSMatrix (matrix: any, cameraCSSMatrix: string) {
 
   var elements = matrix.elements
   var matrix3d = 'matrix3d(' +
