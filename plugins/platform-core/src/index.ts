@@ -113,7 +113,7 @@ export default plugin('core' as Plugin<CoreService>, {}, {
     InstanceOf_exert: '' as ResourceProperty<(value: Emb) => Instance<Emb>>,
   },
   native: {
-    BagOf: '' as Resource<Object>
+    ResourceType: '' as ResourceProperty<Object>
   }
 })
 

@@ -122,14 +122,9 @@ export default (S: CoreService): Doc[] => {
     S.createClass<ResourceType<any>, Type<any>>({
       _id: core.class.ResourceType,
       _attributes: {},
-      _extends: core.class.Type
+      _extends: core.class.Type,
+      _native: core.native.ResourceType
     })
-
-    // S.createClass<Identity, Type<(value: Property<any>) => any>>({
-    //   _id: core.class.Identity,
-    //   _attributes: {},
-    //   _extends: core.class.Type,
-    // })
 
   ]
 }

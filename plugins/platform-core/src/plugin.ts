@@ -91,20 +91,6 @@ export default async (platform: Platform) => {
       Object.defineProperties(proto, descriptors)
     }
 
-    if (_class as string === core.class.ResourceType) {
-      proto.exert = function (this: Instance<ResourceType<any>>, value: Property<any>): any {
-        const funcName = (value ?? this.__layout._default) as ResourceProperty<() => any>
-
-        const f = platform.getResource(funcName)
-        if (f) return f
-
-        const func = (funcs as any)[funcName]
-        if (!func)
-          throw new Error('no resourcetype: ' + funcName)
-        return func
-      }
-    }
-
     const attributes = clazz._attributes as { [key: string]: Type<any> }
     for (const key in attributes) {
       if (key === '_default') { continue } // we do not define `_default`'s type, it's infinitevely recursive :)
@@ -208,6 +194,21 @@ export default async (platform: Platform) => {
     return instantiate(value)
   }
 
+  const TResourceType = {
+    exert: function (this: Instance<ResourceType<any>>, value: Property<any>): any {
+      const funcName = (value ?? this.__layout._default) as ResourceProperty<() => any>
+
+      const f = platform.getResource(funcName)
+      if (f) return f
+
+      const func = (funcs as any)[funcName]
+      if (!func)
+        throw new Error('no resourcetype: ' + funcName)
+      return func
+    }
+  }
+
+  platform.setResource(core.native.ResourceType, TResourceType)
   platform.setResource(core.method.BagOf_exert, BagOf_exert)
   platform.setResource(core.method.InstanceOf_exert, InstanceOf_exert)
 
