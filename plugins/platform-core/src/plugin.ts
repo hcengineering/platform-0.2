@@ -16,7 +16,7 @@
 import { Platform } from '@anticrm/platform'
 import core, {
   CoreService, Obj, Ref, Class, Doc, EClass, BagOf, InstanceOf, PropertyType,
-  Instance, Type, Emb, ResourceType, Property, ResourceProperty
+  Instance, Type, Emb, ResourceType, Property, ResourceProperty, Factory
 } from '.'
 
 export default async (platform: Platform) => {
@@ -80,15 +80,18 @@ export default async (platform: Platform) => {
       const attr = attributes[key]
       const attrInstance = instantiate(attr)
 
-      const exert = attrInstance.exert as (value: Property<any>) => any
-      if (typeof exert !== 'function') {
-        throw new Error('exert must be a function, ' + exert)
+      if (typeof attrInstance.exert !== 'function') {
+        console.log('not a function')
+        console.log(attrInstance)
+        console.log(attrInstance.exert)
       }
+      const factory = attrInstance.exert()
+      // console.log('use factory')
+      // console.log(factory.x.toString())
 
-      const bound = exert.bind(attrInstance)
       Object.defineProperty(proto, key, {
         get (this: InstanceProxy) {
-          return bound(this.__layout[key])
+          return factory.x(this.__layout[key])
         },
         enumerable: true
       })
@@ -161,7 +164,8 @@ export default async (platform: Platform) => {
       if (!type.exert) {
         throw new Error('bagof: no exert')
       }
-      this.exert = type.exert
+      const factory = type.exert()
+      this.exert = factory.x
     }
 
     get (target: any, key: string): any {
@@ -169,29 +173,38 @@ export default async (platform: Platform) => {
     }
   }
 
-  const Type_exert = function (this: Instance<Type<any>>, value: Property<any>): any {
-    return value
+  const Type_exert = function (this: Instance<Type<any>>): Factory {
+    return {
+      x: value => value
+    }
   }
 
-  const BagOf_exert = function (this: Instance<BagOf<any>>, value: { [key: string]: PropertyType }): { [key: string]: any } {
-    return new Proxy(value, new BagProxyHandler(this.of))
+  const BagOf_exert = function (this: Instance<BagOf<any>>): Factory {
+    return {
+      x: (value: PropertyType) => new Proxy(value, new BagProxyHandler(this.of))
+    }
   }
 
-  const InstanceOf_exert = function (this: Instance<InstanceOf<Emb>>, value: Emb): Instance<Emb> {
-    return instantiate(value)
+  const InstanceOf_exert = function (this: Instance<InstanceOf<Emb>>): Factory {
+    return {
+      x: ((value: Emb) => instantiate(value)) as (value: PropertyType) => any
+    }
   }
 
   const TResourceType = {
-    exert: function (this: Instance<ResourceType<any>>, value: Property<any>): any {
-      const funcName = (value ?? this.__layout._default) as ResourceProperty<() => any>
+    exert: function (this: Instance<ResourceType<any>>): Factory {
+      const funcName = (this.__layout._default) as ResourceProperty<() => Factory>
 
       const f = platform.getResource(funcName)
-      if (f) return f
-
+      if (f) return {
+        x: (value: PropertyType) => f
+      }
+      console.log(this)
       throw new Error('no resourcetype: ' + funcName)
     }
   }
 
+  platform.setResource(core.proto.Native, { native: 'object' })
   platform.setResource(core.native.ResourceType, TResourceType)
   platform.setResource(core.method.Type_exert, Type_exert)
   platform.setResource(core.method.BagOf_exert, BagOf_exert)

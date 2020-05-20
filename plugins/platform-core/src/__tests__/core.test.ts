@@ -44,10 +44,13 @@ describe('core', () => {
     const rtProtoProto = Object.getPrototypeOf(rtProto)
     expect(typeProto).toBe(rtProtoProto)
 
+    const bagProto = tx.getPrototype(core.class.BagOf)
+    console.log(bagProto)
+
     const classRefTo = tx.get(core.class.InstanceOf)
     const to = classRefTo._attributes.of
-
     const inst = tx.instantiate(to)
+    console.log(inst)
     const refToProto = Object.getPrototypeOf(inst)
     expect(refToProto).toBe(tx.getPrototype(core.class.RefTo))
   })

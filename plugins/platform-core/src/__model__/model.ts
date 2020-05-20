@@ -57,7 +57,9 @@ export default (S: CoreService): Doc[] => {
         _extends: S.newInstance(core.class.RefTo as Ref<Class<RefTo<Class<Obj>>>>, {
           to: core.class.Class
         }),
-        _native: S.newInstance(core.class.ResourceType, {})
+        _native: S.newInstance(core.class.ResourceType, {
+          _default: core.proto.Native
+        })
       },
       _extends: core.class.Doc
     }),
