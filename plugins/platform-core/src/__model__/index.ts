@@ -14,7 +14,7 @@
 //
 
 import core, {
-  Obj, Ref, Class, Doc, Type, BagOf, ArrayOf, InstanceOf, Emb, EClass
+  Obj, Ref, Class, Doc, Type, BagOf, ArrayOf, InstanceOf, Emb
 } from '..'
 
 import { extendIds } from './utils'

@@ -16,7 +16,7 @@
 import core from '.'
 import {
   Session, Obj, Doc, Class, BagOf, InstanceOf, ResourceType,
-  Property, Type, Emb, ResourceProperty, Ref, RefTo, ArrayOf
+  Type, Emb, Ref, RefTo, ArrayOf
 } from '..'
 
 export default (S: Session): Doc[] => {

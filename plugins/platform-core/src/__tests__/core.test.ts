@@ -27,7 +27,7 @@ describe('core', () => {
   it('should ...', async () => {
     await startPlugin(platform)
     const tx = new TSession(platform)
-    const loaded = model(tx)
+    model(tx)
     expect(true).toBe(true)
     // console.log(JSON.stringify(loaded, null, 2))
     // console.log(JSON.stringify(loaded))
@@ -35,7 +35,7 @@ describe('core', () => {
 
   it('should create prototype', async () => {
     const tx = new TSession(platform)
-    const loaded = model(tx) // eslint-disable-line
+    model(tx) // eslint-disable-line
 
     const typeProto = tx.getPrototype(core.class.Type)
     console.log(typeProto)
@@ -59,7 +59,7 @@ describe('core', () => {
 
   it('should instantiate class', async () => {
     const tx = new TSession(platform)
-    const loaded = model(tx) // eslint-disable-line
+    model(tx) // eslint-disable-line
 
     const classRefTo = tx.get(core.class.RefTo)
 
