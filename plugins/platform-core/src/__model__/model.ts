@@ -29,7 +29,7 @@ export default (S: Session): Doc[] => {
     S.createClass<Emb, Emb>({
       _id: core.class.Emb,
       _attributes: {},
-      _extends: core.class.Obj
+      _extends: core.class.Obj as Ref<Class<Emb>>
     }),
 
     S.createClass<Doc, Obj>({

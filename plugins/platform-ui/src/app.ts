@@ -23,8 +23,6 @@ import { patchProp } from './render/patchProp'
 import { PerspectiveCamera } from 'three'
 import { CSS3DRenderer } from './css3d/CSS3DRenderer'
 
-import { createCity } from './city'
-
 const create3DApp = ((root: any) => {
 
   const app = createRenderer({
@@ -67,37 +65,27 @@ const create3DApp = ((root: any) => {
 
   // C S S  3 D  R E N D E R E R
 
-  // const camera = new PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 10000)
-  // camera.position.z = 1000
+  const camera = new PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 10000)
+  camera.position.z = 1000
 
-  var camera = new PerspectiveCamera(20, window.innerWidth / window.innerHeight, 1, 500)
-  camera.position.set(0, 2, 14)
-
-
-  // const renderer = new CSS3DRenderer()
-  const gl = createCity(camera)
-  // renderer.setSize(window.innerWidth, window.innerHeight)
-  // gl.setSize(window.innerWidth, window.innerHeight)
-  // document.getElementById('container')?.appendChild(renderer.domElement)
-  // document.getElementById('container')?.appendChild(gl.domElement)
+  const renderer = new CSS3DRenderer()
+  renderer.setSize(window.innerWidth, window.innerHeight)
+  document.getElementById('container')?.appendChild(renderer.domElement)
 
   window.addEventListener('resize', onWindowResize, false)
   function onWindowResize () {
     camera.aspect = window.innerWidth / window.innerHeight
     camera.updateProjectionMatrix()
-    // renderer.setSize(window.innerWidth, window.innerHeight)
-    // gl.setSize(window.innerWidth, window.innerHeight)
+    renderer.setSize(window.innerWidth, window.innerHeight)
     render()
   }
 
   function render () {
-    // renderer.render(scene, camera)
-    // gl.render(scene, camera)
+    renderer.render(scene, camera)
   }
 
   function animate () {
-    //requestAnimationFrame(animate)
-    gl()
+    requestAnimationFrame(animate)
   }
 
   return app
