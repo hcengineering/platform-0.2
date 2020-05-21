@@ -58,19 +58,18 @@ const create3DApp = ((root: any) => {
     const proxy = mount(container)
     container.removeAttribute('v-cloak')
 
+    render()
     animate()
     return proxy
   }
 
-  // R E N D E R E R
+  // C S S  3 D  R E N D E R E R
 
   const camera = new PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 10000)
   camera.position.z = 1000
 
   const renderer = new CSS3DRenderer()
   renderer.setSize(window.innerWidth, window.innerHeight)
-  console.log('elem')
-  console.log(renderer.domElement)
   document.getElementById('container')?.appendChild(renderer.domElement)
 
   window.addEventListener('resize', onWindowResize, false)
@@ -86,14 +85,7 @@ const create3DApp = ((root: any) => {
   }
 
   function animate () {
-    console.log('animate')
-
     requestAnimationFrame(animate)
-
-    // TWEEN.update()
-
-    // controls.update()
-
   }
 
   return app

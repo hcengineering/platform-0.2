@@ -74,10 +74,6 @@ class CSS3DRenderer {
 
   renderObject (object: any, scene: any, camera: any, cameraCSSMatrix: string) {
 
-    console.log('render object')
-    console.log(object)
-    console.log(scene)
-
     if (object instanceof CSS3DObject) {
 
       object.onBeforeRender(this as any, scene, camera, undefined as any, undefined as any, undefined as any)
