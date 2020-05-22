@@ -49,43 +49,38 @@ const create3DApp = ((root: any) => {
   app.mount = (containerOrSelector: Element | string): any => {
     const container = normalizeContainer(containerOrSelector)
     if (!container) return
-    const component = app._component
-    if (!isFunction(component) && !component.render && !component.template) {
-      component.template = container.innerHTML
-    }
     // clear content before mounting
     container.innerHTML = ''
+
+    const renderer = new CSS3DRenderer()
+    renderer.setSize(window.innerWidth, window.innerHeight)
+    container.appendChild(renderer.domElement)
+
+    const camera = new PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 10000)
+    camera.position.z = 1000
+
+    window.addEventListener('resize', onWindowResize, false)
+    function onWindowResize () {
+      camera.aspect = window.innerWidth / window.innerHeight
+      camera.updateProjectionMatrix()
+      renderer.setSize(window.innerWidth, window.innerHeight)
+      render()
+    }
+
+    function render () {
+      renderer.render(scene, camera)
+    }
+
+    function animate () {
+      requestAnimationFrame(animate)
+    }
+
     const proxy = mount(container)
     container.removeAttribute('v-cloak')
 
     render()
     animate()
     return proxy
-  }
-
-  // C S S  3 D  R E N D E R E R
-
-  const camera = new PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 10000)
-  camera.position.z = 1000
-
-  const renderer = new CSS3DRenderer()
-  renderer.setSize(window.innerWidth, window.innerHeight)
-  document.getElementById('container')?.appendChild(renderer.domElement)
-
-  window.addEventListener('resize', onWindowResize, false)
-  function onWindowResize () {
-    camera.aspect = window.innerWidth / window.innerHeight
-    camera.updateProjectionMatrix()
-    renderer.setSize(window.innerWidth, window.innerHeight)
-    render()
-  }
-
-  function render () {
-    renderer.render(scene, camera)
-  }
-
-  function animate () {
-    requestAnimationFrame(animate)
   }
 
   return app

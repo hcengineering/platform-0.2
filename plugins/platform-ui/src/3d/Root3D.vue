@@ -15,6 +15,9 @@
 
 <template>
   <css3DObject>
-    <div>Hey There!</div>
+    <div>
+      Hey There, my friend,
+      <b>Andrey</b>
+    </div>
   </css3DObject>
 </template>

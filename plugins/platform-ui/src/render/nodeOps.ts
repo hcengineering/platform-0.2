@@ -13,8 +13,6 @@ let tempSVGContainer: SVGElement
 
 export const scene = new Scene()
 
-const objects = new Array()
-
 export const nodeOps: Omit<RendererOptions<Node, Element>, 'patchProp'> = {
   insert: (child, parent, anchor) => {
     console.log('insert')
@@ -52,9 +50,6 @@ export const nodeOps: Omit<RendererOptions<Node, Element>, 'patchProp'> = {
       object.position.y = 0//Math.random() * 4000 - 2000
       object.position.z = 0//Math.random() * 4000 - 2000
       scene.add(object)
-
-      objects.push(object)
-
 
       return element
     }
