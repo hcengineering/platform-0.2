@@ -27,112 +27,112 @@ import ErrorPage from './components/ErrorPage.vue'
 
 // import { createApp } from 'vue'
 
-import { createRenderer } from '@vue/runtime-core'
+// import { createRenderer } from '@vue/runtime-core'
 
-import { nodeOps, camera, scene, objects } from './dom/nodeOps'
-import { patchProp } from './dom/patchProp'
+// import { nodeOps, camera, scene, objects } from './dom/nodeOps'
+// import { patchProp } from './dom/patchProp'
 
-import { CSS3DRenderer } from './libs/CSS3DRenderer.js'
-import { TWEEN } from './libs/tween.module.min.js'
+// import { CSS3DRenderer } from './libs/CSS3DRenderer.js'
+// import { TWEEN } from './libs/tween.module.min.js'
 
-export const isFunction = (val: unknown): val is Function =>
-  typeof val === 'function'
-export const isString = (val: unknown): val is string => typeof val === 'string'
+// export const isFunction = (val: unknown): val is Function =>
+//   typeof val === 'function'
+// export const isString = (val: unknown): val is string => typeof val === 'string'
 
-function normalizeContainer (container: Element | string): Element | null {
-  if (isString(container)) {
-    const res = document.querySelector(container)
-    return res
-  }
-  return container
-}
-
-
-export const createApp = ((root: any) => {
-  const app = createRenderer({
-    ...nodeOps, patchProp
-  }).createApp(root)
+// function normalizeContainer (container: Element | string): Element | null {
+//   if (isString(container)) {
+//     const res = document.querySelector(container)
+//     return res
+//   }
+//   return container
+// }
 
 
-  const { mount } = app
-  app.mount = (containerOrSelector: Element | string): any => {
-    const container = normalizeContainer(containerOrSelector)
-    if (!container) return
-    const component = app._component
-    if (!isFunction(component) && !component.render && !component.template) {
-      component.template = container.innerHTML
-    }
-    // clear content before mounting
-    container.innerHTML = ''
-    const proxy = mount(container)
-    container.removeAttribute('v-cloak')
-    return proxy
-  }
+// export const createApp = ((root: any) => {
+//   const app = createRenderer({
+//     ...nodeOps, patchProp
+//   }).createApp(root)
 
-  return app
-})
 
-const renderer = new CSS3DRenderer()
-renderer.setSize(window.innerWidth, window.innerHeight)
-document.getElementById('container')?.appendChild(renderer.domElement)
+//   const { mount } = app
+//   app.mount = (containerOrSelector: Element | string): any => {
+//     const container = normalizeContainer(containerOrSelector)
+//     if (!container) return
+//     const component = app._component
+//     if (!isFunction(component) && !component.render && !component.template) {
+//       component.template = container.innerHTML
+//     }
+//     // clear content before mounting
+//     container.innerHTML = ''
+//     const proxy = mount(container)
+//     container.removeAttribute('v-cloak')
+//     return proxy
+//   }
 
-window.addEventListener('resize', onWindowResize, false)
+//   return app
+// })
 
-function onWindowResize () {
+// const renderer = new CSS3DRenderer()
+// renderer.setSize(window.innerWidth, window.innerHeight)
+// document.getElementById('container')?.appendChild(renderer.domElement)
 
-  camera.aspect = window.innerWidth / window.innerHeight
-  camera.updateProjectionMatrix()
+// window.addEventListener('resize', onWindowResize, false)
 
-  renderer.setSize(window.innerWidth, window.innerHeight)
+// function onWindowResize () {
 
-  render()
+//   camera.aspect = window.innerWidth / window.innerHeight
+//   camera.updateProjectionMatrix()
 
-}
+//   renderer.setSize(window.innerWidth, window.innerHeight)
 
-function transform (targets, duration) {
+//   render()
 
-  TWEEN.removeAll()
+// }
 
-  for (var i = 0; i < objects.length; i++) {
+// function transform (targets, duration) {
 
-    var object = objects[i]
-    var target = targets[i]
+//   TWEEN.removeAll()
 
-    new TWEEN.Tween(object.position)
-      .to({ x: target.position.x, y: target.position.y, z: target.position.z }, Math.random() * duration + duration)
-      .easing(TWEEN.Easing.Exponential.InOut)
-      .start()
+//   for (var i = 0; i < objects.length; i++) {
 
-    new TWEEN.Tween(object.rotation)
-      .to({ x: target.rotation.x, y: target.rotation.y, z: target.rotation.z }, Math.random() * duration + duration)
-      .easing(TWEEN.Easing.Exponential.InOut)
-      .start()
+//     var object = objects[i]
+//     var target = targets[i]
 
-  }
+//     new TWEEN.Tween(object.position)
+//       .to({ x: target.position.x, y: target.position.y, z: target.position.z }, Math.random() * duration + duration)
+//       .easing(TWEEN.Easing.Exponential.InOut)
+//       .start()
 
-  new TWEEN.Tween(this)
-    .to({}, duration * 2)
-    .onUpdate(render)
-    .start()
+//     new TWEEN.Tween(object.rotation)
+//       .to({ x: target.rotation.x, y: target.rotation.y, z: target.rotation.z }, Math.random() * duration + duration)
+//       .easing(TWEEN.Easing.Exponential.InOut)
+//       .start()
 
-}
+//   }
 
-function animate () {
-  console.log('animate')
+//   new TWEEN.Tween(this)
+//     .to({}, duration * 2)
+//     .onUpdate(render)
+//     .start()
 
-  requestAnimationFrame(animate)
+// }
 
-  TWEEN.update()
+// function animate () {
+//   console.log('animate')
 
-  // controls.update()
+//   requestAnimationFrame(animate)
 
-}
+//   TWEEN.update()
 
-function render () {
+//   // controls.update()
 
-  renderer.render(scene, camera)
+// }
 
-}
+// function render () {
+
+//   renderer.render(scene, camera)
+
+// }
 
 // import uiMeta from '@anticrm/platform-ui-model/src/__resources__/meta'
 // import contactMeta from '@anticrm/contact/src/__resources__/meta'
@@ -157,9 +157,9 @@ function render () {
 // }
 
 // boot().catch(err => {
-createApp(ErrorPage).mount('#app')
+// createApp(ErrorPage).mount('#app')
 // })
 
-// import './cards.js'
+import './cards.js'
 
-animate()
+// animate()

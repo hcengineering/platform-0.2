@@ -146,12 +146,15 @@ var controls
 var objects = []
 var targets = { table: [], sphere: [], helix: [], grid: [] }
 
+const innerWidth = 1000
+const innerHeight = 1000
+
 init()
 animate()
 
 function init() {
 
-  camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 10000)
+  camera = new THREE.PerspectiveCamera(40, innerWidth / innerHeight, 1, 10000)
   camera.position.z = 3000
 
   scene = new THREE.Scene()
@@ -258,7 +261,7 @@ function init() {
   //
 
   renderer = new CSS3DRenderer()
-  renderer.setSize(window.innerWidth, window.innerHeight)
+  renderer.setSize(innerWidth, innerHeight)
   document.getElementById('container').appendChild(renderer.domElement)
 
   //
@@ -334,7 +337,7 @@ function transform(targets, duration) {
 
 function onWindowResize() {
 
-  camera.aspect = window.innerWidth / window.innerHeight
+  camera.aspect = innerWidth / innerHeight
   camera.updateProjectionMatrix()
 
   renderer.setSize(window.innerWidth, window.innerHeight)

@@ -58,6 +58,8 @@ const create3DApp = ((root: any) => {
 
     const camera = new PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 10000)
     camera.position.z = 1000
+    camera.position.x = 100
+    camera.position.y = 10
 
     window.addEventListener('resize', onWindowResize, false)
     function onWindowResize () {
