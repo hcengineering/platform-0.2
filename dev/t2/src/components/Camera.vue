@@ -14,8 +14,9 @@
 -->
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue'
+import { defineComponent, computed, ref, onMounted, reactive } from 'vue'
 import { PerspectiveCamera, Scene } from 'three'
+import { OrbitControls } from './OrbitControls'
 
 function epsilon (value: number) {
   return Math.abs(value) < 1e-10 ? 0 : value
@@ -56,8 +57,11 @@ function cameraStyle (camera: PerspectiveCamera, size: { width: number, height: 
 
       'translate(' + size.width / 2 + 'px,' + size.height / 2 + 'px)'
   }
-  console.log(style)
   return style
+}
+
+function noop (x: any) {
+
 }
 
 export default defineComponent({
@@ -77,23 +81,35 @@ export default defineComponent({
     camera.position.x = props.x
     camera.position.y = props.y
     camera.position.z = props.z
-    console.log(camera)
 
-    const style = computed(() => cameraStyle(camera, { width: 1000, height: 1000 }))
-    const fov = computed(() => cameraPerspective(camera, props.h))
-    return { style, fov }
+    const root = ref(null)
+    const cameraChange = ref(0)
+
+    onMounted(() => {
+      const controls = new OrbitControls(camera, root.value)
+      controls.minDistance = 500
+      controls.maxDistance = 6000
+      controls.addEventListener('change', () => {
+        cameraChange.value++
+      })
+    })
+
+    const style = computed(() => {
+      noop(cameraChange.value)
+      return cameraStyle(camera, { width: 1000, height: 1000 })
+    })
+    const fov = computed(() => {
+      noop(cameraChange.value)
+      return cameraPerspective(camera, props.h)
+    })
+
+    return { root, style, fov }
   }
-  // size () {
-  //   const camera = this.$refs['camera'] as HTMLElement
-  //   const width = 1000 //camera.clientWidth
-  //   const height = 1000 //camera.clientHeight
-  //   return { width, height }
-  // },
 })
 </script>
 
 <template>
-  <div class="scene" :style="{perspective: fov, width: w + 'px', height: h + 'px'}">
+  <div ref="root" class="scene" :style="{perspective: fov, width: w + 'px', height: h + 'px'}">
     <div class="camera" :style="style">
       <slot />
     </div>

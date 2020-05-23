@@ -251,7 +251,7 @@ export default defineComponent({
 
 <template>
   <div>
-    <Camera :fov="40" :near="1" :far="10000" :w="1000" :h="1000" :x="0" :y="0" :z="3000">
+    <Camera :fov="40" :near="1" :far="10000" :w="1000" :h="1000" :x="0" :y="0" :z="4000">
       <Object3D
         v-for="(elem, index) in elements"
         :key="index"

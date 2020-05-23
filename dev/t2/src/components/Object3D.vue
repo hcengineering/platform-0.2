@@ -23,8 +23,8 @@ function epsilon (value: number) {
 }
 
 function random (x) {
-  if (Math.random() < 0.1)
-    return Math.random() * x * 5
+  if (Math.random() < 0.0)
+    return Math.random() * x * 3 + x
   return Math.random() * x + x
 }
 
@@ -34,7 +34,6 @@ export default defineComponent({
     rx: Number, ry: Number, rz: Number
   },
   setup (props) {
-
     const object3d = reactive({
       x: props.x,
       y: props.y,
@@ -43,10 +42,6 @@ export default defineComponent({
       ry: props.ry,
       rz: props.rz,
     })
-
-    // watch([() => props.x, () => props.y, () => props.z, () => props.rx, () => props.ry, () => props.rz], (n) => {
-    //   gsap.to(object3d, { duration: Math.random() * 0.5 + 0.5, ease: 'back', x: n[0], y: n[1], z: n[2], rx: n[3], ry: n[4], rz: n[5] })
-    // })
 
     watch([() => props.x, () => props.y, () => props.z], (n) => {
       gsap.to(object3d, { duration: random(0.5), ease: 'back', x: n[0], y: n[1], z: n[2] })
