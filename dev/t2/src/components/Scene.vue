@@ -173,10 +173,9 @@ function asTable (): Elem3D[] {
 }
 
 function helix (): Elem3D[] {
-  const result = []
-  var vector = new Vector3();
-
-  for (var i = 0, l = table.length; i < l; i++) {
+  var vector = new Vector3()
+  const l = table.length
+  return table.map((info, i) => {
     var theta = i * 0.175 + Math.PI;
     var y = - (i * 8) + 450;
     var object = new O3D();
@@ -189,7 +188,7 @@ function helix (): Elem3D[] {
 
     object.lookAt(vector);
 
-    result.push({
+    return {
       info: table[i],
       x: object.position.x,
       y: object.position.y,
@@ -197,48 +196,88 @@ function helix (): Elem3D[] {
       rx: object.rotation.x,
       ry: object.rotation.y,
       rz: object.rotation.z,
-    })
-  }
-  return result
+    }
+  })
 }
 
+function sphere (): Elem3D[] {
+  var vector = new Vector3()
+  const l = table.length
+  return table.map((info, i) => {
+    var phi = Math.acos(- 1 + (2 * i) / l)
+    var theta = Math.sqrt(l * Math.PI) * phi
+    const object = new O3D()
+    object.position.setFromSphericalCoords(800, phi, theta)
+    vector.copy(object.position).multiplyScalar(2)
+    object.lookAt(vector)
+
+    return {
+      info: table[i],
+      x: object.position.x,
+      y: object.position.y,
+      z: object.position.z,
+      rx: object.rotation.x,
+      ry: object.rotation.y,
+      rz: object.rotation.z,
+    }
+  })
+}
+
+function grid (): Elem3D[] {
+  return table.map((info, i) => ({
+    info,
+    x: ((i % 5) * 400) - 800,
+    y: (- (Math.floor(i / 5) % 5) * 400) + 800,
+    z: (Math.floor(i / 25)) * 1000 - 2000,
+    rx: 0, ry: 0, rz: 0,
+  }))
+}
 
 export default defineComponent({
   components: { Camera, Object3D },
   setup () {
-    const elements = ref(helix())
-    function elementColor () {
-      console.log('element color')
-      return 'rgba(0, 127, 127, ' + (Math.random() * 0.5 + 0.25) + ')'
+    const elements = ref(asTable())
+    function elementColor (i: number) {
+      const a = table[i][3] as number
+      const b = table[i][4] as number
+      const col = (a ^ b) & 0x7
+      const color = 'rgba(0, 127, 127, ' + ((col / 8) * 0.5 + 0.25) + ')'
+      return color
     }
-    return { elements, elementColor }
+    return { elements, elementColor, helix, asTable, sphere, grid }
   }
 })
 </script>
 
 <template>
-  <Camera :fov="40" :near="1" :far="10000" :w="1000" :h="1000" :x="0" :y="0" :z="3000">
-    <Object3D
-      v-for="(elem, index) in elements"
-      :key="index"
-      :x="elem.x"
-      :y="elem.y"
-      :z="elem.z"
-      :rx="elem.rx"
-      :ry="elem.ry"
-      :rz="elem.rz"
-    >
-      <div class="element" :style="{ backgroundColor: elementColor()}">
-        <div class="number">{{index+1}}</div>
-        <div class="symbol">{{elem.info[0]}}</div>
-        <div class="details">
-          {{elem.info[1]}}
-          <br />
-          {{elem.info[2]}}
+  <div>
+    <Camera :fov="40" :near="1" :far="10000" :w="1000" :h="1000" :x="0" :y="0" :z="3000">
+      <Object3D
+        v-for="(elem, index) in elements"
+        :key="index"
+        :x="elem.x"
+        :y="elem.y"
+        :z="elem.z"
+        :rx="elem.rx"
+        :ry="elem.ry"
+        :rz="elem.rz"
+      >
+        <div class="element" :style="{ backgroundColor: elementColor(index)}">
+          <div class="number">{{index+1}}</div>
+          <div class="symbol">{{elem.info[0]}}</div>
+          <div class="details">
+            {{elem.info[1]}}
+            <br />
+            {{elem.info[2]}}
+          </div>
         </div>
-      </div>
-    </Object3D>
-  </Camera>
+      </Object3D>
+    </Camera>
+    <button @click="elements = asTable()">Table</button>
+    <button @click="elements = helix()">Helix</button>
+    <button @click="elements = sphere()">Sphere</button>
+    <button @click="elements = grid()">Grid</button>
+  </div>
 </template>
 
 <style lang="scss">

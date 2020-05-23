@@ -14,35 +14,58 @@
 -->
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue'
+import { defineComponent, computed, watch, PropType, reactive } from 'vue'
 import { Object3D, Scene } from 'three'
+import gsap from 'gsap'
 
 function epsilon (value: number) {
   return Math.abs(value) < 1e-10 ? 0 : value
 }
 
+function random (x) {
+  if (Math.random() < 0.1)
+    return Math.random() * x * 5
+  return Math.random() * x + x
+}
+
 export default defineComponent({
   props: {
-    x: Number,
-    y: Number,
-    z: Number,
-    rx: Number,
-    ry: Number,
-    rz: Number,
+    x: Number, y: Number, z: Number,
+    rx: Number, ry: Number, rz: Number
   },
   setup (props) {
-    const scene = new Scene()
-    const object = new Object3D()
-    object.position.x = props.x
-    object.position.y = props.y
-    object.position.z = props.z
-    object.rotation.x = props.rx
-    object.rotation.y = props.ry
-    object.rotation.z = props.rz
-    scene.add(object)
-    scene.updateMatrixWorld()
+
+    const object3d = reactive({
+      x: props.x,
+      y: props.y,
+      z: props.z,
+      rx: props.rx,
+      ry: props.ry,
+      rz: props.rz,
+    })
+
+    // watch([() => props.x, () => props.y, () => props.z, () => props.rx, () => props.ry, () => props.rz], (n) => {
+    //   gsap.to(object3d, { duration: Math.random() * 0.5 + 0.5, ease: 'back', x: n[0], y: n[1], z: n[2], rx: n[3], ry: n[4], rz: n[5] })
+    // })
+
+    watch([() => props.x, () => props.y, () => props.z], (n) => {
+      gsap.to(object3d, { duration: random(0.5), ease: 'back', x: n[0], y: n[1], z: n[2] })
+    })
+
+    watch([() => props.rx, () => props.ry, () => props.rz], (n) => {
+      gsap.to(object3d, { duration: random(1), ease: 'back', rx: n[0], ry: n[1], rz: n[2] })
+    })
 
     const style = computed(() => {
+      const object = new Object3D()
+      object.position.x = object3d.x
+      object.position.y = object3d.y
+      object.position.z = object3d.z
+      object.rotation.x = object3d.rx
+      object.rotation.y = object3d.ry
+      object.rotation.z = object3d.rz
+      object.updateMatrixWorld()
+
       const elements = object.matrixWorld.elements
       const matrix3d = 'matrix3d(' +
         epsilon(elements[0]) + ',' +
