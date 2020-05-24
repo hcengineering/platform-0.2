@@ -34,8 +34,8 @@ export default async (platform: Platform, deps: {}): Promise<UIService> => {
 
   // V U E  A P P
 
-  //  const app = createPlatformApp(platform, Root)
-  const app = createPlatformApp(platform, Root3D, true)
+  const app = createPlatformApp(platform, Root)
+  // const app = createPlatformApp(platform, Root3D, true)
 
   // C O M P O N E N T  R E N D E R E R
 
