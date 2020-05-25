@@ -59,7 +59,7 @@ export interface PluginDescriptor<P extends Service, D extends PluginDependencie
 type AnyDescriptor = PluginDescriptor<Service, PluginDependencies>
 
 type PluginModule<P extends Service, D extends PluginDependencies> = () => Promise<{
-  default: (platform: Platform, deps: InferPlugins<D>) => Promise<P>
+  default: (platform: Platform, deps?: InferPlugins<D>) => Promise<P>
 }>
 type AnyModule = PluginModule<Service, PluginDependencies>
 

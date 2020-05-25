@@ -15,8 +15,10 @@
 
 import { IntlMessageFormat, PrimitiveType } from 'intl-messageformat'
 import { Platform } from '@anticrm/platform'
-import { Doc, Obj, Type, Ref, Class, Session, PropertyType } from '@anticrm/platform-core'
-import i18n, { I18nService, IntlString, pluginId } from '..'
+import { Doc, Instance, Type, Ref, Exert, Property } from '@anticrm/platform-core'
+import i18n, { I18nService, IntlString } from '..'
+
+type IntlStringProperty = Property<string> & IntlString
 
 /**
  * Construct `IntlString` id for an object's attribute.
@@ -42,60 +44,39 @@ console.log('PLUGIN: parsed i18n')
 export default async (platform: Platform): Promise<I18nService> => {
   console.log('PLUGIN: started i18n')
 
-  class I18nPluginImpl implements I18nService {
-    readonly pluginId = pluginId
-    readonly platform: Platform
+  const strings: Map<IntlString, string> = new Map()
+  const imfCache: Map<IntlString, IntlMessageFormat> = new Map()
 
-    private strings: Map<IntlString, string> = new Map()
-    private imfCache: Map<IntlString, IntlMessageFormat> = new Map()
-
-    constructor (platform: Platform) { this.platform = platform }
-
-    translate (string: IntlString, params?: Record<string, PrimitiveType> | undefined): string | undefined {
-      const translation = this.strings.get(string)
-      if (!translation) {
-        return string
-      }
-      if (params) {
-        let imf = this.imfCache.get(string)
-        if (!imf) {
-          imf = new IntlMessageFormat(translation, 'ru-RU')
-          this.imfCache.set(string, imf)
-        }
-        return imf.format(params) as string
-      }
-      return translation
+  function translate (string: IntlString, params?: Record<string, PrimitiveType> | undefined): string | undefined {
+    const translation = strings.get(string)
+    if (!translation) {
+      return string
     }
-
-    loadStrings (translations: { [key: string]: string }) {
-      for (const key in translations) {
-        this.strings.set(key as IntlString, translations[key])
+    if (params) {
+      let imf = imfCache.get(string)
+      if (!imf) {
+        imf = new IntlMessageFormat(translation, 'ru-RU')
+        imfCache.set(string, imf)
       }
+      return imf.format(params) as string
+    }
+    return translation
+  }
+
+  function loadStrings (translations: { [key: string]: string }) {
+    for (const key in translations) {
+      strings.set(key as IntlString, translations[key])
     }
   }
 
-  const plugin = new I18nPluginImpl(platform)
+  const IntlString_exert = function (this: Instance<Type<Doc>>): Exert { // eslint-disable-line
+    return ((value: IntlStringProperty) => translate(value)) as Exert
+  }
 
-  // abstract class TIntlString implements Type<IntlString> {
-  //   _class!: Ref<Class<this>>
-  //   abstract getSession (): Session
-  //   abstract getClass (): Class<this>
-  //   abstract toIntlString (plural?: number | undefined): string
+  platform.setResource(i18n.method.IntlString_exert, IntlString_exert)
 
-  //   exert (value: IntlString, target?: any, key?: string): any {
-  //     if (value === undefined) {
-  //       if (target?._id && key) {
-  //         const id = target._id as Ref<Doc>
-  //         const intl = synthIntlString(id, key)
-  //         return plugin.translate(intl)
-  //       }
-  //     }
-  //     return value
-  //   }
-  //   hibernate (value: any): IntlString { return value }
-  // }
-
-  // deps.core.registerPrototype(i18n.native.IntlString, TIntlString.prototype)
-
-  return plugin
+  return {
+    translate,
+    loadStrings
+  }
 }
