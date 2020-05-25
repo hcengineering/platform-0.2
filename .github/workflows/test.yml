@@ -13,6 +13,7 @@ jobs:
         yarn install
         yarn workspace @anticrm/platform run test
         yarn workspace @anticrm/platform-core run test
+        yarn workspace @anticrm/platform-core-i18n run test
     - name: Run lint
       run: |
         yarn workspace @anticrm/platform run lint
