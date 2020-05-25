@@ -46,7 +46,7 @@ export default async (platform: Platform): Promise<I18nService> => {
   const strings: Map<IntlString, string> = new Map()
   const imfCache: Map<IntlString, IntlMessageFormat> = new Map()
 
-  function translate (string: IntlString, params?: Record<string, PrimitiveType> | undefined): string | undefined {
+  function translate (string: IntlString, params?: Record<string, PrimitiveType> | undefined): string {
     const translation = strings.get(string)
     if (!translation) {
       return string
@@ -69,7 +69,18 @@ export default async (platform: Platform): Promise<I18nService> => {
   }
 
   const IntlString_exert = function (this: Instance<Type<Doc>>): Exert { // eslint-disable-line
-    return ((value: IntlString) => translate(value)) as Exert
+    return ((value: IntlString, layout: any, key: string) => {
+      const translation = translate(value)
+      if (translation !== value) {
+        return translation
+      } else {
+        const id = synthIntlString(layout._id as Ref<Doc>, key)
+        console.log(id)
+        const translation = translate(id)
+        if (translation !== id) { return translation }
+        return value
+      }
+    }) as Exert
   }
 
   platform.setResource(i18n.method.IntlString_exert, IntlString_exert)

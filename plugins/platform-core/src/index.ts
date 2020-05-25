@@ -39,7 +39,7 @@ export interface Doc extends Obj {
   _id: Ref<Doc>
   _mixins?: Ref<Class<Doc>>[]
 }
-export type Exert = (value: PropertyType) => any
+export type Exert = (value: PropertyType, layout?: any, key?: string) => any
 export interface Type<A> extends Emb {
   _default?: Property<A>
   exert?: Property<(this: Instance<Type<any>>) => Exert>
@@ -103,7 +103,7 @@ export type Instance<T extends Obj> = { [P in keyof T]:
 export interface Session {
 
   instantiateEmb (value: Emb): Instance<Emb>
-  instantiateDoc (value: Doc): Instance<Doc>
+  instantiateDoc<T extends Doc> (value: T): Instance<T>
 
   mixin<D extends T, M extends T, T extends Doc> (doc: D, clazz: Ref<EClass<M, T>>, values: Omit<M, keyof T>): M
 
@@ -112,7 +112,7 @@ export interface Session {
   newDocument<M extends Doc> (clazz: Ref<Class<M>>, values: Omit<M, keyof Doc>): Instance<M>
   newClass<T extends E, E extends Obj> (values: Omit<EClass<T, E>, keyof Obj>): Instance<EClass<T, E>>
 
-  createDocument<M extends Doc> (clazz: Ref<Class<M>>, values: Omit<M, keyof Doc>): M
+  createDocument<M extends Doc> (clazz: Ref<Class<M>>, values: Omit<M, keyof Obj> & { _id?: Ref<M> }): M
   createClass<T extends E, E extends Obj> (values: Omit<EClass<T, E>, keyof Obj>): EClass<T, E>
 }
 

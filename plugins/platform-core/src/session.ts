@@ -84,7 +84,7 @@ export class TSession implements Session {
 
       Object.defineProperty(proto, key, {
         get (this: Instance<Obj>) {
-          return exert(Reflect.get(this.__layout, key))
+          return exert(Reflect.get(this.__layout, key), this.__layout, key)
         },
         enumerable: true
       })
@@ -134,8 +134,8 @@ export class TSession implements Session {
     return obj
   }
 
-  createDocument<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Doc>): M {
-    const obj = { _class, _id: generateId(), ...values } as M
+  createDocument<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Obj>): M {
+    const obj = { _class, ...values } as M
     this.objects.set(obj._id, obj)
 
     return obj

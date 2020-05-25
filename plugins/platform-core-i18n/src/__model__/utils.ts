@@ -37,7 +37,7 @@ export function verifyTranslation<T extends StringIds> (ids: T, translations: As
   return result as AsStrings<T>
 }
 
-type Labels<T extends Doc> = Partial<Record<KeysByType<T, IntlString>, string>>
+type Labels<T extends Doc> = Partial<Record<KeysByType<T, IntlString | undefined>, string>>
 
 type Refs = { [key: string]: Ref<Doc> }
 

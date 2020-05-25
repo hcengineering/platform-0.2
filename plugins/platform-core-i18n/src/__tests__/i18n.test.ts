@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Platform, identify, Plugin, Service, plugin } from '@anticrm/platform'
+import { Platform, Plugin, Service, plugin } from '@anticrm/platform'
 import { IntlString } from '..'
 import { verifyTranslation, modelTranslation } from '../__model__/utils'
 
@@ -27,7 +27,7 @@ import metaModel from '@anticrm/platform-core/src/__model__/model'
 import i18nModel from '../__model__/model'
 
 interface Person extends Doc {
-  name: IntlString
+  name?: IntlString
 }
 
 interface PersonWithOrg extends Person {
@@ -39,7 +39,8 @@ const test = plugin(
   {},
   {
     person: {
-      Vasya: '' as Ref<Person>
+      Vasya: '' as Ref<Person>,
+      Petya: '' as Ref<Person>
     },
     class: {
       Person: '' as Ref<Class<Person>>,
@@ -50,11 +51,6 @@ const test = plugin(
       Vasya: '' as IntlString
     }
   })
-
-const ru = {
-  MyString: 'Перевод',
-  Vasya: 'Вася'
-}
 
 describe('i18n', () => {
   const platform = new Platform()
@@ -69,8 +65,8 @@ describe('i18n', () => {
   })
 
   it('should verify translation', () => {
-    const translations = verifyTranslation(test.string, ru)
-    expect(translations['string:test.MyString']).toBe(ru.MyString)
+    const translations = verifyTranslation(test.string, test.string)
+    expect(translations['string:test.MyString']).toBe(test.string.MyString)
   })
 
   it('should translate simple', async () => {
@@ -123,15 +119,10 @@ describe('i18n', () => {
     metaModel(S)
     i18nModel(S)
 
-    // interface Person extends Doc {
-    //   name: IntlStringProperty
-    // }
-
-    // const test = plugin('test' as Plugin<Service>, {}, {
-    //   class: {
-    //     Person: '' as Ref<Class<Person>>
-    //   }
-    // })
+    const ru = {
+      MyString: 'Перевод',
+      Vasya: 'Вася'
+    }
 
     const personClass = S.createClass<Person, Doc>({
       _id: test.class.Person,
@@ -142,15 +133,29 @@ describe('i18n', () => {
       _extends: core.class.Doc
     })
 
-    // const person = S.createDocument(test.class.Person, {
-    //   name: test.string.Vasya
-    // })
+    const person = S.createDocument(test.class.Person, {
+      _id: 'xxx' as Ref<Person>,
+      name: test.string.Vasya
+    })
 
-    // expect(person.name)
+    expect(person.name).toBe(test.string.Vasya)
 
-    // const instance = S.instantiateDoc(person)
+    const instance = S.instantiateDoc(person)
+    expect(instance.name).toBe(test.string.Vasya)
 
-    // console.log(instance)
+    const i18nService = await platform.getPlugin(i18n.id)
+    i18nService.loadStrings(verifyTranslation(test.string, ru))
+    expect(instance.name).toBe(ru.Vasya)
 
+    const translations = modelTranslation(test.person, test.class.Person, {
+      Petya: {
+        name: 'Петя'
+      }
+    })
+    i18nService.loadStrings(translations)
+
+    const petya = S.createDocument(test.class.Person, { _id: test.person.Petya })
+    const petyaInstance = S.instantiateDoc(petya)
+    expect(petyaInstance.name).toBe('Петя')
   })
 })
