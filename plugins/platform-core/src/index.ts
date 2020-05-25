@@ -36,7 +36,7 @@ export type PropertyType = Property<any>
 export interface Obj { _class: Ref<Class<this>> }
 export interface Emb extends Obj { __embedded: this }
 export interface Doc extends Obj {
-  _id: Ref<this>
+  _id: Ref<Doc>
   _mixins?: Ref<Class<Doc>>[]
 }
 export type Exert = (value: PropertyType) => any
@@ -62,10 +62,11 @@ type PropertyTypes<T> = { [P in keyof T]:
   never
 }
 export type Attributes<T extends E, E extends Obj> = PropertyTypes<Required<Omit<T, keyof E>>>
+export type AllAttributes<T extends E, E extends Obj> = Attributes<T, E> & Partial<Attributes<E, Obj>>
 
 export interface EClass<T extends E, E extends Obj> extends Doc {
-  _attributes: Attributes<T, E> & Partial<Attributes<E, Obj>>
-  _extends?: Ref<Class<Obj>>
+  _attributes: AllAttributes<T, E>
+  _extends?: Ref<Class<E>>
   _native?: ResourceProperty<Object>
 }
 

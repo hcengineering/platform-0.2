@@ -16,7 +16,7 @@
 import core from '.'
 import {
   Session, Obj, Doc, Class, BagOf, InstanceOf, ResourceType,
-  Property, Type, Emb, ResourceProperty, Ref, RefTo, ArrayOf
+  Type, Emb, Ref, RefTo, ArrayOf
 } from '..'
 
 export default (S: Session): Doc[] => {
@@ -29,7 +29,7 @@ export default (S: Session): Doc[] => {
     S.createClass<Emb, Emb>({
       _id: core.class.Emb,
       _attributes: {},
-      _extends: core.class.Obj
+      _extends: core.class.Obj as Ref<Class<Emb>>
     }),
 
     S.createClass<Doc, Obj>({

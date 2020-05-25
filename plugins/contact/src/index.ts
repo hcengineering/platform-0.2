@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { plugin, Plugin, PluginId } from '@anticrm/platform'
+import { plugin, Plugin, Service } from '@anticrm/platform'
 import { Doc, Ref, Class } from '@anticrm/platform-core'
 import { Asset } from '@anticrm/platform-ui'
 
@@ -34,7 +34,7 @@ export interface Person extends Contact {
 }
 
 export default plugin(
-  'contact' as PluginId<Plugin>,
+  'contact' as Plugin<Service>,
   {},
   {
     icon: {

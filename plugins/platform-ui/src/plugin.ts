@@ -17,9 +17,7 @@
 import { Platform } from '@anticrm/platform'
 import { AnyComponent, UIService, VueConstructor, Component } from '.'
 import { h, ref, createApp, defineComponent } from 'vue'
-
 import Root from './internal/Root.vue'
-import BootLoader from './internal/SysInfo.vue'
 
 console.log('Plugin `ui` loaded')
 

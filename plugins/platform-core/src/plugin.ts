@@ -20,8 +20,15 @@ import core, {
 } from '.'
 import { TSession } from './session'
 
-export default async (platform: Platform): Promise<CoreService> => {
+console.log('PLUGIN: parsed core')
 
+/*!
+ * Anticrm Platform™ Core Plugin
+ * © 2020 Anticrm Platform Contributors. All Rights Reserved.
+ * Licensed under the Eclipse Public License, Version 2.0
+ */
+export default async (platform: Platform): Promise<CoreService> => {
+  console.log('PLUGIN: started core')
 
   // C L A S S E S
 
@@ -33,7 +40,6 @@ export default async (platform: Platform): Promise<CoreService> => {
   //   return getOwnAttribute(clazz, key) ??
   //     (clazz._extends ? getAttribute(get(clazz._extends), key) : undefined)
   // }
-
 
   // T Y P E S : B A G
 

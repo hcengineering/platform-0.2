@@ -13,22 +13,13 @@
 // limitations under the License.
 //
 
-import { Session, Type } from '@anticrm/platform-core'
-import { IntlString } from '..'
+import { plugin, Service, Plugin } from '@anticrm/platform'
+import ui, { AnyComponent } from '@anticrm/platform-ui'
 
-import CoreBuilder from '@anticrm/platform-core/src/__resources__/builder'
-import i18n from '.'
-
-export default class extends CoreBuilder {
-  protected session: Session
-
-  constructor (session: Session) {
-    super(session)
-    this.session = session
+export default plugin('demo-3d' as Plugin<Service>, {
+  ui: ui.id,
+}, {
+  component: {
+    Periodic: '' as AnyComponent
   }
-
-  async i18n (): Promise<Type<IntlString>> {
-    const meta = await this.session.getClass(i18n.class.IntlString)
-    return meta.newInstance({})
-  }
-}
+})
