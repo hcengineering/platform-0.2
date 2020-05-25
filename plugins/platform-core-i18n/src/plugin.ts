@@ -14,10 +14,9 @@
 //
 
 import { IntlMessageFormat, PrimitiveType } from 'intl-messageformat'
-import { Platform, Property } from '@anticrm/platform'
+import { Platform } from '@anticrm/platform'
 import { Doc, Instance, Type, Ref, Exert } from '@anticrm/platform-core'
 import i18n, { I18nService, IntlString } from '..'
-
 
 /**
  * Construct `IntlString` id for an object's attribute.
