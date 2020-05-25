@@ -15,21 +15,24 @@
 
 import { Platform, identify, Plugin, Service, plugin } from '@anticrm/platform'
 import { IntlString } from '..'
-import { verifyTranslation, modelTranslation } from '../__resources__/utils'
+import { verifyTranslation, modelTranslation } from '../__model__/utils'
 
 import db from '@anticrm/platform-db'
-import core, { Ref, Class, Obj, Doc } from '@anticrm/platform-core'
-import i18n from '../__resources__'
+import core from '@anticrm/platform-core/src/__model__'
+import i18n from '../__model__'
+
+import { Ref, Class, Obj, Doc } from '@anticrm/platform-core'
+import { IntlStringProperty } from '../plugin'
+
+import metaModel from '@anticrm/platform-core/src/__model__/model'
+import i18nModel from '../__model__/model'
 
 interface Person extends Doc {
-  first: IntlString
-  last: IntlString
-  age: number
+  name: IntlStringProperty
 }
 
 interface PersonWithOrg extends Person {
   org: IntlString
-  size: number
 }
 
 const test = plugin(
@@ -40,15 +43,18 @@ const test = plugin(
       Vasya: '' as Ref<Person>
     },
     class: {
+      Person: '' as Ref<Class<Person>>,
       PersonWithOrg: '' as Ref<Class<PersonWithOrg>>
     },
     string: {
-      MyString: '' as IntlString
+      MyString: '' as IntlString,
+      Vasya: '' as IntlString
     }
   })
 
 const ru = {
-  MyString: 'Перевод'
+  MyString: 'Перевод',
+  Vasya: 'Вася'
 }
 
 describe('i18n', () => {
@@ -94,12 +100,58 @@ describe('i18n', () => {
   it('should translate model', () => {
     const translations = modelTranslation(test.person, test.class.PersonWithOrg, {
       Vasya: {
-        first: 'Вася',
+        name: 'Вася',
         org: 'Organization'
       }
     })
     // console.log(translations)
-    expect(translations['string:test.Vasya/first']).toBe('Вася')
+    expect(translations['string:test.Vasya/name']).toBe('Вася')
     expect(translations['string:test.Vasya/org']).toBe('Organization')
+  })
+
+  // I N T L S T I N G  T Y P E
+
+  it('should ...', async () => {
+    const coreService = await platform.getPlugin(core.id)
+    const session = coreService.newSession()
+    metaModel(session)
+    expect(true).toBe(true)
+  })
+
+  it('should translate attribute value', async () => {
+    const coreService = await platform.getPlugin(core.id)
+    const S = coreService.newSession()
+    metaModel(S)
+    i18nModel(S)
+
+    // interface Person extends Doc {
+    //   name: IntlStringProperty
+    // }
+
+    // const test = plugin('test' as Plugin<Service>, {}, {
+    //   class: {
+    //     Person: '' as Ref<Class<Person>>
+    //   }
+    // })
+
+    const personClass = S.createClass<Person, Doc>({
+      _id: test.class.Person,
+      _attributes: {
+        name: S.newInstance(i18n.class.IntlString, {
+        })
+      },
+      _extends: core.class.Doc
+    })
+
+    // const person = S.createDocument(test.class.Person, {
+    //   name: test.string.Vasya
+    // })
+
+    // expect(person.name)
+
+    // const instance = S.instantiateDoc(person)
+
+    // console.log(instance)
+
   })
 })

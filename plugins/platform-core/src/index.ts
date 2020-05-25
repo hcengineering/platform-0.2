@@ -103,6 +103,7 @@ export type Instance<T extends Obj> = { [P in keyof T]:
 export interface Session {
 
   instantiateEmb (value: Emb): Instance<Emb>
+  instantiateDoc (value: Doc): Instance<Doc>
 
   mixin<D extends T, M extends T, T extends Doc> (doc: D, clazz: Ref<EClass<M, T>>, values: Omit<M, keyof T>): M
 

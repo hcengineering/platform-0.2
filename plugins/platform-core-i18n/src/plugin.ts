@@ -18,7 +18,7 @@ import { Platform } from '@anticrm/platform'
 import { Doc, Instance, Type, Ref, Exert, Property } from '@anticrm/platform-core'
 import i18n, { I18nService, IntlString } from '..'
 
-type IntlStringProperty = Property<string> & IntlString
+export type IntlStringProperty = Property<string> & IntlString // ??
 
 /**
  * Construct `IntlString` id for an object's attribute.

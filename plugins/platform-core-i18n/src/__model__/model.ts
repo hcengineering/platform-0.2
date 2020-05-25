@@ -13,13 +13,21 @@
 // limitations under the License.
 //
 
+import { Doc, Type, Class, Ref, Session } from '@anticrm/platform-core'
 import core from '@anticrm/platform-core/src/__model__'
-import Builder from '@anticrm/platform-core/src/__model__/builder'
 
 import i18n from '.'
 
-export default async (B: Builder) => {
-  return Promise.all([
-    B.createStruct(i18n.class.IntlString, core.class.Type, {}, i18n.native.IntlString)
-  ])
+export default (S: Session): Doc[] => {
+  return [
+    S.createClass<Type<string>, Type<string>>({
+      _id: i18n.class.IntlString,
+      _attributes: {
+        exert: S.newInstance(core.class.ResourceType, {
+          _default: i18n.method.IntlString_exert
+        })
+      },
+      _extends: core.class.Type
+    }),
+  ]
 }

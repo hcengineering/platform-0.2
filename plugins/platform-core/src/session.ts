@@ -15,6 +15,7 @@
 
 import { Platform } from '@anticrm/platform'
 import core, { Session, Ref, Class, Obj, Instance, Type, Doc, Emb, EClass } from '.'
+import { generateId } from './objectid'
 
 type Konstructor<T extends Obj> = new (obj: Omit<T, '__property' | '_class'>) => Instance<T>
 
@@ -118,6 +119,10 @@ export class TSession implements Session {
     return this.instantiate(obj)
   }
 
+  instantiateDoc<T extends Doc> (obj: T): Instance<T> {
+    return this.instantiate(obj)
+  }
+
   // C O R E  A P I
 
   mixin<D extends T, M extends T, T extends Doc> (doc: D, clazz: Ref<EClass<M, T>>, values: Pick<M, Exclude<keyof M, keyof T>>): M {
@@ -130,7 +135,7 @@ export class TSession implements Session {
   }
 
   createDocument<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Doc>): M {
-    const obj = { _class, ...values } as M
+    const obj = { _class, _id: generateId(), ...values } as M
     this.objects.set(obj._id, obj)
 
     return obj
