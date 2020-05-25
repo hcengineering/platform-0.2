@@ -32,8 +32,9 @@
  * {@link Platform.resolve}
  */
 
-export type Metadata<T> = string & { __metadata: T }
-export type Resource<T> = Metadata<T> & { __resource: true }
+export type Property<T> = string & { __property: T }
+export type Resource<T> = Property<T> & { __resource: true }
+export type Metadata<T> = Property<T>
 
 export interface Service { }
 export type Plugin<S extends Service> = Resource<S>

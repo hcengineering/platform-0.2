@@ -13,19 +13,19 @@
 // limitations under the License.
 //
 
-import { plugin, Plugin, Service, Resource } from '@anticrm/platform'
+import { plugin, Plugin, Service, Resource, Property } from '@anticrm/platform'
 
-/** This is the only allowed type for an object property */
-export interface Property<T> { __property: T }
+// /** This is the only allowed type for an object property */
+// export interface Property<T> { __property: T }
 
-/** Object property serialized as String */
-export type StringProperty<T> = string & Property<T>
-/** Object property serialized as Number */
-export type NumberProperty<T> = number & Property<T>
+// /** Object property serialized as String */
+// export type StringProperty<T> = string & Property<T>
+// /** Object property serialized as Number */
+// export type NumberProperty<T> = number & Property<T>
 
-export type ResourceProperty<T> = Property<T> & Resource<T>
+// export type ResourceProperty<T> = Property<T> & Resource<T>
 
-export type Ref<T> = StringProperty<T> & { __ref: true }
+export type Ref<T> = Property<T> & { __ref: true }
 
 export type PropertyType = Property<any>
   | Emb
@@ -67,7 +67,7 @@ export type AllAttributes<T extends E, E extends Obj> = Attributes<T, E> & Parti
 export interface EClass<T extends E, E extends Obj> extends Doc {
   _attributes: AllAttributes<T, E>
   _extends?: Ref<Class<E>>
-  _native?: ResourceProperty<Object>
+  _native?: Resource<Object>
 }
 
 export type Class<T extends Obj> = EClass<T, Obj>
@@ -116,7 +116,7 @@ export interface Session {
   createClass<T extends E, E extends Obj> (values: Omit<EClass<T, E>, keyof Obj>): EClass<T, E>
 }
 
-export interface CoreService {
+export interface CoreService extends Service {
   newSession (): Session
 }
 
@@ -127,12 +127,12 @@ export default plugin('core' as Plugin<CoreService>, {}, {
     RefTo: '' as Ref<Class<RefTo<Doc>>>,
   },
   method: {
-    Type_exert: '' as ResourceProperty<(this: Instance<Type<any>>) => Exert>,
-    BagOf_exert: '' as ResourceProperty<(this: Instance<BagOf<any>>) => Exert>,
-    InstanceOf_exert: '' as ResourceProperty<(this: Instance<InstanceOf<any>>) => Exert>,
+    Type_exert: '' as Resource<(this: Instance<Type<any>>) => Exert>,
+    BagOf_exert: '' as Resource<(this: Instance<BagOf<any>>) => Exert>,
+    InstanceOf_exert: '' as Resource<(this: Instance<InstanceOf<any>>) => Exert>,
   },
   native: {
-    ResourceType: '' as ResourceProperty<Object>
+    ResourceType: '' as Resource<Object>
   },
 })
 

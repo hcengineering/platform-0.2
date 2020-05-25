@@ -14,11 +14,10 @@
 //
 
 import { IntlMessageFormat, PrimitiveType } from 'intl-messageformat'
-import { Platform } from '@anticrm/platform'
-import { Doc, Instance, Type, Ref, Exert, Property } from '@anticrm/platform-core'
+import { Platform, Property } from '@anticrm/platform'
+import { Doc, Instance, Type, Ref, Exert } from '@anticrm/platform-core'
 import i18n, { I18nService, IntlString } from '..'
 
-export type IntlStringProperty = Property<string> & IntlString // ??
 
 /**
  * Construct `IntlString` id for an object's attribute.
@@ -70,7 +69,7 @@ export default async (platform: Platform): Promise<I18nService> => {
   }
 
   const IntlString_exert = function (this: Instance<Type<Doc>>): Exert { // eslint-disable-line
-    return ((value: IntlStringProperty) => translate(value)) as Exert
+    return ((value: IntlString) => translate(value)) as Exert
   }
 
   platform.setResource(i18n.method.IntlString_exert, IntlString_exert)

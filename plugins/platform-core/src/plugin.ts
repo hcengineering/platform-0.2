@@ -13,10 +13,10 @@
 // limitations under the License.
 //
 
-import { Platform } from '@anticrm/platform'
+import { Platform, Resource } from '@anticrm/platform'
 import core, {
   CoreService, Obj, Ref, Class, Doc, EClass, BagOf, InstanceOf, PropertyType,
-  Instance, Type, Emb, ResourceType, Property, ResourceProperty, Exert, Session
+  Instance, Type, Emb, ResourceType, Exert, Session
 } from '.'
 import { TSession } from './session'
 
@@ -72,7 +72,7 @@ export default async (platform: Platform): Promise<CoreService> => {
 
   const TResourceType = {
     exert: function (this: Instance<ResourceType<any>>): Exert {
-      const resource = (this.__layout._default) as ResourceProperty<(this: Instance<Type<any>>) => Exert>
+      const resource = (this.__layout._default) as Resource<(this: Instance<Type<any>>) => Exert>
       return (value: PropertyType) => resource ? platform.getResource(resource) : undefined
     }
   }

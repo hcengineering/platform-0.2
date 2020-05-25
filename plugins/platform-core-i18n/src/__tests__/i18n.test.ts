@@ -22,13 +22,12 @@ import core from '@anticrm/platform-core/src/__model__'
 import i18n from '../__model__'
 
 import { Ref, Class, Obj, Doc } from '@anticrm/platform-core'
-import { IntlStringProperty } from '../plugin'
 
 import metaModel from '@anticrm/platform-core/src/__model__/model'
 import i18nModel from '../__model__/model'
 
 interface Person extends Doc {
-  name: IntlStringProperty
+  name: IntlString
 }
 
 interface PersonWithOrg extends Person {
