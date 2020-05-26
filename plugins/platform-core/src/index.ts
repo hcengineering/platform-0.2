@@ -56,7 +56,7 @@ export interface ResourceType<T> extends Type<T> { }
 
 type PropertyTypes<T> = { [P in keyof T]:
   T[P] extends Property<infer X> ? Type<X> :
-  T[P] extends { __embedded: infer X } ? (X extends Emb ? X : never) :
+  T[P] extends { __embedded: infer X } ? (X extends Emb ? X : symbol) :
   T[P] extends { [key: string]: Property<infer X> } ? Type<{ [key: string]: X }> :
   T[P] extends Property<infer X>[] ? Type<X[]> :
   never
@@ -74,10 +74,16 @@ export type Class<T extends Obj> = EClass<T, Obj>
 
 //////
 
+export type StringType = Property<string>
+
 export type Instance<T extends Obj> = { [P in keyof T]:
+  T[P] extends Ref<infer X> ? (X extends Doc ? Promise<Instance<X>> : never) :
+  T[P] extends Resource<infer X> | undefined ? Promise<X | undefined> :
+  T[P] extends Resource<infer X> ? Promise<X> :
+  T[P] extends Resource<infer X> | undefined ? Promise<X | undefined> :
   T[P] extends Property<infer X> ? X :
   T[P] extends Property<infer X> | undefined ? X :
-  T[P] extends { __embedded: infer X } ? (X extends Obj ? Instance<X> : never) :
+  T[P] extends { __embedded: infer X } ? (X extends Emb ? Instance<X> : never) :
   T[P] extends { [key: string]: Property<infer X> } ? { [key: string]: X } :
   T[P] extends Property<infer X>[] ? X[] :
   never
@@ -102,8 +108,18 @@ export type Instance<T extends Obj> = { [P in keyof T]:
 */
 export interface Session {
 
+  // L A Y O U T
+
+  // R E A D
+
   instantiateEmb (value: Emb): Instance<Emb>
   instantiateDoc<T extends Doc> (value: T): Instance<T>
+
+  getInstance<T extends Doc> (doc: Ref<T>): Promise<Instance<T>>
+
+  as<T extends Doc, A extends T> (obj: Instance<T>, _class: Ref<Class<A>>): Instance<A>
+
+  // C R E A T E
 
   mixin<D extends T, M extends T, T extends Doc> (doc: D, clazz: Ref<EClass<M, T>>, values: Omit<M, keyof T>): M
 
@@ -129,7 +145,7 @@ export default plugin('core' as Plugin<CoreService>, {}, {
   method: {
     Type_exert: '' as Resource<(this: Instance<Type<any>>) => Exert>,
     BagOf_exert: '' as Resource<(this: Instance<BagOf<any>>) => Exert>,
-    InstanceOf_exert: '' as Resource<(this: Instance<InstanceOf<any>>) => Exert>,
+    InstanceOf_exert: '' as Resource<(this: Instance<InstanceOf<Emb>>) => Exert>,
   },
   native: {
     ResourceType: '' as Resource<Object>

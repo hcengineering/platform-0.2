@@ -14,9 +14,9 @@
 //
 
 
-import { Platform } from '@anticrm/platform'
+import { Platform, Plugin, Service } from '@anticrm/platform'
 import { AnyComponent, UIService, VueConstructor, Component } from '.'
-import { h, ref, createApp, defineComponent } from 'vue'
+import { h, ref, createApp, defineComponent, reactive } from 'vue'
 import Root from './internal/Root.vue'
 
 console.log('Plugin `ui` loaded')
@@ -66,8 +66,31 @@ export default async (platform: Platform, deps: {}): Promise<UIService> => {
     }
   }))
 
+  // U I  S T A T E
+
+  const path = window.location.pathname
+  const split = path.split('/')
+
+  const state = reactive({
+    app: split[1],
+    path
+  })
+
+  app.config.globalProperties.$ui = state
+
+  function addState (plugin: Plugin<Service>, state: any) { // reactive type
+    Reflect.set(app.config.globalProperties, '$' + plugin, state)
+  }
+
+  // H I S T O R Y
+
+  window.addEventListener('popstate', () => {
+    state.path = window.location.pathname
+  })
+
   return {
     getApp () { return app },
+    addState
   }
 
 }

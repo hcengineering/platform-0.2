@@ -14,9 +14,11 @@
 //
 
 import { Platform } from '@anticrm/platform'
+import { UIService } from '.'
 
 declare module '@vue/runtime-core' {
   interface ComponentCustomProperties {
     $platform: Platform
+    $ui: UIService
   }
 }

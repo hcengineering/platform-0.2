@@ -14,13 +14,33 @@
 //
 
 import { plugin, Service, Plugin } from '@anticrm/platform'
+import core, { Ref, Class, Doc, Instance } from '@anticrm/platform-core'
 import ui, { AnyComponent } from '@anticrm/platform-ui'
 
 // import lauchDev from '@anticrm/launch-dev' // TODO Dirty hack, get rid of this later.
 
+export interface WorkbenchState {
+  mainComponent: AnyComponent
+}
+
+export interface WorkbenchService extends Service {
+  getState (): WorkbenchState
+}
+
+/**
+ * ViewModel describes confguration of a Workbench View
+ */
+export interface ViewModel extends Doc {
+  component: AnyComponent
+}
+
+export interface MainModel extends ViewModel {
+
+}
+
 export default plugin('workbench' as Plugin<Service>, {
+  core: core.id,
   ui: ui.id,
-  // launch: lauchDev.id
 }, {
   component: {
     Workbench: '' as AnyComponent

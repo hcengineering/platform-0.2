@@ -16,32 +16,33 @@
   -->
 
 <script lang="ts">
-  import { defineComponent } from 'vue'
-  import { platformConfig } from '.'
-  import Background from './SysInfo.vue'
+import { defineComponent, computed } from 'vue'
+import { platformConfig } from '.'
+import SysInfo from './SysInfo.vue'
 
-  export default defineComponent({
-    components: { Background },
-    setup() {
-      return { platformConfig }
-    }
-  })
+export default defineComponent({
+  components: { SysInfo },
+  setup () {
+    function ui () { return this.$ui }
+    return { ui }
+  }
+})
 </script>
 
 <template>
   <div id="app">
-    <widget v-if="platformConfig.app" :component="platformConfig.app"/>
-    <Background v-else/>
+    <widget v-if="ui().app" :component="ui().app" />
+    <SysInfo v-else />
   </div>
 </template>
 
 <style lang="scss">
-  @import "~@anticrm/platform-ui-theme/css/_globals.scss";
+@import "~@anticrm/platform-ui-theme/css/_globals.scss";
 
-  #app {
-    @include root-style;
+#app {
+  @include root-style;
 
-    height: 100vh;
-    background-color: $content-bg-color;
-  }
+  height: 100vh;
+  background-color: $content-bg-color;
+}
 </style>

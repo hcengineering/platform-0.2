@@ -14,23 +14,19 @@
 //
 
 import { plugin, Plugin, Service } from '@anticrm/platform'
-import { Doc, Ref, Class } from '@anticrm/platform-core'
+import { Doc, Ref, Class, StringType } from '@anticrm/platform-core'
 import { Asset } from '@anticrm/platform-ui'
 
 export interface Contact extends Doc {
-  email?: string
-  phone?: string
-  phoneWork?: string
-  twitter?: string
-  address?: string
-  addressDelivery?: string
+  email?: StringType
+  phone?: StringType
 }
 
 export interface Person extends Contact {
-  firstName?: string
-  lastName?: string
+  firstName?: StringType
+  lastName?: StringType
 
-  birthDate?: string
+  birthDate?: StringType
 }
 
 export default plugin(

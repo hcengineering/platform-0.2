@@ -2,7 +2,7 @@
   "name": "@anticrm/platform-workbench",
   "version": "0.1.0",
   "main": "src/index.ts",
-  "description": "AntiCRM Platform Workbench",
+  "description": "AntiCRM Platform Workbench Plugin",
   "author": "Andrey Platov <andrey.v.platov@gmail.com>",
   "license": "EPL-2.0",
   "scripts": {

@@ -20,7 +20,6 @@ import { defineComponent } from 'vue'
 import PluginList from './Plugins.vue'
 import Credits from './Credits.vue'
 import Button from '@anticrm/platform-ui-controls/src/Button.vue'
-import { platformConfig } from '.'
 import ui, { AnyComponent } from '..'
 
 function pluginInfos () { return this.$platform.getPluginInfos() }
@@ -36,7 +35,7 @@ export default defineComponent({
       run () {
         const defaultApp = this.defaultApp()
         if (defaultApp) {
-          platformConfig.app = defaultApp
+          this.$ui.app = defaultApp
         }
       }
     }

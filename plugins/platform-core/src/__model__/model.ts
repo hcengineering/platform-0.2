@@ -15,11 +15,13 @@
 
 import core from '.'
 import {
-  Session, Obj, Doc, Class, BagOf, InstanceOf, ResourceType,
-  Type, Emb, Ref, RefTo, ArrayOf
+  Obj, Doc, Class, BagOf, InstanceOf, ResourceType,
+  Type, Emb, Ref, RefTo, ArrayOf, EClass
 } from '..'
+import Builder from './builder'
 
-export default (S: Session): Doc[] => {
+
+export default (S: Builder): Doc[] => {
   return [
     S.createClass<Obj, Obj>({
       _id: core.class.Obj,

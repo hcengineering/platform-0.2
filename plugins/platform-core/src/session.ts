@@ -123,7 +123,18 @@ export class TSession implements Session {
     return this.instantiate(obj)
   }
 
-  // C O R E  A P I
+  // A P I : R E A D
+
+  async getInstance<T extends Doc> (id: Ref<T>): Promise<Instance<T>> {
+    const doc = this.get(id)
+    return this.instantiateDoc(doc)
+  }
+
+  as<T extends Doc, A extends Doc> (obj: Instance<T>, _class: Ref<Class<A>>): Instance<A> {
+    return {} as Instance<A>
+  }
+
+  // A P I : C R E A T E
 
   mixin<D extends T, M extends T, T extends Doc> (doc: D, clazz: Ref<EClass<M, T>>, values: Pick<M, Exclude<keyof M, keyof T>>): M {
     throw new Error("Method not implemented.")

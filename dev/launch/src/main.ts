@@ -31,8 +31,8 @@ import ErrorPage from './components/ErrorPage.vue'
 // import contactMeta from '@anticrm/contact/src/__resources__/meta'
 
 const platform = new Platform()
-// platform.setMetadata(ui.metadata.DefaultApplication, workbench.component.Workbench)
-platform.setMetadata(ui.metadata.DefaultApplication, demo.component.Periodic)
+platform.setMetadata(ui.metadata.DefaultApplication, workbench.component.Workbench)
+// platform.setMetadata(ui.metadata.DefaultApplication, demo.component.Periodic)
 
 platform.addLocation(db, () => import(/* webpackChunkName: "platform-db" */ '@anticrm/platform-db/src/memdb'))
 platform.addLocation(core, () => import(/* webpackChunkName: "platform-core" */ '@anticrm/platform-core/src/plugin'))
