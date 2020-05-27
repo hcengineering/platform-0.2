@@ -19,7 +19,7 @@ import {
   Type, Emb, Ref, RefTo, ArrayOf, EClass
 } from '..'
 import Builder from './builder'
-
+export { Builder }
 
 export default (S: Builder) => {
   S.createDocument(core.class.Class, {

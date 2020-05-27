@@ -18,24 +18,29 @@
 import { Platform } from '@anticrm/platform'
 import startPlugin from '../plugin'
 import model from '../__model__/model'
+import Builder from '../__model__/builder'
 import core from '../__model__'
-import { TSession } from '../session'
 
 describe('core', () => {
   const platform = new Platform()
 
-  it('should ...', async () => {
-    await startPlugin(platform)
-    const tx = new TSession(platform)
-    model(tx)
+  it('should load model', async () => {
+    const tx = await startPlugin(platform)
+    const builder = new Builder()
+    builder.load(model)
+    const coreModel = builder.dump()
+    tx.loadModel(coreModel)
+
     expect(true).toBe(true)
-    // console.log(JSON.stringify(loaded, null, 2))
-    // console.log(JSON.stringify(loaded))
+    console.log(JSON.stringify(coreModel))
   })
 
   it('should create prototype', async () => {
-    const tx = new TSession(platform)
-    model(tx) // eslint-disable-line
+    const tx = await startPlugin(platform)
+    const builder = new Builder()
+    builder.load(model)
+    const coreModel = builder.dump()
+    tx.loadModel(coreModel)
 
     const typeProto = tx.getPrototype(core.class.Type)
     console.log(typeProto)
@@ -58,8 +63,11 @@ describe('core', () => {
   })
 
   it('should instantiate class', async () => {
-    const tx = new TSession(platform)
-    model(tx) // eslint-disable-line
+    const tx = await startPlugin(platform)
+    const builder = new Builder()
+    builder.load(model)
+    const coreModel = builder.dump()
+    tx.loadModel(coreModel)
 
     const classRefTo = tx.get(core.class.RefTo)
 

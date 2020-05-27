@@ -35,7 +35,7 @@ describe('launch-dev', () => {
     builder.load(uiModel)
     builder.load(contactModel)
 
-    builder.dump()
+    console.log(JSON.stringify(builder.dump()))
   })
 
   // const platform = new Platform()

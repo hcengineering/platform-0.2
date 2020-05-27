@@ -13,11 +13,18 @@
 // limitations under the License.
 //
 
-import { plugin, Plugin } from '@anticrm/platform'
+import { MemDb } from '../memdb'
+import core from '../__resources__/'
+import { metaModel } from '../__resources__/model'
 
+describe('memdb', () => {
 
-export interface Db {
-  get<T extends Doc> (_id: Ref<T>): T {
-}
-
-export default plugin('db' as Plugin<Db>, {}, {})
+  it('should load classes into memdb', () => {
+    console.log(metaModel)
+    const memdb = new MemDb()
+    memdb.load(metaModel)
+    const object = memdb.get(core.class.Emb)
+    expect(object._id).toBe(core.class.Emb)
+    expect(object._class).toBe(core.class.Class)
+  })
+})

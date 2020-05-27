@@ -44,8 +44,7 @@ class Builder {
     for (const doc of this.objects.values()) {
       result.push(doc)
     }
-    const json = JSON.stringify(result)//, null, 2)
-    console.log(json)
+    return result
   }
 
   /// A S S I G N
@@ -74,6 +73,8 @@ class Builder {
       }
     }
   }
+
+  // N E W  I N S T A N C E S
 
   createClass<T extends E, E extends Obj> (_id: Ref<Class<T>>, _extends: Ref<Class<E>>, _attributes: AllAttributes<T, E>) {
     this.createDocument(core.class.Class as Ref<Class<EClass<T, E>>>, { _extends, _attributes }, _id as Ref<EClass<T, E>>)

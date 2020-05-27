@@ -18,10 +18,10 @@ import core, {
   CoreService, Obj, Ref, Class, Doc, EClass, BagOf, InstanceOf, PropertyType,
   Instance, Type, Emb, ResourceType, Exert, Session
 } from '.'
-import { TSession } from './session'
+
+type Konstructor<T extends Obj> = new (obj: Omit<T, '__property' | '_class'>) => Instance<T>
 
 console.log('PLUGIN: parsed core')
-
 /*!
  * Anticrm Platform™ Core Plugin
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
@@ -40,6 +40,124 @@ export default async (platform: Platform): Promise<CoreService> => {
   //   return getOwnAttribute(clazz, key) ??
   //     (clazz._extends ? getAttribute(get(clazz._extends), key) : undefined)
   // }
+
+  // D A T A
+
+  const objects = new Map<Ref<Doc>, Doc>()
+  //byClass = new Map<Ref<Class<Doc>>, Doc[]>()
+
+
+  function get<T extends Doc> (_id: Ref<T>): T {
+    const result = objects.get(_id)
+    if (result) { return result as T }
+    throw new Error('oops! object not found: ' + _id)
+  }
+
+  function loadModel (model: Doc[]) {
+    for (const doc of model) {
+      objects.set(doc._id, doc)
+    }
+  }
+
+  // C O R E  S E R V I C E
+
+  const coreService = {
+    instantiateEmb,
+    get,
+    getPrototype,
+    instantiate,
+    loadModel
+  }
+
+  // I N S T A N C E S
+
+  const konstructors = new Map<Ref<Class<Obj>>, Konstructor<Obj>>()
+  const prototypes = new Map<Ref<Class<Obj>>, Object>()
+
+  const CoreRoot = {
+    get _class (this: Instance<Obj>) { return this.__layout._class },
+    getSession: (): CoreService => coreService
+  }
+
+  function getPrototype<T extends Obj> (_class: Ref<Class<T>>): Object {
+    const prototype = prototypes.get(_class)
+    if (prototype) {
+      return prototype
+    }
+
+    const clazz = get(_class) as Class<Obj>
+    const parent = clazz._extends ? getPrototype(clazz._extends) : CoreRoot
+    const proto = Object.create(parent)
+    prototypes.set(_class, proto)
+
+    if (clazz._native) {
+      const native = platform.getResource(clazz._native)
+      const descriptors = Object.getOwnPropertyDescriptors(native)
+      Object.defineProperties(proto, descriptors)
+    }
+
+    const attributes = clazz._attributes as { [key: string]: Type<any> }
+    for (const key in attributes) {
+      if (key === '_default') { continue } // we do not define `_default`'s type, it's infinitevely recursive :)
+      const attr = attributes[key]
+      const attrInstance = instantiate(attr)
+
+      if (typeof attrInstance.exert !== 'function') {
+        throw new Error('exert is not a function')
+      }
+      const exert = attrInstance.exert()
+
+      Object.defineProperty(proto, key, {
+        get (this: Instance<Obj>) {
+          return exert(Reflect.get(this.__layout, key), this.__layout, key)
+        },
+        enumerable: true
+      })
+    }
+    return proto
+  }
+
+  function getKonstructor<T extends Obj> (_class: Ref<Class<T>>): Konstructor<T> {
+    const konstructor = konstructors.get(_class)
+    if (konstructor) { return konstructor as unknown as Konstructor<T> }
+    else {
+      // build ctor for _class
+      const proto = getPrototype(_class)
+      const ctor = {
+        [_class]: function (this: Instance<Obj>, obj: Obj) {
+          this.__layout = obj
+        }
+      }[_class]
+      proto.constructor = ctor
+      ctor.prototype = proto
+      konstructors.set(_class, ctor as unknown as Konstructor<Obj>)
+      return ctor as unknown as Konstructor<T>
+    }
+  }
+
+  function instantiate<T extends Obj> (obj: T): Instance<T> {
+    const ctor = getKonstructor(obj._class)
+    return new ctor(obj)
+  }
+
+  function instantiateEmb<T extends Emb> (obj: T): Instance<T> {
+    return instantiate(obj)
+  }
+
+  function instantiateDoc<T extends Doc> (obj: T): Instance<T> {
+    return instantiate(obj)
+  }
+
+  // A P I : R E A D
+
+  async function getInstance<T extends Doc> (id: Ref<T>): Promise<Instance<T>> {
+    const doc = get(id)
+    return instantiateDoc(doc)
+  }
+
+  function as<T extends Doc, A extends Doc> (obj: Instance<T>, _class: Ref<Class<A>>): Instance<A> {
+    return {} as Instance<A>
+  }
 
   // T Y P E S : B A G
 
@@ -82,8 +200,6 @@ export default async (platform: Platform): Promise<CoreService> => {
   platform.setResource(core.method.BagOf_exert, BagOf_exert)
   platform.setResource(core.method.InstanceOf_exert, InstanceOf_exert)
 
-  return {
-    newSession (): Session { return new TSession(platform) }
-  }
+  return coreService
 }
 

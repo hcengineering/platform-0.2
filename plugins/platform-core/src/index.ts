@@ -93,6 +93,8 @@ export type Instance<T extends Obj> = { [P in keyof T]:
   getSession (): Session
 }
 
+// S E S S I O N
+
 /** 
   -- Here is a single fundamental signature: `mixin`:
     
@@ -122,19 +124,24 @@ export interface Session {
 
   // C R E A T E
 
-  mixin<D extends T, M extends T, T extends Doc> (doc: D, clazz: Ref<EClass<M, T>>, values: Omit<M, keyof T>): M
+  // mixin<D extends T, M extends T, T extends Doc> (doc: D, clazz: Ref<EClass<M, T>>, values: Omit<M, keyof T>): M
 
-  newInstance<M extends Emb> (clazz: Ref<Class<M>>, values: Omit<M, keyof Emb>): M
+  // newInstance<M extends Emb> (clazz: Ref<Class<M>>, values: Omit<M, keyof Emb>): M
 
-  newDocument<M extends Doc> (clazz: Ref<Class<M>>, values: Omit<M, keyof Doc>): Instance<M>
-  newClass<T extends E, E extends Obj> (values: Omit<EClass<T, E>, keyof Obj>): Instance<EClass<T, E>>
+  // newDocument<M extends Doc> (clazz: Ref<Class<M>>, values: Omit<M, keyof Doc>): Instance<M>
+  // newClass<T extends E, E extends Obj> (values: Omit<EClass<T, E>, keyof Obj>): Instance<EClass<T, E>>
 
-  createDocument<M extends Doc> (clazz: Ref<Class<M>>, values: Omit<M, keyof Obj> & { _id?: Ref<M> }): M
-  createClass<T extends E, E extends Obj> (values: Omit<EClass<T, E>, keyof Obj>): EClass<T, E>
+  // createDocument<M extends Doc> (clazz: Ref<Class<M>>, values: Omit<M, keyof Obj> & { _id?: Ref<M> }): M
+  // createClass<T extends E, E extends Obj> (values: Omit<EClass<T, E>, keyof Obj>): EClass<T, E>
 }
 
 export interface CoreService extends Service {
-  newSession (): Session
+  instantiateEmb<T extends Emb> (obj: T): Instance<T>
+  loadModel (model: Doc[]): void
+  // debug?
+  get<T extends Doc> (_id: Ref<T>): T
+  getPrototype<T extends Obj> (_class: Ref<Class<T>>): Object
+  instantiate<T extends Obj> (obj: T): Instance<T>
 }
 
 export default plugin('core' as Plugin<CoreService>, {}, {
