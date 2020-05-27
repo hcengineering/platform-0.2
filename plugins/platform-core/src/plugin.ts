@@ -61,7 +61,8 @@ export default async (platform: Platform): Promise<CoreService> => {
   const coreService: CoreService = {
     getDb () { return modelDb },
     getPrototype,
-    getInstance
+    getInstance,
+    as
   }
 
   // I N S T A N C E S

@@ -38,11 +38,11 @@ export default async (platform: Platform, deps: { core: CoreService, ui: UIServi
   const path = window.location.pathname
   const split = path.split('/')
 
-  const session = deps.core.newSession()
+  const coreService = deps.core
 
-  const obj = await session.getInstance(split[2] as Ref<Doc>)
+  const obj = await coreService.getInstance(split[2] as Ref<Doc>)
   const clazz = await obj._class
-  const form = session.as(clazz, ui.class.Form)
+  const form = coreService.as(clazz, ui.class.Form)
 
   const initState: WorkbenchState = {
     mainComponent: form.form

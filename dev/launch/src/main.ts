@@ -15,7 +15,6 @@
 
 import { Platform } from '@anticrm/platform'
 
-import db from '@anticrm/platform-db'
 import core from '@anticrm/platform-core'
 import i18n from '@anticrm/platform-core-i18n'
 import ui from '@anticrm/platform-ui'
@@ -39,7 +38,6 @@ const platform = new Platform()
 platform.setMetadata(ui.metadata.DefaultApplication, workbench.component.Workbench)
 // platform.setMetadata(ui.metadata.DefaultApplication, demo.component.Periodic)
 
-platform.addLocation(db, () => import(/* webpackChunkName: "platform-db" */ '@anticrm/platform-db/src/memdb'))
 platform.addLocation(core, () => import(/* webpackChunkName: "platform-core" */ '@anticrm/platform-core/src/plugin'))
 platform.addLocation(i18n, () => import(/* webpackChunkName: "platform-core-i18n" */ '@anticrm/platform-core-i18n/src/plugin'))
 platform.addLocation(ui, () => import(/* webpackChunkName: "platform-ui" */ '@anticrm/platform-ui/src/plugin'))
