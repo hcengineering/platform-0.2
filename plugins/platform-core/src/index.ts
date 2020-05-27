@@ -108,7 +108,7 @@ export interface CoreService extends Service {
   getInstance<T extends Doc> (id: Ref<T>): Promise<Instance<T>>
   getDb (): DocDb
   // debug?
-  getPrototype<T extends Obj> (_class: Ref<Class<T>>): Object
+  getPrototype<T extends Obj> (_class: Ref<Class<T>>, stereotype: number /* for tests */): Object
 }
 
 export default plugin('core' as Plugin<CoreService>, {}, {

@@ -21,6 +21,8 @@ import model from '../__model__/model'
 import Builder from '../__model__/builder'
 import core from '../__model__'
 
+const DOC = 1 // see `plugin.ts`
+
 describe('core', () => {
   const platform = new Platform()
 
@@ -38,16 +40,16 @@ describe('core', () => {
     const builder = new Builder(tx.getDb())
     builder.load(model)
 
-    const typeProto = tx.getPrototype(core.class.Type)
+    const typeProto = tx.getPrototype(core.class.Type, DOC)
     console.log(typeProto)
 
-    const rtProto = tx.getPrototype(core.class.ResourceType)
+    const rtProto = tx.getPrototype(core.class.ResourceType, DOC)
     console.log(rtProto)
 
     const rtProtoProto = Object.getPrototypeOf(rtProto)
     expect(typeProto).toBe(rtProtoProto)
 
-    const bagProto = tx.getPrototype(core.class.BagOf)
+    const bagProto = tx.getPrototype(core.class.BagOf, DOC)
     console.log(bagProto)
   })
 

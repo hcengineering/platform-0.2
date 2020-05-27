@@ -122,13 +122,12 @@ export default async (platform: Platform): Promise<CoreService> => {
     const konstructor = konstructors.get(_class)
     if (konstructor) { return konstructor as unknown as Konstructor<T> }
     else {
-      // build ctor for _class
       const proto = getPrototype(_class, stereotype)
       const ctor = {
         [_class]: function (this: Instance<Obj>, obj: Obj) {
           this.__layout = obj
         }
-      }[_class]
+      }[_class] // A trick to `name` function as `_class` value
       proto.constructor = ctor
       ctor.prototype = proto
       konstructors.set(_class, ctor as unknown as Konstructor<Obj>)
@@ -137,7 +136,6 @@ export default async (platform: Platform): Promise<CoreService> => {
   }
 
   function instantiateEmb<T extends Emb> (obj: T): Instance<T> {
-    console.log('instantiateEmb: ')
     const ctor = getKonstructor(obj._class, Stereotype.EMB)
     return new ctor(obj)
   }
