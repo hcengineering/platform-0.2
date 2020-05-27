@@ -3,6 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "main": "./src/index.ts",
+  "scripts": {
+    "test": "jest",
+    "doc": "typedoc --out ./generated_docs --readme none",
+    "lint": "eslint src/**/*.ts"
+  },
   "author": "Andrey Platov <andrey.v.platov@gmail.com>",
   "license": "EPL-2.0",
   "dependencies": {

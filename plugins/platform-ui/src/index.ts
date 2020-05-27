@@ -62,6 +62,6 @@ export default plugin('boot' as Plugin<UIService>, {}, {
   class: {
     TypeUIDecorator: '' as Ref<Class<TypeUIDecorator<any>>>,
     ClassUIDecorator: '' as Ref<Class<ClassUIDecorator<Obj>>>,
-    Form: '' as Ref<Class<Form<Doc>>>
+    Form: '' as Ref<Class<Form<Obj>>>
   }
 })

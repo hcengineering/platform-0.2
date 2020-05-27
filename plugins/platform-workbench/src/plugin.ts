@@ -30,6 +30,7 @@ console.log('PLUGIN: `workbench` parsed')
  */
 export default async (platform: Platform, deps: { core: CoreService, ui: UIService }): Promise<WorkbenchService> => {
   console.log('PLUGIN: `workbench` started')
+  const coreService = deps.core
 
   platform.setResource(workbench.component.Workbench, Workbench)
 
@@ -38,14 +39,24 @@ export default async (platform: Platform, deps: { core: CoreService, ui: UIServi
   const path = window.location.pathname
   const split = path.split('/')
 
-  const coreService = deps.core
-
-  const obj = await coreService.getInstance(split[2] as Ref<Doc>)
-  const clazz = await obj._class
-  const form = coreService.as(clazz, ui.class.Form)
+  let form
+  try {
+    const ref = split[2] as Ref<Doc>
+    let doc = await coreService.getInstance(ref)
+    if (!coreService.is(doc, ui.class.Form)) {
+      doc = await doc._class
+    }
+    if (!coreService.is(doc, ui.class.Form)) {
+      throw new Error(`something went wrong, can't find 'Form' for the ${ref}.`)
+    }
+    form = coreService.as(doc, ui.class.Form).form
+    console.log('workbench: use form: ' + form)
+  } catch (err) {
+    console.log(err)
+  }
 
   const initState: WorkbenchState = {
-    mainComponent: form.form
+    mainComponent: form
   }
   const state = reactive(initState)
 

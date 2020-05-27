@@ -20,7 +20,7 @@ import ui, { AnyComponent } from '@anticrm/platform-ui'
 // import lauchDev from '@anticrm/launch-dev' // TODO Dirty hack, get rid of this later.
 
 export interface WorkbenchState {
-  mainComponent: AnyComponent
+  mainComponent: AnyComponent | undefined
 }
 
 export interface WorkbenchService extends Service {

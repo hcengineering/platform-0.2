@@ -15,7 +15,7 @@
 
 import { plugin, Plugin, Service } from '@anticrm/platform'
 import { Doc, Ref, Class, StringType } from '@anticrm/platform-core'
-import { Asset } from '@anticrm/platform-ui'
+import { Asset, ComponentRef, AnyComponent } from '@anticrm/platform-ui'
 
 export interface Contact extends Doc {
   email?: StringType
@@ -42,5 +42,8 @@ export default plugin(
     class: {
       Contact: '' as Ref<Class<Contact>>,
       Person: '' as Ref<Class<Person>>
+    },
+    form: {
+      Person: '' as AnyComponent
     }
   })

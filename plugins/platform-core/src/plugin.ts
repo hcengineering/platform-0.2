@@ -62,7 +62,8 @@ export default async (platform: Platform): Promise<CoreService> => {
     getDb () { return modelDb },
     getPrototype,
     getInstance,
-    as
+    as,
+    is
   }
 
   // I N S T A N C E S
@@ -77,17 +78,17 @@ export default async (platform: Platform): Promise<CoreService> => {
 
   function getPrototype<T extends Obj> (_class: Ref<Class<T>>, stereotype: Stereotype): Object {
     const prototype = prototypes.get(_class)
-    if (prototype) {
-      return prototype
-    }
+    if (prototype) { return prototype }
 
+    console.log('building prototype: ' + _class)
     const clazz = modelDb.get(_class) as Class<Obj>
     const parent = clazz._extends ? getPrototype(clazz._extends, stereotype) : CoreRoot
     const proto = Object.create(parent)
     prototypes.set(_class, proto)
 
     if (clazz._native) {
-      const native = platform.getResource(clazz._native)
+      const native = platform.getResource(clazz._native) // TODO: must `resolve`! we need to have getPrototype async for this.
+      if (!native) { throw new Error(`something went wrong, can't load '${clazz._native}' resource`) }
       const descriptors = Object.getOwnPropertyDescriptors(native)
       Object.defineProperties(proto, descriptors)
     }
@@ -96,7 +97,9 @@ export default async (platform: Platform): Promise<CoreService> => {
     for (const key in attributes) {
       if (key === '_default') { continue } // we do not define `_default`'s type, it's infinitevely recursive :)
       const attr = attributes[key]
+      // console.log(attr)
       const attrInstance = instantiateEmb(attr)
+      // console.log(attrInstance)
 
       if (typeof attrInstance.exert !== 'function') {
         throw new Error('exert is not a function')
@@ -106,11 +109,9 @@ export default async (platform: Platform): Promise<CoreService> => {
       const fullKey = stereotype === Stereotype.DOC ?
         key.startsWith('_') ? key : attributeKey(_class, key) :
         key
-      console.log('class: ' + _class + ' FK: ' + fullKey + ' key: ' + key)
 
       Object.defineProperty(proto, key, {
         get (this: Instance<Obj>) {
-          console.log(this)
           return exert(Reflect.get(this.__layout, fullKey), this.__layout, key)
         },
         enumerable: true
@@ -154,7 +155,16 @@ export default async (platform: Platform): Promise<CoreService> => {
   }
 
   function as<T extends Doc, A extends Doc> (obj: Instance<T>, _class: Ref<Class<A>>): Instance<A> {
-    return {} as Instance<A>
+    console.log('as: ' + _class)
+    console.log(obj)
+    if (!is(obj, _class)) { throw new Error(_class + ' instance does not mixed in') }
+    const ctor = getKonstructor(_class, Stereotype.DOC)
+    return new ctor(obj.__layout as unknown as A)
+  }
+
+  function is<T extends Doc, M extends Doc> (obj: Instance<T>, _class: Ref<Class<M>>): boolean {
+    const mixins = obj._mixins as Ref<Class<Doc>>[]
+    return mixins && mixins.includes(_class as Ref<Class<Doc>>)
   }
 
   // T Y P E S : B A G

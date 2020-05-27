@@ -17,7 +17,7 @@ import contact from '.'
 import core from '@anticrm/platform-core/src/__model__'
 import { Ref, Class, Type } from '@anticrm/platform-core'
 import ui from '@anticrm/platform-ui/src/__model__'
-import { ClassUIDecorator } from '@anticrm/platform-ui'
+import { ClassUIDecorator, Form, ComponentRef } from '@anticrm/platform-ui'
 import { Contact, Person } from '..'
 import { Doc } from '@anticrm/platform-core'
 import Builder from '@anticrm/platform-core/src/__model__/builder'
@@ -32,7 +32,7 @@ export default async (S: Builder) => {
     phone: S.newInstance(contact.class.Phone, {})
   })
 
-  S.createClass<Person, Contact>(contact.class.Person, contact.class.Contact, {
+  S.createClass(contact.class.Person, contact.class.Contact, {
     firstName: S.newInstance(core.class.Type, {}),
     lastName: S.newInstance(core.class.Type, {}),
     birthDate: S.newInstance(core.class.Type, {}),
@@ -43,6 +43,10 @@ export default async (S: Builder) => {
 
   S.mixin(contact.class.Contact, ui.class.ClassUIDecorator as Ref<Class<ClassUIDecorator<Contact>>>, {
     decorators: { phone: S.newInstance(ui.class.TypeUIDecorator, { placeholder: '+7 913 333 5555' as any }) }
+  })
+
+  S.mixin(contact.class.Person, ui.class.Form as Ref<Class<Form<Person>>>, {
+    form: contact.form.Person as string as ComponentRef //TODO
   })
 
 }
