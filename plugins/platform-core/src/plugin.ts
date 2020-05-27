@@ -36,6 +36,11 @@ console.log('PLUGIN: parsed core')
 export default async (platform: Platform): Promise<CoreService> => {
   console.log('PLUGIN: started core')
 
+  enum Stereotype {
+    EMB,
+    DOC
+  }
+
   // C L A S S E S
 
   // function getOwnAttribute (clazz: Class<Obj>, key: string): Type<any> | undefined {
@@ -69,14 +74,14 @@ export default async (platform: Platform): Promise<CoreService> => {
     getSession: (): CoreService => coreService
   }
 
-  function getPrototype<T extends Obj> (_class: Ref<Class<T>>): Object {
+  function getPrototype<T extends Obj> (_class: Ref<Class<T>>, stereotype: Stereotype): Object {
     const prototype = prototypes.get(_class)
     if (prototype) {
       return prototype
     }
 
     const clazz = modelDb.get(_class) as Class<Obj>
-    const parent = clazz._extends ? getPrototype(clazz._extends) : CoreRoot
+    const parent = clazz._extends ? getPrototype(clazz._extends, stereotype) : CoreRoot
     const proto = Object.create(parent)
     prototypes.set(_class, proto)
 
@@ -90,16 +95,21 @@ export default async (platform: Platform): Promise<CoreService> => {
     for (const key in attributes) {
       if (key === '_default') { continue } // we do not define `_default`'s type, it's infinitevely recursive :)
       const attr = attributes[key]
-      const attrInstance = instantiate(attr)
+      const attrInstance = instantiateEmb(attr)
 
       if (typeof attrInstance.exert !== 'function') {
         throw new Error('exert is not a function')
       }
+
       const exert = attrInstance.exert()
-      const fullKey = attributeKey(_class, key)
+      const fullKey = stereotype === Stereotype.DOC ?
+        key.startsWith('_') ? key : attributeKey(_class, key) :
+        key
+      console.log('class: ' + _class + ' FK: ' + fullKey + ' key: ' + key)
 
       Object.defineProperty(proto, key, {
         get (this: Instance<Obj>) {
+          console.log(this)
           return exert(Reflect.get(this.__layout, fullKey), this.__layout, key)
         },
         enumerable: true
@@ -108,12 +118,12 @@ export default async (platform: Platform): Promise<CoreService> => {
     return proto
   }
 
-  function getKonstructor<T extends Obj> (_class: Ref<Class<T>>): Konstructor<T> {
+  function getKonstructor<T extends Obj> (_class: Ref<Class<T>>, stereotype: Stereotype): Konstructor<T> {
     const konstructor = konstructors.get(_class)
     if (konstructor) { return konstructor as unknown as Konstructor<T> }
     else {
       // build ctor for _class
-      const proto = getPrototype(_class)
+      const proto = getPrototype(_class, stereotype)
       const ctor = {
         [_class]: function (this: Instance<Obj>, obj: Obj) {
           this.__layout = obj
@@ -126,17 +136,15 @@ export default async (platform: Platform): Promise<CoreService> => {
     }
   }
 
-  function instantiate<T extends Obj> (obj: T): Instance<T> {
-    const ctor = getKonstructor(obj._class)
+  function instantiateEmb<T extends Emb> (obj: T): Instance<T> {
+    console.log('instantiateEmb: ')
+    const ctor = getKonstructor(obj._class, Stereotype.EMB)
     return new ctor(obj)
   }
 
-  function instantiateEmb<T extends Emb> (obj: T): Instance<T> {
-    return instantiate(obj)
-  }
-
   function instantiateDoc<T extends Doc> (obj: T): Instance<T> {
-    return instantiate(obj)
+    const ctor = getKonstructor(obj._class, Stereotype.DOC)
+    return new ctor(obj)
   }
 
   // A P I : R E A D
