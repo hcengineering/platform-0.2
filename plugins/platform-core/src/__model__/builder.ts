@@ -1,14 +1,14 @@
 //
 // Copyright © 2020 Anticrm Platform Contributors.
-// 
+//
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
 // obtain a copy of the License at https://www.eclipse.org/legal/epl-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// 
+//
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
@@ -21,10 +21,9 @@ import { MemDb } from '../memdb'
 type Layout = { [key: string]: PropertyType }
 
 class Builder {
-
   private memdb: DocDb
 
-  constructor(memdb?: DocDb) {
+  constructor (memdb?: DocDb) {
     this.memdb = memdb ?? new MemDb()
   }
 
@@ -34,7 +33,6 @@ class Builder {
 
   private findAttributeKey<T extends Doc> (cls: Ref<Class<T>>, key: string): string {
     let _class = cls as Ref<Class<Obj>> | undefined
-    const result = [] as [string, string][]
     while (_class) {
       const clazz = this.memdb.get(_class)
       if ((clazz._attributes as any)[key] !== undefined) {
@@ -87,7 +85,6 @@ class Builder {
   }
 
   load (model: (builder: Builder) => void) { model(this) }
-
 }
 
 export default Builder
