@@ -90,58 +90,25 @@ export type Instance<T extends Obj> = { [P in keyof T]:
   never
 } & {
   __layout: T
-  getSession (): Session
+  getSession (): CoreService
 }
 
 // S E S S I O N
 
-/** 
-  -- Here is a single fundamental signature: `mixin`:
-    
-  // mixin<D extends T, M extends T, T extends Doc> (doc: D, clazz: Ref<EClass<M, T>>, values: Omit<M, keyof T>): M 
-
-  Below are convenient API calls for `new` operation, depending on base class of an object being created
-
-  // newInstance       <M        extends       Obj>         (clazz: Ref<Class<M>>,     values: Omit<M, keyof Obj>): M 
-  //     newInstance === mixin, where D = Doc & T = Doc
-  // newDocument       <M        extends       Doc>         (clazz: Ref<Class<M>>,     values: Omit<M, keyof Doc>): M 
-  //     newInstance === mixin, where D = Doc & T = Doc
-  // newClass
-  //     newClass === newInstance, where M === EClass<T, E> // clazz: Ref<Class<EClass<T, E>>>,
-*/
-export interface Session {
-
-  // L A Y O U T
-
-  // R E A D
-
-  instantiateEmb (value: Emb): Instance<Emb>
-  instantiateDoc<T extends Doc> (value: T): Instance<T>
-
-  getInstance<T extends Doc> (doc: Ref<T>): Promise<Instance<T>>
-
-  as<T extends Doc, A extends T> (obj: Instance<T>, _class: Ref<Class<A>>): Instance<A>
-
-  // C R E A T E
-
-  // mixin<D extends T, M extends T, T extends Doc> (doc: D, clazz: Ref<EClass<M, T>>, values: Omit<M, keyof T>): M
-
-  // newInstance<M extends Emb> (clazz: Ref<Class<M>>, values: Omit<M, keyof Emb>): M
-
-  // newDocument<M extends Doc> (clazz: Ref<Class<M>>, values: Omit<M, keyof Doc>): Instance<M>
-  // newClass<T extends E, E extends Obj> (values: Omit<EClass<T, E>, keyof Obj>): Instance<EClass<T, E>>
-
-  // createDocument<M extends Doc> (clazz: Ref<Class<M>>, values: Omit<M, keyof Obj> & { _id?: Ref<M> }): M
-  // createClass<T extends E, E extends Obj> (values: Omit<EClass<T, E>, keyof Obj>): EClass<T, E>
+export interface DocDb {
+  add (doc: Doc): void
+  get<T extends Doc> (id: Ref<T>): T
+  dump (): Doc[]
 }
 
 export interface CoreService extends Service {
-  instantiateEmb<T extends Emb> (obj: T): Instance<T>
-  loadModel (model: Doc[]): void
+  // instantiateEmb<T extends Emb> (obj: T): Instance<T>
+  // instantiateDoc<T extends Doc> (obj: T): Instance<T>
+  // instantiate<T extends Obj> (obj: T): Instance<T>
+  getInstance<T extends Doc> (id: Ref<T>): Promise<Instance<T>>
+  getDb (): DocDb
   // debug?
-  get<T extends Doc> (_id: Ref<T>): T
   getPrototype<T extends Obj> (_class: Ref<Class<T>>): Object
-  instantiate<T extends Obj> (obj: T): Instance<T>
 }
 
 export default plugin('core' as Plugin<CoreService>, {}, {

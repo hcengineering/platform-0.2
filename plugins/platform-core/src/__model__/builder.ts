@@ -13,39 +13,22 @@
 // limitations under the License.
 //
 
-import { PropertyType, Emb, Doc, Obj, Ref, EClass, Class, AllAttributes } from '@anticrm/platform-core'
+import { PropertyType, Emb, Doc, Obj, Ref, EClass, Class, AllAttributes, DocDb } from '@anticrm/platform-core'
 import core from '.'
+import { attributeKey } from '../plugin'
+import { MemDb } from '../memdb'
 
 type Layout = { [key: string]: PropertyType }
 
-function attributeKey (_class: Ref<Class<Obj>>, key: string): string {
-  const index = _class.indexOf(':')
-  return _class.substring(index + 1) + '/' + key
-}
-
 class Builder {
 
-  private objects = new Map<Ref<Doc>, Doc>()
+  private memdb: DocDb
 
-  protected add (doc: Doc) {
-    const id = doc._id
-    if (this.objects.get(id)) { throw new Error('document added already ' + id) }
-    this.objects.set(id, doc)
+  constructor(memdb?: DocDb) {
+    this.memdb = memdb ?? new MemDb()
   }
 
-  protected get<T extends Doc> (id: Ref<T>): T {
-    const obj = this.objects.get(id)
-    if (!obj) { throw new Error('document not found ' + id) }
-    return obj as T
-  }
-
-  dump () {
-    const result = []
-    for (const doc of this.objects.values()) {
-      result.push(doc)
-    }
-    return result
-  }
+  dump (): Doc[] { return this.memdb.dump() }
 
   /// A S S I G N
 
@@ -53,7 +36,7 @@ class Builder {
     let _class = cls as Ref<Class<Obj>> | undefined
     const result = [] as [string, string][]
     while (_class) {
-      const clazz = this.get(_class)
+      const clazz = this.memdb.get(_class)
       if ((clazz._attributes as any)[key] !== undefined) {
         return attributeKey(_class, key)
       }
@@ -85,14 +68,14 @@ class Builder {
     return obj
   }
 
-  createDocument<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Doc>, _id: Ref<M>) {
+  createDocument<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Doc>, _id: Ref<M>): void {
     const layout = { _class, _id } as Doc
     this.assign(layout, _class, core.class.Doc, values)
-    this.add(layout as Doc)
+    this.memdb.add(layout as Doc)
   }
 
   mixin<T extends E, E extends Doc> (id: Ref<E>, clazz: Ref<Class<T>>, values: Pick<T, Exclude<keyof T, keyof E>>) {
-    const doc = this.get(id)
+    const doc = this.memdb.get(id)
     if (!doc._mixins) { doc._mixins = [] }
     doc._mixins.push(clazz as Ref<Class<Doc>>)
     const docClass = doc._class
@@ -100,7 +83,7 @@ class Builder {
   }
 
   patch<T extends Doc> (obj: Ref<T>, f: (obj: T) => void) {
-    f(this.get(obj))
+    f(this.memdb.get(obj))
   }
 
   load (model: (builder: Builder) => void) { model(this) }

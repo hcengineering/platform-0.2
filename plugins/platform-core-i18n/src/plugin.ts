@@ -30,7 +30,7 @@ export function synthIntlString (_id: Ref<Doc>, key: string): IntlString {
   if (keyIndex !== -1) {
     key = key.substring(keyIndex + 1)
   }
-  return 'string' + _id.substring(index) + '/' + key as IntlString
+  return 'string:' + _id.substring(index + 1) + '/' + key as IntlString
 }
 
 console.log('PLUGIN: parsed i18n')
@@ -69,12 +69,15 @@ export default async (platform: Platform): Promise<I18nService> => {
 
   const IntlString_exert = function (this: Instance<Type<Doc>>): Exert { // eslint-disable-line
     return ((value: IntlString, layout: any, key: string) => {
+      console.log('exert : ' + value)
+      console.log(layout)
       const translation = translate(value)
+      console.log('translation: ' + translation)
       if (translation !== value) {
         return translation
       } else {
         const id = synthIntlString(layout._id as Ref<Doc>, key)
-        console.log(id)
+        console.log('key: ' + key + ' synth: ' + id)
         const translation = translate(id)
         if (translation !== id) { return translation }
         return value

@@ -17,13 +17,12 @@ import { Platform, Plugin, Service, plugin } from '@anticrm/platform'
 import { IntlString } from '..'
 import { verifyTranslation, modelTranslation } from '../__model__/utils'
 
-import db from '@anticrm/platform-db'
 import core from '@anticrm/platform-core/src/__model__'
 import i18n from '../__model__'
 
 import { Ref, Class, Obj, Doc } from '@anticrm/platform-core'
 
-import metaModel from '@anticrm/platform-core/src/__model__/model'
+import metaModel, { Builder } from '@anticrm/platform-core/src/__model__/model'
 import i18nModel from '../__model__/model'
 
 interface Person extends Doc {
@@ -54,7 +53,7 @@ const test = plugin(
 
 describe('i18n', () => {
   const platform = new Platform()
-  platform.addLocation(db, () => import('@anticrm/platform-db/src/memdb'))
+  // platform.addLocation(db, () => import('@anticrm/platform-db/src/memdb'))
   platform.addLocation(core, () => import('@anticrm/platform-core/src/plugin'))
   platform.addLocation(i18n, () => import('../plugin'))
   // platform.setResolver('native', core.id)
@@ -108,39 +107,33 @@ describe('i18n', () => {
 
   it('should ...', async () => {
     const coreService = await platform.getPlugin(core.id)
-    const session = coreService.newSession()
-    metaModel(session)
+    const S = new Builder(coreService.getDb())
+    S.load(metaModel)
+    S.load(i18nModel)
     expect(true).toBe(true)
   })
 
   it('should translate attribute value', async () => {
     const coreService = await platform.getPlugin(core.id)
-    const S = coreService.newSession()
-    metaModel(S)
-    i18nModel(S)
+    const S = new Builder(coreService.getDb())
+    // S.load(metaModel)
+    // S.load(i18nModel)
 
     const ru = {
       MyString: 'Перевод',
       Vasya: 'Вася'
     }
 
-    const personClass = S.createClass<Person, Doc>({
-      _id: test.class.Person,
-      _attributes: {
-        name: S.newInstance(i18n.class.IntlString, {
-        })
-      },
-      _extends: core.class.Doc
+    const personClass = S.createClass<Person, Doc>(test.class.Person, core.class.Doc, {
+      name: S.newInstance(i18n.class.IntlString, {})
     })
 
     const person = S.createDocument(test.class.Person, {
-      _id: 'xxx' as Ref<Person>,
       name: test.string.Vasya
-    })
+    }, 'vasya' as Ref<Person>)
 
-    expect(person.name).toBe(test.string.Vasya)
-
-    const instance = S.instantiateDoc(person)
+    const instance = await coreService.getInstance('vasya' as Ref<Person>)
+    console.log(instance)
     expect(instance.name).toBe(test.string.Vasya)
 
     const i18nService = await platform.getPlugin(i18n.id)
@@ -152,10 +145,11 @@ describe('i18n', () => {
         name: 'Петя'
       }
     })
+    console.log(translations)
     i18nService.loadStrings(translations)
 
-    const petya = S.createDocument(test.class.Person, { _id: test.person.Petya })
-    const petyaInstance = S.instantiateDoc(petya)
+    const petya = S.createDocument(test.class.Person, {}, 'test.Petya' as Ref<Person>)
+    const petyaInstance = await coreService.getInstance('test.Petya' as Ref<Person>)
     expect(petyaInstance.name).toBe('Петя')
   })
 })

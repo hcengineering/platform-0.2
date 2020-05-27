@@ -15,11 +15,17 @@
 
 import { Platform, Resource } from '@anticrm/platform'
 import core, {
-  CoreService, Obj, Ref, Class, Doc, EClass, BagOf, InstanceOf, PropertyType,
-  Instance, Type, Emb, ResourceType, Exert, Session
+  CoreService, Obj, Ref, Class, Doc, BagOf, InstanceOf, PropertyType,
+  Instance, Type, Emb, ResourceType, Exert
 } from '.'
+import { MemDb } from './memdb'
 
 type Konstructor<T extends Obj> = new (obj: Omit<T, '__property' | '_class'>) => Instance<T>
+
+export function attributeKey (_class: Ref<Class<Obj>>, key: string): string {
+  const index = _class.indexOf(':')
+  return _class.substring(index + 1) + '/' + key
+}
 
 console.log('PLUGIN: parsed core')
 /*!
@@ -43,30 +49,14 @@ export default async (platform: Platform): Promise<CoreService> => {
 
   // D A T A
 
-  const objects = new Map<Ref<Doc>, Doc>()
-  //byClass = new Map<Ref<Class<Doc>>, Doc[]>()
-
-
-  function get<T extends Doc> (_id: Ref<T>): T {
-    const result = objects.get(_id)
-    if (result) { return result as T }
-    throw new Error('oops! object not found: ' + _id)
-  }
-
-  function loadModel (model: Doc[]) {
-    for (const doc of model) {
-      objects.set(doc._id, doc)
-    }
-  }
+  const modelDb = new MemDb()
 
   // C O R E  S E R V I C E
 
-  const coreService = {
-    instantiateEmb,
-    get,
+  const coreService: CoreService = {
+    getDb () { return modelDb },
     getPrototype,
-    instantiate,
-    loadModel
+    getInstance
   }
 
   // I N S T A N C E S
@@ -85,7 +75,7 @@ export default async (platform: Platform): Promise<CoreService> => {
       return prototype
     }
 
-    const clazz = get(_class) as Class<Obj>
+    const clazz = modelDb.get(_class) as Class<Obj>
     const parent = clazz._extends ? getPrototype(clazz._extends) : CoreRoot
     const proto = Object.create(parent)
     prototypes.set(_class, proto)
@@ -106,10 +96,11 @@ export default async (platform: Platform): Promise<CoreService> => {
         throw new Error('exert is not a function')
       }
       const exert = attrInstance.exert()
+      const fullKey = attributeKey(_class, key)
 
       Object.defineProperty(proto, key, {
         get (this: Instance<Obj>) {
-          return exert(Reflect.get(this.__layout, key), this.__layout, key)
+          return exert(Reflect.get(this.__layout, fullKey), this.__layout, key)
         },
         enumerable: true
       })
@@ -151,7 +142,7 @@ export default async (platform: Platform): Promise<CoreService> => {
   // A P I : R E A D
 
   async function getInstance<T extends Doc> (id: Ref<T>): Promise<Instance<T>> {
-    const doc = get(id)
+    const doc = modelDb.get(id)
     return instantiateDoc(doc)
   }
 
@@ -185,7 +176,7 @@ export default async (platform: Platform): Promise<CoreService> => {
   }
 
   const InstanceOf_exert = function (this: Instance<InstanceOf<Emb>>): Exert {
-    return ((value: Emb) => this.getSession().instantiateEmb(value)) as Exert
+    return ((value: Emb) => instantiateEmb(value)) as Exert
   }
 
   const TResourceType = {

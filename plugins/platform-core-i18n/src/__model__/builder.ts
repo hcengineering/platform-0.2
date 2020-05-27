@@ -16,13 +16,13 @@
 import { Session, Type } from '@anticrm/platform-core'
 import { IntlString } from '..'
 
-import CoreBuilder from '@anticrm/platform-core/src/__resources__/builder'
+import CoreBuilder from '@anticrm/platform-core/src/__model__/builder'
 import i18n from '.'
 
 export default class extends CoreBuilder {
   protected session: Session
 
-  constructor (session: Session) {
+  constructor(session: Session) {
     super(session)
     this.session = session
   }

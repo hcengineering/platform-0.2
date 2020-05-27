@@ -26,21 +26,17 @@ describe('core', () => {
 
   it('should load model', async () => {
     const tx = await startPlugin(platform)
-    const builder = new Builder()
+    const builder = new Builder(tx.getDb())
     builder.load(model)
     const coreModel = builder.dump()
-    tx.loadModel(coreModel)
-
     expect(true).toBe(true)
     console.log(JSON.stringify(coreModel))
   })
 
   it('should create prototype', async () => {
     const tx = await startPlugin(platform)
-    const builder = new Builder()
+    const builder = new Builder(tx.getDb())
     builder.load(model)
-    const coreModel = builder.dump()
-    tx.loadModel(coreModel)
 
     const typeProto = tx.getPrototype(core.class.Type)
     console.log(typeProto)
@@ -53,25 +49,14 @@ describe('core', () => {
 
     const bagProto = tx.getPrototype(core.class.BagOf)
     console.log(bagProto)
-
-    const classRefTo = tx.get(core.class.InstanceOf)
-    const to = classRefTo._attributes.of
-    const inst = tx.instantiate(to)
-    console.log(inst)
-    const refToProto = Object.getPrototypeOf(inst)
-    expect(refToProto).toBe(tx.getPrototype(core.class.RefTo))
   })
 
   it('should instantiate class', async () => {
     const tx = await startPlugin(platform)
-    const builder = new Builder()
+    const builder = new Builder(tx.getDb())
     builder.load(model)
-    const coreModel = builder.dump()
-    tx.loadModel(coreModel)
 
-    const classRefTo = tx.get(core.class.RefTo)
-
-    const inst = tx.instantiate(classRefTo)
+    const inst = await tx.getInstance(core.class.RefTo)
     console.log(inst)
     console.log(inst._attributes)
     console.log(inst._attributes.to)
