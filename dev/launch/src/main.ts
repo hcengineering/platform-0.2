@@ -30,6 +30,11 @@ import ErrorPage from './components/ErrorPage.vue'
 // import uiMeta from '@anticrm/platform-ui-model/src/__resources__/meta'
 // import contactMeta from '@anticrm/contact/src/__resources__/meta'
 
+import Builder from '@anticrm/platform-core/src/__model__/builder'
+import coreModel from '@anticrm/platform-core/src/__model__/model'
+import uiModel from '@anticrm/platform-ui/src/__model__/model'
+import contactModel from '@anticrm/contact/src/__model__/model'
+
 const platform = new Platform()
 platform.setMetadata(ui.metadata.DefaultApplication, workbench.component.Workbench)
 // platform.setMetadata(ui.metadata.DefaultApplication, demo.component.Periodic)
@@ -47,6 +52,12 @@ platform.addLocation(demo, () => import(/* webpackChunkName: "demo-3d" */ '@anti
 // contactMeta(platform)
 
 async function boot (): Promise<void> {
+  const corePlugin = await platform.getPlugin(core.id)
+  const builder = new Builder(corePlugin.getDb())
+  builder.load(coreModel)
+  builder.load(uiModel)
+  builder.load(contactModel)
+
   const uiPlugin = await platform.getPlugin(ui.id)
   uiPlugin.getApp().mount('#app')
 }

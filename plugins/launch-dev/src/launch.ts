@@ -13,60 +13,29 @@
 // limitations under the License.
 //
 
-import { Platform } from '@anticrm/platform'
-import { Db } from '@anticrm/platform-db'
-import { Class, CoreService, Doc, Ref } from '@anticrm/platform-core'
-import { Query } from '@anticrm/platform-ui-model'
+import { Platform, Service } from '@anticrm/platform'
+import { CoreService } from '@anticrm/platform-core'
 
-import { LaunchPlugin } from '..'
+import Builder from '@anticrm/platform-core/src/__model__/builder'
 
-// import { metaModel } from '@anticrm/platform-core/src/__resources__/model'
-
-// import CoreBuilder from '@anticrm/platform-core/src/__resources__/builder'
-// import UIBuilder from '@anticrm/platform-ui-model/src/__resources__/builder'
-
-// import i18nModel from '@anticrm/platform-core-i18n/src/__resources__/model'
-// import uiModel from '@anticrm/platform-ui-model/src/__resources__/model'
-import contactModel from '@anticrm/contact/src/__resources__/model'
-
-import ui from '@anticrm/platform-ui-model/src/__resources__'
-import contact from '@anticrm/contact/src/__resources__'
-
-
-export default async (platform: Platform, deps: {
-  core: CorePlugin,
-  db: Db,
-  // ui: UIPlugin 
-}): Promise<LaunchPlugin> => {
-  console.log('Plugin `launch-dev` started')
-
-  const db = deps.db
-  db.load(metaModel)
-
-  const session = deps.core.getSession()
-
-  const coreBuilder = new CoreBuilder(session)
-  await coreBuilder.build(i18nModel)
-  await coreBuilder.build(uiModel)
-
-  const uiBuilder = new UIBuilder(session)
-  await uiBuilder.build(contactModel)
-
-  const B = coreBuilder
-
-  const queryClass = await B.getClass(ui.class.Query)
-  const clientQuery = queryClass.newInstance({
-    _id: 'xxxxx' as Ref<Query<Doc>>,
-    clazz: contact.class.Person,
-    exclude: [],
-    order: []
-  })
-
-  return {
-    db,
-    // ui: deps.ui,
-    session: deps.core.getSession()
-  }
-}
+import coreModel from '@anticrm/platform-core/src/__model__/model'
+import uiModel from '@anticrm/platform-ui/src/__model__/model'
+import contactModel from '@anticrm/contact/src/__model__/model'
 
 console.log('Plugin `launch-dev` parsed')
+
+export default async (platform: Platform, deps: {
+  core: CoreService,
+}): Promise<Service> => {
+  console.log('Plugin `launch-dev` started')
+
+  const builder = new Builder(deps.core.getDb())
+  builder.load(coreModel)
+  builder.load(uiModel)
+  builder.load(contactModel)
+
+  console.log(JSON.stringify(builder.dump()))
+
+  return {}
+}
+
