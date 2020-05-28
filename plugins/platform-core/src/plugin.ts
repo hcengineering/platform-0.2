@@ -199,7 +199,12 @@ export default async (platform: Platform): Promise<CoreService> => {
   const TResourceType = {
     exert: function (this: Instance<ResourceType<any>>): Exert {
       const resource = (this.__layout._default) as Resource<(this: Instance<Type<any>>) => Exert>
-      return (value: PropertyType) => resource ? platform.getResource(resource) : undefined
+      let resolved: any
+      if (resource) {
+        resolved = platform.getResource(resource)
+        if (!resolved) { throw new Error('something went wrong: we need to `resolve` resource here, so please work on async rework') }
+      }
+      return (value: PropertyType) => resolved
     }
   }
 
