@@ -15,23 +15,16 @@
 
 import { plugin, Plugin, Service, Resource, Property } from '@anticrm/platform'
 
-// /** This is the only allowed type for an object property */
-// export interface Property<T> { __property: T }
-
-// /** Object property serialized as String */
-// export type StringProperty<T> = string & Property<T>
-// /** Object property serialized as Number */
-// export type NumberProperty<T> = number & Property<T>
-
-// export type ResourceProperty<T> = Property<T> & Resource<T>
+// P R O P E R T I E S
 
 export type Ref<T> = Property<T> & { __ref: true }
-
 export type PropertyType = Property<any>
   | Emb
   | undefined
   | PropertyType[]
   | { [key: string]: PropertyType }
+
+// O B J E C T S
 
 export interface Obj { _class: Ref<Class<this>> }
 export interface Emb extends Obj { __embedded: this }
@@ -39,6 +32,9 @@ export interface Doc extends Obj {
   _id: Ref<Doc>
   _mixins?: Ref<Class<Doc>>[]
 }
+
+// T Y P E S
+
 export type Exert = (value: PropertyType, layout?: any, key?: string) => any
 export interface Type<A> extends Emb {
   _default?: Property<A>
@@ -52,8 +48,6 @@ export interface BagOf<A> extends Type<{ [key: string]: A }> {
 export interface ArrayOf<A> extends Type<A[]> { of: Type<A> }
 export interface ResourceType<T> extends Type<T> { }
 
-/////
-
 type PropertyTypes<T> = { [P in keyof T]:
   T[P] extends Property<infer X> ? Type<X> :
   T[P] extends Property<infer X> | undefined ? Type<X> :
@@ -62,6 +56,13 @@ type PropertyTypes<T> = { [P in keyof T]:
   T[P] extends Property<infer X>[] ? Type<X[]> :
   never
 }
+
+// P R I M I T I V E
+
+export type StringType = Property<string> // TODO: Do we need this?
+
+// C L A S S E S
+
 export type Attributes<T extends E, E extends Obj> = PropertyTypes<Required<Omit<T, keyof E>>>
 export type AllAttributes<T extends E, E extends Obj> = Attributes<T, E> & Partial<Attributes<E, Obj>>
 
@@ -72,10 +73,6 @@ export interface EClass<T extends E, E extends Obj> extends Doc {
 }
 
 export type Class<T extends Obj> = EClass<T, Obj>
-
-//////
-
-export type StringType = Property<string>
 
 export type Instance<T extends Obj> = { [P in keyof T]:
   T[P] extends Ref<infer X> ? (X extends Doc ? Promise<Instance<X>> : never) :
@@ -112,6 +109,8 @@ export interface CoreService extends Service {
   // debug?
   getPrototype<T extends Obj> (_class: Ref<Class<T>>, stereotype: number /* for tests */): Object
 }
+
+// P L U G I N
 
 export default plugin('core' as Plugin<CoreService>, {}, {
   class: {

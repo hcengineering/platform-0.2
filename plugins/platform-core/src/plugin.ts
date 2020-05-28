@@ -154,16 +154,16 @@ export default async (platform: Platform): Promise<CoreService> => {
     return instantiateDoc(doc)
   }
 
-  function as<T extends Doc, A extends Doc> (obj: Instance<T>, _class: Ref<Class<A>>): Instance<A> {
+  function as<T extends Doc, A extends Doc> (doc: Instance<T>, _class: Ref<Class<A>>): Instance<A> {
     console.log('as: ' + _class)
-    console.log(obj)
-    if (!is(obj, _class)) { throw new Error(_class + ' instance does not mixed in') }
+    console.log(doc)
+    if (!is(doc, _class)) { throw new Error(_class + ' instance does not mixed in') }
     const ctor = getKonstructor(_class, Stereotype.DOC)
-    return new ctor(obj.__layout as unknown as A)
+    return new ctor(doc.__layout as unknown as A)
   }
 
-  function is<T extends Doc, M extends Doc> (obj: Instance<T>, _class: Ref<Class<M>>): boolean {
-    const mixins = obj._mixins as Ref<Class<Doc>>[]
+  function is<T extends Doc, M extends Doc> (doc: Instance<T>, _class: Ref<Class<M>>): boolean {
+    const mixins = doc._mixins as Ref<Class<Doc>>[]
     return mixins && mixins.includes(_class as Ref<Class<Doc>>)
   }
 
