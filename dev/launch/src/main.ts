@@ -14,38 +14,50 @@
 //
 
 import { Platform } from '@anticrm/platform'
-import db from '@anticrm/platform-db'
+
 import core from '@anticrm/platform-core'
 import i18n from '@anticrm/platform-core-i18n'
 import ui from '@anticrm/platform-ui'
-import uiModel from '@anticrm/platform-ui-model'
 import workbench from '@anticrm/platform-workbench'
-import launch from '@anticrm/launch-dev'
+import contact from '@anticrm/contact'
+import demo from '@anticrm/demo-3d'
 
 import { createApp } from 'vue'
 import ErrorPage from './components/ErrorPage.vue'
 
-import uiMeta from '@anticrm/platform-ui-model/src/__resources__/meta'
-import contactMeta from '@anticrm/contact/src/__resources__/meta'
+// import uiMeta from '@anticrm/platform-ui-model/src/__resources__/meta'
+// import contactMeta from '@anticrm/contact/src/__resources__/meta'
+
+import Builder from '@anticrm/platform-core/src/__model__/builder'
+
+import coreModel from '@anticrm/platform-core/src/__model__/model'
+import i18nModel from '@anticrm/platform-core-i18n/src/__model__/model'
+import uiModel from '@anticrm/platform-ui/src/__model__/model'
+import contactModel from '@anticrm/contact/src/__model__/model'
 
 const platform = new Platform()
 platform.setMetadata(ui.metadata.DefaultApplication, workbench.component.Workbench)
+// platform.setMetadata(ui.metadata.DefaultApplication, demo.component.Periodic)
 
-platform.addLocation(db, () => import(/* webpackChunkName: "platform-db" */ '@anticrm/platform-db/src/memdb'))
 platform.addLocation(core, () => import(/* webpackChunkName: "platform-core" */ '@anticrm/platform-core/src/plugin'))
 platform.addLocation(i18n, () => import(/* webpackChunkName: "platform-core-i18n" */ '@anticrm/platform-core-i18n/src/plugin'))
 platform.addLocation(ui, () => import(/* webpackChunkName: "platform-ui" */ '@anticrm/platform-ui/src/plugin'))
-platform.addLocation(uiModel, () => import(/* webpackChunkName: "platform-ui-model" */ '@anticrm/platform-ui-model/src/plugin'))
 platform.addLocation(workbench, () => import(/* webpackChunkName: "platform-workbench" */ '@anticrm/platform-workbench/src/plugin'))
-platform.addLocation(launch, () => import(/* webpackChunkName: "launch-dev" */ '@anticrm/launch-dev/src/launch'))
+platform.addLocation(contact, () => import(/* webpackChunkName: "contact" */ '@anticrm/contact/src/plugin'))
+platform.addLocation(demo, () => import(/* webpackChunkName: "demo-3d" */ '@anticrm/demo-3d/src/plugin'))
 
-platform.setResolver('native', core.id)
-platform.setResolver('component', ui.id)
-
-uiMeta(platform)
-contactMeta(platform)
+// uiMeta(platform)
+// contactMeta(platform)
 
 async function boot (): Promise<void> {
+  const corePlugin = await platform.getPlugin(core.id)
+  const i18nService = await platform.getPlugin(i18n.id) // TODO: dirty hack, resources does not resolve awhen building prototypes.
+  const builder = new Builder(corePlugin.getDb())
+  builder.load(coreModel)
+  builder.load(i18nModel)
+  builder.load(uiModel)
+  builder.load(contactModel)
+
   const uiPlugin = await platform.getPlugin(ui.id)
   uiPlugin.getApp().mount('#app')
 }

@@ -25,8 +25,8 @@ describe('platform', () => {
   it('should identify resources', () => {
     const ids = identify('test' as AnyPlugin, {
       resource: {
-        MyString: '' as Resource<string>,
-        FixedId: 'my-id' as Resource<string>
+        MyString: '' as Metadata<string>,
+        FixedId: 'my-id' as Metadata<string>
       }
     })
     expect(ids.resource.MyString).toBe('resource:test.MyString')
@@ -52,9 +52,14 @@ describe('platform', () => {
     })
   })
 
-  it('should not resolve resource (no provider specified)', () => {
-    const resolve = () => platform.resolve('resource:My.Resource' as Resource<string>)
-    expect(resolve).toThrowError('no provider')
+  it('should not resolve resource (no plugin location)', (done) => {
+    platform.resolve('resource:NotExists.Resource' as Resource<string>).then(res => { // eslint-disable-line
+      expect(true).toBe(false)
+      done()
+    }).catch(err => {
+      expect(err).toBeInstanceOf(Error)
+      done()
+    })
   })
 
   it('should not resolve resource (plugin does not have resolve method)', () => {
@@ -107,8 +112,8 @@ describe('platform', () => {
   })
 
   it('should set metadata', () => {
-    platform.setMetadata('xxx' as Metadata<string>, 'meta-xxx')
-    expect(platform.getMetadata('xxx' as Metadata<string>)).toBe('meta-xxx')
+    platform.setResource('xxx' as Resource<string>, 'meta-xxx')
+    expect(platform.getResource('xxx' as Resource<string>)).toBe('meta-xxx')
   })
 
   it('should load metadata', () => {

@@ -16,29 +16,29 @@
   -->
 
 <script lang="ts">
-  import { defineComponent } from 'vue'
-  import { PluginInfo, PluginStatus } from '@anticrm/platform'
+import { defineComponent } from 'vue'
+import { PluginInfo, PluginStatus } from '@anticrm/platform'
 
-  export default defineComponent({
-    props: {
-      plugins: Array
-    },
-    setup() {
-      return {
-        status(info: PluginInfo) {
-          return (info.status === PluginStatus.RUNNING) ? '☀︎' : '&nbsp;'
-        }
+export default defineComponent({
+  props: {
+    plugins: Array
+  },
+  setup () {
+    return {
+      status (info: PluginInfo) {
+        return (info.status === PluginStatus.RUNNING) ? '☀︎' : '&nbsp;'
       }
     }
-  })
+  }
+})
 </script>
 
 <template>
   <table class="container">
-    <tr v-for="config in plugins">
+    <tr v-for="config in plugins" :key="config.id">
       <td>platform-{{config.id}}</td>&nbsp;
       <td>{{config.version}}</td>
-      <td v-html="status(config)"/>
+      <td v-html="status(config)" />
     </tr>
   </table>
 </template>

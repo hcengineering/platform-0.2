@@ -13,28 +13,24 @@
 // limitations under the License.
 //
 
-import { plugin, Plugin, PluginId } from '@anticrm/platform'
-import { Doc, Ref, Class } from '@anticrm/platform-core'
-import { Asset } from '@anticrm/platform-ui'
+import { plugin, Plugin, Service } from '@anticrm/platform'
+import { Doc, Ref, Class, StringType } from '@anticrm/platform-core'
+import { Asset, ComponentRef, AnyComponent } from '@anticrm/platform-ui'
 
 export interface Contact extends Doc {
-  email?: string
-  phone?: string
-  phoneWork?: string
-  twitter?: string
-  address?: string
-  addressDelivery?: string
+  email?: StringType
+  phone?: StringType
 }
 
 export interface Person extends Contact {
-  firstName?: string
-  lastName?: string
+  firstName?: StringType
+  lastName?: StringType
 
-  birthDate?: string
+  birthDate?: StringType
 }
 
 export default plugin(
-  'contact' as PluginId<Plugin>,
+  'contact' as Plugin<Service>,
   {},
   {
     icon: {
@@ -46,5 +42,8 @@ export default plugin(
     class: {
       Contact: '' as Ref<Class<Contact>>,
       Person: '' as Ref<Class<Person>>
+    },
+    form: {
+      Person: '' as AnyComponent
     }
   })

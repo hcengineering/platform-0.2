@@ -14,12 +14,10 @@
 //
 
 
-import { AnyPlugin, Platform } from '@anticrm/platform'
-import { AnyComponent, BootService, VueConstructor } from '.'
-import { h, reactive, ref, createApp, defineComponent } from 'vue'
-
+import { Platform, Plugin, Service } from '@anticrm/platform'
+import { AnyComponent, UIService, VueConstructor, Component } from '.'
+import { h, ref, createApp, defineComponent, reactive } from 'vue'
 import Root from './internal/Root.vue'
-import BootLoader from './internal/SysInfo.vue'
 
 console.log('Plugin `ui` loaded')
 
@@ -28,7 +26,7 @@ console.log('Plugin `ui` loaded')
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */
-export default async (platform: Platform, deps: {}): Promise<BootService> => {
+export default async (platform: Platform, deps: {}): Promise<UIService> => {
   console.log('Plugin `ui` started')
 
   // V U E  A P P
@@ -36,58 +34,29 @@ export default async (platform: Platform, deps: {}): Promise<BootService> => {
   const app = createApp(Root)
   app.config.globalProperties.$platform = platform
 
-  // C O M P O N E N T S
-
-  const components = new Map<AnyComponent, VueConstructor>()
-
-  async function resolve (component: AnyComponent): Promise<VueConstructor> {
-    console.log('resolve: ' + component)
-    let comp = components.get(component)
-    if (comp) { return comp }
-    const index = component.indexOf(':') + 1
-    const dot = component.indexOf('.', index)
-    const id = component.substring(index, dot) as AnyPlugin
-    console.log('loading from ' + id)
-    const plugin = await platform.getPlugin(id)
-    comp = components.get(component)
-    if (comp) { return comp }
-    throw new Error('plugin ' + plugin + ' does not provide component: ' + component)
-  }
-
-  function registerComponent(id: AnyComponent, component: VueConstructor): void {
-    if (components.get(id)) {
-      throw new Error('component already registered: ' + id)
-    }
-    components.set(id, component)
-  }
-
-  // R E G I S T E R  C O M P O N E N T S
-
-  // components.set(BootLoaderId, BootLoader)
-
   // C O M P O N E N T  R E N D E R E R
 
   app.component('widget', defineComponent({
     props: {
       component: String // as PropType<Component<VueConstructor>>
     },
-    setup() {
+    setup () {
       return {
         resolved: ref(''),
       }
     },
     render () {
-      const cached = components.get(this.component)
+      const cached = platform.getResource(this.component as Component<VueConstructor>)
       if (cached) {
         return h(cached)
       }
       if (this.component !== this.resolved) {
-        resolve(this.component as AnyComponent).then(resolved => {
+        platform.resolve(this.component as AnyComponent).then(resolved => {
           this.resolved = this.component
         })
         return h('div', [])
       } else {
-        const resolved = components.get(this.resolved)
+        const resolved = platform.getResource(this.resolved as Component<VueConstructor>)
         if (resolved) {
           return h(resolved)
         } else {
@@ -97,10 +66,31 @@ export default async (platform: Platform, deps: {}): Promise<BootService> => {
     }
   }))
 
+  // U I  S T A T E
+
+  const path = window.location.pathname
+  const split = path.split('/')
+
+  const state = reactive({
+    app: split[1],
+    path
+  })
+
+  app.config.globalProperties.$ui = state
+
+  function addState (plugin: Plugin<Service>, state: any) { // reactive type
+    Reflect.set(app.config.globalProperties, '$' + plugin, state)
+  }
+
+  // H I S T O R Y
+
+  window.addEventListener('popstate', () => {
+    state.path = window.location.pathname
+  })
+
   return {
-    getApp() { return app },
-    registerComponent,
-    resolve
+    getApp () { return app },
+    addState
   }
 
 }

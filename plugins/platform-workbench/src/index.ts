@@ -13,14 +13,39 @@
 // limitations under the License.
 //
 
-import { plugin, PluginId, Plugin } from '@anticrm/platform'
+import { plugin, Service, Plugin } from '@anticrm/platform'
+import core, { Ref, Class, Doc, Instance } from '@anticrm/platform-core'
 import ui, { AnyComponent } from '@anticrm/platform-ui'
 
-import lauchDev from '@anticrm/launch-dev' // TODO Dirty hack, get rid of this later.
 
-export default plugin('workbench' as PluginId<Plugin>, {
+export enum ViewModelKind {
+  NEW_FORM = 0,
+}
+
+/**
+ * ViewModel describes confguration of a Workbench View
+ */
+export interface ViewModel {
+  kind: ViewModelKind
+  component: AnyComponent
+  object: Doc
+}
+
+export interface WorkbenchState {
+  mainView: ViewModel | undefined
+}
+
+export interface WorkbenchService extends Service {
+  getState (): WorkbenchState
+}
+
+export interface MainModel extends ViewModel {
+
+}
+
+export default plugin('workbench' as Plugin<Service>, {
+  core: core.id,
   ui: ui.id,
-  launch: lauchDev.id
 }, {
   component: {
     Workbench: '' as AnyComponent

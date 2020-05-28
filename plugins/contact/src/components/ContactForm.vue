@@ -14,38 +14,30 @@
 -->
 
 <script lang="ts">
+import { defineComponent, reactive, watch } from 'vue'
+import { AnyComponent } from '@anticrm/platform-ui'
 
-import Vue, { PropType } from 'vue'
-import { Person } from '..'
+import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.vue'
 
-import ObjectPanel from '@anticrm/platform-ui/src/components/ObjectPanel.vue'
-import InlineEdit from '@anticrm/platform-ui-controls/src/InlineEdit.vue'
-
-export default Vue.extend({
-  components: { ObjectPanel, InlineEdit },
-  props: {
-    object: Promise as PropType<Promise<Person>>,
-  },
-  data() {
+export default defineComponent({
+  components: { InlineEdit },
+  setup (props, context) {
     return {
-      content: {}
+      getWorkbenchState () { return this.$workbench }
     }
-  },
-  created() {
-    this.object.then(obj => this.content = obj)
   }
 })
 </script>
 
 <template>
   <div>
-    <InlineEdit class="caption-1" v-model="content.firstName" placeholder="Фамилия" />
-    <br />
+    <InlineEdit class="caption-1" placeholder="Фамилия" />
+    <!-- <br /> v-model="content.firstName"
     <InlineEdit class="caption-2" v-model="content.lastName" placeholder="Имя Отчество" />
-    <ObjectPanel :object="object" style="margin-top: 2em" />
+    <ObjectPanel :object="object" style="margin-top: 2em" />-->
+    Hey there!
   </div>
 </template>
-
 
 <style scoped lang="scss">
 @import "~@anticrm/platform-ui-theme/css/_variables.scss";

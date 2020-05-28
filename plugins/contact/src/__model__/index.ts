@@ -13,16 +13,28 @@
 // limitations under the License.
 //
 
-import i18n from '..'
-
 import { Ref, Class, Type } from '@anticrm/platform-core'
+import { extendIds } from '@anticrm/platform-core/src/__model__/utils'
 import { IntlString } from '@anticrm/platform-core-i18n'
 
-import { extendIds } from '@anticrm/platform-core/src/__resources__/utils'
+import contact from '..'
 
-export default extendIds(i18n, {
+export default extendIds(contact, {
   class: {
-    IntlString: '' as Ref<Class<Type<IntlString>>>,
+    Email: '' as Ref<Class<Type<string>>>,
+    Phone: '' as Ref<Class<Type<string>>>,
+    Twitter: '' as Ref<Class<Type<string>>>,
+    Address: '' as Ref<Class<Type<string>>>,
+  },
+  string: {
+    Email: '' as IntlString,
+    Phone: '' as IntlString,
+    Twitter: '' as IntlString,
+    Address: '' as IntlString,
+
+    Email_placeholder: '' as IntlString,
+    Phone_placeholder: '' as IntlString,
+    Twitter_placeholder: '' as IntlString,
+    Address_placeholder: '' as IntlString,
   }
 })
-

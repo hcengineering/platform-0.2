@@ -13,32 +13,45 @@
 // limitations under the License.
 //
 
-import { Platform, identify, Plugin, PluginId } from '@anticrm/platform'
+import { Platform, identify, Plugin, Service } from '@anticrm/platform'
 import db from '@anticrm/platform-db'
 import core from '@anticrm/platform-core'
 import i18n from '@anticrm/platform-core-i18n'
 import ui from '@anticrm/platform-ui-model'
 
+import Builder from '@anticrm/platform-core/src/__model__/builder'
+
+import coreModel from '@anticrm/platform-core/src/__model__/model'
+import uiModel from '@anticrm/platform-ui/src/__model__/model'
+import contactModel from '@anticrm/contact/src/__model__/model'
+
 import launch from '..'
 
 describe('launch-dev', () => {
 
-  const platform = new Platform()
-  platform.addLocation(db, () => import('@anticrm/platform-db/src/memdb'))
-  platform.addLocation(core, () => import('@anticrm/platform-core/src/plugin'))
-  platform.addLocation(i18n, () => import('@anticrm/platform-core-i18n/src/plugin'))
-  platform.addLocation(ui, () => import('@anticrm/platform-ui/src/plugin'))
-  platform.addLocation(launch, () => import('../launch'))
+  it('should load models', () => {
+    const builder = new Builder()
+    builder.load(coreModel)
+    builder.load(uiModel)
+    builder.load(contactModel)
 
-  platform.setResolver('native', core.id)
-
-  it('should load classes into memdb', async () => {
-    const launchPlugin = await platform.getPlugin(launch.id)
-    const dump = launchPlugin.db.dump()
-    console.log(dump)
-
-    console.log(JSON.stringify(dump))
-
-    expect(true).toBe(true)
+    console.log(JSON.stringify(builder.dump()))
   })
+
+  // const platform = new Platform()
+  // platform.addLocation(db, () => import('@anticrm/platform-db/src/memdb'))
+  // platform.addLocation(core, () => import('@anticrm/platform-core/src/plugin'))
+  // platform.addLocation(i18n, () => import('@anticrm/platform-core-i18n/src/plugin'))
+  // platform.addLocation(ui, () => import('@anticrm/platform-ui/src/plugin'))
+  // platform.addLocation(launch, () => import('../launch'))
+
+  // it('should load classes into memdb', async () => {
+  //   const launchPlugin = await platform.getPlugin(launch.id)
+  //   const dump = launchPlugin.db.dump()
+  //   console.log(dump)
+
+  //   console.log(JSON.stringify(dump))
+
+  //   expect(true).toBe(true)
+  // })
 })

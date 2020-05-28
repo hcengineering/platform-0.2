@@ -13,22 +13,55 @@
 // limitations under the License.
 //
 
-import { Resource, PluginId, plugin, Metadata, ResourcePlugin } from '@anticrm/platform'
 import { App } from 'vue'
+import { Property, Resource, Metadata, plugin, Plugin, Service } from '@anticrm/platform'
+import { Obj, Emb, Ref, Class, Type, Doc, Attributes } from '@anticrm/platform-core'
+import { IntlString } from '@anticrm/platform-core-i18n'
 
 export type Asset = Metadata<string>
 
 export type VueConstructor = object
 export type Component<C extends VueConstructor> = Resource<C>
 export type AnyComponent = Component<VueConstructor>
+export type ComponentRef = Property<AnyComponent>
 
-export interface BootService extends ResourcePlugin {
-  getApp (): App
-  registerComponent(id: AnyComponent, component: VueConstructor): void
+/// M O D E L
+
+export interface UIDecorator { // interface
+  label?: IntlString
+  icon?: Asset
 }
 
-export default plugin('boot' as PluginId<BootService>, {}, {
+export interface TypeUIDecorator<T> extends Emb, UIDecorator {
+  placeholder?: IntlString
+}
+
+export interface ClassUIDecorator<T extends Obj> extends Class<T>, UIDecorator {
+  decorators?: { [key: string]: TypeUIDecorator<any> }
+}
+
+export interface Form<T extends Obj> extends ClassUIDecorator<T> {
+  form: ComponentRef
+}
+
+/// P L U G I N
+
+export interface UIState {
+  app: AnyComponent | undefined
+}
+
+export interface UIService extends Service {
+  getApp (): App
+  addState (plugin: Plugin<Service>, state: any): void
+}
+
+export default plugin('boot' as Plugin<UIService>, {}, {
   metadata: {
     DefaultApplication: '' as Metadata<AnyComponent>
+  },
+  class: {
+    TypeUIDecorator: '' as Ref<Class<TypeUIDecorator<any>>>,
+    ClassUIDecorator: '' as Ref<Class<ClassUIDecorator<Obj>>>,
+    Form: '' as Ref<Class<Form<Obj>>>
   }
 })

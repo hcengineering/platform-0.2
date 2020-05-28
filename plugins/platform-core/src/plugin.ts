@@ -1,238 +1,218 @@
 //
 // Copyright © 2020 Anticrm Platform Contributors.
-//
+// 
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
 // obtain a copy of the License at https://www.eclipse.org/legal/epl-2.0
-//
+// 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//
+// 
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
 
-import { Platform, Resource, AnyPlugin } from '@anticrm/platform'
-import { Db } from '@anticrm/platform-db'
+import { Platform, Resource } from '@anticrm/platform'
 import core, {
-  Obj, Doc, Ref, Bag, Class, Type, Emb,
-  PropertyType, BagOf, Content, CorePlugin
+  CoreService, Obj, Ref, Class, Doc, BagOf, InstanceOf, PropertyType,
+  Instance, Type, Emb, ResourceType, Exert
 } from '.'
-import { TSession, SessionProto, Konstructor, Layout } from './session'
+import { MemDb } from './memdb'
 
-/// ///////
+type Konstructor<T extends Obj> = new (obj: Omit<T, '__property' | '_class'>) => Instance<T>
+
+export function attributeKey (_class: Ref<Class<Obj>>, key: string): string {
+  const index = _class.indexOf(':')
+  return _class.substring(index + 1) + '/' + key
+}
 
 console.log('PLUGIN: parsed core')
-
 /*!
  * Anticrm Platform™ Core Plugin
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */
-export default async (platform: Platform, deps: { db: Db }): Promise<CorePlugin> => {
+export default async (platform: Platform): Promise<CoreService> => {
   console.log('PLUGIN: started core')
 
-  abstract class TSessionProto implements SessionProto {
-    getSession (): TSession { throw new Error('session provide the implementation') }
-    abstract __mapKey (_class: Ref<Class<Obj>>, key: string): string | null
+  enum Stereotype {
+    EMB,
+    DOC
   }
 
-  class TEmb extends TSessionProto implements Emb {
-    _class!: Ref<Class<this>>
-    toIntlString (plural?: number): string { return this.getClass().toIntlString(plural) }
-    getClass (): Class<this> {
-      return this.getSession().getInstanceSync(this._class)
-    }
+  // C L A S S E S
 
-    __mapKey (_class: Ref<Class<Obj>>, key: string) { return key }
+  // function getOwnAttribute (clazz: Class<Obj>, key: string): Type<any> | undefined {
+  //   return (clazz._attributes as any)[key]
+  // }
+
+  // function getAttribute (clazz: Class<Obj>, key: string): Type<any> | undefined {
+  //   return getOwnAttribute(clazz, key) ??
+  //     (clazz._extends ? getAttribute(get(clazz._extends), key) : undefined)
+  // }
+
+  // D A T A
+
+  const modelDb = new MemDb()
+
+  // C O R E  S E R V I C E
+
+  const coreService: CoreService = {
+    getDb () { return modelDb },
+    getPrototype,
+    getInstance,
+    as,
+    is
   }
 
-  class TDoc extends TSessionProto implements Doc {
-    _class!: Ref<Class<this>>
-    _id!: Ref<this>
-    toIntlString (plural?: number): string { return this.getClass().toIntlString(plural) }
-    getClass (): Class<this> {
-      return this.getSession().getInstanceSync(this._class)
-    }
+  // I N S T A N C E S
 
-    as<T extends Doc> (_class: Ref<Class<T>>): Promise<T | undefined> {
-      return this.getSession().as(this as unknown as Layout<Doc>, _class)
-    }
+  const konstructors = new Map<Ref<Class<Obj>>, Konstructor<Obj>>()
+  const prototypes = new Map<Ref<Class<Obj>>, Object>()
 
-    mixins (): Ref<Class<Doc>>[] {
-      const layout = this as unknown as Layout<Doc>
-      return layout.__layout._classes as Ref<Class<Doc>>[]
-    }
-
-    __mapKey (_class: Ref<Class<Obj>>, key: string) { return key.startsWith('_') ? key : _class + '/' + key }
+  const CoreRoot = {
+    get _class (this: Instance<Obj>) { return this.__layout._class },
+    getSession: (): CoreService => coreService
   }
 
-  // T Y P E S
+  function getPrototype<T extends Obj> (_class: Ref<Class<T>>, stereotype: Stereotype): Object {
+    const prototype = prototypes.get(_class)
+    if (prototype) { return prototype }
 
-  class TType<T extends PropertyType> extends TEmb implements Type<T> {
-    _default?: T
-    exert (value: T, target?: PropertyType, key?: PropertyKey): any { return value ?? this._default } // eslint-disable-line
-    hibernate (value: any): T { return value }
-  }
+    console.log('building prototype: ' + _class)
+    const clazz = modelDb.get(_class) as Class<Obj>
+    const parent = clazz._extends ? getPrototype(clazz._extends, stereotype) : CoreRoot
+    const proto = Object.create(parent)
+    prototypes.set(_class, proto)
 
-  class TInstanceOf<T extends Emb> extends TType<T> {
-    of!: Ref<Class<T>>
-    exert (value: T) {
-      if (typeof value === 'object') { return this.getSession().instantiateSync(value._class, value) }
-      return undefined
-    }
-  }
-
-  // C O L L E C T I O N S : A R R A Y
-
-  class ArrayProxyHandler implements ProxyHandler<PropertyType[]> {
-    private type: Type<PropertyType>
-
-    constructor (type: Type<PropertyType>) {
-      this.type = type
+    if (clazz._native) {
+      const native = platform.getResource(clazz._native) // TODO: must `resolve`! we need to have getPrototype async for this.
+      if (!native) { throw new Error(`something went wrong, can't load '${clazz._native}' resource`) }
+      const descriptors = Object.getOwnPropertyDescriptors(native)
+      Object.defineProperties(proto, descriptors)
     }
 
-    get (target: PropertyType[], key: PropertyKey): any {
-      const value = Reflect.get(target, key)
-      return this.type.exert(value)
-    }
-  }
+    const attributes = clazz._attributes as { [key: string]: Type<any> }
+    for (const key in attributes) {
+      if (key === '_default') { continue } // we do not define `_default`'s type, it's infinitevely recursive :)
+      const attr = attributes[key]
+      // console.log(attr)
+      const attrInstance = instantiateEmb(attr)
+      // console.log(attrInstance)
 
-  class TArrayOf<T extends PropertyType> extends TType<T[]> {
-    of!: Type<T>
-    exert (value: T[]) {
-      console.log('array')
-      console.log(value)
-      return new Proxy(value, new ArrayProxyHandler(this.of))
-    }
-  }
-
-  // C O L L E C T I O N S : B A G
-
-  class BagProxyHandler implements ProxyHandler<Bag<PropertyType>> {
-    private type: Type<PropertyType>
-
-    constructor (type: Type<PropertyType>) {
-      this.type = type
-    }
-
-    get (target: Bag<PropertyType>, key: string): any {
-      const value = Reflect.get(target, key)
-      return this.type.exert(value)
-    }
-  }
-
-  class TBagOf<T extends PropertyType> extends TType<Bag<T>> implements BagOf<T> {
-    of!: Type<T>
-    exert (value: Bag<T>) {
-      if (typeof value === 'object') { return new Proxy(value, new BagProxyHandler(this.of)) }
-      return undefined
-    }
-  }
-
-  // S T R U C T U R A L  F E A T U R E S
-
-  abstract class TStructuralFeature<T extends Obj> extends TDoc implements Class<T> {
-    _attributes!: Bag<Type<PropertyType>>
-    _extends?: Ref<Class<Obj>>
-    _native?: Resource<T>
-
-    abstract createConstructor (): Konstructor<T>
-
-    newInstance (data: Content<T>): Promise<T> {
-      const session = this.getSession()
-      let ctor = session.constructors.get(this._id) as Konstructor<T>
-      if (!ctor) {
-        ctor = this.createConstructor()
-        session.constructors.set(this._id, ctor)
+      if (typeof attrInstance.exert !== 'function') {
+        throw new Error('exert is not a function')
       }
-      return ctor(data)
-    }
-  }
 
-  class TStruct<T extends Obj> extends TStructuralFeature<T> {
-    toIntlString (plural?: number): string { return 'struct: ' + this._id } // eslint-disable-line
+      const exert = attrInstance.exert()
+      const fullKey = stereotype === Stereotype.DOC ?
+        key.startsWith('_') ? key : attributeKey(_class, key) :
+        key
 
-    createConstructor (): Konstructor<T> {
-      const session = this.getSession()
-      const _class = this._id as Ref<Class<T>>
-      return data => session.createEmb(_class, data)
-    }
-  }
-
-  class TClass<T extends Doc> extends TStructuralFeature<T> {
-    toIntlString (plural?: number): string { return 'doc: ' + this._id } // eslint-disable-line
-
-    createConstructor (): Konstructor<T> {
-      const session = this.getSession()
-      const _class = this._id as Ref<Class<T>>
-      return data => session.createDoc(_class, data)
-    }
-  }
-
-  // B O O T  S E S S I O N  &  P L U G I N
-
-  class TCorePlugin implements CorePlugin {
-    readonly platform: Platform
-    readonly pluginId = core.id
-
-    private session: TSession
-    private prototypes = new Map<Resource<object>, object>()
-
-    constructor (platform: Platform, session: TSession) {
-      this.platform = platform
-      this.session = session
-    }
-
-    async resolve (resource: Resource<object>): Promise<object> {
-      const proto = this.prototypes.get(resource)
-      if (proto) { return proto }
-      const index = resource.indexOf(':') + 1
-      const dot = resource.indexOf('.', index)
-      const plugin = resource.substring(index, dot) as AnyPlugin
-      return platform.getPlugin(plugin).then(plugin => {
-        const proto = this.prototypes.get(resource)
-        if (proto) { return proto }
-        throw new Error('plugin ' + plugin + ' does not provide resource: ' + resource)
+      Object.defineProperty(proto, key, {
+        get (this: Instance<Obj>) {
+          return exert(Reflect.get(this.__layout, fullKey), this.__layout, key)
+        },
+        enumerable: true
       })
     }
+    return proto
+  }
 
-    registerPrototype<T extends Obj> (id: Resource<T>, proto: T): void {
-      if (this.prototypes.get(id)) { throw new Error('prototype ' + id + ' already registered') }
-      this.prototypes.set(id, proto)
-    }
-
-    getSession () { return this.session }
-
-    // U T I L I T Y
-
-    async getClassHierarchy (_class: Ref<Class<Obj>>): Promise<Ref<Class<Obj>>[]> {
-      const result = [] as Ref<Class<Obj>>[]
-      let clazz = _class as Ref<Class<Obj>> | undefined
-      while (clazz) {
-        result.push(clazz)
-        const instance = await this.getSession().getInstance(clazz)
-        clazz = instance._extends
-      }
-      return result.reverse()
+  function getKonstructor<T extends Obj> (_class: Ref<Class<T>>, stereotype: Stereotype): Konstructor<T> {
+    const konstructor = konstructors.get(_class)
+    if (konstructor) { return konstructor as unknown as Konstructor<T> }
+    else {
+      const proto = getPrototype(_class, stereotype)
+      const ctor = {
+        [_class]: function (this: Instance<Obj>, obj: Obj) {
+          this.__layout = obj
+        }
+      }[_class] // A trick to `name` function as `_class` value
+      proto.constructor = ctor
+      ctor.prototype = proto
+      konstructors.set(_class, ctor as unknown as Konstructor<Obj>)
+      return ctor as unknown as Konstructor<T>
     }
   }
 
-  const session = new TSession(platform, deps.db)
-  const plugin = new TCorePlugin(platform, session)
+  function instantiateEmb<T extends Emb> (obj: T): Instance<T> {
+    const ctor = getKonstructor(obj._class, Stereotype.EMB)
+    return new ctor(obj)
+  }
 
-  plugin.registerPrototype(core.native.Emb, TEmb.prototype)
-  plugin.registerPrototype(core.native.Doc, TDoc.prototype)
+  function instantiateDoc<T extends Doc> (obj: T): Instance<T> {
+    const ctor = getKonstructor(obj._class, Stereotype.DOC)
+    return new ctor(obj)
+  }
 
-  plugin.registerPrototype(core.native.Type, TType.prototype)
-  plugin.registerPrototype(core.native.BagOf, TBagOf.prototype)
-  plugin.registerPrototype(core.native.ArrayOf, TArrayOf.prototype)
-  plugin.registerPrototype(core.native.InstanceOf, TInstanceOf.prototype)
+  // A P I : R E A D
 
-  plugin.registerPrototype(core.native.StructuralFeature, TStructuralFeature.prototype)
-  plugin.registerPrototype(core.native.Class, TClass.prototype)
-  plugin.registerPrototype(core.native.Struct, TStruct.prototype)
+  async function getInstance<T extends Doc> (id: Ref<T>): Promise<Instance<T>> {
+    const doc = modelDb.get(id)
+    return instantiateDoc(doc)
+  }
 
-  return plugin
+  function as<T extends Doc, A extends Doc> (doc: Instance<T>, _class: Ref<Class<A>>): Instance<A> {
+    console.log('as: ' + _class)
+    console.log(doc)
+    if (!is(doc, _class)) { throw new Error(_class + ' instance does not mixed in') }
+    const ctor = getKonstructor(_class, Stereotype.DOC)
+    return new ctor(doc.__layout as unknown as A)
+  }
+
+  function is<T extends Doc, M extends Doc> (doc: Instance<T>, _class: Ref<Class<M>>): boolean {
+    const mixins = doc._mixins as Ref<Class<Doc>>[]
+    return mixins && mixins.includes(_class as Ref<Class<Doc>>)
+  }
+
+  // T Y P E S : B A G
+
+  class BagProxyHandler implements ProxyHandler<any> {
+    private exert: Exert
+
+    constructor(type: Instance<Type<any>>) {
+      if (!type.exert) {
+        throw new Error('bagof: no exert')
+      }
+      this.exert = type.exert()
+    }
+
+    get (target: any, key: string): any {
+      return this.exert(Reflect.get(target, key))
+    }
+  }
+
+  const Type_exert = function (this: Instance<Type<any>>): Exert {
+    return value => value
+  }
+
+  const BagOf_exert = function (this: Instance<BagOf<any>>): Exert {
+    return (value: PropertyType) => new Proxy(value, new BagProxyHandler(this.of))
+  }
+
+  const InstanceOf_exert = function (this: Instance<InstanceOf<Emb>>): Exert {
+    return ((value: Emb) => instantiateEmb(value)) as Exert
+  }
+
+  const TResourceType = {
+    exert: function (this: Instance<ResourceType<any>>): Exert {
+      const resource = (this.__layout._default) as Resource<(this: Instance<Type<any>>) => Exert>
+      let resolved: any
+      if (resource) {
+        resolved = platform.getResource(resource)
+        if (!resolved) { throw new Error('something went wrong: we need to `resolve` resource here, so please work on async rework') }
+      }
+      return (value: PropertyType) => resolved
+    }
+  }
+
+  platform.setResource(core.native.ResourceType, TResourceType)
+  platform.setResource(core.method.Type_exert, Type_exert)
+  platform.setResource(core.method.BagOf_exert, BagOf_exert)
+  platform.setResource(core.method.InstanceOf_exert, InstanceOf_exert)
+
+  return coreService
 }
+

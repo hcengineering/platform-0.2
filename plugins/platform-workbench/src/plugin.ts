@@ -13,28 +13,69 @@
 // limitations under the License.
 //
 
-import { Platform, Plugin } from '@anticrm/platform'
-import { BootService } from '@anticrm/platform-ui'
+import { Platform, Service } from '@anticrm/platform'
+import { reactive } from 'vue'
+import { CoreService, Obj, Doc, Ref, Instance, Class } from '@anticrm/platform-core'
+import ui, { UIService, AnyComponent } from '@anticrm/platform-ui'
 
-import workbench from '.'
+import workbench, { WorkbenchService, WorkbenchState, ViewModel, ViewModelKind } from '.'
 import Workbench from './components/Workbench.vue'
-import { LaunchPlugin } from '@anticrm/launch-dev'
+// import { LaunchPlugin } from '@anticrm/launch-dev'
 
-console.log('Plugin `workbench` loaded')
-
+console.log('PLUGIN: `workbench` parsed')
 /*!
  * Anticrm Platform™ Workbench Plugin
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */
-export default async (platform: Platform,
-                      deps: { ui: BootService, launch: LaunchPlugin}): Promise<Plugin> => {
-  console.log('Plugin `workbench` started')
+export default async (platform: Platform, deps: { core: CoreService, ui: UIService }): Promise<WorkbenchService> => {
+  console.log('PLUGIN: `workbench` started')
+  const coreService = deps.core
 
-  deps.ui.registerComponent(workbench.component.Workbench, Workbench)
+  platform.setResource(workbench.component.Workbench, Workbench)
 
-  console.log('launch-dev:')
-  console.log(deps.launch)
+  // V I E W  M O D E L
 
-  return {}
+  async function getViewModel (_class: Ref<Class<Doc>>, kind: ViewModelKind): Promise<ViewModel> {
+    const clazz = await coreService.getInstance(_class)
+    // if (!coreService.is(doc, ui.class.Form)) {
+    //   doc = await doc._class
+    // }
+    if (!coreService.is(clazz, ui.class.Form)) {
+      throw new Error(`something went wrong, can't find 'Form' for the ${_class}.`)
+    }
+    const component = coreService.as(clazz, ui.class.Form).form
+    // const object = clazz.newInstance()
+    return {
+      kind: ViewModelKind.NEW_FORM,
+      component,
+      object: {} as Doc
+    }
+  }
+
+  // S T A T E
+
+  const path = window.location.pathname
+  const split = path.split('/')
+
+  let initState = {} as WorkbenchState
+  try {
+    const ref = split[2] as Ref<Class<Doc>>
+    initState.mainView = await getViewModel(ref, ViewModelKind.NEW_FORM)
+    console.log('workbench: viewmodel: ')
+    console.log(initState.mainView)
+  } catch (err) {
+    console.log(err)
+  }
+
+  const state = reactive(initState)
+
+  deps.ui.addState(workbench.id, state)
+
+
+  // W O R K B E N C H  M O D E L
+
+  return {
+    getState () { return state }
+  }
 }

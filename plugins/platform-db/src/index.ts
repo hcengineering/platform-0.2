@@ -13,33 +13,11 @@
 // limitations under the License.
 //
 
-import { plugin, PluginId } from '@anticrm/platform'
+import { plugin, Plugin } from '@anticrm/platform'
 
-export type ContainerId = string
-export type ClassId = ContainerId
-
-export interface Container {
-  _id: ContainerId
-  _class: ClassId
-  _mixins?: ClassId[]
-}
-
-interface Attribute { }
-
-export interface ContainerClass extends Container {
-  _attributes: { [key: string]: Attribute }
-  _extends?: ClassId
-  _native?: string
-}
 
 export interface Db {
-  getClass(_class: ClassId): ContainerClass
-  get(_id: ContainerId): Container
-  createContainer(_id: ContainerId, _class: ClassId): Container
-  index(container: Container): void
-
-  load(docs: Container[]): void
-  dump(): Container[]
+  get<T extends Doc> (_id: Ref<T>): T {
 }
 
-export default plugin('db' as PluginId<Db>, {}, {})
+export default plugin('db' as Plugin<Db>, {}, {})

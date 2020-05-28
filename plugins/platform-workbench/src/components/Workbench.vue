@@ -13,6 +13,22 @@
 // limitations under the License.
 -->
 
+<script lang="ts">
+import { defineComponent, reactive, watch } from 'vue'
+import { workbenchConfig } from '.'
+import { AnyComponent } from '@anticrm/platform-ui'
+
+export default defineComponent({
+  components: {},
+  setup (props, context) {
+    function getWorkbenchState () { return this.$workbench }
+    return {
+      getWorkbenchState
+    }
+  }
+})
+</script>
+
 <template>
   <div id="workbench">
     <header>
@@ -24,7 +40,12 @@
     </nav>
 
     <main>
-<!--      <widget component="component:ui.Icon"/>-->
+      <widget
+        v-if="getWorkbenchState().mainView.component"
+        :component="getWorkbenchState().mainView.component"
+      />
+      {{getWorkbenchState().mainView}}
+      <!-- {{ui().path}} -->
     </main>
 
     <aside>
