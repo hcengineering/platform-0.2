@@ -23,9 +23,13 @@ $pictogram-size: 48px;
 
 $animate: all 250ms ease-in-out;
 
-$font-caption: "Montserrat";
-$font-content: "Open Sans";
-$font-input: "Manrope";
+// $font-caption: "Montserrat";
+// $font-content: "Open Sans";
+$font-content: "IBM Plex Sans";
+$font-caption: "IBM Plex Sans";
+$font-input: "IBM Plex Sans";
+
+// $font-input: "Manrope";
 // $font-content: "-apple-system,system-ui,BlinkMacSystemFont"; //,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
 
 $border-default: 1px solid $workspace-separator-color;
@@ -38,7 +42,8 @@ $border-default: 1px solid $workspace-separator-color;
   font-weight: 400;
   
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;    
+  -moz-osx-font-smoothing: grayscale;  
+
 }
 
 @mixin caption-4 {

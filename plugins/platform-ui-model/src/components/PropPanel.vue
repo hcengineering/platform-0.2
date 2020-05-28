@@ -31,14 +31,14 @@ export default Vue.extend({
     clazz: String as unknown as PropType<Ref<Class<Obj>>>,
     filter: Array as PropType<string[]>
   },
-  data() {
+  data () {
     return {
       model: [],
       classModel: { label: this.clazz },
       content: {}
     }
   },
-  created() {
+  created () {
     this.$platform.getPlugin(ui.id).then(plugin => {
       plugin.getOwnAttrModel(this.clazz, this.filter)
         .then(result => this.model = plugin.groupByType(result))
@@ -70,7 +70,7 @@ export default Vue.extend({
 
 
 <style scoped lang="scss">
-@import "~@anticrm/platform-ui-theme/css/_variables.scss";
+@import "~@anticrm/sparkling-theme/css/_variables.scss";
 
 .container {
   display: inline-flex;

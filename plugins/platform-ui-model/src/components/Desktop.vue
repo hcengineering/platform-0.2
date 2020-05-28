@@ -24,7 +24,7 @@
 </template>
 
 <style lang="scss">
-@import "~@anticrm/platform-ui-theme/css/_globals.scss";
+@import "~@anticrm/sparkling-theme/css/_globals.scss";
 
 #desktop {
   // display: grid;

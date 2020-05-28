@@ -26,7 +26,7 @@ export default Vue.extend({})
 </template>
 
 <style lang="scss">
-@import "~@anticrm/platform-ui-theme/css/_globals.scss";
+@import "~@anticrm/sparkling-theme/css/_globals.scss";
 
 .storybook-theme {
   padding: 16px;

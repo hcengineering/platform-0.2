@@ -23,7 +23,7 @@ import core, { Obj, Doc, Ref, Class } from '@anticrm/platform-core'
 import ui, { UIPlugin, AttrModel } from '@anticrm/platform-ui-model'
 import PropPanel from './PropPanel.vue'
 
-async function getClassHierarchy(platform: Platform, object: Promise<Obj>): Promise<Ref<Class<Obj>>[]> {
+async function getClassHierarchy (platform: Platform, object: Promise<Obj>): Promise<Ref<Class<Obj>>[]> {
   const corePlugin = await platform.getPlugin(core.id)
   const clazz = (await object)._class
   return corePlugin.getClassHierarchy(clazz)
@@ -35,12 +35,12 @@ export default Vue.extend({
     object: Promise as PropType<Promise<Doc>>,
     filter: Array as PropType<string[] | undefined>,
   },
-  data() {
+  data () {
     return {
       classes: [] as Ref<Class<Obj>>[]
     }
   },
-  created() {
+  created () {
     getClassHierarchy(this.$platform, this.object).then(classes => this.classes = classes)
   }
 })
@@ -57,7 +57,7 @@ export default Vue.extend({
 </template>
 
 <style scoped lang="scss">
-@import "~@anticrm/platform-ui-theme/css/_variables.scss";
+@import "~@anticrm/sparkling-theme/css/_variables.scss";
 
 .container {
   display: inline-flex;

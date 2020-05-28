@@ -30,13 +30,13 @@ export default Vue.extend({
     objects: Promise as PropType<Promise<Obj[]>>,
     filter: Array as PropType<string[] | undefined>,
   },
-  data() {
+  data () {
     return {
       model: [],
       content: []
     }
   },
-  created() {
+  created () {
     this.$platform.getPlugin(ui.id).then(plugin => {
       plugin.getAttrModel(this.clazz, this.filter)
         .then(result => this.model = result)
@@ -65,7 +65,7 @@ export default Vue.extend({
 </template>
 
 <style lang="scss">
-@import "~@anticrm/platform-ui-theme/css/_variables.scss";
+@import "~@anticrm/sparkling-theme/css/_variables.scss";
 
 .erp-table {
   display: table;

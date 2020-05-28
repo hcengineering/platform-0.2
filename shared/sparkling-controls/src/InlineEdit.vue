@@ -61,8 +61,8 @@ export default defineComponent({
 </template>
 
 <style lang="scss">
-@import "~@anticrm/platform-ui-theme/css/_variables.scss";
-@import "~@anticrm/platform-ui-theme/css/_components.scss";
+@import "~@anticrm/sparkling-theme/css/_variables.scss";
+@import "~@anticrm/sparkling-theme/css/_components.scss";
 
 .erp-inline-editbox {
   display: inline-flex;

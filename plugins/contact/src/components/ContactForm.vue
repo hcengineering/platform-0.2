@@ -39,7 +39,7 @@ export default defineComponent({
 </template>
 
 <style scoped lang="scss">
-@import "~@anticrm/platform-ui-theme/css/_variables.scss";
+@import "~@anticrm/sparkling-theme/css/_variables.scss";
 
 .container {
   display: inline-flex;
