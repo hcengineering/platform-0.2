@@ -16,26 +16,26 @@
   -->
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, inject } from 'vue'
 import PluginList from './Plugins.vue'
 import Credits from './Credits.vue'
-import Button from '@anticrm/platform-ui-controls/src/Button.vue'
-import ui, { AnyComponent } from '..'
-
-function pluginInfos () { return this.$platform.getPluginInfos() }
+import Button from '@anticrm/sparkling-controls/src/Button.vue'
+import ui, { AnyComponent, UIStateInjectionKey, UIState } from '..'
 
 export default defineComponent({
   components: { PluginList, Credits, Button },
   setup () {
+    const uiState = inject(UIStateInjectionKey) as UIState
+
     return {
-      pluginInfos,
+      pluginInfos () { return this.$platform.getPluginInfos() },
       defaultApp (): AnyComponent {
         return this.$platform.getMetadata(ui.metadata.DefaultApplication)
       },
       run () {
         const defaultApp = this.defaultApp()
         if (defaultApp) {
-          this.$ui.app = defaultApp
+          uiState.app = defaultApp
         }
       }
     }

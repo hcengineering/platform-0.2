@@ -14,18 +14,44 @@
 -->
 
 <script lang="ts">
-import { defineComponent, reactive, watch } from 'vue'
-import { workbenchConfig } from '.'
-import { AnyComponent } from '@anticrm/platform-ui'
+import { Platform } from '@anticrm/platform'
+import { defineComponent, reactive, computed, provide, inject, watch } from 'vue'
+import workbench, { WorkbenchStateInjectionKey, WorkbenchState, ViewModelKind } from '..'
+import { AnyComponent, UIStateInjectionKey, UIState, PlatformInjectionKey } from '@anticrm/platform-ui'
+import { Ref, Class, Doc } from '@anticrm/platform-core'
+
+import Button from '@anticrm/sparkling-controls/src/Button.vue'
 
 export default defineComponent({
-  components: {},
+  components: { Button },
   setup (props, context) {
-    function getWorkbenchState () { return this.$workbench }
-    function component () { return this.getWorkbenchState().mainView?.component }
+    const platform = inject(PlatformInjectionKey) as Platform
+    const uiState = inject(UIStateInjectionKey) as UIState
+    const workbenchState = reactive({} as WorkbenchState)
+    provide(WorkbenchStateInjectionKey, workbenchState)
+
+    const workbenchService = platform.getPlugin(workbench.id)
+
+    watch([() => uiState.path], async (n) => {
+      const path = n[0]
+      const split = path.split('/')
+      const ref = split[2] as Ref<Class<Doc>>
+
+      try {
+        const mainView = await workbenchService.then((service) => service.getViewModel(ref, ViewModelKind.NEW_FORM))
+        workbenchState.mainView = mainView
+        console.log(mainView)
+      } catch (err) {
+        console.log(err)
+      }
+    })
+
+    function doit () { uiState.path = '/component:workbench.Workbench/class:contact.Person' }
+
+    const component = computed(() => workbenchState.mainView?.component)
+
     return {
-      getWorkbenchState,
-      component
+      component, doit
     }
   }
 })
@@ -35,6 +61,7 @@ export default defineComponent({
   <div id="workbench">
     <header>
       <!-- <Header @add="addObject()" /> -->
+      <Button @click="doit()">Go!</Button>
     </header>
 
     <nav>
@@ -42,7 +69,7 @@ export default defineComponent({
     </nav>
 
     <main>
-      <widget v-if="component()" :component="component()" />
+      <widget v-if="component" :component="component" />
     </main>
 
     <aside>

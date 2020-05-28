@@ -35,15 +35,17 @@ export interface WorkbenchState {
   mainView: ViewModel | undefined
 }
 
+export const WorkbenchStateInjectionKey = Symbol('workbenchState')
+
 export interface WorkbenchService extends Service {
-  getState (): WorkbenchState
+  getViewModel (_class: Ref<Class<Doc>>, kind: ViewModelKind): Promise<ViewModel>
 }
 
 export interface MainModel extends ViewModel {
 
 }
 
-export default plugin('workbench' as Plugin<Service>, {
+export default plugin('workbench' as Plugin<WorkbenchService>, {
   core: core.id,
   ui: ui.id,
 }, {

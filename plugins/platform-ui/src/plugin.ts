@@ -15,23 +15,23 @@
 
 
 import { Platform, Plugin, Service } from '@anticrm/platform'
-import { AnyComponent, UIService, VueConstructor, Component } from '.'
-import { h, ref, createApp, defineComponent, reactive } from 'vue'
+import { AnyComponent, UIService, VueConstructor, Component, PlatformInjectionKey } from '.'
+import { h, ref, createApp, defineComponent } from 'vue'
 import Root from './internal/Root.vue'
 
 console.log('Plugin `ui` loaded')
 
 /*!
- * Anticrm Platform™ Bootloader Plugin
+ * Anticrm Platform™ UI Plugin
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */
-export default async (platform: Platform, deps: {}): Promise<UIService> => {
+export default async (platform: Platform): Promise<UIService> => {
   console.log('Plugin `ui` started')
 
   // V U E  A P P
 
-  const app = createApp(Root)
+  const app = createApp(Root).provide(PlatformInjectionKey, platform)
   app.config.globalProperties.$platform = platform
 
   // C O M P O N E N T  R E N D E R E R
@@ -66,31 +66,12 @@ export default async (platform: Platform, deps: {}): Promise<UIService> => {
     }
   }))
 
-  // U I  S T A T E
-
-  const path = window.location.pathname
-  const split = path.split('/')
-
-  const state = reactive({
-    app: split[1],
-    path
-  })
-
-  app.config.globalProperties.$ui = state
-
-  function addState (plugin: Plugin<Service>, state: any) { // reactive type
-    Reflect.set(app.config.globalProperties, '$' + plugin, state)
-  }
-
   // H I S T O R Y
 
-  window.addEventListener('popstate', () => {
-    state.path = window.location.pathname
-  })
+
 
   return {
     getApp () { return app },
-    addState
   }
 
 }

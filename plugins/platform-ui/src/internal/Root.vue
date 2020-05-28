@@ -16,22 +16,33 @@
   -->
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue'
-import { platformConfig } from '.'
+import { defineComponent, computed, reactive, onMounted, onUnmounted, provide } from 'vue'
+import { UIStateInjectionKey, UIState, AnyComponent } from '..'
 import SysInfo from './SysInfo.vue'
 
 export default defineComponent({
   components: { SysInfo },
   setup () {
-    function ui () { return this.$ui }
-    return { ui }
-  }
+    const path = window.location.pathname
+    const split = path.split('/')
+
+    const initState: UIState = { app: split[1] as AnyComponent, path }
+    const uiState = reactive(initState)
+
+    provide(UIStateInjectionKey, uiState)
+
+    const listener = () => { uiState.path = window.location.pathname }
+    onMounted(() => { window.addEventListener('popstate', listener) })
+    onUnmounted(() => { window.removeEventListener('popstate', listener) })
+
+    return { uiState }
+  },
 })
 </script>
 
 <template>
   <div id="app">
-    <widget v-if="ui().app" :component="ui().app" />
+    <widget v-if="uiState.app" :component="uiState.app" />
     <SysInfo v-else />
   </div>
 </template>

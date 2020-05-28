@@ -44,18 +44,23 @@ export interface Form<T extends Obj> extends ClassUIDecorator<T> {
   form: ComponentRef
 }
 
-/// P L U G I N
+// S T A T E
+
+export const PlatformInjectionKey = Symbol('platform')
+export const UIStateInjectionKey = Symbol('ui')
 
 export interface UIState {
-  app: AnyComponent | undefined
+  app: AnyComponent,
+  path: string
 }
+
+/// P L U G I N
 
 export interface UIService extends Service {
   getApp (): App
-  addState (plugin: Plugin<Service>, state: any): void
 }
 
-export default plugin('boot' as Plugin<UIService>, {}, {
+export default plugin('ui' as Plugin<UIService>, {}, {
   metadata: {
     DefaultApplication: '' as Metadata<AnyComponent>
   },

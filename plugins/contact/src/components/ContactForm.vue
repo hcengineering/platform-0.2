@@ -14,16 +14,18 @@
 -->
 
 <script lang="ts">
-import { defineComponent, reactive, watch } from 'vue'
+import { defineComponent, ref, reactive, inject } from 'vue'
 import { AnyComponent } from '@anticrm/platform-ui'
+import { WorkbenchStateInjectionKey } from '@anticrm/platform-workbench'
 
 import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.vue'
 
 export default defineComponent({
   components: { InlineEdit },
   setup (props, context) {
+    const workbenchState = inject(WorkbenchStateInjectionKey)
     return {
-      getWorkbenchState () { return this.$workbench }
+      workbenchState
     }
   }
 })
@@ -32,7 +34,8 @@ export default defineComponent({
 <template>
   <div>
     <InlineEdit class="caption-1" placeholder="Фамилия" />
-    <!-- <br /> v-model="content.firstName"
+    {{workbenchState}}Hallo
+    <!-- <br /> v-model="content.firstName" v-model="content().firstName"
     <InlineEdit class="caption-2" v-model="content.lastName" placeholder="Имя Отчество" />
     <ObjectPanel :object="object" style="margin-top: 2em" />-->
   </div>

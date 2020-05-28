@@ -55,30 +55,30 @@ export default async (platform: Platform, deps: { core: CoreService, ui: UIServi
 
   // S T A T E
 
-  const path = window.location.pathname
-  const split = path.split('/')
+  // const path = window.location.pathname
+  // const split = path.split('/')
 
-  let initState = {
-    mainView: undefined
-  } as WorkbenchState
+  // let initState = {
+  //   mainView: undefined
+  // } as WorkbenchState
 
-  try {
-    const ref = split[2] as Ref<Class<Doc>>
-    initState.mainView = await getViewModel(ref, ViewModelKind.NEW_FORM)
-    console.log('workbench: viewmodel: ')
-    console.log(initState.mainView)
-  } catch (err) {
-    console.log(err)
-  }
+  // try {
+  //   const ref = split[2] as Ref<Class<Doc>>
+  //   initState.mainView = await getViewModel(ref, ViewModelKind.NEW_FORM)
+  //   console.log('workbench: viewmodel: ')
+  //   console.log(initState.mainView)
+  // } catch (err) {
+  //   console.log(err)
+  // }
 
-  const state = reactive(initState)
+  // const state = reactive(initState)
 
-  deps.ui.addState(workbench.id, state)
+  // deps.ui.addState(workbench.id, state)
 
 
   // W O R K B E N C H  M O D E L
 
   return {
-    getState () { return state }
+    getViewModel
   }
 }
