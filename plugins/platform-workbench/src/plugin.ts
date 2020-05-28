@@ -18,7 +18,7 @@ import { reactive } from 'vue'
 import { CoreService, Doc, Ref, Instance, Class } from '@anticrm/platform-core'
 import ui, { UIService, AnyComponent } from '@anticrm/platform-ui'
 
-import workbench, { WorkbenchService, WorkbenchState, MainModel } from '.'
+import workbench, { WorkbenchService, WorkbenchState, ViewModel, ViewModelKind } from '.'
 import Workbench from './components/Workbench.vue'
 // import { LaunchPlugin } from '@anticrm/launch-dev'
 
@@ -34,30 +34,39 @@ export default async (platform: Platform, deps: { core: CoreService, ui: UIServi
 
   platform.setResource(workbench.component.Workbench, Workbench)
 
+  // V I E W  M O D E L
+
+  async function getViewModel (_class: Ref<Class<Doc>>, kind: ViewModelKind): Promise<ViewModel> {
+    const clazz = await coreService.getInstance(_class)
+    // if (!coreService.is(doc, ui.class.Form)) {
+    //   doc = await doc._class
+    // }
+    if (!coreService.is(clazz, ui.class.Form)) {
+      throw new Error(`something went wrong, can't find 'Form' for the ${ref}.`)
+    }
+    const component = coreService.as(clazz, ui.class.Form).form
+    const object = clazz.newInstance()
+    return {
+      kind: ViewModelKind.NEW_FORM,
+      component: form,
+      object: {}
+    }
+  }
+
   // S T A T E
 
   const path = window.location.pathname
   const split = path.split('/')
 
-  let form
+  let initState = {} as WorkbenchState
   try {
     const ref = split[2] as Ref<Doc>
-    let doc = await coreService.getInstance(ref)
-    if (!coreService.is(doc, ui.class.Form)) {
-      doc = await doc._class
-    }
-    if (!coreService.is(doc, ui.class.Form)) {
-      throw new Error(`something went wrong, can't find 'Form' for the ${ref}.`)
-    }
-    form = coreService.as(doc, ui.class.Form).form
-    console.log('workbench: use form: ' + form)
+    initState.mainView = await getViewModel(ref, ViewModelKind.NEW_FORM)
+    console.log('workbench: viewmodel: ' + initState.mainView)
   } catch (err) {
     console.log(err)
   }
 
-  const initState: WorkbenchState = {
-    mainComponent: form
-  }
   const state = reactive(initState)
 
   deps.ui.addState(workbench.id, state)

@@ -17,10 +17,19 @@ import { plugin, Service, Plugin } from '@anticrm/platform'
 import core, { Ref, Class, Doc, Instance } from '@anticrm/platform-core'
 import ui, { AnyComponent } from '@anticrm/platform-ui'
 
-// import lauchDev from '@anticrm/launch-dev' // TODO Dirty hack, get rid of this later.
+
+export enum ViewModelKind {
+  NEW_FORM = 0,
+}
+
+export interface ViewModel {
+  kind: ViewModelKind
+  component: AnyComponent
+  object: Doc
+}
 
 export interface WorkbenchState {
-  mainComponent: AnyComponent | undefined
+  mainView: ViewModel | undefined
 }
 
 export interface WorkbenchService extends Service {
