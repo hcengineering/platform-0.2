@@ -22,8 +22,10 @@ export default defineComponent({
   components: {},
   setup (props, context) {
     function getWorkbenchState () { return this.$workbench }
+    function component () { return this.getWorkbenchState().mainView?.component }
     return {
-      getWorkbenchState
+      getWorkbenchState,
+      component
     }
   }
 })
@@ -40,12 +42,7 @@ export default defineComponent({
     </nav>
 
     <main>
-      <widget
-        v-if="getWorkbenchState().mainView.component"
-        :component="getWorkbenchState().mainView.component"
-      />
-      {{getWorkbenchState().mainView}}
-      <!-- {{ui().path}} -->
+      <widget v-if="component()" :component="component()" />
     </main>
 
     <aside>

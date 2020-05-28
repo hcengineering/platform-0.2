@@ -35,7 +35,6 @@ export default defineComponent({
     <!-- <br /> v-model="content.firstName"
     <InlineEdit class="caption-2" v-model="content.lastName" placeholder="Имя Отчество" />
     <ObjectPanel :object="object" style="margin-top: 2em" />-->
-    Hey there!
   </div>
 </template>
 

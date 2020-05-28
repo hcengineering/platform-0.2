@@ -58,7 +58,10 @@ export default async (platform: Platform, deps: { core: CoreService, ui: UIServi
   const path = window.location.pathname
   const split = path.split('/')
 
-  let initState = {} as WorkbenchState
+  let initState = {
+    mainView: undefined
+  } as WorkbenchState
+
   try {
     const ref = split[2] as Ref<Class<Doc>>
     initState.mainView = await getViewModel(ref, ViewModelKind.NEW_FORM)
