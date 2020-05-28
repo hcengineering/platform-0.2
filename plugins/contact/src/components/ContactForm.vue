@@ -17,28 +17,27 @@
 import { defineComponent, reactive, watch } from 'vue'
 import { AnyComponent } from '@anticrm/platform-ui'
 
+import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.vue'
+
 export default defineComponent({
-  components: {},
+  components: { InlineEdit },
   setup (props, context) {
-    // function getWorkbenchState () { return this.$workbench }
-    // return {
-    //   getWorkbenchState
-    // }
-    return {}
+    return {
+      getWorkbenchState () { return this.$workbench }
+    }
   }
 })
 </script>
 
 <template>
   <div>
-    <!-- <InlineEdit class="caption-1" v-model="content.firstName" placeholder="Фамилия" />
-    <br />
+    <InlineEdit class="caption-1" placeholder="Фамилия" />
+    <!-- <br /> v-model="content.firstName"
     <InlineEdit class="caption-2" v-model="content.lastName" placeholder="Имя Отчество" />
     <ObjectPanel :object="object" style="margin-top: 2em" />-->
     Hey there!
   </div>
 </template>
-
 
 <style scoped lang="scss">
 @import "~@anticrm/platform-ui-theme/css/_variables.scss";
