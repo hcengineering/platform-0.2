@@ -41,10 +41,10 @@ export default defineComponent({
 
     <main>
       <widget
-        v-if="getWorkbenchState().mainComponent"
-        :component="getWorkbenchState().mainComponent"
+        v-if="getWorkbenchState().mainView.component"
+        :component="getWorkbenchState().mainView.component"
       />
-      {{getWorkbenchState().mainComponent}}
+      {{getWorkbenchState().mainView}}
       <!-- {{ui().path}} -->
     </main>
 

@@ -22,6 +22,9 @@ export enum ViewModelKind {
   NEW_FORM = 0,
 }
 
+/**
+ * ViewModel describes confguration of a Workbench View
+ */
 export interface ViewModel {
   kind: ViewModelKind
   component: AnyComponent
@@ -34,13 +37,6 @@ export interface WorkbenchState {
 
 export interface WorkbenchService extends Service {
   getState (): WorkbenchState
-}
-
-/**
- * ViewModel describes confguration of a Workbench View
- */
-export interface ViewModel extends Doc {
-  component: AnyComponent
 }
 
 export interface MainModel extends ViewModel {

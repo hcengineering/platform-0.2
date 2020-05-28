@@ -15,7 +15,7 @@
 
 import { Platform, Service } from '@anticrm/platform'
 import { reactive } from 'vue'
-import { CoreService, Doc, Ref, Instance, Class } from '@anticrm/platform-core'
+import { CoreService, Obj, Doc, Ref, Instance, Class } from '@anticrm/platform-core'
 import ui, { UIService, AnyComponent } from '@anticrm/platform-ui'
 
 import workbench, { WorkbenchService, WorkbenchState, ViewModel, ViewModelKind } from '.'
@@ -42,14 +42,14 @@ export default async (platform: Platform, deps: { core: CoreService, ui: UIServi
     //   doc = await doc._class
     // }
     if (!coreService.is(clazz, ui.class.Form)) {
-      throw new Error(`something went wrong, can't find 'Form' for the ${ref}.`)
+      throw new Error(`something went wrong, can't find 'Form' for the ${_class}.`)
     }
     const component = coreService.as(clazz, ui.class.Form).form
-    const object = clazz.newInstance()
+    // const object = clazz.newInstance()
     return {
       kind: ViewModelKind.NEW_FORM,
-      component: form,
-      object: {}
+      component,
+      object: {} as Doc
     }
   }
 
@@ -60,9 +60,10 @@ export default async (platform: Platform, deps: { core: CoreService, ui: UIServi
 
   let initState = {} as WorkbenchState
   try {
-    const ref = split[2] as Ref<Doc>
+    const ref = split[2] as Ref<Class<Doc>>
     initState.mainView = await getViewModel(ref, ViewModelKind.NEW_FORM)
-    console.log('workbench: viewmodel: ' + initState.mainView)
+    console.log('workbench: viewmodel: ')
+    console.log(initState.mainView)
   } catch (err) {
     console.log(err)
   }
