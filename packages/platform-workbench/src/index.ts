@@ -28,7 +28,7 @@ export enum ViewModelKind {
 export interface ViewModel {
   kind: ViewModelKind
   component: AnyComponent
-  object: Doc
+  content: Doc
 }
 
 export interface WorkbenchState {

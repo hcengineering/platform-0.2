@@ -18,7 +18,7 @@ import { Platform, Plugin, Service } from '@anticrm/platform'
 import { CoreService, Ref, Class, Obj, Type, Instance } from '@anticrm/platform-core'
 import ui, {
   AnyComponent, UIService, VueConstructor, Component,
-  PlatformInjectionKey, UIModel, Asset, AttrModel, TypeUIDecorator
+  PlatformInjectionKey, CoreServiceInjectionKey, UIModel, Asset, AttrModel
 } from '.'
 import { h, ref, createApp, defineComponent } from 'vue'
 import Root from './internal/Root.vue'
@@ -104,7 +104,9 @@ export default async (platform: Platform, deps: { core: CoreService }): Promise<
 
   // V U E  A P P
 
-  const app = createApp(Root).provide(PlatformInjectionKey, platform)
+  const app = createApp(Root)
+    .provide(PlatformInjectionKey, platform)
+    .provide(CoreServiceInjectionKey, coreService)
   app.config.globalProperties.$platform = platform
 
   // C O M P O N E N T  R E N D E R E R
@@ -113,7 +115,10 @@ export default async (platform: Platform, deps: { core: CoreService }): Promise<
     props: {
       component: String // as PropType<Component<VueConstructor>>
     },
-    setup () {
+    setup (props, context) {
+      console.log('widget:')
+      console.log(props)
+      console.log(context)
       return {
         resolved: ref(''),
       }

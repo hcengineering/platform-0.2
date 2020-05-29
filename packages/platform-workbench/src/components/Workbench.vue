@@ -51,7 +51,7 @@ export default defineComponent({
     const component = computed(() => workbenchState.mainView?.component)
 
     return {
-      component, doit
+      component, workbenchState, doit
     }
   }
 })
@@ -69,7 +69,7 @@ export default defineComponent({
     </nav>
 
     <main>
-      <widget v-if="component" :component="component" />
+      <widget v-if="component" :component="component" :content="workbenchState.mainView.content" />
     </main>
 
     <aside>

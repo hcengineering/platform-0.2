@@ -62,7 +62,8 @@ export interface AttrModel extends UIModel {
 // S T A T E
 
 export const PlatformInjectionKey = Symbol('platform')
-export const UIStateInjectionKey = Symbol('ui')
+export const CoreServiceInjectionKey = Symbol('core-plugin')
+export const UIStateInjectionKey = Symbol('ui-state')
 
 export interface UIState {
   app: AnyComponent,
