@@ -23,7 +23,7 @@ type Layout = { [key: string]: PropertyType }
 class Builder {
   private memdb: DocDb
 
-  constructor(memdb?: DocDb) {
+  constructor (memdb?: DocDb) {
     this.memdb = memdb ?? new MemDb()
   }
 

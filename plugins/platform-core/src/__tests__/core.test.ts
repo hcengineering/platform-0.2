@@ -59,9 +59,6 @@ describe('core', () => {
     builder.load(model)
 
     const inst = await tx.getInstance(core.class.RefTo)
-    console.log(inst)
-    console.log(inst._attributes)
-    console.log(inst._attributes.to)
     expect(inst._attributes.to._class).toBe(core.class.RefTo)
   })
 })

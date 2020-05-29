@@ -75,7 +75,7 @@ export default async (platform: Platform): Promise<CoreService> => {
   const prototypes = new Map<Ref<Class<Obj>>, Object>()
 
   const CoreRoot = {
-    //    get _class (this: Instance<Obj>) { return this.__layout._class },
+    get _class (this: Instance<Obj>) { return this.__layout._class },
     getSession: (): CoreService => coreService
   }
 
@@ -83,7 +83,6 @@ export default async (platform: Platform): Promise<CoreService> => {
     const prototype = prototypes.get(_class)
     if (prototype) { return prototype }
 
-    console.log('building prototype: ' + _class)
     const clazz = modelDb.get(_class) as Class<Obj>
     const parent = clazz._extends ? getPrototype(clazz._extends, stereotype) : CoreRoot
     const proto = Object.create(parent)
