@@ -19,3 +19,6 @@ jobs:
         yarn workspace @anticrm/platform run lint
         yarn workspace @anticrm/platform-core run lint
         yarn workspace @anticrm/platform-core-i18n run lint
+    - name: Run build
+      run: |
+        yarn workspace @anticrm/platform run build

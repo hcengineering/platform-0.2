@@ -63,7 +63,6 @@ describe('platform', () => {
   })
 
   it('should not resolve resource (plugin does not have resolve method)', () => {
-    // @ts-expect-error
     platform.setResolver('resource', plugin1)
     const resolved = platform.resolve('resource:My.Resource' as Resource<string>)
     expect(resolved).toBeInstanceOf(Promise)

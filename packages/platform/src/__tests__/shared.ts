@@ -13,13 +13,13 @@
 // limitations under the License.
 //
 
-import { Plugin, PluginId, plugin, ResourcePlugin } from '..'
+import { Plugin, Service, plugin, ResourceProvider } from '..'
 
-export interface TestPlugin {
-  id: PluginId<Plugin>
+export interface TestPlugin extends ResourceProvider {
+  id: Plugin<Service>
 }
 
-export const plugin1 = 'plugin1' as PluginId<TestPlugin>
+export const plugin1 = 'plugin1' as Plugin<TestPlugin>
 export const descriptor1 = plugin(plugin1, {}, {})
 
 export const plugin1State = {
@@ -27,7 +27,7 @@ export const plugin1State = {
   started: false
 }
 
-export const plugin2 = 'plugin2' as PluginId<ResourcePlugin>
+export const plugin2 = 'plugin2' as Plugin<ResourceProvider>
 export const descriptor2 = plugin(plugin2, {}, {})
 
 export const plugin2State = {
@@ -35,7 +35,7 @@ export const plugin2State = {
   started: false
 }
 
-export const plugin3 = 'plugin3' as PluginId<Plugin>
+export const plugin3 = 'plugin3' as Plugin<Service>
 export const descriptor3 = plugin(plugin3, {
   plugin1,
   plugin2

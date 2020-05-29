@@ -26,3 +26,6 @@ yarn workspace @anticrm/platform-core-i18n run lint $1
 
 # B U I L D  D E M O  A P P L I C A T I O N
 yarn workspace launch build
+
+# B U I L D  P A C K A G E S
+yarn workspace @anticrm/platform run build

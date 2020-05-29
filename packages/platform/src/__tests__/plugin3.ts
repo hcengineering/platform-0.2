@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { ResourcePlugin, Platform } from '..'
+import { Service, Platform } from '..'
 
 import { plugin3State, TestPlugin } from './shared'
 
@@ -21,7 +21,7 @@ plugin3State.parsed = true
 
 export default async (platform: Platform, deps: {
   plugin1: TestPlugin,
-  plugin2: ResourcePlugin
+  plugin2: Service
 }) => {
   plugin3State.started = true
   return {
