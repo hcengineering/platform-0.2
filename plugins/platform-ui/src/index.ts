@@ -15,7 +15,7 @@
 
 import { App } from 'vue'
 import { Property, Resource, Metadata, plugin, Plugin, Service } from '@anticrm/platform'
-import { Obj, Emb, Ref, Class, Type, Doc, Instance } from '@anticrm/platform-core'
+import core, { Obj, Emb, Ref, Class, Type, Doc, Instance } from '@anticrm/platform-core'
 import { IntlString } from '@anticrm/platform-core-i18n'
 
 export type URL = string
@@ -77,7 +77,7 @@ export interface UIService extends Service {
   getAttrModel (_class: Ref<Class<Obj>>, props?: string[]): Promise<AttrModel[]>
 }
 
-export default plugin('ui' as Plugin<UIService>, {}, {
+export default plugin('ui' as Plugin<UIService>, { core: core.id }, {
   metadata: {
     DefaultApplication: '' as Metadata<AnyComponent>
   },

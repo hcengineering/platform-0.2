@@ -59,7 +59,9 @@ type PrimitiveType<T> =
   T
 
 type PropertyTypes<T> = { [P in keyof T]:
-  T[P] extends { [key: string]: infer X } | undefined ? { [key: string]: Type<X> } :
+  T[P] extends Ref<infer X> ? Type<X> :
+  T[P] extends { [key: string]: infer X } | undefined ? BagOf<any> :
+  T[P] extends (infer X)[] | undefined ? ArrayOf<any> :
   PrimitiveType<T[P]>
 }
 
