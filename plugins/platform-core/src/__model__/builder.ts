@@ -23,7 +23,7 @@ type Layout = { [key: string]: PropertyType }
 class Builder {
   private memdb: DocDb
 
-  constructor (memdb?: DocDb) {
+  constructor(memdb?: DocDb) {
     this.memdb = memdb ?? new MemDb()
   }
 
@@ -32,6 +32,7 @@ class Builder {
   /// A S S I G N
 
   private findAttributeKey<T extends Doc> (cls: Ref<Class<T>>, key: string): string {
+    // TODO: use memdb class hierarchy
     let _class = cls as Ref<Class<Obj>> | undefined
     while (_class) {
       const clazz = this.memdb.get(_class)

@@ -15,17 +15,18 @@
 
 import { App } from 'vue'
 import { Property, Resource, Metadata, plugin, Plugin, Service } from '@anticrm/platform'
-import { Obj, Emb, Ref, Class, Type, Doc, Attributes } from '@anticrm/platform-core'
+import { Obj, Emb, Ref, Class, Type, Doc, Instance } from '@anticrm/platform-core'
 import { IntlString } from '@anticrm/platform-core-i18n'
 
-export type Asset = Metadata<string>
+export type URL = string
+export type Asset = Metadata<URL>
 
 export type VueConstructor = object
 export type Component<C extends VueConstructor> = Resource<C>
 export type AnyComponent = Component<VueConstructor>
 export type ComponentRef = Property<AnyComponent>
 
-/// M O D E L
+/// C O R E  M O D E L
 
 export interface UIDecorator { // interface
   label?: IntlString
@@ -44,6 +45,20 @@ export interface Form<T extends Obj> extends ClassUIDecorator<T> {
   form: ComponentRef
 }
 
+// U I  M O D E L
+
+export interface UIModel {
+  label: string
+  icon?: URL
+}
+
+export interface AttrModel extends UIModel {
+  key: string
+  type: Instance<Type<any>>
+  placeholder: string
+}
+
+
 // S T A T E
 
 export const PlatformInjectionKey = Symbol('platform')
@@ -58,6 +73,8 @@ export interface UIState {
 
 export interface UIService extends Service {
   getApp (): App
+  getClassModel (_class: Ref<Class<Obj>>): Promise<UIModel>
+  getAttrModel (_class: Ref<Class<Obj>>, props?: string[]): Promise<AttrModel[]>
 }
 
 export default plugin('ui' as Plugin<UIService>, {}, {

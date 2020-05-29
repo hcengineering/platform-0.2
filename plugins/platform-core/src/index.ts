@@ -17,7 +17,7 @@ import { plugin, Plugin, Service, Resource, Property } from '@anticrm/platform'
 
 // P R O P E R T I E S
 
-export type Ref<T> = Property<T> & { __ref: true }
+export type Ref<T> = string & { __ref: T }
 export type PropertyType = Property<any>
   | Emb
   | undefined
@@ -27,7 +27,7 @@ export type PropertyType = Property<any>
 // O B J E C T S
 
 export interface Obj { _class: Ref<Class<this>> }
-export interface Emb extends Obj { __embedded: this }
+export interface Emb extends Obj { __embedded: true }
 export interface Doc extends Obj {
   _id: Ref<Doc>
   _mixins?: Ref<Class<Doc>>[]
@@ -48,20 +48,20 @@ export interface BagOf<A> extends Type<{ [key: string]: A }> {
 export interface ArrayOf<A> extends Type<A[]> { of: Type<A> }
 export interface ResourceType<T> extends Type<T> { }
 
-type PropertyTypes<T> = { [P in keyof T]:
-  T[P] extends Property<infer X> ? Type<X> :
-  T[P] extends Property<infer X> | undefined ? Type<X> :
-  T[P] extends { __embedded: infer X } ? (X extends Emb ? X : never) :
-  T[P] extends { [key: string]: infer X } ? (X extends any ? Type<{ [key: string]: X }> : never) :
-  T[P] extends Property<infer X>[] ? Type<X[]> :
-  never
-}
-
 // P R I M I T I V E
 
 export type StringType = Property<string> // TODO: Do we need this?
 
 // C L A S S E S
+
+type PrimitiveType<T> =
+  T extends Property<infer X> ? Type<X> :
+  T
+
+type PropertyTypes<T> = { [P in keyof T]:
+  T[P] extends { [key: string]: infer X } | undefined ? { [key: string]: Type<X> } :
+  PrimitiveType<T[P]>
+}
 
 export type Attributes<T extends E, E extends Obj> = PropertyTypes<Required<Omit<T, keyof E>>>
 export type AllAttributes<T extends E, E extends Obj> = Attributes<T, E> & Partial<Attributes<E, Obj>>
@@ -74,21 +74,27 @@ export interface EClass<T extends E, E extends Obj> extends Doc {
 
 export type Class<T extends Obj> = EClass<T, Obj>
 
-export type Instance<T extends Obj> = { [P in keyof T]:
-  T[P] extends Ref<infer X> ? (X extends Doc ? Promise<Instance<X>> : never) :
-  T[P] extends Resource<infer X> | undefined ? Promise<X | undefined> :
-  T[P] extends Resource<infer X> ? Promise<X> :
-  T[P] extends Resource<infer X> | undefined ? Promise<X | undefined> :
-  T[P] extends Property<infer X> ? X :
-  T[P] extends Property<infer X> | undefined ? X :
-  T[P] extends { __embedded: infer X } ? (X extends Emb ? Instance<X> : never) :
-  T[P] extends { [key: string]: Property<infer X> } ? { [key: string]: X } :
-  T[P] extends Property<infer X>[] ? X[] :
-  never
+type PrimitiveInstance<T> =
+  T extends Ref<infer X> ? Ref<X> : // (X extends Doc ? Promise<Instance<X>> : never) :
+  T extends Resource<infer X> ? Promise<X> :
+  T extends Property<infer X> ? X :
+  Instance<T> // only Embedded objects remains
+
+export type Instance<T> = { [P in keyof T]:
+  T[P] extends { [key: string]: infer X } | undefined ? { [key: string]: PrimitiveInstance<X> } :
+  T[P] extends (infer X)[] | undefined ? PrimitiveInstance<X>[] :
+  PrimitiveInstance<T[P]>
 } & {
   __layout: T
   getSession (): CoreService
 }
+
+const x = {} as Instance<BagOf<Obj>>
+x.of
+
+const y = {} as Instance<Class<Obj>>
+y._attributes
+
 
 // S E S S I O N
 
@@ -105,7 +111,10 @@ export interface CoreService extends Service {
   getInstance<T extends Doc> (id: Ref<T>): Promise<Instance<T>>
   as<T extends Doc, A extends Doc> (obj: Instance<T>, _class: Ref<Class<A>>): Instance<A>
   is<T extends Doc, A extends Doc> (obj: Instance<T>, _class: Ref<Class<A>>): boolean
+  getClassHierarchy (_class: Ref<Class<Obj>>): Ref<Class<Obj>>[]
+
   getDb (): DocDb
+
   // debug?
   getPrototype<T extends Obj> (_class: Ref<Class<T>>, stereotype: number /* for tests */): Object
 }

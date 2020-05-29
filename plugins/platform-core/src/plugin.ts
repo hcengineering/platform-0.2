@@ -52,6 +52,7 @@ export default async (platform: Platform): Promise<CoreService> => {
   //     (clazz._extends ? getAttribute(get(clazz._extends), key) : undefined)
   // }
 
+
   // D A T A
 
   const modelDb = new MemDb()
@@ -60,10 +61,12 @@ export default async (platform: Platform): Promise<CoreService> => {
 
   const coreService: CoreService = {
     getDb () { return modelDb },
+    getClassHierarchy (cls: Ref<Class<Obj>>) { return modelDb.getClassHierarchy(cls) },
+
     getPrototype,
     getInstance,
     as,
-    is
+    is,
   }
 
   // I N S T A N C E S
@@ -72,7 +75,7 @@ export default async (platform: Platform): Promise<CoreService> => {
   const prototypes = new Map<Ref<Class<Obj>>, Object>()
 
   const CoreRoot = {
-    get _class (this: Instance<Obj>) { return this.__layout._class },
+    //    get _class (this: Instance<Obj>) { return this.__layout._class },
     getSession: (): CoreService => coreService
   }
 

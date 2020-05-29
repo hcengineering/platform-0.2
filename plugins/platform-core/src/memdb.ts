@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { DocDb, Ref, Doc } from '.'
+import { DocDb, Ref, Doc, Class, Obj } from '.'
 
 export class MemDb implements DocDb {
 
@@ -29,6 +29,16 @@ export class MemDb implements DocDb {
     const obj = this.objects.get(id)
     if (!obj) { throw new Error('document not found ' + id) }
     return obj as T
+  }
+
+  getClassHierarchy (cls: Ref<Class<Obj>>): Ref<Class<Obj>>[] {
+    const result = [] as Ref<Class<Obj>>[]
+    let _class = cls as Ref<Class<Obj>> | undefined
+    while (_class) {
+      result.push(_class)
+      _class = this.get(_class)._extends
+    }
+    return result
   }
 
   dump () {
