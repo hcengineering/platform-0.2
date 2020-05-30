@@ -14,24 +14,19 @@
 //
 
 
-import { Platform, Plugin, Service } from '@anticrm/platform'
+import { Platform } from '@anticrm/platform'
 import { CoreService, Ref, Class, Obj, Type, Instance } from '@anticrm/platform-core'
-import ui, {
-  AnyComponent, UIService, VueConstructor, Component,
-  PlatformInjectionKey, CoreServiceInjectionKey, UIModel, Asset, AttrModel, UIServiceInjectionKey
-} from '.'
-import { h, ref, createApp, defineComponent } from 'vue'
-import Root from './internal/Root.vue'
+import ui, { UIService, UIModel, AttrModel } from '.'
 
-console.log('Plugin `ui` loaded')
+console.log('Plugin `face` loaded')
 
 /*!
- * Anticrm Platform™ UI Plugin
+ * Anticrm Platform™ Face Plugin
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */
 export default async (platform: Platform, deps: { core: CoreService }): Promise<UIService> => {
-  console.log('Plugin `ui` started')
+  console.log('Plugin `face` started')
   const coreService = deps.core
 
   // U I  M O D E L S
@@ -80,6 +75,8 @@ export default async (platform: Platform, deps: { core: CoreService }): Promise<
 
       const typeClass = await coreService.getInstance(type._class)
       const typeClassDecorator = coreService.as(typeClass, ui.class.ClassUIDecorator)
+      console.log('key ' + key + ' class deco:')
+      console.log(typeClassDecorator)
 
       const label = await typeDecorator?.label ?? await typeClassDecorator?.label ?? key
       const placeholder = await typeDecorator?.placeholder ?? label
@@ -102,57 +99,12 @@ export default async (platform: Platform, deps: { core: CoreService }): Promise<
     return Promise.all(ownModels).then(result => result.flat())
   }
 
-  // V U E  A P P
-
-  const app = createApp(Root)
-    .provide(PlatformInjectionKey, platform)
-    .provide(CoreServiceInjectionKey, coreService)
-  app.config.globalProperties.$platform = platform
-
-  // C O M P O N E N T  R E N D E R E R
-
-  app.component('widget', defineComponent({
-    props: {
-      component: String // as PropType<Component<VueConstructor>>
-    },
-    setup (props, context) {
-      console.log('widget:')
-      console.log(props)
-      console.log(context)
-      return {
-        resolved: ref(''),
-      }
-    },
-    render () {
-      const cached = platform.getResource(this.component as Component<VueConstructor>)
-      if (cached) {
-        return h(cached)
-      }
-      if (this.component !== this.resolved) {
-        platform.resolve(this.component as AnyComponent).then(resolved => {
-          this.resolved = this.component
-        })
-        return h('div', [])
-      } else {
-        const resolved = platform.getResource(this.resolved as Component<VueConstructor>)
-        if (resolved) {
-          return h(resolved)
-        } else {
-          return h('div', [])
-        }
-      }
-    }
-  }))
-
   // S E R V I C E
 
-  const service = {
-    getApp () { return app },
+  return {
     getClassModel,
-    getAttrModel,
+    getOwnAttrModel,
   }
 
-  app.provide(UIServiceInjectionKey, service)
-  return service
 
 }

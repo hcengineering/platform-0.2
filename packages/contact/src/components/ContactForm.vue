@@ -20,7 +20,7 @@ import { AnyComponent } from '@anticrm/platform-ui'
 import { Person, Contact } from '..'
 
 import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.vue'
-import ObjectPanel from '@anticrm/platform-ui/src/components/ObjectPanel.vue'
+import ObjectPanel from '@anticrm/platform-ui-components/src/components/ObjectPanel.vue'
 
 export default defineComponent({
   components: { InlineEdit, ObjectPanel },

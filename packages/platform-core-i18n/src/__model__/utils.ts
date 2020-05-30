@@ -37,12 +37,11 @@ export function verifyTranslation<T extends StringIds> (ids: T, translations: As
   return result as AsStrings<T>
 }
 
-type Labels<T extends Doc> = Partial<Record<KeysByType<T, IntlString | undefined>, string>>
-
 type Refs = { [key: string]: Ref<Doc> }
 
-type RefsToLabels<T extends Refs, AS extends Doc> = {
-  [P in keyof T]: T[P] extends Ref<infer X> ? AS extends X ? Labels<AS> : never : never
+type L<T extends object> = Partial<Record<KeysByType<T, IntlString | undefined>, string>>
+type R2L<T extends object, A extends object> = {
+  [P in keyof T]: T[P] extends Ref<infer X> ? L<A> : never
 }
 
 /**
@@ -51,7 +50,7 @@ type RefsToLabels<T extends Refs, AS extends Doc> = {
  * @param refs Refs to objects to translate
  * @param as Treat objects as object of `as` class
  */
-export function modelTranslation<T extends Refs, A extends Doc> (refs: T, as: Ref<Class<A>>, translations: Partial<RefsToLabels<T, A>>): Record<string, string> {
+export function modelTranslation<T extends Refs, A extends Doc> (refs: T, as: Ref<Class<A>>, translations: Partial<R2L<T, A>>): Record<string, string> {
   const result = {} as Record<string, string>
   for (const clazz in translations) {
     const classId = refs[clazz]
@@ -64,3 +63,16 @@ export function modelTranslation<T extends Refs, A extends Doc> (refs: T, as: Re
   }
   return result
 }
+
+// import contact from '@anticrm/contact/src/__model__'
+// import ui, { ClassUIDecorator } from '@anticrm/platform-ui/'
+
+
+// const x = {} as Partial<R2L<typeof contact.class, ClassUIDecorator<Obj>>>
+
+
+// const t = modelTranslation(contact.class, ui.class.ClassUIDecorator, {
+//   Email: {
+//     label: ''
+//   }
+// })

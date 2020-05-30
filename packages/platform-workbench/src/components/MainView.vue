@@ -17,10 +17,8 @@
 import { Platform } from '@anticrm/platform'
 import { defineComponent, reactive, computed, provide, inject, watch, PropType } from 'vue'
 import workbench, { WorkbenchStateInjectionKey, WorkbenchState, ViewModelKind } from '..'
-import ui, {
-  AnyComponent, UIServiceInjectionKey, CoreServiceInjectionKey,
-  UIService, PlatformInjectionKey
-} from '@anticrm/platform-ui'
+import ui, { AnyComponent, UIService } from '@anticrm/platform-ui'
+import { UIServiceInjectionKey, CoreServiceInjectionKey, PlatformInjectionKey } from '@anticrm/platform-ui-components'
 import { Ref, Class, Doc, CoreService } from '@anticrm/platform-core'
 
 import Button from '@anticrm/sparkling-controls/src/Button.vue'

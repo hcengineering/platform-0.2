@@ -59,23 +59,11 @@ export interface AttrModel extends UIModel {
 }
 
 
-// S T A T E
-
-export const PlatformInjectionKey = Symbol('platform')
-export const CoreServiceInjectionKey = Symbol('core-plugin')
-export const UIServiceInjectionKey = Symbol('ui-plugin')
-
-export interface UIState {
-  app: AnyComponent,
-  path: string
-}
-
 /// P L U G I N
 
 export interface UIService extends Service {
-  getApp (): App
   getClassModel (_class: Ref<Class<Obj>>): Promise<UIModel>
-  getAttrModel (_class: Ref<Class<Obj>>, props?: string[]): Promise<AttrModel[]>
+  getOwnAttrModel (_class: Ref<Class<Obj>>, props?: string[]): Promise<AttrModel[]>
 }
 
 export default plugin('ui' as Plugin<UIService>, { core: core.id }, {

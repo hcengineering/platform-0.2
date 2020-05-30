@@ -13,8 +13,8 @@
 // limitations under the License.
 //
 
-import { modelTranslation } from '@anticrm/platform-core-i18n/src/__resources__/utils'
-import ui from '@anticrm/platform-ui-model/src/__resources__'
+import { modelTranslation } from '@anticrm/platform-core-i18n/src/__model__/utils'
+import ui from '@anticrm/platform-ui/src/__model__'
 import contact from '..'
 
 export default modelTranslation(contact.class, ui.class.ClassUIDecorator, {
@@ -35,7 +35,7 @@ export default modelTranslation(contact.class, ui.class.ClassUIDecorator, {
     // placeholder: 'Новосибирск, Красный проспект, 15',
   },
   Contact: {
-    label: 'Контактная информация',
+    // label: 'Контактная информация',
     // phoneWork: 'Рабочий',
     // addressDelivery: 'Адрес доставки'
   },

@@ -19,9 +19,7 @@ import { defineComponent, PropType, inject } from 'vue'
 import { Platform } from '@anticrm/platform'
 
 import core, { Obj, Doc, Ref, Class, CoreService } from '@anticrm/platform-core'
-
-import ui, { PlatformInjectionKey, UIService, AttrModel, CoreServiceInjectionKey } from '..'
-// import PropPanel from './PropPanel.vue'
+import { PlatformInjectionKey, CoreServiceInjectionKey } from '..'
 
 async function getClassHierarchy (platform: Platform, object: Promise<Obj>): Promise<Ref<Class<Obj>>[]> {
   const corePlugin = await platform.getPlugin(core.id)
