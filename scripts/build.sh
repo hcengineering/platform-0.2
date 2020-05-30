@@ -31,3 +31,4 @@ yarn workspace launch build && \
 
 # B U I L D  P A C K A G E S
 yarn workspace @anticrm/platform run build
+yarn workspace @anticrm/platform-core run build

@@ -16,23 +16,19 @@
 
 import { Platform } from '@anticrm/platform'
 
-import db from '@anticrm/platform-db'
-import core from '@anticrm/platform-core'
-import i18n from '@anticrm/platform-core-i18n'
-import ui from '@anticrm/platform-ui-model'
-import launch from '@anticrm/launch-dev'
+import Builder from '@anticrm/platform-core/src/__model__/builder'
 
-const platform = new Platform()
-platform.addLocation(db, () => import('@anticrm/platform-db/src/memdb'))
-platform.addLocation(core, () => import('@anticrm/platform-core/src/plugin'))
-platform.addLocation(i18n, () => import('@anticrm/platform-core-i18n/src/plugin'))
-platform.addLocation(ui, () => import('@anticrm/platform-ui/src/plugin'))
-platform.addLocation(launch, () => import('@anticrm/launch-dev/src/launch'))
+import coreModel from '@anticrm/platform-core/src/__model__/model'
+import i18nModel from '@anticrm/platform-core-i18n/src/__model__/model'
+import uiModel from '@anticrm/platform-ui/src/__model__/model'
+import contactModel from '@anticrm/contact/src/__model__/model'
 
-platform.setResolver('native', core.id)
+import contactRu from '@anticrm/contact/src/__model__/strings/ru'
 
-platform.getPlugin(launch.id).then(plugin => {
-  const dump = plugin.db.dump()
-  console.log(dump)
-  console.log(JSON.stringify(dump))
-})
+const builder = new Builder()
+builder.load(coreModel)
+builder.load(i18nModel)
+builder.load(uiModel)
+builder.load(contactModel)
+
+console.log(builder.dump())

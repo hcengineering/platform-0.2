@@ -16,6 +16,7 @@
 /* eslint-env jest */
 
 import { Platform } from '@anticrm/platform'
+import { Instance, Emb } from '@anticrm/platform-core'
 import startPlugin from '../plugin'
 import model from '../__model__/model'
 import Builder from '../__model__/builder'
@@ -59,6 +60,6 @@ describe('core', () => {
     builder.load(model)
 
     const inst = await tx.getInstance(core.class.RefTo)
-    expect(inst._attributes.to._class).toBe(core.class.RefTo)
+    expect((inst._attributes.to as Instance<Emb>)._class).toBe(core.class.RefTo)
   })
 })

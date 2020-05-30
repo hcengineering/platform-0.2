@@ -70,7 +70,7 @@ export default (S: Builder) => {
 
   S.createClass(core.class.InstanceOf, core.class.Type, {
     of: S.newInstance(core.class.RefTo as Ref<Class<RefTo<Class<Emb>>>>, {
-      to: core.class.Class
+      to: core.class.Class as Ref<Class<Class<Emb>>>
     }),
     exert: S.newInstance(core.class.ResourceType, {
       _default: core.method.InstanceOf_exert

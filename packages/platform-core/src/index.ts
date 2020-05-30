@@ -29,7 +29,7 @@ export type PropertyType = Property<any>
 export interface Obj { _class: Ref<Class<this>> }
 export interface Emb extends Obj { __embedded: true }
 export interface Doc extends Obj {
-  _id: Ref<Doc>
+  _id: Ref<this>
   _mixins?: Ref<Class<Doc>>[]
 }
 
