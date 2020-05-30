@@ -63,7 +63,7 @@ export interface AttrModel extends UIModel {
 
 export const PlatformInjectionKey = Symbol('platform')
 export const CoreServiceInjectionKey = Symbol('core-plugin')
-export const UIStateInjectionKey = Symbol('ui-state')
+export const UIServiceInjectionKey = Symbol('ui-plugin')
 
 export interface UIState {
   app: AnyComponent,
@@ -80,7 +80,7 @@ export interface UIService extends Service {
 
 export default plugin('ui' as Plugin<UIService>, { core: core.id }, {
   metadata: {
-    DefaultApplication: '' as Metadata<AnyComponent>
+    DefaultApplication: '' as Metadata<AnyComponent>,
   },
   class: {
     TypeUIDecorator: '' as Ref<Class<TypeUIDecorator<any>>>,

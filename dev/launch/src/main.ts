@@ -21,6 +21,7 @@ import ui from '@anticrm/platform-ui'
 import workbench from '@anticrm/platform-workbench'
 import contact from '@anticrm/contact'
 import demo from '@anticrm/demo-3d'
+import mc from '@anticrm/app-mission-control'
 
 import { createApp } from 'vue'
 import ErrorPage from './components/ErrorPage.vue'
@@ -36,8 +37,11 @@ import uiModel from '@anticrm/platform-ui/src/__model__/model'
 import contactModel from '@anticrm/contact/src/__model__/model'
 
 const platform = new Platform()
-platform.setMetadata(ui.metadata.DefaultApplication, workbench.component.Workbench)
-// platform.setMetadata(ui.metadata.DefaultApplication, demo.component.Periodic)
+platform.setMetadata(ui.metadata.DefaultApplication, mc.component.MissionControl)
+platform.setMetadata(mc.metadata.Applications, [
+  workbench.component.Workbench,
+  demo.component.Periodic
+])
 
 platform.addLocation(core, () => import(/* webpackChunkName: "platform-core" */ '@anticrm/platform-core/src/plugin'))
 platform.addLocation(i18n, () => import(/* webpackChunkName: "platform-core-i18n" */ '@anticrm/platform-core-i18n/src/plugin'))
@@ -45,6 +49,7 @@ platform.addLocation(ui, () => import(/* webpackChunkName: "platform-ui" */ '@an
 platform.addLocation(workbench, () => import(/* webpackChunkName: "platform-workbench" */ '@anticrm/platform-workbench/src/plugin'))
 platform.addLocation(contact, () => import(/* webpackChunkName: "contact" */ '@anticrm/contact/src/plugin'))
 platform.addLocation(demo, () => import(/* webpackChunkName: "demo-3d" */ '@anticrm/demo-3d/src/plugin'))
+platform.addLocation(mc, () => import(/* webpackChunkName: "mission-control" */ '@anticrm/app-mission-control/src/plugin'))
 
 // uiMeta(platform)
 // contactMeta(platform)

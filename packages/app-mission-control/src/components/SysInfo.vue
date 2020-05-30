@@ -17,26 +17,29 @@
 
 <script lang="ts">
 import { defineComponent, inject } from 'vue'
+import ui, { AnyComponent, UIState } from '@anticrm/platform-ui'
+import mc from '..'
+
+import Button from '@anticrm/sparkling-controls/src/Button.vue'
 import PluginList from './Plugins.vue'
 import Credits from './Credits.vue'
-import Button from '@anticrm/sparkling-controls/src/Button.vue'
-import ui, { AnyComponent, UIStateInjectionKey, UIState } from '..'
 
 export default defineComponent({
   components: { PluginList, Credits, Button },
+  props: {
+    app: String
+  },
   setup () {
-    const uiState = inject(UIStateInjectionKey) as UIState
-
     return {
-      pluginInfos () { return this.$platform.getPluginInfos() },
-      defaultApp (): AnyComponent {
-        return this.$platform.getMetadata(ui.metadata.DefaultApplication)
+      pluginInfos () {
+        return this.$platform.getPluginInfos()
       },
-      run () {
-        const defaultApp = this.defaultApp()
-        if (defaultApp) {
-          uiState.app = defaultApp
-        }
+      applications (): AnyComponent[] {
+        console.log('applications:')
+        return this.$platform.getMetadata(mc.metadata.Applications)
+      },
+      run (app) {
+        this.$emit('pushState', '/' + app)
       }
     }
   }
@@ -57,10 +60,13 @@ export default defineComponent({
     <div class="caption" style="grid-area: creditsLabel">Credits</div>
     <Credits class="content" style="grid-area: credits" />
 
-    <div class="caption" style="grid-area: appLabel">Default application</div>
+    <div class="caption" style="grid-area: appLabel">Applications</div>
     <div class="content" style="grid-area: app">
-      <div>{{defaultApp()}}</div>
-      <Button style="margin-top: 0.5em" @click="run()" :disabled="defaultApp() === undefined">Run</Button>
+      <div v-for="app in applications()" :key="app">
+        <Button style="width:100%; margin-top: 0.5em" @click="run(app)">
+          <span style="text-transform: uppercase">{{app}}</span>
+        </Button>
+      </div>
     </div>
 
     <div class="copy">

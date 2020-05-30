@@ -18,7 +18,7 @@ import { Platform, Plugin, Service } from '@anticrm/platform'
 import { CoreService, Ref, Class, Obj, Type, Instance } from '@anticrm/platform-core'
 import ui, {
   AnyComponent, UIService, VueConstructor, Component,
-  PlatformInjectionKey, CoreServiceInjectionKey, UIModel, Asset, AttrModel
+  PlatformInjectionKey, CoreServiceInjectionKey, UIModel, Asset, AttrModel, UIServiceInjectionKey
 } from '.'
 import { h, ref, createApp, defineComponent } from 'vue'
 import Root from './internal/Root.vue'
@@ -146,10 +146,13 @@ export default async (platform: Platform, deps: { core: CoreService }): Promise<
 
   // S E R V I C E
 
-  return {
+  const service = {
     getApp () { return app },
     getClassModel,
     getAttrModel,
   }
+
+  app.provide(UIServiceInjectionKey, service)
+  return service
 
 }
