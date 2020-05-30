@@ -105,6 +105,7 @@ export interface DocDb {
   get<T extends Doc> (id: Ref<T>): T
   dump (): Doc[]
 
+  mixin<T extends E, E extends Doc> (id: Ref<E>, clazz: Ref<Class<T>>, values: Pick<T, Exclude<keyof T, keyof E>>): void
   createDocument<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Doc>, _id?: Ref<M>): M
 }
 

@@ -51,8 +51,7 @@ export class MemDb implements DocDb {
   }
 
   // from Builder
-  assign<T extends Doc> (layout: Layout, _class: Ref<Class<T>>, val: Omit<T, keyof Doc>) {
-    const values = val as unknown as Layout
+  assign<T extends Doc> (layout: Layout, _class: Ref<Class<T>>, values: Layout) {
     for (const key in values) {
       if (key.startsWith('_')) {
         layout[key] = values[key]
@@ -64,9 +63,16 @@ export class MemDb implements DocDb {
 
   createDocument<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Doc>, _id?: Ref<M>): M {
     const layout = { _class, _id: _id ?? generateId() as Ref<Doc> } as Doc
-    this.assign(layout as unknown as Layout, _class, values)
+    this.assign(layout as unknown as Layout, _class, values as unknown as Layout)
     this.add(layout)
     return layout as M
+  }
+
+  mixin<T extends E, E extends Doc> (id: Ref<E>, clazz: Ref<Class<T>>, values: Pick<T, Exclude<keyof T, keyof E>>) {
+    const doc = this.get(id)
+    if (!doc._mixins) { doc._mixins = [] }
+    doc._mixins.push(clazz as Ref<Class<Doc>>)
+    this.assign(doc as unknown as Layout, clazz, values as unknown as Layout)
   }
 
   getClassHierarchy (cls: Ref<Class<Obj>>): Ref<Class<Obj>>[] {

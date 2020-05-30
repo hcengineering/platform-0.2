@@ -15,7 +15,6 @@
 
 import { PropertyType, Emb, Doc, Obj, Ref, EClass, Class, AllAttributes, DocDb } from '@anticrm/platform-core'
 import core from '.'
-import { attributeKey } from '../plugin'
 import { MemDb } from '../memdb'
 
 type Layout = { [key: string]: PropertyType }
@@ -29,31 +28,6 @@ class Builder {
 
   dump (): Doc[] { return this.memdb.dump() }
 
-  private findAttributeKey<T extends Doc> (cls: Ref<Class<T>>, key: string): string {
-    // TODO: use memdb class hierarchy
-    let _class = cls as Ref<Class<Obj>> | undefined
-    while (_class) {
-      const clazz = this.memdb.get(_class)
-      if ((clazz._attributes as any)[key] !== undefined) {
-        return attributeKey(_class, key)
-      }
-      _class = clazz._extends
-    }
-    throw new Error('attribute not found: ' + key)
-  }
-
-  protected assign<T extends E, E extends Doc> (doc: E, _class: Ref<Class<T>>, _extends: Ref<Class<E>>, val: Omit<T, keyof E>) {
-    const layout = doc as unknown as Layout
-    const values = val as unknown as Layout
-    for (const key in values) {
-      if (key.startsWith('_')) {
-        layout[key] = values[key]
-      } else {
-        layout[this.findAttributeKey(_class, key)] = values[key]
-      }
-    }
-  }
-
   // N E W  I N S T A N C E S
 
   createClass<T extends E, E extends Obj> (_id: Ref<Class<T>>, _extends: Ref<Class<E>>, _attributes: AllAttributes<T, E>) {
@@ -66,17 +40,11 @@ class Builder {
   }
 
   createDocument<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Doc>, _id: Ref<M>): void {
-    const layout = { _class, _id } as Doc
-    this.assign(layout, _class, core.class.Doc, values)
-    this.memdb.add(layout as Doc)
+    this.memdb.createDocument(_class, values, _id)
   }
 
   mixin<T extends E, E extends Doc> (id: Ref<E>, clazz: Ref<Class<T>>, values: Pick<T, Exclude<keyof T, keyof E>>) {
-    const doc = this.memdb.get(id)
-    if (!doc._mixins) { doc._mixins = [] }
-    doc._mixins.push(clazz as Ref<Class<Doc>>)
-    const docClass = doc._class
-    this.assign(doc, clazz, docClass, values)
+    this.memdb.mixin<T, E>(id, clazz, values)
   }
 
   patch<T extends Doc> (obj: Ref<T>, f: (obj: T) => void) {
