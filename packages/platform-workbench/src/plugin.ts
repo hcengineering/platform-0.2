@@ -45,11 +45,11 @@ export default async (platform: Platform, deps: { core: CoreService, ui: UIServi
       throw new Error(`something went wrong, can't find 'Form' for the ${_class}.`)
     }
     const component = coreService.as(clazz, ui.class.Form).form
-    // const object = clazz.newInstance()
+    //const object = clazz.newInstance()
     return {
       kind: ViewModelKind.NEW_FORM,
       component,
-      object: {} as Doc
+      content: {} as Doc
     }
   }
 

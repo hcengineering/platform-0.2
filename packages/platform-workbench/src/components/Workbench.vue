@@ -15,44 +15,18 @@
 
 <script lang="ts">
 import { Platform } from '@anticrm/platform'
-import { defineComponent, reactive, computed, provide, inject, watch } from 'vue'
+import { defineComponent, reactive, computed, provide, inject, watch, PropType } from 'vue'
 import workbench, { WorkbenchStateInjectionKey, WorkbenchState, ViewModelKind } from '..'
-import { AnyComponent, UIStateInjectionKey, UIState, PlatformInjectionKey } from '@anticrm/platform-ui'
+import { AnyComponent, UIServiceInjectionKey, UIService, PlatformInjectionKey } from '@anticrm/platform-ui'
 import { Ref, Class, Doc } from '@anticrm/platform-core'
 
 import Button from '@anticrm/sparkling-controls/src/Button.vue'
+import MainView from './MainView.vue'
 
 export default defineComponent({
-  components: { Button },
-  setup (props, context) {
-    const platform = inject(PlatformInjectionKey) as Platform
-    const uiState = inject(UIStateInjectionKey) as UIState
-    const workbenchState = reactive({} as WorkbenchState)
-    provide(WorkbenchStateInjectionKey, workbenchState)
-
-    const workbenchService = platform.getPlugin(workbench.id)
-
-    watch([() => uiState.path], async (n) => {
-      const path = n[0]
-      const split = path.split('/')
-      const ref = split[2] as Ref<Class<Doc>>
-
-      try {
-        const mainView = await workbenchService.then((service) => service.getViewModel(ref, ViewModelKind.NEW_FORM))
-        workbenchState.mainView = mainView
-        console.log(mainView)
-      } catch (err) {
-        console.log(err)
-      }
-    })
-
-    function doit () { uiState.path = '/component:workbench.Workbench/class:contact.Person' }
-
-    const component = computed(() => workbenchState.mainView?.component)
-
-    return {
-      component, doit
-    }
+  components: { Button, MainView },
+  props: {
+    path: String
   }
 })
 </script>
@@ -61,7 +35,9 @@ export default defineComponent({
   <div id="workbench">
     <header>
       <!-- <Header @add="addObject()" /> -->
-      <Button @click="doit()">Go!</Button>
+      <Button
+        @click="this.$emit('pushState', '/component:workbench.Workbench/class:contact.Person')"
+      >Go!</Button>
     </header>
 
     <nav>
@@ -69,7 +45,10 @@ export default defineComponent({
     </nav>
 
     <main>
-      <widget v-if="component" :component="component" />
+      <Suspense v-if="path">
+        <MainView :content="path" />
+      </Suspense>
+      <div v-else>Nothing to show.</div>
     </main>
 
     <aside>

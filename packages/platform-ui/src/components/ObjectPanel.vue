@@ -15,13 +15,13 @@
 
 <script lang="ts">
 
-import Vue, { PropType } from 'vue'
+import { defineComponent, PropType, inject } from 'vue'
 import { Platform } from '@anticrm/platform'
 
-import core, { Obj, Doc, Ref, Class } from '@anticrm/platform-core'
+import core, { Obj, Doc, Ref, Class, CoreService } from '@anticrm/platform-core'
 
-import ui, { UIPlugin, AttrModel } from '@anticrm/platform-ui-model'
-import PropPanel from './PropPanel.vue'
+import ui, { PlatformInjectionKey, UIService, AttrModel, CoreServiceInjectionKey } from '..'
+// import PropPanel from './PropPanel.vue'
 
 async function getClassHierarchy (platform: Platform, object: Promise<Obj>): Promise<Ref<Class<Obj>>[]> {
   const corePlugin = await platform.getPlugin(core.id)
@@ -29,19 +29,18 @@ async function getClassHierarchy (platform: Platform, object: Promise<Obj>): Pro
   return corePlugin.getClassHierarchy(clazz)
 }
 
-export default Vue.extend({
-  components: { PropPanel },
+export default defineComponent({
+  components: {},
   props: {
-    object: Promise as PropType<Promise<Doc>>,
+    content: Object as PropType<Doc>,
     filter: Array as PropType<string[] | undefined>,
   },
-  data () {
-    return {
-      classes: [] as Ref<Class<Obj>>[]
-    }
-  },
-  created () {
-    getClassHierarchy(this.$platform, this.object).then(classes => this.classes = classes)
+  setup (props) {
+    const coreService = inject(CoreServiceInjectionKey) as CoreService
+    const classes = coreService.getClassHierarchy(props.content._class)
+    console.log('classes: ' + classes.toString())
+    console.log(props.content)
+    return { classes }
   }
 })
 </script>
@@ -50,7 +49,8 @@ export default Vue.extend({
   <table>
     <tr>
       <td valign="top" v-for="clazz in classes" :key="clazz">
-        <PropPanel :clazz="clazz" :object="object" />
+        <!-- <PropPanel :clazz="clazz" :content="content" /> -->
+        {{clazz}}
       </td>
     </tr>
   </table>

@@ -14,18 +14,21 @@
 -->
 
 <script lang="ts">
-import { defineComponent, ref, reactive, inject } from 'vue'
+import { defineComponent, ref, reactive, inject, computed, PropType } from 'vue'
+import { Instance } from '@anticrm/platform-core'
 import { AnyComponent } from '@anticrm/platform-ui'
-import { WorkbenchStateInjectionKey } from '@anticrm/platform-workbench'
+import { Person, Contact } from '..'
 
 import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.vue'
+import ObjectPanel from '@anticrm/platform-ui/src/components/ObjectPanel.vue'
 
 export default defineComponent({
-  components: { InlineEdit },
+  components: { InlineEdit, ObjectPanel },
+  props: {
+    content: Object as PropType<Instance<Person>>
+  },
   setup (props, context) {
-    const workbenchState = inject(WorkbenchStateInjectionKey)
     return {
-      workbenchState
     }
   }
 })
@@ -33,11 +36,13 @@ export default defineComponent({
 
 <template>
   <div>
-    <InlineEdit class="caption-1" placeholder="Фамилия" />
-    {{workbenchState}}Hallo
-    <!-- <br /> v-model="content.firstName" v-model="content().firstName"
-    <InlineEdit class="caption-2" v-model="content.lastName" placeholder="Имя Отчество" />
-    <ObjectPanel :object="object" style="margin-top: 2em" />-->
+    <div>
+      <InlineEdit class="caption-1" v-model="content.firstName" placeholder="Фамилия" />
+    </div>
+    <div>
+      <InlineEdit class="caption-2" v-model="content.lastName" placeholder="Имя Отчество" />
+    </div>
+    <ObjectPanel :content="content" style="margin-top: 2em" />
   </div>
 </template>
 
