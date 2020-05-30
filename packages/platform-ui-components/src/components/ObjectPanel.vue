@@ -21,21 +21,23 @@ import { Platform } from '@anticrm/platform'
 import core, { Obj, Doc, Ref, Class, CoreService } from '@anticrm/platform-core'
 import { PlatformInjectionKey, CoreServiceInjectionKey } from '..'
 
-async function getClassHierarchy (platform: Platform, object: Promise<Obj>): Promise<Ref<Class<Obj>>[]> {
-  const corePlugin = await platform.getPlugin(core.id)
-  const clazz = (await object)._class
-  return corePlugin.getClassHierarchy(clazz)
-}
+import PropPanel from './PropPanel.vue'
+
+// async function getClassHierarchy (platform: Platform, object: Promise<Obj>): Promise<Ref<Class<Obj>>[]> {
+//   const corePlugin = await platform.getPlugin(core.id)
+//   const clazz = (await object)._class
+//   return corePlugin.getClassHierarchy(clazz)
+// }
 
 export default defineComponent({
-  components: {},
+  components: { PropPanel },
   props: {
     content: Object as PropType<Doc>,
     filter: Array as PropType<string[] | undefined>,
   },
   setup (props) {
     const coreService = inject(CoreServiceInjectionKey) as CoreService
-    const classes = coreService.getClassHierarchy(props.content._class)
+    const classes = coreService.getClassHierarchy(props.content._class).splice(0, 2)
     console.log('classes: ' + classes.toString())
     console.log(props.content)
     return { classes }
@@ -47,8 +49,9 @@ export default defineComponent({
   <table>
     <tr>
       <td valign="top" v-for="clazz in classes" :key="clazz">
-        <!-- <PropPanel :clazz="clazz" :content="content" /> -->
-        {{clazz}}
+        <Suspense>
+          <PropPanel :clazz="clazz" :content="content" />
+        </Suspense>
       </td>
     </tr>
   </table>

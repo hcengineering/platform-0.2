@@ -83,6 +83,12 @@ export default (S: Builder) => {
     })
   })
 
+  S.createClass(core.class.Metadata, core.class.Type, {
+    exert: S.newInstance(core.class.ResourceType, {
+      _default: core.method.Metadata_exert
+    })
+  })
+
   S.createClass<ResourceType<any>, Type<any>>(core.class.ResourceType, core.class.Type, {})
   S.patch(core.class.ResourceType, (clazz) => { clazz._native = core.native.ResourceType })
 }

@@ -39,14 +39,14 @@ export default defineComponent({
       throw new Error(`something went wrong, can't find 'Form' for the ${_class}.`)
     }
     const component = coreService.as(clazz, ui.class.Form).form
-
+    const content = coreService.getDb().createDocument(_class, {})
     return {
-      component
+      component, content
     }
   }
 })
 </script>
 
 <template>
-  <widget v-if="component" :component="component" :content="{}" />
+  <widget v-if="component" :component="component" :content="content" />
 </template>

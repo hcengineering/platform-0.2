@@ -28,7 +28,7 @@ import { createApp } from 'vue'
 import ErrorPage from './components/ErrorPage.vue'
 
 // import uiMeta from '@anticrm/platform-ui-model/src/__resources__/meta'
-// import contactMeta from '@anticrm/contact/src/__resources__/meta'
+import contactMeta from '@anticrm/contact/src/__model__/meta'
 
 import Builder from '@anticrm/platform-core/src/__model__/builder'
 
@@ -36,6 +36,8 @@ import coreModel from '@anticrm/platform-core/src/__model__/model'
 import i18nModel from '@anticrm/platform-core-i18n/src/__model__/model'
 import uiModel from '@anticrm/platform-ui/src/__model__/model'
 import contactModel from '@anticrm/contact/src/__model__/model'
+
+import contactRu from '@anticrm/contact/src/__model__/strings/ru'
 
 const platform = new Platform()
 platform.setMetadata(ui.metadata.DefaultApplication, mc.component.MissionControl)
@@ -54,11 +56,12 @@ platform.addLocation(demo, () => import(/* webpackChunkName: "demo-3d" */ '@anti
 platform.addLocation(mc, () => import(/* webpackChunkName: "mission-control" */ '@anticrm/app-mission-control/src/plugin'))
 
 // uiMeta(platform)
-// contactMeta(platform)
+contactMeta(platform)
 
 async function boot (): Promise<void> {
   const corePlugin = await platform.getPlugin(core.id)
   const i18nService = await platform.getPlugin(i18n.id) // TODO: dirty hack, resources does not resolve awhen building prototypes.
+  i18nService.loadStrings(contactRu)
   const builder = new Builder(corePlugin.getDb())
   builder.load(coreModel)
   builder.load(i18nModel)

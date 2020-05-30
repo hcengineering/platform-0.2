@@ -97,6 +97,8 @@ describe('session', () => {
       }
     })
 
+    platform.setMetadata(contact.icon.Email, 'http://email')
+    platform.setMetadata(contact.icon.Phone, 'http://phone')
   })
 
   it('should build ClassUIModel', async () => {
@@ -111,6 +113,7 @@ describe('session', () => {
     const ownModel = await uiPlugin.getOwnAttrModel(contact.class.Contact)
     expect(ownModel[0].placeholder).toBe('email')
     expect(ownModel[0].label).toBe('email')
+    expect(ownModel[0].icon).toBe('http://email')
     expect(ownModel[1].placeholder).toBe('+7 913 333 5555')
     expect(ownModel[1].label).toBe('string:contact.Phone_Label')
     expect(ownModel[2].placeholder).toBe('+1 555 333 5555')

@@ -35,4 +35,7 @@ export interface UIComponentsService extends Service {
 }
 
 export default plugin('ui-components' as Plugin<UIComponentsService>, { core: core.id, ui: ui.id }, {
+  icon: {
+    Default: '' as Asset
+  }
 })

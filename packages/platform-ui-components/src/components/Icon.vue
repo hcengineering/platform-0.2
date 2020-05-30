@@ -15,9 +15,9 @@
 
 <script lang="ts">
 
-import { defineComponent } from 'vue'
-import { Metadata } from '@anticrm/platform'
-import ui from '..'
+import { defineComponent, inject } from 'vue'
+import { Platform, Metadata } from '@anticrm/platform'
+import ui, { PlatformInjectionKey } from '..'
 
 export default defineComponent({
   props: {
@@ -26,11 +26,12 @@ export default defineComponent({
       required: true
     }
   },
-  computed: {
-    url (): string {
-      return this.$platform.getMetadata(this.icon as Metadata<string>) ??
-        this.$platform.getMetadata(ui.icon.Search) ?? 'https://salesforce.com'
-    }
+  setup (props) {
+    const platform = inject(PlatformInjectionKey) as Platform
+    console.log(props.icon)
+    const url = props.icon ??
+      platform.getMetadata(ui.icon.Default) ?? 'https://pltfo.com'
+    return { url }
   }
 })
 </script>

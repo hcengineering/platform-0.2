@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { plugin, Plugin, Service, Resource, Property } from '@anticrm/platform'
+import { plugin, Plugin, Service, Resource, Property, Metadata } from '@anticrm/platform'
 
 // P R O P E R T I E S
 
@@ -104,12 +104,14 @@ export interface DocDb {
   add (doc: Doc): void
   get<T extends Doc> (id: Ref<T>): T
   dump (): Doc[]
+
+  mixin<T extends E, E extends Doc> (id: Ref<E>, clazz: Ref<Class<T>>, values: Pick<T, Exclude<keyof T, keyof E>>): void
+  createDocument<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Doc>, _id?: Ref<M>): M
 }
 
 export interface CoreService extends Service {
-  // instantiateEmb<T extends Emb> (obj: T): Instance<T>
-  // instantiateDoc<T extends Doc> (obj: T): Instance<T>
-  // instantiate<T extends Obj> (obj: T): Instance<T>
+  // newInstance<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Obj>, _id?: Ref<M>): Instance<M>
+
   getInstance<T extends Doc> (id: Ref<T>): Promise<Instance<T>>
   as<T extends Doc, A extends Doc> (obj: Instance<T>, _class: Ref<Class<A>>): Instance<A>
   is<T extends Doc, A extends Doc> (obj: Instance<T>, _class: Ref<Class<A>>): boolean
@@ -133,6 +135,7 @@ export default plugin('core' as Plugin<CoreService>, {}, {
     Type_exert: '' as Resource<(this: Instance<Type<any>>) => Exert>,
     BagOf_exert: '' as Resource<(this: Instance<BagOf<any>>) => Exert>,
     InstanceOf_exert: '' as Resource<(this: Instance<InstanceOf<Emb>>) => Exert>,
+    Metadata_exert: '' as Resource<(this: Instance<Type<Metadata<any>>>) => Exert>,
   },
   native: {
     ResourceType: '' as Resource<Object>
