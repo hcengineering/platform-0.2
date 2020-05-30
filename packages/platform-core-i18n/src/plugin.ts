@@ -69,17 +69,19 @@ export default async (platform: Platform): Promise<I18nService> => {
 
   const IntlString_exert = function (this: Instance<Type<Doc>>): Exert { // eslint-disable-line
     return ((value: IntlString, layout: any, key: string) => {
-      console.log('exert : ' + value)
-      console.log(layout)
+      // console.log('exert : ' + value)
+      // console.log(layout)
       const translation = translate(value)
-      console.log('translation: ' + translation)
+      // console.log('translation: ' + translation)
       if (translation !== value) {
         return translation
       } else {
-        const id = synthIntlString(layout._id as Ref<Doc>, key)
-        console.log('key: ' + key + ' synth: ' + id)
-        const translation = translate(id)
-        if (translation !== id) { return translation }
+        if (layout._id) {
+          const id = synthIntlString(layout._id as Ref<Doc>, key)
+          // console.log('key: ' + key + ' synth: ' + id)
+          const translation = translate(id)
+          if (translation !== id) { return translation }
+        }
         return value
       }
     }) as Exert

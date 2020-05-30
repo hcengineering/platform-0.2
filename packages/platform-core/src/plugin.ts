@@ -157,9 +157,9 @@ export default async (platform: Platform): Promise<CoreService> => {
   }
 
   function as<T extends Doc, A extends Doc> (doc: Instance<T>, _class: Ref<Class<A>>): Instance<A> {
-    console.log('as: ' + _class)
-    console.log(doc)
-    if (!is(doc, _class)) { throw new Error(_class + ' instance does not mixed in') }
+    if (!is(doc, _class)) {
+      throw new Error(_class + ' instance does not mixed in')
+    }
     const ctor = getKonstructor(_class, Stereotype.DOC)
     return new ctor(doc.__layout as unknown as A)
   }
@@ -195,7 +195,7 @@ export default async (platform: Platform): Promise<CoreService> => {
   }
 
   const InstanceOf_exert = function (this: Instance<InstanceOf<Emb>>): Exert {
-    return ((value: Emb) => instantiateEmb(value)) as Exert
+    return ((value: Emb) => value ? instantiateEmb(value) : undefined) as Exert
   }
 
   const TResourceType = {

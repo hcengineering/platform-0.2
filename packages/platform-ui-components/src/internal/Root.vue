@@ -16,7 +16,8 @@
 <script lang="ts">
 import { Platform } from '@anticrm/platform'
 import { defineComponent, computed, reactive, onMounted, onUnmounted, inject, ref } from 'vue'
-import ui, { PlatformInjectionKey, UIState, AnyComponent } from '..'
+import ui from '@anticrm/platform-ui'
+import { PlatformInjectionKey } from '..'
 
 export default defineComponent({
   components: {},

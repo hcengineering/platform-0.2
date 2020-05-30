@@ -20,13 +20,15 @@ import { verifyTranslation, modelTranslation } from '../__model__/utils'
 import core from '@anticrm/platform-core/src/__model__'
 import i18n from '../__model__'
 
-import { Ref, Class, Obj, Doc } from '@anticrm/platform-core'
+import { Ref, Class, Obj, Doc, StringType } from '@anticrm/platform-core'
 
 import metaModel, { Builder } from '@anticrm/platform-core/src/__model__/model'
 import i18nModel from '../__model__/model'
 
 interface Person extends Doc {
   name?: IntlString
+  first: StringType
+  last?: StringType
 }
 
 interface PersonWithOrg extends Person {
@@ -103,7 +105,7 @@ describe('i18n', () => {
     expect(translations['string:test.Vasya/org']).toBe('Organization')
   })
 
-  // I N T L S T I N G  T Y P E
+  // L O C A L  S T R I N G  T Y P E
 
   it('should ...', async () => {
     const coreService = await platform.getPlugin(core.id)
@@ -125,11 +127,14 @@ describe('i18n', () => {
     }
 
     const personClass = S.createClass<Person, Doc>(test.class.Person, core.class.Doc, {
-      name: S.newInstance(i18n.class.IntlString, {})
+      name: S.newInstance(i18n.class.IntlString, {}),
+      first: S.newInstance(core.class.Type, {}),
+      last: S.newInstance(core.class.Type, {}),
     })
 
     const person = S.createDocument(test.class.Person, {
-      name: test.string.Vasya
+      name: test.string.Vasya,
+      first: 'first' as StringType
     }, 'vasya' as Ref<Person>)
 
     const instance = await coreService.getInstance('vasya' as Ref<Person>)
@@ -148,7 +153,7 @@ describe('i18n', () => {
     console.log(translations)
     i18nService.loadStrings(translations)
 
-    const petya = S.createDocument(test.class.Person, {}, 'test.Petya' as Ref<Person>)
+    const petya = S.createDocument(test.class.Person, { first: 'first' as StringType }, 'test.Petya' as Ref<Person>)
     const petyaInstance = await coreService.getInstance('test.Petya' as Ref<Person>)
     expect(petyaInstance.name).toBe('Петя')
   })

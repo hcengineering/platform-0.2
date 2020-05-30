@@ -42,7 +42,10 @@ export default async (S: Builder) => {
   S.mixin(contact.class.Phone, ui.class.ClassUIDecorator as Ref<Class<ClassUIDecorator<Type<any>>>>, { icon: contact.icon.Phone })
 
   S.mixin(contact.class.Contact, ui.class.ClassUIDecorator as Ref<Class<ClassUIDecorator<Contact>>>, {
-    decorators: { phone: S.newInstance(ui.class.TypeUIDecorator, { placeholder: '+7 913 333 5555' as any }) }
+    decorators: {
+      email: S.newInstance(ui.class.TypeUIDecorator, {}),
+      phone: S.newInstance(ui.class.TypeUIDecorator, { placeholder: '+7 913 333 5555' as any })
+    }
   })
 
   S.mixin(contact.class.Person, ui.class.Form as Ref<Class<Form<Person>>>, {
