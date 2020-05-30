@@ -18,14 +18,16 @@
 yarn workspace @anticrm/platform run test && \
 yarn workspace @anticrm/platform-core run test && \
 yarn workspace @anticrm/platform-core-i18n run test && \
+yarn workspace @anticrm/platform-ui run test && \
 
 # L I N T  P A C K A G E S
 yarn workspace @anticrm/platform run lint $1 && \
 yarn workspace @anticrm/platform-core run lint $1 && \
-yarn workspace @anticrm/platform-core-i18n run lint $1
+yarn workspace @anticrm/platform-core-i18n run lint $1 && \
+yarn workspace @anticrm/platform-ui run lint $1 && \
 
 # B U I L D  D E M O  A P P L I C A T I O N
-yarn workspace launch build
+yarn workspace launch build && \
 
 # B U I L D  P A C K A G E S
 yarn workspace @anticrm/platform run build

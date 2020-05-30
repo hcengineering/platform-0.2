@@ -1,22 +1,23 @@
 //
 // Copyright © 2020 Anticrm Platform Contributors.
-// 
+//
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
 // obtain a copy of the License at https://www.eclipse.org/legal/epl-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// 
+//
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
 
+/* eslint-env jest */
 import { Platform, plugin, Plugin, Service } from '@anticrm/platform'
 import { Ref, Class, Doc, StringType, Type } from '@anticrm/platform-core'
 import { ClassUIDecorator, Asset } from '..'
-import i18n, { IntlString, I18nService } from '@anticrm/platform-core-i18n'
+import i18n, { IntlString } from '@anticrm/platform-core-i18n'
 import { verifyTranslation, modelTranslation } from '@anticrm/platform-core-i18n/src/__model__/utils'
 
 import core from '@anticrm/platform-core/src/__model__'
@@ -29,7 +30,6 @@ import i18nModel from '@anticrm/platform-core-i18n/src/__model__/model'
 import uiModel from '@anticrm/platform-ui/src/__model__/model'
 
 describe('session', () => {
-
   const platform = new Platform()
   platform.addLocation(i18n, () => import('@anticrm/platform-core-i18n/src/plugin'))
   platform.addLocation(core, () => import('@anticrm/platform-core/src/plugin'))
@@ -48,7 +48,7 @@ describe('session', () => {
     {
       icon: {
         Email: '' as Asset,
-        Phone: '' as Asset,
+        Phone: '' as Asset
       },
       class: {
         Email: '' as Ref<Class<Type<string>>>,
@@ -56,7 +56,7 @@ describe('session', () => {
         Twitter: '' as Ref<Class<Type<string>>>,
         LinkedIn: '' as Ref<Class<Type<string>>>,
 
-        Contact: '' as Ref<Class<Contact>>,
+        Contact: '' as Ref<Class<Contact>>
       },
       string: {
         PhoneClassLabel: '' as IntlString,
@@ -66,7 +66,7 @@ describe('session', () => {
 
   it('should load models', async () => {
     const coreServices = await platform.getPlugin(core.id)
-    const i18nService = await platform.getPlugin(i18n.id) // TODO: dirty hack, resources does not resolve awhen building prototypes.
+    await platform.getPlugin(i18n.id) // TODO: dirty hack, resources does not resolve awhen building prototypes.
 
     const S = new Builder(coreServices.getDb())
     S.load(coreModel)
@@ -81,7 +81,7 @@ describe('session', () => {
       email: S.newInstance(contact.class.Email, {}),
       phone: S.newInstance(contact.class.Phone, {}),
       phone2: S.newInstance(contact.class.Phone, {}),
-      twitter: S.newInstance(contact.class.Twitter, {}),
+      twitter: S.newInstance(contact.class.Twitter, {})
     })
 
     S.mixin(contact.class.Email, ui.class.ClassUIDecorator as Ref<Class<ClassUIDecorator<Type<any>>>>, { icon: contact.icon.Email })
@@ -93,7 +93,7 @@ describe('session', () => {
         email: S.newInstance(ui.class.TypeUIDecorator, {}),
         phone: S.newInstance(ui.class.TypeUIDecorator, { label: contact.string.Phone_Label, placeholder: '+7 913 333 5555' as any }),
         phone2: S.newInstance(ui.class.TypeUIDecorator, { placeholder: '+1 555 333 5555' as any }),
-        twitter: S.newInstance(ui.class.TypeUIDecorator, {}),
+        twitter: S.newInstance(ui.class.TypeUIDecorator, {})
       }
     })
 
@@ -102,7 +102,7 @@ describe('session', () => {
   })
 
   it('should build ClassUIModel', async () => {
-    const coreServices = await platform.getPlugin(core.id)
+    await platform.getPlugin(core.id)
     const uiPlugin = await platform.getPlugin(ui.id)
     const classModel = await uiPlugin.getClassModel(contact.class.Contact)
     console.log(classModel)
