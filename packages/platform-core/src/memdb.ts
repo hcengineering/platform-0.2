@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import core, { DocDb, Ref, Doc, Class, Obj, PropertyType } from '.'
+import { DocDb, Ref, Doc, Class, Obj, PropertyType } from '.'
 import { generateId } from './objectid'
 import { attributeKey } from './plugin'
 
@@ -93,10 +93,10 @@ export class MemDb implements DocDb {
     return result
   }
 
-  // loadModel (model: Doc[]) {
-  //   for (const doc of model) {
-  //     this.add(doc)
-  //   }
-  // }
+  loadModel (model: Doc[]) {
+    for (const doc of model) {
+      this.add(doc)
+    }
+  }
 
 }

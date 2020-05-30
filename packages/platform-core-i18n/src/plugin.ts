@@ -45,6 +45,12 @@ export default async (platform: Platform): Promise<I18nService> => {
   const strings: Map<IntlString, string> = new Map()
   const imfCache: Map<IntlString, IntlMessageFormat> = new Map()
 
+  function loadStrings (translations: { [key: string]: string }) {
+    for (const key in translations) {
+      strings.set(key as IntlString, translations[key])
+    }
+  }
+
   function translate (string: IntlString, params?: Record<string, PrimitiveType> | undefined): string {
     const translation = strings.get(string)
     if (!translation) {
@@ -61,24 +67,14 @@ export default async (platform: Platform): Promise<I18nService> => {
     return translation
   }
 
-  function loadStrings (translations: { [key: string]: string }) {
-    for (const key in translations) {
-      strings.set(key as IntlString, translations[key])
-    }
-  }
-
   const IntlString_exert = function (this: Instance<Type<Doc>>): Exert { // eslint-disable-line
     return ((value: IntlString, layout: any, key: string) => {
-      // console.log('exert : ' + value)
-      // console.log(layout)
       const translation = translate(value)
-      // console.log('translation: ' + translation)
       if (translation !== value) {
         return translation
       } else {
         if (layout._id) {
           const id = synthIntlString(layout._id as Ref<Doc>, key)
-          // console.log('key: ' + key + ' synth: ' + id)
           const translation = translate(id)
           if (translation !== id) { return translation }
         }
@@ -86,6 +82,9 @@ export default async (platform: Platform): Promise<I18nService> => {
       }
     }) as Exert
   }
+
+  const boot = platform.getMetadata(i18n.metadata.BootStrings)
+  if (boot) { loadStrings(boot) }
 
   platform.setResource(i18n.method.IntlString_exert, IntlString_exert)
 

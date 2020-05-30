@@ -119,6 +119,9 @@ export interface CoreService extends Service {
 // P L U G I N
 
 export default plugin('core' as Plugin<CoreService>, {}, {
+  metadata: {
+    MetaModel: '' as Metadata<Doc[]>
+  },
   class: {
     Class: '' as Ref<Class<Class<Obj>>>,
     ResourceType: '' as Ref<Class<ResourceType<any>>>,

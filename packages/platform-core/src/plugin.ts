@@ -56,6 +56,12 @@ export default async (platform: Platform): Promise<CoreService> => {
   // D A T A
 
   const modelDb = new MemDb()
+  const metaModel = platform.getMetadata(core.metadata.MetaModel)
+  if (metaModel) {
+    modelDb.loadModel(metaModel)
+  } else {
+    console.log('Warning: no metamodel provided.')
+  }
 
   // C O R E  S E R V I C E
 

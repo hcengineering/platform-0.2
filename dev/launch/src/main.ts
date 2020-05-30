@@ -29,6 +29,7 @@ import ErrorPage from './components/ErrorPage.vue'
 
 // import uiMeta from '@anticrm/platform-ui-model/src/__resources__/meta'
 import contactMeta from '@anticrm/contact/src/__model__/meta'
+import contactRu from '@anticrm/contact/src/__model__/strings/ru'
 
 import Builder from '@anticrm/platform-core/src/__model__/builder'
 
@@ -37,9 +38,15 @@ import i18nModel from '@anticrm/platform-core-i18n/src/__model__/model'
 import uiModel from '@anticrm/platform-ui/src/__model__/model'
 import contactModel from '@anticrm/contact/src/__model__/model'
 
-import contactRu from '@anticrm/contact/src/__model__/strings/ru'
+const builder = new Builder()
+builder.load(coreModel)
+builder.load(i18nModel)
+builder.load(uiModel)
+builder.load(contactModel)
 
 const platform = new Platform()
+platform.setMetadata(core.metadata.MetaModel, builder.dump())
+platform.setMetadata(i18n.metadata.BootStrings, contactRu)
 platform.setMetadata(ui.metadata.DefaultApplication, mc.component.MissionControl)
 platform.setMetadata(mc.metadata.Applications, [
   workbench.component.Workbench,
@@ -59,15 +66,7 @@ platform.addLocation(mc, () => import(/* webpackChunkName: "mission-control" */ 
 contactMeta(platform)
 
 async function boot (): Promise<void> {
-  const corePlugin = await platform.getPlugin(core.id)
   const i18nService = await platform.getPlugin(i18n.id) // TODO: dirty hack, resources does not resolve awhen building prototypes.
-  i18nService.loadStrings(contactRu)
-  const builder = new Builder(corePlugin.getDb())
-  builder.load(coreModel)
-  builder.load(i18nModel)
-  builder.load(uiModel)
-  builder.load(contactModel)
-
   const uiComponentsService = await platform.getPlugin(uiComponents.id)
   uiComponentsService.getApp().mount('#app')
 }
