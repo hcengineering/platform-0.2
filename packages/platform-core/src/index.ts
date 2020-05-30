@@ -104,12 +104,13 @@ export interface DocDb {
   add (doc: Doc): void
   get<T extends Doc> (id: Ref<T>): T
   dump (): Doc[]
+
+  createDocument<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Doc>, _id?: Ref<M>): M
 }
 
 export interface CoreService extends Service {
-  // instantiateEmb<T extends Emb> (obj: T): Instance<T>
-  // instantiateDoc<T extends Doc> (obj: T): Instance<T>
-  // instantiate<T extends Obj> (obj: T): Instance<T>
+  // newInstance<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Obj>, _id?: Ref<M>): Instance<M>
+
   getInstance<T extends Doc> (id: Ref<T>): Promise<Instance<T>>
   as<T extends Doc, A extends Doc> (obj: Instance<T>, _class: Ref<Class<A>>): Instance<A>
   is<T extends Doc, A extends Doc> (obj: Instance<T>, _class: Ref<Class<A>>): boolean

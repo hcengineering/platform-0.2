@@ -29,8 +29,6 @@ class Builder {
 
   dump (): Doc[] { return this.memdb.dump() }
 
-  /// A S S I G N
-
   private findAttributeKey<T extends Doc> (cls: Ref<Class<T>>, key: string): string {
     // TODO: use memdb class hierarchy
     let _class = cls as Ref<Class<Obj>> | undefined

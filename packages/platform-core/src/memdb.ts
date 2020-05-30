@@ -13,7 +13,11 @@
 // limitations under the License.
 //
 
-import { DocDb, Ref, Doc, Class, Obj } from '.'
+import core, { DocDb, Ref, Doc, Class, Obj, PropertyType } from '.'
+import { generateId } from './objectid'
+import { attributeKey } from './plugin'
+
+type Layout = { [key: string]: PropertyType }
 
 export class MemDb implements DocDb {
 
@@ -29,6 +33,40 @@ export class MemDb implements DocDb {
     const obj = this.objects.get(id)
     if (!obj) { throw new Error('document not found ' + id) }
     return obj as T
+  }
+
+  /// A S S I G N
+
+  private findAttributeKey<T extends Doc> (cls: Ref<Class<T>>, key: string): string {
+    // TODO: use memdb class hierarchy
+    let _class = cls as Ref<Class<Obj>> | undefined
+    while (_class) {
+      const clazz = this.get(_class)
+      if ((clazz._attributes as any)[key] !== undefined) {
+        return attributeKey(_class, key)
+      }
+      _class = clazz._extends
+    }
+    throw new Error('attribute not found: ' + key)
+  }
+
+  // from Builder
+  assign<T extends Doc> (layout: Layout, _class: Ref<Class<T>>, val: Omit<T, keyof Doc>) {
+    const values = val as unknown as Layout
+    for (const key in values) {
+      if (key.startsWith('_')) {
+        layout[key] = values[key]
+      } else {
+        layout[this.findAttributeKey(_class, key)] = values[key]
+      }
+    }
+  }
+
+  createDocument<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Doc>, _id?: Ref<M>): M {
+    const layout = { _class, _id: _id ?? generateId() as Ref<Doc> } as Doc
+    this.assign(layout as unknown as Layout, _class, values)
+    this.add(layout)
+    return layout as M
   }
 
   getClassHierarchy (cls: Ref<Class<Obj>>): Ref<Class<Obj>>[] {
