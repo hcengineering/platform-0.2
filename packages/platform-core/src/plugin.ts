@@ -27,7 +27,6 @@ export function attributeKey (_class: Ref<Class<Obj>>, key: string): string {
   return _class.substring(index + 1) + '/' + key
 }
 
-console.log('PLUGIN: parsed core')
 /*!
  * Anticrm Platform™ Core Plugin
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.

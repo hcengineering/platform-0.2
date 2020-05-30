@@ -20,11 +20,17 @@ import i18nModel from '@anticrm/platform-core-i18n/src/__model__/model'
 import uiModel from '@anticrm/platform-ui/src/__model__/model'
 import contactModel from '@anticrm/contact/src/__model__/model'
 
+import contactRu from '@anticrm/contact/src/__model__/strings/ru'
+
 const builder = new Builder()
 builder.load(coreModel)
 builder.load(i18nModel)
 builder.load(uiModel)
 builder.load(contactModel)
 
+console.log('model:')
 const model = builder.dump()
 console.log(JSON.stringify(model))
+
+console.log('strings:')
+console.log(JSON.stringify(contactRu))
