@@ -42,7 +42,9 @@ export default defineComponent({
     <div>
       <InlineEdit class="caption-2" v-model="content.lastName" placeholder="Имя Отчество" />
     </div>
-    <ObjectPanel :content="content" style="margin-top: 2em" />
+    <Suspense>
+      <ObjectPanel :content="content" style="margin-top: 2em" />
+    </Suspense>
   </div>
 </template>
 

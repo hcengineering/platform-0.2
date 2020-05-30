@@ -64,6 +64,7 @@ export interface AttrModel extends UIModel {
 export interface UIService extends Service {
   getClassModel (_class: Ref<Class<Obj>>): Promise<UIModel>
   getOwnAttrModel (_class: Ref<Class<Obj>>, props?: string[]): Promise<AttrModel[]>
+  groupByType (model: AttrModel[]): { [key: string]: AttrModel[] }
 }
 
 export default plugin('ui' as Plugin<UIService>, { core: core.id }, {

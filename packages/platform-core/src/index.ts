@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { plugin, Plugin, Service, Resource, Property } from '@anticrm/platform'
+import { plugin, Plugin, Service, Resource, Property, Metadata } from '@anticrm/platform'
 
 // P R O P E R T I E S
 
@@ -135,6 +135,7 @@ export default plugin('core' as Plugin<CoreService>, {}, {
     Type_exert: '' as Resource<(this: Instance<Type<any>>) => Exert>,
     BagOf_exert: '' as Resource<(this: Instance<BagOf<any>>) => Exert>,
     InstanceOf_exert: '' as Resource<(this: Instance<InstanceOf<Emb>>) => Exert>,
+    Metadata_exert: '' as Resource<(this: Instance<Type<Metadata<any>>>) => Exert>,
   },
   native: {
     ResourceType: '' as Resource<Object>

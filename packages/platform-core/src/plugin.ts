@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Platform, Resource } from '@anticrm/platform'
+import { Platform, Resource, Metadata } from '@anticrm/platform'
 import core, {
   CoreService, Obj, Ref, Class, Doc, BagOf, InstanceOf, PropertyType,
   Instance, Type, Emb, ResourceType, Exert
@@ -158,7 +158,7 @@ export default async (platform: Platform): Promise<CoreService> => {
 
   function as<T extends Doc, A extends Doc> (doc: Instance<T>, _class: Ref<Class<A>>): Instance<A> {
     if (!is(doc, _class)) {
-      throw new Error(_class + ' instance does not mixed in')
+      console.log('Warning:' + _class + ' instance does not mixed into `' + doc._class + '`')
     }
     const ctor = getKonstructor(_class, Stereotype.DOC)
     return new ctor(doc.__layout as unknown as A)
@@ -190,8 +190,12 @@ export default async (platform: Platform): Promise<CoreService> => {
     return value => value
   }
 
+  const Metadata_exert = function (this: Instance<Type<any>>): Exert {
+    return ((value: Metadata<any>) => value ? platform.getMetadata(value) : undefined) as Exert
+  }
+
   const BagOf_exert = function (this: Instance<BagOf<any>>): Exert {
-    return (value: PropertyType) => new Proxy(value, new BagProxyHandler(this.of))
+    return (value: PropertyType) => value ? new Proxy(value, new BagProxyHandler(this.of)) : undefined
   }
 
   const InstanceOf_exert = function (this: Instance<InstanceOf<Emb>>): Exert {
@@ -214,6 +218,7 @@ export default async (platform: Platform): Promise<CoreService> => {
   platform.setResource(core.method.Type_exert, Type_exert)
   platform.setResource(core.method.BagOf_exert, BagOf_exert)
   platform.setResource(core.method.InstanceOf_exert, InstanceOf_exert)
+  platform.setResource(core.method.Metadata_exert, Metadata_exert)
 
   return coreService
 }

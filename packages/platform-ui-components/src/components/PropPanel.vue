@@ -15,38 +15,34 @@
 
 <script lang="ts">
 
-import Vue, { PropType } from 'vue'
+import { PropType, defineComponent, inject, ref } from 'vue'
 import { Platform } from '@anticrm/platform'
 
-import { Obj, Class, Ref } from '@anticrm/platform-core'
+import { Obj, Class, Ref, CoreService } from '@anticrm/platform-core'
 
-import ui, { UIPlugin, AttrModel } from '@anticrm/platform-ui-model'
-import InlineEdit from '@anticrm/platform-ui-controls/src/InlineEdit.vue'
+import ui, { UIService, AttrModel } from '@anticrm/platform-ui'
+import { UIServiceInjectionKey } from '@anticrm/platform-ui-components'
+
+import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.vue'
 import Icon from './Icon.vue'
 
-export default Vue.extend({
+export default defineComponent({
   components: { InlineEdit, Icon },
   props: {
-    object: Promise as PropType<Promise<Obj>>,
+    content: Object as PropType<Promise<Obj>>,
     clazz: String as unknown as PropType<Ref<Class<Obj>>>,
     filter: Array as PropType<string[]>
   },
-  data () {
-    return {
-      model: [],
-      classModel: { label: this.clazz },
-      content: {}
+  async setup (props) {
+    const uiService = inject(UIServiceInjectionKey) as UIService
+    try {
+      const classModel = await uiService.getClassModel(props.clazz)
+      const attrModel = await uiService.getOwnAttrModel(props.clazz)
+      const grouped = uiService.groupByType(attrModel)
+      return { classModel, grouped }
+    } catch (err) {
+      console.log(err)
     }
-  },
-  created () {
-    this.$platform.getPlugin(ui.id).then(plugin => {
-      plugin.getOwnAttrModel(this.clazz, this.filter)
-        .then(result => this.model = plugin.groupByType(result))
-    })
-    this.object.then(res => this.content = res)
-    this.$platform.getPlugin(ui.id).then(plugin => {
-      plugin.getClassModel(this.clazz).then(model => this.classModel = model)
-    })
   }
 })
 </script>
@@ -54,7 +50,8 @@ export default Vue.extend({
 <template>
   <div>
     <div class="caption-4" style="margin-bottom: 1em">{{ classModel.label }}</div>
-    <div v-for="(attrs, type) in model" :key="type" class="container">
+
+    <div v-for="(attrs, type) in grouped" :key="type" class="container">
       <div style="margin-right: 0.5em">
         <Icon :icon="attrs[0].icon" class="icon-embed-2x" />
       </div>
@@ -67,7 +64,6 @@ export default Vue.extend({
     </div>
   </div>
 </template>
-
 
 <style scoped lang="scss">
 @import "~@anticrm/sparkling-theme/css/_variables.scss";

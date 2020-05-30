@@ -33,7 +33,7 @@ export default async (platform: Platform, deps: { core: CoreService }): Promise<
 
   async function getClassModel (_class: Ref<Class<Obj>>): Promise<UIModel> {
     const clazz = await coreService.getInstance(_class)
-    const decorator = await coreService.as(clazz, ui.class.ClassUIDecorator)
+    const decorator = coreService.as(clazz, ui.class.ClassUIDecorator)
     const label = await decorator.label ?? _class
     return {
       label,
@@ -75,8 +75,6 @@ export default async (platform: Platform, deps: { core: CoreService }): Promise<
 
       const typeClass = await coreService.getInstance(type._class)
       const typeClassDecorator = coreService.as(typeClass, ui.class.ClassUIDecorator)
-      console.log('key ' + key + ' class deco:')
-      console.log(typeClassDecorator)
 
       const label = await typeDecorator?.label ?? await typeClassDecorator?.label ?? key
       const placeholder = await typeDecorator?.placeholder ?? label
@@ -104,6 +102,7 @@ export default async (platform: Platform, deps: { core: CoreService }): Promise<
   return {
     getClassModel,
     getOwnAttrModel,
+    groupByType,
   }
 
 

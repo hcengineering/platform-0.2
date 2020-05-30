@@ -35,7 +35,7 @@ export default modelTranslation(contact.class, ui.class.ClassUIDecorator, {
     // placeholder: 'Новосибирск, Красный проспект, 15',
   },
   Contact: {
-    // label: 'Контактная информация',
+    label: 'Контактная информация',
     // phoneWork: 'Рабочий',
     // addressDelivery: 'Адрес доставки'
   },
