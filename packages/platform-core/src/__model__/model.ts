@@ -15,7 +15,7 @@
 
 import core from '.'
 import {
-  Obj, Doc, Class, InstanceOf, ResourceType, Type, Emb, Ref, RefTo
+  Obj, Doc, Class, InstanceOf, Type, Emb, Ref, RefTo
 } from '..'
 import Builder from './builder'
 export { Builder }
@@ -89,6 +89,6 @@ export default (S: Builder) => {
     })
   })
 
-  S.createClass<ResourceType<any>, Type<any>>(core.class.ResourceType, core.class.Type, {})
-  S.patch(core.class.ResourceType, (clazz) => { clazz._native = core.native.ResourceType })
+  S.createClass(core.class.ResourceType, core.class.Type, {})
+  S.patch(core.class.ResourceType, (clazz: Class<Obj>) => { clazz._native = core.native.ResourceType })
 }

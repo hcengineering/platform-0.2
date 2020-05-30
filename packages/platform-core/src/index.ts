@@ -17,7 +17,7 @@ import { plugin, Plugin, Service, Resource, Property, Metadata } from '@anticrm/
 
 // P R O P E R T I E S
 
-export type Ref<T> = string & { __ref: T }
+export type Ref<T extends Doc> = string & { __ref: T }
 export type PropertyType = Property<any>
   | Emb
   | undefined
@@ -90,13 +90,6 @@ export type Instance<T> = { [P in keyof T]:
   __layout: T
   getSession (): CoreService
 }
-
-const x = {} as Instance<BagOf<Obj>>
-x.of
-
-const y = {} as Instance<Class<Obj>>
-y._attributes
-
 
 // S E S S I O N
 
