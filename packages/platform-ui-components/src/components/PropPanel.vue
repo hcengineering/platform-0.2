@@ -50,7 +50,7 @@ export default defineComponent({
 
 <template>
   <div>
-    <div class="caption-4" style="margin-bottom: 1em">{{ classModel.label }}</div>
+    <div class="caption-4" style="margin-bottom: 1em; font-weight: 400">{{ classModel.label }}</div>
 
     <div v-for="(attrs, type) in grouped" :key="type" class="container">
       <div style="margin-right: 0.5em">
@@ -58,8 +58,8 @@ export default defineComponent({
       </div>
       <div style="margin-right: 1em; margin-bottom: 1em">
         <div v-for="prop in attrs" :key="prop.key">
-          <div class="caption-4">{{ prop.label }}</div>
-          <InlineEdit v-model="content[prop.key]" :placeholder="prop.placeholder" />
+          <div class="caption-4" style="color: #808080">{{ prop.label }}</div>
+          <InlineEdit class="inline" v-model="content[prop.key]" :placeholder="prop.placeholder" />
         </div>
       </div>
     </div>
@@ -71,5 +71,10 @@ export default defineComponent({
 
 .container {
   display: inline-flex;
+}
+
+.inline {
+  font-family: Raleway;
+  font-size: 14px;
 }
 </style>

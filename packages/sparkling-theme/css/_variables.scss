@@ -23,10 +23,14 @@ $pictogram-size: 48px;
 
 $animate: all 250ms ease-in-out;
 
+$font-caption: "Raleway";
 // $font-caption: "Montserrat";
+// $font-caption: "Open Sans";
+// $font-caption: "IBM Plex Sans";
+
 // $font-content: "Open Sans";
 $font-content: "IBM Plex Sans";
-$font-caption: "IBM Plex Sans";
+
 $font-input: "IBM Plex Sans";
 
 // $font-input: "Manrope";
@@ -47,8 +51,10 @@ $border-default: 1px solid $workspace-separator-color;
 }
 
 @mixin caption-4 {
-  font-family: $font-caption;
+  // font-family: "Open Sans";
+  font-family: "IBM Plex Sans";
+  // font-family: "Raleway";
   font-size: 10px;
-  font-weight: 600;
+  font-weight: 400;
   text-transform: uppercase;
 }

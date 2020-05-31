@@ -1,8 +1,8 @@
 @import "./_variables.scss";
 
-// @import url("https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600,700&display=swap&subset=cyrillic");
-// @import url("https://fonts.googleapis.com/css?family=Open+Sans:300,400,500,600,700&display=swap&subset=cyrillic");
-// @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600,700&display=swap&subset=cyrillic");
+@import url("https://fonts.googleapis.com/css?family=Open+Sans:300,400,500,600,700&display=swap&subset=cyrillic");
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&display=swap');
 // @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap');
 // @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
 
@@ -19,11 +19,37 @@
 @font-face {
   font-family: 'IBM Plex Sans';
   font-style: normal;
+  font-weight: 500;
+  src: local('IBM Plex Sans Medium'),
+    local('IBMPlexSans-Medium'),
+    url('~@anticrm/sparkling-theme/fonts/complete/woff2/IBMPlexSans-Medium.woff2') format('woff2'),
+    url('~@anticrm/sparkling-theme/fonts/complete/woff/IBMPlexSans-Medium.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
   font-weight: 700;
   src: local('IBM Plex Sans Bold'),
     local('IBMPlexSans-Bold'),
     url('~@anticrm/sparkling-theme/fonts/complete/woff2/IBMPlexSans-Bold.woff2') format('woff2'),
     url('~@anticrm/sparkling-theme/fonts/complete/woff/IBMPlexSans-Bold.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Raleway';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Raleway'),
+    url('~@anticrm/sparkling-theme/fonts/complete/otf/Raleway-Regular.otf');
+}
+
+@font-face {
+  font-family: 'Raleway';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Raleway Bold'),
+    url('~@anticrm/sparkling-theme/fonts/complete/otf/Raleway-Bold.otf');
 }
 
 a {
@@ -59,7 +85,7 @@ a:hover {
 }
 
 .caption-1 {
-  font-family: "IBM Plex Sans";
+  font-family: $font-caption;
   // font-family: "Montserrat";
   // font-family: "Open Sans";
   font-size: 36px;
@@ -67,7 +93,7 @@ a:hover {
 }
 
 .caption-2 {
-  font-family: "IBM Plex Sans";
+  font-family: $font-caption;
   // font-family: "Montserrat";
   // font-family: "Open Sans";
   font-size: 24px;
@@ -75,7 +101,7 @@ a:hover {
 }
 
 .caption-3 {
-  font-family: "IBM Plex Sans";
+  font-family: $font-caption;
   // font-family: "Montserrat";
   // font-family: "Open Sans";
   font-size: 14px;
@@ -88,7 +114,7 @@ a:hover {
 }
 
 .caption-5 {
-  font-family: "IBM Plex Sans";
+  font-family: $font-caption;
   // font-family: "Montserrat";
   // font-family: "Open Sans";
   font-size: 11px;
