@@ -22,6 +22,10 @@ export default defineComponent({
     placeholder: {
       type: String,
       required: true
+    },
+    maxWidth: {
+      type: Number,
+      default: 300
     }
   },
   setup () {
@@ -32,7 +36,8 @@ export default defineComponent({
         if (!value || value.length == 0)
           value = this.placeholder
         div.innerHTML = value.replace(/ /g, '&nbsp;')
-        input.style.width = div.clientWidth + 'px'
+        const width = div.clientWidth > this.maxWidth ? this.maxWidth : div.clientWidth
+        input.style.width = width + 'px'
       },
       onInput (value: string) {
         this.computeSize(value)
@@ -41,22 +46,25 @@ export default defineComponent({
     }
   },
   mounted () {
-    this.computeSize(this.value)
-  }
+    const input = this.$refs['input'] as HTMLInputElement
+    input.addEventListener('focus', () => this.computeSize(input.value))
+  },
 })
 
 </script>
 
 <template>
   <div class="erp-inline-editbox">
-    <div ref="compute" class="compute-width"></div>
-    <input
-      ref="input"
-      type="text"
-      :value="value"
-      :placeholder="placeholder"
-      @input="onInput($event.target.value)"
-    />
+    <div class="control">
+      <div ref="compute" class="compute-width"></div>
+      <input
+        ref="input"
+        type="text"
+        :value="value"
+        :placeholder="placeholder"
+        @input="onInput($event.target.value)"
+      />
+    </div>
   </div>
 </template>
 
@@ -65,37 +73,33 @@ export default defineComponent({
 @import "~@anticrm/sparkling-theme/css/_components.scss";
 
 .erp-inline-editbox {
-  display: inline-flex;
-  box-sizing: border-box;
+  min-width: 12em;
+  .control {
+    display: inline-flex;
+    box-sizing: border-box;
 
-  border: 1px solid transparent;
-  border-radius: 2px;
+    border: 1px solid transparent;
+    border-radius: 2px;
 
-  // padding: 0px 0px;
+    &:focus-within {
+      border-color: $highlight-color;
+    }
 
-  &:focus-within {
-    border-color: $highlight-color;
-  }
+    .compute-width {
+      position: absolute;
+      white-space: nowrap;
+      visibility: hidden;
+    }
 
-  .compute-width {
-    position: absolute;
-    white-space: nowrap;
-    visibility: hidden;
-  }
+    input {
+      border: none;
+      color: inherit;
+      background-color: inherit;
+      font: inherit;
 
-  input {
-    // padding: 0; // Chrome
-    // margin: 0; // Safari :)
-    border: none;
-    color: inherit;
-    background-color: inherit;
-    font: inherit;
-    // font-family: $font-input;
-    // font-weight: 300;
-    // font-size: 14px;
-
-    &:focus {
-      outline: none;
+      &:focus {
+        outline: none;
+      }
     }
   }
 }
