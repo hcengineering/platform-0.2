@@ -54,15 +54,12 @@ export type StringType = Property<string> // TODO: Do we need this?
 
 // C L A S S E S
 
-type PrimitiveType<T> =
-  T extends Property<infer X> ? Type<X> :
-  T
-
 type PropertyTypes<T> = { [P in keyof T]:
+  T[P] extends Property<infer X> ? Type<X> :
   T[P] extends Ref<infer X> ? Type<X> :
   T[P] extends { [key: string]: infer X } | undefined ? BagOf<any> :
   T[P] extends (infer X)[] | undefined ? ArrayOf<any> :
-  PrimitiveType<T[P]>
+  T[P]
 }
 
 export type Attributes<T extends E, E extends Obj> = PropertyTypes<Required<Omit<T, keyof E>>>
@@ -108,7 +105,7 @@ export interface CoreService extends Service {
   getInstance<T extends Doc> (id: Ref<T>): Promise<Instance<T>>
   as<T extends Doc, A extends Doc> (obj: Instance<T>, _class: Ref<Class<A>>): Instance<A>
   is<T extends Doc, A extends Doc> (obj: Instance<T>, _class: Ref<Class<A>>): boolean
-  getClassHierarchy (_class: Ref<Class<Obj>>): Ref<Class<Obj>>[]
+  getClassHierarchy (_class: Ref<Class<Obj>>, top?: Ref<Class<Obj>>): Ref<Class<Obj>>[]
 
   getDb (): DocDb
 
@@ -123,6 +120,7 @@ export default plugin('core' as Plugin<CoreService>, {}, {
     MetaModel: '' as Metadata<Doc[]>
   },
   class: {
+    Doc: '' as Ref<Class<Doc>>,
     Class: '' as Ref<Class<Class<Obj>>>,
     ResourceType: '' as Ref<Class<ResourceType<any>>>,
     RefTo: '' as Ref<Class<RefTo<Doc>>>,

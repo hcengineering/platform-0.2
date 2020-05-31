@@ -14,7 +14,7 @@
 //
 
 import core, {
-  Obj, Ref, Class, Doc, Type, BagOf, ArrayOf, InstanceOf, Emb
+  Obj, Ref, Class, Type, BagOf, ArrayOf, InstanceOf, Emb
 } from '..'
 
 import { extendIds } from './utils'
@@ -23,7 +23,6 @@ export default extendIds(core, {
   class: {
     Obj: '' as Ref<Class<Obj>>,
     Emb: '' as Ref<Class<Emb>>,
-    Doc: '' as Ref<Class<Doc>>,
 
     Type: '' as Ref<Class<Type<any>>>,
     BagOf: '' as Ref<Class<BagOf<any>>>,

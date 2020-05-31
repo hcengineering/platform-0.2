@@ -26,10 +26,6 @@ export default modelTranslation(contact.class, ui.class.ClassUIDecorator, {
     label: 'Телефон',
     // placeholder: '+7 913 333 5555'
   },
-  Twitter: {
-    label: 'Twitter',
-    // placeholder: '@twitter',
-  },
   Address: {
     label: 'Адрес',
     // placeholder: 'Новосибирск, Красный проспект, 15',

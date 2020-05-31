@@ -58,12 +58,11 @@ export interface AttrModel extends UIModel {
   placeholder: string
 }
 
-
 /// P L U G I N
 
 export interface UIService extends Service {
   getClassModel (_class: Ref<Class<Obj>>): Promise<UIModel>
-  getOwnAttrModel (_class: Ref<Class<Obj>>, props?: string[]): Promise<AttrModel[]>
+  getOwnAttrModel (_class: Ref<Class<Obj>>, exclude?: string[] | string): Promise<AttrModel[]>
   groupByType (model: AttrModel[]): { [key: string]: AttrModel[] }
 }
 

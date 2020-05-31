@@ -21,20 +21,19 @@ import contact from '..'
 
 export default extendIds(contact, {
   class: {
+    Date: '' as Ref<Class<Type<Date>>>,
+
     Email: '' as Ref<Class<Type<string>>>,
     Phone: '' as Ref<Class<Type<string>>>,
-    Twitter: '' as Ref<Class<Type<string>>>,
     Address: '' as Ref<Class<Type<string>>>,
   },
   string: {
     Email: '' as IntlString,
     Phone: '' as IntlString,
-    Twitter: '' as IntlString,
     Address: '' as IntlString,
 
     Email_placeholder: '' as IntlString,
     Phone_placeholder: '' as IntlString,
-    Twitter_placeholder: '' as IntlString,
     Address_placeholder: '' as IntlString,
   }
 })

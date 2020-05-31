@@ -22,8 +22,7 @@ import ui, { PlatformInjectionKey } from '..'
 export default defineComponent({
   props: {
     icon: {
-      type: String,
-      required: true
+      type: String
     }
   },
   setup (props) {

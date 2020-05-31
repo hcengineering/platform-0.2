@@ -13,9 +13,11 @@
 // limitations under the License.
 //
 
-import { plugin, Plugin, Service } from '@anticrm/platform'
+import { Property, plugin, Plugin, Service } from '@anticrm/platform'
 import { Doc, Ref, Class, StringType } from '@anticrm/platform-core'
 import { Asset, ComponentRef, AnyComponent } from '@anticrm/platform-ui'
+
+export type DateType = number & Property<Date>
 
 export interface Contact extends Doc {
   email?: StringType
@@ -26,7 +28,7 @@ export interface Person extends Contact {
   firstName?: StringType
   lastName?: StringType
 
-  birthDate?: StringType
+  birthDate?: DateType
 }
 
 export default plugin(
@@ -34,9 +36,9 @@ export default plugin(
   {},
   {
     icon: {
+      Date: '' as Asset,
       Email: '' as Asset,
       Phone: '' as Asset,
-      Twitter: '' as Asset,
       Address: '' as Asset,
     },
     class: {

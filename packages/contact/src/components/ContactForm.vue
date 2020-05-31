@@ -17,7 +17,7 @@
 import { defineComponent, ref, reactive, inject, computed, PropType } from 'vue'
 import { Instance } from '@anticrm/platform-core'
 import { AnyComponent } from '@anticrm/platform-ui'
-import { Person, Contact } from '..'
+import { Person } from '..'
 
 import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.vue'
 import ObjectPanel from '@anticrm/platform-ui-components/src/components/ObjectPanel.vue'
@@ -43,7 +43,12 @@ export default defineComponent({
       <InlineEdit class="caption-2" v-model="content.lastName" placeholder="Имя Отчество" />
     </div>
     <Suspense>
-      <ObjectPanel :content="content" style="margin-top: 2em" />
+      <ObjectPanel
+        :content="content"
+        top="class:core.Doc"
+        exclude="firstName, lastName"
+        style="margin-top: 2em"
+      />
     </Suspense>
   </div>
 </template>

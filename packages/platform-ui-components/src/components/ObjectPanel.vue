@@ -23,23 +23,16 @@ import { PlatformInjectionKey, CoreServiceInjectionKey } from '..'
 
 import PropPanel from './PropPanel.vue'
 
-// async function getClassHierarchy (platform: Platform, object: Promise<Obj>): Promise<Ref<Class<Obj>>[]> {
-//   const corePlugin = await platform.getPlugin(core.id)
-//   const clazz = (await object)._class
-//   return corePlugin.getClassHierarchy(clazz)
-// }
-
 export default defineComponent({
   components: { PropPanel },
   props: {
     content: Object as PropType<Doc>,
-    filter: Array as PropType<string[] | undefined>,
+    top: String,
+    exclude: String
   },
   setup (props) {
     const coreService = inject(CoreServiceInjectionKey) as CoreService
-    const classes = coreService.getClassHierarchy(props.content._class).splice(0, 2)
-    console.log('classes: ' + classes.toString())
-    console.log(props.content)
+    const classes = coreService.getClassHierarchy(props.content._class, props.top as Ref<Class<Obj>>)
     return { classes }
   }
 })
@@ -50,7 +43,7 @@ export default defineComponent({
     <tr>
       <td valign="top" v-for="clazz in classes" :key="clazz">
         <Suspense>
-          <PropPanel :clazz="clazz" :content="content" />
+          <PropPanel :clazz="clazz" :content="content" :exclude="exclude" />
         </Suspense>
       </td>
     </tr>

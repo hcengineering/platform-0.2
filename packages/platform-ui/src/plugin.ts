@@ -15,7 +15,7 @@
 
 
 import { Platform } from '@anticrm/platform'
-import { CoreService, Ref, Class, Obj, Type, Instance } from '@anticrm/platform-core'
+import core, { CoreService, Ref, Class, Obj, Type, Instance } from '@anticrm/platform-core'
 import ui, { UIService, UIModel, AttrModel } from '.'
 
 console.log('Plugin `face` loaded')
@@ -63,10 +63,10 @@ export default async (platform: Platform, deps: { core: CoreService }): Promise<
    3. Property `Type`'s Class UI Decorator `label` attribute
    4. Property `Type`'s Class synthetic id
    */
-  async function getOwnAttrModel (_class: Ref<Class<Obj>>, props?: string[]): Promise<AttrModel[]> {
+  async function getOwnAttrModel (_class: Ref<Class<Obj>>, exclude?: string[] | string): Promise<AttrModel[]> {
     const clazz = await coreService.getInstance(_class)
     const decorator = coreService.as(clazz, ui.class.ClassUIDecorator)
-    const keys = props ?? Object.getOwnPropertyNames(clazz._attributes)
+    const keys = Object.getOwnPropertyNames(clazz._attributes).filter(key => !exclude?.includes(key))
 
     const attributes = clazz._attributes as { [key: string]: Instance<Type<any>> }
     const attrs = keys.map(async (key) => {
@@ -91,9 +91,9 @@ export default async (platform: Platform, deps: { core: CoreService }): Promise<
     return Promise.all(attrs)
   }
 
-  async function getAttrModel (_class: Ref<Class<Obj>>, props?: string[]): Promise<AttrModel[]> {
-    const hierarchy = coreService.getClassHierarchy(_class)
-    const ownModels = hierarchy.map(clazz => getOwnAttrModel(clazz, props))
+  async function getAttrModel (_class: Ref<Class<Obj>>, top?: Ref<Class<Obj>>, exclude?: string[] | string): Promise<AttrModel[]> {
+    const hierarchy = coreService.getClassHierarchy(_class, top)
+    const ownModels = hierarchy.map(clazz => getOwnAttrModel(clazz, exclude))
     return Promise.all(ownModels).then(result => result.flat())
   }
 

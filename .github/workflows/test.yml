@@ -25,3 +25,4 @@ jobs:
       run: |
         yarn workspace @anticrm/platform run build
         yarn workspace @anticrm/platform-core run build
+        yarn workspace @anticrm/dev-boot run build

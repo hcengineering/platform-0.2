@@ -62,11 +62,19 @@ export default async (platform: Platform): Promise<CoreService> => {
     console.log('Warning: no metamodel provided.')
   }
 
+  function getClassHierarchy (cls: Ref<Class<Obj>>, top?: Ref<Class<Obj>>) {
+    const hierarchy = modelDb.getClassHierarchy(cls)
+    console.log('TOP: ' + top)
+    const result = top ? hierarchy.slice(0, hierarchy.indexOf(top)) : hierarchy
+    console.log(result)
+    return result
+  }
+
   // C O R E  S E R V I C E
 
   const coreService: CoreService = {
     getDb () { return modelDb },
-    getClassHierarchy (cls: Ref<Class<Obj>>) { return modelDb.getClassHierarchy(cls) },
+    getClassHierarchy,
 
     getPrototype,
     getInstance,

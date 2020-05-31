@@ -31,13 +31,14 @@ export default defineComponent({
   props: {
     content: Object as PropType<Promise<Obj>>,
     clazz: String as unknown as PropType<Ref<Class<Obj>>>,
-    filter: Array as PropType<string[]>
+    exclude: String
   },
   async setup (props) {
     const uiService = inject(UIServiceInjectionKey) as UIService
     try {
       const classModel = await uiService.getClassModel(props.clazz)
-      const attrModel = await uiService.getOwnAttrModel(props.clazz)
+      console.log(props.exclude)
+      const attrModel = await uiService.getOwnAttrModel(props.clazz, props.exclude)
       const grouped = uiService.groupByType(attrModel)
       return { classModel, grouped }
     } catch (err) {
