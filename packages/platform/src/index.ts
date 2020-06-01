@@ -14,29 +14,49 @@
 //
 
 /**
- * Platform Resource Identifier (PRI).
+ * `Plugin` and `Resource` are core Platform concepts. 
+ * Any Platform application is nothing but a set of installed plugins. 
+ * At the very core Platform is a simple piece of code, 
+ * which connect `Plugin`s together, and bring `Resource`s to life.
+ * 
+ * # Platform Metadata Identifier (PMI)
+ * 
+ * 'Metadata' is simply any JavaScript object, which is used to configure platform, e.g. IP addresses.
+ * Another example of metadata is an asset URL. The logic behind providing asset URLs as metadata is 
+ * we know URL at compile time only and URLs vary depending on deployment options.
+ * 
+ * # Platform Resource Identifier (PRI)
  *
- * PRI is a `string` in the `kind:...` format.
- * The Platform use `kind` part to delegate resource resolution to the plugin
- * that is registered as a resolver for `Resources` of such a kind.
- *
- * Examples of PRIs:
+ * 'Resource' is simply any JavaScript object. There is a plugin exists, which 'resolve' PRI into actual object.
+ * This is a difference from Metadata. Metadata object 'resolved' by Platform instance, so we may consider Metadata as
+ * a Resource, provided by Platform itself. Because there is always a plugin, which resolve `Resource` resolution is 
+ * aynchronous process.
+ * 
+ * `Resource` is a string of `kind:plugin.id` format. Since Metadata is a kind of Resource. 
+ * Metadata also can be reolved using resource API.
+ * 
+ * Examples of `Resource`:
  * ```typescript
  *   `class:contact.Person` as Resource<Class<Person>> // database object with id === `class:contact.Person`
  *   `string:class.ClassLabel` as Resource<string> // translated string according to current language and i18n settings
  *   `asset:ui.Icons` as Resource<URL> // URL to SVG sprites
  *   `easyscript:2+2` as Resource<() => number> // function
  * ```
- *
- * {@link ResourcePlugin}
+ * @packageDocumentation
+ * {@link Resource}
+ * {@link Plugin}
  * {@link Platform.resolve}
  */
 
-export type Property<T> = string & { __property: T }
-export type Resource<T> = Property<T> & { __resource: true }
-export type Metadata<T> = Property<T>
-
+/** Every Platform object property must inherit from this type. (Not sure). */
+export type Property<T> = string & { __property: T } // TODO: remove `string`
+/** Platform Metadata Identifier. */
+export type Metadata<T> = string & Property<T>
+/** Platform Resource Identifier. */
+export type Resource<T> = Metadata<T> & { __resource: true }
+/** Base interface for every plugin API. */
 export interface Service { }
+/** Plugin identifier. */
 export type Plugin<S extends Service> = Resource<S>
 export type AnyPlugin = Plugin<Service>
 
