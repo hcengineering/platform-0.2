@@ -14,7 +14,7 @@
 //
 
 import { Property, Resource, Metadata, plugin, Plugin, Service, ResourceKind } from '@anticrm/platform'
-import core, { Obj, Emb, Ref, Class, Type, Doc, Instance } from '@anticrm/platform-core'
+import core, { Obj, Emb, Ref, Class, Type, Doc, Instance, AdapterType } from '@anticrm/platform-core'
 import { IntlString } from '@anticrm/platform-core-i18n'
 
 export type URL = string
@@ -77,5 +77,8 @@ export default plugin('ui' as Plugin<UIService>, { core: core.id }, {
     TypeUIDecorator: '' as Ref<Class<TypeUIDecorator<any>>>,
     ClassUIDecorator: '' as Ref<Class<ClassUIDecorator<Obj>>>,
     Form: '' as Ref<Class<Form<Obj>>>
+  },
+  method: {
+    ClassToComponent: '' as Resource<AdapterType>
   }
 })

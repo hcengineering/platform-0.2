@@ -22,7 +22,7 @@ type Layout = { [key: string]: PropertyType }
 class Builder {
   private memdb: DocDb
 
-  constructor (memdb?: DocDb) {
+  constructor(memdb?: DocDb) {
     this.memdb = memdb ?? new MemDb()
   }
 
@@ -39,7 +39,7 @@ class Builder {
     return obj
   }
 
-  createDocument<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Doc>, _id: Ref<M>): void {
+  createDocument<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Doc>, _id?: Ref<M>): void {
     this.memdb.createDocument(_class, values, _id)
   }
 

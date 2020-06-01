@@ -15,7 +15,7 @@
 
 import {
   plugin, Plugin, Service, Resource, Property,
-  Metadata
+  Metadata, ResourceKind
 } from '@anticrm/platform'
 
 // P R O P E R T I E S
@@ -74,6 +74,7 @@ export interface EClass<T extends E, E extends Obj> extends Doc {
   _native?: Resource<Object>
 }
 
+export const CLASS = 'class' as ResourceKind
 export type Class<T extends Obj> = EClass<T, Obj>
 
 type PrimitiveInstance<T> =
@@ -98,7 +99,7 @@ export type AdapterType = (resource: Resource<any>) => Promise<Resource<any>> | 
 export interface Adapter extends Doc {
   from: StringType
   to: StringType
-  adapter: Resource<AdapterType>
+  adapt: Property<AdapterType>
 }
 
 // S E S S I O N
@@ -145,6 +146,7 @@ export default plugin('core' as Plugin<CoreService>, {}, {
     BagOf_exert: '' as Resource<(this: Instance<BagOf<any>>) => Exert>,
     InstanceOf_exert: '' as Resource<(this: Instance<InstanceOf<Emb>>) => Exert>,
     Metadata_exert: '' as Resource<(this: Instance<Type<Metadata<any>>>) => Exert>,
+    Adapter_adapt: '' as Resource<(this: Instance<Adapter>) => Promise<Resource<any>> | undefined>
   },
   native: {
     ResourceType: '' as Resource<Object>

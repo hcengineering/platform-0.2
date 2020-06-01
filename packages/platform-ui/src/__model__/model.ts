@@ -14,8 +14,10 @@
 //
 
 import core from '@anticrm/platform-core/src/__model__'
+import { CLASS } from '@anticrm/platform-core'
 import i18n from '@anticrm/platform-core-i18n/src/__model__'
 import ui from '.'
+import { COMPONENT } from '..'
 
 import Builder from '@anticrm/platform-core/src/__model__/builder'
 
@@ -29,10 +31,20 @@ export default (S: Builder) => {
   S.createClass(ui.class.ClassUIDecorator, core.class.Class, {
     label: S.newInstance(i18n.class.IntlString, {}),
     icon: S.newInstance(core.class.Metadata, {}),
-    decorators: S.newInstance(core.class.BagOf, { of: S.newInstance(core.class.InstanceOf, { of: ui.class.TypeUIDecorator }) })
+    decorators: S.newInstance(core.class.BagOf, {
+      of: S.newInstance(core.class.InstanceOf, {
+        of: ui.class.TypeUIDecorator
+      })
+    })
   })
 
   S.createClass(ui.class.Form, ui.class.ClassUIDecorator, {
     form: S.newInstance(core.class.Type, {})
+  })
+
+  S.createDocument(core.class.Adapter, {
+    from: CLASS,
+    to: COMPONENT,
+    adapt: ui.method.ClassToComponent
   })
 }

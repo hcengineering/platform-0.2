@@ -81,7 +81,7 @@ export interface PluginInfo {
   status: PluginStatus
 }
 
-export type ResourceKind = string & { __resourceKind: true }
+export type ResourceKind = string & Property<string> & { __resourceKind: true }
 
 export interface ResourceInfo {
   kind: ResourceKind

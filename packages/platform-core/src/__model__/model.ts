@@ -92,11 +92,11 @@ export default (S: Builder) => {
   S.createClass(core.class.ResourceType, core.class.Type, {})
   S.patch(core.class.ResourceType, (clazz: Class<Obj>) => { clazz._native = core.native.ResourceType })
 
-  // S.createClass(core.class.Adapter, core.class.Doc, {
-  //   from: S.newInstance(core.class.Type, {}),
-  //   to: S.newInstance(core.class.Type, {}),
-  //   adapt: S.newInstance(core.class.ResourceType, {
-  //     _default: core.method.Metadata_exert
-  //   })
-  // })
+  S.createClass(core.class.Adapter, core.class.Doc, {
+    from: S.newInstance(core.class.Type, {}),
+    to: S.newInstance(core.class.Type, {}),
+    adapt: S.newInstance(core.class.ResourceType, {
+      _default: core.method.Adapter_adapt
+    })
+  })
 }

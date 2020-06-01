@@ -22,11 +22,28 @@ type Layout = { [key: string]: PropertyType }
 export class MemDb implements DocDb {
 
   private objects = new Map<Ref<Doc>, Doc>()
+  private byClass: Map<Ref<Class<Obj>>, Doc[]> | null = null
 
-  add (doc: Doc) {
+  set (doc: Doc) {
     const id = doc._id
     if (this.objects.get(id)) { throw new Error('document added already ' + id) }
     this.objects.set(id, doc)
+  }
+
+  index (doc: Doc) {
+    if (this.byClass === null) { throw new Error('index not created') }
+    const byClass = this.byClass
+    const hierarchy = this.getClassHierarchy(doc._class)
+    hierarchy.forEach((_class) => {
+      const list = byClass.get(_class)
+      if (list) { list.push(doc) }
+      else { byClass.set(_class, [doc]) }
+    })
+  }
+
+  add (doc: Doc) {
+    this.set(doc)
+    if (this.byClass) this.index(doc)
   }
 
   get<T extends Doc> (id: Ref<T>): T {
@@ -94,9 +111,36 @@ export class MemDb implements DocDb {
   }
 
   loadModel (model: Doc[]) {
-    for (const doc of model) {
-      this.add(doc)
-    }
+    for (const doc of model) { this.set(doc) }
+    if (this.byClass === null) { this.byClass = new Map<Ref<Class<Obj>>, Doc[]>() }
+    for (const doc of model) { this.index(doc) }
   }
 
+  // Q U E R Y
+  findAll<T extends Doc> (clazz: Ref<Class<T>>, query: Partial<T>): T[] {
+    console.log(this.byClass?.get(clazz))
+    const result = this.byClass?.get(clazz)
+    return result as T[] ?? []
+  }
+}
+
+function findAll<T extends Doc> (docs: T[], clazz: Ref<Class<T>>, query: Partial<T>): T[] {
+  let result = docs
+
+  for (const propertyKey in query) {
+    const condition = query[propertyKey]
+    result = filterEq(result, propertyKey, condition as PropertyType) // TODO: must be PropertyType
+  }
+
+  return result as T[]
+}
+
+function filterEq<T extends Doc> (docs: T[], propertyKey: string, value: PropertyType): T[] {
+  const result: T[] = []
+  for (const doc of docs) {
+    if (value === (doc as any)[propertyKey]) {
+      result.push(doc)
+    }
+  }
+  return result
 }

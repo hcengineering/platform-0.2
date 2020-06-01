@@ -51,11 +51,30 @@ export default async (platform: Platform): Promise<CoreService> => {
   //     (clazz._extends ? getAttribute(get(clazz._extends), key) : undefined)
   // }
 
-  // A D A P T E R S
+  // D A T A
+
+  const modelDb = new MemDb()
+
+  const metaModel = platform.getMetadata(core.metadata.MetaModel)
+  if (metaModel) {
+    modelDb.loadModel(metaModel)
+  } else {
+    console.log('Warning: no metamodel provided.')
+  }
+
+  function getClassHierarchy (cls: Ref<Class<Obj>>, top?: Ref<Class<Obj>>) {
+    const hierarchy = modelDb.getClassHierarchy(cls)
+    console.log('TOP: ' + top)
+    const result = top ? hierarchy.slice(0, hierarchy.indexOf(top)) : hierarchy
+    console.log(result)
+    return result
+  }
 
   // A D A P T E R S
 
   const adapters = new Map<string, AdapterType[]>()
+
+  const allAdapters = modelDb.findAll(core.class.Adapter, {})
 
   function adapt (resource: Resource<any>, kind: string): Promise<Resource<any>> | undefined {
     const info = platform.getResourceInfo(resource)
@@ -71,24 +90,6 @@ export default async (platform: Platform): Promise<CoreService> => {
       }
     }
     return undefined
-  }
-
-  // D A T A
-
-  const modelDb = new MemDb()
-  const metaModel = platform.getMetadata(core.metadata.MetaModel)
-  if (metaModel) {
-    modelDb.loadModel(metaModel)
-  } else {
-    console.log('Warning: no metamodel provided.')
-  }
-
-  function getClassHierarchy (cls: Ref<Class<Obj>>, top?: Ref<Class<Obj>>) {
-    const hierarchy = modelDb.getClassHierarchy(cls)
-    console.log('TOP: ' + top)
-    const result = top ? hierarchy.slice(0, hierarchy.indexOf(top)) : hierarchy
-    console.log(result)
-    return result
   }
 
   // C O R E  S E R V I C E
