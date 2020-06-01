@@ -81,6 +81,16 @@ export interface PluginInfo {
   status: PluginStatus
 }
 
+export type ResourceKind = string & { __resourceKind: true }
+
+export interface ResourceInfo {
+  kind: ResourceKind
+  plugin: Plugin<Service>
+  id: string
+}
+
+export type Adapter = (resource: Resource<any>) => Promise<Resource<any>> | undefined
+
 /*!
  * Built on Anticrm Platform™
  * Copyright © 2020 Anticrm Platform Contributors. All Rights Reserved.
@@ -136,6 +146,18 @@ export class Platform {
     this.resources.set(id, value)
   }
 
+  getResourceKind (resource: Resource<any>): ResourceKind {
+    return resource.substring(0, resource.indexOf(':')) as ResourceKind
+  }
+
+  getResourceInfo (resource: Resource<any>): ResourceInfo {
+    const index = resource.indexOf(':') + 1
+    const kind = resource.substring(0, index) as ResourceKind
+    const dot = resource.indexOf('.', index)
+    const plugin = resource.substring(index, dot) as AnyPlugin
+    const id = resource.substring(dot)
+    return { kind, plugin, id }
+  }
 
   resolve<T> (resource: Resource<T>): Promise<T> {
     const kind = resource.substring(0, resource.indexOf(':'))
@@ -161,15 +183,43 @@ export class Platform {
     const resolved = this.resources.get(resource)
     if (resolved) { return resolved }
     else {
-      const index = resource.indexOf(':') + 1
-      const dot = resource.indexOf('.', index)
-      const id = resource.substring(index, dot) as AnyPlugin
-      console.log('loading from ' + id)
-      const plugin = await this.getPlugin(id)
+      const info = this.getResourceInfo(resource)
+      console.log(`loading '${resource}' from '${info.plugin}'.`)
+      await this.getPlugin(info.plugin)
       const resolved = this.resources.get(resource)
       if (resolved) { return resolved }
     }
     throw new Error(`Plugin '${plugin}' did not provide resource '${resource}' as expected.`)
+  }
+
+  // A D A P T E R S
+
+  private adapters = new Map<string, Adapter[]>()
+
+  adapt (resource: Resource<any>, kind: string): Promise<Resource<any>> | undefined {
+    const info = this.getResourceInfo(resource)
+    if (info.kind === kind) {
+      return Promise.resolve(resource)
+    }
+    const key = info.kind + ':' + kind
+    const adapters = this.adapters.get(key)
+    if (adapters) {
+      for (const adapter of adapters) {
+        const adapted = adapter(resource)
+        if (adapted) { return adapted }
+      }
+    }
+    return undefined
+  }
+
+  setAdapter (from: string, to: string, adapter: Adapter) {
+    const key = from + ':' + to
+    const adapters = this.adapters.get(key)
+    if (adapters) {
+      adapters.push(adapter)
+    } else {
+      this.adapters.set(key, [adapter])
+    }
   }
 
   // P L U G I N S

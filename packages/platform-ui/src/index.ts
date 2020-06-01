@@ -13,8 +13,7 @@
 // limitations under the License.
 //
 
-import { App } from 'vue'
-import { Property, Resource, Metadata, plugin, Plugin, Service } from '@anticrm/platform'
+import { Property, Resource, Metadata, plugin, Plugin, Service, ResourceKind } from '@anticrm/platform'
 import core, { Obj, Emb, Ref, Class, Type, Doc, Instance } from '@anticrm/platform-core'
 import { IntlString } from '@anticrm/platform-core-i18n'
 
@@ -25,6 +24,9 @@ export type VueConstructor = object
 export type Component<C extends VueConstructor> = Resource<C>
 export type AnyComponent = Component<VueConstructor>
 export type ComponentRef = Property<AnyComponent>
+
+export const ASSET = 'asset' as ResourceKind
+export const COMPONENT = 'component' as ResourceKind
 
 /// C O R E  M O D E L
 

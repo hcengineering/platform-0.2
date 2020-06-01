@@ -13,7 +13,10 @@
 // limitations under the License.
 //
 
-import { plugin, Plugin, Service, Resource, Property, Metadata } from '@anticrm/platform'
+import {
+  plugin, Plugin, Service, Resource, Property,
+  Metadata, Adapter as AdapterType
+} from '@anticrm/platform'
 
 // P R O P E R T I E S
 
@@ -88,6 +91,14 @@ export type Instance<T> = { [P in keyof T]:
   getSession (): CoreService
 }
 
+// A D A P T E R S
+
+export interface Adapter extends Doc {
+  from: StringType
+  to: StringType
+  adapter: Resource<AdapterType>
+}
+
 // S E S S I O N
 
 export interface DocDb {
@@ -124,6 +135,7 @@ export default plugin('core' as Plugin<CoreService>, {}, {
     Class: '' as Ref<Class<Class<Obj>>>,
     ResourceType: '' as Ref<Class<ResourceType<any>>>,
     RefTo: '' as Ref<Class<RefTo<Doc>>>,
+    Adapter: '' as Ref<Class<Adapter>>
   },
   method: {
     Type_exert: '' as Resource<(this: Instance<Type<any>>) => Exert>,

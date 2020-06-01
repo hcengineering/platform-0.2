@@ -14,10 +14,10 @@
 -->
 
 <script lang="ts">
-import { Platform } from '@anticrm/platform'
+import { Platform, Resource } from '@anticrm/platform'
 import { defineComponent, reactive, computed, provide, inject, watch, PropType } from 'vue'
 import workbench, { WorkbenchStateInjectionKey, WorkbenchState, ViewModelKind } from '..'
-import ui, { AnyComponent, UIService } from '@anticrm/platform-ui'
+import ui, { AnyComponent, UIService, COMPONENT } from '@anticrm/platform-ui'
 import { UIServiceInjectionKey, CoreServiceInjectionKey, PlatformInjectionKey } from '@anticrm/platform-ui-components'
 import { Ref, Class, Doc, CoreService } from '@anticrm/platform-core'
 
@@ -34,6 +34,10 @@ export default defineComponent({
     const uiService = inject(UIServiceInjectionKey) as UIService
 
     const _class = props.content as Ref<Class<Doc>>
+
+    const show = props.content as Resource<any>
+    //const component = platform.adapt(show, COMPONENT)
+
     const clazz = await coreService.getInstance(_class)
     if (!coreService.is(clazz, ui.class.Form)) {
       throw new Error(`something went wrong, can't find 'Form' for the ${_class}.`)
