@@ -15,9 +15,11 @@
 
 /* eslint-env jest */
 
-import { Platform, identify, AnyPlugin, Resource, Metadata } from '..'
+import { Platform, identify, Plugin, Service, Resource, Metadata } from '..'
 
 import { plugin1, descriptor1, plugin1State, plugin2, descriptor2, plugin2State, plugin3, descriptor3 } from './shared'
+
+type AnyPlugin = Plugin<Service>
 
 describe('platform', () => {
   const platform = new Platform()

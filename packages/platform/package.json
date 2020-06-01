@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc",
     "test": "jest",
-    "doc": "typedoc --out ./generated_docs",
+    "doc": "typedoc --out ./generated_docs --excludeNotExported --inputFiles README.md --inputFiles src/index.ts",
     "lint": "eslint src/**/*.ts"
   },
   "devDependencies": {

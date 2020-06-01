@@ -1,37 +1,47 @@
-# Anticrm Platform
+# The Platform
 
-[![Gitter](https://badges.gitter.im/anticrm/community.svg)](https://gitter.im/anticrm/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge) ![CI](https://github.com/anticrm/platform/workflows/CI/badge.svg) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
-
-Any Anticrm application is nothing but a set of installed Anticrm `plugins`. 
+Any Platform application is nothing but a set of installed `plugins`. 
 At the very core `Platform` is a simple piece of code, which connects plugins together.
 
 ## Plugins
 
 Plugin is an *isolated* piece of software, and a plugin never directly `import` stuff from other plugins 
-(in sence of JavaScript `import` statement). Every plugin provide `Resources` to another plugins via
-`Platform` runtime. Resources are accessible via a kind of PRI (Platform Resource Identifier) link.
+(in sense of JavaScript `import` statement). Every plugin provide `Resources` to another plugins via
+`Platform` runtime. Resources are accessible via a kind of PRI (Platform Resource Identifier).
 
 Resource can be anything meaningful: an object in the database, `Vue` component, an asset URL, etc. 
 For any `resource` there is a known `plugin`, which can *resolve* resource identifier into actual meaningful object.
-Resource identifier either known statically e.g. `client-ui:component.Button` Vue component, or some dynamic string e.g. 
-`mongo:0fbfaaddbbccff` or `calc:2+2`.
 
-Plugins are loaded asynchonously, on-demand thus everything in the `Platform` wired together via asynchronous communications. 
+Examples of `Resource`:
+```typescript
+// database object with id === `class:contact.Person`
+`class:contact.Person` as Resource<Class<Person>>
+// translated string according to current i18n settings
+`string:class.ClassLabel` as Resource<string> 
+// URL to SVG sprites
+`asset:ui.Icons` as Resource<URL> 
+// Vue component for Person Form
+`component:client.PersonForm` as Resource<Component<VueComp>> 
+`easyscript:2+2` as Resource<() => number> // function
+`object:5679fd5a459245ccb435` as Resource<Doc> // db object
+```
+
+Plugins loaded asynchonously, on-demand thus everything in the `Platform` wired together via asynchronous communications. 
 A `Plugin` itself is also a Platform `Resource`, so you can request access to a plugin's API using same approach.
 
 ### Plugin package structure
 
-Following is not a mandatory. In the meantime I tend to use following package structure for every Anticrm Plugin.
+Following is not a mandatory. In the meantime I tend to use following package structure for each Plugin.
 
-```
-__tests__ <- tests :)
+```text
+__tests__
 __resources__
   model.ts
   meta.ts
   strings/*.ts
-*.ts <- implementation-related stuff
-plugin.ts <- plugin entry point, exports plugin start function
-index.ts <- A Plugin's API and PRI's. 
+index.ts // A Plugin's API
+plugin.ts // plugin entry point
+*.ts  // implementation-related stuff
 ```
 
 Plugin API defined in `index.ts`. It should not export any code (including internal) and should not have any side effects.
@@ -41,4 +51,4 @@ Basically, if a plugin depends on another, importing dependant's `index.ts` must
 
 A `plugin.ts` available to `Platform` only. So you should never import anything from another plugin besides `index.ts`.
 
-Runtime code not allowed to import anything from `__resources__` folder. This is solely for tooling/configuration purposes, and does not exists at runtime.
+Runtime code not allowed to import anything from `__model__` folder. This is solely for tooling/configuration purposes, and does not exists at runtime.

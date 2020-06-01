@@ -14,7 +14,7 @@
 //
 
 import { mergeWith } from 'lodash'
-import { PluginDescriptor, Service, identify, PluginDependencies } from '@anticrm/platform'
+import { PluginDescriptor, Service, identify, Plugin } from '@anticrm/platform'
 
 type PluginIds = { [key: string]: { [key: string]: any } }
 
@@ -26,7 +26,9 @@ export function mergeIds<A extends PluginIds, B extends PluginIds> (a: A, b: B):
   })
 }
 
+type AnyPlugin = Plugin<Service>
 type Namespace = Record<string, Record<string, any>>
+interface PluginDependencies { [key: string]: AnyPlugin }
 
 export function extendIds<P extends Service, X extends PluginDependencies, D extends PluginDescriptor<P, X>, N extends Namespace> (a: D, b: N): D & N {
   return mergeWith({}, a, identify(a.id, b), (value) => {

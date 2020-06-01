@@ -13,20 +13,21 @@
 // limitations under the License.
 //
 
+/** Every Platform object property must inherit from this type. (Not sure). */
+export type Property<T> = string & { __property: T } // TODO: remove `string`
+
 /**
- * `Plugin` and `Resource` are core Platform concepts. 
- * Any Platform application is nothing but a set of installed plugins. 
- * At the very core Platform is a simple piece of code, 
- * which connect `Plugin`s together, and bring `Resource`s to life.
- * 
- * # Platform Metadata Identifier (PMI)
+ * Platform Metadata Identifier (PMI).
  * 
  * 'Metadata' is simply any JavaScript object, which is used to configure platform, e.g. IP addresses.
  * Another example of metadata is an asset URL. The logic behind providing asset URLs as metadata is 
  * we know URL at compile time only and URLs vary depending on deployment options.
+ */
+export type Metadata<T> = string & Property<T>
+
+/** 
+ * Platform Resource Identifier. 
  * 
- * # Platform Resource Identifier (PRI)
- *
  * 'Resource' is simply any JavaScript object. There is a plugin exists, which 'resolve' PRI into actual object.
  * This is a difference from Metadata. Metadata object 'resolved' by Platform instance, so we may consider Metadata as
  * a Resource, provided by Platform itself. Because there is always a plugin, which resolve `Resource` resolution is 
@@ -42,23 +43,13 @@
  *   `asset:ui.Icons` as Resource<URL> // URL to SVG sprites
  *   `easyscript:2+2` as Resource<() => number> // function
  * ```
- * @packageDocumentation
- * {@link Resource}
- * {@link Plugin}
- * {@link Platform.resolve}
  */
-
-/** Every Platform object property must inherit from this type. (Not sure). */
-export type Property<T> = string & { __property: T } // TODO: remove `string`
-/** Platform Metadata Identifier. */
-export type Metadata<T> = string & Property<T>
-/** Platform Resource Identifier. */
 export type Resource<T> = Metadata<T> & { __resource: true }
 /** Base interface for every plugin API. */
 export interface Service { }
 /** Plugin identifier. */
 export type Plugin<S extends Service> = Resource<S>
-export type AnyPlugin = Plugin<Service>
+type AnyPlugin = Plugin<Service>
 
 export interface ResourceProvider extends Service {
   resolve (resource: Resource<any>): Promise<any>
@@ -67,8 +58,9 @@ export interface ResourceProvider extends Service {
 /**
  * A plugin may request platform to inject resolved references to plugins it depends on.
  */
-export interface PluginDependencies { [key: string]: AnyPlugin }
+interface PluginDependencies { [key: string]: AnyPlugin }
 
+/** @hidden */
 type InferPlugins<T extends PluginDependencies> = {
   [P in keyof T]: T[P] extends Plugin<infer Service> ? Service : T[P]
 }
