@@ -15,7 +15,7 @@
 
 import {
   plugin, Plugin, Service, Resource, Property,
-  Metadata, Adapter as AdapterType
+  Metadata
 } from '@anticrm/platform'
 
 // P R O P E R T I E S
@@ -93,6 +93,8 @@ export type Instance<T> = { [P in keyof T]:
 
 // A D A P T E R S
 
+export type AdapterType = (resource: Resource<any>) => Promise<Resource<any>> | undefined
+
 export interface Adapter extends Doc {
   from: StringType
   to: StringType
@@ -111,8 +113,9 @@ export interface DocDb {
 }
 
 export interface CoreService extends Service {
-  // newInstance<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Obj>, _id?: Ref<M>): Instance<M>
+  adapt (resource: Resource<any>, kind: string): Promise<Resource<any>> | undefined
 
+  // newInstance<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Obj>, _id?: Ref<M>): Instance<M>
   getInstance<T extends Doc> (id: Ref<T>): Promise<Instance<T>>
   as<T extends Doc, A extends Doc> (obj: Instance<T>, _class: Ref<Class<A>>): Instance<A>
   is<T extends Doc, A extends Doc> (obj: Instance<T>, _class: Ref<Class<A>>): boolean

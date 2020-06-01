@@ -16,7 +16,7 @@
 import { Platform, Resource, Metadata } from '@anticrm/platform'
 import core, {
   CoreService, Obj, Ref, Class, Doc, BagOf, InstanceOf, PropertyType,
-  Instance, Type, Emb, ResourceType, Exert
+  Instance, Type, Emb, ResourceType, Exert, AdapterType
 } from '.'
 import { MemDb } from './memdb'
 
@@ -51,6 +51,27 @@ export default async (platform: Platform): Promise<CoreService> => {
   //     (clazz._extends ? getAttribute(get(clazz._extends), key) : undefined)
   // }
 
+  // A D A P T E R S
+
+  // A D A P T E R S
+
+  const adapters = new Map<string, AdapterType[]>()
+
+  function adapt (resource: Resource<any>, kind: string): Promise<Resource<any>> | undefined {
+    const info = platform.getResourceInfo(resource)
+    if (info.kind === kind) {
+      return Promise.resolve(resource)
+    }
+    const key = info.kind + ':' + kind
+    const list = adapters.get(key)
+    if (list) {
+      for (const adapter of list) {
+        const adapted = adapter(resource)
+        if (adapted) { return adapted }
+      }
+    }
+    return undefined
+  }
 
   // D A T A
 
@@ -73,6 +94,8 @@ export default async (platform: Platform): Promise<CoreService> => {
   // C O R E  S E R V I C E
 
   const coreService: CoreService = {
+    adapt,
+
     getDb () { return modelDb },
     getClassHierarchy,
 

@@ -89,8 +89,6 @@ export interface ResourceInfo {
   id: string
 }
 
-export type Adapter = (resource: Resource<any>) => Promise<Resource<any>> | undefined
-
 /*!
  * Built on Anticrm Platform™
  * Copyright © 2020 Anticrm Platform Contributors. All Rights Reserved.
@@ -190,36 +188,6 @@ export class Platform {
       if (resolved) { return resolved }
     }
     throw new Error(`Plugin '${plugin}' did not provide resource '${resource}' as expected.`)
-  }
-
-  // A D A P T E R S
-
-  private adapters = new Map<string, Adapter[]>()
-
-  adapt (resource: Resource<any>, kind: string): Promise<Resource<any>> | undefined {
-    const info = this.getResourceInfo(resource)
-    if (info.kind === kind) {
-      return Promise.resolve(resource)
-    }
-    const key = info.kind + ':' + kind
-    const adapters = this.adapters.get(key)
-    if (adapters) {
-      for (const adapter of adapters) {
-        const adapted = adapter(resource)
-        if (adapted) { return adapted }
-      }
-    }
-    return undefined
-  }
-
-  setAdapter (from: string, to: string, adapter: Adapter) {
-    const key = from + ':' + to
-    const adapters = this.adapters.get(key)
-    if (adapters) {
-      adapters.push(adapter)
-    } else {
-      this.adapters.set(key, [adapter])
-    }
   }
 
   // P L U G I N S
