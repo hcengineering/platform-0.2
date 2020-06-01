@@ -13,8 +13,8 @@
 // limitations under the License.
 //
 
-import { Property, plugin, Plugin, Service } from '@anticrm/platform'
-import { Doc, Ref, Class, StringType } from '@anticrm/platform-core'
+import { plugin, Plugin, Service } from '@anticrm/platform'
+import { Property, Doc, Ref, Class, StringType } from '@anticrm/platform-core'
 import { Asset, ComponentRef, AnyComponent } from '@anticrm/platform-ui'
 
 export type DateType = number & Property<Date>

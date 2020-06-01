@@ -14,11 +14,14 @@
 //
 
 import {
-  plugin, Plugin, Service, Resource, Property,
+  plugin, Plugin, Service, Resource,
   Metadata, ResourceKind
 } from '@anticrm/platform'
 
 // P R O P E R T I E S
+
+export type Property<T> = { __property: T }
+export type Resolve = { __resolve: true }
 
 export type Ref<T extends Doc> = string & { __ref: T }
 export type PropertyType = Property<any>
@@ -26,6 +29,12 @@ export type PropertyType = Property<any>
   | undefined
   | PropertyType[]
   | { [key: string]: PropertyType }
+
+// P R I M I T I V E
+
+export type StringType = Property<string> // TODO: Do we need this?
+export type ResourceProperty<T> = Resource<T> & Property<Resource<T>>
+export type ResolveResource<T> = Resource<T> & Property<T> & Resolve
 
 // O B J E C T S
 
@@ -41,7 +50,7 @@ export interface Doc extends Obj {
 export type Exert = (value: PropertyType, layout?: any, key?: string) => any
 export interface Type<A> extends Emb {
   _default?: Property<A>
-  exert?: Property<(this: Instance<Type<any>>) => Exert>
+  exert?: ResolveResource<(this: Instance<Type<any>>) => Exert>
 }
 export interface RefTo<T extends Doc> extends Type<T> { to: Ref<Class<T>> }
 export interface InstanceOf<T extends Emb> extends Type<T> { of: Ref<Class<T>> }
@@ -51,13 +60,10 @@ export interface BagOf<A> extends Type<{ [key: string]: A }> {
 export interface ArrayOf<A> extends Type<A[]> { of: Type<A> }
 export interface ResourceType<T> extends Type<T> { }
 
-// P R I M I T I V E
-
-export type StringType = Property<string> // TODO: Do we need this?
-
 // C L A S S E S
 
-type PropertyTypes<T> = { [P in keyof T]:
+type PropertyTypes<T> = {
+  [P in keyof T]:
   T[P] extends Property<infer X> ? Type<X> :
   T[P] extends Ref<infer X> ? Type<X> :
   T[P] extends { [key: string]: infer X } | undefined ? BagOf<any> :
@@ -71,7 +77,7 @@ export type AllAttributes<T extends E, E extends Obj> = Attributes<T, E> & Parti
 export interface EClass<T extends E, E extends Obj> extends Doc {
   _attributes: AllAttributes<T, E>
   _extends?: Ref<Class<E>>
-  _native?: Resource<Object>
+  _native?: ResourceProperty<Object>
 }
 
 export const CLASS = 'class' as ResourceKind
@@ -79,7 +85,7 @@ export type Class<T extends Obj> = EClass<T, Obj>
 
 type PrimitiveInstance<T> =
   T extends Ref<infer X> ? Ref<X> : // (X extends Doc ? Promise<Instance<X>> : never) :
-  T extends Resource<infer X> ? Promise<X> :
+  T extends Property<infer X> & Resolve ? Promise<X> :
   T extends Property<infer X> ? X :
   Instance<T> // only Embedded objects remains
 
@@ -99,7 +105,7 @@ export type AdapterType = (resource: Resource<any>) => Promise<Resource<any>> | 
 export interface Adapter extends Doc {
   from: StringType
   to: StringType
-  adapt: Property<AdapterType>
+  adapt: Property<Resource<AdapterType>>
 }
 
 // S E S S I O N

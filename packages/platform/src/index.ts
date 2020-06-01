@@ -14,16 +14,7 @@
 //
 
 /** Every Platform object property must inherit from this type. (Not sure). */
-export type Property<T> = string & { __property: T } // TODO: remove `string`
-
-/**
- * Platform Metadata Identifier (PMI).
- * 
- * 'Metadata' is simply any JavaScript object, which is used to configure platform, e.g. IP addresses.
- * Another example of metadata is an asset URL. The logic behind providing asset URLs as metadata is 
- * we know URL at compile time only and URLs vary depending on deployment options.
- */
-export type Metadata<T> = string & Property<T>
+// export type Property<T> = string & { __property: T } // TODO: remove `string`
 
 /** 
  * Platform Resource Identifier. 
@@ -44,7 +35,18 @@ export type Metadata<T> = string & Property<T>
  *   `easyscript:2+2` as Resource<() => number> // function
  * ```
  */
-export type Resource<T> = Metadata<T> & { __resource: true }
+export type Resource<T> = string & { __resource: T }
+
+/**
+ * Platform Metadata Identifier (PMI).
+ * 
+ * 'Metadata' is simply any JavaScript object, which is used to configure platform, e.g. IP addresses.
+ * Another example of metadata is an asset URL. The logic behind providing asset URLs as metadata is 
+ * we know URL at compile time only and URLs vary depending on deployment options.
+ */
+export type Metadata<T> = Resource<T> & { __metadata: true }
+
+
 /** Base interface for every plugin API. */
 export interface Service { }
 /** Plugin identifier. */
@@ -93,7 +95,7 @@ export interface PluginInfo {
   status: PluginStatus
 }
 
-export type ResourceKind = string & Property<string> & { __resourceKind: true }
+export type ResourceKind = string & { __resourceKind: true }
 
 export interface ResourceInfo {
   kind: ResourceKind
@@ -122,7 +124,7 @@ export class Platform {
 
   // M E T A D A T A
 
-  private resources = new Map<Metadata<any>, any>()
+  private resources = new Map<Resource<any>, any>()
 
   getMetadata<T> (id: Metadata<T>): T | undefined {
     return this.resources.get(id)

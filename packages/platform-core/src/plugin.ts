@@ -16,7 +16,7 @@
 import { Platform, Resource, Metadata } from '@anticrm/platform'
 import core, {
   CoreService, Obj, Ref, Class, Doc, BagOf, InstanceOf, PropertyType,
-  Instance, Type, Emb, ResourceType, Exert, AdapterType
+  Instance, Type, Emb, ResourceType, Exert, AdapterType, Property, Resolve
 } from '.'
 import { MemDb } from './memdb'
 
@@ -228,7 +228,7 @@ export default async (platform: Platform): Promise<CoreService> => {
   }
 
   const Metadata_exert = function (this: Instance<Type<any>>): Exert {
-    return ((value: Metadata<any>) => value ? platform.getMetadata(value) : undefined) as Exert
+    return ((value: Metadata<any> & Property<any> & Resolve) => value ? platform.getMetadata(value) : undefined) as Exert
   }
 
   const BagOf_exert = function (this: Instance<BagOf<any>>): Exert {
