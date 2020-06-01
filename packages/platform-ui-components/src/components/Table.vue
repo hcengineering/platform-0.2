@@ -15,34 +15,26 @@
 
 <script lang="ts">
 
-import Vue, { PropType } from 'vue'
+import { defineComponent, PropType, inject } from 'vue'
+import { Obj, Ref, Class, CoreService } from '@anticrm/platform-core'
+import { UIService } from '@anticrm/platform-ui'
+import { CoreServiceInjectionKey, UIServiceInjectionKey } from '..'
 
-import { Obj, Ref, Class } from '@anticrm/platform-core'
-
-import InlineEdit from '@anticrm/platform-ui-controls/src/InlineEdit.vue'
-import Icon from './Icon.vue'
-import ui from '..'
-
-export default Vue.extend({
-  components: { InlineEdit, Icon },
+export default defineComponent({
+  components: {},
   props: {
     clazz: String as unknown as PropType<Ref<Class<Obj>>>,
-    objects: Promise as PropType<Promise<Obj[]>>,
-    filter: Array as PropType<string[] | undefined>,
+    exclude: String as PropType<string[] | string>,
   },
-  data () {
+  async setup (props) {
+    const coreService = inject(CoreServiceInjectionKey) as CoreService
+    const uiService = inject(UIServiceInjectionKey) as UIService
+    const model = await uiService.getAttrModel(props.clazz)
+    const content = []
     return {
-      model: [],
-      content: []
+      model, content
     }
   },
-  created () {
-    this.$platform.getPlugin(ui.id).then(plugin => {
-      plugin.getAttrModel(this.clazz, this.filter)
-        .then(result => this.model = result)
-    })
-    this.objects.then(obj => this.content = obj)
-  }
 })
 </script>
 

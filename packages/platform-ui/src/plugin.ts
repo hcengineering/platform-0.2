@@ -91,8 +91,8 @@ export default async (platform: Platform, deps: { core: CoreService }): Promise<
     return Promise.all(attrs)
   }
 
-  async function getAttrModel (_class: Ref<Class<Obj>>, top?: Ref<Class<Obj>>, exclude?: string[] | string): Promise<AttrModel[]> {
-    const hierarchy = coreService.getClassHierarchy(_class, top)
+  async function getAttrModel (_class: Ref<Class<Obj>>, exclude?: string[] | string, top?: Ref<Class<Obj>>): Promise<AttrModel[]> {
+    const hierarchy = coreService.getClassHierarchy(_class, top ?? core.class.Doc)
     const ownModels = hierarchy.map(clazz => getOwnAttrModel(clazz, exclude))
     return Promise.all(ownModels).then(result => result.flat())
   }
@@ -102,6 +102,7 @@ export default async (platform: Platform, deps: { core: CoreService }): Promise<
   return {
     getClassModel,
     getOwnAttrModel,
+    getAttrModel,
     groupByType,
   }
 

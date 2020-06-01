@@ -21,9 +21,10 @@ import { Person } from '..'
 
 import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.vue'
 import ObjectPanel from '@anticrm/platform-ui-components/src/components/ObjectPanel.vue'
+import Table from '@anticrm/platform-ui-components/src/components/Table.vue'
 
 export default defineComponent({
-  components: { InlineEdit, ObjectPanel },
+  components: { InlineEdit, ObjectPanel, Table },
   props: {
     content: Object as PropType<Instance<Person>>
   },
@@ -50,6 +51,7 @@ export default defineComponent({
         style="margin-top: 2em"
       />
     </Suspense>
+    <Table clazz="class:contact.Person" exclude />
   </div>
 </template>
 
