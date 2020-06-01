@@ -120,7 +120,7 @@ export class MemDb implements DocDb {
   findAll<T extends Doc> (clazz: Ref<Class<T>>, query: Partial<T>): T[] {
     console.log(this.byClass?.get(clazz))
     const result = this.byClass?.get(clazz)
-    return result as T[] ?? []
+    return (result as T[]) ?? []
   }
 }
 
