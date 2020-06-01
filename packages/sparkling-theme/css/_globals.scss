@@ -110,7 +110,12 @@ a:hover {
 }
 
 .caption-4 {
-  @include caption-4;
+  // font-family: "Open Sans";
+  font-family: "IBM Plex Sans";
+  // font-family: "Raleway";
+  font-size: 10px;
+  font-weight: 400;
+  text-transform: uppercase;
 }
 
 .caption-5 {
