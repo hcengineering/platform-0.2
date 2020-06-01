@@ -22,17 +22,17 @@ export default defineComponent({
   setup () {
     return {
       credits: [
-        { name: "Andrey Platov", f: "Project Sponsor" },
-        { name: "", f: "Project Manager" },
-        { name: "", f: "Product Owner" },
-        { name: "", f: "Product Manager" },
-        { name: "", f: "System Architect" },
-        { name: "", f: "Senior Frontend Engineer" },
-        { name: "", f: "Senior Backend Engineer" },
-        { name: "", f: "Senior DevOps" },
-        { name: "", f: "Release Manager" },
-        { name: "", f: "UI/UX Lead" },
-        { name: "", f: "QA Lead" },
+        ["Andrey Platov", "Project Sponsor"],
+        ["", "Project Manager"],
+        ["", "Product Owner"],
+        ["", "Product Manager"],
+        ["", "Senior Frontend Engineer"],
+        ["", "Senior Backend Engineer"],
+        ["", "Senior DevOps"],
+        ["", "System Architect"],
+        ["", "Release Manager"],
+        ["", "UI/UX Lead"],
+        ["", "QA Lead"],
       ]
     }
   }
@@ -40,16 +40,16 @@ export default defineComponent({
 </script>
 
 <template>
-  <table class="container">
-    <tr v-for="person in credits" :key="person.f">
-      <td style="white-space:nowrap">{{person.name}}</td>&nbsp;
-      <td>{{person.f}}</td>
+  <table class="mc-credits-container">
+    <tr v-for="(credit, index) in credits" :key="index">
+      <td style="white-space:nowrap">{{credit[0]}}</td>
+      <td>{{credit[1]}}</td>
     </tr>
   </table>
 </template>
 
-<style scoped lang="scss">
-.container {
+<style lang="scss">
+.mc-credits-container {
   border-spacing: 0;
 }
 </style>

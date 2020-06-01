@@ -26,7 +26,7 @@ export default defineComponent({
   setup () {
     return {
       status (info: PluginInfo) {
-        return (info.status === PluginStatus.RUNNING) ? '☀︎' : '&nbsp;'
+        return (info.status === PluginStatus.RUNNING) ? '☀︎' : ''
       }
     }
   }
@@ -34,17 +34,17 @@ export default defineComponent({
 </script>
 
 <template>
-  <table class="container">
+  <table class="mc-plugins-container">
     <tr v-for="config in plugins" :key="config.id">
-      <td>platform-{{config.id}}</td>&nbsp;
+      <td>platform-{{config.id}}</td>
       <td>{{config.version}}</td>
-      <td v-html="status(config)" />
+      <td>{{status(config)}}</td>
     </tr>
   </table>
 </template>
 
-<style scoped lang="scss">
-.container {
+<style lang="scss">
+.mc-plugins-container {
   border-spacing: 0;
 }
 </style>

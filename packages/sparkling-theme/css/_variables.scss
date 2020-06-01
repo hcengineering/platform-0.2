@@ -49,12 +49,3 @@ $border-default: 1px solid $workspace-separator-color;
   -moz-osx-font-smoothing: grayscale;  
 
 }
-
-@mixin caption-4 {
-  // font-family: "Open Sans";
-  font-family: "IBM Plex Sans";
-  // font-family: "Raleway";
-  font-size: 10px;
-  font-weight: 400;
-  text-transform: uppercase;
-}

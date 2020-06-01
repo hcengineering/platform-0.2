@@ -16,11 +16,8 @@
 import { plugin, Service, Plugin, Metadata } from '@anticrm/platform'
 import ui, { AnyComponent } from '@anticrm/platform-ui'
 
-export default plugin('app-mission-control' as Plugin<Service>, {}, {
+export default plugin('storybook' as Plugin<Service>, {}, {
   component: {
-    MissionControl: '' as AnyComponent
+    Storybook: '' as AnyComponent
   },
-  metadata: {
-    Applications: '' as Metadata<AnyComponent[]>
-  }
 })

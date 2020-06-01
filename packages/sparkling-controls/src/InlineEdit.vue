@@ -70,7 +70,6 @@ export default defineComponent({
 
 <style lang="scss">
 @import "~@anticrm/sparkling-theme/css/_variables.scss";
-@import "~@anticrm/sparkling-theme/css/_components.scss";
 
 .erp-inline-editbox {
   min-width: 12em;
