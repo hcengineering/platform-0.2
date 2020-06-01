@@ -16,21 +16,22 @@
 import { Platform, Service } from '@anticrm/platform'
 import { UIService } from '@anticrm/platform-ui'
 
-import mc from '.'
-import SysInfo from './components/SysInfo.vue'
+import storybook from '.'
+import Storybook from './components/Storybook.vue'
 // import { LaunchPlugin } from '@anticrm/launch-dev'
 
-console.log('Plugin `app-mission-control` loaded')
+console.log('Plugin `app-storybook` loaded')
 
 /*!
- * Anticrm Platform™ 3D Demo Plugin
+ * Anticrm Platform™ Storybook Plugin
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */
-export default async (platform: Platform): Promise<Service> => {
-  console.log('Plugin `app-mission-control` started')
+export default async (platform: Platform,
+  deps: {}): Promise<Service> => {
+  console.log('Plugin `app-storybook` started')
 
-  platform.setResource(mc.component.MissionControl, SysInfo)
+  platform.setResource(storybook.component.Storybook, Storybook)
 
   return {}
 }

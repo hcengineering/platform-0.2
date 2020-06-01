@@ -23,6 +23,7 @@ import workbench from '@anticrm/platform-workbench'
 import contact from '@anticrm/contact'
 import demo from '@anticrm/demo-3d'
 import mc from '@anticrm/app-mission-control'
+import storybook from '@anticrm/app-storybook'
 
 import { createApp } from 'vue'
 import ErrorPage from './components/ErrorPage.vue'
@@ -50,7 +51,8 @@ platform.setMetadata(i18n.metadata.BootStrings, contactRu)
 platform.setMetadata(ui.metadata.DefaultApplication, mc.component.MissionControl)
 platform.setMetadata(mc.metadata.Applications, [
   workbench.component.Workbench,
-  demo.component.Periodic
+  demo.component.Periodic,
+  storybook.component.Storybook
 ])
 
 platform.addLocation(core, () => import(/* webpackChunkName: "platform-core" */ '@anticrm/platform-core/src/plugin'))
@@ -61,6 +63,7 @@ platform.addLocation(workbench, () => import(/* webpackChunkName: "platform-work
 platform.addLocation(contact, () => import(/* webpackChunkName: "contact" */ '@anticrm/contact/src/plugin'))
 platform.addLocation(demo, () => import(/* webpackChunkName: "demo-3d" */ '@anticrm/demo-3d/src/plugin'))
 platform.addLocation(mc, () => import(/* webpackChunkName: "mission-control" */ '@anticrm/app-mission-control/src/plugin'))
+platform.addLocation(storybook, () => import(/* webpackChunkName: "storybook" */ '@anticrm/app-storybook/src/plugin'))
 
 // uiMeta(platform)
 contactMeta(platform)
