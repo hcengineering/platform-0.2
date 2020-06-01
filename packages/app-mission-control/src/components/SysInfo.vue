@@ -17,7 +17,7 @@
 
 <script lang="ts">
 import { defineComponent, inject } from 'vue'
-import ui, { AnyComponent, UIState } from '@anticrm/platform-ui'
+import ui, { AnyComponent } from '@anticrm/platform-ui'
 import mc from '..'
 
 import Button from '@anticrm/sparkling-controls/src/Button.vue'
@@ -35,7 +35,6 @@ export default defineComponent({
         return this.$platform.getPluginInfos()
       },
       applications (): AnyComponent[] {
-        console.log('applications:')
         return this.$platform.getMetadata(mc.metadata.Applications)
       },
       run (app) {
