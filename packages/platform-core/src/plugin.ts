@@ -220,35 +220,34 @@ export default async (platform: Platform): Promise<CoreService> => {
       if (!exert) {
         throw new Error('bagof: no exert')
       }
-      console.log('constructing bag, exert function: ')
-      console.log(exert.toString())
+      // console.log('constructing bag, exert function: ')
+      // console.log(exert.toString())
       this.exert = exert
     }
 
     get (target: any, key: string): any {
-      console.log('bagof GET ' + key)
-      console.log(target)
+      // console.log('bagof GET ' + key)
+      // console.log(target)
       const value = Reflect.get(target, key)
-      console.log(value)
-      console.log(this.exert.toString())
+      // console.log(value)
+      // console.log(this.exert.toString())
       const result = this.exert(value)
-      console.log(result)
+      // console.log(result)
       return result
     }
   }
 
-  const Type_exert = function (this: Instance<Type<any>>): Promise<Exert> {
-    console.log('type exert')
-    return Promise.resolve(value => value)
+  const Type_exert = async function (this: Instance<Type<any>>): Promise<Exert> {
+    return value => value
   }
 
-  const Metadata_exert = function (this: Instance<Type<any>>): Exert {
+  const Metadata_exert = async function (this: Instance<Type<any>>): Promise<Exert> {
     return ((value: Metadata<any>) => value ? platform.getMetadata(value) : undefined) as Exert
   }
 
   const BagOf_exert = async function (this: Instance<BagOf<any>>): Promise<Exert> {
-    console.log('constructing BagOf')
-    console.log(this)
+    // console.log('constructing BagOf')
+    // console.log(this)
     const off = await this.of
     if (!off) { throw new Error('no exert here!!!') }
     if (!off.exert) { throw new Error('no exert here!!!!!!') }
@@ -259,18 +258,18 @@ export default async (platform: Platform): Promise<CoreService> => {
   }
 
   const InstanceOf_exert = async function (this: Instance<InstanceOf<Emb>>): Promise<Exert> {
-    console.log('instanceof exert')
+    // console.log('instanceof exert')
     return ((value: Emb) => {
-      console.log('instanceof exerting')
+      // console.log('instanceof exerting')
       const result = value ? instantiateEmb(value) : undefined
-      console.log('instanceof')
-      if (result instanceof Promise) {
-        result.then((x) => {
-          console.log('instance resolved')
-          console.log(x)
-        })
-      }
-      console.log(result)
+      // console.log('instanceof')
+      // if (result instanceof Promise) {
+      //   result.then((x) => {
+      //     console.log('instance resolved')
+      //     console.log(x)
+      //   })
+      // }
+      // console.log(result)
       return result
     }) as Exert
   }

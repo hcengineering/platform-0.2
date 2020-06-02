@@ -66,6 +66,7 @@ describe('core', () => {
     console.log(x)
     const to = await x.to
     console.log(x)
+    console.log(to._class)
     // const m = await x.to
     // console.log(m.toString())
     //    expect((inst._attributes.to as Instance<Emb>)._class).toBe(core.class.RefTo)

@@ -33,7 +33,7 @@ export default async (platform: Platform, deps: { core: CoreService }): Promise<
 
   async function getClassModel (_class: Ref<Class<Obj>>): Promise<UIModel> {
     const clazz = await coreService.getInstance(_class)
-    const decorator = coreService.as(clazz, ui.class.ClassUIDecorator)
+    const decorator = await coreService.as(clazz, ui.class.ClassUIDecorator)
     const label = await decorator.label ?? _class
     return {
       label,
@@ -65,21 +65,24 @@ export default async (platform: Platform, deps: { core: CoreService }): Promise<
    */
   async function getOwnAttrModel (_class: Ref<Class<Obj>>, exclude?: string[] | string): Promise<AttrModel[]> {
     const clazz = await coreService.getInstance(_class)
-    const decorator = coreService.as(clazz, ui.class.ClassUIDecorator)
+    const decorator = await coreService.as(clazz, ui.class.ClassUIDecorator)
     const keys = Object.getOwnPropertyNames(clazz._attributes).filter(key => !exclude?.includes(key))
 
     const attributes = clazz._attributes as { [key: string]: Instance<Type<any>> }
     const attrs = keys.map(async (key) => {
-      const type = attributes[key]
-      const typeDecorator = decorator.decorators?.[key]
+      const type = await attributes[key]
+      const typeDecorator = await decorator.decorators?.[key]
+
+      console.log('!!!!!!!!!!!!!!')
+      console.log(typeDecorator)
 
       const typeClass = await coreService.getInstance(type._class)
-      const typeClassDecorator = coreService.as(typeClass, ui.class.ClassUIDecorator)
+      const typeClassDecorator = await coreService.as(typeClass, ui.class.ClassUIDecorator)
 
       const label = await typeDecorator?.label ?? await typeClassDecorator?.label ?? key
-      const placeholder = await typeDecorator?.placeholder ?? label
+      const placeholder = (await typeDecorator?.placeholder) ?? label
 
-      const icon = typeDecorator?.icon ?? typeClassDecorator?.icon
+      const icon = await typeDecorator?.icon ?? await typeClassDecorator?.icon
       return {
         key,
         type,

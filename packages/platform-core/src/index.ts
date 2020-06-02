@@ -142,10 +142,11 @@ export default plugin('core' as Plugin<CoreService>, {}, {
     Adapter: '' as Ref<Class<Adapter>>
   },
   method: {
-    Type_exert: '' as Resource<(this: Instance<Type<any>>) => Exert>,
-    BagOf_exert: '' as Resource<(this: Instance<BagOf<any>>) => Exert>,
-    InstanceOf_exert: '' as Resource<(this: Instance<InstanceOf<Emb>>) => Exert>,
-    Metadata_exert: '' as Resource<(this: Instance<Type<Metadata<any>>>) => Exert>,
+    Type_exert: '' as Resource<(this: Instance<Type<any>>) => Promise<Exert>>,
+    BagOf_exert: '' as Resource<(this: Instance<BagOf<any>>) => Promise<Exert>>,
+    InstanceOf_exert: '' as Resource<(this: Instance<InstanceOf<Emb>>) => Promise<Exert>>,
+    Metadata_exert: '' as Resource<(this: Instance<Type<Metadata<any>>>) => Promise<Exert>>,
+
     Adapter_adapt: '' as Resource<(this: Instance<Adapter>) => Promise<Resource<any>> | undefined>
   },
   native: {
