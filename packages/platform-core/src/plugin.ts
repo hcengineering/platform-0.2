@@ -116,12 +116,12 @@ export default async (platform: Platform): Promise<CoreService> => {
     getSession: (): CoreService => coreService
   }
 
-  function getPrototype<T extends Obj> (_class: Ref<Class<T>>, stereotype: Stereotype): Object {
+  async function getPrototype<T extends Obj> (_class: Ref<Class<T>>, stereotype: Stereotype): Promise<Object> {
     const prototype = prototypes.get(_class)
     if (prototype) { return prototype }
 
     const clazz = modelDb.get(_class) as Class<Obj>
-    const parent = clazz._extends ? getPrototype(clazz._extends, stereotype) : CoreRoot
+    const parent = clazz._extends ? await getPrototype(clazz._extends, stereotype) : CoreRoot
     const proto = Object.create(parent)
     prototypes.set(_class, proto)
 
@@ -137,14 +137,19 @@ export default async (platform: Platform): Promise<CoreService> => {
       if (key === '_default') { continue } // we do not define `_default`'s type, it's infinitevely recursive :)
       const attr = attributes[key]
       // console.log(attr)
-      const attrInstance = instantiateEmb(attr)
+      const attrInstance = await instantiateEmb(attr)
       // console.log(attrInstance)
 
       if (typeof attrInstance.exert !== 'function') {
         throw new Error('exert is not a function')
       }
 
-      const exert = attrInstance.exert()
+      const exert = await attrInstance.exert()
+
+      if (typeof exert !== 'function') {
+        throw new Error('exert is not a function 2')
+      }
+
       const fullKey = stereotype === Stereotype.DOC ?
         key.startsWith('_') ? key : attributeKey(_class, key) :
         key
@@ -159,11 +164,11 @@ export default async (platform: Platform): Promise<CoreService> => {
     return proto
   }
 
-  function getKonstructor<T extends Obj> (_class: Ref<Class<T>>, stereotype: Stereotype): Konstructor<T> {
+  async function getKonstructor<T extends Obj> (_class: Ref<Class<T>>, stereotype: Stereotype): Promise<Konstructor<T>> {
     const konstructor = konstructors.get(_class)
     if (konstructor) { return konstructor as unknown as Konstructor<T> }
     else {
-      const proto = getPrototype(_class, stereotype)
+      const proto = await getPrototype(_class, stereotype)
       const ctor = {
         [_class]: function (this: Instance<Obj>, obj: Obj) {
           this.__layout = obj
@@ -176,13 +181,13 @@ export default async (platform: Platform): Promise<CoreService> => {
     }
   }
 
-  function instantiateEmb<T extends Emb> (obj: T): Instance<T> {
-    const ctor = getKonstructor(obj._class, Stereotype.EMB)
+  async function instantiateEmb<T extends Emb> (obj: T): Promise<Instance<T>> {
+    const ctor = await getKonstructor(obj._class, Stereotype.EMB)
     return new ctor(obj)
   }
 
-  function instantiateDoc<T extends Doc> (obj: T): Instance<T> {
-    const ctor = getKonstructor(obj._class, Stereotype.DOC)
+  async function instantiateDoc<T extends Doc> (obj: T): Promise<Instance<T>> {
+    const ctor = await getKonstructor(obj._class, Stereotype.DOC)
     return new ctor(obj)
   }
 
@@ -193,11 +198,11 @@ export default async (platform: Platform): Promise<CoreService> => {
     return instantiateDoc(doc)
   }
 
-  function as<T extends Doc, A extends Doc> (doc: Instance<T>, _class: Ref<Class<A>>): Instance<A> {
+  async function as<T extends Doc, A extends Doc> (doc: Instance<T>, _class: Ref<Class<A>>): Promise<Instance<A>> {
     if (!is(doc, _class)) {
       console.log('Warning:' + _class + ' instance does not mixed into `' + doc._class + '`')
     }
-    const ctor = getKonstructor(_class, Stereotype.DOC)
+    const ctor = await getKonstructor(_class, Stereotype.DOC)
     return new ctor(doc.__layout as unknown as A)
   }
 
@@ -211,19 +216,28 @@ export default async (platform: Platform): Promise<CoreService> => {
   class BagProxyHandler implements ProxyHandler<any> {
     private exert: Exert
 
-    constructor(type: Instance<Type<any>>) {
-      if (!type.exert) {
+    constructor(exert: Exert | undefined) {
+      if (!exert) {
         throw new Error('bagof: no exert')
       }
-      this.exert = type.exert()
+      // console.log('constructing bag, exert function: ')
+      // console.log(exert.toString())
+      this.exert = exert
     }
 
     get (target: any, key: string): any {
-      return this.exert(Reflect.get(target, key))
+      // console.log('bagof GET ' + key)
+      // console.log(target)
+      const value = Reflect.get(target, key)
+      // console.log(value)
+      // console.log(this.exert.toString())
+      const result = this.exert(value)
+      // console.log(result)
+      return result
     }
   }
 
-  const Type_exert = function (this: Instance<Type<any>>): Exert {
+  const Type_exert = async function (this: Instance<Type<any>>): Promise<Exert> {
     return value => value
   }
 
@@ -231,16 +245,37 @@ export default async (platform: Platform): Promise<CoreService> => {
     return ((value: Metadata<any> & Property<any> & Resolve) => value ? platform.getMetadata(value) : undefined) as Exert
   }
 
-  const BagOf_exert = function (this: Instance<BagOf<any>>): Exert {
-    return (value: PropertyType) => value ? new Proxy(value, new BagProxyHandler(this.of)) : undefined
+  const BagOf_exert = async function (this: Instance<BagOf<any>>): Promise<Exert> {
+    // console.log('constructing BagOf')
+    // console.log(this)
+    const off = await this.of
+    if (!off) { throw new Error('no exert here!!!') }
+    if (!off.exert) { throw new Error('no exert here!!!!!!') }
+    const exert = off.exert()
+    if (!exert) { throw new Error('no exert here') }
+    const e = await exert// off.exert()
+    return (value: PropertyType) => value ? new Proxy(value, new BagProxyHandler(e)) : undefined
   }
 
-  const InstanceOf_exert = function (this: Instance<InstanceOf<Emb>>): Exert {
-    return ((value: Emb) => value ? instantiateEmb(value) : undefined) as Exert
+  const InstanceOf_exert = async function (this: Instance<InstanceOf<Emb>>): Promise<Exert> {
+    // console.log('instanceof exert')
+    return ((value: Emb) => {
+      // console.log('instanceof exerting')
+      const result = value ? instantiateEmb(value) : undefined
+      // console.log('instanceof')
+      // if (result instanceof Promise) {
+      //   result.then((x) => {
+      //     console.log('instance resolved')
+      //     console.log(x)
+      //   })
+      // }
+      // console.log(result)
+      return result
+    }) as Exert
   }
 
   const TResourceType = {
-    exert: function (this: Instance<ResourceType<any>>): Exert {
+    exert: async function (this: Instance<ResourceType<any>>): Promise<Exert> {
       const resource = (this.__layout._default) as Resource<(this: Instance<Type<any>>) => Exert>
       let resolved: any
       if (resource) {

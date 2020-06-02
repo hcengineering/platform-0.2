@@ -124,14 +124,14 @@ export interface CoreService extends Service {
 
   // newInstance<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Obj>, _id?: Ref<M>): Instance<M>
   getInstance<T extends Doc> (id: Ref<T>): Promise<Instance<T>>
-  as<T extends Doc, A extends Doc> (obj: Instance<T>, _class: Ref<Class<A>>): Instance<A>
+  as<T extends Doc, A extends Doc> (obj: Instance<T>, _class: Ref<Class<A>>): Promise<Instance<A>>
   is<T extends Doc, A extends Doc> (obj: Instance<T>, _class: Ref<Class<A>>): boolean
   getClassHierarchy (_class: Ref<Class<Obj>>, top?: Ref<Class<Obj>>): Ref<Class<Obj>>[]
 
   getDb (): DocDb
 
   // debug?
-  getPrototype<T extends Obj> (_class: Ref<Class<T>>, stereotype: number /* for tests */): Object
+  getPrototype<T extends Obj> (_class: Ref<Class<T>>, stereotype: number /* for tests */): Promise<Object>
 }
 
 // P L U G I N
@@ -148,10 +148,11 @@ export default plugin('core' as Plugin<CoreService>, {}, {
     Adapter: '' as Ref<Class<Adapter>>
   },
   method: {
-    Type_exert: '' as Resource<(this: Instance<Type<any>>) => Exert>,
-    BagOf_exert: '' as Resource<(this: Instance<BagOf<any>>) => Exert>,
-    InstanceOf_exert: '' as Resource<(this: Instance<InstanceOf<Emb>>) => Exert>,
-    Metadata_exert: '' as Resource<(this: Instance<Type<Metadata<any>>>) => Exert>,
+    Type_exert: '' as Resource<(this: Instance<Type<any>>) => Promise<Exert>>,
+    BagOf_exert: '' as Resource<(this: Instance<BagOf<any>>) => Promise<Exert>>,
+    InstanceOf_exert: '' as Resource<(this: Instance<InstanceOf<Emb>>) => Promise<Exert>>,
+    Metadata_exert: '' as Resource<(this: Instance<Type<Metadata<any>>>) => Promise<Exert>>,
+
     Adapter_adapt: '' as Resource<(this: Instance<Adapter>) => Promise<Resource<any>> | undefined>
   },
   native: {
