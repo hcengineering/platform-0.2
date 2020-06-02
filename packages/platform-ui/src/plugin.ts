@@ -73,9 +73,6 @@ export default async (platform: Platform, deps: { core: CoreService }): Promise<
       const type = await attributes[key]
       const typeDecorator = await decorator.decorators?.[key]
 
-      console.log('!!!!!!!!!!!!!!')
-      console.log(typeDecorator)
-
       const typeClass = await coreService.getInstance(type._class)
       const typeClassDecorator = await coreService.as(typeClass, ui.class.ClassUIDecorator)
 
