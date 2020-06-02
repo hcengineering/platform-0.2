@@ -86,7 +86,7 @@ export default async (platform: Platform, deps: { core: CoreService }): Promise<
         label,
         placeholder,
         icon
-      }
+      } as AttrModel
     })
     return Promise.all(attrs)
   }

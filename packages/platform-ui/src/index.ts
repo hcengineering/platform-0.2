@@ -13,8 +13,8 @@
 // limitations under the License.
 //
 
-import { Property, Resource, Metadata, plugin, Plugin, Service, ResourceKind } from '@anticrm/platform'
-import core, { Obj, Emb, Ref, Class, Type, Doc, Instance, AdapterType } from '@anticrm/platform-core'
+import { Resource, Metadata, plugin, Plugin, Service, ResourceKind } from '@anticrm/platform'
+import core, { Obj, Emb, Ref, Class, Type, Property, Instance, AdapterType } from '@anticrm/platform-core'
 import { IntlString } from '@anticrm/platform-core-i18n'
 
 export type URL = string
@@ -46,6 +46,9 @@ export interface ClassUIDecorator<T extends Obj> extends Class<T>, UIDecorator {
 export interface Form<T extends Obj> extends ClassUIDecorator<T> {
   form: ComponentRef
 }
+
+const x = {} as Instance<UIDecorator>
+x.icon
 
 // U I  M O D E L
 

@@ -33,8 +33,8 @@ export type PropertyType = Property<any>
 // P R I M I T I V E
 
 export type StringType = Property<string> // TODO: Do we need this?
-export type ResourceProperty<T> = Resource<T> & Property<Resource<T>>
-export type ResolveResource<T> = Resource<T> & Property<T> & Resolve
+// export type ResourceProperty<T> = Resource<T> & Property<Resource<T>>
+// export type ResolveResource<T> = Resource<T> & Property<T> & Resolve
 
 // O B J E C T S
 
@@ -50,7 +50,7 @@ export interface Doc extends Obj {
 export type Exert = (value: PropertyType, layout?: any, key?: string) => any
 export interface Type<A> extends Emb {
   _default?: Property<A>
-  exert?: ResolveResource<(this: Instance<Type<any>>) => Exert>
+  exert?: Resource<(this: Instance<Type<any>>) => Exert> & Resolve
 }
 export interface RefTo<T extends Doc> extends Type<T> { to: Ref<Class<T>> }
 export interface InstanceOf<T extends Emb> extends Type<T> { of: Ref<Class<T>> }
@@ -77,7 +77,7 @@ export type AllAttributes<T extends E, E extends Obj> = Attributes<T, E> & Parti
 export interface EClass<T extends E, E extends Obj> extends Doc {
   _attributes: AllAttributes<T, E>
   _extends?: Ref<Class<E>>
-  _native?: ResourceProperty<Object>
+  _native?: Resource<Object>
 }
 
 export const CLASS = 'class' as ResourceKind
@@ -85,7 +85,8 @@ export type Class<T extends Obj> = EClass<T, Obj>
 
 type PrimitiveInstance<T> =
   T extends Ref<infer X> ? Ref<X> : // (X extends Doc ? Promise<Instance<X>> : never) :
-  T extends Property<infer X> & Resolve ? Promise<X> :
+  T extends Resource<infer X> & Resolve ? Promise<X> :
+  T extends Resource<infer X> ? X :
   T extends Property<infer X> ? X :
   Instance<T> // only Embedded objects remains
 
@@ -153,15 +154,15 @@ export default plugin('core' as Plugin<CoreService>, {}, {
     Adapter: '' as Ref<Class<Adapter>>
   },
   method: {
-    Type_exert: '' as ResolveResource<(this: Instance<Type<any>>) => Promise<Exert>>,
-    BagOf_exert: '' as ResolveResource<(this: Instance<BagOf<any>>) => Promise<Exert>>,
-    InstanceOf_exert: '' as ResolveResource<(this: Instance<InstanceOf<Emb>>) => Promise<Exert>>,
-    Metadata_exert: '' as ResolveResource<(this: Instance<Type<Metadata<any>>>) => Promise<Exert>>,
+    Type_exert: '' as Resolve & Resource<(this: Instance<Type<any>>) => Promise<Exert>>,
+    BagOf_exert: '' as Resolve & Resource<(this: Instance<BagOf<any>>) => Promise<Exert>>,
+    InstanceOf_exert: '' as Resolve & Resource<(this: Instance<InstanceOf<Emb>>) => Promise<Exert>>,
+    Metadata_exert: '' as Resolve & Resource<(this: Instance<Type<Metadata<any>>>) => Promise<Exert>>,
 
-    Adapter_adapt: '' as ResolveResource<(this: Instance<Adapter>) => Promise<Resource<any>> | undefined>
+    Adapter_adapt: '' as Resolve & Resource<(this: Instance<Adapter>) => Promise<Resource<any>> | undefined>
   },
   native: {
-    ResourceType: '' as ResourceProperty<Object>
+    ResourceType: '' as Resource<Object>
   },
 })
 

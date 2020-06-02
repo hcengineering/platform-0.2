@@ -17,7 +17,7 @@ import { PrimitiveType } from 'intl-messageformat'
 import { Plugin, Service, plugin, Resource, Metadata } from '@anticrm/platform'
 import { Type, Instance, Exert, ResolveResource } from '@anticrm/platform-core'
 
-export type IntlString = Resource<string> & { __intl_string: void }  // eslint-disable-line
+export type IntlString = Resource<string> & { __intl_string: true }  // eslint-disable-line
 
 export const pluginId = 'i18n' as Plugin<I18nService>
 
