@@ -127,7 +127,7 @@ export type AdapterType = (resource: Resource<any>) => Promise<Resource<any> | u
 export interface Adapter extends Doc {
   from: Property<string>
   to: Property<string>
-  adapt: Property<AdapterType>
+  adapt: Property<Promise<AdapterType>>
 }
 
 // S E S S I O N
@@ -166,6 +166,7 @@ export default plugin('core' as Plugin<CoreService>, {}, {
     Doc: '' as Ref<Class<Doc>>,
     Class: '' as Ref<Class<Class<Obj>>>,
     StaticResource: '' as Ref<Class<StaticResource<any>>>,
+    // Resource: '' as Ref<Class<Type<any>>>,
     RefTo: '' as Ref<Class<RefTo<Doc>>>,
     Adapter: '' as Ref<Class<Adapter>>
   },
@@ -174,8 +175,9 @@ export default plugin('core' as Plugin<CoreService>, {}, {
     BagOf_exert: '' as Resource<(this: Instance<BagOf<any>>) => Promise<Exert>>,
     InstanceOf_exert: '' as Resource<(this: Instance<InstanceOf<Emb>>) => Promise<Exert>>,
     Metadata_exert: '' as Resource<(this: Instance<Type<Metadata<any>>>) => Promise<Exert>>,
+    Resource_exert: '' as Resource<(this: Instance<Type<any>>) => Promise<Exert>>,
 
-    Adapter_adapt: '' as Resource<(this: Instance<Adapter>) => Promise<Resource<any>> | undefined>
+    // Adapter_adapt: '' as Resource<(this: Instance<Adapter>) => Promise<Resource<any>> | undefined>
   },
   native: {
     StaticResource: '' as Resource<Object>

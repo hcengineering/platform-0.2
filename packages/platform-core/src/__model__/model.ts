@@ -89,14 +89,18 @@ export default (S: Builder) => {
     })
   })
 
+  S.createClass(core.class.Resource, core.class.Type, {
+    exert: S.newInstance(core.class.StaticResource, {
+      _default: S.resolve(core.method.Resource_exert)
+    })
+  })
+
   S.createClass(core.class.StaticResource, core.class.Type, {})
   S.patch(core.class.StaticResource, (clazz: Class<Obj>) => { clazz._native = S.primitive(core.native.StaticResource) })
 
   S.createClass(core.class.Adapter, core.class.Doc, {
     from: S.newInstance(core.class.Type, {}),
     to: S.newInstance(core.class.Type, {}),
-    adapt: S.newInstance(core.class.StaticResource, {
-      _default: S.resolve(core.method.Adapter_adapt)
-    })
+    adapt: S.newInstance(core.class.Resource, {})
   })
 }

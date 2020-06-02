@@ -100,8 +100,10 @@ export default async (platform: Platform): Promise<CoreService> => {
       console.log('ADAPTER:')
       console.log(adapter)
       const instance = await coreService.getInstance(adapter._id)
-      console.log(instance)
-      return instance.adapt(resource)
+      const adapted = (await instance.adapt)(resource)
+      console.log('adapted')
+      console.log(adapted)
+      return adapted
     }
 
     // const list = adapters.get(key)
@@ -118,7 +120,7 @@ export default async (platform: Platform): Promise<CoreService> => {
     return undefined
   }
 
-  platform.setResource(core.method.Adapter_adapt, async () => { throw new Error('Abstract `adapt` function.') })
+  // platform.setResource(core.method.Adapter_adapt, async () => { throw new Error('Abstract `adapt` function.') })
 
   // C O R E  S E R V I C E
 
@@ -279,6 +281,10 @@ export default async (platform: Platform): Promise<CoreService> => {
     return ((value: Metadata<any> & Property<any>) => value ? platform.getMetadata(value) : undefined) as Exert
   }
 
+  const Resource_exert = async function (this: Instance<Type<any>>): Promise<Exert> {
+    return (async (value: Property<any>) => value ? platform.getResource(value as unknown as Resource<any>) : undefined) as Exert
+  }
+
   const BagOf_exert = async function (this: Instance<BagOf<any>>): Promise<Exert> {
     const off = await this.of
     const exertFactory = off.exert
@@ -321,6 +327,7 @@ export default async (platform: Platform): Promise<CoreService> => {
   platform.setResource(core.method.BagOf_exert, BagOf_exert)
   platform.setResource(core.method.InstanceOf_exert, InstanceOf_exert)
   platform.setResource(core.method.Metadata_exert, Metadata_exert)
+  platform.setResource(core.method.Resource_exert, Resource_exert)
 
   return coreService
 }
