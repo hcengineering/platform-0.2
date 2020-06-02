@@ -13,10 +13,10 @@
 // limitations under the License.
 //
 
-import { Platform, Resource, Metadata } from '@anticrm/platform'
+import { Platform, Resource, Metadata, ResourceKind } from '@anticrm/platform'
 import core, {
   CoreService, Obj, Ref, Class, Doc, BagOf, InstanceOf, PropertyType,
-  Instance, Type, Emb, ResourceType, Exert, AdapterType, Property
+  Instance, Type, Emb, ResourceType, Exert, Adapter, Property
 } from '.'
 import { MemDb } from './memdb'
 
@@ -72,25 +72,53 @@ export default async (platform: Platform): Promise<CoreService> => {
 
   // A D A P T E R S
 
-  const adapters = new Map<string, AdapterType[]>()
+  // const adapters = new Map<string, Ref<Adapter>[]>()
 
-  const allAdapters = modelDb.findAll(core.class.Adapter, {})
+  // const allAdapters = modelDb.findAll(core.class.Adapter, {})
+  // console.log('ALL ADAPTERS:')
+  // console.log(allAdapters)
+  // allAdapters.forEach((adapter) => {
+  //   const key = adapter.from + ':' + adapter.to
+  //   const all = adapters.get(key)
+  //   if (all) { all.push(adapter._id) }
+  //   else { adapters.set(key, [adapter._id]) }
+  // })
 
-  function adapt (resource: Resource<any>, kind: string): Promise<Resource<any>> | undefined {
+  async function adapt (resource: Resource<any>, kind: string): Promise<Resource<any> | undefined> {
+    console.log('adapting ' + resource + ' to ' + kind)
     const info = platform.getResourceInfo(resource)
     if (info.kind === kind) {
       return Promise.resolve(resource)
     }
-    const key = info.kind + ':' + kind
-    const list = adapters.get(key)
-    if (list) {
-      for (const adapter of list) {
-        const adapted = adapter(resource)
-        if (adapted) { return adapted }
-      }
+
+    const adapter = await modelDb.findOne(core.class.Adapter, {
+      from: info.kind as unknown as Property<ResourceKind>,
+      to: kind as unknown as Property<ResourceKind>
+    })
+
+    if (adapter) {
+      console.log('ADAPTER:')
+      console.log(adapter)
+      const instance = await coreService.getInstance(adapter._id)
+      console.log(instance)
+      return instance.adapt(resource)
     }
+
+    // const list = adapters.get(key)
+    // console.log('adapters for ' + key)
+    // console.log(list)
+    // if (list) {
+    //   for (const adapter of list) {
+    //     const instance = await coreService.getInstance(adapter)
+    //     instance.adapt
+    //     const adapted = adapter(resource)
+    //     if (adapted) { return adapted }
+    //   }
+    // }
     return undefined
   }
+
+  platform.setResource(core.method.Adapter_adapt, async () => { throw new Error('Abstract `adapt` function.') })
 
   // C O R E  S E R V I C E
 

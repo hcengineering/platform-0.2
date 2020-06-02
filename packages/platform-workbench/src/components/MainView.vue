@@ -31,7 +31,10 @@ export default defineComponent({
   async setup (props, context) {
     const platform = inject(PlatformInjectionKey) as Platform
     const coreService = inject(CoreServiceInjectionKey) as CoreService
-    const uiService = inject(UIServiceInjectionKey) as UIService
+
+    const adapted = coreService.adapt(props.content as Ref<Class<Doc>>, COMPONENT)
+    console.log('adapted:')
+    console.log(adapted)
 
     const _class = props.content as Ref<Class<Doc>>
 

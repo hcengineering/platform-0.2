@@ -14,8 +14,8 @@
 //
 
 
-import { Platform } from '@anticrm/platform'
-import core, { CoreService, Ref, Class, Obj, Type, Instance } from '@anticrm/platform-core'
+import { Platform, Resource } from '@anticrm/platform'
+import core, { CoreService, Ref, Class, Obj, Doc, Type, Instance, AdapterType } from '@anticrm/platform-core'
 import ui, { UIService, UIModel, AttrModel } from '.'
 
 console.log('Plugin `face` loaded')
@@ -96,6 +96,19 @@ export default async (platform: Platform, deps: { core: CoreService }): Promise<
     const ownModels = hierarchy.map(clazz => getOwnAttrModel(clazz, exclude))
     return Promise.all(ownModels).then(result => result.flat())
   }
+
+  // A D A P T E R S
+
+  async function classToComponent (resource: Resource<any>): Promise<Resource<any>> {
+    const clazz = await coreService.getInstance(resource as Ref<Class<Doc>>)
+    if (!coreService.is(clazz, ui.class.Form)) {
+      throw new Error(`something went wrong, can't find 'Form' for the ${resource}.`)
+    }
+    const component = (await coreService.as(clazz, ui.class.Form)).form
+    return component
+  }
+
+  platform.setResource(ui.method.ClassToComponent, classToComponent)
 
   // S E R V I C E
 
