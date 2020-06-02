@@ -14,7 +14,7 @@
 //
 
 import { Resource } from '@anticrm/platform'
-import { PropertyType, Emb, Doc, Obj, Ref, EClass, Class, AllAttributes, DocDb, Property, Resolve } from '@anticrm/platform-core'
+import { PropertyType, Emb, Doc, Obj, Ref, EClass, Class, AllAttributes, DocDb, Property } from '@anticrm/platform-core'
 import core from '.'
 import { MemDb } from '../memdb'
 

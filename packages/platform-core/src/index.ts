@@ -20,8 +20,16 @@ import {
 
 // P R O P E R T I E S
 
+/** 
+ * When we define class, we do not define storage types. E.g. some property may
+ * serialize to string, another to number or structure. Howerver we preserve
+ * `runtime` types for a property. 
+ * 
+ * @typeParam T   Property will be of type `T` when instantiated.
+ * 
+ * {@link Instance}
+ */
 export type Property<T> = { __property: T }
-export type Resolve = { __resolve: true }
 
 export type Ref<T extends Doc> = string & { __ref: T }
 export type PropertyType = Property<any>
@@ -32,9 +40,7 @@ export type PropertyType = Property<any>
 
 // P R I M I T I V E
 
-export type StringType = Property<string> // TODO: Do we need this?
-// export type ResourceProperty<T> = Resource<T> & Property<Resource<T>>
-// export type ResolveResource<T> = Resource<T> & Property<T> & Resolve
+export type StringType = string & Property<string>
 
 // O B J E C T S
 
@@ -160,12 +166,12 @@ export default plugin('core' as Plugin<CoreService>, {}, {
     Adapter: '' as Ref<Class<Adapter>>
   },
   method: {
-    Type_exert: '' as Resolve & Resource<(this: Instance<Type<any>>) => Promise<Exert>>,
-    BagOf_exert: '' as Resolve & Resource<(this: Instance<BagOf<any>>) => Promise<Exert>>,
-    InstanceOf_exert: '' as Resolve & Resource<(this: Instance<InstanceOf<Emb>>) => Promise<Exert>>,
-    Metadata_exert: '' as Resolve & Resource<(this: Instance<Type<Metadata<any>>>) => Promise<Exert>>,
+    Type_exert: '' as Resource<(this: Instance<Type<any>>) => Promise<Exert>>,
+    BagOf_exert: '' as Resource<(this: Instance<BagOf<any>>) => Promise<Exert>>,
+    InstanceOf_exert: '' as Resource<(this: Instance<InstanceOf<Emb>>) => Promise<Exert>>,
+    Metadata_exert: '' as Resource<(this: Instance<Type<Metadata<any>>>) => Promise<Exert>>,
 
-    Adapter_adapt: '' as Resolve & Resource<(this: Instance<Adapter>) => Promise<Resource<any>> | undefined>
+    Adapter_adapt: '' as Resource<(this: Instance<Adapter>) => Promise<Resource<any>> | undefined>
   },
   native: {
     ResourceType: '' as Resource<Object>
