@@ -68,7 +68,7 @@ export interface BagOf<A> extends Type<{ [key: string]: A }> {
   of: Type<A>
 }
 export interface ArrayOf<A> extends Type<A[]> { of: Type<A> }
-export interface ResourceType<T> extends Type<T> { }
+export interface StaticResource<T> extends Type<T> { }
 
 // C L A S S E S
 
@@ -165,7 +165,7 @@ export default plugin('core' as Plugin<CoreService>, {}, {
   class: {
     Doc: '' as Ref<Class<Doc>>,
     Class: '' as Ref<Class<Class<Obj>>>,
-    ResourceType: '' as Ref<Class<ResourceType<any>>>,
+    StaticResource: '' as Ref<Class<StaticResource<any>>>,
     RefTo: '' as Ref<Class<RefTo<Doc>>>,
     Adapter: '' as Ref<Class<Adapter>>
   },
@@ -178,7 +178,7 @@ export default plugin('core' as Plugin<CoreService>, {}, {
     Adapter_adapt: '' as Resource<(this: Instance<Adapter>) => Promise<Resource<any>> | undefined>
   },
   native: {
-    ResourceType: '' as Resource<Object>
+    StaticResource: '' as Resource<Object>
   },
 })
 

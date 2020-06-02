@@ -16,7 +16,7 @@
 import { Platform, Resource, Metadata, ResourceKind } from '@anticrm/platform'
 import core, {
   CoreService, Obj, Ref, Class, Doc, BagOf, InstanceOf, PropertyType,
-  Instance, Type, Emb, ResourceType, Exert, Adapter, Property
+  Instance, Type, Emb, StaticResource, Exert, Adapter, Property
 } from '.'
 import { MemDb } from './memdb'
 
@@ -305,8 +305,8 @@ export default async (platform: Platform): Promise<CoreService> => {
     }) as Exert
   }
 
-  const TResourceType = {
-    exert: async function (this: Instance<ResourceType<any>>): Promise<Exert> {
+  const TStaticResource = {
+    exert: async function (this: Instance<StaticResource<any>>): Promise<Exert> {
       const resource = (this.__layout._default) as unknown as Resource<(this: Instance<Type<any>>) => Exert>
       if (resource) {
         const resolved = await platform.getResource(resource)
@@ -316,7 +316,7 @@ export default async (platform: Platform): Promise<CoreService> => {
     }
   }
 
-  platform.setResource(core.native.ResourceType, TResourceType)
+  platform.setResource(core.native.StaticResource, TStaticResource)
   platform.setResource(core.method.Type_exert, Type_exert)
   platform.setResource(core.method.BagOf_exert, BagOf_exert)
   platform.setResource(core.method.InstanceOf_exert, InstanceOf_exert)
