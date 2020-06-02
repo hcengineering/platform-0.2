@@ -126,7 +126,7 @@ export default async (platform: Platform): Promise<CoreService> => {
     prototypes.set(_class, proto)
 
     if (clazz._native) {
-      const native = platform.getResource(clazz._native) // TODO: must `resolve`! we need to have getPrototype async for this.
+      const native = platform.getResource(clazz._native as unknown as Resource<Object>) // TODO: must `resolve`! we need to have getPrototype async for this.
       if (!native) { throw new Error(`something went wrong, can't load '${clazz._native}' resource`) }
       const descriptors = Object.getOwnPropertyDescriptors(native)
       Object.defineProperties(proto, descriptors)
@@ -144,7 +144,7 @@ export default async (platform: Platform): Promise<CoreService> => {
       //   throw new Error('exert is not a function')
       // }
 
-      const exertFactory = await attrInstance.exert
+      const exertFactory = attrInstance.exert
 
       if (typeof exertFactory !== 'function') {
         throw new Error('exertFactory is not a function')
@@ -253,7 +253,7 @@ export default async (platform: Platform): Promise<CoreService> => {
 
   const BagOf_exert = async function (this: Instance<BagOf<any>>): Promise<Exert> {
     const off = await this.of
-    const exertFactory = await off.exert
+    const exertFactory = off.exert
     if (typeof exertFactory !== 'function') { throw new Error('not a function') }
     const exert = await exertFactory.call(this)
     if (typeof exert !== 'function') { throw new Error('not a function') }

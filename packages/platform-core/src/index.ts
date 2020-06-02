@@ -50,7 +50,7 @@ export interface Doc extends Obj {
 export type Exert = (value: PropertyType, layout?: any, key?: string) => any
 export interface Type<A> extends Emb {
   _default?: Property<A>
-  exert?: Resource<(this: Instance<Type<any>>) => Exert> & Resolve
+  exert?: Property<(this: Instance<Type<any>>) => Promise<Exert>>
 }
 export interface RefTo<T extends Doc> extends Type<T> { to: Ref<Class<T>> }
 export interface InstanceOf<T extends Emb> extends Type<T> { of: Ref<Class<T>> }
@@ -77,31 +77,37 @@ export type AllAttributes<T extends E, E extends Obj> = Attributes<T, E> & Parti
 export interface EClass<T extends E, E extends Obj> extends Doc {
   _attributes: AllAttributes<T, E>
   _extends?: Ref<Class<E>>
-  _native?: Resource<Object>
+  _native?: Property<Object>
 }
 
 export const CLASS = 'class' as ResourceKind
 export type Class<T extends Obj> = EClass<T, Obj>
 
 type PrimitiveInstance<T> =
-  T extends Ref<infer X> ? Ref<X> : // (X extends Doc ? Promise<Instance<X>> : never) :
-  T extends Resource<infer X> & Resolve ? Promise<X> :
-  T extends Resource<infer X> ? X :
+  T extends Ref<infer X> ? Ref<X> :
+  // T extends Resource<infer X> & Resolve ? Promise<X> :
+  // T extends Resource<infer X> ? X :
   T extends Property<infer X> ? X :
   Instance<T> // only Embedded objects remains
 
 export type Instance<T> = { [P in keyof T]:
-  T[P] extends { [key: string]: infer X } | undefined ? { [key: string]: PrimitiveInstance<X> } :
-  T[P] extends (infer X)[] | undefined ? PrimitiveInstance<X>[] :
-  PrimitiveInstance<T[P]>
+  T[P] extends Property<infer X> | undefined ? X :
+  T[P] extends Ref<infer X> ? Ref<X> :
+  T[P] extends { __embedded: true } ? Instance<T[P]> :
+  T[P] extends { [key: string]: infer X } | undefined ? { [key: string]: Instance<X> } :
+  T[P] extends (infer X)[] | undefined ? Instance<X>[] :
+  never
 } & {
   __layout: T
   getSession (): CoreService
 }
 
-const x = {} as Instance<Type<any>>
+const x = {} as Instance<Type<number>>
 
 const m = x.exert
+
+const y = {} as Attributes<Type<any>, Obj>
+y.exert
 
 
 // A D A P T E R S

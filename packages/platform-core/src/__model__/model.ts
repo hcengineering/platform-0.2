@@ -49,7 +49,7 @@ export default (S: Builder) => {
   S.createClass(core.class.Type, core.class.Emb, {
     _default: S.newInstance(core.class.Type, {}),
     exert: S.newInstance(core.class.ResourceType, {
-      _default: core.method.Type_exert
+      _default: S.resolve(core.method.Type_exert)
     })
   })
 
@@ -58,7 +58,7 @@ export default (S: Builder) => {
       of: core.class.Type
     }),
     exert: S.newInstance(core.class.ResourceType, {
-      _default: core.method.BagOf_exert
+      _default: S.resolve(core.method.BagOf_exert)
     })
   })
 
@@ -73,7 +73,7 @@ export default (S: Builder) => {
       to: core.class.Class as Ref<Class<Class<Emb>>>
     }),
     exert: S.newInstance(core.class.ResourceType, {
-      _default: core.method.InstanceOf_exert
+      _default: S.resolve(core.method.InstanceOf_exert)
     })
   })
 
@@ -85,18 +85,18 @@ export default (S: Builder) => {
 
   S.createClass(core.class.Metadata, core.class.Type, {
     exert: S.newInstance(core.class.ResourceType, {
-      _default: core.method.Metadata_exert
+      _default: S.resolve(core.method.Metadata_exert)
     })
   })
 
   S.createClass(core.class.ResourceType, core.class.Type, {})
-  S.patch(core.class.ResourceType, (clazz: Class<Obj>) => { clazz._native = core.native.ResourceType })
+  S.patch(core.class.ResourceType, (clazz: Class<Obj>) => { clazz._native = S.ref(core.native.ResourceType) })
 
   S.createClass(core.class.Adapter, core.class.Doc, {
     from: S.newInstance(core.class.Type, {}),
     to: S.newInstance(core.class.Type, {}),
     adapt: S.newInstance(core.class.ResourceType, {
-      _default: core.method.Adapter_adapt
+      _default: S.resolve(core.method.Adapter_adapt)
     })
   })
 }
