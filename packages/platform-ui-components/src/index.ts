@@ -14,8 +14,8 @@
 //
 
 import { App } from 'vue'
-import { Property, Resource, Metadata, plugin, Plugin, Service } from '@anticrm/platform'
-import core, { Obj, Emb, Ref, Class, Type, Instance } from '@anticrm/platform-core'
+import { Metadata, plugin, Plugin, Service } from '@anticrm/platform'
+import core from '@anticrm/platform-core'
 import ui from '@anticrm/platform-ui'
 
 export type URL = string

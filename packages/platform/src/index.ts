@@ -13,32 +13,45 @@
 // limitations under the License.
 //
 
-/**
- * Platform Resource Identifier (PRI).
- *
- * PRI is a `string` in the `kind:...` format.
- * The Platform use `kind` part to delegate resource resolution to the plugin
- * that is registered as a resolver for `Resources` of such a kind.
- *
- * Examples of PRIs:
+/** Every Platform object property must inherit from this type. (Not sure). */
+// export type Property<T> = string & { __property: T } // TODO: remove `string`
+
+/** 
+ * Platform Resource Identifier. 
+ * 
+ * 'Resource' is simply any JavaScript object. There is a plugin exists, which 'resolve' PRI into actual object.
+ * This is a difference from Metadata. Metadata object 'resolved' by Platform instance, so we may consider Metadata as
+ * a Resource, provided by Platform itself. Because there is always a plugin, which resolve `Resource` resolution is 
+ * aynchronous process.
+ * 
+ * `Resource` is a string of `kind:plugin.id` format. Since Metadata is a kind of Resource. 
+ * Metadata also can be reolved using resource API.
+ * 
+ * Examples of `Resource`:
  * ```typescript
  *   `class:contact.Person` as Resource<Class<Person>> // database object with id === `class:contact.Person`
  *   `string:class.ClassLabel` as Resource<string> // translated string according to current language and i18n settings
  *   `asset:ui.Icons` as Resource<URL> // URL to SVG sprites
  *   `easyscript:2+2` as Resource<() => number> // function
  * ```
- *
- * {@link ResourcePlugin}
- * {@link Platform.resolve}
  */
+export type Resource<T> = string & { __resource: T }
 
-export type Property<T> = string & { __property: T }
-export type Resource<T> = Property<T> & { __resource: true }
-export type Metadata<T> = Property<T>
+/**
+ * Platform Metadata Identifier (PMI).
+ * 
+ * 'Metadata' is simply any JavaScript object, which is used to configure platform, e.g. IP addresses.
+ * Another example of metadata is an asset URL. The logic behind providing asset URLs as metadata is 
+ * we know URL at compile time only and URLs vary depending on deployment options.
+ */
+export type Metadata<T> = Resource<T> & { __metadata: true }
 
+
+/** Base interface for every plugin API. */
 export interface Service { }
+/** Plugin identifier. */
 export type Plugin<S extends Service> = Resource<S>
-export type AnyPlugin = Plugin<Service>
+type AnyPlugin = Plugin<Service>
 
 export interface ResourceProvider extends Service {
   resolve (resource: Resource<any>): Promise<any>
@@ -47,8 +60,9 @@ export interface ResourceProvider extends Service {
 /**
  * A plugin may request platform to inject resolved references to plugins it depends on.
  */
-export interface PluginDependencies { [key: string]: AnyPlugin }
+interface PluginDependencies { [key: string]: AnyPlugin }
 
+/** @hidden */
 type InferPlugins<T extends PluginDependencies> = {
   [P in keyof T]: T[P] extends Plugin<infer Service> ? Service : T[P]
 }
@@ -81,7 +95,7 @@ export interface PluginInfo {
   status: PluginStatus
 }
 
-export type ResourceKind = string & Property<string> & { __resourceKind: true }
+export type ResourceKind = string & { __resourceKind: true }
 
 export interface ResourceInfo {
   kind: ResourceKind
@@ -110,7 +124,7 @@ export class Platform {
 
   // M E T A D A T A
 
-  private resources = new Map<Metadata<any>, any>()
+  private resources = new Map<Resource<any>, any>()
 
   getMetadata<T> (id: Metadata<T>): T | undefined {
     return this.resources.get(id)

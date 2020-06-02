@@ -14,11 +14,22 @@
 //
 
 import {
-  plugin, Plugin, Service, Resource, Property,
+  plugin, Plugin, Service, Resource,
   Metadata, ResourceKind
 } from '@anticrm/platform'
 
 // P R O P E R T I E S
+
+/** 
+ * When we define class, we do not define storage types. E.g. some property may
+ * serialize to string, another to number or structure. Howerver we preserve
+ * `runtime` types for a property. 
+ * 
+ * @typeParam T   Property will be of type `T` when instantiated.
+ * 
+ * {@link Instance}
+ */
+export type Property<T> = { __property: T }
 
 export type Ref<T extends Doc> = string & { __ref: T }
 export type PropertyType = Property<any>
@@ -26,6 +37,14 @@ export type PropertyType = Property<any>
   | undefined
   | PropertyType[]
   | { [key: string]: PropertyType }
+
+
+export type Resolve<T> = T extends Resource<infer X> ? Property<Promise<X>> : never
+// export type Preserve<T> = T extends Resource<infer X> ? Property<Resource<X>> : never
+
+// P R I M I T I V E
+
+// export type Primitive<T> = T & Property<T>
 
 // O B J E C T S
 
@@ -41,7 +60,7 @@ export interface Doc extends Obj {
 export type Exert = (value: PropertyType, layout?: any, key?: string) => any
 export interface Type<A> extends Emb {
   _default?: Property<A>
-  exert?: Property<(this: Instance<Type<any>>) => Exert>
+  exert?: Property<(this: Instance<Type<any>>) => Promise<Exert>>
 }
 export interface RefTo<T extends Doc> extends Type<T> { to: Ref<Class<T>> }
 export interface InstanceOf<T extends Emb> extends Type<T> { of: Ref<Class<T>> }
@@ -51,13 +70,10 @@ export interface BagOf<A> extends Type<{ [key: string]: A }> {
 export interface ArrayOf<A> extends Type<A[]> { of: Type<A> }
 export interface ResourceType<T> extends Type<T> { }
 
-// P R I M I T I V E
-
-export type StringType = Property<string> // TODO: Do we need this?
-
 // C L A S S E S
 
-type PropertyTypes<T> = { [P in keyof T]:
+type PropertyTypes<T> = {
+  [P in keyof T]:
   T[P] extends Property<infer X> ? Type<X> :
   T[P] extends Ref<infer X> ? Type<X> :
   T[P] extends { [key: string]: infer X } | undefined ? BagOf<any> :
@@ -71,35 +87,47 @@ export type AllAttributes<T extends E, E extends Obj> = Attributes<T, E> & Parti
 export interface EClass<T extends E, E extends Obj> extends Doc {
   _attributes: AllAttributes<T, E>
   _extends?: Ref<Class<E>>
-  _native?: Resource<Object>
+  _native?: Property<Object>
 }
 
 export const CLASS = 'class' as ResourceKind
 export type Class<T extends Obj> = EClass<T, Obj>
 
 type PrimitiveInstance<T> =
-  T extends Ref<infer X> ? Ref<X> : // (X extends Doc ? Promise<Instance<X>> : never) :
-  T extends Resource<infer X> ? Promise<X> :
+  T extends Ref<infer X> ? Ref<X> :
+  // T extends Resource<infer X> & Resolve ? Promise<X> :
+  // T extends Resource<infer X> ? X :
   T extends Property<infer X> ? X :
   Instance<T> // only Embedded objects remains
 
 export type Instance<T> = { [P in keyof T]:
-  T[P] extends { [key: string]: infer X } | undefined ? { [key: string]: PrimitiveInstance<X> } :
-  T[P] extends (infer X)[] | undefined ? PrimitiveInstance<X>[] :
-  PrimitiveInstance<T[P]>
+  T[P] extends Property<infer X> | undefined ? X :
+  T[P] extends Ref<infer X> ? Ref<X> :
+  T[P] extends { __embedded: true } ? Instance<T[P]> :
+  T[P] extends { [key: string]: infer X } | undefined ? { [key: string]: Instance<X> } :
+  T[P] extends (infer X)[] | undefined ? Instance<X>[] :
+  never
 } & {
   __layout: T
   getSession (): CoreService
 }
+
+const x = {} as Instance<Type<number>>
+
+const m = x.exert
+
+const y = {} as Attributes<Type<any>, Obj>
+y.exert
+
 
 // A D A P T E R S
 
 export type AdapterType = (resource: Resource<any>) => Promise<Resource<any>> | undefined
 
 export interface Adapter extends Doc {
-  from: StringType
-  to: StringType
-  adapt: Property<AdapterType>
+  from: Property<string>
+  to: Property<string>
+  adapt: Property<Resource<AdapterType>>
 }
 
 // S E S S I O N
@@ -118,14 +146,14 @@ export interface CoreService extends Service {
 
   // newInstance<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Obj>, _id?: Ref<M>): Instance<M>
   getInstance<T extends Doc> (id: Ref<T>): Promise<Instance<T>>
-  as<T extends Doc, A extends Doc> (obj: Instance<T>, _class: Ref<Class<A>>): Instance<A>
+  as<T extends Doc, A extends Doc> (obj: Instance<T>, _class: Ref<Class<A>>): Promise<Instance<A>>
   is<T extends Doc, A extends Doc> (obj: Instance<T>, _class: Ref<Class<A>>): boolean
   getClassHierarchy (_class: Ref<Class<Obj>>, top?: Ref<Class<Obj>>): Ref<Class<Obj>>[]
 
   getDb (): DocDb
 
   // debug?
-  getPrototype<T extends Obj> (_class: Ref<Class<T>>, stereotype: number /* for tests */): Object
+  getPrototype<T extends Obj> (_class: Ref<Class<T>>, stereotype: number /* for tests */): Promise<Object>
 }
 
 // P L U G I N
@@ -142,10 +170,11 @@ export default plugin('core' as Plugin<CoreService>, {}, {
     Adapter: '' as Ref<Class<Adapter>>
   },
   method: {
-    Type_exert: '' as Resource<(this: Instance<Type<any>>) => Exert>,
-    BagOf_exert: '' as Resource<(this: Instance<BagOf<any>>) => Exert>,
-    InstanceOf_exert: '' as Resource<(this: Instance<InstanceOf<Emb>>) => Exert>,
-    Metadata_exert: '' as Resource<(this: Instance<Type<Metadata<any>>>) => Exert>,
+    Type_exert: '' as Resource<(this: Instance<Type<any>>) => Promise<Exert>>,
+    BagOf_exert: '' as Resource<(this: Instance<BagOf<any>>) => Promise<Exert>>,
+    InstanceOf_exert: '' as Resource<(this: Instance<InstanceOf<Emb>>) => Promise<Exert>>,
+    Metadata_exert: '' as Resource<(this: Instance<Type<Metadata<any>>>) => Promise<Exert>>,
+
     Adapter_adapt: '' as Resource<(this: Instance<Adapter>) => Promise<Resource<any>> | undefined>
   },
   native: {

@@ -16,7 +16,6 @@
 /* eslint-env jest */
 
 import { Platform } from '@anticrm/platform'
-import { Instance, Emb } from '@anticrm/platform-core'
 import startPlugin from '../plugin'
 import model from '../__model__/model'
 import Builder from '../__model__/builder'
@@ -41,16 +40,16 @@ describe('core', () => {
     const builder = new Builder(tx.getDb())
     builder.load(model)
 
-    const typeProto = tx.getPrototype(core.class.Type, DOC)
+    const typeProto = await tx.getPrototype(core.class.Type, DOC)
     console.log(typeProto)
 
-    const rtProto = tx.getPrototype(core.class.ResourceType, DOC)
+    const rtProto = await tx.getPrototype(core.class.ResourceType, DOC)
     console.log(rtProto)
 
     const rtProtoProto = Object.getPrototypeOf(rtProto)
     expect(typeProto).toBe(rtProtoProto)
 
-    const bagProto = tx.getPrototype(core.class.BagOf, DOC)
+    const bagProto = await tx.getPrototype(core.class.BagOf, DOC)
     console.log(bagProto)
   })
 
@@ -60,6 +59,10 @@ describe('core', () => {
     builder.load(model)
 
     const inst = await tx.getInstance(core.class.RefTo)
-    expect((inst._attributes.to as Instance<Emb>)._class).toBe(core.class.RefTo)
+    const x = inst._attributes
+    const to = await x.to
+    // TODO: understand problem
+    expect((to as any)._class).toBe(core.class.RefTo)
+    //    expect((inst._attributes.to as Instance<Emb>)._class).toBe(core.class.RefTo)
   })
 })

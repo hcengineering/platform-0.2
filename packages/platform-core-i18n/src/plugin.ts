@@ -15,7 +15,7 @@
 
 import { IntlMessageFormat, PrimitiveType } from 'intl-messageformat'
 import { Platform } from '@anticrm/platform'
-import { Doc, Instance, Type, Ref, Exert } from '@anticrm/platform-core'
+import { Doc, Instance, Type, Ref, Exert, Property } from '@anticrm/platform-core'
 import i18n, { I18nService, IntlString } from '..'
 
 /**
@@ -67,8 +67,8 @@ export default async (platform: Platform): Promise<I18nService> => {
     return translation
   }
 
-  const IntlString_exert = function (this: Instance<Type<Doc>>): Exert { // eslint-disable-line
-    return ((value: IntlString, layout: any, key: string) => {
+  const IntlString_exert = async function (this: Instance<Type<Doc>>): Promise<Exert> { // eslint-disable-line
+    return ((value: IntlString & Property<string>, layout: any, key: string) => {
       const translation = translate(value)
       if (translation !== value) {
         return translation

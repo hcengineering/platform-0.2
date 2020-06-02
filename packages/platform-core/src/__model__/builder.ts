@@ -13,7 +13,8 @@
 // limitations under the License.
 //
 
-import { PropertyType, Emb, Doc, Obj, Ref, EClass, Class, AllAttributes, DocDb } from '@anticrm/platform-core'
+import { Resource, Metadata } from '@anticrm/platform'
+import { PropertyType, Emb, Doc, Obj, Ref, EClass, Class, AllAttributes, DocDb, Property } from '@anticrm/platform-core'
 import core from '.'
 import { MemDb } from '../memdb'
 
@@ -52,6 +53,18 @@ class Builder {
   }
 
   load (model: (builder: Builder) => void) { model(this) }
+
+  resolve<T> (resource: Resource<T>) {
+    return resource as Resource<T> & Property<Promise<T>>
+  }
+
+  resolveMeta<T> (resource: Metadata<T>) {
+    return resource as Metadata<T> & Property<T>
+  }
+
+  primitive<T> (prop: T) {
+    return prop as T & Property<T>
+  }
 }
 
 export default Builder

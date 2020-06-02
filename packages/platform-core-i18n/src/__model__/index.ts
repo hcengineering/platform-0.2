@@ -22,6 +22,6 @@ import { extendIds } from '@anticrm/platform-core/src/__model__/utils'
 
 export default extendIds(i18n, {
   class: {
-    IntlString: '' as Ref<Class<Type<IntlString>>>
+    IntlString: '' as Ref<Class<Type<Promise<string>>>>
   }
 })

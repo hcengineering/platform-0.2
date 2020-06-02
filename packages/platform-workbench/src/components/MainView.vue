@@ -42,7 +42,7 @@ export default defineComponent({
     if (!coreService.is(clazz, ui.class.Form)) {
       throw new Error(`something went wrong, can't find 'Form' for the ${_class}.`)
     }
-    const component = coreService.as(clazz, ui.class.Form).form
+    const component = (await coreService.as(clazz, ui.class.Form)).form
     const content = coreService.getDb().createDocument(_class, {})
     return {
       component, content
