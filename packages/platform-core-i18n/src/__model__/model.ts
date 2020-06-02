@@ -21,7 +21,7 @@ import i18n from '.'
 
 export default (S: Builder) => {
   S.createClass(i18n.class.IntlString, core.class.Type, {
-    exert: S.newInstance(core.class.ResourceType, {
+    exert: S.newInstance(core.class.StaticResource, {
       _default: S.primitive(i18n.method.IntlString_exert)
     })
   })

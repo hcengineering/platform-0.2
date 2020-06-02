@@ -31,7 +31,7 @@ import {
  */
 export type Property<T> = { __property: T }
 
-export type Ref<T extends Doc> = string & { __ref: T }
+export type Ref<T extends Doc> = string & { __ref: T } & Resource<T>
 export type PropertyType = Property<any>
   | Emb
   | undefined
@@ -68,7 +68,7 @@ export interface BagOf<A> extends Type<{ [key: string]: A }> {
   of: Type<A>
 }
 export interface ArrayOf<A> extends Type<A[]> { of: Type<A> }
-export interface ResourceType<T> extends Type<T> { }
+export interface StaticResource<T> extends Type<T> { }
 
 // C L A S S E S
 
@@ -122,12 +122,12 @@ y.exert
 
 // A D A P T E R S
 
-export type AdapterType = (resource: Resource<any>) => Promise<Resource<any>> | undefined
+export type AdapterType = (resource: Resource<any>) => Promise<Resource<any> | undefined>
 
 export interface Adapter extends Doc {
   from: Property<string>
   to: Property<string>
-  adapt: Property<Resource<AdapterType>>
+  adapt: Property<Promise<AdapterType>>
 }
 
 // S E S S I O N
@@ -142,7 +142,7 @@ export interface DocDb {
 }
 
 export interface CoreService extends Service {
-  adapt (resource: Resource<any>, kind: string): Promise<Resource<any>> | undefined
+  adapt (resource: Resource<any>, kind: string): Promise<Resource<any> | undefined>
 
   // newInstance<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Obj>, _id?: Ref<M>): Instance<M>
   getInstance<T extends Doc> (id: Ref<T>): Promise<Instance<T>>
@@ -165,7 +165,8 @@ export default plugin('core' as Plugin<CoreService>, {}, {
   class: {
     Doc: '' as Ref<Class<Doc>>,
     Class: '' as Ref<Class<Class<Obj>>>,
-    ResourceType: '' as Ref<Class<ResourceType<any>>>,
+    StaticResource: '' as Ref<Class<StaticResource<any>>>,
+    // Resource: '' as Ref<Class<Type<any>>>,
     RefTo: '' as Ref<Class<RefTo<Doc>>>,
     Adapter: '' as Ref<Class<Adapter>>
   },
@@ -174,11 +175,12 @@ export default plugin('core' as Plugin<CoreService>, {}, {
     BagOf_exert: '' as Resource<(this: Instance<BagOf<any>>) => Promise<Exert>>,
     InstanceOf_exert: '' as Resource<(this: Instance<InstanceOf<Emb>>) => Promise<Exert>>,
     Metadata_exert: '' as Resource<(this: Instance<Type<Metadata<any>>>) => Promise<Exert>>,
+    Resource_exert: '' as Resource<(this: Instance<Type<any>>) => Promise<Exert>>,
 
-    Adapter_adapt: '' as Resource<(this: Instance<Adapter>) => Promise<Resource<any>> | undefined>
+    // Adapter_adapt: '' as Resource<(this: Instance<Adapter>) => Promise<Resource<any>> | undefined>
   },
   native: {
-    ResourceType: '' as Resource<Object>
+    StaticResource: '' as Resource<Object>
   },
 })
 

@@ -31,7 +31,10 @@ export default defineComponent({
   async setup (props, context) {
     const platform = inject(PlatformInjectionKey) as Platform
     const coreService = inject(CoreServiceInjectionKey) as CoreService
-    const uiService = inject(UIServiceInjectionKey) as UIService
+
+    const adapted = await coreService.adapt(props.content as Ref<Class<Doc>>, COMPONENT)
+    console.log('FORM ADAPTED:')
+    console.log(adapted)
 
     const _class = props.content as Ref<Class<Doc>>
 
@@ -43,6 +46,8 @@ export default defineComponent({
       throw new Error(`something went wrong, can't find 'Form' for the ${_class}.`)
     }
     const component = (await coreService.as(clazz, ui.class.Form)).form
+    console.log('COMPONENT')
+    console.log(component)
     const content = coreService.getDb().createDocument(_class, {})
     return {
       component, content

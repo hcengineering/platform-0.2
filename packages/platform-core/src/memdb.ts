@@ -117,19 +117,25 @@ export class MemDb implements DocDb {
   }
 
   // Q U E R Y
-  findAll<T extends Doc> (clazz: Ref<Class<T>>, query: Partial<T>): T[] {
+  async find<T extends Doc> (clazz: Ref<Class<T>>, query: Partial<T>): Promise<T[]> {
     console.log(this.byClass?.get(clazz))
-    const result = this.byClass?.get(clazz)
-    return (result as T[]) ?? []
+    const result = (this.byClass?.get(clazz) ?? []) as T[]
+    return findAll(result, clazz, query)
+  }
+
+  async findOne<T extends Doc> (clazz: Ref<Class<T>>, query: Partial<T>): Promise<T | undefined> {
+    const result = await this.find(clazz, query)
+    return result.length == 0 ? undefined : result[0]
   }
 }
 
 function findAll<T extends Doc> (docs: T[], clazz: Ref<Class<T>>, query: Partial<T>): T[] {
   let result = docs
 
-  for (const propertyKey in query) {
-    const condition = query[propertyKey]
-    result = filterEq(result, propertyKey, condition as PropertyType) // TODO: must be PropertyType
+  for (const key in query) {
+    const condition = query[key]
+    const aKey = attributeKey(clazz, key)
+    result = filterEq(result, aKey, condition as PropertyType)
   }
 
   return result as T[]

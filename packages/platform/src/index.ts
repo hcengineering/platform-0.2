@@ -172,10 +172,10 @@ export class Platform {
   }
 
   getResourceInfo (resource: Resource<any>): ResourceInfo {
-    const index = resource.indexOf(':') + 1
+    const index = resource.indexOf(':')
     const kind = resource.substring(0, index) as ResourceKind
     const dot = resource.indexOf('.', index)
-    const plugin = resource.substring(index, dot) as AnyPlugin
+    const plugin = resource.substring(index + 1, dot) as AnyPlugin
     const id = resource.substring(dot)
     return { kind, plugin, id }
   }

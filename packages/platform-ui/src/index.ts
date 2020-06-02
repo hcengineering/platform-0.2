@@ -47,12 +47,6 @@ export interface Form<T extends Obj> extends ClassUIDecorator<T> {
   form: Property<AnyComponent>
 }
 
-const y = {} as Form<Obj>
-y.form
-
-const x = {} as Instance<UIDecorator>
-x.label
-
 // U I  M O D E L
 
 export interface UIModel {

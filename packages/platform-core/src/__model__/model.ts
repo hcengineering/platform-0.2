@@ -43,12 +43,12 @@ export default (S: Builder) => {
     _extends: S.newInstance(core.class.RefTo as Ref<Class<RefTo<Class<Obj>>>>, {
       to: core.class.Class
     }),
-    _native: S.newInstance(core.class.ResourceType, {})
+    _native: S.newInstance(core.class.StaticResource, {})
   })
 
   S.createClass(core.class.Type, core.class.Emb, {
     _default: S.newInstance(core.class.Type, {}),
-    exert: S.newInstance(core.class.ResourceType, {
+    exert: S.newInstance(core.class.StaticResource, {
       _default: S.resolve(core.method.Type_exert)
     })
   })
@@ -57,7 +57,7 @@ export default (S: Builder) => {
     of: S.newInstance(core.class.InstanceOf as Ref<Class<InstanceOf<Type<any>>>>, {
       of: core.class.Type
     }),
-    exert: S.newInstance(core.class.ResourceType, {
+    exert: S.newInstance(core.class.StaticResource, {
       _default: S.resolve(core.method.BagOf_exert)
     })
   })
@@ -72,7 +72,7 @@ export default (S: Builder) => {
     of: S.newInstance(core.class.RefTo as Ref<Class<RefTo<Class<Emb>>>>, {
       to: core.class.Class as Ref<Class<Class<Emb>>>
     }),
-    exert: S.newInstance(core.class.ResourceType, {
+    exert: S.newInstance(core.class.StaticResource, {
       _default: S.resolve(core.method.InstanceOf_exert)
     })
   })
@@ -84,19 +84,23 @@ export default (S: Builder) => {
   })
 
   S.createClass(core.class.Metadata, core.class.Type, {
-    exert: S.newInstance(core.class.ResourceType, {
+    exert: S.newInstance(core.class.StaticResource, {
       _default: S.resolve(core.method.Metadata_exert)
     })
   })
 
-  S.createClass(core.class.ResourceType, core.class.Type, {})
-  S.patch(core.class.ResourceType, (clazz: Class<Obj>) => { clazz._native = S.primitive(core.native.ResourceType) })
+  S.createClass(core.class.Resource, core.class.Type, {
+    exert: S.newInstance(core.class.StaticResource, {
+      _default: S.resolve(core.method.Resource_exert)
+    })
+  })
+
+  S.createClass(core.class.StaticResource, core.class.Type, {})
+  S.patch(core.class.StaticResource, (clazz: Class<Obj>) => { clazz._native = S.primitive(core.native.StaticResource) })
 
   S.createClass(core.class.Adapter, core.class.Doc, {
     from: S.newInstance(core.class.Type, {}),
     to: S.newInstance(core.class.Type, {}),
-    adapt: S.newInstance(core.class.ResourceType, {
-      _default: S.resolve(core.method.Adapter_adapt)
-    })
+    adapt: S.newInstance(core.class.Resource, {})
   })
 }

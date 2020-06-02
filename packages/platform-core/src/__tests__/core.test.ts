@@ -43,7 +43,7 @@ describe('core', () => {
     const typeProto = await tx.getPrototype(core.class.Type, DOC)
     console.log(typeProto)
 
-    const rtProto = await tx.getPrototype(core.class.ResourceType, DOC)
+    const rtProto = await tx.getPrototype(core.class.StaticResource, DOC)
     console.log(rtProto)
 
     const rtProtoProto = Object.getPrototypeOf(rtProto)

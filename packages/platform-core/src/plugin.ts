@@ -13,10 +13,10 @@
 // limitations under the License.
 //
 
-import { Platform, Resource, Metadata } from '@anticrm/platform'
+import { Platform, Resource, Metadata, ResourceKind } from '@anticrm/platform'
 import core, {
   CoreService, Obj, Ref, Class, Doc, BagOf, InstanceOf, PropertyType,
-  Instance, Type, Emb, ResourceType, Exert, AdapterType, Property
+  Instance, Type, Emb, StaticResource, Exert, Adapter, Property
 } from '.'
 import { MemDb } from './memdb'
 
@@ -72,25 +72,55 @@ export default async (platform: Platform): Promise<CoreService> => {
 
   // A D A P T E R S
 
-  const adapters = new Map<string, AdapterType[]>()
+  // const adapters = new Map<string, Ref<Adapter>[]>()
 
-  const allAdapters = modelDb.findAll(core.class.Adapter, {})
+  // const allAdapters = modelDb.findAll(core.class.Adapter, {})
+  // console.log('ALL ADAPTERS:')
+  // console.log(allAdapters)
+  // allAdapters.forEach((adapter) => {
+  //   const key = adapter.from + ':' + adapter.to
+  //   const all = adapters.get(key)
+  //   if (all) { all.push(adapter._id) }
+  //   else { adapters.set(key, [adapter._id]) }
+  // })
 
-  function adapt (resource: Resource<any>, kind: string): Promise<Resource<any>> | undefined {
+  async function adapt (resource: Resource<any>, kind: string): Promise<Resource<any> | undefined> {
+    console.log('adapting ' + resource + ' to ' + kind)
     const info = platform.getResourceInfo(resource)
     if (info.kind === kind) {
       return Promise.resolve(resource)
     }
-    const key = info.kind + ':' + kind
-    const list = adapters.get(key)
-    if (list) {
-      for (const adapter of list) {
-        const adapted = adapter(resource)
-        if (adapted) { return adapted }
-      }
+
+    const adapter = await modelDb.findOne(core.class.Adapter, {
+      from: info.kind as unknown as Property<ResourceKind>,
+      to: kind as unknown as Property<ResourceKind>
+    })
+
+    if (adapter) {
+      console.log('ADAPTER:')
+      console.log(adapter)
+      const instance = await coreService.getInstance(adapter._id)
+      const adapted = (await instance.adapt)(resource)
+      console.log('adapted')
+      console.log(adapted)
+      return adapted
     }
+
+    // const list = adapters.get(key)
+    // console.log('adapters for ' + key)
+    // console.log(list)
+    // if (list) {
+    //   for (const adapter of list) {
+    //     const instance = await coreService.getInstance(adapter)
+    //     instance.adapt
+    //     const adapted = adapter(resource)
+    //     if (adapted) { return adapted }
+    //   }
+    // }
     return undefined
   }
+
+  // platform.setResource(core.method.Adapter_adapt, async () => { throw new Error('Abstract `adapt` function.') })
 
   // C O R E  S E R V I C E
 
@@ -251,6 +281,10 @@ export default async (platform: Platform): Promise<CoreService> => {
     return ((value: Metadata<any> & Property<any>) => value ? platform.getMetadata(value) : undefined) as Exert
   }
 
+  const Resource_exert = async function (this: Instance<Type<any>>): Promise<Exert> {
+    return (async (value: Property<any>) => value ? platform.getResource(value as unknown as Resource<any>) : undefined) as Exert
+  }
+
   const BagOf_exert = async function (this: Instance<BagOf<any>>): Promise<Exert> {
     const off = await this.of
     const exertFactory = off.exert
@@ -277,8 +311,8 @@ export default async (platform: Platform): Promise<CoreService> => {
     }) as Exert
   }
 
-  const TResourceType = {
-    exert: async function (this: Instance<ResourceType<any>>): Promise<Exert> {
+  const TStaticResource = {
+    exert: async function (this: Instance<StaticResource<any>>): Promise<Exert> {
       const resource = (this.__layout._default) as unknown as Resource<(this: Instance<Type<any>>) => Exert>
       if (resource) {
         const resolved = await platform.getResource(resource)
@@ -288,11 +322,12 @@ export default async (platform: Platform): Promise<CoreService> => {
     }
   }
 
-  platform.setResource(core.native.ResourceType, TResourceType)
+  platform.setResource(core.native.StaticResource, TStaticResource)
   platform.setResource(core.method.Type_exert, Type_exert)
   platform.setResource(core.method.BagOf_exert, BagOf_exert)
   platform.setResource(core.method.InstanceOf_exert, InstanceOf_exert)
   platform.setResource(core.method.Metadata_exert, Metadata_exert)
+  platform.setResource(core.method.Resource_exert, Resource_exert)
 
   return coreService
 }
