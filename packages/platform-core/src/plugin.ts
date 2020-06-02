@@ -126,7 +126,7 @@ export default async (platform: Platform): Promise<CoreService> => {
     prototypes.set(_class, proto)
 
     if (clazz._native) {
-      const native = platform.getResource(clazz._native as unknown as Resource<Object>) // TODO: must `resolve`! we need to have getPrototype async for this.
+      const native = await platform.getResource(clazz._native as unknown as Resource<Object>) // TODO: must `resolve`! we need to have getPrototype async for this.
       if (!native) { throw new Error(`something went wrong, can't load '${clazz._native}' resource`) }
       const descriptors = Object.getOwnPropertyDescriptors(native)
       Object.defineProperties(proto, descriptors)
@@ -280,12 +280,11 @@ export default async (platform: Platform): Promise<CoreService> => {
   const TResourceType = {
     exert: async function (this: Instance<ResourceType<any>>): Promise<Exert> {
       const resource = (this.__layout._default) as unknown as Resource<(this: Instance<Type<any>>) => Exert>
-      let resolved: any
       if (resource) {
-        resolved = platform.getResource(resource)
-        if (!resolved) { throw new Error('something went wrong: we need to `resolve` resource here, so please work on async rework') }
+        const resolved = await platform.getResource(resource)
+        return () => resolved
       }
-      return (value: PropertyType) => resolved
+      return () => undefined
     }
   }
 

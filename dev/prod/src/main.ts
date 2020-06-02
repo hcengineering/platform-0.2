@@ -55,7 +55,6 @@ platform.addLocation(mc, () => import(/* webpackChunkName: "mission-control" */ 
 contactMeta(platform)
 
 async function boot (): Promise<void> {
-  // const i18nService = await platform.getPlugin(i18n.id) // TODO: dirty hack, resources does not resolve awhen building prototypes.
   const uiComponentsService = await platform.getPlugin(uiComponents.id)
   uiComponentsService.getApp().mount('#app')
 }

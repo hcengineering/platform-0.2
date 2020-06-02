@@ -112,9 +112,10 @@ describe('platform', () => {
     })
   })
 
-  it('should set metadata', () => {
+  it('should set metadata', async () => {
     platform.setResource('xxx' as Resource<string>, 'meta-xxx')
-    expect(platform.getResource('xxx' as Resource<string>)).toBe('meta-xxx')
+    const resource = await platform.getResource('xxx' as Resource<string>)
+    expect(resource).toBe('meta-xxx')
   })
 
   it('should load metadata', () => {

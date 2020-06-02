@@ -58,7 +58,7 @@ export default async (platform: Platform, deps: { core: CoreService, ui: UIServi
       }
     },
     render () {
-      const cached = platform.getResource(this.component as AnyComponent)
+      const cached = platform.peekResource(this.component as AnyComponent)
       if (cached) {
         return h(cached)
       }
@@ -68,7 +68,7 @@ export default async (platform: Platform, deps: { core: CoreService, ui: UIServi
         })
         return h('div', [])
       } else {
-        const resolved = platform.getResource(this.resolved as AnyComponent)
+        const resolved = platform.peekResource(this.resolved as AnyComponent)
         if (resolved) {
           return h(resolved)
         } else {

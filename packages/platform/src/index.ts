@@ -13,9 +13,6 @@
 // limitations under the License.
 //
 
-/** Every Platform object property must inherit from this type. (Not sure). */
-// export type Property<T> = string & { __property: T } // TODO: remove `string`
-
 /** 
  * Platform Resource Identifier. 
  * 
@@ -124,8 +121,6 @@ export class Platform {
 
   // M E T A D A T A
 
-  private resources = new Map<Resource<any>, any>()
-
   getMetadata<T> (id: Metadata<T>): T | undefined {
     return this.resources.get(id)
   }
@@ -147,11 +142,25 @@ export class Platform {
 
   // R E S O U R C E S
 
+  private resources = new Map<Resource<any>, any>()
   private resolvers = new Map<string, Plugin<ResourceProvider>>()
   private resolvedProviders = new Map<string, Promise<ResourceProvider>>()
 
-  getResource<T> (id: Resource<T>): T | undefined {
-    return this.resources.get(id)
+  /** Peek does not resolve resource. Return resource if it's already loaded. */
+  peekResource<T> (resource: Resource<T>): T { return this.resources.get(resource) }
+
+  async getResource<T> (resource: Resource<T>): Promise<T> {
+    console.log('resolve resource: ' + resource)
+    const resolved = this.resources.get(resource)
+    if (resolved) { return resolved }
+    else {
+      const info = this.getResourceInfo(resource)
+      console.log(`loading '${resource}' from '${info.plugin}'.`)
+      await this.getPlugin(info.plugin)
+      const resolved = this.resources.get(resource)
+      if (resolved) { return resolved }
+    }
+    throw new Error(`Plugin '${plugin}' did not provide resource '${resource}' as expected.`)
   }
 
   setResource<T> (id: Resource<T>, value: T): void {
@@ -171,13 +180,15 @@ export class Platform {
     return { kind, plugin, id }
   }
 
+  // TODO: do we need the following?
+
   resolve<T> (resource: Resource<T>): Promise<T> {
     const kind = resource.substring(0, resource.indexOf(':'))
     let provider = this.resolvedProviders.get(kind)
     if (!provider) {
       const resourcePlugin = this.resolvers.get(kind)
       if (!resourcePlugin) {
-        return this.resolveStatic(resource)
+        return this.getResource(resource)
       } else {
         provider = this.getPlugin(resourcePlugin)
         this.resolvedProviders.set(kind, provider)
@@ -188,20 +199,6 @@ export class Platform {
 
   setResolver (kind: string, resolver: Plugin<ResourceProvider>) {
     this.resolvers.set(kind, resolver)
-  }
-
-  async resolveStatic (resource: Resource<any>): Promise<any> {
-    console.log('resolve resource: ' + resource)
-    const resolved = this.resources.get(resource)
-    if (resolved) { return resolved }
-    else {
-      const info = this.getResourceInfo(resource)
-      console.log(`loading '${resource}' from '${info.plugin}'.`)
-      await this.getPlugin(info.plugin)
-      const resolved = this.resources.get(resource)
-      if (resolved) { return resolved }
-    }
-    throw new Error(`Plugin '${plugin}' did not provide resource '${resource}' as expected.`)
   }
 
   // P L U G I N S
