@@ -41,7 +41,7 @@ export interface Doc extends Obj {
 export type Exert = (value: PropertyType, layout?: any, key?: string) => any
 export interface Type<A> extends Emb {
   _default?: Property<A>
-  exert?: Property<(this: Instance<Type<any>>) => Exert>
+  exert?: Property<(this: Instance<Type<any>>) => Promise<Exert>>
 }
 export interface RefTo<T extends Doc> extends Type<T> { to: Ref<Class<T>> }
 export interface InstanceOf<T extends Emb> extends Type<T> { of: Ref<Class<T>> }
@@ -118,14 +118,14 @@ export interface CoreService extends Service {
 
   // newInstance<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Obj>, _id?: Ref<M>): Instance<M>
   getInstance<T extends Doc> (id: Ref<T>): Promise<Instance<T>>
-  as<T extends Doc, A extends Doc> (obj: Instance<T>, _class: Ref<Class<A>>): Instance<A>
+  as<T extends Doc, A extends Doc> (obj: Instance<T>, _class: Ref<Class<A>>): Promise<Instance<A>>
   is<T extends Doc, A extends Doc> (obj: Instance<T>, _class: Ref<Class<A>>): boolean
   getClassHierarchy (_class: Ref<Class<Obj>>, top?: Ref<Class<Obj>>): Ref<Class<Obj>>[]
 
   getDb (): DocDb
 
   // debug?
-  getPrototype<T extends Obj> (_class: Ref<Class<T>>, stereotype: number /* for tests */): Object
+  getPrototype<T extends Obj> (_class: Ref<Class<T>>, stereotype: number /* for tests */): Promise<Object>
 }
 
 // P L U G I N
