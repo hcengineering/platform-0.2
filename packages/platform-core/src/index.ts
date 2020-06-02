@@ -98,6 +98,11 @@ export type Instance<T> = { [P in keyof T]:
   getSession (): CoreService
 }
 
+const x = {} as Instance<Type<any>>
+
+const m = x.exert
+
+
 // A D A P T E R S
 
 export type AdapterType = (resource: Resource<any>) => Promise<Resource<any>> | undefined
@@ -148,15 +153,15 @@ export default plugin('core' as Plugin<CoreService>, {}, {
     Adapter: '' as Ref<Class<Adapter>>
   },
   method: {
-    Type_exert: '' as Resource<(this: Instance<Type<any>>) => Promise<Exert>>,
-    BagOf_exert: '' as Resource<(this: Instance<BagOf<any>>) => Promise<Exert>>,
-    InstanceOf_exert: '' as Resource<(this: Instance<InstanceOf<Emb>>) => Promise<Exert>>,
-    Metadata_exert: '' as Resource<(this: Instance<Type<Metadata<any>>>) => Promise<Exert>>,
+    Type_exert: '' as ResolveResource<(this: Instance<Type<any>>) => Promise<Exert>>,
+    BagOf_exert: '' as ResolveResource<(this: Instance<BagOf<any>>) => Promise<Exert>>,
+    InstanceOf_exert: '' as ResolveResource<(this: Instance<InstanceOf<Emb>>) => Promise<Exert>>,
+    Metadata_exert: '' as ResolveResource<(this: Instance<Type<Metadata<any>>>) => Promise<Exert>>,
 
-    Adapter_adapt: '' as Resource<(this: Instance<Adapter>) => Promise<Resource<any>> | undefined>
+    Adapter_adapt: '' as ResolveResource<(this: Instance<Adapter>) => Promise<Resource<any>> | undefined>
   },
   native: {
-    ResourceType: '' as Resource<Object>
+    ResourceType: '' as ResourceProperty<Object>
   },
 })
 

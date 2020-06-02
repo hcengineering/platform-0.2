@@ -16,7 +16,7 @@
 import { Platform, Resource, Metadata } from '@anticrm/platform'
 import core, {
   CoreService, Obj, Ref, Class, Doc, BagOf, InstanceOf, PropertyType,
-  Instance, Type, Emb, ResourceType, Exert, AdapterType, Property, Resolve
+  Instance, Type, Emb, ResourceType, Exert, AdapterType, Property, Resolve, ResolveResource
 } from '.'
 import { MemDb } from './memdb'
 
@@ -140,14 +140,20 @@ export default async (platform: Platform): Promise<CoreService> => {
       const attrInstance = await instantiateEmb(attr)
       // console.log(attrInstance)
 
-      if (typeof attrInstance.exert !== 'function') {
-        throw new Error('exert is not a function')
+      // if (typeof attrInstance.exert !== 'function') {
+      //   throw new Error('exert is not a function')
+      // }
+
+      const exertFactory = await attrInstance.exert
+
+      if (typeof exertFactory !== 'function') {
+        throw new Error('exertFactory is not a function')
       }
 
-      const exert = await attrInstance.exert()
+      const exert = await exertFactory.call(attrInstance)
 
       if (typeof exert !== 'function') {
-        throw new Error('exert is not a function 2')
+        throw new Error('exert is not a function')
       }
 
       const fullKey = stereotype === Stereotype.DOC ?
@@ -241,20 +247,17 @@ export default async (platform: Platform): Promise<CoreService> => {
     return value => value
   }
 
-  const Metadata_exert = function (this: Instance<Type<any>>): Exert {
+  const Metadata_exert = async function (this: Instance<Type<any>>): Promise<Exert> {
     return ((value: Metadata<any> & Property<any> & Resolve) => value ? platform.getMetadata(value) : undefined) as Exert
   }
 
   const BagOf_exert = async function (this: Instance<BagOf<any>>): Promise<Exert> {
-    // console.log('constructing BagOf')
-    // console.log(this)
     const off = await this.of
-    if (!off) { throw new Error('no exert here!!!') }
-    if (!off.exert) { throw new Error('no exert here!!!!!!') }
-    const exert = off.exert()
-    if (!exert) { throw new Error('no exert here') }
-    const e = await exert// off.exert()
-    return (value: PropertyType) => value ? new Proxy(value, new BagProxyHandler(e)) : undefined
+    const exertFactory = await off.exert
+    if (typeof exertFactory !== 'function') { throw new Error('not a function') }
+    const exert = await exertFactory.call(this)
+    if (typeof exert !== 'function') { throw new Error('not a function') }
+    return (value: PropertyType) => value ? new Proxy(value, new BagProxyHandler(exert)) : undefined
   }
 
   const InstanceOf_exert = async function (this: Instance<InstanceOf<Emb>>): Promise<Exert> {
@@ -276,7 +279,7 @@ export default async (platform: Platform): Promise<CoreService> => {
 
   const TResourceType = {
     exert: async function (this: Instance<ResourceType<any>>): Promise<Exert> {
-      const resource = (this.__layout._default) as Resource<(this: Instance<Type<any>>) => Exert>
+      const resource = (this.__layout._default) as ResolveResource<(this: Instance<Type<any>>) => Exert>
       let resolved: any
       if (resource) {
         resolved = platform.getResource(resource)
