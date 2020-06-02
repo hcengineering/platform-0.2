@@ -15,7 +15,7 @@
 
 import { PrimitiveType } from 'intl-messageformat'
 import { Plugin, Service, plugin, Resource, Metadata } from '@anticrm/platform'
-import { Type, Instance, Exert, ResolveResource } from '@anticrm/platform-core'
+import { Type, Instance, Exert } from '@anticrm/platform-core'
 
 export type IntlString = Resource<string> & { __intl_string: true }  // eslint-disable-line
 
@@ -31,6 +31,6 @@ export default plugin('i18n' as Plugin<I18nService>, {}, {
     BootStrings: '' as Metadata<Record<string, string>>
   },
   method: {
-    IntlString_exert: '' as ResolveResource<(this: Instance<Type<any>>) => Promise<Exert>>
+    IntlString_exert: '' as Resource<(this: Instance<Type<any>>) => Promise<Exert>>
   }
 })
