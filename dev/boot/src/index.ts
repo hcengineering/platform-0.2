@@ -30,7 +30,27 @@ builder.load(contactModel)
 
 console.log('model:')
 const model = builder.dump()
-console.log(JSON.stringify(model))
+const modelJson = JSON.stringify(model)
+console.log(modelJson)
 
 console.log('strings:')
-console.log(JSON.stringify(contactRu))
+const stringsJson = JSON.stringify(contactRu)
+console.log(stringsJson)
+
+const fs = require('fs')
+
+fs.writeFile(__dirname + "/../../prod/src/model.json", modelJson, 'utf8', function (err: Error) {
+  if (err) {
+    console.log("An error occured while writing JSON Object to File.")
+    return console.log(err);
+  }
+  console.log("model saved.")
+})
+
+fs.writeFile(__dirname + "/../../prod/src/strings.json", stringsJson, 'utf8', function (err: Error) {
+  if (err) {
+    console.log("An error occured while writing JSON Object to File.")
+    return console.log(err);
+  }
+  console.log("strings saved.")
+})
