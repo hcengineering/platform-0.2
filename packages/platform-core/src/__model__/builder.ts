@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Resource } from '@anticrm/platform'
+import { Resource, Metadata } from '@anticrm/platform'
 import { PropertyType, Emb, Doc, Obj, Ref, EClass, Class, AllAttributes, DocDb, Property } from '@anticrm/platform-core'
 import core from '.'
 import { MemDb } from '../memdb'
@@ -23,7 +23,7 @@ type Layout = { [key: string]: PropertyType }
 class Builder {
   private memdb: DocDb
 
-  constructor(memdb?: DocDb) {
+  constructor (memdb?: DocDb) {
     this.memdb = memdb ?? new MemDb()
   }
 
@@ -58,10 +58,13 @@ class Builder {
     return resource as Resource<T> & Property<Promise<T>>
   }
 
-  ref<T> (resource: Resource<T>) {
-    return resource as Resource<T> & Property<T>
+  resolveMeta<T> (resource: Metadata<T>) {
+    return resource as Metadata<T> & Property<T>
   }
 
+  primitive<T> (prop: T) {
+    return prop as T & Property<T>
+  }
 }
 
 export default Builder

@@ -90,7 +90,7 @@ export default (S: Builder) => {
   })
 
   S.createClass(core.class.ResourceType, core.class.Type, {})
-  S.patch(core.class.ResourceType, (clazz: Class<Obj>) => { clazz._native = S.ref(core.native.ResourceType) })
+  S.patch(core.class.ResourceType, (clazz: Class<Obj>) => { clazz._native = S.primitive(core.native.ResourceType) })
 
   S.createClass(core.class.Adapter, core.class.Doc, {
     from: S.newInstance(core.class.Type, {}),

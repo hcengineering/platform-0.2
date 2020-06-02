@@ -20,9 +20,9 @@ import Builder from '@anticrm/platform-core/src/__model__/builder'
 import i18n from '.'
 
 export default (S: Builder) => {
-  S.createClass<Type<string>, Type<string>>(i18n.class.IntlString, core.class.Type, {
+  S.createClass(i18n.class.IntlString, core.class.Type, {
     exert: S.newInstance(core.class.ResourceType, {
-      _default: i18n.method.IntlString_exert
+      _default: S.primitive(i18n.method.IntlString_exert)
     })
   })
 }

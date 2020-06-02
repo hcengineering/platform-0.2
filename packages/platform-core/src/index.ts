@@ -38,9 +38,13 @@ export type PropertyType = Property<any>
   | PropertyType[]
   | { [key: string]: PropertyType }
 
+
+export type Resolve<T> = T extends Resource<infer X> ? Property<Promise<X>> : never
+// export type Preserve<T> = T extends Resource<infer X> ? Property<Resource<X>> : never
+
 // P R I M I T I V E
 
-export type StringType = string & Property<string>
+// export type Primitive<T> = T & Property<T>
 
 // O B J E C T S
 
@@ -121,8 +125,8 @@ y.exert
 export type AdapterType = (resource: Resource<any>) => Promise<Resource<any>> | undefined
 
 export interface Adapter extends Doc {
-  from: StringType
-  to: StringType
+  from: Property<string>
+  to: Property<string>
   adapt: Property<Resource<AdapterType>>
 }
 

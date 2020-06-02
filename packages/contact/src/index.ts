@@ -14,19 +14,19 @@
 //
 
 import { plugin, Plugin, Service } from '@anticrm/platform'
-import { Property, Doc, Ref, Class, StringType } from '@anticrm/platform-core'
-import { Asset, ComponentRef, AnyComponent } from '@anticrm/platform-ui'
+import { Property, Doc, Ref, Class } from '@anticrm/platform-core'
+import { Asset, AnyComponent } from '@anticrm/platform-ui'
 
 export type DateType = number & Property<Date>
 
 export interface Contact extends Doc {
-  email?: StringType
-  phone?: StringType
+  email?: Property<string>
+  phone?: Property<string>
 }
 
 export interface Person extends Contact {
-  firstName?: StringType
-  lastName?: StringType
+  firstName?: Property<string>
+  lastName?: Property<string>
 
   birthDate?: DateType
 }

@@ -24,7 +24,7 @@ import Builder from '@anticrm/platform-core/src/__model__/builder'
 export default (S: Builder) => {
   S.createClass(ui.class.TypeUIDecorator, core.class.Type, {
     label: S.newInstance(i18n.class.IntlString, {}),
-    icon: S.newInstance(core.class.ResourceType, {}),
+    icon: S.newInstance(core.class.Metadata, {}),
     placeholder: S.newInstance(i18n.class.IntlString, {})
   })
 
@@ -43,8 +43,8 @@ export default (S: Builder) => {
   })
 
   S.createDocument(core.class.Adapter, {
-    from: CLASS,
-    to: COMPONENT,
-    adapt: ui.method.ClassToComponent
+    from: S.primitive(CLASS),
+    to: S.primitive(COMPONENT),
+    adapt: S.primitive(ui.method.ClassToComponent)
   })
 }
