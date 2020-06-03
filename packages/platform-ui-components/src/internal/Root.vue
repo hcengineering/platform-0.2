@@ -15,47 +15,27 @@
 
 <script lang="ts">
 import { Platform } from '@anticrm/platform'
-import { defineComponent, computed, reactive, onMounted, onUnmounted, inject, ref } from 'vue'
-import ui from '@anticrm/platform-ui'
-import { PlatformInjectionKey } from '..'
+import { defineComponent, computed, reactive, onMounted, onUnmounted, inject, ref, toRefs } from 'vue'
+import ui, { AnyComponent } from '@anticrm/platform-ui'
+import uiComponents, { UIComponentsInjectionKey, UIComponentsService } from '..'
+
+export const AppInjectionKey = 'AppInjectionKey'
 
 export default defineComponent({
   components: {},
   setup () {
-    const platform = inject(PlatformInjectionKey) as Platform
-
-    const app = ref('')
-    const path = ref('')
-
-    function onPathChange () {
-      const pathname = window.location.pathname
-      const split = pathname.split('/')
-
-      app.value = split[1].length === 0 ? platform.getMetadata(ui.metadata.DefaultApplication) : split[1]
-      path.value = split.splice(2).join('/')
-    }
-
-    onPathChange()
-
-    onMounted(() => { window.addEventListener('popstate', onPathChange) })
-    onUnmounted(() => { window.removeEventListener('popstate', onPathChange) })
-
-    // E V E N T S
-
-    function pushState (url) {
-      history.pushState(null, null, url)
-      onPathChange()
-    }
-
-    return { app, path, pushState }
+    const uiComponentsService = inject(UIComponentsInjectionKey) as UIComponentsService
+    const current = computed(() => uiComponentsService.getLocation())
+    uiComponentsService.navigate({ path: '' })
+    return { current }
   },
 })
 </script>
 
 <template>
   <div id="app">
-    <widget v-if="app" :component="app" :path="path" @pushState="pushState($event)" />
-    <div v-else class="caption-1">Huston: no default application provided.</div>
+    <widget v-if="current.app" :component="current.app" :path="current.path" />
+    <div v-else class="caption-1">Huston, no default application provided.</div>
   </div>
 </template>
 

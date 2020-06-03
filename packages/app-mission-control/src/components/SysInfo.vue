@@ -20,11 +20,12 @@ import ui, { AnyComponent } from '@anticrm/platform-ui'
 import mc from '..'
 
 import Button from '@anticrm/sparkling-controls/src/Button.vue'
+import InfoPanel from '@anticrm/sparkling-controls/src/InfoPanel.vue'
 
-import InfoPanel from './InfoPanel.vue'
+import Link from '@anticrm/platform-ui-components/src/components/Link.vue'
 
 export default defineComponent({
-  components: { Button, InfoPanel },
+  components: { Button, InfoPanel, Link },
   props: {
     app: String
   },
@@ -37,7 +38,8 @@ export default defineComponent({
         return this.$platform.getMetadata(mc.metadata.Applications)
       },
       run (app) {
-        this.$emit('pushState', '/' + app)
+        console.log('run: ' + app)
+        this.$emit('pushState', { app, path: '' })
       },
       status (info: PluginInfo) {
         return (info.status === PluginStatus.RUNNING) ? '☀︎' : ''
@@ -90,9 +92,7 @@ export default defineComponent({
 
       <InfoPanel caption="Applications">
         <div v-for="app in applications()" :key="app">
-          <Button style="width:100%; margin-top: 0.5em" @click="run(app)">
-            <span style="text-transform: uppercase">{{app}}</span>
-          </Button>
+          <Link :app="app">{{app}}</Link>
         </div>
       </InfoPanel>
     </main>
@@ -103,6 +103,10 @@ export default defineComponent({
     </footer>
   </div>
 </template>
+
+          <!-- <Button style="width:100%; margin-top: 0.5em" @click="run(app)">
+            <span style="text-transform: uppercase">{{app}}</span>
+          </Button>-->
 
 <style scoped lang="scss">
 @import "~@anticrm/sparkling-theme/css/_variables.scss";
