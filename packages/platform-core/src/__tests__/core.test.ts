@@ -76,5 +76,4 @@ describe('core', () => {
     const result = await tx.find(core.class.Class, {})
     console.log(result)
   })
-
 })
