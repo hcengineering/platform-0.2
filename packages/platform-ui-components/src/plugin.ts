@@ -90,8 +90,10 @@ export default async (platform: Platform): Promise<UIComponentsService> => {
     console.log('navigate: ' + target)
     const newPath = target.path ?? ''
     const url = '/' + (target.app ?? getLocation().app) + '/' + newPath
-    history.pushState(null, '', url)
-    location.value = url
+    if (url !== location.value) {
+      history.pushState(null, '', url)
+      location.value = url
+    }
   }
 
 

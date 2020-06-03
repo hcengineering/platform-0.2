@@ -37,10 +37,6 @@ export default defineComponent({
       applications (): AnyComponent[] {
         return this.$platform.getMetadata(mc.metadata.Applications)
       },
-      run (app) {
-        console.log('run: ' + app)
-        this.$emit('pushState', { app, path: '' })
-      },
       status (info: PluginInfo) {
         return (info.status === PluginStatus.RUNNING) ? '☀︎' : ''
       },
