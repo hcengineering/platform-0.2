@@ -13,8 +13,8 @@
 // limitations under the License.
 //
 
-import { App } from 'vue'
-import { Metadata, plugin, Plugin, Service } from '@anticrm/platform'
+import { App, inject } from 'vue'
+import { Metadata, plugin, Plugin, Service, Platform, PluginDependencies, InferPlugins } from '@anticrm/platform'
 import core from '@anticrm/platform-core'
 import ui from '@anticrm/platform-ui'
 
@@ -25,8 +25,12 @@ export type Asset = Metadata<URL>
 
 export const PlatformInjectionKey = Symbol('platform')
 
-export const CoreServiceInjectionKey = Symbol('core-plugin')
-export const UIServiceInjectionKey = Symbol('ui-plugin')
+export async function injectPlatform<D extends PluginDependencies> (deps: D): Promise<{ platform: Platform, deps: InferPlugins<D> }> {
+  const platform = inject(PlatformInjectionKey) as Platform
+  if (!platform) { throw new Error('Platform is not provided.') }
+  const resolvedDeps = await platform.resolveDependencies(deps)
+  return { platform: platform as Platform, deps: resolvedDeps as InferPlugins<D> }
+}
 
 /// P L U G I N
 
@@ -34,7 +38,7 @@ export interface UIComponentsService extends Service {
   getApp (): App
 }
 
-export default plugin('ui-components' as Plugin<UIComponentsService>, { core: core.id, ui: ui.id }, {
+export default plugin('ui-components' as Plugin<UIComponentsService>, {}, {
   icon: {
     Default: '' as Asset
   }

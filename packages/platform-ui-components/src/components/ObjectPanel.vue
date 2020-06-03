@@ -15,11 +15,11 @@
 
 <script lang="ts">
 
-import { defineComponent, PropType, inject } from 'vue'
+import { defineComponent, PropType } from 'vue'
 import { Platform } from '@anticrm/platform'
 
 import core, { Obj, Doc, Ref, Class, CoreService } from '@anticrm/platform-core'
-import { PlatformInjectionKey, CoreServiceInjectionKey } from '..'
+import { injectPlatform } from '..'
 
 import PropPanel from './PropPanel.vue'
 
@@ -30,8 +30,9 @@ export default defineComponent({
     top: String,
     exclude: String
   },
-  setup (props) {
-    const coreService = inject(CoreServiceInjectionKey) as CoreService
+  async setup (props) {
+    const _ = await injectPlatform({ core: core.id })
+    const coreService = _.deps.core
     const classes = coreService.getClassHierarchy(props.content._class, props.top as Ref<Class<Obj>>)
     return { classes }
   }

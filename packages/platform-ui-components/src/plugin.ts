@@ -14,11 +14,8 @@
 //
 
 import { Platform } from '@anticrm/platform'
-import { CoreService } from '@anticrm/platform-core'
-import { UIService, AnyComponent } from '@anticrm/platform-ui'
-import {
-  UIComponentsService, PlatformInjectionKey, CoreServiceInjectionKey, Asset, UIServiceInjectionKey
-} from '.'
+import { AnyComponent } from '@anticrm/platform-ui'
+import { UIComponentsService, PlatformInjectionKey } from '.'
 import { h, ref, createApp, defineComponent } from 'vue'
 import Root from './internal/Root.vue'
 
@@ -29,17 +26,13 @@ console.log('Plugin `ui` loaded')
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */
-export default async (platform: Platform, deps: { core: CoreService, ui: UIService }): Promise<UIComponentsService> => {
+export default async (platform: Platform): Promise<UIComponentsService> => {
   console.log('Plugin `ui` started')
-  const coreService = deps.core
-  const uiService = deps.ui
 
   // V U E  A P P
 
   const app = createApp(Root)
     .provide(PlatformInjectionKey, platform)
-    .provide(CoreServiceInjectionKey, coreService)
-    .provide(UIServiceInjectionKey, uiService)
 
   app.config.globalProperties.$platform = platform
 

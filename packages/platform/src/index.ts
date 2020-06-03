@@ -57,10 +57,9 @@ export interface ResourceProvider extends Service {
 /**
  * A plugin may request platform to inject resolved references to plugins it depends on.
  */
-interface PluginDependencies { [key: string]: AnyPlugin }
+export interface PluginDependencies { [key: string]: AnyPlugin }
 
-/** @hidden */
-type InferPlugins<T extends PluginDependencies> = {
+export type InferPlugins<T extends PluginDependencies> = {
   [P in keyof T]: T[P] extends Plugin<infer Service> ? Service : T[P]
 }
 
@@ -247,7 +246,7 @@ export class Platform {
 
   // D E P E N D E N C I E S
 
-  private async resolveDependencies (deps: PluginDependencies): Promise<{ [key: string]: Service }> {
+  async resolveDependencies (deps: PluginDependencies): Promise<{ [key: string]: Service }> {
     const result = {} as { [key: string]: Service }
     for (const key in deps) {
       const id = deps[key]

@@ -19,9 +19,8 @@ import { PropType, defineComponent, inject, ref } from 'vue'
 import { Platform } from '@anticrm/platform'
 
 import { Obj, Class, Ref, CoreService } from '@anticrm/platform-core'
-
 import ui, { UIService, AttrModel } from '@anticrm/platform-ui'
-import { UIServiceInjectionKey } from '@anticrm/platform-ui-components'
+import { injectPlatform } from '..'
 
 import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.vue'
 import Icon from './Icon.vue'
@@ -34,7 +33,8 @@ export default defineComponent({
     exclude: String
   },
   async setup (props) {
-    const uiService = inject(UIServiceInjectionKey) as UIService
+    const _ = await injectPlatform({ ui: ui.id })
+    const uiService = _.deps.ui
     try {
       const classModel = await uiService.getClassModel(props.clazz)
       console.log(props.exclude)
