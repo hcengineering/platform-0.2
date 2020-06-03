@@ -13,12 +13,16 @@
 // limitations under the License.
 //
 
-import { Platform, Service } from '@anticrm/platform'
+import { Platform } from '@anticrm/platform'
+import { CoreService } from '@anticrm/platform-core'
 
 import storybook from '.'
 import Storybook from './components/Storybook.vue'
 
+import Builder from '@anticrm/platform-core/src/__model__/builder'
+
 import Persons from './components/Persons.vue'
+
 
 console.log('Plugin `app-storybook` loaded')
 
@@ -27,11 +31,15 @@ console.log('Plugin `app-storybook` loaded')
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */
-export default async (platform: Platform): Promise<Service> => {
+export default async (platform: Platform) => {
   console.log('Plugin `app-storybook` started')
 
   platform.setResource(storybook.component.Storybook, Storybook)
   platform.setResource(storybook.component.Persons, Persons)
+
+  // const memdb = deps.core.getDb()
+  // const builder = new Builder(memdb)
+  // builder.load(demoModel)
 
   return {}
 }

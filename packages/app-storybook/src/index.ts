@@ -14,6 +14,7 @@
 //
 
 import { plugin, Service, Plugin, Metadata } from '@anticrm/platform'
+import core from '@anticrm/platform-core'
 import ui, { AnyComponent } from '@anticrm/platform-ui'
 
 export default plugin('storybook' as Plugin<Service>, {}, {
