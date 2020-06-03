@@ -17,7 +17,8 @@ import { Platform, Service } from '@anticrm/platform'
 
 import storybook from '.'
 import Storybook from './components/Storybook.vue'
-// import { LaunchPlugin } from '@anticrm/launch-dev'
+
+import Persons from './components/Persons.vue'
 
 console.log('Plugin `app-storybook` loaded')
 
@@ -30,6 +31,7 @@ export default async (platform: Platform): Promise<Service> => {
   console.log('Plugin `app-storybook` started')
 
   platform.setResource(storybook.component.Storybook, Storybook)
+  platform.setResource(storybook.component.Persons, Persons)
 
   return {}
 }

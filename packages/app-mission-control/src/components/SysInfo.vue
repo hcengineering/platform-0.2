@@ -22,10 +22,10 @@ import mc from '..'
 import Button from '@anticrm/sparkling-controls/src/Button.vue'
 import InfoPanel from '@anticrm/sparkling-controls/src/InfoPanel.vue'
 
-import Link from '@anticrm/platform-ui-components/src/components/Link.vue'
+import LinkTo from '@anticrm/platform-ui-components/src/components/LinkTo.vue'
 
 export default defineComponent({
-  components: { Button, InfoPanel, Link },
+  components: { Button, InfoPanel, LinkTo },
   props: {
     app: String
   },
@@ -81,18 +81,22 @@ export default defineComponent({
         </div>
       </InfoPanel>
 
+      <InfoPanel caption="Applications">
+        <div class="crm-table">
+          <div class="tr" v-for="app in applications()" :key="app">
+            <div class="td mc-plugins">
+              <LinkTo :app="app">{{app}}</LinkTo>
+            </div>
+          </div>
+        </div>
+      </InfoPanel>
+
       <InfoPanel caption="Credits">
         <div class="crm-table">
           <div class="tr" v-for="(credit, index) in credits" :key="index">
             <div class="td mc-plugins" style="white-space:nowrap">{{credit[0]}}</div>
             <div class="td mc-plugins">{{credit[1]}}</div>
           </div>
-        </div>
-      </InfoPanel>
-
-      <InfoPanel caption="Applications">
-        <div v-for="app in applications()" :key="app">
-          <Link :app="app">{{app}}</Link>
         </div>
       </InfoPanel>
     </main>

@@ -16,17 +16,17 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import InfoPanel from '@anticrm/sparkling-controls/src/InfoPanel.vue'
-import Link from '@anticrm/platform-ui-components/src/components/Link.vue'
+import LinkTo from '@anticrm/platform-ui-components/src/components/LinkTo.vue'
 
 export default defineComponent({
-  components: { InfoPanel, Link }
+  components: { InfoPanel, LinkTo }
 })
 </script>
 
 <template>
   <div class="text-small-uppercase">
     <InfoPanel caption="Examples">
-      <Link path>An Example</Link>
+      <LinkTo app="component:storybook.Persons">Table of Persons</LinkTo>
     </InfoPanel>
   </div>
 </template>
