@@ -14,13 +14,12 @@
 //
 
 import { Platform } from '@anticrm/platform'
-import { AnyComponent } from '@anticrm/platform-ui'
-import { UIComponentsService, PlatformInjectionKey } from '.'
-import { h, ref, createApp, defineComponent } from 'vue'
+import ui, { AnyComponent } from '@anticrm/platform-ui'
+import { UIComponentsService, PlatformInjectionKey, UIComponentsInjectionKey, LinkTarget } from '.'
+import { h, ref, reactive, createApp, defineComponent } from 'vue'
 import Root from './internal/Root.vue'
 
 console.log('Plugin `ui` loaded')
-
 /*!
  * Anticrm Platform™ UI Components Plugin
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
@@ -71,10 +70,40 @@ export default async (platform: Platform): Promise<UIComponentsService> => {
     }
   }))
 
+  // R O U T I N G
+
+  const location = ref(window.location.pathname)
+
+  const onStateChange = () => { location.value = window.location.pathname }
+  window.addEventListener('popstate', onStateChange)
+
+  function getLocation (): LinkTarget {
+    const split = location.value.split('/')
+    const appValue = split[1].length === 0 ? platform.getMetadata(ui.metadata.DefaultApplication) : split[1]
+    return {
+      app: appValue as AnyComponent,
+      path: split.splice(2).join('/')
+    }
+  }
+
+  function navigate (target: LinkTarget) {
+    console.log('navigate: ' + target)
+    const newPath = target.path ?? ''
+    const url = '/' + (target.app ?? getLocation().app) + '/' + newPath
+    history.pushState(null, '', url)
+    location.value = url
+  }
+
+
   // S E R V I C E
 
-  return {
+  const service = {
     getApp () { return app },
+    getLocation,
+    navigate,
   }
+
+  app.provide(UIComponentsInjectionKey, service)
+  return service
 
 }

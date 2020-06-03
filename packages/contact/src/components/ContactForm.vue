@@ -51,7 +51,6 @@ export default defineComponent({
         style="margin-top: 2em"
       />
     </Suspense>
-    <Table clazz="class:contact.Person" exclude />
   </div>
 </template>
 

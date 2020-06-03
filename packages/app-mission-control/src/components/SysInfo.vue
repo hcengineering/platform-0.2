@@ -20,11 +20,12 @@ import ui, { AnyComponent } from '@anticrm/platform-ui'
 import mc from '..'
 
 import Button from '@anticrm/sparkling-controls/src/Button.vue'
+import InfoPanel from '@anticrm/sparkling-controls/src/InfoPanel.vue'
 
-import InfoPanel from './InfoPanel.vue'
+import LinkTo from '@anticrm/platform-ui-components/src/components/LinkTo.vue'
 
 export default defineComponent({
-  components: { Button, InfoPanel },
+  components: { Button, InfoPanel, LinkTo },
   props: {
     app: String
   },
@@ -37,7 +38,8 @@ export default defineComponent({
         return this.$platform.getMetadata(mc.metadata.Applications)
       },
       run (app) {
-        this.$emit('pushState', '/' + app)
+        console.log('run: ' + app)
+        this.$emit('pushState', { app, path: '' })
       },
       status (info: PluginInfo) {
         return (info.status === PluginStatus.RUNNING) ? '☀︎' : ''
@@ -79,20 +81,22 @@ export default defineComponent({
         </div>
       </InfoPanel>
 
+      <InfoPanel caption="Applications">
+        <div class="crm-table">
+          <div class="tr" v-for="app in applications()" :key="app">
+            <div class="td mc-plugins">
+              <LinkTo :app="app">{{app}}</LinkTo>
+            </div>
+          </div>
+        </div>
+      </InfoPanel>
+
       <InfoPanel caption="Credits">
         <div class="crm-table">
           <div class="tr" v-for="(credit, index) in credits" :key="index">
             <div class="td mc-plugins" style="white-space:nowrap">{{credit[0]}}</div>
             <div class="td mc-plugins">{{credit[1]}}</div>
           </div>
-        </div>
-      </InfoPanel>
-
-      <InfoPanel caption="Applications">
-        <div v-for="app in applications()" :key="app">
-          <Button style="width:100%; margin-top: 0.5em" @click="run(app)">
-            <span style="text-transform: uppercase">{{app}}</span>
-          </Button>
         </div>
       </InfoPanel>
     </main>
@@ -103,6 +107,10 @@ export default defineComponent({
     </footer>
   </div>
 </template>
+
+          <!-- <Button style="width:100%; margin-top: 0.5em" @click="run(app)">
+            <span style="text-transform: uppercase">{{app}}</span>
+          </Button>-->
 
 <style scoped lang="scss">
 @import "~@anticrm/sparkling-theme/css/_variables.scss";

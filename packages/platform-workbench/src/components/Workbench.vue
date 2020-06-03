@@ -17,8 +17,9 @@
 import { Platform } from '@anticrm/platform'
 import { defineComponent, reactive, computed, provide, inject, watch, PropType } from 'vue'
 import workbench, { WorkbenchStateInjectionKey, WorkbenchState, ViewModelKind } from '..'
-import { PlatformInjectionKey } from '@anticrm/platform-ui-components'
+import { UIComponentsInjectionKey, UIComponentsService } from '@anticrm/platform-ui-components'
 import { Ref, Class, Doc } from '@anticrm/platform-core'
+import contact from '@anticrm/contact'
 
 import Button from '@anticrm/sparkling-controls/src/Button.vue'
 import MainView from './MainView.vue'
@@ -27,6 +28,11 @@ export default defineComponent({
   components: { Button, MainView },
   props: {
     path: String
+  },
+  setup () {
+    const uiComponentsService = inject(UIComponentsInjectionKey) as UIComponentsService
+
+    return { workbench, contact, navigate: uiComponentsService.navigate }
   }
 })
 </script>
@@ -36,7 +42,7 @@ export default defineComponent({
     <header>
       <!-- <Header @add="addObject()" /> -->
       <Button
-        @click="this.$emit('pushState', '/component:workbench.Workbench/class:contact.Person')"
+        @click="navigate({ app: workbench.component.Workbench, path: contact.class.Person })"
       >Go!</Button>
     </header>
 

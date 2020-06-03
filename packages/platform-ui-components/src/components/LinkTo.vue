@@ -14,19 +14,27 @@
 -->
 
 <script lang="ts">
-import { defineComponent } from 'vue'
-import InfoPanel from '@anticrm/sparkling-controls/src/InfoPanel.vue'
-import LinkTo from '@anticrm/platform-ui-components/src/components/LinkTo.vue'
+
+import { defineComponent, PropType, inject } from 'vue'
+import { AnyComponent } from '@anticrm/platform-ui'
+import { UIComponentsService, UIComponentsInjectionKey } from '..'
 
 export default defineComponent({
-  components: { InfoPanel, LinkTo }
+  props: {
+    app: String as unknown as PropType<AnyComponent>,
+    path: String
+  },
+  setup (props) {
+    const uiComponentsService = inject(UIComponentsInjectionKey) as UIComponentsService
+    return {
+      navigate: uiComponentsService.navigate
+    }
+  }
 })
 </script>
 
 <template>
-  <div class="text-small-uppercase">
-    <InfoPanel caption="Examples">
-      <LinkTo app="component:storybook.Persons">Table of Persons</LinkTo>
-    </InfoPanel>
-  </div>
+  <a href="#" @click.prevent="navigate({app, path})">
+    <slot />
+  </a>
 </template>

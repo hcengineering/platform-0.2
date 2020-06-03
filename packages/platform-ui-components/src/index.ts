@@ -15,8 +15,7 @@
 
 import { App, inject } from 'vue'
 import { Metadata, plugin, Plugin, Service, Platform, PluginDependencies, InferPlugins } from '@anticrm/platform'
-import core from '@anticrm/platform-core'
-import ui from '@anticrm/platform-ui'
+import { AnyComponent } from '@anticrm/platform-ui'
 
 export type URL = string
 export type Asset = Metadata<URL>
@@ -24,6 +23,7 @@ export type Asset = Metadata<URL>
 // S T A T E
 
 export const PlatformInjectionKey = Symbol('platform')
+export const UIComponentsInjectionKey = Symbol('ui-components')
 
 export async function injectPlatform<D extends PluginDependencies> (deps: D): Promise<{ platform: Platform, deps: InferPlugins<D> }> {
   const platform = inject(PlatformInjectionKey) as Platform
@@ -34,8 +34,15 @@ export async function injectPlatform<D extends PluginDependencies> (deps: D): Pr
 
 /// P L U G I N
 
+export interface LinkTarget {
+  path: string
+  app?: AnyComponent
+}
+
 export interface UIComponentsService extends Service {
   getApp (): App
+  getLocation (): LinkTarget
+  navigate (target: LinkTarget): void
 }
 
 export default plugin('ui-components' as Plugin<UIComponentsService>, {}, {
