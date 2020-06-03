@@ -142,6 +142,9 @@ export class Platform {
   // R E S O U R C E S
 
   private resources = new Map<Resource<any>, any>()
+  private resolving = new Map<Resource<any>, Promise<any>>()
+  private resolveFunc = new Map<Resource<any>, (value?: any) => void>()
+
   private resolvers = new Map<string, Plugin<ResourceProvider>>()
   private resolvedProviders = new Map<string, Promise<ResourceProvider>>()
 
@@ -152,18 +155,33 @@ export class Platform {
     const resolved = this.resources.get(resource)
     if (resolved) { return resolved }
     else {
+      let resolving = this.resolving.get(resource)
+      if (resolving) { return resolving }
+
       console.log('resolve resource: ' + resource)
+      resolving = new Promise((resolve, reject) => {
+        this.resolveFunc.set(resource, resolve)
+        setTimeout(() => reject(new Error('resource loading timed out: ' + resource)), 3000)
+      })
+      this.resolving.set(resource, resolving)
+
       const info = this.getResourceInfo(resource)
       console.log(`loading '${resource}' from '${info.plugin}'.`)
-      await this.getPlugin(info.plugin)
-      const resolved = this.resources.get(resource)
-      if (resolved) { return resolved }
+      this.getPlugin(info.plugin)
+      return resolving
     }
-    throw new Error(`Plugin '${plugin}' did not provide resource '${resource}' as expected.`)
   }
 
-  setResource<T> (id: Resource<T>, value: T): void {
-    this.resources.set(id, value)
+  setResource<T> (resource: Resource<T>, value: T): void {
+    this.resources.set(resource, value)
+    const resolving = this.resolving.get(resource)
+    if (resolving) {
+      const func = this.resolveFunc.get(resource)
+      if (!func) { throw new Error('can not find resolve func') }
+      func(value)
+      this.resolveFunc.delete(resource)
+      this.resolving.delete(resource)
+    }
   }
 
   getResourceKind (resource: Resource<any>): ResourceKind {
