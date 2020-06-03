@@ -14,7 +14,6 @@
 //
 
 import { Platform, Service } from '@anticrm/platform'
-import { UIService } from '@anticrm/platform-ui'
 
 import storybook from '.'
 import Storybook from './components/Storybook.vue'
@@ -27,8 +26,7 @@ console.log('Plugin `app-storybook` loaded')
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */
-export default async (platform: Platform,
-  deps: {}): Promise<Service> => {
+export default async (platform: Platform): Promise<Service> => {
   console.log('Plugin `app-storybook` started')
 
   platform.setResource(storybook.component.Storybook, Storybook)

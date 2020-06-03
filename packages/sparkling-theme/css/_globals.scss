@@ -110,26 +110,67 @@ a:hover {
 }
 
 .caption-4 {
-  // font-family: "Open Sans";
   font-family: "IBM Plex Sans";
-  // font-family: "Raleway";
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.caption-5 {
+  font-family: "IBM Plex Sans";
   font-size: 10px;
   font-weight: 400;
   text-transform: uppercase;
 }
 
-.caption-5 {
-  font-family: $font-caption;
-  // font-family: "Montserrat";
-  // font-family: "Open Sans";
-  font-size: 11px;
-  font-weight: 400;
-}
-
-.text-large {
-  font-size: 12px;
+.text-small-uppercase {
+  font-size: 10px;
+  text-transform: uppercase;  
 }
 
 .content-dark {
   color: $content-color-dark;
+}
+
+.crm-table {
+  display: table;
+  border-collapse: collapse;
+
+  .tr {
+    display: table-row;
+  }
+
+  .thead {
+    display: table-header-group;
+  }
+
+  .th {
+    display: table-cell;
+    padding: 0.5em;
+  }
+
+  .tbody {
+    display: table-row-group;
+
+    .tr {
+      border-bottom: $border-default;
+    }
+  }
+
+  .td {
+    display: table-cell;
+  }
+
+  .tfoot {
+    display: table-footer-group;
+  }
+  .col {
+    display: table-column;
+  }
+  .colgroup {
+    display: table-column-group;
+  }
+  .caption {
+    display: table-caption;
+  }
 }

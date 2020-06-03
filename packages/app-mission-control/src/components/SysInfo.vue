@@ -1,31 +1,30 @@
 <!--
-  -
-  - Copyright © 2020 Anticrm Platform Contributors.
-  -
-  - Licensed under the Eclipse Public License, Version 2.0 (the "License");
-  - you may not use this file except in compliance with the License. You may
-  - obtain a copy of the License at https://www.eclipse.org/legal/epl-2.0
-  -
-  - Unless required by applicable law or agreed to in writing, software
-  - distributed under the License is distributed on an "AS IS" BASIS,
-  - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  -
-  - See the License for the specific language governing permissions and
-  - limitations under the License.
-  -
-  -->
+// Copyright © 2020 Anticrm Platform Contributors.
+// 
+// Licensed under the Eclipse Public License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License. You may
+// obtain a copy of the License at https://www.eclipse.org/legal/epl-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// 
+// See the License for the specific language governing permissions and
+// limitations under the License.
+-->
 
 <script lang="ts">
 import { defineComponent, inject } from 'vue'
+import { PluginInfo, PluginStatus } from '@anticrm/platform'
 import ui, { AnyComponent } from '@anticrm/platform-ui'
 import mc from '..'
 
 import Button from '@anticrm/sparkling-controls/src/Button.vue'
-import PluginList from './Plugins.vue'
-import Credits from './Credits.vue'
+
+import InfoPanel from './InfoPanel.vue'
 
 export default defineComponent({
-  components: { PluginList, Credits, Button },
+  components: { Button, InfoPanel },
   props: {
     app: String
   },
@@ -39,76 +38,93 @@ export default defineComponent({
       },
       run (app) {
         this.$emit('pushState', '/' + app)
-      }
+      },
+      status (info: PluginInfo) {
+        return (info.status === PluginStatus.RUNNING) ? '☀︎' : ''
+      },
+      credits: [
+        ["Andrey Platov", "Project Sponsor"],
+        ["", "Project Manager"],
+        ["", "Product Owner"],
+        ["", "Product Manager"],
+        ["", "Senior Frontend Engineer"],
+        ["", "Senior Backend Engineer"],
+        ["", "Senior DevOps"],
+        ["", "System Architect"],
+        ["", "Release Manager"],
+        ["", "UI/UX Lead"],
+        ["", "QA Lead"],
+      ]
     }
   }
 })
 </script>
 
 <template>
-  <div class="info">
-    <div class="logo">
+  <div class="text-small-uppercase info">
+    <header class="logo">
       <span class="text-1">anticrm</span>
       <span class="text-2">Platform</span>&nbsp;
       <span class="text-3">0.1.0</span>
-    </div>
+    </header>
 
-    <div class="caption" style="grid-area: pluginsLabel">Available plugins</div>
-    <PluginList class="content" style="grid-area: plugins" :plugins="pluginInfos()" />
+    <main>
+      <InfoPanel caption="Available plugins">
+        <div class="crm-table">
+          <div class="tr" v-for="config in pluginInfos()" :key="config.id">
+            <div class="td mc-plugins">platform-{{config.id}}</div>
+            <div class="td mc-plugins">{{config.version}}</div>
+            <div class="td mc-plugins">{{status(config)}}</div>
+          </div>
+        </div>
+      </InfoPanel>
 
-    <div class="caption" style="grid-area: creditsLabel">Credits</div>
-    <Credits class="content" style="grid-area: credits" />
+      <InfoPanel caption="Credits">
+        <div class="crm-table">
+          <div class="tr" v-for="(credit, index) in credits" :key="index">
+            <div class="td mc-plugins" style="white-space:nowrap">{{credit[0]}}</div>
+            <div class="td mc-plugins">{{credit[1]}}</div>
+          </div>
+        </div>
+      </InfoPanel>
 
-    <div class="caption" style="grid-area: appLabel">Applications</div>
-    <div class="content" style="grid-area: app">
-      <div v-for="app in applications()" :key="app">
-        <Button style="width:100%; margin-top: 0.5em" @click="run(app)">
-          <span style="text-transform: uppercase">{{app}}</span>
-        </Button>
-      </div>
-    </div>
+      <InfoPanel caption="Applications">
+        <div v-for="app in applications()" :key="app">
+          <Button style="width:100%; margin-top: 0.5em" @click="run(app)">
+            <span style="text-transform: uppercase">{{app}}</span>
+          </Button>
+        </div>
+      </InfoPanel>
+    </main>
 
-    <div class="copy">
+    <footer class="copy">
       &copy; 2020
       <a href="https://github.com/anticrm/platform">Anticrm Platform</a> Contributors.
-    </div>
+    </footer>
   </div>
 </template>
 
 <style scoped lang="scss">
 @import "~@anticrm/sparkling-theme/css/_variables.scss";
 
-// $f: "Montserrat";
-//  $f: "Open Sans";
-//  $f: "Manrope";
-//  $f: "IBM Plex Sans";
-$f: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
-//$f: -apple-system,system-ui,BlinkMacSystemFont;
-
-//  $f: "Inter";
+.crm-table {
+  .mc-plugins {
+    padding-right: 0.5em;
+    padding-bottom: 0.25em;
+  }
+}
 
 .info {
-  font-family: $f;
+  display: flex;
+  flex-direction: column;
 
-  font-size: 10px;
-  text-transform: uppercase;
-
-  display: grid;
-  grid-template-columns: 200px 250px 200px 250px;
-  grid-template-rows: 4em auto 2em auto 4em;
-  grid-template-areas:
-    "logo . . ."
-    "pluginsLabel plugins creditsLabel credits"
-    ". . . ."
-    "appLabel app . ."
-    "copy copy copy copy";
-
-  padding: 2em;
+  main {
+    display: flex;
+    flex-wrap: wrap;
+  }
 
   .logo {
-    padding-right: 1em;
-    text-align: right;
-    grid-area: logo;
+    padding: 1em 2em;
     text-transform: initial;
 
     .text-1 {
@@ -125,21 +141,8 @@ $f: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
     }
   }
 
-  .caption {
-    border-right: $content-color solid 1px;
-    padding: 1px 1em 1px 1px;
-    text-align: right;
-    font-weight: 700;
-  }
-
-  .content {
-    width: 100%;
-    padding-left: 1em;
-  }
-
   .copy {
-    grid-area: copy;
-    align-self: end;
+    padding: 2em;
   }
 }
 </style>
