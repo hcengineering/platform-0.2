@@ -149,10 +149,10 @@ export class Platform {
   peekResource<T> (resource: Resource<T>): T { return this.resources.get(resource) }
 
   async getResource<T> (resource: Resource<T>): Promise<T> {
-    console.log('resolve resource: ' + resource)
     const resolved = this.resources.get(resource)
     if (resolved) { return resolved }
     else {
+      console.log('resolve resource: ' + resource)
       const info = this.getResourceInfo(resource)
       console.log(`loading '${resource}' from '${info.plugin}'.`)
       await this.getPlugin(info.plugin)
