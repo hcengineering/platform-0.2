@@ -112,14 +112,6 @@ export type Instance<T> = { [P in keyof T]:
   getSession (): CoreService
 }
 
-const x = {} as Instance<Type<number>>
-
-const m = x.exert
-
-const y = {} as Attributes<Type<any>, Obj>
-y.exert
-
-
 // A D A P T E R S
 
 export type AdapterType = (resource: Resource<any>) => Promise<Resource<any> | undefined>
@@ -137,6 +129,8 @@ export interface DocDb {
   get<T extends Doc> (id: Ref<T>): T
   dump (): Doc[]
 
+  find<T extends Doc> (clazz: Ref<Class<T>>, query: Partial<T>): Promise<T[]>
+
   mixin<T extends E, E extends Doc> (id: Ref<E>, clazz: Ref<Class<T>>, values: Pick<T, Exclude<keyof T, keyof E>>): void
   createDocument<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Doc>, _id?: Ref<M>): M
 }
@@ -148,7 +142,10 @@ export interface CoreService extends Service {
   getInstance<T extends Doc> (id: Ref<T>): Promise<Instance<T>>
   as<T extends Doc, A extends Doc> (obj: Instance<T>, _class: Ref<Class<A>>): Promise<Instance<A>>
   is<T extends Doc, A extends Doc> (obj: Instance<T>, _class: Ref<Class<A>>): boolean
+
   getClassHierarchy (_class: Ref<Class<Obj>>, top?: Ref<Class<Obj>>): Ref<Class<Obj>>[]
+
+  find<T extends Doc> (_class: Ref<Class<T>>, query: Partial<T>): Promise<Instance<T>[]>
 
   getDb (): DocDb
 

@@ -129,6 +129,7 @@ export default async (platform: Platform): Promise<CoreService> => {
 
     getDb () { return modelDb },
     getClassHierarchy,
+    find,
 
     getPrototype,
     getInstance,
@@ -247,7 +248,13 @@ export default async (platform: Platform): Promise<CoreService> => {
     return mixins && mixins.includes(_class as Ref<Class<Doc>>)
   }
 
-  // T Y P E S : B A G
+  async function find<T extends Doc> (_class: Ref<Class<T>>, query: Partial<T>): Promise<Instance<T>[]> {
+    const layout = await modelDb.find(_class, query)
+    const result = layout.map(doc => instantiateDoc(doc))
+    return Promise.all(result)
+  }
+
+  // C O L L E C T I O N : B A G
 
   class BagProxyHandler implements ProxyHandler<any> {
     private exert: Exert
@@ -256,19 +263,31 @@ export default async (platform: Platform): Promise<CoreService> => {
       if (!exert) {
         throw new Error('bagof: no exert')
       }
-      // console.log('constructing bag, exert function: ')
-      // console.log(exert.toString())
       this.exert = exert
     }
 
-    get (target: any, key: string): any {
-      // console.log('bagof GET ' + key)
-      // console.log(target)
+    get (target: any, key: PropertyKey): any {
       const value = Reflect.get(target, key)
-      // console.log(value)
-      // console.log(this.exert.toString())
       const result = this.exert(value)
-      // console.log(result)
+      return result
+    }
+  }
+
+  // C O L L E C T I O N : A R R A Y
+
+  class ArrayProxyHandler implements ProxyHandler<any> {
+    private exert: Exert
+
+    constructor(exert: Exert | undefined) {
+      if (!exert) {
+        throw new Error('bagof: no exert')
+      }
+      this.exert = exert
+    }
+
+    get (target: any, key: PropertyKey): any {
+      const value = Reflect.get(target, key)
+      const result = this.exert(value)
       return result
     }
   }
@@ -295,18 +314,8 @@ export default async (platform: Platform): Promise<CoreService> => {
   }
 
   const InstanceOf_exert = async function (this: Instance<InstanceOf<Emb>>): Promise<Exert> {
-    // console.log('instanceof exert')
     return ((value: Emb) => {
-      // console.log('instanceof exerting')
       const result = value ? instantiateEmb(value) : undefined
-      // console.log('instanceof')
-      // if (result instanceof Promise) {
-      //   result.then((x) => {
-      //     console.log('instance resolved')
-      //     console.log(x)
-      //   })
-      // }
-      // console.log(result)
       return result
     }) as Exert
   }

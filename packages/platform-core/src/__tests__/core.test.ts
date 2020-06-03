@@ -65,4 +65,16 @@ describe('core', () => {
     expect((to as any)._class).toBe(core.class.RefTo)
     //    expect((inst._attributes.to as Instance<Emb>)._class).toBe(core.class.RefTo)
   })
+
+  it('should instantiate array', async () => {
+    const tx = await startPlugin(platform)
+    const builder = new Builder(tx.getDb())
+    builder.load(model)
+
+    // console.log(tx.getDb().dump())
+
+    const result = await tx.find(core.class.Class, {})
+    console.log(result)
+  })
+
 })

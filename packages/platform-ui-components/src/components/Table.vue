@@ -16,23 +16,24 @@
 <script lang="ts">
 
 import { defineComponent, PropType, inject } from 'vue'
-import { Obj, Ref, Class, CoreService } from '@anticrm/platform-core'
+import core, { Obj, Doc, Ref, Class, CoreService } from '@anticrm/platform-core'
 import ui, { UIService } from '@anticrm/platform-ui'
 import { injectPlatform } from '..'
 
 export default defineComponent({
   components: {},
   props: {
-    clazz: String as unknown as PropType<Ref<Class<Obj>>>,
+    clazz: String as unknown as PropType<Ref<Class<Doc>>>,
     exclude: String as PropType<string[] | string>,
   },
   async setup (props) {
-    const _ = await injectPlatform({ ui: ui.id })
+    const _ = await injectPlatform({ core: core.id, ui: ui.id })
+    const coreService = _.deps.core
     const uiService = _.deps.ui
-    const model = await uiService.getAttrModel(props.clazz)
-    const content = []
+    const model = uiService.getAttrModel(props.clazz)
+    const content = coreService.find(props.clazz, {})
     return {
-      model, content
+      model: await model, content: await content
     }
   },
 })

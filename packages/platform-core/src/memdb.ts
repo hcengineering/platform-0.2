@@ -24,6 +24,17 @@ export class MemDb implements DocDb {
   private objects = new Map<Ref<Doc>, Doc>()
   private byClass: Map<Ref<Class<Obj>>, Doc[]> | null = null
 
+  objectsOfClass<T extends Doc> (_class: Ref<Class<T>>): T[] {
+    console.log('indexing database...')
+    if (!this.byClass) {
+      this.byClass = new Map<Ref<Class<Obj>>, Doc[]>()
+      for (const doc of this.objects.values()) {
+        this.index(doc)
+      }
+    }
+    return this.byClass.get(_class) as T[]
+  }
+
   set (doc: Doc) {
     const id = doc._id
     if (this.objects.get(id)) { throw new Error('document added already ' + id) }
@@ -112,15 +123,14 @@ export class MemDb implements DocDb {
 
   loadModel (model: Doc[]) {
     for (const doc of model) { this.set(doc) }
-    if (this.byClass === null) { this.byClass = new Map<Ref<Class<Obj>>, Doc[]>() }
-    for (const doc of model) { this.index(doc) }
+    // if (this.byClass === null) { this.byClass = new Map<Ref<Class<Obj>>, Doc[]>() }
+    // for (const doc of model) { this.index(doc) }
   }
 
   // Q U E R Y
   async find<T extends Doc> (clazz: Ref<Class<T>>, query: Partial<T>): Promise<T[]> {
-    console.log(this.byClass?.get(clazz))
-    const result = (this.byClass?.get(clazz) ?? []) as T[]
-    return findAll(result, clazz, query)
+    const byClass = this.objectsOfClass(clazz)
+    return findAll(byClass, clazz, query)
   }
 
   async findOne<T extends Doc> (clazz: Ref<Class<T>>, query: Partial<T>): Promise<T | undefined> {
