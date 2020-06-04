@@ -48,7 +48,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <svg>
+  <svg class="icon">
     <use :xlink:href="url" />
   </svg>
 </template>

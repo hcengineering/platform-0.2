@@ -47,12 +47,45 @@ export default defineComponent({
 </script>
 
 <template>
-  <div>
+  <div class="workbench-new-item-menu">
     <Icon icon="icon:workbench.NewItem" class="icon-embed-2x" />
-    <div v-for="action in actions" :key="action._id">
-      <Icon :icon="icon(action.clazz)" class="icon-embed-2x" />
-      <Label :text="label(action.clazz)" />
-      <!-- <LinkTo :path="action.id">{{action.clazz}}</LinkTo> -->
+    <div class="menu">
+      <div v-for="action in actions" :key="action._id" class="item">
+        <Icon :icon="icon(action.clazz)" />
+        <br />
+        <Label class="caption-6" :text="label(action.clazz)" />
+        <!-- <LinkTo :path="action.id">{{action.clazz}}</LinkTo> -->
+      </div>
     </div>
   </div>
 </template>
+
+<style lang="scss">
+@import "~@anticrm/sparkling-theme/css/_variables.scss";
+
+.workbench-new-item-menu {
+  &:hover {
+    .menu {
+      visibility: visible;
+    }
+  }
+
+  .menu {
+    display: flex;
+    position: absolute;
+    background-color: $nav-bg-color;
+    border: 1px solid $content-color;
+    visibility: hidden;
+
+    .item {
+      padding: 0.5em;
+      text-align: center;
+
+      .icon {
+        width: 2em;
+        height: 2em;
+      }
+    }
+  }
+}
+</style>

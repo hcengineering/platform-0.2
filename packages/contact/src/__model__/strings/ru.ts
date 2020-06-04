@@ -36,7 +36,7 @@ export default modelTranslation(contact.class, ui.class.ClassUIDecorator, {
     // addressDelivery: 'Адрес доставки'
   },
   Person: {
-    label: 'Общая информация',
+    label: 'Персона',
     // firstName: 'Имя',
     // lastName: 'Фамилия',
     // birthDate: 'День рождения'

@@ -90,7 +90,7 @@ export interface EClass<T extends E, E extends Obj> extends Doc {
   _native?: Property<Object>
 }
 
-export const CLASS = 'class' as ResourceKind
+export const ClassKind = 'class' as ResourceKind
 export type Class<T extends Obj> = EClass<T, Obj>
 
 type PrimitiveInstance<T> =

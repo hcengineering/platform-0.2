@@ -22,10 +22,10 @@ import workbench from '..'
 
 import MainView from './MainView.vue'
 import Home from './Home.vue'
-import Header from './Header.vue'
+import NewItemMenu from './NewItemMenu.vue'
 
 export default defineComponent({
-  components: { MainView, Home, Header },
+  components: { MainView, Home, NewItemMenu },
   props: {
     path: String
   },
@@ -38,7 +38,7 @@ export default defineComponent({
 <template>
   <div id="workbench">
     <header>
-      <Header />
+      <NewItemMenu />
     </header>
 
     <nav>

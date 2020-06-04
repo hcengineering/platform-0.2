@@ -14,10 +14,10 @@
 //
 
 import core from '@anticrm/platform-core/src/__model__'
-import { CLASS } from '@anticrm/platform-core'
+import { ClassKind } from '@anticrm/platform-core'
 import i18n from '@anticrm/platform-core-i18n/src/__model__'
 import ui from '.'
-import { COMPONENT } from '..'
+import { ComponentKind } from '..'
 
 import Builder from '@anticrm/platform-core/src/__model__/builder'
 
@@ -43,8 +43,8 @@ export default (S: Builder) => {
   })
 
   S.createDocument(core.class.Adapter, {
-    from: S.primitive(CLASS),
-    to: S.primitive(COMPONENT),
+    from: S.primitive(ClassKind),
+    to: S.primitive(ComponentKind),
     adapt: S.resolve(ui.method.ClassToComponent)
   })
 }

@@ -26,7 +26,7 @@ export type AnyComponent = Component<VueConstructor>
 export type ComponentRef = Property<AnyComponent>
 
 export const ASSET = 'asset' as ResourceKind
-export const COMPONENT = 'component' as ResourceKind
+export const ComponentKind = 'component' as ResourceKind
 
 /// C O R E  M O D E L
 

@@ -17,8 +17,8 @@
 import { defineComponent, reactive, computed, provide, inject, watch, PropType } from 'vue'
 import { Platform, Resource, getResourceKind } from '@anticrm/platform'
 import { injectPlatform } from '@anticrm/platform-vue'
-import core, { Ref, Class, Doc, CoreService, CLASS, Instance } from '@anticrm/platform-core'
-import ui, { AnyComponent, UIService, COMPONENT } from '@anticrm/platform-ui'
+import core, { Ref, Class, Doc, CoreService, ClassKind, Instance } from '@anticrm/platform-core'
+import ui, { AnyComponent, UIService, ComponentKind } from '@anticrm/platform-ui'
 import { getCoreService } from '..'
 
 import Button from '@anticrm/sparkling-controls/src/Button.vue'
@@ -31,10 +31,10 @@ export default defineComponent({
   async setup (props, context) {
     const resource = props.content as Resource<any>
     const coreService = getCoreService()
-    const component = await coreService.adapt(resource, COMPONENT)
+    const component = await coreService.adapt(resource, ComponentKind)
 
     let document: Ref<Doc>
-    if (getResourceKind(resource) === CLASS) {
+    if (getResourceKind(resource) === ClassKind) {
       const _class = resource as Ref<Class<Doc>>
       document = coreService.getDb().createDocument(_class, {
         firstName: 'Валентин Генрихович',
