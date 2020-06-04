@@ -27,7 +27,7 @@ import mc from '@anticrm/app-mission-control'
 import { createApp } from 'vue'
 import ErrorPage from './components/ErrorPage.vue'
 
-// import uiMeta from '@anticrm/platform-ui-model/src/__resources__/meta'
+import uiMeta from '@anticrm/platform-vue/src/__meta__/meta'
 import contactMeta from '@anticrm/contact/src/__model__/meta'
 
 const metaModel = require('./model.json') as Doc[]
@@ -51,7 +51,7 @@ platform.addLocation(contact, () => import(/* webpackChunkName: "contact" */ '@a
 // platform.addLocation(demo, () => import(/* webpackChunkName: "demo-3d" */ '@anticrm/demo-3d/src/plugin'))
 platform.addLocation(mc, () => import(/* webpackChunkName: "mission-control" */ '@anticrm/app-mission-control/src/plugin'))
 
-// uiMeta(platform)
+uiMeta(platform)
 contactMeta(platform)
 
 async function boot (): Promise<void> {
