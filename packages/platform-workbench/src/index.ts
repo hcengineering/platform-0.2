@@ -13,10 +13,18 @@
 // limitations under the License.
 //
 
-import { plugin, Service, Plugin } from '@anticrm/platform'
-import core, { Ref, Class, Doc, Instance } from '@anticrm/platform-core'
+import { plugin, Service, Plugin, Resource } from '@anticrm/platform'
+import core, { Ref, Class, Doc, Instance, Property } from '@anticrm/platform-core'
 import ui, { AnyComponent } from '@anticrm/platform-ui'
 
+// C O R E  M O D E L
+
+export interface DocCreateAction extends Doc {
+  clazz: Ref<Class<Doc>>
+  action?: Property<() => void>
+}
+
+// U I  M O D E L
 
 export enum ViewModelKind {
   NEW_FORM = 0,
@@ -29,10 +37,6 @@ export interface ViewModel {
   kind: ViewModelKind
   component: AnyComponent
   content: Doc
-}
-
-export interface WorkbenchState {
-  mainView: ViewModel | undefined
 }
 
 export const WorkbenchStateInjectionKey = Symbol('workbenchState')
@@ -49,6 +53,9 @@ export default plugin('workbench' as Plugin<WorkbenchService>, {
   core: core.id,
   ui: ui.id,
 }, {
+  class: {
+    DocCreateAction: '' as Ref<Class<DocCreateAction>>
+  },
   component: {
     Workbench: '' as AnyComponent
   }

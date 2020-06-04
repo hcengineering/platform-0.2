@@ -50,10 +50,10 @@ export default defineComponent({
 <template>
   <div>
     <div>
-      <InlineEdit class="caption-1" v-model="instance.firstName" placeholder="Фамилия" />
+      <InlineEdit class="caption-1" v-model="instance.lastName" placeholder="Фамилия" />
     </div>
     <div>
-      <InlineEdit class="caption-2" v-model="instance.lastName" placeholder="Имя Отчество" />
+      <InlineEdit class="caption-2" v-model="instance.firstName" placeholder="Имя Отчество" />
     </div>
     <Suspense>
       <ObjectPanel

@@ -15,17 +15,16 @@
 
 <script lang="ts">
 import { Platform } from '@anticrm/platform'
-import { defineComponent, reactive, computed, provide, inject, watch, PropType } from 'vue'
-import workbench, { WorkbenchStateInjectionKey, WorkbenchState, ViewModelKind } from '..'
+import { defineComponent, inject } from 'vue'
 import { UIComponentsInjectionKey, UIComponentsService } from '@anticrm/platform-ui-components'
-import { Ref, Class, Doc } from '@anticrm/platform-core'
 import contact from '@anticrm/contact'
+import workbench from '..'
 
-import Button from '@anticrm/sparkling-controls/src/Button.vue'
 import MainView from './MainView.vue'
+import Home from './Home.vue'
 
 export default defineComponent({
-  components: { Button, MainView },
+  components: { MainView, Home },
   props: {
     path: String
   },
@@ -39,12 +38,7 @@ export default defineComponent({
 
 <template>
   <div id="workbench">
-    <header>
-      <!-- <Header @add="addObject()" /> -->
-      <Button
-        @click="navigate({ app: workbench.component.Workbench, path: contact.class.Person })"
-      >Go!</Button>
-    </header>
+    <header></header>
 
     <nav>
       <!-- <Sidenav :applications="applications" /> -->
@@ -54,7 +48,7 @@ export default defineComponent({
       <Suspense v-if="path">
         <MainView :content="path" />
       </Suspense>
-      <div v-else>Nothing to show.</div>
+      <Home v-else />
     </main>
 
     <aside>

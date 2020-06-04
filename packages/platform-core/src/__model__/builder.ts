@@ -14,7 +14,10 @@
 //
 
 import { Resource, Metadata } from '@anticrm/platform'
-import { PropertyType, Emb, Doc, Obj, Ref, EClass, Class, AllAttributes, DocDb, Property } from '@anticrm/platform-core'
+import {
+  PropertyType, Emb, Doc, Obj, Ref, EClass, Class,
+  AllAttributes, DocDb, Property, RefTo
+} from '@anticrm/platform-core'
 import core from '.'
 import { MemDb } from '../memdb'
 
@@ -64,6 +67,12 @@ class Builder {
 
   primitive<T> (prop: T) {
     return prop as T & Property<T>
+  }
+
+  // H E L P E R S
+
+  ref<T extends Doc> (to: Ref<Class<T>>): RefTo<T> {
+    return this.newInstance(core.class.RefTo, { to: to as Ref<Class<Doc>> }) as RefTo<T>
   }
 }
 

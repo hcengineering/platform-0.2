@@ -19,7 +19,6 @@ import { Platform, Resource } from '@anticrm/platform'
 import { injectPlatform } from '@anticrm/platform-ui-components'
 import core, { Ref, Class, Doc, CoreService, CLASS, Instance } from '@anticrm/platform-core'
 import ui, { AnyComponent, UIService, COMPONENT } from '@anticrm/platform-ui'
-import workbench, { WorkbenchStateInjectionKey, WorkbenchState, ViewModelKind } from '..'
 
 import Button from '@anticrm/sparkling-controls/src/Button.vue'
 
@@ -39,8 +38,8 @@ export default defineComponent({
     if (_.platform.getResourceKind(resource) === CLASS) {
       const _class = resource as Ref<Class<Doc>>
       document = coreService.getDb().createDocument(_class, {
-        firstName: 'Andrey',
-        lastName: 'Platov',
+        firstName: 'Валентин Генрихович',
+        lastName: 'Либерзон',
         phone: '+7 913 333 7777'
       })._id
       console.log('CREATE!')

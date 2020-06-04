@@ -18,6 +18,7 @@ import Builder from '@anticrm/platform-core/src/__model__/builder'
 import coreModel from '@anticrm/platform-core/src/__model__/model'
 import i18nModel from '@anticrm/platform-core-i18n/src/__model__/model'
 import uiModel from '@anticrm/platform-ui/src/__model__/model'
+import workbenchModel from '@anticrm/platform-workbench/src/__model__/model'
 import contactModel from '@anticrm/contact/src/__model__/model'
 
 import contactRu from '@anticrm/contact/src/__model__/strings/ru'
@@ -26,6 +27,7 @@ const builder = new Builder()
 builder.load(coreModel)
 builder.load(i18nModel)
 builder.load(uiModel)
+builder.load(workbenchModel)
 builder.load(contactModel)
 
 console.log('model:')

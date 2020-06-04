@@ -15,11 +15,11 @@
 
 import contact from '.'
 import core from '@anticrm/platform-core/src/__model__'
-import { Ref, Class, Type } from '@anticrm/platform-core'
 import ui from '@anticrm/platform-ui/src/__model__'
+import workbench from '@anticrm/platform-workbench/src/__model__'
+import { Ref, Class, Type } from '@anticrm/platform-core'
 import { ClassUIDecorator, Form } from '@anticrm/platform-ui'
 import { Contact, Person } from '..'
-import { Doc } from '@anticrm/platform-core'
 import Builder from '@anticrm/platform-core/src/__model__/builder'
 
 export default async (S: Builder) => {
@@ -60,6 +60,10 @@ export default async (S: Builder) => {
 
   S.mixin(contact.class.Person, ui.class.Form as Ref<Class<Form<Person>>>, {
     form: S.primitive(contact.form.Person)
+  })
+
+  S.createDocument(workbench.class.DocCreateAction, {
+    clazz: contact.class.Person,
   })
 
 }

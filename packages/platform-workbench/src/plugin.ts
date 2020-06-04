@@ -18,8 +18,8 @@ import { reactive } from 'vue'
 import { CoreService, Obj, Doc, Ref, Instance, Class } from '@anticrm/platform-core'
 import ui, { UIService, AnyComponent } from '@anticrm/platform-ui'
 
-import workbench, { WorkbenchService, WorkbenchState, ViewModel, ViewModelKind } from '.'
-import Workbench from './components/Workbench.vue'
+import workbench, { WorkbenchService, ViewModel, ViewModelKind } from '.'
+import Workbench from './internal/Workbench.vue'
 // import { LaunchPlugin } from '@anticrm/launch-dev'
 
 console.log('PLUGIN: `workbench` parsed')
