@@ -51,10 +51,12 @@ export default defineComponent({
     <Icon icon="icon:workbench.NewItem" class="icon-embed-2x" />
     <div class="menu">
       <div v-for="action in actions" :key="action._id" class="item">
-        <Icon :icon="icon(action.clazz)" />
-        <br />
-        <Label class="caption-6" :text="label(action.clazz)" />
-        <!-- <LinkTo :path="action.id">{{action.clazz}}</LinkTo> -->
+        <LinkTo :path="action.clazz">
+          <Icon :icon="icon(action.clazz)" />
+          <br />
+          <Label class="caption-6" :text="label(action.clazz)" />
+        </LinkTo>
+        <!-- {{action.clazz}}</LinkTo> -->
       </div>
     </div>
   </div>
