@@ -37,9 +37,16 @@ export async function injectPlatform<D extends PluginDependencies> (deps: D): Pr
 
 /// P L U G I N
 
+/**
+ * Navigation (routing) target for a platform application. 
+ * It will be encoded as following in the url:
+ * 
+ * `/app[/path][?{param=value}{&param=value...}]`
+ */
 export interface LinkTarget {
-  path: string
+  path?: string
   app?: AnyComponent
+  params?: Record<string, string>
 }
 
 export interface VueService extends Service {
