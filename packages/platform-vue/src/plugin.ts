@@ -21,7 +21,7 @@ import Root from './internal/Root.vue'
 
 console.log('Plugin `ui` loaded')
 /*!
- * Anticrm Platform™ UI Components Plugin
+ * Anticrm Platform™ Vue Components Plugin
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */
@@ -92,8 +92,9 @@ export default async (platform: Platform): Promise<VueService> => {
     const path = split.splice(2).join('/')
 
     const params = {} as Record<string, string>
-    const searchParams = new URLSearchParams(search)
-    for (const [key, value] of searchParams) {
+    const searchParams = search.split('&')
+    for (const param of searchParams) {
+      const [key, value] = param.split('=')
       params[key] = value
     }
 
