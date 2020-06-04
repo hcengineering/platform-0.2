@@ -17,7 +17,7 @@
 import { defineComponent, reactive, computed, provide, inject, watch, PropType } from 'vue'
 import { Platform, Resource } from '@anticrm/platform'
 import { injectPlatform } from '@anticrm/platform-ui-components'
-import core, { Ref, Class, Doc, CoreService, CLASS } from '@anticrm/platform-core'
+import core, { Ref, Class, Doc, CoreService, CLASS, Instance } from '@anticrm/platform-core'
 import ui, { AnyComponent, UIService, COMPONENT } from '@anticrm/platform-ui'
 import workbench, { WorkbenchStateInjectionKey, WorkbenchState, ViewModelKind } from '..'
 
@@ -35,19 +35,25 @@ export default defineComponent({
     const resource = props.content as Resource<any>
     const component = await coreService.adapt(resource, COMPONENT)
 
-    let content: Doc
+    let document: Ref<Doc>
     if (_.platform.getResourceKind(resource) === CLASS) {
       const _class = resource as Ref<Class<Doc>>
-      content = coreService.getDb().createDocument(_class, {})
+      document = coreService.getDb().createDocument(_class, {
+        firstName: 'Andrey',
+        lastName: 'Platov',
+        phone: '+7 913 333 7777'
+      })._id
+      console.log('CREATE!')
+      console.log(document)
     }
 
     return {
-      component, content
+      component, document
     }
   }
 })
 </script>
 
 <template>
-  <widget v-if="component" :component="component" :content="content" />
+  <widget v-if="component" :component="component" :content="document" />
 </template>

@@ -19,9 +19,8 @@ import { CoreService } from '@anticrm/platform-core'
 import storybook from '.'
 import Storybook from './components/Storybook.vue'
 
-import Builder from '@anticrm/platform-core/src/__model__/builder'
-
 import Persons from './components/Persons.vue'
+import Controls from './components/Controls.vue'
 
 
 console.log('Plugin `app-storybook` loaded')
@@ -36,6 +35,7 @@ export default async (platform: Platform) => {
 
   platform.setResource(storybook.component.Storybook, Storybook)
   platform.setResource(storybook.component.Persons, Persons)
+  platform.setResource(storybook.component.Controls, Controls)
 
   // const memdb = deps.core.getDb()
   // const builder = new Builder(memdb)

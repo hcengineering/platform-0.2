@@ -18,7 +18,7 @@
 import { defineComponent, PropType } from 'vue'
 import { Platform } from '@anticrm/platform'
 
-import core, { Obj, Doc, Ref, Class, CoreService } from '@anticrm/platform-core'
+import core, { Obj, Doc, Ref, Class, CoreService, Instance } from '@anticrm/platform-core'
 import { injectPlatform } from '..'
 
 import PropPanel from './PropPanel.vue'
@@ -26,14 +26,14 @@ import PropPanel from './PropPanel.vue'
 export default defineComponent({
   components: { PropPanel },
   props: {
-    content: Object as PropType<Doc>,
+    instance: Object as PropType<Instance<Doc>>,
     top: String,
     exclude: String
   },
   async setup (props) {
     const _ = await injectPlatform({ core: core.id })
     const coreService = _.deps.core
-    const classes = coreService.getClassHierarchy(props.content._class, props.top as Ref<Class<Obj>>)
+    const classes = coreService.getClassHierarchy(props.instance._class, props.top as Ref<Class<Obj>>)
     return { classes }
   }
 })
@@ -44,7 +44,7 @@ export default defineComponent({
     <tr>
       <td valign="top" v-for="clazz in classes" :key="clazz">
         <Suspense>
-          <PropPanel :clazz="clazz" :content="content" :exclude="exclude" />
+          <PropPanel :clazz="clazz" :instance="instance" :exclude="exclude" />
         </Suspense>
       </td>
     </tr>

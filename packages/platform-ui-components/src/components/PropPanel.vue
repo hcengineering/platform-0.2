@@ -18,7 +18,7 @@
 import { PropType, defineComponent, inject, ref } from 'vue'
 import { Platform } from '@anticrm/platform'
 
-import { Obj, Class, Ref, CoreService } from '@anticrm/platform-core'
+import { Obj, Class, Ref, CoreService, Instance, Doc } from '@anticrm/platform-core'
 import ui, { UIService, AttrModel } from '@anticrm/platform-ui'
 import { injectPlatform } from '..'
 
@@ -28,7 +28,7 @@ import Icon from './Icon.vue'
 export default defineComponent({
   components: { InlineEdit, Icon },
   props: {
-    content: Object as PropType<Promise<Obj>>,
+    instance: Object as PropType<Instance<Doc>>,
     clazz: String as unknown as PropType<Ref<Class<Obj>>>,
     exclude: String
   },
@@ -59,7 +59,7 @@ export default defineComponent({
       <div style="margin-right: 1em; margin-bottom: 1em">
         <div v-for="prop in attrs" :key="prop.key">
           <div class="caption-4" style="color: #808080">{{ prop.label }}</div>
-          <InlineEdit class="inline" v-model="content[prop.key]" :placeholder="prop.placeholder" />
+          <InlineEdit class="inline" v-model="instance[prop.key]" :placeholder="prop.placeholder" />
         </div>
       </div>
     </div>

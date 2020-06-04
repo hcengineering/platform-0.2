@@ -132,6 +132,8 @@ export default async (platform: Platform): Promise<CoreService> => {
     find,
 
     getPrototype,
+
+    newInstance,
     getInstance,
     as,
     is,
@@ -195,6 +197,9 @@ export default async (platform: Platform): Promise<CoreService> => {
         get (this: Instance<Obj>) {
           return exert(Reflect.get(this.__layout, fullKey), this.__layout, key)
         },
+        set (this: Instance<Obj>, value: any) {
+          Reflect.set(this.__layout, fullKey, value)
+        },
         enumerable: true
       })
     }
@@ -229,6 +234,11 @@ export default async (platform: Platform): Promise<CoreService> => {
   }
 
   // A P I : R E A D
+
+  function newInstance<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Doc>, _id?: Ref<M>): Promise<Instance<M>> {
+    const doc = modelDb.createDocument(_class, values, _id)
+    return getInstance(doc._id)
+  }
 
   async function getInstance<T extends Doc> (id: Ref<T>): Promise<Instance<T>> {
     const doc = modelDb.get(id)

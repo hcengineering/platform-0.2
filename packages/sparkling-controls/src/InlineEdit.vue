@@ -18,7 +18,7 @@ import { defineComponent } from 'vue'
 
 export default defineComponent({
   props: {
-    value: String,
+    modelValue: String,
     placeholder: {
       type: String,
       required: true
@@ -41,7 +41,7 @@ export default defineComponent({
       },
       onInput (value: string) {
         this.computeSize(value)
-        this.$emit('input', value)
+        this.$emit('update:modelValue', value)
       }
     }
   },
@@ -60,7 +60,7 @@ export default defineComponent({
       <input
         ref="input"
         type="text"
-        :value="value"
+        :value="modelValue"
         :placeholder="placeholder"
         @input="onInput($event.target.value)"
       />
@@ -73,6 +73,7 @@ export default defineComponent({
 
 .erp-inline-editbox {
   min-width: 12em;
+
   .control {
     display: inline-flex;
     box-sizing: border-box;

@@ -24,9 +24,20 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="text-small-uppercase">
+  <div class="text-small-uppercase" style="padding: 2em;">
     <InfoPanel caption="Examples">
-      <LinkTo app="component:storybook.Persons">Table of Persons</LinkTo>
+      <div class="crm-table">
+        <div class="tr">
+          <div class="td">
+            <LinkTo app="component:storybook.Controls">Controls</LinkTo>
+          </div>
+        </div>
+        <div class="tr">
+          <div class="td">
+            <LinkTo app="component:storybook.Persons">Table of Persons</LinkTo>
+          </div>
+        </div>
+      </div>
     </InfoPanel>
   </div>
 </template>

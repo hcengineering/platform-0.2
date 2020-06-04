@@ -15,8 +15,9 @@
 
 <script lang="ts">
 import { defineComponent, ref, reactive, inject, computed, PropType } from 'vue'
-import { Instance } from '@anticrm/platform-core'
+import core, { Ref, Instance } from '@anticrm/platform-core'
 import { AnyComponent } from '@anticrm/platform-ui'
+import { injectPlatform } from '@anticrm/platform-ui-components'
 import { Person } from '..'
 
 import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.vue'
@@ -26,26 +27,37 @@ import Table from '@anticrm/platform-ui-components/src/components/Table.vue'
 export default defineComponent({
   components: { InlineEdit, ObjectPanel, Table },
   props: {
-    content: Object as PropType<Instance<Person>>
+    content: String as unknown as PropType<Ref<Person>>
   },
-  setup (props, context) {
+  async setup (props, context) {
+    const _ = await injectPlatform({ core: core.id })
+    const coreService = _.deps.core
+
+    const instance = await coreService.getInstance(props.content)
+
+    console.log('CONTENT!!!!!')
+    console.log(instance)
+    console.log(instance.firstName)
     return {
+      instance
     }
   }
 })
 </script>
 
+<!-- Must use v-model, but dont work for me with Vue3 -->
+
 <template>
   <div>
     <div>
-      <InlineEdit class="caption-1" v-model="content.firstName" placeholder="Фамилия" />
+      <InlineEdit class="caption-1" v-model="instance.firstName" placeholder="Фамилия" />
     </div>
     <div>
-      <InlineEdit class="caption-2" v-model="content.lastName" placeholder="Имя Отчество" />
+      <InlineEdit class="caption-2" v-model="instance.lastName" placeholder="Имя Отчество" />
     </div>
     <Suspense>
       <ObjectPanel
-        :content="content"
+        :instance="instance"
         top="class:core.Doc"
         exclude="firstName, lastName"
         style="margin-top: 2em"
