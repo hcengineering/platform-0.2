@@ -17,16 +17,16 @@
 import { Platform } from '@anticrm/platform'
 import { defineComponent, computed, reactive, onMounted, onUnmounted, inject, ref, toRefs } from 'vue'
 import ui, { AnyComponent } from '@anticrm/platform-ui'
-import uiComponents, { UIComponentsInjectionKey, UIComponentsService } from '..'
+import vue, { getVueService } from '..'
 
 export const AppInjectionKey = 'AppInjectionKey'
 
 export default defineComponent({
   components: {},
   setup () {
-    const uiComponentsService = inject(UIComponentsInjectionKey) as UIComponentsService
-    const current = computed(() => uiComponentsService.getLocation())
-    uiComponentsService.navigate({ path: '' })
+    const vueService = getVueService()
+    const current = computed(() => vueService.getLocation())
+    vueService.navigate({ path: '' })
     return { current }
   },
 })

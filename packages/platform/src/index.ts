@@ -99,6 +99,10 @@ export interface ResourceInfo {
   id: string
 }
 
+export function getResourceKind (resource: Resource<any>): ResourceKind {
+  return resource.substring(0, resource.indexOf(':')) as ResourceKind
+}
+
 /*!
  * Built on Anticrm Platform™
  * Copyright © 2020 Anticrm Platform Contributors. All Rights Reserved.
@@ -175,10 +179,6 @@ export class Platform {
 
   setResource<T> (resource: Resource<T>, value: T): void {
     this.resources.set(resource, value)
-  }
-
-  getResourceKind (resource: Resource<any>): ResourceKind {
-    return resource.substring(0, resource.indexOf(':')) as ResourceKind
   }
 
   getResourceInfo (resource: Resource<any>): ResourceInfo {

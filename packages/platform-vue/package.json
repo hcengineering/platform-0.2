@@ -1,5 +1,5 @@
 {
-  "name": "@anticrm/platform-ui-components",
+  "name": "@anticrm/platform-vue",
   "version": "0.1.0",
   "main": "src/index.ts",
   "description": "AntiCRM Platform UI Plugin",

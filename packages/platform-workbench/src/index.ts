@@ -13,9 +13,11 @@
 // limitations under the License.
 //
 
+import { inject } from 'vue'
 import { plugin, Service, Plugin, Resource } from '@anticrm/platform'
-import core, { Ref, Class, Doc, Instance, Property } from '@anticrm/platform-core'
-import ui, { AnyComponent } from '@anticrm/platform-ui'
+import core, { Ref, Class, Doc, CoreService, Property } from '@anticrm/platform-core'
+import ui, { AnyComponent, UIService } from '@anticrm/platform-ui'
+import vue from '@anticrm/platform-vue'
 
 // C O R E  M O D E L
 
@@ -39,7 +41,15 @@ export interface ViewModel {
   content: Doc
 }
 
-export const WorkbenchStateInjectionKey = Symbol('workbenchState')
+// S E R V I C E
+
+export const CoreInjectionKey = Symbol('core')
+export const UIInjectionKey = Symbol('ui')
+export const WorkbenchInjectionKey = Symbol('workbenchState')
+
+export function getCoreService () { return inject(CoreInjectionKey) as CoreService }
+export function getUIService () { return inject(UIInjectionKey) as UIService }
+
 
 export interface WorkbenchService extends Service {
   getViewModel (_class: Ref<Class<Doc>>, kind: ViewModelKind): Promise<ViewModel>
@@ -52,6 +62,7 @@ export interface MainModel extends ViewModel {
 export default plugin('workbench' as Plugin<WorkbenchService>, {
   core: core.id,
   ui: ui.id,
+  vue: vue.id
 }, {
   class: {
     DocCreateAction: '' as Ref<Class<DocCreateAction>>

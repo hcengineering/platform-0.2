@@ -16,7 +16,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import InfoPanel from '@anticrm/sparkling-controls/src/InfoPanel.vue'
-import LinkTo from '@anticrm/platform-ui-components/src/components/LinkTo.vue'
+import LinkTo from '@anticrm/platform-vue/src/components/LinkTo.vue'
 
 export default defineComponent({
   components: { InfoPanel, LinkTo }
