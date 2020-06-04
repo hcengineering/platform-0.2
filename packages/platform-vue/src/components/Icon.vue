@@ -17,7 +17,8 @@
 
 import { defineComponent, ref } from 'vue'
 import { Platform, Metadata } from '@anticrm/platform'
-import ui, { getPlatform } from '..'
+import { Asset } from '@anticrm/platform-ui'
+import vue, { getPlatform, } from '..'
 
 export default defineComponent({
   props: {
@@ -28,17 +29,17 @@ export default defineComponent({
   setup (props) {
     console.log(props.icon)
 
-    function defaultIcon () {
-      return getPlatform().getMetadata(ui.icon.Default) ?? 'https://pltfo.com/logo.svg'
+    function getUrl (icon?: Asset) {
+      return getPlatform().getMetadata(icon ?? vue.icon.Default) ?? 'https://pltfo.com/logo.svg'
     }
 
     const icon = props.icon
     let url
     if (icon instanceof Promise) {
-      url = ref(defaultIcon())
+      url = ref(getUrl())
       icon.then(u => { if (u) { url.value = u } })
     } else {
-      url = icon ?? defaultIcon()
+      url = getUrl(icon as unknown as Asset)
     }
 
     return { url }

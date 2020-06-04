@@ -30,7 +30,7 @@ export default (S: Builder) => {
 
   S.createClass(ui.class.ClassUIDecorator, core.class.Class, {
     label: S.newInstance(i18n.class.IntlString, {}),
-    icon: S.newInstance(core.class.Metadata, {}),
+    icon: S.newInstance(core.class.Type, {}),
     decorators: S.newInstance(core.class.BagOf, {
       of: S.newInstance(core.class.InstanceOf, {
         of: ui.class.TypeUIDecorator

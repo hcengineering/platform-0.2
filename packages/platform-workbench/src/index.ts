@@ -17,7 +17,7 @@ import { inject } from 'vue'
 import { plugin, Service, Plugin, Resource } from '@anticrm/platform'
 import core, { Ref, Class, Doc, CoreService, Property } from '@anticrm/platform-core'
 import ui, { AnyComponent, UIService } from '@anticrm/platform-ui'
-import vue from '@anticrm/platform-vue'
+import vue, { Asset } from '@anticrm/platform-vue'
 
 // C O R E  M O D E L
 
@@ -64,6 +64,9 @@ export default plugin('workbench' as Plugin<WorkbenchService>, {
   ui: ui.id,
   vue: vue.id
 }, {
+  icon: {
+    NewItem: '' as Asset
+  },
   class: {
     DocCreateAction: '' as Ref<Class<DocCreateAction>>
   },

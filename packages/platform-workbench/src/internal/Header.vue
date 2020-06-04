@@ -48,6 +48,7 @@ export default defineComponent({
 
 <template>
   <div>
+    <Icon icon="icon:workbench.NewItem" class="icon-embed-2x" />
     <div v-for="action in actions" :key="action._id">
       <Icon :icon="icon(action.clazz)" class="icon-embed-2x" />
       <Label :text="label(action.clazz)" />
