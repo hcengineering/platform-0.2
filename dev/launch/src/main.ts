@@ -18,7 +18,7 @@ import { Platform } from '@anticrm/platform'
 import core from '@anticrm/platform-core'
 import i18n from '@anticrm/platform-core-i18n'
 import ui from '@anticrm/platform-ui'
-import uiComponents from '@anticrm/platform-ui-components'
+import vue from '@anticrm/platform-vue'
 import workbench from '@anticrm/platform-workbench'
 import contact from '@anticrm/contact'
 import demo from '@anticrm/demo-3d'
@@ -62,7 +62,7 @@ platform.setMetadata(mc.metadata.Applications, [
 platform.addLocation(core, () => import(/* webpackChunkName: "platform-core" */ '@anticrm/platform-core/src/plugin'))
 platform.addLocation(i18n, () => import(/* webpackChunkName: "platform-core-i18n" */ '@anticrm/platform-core-i18n/src/plugin'))
 platform.addLocation(ui, () => import(/* webpackChunkName: "platform-ui" */ '@anticrm/platform-ui/src/plugin'))
-platform.addLocation(uiComponents, () => import(/* webpackChunkName: "platform-ui-components" */ '@anticrm/platform-ui-components/src/plugin'))
+platform.addLocation(vue, () => import(/* webpackChunkName: "platform-vue" */ '@anticrm/platform-vue/src/plugin'))
 platform.addLocation(workbench, () => import(/* webpackChunkName: "platform-workbench" */ '@anticrm/platform-workbench/src/plugin'))
 platform.addLocation(contact, () => import(/* webpackChunkName: "contact" */ '@anticrm/contact/src/plugin'))
 platform.addLocation(demo, () => import(/* webpackChunkName: "demo-3d" */ '@anticrm/demo-3d/src/plugin'))
@@ -73,8 +73,8 @@ platform.addLocation(storybook, () => import(/* webpackChunkName: "storybook" */
 contactMeta(platform)
 
 async function boot (): Promise<void> {
-  const uiComponentsService = await platform.getPlugin(uiComponents.id)
-  uiComponentsService.getApp().mount('#app')
+  const vueService = await platform.getPlugin(vue.id)
+  vueService.getApp().mount('#app')
 }
 
 boot().catch(err => {

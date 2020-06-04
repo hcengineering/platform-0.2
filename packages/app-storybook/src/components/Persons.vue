@@ -15,7 +15,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import Table from '@anticrm/platform-ui-components/src/components/Table.vue'
+import Table from '@anticrm/platform-vue/src/components/Table.vue'
 
 export default defineComponent({
   components: { Table }

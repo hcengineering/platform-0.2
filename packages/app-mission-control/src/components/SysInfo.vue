@@ -22,7 +22,7 @@ import mc from '..'
 import Button from '@anticrm/sparkling-controls/src/Button.vue'
 import InfoPanel from '@anticrm/sparkling-controls/src/InfoPanel.vue'
 
-import LinkTo from '@anticrm/platform-ui-components/src/components/LinkTo.vue'
+import LinkTo from '@anticrm/platform-vue/src/components/LinkTo.vue'
 
 export default defineComponent({
   components: { Button, InfoPanel, LinkTo },

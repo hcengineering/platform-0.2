@@ -14,21 +14,34 @@
 -->
 
 <script lang="ts">
-import { defineComponent } from 'vue'
-import contact from '@anticrm/contact'
+import { defineComponent, ref } from 'vue'
+import core, { Ref, Class, Obj, Doc, CoreService, Instance } from '@anticrm/platform-core'
+import { UIDecorator } from '@anticrm/platform-ui'
+import workbench, { DocCreateAction, getCoreService, getUIService } from '..'
 
 import LinkTo from '@anticrm/platform-vue/src/components/LinkTo.vue'
 
 export default defineComponent({
   components: { LinkTo },
   setup () {
-    return { contact }
+    const actions = ref([] as Instance<DocCreateAction>[])
+
+    getCoreService().find(workbench.class.DocCreateAction, {})
+      .then(acts => { actions.value = acts })
+
+    function uiDecorator (_class: Ref<Class<Obj>>) {
+      return getUIService().getClassModel(_class)
+    }
+
+    return { actions }
   }
 })
 </script>
 
 <template>
   <div>
-    <LinkTo :path="contact.class.Person">Персоны</LinkTo>
+    <div v-for="action in actions" :key="action._id">
+      <LinkTo :path="action.id">{{action.clazz}}</LinkTo>
+    </div>
   </div>
 </template>

@@ -23,7 +23,10 @@ export type Asset = Metadata<URL>
 // S T A T E
 
 export const PlatformInjectionKey = Symbol('platform')
-export const UIComponentsInjectionKey = Symbol('ui-components')
+export const VueInjectionKey = Symbol('vue')
+
+export function getPlatform () { return inject(PlatformInjectionKey) as Platform }
+export function getVueService () { return inject(VueInjectionKey) as VueService }
 
 export async function injectPlatform<D extends PluginDependencies> (deps: D): Promise<{ platform: Platform, deps: InferPlugins<D> }> {
   const platform = inject(PlatformInjectionKey) as Platform
@@ -39,13 +42,13 @@ export interface LinkTarget {
   app?: AnyComponent
 }
 
-export interface UIComponentsService extends Service {
+export interface VueService extends Service {
   getApp (): App
   getLocation (): LinkTarget
   navigate (target: LinkTarget): void
 }
 
-export default plugin('ui-components' as Plugin<UIComponentsService>, {}, {
+export default plugin('vue' as Plugin<VueService>, {}, {
   icon: {
     Default: '' as Asset
   }

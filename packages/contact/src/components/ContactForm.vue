@@ -17,12 +17,12 @@
 import { defineComponent, ref, reactive, inject, computed, PropType } from 'vue'
 import core, { Ref, Instance } from '@anticrm/platform-core'
 import { AnyComponent } from '@anticrm/platform-ui'
-import { injectPlatform } from '@anticrm/platform-ui-components'
+import { injectPlatform } from '@anticrm/platform-vue'
 import { Person } from '..'
 
 import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.vue'
-import ObjectPanel from '@anticrm/platform-ui-components/src/components/ObjectPanel.vue'
-import Table from '@anticrm/platform-ui-components/src/components/Table.vue'
+import ObjectPanel from '@anticrm/platform-vue/src/components/ObjectPanel.vue'
+import Table from '@anticrm/platform-vue/src/components/Table.vue'
 
 export default defineComponent({
   components: { InlineEdit, ObjectPanel, Table },

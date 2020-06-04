@@ -16,29 +16,30 @@
 <script lang="ts">
 import { Platform } from '@anticrm/platform'
 import { defineComponent, inject } from 'vue'
-import { UIComponentsInjectionKey, UIComponentsService } from '@anticrm/platform-ui-components'
+import { getVueService } from '@anticrm/platform-vue'
 import contact from '@anticrm/contact'
 import workbench from '..'
 
 import MainView from './MainView.vue'
 import Home from './Home.vue'
+import Header from './Header.vue'
 
 export default defineComponent({
-  components: { MainView, Home },
+  components: { MainView, Home, Header },
   props: {
     path: String
   },
   setup () {
-    const uiComponentsService = inject(UIComponentsInjectionKey) as UIComponentsService
-
-    return { workbench, contact, navigate: uiComponentsService.navigate }
+    return { workbench, contact, navigate: getVueService().navigate }
   }
 })
 </script>
 
 <template>
   <div id="workbench">
-    <header></header>
+    <header>
+      <Header />
+    </header>
 
     <nav>
       <!-- <Sidenav :applications="applications" /> -->

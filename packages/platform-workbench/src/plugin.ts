@@ -14,13 +14,12 @@
 //
 
 import { Platform, Service } from '@anticrm/platform'
-import { reactive } from 'vue'
 import { CoreService, Obj, Doc, Ref, Instance, Class } from '@anticrm/platform-core'
 import ui, { UIService, AnyComponent } from '@anticrm/platform-ui'
+import vue, { VueService } from '@anticrm/platform-vue'
 
-import workbench, { WorkbenchService, ViewModel, ViewModelKind } from '.'
+import workbench, { WorkbenchService, ViewModel, ViewModelKind, CoreInjectionKey, UIInjectionKey } from '.'
 import Workbench from './internal/Workbench.vue'
-// import { LaunchPlugin } from '@anticrm/launch-dev'
 
 console.log('PLUGIN: `workbench` parsed')
 /*!
@@ -28,7 +27,7 @@ console.log('PLUGIN: `workbench` parsed')
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */
-export default async (platform: Platform, deps: { core: CoreService, ui: UIService }): Promise<WorkbenchService> => {
+export default async (platform: Platform, deps: { core: CoreService, ui: UIService, vue: VueService }): Promise<WorkbenchService> => {
   console.log('PLUGIN: `workbench` started')
   const coreService = deps.core
 
@@ -53,30 +52,11 @@ export default async (platform: Platform, deps: { core: CoreService, ui: UIServi
     }
   }
 
-  // S T A T E
-
-  // const path = window.location.pathname
-  // const split = path.split('/')
-
-  // let initState = {
-  //   mainView: undefined
-  // } as WorkbenchState
-
-  // try {
-  //   const ref = split[2] as Ref<Class<Doc>>
-  //   initState.mainView = await getViewModel(ref, ViewModelKind.NEW_FORM)
-  //   console.log('workbench: viewmodel: ')
-  //   console.log(initState.mainView)
-  // } catch (err) {
-  //   console.log(err)
-  // }
-
-  // const state = reactive(initState)
-
-  // deps.ui.addState(workbench.id, state)
-
-
   // W O R K B E N C H  M O D E L
+
+  deps.vue.getApp()
+    .provide(CoreInjectionKey, deps.core)
+    .provide(UIInjectionKey, deps.ui)
 
   return {
     getViewModel

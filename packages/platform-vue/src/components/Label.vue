@@ -15,28 +15,31 @@
 
 <script lang="ts">
 
-import { defineComponent, inject } from 'vue'
+import { defineComponent, ref } from 'vue'
 import { Platform, Metadata } from '@anticrm/platform'
-import ui, { PlatformInjectionKey } from '..'
+import ui, { getPlatform } from '..'
 
 export default defineComponent({
   props: {
-    icon: {
-      type: String
+    text: {
+      type: [String, Promise]
     }
   },
   setup (props) {
-    const platform = inject(PlatformInjectionKey) as Platform
-    console.log(props.icon)
-    const url = props.icon ??
-      platform.getMetadata(ui.icon.Default) ?? 'https://pltfo.com'
-    return { url }
+    const text = props.text
+    let content
+    if (text instanceof Promise) {
+      content = ref('')
+      text.then(text => content.value = text)
+    } else {
+      content = text
+    }
+
+    return { content }
   }
 })
 </script>
 
 <template>
-  <svg>
-    <use :xlink:href="url" />
-  </svg>
+  <span>{{content}}</span>
 </template>

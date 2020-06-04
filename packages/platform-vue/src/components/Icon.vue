@@ -15,26 +15,39 @@
 
 <script lang="ts">
 
-import { defineComponent, PropType, inject } from 'vue'
-import { AnyComponent } from '@anticrm/platform-ui'
-import { UIComponentsService, UIComponentsInjectionKey } from '..'
+import { defineComponent, ref } from 'vue'
+import { Platform, Metadata } from '@anticrm/platform'
+import ui, { getPlatform } from '..'
 
 export default defineComponent({
   props: {
-    app: String as unknown as PropType<AnyComponent>,
-    path: String
+    icon: {
+      type: [String, Promise]
+    }
   },
   setup (props) {
-    const uiComponentsService = inject(UIComponentsInjectionKey) as UIComponentsService
-    return {
-      navigate: uiComponentsService.navigate
+    console.log(props.icon)
+
+    function defaultIcon () {
+      return getPlatform().getMetadata(ui.icon.Default) ?? 'https://pltfo.com/logo.svg'
     }
+
+    const icon = props.icon
+    let url
+    if (icon instanceof Promise) {
+      url = ref(defaultIcon())
+      icon.then(u => url.value = u)
+    } else {
+      url = icon ?? defaultIcon()
+    }
+
+    return { url }
   }
 })
 </script>
 
 <template>
-  <a href="#" @click.prevent="navigate({app, path})">
-    <slot />
-  </a>
+  <svg>
+    <use :xlink:href="url" />
+  </svg>
 </template>

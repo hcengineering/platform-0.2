@@ -15,7 +15,7 @@
 
 import { Platform } from '@anticrm/platform'
 import ui, { AnyComponent } from '@anticrm/platform-ui'
-import { UIComponentsService, PlatformInjectionKey, UIComponentsInjectionKey, LinkTarget } from '.'
+import { VueService, PlatformInjectionKey, VueInjectionKey, LinkTarget } from '.'
 import { h, ref, reactive, createApp, defineComponent } from 'vue'
 import Root from './internal/Root.vue'
 
@@ -25,7 +25,7 @@ console.log('Plugin `ui` loaded')
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */
-export default async (platform: Platform): Promise<UIComponentsService> => {
+export default async (platform: Platform): Promise<VueService> => {
   console.log('Plugin `ui` started')
 
   // V U E  A P P
@@ -105,7 +105,7 @@ export default async (platform: Platform): Promise<UIComponentsService> => {
     navigate,
   }
 
-  app.provide(UIComponentsInjectionKey, service)
+  app.provide(VueInjectionKey, service)
   return service
 
 }

@@ -14,21 +14,26 @@
 -->
 
 <script lang="ts">
-import { defineComponent } from 'vue'
-import contact from '@anticrm/contact'
 
-import LinkTo from '@anticrm/platform-vue/src/components/LinkTo.vue'
+import { defineComponent, PropType, inject } from 'vue'
+import { AnyComponent } from '@anticrm/platform-ui'
+import { getVueService } from '..'
 
 export default defineComponent({
-  components: { LinkTo },
-  setup () {
-    return { contact }
+  props: {
+    app: String as unknown as PropType<AnyComponent>,
+    path: String
+  },
+  setup (props) {
+    return {
+      navigate: getVueService().navigate
+    }
   }
 })
 </script>
 
 <template>
-  <div>
-    <LinkTo :path="contact.class.Person">Персоны</LinkTo>
-  </div>
+  <a href="#" @click.prevent="navigate({app, path})">
+    <slot />
+  </a>
 </template>
