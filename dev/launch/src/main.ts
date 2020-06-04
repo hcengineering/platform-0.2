@@ -28,7 +28,7 @@ import storybook from '@anticrm/app-storybook'
 import { createApp } from 'vue'
 import ErrorPage from './components/ErrorPage.vue'
 
-// import uiMeta from '@anticrm/platform-ui-model/src/__resources__/meta'
+import uiMeta from '@anticrm/platform-vue/src/__meta__/meta'
 import contactMeta from '@anticrm/contact/src/__model__/meta'
 import contactRu from '@anticrm/contact/src/__model__/strings/ru'
 
@@ -69,7 +69,7 @@ platform.addLocation(demo, () => import(/* webpackChunkName: "demo-3d" */ '@anti
 platform.addLocation(mc, () => import(/* webpackChunkName: "mission-control" */ '@anticrm/app-mission-control/src/plugin'))
 platform.addLocation(storybook, () => import(/* webpackChunkName: "storybook" */ '@anticrm/app-storybook/src/plugin'))
 
-// uiMeta(platform)
+uiMeta(platform)
 contactMeta(platform)
 
 async function boot (): Promise<void> {

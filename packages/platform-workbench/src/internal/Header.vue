@@ -20,20 +20,28 @@ import { UIDecorator } from '@anticrm/platform-ui'
 import workbench, { DocCreateAction, getCoreService, getUIService } from '..'
 
 import LinkTo from '@anticrm/platform-vue/src/components/LinkTo.vue'
+import Label from '@anticrm/platform-vue/src/components/Label.vue'
+import Icon from '@anticrm/platform-vue/src/components/Icon.vue'
 
 export default defineComponent({
-  components: { LinkTo },
+  components: { LinkTo, Label, Icon },
   setup () {
     const actions = ref([] as Instance<DocCreateAction>[])
 
     getCoreService().find(workbench.class.DocCreateAction, {})
       .then(acts => { actions.value = acts })
 
-    function uiDecorator (_class: Ref<Class<Obj>>) {
-      return getUIService().getClassModel(_class)
+    const uiService = getUIService()
+
+    function label (_class: Ref<Class<Obj>>): Promise<string> {
+      return uiService.getClassModel(_class).then(model => model.label)
     }
 
-    return { actions }
+    function icon (_class: Ref<Class<Obj>>): Promise<string> {
+      return uiService.getClassModel(_class).then(model => model.icon)
+    }
+
+    return { actions, label, icon }
   }
 })
 </script>
@@ -41,7 +49,9 @@ export default defineComponent({
 <template>
   <div>
     <div v-for="action in actions" :key="action._id">
-      <LinkTo :path="action.id">{{action.clazz}}</LinkTo>
+      <Icon :icon="icon(action.clazz)" class="icon-embed-2x" />
+      <Label :text="label(action.clazz)" />
+      <!-- <LinkTo :path="action.id">{{action.clazz}}</LinkTo> -->
     </div>
   </div>
 </template>

@@ -36,7 +36,7 @@ export default defineComponent({
     let url
     if (icon instanceof Promise) {
       url = ref(defaultIcon())
-      icon.then(u => url.value = u)
+      icon.then(u => { if (u) { url.value = u } })
     } else {
       url = icon ?? defaultIcon()
     }
