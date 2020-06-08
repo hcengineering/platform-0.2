@@ -22,5 +22,6 @@ export default plugin('storybook' as Plugin<Service>, {}, {
     Storybook: '' as AnyComponent,
     Persons: '' as AnyComponent,
     Controls: '' as AnyComponent,
+    Calendar: '' as AnyComponent,
   },
 })

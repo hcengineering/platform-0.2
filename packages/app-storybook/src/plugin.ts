@@ -21,6 +21,7 @@ import Storybook from './components/Storybook.vue'
 
 import Persons from './components/Persons.vue'
 import Controls from './components/Controls.vue'
+import Calendar from './components/Calendar.vue'
 
 
 console.log('Plugin `app-storybook` loaded')
@@ -36,6 +37,7 @@ export default async (platform: Platform) => {
   platform.setResource(storybook.component.Storybook, Storybook)
   platform.setResource(storybook.component.Persons, Persons)
   platform.setResource(storybook.component.Controls, Controls)
+  platform.setResource(storybook.component.Calendar, Calendar)
 
   return {}
 }
