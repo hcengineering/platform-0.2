@@ -295,15 +295,15 @@ export function plugin<P extends Service, D extends PluginDependencies, N extend
 
 // P R O M I S E
 
-// export function allValues (object: { [key: string]: Promise<any> }): Promise<{ [key: string]: any }> {
-//   const keys = Object.keys(object)
-//   const values = Object.values(object)
-//   const all = Promise.all(values)
-//   return all.then(values => {
-//     const result = []
-//     for (let i = 0; i < keys.length; i++) {
-//       result.push([keys[i], values[i]])
-//     }
-//     return Object.fromEntries(result) as { [key: string]: any }
-//   })
-// }
+export function allValues (object: { [key: string]: Promise<any> }): Promise<{ [key: string]: any }> {
+  const keys = Object.keys(object)
+  const values = Object.values(object)
+  const all = Promise.all(values)
+  return all.then(values => {
+    const result = []
+    for (let i = 0; i < keys.length; i++) {
+      result.push([keys[i], values[i]])
+    }
+    return Object.fromEntries(result) as { [key: string]: any }
+  })
+}

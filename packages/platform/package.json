@@ -1,8 +1,7 @@
 {
   "name": "@anticrm/platform",
   "version": "0.1.0",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
+  "main": "src/index.ts",
   "author": "Andrey Platov <andrey.v.platov@gmail.com>",
   "license": "EPL-2.0",
   "scripts": {

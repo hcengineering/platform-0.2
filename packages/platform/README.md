@@ -12,19 +12,6 @@ Plugin is an *isolated* piece of software, and a plugin never directly `import` 
 Resource can be anything meaningful: an object in the database, `Vue` component, an asset URL, etc. 
 For any `resource` there is a known `plugin`, which can *resolve* resource identifier into actual meaningful object.
 
-### Why we need `Resources`?
-
-Platform persists `Platform objects` in the database. Platform objects uniquely identified and belongs to a `Class`. Any platform object may have properties, which can be:
-
-* A reference to another platform object
-* Embedded object (structure)
-* Value of some type (including user-defined type)
-* Resource
-
-Resources play significant role in platform object persistence. Consider we have a property which refer to something we can't
-persist in the database (something which live in runtime only, e.g. JavaScript function instance). So we can provide this function as `Resource` with `method:myplugin.Method` PRI. So `myplugin` will be responsible to provide the function at runtime.
-Plaform will wire things together: platform object's property of Resource type with actual function provided under `method:myplugin.Method` PRI.
-
 Examples of `Resource`:
 ```typescript
 // database object with id === `class:contact.Person`
@@ -48,7 +35,7 @@ Following is not a mandatory. In the meantime I tend to use following package st
 
 ```text
 __tests__
-__model__
+__resources__
   model.ts
   meta.ts
   strings/*.ts
