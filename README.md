@@ -8,7 +8,7 @@ Use following commands to install and run demo application.
 
 ```
 yarn install
-yarn workspace lauch serve
+yarn workspace launch serve
 ```
 
 # The Platform
