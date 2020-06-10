@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "outDir": "lib",
+    "rootDir": "src",
+    "esModuleInterop": true
+  },
+  "include": [
+    "src"
+  ],
+  "references": [
+    {
+      "path": "../platform"
+    }
+  ]
+}
