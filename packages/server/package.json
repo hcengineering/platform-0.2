@@ -1,0 +1,19 @@
+{
+  "name": "@anticrm/server",
+  "version": "0.1.0",
+  "scripts": {
+    "build": "tsc",
+    "start": "ts-node src/index.ts"
+  },
+  "author": "Anticrm Platform Contributors",
+  "license": "EPL-2.0",
+  "devDependencies": {
+    "@types/jwt-simple": "^0.5.33",
+    "@types/ws": "^7.2.5",
+    "ts-node": "^8.10.2"
+  },
+  "dependencies": {
+    "jwt-simple": "^0.5.6",
+    "ws": "^7.3.0"
+  }
+}
