@@ -57,17 +57,12 @@ export function start (port: number, dbUri: string) {
   })
 
   function auth (request: IncomingMessage, done: (err: Error | null, client: Client | null) => void) {
-    const auth = request.headers.authorization
-    if (!auth) {
-      done(new Error('no authorization header'), null)
+    const token = request.url?.substring(1) // remove leading '/'
+    if (!token) {
+      done(new Error('no authorization token'), null)
     } else {
-      if (!auth.startsWith(BEARER)) {
-        done(new Error('expect bearer'), null)
-      } else {
-        const token = auth.substring(BEARER.length)
-        const payload = decode(token, 'secret', false)
-        done(null, payload)
-      }
+      const payload = decode(token, 'secret', false)
+      done(null, payload)
     }
   }
 
@@ -78,7 +73,6 @@ export function start (port: number, dbUri: string) {
         socket.destroy()
         return
       }
-      console.log(client)
       wss.handleUpgrade(request, socket, head, function done (ws) {
         wss.emit('connection', ws, request, client);
       })

@@ -28,9 +28,7 @@ describe('server', () => {
       tenant: 'company1'
     }
     const token = encode(client, 'secret')
-    return new WebSocket('ws://localhost:3333/', {
-      headers: { authorization: 'Bearer ' + token }
-    })
+    return new WebSocket('ws://localhost:3333/' + token)
   }
 
   it('should connect to server', (done) => {
@@ -78,7 +76,7 @@ describe('server', () => {
     })
     conn.on('message', (msg: string) => {
       const resp = getResponse(msg)
-      console.log(resp)
+      expect(resp.result.length).toBeGreaterThan(0)
       conn.close()
       done()
     })
