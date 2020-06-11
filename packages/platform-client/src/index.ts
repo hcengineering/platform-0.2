@@ -14,10 +14,9 @@
 //
 
 import { plugin, Plugin, Service, Metadata } from '@anticrm/platform'
-import { Ref, Class, Doc, Instance } from '@anticrm/platform-core'
 
 export interface ClientService extends Service {
-  find<T extends Doc> (_class: Ref<Class<T>>, query: Partial<T>): Promise<Instance<T>[]>
+  find (_class: string, query: {}): Promise<[]>
 }
 
 export default plugin('i18n' as Plugin<ClientService>, {}, {

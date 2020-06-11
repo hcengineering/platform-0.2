@@ -14,7 +14,7 @@
 //
 
 import { Platform } from '@anticrm/platform'
-import { Ref, Class, Doc, Instance } from '@anticrm/platform-core'
+import { makeRequest, getResponse } from '@anticrm/platform-rpc'
 
 import client, { ClientService } from '.'
 
@@ -28,11 +28,36 @@ export default async (platform: Platform): Promise<ClientService> => {
   const host = platform.getMetadata(client.metadata.WSHost)
   const port = platform.getMetadata(client.metadata.WSPort)
 
-  const websocket = new WebSocket('ws://' + host + ':' + port)
+  // { tenant: 'company1' }
+  const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0ZW5hbnQiOiJjb21wYW55MSJ9.t8xg-wosznL6qYTCvsHfznq_Xe7iHeGjU1VAUBgyy7s'
+
+  const websocket = new WebSocket('ws://' + host + ':' + port + '/' + token)
+
+  const requests = new Map<number | string, (value?: any) => void>()
+  let lastId = 0
+
+  function request (meth: string, params: any[]): Promise<any> {
+    return new Promise<any>((resolve, reject) => {
+      const id = ++lastId
+      requests.set(id, resolve)
+      websocket.send(makeRequest({ id, meth, params }))
+    })
+  }
+
+  websocket.onmessage = (ev: MessageEvent) => {
+    const response = getResponse(ev.data)
+    if (response.id === null) { throw new Error('rpc id should not be null') }
+    const resolve = requests.get(response.id)
+    if (resolve) {
+      resolve(response.result)
+    } else {
+      throw new Error('unknown rpc id')
+    }
+  }
 
   return {
-    find<T extends Doc> (_class: Ref<Class<T>>, query: Partial<T>): Promise<Instance<T>[]> {
-      throw new Error('not implemented')
+    find (_class: string, query: {}): Promise<[]> {
+      return request('find', [_class, query])
     }
   }
 }

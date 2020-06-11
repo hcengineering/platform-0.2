@@ -13,14 +13,18 @@
 // limitations under the License.
 //
 
+import { makeResponse, getRequest } from '@anticrm/platform-rpc'
 import { createServer, IncomingMessage } from 'http'
 import WebSocket, { Server } from 'ws'
 
 import { decode } from 'jwt-simple'
-import { response, Service, getRequest, Client } from './types'
 import { connect } from './service'
 
-const BEARER = "Bearer "
+export type Service = { [key: string]: (...args: any[]) => Promise<any> }
+
+export interface Client {
+  tenant: string
+}
 
 export function start (port: number, dbUri: string) {
 
@@ -47,7 +51,7 @@ export function start (port: number, dbUri: string) {
       service.then(s => {
         const f = s[request.meth]
         f.apply(null, request.params ?? []).then(result => {
-          ws.send(response({
+          ws.send(makeResponse({
             id: request.id,
             result
           }))

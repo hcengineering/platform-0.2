@@ -14,10 +14,10 @@
 //
 
 import core from '@anticrm/platform-core'
-import { start } from '../server'
+import { makeRequest, getResponse } from '@anticrm/platform-rpc'
+import { start, Client } from '../server'
 import WebSocket from 'ws'
 import { encode } from 'jwt-simple'
-import { request, getResponse, Client } from '../types'
 
 describe('server', () => {
 
@@ -28,6 +28,7 @@ describe('server', () => {
       tenant: 'company1'
     }
     const token = encode(client, 'secret')
+    console.log(token)
     return new WebSocket('ws://localhost:3333/' + token)
   }
 
@@ -45,7 +46,7 @@ describe('server', () => {
     const start = Date.now()
     conn.on('open', () => {
       for (let i = 0; i < total; i++) {
-        conn.send(request({
+        conn.send(makeRequest({
           id: i,
           meth: 'ping'
         }))
@@ -65,7 +66,7 @@ describe('server', () => {
   it('should send query', (done) => {
     const conn = connect()
     conn.on('open', () => {
-      conn.send(request({
+      conn.send(makeRequest({
         id: null,
         meth: 'find',
         params: [

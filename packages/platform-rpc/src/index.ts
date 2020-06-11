@@ -13,12 +13,6 @@
 // limitations under the License.
 //
 
-export type Service = { [key: string]: (...args: any[]) => Promise<any> }
-
-export interface Client {
-  tenant: string
-}
-
 export interface Request {
   id: string | number | null
   meth: string
@@ -37,7 +31,7 @@ export interface Response {
   error?: RpcError
 }
 
-export function request (request: Request): string | Buffer {
+export function makeRequest (request: Request): string | Buffer {
   return JSON.stringify(request)
 }
 
@@ -45,7 +39,7 @@ export function getRequest (req: string | Buffer): Request {
   return JSON.parse(req as string)
 }
 
-export function response (response: Response): string | Buffer {
+export function makeResponse (response: Response): string | Buffer {
   return JSON.stringify(response)
 }
 
