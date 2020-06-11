@@ -18,9 +18,9 @@
 //
 -->
 <script lang="ts">
-import { defineComponent, PropType, inject } from "vue"
-import core, { Obj, Doc, Ref, Class, CoreService } from "@anticrm/platform-core"
-import ui, { UIService } from "@anticrm/platform-ui"
+import { defineComponent, PropType, inject } from 'vue'
+import core, { Obj, Doc, Ref, Class, CoreService } from '@anticrm/platform-core'
+import ui, { UIService } from '@anticrm/platform-ui'
 import { injectPlatform } from ".."
 
 import MonthCalendar from "./calendars/MonthCalendar.vue"

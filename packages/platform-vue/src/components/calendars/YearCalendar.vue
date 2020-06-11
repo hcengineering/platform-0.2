@@ -31,11 +31,14 @@ export default defineComponent({
     /**
      * If passed, calendars will use monday as first day
      */
-    mondayStart: Boolean,
+    mondayStart: { type: Boolean, default: true },
     /**
      * Initial date to be shown
      */
-    date: Date
+    date: {
+      type: Date,
+      default: () => new Date(),
+    }
   },
   async setup(props) {
     return {

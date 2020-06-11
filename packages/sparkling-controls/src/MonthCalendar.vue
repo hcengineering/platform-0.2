@@ -22,10 +22,8 @@ import { defineComponent, PropType, inject } from 'vue';
 import core, { Obj, Doc, Ref, Class, CoreService } from '@anticrm/platform-core';
 import ui, { UIService } from '@anticrm/platform-ui';
 
-import CalendarDay from "./CalendarDay.vue";
-
 export default defineComponent({
-  components: { CalendarDay },
+  components: {},
   props: {
     /**
      * If passed calendar will use Monday as first day.
@@ -46,12 +44,10 @@ export default defineComponent({
       default: () => new Date()
     },
   },
-  async setup(props) {
+  setup(props) {
     console.log("setup", props.date)
     return {
-      // date: props.date || new Date(),
-      weekFormat: props.weekFormat || 'short',
-      mondayStart: props.mondayStart || true,
+      selected: props.date,
       /**
        * Return a month calendar first day
        * @param mondayStart
@@ -85,6 +81,28 @@ export default defineComponent({
        */
       day(offset: number): Date {
         return new Date(this.firstDay().getTime() + offset * 86400000)
+      },
+      wday(w, d: number): Date {
+        return this.day((w - 1) * 7 + (d - 1));
+      },
+      isToday(date: Date) {
+        let now = new Date()
+        return (
+          date.getFullYear() == now.getFullYear() &&
+          date.getMonth() == now.getMonth() &&
+          date.getDate() == now.getDate()
+        )
+      },
+      isSelected(date: Date) {
+        let s = this.selected
+        return (
+          date.getFullYear() == s.getFullYear() &&
+          date.getMonth() == s.getMonth() &&
+          date.getDate() == s.getDate()
+        )
+      },
+      isWeekend(date: Date) {
+        return date.getDay() == 0 || date.getDay() == 6
       }
     };
   }
@@ -92,13 +110,24 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="erp-calendar">
+  <div class="erp-calendar-control">
     <div class="thead">
       <div class="th" v-for="d in 7" :key="'w_'+d">{{getWeekDayName(day(d-1))}}</div>
     </div>
     <div class="tbody">
       <div class="tr" v-for="w in 6" :key="'week_'+w">
-        <CalendarDay v-for="d in 7" :key="'d_'+d" v-bind:date="day((w-1)*7 + (d-1))" />
+        <div
+          v-for="d in 7"
+          :key="'d_'+d"
+          class="td"
+          :set="dd=wday(w,d)"
+          :class="{'weekend': isWeekend(wday(w,d))}"
+          v-on:click="selected=wday(w,d)"
+        >
+          <div class="day-title" :class="{'today':isToday(dd), 'selected':isSelected(dd)}">
+            <div>{{dd.getDate() }}</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -107,7 +136,7 @@ export default defineComponent({
 <style scoped lang="scss">
 @import "~@anticrm/sparkling-theme/css/_variables.scss";
 
-.erp-calendar {
+.erp-calendar-control {
   display: table;
   border-collapse: collapse;
   background-color: $content-bg-color;
@@ -124,6 +153,46 @@ export default defineComponent({
     display: table-cell;
     // padding: 0.5em;
     text-align: center;
+  }
+  .td {
+    display: table-cell;
+    :hover {
+      background-color: red;
+      position: absolute;
+      margin: -1px -1px 1px -1px;
+      box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
+    }
+    &.weekend {
+      background-color: #2e2e2d;
+    }
+    .day-title {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      text-align: center;
+      div {
+        // child divs, should not be pointered
+        pointer-events: none;
+      }
+      &.today {
+        display: inline-block;
+        background-color: red;
+        position: absolute;
+        border-radius: 50%;
+        color: white;
+        vertical-align: middle;
+        box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
+      }
+      &.selected {
+        display: inline-block;
+        background-color: blue;
+        position: absolute;
+        border-radius: 50%;
+        color: white;
+        vertical-align: middle;
+        box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
+      }
+    }
   }
 
   .tbody {

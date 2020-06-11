@@ -20,8 +20,10 @@ import MonthCalendar from "@anticrm/platform-vue/src/components/calendars/MonthC
 import YearCalendar from "@anticrm/platform-vue/src/components/calendars/YearCalendar.vue";
 import InfoPanel from "@anticrm/sparkling-controls/src/InfoPanel.vue";
 
+import MonthCalendarControl from "@anticrm/sparkling-controls/src/MonthCalendar.vue";
+
 export default defineComponent({
-  components: { YearCalendar, MonthCalendar, Calendar, InfoPanel }
+  components: { YearCalendar, MonthCalendar, Calendar, InfoPanel, MonthCalendarControl }
 });
 </script>
 
@@ -29,20 +31,20 @@ export default defineComponent({
   <div style="margin: 2em;">
     <Suspense>
       <!-- <InfoPanel caption="Calendars"> -->
-        <div class="crm-table">
-          <div class="tr">Month Calendar</div>
-          <div class="tr">
-            <div class="td">
-              <MonthCalendar v-bind:date="new Date()" />
-            </div>
-          </div>
-          <div class="tr">Full Calendar</div>
-          <div class="tr">
-            <div class="td">
-              <Calendar />
-            </div>
+      <div class="crm-table">
+        <div class="tr">Month Calendar</div>
+        <div class="tr">
+          <div class="td">
+            <MonthCalendarControl />
           </div>
         </div>
+        <div class="tr">Full Calendar</div>
+        <div class="tr">
+          <div class="td">
+            <Calendar />
+          </div>
+        </div>
+      </div>
       <!-- </InfoPanel> -->
     </Suspense>
   </div>
