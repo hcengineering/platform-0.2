@@ -5,11 +5,15 @@
   "author": "Andrey Platov <andrey.v.platov@gmail.com>",
   "license": "EPL-2.0",
   "devDependencies": {
+    "@types/mongodb": "^3.5.20",
     "ts-node": "^8.10.1",
     "typescript": "~3.8.3"
   },
   "scripts": {
     "build": "tsc",
     "dump": "ts-node -T src/index.ts"
+  },
+  "dependencies": {
+    "mongodb": "^3.5.8"
   }
 }

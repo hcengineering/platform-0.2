@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Platform, Resource, Metadata, ResourceKind } from '@anticrm/platform'
+import { Platform, Resource, Metadata, ResourceKind, plugin } from '@anticrm/platform'
 import core, {
   CoreService, Obj, Ref, Class, Doc, BagOf, InstanceOf, PropertyType,
   Instance, Type, Emb, StaticResource, Exert, Adapter, Property
@@ -24,7 +24,11 @@ type Konstructor<T extends Obj> = new (obj: Omit<T, '__property' | '_class'>) =>
 
 export function attributeKey (_class: Ref<Class<Obj>>, key: string): string {
   const index = _class.indexOf(':')
-  return _class.substring(index + 1) + '/' + key
+  const dot = _class.indexOf('.')
+  const plugin = _class.substring(index + 1, dot)
+  const cls = _class.substring(dot + 1)
+  // return _class.substring(index + 1) + '/' + key
+  return plugin + ':' + cls + '/' + key
 }
 
 /*!

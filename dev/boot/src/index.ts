@@ -23,6 +23,8 @@ import contactModel from '@anticrm/contact/src/__model__/model'
 
 import contactRu from '@anticrm/contact/src/__model__/strings/ru'
 
+import { MongoClient } from 'mongodb'
+
 const builder = new Builder()
 builder.load(coreModel)
 builder.load(i18nModel)
@@ -56,3 +58,16 @@ fs.writeFile(__dirname + "/../../prod/src/strings.json", stringsJson, 'utf8', fu
   }
   console.log("strings saved.")
 })
+
+function initDatabase (uri: string, tenant: string) {
+  MongoClient.connect(uri, { useUnifiedTopology: true }, (err, client) => {
+    const db = client.db(tenant)
+    db.collection('model', (err, coll) => {
+      coll.insertMany(model).then(result => { client.close() })
+    })
+  })
+
+}
+
+initDatabase('mongodb://localhost:27017', 'company1')
+
