@@ -52,15 +52,14 @@ export default async (platform: Platform): Promise<VueService> => {
       }
     },
     render () {
-      const cached = platform.peekResource(this.component as AnyComponent)
-      if (cached) {
-        return h(cached)
+      const resolved = platform.peekResource(this.component as AnyComponent)
+      if (resolved) {
+        return h(resolved)
       }
       if (this.component !== this.resolved) {
         platform.resolve(this.component as AnyComponent).then(resolved => {
           this.resolved = this.component
         })
-
         const fallback = platform.peekResource(this.fallback as AnyComponent)
         if (fallback) {
           return h(fallback)
