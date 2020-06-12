@@ -19,16 +19,18 @@ import core, {
   Instance, Type, Emb, StaticResource, Exert, Adapter, Property
 } from '.'
 import { MemDb } from './memdb'
+import { createClient, createNullClient } from './client'
+import model from './__model__/model'
 
 type Konstructor<T extends Obj> = new (obj: Omit<T, '__property' | '_class'>) => Instance<T>
 
+// TODO: Platform.getResourceInfo
 export function attributeKey (_class: Ref<Class<Obj>>, key: string): string {
   const index = _class.indexOf(':')
   const dot = _class.indexOf('.')
   const plugin = _class.substring(index + 1, dot)
   const cls = _class.substring(dot + 1)
-  // return _class.substring(index + 1) + '/' + key
-  return plugin + ':' + cls + '/' + key
+  return plugin + '|' + cls + '|' + key
 }
 
 /*!
@@ -44,6 +46,19 @@ export default async (platform: Platform): Promise<CoreService> => {
     DOC
   }
 
+  // C L I E N T
+
+  const host = platform.getMetadata(core.metadata.WSHost)
+  const port = platform.getMetadata(core.metadata.WSPort)
+
+  const client = host ? await createClient(host, port) : createNullClient()
+
+  // M E T A M O D E L
+
+  const modelDb = new MemDb()
+  const metaModel = platform.getMetadata(core.metadata.MetaModel) ?? await client.load('model')
+  modelDb.loadModel(metaModel)
+
   // C L A S S E S
 
   // function getOwnAttribute (clazz: Class<Obj>, key: string): Type<any> | undefined {
@@ -54,17 +69,6 @@ export default async (platform: Platform): Promise<CoreService> => {
   //   return getOwnAttribute(clazz, key) ??
   //     (clazz._extends ? getAttribute(get(clazz._extends), key) : undefined)
   // }
-
-  // D A T A
-
-  const modelDb = new MemDb()
-
-  const metaModel = platform.getMetadata(core.metadata.MetaModel)
-  if (metaModel) {
-    modelDb.loadModel(metaModel)
-  } else {
-    console.log('Warning: no metamodel provided.')
-  }
 
   function getClassHierarchy (cls: Ref<Class<Obj>>, top?: Ref<Class<Obj>>) {
     const hierarchy = modelDb.getClassHierarchy(cls)

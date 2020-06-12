@@ -13,20 +13,24 @@
 // limitations under the License.
 //
 
-import { makeResponse, getRequest } from '@anticrm/platform-rpc'
+import { makeResponse, getRequest } from '@anticrm/platform/src/rpc'
 import { createServer, IncomingMessage } from 'http'
 import WebSocket, { Server } from 'ws'
 
 import { decode } from 'jwt-simple'
 import { connect } from './service'
 
-export type Service = { [key: string]: (...args: any[]) => Promise<any> }
-
 export interface Client {
   tenant: string
 }
 
+interface Service {
+  [key: string]: (...args: any[]) => Promise<any>
+}
+
 export function start (port: number, dbUri: string) {
+
+  console.log('starting server on port ' + port + '...')
 
   const server = createServer()
   const wss = new Server({ noServer: true })
@@ -35,7 +39,7 @@ export function start (port: number, dbUri: string) {
 
   function createClient (uri: string, tenant: string): Promise<Service> {
     const service = new Promise<Service>((resolve, reject) => {
-      connect(uri, tenant).then(service => { resolve(service) }).catch(err => reject(err))
+      connect(uri, tenant).then(service => { resolve(service as unknown as Service) }).catch(err => reject(err))
     })
     clients.set(tenant, service)
     return service
@@ -44,18 +48,27 @@ export function start (port: number, dbUri: string) {
   wss.on('connection', function connection (ws: WebSocket, request: any, client: Client) {
     ws.on('message', function message (msg: string) {
       const request = getRequest(msg)
+      console.log('rpc: ' + request.meth)
       let service = clients.get(client.tenant)
       if (!service) {
         service = createClient(dbUri, client.tenant)
       }
       service.then(s => {
         const f = s[request.meth]
-        f.apply(null, request.params ?? []).then(result => {
+        const result = f.apply(null, request.params ?? [])
+        if (result instanceof Promise) {
+          result.then(result => {
+            ws.send(makeResponse({
+              id: request.id,
+              result
+            }))
+          })
+        } else {
           ws.send(makeResponse({
             id: request.id,
             result
           }))
-        })
+        }
       })
     })
   })
@@ -84,6 +97,8 @@ export function start (port: number, dbUri: string) {
   })
 
   const httpServer = server.listen(port)
+
+  console.log('server started.')
 
   return async function shutdown () {
     for (const client of clients) {

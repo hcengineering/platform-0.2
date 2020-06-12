@@ -14,7 +14,7 @@
 //
 
 import core from '@anticrm/platform-core'
-import { makeRequest, getResponse } from '@anticrm/platform-rpc'
+import { makeRequest, getResponse } from '@anticrm/platform/src/rpc'
 import { start, Client } from '../server'
 import WebSocket from 'ws'
 import { encode } from 'jwt-simple'

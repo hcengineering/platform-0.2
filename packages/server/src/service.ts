@@ -15,10 +15,11 @@
 
 import { Ref, Class, Doc } from '@anticrm/platform-core'
 import { MemDb } from '@anticrm/platform-core/src/memdb'
+import { ClientService } from '@anticrm/platform-core/src/client'
 import { MongoClient, Db } from 'mongodb'
-import { Service } from './types'
 
-export async function connect (uri: string, dbName: string): Promise<Service> {
+
+export async function connect (uri: string, dbName: string): Promise<ClientService & { shutdown: () => Promise<void> }> {
   console.log('connecting to ' + dbName)
   const client = await MongoClient.connect(uri, { useUnifiedTopology: true })
   const db = client.db(dbName)
@@ -34,6 +35,10 @@ export async function connect (uri: string, dbName: string): Promise<Service> {
   return {
     find (_class: Ref<Class<Doc>>, query: {}): Promise<Doc[]> {
       return memdb.find(_class, query)
+    },
+
+    async load (domain: string): Promise<Doc[]> {
+      return memdb.dump()
     },
 
     async ping (): Promise<any> { return null },
