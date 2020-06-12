@@ -108,18 +108,17 @@ describe('i18n', () => {
   // L O C A L  S T R I N G  T Y P E
 
   it('should ...', async () => {
-    const coreService = await platform.getPlugin(core.id)
-    const S = new Builder(coreService.getDb())
+    // const coreService = await platform.getPlugin(core.id)
+    const S = new Builder()
     S.load(metaModel)
     S.load(i18nModel)
+    platform.setMetadata(core.metadata.MetaModel, S.dump())
     expect(true).toBe(true)
   })
 
   it('should translate attribute value', async () => {
     const coreService = await platform.getPlugin(core.id)
     const S = new Builder(coreService.getDb())
-    // S.load(metaModel)
-    // S.load(i18nModel)
 
     const ru = {
       MyString: 'Перевод',

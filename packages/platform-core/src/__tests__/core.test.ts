@@ -27,18 +27,16 @@ describe('core', () => {
   const platform = new Platform()
 
   it('should load model', async () => {
-    const tx = await startPlugin(platform)
-    const builder = new Builder(tx.getDb())
+    const builder = new Builder()
     builder.load(model)
     const coreModel = builder.dump()
+    platform.setMetadata(core.metadata.MetaModel, coreModel)
     expect(true).toBe(true)
     console.log(JSON.stringify(coreModel))
   })
 
   it('should create prototype', async () => {
     const tx = await startPlugin(platform)
-    const builder = new Builder(tx.getDb())
-    builder.load(model)
 
     const typeProto = await tx.getPrototype(core.class.Type, DOC)
     console.log(typeProto)
@@ -55,8 +53,6 @@ describe('core', () => {
 
   it('should instantiate class', async () => {
     const tx = await startPlugin(platform)
-    const builder = new Builder(tx.getDb())
-    builder.load(model)
 
     const inst = await tx.getInstance(core.class.RefTo)
     const x = inst._attributes
@@ -68,10 +64,6 @@ describe('core', () => {
 
   it('should instantiate array', async () => {
     const tx = await startPlugin(platform)
-    const builder = new Builder(tx.getDb())
-    builder.load(model)
-
-    // console.log(tx.getDb().dump())
 
     const result = await tx.find(core.class.Class, {})
     console.log(result)

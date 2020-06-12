@@ -65,7 +65,9 @@ function initDatabase (uri: string, tenant: string) {
   MongoClient.connect(uri, { useUnifiedTopology: true }, (err, client) => {
     const db = client.db(tenant)
     db.collection('model', (err, coll) => {
-      coll.insertMany(model).then(result => { client.close() })
+      coll.deleteMany({}, () => {
+        coll.insertMany(model).then(() => { client.close() })
+      })
     })
   })
 
