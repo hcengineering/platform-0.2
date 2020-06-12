@@ -157,7 +157,9 @@ export interface CoreService extends Service {
 
 export default plugin('core' as Plugin<CoreService>, {}, {
   metadata: {
-    MetaModel: '' as Metadata<Doc[]>
+    MetaModel: '' as Metadata<Doc[]>,
+    WSHost: '' as Metadata<string>,
+    WSPort: '' as Metadata<number>
   },
   class: {
     Doc: '' as Ref<Class<Doc>>,

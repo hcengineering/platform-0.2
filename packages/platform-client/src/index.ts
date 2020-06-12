@@ -17,6 +17,7 @@ import { plugin, Plugin, Service, Metadata } from '@anticrm/platform'
 
 export interface ClientService extends Service {
   find (_class: string, query: {}): Promise<[]>
+  load (domain: string, query: {}): Promise<[]>
 }
 
 export default plugin('i18n' as Plugin<ClientService>, {}, {

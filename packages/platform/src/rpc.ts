@@ -31,18 +31,18 @@ export interface Response {
   error?: RpcError
 }
 
-export function makeRequest (request: Request): string | Buffer {
+export function makeRequest (request: Request): string {
   return JSON.stringify(request)
 }
 
-export function getRequest (req: string | Buffer): Request {
+export function getRequest (req: string): Request {
   return JSON.parse(req as string)
 }
 
-export function makeResponse (response: Response): string | Buffer {
+export function makeResponse (response: Response): string {
   return JSON.stringify(response)
 }
 
-export function getResponse (res: string | Buffer): Response {
+export function getResponse (res: string): Response {
   return JSON.parse(res as string)
 }

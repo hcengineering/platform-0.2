@@ -13,30 +13,27 @@
 // limitations under the License.
 //
 
-import { Platform } from '@anticrm/platform'
-import { makeRequest, getResponse } from '@anticrm/platform-rpc'
+import { makeRequest, getResponse } from '@anticrm/platform/src/rpc'
+import { Ref, Class, Doc } from '.'
 
-import client, { ClientService } from '.'
+export interface ClientService {
+  find (_class: Ref<Class<Doc>>, query: {}): Promise<Doc[]>
+  load (domain: string): Promise<Doc[]>
+  ping (): Promise<void>
+}
 
-/*!
-  * Anticrm Platform™ Core Internationalization Plugin
-  * Copyright © 2020 Anticrm Platform Contributors. All Rights Reserved.
-  * Licensed under the Eclipse Public License, Version 2.0
-  */
-export default async (platform: Platform): Promise<ClientService> => {
-
-  const host = platform.getMetadata(client.metadata.WSHost)
-  const port = platform.getMetadata(client.metadata.WSPort)
+export function createClient (host: string, port?: number): Promise<ClientService> {
 
   // { tenant: 'company1' }
   const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0ZW5hbnQiOiJjb21wYW55MSJ9.t8xg-wosznL6qYTCvsHfznq_Xe7iHeGjU1VAUBgyy7s'
 
-  const websocket = new WebSocket('ws://' + host + ':' + port + '/' + token)
+  const websocket = new WebSocket('ws://' + host + (port ? ':' + port : '') + '/' + token)
 
   const requests = new Map<number | string, (value?: any) => void>()
   let lastId = 0
 
   function request (meth: string, params: any[]): Promise<any> {
+    console.log('sending request: ', meth)
     return new Promise<any>((resolve, reject) => {
       const id = ++lastId
       requests.set(id, resolve)
@@ -45,6 +42,7 @@ export default async (platform: Platform): Promise<ClientService> => {
   }
 
   websocket.onmessage = (ev: MessageEvent) => {
+    console.log('got response')
     const response = getResponse(ev.data)
     if (response.id === null) { throw new Error('rpc id should not be null') }
     const resolve = requests.get(response.id)
@@ -55,12 +53,34 @@ export default async (platform: Platform): Promise<ClientService> => {
     }
   }
 
+  return new Promise<ClientService>((resolve, reject) => {
+    websocket.onopen = () => {
+      resolve({
+        find (_class: string, query: {}): Promise<[]> {
+          return request('find', [_class, query])
+        },
+        load (domain: string): Promise<[]> {
+          return request('load', [domain])
+        },
+        ping (): Promise<void> {
+          return request('ping', [])
+        }
+      })
+    }
+  })
+
+}
+
+export function createNullClient (): ClientService {
   return {
     find (_class: string, query: {}): Promise<[]> {
-      return request('find', [_class, query])
+      throw new Error('not implemented')
     },
     load (domain: string): Promise<[]> {
-      return request('load', [domain])
+      throw new Error('not implemented')
+    },
+    ping (): Promise<void> {
+      throw new Error('not implemented')
     }
   }
 }

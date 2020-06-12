@@ -14,7 +14,7 @@
 //
 
 import core from '@anticrm/platform-core'
-import { makeRequest, getResponse } from '@anticrm/platform-rpc'
+import { makeRequest, getResponse } from '@anticrm/platform/src/rpc'
 import { start, Client } from '../server'
 import WebSocket from 'ws'
 import { encode } from 'jwt-simple'
@@ -42,7 +42,7 @@ describe('server', () => {
 
   it('should send many requests', (done) => {
     const conn = connect()
-    const total = 1000
+    const total = 10
     const start = Date.now()
     conn.on('open', () => {
       for (let i = 0; i < total; i++) {
@@ -72,6 +72,24 @@ describe('server', () => {
         params: [
           core.class.Class,
           {}
+        ]
+      }))
+    })
+    conn.on('message', (msg: string) => {
+      const resp = getResponse(msg)
+      expect(resp.result.length).toBeGreaterThan(0)
+      conn.close()
+      done()
+    })
+  })
+
+  it('should load domain', (done) => {
+    const conn = connect()
+    conn.on('open', () => {
+      conn.send(makeRequest({
+        id: null,
+        meth: 'load',
+        params: [
         ]
       }))
     })

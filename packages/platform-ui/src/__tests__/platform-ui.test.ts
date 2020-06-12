@@ -35,6 +35,12 @@ describe('session', () => {
   platform.addLocation(core, () => import('@anticrm/platform-core/src/plugin'))
   platform.addLocation(ui, () => import('../plugin'))
 
+  const S = new Builder()
+  S.load(coreModel)
+  S.load(i18nModel)
+  S.load(uiModel)
+  platform.setMetadata(core.metadata.MetaModel, S.dump())
+
   interface Contact extends Doc {
     email?: StringType
     phone?: StringType
@@ -69,9 +75,6 @@ describe('session', () => {
     await platform.getPlugin(i18n.id) // TODO: dirty hack, resources does not resolve awhen building prototypes.
 
     const S = new Builder(coreServices.getDb())
-    S.load(coreModel)
-    S.load(i18nModel)
-    S.load(uiModel)
 
     S.createClass(contact.class.Email, core.class.Type, {})
     S.createClass(contact.class.Phone, core.class.Type, {})
