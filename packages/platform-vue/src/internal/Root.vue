@@ -35,7 +35,12 @@ export default defineComponent({
 <template>
   <div id="app">
     <Suspense v-if="current.app">
-      <widget :component="current.app" :path="current.path" />
+      <template #default>
+        <widget :component="current.app" :path="current.path" />
+      </template>
+      <template #fallback>
+        <div>Loading...</div>
+      </template>
     </Suspense>
     <div v-else class="caption-1">Huston, no default application provided.</div>
   </div>
