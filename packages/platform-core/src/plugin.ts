@@ -57,6 +57,7 @@ export default async (platform: Platform): Promise<CoreService> => {
 
   const modelDb = new MemDb()
   const metaModel = platform.getMetadata(core.metadata.MetaModel) ?? await client.load('model')
+  console.log(metaModel)
   modelDb.loadModel(metaModel)
 
   // C L A S S E S

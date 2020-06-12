@@ -46,30 +46,19 @@ export function start (port: number, dbUri: string) {
   }
 
   wss.on('connection', function connection (ws: WebSocket, request: any, client: Client) {
-    ws.on('message', function message (msg: string) {
+    ws.on('message', async (msg: string) => {
       const request = getRequest(msg)
       console.log('rpc: ' + request.meth)
       let service = clients.get(client.tenant)
       if (!service) {
         service = createClient(dbUri, client.tenant)
       }
-      service.then(s => {
-        const f = s[request.meth]
-        const result = f.apply(null, request.params ?? [])
-        if (result instanceof Promise) {
-          result.then(result => {
-            ws.send(makeResponse({
-              id: request.id,
-              result
-            }))
-          })
-        } else {
-          ws.send(makeResponse({
-            id: request.id,
-            result
-          }))
-        }
-      })
+      const f = (await service)[request.meth]
+      const result = await f.apply(null, request.params ?? [])
+      ws.send(makeResponse({
+        id: request.id,
+        result
+      }))
     })
   })
 
