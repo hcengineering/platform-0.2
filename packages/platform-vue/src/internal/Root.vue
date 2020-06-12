@@ -34,7 +34,9 @@ export default defineComponent({
 
 <template>
   <div id="app">
-    <widget v-if="current.app" :component="current.app" :path="current.path" />
+    <Suspense v-if="current.app">
+      <widget :component="current.app" :path="current.path" />
+    </Suspense>
     <div v-else class="caption-1">Huston, no default application provided.</div>
   </div>
 </template>
