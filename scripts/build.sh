@@ -35,4 +35,5 @@ yarn workspace @anticrm/dev-boot run build && \
 yarn workspace @anticrm/dev-boot run dump && \
 
 # B U I L D  D E M O  A P P L I C A T I O N
-yarn workspace launch run build
+yarn workspace prod build --report
+
