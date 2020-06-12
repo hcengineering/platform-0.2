@@ -87,14 +87,12 @@ export default async (platform: Platform): Promise<VueService> => {
 
   function getLocation () {
     const loc = location.value
+
     const index = loc.indexOf('?')
     const pathname = (index === -1) ? loc : loc.substring(0, index)
     const search = (index === -1) ? '' : loc.substring(index + 1)
 
     const split = pathname.split('/')
-
-    console.log(split)
-
     const app = split[1].length === 0 ? platform.getMetadata(ui.metadata.DefaultApplication) as AnyComponent : split[1] as AnyComponent
     const path = split.splice(2).join('/')
 
@@ -102,7 +100,9 @@ export default async (platform: Platform): Promise<VueService> => {
     const searchParams = search.split('&')
     for (const param of searchParams) {
       const [key, value] = param.split('=')
-      params[key] = value
+      if (value) {
+        params[key] = value
+      }
     }
 
     return { app, path, params }
@@ -122,9 +122,6 @@ export default async (platform: Platform): Promise<VueService> => {
   }
 
   function navigate (target: LinkTarget) {
-    console.log('navigate: ')
-    console.log(target)
-
     const current = getLocation()
     if (target.app) { current.app = target.app }
     if (target.path) { current.path = target.path }
@@ -136,7 +133,6 @@ export default async (platform: Platform): Promise<VueService> => {
 
     const url = toUrl(current)
     if (url !== location.value) {
-      console.log('pushstate: ' + url)
       history.pushState(null, '', url)
       location.value = url
     }
