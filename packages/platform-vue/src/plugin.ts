@@ -15,9 +15,11 @@
 
 import { Platform } from '@anticrm/platform'
 import ui, { AnyComponent } from '@anticrm/platform-ui'
-import { VueService, PlatformInjectionKey, VueInjectionKey, LinkTarget } from '.'
-import { h, ref, reactive, createApp, defineComponent } from 'vue'
+import vue, { VueService, PlatformInjectionKey, VueInjectionKey, LinkTarget } from '.'
+import { h, ref, PropType, createApp, defineComponent } from 'vue'
+
 import Root from './internal/Root.vue'
+import AppLoader from './internal/AppLoader.vue'
 
 console.log('Plugin `ui` loaded')
 /*!
@@ -37,28 +39,33 @@ export default async (platform: Platform): Promise<VueService> => {
 
   // C O M P O N E N T  R E N D E R E R
 
+  platform.setResource(vue.component.AppLoader, AppLoader)
+
   app.component('widget', defineComponent({
     props: {
-      component: String // as PropType<Component<VueConstructor>>
+      component: String as unknown as PropType<AnyComponent>,
+      fallback: String as unknown as PropType<AnyComponent>
     },
-    setup (props, context) {
-      console.log('widget:')
-      console.log(props)
-      console.log(context)
+    setup () {
       return {
         resolved: ref(''),
       }
     },
     render () {
-      const cached = platform.peekResource(this.component as AnyComponent)
-      if (cached) {
-        return h(cached)
+      const resolved = platform.peekResource(this.component as AnyComponent)
+      if (resolved) {
+        return h(resolved)
       }
       if (this.component !== this.resolved) {
         platform.resolve(this.component as AnyComponent).then(resolved => {
           this.resolved = this.component
         })
-        return h('div', [])
+        const fallback = platform.peekResource(this.fallback as AnyComponent)
+        if (fallback) {
+          return h(fallback)
+        } else {
+          return h('div', [])
+        }
       } else {
         const resolved = platform.peekResource(this.resolved as AnyComponent)
         if (resolved) {
