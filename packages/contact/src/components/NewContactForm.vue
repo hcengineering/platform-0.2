@@ -17,6 +17,7 @@
 import { defineComponent, ref, reactive, inject, computed, PropType } from 'vue'
 import { Platform, Resource, getResourceKind } from '@anticrm/platform'
 import core, { Ref, Doc, Class, Instance, ClassKind, Property } from '@anticrm/platform-core'
+import { Account } from '@anticrm/platform-business'
 import { AnyComponent } from '@anticrm/platform-ui'
 import { injectPlatform } from '@anticrm/platform-vue'
 import { Person } from '..'
@@ -42,25 +43,14 @@ export default defineComponent({
     if (getResourceKind(props.resource) === ClassKind) {
       const _class = props.resource as Ref<Class<Person>>
       document = coreService.getDb().createDocument(_class, {
+        createdBy: '' as unknown as Ref<Account>,
+        createdOn: '12 May 2020' as unknown as Property<Date>,
         firstName: str('Дмитрий Сергеевич'),
         lastName: str('Либерзон'),
-        phone: str('+7 913 333 7777)')
+        phone: str('+7 913 333 7777')
       })._id
-      console.log('CREATE!')
-      console.log(document)
-      console.log('OP:')
-      console.log(props.operation)
-      console.log('PARAMS:')
-      console.log(props.params)
     }
-
-
     const instance = await coreService.getInstance(document)
-
-    console.log('CONTENT!!!!!')
-    console.log(props.params)
-    console.log(instance)
-    console.log(instance.firstName)
     return {
       instance
     }

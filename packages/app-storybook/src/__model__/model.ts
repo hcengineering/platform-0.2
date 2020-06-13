@@ -16,13 +16,16 @@
 import contact from '@anticrm/contact'
 import Builder from '@anticrm/platform-core/src/__model__/builder'
 
-import { Property } from '@anticrm/platform-core'
+import { Ref, Property } from '@anticrm/platform-core'
+import { Account } from '@anticrm/platform-business'
 
 function str (s: string): Property<string> { return s as unknown as Property<string> }
 
 export default async (S: Builder) => {
 
   S.createDocument(contact.class.Person, {
+    createdBy: '' as unknown as Ref<Account>,
+    createdOn: '12 May 2020' as unknown as Property<Date>,
     firstName: str('Andrey'),
     lastName: str('Platov'),
     // birthDate: str('1 May 1976'),
@@ -30,6 +33,8 @@ export default async (S: Builder) => {
   })
 
   S.createDocument(contact.class.Person, {
+    createdBy: '' as unknown as Ref<Account>,
+    createdOn: '12 May 2020' as unknown as Property<Date>,
     firstName: str('Andrey'),
     lastName: str('Sobolev'),
     email: str('haiodo@gmail.com')

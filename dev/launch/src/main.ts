@@ -17,6 +17,7 @@ import { Platform } from '@anticrm/platform'
 
 import core from '@anticrm/platform-core'
 import i18n from '@anticrm/platform-core-i18n'
+import business from '@anticrm/platform-business'
 import ui from '@anticrm/platform-ui'
 import vue from '@anticrm/platform-vue'
 import workbench from '@anticrm/platform-workbench'
@@ -38,6 +39,7 @@ import Builder from '@anticrm/platform-core/src/__model__/builder'
 
 import coreModel from '@anticrm/platform-core/src/__model__/model'
 import i18nModel from '@anticrm/platform-core-i18n/src/__model__/model'
+import businessModel from '@anticrm/platform-business/src/__model__/model'
 import uiModel from '@anticrm/platform-ui/src/__model__/model'
 import contactModel from '@anticrm/contact/src/__model__/model'
 import workbenchModel from '@anticrm/platform-workbench/src/__model__/model'
@@ -46,6 +48,7 @@ import demoModel from '@anticrm/app-storybook/src/__model__/model'
 const builder = new Builder()
 builder.load(coreModel)
 builder.load(i18nModel)
+builder.load(businessModel)
 builder.load(uiModel)
 builder.load(workbenchModel)
 builder.load(contactModel)
