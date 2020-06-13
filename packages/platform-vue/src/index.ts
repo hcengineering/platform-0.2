@@ -14,7 +14,7 @@
 //
 
 import { App, inject } from 'vue'
-import { Metadata, plugin, Plugin, Service, Platform, PluginDependencies, InferPlugins } from '@anticrm/platform'
+import { Metadata, plugin, Plugin, Service, Platform, PluginDependencies, InferPlugins, Resource } from '@anticrm/platform'
 import { AnyComponent } from '@anticrm/platform-ui'
 
 export type URL = string
@@ -52,7 +52,8 @@ export interface LinkTarget {
 export interface VueService extends Service {
   getApp (): App
   getLocation (): LinkTarget
-  navigate (target: LinkTarget): void
+  toUrl (target: LinkTarget): string
+  navigate (url: string): void
 }
 
 export default plugin('vue' as Plugin<VueService>, {}, {
@@ -61,5 +62,8 @@ export default plugin('vue' as Plugin<VueService>, {}, {
   },
   component: {
     AppLoader: '' as AnyComponent
+  },
+  method: {
+    AnAction: '' as Resource<(args: any) => void>
   }
 })

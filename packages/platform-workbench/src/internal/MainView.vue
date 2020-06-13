@@ -26,32 +26,45 @@ import Button from '@anticrm/sparkling-controls/src/Button.vue'
 export default defineComponent({
   components: {},
   props: {
-    content: String
+    path: String,
+    params: Object
   },
+
+  // Adapt `content` to a `Component`. Forward to `Component`.
   async setup (props, context) {
-    const resource = props.content as Resource<any>
+    const split = props.path.split('/')
+    const operation = split[1]
+    const resource = split[0] as Resource<any>
     const coreService = getCoreService()
     const component = await coreService.adapt(resource, ComponentKind)
 
-    let document: Ref<Doc>
-    if (getResourceKind(resource) === ClassKind) {
-      const _class = resource as Ref<Class<Doc>>
-      document = coreService.getDb().createDocument(_class, {
-        firstName: 'Валентин Генрихович',
-        lastName: 'Либерзон',
-        phone: '+7 913 333 7777'
-      })._id
-      console.log('CREATE!')
-      console.log(document)
-    }
+    // let document: Ref<Doc>
+    // if (getResourceKind(resource) === ClassKind) {
+    //   const _class = resource as Ref<Class<Doc>>
+    //   document = coreService.getDb().createDocument(_class, {
+    //     firstName: 'Валентин Генрихович',
+    //     lastName: 'Либерзон',
+    //     phone: '+7 913 333 7777'
+    //   })._id
+    //   console.log('CREATE!')
+    //   console.log(document)
+    //   console.log('PARAMS:')
+    //   console.log(props.params)
+    // }
 
     return {
-      component, document
+      component, resource, operation
     }
   }
 })
 </script>
 
 <template>
-  <widget v-if="component" :component="component" :content="document" />
+  <widget
+    v-if="component"
+    :component="component"
+    :resource="resource"
+    :operation="operation"
+    :params="params"
+  />
 </template>

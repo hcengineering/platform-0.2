@@ -82,10 +82,15 @@ export default async (platform: Platform): Promise<VueService> => {
   function currentLocation () { return window.location.pathname + window.location.search }
   const location = ref(currentLocation())
 
-  const onStateChange = () => { location.value = currentLocation() }
+  const onStateChange = () => {
+    location.value = currentLocation()
+  }
   window.addEventListener('popstate', onStateChange)
 
-  function getLocation () {
+  /**
+   * Returns location (current URL) as @link {LinkTarget}
+   */
+  function getLocation (): LinkTarget {
     const loc = location.value
 
     const index = loc.indexOf('?')
@@ -93,7 +98,8 @@ export default async (platform: Platform): Promise<VueService> => {
     const search = (index === -1) ? '' : loc.substring(index + 1)
 
     const split = pathname.split('/')
-    const app = split[1].length === 0 ? platform.getMetadata(ui.metadata.DefaultApplication) as AnyComponent : split[1] as AnyComponent
+    const appSegment = (split[1] ?? '') as AnyComponent
+    const app = appSegment === '' ? platform.getMetadata(ui.metadata.DefaultApplication) : appSegment
     const path = split.splice(2).join('/')
 
     const params = {} as Record<string, string>
@@ -109,19 +115,6 @@ export default async (platform: Platform): Promise<VueService> => {
   }
 
   function toUrl (target: LinkTarget) {
-    let paramCount = 0
-    let params = ''
-    for (const key in target.params) {
-      params += paramCount === 0 ? '?' : '&'
-      params += key + '=' + target.params[key]
-    }
-
-    return '/' + target.app +
-      (target.path ? '/' + target.path : '') +
-      params
-  }
-
-  function navigate (target: LinkTarget) {
     const current = getLocation()
     if (target.app) { current.app = target.app }
     if (target.path) { current.path = target.path }
@@ -131,19 +124,44 @@ export default async (platform: Platform): Promise<VueService> => {
       current.params[key] = target.params[key]
     }
 
-    const url = toUrl(current)
+    let paramCount = 0
+    let params = ''
+    for (const key in target.params) {
+      params += paramCount === 0 ? '?' : '&'
+      params += key + '=' + target.params[key]
+    }
+
+    return '/' + current.app +
+      (current.path ? '/' + current.path : '') +
+      params
+  }
+
+  /**
+   * Navigate to given url
+   * @param url 
+   */
+  function navigate (url: string) {
     if (url !== location.value) {
       history.pushState(null, '', url)
       location.value = url
     }
   }
 
+  // M E T H O D S
+
+  const anAction = (args: any) => {
+    console.log('call action:')
+    console.log(args)
+  }
+
+  platform.setResource(vue.method.AnAction, anAction)
 
   // S E R V I C E
 
   const service = {
     getApp () { return app },
     getLocation,
+    toUrl,
     navigate,
   }
 

@@ -16,19 +16,24 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import contact from '@anticrm/contact'
+import vue from '@anticrm/platform-vue'
 
 import LinkTo from '@anticrm/platform-vue/src/components/LinkTo.vue'
+import Action from '@anticrm/platform-vue/src/components/Action.vue'
 
 export default defineComponent({
-  components: { LinkTo },
+  components: { LinkTo, Action },
   setup () {
-    return { contact }
+    return { contact, vue }
   }
 })
 </script>
 
 <template>
   <div>
-    <LinkTo :path="contact.class.Person">Персоны</LinkTo>
+    <LinkTo :path="`${contact.class.Person}/new`" :params="{x:5}">Персоны</LinkTo>
+    <Suspense>
+      <Action :action="vue.method.AnAction" hi="there">Hello</Action>
+    </Suspense>
   </div>
 </template>
