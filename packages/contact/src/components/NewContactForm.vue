@@ -16,7 +16,7 @@
 <script lang="ts">
 import { defineComponent, ref, reactive, inject, computed, PropType } from 'vue'
 import { Platform, Resource, getResourceKind } from '@anticrm/platform'
-import core, { Ref, Doc, Class, Instance, ClassKind } from '@anticrm/platform-core'
+import core, { Ref, Doc, Class, Instance, ClassKind, Property } from '@anticrm/platform-core'
 import { AnyComponent } from '@anticrm/platform-ui'
 import { injectPlatform } from '@anticrm/platform-vue'
 import { Person } from '..'
@@ -24,6 +24,8 @@ import { Person } from '..'
 import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.vue'
 import ObjectPanel from '@anticrm/platform-vue/src/components/ObjectPanel.vue'
 import Table from '@anticrm/platform-vue/src/components/Table.vue'
+
+function str (value: string): Property<string> { return str as unknown as Property<string> }
 
 export default defineComponent({
   components: { InlineEdit, ObjectPanel, Table },
@@ -40,9 +42,9 @@ export default defineComponent({
     if (getResourceKind(props.resource) === ClassKind) {
       const _class = props.resource as Ref<Class<Person>>
       document = coreService.getDb().createDocument(_class, {
-        firstName: 'Дмитрий Сергеевич',
-        lastName: 'Либерзон',
-        phone: '+7 913 333 7777'
+        firstName: str('Дмитрий Сергеевич'),
+        lastName: str('Либерзон'),
+        phone: str('+7 913 333 7777)')
       })._id
       console.log('CREATE!')
       console.log(document)
