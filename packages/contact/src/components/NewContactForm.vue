@@ -25,7 +25,7 @@ import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.vue'
 import ObjectPanel from '@anticrm/platform-vue/src/components/ObjectPanel.vue'
 import Table from '@anticrm/platform-vue/src/components/Table.vue'
 
-function str (value: string): Property<string> { return str as unknown as Property<string> }
+function str (value: string): Property<string> { return value as unknown as Property<string> }
 
 export default defineComponent({
   components: { InlineEdit, ObjectPanel, Table },
