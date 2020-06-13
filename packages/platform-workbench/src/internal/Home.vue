@@ -31,7 +31,9 @@ export default defineComponent({
 
 <template>
   <div>
-    <LinkTo :path="`${contact.class.Person}/new`" :params="{x:5}">Персоны</LinkTo>
+    <LinkTo :path="`${contact.class.Person}/new`" :params="{x:5}">Новая Персона</LinkTo>
+    <br />
+    <LinkTo :path="`${contact.class.Person}`" :params="{x:5}">Список Персон</LinkTo>
     <Suspense>
       <Action :action="vue.method.AnAction" hi="there">Hello</Action>
     </Suspense>
