@@ -44,23 +44,10 @@ export default defineComponent({
       document = coreService.getDb().createDocument(_class, {
         firstName: str('Дмитрий Сергеевич'),
         lastName: str('Либерзон'),
-        phone: str('+7 913 333 7777)')
+        phone: str('+7 913 333 7777')
       })._id
-      console.log('CREATE!')
-      console.log(document)
-      console.log('OP:')
-      console.log(props.operation)
-      console.log('PARAMS:')
-      console.log(props.params)
     }
-
-
     const instance = await coreService.getInstance(document)
-
-    console.log('CONTENT!!!!!')
-    console.log(props.params)
-    console.log(instance)
-    console.log(instance.firstName)
     return {
       instance
     }
