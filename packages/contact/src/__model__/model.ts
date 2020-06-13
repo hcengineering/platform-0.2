@@ -15,6 +15,7 @@
 
 import contact from '.'
 import core from '@anticrm/platform-core/src/__model__'
+import business from '@anticrm/platform-business/src/__model__'
 import ui from '@anticrm/platform-ui/src/__model__'
 import workbench from '@anticrm/platform-workbench/src/__model__'
 import { Ref, Class, Type } from '@anticrm/platform-core'
@@ -29,7 +30,7 @@ export default async (S: Builder) => {
   S.createClass(contact.class.Email, core.class.Type, {})
   S.createClass(contact.class.Phone, core.class.Type, {})
 
-  S.createClass(contact.class.Contact, core.class.Doc, {
+  S.createClass(contact.class.Contact, business.class.BusinessObject, {
     email: S.newInstance(contact.class.Email, {}),
     phone: S.newInstance(contact.class.Phone, {})
   })
