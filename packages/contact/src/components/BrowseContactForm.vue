@@ -18,14 +18,12 @@ import { defineComponent, ref, reactive, inject, computed, PropType } from 'vue'
 import core, { Ref, Doc, Class, Instance, ClassKind } from '@anticrm/platform-core'
 import { Person } from '..'
 
-import NewContactForm from './NewContactForm.vue'
-import BrowseContactForm from './BrowseContactForm.vue'
+import Table from '@anticrm/platform-vue/src/components/Table.vue'
 
 export default defineComponent({
-  components: { NewContactForm, BrowseContactForm },
+  components: { Table },
   props: {
     resource: String as unknown as PropType<Ref<Class<Person>>>,
-    operation: String,
     params: Object
   }
 })
@@ -33,8 +31,11 @@ export default defineComponent({
 
 <template>
   <div>
-    <NewContactForm v-if="operation === 'new'" :resource="resource" :params="params" />
-    <BrowseContactForm v-else :resource="resource" :params="params" />
+    <div class="caption-1">Персоны</div>
+    <br />
+    <Suspense>
+      <Table :clazz="resource" exclude />
+    </Suspense>
   </div>
 </template>
 

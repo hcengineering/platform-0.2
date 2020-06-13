@@ -14,30 +14,39 @@
 -->
 
 <script lang="ts">
-import { defineComponent, ref, reactive, inject, computed, PropType } from 'vue'
-import core, { Ref, Doc, Class, Instance, ClassKind } from '@anticrm/platform-core'
-import { Person } from '..'
-
-import NewContactForm from './NewContactForm.vue'
-import BrowseContactForm from './BrowseContactForm.vue'
+import { Resource } from '@anticrm/platform'
+import { defineComponent, PropType, inject, ref } from 'vue'
+import { AnyComponent } from '@anticrm/platform-ui'
+import { getPlatform } from '..'
 
 export default defineComponent({
-  components: { NewContactForm, BrowseContactForm },
   props: {
-    resource: String as unknown as PropType<Ref<Class<Person>>>,
-    operation: String,
-    params: Object
+    action: String
+  },
+  setup (props, context) {
+    const working = ref(false)
+
+    function execute () {
+      working.value = true
+      this.$platform.getResource(props.action as Resource<any>).then(action => {
+        const result = action(context.attrs)
+        if (result instanceof Promise) {
+          result.then(() => working.value = false)
+        } else {
+          working.value = false
+        }
+      })
+    }
+    return {
+      working,
+      execute
+    }
   }
 })
 </script>
 
 <template>
-  <div>
-    <NewContactForm v-if="operation === 'new'" :resource="resource" :params="params" />
-    <BrowseContactForm v-else :resource="resource" :params="params" />
+  <div @click.prevent="execute()">
+    <slot />
   </div>
 </template>
-
-<style scoped lang="scss">
-@import "~@anticrm/sparkling-theme/css/_variables.scss";
-</style>

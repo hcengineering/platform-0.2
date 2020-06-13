@@ -22,18 +22,20 @@ import { getVueService } from '..'
 export default defineComponent({
   props: {
     app: String as unknown as PropType<AnyComponent>,
-    path: String
+    path: String,
+    params: Object
   },
   setup (props) {
-    return {
-      navigate: getVueService().navigate
-    }
+    const service = getVueService()
+    const url = service.toUrl({ app: props.app, path: props.path, params: props.params })
+    const navigate = service.navigate
+    return { url, navigate }
   }
 })
 </script>
 
 <template>
-  <a href="#" @click.prevent="navigate({app, path})">
+  <a :href="url" @click.prevent="navigate(url)">
     <slot />
   </a>
 </template>

@@ -26,7 +26,6 @@ export default defineComponent({
   setup () {
     const vueService = getVueService()
     const current = computed(() => vueService.getLocation())
-    vueService.navigate({ path: '' })
     return { current, appLoader: vue.component.AppLoader }
   },
 })
@@ -34,7 +33,13 @@ export default defineComponent({
 
 <template>
   <div id="app">
-    <widget v-if="current.app" :component="current.app" :path="current.path" :fallback="appLoader" />
+    <widget
+      v-if="current.app"
+      :component="current.app"
+      :path="current.path"
+      :params="current.params"
+      :fallback="appLoader"
+    />
     <div v-else class="caption-1">Huston, no default application provided.</div>
   </div>
 </template>

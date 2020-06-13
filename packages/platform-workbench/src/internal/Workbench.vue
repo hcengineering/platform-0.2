@@ -27,10 +27,12 @@ import NewItemMenu from './NewItemMenu.vue'
 export default defineComponent({
   components: { MainView, Home, NewItemMenu },
   props: {
-    path: String
+    path: String,
+    params: Object
   },
-  setup () {
-    return { workbench, contact, navigate: getVueService().navigate }
+  setup (props) {
+    console.log('Workbench: ')
+    console.log(props.params)
   }
 })
 </script>
@@ -47,7 +49,7 @@ export default defineComponent({
 
     <main>
       <Suspense v-if="path">
-        <MainView :content="path" />
+        <MainView :path="path" :params="params" />
       </Suspense>
       <Home v-else />
     </main>
