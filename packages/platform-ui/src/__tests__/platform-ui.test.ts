@@ -184,7 +184,7 @@ describe('session', () => {
     const coreService = await platform.getPlugin(core.id)
     const session = coreService.newSession()
     try {
-      const component = await session.adapt(core.class.Class, ComponentKind)
+      await session.adapt(core.class.Class, ComponentKind)
     } catch (err) {
       expect(err.message.startsWith('something')).toBe(true)
     }
