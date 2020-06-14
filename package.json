@@ -4,14 +4,5 @@
   "workspaces": [
     "packages/*",
     "dev/*"
-  ],
-  "dependencies": {
-    "@vue/cli-plugin-babel": "4.4.4",
-    "@vue/cli-plugin-typescript": "4.4.4",
-    "@vue/cli-service": "4.4.4",
-    "@vue/compiler-sfc": "3.0.0-beta.15",
-    "typescript": "3.9.4",
-    "vue": "3.0.0-beta.15",
-    "vue-cli-plugin-vue-next": "0.1.3"
-  }
+  ]
 }

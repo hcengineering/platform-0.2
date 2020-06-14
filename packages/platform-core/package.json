@@ -31,10 +31,9 @@
     "jest": "^25.5.2",
     "lodash": "^4.17.15",
     "typedoc": "^0.17.6",
-    "typescript": "~3.8.3"
+    "typescript": "~3.9.4"
   },
   "dependencies": {
-    "intl-messageformat": "^8.3.9",
     "simplytyped": "^3.3.0"
   }
 }
