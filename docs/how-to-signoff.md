@@ -38,7 +38,7 @@ Your email:
 git config user.email "MY_NAME@example.com"
 ```
 
-# How to amend a sign-off
+## How to amend a sign-off
 
 If you have authored a commit that is missing the signed-off-by line, you can amend your commits and push them to GitHub
 
