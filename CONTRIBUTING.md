@@ -36,7 +36,13 @@ The Anticrm Platform project uses a DCO bot for all GitHub pulls to verify that 
 
 ![DCO Failure](docs/images/dco-failure.png)
 
-If your Pull Request fails the DCO check, it's necessary to fix the entire commit history in the PR. Although this is a situation we'd like to avoid the best practice is to squash the commit history to a single commit, append the DCO sign-off as described above or interactively in the rebase comment editing process, and force push. For example, if you have 2 commits in your history (Note the ~2)
+If you have authored a commit that is missing the signed-off-by line, you can amend your commit and push it to GitHub
+```
+git commit --amend --signoff
+```
+If you've pushed your changes to GitHub already you'll need to force push your branch after this with `git push -f`.
+
+Sometimes, it's necessary to fix the entire commit history in the PR. Although this is a situation we'd like to avoid the best practice is to squash the commit history to a single commit, append the DCO sign-off as described above or interactively in the rebase comment editing process, and force push. For example, if you have 2 commits in your history (Note the ~2)
 
 ```bash
 git rebase --interactive HEAD~2
