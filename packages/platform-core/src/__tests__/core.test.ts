@@ -20,23 +20,25 @@ import startPlugin from '../plugin'
 import model from '../__model__/model'
 import Builder from '../__model__/builder'
 import core from '../__model__'
-
+import {mergeIds} from "../__model__/utils";
 const DOC = 1 // see `plugin.ts`
 
 describe('core', () => {
   const platform = new Platform()
 
   it('should load model', async () => {
-    const builder = new Builder()
+    const tx = await startPlugin(platform)
+    const builder = new Builder(tx.getDb())
     builder.load(model)
     const coreModel = builder.dump()
-    platform.setMetadata(core.metadata.MetaModel, coreModel)
     expect(true).toBe(true)
     console.log(JSON.stringify(coreModel))
   })
 
   it('should create prototype', async () => {
     const tx = await startPlugin(platform)
+    const builder = new Builder(tx.getDb())
+    builder.load(model)
 
     const typeProto = await tx.getPrototype(core.class.Type, DOC)
     console.log(typeProto)
@@ -53,6 +55,8 @@ describe('core', () => {
 
   it('should instantiate class', async () => {
     const tx = await startPlugin(platform)
+    const builder = new Builder(tx.getDb())
+    builder.load(model)
 
     const inst = await tx.getInstance(core.class.RefTo)
     const x = inst._attributes
@@ -64,8 +68,23 @@ describe('core', () => {
 
   it('should instantiate array', async () => {
     const tx = await startPlugin(platform)
+    const builder = new Builder(tx.getDb())
+    builder.load(model)
+
+    // console.log(tx.getDb().dump())
 
     const result = await tx.find(core.class.Class, {})
     console.log(result)
+  })
+
+  it('should merge ids', () => {
+
+    let mm1 : { [key: string]: { [key: string]: any } } = {}
+    mm1['k1'] = ['value11', 'value12']
+    let mm2 : { [key: string]: { [key: string]: any } } = {}
+    mm2['k2'] = ['value21', 'value22']
+    let mi = mergeIds(mm1, mm2)
+    expect(mi.k1).toStrictEqual(['value11', 'value12'])
+    expect(mi.k2).toStrictEqual(['value21', 'value22'])
   })
 })
