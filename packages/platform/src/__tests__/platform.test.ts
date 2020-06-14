@@ -15,7 +15,7 @@
 
 /* eslint-env jest */
 
-import { Platform, identify, Plugin, Service, Resource, Metadata } from '..'
+import {Platform, identify, Plugin, Service, Resource, Metadata} from '..'
 
 import { plugin1, descriptor1, plugin1State, plugin2, descriptor2, plugin2State, plugin3, descriptor3 } from './shared'
 
@@ -48,14 +48,14 @@ describe('platform', () => {
     expect(p1).toBeInstanceOf(Promise)
     expect(plugin1State.parsed).toBe(false)
     expect(plugin1State.started).toBe(false)
-    return p1.then(plugin => { // eslint-disable-line @typescript-eslint/no-unused-vars
+    return p1.then(() => {
       expect(plugin1State.parsed).toBe(true)
       expect(plugin1State.started).toBe(true)
     })
   })
 
   it('should not resolve resource (no plugin location)', (done) => {
-    platform.resolve('resource:NotExists.Resource' as Resource<string>).then(res => { // eslint-disable-line
+    platform.resolve('resource:NotExists.Resource' as Resource<string>).then(() => {
       expect(true).toBe(false)
       done()
     }).catch(err => {
@@ -128,10 +128,42 @@ describe('platform', () => {
 
     platform.loadMetadata(ids.meta, {
       M1: 'hey',
-      M2: 'there'
+      M2: 'there',
     })
 
     expect(platform.getMetadata(ids.meta.M1)).toBe('hey')
     expect(platform.getMetadata(ids.meta.M2)).toBe('there')
   })
+
+  it('should set metadata', () => {
+
+    const ids = identify('test' as AnyPlugin, {
+      meta: {
+        M1: 'test-meta' as Metadata<string>,
+        M2: 'test-meta2' as Metadata<string>,
+        M3: '' as Metadata<string>,
+      }
+    })
+    platform.setMetadata(ids.meta.M1, 'new-test-meta')
+    expect(platform.getMetadata(ids.meta.M1)).toBe('new-test-meta')
+    platform.setMetadata(ids.meta.M2, undefined)
+    expect(platform.getMetadata(ids.meta.M2)).toBe(undefined)
+    platform.setMetadata(ids.meta.M3, null)
+    expect(platform.getMetadata(ids.meta.M3)).toBe(null)
+  })
+
+  it('should get plugins infos', () => {
+
+    const ids = identify('test' as AnyPlugin, {
+      meta: {
+        M: '' as Metadata<string>
+      }
+    })
+
+    platform.loadMetadata(ids.meta, {
+      M: 'hey'
+    })
+    expect(platform.peekResource(ids.meta.M)).toBe('hey')
+  })
+
 })

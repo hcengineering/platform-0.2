@@ -20,7 +20,7 @@ import startPlugin from '../plugin'
 import model from '../__model__/model'
 import Builder from '../__model__/builder'
 import core from '../__model__'
-
+import {mergeIds} from "../__model__/utils";
 const DOC = 1 // see `plugin.ts`
 
 describe('core', () => {
@@ -75,5 +75,16 @@ describe('core', () => {
 
     const result = await tx.find(core.class.Class, {})
     console.log(result)
+  })
+
+  it('should merge ids', () => {
+
+    let mm1 : { [key: string]: { [key: string]: any } } = {}
+    mm1['k1'] = ['value11', 'value12']
+    let mm2 : { [key: string]: { [key: string]: any } } = {}
+    mm2['k2'] = ['value21', 'value22']
+    let mi = mergeIds(mm1, mm2)
+    expect(mi.k1).toStrictEqual(['value11', 'value12'])
+    expect(mi.k2).toStrictEqual(['value21', 'value22'])
   })
 })
