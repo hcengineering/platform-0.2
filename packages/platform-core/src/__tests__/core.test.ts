@@ -26,7 +26,7 @@ const DOC = 1 // see `plugin.ts`
 describe('core', () => {
   const platform = new Platform()
 
-  it('should load model', async () => {
+  it('should build model', async () => {
     const builder = new Builder()
     builder.load(model)
     const coreModel = builder.dump()

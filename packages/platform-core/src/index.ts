@@ -84,10 +84,18 @@ type PropertyTypes<T> = {
 export type Attributes<T extends E, E extends Obj> = PropertyTypes<Required<Omit<T, keyof E>>>
 export type AllAttributes<T extends E, E extends Obj> = Attributes<T, E> & Partial<Attributes<E, Obj>>
 
-export interface EClass<T extends E, E extends Obj> extends Doc {
+export interface EClassifier<T extends E, E extends Obj> extends Doc {
   _attributes: AllAttributes<T, E>
+}
+
+export enum CoreDomain {
+  Model = 'model'
+}
+
+export interface EClass<T extends E, E extends Obj> extends EClassifier<T, E> {
   _extends?: Ref<Class<E>>
   _native?: Property<Object>
+  _domain?: Property<string>
 }
 
 export const ClassKind = 'class' as ResourceKind

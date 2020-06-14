@@ -24,7 +24,7 @@ git commit -s -m "This is my commit message"
 
 This will use your default git configuration which is found in `.git/config`.
 
-To change this, you can use the following commands (Note these only change the current repo settings, you will need to add --global for these commands to change the installation default).
+To change this, you can use the following commands (Note these only change the current repo settings, you will need to add `--global` for these commands to change the installation default).
 
 Your name:
 

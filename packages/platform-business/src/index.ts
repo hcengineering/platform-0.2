@@ -16,8 +16,14 @@
 import { plugin, Plugin, Service } from '@anticrm/platform'
 import { Ref, Doc, Property } from '@anticrm/platform-core'
 
+// @Mixin
+export interface User extends Doc {
+  account: Ref<Account>
+}
+
 export interface Account extends Doc {
   id: Property<string>
+  user: Ref<User>
 }
 
 export interface BusinessObject extends Doc {

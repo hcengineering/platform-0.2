@@ -33,30 +33,11 @@ import uiMeta from '@anticrm/platform-vue/src/__meta__/meta'
 import workbenchMeta from '@anticrm/platform-workbench/src/__model__/meta'
 import contactMeta from '@anticrm/contact/src/__model__/meta'
 
-import contactRu from '@anticrm/contact/src/__model__/strings/ru'
-
-import Builder from '@anticrm/platform-core/src/__model__/builder'
-
-import coreModel from '@anticrm/platform-core/src/__model__/model'
-import i18nModel from '@anticrm/platform-core-i18n/src/__model__/model'
-import businessModel from '@anticrm/platform-business/src/__model__/model'
-import uiModel from '@anticrm/platform-ui/src/__model__/model'
-import contactModel from '@anticrm/contact/src/__model__/model'
-import workbenchModel from '@anticrm/platform-workbench/src/__model__/model'
-import demoModel from '@anticrm/app-storybook/src/__model__/model'
-
-const builder = new Builder()
-builder.load(coreModel)
-builder.load(i18nModel)
-builder.load(businessModel)
-builder.load(uiModel)
-builder.load(workbenchModel)
-builder.load(contactModel)
-builder.load(demoModel)
+import { Model, Strings } from '@anticrm/dev-boot/src/boot'
 
 const platform = new Platform()
-platform.setMetadata(core.metadata.MetaModel, builder.dump())
-platform.setMetadata(i18n.metadata.BootStrings, contactRu)
+platform.setMetadata(core.metadata.MetaModel, Model)
+platform.setMetadata(i18n.metadata.BootStrings, Strings)
 platform.setMetadata(ui.metadata.DefaultApplication, mc.component.MissionControl)
 platform.setMetadata(mc.metadata.Applications, [
   workbench.component.Workbench,

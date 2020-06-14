@@ -43,7 +43,8 @@ export default (S: Builder) => {
     _extends: S.newInstance(core.class.RefTo as Ref<Class<RefTo<Class<Obj>>>>, {
       to: core.class.Class
     }),
-    _native: S.newInstance(core.class.StaticResource, {})
+    _native: S.newInstance(core.class.StaticResource, {}),
+    _domain: S.newInstance(core.class.Type, {})
   })
 
   S.createClass(core.class.Type, core.class.Emb, {
