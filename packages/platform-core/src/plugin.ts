@@ -136,7 +136,7 @@ export default async (platform: Platform): Promise<CoreService> => {
   const coreService: CoreService = {
     adapt,
 
-    getDb () { return modelDb },
+    newSession () { return modelDb },
     getClassHierarchy,
     find,
 

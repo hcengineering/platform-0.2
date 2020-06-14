@@ -155,7 +155,7 @@ export interface CoreService extends Service {
 
   find<T extends Doc> (_class: Ref<Class<T>>, query: Partial<T>): Promise<Instance<T>[]>
 
-  getDb (): DocDb
+  newSession (): DocDb
 
   // debug?
   getPrototype<T extends Obj> (_class: Ref<Class<T>>, stereotype: number /* for tests */): Promise<Object>

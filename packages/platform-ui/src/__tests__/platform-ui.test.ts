@@ -74,7 +74,7 @@ describe('session', () => {
     const coreServices = await platform.getPlugin(core.id)
     await platform.getPlugin(i18n.id) // TODO: dirty hack, resources does not resolve awhen building prototypes.
 
-    const S = new Builder(coreServices.getDb())
+    const S = new Builder(coreServices.newSession())
 
     S.createClass(contact.class.Email, core.class.Type, {})
     S.createClass(contact.class.Phone, core.class.Type, {})

@@ -42,7 +42,7 @@ export default defineComponent({
     let document: Ref<Person>
     if (getResourceKind(props.resource) === ClassKind) {
       const _class = props.resource as Ref<Class<Person>>
-      document = coreService.getDb().createDocument(_class, {
+      document = coreService.newSession().createDocument(_class, {
         createdBy: '' as unknown as Ref<Account>,
         createdOn: '12 May 2020' as unknown as Property<Date>,
         firstName: str('Дмитрий Сергеевич'),

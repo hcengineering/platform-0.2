@@ -35,14 +35,12 @@ describe('core', () => {
   platform.addLocation(i18n, () => import('@anticrm/platform-core-i18n/src/plugin'))
 
   it('should load model', async () => {
-    const coreService = await platform.getPlugin(core.id)
-
-    const builder = new Builder(coreService.getDb())
+    const builder = new Builder()
     builder.load(coreModel)
     builder.load(i18nModel)
     builder.load(uiModel)
     builder.load(contactModel)
-
+    platform.setMetadata(core.metadata.MetaModel, builder.dump())
     console.log(JSON.stringify(builder.dump()))
   })
 

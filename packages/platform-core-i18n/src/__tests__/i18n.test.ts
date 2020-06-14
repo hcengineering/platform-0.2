@@ -118,7 +118,7 @@ describe('i18n', () => {
 
   it('should translate attribute value', async () => {
     const coreService = await platform.getPlugin(core.id)
-    const S = new Builder(coreService.getDb())
+    const S = new Builder(coreService.newSession())
 
     const ru = {
       MyString: 'Перевод',

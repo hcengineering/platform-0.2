@@ -37,20 +37,6 @@ export default defineComponent({
     const coreService = getCoreService()
     const component = await coreService.adapt(resource, ComponentKind)
 
-    // let document: Ref<Doc>
-    // if (getResourceKind(resource) === ClassKind) {
-    //   const _class = resource as Ref<Class<Doc>>
-    //   document = coreService.getDb().createDocument(_class, {
-    //     firstName: 'Валентин Генрихович',
-    //     lastName: 'Либерзон',
-    //     phone: '+7 913 333 7777'
-    //   })._id
-    //   console.log('CREATE!')
-    //   console.log(document)
-    //   console.log('PARAMS:')
-    //   console.log(props.params)
-    // }
-
     return {
       component, resource, operation
     }
