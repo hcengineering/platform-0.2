@@ -48,10 +48,10 @@ export type Resolve<T> = T extends Resource<infer X> ? Property<Promise<X>> : ne
 
 // O B J E C T S
 
-export interface Obj { _class: Ref<Class<this>> }
+export interface Obj { _class: Ref<Class<Obj>> }
 export interface Emb extends Obj { __embedded: true }
 export interface Doc extends Obj {
-  _id: Ref<this>
+  _id: Ref<Doc>
   _mixins?: Ref<Class<Doc>>[]
 }
 
@@ -137,7 +137,7 @@ export interface ModelDb {
   get<T extends Doc> (id: Ref<T>): T
   dump (): Doc[]
 
-  find<T extends Doc> (clazz: Ref<Class<T>>, query: Partial<T>): Promise<T[]>
+  find (clazz: Ref<Class<Doc>>, query: { [key: string]: PropertyType }): Promise<Doc[]>
 
   mixin<T extends E, E extends Doc> (id: Ref<E>, clazz: Ref<Class<T>>, values: Pick<T, Exclude<keyof T, keyof E>>): void
   createDocument<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Doc>, _id?: Ref<M>): M

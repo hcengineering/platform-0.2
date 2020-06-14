@@ -92,7 +92,7 @@ export default async (platform: Platform, deps: { core: CoreService }): Promise<
 
   async function getAttrModel (clazz: Instance<Class<Obj>>, exclude?: string[] | string, top?: Ref<Class<Obj>>): Promise<AttrModel[]> {
     const session = clazz.getSession()
-    const hierarchy = session.getClassHierarchy(clazz._id, top ?? core.class.Doc)
+    const hierarchy = session.getClassHierarchy(clazz._id as Ref<Class<Obj>>, top ?? core.class.Doc)
     const ownModels = hierarchy.map(async (_class) => getOwnAttrModel(await session.getInstance(_class), exclude))
     return Promise.all(ownModels).then(result => result.flat())
   }

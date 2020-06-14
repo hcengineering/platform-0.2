@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import core, { Doc, Ref, Class, Obj, Emb, Instance, Type, Property, Session } from '.'
+import core, { Doc, Ref, Class, Obj, Emb, Instance, Type, Property, Session, PropertyType, Adapter } from '.'
 import { MemDb, Layout } from './memdb'
 import { generateId } from './objectid'
 import { Platform, Resource, ResourceKind } from '@anticrm/platform'
@@ -34,7 +34,7 @@ export function createSession (platform: Platform, modelDb: MemDb): Session {
   const prototypes = new Map<Ref<Class<Obj>>, Object>()
 
   const CoreRoot = {
-    get _class (this: Instance<Obj>) { return this.__layout._class },
+    get _class (): Ref<Class<Obj>> { return (this as Instance<Obj>).__layout._class },
     getSession: (): Session => session
   }
 
@@ -114,19 +114,19 @@ export function createSession (platform: Platform, modelDb: MemDb): Session {
 
   async function instantiateEmb<T extends Emb> (obj: T): Promise<Instance<T>> {
     const ctor = await getKonstructor(obj._class, Stereotype.EMB)
-    return new ctor(obj)
+    return new ctor(obj) as Instance<T>
   }
 
   async function instantiateDoc<T extends Doc> (obj: T): Promise<Instance<T>> {
     const ctor = await getKonstructor(obj._class, Stereotype.DOC)
-    return new ctor(obj)
+    return new ctor(obj) as Instance<T>
   }
 
   // A P I : R E A D
 
   function newInstance<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Doc>, _id?: Ref<M>): Promise<Instance<M>> {
     const doc = modelDb.createDocument(_class, values, _id)
-    return getInstance(doc._id)
+    return getInstance(doc._id) as Promise<Instance<M>>
   }
 
   async function getInstance<T extends Doc> (id: Ref<T>): Promise<Instance<T>> {
@@ -148,9 +148,9 @@ export function createSession (platform: Platform, modelDb: MemDb): Session {
   }
 
   async function find<T extends Doc> (_class: Ref<Class<T>>, query: Partial<T>): Promise<Instance<T>[]> {
-    const layout = await modelDb.find(_class, query)
+    const layout = await modelDb.find(_class as Ref<Class<Doc>>, query as { [key: string]: PropertyType })
     const result = layout.map(doc => instantiateDoc(doc))
-    return Promise.all(result)
+    return Promise.all(result) as Promise<Instance<T>[]>
   }
 
   async function adapt (resource: Resource<any>, kind: string): Promise<Resource<any> | undefined> {
@@ -165,7 +165,7 @@ export function createSession (platform: Platform, modelDb: MemDb): Session {
     })
 
     if (adapter) {
-      const instance = await getInstance(adapter._id)
+      const instance = await getInstance(adapter._id as Ref<Adapter>)
       return (await instance.adapt).call(instance, resource)
     }
 

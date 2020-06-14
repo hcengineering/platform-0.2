@@ -25,7 +25,7 @@
     "eslint-plugin-standard": "^4.0.1",
     "jest": "^25.5.2",
     "typedoc": "^0.17.6",
-    "typescript": "~3.8.3"
+    "typescript": "~3.9.4"
   },
   "dependencies": {
     "@anticrm/platform": "0.1.0",

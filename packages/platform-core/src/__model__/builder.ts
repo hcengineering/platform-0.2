@@ -45,7 +45,7 @@ class Builder {
   }
 
   newInstance<M extends Emb> (_class: Ref<Class<M>>, values: Omit<M, keyof Emb>): M {
-    const obj = { _class, ...values } as M
+    const obj = { _class: _class as Ref<Class<Obj>>, ...values } as M
     return obj
   }
 
