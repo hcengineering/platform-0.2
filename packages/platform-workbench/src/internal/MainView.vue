@@ -32,9 +32,8 @@ export default defineComponent({
 
   // Adapt `content` to a `Component`. Forward to `Component`.
   async setup (props, context) {
-    const split = props.path.split('/')
-    const operation = split[1]
-    const resource = split[0] as Resource<any>
+    const operation = computed(() => props.path.split('/')[1])
+    const resource = props.path.split('/')[0] as Resource<any>
     const coreService = getCoreService()
     const component = await coreService.adapt(resource, ComponentKind)
 
@@ -60,11 +59,14 @@ export default defineComponent({
 </script>
 
 <template>
-  <widget
-    v-if="component"
-    :component="component"
-    :resource="resource"
-    :operation="operation"
-    :params="params"
-  />
+  <div>
+    <div class="caption-5">{{path}} : {{operation}}</div>
+    <widget
+      v-if="component"
+      :component="component"
+      :resource="resource"
+      :operation="operation"
+      :params="params"
+    />
+  </div>
 </template>

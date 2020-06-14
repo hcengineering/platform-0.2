@@ -19,9 +19,10 @@ import core, { Ref, Doc, Class, Instance, ClassKind } from '@anticrm/platform-co
 import { Person } from '..'
 
 import Table from '@anticrm/platform-vue/src/components/Table.vue'
+import LinkTo from '@anticrm/platform-vue/src/components/LinkTo.vue'
 
 export default defineComponent({
-  components: { Table },
+  components: { Table, LinkTo },
   props: {
     resource: String as unknown as PropType<Ref<Class<Person>>>,
     params: Object
@@ -32,7 +33,7 @@ export default defineComponent({
 <template>
   <div>
     <div class="caption-1">Персоны</div>
-    <br />
+    <LinkTo :path="`${resource}/new`" :params="{x:5}">Новая Персона</LinkTo>
     <Suspense>
       <Table :clazz="resource" exclude />
     </Suspense>
