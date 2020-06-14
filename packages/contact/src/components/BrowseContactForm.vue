@@ -33,7 +33,7 @@ export default defineComponent({
 <template>
   <div>
     <div class="caption-1">Персоны</div>
-    <LinkTo :path="`${resource}/new`" :params="{x:5}">Новая Персона</LinkTo>
+    <LinkTo :path="`${resource}/new`">Новая Персона</LinkTo>
     <Suspense>
       <Table :clazz="resource" exclude />
     </Suspense>

@@ -19,7 +19,7 @@ import { Platform, Resource, getResourceKind } from '@anticrm/platform'
 import core, { Ref, Doc, Class, Instance, ClassKind, Property } from '@anticrm/platform-core'
 import { Account } from '@anticrm/platform-business'
 import { AnyComponent } from '@anticrm/platform-ui'
-import { injectPlatform } from '@anticrm/platform-vue'
+import { getSession } from '@anticrm/platform-vue'
 import { Person } from '..'
 
 import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.vue'
@@ -36,21 +36,22 @@ export default defineComponent({
     params: Object
   },
   async setup (props, context) {
-    const _ = await injectPlatform({ core: core.id })
-    const coreService = _.deps.core
+    // const _ = await injectPlatform({ core: core.id })
+    // const coreService = _.deps.core
+    const session = getSession()
 
     let document: Ref<Person>
     if (getResourceKind(props.resource) === ClassKind) {
       const _class = props.resource as Ref<Class<Person>>
-      document = coreService.newSession().createDocument(_class, {
+      document = session.getModel().createDocument(_class, {
         createdBy: '' as unknown as Ref<Account>,
         createdOn: '12 May 2020' as unknown as Property<Date>,
-        firstName: str('Дмитрий Сергеевич'),
+        firstName: str('Валентин Генрихович'),
         lastName: str('Либерзон'),
         phone: str('+7 913 333 7777')
       })._id
     }
-    const instance = await coreService.getInstance(document)
+    const instance = await session.getInstance(document)
     return {
       instance
     }

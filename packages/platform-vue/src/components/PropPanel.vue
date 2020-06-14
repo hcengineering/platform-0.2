@@ -36,9 +36,10 @@ export default defineComponent({
     const _ = await injectPlatform({ ui: ui.id })
     const uiService = _.deps.ui
     try {
-      const classModel = await uiService.getClassModel(props.clazz)
-      console.log(props.exclude)
-      const attrModel = await uiService.getOwnAttrModel(props.clazz, props.exclude)
+      const session = props.instance.getSession()
+      const classInstance = await session.getInstance(props.clazz)
+      const classModel = await uiService.getClassModel(classInstance)
+      const attrModel = await uiService.getOwnAttrModel(classInstance, props.exclude)
       const grouped = uiService.groupByType(attrModel)
       return { classModel, grouped }
     } catch (err) {

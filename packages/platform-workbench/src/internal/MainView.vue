@@ -16,10 +16,9 @@
 <script lang="ts">
 import { defineComponent, reactive, computed, provide, inject, watch, PropType } from 'vue'
 import { Platform, Resource, getResourceKind } from '@anticrm/platform'
-import { injectPlatform } from '@anticrm/platform-vue'
+import { getSession } from '@anticrm/platform-vue'
 import core, { Ref, Class, Doc, CoreService, ClassKind, Instance } from '@anticrm/platform-core'
 import ui, { AnyComponent, UIService, ComponentKind } from '@anticrm/platform-ui'
-import { getCoreService } from '..'
 
 import Button from '@anticrm/sparkling-controls/src/Button.vue'
 
@@ -32,10 +31,10 @@ export default defineComponent({
 
   // Adapt `content` to a `Component`. Forward to `Component`.
   async setup (props, context) {
+    const session = getSession()
     const operation = computed(() => props.path.split('/')[1])
     const resource = props.path.split('/')[0] as Resource<any>
-    const coreService = getCoreService()
-    const component = await coreService.adapt(resource, ComponentKind)
+    const component = await session.adapt(resource, ComponentKind)
 
     return {
       component, resource, operation

@@ -17,7 +17,8 @@
 import { defineComponent, ref } from 'vue'
 import core, { Ref, Class, Obj, Doc, CoreService, Instance } from '@anticrm/platform-core'
 import { UIDecorator } from '@anticrm/platform-ui'
-import workbench, { DocCreateAction, getCoreService, getUIService } from '..'
+import { getSession, getUIService } from '@anticrm/platform-vue'
+import workbench, { DocCreateAction } from '..'
 
 import LinkTo from '@anticrm/platform-vue/src/components/LinkTo.vue'
 import Label from '@anticrm/platform-vue/src/components/Label.vue'
@@ -28,17 +29,19 @@ export default defineComponent({
   setup () {
     const actions = ref([] as Instance<DocCreateAction>[])
 
-    getCoreService().find(workbench.class.DocCreateAction, {})
+    const session = getSession()
+
+    session.find(workbench.class.DocCreateAction, {})
       .then(acts => { actions.value = acts })
 
     const uiService = getUIService()
 
-    function label (_class: Ref<Class<Obj>>): Promise<string> {
-      return uiService.getClassModel(_class).then(model => model.label)
+    async function label (_class: Ref<Class<Obj>>): Promise<string> {
+      return uiService.getClassModel(await session.getInstance(_class)).then(model => model.label)
     }
 
-    function icon (_class: Ref<Class<Obj>>): Promise<string> {
-      return uiService.getClassModel(_class).then(model => model.icon)
+    async function icon (_class: Ref<Class<Obj>>): Promise<string> {
+      return uiService.getClassModel(await session.getInstance(_class)).then(model => model.icon)
     }
 
     return { actions, label, icon }

@@ -16,7 +16,7 @@
 import { Resource, Metadata } from '@anticrm/platform'
 import {
   PropertyType, Emb, Doc, Obj, Ref, EClass, Class,
-  AllAttributes, DocDb, Property, RefTo, CoreDomain
+  AllAttributes, ModelDb, Property, RefTo, CoreDomain
 } from '@anticrm/platform-core'
 import core from '.'
 import { MemDb } from '../memdb'
@@ -28,9 +28,9 @@ function str (value: string): Property<string> {
 }
 
 class Builder {
-  private memdb: DocDb
+  private memdb: ModelDb
 
-  constructor (memdb?: DocDb) {
+  constructor (memdb?: ModelDb) {
     this.memdb = memdb ?? new MemDb()
   }
 

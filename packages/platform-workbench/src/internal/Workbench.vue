@@ -30,10 +30,6 @@ export default defineComponent({
     path: String,
     params: Object
   },
-  setup (props) {
-    console.log('Workbench: ')
-    console.log(props.params)
-  }
 })
 </script>
 

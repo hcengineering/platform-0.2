@@ -118,7 +118,8 @@ describe('i18n', () => {
 
   it('should translate attribute value', async () => {
     const coreService = await platform.getPlugin(core.id)
-    const S = new Builder(coreService.newSession())
+    const session = coreService.newSession()
+    const S = new Builder(session.getModel())
 
     const ru = {
       MyString: 'Перевод',
@@ -136,7 +137,7 @@ describe('i18n', () => {
       first: 'first' as StringType
     }, 'vasya' as Ref<Person>)
 
-    const instance = await coreService.getInstance('vasya' as Ref<Person>)
+    const instance = await session.getInstance('vasya' as Ref<Person>)
     console.log(instance)
     expect(instance.name).toBe(test.string.Vasya)
 
@@ -153,7 +154,7 @@ describe('i18n', () => {
     i18nService.loadStrings(translations)
 
     const petya = S.createDocument(test.class.Person, { first: 'first' as StringType }, 'test.Petya' as Ref<Person>)
-    const petyaInstance = await coreService.getInstance('test.Petya' as Ref<Person>)
+    const petyaInstance = await session.getInstance('test.Petya' as Ref<Person>)
     expect(petyaInstance.name).toBe('Петя')
   })
 })
