@@ -36,7 +36,8 @@ describe('core', () => {
   })
 
   it('should create prototype', async () => {
-    const tx = await startPlugin(platform)
+    const plugin = await startPlugin(platform)
+    const tx = plugin.newSession()
 
     const typeProto = await tx.getPrototype(core.class.Type, DOC)
     console.log(typeProto)
@@ -52,7 +53,8 @@ describe('core', () => {
   })
 
   it('should instantiate class', async () => {
-    const tx = await startPlugin(platform)
+    const plugin = await startPlugin(platform)
+    const tx = plugin.newSession()
 
     const inst = await tx.getInstance(core.class.RefTo)
     const x = inst._attributes
@@ -63,7 +65,8 @@ describe('core', () => {
   })
 
   it('should instantiate array', async () => {
-    const tx = await startPlugin(platform)
+    const plugin = await startPlugin(platform)
+    const tx = plugin.newSession()
 
     const result = await tx.find(core.class.Class, {})
     console.log(result)

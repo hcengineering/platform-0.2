@@ -15,7 +15,7 @@
 
 
 import { Platform, Resource } from '@anticrm/platform'
-import core, { CoreService, Ref, Class, Obj, Doc, Type, Instance, AdapterType } from '@anticrm/platform-core'
+import core, { CoreService, Ref, Class, Obj, Doc, Type, Instance, AdapterType, Adapter } from '@anticrm/platform-core'
 import ui, { UIService, UIModel, AttrModel } from '.'
 
 console.log('Plugin `face` loaded')
@@ -31,10 +31,9 @@ export default async (platform: Platform, deps: { core: CoreService }): Promise<
 
   // U I  M O D E L S
 
-  async function getClassModel (_class: Ref<Class<Obj>>): Promise<UIModel> {
-    const clazz = await coreService.getInstance(_class)
-    const decorator = await coreService.as(clazz, ui.class.ClassUIDecorator)
-    const label = await decorator.label ?? _class
+  async function getClassModel (clazz: Instance<Class<Obj>>): Promise<UIModel> {
+    const decorator = await clazz.getSession().as(clazz, ui.class.ClassUIDecorator)
+    const label = await decorator.label ?? clazz._id
     return {
       label,
       icon: decorator?.icon
@@ -63,9 +62,9 @@ export default async (platform: Platform, deps: { core: CoreService }): Promise<
    3. Property `Type`'s Class UI Decorator `label` attribute
    4. Property `Type`'s Class synthetic id
    */
-  async function getOwnAttrModel (_class: Ref<Class<Obj>>, exclude?: string[] | string): Promise<AttrModel[]> {
-    const clazz = await coreService.getInstance(_class)
-    const decorator = await coreService.as(clazz, ui.class.ClassUIDecorator)
+  async function getOwnAttrModel (clazz: Instance<Class<Obj>>, exclude?: string[] | string): Promise<AttrModel[]> {
+    const session = clazz.getSession()
+    const decorator = await session.as(clazz, ui.class.ClassUIDecorator)
     const keys = Object.getOwnPropertyNames(clazz._attributes).filter(key => !exclude?.includes(key))
 
     const attributes = clazz._attributes as { [key: string]: Instance<Type<any>> }
@@ -73,8 +72,8 @@ export default async (platform: Platform, deps: { core: CoreService }): Promise<
       const type = await attributes[key]
       const typeDecorator = await decorator.decorators?.[key]
 
-      const typeClass = await coreService.getInstance(type._class)
-      const typeClassDecorator = await coreService.as(typeClass, ui.class.ClassUIDecorator)
+      const typeClass = await session.getInstance(type._class)
+      const typeClassDecorator = await session.as(typeClass, ui.class.ClassUIDecorator)
 
       const label = await typeDecorator?.label ?? await typeClassDecorator?.label ?? key
       const placeholder = (await typeDecorator?.placeholder) ?? label
@@ -91,20 +90,22 @@ export default async (platform: Platform, deps: { core: CoreService }): Promise<
     return Promise.all(attrs)
   }
 
-  async function getAttrModel (_class: Ref<Class<Obj>>, exclude?: string[] | string, top?: Ref<Class<Obj>>): Promise<AttrModel[]> {
-    const hierarchy = coreService.getClassHierarchy(_class, top ?? core.class.Doc)
-    const ownModels = hierarchy.map(clazz => getOwnAttrModel(clazz, exclude))
+  async function getAttrModel (clazz: Instance<Class<Obj>>, exclude?: string[] | string, top?: Ref<Class<Obj>>): Promise<AttrModel[]> {
+    const session = clazz.getSession()
+    const hierarchy = session.getClassHierarchy(clazz._id, top ?? core.class.Doc)
+    const ownModels = hierarchy.map(async (_class) => getOwnAttrModel(await session.getInstance(_class), exclude))
     return Promise.all(ownModels).then(result => result.flat())
   }
 
   // A D A P T E R S
 
-  async function classToComponent (resource: Resource<any>): Promise<Resource<any>> {
-    const clazz = await coreService.getInstance(resource as Ref<Class<Doc>>)
-    if (!coreService.is(clazz, ui.class.Form)) {
+  async function classToComponent (this: Instance<Adapter>, resource: Resource<any>): Promise<Resource<any>> {
+    const session = this.getSession()
+    const clazz = await session.getInstance(resource as Ref<Class<Doc>>)
+    if (!session.is(clazz, ui.class.Form)) {
       throw new Error(`something went wrong, can't find 'Form' for the ${resource}.`)
     }
-    const component = (await coreService.as(clazz, ui.class.Form)).form
+    const component = (await session.as(clazz, ui.class.Form)).form
     return component
   }
 

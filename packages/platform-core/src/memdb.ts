@@ -13,13 +13,13 @@
 // limitations under the License.
 //
 
-import { DocDb, Ref, Doc, Class, Obj, PropertyType } from '.'
+import { Ref, Doc, Class, Obj, PropertyType } from '.'
 import { generateId } from './objectid'
 import { attributeKey } from './plugin'
 
-type Layout = { [key: string]: PropertyType }
+export type Layout = { [key: string]: PropertyType }
 
-export class MemDb implements DocDb {
+export class MemDb {
 
   private objects = new Map<Ref<Doc>, Doc>()
   private byClass: Map<Ref<Class<Obj>>, Doc[]> | null = null

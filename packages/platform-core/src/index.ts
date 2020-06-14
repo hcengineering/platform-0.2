@@ -117,7 +117,7 @@ export type Instance<T> = { [P in keyof T]:
   never
 } & {
   __layout: T
-  getSession (): CoreService
+  getSession (): Session
 }
 
 // A D A P T E R S
@@ -132,7 +132,7 @@ export interface Adapter extends Doc {
 
 // S E S S I O N
 
-export interface DocDb {
+export interface ModelDb {
   add (doc: Doc): void
   get<T extends Doc> (id: Ref<T>): T
   dump (): Doc[]
@@ -143,22 +143,25 @@ export interface DocDb {
   createDocument<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Doc>, _id?: Ref<M>): M
 }
 
-export interface CoreService extends Service {
-  adapt (resource: Resource<any>, kind: string): Promise<Resource<any> | undefined>
-
+export interface Session {
   newInstance<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Doc>, _id?: Ref<M>): Promise<Instance<M>>
   getInstance<T extends Doc> (id: Ref<T>): Promise<Instance<T>>
   as<T extends Doc, A extends Doc> (obj: Instance<T>, _class: Ref<Class<A>>): Promise<Instance<A>>
   is<T extends Doc, A extends Doc> (obj: Instance<T>, _class: Ref<Class<A>>): boolean
-
-  getClassHierarchy (_class: Ref<Class<Obj>>, top?: Ref<Class<Obj>>): Ref<Class<Obj>>[]
-
   find<T extends Doc> (_class: Ref<Class<T>>, query: Partial<T>): Promise<Instance<T>[]>
+  adapt (resource: Resource<any>, kind: string): Promise<Resource<any> | undefined>
 
-  getDb (): DocDb
+  instantiateEmb<T extends Emb> (obj: T): Promise<Instance<T>>
+
+  getModel (): ModelDb
+  getClassHierarchy (_class: Ref<Class<Obj>>, top?: Ref<Class<Obj>>): Ref<Class<Obj>>[]
 
   // debug?
   getPrototype<T extends Obj> (_class: Ref<Class<T>>, stereotype: number /* for tests */): Promise<Object>
+}
+
+export interface CoreService extends Service {
+  newSession (): Session
 }
 
 // P L U G I N

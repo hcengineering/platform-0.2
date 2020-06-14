@@ -15,8 +15,8 @@
 
 /* eslint-env jest */
 import { Platform, plugin, Plugin, Service } from '@anticrm/platform'
-import { Ref, Class, Doc, StringType, Type } from '@anticrm/platform-core'
-import { ClassUIDecorator, Asset } from '..'
+import { Ref, Class, Doc, Type, Property } from '@anticrm/platform-core'
+import { ClassUIDecorator, Asset, ComponentKind } from '..'
 import i18n, { IntlString } from '@anticrm/platform-core-i18n'
 import { verifyTranslation, modelTranslation } from '@anticrm/platform-core-i18n/src/__model__/utils'
 
@@ -28,6 +28,8 @@ import Builder from '@anticrm/platform-core/src/__model__/builder'
 import coreModel from '@anticrm/platform-core/src/__model__/model'
 import i18nModel from '@anticrm/platform-core-i18n/src/__model__/model'
 import uiModel from '@anticrm/platform-ui/src/__model__/model'
+
+type StringType = Property<string>
 
 describe('session', () => {
   const platform = new Platform()
@@ -72,9 +74,10 @@ describe('session', () => {
 
   it('should load models', async () => {
     const coreServices = await platform.getPlugin(core.id)
+    const session = coreServices.newSession()
     await platform.getPlugin(i18n.id) // TODO: dirty hack, resources does not resolve awhen building prototypes.
 
-    const S = new Builder(coreServices.getDb())
+    const S = new Builder(session.getModel())
 
     S.createClass(contact.class.Email, core.class.Type, {})
     S.createClass(contact.class.Phone, core.class.Type, {})
@@ -105,15 +108,18 @@ describe('session', () => {
   })
 
   it('should build ClassUIModel', async () => {
-    await platform.getPlugin(core.id)
+    const coreService = await platform.getPlugin(core.id)
+    const session = coreService.newSession()
     const uiPlugin = await platform.getPlugin(ui.id)
-    const classModel = await uiPlugin.getClassModel(contact.class.Contact)
+    const classModel = await uiPlugin.getClassModel(await session.getInstance(contact.class.Contact))
     console.log(classModel)
   })
 
   it('should build AttrUIModel without strings loaded', async () => {
+    const coreService = await platform.getPlugin(core.id)
+    const session = coreService.newSession()
     const uiPlugin = await platform.getPlugin(ui.id)
-    const ownModel = await uiPlugin.getOwnAttrModel(contact.class.Contact)
+    const ownModel = await uiPlugin.getOwnAttrModel(await session.getInstance(contact.class.Contact))
     expect(ownModel[0].placeholder).toBe('email')
     expect(ownModel[0].label).toBe('email')
     // expect(ownModel[0].icon).toBe('http://email')
@@ -133,8 +139,10 @@ describe('session', () => {
       Phone_Label: 'Телефон'
     }))
 
+    const coreService = await platform.getPlugin(core.id)
+    const session = coreService.newSession()
     const uiPlugin = await platform.getPlugin(ui.id)
-    const ownModel = await uiPlugin.getOwnAttrModel(contact.class.Contact)
+    const ownModel = await uiPlugin.getOwnAttrModel(await session.getInstance(contact.class.Contact))
     expect(ownModel[0].placeholder).toBe('email')
     expect(ownModel[0].label).toBe('email')
     expect(ownModel[1].placeholder).toBe('+7 913 333 5555')
@@ -158,8 +166,10 @@ describe('session', () => {
     })
     i18nPlugin.loadStrings(translation)
 
+    const coreService = await platform.getPlugin(core.id)
+    const session = coreService.newSession()
     const uiPlugin = await platform.getPlugin(ui.id)
-    const ownModel = await uiPlugin.getOwnAttrModel(contact.class.Contact)
+    const ownModel = await uiPlugin.getOwnAttrModel(await session.getInstance(contact.class.Contact))
     expect(ownModel[0].placeholder).toBe('Электронная почта')
     expect(ownModel[0].label).toBe('Электронная почта')
     expect(ownModel[1].placeholder).toBe('+7 913 333 5555')
@@ -170,15 +180,13 @@ describe('session', () => {
     expect(ownModel[3].label).toBe('Twitter')
   })
 
-  it('should add ui decorator to Class<Class>', () => {
-    // const typeDecorator = session.getClass(ui.class.TypeUIDecorator)
-    // const classClass = session.getClass(core.class.Class)
-    // const decoClass = session.mixin(classClass, ui.class.ClassUIDecorator as Ref<Class<ClassUIDecorator<Class<Obj>>>>, {
-    //   decorators: {
-    //     _attributes: typeDecorator.newInstance({ label: 'The Label' as IntlString })
-    //   }
-    // })
-    // expect(decoClass.decorators?._attributes.label).toBe('The Label')
-    // expect(decoClass._native).toBe(core.native.Class)
+  it('should adapt to component', async () => {
+    const coreService = await platform.getPlugin(core.id)
+    const session = coreService.newSession()
+    try {
+      await session.adapt(core.class.Class, ComponentKind)
+    } catch (err) {
+      expect(err.message.startsWith('something')).toBe(true)
+    }
   })
 })

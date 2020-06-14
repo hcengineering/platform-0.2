@@ -33,7 +33,8 @@ export default defineComponent({
   async setup (props) {
     const _ = await injectPlatform({ core: core.id })
     const coreService = _.deps.core
-    const classes = coreService.getClassHierarchy(props.instance._class, props.top as Ref<Class<Obj>>)
+    const session = props.instance.getSession()
+    const classes = session.getClassHierarchy(props.instance._class, props.top as Ref<Class<Obj>>)
     return { classes }
   }
 })
