@@ -44,8 +44,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <div>
-    <div class="caption-5">{{path}} : {{operation}}</div>
+  <div style="height: 100%">
     <widget
       v-if="component"
       :component="component"

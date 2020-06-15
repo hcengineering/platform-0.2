@@ -14,22 +14,30 @@
 //
 
 import { plugin, Plugin, Service } from '@anticrm/platform'
-import { Ref, Doc, Property } from '@anticrm/platform-core'
+import { Property, Ref, Emb } from '@anticrm/platform-core'
+import { BusinessObject, User } from '@anticrm/platform-business'
+import { AnyComponent } from '@anticrm/platform-ui'
 
-// @Mixin
-export interface User extends Doc {
-}
-
-export interface Account extends Doc {
-  id: Property<string>
-  user: Ref<User>
-}
-
-export interface BusinessObject extends Doc {
-  createdOn: Property<Date>
-  createdBy: Ref<Account>
+interface Message {
   onBehalfOf: Ref<User>
+  createdOn: Property<Date>
+  text: Property<string>
 }
 
-export default plugin('business' as Plugin<Service>, {}, {
+interface EmbMessage extends Emb, Message { }
+
+export interface Channel extends BusinessObject {
+
+}
+
+export interface DocMessage extends BusinessObject, Message {
+  channel: Ref<Channel>
+  participants: Ref<User>[]
+  replies: EmbMessage[]
+}
+
+export default plugin('chunter' as Plugin<Service>, {}, {
+  component: {
+    Chunter: '' as AnyComponent
+  }
 })

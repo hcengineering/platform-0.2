@@ -17,13 +17,14 @@ import contact from '@anticrm/contact'
 import Builder from '@anticrm/platform-core/src/__model__/builder'
 
 import { Ref, Property } from '@anticrm/platform-core'
-import { Account } from '@anticrm/platform-business'
+import { Account, User } from '@anticrm/platform-business'
 
 function str (s: string): Property<string> { return s as unknown as Property<string> }
 
 export default async (S: Builder) => {
 
   S.createDocument(contact.class.Person, {
+    onBehalfOf: '' as unknown as Ref<User>,
     createdBy: '' as unknown as Ref<Account>,
     createdOn: '12 May 2020' as unknown as Property<Date>,
     firstName: str('Andrey'),
@@ -33,6 +34,7 @@ export default async (S: Builder) => {
   })
 
   S.createDocument(contact.class.Person, {
+    onBehalfOf: '' as unknown as Ref<User>,
     createdBy: '' as unknown as Ref<Account>,
     createdOn: '12 May 2020' as unknown as Property<Date>,
     firstName: str('Andrey'),
