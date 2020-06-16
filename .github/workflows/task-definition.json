@@ -1,76 +1,74 @@
 {
-    "taskDefinition": {
-        "taskDefinitionArn": "arn:aws:ecs:us-east-2:498671227303:task-definition/server-task-definition:1",
-        "containerDefinitions": [
-            {
-                "name": "anticrm-server",
-                "image": "anticrm/server",
-                "cpu": 256,
-                "memoryReservation": 512,
-                "links": [],
-                "portMappings": [
-                    {
-                        "containerPort": 8080,
-                        "hostPort": 8080,
-                        "protocol": "tcp"
-                    }
-                ],
-                "essential": true,
-                "entryPoint": [
-                    "sh",
-                    "-c"
-                ],
-                "command": [
-                    "/bin/sh -c \"echo '<html> <head> <title>Amazon ECS Sample App</title> <style>body {margin-top: 40px; background-color: #333;} </style> </head><body> <div style=color:white;text-align:center> <h1>Amazon ECS Sample App</h1> <h2>Congratulations!</h2> <p>Your application is now running on a container in Amazon ECS.</p> </div></body></html>' >  /usr/local/apache2/htdocs/index.html && httpd-foreground\""
-                ],
-                "environment": [],
-                "mountPoints": [],
-                "volumesFrom": [],
-                "logConfiguration": {
-                    "logDriver": "awslogs",
-                    "options": {
-                        "awslogs-group": "/ecs/server-task-definition",
-                        "awslogs-region": "us-east-2",
-                        "awslogs-stream-prefix": "ecs"
-                    }
+    "taskDefinitionArn": "arn:aws:ecs:us-east-2:498671227303:task-definition/server-task-definition:1",
+    "containerDefinitions": [
+        {
+            "name": "anticrm-server",
+            "image": "anticrm/server",
+            "cpu": 256,
+            "memoryReservation": 512,
+            "links": [],
+            "portMappings": [
+                {
+                    "containerPort": 8080,
+                    "hostPort": 8080,
+                    "protocol": "tcp"
+                }
+            ],
+            "essential": true,
+            "entryPoint": [
+                "sh",
+                "-c"
+            ],
+            "command": [
+                "/bin/sh -c \"echo '<html> <head> <title>Amazon ECS Sample App</title> <style>body {margin-top: 40px; background-color: #333;} </style> </head><body> <div style=color:white;text-align:center> <h1>Amazon ECS Sample App</h1> <h2>Congratulations!</h2> <p>Your application is now running on a container in Amazon ECS.</p> </div></body></html>' >  /usr/local/apache2/htdocs/index.html && httpd-foreground\""
+            ],
+            "environment": [],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/server-task-definition",
+                    "awslogs-region": "us-east-2",
+                    "awslogs-stream-prefix": "ecs"
                 }
             }
-        ],
-        "family": "server-task-definition",
-        "executionRoleArn": "arn:aws:iam::498671227303:role/ecsTaskExecutionRole",
-        "networkMode": "awsvpc",
-        "revision": 1,
-        "volumes": [],
-        "status": "ACTIVE",
-        "requiresAttributes": [
-            {
-                "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
-            },
-            {
-                "name": "ecs.capability.execution-role-awslogs"
-            },
-            {
-                "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
-            },
-            {
-                "name": "com.amazonaws.ecs.capability.docker-remote-api.1.21"
-            },
-            {
-                "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
-            },
-            {
-                "name": "ecs.capability.task-eni"
-            }
-        ],
-        "placementConstraints": [],
-        "compatibilities": [
-            "EC2",
-            "FARGATE"
-        ],
-        "requiresCompatibilities": [
-            "FARGATE"
-        ],
-        "cpu": "256",
-        "memory": "512"
-    }
+        }
+    ],
+    "family": "server-task-definition",
+    "executionRoleArn": "arn:aws:iam::498671227303:role/ecsTaskExecutionRole",
+    "networkMode": "awsvpc",
+    "revision": 1,
+    "volumes": [],
+    "status": "ACTIVE",
+    "requiresAttributes": [
+        {
+            "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
+        },
+        {
+            "name": "ecs.capability.execution-role-awslogs"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.21"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
+        },
+        {
+            "name": "ecs.capability.task-eni"
+        }
+    ],
+    "placementConstraints": [],
+    "compatibilities": [
+        "EC2",
+        "FARGATE"
+    ],
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "cpu": "256",
+    "memory": "512"
 }
