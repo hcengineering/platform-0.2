@@ -40,7 +40,7 @@ export default defineComponent({
       default: () => new Date(),
     }
   },
-  async setup(props) {
+  setup(props) {
     return {
       // date: props.date || new Date(),
       mondayStart: props.mondayStart || true,

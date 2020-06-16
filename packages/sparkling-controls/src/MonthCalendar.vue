@@ -39,22 +39,22 @@ export default defineComponent({
     /**
      * Date to show calendar month on.
      */
-    date: {
+    modelValue: {
       type: Date,
       default: () => new Date()
     },
   },
   setup(props) {
-    console.log("setup", props.date)
+    console.log("setup", props.modelValue)
     return {
-      selected: props.date,
+      selected: props.modelValue,
       /**
        * Return a month calendar first day
        * @param mondayStart
        * @param date
        */
       firstDay(): Date {
-        let firstDayOfMonth = new Date(this.date)
+        let firstDayOfMonth = new Date(this.modelValue)
         firstDayOfMonth.setDate(1) // First day of month
         let result = new Date(firstDayOfMonth)
         result.setDate(
@@ -103,6 +103,10 @@ export default defineComponent({
       },
       isWeekend(date: Date) {
         return date.getDay() == 0 || date.getDay() == 6
+      },
+      onSelect(date: Date) {
+        this.selected = date;
+        this.$emit('update:modelValue', date);
       }
     };
   }
@@ -122,10 +126,10 @@ export default defineComponent({
           class="td"
           :set="dd=wday(w,d)"
           :class="{'weekend': isWeekend(wday(w,d))}"
-          v-on:click="selected=wday(w,d)"
+          v-on:click="onSelect(wday(w,d))"
         >
           <div class="day-title" :class="{'today':isToday(dd), 'selected':isSelected(dd)}">
-            <div>{{dd.getDate() }}</div>
+            {{dd.getDate() }}
           </div>
         </div>
       </div>
@@ -169,6 +173,7 @@ export default defineComponent({
       display: inline-block;
       width: 20px;
       height: 20px;
+      line-height: 20px;
       text-align: center;
       div {
         // child divs, should not be pointered

@@ -43,7 +43,7 @@ export default defineComponent({
      */
     date: Date
   },
-  async setup(props) {
+  setup(props) {
     return {
       mode: CalendarMode.Month,
       yearShift: 0,

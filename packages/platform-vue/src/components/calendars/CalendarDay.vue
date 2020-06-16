@@ -27,7 +27,7 @@ export default defineComponent({
   props: {
     date: Date
   },
-  async setup(props) {
+  setup(props) {
     return {
       isToday(date: Date) {
         let now = new Date()

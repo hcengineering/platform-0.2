@@ -46,7 +46,7 @@ export default defineComponent({
       default: () => new Date()
     },
   },
-  async setup(props) {
+  setup(props) {
     console.log("setup", props.date)
     return {
       // date: props.date || new Date(),
