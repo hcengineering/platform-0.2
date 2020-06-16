@@ -4,8 +4,8 @@
         {
             "name": "anticrm-server",
             "image": "anticrm/server",
-            "cpu": 256,
-            "memoryReservation": 512,
+            "cpu": 1024,
+            "memoryReservation": 2048,
             "links": [],
             "portMappings": [
                 {
@@ -62,6 +62,6 @@
     "requiresCompatibilities": [
         "FARGATE"
     ],
-    "cpu": "256",
-    "memory": "512"
+    "cpu": "1024",
+    "memory": "2048"
 }
