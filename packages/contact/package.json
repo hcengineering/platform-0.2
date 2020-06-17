@@ -1,6 +1,6 @@
 {
   "name": "@anticrm/contact",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "main": "./src/index.ts",
   "scripts": {
     "test": "jest",
@@ -10,7 +10,7 @@
   "author": "Andrey Platov <andrey.v.platov@gmail.com>",
   "license": "EPL-2.0",
   "dependencies": {
-    "@anticrm/platform-ui": "0.1.0",
-    "@anticrm/sparkling-controls": "0.1.0"
+    "@anticrm/platform-ui": "^0.1.1",
+    "@anticrm/sparkling-controls": "^0.1.1"
   }
 }

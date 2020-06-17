@@ -1,6 +1,6 @@
 {
   "name": "@anticrm/platform-core",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Anticrm Platform Core",
   "main": "./src/index.ts",
   "scripts": {
@@ -29,9 +29,8 @@
     "eslint-plugin-standard": "^4.0.1",
     "jest": "^25.5.2",
     "lodash": "^4.17.15",
+    "simplytyped": "^3.3.0",
     "typedoc": "^0.17.6",
-    "typescript": "~3.9.4",
-    "simplytyped": "^3.3.0"
-  },
-  "dependencies": {}
+    "typescript": "~3.9.4"
+  }
 }
