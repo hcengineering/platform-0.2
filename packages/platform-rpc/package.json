@@ -8,5 +8,8 @@
     "test": "jest",
     "doc": "typedoc --out ./generated_docs --readme none",
     "lint": "eslint ./**/*.ts"
+  },
+  "dependencies": {
+    "@anticrm/platform": "^0.1.3"
   }
 }
