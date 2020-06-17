@@ -41,8 +41,8 @@ jobs:
 
     - name: Publish npms
       run: |
-        yarn workspace @anticrm/platform publish --access public --tag dev --no-git-tag-version --new-version 0.1.0-dev.${BUILD_NUMBER}
-        yarn workspace @anticrm/platform-core publish --access public --tag dev --no-git-tag-version --new-version 0.1.0-dev.${BUILD_NUMBER}
+        echo "yarn workspace @anticrm/platform publish --access public --tag dev --no-git-tag-version --new-version 0.1.0-dev.${BUILD_NUMBER}"
+        echo "yarn workspace @anticrm/platform-core publish --access public --tag dev --no-git-tag-version --new-version 0.1.0-dev.${BUILD_NUMBER}"
         echo "yarn workspace @anticrm/platform-core-plugin publish --access public --tag dev --no-git-tag-version --new-version 0.1.0-dev.${BUILD_NUMBER}"
       env:
         NODE_AUTH_TOKEN: ${{secrets.npm_token}}
