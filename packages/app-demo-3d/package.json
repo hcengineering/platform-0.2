@@ -1,6 +1,6 @@
 {
   "name": "@anticrm/demo-3d",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "main": "src/index.ts",
   "description": "AntiCRM Platform Workbench",
   "author": "Andrey Platov <andrey.v.platov@gmail.com>",
@@ -21,6 +21,6 @@
   },
   "dependencies": {
     "@anticrm/platform-core": "^0.1.1",
-    "@anticrm/platform-ui": "^0.1.2"
+    "@anticrm/platform-ui": "^0.1.3"
   }
 }
