@@ -52,5 +52,11 @@ function initDatabase (uri: string, tenant: string) {
 
 }
 
-initDatabase('mongodb://localhost:27017', 'company1')
+const mongodbUri = process.env.MONGODB_URI
+if (mongodbUri) {
+  console.log('uploading new model to MongoDB...')
+  initDatabase(mongodbUri, 'latest-model')
+} else {
+  console.log('skip database model update -- no mongodb uri provided.')
+}
 

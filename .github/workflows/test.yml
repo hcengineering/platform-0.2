@@ -8,6 +8,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+      with:
+        node-version: 14
+        registry-url: 'https://registry.npmjs.org'
+
     - name: Run tests
       run: |
         yarn install
@@ -15,14 +20,36 @@ jobs:
         yarn workspace @anticrm/platform-core run test
         yarn workspace @anticrm/platform-core-i18n run test
         yarn workspace @anticrm/platform-ui run test
+
     - name: Run lint
       run: |
         yarn workspace @anticrm/platform run lint
         yarn workspace @anticrm/platform-core run lint
         yarn workspace @anticrm/platform-core-i18n run lint
         yarn workspace @anticrm/platform-ui run lint
+
     - name: Run build
       run: |
         yarn workspace @anticrm/platform run build
         yarn workspace @anticrm/platform-core run build
+
+    - name: Generate build number
+      id: buildnumber
+      uses: einaregilsson/build-number@v2 
+      with:
+        token: ${{secrets.github_token}}   
+
+    - name: Publish npms
+      run: |
+        yarn workspace @anticrm/platform publish --access public --tag dev --no-git-tag-version --new-version 0.1.0-dev.${BUILD_NUMBER}
+        yarn workspace @anticrm/platform-core publish --access public --tag dev --no-git-tag-version --new-version 0.1.0-dev.${BUILD_NUMBER}
+        yarn workspace @anticrm/platform-core-plugin publish --access public --tag dev --no-git-tag-version --new-version 0.1.0-dev.${BUILD_NUMBER}
+      env:
+        NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+
+    - name: Final
+      run: |
         yarn workspace @anticrm/dev-boot run build
+        yarn workspace @anticrm/dev-boot run dump
+      env:
+        MONGODB_URI: ${{secrets.mongodb_uri}}
