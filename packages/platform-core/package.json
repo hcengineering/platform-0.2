@@ -2,7 +2,6 @@
   "name": "@anticrm/platform-core",
   "version": "0.1.0",
   "description": "Anticrm Platform Core",
-  "private": true,
   "main": "./src/index.ts",
   "scripts": {
     "build": "tsc",
