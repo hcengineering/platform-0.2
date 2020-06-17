@@ -14,7 +14,7 @@
 //
 
 import { Platform } from '@anticrm/platform'
-import { makeRequest, getResponse } from '@anticrm/platform-rpc'
+import { makeRequest, getResponse } from './rpc'
 
 import client, { ClientService } from '.'
 
