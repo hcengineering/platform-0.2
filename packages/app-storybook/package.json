@@ -1,6 +1,6 @@
 {
   "name": "@anticrm/app-storybook",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "main": "src/index.ts",
   "description": "AntiCRM Platform UI Plugin",
   "author": "Andrey Platov <andrey.v.platov@gmail.com>",
@@ -29,6 +29,6 @@
     "typescript": "~3.9.4"
   },
   "dependencies": {
-    "@anticrm/platform": "^0.1.1"
+    "@anticrm/platform": "^0.1.2"
   }
 }
