@@ -1,6 +1,6 @@
 {
   "name": "@anticrm/sparkling-3d",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "main": "src/index.ts",
   "description": "AntiCRM Platform UI Plugin",
   "author": "Andrey Platov <andrey.v.platov@gmail.com>",

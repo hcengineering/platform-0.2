@@ -1,6 +1,6 @@
 {
   "name": "@anticrm/platform-core",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Anticrm Platform Core",
   "main": "./src/index.ts",
   "scripts": {
@@ -34,6 +34,6 @@
     "typescript": "~3.9.4"
   },
   "dependencies": {
-    "@anticrm/platform": "^0.1.0"
+    "@anticrm/platform": "^0.1.4"
   }
 }

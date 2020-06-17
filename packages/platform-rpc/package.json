@@ -1,6 +1,6 @@
 {
   "name": "@anticrm/platform-rpc",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "main": "src/index.ts",
   "author": "Anticrm Platform Contributors (https://github.com/anticrm)",
   "license": "EPL-2.0",
@@ -10,6 +10,6 @@
     "lint": "eslint ./**/*.ts"
   },
   "dependencies": {
-    "@anticrm/platform": "^0.1.3"
+    "@anticrm/platform": "^0.1.4"
   }
 }
