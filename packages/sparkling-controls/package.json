@@ -1,6 +1,6 @@
 {
   "name": "@anticrm/sparkling-controls",
-  "version": "0.1.0",
+  "version": "0.1.4",
   "description": "Sparkling UI Controls",
   "author": "Andrey Platov <andrey.v.platov@gmail.com>",
   "license": "EPL-2.0",
@@ -26,9 +26,5 @@
     "jest": "^25.5.2",
     "typedoc": "^0.17.6",
     "typescript": "~3.9.4"
-  },
-  "dependencies": {
-    "@anticrm/platform": "0.1.0",
-    "three": "^0.116.1"
   }
 }

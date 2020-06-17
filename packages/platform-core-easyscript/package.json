@@ -1,6 +1,6 @@
 {
   "name": "@anticrm/platform-core-easyscript",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "main": "src/index.ts",
   "author": "Andrey Platov <andrey.v.platov@gmail.com>",
   "license": "EPL-2.0",
