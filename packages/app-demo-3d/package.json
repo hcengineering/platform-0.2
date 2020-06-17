@@ -20,7 +20,7 @@
     "typescript": "~3.9.4"
   },
   "dependencies": {
-    "@anticrm/platform-core": "^0.1.1",
+    "@anticrm/platform": "^0.1.1",
     "@anticrm/platform-ui": "^0.1.3"
   }
 }
