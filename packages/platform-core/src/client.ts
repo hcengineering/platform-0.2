@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { makeRequest, getResponse } from '@anticrm/platform/src/rpc'
+import { makeRequest, getResponse } from '@anticrm/platform-rpc/src/rpc'
 import { Ref, Class, Doc } from '.'
 
 export interface ClientService {
