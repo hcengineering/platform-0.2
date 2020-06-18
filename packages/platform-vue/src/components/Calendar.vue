@@ -23,9 +23,9 @@ import core, { Obj, Doc, Ref, Class, CoreService } from '@anticrm/platform-core'
 import ui, { UIService } from '@anticrm/platform-ui'
 import { injectPlatform } from ".."
 
-import MonthCalendar from "./calendars/MonthCalendar.vue"
-import YearCalendar from "./calendars/YearCalendar.vue"
-import Button from "@anticrm/sparkling-controls/src/Button.vue"
+import MonthCalendar from './calendars/MonthCalendar.vue'
+import YearCalendar from './calendars/YearCalendar.vue'
+import Button from '@anticrm/sparkling-controls/src/Button.vue'
 
 enum CalendarMode {
   Day, Week, Month, Year
