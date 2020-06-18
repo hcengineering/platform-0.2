@@ -15,6 +15,7 @@
 
 import { Platform } from '@anticrm/platform'
 
+import rpcStub from '@anticrm/platform-rpc-stub'
 import core from '@anticrm/platform-core'
 import i18n from '@anticrm/platform-core-i18n'
 import business from '@anticrm/platform-business'
@@ -38,7 +39,7 @@ import contactMeta from '@anticrm/contact/src/__model__/meta'
 import { Model, Strings } from '@anticrm/dev-boot/src/boot'
 
 const platform = new Platform()
-platform.setMetadata(core.metadata.MetaModel, Model)
+platform.setMetadata(rpcStub.metadata.Metamodel, Model)
 platform.setMetadata(i18n.metadata.BootStrings, Strings)
 platform.setMetadata(ui.metadata.DefaultApplication, mc.component.MissionControl)
 platform.setMetadata(mc.metadata.Applications, [
@@ -48,6 +49,7 @@ platform.setMetadata(mc.metadata.Applications, [
   login.component.LoginForm
 ])
 
+platform.addLocation(rpcStub, () => import(/* webpackChunkName: "platform-rpc-stub" */ '@anticrm/platform-rpc-stub/src/plugin'))
 platform.addLocation(core, () => import(/* webpackChunkName: "platform-core" */ '@anticrm/platform-core/src/plugin'))
 platform.addLocation(i18n, () => import(/* webpackChunkName: "platform-core-i18n" */ '@anticrm/platform-core-i18n/src/plugin'))
 platform.addLocation(ui, () => import(/* webpackChunkName: "platform-ui" */ '@anticrm/platform-ui/src/plugin'))

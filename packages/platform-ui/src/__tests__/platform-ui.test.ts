@@ -20,6 +20,7 @@ import { ClassUIDecorator, Asset, ComponentKind } from '..'
 import i18n, { IntlString } from '@anticrm/platform-core-i18n'
 import { verifyTranslation, modelTranslation } from '@anticrm/platform-core-i18n/src/__model__/utils'
 
+import rpcStub from '@anticrm/platform-rpc-stub'
 import core from '@anticrm/platform-core/src/__model__'
 import ui from '../__model__/'
 
@@ -33,6 +34,7 @@ type StringType = Property<string>
 
 describe('session', () => {
   const platform = new Platform()
+  platform.addLocation(rpcStub, () => import('@anticrm/platform-rpc-stub/src/plugin'))
   platform.addLocation(i18n, () => import('@anticrm/platform-core-i18n/src/plugin'))
   platform.addLocation(core, () => import('@anticrm/platform-core/src/plugin'))
   platform.addLocation(ui, () => import('../plugin'))
@@ -41,7 +43,7 @@ describe('session', () => {
   S.load(coreModel)
   S.load(i18nModel)
   S.load(uiModel)
-  platform.setMetadata(core.metadata.MetaModel, S.dump())
+  platform.setMetadata(rpcStub.metadata.Metamodel, S.dump())
 
   interface Contact extends Doc {
     email?: StringType

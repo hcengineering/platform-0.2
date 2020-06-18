@@ -16,10 +16,10 @@
 /* eslint-env jest */
 
 import { Platform } from '@anticrm/platform'
-import startPlugin from '../plugin'
 import model from '../__model__/model'
 import Builder from '../__model__/builder'
 import core from '../__model__'
+import rpcStub from '@anticrm/platform-rpc-stub'
 
 const DOC = 1 // see `plugin.ts`
 
@@ -30,13 +30,15 @@ describe('core', () => {
     const builder = new Builder()
     builder.load(model)
     const coreModel = builder.dump()
-    platform.setMetadata(core.metadata.MetaModel, coreModel)
+    platform.setMetadata(rpcStub.metadata.Metamodel, coreModel)
+    platform.addLocation(rpcStub, () => import('@anticrm/platform-rpc-stub/src/plugin'))
+    platform.addLocation(core, () => import('@anticrm/platform-core/src/plugin'))
     expect(true).toBe(true)
     console.log(JSON.stringify(coreModel))
   })
 
   it('should create prototype', async () => {
-    const plugin = await startPlugin(platform)
+    const plugin = await platform.getPlugin(core.id)
     const tx = plugin.newSession()
 
     const typeProto = await tx.getPrototype(core.class.Type, DOC)
@@ -53,7 +55,7 @@ describe('core', () => {
   })
 
   it('should instantiate class', async () => {
-    const plugin = await startPlugin(platform)
+    const plugin = await platform.getPlugin(core.id)
     const tx = plugin.newSession()
 
     const inst = await tx.getInstance(core.class.RefTo)
@@ -65,7 +67,7 @@ describe('core', () => {
   })
 
   it('should instantiate array', async () => {
-    const plugin = await startPlugin(platform)
+    const plugin = await platform.getPlugin(core.id)
     const tx = plugin.newSession()
 
     const result = await tx.find(core.class.Class, {})

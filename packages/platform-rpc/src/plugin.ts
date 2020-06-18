@@ -63,4 +63,5 @@ export default async (platform: Platform): Promise<ClientService> => {
       return request('load', [domain])
     }
   }
+
 }

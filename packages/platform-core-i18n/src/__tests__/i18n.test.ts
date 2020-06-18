@@ -17,6 +17,7 @@ import { Platform, Plugin, Service, plugin } from '@anticrm/platform'
 import { IntlString } from '..'
 import { verifyTranslation, modelTranslation } from '../__model__/utils'
 
+import rpcStub from '@anticrm/platform-rpc-stub'
 import core from '@anticrm/platform-core/src/__model__'
 import i18n from '../__model__'
 
@@ -55,7 +56,7 @@ const test = plugin(
 
 describe('i18n', () => {
   const platform = new Platform()
-  // platform.addLocation(db, () => import('@anticrm/platform-db/src/memdb'))
+  platform.addLocation(rpcStub, () => import('@anticrm/platform-rpc-stub/src/plugin'))
   platform.addLocation(core, () => import('@anticrm/platform-core/src/plugin'))
   platform.addLocation(i18n, () => import('../plugin'))
   // platform.setResolver('native', core.id)
@@ -112,7 +113,7 @@ describe('i18n', () => {
     const S = new Builder()
     S.load(metaModel)
     S.load(i18nModel)
-    platform.setMetadata(core.metadata.MetaModel, S.dump())
+    platform.setMetadata(rpcStub.metadata.Metamodel, S.dump())
     expect(true).toBe(true)
   })
 
