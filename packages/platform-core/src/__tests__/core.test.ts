@@ -21,14 +21,14 @@ import model from '../__model__/model'
 import Builder from '../__model__/builder'
 import core from '../__model__'
 import {mergeIds} from "../__model__/utils";
+import {ClientService, createClient} from "../client";
 const DOC = 1 // see `plugin.ts`
 
 describe('core', () => {
   const platform = new Platform()
 
-  it('should load model', async () => {
-    const tx = await startPlugin(platform)
-    const builder = new Builder(tx.getDb())
+  it('should build model', async () => {
+    const builder = new Builder()
     builder.load(model)
     const coreModel = builder.dump()
     expect(true).toBe(true)
@@ -36,9 +36,9 @@ describe('core', () => {
   })
 
   it('should create prototype', async () => {
-    const tx = await startPlugin(platform)
-    const builder = new Builder(tx.getDb())
-    builder.load(model)
+    const plugin = await startPlugin(platform)
+
+    const tx = plugin.newSession()
 
     const typeProto = await tx.getPrototype(core.class.Type, DOC)
     console.log(typeProto)
@@ -54,10 +54,8 @@ describe('core', () => {
   })
 
   it('should instantiate class', async () => {
-    const tx = await startPlugin(platform)
-    const builder = new Builder(tx.getDb())
-    builder.load(model)
-
+    const plugin = await startPlugin(platform)
+    const tx = plugin.newSession()
     const inst = await tx.getInstance(core.class.RefTo)
     const x = inst._attributes
     const to = await x.to
@@ -67,12 +65,8 @@ describe('core', () => {
   })
 
   it('should instantiate array', async () => {
-    const tx = await startPlugin(platform)
-    const builder = new Builder(tx.getDb())
-    builder.load(model)
-
-    // console.log(tx.getDb().dump())
-
+    const plugin = await startPlugin(platform)
+    const tx = plugin.newSession()
     const result = await tx.find(core.class.Class, {})
     console.log(result)
   })
@@ -80,11 +74,22 @@ describe('core', () => {
   it('should merge ids', () => {
 
     let mm1 : { [key: string]: { [key: string]: any } } = {}
-    mm1['k1'] = ['value11', 'value12']
+    mm1['k1'] = { key11: 'value' }
     let mm2 : { [key: string]: { [key: string]: any } } = {}
-    mm2['k2'] = ['value21', 'value22']
+    mm2['k2'] = { key21: 'value' }
     let mi = mergeIds(mm1, mm2)
-    expect(mi.k1).toStrictEqual(['value11', 'value12'])
-    expect(mi.k2).toStrictEqual(['value21', 'value22'])
+    expect(mi.k1).toStrictEqual({ key11: 'value' })
+    expect(mi.k2).toStrictEqual({ key21: 'value' })
+
+    mm1['k1'] = { key12: 'value' }
+    mm2['k2'] = { key12: 'value' }
+    mi = mergeIds(mm1, mm2)
+    expect(mi.k1).toStrictEqual({ key12: 'value' })
+    expect(mi.k2).toStrictEqual({ key12: 'value' })
+
+    mm1['k1'] = { key13: 'value' }
+    mm2['k1'] = { key23: 'value' }
+    mi = mergeIds(mm1, mm2)
+    expect(mi.k1).toStrictEqual({ key13: 'value', key23: 'value' })
   })
 })

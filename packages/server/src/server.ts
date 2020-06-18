@@ -48,7 +48,6 @@ export function start (port: number, dbUri: string) {
   wss.on('connection', function connection (ws: WebSocket, request: any, client: Client) {
     ws.on('message', async (msg: string) => {
       const request = getRequest(msg)
-      console.log('rpc: ' + request.meth)
       let service = clients.get(client.tenant)
       if (!service) {
         service = createClient(dbUri, client.tenant)

@@ -30,10 +30,6 @@ export default defineComponent({
     path: String,
     params: Object
   },
-  setup (props) {
-    console.log('Workbench: ')
-    console.log(props.params)
-  }
 })
 </script>
 
@@ -41,6 +37,7 @@ export default defineComponent({
   <div id="workbench">
     <header>
       <NewItemMenu />
+      <div class="caption-5">{{path}}</div>
     </header>
 
     <nav>
@@ -68,14 +65,14 @@ export default defineComponent({
 #workbench {
   display: grid;
 
-  grid-template-columns: $pictogram-size 250px 1fr auto;
+  grid-template-columns: $pictogram-size 1fr auto;
   grid-template-rows: $pictogram-size 1fr 24px;
 
   height: 100vh;
 
   header {
     grid-column-start: 1;
-    grid-column-end: 5;
+    grid-column-end: 4;
 
     grid-row-start: 1;
     grid-row-end: 2;
@@ -96,18 +93,18 @@ export default defineComponent({
 
   main {
     grid-column-start: 2;
-    grid-column-end: 4;
+    grid-column-end: 3;
 
     grid-row-start: 2;
     grid-row-end: 3;
 
     background-color: $content-bg-color;
-    padding: 0em 1em;
+    // padding: 0em 1em;
   }
 
   aside {
-    grid-column-start: 4;
-    grid-column-end: 5;
+    grid-column-start: 3;
+    grid-column-end: 4;
 
     grid-row-start: 2;
     grid-row-end: 3;
@@ -118,7 +115,7 @@ export default defineComponent({
 
   footer {
     grid-column-start: 1;
-    grid-column-end: 5;
+    grid-column-end: 4;
 
     grid-row-start: 3;
     grid-row-end: 4;

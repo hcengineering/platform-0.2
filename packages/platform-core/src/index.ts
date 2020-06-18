@@ -48,10 +48,10 @@ export type Resolve<T> = T extends Resource<infer X> ? Property<Promise<X>> : ne
 
 // O B J E C T S
 
-export interface Obj { _class: Ref<Class<this>> }
+export interface Obj { _class: Ref<Class<Obj>> }
 export interface Emb extends Obj { __embedded: true }
 export interface Doc extends Obj {
-  _id: Ref<this>
+  _id: Ref<Doc>
   _mixins?: Ref<Class<Doc>>[]
 }
 
@@ -84,10 +84,18 @@ type PropertyTypes<T> = {
 export type Attributes<T extends E, E extends Obj> = PropertyTypes<Required<Omit<T, keyof E>>>
 export type AllAttributes<T extends E, E extends Obj> = Attributes<T, E> & Partial<Attributes<E, Obj>>
 
-export interface EClass<T extends E, E extends Obj> extends Doc {
+export interface EClassifier<T extends E, E extends Obj> extends Doc {
   _attributes: AllAttributes<T, E>
+}
+
+export enum CoreDomain {
+  Model = 'model'
+}
+
+export interface EClass<T extends E, E extends Obj> extends EClassifier<T, E> {
   _extends?: Ref<Class<E>>
   _native?: Property<Object>
+  _domain?: Property<string>
 }
 
 export const ClassKind = 'class' as ResourceKind
@@ -109,7 +117,7 @@ export type Instance<T> = { [P in keyof T]:
   never
 } & {
   __layout: T
-  getSession (): CoreService
+  getSession (): Session
 }
 
 // A D A P T E R S
@@ -124,33 +132,36 @@ export interface Adapter extends Doc {
 
 // S E S S I O N
 
-export interface DocDb {
+export interface ModelDb {
   add (doc: Doc): void
   get<T extends Doc> (id: Ref<T>): T
   dump (): Doc[]
 
-  find<T extends Doc> (clazz: Ref<Class<T>>, query: Partial<T>): Promise<T[]>
+  find (clazz: Ref<Class<Doc>>, query: { [key: string]: PropertyType }): Promise<Doc[]>
 
   mixin<T extends E, E extends Doc> (id: Ref<E>, clazz: Ref<Class<T>>, values: Pick<T, Exclude<keyof T, keyof E>>): void
   createDocument<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Doc>, _id?: Ref<M>): M
 }
 
-export interface CoreService extends Service {
-  adapt (resource: Resource<any>, kind: string): Promise<Resource<any> | undefined>
-
+export interface Session {
   newInstance<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Doc>, _id?: Ref<M>): Promise<Instance<M>>
   getInstance<T extends Doc> (id: Ref<T>): Promise<Instance<T>>
   as<T extends Doc, A extends Doc> (obj: Instance<T>, _class: Ref<Class<A>>): Promise<Instance<A>>
   is<T extends Doc, A extends Doc> (obj: Instance<T>, _class: Ref<Class<A>>): boolean
-
-  getClassHierarchy (_class: Ref<Class<Obj>>, top?: Ref<Class<Obj>>): Ref<Class<Obj>>[]
-
   find<T extends Doc> (_class: Ref<Class<T>>, query: Partial<T>): Promise<Instance<T>[]>
+  adapt (resource: Resource<any>, kind: string): Promise<Resource<any> | undefined>
 
-  getDb (): DocDb
+  instantiateEmb<T extends Emb> (obj: T): Promise<Instance<T>>
+
+  getModel (): ModelDb
+  getClassHierarchy (_class: Ref<Class<Obj>>, top?: Ref<Class<Obj>>): Ref<Class<Obj>>[]
 
   // debug?
   getPrototype<T extends Obj> (_class: Ref<Class<T>>, stereotype: number /* for tests */): Promise<Object>
+}
+
+export interface CoreService extends Service {
+  newSession (): Session
 }
 
 // P L U G I N

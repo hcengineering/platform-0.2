@@ -15,10 +15,19 @@
 
 import { App, inject } from 'vue'
 import { Metadata, plugin, Plugin, Service, Platform, PluginDependencies, InferPlugins, Resource } from '@anticrm/platform'
-import { AnyComponent } from '@anticrm/platform-ui'
+import { CoreService, Session } from '@anticrm/platform-core'
+import { UIService, AnyComponent } from '@anticrm/platform-ui'
 
 export type URL = string
 export type Asset = Metadata<URL>
+
+export const CoreInjectionKey = Symbol('core')
+export const UIInjectionKey = Symbol('ui')
+export const SessionInjectionKey = Symbol('session')
+
+export function getCoreService () { return inject(CoreInjectionKey) as CoreService }
+export function getUIService () { return inject(UIInjectionKey) as UIService }
+export function getSession () { return inject(SessionInjectionKey) as Session }
 
 // S T A T E
 

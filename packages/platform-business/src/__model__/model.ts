@@ -20,13 +20,13 @@ import business from '.'
 
 export default (S: Builder) => {
   S.createClass(business.class.Account, core.class.Doc, {
-    id: S.newInstance(core.class.Type, {
-    })
+    id: S.newInstance(core.class.Type, {}),
+    user: S.ref(business.class.User)
   })
 
   S.createClass(business.class.BusinessObject, core.class.Doc, {
-    createdOn: S.newInstance(core.class.Type, {
-    }),
-    createdBy: S.ref(business.class.Account)
+    createdOn: S.newInstance(core.class.Type, {}),
+    createdBy: S.ref(business.class.Account),
+    onBehalfOf: S.ref(business.class.User)
   })
 }

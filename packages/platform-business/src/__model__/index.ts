@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import business, { Account, BusinessObject } from '..'
+import business, { Account, User, BusinessObject } from '..'
 import { Ref, Class } from '@anticrm/platform-core'
 
 import { extendIds } from '@anticrm/platform-core/src/__model__/utils'
@@ -21,6 +21,7 @@ import { extendIds } from '@anticrm/platform-core/src/__model__/utils'
 export default extendIds(business, {
   class: {
     Account: '' as Ref<Class<Account>>,
+    User: '' as Ref<Class<User>>,
     BusinessObject: '' as Ref<Class<BusinessObject>>
   }
 })

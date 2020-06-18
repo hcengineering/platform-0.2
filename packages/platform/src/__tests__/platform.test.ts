@@ -15,7 +15,7 @@
 
 /* eslint-env jest */
 
-import {Platform, identify, Plugin, Service, Resource, Metadata} from '..'
+import { Platform, identify, Plugin, Service, Resource, Metadata } from '..'
 
 import { plugin1, descriptor1, plugin1State, plugin2, descriptor2, plugin2State, plugin3, descriptor3 } from './shared'
 
@@ -128,7 +128,7 @@ describe('platform', () => {
 
     platform.loadMetadata(ids.meta, {
       M1: 'hey',
-      M2: 'there',
+      M2: 'there'
     })
 
     expect(platform.getMetadata(ids.meta.M1)).toBe('hey')
@@ -141,7 +141,7 @@ describe('platform', () => {
       meta: {
         M1: 'test-meta' as Metadata<string>,
         M2: 'test-meta2' as Metadata<string>,
-        M3: '' as Metadata<string>,
+        M3: '' as Metadata<string>
       }
     })
     platform.setMetadata(ids.meta.M1, 'new-test-meta')

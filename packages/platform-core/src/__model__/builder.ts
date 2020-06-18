@@ -16,17 +16,21 @@
 import { Resource, Metadata } from '@anticrm/platform'
 import {
   PropertyType, Emb, Doc, Obj, Ref, EClass, Class,
-  AllAttributes, DocDb, Property, RefTo
+  AllAttributes, ModelDb, Property, RefTo, CoreDomain
 } from '@anticrm/platform-core'
 import core from '.'
 import { MemDb } from '../memdb'
 
 type Layout = { [key: string]: PropertyType }
 
-class Builder {
-  private memdb: DocDb
+function str (value: string): Property<string> {
+  return value as unknown as Property<string>
+}
 
-  constructor (memdb?: DocDb) {
+class Builder {
+  private memdb: ModelDb
+
+  constructor (memdb?: ModelDb) {
     this.memdb = memdb ?? new MemDb()
   }
 
@@ -34,12 +38,14 @@ class Builder {
 
   // N E W  I N S T A N C E S
 
-  createClass<T extends E, E extends Obj> (_id: Ref<Class<T>>, _extends: Ref<Class<E>>, _attributes: AllAttributes<T, E>) {
-    this.createDocument(core.class.Class as Ref<Class<EClass<T, E>>>, { _extends, _attributes }, _id as Ref<EClass<T, E>>)
+  createClass<T extends E, E extends Obj> (_id: Ref<Class<T>>, _extends: Ref<Class<E>>, _attributes: AllAttributes<T, E>, domain: string = CoreDomain.Model) {
+    this.createDocument(core.class.Class as Ref<Class<EClass<T, E>>>,
+      { _extends, _attributes, _domain: str(domain) },
+      _id as Ref<EClass<T, E>>)
   }
 
   newInstance<M extends Emb> (_class: Ref<Class<M>>, values: Omit<M, keyof Emb>): M {
-    const obj = { _class, ...values } as M
+    const obj = { _class: _class as Ref<Class<Obj>>, ...values } as M
     return obj
   }
 

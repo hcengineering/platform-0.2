@@ -16,10 +16,9 @@
 <script lang="ts">
 import { defineComponent, reactive, computed, provide, inject, watch, PropType } from 'vue'
 import { Platform, Resource, getResourceKind } from '@anticrm/platform'
-import { injectPlatform } from '@anticrm/platform-vue'
+import { getSession } from '@anticrm/platform-vue'
 import core, { Ref, Class, Doc, CoreService, ClassKind, Instance } from '@anticrm/platform-core'
 import ui, { AnyComponent, UIService, ComponentKind } from '@anticrm/platform-ui'
-import { getCoreService } from '..'
 
 import Button from '@anticrm/sparkling-controls/src/Button.vue'
 
@@ -32,25 +31,10 @@ export default defineComponent({
 
   // Adapt `content` to a `Component`. Forward to `Component`.
   async setup (props, context) {
-    const split = props.path.split('/')
-    const operation = split[1]
-    const resource = split[0] as Resource<any>
-    const coreService = getCoreService()
-    const component = await coreService.adapt(resource, ComponentKind)
-
-    // let document: Ref<Doc>
-    // if (getResourceKind(resource) === ClassKind) {
-    //   const _class = resource as Ref<Class<Doc>>
-    //   document = coreService.getDb().createDocument(_class, {
-    //     firstName: 'Валентин Генрихович',
-    //     lastName: 'Либерзон',
-    //     phone: '+7 913 333 7777'
-    //   })._id
-    //   console.log('CREATE!')
-    //   console.log(document)
-    //   console.log('PARAMS:')
-    //   console.log(props.params)
-    // }
+    const session = getSession()
+    const operation = computed(() => props.path.split('/')[1])
+    const resource = props.path.split('/')[0] as Resource<any>
+    const component = await session.adapt(resource, ComponentKind)
 
     return {
       component, resource, operation
@@ -60,11 +44,13 @@ export default defineComponent({
 </script>
 
 <template>
-  <widget
-    v-if="component"
-    :component="component"
-    :resource="resource"
-    :operation="operation"
-    :params="params"
-  />
+  <div style="height: 100%">
+    <widget
+      v-if="component"
+      :component="component"
+      :resource="resource"
+      :operation="operation"
+      :params="params"
+    />
+  </div>
 </template>

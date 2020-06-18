@@ -37,9 +37,5 @@ export default async (platform: Platform) => {
   platform.setResource(storybook.component.Persons, Persons)
   platform.setResource(storybook.component.Controls, Controls)
 
-  // const memdb = deps.core.getDb()
-  // const builder = new Builder(memdb)
-  // builder.load(demoModel)
-
   return {}
 }

@@ -15,4 +15,4 @@
 
 import { start } from './server'
 
-start(3333, 'mongodb://localhost:27017')
+start(8080, 'mongodb://localhost:27017')

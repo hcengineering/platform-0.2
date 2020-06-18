@@ -16,9 +16,9 @@
 import { Platform, Service } from '@anticrm/platform'
 import { CoreService, Obj, Doc, Ref, Instance, Class } from '@anticrm/platform-core'
 import ui, { UIService, AnyComponent } from '@anticrm/platform-ui'
-import vue, { VueService } from '@anticrm/platform-vue'
+import vue, { VueService, SessionInjectionKey, CoreInjectionKey, UIInjectionKey } from '@anticrm/platform-vue'
 
-import workbench, { WorkbenchService, ViewModel, ViewModelKind, CoreInjectionKey, UIInjectionKey } from '.'
+import workbench, { WorkbenchService } from '.'
 import Workbench from './internal/Workbench.vue'
 
 console.log('PLUGIN: `workbench` parsed')
@@ -35,30 +35,33 @@ export default async (platform: Platform, deps: { core: CoreService, ui: UIServi
 
   // V I E W  M O D E L
 
-  async function getViewModel (_class: Ref<Class<Doc>>, kind: ViewModelKind): Promise<ViewModel> {
-    const clazz = await coreService.getInstance(_class)
-    // if (!coreService.is(doc, ui.class.Form)) {
-    //   doc = await doc._class
-    // }
-    if (!coreService.is(clazz, ui.class.Form)) {
-      throw new Error(`something went wrong, can't find 'Form' for the ${_class}.`)
-    }
-    const component = (await coreService.as(clazz, ui.class.Form)).form
-    //const object = clazz.newInstance()
-    return {
-      kind: ViewModelKind.NEW_FORM,
-      component,
-      content: {} as Doc
-    }
-  }
+  // async function getViewModel (_class: Ref<Class<Doc>>, kind: ViewModelKind): Promise<ViewModel> {
+  //   const clazz = await coreService.getInstance(_class)
+  //   // if (!coreService.is(doc, ui.class.Form)) {
+  //   //   doc = await doc._class
+  //   // }
+  //   if (!coreService.is(clazz, ui.class.Form)) {
+  //     throw new Error(`something went wrong, can't find 'Form' for the ${_class}.`)
+  //   }
+  //   const component = (await coreService.as(clazz, ui.class.Form)).form
+  //   //const object = clazz.newInstance()
+  //   return {
+  //     kind: ViewModelKind.NEW_FORM,
+  //     component,
+  //     content: {} as Doc
+  //   }
+  // }
 
   // W O R K B E N C H  M O D E L
+
+  const session = deps.core.newSession()
 
   deps.vue.getApp()
     .provide(CoreInjectionKey, deps.core)
     .provide(UIInjectionKey, deps.ui)
+    .provide(SessionInjectionKey, session)
 
   return {
-    getViewModel
+    // getViewModel
   }
 }

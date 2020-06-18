@@ -22,6 +22,7 @@ import ui from '@anticrm/platform-ui'
 import vue from '@anticrm/platform-vue'
 import workbench from '@anticrm/platform-workbench'
 import contact from '@anticrm/contact'
+import chunter from '@anticrm/chunter'
 import demo from '@anticrm/demo-3d'
 import mc from '@anticrm/app-mission-control'
 import storybook from '@anticrm/app-storybook'
@@ -33,30 +34,11 @@ import uiMeta from '@anticrm/platform-vue/src/__meta__/meta'
 import workbenchMeta from '@anticrm/platform-workbench/src/__model__/meta'
 import contactMeta from '@anticrm/contact/src/__model__/meta'
 
-import contactRu from '@anticrm/contact/src/__model__/strings/ru'
-
-import Builder from '@anticrm/platform-core/src/__model__/builder'
-
-import coreModel from '@anticrm/platform-core/src/__model__/model'
-import i18nModel from '@anticrm/platform-core-i18n/src/__model__/model'
-import businessModel from '@anticrm/platform-business/src/__model__/model'
-import uiModel from '@anticrm/platform-ui/src/__model__/model'
-import contactModel from '@anticrm/contact/src/__model__/model'
-import workbenchModel from '@anticrm/platform-workbench/src/__model__/model'
-import demoModel from '@anticrm/app-storybook/src/__model__/model'
-
-const builder = new Builder()
-builder.load(coreModel)
-builder.load(i18nModel)
-builder.load(businessModel)
-builder.load(uiModel)
-builder.load(workbenchModel)
-builder.load(contactModel)
-builder.load(demoModel)
+import { Model, Strings } from '@anticrm/dev-boot/src/boot'
 
 const platform = new Platform()
-platform.setMetadata(core.metadata.MetaModel, builder.dump())
-platform.setMetadata(i18n.metadata.BootStrings, contactRu)
+platform.setMetadata(core.metadata.MetaModel, Model)
+platform.setMetadata(i18n.metadata.BootStrings, Strings)
 platform.setMetadata(ui.metadata.DefaultApplication, mc.component.MissionControl)
 platform.setMetadata(mc.metadata.Applications, [
   workbench.component.Workbench,
@@ -70,6 +52,7 @@ platform.addLocation(ui, () => import(/* webpackChunkName: "platform-ui" */ '@an
 platform.addLocation(vue, () => import(/* webpackChunkName: "platform-vue" */ '@anticrm/platform-vue/src/plugin'))
 platform.addLocation(workbench, () => import(/* webpackChunkName: "platform-workbench" */ '@anticrm/platform-workbench/src/plugin'))
 platform.addLocation(contact, () => import(/* webpackChunkName: "contact" */ '@anticrm/contact/src/plugin'))
+platform.addLocation(chunter, () => import(/* webpackChunkName: "chunter" */ '@anticrm/chunter/src/plugin'))
 platform.addLocation(demo, () => import(/* webpackChunkName: "demo-3d" */ '@anticrm/demo-3d/src/plugin'))
 platform.addLocation(mc, () => import(/* webpackChunkName: "mission-control" */ '@anticrm/app-mission-control/src/plugin'))
 platform.addLocation(storybook, () => import(/* webpackChunkName: "storybook" */ '@anticrm/app-storybook/src/plugin'))

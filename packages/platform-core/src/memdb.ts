@@ -13,26 +13,26 @@
 // limitations under the License.
 //
 
-import { DocDb, Ref, Doc, Class, Obj, PropertyType } from '.'
+import { Ref, Doc, Class, Obj, PropertyType } from '.'
 import { generateId } from './objectid'
 import { attributeKey } from './plugin'
 
-type Layout = { [key: string]: PropertyType }
+export type Layout = { [key: string]: PropertyType }
 
-export class MemDb implements DocDb {
+export class MemDb {
 
   private objects = new Map<Ref<Doc>, Doc>()
   private byClass: Map<Ref<Class<Obj>>, Doc[]> | null = null
 
-  objectsOfClass<T extends Doc> (_class: Ref<Class<T>>): T[] {
+  objectsOfClass (_class: Ref<Class<Doc>>): Doc[] {
     console.log('indexing database...')
     if (!this.byClass) {
-      this.byClass = new Map<Ref<Class<Obj>>, Doc[]>()
+      this.byClass = new Map<Ref<Class<Doc>>, Doc[]>()
       for (const doc of this.objects.values()) {
         this.index(doc)
       }
     }
-    return this.byClass.get(_class) as T[]
+    return this.byClass.get(_class) ?? []
   }
 
   set (doc: Doc) {
@@ -128,18 +128,18 @@ export class MemDb implements DocDb {
   }
 
   // Q U E R Y
-  async find<T extends Doc> (clazz: Ref<Class<T>>, query: Partial<T>): Promise<T[]> {
+  async find (clazz: Ref<Class<Doc>>, query: { [key: string]: PropertyType }): Promise<Doc[]> {
     const byClass = this.objectsOfClass(clazz)
     return findAll(byClass, clazz, query)
   }
 
-  async findOne<T extends Doc> (clazz: Ref<Class<T>>, query: Partial<T>): Promise<T | undefined> {
+  async findOne (clazz: Ref<Class<Doc>>, query: { [key: string]: PropertyType }): Promise<Doc | undefined> {
     const result = await this.find(clazz, query)
     return result.length == 0 ? undefined : result[0]
   }
 }
 
-function findAll<T extends Doc> (docs: T[], clazz: Ref<Class<T>>, query: Partial<T>): T[] {
+function findAll (docs: Doc[], clazz: Ref<Class<Doc>>, query: { [key: string]: PropertyType }): Doc[] {
   let result = docs
 
   for (const key in query) {
@@ -148,11 +148,11 @@ function findAll<T extends Doc> (docs: T[], clazz: Ref<Class<T>>, query: Partial
     result = filterEq(result, aKey, condition as PropertyType)
   }
 
-  return result as T[]
+  return result
 }
 
-function filterEq<T extends Doc> (docs: T[], propertyKey: string, value: PropertyType): T[] {
-  const result: T[] = []
+function filterEq (docs: Doc[], propertyKey: string, value: PropertyType): Doc[] {
+  const result: Doc[] = []
   for (const doc of docs) {
     if (value === (doc as any)[propertyKey]) {
       result.push(doc)

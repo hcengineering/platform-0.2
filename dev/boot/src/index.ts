@@ -13,34 +13,13 @@
 // limitations under the License.
 //
 
-import Builder from '@anticrm/platform-core/src/__model__/builder'
-
-import coreModel from '@anticrm/platform-core/src/__model__/model'
-import i18nModel from '@anticrm/platform-core-i18n/src/__model__/model'
-import uiModel from '@anticrm/platform-ui/src/__model__/model'
-import contactModel from '@anticrm/contact/src/__model__/model'
-import workbenchModel from '@anticrm/platform-workbench/src/__model__/model'
-import demoModel from '@anticrm/app-storybook/src/__model__/model'
-
-import contactRu from '@anticrm/contact/src/__model__/strings/ru'
-
 import { MongoClient } from 'mongodb'
+import { Model, Strings } from './boot'
 
-const builder = new Builder()
-builder.load(coreModel)
-builder.load(i18nModel)
-builder.load(uiModel)
-builder.load(workbenchModel)
-builder.load(contactModel)
-builder.load(demoModel)
-
-console.log('model:')
-const model = builder.dump()
-const modelJson = JSON.stringify(model)
+const modelJson = JSON.stringify(Model)
 console.log(modelJson)
 
-console.log('strings:')
-const stringsJson = JSON.stringify(contactRu)
+const stringsJson = JSON.stringify(Strings)
 console.log(stringsJson)
 
 const fs = require('fs')
@@ -66,7 +45,7 @@ function initDatabase (uri: string, tenant: string) {
     const db = client.db(tenant)
     db.collection('model', (err, coll) => {
       coll.deleteMany({}, () => {
-        coll.insertMany(model).then(() => { client.close() })
+        coll.insertMany(Model).then(() => { client.close() })
       })
     })
   })

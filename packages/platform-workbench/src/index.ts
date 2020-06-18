@@ -15,9 +15,10 @@
 
 import { inject } from 'vue'
 import { plugin, Service, Plugin, Resource } from '@anticrm/platform'
-import core, { Ref, Class, Doc, CoreService, Property } from '@anticrm/platform-core'
+import core, { Ref, Class, Doc, CoreService, Property, Session } from '@anticrm/platform-core'
 import ui, { AnyComponent, UIService } from '@anticrm/platform-ui'
 import vue, { Asset } from '@anticrm/platform-vue'
+import { CoreInjectionKey, UIInjectionKey, SessionInjectionKey } from '@anticrm/platform-vue'
 
 // C O R E  M O D E L
 
@@ -43,16 +44,8 @@ export interface ViewModel {
 
 // S E R V I C E
 
-export const CoreInjectionKey = Symbol('core')
-export const UIInjectionKey = Symbol('ui')
-export const WorkbenchInjectionKey = Symbol('workbenchState')
-
-export function getCoreService () { return inject(CoreInjectionKey) as CoreService }
-export function getUIService () { return inject(UIInjectionKey) as UIService }
-
-
 export interface WorkbenchService extends Service {
-  getViewModel (_class: Ref<Class<Doc>>, kind: ViewModelKind): Promise<ViewModel>
+  // getViewModel (_class: Ref<Class<Doc>>, kind: ViewModelKind): Promise<ViewModel>
 }
 
 export interface MainModel extends ViewModel {
