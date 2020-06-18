@@ -46,6 +46,10 @@ $border-default: 1px solid $workspace-separator-color;
   font-weight: 400;
   
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;  
+  -moz-osx-font-smoothing: grayscale;
+
+  input {
+    color: $content-color;
+  }
 
 }

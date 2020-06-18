@@ -24,7 +24,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <button type="button" class="erp-button" :disabled="disabled">
+  <button type="button" class="crm-button" :disabled="disabled">
     <slot />
   </button>
 </template>
@@ -32,7 +32,7 @@ export default defineComponent({
 <style lang="scss">
 @import "~@anticrm/sparkling-theme/css/_variables.scss";
 
-.erp-button {
+.crm-button {
   display: inline-block;
   border: 1px solid currentColor;
   border-radius: 2em;
@@ -48,16 +48,21 @@ export default defineComponent({
   color: inherit;
   background-color: inherit;
 
+  &:focus {
+    outline: none;
+    border-color: $highlight-color;
+    box-shadow: inset 0px 0px 2px 0px $highlight-color;
+  }
+
   &.large {
     padding: 0.75em 1.5em 0.75em;
   }
 
   &:hover {
-    // border-color: $highlight-color;
-    // box-shadow:inset 0px 0px 2px 0px $highlight-color;
+    border-color: $highlight-color;
     // color: $highlight-color;
     // background-color: $highlight-color;
-    background-color: darken($highlight-color, 5%);
+    background-color: darken($highlight-color, 10%);
   }
 
   &.primary {

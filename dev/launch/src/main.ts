@@ -26,6 +26,7 @@ import chunter from '@anticrm/chunter'
 import demo from '@anticrm/demo-3d'
 import mc from '@anticrm/app-mission-control'
 import storybook from '@anticrm/app-storybook'
+import login from '@anticrm/platform-login'
 
 import { createApp } from 'vue'
 import ErrorPage from './components/ErrorPage.vue'
@@ -43,7 +44,8 @@ platform.setMetadata(ui.metadata.DefaultApplication, mc.component.MissionControl
 platform.setMetadata(mc.metadata.Applications, [
   workbench.component.Workbench,
   demo.component.Periodic,
-  storybook.component.Storybook
+  storybook.component.Storybook,
+  login.component.LoginForm
 ])
 
 platform.addLocation(core, () => import(/* webpackChunkName: "platform-core" */ '@anticrm/platform-core/src/plugin'))
@@ -56,6 +58,7 @@ platform.addLocation(chunter, () => import(/* webpackChunkName: "chunter" */ '@a
 platform.addLocation(demo, () => import(/* webpackChunkName: "demo-3d" */ '@anticrm/demo-3d/src/plugin'))
 platform.addLocation(mc, () => import(/* webpackChunkName: "mission-control" */ '@anticrm/app-mission-control/src/plugin'))
 platform.addLocation(storybook, () => import(/* webpackChunkName: "storybook" */ '@anticrm/app-storybook/src/plugin'))
+platform.addLocation(login, () => import(/* webpackChunkName: "login" */ '@anticrm/platform-login/src/plugin'))
 
 uiMeta(platform)
 workbenchMeta(platform)

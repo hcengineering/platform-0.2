@@ -16,6 +16,7 @@
 import { Platform } from '@anticrm/platform'
 
 import core, { Doc } from '@anticrm/platform-core'
+import rpc from '@anticrm/platform-rpc'
 import i18n from '@anticrm/platform-core-i18n'
 import ui from '@anticrm/platform-ui'
 import vue from '@anticrm/platform-vue'
@@ -48,6 +49,7 @@ platform.setMetadata(mc.metadata.Applications, [
 ])
 
 platform.addLocation(core, () => import(/* webpackChunkName: "platform-core" */ '@anticrm/platform-core/src/plugin'))
+platform.addLocation(rpc, () => import(/* webpackChunkName: "platform-rpc" */ '@anticrm/platform-rpc/src/plugin'))
 platform.addLocation(i18n, () => import(/* webpackChunkName: "platform-core-i18n" */ '@anticrm/platform-core-i18n/src/plugin'))
 platform.addLocation(ui, () => import(/* webpackChunkName: "platform-ui" */ '@anticrm/platform-ui/src/plugin'))
 platform.addLocation(vue, () => import(/* webpackChunkName: "platform-vue" */ '@anticrm/platform-vue/src/plugin'))

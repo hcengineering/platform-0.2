@@ -25,8 +25,8 @@ import client, { ClientService } from '.'
   */
 export default async (platform: Platform): Promise<ClientService> => {
 
-  const host = platform.getMetadata(client.metadata.WSHost)
-  const port = platform.getMetadata(client.metadata.WSPort)
+  const host = platform.getMetadata(client.metadata.WSHost) || 'localhost'
+  const port = platform.getMetadata(client.metadata.WSPort) || 18080
 
   // { tenant: 'company1' }
   const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0ZW5hbnQiOiJjb21wYW55MSJ9.t8xg-wosznL6qYTCvsHfznq_Xe7iHeGjU1VAUBgyy7s'

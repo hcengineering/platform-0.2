@@ -18,6 +18,8 @@ import {
   Metadata, ResourceKind
 } from '@anticrm/platform'
 
+import rpc from '@anticrm/platform-rpc'
+
 // P R O P E R T I E S
 
 /** 
@@ -166,7 +168,7 @@ export interface CoreService extends Service {
 
 // P L U G I N
 
-export default plugin('core' as Plugin<CoreService>, {}, {
+export default plugin('core' as Plugin<CoreService>, { rpc: rpc.id }, {
   metadata: {
     MetaModel: '' as Metadata<Doc[]>,
     WSHost: '' as Metadata<string>,
@@ -193,5 +195,3 @@ export default plugin('core' as Plugin<CoreService>, {}, {
     StaticResource: '' as Resource<Object>
   },
 })
-
-
