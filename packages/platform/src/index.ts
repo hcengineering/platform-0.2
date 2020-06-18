@@ -13,17 +13,17 @@
 // limitations under the License.
 //
 
-/** 
- * Platform Resource Identifier. 
- * 
+/**
+ * Platform Resource Identifier.
+ *
  * 'Resource' is simply any JavaScript object. There is a plugin exists, which 'resolve' PRI into actual object.
  * This is a difference from Metadata. Metadata object 'resolved' by Platform instance, so we may consider Metadata as
- * a Resource, provided by Platform itself. Because there is always a plugin, which resolve `Resource` resolution is 
+ * a Resource, provided by Platform itself. Because there is always a plugin, which resolve `Resource` resolution is
  * aynchronous process.
- * 
- * `Resource` is a string of `kind:plugin.id` format. Since Metadata is a kind of Resource. 
+ *
+ * `Resource` is a string of `kind:plugin.id` format. Since Metadata is a kind of Resource.
  * Metadata also can be reolved using resource API.
- * 
+ *
  * Examples of `Resource`:
  * ```typescript
  *   `class:contact.Person` as Resource<Class<Person>> // database object with id === `class:contact.Person`
@@ -36,9 +36,9 @@ export type Resource<T> = string & { __resource: T }
 
 /**
  * Platform Metadata Identifier (PMI).
- * 
+ *
  * 'Metadata' is simply any JavaScript object, which is used to configure platform, e.g. IP addresses.
- * Another example of metadata is an asset URL. The logic behind providing asset URLs as metadata is 
+ * Another example of metadata is an asset URL. The logic behind providing asset URLs as metadata is
  * we know URL at compile time only and URLs vary depending on deployment options.
  */
 export type Metadata<T> = Resource<T> & { __metadata: true }
