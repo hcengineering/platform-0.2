@@ -14,7 +14,7 @@
 //
 
 import { Platform } from '@anticrm/platform'
-import { ClientService } from '@anticrm/platform-rpc'
+import { RpcService, Response } from '@anticrm/platform-rpc'
 import { MemDb } from './memdb'
 import { Ref, Class } from './types'
 import rpcStub from '.'
@@ -24,7 +24,7 @@ import rpcStub from '.'
   * Copyright © 2020 Anticrm Platform Contributors. All Rights Reserved.
   * Licensed under the Eclipse Public License, Version 2.0
   */
-export default async (platform: Platform): Promise<ClientService> => {
+export default async (platform: Platform): Promise<RpcService> => {
 
   const metamodel = platform.getMetadata(rpcStub.metadata.Metamodel)
   if (!metamodel)
@@ -33,12 +33,26 @@ export default async (platform: Platform): Promise<ClientService> => {
   const memdb = new MemDb()
   memdb.loadModel(metamodel)
 
+  function find (_class: string, query: {}): Promise<[]> {
+    return memdb.find(_class as Ref<Class>, query) as Promise<[]>
+  }
+
+  async function load (): Promise<[]> {
+    return memdb.dump() as []
+  }
+
   return {
-    find (_class: string, query: {}): Promise<[]> {
-      return memdb.find(_class as Ref<Class>, query) as Promise<[]>
-    },
-    async load (): Promise<[]> {
-      return memdb.dump() as []
+    async request<P extends any[], R> (method: string, ...params: P): Promise<Response<R>> {
+      switch (method) {
+        case 'load':
+          return { result: await load() as unknown as R }
+        case 'find':
+          const _class = params[0] as string
+          const query = params[1] as {}
+          return { result: await find(_class, query) as unknown as R }
+        default:
+          throw new Error('Unknown rpc method')
+      }
     }
   }
 

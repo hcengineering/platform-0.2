@@ -15,12 +15,34 @@
 
 import { plugin, Plugin, Service, Metadata } from '@anticrm/platform'
 
-export interface ClientService extends Service {
-  find (_class: string, query: {}): Promise<[]>
-  load (domain: string): Promise<[]>
+export type ReqId = string | number
+
+export interface Request<P extends any[]> {
+  id?: ReqId
+  method: string
+  params: P
 }
 
-export default plugin('rpc' as Plugin<ClientService>, {}, {
+export interface RpcError {
+  code: number
+  message?: string
+  data?: any
+}
+
+export interface Response<R> {
+  result?: R
+  id?: ReqId
+  error?: RpcError
+}
+
+export interface RpcService extends Service {
+  request<P extends any[], R> (method: string, ...params: P): Promise<Response<R>>
+
+  // find (_class: string, query: {}): Promise<[]>
+  // load (domain: string): Promise<[]>
+}
+
+export default plugin('rpc' as Plugin<RpcService>, {}, {
   metadata: {
     WSHost: '' as Metadata<string>,
     WSPort: '' as Metadata<number>

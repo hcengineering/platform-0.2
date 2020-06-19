@@ -14,16 +14,15 @@
 //
 
 import { Platform } from '@anticrm/platform'
-import { makeRequest, getResponse } from './rpc'
 
-import client, { ClientService } from '.'
+import client, { RpcService, Request, Response } from '.'
 
 /*!
   * Anticrm Platform™ Core Internationalization Plugin
   * Copyright © 2020 Anticrm Platform Contributors. All Rights Reserved.
   * Licensed under the Eclipse Public License, Version 2.0
   */
-export default async (platform: Platform): Promise<ClientService> => {
+export default async (platform: Platform): Promise<RpcService> => {
 
   const host = platform.getMetadata(client.metadata.WSHost) || 'localhost'
   const port = platform.getMetadata(client.metadata.WSPort) || 18080
@@ -36,17 +35,25 @@ export default async (platform: Platform): Promise<ClientService> => {
   const requests = new Map<number | string, (value?: any) => void>()
   let lastId = 0
 
-  function request (meth: string, params: any[]): Promise<any> {
+  function makeRequest<P extends any[]> (request: Request<P>): string {
+    return JSON.stringify(request)
+  }
+
+  function getResponse<D> (res: string): Response<D> {
+    return JSON.parse(res as string)
+  }
+
+  function request<P extends any[], R> (method: string, ...params: P): Promise<Response<R>> {
     return new Promise<any>((resolve, reject) => {
       const id = ++lastId
       requests.set(id, resolve)
-      websocket.send(makeRequest({ id, meth, params }))
+      websocket.send(makeRequest({ id, method, params }))
     })
   }
 
   websocket.onmessage = (ev: MessageEvent) => {
     const response = getResponse(ev.data)
-    if (response.id === null) { throw new Error('rpc id should not be null') }
+    if (!response.id) { throw new Error('rpc id should not be null') }
     const resolve = requests.get(response.id)
     if (resolve) {
       resolve(response.result)
@@ -56,12 +63,14 @@ export default async (platform: Platform): Promise<ClientService> => {
   }
 
   return {
-    find (_class: string, query: {}): Promise<[]> {
-      return request('find', [_class, query])
-    },
-    load (domain: string): Promise<[]> {
-      return request('load', [domain])
-    }
+    request,
+
+    // find (_class: string, query: {}): Promise<[]> {
+    //   return request('find', [_class, query])
+    // },
+    // load (domain: string): Promise<[]> {
+    //   return request('load', [domain])
+    // }
   }
 
 }

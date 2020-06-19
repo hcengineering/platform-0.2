@@ -122,6 +122,15 @@ export type Instance<T> = { [P in keyof T]:
   getSession (): Session
 }
 
+export type Values<T> = { [P in keyof T]:
+  T[P] extends Property<infer X> | undefined ? X :
+  T[P] extends Ref<infer X> ? Ref<X> :
+  T[P] extends { __embedded: true } ? Instance<T[P]> :
+  T[P] extends { [key: string]: infer X } | undefined ? { [key: string]: Instance<X> } :
+  T[P] extends (infer X)[] | undefined ? Instance<X>[] :
+  never
+}
+
 // A D A P T E R S
 
 export type AdapterType = (resource: Resource<any>) => Promise<Resource<any> | undefined>
@@ -145,12 +154,18 @@ export interface ModelDb {
   createDocument<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Doc>, _id?: Ref<M>): M
 }
 
+export interface Cursor<T extends Doc> {
+  all (): Promise<Instance<T>[]>
+}
+
 export interface Session {
-  newInstance<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Doc>, _id?: Ref<M>): Promise<Instance<M>>
+  newInstance<M extends Doc> (_class: Ref<Class<M>>, values: Values<Omit<M, keyof Doc>>, _id?: Ref<M>): Promise<Instance<M>>
   getInstance<T extends Doc> (id: Ref<T>): Promise<Instance<T>>
   as<T extends Doc, A extends Doc> (obj: Instance<T>, _class: Ref<Class<A>>): Promise<Instance<A>>
   is<T extends Doc, A extends Doc> (obj: Instance<T>, _class: Ref<Class<A>>): boolean
-  find<T extends Doc> (_class: Ref<Class<T>>, query: Partial<T>): Promise<Instance<T>[]>
+  find<T extends Doc> (_class: Ref<Class<T>>, query: Partial<T>): Cursor<T>
+  commit (): Promise<void>
+
   adapt (resource: Resource<any>, kind: string): Promise<Resource<any> | undefined>
 
   instantiateEmb<T extends Emb> (obj: T): Promise<Instance<T>>

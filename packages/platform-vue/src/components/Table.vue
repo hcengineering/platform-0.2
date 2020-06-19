@@ -30,7 +30,7 @@ export default defineComponent({
     const session = getSession()
     const uiService = getUIService()
     const model = uiService.getAttrModel(await session.getInstance(props.clazz))
-    const content = session.find(props.clazz, {})
+    const content = session.find(props.clazz, {}).all()
     return {
       model: await model, content: await content
     }

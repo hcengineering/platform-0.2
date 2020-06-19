@@ -14,7 +14,7 @@
 //
 
 import { plugin, Plugin, Service, Metadata } from '@anticrm/platform'
-import rpc, { ClientService } from '@anticrm/platform-rpc'
+import rpc, { RpcService } from '@anticrm/platform-rpc'
 
 export default plugin(rpc.id, {}, {
   metadata: {

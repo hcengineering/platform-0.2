@@ -13,13 +13,15 @@
 // limitations under the License.
 //
 
-import core, { Doc, Ref, Class, Obj, Emb, Instance, Type, Property, Session, PropertyType, Adapter } from '.'
+import { RpcService } from '@anticrm/platform-rpc'
+import core, { Doc, Ref, Class, Obj, Emb, Instance, Type, Property, Session, Values, Adapter, Cursor } from '.'
 import { MemDb, Layout } from './memdb'
 import { generateId } from './objectid'
 import { Platform, Resource, ResourceKind } from '@anticrm/platform'
 import { attributeKey } from './plugin'
+import { result, Function } from 'lodash'
 
-export function createSession (platform: Platform, modelDb: MemDb): Session {
+export function createSession (platform: Platform, modelDb: MemDb, rpc: RpcService): Session {
 
   type Konstructor<T extends Obj> = new (obj: Omit<T, '__property' | '_class'>) => Instance<T>
 
@@ -28,7 +30,7 @@ export function createSession (platform: Platform, modelDb: MemDb): Session {
     DOC
   }
 
-  // I N S T A N C E S
+  // M O D E L
 
   const konstructors = new Map<Ref<Class<Obj>>, Konstructor<Obj>>()
   const prototypes = new Map<Ref<Class<Obj>>, Object>()
@@ -122,16 +124,37 @@ export function createSession (platform: Platform, modelDb: MemDb): Session {
     return new ctor(obj) as Instance<T>
   }
 
-  // A P I : R E A D
+  // I N S T A N C E S
 
-  function newInstance<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Doc>, _id?: Ref<M>): Promise<Instance<M>> {
-    const doc = modelDb.createDocument(_class, values, _id)
-    return getInstance(doc._id) as Promise<Instance<M>>
+  const newObjects = new Map<Ref<Doc>, Doc>()
+
+  async function newInstance<M extends Doc> (_class: Ref<Class<M>>, values: Values<Omit<M, keyof Doc>>, id?: Ref<M>): Promise<Instance<M>> {
+    const _id = id ?? generateId() as Ref<Doc>
+    const layout = { _class, _id } as Doc
+    newObjects.set(_id, layout)
+
+    const instance = await instantiateDoc(layout)
+    for (const key in values) {
+      (instance as any)[key] = (values as any)[key]
+    }
+
+    return instance as Instance<M>
+  }
+
+  async function commit () {
+    for (const o of newObjects) {
+      console.log(o[1])
+    }
   }
 
   async function getInstance<T extends Doc> (id: Ref<T>): Promise<Instance<T>> {
-    const doc = modelDb.get(id)
-    return instantiateDoc(doc)
+    //const doc = modelDb.get(id)
+    let doc = newObjects.get(id)
+    if (!doc) {
+      doc = modelDb.get(id)
+      if (!doc) { throw new Error('no document ,id: ' + id) }
+    }
+    return instantiateDoc(doc as T)
   }
 
   async function as<T extends Doc, A extends Doc> (doc: Instance<T>, _class: Ref<Class<A>>): Promise<Instance<A>> {
@@ -147,10 +170,27 @@ export function createSession (platform: Platform, modelDb: MemDb): Session {
     return mixins && mixins.includes(_class as Ref<Class<Doc>>)
   }
 
-  async function find<T extends Doc> (_class: Ref<Class<T>>, query: Partial<T>): Promise<Instance<T>[]> {
-    const layout = await modelDb.find(_class as Ref<Class<Doc>>, query as { [key: string]: PropertyType })
-    const result = layout.map(doc => instantiateDoc(doc))
-    return Promise.all(result) as Promise<Instance<T>[]>
+  // find (_class: string, query: {}): Promise<[]> {
+  //   return request('find', [_class, query])
+  // },
+  // load (domain: string): Promise<[]> {
+  //   return request('load', [domain])
+  // }
+
+
+  function findRequest<T extends Doc> (_class: Ref<Class<T>>, query: Partial<T>) {
+    return rpc.request<[Ref<Class<T>>, Partial<T>], Doc[]>('find', _class, query)
+  }
+
+  function find<T extends Doc> (_class: Ref<Class<T>>, query: Partial<T>): Cursor<T> {
+    const resp = findRequest(_class, query)
+
+    return {
+      async all (): Promise<Instance<T>[]> {
+        const result = await resp.then(resolved => (resolved.result as T[]).map(doc => instantiateDoc(doc)))
+        return Promise.all(result)
+      }
+    }
   }
 
   async function adapt (resource: Resource<any>, kind: string): Promise<Resource<any> | undefined> {
@@ -181,6 +221,7 @@ export function createSession (platform: Platform, modelDb: MemDb): Session {
   }
 
   const session: Session = {
+    commit,
     getClassHierarchy,
     newInstance,
     getInstance,

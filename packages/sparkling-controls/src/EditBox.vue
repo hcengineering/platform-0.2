@@ -26,7 +26,7 @@ export default defineComponent({
 
 <template>
   <input
-    class="crm-editbox"
+    class="edit-box"
     :value="modelValue"
     @input="$emit('update:modelValue', $event.target.value)"
   />
@@ -35,7 +35,7 @@ export default defineComponent({
 <style lang="scss">
 @import "~@anticrm/sparkling-theme/css/_variables.scss";
 
-.crm-editbox {
+.edit-box {
   border: 1px solid $workspace-separator-color;
   border-radius: 0.5em;
   padding: 0.5em 0.75em;

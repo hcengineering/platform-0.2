@@ -15,11 +15,11 @@
 
 import { Platform, Resource, Metadata } from '@anticrm/platform'
 import core, {
-  CoreService, Obj, Ref, Class, BagOf, InstanceOf, PropertyType,
+  CoreService, Obj, Doc, Ref, Class, BagOf, InstanceOf, PropertyType,
   Instance, Type, Emb, StaticResource, Exert, Property
 } from '.'
 import { MemDb } from './memdb'
-import { ClientService } from '@anticrm/platform-rpc'
+import { RpcService } from '@anticrm/platform-rpc'
 import { createSession } from './session'
 
 // TODO: Platform.getResourceInfo
@@ -36,7 +36,7 @@ export function attributeKey (_class: Ref<Class<Obj>>, key: string): string {
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */
-export default async (platform: Platform, deps: { rpc: ClientService }): Promise<CoreService> => {
+export default async (platform: Platform, deps: { rpc: RpcService }): Promise<CoreService> => {
   console.log('PLUGIN: started core')
 
   // C L I E N T
@@ -46,12 +46,17 @@ export default async (platform: Platform, deps: { rpc: ClientService }): Promise
 
   const client = deps.rpc //host ? await createClient(host, port) : createNullClient()
 
+  function loadRequest (domain: string) { return client.request<[], Doc[]>('load') }
+
   // M E T A M O D E L
 
   console.log(deps.rpc)
 
   const modelDb = new MemDb()
-  const metaModel = await client.load('model')
+  const resp = await loadRequest('model')
+  console.log(resp)
+  const metaModel = resp.result
+  if (!metaModel) { throw new Error('no metamodel') }
   console.log(metaModel)
   modelDb.loadModel(metaModel)
 
@@ -86,7 +91,7 @@ export default async (platform: Platform, deps: { rpc: ClientService }): Promise
   // C O R E  S E R V I C E
 
   const coreService: CoreService = {
-    newSession () { return createSession(platform, modelDb) },
+    newSession () { return createSession(platform, modelDb, client) },
     // getClassHierarchy,
   }
 

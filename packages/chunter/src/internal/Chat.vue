@@ -16,53 +16,32 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 
-import Chat from './Chat.vue'
-import ChatInput from './ChatInput.vue'
+import EditBox from '@anticrm/sparkling-controls/src/EditBox.vue'
 
 export default defineComponent({
-  components: { Chat, ChatInput },
+  components: { EditBox },
+  setup () {
+    function submit (value: string) {
+      console.log('todo: submit ' + value)
+    }
+    return { submit }
+  }
 })
 </script>
 
 <template>
-  <div id="chunter">
-    <nav># general</nav>
-    <main>
-      <Chat />
-      <ChatInput />
-    </main>
+  <div class="chunter-chat">
+    <div>Chat window</div>
   </div>
 </template>
 
 <style lang="scss">
 @import "~@anticrm/sparkling-theme/css/_variables.scss";
 
-#chunter {
+.chunter-chat {
   display: flex;
+  flex-direction: column;
   align-items: stretch;
-
   height: 100%;
-
-  font-size: 13px;
-
-  nav {
-    width: 250px;
-
-    background-color: $nav-bg-color;
-    border-left: 1px solid $workspace-separator-color;
-    border-right: 1px solid $workspace-separator-color;
-
-    padding: 1em;
-  }
-
-  main {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    height: 100%;
-
-    background-color: $content-bg-color;
-    padding: 0em 1em;
-  }
 }
 </style>
