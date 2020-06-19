@@ -15,10 +15,10 @@
 
 import { Platform } from '@anticrm/platform'
 
-import client, { RpcService, Request, Response } from '.'
+import client, { RpcService, ReqId, Request, Response } from '.'
 
 /*!
-  * Anticrm Platform™ Core Internationalization Plugin
+  * Anticrm Platform™ Remote Procedure Call Plugin
   * Copyright © 2020 Anticrm Platform Contributors. All Rights Reserved.
   * Licensed under the Eclipse Public License, Version 2.0
   */
@@ -32,7 +32,8 @@ export default async (platform: Platform): Promise<RpcService> => {
 
   const websocket = new WebSocket('ws://' + host + ':' + port + '/' + token)
 
-  const requests = new Map<number | string, (value?: any) => void>()
+  interface PromiseInfo { resolve: (value?: any) => void, reject: (error: any) => void }
+  const requests = new Map<ReqId, PromiseInfo>()
   let lastId = 0
 
   function makeRequest<P extends any[]> (request: Request<P>): string {
@@ -43,10 +44,10 @@ export default async (platform: Platform): Promise<RpcService> => {
     return JSON.parse(res as string)
   }
 
-  function request<P extends any[], R> (method: string, ...params: P): Promise<Response<R>> {
+  function request<P extends any[], R> (method: string, ...params: P): Promise<R> {
     return new Promise<any>((resolve, reject) => {
       const id = ++lastId
-      requests.set(id, resolve)
+      requests.set(id, { resolve, reject })
       websocket.send(makeRequest({ id, method, params }))
     })
   }
@@ -54,9 +55,13 @@ export default async (platform: Platform): Promise<RpcService> => {
   websocket.onmessage = (ev: MessageEvent) => {
     const response = getResponse(ev.data)
     if (!response.id) { throw new Error('rpc id should not be null') }
-    const resolve = requests.get(response.id)
-    if (resolve) {
-      resolve(response.result)
+    const promise = requests.get(response.id)
+    if (promise) {
+      if (response.error) {
+        promise.reject(response.error)
+      } else {
+        promise.resolve(response.result)
+      }
     } else {
       throw new Error('unknown rpc id')
     }
@@ -64,13 +69,6 @@ export default async (platform: Platform): Promise<RpcService> => {
 
   return {
     request,
-
-    // find (_class: string, query: {}): Promise<[]> {
-    //   return request('find', [_class, query])
-    // },
-    // load (domain: string): Promise<[]> {
-    //   return request('load', [domain])
-    // }
   }
 
 }

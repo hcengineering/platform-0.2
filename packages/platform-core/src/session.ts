@@ -142,9 +142,13 @@ export function createSession (platform: Platform, modelDb: MemDb, rpc: RpcServi
   }
 
   async function commit () {
-    for (const o of newObjects) {
-      console.log(o[1])
+    const commit = {
+      create: [] as Doc[]
     }
+    for (const o of newObjects) {
+      commit.create.push(o[1])
+    }
+    const resp = rpc.request('commit', commit)
   }
 
   async function getInstance<T extends Doc> (id: Ref<T>): Promise<Instance<T>> {
@@ -183,11 +187,11 @@ export function createSession (platform: Platform, modelDb: MemDb, rpc: RpcServi
   }
 
   function find<T extends Doc> (_class: Ref<Class<T>>, query: Partial<T>): Cursor<T> {
-    const resp = findRequest(_class, query)
+    const layouts = findRequest(_class, query)
 
     return {
       async all (): Promise<Instance<T>[]> {
-        const result = await resp.then(resolved => (resolved.result as T[]).map(doc => instantiateDoc(doc)))
+        const result = await layouts.then(resolved => (resolved as T[]).map(doc => instantiateDoc(doc)))
         return Promise.all(result)
       }
     }

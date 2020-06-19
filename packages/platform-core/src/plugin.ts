@@ -53,10 +53,7 @@ export default async (platform: Platform, deps: { rpc: RpcService }): Promise<Co
   console.log(deps.rpc)
 
   const modelDb = new MemDb()
-  const resp = await loadRequest('model')
-  console.log(resp)
-  const metaModel = resp.result
-  if (!metaModel) { throw new Error('no metamodel') }
+  const metaModel = await loadRequest('model')
   console.log(metaModel)
   modelDb.loadModel(metaModel)
 

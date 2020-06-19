@@ -42,14 +42,18 @@ export default async (platform: Platform): Promise<RpcService> => {
   }
 
   return {
-    async request<P extends any[], R> (method: string, ...params: P): Promise<Response<R>> {
+    request<P extends any[], R> (method: string, ...params: P): Promise<R> {
       switch (method) {
         case 'load':
-          return { result: await load() as unknown as R }
+          return load() as unknown as Promise<R>
         case 'find':
           const _class = params[0] as string
           const query = params[1] as {}
-          return { result: await find(_class, query) as unknown as R }
+          return find(_class, query) as unknown as Promise<R>
+        case 'commit':
+          const commit = params[0]
+          console.log(commit)
+          return Promise.resolve({}) as Promise<R>
         default:
           throw new Error('Unknown rpc method')
       }
