@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { RpcService } from '@anticrm/platform-rpc'
+import { RpcService, Response } from '@anticrm/platform-rpc'
 import core, { Doc, Ref, Class, Obj, Emb, Instance, Type, Property, Session, Values, Adapter, Cursor } from '.'
 import { MemDb, Layout } from './memdb'
 import { generateId } from './objectid'
@@ -128,6 +128,11 @@ export function createSession (platform: Platform, modelDb: MemDb, rpc: RpcServi
 
   const newObjects = new Map<Ref<Doc>, Doc>()
 
+  rpc.addEventListener((response: Response<unknown>) => {
+    console.log('response')
+    console.log(response)
+  })
+
   async function newInstance<M extends Doc> (_class: Ref<Class<M>>, values: Values<Omit<M, keyof Doc>>, id?: Ref<M>): Promise<Instance<M>> {
     const _id = id ?? generateId() as Ref<Doc>
     const layout = { _class, _id } as Doc
@@ -143,10 +148,10 @@ export function createSession (platform: Platform, modelDb: MemDb, rpc: RpcServi
 
   async function commit () {
     const commit = {
-      create: [] as Doc[]
+      created: [] as Doc[]
     }
     for (const o of newObjects) {
-      commit.create.push(o[1])
+      commit.created.push(o[1])
     }
     const resp = rpc.request('commit', commit)
   }

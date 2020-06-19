@@ -35,11 +35,11 @@ export interface Response<R> {
   error?: RpcError
 }
 
+export type EventListener = (event: Response<unknown>) => void
+
 export interface RpcService extends Service {
   request<P extends any[], R> (method: string, ...params: P): Promise<R>
-
-  // find (_class: string, query: {}): Promise<[]>
-  // load (domain: string): Promise<[]>
+  addEventListener (listener: EventListener): void
 }
 
 export default plugin('rpc' as Plugin<RpcService>, {}, {

@@ -15,7 +15,7 @@
 
 import { Platform } from '@anticrm/platform'
 
-import client, { RpcService, ReqId, Request, Response } from '.'
+import client, { RpcService, ReqId, Request, Response, EventListener } from '.'
 
 /*!
   * Anticrm Platform™ Remote Procedure Call Plugin
@@ -52,23 +52,33 @@ export default async (platform: Platform): Promise<RpcService> => {
     })
   }
 
+  const listeners: EventListener[] = []
+
   websocket.onmessage = (ev: MessageEvent) => {
     const response = getResponse(ev.data)
-    if (!response.id) { throw new Error('rpc id should not be null') }
-    const promise = requests.get(response.id)
-    if (promise) {
-      if (response.error) {
-        promise.reject(response.error)
-      } else {
-        promise.resolve(response.result)
+    if (!response.id) {
+      for (const listener of listeners) {
+        listener(response)
       }
     } else {
-      throw new Error('unknown rpc id')
+      const promise = requests.get(response.id)
+      if (promise) {
+        if (response.error) {
+          promise.reject(response.error)
+        } else {
+          promise.resolve(response.result)
+        }
+      } else {
+        throw new Error('unknown rpc id')
+      }
     }
   }
 
   return {
     request,
+    addEventListener (listener: EventListener) {
+      listeners.push(listener)
+    }
   }
 
 }

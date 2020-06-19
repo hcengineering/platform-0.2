@@ -19,7 +19,7 @@ import core, {
   Instance, Type, Emb, StaticResource, Exert, Property
 } from '.'
 import { MemDb } from './memdb'
-import { RpcService } from '@anticrm/platform-rpc'
+import { RpcService, Response } from '@anticrm/platform-rpc'
 import { createSession } from './session'
 
 // TODO: Platform.getResourceInfo
@@ -39,23 +39,31 @@ export function attributeKey (_class: Ref<Class<Obj>>, key: string): string {
 export default async (platform: Platform, deps: { rpc: RpcService }): Promise<CoreService> => {
   console.log('PLUGIN: started core')
 
-  // C L I E N T
+  // R P C
 
-  // const host = platform.getMetadata(core.metadata.WSHost)
-  // const port = platform.getMetadata(core.metadata.WSPort)
+  const rpc = deps.rpc
 
-  const client = deps.rpc //host ? await createClient(host, port) : createNullClient()
-
-  function loadRequest (domain: string) { return client.request<[], Doc[]>('load') }
+  function loadRequest (domain: string) { return rpc.request<[], Doc[]>('load') }
 
   // M E T A M O D E L
-
-  console.log(deps.rpc)
 
   const modelDb = new MemDb()
   const metaModel = await loadRequest('model')
   console.log(metaModel)
   modelDb.loadModel(metaModel)
+
+  const layouts = new Map<Ref<Doc>, Doc>()
+
+  interface CommitInfo {
+    created: Doc[]
+  }
+
+  rpc.addEventListener((response: Response<unknown>) => {
+    const commitInfo = response.result as CommitInfo
+    for (const doc of commitInfo.created) {
+      layouts.set(doc._id, doc)
+    }
+  })
 
   // C L A S S E S
 
@@ -88,7 +96,7 @@ export default async (platform: Platform, deps: { rpc: RpcService }): Promise<Co
   // C O R E  S E R V I C E
 
   const coreService: CoreService = {
-    newSession () { return createSession(platform, modelDb, client) },
+    newSession () { return createSession(platform, modelDb, rpc) },
     // getClassHierarchy,
   }
 

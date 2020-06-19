@@ -14,9 +14,9 @@
 //
 
 import { Platform } from '@anticrm/platform'
-import { RpcService, Response } from '@anticrm/platform-rpc'
+import { RpcService, Response, EventListener } from '@anticrm/platform-rpc'
 import { MemDb } from './memdb'
-import { Ref, Class } from './types'
+import { Ref, Class, Doc } from './types'
 import rpcStub from '.'
 
 /*!
@@ -33,12 +33,24 @@ export default async (platform: Platform): Promise<RpcService> => {
   const memdb = new MemDb()
   memdb.loadModel(metamodel)
 
+  const listeners: EventListener[] = []
+
   function find (_class: string, query: {}): Promise<[]> {
     return memdb.find(_class as Ref<Class>, query) as Promise<[]>
   }
 
   async function load (): Promise<[]> {
     return memdb.dump() as []
+  }
+
+  interface CommitInfo {
+    created: Doc[]
+  }
+
+  async function commit (commitInfo: CommitInfo): Promise<void> {
+    for (const listener of listeners) {
+      listener({ result: commitInfo })
+    }
   }
 
   return {
@@ -51,12 +63,13 @@ export default async (platform: Platform): Promise<RpcService> => {
           const query = params[1] as {}
           return find(_class, query) as unknown as Promise<R>
         case 'commit':
-          const commit = params[0]
-          console.log(commit)
-          return Promise.resolve({}) as Promise<R>
+          return commit(params[0] as CommitInfo) as unknown as Promise<R>
         default:
           throw new Error('Unknown rpc method')
       }
+    },
+    addEventListener (listener: EventListener) {
+      listeners.push(listener)
     }
   }
 
