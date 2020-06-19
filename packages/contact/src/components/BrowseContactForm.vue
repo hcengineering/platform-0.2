@@ -16,6 +16,8 @@
 <script lang="ts">
 import { defineComponent, ref, reactive, inject, computed, PropType } from 'vue'
 import core, { Ref, Doc, Class, Instance, ClassKind } from '@anticrm/platform-core'
+import { getSession, getUIService } from '@anticrm/platform-vue'
+
 import { Person } from '..'
 
 import Table from '@anticrm/platform-vue/src/components/Table.vue'
@@ -26,6 +28,25 @@ export default defineComponent({
   props: {
     resource: String as unknown as PropType<Ref<Class<Person>>>,
     params: Object
+  },
+  setup (props) {
+    const session = getSession()
+    const uiService = getUIService()
+
+    const model = ref([])
+    const content = ref([])
+
+    session.getInstance(props.resource)
+      .then(clazz => uiService.getAttrModel(clazz))
+      .then(attrs => model.value = attrs)
+
+    session.query(props.resource, {}, result => {
+      console.log('QUERY return: ')
+      console.log(result)
+      content.value = result
+    })
+
+    return { model, content }
   }
 })
 </script>
@@ -34,9 +55,7 @@ export default defineComponent({
   <div>
     <div class="caption-1">Персоны</div>
     <LinkTo :path="`${resource}/new`">Новая Персона</LinkTo>
-    <Suspense>
-      <Table :clazz="resource" exclude />
-    </Suspense>
+    <Table :model="model" :content="content" />
   </div>
 </template>
 

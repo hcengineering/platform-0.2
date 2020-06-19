@@ -17,24 +17,14 @@
 
 import { defineComponent, PropType, inject } from 'vue'
 import core, { Obj, Doc, Ref, Class, CoreService } from '@anticrm/platform-core'
-import ui, { UIService } from '@anticrm/platform-ui'
-import { getSession, getUIService } from '@anticrm/platform-vue'
+import ui, { UIService, AttrModel } from '@anticrm/platform-ui'
 
 export default defineComponent({
   components: {},
   props: {
-    clazz: String as unknown as PropType<Ref<Class<Doc>>>,
-    exclude: String as PropType<string[] | string>,
-  },
-  async setup (props) {
-    const session = getSession()
-    const uiService = getUIService()
-    const model = uiService.getAttrModel(await session.getInstance(props.clazz))
-    const content = session.find(props.clazz, {}).all()
-    return {
-      model: await model, content: await content
-    }
-  },
+    model: Array as PropType<AttrModel[]>,
+    content: Array as PropType<Doc[]>
+  }
 })
 </script>
 

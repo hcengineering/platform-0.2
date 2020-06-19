@@ -169,6 +169,7 @@ export interface Session {
   as<T extends Doc, A extends Doc> (obj: Instance<T>, _class: Ref<Class<A>>): Promise<Instance<A>>
   is<T extends Doc, A extends Doc> (obj: Instance<T>, _class: Ref<Class<A>>): boolean
   find<T extends Doc> (_class: Ref<Class<T>>, query: Partial<T>): Cursor<T>
+  query<T extends Doc> (_class: Ref<Class<T>>, query: Values<Partial<T>>, listener: (result: Instance<T>[]) => void): () => void
   commit (): Promise<void>
   commitInfo (info: CommitInfo): void
   close (discard?: boolean): void

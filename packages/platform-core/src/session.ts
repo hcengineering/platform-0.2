@@ -321,6 +321,7 @@ export function createSession (platform: Platform, modelDb: MemDb, rpc: RpcServi
     as,
     is,
     find,
+    query,
     adapt,
     instantiateEmb,
     getPrototype,
