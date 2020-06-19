@@ -19,7 +19,7 @@ import { Platform, Resource, getResourceKind } from '@anticrm/platform'
 import core, { Ref, Doc, Class, Instance, ClassKind, Property } from '@anticrm/platform-core'
 import { Account, User } from '@anticrm/platform-business'
 import { AnyComponent } from '@anticrm/platform-ui'
-import { getCoreService } from '@anticrm/platform-vue'
+import { getCoreService, getVueService } from '@anticrm/platform-vue'
 import { Person } from '..'
 
 import Button from '@anticrm/sparkling-controls/src/Button.vue'
@@ -37,9 +37,7 @@ export default defineComponent({
     params: Object
   },
   async setup (props, context) {
-    // const _ = await injectPlatform({ core: core.id })
-    // const coreService = _.deps.core
-    //const session = getSession()
+    const vueService = getVueService()
     const coreService = getCoreService()
     const session = coreService.newSession()
 
@@ -57,11 +55,19 @@ export default defineComponent({
     }
 
     function save () {
-      session.commit()
+      session.commit().then(() => {
+        session.close()
+        vueService.back()
+      })
+    }
+
+    function cancel () {
+      session.close(true)
+      vueService.back()
     }
 
     return {
-      instance, save
+      instance, save, cancel
     }
   }
 })
@@ -80,6 +86,9 @@ export default defineComponent({
       </div>
       <div>
         <Button @click="save">Save</Button>
+      </div>
+      <div>
+        <Button @click="cancel">Cancel</Button>
       </div>
     </div>
     <Suspense>

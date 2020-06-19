@@ -63,6 +63,7 @@ export interface VueService extends Service {
   getLocation (): LinkTarget
   toUrl (target: LinkTarget): string
   navigate (url: string): void
+  back (): void
 }
 
 export default plugin('vue' as Plugin<VueService>, {}, {

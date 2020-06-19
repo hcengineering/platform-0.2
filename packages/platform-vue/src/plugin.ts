@@ -147,6 +147,10 @@ export default async (platform: Platform): Promise<VueService> => {
     }
   }
 
+  function back () {
+    history.back()
+  }
+
   // M E T H O D S
 
   const anAction = (args: any) => {
@@ -163,6 +167,7 @@ export default async (platform: Platform): Promise<VueService> => {
     getLocation,
     toUrl,
     navigate,
+    back
   }
 
   app.provide(VueInjectionKey, service)
