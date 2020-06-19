@@ -119,6 +119,7 @@ export type Instance<T> = { [P in keyof T]:
   never
 } & {
   __layout: T
+  __update: T
   getSession (): Session
 }
 
@@ -158,6 +159,10 @@ export interface Cursor<T extends Doc> {
   all (): Promise<Instance<T>[]>
 }
 
+export interface CommitInfo {
+  created: Doc[]
+}
+
 export interface Session {
   newInstance<M extends Doc> (_class: Ref<Class<M>>, values: Values<Omit<M, keyof Doc>>, _id?: Ref<M>): Promise<Instance<M>>
   getInstance<T extends Doc> (id: Ref<T>): Promise<Instance<T>>
@@ -165,6 +170,8 @@ export interface Session {
   is<T extends Doc, A extends Doc> (obj: Instance<T>, _class: Ref<Class<A>>): boolean
   find<T extends Doc> (_class: Ref<Class<T>>, query: Partial<T>): Cursor<T>
   commit (): Promise<void>
+  commitInfo (info: CommitInfo): void
+  close (discard?: boolean): void
 
   adapt (resource: Resource<any>, kind: string): Promise<Resource<any> | undefined>
 

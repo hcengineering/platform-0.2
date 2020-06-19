@@ -139,7 +139,7 @@ export class MemDb {
   }
 }
 
-function findAll (docs: Doc[], clazz: Ref<Class<Doc>>, query: { [key: string]: PropertyType }): Doc[] {
+export function findAll (docs: Doc[], clazz: Ref<Class<Doc>>, query: { [key: string]: PropertyType }): Doc[] {
   let result = docs
 
   for (const key in query) {

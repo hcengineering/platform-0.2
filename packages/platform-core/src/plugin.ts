@@ -16,7 +16,7 @@
 import { Platform, Resource, Metadata } from '@anticrm/platform'
 import core, {
   CoreService, Obj, Doc, Ref, Class, BagOf, InstanceOf, PropertyType,
-  Instance, Type, Emb, StaticResource, Exert, Property
+  Instance, Type, Emb, StaticResource, Exert, Property, Session, CommitInfo
 } from '.'
 import { MemDb } from './memdb'
 import { RpcService, Response } from '@anticrm/platform-rpc'
@@ -52,18 +52,30 @@ export default async (platform: Platform, deps: { rpc: RpcService }): Promise<Co
   console.log(metaModel)
   modelDb.loadModel(metaModel)
 
-  const layouts = new Map<Ref<Doc>, Doc>()
+  // C O R E  S E R V I C E
 
-  interface CommitInfo {
-    created: Doc[]
-  }
+  const sessions = [] as Session[]
 
   rpc.addEventListener((response: Response<unknown>) => {
+    console.log('EVENT:')
     const commitInfo = response.result as CommitInfo
+    console.log(commitInfo)
     for (const doc of commitInfo.created) {
-      layouts.set(doc._id, doc)
+      console.log('adding: ' + doc._id)
+      modelDb.add(doc)
+    }
+    for (const session of sessions) {
+      session.commitInfo(commitInfo)
     }
   })
+
+  const coreService: CoreService = {
+    newSession () {
+      const session = createSession(platform, modelDb, rpc)
+      sessions.push(session)
+      return session
+    }
+  }
 
   // C L A S S E S
 
@@ -92,13 +104,6 @@ export default async (platform: Platform, deps: { rpc: RpcService }): Promise<Co
 
 
   // platform.setResource(core.method.Adapter_adapt, async () => { throw new Error('Abstract `adapt` function.') })
-
-  // C O R E  S E R V I C E
-
-  const coreService: CoreService = {
-    newSession () { return createSession(platform, modelDb, rpc) },
-    // getClassHierarchy,
-  }
 
   // C O L L E C T I O N : B A G
 

@@ -14,12 +14,14 @@
 //
 
 import { RpcService, Response } from '@anticrm/platform-rpc'
-import core, { Doc, Ref, Class, Obj, Emb, Instance, Type, Property, Session, Values, Adapter, Cursor } from '.'
-import { MemDb, Layout } from './memdb'
+import core, {
+  Doc, Ref, Class, Obj, Emb, Instance, Type, PropertyType,
+  Property, Session, Values, Adapter, Cursor, CommitInfo
+} from '.'
+import { MemDb, findAll } from './memdb'
 import { generateId } from './objectid'
 import { Platform, Resource, ResourceKind } from '@anticrm/platform'
 import { attributeKey } from './plugin'
-import { result, Function } from 'lodash'
 
 export function createSession (platform: Platform, modelDb: MemDb, rpc: RpcService): Session {
 
@@ -34,6 +36,9 @@ export function createSession (platform: Platform, modelDb: MemDb, rpc: RpcServi
 
   const konstructors = new Map<Ref<Class<Obj>>, Konstructor<Obj>>()
   const prototypes = new Map<Ref<Class<Obj>>, Object>()
+
+  const created = new Map<Ref<Doc>, Instance<Doc>>()
+  const updated = new Map<Ref<Doc>, Instance<Doc>>()
 
   const CoreRoot = {
     get _class (): Ref<Class<Obj>> { return (this as Instance<Obj>).__layout._class },
@@ -86,10 +91,16 @@ export function createSession (platform: Platform, modelDb: MemDb, rpc: RpcServi
 
       Object.defineProperty(proto, key, {
         get (this: Instance<Obj>) {
-          return exert(Reflect.get(this.__layout, fullKey), this.__layout, key)
+          let value = (this.__update as any)[fullKey]
+          if (!value) {
+            value = (this.__layout as any)[fullKey]
+          }
+          return exert(value, this.__layout, key)
         },
         set (this: Instance<Obj>, value: any) {
-          Reflect.set(this.__layout, fullKey, value)
+          (this.__update as any)[fullKey] = value
+          const id = (this.__layout as Doc)._id
+          if (id) { updated.set(id, this as Instance<Doc>) }
         },
         enumerable: true
       })
@@ -105,6 +116,7 @@ export function createSession (platform: Platform, modelDb: MemDb, rpc: RpcServi
       const ctor = {
         [_class]: function (this: Instance<Obj>, obj: Obj) {
           this.__layout = obj
+          this.__update = {} as Obj
         }
       }[_class] // A trick to `name` function as `_class` value
       proto.constructor = ctor
@@ -126,43 +138,88 @@ export function createSession (platform: Platform, modelDb: MemDb, rpc: RpcServi
 
   // I N S T A N C E S
 
-  const newObjects = new Map<Ref<Doc>, Doc>()
-
-  rpc.addEventListener((response: Response<unknown>) => {
-    console.log('response')
-    console.log(response)
-  })
-
   async function newInstance<M extends Doc> (_class: Ref<Class<M>>, values: Values<Omit<M, keyof Doc>>, id?: Ref<M>): Promise<Instance<M>> {
     const _id = id ?? generateId() as Ref<Doc>
     const layout = { _class, _id } as Doc
-    newObjects.set(_id, layout)
 
     const instance = await instantiateDoc(layout)
     for (const key in values) {
       (instance as any)[key] = (values as any)[key]
     }
 
+    created.set(_id, instance)
+
     return instance as Instance<M>
   }
 
+  function fullLayout (instance: Instance<Doc>): Doc {
+    const layout = instance.__layout
+    const update = instance.__update
+    return { ...layout, ...update }
+  }
+
+  let currentCommit: { resolve: () => void, reject: () => void } | null = null
+
   async function commit () {
-    const commit = {
-      created: [] as Doc[]
+    const result = new Promise(async (resolve, reject) => {
+      currentCommit = { resolve, reject }
+
+      const info: CommitInfo = {
+        created: [] as Doc[]
+      }
+
+      console.log('COMMIT')
+      for (const instance of created.values()) {
+        info.created.push(fullLayout(instance))
+        updated.delete(instance._id)
+      }
+
+      console.log(info)
+      console.log('------------')
+
+      rpc.request('commit', info).then(() => { console.log('done rpc commit') })
+
+    })
+  }
+
+  async function commitInfo (info: CommitInfo) {
+    console.log('session commitinfo')
+    console.log(info)
+
+    for (const doc of info.created) {
+      created.delete(doc._id)
     }
-    for (const o of newObjects) {
-      commit.created.push(o[1])
+
+    for (const q of queries) {
+      const find = findAll(info.created, q._class, q.query as { [key: string]: PropertyType })
+      if (find.length > 0) {
+        q.result.push(...find)
+        const foundInstances = await Promise.all(find.map(doc => instantiateDoc(doc)))
+        q.instances.push(...foundInstances)
+        q.listener(q.instances)
+      }
     }
-    const resp = rpc.request('commit', commit)
+
+    if (currentCommit !== null) {
+      console.log('resolve current commit')
+      currentCommit.resolve()
+      currentCommit = null
+    }
+  }
+
+  function close (discard?: boolean) {
+    if (created.size > 0 || updated.size > 0) {
+      if (!discard) { throw new Error('you have uncommitted changes.') }
+    }
   }
 
   async function getInstance<T extends Doc> (id: Ref<T>): Promise<Instance<T>> {
-    //const doc = modelDb.get(id)
-    let doc = newObjects.get(id)
-    if (!doc) {
-      doc = modelDb.get(id)
-      if (!doc) { throw new Error('no document ,id: ' + id) }
+    const newInstance = created.get(id)
+    if (newInstance) {
+      return newInstance as Instance<T>
     }
+    const doc = modelDb.get(id)
+    if (!doc) { throw new Error('no document ,id: ' + id) }
     return instantiateDoc(doc as T)
   }
 
@@ -179,14 +236,6 @@ export function createSession (platform: Platform, modelDb: MemDb, rpc: RpcServi
     return mixins && mixins.includes(_class as Ref<Class<Doc>>)
   }
 
-  // find (_class: string, query: {}): Promise<[]> {
-  //   return request('find', [_class, query])
-  // },
-  // load (domain: string): Promise<[]> {
-  //   return request('load', [domain])
-  // }
-
-
   function findRequest<T extends Doc> (_class: Ref<Class<T>>, query: Partial<T>) {
     return rpc.request<[Ref<Class<T>>, Partial<T>], Doc[]>('find', _class, query)
   }
@@ -201,6 +250,39 @@ export function createSession (platform: Platform, modelDb: MemDb, rpc: RpcServi
       }
     }
   }
+
+  interface Query<T extends Doc> {
+    _class: Ref<Class<T>>
+    query: Values<Partial<T>>
+    result: T[]
+    instances: Instance<T>[]
+    listener: (result: Instance<T>[]) => void
+  }
+
+  const queries = [] as Query<Doc>[]
+
+  function query<T extends Doc> (_class: Ref<Class<T>>, query: Values<Partial<T>>, listener: (result: Instance<T>[]) => void): () => void {
+    const _q: Query<T> = { _class, query, listener, result: [], instances: [] }
+    const q = _q as unknown as Query<Doc>
+    queries.push(q)
+
+    findRequest(_class, query as Partial<T>)
+      .then(result => {
+        q.result = result
+        return Promise.all(result.map(doc => instantiateDoc(doc)))
+      })
+      .then(result => {
+        q.instances = result
+        listener(result as Instance<T>[])
+      }
+      )
+
+    return () => {
+      queries.splice(queries.indexOf(q), 1)
+    }
+  }
+
+  // A D A P T E R S
 
   async function adapt (resource: Resource<any>, kind: string): Promise<Resource<any> | undefined> {
     const info = platform.getResourceInfo(resource)
@@ -231,6 +313,8 @@ export function createSession (platform: Platform, modelDb: MemDb, rpc: RpcServi
 
   const session: Session = {
     commit,
+    commitInfo,
+    close,
     getClassHierarchy,
     newInstance,
     getInstance,
