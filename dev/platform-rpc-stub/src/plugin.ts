@@ -48,6 +48,9 @@ export default async (platform: Platform): Promise<RpcService> => {
   }
 
   async function commit (commitInfo: CommitInfo): Promise<void> {
+    for (const doc of commitInfo.created) {
+      memdb.add(doc)
+    }
     for (const listener of listeners) {
       listener({ result: commitInfo })
     }

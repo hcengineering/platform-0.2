@@ -155,7 +155,7 @@ function findAll (docs: Doc[], clazz: Ref<Class>, query: { [key: string]: Proper
     result = filterEq(result, aKey, condition as PropertyType)
   }
 
-  return result
+  return result === docs ? docs.concat() : result
 }
 
 function filterEq (docs: Doc[], propertyKey: string, value: PropertyType): Doc[] {
