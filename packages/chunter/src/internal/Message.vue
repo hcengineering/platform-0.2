@@ -14,43 +14,39 @@
 -->
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
-import { getSession } from '@anticrm/platform-vue'
-import chunter from '..'
+import { defineComponent, PropType } from 'vue'
 
-import EditBox from '@anticrm/sparkling-controls/src/EditBox.vue'
-import Message from './Message.vue'
+import { Instance } from '@anticrm/platform-core'
+import { DocMessage } from '..'
 
 export default defineComponent({
-  components: { EditBox, Message },
-  setup () {
-    const messages = ref([])
-
-    const session = getSession()
-    session.query(chunter.class.DocMessage, {}, result => {
-      console.log('!!!!!!!!!!!!!!!!!')
-      console.log(result)
-      messages.value = result.concat()
-    })
-
-    return { messages }
+  components: {},
+  props: {
+    message: Object as PropType<Instance<DocMessage>>
   }
 })
 </script>
 
 <template>
-  <div class="chunter-chat">
-    <Message v-for="message in messages" :key="message._id" :message="message" />
+  <div class="chunter-message">
+    <div>img</div>
+    <div class="content">
+      <div class="caption-4">Andrey Platov</div>
+      <div>{{message.text}}</div>
+    </div>
   </div>
 </template>
 
 <style lang="scss">
 @import "~@anticrm/sparkling-theme/css/_variables.scss";
 
-.chunter-chat {
+.chunter-message {
   display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  height: 100%;
+  margin-top: 1em;
+
+  .content {
+    display: flex;
+    flex-direction: column;
+  }
 }
 </style>

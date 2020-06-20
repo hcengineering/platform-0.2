@@ -13,10 +13,10 @@
 // limitations under the License.
 //
 
-import { plugin, Plugin, Service } from '@anticrm/platform'
+import { plugin, Plugin, Service, Resource } from '@anticrm/platform'
 import { Property, Doc, Ref, Class } from '@anticrm/platform-core'
 import { Asset, AnyComponent } from '@anticrm/platform-ui'
-import { BusinessObject } from '@anticrm/platform-business'
+import { BusinessObject, User } from '@anticrm/platform-business'
 
 export type DateType = number & Property<Date>
 
@@ -25,7 +25,7 @@ export interface Contact extends BusinessObject {
   phone?: Property<string>
 }
 
-export interface Person extends Contact {
+export interface Person extends Contact, User {
   firstName?: Property<string>
   lastName?: Property<string>
 
@@ -41,6 +41,10 @@ export default plugin(
       Email: '' as Asset,
       Phone: '' as Asset,
       Address: '' as Asset,
+    },
+    method: {
+      Person_getText: '' as Resource<() => string>,
+      Person_getImage: '' as Resource<() => Resource<string>>,
     },
     class: {
       Contact: '' as Ref<Class<Contact>>,

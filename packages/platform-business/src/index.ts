@@ -13,10 +13,9 @@
 // limitations under the License.
 //
 
-import { plugin, Plugin, Service } from '@anticrm/platform'
-import { Ref, Doc, Property } from '@anticrm/platform-core'
+import { plugin, Plugin, Service, Resource } from '@anticrm/platform'
+import { Ref, Doc, Property, Session, Class, Values, Instance } from '@anticrm/platform-core'
 
-// @Mixin
 export interface User extends Doc {
 }
 
@@ -29,7 +28,18 @@ export interface BusinessObject extends Doc {
   createdOn: Property<Date>
   createdBy: Ref<Account>
   onBehalfOf: Ref<User>
+
+  getText: Property<Promise<() => string>>
+  getImage: Property<Promise<() => Resource<string>>>
 }
 
-export default plugin('business' as Plugin<Service>, {}, {
+export interface BusinessService extends Service {
+  newBusinessObject<B extends BusinessObject> (session: Session, _class: Ref<Class<B>>, values: Values<Omit<B, keyof BusinessObject>>, _id?: Ref<B>): Promise<Instance<B>>
+}
+
+export default plugin('business' as Plugin<BusinessService>, {}, {
+  method: {
+    BusinessObject_getText: '' as Resource<() => Promise<string | undefined>>,
+    BusinessObject_getImage: '' as Resource<() => Promise<Resource<string> | undefined>>,
+  }
 })

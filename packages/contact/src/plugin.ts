@@ -13,20 +13,31 @@
 // limitations under the License.
 //
 
-import { Platform, Plugin, Service } from '@anticrm/platform'
+import { Platform, Resource } from '@anticrm/platform'
+import { Instance } from '@anticrm/platform-core'
 
-import contact from '.'
+import contact, { Person } from '.'
 import ContactForm from './components/ContactForm.vue'
 
 console.log('Plugin `contact` loaded')
-
 /*!
- * Anticrm Platform™ Bootloader Plugin
+ * Anticrm Platform™ Contact Plugin
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */
 export default async (platform: Platform) => {
   console.log('Plugin `contact` started')
+
+  function getText (this: Instance<Person>): string {
+    return this.firstName + ' ' + this.lastName
+  }
+
+  function getImage (this: Instance<Person>): Resource<string> {
+    return 'xyz' as Resource<string>
+  }
+
+  platform.setResource(contact.method.Person_getText, getText)
+  platform.setResource(contact.method.Person_getImage, getImage)
 
   platform.setResource(contact.form.Person, ContactForm)
 

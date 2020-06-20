@@ -39,6 +39,13 @@ export default async (S: Builder) => {
     firstName: S.newInstance(core.class.Type, {}),
     lastName: S.newInstance(core.class.Type, {}),
     birthDate: S.newInstance(contact.class.Date, {}),
+
+    getText: S.newInstance(core.class.StaticResource, {
+      _default: S.resolve(contact.method.Person_getText)
+    }),
+    getImage: S.newInstance(core.class.StaticResource, {
+      _default: S.resolve(contact.method.Person_getImage)
+    }),
   })
 
   S.mixin(contact.class.Date, ui.class.ClassUIDecorator as Ref<Class<ClassUIDecorator<Type<any>>>>, {

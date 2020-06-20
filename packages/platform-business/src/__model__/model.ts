@@ -27,6 +27,13 @@ export default (S: Builder) => {
   S.createClass(business.class.BusinessObject, core.class.Doc, {
     createdOn: S.newInstance(core.class.Type, {}),
     createdBy: S.ref(business.class.Account),
-    onBehalfOf: S.ref(business.class.User)
+    onBehalfOf: S.ref(business.class.User),
+
+    getText: S.newInstance(core.class.StaticResource, {
+      _default: S.resolve(business.method.BusinessObject_getText)
+    }),
+    getImage: S.newInstance(core.class.StaticResource, {
+      _default: S.resolve(business.method.BusinessObject_getImage)
+    }),
   })
 }

@@ -20,38 +20,62 @@ import { Platform } from '@anticrm/platform'
 import core from '@anticrm/platform-core/src/__model__'
 import i18n from '@anticrm/platform-core-i18n/src/__model__'
 import ui from '@anticrm/platform-ui/src/__model__'
+import business from '@anticrm/platform-business/src/__model__'
+import rpcStub from '@anticrm/platform-rpc-stub'
 import contact from '../__model__'
 
 import coreModel from '@anticrm/platform-core/src/__model__/model'
 import i18nModel from '@anticrm/platform-core-i18n/src/__model__/model'
 import uiModel from '@anticrm/platform-ui/src/__model__/model'
+import businessModel from '@anticrm/platform-business/src/__model__/model'
 import contactModel from '@anticrm/contact/src/__model__/model'
 
 import Builder from '@anticrm/platform-core/src/__model__/builder'
 
 describe('core', () => {
   const platform = new Platform()
-  platform.addLocation(core, () => import('@anticrm/platform-core/src/plugin'))
+  platform.addLocation(rpcStub, () => import('@anticrm/platform-rpc-stub/src/plugin'))
   platform.addLocation(i18n, () => import('@anticrm/platform-core-i18n/src/plugin'))
+  platform.addLocation(core, () => import('@anticrm/platform-core/src/plugin'))
+  platform.addLocation(business, () => import('@anticrm/platform-business/src/plugin'))
+  platform.addLocation(ui, () => import('@anticrm/platform-ui/src/plugin'))
+  platform.addLocation(contact, () => import('../plugin'))
 
-  it('should load model', async () => {
-    const builder = new Builder()
-    builder.load(coreModel)
-    builder.load(i18nModel)
-    builder.load(uiModel)
-    builder.load(contactModel)
-    platform.setMetadata(core.metadata.MetaModel, builder.dump())
-    console.log(JSON.stringify(builder.dump()))
-  })
+  const S = new Builder()
+  S.load(coreModel)
+  S.load(i18nModel)
+  S.load(uiModel)
+  S.load(businessModel)
+  S.load(contactModel)
+  platform.setMetadata(rpcStub.metadata.Metamodel, S.dump())
 
   it('should resolve form for persons', async () => {
     const coreService = await platform.getPlugin(core.id)
-    const i18nService = await platform.getPlugin(i18n.id)
+    const session = coreService.newSession()
 
-    const obj = await coreService.getInstance(contact.class.Person)
-    expect(coreService.is(obj, ui.class.Form)).toBe(true)
-    expect(coreService.as(obj, ui.class.Form).form).toBe(contact.form.Person)
+    const obj = await session.getInstance(contact.class.Person)
+    expect(session.is(obj, ui.class.Form)).toBe(true)
+    const asForm = await session.as(obj, ui.class.Form)
+    expect(asForm.form).toBe(contact.form.Person)
     const clazz = await obj._class
+    expect(true).toBe(true)
+  })
+
+  it('should provide proper text / image', async () => {
+    const coreService = await platform.getPlugin(core.id)
+    const businessService = await platform.getPlugin(business.id)
+    const session = coreService.newSession()
+
+    const x = await businessService.newBusinessObject(session, contact.class.Person, {
+      firstName: 'John', lastName: 'Carmack'
+    })
+
+    const m = x.getText()
+
+    console.log(m)
+    console.log(await m)
+
+
     expect(true).toBe(true)
   })
 

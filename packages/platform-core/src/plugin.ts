@@ -49,7 +49,6 @@ export default async (platform: Platform, deps: { rpc: RpcService }): Promise<Co
 
   const modelDb = new MemDb()
   const metaModel = await loadRequest('model')
-  console.log(metaModel)
   modelDb.loadModel(metaModel)
 
   // C O R E  S E R V I C E
