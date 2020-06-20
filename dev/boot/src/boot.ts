@@ -20,6 +20,7 @@ import i18nModel from '@anticrm/platform-core-i18n/src/__model__/model'
 import businessModel from '@anticrm/platform-business/src/__model__/model'
 import uiModel from '@anticrm/platform-ui/src/__model__/model'
 import contactModel from '@anticrm/contact/src/__model__/model'
+import chunterModel from '@anticrm/chunter/src/__model__/model'
 import workbenchModel from '@anticrm/platform-workbench/src/__model__/model'
 import demoModel from '@anticrm/app-storybook/src/__model__/model'
 
@@ -32,6 +33,7 @@ builder.load(businessModel)
 builder.load(uiModel)
 builder.load(workbenchModel)
 builder.load(contactModel)
+builder.load(chunterModel)
 builder.load(demoModel)
 
 export const Model = builder.dump()

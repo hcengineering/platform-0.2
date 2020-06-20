@@ -16,7 +16,7 @@
 import { Resource, Metadata } from '@anticrm/platform'
 import {
   PropertyType, Emb, Doc, Obj, Ref, EClass, Class,
-  AllAttributes, ModelDb, Property, RefTo, CoreDomain
+  AllAttributes, ModelDb, Property, RefTo, CoreDomain, ArrayOf, Type, InstanceOf
 } from '@anticrm/platform-core'
 import core from '.'
 import { MemDb } from '../memdb'
@@ -30,7 +30,7 @@ function str (value: string): Property<string> {
 class Builder {
   private memdb: ModelDb
 
-  constructor (memdb?: ModelDb) {
+  constructor(memdb?: ModelDb) {
     this.memdb = memdb ?? new MemDb()
   }
 
@@ -79,6 +79,14 @@ class Builder {
 
   ref<T extends Doc> (to: Ref<Class<T>>): RefTo<T> {
     return this.newInstance(core.class.RefTo, { to: to as Ref<Class<Doc>> }) as RefTo<T>
+  }
+
+  arrayOf<T> (of: Type<T>): ArrayOf<T> {
+    return this.newInstance(core.class.ArrayOf, { of })
+  }
+
+  instanceOf<T extends Emb> (of: Ref<Class<T>>): InstanceOf<T> {
+    return this.newInstance(core.class.InstanceOf as Ref<Class<InstanceOf<T>>>, { of })
   }
 }
 

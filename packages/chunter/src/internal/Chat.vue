@@ -14,24 +14,32 @@
 -->
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, ref } from 'vue'
+import { getSession } from '@anticrm/platform-vue'
+import chunter from '..'
 
 import EditBox from '@anticrm/sparkling-controls/src/EditBox.vue'
 
 export default defineComponent({
   components: { EditBox },
   setup () {
-    function submit (value: string) {
-      console.log('todo: submit ' + value)
-    }
-    return { submit }
+    const messages = ref([])
+
+    const session = getSession()
+    session.query(chunter.class.DocMessage, {}, result => {
+      console.log('!!!!!!!!!!!!!!!!!')
+      console.log(result)
+      messages.value = result.concat()
+    })
+
+    return { messages }
   }
 })
 </script>
 
 <template>
   <div class="chunter-chat">
-    <div>Chat window</div>
+    <div v-for="message in messages" :key="message._id">{{ message._id }} -- {{ message.text }}</div>
   </div>
 </template>
 

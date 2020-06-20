@@ -14,17 +14,18 @@
 //
 
 import { plugin, Plugin, Service } from '@anticrm/platform'
-import { Property, Ref, Emb } from '@anticrm/platform-core'
-import { BusinessObject, User } from '@anticrm/platform-business'
+import { Property, Ref, Emb, Class } from '@anticrm/platform-core'
+import { BusinessObject, User, Account } from '@anticrm/platform-business'
 import { AnyComponent } from '@anticrm/platform-ui'
 
 interface Message {
   onBehalfOf: Ref<User>
   createdOn: Property<Date>
+  createdBy: Ref<Account>
   text: Property<string>
 }
 
-interface EmbMessage extends Emb, Message { }
+export interface EmbMessage extends Emb, Message { }
 
 export interface Channel extends BusinessObject {
 
@@ -37,6 +38,9 @@ export interface DocMessage extends BusinessObject, Message {
 }
 
 export default plugin('chunter' as Plugin<Service>, {}, {
+  class: {
+    DocMessage: '' as Ref<Class<DocMessage>>
+  },
   component: {
     Chunter: '' as AnyComponent
   }

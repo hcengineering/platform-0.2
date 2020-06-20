@@ -15,13 +15,24 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
+import { Ref } from '@anticrm/platform-core'
+import { Account, User } from '@anticrm/platform-business'
+import { getSession } from '@anticrm/platform-vue'
 
+import chunter, { Channel } from '..'
 import EditBox from '@anticrm/sparkling-controls/src/EditBox.vue'
 
 export default defineComponent({
   components: { EditBox },
   setup () {
+    const session = getSession()
+
     function submit (value: string) {
+      session.newInstance(chunter.class.DocMessage, {
+        text: value, channel: '' as Ref<Channel>, participants: [], replies: [],
+        createdOn: new Date(), createdBy: '' as Ref<Account>, onBehalfOf: '' as Ref<User>
+      })
+      session.commit()
       console.log('todo: submit ' + value)
     }
     return { submit }
