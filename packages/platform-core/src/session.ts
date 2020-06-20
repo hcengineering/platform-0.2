@@ -136,8 +136,6 @@ export function createSession (platform: Platform, modelDb: MemDb, rpc: RpcServi
     return new ctor(obj) as Instance<T>
   }
 
-  // I N S T A N C E S
-
   async function newInstance<M extends Doc> (_class: Ref<Class<M>>, values: Values<Omit<M, keyof Doc>>, id?: Ref<M>): Promise<Instance<M>> {
     const _id = id ?? generateId() as Ref<Doc>
     const layout = { _class, _id } as Doc
@@ -152,18 +150,16 @@ export function createSession (platform: Platform, modelDb: MemDb, rpc: RpcServi
     return instance as Instance<M>
   }
 
+  // C O M M I T S
+
   function fullLayout (instance: Instance<Doc>): Doc {
     const layout = instance.__layout
     const update = instance.__update
     return { ...layout, ...update }
   }
 
-  let currentCommit: { resolve: () => void, reject: () => void } | null = null
-
   async function commit () {
-    const result = new Promise(async (resolve, reject) => {
-      currentCommit = { resolve, reject }
-
+    return new Promise<void>(async (resolve, reject) => {
       const info: CommitInfo = {
         created: [] as Doc[]
       }
@@ -177,8 +173,11 @@ export function createSession (platform: Platform, modelDb: MemDb, rpc: RpcServi
       console.log(info)
       console.log('------------')
 
-      rpc.request('commit', info).then(() => { console.log('done rpc commit') })
-
+      rpc.request('commit', info).then(() => {
+        console.log('done rpc commit')
+        console.log(info)
+        commitInfo(info).then(() => { resolve() })
+      })
     })
   }
 
@@ -199,12 +198,6 @@ export function createSession (platform: Platform, modelDb: MemDb, rpc: RpcServi
         q.listener(q.instances)
       }
     }
-
-    if (currentCommit !== null) {
-      console.log('resolve current commit')
-      currentCommit.resolve()
-      currentCommit = null
-    }
   }
 
   function close (discard?: boolean) {
@@ -212,6 +205,8 @@ export function createSession (platform: Platform, modelDb: MemDb, rpc: RpcServi
       if (!discard) { throw new Error('you have uncommitted changes.') }
     }
   }
+
+  // I N S T A N C E S
 
   async function getInstance<T extends Doc> (id: Ref<T>): Promise<Instance<T>> {
     const newInstance = created.get(id)

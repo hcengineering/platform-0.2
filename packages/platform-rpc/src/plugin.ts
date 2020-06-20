@@ -27,10 +27,39 @@ export default async (platform: Platform): Promise<RpcService> => {
   const host = platform.getMetadata(client.metadata.WSHost) || 'localhost'
   const port = platform.getMetadata(client.metadata.WSPort) || 18080
 
-  // { tenant: 'company1' }
-  const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0ZW5hbnQiOiJjb21wYW55MSJ9.t8xg-wosznL6qYTCvsHfznq_Xe7iHeGjU1VAUBgyy7s'
+  // { tenant: 'latest-model' }
+  const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0ZW5hbnQiOiJsYXRlc3QtbW9kZWwifQ.hKZDHkhxNL-eCOqk5NFToVh43KOGshLS4b6DgztJQqI'
 
-  const websocket = new WebSocket('ws://' + host + ':' + port + '/' + token)
+  const websocket = new Promise<WebSocket>((resolve, reject) => {
+    const ws = new WebSocket('ws://' + host + ':' + port + '/' + token)
+    ws.onopen = () => {
+      resolve(ws)
+    }
+
+    ws.onmessage = (ev: MessageEvent) => {
+      const response = getResponse(ev.data)
+      console.log('>>>>>>>>>')
+      console.log(ev.data)
+      console.log('----------')
+      if (!response.id) {
+        for (const listener of listeners) {
+          listener(response)
+        }
+      } else {
+        const promise = requests.get(response.id)
+        if (promise) {
+          if (response.error) {
+            promise.reject(response.error)
+          } else {
+            promise.resolve(response.result)
+          }
+        } else {
+          throw new Error('unknown rpc id')
+        }
+      }
+    }
+
+  })
 
   interface PromiseInfo { resolve: (value?: any) => void, reject: (error: any) => void }
   const requests = new Map<ReqId, PromiseInfo>()
@@ -45,34 +74,17 @@ export default async (platform: Platform): Promise<RpcService> => {
   }
 
   function request<P extends any[], R> (method: string, ...params: P): Promise<R> {
-    return new Promise<any>((resolve, reject) => {
+    console.log('<<<<<<< ' + method)
+    console.log(params)
+    return new Promise<any>(async (resolve, reject) => {
       const id = ++lastId
       requests.set(id, { resolve, reject })
-      websocket.send(makeRequest({ id, method, params }))
+      const ws = await websocket
+      ws.send(makeRequest({ id, method, params }))
     })
   }
 
   const listeners: EventListener[] = []
-
-  websocket.onmessage = (ev: MessageEvent) => {
-    const response = getResponse(ev.data)
-    if (!response.id) {
-      for (const listener of listeners) {
-        listener(response)
-      }
-    } else {
-      const promise = requests.get(response.id)
-      if (promise) {
-        if (response.error) {
-          promise.reject(response.error)
-        } else {
-          promise.resolve(response.result)
-        }
-      } else {
-        throw new Error('unknown rpc id')
-      }
-    }
-  }
 
   return {
     request,

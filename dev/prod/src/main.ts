@@ -19,6 +19,7 @@ import core, { Doc } from '@anticrm/platform-core'
 import rpc from '@anticrm/platform-rpc'
 import i18n from '@anticrm/platform-core-i18n'
 import ui from '@anticrm/platform-ui'
+import business from '@anticrm/platform-business'
 import vue from '@anticrm/platform-vue'
 import workbench from '@anticrm/platform-workbench'
 import contact from '@anticrm/contact'
@@ -39,7 +40,7 @@ const strings = require('./strings.json') as Record<string, string>
 const platform = new Platform()
 // platform.setMetadata(core.metadata.MetaModel, metaModel)
 platform.setMetadata(core.metadata.WSHost, 'localhost')
-platform.setMetadata(core.metadata.WSPort, 3333)
+platform.setMetadata(core.metadata.WSPort, 18080)
 platform.setMetadata(i18n.metadata.BootStrings, strings)
 platform.setMetadata(ui.metadata.DefaultApplication, mc.component.MissionControl)
 platform.setMetadata(mc.metadata.Applications, [
@@ -52,6 +53,7 @@ platform.addLocation(core, () => import(/* webpackChunkName: "platform-core" */ 
 platform.addLocation(rpc, () => import(/* webpackChunkName: "platform-rpc" */ '@anticrm/platform-rpc/src/plugin'))
 platform.addLocation(i18n, () => import(/* webpackChunkName: "platform-core-i18n" */ '@anticrm/platform-core-i18n/src/plugin'))
 platform.addLocation(ui, () => import(/* webpackChunkName: "platform-ui" */ '@anticrm/platform-ui/src/plugin'))
+platform.addLocation(business, () => import(/* webpackChunkName: "platform-business" */ '@anticrm/platform-business/src/plugin'))
 platform.addLocation(vue, () => import(/* webpackChunkName: "platform-vue" */ '@anticrm/platform-vue/src/plugin'))
 platform.addLocation(workbench, () => import(/* webpackChunkName: "platform-workbench" */ '@anticrm/platform-workbench/src/plugin'))
 platform.addLocation(contact, () => import(/* webpackChunkName: "contact" */ '@anticrm/contact/src/plugin'))
