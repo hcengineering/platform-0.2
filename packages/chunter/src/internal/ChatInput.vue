@@ -14,7 +14,7 @@
 -->
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, ref } from 'vue'
 import { Ref } from '@anticrm/platform-core'
 import { Account, User } from '@anticrm/platform-business'
 import { getSession } from '@anticrm/platform-vue'
@@ -26,23 +26,24 @@ export default defineComponent({
   components: { EditBox },
   setup () {
     const session = getSession()
+    const text = ref('')
 
     function submit (value: string) {
       session.newInstance(chunter.class.DocMessage, {
         text: value, channel: '' as Ref<Channel>, participants: [], replies: [],
         createdOn: new Date(), createdBy: '' as Ref<Account>, onBehalfOf: '' as Ref<User>
-      })
-      session.commit()
+      }).then(() => session.commit()).then(() => text.value = '')
+
       console.log('todo: submit ' + value)
     }
-    return { submit }
+    return { submit, text }
   }
 })
 </script>
 
 <template>
   <div class="chat-input">
-    <EditBox @keyup.enter="submit($event.target.value)" />
+    <EditBox v-model="text" @keyup.enter="submit($event.target.value)" />
   </div>
 </template>
 
