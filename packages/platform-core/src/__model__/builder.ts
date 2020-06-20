@@ -30,7 +30,7 @@ function str (value: string): Property<string> {
 class Builder {
   private memdb: ModelDb
 
-  constructor(memdb?: ModelDb) {
+  constructor (memdb?: ModelDb) {
     this.memdb = memdb ?? new MemDb()
   }
 
