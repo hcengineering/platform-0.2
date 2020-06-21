@@ -13,7 +13,8 @@
 // limitations under the License.
 //
 
-import { Ref, Class, Doc, Layout, DocLayout } from '@anticrm/platform'
+import { Ref, Class, Doc } from '@anticrm/platform'
+import { Layout, AnyLayout } from '@anticrm/memdb'
 
 // P R O T O C O L
 
@@ -48,12 +49,12 @@ export function getResponse<D> (res: string): Response<D> {
 // C O R E  P R O T O C O L
 
 export interface CommitInfo {
-  created: DocLayout[]
+  created: Layout<Doc>[]
 }
 
 export interface CoreProtocol {
-  find (_class: Ref<Class<Doc>>, query: Layout): Promise<DocLayout[]>
-  load (): Promise<DocLayout[]> // TODO: must be load domain
+  find (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Layout<Doc>[]>
+  load (): Promise<Layout<Doc>[]> // TODO: must be load domain
   commit (commitInfo: CommitInfo): Promise<void>
 }
 

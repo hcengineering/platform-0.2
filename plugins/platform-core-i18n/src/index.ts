@@ -31,6 +31,6 @@ export default plugin('i18n' as Plugin<I18nService>, {}, {
     BootStrings: '' as Metadata<Record<string, string>>
   },
   method: {
-    IntlString_exert: '' as Resource<(this: Instance<Type<any>>) => Promise<Exert>>
+    IntlString_exert: '' as Resource<(this: Instance<Type<any>>) => Promise<Exert<any>>>
   }
 })

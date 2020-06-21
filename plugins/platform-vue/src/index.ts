@@ -14,7 +14,7 @@
 //
 
 import { App, inject } from 'vue'
-import { Metadata, plugin, Plugin, Service, Platform, PluginDependencies, InferPlugins, Resource } from '@anticrm/platform'
+import { Metadata, plugin, Plugin, Service, Platform, PluginDependencies, PluginServices, Resource } from '@anticrm/platform'
 import { CoreService, Session } from '@anticrm/platform-core'
 import { UIService, AnyComponent } from '@anticrm/platform-ui'
 
@@ -37,11 +37,11 @@ export const VueInjectionKey = Symbol('vue')
 export function getPlatform () { return inject(PlatformInjectionKey) as Platform }
 export function getVueService () { return inject(VueInjectionKey) as VueService }
 
-export async function injectPlatform<D extends PluginDependencies> (deps: D): Promise<{ platform: Platform, deps: InferPlugins<D> }> {
+export async function injectPlatform<D extends PluginDependencies> (deps: D): Promise<{ platform: Platform, deps: PluginServices<D> }> {
   const platform = inject(PlatformInjectionKey) as Platform
   if (!platform) { throw new Error('Platform is not provided.') }
   const resolvedDeps = await platform.resolveDependencies(deps)
-  return { platform: platform as Platform, deps: resolvedDeps as InferPlugins<D> }
+  return { platform: platform as Platform, deps: resolvedDeps as PluginServices<D> }
 }
 
 /// P L U G I N

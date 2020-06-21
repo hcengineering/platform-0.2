@@ -13,28 +13,56 @@
 // limitations under the License.
 //
 
-import { attributeKey, DocLayout, Ref, Class, Obj, Doc, Layout, LayoutType, ClassLayout } from '@anticrm/platform'
+import { attributeKey, Ref, Class, Obj, Doc, Property, Emb } from '@anticrm/platform'
 import { generateId } from './objectid'
 
-export interface ModelDb {
-  add (doc: DocLayout): void
-  get (id: Ref<Doc>): DocLayout
-  dump (): DocLayout[]
+interface Z<T extends Obj> extends Class<T> {
+  x: Property<string>
+  y?: Property<Date>
+  z?: { [key: string]: Emb }
+}
 
-  find (clazz: Ref<Class<Doc>>, query: Layout): Promise<DocLayout[]>
-  mixin<T extends E, E extends Doc> (id: Ref<E>, clazz: Ref<Class<T>>, values: Record<Exclude<keyof T, keyof E>, LayoutType>): void
-  createDocument<M extends Doc> (_class: Ref<Class<M>>, values: Record<Exclude<keyof M, keyof Doc>, LayoutType>, _id?: Ref<M>): DocLayout
+export type LayoutType = string | number | Emb | { [key: string]: LayoutType }
+export type AnyLayout = { [key: string]: LayoutType }
+
+//export type PropertyType = Property<any> | Ref<Doc> | Emb | PropertyType[] | { [key: string]: PropertyType }
+
+type ToLayout<T> =
+  T extends Ref<Doc> | undefined ? T :
+  T extends Property<any> | undefined ? LayoutType :
+  T extends { __embedded: true } ? T :
+  Layout<T>
+
+export type Layout<T> = { [P in keyof T]:
+  T[P] extends Ref<Doc> | undefined ? T[P] :
+  T[P] extends Property<any> | undefined ? LayoutType :
+  T[P] extends (infer X)[] | undefined ? ToLayout<X>[] :
+  T[P] extends { [key: string]: infer X } | undefined ? { [key: string]: ToLayout<X> } :
+  never
+}
+
+// let x = {} as Layout<Z<Doc>>
+// x.
+
+export interface ModelDb {
+  add (doc: Layout<Doc>): void
+  get (id: Ref<Doc>): Layout<Doc>
+  dump (): Layout<Doc>[]
+
+  find (clazz: Ref<Class<Doc>>, query: AnyLayout): Promise<Layout<Doc>[]>
+  mixin<T extends E, E extends Doc> (id: Ref<E>, clazz: Ref<Class<T>>, values: Layout<Omit<T, keyof E>>): void
+  createDocument<M extends Doc> (_class: Ref<Class<M>>, values: Layout<Omit<M, keyof Doc>>, _id?: Ref<M>): Layout<Doc>
 }
 
 export class MemDb implements ModelDb {
 
-  private objects = new Map<Ref<Doc>, DocLayout>()
-  private byClass: Map<Ref<Class<Doc>>, DocLayout[]> | null = null
+  private objects = new Map<Ref<Doc>, Layout<Doc>>()
+  private byClass: Map<Ref<Class<Doc>>, Layout<Doc>[]> | null = null
 
-  objectsOfClass (_class: Ref<Class<Doc>>): DocLayout[] {
+  objectsOfClass (_class: Ref<Class<Doc>>): Layout<Doc>[] {
     console.log('indexing database...')
     if (!this.byClass) {
-      this.byClass = new Map<Ref<Class<Doc>>, DocLayout[]>()
+      this.byClass = new Map<Ref<Class<Doc>>, Layout<Doc>[]>()
       for (const doc of this.objects.values()) {
         this.index(doc)
       }
@@ -42,13 +70,13 @@ export class MemDb implements ModelDb {
     return this.byClass.get(_class) ?? []
   }
 
-  set (doc: DocLayout) {
+  set (doc: Layout<Doc>) {
     const id = doc._id
     if (this.objects.get(id)) { throw new Error('document added already ' + id) }
     this.objects.set(id, doc)
   }
 
-  index (doc: DocLayout) {
+  index (doc: Layout<Doc>) {
     if (this.byClass === null) { throw new Error('index not created') }
     const byClass = this.byClass
     const hierarchy = this.getClassHierarchy(doc._class)
@@ -60,12 +88,12 @@ export class MemDb implements ModelDb {
     })
   }
 
-  add (doc: DocLayout) {
+  add (doc: Layout<Doc>) {
     this.set(doc)
     if (this.byClass) this.index(doc)
   }
 
-  get (id: Ref<Doc>): DocLayout {
+  get (id: Ref<Doc>): Layout<Doc> {
     const obj = this.objects.get(id)
     if (!obj) { throw new Error('document not found ' + id) }
     return obj
@@ -73,11 +101,11 @@ export class MemDb implements ModelDb {
 
   /// A S S I G N
 
-  private findAttributeKey<T extends DocLayout> (cls: Ref<Class<Obj>>, key: string): string {
+  private findAttributeKey<T extends Layout<Doc>> (cls: Ref<Class<Obj>>, key: string): string {
     // TODO: use memdb class hierarchy
     let _class = cls as Ref<Class<Obj>> | undefined
     while (_class) {
-      const clazz = this.get(_class) as ClassLayout
+      const clazz = this.get(_class) as Layout<Class<Obj>>
       if ((clazz._attributes as any)[key] !== undefined) {
         return attributeKey(_class, key)
       }
@@ -87,30 +115,30 @@ export class MemDb implements ModelDb {
   }
 
   // from Builder
-  assign (layout: DocLayout, _class: Ref<Class<Doc>>, values: Layout) {
-    const l = layout as unknown as Layout
+  assign<T extends Doc> (layout: Layout<T>, _class: Ref<Class<T>>, values: Layout<Omit<T, keyof Doc>>) {
+    const l = layout as unknown as AnyLayout
+    const r = values as unknown as AnyLayout
     for (const key in values) {
       if (key.startsWith('_')) {
-        l[key] = values[key]
+        l[key] = r[key]
       } else {
-        l[this.findAttributeKey(_class, key)] = values[key]
+        l[this.findAttributeKey(_class, key)] = r[key]
       }
     }
   }
 
-  createDocument<M extends Doc> (_class: Ref<Class<M>>, values: Record<Exclude<keyof M, keyof Doc>, LayoutType>, _id?: Ref<M>): DocLayout {
-    const layout = { _class, _id: _id ?? generateId() as Ref<Doc> } as DocLayout
-    this.assign(layout, _class as Ref<Class<Doc>>, values)
+  createDocument<M extends Doc> (_class: Ref<Class<M>>, values: Layout<Omit<M, keyof Doc>>, _id?: Ref<M>): Layout<Doc> {
+    const layout = { _class, _id: _id ?? generateId() as Ref<Doc> } as Layout<Doc>
+    this.assign(layout, _class, values)
     this.add(layout)
     return layout
   }
 
-  mixin<T extends E, E extends Doc> (id: Ref<E>, clazz: Ref<Class<T>>, values: Record<Exclude<keyof T, keyof E>, LayoutType>) {
+  mixin<T extends E, E extends Doc> (id: Ref<E>, clazz: Ref<Class<T>>, values: Layout<Omit<T, keyof E>>): void {
     const doc = this.get(id)
     if (!doc._mixins) { doc._mixins = [] }
-    const cls = clazz as Ref<Class<Doc>>
-    doc._mixins.push(cls)
-    this.assign(doc, cls, values as unknown as Layout)
+    doc._mixins.push(clazz)
+    this.assign(doc, clazz, values)
   }
 
   getClassHierarchy (cls: Ref<Class<Doc>>): Ref<Class<Obj>>[] {
@@ -118,7 +146,7 @@ export class MemDb implements ModelDb {
     let _class = cls as Ref<Class<Obj>> | undefined
     while (_class) {
       result.push(_class)
-      _class = (this.get(_class) as ClassLayout)._extends
+      _class = (this.get(_class) as Layout<Class<Obj>>)._extends
     }
     return result
   }
@@ -131,25 +159,25 @@ export class MemDb implements ModelDb {
     return result
   }
 
-  loadModel (model: DocLayout[]) {
+  loadModel (model: Layout<Doc>[]) {
     for (const doc of model) { this.set(doc) }
-    // if (this.byClass === null) { this.byClass = new Map<Ref<ClassLayout>, DocLayout[]>() }
+    // if (this.byClass === null) { this.byClass = new Map<Ref<ClassLayout>, Layout<Doc>[]>() }
     // for (const doc of model) { this.index(doc) }
   }
 
   // Q U E R Y
-  async find (clazz: Ref<Class<Doc>>, query: Layout): Promise<DocLayout[]> {
+  async find (clazz: Ref<Class<Doc>>, query: AnyLayout): Promise<Layout<Doc>[]> {
     const byClass = this.objectsOfClass(clazz)
     return findAll(byClass, clazz, query)
   }
 
-  async findOne (clazz: Ref<Class<Doc>>, query: Layout): Promise<DocLayout | undefined> {
+  async findOne (clazz: Ref<Class<Doc>>, query: AnyLayout): Promise<Layout<Doc> | undefined> {
     const result = await this.find(clazz, query)
     return result.length == 0 ? undefined : result[0]
   }
 }
 
-export function findAll (docs: DocLayout[], clazz: Ref<Class<Doc>>, query: Layout): DocLayout[] {
+export function findAll (docs: Layout<Doc>[], clazz: Ref<Class<Doc>>, query: AnyLayout): Layout<Doc>[] {
   let result = docs
 
   for (const key in query) {
@@ -161,8 +189,8 @@ export function findAll (docs: DocLayout[], clazz: Ref<Class<Doc>>, query: Layou
   return result === docs ? docs.concat() : result
 }
 
-function filterEq (docs: DocLayout[], propertyKey: string, value: LayoutType): DocLayout[] {
-  const result: DocLayout[] = []
+function filterEq (docs: Layout<Doc>[], propertyKey: string, value: LayoutType): Layout<Doc>[] {
+  const result: Layout<Doc>[] = []
   for (const doc of docs) {
     if (value === (doc as any)[propertyKey]) {
       result.push(doc)

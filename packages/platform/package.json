@@ -6,9 +6,9 @@
   "author": "Anticrm Platform Contributors (https://github.com/anticrm)",
   "license": "EPL-2.0",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --build",
     "test": "jest",
-    "doc": "typedoc --out ./generated_docs --excludeNotExported --inputFiles README.md --inputFiles src/index.ts",
+    "doc": "typedoc --out ./generated_docs --excludeNotExported --inputFiles README.md --inputFiles src/index.ts --media images",
     "lint": "eslint src/**/*.ts"
   },
   "devDependencies": {

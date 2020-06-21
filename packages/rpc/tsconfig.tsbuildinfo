@@ -222,13 +222,18 @@
         "affectsGlobalScope": false
       },
       "../platform/lib/index.d.ts": {
-        "version": "2657c0fb8d74c14772a7cc76820bc62da3c498d73c3653330a2e8152123281e4",
-        "signature": "2657c0fb8d74c14772a7cc76820bc62da3c498d73c3653330a2e8152123281e4",
+        "version": "f0080f8a8079ec55c309fe0c85d90aba8e8b4326f841b9f7b3f788fe973d9172",
+        "signature": "f0080f8a8079ec55c309fe0c85d90aba8e8b4326f841b9f7b3f788fe973d9172",
+        "affectsGlobalScope": false
+      },
+      "../memdb/lib/index.d.ts": {
+        "version": "4cd2677d1bb7eab082a9cb837fcb6efbcf9fe007cbe8899dbe5a53acd6652b33",
+        "signature": "4cd2677d1bb7eab082a9cb837fcb6efbcf9fe007cbe8899dbe5a53acd6652b33",
         "affectsGlobalScope": false
       },
       "./src/index.ts": {
-        "version": "451dcceea938185d9531ca7652c705d8a03d64bafddf743936d6646259022731",
-        "signature": "1f82242eae67bd977cff3b3573062403d2fbafe266f4d856537c8686c232e53d",
+        "version": "896636c27d8d2e318deafdc8035d5e28db76d7f7b6a9c0ce4fdfda33d4afefde",
+        "signature": "344ae75bfdbc7a04ddc2b14841eb294342f41f62d7ba85a12aca9bc032ba5dfb",
         "affectsGlobalScope": false
       },
       "../../node_modules/@types/anymatch/index.d.ts": {
@@ -2184,6 +2189,14 @@
         "../../node_modules/@types/node/ts3.2/util.d.ts",
         "../../node_modules/@types/node/util.d.ts"
       ],
+      "../memdb/lib/index.d.ts": [
+        "../../node_modules/@types/graceful-fs/index.d.ts",
+        "../../node_modules/@types/node/fs.d.ts",
+        "../../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../../node_modules/@types/node/ts3.2/util.d.ts",
+        "../../node_modules/@types/node/util.d.ts",
+        "../platform/lib/index.d.ts"
+      ],
       "../platform/lib/index.d.ts": [
         "../../node_modules/@types/graceful-fs/index.d.ts",
         "../../node_modules/@types/node/fs.d.ts",
@@ -2197,6 +2210,7 @@
         "../../node_modules/@types/node/ts3.2/fs.d.ts",
         "../../node_modules/@types/node/ts3.2/util.d.ts",
         "../../node_modules/@types/node/util.d.ts",
+        "../memdb/lib/index.d.ts",
         "../platform/lib/index.d.ts"
       ]
     },
@@ -3588,6 +3602,14 @@
         "../../node_modules/@types/node/ts3.2/util.d.ts",
         "../../node_modules/@types/node/util.d.ts"
       ],
+      "../memdb/lib/index.d.ts": [
+        "../../node_modules/@types/graceful-fs/index.d.ts",
+        "../../node_modules/@types/node/fs.d.ts",
+        "../../node_modules/@types/node/ts3.2/fs.d.ts",
+        "../../node_modules/@types/node/ts3.2/util.d.ts",
+        "../../node_modules/@types/node/util.d.ts",
+        "../platform/lib/index.d.ts"
+      ],
       "../platform/lib/index.d.ts": [
         "../../node_modules/@types/graceful-fs/index.d.ts",
         "../../node_modules/@types/node/fs.d.ts",
@@ -3596,6 +3618,7 @@
         "../../node_modules/@types/node/util.d.ts"
       ],
       "./src/index.ts": [
+        "../memdb/lib/index.d.ts",
         "../platform/lib/index.d.ts"
       ]
     },
@@ -3755,6 +3778,7 @@
       "../../node_modules/typescript/lib/lib.esnext.string.d.ts",
       "../../node_modules/typescript/lib/lib.scripthost.d.ts",
       "../../node_modules/typescript/lib/lib.webworker.importscripts.d.ts",
+      "../memdb/lib/index.d.ts",
       "../platform/lib/index.d.ts",
       "./src/index.ts"
     ]

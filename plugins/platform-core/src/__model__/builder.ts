@@ -13,15 +13,11 @@
 // limitations under the License.
 //
 
-import { Resource, Metadata, Emb, Doc, Obj, Ref, EClass, Class, AllAttributes, Property, ArrayOf, Type, DocLayout, LayoutType } from '@anticrm/platform'
+import { Resource, Metadata, Emb, Doc, Obj, Ref, EClass, Class, AllAttributes, Property } from '@anticrm/platform'
 
-import { RefTo, CoreDomain, InstanceOf } from '@anticrm/platform-core'
+import { RefTo, CoreDomain, InstanceOf, ArrayOf, Type } from '..'
 import core from '.'
-import { ModelDb, MemDb } from '@anticrm/memdb'
-
-function str (value: string): Property<string> {
-  return value as unknown as Property<string>
-}
+import { ModelDb, MemDb, Layout } from '@anticrm/memdb'
 
 class Builder {
   private memdb: ModelDb
@@ -30,13 +26,13 @@ class Builder {
     this.memdb = memdb ?? new MemDb()
   }
 
-  dump (): DocLayout[] { return this.memdb.dump() }
+  dump (): Layout<Doc>[] { return this.memdb.dump() }
 
   // N E W  I N S T A N C E S
 
-  createClass<T extends E, E extends Obj> (_id: Ref<Class<T>>, _extends: Ref<Class<E>>, _attributes: AllAttributes<T, E>, domain: string = CoreDomain.Model) {
+  createClass<T extends E, E extends Obj> (_id: Ref<Class<T>>, _extends: Ref<Class<E>>, _attributes: AllAttributes<T, E>, _domain: string = CoreDomain.Model, _native?: Resource<any>) {
     this.createDocument(core.class.Class as Ref<Class<EClass<T, E>>>,
-      { _extends, _attributes, _domain: str(domain), _native: undefined },
+      { _extends, _attributes, _domain, _native } as Layout<EClass<T, E>>,
       _id as Ref<EClass<T, E>>)
   }
 
@@ -45,15 +41,15 @@ class Builder {
     return obj
   }
 
-  createDocument<M extends Doc> (_class: Ref<Class<M>>, values: Record<Exclude<keyof M, keyof Doc>, LayoutType>, _id?: Ref<M>): void {
+  createDocument<M extends Doc> (_class: Ref<Class<M>>, values: Layout<Omit<M, keyof Doc>>, _id?: Ref<M>): void {
     this.memdb.createDocument(_class, values, _id)
   }
 
-  mixin<T extends E, E extends Doc> (id: Ref<E>, clazz: Ref<Class<T>>, values: Record<Exclude<keyof T, keyof E>, LayoutType>) {
+  mixin<T extends E, E extends Doc> (id: Ref<E>, clazz: Ref<Class<T>>, values: Layout<Omit<T, keyof E>>) {
     this.memdb.mixin(id, clazz, values)
   }
 
-  patch<T extends Doc> (obj: Ref<T>, f: (obj: DocLayout) => void) {
+  patch<T extends Doc> (obj: Ref<T>, f: (obj: Layout<Doc>) => void) {
     f(this.memdb.get(obj))
   }
 

@@ -222,8 +222,8 @@
         "affectsGlobalScope": false
       },
       "../platform/lib/index.d.ts": {
-        "version": "2657c0fb8d74c14772a7cc76820bc62da3c498d73c3653330a2e8152123281e4",
-        "signature": "2657c0fb8d74c14772a7cc76820bc62da3c498d73c3653330a2e8152123281e4",
+        "version": "f0080f8a8079ec55c309fe0c85d90aba8e8b4326f841b9f7b3f788fe973d9172",
+        "signature": "f0080f8a8079ec55c309fe0c85d90aba8e8b4326f841b9f7b3f788fe973d9172",
         "affectsGlobalScope": false
       },
       "./src/objectid.ts": {
@@ -232,8 +232,8 @@
         "affectsGlobalScope": false
       },
       "./src/index.ts": {
-        "version": "286c53b8ff6129f234fc7b3a16c74a3513a84d523bc0e95269953031f44970cb",
-        "signature": "c7d0861a4a33502be2029f6f08aaeee12df06bdd938a444c14769ce60db11433",
+        "version": "99797e94cf5b37062cc4eca66ce68994ac1f346cd1d8e26db6e727114b6e2f41",
+        "signature": "4cd2677d1bb7eab082a9cb837fcb6efbcf9fe007cbe8899dbe5a53acd6652b33",
         "affectsGlobalScope": false
       },
       "../../node_modules/@types/anymatch/index.d.ts": {

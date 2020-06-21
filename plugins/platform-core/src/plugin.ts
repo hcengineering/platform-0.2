@@ -13,9 +13,10 @@
 // limitations under the License.
 //
 
-import { Platform, Resource, Metadata, ObjLayout } from '@anticrm/platform'
-import { Obj, Doc, DocLayout, Ref, Class, BagOf, LayoutType, Type, Emb, Exert, Property, TypeLayout } from '@anticrm/platform'
-import core, { CoreService, InstanceOf, Instance, StaticResource, Session } from '.'
+import { Platform, Resource, Metadata } from '@anticrm/platform'
+import { Obj, Doc, Ref, Class, Emb, Property } from '@anticrm/platform'
+import { Layout, LayoutType } from '@anticrm/memdb'
+import core, { CoreService, InstanceOf, Instance, StaticResource, Session, Exert, BagOf, Type } from '.'
 
 import { MemDb } from '@anticrm/memdb'
 import { CoreProtocol, Response, CommitInfo } from '@anticrm/rpc'
@@ -48,7 +49,7 @@ export default async (platform: Platform, deps: { rpc: RpcService }): Promise<Co
   const coreProtocol: CoreProtocol = {
     load: () => rpc.request('load', []),
     commit: (info: CommitInfo) => rpc.request('commit', info),
-    find: <T extends Doc> (_class: Ref<Class<T>>, query: Partial<T>) => rpc.request<DocLayout[]>('find', _class, query)
+    find: <T extends Doc> (_class: Ref<Class<T>>, query: Partial<T>) => rpc.request<Layout<Doc>[]>('find', _class, query)
   }
 
   // M E T A M O D E L
@@ -157,7 +158,7 @@ export default async (platform: Platform, deps: { rpc: RpcService }): Promise<Co
   }
 
   const Resource_exert = async function (this: Instance<Type<any>>): Promise<Exert<any>> {
-    return (async (value: Property<any>) => value ? platform.getResource(value as unknown as Resource<any>) : undefined) as Exert<any>
+    return (async (value: LayoutType) => value ? platform.getResource(value as unknown as Resource<any>) : undefined) as Exert<any>
   }
 
   const BagOf_exert = async function (this: Instance<BagOf<any>>): Promise<Exert<any>> {
@@ -171,14 +172,14 @@ export default async (platform: Platform, deps: { rpc: RpcService }): Promise<Co
 
   const InstanceOf_exert = async function (this: Instance<InstanceOf<Emb>>): Promise<Exert<any>> {
     return ((value: LayoutType) => {
-      const result = value ? this.getSession().instantiateEmb(value as ObjLayout) : undefined
+      const result = value ? this.getSession().instantiateEmb(value as Layout<Obj>) : undefined
       return result
     }) as Exert<any>
   }
 
   const TStaticResource = {
     exert: async function (this: Instance<StaticResource<any>>): Promise<Exert<any>> {
-      const resource = (this.__layout as TypeLayout)._default as unknown as Resource<(this: Instance<Type<any>>) => Exert<any>>
+      const resource = (this.__layout as Layout<Type<any>>)._default as unknown as Resource<(this: Instance<Type<any>>) => Exert<any>>
       if (resource) {
         const resolved = await platform.getResource(resource)
         return () => resolved

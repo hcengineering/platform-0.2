@@ -14,20 +14,15 @@
 //
 
 import {
-  plugin, Plugin, Service, Resource,
-  Metadata, ResourceKind, ObjLayout
+  plugin, Plugin, Service, Resource, Metadata,
+  ResourceKind, Obj, Doc, Ref, Class, Emb, Property
 } from '@anticrm/platform'
 
-import {
-  Property, Ref, DocLayout,
-  Obj, Emb, Doc, Class, Type, Exert, BagOf
-} from '@anticrm/platform'
-
-import { ModelDb } from '@anticrm/memdb'
+import { ModelDb, Layout, LayoutType } from '@anticrm/memdb'
 import rpc from '@anticrm/platform-rpc'
 import { CommitInfo } from '@anticrm/rpc'
 
-export { Obj, Doc, Ref, Class, Type, BagOf, ArrayOf, Emb } from '@anticrm/platform'
+export { Obj, Doc, Ref, Class, Emb, Property } from '@anticrm/platform'
 
 // P R O P E R T I E S
 
@@ -43,12 +38,11 @@ export { Obj, Doc, Ref, Class, Type, BagOf, ArrayOf, Emb } from '@anticrm/platfo
 // export type Property<T> = { __property: T }
 
 // export type Ref<T extends Doc> = string & { __ref: T } & Resource<T>
-// export type PropertyType = Property<any>
-//   | Emb
-//   | undefined
-//   | PropertyType[]
-//   | { [key: string]: PropertyType }
-
+export type PropertyType = Property<any>
+  | Emb
+  | undefined
+  | PropertyType[]
+  | { [key: string]: PropertyType }
 
 export type Resolve<T> = T extends Resource<infer X> ? Property<Promise<X>> : never
 // export type Preserve<T> = T extends Resource<infer X> ? Property<Resource<X>> : never
@@ -68,17 +62,17 @@ export type Resolve<T> = T extends Resource<infer X> ? Property<Promise<X>> : ne
 
 // T Y P E S
 
-// export type Exert = (value: PropertyType, layout?: any, key?: string) => any
-// export interface Type<A> extends Emb {
-//   _default?: Property<A>
-//   exert?: Property<(this: Instance<Type<any>>) => Promise<Exert>>
-// }
+export type Exert<A> = (value: LayoutType, layout?: any, key?: string) => A
+export interface Type<A> extends Emb {
+  _default?: Property<A>
+  exert?: Property<(this: Instance<Type<any>>) => Promise<Exert<A>>>
+}
 export interface RefTo<T extends Doc> extends Type<T> { to: Ref<Class<T>> }
 export interface InstanceOf<T extends Emb> extends Type<T> { of: Ref<Class<T>> }
-// export interface BagOf<A> extends Type<{ [key: string]: A }> {
-//   of: Type<A>
-// }
-// export interface ArrayOf<A> extends Type<A[]> { of: Type<A> }
+export interface BagOf<A> extends Type<{ [key: string]: A }> {
+  of: Type<A>
+}
+export interface ArrayOf<A> extends Type<A[]> { of: Type<A> }
 export interface StaticResource<T> extends Type<T> { }
 
 // C L A S S E S
@@ -127,8 +121,8 @@ export type Instance<T> = { [P in keyof T]:
   T[P] extends (infer X)[] | undefined ? Instance<X>[] :
   never
 } & {
-  __layout: ObjLayout
-  __update: ObjLayout
+  __layout: Layout<Obj>
+  __update: Layout<Obj>
   getSession (): Session
 }
 
@@ -170,7 +164,7 @@ export interface Session {
 
   adapt (resource: Resource<any>, kind: string): Promise<Resource<any> | undefined>
 
-  instantiateEmb<T extends Emb> (obj: ObjLayout): Promise<Instance<T>>
+  instantiateEmb<T extends Emb> (obj: Layout<Obj>): Promise<Instance<T>>
 
   getModel (): ModelDb // TODO: need this?
   getClassHierarchy (_class: Ref<Class<Obj>>, top?: Ref<Class<Obj>>): Ref<Class<Obj>>[]

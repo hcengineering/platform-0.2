@@ -67,7 +67,7 @@ export default async (platform: Platform): Promise<I18nService> => {
     return translation
   }
 
-  const IntlString_exert = async function (this: Instance<Type<Doc>>): Promise<Exert> { // eslint-disable-line
+  const IntlString_exert = async function (this: Instance<Type<Doc>>): Promise<Exert<any>> { // eslint-disable-line
     return ((value: IntlString & Property<string>, layout: any, key: string) => {
       const translation = translate(value)
       if (translation !== value) {
@@ -80,7 +80,7 @@ export default async (platform: Platform): Promise<I18nService> => {
         }
         return value
       }
-    }) as Exert
+    }) as Exert<any>
   }
 
   const boot = platform.getMetadata(i18n.metadata.BootStrings)

@@ -14,16 +14,17 @@
 //
 
 import { CommitInfo, CoreProtocol } from '@anticrm/rpc'
-import { Platform, Resource, Doc, Ref, Class, Obj, Emb, Type, Layout, ClassLayout, DocLayout, ObjLayout } from '@anticrm/platform'
-import { MemDb, findAll } from '@anticrm/memdb'
+import { Platform, Resource, Doc, Ref, Class, Obj, Emb } from '@anticrm/platform'
+import { MemDb, findAll, Layout, AnyLayout } from '@anticrm/memdb'
 import { generateId } from './objectid'
 import { attributeKey } from './plugin'
+import { Type } from '.'
 
 import core, { Instance, Session, Values, Adapter, Cursor } from '.'
 
 export function createSession (platform: Platform, modelDb: MemDb, coreProtocol: CoreProtocol): Session {
 
-  type Konstructor<T extends Obj> = new (obj: ObjLayout) => Instance<T>
+  type Konstructor<T extends Obj> = new (obj: Layout<Obj>) => Instance<T>
 
   enum Stereotype {
     EMB,
@@ -47,7 +48,7 @@ export function createSession (platform: Platform, modelDb: MemDb, coreProtocol:
     const prototype = prototypes.get(_class)
     if (prototype) { return prototype }
 
-    const clazz = modelDb.get(_class) as ClassLayout
+    const clazz = modelDb.get(_class) as Layout<Class<Doc>>
     const parent = clazz._extends ? await getPrototype(clazz._extends as string as Ref<Class<Obj>>, stereotype) : CoreRoot
     const proto = Object.create(parent)
     prototypes.set(_class, proto)
@@ -97,7 +98,7 @@ export function createSession (platform: Platform, modelDb: MemDb, coreProtocol:
         },
         set (this: Instance<Obj>, value: any) {
           (this.__update as any)[fullKey] = value
-          const id = (this.__layout as DocLayout)._id
+          const id = (this.__layout as Layout<Doc>)._id
           if (id) { updated.set(id, this as Instance<Doc>) }
         },
         enumerable: true
@@ -112,9 +113,9 @@ export function createSession (platform: Platform, modelDb: MemDb, coreProtocol:
     else {
       const proto = await getPrototype(_class, stereotype)
       const ctor = {
-        [_class]: function (this: Instance<Obj>, obj: DocLayout) {
+        [_class]: function (this: Instance<Obj>, obj: Layout<Doc>) {
           this.__layout = obj
-          this.__update = {} as DocLayout
+          this.__update = {} as Layout<Doc>
         }
       }[_class] // A trick to `name` function as `_class` value
       proto.constructor = ctor
@@ -124,19 +125,19 @@ export function createSession (platform: Platform, modelDb: MemDb, coreProtocol:
     }
   }
 
-  async function instantiateEmb<T extends Emb> (obj: ObjLayout): Promise<Instance<T>> {
+  async function instantiateEmb<T extends Emb> (obj: Layout<Obj>): Promise<Instance<T>> {
     const ctor = await getKonstructor(obj._class, Stereotype.EMB)
     return new ctor(obj) as Instance<T>
   }
 
-  async function instantiateDoc<T extends Doc> (obj: DocLayout): Promise<Instance<T>> {
+  async function instantiateDoc<T extends Doc> (obj: Layout<Doc>): Promise<Instance<T>> {
     const ctor = await getKonstructor(obj._class, Stereotype.DOC)
     return new ctor(obj) as unknown as Instance<T>
   }
 
   async function newInstance<M extends Doc> (_class: Ref<Class<M>>, values: Values<Omit<M, keyof Doc>>, id?: Ref<M>): Promise<Instance<M>> {
     const _id = id ?? generateId() as Ref<Doc>
-    const layout = { _class, _id } as DocLayout
+    const layout = { _class, _id } as Layout<Doc>
 
     const instance = await instantiateDoc(layout)
     for (const key in values) {
@@ -175,7 +176,7 @@ export function createSession (platform: Platform, modelDb: MemDb, coreProtocol:
 
   // C O M M I T S
 
-  function fullLayout (instance: Instance<Obj>): ObjLayout {
+  function fullLayout (instance: Instance<Obj>): Layout<Obj> {
     const layout = instance.__layout
     const update = instance.__update
     return { ...layout, ...update }
@@ -184,12 +185,12 @@ export function createSession (platform: Platform, modelDb: MemDb, coreProtocol:
   async function commit () {
     return new Promise<void>(async (resolve, reject) => {
       const info: CommitInfo = {
-        created: [] as DocLayout[]
+        created: [] as Layout<Doc>[]
       }
 
       console.log('COMMIT')
       for (const instance of created.values()) {
-        info.created.push(fullLayout(instance) as DocLayout)
+        info.created.push(fullLayout(instance) as Layout<Doc>)
         updated.delete(instance._id)
       }
 
@@ -213,7 +214,7 @@ export function createSession (platform: Platform, modelDb: MemDb, coreProtocol:
     }
 
     for (const q of queries) {
-      const find = findAll(info.created, q._class, q.query as Layout)
+      const find = findAll(info.created, q._class, q.query as AnyLayout)
       if (find.length > 0) {
         q.result.push(...find)
         const foundInstances = await Promise.all(find.map(doc => instantiateDoc(doc)))
@@ -230,7 +231,7 @@ export function createSession (platform: Platform, modelDb: MemDb, coreProtocol:
   }
 
   function find<T extends Doc> (_class: Ref<Class<T>>, query: Partial<T>): Cursor<T> {
-    const layouts = coreProtocol.find(_class as Ref<Class<Doc>>, query as Layout)
+    const layouts = coreProtocol.find(_class as Ref<Class<Doc>>, query as unknown as AnyLayout) // !!!!! WRONG, need hibernate
 
     return {
       async all (): Promise<Instance<T>[]> {
@@ -243,7 +244,7 @@ export function createSession (platform: Platform, modelDb: MemDb, coreProtocol:
   interface Query<T extends Doc> {
     _class: Ref<Class<T>>
     query: Values<Partial<T>>
-    result: DocLayout[]
+    result: Layout<Doc>[]
     instances: Instance<T>[]
     listener: (result: Instance<T>[]) => void
   }
@@ -255,7 +256,7 @@ export function createSession (platform: Platform, modelDb: MemDb, coreProtocol:
     const q = _q as unknown as Query<Doc>
     queries.push(q)
 
-    coreProtocol.find(_class as Ref<Class<Doc>>, query as Layout)
+    coreProtocol.find(_class as Ref<Class<Doc>>, query as unknown as AnyLayout) // !!!!! WRONG, need hibernate
       .then(result => {
         q.result = result
         return Promise.all(result.map(doc => instantiateDoc(doc)))
