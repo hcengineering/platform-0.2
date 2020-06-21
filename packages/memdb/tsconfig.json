@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "commonjs",
+    "outDir": "./lib",
+    "rootDir": "./src",
+    "strict": true,
+    "composite": true
+  },
+  "references": [
+    {
+      "path": "../platform"
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+lib/__tests__
+src
+.*.js
+*.config.js
+tsconfig.*
+

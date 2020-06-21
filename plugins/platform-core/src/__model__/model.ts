@@ -18,6 +18,7 @@ import {
   Obj, Doc, Class, InstanceOf, Type, Emb, Ref, RefTo
 } from '..'
 import Builder from './builder'
+import { ClassLayout } from '@anticrm/platform'
 export { Builder }
 
 export default (S: Builder) => {
@@ -97,7 +98,7 @@ export default (S: Builder) => {
   })
 
   S.createClass(core.class.StaticResource, core.class.Type, {})
-  S.patch(core.class.StaticResource, (clazz: Class<Obj>) => { clazz._native = S.primitive(core.native.StaticResource) })
+  S.patch(core.class.StaticResource, (clazz: ClassLayout) => { clazz._native = S.primitive(core.native.StaticResource) })
 
   S.createClass(core.class.Adapter, core.class.Doc, {
     from: S.newInstance(core.class.Type, {}),

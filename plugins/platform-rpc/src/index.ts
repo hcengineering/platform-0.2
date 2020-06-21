@@ -14,31 +14,12 @@
 //
 
 import { plugin, Plugin, Service, Metadata } from '@anticrm/platform'
-
-export type ReqId = string | number
-
-export interface Request<P extends any[]> {
-  id?: ReqId
-  method: string
-  params: P
-}
-
-export interface RpcError {
-  code: number
-  message?: string
-  data?: any
-}
-
-export interface Response<R> {
-  result?: R
-  id?: ReqId
-  error?: RpcError
-}
+import { Response } from '@anticrm/rpc'
 
 export type EventListener = (event: Response<unknown>) => void
 
 export interface RpcService extends Service {
-  request<P extends any[], R> (method: string, ...params: P): Promise<R>
+  request<R> (method: string, ...params: any[]): Promise<R>
   addEventListener (listener: EventListener): void
 }
 

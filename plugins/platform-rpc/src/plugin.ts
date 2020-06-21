@@ -14,8 +14,9 @@
 //
 
 import { Platform } from '@anticrm/platform'
+import { ReqId, makeRequest, getResponse } from '@anticrm/rpc'
 
-import client, { RpcService, ReqId, Request, Response, EventListener } from '.'
+import client, { RpcService, EventListener } from '.'
 
 /*!
   * Anticrm Platform™ Remote Procedure Call Plugin
@@ -65,15 +66,7 @@ export default async (platform: Platform): Promise<RpcService> => {
   const requests = new Map<ReqId, PromiseInfo>()
   let lastId = 0
 
-  function makeRequest<P extends any[]> (request: Request<P>): string {
-    return JSON.stringify(request)
-  }
-
-  function getResponse<D> (res: string): Response<D> {
-    return JSON.parse(res as string)
-  }
-
-  function request<P extends any[], R> (method: string, ...params: P): Promise<R> {
+  function request<R> (method: string, ...params: any[]): Promise<R> {
     console.log('<<<<<<< ' + method)
     console.log(params)
     return new Promise<any>(async (resolve, reject) => {

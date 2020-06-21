@@ -5,5 +5,11 @@
     "outDir": "./lib",
     "rootDir": "./src",
     "strict": true,
-  }
+    "composite": true
+  },
+  "references": [
+    {
+      "path": "../memdb"
+    }
+  ]
 }

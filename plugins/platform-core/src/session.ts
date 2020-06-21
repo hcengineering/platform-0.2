@@ -13,19 +13,17 @@
 // limitations under the License.
 //
 
-import { RpcService, Response } from '@anticrm/platform-rpc'
-import core, {
-  Doc, Ref, Class, Obj, Emb, Instance, Type, PropertyType,
-  Property, Session, Values, Adapter, Cursor, CommitInfo
-} from '.'
-import { MemDb, findAll } from './memdb'
+import { CommitInfo, CoreProtocol } from '@anticrm/rpc'
+import { Platform, Resource, Doc, Ref, Class, Obj, Emb, Type, Layout, ClassLayout, DocLayout, ObjLayout } from '@anticrm/platform'
+import { MemDb, findAll } from '@anticrm/memdb'
 import { generateId } from './objectid'
-import { Platform, Resource, ResourceKind } from '@anticrm/platform'
 import { attributeKey } from './plugin'
 
-export function createSession (platform: Platform, modelDb: MemDb, rpc: RpcService): Session {
+import core, { Instance, Session, Values, Adapter, Cursor } from '.'
 
-  type Konstructor<T extends Obj> = new (obj: Omit<T, '__property' | '_class'>) => Instance<T>
+export function createSession (platform: Platform, modelDb: MemDb, coreProtocol: CoreProtocol): Session {
+
+  type Konstructor<T extends Obj> = new (obj: ObjLayout) => Instance<T>
 
   enum Stereotype {
     EMB,
@@ -49,8 +47,8 @@ export function createSession (platform: Platform, modelDb: MemDb, rpc: RpcServi
     const prototype = prototypes.get(_class)
     if (prototype) { return prototype }
 
-    const clazz = modelDb.get(_class) as Class<Obj>
-    const parent = clazz._extends ? await getPrototype(clazz._extends, stereotype) : CoreRoot
+    const clazz = modelDb.get(_class) as ClassLayout
+    const parent = clazz._extends ? await getPrototype(clazz._extends as string as Ref<Class<Obj>>, stereotype) : CoreRoot
     const proto = Object.create(parent)
     prototypes.set(_class, proto)
 
@@ -61,12 +59,12 @@ export function createSession (platform: Platform, modelDb: MemDb, rpc: RpcServi
       Object.defineProperties(proto, descriptors)
     }
 
-    const attributes = clazz._attributes as { [key: string]: Type<any> }
+    const attributes = clazz._attributes
     for (const key in attributes) {
       if (key === '_default') { continue } // we do not define `_default`'s type, it's infinitevely recursive :)
       const attr = attributes[key]
       // console.log(attr)
-      const attrInstance = await instantiateEmb(attr)
+      const attrInstance = await instantiateEmb(attr) as Instance<Type<any>>
       // console.log(attrInstance)
 
       // if (typeof attrInstance.exert !== 'function') {
@@ -99,7 +97,7 @@ export function createSession (platform: Platform, modelDb: MemDb, rpc: RpcServi
         },
         set (this: Instance<Obj>, value: any) {
           (this.__update as any)[fullKey] = value
-          const id = (this.__layout as Doc)._id
+          const id = (this.__layout as DocLayout)._id
           if (id) { updated.set(id, this as Instance<Doc>) }
         },
         enumerable: true
@@ -114,9 +112,9 @@ export function createSession (platform: Platform, modelDb: MemDb, rpc: RpcServi
     else {
       const proto = await getPrototype(_class, stereotype)
       const ctor = {
-        [_class]: function (this: Instance<Obj>, obj: Obj) {
+        [_class]: function (this: Instance<Obj>, obj: DocLayout) {
           this.__layout = obj
-          this.__update = {} as Obj
+          this.__update = {} as DocLayout
         }
       }[_class] // A trick to `name` function as `_class` value
       proto.constructor = ctor
@@ -126,19 +124,19 @@ export function createSession (platform: Platform, modelDb: MemDb, rpc: RpcServi
     }
   }
 
-  async function instantiateEmb<T extends Emb> (obj: T): Promise<Instance<T>> {
+  async function instantiateEmb<T extends Emb> (obj: ObjLayout): Promise<Instance<T>> {
     const ctor = await getKonstructor(obj._class, Stereotype.EMB)
     return new ctor(obj) as Instance<T>
   }
 
-  async function instantiateDoc<T extends Doc> (obj: T): Promise<Instance<T>> {
+  async function instantiateDoc<T extends Doc> (obj: DocLayout): Promise<Instance<T>> {
     const ctor = await getKonstructor(obj._class, Stereotype.DOC)
-    return new ctor(obj) as Instance<T>
+    return new ctor(obj) as unknown as Instance<T>
   }
 
   async function newInstance<M extends Doc> (_class: Ref<Class<M>>, values: Values<Omit<M, keyof Doc>>, id?: Ref<M>): Promise<Instance<M>> {
     const _id = id ?? generateId() as Ref<Doc>
-    const layout = { _class, _id } as Doc
+    const layout = { _class, _id } as DocLayout
 
     const instance = await instantiateDoc(layout)
     for (const key in values) {
@@ -147,63 +145,7 @@ export function createSession (platform: Platform, modelDb: MemDb, rpc: RpcServi
 
     created.set(_id, instance)
 
-    return instance as Instance<M>
-  }
-
-  // C O M M I T S
-
-  function fullLayout (instance: Instance<Doc>): Doc {
-    const layout = instance.__layout
-    const update = instance.__update
-    return { ...layout, ...update }
-  }
-
-  async function commit () {
-    return new Promise<void>(async (resolve, reject) => {
-      const info: CommitInfo = {
-        created: [] as Doc[]
-      }
-
-      console.log('COMMIT')
-      for (const instance of created.values()) {
-        info.created.push(fullLayout(instance))
-        updated.delete(instance._id)
-      }
-
-      console.log(info)
-      console.log('------------')
-
-      rpc.request('commit', info).then(() => {
-        console.log('done rpc commit')
-        console.log(info)
-        commitInfo(info).then(() => { resolve() })
-      })
-    })
-  }
-
-  async function commitInfo (info: CommitInfo) {
-    console.log('session commitinfo')
-    console.log(info)
-
-    for (const doc of info.created) {
-      created.delete(doc._id)
-    }
-
-    for (const q of queries) {
-      const find = findAll(info.created, q._class, q.query as { [key: string]: PropertyType })
-      if (find.length > 0) {
-        q.result.push(...find)
-        const foundInstances = await Promise.all(find.map(doc => instantiateDoc(doc)))
-        q.instances.push(...foundInstances)
-        q.listener(q.instances)
-      }
-    }
-  }
-
-  function close (discard?: boolean) {
-    if (created.size > 0 || updated.size > 0) {
-      if (!discard) { throw new Error('you have uncommitted changes.') }
-    }
+    return instance as unknown as Instance<M>
   }
 
   // I N S T A N C E S
@@ -211,7 +153,7 @@ export function createSession (platform: Platform, modelDb: MemDb, rpc: RpcServi
   async function getInstance<T extends Doc> (id: Ref<T>): Promise<Instance<T>> {
     const newInstance = created.get(id)
     if (newInstance) {
-      return newInstance as Instance<T>
+      return newInstance as unknown as Instance<T>
     }
     const doc = modelDb.get(id)
     if (!doc) { throw new Error('no document ,id: ' + id) }
@@ -231,17 +173,69 @@ export function createSession (platform: Platform, modelDb: MemDb, rpc: RpcServi
     return mixins && mixins.includes(_class as Ref<Class<Doc>>)
   }
 
-  function findRequest<T extends Doc> (_class: Ref<Class<T>>, query: Partial<T>) {
-    return rpc.request<[Ref<Class<T>>, Partial<T>], Doc[]>('find', _class, query)
+  // C O M M I T S
+
+  function fullLayout (instance: Instance<Obj>): ObjLayout {
+    const layout = instance.__layout
+    const update = instance.__update
+    return { ...layout, ...update }
+  }
+
+  async function commit () {
+    return new Promise<void>(async (resolve, reject) => {
+      const info: CommitInfo = {
+        created: [] as DocLayout[]
+      }
+
+      console.log('COMMIT')
+      for (const instance of created.values()) {
+        info.created.push(fullLayout(instance) as DocLayout)
+        updated.delete(instance._id)
+      }
+
+      console.log(info)
+      console.log('------------')
+
+      coreProtocol.commit(info).then(() => {
+        console.log('done rpc commit')
+        console.log(info)
+        commitInfo(info).then(() => { resolve() })
+      })
+    })
+  }
+
+  async function commitInfo (info: CommitInfo) {
+    console.log('session commitinfo')
+    console.log(info)
+
+    for (const doc of info.created) {
+      created.delete(doc._id)
+    }
+
+    for (const q of queries) {
+      const find = findAll(info.created, q._class, q.query as Layout)
+      if (find.length > 0) {
+        q.result.push(...find)
+        const foundInstances = await Promise.all(find.map(doc => instantiateDoc(doc)))
+        q.instances.push(...foundInstances)
+        q.listener(q.instances)
+      }
+    }
+  }
+
+  function close (discard?: boolean) {
+    if (created.size > 0 || updated.size > 0) {
+      if (!discard) { throw new Error('you have uncommitted changes.') }
+    }
   }
 
   function find<T extends Doc> (_class: Ref<Class<T>>, query: Partial<T>): Cursor<T> {
-    const layouts = findRequest(_class, query)
+    const layouts = coreProtocol.find(_class as Ref<Class<Doc>>, query as Layout)
 
     return {
       async all (): Promise<Instance<T>[]> {
         const result = await layouts.then(resolved => (resolved as T[]).map(doc => instantiateDoc(doc)))
-        return Promise.all(result)
+        return Promise.all(result as unknown as Promise<Instance<T>>[])
       }
     }
   }
@@ -249,7 +243,7 @@ export function createSession (platform: Platform, modelDb: MemDb, rpc: RpcServi
   interface Query<T extends Doc> {
     _class: Ref<Class<T>>
     query: Values<Partial<T>>
-    result: T[]
+    result: DocLayout[]
     instances: Instance<T>[]
     listener: (result: Instance<T>[]) => void
   }
@@ -261,14 +255,14 @@ export function createSession (platform: Platform, modelDb: MemDb, rpc: RpcServi
     const q = _q as unknown as Query<Doc>
     queries.push(q)
 
-    findRequest(_class, query as Partial<T>)
+    coreProtocol.find(_class as Ref<Class<Doc>>, query as Layout)
       .then(result => {
         q.result = result
         return Promise.all(result.map(doc => instantiateDoc(doc)))
       })
       .then(result => {
         q.instances = result
-        listener(result as Instance<T>[])
+        listener(result as unknown as Instance<T>[])
       }
       )
 
@@ -286,24 +280,24 @@ export function createSession (platform: Platform, modelDb: MemDb, rpc: RpcServi
     }
 
     const adapter = await modelDb.findOne(core.class.Adapter, {
-      from: info.kind as unknown as Property<ResourceKind>,
-      to: kind as unknown as Property<ResourceKind>
+      from: info.kind,
+      to: kind
     })
 
     if (adapter) {
-      const instance = await getInstance(adapter._id as Ref<Adapter>)
+      const instance = await getInstance(adapter._id as string as Ref<Adapter>)
       return (await instance.adapt).call(instance, resource)
     }
 
     return undefined
   }
 
-  function getClassHierarchy (_class: Ref<Class<Obj>>, top?: Ref<Class<Obj>>): Ref<Class<Obj>>[] {
+  function getClassHierarchy (_class: Ref<Class<Doc>>, top?: Ref<Class<Obj>>): Ref<Class<Obj>>[] {
     const hierarchy = modelDb.getClassHierarchy(_class)
     console.log('TOP: ' + top)
     const result = top ? hierarchy.slice(0, hierarchy.indexOf(top)) : hierarchy
     console.log(result)
-    return result
+    return result as string[] as Ref<Class<Obj>>[]
   }
 
   const session: Session = {

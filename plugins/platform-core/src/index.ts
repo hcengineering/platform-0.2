@@ -15,10 +15,19 @@
 
 import {
   plugin, Plugin, Service, Resource,
-  Metadata, ResourceKind
+  Metadata, ResourceKind, ObjLayout
 } from '@anticrm/platform'
 
+import {
+  Property, Ref, DocLayout,
+  Obj, Emb, Doc, Class, Type, Exert, BagOf
+} from '@anticrm/platform'
+
+import { ModelDb } from '@anticrm/memdb'
 import rpc from '@anticrm/platform-rpc'
+import { CommitInfo } from '@anticrm/rpc'
+
+export { Obj, Doc, Ref, Class, Type, BagOf, ArrayOf, Emb } from '@anticrm/platform'
 
 // P R O P E R T I E S
 
@@ -31,14 +40,14 @@ import rpc from '@anticrm/platform-rpc'
  * 
  * {@link Instance}
  */
-export type Property<T> = { __property: T }
+// export type Property<T> = { __property: T }
 
-export type Ref<T extends Doc> = string & { __ref: T } & Resource<T>
-export type PropertyType = Property<any>
-  | Emb
-  | undefined
-  | PropertyType[]
-  | { [key: string]: PropertyType }
+// export type Ref<T extends Doc> = string & { __ref: T } & Resource<T>
+// export type PropertyType = Property<any>
+//   | Emb
+//   | undefined
+//   | PropertyType[]
+//   | { [key: string]: PropertyType }
 
 
 export type Resolve<T> = T extends Resource<infer X> ? Property<Promise<X>> : never
@@ -50,58 +59,58 @@ export type Resolve<T> = T extends Resource<infer X> ? Property<Promise<X>> : ne
 
 // O B J E C T S
 
-export interface Obj { _class: Ref<Class<Obj>> }
-export interface Emb extends Obj { __embedded: true }
-export interface Doc extends Obj {
-  _id: Ref<Doc>
-  _mixins?: Ref<Class<Doc>>[]
-}
+// export interface Obj { _class: Ref<Class<Obj>> }
+// export interface Emb extends Obj { __embedded: true }
+// export interface Doc extends Obj {
+//   _id: Ref<Doc>
+//   _mixins?: Ref<Class<Doc>>[]
+// }
 
 // T Y P E S
 
-export type Exert = (value: PropertyType, layout?: any, key?: string) => any
-export interface Type<A> extends Emb {
-  _default?: Property<A>
-  exert?: Property<(this: Instance<Type<any>>) => Promise<Exert>>
-}
+// export type Exert = (value: PropertyType, layout?: any, key?: string) => any
+// export interface Type<A> extends Emb {
+//   _default?: Property<A>
+//   exert?: Property<(this: Instance<Type<any>>) => Promise<Exert>>
+// }
 export interface RefTo<T extends Doc> extends Type<T> { to: Ref<Class<T>> }
 export interface InstanceOf<T extends Emb> extends Type<T> { of: Ref<Class<T>> }
-export interface BagOf<A> extends Type<{ [key: string]: A }> {
-  of: Type<A>
-}
-export interface ArrayOf<A> extends Type<A[]> { of: Type<A> }
+// export interface BagOf<A> extends Type<{ [key: string]: A }> {
+//   of: Type<A>
+// }
+// export interface ArrayOf<A> extends Type<A[]> { of: Type<A> }
 export interface StaticResource<T> extends Type<T> { }
 
 // C L A S S E S
 
-type PropertyTypes<T> = {
-  [P in keyof T]:
-  T[P] extends Property<infer X> ? Type<X> :
-  T[P] extends Ref<infer X> ? Type<X> :
-  T[P] extends { [key: string]: infer X } | undefined ? BagOf<any> :
-  T[P] extends (infer X)[] | undefined ? ArrayOf<any> :
-  T[P]
-}
+// type PropertyTypes<T> = {
+//   [P in keyof T]:
+//   T[P] extends Property<infer X> ? Type<X> :
+//   T[P] extends Ref<infer X> ? Type<X> :
+//   T[P] extends { [key: string]: infer X } | undefined ? BagOf<any> :
+//   T[P] extends (infer X)[] | undefined ? ArrayOf<any> :
+//   T[P]
+// }
 
-export type Attributes<T extends E, E extends Obj> = PropertyTypes<Required<Omit<T, keyof E>>>
-export type AllAttributes<T extends E, E extends Obj> = Attributes<T, E> & Partial<Attributes<E, Obj>>
+// export type Attributes<T extends E, E extends Obj> = PropertyTypes<Required<Omit<T, keyof E>>>
+// export type AllAttributes<T extends E, E extends Obj> = Attributes<T, E> & Partial<Attributes<E, Obj>>
 
-export interface EClassifier<T extends E, E extends Obj> extends Doc {
-  _attributes: AllAttributes<T, E>
-}
+// export interface EClassifier<T extends E, E extends Obj> extends Doc {
+//   _attributes: AllAttributes<T, E>
+// }
 
 export enum CoreDomain {
   Model = 'model'
 }
 
-export interface EClass<T extends E, E extends Obj> extends EClassifier<T, E> {
-  _extends?: Ref<Class<E>>
-  _native?: Property<Object>
-  _domain?: Property<string>
-}
+// export interface EClass<T extends E, E extends Obj> extends EClassifier<T, E> {
+//   _extends?: Ref<Class<E>>
+//   _native?: Property<Object>
+//   _domain?: Property<string>
+// }
 
 export const ClassKind = 'class' as ResourceKind
-export type Class<T extends Obj> = EClass<T, Obj>
+// export type Class<T extends Obj> = EClass<T, Obj>
 
 type PrimitiveInstance<T> =
   T extends Ref<infer X> ? Ref<X> :
@@ -118,8 +127,8 @@ export type Instance<T> = { [P in keyof T]:
   T[P] extends (infer X)[] | undefined ? Instance<X>[] :
   never
 } & {
-  __layout: T
-  __update: T
+  __layout: ObjLayout
+  __update: ObjLayout
   getSession (): Session
 }
 
@@ -144,23 +153,8 @@ export interface Adapter extends Doc {
 
 // S E S S I O N
 
-export interface ModelDb {
-  add (doc: Doc): void
-  get<T extends Doc> (id: Ref<T>): T
-  dump (): Doc[]
-
-  find (clazz: Ref<Class<Doc>>, query: { [key: string]: PropertyType }): Promise<Doc[]>
-
-  mixin<T extends E, E extends Doc> (id: Ref<E>, clazz: Ref<Class<T>>, values: Pick<T, Exclude<keyof T, keyof E>>): void
-  createDocument<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Doc>, _id?: Ref<M>): M
-}
-
 export interface Cursor<T extends Doc> {
   all (): Promise<Instance<T>[]>
-}
-
-export interface CommitInfo {
-  created: Doc[]
 }
 
 export interface Session {
@@ -176,9 +170,9 @@ export interface Session {
 
   adapt (resource: Resource<any>, kind: string): Promise<Resource<any> | undefined>
 
-  instantiateEmb<T extends Emb> (obj: T): Promise<Instance<T>>
+  instantiateEmb<T extends Emb> (obj: ObjLayout): Promise<Instance<T>>
 
-  getModel (): ModelDb
+  getModel (): ModelDb // TODO: need this?
   getClassHierarchy (_class: Ref<Class<Obj>>, top?: Ref<Class<Obj>>): Ref<Class<Obj>>[]
 
   // debug?
@@ -205,11 +199,11 @@ export default plugin('core' as Plugin<CoreService>, { rpc: rpc.id }, {
     Adapter: '' as Ref<Class<Adapter>>
   },
   method: {
-    Type_exert: '' as Resource<(this: Instance<Type<any>>) => Promise<Exert>>,
-    BagOf_exert: '' as Resource<(this: Instance<BagOf<any>>) => Promise<Exert>>,
-    InstanceOf_exert: '' as Resource<(this: Instance<InstanceOf<Emb>>) => Promise<Exert>>,
-    Metadata_exert: '' as Resource<(this: Instance<Type<Metadata<any>>>) => Promise<Exert>>,
-    Resource_exert: '' as Resource<(this: Instance<Type<any>>) => Promise<Exert>>,
+    Type_exert: '' as Resource<(this: Instance<Type<any>>) => Promise<Exert<any>>>,
+    BagOf_exert: '' as Resource<(this: Instance<BagOf<any>>) => Promise<Exert<any>>>,
+    InstanceOf_exert: '' as Resource<(this: Instance<InstanceOf<Emb>>) => Promise<Exert<any>>>,
+    Metadata_exert: '' as Resource<(this: Instance<Type<Metadata<any>>>) => Promise<Exert<any>>>,
+    Resource_exert: '' as Resource<(this: Instance<Type<any>>) => Promise<Exert<any>>>,
 
     // Adapter_adapt: '' as Resource<(this: Instance<Adapter>) => Promise<Resource<any>> | undefined>
   },

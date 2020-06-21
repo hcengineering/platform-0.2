@@ -74,7 +74,99 @@ type PluginModule<P extends Service, D extends PluginDependencies> = () => Promi
 }>
 type AnyModule = PluginModule<Service, PluginDependencies>
 
-/// ///////////
+///
+///  M E T A M O D E L
+///
+
+export type Property<T> = { __property: T }
+export type PropertyType = Property<any>
+  | Emb
+  | undefined
+  | PropertyType[]
+  | { [key: string]: PropertyType }
+export type Ref<T extends Doc> = string & { __ref: T } & Resource<T>
+
+export type LayoutType = string | number | LayoutType[] | { [key: string]: LayoutType } | ObjLayout
+export type Layout = { [key: string]: LayoutType }
+
+export interface ObjLayout {
+  _class: Ref<Class<Obj>>
+}
+
+export interface DocLayout extends ObjLayout {
+  _class: Ref<Class<Doc>>
+  _id: Ref<Doc>
+  _mixins?: Ref<Class<Doc>>[]
+}
+
+export interface ClassLayout extends DocLayout {
+  _attributes: { [key: string]: TypeLayout }
+  _extends?: Ref<Class<Obj>>
+  _native?: LayoutType
+}
+
+export interface TypeLayout extends ObjLayout {
+  _default?: LayoutType
+  exert: LayoutType
+}
+
+// O B J E C T S
+
+export interface Obj { _class: Ref<Class<Obj>> }
+export interface Emb extends Obj { __embedded: true }
+export interface Doc extends Obj {
+  // __document: true
+  _class: Ref<Class<Doc>>
+  _id: Ref<Doc>
+  _mixins?: Ref<Class<Doc>>[]
+}
+
+// T Y P E S
+
+export type Exert<A> = (value: LayoutType, layout?: ObjLayout, key?: string) => A
+export interface Type<A> extends Emb {
+  _default?: Property<A>
+  exert?: Property<() => Promise<Exert<A>>>
+}
+
+export interface BagOf<A> extends Type<{ [key: string]: A }> { of: Type<A> }
+export interface ArrayOf<A> extends Type<A[]> { of: Type<A> }
+
+// C L A S S E S
+
+type PropertyTypes<T> = {
+  [P in keyof T]:
+  T[P] extends Property<infer X> ? Type<X> :
+  T[P] extends Ref<infer X> ? Type<X> :
+  T[P] extends { [key: string]: infer X } | undefined ? BagOf<any> :
+  T[P] extends (infer X)[] | undefined ? ArrayOf<any> :
+  T[P]
+}
+
+export type Attributes<T extends E, E extends Obj> = PropertyTypes<Required<Omit<T, keyof E>>>
+export type AllAttributes<T extends E, E extends Obj> = Attributes<T, E> & Partial<Attributes<E, Obj>>
+
+export interface EClassifier<T extends E, E extends Obj> extends Doc {
+  _attributes: AllAttributes<T, E>
+}
+
+export interface EClass<T extends E, E extends Obj> extends EClassifier<T, E> {
+  _extends?: Ref<Class<E>>
+  _native?: Property<Object>
+  _domain?: Property<string>
+}
+export type Class<T extends Obj> = EClass<T, Obj>
+
+// C O N V E R T  I N T O  L A Y O U T
+
+export type AsLayout<T extends Obj> = { [P in keyof T]:
+  T[P] extends Ref<Doc> ? T[P] :
+  T[P] extends Property<any | undefined> ? LayoutType | undefined :
+  T[P] extends Property<any> ? LayoutType :
+  never
+}
+
+///
 
 type ExtractType<T, X extends Record<string, Metadata<T>>> = { [P in keyof X]:
   X[P] extends Metadata<infer Z> ? Z : never
@@ -291,6 +383,14 @@ export function identify<N extends Namespace> (pluginId: AnyPlugin, namespace: N
 
 export function plugin<P extends Service, D extends PluginDependencies, N extends Namespace> (id: Plugin<P>, deps: D, namespace: N): PluginDescriptor<P, D> & N {
   return { id, deps, ...identify(id, namespace) }
+}
+
+export function attributeKey (_class: Ref<Class<Obj>>, key: string): string {
+  const index = _class.indexOf(':')
+  const dot = _class.indexOf('.')
+  const plugin = _class.substring(index + 1, dot)
+  const cls = _class.substring(dot + 1)
+  return plugin + '|' + cls + '|' + key
 }
 
 // P R O M I S E

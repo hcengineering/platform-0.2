@@ -1,7 +1,7 @@
 {
-  "name": "@anticrm/platform-rpc",
-  "version": "0.1.1",
-  "main": "src/index.ts",
+  "name": "@anticrm/memdb",
+  "version": "0.1.0",
+  "main": "lib/index.js",
   "author": "Anticrm Platform Contributors (https://github.com/anticrm)",
   "license": "EPL-2.0",
   "scripts": {

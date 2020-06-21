@@ -13,14 +13,16 @@
 // limitations under the License.
 //
 
-import { Platform, Resource, Metadata } from '@anticrm/platform'
-import core, {
-  CoreService, Obj, Doc, Ref, Class, BagOf, InstanceOf, PropertyType,
-  Instance, Type, Emb, StaticResource, Exert, Property, Session, CommitInfo
-} from '.'
-import { MemDb } from './memdb'
-import { RpcService, Response } from '@anticrm/platform-rpc'
+import { Platform, Resource, Metadata, ObjLayout } from '@anticrm/platform'
+import { Obj, Doc, DocLayout, Ref, Class, BagOf, LayoutType, Type, Emb, Exert, Property, TypeLayout } from '@anticrm/platform'
+import core, { CoreService, InstanceOf, Instance, StaticResource, Session } from '.'
+
+import { MemDb } from '@anticrm/memdb'
+import { CoreProtocol, Response, CommitInfo } from '@anticrm/rpc'
+
+import { RpcService } from '@anticrm/platform-rpc'
 import { createSession } from './session'
+import { find } from 'lodash'
 
 // TODO: Platform.getResourceInfo
 export function attributeKey (_class: Ref<Class<Obj>>, key: string): string {
@@ -43,12 +45,16 @@ export default async (platform: Platform, deps: { rpc: RpcService }): Promise<Co
 
   const rpc = deps.rpc
 
-  function loadRequest (domain: string) { return rpc.request<[], Doc[]>('load') }
+  const coreProtocol: CoreProtocol = {
+    load: () => rpc.request('load', []),
+    commit: (info: CommitInfo) => rpc.request('commit', info),
+    find: <T extends Doc> (_class: Ref<Class<T>>, query: Partial<T>) => rpc.request<DocLayout[]>('find', _class, query)
+  }
 
   // M E T A M O D E L
 
   const modelDb = new MemDb()
-  const metaModel = await loadRequest('model')
+  const metaModel = await coreProtocol.load()
   modelDb.loadModel(metaModel)
 
   // C O R E  S E R V I C E
@@ -70,7 +76,7 @@ export default async (platform: Platform, deps: { rpc: RpcService }): Promise<Co
 
   const coreService: CoreService = {
     newSession () {
-      const session = createSession(platform, modelDb, rpc)
+      const session = createSession(platform, modelDb, coreProtocol)
       sessions.push(session)
       return session
     }
@@ -107,9 +113,9 @@ export default async (platform: Platform, deps: { rpc: RpcService }): Promise<Co
   // C O L L E C T I O N : B A G
 
   class BagProxyHandler implements ProxyHandler<any> {
-    private exert: Exert
+    private exert: Exert<any>
 
-    constructor(exert: Exert | undefined) {
+    constructor(exert: Exert<any> | undefined) {
       if (!exert) {
         throw new Error('bagof: no exert')
       }
@@ -126,9 +132,9 @@ export default async (platform: Platform, deps: { rpc: RpcService }): Promise<Co
   // C O L L E C T I O N : A R R A Y
 
   class ArrayProxyHandler implements ProxyHandler<any> {
-    private exert: Exert
+    private exert: Exert<any>
 
-    constructor(exert: Exert | undefined) {
+    constructor(exert: Exert<any> | undefined) {
       if (!exert) {
         throw new Error('bagof: no exert')
       }
@@ -142,37 +148,37 @@ export default async (platform: Platform, deps: { rpc: RpcService }): Promise<Co
     }
   }
 
-  const Type_exert = async function (this: Instance<Type<any>>): Promise<Exert> {
+  const Type_exert = async function (this: Instance<Type<any>>): Promise<Exert<any>> {
     return value => value
   }
 
-  const Metadata_exert = async function (this: Instance<Type<any>>): Promise<Exert> {
-    return ((value: Metadata<any> & Property<any>) => value ? platform.getMetadata(value) : undefined) as Exert
+  const Metadata_exert = async function (this: Instance<Type<any>>): Promise<Exert<any>> {
+    return ((value: Metadata<any> & Property<any>) => value ? platform.getMetadata(value) : undefined) as Exert<any>
   }
 
-  const Resource_exert = async function (this: Instance<Type<any>>): Promise<Exert> {
-    return (async (value: Property<any>) => value ? platform.getResource(value as unknown as Resource<any>) : undefined) as Exert
+  const Resource_exert = async function (this: Instance<Type<any>>): Promise<Exert<any>> {
+    return (async (value: Property<any>) => value ? platform.getResource(value as unknown as Resource<any>) : undefined) as Exert<any>
   }
 
-  const BagOf_exert = async function (this: Instance<BagOf<any>>): Promise<Exert> {
+  const BagOf_exert = async function (this: Instance<BagOf<any>>): Promise<Exert<any>> {
     const off = await this.of
     const exertFactory = off.exert
     if (typeof exertFactory !== 'function') { throw new Error('not a function') }
     const exert = await exertFactory.call(this)
     if (typeof exert !== 'function') { throw new Error('not a function') }
-    return (value: PropertyType) => value ? new Proxy(value, new BagProxyHandler(exert)) : undefined
+    return (value: LayoutType) => value ? new Proxy(value, new BagProxyHandler(exert)) : undefined
   }
 
-  const InstanceOf_exert = async function (this: Instance<InstanceOf<Emb>>): Promise<Exert> {
-    return ((value: Emb) => {
-      const result = value ? this.getSession().instantiateEmb(value) : undefined
+  const InstanceOf_exert = async function (this: Instance<InstanceOf<Emb>>): Promise<Exert<any>> {
+    return ((value: LayoutType) => {
+      const result = value ? this.getSession().instantiateEmb(value as ObjLayout) : undefined
       return result
-    }) as Exert
+    }) as Exert<any>
   }
 
   const TStaticResource = {
-    exert: async function (this: Instance<StaticResource<any>>): Promise<Exert> {
-      const resource = (this.__layout._default) as unknown as Resource<(this: Instance<Type<any>>) => Exert>
+    exert: async function (this: Instance<StaticResource<any>>): Promise<Exert<any>> {
+      const resource = (this.__layout as TypeLayout)._default as unknown as Resource<(this: Instance<Type<any>>) => Exert<any>>
       if (resource) {
         const resolved = await platform.getResource(resource)
         return () => resolved
