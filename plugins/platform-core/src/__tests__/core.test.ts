@@ -37,47 +37,47 @@ describe('core', () => {
     expect(coreModel.length).toBeGreaterThan(0)
   })
 
-  // it('should create prototype', async () => {
-  //   const plugin = await platform.getPlugin(core.id)
-  //   const tx = plugin.newSession()
+  it('should create prototype', async () => {
+    const plugin = await platform.getPlugin(core.id)
+    const tx = plugin.newSession()
 
-  //   const typeProto = await tx.getPrototype(core.class.Type, DOC)
-  //   expect((typeProto as Object).hasOwnProperty('exert')).toBe(true)
+    const typeProto = await tx.getPrototype(core.class.Type, DOC)
+    expect((typeProto as Object).hasOwnProperty('exert')).toBe(true) // eslint-disable-line
 
-  //   const rtProto = await tx.getPrototype(core.class.StaticResource, DOC)
-  //   expect((rtProto as Object).hasOwnProperty('constructor')).toBe(true)
+    const rtProto = await tx.getPrototype(core.class.StaticResource, DOC)
+    expect((rtProto as Object).hasOwnProperty('constructor')).toBe(true) // eslint-disable-line
 
-  //   const rtProtoProto = Object.getPrototypeOf(rtProto)
-  //   expect(typeProto).toBe(rtProtoProto)
+    const rtProtoProto = Object.getPrototypeOf(rtProto)
+    expect(typeProto).toBe(rtProtoProto)
 
-  //   const bagProto = await tx.getPrototype(core.class.BagOf, DOC)
-  //   expect((bagProto as Object).hasOwnProperty('of')).toBe(true)
+    const bagProto = await tx.getPrototype(core.class.BagOf, DOC)
+    expect((bagProto as Object).hasOwnProperty('of')).toBe(true) // eslint-disable-line
 
-  //   tx.close()
-  // })
+    tx.close()
+  })
 
-  // it('should instantiate class', async () => {
-  //   const plugin = await platform.getPlugin(core.id)
-  //   const tx = plugin.newSession()
+  it('should instantiate class', async () => {
+    const plugin = await platform.getPlugin(core.id)
+    const tx = plugin.newSession()
 
-  //   const inst = await tx.getInstance(core.class.RefTo)
-  //   const x = inst._attributes
-  //   const to = await x.to
-  //   // TODO: understand problem
-  //   expect((to as any)._class).toBe(core.class.RefTo)
-  //   //    expect((inst._attributes.to as Instance<Emb>)._class).toBe(core.class.RefTo)
-  //   tx.close()
-  // })
+    const inst = await tx.getInstance(core.class.RefTo)
+    const x = inst._attributes
+    const to = await x.to
+    // TODO: understand problem
+    expect((to as any)._class).toBe(core.class.RefTo)
+    //    expect((inst._attributes.to as Instance<Emb>)._class).toBe(core.class.RefTo)
+    tx.close()
+  })
 
-  // it('should find classes', async () => {
-  //   const plugin = await platform.getPlugin(core.id)
-  //   const tx = plugin.newSession()
+  it('should find classes', async () => {
+    const plugin = await platform.getPlugin(core.id)
+    const tx = plugin.newSession()
 
-  //   const result = await tx.find(core.class.Class, {})
-  //   const model = await result.all()
-  //   expect(model.length).toBeGreaterThan(0)
-  //   tx.close()
-  // })
+    const result = await tx.find(core.class.Class, {})
+    const model = await result.all()
+    expect(model.length).toBeGreaterThan(0)
+    tx.close()
+  })
 
   it('should perform live query', async (done) => {
     expect.assertions(2)
@@ -98,7 +98,7 @@ describe('core', () => {
           console.log('default')
       }
     })
-    const x = await session.newInstance(core.class.Adapter, {
+    await session.newInstance(core.class.Adapter, {
       from: core.class.Adapter,
       to: core.class.Adapter,
       adapt: '' as unknown as Promise<AdapterType>
