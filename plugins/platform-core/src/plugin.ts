@@ -63,21 +63,30 @@ export default async (platform: Platform, deps: { rpc: RpcService }): Promise<Co
   const sessions = [] as Session[]
 
   rpc.addEventListener((response: Response<unknown>) => {
-    console.log('EVENT:')
+    console.log('FOREIGN transaction received')
     const commitInfo = response.result as CommitInfo
-    console.log(commitInfo)
-    for (const doc of commitInfo.created) {
-      console.log('adding: ' + doc._id)
+    broadcastXact(commitInfo)
+  })
+
+  function broadcastXact (info: CommitInfo, originator?: Session) {
+    for (const doc of info.created) {
       modelDb.add(doc)
     }
     for (const session of sessions) {
-      session.commitInfo(commitInfo)
+      console.log('broadcasting to ' + sessions.length + ' sessions')
+      if (session !== originator) {
+        session.acceptXact(info)
+      }
     }
-  })
+  }
+
+  function closeSession (session: Session) {
+    sessions.splice(sessions.indexOf(session), 1)
+  }
 
   const coreService: CoreService = {
     newSession () {
-      const session = createSession(platform, modelDb, coreProtocol)
+      const session = createSession(platform, modelDb, coreProtocol, broadcastXact, closeSession)
       sessions.push(session)
       return session
     }

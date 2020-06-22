@@ -23,6 +23,7 @@ import business from '@anticrm/platform-business'
 import vue from '@anticrm/platform-vue'
 import workbench from '@anticrm/platform-workbench'
 import contact from '@anticrm/contact'
+import chunter from '@anticrm/chunter'
 // import demo from '@anticrm/demo-3d'
 import mc from '@anticrm/app-mission-control'
 import storybook from '@anticrm/app-storybook'
@@ -57,6 +58,7 @@ platform.addLocation(business, () => import(/* webpackChunkName: "platform-busin
 platform.addLocation(vue, () => import(/* webpackChunkName: "platform-vue" */ '@anticrm/platform-vue/src/plugin'))
 platform.addLocation(workbench, () => import(/* webpackChunkName: "platform-workbench" */ '@anticrm/platform-workbench/src/plugin'))
 platform.addLocation(contact, () => import(/* webpackChunkName: "contact" */ '@anticrm/contact/src/plugin'))
+platform.addLocation(chunter, () => import(/* webpackChunkName: "chunter" */ '@anticrm/chunter/src/plugin'))
 // platform.addLocation(demo, () => import(/* webpackChunkName: "demo-3d" */ '@anticrm/demo-3d/src/plugin'))
 platform.addLocation(mc, () => import(/* webpackChunkName: "mission-control" */ '@anticrm/app-mission-control/src/plugin'))
 platform.addLocation(storybook, () => import(/* webpackChunkName: "storybook" */ '@anticrm/app-storybook/src/plugin'))

@@ -60,8 +60,8 @@ export class MemDb implements ModelDb {
   private byClass: Map<Ref<Class<Doc>>, Layout<Doc>[]> | null = null
 
   objectsOfClass (_class: Ref<Class<Doc>>): Layout<Doc>[] {
-    console.log('indexing database...')
     if (!this.byClass) {
+      console.log('indexing database...')
       this.byClass = new Map<Ref<Class<Doc>>, Layout<Doc>[]>()
       for (const doc of this.objects.values()) {
         this.index(doc)

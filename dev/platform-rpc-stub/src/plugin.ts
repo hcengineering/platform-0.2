@@ -50,9 +50,10 @@ export default async (platform: Platform): Promise<RpcService> => {
       for (const doc of commitInfo.created) {
         memdb.add(doc)
       }
-      for (const listener of listeners) {
-        listener({ result: commitInfo })
-      }
+      // do not broadcast to originator
+      // for (const listener of listeners) {
+      //   listener({ result: commitInfo })
+      // }
     }
 
   }

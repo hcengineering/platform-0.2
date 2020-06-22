@@ -18,11 +18,10 @@ import { Platform, Resource, Doc, Ref, Class, Obj, Emb } from '@anticrm/platform
 import { MemDb, findAll, Layout, AnyLayout } from '@anticrm/memdb'
 import { generateId } from './objectid'
 import { attributeKey } from './plugin'
-import { Type } from '.'
 
-import core, { Instance, Session, Values, Adapter, Cursor } from '.'
+import core, { Instance, Type, Session, Values, Adapter, Cursor } from '.'
 
-export function createSession (platform: Platform, modelDb: MemDb, coreProtocol: CoreProtocol): Session {
+export function createSession (platform: Platform, modelDb: MemDb, coreProtocol: CoreProtocol, broadcastXact: (info: CommitInfo, originator?: Session) => void, closeSession: (session: Session) => void): Session {
 
   type Konstructor<T extends Obj> = new (obj: Layout<Obj>) => Instance<T>
 
@@ -188,24 +187,19 @@ export function createSession (platform: Platform, modelDb: MemDb, coreProtocol:
         created: [] as Layout<Doc>[]
       }
 
-      console.log('COMMIT')
       for (const instance of created.values()) {
         info.created.push(fullLayout(instance) as Layout<Doc>)
         updated.delete(instance._id)
       }
 
-      console.log(info)
-      console.log('------------')
-
-      coreProtocol.commit(info).then(() => {
-        console.log('done rpc commit')
-        console.log(info)
-        commitInfo(info).then(() => { resolve() })
-      })
+      await coreProtocol.commit(info)
+      // transaction will NOT be broadcasted back to us (as a client), so we have to broadcast locally
+      broadcastXact(info)
+      resolve()
     })
   }
 
-  async function commitInfo (info: CommitInfo) {
+  async function acceptXact (info: CommitInfo) {
     console.log('session commitinfo')
     console.log(info)
 
@@ -213,9 +207,11 @@ export function createSession (platform: Platform, modelDb: MemDb, coreProtocol:
       created.delete(doc._id)
     }
 
+    console.log('scanning ' + queries.length + ' queries...')
     for (const q of queries) {
       const find = findAll(info.created, q._class, q.query as AnyLayout)
       if (find.length > 0) {
+        console.log('match found: ' + find.length)
         q.result.push(...find)
         const foundInstances = await Promise.all(find.map(doc => instantiateDoc(doc)))
         q.instances.push(...foundInstances)
@@ -228,6 +224,7 @@ export function createSession (platform: Platform, modelDb: MemDb, coreProtocol:
     if (created.size > 0 || updated.size > 0) {
       if (!discard) { throw new Error('you have uncommitted changes.') }
     }
+    closeSession(session)
   }
 
   function find<T extends Doc> (_class: Ref<Class<T>>, query: Partial<T>): Cursor<T> {
@@ -303,7 +300,7 @@ export function createSession (platform: Platform, modelDb: MemDb, coreProtocol:
 
   const session: Session = {
     commit,
-    commitInfo,
+    acceptXact,
     close,
     getClassHierarchy,
     newInstance,

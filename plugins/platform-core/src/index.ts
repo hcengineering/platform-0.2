@@ -159,7 +159,7 @@ export interface Session {
   find<T extends Doc> (_class: Ref<Class<T>>, query: Partial<T>): Cursor<T>
   query<T extends Doc> (_class: Ref<Class<T>>, query: Values<Partial<T>>, listener: (result: Instance<T>[]) => void): () => void
   commit (): Promise<void>
-  commitInfo (info: CommitInfo): void
+  acceptXact (info: CommitInfo): void
   close (discard?: boolean): void
 
   adapt (resource: Resource<any>, kind: string): Promise<Resource<any> | undefined>
