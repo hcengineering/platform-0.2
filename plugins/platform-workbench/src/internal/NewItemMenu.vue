@@ -31,8 +31,8 @@ export default defineComponent({
 
     const session = getSession()
 
-    session.find(workbench.class.DocCreateAction, {})
-      .then(acts => { actions.value = acts })
+    // session.find(workbench.class.DocCreateAction, {})
+    //   .then(acts => { actions.value = acts })
 
     const uiService = getUIService()
 
