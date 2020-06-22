@@ -16,6 +16,7 @@ jobs:
     - name: Run tests
       run: |
         yarn install
+        ./scripts/build-packages.sh
         yarn workspace @anticrm/platform run test
         yarn workspace @anticrm/platform-core run test
         yarn workspace @anticrm/platform-core-i18n run test
