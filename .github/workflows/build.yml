@@ -57,7 +57,7 @@ jobs:
 
     - name: Build client
       run: |
-        yarn workspace @anticrm/prod run build --modern
+        yarn workspace prod run build --modern
 
     - uses: jakejarvis/s3-sync-action@master
       with:
