@@ -181,8 +181,6 @@ export interface CoreService extends Service {
 
 export default plugin('core' as Plugin<CoreService>, { rpc: rpc.id }, {
   metadata: {
-    WSHost: '' as Metadata<string>,
-    WSPort: '' as Metadata<number>
   },
   class: {
     Doc: '' as Ref<Class<Doc>>,

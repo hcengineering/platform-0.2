@@ -15,7 +15,7 @@
 
 import { Platform } from '@anticrm/platform'
 
-import core, { Doc } from '@anticrm/platform-core'
+import core from '@anticrm/platform-core'
 import rpc from '@anticrm/platform-rpc'
 import i18n from '@anticrm/platform-core-i18n'
 import ui from '@anticrm/platform-ui'
@@ -24,9 +24,10 @@ import vue from '@anticrm/platform-vue'
 import workbench from '@anticrm/platform-workbench'
 import contact from '@anticrm/contact'
 import chunter from '@anticrm/chunter'
-// import demo from '@anticrm/demo-3d'
+import demo from '@anticrm/demo-3d'
 import mc from '@anticrm/app-mission-control'
 import storybook from '@anticrm/app-storybook'
+import login from '@anticrm/platform-login'
 
 import { createApp } from 'vue'
 import ErrorPage from './components/ErrorPage.vue'
@@ -38,16 +39,20 @@ import contactMeta from '@anticrm/contact/src/__model__/meta'
 // const metaModel = require('./model.json') as Doc[]
 const strings = require('./strings.json') as Record<string, string>
 
+const host = process.env.VUE_APP_WSHOST || 'localhost'
+const port = process.env.VUE_APP_WSPORT || '18080'
+
 const platform = new Platform()
 // platform.setMetadata(core.metadata.MetaModel, metaModel)
-platform.setMetadata(core.metadata.WSHost, 'localhost')
-platform.setMetadata(core.metadata.WSPort, 18080)
+platform.setMetadata(rpc.metadata.WSHost, host)
+platform.setMetadata(rpc.metadata.WSPort, port)
 platform.setMetadata(i18n.metadata.BootStrings, strings)
 platform.setMetadata(ui.metadata.DefaultApplication, mc.component.MissionControl)
 platform.setMetadata(mc.metadata.Applications, [
   workbench.component.Workbench,
-  // demo.component.Periodic,
-  storybook.component.Storybook
+  demo.component.Periodic,
+  storybook.component.Storybook,
+  login.component.LoginForm
 ])
 
 platform.addLocation(core, () => import(/* webpackChunkName: "platform-core" */ '@anticrm/platform-core/src/plugin'))
@@ -59,9 +64,10 @@ platform.addLocation(vue, () => import(/* webpackChunkName: "platform-vue" */ '@
 platform.addLocation(workbench, () => import(/* webpackChunkName: "platform-workbench" */ '@anticrm/platform-workbench/src/plugin'))
 platform.addLocation(contact, () => import(/* webpackChunkName: "contact" */ '@anticrm/contact/src/plugin'))
 platform.addLocation(chunter, () => import(/* webpackChunkName: "chunter" */ '@anticrm/chunter/src/plugin'))
-// platform.addLocation(demo, () => import(/* webpackChunkName: "demo-3d" */ '@anticrm/demo-3d/src/plugin'))
+platform.addLocation(demo, () => import(/* webpackChunkName: "demo-3d" */ '@anticrm/demo-3d/src/plugin'))
 platform.addLocation(mc, () => import(/* webpackChunkName: "mission-control" */ '@anticrm/app-mission-control/src/plugin'))
 platform.addLocation(storybook, () => import(/* webpackChunkName: "storybook" */ '@anticrm/app-storybook/src/plugin'))
+platform.addLocation(login, () => import(/* webpackChunkName: "login" */ '@anticrm/platform-login/src/plugin'))
 
 uiMeta(platform)
 workbenchMeta(platform)

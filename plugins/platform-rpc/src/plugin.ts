@@ -25,8 +25,8 @@ import client, { RpcService, EventListener } from '.'
   */
 export default async (platform: Platform): Promise<RpcService> => {
 
-  const host = platform.getMetadata(client.metadata.WSHost) || 'localhost'
-  const port = platform.getMetadata(client.metadata.WSPort) || 18080
+  const host = platform.getMetadata(client.metadata.WSHost)
+  const port = platform.getMetadata(client.metadata.WSPort)
 
   // { tenant: 'latest-model' }
   const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0ZW5hbnQiOiJsYXRlc3QtbW9kZWwifQ.hKZDHkhxNL-eCOqk5NFToVh43KOGshLS4b6DgztJQqI'

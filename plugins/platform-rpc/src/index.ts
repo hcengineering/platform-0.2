@@ -26,6 +26,6 @@ export interface RpcService extends Service {
 export default plugin('rpc' as Plugin<RpcService>, {}, {
   metadata: {
     WSHost: '' as Metadata<string>,
-    WSPort: '' as Metadata<number>
+    WSPort: '' as Metadata<string>
   }
 })
