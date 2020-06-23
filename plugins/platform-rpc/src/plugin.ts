@@ -32,7 +32,7 @@ export default async (platform: Platform): Promise<RpcService> => {
   const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0ZW5hbnQiOiJsYXRlc3QtbW9kZWwifQ.hKZDHkhxNL-eCOqk5NFToVh43KOGshLS4b6DgztJQqI'
 
   const websocket = new Promise<WebSocket>((resolve, reject) => {
-    const ws = new WebSocket('wss://' + host + ':' + port + '/' + token)
+    const ws = new WebSocket('ws://' + host + ':' + port + '/' + token)
     ws.onopen = () => {
       resolve(ws)
     }
