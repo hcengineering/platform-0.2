@@ -1,4 +1,6 @@
-lib
-src/__tests__
+lib/__tests__
+src
 .*.js
 *.config.js
+tsconfig.*
+

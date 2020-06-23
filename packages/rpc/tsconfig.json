@@ -7,5 +7,10 @@
     "strict": true,
     "composite": true,
     "declaration": true
-  }
+  },
+  "references": [
+    {
+      "path": "../memdb"
+    }
+  ]
 }

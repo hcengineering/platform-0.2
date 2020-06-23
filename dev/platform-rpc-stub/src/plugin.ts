@@ -13,10 +13,10 @@
 // limitations under the License.
 //
 
-import { Platform } from '@anticrm/platform'
-import { RpcService, Response, EventListener } from '@anticrm/platform-rpc'
-import { MemDb } from './memdb'
-import { Ref, Class, Doc } from './types'
+import { Platform, Ref, Class, Doc } from '@anticrm/platform'
+import { RpcService, EventListener } from '@anticrm/platform-rpc'
+import { MemDb } from '@anticrm/memdb'
+import { CoreProtocol, CommitInfo } from '@anticrm/rpc'
 import rpcStub from '.'
 
 /*!
@@ -35,42 +35,39 @@ export default async (platform: Platform): Promise<RpcService> => {
 
   const listeners: EventListener[] = []
 
-  function find (_class: string, query: {}): Promise<[]> {
-    return memdb.find(_class as Ref<Class>, query) as Promise<[]>
+  interface Functions {
+    [key: string]: Function
   }
 
-  async function load (): Promise<[]> {
-    return memdb.dump() as []
-  }
-
-  interface CommitInfo {
-    created: Doc[]
-  }
-
-  async function commit (commitInfo: CommitInfo): Promise<void> {
-    for (const doc of commitInfo.created) {
-      memdb.add(doc)
+  const coreService: CoreProtocol & Functions = {
+    find (_class: string, query: {}): Promise<[]> {
+      return memdb.find(_class as Ref<Class<Doc>>, query) as Promise<[]>
+    },
+    async load (): Promise<[]> {
+      return memdb.dump() as []
+    },
+    async commit (commitInfo: CommitInfo): Promise<void> {
+      for (const doc of commitInfo.created) {
+        memdb.add(doc)
+      }
+      // do not broadcast to originator
+      // for (const listener of listeners) {
+      //   listener({ result: commitInfo })
+      // }
     }
-    for (const listener of listeners) {
-      listener({ result: commitInfo })
-    }
+
   }
 
   return {
-    request<P extends any[], R> (method: string, ...params: P): Promise<R> {
-      switch (method) {
-        case 'load':
-          return load() as unknown as Promise<R>
-        case 'find':
-          const _class = params[0] as string
-          const query = params[1] as {}
-          return find(_class, query) as unknown as Promise<R>
-        case 'commit':
-          return commit(params[0] as CommitInfo) as unknown as Promise<R>
-        default:
-          throw new Error('Unknown rpc method')
+    request<R> (method: string, ...params: any[]): Promise<R> {
+      const f = coreService[method]
+      if (f) {
+        return f.apply(null, params)
+      } else {
+        throw new Error('Unknown rpc method: ' + method)
       }
     },
+
     addEventListener (listener: EventListener) {
       listeners.push(listener)
     }

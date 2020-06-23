@@ -13,6 +13,10 @@
 // limitations under the License.
 //
 
+///
+/// R E S O U R C E S 
+///
+
 /**
  * Platform Resource Identifier.
  *
@@ -43,38 +47,130 @@ export type Resource<T> = string & { __resource: T }
  */
 export type Metadata<T> = Resource<T> & { __metadata: true }
 
+///
+/// P L U G I N S  &  S E R V I C E S
+///
 
-/** Base interface for every plugin API. */
+/** Base interface for a plugin service. */
 export interface Service { }
 /** Plugin identifier. */
 export type Plugin<S extends Service> = Resource<S>
 type AnyPlugin = Plugin<Service>
 
+/** @deprecated -- not sure this will be needed in the future. */
 export interface ResourceProvider extends Service {
   resolve (resource: Resource<any>): Promise<any>
 }
 
-/**
- * A plugin may request platform to inject resolved references to plugins it depends on.
- */
+/** A list of dependencies e.g. `{ core: core.id, ui: ui.id }`. */
 export interface PluginDependencies { [key: string]: AnyPlugin }
 
-export type InferPlugins<T extends PluginDependencies> = {
+/** 
+ * Convert list of dependencies to a list of provided services, 
+ * e.g. `PluginServices<{core: core.id}> === {core: CoreService}`
+ */
+export type PluginServices<T extends PluginDependencies> = {
   [P in keyof T]: T[P] extends Plugin<infer Service> ? Service : T[P]
 }
 
-export interface PluginDescriptor<P extends Service, D extends PluginDependencies> {
-  id: Plugin<P>,
+/**
+ * A Plugin Descriptor, literaly plugin ID + dependencies.
+ */
+export interface PluginDescriptor<S extends Service, D extends PluginDependencies> {
+  id: Plugin<S>
   deps: D
 }
 type AnyDescriptor = PluginDescriptor<Service, PluginDependencies>
 
 type PluginModule<P extends Service, D extends PluginDependencies> = () => Promise<{
-  default: (platform: Platform, deps: InferPlugins<D>) => Promise<P>
+  default: (platform: Platform, deps: PluginServices<D>) => Promise<P>
 }>
 type AnyModule = PluginModule<Service, PluginDependencies>
 
-/// ///////////
+///
+///  M E T A M O D E L
+///
+
+export type Property<T> = { __property: T }
+export type PropertyType = Property<any> | Ref<Doc> | Emb | PropertyType[] | { [key: string]: PropertyType }
+export type Ref<T extends Doc> = string & { __ref: T } & Resource<T>
+
+export interface Obj { _class: Ref<Class<Obj>> }
+export interface Emb extends Obj { __embedded: true }
+export interface Doc extends Obj {
+  _class: Ref<Class<Doc>>
+  _id: Ref<Doc>
+  _mixins?: Ref<Class<Doc>>[]
+}
+
+export interface Attribute extends Emb { }
+
+export type Attributes<T extends E, E extends Obj> = Record<Exclude<keyof T, keyof E>, Attribute>
+export type AllAttributes<T extends E, E extends Obj> = Required<Attributes<T, E>> & Partial<Attributes<E, Obj>>
+
+export interface EClassifier<T extends E, E extends Obj> extends Doc {
+  _attributes: AllAttributes<T, E>
+  _extends?: Ref<Classifier<E>>
+}
+export type Classifier<T extends Obj> = EClassifier<T, Obj>
+
+export interface EClass<T extends E, E extends Obj> extends EClassifier<T, E> {
+  _native?: Property<Object>
+  _domain?: Property<string>
+}
+export type Class<T extends Obj> = EClass<T, Obj>
+
+// let xx = '' as Ref<Doc>
+// let yy = '' as Ref<Class<Obj>>
+// let zz = '' as Ref<Class<Doc>>
+
+// xx = yy
+// yy = zz
+// xx = zz
+
+// yy = xx
+// zz = yy
+
+// function xxx (x: Ref<Class<Doc>>) { }
+// function yyy<T extends Doc> (x: Ref<Class<T>>) { xxx(x) }
+
+// T Y P E S
+
+// export type Exert<A> = (value: LayoutType, layout?: ObjLayout, key?: string) => A
+// export interface BaseType<T> extends Emb { type: string }
+// export interface Type<A> extends Emb {
+//_default?: Property<A>
+//  exert?: Property<() => Promise<Exert<A>>>
+// }
+
+// export interface BagOf<A> extends Type<{ [key: string]: A }> { of: Type<A> }
+// export interface ArrayOf<A> extends Type<A[]> { of: Type<A> }
+
+// C L A S S E S
+
+// type PropertyTypes<T> = {
+//   [P in keyof T]: BaseType<T[P]>
+//   // T[P] extends Property<infer X> ? BaseType :
+//   // T[P] extends Ref<infer X> ? BaseType :
+//   // T[P] extends { [key: string]: infer X } | undefined ? BagOf<any> :
+//   // T[P] extends (infer X)[] | undefined ? ArrayOf<any> :
+//   // T[P]
+// }
+
+// export type Attributes<T extends E, E extends Obj> = PropertyTypes<Required<Omit<T, keyof E>>>
+// export type AllAttributes<T extends E, E extends Obj> = Attributes<T, E> & Partial<Attributes<E, Obj>>
+
+
+// C O N V E R T  I N T O  L A Y O U T
+
+// export type AsLayout<T extends Obj> = { [P in keyof T]:
+//   T[P] extends Ref<Doc> ? T[P] :
+//   T[P] extends Property<any | undefined> ? LayoutType | undefined :
+//   T[P] extends Property<any> ? LayoutType :
+//   never
+// }
+
+///
 
 type ExtractType<T, X extends Record<string, Metadata<T>>> = { [P in keyof X]:
   X[P] extends Metadata<infer Z> ? Z : never
@@ -291,6 +387,14 @@ export function identify<N extends Namespace> (pluginId: AnyPlugin, namespace: N
 
 export function plugin<P extends Service, D extends PluginDependencies, N extends Namespace> (id: Plugin<P>, deps: D, namespace: N): PluginDescriptor<P, D> & N {
   return { id, deps, ...identify(id, namespace) }
+}
+
+export function attributeKey (_class: Ref<Class<Obj>>, key: string): string {
+  const index = _class.indexOf(':')
+  const dot = _class.indexOf('.')
+  const plugin = _class.substring(index + 1, dot)
+  const cls = _class.substring(dot + 1)
+  return plugin + '|' + cls + '|' + key
 }
 
 // P R O M I S E
