@@ -68,7 +68,7 @@ export default defineComponent({
   grid-template-columns: $pictogram-size 1fr auto;
   grid-template-rows: $pictogram-size 1fr 24px;
 
-  height: 100vh;
+  height: 100%;
 
   header {
     grid-column-start: 1;
