@@ -8,7 +8,7 @@ Use following commands to install and run demo application without server-side a
 In-memory database will be used with limited capabilities.
 
 ```
-yarn install
+yarn 
 ./scripts/build-packages.sh
 yarn workspace launch serve
 ```
@@ -16,9 +16,14 @@ yarn workspace launch serve
 ## Run with Server and MongoDb
 
 1. You have to run mongodb instance locally. Easiest way to do this is to run official mongodb container: `docker run -d mongo`.
-2. Initialize database with `boot` package: `yarn workspace @anticrm/dev-boot dump`. Note: the `boot` will use `MONGODB_URI` environment variable, failover to `localhost` and default mongodb port if variable not present.
-3. From the Cloud repo run WebSocket server: `yarn workspace @anticrm/server build && yarn workspace @anticrm/server start`.
+2. Initialize database with `boot` package: `yarn && ./scripts/build-packages.sh && yarn workspace @anticrm/dev-boot dump`. Note: the `boot` will use `MONGODB_URI` environment variable, failover to `localhost` and default mongodb port if variable not present.
+3. From the Cloud repo run WebSocket server: `yarn && yarn workspace @anticrm/server build && yarn workspace @anticrm/server start`.
 4. From the Platform (this) repo run `prod` launcher: `yarn workspace prod serve`.
+
+## Continuous Integration
+
+* Build system deploy in-memory-database client to: https://platform-one.now.sh and/or branch-specific URLs (see particular commit comments).
+* Build system deploy production client to: http://anticrm-platform.s3-website.us-east-2.amazonaws.com/
 
 # The Platform Documentation
 
