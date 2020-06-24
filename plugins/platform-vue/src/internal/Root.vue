@@ -19,12 +19,14 @@ import { defineComponent, computed, reactive, onMounted, onUnmounted, inject, re
 import ui, { AnyComponent } from '@anticrm/platform-ui'
 import vue, { getVueService, getPlatform } from '..'
 
-export const AppInjectionKey = 'AppInjectionKey'
+import Clock from './widgets/Clock.vue'
+import Network from './widgets/Network.vue'
 
-const defaultStatus = 'Система готова к работе.'
+//const defaultStatus = 'Система готова к работе.'
+const defaultStatus = ''
 
 export default defineComponent({
-  components: {},
+  components: { Network, Clock },
   setup () {
     const platform = getPlatform()
     const status = ref(defaultStatus)
@@ -32,7 +34,7 @@ export default defineComponent({
       status.value = task.name + '...'
     })
     platform.addEventListener(TaskEvent.Done, (task: Task) => {
-      //status.value = defaultStatus
+      status.value = defaultStatus
     })
 
     const vueService = getVueService()
@@ -53,7 +55,12 @@ export default defineComponent({
         </div>
         <div class="status-messages">{{status}}</div>
         <div class="widgets">
-          <div class="clock">11:47</div>
+          <div class="clock">
+            <Clock />
+          </div>
+          <div>
+            <Network />
+          </div>
         </div>
       </div>
     </div>
@@ -121,6 +128,7 @@ export default defineComponent({
 
         .clock {
           padding-right: 1em;
+          padding-left: 0.5em;
           font-size: 1em;
           font-weight: 700;
         }

@@ -23,6 +23,6 @@ export default (platform: Platform) => {
     // Add: spritesUrl + '#add',
     // Checked: spritesUrl + '#checked',
     // Edit: spritesUrl + '#edit',
-    // Search: spritesUrl + '#search',
+    Network: spritesUrl + '#network'
   })
 }

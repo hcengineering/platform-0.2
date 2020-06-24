@@ -68,7 +68,8 @@ export interface VueService extends Service {
 
 export default plugin('vue' as Plugin<VueService>, {}, {
   icon: {
-    Default: '' as Asset
+    Default: '' as Asset,
+    Network: '' as Asset
   },
   component: {
     AppLoader: '' as AnyComponent

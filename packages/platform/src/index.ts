@@ -184,9 +184,11 @@ export enum TaskEvent {
   Error = 'task-error'
 }
 
+export const NetworkActivity = 'network'
+
 ///
-/// 
-/// 
+///
+///
 
 type ExtractType<T, X extends Record<string, Metadata<T>>> = { [P in keyof X]:
   X[P] extends Metadata<infer Z> ? Z : never
@@ -329,6 +331,15 @@ export class Platform {
 
   addEventListener (type: string, listener: (event: any) => void) {
     this.listeners.push({ type, listener })
+  }
+
+  removeEventListener (listener: (event: any) => void) {
+    for (let i = 0; i < this.listeners.length; i++) {
+      if (this.listeners[i].listener === listener) {
+        this.listeners.splice(i, 1)
+        break
+      }
+    }
   }
 
   broadcastEvent (type: string, event: any) {

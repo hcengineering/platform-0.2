@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Platform } from '@anticrm/platform'
+import { Platform, NetworkActivity } from '@anticrm/platform'
 import { ReqId, makeRequest, getResponse } from '@anticrm/rpc'
 
 import client, { RpcService, EventListener } from '.'
@@ -68,6 +68,10 @@ export default async (platform: Platform): Promise<RpcService> => {
             } else {
               promise.resolve(response.result)
             }
+            requests.delete(response.id)
+            if (requests.size === 0) {
+              platform.broadcastEvent(NetworkActivity, false)
+            }
           } else {
             throw new Error('unknown rpc id')
           }
@@ -89,6 +93,9 @@ export default async (platform: Platform): Promise<RpcService> => {
     console.log(params)
     return new Promise<any>(async (resolve, reject) => {
       const id = ++lastId
+      if (requests.size === 0) {
+        platform.broadcastEvent(NetworkActivity, true)
+      }
       requests.set(id, { resolve, reject })
       const ws = await getWebSocket()
       ws.send(makeRequest({ id, method, params }))
