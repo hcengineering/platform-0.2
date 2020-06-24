@@ -41,6 +41,7 @@ export default async (platform: Platform): Promise<RpcService> => {
 
   const coreService: CoreProtocol & Functions = {
     find (_class: string, query: {}): Promise<[]> {
+      console.log('QUERY:::::: ', _class, query)
       return memdb.find(_class as Ref<Class<Doc>>, query) as Promise<[]>
     },
     async load (): Promise<[]> {

@@ -41,9 +41,9 @@ export default defineComponent({
       .then(attrs => model.value = attrs)
 
     session.query(props.resource, {}, result => {
-      console.log('QUERY return: ')
+      console.log('CONTACT QUERY UPDATE: ')
       console.log(result)
-      content.value = result
+      content.value = result.concat()
     })
 
     return { model, content }
