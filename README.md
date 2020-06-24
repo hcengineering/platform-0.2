@@ -9,6 +9,7 @@ In-memory database will be used with limited capabilities.
 
 ```
 yarn install
+./scripts/build-packages.sh
 yarn workspace launch serve
 ```
 
