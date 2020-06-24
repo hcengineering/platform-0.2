@@ -171,6 +171,22 @@ export type Class<T extends Obj> = EClass<T, Obj>
 // }
 
 ///
+///
+///
+
+export interface Task {
+  name: string
+}
+
+export enum TaskEvent {
+  Start = 'task-start',
+  Done = 'task-done',
+  Error = 'task-error'
+}
+
+///
+/// 
+/// 
 
 type ExtractType<T, X extends Record<string, Metadata<T>>> = { [P in keyof X]:
   X[P] extends Metadata<infer Z> ? Z : never
@@ -307,6 +323,53 @@ export class Platform {
     this.resolvers.set(kind, resolver)
   }
 
+  // E V E N T S
+
+  private listeners: { type: string, listener: (event: any) => void }[] = []
+
+  addEventListener (type: string, listener: (event: any) => void) {
+    this.listeners.push({ type, listener })
+  }
+
+  broadcastEvent (type: string, event: any) {
+    for (const listener of this.listeners) {
+      if (type === listener.type) {
+        listener.listener(event)
+      }
+    }
+  }
+
+  // T A S K S
+
+  taskStart (task: Task) {
+    console.log('task start', task)
+    this.broadcastEvent(TaskEvent.Start, task)
+  }
+
+  taskDone (task: Task) {
+    console.log('task done', task)
+    this.broadcastEvent(TaskEvent.Done, task)
+  }
+
+  taskError (task: Task) {
+    console.log('task error', task)
+    this.broadcastEvent(TaskEvent.Error, task)
+  }
+
+  task<T> (name: string, promise: Promise<T>): Promise<T> {
+    const task = { name }
+    return new Promise((resolve, reject) => {
+      this.taskStart(task)
+      promise.then(result => {
+        this.taskDone(task)
+        resolve(result)
+      }).catch(error => {
+        this.taskError(task)
+        reject(error)
+      })
+    })
+  }
+
   // P L U G I N S
 
   private plugins = new Map<AnyPlugin, Promise<Service>>()
@@ -331,7 +394,7 @@ export class Platform {
     } else {
       const location = this.getLocation(id)
       const plugin = this.resolveDependencies(location[0].deps).then(deps =>
-        location[1]().then(module => module.default).then(f => f(this, deps))
+        this.task(`Загружаю плагин '${id}'`, location[1]()).then(module => module.default).then(f => f(this, deps))
       )
       this.plugins.set(id, plugin)
       return plugin as Promise<T>

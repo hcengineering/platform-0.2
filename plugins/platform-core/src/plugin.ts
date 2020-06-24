@@ -23,7 +23,6 @@ import { CoreProtocol, Response, CommitInfo } from '@anticrm/rpc'
 
 import { RpcService } from '@anticrm/platform-rpc'
 import { createSession } from './session'
-import { find } from 'lodash'
 
 // TODO: Platform.getResourceInfo
 export function attributeKey (_class: Ref<Class<Obj>>, key: string): string {
@@ -55,7 +54,7 @@ export default async (platform: Platform, deps: { rpc: RpcService }): Promise<Co
   // M E T A M O D E L
 
   const modelDb = new MemDb()
-  const metaModel = await coreProtocol.load()
+  const metaModel = await platform.task('Загружаю модель предприятия...', coreProtocol.load())
   modelDb.loadModel(metaModel)
 
   // C O R E  S E R V I C E
