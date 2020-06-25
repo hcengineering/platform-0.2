@@ -81,6 +81,8 @@ export default defineComponent({
 @import "~@anticrm/sparkling-theme/css/_globals.scss";
 @import "~@anticrm/sparkling-theme/css/_variables.scss";
 
+$status-bar-height: 20px;
+
 #rich-client {
   @include root-style;
 

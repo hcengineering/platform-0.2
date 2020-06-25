@@ -28,7 +28,9 @@ export default defineComponent({
   <div id="chunter">
     <nav># general</nav>
     <main>
-      <Chat />
+      <div class="chat">
+        <Chat />
+      </div>
       <ChatInput />
     </main>
   </div>
@@ -62,7 +64,12 @@ export default defineComponent({
     height: 100%;
 
     background-color: $content-bg-color;
-    padding: 0em 1em;
+    // padding: 0em 1em;
+
+    .chat {
+      position: relative;
+      height: 100%;
+    }
   }
 }
 </style>
