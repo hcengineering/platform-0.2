@@ -46,15 +46,16 @@ export default async (platform: Platform, deps: { rpc: RpcService }): Promise<Co
   const rpc = deps.rpc
 
   const coreProtocol: CoreProtocol = {
-    load: () => rpc.request('load', []),
-    commit: (info: CommitInfo) => rpc.request('commit', info),
-    find: <T extends Doc> (_class: Ref<Class<T>>, query: Partial<T>) => rpc.request<Layout<Doc>[]>('find', _class, query)
+    load: () => platform.task(`Загружаю данные домена`, rpc.request('load', [])),
+    commit: (info: CommitInfo) => platform.task(`Сохраняю изменения`, rpc.request('commit', info)),
+    find: <T extends Doc> (_class: Ref<Class<T>>, query: Partial<T>) => 
+      platform.task(`Загружаю информацию о`, rpc.request<Layout<Doc>[]>('find', _class, query))
   }
 
   // M E T A M O D E L
 
   const modelDb = new MemDb()
-  const metaModel = await platform.task('Загружаю модель предприятия...', coreProtocol.load())
+  const metaModel = await coreProtocol.load()
   modelDb.loadModel(metaModel)
 
   // C O R E  S E R V I C E

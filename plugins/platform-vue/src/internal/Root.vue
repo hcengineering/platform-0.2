@@ -30,16 +30,20 @@ export default defineComponent({
   setup () {
     const platform = getPlatform()
     const status = ref(defaultStatus)
+    const error = ref('')
     platform.addEventListener(TaskEvent.Start, (task: Task) => {
       status.value = task.name + '...'
     })
     platform.addEventListener(TaskEvent.Done, (task: Task) => {
       status.value = defaultStatus
     })
+    platform.addEventListener(TaskEvent.Error, (err: Error) => {
+      error.value = err.message
+    })
 
     const vueService = getVueService()
     const current = computed(() => vueService.getLocation())
-    return { status, current, appLoader: vue.component.AppLoader }
+    return { status, error, current, appLoader: vue.component.AppLoader }
   },
 })
 </script>
@@ -53,7 +57,7 @@ export default defineComponent({
           <span class="text-2">Platform</span>&nbsp;
           <span class="text-3">0.1.0</span>
         </div>
-        <div class="status-messages">{{status}}</div>
+        <div class="status-messages">{{status}} {{error}}</div>
         <div class="widgets">
           <div class="clock">
             <Clock />

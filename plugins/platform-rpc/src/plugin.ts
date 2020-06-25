@@ -80,10 +80,12 @@ export default async (platform: Platform): Promise<RpcService> => {
     })
   }
 
-  let websocket: Promise<WebSocket> | null = null
-  function getWebSocket () {
-    if (websocket === null) {
-      websocket = createWebsocket()
+  let websocket: WebSocket | null = null
+  async function getWebSocket () {
+    if (websocket === null || 
+      websocket.readyState === WebSocket.CLOSED ||
+      websocket.readyState === WebSocket.CLOSING) {
+      websocket = await createWebsocket()
     }
     return websocket
   }
