@@ -22,9 +22,10 @@ import { Person } from '..'
 
 import Table from '@anticrm/platform-vue/src/components/Table.vue'
 import LinkTo from '@anticrm/platform-vue/src/components/LinkTo.vue'
+import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.vue'
 
 export default defineComponent({
-  components: { Table, LinkTo },
+  components: { Table, LinkTo, ScrollView },
   props: {
     resource: String as unknown as PropType<Ref<Class<Person>>>,
     params: Object
@@ -52,13 +53,27 @@ export default defineComponent({
 </script>
 
 <template>
-  <div>
-    <div class="caption-1">Персоны</div>
-    <LinkTo :path="`${resource}/new`">Новая Персона</LinkTo>
-    <Table :model="model" :content="content" />
+  <div class="contact-browse-form">
+    <div>
+      <div class="caption-1">Персоны</div>
+      <LinkTo :path="`${resource}/new`">Новая Персона</LinkTo>
+    </div>
+    <ScrollView class="container">
+      <Table :model="model" :content="content" />
+    </ScrollView>
   </div>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss">
 @import "~@anticrm/sparkling-theme/css/_variables.scss";
+
+.contact-browse-form {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .container {
+    height: 100%;
+  }
+}
 </style>

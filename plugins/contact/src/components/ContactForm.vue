@@ -32,12 +32,16 @@ export default defineComponent({
 </script>
 
 <template>
-  <div>
+  <div class="contact-contact-form">
     <NewContactForm v-if="operation === 'new'" :resource="resource" :params="params" />
     <BrowseContactForm v-else :resource="resource" :params="params" />
   </div>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss">
 @import "~@anticrm/sparkling-theme/css/_variables.scss";
+
+.contact-contact-form {
+  height: 100%;
+}
 </style>

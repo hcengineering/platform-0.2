@@ -51,10 +51,5 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
   align-items: stretch;
-
-  overflow-y: scroll;
-  position: absolute;
-  height: 100%;
-  width: 100%;
 }
 </style>

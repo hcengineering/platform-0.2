@@ -16,11 +16,12 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 
-import Chat from './Chat.vue'
+import Messages from './Messages.vue'
 import ChatInput from './ChatInput.vue'
+import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.vue'
 
 export default defineComponent({
-  components: { Chat, ChatInput },
+  components: { Messages, ChatInput, ScrollView },
 })
 </script>
 
@@ -28,9 +29,9 @@ export default defineComponent({
   <div id="chunter">
     <nav># general</nav>
     <main>
-      <div class="chat">
-        <Chat />
-      </div>
+      <ScrollView class="chat">
+        <Messages />
+      </ScrollView>
       <ChatInput />
     </main>
   </div>
@@ -67,7 +68,6 @@ export default defineComponent({
     // padding: 0em 1em;
 
     .chat {
-      position: relative;
       height: 100%;
     }
   }
