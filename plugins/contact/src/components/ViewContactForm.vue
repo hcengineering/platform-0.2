@@ -55,7 +55,8 @@ export default defineComponent({
     }
 
     function del () {
-      //session.del(props.params.id)
+      session.delete(contact.class.Person, props.params.id)
+      vueService.back()
     }
 
     return {

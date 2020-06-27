@@ -28,26 +28,26 @@ export default async (S: Builder) => {
   // CODE BELOW DOES NOT SUPPOSE TO USE PLATFORM API / NOT HOW TO GET JOB DONE
   //
 
-  S.createDocument(contact.class.Person, {
-    onBehalfOf: '' as unknown as Ref<User>,
-    createdBy: '' as unknown as Ref<Account>,
-    createdOn: '12 May 2020',
-    firstName: str('Andrey'),
-    lastName: str('Platov'),
-    email: str('andrey.v.platov@gmail.com'),
-    getText: '',
-    getImage: ''
-  })
+  // S.createDocument(contact.class.Person, {
+  //   onBehalfOf: '' as unknown as Ref<User>,
+  //   createdBy: '' as unknown as Ref<Account>,
+  //   createdOn: '12 May 2020',
+  //   firstName: str('Andrey'),
+  //   lastName: str('Platov'),
+  //   email: str('andrey.v.platov@gmail.com'),
+  //   getText: '',
+  //   getImage: ''
+  // })
 
-  S.createDocument(contact.class.Person, {
-    onBehalfOf: '' as unknown as Ref<User>,
-    createdBy: '' as unknown as Ref<Account>,
-    createdOn: '12 May 2020',
-    firstName: str('Andrey'),
-    lastName: str('Sobolev'),
-    email: str('haiodo@gmail.com'),
-    getText: '',
-    getImage: ''
-  })
+  // S.createDocument(contact.class.Person, {
+  //   onBehalfOf: '' as unknown as Ref<User>,
+  //   createdBy: '' as unknown as Ref<Account>,
+  //   createdOn: '12 May 2020',
+  //   firstName: str('Andrey'),
+  //   lastName: str('Sobolev'),
+  //   email: str('haiodo@gmail.com'),
+  //   getText: '',
+  //   getImage: ''
+  // })
 
 }

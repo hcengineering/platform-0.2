@@ -44,6 +44,12 @@ export default async (platform: Platform): Promise<RpcService> => {
       console.log('QUERY:::::: ', _class, query)
       return memdb.find(_class as Ref<Class<Doc>>, query) as Promise<[]>
     },
+
+    delete (_class: string, query: {}): Promise<void> {
+      console.log('DELETE:::::: ', _class, query)
+      throw new Error('RPC Stub: delete not implemented')
+    },
+
     async load (): Promise<[]> {
       return memdb.dump() as []
     },

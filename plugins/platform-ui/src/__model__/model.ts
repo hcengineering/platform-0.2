@@ -45,6 +45,6 @@ export default (S: Builder) => {
   S.createDocument(core.class.Adapter, {
     from: S.primitive(ClassKind),
     to: S.primitive(ComponentKind),
-    adapt: S.resolve(ui.method.ClassToComponent)
+    adapt: S.resolve(ui.method.ClassToComponent) as any // TODO: types
   })
 }

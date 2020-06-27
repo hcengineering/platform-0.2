@@ -35,7 +35,7 @@ export default defineComponent({
 <template>
   <div class="contact-contact-form">
     <NewContactForm v-if="operation === 'new'" :resource="resource" :params="params" />
-    <ViewContactForm v-if="operation === 'view'" :resource="resource" :params="params" />
+    <ViewContactForm v-else-if="operation === 'view'" :resource="resource" :params="params" />
     <BrowseContactForm v-else :resource="resource" :params="params" />
   </div>
 </template>

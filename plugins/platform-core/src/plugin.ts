@@ -48,8 +48,10 @@ export default async (platform: Platform, deps: { rpc: RpcService }): Promise<Co
   const coreProtocol: CoreProtocol = {
     load: () => platform.task(`Загружаю данные домена`, rpc.request('load', [])),
     commit: (info: CommitInfo) => platform.task(`Сохраняю изменения`, rpc.request('commit', info)),
-    find: <T extends Doc> (_class: Ref<Class<T>>, query: Partial<T>) => 
-      platform.task(`Загружаю информацию о`, rpc.request<Layout<Doc>[]>('find', _class, query))
+    find: <T extends Doc> (_class: Ref<Class<T>>, query: Partial<T>) =>
+      platform.task(`Загружаю информацию о`, rpc.request('find', _class, query)),
+    delete: <T extends Doc> (_class: Ref<Class<T>>, query: Partial<T>) =>
+      platform.task(`Удаляю`, rpc.request('delete', _class, query))
   }
 
   // M E T A M O D E L
