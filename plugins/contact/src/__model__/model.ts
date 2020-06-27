@@ -46,7 +46,7 @@ export default async (S: Builder) => {
     getImage: S.newInstance(core.class.Method, {
       _default: S.resolve(contact.method.Person_getImage)
     }),
-  })
+  }, 'contact')
 
   S.mixin(contact.class.Date, ui.class.ClassUIDecorator as Ref<Class<ClassUIDecorator<Type<any>>>>, {
     icon: S.resolveMeta(contact.icon.Date)

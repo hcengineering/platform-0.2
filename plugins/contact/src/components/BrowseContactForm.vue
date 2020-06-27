@@ -16,7 +16,7 @@
 <script lang="ts">
 import { defineComponent, ref, reactive, inject, computed, PropType } from 'vue'
 import core, { Ref, Doc, Class, Instance, ClassKind } from '@anticrm/platform-core'
-import { getSession, getUIService } from '@anticrm/platform-vue'
+import { getSession, getUIService, getVueService } from '@anticrm/platform-vue'
 
 import contact, { Person } from '..'
 
@@ -33,6 +33,7 @@ export default defineComponent({
   setup (props) {
     const session = getSession()
     const uiService = getUIService()
+    const vueService = getVueService()
 
     const model = ref([])
     const content = ref([])
@@ -47,7 +48,18 @@ export default defineComponent({
       content.value = result.concat()
     })
 
-    return { model, content }
+    function navigate (id: Ref<Doc>) {
+      console.log('NAVIGATE: ' + id)
+      console.log(vueService.getLocation())
+      const loc = { ...vueService.getLocation() }
+      loc.path = props.resource + '/view'
+      loc.params = { id }
+      const url = vueService.toUrl(loc)
+      console.log(url)
+      vueService.navigate(url)
+    }
+
+    return { model, content, navigate }
   }
 })
 </script>
@@ -59,7 +71,7 @@ export default defineComponent({
       <LinkTo :path="`${resource}/new`">Новая Персона</LinkTo>
     </div>
     <ScrollView class="container">
-      <Table :model="model" :content="content" />
+      <Table :model="model" :content="content" @navigate="navigate" />
     </ScrollView>
   </div>
 </template>
