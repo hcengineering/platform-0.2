@@ -99,6 +99,8 @@ export class MemDb implements ModelDb {
     return obj
   }
 
+  // D O M A I N
+
   getDomain (id: Ref<Class<Doc>>): string {
     let clazz = this.objects.get(id) as Layout<Class<Doc>> | undefined
     while (clazz) {
