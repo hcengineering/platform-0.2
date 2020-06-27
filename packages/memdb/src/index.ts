@@ -35,7 +35,7 @@ type ToLayout<T> =
 
 export type Layout<T> = { [P in keyof T]:
   T[P] extends Ref<Doc> | undefined ? T[P] :
-  T[P] extends Property<any> | undefined ? LayoutType :
+  T[P] extends Property<infer X> | undefined ? X :
   T[P] extends (infer X)[] | undefined ? ToLayout<X>[] :
   T[P] extends { [key: string]: infer X } | undefined ? { [key: string]: ToLayout<X> } :
   never
@@ -97,6 +97,15 @@ export class MemDb implements ModelDb {
     const obj = this.objects.get(id)
     if (!obj) { throw new Error('document not found ' + id) }
     return obj
+  }
+
+  getDomain (id: Ref<Class<Doc>>): string {
+    let clazz = this.objects.get(id) as Layout<Class<Doc>> | undefined
+    while (clazz) {
+      if (clazz._domain) return clazz._domain
+      clazz = clazz._extends ? this.objects.get(clazz._extends) as Layout<Class<Doc>> : undefined
+    }
+    throw new Error('no domain found for class: ' + id)
   }
 
   /// A S S I G N
