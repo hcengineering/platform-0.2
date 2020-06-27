@@ -286,6 +286,10 @@ export function createSession (platform: Platform, modelDb: MemDb, coreProtocol:
     }
   }
 
+  async function del<T extends Doc> (_class: Ref<Class<T>>, _id: Ref<T>): Promise<void> {
+    return coreProtocol.delete(_class as Ref<Class<Doc>>, { _id })
+  }
+
   // A D A P T E R S
 
   async function adapt (resource: Resource<any>, kind: string): Promise<Resource<any> | undefined> {
@@ -326,6 +330,7 @@ export function createSession (platform: Platform, modelDb: MemDb, coreProtocol:
     is,
     find,
     query,
+    delete: del,
     adapt,
     instantiateEmb,
     getPrototype,

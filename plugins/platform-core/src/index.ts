@@ -159,6 +159,7 @@ export interface Session {
   is<T extends Doc, A extends Doc> (obj: Instance<T>, _class: Ref<Class<A>>): boolean
   find<T extends Doc> (_class: Ref<Class<T>>, query: Partial<T>): Cursor<T>
   query<T extends Doc> (_class: Ref<Class<T>>, query: Values<Partial<T>>, listener: (result: Instance<T>[]) => void): () => void
+  delete<T extends Doc> (_class: Ref<Class<T>>, _id: Ref<T>): Promise<void>
   commit (): Promise<void>
   acceptXact (info: CommitInfo): void
   close (discard?: boolean): void
