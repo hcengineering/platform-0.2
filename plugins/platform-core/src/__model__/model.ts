@@ -14,7 +14,7 @@
 //
 
 import core from '.'
-import { Obj, Doc, Class, InstanceOf, Type, Emb, Ref, RefTo } from '..'
+import { Obj, Doc, Class, InstanceOf, Type, Emb, Ref, RefTo, CoreDomain } from '..'
 import Builder from './builder'
 export { Builder }
 
@@ -43,7 +43,7 @@ export default (S: Builder) => {
     }),
     _native: S.newInstance(core.class.StaticResource, {}),
     _domain: S.newInstance(core.class.Type, {})
-  })
+  }, CoreDomain.Model)
 
   S.createClass(core.class.Type, core.class.Emb, {
     _default: S.newInstance(core.class.Type, {}),
@@ -102,5 +102,5 @@ export default (S: Builder) => {
     from: S.newInstance(core.class.Type, {}),
     to: S.newInstance(core.class.Type, {}),
     adapt: S.newInstance(core.class.Resource, {})
-  })
+  }, CoreDomain.Model)
 }

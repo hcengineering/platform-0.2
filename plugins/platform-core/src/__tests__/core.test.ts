@@ -60,7 +60,7 @@ describe('core', () => {
     const plugin = await platform.getPlugin(core.id)
     const tx = plugin.newSession()
 
-    const inst = await tx.getInstance(core.class.RefTo)
+    const inst = await tx.getInstance(core.class.Class, core.class.RefTo)
     const x = inst._attributes
     const to = await x.to
     // TODO: understand problem

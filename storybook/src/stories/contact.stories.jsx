@@ -29,12 +29,12 @@ export default {
 async function createPerson() {
   const corePlugin = await platform.getPlugin(core.id)
   const session = corePlugin.getSession()
-  const personClass = await session.getInstance(contact.class.Person)
+  const personClass = await session.getInstance(core.class.Class, contact.class.Person)
   return personClass.newInstance({ phone: '555 777 8888', firstName: 'John' })
 }
 
 export const form = () => ({
   render() {
-    return <Theme><ContactForm object={createPerson()}/></Theme>
+    return <Theme><ContactForm object={createPerson()} /></Theme>
   }
 })

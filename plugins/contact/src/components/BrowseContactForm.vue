@@ -18,7 +18,7 @@ import { defineComponent, ref, reactive, inject, computed, PropType } from 'vue'
 import core, { Ref, Doc, Class, Instance, ClassKind } from '@anticrm/platform-core'
 import { getSession, getUIService } from '@anticrm/platform-vue'
 
-import { Person } from '..'
+import contact, { Person } from '..'
 
 import Table from '@anticrm/platform-vue/src/components/Table.vue'
 import LinkTo from '@anticrm/platform-vue/src/components/LinkTo.vue'
@@ -37,7 +37,7 @@ export default defineComponent({
     const model = ref([])
     const content = ref([])
 
-    session.getInstance(props.resource)
+    session.getInstance(core.class.Class, props.resource)
       .then(clazz => uiService.getAttrModel(clazz))
       .then(attrs => model.value = attrs)
 

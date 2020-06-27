@@ -14,7 +14,6 @@
 //
 
 import core from '@anticrm/platform-core/src/__model__'
-import { DefaultResourceKind } from '@anticrm/platform'
 import { ClassKind } from '@anticrm/platform-core'
 import i18n from '@anticrm/platform-core-i18n/src/__model__'
 import ui from '.'
@@ -48,11 +47,4 @@ export default (S: Builder) => {
     to: S.primitive(ComponentKind),
     adapt: S.resolve(ui.method.ClassToComponent)
   })
-
-  S.createDocument(core.class.Adapter, {
-    from: S.primitive(DefaultResourceKind),
-    to: S.primitive(ComponentKind),
-    adapt: S.resolve(ui.method.ObjectToComponent)
-  })
-
 }

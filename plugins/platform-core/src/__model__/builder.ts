@@ -15,14 +15,14 @@
 
 import { Resource, Metadata, Emb, Doc, Obj, Ref, EClass, Class, AllAttributes, Property } from '@anticrm/platform'
 
-import { RefTo, CoreDomain, InstanceOf, ArrayOf, Type } from '..'
+import { RefTo, InstanceOf, ArrayOf, Type } from '..'
 import core from '.'
 import { ModelDb, MemDb, Layout } from '@anticrm/memdb'
 
 class Builder {
   private memdb: ModelDb
 
-  constructor(memdb?: ModelDb) {
+  constructor (memdb?: ModelDb) {
     this.memdb = memdb ?? new MemDb()
   }
 
@@ -30,7 +30,7 @@ class Builder {
 
   // N E W  I N S T A N C E S
 
-  createClass<T extends E, E extends Obj> (_id: Ref<Class<T>>, _extends: Ref<Class<E>>, _attributes: AllAttributes<T, E>, _domain: string = CoreDomain.Model, _native?: Resource<any>) {
+  createClass<T extends E, E extends Obj> (_id: Ref<Class<T>>, _extends: Ref<Class<E>>, _attributes: AllAttributes<T, E>, _domain?: string, _native?: Resource<any>) {
     this.createDocument(core.class.Class as Ref<Class<EClass<T, E>>>,
       { _extends, _attributes, _domain, _native } as Layout<EClass<T, E>>,
       _id as Ref<EClass<T, E>>)

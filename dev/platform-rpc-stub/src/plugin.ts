@@ -48,6 +48,7 @@ export default async (platform: Platform): Promise<RpcService> => {
       return memdb.dump() as []
     },
     async commit (commitInfo: CommitInfo): Promise<void> {
+      console.log('COMMIT:::::: ', commitInfo)
       for (const doc of commitInfo.created) {
         memdb.add(doc)
       }

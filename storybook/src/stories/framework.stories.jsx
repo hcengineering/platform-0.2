@@ -37,8 +37,8 @@ export const icon = () => ({
     return <Theme>
       <Icon icon={ui.icon.Add} class="icon-embed" />
       <Icon icon={ui.icon.AddGroup} class="icon-embed" />
-      <br/>
-      Default: <Icon class="icon-embed"/>
+      <br />
+      Default: <Icon class="icon-embed" />
     </Theme>
   }
 })
@@ -73,7 +73,7 @@ export const object = () => ({
 
 async function createTableConent() {
   const session = await getSession()
-  const personClass = await session.getInstance(contact.class.Person)
+  const personClass = await session.getInstance(core.class.Class, contact.class.Person)
 
   const person1 = await personClass.newInstance({})
   person1.firstName = 'Валентин Генрихович'

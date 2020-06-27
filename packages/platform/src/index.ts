@@ -206,7 +206,6 @@ export interface PluginInfo {
 }
 
 export type ResourceKind = string & { __resourceKind: true }
-export const DefaultResourceKind = 'default' as ResourceKind
 
 export interface ResourceInfo {
   kind: ResourceKind
@@ -216,7 +215,8 @@ export interface ResourceInfo {
 
 export function getResourceKind (resource: Resource<any>): ResourceKind {
   const i = resource.indexOf(':')
-  return (i === -1) ? DefaultResourceKind : resource.substring(0, i) as ResourceKind
+  if (i === -1) { throw new Error('invalid resource id format') }
+  return resource.substring(0, i) as ResourceKind
 }
 
 /*!
@@ -300,7 +300,7 @@ export class Platform {
   getResourceInfo (resource: Resource<any>): ResourceInfo {
     const index = resource.indexOf(':')
     if (index === -1) {
-      return { id: resource, kind: DefaultResourceKind, plugin: '' as Plugin<Service> }
+      throw new Error('invalid resource id format')
     }
     const kind = resource.substring(0, index) as ResourceKind
     const dot = resource.indexOf('.', index)

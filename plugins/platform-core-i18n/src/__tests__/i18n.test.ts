@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Platform, Plugin, Service, plugin } from '@anticrm/platform'
+import { Platform, Plugin, Service, plugin, Property } from '@anticrm/platform'
 import { IntlString } from '..'
 import { verifyTranslation, modelTranslation } from '../__model__/utils'
 
@@ -21,10 +21,12 @@ import rpcStub from '@anticrm/platform-rpc-stub'
 import core from '@anticrm/platform-core/src/__model__'
 import i18n from '../__model__'
 
-import { Ref, Class, Obj, Doc, StringType } from '@anticrm/platform-core'
+import { Ref, Class, Obj, Doc, CoreDomain } from '@anticrm/platform-core'
 
 import metaModel, { Builder } from '@anticrm/platform-core/src/__model__/model'
 import i18nModel from '../__model__/model'
+
+type StringType = Property<string>
 
 interface Person extends Doc {
   name?: IntlString
@@ -131,14 +133,14 @@ describe('i18n', () => {
       name: S.newInstance(i18n.class.IntlString, {}),
       first: S.newInstance(core.class.Type, {}),
       last: S.newInstance(core.class.Type, {}),
-    })
+    }, CoreDomain.Model)
 
     const person = S.createDocument(test.class.Person, {
       name: test.string.Vasya,
-      first: 'first' as StringType
+      first: 'first'
     }, 'vasya' as Ref<Person>)
 
-    const instance = await session.getInstance('vasya' as Ref<Person>)
+    const instance = await session.getInstance(test.class.Person, 'vasya' as Ref<Person>)
     console.log(instance)
     expect(instance.name).toBe(test.string.Vasya)
 
@@ -154,8 +156,8 @@ describe('i18n', () => {
     console.log(translations)
     i18nService.loadStrings(translations)
 
-    const petya = S.createDocument(test.class.Person, { first: 'first' as StringType }, 'test.Petya' as Ref<Person>)
-    const petyaInstance = await session.getInstance('test.Petya' as Ref<Person>)
+    const petya = S.createDocument(test.class.Person, { first: 'first' }, 'test.Petya' as Ref<Person>)
+    const petyaInstance = await session.getInstance(test.class.Person, 'test.Petya' as Ref<Person>)
     expect(petyaInstance.name).toBe('Петя')
   })
 })
