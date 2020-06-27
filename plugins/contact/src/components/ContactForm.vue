@@ -19,10 +19,11 @@ import core, { Ref, Doc, Class, Instance, ClassKind } from '@anticrm/platform-co
 import { Person } from '..'
 
 import NewContactForm from './NewContactForm.vue'
+import ViewContactForm from './ViewContactForm.vue'
 import BrowseContactForm from './BrowseContactForm.vue'
 
 export default defineComponent({
-  components: { NewContactForm, BrowseContactForm },
+  components: { NewContactForm, BrowseContactForm, ViewContactForm },
   props: {
     resource: String as unknown as PropType<Ref<Class<Person>>>,
     operation: String,
@@ -34,6 +35,7 @@ export default defineComponent({
 <template>
   <div class="contact-contact-form">
     <NewContactForm v-if="operation === 'new'" :resource="resource" :params="params" />
+    <ViewContactForm v-else-if="operation === 'view'" :resource="resource" :params="params" />
     <BrowseContactForm v-else :resource="resource" :params="params" />
   </div>
 </template>

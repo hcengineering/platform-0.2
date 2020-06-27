@@ -18,7 +18,7 @@
 import { PropType, defineComponent, inject, ref } from 'vue'
 import { Platform } from '@anticrm/platform'
 
-import { Obj, Class, Ref, CoreService, Instance, Doc } from '@anticrm/platform-core'
+import core, { Obj, Class, Ref, CoreService, Instance, Doc } from '@anticrm/platform-core'
 import ui, { UIService, AttrModel } from '@anticrm/platform-ui'
 import { injectPlatform } from '..'
 
@@ -37,7 +37,7 @@ export default defineComponent({
     const uiService = _.deps.ui
     try {
       const session = props.instance.getSession()
-      const classInstance = await session.getInstance(props.clazz)
+      const classInstance = await session.getInstance(core.class.Class, props.clazz)
       const classModel = await uiService.getClassModel(classInstance)
       const attrModel = await uiService.getOwnAttrModel(classInstance, props.exclude)
       const grouped = uiService.groupByType(attrModel)

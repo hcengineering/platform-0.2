@@ -53,7 +53,7 @@ describe('core', () => {
     const coreService = await platform.getPlugin(core.id)
     const session = coreService.newSession()
 
-    const obj = await session.getInstance(contact.class.Person)
+    const obj = await session.getInstance(core.class.Class, contact.class.Person)
     expect(session.is(obj, ui.class.Form)).toBe(true)
     const asForm = await session.as(obj, ui.class.Form)
     expect(asForm.form).toBe(contact.form.Person)

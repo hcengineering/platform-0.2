@@ -154,11 +154,12 @@ export interface Cursor<T extends Doc> {
 
 export interface Session {
   newInstance<M extends Doc> (_class: Ref<Class<M>>, values: Values<Omit<M, keyof Doc>>, _id?: Ref<M>): Promise<Instance<M>>
-  getInstance<T extends Doc> (id: Ref<T>): Promise<Instance<T>>
+  getInstance<T extends Doc> (_class: Ref<Class<T>>, _id: Ref<T>): Promise<Instance<T>>
   as<T extends Doc, A extends Doc> (obj: Instance<T>, _class: Ref<Class<A>>): Promise<Instance<A>>
   is<T extends Doc, A extends Doc> (obj: Instance<T>, _class: Ref<Class<A>>): boolean
   find<T extends Doc> (_class: Ref<Class<T>>, query: Partial<T>): Cursor<T>
   query<T extends Doc> (_class: Ref<Class<T>>, query: Values<Partial<T>>, listener: (result: Instance<T>[]) => void): () => void
+  delete<T extends Doc> (_class: Ref<Class<T>>, _id: Ref<T>): Promise<void>
   commit (): Promise<void>
   acceptXact (info: CommitInfo): void
   close (discard?: boolean): void

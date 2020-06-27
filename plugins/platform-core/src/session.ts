@@ -19,7 +19,8 @@ import { MemDb, findAll, Layout, AnyLayout } from '@anticrm/memdb'
 import { generateId } from './objectid'
 import { attributeKey } from './plugin'
 
-import core, { Instance, Type, Session, Values, Adapter, Cursor } from '.'
+import core, { Instance, Type, Session, Values, Adapter, Cursor, CoreDomain } from '.'
+import model from './__model__/model'
 
 export function createSession (platform: Platform, modelDb: MemDb, coreProtocol: CoreProtocol, broadcastXact: (info: CommitInfo, originator?: Session) => void, closeSession: (session: Session) => void): Session {
 
@@ -150,13 +151,29 @@ export function createSession (platform: Platform, modelDb: MemDb, coreProtocol:
 
   // I N S T A N C E S
 
-  async function getInstance<T extends Doc> (id: Ref<T>): Promise<Instance<T>> {
-    const newInstance = created.get(id)
+  /** To be deprecated, use findOne instead */
+  async function getInstance<T extends Doc> (_class: Ref<Class<T>>, _id: Ref<T>): Promise<Instance<T>> {
+    if (!_class || !_id) { throw new Error('getInstance invalid args') }
+    const newInstance = created.get(_id)
     if (newInstance) {
       return newInstance as unknown as Instance<T>
     }
-    const doc = modelDb.get(id)
-    if (!doc) { throw new Error('no document ,id: ' + id) }
+
+    const clazz = modelDb.get(_class) as Layout<Class<T>>
+    const domain = clazz._domain
+    if (!domain) { throw new Error(`can't get domain for class: '${_class}'`) }
+
+    let doc
+    if (domain === CoreDomain.Model) {
+      doc = modelDb.get(_id)
+    } else {
+      const cursor = find(_class, { _id } as unknown as Partial<T>) //  TODO: cast
+      const all = await cursor.all()
+      if (all.length !== 1) { { throw new Error('getInstance: no document ,id: ' + _id) } }
+      return all[0]
+    }
+
+    if (!doc) { throw new Error('no document ,id: ' + _id) }
     return instantiateDoc(doc as T)
   }
 
@@ -269,6 +286,10 @@ export function createSession (platform: Platform, modelDb: MemDb, coreProtocol:
     }
   }
 
+  async function del<T extends Doc> (_class: Ref<Class<T>>, _id: Ref<T>): Promise<void> {
+    return coreProtocol.delete(_class as Ref<Class<Doc>>, { _id })
+  }
+
   // A D A P T E R S
 
   async function adapt (resource: Resource<any>, kind: string): Promise<Resource<any> | undefined> {
@@ -283,7 +304,7 @@ export function createSession (platform: Platform, modelDb: MemDb, coreProtocol:
     })
 
     if (adapter) {
-      const instance = await getInstance(adapter._id as string as Ref<Adapter>)
+      const instance = await getInstance(core.class.Adapter, adapter._id as string as Ref<Adapter>)
       return (await instance.adapt).call(instance, resource)
     }
 
@@ -309,6 +330,7 @@ export function createSession (platform: Platform, modelDb: MemDb, coreProtocol:
     is,
     find,
     query,
+    delete: del,
     adapt,
     instantiateEmb,
     getPrototype,

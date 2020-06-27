@@ -37,11 +37,11 @@ export default defineComponent({
     const uiService = getUIService()
 
     async function label (_class: Ref<Class<Obj>>): Promise<string> {
-      return uiService.getClassModel(await session.getInstance(_class)).then(model => model.label)
+      return uiService.getClassModel(await session.getInstance(core.class.Class, _class)).then(model => model.label)
     }
 
     async function icon (_class: Ref<Class<Obj>>): Promise<string> {
-      return uiService.getClassModel(await session.getInstance(_class)).then(model => model.icon)
+      return uiService.getClassModel(await session.getInstance(core.class.Class, _class)).then(model => model.icon)
     }
 
     return { actions, label, icon }

@@ -16,7 +16,7 @@
 import { Platform, Resource } from '@anticrm/platform'
 
 import business, { BusinessObject, BusinessService } from '.'
-import { Instance, Ref, Class, Session, Values } from '@anticrm/platform-core'
+import core, { Instance, Ref, Class, Session, Values } from '@anticrm/platform-core'
 import ui from '@anticrm/platform-ui'
 import { Account, User } from '.'
 
@@ -31,14 +31,14 @@ export default async (platform: Platform): Promise<BusinessService> => {
 
   function getText (this: Instance<BusinessObject>): Promise<string | undefined> {
     const session = this.getSession()
-    return session.getInstance(this._class).then(clazz =>
+    return session.getInstance(core.class.Class, this._class).then(clazz =>
       session.as(clazz, ui.class.ClassUIDecorator)
     ).then(clazz => clazz.label)
   }
 
   function getImage (this: Instance<BusinessObject>): Promise<Resource<string> | undefined> {
     const session = this.getSession()
-    return session.getInstance(this._class).then(clazz =>
+    return session.getInstance(core.class.Class, this._class).then(clazz =>
       session.as(clazz, ui.class.ClassUIDecorator)
     ).then(clazz => clazz.icon as Resource<string> | undefined)
   }

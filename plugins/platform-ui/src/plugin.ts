@@ -72,7 +72,7 @@ export default async (platform: Platform, deps: { core: CoreService }): Promise<
       const type = await attributes[key]
       const typeDecorator = await decorator.decorators?.[key]
 
-      const typeClass = await session.getInstance(type._class)
+      const typeClass = await session.getInstance(core.class.Class, type._class)
       const typeClassDecorator = await session.as(typeClass, ui.class.ClassUIDecorator)
 
       const label = await typeDecorator?.label ?? await typeClassDecorator?.label ?? key
@@ -93,7 +93,7 @@ export default async (platform: Platform, deps: { core: CoreService }): Promise<
   async function getAttrModel (clazz: Instance<Class<Obj>>, exclude?: string[] | string, top?: Ref<Class<Obj>>): Promise<AttrModel[]> {
     const session = clazz.getSession()
     const hierarchy = session.getClassHierarchy(clazz._id as Ref<Class<Obj>>, top ?? core.class.Doc)
-    const ownModels = hierarchy.map(async (_class) => getOwnAttrModel(await session.getInstance(_class), exclude))
+    const ownModels = hierarchy.map(async (_class) => getOwnAttrModel(await session.getInstance(core.class.Class, _class), exclude))
     return Promise.all(ownModels).then(result => result.flat())
   }
 
@@ -101,18 +101,7 @@ export default async (platform: Platform, deps: { core: CoreService }): Promise<
 
   async function classToComponent (this: Instance<Adapter>, resource: Resource<any>): Promise<Resource<any>> {
     const session = this.getSession()
-    const clazz = await session.getInstance(resource as Ref<Class<Doc>>)
-    if (!session.is(clazz, ui.class.Form)) {
-      throw new Error(`something went wrong, can't find 'Form' for the ${resource}.`)
-    }
-    const component = (await session.as(clazz, ui.class.Form)).form
-    return component
-  }
-
-  async function objectToComponent (this: Instance<Adapter>, resource: Resource<any>): Promise<Resource<any>> {
-    const session = this.getSession()
-    const object = await session.getInstance(resource as Ref<Doc>)
-    const clazz = await session.getInstance(object._class)
+    const clazz = await session.getInstance(core.class.Class, resource as Ref<Class<Doc>>)
     if (!session.is(clazz, ui.class.Form)) {
       throw new Error(`something went wrong, can't find 'Form' for the ${resource}.`)
     }
@@ -121,7 +110,6 @@ export default async (platform: Platform, deps: { core: CoreService }): Promise<
   }
 
   platform.setResource(ui.method.ClassToComponent, classToComponent)
-  platform.setResource(ui.method.ObjectToComponent, classToComponent)
 
   // S E R V I C E
 

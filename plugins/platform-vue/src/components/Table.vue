@@ -26,15 +26,6 @@ export default defineComponent({
     model: Array as PropType<AttrModel[]>,
     content: Array as PropType<Doc[]>,
   },
-  setup () {
-    const service = getVueService()
-
-    return {
-      navigate (id: Ref<Doc>) {
-        service.navigate(id)
-      }
-    }
-  }
 })
 </script>
 
@@ -46,7 +37,12 @@ export default defineComponent({
       </div>
     </div>
     <div class="tbody">
-      <div class="tr" v-for="object in content" :key="object._id" @click="navigate(object._id)">
+      <div
+        class="tr"
+        v-for="object in content"
+        :key="object._id"
+        @click="$emit('navigate', object._id)"
+      >
         <div class="td" v-for="attr in model" :key="attr.key">
           {{ object[attr.key] }}
           <!-- <component :is="getPresenters()[propertyKey]" :value="object[propertyKey]"></component> -->

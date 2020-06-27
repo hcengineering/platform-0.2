@@ -54,6 +54,7 @@ export interface CommitInfo {
 
 export interface CoreProtocol {
   find (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Layout<Doc>[]>
+  delete (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<void>
   load (): Promise<Layout<Doc>[]> // TODO: must be load domain
   commit (commitInfo: CommitInfo): Promise<void>
 }
