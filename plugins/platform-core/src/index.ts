@@ -74,6 +74,7 @@ export interface BagOf<A> extends Type<{ [key: string]: A }> {
 }
 export interface ArrayOf<A> extends Type<A[]> { of: Type<A> }
 export interface StaticResource<T> extends Type<T> { }
+export interface Method<T> extends StaticResource<T> { }
 
 // C L A S S E S
 
@@ -186,7 +187,7 @@ export default plugin('core' as Plugin<CoreService>, { rpc: rpc.id }, {
     Doc: '' as Ref<Class<Doc>>,
     Class: '' as Ref<Class<Class<Obj>>>,
     StaticResource: '' as Ref<Class<StaticResource<any>>>,
-    // Resource: '' as Ref<Class<Type<any>>>,
+    Method: '' as Ref<Class<Method<any>>>,
     RefTo: '' as Ref<Class<RefTo<Doc>>>,
     Adapter: '' as Ref<Class<Adapter>>
   },

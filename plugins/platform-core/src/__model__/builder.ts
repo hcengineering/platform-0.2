@@ -22,7 +22,7 @@ import { ModelDb, MemDb, Layout } from '@anticrm/memdb'
 class Builder {
   private memdb: ModelDb
 
-  constructor (memdb?: ModelDb) {
+  constructor(memdb?: ModelDb) {
     this.memdb = memdb ?? new MemDb()
   }
 
@@ -47,10 +47,6 @@ class Builder {
 
   mixin<T extends E, E extends Doc> (id: Ref<E>, clazz: Ref<Class<T>>, values: Layout<Omit<T, keyof E>>) {
     this.memdb.mixin(id, clazz, values)
-  }
-
-  patch<T extends Doc> (obj: Ref<T>, f: (obj: Layout<Doc>) => void) {
-    f(this.memdb.get(obj))
   }
 
   load (model: (builder: Builder) => void) { model(this) }

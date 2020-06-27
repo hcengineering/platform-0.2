@@ -79,6 +79,7 @@ export default plugin('ui' as Plugin<UIService>, { core: core.id }, {
     Form: '' as Ref<Class<Form<Obj>>>
   },
   method: {
-    ClassToComponent: '' as Resource<AdapterType>
+    ClassToComponent: '' as Resource<AdapterType>,
+    ObjectToComponent: '' as Resource<AdapterType>
   }
 })

@@ -23,8 +23,6 @@ import { ClassUIDecorator, Form } from '@anticrm/platform-ui'
 import { Contact, Person } from '..'
 import Builder from '@anticrm/platform-core/src/__model__/builder'
 
-import { Layout } from '@anticrm/memdb'
-
 export default async (S: Builder) => {
 
   S.createClass(contact.class.Date, core.class.Type, {})
@@ -42,10 +40,10 @@ export default async (S: Builder) => {
     lastName: S.newInstance(core.class.Type, {}),
     birthDate: S.newInstance(contact.class.Date, {}),
 
-    getText: S.newInstance(core.class.StaticResource, {
+    getText: S.newInstance(core.class.Method, {
       _default: S.resolve(contact.method.Person_getText)
     }),
-    getImage: S.newInstance(core.class.StaticResource, {
+    getImage: S.newInstance(core.class.Method, {
       _default: S.resolve(contact.method.Person_getImage)
     }),
   })

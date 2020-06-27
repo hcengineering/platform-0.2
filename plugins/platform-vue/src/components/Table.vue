@@ -18,12 +18,22 @@
 import { defineComponent, PropType, inject } from 'vue'
 import core, { Obj, Doc, Ref, Class, CoreService } from '@anticrm/platform-core'
 import ui, { UIService, AttrModel } from '@anticrm/platform-ui'
+import { getVueService } from '@anticrm/platform-vue'
 
 export default defineComponent({
   components: {},
   props: {
     model: Array as PropType<AttrModel[]>,
-    content: Array as PropType<Doc[]>
+    content: Array as PropType<Doc[]>,
+  },
+  setup () {
+    const service = getVueService()
+
+    return {
+      navigate (id: Ref<Doc>) {
+        service.navigate(id)
+      }
+    }
   }
 })
 </script>
@@ -36,7 +46,7 @@ export default defineComponent({
       </div>
     </div>
     <div class="tbody">
-      <div class="tr" v-for="object in content" :key="object._id">
+      <div class="tr" v-for="object in content" :key="object._id" @click="navigate(object._id)">
         <div class="td" v-for="attr in model" :key="attr.key">
           {{ object[attr.key] }}
           <!-- <component :is="getPresenters()[propertyKey]" :value="object[propertyKey]"></component> -->
@@ -71,6 +81,12 @@ export default defineComponent({
 
     .tr {
       border-bottom: $border-default;
+
+      &:hover {
+        background-color: $content-color;
+        color: $content-bg-color;
+        cursor: pointer;
+      }
     }
   }
 

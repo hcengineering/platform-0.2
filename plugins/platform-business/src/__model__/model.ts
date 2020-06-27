@@ -29,10 +29,10 @@ export default (S: Builder) => {
     createdBy: S.ref(business.class.Account),
     onBehalfOf: S.ref(business.class.User),
 
-    getText: S.newInstance(core.class.StaticResource, {
+    getText: S.newInstance(core.class.Method, {
       _default: S.resolve(business.method.BusinessObject_getText)
     }),
-    getImage: S.newInstance(core.class.StaticResource, {
+    getImage: S.newInstance(core.class.Method, {
       _default: S.resolve(business.method.BusinessObject_getImage)
     }),
   })

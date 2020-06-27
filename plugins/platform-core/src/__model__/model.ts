@@ -95,7 +95,8 @@ export default (S: Builder) => {
   })
 
   S.createClass(core.class.StaticResource, core.class.Type, {}, undefined, core.native.StaticResource)
-  // S.patch(core.class.StaticResource, (clazz: Layout<Class<Obj>>) => { clazz._native = S.primitive(core.native.StaticResource) })
+
+  S.createClass(core.class.Method, core.class.StaticResource, {})
 
   S.createClass(core.class.Adapter, core.class.Doc, {
     from: S.newInstance(core.class.Type, {}),

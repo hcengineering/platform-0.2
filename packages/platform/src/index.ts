@@ -206,6 +206,7 @@ export interface PluginInfo {
 }
 
 export type ResourceKind = string & { __resourceKind: true }
+export const DefaultResourceKind = 'default' as ResourceKind
 
 export interface ResourceInfo {
   kind: ResourceKind
@@ -214,7 +215,8 @@ export interface ResourceInfo {
 }
 
 export function getResourceKind (resource: Resource<any>): ResourceKind {
-  return resource.substring(0, resource.indexOf(':')) as ResourceKind
+  const i = resource.indexOf(':')
+  return (i === -1) ? DefaultResourceKind : resource.substring(0, i) as ResourceKind
 }
 
 /*!
@@ -297,6 +299,9 @@ export class Platform {
 
   getResourceInfo (resource: Resource<any>): ResourceInfo {
     const index = resource.indexOf(':')
+    if (index === -1) {
+      return { id: resource, kind: DefaultResourceKind, plugin: '' as Plugin<Service> }
+    }
     const kind = resource.substring(0, index) as ResourceKind
     const dot = resource.indexOf('.', index)
     const plugin = resource.substring(index + 1, dot) as AnyPlugin
@@ -471,17 +476,3 @@ export function attributeKey (_class: Ref<Class<Obj>>, key: string): string {
   return plugin + '|' + cls + '|' + key
 }
 
-// P R O M I S E
-
-// export function allValues (object: { [key: string]: Promise<any> }): Promise<{ [key: string]: any }> {
-//   const keys = Object.keys(object)
-//   const values = Object.values(object)
-//   const all = Promise.all(values)
-//   return all.then(values => {
-//     const result = []
-//     for (let i = 0; i < keys.length; i++) {
-//       result.push([keys[i], values[i]])
-//     }
-//     return Object.fromEntries(result) as { [key: string]: any }
-//   })
-// }
