@@ -20,9 +20,11 @@ import core from '@anticrm/platform-core/src/__model__'
 import business from '@anticrm/platform-business/src/__model__'
 import chunter from '.'
 
+const ChunterDomain = 'chunter'
+
 export default async (S: Builder) => {
 
-  S.createClass(chunter.class.Channel, business.class.BusinessObject, {})
+  S.createClass(chunter.class.Channel, business.class.BusinessObject, {}, ChunterDomain)
 
   S.createClass(chunter.class.DocMessage, business.class.BusinessObject, {
     channel: S.ref(chunter.class.Channel),
@@ -30,7 +32,7 @@ export default async (S: Builder) => {
     replies: S.arrayOf(S.instanceOf(chunter.class.EmbMessage)),
 
     text: S.newInstance(core.class.Type, {})
-  })
+  }, ChunterDomain)
 
   S.createClass(chunter.class.EmbMessage, core.class.Emb, {
     createdOn: S.newInstance(core.class.Type, {}),
