@@ -25,7 +25,7 @@ export default (S: Builder) => {
   })
 
   S.createClass(business.class.BusinessObject, core.class.Doc, {
-    createdOn: S.newInstance(core.class.Type, {}),
+    createdOn: S.newInstance(core.class.Date, {}),
     createdBy: S.ref(business.class.Account),
     onBehalfOf: S.ref(business.class.User),
 

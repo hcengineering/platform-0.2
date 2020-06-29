@@ -29,6 +29,8 @@ export default extendIds(core, {
     ArrayOf: '' as Ref<Class<ArrayOf<any>>>,
     InstanceOf: '' as Ref<Class<InstanceOf<Emb>>>,
     Metadata: '' as Ref<Class<Type<any>>>,
-    Resource: '' as Ref<Class<Type<any>>>
+    Resource: '' as Ref<Class<Type<any>>>,
+
+    Date: '' as Ref<Class<Type<Date>>>
   }
 })

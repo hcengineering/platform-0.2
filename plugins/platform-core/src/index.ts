@@ -66,6 +66,7 @@ export type Exert<A> = (value: LayoutType, layout?: any, key?: string) => A
 export interface Type<A> extends Emb {
   _default?: Property<A>
   exert?: Property<(this: Instance<Type<any>>) => Promise<Exert<A>>>
+  hibernate?: Property<(this: Instance<Type<A>>, value: A) => LayoutType>
 }
 export interface RefTo<T extends Doc> extends Type<T> { to: Ref<Class<T>> }
 export interface InstanceOf<T extends Emb> extends Type<T> { of: Ref<Class<T>> }
@@ -116,7 +117,7 @@ type PrimitiveInstance<T> =
 
 export type Instance<T> = { [P in keyof T]:
   T[P] extends Property<infer X> | undefined ? X :
-  T[P] extends Ref<infer X> ? Ref<X> :
+  T[P] extends Ref<infer X> | undefined ? Ref<X> :
   T[P] extends { __embedded: true } ? Instance<T[P]> :
   T[P] extends { [key: string]: infer X } | undefined ? { [key: string]: Instance<X> } :
   T[P] extends (infer X)[] | undefined ? Instance<X>[] :
@@ -194,12 +195,14 @@ export default plugin('core' as Plugin<CoreService>, { rpc: rpc.id }, {
   },
   method: {
     Type_exert: '' as Resource<(this: Instance<Type<any>>) => Promise<Exert<any>>>,
+    Type_hibernate: '' as Resource<(this: Instance<Type<any>>, value: any) => LayoutType>,
     BagOf_exert: '' as Resource<(this: Instance<BagOf<any>>) => Promise<Exert<any>>>,
     InstanceOf_exert: '' as Resource<(this: Instance<InstanceOf<Emb>>) => Promise<Exert<any>>>,
     Metadata_exert: '' as Resource<(this: Instance<Type<Metadata<any>>>) => Promise<Exert<any>>>,
     Resource_exert: '' as Resource<(this: Instance<Type<any>>) => Promise<Exert<any>>>,
 
-    // Adapter_adapt: '' as Resource<(this: Instance<Adapter>) => Promise<Resource<any>> | undefined>
+    Date_exert: '' as Resource<(this: Instance<Type<Date>>) => Promise<Exert<Date>>>,
+    Date_hibernate: '' as Resource<(this: Instance<Type<Date>>, value: Date) => LayoutType>,
   },
   native: {
     StaticResource: '' as Resource<Object>

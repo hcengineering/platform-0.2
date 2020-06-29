@@ -20,7 +20,6 @@ import { generateId } from './objectid'
 import { attributeKey } from './plugin'
 
 import core, { Instance, Type, Session, Values, Adapter, Cursor, CoreDomain } from '.'
-import model from './__model__/model'
 
 export function createSession (platform: Platform, modelDb: MemDb, coreProtocol: CoreProtocol, broadcastXact: (info: CommitInfo, originator?: Session) => void, closeSession: (session: Session) => void): Session {
 
@@ -79,10 +78,15 @@ export function createSession (platform: Platform, modelDb: MemDb, coreProtocol:
       }
 
       const exert = await exertFactory.call(attrInstance)
-
       if (typeof exert !== 'function') {
         throw new Error('exert is not a function')
       }
+
+      const hibernate = attrInstance.hibernate
+      if (typeof hibernate !== 'function') {
+        throw new Error('hibernate is not a function')
+      }
+      const hibernateBound = hibernate.bind(attrInstance)
 
       const fullKey = stereotype === Stereotype.DOC ?
         key.startsWith('_') ? key : attributeKey(_class, key) :
@@ -97,7 +101,7 @@ export function createSession (platform: Platform, modelDb: MemDb, coreProtocol:
           return exert(value, this.__layout, key)
         },
         set (this: Instance<Obj>, value: any) {
-          (this.__update as any)[fullKey] = value
+          (this.__update as any)[fullKey] = hibernateBound(value)
           const id = (this.__layout as Layout<Doc>)._id
           if (id) { updated.set(id, this as Instance<Doc>) }
         },
@@ -135,9 +139,35 @@ export function createSession (platform: Platform, modelDb: MemDb, coreProtocol:
     return new ctor(obj) as unknown as Instance<T>
   }
 
+  // TODO: employ prototypes to get rid of this
+  // async function getAttribute (_class: Ref<Class<Obj>>, key: string) {
+  //   let cls = _class as Ref<Classifier<Obj>> | undefined
+  //   console.log('get attribute: ' + key + ' ' + cls)
+  //   while (cls) {
+  //     const clazz = await getInstance(core.class.Class, cls)
+  //     console.log('instance: ' + clazz)
+  //     const attributes = clazz._attributes as { [key: string]: Instance<Type<any>> | undefined }
+  //     const attr = attributes[key]
+  //     if (attr) { return attr }
+  //     cls = clazz._extends
+  //     console.log(clazz._extends)
+  //   }
+  //   return undefined
+  // }
+
   async function newInstance<M extends Doc> (_class: Ref<Class<M>>, values: Values<Omit<M, keyof Doc>>, id?: Ref<M>): Promise<Instance<M>> {
     const _id = id ?? generateId() as Ref<Doc>
     const layout = { _class, _id } as Layout<Doc>
+
+    // for (const key in values) {
+    //   const attr = await getAttribute(_class, key)
+    //   if (!attr) { throw new Error('attribute not found') }
+    //   const value = (values as any)[key]
+    //   const h = attr.hibernate
+    //   if (!h) { throw new Error('no hibernate function') }
+    //   const lv = h.bind(attr)(value)
+    //     ; (layout as any)[key] = lv
+    // }
 
     const instance = await instantiateDoc(layout)
     for (const key in values) {

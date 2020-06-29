@@ -49,6 +49,9 @@ export default (S: Builder) => {
     _default: S.newInstance(core.class.Type, {}),
     exert: S.newInstance(core.class.StaticResource, {
       _default: S.resolve(core.method.Type_exert)
+    }),
+    hibernate: S.newInstance(core.class.StaticResource, {
+      _default: S.resolve(core.method.Type_hibernate)
     })
   })
 
@@ -97,6 +100,15 @@ export default (S: Builder) => {
   S.createClass(core.class.StaticResource, core.class.Type, {}, undefined, core.native.StaticResource)
 
   S.createClass(core.class.Method, core.class.StaticResource, {})
+
+  S.createClass(core.class.Date, core.class.Type, {
+    exert: S.newInstance(core.class.StaticResource, {
+      _default: S.resolve(core.method.Date_exert)
+    }),
+    hibernate: S.newInstance(core.class.StaticResource, {
+      _default: S.resolve(core.method.Date_hibernate)
+    })
+  })
 
   S.createClass(core.class.Adapter, core.class.Doc, {
     from: S.newInstance(core.class.Type, {}),

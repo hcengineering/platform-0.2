@@ -164,6 +164,10 @@ export default async (platform: Platform, deps: { rpc: RpcService }): Promise<Co
     return value => value
   }
 
+  const Type_hibernate = function (this: Instance<Type<any>>, value: any): LayoutType {
+    return value
+  }
+
   const Metadata_exert = async function (this: Instance<Type<any>>): Promise<Exert<any>> {
     return ((value: Metadata<any> & Property<any>) => value ? platform.getMetadata(value) : undefined) as Exert<any>
   }
@@ -196,15 +200,30 @@ export default async (platform: Platform, deps: { rpc: RpcService }): Promise<Co
         return () => resolved
       }
       return () => undefined
+    },
+    hibernate: function (this: Instance<StaticResource<any>>, value: any): LayoutType {
+      throw new Error('cant change static resource')
     }
+  }
+
+  const Date_exert = async function (this: Instance<Type<Date>>): Promise<Exert<Date>> {
+    return value => new Date(value as number)
+  }
+
+  const Date_hibernate = function (this: Instance<Type<Date>>, value: Date): LayoutType {
+    return value.getTime()
   }
 
   platform.setResource(core.native.StaticResource, TStaticResource)
   platform.setResource(core.method.Type_exert, Type_exert)
+  platform.setResource(core.method.Type_hibernate, Type_hibernate)
   platform.setResource(core.method.BagOf_exert, BagOf_exert)
   platform.setResource(core.method.InstanceOf_exert, InstanceOf_exert)
   platform.setResource(core.method.Metadata_exert, Metadata_exert)
   platform.setResource(core.method.Resource_exert, Resource_exert)
+
+  platform.setResource(core.method.Date_exert, Date_exert)
+  platform.setResource(core.method.Date_hibernate, Date_hibernate)
 
   return coreService
 }
