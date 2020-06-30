@@ -24,6 +24,7 @@ import chunterModel from '@anticrm/chunter/src/__model__/model'
 import workbenchModel from '@anticrm/platform-workbench/src/__model__/model'
 import demoModel from '@anticrm/app-storybook/src/__model__/model'
 
+import uiRu from '@anticrm/platform-ui/src/__model__/strings/ru'
 import contactRu from '@anticrm/contact/src/__model__/strings/ru'
 
 const builder = new Builder()
@@ -37,4 +38,7 @@ builder.load(chunterModel)
 builder.load(demoModel)
 
 export const Model = builder.dump()
-export const Strings = contactRu
+export const Strings = {
+  ...uiRu,
+  ...contactRu
+}

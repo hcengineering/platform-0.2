@@ -18,6 +18,7 @@ import { plugin, Service, Plugin, Resource } from '@anticrm/platform'
 import core, { Ref, Class, Doc, CoreService, Property, Session } from '@anticrm/platform-core'
 import ui, { AnyComponent, UIService } from '@anticrm/platform-ui'
 import vue, { Asset } from '@anticrm/platform-vue'
+import i18n from '@anticrm/platform-core-i18n'
 import { CoreInjectionKey, UIInjectionKey, SessionInjectionKey } from '@anticrm/platform-vue'
 
 // C O R E  M O D E L
@@ -54,6 +55,7 @@ export interface MainModel extends ViewModel {
 
 export default plugin('workbench' as Plugin<WorkbenchService>, {
   core: core.id,
+  i18n: i18n.id,
   ui: ui.id,
   vue: vue.id
 }, {

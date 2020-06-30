@@ -44,8 +44,8 @@ export default defineComponent({
         @click="$emit('navigate', object._id)"
       >
         <div class="td" v-for="attr in model" :key="attr.key">
-          {{ object[attr.key] }}
-          <!-- <component :is="getPresenters()[propertyKey]" :value="object[propertyKey]"></component> -->
+          <!-- {{ object[attr.key] }} {{ attr.presenter }} -->
+          <widget :component="attr.presenter" :modelValue="object[attr.key]" />
         </div>
       </div>
     </div>

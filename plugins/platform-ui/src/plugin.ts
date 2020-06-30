@@ -18,7 +18,8 @@ import { Platform, Resource } from '@anticrm/platform'
 import core, { CoreService, Ref, Class, Obj, Doc, Type, Instance, AdapterType, Adapter } from '@anticrm/platform-core'
 import ui, { UIService, UIModel, AttrModel } from '.'
 
-console.log('Plugin `face` loaded')
+import DefaultPresenter from './internal/DefaultPresenter.vue'
+import DatePresenter from './internal/DatePresenter.vue'
 
 /*!
  * Anticrm Platform™ Face Plugin
@@ -75,6 +76,15 @@ export default async (platform: Platform, deps: { core: CoreService }): Promise<
       const typeClass = await session.getInstance(core.class.Class, type._class)
       const typeClassDecorator = await session.as(typeClass, ui.class.ClassUIDecorator)
 
+      let presenter = ui.component.DefaultPresenter
+      const typeClassUIDecorator = await session.as(typeClass, ui.class.TypeClassUIDecorator)
+      if (typeClassUIDecorator) {
+        if (typeClassUIDecorator.presenter) {
+          console.log('TYPE CLASS DECORATOR!!! ', typeClassUIDecorator.presenter)
+          presenter = typeClassUIDecorator.presenter
+        }
+      }
+
       const label = await typeDecorator?.label ?? await typeClassDecorator?.label ?? key
       const placeholder = (await typeDecorator?.placeholder) ?? label
 
@@ -84,7 +94,8 @@ export default async (platform: Platform, deps: { core: CoreService }): Promise<
         type,
         label,
         placeholder,
-        icon
+        icon,
+        presenter
       } as AttrModel
     })
     return Promise.all(attrs).then(model => model.filter(e => e.type._class !== core.class.Method))
@@ -110,6 +121,9 @@ export default async (platform: Platform, deps: { core: CoreService }): Promise<
   }
 
   platform.setResource(ui.method.ClassToComponent, classToComponent)
+
+  platform.setResource(ui.component.DefaultPresenter, DefaultPresenter)
+  platform.setResource(ui.component.DatePresenter, DatePresenter)
 
   // S E R V I C E
 
