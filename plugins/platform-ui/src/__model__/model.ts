@@ -47,4 +47,9 @@ export default (S: Builder) => {
     to: S.primitive(ComponentKind),
     adapt: S.resolve(ui.method.ClassToComponent) as any // TODO: types
   })
+
+
+  S.mixin(core.class.Date, ui.class.TypeClassUIDecorator, {
+    presenter: S.resolve(ui.component.DatePresenter)
+  })
 }

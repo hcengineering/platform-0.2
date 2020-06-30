@@ -19,6 +19,13 @@ Platform Objects utilize classical object-oriented model, so every platform obje
 There are no instances of `Obj`, `Doc`, `Class`... and other classes in the hierarchy exists. Those are abstract classes describing **models**. Platform instantiate **derived** classes,
 which are either `Layout<Obj>` or `Instance<Obj>`.
 
+| Layout<Obj>  |   Obj                | Instance<Obj> |
+|--------------|----------------------|---------------|
+|  Ref<Doc>    | Ref<Doc> (string)    | Ref<Doc>      |
+|  LayoutType  | Property<T> (T)      | T             |
+|  Resource<T> | Resource<T> (string) | T             |
+
+
 ## Resources
 
 Resource can be anything meaningful: an object in extrnal database, `Vue` component, an asset URL, etc. 

@@ -24,8 +24,6 @@ export default defineComponent({
 
 <template>
   <div style="margin: 2em;">
-    <Suspense>
-      <Table clazz="class:contact.Person" exclude />
-    </Suspense>
+    <Table clazz="class:contact.Person" exclude />
   </div>
 </template>
