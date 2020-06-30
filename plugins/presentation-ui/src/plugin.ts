@@ -13,9 +13,19 @@
 // limitations under the License.
 //
 
-import { verifyTranslation } from '@anticrm/platform-core-i18n/src/__model__/utils'
-import ui from '..'
+import { Platform, Service } from '@anticrm/platform'
+import presentationUI from '.'
 
-export default verifyTranslation(ui.strings, {
-  TimeSince: '{count, plural, =0 {секунды} =1 {минуту} few {# минуты} many {# минут} other {# минуту}} назад'
-})
+import DatePresenter from './internal/DatePresenter.vue'
+
+/*!
+ * Anticrm Platform™ Presentation UI Plugin
+ * © 2020 Anticrm Platform Contributors. All Rights Reserved.
+ * Licensed under the Eclipse Public License, Version 2.0
+ */
+export default async (platform: Platform): Promise<Service> => {
+
+  platform.setResource(presentationUI.component.DatePresenter, DatePresenter)
+
+  return {}
+}

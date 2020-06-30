@@ -188,6 +188,7 @@ describe('session', () => {
     try {
       await session.adapt(core.class.Class, ComponentKind)
     } catch (err) {
+      console.log(err)
       expect(err.message.startsWith('something')).toBe(true)
     }
   })

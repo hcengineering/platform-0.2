@@ -17,7 +17,7 @@
 
 import { PropType, defineComponent, ref, computed } from 'vue'
 import { getI18nService } from '@anticrm/platform-vue'
-import ui from '@anticrm/platform-ui'
+import presentationUI from '..'
 
 const currentTime = ref(Math.round(Date.now() / 1000)) // seconds
 setInterval(() => { currentTime.value = Math.round(Date.now() / 1000) }, 1000)
@@ -25,7 +25,7 @@ setInterval(() => { currentTime.value = Math.round(Date.now() / 1000) }, 1000)
 export default defineComponent({
   components: {},
   props: {
-    modelValue: Object as PropType<Date>
+    modelValue: Date as PropType<Date>
   },
   setup (props) {
 
@@ -37,7 +37,7 @@ export default defineComponent({
       }
       const seconds = Math.round(props.modelValue.getTime() / 1000)
       const duration = currentTime.value - seconds
-      return i18n.translate(ui.strings.TimeSince, { count: Math.round(duration / 60) })
+      return i18n.translate(presentationUI.string.TimeSince, { count: Math.round(duration / 60) })
     })
 
     return { text }

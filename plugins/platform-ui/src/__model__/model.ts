@@ -14,13 +14,12 @@
 //
 
 import core from '@anticrm/platform-core/src/__model__'
-import { ClassKind, Type } from '@anticrm/platform-core'
+import { ClassKind } from '@anticrm/platform-core'
 import i18n from '@anticrm/platform-core-i18n/src/__model__'
 import ui from '.'
 import { ComponentKind } from '..'
 
 import Builder from '@anticrm/platform-core/src/__model__/builder'
-
 
 export default (S: Builder) => {
   S.createClass(ui.class.TypeUIDecorator, core.class.Type, {
@@ -51,9 +50,5 @@ export default (S: Builder) => {
     from: S.primitive(ClassKind),
     to: S.primitive(ComponentKind),
     adapt: S.resolve(ui.method.ClassToComponent) as any // TODO: types
-  })
-
-  S.mixin(core.class.Date, ui.class.TypeClassUIDecorator, {
-    presenter: ui.component.DatePresenter
   })
 }

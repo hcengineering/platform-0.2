@@ -1,4 +1,4 @@
-<!--
+//
 // Copyright © 2020 Anticrm Platform Contributors.
 // 
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
@@ -11,20 +11,18 @@
 // 
 // See the License for the specific language governing permissions and
 // limitations under the License.
--->
+//
 
-<script lang="ts">
+import { plugin, Plugin, Service } from '@anticrm/platform'
+import { IntlString } from '@anticrm/platform-core-i18n'
+import { AnyComponent } from '@anticrm/platform-ui'
 
-import { defineComponent } from 'vue'
-
-export default defineComponent({
-  props: {
-    modelValue: Object
+export default plugin('presentation-ui' as Plugin<Service>, {
+}, {
+  string: {
+    TimeSince: '' as IntlString
+  },
+  component: {
+    DatePresenter: '' as AnyComponent
   },
 })
-
-</script>
-
-<template>
-  <div>{{modelValue}}</div>
-</template>

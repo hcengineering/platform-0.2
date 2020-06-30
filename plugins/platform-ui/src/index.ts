@@ -78,13 +78,6 @@ export default plugin('ui' as Plugin<UIService>, { core: core.id }, {
   metadata: {
     DefaultApplication: '' as Metadata<AnyComponent>,
   },
-  strings: {
-    TimeSince: '' as IntlString
-  },
-  component: {
-    DefaultPresenter: '' as AnyComponent,
-    DatePresenter: '' as AnyComponent,
-  },
   class: {
     TypeUIDecorator: '' as Ref<Class<TypeUIDecorator<any>>>,
     ClassUIDecorator: '' as Ref<Class<ClassUIDecorator<Obj>>>,

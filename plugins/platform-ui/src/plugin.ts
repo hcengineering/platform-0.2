@@ -16,10 +16,7 @@
 
 import { Platform, Resource } from '@anticrm/platform'
 import core, { CoreService, Ref, Class, Obj, Doc, Type, Instance, AdapterType, Adapter } from '@anticrm/platform-core'
-import ui, { UIService, UIModel, AttrModel } from '.'
-
-import DefaultPresenter from './internal/DefaultPresenter.vue'
-import DatePresenter from './internal/DatePresenter.vue'
+import ui, { UIService, UIModel, AttrModel, AnyComponent } from '.'
 
 /*!
  * Anticrm Platform™ Face Plugin
@@ -76,7 +73,7 @@ export default async (platform: Platform, deps: { core: CoreService }): Promise<
       const typeClass = await session.getInstance(core.class.Class, type._class)
       const typeClassDecorator = await session.as(typeClass, ui.class.ClassUIDecorator)
 
-      let presenter = ui.component.DefaultPresenter
+      let presenter: AnyComponent | null = null
       const typeClassUIDecorator = await session.as(typeClass, ui.class.TypeClassUIDecorator)
       if (typeClassUIDecorator) {
         if (typeClassUIDecorator.presenter) {
@@ -121,9 +118,6 @@ export default async (platform: Platform, deps: { core: CoreService }): Promise<
   }
 
   platform.setResource(ui.method.ClassToComponent, classToComponent)
-
-  platform.setResource(ui.component.DefaultPresenter, DefaultPresenter)
-  platform.setResource(ui.component.DatePresenter, DatePresenter)
 
   // S E R V I C E
 
