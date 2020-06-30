@@ -16,7 +16,8 @@
 import { Platform, Service } from '@anticrm/platform'
 import { CoreService, Obj, Doc, Ref, Instance, Class } from '@anticrm/platform-core'
 import ui, { UIService, AnyComponent } from '@anticrm/platform-ui'
-import vue, { VueService, SessionInjectionKey, CoreInjectionKey, UIInjectionKey } from '@anticrm/platform-vue'
+import vue, { VueService, SessionInjectionKey, CoreInjectionKey, UIInjectionKey, I18nInjectionKey } from '@anticrm/platform-vue'
+import { I18nService } from '@anticrm/platform-core-i18n'
 
 import workbench, { WorkbenchService } from '.'
 import Workbench from './internal/Workbench.vue'
@@ -27,7 +28,7 @@ console.log('PLUGIN: `workbench` parsed')
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */
-export default async (platform: Platform, deps: { core: CoreService, ui: UIService, vue: VueService }): Promise<WorkbenchService> => {
+export default async (platform: Platform, deps: { core: CoreService, i18n: I18nService, ui: UIService, vue: VueService }): Promise<WorkbenchService> => {
   console.log('PLUGIN: `workbench` started')
   const coreService = deps.core
 
@@ -58,6 +59,7 @@ export default async (platform: Platform, deps: { core: CoreService, ui: UIServi
 
   deps.vue.getApp()
     .provide(CoreInjectionKey, deps.core)
+    .provide(I18nInjectionKey, deps.i18n)
     .provide(UIInjectionKey, deps.ui)
     .provide(SessionInjectionKey, session)
 

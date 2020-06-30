@@ -1,4 +1,4 @@
-<!--
+//
 // Copyright © 2020 Anticrm Platform Contributors.
 // 
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
@@ -11,19 +11,11 @@
 // 
 // See the License for the specific language governing permissions and
 // limitations under the License.
--->
+//
 
-<script lang="ts">
-import { defineComponent } from 'vue'
-import Table from '@anticrm/platform-vue/src/components/Table.vue'
+import { verifyTranslation } from '@anticrm/platform-core-i18n/src/__model__/utils'
+import ui from '..'
 
-export default defineComponent({
-  components: { Table }
+export default verifyTranslation(ui.string, {
+  TimeSince: '{count, plural, =0 {секунды} =1 {минуту} few {# минуты} many {# минут} other {# минуту}} назад'
 })
-</script>
-
-<template>
-  <div style="margin: 2em;">
-    <Table clazz="class:contact.Person" exclude />
-  </div>
-</template>

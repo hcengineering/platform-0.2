@@ -43,9 +43,14 @@ export interface ClassUIDecorator<T extends Obj> extends Class<T>, UIDecorator {
   decorators?: { [key: string]: TypeUIDecorator<any> }
 }
 
+export interface TypeClassUIDecorator<T extends Type<any>> extends Class<T> {
+  presenter: Property<AnyComponent>
+}
+
 export interface Form<T extends Obj> extends ClassUIDecorator<T> {
   form: Property<AnyComponent>
 }
+
 
 // U I  M O D E L
 
@@ -76,6 +81,7 @@ export default plugin('ui' as Plugin<UIService>, { core: core.id }, {
   class: {
     TypeUIDecorator: '' as Ref<Class<TypeUIDecorator<any>>>,
     ClassUIDecorator: '' as Ref<Class<ClassUIDecorator<Obj>>>,
+    TypeClassUIDecorator: '' as Ref<Class<TypeClassUIDecorator<Type<any>>>>,
     Form: '' as Ref<Class<Form<Obj>>>
   },
   method: {

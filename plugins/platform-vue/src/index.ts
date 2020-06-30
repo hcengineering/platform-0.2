@@ -17,15 +17,18 @@ import { App, inject } from 'vue'
 import { Metadata, plugin, Plugin, Service, Platform, PluginDependencies, PluginServices, Resource } from '@anticrm/platform'
 import { CoreService, Session } from '@anticrm/platform-core'
 import { UIService, AnyComponent } from '@anticrm/platform-ui'
+import { I18nService } from '@anticrm/platform-core-i18n'
 
 export type URL = string
 export type Asset = Metadata<URL>
 
 export const CoreInjectionKey = Symbol('core')
 export const UIInjectionKey = Symbol('ui')
+export const I18nInjectionKey = Symbol('i18n')
 export const SessionInjectionKey = Symbol('session')
 
 export function getCoreService () { return inject(CoreInjectionKey) as CoreService }
+export function getI18nService () { return inject(I18nInjectionKey) as I18nService }
 export function getUIService () { return inject(UIInjectionKey) as UIService }
 export function getSession () { return inject(SessionInjectionKey) as Session }
 

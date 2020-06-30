@@ -1,1 +1,1 @@
-{"string:contact.Email/label":"Email","string:contact.Phone/label":"Телефон","string:contact.Address/label":"Адрес","string:contact.Contact/label":"Контактная информация","string:contact.Person/label":"Персона"}
+{"string:presentation-ui.TimeSince":"{count, plural, =0 {секунды} =1 {минуту} few {# минуты} many {# минут} other {# минуту}} назад","string:contact.Email/label":"Email","string:contact.Phone/label":"Телефон","string:contact.Address/label":"Адрес","string:contact.Contact/label":"Контактная информация","string:contact.Person/label":"Персона"}

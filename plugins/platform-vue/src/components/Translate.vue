@@ -14,16 +14,25 @@
 -->
 
 <script lang="ts">
-import { defineComponent } from 'vue'
-import Table from '@anticrm/platform-vue/src/components/Table.vue'
+
+import { defineComponent, ref, PropType } from 'vue'
+import { getPlatform } from '@anticrm/platform-vue'
+import i18n, { IntlString } from '@anticrm/platform-core-i18n'
 
 export default defineComponent({
-  components: { Table }
+  props: {
+    id: String as unknown as PropType<IntlString>,
+    params: Object,
+  },
+  setup (props) {
+    const platform = getPlatform()
+    const text = ref('to be translated')
+    platform.getPlugin(i18n.id).then(plugin => text.value = plugin.translate(props.id, props.params))
+    return { text }
+  }
 })
 </script>
 
 <template>
-  <div style="margin: 2em;">
-    <Table clazz="class:contact.Person" exclude />
-  </div>
+  <span>{{text}} {{params}}</span>
 </template>

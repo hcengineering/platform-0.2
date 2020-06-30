@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { attributeKey, Ref, Class, Obj, Doc, Property, Emb } from '@anticrm/platform'
+import { attributeKey, Ref, Class, Obj, Doc, Property, Emb, Resource } from '@anticrm/platform'
 import { generateId } from './objectid'
 
 interface Z<T extends Obj> extends Class<T> {

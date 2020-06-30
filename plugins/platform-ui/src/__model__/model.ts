@@ -42,6 +42,10 @@ export default (S: Builder) => {
     form: S.newInstance(core.class.Type, {})
   })
 
+  S.createClass(ui.class.TypeClassUIDecorator, core.class.Class, {
+    presenter: S.newInstance(core.class.Type, {})
+  })
+
   S.createDocument(core.class.Adapter, {
     from: S.primitive(ClassKind),
     to: S.primitive(ComponentKind),

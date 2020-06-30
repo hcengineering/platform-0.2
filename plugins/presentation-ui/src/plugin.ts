@@ -1,4 +1,4 @@
-<!--
+//
 // Copyright © 2020 Anticrm Platform Contributors.
 // 
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
@@ -11,19 +11,21 @@
 // 
 // See the License for the specific language governing permissions and
 // limitations under the License.
--->
+//
 
-<script lang="ts">
-import { defineComponent } from 'vue'
-import Table from '@anticrm/platform-vue/src/components/Table.vue'
+import { Platform, Service } from '@anticrm/platform'
+import presentationUI from '.'
 
-export default defineComponent({
-  components: { Table }
-})
-</script>
+import DatePresenter from './internal/DatePresenter.vue'
 
-<template>
-  <div style="margin: 2em;">
-    <Table clazz="class:contact.Person" exclude />
-  </div>
-</template>
+/*!
+ * Anticrm Platform™ Presentation UI Plugin
+ * © 2020 Anticrm Platform Contributors. All Rights Reserved.
+ * Licensed under the Eclipse Public License, Version 2.0
+ */
+export default async (platform: Platform): Promise<Service> => {
+
+  platform.setResource(presentationUI.component.DatePresenter, DatePresenter)
+
+  return {}
+}

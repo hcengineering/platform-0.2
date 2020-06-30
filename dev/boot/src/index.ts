@@ -16,7 +16,7 @@
 import { MongoClient } from 'mongodb'
 import { Model, Strings } from './boot'
 
-const modelJson = JSON.stringify(Model)
+const modelJson = JSON.stringify(Model, null, 2)
 console.log(modelJson)
 
 const stringsJson = JSON.stringify(Strings)
@@ -57,4 +57,5 @@ function initDatabase (uri: string, tenant: string) {
 const mongodbUri = process.env.MONGODB_URI || 'mongodb://localhost:27017'
 console.log('uploading new model to MongoDB ...' + mongodbUri.substring(25))
 initDatabase(mongodbUri, 'latest-model')
+dumpToFile()
 
