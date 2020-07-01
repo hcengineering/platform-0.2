@@ -19,11 +19,12 @@ import Calendar from "@anticrm/platform-vue/src/components/Calendar.vue";
 import MonthCalendar from "@anticrm/platform-vue/src/components/calendars/MonthCalendar.vue";
 import YearCalendar from "@anticrm/platform-vue/src/components/calendars/YearCalendar.vue";
 import InfoPanel from "@anticrm/sparkling-controls/src/InfoPanel.vue";
+import ScrollView from "@anticrm/sparkling-controls/src/ScrollView.vue";
 
 import MonthCalendarControl from "@anticrm/sparkling-controls/src/MonthCalendar.vue";
 
 export default defineComponent({
-  components: { YearCalendar, MonthCalendar, Calendar, InfoPanel, MonthCalendarControl },
+  components: { YearCalendar, MonthCalendar, Calendar, InfoPanel, MonthCalendarControl, ScrollView },
   setup(props) {
     return {
       date: new Date(),
@@ -33,14 +34,22 @@ export default defineComponent({
 </script>
 
 <template>
-  <div style="margin: 2em;">
+  <div style="margin: 2em;  height: 100%;">
+    <ScrollView style="height:100%">
     <InfoPanel caption="Calendars">
-      <div class="crm-table">
+      <div>
         <div class="tr">Month Calendar Selector</div>
         <div class="tr">
           <div class="td">
             Selected {{date}}
-            <MonthCalendarControl v-model="date" />
+            <MonthCalendarControl v-model="date" style="width: 100%; height: 500px;" />
+          </div>
+        </div>
+        <div class="tr">Month Calendar Selector</div>
+        <div class="tr">
+          <div class="td">
+            Selected {{date}}
+            <MonthCalendarControl v-model="date" style="width: 100px" />
           </div>
         </div>
         <div class="tr">Full Calendar</div>
@@ -51,5 +60,6 @@ export default defineComponent({
         </div>
       </div>
     </InfoPanel>
+    </ScrollView>
   </div>
 </template>

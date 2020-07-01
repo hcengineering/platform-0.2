@@ -126,11 +126,13 @@ export default defineComponent({
 
 <template>
   <div class="erp-month-calendar-widget">
-    <div class="monthName">{{getMonthName(currentDate) + " " + currentDate.getFullYear()}}</div>
     <div class="buttons">
-      <div class="button" v-on:click="incMonth(-1)">&lt;</div>
-      <div class="button" v-on:click="incMonth(0)">today</div>
-      <div class="button" v-on:click="incMonth(1)">&gt;</div>
+      <div class="monthName">{{getMonthName(currentDate) + " " + currentDate.getFullYear()}}</div>
+      <div class="controls">
+        <Button class="small" v-on:click="incMonth(-1)">&lt;</Button>
+        <Button class="small" v-on:click="incMonth(0)">today</Button>
+        <Button class="small" v-on:click="incMonth(1)">&gt;</Button>
+      </div>
     </div>
     <div class="erp-month-calendar-control">
       <div class="thead">
@@ -138,18 +140,14 @@ export default defineComponent({
       </div>
       <div class="tbody">
         <div class="tr" v-for="w in 6" :key="'week_'+w">
-          <div
-            v-for="d in 7"
-            :key="'d_'+d"
-            class="td"
-            :set="dd=wday(w,d)"
-            :class="{'weekend': isWeekend(wday(w,d))}"
-            v-on:click="onSelect(wday(w,d))"
-          >
+          <div v-for="d in 7" :key="'d_'+d" class="td" v-on:click="onSelect(wday(w,d))">
             <div
-              class="day-title"
-              :class="{'today':isToday(dd), 'selected':isSelected(dd)}"
-            >{{dd.getDate() }}</div>
+              class="cell"
+              :class="{
+              'weekend': isWeekend(wday(w,d)),
+              'today':isToday(wday(w,d)),
+              'selected':isSelected(wday(w,d))}"
+            >{{wday(w,d).getDate() }}</div>
           </div>
         </div>
       </div>
@@ -161,31 +159,22 @@ export default defineComponent({
 @import "~@anticrm/sparkling-theme/css/_variables.scss";
 
 .erp-month-calendar-widget {
-  .monthName {
-    display: inline-block;
-    text-align: center;
-    width: 100px;
-  }
   .buttons {
-    display: inline-block;
-    width: 75px;
-    .button {
-      user-select: none;
-      margin: 2px 2px 2px 2px;
-      min-width: 15px;
-      display: inline-block;
-      text-align: center;
-      border-radius: 3px;
-      background: linear-gradient(145deg, #5c5700, #6d6800);
-      box-shadow: 2px 2px 8px #645f00, -2px -2px 8px #686300;
-      &:hover {
-        border-radius: 3px;
-        background: linear-gradient(145deg, #985e00, #b56f00);
-        box-shadow: 2px 2px 10px #a66600, -2px -2px 10px #ac6a00;
-      }
+    width: 100%;
+    display: flex;
+    .monthName {
+      display: flex;
+      white-space: nowrap;
+      margin: auto auto auto 0;
+    }
+    .controls {
+      display: flex;
+      // justify-content: flex-end;
     }
   }
   .erp-month-calendar-control {
+    width: 100%;
+    height: 100%;
     display: table;
     border-collapse: collapse;
     background-color: $content-bg-color;
@@ -197,56 +186,48 @@ export default defineComponent({
     .thead {
       display: table-header-group;
     }
-
     .th {
       display: table-cell;
-      // padding: 0.5em;
-      text-align: left;
-      padding: 0 0 0 0;
-      width: 25px;
       user-select: none;
+      text-align: center;
+      min-width: 2em; // Make cells size equal
     }
     .td {
       display: table-cell;
-      padding: 0 0 0 0;
+      user-select: none;
+      vertical-align: middle;
+      text-align: center;
 
-      :hover {
-        border-radius: 3px;
-        background: #929292;
-        box-shadow: 3px 3px 10px #838383;
-      }
-      &.weekend {
+      .weekend {
         background-color: #2e2e2d;
       }
-      .day-title {
-        user-select: none;
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        line-height: 20px;
-        text-align: center;
-        padding: 0 0 0 0;
-        div {
-          // child divs, should not be pointered
-          pointer-events: none;
-        }
-        &.today {
-          color: #a66600;
-        }
-        &.selected {
-          display: inline-block;
-          position: absolute;
-          color: white;
-
-          border-radius: 3px;
-          background: linear-gradient(145deg, #985e00, #b56f00);
-          box-shadow: 2px 2px 10px #a66600, -2px -2px 10px #ac6a00;
-        }
+      .today {
+        color: #a66600;
+      }
+      .selected {
+        color: white;
+        border-radius: 3px;
+        background: linear-gradient(145deg, #985e00, #b56f00);
+      }
+      .cell {
+        height: 100%;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .cell:hover {
+        border-radius: 3px;
+        background: #929292;
+        transform: perspective(600px) translate3d(0, 0, 150px);
+        transition: transform 0.3s;
+        box-shadow: 3px 3px 3px #2e2e2d;
       }
     }
 
     .tbody {
       display: table-row-group;
+      height: 100%;
 
       .tr {
         border-bottom: $border-default;
