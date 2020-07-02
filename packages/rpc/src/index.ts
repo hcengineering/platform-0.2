@@ -66,6 +66,6 @@ export function getResponse<D> (response: string): Response<D> {
   return JSON.parse(response as string)
 }
 
-export function getRequest<P> (request: string): Request<P> {
+export function getRequest<P extends any[]> (request: string): Request<P> {
   return JSON.parse(request)
 }
