@@ -16,10 +16,12 @@
 import { CommitInfo, CoreProtocol } from '@anticrm/rpc'
 import { Platform, Resource, Doc, Ref, Class, Obj, Emb } from '@anticrm/platform'
 import { MemDb, findAll, Layout, AnyLayout } from '@anticrm/memdb'
+import { createCache } from '@anticrm/memdb/lib/indexeddb'
 import { generateId } from './objectid'
 import { attributeKey } from './plugin'
 
 import core, { Instance, Type, Session, Values, Adapter, Cursor, CoreDomain } from '.'
+import { result } from 'lodash'
 
 export function createSession (platform: Platform, modelDb: MemDb, coreProtocol: CoreProtocol, broadcastXact: (info: CommitInfo, originator?: Session) => void, closeSession: (session: Session) => void): Session {
 
@@ -259,7 +261,7 @@ export function createSession (platform: Platform, modelDb: MemDb, coreProtocol:
       const find = findAll(info.created, q._class, q.query as AnyLayout)
       if (find.length > 0) {
         console.log('match found: ' + find.length)
-        q.result.push(...find)
+        // q.result.push(...find)
         const foundInstances = await Promise.all(find.map(doc => instantiateDoc(doc)))
         q.instances.push(...foundInstances)
         q.listener(q.instances)
@@ -285,10 +287,13 @@ export function createSession (platform: Platform, modelDb: MemDb, coreProtocol:
     }
   }
 
+  /// Q U E R Y
+
+  const cache = createCache('cache', modelDb)
+
   interface Query<T extends Doc> {
     _class: Ref<Class<T>>
     query: Values<Partial<T>>
-    result: Layout<Doc>[]
     instances: Instance<T>[]
     listener: (result: Instance<T>[]) => void
   }
@@ -296,20 +301,35 @@ export function createSession (platform: Platform, modelDb: MemDb, coreProtocol:
   const queries = [] as Query<Doc>[]
 
   function query<T extends Doc> (_class: Ref<Class<T>>, query: Values<Partial<T>>, listener: (result: Instance<T>[]) => void): () => void {
-    const _q: Query<T> = { _class, query, listener, result: [], instances: [] }
+    const _q: Query<T> = { _class, query, listener, instances: [] }
     const q = _q as unknown as Query<Doc>
     queries.push(q)
 
+    let done = false
+
+    async function getFromCache (): Promise<void> {
+      return (await cache).find(_class as Ref<Class<Doc>>, query as unknown as AnyLayout) // !!!!! WRONG, need hibernate
+        .then(result => Promise.all(result.map(doc => instantiateDoc(doc))))
+        .then(result => {
+          if (!done) {
+            q.instances = result
+            listener(result as unknown as Instance<T>[])
+          }
+        })
+    }
+
+    getFromCache().then(() => { })
+
     coreProtocol.find(_class as Ref<Class<Doc>>, query as unknown as AnyLayout) // !!!!! WRONG, need hibernate
-      .then(result => {
-        q.result = result
+      .then(async result => {
+        done = true
+          ; ((await cache).cache(result)).then(() => console.log('RESULTS CACHED'))
         return Promise.all(result.map(doc => instantiateDoc(doc)))
       })
-      .then(result => {
+      .then(async result => {
         q.instances = result
         listener(result as unknown as Instance<T>[])
-      }
-      )
+      })
 
     return () => {
       queries.splice(queries.indexOf(q), 1)

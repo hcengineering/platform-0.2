@@ -22,6 +22,8 @@ import core from '../__model__'
 import rpcStub from '@anticrm/platform-rpc-stub'
 import { AdapterType } from '..'
 
+require('fake-indexeddb/auto')
+
 const DOC = 1 // see `plugin.ts`
 
 describe('core', () => {
@@ -98,11 +100,13 @@ describe('core', () => {
           console.log('default')
       }
     })
-    await session.newInstance(core.class.Adapter, {
-      from: core.class.Adapter,
-      to: core.class.Adapter,
-      adapt: '' as unknown as Promise<AdapterType>
-    })
-    await session.commit()
+    setTimeout(async () => {
+      await session.newInstance(core.class.Adapter, {
+        from: core.class.Adapter,
+        to: core.class.Adapter,
+        adapt: '' as unknown as Promise<AdapterType>
+      })
+      await session.commit()
+    }, 100)
   })
 })

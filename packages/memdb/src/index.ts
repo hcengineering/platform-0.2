@@ -1,19 +1,19 @@
 //
 // Copyright © 2020 Anticrm Platform Contributors.
-// 
+//
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
 // obtain a copy of the License at https://www.eclipse.org/legal/epl-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// 
+//
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
 
-import { attributeKey, Ref, Class, Obj, Doc, Property, Emb, Resource } from '@anticrm/platform'
+import { attributeKey, Ref, Class, Obj, Doc, Property, Emb } from '@anticrm/platform'
 import { generateId } from './objectid'
 
 interface Z<T extends Obj> extends Class<T> {
@@ -22,10 +22,18 @@ interface Z<T extends Obj> extends Class<T> {
   z?: { [key: string]: Emb }
 }
 
-export type LayoutType = string | number | Emb | { [key: string]: LayoutType }
+export type LayoutType = string | number | Emb | { [key: string]: LayoutType } | LayoutType[] | undefined
 export type AnyLayout = { [key: string]: LayoutType }
 
-//export type PropertyType = Property<any> | Ref<Doc> | Emb | PropertyType[] | { [key: string]: PropertyType }
+export interface ObjLayout {
+  [key: string]: LayoutType
+  _class: Ref<Class<Doc>>
+}
+
+export interface DocLayout extends ObjLayout {
+  _id: Ref<Doc>
+  _mixins?: Ref<Class<Doc>>[]
+}
 
 type ToLayout<T> =
   T extends Ref<Doc> | undefined ? T :
@@ -41,8 +49,16 @@ export type Layout<T> = { [P in keyof T]:
   never
 }
 
-// let x = {} as Layout<Z<Doc>>
-// x.
+export interface CommitInfo {
+  created: Layout<Doc>[]
+}
+
+export interface DbProtocol {
+  find (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Layout<Doc>[]>
+  delete (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<void>
+  load (): Promise<Layout<Doc>[]> // TODO: must be load domain
+  commit (commitInfo: CommitInfo): Promise<void>
+}
 
 export interface ModelDb {
   add (doc: Layout<Doc>): void
@@ -54,8 +70,9 @@ export interface ModelDb {
   createDocument<M extends Doc> (_class: Ref<Class<M>>, values: Layout<Omit<M, keyof Doc>>, _id?: Ref<M>): Layout<Doc>
 }
 
-export class MemDb implements ModelDb {
+export const ClassClass = 'class:core.Class' as Ref<Class<Class<Obj>>>
 
+export class MemDb implements ModelDb {
   private objects = new Map<Ref<Doc>, Layout<Doc>>()
   private byClass: Map<Ref<Class<Doc>>, Layout<Doc>[]> | null = null
 
@@ -83,8 +100,7 @@ export class MemDb implements ModelDb {
     hierarchy.forEach((_class) => {
       const cls = _class as Ref<Class<Doc>>
       const list = byClass.get(cls)
-      if (list) { list.push(doc) }
-      else { byClass.set(cls, [doc]) }
+      if (list) { list.push(doc) } else { byClass.set(cls, [doc]) }
     })
   }
 
@@ -170,10 +186,15 @@ export class MemDb implements ModelDb {
     return result
   }
 
-  loadModel (model: Layout<Doc>[]) {
+  loadModel (model: DocLayout[]) {
     for (const doc of model) { this.set(doc) }
     // if (this.byClass === null) { this.byClass = new Map<Ref<ClassLayout>, Layout<Doc>[]>() }
     // for (const doc of model) { this.index(doc) }
+  }
+
+  findClass (query: AnyLayout): Layout<Class<Obj>>[] {
+    const byClass = this.objectsOfClass(ClassClass)
+    return findAll(byClass, ClassClass, query) as Layout<Class<Obj>>[]
   }
 
   // Q U E R Y
@@ -184,7 +205,7 @@ export class MemDb implements ModelDb {
 
   async findOne (clazz: Ref<Class<Doc>>, query: AnyLayout): Promise<Layout<Doc> | undefined> {
     const result = await this.find(clazz, query)
-    return result.length == 0 ? undefined : result[0]
+    return result.length === 0 ? undefined : result[0]
   }
 }
 

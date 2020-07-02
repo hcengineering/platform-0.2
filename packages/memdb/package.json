@@ -12,6 +12,10 @@
     "lint": "eslint ./**/*.ts"
   },
   "dependencies": {
-    "@anticrm/platform": "^0.1.6"
+    "@anticrm/platform": "^0.1.6",
+    "idb": "^5.0.4"
+  },
+  "devDependencies": {
+    "fake-indexeddb": "^3.0.2"
   }
 }
