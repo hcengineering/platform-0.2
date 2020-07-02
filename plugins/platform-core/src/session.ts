@@ -318,7 +318,7 @@ export function createSession (platform: Platform, modelDb: MemDb, coreProtocol:
         })
     }
 
-    getFromCache().then(() => console.log('GET FROM CACHE DONE'))
+    getFromCache().then(() => { })
 
     coreProtocol.find(_class as Ref<Class<Doc>>, query as unknown as AnyLayout) // !!!!! WRONG, need hibernate
       .then(async result => {

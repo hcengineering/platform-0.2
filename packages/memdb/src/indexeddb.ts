@@ -68,6 +68,7 @@ export async function createCache (dbname: string, modelDb: MemDb): Promise<DbPr
     /// /
 
     async cache (docs: Layout<Doc>[]): Promise<void> {
+      if (docs.length === 0) { return }
       const domains = new Map<string, Layout<Doc>[]>()
       for (const doc of docs) {
         const domain = modelDb.getDomain(doc._class)
@@ -79,7 +80,11 @@ export async function createCache (dbname: string, modelDb: MemDb): Promise<DbPr
         perDomain.push(doc)
       }
 
-      const tx = db.transaction(Array.from(domains.keys()), 'readwrite')
+      const domainNames = Array.from(domains.keys())
+      if (domainNames.length === 0) {
+        throw new Error('no domains!')
+      }
+      const tx = db.transaction(domainNames, 'readwrite')
       for (const e of domains.entries()) {
         const store = tx.objectStore(e[0])
         for (const doc of e[1]) {
