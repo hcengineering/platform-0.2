@@ -101,14 +101,14 @@ export default defineComponent({
 #login-form {
   form {
     margin: auto;
-    margin-top: 100px;
+    margin-top: 20vh;
     width: 30em;
     padding: 2em;
     border: 1px solid $workspace-separator-color;
     border-radius: 1em;
 
     .field {
-      .crm-editbox {
+      .sparkling-editbox {
         width: 100%;
       }
       margin: 1em 0;

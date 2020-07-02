@@ -42,8 +42,30 @@ export function makeRequest<P extends any[]> (request: Request<P>): string {
   return JSON.stringify(request)
 }
 
-export function getResponse<D> (res: string): Response<D> {
-  return JSON.parse(res as string)
+export function makeDataResponse<R> (result: R, id?: ReqId): string {
+  const response: Response<R> = {
+    result,
+    id
+  }
+  return JSON.stringify(response)
 }
 
+export function makeErrorResponse (code: number, id?: ReqId, message?: string, data?: any): string {
+  const response: Response<void> = {
+    id,
+    error: {
+      code,
+      message,
+      data
+    },
+  }
+  return JSON.stringify(response)
+}
 
+export function getResponse<D> (response: string): Response<D> {
+  return JSON.parse(response as string)
+}
+
+export function getRequest<P> (request: string): Request<P> {
+  return JSON.parse(request)
+}
