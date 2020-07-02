@@ -13,8 +13,8 @@
 // limitations under the License.
 //
 
-import { Ref, Class, Doc } from '@anticrm/platform'
-import { Layout, AnyLayout } from '@anticrm/memdb'
+export { DbProtocol as CoreProtocol } from '@anticrm/memdb'
+export { CommitInfo } from '@anticrm/memdb'
 
 // P R O T O C O L
 
@@ -46,16 +46,4 @@ export function getResponse<D> (res: string): Response<D> {
   return JSON.parse(res as string)
 }
 
-// C O R E  P R O T O C O L
-
-export interface CommitInfo {
-  created: Layout<Doc>[]
-}
-
-export interface CoreProtocol {
-  find (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Layout<Doc>[]>
-  delete (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<void>
-  load (): Promise<Layout<Doc>[]> // TODO: must be load domain
-  commit (commitInfo: CommitInfo): Promise<void>
-}
 

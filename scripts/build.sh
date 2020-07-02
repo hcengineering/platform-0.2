@@ -16,18 +16,21 @@
 
 # T E S T  P A C K A G E S
 yarn workspace @anticrm/platform run test && \
+yarn workspace @anticrm/memdb test && \
 yarn workspace @anticrm/platform-core run test && \
 yarn workspace @anticrm/platform-core-i18n run test && \
 yarn workspace @anticrm/platform-ui run test && \
 
 # L I N T  P A C K A G E S
 yarn workspace @anticrm/platform run lint $1 && \
+yarn workspace @anticrm/memdb lint $1 && \
 yarn workspace @anticrm/platform-core run lint $1 && \
 yarn workspace @anticrm/platform-core-i18n run lint $1 && \
 yarn workspace @anticrm/platform-ui run lint $1 && \
 
 # B U I L D  P A C K A G E S
 yarn workspace @anticrm/platform run build && \
+yarn workspace @anticrm/memdb build && \
 yarn workspace @anticrm/platform-core run build && \
 yarn workspace @anticrm/dev-boot run build && \
 

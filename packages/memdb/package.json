@@ -13,5 +13,8 @@
   },
   "dependencies": {
     "@anticrm/platform": "^0.1.6"
+  },
+  "devDependencies": {
+    "fake-indexeddb": "^3.0.2"
   }
 }
