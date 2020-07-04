@@ -21,14 +21,14 @@ import i18n from '@anticrm/platform-core-i18n'
 import ui from '@anticrm/platform-ui'
 import presentationUi from '@anticrm/presentation-ui'
 import business from '@anticrm/platform-business'
-import vue from '@anticrm/platform-vue'
+import vue, { VueService, LinkTarget } from '@anticrm/platform-vue'
 import workbench from '@anticrm/platform-workbench'
 import contact from '@anticrm/contact'
 import chunter from '@anticrm/chunter'
 import demo from '@anticrm/demo-3d'
 import mc from '@anticrm/app-mission-control'
 import storybook from '@anticrm/app-storybook'
-import login from '@anticrm/platform-login'
+import login, { setAccount, currentAccount, Account } from '@anticrm/platform-login'
 
 import { createApp } from 'vue'
 import ErrorPage from './components/ErrorPage.vue'
@@ -37,16 +37,20 @@ import uiMeta from '@anticrm/platform-vue/src/__meta__/meta'
 import workbenchMeta from '@anticrm/platform-workbench/src/__model__/meta'
 import contactMeta from '@anticrm/contact/src/__model__/meta'
 
+const platform = new Platform()
+
 // const metaModel = require('./model.json') as Doc[]
 const strings = require('./strings.json') as Record<string, string>
 
-const host = process.env.VUE_APP_WSHOST || 'localhost'
-const port = process.env.VUE_APP_WSPORT || '18080'
+const loginUrl = process.env.VUE_APP_LOGIN_URL
+const account = process.env.VUE_APP_ACCOUNT
 
-const platform = new Platform()
+if (account) {
+  setAccount(platform, JSON.parse(account))
+}
+
 // platform.setMetadata(core.metadata.MetaModel, metaModel)
-platform.setMetadata(rpc.metadata.WSHost, host)
-platform.setMetadata(rpc.metadata.WSPort, port)
+platform.setMetadata(login.metadata.LoginUrl, loginUrl)
 platform.setMetadata(i18n.metadata.BootStrings, strings)
 platform.setMetadata(ui.metadata.DefaultApplication, mc.component.MissionControl)
 platform.setMetadata(mc.metadata.Applications, [
@@ -55,6 +59,17 @@ platform.setMetadata(mc.metadata.Applications, [
   storybook.component.Storybook,
   login.component.LoginForm
 ])
+
+function guard (service: VueService, target: LinkTarget): LinkTarget {
+  const account = currentAccount()
+  if (account) {
+    return target
+  }
+  const back = service.toUrl(target)
+  return { app: login.component.LoginForm, params: { back } }
+}
+
+platform.setMetadata(vue.metadata.RouteGuard, guard)
 
 platform.addLocation(core, () => import(/* webpackChunkName: "platform-core" */ '@anticrm/platform-core/src/plugin'))
 platform.addLocation(rpc, () => import(/* webpackChunkName: "platform-rpc" */ '@anticrm/platform-rpc/src/plugin'))

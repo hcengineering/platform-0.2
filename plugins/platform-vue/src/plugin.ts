@@ -91,8 +91,11 @@ export default async (platform: Platform): Promise<VueService> => {
    * Returns location (current URL) as @link {LinkTarget}
    */
   function getLocation (): LinkTarget {
-    const loc = location.value
+    return toLinkTarget(location.value)
+  }
 
+
+  function toLinkTarget (loc: string): LinkTarget {
     const index = loc.indexOf('?')
     const pathname = (index === -1) ? loc : loc.substring(0, index)
     const search = (index === -1) ? '' : loc.substring(index + 1)
@@ -136,12 +139,21 @@ export default async (platform: Platform): Promise<VueService> => {
       params
   }
 
+  const guard = platform.getMetadata(vue.metadata.RouteGuard)
+
   /**
    * Navigate to given url
    * @param url 
    */
   function navigate (url: string) {
+    console.log('NAVIGATE: ' + url)
     if (url !== location.value) {
+      if (guard) {
+        const target = toLinkTarget(url)
+        const newTarget = guard(service, target)
+        url = toUrl(newTarget)
+      }
+
       history.pushState(null, '', url)
       location.value = url
     }

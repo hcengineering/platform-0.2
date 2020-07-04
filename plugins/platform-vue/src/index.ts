@@ -70,6 +70,9 @@ export interface VueService extends Service {
 }
 
 export default plugin('vue' as Plugin<VueService>, {}, {
+  metadata: {
+    RouteGuard: '' as Metadata<(service: VueService, url: LinkTarget) => LinkTarget>
+  },
   icon: {
     Default: '' as Asset,
     Network: '' as Asset

@@ -15,6 +15,7 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
+import { getVueService } from '@anticrm/platform-vue'
 
 import EditBox from '@anticrm/sparkling-controls/src/EditBox.vue'
 import Button from '@anticrm/sparkling-controls/src/Button.vue'
@@ -31,10 +32,15 @@ export default defineComponent({
     Button,
   },
   setup () {
-    const username = ref()
-    const password = ref()
+
+    const vueService = getVueService()
+
+    const username = ref('')
+    const password = ref('')
 
     const working = ref(false)
+    const result = ref('')
+    const error = ref('')
 
     function doLogin () {
       working.value = true
@@ -44,28 +50,29 @@ export default defineComponent({
         password: password.value,
       }
 
-      const url = login.metadata.LoginUrl
+      const url = this.$platform.getMetadata(login.metadata.LoginUrl)
       const token = ''
 
-      // fetch(url, {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json;charset=utf-8'
-      //   },
-      //   body: JSON.stringify(request)
-      // }).then(async (response) => {
-      //   const json = await response.json() as LoginInfo
-      //   if (json.errorCode) {
-      //     console.log(json.errorCode)
-      //   } else {
-      //     this.$platform.setMetadata()
-      //   }
-      // })
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json;charset=utf-8'
+        },
+        body: JSON.stringify(request)
+      }).then(async (response) => {
+        working.value = false
+        if (response.ok) {
+          //vueService.navigate
+        }
+      }).catch(err => {
+        working.value = false
+        error.value = 'Не могу соедениться с сервером.'
+      })
 
 
     }
 
-    return { doLogin, username, password, working }
+    return { doLogin, username, password, working, result, error }
   }
 })
 </script>
@@ -75,15 +82,29 @@ export default defineComponent({
     <form>
       <div class="caption-2">Вход в систему</div>
 
-      <slot name="working" v-if="working">Соединяюсь с сервером...</slot>
-      <slot name="success" v-else-if="result">{{result}}</slot>
-      <slot name="failure" v-else-if="error">{{error}}</slot>
+      <div class="status">
+        <div v-if="working">Соединяюсь с сервером...</div>
+        <div v-else-if="result !== ''">{{result}}</div>
+        <div v-else-if="error !== ''">{{error}}</div>
+      </div>
 
       <div class="field">
-        <EditBox placeholder="Электропочта" v-model="username" />
+        <EditBox
+          name="username"
+          type="text"
+          placeholder="Электропочта"
+          v-model="username"
+          autocomplete="username"
+        />
       </div>
       <div class="field">
-        <EditBox type="password" placeholder="Пароль" v-model="password" />
+        <EditBox
+          name="password"
+          type="password"
+          placeholder="Пароль"
+          v-model="password"
+          autocomplete="current-password"
+        />
       </div>
 
       <div class="actions">
@@ -106,6 +127,10 @@ export default defineComponent({
     padding: 2em;
     border: 1px solid $workspace-separator-color;
     border-radius: 1em;
+
+    .status {
+      margin-top: 0.5em;
+    }
 
     .field {
       .sparkling-editbox {
