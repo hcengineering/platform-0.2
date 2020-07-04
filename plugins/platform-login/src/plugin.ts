@@ -17,8 +17,7 @@ import { Platform, Service } from '@anticrm/platform'
 
 import login from '.'
 import LoginForm from './internal/LoginForm.vue'
-
-console.log('Plugin `platform-login` loaded')
+import SignupForm from './internal/SignupForm.vue'
 
 /*!
  * Anticrm Platform™ 3D Demo Plugin
@@ -26,9 +25,9 @@ console.log('Plugin `platform-login` loaded')
  * Licensed under the Eclipse Public License, Version 2.0
  */
 export default async (platform: Platform): Promise<Service> => {
-  console.log('Plugin `platform-login` started')
 
   platform.setResource(login.component.LoginForm, LoginForm)
+  platform.setResource(login.component.SignupForm, SignupForm)
 
   return {}
 }

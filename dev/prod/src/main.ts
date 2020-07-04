@@ -66,11 +66,11 @@ platform.setMetadata(mc.metadata.Applications, [
 function guard (service: VueService, target: LinkTarget): LinkTarget {
   const account = currentAccount()
   console.log('GUARD: ', account)
-  if (account) {
-    return target
+  if (!account && target.app === workbench.component.Workbench) {
+    const back = service.toUrl(target)
+    return { app: login.component.LoginForm, params: { back } }
   }
-  const back = service.toUrl(target)
-  return { app: login.component.LoginForm, params: { back } }
+  return target
 }
 
 platform.setMetadata(vue.metadata.RouteGuard, guard)

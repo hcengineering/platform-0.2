@@ -44,7 +44,8 @@ export function logout (vueService: VueService) {
 
 const login = plugin('login' as Plugin<Service>, {}, {
   component: {
-    LoginForm: '' as AnyComponent
+    LoginForm: '' as AnyComponent,
+    SignupForm: '' as AnyComponent
   },
   metadata: {
     LoginUrl: '' as Metadata<string>

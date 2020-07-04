@@ -39,16 +39,18 @@ export default defineComponent({
   setup () {
 
     const vueService = getVueService()
-    const status = ref('Введите адрес электропочты и пароль.')
+    const status = ref('Введите ваши данные.')
 
     const username = ref('')
     const password = ref('')
-
-    function doSignup () {
-      vueService.navigate('/' + login.component.SignupForm)
-    }
+    const first = ref('')
+    const last = ref('')
 
     function doLogin () {
+      vueService.navigate('/' + login.component.LoginForm)
+    }
+
+    function doSignup () {
       status.value = 'Соединяюсь с сервером'
 
       console.log('login ', username.value, " ", password.value)
@@ -80,14 +82,22 @@ export default defineComponent({
       })
     }
 
-    return { status, doLogin, doSignup, username, password }
+    return { status, doLogin, username, password, first, last }
   }
 })
 </script>
 
 <template>
-  <Chrome caption="Вход в систему" description="Введите адрес электропочты и пароль.">
+  <Chrome caption="Регистрация в системе">
     <div class="status">{{ status }}</div>
+
+    <div class="field">
+      <EditBox name="first" type="text" placeholder="Имя" v-model="first" autocomplete="first" />
+    </div>
+
+    <div class="field">
+      <EditBox name="last" type="text" placeholder="Фамилия" v-model="last" autocomplete="last" />
+    </div>
 
     <div class="field">
       <EditBox
@@ -98,20 +108,21 @@ export default defineComponent({
         autocomplete="username"
       />
     </div>
+
     <div class="field">
       <EditBox
         name="password"
         type="password"
         placeholder="Пароль"
         v-model="password"
-        autocomplete="current-password"
+        autocomplete="new-password"
       />
     </div>
 
     <div class="actions">
-      <Button @click="doSignup">Зарегистрироваться</Button>
-      <div class="separator" />
       <Button @click="doLogin">Войти в систему</Button>
+      <div class="separator" />
+      <Button>Зарегистрироваться</Button>
     </div>
   </Chrome>
 </template>
