@@ -70,5 +70,8 @@ export default plugin('workbench' as Plugin<WorkbenchService>, {
   },
   component: {
     Workbench: '' as AnyComponent
+  },
+  method: {
+    Logout: '' as Resource<() => void>
   }
 })

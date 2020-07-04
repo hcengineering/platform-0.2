@@ -43,8 +43,11 @@ const platform = new Platform()
 const strings = require('./strings.json') as Record<string, string>
 
 const loginUrl = process.env.VUE_APP_LOGIN_URL
-const account = process.env.VUE_APP_ACCOUNT
-
+// const account = process.env.VUE_APP_ACCOUNT
+// if (account) {
+//   localStorage.setItem('account', account)
+// }
+const account = localStorage.getItem('account')
 if (account) {
   setAccount(platform, JSON.parse(account))
 }
@@ -62,6 +65,7 @@ platform.setMetadata(mc.metadata.Applications, [
 
 function guard (service: VueService, target: LinkTarget): LinkTarget {
   const account = currentAccount()
+  console.log('GUARD: ', account)
   if (account) {
     return target
   }

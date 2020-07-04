@@ -16,6 +16,7 @@
 import { plugin, Service, Plugin, Metadata, Platform } from '@anticrm/platform'
 import { AnyComponent } from '@anticrm/platform-ui'
 import rpc from '@anticrm/platform-rpc'
+import vue, { VueService } from '@anticrm/platform-vue'
 
 export interface Account {
   account: string
@@ -36,7 +37,12 @@ export function setAccount (platform: Platform, account: Account) {
   platform.setMetadata(rpc.metadata.WSPort, account.port)
 }
 
-export default plugin('login' as Plugin<Service>, {}, {
+export function logout (vueService: VueService) {
+  localStorage.removeItem('account')
+  vueService.navigate(login.component.LoginForm)
+}
+
+const login = plugin('login' as Plugin<Service>, {}, {
   component: {
     LoginForm: '' as AnyComponent
   },
@@ -44,3 +50,5 @@ export default plugin('login' as Plugin<Service>, {}, {
     LoginUrl: '' as Metadata<string>
   }
 })
+
+export default login

@@ -18,6 +18,7 @@ import { CoreService, Obj, Doc, Ref, Instance, Class } from '@anticrm/platform-c
 import ui, { UIService, AnyComponent } from '@anticrm/platform-ui'
 import vue, { VueService, SessionInjectionKey, CoreInjectionKey, UIInjectionKey, I18nInjectionKey } from '@anticrm/platform-vue'
 import { I18nService } from '@anticrm/platform-core-i18n'
+import { logout } from '@anticrm/platform-login'
 
 import workbench, { WorkbenchService } from '.'
 import Workbench from './internal/Workbench.vue'
@@ -34,26 +35,11 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18nS
 
   platform.setResource(workbench.component.Workbench, Workbench)
 
-  // V I E W  M O D E L
+  // A C T I O N S
 
-  // async function getViewModel (_class: Ref<Class<Doc>>, kind: ViewModelKind): Promise<ViewModel> {
-  //   const clazz = await coreService.getInstance(_class)
-  //   // if (!coreService.is(doc, ui.class.Form)) {
-  //   //   doc = await doc._class
-  //   // }
-  //   if (!coreService.is(clazz, ui.class.Form)) {
-  //     throw new Error(`something went wrong, can't find 'Form' for the ${_class}.`)
-  //   }
-  //   const component = (await coreService.as(clazz, ui.class.Form)).form
-  //   //const object = clazz.newInstance()
-  //   return {
-  //     kind: ViewModelKind.NEW_FORM,
-  //     component,
-  //     content: {} as Doc
-  //   }
-  // }
-
-  // W O R K B E N C H  M O D E L
+  platform.setResource(workbench.method.Logout, () => {
+    logout(deps.vue)
+  })
 
   const session = deps.core.newSession()
 
