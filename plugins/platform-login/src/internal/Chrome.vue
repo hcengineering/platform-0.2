@@ -14,13 +14,60 @@
 -->
 <script lang="ts">
 
-import { defineComponent, ref } from 'vue'
+import { defineComponent, ref, reactive, watch, PropType } from 'vue'
+import EditBox from '@anticrm/sparkling-controls/src/EditBox.vue'
+import Button from '@anticrm/sparkling-controls/src/Button.vue'
+
+interface Fields {
+  [key: string]: {
+    type?: string
+    optional?: boolean
+    i18n: string
+  }
+}
+
+interface Action {
+  i18n: string,
+  func: () => Promise<void>
+}
 
 export default defineComponent({
-  components: {},
+  components: { EditBox, Button },
   props: {
     caption: String,
+    description: String,
+    info: String,
+    error: String,
+    object: Object,
+    fields: Object as PropType<Fields>,
+    actions: Array as PropType<Action[]>
   },
+  setup (props) {
+    const status = ref(props.description)
+
+    watch(() => props.info, (info) => {
+      status.value = info
+    })
+    watch(() => props.error, (error) => {
+      status.value = error
+    })
+
+    function validate () {
+      for (const field in props.fields) {
+        const v = props.object[field]
+        const f = props.fields[field]
+        if (!f.optional && (!v || v === '')) {
+          status.value = `Поле '${props.fields[field].i18n}' обязательно к заполнению.`
+          return
+        }
+      }
+      status.value = props.description
+    }
+
+    validate()
+
+    return { status, validate }
+  }
 })
 </script>
 
@@ -28,7 +75,28 @@ export default defineComponent({
   <div class="login-chrome">
     <form @status="onStatus" @error="console.log('$event')">
       <div class="caption-2">{{ caption }}</div>
-      <slot />
+      <div class="status">{{ status }}</div>
+
+      <div v-for="(field, name) in fields" :key="name" class="field">
+        <EditBox
+          @keyup="validate"
+          :name="name"
+          :type="field.type || 'text'"
+          :placeholder="field.i18n"
+          v-model="object[name]"
+        />
+      </div>
+
+      <div class="actions">
+        <Button
+          @click="action.func.bind(this)()"
+          v-for="(action, i) in actions"
+          :key="i"
+          :class="{ 'separator': i != 0 }"
+        >{{action.i18n}}</Button>
+        <!-- <div class="separator" />
+        <Button @click="doLogin">Войти в систему</Button>-->
+      </div>
     </form>
   </div>
 </template>
@@ -60,12 +128,11 @@ export default defineComponent({
       display: flex;
       margin-top: 1.5em;
 
-      .separator {
-        width: 1em;
-      }
-
       .crm-button {
         flex: 1;
+        &.separator {
+          margin-left: 1em;
+        }
       }
     }
   }

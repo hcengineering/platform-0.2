@@ -33,85 +33,65 @@ type LoginInfo = { token?: string, wsUrl?: string, errorCode?: number }
 export default defineComponent({
   components: {
     Chrome,
-    EditBox,
-    Button,
   },
   setup () {
-
     const vueService = getVueService()
-    const status = ref('Введите адрес электропочты и пароль.')
 
-    const username = ref('')
-    const password = ref('')
+    const object = { username: '', password: '', workspace: '' }
+    const info = ref('')
+    const error = ref('')
 
     function doSignup () {
       vueService.navigate('/' + login.component.SignupForm)
     }
 
-    function doLogin () {
-      status.value = 'Соединяюсь с сервером'
-
-      console.log('login ', username.value, " ", password.value)
-      const request: Request<[string, string]> = {
-        method: 'login',
-        params: [username.value, password.value]
-      }
+    async function doLogin () {
+      info.value = "Соединяюсь с сервером..."
 
       const url = this.$platform.getMetadata(login.metadata.LoginUrl)
-      const token = ''
 
-      fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json;charset=utf-8'
-        },
-        body: JSON.stringify(request)
-      }).then(async (response) => {
-        console.log(response)
-        return response.json()
-      }).then(json => {
-        const result = json as Response<void>
-        console.log(result)
+      const request: Request<[string, string, string]> = {
+        method: 'login',
+        params: [object.username, object.password, object.workspace]
+      }
+
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json;charset=utf-8'
+          },
+          body: JSON.stringify(request)
+        })
+        const result = await response.json() as Response<void>
         if (result.error) {
-          status.value = result.error.message
+          error.value = result.error.message
         }
-      }).catch(err => {
-        status.value = 'Не могу соедениться с сервером.'
-      })
+      } catch (err) {
+        error.value = 'Не могу соедениться с сервером.'
+      }
     }
 
-    return { status, doLogin, doSignup, username, password }
+    return { doLogin, doSignup, object, info, error }
   }
 })
 </script>
 
 <template>
-  <Chrome caption="Вход в систему" description="Введите адрес электропочты и пароль.">
-    <div class="status">{{ status }}</div>
-
-    <div class="field">
-      <EditBox
-        name="username"
-        type="text"
-        placeholder="Электропочта"
-        v-model="username"
-        autocomplete="username"
-      />
-    </div>
-    <div class="field">
-      <EditBox
-        name="password"
-        type="password"
-        placeholder="Пароль"
-        v-model="password"
-        autocomplete="current-password"
-      />
-    </div>
-
-    <div class="actions">
-      <Button @click="doSignup">Зарегистрироваться</Button>
-      <div class="separator" />
-      <Button @click="doLogin">Войти в систему</Button>
-    </div>
-  </Chrome>
+  <Chrome
+    caption="Вход в систему"
+    description="Нажмите 'Войти в систему' для продолжения."
+    :info="info"
+    :error="error"
+    :object="object"
+    :fields="{  
+      username: { i18n: 'Электропочта' }, 
+      password: { i18n: 'Пароль', type: 'password'},
+      workspace: { i18n: 'Рабочее пространство'}
+    }"
+    :actions="[
+      { i18n: 'Создать пространство', func: doSignup },
+      { i18n: 'Войти в систему', func: doLogin },
+    ]"
+  />
 </template>

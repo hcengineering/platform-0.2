@@ -21,8 +21,6 @@ import { defineComponent, ref } from 'vue'
 import { getVueService } from '@anticrm/platform-vue'
 
 import Chrome from './Chrome.vue'
-import EditBox from '@anticrm/sparkling-controls/src/EditBox.vue'
-import Button from '@anticrm/sparkling-controls/src/Button.vue'
 
 import login from '..'
 
@@ -33,96 +31,80 @@ type LoginInfo = { token?: string, wsUrl?: string, errorCode?: number }
 export default defineComponent({
   components: {
     Chrome,
-    EditBox,
-    Button,
   },
   setup () {
-
     const vueService = getVueService()
-    const status = ref('Введите ваши данные.')
 
-    const username = ref('')
-    const password = ref('')
-    const first = ref('')
-    const last = ref('')
+    const object = { username: '', password: '', workspace: '', organisation: '' }
+    const info = ref('')
+    const error = ref('')
 
     function doLogin () {
       vueService.navigate('/' + login.component.LoginForm)
     }
 
-    function doSignup () {
-      status.value = 'Соединяюсь с сервером'
-
-      console.log('login ', username.value, " ", password.value)
-      const request: Request<[string, string]> = {
-        method: 'login',
-        params: [username.value, password.value]
-      }
+    async function createWorkspace () {
+      info.value = "Соединяюсь с сервером..."
 
       const url = this.$platform.getMetadata(login.metadata.LoginUrl)
-      const token = ''
 
-      fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json;charset=utf-8'
-        },
-        body: JSON.stringify(request)
-      }).then(async (response) => {
-        console.log(response)
-        return response.json()
-      }).then(json => {
-        const result = json as Response<void>
-        console.log(result)
-        if (result.error) {
-          status.value = result.error.message
+      try {
+        const request: Request<[string, string, string]> = {
+          method: 'createWorkspace',
+          params: [object.username, object.password, object.organisation]
         }
-      }).catch(err => {
-        status.value = 'Не могу соедениться с сервером.'
-      })
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json;charset=utf-8' },
+          body: JSON.stringify(request)
+        })
+        const result = await response.json() as Response<string>
+        if (result.error) {
+          error.value = result.error.message
+        } else {
+          const workspace = result.result
+
+          const request: Request<[string, string, string]> = {
+            method: 'createAccount',
+            params: [object.username, object.password, workspace]
+          }
+          const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json;charset=utf-8' },
+            body: JSON.stringify(request)
+          })
+          const account = await response.json() as Response<void>
+          if (account.error) {
+            error.value = account.error.message
+          }
+        }
+      } catch (err) {
+        error.value = 'Не могу соедениться с сервером.'
+      }
+
     }
 
-    return { status, doLogin, username, password, first, last }
+    return { createWorkspace, doLogin, object, info, error }
+
   }
 })
 </script>
 
 <template>
-  <Chrome caption="Регистрация в системе">
-    <div class="status">{{ status }}</div>
-
-    <div class="field">
-      <EditBox name="first" type="text" placeholder="Имя" v-model="first" autocomplete="first" />
-    </div>
-
-    <div class="field">
-      <EditBox name="last" type="text" placeholder="Фамилия" v-model="last" autocomplete="last" />
-    </div>
-
-    <div class="field">
-      <EditBox
-        name="username"
-        type="text"
-        placeholder="Электропочта"
-        v-model="username"
-        autocomplete="username"
-      />
-    </div>
-
-    <div class="field">
-      <EditBox
-        name="password"
-        type="password"
-        placeholder="Пароль"
-        v-model="password"
-        autocomplete="new-password"
-      />
-    </div>
-
-    <div class="actions">
-      <Button @click="doLogin">Войти в систему</Button>
-      <div class="separator" />
-      <Button>Зарегистрироваться</Button>
-    </div>
-  </Chrome>
+  <Chrome
+    caption="Создание рабочего пространства"
+    description="Нажмите 'Создать пространство' для продолжения."
+    :info="info"
+    :error="error"
+    :object="object"
+    :fields="{  
+      username: { i18n: 'Электропочта' }, 
+      password: { i18n: 'Пароль', type: 'password'},
+      organisation: { i18n: 'Организация'}
+    }"
+    :actions="[
+      { i18n: 'Войти в систему', func: doLogin },
+      { i18n: 'Создать пространство', func: createWorkspace },
+    ]"
+  />
 </template>
