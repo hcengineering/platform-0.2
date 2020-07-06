@@ -35,7 +35,7 @@ export default defineComponent({
   setup () {
     const vueService = getVueService()
 
-    const object = { username: '', password: '', workspace: '', organisation: '' }
+    const object = { username: '', password: '', organisation: '' }
     const info = ref('')
     const error = ref('')
 
@@ -49,6 +49,21 @@ export default defineComponent({
       const url = this.$platform.getMetadata(login.metadata.LoginUrl)
 
       try {
+        // const request: Request<[string, string, string]> = {
+        //   method: 'createWorkspace',
+        //   params: [object.username, object.password, object.organisation]
+        // }
+        // const response = await fetch(url, {
+        //   method: 'POST',
+        //   headers: { 'Content-Type': 'application/json;charset=utf-8' },
+        //   body: JSON.stringify(request)
+        // })
+        // const result = await response.json() as Response<string>
+        // if (result.error) {
+        //   error.value = result.error.message
+        // } else {
+        //   const workspace = result.result
+
         const request: Request<[string, string, string]> = {
           method: 'createWorkspace',
           params: [object.username, object.password, object.organisation]
@@ -58,26 +73,11 @@ export default defineComponent({
           headers: { 'Content-Type': 'application/json;charset=utf-8' },
           body: JSON.stringify(request)
         })
-        const result = await response.json() as Response<string>
-        if (result.error) {
-          error.value = result.error.message
-        } else {
-          const workspace = result.result
-
-          const request: Request<[string, string, string]> = {
-            method: 'createAccount',
-            params: [object.username, object.password, workspace]
-          }
-          const response = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json;charset=utf-8' },
-            body: JSON.stringify(request)
-          })
-          const account = await response.json() as Response<void>
-          if (account.error) {
-            error.value = account.error.message
-          }
+        const account = await response.json() as Response<void>
+        if (account.error) {
+          error.value = account.error.message
         }
+        // }
       } catch (err) {
         error.value = 'Не могу соедениться с сервером.'
       }
