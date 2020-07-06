@@ -43,10 +43,12 @@ const platform = new Platform()
 const strings = require('./strings.json') as Record<string, string>
 
 const loginUrl = process.env.VUE_APP_LOGIN_URL
-// const account = process.env.VUE_APP_ACCOUNT
-// if (account) {
-//   localStorage.setItem('account', account)
-// }
+
+const devel = process.env.VUE_APP_ACCOUNT
+if (devel) {
+  localStorage.setItem('account', devel)
+}
+
 const account = localStorage.getItem('account')
 if (account) {
   setAccount(platform, JSON.parse(account))
