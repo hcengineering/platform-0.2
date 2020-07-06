@@ -18,7 +18,7 @@ import { defineComponent, ref } from 'vue'
 import core, { Ref, Class, Obj, Doc, CoreService, Instance } from '@anticrm/platform-core'
 import { UIDecorator } from '@anticrm/platform-ui'
 import { getSession, getUIService } from '@anticrm/platform-vue'
-import workbench, { DocCreateAction } from '..'
+import workbench, { DocCreateAction } from '../..'
 
 import LinkTo from '@anticrm/platform-vue/src/components/LinkTo.vue'
 import Label from '@anticrm/platform-vue/src/components/Label.vue'

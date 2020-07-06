@@ -13,14 +13,43 @@
 // limitations under the License.
 //
 
-import { plugin, Service, Plugin, Metadata } from '@anticrm/platform'
-import ui, { AnyComponent } from '@anticrm/platform-ui'
+import { plugin, Service, Plugin, Metadata, Platform } from '@anticrm/platform'
+import { AnyComponent } from '@anticrm/platform-ui'
+import rpc from '@anticrm/platform-rpc'
+import vue, { VueService } from '@anticrm/platform-vue'
 
-export default plugin('login' as Plugin<Service>, {}, {
+export interface Account {
+  account: string
+  server: string
+  port: string
+  token: string
+}
+
+export function currentAccount (): Account | null {
+  const account = localStorage.getItem('account')
+  return account ? JSON.parse(account) : null
+}
+
+export function setAccount (platform: Platform, account: Account) {
+  localStorage.setItem('account', JSON.stringify(account))
+
+  platform.setMetadata(rpc.metadata.WSHost, account.server)
+  platform.setMetadata(rpc.metadata.WSPort, account.port)
+}
+
+export function logout (vueService: VueService) {
+  localStorage.removeItem('account')
+  vueService.navigate(login.component.LoginForm)
+}
+
+const login = plugin('login' as Plugin<Service>, {}, {
   component: {
-    LoginForm: '' as AnyComponent
+    LoginForm: '' as AnyComponent,
+    SignupForm: '' as AnyComponent
   },
   metadata: {
     LoginUrl: '' as Metadata<string>
   }
 })
+
+export default login

@@ -303,7 +303,7 @@
   },
   {
     "_class": "class:core.Adapter",
-    "_id": "5efda3398ef380a61377d821",
+    "_id": "5f0049dbd294af4e24234e65",
     "core|Adapter|from": "class",
     "core|Adapter|to": "component",
     "core|Adapter|adapt": "method:ui.ClassToComponent"
@@ -408,7 +408,7 @@
   },
   {
     "_class": "class:workbench.DocCreateAction",
-    "_id": "5efda3398ef380a61377d822",
+    "_id": "5f0049dbd294af4e24234e66",
     "workbench|DocCreateAction|clazz": "class:contact.Person"
   },
   {

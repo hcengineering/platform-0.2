@@ -22,7 +22,7 @@ export default (S: Builder) => {
   S.createClass(business.class.Account, core.class.Doc, {
     id: S.newInstance(core.class.Type, {}),
     user: S.ref(business.class.User)
-  })
+  }, 'account')
 
   S.createClass(business.class.BusinessObject, core.class.Doc, {
     createdOn: S.newInstance(core.class.Date, {}),

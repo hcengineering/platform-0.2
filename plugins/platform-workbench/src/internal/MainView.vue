@@ -14,9 +14,9 @@
 -->
 
 <script lang="ts">
-import { defineComponent, reactive, computed, provide, inject, watch, PropType } from 'vue'
+import { defineComponent, ref, computed } from 'vue'
 import { Platform, Resource, getResourceKind } from '@anticrm/platform'
-import { getSession } from '@anticrm/platform-vue'
+import vue, { getSession } from '@anticrm/platform-vue'
 import core, { Ref, Class, Doc, CoreService, ClassKind, Instance } from '@anticrm/platform-core'
 import ui, { AnyComponent, UIService, ComponentKind } from '@anticrm/platform-ui'
 
@@ -30,11 +30,13 @@ export default defineComponent({
   },
 
   // Adapt `content` to a `Component`. Forward to `Component`.
-  async setup (props, context) {
+  setup (props, context) {
+    const component = ref(vue.component.AppLoader)
     const session = getSession()
     const operation = computed(() => props.path.split('/')[1])
     const resource = props.path.split('/')[0] as Resource<any>
-    const component = await session.adapt(resource, ComponentKind)
+    session.adapt(resource, ComponentKind)
+      .then(comp => { component.value = comp })
 
     return {
       component, resource, operation

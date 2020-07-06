@@ -14,7 +14,7 @@
 //
 
 import { inject } from 'vue'
-import { plugin, Service, Plugin, Resource } from '@anticrm/platform'
+import { plugin, Service, Plugin, Resource, Metadata } from '@anticrm/platform'
 import core, { Ref, Class, Doc, CoreService, Property, Session } from '@anticrm/platform-core'
 import ui, { AnyComponent, UIService } from '@anticrm/platform-ui'
 import vue, { Asset } from '@anticrm/platform-vue'
@@ -59,6 +59,9 @@ export default plugin('workbench' as Plugin<WorkbenchService>, {
   ui: ui.id,
   vue: vue.id
 }, {
+  metadata: {
+    ServerUrl: '' as Metadata<string>
+  },
   icon: {
     NewItem: '' as Asset
   },
@@ -67,5 +70,8 @@ export default plugin('workbench' as Plugin<WorkbenchService>, {
   },
   component: {
     Workbench: '' as AnyComponent
+  },
+  method: {
+    Logout: '' as Resource<() => void>
   }
 })

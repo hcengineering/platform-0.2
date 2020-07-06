@@ -21,8 +21,6 @@ import { defineComponent, ref } from 'vue'
 import { getVueService } from '@anticrm/platform-vue'
 
 import Chrome from './Chrome.vue'
-import EditBox from '@anticrm/sparkling-controls/src/EditBox.vue'
-import Button from '@anticrm/sparkling-controls/src/Button.vue'
 
 import login from '..'
 
@@ -37,61 +35,76 @@ export default defineComponent({
   setup () {
     const vueService = getVueService()
 
-    const object = { username: '', password: '', workspace: '' }
+    const object = { username: '', password: '', organisation: '' }
     const info = ref('')
     const error = ref('')
 
-    function doSignup () {
-      vueService.navigate('/' + login.component.SignupForm)
+    function doLogin () {
+      vueService.navigate('/' + login.component.LoginForm)
     }
 
-    async function doLogin () {
+    async function createWorkspace () {
       info.value = "Соединяюсь с сервером..."
 
       const url = this.$platform.getMetadata(login.metadata.LoginUrl)
 
-      const request: Request<[string, string, string]> = {
-        method: 'login',
-        params: [object.username, object.password, object.workspace]
-      }
-
       try {
+        // const request: Request<[string, string, string]> = {
+        //   method: 'createWorkspace',
+        //   params: [object.username, object.password, object.organisation]
+        // }
+        // const response = await fetch(url, {
+        //   method: 'POST',
+        //   headers: { 'Content-Type': 'application/json;charset=utf-8' },
+        //   body: JSON.stringify(request)
+        // })
+        // const result = await response.json() as Response<string>
+        // if (result.error) {
+        //   error.value = result.error.message
+        // } else {
+        //   const workspace = result.result
+
+        const request: Request<[string, string, string]> = {
+          method: 'createWorkspace',
+          params: [object.username, object.password, object.organisation]
+        }
         const response = await fetch(url, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json;charset=utf-8'
-          },
+          headers: { 'Content-Type': 'application/json;charset=utf-8' },
           body: JSON.stringify(request)
         })
-        const result = await response.json() as Response<void>
-        if (result.error) {
-          error.value = result.error.message
+        const account = await response.json() as Response<void>
+        if (account.error) {
+          error.value = account.error.message
         }
+        // }
       } catch (err) {
         error.value = 'Не могу соедениться с сервером.'
       }
+
     }
 
-    return { doLogin, doSignup, object, info, error }
+    return { createWorkspace, doLogin, object, info, error }
+
   }
 })
 </script>
 
 <template>
   <Chrome
-    caption="Вход в систему"
-    description="Нажмите 'Войти в систему' для продолжения."
+    caption="Создание рабочего пространства"
+    description="Нажмите 'Создать пространство' для продолжения."
     :info="info"
     :error="error"
     :object="object"
     :fields="{  
       username: { i18n: 'Электропочта' }, 
       password: { i18n: 'Пароль', type: 'password'},
-      workspace: { i18n: 'Рабочее пространство'}
+      organisation: { i18n: 'Организация'}
     }"
     :actions="[
-      { i18n: 'Создать пространство', func: doSignup },
       { i18n: 'Войти в систему', func: doLogin },
+      { i18n: 'Создать пространство', func: createWorkspace },
     ]"
   />
 </template>
