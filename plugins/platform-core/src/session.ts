@@ -14,13 +14,12 @@
 //
 
 import { CommitInfo, CoreProtocol } from '@anticrm/rpc'
-import { Platform, Resource, Doc, Ref, Class, Obj, Emb, attributeKey } from '@anticrm/platform'
+import { Platform, Resource, Doc, Ref, Class, Obj, Emb, attributeKey, getResourceInfo } from '@anticrm/platform'
 import { MemDb, findAll, Layout, AnyLayout } from '@anticrm/memdb'
 import { createCache } from '@anticrm/memdb/lib/indexeddb'
 import { generateId } from './objectid'
 
 import core, { Instance, Type, Session, Values, Adapter, Cursor, CoreDomain } from '.'
-import { result } from 'lodash'
 
 export function createSession (platform: Platform, modelDb: MemDb, coreProtocol: CoreProtocol, broadcastXact: (info: CommitInfo, originator?: Session) => void, closeSession: (session: Session) => void): Session {
 
@@ -342,7 +341,7 @@ export function createSession (platform: Platform, modelDb: MemDb, coreProtocol:
   // A D A P T E R S
 
   async function adapt (resource: Resource<any>, kind: string): Promise<Resource<any> | undefined> {
-    const info = platform.getResourceInfo(resource)
+    const info = getResourceInfo(resource)
     if (info.kind === kind) {
       return Promise.resolve(resource)
     }
