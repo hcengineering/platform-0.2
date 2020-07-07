@@ -21,6 +21,8 @@ import vue, { Asset } from '@anticrm/platform-vue'
 import i18n from '@anticrm/platform-core-i18n'
 import { CoreInjectionKey, UIInjectionKey, SessionInjectionKey } from '@anticrm/platform-vue'
 
+export const AccountLocalStorage = 'account'
+
 // C O R E  M O D E L
 
 export interface DocCreateAction extends Doc {

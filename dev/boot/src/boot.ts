@@ -39,7 +39,7 @@ builder.load(contactModel)
 builder.load(chunterModel)
 builder.load(demoModel)
 
-export const Model = builder.dump()
+export const Model = builder.dumpAll()
 export const Strings = {
   ...uiRu,
   ...contactRu

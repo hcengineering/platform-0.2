@@ -14,7 +14,7 @@
 //
 
 import core, {
-  Obj, Ref, Class, Type, BagOf, ArrayOf, InstanceOf, Emb
+  Obj, Ref, Class, Type, BagOf, ArrayOf, InstanceOf, Emb, CreateTx, Tx, VDoc
 } from '..'
 
 import { extendIds } from './utils'
@@ -31,6 +31,10 @@ export default extendIds(core, {
     Metadata: '' as Ref<Class<Type<any>>>,
     Resource: '' as Ref<Class<Type<any>>>,
 
-    Date: '' as Ref<Class<Type<Date>>>
+    Date: '' as Ref<Class<Type<Date>>>,
+
+    VDoc: '' as Ref<Class<VDoc>>,
+    Tx: '' as Ref<Class<Tx>>,
+    CreateTx: '' as Ref<Class<CreateTx>>
   }
 })

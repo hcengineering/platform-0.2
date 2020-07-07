@@ -45,11 +45,14 @@ function dumpToFile () {
 function initDatabase (uri: string, tenant: string) {
   MongoClient.connect(uri, { useUnifiedTopology: true }, (err, client) => {
     const db = client.db(tenant)
-    db.collection('model', (err, coll) => {
-      coll.deleteMany({}, () => {
-        coll.insertMany(Model).then(() => { client.close() })
+    for (const domain in Model) {
+      const model = Model[domain]
+      db.collection(domain, (err, coll) => {
+        coll.deleteMany({}, () => {
+          coll.insertMany(model).then(() => { client.close() })
+        })
       })
-    })
+    }
   })
 
 }

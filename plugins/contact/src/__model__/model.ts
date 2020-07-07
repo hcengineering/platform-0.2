@@ -30,7 +30,7 @@ export default async (S: Builder) => {
   S.createClass(contact.class.Email, core.class.Type, {})
   S.createClass(contact.class.Phone, core.class.Type, {})
 
-  S.createClass(contact.class.Contact, business.class.BusinessObject, {
+  S.createClass(contact.class.Contact, core.class.VDoc, {
     email: S.newInstance(contact.class.Email, {}),
     phone: S.newInstance(contact.class.Phone, {})
   })
@@ -40,12 +40,12 @@ export default async (S: Builder) => {
     lastName: S.newInstance(core.class.Type, {}),
     birthDate: S.newInstance(contact.class.Date, {}),
 
-    getText: S.newInstance(core.class.Method, {
-      _default: S.resolve(contact.method.Person_getText)
-    }),
-    getImage: S.newInstance(core.class.Method, {
-      _default: S.resolve(contact.method.Person_getImage)
-    }),
+    // getText: S.newInstance(core.class.Method, {
+    //   _default: S.resolve(contact.method.Person_getText)
+    // }),
+    // getImage: S.newInstance(core.class.Method, {
+    //   _default: S.resolve(contact.method.Person_getImage)
+    // }),
   }, 'contact')
 
   S.mixin(contact.class.Date, ui.class.ClassUIDecorator as Ref<Class<ClassUIDecorator<Type<any>>>>, {
@@ -73,5 +73,11 @@ export default async (S: Builder) => {
   S.createDocument(workbench.class.DocCreateAction, {
     clazz: contact.class.Person,
   })
+
+  S.createVDocument(contact.class.Person, {
+    firstName: 'John',
+    lastName: 'Appleseed',
+    email: 'john.appleseed@apple.com'
+  }, 'john.appleseed@apple.com')
 
 }

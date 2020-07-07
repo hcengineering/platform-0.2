@@ -28,7 +28,7 @@ export async function createCache (dbname: string, modelDb: MemDb): Promise<DbPr
       const domains = new Map<string, string>()
       const classes = modelDb.findClass({})
       for (const clazz of classes) {
-        const domain = clazz._domain
+        const domain = clazz._domain as string
         if (domain && !domains.get(domain)) {
           domains.set(domain, domain)
           console.log('create object store: ' + domain)
