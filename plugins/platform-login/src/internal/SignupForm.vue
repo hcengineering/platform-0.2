@@ -26,8 +26,6 @@ import login from '..'
 
 import { encode } from 'jwt-simple'
 
-type LoginInfo = { token?: string, wsUrl?: string, errorCode?: number }
-
 export default defineComponent({
   components: {
     Chrome,

@@ -110,6 +110,30 @@ export default (S: Builder) => {
     })
   })
 
+  S.createClass(core.class.VDoc, core.class.Doc, {
+    _createdOn: S.newInstance(core.class.Type, {}),
+    _createdBy: S.newInstance(core.class.Type, {}),
+    _modifiedOn: S.newInstance(core.class.Type, {}),
+    _modifiedBy: S.newInstance(core.class.Type, {})
+  })
+
+  S.createClass(core.class.Tx, core.class.Doc, {
+    _date: S.newInstance(core.class.Type, {}),
+    _user: S.newInstance(core.class.Type, {}),
+    _objectId: S.newInstance(core.class.RefTo, {
+      to: core.class.VDoc
+    })
+  })
+
+  S.createClass(core.class.CreateTx, core.class.Tx, {
+    _objectClass: S.newInstance(core.class.RefTo, {
+      to: core.class.Class
+    }),
+    _attributes: S.newInstance(core.class.BagOf, {
+      of: S.newInstance(core.class.InstanceOf, { of: core.class.Type })
+    })
+  })
+
   S.createClass(core.class.Adapter, core.class.Doc, {
     from: S.newInstance(core.class.Type, {}),
     to: S.newInstance(core.class.Type, {}),

@@ -43,7 +43,7 @@ type ToLayout<T> =
 
 export type Layout<T> = { [P in keyof T]:
   T[P] extends Ref<Doc> | undefined ? T[P] :
-  T[P] extends Property<infer X> | undefined ? X :
+  T[P] extends Property<infer X> | undefined ? LayoutType :
   T[P] extends (infer X)[] | undefined ? ToLayout<X>[] :
   T[P] extends { [key: string]: infer X } | undefined ? { [key: string]: ToLayout<X> } :
   never
@@ -120,7 +120,7 @@ export class MemDb implements ModelDb {
   getDomain (id: Ref<Class<Doc>>): string {
     let clazz = this.objects.get(id) as Layout<Class<Doc>> | undefined
     while (clazz) {
-      if (clazz._domain) return clazz._domain
+      if (clazz._domain) return clazz._domain as string
       clazz = clazz._extends ? this.objects.get(clazz._extends) as Layout<Class<Doc>> : undefined
     }
     throw new Error('no domain found for class: ' + id)
@@ -142,7 +142,7 @@ export class MemDb implements ModelDb {
   }
 
   // from Builder
-  assign<T extends Doc> (layout: Layout<T>, _class: Ref<Class<T>>, values: Layout<Omit<T, keyof Doc>>) {
+  assign (layout: AnyLayout, _class: Ref<Class<Doc>>, values: AnyLayout) {
     const l = layout as unknown as AnyLayout
     const r = values as unknown as AnyLayout
     for (const key in values) {
@@ -154,8 +154,12 @@ export class MemDb implements ModelDb {
     }
   }
 
+  generateId (): Ref<Doc> {
+    return generateId() as Ref<Doc>
+  }
+
   createDocument<M extends Doc> (_class: Ref<Class<M>>, values: Layout<Omit<M, keyof Doc>>, _id?: Ref<M>): Layout<Doc> {
-    const layout = { _class, _id: _id ?? generateId() as Ref<Doc> } as Layout<Doc>
+    const layout = { _class, _id: _id ?? this.generateId() } as Layout<Doc>
     this.assign(layout, _class, values)
     this.add(layout)
     return layout

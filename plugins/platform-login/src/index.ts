@@ -18,6 +18,14 @@ import { AnyComponent } from '@anticrm/platform-ui'
 import rpc from '@anticrm/platform-rpc'
 import vue, { VueService } from '@anticrm/platform-vue'
 
+export interface LoginInfo {
+  email: string
+  workspace: string
+  server: string
+  port: string
+  token: string
+}
+
 export interface Account {
   account: string
   server: string

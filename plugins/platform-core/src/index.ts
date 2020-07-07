@@ -96,7 +96,8 @@ export interface Method<T> extends StaticResource<T> { }
 // }
 
 export enum CoreDomain {
-  Model = 'model'
+  Model = 'model',
+  Tx = 'tx'
 }
 
 // export interface EClass<T extends E, E extends Obj> extends EClassifier<T, E> {
@@ -135,6 +136,26 @@ export type Values<T> = { [P in keyof T]:
   T[P] extends { [key: string]: infer X } | undefined ? { [key: string]: Instance<X> } :
   T[P] extends (infer X)[] | undefined ? Instance<X>[] :
   never
+}
+
+// V E R S I O N I N G
+
+export interface VDoc extends Doc {
+  _createdOn: Property<Date>
+  _createdBy: Property<string>
+  _modifiedOn?: Property<Date>
+  _modifiedBy?: Property<string>
+}
+
+export interface Tx extends Doc {
+  _date: Property<Date>
+  _user: Property<string>
+  _objectId: Ref<VDoc>
+}
+
+export interface CreateTx extends Tx {
+  _objectClass: Ref<Class<VDoc>>
+  _attributes: { [key: string]: Property<any> }
 }
 
 // A D A P T E R S

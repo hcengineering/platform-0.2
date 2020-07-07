@@ -15,18 +15,41 @@
 
 import { Resource, Metadata, Emb, Doc, Obj, Ref, EClass, Class, AllAttributes, Property } from '@anticrm/platform'
 
-import { RefTo, InstanceOf, ArrayOf, Type } from '..'
+import { CreateTx, VDoc, RefTo, InstanceOf, ArrayOf, Type, CoreDomain } from '..'
+import { MemDb, Layout } from '@anticrm/memdb'
 import core from '.'
-import { ModelDb, MemDb, Layout } from '@anticrm/memdb'
 
 class Builder {
-  private memdb: ModelDb
+  private memdb: MemDb
 
-  constructor (memdb?: ModelDb) {
+  private domains = new Map<string, MemDb>()
+
+  constructor (memdb?: MemDb) {
     this.memdb = memdb ?? new MemDb()
   }
 
-  dump (): Layout<Doc>[] { return this.memdb.dump() }
+  dump (): Layout<Doc>[] {
+    return this.memdb.dump()
+  }
+
+  dumpAll (): { [key: string]: Layout<Doc>[] } {
+    const result = {} as { [key: string]: Layout<Doc>[] }
+    for (const e of this.domains) {
+      result[e[0]] = e[1].dump()
+    }
+    result[CoreDomain.Model] = this.memdb.dump()
+    return result
+  }
+
+  getDomain (domain: string) {
+    const memdb = this.domains.get(domain)
+    if (!memdb) {
+      const memdb = new MemDb()
+      this.domains.set(domain, memdb)
+      return memdb
+    }
+    return memdb
+  }
 
   // N E W  I N S T A N C E S
 
@@ -43,6 +66,35 @@ class Builder {
 
   createDocument<M extends Doc> (_class: Ref<Class<M>>, values: Layout<Omit<M, keyof Doc>>, _id?: Ref<M>): void {
     this.memdb.createDocument(_class, values, _id)
+  }
+
+  createVDocument<M extends VDoc> (_class: Ref<Class<M>>, values: Layout<Omit<M, keyof VDoc>>, user: string, _id?: Ref<M>) {
+    const date = Date.now()
+    const clazz = this.memdb.get(_class) as Layout<Class<VDoc>>
+    const id = _id ?? this.memdb.generateId()
+    const layout: Layout<VDoc> = {
+      _class,
+      _id: id,
+      _createdOn: date,
+      _createdBy: user
+    }
+    this.memdb.assign(layout as Layout<M>, _class, values)
+    this.getDomain(clazz._domain as string).add(layout)
+
+    // Create Tx
+    const attributes = {}
+    this.memdb.assign(attributes as Layout<M>, _class, values)
+
+    const txLayout: Layout<CreateTx> = {
+      _class: core.class.CreateTx,
+      _id: this.memdb.generateId(),
+      _date: date,
+      _user: user,
+      _objectId: id as Ref<VDoc>,
+      _objectClass: _class,
+      _attributes: attributes
+    }
+    this.getDomain(CoreDomain.Tx).add(txLayout)
   }
 
   mixin<T extends E, E extends Doc> (id: Ref<E>, clazz: Ref<Class<T>>, values: Layout<Omit<T, keyof E>>) {

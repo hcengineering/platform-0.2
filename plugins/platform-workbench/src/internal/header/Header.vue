@@ -15,11 +15,14 @@
 
 <script lang="ts">
 import { defineComponent, ref, computed } from 'vue'
+import { getSession } from '@anticrm/platform-vue'
+import { LoginInfo } from '@anticrm/platform-login'
+import contact from '@anticrm/contact'
 
 import NewItemMenu from './NewItemMenu.vue'
 import Action from '@anticrm/platform-vue/src/components/Action.vue'
 
-import workbench from '../..'
+import workbench, { AccountLocalStorage } from '../..'
 
 export default defineComponent({
   components: { NewItemMenu, Action },
@@ -28,6 +31,18 @@ export default defineComponent({
     params: Object
   },
   setup () {
+    const accountJson = localStorage.getItem(AccountLocalStorage)
+    const account = JSON.parse(accountJson) as LoginInfo
+
+    const session = getSession()
+    const cursor = session.find(contact.class.Person, {
+      //email: account.email as any // TODO: fix `find`
+    })
+    cursor.all().then(persons => {
+      console.log('PERSONS')
+      console.log(persons)
+    })
+
     return { workbench }
   }
 })
