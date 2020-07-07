@@ -24,14 +24,6 @@ import { CoreProtocol, Response, CommitInfo } from '@anticrm/rpc'
 import { RpcService } from '@anticrm/platform-rpc'
 import { createSession } from './session'
 
-// TODO: Platform.getResourceInfo
-export function attributeKey (_class: Ref<Class<Obj>>, key: string): string {
-  const index = _class.indexOf(':')
-  const dot = _class.indexOf('.')
-  const plugin = _class.substring(index + 1, dot)
-  const cls = _class.substring(dot + 1)
-  return plugin + '|' + cls + '|' + key
-}
 
 /*!
  * Anticrm Platform™ Core Plugin
