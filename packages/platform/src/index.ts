@@ -279,7 +279,7 @@ export class Platform {
 
       console.log('resolve resource: ' + resource)
       resolving = new Promise((resolve, reject) => {
-        const info = this.getResourceInfo(resource)
+        const info = getResourceInfo(resource)
         console.log(`loading '${resource}' from '${info.plugin}'.`)
         this.getPlugin(info.plugin).then(plugin => {
           const value = this.resources.get(resource)
@@ -295,18 +295,6 @@ export class Platform {
 
   setResource<T> (resource: Resource<T>, value: T): void {
     this.resources.set(resource, value)
-  }
-
-  getResourceInfo (resource: Resource<any>): ResourceInfo {
-    const index = resource.indexOf(':')
-    if (index === -1) {
-      throw new Error('invalid resource id format')
-    }
-    const kind = resource.substring(0, index) as ResourceKind
-    const dot = resource.indexOf('.', index)
-    const plugin = resource.substring(index + 1, dot) as AnyPlugin
-    const id = resource.substring(dot)
-    return { kind, plugin, id }
   }
 
   // TODO: do we need the following?
@@ -466,6 +454,18 @@ export function identify<N extends Namespace> (pluginId: AnyPlugin, namespace: N
 
 export function plugin<P extends Service, D extends PluginDependencies, N extends Namespace> (id: Plugin<P>, deps: D, namespace: N): PluginDescriptor<P, D> & N {
   return { id, deps, ...identify(id, namespace) }
+}
+
+export function getResourceInfo (resource: Resource<any>): ResourceInfo {
+  const index = resource.indexOf(':')
+  if (index === -1) {
+    throw new Error('invalid resource id format')
+  }
+  const kind = resource.substring(0, index) as ResourceKind
+  const dot = resource.indexOf('.', index)
+  const plugin = resource.substring(index + 1, dot) as AnyPlugin
+  const id = resource.substring(dot)
+  return { kind, plugin, id }
 }
 
 export function attributeKey (_class: Ref<Class<Obj>>, key: string): string {

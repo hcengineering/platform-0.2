@@ -14,11 +14,10 @@
 //
 
 import { CommitInfo, CoreProtocol } from '@anticrm/rpc'
-import { Platform, Resource, Doc, Ref, Class, Obj, Emb } from '@anticrm/platform'
+import { Platform, Resource, Doc, Ref, Class, Obj, Emb, attributeKey } from '@anticrm/platform'
 import { MemDb, findAll, Layout, AnyLayout } from '@anticrm/memdb'
 import { createCache } from '@anticrm/memdb/lib/indexeddb'
 import { generateId } from './objectid'
-import { attributeKey } from './plugin'
 
 import core, { Instance, Type, Session, Values, Adapter, Cursor, CoreDomain } from '.'
 import { result } from 'lodash'
