@@ -40,7 +40,7 @@ import contactMeta from '@anticrm/contact/src/__model__/meta'
 import { Model, Strings } from '@anticrm/dev-boot/src/boot'
 
 const platform = new Platform()
-platform.setMetadata(rpcStub.metadata.Metamodel, Model)
+platform.setMetadata(rpcStub.metadata.Metamodel, Model.model)
 platform.setMetadata(i18n.metadata.BootStrings, Strings)
 platform.setMetadata(ui.metadata.DefaultApplication, mc.component.MissionControl)
 platform.setMetadata(mc.metadata.Applications, [
