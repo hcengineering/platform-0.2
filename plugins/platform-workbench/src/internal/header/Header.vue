@@ -31,6 +31,9 @@ export default defineComponent({
     params: Object
   },
   setup () {
+
+    const name = ref('')
+
     const accountJson = localStorage.getItem(AccountLocalStorage)
     const account = JSON.parse(accountJson) as LoginInfo
 
@@ -39,11 +42,15 @@ export default defineComponent({
       email: account.email as any // TODO: fix `find`
     })
     cursor.all().then(persons => {
-      console.log('PERSONS')
-      console.log(persons)
+      console.log('PERSONS', persons)
+      if (persons.length === 1) {
+        name.value = persons[0].firstName + ' ' + persons[0].lastName
+      } else {
+        name.value = 'No account'
+      }
     })
 
-    return { workbench }
+    return { workbench, name }
   }
 })
 </script>
@@ -51,10 +58,16 @@ export default defineComponent({
 <template>
   <div class="workbench-header">
     <div class="container">
-      <NewItemMenu />
-      <div class="left">Left</div>
+      <div class="valign">
+        <NewItemMenu />
+      </div>
       <div class="right">
-        <Action :action="workbench.method.Logout">Logout</Action>
+        <div>
+          <div>{{ name }}</div>
+          <div>
+            <Action :action="workbench.method.Logout">Logout</Action>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -63,17 +76,18 @@ export default defineComponent({
 <style lang="scss">
 @import "~@anticrm/sparkling-theme/css/_variables.scss";
 .workbench-header {
-  line-height: $pictogram-size;
+  height: 100%;
+  width: 100%;
 
   .container {
     display: flex;
 
-    .left {
-      flex-grow: 1;
+    .valign {
+      line-height: $pictogram-size;
     }
 
-    .rigth {
-      flex-grow: 4;
+    .right {
+      flex-grow: 1;
       display: flex;
       flex-direction: row-reverse;
     }
