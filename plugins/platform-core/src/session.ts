@@ -57,6 +57,8 @@ export function createSession (platform: Platform, modelDb: MemDb, coreProtocol:
       if (!native) { throw new Error(`something went wrong, can't load '${clazz._native}' resource`) }
       const descriptors = Object.getOwnPropertyDescriptors(native)
       Object.defineProperties(proto, descriptors)
+      // prototypes.set(_class, proto)
+      return proto
     }
 
     const attributes = clazz._attributes
@@ -74,7 +76,7 @@ export function createSession (platform: Platform, modelDb: MemDb, coreProtocol:
       const exertFactory = attrInstance.exert
 
       if (typeof exertFactory !== 'function') {
-        throw new Error('exertFactory is not a function')
+        throw new Error('exertFactory is not a function ' + attrInstance._class)
       }
 
       const exert = await exertFactory.call(attrInstance)
@@ -275,10 +277,30 @@ export function createSession (platform: Platform, modelDb: MemDb, coreProtocol:
   }
 
   function find<T extends Doc> (_class: Ref<Class<T>>, query: Partial<T>): Cursor<T> {
-    const layouts = coreProtocol.find(_class as Ref<Class<Doc>>, query as unknown as AnyLayout) // !!!!! WRONG, need hibernate
+    const layout = {} as AnyLayout
+    const hierarchy = getClassHierarchy(_class)
 
     return {
       async all (): Promise<Instance<T>[]> {
+        const promises = hierarchy.map(cls =>
+          getInstance(core.class.Class, cls).then(async clazz => {
+            const attributes = clazz._attributes
+            for (const key in attributes) {
+              const qv = (query as any)[key]
+              if (qv) {
+                const attribute = await attributes[key] as Instance<Type<any>>
+                if (!attribute.hibernate) {
+                  console.log('ATTRIBUTE', attribute)
+                  throw new Error('should not happen, fix #49 and remove this line')
+                }
+                layout[attributeKey(cls, key)] = attribute.hibernate(qv)
+              }
+            }
+          })
+        )
+        await Promise.all(promises)
+        console.log('LAYOUT: ', layout)
+        const layouts = coreProtocol.find(_class as Ref<Class<Doc>>, layout)
         const result = await layouts.then(resolved => (resolved as T[]).map(doc => instantiateDoc(doc)))
         return Promise.all(result as unknown as Promise<Instance<T>>[])
       }

@@ -198,6 +198,15 @@ export default async (platform: Platform, deps: { rpc: RpcService }): Promise<Co
     }
   }
 
+  const TType = {
+    exert: async function (this: Instance<StaticResource<any>>): Promise<Exert<any>> {
+      return value => value
+    },
+    hibernate: function (this: Instance<StaticResource<any>>, value: any): LayoutType {
+      return value
+    }
+  }
+
   const Date_exert = async function (this: Instance<Type<Date>>): Promise<Exert<Date>> {
     return value => new Date(value as number)
   }
@@ -207,6 +216,8 @@ export default async (platform: Platform, deps: { rpc: RpcService }): Promise<Co
   }
 
   platform.setResource(core.native.StaticResource, TStaticResource)
+  platform.setResource(core.native.Type, TType)
+
   platform.setResource(core.method.Type_exert, Type_exert)
   platform.setResource(core.method.Type_hibernate, Type_hibernate)
   platform.setResource(core.method.BagOf_exert, BagOf_exert)

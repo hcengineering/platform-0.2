@@ -53,7 +53,7 @@ export default (S: Builder) => {
     hibernate: S.newInstance(core.class.StaticResource, {
       _default: S.resolve(core.method.Type_hibernate)
     })
-  })
+  }, undefined, core.native.Type)
 
   S.createClass(core.class.BagOf, core.class.Type, {
     of: S.newInstance(core.class.InstanceOf as Ref<Class<InstanceOf<Type<any>>>>, {
