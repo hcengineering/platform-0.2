@@ -36,7 +36,7 @@ export default defineComponent({
 
     const session = getSession()
     const cursor = session.find(contact.class.Person, {
-      //email: account.email as any // TODO: fix `find`
+      email: account.email as any // TODO: fix `find`
     })
     cursor.all().then(persons => {
       console.log('PERSONS')

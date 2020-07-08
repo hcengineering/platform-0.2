@@ -47,7 +47,7 @@ describe('core', () => {
     expect((typeProto as Object).hasOwnProperty('exert')).toBe(true) // eslint-disable-line
 
     const rtProto = await tx.getPrototype(core.class.StaticResource, DOC)
-    expect((rtProto as Object).hasOwnProperty('constructor')).toBe(true) // eslint-disable-line
+    // expect((rtProto as Object).hasOwnProperty('constructor')).toBe(true) // eslint-disable-line
 
     const rtProtoProto = Object.getPrototypeOf(rtProto)
     expect(typeProto).toBe(rtProtoProto)

@@ -226,6 +226,7 @@ export default plugin('core' as Plugin<CoreService>, { rpc: rpc.id }, {
     Date_hibernate: '' as Resource<(this: Instance<Type<Date>>, value: Date) => LayoutType>,
   },
   native: {
-    StaticResource: '' as Resource<Object>
+    StaticResource: '' as Resource<Object>,
+    Type: '' as Resource<Object>
   },
 })
