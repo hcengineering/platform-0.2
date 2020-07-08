@@ -86,34 +86,6 @@ export default async (platform: Platform, deps: { rpc: RpcService }): Promise<Co
     }
   }
 
-  // C L A S S E S
-
-  // function getOwnAttribute (clazz: Class<Obj>, key: string): Type<any> | undefined {
-  //   return (clazz._attributes as any)[key]
-  // }
-
-  // function getAttribute (clazz: Class<Obj>, key: string): Type<any> | undefined {
-  //   return getOwnAttribute(clazz, key) ??
-  //     (clazz._extends ? getAttribute(get(clazz._extends), key) : undefined)
-  // }
-
-  // A D A P T E R S
-
-  // const adapters = new Map<string, Ref<Adapter>[]>()
-
-  // const allAdapters = modelDb.findAll(core.class.Adapter, {})
-  // console.log('ALL ADAPTERS:')
-  // console.log(allAdapters)
-  // allAdapters.forEach((adapter) => {
-  //   const key = adapter.from + ':' + adapter.to
-  //   const all = adapters.get(key)
-  //   if (all) { all.push(adapter._id) }
-  //   else { adapters.set(key, [adapter._id]) }
-  // })
-
-
-  // platform.setResource(core.method.Adapter_adapt, async () => { throw new Error('Abstract `adapt` function.') })
-
   // C O L L E C T I O N : B A G
 
   class BagProxyHandler implements ProxyHandler<any> {
