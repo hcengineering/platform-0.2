@@ -28,7 +28,7 @@ which are either `Layout<Obj>` or `Instance<Obj>`.
 
 ## Resources
 
-Resource can be anything meaningful: an object in extrnal database, `Vue` component, an asset URL, etc. 
+Resource can be anything meaningful: an object in external database, `Vue` component, an asset URL, etc. 
 For any `resource` there is a known `plugin`, which can *resolve* resource identifier into actual meaningful object.
 
 Plugin is an *isolated* piece of software, and a plugin never directly `import` stuff from other plugins 
@@ -67,7 +67,7 @@ A `Plugin` itself is also a Platform `Resource`, so you can request access to a 
 
 ## Plugins
 
-Following is a plugin package structure. It is not a mandatory, but the stucture I tend to use now.
+Following is a plugin package structure. It is not a mandatory, but the structure I tend to use now.
 
 ```text
 __tests__
