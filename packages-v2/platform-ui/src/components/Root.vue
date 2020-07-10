@@ -14,39 +14,39 @@
 -->
 
 <script lang="ts">
-import { defineComponent, ref, computed } from 'vue'
-import ui, { getPlatform, getUIService } from '..'
-import { PlatformStatus, Status, Severity } from '@anticrm/platform'
+  import { computed, defineComponent, ref } from 'vue'
+  import ui, { getPlatform, getUIService } from '..'
+  import { PlatformStatus, Severity, Status } from '@anticrm/platform'
 
-import Clock from './widgets/Clock.vue'
+  import Clock from './widgets/Clock.vue'
 
-export default defineComponent({
-  components: { Clock },
-  setup () {
-    const platform = getPlatform()
-    const uiService = getUIService()
+  export default defineComponent({
+    components: {Clock},
+    setup() {
+      const platform = getPlatform()
+      const uiService = getUIService()
 
-    const status = ref('')
-    const error = ref('')
+      const status = ref('')
+      const error = ref('')
 
-    platform.addEventListener(PlatformStatus, async (event: string, platformStatus: Status) => {
-      switch(platformStatus.severity) {
-        case Severity.INFO:
-          status.value = platformStatus.message + '...'
-          break
-        case Severity.ERROR:
-          error.value = platformStatus.message + '.'
-          break
-        default:
-          status.value = ''
-      }
-    })
+      platform.addEventListener(PlatformStatus, async (event: string, platformStatus: Status) => {
+        switch (platformStatus.severity) {
+          case Severity.INFO:
+            status.value = platformStatus.message + '...'
+            break
+          case Severity.ERROR:
+            error.value = platformStatus.message + '.'
+            break
+          default:
+            status.value = ''
+        }
+      })
 
-    const location = computed(() => uiService.getLocation())
+      const location = computed(() => uiService.getLocation())
 
-    return { status, error, location, spinner: ui.component.Spinner }
-  },
-})
+      return {status, error, location, spinner: ui.component.Spinner}
+    }
+  })
 </script>
 
 <template>
@@ -57,16 +57,16 @@ export default defineComponent({
         <div class="status-messages">{{status}} {{error}}</div>
         <div class="widgets">
           <div class="clock">
-            <Clock />
+            <Clock/>
           </div>
         </div>
       </div>
     </div>
     <div class="app">
       <widget
-        v-if="location.app"
-        :component="location.app"
-        :fallback="spinner"
+          :component="location.app"
+          :fallback="spinner"
+          v-if="location.app"
       />
       <!--        :path="current.path"-->
       <!--        :params="current.params"-->
@@ -76,66 +76,67 @@ export default defineComponent({
 </template>
 
 <style lang="scss">
-@import "~@anticrm/sparkling-theme/css/_globals.scss";
-@import "~@anticrm/sparkling-theme/css/_variables.scss";
+  @import "~@anticrm/sparkling-theme/css/_globals.scss";
+  @import "~@anticrm/sparkling-theme/css/_variables.scss";
 
-$status-bar-height: 20px;
+  $status-bar-height: 20px;
 
-#ui-root {
-  @include root-style;
+  #ui-root {
+    @include root-style;
 
-  display: flex;
-  flex-direction: column;
+    display: flex;
+    flex-direction: column;
 
-  height: 100vh;
+    height: 100vh;
 
-  .status-bar {
-    background-color: $side-bg-color;
-    color: $content-color;
-    height: $status-bar-height;
-    line-height: $status-bar-height;
-    border-bottom: 1px solid $nav-bg-color;
-    box-sizing: border-box;
+    .status-bar {
+      background-color: $side-bg-color;
+      color: $content-color;
+      height: $status-bar-height;
+      line-height: $status-bar-height;
+      border-bottom: 1px solid $nav-bg-color;
+      box-sizing: border-box;
 
-    .container {
-      display: flex;
-      .logo {
-        padding-left: 1em;
-        padding-right: 1em;
-
-        font-size: 1.25em;
-        font-weight: 700;
-
-        border-right: 1px solid $nav-bg-color;
-      }
-
-      .status-messages {
-        flex-grow: 1;
-        text-align: center;
-      }
-
-      .widgets {
+      .container {
         display: flex;
-        flex-direction: row-reverse;
-        border-left: 1px solid $nav-bg-color;
 
-        .clock {
-          padding-right: 1em;
+        .logo {
           padding-left: 1em;
+          padding-right: 1em;
+
+          font-size: 1.25em;
           font-weight: 700;
+
+          border-right: 1px solid $nav-bg-color;
+        }
+
+        .status-messages {
+          flex-grow: 1;
+          text-align: center;
+        }
+
+        .widgets {
+          display: flex;
+          flex-direction: row-reverse;
+          border-left: 1px solid $nav-bg-color;
+
+          .clock {
+            padding-right: 1em;
+            padding-left: 1em;
+            font-weight: 700;
+          }
         }
       }
     }
-  }
 
-  .error {
-    margin-top: 45vh;
-    text-align: center;
-  }
+    .error {
+      margin-top: 45vh;
+      text-align: center;
+    }
 
-  .app {
-    height: calc(100vh - #{$status-bar-height});
-    background-color: $content-bg-color;
+    .app {
+      height: calc(100vh - #{$status-bar-height});
+      background-color: $content-bg-color;
+    }
   }
-}
 </style>

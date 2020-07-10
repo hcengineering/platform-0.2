@@ -13,22 +13,76 @@
 // limitations under the License.
 //
 
-import { Ref, Doc, Class, Obj, LayoutType, Property, Emb, Resource } from '@anticrm/platform'
+import { Resource } from './platform'
 import { generateId } from './objectid'
+
+export type Property<L, F> = { __layout: L, __feature: F }
+export type Ref<T extends Doc> = string & { __ref: T } & Resource<T>
+
+export interface Obj {
+  _class: Ref<Class<Obj>>
+}
+
+export interface Emb extends Obj {
+  __embedded: true
+}
+
+export interface Doc extends Obj {
+  _class: Ref<Class<Doc>>
+  _id: Ref<Doc>
+  _mixins?: Ref<Class<Doc>>[]
+}
+
+export type LayoutType = string | number
+  | Emb
+  | { [key: string]: LayoutType }
+  | LayoutType[]
+  | undefined
+
+export type PropertyType = Property<LayoutType, any>
+  | Resource<any>
+  | Emb
+  | PropertyType[]
+  | { [key: string]: PropertyType }
+
+export type StringProperty = Property<string, string>
+
+export interface Attribute extends Emb {
+}
+
+export type Attributes<T extends E, E extends Obj> = Record<Exclude<keyof T, keyof E>, Attribute>
+export type AllAttributes<T extends E, E extends Obj> = Required<Attributes<T, E>> & Partial<Attributes<E, Obj>>
+
+export interface EClassifier<T extends E, E extends Obj> extends Doc {
+  _attributes: AllAttributes<T, E>
+  _extends?: Ref<Classifier<E>>
+}
+
+export type Classifier<T extends Obj> = EClassifier<T, Obj>
+
+export interface EClass<T extends E, E extends Obj> extends EClassifier<T, E> {
+  _native?: Resource<Object>
+  _domain?: StringProperty
+}
+
+export type Class<T extends Obj> = EClass<T, Obj>
+
+///
 
 type ToLayout<T> =
   T extends Resource<any> | undefined ? T :
-  T extends Property<infer X, any> | undefined ? X :
-  T extends { __embedded: true } ? T :
-  Layout<T>
+    T extends Property<infer X, any> | undefined ? X :
+      T extends { __embedded: true } ? T :
+        Layout<T>
 
-export type Layout<T> = { [P in keyof T]:
+export type Layout<T> = {
+  [P in keyof T]:
   T[P] extends Resource<any> | undefined ? T[P] :
-  T[P] extends Property<infer X, any> | undefined ? X :
-  T[P] extends { __embedded: true } ? T[P] :
-  T[P] extends (infer X)[] | undefined ? ToLayout<X>[] :
-  T[P] extends { [key: string]: infer X } | undefined ? { [key: string]: ToLayout<X> } :
-  never
+    T[P] extends Property<infer X, any> | undefined ? X :
+      T[P] extends { __embedded: true } ? T[P] :
+        T[P] extends (infer X)[] | undefined ? ToLayout<X>[] :
+          T[P] extends { [key: string]: infer X } | undefined ? { [key: string]: ToLayout<X> } :
+            never
 }
 
 export interface AnyLayout {
@@ -60,18 +114,26 @@ export class MemDb {
 
   set (doc: Layout<Doc>) {
     const id = doc._id
-    if (this.objects.get(id)) { throw new Error('document added already ' + id) }
+    if (this.objects.get(id)) {
+      throw new Error('document added already ' + id)
+    }
     this.objects.set(id, doc)
   }
 
   index (doc: Layout<Doc>) {
-    if (this.byClass === null) { throw new Error('index not created') }
+    if (this.byClass === null) {
+      throw new Error('index not created')
+    }
     const byClass = this.byClass
     const hierarchy = this.getClassHierarchy(doc._class)
     hierarchy.forEach((_class) => {
       const cls = _class as Ref<Class<Doc>>
       const list = byClass.get(cls)
-      if (list) { list.push(doc) } else { byClass.set(cls, [doc]) }
+      if (list) {
+        list.push(doc)
+      } else {
+        byClass.set(cls, [doc])
+      }
     })
   }
 
@@ -82,7 +144,9 @@ export class MemDb {
 
   get (id: Ref<Doc>): Layout<Doc> {
     const obj = this.objects.get(id)
-    if (!obj) { throw new Error('document not found ' + id) }
+    if (!obj) {
+      throw new Error('document not found ' + id)
+    }
     return obj
   }
 
@@ -138,7 +202,9 @@ export class MemDb {
 
   mixin<T extends E, E extends Doc> (id: Ref<E>, clazz: Ref<Class<T>>, values: Layout<Omit<T, keyof E>>): void {
     const doc = this.get(id)
-    if (!doc._mixins) { doc._mixins = [] }
+    if (!doc._mixins) {
+      doc._mixins = []
+    }
     doc._mixins.push(clazz)
     this.assign(doc, clazz, values as AnyLayout)
   }
@@ -162,7 +228,9 @@ export class MemDb {
   }
 
   loadModel (model: Layout<Doc>[]) {
-    for (const doc of model) { this.set(doc) }
+    for (const doc of model) {
+      this.set(doc)
+    }
     // if (this.byClass === null) { this.byClass = new Map<Ref<ClassLayout>, Layout<Doc>[]>() }
     // for (const doc of model) { this.index(doc) }
   }

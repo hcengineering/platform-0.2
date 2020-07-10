@@ -25,7 +25,6 @@ import SignupForm from './internal/SignupForm.vue'
  * Licensed under the Eclipse Public License, Version 2.0
  */
 export default async (platform: Platform): Promise<Service> => {
-
   platform.setResource(login.component.LoginForm, LoginForm)
   platform.setResource(login.component.SignupForm, SignupForm)
 

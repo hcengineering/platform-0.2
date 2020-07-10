@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Plugin, Service, plugin } from '..'
+import { Plugin, plugin, Service } from '..'
 
 export interface TestPlugin extends Service {
   id: Plugin<Service>

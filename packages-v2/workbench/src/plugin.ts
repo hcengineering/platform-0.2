@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Platform, Service } from '@anticrm/platform'
+import { Platform } from '@anticrm/platform'
 import workbench, { WorkbenchService } from '.'
 
 import Workbench from './components/Workbench.vue'
@@ -28,6 +28,5 @@ export default async (platform: Platform): Promise<WorkbenchService> => {
 
   platform.setResource(workbench.component.Workbench, Workbench)
 
-  return {
-  }
+  return {}
 }

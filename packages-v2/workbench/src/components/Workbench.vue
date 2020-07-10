@@ -14,25 +14,25 @@
 -->
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+  import { defineComponent } from 'vue'
 
-import MainView from './MainView.vue'
-import Home from './Home.vue'
-import Header from './header/Header.vue'
+  import MainView from './MainView.vue'
+  import Home from './Home.vue'
+  import Header from './header/Header.vue'
 
-export default defineComponent({
-  components: { MainView, Home, Header },
-  props: {
-    path: String,
-    params: Object
-  },
-})
+  export default defineComponent({
+    components: {MainView, Home, Header},
+    props: {
+      path: String,
+      params: Object
+    }
+  })
 </script>
 
 <template>
   <div id="workbench">
     <header>
-      <Header />
+      <Header/>
     </header>
 
     <nav>
@@ -41,9 +41,9 @@ export default defineComponent({
 
     <main>
       <Suspense v-if="path">
-        <MainView :path="path" :params="params" />
+        <MainView :params="params" :path="path"/>
       </Suspense>
-      <Home v-else />
+      <Home v-else/>
     </main>
 
     <aside>
@@ -55,67 +55,67 @@ export default defineComponent({
 </template>
 
 <style lang="scss">
-@import "~@anticrm/sparkling-theme/css/_variables.scss";
+  @import "~@anticrm/sparkling-theme/css/_variables.scss";
 
-#workbench {
-  display: grid;
+  #workbench {
+    display: grid;
 
-  grid-template-columns: $pictogram-size 1fr auto;
-  grid-template-rows: $pictogram-size 1fr 24px;
+    grid-template-columns: $pictogram-size 1fr auto;
+    grid-template-rows: $pictogram-size 1fr 24px;
 
-  height: 100%;
+    height: 100%;
 
-  header {
-    grid-column-start: 1;
-    grid-column-end: 4;
+    header {
+      grid-column-start: 1;
+      grid-column-end: 4;
 
-    grid-row-start: 1;
-    grid-row-end: 2;
+      grid-row-start: 1;
+      grid-row-end: 2;
 
-    background-color: $header-bg-color;
-    border-bottom: 1px solid $workspace-separator-color;
+      background-color: $header-bg-color;
+      border-bottom: 1px solid $workspace-separator-color;
+    }
+
+    nav {
+      grid-column-start: 1;
+      grid-column-end: 2;
+
+      grid-row-start: 2;
+      grid-row-end: 3;
+
+      background-color: $nav-bg-color;
+    }
+
+    main {
+      grid-column-start: 2;
+      grid-column-end: 3;
+
+      grid-row-start: 2;
+      grid-row-end: 3;
+
+      background-color: $content-bg-color;
+      // padding: 0em 1em;
+    }
+
+    aside {
+      grid-column-start: 3;
+      grid-column-end: 4;
+
+      grid-row-start: 2;
+      grid-row-end: 3;
+
+      background-color: $header-bg-color;
+      border-left: 1px solid $workspace-separator-color;
+    }
+
+    footer {
+      grid-column-start: 1;
+      grid-column-end: 4;
+
+      grid-row-start: 3;
+      grid-row-end: 4;
+
+      background-color: purple;
+    }
   }
-
-  nav {
-    grid-column-start: 1;
-    grid-column-end: 2;
-
-    grid-row-start: 2;
-    grid-row-end: 3;
-
-    background-color: $nav-bg-color;
-  }
-
-  main {
-    grid-column-start: 2;
-    grid-column-end: 3;
-
-    grid-row-start: 2;
-    grid-row-end: 3;
-
-    background-color: $content-bg-color;
-    // padding: 0em 1em;
-  }
-
-  aside {
-    grid-column-start: 3;
-    grid-column-end: 4;
-
-    grid-row-start: 2;
-    grid-row-end: 3;
-
-    background-color: $header-bg-color;
-    border-left: 1px solid $workspace-separator-color;
-  }
-
-  footer {
-    grid-column-start: 1;
-    grid-column-end: 4;
-
-    grid-row-start: 3;
-    grid-row-end: 4;
-
-    background-color: purple;
-  }
-}
 </style>

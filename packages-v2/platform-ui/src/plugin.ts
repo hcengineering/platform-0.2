@@ -15,8 +15,8 @@
 
 import { Platform } from '@anticrm/platform'
 import ui, { AnyComponent } from '@anticrm/platform-ui'
-import { UIService, PlatformInjectionKey, UIInjectionKey, Location } from '.'
-import { h, ref, PropType, createApp, defineComponent, App } from 'vue'
+import { Location, PlatformInjectionKey, UIInjectionKey, UIService } from '.'
+import { createApp, defineComponent, h, PropType, ref } from 'vue'
 
 import Root from './components/Root.vue'
 import Spinner from './components/Spinner.vue'
@@ -28,7 +28,6 @@ import BadComponent from './components/BadComponent.vue'
  * Licensed under the Eclipse Public License, Version 2.0
  */
 export default async (platform: Platform): Promise<UIService> => {
-
   // V U E  A P P
 
   const app = createApp(Root)
@@ -51,7 +50,7 @@ export default async (platform: Platform): Promise<UIService> => {
       }
     },
     render() {
-      let resolved = platform.peekResource(this.component as AnyComponent)
+      const resolved = platform.peekResource(this.component as AnyComponent)
       if (resolved) {
         return h(resolved)
       }
@@ -135,5 +134,4 @@ export default async (platform: Platform): Promise<UIService> => {
   app.provide(UIInjectionKey, service)
 
   return service
-
 }

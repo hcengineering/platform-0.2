@@ -11,9 +11,9 @@
   font-style: normal;
   font-weight: 400;
   src: local('IBM Plex Sans'),
-    local('IBMPlexSans'),
-    url('~@anticrm/sparkling-theme/fonts/complete/woff2/IBMPlexSans-Regular.woff2') format('woff2'),
-    url('~@anticrm/sparkling-theme/fonts/complete/woff/IBMPlexSans-Regular.woff') format('woff');
+  local('IBMPlexSans'),
+  url('~@anticrm/sparkling-theme/fonts/complete/woff2/IBMPlexSans-Regular.woff2') format('woff2'),
+  url('~@anticrm/sparkling-theme/fonts/complete/woff/IBMPlexSans-Regular.woff') format('woff');
 }
 
 @font-face {
@@ -21,9 +21,9 @@
   font-style: normal;
   font-weight: 500;
   src: local('IBM Plex Sans Medium'),
-    local('IBMPlexSans-Medium'),
-    url('~@anticrm/sparkling-theme/fonts/complete/woff2/IBMPlexSans-Medium.woff2') format('woff2'),
-    url('~@anticrm/sparkling-theme/fonts/complete/woff/IBMPlexSans-Medium.woff') format('woff');
+  local('IBMPlexSans-Medium'),
+  url('~@anticrm/sparkling-theme/fonts/complete/woff2/IBMPlexSans-Medium.woff2') format('woff2'),
+  url('~@anticrm/sparkling-theme/fonts/complete/woff/IBMPlexSans-Medium.woff') format('woff');
 }
 
 @font-face {
@@ -31,9 +31,9 @@
   font-style: normal;
   font-weight: 700;
   src: local('IBM Plex Sans Bold'),
-    local('IBMPlexSans-Bold'),
-    url('~@anticrm/sparkling-theme/fonts/complete/woff2/IBMPlexSans-Bold.woff2') format('woff2'),
-    url('~@anticrm/sparkling-theme/fonts/complete/woff/IBMPlexSans-Bold.woff') format('woff');
+  local('IBMPlexSans-Bold'),
+  url('~@anticrm/sparkling-theme/fonts/complete/woff2/IBMPlexSans-Bold.woff2') format('woff2'),
+  url('~@anticrm/sparkling-theme/fonts/complete/woff/IBMPlexSans-Bold.woff') format('woff');
 }
 
 @font-face {
@@ -41,7 +41,7 @@
   font-style: normal;
   font-weight: 400;
   src: local('Raleway'),
-    url('~@anticrm/sparkling-theme/fonts/complete/otf/Raleway-Regular.otf');
+  url('~@anticrm/sparkling-theme/fonts/complete/otf/Raleway-Regular.otf');
 }
 
 @font-face {
@@ -49,7 +49,7 @@
   font-style: normal;
   font-weight: 700;
   src: local('Raleway Bold'),
-    url('~@anticrm/sparkling-theme/fonts/complete/otf/Raleway-Bold.otf');
+  url('~@anticrm/sparkling-theme/fonts/complete/otf/Raleway-Bold.otf');
 }
 
 a {
@@ -125,7 +125,7 @@ a:hover {
 
 .text-small-uppercase {
   font-size: 10px;
-  text-transform: uppercase;  
+  text-transform: uppercase;
 }
 
 .content-dark {
@@ -164,12 +164,15 @@ a:hover {
   .tfoot {
     display: table-footer-group;
   }
+
   .col {
     display: table-column;
   }
+
   .colgroup {
     display: table-column-group;
   }
+
   .caption {
     display: table-caption;
   }

@@ -14,52 +14,52 @@
 -->
 
 <script lang="ts">
-import { defineComponent, ref, computed } from 'vue'
-import { getSession } from '@anticrm/platform-vue'
-import { LoginInfo } from '@anticrm/platform-login'
-import contact from '@anticrm/contact'
+  import { defineComponent, ref } from 'vue'
+  import { getSession } from '@anticrm/platform-vue'
+  import { LoginInfo } from '@anticrm/platform-login'
+  import contact from '@anticrm/contact'
 
-import NewItemMenu from './NewItemMenu.vue'
-import Action from '@anticrm/platform-vue/src/components/Action.vue'
+  import NewItemMenu from './NewItemMenu.vue'
+  import Action from '@anticrm/platform-vue/src/components/Action.vue'
 
-import workbench, { AccountLocalStorage } from '../..'
+  import workbench, { AccountLocalStorage } from '../..'
 
-export default defineComponent({
-  components: { NewItemMenu, Action },
-  props: {
-    path: String,
-    params: Object
-  },
-  setup () {
+  export default defineComponent({
+    components: {NewItemMenu, Action},
+    props: {
+      path: String,
+      params: Object
+    },
+    setup() {
 
-    const name = ref('')
+      const name = ref('')
 
-    const accountJson = localStorage.getItem(AccountLocalStorage)
-    const account = JSON.parse(accountJson) as LoginInfo
+      const accountJson = localStorage.getItem(AccountLocalStorage)
+      const account = JSON.parse(accountJson) as LoginInfo
 
-    const session = getSession()
-    const cursor = session.find(contact.class.Person, {
-      email: account.email as any // TODO: fix `find`
-    })
-    cursor.all().then(persons => {
-      console.log('PERSONS', persons)
-      if (persons.length === 1) {
-        name.value = persons[0].firstName + ' ' + persons[0].lastName
-      } else {
-        name.value = 'No account'
-      }
-    })
+      const session = getSession()
+      const cursor = session.find(contact.class.Person, {
+        email: account.email as any // TODO: fix `find`
+      })
+      cursor.all().then(persons => {
+        console.log('PERSONS', persons)
+        if (persons.length === 1) {
+          name.value = persons[0].firstName + ' ' + persons[0].lastName
+        } else {
+          name.value = 'No account'
+        }
+      })
 
-    return { workbench, name }
-  }
-})
+      return {workbench, name}
+    }
+  })
 </script>
 
 <template>
   <div class="workbench-header">
     <div class="container">
       <div class="valign">
-        <NewItemMenu />
+        <NewItemMenu/>
       </div>
       <div class="right">
         <div>
@@ -74,23 +74,24 @@ export default defineComponent({
 </template>
 
 <style lang="scss">
-@import "~@anticrm/sparkling-theme/css/_variables.scss";
-.workbench-header {
-  height: 100%;
-  width: 100%;
+  @import "~@anticrm/sparkling-theme/css/_variables.scss";
 
-  .container {
-    display: flex;
+  .workbench-header {
+    height: 100%;
+    width: 100%;
 
-    .valign {
-      line-height: $pictogram-size;
-    }
-
-    .right {
-      flex-grow: 1;
+    .container {
       display: flex;
-      flex-direction: row-reverse;
+
+      .valign {
+        line-height: $pictogram-size;
+      }
+
+      .right {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: row-reverse;
+      }
     }
   }
-}
 </style>

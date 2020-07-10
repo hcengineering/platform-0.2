@@ -14,27 +14,27 @@
 -->
 
 <script lang="ts">
-import { defineComponent, ref, onUnmounted } from 'vue'
+  import { defineComponent, onUnmounted, ref } from 'vue'
 
-export default defineComponent({
-  setup () {
-    const hours = ref('')
-    const minutes = ref('')
-    const delimiter = ref(false)
-    const interval = setInterval(() => {
-      const date = new Date()
-      const h = date.getHours()
-      hours.value = h < 10 ? '0' + h : h.toString()
-      const m = date.getMinutes()
-      minutes.value = m < 10 ? '0' + m : m.toString()
-      delimiter.value = !delimiter.value
-    }, 500)
-    onUnmounted(() => {
-      clearInterval(interval)
-    })
-    return { hours, minutes, delimiter: delimiter }
-  },
-})
+  export default defineComponent({
+    setup() {
+      const hours = ref('')
+      const minutes = ref('')
+      const delimiter = ref(false)
+      const interval = setInterval(() => {
+        const date = new Date()
+        const h = date.getHours()
+        hours.value = h < 10 ? '0' + h : h.toString()
+        const m = date.getMinutes()
+        minutes.value = m < 10 ? '0' + m : m.toString()
+        delimiter.value = !delimiter.value
+      }, 500)
+      onUnmounted(() => {
+        clearInterval(interval)
+      })
+      return {hours, minutes, delimiter: delimiter}
+    }
+  })
 </script>
 
 <template>

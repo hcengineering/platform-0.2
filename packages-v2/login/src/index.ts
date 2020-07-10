@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { plugin, Service, Plugin, Metadata, Platform } from '@anticrm/platform'
+import { Metadata, Plugin, plugin, Service } from '@anticrm/platform'
 import { AnyComponent } from '@anticrm/platform-ui'
 
 export interface LoginInfo {

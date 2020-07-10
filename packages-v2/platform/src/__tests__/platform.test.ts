@@ -15,9 +15,9 @@
 
 /* eslint-env jest */
 
-import { Platform, identify, Plugin, Service, Resource, Metadata, createPlatform } from '..'
+import { createPlatform, identify, Metadata, Plugin, Resource, Service } from '..'
 
-import { plugin1, descriptor1, plugin1State, plugin2, descriptor2, plugin2State, plugin3, descriptor3 } from './shared'
+import { descriptor1, descriptor2, descriptor3, plugin1, plugin1State, plugin2, plugin2State, plugin3 } from './shared'
 
 type AnyPlugin = Plugin<Service>
 
@@ -79,10 +79,10 @@ describe('platform', () => {
   })
 
   it('should resolve resource second time', () => {
-    const resolved = platform.getResource('resource2:plugin2.Resource2' as Resource<string>)
+    const resolved = platform.getResource('resource2:plugin2.Resource' as Resource<string>)
     expect(resolved).toBeInstanceOf(Promise)
     return resolved.then(resource => {
-      expect(resource).toBe('hello resource2:My.Resource2')
+      expect(resource).toBe('hello resource2:My.Resource')
     })
   })
 

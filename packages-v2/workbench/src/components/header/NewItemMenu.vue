@@ -14,50 +14,49 @@
 -->
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
-import core, { Ref, Class, Obj, Doc, CoreService, Instance } from '@anticrm/platform-core'
-import { UIDecorator } from '@anticrm/platform-ui'
-import { getSession, getUIService } from '@anticrm/platform-vue'
-import workbench, { DocCreateAction } from '../..'
+  import { defineComponent, ref } from 'vue'
+  import core, { Class, Instance, Obj, Ref } from '@anticrm/platform-core'
+  import { getSession, getUIService } from '@anticrm/platform-vue'
+  import { DocCreateAction } from '../..'
 
-import LinkTo from '@anticrm/platform-vue/src/components/LinkTo.vue'
-import Label from '@anticrm/platform-vue/src/components/Label.vue'
-import Icon from '@anticrm/platform-vue/src/components/Icon.vue'
+  import LinkTo from '@anticrm/platform-vue/src/components/LinkTo.vue'
+  import Label from '@anticrm/platform-vue/src/components/Label.vue'
+  import Icon from '@anticrm/platform-vue/src/components/Icon.vue'
 
-export default defineComponent({
-  components: { LinkTo, Label, Icon },
-  setup () {
-    const actions = ref([] as Instance<DocCreateAction>[])
+  export default defineComponent({
+    components: {LinkTo, Label, Icon},
+    setup() {
+      const actions = ref([] as Instance<DocCreateAction>[])
 
-    const session = getSession()
+      const session = getSession()
 
-    // session.find(workbench.class.DocCreateAction, {})
-    //   .then(acts => { actions.value = acts })
+      // session.find(workbench.class.DocCreateAction, {})
+      //   .then(acts => { actions.value = acts })
 
-    const uiService = getUIService()
+      const uiService = getUIService()
 
-    async function label (_class: Ref<Class<Obj>>): Promise<string> {
-      return uiService.getClassModel(await session.getInstance(core.class.Class, _class)).then(model => model.label)
+      async function label(_class: Ref<Class<Obj>>): Promise<string> {
+        return uiService.getClassModel(await session.getInstance(core.class.Class, _class)).then(model => model.label)
+      }
+
+      async function icon(_class: Ref<Class<Obj>>): Promise<string> {
+        return uiService.getClassModel(await session.getInstance(core.class.Class, _class)).then(model => model.icon)
+      }
+
+      return {actions, label, icon}
     }
-
-    async function icon (_class: Ref<Class<Obj>>): Promise<string> {
-      return uiService.getClassModel(await session.getInstance(core.class.Class, _class)).then(model => model.icon)
-    }
-
-    return { actions, label, icon }
-  }
-})
+  })
 </script>
 
 <template>
   <div class="workbench-new-item-menu">
-    <Icon icon="icon:workbench.NewItem" class="icon-embed-2x" />
+    <Icon class="icon-embed-2x" icon="icon:workbench.NewItem"/>
     <div class="menu">
       <div v-for="action in actions" :key="action._id" class="item">
         <LinkTo :path="action.clazz">
-          <Icon :icon="icon(action.clazz)" />
-          <br />
-          <Label class="caption-6" :text="label(action.clazz)" />
+          <Icon :icon="icon(action.clazz)"/>
+          <br/>
+          <Label :text="label(action.clazz)" class="caption-6"/>
         </LinkTo>
         <!-- {{action.clazz}}</LinkTo> -->
       </div>
@@ -66,31 +65,31 @@ export default defineComponent({
 </template>
 
 <style lang="scss">
-@import "~@anticrm/sparkling-theme/css/_variables.scss";
+  @import "~@anticrm/sparkling-theme/css/_variables.scss";
 
-.workbench-new-item-menu {
-  &:hover {
-    .menu {
-      visibility: visible;
+  .workbench-new-item-menu {
+    &:hover {
+      .menu {
+        visibility: visible;
+      }
     }
-  }
 
-  .menu {
-    display: flex;
-    position: absolute;
-    background-color: $nav-bg-color;
-    border: 1px solid $content-color;
-    visibility: hidden;
+    .menu {
+      display: flex;
+      position: absolute;
+      background-color: $nav-bg-color;
+      border: 1px solid $content-color;
+      visibility: hidden;
 
-    .item {
-      padding: 0.5em;
-      text-align: center;
+      .item {
+        padding: 0.5em;
+        text-align: center;
 
-      .icon {
-        width: 2em;
-        height: 2em;
+        .icon {
+          width: 2em;
+          height: 2em;
+        }
       }
     }
   }
-}
 </style>

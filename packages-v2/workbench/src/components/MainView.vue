@@ -14,39 +14,41 @@
 -->
 
 <script lang="ts">
-import { defineComponent, ref, computed } from 'vue'
-import ui from '@anticrm/platform-ui'
+  import { computed, defineComponent, ref } from 'vue'
+  import ui from '@anticrm/platform-ui'
 
-export default defineComponent({
-  components: {},
-  props: {
-    path: Array,
-    params: Object
-  },
+  export default defineComponent({
+    components: {},
+    props: {
+      path: Array,
+      params: Object
+    },
 
-  // Adapt `content` to a `Component`. Forward to `Component`.
-  setup (props, context) {
-    const component = ref(ui.component.Spinner)
-    const operation = computed(() => props.path[0])
-    const resource = props.path.split('/')[0] as Resource<any>
-    session.adapt(resource, ComponentKind)
-      .then(comp => { component.value = comp })
+    // Adapt `content` to a `Component`. Forward to `Component`.
+    setup(props, context) {
+      const component = ref(ui.component.Spinner)
+      const operation = computed(() => props.path[0])
+      const resource = props.path.split('/')[0] as Resource<any>
+      session.adapt(resource, ComponentKind)
+        .then(comp => {
+          component.value = comp
+        })
 
-    return {
-      component, resource, operation
+      return {
+        component, resource, operation
+      }
     }
-  }
-})
+  })
 </script>
 
 <template>
   <div style="height: 100%">
     <widget
-      v-if="component"
-      :component="component"
-      :resource="resource"
-      :operation="operation"
-      :params="params"
+        :component="component"
+        :operation="operation"
+        :params="params"
+        :resource="resource"
+        v-if="component"
     />
   </div>
 </template>

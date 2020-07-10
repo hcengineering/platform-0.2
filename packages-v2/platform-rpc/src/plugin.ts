@@ -1,22 +1,21 @@
 //
 // Copyright © 2020 Anticrm Platform Contributors.
-// 
+//
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
 // obtain a copy of the License at https://www.eclipse.org/legal/epl-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// 
+//
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
 
-import { Platform } from '@anticrm/platform'
-import { ReqId, Request, readResponse, serialize } from '@anticrm/rpc'
+import { Platform, readResponse, ReqId, Request, serialize } from '@anticrm/platform'
 
-import client, { RpcService, EventListener, NetworkActivity } from '.'
+import client, { EventListener, NetworkActivity, RpcService } from '.'
 
 /*!
   * Anticrm Platform™ Remote Procedure Call Plugin
@@ -24,12 +23,15 @@ import client, { RpcService, EventListener, NetworkActivity } from '.'
   * Licensed under the Eclipse Public License, Version 2.0
   */
 export default async (platform: Platform): Promise<RpcService> => {
+  interface PromiseInfo {
+    resolve: (value?: any) => void,
+    reject: (error: any) => void
+  }
 
-  interface PromiseInfo { resolve: (value?: any) => void, reject: (error: any) => void }
   const requests = new Map<ReqId, PromiseInfo>()
   let lastId = 0
 
-  function createWebsocket () {
+  function createWebsocket() {
     const host = platform.getMetadata(client.metadata.WSHost)
     const port = platform.getMetadata(client.metadata.WSPort)
     const token = platform.getMetadata(client.metadata.WSToken)
@@ -77,8 +79,9 @@ export default async (platform: Platform): Promise<RpcService> => {
   }
 
   let websocket: WebSocket | null = null
+
   async function getWebSocket () {
-    if (websocket === null || 
+    if (websocket === null ||
       websocket.readyState === WebSocket.CLOSED ||
       websocket.readyState === WebSocket.CLOSING) {
       websocket = await createWebsocket()
@@ -108,5 +111,4 @@ export default async (platform: Platform): Promise<RpcService> => {
       listeners.push(listener)
     }
   }
-
 }

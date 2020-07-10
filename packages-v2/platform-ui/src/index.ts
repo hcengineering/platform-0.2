@@ -30,15 +30,22 @@ export interface Location {
 
 export interface UIService extends Service {
   getApp(): App
+
   navigate(url: string): void
+
   getLocation(): Location
 }
 
 export const PlatformInjectionKey = Symbol('platform')
 export const UIInjectionKey = Symbol('platform-ui')
 
-export function getPlatform () { return inject(PlatformInjectionKey) as Platform }
-export function getUIService () { return inject(UIInjectionKey) as UIService }
+export function getPlatform() {
+  return inject(PlatformInjectionKey) as Platform
+}
+
+export function getUIService() {
+  return inject(UIInjectionKey) as UIService
+}
 
 export default plugin('vue' as Plugin<UIService>, {}, {
   metadata: {

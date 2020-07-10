@@ -13,14 +13,14 @@
 // limitations under the License.
 //
 
-import { plugin, Service, Plugin, Resource, Metadata } from '@anticrm/platform'
+import { plugin, Plugin, Service } from '@anticrm/platform'
 import { AnyComponent } from '@anticrm/platform-ui'
 
-export interface WorkbenchService extends Service {}
+export interface WorkbenchService extends Service {
+}
 
-export default plugin('workbench' as Plugin<WorkbenchService>, {
-}, {
+export default plugin('workbench' as Plugin<WorkbenchService>, {}, {
   component: {
     Workbench: '' as AnyComponent
-  },
+  }
 })

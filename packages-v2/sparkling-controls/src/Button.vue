@@ -14,72 +14,73 @@
 -->
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+  import { defineComponent } from 'vue'
 
-export default defineComponent({
-  props: {
-    disabled: Boolean
-  }
-})
+  export default defineComponent({
+    props: {
+      disabled: Boolean
+    }
+  })
 </script>
 
 <template>
   <button type="button" class="sparkling-button" :disabled="disabled">
-    <slot />
+    <slot/>
   </button>
 </template>
 
 <style lang="scss">
-@import "~@anticrm/sparkling-theme/css/_variables.scss";
+  @import "~@anticrm/sparkling-theme/css/_variables.scss";
 
-.sparkling-button {
-  display: inline-block;
-  border: 1px solid currentColor;
-  border-radius: 2em;
-  padding: 0.5em 1.33em 0.5em;
-  box-sizing: border-box;
-  cursor: pointer;
-  user-select: none;
-  text-align: center;
+  .sparkling-button {
+    display: inline-block;
+    border: 1px solid currentColor;
+    border-radius: 2em;
+    padding: 0.5em 1.33em 0.5em;
+    box-sizing: border-box;
+    cursor: pointer;
+    user-select: none;
+    text-align: center;
 
-  font: inherit;
-  font-weight: 400;
+    font: inherit;
+    font-weight: 400;
 
-  color: inherit;
-  background-color: inherit;
+    color: inherit;
+    background-color: inherit;
 
-  &:focus {
-    outline: none;
-    border-color: $highlight-color;
-    box-shadow: inset 0px 0px 2px 0px $highlight-color;
+    &:focus {
+      outline: none;
+      border-color: $highlight-color;
+      box-shadow: inset 0px 0px 2px 0px $highlight-color;
+    }
+
+    &.large {
+      padding: 0.75em 1.5em 0.75em;
+    }
+
+    &.small {
+      padding: 0 0.6em 0;
+    }
+
+    &:hover {
+      border-color: $highlight-color;
+      // color: $highlight-color;
+      // background-color: $highlight-color;
+      background-color: darken($highlight-color, 10%);
+    }
+
+    &.primary {
+      // border-color: $highlight-color;
+      background-color: $highlight-color;
+      // color: $nav-bg-color;
+      font-weight: bold;
+    }
+
+    &:hover.primary {
+      background-color: darken($highlight-color, 5%);
+      // border-color: $highlight-color;
+      // box-shadow:inset 0px 0px 3px 0px currentColor;
+      // color: $highlight-color;
+    }
   }
-
-  &.large {
-    padding: 0.75em 1.5em 0.75em;
-  }
-  &.small {
-    padding: 0 0.6em 0;
-  }
-
-  &:hover {
-    border-color: $highlight-color;
-    // color: $highlight-color;
-    // background-color: $highlight-color;
-    background-color: darken($highlight-color, 10%);
-  }
-
-  &.primary {
-    // border-color: $highlight-color;
-    background-color: $highlight-color;
-    // color: $nav-bg-color;
-    font-weight: bold;
-  }
-
-  &:hover.primary {
-    background-color: darken($highlight-color, 5%);
-    // border-color: $highlight-color;
-    // box-shadow:inset 0px 0px 3px 0px currentColor;
-    // color: $highlight-color;
-  }
-}
 </style>
