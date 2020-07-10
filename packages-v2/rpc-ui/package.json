@@ -1,0 +1,16 @@
+{
+  "name": "@anticrm/rpc-ui",
+  "version": "0.1.1",
+  "main": "src/index.ts",
+  "author": "Anticrm Platform Contributors (https://github.com/anticrm)",
+  "license": "EPL-2.0",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "doc": "typedoc --out ./generated_docs --readme none",
+    "lint": "eslint ./**/*.ts"
+  },
+  "dependencies": {
+    "@anticrm/platform": "^0.1.4"
+  }
+}

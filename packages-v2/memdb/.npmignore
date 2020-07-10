@@ -1,0 +1,9 @@
+lib/__tests__
+src
+.*.js
+*.config.js
+tsconfig.*
+coverage
+generated_docs
+images
+

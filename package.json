@@ -2,8 +2,7 @@
   "name": "root",
   "private": true,
   "workspaces": [
-    "packages/*",
-    "plugins/*",
-    "dev/*"
+    "packages-v2/*",
+    "dev-v2/*"
   ]
 }

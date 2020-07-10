@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "commonjs",
+    "outDir": "./lib",
+    "rootDir": "./src",
+    "strict": true,
+    "composite": true,
+    "declaration": true
+  },
+  "references": [
+    {
+      "path": "../memdb"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "name": "@anticrm/platform",
+  "version": "0.1.8",
+  "main": "src/index.ts",
+  "author": "Anticrm Platform Contributors (https://github.com/anticrm)",
+  "license": "EPL-2.0",
+  "scripts": {
+    "build": "tsc --build",
+    "test": "jest",
+    "doc": "typedoc --out ./generated_docs --excludeNotExported --inputFiles README.md --inputFiles src/index.ts --media images",
+    "lint": "eslint src/**/*.ts"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^2.33.0",
+    "@typescript-eslint/parser": "^2.33.0",
+    "eslint": "^7.0.0",
+    "eslint-config-standard": "^14.1.1",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "typedoc": "^0.17.6",
+    "typescript": "^3.9.4"
+  }
+}
