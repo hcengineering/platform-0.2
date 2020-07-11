@@ -16,12 +16,13 @@
 <script lang="ts">
   import { defineComponent } from 'vue'
 
+  import Nav from './nav/Nav.vue'
   import MainView from './MainView.vue'
   import Home from './Home.vue'
-  import Header from './header/Header.vue'
+  // import Header from './header/Header.vue'
 
   export default defineComponent({
-    components: {MainView, Home, Header},
+    components: {Nav, MainView, Home},
     props: {
       path: String,
       params: Object
@@ -32,11 +33,13 @@
 <template>
   <div id="workbench">
     <header>
-      <Header/>
+      <div/>
+      <!--      <Header/>-->
     </header>
 
     <nav>
       <!-- <Sidenav :applications="applications" /> -->
+      <Nav/>
     </nav>
 
     <main>

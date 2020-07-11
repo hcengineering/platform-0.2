@@ -14,19 +14,24 @@
 //
 
 import { Platform } from '@anticrm/platform'
+import { CoreService } from '@anticrm/platform-core'
 import workbench, { WorkbenchService } from '.'
 
 import Workbench from './components/Workbench.vue'
+import { UIService } from '@anticrm/platform-ui'
 
-console.log('PLUGIN: `workbench` parsed')
+import { CoreInjectionKey } from './int'
+
 /*!
  * Anticrm Platform™ Workbench Plugin
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */
-export default async (platform: Platform): Promise<WorkbenchService> => {
+export default async (platform: Platform, deps: { core: CoreService, ui: UIService }): Promise<WorkbenchService> => {
 
   platform.setResource(workbench.component.Workbench, Workbench)
+
+  deps.ui.getApp().provide(CoreInjectionKey, deps.core)
 
   return {}
 }

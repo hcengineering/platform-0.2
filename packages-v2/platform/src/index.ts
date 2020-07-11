@@ -14,5 +14,6 @@
 //
 
 export * from './platform'
+export * from './core'
 export * from './memdb'
 export * from './rpc'

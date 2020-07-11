@@ -18,33 +18,25 @@
   import ui, { getPlatform, getUIService } from '..'
   import { PlatformStatus, Severity, Status } from '@anticrm/platform'
 
+  import StatusComponent from './Status.vue'
   import Clock from './widgets/Clock.vue'
 
   export default defineComponent({
-    components: {Clock},
+    components: {Status: StatusComponent, Clock},
     setup() {
       const platform = getPlatform()
       const uiService = getUIService()
 
-      const status = ref('')
-      const error = ref('')
+      const status = ref(new Status(Severity.OK, 0, ''))
+      const icon = ref('')
 
       platform.addEventListener(PlatformStatus, async (event: string, platformStatus: Status) => {
-        switch (platformStatus.severity) {
-          case Severity.INFO:
-            status.value = platformStatus.message + '...'
-            break
-          case Severity.ERROR:
-            error.value = platformStatus.message + '.'
-            break
-          default:
-            status.value = ''
-        }
+        status.value = platformStatus
       })
 
       const location = computed(() => uiService.getLocation())
 
-      return {status, error, location, spinner: ui.component.Spinner}
+      return {status, icon, location, spinner: ui.component.Spinner}
     }
   })
 </script>
@@ -54,7 +46,9 @@
     <div class="status-bar">
       <div class="container">
         <div class="logo">&#x24C5;</div>
-        <div class="status-messages">{{status}} {{error}}</div>
+        <div class="status-messages">
+          <Status :status="status"/>
+        </div>
         <div class="widgets">
           <div class="clock">
             <Clock/>
@@ -95,14 +89,16 @@
       height: $status-bar-height;
       line-height: $status-bar-height;
       border-bottom: 1px solid $nav-bg-color;
-      box-sizing: border-box;
+      /*box-sizing: border-box;*/
 
       .container {
         display: flex;
 
         .logo {
-          padding-left: 1em;
-          padding-right: 1em;
+          width: $pictogram-size;
+          text-align: center;
+          /*padding-left: 1em;*/
+          /*padding-right: 1em;*/
 
           font-size: 1.25em;
           font-weight: 700;

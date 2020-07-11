@@ -14,7 +14,7 @@
 -->
 
 <script lang="ts">
-  import { computed, defineComponent, ref } from 'vue'
+  import { defineComponent, ref } from 'vue'
   import ui from '@anticrm/platform-ui'
 
   export default defineComponent({
@@ -27,15 +27,15 @@
     // Adapt `content` to a `Component`. Forward to `Component`.
     setup(props, context) {
       const component = ref(ui.component.Spinner)
-      const operation = computed(() => props.path[0])
-      const resource = props.path.split('/')[0] as Resource<any>
-      session.adapt(resource, ComponentKind)
-        .then(comp => {
-          component.value = comp
-        })
+      // const operation = computed(() => props.path[0])
+      // const resource = props.path.split('/')[0] as Resource<any>
+      // session.adapt(resource, ComponentKind)
+      //   .then(comp => {
+      //     component.value = comp
+      //   })
 
       return {
-        component, resource, operation
+        component // resource, operation
       }
     }
   })
@@ -43,12 +43,11 @@
 
 <template>
   <div style="height: 100%">
-    <widget
-        :component="component"
-        :operation="operation"
-        :params="params"
-        :resource="resource"
-        v-if="component"
+    <widget :component="component"
     />
   </div>
 </template>
+
+<!--        :operation="operation"-->
+<!--        :params="params"-->
+<!--        :resource="resource"-->

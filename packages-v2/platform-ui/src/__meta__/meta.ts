@@ -19,7 +19,8 @@ import ui from '../index'
 export default (platform: Platform) => {
   const spritesUrl = require('../../assets/icons.svg')
   platform.loadMetadata(ui.icon, {
-    Default: spritesUrl + '#search',
+    Default: spritesUrl + '#error',
+    Error: spritesUrl + '#error',
     Network: spritesUrl + '#network'
   })
 }

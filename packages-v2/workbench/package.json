@@ -1,5 +1,5 @@
 {
-  "name": "@anticrm/platform-workbench",
+  "name": "@anticrm/workbench",
   "version": "0.1.5",
   "main": "src/index.ts",
   "description": "AntiCRM Platform Workbench Plugin",

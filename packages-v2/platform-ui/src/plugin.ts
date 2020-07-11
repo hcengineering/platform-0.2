@@ -58,9 +58,10 @@ export default async (platform: Platform): Promise<UIService> => {
         return h(BadComponent)
       }
       if (this.component !== this.resolved) {
-        platform.getResource(this.component as AnyComponent).then(resolved => {
+        platform.getResource(this.component as AnyComponent).then(() => {
           this.resolved = this.component
         }).catch(err => {
+          platform.setPlatformStatus(err)
           this.resolved = BAD_COMPONENT
         })
         const fallback = platform.peekResource(this.fallback as AnyComponent)

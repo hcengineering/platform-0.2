@@ -126,9 +126,7 @@ type EventListener = (event: string, data: any) => Promise<void>
 
 export interface Platform {
   getMetadata<T>(id: Metadata<T>): T | undefined
-
   setMetadata<T>(id: Metadata<T>, value: T): void
-
   loadMetadata<T, X extends Record<string, Metadata<T>>>(ids: X, resources: ExtractType<T, X>): void
 
   addLocation<P extends Service, X extends PluginDependencies>
@@ -149,6 +147,8 @@ export interface Platform {
   removeEventListener(event: string, listener: EventListener): void
 
   broadcastEvent(event: string, data: any): void
+
+  setPlatformStatus(status: Status): void
 }
 
 /*!
@@ -248,14 +248,27 @@ export function createPlatform(): Platform {
     }
   }
 
+  function setPlatformStatus(status: Status | Error | string) {
+    if (typeof status === 'string') {
+      broadcastEvent(PlatformStatus, new Status(Severity.INFO, 0, status))
+    } else if (status instanceof Error) {
+      const err = status as Error
+      broadcastEvent(PlatformStatus, new Status(Severity.ERROR, 0, err.message))
+    } else if (status instanceof Status) {
+      broadcastEvent(PlatformStatus, status)
+    } else {
+      broadcastEvent(PlatformStatus, new Status(Severity.WARNING, 0, 'Unknown status: ' + status))
+    }
+  }
+
   function createMonitor<T>(name: string, promise: Promise<T>): Promise<T> {
     return new Promise((resolve, reject) => {
-      broadcastEvent(PlatformStatus, new Status(Severity.INFO, 0, name))
+      setPlatformStatus(name)
       promise.then(result => {
-        broadcastEvent(PlatformStatus, new Status(Severity.OK, 0, ''))
+        setPlatformStatus(new Status(Severity.OK, 0, ''))
         resolve(result)
       }).catch(error => {
-        broadcastEvent(PlatformStatus, new Status(Severity.ERROR, 0, error.toString()))
+        setPlatformStatus(error)
         reject(error)
       })
     })
@@ -288,7 +301,7 @@ export function createPlatform(): Platform {
     } else {
       const location = getLocation(id)
       const plugin = resolveDependencies(location[0].deps).then(deps =>
-        createMonitor(`Загружаю плагин '${id}'`, location[1]())
+        createMonitor(`Загружаю плагин '${id}...'`, location[1]())
           .then(module => module.default)
           .then(f => f(platform, deps))
       )
@@ -334,7 +347,9 @@ export function createPlatform(): Platform {
 
     addEventListener,
     removeEventListener,
-    broadcastEvent
+    broadcastEvent,
+
+    setPlatformStatus
   }
 
   return platform

@@ -53,6 +53,7 @@ export default plugin('vue' as Plugin<UIService>, {}, {
   },
   icon: {
     Default: '' as Asset,
+    Error: '' as Asset,
     Network: '' as Asset
   },
   component: {

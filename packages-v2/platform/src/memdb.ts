@@ -13,83 +13,10 @@
 // limitations under the License.
 //
 
-import { Resource } from './platform'
 import { generateId } from './objectid'
+import { AnyLayout, Class, CoreProtocol, Doc, Layout, LayoutType, Obj, Ref } from './core'
 
-export type Property<L, F> = { __layout: L, __feature: F }
-export type Ref<T extends Doc> = string & { __ref: T } & Resource<T>
-
-export interface Obj {
-  _class: Ref<Class<Obj>>
-}
-
-export interface Emb extends Obj {
-  __embedded: true
-}
-
-export interface Doc extends Obj {
-  _class: Ref<Class<Doc>>
-  _id: Ref<Doc>
-  _mixins?: Ref<Class<Doc>>[]
-}
-
-export type LayoutType = string | number
-  | Emb
-  | { [key: string]: LayoutType }
-  | LayoutType[]
-  | undefined
-
-export type PropertyType = Property<LayoutType, any>
-  | Resource<any>
-  | Emb
-  | PropertyType[]
-  | { [key: string]: PropertyType }
-
-export type StringProperty = Property<string, string>
-
-export interface Attribute extends Emb {
-}
-
-export type Attributes<T extends E, E extends Obj> = Record<Exclude<keyof T, keyof E>, Attribute>
-export type AllAttributes<T extends E, E extends Obj> = Required<Attributes<T, E>> & Partial<Attributes<E, Obj>>
-
-export interface EClassifier<T extends E, E extends Obj> extends Doc {
-  _attributes: AllAttributes<T, E>
-  _extends?: Ref<Classifier<E>>
-}
-
-export type Classifier<T extends Obj> = EClassifier<T, Obj>
-
-export interface EClass<T extends E, E extends Obj> extends EClassifier<T, E> {
-  _native?: Resource<Object>
-  _domain?: StringProperty
-}
-
-export type Class<T extends Obj> = EClass<T, Obj>
-
-///
-
-type ToLayout<T> =
-  T extends Resource<any> | undefined ? T :
-    T extends Property<infer X, any> | undefined ? X :
-      T extends { __embedded: true } ? T :
-        Layout<T>
-
-export type Layout<T> = {
-  [P in keyof T]:
-  T[P] extends Resource<any> | undefined ? T[P] :
-    T[P] extends Property<infer X, any> | undefined ? X :
-      T[P] extends { __embedded: true } ? T[P] :
-        T[P] extends (infer X)[] | undefined ? ToLayout<X>[] :
-          T[P] extends { [key: string]: infer X } | undefined ? { [key: string]: ToLayout<X> } :
-            never
-}
-
-export interface AnyLayout {
-  [key: string]: LayoutType
-}
-
-function attributeKey (_class: Ref<Class<Obj>>, key: string): string {
+export function attributeKey(_class: Ref<Class<Obj>>, key: string): string {
   const index = _class.indexOf(':')
   const dot = _class.indexOf('.')
   const plugin = _class.substring(index + 1, dot)
@@ -97,11 +24,16 @@ function attributeKey (_class: Ref<Class<Obj>>, key: string): string {
   return plugin + '|' + cls + '|' + key
 }
 
-export class MemDb {
+export class MemDb implements CoreProtocol {
+  private domain: string
   private objects = new Map<Ref<Doc>, Layout<Doc>>()
   private byClass: Map<Ref<Class<Doc>>, Layout<Doc>[]> | null = null
 
-  objectsOfClass (_class: Ref<Class<Doc>>): Layout<Doc>[] {
+  constructor(domain: string) {
+    this.domain = domain
+  }
+
+  objectsOfClass(_class: Ref<Class<Doc>>): Layout<Doc>[] {
     if (!this.byClass) {
       console.log('indexing database...')
       this.byClass = new Map<Ref<Class<Doc>>, Layout<Doc>[]>()
@@ -219,7 +151,7 @@ export class MemDb {
     return result
   }
 
-  dump () {
+  dump(): Layout<Doc>[] {
     const result = []
     for (const doc of this.objects.values()) {
       result.push(doc)
@@ -227,7 +159,14 @@ export class MemDb {
     return result
   }
 
-  loadModel (model: Layout<Doc>[]) {
+  async loadDomain(domain: string): Promise<Layout<Doc>[]> {
+    if (this.domain !== domain) {
+      throw new Error('domain does not match')
+    }
+    return this.dump()
+  }
+
+  loadModel(model: Layout<Doc>[]) {
     for (const doc of model) {
       this.set(doc)
     }
@@ -236,14 +175,18 @@ export class MemDb {
   }
 
   // Q U E R Y
-  async find (clazz: Ref<Class<Doc>>, query: AnyLayout): Promise<Layout<Doc>[]> {
+  async find(clazz: Ref<Class<Doc>>, query: AnyLayout): Promise<Layout<Doc>[]> {
     const byClass = this.objectsOfClass(clazz)
     return findAll(byClass, clazz, query)
   }
 
-  async findOne (clazz: Ref<Class<Doc>>, query: AnyLayout): Promise<Layout<Doc> | undefined> {
+  async findOne(clazz: Ref<Class<Doc>>, query: AnyLayout): Promise<Layout<Doc> | undefined> {
     const result = await this.find(clazz, query)
     return result.length === 0 ? undefined : result[0]
+  }
+
+  tx(): Promise<void> {
+    throw new Error('memdb is read only')
   }
 }
 

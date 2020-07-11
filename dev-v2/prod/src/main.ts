@@ -13,23 +13,10 @@
 // limitations under the License.
 //
 
-import { createPlatform, Platform } from '@anticrm/platform'
 import { createApp } from 'vue'
 import ErrorPage from './components/ErrorPage.vue'
-
+import platform from '@anticrm/boot/src/platform'
 import ui from '@anticrm/platform-ui'
-import login from '@anticrm/login'
-
-import uiMeta from '@anticrm/platform-ui/src/__meta__/meta'
-
-const platform = createPlatform()
-
-platform.setMetadata(ui.metadata.DefaultApplication, login.component.LoginForm)
-
-platform.addLocation(ui, () => import(/* webpackChunkName: "platform-ui" */ '@anticrm/platform-ui/src/plugin'))
-platform.addLocation(login, () => import(/* webpackChunkName: "login" */ '@anticrm/login/src/plugin'))
-
-uiMeta(platform)
 
 async function boot (): Promise<void> {
   const uiService = await platform.getPlugin(ui.id)
