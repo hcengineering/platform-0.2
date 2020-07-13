@@ -17,8 +17,6 @@ import {
   Class,
   Doc,
   Emb,
-  Layout,
-  LayoutType,
   MemDb,
   Metadata,
   Method,
@@ -33,32 +31,30 @@ import {
 
 // T Y P E S
 
-export interface Type<L, P> extends Emb {
-  _default?: Property<L, P>
-  exert: Method<() => P>
-  hibernate: Method<(value: P) => L>
+export interface Type extends Emb {
+  _default?: PropertyType
+  exert: Method<() => any>
+  hibernate: Method<(value: any) => PropertyType>
 }
 
-export interface RefTo<T extends Doc> extends Type<Ref<T>, Ref<T>> {
+export interface RefTo<T extends Doc> extends Type {
   to: Ref<Class<T>>
 }
 
-export interface InstanceOf<T extends Emb> extends Type<T, T> {
+export interface InstanceOf<T extends Emb> extends Type {
   of: Ref<Class<T>>
 }
 
-export interface BagOf<A> extends Type<{ [key: string]: A }, { [key: string]: A }> {
-  of: Type<A, A>
+export interface BagOf<A> extends Type {
+  of: Type
 }
 
-export interface ArrayOf<A> extends Type<A[], A[]> {
-  of: Type<A, A>
+export interface ArrayOf<A> extends Type {
+  of: Type
 }
 
 // export interface StaticResource<T> extends Type<T> { }
 // export interface Method<T> extends StaticResource<T> { }
-
-export type AnyType = Type<LayoutType, PropertyType>
 
 // V E R S I O N I N G
 
@@ -90,6 +86,6 @@ export interface CoreService extends Service {
 
 export default plugin('core' as Plugin<CoreService>, {}, {
   metadata: {
-    Model: '' as Metadata<{ [key: string]: Layout<Doc>[] }>
+    Model: '' as Metadata<{ [key: string]: Doc[] }>
   }
 })

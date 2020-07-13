@@ -18,7 +18,9 @@ import { CombineObjects, KeysByType } from 'simplytyped'
 
 type MethodType = (...args: any[]) => any
 
-export type Property<L, F> = { __layout: L, __feature: F }
+type PrimitiveType = number | string | undefined
+
+export type Property<P extends PrimitiveType, T> = P & { __property: T }
 export type Ref<T extends Doc> = string & { __ref: T } & Resource<T>
 export type Method<T extends MethodType> = T & { __method: T } & Resource<T>
 
@@ -36,13 +38,7 @@ export interface Doc extends Obj {
   _mixins?: Ref<Class<Doc>>[]
 }
 
-export type LayoutType = string | number
-  | Emb
-  | { [key: string]: LayoutType }
-  | LayoutType[]
-  | undefined
-
-export type PropertyType = Property<LayoutType, any>
+export type PropertyType = Property<PrimitiveType, any>
   | Resource<any>
   | Emb
   | PropertyType[]
@@ -92,29 +88,11 @@ export interface CreateTx extends Tx {
   _attributes: { [key: string]: PropertyType }
 }
 
-// L A Y O U T
-
-type ToLayout<T> =
-  T extends Resource<any> | undefined ? T :
-    T extends Property<infer X, any> | undefined ? X :
-      T extends { __embedded: true } ? T :
-        LayoutA<T>
-
-type LayoutA<T> = {
-  [P in keyof T]:
-  T[P] extends Resource<any> | undefined ? T[P] :
-    T[P] extends Property<infer X, any> | undefined ? X :
-      T[P] extends { __embedded: true } ? T[P] :
-        T[P] extends (infer X)[] | undefined ? ToLayout<X>[] :
-          T[P] extends { [key: string]: infer X } | undefined ? { [key: string]: ToLayout<X> } :
-            never
-}
-
-export type Layout<T extends object> = LayoutA<CombineObjects<Omit<T, KeysByType<T, MethodType>>,
-  Partial<Pick<T, KeysByType<T, MethodType>>>>>
+export type OptionalMethods<T extends object> = CombineObjects<Omit<T, KeysByType<T, MethodType>>,
+  Partial<Pick<T, KeysByType<T, MethodType>>>>
 
 export interface AnyLayout {
-  [key: string]: LayoutType
+  [key: string]: PropertyType
 }
 
 export enum CoreDomain {
@@ -122,9 +100,9 @@ export enum CoreDomain {
 }
 
 export interface CoreProtocol {
-  find(_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Layout<Doc>[]>
+  find(_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc[]>
 
   tx(tx: Tx): Promise<void>
 
-  loadDomain(domain: string): Promise<Layout<Doc>[]>
+  loadDomain(domain: string): Promise<Doc[]>
 }

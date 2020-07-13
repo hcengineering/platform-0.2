@@ -13,23 +13,13 @@
 // limitations under the License.
 //
 
-import { Class, Doc, plugin, Plugin, Ref, Service, StringProperty } from '@anticrm/platform'
-import ui, { AnyComponent, Asset } from '@anticrm/platform-ui'
-import core from '@anticrm/platform-core'
+import { extendIds } from '@anticrm/platform-model'
+import recruitment from '@anticrm/recruitment'
+import { Ref } from '@anticrm/platform'
+import { Application } from '@anticrm/workbench'
 
-export interface Application extends Doc {
-  label: StringProperty
-  icon: Asset
-}
-
-export interface WorkbenchService extends Service {
-}
-
-export default plugin('workbench' as Plugin<WorkbenchService>, {core: core.id, ui: ui.id}, {
-  class: {
-    Application: '' as Ref<Class<Application>>
-  },
-  component: {
-    Workbench: '' as AnyComponent
+export default extendIds(recruitment, {
+  application: {
+    Recruitment: '' as Ref<Application>
   }
 })

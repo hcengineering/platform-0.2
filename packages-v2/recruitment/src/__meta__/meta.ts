@@ -13,23 +13,12 @@
 // limitations under the License.
 //
 
-import { Class, Doc, plugin, Plugin, Ref, Service, StringProperty } from '@anticrm/platform'
-import ui, { AnyComponent, Asset } from '@anticrm/platform-ui'
-import core from '@anticrm/platform-core'
+import { Platform } from '@anticrm/platform'
+import recruitment from '..'
 
-export interface Application extends Doc {
-  label: StringProperty
-  icon: Asset
+export default (platform: Platform) => {
+  const spritesUrl = require('../../assets/icons.svg')
+  platform.loadMetadata(recruitment.icon, {
+    Recruitment: spritesUrl + '#recruitment',
+  })
 }
-
-export interface WorkbenchService extends Service {
-}
-
-export default plugin('workbench' as Plugin<WorkbenchService>, {core: core.id, ui: ui.id}, {
-  class: {
-    Application: '' as Ref<Class<Application>>
-  },
-  component: {
-    Workbench: '' as AnyComponent
-  }
-})

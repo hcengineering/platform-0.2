@@ -60,6 +60,7 @@
       <widget
           :component="location.app"
           :fallback="spinner"
+          :location="location"
           v-if="location.app"
       />
       <!--        :path="current.path"-->

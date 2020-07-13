@@ -14,8 +14,34 @@
 //
 
 import Builder from './builder'
+import { Class, CoreDomain, Obj, Ref } from '@anticrm/platform'
+import { RefTo } from '@anticrm/platform-core'
+import core from '.'
 
 export { Builder }
 
 export default (S: Builder) => {
+  S.createDocument(core.class.Class, {
+    _attributes: {}
+  }, core.class.Obj)
+
+  S.createClass(core.class.Doc, core.class.Obj, {
+    _id: S.newInstance(core.class.RefTo, {
+      to: core.class.Doc
+    }),
+    _mixins: S.newInstance(core.class.ArrayOf, {
+      of: S.newInstance(core.class.RefTo, { to: core.class.Doc })
+    })
+  })
+
+  S.createClass(core.class.Class, core.class.Doc, {
+    _attributes: S.newInstance(core.class.BagOf, {
+      of: S.newInstance(core.class.InstanceOf, { of: core.class.Type })
+    }),
+    _extends: S.newInstance(core.class.RefTo as Ref<Class<RefTo<Class<Obj>>>>, {
+      to: core.class.Class
+    }),
+    _native: S.newInstance(core.class.Type, {}),
+    _domain: S.newInstance(core.class.Type, {})
+  }, CoreDomain.Model)
 }

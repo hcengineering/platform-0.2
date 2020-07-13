@@ -50,7 +50,7 @@
 </script>
 
 <template>
-  <svg class="icon">
+  <svg class="ui-icon">
     <use :xlink:href="url"/>
   </svg>
 </template>

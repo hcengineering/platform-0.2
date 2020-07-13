@@ -21,6 +21,8 @@ import login from '@anticrm/login'
 import workbench from '@anticrm/workbench'
 
 import uiMeta from '@anticrm/platform-ui/src/__meta__/meta'
+import recruitmentMeta from '@anticrm/recruitment/src/__meta__/meta'
+import taskMeta from '@anticrm/task/src/__meta__/meta'
 
 const platform = createPlatform()
 
@@ -32,5 +34,7 @@ platform.addLocation(login, () => import(/* webpackChunkName: "login" */ '@antic
 platform.addLocation(workbench, () => import(/* webpackChunkName: "workbench" */ '@anticrm/workbench/src/plugin'))
 
 uiMeta(platform)
+recruitmentMeta(platform)
+taskMeta(platform)
 
 export default platform

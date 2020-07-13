@@ -44,12 +44,12 @@ export default async (platform: Platform): Promise<UIService> => {
       component: String as unknown as PropType<AnyComponent>,
       fallback: String as unknown as PropType<AnyComponent>
     },
-    setup() {
+    setup () {
       return {
         resolved: ref('')
       }
     },
-    render() {
+    render () {
       const resolved = platform.peekResource(this.component as AnyComponent)
       if (resolved) {
         return h(resolved)
@@ -83,7 +83,7 @@ export default async (platform: Platform): Promise<UIService> => {
 
   // R O U T I N G
 
-  function windowLocation() {
+  function windowLocation () {
     return window.location.pathname + window.location.search
   }
 
@@ -97,7 +97,7 @@ export default async (platform: Platform): Promise<UIService> => {
    * Navigate to given url
    * @param url
    */
-  function navigate(url: string) {
+  function navigate (url: string) {
     if (url !== location.value) {
       // if (guard) {
       //   const target = toLinkTarget(url)
@@ -110,11 +110,11 @@ export default async (platform: Platform): Promise<UIService> => {
     }
   }
 
-  function getLocation(): Location {
+  function getLocation (): Location {
     const path = location.value.split('/')
     const app = path[1] === '' ? platform.getMetadata(ui.metadata.DefaultApplication) : path[1]
     path.splice(0, 2)
-    return {app, path}
+    return { app, path }
   }
 
   // C O M P O N E N T S
@@ -125,7 +125,7 @@ export default async (platform: Platform): Promise<UIService> => {
   // S E R V I C E
 
   const service = {
-    getApp() {
+    getApp () {
       return app
     },
     navigate,

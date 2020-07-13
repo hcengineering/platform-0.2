@@ -14,29 +14,29 @@
 //
 
 import { generateId } from './objectid'
-import { AnyLayout, Class, CoreProtocol, Doc, Layout, LayoutType, Obj, Ref } from './core'
+import { AnyLayout, Class, CoreProtocol, Doc, Obj, PropertyType, Ref } from './core'
 
-export function attributeKey(_class: Ref<Class<Obj>>, key: string): string {
-  const index = _class.indexOf(':')
-  const dot = _class.indexOf('.')
-  const plugin = _class.substring(index + 1, dot)
-  const cls = _class.substring(dot + 1)
-  return plugin + '|' + cls + '|' + key
+export function attributeKey (_class: Ref<Class<Obj>>, key: string): string {
+  // const index = _class.indexOf(':')
+  // const dot = _class.indexOf('.')
+  // const plugin = _class.substring(index + 1, dot)
+  // const cls = _class.substring(dot + 1)
+  // return plugin + '|' + cls + '|' + key
+  return key
 }
 
 export class MemDb implements CoreProtocol {
   private domain: string
-  private objects = new Map<Ref<Doc>, Layout<Doc>>()
-  private byClass: Map<Ref<Class<Doc>>, Layout<Doc>[]> | null = null
+  private objects = new Map<Ref<Doc>, Doc>()
+  private byClass: Map<Ref<Class<Doc>>, Doc[]> | null = null
 
-  constructor(domain: string) {
+  constructor (domain: string) {
     this.domain = domain
   }
 
-  objectsOfClass(_class: Ref<Class<Doc>>): Layout<Doc>[] {
+  objectsOfClass (_class: Ref<Class<Doc>>): Doc[] {
     if (!this.byClass) {
-      console.log('indexing database...')
-      this.byClass = new Map<Ref<Class<Doc>>, Layout<Doc>[]>()
+      this.byClass = new Map<Ref<Class<Doc>>, Doc[]>()
       for (const doc of this.objects.values()) {
         this.index(doc)
       }
@@ -44,7 +44,7 @@ export class MemDb implements CoreProtocol {
     return this.byClass.get(_class) ?? []
   }
 
-  set (doc: Layout<Doc>) {
+  set (doc: Doc) {
     const id = doc._id
     if (this.objects.get(id)) {
       throw new Error('document added already ' + id)
@@ -52,7 +52,7 @@ export class MemDb implements CoreProtocol {
     this.objects.set(id, doc)
   }
 
-  index (doc: Layout<Doc>) {
+  index (doc: Doc) {
     if (this.byClass === null) {
       throw new Error('index not created')
     }
@@ -69,12 +69,12 @@ export class MemDb implements CoreProtocol {
     })
   }
 
-  add (doc: Layout<Doc>) {
+  add (doc: Doc) {
     this.set(doc)
     if (this.byClass) this.index(doc)
   }
 
-  get (id: Ref<Doc>): Layout<Doc> {
+  get (id: Ref<Doc>): Doc {
     const obj = this.objects.get(id)
     if (!obj) {
       throw new Error('document not found ' + id)
@@ -85,21 +85,21 @@ export class MemDb implements CoreProtocol {
   // D O M A I N
 
   getDomain (id: Ref<Class<Doc>>): string {
-    let clazz = this.objects.get(id) as Layout<Class<Doc>> | undefined
+    let clazz = this.objects.get(id) as Class<Doc> | undefined
     while (clazz) {
       if (clazz._domain) return clazz._domain as string
-      clazz = clazz._extends ? this.objects.get(clazz._extends) as Layout<Class<Doc>> : undefined
+      clazz = clazz._extends ? this.objects.get(clazz._extends) as Class<Doc> : undefined
     }
     throw new Error('no domain found for class: ' + id)
   }
 
   /// A S S I G N
 
-  private findAttributeKey<T extends Layout<Doc>> (cls: Ref<Class<Obj>>, key: string): string {
+  private findAttributeKey<T extends Doc> (cls: Ref<Class<Obj>>, key: string): string {
     // TODO: use memdb class hierarchy
     let _class = cls as Ref<Class<Obj>> | undefined
     while (_class) {
-      const clazz = this.get(_class) as Layout<Class<Obj>>
+      const clazz = this.get(_class) as Class<Obj>
       if ((clazz._attributes as any)[key] !== undefined) {
         return attributeKey(_class, key)
       }
@@ -125,20 +125,20 @@ export class MemDb implements CoreProtocol {
     return generateId() as Ref<Doc>
   }
 
-  createDocument<M extends Doc> (_class: Ref<Class<M>>, values: Layout<Omit<M, keyof Doc>>, _id?: Ref<M>): Layout<Doc> {
+  createDocument<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Doc>, _id?: Ref<M>): Doc {
     const layout = { _class, _id: _id ?? this.generateId() }
-    this.assign(layout, _class, values as AnyLayout)
+    this.assign(layout, _class, values as unknown as AnyLayout)
     this.add(layout)
     return layout
   }
 
-  mixin<T extends E, E extends Doc> (id: Ref<E>, clazz: Ref<Class<T>>, values: Layout<Omit<T, keyof E>>): void {
+  mixin<T extends E, E extends Doc> (id: Ref<E>, clazz: Ref<Class<T>>, values: Omit<T, keyof E>): void {
     const doc = this.get(id)
     if (!doc._mixins) {
       doc._mixins = []
     }
     doc._mixins.push(clazz)
-    this.assign(doc, clazz, values as AnyLayout)
+    this.assign(doc as unknown as AnyLayout, clazz, values as unknown as AnyLayout)
   }
 
   getClassHierarchy (cls: Ref<Class<Doc>>): Ref<Class<Obj>>[] {
@@ -146,12 +146,12 @@ export class MemDb implements CoreProtocol {
     let _class = cls as Ref<Class<Obj>> | undefined
     while (_class) {
       result.push(_class)
-      _class = (this.get(_class) as Layout<Class<Obj>>)._extends
+      _class = (this.get(_class) as Class<Obj>)._extends
     }
     return result
   }
 
-  dump(): Layout<Doc>[] {
+  dump (): Doc[] {
     const result = []
     for (const doc of this.objects.values()) {
       result.push(doc)
@@ -159,38 +159,38 @@ export class MemDb implements CoreProtocol {
     return result
   }
 
-  async loadDomain(domain: string): Promise<Layout<Doc>[]> {
+  async loadDomain (domain: string): Promise<Doc[]> {
     if (this.domain !== domain) {
       throw new Error('domain does not match')
     }
     return this.dump()
   }
 
-  loadModel(model: Layout<Doc>[]) {
+  loadModel (model: Doc[]) {
     for (const doc of model) {
       this.set(doc)
     }
-    // if (this.byClass === null) { this.byClass = new Map<Ref<ClassLayout>, Layout<Doc>[]>() }
+    // if (this.byClass === null) { this.byClass = new Map<Ref<ClassLayout>, Doc[]>() }
     // for (const doc of model) { this.index(doc) }
   }
 
   // Q U E R Y
-  async find(clazz: Ref<Class<Doc>>, query: AnyLayout): Promise<Layout<Doc>[]> {
+  async find (clazz: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc[]> {
     const byClass = this.objectsOfClass(clazz)
     return findAll(byClass, clazz, query)
   }
 
-  async findOne(clazz: Ref<Class<Doc>>, query: AnyLayout): Promise<Layout<Doc> | undefined> {
+  async findOne (clazz: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc | undefined> {
     const result = await this.find(clazz, query)
     return result.length === 0 ? undefined : result[0]
   }
 
-  tx(): Promise<void> {
+  tx (): Promise<void> {
     throw new Error('memdb is read only')
   }
 }
 
-function findAll (docs: Layout<Doc>[], clazz: Ref<Class<Doc>>, query: AnyLayout): Layout<Doc>[] {
+function findAll (docs: Doc[], clazz: Ref<Class<Doc>>, query: AnyLayout): Doc[] {
   let result = docs
 
   for (const key in query) {
@@ -202,8 +202,8 @@ function findAll (docs: Layout<Doc>[], clazz: Ref<Class<Doc>>, query: AnyLayout)
   return result === docs ? docs.concat() : result
 }
 
-function filterEq (docs: Layout<Doc>[], propertyKey: string, value: LayoutType): Layout<Doc>[] {
-  const result: Layout<Doc>[] = []
+function filterEq (docs: Doc[], propertyKey: string, value: PropertyType): Doc[] {
+  const result: Doc[] = []
   for (const doc of docs) {
     if (value === (doc as any)[propertyKey]) {
       result.push(doc)

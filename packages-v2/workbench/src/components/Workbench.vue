@@ -24,7 +24,7 @@
   export default defineComponent({
     components: {Nav, MainView, Home},
     props: {
-      path: String,
+      location: Object,
       params: Object
     }
   })
@@ -39,7 +39,7 @@
 
     <nav>
       <!-- <Sidenav :applications="applications" /> -->
-      <Nav/>
+      <Nav :location="location"/>
     </nav>
 
     <main>

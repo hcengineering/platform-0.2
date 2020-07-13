@@ -13,23 +13,14 @@
 // limitations under the License.
 //
 
-import { Class, Doc, plugin, Plugin, Ref, Service, StringProperty } from '@anticrm/platform'
-import ui, { AnyComponent, Asset } from '@anticrm/platform-ui'
-import core from '@anticrm/platform-core'
+import { Platform, Service } from '@anticrm/platform'
 
-export interface Application extends Doc {
-  label: StringProperty
-  icon: Asset
+/*!
+ * Anticrm Platform™ Recruitment Plugin
+ * © 2020 Anticrm Platform Contributors. All Rights Reserved.
+ * Licensed under the Eclipse Public License, Version 2.0
+ */
+export default async (platform: Platform): Promise<Service> => {
+
+  return {}
 }
-
-export interface WorkbenchService extends Service {
-}
-
-export default plugin('workbench' as Plugin<WorkbenchService>, {core: core.id, ui: ui.id}, {
-  class: {
-    Application: '' as Ref<Class<Application>>
-  },
-  component: {
-    Workbench: '' as AnyComponent
-  }
-})

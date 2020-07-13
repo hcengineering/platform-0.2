@@ -20,9 +20,9 @@ import {
   Doc,
   EClass,
   Emb,
-  Layout,
   MemDb,
   Obj,
+  OptionalMethods,
   Ref,
   Resource
 } from '@anticrm/platform'
@@ -33,20 +33,20 @@ class Builder {
 
   private domains = new Map<string, MemDb>()
 
-  constructor(memdb?: MemDb) {
+  constructor (memdb?: MemDb) {
     this.memdb = memdb ?? new MemDb(CoreDomain.Model)
   }
 
-  load(model: (builder: Builder) => void) {
+  load (model: (builder: Builder) => void) {
     model(this)
   }
 
-  dump(): Layout<Doc>[] {
+  dump (): Doc[] {
     return this.memdb.dump()
   }
 
-  dumpAll(): { [key: string]: Layout<Doc>[] } {
-    const result = {} as { [key: string]: Layout<Doc>[] }
+  dumpAll (): { [key: string]: Doc[] } {
+    const result = {} as { [key: string]: Doc[] }
     for (const e of this.domains) {
       result[e[0]] = e[1].dump()
     }
@@ -54,7 +54,7 @@ class Builder {
     return result
   }
 
-  getDomain(domain: string) {
+  getDomain (domain: string) {
     const memdb = this.domains.get(domain)
     if (!memdb) {
       const memdb = new MemDb(domain)
@@ -66,18 +66,18 @@ class Builder {
 
   ///
 
-  newInstance<M extends Emb>(_class: Ref<Class<M>>, values: Layout<Omit<M, keyof Emb>>): Layout<M> {
-    const obj = {_class: _class as Ref<Class<Obj>>, ...values} as Layout<M>
+  newInstance<M extends Emb> (_class: Ref<Class<M>>, values: OptionalMethods<Omit<M, keyof Emb>>): M {
+    const obj = { _class: _class as Ref<Class<Obj>>, ...values } as M
     return obj
   }
 
-  createDocument<M extends Doc>(_class: Ref<Class<M>>, values: Layout<Omit<M, keyof Doc>>, _id?: Ref<M>): void {
+  createDocument<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Doc>, _id?: Ref<M>): void {
     this.memdb.createDocument(_class, values, _id)
   }
 
-  createClass<T extends E, E extends Obj>(_id: Ref<Class<T>>, _extends: Ref<Class<E>>, _attributes: AllAttributes<T, E>, _domain?: string, _native?: Resource<any>) {
+  createClass<T extends E, E extends Obj> (_id: Ref<Class<T>>, _extends: Ref<Class<E>>, _attributes: AllAttributes<T, E>, _domain?: string, _native?: Resource<any>) {
     this.createDocument(core.class.Class as Ref<Class<EClass<T, E>>>,
-      {_extends, _attributes, _domain, _native} as unknown as Layout<EClass<T, E>>,
+      { _extends, _attributes, _domain, _native } as EClass<T, E>,
       _id as Ref<EClass<T, E>>)
   }
 }
