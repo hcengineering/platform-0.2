@@ -15,7 +15,7 @@
 
 <script lang="ts">
 
-import { defineComponent, PropType, inject } from 'vue'
+import { defineComponent, PropType } from 'vue'
 import { AnyComponent, getUIService } from '..'
 
 export default defineComponent({
@@ -28,9 +28,7 @@ export default defineComponent({
   },
   setup (props) {
     const service = getUIService()
-    console.log('app', props.app, 'path', props.path)
     const url = service.toUrl({ app: props.app, path: props.path })
-    console.log('url: ' + url)
     const navigate = service.navigate
     return { url, navigate }
   }

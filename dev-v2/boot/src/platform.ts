@@ -19,6 +19,8 @@ import ui from '@anticrm/platform-ui'
 import core from '@anticrm/platform-core'
 import login from '@anticrm/login'
 import workbench from '@anticrm/workbench'
+import recruitment from '@anticrm/recruitment'
+import task from '@anticrm/task'
 
 import uiMeta from '@anticrm/platform-ui/src/__meta__/meta'
 import recruitmentMeta from '@anticrm/recruitment/src/__meta__/meta'
@@ -32,6 +34,8 @@ platform.addLocation(ui, () => import(/* webpackChunkName: "platform-ui" */ '@an
 platform.addLocation(core, () => import(/* webpackChunkName: "platform-core" */ '@anticrm/platform-core/src/plugin'))
 platform.addLocation(login, () => import(/* webpackChunkName: "login" */ '@anticrm/login/src/plugin'))
 platform.addLocation(workbench, () => import(/* webpackChunkName: "workbench" */ '@anticrm/workbench/src/plugin'))
+platform.addLocation(recruitment, () => import(/* webpackChunkName: "recruitment" */ '@anticrm/recruitment/src/plugin'))
+platform.addLocation(task, () => import(/* webpackChunkName: "task" */ '@anticrm/task/src/plugin'))
 
 uiMeta(platform)
 recruitmentMeta(platform)

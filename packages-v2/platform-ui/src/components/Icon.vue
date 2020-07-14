@@ -25,8 +25,6 @@
       }
     },
     setup(props) {
-      console.log(props.icon)
-
       function getUrl(icon?: Asset) {
         return getPlatform().getMetadata(icon ?? vue.icon.Default) ?? 'https://pltfo.com/logo.svg'
       }

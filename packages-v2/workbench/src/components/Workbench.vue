@@ -37,13 +37,22 @@
 
       const apps = ref([] as Application[])
 
+      function getMain(current: string): string {
+        for (const app of apps.value) {
+          if (app._id === current) {
+            return app.main
+          }
+        }
+        return ''
+      }
+
       coreService.getModel().find(workbench.class.Application, {}).then(docs => {
-        console.log(docs)
         apps.value = docs as Application[]
       })
 
       const current = computed(() => props.location.path.length > 0 ? props.location.path[0] : '')
-      const page = props.location.path.length > 1 ? props.location.path[1] : ''
+      const page = computed(() => props.location.path.length > 1 ? props.location.path[1] :
+        getMain(current.value))
 
       return {current, apps, page}
     }
