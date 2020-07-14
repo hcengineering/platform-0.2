@@ -23,7 +23,8 @@ export default (S: Builder) => {
 
   S.createDocument(workbench.class.Application, {
     label: 'Задачи' as StringProperty,
-    icon: task.icon.Task
+    icon: task.icon.Task,
+    main: task.component.Main
   }, task.application.Task)
 
 }

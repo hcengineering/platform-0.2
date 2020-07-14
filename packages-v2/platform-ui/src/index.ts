@@ -32,6 +32,7 @@ export interface UIService extends Service {
   getApp(): App
 
   navigate(url: string): void
+  toUrl(location: Location): string
 
   getLocation(): Location
 }

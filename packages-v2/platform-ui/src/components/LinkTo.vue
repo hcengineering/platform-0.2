@@ -14,22 +14,31 @@
 -->
 
 <script lang="ts">
-  import { defineComponent } from 'vue'
 
-  export default defineComponent({
-  })
+import { defineComponent, PropType, inject } from 'vue'
+import { AnyComponent, getUIService } from '..'
+
+export default defineComponent({
+  props: {
+    app: String as unknown as PropType<AnyComponent>,
+    path: {
+      type: Array as PropType<string[]>,
+      required: true,
+    },
+  },
+  setup (props) {
+    const service = getUIService()
+    console.log('app', props.app, 'path', props.path)
+    const url = service.toUrl({ app: props.app, path: props.path })
+    console.log('url: ' + url)
+    const navigate = service.navigate
+    return { url, navigate }
+  }
+})
 </script>
 
 <template>
-  <div>
-    Home
-    <!--    <LinkTo :path="`${contact.class.Person}/new`">Новая Персона</LinkTo>-->
-    <!--    <br/>-->
-    <!--    <LinkTo :path="`${contact.class.Person}`">Список Персон</LinkTo>-->
-    <!--    <br/>-->
-    <!--    <LinkTo :path="`${chunter.component.Chunter}`">Chunter!</LinkTo>-->
-    <!--    <Suspense>-->
-    <!--      <Action :action="vue.method.AnAction" hi="there">Hello</Action>-->
-    <!--    </Suspense>-->
-  </div>
+  <a :href="url" @click.prevent="navigate(url)">
+    <slot />
+  </a>
 </template>

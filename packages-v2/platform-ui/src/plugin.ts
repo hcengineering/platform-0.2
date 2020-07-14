@@ -117,6 +117,15 @@ export default async (platform: Platform): Promise<UIService> => {
     return { app, path }
   }
 
+  function toUrl (location: Location): string {
+    const current = getLocation()
+    const app = location.app || current.app
+    const path = location.path.join('/')
+
+    return '/' + app + '/' + path
+  }
+
+
   // C O M P O N E N T S
 
   platform.setResource(ui.component.Spinner, Spinner)
@@ -129,6 +138,7 @@ export default async (platform: Platform): Promise<UIService> => {
       return app
     },
     navigate,
+    toUrl,
     getLocation
   }
 

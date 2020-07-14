@@ -14,6 +14,9 @@
 //
 
 import { Platform, Service } from '@anticrm/platform'
+import recruitment from '.'
+
+import Main from './components/Main.vue'
 
 /*!
  * Anticrm Platform™ Recruitment Plugin
@@ -21,6 +24,8 @@ import { Platform, Service } from '@anticrm/platform'
  * Licensed under the Eclipse Public License, Version 2.0
  */
 export default async (platform: Platform): Promise<Service> => {
+
+  platform.setResource(recruitment.component.Main, Main)
 
   return {}
 }

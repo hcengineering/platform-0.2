@@ -20,7 +20,8 @@ export default (S: Builder) => {
 
   S.createClass(workbench.class.Application, core.class.Doc, {
     label: S.newInstance(core.class.String, {}),
-    icon: S.newInstance(core.class.Type, {})
+    icon: S.newInstance(core.class.Type, {}),
+    main: S.newInstance(core.class.Type, {})
   })
 
 }

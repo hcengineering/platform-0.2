@@ -20,7 +20,7 @@ import workbench, { WorkbenchService } from '.'
 import Workbench from './components/Workbench.vue'
 import { UIService } from '@anticrm/platform-ui'
 
-import { CoreInjectionKey } from './int'
+import { CoreInjectionKey } from './utils'
 
 /*!
  * Anticrm Platform™ Workbench Plugin

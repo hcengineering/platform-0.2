@@ -20,6 +20,7 @@ import core from '@anticrm/platform-core'
 export interface Application extends Doc {
   label: StringProperty
   icon: Asset
+  main: AnyComponent
 }
 
 export interface WorkbenchService extends Service {

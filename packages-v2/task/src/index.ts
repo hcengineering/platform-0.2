@@ -14,12 +14,13 @@
 //
 
 import { plugin, Plugin, Service } from '@anticrm/platform'
-import { Asset } from '@anticrm/platform-ui'
+import { Asset, AnyComponent } from '@anticrm/platform-ui'
 
 export default plugin('task' as Plugin<Service>, {}, {
   icon: {
     Task: '' as Asset,
   },
   component: {
+    Main: '' as AnyComponent
   }
 })

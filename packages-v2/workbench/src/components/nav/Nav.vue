@@ -16,36 +16,23 @@
 <script lang="ts">
   import { defineComponent, PropType, ref } from 'vue'
   import { Location } from '@anticrm/platform-ui'
-  import { getCoreService } from '../../int'
+  import { getCoreService } from '../../utils'
   import workbench, { Application } from '../..'
 
   import Icon from '@anticrm/platform-ui/src/components/Icon.vue'
+  import LinkTo from '@anticrm/platform-ui/src/components/LinkTo.vue'
 
   export default defineComponent({
-    components: { Icon },
+    components: { Icon, LinkTo },
     props: {
-      location: {
-        type: Object as PropType<Location>,
+      apps: {
+        type: Array as PropType<Application[]>,
         required: true
-      }
+      },
+      current: String
     },
 
     setup(props) {
-      const coreService = getCoreService()
-
-      const apps = ref([] as Application[])
-
-      coreService.getModel().find(workbench.class.Application, {}).then(docs => {
-        console.log(docs)
-        apps.value = docs as Application[]
-      })
-
-      const path = props.location.path
-      const current = path.length > 0 ? path[0] : ''
-
-      console.log(current)
-
-      return {current, apps}
     }
   })
 </script>
@@ -53,7 +40,9 @@
 <template>
   <div class="workbench-nav">
     <div v-for="app in apps" class="app-icon" :class="{'current-app': app._id === current}">
-      <Icon :icon="app.icon" class="icon-embed-2x" />
+      <LinkTo :path="[app._id]">
+        <Icon :icon="app.icon" class="icon-embed-2x" />
+      </LinkTo>
     </div>
   </div>
 </template>

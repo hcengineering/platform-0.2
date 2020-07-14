@@ -23,7 +23,8 @@ export default (S: Builder) => {
 
   S.createDocument(workbench.class.Application, {
     label: 'Найм' as StringProperty,
-    icon: requirement.icon.Recruitment
+    icon: requirement.icon.Recruitment,
+    main: requirement.component.Main,
   }, requirement.application.Recruitment)
 
 }

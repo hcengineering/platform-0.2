@@ -14,19 +14,40 @@
 -->
 
 <script lang="ts">
-  import { defineComponent } from 'vue'
+  import { defineComponent, ref, computed } from 'vue'
 
   import Nav from './nav/Nav.vue'
   import MainView from './MainView.vue'
   import Home from './Home.vue'
+  import {getCoreService} from "../utils";
+  import workbench, {Application} from "../index";
   // import Header from './header/Header.vue'
 
   export default defineComponent({
     components: {Nav, MainView, Home},
     props: {
-      location: Object,
+      location: {
+        type: Object,
+        required: true,
+      },
       params: Object
+    },
+    setup(props) {
+      const coreService = getCoreService()
+
+      const apps = ref([] as Application[])
+
+      coreService.getModel().find(workbench.class.Application, {}).then(docs => {
+        console.log(docs)
+        apps.value = docs as Application[]
+      })
+
+      const current = computed(() => props.location.path.length > 0 ? props.location.path[0] : '')
+      const page = props.location.path.length > 1 ? props.location.path[1] : ''
+
+      return {current, apps, page}
     }
+
   })
 </script>
 
@@ -39,13 +60,11 @@
 
     <nav>
       <!-- <Sidenav :applications="applications" /> -->
-      <Nav :location="location"/>
+      <Nav :apps="apps" :current="current"/>
     </nav>
 
     <main>
-      <Suspense v-if="path">
-        <MainView :params="params" :path="path"/>
-      </Suspense>
+      <widget v-if="page !== ''" :component="page"/>
       <Home v-else/>
     </main>
 
