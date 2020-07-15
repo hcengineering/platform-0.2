@@ -14,12 +14,21 @@
 //
 
 import { extendIds } from '@anticrm/platform-model'
-import task from '@anticrm/task'
-import { Ref } from '@anticrm/platform'
+import { Class, Ref } from '@anticrm/platform'
 import { Application } from '@anticrm/workbench'
+
+import task, { Task } from '@anticrm/task'
+import { IntlString } from '@anticrm/platform-i18n'
 
 export default extendIds(task, {
   application: {
     Task: '' as Ref<Application>
+  },
+  class: {
+    Task: '' as Ref<Class<Task>>
+  },
+  string: {
+    Task_name: '' as IntlString,
+    Task_description: '' as IntlString,
   }
 })

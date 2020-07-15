@@ -15,6 +15,7 @@
 
 import { mergeWith } from 'lodash'
 import { identify, Plugin, PluginDescriptor, Service } from '@anticrm/platform'
+import { IntlString } from '@anticrm/platform-i18n'
 
 type PluginIds = { [key: string]: { [key: string]: any } }
 
@@ -39,4 +40,21 @@ export function extendIds<P extends Service, X extends PluginDependencies, D ext
       throw new Error('attempting to overwrite ' + value)
     }
   })
+}
+
+// S T R I N G S
+
+type StringIds = { [key: string]: IntlString }
+type AsStrings<T> = { [P in keyof T]: string }
+
+export function verifyTranslation<T extends StringIds> (ids: T, translations: AsStrings<T>): { [key: string]: string } {
+  const result = {} as Record<string, string>
+  for (const key in ids) {
+    const translated = translations[key]
+    if (translated) {
+      const id = ids[key]
+      result[id] = translated
+    } else { throw new Error(`no translation for ${key}`) }
+  }
+  return result as AsStrings<T>
 }

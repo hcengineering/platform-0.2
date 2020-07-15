@@ -25,23 +25,39 @@ export default (S: Builder) => {
     _attributes: {}
   }, core.class.Obj)
 
+  S.createDocument(core.class.Class, {
+    _extends: core.class.Obj,
+    _attributes: {}
+  }, core.class.Emb)
+
   S.createClass(core.class.Doc, core.class.Obj, {
-    _id: S.newInstance(core.class.RefTo, {
+    _id: S.attr(core.class.RefTo, {
       to: core.class.Doc
     }),
-    _mixins: S.newInstance(core.class.ArrayOf, {
+    _mixins: S.attr(core.class.ArrayOf, {
       of: S.newInstance(core.class.RefTo, { to: core.class.Doc })
     })
   })
 
+  S.createClass(core.class.VDoc, core.class.Doc, {
+    _createdOn: S.attr(core.class.Type, {}),
+    _createdBy: S.attr(core.class.Type, {}),
+    _modifiedOn: S.attr(core.class.Type, {}),
+    _modifiedBy: S.attr(core.class.Type, {})
+  })
+
+  S.createClass(core.class.Attribute, core.class.Emb, {
+    type: S.attr(core.class.Type, {})
+  })
+
   S.createClass(core.class.Class, core.class.Doc, {
-    _attributes: S.newInstance(core.class.BagOf, {
+    _attributes: S.attr(core.class.BagOf, {
       of: S.newInstance(core.class.InstanceOf, { of: core.class.Type })
     }),
-    _extends: S.newInstance(core.class.RefTo as Ref<Class<RefTo<Class<Obj>>>>, {
+    _extends: S.attr(core.class.RefTo as Ref<Class<RefTo<Class<Obj>>>>, {
       to: core.class.Class
     }),
-    _native: S.newInstance(core.class.Type, {}),
-    _domain: S.newInstance(core.class.Type, {})
+    _native: S.attr(core.class.Type, {}),
+    _domain: S.attr(core.class.Type, {})
   }, CoreDomain.Model)
 }

@@ -13,29 +13,9 @@
 // limitations under the License.
 //
 
-import {
-  Class,
-  Doc,
-  Emb,
-  MemDb,
-  Metadata,
-  Method,
-  Plugin,
-  plugin,
-  Property,
-  PropertyType,
-  Ref,
-  Service,
-  StringProperty
-} from '@anticrm/platform'
+import { Class, Doc, Emb, MemDb, Metadata, Obj, Plugin, plugin, Ref, Service, Type } from '@anticrm/platform'
 
 // T Y P E S
-
-export interface Type extends Emb {
-  _default?: PropertyType
-  exert: Method<() => any>
-  hibernate: Method<(value: any) => PropertyType>
-}
 
 export interface RefTo<T extends Doc> extends Type {
   to: Ref<Class<T>>
@@ -53,35 +33,13 @@ export interface ArrayOf<A> extends Type {
   of: Type
 }
 
-// export interface StaticResource<T> extends Type<T> { }
-// export interface Method<T> extends StaticResource<T> { }
-
-// V E R S I O N I N G
-
-export type DateProperty = Property<number, Date>
-
-export interface VDoc extends Doc {
-  _createdOn: DateProperty
-  _createdBy: StringProperty
-  _modifiedOn?: DateProperty
-  _modifiedBy?: StringProperty
-}
-
-export interface Tx extends Doc {
-  _date: DateProperty
-  _user: StringProperty
-  _objectId: Ref<VDoc>
-}
-
-export interface CreateTx extends Tx {
-  _objectClass: Ref<Class<VDoc>>
-  _attributes: { [key: string]: PropertyType }
-}
-
 // P L U G I N
 
 export interface CoreService extends Service {
   getModel(): MemDb
+
+  is (obj: Obj, _class: Ref<Class<Obj>>): boolean
+  isMixedIn (obj: Doc, _class: Ref<Class<Doc>>): boolean
 }
 
 export default plugin('core' as Plugin<CoreService>, {}, {

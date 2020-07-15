@@ -13,20 +13,10 @@
 // limitations under the License.
 //
 
-import { plugin, Plugin, Service, StringProperty, VDoc } from '@anticrm/platform'
-import ui, { AnyComponent, Asset } from '@anticrm/platform-ui'
-import presentationCore from '@anticrm/presentation-core'
+import { verifyTranslation } from '@anticrm/platform-model'
+import task from '..'
 
-export interface Task extends VDoc {
-  name: StringProperty
-  description: StringProperty
-}
-
-export default plugin('task' as Plugin<Service>, { ui: ui.id, presentationCore: presentationCore.id }, {
-  icon: {
-    Task: '' as Asset,
-  },
-  component: {
-    Main: '' as AnyComponent
-  }
+export default verifyTranslation(task.string, {
+  Task_name: 'Наименование',
+  Task_description: 'Описание'
 })

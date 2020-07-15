@@ -15,6 +15,7 @@
 
 import {
   AllAttributes,
+  Attribute,
   Class,
   CoreDomain,
   Doc,
@@ -69,6 +70,11 @@ class Builder {
   newInstance<M extends Emb> (_class: Ref<Class<M>>, values: OptionalMethods<Omit<M, keyof Emb>>): M {
     const obj = { _class: _class as Ref<Class<Obj>>, ...values } as M
     return obj
+  }
+
+  attr<M extends Emb> (_class: Ref<Class<M>>, values: OptionalMethods<Omit<M, keyof Emb>>): Attribute {
+    const type = { _class: _class as Ref<Class<Obj>>, ...values } as M
+    return { _class: core.class.Attribute, type } as unknown as Attribute
   }
 
   createDocument<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Doc>, _id?: Ref<M>): void {

@@ -13,20 +13,25 @@
 // limitations under the License.
 //
 
-import core, { ArrayOf, BagOf, InstanceOf, RefTo, Type } from '@anticrm/platform-core'
+import core, { ArrayOf, BagOf, InstanceOf, RefTo } from '@anticrm/platform-core'
 import { extendIds } from './utils'
-import { Class, Doc, Emb, Obj, Ref } from '@anticrm/platform'
+import { Attribute, Class, Doc, Emb, Obj, Ref, Type, VDoc } from '@anticrm/platform'
 
 export { extendIds }
 export { default as Builder } from './builder'
+export { verifyTranslation } from './utils'
 
 export default extendIds(core, {
   class: {
     Obj: '' as Ref<Class<Obj>>,
+    Emb: '' as Ref<Class<Emb>>,
     Doc: '' as Ref<Class<Doc>>,
     Class: '' as Ref<Class<Class<Obj>>>,
 
+    Attribute: '' as Ref<Class<Attribute>>,
     Type: '' as Ref<Class<Type>>,
+
+    VDoc: '' as Ref<Class<VDoc>>,
 
     RefTo: '' as Ref<Class<RefTo<Doc>>>,
     InstanceOf: '' as Ref<Class<InstanceOf<Emb>>>,

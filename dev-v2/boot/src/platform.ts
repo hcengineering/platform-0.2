@@ -17,7 +17,9 @@ import { createPlatform } from '@anticrm/platform'
 
 import ui from '@anticrm/platform-ui'
 import core from '@anticrm/platform-core'
+import i18n from '@anticrm/platform-i18n'
 import login from '@anticrm/login'
+import presentationCore from '@anticrm/presentation-core'
 import workbench from '@anticrm/workbench'
 import recruitment from '@anticrm/recruitment'
 import task from '@anticrm/task'
@@ -32,7 +34,9 @@ platform.setMetadata(ui.metadata.DefaultApplication, login.component.LoginForm)
 
 platform.addLocation(ui, () => import(/* webpackChunkName: "platform-ui" */ '@anticrm/platform-ui/src/plugin'))
 platform.addLocation(core, () => import(/* webpackChunkName: "platform-core" */ '@anticrm/platform-core/src/plugin'))
+platform.addLocation(i18n, () => import(/* webpackChunkName: "platform-i18n" */ '@anticrm/platform-i18n/src/plugin'))
 platform.addLocation(login, () => import(/* webpackChunkName: "login" */ '@anticrm/login/src/plugin'))
+platform.addLocation(presentationCore, () => import(/* webpackChunkName: "presentation-core" */ '@anticrm/presentation-core/src/plugin'))
 platform.addLocation(workbench, () => import(/* webpackChunkName: "workbench" */ '@anticrm/workbench/src/plugin'))
 platform.addLocation(recruitment, () => import(/* webpackChunkName: "recruitment" */ '@anticrm/recruitment/src/plugin'))
 platform.addLocation(task, () => import(/* webpackChunkName: "task" */ '@anticrm/task/src/plugin'))

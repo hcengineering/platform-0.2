@@ -141,7 +141,7 @@ export class MemDb implements CoreProtocol {
     this.assign(doc as unknown as AnyLayout, clazz, values as unknown as AnyLayout)
   }
 
-  getClassHierarchy (cls: Ref<Class<Doc>>): Ref<Class<Obj>>[] {
+  getClassHierarchy (cls: Ref<Class<Obj>>): Ref<Class<Obj>>[] {
     const result = [] as Ref<Class<Obj>>[]
     let _class = cls as Ref<Class<Obj>> | undefined
     while (_class) {
@@ -149,6 +149,17 @@ export class MemDb implements CoreProtocol {
       _class = (this.get(_class) as Class<Obj>)._extends
     }
     return result
+  }
+
+  is (_class: Ref<Class<Obj>>, a: Ref<Class<Obj>>): boolean {
+    let cls = _class as Ref<Class<Obj>> | undefined
+    while (cls) {
+      if (cls === a) {
+        return true
+      }
+      cls = (this.get(cls) as Class<Obj>)._extends
+    }
+    return false
   }
 
   dump (): Doc[] {

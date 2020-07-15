@@ -14,8 +14,11 @@
 //
 
 import { Platform, Service } from '@anticrm/platform'
-import task from '.'
+import { UIService } from '@anticrm/platform-ui'
+import { PresentationCore } from '@anticrm/presentation-core'
+import { PresentationCoreInjectionKey } from './utils'
 
+import task from '.'
 import Main from './components/Main.vue'
 
 /*!
@@ -23,9 +26,11 @@ import Main from './components/Main.vue'
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */
-export default async (platform: Platform): Promise<Service> => {
+export default async (platform: Platform, deps: { ui: UIService, presentationCore: PresentationCore }): Promise<Service> => {
 
   platform.setResource(task.component.Main, Main)
+
+  deps.ui.getApp().provide(PresentationCoreInjectionKey, deps.presentationCore)
 
   return {}
 }

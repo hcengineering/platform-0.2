@@ -13,13 +13,16 @@
 // limitations under the License.
 //
 
-import { Builder } from '@anticrm/platform-model'
 import { StringProperty } from '@anticrm/platform'
 
+import { UIBuilder } from '@anticrm/presentation-model'
+
+import core from '@anticrm/platform-model'
 import workbench from '@anticrm/workbench-model'
 import task from '.'
 
-export default (S: Builder) => {
+
+export default (S: UIBuilder) => {
 
   S.createDocument(workbench.class.Application, {
     label: 'Задачи' as StringProperty,
@@ -27,4 +30,12 @@ export default (S: Builder) => {
     main: task.component.Main
   }, task.application.Task)
 
+  S.createClass(task.class.Task, core.class.VDoc, {
+    name: S.attrUI(core.class.Type, {}, {
+      label: task.string.Task_name
+    }),
+    description: S.attrUI(core.class.Type, {}, {
+      label: task.string.Task_description
+    }),
+  })
 }

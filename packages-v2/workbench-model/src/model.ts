@@ -19,9 +19,9 @@ import workbench from '.'
 export default (S: Builder) => {
 
   S.createClass(workbench.class.Application, core.class.Doc, {
-    label: S.newInstance(core.class.String, {}),
-    icon: S.newInstance(core.class.Type, {}),
-    main: S.newInstance(core.class.Type, {})
+    label: S.attr(core.class.String, {}),
+    icon: S.attr(core.class.Type, {}),
+    main: S.attr(core.class.Type, {})
   })
 
 }

@@ -46,7 +46,12 @@ export type PropertyType = Property<PrimitiveType, any>
 
 export type StringProperty = Property<string, string>
 
+export interface Type extends Emb {
+  _default?: PropertyType
+}
+
 export interface Attribute extends Emb {
+  type: Type
 }
 
 export type Attributes<T extends E, E extends Obj> = Record<Exclude<keyof T, keyof E>, Attribute>

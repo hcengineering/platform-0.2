@@ -13,20 +13,14 @@
 // limitations under the License.
 //
 
-import { plugin, Plugin, Service, StringProperty, VDoc } from '@anticrm/platform'
-import ui, { AnyComponent, Asset } from '@anticrm/platform-ui'
-import presentationCore from '@anticrm/presentation-core'
+import { plugin, Plugin, Resource, Service } from '@anticrm/platform'
+import { PrimitiveType } from 'intl-messageformat'
 
-export interface Task extends VDoc {
-  name: StringProperty
-  description: StringProperty
+export type IntlString = Resource<string> & { __intl_string: true }  // eslint-disable-line
+
+export interface I18n extends Service {
+  loadStrings (translations: { [key: string]: string }): void
+  translate (string: IntlString, params?: Record<string, PrimitiveType> | undefined): Promise<string>
 }
 
-export default plugin('task' as Plugin<Service>, { ui: ui.id, presentationCore: presentationCore.id }, {
-  icon: {
-    Task: '' as Asset,
-  },
-  component: {
-    Main: '' as AnyComponent
-  }
-})
+export default plugin('i18n' as Plugin<I18n>, { }, {})

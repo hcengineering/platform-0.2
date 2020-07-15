@@ -24,7 +24,7 @@ import { Model } from '@anticrm/boot/src/boot'
 
 platform.setMetadata(core.metadata.Model, Model)
 
-async function boot(): Promise<void> {
+async function boot (): Promise<void> {
   const uiService = await platform.getPlugin(ui.id)
   uiService.getApp().mount('#app')
 }

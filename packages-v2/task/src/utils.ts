@@ -13,20 +13,11 @@
 // limitations under the License.
 //
 
-import { plugin, Plugin, Service, StringProperty, VDoc } from '@anticrm/platform'
-import ui, { AnyComponent, Asset } from '@anticrm/platform-ui'
-import presentationCore from '@anticrm/presentation-core'
+import { PresentationCore } from '@anticrm/presentation-core'
+import { inject } from 'vue'
 
-export interface Task extends VDoc {
-  name: StringProperty
-  description: StringProperty
+export const PresentationCoreInjectionKey = 'presentation-core-injection-key'
+
+export function getPresentationCore(): PresentationCore {
+  return inject(PresentationCoreInjectionKey) as PresentationCore
 }
-
-export default plugin('task' as Plugin<Service>, { ui: ui.id, presentationCore: presentationCore.id }, {
-  icon: {
-    Task: '' as Asset,
-  },
-  component: {
-    Main: '' as AnyComponent
-  }
-})

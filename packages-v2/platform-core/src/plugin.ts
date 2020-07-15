@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { CoreDomain, MemDb, Platform } from '@anticrm/platform'
+import { Class, CoreDomain, Doc, MemDb, Obj, Platform, Ref } from '@anticrm/platform'
 import core, { CoreService } from '.'
 
 /*!
@@ -22,7 +22,6 @@ import core, { CoreService } from '.'
  * Licensed under the Eclipse Public License, Version 2.0
  */
 export default async (platform: Platform): Promise<CoreService> => {
-
   const model = new MemDb(CoreDomain.Model)
   const offline = platform.getMetadata(core.metadata.Model)
   if (offline) {
@@ -32,8 +31,16 @@ export default async (platform: Platform): Promise<CoreService> => {
   }
 
   return {
-    getModel() {
+    getModel () {
       return model
+    },
+
+    is (obj: Obj, _class: Ref<Class<Obj>>): boolean {
+      return model.is(obj._class, _class)
+    },
+
+    isMixedIn (obj: Doc, _class: Ref<Class<Doc>>): boolean {
+      return obj._mixins ? obj._mixins.includes(_class) : false
     }
   }
 }

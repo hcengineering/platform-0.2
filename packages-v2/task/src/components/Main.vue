@@ -13,6 +13,27 @@
 // limitations under the License.
 -->
 
+<script lang="ts">
+
+  import { defineComponent } from 'vue'
+  import { getPresentationCore } from '../utils'
+
+  import Table from '@anticrm/presentation-ui'
+
+  export default defineComponent({
+    components: { Table },
+    props: {
+      _class: String
+    },
+    setup(props) {
+      const ui = getPresentationCore()
+      ui.getAttrModel('class:task.Task').then(model => {
+        console.log('model', model)
+      })
+    }
+  })
+</script>
+
 <template>
   <div class="caption-1">Задачи</div>
 </template>
