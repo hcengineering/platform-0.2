@@ -32,5 +32,8 @@ export default plugin('workbench' as Plugin<WorkbenchService>, {core: core.id, u
   },
   component: {
     Workbench: '' as AnyComponent
+  },
+  icon: {
+    Add: '' as Asset
   }
 })

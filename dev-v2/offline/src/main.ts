@@ -19,10 +19,12 @@ import ErrorPage from './components/ErrorPage.vue'
 import platform from '@anticrm/boot/src/platform'
 import core from '@anticrm/platform-core'
 import ui from '@anticrm/platform-ui'
+import i18n from '@anticrm/platform-i18n'
 
-import { Model } from '@anticrm/boot/src/boot'
+import { Model, Strings } from '@anticrm/boot/src/boot'
 
 platform.setMetadata(core.metadata.Model, Model)
+platform.setMetadata(i18n.metadata.Strings, Strings)
 
 async function boot (): Promise<void> {
   const uiService = await platform.getPlugin(ui.id)

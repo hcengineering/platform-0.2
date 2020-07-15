@@ -42,7 +42,7 @@ export interface AttrModel extends UIModel {
 
 export interface PresentationCore extends Service {
 
-  getAttrModel(_class: Ref<Class<Obj>>): Promise<AttrModel[]>
+  getAttrModel(_class: Ref<Class<Obj>>, top?: Ref<Class<Obj>>): Promise<AttrModel[]>
 }
 
 export default plugin('presentation-core' as Plugin<PresentationCore>, { core: core.id, i18n: i18n.id }, {

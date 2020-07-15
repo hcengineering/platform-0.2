@@ -141,10 +141,10 @@ export class MemDb implements CoreProtocol {
     this.assign(doc as unknown as AnyLayout, clazz, values as unknown as AnyLayout)
   }
 
-  getClassHierarchy (cls: Ref<Class<Obj>>): Ref<Class<Obj>>[] {
+  getClassHierarchy (cls: Ref<Class<Obj>>, top?: Ref<Class<Obj>>): Ref<Class<Obj>>[] {
     const result = [] as Ref<Class<Obj>>[]
     let _class = cls as Ref<Class<Obj>> | undefined
-    while (_class) {
+    while (_class && _class !== top) {
       result.push(_class)
       _class = (this.get(_class) as Class<Obj>)._extends
     }

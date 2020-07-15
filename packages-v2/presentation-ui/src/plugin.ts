@@ -14,15 +14,20 @@
 //
 
 import { Platform } from '@anticrm/platform'
+import { PresentationCore } from '@anticrm/presentation-core'
+import { UIService } from '@anticrm/platform-ui'
+
+import { PresentationCoreInjectionKey } from './utils'
 import { PresentationUI } from '.'
-import { CoreService } from '@anticrm/platform-core'
 
 /*!
  * Anticrm Platform™ Presentation Plugin
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */
-export default async (platform: Platform, deps: { core: CoreService }): Promise<PresentationUI> => {
+export default async (platform: Platform, deps: { ui: UIService, presentationCore: PresentationCore }): Promise<PresentationUI> => {
+
+  deps.ui.getApp().provide(PresentationCoreInjectionKey, deps.presentationCore)
 
   return {
 

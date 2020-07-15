@@ -20,7 +20,7 @@ import workbench, { WorkbenchService } from '.'
 import Workbench from './components/Workbench.vue'
 import { UIService } from '@anticrm/platform-ui'
 
-import { CoreInjectionKey } from './utils'
+import { CoreInjectionKey, UIInjectionKey } from './utils'
 
 /*!
  * Anticrm Platform™ Workbench Plugin
@@ -31,7 +31,9 @@ export default async (platform: Platform, deps: { core: CoreService, ui: UIServi
 
   platform.setResource(workbench.component.Workbench, Workbench)
 
-  deps.ui.getApp().provide(CoreInjectionKey, deps.core)
+  deps.ui.getApp()
+    .provide(CoreInjectionKey, deps.core)
+    .provide(UIInjectionKey, deps.ui)
 
   return {}
 }

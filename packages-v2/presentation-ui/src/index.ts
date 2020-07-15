@@ -15,10 +15,12 @@
 
 import { plugin, Plugin, Service } from '@anticrm/platform'
 
+import presentationCore from '@anticrm/presentation-core'
+import ui from '@anticrm/platform-ui'
 
 export interface PresentationUI extends Service {
 }
 
-export default plugin('presentation-ui' as Plugin<PresentationUI>, { }, {
+export default plugin('presentation-ui' as Plugin<PresentationUI>, { ui: ui.id, presentationCore: presentationCore.id }, {
 
 })

@@ -15,24 +15,32 @@
 
 <script lang="ts">
 
-  import { defineComponent } from 'vue'
-  import workbench from '@anticrm/workbench'
-
-  import Table from '@anticrm/presentation-ui/src/components/Table.vue'
-  import AddItem from '@anticrm/workbench/src/components/AddItem.vue'
+  import { defineComponent, PropType, ref } from 'vue'
+  import { Class, Doc, Obj, Ref } from '@anticrm/platform'
+  import { getPresentationCore } from '../utils'
+  import { AttrModel } from '@anticrm/presentation-core'
 
   export default defineComponent({
-    components: { Table, AddItem },
+    components: {},
     props: {
-      _class: String
+      _class: {
+        type: String as unknown as PropType<Ref<Class<Obj>>>,
+        required: true
+      },
+      content: Array as PropType<Doc[]>,
     },
     setup(props) {
-      return { workbench }
+      const ui = getPresentationCore()
+      const model = ref([] as AttrModel[])
+      ui.getAttrModel(props._class, 'class:core.VDoc' as Ref<Class<Obj>>).then(m => {
+        model.value = m
+      })
+      return { model }
     }
+
   })
 </script>
 
 <template>
-  <div><span class="caption-1">Задачи</span>&nbsp;<AddItem :_class="_class" /></div>
-  <Table _class="class:task.Task" />
+  <div class="caption-1">Новый</div>
 </template>

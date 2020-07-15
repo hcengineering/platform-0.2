@@ -15,56 +15,41 @@
 
 <script lang="ts">
   import { defineComponent, PropType } from 'vue'
-  import { Application } from '../..'
-
+  import { Class, CreateTx, Ref, VDoc } from '@anticrm/platform'
   import Icon from '@anticrm/platform-ui/src/components/Icon.vue'
-  import LinkTo from '@anticrm/platform-ui/src/components/LinkTo.vue'
+  import workbench from '../..'
+  import { getCoreService } from '../utils'
 
   export default defineComponent({
-    components: { Icon, LinkTo },
+    components: { Icon },
     props: {
-      apps: {
-        type: Array as PropType<Application[]>,
-        required: true
-      },
-      current: String
+      _class: String as unknown as PropType<Ref<Class<VDoc>>>
     },
-
     setup(props) {
+
+      const coreService = getCoreService()
+
+      function add() {
+        console.log('add')
+        coreService.beginTransaction()
+        const createTx: CreateTx = {
+
+        }
+      }
+
+      return { workbench, add }
     }
   })
 </script>
 
 <template>
-  <div class="workbench-nav">
-    <div v-for="app in apps" class="app-icon" :class="{'current-app': app._id === current}">
-<!--      <LinkTo :path="[app._id]">-->
-      <a href="#" @click.prevent="$emit('navigate', app._id)">
-        <Icon :icon="app.icon" class="icon-embed-2x"/>
-      </a>
-<!--      </LinkTo>-->
-    </div>
-  </div>
+  <Icon :icon="workbench.icon.Add" class="icon-embed-2x workbench-add-item" @click="add"/>
 </template>
 
 <style lang="scss">
   @import "~@anticrm/sparkling-theme/css/_variables.scss";
 
-  .workbench-nav {
-    display: flex;
-    flex-direction: column;
-
-    .app-icon {
-      border-bottom: solid 1px $workspace-separator-color;
-      height: $pictogram-size;
-      .ui-icon {
-        padding:1em;
-      }
-
-      &.current-app {
-        background-color: $content-bg-color;
-      }
-    }
+  .workbench-add-item {
+    cursor: pointer;
   }
-
 </style>

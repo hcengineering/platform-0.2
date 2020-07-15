@@ -22,6 +22,7 @@
   "dependencies": {
     "@anticrm/platform": "^0.1.0",
     "@anticrm/platform-core": "^0.1.3",
-    "@anticrm/presentation-ui": "^0.1.0"
+    "@anticrm/presentation-ui": "^0.1.0",
+    "@anticrm/workbench": "^0.1.0"
   }
 }

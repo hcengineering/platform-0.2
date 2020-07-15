@@ -14,17 +14,27 @@
 -->
 
 <script lang="ts">
-  import { defineComponent, ref, computed } from 'vue'
+  import { computed, defineComponent, ref } from 'vue'
 
   import Nav from './nav/Nav.vue'
-  import MainView from './MainView.vue'
   import Home from './Home.vue'
-  import {getCoreService} from "../utils";
-  import workbench, {Application} from "../index";
-  // import Header from './header/Header.vue'
+  import { getCoreService, getUIService } from '../utils'
+  import workbench, { Application } from '../..'
+  import { Ref } from '@anticrm/platform'
+  import { AnyComponent } from '@anticrm/platform-ui'
+
+  interface PanelConfig {
+    app: Ref<Application>
+    component: AnyComponent
+  }
+
+  interface WorkbenchConfig {
+    panels: PanelConfig[]
+    currentPanel: number
+  }
 
   export default defineComponent({
-    components: {Nav, MainView, Home},
+    components: {Nav, Home},
     props: {
       location: {
         type: Object,
@@ -33,28 +43,61 @@
       params: Object
     },
     setup(props) {
-      const coreService = getCoreService()
-
       const apps = ref([] as Application[])
 
-      function getMain(current: string): string {
-        for (const app of apps.value) {
-          if (app._id === current) {
-            return app.main
-          }
-        }
-        return ''
-      }
-
+      const coreService = getCoreService()
       coreService.getModel().find(workbench.class.Application, {}).then(docs => {
         apps.value = docs as Application[]
       })
 
-      const current = computed(() => props.location.path.length > 0 ? props.location.path[0] : '')
-      const page = computed(() => props.location.path.length > 1 ? props.location.path[1] :
-        getMain(current.value))
+      const uiService = getUIService()
 
-      return {current, apps, page}
+      function getAppComponent(application: string): AnyComponent {
+        for (const app of apps.value) {
+          if (app._id === application) {
+            return app.main
+          }
+        }
+        return '' as AnyComponent
+      }
+
+      /**
+       * Translate application-agnostic path into workbench config.
+       * @param path
+       */
+      function parsePath(path: string[]): WorkbenchConfig {
+        const panels = [] as PanelConfig[]
+        for (const p of path) {
+          const split = p.split('!')
+          const app = split[0]
+          const component = split.length > 1 ? split[1] : getAppComponent(app)
+          panels.push({app: app as Ref<Application>, component: component as AnyComponent})
+        }
+        return { panels, currentPanel: panels.length - 1 }
+      }
+
+      const config = computed(() => parsePath(props.location.path))
+
+      function toLocation(config: WorkbenchConfig) {
+        const path = [] as string[]
+        for (const panel of config.panels) {
+          path.push(panel.app + '!' + panel.component)
+        }
+        return { app: undefined, path }
+      }
+
+      function navigateApp(app: Ref<Application>) {
+        const newConfig = { ...config.value }
+        if (newConfig.currentPanel >= 0) {
+          newConfig.panels[newConfig.currentPanel] = { app, component: getAppComponent(app) }
+        } else {
+          newConfig.panels.push({ app, component: getAppComponent(app) })
+          newConfig.currentPanel = 0
+        }
+        uiService.navigate(uiService.toUrl(toLocation(newConfig)))
+      }
+
+      return {apps, config, navigateApp}
     }
 
   })
@@ -69,16 +112,18 @@
 
     <nav>
       <!-- <Sidenav :applications="applications" /> -->
-      <Nav :apps="apps" :current="current"/>
+      <Nav :apps="apps"
+           :current="config.currentPanel < 0 ? '' : config.panels[config.currentPanel].app"
+           @navigate="navigateApp"
+      />
     </nav>
 
     <main>
-      <widget v-if="page !== ''" :component="page"/>
+      <widget v-if="config.currentPanel >= 0" :component="config.panels[0].component"/>
       <Home v-else/>
     </main>
 
     <aside>
-      <!-- <FormEditor v-if="leftPane" :object="leftPane" @save="onSave()"></FormEditor> -->
     </aside>
 
     <footer></footer>

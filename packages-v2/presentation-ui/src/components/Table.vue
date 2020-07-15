@@ -15,16 +15,29 @@
 
 <script lang="ts">
 
-  import { defineComponent, PropType } from 'vue'
-  import { Doc } from '@anticrm/platform'
+  import { defineComponent, PropType, ref } from 'vue'
+  import { Class, Doc, Obj, Ref } from '@anticrm/platform'
+  import { getPresentationCore } from '../utils'
   import { AttrModel } from '@anticrm/presentation-core'
 
   export default defineComponent({
     components: {},
     props: {
-      model: Array as PropType<AttrModel[]>,
+      _class: {
+        type: String as unknown as PropType<Ref<Class<Obj>>>,
+        required: true
+      },
       content: Array as PropType<Doc[]>,
     },
+    setup(props) {
+      const ui = getPresentationCore()
+      const model = ref([] as AttrModel[])
+      ui.getAttrModel(props._class, 'class:core.VDoc' as Ref<Class<Obj>>).then(m => {
+        model.value = m
+      })
+      return { model }
+    }
+
   })
 </script>
 

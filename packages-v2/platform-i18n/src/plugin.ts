@@ -14,7 +14,7 @@
 //
 
 import { Platform } from '@anticrm/platform'
-import { I18n, IntlString } from '.'
+import i18n, { I18n, IntlString } from '.'
 import { IntlMessageFormat, PrimitiveType } from 'intl-messageformat'
 
 /*!
@@ -47,6 +47,12 @@ export default async (platform: Platform): Promise<I18n> => {
       return imf.format(params) as string
     }
     return translation
+  }
+
+  const meta = platform.getMetadata(i18n.metadata.Strings)
+  if (meta) {
+    console.log(meta)
+    loadStrings(meta)
   }
 
   return {

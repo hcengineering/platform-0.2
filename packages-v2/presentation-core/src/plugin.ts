@@ -57,14 +57,12 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
         type: attribute.type
       })
     }
-    console.log(_class, result)
     return result
   }
 
-  async function getAttrModel(_class: Ref<Class<Obj>>): Promise<AttrModel[]> {
+  async function getAttrModel(_class: Ref<Class<Obj>>, top?: Ref<Class<Obj>>): Promise<AttrModel[]> {
     const model = coreService.getModel()
-    const hierarchy = model.getClassHierarchy(_class)
-    console.log('hierarchy', _class, hierarchy)
+    const hierarchy = model.getClassHierarchy(_class, top)
     const ownModels = hierarchy.map(async (_class) => getOwnAttrModel(_class))
     return Promise.all(ownModels).then(result => result.flat())
   }

@@ -13,11 +13,17 @@
 // limitations under the License.
 //
 
-import { CoreService } from '@anticrm/platform-core'
 import { inject } from 'vue'
+import { CoreService } from '@anticrm/platform-core'
+import { UIService } from '@anticrm/platform-ui'
 
 export const CoreInjectionKey = 'core-injection-key'
+export const UIInjectionKey = 'ui-injection-key'
 
 export function getCoreService(): CoreService {
   return inject(CoreInjectionKey) as CoreService
+}
+
+export function getUIService(): UIService {
+  return inject(UIInjectionKey) as UIService
 }

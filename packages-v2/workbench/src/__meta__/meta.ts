@@ -1,4 +1,4 @@
-<!--
+//
 // Copyright © 2020 Anticrm Platform Contributors.
 //
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
@@ -11,28 +11,14 @@
 //
 // See the License for the specific language governing permissions and
 // limitations under the License.
--->
+//
 
-<script lang="ts">
+import { Platform } from '@anticrm/platform'
+import workbench from '..'
 
-  import { defineComponent } from 'vue'
-  import workbench from '@anticrm/workbench'
-
-  import Table from '@anticrm/presentation-ui/src/components/Table.vue'
-  import AddItem from '@anticrm/workbench/src/components/AddItem.vue'
-
-  export default defineComponent({
-    components: { Table, AddItem },
-    props: {
-      _class: String
-    },
-    setup(props) {
-      return { workbench }
-    }
+export default (platform: Platform) => {
+  const spritesUrl = require('../../assets/icons.svg')
+  platform.loadMetadata(workbench.icon, {
+    Add: spritesUrl + '#add',
   })
-</script>
-
-<template>
-  <div><span class="caption-1">Задачи</span>&nbsp;<AddItem :_class="_class" /></div>
-  <Table _class="class:task.Task" />
-</template>
+}

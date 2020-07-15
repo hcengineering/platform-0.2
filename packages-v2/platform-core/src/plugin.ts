@@ -35,6 +35,8 @@ export default async (platform: Platform): Promise<CoreService> => {
       return model
     },
 
+    beginTransaction () {},
+
     is (obj: Obj, _class: Ref<Class<Obj>>): boolean {
       return model.is(obj._class, _class)
     },

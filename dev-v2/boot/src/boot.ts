@@ -20,6 +20,8 @@ import workbenchModel from '@anticrm/workbench-model/src/model'
 import recruitmentModel from '@anticrm/recruitment-model/src/model'
 import taskModel from '@anticrm/task-model/src/model'
 
+import taskStrings from '@anticrm/task-model/src/strings/ru'
+
 const builder = new UIBuilder()
 builder.load(platformModel)
 builder.load(workbenchModel)
@@ -27,4 +29,6 @@ builder.load(recruitmentModel)
 builder.load(taskModel)
 
 export const Model = builder.dumpAll()
-export const Strings = {}
+export const Strings = {
+  ...taskStrings
+}

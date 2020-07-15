@@ -38,6 +38,8 @@ export interface ArrayOf<A> extends Type {
 export interface CoreService extends Service {
   getModel(): MemDb
 
+  beginTransaction(): void
+
   is (obj: Obj, _class: Ref<Class<Obj>>): boolean
   isMixedIn (obj: Doc, _class: Ref<Class<Doc>>): boolean
 }

@@ -18,6 +18,6 @@ import { inject } from 'vue'
 
 export const PresentationCoreInjectionKey = 'presentation-core-injection-key'
 
-export function getCoreService(): PresentationCore {
+export function getPresentationCore(): PresentationCore {
   return inject(PresentationCoreInjectionKey) as PresentationCore
 }
