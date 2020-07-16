@@ -1,4 +1,4 @@
-//
+<!--
 // Copyright © 2020 Anticrm Platform Contributors.
 //
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
@@ -11,19 +11,31 @@
 //
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
+-->
 
-import { plugin, Plugin, Service } from '@anticrm/platform'
+<script lang="ts">
 
-import presentationCore from '@anticrm/presentation-core'
-import ui, { AnyComponent } from '@anticrm/platform-ui'
+  import { defineComponent } from 'vue'
+  import workbench from '..'
 
-export interface PresentationUI extends Service {
-}
+  import Table from '@anticrm/presentation-ui/src/components/Table.vue'
+  import AddItem from './AddItem.vue'
 
-export default plugin('presentation-ui' as Plugin<PresentationUI>, { ui: ui.id, presentationCore: presentationCore.id }, {
+  export default defineComponent({
+    components: {
+      Table,
+      AddItem
+    },
+    props: {
+      _class: String
+    },
+    setup(props) {
+      return { workbench }
+    }
+  })
+</script>
 
-  components: {
-    Table: '' as AnyComponent
-  }
-})
+<template>
+  <div><span class="caption-1">{{_class}}</span>&nbsp;<AddItem :_class="_class" /></div>
+  <Table _class="class:task.Task" />
+</template>

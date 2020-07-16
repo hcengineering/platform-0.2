@@ -15,11 +15,19 @@
 
 import { extendIds } from '@anticrm/platform-model'
 import recruitment from '@anticrm/recruitment'
-import { Ref } from '@anticrm/platform'
+import { Class, Ref, VDoc } from '@anticrm/platform'
 import { Application } from '@anticrm/workbench'
+
+export interface Candidate extends VDoc {
+  firstName: string
+  lastName: string
+}
 
 export default extendIds(recruitment, {
   application: {
     Recruitment: '' as Ref<Application>
+  },
+  class: {
+    Candidate: '' as Ref<Class<Candidate>>
   }
 })

@@ -20,7 +20,7 @@
   import Home from './Home.vue'
   import { getCoreService, getUIService } from '../utils'
   import workbench, { Application } from '../..'
-  import { Ref } from '@anticrm/platform'
+  import { Class, Ref, VDoc } from '@anticrm/platform'
   import { AnyComponent } from '@anticrm/platform-ui'
 
   interface PanelConfig {
@@ -52,13 +52,13 @@
 
       const uiService = getUIService()
 
-      function getAppComponent(application: string): AnyComponent {
+      function getAppClass(application: string): Ref<Class<VDoc>> {
         for (const app of apps.value) {
           if (app._id === application) {
-            return app.main
+            return app.appClass
           }
         }
-        return '' as AnyComponent
+        return '' as Ref<Class<VDoc>>
       }
 
       /**
@@ -70,7 +70,7 @@
         for (const p of path) {
           const split = p.split('!')
           const app = split[0]
-          const component = split.length > 1 ? split[1] : getAppComponent(app)
+          const component = split.length > 1 ? split[1] : workbench.component.Browse
           panels.push({app: app as Ref<Application>, component: component as AnyComponent})
         }
         return { panels, currentPanel: panels.length - 1 }
@@ -86,18 +86,23 @@
         return { app: undefined, path }
       }
 
-      function navigateApp(app: Ref<Application>) {
+      function navigateApp(app: Application) {
         const newConfig = { ...config.value }
+        const component = workbench.component.Browse
         if (newConfig.currentPanel >= 0) {
-          newConfig.panels[newConfig.currentPanel] = { app, component: getAppComponent(app) }
+          newConfig.panels[newConfig.currentPanel] = { app: app._id as Ref<Application>, component }
         } else {
-          newConfig.panels.push({ app, component: getAppComponent(app) })
+          newConfig.panels.push({ app: app._id as Ref<Application>, component })
           newConfig.currentPanel = 0
         }
         uiService.navigate(uiService.toUrl(toLocation(newConfig)))
       }
 
-      return {apps, config, navigateApp}
+      function navigatePanel(event: any) {
+        console.log('navigate', event)
+      }
+
+      return {apps, config, navigateApp, navigatePanel, getAppClass}
     }
 
   })
@@ -119,7 +124,9 @@
     </nav>
 
     <main>
-      <widget v-if="config.currentPanel >= 0" :component="config.panels[0].component"/>
+      <widget v-if="config.currentPanel >= 0" :component="config.panels[0].component"
+              :_class="getAppClass(config.panels[0].app)"
+      />
       <Home v-else/>
     </main>
 

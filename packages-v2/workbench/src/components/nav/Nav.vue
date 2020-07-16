@@ -39,7 +39,7 @@
   <div class="workbench-nav">
     <div v-for="app in apps" class="app-icon" :class="{'current-app': app._id === current}">
 <!--      <LinkTo :path="[app._id]">-->
-      <a href="#" @click.prevent="$emit('navigate', app._id)">
+      <a href="#" @click.prevent="$emit('navigate', app)">
         <Icon :icon="app.icon" class="icon-embed-2x"/>
       </a>
 <!--      </LinkTo>-->

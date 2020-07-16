@@ -21,6 +21,7 @@ export default (S: Builder) => {
   S.createClass(workbench.class.Application, core.class.Doc, {
     label: S.attr(core.class.String, {}),
     icon: S.attr(core.class.Type, {}),
+    appClass: S.attr(core.class.Type, {}),
     main: S.attr(core.class.Type, {})
   })
 

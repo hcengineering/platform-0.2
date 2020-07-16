@@ -16,9 +16,11 @@
 import { inject } from 'vue'
 import { CoreService } from '@anticrm/platform-core'
 import { UIService } from '@anticrm/platform-ui'
+// import { PresentationUI } from '@anticrm/presentation-ui'
 
 export const CoreInjectionKey = 'core-injection-key'
 export const UIInjectionKey = 'ui-injection-key'
+export const PresentationUIInjectionKey = 'presentation-ui-injection-key'
 
 export function getCoreService(): CoreService {
   return inject(CoreInjectionKey) as CoreService
@@ -27,3 +29,7 @@ export function getCoreService(): CoreService {
 export function getUIService(): UIService {
   return inject(UIInjectionKey) as UIService
 }
+
+// export function getPresentationUI(): PresentationUI {
+//   return inject(PresentationUIInjectionKey) as PresentationUI
+// }

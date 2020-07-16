@@ -13,18 +13,30 @@
 // limitations under the License.
 //
 
-import { Builder } from '@anticrm/platform-model'
+import { UIBuilder } from '@anticrm/presentation-model'
 import workbench from '@anticrm/workbench-model'
 import { StringProperty } from '@anticrm/platform'
+import core from '@anticrm/platform-model'
 
 import requirement from '.'
+import { IntlString } from '@anticrm/platform-i18n'
 
-export default (S: Builder) => {
+export default (S: UIBuilder) => {
 
   S.createDocument(workbench.class.Application, {
     label: 'Найм' as StringProperty,
     icon: requirement.icon.Recruitment,
     main: requirement.component.Main,
+    appClass: requirement.class.Candidate
   }, requirement.application.Recruitment)
+
+  S.createClass(requirement.class.Candidate, core.class.VDoc, {
+    firstName: S.attrUI(core.class.Type, {}, {
+      label: 'Имя' as IntlString
+    }),
+    lastName: S.attrUI(core.class.Type, {}, {
+      label: 'Фамилия' as IntlString
+    }),
+  })
 
 }

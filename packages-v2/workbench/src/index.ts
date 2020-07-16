@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Class, Doc, plugin, Plugin, Ref, Service, StringProperty } from '@anticrm/platform'
+import { Class, Doc, plugin, Plugin, Ref, Service, StringProperty, VDoc } from '@anticrm/platform'
 import ui, { AnyComponent, Asset } from '@anticrm/platform-ui'
 import core from '@anticrm/platform-core'
 
@@ -21,6 +21,7 @@ export interface Application extends Doc {
   label: StringProperty
   icon: Asset
   main: AnyComponent
+  appClass: Ref<Class<VDoc>>
 }
 
 export interface WorkbenchService extends Service {
@@ -31,7 +32,8 @@ export default plugin('workbench' as Plugin<WorkbenchService>, {core: core.id, u
     Application: '' as Ref<Class<Application>>
   },
   component: {
-    Workbench: '' as AnyComponent
+    Workbench: '' as AnyComponent,
+    Browse: '' as AnyComponent
   },
   icon: {
     Add: '' as Asset

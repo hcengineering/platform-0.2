@@ -27,7 +27,8 @@ export default (S: UIBuilder) => {
   S.createDocument(workbench.class.Application, {
     label: 'Задачи' as StringProperty,
     icon: task.icon.Task,
-    main: task.component.Main
+    main: task.component.Main,
+    appClass: task.class.Task
   }, task.application.Task)
 
   S.createClass(task.class.Task, core.class.VDoc, {

@@ -18,7 +18,9 @@ import { PresentationCore } from '@anticrm/presentation-core'
 import { UIService } from '@anticrm/platform-ui'
 
 import { PresentationCoreInjectionKey } from './utils'
-import { PresentationUI } from '.'
+import ui, { PresentationUI } from '.'
+
+import Table from './components/Table.vue'
 
 /*!
  * Anticrm Platform™ Presentation Plugin
@@ -28,6 +30,8 @@ import { PresentationUI } from '.'
 export default async (platform: Platform, deps: { ui: UIService, presentationCore: PresentationCore }): Promise<PresentationUI> => {
 
   deps.ui.getApp().provide(PresentationCoreInjectionKey, deps.presentationCore)
+
+  platform.setResource(ui.components.Table, Table)
 
   return {
 

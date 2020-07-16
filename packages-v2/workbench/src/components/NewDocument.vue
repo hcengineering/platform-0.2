@@ -17,7 +17,7 @@
 
   import { defineComponent, PropType, ref } from 'vue'
   import { Class, Doc, Obj, Ref } from '@anticrm/platform'
-  import { getPresentationCore } from '../utils'
+  import { getPresentationCore } from '@anticrm/presentation-ui/src/utils'
   import { AttrModel } from '@anticrm/presentation-core'
 
   export default defineComponent({
