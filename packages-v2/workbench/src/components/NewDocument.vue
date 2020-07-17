@@ -15,32 +15,64 @@
 
 <script lang="ts">
 
-  import { defineComponent, PropType, ref } from 'vue'
-  import { Class, Doc, Obj, Ref } from '@anticrm/platform'
-  import { getPresentationCore } from '@anticrm/presentation-ui/src/utils'
-  import { AttrModel } from '@anticrm/presentation-core'
+  import { computed, defineComponent, PropType, ref, watch } from 'vue'
+  import { Class, Obj, Ref } from '@anticrm/platform'
+  import presentationCore, { AttrModel } from '@anticrm/presentation-core'
+  import { getPlatform } from '@anticrm/platform-ui'
+
+  import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.vue'
 
   export default defineComponent({
-    components: {},
+    components: { InlineEdit },
     props: {
       _class: {
         type: String as unknown as PropType<Ref<Class<Obj>>>,
         required: true
       },
-      content: Array as PropType<Doc[]>,
     },
     setup(props) {
-      const ui = getPresentationCore()
+      const platform = getPlatform()
       const model = ref([] as AttrModel[])
-      ui.getAttrModel(props._class, 'class:core.VDoc' as Ref<Class<Obj>>).then(m => {
-        model.value = m
-      })
-      return { model }
-    }
 
+      // following async code does not trigger on `_class` prop change, so we use `watch`
+      // the issue is that watching props is a kind of nonsense (because props) are formally constants.
+      // so, the trick for now is to make computed and watch it... we need to revisit this later.
+
+      watch(computed(() => props._class), () => {
+        platform.getPlugin(presentationCore.id)
+          .then(core => core.getAttrModel(props._class, 'class:core.VDoc' as Ref<Class<Obj>>))
+          .then(m => model.value = m)
+      }, {immediate: true})
+      return {model}
+    }
   })
 </script>
 
 <template>
-  <div class="caption-1">Новый</div>
+  <div style="margin-left: 1em" class="workbench-new-document">
+    <div class="caption-4">Создаем: Рекрутинг/Кандидат</div>
+
+    <table>
+      <tr v-for="attr in model">
+        <td class="label">{{attr.label}}</td>
+        <td class="edit"><InlineEdit :placeholder="attr.placeholder"/></td>
+      </tr>
+    </table>
+  </div>
 </template>
+
+<style lang="scss">
+  @import "~@anticrm/sparkling-theme/css/_variables.scss";
+
+  .workbench-new-document {
+
+    .label {
+      color: $content-color-dark;
+    }
+
+    .edit {
+      /*font-family: 'IBM Plex Sans';*/
+      /*font-size: 14px;*/
+    }
+  }
+</style>

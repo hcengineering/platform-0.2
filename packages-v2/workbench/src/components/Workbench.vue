@@ -98,8 +98,10 @@
         uiService.navigate(uiService.toUrl(toLocation(newConfig)))
       }
 
-      function navigatePanel(event: any) {
-        console.log('navigate', event)
+      function navigatePanel(component: AnyComponent) {
+        const newConfig = { ...config.value }
+        newConfig.panels[newConfig.currentPanel].component = component
+        uiService.navigate(uiService.toUrl(toLocation(newConfig)))
       }
 
       return {apps, config, navigateApp, navigatePanel, getAppClass}
@@ -124,8 +126,12 @@
     </nav>
 
     <main>
+      <div v-if="config.currentPanel >= 0">
+
+      </div>
       <widget v-if="config.currentPanel >= 0" :component="config.panels[0].component"
               :_class="getAppClass(config.panels[0].app)"
+              @navigate="navigatePanel"
       />
       <Home v-else/>
     </main>

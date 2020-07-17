@@ -15,30 +15,37 @@
 
 <script lang="ts">
 
-  import { defineComponent, PropType, ref } from 'vue'
+  import { computed, defineComponent, PropType, ref, watch } from 'vue'
   import { Class, Doc, Obj, Ref } from '@anticrm/platform'
-  import { getPresentationCore } from '../utils'
-  import { AttrModel } from '@anticrm/presentation-core'
+  import presentationCore, { AttrModel } from '@anticrm/presentation-core'
+  import { getPlatform } from '@anticrm/platform-ui'
 
   export default defineComponent({
-    components: {},
-    props: {
-      _class: {
-        type: String as unknown as PropType<Ref<Class<Obj>>>,
-        required: true
+      components: {},
+      props: {
+        _class: {
+          type: String as unknown as PropType<Ref<Class<Obj>>>,
+          required: true
+        },
+        content: Array as PropType<Doc[]>,
       },
-      content: Array as PropType<Doc[]>,
-    },
-    setup(props) {
-      const ui = getPresentationCore()
-      const model = ref([] as AttrModel[])
-      ui.getAttrModel(props._class, 'class:core.VDoc' as Ref<Class<Obj>>).then(m => {
-        model.value = m
-      })
-      return { model }
-    }
+      setup(props) {
+        const platform = getPlatform()
+        const model = ref([] as AttrModel[])
 
-  })
+        // following async code does not trigger on `_class` prop change, so we use `watch`
+        // the issue is that watching props is a kind of nonsense (because props) are formally constants.
+        // so, the trick for now is to make computed and watch it... we need to revisit this later.
+
+        watch(computed(()=> props._class), () => {
+          platform.getPlugin(presentationCore.id)
+            .then(core => core.getAttrModel(props._class, 'class:core.VDoc' as Ref<Class<Obj>>))
+            .then(m => model.value = m)
+        }, { immediate: true })
+        return { model }
+      }
+    })
+
 </script>
 
 <template>

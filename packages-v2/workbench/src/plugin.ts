@@ -22,6 +22,7 @@ import { CoreInjectionKey, UIInjectionKey } from './utils'
 
 import Workbench from './components/Workbench.vue'
 import Browse from './components/Browse.vue'
+import NewDocument from './components/NewDocument.vue'
 
 /*!
  * Anticrm Platform™ Workbench Plugin
@@ -31,7 +32,9 @@ import Browse from './components/Browse.vue'
 export default async (platform: Platform, deps: { core: CoreService, ui: UIService }): Promise<WorkbenchService> => {
 
   platform.setResource(workbench.component.Workbench, Workbench)
+
   platform.setResource(workbench.component.Browse, Browse)
+  platform.setResource(workbench.component.NewDocument, NewDocument)
 
   deps.ui.getApp()
     .provide(CoreInjectionKey, deps.core)

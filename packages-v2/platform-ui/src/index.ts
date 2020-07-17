@@ -14,7 +14,16 @@
 //
 
 import { App, inject } from 'vue'
-import { Metadata, Platform, plugin, Plugin, Resource, Service } from '@anticrm/platform'
+import {
+  Metadata,
+  Platform,
+  plugin,
+  Plugin,
+  PluginDependencies,
+  PluginServices,
+  Resource,
+  Service
+} from '@anticrm/platform'
 
 export type URL = string
 export type Asset = Metadata<URL>
@@ -40,12 +49,19 @@ export interface UIService extends Service {
 export const PlatformInjectionKey = Symbol('platform')
 export const UIInjectionKey = Symbol('platform-ui')
 
-export function getPlatform() {
+export function getPlatform () {
   return inject(PlatformInjectionKey) as Platform
 }
 
-export function getUIService() {
+export function getUIService () {
   return inject(UIInjectionKey) as UIService
+}
+
+export async function injectPlugins<D extends PluginDependencies> (deps: D): Promise<{ platform: Platform, deps: PluginServices<D> }> {
+  const platform = inject(PlatformInjectionKey) as Platform
+  if (!platform) { throw new Error('Platform is not provided.') }
+  const resolvedDeps = await platform.resolveDependencies(deps)
+  return { platform: platform as Platform, deps: resolvedDeps as PluginServices<D> }
 }
 
 export default plugin('vue' as Plugin<UIService>, {}, {

@@ -19,23 +19,33 @@
   import workbench from '..'
 
   import Table from '@anticrm/presentation-ui/src/components/Table.vue'
-  import AddItem from './AddItem.vue'
+  import Icon from '@anticrm/platform-ui/src/components/Icon.vue'
 
   export default defineComponent({
     components: {
       Table,
-      AddItem
+      Icon
     },
     props: {
       _class: String
     },
     setup(props) {
-      return { workbench }
+      console.log('Browse', props._class)
+      function add() {
+        console.log('add')
+        this.$emit('navigate', workbench.component.NewDocument)
+      }
+      return { workbench, add }
     }
   })
 </script>
 
 <template>
-  <div><span class="caption-1">{{_class}}</span>&nbsp;<AddItem :_class="_class" /></div>
-  <Table _class="class:task.Task" />
+  <div>
+    <div>
+      <span class="caption-1">{{_class}}</span>&nbsp;
+      <a href="#" @click.prevent="add"><Icon :icon="workbench.icon.Add" class="icon-embed-2x"/></a>
+    </div>
+    <Table :_class="_class" />
+  </div>
 </template>

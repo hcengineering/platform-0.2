@@ -33,7 +33,8 @@ export default plugin('workbench' as Plugin<WorkbenchService>, {core: core.id, u
   },
   component: {
     Workbench: '' as AnyComponent,
-    Browse: '' as AnyComponent
+    Browse: '' as AnyComponent,
+    NewDocument: '' as AnyComponent
   },
   icon: {
     Add: '' as Asset
