@@ -14,16 +14,7 @@
 //
 
 import { generateId } from './objectid'
-import { AnyLayout, Class, CoreProtocol, Doc, Obj, PropertyType, Ref } from './core'
-
-export function attributeKey (_class: Ref<Class<Obj>>, key: string): string {
-  // const index = _class.indexOf(':')
-  // const dot = _class.indexOf('.')
-  // const plugin = _class.substring(index + 1, dot)
-  // const cls = _class.substring(dot + 1)
-  // return plugin + '|' + cls + '|' + key
-  return key
-}
+import { AnyLayout, Class, Classifier, ClassifierKind, CoreProtocol, Doc, Mixin, Obj, PropertyType, Ref } from './core'
 
 export class MemDb implements CoreProtocol {
   private domain: string
@@ -42,6 +33,13 @@ export class MemDb implements CoreProtocol {
       }
     }
     return this.byClass.get(_class) ?? []
+  }
+
+  attributeKey (clazz: Classifier<Obj>, key: string): string {
+    if (clazz._kind === ClassifierKind.MIXIN) {
+      return clazz._id + '|' + key
+    }
+    return key
   }
 
   set (doc: Doc) {
@@ -101,7 +99,7 @@ export class MemDb implements CoreProtocol {
     while (_class) {
       const clazz = this.get(_class) as Class<Obj>
       if ((clazz._attributes as any)[key] !== undefined) {
-        return attributeKey(_class, key)
+        return this.attributeKey(clazz, key)
       }
       _class = clazz._extends
     }
@@ -109,7 +107,7 @@ export class MemDb implements CoreProtocol {
   }
 
   // from Builder
-  assign (layout: AnyLayout, _class: Ref<Class<Doc>>, values: AnyLayout) {
+  assign (layout: AnyLayout, _class: Ref<Classifier<Doc>>, values: AnyLayout) {
     const l = layout as unknown as AnyLayout
     const r = values as unknown as AnyLayout
     for (const key in values) {
@@ -132,13 +130,13 @@ export class MemDb implements CoreProtocol {
     return layout
   }
 
-  mixin<T extends E, E extends Doc> (id: Ref<E>, clazz: Ref<Class<T>>, values: Omit<T, keyof E>): void {
+  mixin<T extends E, E extends Doc> (id: Ref<E>, clazz: Ref<Mixin<T>>, values: Omit<T, keyof E>): void {
     const doc = this.get(id)
     if (!doc._mixins) {
       doc._mixins = []
     }
     doc._mixins.push(clazz)
-    this.assign(doc as unknown as AnyLayout, clazz, values as unknown as AnyLayout)
+    this.assign(doc as unknown as AnyLayout, clazz as Ref<Classifier<Doc>>, values as unknown as AnyLayout)
   }
 
   getClassHierarchy (cls: Ref<Class<Obj>>, top?: Ref<Class<Obj>>): Ref<Class<Obj>>[] {
@@ -188,7 +186,7 @@ export class MemDb implements CoreProtocol {
   // Q U E R Y
   async find (clazz: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc[]> {
     const byClass = this.objectsOfClass(clazz)
-    return findAll(byClass, clazz, query)
+    return this.findAll(byClass, clazz, query)
   }
 
   async findOne (clazz: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc | undefined> {
@@ -196,21 +194,22 @@ export class MemDb implements CoreProtocol {
     return result.length === 0 ? undefined : result[0]
   }
 
+  private findAll (docs: Doc[], _class: Ref<Class<Doc>>, query: AnyLayout): Doc[] {
+    let result = docs
+    const clazz = this.get(_class) as Classifier<Obj>
+
+    for (const key in query) {
+      const condition = query[key]
+      const aKey = this.attributeKey(clazz, key)
+      result = filterEq(result, aKey, condition)
+    }
+
+    return result === docs ? docs.concat() : result
+  }
+
   tx (): Promise<void> {
     throw new Error('memdb is read only')
   }
-}
-
-function findAll (docs: Doc[], clazz: Ref<Class<Doc>>, query: AnyLayout): Doc[] {
-  let result = docs
-
-  for (const key in query) {
-    const condition = query[key]
-    const aKey = attributeKey(clazz, key)
-    result = filterEq(result, aKey, condition)
-  }
-
-  return result === docs ? docs.concat() : result
 }
 
 function filterEq (docs: Doc[], propertyKey: string, value: PropertyType): Doc[] {

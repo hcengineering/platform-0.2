@@ -15,7 +15,7 @@
 
 import core, { ArrayOf, BagOf, InstanceOf, RefTo } from '@anticrm/platform-core'
 import { extendIds } from './utils'
-import { Attribute, Class, Doc, Emb, Obj, Ref, Type, VDoc } from '@anticrm/platform'
+import { Attribute, Class, Classifier, Doc, Emb, Mixin, Obj, Ref, Type, VDoc } from '@anticrm/platform'
 
 export { extendIds }
 export { default as Builder } from './builder'
@@ -26,7 +26,10 @@ export default extendIds(core, {
     Obj: '' as Ref<Class<Obj>>,
     Emb: '' as Ref<Class<Emb>>,
     Doc: '' as Ref<Class<Doc>>,
+
+    Classifier: '' as Ref<Class<Classifier<Obj>>>,
     Class: '' as Ref<Class<Class<Obj>>>,
+    Mixin: '' as Ref<Class<Mixin<Doc>>>,
 
     Attribute: '' as Ref<Class<Attribute>>,
     Type: '' as Ref<Class<Type>>,

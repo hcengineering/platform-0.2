@@ -39,7 +39,7 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
       let label = key
       let placeholder = key
       let icon: Asset | undefined
-      if (coreService.is(attribute, ui.class.AttributeUI)) {
+      if (coreService.getModel().is(attribute._class, ui.class.AttributeUI)) {
         const attributeUI = attribute as AttributeUI
         label = await i18nService.translate(attributeUI.label)
         if (attributeUI.placeholder) {

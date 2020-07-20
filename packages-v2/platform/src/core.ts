@@ -35,7 +35,7 @@ export interface Emb extends Obj {
 export interface Doc extends Obj {
   _class: Ref<Class<Doc>>
   _id: Ref<Doc>
-  _mixins?: Ref<Class<Doc>>[]
+  _mixins?: Ref<Mixin<Doc>>[]
 }
 
 export type PropertyType = Property<PrimitiveType, any>
@@ -57,12 +57,22 @@ export interface Attribute extends Emb {
 export type Attributes<T extends E, E extends Obj> = Record<Exclude<keyof T, keyof E>, Attribute>
 export type AllAttributes<T extends E, E extends Obj> = Required<Attributes<T, E>> & Partial<Attributes<E, Obj>>
 
+export enum ClassifierKind {
+  CLASS,
+  MIXIN
+}
+
 export interface EClassifier<T extends E, E extends Obj> extends Doc {
+  _kind: ClassifierKind
   _attributes: AllAttributes<T, E>
   _extends?: Ref<Classifier<E>>
 }
 
 export type Classifier<T extends Obj> = EClassifier<T, Obj>
+
+export interface EMixin<T extends E, E extends Doc> extends EClassifier<T, E> {}
+
+export type Mixin<T extends Doc> = EMixin<T, Doc>
 
 export interface EClass<T extends E, E extends Obj> extends EClassifier<T, E> {
   _native?: Resource<Object>

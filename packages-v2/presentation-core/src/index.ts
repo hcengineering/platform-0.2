@@ -13,11 +13,11 @@
 // limitations under the License.
 //
 
-import { Attribute, Class, Obj, Plugin, plugin, Ref, Service, Type } from '@anticrm/platform'
+import { Attribute, Class, Mixin, Obj, Plugin, plugin, Ref, Service, Type, VDoc } from '@anticrm/platform'
 
 import core from '@anticrm/platform-core'
 import i18n, { IntlString } from '@anticrm/platform-i18n'
-import { Asset } from '@anticrm/platform-ui'
+import { AnyComponent, Asset } from '@anticrm/platform-ui'
 
 // U I  E X T E N S I O N S
 
@@ -25,6 +25,10 @@ export interface AttributeUI extends Attribute {
   label: IntlString
   placeholder?: IntlString
   icon?: Asset
+}
+
+export interface DetailsForm<T extends VDoc> extends Class<T> {
+  form: AnyComponent
 }
 
 // U I  M O D E L
@@ -47,6 +51,7 @@ export interface PresentationCore extends Service {
 
 export default plugin('presentation-core' as Plugin<PresentationCore>, { core: core.id, i18n: i18n.id }, {
   class: {
-    AttributeUI: '' as Ref<Class<AttributeUI>>
+    AttributeUI: '' as Ref<Class<AttributeUI>>,
+    DetailsForm: '' as Ref<Mixin<DetailsForm<VDoc>>>
   }
 })

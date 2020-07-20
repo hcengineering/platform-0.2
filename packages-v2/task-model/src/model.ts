@@ -15,7 +15,7 @@
 
 import { StringProperty } from '@anticrm/platform'
 
-import { UIBuilder } from '@anticrm/presentation-model'
+import presentation, { UIBuilder } from '@anticrm/presentation-model'
 
 import core from '@anticrm/platform-model'
 import workbench from '@anticrm/workbench-model'
@@ -38,5 +38,9 @@ export default (S: UIBuilder) => {
     description: S.attrUI(core.class.Type, {}, {
       label: task.string.Task_description
     }),
+  })
+
+  S.mixin(task.class.Task, presentation.class.DetailsForm, {
+    form: task.component.TaskDetails
   })
 }

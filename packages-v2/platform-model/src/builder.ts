@@ -17,11 +17,13 @@ import {
   AllAttributes,
   Attribute,
   Class,
+  ClassifierKind,
   CoreDomain,
   Doc,
   EClass,
   Emb,
   MemDb,
+  Mixin,
   Obj,
   OptionalMethods,
   Ref,
@@ -67,6 +69,10 @@ class Builder {
 
   ///
 
+  mixin<T extends E, E extends Doc> (id: Ref<E>, clazz: Ref<Mixin<T>>, values: Omit<T, keyof E>): void {
+    this.memdb.mixin(id, clazz, values)
+  }
+
   newInstance<M extends Emb> (_class: Ref<Class<M>>, values: OptionalMethods<Omit<M, keyof Emb>>): M {
     const obj = { _class: _class as Ref<Class<Obj>>, ...values } as M
     return obj
@@ -83,7 +89,13 @@ class Builder {
 
   createClass<T extends E, E extends Obj> (_id: Ref<Class<T>>, _extends: Ref<Class<E>>, _attributes: AllAttributes<T, E>, _domain?: string, _native?: Resource<any>) {
     this.createDocument(core.class.Class as Ref<Class<EClass<T, E>>>,
-      { _extends, _attributes, _domain, _native } as EClass<T, E>,
+      { _extends, _attributes, _domain, _native, _kind: ClassifierKind.CLASS } as EClass<T, E>,
+      _id as Ref<EClass<T, E>>)
+  }
+
+  createMixin<T extends E, E extends Doc> (_id: Ref<Mixin<T>>, _extends: Ref<Class<E>>, _attributes: AllAttributes<T, E>, _domain?: string, _native?: Resource<any>) {
+    this.createDocument(core.class.Class as Ref<Class<EClass<T, E>>>,
+      { _extends, _attributes, _domain, _native, _kind: ClassifierKind.MIXIN } as EClass<T, E>,
       _id as Ref<EClass<T, E>>)
   }
 }

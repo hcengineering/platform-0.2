@@ -27,6 +27,7 @@ export default plugin('task' as Plugin<Service>, { ui: ui.id, presentationCore: 
     Task: '' as Asset,
   },
   component: {
-    Main: '' as AnyComponent
+    Main: '' as AnyComponent,
+    TaskDetails: '' as AnyComponent
   }
 })

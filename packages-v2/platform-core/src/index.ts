@@ -13,7 +13,8 @@
 // limitations under the License.
 //
 
-import { Class, Doc, Emb, MemDb, Metadata, Obj, Plugin, plugin, Ref, Service, Type } from '@anticrm/platform'
+import { Class, Doc, Emb, Metadata, Plugin, plugin, Ref, Service, Type } from '@anticrm/platform'
+import { ModelDb } from './modeldb'
 
 // T Y P E S
 
@@ -36,12 +37,8 @@ export interface ArrayOf<A> extends Type {
 // P L U G I N
 
 export interface CoreService extends Service {
-  getModel(): MemDb
+  getModel(): ModelDb
 
-  beginTransaction(): void
-
-  is (obj: Obj, _class: Ref<Class<Obj>>): boolean
-  isMixedIn (obj: Doc, _class: Ref<Class<Doc>>): boolean
 }
 
 export default plugin('core' as Plugin<CoreService>, {}, {

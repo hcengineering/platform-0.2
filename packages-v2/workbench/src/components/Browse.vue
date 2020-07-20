@@ -15,25 +15,35 @@
 
 <script lang="ts">
 
-  import { defineComponent } from 'vue'
-  import workbench from '..'
+import { defineComponent, PropType } from 'vue'
 
-  import Table from '@anticrm/presentation-ui/src/components/Table.vue'
-  import Icon from '@anticrm/platform-ui/src/components/Icon.vue'
+import presentation from '@anticrm/presentation-core'
+import workbench from '..'
 
-  export default defineComponent({
+import Table from '@anticrm/presentation-ui/src/components/Table.vue'
+import Icon from '@anticrm/platform-ui/src/components/Icon.vue'
+import { getCoreService } from '../utils'
+import { Class, Ref, VDoc } from '@anticrm/platform'
+
+export default defineComponent({
     components: {
       Table,
       Icon
     },
     props: {
-      _class: String
+      _class: {
+        type: String as unknown as PropType<Ref<Class<VDoc>>>,
+        required: true
+      }
     },
     setup(props) {
-      console.log('Browse', props._class)
+      const coreService = getCoreService()
+      const model = coreService.getModel()
+
       function add() {
-        console.log('add')
-        this.$emit('navigate', workbench.component.NewDocument)
+        const clazz = model.get(props._class) as Class<VDoc>
+        const details = model.as(clazz, presentation.class.DetailsForm)
+        this.$emit('navigate', details.form || workbench.component.NewDocument)
       }
       return { workbench, add }
     }
