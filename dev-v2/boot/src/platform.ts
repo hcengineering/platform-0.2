@@ -20,6 +20,7 @@ import core from '@anticrm/platform-core'
 import i18n from '@anticrm/platform-i18n'
 import login from '@anticrm/login'
 import presentationCore from '@anticrm/presentation-core'
+import presentationUI from '@anticrm/presentation-ui'
 import workbench from '@anticrm/workbench'
 import recruitment from '@anticrm/recruitment'
 import task from '@anticrm/task'
@@ -38,6 +39,7 @@ platform.addLocation(core, () => import(/* webpackChunkName: "platform-core" */ 
 platform.addLocation(i18n, () => import(/* webpackChunkName: "platform-i18n" */ '@anticrm/platform-i18n/src/plugin'))
 platform.addLocation(login, () => import(/* webpackChunkName: "login" */ '@anticrm/login/src/plugin'))
 platform.addLocation(presentationCore, () => import(/* webpackChunkName: "presentation-core" */ '@anticrm/presentation-core/src/plugin'))
+platform.addLocation(presentationUI, () => import(/* webpackChunkName: "presentation-ui" */ '@anticrm/presentation-ui/src/plugin'))
 platform.addLocation(workbench, () => import(/* webpackChunkName: "workbench" */ '@anticrm/workbench/src/plugin'))
 platform.addLocation(recruitment, () => import(/* webpackChunkName: "recruitment" */ '@anticrm/recruitment/src/plugin'))
 platform.addLocation(task, () => import(/* webpackChunkName: "task" */ '@anticrm/task/src/plugin'))

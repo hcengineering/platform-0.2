@@ -13,21 +13,11 @@
 // limitations under the License.
 //
 
-import { plugin, Plugin, Service, StringProperty, VDoc } from '@anticrm/platform'
-import ui, { AnyComponent, Asset } from '@anticrm/platform-ui'
-import presentationCore from '@anticrm/presentation-core'
+import { Platform } from '@anticrm/platform'
+import recruitment from '..'
 
-export interface Task extends VDoc {
-  title: StringProperty
-  description: StringProperty
+export default (platform: Platform) => {
+  const spritesUrl = require('../../assets/icons.svg')
+  platform.loadMetadata(recruitment.icon, {
+  })
 }
-
-export default plugin('task' as Plugin<Service>, { ui: ui.id, presentationCore: presentationCore.id }, {
-  icon: {
-    Task: '' as Asset,
-  },
-  component: {
-    Main: '' as AnyComponent,
-    View: '' as AnyComponent
-  }
-})

@@ -14,7 +14,13 @@
 //
 
 import { plugin, Plugin, Service } from '@anticrm/platform'
-import { Asset, AnyComponent } from '@anticrm/platform-ui'
+import { AnyComponent, Asset } from '@anticrm/platform-ui'
+import { Person } from '@anticrm/contact'
+
+export interface Candidate extends Person {
+  currentPosition: string
+  currentEmployer: string
+}
 
 export default plugin('recruitment' as Plugin<Service>, {}, {
   icon: {

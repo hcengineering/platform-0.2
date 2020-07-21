@@ -15,12 +15,11 @@
 
 <script lang="ts">
 
-import { computed, defineComponent, PropType, ref, watch } from 'vue'
+import { defineComponent, PropType } from 'vue'
 import { Class, Obj, Ref } from '@anticrm/platform'
-import presentationCore, { ClassModel } from '@anticrm/presentation-core'
-import { getPlatform } from '@anticrm/platform-ui'
 
 import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.vue'
+import { getPresentationUI } from '@anticrm/presentation-ui/src/utils'
 
 export default defineComponent({
     components: { InlineEdit },
@@ -31,20 +30,8 @@ export default defineComponent({
       },
     },
     setup(props) {
-      const platform = getPlatform()
-      const model = ref(null as ClassModel | null)
-
-      // following async code does not trigger on `_class` prop change, so we use `watch`
-      // the issue is that watching props is a kind of nonsense (because props) are formally constants.
-      // so, the trick for now is to make computed and watch it... we need to revisit this later.
-
-      watch(computed(() => props._class), () => {
-        console.log('watch: `' + props._class + '`')
-        platform.getPlugin(presentationCore.id)
-          .then(core => core.getClassModel(props._class, 'class:core.VDoc' as Ref<Class<Obj>>))
-          .then(m => model.value = m)
-      }, {immediate: true})
-      return {model}
+      const ui = getPresentationUI()
+      return {model: ui.getClassModel(props)}
     }
   })
 </script>

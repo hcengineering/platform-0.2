@@ -13,21 +13,16 @@
 // limitations under the License.
 //
 
-import { plugin, Plugin, Service, StringProperty, VDoc } from '@anticrm/platform'
-import ui, { AnyComponent, Asset } from '@anticrm/platform-ui'
-import presentationCore from '@anticrm/presentation-core'
+import { extendIds } from '@anticrm/platform-model'
+import contact, { Contact, Person } from '@anticrm/contact'
+import { Ref } from '@anticrm/platform'
+import { ClassUI } from '@anticrm/presentation-core'
 
-export interface Task extends VDoc {
-  title: StringProperty
-  description: StringProperty
-}
-
-export default plugin('task' as Plugin<Service>, { ui: ui.id, presentationCore: presentationCore.id }, {
-  icon: {
-    Task: '' as Asset,
+export default extendIds(contact, {
+  application: {
   },
-  component: {
-    Main: '' as AnyComponent,
-    View: '' as AnyComponent
+  class: {
+    Contact: '' as Ref<ClassUI<Contact>>,
+    Person: '' as Ref<ClassUI<Person>>
   }
 })

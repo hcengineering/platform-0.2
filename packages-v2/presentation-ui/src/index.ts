@@ -13,12 +13,14 @@
 // limitations under the License.
 //
 
+import { Ref } from 'vue'
 import { plugin, Plugin, Service } from '@anticrm/platform'
 
-import presentationCore from '@anticrm/presentation-core'
+import presentationCore, { ClassModel } from '@anticrm/presentation-core'
 import ui, { AnyComponent } from '@anticrm/platform-ui'
 
 export interface PresentationUI extends Service {
+  getClassModel(props: { _class: String }, onChange?: (model: ClassModel) => ClassModel): Ref<ClassModel>
 }
 
 export default plugin('presentation-ui' as Plugin<PresentationUI>, { ui: ui.id, presentationCore: presentationCore.id }, {

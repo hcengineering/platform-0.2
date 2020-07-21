@@ -69,12 +69,24 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
     return result
   }
 
-  class TClassModel implements ClassModel {
+  abstract class ClassModelBase implements ClassModel {
+    filterAttributes(keys: string[]): ClassModel {
+      const filter = {} as { [key: string]: {} }
+      keys.forEach(key => filter[key] = {})
+      return new AttributeFilter(this, filter)
+    }
+    abstract getAttribute(key: string, _class?: Ref<Class<Obj>>): AttrModel | undefined
+    abstract getGroups(): GroupModel[]
+    abstract getOwnAttributes(_class: Ref<Class<Obj>>): AttrModel[]
+  }
+
+  class TClassModel extends ClassModelBase {
 
     private readonly attributes: AttrModel[]
     private readonly groups: GroupModel[]
 
     constructor(groups: GroupModel[], attributes: AttrModel[]) {
+      super()
       this.attributes = attributes
       this.groups = groups
     }
@@ -83,16 +95,40 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
       return this.attributes.filter(attr => attr._class === _class)
     }
 
-    getAttribute(key: string, _class?: Ref<Class<Obj>>): AttrModel {
-      const result = this.attributes.find(attr => attr.key === key && (_class ? _class === attr._class : true))
-      if (result)
-        return result
-      throw new Error('attribute not found: ' + key)
+    getAttribute(key: string, _class?: Ref<Class<Obj>>): AttrModel | undefined {
+      return this.attributes.find(attr => attr.key === key && (_class ? _class === attr._class : true))
     }
 
     getGroups(): GroupModel[] { return this.groups }
   }
 
+  class AttributeFilter extends ClassModelBase {
+    private readonly next: ClassModel
+    private readonly filter: { [key: string]: {} }
+
+    constructor(next: ClassModel, filter: { [key: string]: {} }) {
+      super()
+      this.next = next
+      this.filter = filter
+    }
+
+    getAttribute(key: string, _class?: Ref<Class<Obj>>): AttrModel | undefined {
+      const result = this.next.getAttribute(key, _class)
+      if (result) {
+        return this.filter[result.key] ? undefined : result
+      }
+    }
+
+    getGroups(): GroupModel[] {
+      return [];
+    }
+
+    getOwnAttributes(_class: Ref<Class<Obj>>): AttrModel[] {
+      const result = this.next.getOwnAttributes(_class)
+      return result.filter(attr => !this.filter[attr.key])
+    }
+
+  }
 
   async function getClassModel(_class: Ref<Class<Obj>>, top?: Ref<Class<Obj>>): Promise<ClassModel> {
     const model = coreService.getModel()
@@ -106,7 +142,13 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
     return new TClassModel(groups, attributes)
   }
 
+  function getEmptyModel(): ClassModel {
+    return new TClassModel([], [])
+  }
+
+
   return {
+    getEmptyModel,
     getClassModel
   }
 }

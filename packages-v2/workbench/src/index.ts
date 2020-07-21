@@ -16,6 +16,7 @@
 import { Class, Doc, plugin, Plugin, Ref, Service, StringProperty, VDoc } from '@anticrm/platform'
 import ui, { AnyComponent, Asset } from '@anticrm/platform-ui'
 import core from '@anticrm/platform-core'
+import presentationUI from '@anticrm/presentation-ui'
 
 export interface Application extends Doc {
   label: StringProperty
@@ -27,7 +28,9 @@ export interface Application extends Doc {
 export interface WorkbenchService extends Service {
 }
 
-export default plugin('workbench' as Plugin<WorkbenchService>, {core: core.id, ui: ui.id}, {
+export default plugin('workbench' as Plugin<WorkbenchService>, {
+  core: core.id, ui: ui.id, presentationUI: presentationUI.id
+}, {
   class: {
     Application: '' as Ref<Class<Application>>
   },

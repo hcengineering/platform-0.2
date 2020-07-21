@@ -13,11 +13,12 @@
 // limitations under the License.
 //
 
-import { Platform } from '@anticrm/platform'
-import { PresentationCore } from '@anticrm/presentation-core'
+import { computed, ref, watch } from 'vue'
+import { Class, Obj, Platform, Ref } from '@anticrm/platform'
+import { ClassModel, PresentationCore } from '@anticrm/presentation-core'
 import { UIService } from '@anticrm/platform-ui'
 
-import { PresentationCoreInjectionKey } from './utils'
+import { PresentationCoreInjectionKey, PresentationUIInjectionKey } from './utils'
 import ui, { PresentationUI } from '.'
 
 import Table from './components/Table.vue'
@@ -29,11 +30,38 @@ import Table from './components/Table.vue'
  */
 export default async (platform: Platform, deps: { ui: UIService, presentationCore: PresentationCore }): Promise<PresentationUI> => {
 
-  deps.ui.getApp().provide(PresentationCoreInjectionKey, deps.presentationCore)
-
   platform.setResource(ui.components.Table, Table)
 
-  return {
+  const coreService = deps.presentationCore
 
+  function getClassModel(props: { _class: Ref<Class<Obj>> }, onChange?: (model: ClassModel) => ClassModel) {
+    const emptyModel = coreService.getEmptyModel()
+    const model = ref(emptyModel)
+
+    // following async code does not trigger on `_class` prop change, so we use `watch`
+    // the issue is that watching props is a kind of nonsense (because props) are formally constants.
+    // so, the trick for now is to make computed and watch it... we need to revisit this later.
+
+    watch(computed(() => props._class), () => {
+       coreService.getClassModel(props._class, 'class:core.VDoc' as Ref<Class<Obj>>)
+         .then(m => {
+           model.value = onChange ? onChange(m) : m
+         })
+         .catch(err => {
+           platform.setPlatformStatus(err)
+         })
+    }, {immediate: true})
+
+    return model
   }
+
+  const service = {
+    getClassModel
+  }
+
+  deps.ui.getApp()
+    .provide(PresentationCoreInjectionKey, coreService)
+    .provide(PresentationUIInjectionKey, service)
+
+  return service
 }

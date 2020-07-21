@@ -14,33 +14,33 @@
 //
 
 import { UIBuilder } from '@anticrm/presentation-model'
-import workbench from '@anticrm/workbench-model'
-import { StringProperty } from '@anticrm/platform'
 import core from '@anticrm/platform-model'
-import contact from '@anticrm/contact-model'
 
-import recruitment from '.'
+import contact from '.'
 import { IntlString } from '@anticrm/platform-i18n'
 
 export default (S: UIBuilder) => {
 
-  S.createDocument(workbench.class.Application, {
-    label: 'Найм' as StringProperty,
-    icon: recruitment.icon.Recruitment,
-    main: recruitment.component.Main,
-    appClass: recruitment.class.Candidate
-  }, recruitment.application.Recruitment)
-
-  S.createClassUI(recruitment.class.Candidate, contact.class.Person, {
-    label: 'Кандидат' as IntlString
+  S.createClassUI(contact.class.Contact, core.class.VDoc, {
+    label: 'Контактная информация' as IntlString
   }, {
-    currentPosition: S.attrUI(core.class.Type, {}, {
-      label: 'Текущая должность' as IntlString
+    phone: S.attrUI(core.class.Type, {}, {
+      label: 'Телефон' as IntlString
     }),
-      currentEmployer: S.attrUI(core.class.Type, {}, {
-    label: 'Место работы' as IntlString
-  }),
+    email: S.attrUI(core.class.Type, {}, {
+      label: 'Электропочта' as IntlString
+    }),
+  })
 
-})
+  S.createClassUI(contact.class.Person, contact.class.Contact, {
+    label: 'Персона' as IntlString
+  }, {
+    firstName: S.attrUI(core.class.Type, {}, {
+      label: 'Имя' as IntlString
+    }),
+    lastName: S.attrUI(core.class.Type, {}, {
+      label: 'Фамилия' as IntlString
+    }),
+  })
 
 }

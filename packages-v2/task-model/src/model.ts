@@ -32,7 +32,7 @@ export default (S: UIBuilder) => {
   }, task.application.Task)
 
   S.createClass(task.class.Task, core.class.VDoc, {
-    name: S.attrUI(core.class.Type, {}, {
+    title: S.attrUI(core.class.Type, {}, {
       label: task.string.Task_name
     }),
     description: S.attrUI(core.class.Type, {}, {

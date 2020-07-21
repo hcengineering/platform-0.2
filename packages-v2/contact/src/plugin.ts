@@ -13,21 +13,14 @@
 // limitations under the License.
 //
 
-import { plugin, Plugin, Service, StringProperty, VDoc } from '@anticrm/platform'
-import ui, { AnyComponent, Asset } from '@anticrm/platform-ui'
-import presentationCore from '@anticrm/presentation-core'
+import { Platform, Service } from '@anticrm/platform'
 
-export interface Task extends VDoc {
-  title: StringProperty
-  description: StringProperty
+/*!
+ * Anticrm Platform™ Contact Plugin
+ * © 2020 Anticrm Platform Contributors. All Rights Reserved.
+ * Licensed under the Eclipse Public License, Version 2.0
+ */
+export default async (platform: Platform): Promise<Service> => {
+
+  return {}
 }
-
-export default plugin('task' as Plugin<Service>, { ui: ui.id, presentationCore: presentationCore.id }, {
-  icon: {
-    Task: '' as Asset,
-  },
-  component: {
-    Main: '' as AnyComponent,
-    View: '' as AnyComponent
-  }
-})

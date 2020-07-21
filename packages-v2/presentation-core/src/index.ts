@@ -55,13 +55,14 @@ export interface GroupModel extends UIModel {}
 export interface ClassModel {
   getGroups(): GroupModel[]
   getOwnAttributes(_class: Ref<Class<Obj>>): AttrModel[]
-  getAttribute(key: string, _class?: Ref<Class<Obj>>): AttrModel
+  getAttribute(key: string, _class?: Ref<Class<Obj>>): AttrModel | undefined
+  filterAttributes(keys: string[]): ClassModel
 }
 
 // S E R V I C E
 
 export interface PresentationCore extends Service {
-
+  getEmptyModel(): ClassModel
   getClassModel(_class: Ref<Class<Obj>>, top?: Ref<Class<Obj>>): Promise<ClassModel>
 }
 
