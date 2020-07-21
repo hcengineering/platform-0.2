@@ -28,6 +28,6 @@ export default plugin('task' as Plugin<Service>, { ui: ui.id, presentationCore: 
   },
   component: {
     Main: '' as AnyComponent,
-    TaskDetails: '' as AnyComponent
+    View: '' as AnyComponent
   }
 })

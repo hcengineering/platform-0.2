@@ -20,6 +20,7 @@ import { PresentationCoreInjectionKey } from './utils'
 
 import task from '.'
 import Main from './components/Main.vue'
+import View from './components/View.vue'
 
 /*!
  * Anticrm Platform™ Recruitment Plugin
@@ -29,6 +30,7 @@ import Main from './components/Main.vue'
 export default async (platform: Platform, deps: { ui: UIService, presentationCore: PresentationCore }): Promise<Service> => {
 
   platform.setResource(task.component.Main, Main)
+  platform.setResource(task.component.View, View)
 
   deps.ui.getApp().provide(PresentationCoreInjectionKey, deps.presentationCore)
 

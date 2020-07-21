@@ -17,6 +17,7 @@ import {
   AllAttributes,
   Attribute,
   Class,
+  Classifier,
   ClassifierKind,
   CoreDomain,
   Doc,
@@ -85,6 +86,14 @@ class Builder {
 
   createDocument<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Doc>, _id?: Ref<M>): void {
     this.memdb.createDocument(_class, values, _id)
+  }
+
+  createCls<T extends E, E extends Obj> (_id: Ref<Class<T>>, _extends: Ref<Class<E>>, values: Omit<Class<T>, keyof Classifier<Obj>>, _attributes: AllAttributes<T, E>) {
+    this.createDocument(core.class.Class as Ref<Class<Class<T>>>, {
+      _extends,
+      _attributes,
+      ...values
+    } as unknown as Class<T>, _id as Ref<Class<T>>)
   }
 
   createClass<T extends E, E extends Obj> (_id: Ref<Class<T>>, _extends: Ref<Class<E>>, _attributes: AllAttributes<T, E>, _domain?: string, _native?: Resource<any>) {

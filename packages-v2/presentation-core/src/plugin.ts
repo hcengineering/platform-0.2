@@ -14,7 +14,7 @@
 //
 
 import { Attribute, Class, Obj, Platform, Ref } from '@anticrm/platform'
-import ui, { AttributeUI, AttrModel, PresentationCore } from '.'
+import ui, { AttributeUI, AttrModel, ClassModel, ClassUI, GroupModel, PresentationCore } from '.'
 import { CoreService } from '@anticrm/platform-core'
 import { Asset } from '@anticrm/platform-ui'
 import { I18n } from '@anticrm/platform-i18n'
@@ -28,6 +28,14 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
 
   const coreService = deps.core
   const i18nService = deps.i18n
+
+  async function getGroupModel(_class: Ref<ClassUI<Obj>>): Promise<GroupModel> {
+    const model = coreService.getModel()
+    const clazz = model.get(_class) as ClassUI<Obj>
+    const label = await i18nService.translate(clazz.label)
+
+    return { label, icon: clazz.icon }
+  }
 
   async function getOwnAttrModel(_class: Ref<Class<Obj>>): Promise<AttrModel[]> {
     const result = [] as AttrModel[]
@@ -51,6 +59,7 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
       }
       result.push({
         key,
+        _class,
         icon,
         label,
         placeholder,
@@ -60,14 +69,44 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
     return result
   }
 
-  async function getAttrModel(_class: Ref<Class<Obj>>, top?: Ref<Class<Obj>>): Promise<AttrModel[]> {
+  class TClassModel implements ClassModel {
+
+    private readonly attributes: AttrModel[]
+    private readonly groups: GroupModel[]
+
+    constructor(groups: GroupModel[], attributes: AttrModel[]) {
+      this.attributes = attributes
+      this.groups = groups
+    }
+
+    getOwnAttributes(_class: Ref<Class<Obj>>): AttrModel[] {
+      return this.attributes.filter(attr => attr._class === _class)
+    }
+
+    getAttribute(key: string, _class?: Ref<Class<Obj>>): AttrModel {
+      const result = this.attributes.find(attr => attr.key === key && (_class ? _class === attr._class : true))
+      if (result)
+        return result
+      throw new Error('attribute not found: ' + key)
+    }
+
+    getGroups(): GroupModel[] { return this.groups }
+  }
+
+
+  async function getClassModel(_class: Ref<Class<Obj>>, top?: Ref<Class<Obj>>): Promise<ClassModel> {
     const model = coreService.getModel()
     const hierarchy = model.getClassHierarchy(_class, top)
-    const ownModels = hierarchy.map(async (_class) => getOwnAttrModel(_class))
-    return Promise.all(ownModels).then(result => result.flat())
+    const groupModels = hierarchy.map(_class => getGroupModel(_class as Ref<ClassUI<Obj>>))
+    const attrModels = hierarchy.map(_class => getOwnAttrModel(_class))
+
+    const groups = await Promise.all(groupModels)
+    const attributes = await Promise.all(attrModels).then(result => result.flat())
+
+    return new TClassModel(groups, attributes)
   }
 
   return {
-    getAttrModel
+    getClassModel
   }
 }

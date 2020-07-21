@@ -41,6 +41,6 @@ export default (S: UIBuilder) => {
   })
 
   S.mixin(task.class.Task, presentation.class.DetailsForm, {
-    form: task.component.TaskDetails
+    form: task.component.View
   })
 }

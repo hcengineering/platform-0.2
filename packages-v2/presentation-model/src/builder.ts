@@ -14,13 +14,20 @@
 //
 
 import { Builder } from '@anticrm/platform-model'
-import { Attribute, Class, Emb, Obj, OptionalMethods, Ref, Type } from '@anticrm/platform'
-import ui, { AttributeUI } from '@anticrm/presentation-core'
+import { AllAttributes, Attribute, Class, Classifier, Emb, Obj, OptionalMethods, Ref, Type } from '@anticrm/platform'
+import ui, { AttributeUI, ClassUI } from '@anticrm/presentation-core'
 
 export class UIBuilder extends Builder {
-
   load (model: (builder: UIBuilder) => void) {
     model(this)
+  }
+
+  createClassUI<T extends E, E extends Obj> (_id: Ref<ClassUI<T>>, _extends: Ref<Class<E>>, values: Omit<ClassUI<T>, keyof Classifier<Obj>>, _attributes: AllAttributes<T, E>) {
+    this.createDocument(ui.class.ClassUI as Ref<Class<ClassUI<T>>>, {
+      _extends,
+      _attributes,
+      ...values
+    } as unknown as ClassUI<T>, _id as Ref<ClassUI<T>>)
   }
 
   attrUI<M extends Type> (_class: Ref<Class<M>>, values: OptionalMethods<Omit<M, keyof Emb>>, aui: Omit<AttributeUI, keyof Attribute>): AttributeUI {
@@ -28,4 +35,3 @@ export class UIBuilder extends Builder {
     return { _class: ui.class.AttributeUI, type, ...aui } as unknown as AttributeUI
   }
 }
-

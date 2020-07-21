@@ -15,12 +15,12 @@
 
 <script lang="ts">
 
-  import { computed, defineComponent, PropType, ref, watch } from 'vue'
-  import { Class, Doc, Obj, Ref } from '@anticrm/platform'
-  import presentationCore, { AttrModel } from '@anticrm/presentation-core'
-  import { getPlatform } from '@anticrm/platform-ui'
+import { computed, defineComponent, PropType, ref, watch } from 'vue'
+import { Class, Doc, Obj, Ref } from '@anticrm/platform'
+import presentationCore, { ClassModel } from '@anticrm/presentation-core'
+import { getPlatform } from '@anticrm/platform-ui'
 
-  export default defineComponent({
+export default defineComponent({
       components: {},
       props: {
         _class: {
@@ -31,7 +31,7 @@
       },
       setup(props) {
         const platform = getPlatform()
-        const model = ref([] as AttrModel[])
+        const model = ref(null as ClassModel | null)
 
         // following async code does not trigger on `_class` prop change, so we use `watch`
         // the issue is that watching props is a kind of nonsense (because props) are formally constants.
@@ -39,7 +39,7 @@
 
         watch(computed(()=> props._class), () => {
           platform.getPlugin(presentationCore.id)
-            .then(core => core.getAttrModel(props._class, 'class:core.VDoc' as Ref<Class<Obj>>))
+            .then(core => core.getClassModel(props._class, 'class:core.VDoc' as Ref<Class<Obj>>))
             .then(m => model.value = m)
         }, { immediate: true })
         return { model }
@@ -52,7 +52,7 @@
   <div class="erp-table">
     <div class="thead">
       <div class="tr">
-        <div class="th caption-4" v-for="attr in this.model" :key="attr.key">{{ attr.label }}</div>
+        <div class="th caption-4" v-for="attr in model ? model.getOwnAttributes(_class) : []" :key="attr.key">{{ attr.label }}</div>
       </div>
     </div>
     <div class="tbody">
@@ -62,7 +62,7 @@
           :key="object._id"
           @click="$emit('navigate', object._id)"
       >
-        <div class="td" v-for="attr in model" :key="attr.key">
+        <div class="td" v-for="attr in model ? model.getOwnAttributes(_class) : []" :key="attr.key">
           <widget v-if="attr.presenter" :component="attr.presenter" :modelValue="object[attr.key]" />
           <span v-else>{{ object[attr.key] }}</span>
         </div>

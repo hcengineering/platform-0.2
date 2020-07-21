@@ -18,6 +18,11 @@ import core from '@anticrm/platform-model'
 import ui from '.'
 
 export default (S: UIBuilder) => {
+  S.createClass(ui.class.ClassUI, core.class.Class, {
+    label: S.attr(core.class.Type, {}),
+    icon: S.attr(core.class.Type, {})
+  })
+
   S.createClass(ui.class.AttributeUI, core.class.Attribute, {
     label: S.attr(core.class.Type, {}),
     placeholder: S.attr(core.class.Type, {}),

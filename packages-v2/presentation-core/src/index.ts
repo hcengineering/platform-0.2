@@ -27,6 +27,11 @@ export interface AttributeUI extends Attribute {
   icon?: Asset
 }
 
+export interface ClassUI<T extends Obj> extends Class<T> {
+  label: IntlString
+  icon?: Asset
+}
+
 export interface DetailsForm<T extends VDoc> extends Class<T> {
   form: AnyComponent
 }
@@ -39,19 +44,31 @@ export interface UIModel {
 }
 
 export interface AttrModel extends UIModel {
+  _class: Ref<Class<Obj>>
   key: string
   type: Type
   placeholder: string
 }
 
+export interface GroupModel extends UIModel {}
+
+export interface ClassModel {
+  getGroups(): GroupModel[]
+  getOwnAttributes(_class: Ref<Class<Obj>>): AttrModel[]
+  getAttribute(key: string, _class?: Ref<Class<Obj>>): AttrModel
+}
+
+// S E R V I C E
+
 export interface PresentationCore extends Service {
 
-  getAttrModel(_class: Ref<Class<Obj>>, top?: Ref<Class<Obj>>): Promise<AttrModel[]>
+  getClassModel(_class: Ref<Class<Obj>>, top?: Ref<Class<Obj>>): Promise<ClassModel>
 }
 
 export default plugin('presentation-core' as Plugin<PresentationCore>, { core: core.id, i18n: i18n.id }, {
   class: {
     AttributeUI: '' as Ref<Class<AttributeUI>>,
+    ClassUI: '' as Ref<Class<ClassUI<Obj>>>,
     DetailsForm: '' as Ref<Mixin<DetailsForm<VDoc>>>
   }
 })
