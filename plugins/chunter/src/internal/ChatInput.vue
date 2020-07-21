@@ -26,17 +26,24 @@ import { Resource } from '@anticrm/platform'
 
 import ContentEditable from './ContentEditable.vue'
 
+import Toolbar from '@anticrm/sparkling-controls/src/toolbar/Toolbar.vue'
+import ToolbarButton from '@anticrm/sparkling-controls/src/toolbar/Button.vue'
+
 export default defineComponent({
-  components: { EditBox, Button, ContentEditable },
+  components: { EditBox, Button, ContentEditable, Toolbar, ToolbarButton },
   setup() {
     const session = getSession()
     let htmlValue = ref('')
-    let isEmpty = computed(() => htmlValue.value.length == 0)
+    let sendAllowed = ref(false)
+    let styleState = ref({bold: false, italic: false, underline: false})
+    const htmlEditor = ref(null)
     let stylesEnabled = ref(false)
     return {
       htmlValue,
-      isEmpty,
       stylesEnabled,
+      styleState,
+      htmlEditor,
+      sendAllowed,
 
       handleSubmit() {
         let newValue = {
@@ -57,7 +64,7 @@ export default defineComponent({
       },
       execCommand(cmdName: string, cmdValue?: string) {
         document.execCommand(cmdName, false, cmdValue)
-        this.$refs['input'].focus()
+        htmlEditor.value.focus()
 
         console.log("html", htmlValue.value)
       },
@@ -69,6 +76,18 @@ export default defineComponent({
         this.htmlValue = newValue
         console.log("New value: ", htmlValue.value)
       },
+      updateState(newValue) {
+        console.log("New state: ", newValue)
+        this.sendAllowed = !newValue.empty
+        this.styleState.bold = newValue.bold
+        this.styleState.italic = newValue.italic
+        this.styleState.underline = newValue.underline
+      },
+      markBold() {
+        this.execCommand('bold')
+        this.styleState.bold = !this.styleState.bold
+        console.log("update bold style", this.styleState)
+      },
     }
   },
 })
@@ -76,59 +95,52 @@ export default defineComponent({
 
 <template>
   <div class="chunter-chat-input">
-    <div v-if="stylesEnabled" class="flex-column">
-      <div class="edit-area">
-        <ContentEditable
-          ref="input"
-          class="edit-box"
-          :content="htmlValue"
-          @update="updateValue($event)"
-          @submit="handleSubmit()"
-        />
-      </div>
-      <div class="separator" />
-      <div class="style-buttons">
-        <div class="button-block">
-          <Button class="small">§</Button>
-          <Button class="small" v-on:click="execCommand('bold')" style="font-weight:bold;">B</Button>
-          <Button class="small" v-on:click="execCommand('italic')" style="font-weight:italic;">I</Button>
-          <Button
+    <div :class="{'flex-column':stylesEnabled, 'flex-row': !stylesEnabled}">
+      <Toolbar v-if="!stylesEnabled" class="style-buttons">
+        <ToolbarButton class="small">§</ToolbarButton>
+      </Toolbar>
+
+      <ContentEditable
+        ref="htmlEditor"
+        :class="{'edit-box-vertical':stylesEnabled, 'edit-box': !stylesEnabled}"
+        :content="htmlValue"
+        @updateState="updateState"
+        @update="updateValue($event)"
+        @submit="handleSubmit()"
+      />
+
+      <div v-if="stylesEnabled" class="separator" />
+      <Toolbar>
+        <template v-if="stylesEnabled">
+          <ToolbarButton class="small">§</ToolbarButton>
+          <ToolbarButton class="small" v-on:click="markBold()" style="font-weight:bold;" :selected="styleState.bold">B</ToolbarButton>
+          <ToolbarButton
+            class="small"
+            v-on:click="execCommand('italic')"
+            style="font-weight:italic;"
+            :selected="styleState.italic"
+          >I</ToolbarButton>
+          <ToolbarButton
             class="small"
             v-on:click="execCommand('underline')"
             style="font-weight:underline;"
-          >U</Button>
-          <Button class="small" v-on:click="execCommand('strikeThrough')">~</Button>
-          <Button class="small" v-on:click="execCommand('insertUnorderedList')">L</Button>
-          <Button class="small" v-on:click="execCommand('insertOrderedList')">O</Button>
-          <Button class="small" v-on:click="execCommand('formatBlock', 'pre')">P</Button>
-          <Button
+            :selected="styleState.underline"
+          >U</ToolbarButton>
+          <ToolbarButton class="small" v-on:click="execCommand('strikeThrough')">~</ToolbarButton>
+          <ToolbarButton class="small" v-on:click="execCommand('insertUnorderedList')">L</ToolbarButton>
+          <ToolbarButton class="small" v-on:click="execCommand('insertOrderedList')">O</ToolbarButton>
+          <ToolbarButton class="small" v-on:click="execCommand('formatBlock', 'pre')">P</ToolbarButton>
+          <ToolbarButton
             class="small"
-            v-on:click="execCommand('insertHtml', '<div class=\'code-block\'/>')"
-          >H</Button>
-        </div>
-        <div class="right-panel">
-          <Button class="small" @click="handleSubmit()">▶️</Button>
-          <Button class="small">😀</Button>
-          <Button class="small" @click="toggleStyle()">Aa</Button>
-        </div>
-      </div>
-    </div>
-    <div v-else class="flex-row">
-      <div class="edit-area">
-        <Button class="small">§</Button>
-        <ContentEditable
-          ref="input"
-          class="edit-box"
-          :content="htmlValue"
-          @update="updateValue($event)"
-          @submit="handleSubmit()"
-        />
-      </div>
-      <div class="right-panel">
-        <Button class="small" @click="handleSubmit()">▶️</Button>
-        <Button class="small">😀</Button>
-        <Button class="small" @click="toggleStyle()">Aa</Button>
-      </div>
+            v-on:click="execCommand('insertHtml', '<div class=\'code-block\'></div>')"
+          >H</ToolbarButton>
+        </template>
+        <template v-slot:right>
+          <ToolbarButton class="small" @click="handleSubmit()" :selected="sendAllowed">▶️</ToolbarButton>
+          <ToolbarButton class="small">😀</ToolbarButton>
+          <ToolbarButton class="small" @click="toggleStyle()">Aa</ToolbarButton>
+        </template>
+      </Toolbar>
     </div>
   </div>
 </template>
@@ -142,47 +154,35 @@ export default defineComponent({
   .flex-column {
     display: flex;
     flex-direction: column;
+    align-items: stretch;
   }
   .flex-row {
     display: flex;
     flex-direction: row;
+    align-items: flex-end;
   }
 
-  .edit-area {
-    display: flex;
-    flex-direction: row;
-    height: 100%;
-    width: 100%;
-  }
   .edit-box {
     width: 100%;
     height: 100%;
-    min-height: 2em;
+    align-self: center;
   }
-  .edit-box:focus {
-    outline: none;
+  .edit-box-vertical {
+    width: 100%;
+    height: 100%;
   }
   .separator {
     width: 100%;
     height: 1px;
     background-color: grey;
   }
-  .style-buttons {
-    width: 100%;
-    flex-direction: row;
-    display: flex;
-  }
-  .button-block {
-    min-height: 2em;
-    display: flex;
-  }
-  .right-panel {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: row-reverse;
-  }
   .code-block {
-    background-color: red;
+    background-color: grey;
+    display: block;
+    border: 1px dashed grey;
+    width: calc(100% - 1em);
+    min-height: 1.5em;
+    // margin: 1em;
   }
   border: 1px solid;
 }
