@@ -25,21 +25,27 @@ export default (S: UIBuilder) => {
     label: 'Контактная информация' as IntlString
   }, {
     phone: S.attrUI(core.class.Type, {}, {
-      label: 'Телефон' as IntlString
+      label: 'Телефон' as IntlString,
+      icon: contact.icon.Phone
     }),
     email: S.attrUI(core.class.Type, {}, {
-      label: 'Электропочта' as IntlString
+      label: 'Электропочта' as IntlString,
+      icon: contact.icon.Email
     }),
   })
 
   S.createClassUI(contact.class.Person, contact.class.Contact, {
-    label: 'Персона' as IntlString
+    label: 'Персональная информация' as IntlString
   }, {
     firstName: S.attrUI(core.class.Type, {}, {
       label: 'Имя' as IntlString
     }),
     lastName: S.attrUI(core.class.Type, {}, {
       label: 'Фамилия' as IntlString
+    }),
+    birthDate: S.attrUI(core.class.Type, {}, {
+      label: 'День рождения' as IntlString,
+      icon: contact.icon.Date
     }),
   })
 

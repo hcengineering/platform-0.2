@@ -26,6 +26,7 @@ import recruitment from '@anticrm/recruitment'
 import task from '@anticrm/task'
 
 import uiMeta from '@anticrm/platform-ui/src/__meta__/meta'
+import contactMeta from '@anticrm/contact/src/__meta__/meta'
 import recruitmentMeta from '@anticrm/recruitment/src/__meta__/meta'
 import taskMeta from '@anticrm/task/src/__meta__/meta'
 import workbenchMeta from '@anticrm/workbench/src/__meta__/meta'
@@ -48,5 +49,6 @@ uiMeta(platform)
 recruitmentMeta(platform)
 taskMeta(platform)
 workbenchMeta(platform)
+contactMeta(platform)
 
 export default platform

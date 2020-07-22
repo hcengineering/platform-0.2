@@ -37,11 +37,14 @@ export default (S: UIBuilder) => {
     label: 'Кандидат' as IntlString
   }, {
     currentPosition: S.attrUI(core.class.Type, {}, {
-      label: 'Текущая должность' as IntlString
+      label: 'Текущая должность' as IntlString,
+      icon: recruitment.icon.Position
     }),
-      currentEmployer: S.attrUI(core.class.Type, {}, {
-    label: 'Место работы' as IntlString
-  })})
+    currentEmployer: S.attrUI(core.class.Type, {}, {
+      label: 'Место работы' as IntlString,
+      icon: recruitment.icon.Employer
+    })
+  })
 
   S.mixin(recruitment.class.Candidate as Ref<Class<Candidate>>, presentation.class.DetailsForm, {
     form: recruitment.component.View

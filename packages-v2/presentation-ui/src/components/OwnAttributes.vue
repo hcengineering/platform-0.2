@@ -18,11 +18,13 @@
 import { defineComponent, PropType } from 'vue'
 import { Class, Obj, Ref } from '@anticrm/platform'
 
+import Icon from '@anticrm/platform-ui/src/components/Icon.vue'
 import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.vue'
+
 import { ClassModel } from '@anticrm/presentation-core'
 
 export default defineComponent({
-  components: { InlineEdit },
+  components: { InlineEdit, Icon },
   props: {
     _class: {
       type: String as unknown as PropType<Ref<Class<Obj>>>,
@@ -38,15 +40,39 @@ export default defineComponent({
 </script>
 
 <template>
-    <table>
-      <tr v-for="attr in model ? model.getOwnAttributes(_class) : []">
-        <td class="label">{{attr.label}}</td>
-        <td class="edit"><InlineEdit :placeholder="attr.placeholder"/></td>
-      </tr>
-    </table>
+    <div class="presentation-ui-own-attributes">
+      <div class="caption-4">{{ model.getGroup(_class).label }}</div>
+      <table>
+        <tr v-for="attr in model.getOwnAttributes(_class)">
+          <td><Icon :icon="attr.icon" class="icon-embed-15x icon"/></td>
+          <td>
+            <div class="label">{{attr.label}}</div>
+          </td>
+          <td>
+            <div class="edit"><InlineEdit :placeholder="attr.placeholder"/></div>
+          </td>
+        </tr>
+      </table>
+    </div>
 </template>
 
 <style lang="scss">
-@import "../../../../node_modules/@anticrm/sparkling-theme/css/variables";
+@import "~@anticrm/sparkling-theme/css/_variables.scss";
 
+.presentation-ui-own-attributes {
+
+  .icon {
+    fill: $content-color-dark;
+  }
+
+  .label {
+    color: $content-color-dark;
+  }
+
+  .edit {
+    font-family: Raleway;
+    font-size: 14px;
+  }
+
+}
 </style>

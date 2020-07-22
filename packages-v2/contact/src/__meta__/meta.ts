@@ -19,5 +19,8 @@ import recruitment from '..'
 export default (platform: Platform) => {
   const spritesUrl = require('../../assets/icons.svg')
   platform.loadMetadata(recruitment.icon, {
+    Date: spritesUrl + '#date',
+    Phone: spritesUrl + '#phone',
+    Email: spritesUrl + '#email',
   })
 }

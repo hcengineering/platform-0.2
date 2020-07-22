@@ -20,5 +20,7 @@ export default (platform: Platform) => {
   const spritesUrl = require('../../assets/icons.svg')
   platform.loadMetadata(recruitment.icon, {
     Recruitment: spritesUrl + '#recruitment',
+    Position: spritesUrl + '#position',
+    Employer: spritesUrl + '#employer'
   })
 }

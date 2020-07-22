@@ -56,6 +56,7 @@ export interface GroupModel extends UIModel {
 
 export interface ClassModel {
   getGroups(): GroupModel[]
+  getGroup(_class: Ref<Class<Obj>>): GroupModel | undefined
   getOwnAttributes(_class: Ref<Class<Obj>>): AttrModel[]
   getAttribute(key: string, _class?: Ref<Class<Obj>>): AttrModel | undefined
   filterAttributes(keys: string[]): ClassModel

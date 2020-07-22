@@ -73,14 +73,5 @@ export default defineComponent({
   .content {
     margin: 1em;
   }
-
-  .label {
-    color: $content-color-dark;
-  }
-
-  .edit {
-    /*font-family: 'IBM Plex Sans';*/
-    /*font-size: 14px;*/
-  }
 }
 </style>

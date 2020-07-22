@@ -17,11 +17,12 @@
 
 import { defineComponent, PropType, ref } from 'vue'
 import { Class, Obj, Ref } from '@anticrm/platform'
+
 import { getPresentationUI } from '@anticrm/presentation-ui/src/utils'
+import { getPresentationCore } from '../utils'
 
 import OwnAttributes from '@anticrm/presentation-ui/src/components/OwnAttributes.vue'
 import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.vue'
-import { getPresentationCore } from '../utils'
 
 export default defineComponent({
   components: { InlineEdit, OwnAttributes },
@@ -33,27 +34,35 @@ export default defineComponent({
   },
   setup(props) {
     const core = getPresentationCore()
-    const title = ref(null)
+    const firstName = ref(core.getEmptyAttribute(props._class))
+    const lastName = ref(core.getEmptyAttribute(props._class))
 
     const ui = getPresentationUI()
     const model = ui.getClassModel(props, model => {
-      return model
+      firstName.value = model.getAttribute('firstName')
+      lastName.value = model.getAttribute('lastName')
+      return model.filterAttributes(['firstName', 'lastName'])
     })
     return {
       model,
-      title
+      firstName,
+      lastName
     }
   }
 })
 </script>
 
 <template>
-  <div class="task-view">
-    <div class="caption-4">Задачи / Новая задача</div>
+  <div class="recruiting-view">
+    <div class="caption-4">Найм / Новый кандидат</div>
 
     <div class="content">
+      <InlineEdit class="caption-1" :placeholder="firstName.placeholder"/>
+      <InlineEdit class="caption-2" :placeholder="lastName.placeholder"/>
 
-      <OwnAttributes v-for="group in model.getGroups()" :_class="group._class" :model="model"></OwnAttributes>
+      <div class="attributes">
+        <OwnAttributes class="group" v-for="group in model.getGroups()" :_class="group._class" :model="model"></OwnAttributes>
+      </div>
 
     </div>
   </div>
@@ -62,7 +71,7 @@ export default defineComponent({
 <style lang="scss">
 @import "~@anticrm/sparkling-theme/css/_variables.scss";
 
-.task-view {
+.recruiting-view {
 
   margin: 1em;
 
@@ -70,13 +79,21 @@ export default defineComponent({
     margin: 1em;
   }
 
-  .label {
-    color: $content-color-dark;
-  }
+  .attributes {
+    display: flex;
+    flex-wrap: wrap;
 
-  .edit {
-    /*font-family: 'IBM Plex Sans';*/
-    /*font-size: 14px;*/
+    //display: grid;
+    //background-color: $content-color-dark;
+    //grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    //grid-gap: 1px;
+
+    margin-top: 1em;
+
+    .group {
+      padding: 0.5em;
+      //background-color: $content-bg-color;
+    }
   }
 }
 </style>

@@ -78,6 +78,7 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
     abstract getAttribute(key: string, _class?: Ref<Class<Obj>>): AttrModel | undefined
     abstract getGroups(): GroupModel[]
     abstract getOwnAttributes(_class: Ref<Class<Obj>>): AttrModel[]
+    abstract getGroup(_class: Ref<Class<Obj>>): GroupModel | undefined
   }
 
   class TClassModel extends ClassModelBase {
@@ -100,6 +101,10 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
     }
 
     getGroups(): GroupModel[] { return this.groups }
+
+    getGroup(_class: Ref<Class<Obj>>): GroupModel | undefined {
+      return this.groups.find(group => group._class === _class)
+    }
   }
 
   class AttributeFilter extends ClassModelBase {
@@ -120,12 +125,17 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
     }
 
     getGroups(): GroupModel[] {
-      return [];
+      return this.next.getGroups()
+    }
+
+    getGroup(_class: Ref<Class<Obj>>): GroupModel | undefined {
+      return this.next.getGroup(_class)
     }
 
     getOwnAttributes(_class: Ref<Class<Obj>>): AttrModel[] {
       const result = this.next.getOwnAttributes(_class)
-      return result.filter(attr => !this.filter[attr.key])
+      const filtered = result.filter(attr => !this.filter[attr.key])
+      return filtered
     }
 
   }

@@ -25,6 +25,8 @@ export interface Candidate extends Person {
 export default plugin('recruitment' as Plugin<Service>, {}, {
   icon: {
     Recruitment: '' as Asset,
+    Position: '' as Asset,
+    Employer: '' as Asset
   },
   component: {
     Main: '' as AnyComponent,
