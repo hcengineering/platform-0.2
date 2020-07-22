@@ -19,48 +19,34 @@ import { defineComponent, PropType } from 'vue'
 import { Class, Obj, Ref } from '@anticrm/platform'
 
 import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.vue'
-import { getPresentationUI } from '@anticrm/presentation-ui/src/utils'
+import { ClassModel } from '@anticrm/presentation-core'
 
 export default defineComponent({
-    components: { InlineEdit },
-    props: {
-      _class: {
-        type: String as unknown as PropType<Ref<Class<Obj>>>,
-        required: true
-      },
+  components: { InlineEdit },
+  props: {
+    _class: {
+      type: String as unknown as PropType<Ref<Class<Obj>>>,
+      required: true
     },
-    setup(props) {
-      const ui = getPresentationUI()
-      return {model: ui.getClassModel(props)}
+    model: {
+      type: Object as PropType<ClassModel>
     }
-  })
+  },
+  setup(props) {
+  }
+})
 </script>
 
 <template>
-  <div style="margin-left: 1em" class="workbench-new-document">
-    <div class="caption-4">Создаем: Рекрутинг/Кандидат</div>
-
     <table>
       <tr v-for="attr in model ? model.getOwnAttributes(_class) : []">
         <td class="label">{{attr.label}}</td>
         <td class="edit"><InlineEdit :placeholder="attr.placeholder"/></td>
       </tr>
     </table>
-  </div>
 </template>
 
 <style lang="scss">
-  @import "~@anticrm/sparkling-theme/css/_variables.scss";
+@import "../../../../node_modules/@anticrm/sparkling-theme/css/variables";
 
-  .workbench-new-document {
-
-    .label {
-      color: $content-color-dark;
-    }
-
-    .edit {
-      /*font-family: 'IBM Plex Sans';*/
-      /*font-size: 14px;*/
-    }
-  }
 </style>

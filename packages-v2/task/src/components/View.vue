@@ -17,13 +17,14 @@
 
 import { defineComponent, PropType, ref } from 'vue'
 import { Class, Obj, Ref } from '@anticrm/platform'
-import { AttrModel } from '@anticrm/presentation-core'
 
+import OwnAttributes from '@anticrm/presentation-ui/src/components/OwnAttributes.vue'
 import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.vue'
 import { getPresentationUI } from '@anticrm/presentation-ui/src/utils'
+import { getPresentationCore } from '../utils'
 
 export default defineComponent({
-  components: { InlineEdit },
+  components: { InlineEdit, OwnAttributes },
   props: {
     _class: {
       type: String as unknown as PropType<Ref<Class<Obj>>>,
@@ -31,7 +32,9 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const title = ref<AttrModel | null>(null)
+    const core = getPresentationCore()
+    const title = ref(core.getEmptyAttribute(props._class))
+
     const ui = getPresentationUI()
     const model = ui.getClassModel(props, model => {
       title.value = model.getAttribute('title')
@@ -54,12 +57,7 @@ export default defineComponent({
       <div class="caption-1">КАНД-213</div>
       <InlineEdit class="caption-2" :placeholder="title.placeholder"/>
 
-      <table>
-        <tr v-for="attr in model.getOwnAttributes(_class)">
-          <td class="label">{{attr.label}}</td>
-          <td class="edit"><InlineEdit :placeholder="attr.placeholder"/></td>
-        </tr>
-      </table>
+<!--      <div v-for="group in model.getGroups()" :_class="group._class" :model="model">{{group._class}}</div>-->
 
     </div>
   </div>

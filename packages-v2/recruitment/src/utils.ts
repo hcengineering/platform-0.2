@@ -13,21 +13,11 @@
 // limitations under the License.
 //
 
-import { plugin, Plugin, Service } from '@anticrm/platform'
-import { AnyComponent, Asset } from '@anticrm/platform-ui'
-import { Person } from '@anticrm/contact'
+import { PresentationCore } from '@anticrm/presentation-core'
+import { inject } from 'vue'
 
-export interface Candidate extends Person {
-  currentPosition: string
-  currentEmployer: string
+export const PresentationCoreInjectionKey = 'presentation-core-injection-key'
+
+export function getPresentationCore(): PresentationCore {
+  return inject(PresentationCoreInjectionKey) as PresentationCore
 }
-
-export default plugin('recruitment' as Plugin<Service>, {}, {
-  icon: {
-    Recruitment: '' as Asset,
-  },
-  component: {
-    Main: '' as AnyComponent,
-    View: '' as AnyComponent
-  }
-})

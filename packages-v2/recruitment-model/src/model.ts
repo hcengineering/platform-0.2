@@ -15,12 +15,14 @@
 
 import { UIBuilder } from '@anticrm/presentation-model'
 import workbench from '@anticrm/workbench-model'
-import { StringProperty } from '@anticrm/platform'
+import { Class, Ref, StringProperty } from '@anticrm/platform'
 import core from '@anticrm/platform-model'
 import contact from '@anticrm/contact-model'
+import presentation from '@anticrm/presentation-core'
 
 import recruitment from '.'
 import { IntlString } from '@anticrm/platform-i18n'
+import { Candidate } from '@anticrm/recruitment/src'
 
 export default (S: UIBuilder) => {
 
@@ -39,8 +41,10 @@ export default (S: UIBuilder) => {
     }),
       currentEmployer: S.attrUI(core.class.Type, {}, {
     label: 'Место работы' as IntlString
-  }),
+  })})
 
-})
+  S.mixin(recruitment.class.Candidate as Ref<Class<Candidate>>, presentation.class.DetailsForm, {
+    form: recruitment.component.View
+  })
 
 }

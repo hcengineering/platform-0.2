@@ -13,11 +13,11 @@
 // limitations under the License.
 //
 
-import { Attribute, Class, Obj, Platform, Ref } from '@anticrm/platform'
+import { Attribute, Class, Obj, Platform, Ref, Type } from '@anticrm/platform'
 import ui, { AttributeUI, AttrModel, ClassModel, ClassUI, GroupModel, PresentationCore } from '.'
 import { CoreService } from '@anticrm/platform-core'
 import { Asset } from '@anticrm/platform-ui'
-import { I18n } from '@anticrm/platform-i18n'
+import { I18n, IntlString } from '@anticrm/platform-i18n'
 
 /*!
  * Anticrm Platform™ Presentation Core Plugin
@@ -34,7 +34,7 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
     const clazz = model.get(_class) as ClassUI<Obj>
     const label = await i18nService.translate(clazz.label)
 
-    return { label, icon: clazz.icon }
+    return { _class, label, icon: clazz.icon }
   }
 
   async function getOwnAttrModel(_class: Ref<Class<Obj>>): Promise<AttrModel[]> {
@@ -146,9 +146,13 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
     return new TClassModel([], [])
   }
 
+  function getEmptyAttribute(_class: Ref<Class<Obj>>): AttrModel {
+    return { _class, key: 'non-existent', label: 'Несуществующий аттрибут' as IntlString, placeholder: '' as IntlString, type: null as unknown as Type }
+  }
 
   return {
     getEmptyModel,
+    getEmptyAttribute,
     getClassModel
   }
 }

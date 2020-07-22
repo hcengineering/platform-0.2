@@ -50,7 +50,9 @@ export interface AttrModel extends UIModel {
   placeholder: string
 }
 
-export interface GroupModel extends UIModel {}
+export interface GroupModel extends UIModel {
+  _class: Ref<Class<Obj>>
+}
 
 export interface ClassModel {
   getGroups(): GroupModel[]
@@ -63,6 +65,7 @@ export interface ClassModel {
 
 export interface PresentationCore extends Service {
   getEmptyModel(): ClassModel
+  getEmptyAttribute(_class: Ref<Class<Obj>>): AttrModel
   getClassModel(_class: Ref<Class<Obj>>, top?: Ref<Class<Obj>>): Promise<ClassModel>
 }
 
