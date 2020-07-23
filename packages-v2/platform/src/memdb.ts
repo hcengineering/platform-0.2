@@ -25,7 +25,7 @@ export class MemDb implements CoreProtocol {
     this.domain = domain
   }
 
-  objectsOfClass (_class: Ref<Class<Doc>>): Doc[] {
+  protected objectsOfClass (_class: Ref<Class<Doc>>): Doc[] {
     if (!this.byClass) {
       this.byClass = new Map<Ref<Class<Doc>>, Doc[]>()
       for (const doc of this.objects.values()) {
@@ -194,7 +194,7 @@ export class MemDb implements CoreProtocol {
     return result.length === 0 ? undefined : result[0]
   }
 
-  private findAll (docs: Doc[], _class: Ref<Class<Doc>>, query: AnyLayout): Doc[] {
+  protected findAll (docs: Doc[], _class: Ref<Class<Doc>>, query: AnyLayout): Doc[] {
     let result = docs
     const clazz = this.get(_class) as Classifier<Obj>
 

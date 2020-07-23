@@ -16,10 +16,13 @@
 <script lang="ts">
 
 import { defineComponent, PropType, ref } from 'vue'
-import { Class, Obj, Ref } from '@anticrm/platform'
+import { Class, CreateTx, Doc, generateId, Property, Ref, VDoc } from '@anticrm/platform'
+
+import core from '@anticrm/platform-core'
 
 import { getPresentationUI } from '@anticrm/presentation-ui/src/utils'
 import { getPresentationCore } from '../utils'
+import { getCoreService } from '@anticrm/workbench/src/utils'
 
 import OwnAttributes from '@anticrm/presentation-ui/src/components/OwnAttributes.vue'
 import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.vue'
@@ -29,27 +32,49 @@ export default defineComponent({
   components: { InlineEdit, OwnAttributes, Button },
   props: {
     _class: {
-      type: String as unknown as PropType<Ref<Class<Obj>>>,
+      type: String as unknown as PropType<Ref<Class<VDoc>>>,
       required: true
     },
   },
-  setup(props) {
-    const core = getPresentationCore()
-    const firstName = ref(core.getEmptyAttribute(props._class))
-    const lastName = ref(core.getEmptyAttribute(props._class))
+  setup: function (props) {
+    const coreService = getCoreService()
+
+    const presentationCore = getPresentationCore()
+    const firstName = ref(presentationCore.getEmptyAttribute(props._class))
+    const lastName = ref(presentationCore.getEmptyAttribute(props._class))
 
     const ui = getPresentationUI()
     const model = ui.getClassModel(props, model => {
-      firstName.value = model.getAttribute('firstName')
-      lastName.value = model.getAttribute('lastName')
+      const aFirstName = model.getAttribute('firstName')
+      if (aFirstName)
+        firstName.value = aFirstName
+      const aLastName = model.getAttribute('lastName')
+      if (aLastName)
+        lastName.value = aLastName
       return model.filterAttributes(['firstName', 'lastName'])
     })
 
     function save() {
+      const objectId = generateId() as Ref<VDoc>
 
+      const tx: CreateTx = {
+        _class: core.class.CreateTx,
+        _id: generateId() as Ref<Doc>,
+
+        _objectId: objectId,
+        _objectClass: props._class,
+
+        _date: Date.now() as Property<number, Date>,
+        _user: 'andrey.v.platov@gmail.com' as Property<string, string>,
+
+        _attributes: {}
+      }
+
+      coreService.tx(tx)
     }
 
     return {
+      save,
       model,
       firstName,
       lastName

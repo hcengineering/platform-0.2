@@ -13,9 +13,10 @@
 // limitations under the License.
 //
 
-import { CoreDomain, Platform } from '@anticrm/platform'
+import { AnyLayout, Class, CoreDomain, Doc, Platform, Ref, Tx } from '@anticrm/platform'
 import core, { CoreService } from '.'
 import { ModelDb } from './modeldb'
+import { createCache } from './indexeddb'
 
 /*!
  * Anticrm Platform™ Core Plugin
@@ -23,7 +24,7 @@ import { ModelDb } from './modeldb'
  * Licensed under the Eclipse Public License, Version 2.0
  */
 export default async (platform: Platform): Promise<CoreService> => {
-  const model = new ModelDb(CoreDomain.Model)
+  const model = new ModelDb()
   const offline = platform.getMetadata(core.metadata.Model)
   if (offline) {
     model.loadModel(offline[CoreDomain.Model])
@@ -31,9 +32,21 @@ export default async (platform: Platform): Promise<CoreService> => {
     throw new Error('not implemented')
   }
 
+  const cache = await createCache('db1', model)
+
   return {
     getModel () {
       return model
+    },
+    find (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc[]> {
+      return model.find(_class, query)
+    },
+    tx (tx: Tx): Promise<void> {
+      const c = cache.tx(tx)
+      return c
+    },
+    loadDomain (domain: string): Promise<Doc[]> {
+      return model.loadDomain(domain)
     }
   }
 }

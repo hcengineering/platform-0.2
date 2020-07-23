@@ -13,13 +13,24 @@
 // limitations under the License.
 //
 
-import { Attribute, Classifier, Doc, MemDb, Mixin, Obj, Ref } from '@anticrm/platform'
+import { AnyLayout, Attribute, Class, Classifier, CoreDomain, Doc, MemDb, Mixin, Obj, Ref } from '@anticrm/platform'
+import core from '.'
 
 interface Proxy {
   __layout: any
 }
 
 export class ModelDb extends MemDb {
+
+  constructor () {
+    super(CoreDomain.Model)
+  }
+
+  findClasses (query: AnyLayout): Class<Obj>[] {
+    const classes = this.objectsOfClass(core.class.Class)
+    return this.findAll(classes, core.class.Class, query) as Class<Obj>[]
+  }
+
   private prototypes = new Map<Ref<Classifier<Obj>>, Object>()
 
   createPrototype (classifier: Classifier<Obj>): Object {

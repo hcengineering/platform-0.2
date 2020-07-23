@@ -14,8 +14,7 @@
 //
 
 import Builder from './builder'
-import { Class, ClassifierKind, CoreDomain, Obj, Ref } from '@anticrm/platform'
-import { RefTo } from '@anticrm/platform-core'
+import { ClassifierKind, CoreDomain } from '@anticrm/platform'
 import core from '.'
 
 export { Builder }
@@ -58,7 +57,7 @@ export default (S: Builder) => {
 
   S.createClass(core.class.Classifier, core.class.Doc, {
     _kind: S.attr(core.class.Type, {}),
-    _extends: S.attr(core.class.RefTo as Ref<Class<RefTo<Class<Obj>>>>, {
+    _extends: S.attr(core.class.RefTo, {
       to: core.class.Class
     }),
     _attributes: S.attr(core.class.BagOf, {
@@ -73,4 +72,17 @@ export default (S: Builder) => {
 
   S.createClass(core.class.Mixin, core.class.Classifier, {
   }, CoreDomain.Model)
+
+  S.createClass(core.class.Tx, core.class.Doc, {
+    _objectId: S.attr(core.class.Type, {}),
+    _date: S.attr(core.class.Type, {}),
+    _user: S.attr(core.class.Type, {}),
+  }, CoreDomain.Tx)
+
+  S.createClass(core.class.CreateTx, core.class.Tx, {
+    _objectClass: S.attr(core.class.RefTo, { to: core.class.Class }),
+    _attributes: S.attr(core.class.BagOf, {
+      of: S.newInstance(core.class.InstanceOf, { of: core.class.Type })
+    })
+  }, CoreDomain.Tx)
 }

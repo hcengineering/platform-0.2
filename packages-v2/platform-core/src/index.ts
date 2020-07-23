@@ -13,7 +13,20 @@
 // limitations under the License.
 //
 
-import { Class, Doc, Emb, Metadata, Plugin, plugin, Ref, Service, Type } from '@anticrm/platform'
+import {
+  Class,
+  CoreProtocol,
+  CreateTx,
+  Doc,
+  Emb,
+  Metadata,
+  Obj,
+  Plugin,
+  plugin,
+  Ref,
+  Service,
+  Type
+} from '@anticrm/platform'
 import { ModelDb } from './modeldb'
 
 // T Y P E S
@@ -36,7 +49,7 @@ export interface ArrayOf<A> extends Type {
 
 // P L U G I N
 
-export interface CoreService extends Service {
+export interface CoreService extends Service, CoreProtocol {
   getModel(): ModelDb
 
 }
@@ -44,5 +57,9 @@ export interface CoreService extends Service {
 export default plugin('core' as Plugin<CoreService>, {}, {
   metadata: {
     Model: '' as Metadata<{ [key: string]: Doc[] }>
+  },
+  class: {
+    Class: '' as Ref<Class<Class<Obj>>>,
+    CreateTx: '' as Ref<Class<CreateTx>>
   }
 })
