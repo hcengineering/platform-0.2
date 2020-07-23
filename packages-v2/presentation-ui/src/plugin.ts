@@ -22,6 +22,8 @@ import { PresentationCoreInjectionKey, PresentationUIInjectionKey } from './util
 import ui, { PresentationUI } from '.'
 
 import Table from './components/Table.vue'
+import NumberPresenter from './components/presenter/NumberPresenter.vue'
+import StringPresenter from './components/presenter/StringPresenter.vue'
 
 /*!
  * Anticrm Platform™ Presentation Plugin
@@ -31,12 +33,13 @@ import Table from './components/Table.vue'
 export default async (platform: Platform, deps: { ui: UIService, presentationCore: PresentationCore }): Promise<PresentationUI> => {
 
   platform.setResource(ui.components.Table, Table)
+  platform.setResource(ui.components.StringPresenter, StringPresenter)
+  platform.setResource(ui.components.NumberPresenter, NumberPresenter)
 
   const coreService = deps.presentationCore
 
   function getClassModel(props: { _class: Ref<Class<Obj>> }, onChange?: (model: ClassModel) => ClassModel) {
-    const emptyModel = coreService.getEmptyModel()
-    const model = ref(emptyModel)
+    const model = ref(coreService.getEmptyModel())
 
     // following async code does not trigger on `_class` prop change, so we use `watch`
     // the issue is that watching props is a kind of nonsense (because props) are formally constants.

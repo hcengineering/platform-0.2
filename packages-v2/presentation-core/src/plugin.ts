@@ -16,7 +16,7 @@
 import { Attribute, Class, Obj, Platform, Ref, Type } from '@anticrm/platform'
 import ui, { AttributeUI, AttrModel, ClassModel, ClassUI, GroupModel, PresentationCore } from '.'
 import { CoreService } from '@anticrm/platform-core'
-import { Asset } from '@anticrm/platform-ui'
+import { AnyComponent, Asset } from '@anticrm/platform-ui'
 import { I18n, IntlString } from '@anticrm/platform-i18n'
 
 /*!
@@ -47,7 +47,8 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
       let label = key
       let placeholder = key
       let icon: Asset | undefined
-      if (coreService.getModel().is(attribute._class, ui.class.AttributeUI)) {
+      const coreModel = coreService.getModel()
+      if (coreModel.is(attribute._class, ui.class.AttributeUI)) {
         const attributeUI = attribute as AttributeUI
         label = await i18nService.translate(attributeUI.label)
         if (attributeUI.placeholder) {
@@ -57,13 +58,20 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
         }
         icon = attributeUI.icon
       }
+      // get presenter
+      const typeClassId = attribute.type._class
+      const typeClass = coreModel.get(typeClassId) as Class<Type>
+      if (!coreModel.isMixedIn(typeClass, ui.class.Presenter)) {
+        throw new Error(`no presenter for type '${typeClassId}'`)
+      }
+      const presenter = coreModel.as(typeClass, ui.class.Presenter)
       result.push({
         key,
         _class,
         icon,
         label,
         placeholder,
-        type: attribute.type
+        presenter: presenter.presenter
       })
     }
     return result
@@ -137,7 +145,6 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
       const filtered = result.filter(attr => !this.filter[attr.key])
       return filtered
     }
-
   }
 
   async function getClassModel(_class: Ref<Class<Obj>>, top?: Ref<Class<Obj>>): Promise<ClassModel> {
@@ -157,7 +164,7 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
   }
 
   function getEmptyAttribute(_class: Ref<Class<Obj>>): AttrModel {
-    return { _class, key: 'non-existent', label: 'Несуществующий аттрибут' as IntlString, placeholder: '' as IntlString, type: null as unknown as Type }
+    return { _class, key: 'non-existent', label: 'Несуществующий аттрибут' as IntlString, placeholder: '' as IntlString, presenter: 'component:ui.StringPresenter' as AnyComponent }
   }
 
   return {

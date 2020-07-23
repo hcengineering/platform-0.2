@@ -23,9 +23,10 @@ import { getPresentationCore } from '../utils'
 
 import OwnAttributes from '@anticrm/presentation-ui/src/components/OwnAttributes.vue'
 import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.vue'
+import Button from '@anticrm/sparkling-controls/src/Button.vue'
 
 export default defineComponent({
-  components: { InlineEdit, OwnAttributes },
+  components: { InlineEdit, OwnAttributes, Button },
   props: {
     _class: {
       type: String as unknown as PropType<Ref<Class<Obj>>>,
@@ -43,6 +44,11 @@ export default defineComponent({
       lastName.value = model.getAttribute('lastName')
       return model.filterAttributes(['firstName', 'lastName'])
     })
+
+    function save() {
+
+    }
+
     return {
       model,
       firstName,
@@ -54,7 +60,13 @@ export default defineComponent({
 
 <template>
   <div class="recruiting-view">
-    <div class="caption-4">Найм / Новый кандидат</div>
+    <div class="header">
+      <div class="caption-4">Найм / Новый кандидат</div>
+      <div class="actions">
+        <Button>Cancel</Button>
+        <Button @click="save">Save</Button>
+      </div>
+    </div>
 
     <div class="content">
       <InlineEdit class="caption-1" :placeholder="firstName.placeholder"/>
@@ -74,6 +86,21 @@ export default defineComponent({
 .recruiting-view {
 
   margin: 1em;
+
+  .header {
+    display: flex;
+
+    .actions {
+      display: flex;
+      flex-grow: 1;
+      flex-direction: row-reverse;
+      font-size: 10px;
+
+      button {
+        margin-left: 0.5em;
+      }
+    }
+  }
 
   .content {
     margin: 1em;

@@ -32,6 +32,10 @@ export interface ClassUI<T extends Obj> extends Class<T> {
   icon?: Asset
 }
 
+export interface Presenter<T extends Type> extends Class<T> {
+  presenter: AnyComponent
+}
+
 export interface DetailsForm<T extends VDoc> extends Class<T> {
   form: AnyComponent
 }
@@ -46,7 +50,7 @@ export interface UIModel {
 export interface AttrModel extends UIModel {
   _class: Ref<Class<Obj>>
   key: string
-  type: Type
+  presenter: AnyComponent
   placeholder: string
 }
 
@@ -74,6 +78,7 @@ export default plugin('presentation-core' as Plugin<PresentationCore>, { core: c
   class: {
     AttributeUI: '' as Ref<Class<AttributeUI>>,
     ClassUI: '' as Ref<Class<ClassUI<Obj>>>,
+    Presenter: '' as Ref<Mixin<Presenter<Type>>>,
     DetailsForm: '' as Ref<Mixin<DetailsForm<VDoc>>>
   }
 })

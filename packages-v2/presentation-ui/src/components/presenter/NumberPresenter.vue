@@ -18,13 +18,12 @@
 import { defineComponent, PropType } from 'vue'
 import { Class, Obj, Ref } from '@anticrm/platform'
 
-import Icon from '@anticrm/platform-ui/src/components/Icon.vue'
 import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.vue'
 
 import { ClassModel } from '@anticrm/presentation-core'
 
 export default defineComponent({
-  components: { InlineEdit, Icon },
+  components: { InlineEdit },
   props: {
     _class: {
       type: String as unknown as PropType<Ref<Class<Obj>>>,
@@ -40,39 +39,5 @@ export default defineComponent({
 </script>
 
 <template>
-    <div class="presentation-ui-own-attributes">
-      <div class="caption-4">{{ model.getGroup(_class).label }}</div>
-      <table>
-        <tr v-for="attr in model.getOwnAttributes(_class)">
-          <td><Icon :icon="attr.icon" class="icon-embed-15x icon"/></td>
-          <td width="120px">
-            <div class="label">{{attr.label}}</div>
-          </td>
-          <td>
-            <div class="edit"><InlineEdit :placeholder="attr.placeholder"/></div>
-          </td>
-        </tr>
-      </table>
-    </div>
+  <InlineEdit />
 </template>
-
-<style lang="scss">
-@import "~@anticrm/sparkling-theme/css/_variables.scss";
-
-.presentation-ui-own-attributes {
-
-  .icon {
-    fill: $content-color-dark;
-  }
-
-  .label {
-    color: $content-color-dark;
-  }
-
-  .edit {
-    font-family: Raleway;
-    font-size: 14px;
-  }
-
-}
-</style>

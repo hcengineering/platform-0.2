@@ -14,16 +14,18 @@
 -->
 
 <script lang="ts">
-  import { computed, defineComponent, ref } from 'vue'
+import { computed, defineComponent, ref } from 'vue'
 
-  import Nav from './nav/Nav.vue'
-  import Home from './Home.vue'
-  import { getCoreService, getUIService } from '../utils'
-  import workbench, { Application } from '../..'
-  import { Class, Ref, VDoc } from '@anticrm/platform'
-  import { AnyComponent } from '@anticrm/platform-ui'
+import Nav from './nav/Nav.vue'
+import Home from './Home.vue'
+import { getCoreService, getUIService } from '../utils'
+import workbench, { Application } from '../..'
+import { Class, Ref, VDoc } from '@anticrm/platform'
+import { AnyComponent } from '@anticrm/platform-ui'
 
-  interface PanelConfig {
+import View from '@anticrm/recruitment/src/components/View.vue'
+
+interface PanelConfig {
     app: Ref<Application>
     component: AnyComponent
   }
@@ -34,7 +36,7 @@
   }
 
   export default defineComponent({
-    components: {Nav, Home},
+    components: {Nav, Home, View},
     props: {
       location: {
         type: Object,
@@ -112,10 +114,10 @@
 
 <template>
   <div id="workbench">
-    <header>
-      <div/>
-      <!--      <Header/>-->
-    </header>
+<!--    <header>-->
+<!--      <div/>-->
+<!--      &lt;!&ndash;      <Header/>&ndash;&gt;-->
+<!--    </header>-->
 
     <nav>
       <!-- <Sidenav :applications="applications" /> -->
@@ -137,9 +139,10 @@
     </main>
 
     <aside>
+      <View _class="class:recruitment.Candidate" />
     </aside>
 
-    <footer></footer>
+<!--    <footer></footer>-->
   </div>
 </template>
 
@@ -149,8 +152,9 @@
   #workbench {
     display: grid;
 
-    grid-template-columns: $pictogram-size 1fr auto;
-    grid-template-rows: $pictogram-size 1fr 24px;
+    grid-template-columns: $pictogram-size 1fr 36em;
+    //grid-template-rows: $pictogram-size 1fr 24px;
+    grid-template-rows: 1fr;
 
     height: 100%;
 
@@ -169,8 +173,8 @@
       grid-column-start: 1;
       grid-column-end: 2;
 
-      grid-row-start: 2;
-      grid-row-end: 3;
+      grid-row-start: 1;
+      grid-row-end: 2;
 
       background-color: $nav-bg-color;
     }
@@ -179,9 +183,10 @@
       grid-column-start: 2;
       grid-column-end: 3;
 
-      grid-row-start: 2;
-      grid-row-end: 3;
+      grid-row-start: 1;
+      grid-row-end: 2;
 
+      //background-color: $header-bg-color;
       background-color: $content-bg-color;
       // padding: 0em 1em;
     }
@@ -190,10 +195,11 @@
       grid-column-start: 3;
       grid-column-end: 4;
 
-      grid-row-start: 2;
-      grid-row-end: 3;
+      grid-row-start: 1;
+      grid-row-end: 2;
 
       background-color: $header-bg-color;
+      //background-color: $content-bg-color;
       border-left: 1px solid $workspace-separator-color;
     }
 

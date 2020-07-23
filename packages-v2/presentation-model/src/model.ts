@@ -16,6 +16,7 @@
 import { UIBuilder } from './builder'
 import core from '@anticrm/platform-model'
 import ui from '.'
+import presentationUI from '@anticrm/presentation-ui'
 
 export default (S: UIBuilder) => {
   S.createClass(ui.class.ClassUI, core.class.Class, {
@@ -27,6 +28,14 @@ export default (S: UIBuilder) => {
     label: S.attr(core.class.Type, {}),
     placeholder: S.attr(core.class.Type, {}),
     icon: S.attr(core.class.Type, {})
+  })
+
+  S.createMixin(ui.class.Presenter, core.class.Class, {
+    presenter: S.attr(core.class.Type, {})
+  })
+
+  S.mixin(core.class.Type, ui.class.Presenter, {
+    presenter: presentationUI.components.StringPresenter
   })
 
   S.createMixin(ui.class.DetailsForm, core.class.Class, {
