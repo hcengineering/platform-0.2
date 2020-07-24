@@ -4,5 +4,8 @@
   "workspaces": [
     "packages-v2/*",
     "dev-v2/*"
-  ]
+  ],
+  "dependencies": {
+    "vue": "3.0.0-rc.4"
+  }
 }

@@ -21,7 +21,7 @@ import { PresentationUI } from '@anticrm/presentation-ui'
 
 import { CoreInjectionKey, UIInjectionKey } from './utils'
 
-import Workbench from './components/Workbench.vue'
+import Workbench from './components/WorkbenchNav.vue'
 import Browse from './components/Browse.vue'
 
 /*!

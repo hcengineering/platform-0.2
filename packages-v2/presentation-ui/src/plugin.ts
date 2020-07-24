@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { computed, ref, watch } from 'vue'
+import { ref, watchEffect } from 'vue'
 import { Class, Obj, Platform, Ref } from '@anticrm/platform'
 import { ClassModel, PresentationCore } from '@anticrm/presentation-core'
 import { UIService } from '@anticrm/platform-ui'
@@ -45,7 +45,7 @@ export default async (platform: Platform, deps: { ui: UIService, presentationCor
     // the issue is that watching props is a kind of nonsense (because props) are formally constants.
     // so, the trick for now is to make computed and watch it... we need to revisit this later.
 
-    watch(computed(() => props._class), () => {
+    watchEffect( () => {
        coreService.getClassModel(props._class, 'class:core.VDoc' as Ref<Class<Obj>>)
          .then(m => {
            model.value = onChange ? onChange(m) : m
@@ -53,7 +53,7 @@ export default async (platform: Platform, deps: { ui: UIService, presentationCor
          .catch(err => {
            platform.setPlatformStatus(err)
          })
-    }, {immediate: true})
+    })
 
     return model
   }

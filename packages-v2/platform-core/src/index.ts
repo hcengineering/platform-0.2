@@ -14,6 +14,7 @@
 //
 
 import {
+  AnyLayout,
   Class,
   CoreProtocol,
   CreateTx,
@@ -51,7 +52,7 @@ export interface ArrayOf<A> extends Type {
 
 export interface CoreService extends Service, CoreProtocol {
   getModel(): ModelDb
-
+  query (_class: Ref<Class<Doc>>, query: AnyLayout, listener: (result: Doc[]) => void): () => void
 }
 
 export default plugin('core' as Plugin<CoreService>, {}, {

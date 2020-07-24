@@ -32,28 +32,39 @@ export default defineComponent({
     },
     model: {
       type: Object as PropType<ClassModel>
+    },
+    object: {
+      type: Object
     }
   },
-  setup(props) {
+  setup (props) {
+    // const object = reactive({})
+    //
+    // return { object }
   }
 })
 </script>
 
 <template>
-    <div class="presentation-ui-own-attributes">
-      <div class="caption-4">{{ model.getGroup(_class).label }}</div>
-      <table>
-        <tr v-for="attr in model.getOwnAttributes(_class)">
-          <td><Icon :icon="attr.icon" class="icon-embed-15x icon"/></td>
-          <td width="120px">
-            <div class="label">{{attr.label}}</div>
-          </td>
-          <td>
-            <div class="edit"><InlineEdit :placeholder="attr.placeholder"/></div>
-          </td>
-        </tr>
-      </table>
-    </div>
+  <div class="presentation-ui-own-attributes">
+    <div class="caption-4">{{ model.getGroup(_class).label }}</div>
+    <table>
+      <tr v-for="attr in model.getOwnAttributes(_class)">
+        <td>
+          <Icon :icon="attr.icon" class="icon-embed-15x icon"/>
+        </td>
+        <td width="120px">
+          <div class="label">{{ attr.label }}</div>
+        </td>
+        <td>
+          <div class="edit">
+            <widget :component="attr.presenter" v-model="object[attr.key]" :placeholder="attr.placeholder"/>
+<!--            <InlineEdit :placeholder="attr.placeholder"/>-->
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
 </template>
 
 <style lang="scss">

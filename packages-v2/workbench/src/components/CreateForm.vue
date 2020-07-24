@@ -15,13 +15,11 @@
 
 <script lang="ts">
 
-import { defineComponent, PropType, reactive, ref } from 'vue'
+import { defineComponent, PropType, reactive } from 'vue'
 import { Class, CreateTx, Doc, generateId, Property, Ref, VDoc } from '@anticrm/platform'
 
 import core from '@anticrm/platform-core'
 
-import { getPresentationUI } from '@anticrm/presentation-ui/src/utils'
-import { getPresentationCore } from '../utils'
 import { getCoreService } from '@anticrm/workbench/src/utils'
 
 import OwnAttributes from '@anticrm/presentation-ui/src/components/OwnAttributes.vue'
@@ -35,25 +33,13 @@ export default defineComponent({
       type: String as unknown as PropType<Ref<Class<VDoc>>>,
       required: true
     },
+    component: {
+      type: String,
+      required: true
+    }
   },
   setup(props, context) {
     const coreService = getCoreService()
-
-    const presentationCore = getPresentationCore()
-    const firstName = ref(presentationCore.getEmptyAttribute(props._class))
-    const lastName = ref(presentationCore.getEmptyAttribute(props._class))
-
-    const ui = getPresentationUI()
-    // const model = ref(presentationCore.getEmptyModel())
-    const model = ui.getClassModel(props, model => {
-      const aFirstName = model.getAttribute('firstName')
-      if (aFirstName)
-        firstName.value = aFirstName
-      const aLastName = model.getAttribute('lastName')
-      if (aLastName)
-        lastName.value = aLastName
-      return model.filterAttributes(['firstName', 'lastName'])
-    })
 
     const object = reactive({})
 
@@ -74,22 +60,17 @@ export default defineComponent({
       }
 
       coreService.tx(tx)
+      context.emit('done', 'save')
     }
 
     function cancel() {
-      context.emit('open', {
-        component: '',
-        document: ''
-      })
+      context.emit('done', 'cancel')
     }
 
     return {
       object,
       save,
       cancel,
-      model,
-      firstName,
-      lastName
     }
   }
 })
@@ -106,13 +87,7 @@ export default defineComponent({
     </div>
 
     <div class="content">
-      <InlineEdit class="caption-1" :placeholder="firstName.placeholder"/>
-      <InlineEdit class="caption-2" :placeholder="lastName.placeholder"/>
-
-      <div class="attributes">
-        <OwnAttributes class="group" v-for="group in model.getGroups()" :_class="group._class" :model="model" :object="object"></OwnAttributes>
-      </div>
-
+      <widget :component="component" :object="object" :_class="_class"/>
     </div>
   </div>
 </template>

@@ -32,21 +32,75 @@ export default async (platform: Platform): Promise<CoreService> => {
     throw new Error('not implemented')
   }
 
-  const cache = await createCache('db1', model)
+  const cache = await createCache('db3', model)
+
+  interface Query {
+    _class: Ref<Class<Doc>>
+    query: AnyLayout
+    instances: Doc[]
+    listener: (result: Doc[]) => void
+  }
+
+  const queries = [] as Query[]
+
+  function query (_class: Ref<Class<Doc>>, query: AnyLayout, listener: (result: Doc[]) => void): () => void {
+    console.log('query', _class)
+    console.log('total', queries.length)
+    const q: Query = { _class, query, listener, instances: [] }
+    queries.push(q)
+
+    const done = false
+
+    cache.find(_class as Ref<Class<Doc>>, query)
+      .then(result => {
+        // network call may perform faster than cache access :),
+        // so we do not return cached results in this case
+        if (!done) {
+          q.instances = result
+          listener(result)
+        }
+      })
+
+    // coreProtocol.find(_class as Ref<Class<Doc>>, query) // !!!!! WRONG, need hibernate
+    //   .then(async result => {
+    //     done = true
+    //     ; ((await cache).cache(result)).then(() => console.log('RESULTS CACHED'))
+    //     return Promise.all(result.map(doc => prototypes.instantiateDoc(doc)))
+    //   })
+    //   .then(async result => {
+    //     q.instances = result
+    //     listener(result as unknown as Instance<T>[])
+    //   })
+
+    return () => {
+      queries.splice(queries.indexOf(q), 1)
+    }
+  }
+
+  async function find (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc[]> {
+    return cache.find(_class, query)
+  }
+
+  function tx (tx: Tx): Promise<void> {
+    const c = cache.tx(tx)
+    for (const q of queries) {
+      // TODO: check if given tx affect query results
+      find(q._class, q.query).then(result => {
+        q.listener(result)
+      })
+    }
+    return c
+  }
 
   return {
     getModel () {
       return model
     },
-    find (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc[]> {
-      return model.find(_class, query)
-    },
-    tx (tx: Tx): Promise<void> {
-      const c = cache.tx(tx)
-      return c
-    },
     loadDomain (domain: string): Promise<Doc[]> {
       return model.loadDomain(domain)
-    }
+    },
+    query,
+    find,
+    tx
   }
 }

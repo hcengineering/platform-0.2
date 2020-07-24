@@ -18,6 +18,7 @@ import recruitment from '.'
 
 import Main from './components/Main.vue'
 import View from './components/View.vue'
+import View2 from './components/View2.vue'
 
 /*!
  * Anticrm Platform™ Recruitment Plugin
@@ -28,6 +29,7 @@ export default async (platform: Platform): Promise<Service> => {
 
   platform.setResource(recruitment.component.Main, Main)
   platform.setResource(recruitment.component.View, View)
+  platform.setResource(recruitment.component.View2, View2)
 
   return {}
 }

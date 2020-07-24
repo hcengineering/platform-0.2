@@ -27,7 +27,6 @@ export default defineComponent({
   props: {
     _class: {
       type: String as unknown as PropType<Ref<Class<Obj>>>,
-      required: true
     },
     model: {
       type: Object as PropType<ClassModel>

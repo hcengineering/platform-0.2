@@ -16,19 +16,26 @@
 <script lang="ts">
 
 import { defineComponent, PropType } from 'vue'
-import { Doc } from '@anticrm/platform'
+import { Class, Doc, Ref } from '@anticrm/platform'
 import { getPresentationUI } from '../utils'
 
 export default defineComponent({
       components: {},
       props: {
         _class: {
-          type: String,
+          type: String as unknown as PropType<Ref<Class<Doc>>>,
           required: true
         },
         content: Array as PropType<Doc[]>,
       },
       setup(props) {
+        // const content = ref([] as Doc[])
+        //
+        // const core = getCoreService()
+        // console.log('props', props._class)
+        // core.query(props._class, {}, (result: Doc[]) => {
+        //   content.value = result
+        // })
         const ui = getPresentationUI()
         return { model: ui.getClassModel(props) }
       }
@@ -48,11 +55,11 @@ export default defineComponent({
           class="tr"
           v-for="object in content"
           :key="object._id"
-          @click="$emit('navigate', object._id)"
+          @click="$emit('open', object._id)"
       >
         <div class="td" v-for="attr in model.getOwnAttributes(_class)" :key="attr.key">
-          <widget v-if="attr.presenter" :component="attr.presenter" :modelValue="object[attr.key]" />
-          <span v-else>{{ object[attr.key] }}</span>
+<!--          <widget v-if="attr.presenter" :component="attr.presenter" :modelValue="object[attr.key]" />-->
+          <span>{{ object[attr.key] || '&nbsp;' }}</span>
         </div>
       </div>
     </div>

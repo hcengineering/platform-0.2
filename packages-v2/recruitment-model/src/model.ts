@@ -15,12 +15,12 @@
 
 import { UIBuilder } from '@anticrm/presentation-model'
 import workbench from '@anticrm/workbench-model'
-import { Class, Ref, StringProperty } from '@anticrm/platform'
+import { Class, Property, Ref, StringProperty } from '@anticrm/platform'
 import core from '@anticrm/platform-model'
 import contact from '@anticrm/contact-model'
 import presentation from '@anticrm/presentation-core'
 
-import recruitment from '.'
+import recruitment, { RecruitmentDomain } from '.'
 import { IntlString } from '@anticrm/platform-i18n'
 import { Candidate } from '@anticrm/recruitment/src'
 
@@ -34,6 +34,7 @@ export default (S: UIBuilder) => {
   }, recruitment.application.Recruitment)
 
   S.createClassUI(recruitment.class.Candidate, contact.class.Person, {
+    _domain: RecruitmentDomain.Recruitment as Property<string, string>,
     label: 'Кандидат' as IntlString
   }, {
     currentPosition: S.attrUI(core.class.Type, {}, {

@@ -30,6 +30,7 @@ export default plugin('recruitment' as Plugin<Service>, {}, {
   },
   component: {
     Main: '' as AnyComponent,
-    View: '' as AnyComponent
+    View: '' as AnyComponent,
+    View2: '' as AnyComponent
   }
 })

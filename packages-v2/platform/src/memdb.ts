@@ -184,9 +184,16 @@ export class MemDb implements CoreProtocol {
   }
 
   // Q U E R Y
-  async find (clazz: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc[]> {
+
+  findSync (clazz: Ref<Class<Doc>>, query: AnyLayout): Doc[] {
     const byClass = this.objectsOfClass(clazz)
     return this.findAll(byClass, clazz, query)
+  }
+
+  async find (clazz: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc[]> {
+    return this.findSync(clazz, query)
+    // const byClass = this.objectsOfClass(clazz)
+    // return this.findAll(byClass, clazz, query)
   }
 
   async findOne (clazz: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc | undefined> {

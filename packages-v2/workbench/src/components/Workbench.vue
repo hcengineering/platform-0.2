@@ -132,7 +132,7 @@ interface PanelConfig {
 
       </div>
       <widget v-if="config.currentPanel >= 0" :component="config.panels[0].component"
-              :_class="getAppClass(config.panels[0].app)"
+              _class="class:recruitment.Candidate"
               @navigate="navigatePanel"
       />
       <Home v-else/>

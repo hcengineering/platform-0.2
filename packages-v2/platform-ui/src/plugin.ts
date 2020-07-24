@@ -37,45 +37,47 @@ export default async (platform: Platform): Promise<UIService> => {
 
   // C O M P O N E N T  R E N D E R E R
 
-  const BAD_COMPONENT = 'bad_component'
+  const BAD_COMPONENT = 'bad_component' as AnyComponent
 
   app.component('widget', defineComponent({
     props: {
-      component: String as unknown as PropType<AnyComponent>,
+      component: {
+        type: String as unknown as PropType<AnyComponent>,
+        required: true
+      },
       fallback: String as unknown as PropType<AnyComponent>
     },
-    setup () {
-      return {
-        resolved: ref('')
-      }
-    },
-    render () {
-      const resolved = platform.peekResource(this.component as AnyComponent)
-      if (resolved) {
-        return h(resolved)
-      }
-      if (this.resolved === BAD_COMPONENT) {
-        return h(BadComponent)
-      }
-      if (this.component !== this.resolved) {
-        platform.getResource(this.component as AnyComponent).then(() => {
-          this.resolved = this.component
-        }).catch(err => {
-          platform.setPlatformStatus(err)
-          this.resolved = BAD_COMPONENT
-        })
-        const fallback = platform.peekResource(this.fallback as AnyComponent)
-        if (fallback) {
-          return h(fallback)
-        } else {
-          return h('div', [])
+    setup (props, context) {
+      const resolved = ref('' as AnyComponent)
+
+      return () => {
+        const resolvedComponent = platform.peekResource(props.component as AnyComponent)
+        if (resolvedComponent) {
+          return h(resolvedComponent, context.attrs)
         }
-      } else {
-        const resolved = platform.peekResource(this.resolved as AnyComponent)
-        if (resolved) {
-          return h(resolved)
+        if (resolved.value === BAD_COMPONENT) {
+          return h(BadComponent)
+        }
+        if (props.component !== resolved.value) {
+          platform.getResource(props.component as AnyComponent).then(() => {
+            resolved.value = props.component as AnyComponent
+          }).catch(err => {
+            platform.setPlatformStatus(err)
+            resolved.value = BAD_COMPONENT
+          })
+          const fallback = platform.peekResource(props.fallback as AnyComponent)
+          if (fallback) {
+            return h(fallback)
+          } else {
+            return h('div', [])
+          }
         } else {
-          return h('div', [])
+          const resolvedComponent = platform.peekResource(resolved.value as AnyComponent)
+          if (resolvedComponent) {
+            return h(resolvedComponent, context.attrs)
+          } else {
+            return h('div', [])
+          }
         }
       }
     }

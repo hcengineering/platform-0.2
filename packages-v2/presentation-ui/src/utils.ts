@@ -16,9 +16,17 @@
 import { PresentationCore } from '@anticrm/presentation-core'
 import { inject } from 'vue'
 import { PresentationUI } from '.'
+import { CoreService } from '@anticrm/platform-core'
 
+export const CoreInjectionKey = 'core-injection-key'
 export const PresentationCoreInjectionKey = 'presentation-core-injection-key'
 export const PresentationUIInjectionKey = 'presentation-ui-injection-key'
+
+export function getCoreService(): CoreService {
+  const core = inject(CoreInjectionKey)
+  if (core) { return core as CoreService }
+  throw new Error('`core` plugin not loaded.')
+}
 
 export function getPresentationCore(): PresentationCore {
   return inject(PresentationCoreInjectionKey) as PresentationCore

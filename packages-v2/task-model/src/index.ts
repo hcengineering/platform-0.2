@@ -20,6 +20,10 @@ import { Application } from '@anticrm/workbench'
 import task, { Task } from '@anticrm/task'
 import { IntlString } from '@anticrm/platform-i18n'
 
+export enum TaskDomain {
+  Task = 'task'
+}
+
 export default extendIds(task, {
   application: {
     Task: '' as Ref<Application>

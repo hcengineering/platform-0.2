@@ -19,7 +19,7 @@ import presentation, { UIBuilder } from '@anticrm/presentation-model'
 
 import core from '@anticrm/platform-model'
 import workbench from '@anticrm/workbench-model'
-import task from '.'
+import task, { TaskDomain } from '.'
 
 
 export default (S: UIBuilder) => {
@@ -38,7 +38,7 @@ export default (S: UIBuilder) => {
     description: S.attrUI(core.class.Type, {}, {
       label: task.string.Task_description
     }),
-  })
+  }, TaskDomain.Task)
 
   S.mixin(task.class.Task, presentation.class.DetailsForm, {
     form: task.component.View
