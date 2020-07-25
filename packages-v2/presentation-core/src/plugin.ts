@@ -86,6 +86,7 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
     abstract getAttribute(key: string, _class?: Ref<Class<Obj>>): AttrModel | undefined
     abstract getGroups(): GroupModel[]
     abstract getOwnAttributes(_class: Ref<Class<Obj>>): AttrModel[]
+    abstract getAttributes(): AttrModel[]
     abstract getGroup(_class: Ref<Class<Obj>>): GroupModel | undefined
   }
 
@@ -98,6 +99,10 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
       super()
       this.attributes = attributes
       this.groups = groups
+    }
+
+    getAttributes(): AttrModel[] {
+      return this.attributes
     }
 
     getOwnAttributes(_class: Ref<Class<Obj>>): AttrModel[] {
@@ -142,6 +147,12 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
 
     getOwnAttributes(_class: Ref<Class<Obj>>): AttrModel[] {
       const result = this.next.getOwnAttributes(_class)
+      const filtered = result.filter(attr => !this.filter[attr.key])
+      return filtered
+    }
+
+    getAttributes(): AttrModel[] {
+      const result = this.next.getAttributes()
       const filtered = result.filter(attr => !this.filter[attr.key])
       return filtered
     }

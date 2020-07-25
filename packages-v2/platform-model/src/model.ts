@@ -74,15 +74,19 @@ export default (S: Builder) => {
   }, CoreDomain.Model)
 
   S.createClass(core.class.Tx, core.class.Doc, {
+    _objectClass: S.attr(core.class.RefTo, { to: core.class.Class }),
     _objectId: S.attr(core.class.Type, {}),
     _date: S.attr(core.class.Type, {}),
     _user: S.attr(core.class.Type, {}),
   }, CoreDomain.Tx)
 
   S.createClass(core.class.CreateTx, core.class.Tx, {
-    _objectClass: S.attr(core.class.RefTo, { to: core.class.Class }),
     _attributes: S.attr(core.class.BagOf, {
       of: S.newInstance(core.class.InstanceOf, { of: core.class.Type })
     })
   }, CoreDomain.Tx)
+
+  S.createClass(core.class.DeleteTx, core.class.Tx, {
+  }, CoreDomain.Tx)
+
 }

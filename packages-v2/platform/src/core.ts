@@ -96,11 +96,14 @@ export interface Tx extends Doc {
   _date: DateProperty
   _user: StringProperty
   _objectId: Ref<VDoc>
+  _objectClass: Ref<Class<VDoc>>
 }
 
 export interface CreateTx extends Tx {
-  _objectClass: Ref<Class<VDoc>>
   _attributes: { [key: string]: PropertyType }
+}
+
+export interface DeleteTx extends Tx {
 }
 
 export type OptionalMethods<T extends object> = CombineObjects<Omit<T, KeysByType<T, MethodType>>,

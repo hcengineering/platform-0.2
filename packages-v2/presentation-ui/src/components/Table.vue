@@ -47,7 +47,7 @@ export default defineComponent({
   <div class="erp-table">
     <div class="thead">
       <div class="tr">
-        <div class="th caption-4" v-for="attr in model.getOwnAttributes(_class)" :key="attr.key">{{ attr.label }}</div>
+        <div class="th caption-4" v-for="attr in model.getAttributes()" :key="attr.key">{{ attr.label }}</div>
       </div>
     </div>
     <div class="tbody">
@@ -57,7 +57,7 @@ export default defineComponent({
           :key="object._id"
           @click="$emit('open', object)"
       >
-        <div class="td" v-for="attr in model.getOwnAttributes(_class)" :key="attr.key">
+        <div class="td" v-for="attr in model.getAttributes()" :key="attr.key">
 <!--          <widget v-if="attr.presenter" :component="attr.presenter" :modelValue="object[attr.key]" />-->
           <span>{{ object[attr.key] || '&nbsp;' }}</span>
         </div>

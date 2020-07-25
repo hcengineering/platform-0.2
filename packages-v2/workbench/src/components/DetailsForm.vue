@@ -16,10 +16,11 @@
 <script lang="ts">
 
 import { defineComponent, PropType, ref } from 'vue'
-import { Class, VDoc } from '@anticrm/platform'
+import { Class, DeleteTx, Doc, generateId, Property, Ref, VDoc } from '@anticrm/platform'
 import presentationCore from '@anticrm/presentation-core'
 
 import { getCoreService } from '@anticrm/workbench/src/utils'
+import core from '@anticrm/platform-core'
 
 import OwnAttributes from '@anticrm/presentation-ui/src/components/OwnAttributes.vue'
 import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.vue'
@@ -51,10 +52,27 @@ export default defineComponent({
       context.emit('done', 'cancel')
     }
 
+    function remove() {
+      const tx: DeleteTx = {
+        _class: core.class.DeleteTx,
+        _id: generateId() as Ref<Doc>,
+
+        _objectId: props.object._id as Ref<VDoc>,
+        _objectClass: props.object._class as Ref<Class<VDoc>>,
+        _date: Date.now() as Property<number, Date>,
+        _user: 'andrey.v.platov@gmail.com' as Property<string, string>,
+      }
+
+      coreService.tx(tx)
+
+      context.emit('done', 'delete')
+    }
+
     return {
       component,
       _class,
       cancel,
+      remove
     }
   }
 })
@@ -66,6 +84,7 @@ export default defineComponent({
       <div class="caption-4">Найм / Новый кандидат</div>
       <div class="actions">
         <Button @click="cancel">Cancel</Button>
+        <Button @click="remove">Delete</Button>
       </div>
     </div>
 

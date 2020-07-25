@@ -68,6 +68,14 @@ export async function createCache (dbname: string, modelDb: ModelDb): Promise<Co
     return tx.done
   }
 
+  async function remove (_class: Ref<Class<Doc>>, doc: Ref<Doc>): Promise<void> {
+    const domain = modelDb.getDomain(_class)
+    const tx = db.transaction(domain, 'readwrite')
+    const store = tx.objectStore(domain)
+    store.delete(doc)
+    return tx.done
+  }
+
   /**
    * Apply given transaction to cached results.
    * @param tx
@@ -85,6 +93,9 @@ export async function createCache (dbname: string, modelDb: ModelDb): Promise<Co
           ...create._attributes
         }
         return store([doc])
+      }
+      case core.class.DeleteTx: {
+        return remove(tx._objectClass, tx._objectId)
       }
       default:
         throw new Error('not implemented (apply tx)')

@@ -169,6 +169,7 @@ export default defineComponent({
     //background-color: $header-bg-color;
     background-color: $content-bg-color;
     padding: 0em 1em;
+    width: 80em;
   }
 
   .input {
