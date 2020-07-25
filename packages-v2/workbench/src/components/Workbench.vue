@@ -14,203 +14,194 @@
 -->
 
 <script lang="ts">
-import { computed, defineComponent, ref } from 'vue'
+import { computed, defineComponent, PropType, ref } from 'vue'
 
 import Nav from './nav/Nav.vue'
 import Home from './Home.vue'
+import InputControl from './InputControl.vue'
+import DetailsForm from './DetailsForm.vue'
+
 import { getCoreService, getUIService } from '../utils'
 import workbench, { Application } from '../..'
-import { Class, Ref, VDoc } from '@anticrm/platform'
-import { AnyComponent } from '@anticrm/platform-ui'
+import { Location } from '@anticrm/platform-ui'
+import presentationUI from '@anticrm/presentation-ui'
 
-import View from '@anticrm/recruitment/src/components/View.vue'
+import { Doc } from '@anticrm/platform'
 
-interface PanelConfig {
-    app: Ref<Application>
-    component: AnyComponent
-  }
+export default defineComponent({
+  components: { Nav, Home, InputControl, DetailsForm },
+  props: {
+    location: {
+      type: Object as PropType<Location>,
+      required: true
+    }
+  },
+  setup (props) {
+    const apps = ref([] as Application[])
+    const coreService = getCoreService()
+    coreService.getModel().find(workbench.class.Application, {}).then(docs => {
+      apps.value = docs as Application[]
+    })
 
-  interface WorkbenchConfig {
-    panels: PanelConfig[]
-    currentPanel: number
-  }
+    const app = computed(() => props.location.path[0])
 
-  export default defineComponent({
-    components: {Nav, Home, View},
-    props: {
-      location: {
-        type: Object,
-        required: true,
-      },
-      params: Object
-    },
-    setup(props) {
-      const apps = ref([] as Application[])
-
-      const coreService = getCoreService()
-      coreService.getModel().find(workbench.class.Application, {}).then(docs => {
-        apps.value = docs as Application[]
-      })
-
-      const uiService = getUIService()
-
-      function getAppClass(application: string): Ref<Class<VDoc>> {
-        for (const app of apps.value) {
-          if (app._id === application) {
-            return app.appClass
-          }
+    function currentApp(): Application | undefined {
+      for (const application of apps.value) {
+        if (application._id === app.value) {
+          return application
         }
-        return '' as Ref<Class<VDoc>>
       }
-
-      /**
-       * Translate application-agnostic path into workbench config.
-       * @param path
-       */
-      function parsePath(path: string[]): WorkbenchConfig {
-        const panels = [] as PanelConfig[]
-        for (const p of path) {
-          const split = p.split('!')
-          const app = split[0]
-          const component = split.length > 1 ? split[1] : workbench.component.Browse
-          panels.push({app: app as Ref<Application>, component: component as AnyComponent})
-        }
-        return { panels, currentPanel: panels.length - 1 }
-      }
-
-      const config = computed(() => parsePath(props.location.path))
-
-      function toLocation(config: WorkbenchConfig) {
-        const path = [] as string[]
-        for (const panel of config.panels) {
-          path.push(panel.app + '!' + panel.component)
-        }
-        return { app: undefined, path }
-      }
-
-      function navigateApp(app: Application) {
-        const newConfig = { ...config.value }
-        const component = workbench.component.Browse
-        if (newConfig.currentPanel >= 0) {
-          newConfig.panels[newConfig.currentPanel] = { app: app._id as Ref<Application>, component }
-        } else {
-          newConfig.panels.push({ app: app._id as Ref<Application>, component })
-          newConfig.currentPanel = 0
-        }
-        uiService.navigate(uiService.toUrl(toLocation(newConfig)))
-      }
-
-      function navigatePanel(component: AnyComponent) {
-        const newConfig = { ...config.value }
-        newConfig.panels[newConfig.currentPanel].component = component
-        uiService.navigate(uiService.toUrl(toLocation(newConfig)))
-      }
-
-      return {apps, config, navigateApp, navigatePanel, getAppClass}
     }
 
-  })
+    const appClass = computed(() => {
+      if (props.location.path.length >= 2) {
+        return props.location.path[1]
+      }
+      return currentApp()?.appClass || null
+    })
+
+    const mainComponent = computed(() => {
+      if (props.location.path.length >= 3) {
+        return props.location.path[2]
+      }
+      return presentationUI.component.BrowseView
+    })
+
+    const uiService = getUIService()
+
+    function navigateApp (app: Application) {
+      uiService.navigate(uiService.toUrl({app: undefined, path: [app._id]}))
+    }
+
+    const details = ref<Doc | null>(null)
+
+    function open (object: Doc) {
+      console.log('open')
+      details.value = object
+    }
+
+    function done () {
+      details.value = null
+    }
+
+    return { apps, app, appClass, mainComponent, navigateApp, open, done, details }
+  }
+
+})
 </script>
 
 <template>
   <div id="workbench">
-<!--    <header>-->
-<!--      <div/>-->
-<!--      &lt;!&ndash;      <Header/>&ndash;&gt;-->
-<!--    </header>-->
+    <!--    <header>-->
+    <!--      <div/>-->
+    <!--      &lt;!&ndash;      <Header/>&ndash;&gt;-->
+    <!--    </header>-->
 
     <nav>
       <!-- <Sidenav :applications="applications" /> -->
       <Nav :apps="apps"
-           :current="config.currentPanel < 0 ? '' : config.panels[config.currentPanel].app"
+           :current="app"
            @navigate="navigateApp"
       />
     </nav>
 
     <main>
-      <div v-if="config.currentPanel >= 0">
-
-      </div>
-      <widget v-if="config.currentPanel >= 0" :component="config.panels[0].component"
-              _class="class:recruitment.Candidate"
-              @navigate="navigatePanel"
+      <widget v-if="appClass"
+              :component="mainComponent"
+              :_class="appClass"
+              @open="open"
       />
       <Home v-else/>
     </main>
 
+    <div class="input">
+      <InputControl/>
+    </div>
+
     <aside>
-      <View _class="class:recruitment.Candidate" />
+      <DetailsForm v-if="details" :object="details" @done="done"/>
     </aside>
 
-<!--    <footer></footer>-->
+    <!--    <footer></footer>-->
   </div>
 </template>
 
 <style lang="scss">
-  @import "~@anticrm/sparkling-theme/css/_variables.scss";
+@import "~@anticrm/sparkling-theme/css/_variables.scss";
 
-  #workbench {
-    display: grid;
+#workbench {
+  display: grid;
 
-    grid-template-columns: $pictogram-size 1fr 36em;
-    //grid-template-rows: $pictogram-size 1fr 24px;
-    grid-template-rows: 1fr;
+  grid-template-columns: $pictogram-size 1fr auto;
+  //grid-template-rows: $pictogram-size 1fr 24px;
+  grid-template-rows: 1fr auto;
 
-    height: 100%;
+  height: 100%;
 
-    header {
-      grid-column-start: 1;
-      grid-column-end: 4;
+  header {
+    grid-column-start: 1;
+    grid-column-end: 4;
 
-      grid-row-start: 1;
-      grid-row-end: 2;
+    grid-row-start: 1;
+    grid-row-end: 2;
 
-      background-color: $header-bg-color;
-      border-bottom: 1px solid $workspace-separator-color;
-    }
-
-    nav {
-      grid-column-start: 1;
-      grid-column-end: 2;
-
-      grid-row-start: 1;
-      grid-row-end: 2;
-
-      background-color: $nav-bg-color;
-    }
-
-    main {
-      grid-column-start: 2;
-      grid-column-end: 3;
-
-      grid-row-start: 1;
-      grid-row-end: 2;
-
-      //background-color: $header-bg-color;
-      background-color: $content-bg-color;
-      // padding: 0em 1em;
-    }
-
-    aside {
-      grid-column-start: 3;
-      grid-column-end: 4;
-
-      grid-row-start: 1;
-      grid-row-end: 2;
-
-      background-color: $header-bg-color;
-      //background-color: $content-bg-color;
-      border-left: 1px solid $workspace-separator-color;
-    }
-
-    footer {
-      grid-column-start: 1;
-      grid-column-end: 4;
-
-      grid-row-start: 3;
-      grid-row-end: 4;
-
-      background-color: purple;
-    }
+    background-color: $header-bg-color;
+    border-bottom: 1px solid $workspace-separator-color;
   }
+
+  nav {
+    grid-column-start: 1;
+    grid-column-end: 2;
+
+    grid-row-start: 1;
+    grid-row-end: 3;
+
+    background-color: $nav-bg-color;
+  }
+
+  main {
+    grid-column-start: 2;
+    grid-column-end: 3;
+
+    grid-row-start: 1;
+    grid-row-end: 2;
+
+    //background-color: $header-bg-color;
+    background-color: $content-bg-color;
+    padding: 0em 1em;
+    width: 80em;
+  }
+
+  .input {
+    grid-column-start: 2;
+    grid-column-end: 3;
+
+    grid-row-start: 2;
+    grid-row-end: 3;
+
+    padding: 1.5em;
+  }
+
+  aside {
+    grid-column-start: 3;
+    grid-column-end: 4;
+
+    grid-row-start: 1;
+    grid-row-end: 3;
+
+    background-color: $header-bg-color;
+    //background-color: $content-bg-color;
+    border-left: 1px solid $workspace-separator-color;
+  }
+
+  footer {
+    grid-column-start: 1;
+    grid-column-end: 4;
+
+    grid-row-start: 3;
+    grid-row-end: 4;
+
+    background-color: purple;
+  }
+}
 </style>

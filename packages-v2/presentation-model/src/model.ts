@@ -35,7 +35,7 @@ export default (S: UIBuilder) => {
   })
 
   S.mixin(core.class.Type, ui.class.Presenter, {
-    presenter: presentationUI.components.StringPresenter
+    presenter: presentationUI.component.StringPresenter
   })
 
   S.createMixin(ui.class.DetailsForm, core.class.Class, {

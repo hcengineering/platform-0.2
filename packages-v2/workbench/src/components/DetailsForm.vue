@@ -15,7 +15,7 @@
 
 <script lang="ts">
 
-import { defineComponent, PropType, ref } from 'vue'
+import { defineComponent, PropType, ref, watch } from 'vue'
 import { Class, DeleteTx, Doc, generateId, Property, Ref, VDoc } from '@anticrm/platform'
 import presentationCore from '@anticrm/presentation-core'
 
@@ -42,11 +42,17 @@ export default defineComponent({
     const component = ref('')
     const _class = ref('')
 
-    if (model.isMixedIn(clazz, presentationCore.class.DetailsForm)) {
-      const detailsForm = model.as(clazz, presentationCore.class.DetailsForm)
-      component.value = detailsForm.form
-      _class.value = clazz._id
-    }
+    watch(()=>props.object, object => {
+      if (model.isMixedIn(clazz, presentationCore.class.DetailsForm)) {
+        const detailsForm = model.as(clazz, presentationCore.class.DetailsForm)
+        component.value = detailsForm.form
+        _class.value = clazz._id
+        console.log('details', detailsForm.form)
+        console.log('class', clazz._id)
+      } else {
+        component.value = ''
+      }
+    }, {immediate: true})
 
     function cancel() {
       context.emit('done', 'cancel')

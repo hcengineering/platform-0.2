@@ -25,8 +25,9 @@ export interface PresentationUI extends Service {
 
 export default plugin('presentation-ui' as Plugin<PresentationUI>, { ui: ui.id, presentationCore: presentationCore.id }, {
 
-  components: {
+  component: {
     Table: '' as AnyComponent,
+    BrowseView: '' as AnyComponent,
     NumberPresenter: '' as AnyComponent,
     StringPresenter: '' as AnyComponent,
   }

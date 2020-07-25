@@ -22,6 +22,7 @@ import { PresentationCoreInjectionKey, PresentationUIInjectionKey } from './util
 import ui, { PresentationUI } from '.'
 
 import Table from './components/Table.vue'
+import BrowseView from './components/BrowseView.vue'
 import NumberPresenter from './components/presenter/NumberPresenter.vue'
 import StringPresenter from './components/presenter/StringPresenter.vue'
 
@@ -32,9 +33,10 @@ import StringPresenter from './components/presenter/StringPresenter.vue'
  */
 export default async (platform: Platform, deps: { ui: UIService, presentationCore: PresentationCore }): Promise<PresentationUI> => {
 
-  platform.setResource(ui.components.Table, Table)
-  platform.setResource(ui.components.StringPresenter, StringPresenter)
-  platform.setResource(ui.components.NumberPresenter, NumberPresenter)
+  platform.setResource(ui.component.Table, Table)
+  platform.setResource(ui.component.BrowseView, BrowseView)
+  platform.setResource(ui.component.StringPresenter, StringPresenter)
+  platform.setResource(ui.component.NumberPresenter, NumberPresenter)
 
   const coreService = deps.presentationCore
 

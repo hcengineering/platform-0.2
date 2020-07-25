@@ -18,13 +18,13 @@
 import { defineComponent, onUnmounted, PropType, ref, watch } from 'vue'
 
 import presentation from '@anticrm/presentation-core'
-import workbench from '..'
+import workbench from '@anticrm/workbench/src'
 
 import Table from '@anticrm/presentation-ui/src/components/Table.vue'
 import Icon from '@anticrm/platform-ui/src/components/Icon.vue'
 import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.vue'
 
-import { getCoreService } from '../utils'
+import { getCoreService } from '@anticrm/workbench/src/utils'
 import { Class, Doc, Ref, VDoc } from '@anticrm/platform'
 
 export default defineComponent({
@@ -66,10 +66,7 @@ export default defineComponent({
       }
 
       function open(object: Object) {
-        context.emit('open', {
-          component: workbench.component.DetailsForm,
-          object: object
-        })
+        context.emit('open', object)
       }
 
       return { workbench, add, open, content }

@@ -21,9 +21,7 @@ import { PresentationUI } from '@anticrm/presentation-ui'
 
 import { CoreInjectionKey, UIInjectionKey } from './utils'
 
-import Workbench from './components/WorkbenchNav.vue'
-import Browse from './components/Browse.vue'
-import DetailsForm from './components/DetailsForm.vue'
+import Workbench from './components/Workbench.vue'
 
 /*!
  * Anticrm Platform™ Workbench Plugin
@@ -35,8 +33,6 @@ export default async (platform: Platform, deps: {
 }): Promise<WorkbenchService> => {
 
   platform.setResource(workbench.component.Workbench, Workbench)
-  platform.setResource(workbench.component.Browse, Browse)
-  platform.setResource(workbench.component.DetailsForm, DetailsForm)
 
   deps.ui.getApp()
     .provide(CoreInjectionKey, deps.core)
