@@ -55,7 +55,7 @@ export default defineComponent({
           class="tr"
           v-for="object in content"
           :key="object._id"
-          @click="$emit('open', object._id)"
+          @click="$emit('open', object)"
       >
         <div class="td" v-for="attr in model.getOwnAttributes(_class)" :key="attr.key">
 <!--          <widget v-if="attr.presenter" :component="attr.presenter" :modelValue="object[attr.key]" />-->

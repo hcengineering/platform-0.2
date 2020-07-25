@@ -14,20 +14,15 @@
 -->
 
 <script lang="ts">
-import { defineComponent, PropType, ref } from 'vue'
+import { defineComponent, ref } from 'vue'
 import Icon from '@anticrm/platform-ui/src/components/Icon.vue'
 import CreateForm from './CreateForm.vue'
 import workbench from '../..'
 import recruiment from '@anticrm/recruitment'
-import { Location } from '@anticrm/platform-ui'
 
 export default defineComponent({
   components: { Icon, CreateForm },
   props: {
-    location: {
-      type: Object as PropType<Location>,
-      required: true
-    }
   },
   setup (props) {
     const component = ref('')

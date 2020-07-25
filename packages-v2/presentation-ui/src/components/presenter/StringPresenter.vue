@@ -14,29 +14,102 @@
 -->
 
 <script lang="ts">
-
-import { defineComponent, PropType } from 'vue'
-import { Class, Obj, Ref } from '@anticrm/platform'
-
-import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.vue'
-
-import { ClassModel } from '@anticrm/presentation-core'
+import { defineComponent } from 'vue'
 
 export default defineComponent({
-  components: { InlineEdit },
   props: {
-    _class: {
-      type: String as unknown as PropType<Ref<Class<Obj>>>,
+    attributeKey: {
+      type: String,
+      required: true
     },
-    model: {
-      type: Object as PropType<ClassModel>
+    value: String,
+    placeholder: {
+      type: String,
+      required: true
+    },
+    maxWidth: {
+      type: Number,
+      default: 300
     }
   },
-  setup(props) {
-  }
+  setup (props, context) {
+    return {
+      computeSize (value: string) {
+        const input = this.$refs['input'] as HTMLElement
+        const div = this.$refs['compute'] as HTMLElement
+        if (!value || value.length == 0)
+          value = props.placeholder
+        div.innerHTML = value.replace(/ /g, '&nbsp;')
+        const width = div.clientWidth > props.maxWidth ? props.maxWidth : div.clientWidth
+        input.style.width = width + 'px'
+      },
+      onInput (value: string) {
+        this.computeSize(value)
+      },
+      onBlur (value: string) {
+        if (value !== props.value) {
+          context.emit('update', { value, key: props.attributeKey })
+        }
+      }
+    }
+  },
+  mounted () {
+    const input = this.$refs['input'] as HTMLInputElement
+    input.addEventListener('focus', () => this.computeSize(input.value))
+  },
 })
+
 </script>
 
 <template>
-  <InlineEdit />
+  <div class="sparkling-inline-edit">
+    <div class="control">
+      <div ref="compute" class="compute-width"></div>
+      <input
+          ref="input"
+          type="text"
+          :value="value"
+          :placeholder="placeholder"
+          @input="onInput($event.target.value)"
+          @blur="onBlur($event.target.value)"
+      />
+    </div>
+  </div>
 </template>
+
+<style lang="scss">
+@import "~@anticrm/sparkling-theme/css/_variables.scss";
+
+.sparkling-inline-edit {
+  min-width: 12em;
+
+  .control {
+    display: inline-flex;
+    box-sizing: border-box;
+
+    border: 1px solid transparent;
+    border-radius: 2px;
+
+    &:focus-within {
+      border-color: $highlight-color;
+    }
+
+    .compute-width {
+      position: absolute;
+      white-space: nowrap;
+      visibility: hidden;
+    }
+
+    input {
+      border: none;
+      color: inherit;
+      background-color: inherit;
+      font: inherit;
+
+      &:focus {
+        outline: none;
+      }
+    }
+  }
+}
+</style>

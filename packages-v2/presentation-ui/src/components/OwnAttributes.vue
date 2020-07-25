@@ -38,9 +38,12 @@ export default defineComponent({
     }
   },
   setup (props) {
-    // const object = reactive({})
-    //
-    // return { object }
+    function update(event: {key: string, value: string}) {
+      console.log(event)
+      props.object[event.key] = event.value
+    }
+
+    return { update }
   }
 })
 </script>
@@ -58,7 +61,12 @@ export default defineComponent({
         </td>
         <td>
           <div class="edit">
-            <widget :component="attr.presenter" v-model="object[attr.key]" :placeholder="attr.placeholder"/>
+            <widget :component="attr.presenter"
+                    :attributeKey="attr.key"
+                    :value="object[attr.key]"
+                    :placeholder="attr.placeholder"
+                    @update="update"
+            />
 <!--            <InlineEdit :placeholder="attr.placeholder"/>-->
           </div>
         </td>

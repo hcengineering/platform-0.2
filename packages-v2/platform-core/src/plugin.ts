@@ -44,8 +44,6 @@ export default async (platform: Platform): Promise<CoreService> => {
   const queries = [] as Query[]
 
   function query (_class: Ref<Class<Doc>>, query: AnyLayout, listener: (result: Doc[]) => void): () => void {
-    console.log('query', _class)
-    console.log('total', queries.length)
     const q: Query = { _class, query, listener, instances: [] }
     queries.push(q)
 

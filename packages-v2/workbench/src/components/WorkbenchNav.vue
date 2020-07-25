@@ -22,7 +22,6 @@ import InputControl from './InputControl.vue'
 
 import { getCoreService, getUIService } from '../utils'
 import workbench, { Application } from '../..'
-import { Doc, Ref } from '@anticrm/platform'
 import { AnyComponent, Location } from '@anticrm/platform-ui'
 
 import View from '@anticrm/recruitment/src/components/View.vue'
@@ -73,15 +72,20 @@ export default defineComponent({
 
     const details = reactive({
       component: '' as AnyComponent,
-      document: '' as Ref<Doc>
+      object: '' as Object
     })
 
-    function open (event: {component: AnyComponent, document: Ref<Doc>}) {
+    function open (event: {component: AnyComponent, object: Object}) {
       details.component = event.component
-      details.document = event.document
+      details.object = event.object
     }
 
-    return { apps, app, appClass, component, navigateApp, navigatePanel, open, details }
+    function done () {
+      details.component = '' as AnyComponent
+      details.object = {}
+    }
+
+    return { apps, app, appClass, component, navigateApp, navigatePanel, open, done, details }
   }
 
 })
@@ -115,7 +119,7 @@ export default defineComponent({
     </div>
 
     <aside>
-      <widget v-if="details.component !== ''" :component="details.component" :_class="details.document" @open="open"/>
+      <widget v-if="details.component !== ''" :component="details.component" :object="details.object" @done="done"/>
     </aside>
 
     <!--    <footer></footer>-->

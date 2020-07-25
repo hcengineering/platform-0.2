@@ -65,8 +65,11 @@ export default defineComponent({
         })
       }
 
-      function open(event: any) {
-        console.log('open', event)
+      function open(object: Object) {
+        context.emit('open', {
+          component: workbench.component.DetailsForm,
+          object: object
+        })
       }
 
       return { workbench, add, open, content }

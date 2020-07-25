@@ -37,7 +37,8 @@ export default plugin('workbench' as Plugin<WorkbenchService>, {
   component: {
     Workbench: '' as AnyComponent,
     Browse: '' as AnyComponent,
-    NewDocument: '' as AnyComponent
+    NewDocument: '' as AnyComponent,
+    DetailsForm: '' as AnyComponent
   },
   icon: {
     Add: '' as Asset
