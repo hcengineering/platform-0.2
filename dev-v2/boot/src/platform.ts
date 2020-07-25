@@ -22,10 +22,12 @@ import login from '@anticrm/login'
 import presentationCore from '@anticrm/presentation-core'
 import presentationUI from '@anticrm/presentation-ui'
 import workbench from '@anticrm/workbench'
+import chunter from '@anticrm/chunter'
 import recruitment from '@anticrm/recruitment'
 import task from '@anticrm/task'
 
 import uiMeta from '@anticrm/platform-ui/src/__meta__/meta'
+import chunterMeta from '@anticrm/chunter/src/__meta__/meta'
 import contactMeta from '@anticrm/contact/src/__meta__/meta'
 import recruitmentMeta from '@anticrm/recruitment/src/__meta__/meta'
 import taskMeta from '@anticrm/task/src/__meta__/meta'
@@ -42,10 +44,12 @@ platform.addLocation(login, () => import(/* webpackChunkName: "login" */ '@antic
 platform.addLocation(presentationCore, () => import(/* webpackChunkName: "presentation-core" */ '@anticrm/presentation-core/src/plugin'))
 platform.addLocation(presentationUI, () => import(/* webpackChunkName: "presentation-ui" */ '@anticrm/presentation-ui/src/plugin'))
 platform.addLocation(workbench, () => import(/* webpackChunkName: "workbench" */ '@anticrm/workbench/src/plugin'))
+platform.addLocation(chunter, () => import(/* webpackChunkName: "chunter" */ '@anticrm/chunter/src/plugin'))
 platform.addLocation(recruitment, () => import(/* webpackChunkName: "recruitment" */ '@anticrm/recruitment/src/plugin'))
 platform.addLocation(task, () => import(/* webpackChunkName: "task" */ '@anticrm/task/src/plugin'))
 
 uiMeta(platform)
+chunterMeta(platform)
 recruitmentMeta(platform)
 taskMeta(platform)
 workbenchMeta(platform)

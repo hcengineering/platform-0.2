@@ -19,6 +19,7 @@ import platformModel from '@anticrm/platform-model/src/model'
 import presentationModel from '@anticrm/presentation-model/src/model'
 import contactModel from '@anticrm/contact-model/src/model'
 import workbenchModel from '@anticrm/workbench-model/src/model'
+import chunterModel from '@anticrm/chunter-model/src/model'
 import recruitmentModel from '@anticrm/recruitment-model/src/model'
 import taskModel from '@anticrm/task-model/src/model'
 
@@ -29,6 +30,7 @@ builder.load(platformModel)
 builder.load(presentationModel)
 builder.load(contactModel)
 builder.load(workbenchModel)
+builder.load(chunterModel)
 builder.load(recruitmentModel)
 builder.load(taskModel)
 

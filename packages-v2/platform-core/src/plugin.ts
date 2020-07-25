@@ -32,7 +32,7 @@ export default async (platform: Platform): Promise<CoreService> => {
     throw new Error('not implemented')
   }
 
-  const cache = await createCache('db3', model)
+  const cache = await createCache('db5', model)
 
   interface Query {
     _class: Ref<Class<Doc>>
