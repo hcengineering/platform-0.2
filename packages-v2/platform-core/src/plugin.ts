@@ -94,8 +94,12 @@ export default async (platform: Platform): Promise<CoreService> => {
     getModel () {
       return model
     },
-    loadDomain (domain: string): Promise<Doc[]> {
-      return model.loadDomain(domain)
+    loadDomain (domain: string, index?: string, direction?: string): Promise<Doc[]> {
+      if (domain === CoreDomain.Model) {
+        return model.loadDomain(domain)
+      } else {
+        return cache.loadDomain(domain, index, direction)
+      }
     },
     query,
     find,

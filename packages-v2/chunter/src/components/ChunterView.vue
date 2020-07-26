@@ -15,7 +15,7 @@
 
 <script lang="ts">
 
-import { defineComponent, onUnmounted, ref } from 'vue'
+import { defineComponent, ref } from 'vue'
 
 import Table from '@anticrm/presentation-ui/src/components/Table.vue'
 import Icon from '@anticrm/platform-ui/src/components/Icon.vue'
@@ -24,7 +24,7 @@ import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.vue'
 import core from '@anticrm/platform-core'
 
 import { getCoreService } from '@anticrm/workbench/src/utils'
-import { Doc } from '@anticrm/platform'
+import { buildModel } from '../model'
 
 export default defineComponent({
     components: {
@@ -36,15 +36,9 @@ export default defineComponent({
     },
     setup(props, context) {
       const coreService = getCoreService()
-      const model = coreService.getModel()
+      const content = ref([])
 
-      const content = ref([] as Doc[])
-
-      const shutdown = coreService.query(core.class.Tx, {}, (result: Doc[]) => {
-          content.value = result
-      })
-
-      onUnmounted(() => shutdown() )
+      buildModel(coreService).then(model => content.value = model)
 
       function open(object: Object) {
         context.emit('open', object)
@@ -56,28 +50,45 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="workbench-browse">
+  <div class="chunter-chunter-view">
     <div>
-      <span class="caption-1">{{_class}}</span>&nbsp;
+      <span class="caption-1">Chunter</span>&nbsp;
 <!--      <a href="#" @click.prevent="add"><Icon :icon="workbench.icon.Add" class="icon-embed-2x"/></a>-->
     </div>
-    <div class="table">
-      <ScrollView style="height: 100%">
-        <Table :_class="core.class.Tx" :content="content" @open="open"/>
-      </ScrollView>
+    <div class="content">
+      <div class="item" v-for="doc in content">
+        <img class="avatar" src="../../assets/ava2x48.jpg">
+        <div class="details"><b>Andrey Platov</b> 15:23</div>
+      </div>
     </div>
   </div>
 </template>
 
 <style lang="scss">
 
-.workbench-browse {
+.chunter-chunter-view {
   height: 100%;
   display: flex;
   flex-direction: column;
 
-  .table {
+  .content {
     flex-grow: 1;
+
+    .item {
+      display: flex;
+      margin: 1em;
+
+      .avatar {
+        object-fit: cover;
+        border-radius: 4px;
+        width: 3em;
+        height: 3em;
+      }
+
+      .details {
+        padding-left: 1em;
+      }
+    }
   }
 }
 </style>

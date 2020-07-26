@@ -34,7 +34,11 @@ export async function createCache (dbname: string, modelDb: ModelDb): Promise<Co
           domains.set(domain, domain)
           console.log('create object store: ' + domain)
           const objectStore = db.createObjectStore(domain, { keyPath: '_id' })
+          // TODO: following are hardcoded indexes, replace with generic mechanism
           objectStore.createIndex('_class', '_class', { unique: false })
+          if (domain === 'tx') {
+            objectStore.createIndex('date', 'date', { unique: false })
+          }
         }
       }
     }
@@ -105,7 +109,6 @@ export async function createCache (dbname: string, modelDb: ModelDb): Promise<Co
   const cache: CoreProtocol & CacheControl = {
 
     async find (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc[]> { // eslint-disable-line
-      console.log('indexeddb find: ', _class)
       const result = [] as Doc[]
       const domain = modelDb.getDomain(_class)
       const tx = db.transaction(domain)
@@ -118,15 +121,24 @@ export async function createCache (dbname: string, modelDb: ModelDb): Promise<Co
         result.push(cursor.value)
         cursor = await cursor.continue()
       }
-      return result
+      return tx.done.then(() => result)
     },
 
     tx (tx: Tx): Promise<void> {
       return Promise.all([store([tx]), apply(tx)]).then()
     },
 
-    loadDomain (domain: string): Promise<Doc[]> {
-      throw new Error('not implemented')
+    async loadDomain (domain: string, index?: string, direction?: string): Promise<Doc[]> {
+      const result = [] as Doc[]
+      const tx = db.transaction(domain)
+      const store = tx.objectStore(domain)
+      let cursor = await store.openCursor(undefined, direction as any)
+      while (cursor) {
+        // console.log('cursor value: ', cursor.value)
+        result.push(cursor.value)
+        cursor = await cursor.continue()
+      }
+      return tx.done.then(() => result)
     },
 
     /// /
