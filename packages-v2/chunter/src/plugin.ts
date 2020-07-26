@@ -14,6 +14,9 @@
 //
 
 import { Platform, Service } from '@anticrm/platform'
+import chunter from '.'
+
+import ChunterView from './components/ChunterView.vue'
 
 /*!
  * Anticrm Platform™ Recruitment Plugin
@@ -22,9 +25,7 @@ import { Platform, Service } from '@anticrm/platform'
  */
 export default async (platform: Platform): Promise<Service> => {
 
-  // platform.setResource(recruitment.component.Main, Main)
-  // platform.setResource(recruitment.component.View, View)
-  // platform.setResource(recruitment.component.View2, View2)
+  platform.setResource(chunter.component.ChunterView, ChunterView)
 
   return {}
 }

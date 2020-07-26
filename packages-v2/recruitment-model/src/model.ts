@@ -19,6 +19,7 @@ import { Class, Property, Ref, StringProperty } from '@anticrm/platform'
 import core from '@anticrm/platform-model'
 import contact from '@anticrm/contact-model'
 import presentation from '@anticrm/presentation-core'
+import presentationUI from '@anticrm/presentation-ui'
 
 import recruitment, { RecruitmentDomain } from '.'
 import { IntlString } from '@anticrm/platform-i18n'
@@ -29,7 +30,7 @@ export default (S: UIBuilder) => {
   S.createDocument(workbench.class.Application, {
     label: 'Найм' as StringProperty,
     icon: recruitment.icon.Recruitment,
-    main: recruitment.component.Main,
+    main: presentationUI.component.BrowseView,
     appClass: recruitment.class.Candidate
   }, recruitment.application.Recruitment)
 

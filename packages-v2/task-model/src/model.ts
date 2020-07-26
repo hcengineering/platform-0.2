@@ -16,6 +16,8 @@
 import { StringProperty } from '@anticrm/platform'
 
 import presentation, { UIBuilder } from '@anticrm/presentation-model'
+import presentationUI from '@anticrm/presentation-ui'
+
 
 import core from '@anticrm/platform-model'
 import workbench from '@anticrm/workbench-model'
@@ -27,7 +29,7 @@ export default (S: UIBuilder) => {
   S.createDocument(workbench.class.Application, {
     label: 'Задачи' as StringProperty,
     icon: task.icon.Task,
-    main: task.component.Main,
+    main: presentationUI.component.BrowseView,
     appClass: task.class.Task
   }, task.application.Task)
 

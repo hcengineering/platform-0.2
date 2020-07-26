@@ -26,7 +26,7 @@ export default (S: UIBuilder) => {
   S.createDocument(workbench.class.Application, {
     label: 'Chunter' as StringProperty,
     icon: chunter.icon.Chunter,
-    main: chunter.component.Main,
+    main: chunter.component.ChunterView,
     appClass: chunter.class.Message
   }, chunter.application.Chunter)
 

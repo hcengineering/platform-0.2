@@ -24,7 +24,6 @@ import DetailsForm from './DetailsForm.vue'
 import { getCoreService, getUIService } from '../utils'
 import workbench, { Application } from '../..'
 import { Location } from '@anticrm/platform-ui'
-import presentationUI from '@anticrm/presentation-ui'
 
 import { Doc } from '@anticrm/platform'
 
@@ -64,7 +63,7 @@ export default defineComponent({
       if (props.location.path.length >= 3) {
         return props.location.path[2]
       }
-      return presentationUI.component.BrowseView
+      return currentApp()?.main || ''
     })
 
     const uiService = getUIService()

@@ -33,6 +33,6 @@ export default plugin('chunter' as Plugin<Service>, {}, {
     Chunter: '' as Asset,
   },
   component: {
-    Main: '' as AnyComponent
+    ChunterView: '' as AnyComponent
   }
 })

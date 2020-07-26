@@ -15,15 +15,16 @@
 
 <script lang="ts">
 
-import { defineComponent, onUnmounted, PropType, ref, watch } from 'vue'
-import workbench from '@anticrm/workbench/src'
+import { defineComponent, onUnmounted, ref } from 'vue'
 
 import Table from '@anticrm/presentation-ui/src/components/Table.vue'
 import Icon from '@anticrm/platform-ui/src/components/Icon.vue'
 import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.vue'
 
+import core from '@anticrm/platform-core'
+
 import { getCoreService } from '@anticrm/workbench/src/utils'
-import { Class, Doc, Ref, VDoc } from '@anticrm/platform'
+import { Doc } from '@anticrm/platform'
 
 export default defineComponent({
     components: {
@@ -32,10 +33,6 @@ export default defineComponent({
       Icon,
     },
     props: {
-      _class: {
-        type: String as unknown as PropType<Ref<Class<VDoc>>>,
-        required: true
-      }
     },
     setup(props, context) {
       const coreService = getCoreService()
@@ -43,31 +40,17 @@ export default defineComponent({
 
       const content = ref([] as Doc[])
 
-      let shutdown: any = null
-
-      watch(() => props._class, _class => {
-        if (shutdown) { shutdown() }
-        shutdown = coreService.query(props._class, {}, (result: Doc[]) => {
+      const shutdown = coreService.query(core.class.Tx, {}, (result: Doc[]) => {
           content.value = result
-        })
-      }, {immediate: true})
+      })
 
       onUnmounted(() => shutdown() )
-
-      // function add() {
-      //   const clazz = model.get(props._class) as Class<VDoc>
-      //   const details = model.as(clazz, presentation.class.DetailsForm)
-      //   context.emit('open', {
-      //     component: details.form || workbench.component.NewDocument,
-      //     document: props._class
-      //   })
-      // }
 
       function open(object: Object) {
         context.emit('open', object)
       }
 
-      return { workbench, open, content }
+      return { core, open, content }
     }
   })
 </script>
@@ -80,7 +63,7 @@ export default defineComponent({
     </div>
     <div class="table">
       <ScrollView style="height: 100%">
-        <Table :_class="_class" :content="content" @open="open"/>
+        <Table :_class="core.class.Tx" :content="content" @open="open"/>
       </ScrollView>
     </div>
   </div>
