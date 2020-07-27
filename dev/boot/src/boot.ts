@@ -13,34 +13,28 @@
 // limitations under the License.
 //
 
-import Builder from '@anticrm/platform-core/src/__model__/builder'
+import { UIBuilder } from '@anticrm/presentation-model'
 
-import coreModel from '@anticrm/platform-core/src/__model__/model'
-import i18nModel from '@anticrm/platform-core-i18n/src/__model__/model'
-import businessModel from '@anticrm/platform-business/src/__model__/model'
-import uiModel from '@anticrm/platform-ui/src/__model__/model'
-import presentationUiModel from '@anticrm/presentation-ui/src/__model__/model'
-import contactModel from '@anticrm/contact/src/__model__/model'
-import chunterModel from '@anticrm/chunter/src/__model__/model'
-import workbenchModel from '@anticrm/platform-workbench/src/__model__/model'
-import demoModel from '@anticrm/app-storybook/src/__model__/model'
+import platformModel from '@anticrm/platform-model/src/model'
+import presentationModel from '@anticrm/presentation-model/src/model'
+import contactModel from '@anticrm/contact-model/src/model'
+import workbenchModel from '@anticrm/workbench-model/src/model'
+import chunterModel from '@anticrm/chunter-model/src/model'
+import recruitmentModel from '@anticrm/recruitment-model/src/model'
+import taskModel from '@anticrm/task-model/src/model'
 
-import uiRu from '@anticrm/presentation-ui/src/__model__/strings/ru'
-import contactRu from '@anticrm/contact/src/__model__/strings/ru'
+import taskStrings from '@anticrm/task-model/src/strings/ru'
 
-const builder = new Builder()
-builder.load(coreModel)
-builder.load(i18nModel)
-builder.load(businessModel)
-builder.load(uiModel)
-builder.load(presentationUiModel)
-builder.load(workbenchModel)
+const builder = new UIBuilder()
+builder.load(platformModel)
+builder.load(presentationModel)
 builder.load(contactModel)
+builder.load(workbenchModel)
 builder.load(chunterModel)
-builder.load(demoModel)
+builder.load(recruitmentModel)
+builder.load(taskModel)
 
 export const Model = builder.dumpAll()
 export const Strings = {
-  ...uiRu,
-  ...contactRu
+  ...taskStrings
 }

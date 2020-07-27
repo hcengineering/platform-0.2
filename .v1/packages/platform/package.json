@@ -1,7 +1,8 @@
 {
   "name": "@anticrm/platform",
   "version": "0.1.8",
-  "main": "src/index.ts",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "author": "Anticrm Platform Contributors (https://github.com/anticrm)",
   "license": "EPL-2.0",
   "scripts": {
@@ -19,7 +20,6 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.1",
-    "simplytyped": "^3.3.0",
     "typedoc": "^0.17.6",
     "typescript": "^3.9.4"
   }

@@ -13,15 +13,18 @@
 // limitations under the License.
 //
 
-import { Platform } from '..'
+import { Service, Platform } from '..'
 
-import { plugin1, plugin1State } from './shared'
+import { plugin3State, TestPlugin } from './shared'
 
-plugin1State.parsed = true
+plugin3State.parsed = true
 
-export default async (platform: Platform, deps: {}) => { // eslint-disable-line @typescript-eslint/no-unused-vars
-  plugin1State.started = true
+export default async (platform: Platform, deps: {
+  plugin1: TestPlugin,
+  plugin2: Service
+}) => {
+  plugin3State.started = true
   return {
-    id: plugin1
+    deps
   }
 }

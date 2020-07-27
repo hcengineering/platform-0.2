@@ -4,8 +4,6 @@
     "module": "commonjs",
     "outDir": "./lib",
     "rootDir": "./src",
-    "strict": true,
-    "composite": true,
-    "declaration": true
+    "strict": true
   }
 }

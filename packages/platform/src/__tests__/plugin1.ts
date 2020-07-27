@@ -15,13 +15,13 @@
 
 import { Platform } from '..'
 
-import { plugin1State } from './shared'
+import { plugin1, plugin1State } from './shared'
 
 plugin1State.parsed = true
 
 export default async (platform: Platform, deps: {}) => { // eslint-disable-line @typescript-eslint/no-unused-vars
   plugin1State.started = true
   return {
-    id: 'plugin1'
+    id: plugin1
   }
 }

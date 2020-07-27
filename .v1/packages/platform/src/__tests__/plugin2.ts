@@ -13,17 +13,22 @@
 // limitations under the License.
 //
 
-import { createApp } from 'vue'
-import ErrorPage from './components/ErrorPage.vue'
-import platform from '@anticrm/boot/src/platform'
-import ui from '@anticrm/platform-ui'
+import { Resource, Platform } from '..'
 
-async function boot (): Promise<void> {
-  const uiService = await platform.getPlugin(ui.id)
-  uiService.getApp().mount('#app')
+import { plugin2State } from './shared'
+
+plugin2State.parsed = true
+
+export default async (platform: Platform, deps: {}) => { // eslint-disable-line @typescript-eslint/no-unused-vars
+  plugin2State.started = true
+  const plugin = {
+    id: 'plugin2',
+    async resolve (resource: Resource<any>): Promise<any> {
+      if (resource === 'resource2:undefined') {
+        return undefined
+      }
+      return 'hello ' + resource
+    }
+  }
+  return plugin
 }
-
-boot().catch(err => {
-  console.log(err)
-  createApp(ErrorPage).mount('#app')
-})

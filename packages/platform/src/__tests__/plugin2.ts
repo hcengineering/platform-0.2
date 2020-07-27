@@ -13,22 +13,16 @@
 // limitations under the License.
 //
 
-import { Resource, Platform } from '..'
+import { Platform, Resource } from '..'
 
-import { plugin2State } from './shared'
+import { plugin2, plugin2State } from './shared'
 
 plugin2State.parsed = true
 
 export default async (platform: Platform, deps: {}) => { // eslint-disable-line @typescript-eslint/no-unused-vars
   plugin2State.started = true
-  const plugin = {
-    id: 'plugin2',
-    async resolve (resource: Resource<any>): Promise<any> {
-      if (resource === 'resource2:undefined') {
-        return undefined
-      }
-      return 'hello ' + resource
-    }
+  platform.setResource('resource2:plugin2.Resource' as Resource<string>, 'hello resource2:My.Resource')
+  return {
+    id: plugin2
   }
-  return plugin
 }

@@ -15,14 +15,14 @@
 
 /* eslint-env jest */
 
-import { createPlatform, identify, Metadata, Plugin, Resource, Service } from '..'
+import { Platform, identify, Plugin, Service, Resource, Metadata } from '..'
 
-import { descriptor1, descriptor2, descriptor3, plugin1, plugin1State, plugin2, plugin2State, plugin3 } from './shared'
+import { plugin1, descriptor1, plugin1State, plugin2, descriptor2, plugin2State, plugin3, descriptor3 } from './shared'
 
 type AnyPlugin = Plugin<Service>
 
 describe('platform', () => {
-  const platform = createPlatform()
+  const platform = new Platform()
 
   it('should identify resources', () => {
     const ids = identify('test' as AnyPlugin, {
@@ -55,7 +55,7 @@ describe('platform', () => {
   })
 
   it('should not resolve resource (no plugin location)', (done) => {
-    platform.getResource('resource:NotExists.Resource' as Resource<string>).then(res => { // eslint-disable-line
+    platform.resolve('resource:NotExists.Resource' as Resource<string>).then(res => { // eslint-disable-line
       expect(true).toBe(false)
       done()
     }).catch(err => {
@@ -64,12 +64,19 @@ describe('platform', () => {
     })
   })
 
+  it('should not resolve resource (plugin does not have resolve method)', () => {
+    platform.setResolver('resource', plugin1)
+    const resolved = platform.resolve('resource:My.Resource' as Resource<string>)
+    expect(resolved).toBeInstanceOf(Promise)
+    return expect(resolved).rejects.toThrowError('plugin.resolve is not a function')
+  })
+
   it('should resolve resource', () => {
     platform.addLocation(descriptor2, () => import('./plugin2'))
-    // platform.setResolver('resource2', plugin2)
+    platform.setResolver('resource2', plugin2)
     expect(plugin2State.parsed).toBe(false)
     expect(plugin2State.started).toBe(false)
-    const resolved = platform.getResource('resource2:plugin2.Resource' as Resource<string>)
+    const resolved = platform.resolve('resource2:My.Resource' as Resource<string>)
     expect(resolved).toBeInstanceOf(Promise)
     return resolved.then(resource => {
       expect(resource).toBe('hello resource2:My.Resource')
@@ -79,10 +86,18 @@ describe('platform', () => {
   })
 
   it('should resolve resource second time', () => {
-    const resolved = platform.getResource('resource2:plugin2.Resource' as Resource<string>)
+    const resolved = platform.resolve('resource2:My.Resource2' as Resource<string>)
     expect(resolved).toBeInstanceOf(Promise)
     return resolved.then(resource => {
-      expect(resource).toBe('hello resource2:My.Resource')
+      expect(resource).toBe('hello resource2:My.Resource2')
+    })
+  })
+
+  it('should resolve resource to undefined', () => {
+    const resolved = platform.resolve('resource2:undefined' as Resource<string>)
+    expect(resolved).toBeInstanceOf(Promise)
+    return resolved.then(resource => {
+      expect(resource).toBeUndefined()
     })
   })
 
@@ -93,6 +108,7 @@ describe('platform', () => {
       const deps = (plugin as any).deps
       expect(deps.plugin1.id).toBe('plugin1')
       expect(deps.plugin2.id).toBe('plugin2')
+      expect(typeof deps.plugin2.resolve === 'function').toBeTruthy()
     })
   })
 

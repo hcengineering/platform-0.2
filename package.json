@@ -2,10 +2,9 @@
   "name": "root",
   "private": true,
   "workspaces": [
-    "packages-v2/*",
-    "dev-v2/*"
+    "packages/*",
+    "dev/*"
   ],
   "dependencies": {
-    "vue": "3.0.0-rc.4"
   }
 }
