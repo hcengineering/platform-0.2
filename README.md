@@ -14,6 +14,8 @@ yarn
 yarn workspace offline serve
 ```
 
+Go to http://localhost:8080/component:workbench.Workbench
+
 # The Platform Documentation
 
 * [Platform Architecture](./packages/platform/README.md)
