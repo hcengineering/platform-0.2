@@ -41,7 +41,7 @@ export default defineComponent({
   display: inline-block;
   border: 0px solid currentColor;
   border-radius: 2px;
-  padding: 2px;
+  padding: 0.5em 1em 0.5em;
   box-sizing: border-box;
   cursor: pointer;
   user-select: none;

@@ -24,18 +24,17 @@ import EditBox from '@anticrm/sparkling-controls/src/EditBox.vue'
 import Button from '@anticrm/sparkling-controls/src/Button.vue'
 import { Resource } from '@anticrm/platform'
 
-import ContentEditable from './ContentEditable.vue'
+import EditorContent from '@anticrm/sparkling-rich/src/EditorContent'
 
 import Toolbar from '@anticrm/sparkling-controls/src/toolbar/Toolbar.vue'
 import ToolbarButton from '@anticrm/sparkling-controls/src/toolbar/Button.vue'
 
 export default defineComponent({
-  components: { EditBox, Button, ContentEditable, Toolbar, ToolbarButton },
+  components: { EditBox, Button, EditorContent, Toolbar, ToolbarButton },
   setup() {
     const session = getSession()
-    let htmlValue = ref('')
-    let sendAllowed = ref(false)
-    let styleState = ref({bold: false, italic: false, underline: false})
+    let htmlValue = ref('<strong>TEst</strong> Some other text')
+    let styleState = ref({ isEmpty: true })
     const htmlEditor = ref(null)
     let stylesEnabled = ref(false)
     return {
@@ -43,7 +42,6 @@ export default defineComponent({
       stylesEnabled,
       styleState,
       htmlEditor,
-      sendAllowed,
 
       handleSubmit() {
         let newValue = {
@@ -58,36 +56,9 @@ export default defineComponent({
         session.newInstance(chunter.class.DocMessage, newValue)
           .then(() => session.commit())
           .then(() => {
-            // this.value.value = ''
-            this.updateValue('')
+            this.htmlValue = ''
           })
-      },
-      execCommand(cmdName: string, cmdValue?: string) {
-        document.execCommand(cmdName, false, cmdValue)
-        htmlEditor.value.focus()
-
-        console.log("html", htmlValue.value)
-      },
-      toggleStyle() {
-        this.stylesEnabled = !this.stylesEnabled;
-        console.log(stylesEnabled.value)
-      },
-      updateValue(newValue) {
-        this.htmlValue = newValue
-        console.log("New value: ", htmlValue.value)
-      },
-      updateState(newValue) {
-        console.log("New state: ", newValue)
-        this.sendAllowed = !newValue.empty
-        this.styleState.bold = newValue.bold
-        this.styleState.italic = newValue.italic
-        this.styleState.underline = newValue.underline
-      },
-      markBold() {
-        this.execCommand('bold')
-        this.styleState.bold = !this.styleState.bold
-        console.log("update bold style", this.styleState)
-      },
+      }
     }
   },
 })
@@ -97,26 +68,31 @@ export default defineComponent({
   <div class="chunter-chat-input">
     <div :class="{'flex-column':stylesEnabled, 'flex-row': !stylesEnabled}">
       <Toolbar v-if="!stylesEnabled" class="style-buttons">
-        <ToolbarButton class="small">§</ToolbarButton>
+        <ToolbarButton>§</ToolbarButton>
       </Toolbar>
 
-      <ContentEditable
+      <editor-content
         ref="htmlEditor"
-        :class="{'edit-box-vertical':stylesEnabled, 'edit-box': !stylesEnabled}"
+        :class="{'edit-box-vertical':stylesEnabled, 'edit-box-horizontal': !stylesEnabled}"
         :content="htmlValue"
-        @updateState="updateState"
-        @update="updateValue($event)"
+        @update:content="htmlValue = $event"
+        @styleEvent="styleState = $event"
         @submit="handleSubmit()"
       />
 
       <div v-if="stylesEnabled" class="separator" />
       <Toolbar>
         <template v-if="stylesEnabled">
-          <ToolbarButton class="small">§</ToolbarButton>
-          <ToolbarButton class="small" v-on:click="markBold()" style="font-weight:bold;" :selected="styleState.bold">B</ToolbarButton>
+          <ToolbarButton>§</ToolbarButton>
           <ToolbarButton
             class="small"
-            v-on:click="execCommand('italic')"
+            @click="htmlEditor.toggleBold()"
+            style="font-weight:bold;"
+            :selected="styleState.bold"
+          >B</ToolbarButton>
+          <ToolbarButton
+            class="small"
+            @click="htmlEditor.toggleItalic()"
             style="font-weight:italic;"
             :selected="styleState.italic"
           >I</ToolbarButton>
@@ -126,7 +102,7 @@ export default defineComponent({
             style="font-weight:underline;"
             :selected="styleState.underline"
           >U</ToolbarButton>
-          <ToolbarButton class="small" v-on:click="execCommand('strikeThrough')">~</ToolbarButton>
+          <ToolbarButton class="small" v-on:click="htmlEditor.toggleStrike()" :selected="styleState.strike">~</ToolbarButton>
           <ToolbarButton class="small" v-on:click="execCommand('insertUnorderedList')">L</ToolbarButton>
           <ToolbarButton class="small" v-on:click="execCommand('insertOrderedList')">O</ToolbarButton>
           <ToolbarButton class="small" v-on:click="execCommand('formatBlock', 'pre')">P</ToolbarButton>
@@ -136,9 +112,9 @@ export default defineComponent({
           >H</ToolbarButton>
         </template>
         <template v-slot:right>
-          <ToolbarButton class="small" @click="handleSubmit()" :selected="sendAllowed">▶️</ToolbarButton>
+          <ToolbarButton class="small" @click="handleSubmit()" :selected="!styleState.isEmpty">▶️</ToolbarButton>
           <ToolbarButton class="small">😀</ToolbarButton>
-          <ToolbarButton class="small" @click="toggleStyle()">Aa</ToolbarButton>
+          <ToolbarButton class="small" @click="stylesEnabled = !stylesEnabled">Aa</ToolbarButton>
         </template>
       </Toolbar>
     </div>
@@ -162,7 +138,7 @@ export default defineComponent({
     align-items: flex-end;
   }
 
-  .edit-box {
+  .edit-box-horizontal {
     width: 100%;
     height: 100%;
     align-self: center;
@@ -170,6 +146,7 @@ export default defineComponent({
   .edit-box-vertical {
     width: 100%;
     height: 100%;
+    margin: 5px;
   }
   .separator {
     width: 100%;
