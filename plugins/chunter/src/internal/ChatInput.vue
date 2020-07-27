@@ -98,18 +98,17 @@ export default defineComponent({
           >I</ToolbarButton>
           <ToolbarButton
             class="small"
-            v-on:click="execCommand('underline')"
+            v-on:click="htmlEditor.toggleUnderline()"
             style="font-weight:underline;"
             :selected="styleState.underline"
           >U</ToolbarButton>
-          <ToolbarButton class="small" v-on:click="htmlEditor.toggleStrike()" :selected="styleState.strike">~</ToolbarButton>
-          <ToolbarButton class="small" v-on:click="execCommand('insertUnorderedList')">L</ToolbarButton>
-          <ToolbarButton class="small" v-on:click="execCommand('insertOrderedList')">O</ToolbarButton>
-          <ToolbarButton class="small" v-on:click="execCommand('formatBlock', 'pre')">P</ToolbarButton>
           <ToolbarButton
             class="small"
-            v-on:click="execCommand('insertHtml', '<div class=\'code-block\'></div>')"
-          >H</ToolbarButton>
+            v-on:click="htmlEditor.toggleStrike()"
+            :selected="styleState.strike"
+          >~</ToolbarButton>
+          <ToolbarButton class="small" v-on:click="htmlEditor.toggleUnOrderedList()">L</ToolbarButton>
+          <ToolbarButton class="small" v-on:click="htmlEditor.toggleOrderedList()">O</ToolbarButton>
         </template>
         <template v-slot:right>
           <ToolbarButton class="small" @click="handleSubmit()" :selected="!styleState.isEmpty">▶️</ToolbarButton>

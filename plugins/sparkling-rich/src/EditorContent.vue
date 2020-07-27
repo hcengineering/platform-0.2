@@ -84,8 +84,6 @@ export default defineComponent({
     let view = new EditorView(editRoot, {
       state,
       dispatchTransaction(transaction) {
-        console.log("Document size went from", transaction.before.content.size,
-          "to", transaction.doc.content.size, view.state.selection.head)
         let newState = view.state.apply(transaction)
         view.updateState(newState)
 
@@ -97,15 +95,16 @@ export default defineComponent({
         let isBold = schema.marks.strong.isInSet(marks) != null
         let isItalic = schema.marks.em.isInSet(marks) != null
         let isStrike = schema.marks.strike.isInSet(marks) != null
+        let isUnderline = schema.marks.underline.isInSet(marks) != null
 
         let evt = {
           isEmpty: isEmpty.value,
           bold: isBold, isBoldEnabled: Commands.toggleStrong(view.state, null),
           italic: isItalic, isItalicEnabled: Commands.toggleItalic(view.state, null),
           strike: isStrike, isStrikeEnabled: Commands.toggleStrike(view.state, null),
+          underline: isUnderline, isUnderlineEnabled: Commands.toggleUnderline(view.state, null)
         }
         context.emit("styleEvent", evt)
-        console.log("style evt:", evt)
       }
     })
 
@@ -135,18 +134,30 @@ export default defineComponent({
       isEmpty,
 
       // Some operations
-      toggleBold: () => {
+      toggleBold() {
         Commands.toggleStrong(view.state, view.dispatch)
         view.focus()
       },
-      toggleItalic: () => {
+      toggleItalic() {
         Commands.toggleItalic(view.state, view.dispatch)
         view.focus()
       },
-      toggleStrike: () => {
+      toggleStrike() {
         Commands.toggleStrike(view.state, view.dispatch)
         view.focus()
       },
+      toggleUnderline() {
+        Commands.toggleUnderline(view.state, view.dispatch)
+        view.focus()
+      },
+      toggleUnOrderedList() {
+        Commands.toggleUnOrdered(view.state, view.dispatch)
+        view.focus()
+      },
+      toggleOrderedList() {
+        Commands.toggleOrdered(view.state, view.dispatch)
+        view.focus()
+      }
     }
   },
 })
@@ -174,6 +185,10 @@ export default defineComponent({
     div {
       outline: none;
       p {
+        margin: 5px;
+      }
+      blockquote {
+        border-left: 1.5px solid #bbb;
         margin: 5px;
       }
     }

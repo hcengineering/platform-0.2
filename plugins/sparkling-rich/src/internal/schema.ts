@@ -153,7 +153,7 @@ export const marks = {
     },
     // :: MarkSpec An emphasis mark. Rendered as an `<em>` element.
     // Has parse rules that also match `<i>` and `font-style: italic`.
-    udnerline: {
+    underline: {
         parseDOM: [{ tag: "u" }],
         toDOM() { return underlineDOM }
     },
