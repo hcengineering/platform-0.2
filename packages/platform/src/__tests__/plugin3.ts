@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Service, Platform } from '..'
+import { Platform, Service } from '..'
 
 import { plugin3State, TestPlugin } from './shared'
 
