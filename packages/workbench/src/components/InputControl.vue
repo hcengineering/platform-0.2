@@ -43,6 +43,9 @@ export default defineComponent({
     function done() {
       component.value = ''
     }
+    function handleSubmit() {
+      htmlValue.value = ''
+    }
 
     return {
       add,
@@ -52,7 +55,8 @@ export default defineComponent({
       htmlValue,
       htmlEditor,
       styleState,
-      stylesEnabled
+      stylesEnabled,
+      handleSubmit
     }
   }
 })

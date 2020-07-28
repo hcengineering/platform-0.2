@@ -61,8 +61,12 @@ export default defineComponent({
     const parser = new window.DOMParser()
     const element = parser.parseFromString(props.content, 'text/html').body
 
+    function checkEmpty(value: string): boolean {
+      return value.length === 0 || value === "<p><br></p>"
+    }
+
     let isEmpty = computed(() => {
-      return props.content.length === 0 || props.content === "<p><br></p>"
+      return checkEmpty(props.content)
     })
 
     let state = EditorState.create({
@@ -87,7 +91,8 @@ export default defineComponent({
         let newState = view.state.apply(transaction)
         view.updateState(newState)
 
-        context.emit("update:content", view.dom.innerHTML)
+        let innerDOMValue = view.dom.innerHTML
+        context.emit("update:content", innerDOMValue)
 
         // Check types
         let marks = view.state.storedMarks || view.state.selection.$from.marks()
@@ -98,7 +103,7 @@ export default defineComponent({
         let isUnderline = schema.marks.underline.isInSet(marks) != null
 
         let evt = {
-          isEmpty: isEmpty.value,
+          isEmpty: checkEmpty(innerDOMValue),
           bold: isBold, isBoldEnabled: Commands.toggleStrong(view.state, null),
           italic: isItalic, isItalicEnabled: Commands.toggleItalic(view.state, null),
           strike: isStrike, isStrikeEnabled: Commands.toggleStrike(view.state, null),
