@@ -29,7 +29,7 @@ export default defineComponent({
   setup(props, context) {
     const coreService = getCoreService()
     const items = ref([] as WorkbenchCreateItem[])
-    getCoreService().getModel().find(workbench.class.WorkbenchCreateItem, {}).then(i => items.value = i)
+    coreService.getModel().find(workbench.class.WorkbenchCreateItem, {}).then(i => items.value = i)
 
     function selectItem(_class: Ref<Class<VDoc>>) {
       context.emit('select', _class)
@@ -69,7 +69,7 @@ export default defineComponent({
     position: absolute;
     bottom: 125%;
     left: 50%;
-    margin-bottom: 2.5em;
+    //margin-bottom: 2.5em;
 
     &.show {
       visibility: visible;
