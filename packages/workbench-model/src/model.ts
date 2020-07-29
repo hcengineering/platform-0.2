@@ -25,4 +25,10 @@ export default (S: Builder) => {
     main: S.attr(core.class.Type, {})
   })
 
+  S.createClass(workbench.class.WorkbenchCreateItem, core.class.Doc, {
+    label: S.attr(core.class.String, {}),
+    icon: S.attr(core.class.Type, {}),
+    itemClass: S.attr(core.class.Type, {}),
+  })
+
 }

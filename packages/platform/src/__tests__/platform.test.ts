@@ -17,7 +17,7 @@
 
 import { createPlatform, identify, Metadata, Plugin, Resource, Service } from '..'
 
-import { descriptor1, descriptor2, descriptor3, plugin1, plugin1State, plugin2, plugin2State, plugin3 } from './shared'
+import { descriptor1, descriptor2, descriptor3, plugin1, plugin1State, plugin2State, plugin3 } from './shared'
 
 type AnyPlugin = Plugin<Service>
 

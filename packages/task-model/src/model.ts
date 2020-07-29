@@ -45,4 +45,10 @@ export default (S: UIBuilder) => {
   S.mixin(task.class.Task, presentation.class.DetailsForm, {
     form: task.component.View
   })
+
+  S.createDocument(workbench.class.WorkbenchCreateItem, {
+    label: 'Задачи / Новая задача' as StringProperty,
+    icon: task.icon.Task,
+    itemClass: task.class.Task
+  })
 }

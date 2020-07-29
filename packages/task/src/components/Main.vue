@@ -15,14 +15,13 @@
 
 <script lang="ts">
 
-  import { defineComponent } from 'vue'
-  import workbench from '@anticrm/workbench'
+import { defineComponent } from 'vue'
+import workbench from '@anticrm/workbench'
 
-  import Table from '@anticrm/presentation-ui/src/components/Table.vue'
-  import AddItem from '@anticrm/workbench/src/components/AddItem.vue'
+import Table from '@anticrm/presentation-ui/src/components/Table.vue'
 
-  export default defineComponent({
-    components: { Table, AddItem },
+export default defineComponent({
+    components: { Table },
     props: {
       _class: String
     },

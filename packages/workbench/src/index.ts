@@ -25,6 +25,12 @@ export interface Application extends Doc {
   appClass: Ref<Class<VDoc>>
 }
 
+export interface WorkbenchCreateItem extends Doc {
+  label: StringProperty
+  icon: Asset
+  itemClass: AnyComponent
+}
+
 export interface WorkbenchService extends Service {
 }
 
@@ -32,7 +38,8 @@ export default plugin('workbench' as Plugin<WorkbenchService>, {
   core: core.id, ui: ui.id, presentationUI: presentationUI.id
 }, {
   class: {
-    Application: '' as Ref<Class<Application>>
+    Application: '' as Ref<Class<Application>>,
+    WorkbenchCreateItem: '' as Ref<Class<WorkbenchCreateItem>>
   },
   component: {
     Workbench: '' as AnyComponent,

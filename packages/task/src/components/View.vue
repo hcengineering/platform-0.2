@@ -16,33 +16,38 @@
 <script lang="ts">
 
 import { defineComponent, PropType, ref } from 'vue'
-import { Class, Obj, Ref } from '@anticrm/platform'
+import { Class, Ref, VDoc } from '@anticrm/platform'
+
+import { getPresentationUI } from '@anticrm/presentation-ui/src/utils'
+import { getPresentationCore } from '../utils'
 
 import OwnAttributes from '@anticrm/presentation-ui/src/components/OwnAttributes.vue'
 import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.vue'
-import { getPresentationUI } from '@anticrm/presentation-ui/src/utils'
-import { getPresentationCore } from '../utils'
 
 export default defineComponent({
   components: { InlineEdit, OwnAttributes },
   props: {
     _class: {
-      type: String as unknown as PropType<Ref<Class<Obj>>>,
+      type: String as unknown as PropType<Ref<Class<VDoc>>>,
       required: true
     },
+    object: Object
   },
-  setup(props) {
-    const core = getPresentationCore()
-    const title = ref(core.getEmptyAttribute(props._class))
+  setup(props, context) {
+    const presentationCore = getPresentationCore()
+    const title = ref(presentationCore.getEmptyAttribute(props._class))
 
     const ui = getPresentationUI()
     const model = ui.getClassModel(props, model => {
-      title.value = model.getAttribute('title')
+      const aTitle = model.getAttribute('title')
+      if (aTitle)
+        title.value = aTitle
       return model.filterAttributes(['title'])
     })
+
     return {
       model,
-      title
+      title,
     }
   }
 })
@@ -50,16 +55,13 @@ export default defineComponent({
 
 <template>
   <div class="task-view">
-    <div class="caption-4">Задачи / Новая задача</div>
+    <div class="caption-1">ЗДЧ-1</div>
+    <InlineEdit class="caption-2" :placeholder="title.placeholder"/>
 
-    <div class="content">
-
-      <div class="caption-1">КАНД-213</div>
-      <InlineEdit class="caption-2" :placeholder="title.placeholder"/>
-
-<!--      <div v-for="group in model.getGroups()" :_class="group._class" :model="model">{{group._class}}</div>-->
-
+    <div class="attributes">
+      <OwnAttributes class="group" v-for="group in model.getGroups()" :_class="group._class" :model="model" :object="object"></OwnAttributes>
     </div>
+
   </div>
 </template>
 
@@ -68,10 +70,15 @@ export default defineComponent({
 
 .task-view {
 
-  margin: 1em;
+  .attributes {
+    display: flex;
+    flex-wrap: wrap;
 
-  .content {
-    margin: 1em;
+    margin-top: 1em;
+
+    .group {
+      padding: 0.5em;
+    }
   }
 }
 </style>

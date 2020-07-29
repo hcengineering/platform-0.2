@@ -17,18 +17,41 @@
 import { defineComponent, ref } from 'vue'
 import Icon from '@anticrm/platform-ui/src/components/Icon.vue'
 import CreateForm from './CreateForm.vue'
+import CreateMenu from './CreateMenu.vue'
 import workbench from '../..'
-import recruiment from '@anticrm/recruitment'
+import ui from '@anticrm/platform-ui'
+import presentationCore from '@anticrm/presentation-core'
+import { Class, Ref, VDoc } from '@anticrm/platform'
+import { getCoreService } from '../utils'
 
 export default defineComponent({
-  components: { Icon, CreateForm },
+  components: { Icon, CreateForm, CreateMenu },
   props: {
   },
   setup (props) {
+    const coreService = getCoreService()
+    const model = coreService.getModel()
+
+    const showMenu = ref(false)
     const component = ref('')
+    const componentClass = ref('')
 
     function add() {
-      component.value = recruiment.component.View2
+      // component.value = recruiment.component.View2
+      showMenu.value = !showMenu.value
+    }
+
+    function selectItem(_class: Ref<Class<VDoc>>) {
+      showMenu.value = false
+
+      const clazz = model.get(_class) as Class<VDoc>
+      if (model.isMixedIn(clazz, presentationCore.class.DetailsForm)) {
+        const properties = model.as(clazz, presentationCore.class.DetailsForm)
+        componentClass.value = _class
+        component.value = properties.form
+      } else {
+        component.value = ui.component.BadComponent
+      }
     }
 
     function done() {
@@ -36,10 +59,13 @@ export default defineComponent({
     }
 
     return {
+      showMenu,
+      component,
+      componentClass,
+      selectItem,
       add,
       done,
       workbench,
-      component
     }
   }
 })
@@ -48,9 +74,9 @@ export default defineComponent({
 
 <template>
   <div class="workbench-input-control">
-<!--    <widget v-if="component !== ''" :component="component" _class="class:recruitment.Candidate"/>-->
-    <CreateForm v-if="component !== ''" :component="component" _class="class:recruitment.Candidate" @done="done"/>
+    <CreateForm v-if="component !== ''" :component="component" :_class="componentClass" @done="done"/>
     <div>
+      <CreateMenu :visible="showMenu" @select="selectItem"/>
       <a href="#" @click.prevent="add"><Icon :icon="workbench.icon.Add" class="icon-embed-2x"/></a>
     </div>
   </div>

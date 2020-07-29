@@ -52,4 +52,9 @@ export default (S: UIBuilder) => {
     form: recruitment.component.View2
   })
 
+  S.createDocument(workbench.class.WorkbenchCreateItem, {
+    label: 'Найм / Новый Кадидат' as StringProperty,
+    icon: recruitment.icon.Recruitment,
+    itemClass: recruitment.class.Candidate
+  })
 }
