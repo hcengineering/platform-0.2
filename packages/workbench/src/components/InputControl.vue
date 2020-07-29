@@ -20,12 +20,21 @@ import CreateForm from './CreateForm.vue'
 import workbench from '../..'
 import recruiment from '@anticrm/recruitment'
 
+import Toolbar from '@anticrm/sparkling-controls/src/toolbar/Toolbar.vue'
+import ToolbarButton from '@anticrm/sparkling-controls/src/toolbar/Button.vue'
+import EditorContent from '@anticrm/sparkling-rich/src/EditorContent'
+
 export default defineComponent({
-  components: { Icon, CreateForm },
+  components: { Icon, CreateForm, EditorContent, Toolbar, ToolbarButton },
   props: {
   },
-  setup (props) {
+  setup(props) {
     const component = ref('')
+
+    let htmlValue = ref('<strong>TEst</strong> Some other text')
+    let styleState = ref({ isEmpty: true })
+    const htmlEditor = ref(null)
+    let stylesEnabled = ref(false)
 
     function add() {
       component.value = recruiment.component.View2
@@ -34,12 +43,20 @@ export default defineComponent({
     function done() {
       component.value = ''
     }
+    function handleSubmit() {
+      htmlValue.value = ''
+    }
 
     return {
       add,
       done,
       workbench,
-      component
+      component,
+      htmlValue,
+      htmlEditor,
+      styleState,
+      stylesEnabled,
+      handleSubmit
     }
   }
 })
@@ -48,10 +65,69 @@ export default defineComponent({
 
 <template>
   <div class="workbench-input-control">
-<!--    <widget v-if="component !== ''" :component="component" _class="class:recruitment.Candidate"/>-->
-    <CreateForm v-if="component !== ''" :component="component" _class="class:recruitment.Candidate" @done="done"/>
+    <!--    <widget v-if="component !== ''" :component="component" _class="class:recruitment.Candidate"/>-->
+    <CreateForm
+      v-if="component !== ''"
+      :component="component"
+      _class="class:recruitment.Candidate"
+      @done="done"
+    />
     <div>
-      <a href="#" @click.prevent="add"><Icon :icon="workbench.icon.Add" class="icon-embed-2x"/></a>
+      <div :class="{'flex-column':stylesEnabled, 'flex-row': !stylesEnabled}">
+        <Toolbar v-if="!stylesEnabled" class="style-buttons">
+          <a href="#" @click.prevent="add">
+            <Icon :icon="workbench.icon.Add" class="icon-embed-2x" />
+          </a>
+        </Toolbar>
+
+        <editor-content
+          ref="htmlEditor"
+          :class="{'edit-box-vertical':stylesEnabled, 'edit-box-horizontal': !stylesEnabled}"
+          :content="htmlValue"
+          @update:content="htmlValue = $event"
+          @styleEvent="styleState = $event"
+          @submit="handleSubmit()"
+        />
+
+        <div v-if="stylesEnabled" class="separator" />
+        <Toolbar>
+          <template v-if="stylesEnabled">
+            <a href="#" @click.prevent="add">
+              <Icon :icon="workbench.icon.Add" class="icon-embed-2x" />
+            </a>
+            <ToolbarButton
+              class="small"
+              @click="htmlEditor.toggleBold()"
+              style="font-weight:bold;"
+              :selected="styleState.bold"
+            >B</ToolbarButton>
+            <ToolbarButton
+              class="small"
+              @click="htmlEditor.toggleItalic()"
+              style="font-weight:italic;"
+              :selected="styleState.italic"
+            >I</ToolbarButton>
+            <ToolbarButton
+              class="small"
+              v-on:click="htmlEditor.toggleUnderline()"
+              style="font-weight:underline;"
+              :selected="styleState.underline"
+            >U</ToolbarButton>
+            <ToolbarButton
+              class="small"
+              v-on:click="htmlEditor.toggleStrike()"
+              :selected="styleState.strike"
+            >~</ToolbarButton>
+            <ToolbarButton class="small" v-on:click="htmlEditor.toggleUnOrderedList()">L</ToolbarButton>
+            <ToolbarButton class="small" v-on:click="htmlEditor.toggleOrderedList()">O</ToolbarButton>
+          </template>
+          <template v-slot:right>
+            <ToolbarButton class="small" @click="handleSubmit()" :selected="!styleState.isEmpty">▶️</ToolbarButton>
+            <ToolbarButton class="small">😀</ToolbarButton>
+            <ToolbarButton class="small" @click="stylesEnabled = !stylesEnabled">Aa</ToolbarButton>
+          </template>
+        </Toolbar>
+      </div>
     </div>
   </div>
 </template>
@@ -67,5 +143,27 @@ export default defineComponent({
   border-radius: 4px;
   padding: 1em;
   box-sizing: border-box;
+
+  .flex-column {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .flex-row {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+  }
+
+  .edit-box-horizontal {
+    width: 100%;
+    height: 100%;
+    align-self: center;
+  }
+  .edit-box-vertical {
+    width: 100%;
+    height: 100%;
+    margin: 5px;
+  }
 }
 </style>
