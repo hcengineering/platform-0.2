@@ -14,11 +14,12 @@
 //
 
 import { extendIds } from '@anticrm/platform-model'
-import { Class, Ref } from '@anticrm/platform'
+import { Ref } from '@anticrm/platform'
 import { Application } from '@anticrm/workbench'
 
 import task, { Task } from '@anticrm/task'
 import { IntlString } from '@anticrm/platform-i18n'
+import { ClassUI } from '@anticrm/presentation-core'
 
 export enum TaskDomain {
   Task = 'task'
@@ -29,7 +30,7 @@ export default extendIds(task, {
     Task: '' as Ref<Application>
   },
   class: {
-    Task: '' as Ref<Class<Task>>
+    Task: '' as Ref<ClassUI<Task>>
   },
   string: {
     Task_name: '' as IntlString,

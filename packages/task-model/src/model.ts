@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { StringProperty } from '@anticrm/platform'
+import { Class, Property, Ref, StringProperty } from '@anticrm/platform'
 
 import presentation, { UIBuilder } from '@anticrm/presentation-model'
 import presentationUI from '@anticrm/presentation-ui'
@@ -22,6 +22,8 @@ import presentationUI from '@anticrm/presentation-ui'
 import core from '@anticrm/platform-model'
 import workbench from '@anticrm/workbench-model'
 import task, { TaskDomain } from '.'
+import { IntlString } from '@anticrm/platform-i18n'
+import { Task } from '@anticrm/task'
 
 
 export default (S: UIBuilder) => {
@@ -33,16 +35,19 @@ export default (S: UIBuilder) => {
     appClass: task.class.Task
   }, task.application.Task)
 
-  S.createClass(task.class.Task, core.class.VDoc, {
+  S.createClassUI(task.class.Task, core.class.VDoc, {
+    _domain: TaskDomain.Task as Property<string, string>,
+    label: 'Задача' as IntlString
+  }, {
     title: S.attrUI(core.class.Type, {}, {
       label: task.string.Task_name
     }),
     description: S.attrUI(core.class.Type, {}, {
       label: task.string.Task_description
     }),
-  }, TaskDomain.Task)
+  })
 
-  S.mixin(task.class.Task, presentation.class.DetailsForm, {
+  S.mixin(task.class.Task as Ref<Class<Task>>, presentation.class.DetailsForm, {
     form: task.component.View
   })
 

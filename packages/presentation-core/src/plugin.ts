@@ -32,6 +32,7 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
   async function getGroupModel(_class: Ref<ClassUI<Obj>>): Promise<GroupModel> {
     const model = coreService.getModel()
     const clazz = model.get(_class) as ClassUI<Obj>
+    console.log('class label: ', clazz)
     const label = await i18nService.translate(clazz.label)
 
     return { _class, label, icon: clazz.icon }

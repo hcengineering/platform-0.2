@@ -40,13 +40,12 @@ export default defineComponent({
     const component = ref('')
     const componentClass = ref('')
 
-    let htmlValue = ref('<strong>TEst</strong> Some other text')
+    let htmlValue = ref('')
     let styleState = ref({ isEmpty: true })
     const htmlEditor = ref(null)
     let stylesEnabled = ref(false)
 
     function add() {
-      // component.value = recruiment.component.View2
       showMenu.value = !showMenu.value
     }
 

@@ -55,7 +55,7 @@ export default defineComponent({
 
 <template>
   <div class="task-view">
-    <div class="caption-1">ЗДЧ-1</div>
+    <div class="caption-1">Зaдача №243</div>
     <InlineEdit class="caption-2" :placeholder="title.placeholder"/>
 
     <div class="attributes">

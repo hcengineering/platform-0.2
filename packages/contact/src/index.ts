@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { plugin, Plugin, Property, Service, VDoc } from '@anticrm/platform'
+import { Mixin, plugin, Plugin, Property, Ref, Service, VDoc } from '@anticrm/platform'
 import { Asset } from '@anticrm/platform-ui'
 
 export interface Contact extends VDoc {
@@ -28,6 +28,11 @@ export interface Person extends Contact {
   birthDate: Property<number, Date>
 }
 
+export interface User extends Person {
+  account: string
+  displayName: string
+}
+
 export default plugin('contact' as Plugin<Service>, {}, {
   icon: {
     Date: '' as Asset,
@@ -36,6 +41,7 @@ export default plugin('contact' as Plugin<Service>, {}, {
   },
   component: {
   },
-  class: {
+  mixin: {
+    User: '' as Ref<Mixin<User>>
   }
 })
