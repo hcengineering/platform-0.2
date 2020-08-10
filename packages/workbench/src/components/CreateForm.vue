@@ -38,12 +38,12 @@ export default defineComponent({
       required: true
     }
   },
-  setup(props, context) {
+  setup (props, context) {
     const coreService = getCoreService()
 
     const object = reactive({})
 
-    function save() {
+    function save () {
       const objectId = generateId() as Ref<VDoc>
 
       const tx: CreateTx = {
@@ -63,7 +63,7 @@ export default defineComponent({
       context.emit('done', 'save')
     }
 
-    function cancel() {
+    function cancel () {
       context.emit('done', 'cancel')
     }
 
@@ -87,7 +87,7 @@ export default defineComponent({
     </div>
 
     <div class="content">
-      <widget :component="component" :object="object" :_class="_class"/>
+      <widget :component="component" :object="object" :_class="_class" />
     </div>
   </div>
 </template>
@@ -96,7 +96,6 @@ export default defineComponent({
 @import "~@anticrm/sparkling-theme/css/_variables.scss";
 
 .recruiting-view {
-
   margin: 1em;
 
   .header {

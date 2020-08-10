@@ -37,7 +37,7 @@ class Builder {
 
   private domains = new Map<string, MemDb>()
 
-  constructor (memdb?: MemDb) {
+  constructor(memdb?: MemDb) {
     this.memdb = memdb ?? new MemDb(CoreDomain.Model)
   }
 
@@ -88,13 +88,13 @@ class Builder {
     this.memdb.createDocument(_class, values, _id)
   }
 
-  createCls<T extends E, E extends Obj> (_id: Ref<Class<T>>, _extends: Ref<Class<E>>, values: Omit<Class<T>, keyof Classifier<Obj>>, _attributes: AllAttributes<T, E>) {
-    this.createDocument(core.class.Class as Ref<Class<Class<T>>>, {
-      _extends,
-      _attributes,
-      ...values
-    } as unknown as Class<T>, _id as Ref<Class<T>>)
-  }
+  // createCls<T extends E, E extends Obj> (_id: Ref<Class<T>>, _extends: Ref<Class<E>>, values: Omit<Class<T>, keyof Classifier<Obj>>, _attributes: AllAttributes<T, E>) {
+  //   this.createDocument(core.class.Class as Ref<Class<Class<T>>>, {
+  //     _extends,
+  //     _attributes,
+  //     ...values
+  //   } as unknown as Class<T>, _id as Ref<Class<T>>)
+  // }
 
   createClass<T extends E, E extends Obj> (_id: Ref<Class<T>>, _extends: Ref<Class<E>>, _attributes: AllAttributes<T, E>, _domain?: string, _native?: Resource<any>) {
     this.createDocument(core.class.Class as Ref<Class<EClass<T, E>>>,

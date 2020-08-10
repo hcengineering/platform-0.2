@@ -14,7 +14,7 @@
 //
 
 import { Mixin, plugin, Plugin, Property, Ref, Service, VDoc } from '@anticrm/platform'
-import { Asset } from '@anticrm/platform-ui'
+import { Asset, AnyComponent } from '@anticrm/platform-ui'
 
 export interface Contact extends VDoc {
   phone?: string
@@ -40,8 +40,9 @@ export default plugin('contact' as Plugin<Service>, {}, {
     Email: '' as Asset
   },
   component: {
+    PersonProperties: '' as AnyComponent
   },
-  mixin: {
-    User: '' as Ref<Mixin<User>>
-  }
+  // mixin: {
+  //   User: '' as Ref<Mixin<User>>
+  // }
 })

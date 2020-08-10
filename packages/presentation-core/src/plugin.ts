@@ -13,11 +13,12 @@
 // limitations under the License.
 //
 
-import { Attribute, Class, Obj, Platform, Ref, Type } from '@anticrm/platform'
+import { Attribute, Class, Obj, Platform, Ref, Type, VDoc } from '@anticrm/platform'
 import ui, { AttributeUI, AttrModel, ClassModel, ClassUI, GroupModel, PresentationCore } from '.'
 import { CoreService } from '@anticrm/platform-core'
 import { AnyComponent, Asset } from '@anticrm/platform-ui'
 import { I18n, IntlString } from '@anticrm/platform-i18n'
+import vue from '@anticrm/platform-ui'
 
 /*!
  * Anticrm Platform™ Presentation Core Plugin
@@ -29,7 +30,7 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
   const coreService = deps.core
   const i18nService = deps.i18n
 
-  async function getGroupModel(_class: Ref<ClassUI<Obj>>): Promise<GroupModel> {
+  async function getGroupModel (_class: Ref<ClassUI<Obj>>): Promise<GroupModel> {
     const model = coreService.getModel()
     const clazz = model.get(_class) as ClassUI<Obj>
     console.log('class label: ', clazz)
@@ -38,7 +39,7 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
     return { _class, label, icon: clazz.icon }
   }
 
-  async function getOwnAttrModel(_class: Ref<Class<Obj>>): Promise<AttrModel[]> {
+  async function getOwnAttrModel (_class: Ref<Class<Obj>>): Promise<AttrModel[]> {
     const result = [] as AttrModel[]
     const model = coreService.getModel()
     const clazz = model.get(_class) as Class<Obj>
@@ -79,16 +80,16 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
   }
 
   abstract class ClassModelBase implements ClassModel {
-    filterAttributes(keys: string[]): ClassModel {
+    filterAttributes (keys: string[]): ClassModel {
       const filter = {} as { [key: string]: {} }
       keys.forEach(key => filter[key] = {})
       return new AttributeFilter(this, filter)
     }
-    abstract getAttribute(key: string, _class?: Ref<Class<Obj>>): AttrModel | undefined
-    abstract getGroups(): GroupModel[]
-    abstract getOwnAttributes(_class: Ref<Class<Obj>>): AttrModel[]
-    abstract getAttributes(): AttrModel[]
-    abstract getGroup(_class: Ref<Class<Obj>>): GroupModel | undefined
+    abstract getAttribute (key: string, _class?: Ref<Class<Obj>>): AttrModel | undefined
+    abstract getGroups (): GroupModel[]
+    abstract getOwnAttributes (_class: Ref<Class<Obj>>): AttrModel[]
+    abstract getAttributes (): AttrModel[]
+    abstract getGroup (_class: Ref<Class<Obj>>): GroupModel | undefined
   }
 
   class TClassModel extends ClassModelBase {
@@ -102,21 +103,21 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
       this.groups = groups
     }
 
-    getAttributes(): AttrModel[] {
+    getAttributes (): AttrModel[] {
       return this.attributes
     }
 
-    getOwnAttributes(_class: Ref<Class<Obj>>): AttrModel[] {
+    getOwnAttributes (_class: Ref<Class<Obj>>): AttrModel[] {
       return this.attributes.filter(attr => attr._class === _class)
     }
 
-    getAttribute(key: string, _class?: Ref<Class<Obj>>): AttrModel | undefined {
+    getAttribute (key: string, _class?: Ref<Class<Obj>>): AttrModel | undefined {
       return this.attributes.find(attr => attr.key === key && (_class ? _class === attr._class : true))
     }
 
-    getGroups(): GroupModel[] { return this.groups }
+    getGroups (): GroupModel[] { return this.groups }
 
-    getGroup(_class: Ref<Class<Obj>>): GroupModel | undefined {
+    getGroup (_class: Ref<Class<Obj>>): GroupModel | undefined {
       return this.groups.find(group => group._class === _class)
     }
   }
@@ -131,35 +132,35 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
       this.filter = filter
     }
 
-    getAttribute(key: string, _class?: Ref<Class<Obj>>): AttrModel | undefined {
+    getAttribute (key: string, _class?: Ref<Class<Obj>>): AttrModel | undefined {
       const result = this.next.getAttribute(key, _class)
       if (result) {
         return this.filter[result.key] ? undefined : result
       }
     }
 
-    getGroups(): GroupModel[] {
+    getGroups (): GroupModel[] {
       return this.next.getGroups()
     }
 
-    getGroup(_class: Ref<Class<Obj>>): GroupModel | undefined {
+    getGroup (_class: Ref<Class<Obj>>): GroupModel | undefined {
       return this.next.getGroup(_class)
     }
 
-    getOwnAttributes(_class: Ref<Class<Obj>>): AttrModel[] {
+    getOwnAttributes (_class: Ref<Class<Obj>>): AttrModel[] {
       const result = this.next.getOwnAttributes(_class)
       const filtered = result.filter(attr => !this.filter[attr.key])
       return filtered
     }
 
-    getAttributes(): AttrModel[] {
+    getAttributes (): AttrModel[] {
       const result = this.next.getAttributes()
       const filtered = result.filter(attr => !this.filter[attr.key])
       return filtered
     }
   }
 
-  async function getClassModel(_class: Ref<Class<Obj>>, top?: Ref<Class<Obj>>): Promise<ClassModel> {
+  async function getClassModel (_class: Ref<Class<Obj>>, top?: Ref<Class<Obj>>): Promise<ClassModel> {
     const model = coreService.getModel()
     const hierarchy = model.getClassHierarchy(_class, top)
     const groupModels = hierarchy.map(_class => getGroupModel(_class as Ref<ClassUI<Obj>>))
@@ -171,17 +172,34 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
     return new TClassModel(groups, attributes)
   }
 
-  function getEmptyModel(): ClassModel {
+  function getEmptyModel (): ClassModel {
     return new TClassModel([], [])
   }
 
-  function getEmptyAttribute(_class: Ref<Class<Obj>>): AttrModel {
+  function getEmptyAttribute (_class: Ref<Class<Obj>>): AttrModel {
     return { _class, key: 'non-existent', label: 'Несуществующий аттрибут' as IntlString, placeholder: '' as IntlString, presenter: 'component:ui.StringPresenter' as AnyComponent }
+  }
+
+  function getDetailForm (_class: Ref<Class<Obj>>): AnyComponent {
+    const model = coreService.getModel()
+    while (_class) {
+      console.log(_class)
+      const clazz = model.get(_class) as Class<VDoc>
+      if (model.isMixedIn(clazz, ui.class.DetailsForm)) {
+        const properties = model.as(clazz, ui.class.DetailsForm)
+        return properties.form
+      } else {
+        _class = clazz._extends as Ref<Class<Obj>>
+      }
+    }
+    console.log('ERROR: detail form not mixed in: ', _class)
+    return vue.component.BadComponent
   }
 
   return {
     getEmptyModel,
     getEmptyAttribute,
-    getClassModel
+    getClassModel,
+    getDetailForm,
   }
 }

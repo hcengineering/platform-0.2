@@ -15,12 +15,17 @@
 
 import { Platform, Service } from '@anticrm/platform'
 
+import contact from '.'
+import PersonProperties from './components/PersonProperties.vue'
+
 /*!
  * Anticrm Platform™ Contact Plugin
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */
 export default async (platform: Platform): Promise<Service> => {
+
+  platform.setResource(contact.component.PersonProperties, PersonProperties)
 
   return {}
 }

@@ -22,11 +22,11 @@ import workbench from '../..'
 import ui from '@anticrm/platform-ui'
 import presentationCore from '@anticrm/presentation-core'
 import { Class, Ref, VDoc } from '@anticrm/platform'
-import { getCoreService } from '../utils'
+import { getCoreService, getPresentationCore } from '../utils'
 
 import Toolbar from '@anticrm/sparkling-controls/src/toolbar/Toolbar.vue'
 import ToolbarButton from '@anticrm/sparkling-controls/src/toolbar/Button.vue'
-import EditorContent from '@anticrm/sparkling-rich/src/EditorContent'
+import EditorContent from '@anticrm/sparkling-rich/src/EditorContent.vue'
 
 export default defineComponent({
   components: { Icon, CreateForm, CreateMenu, EditorContent, Toolbar, ToolbarButton },
@@ -35,6 +35,8 @@ export default defineComponent({
   setup (props) {
     const coreService = getCoreService()
     const model = coreService.getModel()
+
+    const presentationCoreService = getPresentationCore()
 
     const showMenu = ref(false)
     const component = ref('')
@@ -45,27 +47,30 @@ export default defineComponent({
     const htmlEditor = ref(null)
     let stylesEnabled = ref(false)
 
-    function add() {
+    function add () {
       showMenu.value = !showMenu.value
     }
 
-    function selectItem(_class: Ref<Class<VDoc>>) {
+    function selectItem (_class: Ref<Class<VDoc>>) {
       showMenu.value = false
 
-      const clazz = model.get(_class) as Class<VDoc>
-      if (model.isMixedIn(clazz, presentationCore.class.DetailsForm)) {
-        const properties = model.as(clazz, presentationCore.class.DetailsForm)
-        componentClass.value = _class
-        component.value = properties.form
-      } else {
-        component.value = ui.component.BadComponent
-      }
+      // const clazz = model.get(_class) as Class<VDoc>
+      // if (model.isMixedIn(clazz, presentationCore.class.DetailsForm)) {
+      //   const properties = model.as(clazz, presentationCore.class.DetailsForm)
+      //   componentClass.value = _class
+      //   component.value = properties.form
+      // } else {
+      //   console.log('ERROR: details form not mixed in: ', _class)
+      //   component.value = ui.component.BadComponent
+      // }
+      componentClass.value = _class
+      component.value = presentationCoreService.getDetailForm(_class)
     }
 
-    function done() {
+    function done () {
       component.value = ''
     }
-    function handleSubmit() {
+    function handleSubmit () {
       htmlValue.value = ''
     }
 
@@ -90,12 +95,19 @@ export default defineComponent({
 
 <template>
   <div class="workbench-input-control">
-    <CreateForm v-if="component !== ''" :component="component" :_class="componentClass" @done="done"/>
+    <CreateForm
+      v-if="component !== ''"
+      :component="component"
+      :_class="componentClass"
+      @done="done"
+    />
     <div>
       <div :class="{'flex-column':stylesEnabled, 'flex-row': !stylesEnabled}">
         <Toolbar v-if="!stylesEnabled" class="style-buttons">
-          <CreateMenu :visible="showMenu" @select="selectItem"/>
-          <a href="#" @click.prevent="add"><Icon :icon="workbench.icon.Add" class="icon-embed-2x"/></a>
+          <CreateMenu :visible="showMenu" @select="selectItem" />
+          <a href="#" @click.prevent="add">
+            <Icon :icon="workbench.icon.Add" class="icon-embed-2x" />
+          </a>
         </Toolbar>
 
         <editor-content

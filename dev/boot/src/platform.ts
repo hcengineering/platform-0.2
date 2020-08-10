@@ -22,6 +22,7 @@ import login from '@anticrm/login'
 import presentationCore from '@anticrm/presentation-core'
 import presentationUI from '@anticrm/presentation-ui'
 import workbench from '@anticrm/workbench'
+import contact from '@anticrm/contact'
 import chunter from '@anticrm/chunter'
 import recruitment from '@anticrm/recruitment'
 import task from '@anticrm/task'
@@ -44,6 +45,7 @@ platform.addLocation(login, () => import(/* webpackChunkName: "login" */ '@antic
 platform.addLocation(presentationCore, () => import(/* webpackChunkName: "presentation-core" */ '@anticrm/presentation-core/src/plugin'))
 platform.addLocation(presentationUI, () => import(/* webpackChunkName: "presentation-ui" */ '@anticrm/presentation-ui/src/plugin'))
 platform.addLocation(workbench, () => import(/* webpackChunkName: "workbench" */ '@anticrm/workbench/src/plugin'))
+platform.addLocation(contact, () => import(/* webpackChunkName: "contact" */ '@anticrm/contact/src/plugin'))
 platform.addLocation(chunter, () => import(/* webpackChunkName: "chunter" */ '@anticrm/chunter/src/plugin'))
 platform.addLocation(recruitment, () => import(/* webpackChunkName: "recruitment" */ '@anticrm/recruitment/src/plugin'))
 platform.addLocation(task, () => import(/* webpackChunkName: "task" */ '@anticrm/task/src/plugin'))

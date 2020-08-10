@@ -59,20 +59,21 @@ export interface GroupModel extends UIModel {
 }
 
 export interface ClassModel {
-  getGroups(): GroupModel[]
-  getGroup(_class: Ref<Class<Obj>>): GroupModel | undefined
-  getOwnAttributes(_class: Ref<Class<Obj>>): AttrModel[]
-  getAttributes(): AttrModel[]
-  getAttribute(key: string, _class?: Ref<Class<Obj>>): AttrModel | undefined
-  filterAttributes(keys: string[]): ClassModel
+  getGroups (): GroupModel[]
+  getGroup (_class: Ref<Class<Obj>>): GroupModel | undefined
+  getOwnAttributes (_class: Ref<Class<Obj>>): AttrModel[]
+  getAttributes (): AttrModel[]
+  getAttribute (key: string, _class?: Ref<Class<Obj>>): AttrModel | undefined
+  filterAttributes (keys: string[]): ClassModel
 }
 
 // S E R V I C E
 
 export interface PresentationCore extends Service {
-  getEmptyModel(): ClassModel
-  getEmptyAttribute(_class: Ref<Class<Obj>>): AttrModel
-  getClassModel(_class: Ref<Class<Obj>>, top?: Ref<Class<Obj>>): Promise<ClassModel>
+  getEmptyModel (): ClassModel
+  getEmptyAttribute (_class: Ref<Class<Obj>>): AttrModel
+  getClassModel (_class: Ref<Class<Obj>>, top?: Ref<Class<Obj>>): Promise<ClassModel>
+  getDetailForm (_class: Ref<Class<Obj>>): AnyComponent
 }
 
 export default plugin('presentation-core' as Plugin<PresentationCore>, { core: core.id, i18n: i18n.id }, {

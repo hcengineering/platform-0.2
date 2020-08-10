@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Class, CoreProtocol, CreateTx, Doc, Ref, Tx, VDoc } from '@anticrm/platform'
+import { AnyLayout, Class, Mixin, CoreProtocol, CreateTx, Doc, Ref, Tx, VDoc, Obj, ClassifierKind } from '@anticrm/platform'
 
 import { openDB } from 'idb'
 import { ModelDb } from './modeldb'
@@ -80,6 +80,32 @@ export async function createCache (dbname: string, modelDb: ModelDb): Promise<Co
     return tx.done
   }
 
+  function createTx2VDoc (create: CreateTx): VDoc {
+    const doc: VDoc = {
+      _class: create._objectClass,
+      _id: create._objectId,
+      _createdBy: create._user,
+      _createdOn: create._date,
+      ...create._attributes
+    }
+    let _class = create._objectClass
+    while (true) {
+      const clazz = modelDb.get(_class) as Class<Obj>
+      if (clazz._kind === ClassifierKind.MIXIN) {
+        if (doc._mixins) {
+          doc._mixins.push(_class as Ref<Mixin<Doc>>)
+        } else {
+          doc._mixins = [_class as Ref<Mixin<Doc>>]
+        }
+        _class = clazz._extends as Ref<Class<VDoc>>
+      } else {
+        doc._class = _class
+        break
+      }
+    }
+    return doc
+  }
+
   /**
    * Apply given transaction to cached results.
    * @param tx
@@ -88,14 +114,7 @@ export async function createCache (dbname: string, modelDb: ModelDb): Promise<Co
     const _class = tx._class
     switch (_class) {
       case core.class.CreateTx: {
-        const create = tx as CreateTx
-        const doc: VDoc = {
-          _class: create._objectClass,
-          _id: create._objectId,
-          _createdBy: create._user,
-          _createdOn: create._date,
-          ...create._attributes
-        }
+        const doc = createTx2VDoc(tx as CreateTx)
         return store([doc])
       }
       case core.class.DeleteTx: {
