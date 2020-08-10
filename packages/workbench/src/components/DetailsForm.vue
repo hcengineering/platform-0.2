@@ -19,7 +19,7 @@ import { defineComponent, PropType, ref, watch } from 'vue'
 import { Class, DeleteTx, Doc, generateId, Property, Ref, VDoc } from '@anticrm/platform'
 import presentationCore from '@anticrm/presentation-core'
 
-import { getCoreService } from '@anticrm/workbench/src/utils'
+import { getCoreService, getPresentationCore } from '../utils'
 import core from '@anticrm/platform-core'
 
 import OwnAttributes from '@anticrm/presentation-ui/src/components/OwnAttributes.vue'
@@ -34,31 +34,24 @@ export default defineComponent({
       required: true
     }
   },
-  setup(props, context) {
+  setup (props, context) {
     const coreService = getCoreService()
     const model = coreService.getModel()
-    const clazz = model.get(props.object._class) as Class<VDoc>
+    const presentationCoreService = getPresentationCore()
 
     const component = ref('')
     const _class = ref('')
 
-    watch(()=>props.object, object => {
-      if (model.isMixedIn(clazz, presentationCore.class.DetailsForm)) {
-        const detailsForm = model.as(clazz, presentationCore.class.DetailsForm)
-        component.value = detailsForm.form
-        _class.value = clazz._id
-        console.log('details', detailsForm.form)
-        console.log('class', clazz._id)
-      } else {
-        component.value = ''
-      }
-    }, {immediate: true})
+    watch(() => props.object, object => {
+      component.value = presentationCoreService.getDetailForm(props.object._class)
+      _class.value = props.object._class
+    }, { immediate: true })
 
-    function cancel() {
+    function cancel () {
       context.emit('done', 'cancel')
     }
 
-    function remove() {
+    function remove () {
       const tx: DeleteTx = {
         _class: core.class.DeleteTx,
         _id: generateId() as Ref<Doc>,
@@ -95,7 +88,7 @@ export default defineComponent({
     </div>
 
     <div class="content">
-      <widget v-if="component !== ''" :component="component" :object="object" :_class="_class"/>
+      <widget v-if="component !== ''" :component="component" :object="object" :_class="_class" />
     </div>
   </div>
 </template>
@@ -104,7 +97,6 @@ export default defineComponent({
 @import "~@anticrm/sparkling-theme/css/_variables.scss";
 
 .recruiting-view {
-
   margin: 1em;
 
   .header {
