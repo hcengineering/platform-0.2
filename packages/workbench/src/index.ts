@@ -28,7 +28,7 @@ export interface Application extends Doc {
 export interface WorkbenchCreateItem extends Doc {
   label: StringProperty
   icon: Asset
-  itemClass: AnyComponent
+  itemClass: Ref<Class<VDoc>>
 }
 
 export interface WorkbenchService extends Service {

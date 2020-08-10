@@ -48,12 +48,12 @@ export default (S: UIBuilder) => {
     })
   })
 
-  S.mixin(recruitment.class.Candidate as Ref<Class<Candidate>>, presentation.class.DetailsForm, {
-    form: recruitment.component.View2
-  })
+  // S.mixin(recruitment.class.Candidate as Ref<Class<Candidate>>, presentation.class.DetailsForm, {
+  //   form: recruitment.component.View2
+  // })
 
   S.createDocument(workbench.class.WorkbenchCreateItem, {
-    label: 'Найм / Новый Кадидат' as StringProperty,
+    label: 'Найм / Новый Кандидат' as StringProperty,
     icon: recruitment.icon.Recruitment,
     itemClass: recruitment.class.Candidate
   })

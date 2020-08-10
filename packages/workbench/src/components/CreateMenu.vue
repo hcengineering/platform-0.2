@@ -26,13 +26,13 @@ export default defineComponent({
   props: {
     visible: Boolean
   },
-  setup(props, context) {
+  setup (props, context) {
     const coreService = getCoreService()
     const items = ref([] as WorkbenchCreateItem[])
     coreService.getModel().find(workbench.class.WorkbenchCreateItem, {}).then(i => items.value = i)
 
-    function selectItem(_class: Ref<Class<VDoc>>) {
-      context.emit('select', _class)
+    function selectItem (item: WorkbenchCreateItem) {
+      context.emit('select', item)
     }
 
     return { items, selectItem }
@@ -43,11 +43,10 @@ export default defineComponent({
 <template>
   <div class="workbench-create-menu">
     <div class="content" :class="{show: visible}">
-      <div v-for="item in items" class="item">
-        <a href="#" @click.prevent="selectItem(item.itemClass)">{{ item.label }}</a>
+      <div v-for="item in items" class="item" :key="item._id">
+        <a href="#" @click.prevent="selectItem(item)">{{ item.label }}</a>
       </div>
     </div>
-
   </div>
 </template>
 
@@ -81,5 +80,4 @@ export default defineComponent({
     }
   }
 }
-
 </style>

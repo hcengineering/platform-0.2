@@ -33,6 +33,10 @@ export default defineComponent({
       type: String as unknown as PropType<Ref<Class<VDoc>>>,
       required: true
     },
+    title: {
+      type: String,
+      required: true
+    },
     component: {
       type: String,
       required: true
@@ -79,7 +83,7 @@ export default defineComponent({
 <template>
   <div class="recruiting-view">
     <div class="header">
-      <div class="caption-4">Найм / Новый кандидат</div>
+      <div class="caption-4">{{title}}</div>
       <div class="actions">
         <Button @click="cancel">Cancel</Button>
         <Button @click="save">Save</Button>

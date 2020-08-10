@@ -18,7 +18,7 @@ import { defineComponent, ref } from 'vue'
 import Icon from '@anticrm/platform-ui/src/components/Icon.vue'
 import CreateForm from './CreateForm.vue'
 import CreateMenu from './CreateMenu.vue'
-import workbench from '../..'
+import workbench, { WorkbenchCreateItem } from '..'
 import ui from '@anticrm/platform-ui'
 import presentationCore from '@anticrm/presentation-core'
 import { Class, Ref, VDoc } from '@anticrm/platform'
@@ -40,7 +40,7 @@ export default defineComponent({
 
     const showMenu = ref(false)
     const component = ref('')
-    const componentClass = ref('')
+    const createItem = ref<WorkbenchCreateItem | null>(null)
 
     let htmlValue = ref('')
     let styleState = ref({ isEmpty: true })
@@ -51,20 +51,10 @@ export default defineComponent({
       showMenu.value = !showMenu.value
     }
 
-    function selectItem (_class: Ref<Class<VDoc>>) {
+    function selectItem (item: WorkbenchCreateItem) {
       showMenu.value = false
-
-      // const clazz = model.get(_class) as Class<VDoc>
-      // if (model.isMixedIn(clazz, presentationCore.class.DetailsForm)) {
-      //   const properties = model.as(clazz, presentationCore.class.DetailsForm)
-      //   componentClass.value = _class
-      //   component.value = properties.form
-      // } else {
-      //   console.log('ERROR: details form not mixed in: ', _class)
-      //   component.value = ui.component.BadComponent
-      // }
-      componentClass.value = _class
-      component.value = presentationCoreService.getDetailForm(_class)
+      createItem.value = item
+      component.value = presentationCoreService.getDetailForm(item.itemClass)
     }
 
     function done () {
@@ -77,7 +67,7 @@ export default defineComponent({
     return {
       showMenu,
       component,
-      componentClass,
+      createItem,
       selectItem,
       add,
       done,
@@ -98,7 +88,8 @@ export default defineComponent({
     <CreateForm
       v-if="component !== ''"
       :component="component"
-      :_class="componentClass"
+      :_class="createItem.itemClass"
+      :title="createItem.label"
       @done="done"
     />
     <div>
