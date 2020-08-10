@@ -36,7 +36,6 @@ export default defineComponent({
   },
   setup (props, context) {
     const coreService = getCoreService()
-    const model = coreService.getModel()
     const presentationCoreService = getPresentationCore()
 
     const component = ref('')
@@ -80,7 +79,6 @@ export default defineComponent({
 <template>
   <div class="recruiting-view">
     <div class="header">
-      <div class="caption-4">Найм / Новый кандидат</div>
       <div class="actions">
         <Button @click="cancel">Cancel</Button>
         <Button @click="remove">Delete</Button>
