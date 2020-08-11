@@ -13,8 +13,8 @@
 // limitations under the License.
 //
 
-import { Attribute, Class, Obj, Platform, Ref, Type, VDoc } from '@anticrm/platform'
-import ui, { AttributeUI, AttrModel, ClassModel, ClassUI, GroupModel, PresentationCore } from '.'
+import { Attribute, Class, Obj, Platform, Ref, Type, VDoc, Mixin } from '@anticrm/platform'
+import ui, { AttributeUI, AttrModel, ClassModel, ClassUI, GroupModel, PresentationCore, ComponentExtension } from '.'
 import { CoreService } from '@anticrm/platform-core'
 import { AnyComponent, Asset } from '@anticrm/platform-ui'
 import { I18n, IntlString } from '@anticrm/platform-i18n'
@@ -180,14 +180,14 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
     return { _class, key: 'non-existent', label: 'Несуществующий аттрибут' as IntlString, placeholder: '' as IntlString, presenter: 'component:ui.StringPresenter' as AnyComponent }
   }
 
-  function getDetailForm (_class: Ref<Class<Obj>>): AnyComponent {
+  function getComponentExtension (_class: Ref<Class<Obj>>, extension: Ref<Mixin<ComponentExtension<VDoc>>>): AnyComponent {
     const model = coreService.getModel()
     while (_class) {
       console.log(_class)
       const clazz = model.get(_class) as Class<VDoc>
-      if (model.isMixedIn(clazz, ui.class.DetailsForm)) {
-        const properties = model.as(clazz, ui.class.DetailsForm)
-        return properties.form
+      if (model.isMixedIn(clazz, extension)) {
+        const properties = model.as(clazz, extension)
+        return properties.component
       } else {
         _class = clazz._extends as Ref<Class<Obj>>
       }
@@ -200,6 +200,6 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
     getEmptyModel,
     getEmptyAttribute,
     getClassModel,
-    getDetailForm,
+    getComponentExtension,
   }
 }

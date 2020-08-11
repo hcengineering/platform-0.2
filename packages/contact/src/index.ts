@@ -40,9 +40,10 @@ export default plugin('contact' as Plugin<Service>, {}, {
     Email: '' as Asset
   },
   component: {
-    PersonProperties: '' as AnyComponent
+    PersonProperties: '' as AnyComponent,
+    UserLookup: '' as AnyComponent
   },
-  // mixin: {
-  //   User: '' as Ref<Mixin<User>>
-  // }
+  mixin: {
+    User: '' as Ref<Mixin<User>>
+  }
 })

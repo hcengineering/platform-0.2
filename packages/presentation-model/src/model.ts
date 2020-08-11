@@ -38,7 +38,16 @@ export default (S: UIBuilder) => {
     presenter: presentationUI.component.StringPresenter
   })
 
-  S.createMixin(ui.class.DetailsForm, core.class.Class, {
-    form: S.attr(core.class.Type, {})
+  S.mixin(core.class.RefTo, ui.class.Presenter, {
+    presenter: presentationUI.component.RefPresenter
   })
+
+  S.createMixin(ui.class.DetailForm, core.class.Class, {
+    component: S.attr(core.class.Type, {})
+  })
+
+  S.createMixin(ui.class.LookupForm, core.class.Class, {
+    component: S.attr(core.class.Type, {})
+  })
+
 }

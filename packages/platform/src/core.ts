@@ -70,9 +70,9 @@ export interface EClassifier<T extends E, E extends Obj> extends Doc {
 
 export type Classifier<T extends Obj> = EClassifier<T, Obj>
 
-export interface EMixin<T extends E, E extends Doc> extends EClassifier<T, E> {}
+export interface EMixin<T extends E, E extends Obj> extends EClass<T, E> { }
 
-export type Mixin<T extends Doc> = EMixin<T, Doc>
+export type Mixin<T extends Obj> = EMixin<T, Obj>
 
 export interface EClass<T extends E, E extends Obj> extends EClassifier<T, E> {
   _native?: Resource<Object>
@@ -119,7 +119,7 @@ export enum CoreDomain {
 }
 
 export interface CoreProtocol {
-  find(_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc[]>
-  tx(tx: Tx): Promise<void>
-  loadDomain(domain: string, index?: string, direction?: string): Promise<Doc[]>
+  find (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc[]>
+  tx (tx: Tx): Promise<void>
+  loadDomain (domain: string, index?: string, direction?: string): Promise<Doc[]>
 }

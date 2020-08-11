@@ -62,8 +62,12 @@ export default (S: UIBuilder) => {
     })
   })
 
-  S.mixin(contact.class.Person as Ref<Class<Person>>, presentation.class.DetailsForm, {
-    form: contact.component.PersonProperties
+  S.mixin(contact.class.Person as Ref<Class<Person>>, presentation.class.DetailForm, {
+    component: contact.component.PersonProperties
+  })
+
+  S.mixin(contact.mixin.User, presentation.class.LookupForm, {
+    component: contact.component.UserLookup
   })
 
   S.createDocument(workbench.class.WorkbenchCreateItem, {

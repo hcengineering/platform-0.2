@@ -25,7 +25,7 @@ export default extendIds(contact, {
     Contact: '' as Ref<ClassUI<Contact>>,
     Person: '' as Ref<ClassUI<Person>>
   },
-  mixin: {
-    User: '' as Ref<Mixin<User>>
-  }
+  // mixin: {
+  //   User: '' as Ref<Mixin<User>>
+  // }
 })

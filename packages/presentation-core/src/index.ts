@@ -36,8 +36,16 @@ export interface Presenter<T extends Type> extends Class<T> {
   presenter: AnyComponent
 }
 
-export interface DetailsForm<T extends VDoc> extends Class<T> {
-  form: AnyComponent
+// export interface DetailsForm<T extends VDoc> extends Class<T> {
+//   form: AnyComponent
+// }
+
+// export interface LookupForm<T extends VDoc> extends Class<T> {
+//   form: AnyComponent
+// }
+
+export interface ComponentExtension<T extends VDoc> extends Class<T> {
+  component: AnyComponent
 }
 
 // U I  M O D E L
@@ -73,7 +81,7 @@ export interface PresentationCore extends Service {
   getEmptyModel (): ClassModel
   getEmptyAttribute (_class: Ref<Class<Obj>>): AttrModel
   getClassModel (_class: Ref<Class<Obj>>, top?: Ref<Class<Obj>>): Promise<ClassModel>
-  getDetailForm (_class: Ref<Class<Obj>>): AnyComponent
+  getComponentExtension (_class: Ref<Class<Obj>>, extension: Ref<Mixin<ComponentExtension<VDoc>>>): AnyComponent
 }
 
 export default plugin('presentation-core' as Plugin<PresentationCore>, { core: core.id, i18n: i18n.id }, {
@@ -81,6 +89,7 @@ export default plugin('presentation-core' as Plugin<PresentationCore>, { core: c
     AttributeUI: '' as Ref<Class<AttributeUI>>,
     ClassUI: '' as Ref<Class<ClassUI<Obj>>>,
     Presenter: '' as Ref<Mixin<Presenter<Type>>>,
-    DetailsForm: '' as Ref<Mixin<DetailsForm<VDoc>>>
+    DetailForm: '' as Ref<Mixin<ComponentExtension<VDoc>>>,
+    LookupForm: '' as Ref<Mixin<ComponentExtension<VDoc>>>
   }
 })

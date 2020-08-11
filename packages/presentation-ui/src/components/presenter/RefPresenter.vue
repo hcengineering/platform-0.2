@@ -14,10 +14,17 @@
 -->
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, PropType } from 'vue'
+import { Doc } from '@anticrm/platform'
+import { RefTo } from '@anticrm/platform-core'
+import { getCoreService } from '../../utils'
 
 export default defineComponent({
   props: {
+    type: {
+      type: Object as PropType<RefTo<Doc>>,
+      required: true
+    },
     attributeKey: {
       type: String,
       required: true
@@ -33,6 +40,9 @@ export default defineComponent({
     }
   },
   setup (props, context) {
+
+    const coreService = getCoreService()
+
     return {
       computeSize (value: string) {
         const input = this.$refs['input'] as HTMLElement

@@ -74,7 +74,7 @@ export default (S: Builder) => {
     _domain: S.attr(core.class.Type, {})
   }, CoreDomain.Model)
 
-  S.createClass(core.class.Mixin, core.class.Classifier, {
+  S.createClass(core.class.Mixin, core.class.Class, {
   }, CoreDomain.Model)
 
   S.createClass(core.class.Tx, core.class.Doc, {

@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Class, Property, Ref, StringProperty } from '@anticrm/platform'
+import { Class, Property, Ref, Doc, StringProperty } from '@anticrm/platform'
 
 import presentation, { UIBuilder } from '@anticrm/presentation-model'
 import presentationUI from '@anticrm/presentation-ui'
@@ -21,6 +21,7 @@ import presentationUI from '@anticrm/presentation-ui'
 
 import core from '@anticrm/platform-model'
 import workbench from '@anticrm/workbench-model'
+import contact from '@anticrm/contact-model'
 import task, { TaskDomain } from '.'
 import { IntlString } from '@anticrm/platform-i18n'
 import { Task } from '@anticrm/task'
@@ -42,13 +43,15 @@ export default (S: UIBuilder) => {
     title: S.attrUI(core.class.Type, {}, {
       label: task.string.Task_name
     }),
-    assignee: S.attrUI(core.class.Type, {}, {
+    assignee: S.attrUI(core.class.RefTo, {
+      to: contact.mixin.User as Ref<Class<Doc>> // TODO: fix types
+    }, {
       label: task.string.Task_assignee
     }),
   })
 
-  S.mixin(task.class.Task as Ref<Class<Task>>, presentation.class.DetailsForm, {
-    form: task.component.View
+  S.mixin(task.class.Task as Ref<Class<Task>>, presentation.class.DetailForm, {
+    component: task.component.View
   })
 
   S.createDocument(workbench.class.WorkbenchCreateItem, {

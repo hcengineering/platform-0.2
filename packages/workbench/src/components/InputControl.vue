@@ -54,7 +54,7 @@ export default defineComponent({
     function selectItem (item: WorkbenchCreateItem) {
       showMenu.value = false
       createItem.value = item
-      component.value = presentationCoreService.getDetailForm(item.itemClass)
+      component.value = presentationCoreService.getComponentExtension(item.itemClass, presentationCore.class.DetailForm)
     }
 
     function done () {

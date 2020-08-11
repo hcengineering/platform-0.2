@@ -42,7 +42,7 @@ export default defineComponent({
     const _class = ref('')
 
     watch(() => props.object, object => {
-      component.value = presentationCoreService.getDetailForm(props.object._class)
+      component.value = presentationCoreService.getComponentExtension(props.object._class, presentationCore.class.DetailForm)
       _class.value = props.object._class
     }, { immediate: true })
 

@@ -17,6 +17,7 @@ import { Platform, Service } from '@anticrm/platform'
 
 import contact from '.'
 import PersonProperties from './components/PersonProperties.vue'
+import UserLookup from './components/UserLookup.vue'
 
 /*!
  * Anticrm Platform™ Contact Plugin
@@ -26,6 +27,7 @@ import PersonProperties from './components/PersonProperties.vue'
 export default async (platform: Platform): Promise<Service> => {
 
   platform.setResource(contact.component.PersonProperties, PersonProperties)
+  platform.setResource(contact.component.UserLookup, UserLookup)
 
   return {}
 }
