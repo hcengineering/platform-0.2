@@ -73,7 +73,8 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
         icon,
         label,
         placeholder,
-        presenter: presenter.presenter
+        presenter: presenter.presenter,
+        type: attribute.type
       })
     }
     return result
@@ -177,7 +178,14 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
   }
 
   function getEmptyAttribute (_class: Ref<Class<Obj>>): AttrModel {
-    return { _class, key: 'non-existent', label: 'Несуществующий аттрибут' as IntlString, placeholder: '' as IntlString, presenter: 'component:ui.StringPresenter' as AnyComponent }
+    return {
+      _class,
+      key: 'non-existent',
+      label: 'Несуществующий аттрибут' as IntlString,
+      placeholder: '' as IntlString,
+      presenter: 'component:ui.StringPresenter' as AnyComponent,
+      type: {} as Type
+    }
   }
 
   function getComponentExtension (_class: Ref<Class<Obj>>, extension: Ref<Mixin<ComponentExtension<VDoc>>>): AnyComponent {

@@ -60,6 +60,7 @@ export interface AttrModel extends UIModel {
   key: string
   presenter: AnyComponent
   placeholder: string
+  type: Type
 }
 
 export interface GroupModel extends UIModel {

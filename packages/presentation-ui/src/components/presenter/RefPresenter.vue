@@ -14,10 +14,11 @@
 -->
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue'
+import { defineComponent, PropType, ref } from 'vue'
 import { Doc } from '@anticrm/platform'
 import { RefTo } from '@anticrm/platform-core'
-import { getCoreService } from '../../utils'
+import { getPresentationCore } from '../../utils'
+import presentationCore from '@anticrm/presentation-core'
 
 export default defineComponent({
   props: {
@@ -41,9 +42,14 @@ export default defineComponent({
   },
   setup (props, context) {
 
-    const coreService = getCoreService()
+    const presentationCoreService = getPresentationCore()
+
+    const lookup = ref('')
+
+    lookup.value = presentationCoreService.getComponentExtension(props.type.to, presentationCore.class.LookupForm)
 
     return {
+      lookup,
       computeSize (value: string) {
         const input = this.$refs['input'] as HTMLElement
         const div = this.$refs['compute'] as HTMLElement
@@ -73,6 +79,8 @@ export default defineComponent({
 
 <template>
   <div class="presentation-ui-ref-presenter">
+    {{lookup}}
+    <widget :component="lookup" />
     <div class="control">
       <div ref="compute" class="compute-width"></div>
       <input

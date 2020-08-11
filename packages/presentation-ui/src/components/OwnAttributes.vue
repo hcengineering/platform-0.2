@@ -66,6 +66,7 @@ export default defineComponent({
               :attributeKey="attr.key"
               :value="object[attr.key]"
               :placeholder="attr.placeholder"
+              :type="attr.type"
               @update="update"
             />
             <!--            <InlineEdit :placeholder="attr.placeholder"/>-->
