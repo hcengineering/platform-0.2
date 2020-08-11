@@ -42,8 +42,8 @@ export default (S: UIBuilder) => {
     title: S.attrUI(core.class.Type, {}, {
       label: task.string.Task_name
     }),
-    description: S.attrUI(core.class.Type, {}, {
-      label: task.string.Task_description
+    assignee: S.attrUI(core.class.Type, {}, {
+      label: task.string.Task_assignee
     }),
   })
 

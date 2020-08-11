@@ -20,7 +20,7 @@ import presentationCore, { ClassModel } from '@anticrm/presentation-core'
 import ui, { AnyComponent } from '@anticrm/platform-ui'
 
 export interface PresentationUI extends Service {
-  getClassModel(props: { _class: String }, onChange?: (model: ClassModel) => ClassModel): Ref<ClassModel>
+  getClassModel (props: { _class: String }, onChange?: (model: ClassModel) => ClassModel): Ref<ClassModel>
 }
 
 export default plugin('presentation-ui' as Plugin<PresentationUI>, { ui: ui.id, presentationCore: presentationCore.id }, {
@@ -30,5 +30,6 @@ export default plugin('presentation-ui' as Plugin<PresentationUI>, { ui: ui.id, 
     BrowseView: '' as AnyComponent,
     NumberPresenter: '' as AnyComponent,
     StringPresenter: '' as AnyComponent,
+    RefPresenter: '' as AnyComponent,
   }
 })

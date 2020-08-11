@@ -25,6 +25,7 @@ import Table from './components/Table.vue'
 import BrowseView from './components/BrowseView.vue'
 import NumberPresenter from './components/presenter/NumberPresenter.vue'
 import StringPresenter from './components/presenter/StringPresenter.vue'
+import RefPresenter from './components/presenter/RefPresenter.vue'
 
 /*!
  * Anticrm Platform™ Presentation Plugin
@@ -37,24 +38,25 @@ export default async (platform: Platform, deps: { ui: UIService, presentationCor
   platform.setResource(ui.component.BrowseView, BrowseView)
   platform.setResource(ui.component.StringPresenter, StringPresenter)
   platform.setResource(ui.component.NumberPresenter, NumberPresenter)
+  platform.setResource(ui.component.RefPresenter, RefPresenter)
 
   const coreService = deps.presentationCore
 
-  function getClassModel(props: { _class: Ref<Class<Obj>> }, onChange?: (model: ClassModel) => ClassModel) {
+  function getClassModel (props: { _class: Ref<Class<Obj>> }, onChange?: (model: ClassModel) => ClassModel) {
     const model = ref(coreService.getEmptyModel())
 
     // following async code does not trigger on `_class` prop change, so we use `watch`
     // the issue is that watching props is a kind of nonsense (because props) are formally constants.
     // so, the trick for now is to make computed and watch it... we need to revisit this later.
 
-    watchEffect( () => {
-       coreService.getClassModel(props._class, 'class:core.VDoc' as Ref<Class<Obj>>)
-         .then(m => {
-           model.value = onChange ? onChange(m) : m
-         })
-         .catch(err => {
-           platform.setPlatformStatus(err)
-         })
+    watchEffect(() => {
+      coreService.getClassModel(props._class, 'class:core.VDoc' as Ref<Class<Obj>>)
+        .then(m => {
+          model.value = onChange ? onChange(m) : m
+        })
+        .catch(err => {
+          platform.setPlatformStatus(err)
+        })
     })
 
     return model

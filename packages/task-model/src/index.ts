@@ -34,6 +34,6 @@ export default extendIds(task, {
   },
   string: {
     Task_name: '' as IntlString,
-    Task_description: '' as IntlString,
+    Task_assignee: '' as IntlString,
   }
 })

@@ -18,5 +18,5 @@ import task from '..'
 
 export default verifyTranslation(task.string, {
   Task_name: 'Наименование',
-  Task_description: 'Описание'
+  Task_assignee: 'Ответственный'
 })

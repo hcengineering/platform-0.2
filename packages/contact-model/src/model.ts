@@ -17,7 +17,7 @@ import { UIBuilder } from '@anticrm/presentation-model'
 import core from '@anticrm/platform-model'
 import presentation from '@anticrm/presentation-model'
 import workbench from '@anticrm/workbench-model'
-import { Class, Property, Ref, StringProperty } from '@anticrm/platform'
+import { Class, VDoc, Ref, StringProperty } from '@anticrm/platform'
 
 import contact from '.'
 import { Person } from '@anticrm/contact'
@@ -69,6 +69,6 @@ export default (S: UIBuilder) => {
   S.createDocument(workbench.class.WorkbenchCreateItem, {
     label: 'Контакт / Новый Пользователь' as StringProperty,
     icon: contact.icon.Phone,
-    itemClass: contact.mixin.User
+    itemClass: contact.mixin.User as Ref<Class<VDoc>> // TODO: fix itemClass type
   })
 }

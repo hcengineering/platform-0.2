@@ -13,13 +13,14 @@
 // limitations under the License.
 //
 
-import { plugin, Plugin, Service, StringProperty, VDoc } from '@anticrm/platform'
+import { plugin, Plugin, Service, StringProperty, VDoc, Ref } from '@anticrm/platform'
 import ui, { AnyComponent, Asset } from '@anticrm/platform-ui'
 import presentationCore from '@anticrm/presentation-core'
+import { User } from '@anticrm/contact'
 
 export interface Task extends VDoc {
   title: StringProperty
-  description: StringProperty
+  assignee: Ref<User>
 }
 
 export default plugin('task' as Plugin<Service>, { ui: ui.id, presentationCore: presentationCore.id }, {

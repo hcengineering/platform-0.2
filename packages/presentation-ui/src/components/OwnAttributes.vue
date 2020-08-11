@@ -38,7 +38,7 @@ export default defineComponent({
     }
   },
   setup (props) {
-    function update(event: {key: string, value: string}) {
+    function update (event: { key: string, value: string }) {
       console.log(event)
       props.object[event.key] = event.value
     }
@@ -52,22 +52,23 @@ export default defineComponent({
   <div class="presentation-ui-own-attributes">
     <div class="caption-4">{{ model.getGroup(_class).label }}</div>
     <table>
-      <tr v-for="attr in model.getOwnAttributes(_class)">
+      <tr v-for="attr in model.getOwnAttributes(_class)" :key="attr.key">
         <td>
-          <Icon :icon="attr.icon" class="icon-embed-15x icon"/>
+          <Icon :icon="attr.icon" class="icon-embed-15x icon" />
         </td>
         <td width="120px">
           <div class="label">{{ attr.label }}</div>
         </td>
         <td>
           <div class="edit">
-            <widget :component="attr.presenter"
-                    :attributeKey="attr.key"
-                    :value="object[attr.key]"
-                    :placeholder="attr.placeholder"
-                    @update="update"
+            <widget
+              :component="attr.presenter"
+              :attributeKey="attr.key"
+              :value="object[attr.key]"
+              :placeholder="attr.placeholder"
+              @update="update"
             />
-<!--            <InlineEdit :placeholder="attr.placeholder"/>-->
+            <!--            <InlineEdit :placeholder="attr.placeholder"/>-->
           </div>
         </td>
       </tr>
@@ -79,7 +80,6 @@ export default defineComponent({
 @import "~@anticrm/sparkling-theme/css/_variables.scss";
 
 .presentation-ui-own-attributes {
-
   .icon {
     fill: $content-color-dark;
   }
@@ -92,6 +92,5 @@ export default defineComponent({
     font-family: Raleway;
     font-size: 14px;
   }
-
 }
 </style>

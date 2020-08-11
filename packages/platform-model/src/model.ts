@@ -55,6 +55,10 @@ export default (S: Builder) => {
     _default: S.attr(core.class.Type, {})
   })
 
+  S.createClass(core.class.RefTo, core.class.Type, {
+    to: S.attr(core.class.Type, {})
+  })
+
   S.createClass(core.class.Classifier, core.class.Doc, {
     _kind: S.attr(core.class.Type, {}),
     _extends: S.attr(core.class.RefTo, {
