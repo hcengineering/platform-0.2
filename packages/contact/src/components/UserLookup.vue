@@ -16,7 +16,7 @@
 <script lang="ts">
 
 import { defineComponent, PropType, ref } from 'vue'
-import { Class, Ref, VDoc } from '@anticrm/platform'
+import { Class, Ref, Doc } from '@anticrm/platform'
 
 import { getPresentationUI } from '@anticrm/presentation-ui/src/utils'
 import { getCoreService, getPresentationCore } from '../utils'
@@ -30,14 +30,23 @@ export default defineComponent({
   setup (props, context) {
     const coreService = getCoreService()
 
-    coreService.find(contact.mixin.User, {})
+    const result = ref([] as Doc[])
+
+    coreService.find(contact.mixin.User, {}).then(docs => result.value = docs)
+
+    return {
+      result
+    }
   }
 })
 
 </script>
 
 <template>
-  <div class="contact-user-lookup">XX</div>
+  <div class="contact-user-lookup">
+    UserLookup
+    <div v-for="doc in result" :key="doc._id">{{doc}}</div>
+  </div>
 </template>
 
 <style lang="scss">

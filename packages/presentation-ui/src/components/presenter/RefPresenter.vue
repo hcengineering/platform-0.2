@@ -79,7 +79,6 @@ export default defineComponent({
 
 <template>
   <div class="presentation-ui-ref-presenter">
-    {{lookup}}
     <widget :component="lookup" />
     <div class="control">
       <div ref="compute" class="compute-width"></div>

@@ -17,7 +17,7 @@ import { UIBuilder } from '@anticrm/presentation-model'
 import core from '@anticrm/platform-model'
 import presentation from '@anticrm/presentation-model'
 import workbench from '@anticrm/workbench-model'
-import { Class, VDoc, Ref, StringProperty } from '@anticrm/platform'
+import { Class, VDoc, Ref, StringProperty, Property } from '@anticrm/platform'
 
 import contact from '.'
 import { Person } from '@anticrm/contact'
@@ -26,7 +26,8 @@ import { IntlString } from '@anticrm/platform-i18n'
 export default (S: UIBuilder) => {
 
   S.createClassUI(contact.class.Contact, core.class.VDoc, {
-    label: 'Контактная информация' as IntlString
+    label: 'Контактная информация' as IntlString,
+    _domain: 'contact' as Property<string, string>,
   }, {
     phone: S.attrUI(core.class.Type, {}, {
       label: 'Телефон' as IntlString,
