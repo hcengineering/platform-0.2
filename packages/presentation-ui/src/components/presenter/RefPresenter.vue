@@ -51,13 +51,34 @@ export default defineComponent({
     lookupComponent.value = presentationCoreService.getComponentExtension(props.type.to, presentationCore.class.LookupForm)
 
     const prefix = ref('')
+    const value = ref(props.modelValue)
+    const visible = ref(false)
 
     return {
       lookupComponent,
       prefix,
-      onUpdateValue (value: string) {
-        console.log('value: ', value)
-        context.emit('update:modelValue', value)
+      value,
+      visible,
+      // onUpdateValue (value: string) {
+      //   console.log('value: ', value)
+      //   context.emit('update:modelValue', value)
+      // },
+      onFocus (e) {
+        visible.value = true
+      },
+      onBlur (e) {
+        visible.value = false
+        if (value.value) {
+          if (value.value !== props.modelValue) {
+            context.emit('update:modelValue', value)
+          }
+        } else {
+          if (prefix.value.length === 0) {
+            context.emit('update:modelValue', null)
+          } else {
+            value.value = props.modelValue
+          }
+        }
       }
     }
   },
@@ -70,12 +91,12 @@ export default defineComponent({
     <div class="lookup">
       <widget
         :component="lookupComponent"
+        :visible="visible"
+        v-model="value"
         v-model:lookup="prefix"
-        :modelValue="modelValue"
-        @update:modelValue="onUpdateValue"
       />
     </div>
-    <InlineEdit :placeholder="placeholder" v-model="prefix" />
+    <InlineEdit :placeholder="placeholder" v-model="prefix" @focus="onFocus" @blur="onBlur" />
   </div>
 </template>
 
@@ -86,20 +107,6 @@ export default defineComponent({
   .lookup {
     position: relative;
     display: inline-block;
-
-    // .content {
-    //   position: absolute;
-    //   bottom: 100%;
-    //   left: 100%;
-
-    //   background-color: $input-color;
-    //   border: 1px solid $content-color-dark;
-    //   border-radius: 4px;
-
-    //   padding: 0.5em;
-    //   margin: 0;
-    //   margin-bottom: 1.5em;
-    // }
   }
 }
 </style>

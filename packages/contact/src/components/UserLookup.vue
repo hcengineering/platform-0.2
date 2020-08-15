@@ -32,7 +32,8 @@ function startsWith (str: string | undefined, prefix: string) {
 export default defineComponent({
   props: {
     lookup: String,
-    modelValue: String
+    modelValue: String,
+    visible: Boolean,
   },
   setup (props, context) {
     const coreService = getCoreService()
@@ -78,7 +79,7 @@ export default defineComponent({
         }
         result.value = filtered
         if (!found) {
-          context.emit('update:modelValue', undefined)
+          context.emit('update:modelValue', null)
         }
       })
     }, { immediate: true })
@@ -119,7 +120,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="contact-user-lookup" v-show="result.length > 0 && modelValue === undefined">
+  <div class="contact-user-lookup" v-show="visible && result.length > 0 && !modelValue">
     <div
       v-for="(doc, index) in result"
       :key="doc._id"

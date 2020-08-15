@@ -62,6 +62,7 @@ export default defineComponent({
     <div class="control">
       <div ref="compute" class="compute-width"></div>
       <input
+        v-bind="$attrs"
         ref="input"
         type="text"
         :value="modelValue"
