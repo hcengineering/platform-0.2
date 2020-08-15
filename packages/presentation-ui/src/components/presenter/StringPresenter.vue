@@ -39,7 +39,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <InlineEdit :placeholder="attribute.placeholder" />
+  <InlineEdit :placeholder="attribute.placeholder" v-model="modelValue" />
 </template>
 
 <style lang="scss">

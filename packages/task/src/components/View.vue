@@ -38,7 +38,6 @@ export default defineComponent({
     const ui = getPresentationUI()
 
     const TITLE = 'title'
-
     const title = ref(presentationCore.getEmptyAttribute(props._class))
     const model = ui.getClassModel(props, model => {
       title.value = model.getAttribute(TITLE)
@@ -48,7 +47,6 @@ export default defineComponent({
     return {
       model,
       title,
-      TITLE,
     }
   }
 })
@@ -57,7 +55,7 @@ export default defineComponent({
 <template>
   <div class="task-view">
     <div class="caption-1">Зaдача №243</div>
-    <StringPresenter class="caption-2" :attribute="title" v-model="object[TITLE]" />
+    <StringPresenter class="caption-2" :attribute="title" v-model="object[title.key]" />
 
     <div class="attributes">
       <OwnAttributes

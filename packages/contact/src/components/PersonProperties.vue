@@ -22,11 +22,11 @@ import { getPresentationUI } from '@anticrm/presentation-ui/src/utils'
 import { getPresentationCore } from '../utils'
 
 import OwnAttributes from '@anticrm/presentation-ui/src/components/OwnAttributes.vue'
-import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.vue'
+import StringPresenter from '@anticrm/presentation-ui/src/components/presenter/StringPresenter.vue'
 import Button from '@anticrm/sparkling-controls/src/Button.vue'
 
 export default defineComponent({
-  components: { InlineEdit, OwnAttributes, Button },
+  components: { StringPresenter, OwnAttributes, Button },
   props: {
     _class: {
       type: String as unknown as PropType<Ref<Class<VDoc>>>,
@@ -36,24 +36,23 @@ export default defineComponent({
   },
   setup (props, context) {
     const presentationCore = getPresentationCore()
+    const ui = getPresentationUI()
+
+    const FIRST_NAME = 'firstName'
+    const LAST_NAME = 'lastName'
     const firstName = ref(presentationCore.getEmptyAttribute(props._class))
     const lastName = ref(presentationCore.getEmptyAttribute(props._class))
 
-    const ui = getPresentationUI()
     const model = ui.getClassModel(props, model => {
-      const aFirstName = model.getAttribute('firstName')
-      if (aFirstName)
-        firstName.value = aFirstName
-      const aLastName = model.getAttribute('lastName')
-      if (aLastName)
-        lastName.value = aLastName
-      return model.filterAttributes(['firstName', 'lastName'])
+      firstName.value = model.getAttribute(FIRST_NAME)
+      lastName.value = model.getAttribute(LAST_NAME)
+      return model.filterAttributes([FIRST_NAME, LAST_NAME])
     })
 
     return {
       model,
       firstName,
-      lastName
+      lastName,
     }
   }
 })
@@ -61,8 +60,8 @@ export default defineComponent({
 
 <template>
   <div class="contact-person-properties">
-    <InlineEdit class="caption-1" :placeholder="firstName.placeholder" />
-    <InlineEdit class="caption-2" :placeholder="lastName.placeholder" />
+    <StringPresenter class="caption-1" :attribute="firstName" v-model="object[firstName.key]" />
+    <StringPresenter class="caption-2" :attribute="lastName" v-model="object[lastName.key]" />
 
     <div class="attributes">
       <OwnAttributes
