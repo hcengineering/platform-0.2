@@ -75,8 +75,12 @@ export default async (platform: Platform): Promise<CoreService> => {
     }
   }
 
-  async function find (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc[]> {
+  function find (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc[]> {
     return cache.find(_class, query)
+  }
+
+  function findOne (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc | undefined> {
+    return cache.findOne(_class, query)
   }
 
   function tx (tx: Tx): Promise<void> {
@@ -103,6 +107,7 @@ export default async (platform: Platform): Promise<CoreService> => {
     },
     query,
     find,
+    findOne,
     tx
   }
 }

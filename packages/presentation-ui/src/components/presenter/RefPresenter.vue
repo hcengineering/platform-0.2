@@ -15,12 +15,15 @@
 
 <script lang="ts">
 import { defineComponent, PropType, ref } from 'vue'
-import { Doc } from '@anticrm/platform'
+import { Doc, PropertyType } from '@anticrm/platform'
 import { RefTo } from '@anticrm/platform-core'
-import { getPresentationCore } from '../../utils'
+import { getCoreService, getPresentationCore } from '../../utils'
 import presentationCore from '@anticrm/presentation-core'
 
+import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.vue'
+
 export default defineComponent({
+  components: { InlineEdit },
   props: {
     type: {
       type: Object as PropType<RefTo<Doc>>,
@@ -30,7 +33,7 @@ export default defineComponent({
       type: String,
       required: true
     },
-    value: String,
+    modelValue: String,
     placeholder: {
       type: String,
       required: true
@@ -41,37 +44,31 @@ export default defineComponent({
     }
   },
   setup (props, context) {
-
+    const coreService = getCoreService()
     const presentationCoreService = getPresentationCore()
 
-    const lookup = ref('')
+    const lookupComponent = ref('')
+    lookupComponent.value = presentationCoreService.getComponentExtension(props.type.to, presentationCore.class.LookupForm)
 
-    lookup.value = presentationCoreService.getComponentExtension(props.type.to, presentationCore.class.LookupForm)
+    const prefix = ref('')
 
     return {
-      lookup,
-      computeSize (value: string) {
-        const input = this.$refs['input'] as HTMLElement
-        const div = this.$refs['compute'] as HTMLElement
-        if (!value || value.length == 0)
-          value = props.placeholder
-        div.innerHTML = value.replace(/ /g, '&nbsp;')
-        const width = div.clientWidth > props.maxWidth ? props.maxWidth : div.clientWidth
-        input.style.width = width + 'px'
-      },
-      onInput (value: string) {
-        this.computeSize(value)
-      },
+      lookupComponent,
+      prefix,
       onBlur (value: string) {
-        if (value !== props.value) {
+        console.log(value)
+        if (value !== props.modelValue) {
           context.emit('update', { value, key: props.attributeKey })
         }
+      },
+      onPrefix (value: string) {
+        prefix.value = value
+      },
+      onUpdateValue (value: string) {
+        console.log('value: ', value)
+        context.emit('update:modelValue', value)
       }
     }
-  },
-  mounted () {
-    const input = this.$refs['input'] as HTMLInputElement
-    input.addEventListener('focus', () => this.computeSize(input.value))
   },
 })
 
@@ -79,18 +76,18 @@ export default defineComponent({
 
 <template>
   <div class="presentation-ui-ref-presenter">
-    <widget :component="lookup" />
-    <div class="control">
-      <div ref="compute" class="compute-width"></div>
-      <input
-        ref="input"
-        type="text"
-        :value="value"
-        :placeholder="placeholder"
-        @input="onInput($event.target.value)"
-        @blur="onBlur($event.target.value)"
-      />
+    {{prefix}}
+    <div class="lookup">
+      <div class="content">
+        <widget
+          :component="lookupComponent"
+          v-model:lookup="prefix"
+          :modelValue="modelValue"
+          @update:modelValue="onUpdateValue"
+        />
+      </div>
     </div>
+    <InlineEdit :placeholder="placeholder" v-model="prefix" @blur="onBlur" />
   </div>
 </template>
 
@@ -98,34 +95,22 @@ export default defineComponent({
 @import "~@anticrm/sparkling-theme/css/_variables.scss";
 
 .presentation-ui-ref-presenter {
-  min-width: 12em;
+  .lookup {
+    position: relative;
+    display: inline-block;
 
-  .control {
-    display: inline-flex;
-    box-sizing: border-box;
-
-    border: 1px solid transparent;
-    border-radius: 2px;
-
-    &:focus-within {
-      border-color: $highlight-color;
-    }
-
-    .compute-width {
+    .content {
       position: absolute;
-      white-space: nowrap;
-      visibility: hidden;
-    }
+      bottom: 100%;
+      left: 100%;
 
-    input {
-      border: none;
-      color: inherit;
-      background-color: inherit;
-      font: inherit;
+      background-color: $input-color;
+      border: 1px solid $content-color-dark;
+      border-radius: 4px;
 
-      &:focus {
-        outline: none;
-      }
+      padding: 0.5em;
+      margin: 0;
+      margin-bottom: 1.5em;
     }
   }
 }

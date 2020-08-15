@@ -18,6 +18,7 @@ import { AnyLayout, Class, Mixin, CoreProtocol, CreateTx, Doc, Ref, Tx, VDoc, Ob
 import { openDB } from 'idb'
 import { ModelDb } from './modeldb'
 import core from '.'
+import { find } from 'lodash'
 
 export interface CacheControl {
   cache (docs: Doc[]): Promise<void>
@@ -136,24 +137,30 @@ export async function createCache (dbname: string, modelDb: ModelDb): Promise<Co
     throw new Error('class not found in hierarchy: ' + _class)
   }
 
+  async function find (classOrMixin: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc[]> { // eslint-disable-line
+    const result = [] as Doc[]
+    const _class = getClass(classOrMixin)
+    console.log('mixin: ' + classOrMixin + ', class: ' + _class)
+    const domain = modelDb.getDomain(_class)
+    const tx = db.transaction(domain)
+    const store = tx.objectStore(domain)
+    const index = store.index('_class')
+    const range = IDBKeyRange.bound(_class, _class)
+    let cursor = await index.openCursor(range)
+    while (cursor) {
+      // console.log('cursor value: ', cursor.value)
+      result.push(cursor.value)
+      cursor = await cursor.continue()
+    }
+    return tx.done.then(() => result)
+  }
+
   const cache: CoreProtocol & CacheControl = {
 
-    async find (classOrMixin: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc[]> { // eslint-disable-line
-      const result = [] as Doc[]
-      const _class = getClass(classOrMixin)
-      console.log('mixin: ' + classOrMixin + ', class: ' + _class)
-      const domain = modelDb.getDomain(_class)
-      const tx = db.transaction(domain)
-      const store = tx.objectStore(domain)
-      const index = store.index('_class')
-      const range = IDBKeyRange.bound(_class, _class)
-      let cursor = await index.openCursor(range)
-      while (cursor) {
-        // console.log('cursor value: ', cursor.value)
-        result.push(cursor.value)
-        cursor = await cursor.continue()
-      }
-      return tx.done.then(() => result)
+    find,
+
+    findOne (classOrMixin: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc | undefined> {
+      return find(classOrMixin, query).then(result => result.length > 0 ? result[0] : undefined)
     },
 
     tx (tx: Tx): Promise<void> {

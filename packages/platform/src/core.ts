@@ -120,6 +120,7 @@ export enum CoreDomain {
 
 export interface CoreProtocol {
   find (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc[]>
+  findOne (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc | undefined>
   tx (tx: Tx): Promise<void>
   loadDomain (domain: string, index?: string, direction?: string): Promise<Doc[]>
 }

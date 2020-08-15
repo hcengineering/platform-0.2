@@ -14,9 +14,9 @@
 -->
 
 <script lang="ts">
-  import { defineComponent } from 'vue'
+import { defineComponent, watch, ref } from 'vue'
 
-  export default defineComponent({
+export default defineComponent({
   props: {
     modelValue: String,
     placeholder: {
@@ -28,26 +28,30 @@
       default: 300
     }
   },
-  setup () {
+  setup (props, context) {
+
+    const input = ref<HTMLElement>(null)
+    const compute = ref<HTMLElement>(null)
+
+    function computeSize (value: string) {
+      if (!value || value.length == 0)
+        value = props.placeholder
+      compute.value.innerHTML = value.replace(/ /g, '&nbsp;')
+      const width = compute.value.clientWidth > props.maxWidth ? props.maxWidth : compute.value.clientWidth
+      input.value.style.width = width + 'px'
+    }
+
+    watch(() => props.modelValue, value => computeSize(value))
+
     return {
-      computeSize (value: string) {
-        const input = this.$refs['input'] as HTMLElement
-        const div = this.$refs['compute'] as HTMLElement
-        if (!value || value.length == 0)
-          value = this.placeholder
-        div.innerHTML = value.replace(/ /g, '&nbsp;')
-        const width = div.clientWidth > this.maxWidth ? this.maxWidth : div.clientWidth
-        input.style.width = width + 'px'
-      },
+      input,
+      compute,
+      computeSize,
       onInput (value: string) {
-        this.computeSize(value)
+        computeSize(value)
         this.$emit('update:modelValue', value)
       }
     }
-  },
-  mounted () {
-    const input = this.$refs['input'] as HTMLInputElement
-    input.addEventListener('focus', () => this.computeSize(input.value))
   },
 })
 
@@ -63,6 +67,7 @@
         :value="modelValue"
         :placeholder="placeholder"
         @input="onInput($event.target.value)"
+        @focus="computeSize($event.target.value)"
       />
     </div>
   </div>
@@ -73,6 +78,7 @@
 
 .sparkling-inline-edit {
   min-width: 12em;
+  display: inline-block;
 
   .control {
     display: inline-flex;

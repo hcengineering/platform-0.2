@@ -64,7 +64,7 @@ export default defineComponent({
             <widget
               :component="attr.presenter"
               :attributeKey="attr.key"
-              :value="object[attr.key]"
+              v-model="object[attr.key]"
               :placeholder="attr.placeholder"
               :type="attr.type"
               @update="update"
