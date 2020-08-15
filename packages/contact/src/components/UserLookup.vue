@@ -51,36 +51,37 @@ export default defineComponent({
       return result
     }
 
-    let all = [] as User[]
-    coreService.find(contact.mixin.User, {}).then(docs => {
-      all = docs as User[]
-      // TODO: id to display name
-      // for (const user of all) {
-      //   if (user._id === props.modelValue) {
-      //     const displayName = user.displayName ?? name(user)
-      //     context.emit('update:lookup', displayName)
-      //   }
-      // }
-    })
-
+    // all = docs as User[]
+    // TODO: id to display name
+    // for (const user of all) {
+    //   if (user._id === props.modelValue) {
+    //     const displayName = user.displayName ?? name(user)
+    //     context.emit('update:lookup', displayName)
+    //   }
+    // }
     const result = ref([] as Doc[])
+
     watch(() => props.lookup, prefix => {
-      const filtered = []
-      let found = false
-      for (const value of all) {
-        if (prefix ? startsWith(value.firstName, prefix) || startsWith(value.lastName, prefix) || startsWith(value.displayName, prefix) : true) {
-          filtered.push(value)
-          if (prefix === name(value) || prefix === value.displayName) {
-            context.emit('update:modelValue', value._id)
-            found = true
+      console.log('watch')
+      coreService.find(contact.mixin.User, {}).then(docs => {
+        const filtered = []
+        let found = false
+        const all = docs as User[]
+        for (const value of all) {
+          if (prefix ? startsWith(value.firstName, prefix) || startsWith(value.lastName, prefix) || startsWith(value.displayName, prefix) : true) {
+            filtered.push(value)
+            if (prefix === name(value) || prefix === value.displayName) {
+              context.emit('update:modelValue', value._id)
+              found = true
+            }
           }
         }
-      }
-      result.value = filtered
-      if (!found) {
-        context.emit('update:modelValue', undefined)
-      }
-    })
+        result.value = filtered
+        if (!found) {
+          context.emit('update:modelValue', undefined)
+        }
+      })
+    }, { immediate: true })
 
     const selected = ref(0)
 
@@ -118,7 +119,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="contact-user-lookup">
+  <div class="contact-user-lookup" v-show="result.length > 0 && modelValue === undefined">
     <div
       v-for="(doc, index) in result"
       :key="doc._id"
@@ -136,6 +137,18 @@ export default defineComponent({
 @import "~@anticrm/sparkling-theme/css/_variables.scss";
 
 .contact-user-lookup {
+  position: absolute;
+  bottom: 100%;
+  left: 100%;
+
+  background-color: $input-color;
+  border: 1px solid $content-color-dark;
+  border-radius: 4px;
+
+  padding: 0.5em;
+  margin: 0;
+  margin-bottom: 1.5em;
+
   .item {
     white-space: nowrap;
 

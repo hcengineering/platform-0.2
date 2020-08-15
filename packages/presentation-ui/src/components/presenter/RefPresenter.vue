@@ -55,15 +55,6 @@ export default defineComponent({
     return {
       lookupComponent,
       prefix,
-      onBlur (value: string) {
-        console.log(value)
-        if (value !== props.modelValue) {
-          context.emit('update', { value, key: props.attributeKey })
-        }
-      },
-      onPrefix (value: string) {
-        prefix.value = value
-      },
       onUpdateValue (value: string) {
         console.log('value: ', value)
         context.emit('update:modelValue', value)
@@ -76,18 +67,15 @@ export default defineComponent({
 
 <template>
   <div class="presentation-ui-ref-presenter">
-    {{prefix}}
     <div class="lookup">
-      <div class="content">
-        <widget
-          :component="lookupComponent"
-          v-model:lookup="prefix"
-          :modelValue="modelValue"
-          @update:modelValue="onUpdateValue"
-        />
-      </div>
+      <widget
+        :component="lookupComponent"
+        v-model:lookup="prefix"
+        :modelValue="modelValue"
+        @update:modelValue="onUpdateValue"
+      />
     </div>
-    <InlineEdit :placeholder="placeholder" v-model="prefix" @blur="onBlur" />
+    <InlineEdit :placeholder="placeholder" v-model="prefix" />
   </div>
 </template>
 
@@ -99,19 +87,19 @@ export default defineComponent({
     position: relative;
     display: inline-block;
 
-    .content {
-      position: absolute;
-      bottom: 100%;
-      left: 100%;
+    // .content {
+    //   position: absolute;
+    //   bottom: 100%;
+    //   left: 100%;
 
-      background-color: $input-color;
-      border: 1px solid $content-color-dark;
-      border-radius: 4px;
+    //   background-color: $input-color;
+    //   border: 1px solid $content-color-dark;
+    //   border-radius: 4px;
 
-      padding: 0.5em;
-      margin: 0;
-      margin-bottom: 1.5em;
-    }
+    //   padding: 0.5em;
+    //   margin: 0;
+    //   margin-bottom: 1.5em;
+    // }
   }
 }
 </style>
