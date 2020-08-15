@@ -63,10 +63,8 @@ export default defineComponent({
           <div class="edit">
             <widget
               :component="attr.presenter"
-              :attributeKey="attr.key"
+              :attribute="attr"
               v-model="object[attr.key]"
-              :placeholder="attr.placeholder"
-              :type="attr.type"
               @update="update"
             />
             <!--            <InlineEdit :placeholder="attr.placeholder"/>-->

@@ -22,10 +22,10 @@ import { getPresentationUI } from '@anticrm/presentation-ui/src/utils'
 import { getPresentationCore } from '../utils'
 
 import OwnAttributes from '@anticrm/presentation-ui/src/components/OwnAttributes.vue'
-import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.vue'
+import StringPresenter from '@anticrm/presentation-ui/src/components/presenter/StringPresenter.vue'
 
 export default defineComponent({
-  components: { InlineEdit, OwnAttributes },
+  components: { StringPresenter, OwnAttributes },
   props: {
     _class: {
       type: String as unknown as PropType<Ref<Class<VDoc>>>,
@@ -33,21 +33,22 @@ export default defineComponent({
     },
     object: Object
   },
-  setup(props, context) {
+  setup (props, context) {
     const presentationCore = getPresentationCore()
-    const title = ref(presentationCore.getEmptyAttribute(props._class))
-
     const ui = getPresentationUI()
+
+    const TITLE = 'title'
+
+    const title = ref(presentationCore.getEmptyAttribute(props._class))
     const model = ui.getClassModel(props, model => {
-      const aTitle = model.getAttribute('title')
-      if (aTitle)
-        title.value = aTitle
-      return model.filterAttributes(['title'])
+      title.value = model.getAttribute(TITLE)
+      return model.filterAttributes([TITLE])
     })
 
     return {
       model,
       title,
+      TITLE,
     }
   }
 })
@@ -56,12 +57,18 @@ export default defineComponent({
 <template>
   <div class="task-view">
     <div class="caption-1">Зaдача №243</div>
-    <InlineEdit class="caption-2" :placeholder="title.placeholder"/>
+    <StringPresenter class="caption-2" :attribute="title" v-model="object[TITLE]" />
 
     <div class="attributes">
-      <OwnAttributes class="group" v-for="group in model.getGroups()" :_class="group._class" :model="model" :object="object"></OwnAttributes>
+      <OwnAttributes
+        class="group"
+        v-for="group in model.getGroups()"
+        :_class="group._class"
+        :model="model"
+        :object="object"
+        :key="group._class"
+      ></OwnAttributes>
     </div>
-
   </div>
 </template>
 
@@ -69,7 +76,6 @@ export default defineComponent({
 @import "~@anticrm/sparkling-theme/css/_variables.scss";
 
 .task-view {
-
   .attributes {
     display: flex;
     flex-wrap: wrap;

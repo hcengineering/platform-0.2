@@ -18,26 +18,18 @@ import { defineComponent, PropType, ref } from 'vue'
 import { Doc, PropertyType } from '@anticrm/platform'
 import { RefTo } from '@anticrm/platform-core'
 import { getCoreService, getPresentationCore } from '../../utils'
-import presentationCore from '@anticrm/presentation-core'
+import presentationCore, { AttrModel } from '@anticrm/presentation-core'
 
 import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.vue'
 
 export default defineComponent({
   components: { InlineEdit },
   props: {
-    type: {
-      type: Object as PropType<RefTo<Doc>>,
-      required: true
-    },
-    attributeKey: {
-      type: String,
+    attribute: {
+      type: Object as PropType<AttrModel>,
       required: true
     },
     modelValue: String,
-    placeholder: {
-      type: String,
-      required: true
-    },
     maxWidth: {
       type: Number,
       default: 300
@@ -48,7 +40,8 @@ export default defineComponent({
     const presentationCoreService = getPresentationCore()
 
     const lookupComponent = ref('')
-    lookupComponent.value = presentationCoreService.getComponentExtension(props.type.to, presentationCore.class.LookupForm)
+    const type = props.attribute.type as RefTo<Doc>
+    lookupComponent.value = presentationCoreService.getComponentExtension(type.to, presentationCore.class.LookupForm)
 
     const prefix = ref('')
     const value = ref(props.modelValue)
@@ -96,7 +89,12 @@ export default defineComponent({
         v-model:lookup="prefix"
       />
     </div>
-    <InlineEdit :placeholder="placeholder" v-model="prefix" @focus="onFocus" @blur="onBlur" />
+    <InlineEdit
+      :placeholder="attribute.placeholder"
+      v-model="prefix"
+      @focus="onFocus"
+      @blur="onBlur"
+    />
   </div>
 </template>
 
