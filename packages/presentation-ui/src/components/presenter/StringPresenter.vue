@@ -14,7 +14,7 @@
 -->
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue'
+import { defineComponent, PropType, ref, watch } from 'vue'
 import { AttrModel } from '@anticrm/presentation-core'
 
 import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.vue'
@@ -33,13 +33,22 @@ export default defineComponent({
     }
   },
   setup (props, context) {
+    const value = ref('')
+    watch(() => props.modelValue, v => value.value = v)
+
+    return {
+      value,
+      onChange (event) {
+        context.emit('update:modelValue', value.value)
+      }
+    }
   },
 })
 
 </script>
 
 <template>
-  <InlineEdit :placeholder="attribute.placeholder" v-model="modelValue" />
+  <InlineEdit :placeholder="attribute.placeholder" v-model="value" @change="onChange" />
 </template>
 
 <style lang="scss">
