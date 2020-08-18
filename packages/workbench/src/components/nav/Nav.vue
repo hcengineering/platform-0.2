@@ -14,57 +14,70 @@
 -->
 
 <script lang="ts">
-  import { defineComponent, PropType } from 'vue'
-  import { Application } from '../..'
+import { defineComponent, PropType } from 'vue'
+import { Application } from '../..'
 
-  import Icon from '@anticrm/platform-ui/src/components/Icon.vue'
-  import LinkTo from '@anticrm/platform-ui/src/components/LinkTo.vue'
+import Icon from '@anticrm/platform-ui/src/components/Icon.vue'
+import LinkTo from '@anticrm/platform-ui/src/components/LinkTo.vue'
 
-  export default defineComponent({
-    components: { Icon, LinkTo },
-    props: {
-      apps: {
-        type: Array as PropType<Application[]>,
-        required: true
-      },
-      current: String
+export default defineComponent({
+  components: { Icon, LinkTo },
+  props: {
+    apps: {
+      type: Array as PropType<Application[]>,
+      required: true
     },
+    current: String
+  },
 
-    setup(props) {
-    }
-  })
+  setup (props) {
+  }
+})
 </script>
 
 <template>
   <div class="workbench-nav">
-    <div v-for="app in apps" class="app-icon" :class="{'current-app': app._id === current}">
-<!--      <LinkTo :path="[app._id]">-->
+    <div
+      v-for="app in apps"
+      class="app-icon"
+      :class="{'current-app': app._id === current}"
+      :key="app._id"
+    >
+      <!--      <LinkTo :path="[app._id]">-->
       <a href="#" @click.prevent="$emit('navigate', app)">
-        <Icon :icon="app.icon" class="icon-embed-2x"/>
+        <Icon :icon="app.icon" class="icon-embed-2x" />
       </a>
-<!--      </LinkTo>-->
+      <!--      </LinkTo>-->
     </div>
+    <div class="remainder"></div>
   </div>
 </template>
 
 <style lang="scss">
-  @import "~@anticrm/sparkling-theme/css/_variables.scss";
+@import "~@anticrm/sparkling-theme/css/_variables.scss";
 
-  .workbench-nav {
-    display: flex;
-    flex-direction: column;
+.workbench-nav {
+  display: flex;
+  flex-direction: column;
 
-    .app-icon {
-      border-bottom: solid 1px $workspace-separator-color;
-      height: $pictogram-size;
-      .ui-icon {
-        padding:1em;
-      }
+  .app-icon {
+    border-bottom: solid 1px $workspace-separator-color;
+    // border-right: solid 1px $workspace-separator-color;
+    height: $pictogram-size;
 
-      &.current-app {
-        background-color: $content-bg-color;
-      }
+    .ui-icon {
+      padding: 1em;
+    }
+
+    &.current-app {
+      background-color: $content-bg-color;
+      border-right: solid 1px $content-bg-color;
     }
   }
 
+  .remainder {
+    flex-grow: 1;
+    border-right: solid 1px $workspace-separator-color;
+  }
+}
 </style>

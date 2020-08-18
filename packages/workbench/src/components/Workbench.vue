@@ -18,6 +18,7 @@ import { computed, defineComponent, PropType, ref } from 'vue'
 
 import Nav from './nav/Nav.vue'
 import Home from './Home.vue'
+import Projects from './Projects.vue'
 import InputControl from './InputControl.vue'
 import DetailsForm from './DetailsForm.vue'
 
@@ -29,7 +30,7 @@ import { Doc } from '@anticrm/platform'
 
 
 export default defineComponent({
-  components: { Nav, Home, InputControl, DetailsForm },
+  components: { Nav, Home, Projects, InputControl, DetailsForm },
   props: {
     location: {
       type: Object as PropType<Location>,
@@ -45,7 +46,7 @@ export default defineComponent({
 
     const app = computed(() => props.location.path[0])
 
-    function currentApp(): Application | undefined {
+    function currentApp (): Application | undefined {
       for (const application of apps.value) {
         if (application._id === app.value) {
           return application
@@ -70,7 +71,7 @@ export default defineComponent({
     const uiService = getUIService()
 
     function navigateApp (app: Application) {
-      uiService.navigate(uiService.toUrl({app: undefined, path: [app._id]}))
+      uiService.navigate(uiService.toUrl({ app: undefined, path: [app._id] }))
     }
 
     const details = ref<Doc | null>(null)
@@ -92,37 +93,26 @@ export default defineComponent({
 
 <template>
   <div id="workbench">
-    <!--    <header>-->
-    <!--      <div/>-->
-    <!--      &lt;!&ndash;      <Header/>&ndash;&gt;-->
-    <!--    </header>-->
-
     <nav>
-      <!-- <Sidenav :applications="applications" /> -->
-      <Nav :apps="apps"
-           :current="app"
-           @navigate="navigateApp"
-      />
+      <Nav :apps="apps" :current="app" @navigate="navigateApp" />
     </nav>
 
+    <div class="projects">
+      <Projects />
+    </div>
+
     <main>
-      <widget v-if="appClass"
-              :component="mainComponent"
-              :_class="appClass"
-              @open="open"
-      />
-      <Home v-else/>
+      <widget v-if="appClass" :component="mainComponent" :_class="appClass" @open="open" />
+      <Home v-else />
     </main>
 
     <div class="input">
-      <InputControl/>
+      <InputControl />
     </div>
 
     <aside>
-      <DetailsForm v-if="details" :object="details" @done="done"/>
+      <DetailsForm v-if="details" :object="details" @done="done" />
     </aside>
-
-    <!--    <footer></footer>-->
   </div>
 </template>
 
@@ -132,7 +122,7 @@ export default defineComponent({
 #workbench {
   display: grid;
 
-  grid-template-columns: $pictogram-size 1fr auto;
+  grid-template-columns: $pictogram-size 250px 1fr auto;
   //grid-template-rows: $pictogram-size 1fr 24px;
   grid-template-rows: 1fr auto;
 
@@ -140,7 +130,7 @@ export default defineComponent({
 
   header {
     grid-column-start: 1;
-    grid-column-end: 4;
+    grid-column-end: 5;
 
     grid-row-start: 1;
     grid-row-end: 2;
@@ -159,9 +149,23 @@ export default defineComponent({
     background-color: $nav-bg-color;
   }
 
-  main {
+  .projects {
     grid-column-start: 2;
     grid-column-end: 3;
+
+    grid-row-start: 1;
+    grid-row-end: 3;
+
+    background-color: $content-bg-color;
+    // border-left: 1px solid $workspace-separator-color;
+    border-right: 1px solid $workspace-separator-color;
+
+    padding: 1em;
+  }
+
+  main {
+    grid-column-start: 3;
+    grid-column-end: 4;
 
     grid-row-start: 1;
     grid-row-end: 2;
@@ -173,8 +177,8 @@ export default defineComponent({
   }
 
   .input {
-    grid-column-start: 2;
-    grid-column-end: 3;
+    grid-column-start: 3;
+    grid-column-end: 4;
 
     grid-row-start: 2;
     grid-row-end: 3;
@@ -183,8 +187,8 @@ export default defineComponent({
   }
 
   aside {
-    grid-column-start: 3;
-    grid-column-end: 4;
+    grid-column-start: 4;
+    grid-column-end: 5;
 
     grid-row-start: 1;
     grid-row-end: 3;
@@ -192,16 +196,6 @@ export default defineComponent({
     background-color: $header-bg-color;
     //background-color: $content-bg-color;
     border-left: 1px solid $workspace-separator-color;
-  }
-
-  footer {
-    grid-column-start: 1;
-    grid-column-end: 4;
-
-    grid-row-start: 3;
-    grid-row-end: 4;
-
-    background-color: purple;
   }
 }
 </style>
