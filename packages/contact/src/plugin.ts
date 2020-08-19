@@ -13,21 +13,30 @@
 // limitations under the License.
 //
 
-import { Platform, Service } from '@anticrm/platform'
+import { Platform, Service, StringProperty } from '@anticrm/platform'
 
-import contact from '.'
+import contact, { User, ContactService } from '.'
 import PersonProperties from './components/PersonProperties.vue'
 import UserLookup from './components/UserLookup.vue'
+import { CoreService } from '@anticrm/platform-core'
 
 /*!
  * Anticrm Platform™ Contact Plugin
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */
-export default async (platform: Platform): Promise<Service> => {
+export default async (platform: Platform, deps: { core: CoreService }): Promise<ContactService> => {
 
   platform.setResource(contact.component.PersonProperties, PersonProperties)
   platform.setResource(contact.component.UserLookup, UserLookup)
 
-  return {}
+  const coreService = deps.core
+
+  function getUser (account: string): Promise<User> {
+    return coreService.findOne(contact.mixin.User, { account: account as StringProperty }) as Promise<User>
+  }
+
+  return {
+    getUser
+  }
 }

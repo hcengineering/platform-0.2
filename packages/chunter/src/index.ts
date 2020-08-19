@@ -15,6 +15,8 @@
 
 import { DateProperty, Emb, plugin, Plugin, Service, StringProperty, VDoc } from '@anticrm/platform'
 import { AnyComponent, Asset } from '@anticrm/platform-ui'
+import contact from '@anticrm/contact'
+import ui from '@anticrm/platform-ui'
 
 export interface Comment extends Emb {
   _createdOn: DateProperty
@@ -28,7 +30,7 @@ export interface Message extends VDoc {
   comments: Comment[]
 }
 
-export default plugin('chunter' as Plugin<Service>, {}, {
+export default plugin('chunter' as Plugin<Service>, { ui: ui.id, contact: contact.id }, {
   icon: {
     Chunter: '' as Asset,
   },

@@ -13,11 +13,23 @@
 // limitations under the License.
 //
 
+import { CoreService } from '@anticrm/platform-core'
 import { PresentationCore } from '@anticrm/presentation-core'
 import { inject } from 'vue'
+import { ContactService } from '@anticrm/contact'
 
+export const CoreInjectionKey = 'core-injection-key'
 export const PresentationCoreInjectionKey = 'presentation-core-injection-key'
+export const ContactServiceInjectionKey = 'contact-injection-key'
 
-export function getPresentationCore(): PresentationCore {
+export function getCoreService (): CoreService {
+  return inject(CoreInjectionKey) as CoreService
+}
+
+export function getPresentationCore (): PresentationCore {
   return inject(PresentationCoreInjectionKey) as PresentationCore
+}
+
+export function getContactService (): ContactService {
+  return inject(ContactServiceInjectionKey) as ContactService
 }

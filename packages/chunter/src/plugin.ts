@@ -14,18 +14,24 @@
 //
 
 import { Platform, Service } from '@anticrm/platform'
+import { ContactServiceInjectionKey } from './utils'
 import chunter from '.'
 
 import ChunterView from './components/ChunterView.vue'
+import { ContactService } from '@anticrm/contact'
+import { UIService } from '@anticrm/platform-ui'
 
 /*!
  * Anticrm Platform™ Recruitment Plugin
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */
-export default async (platform: Platform): Promise<Service> => {
+export default async (platform: Platform, deps: { ui: UIService, contact: ContactService }): Promise<Service> => {
 
   platform.setResource(chunter.component.ChunterView, ChunterView)
+
+  deps.ui.getApp()
+    .provide(ContactServiceInjectionKey, deps.contact)
 
   return {}
 }

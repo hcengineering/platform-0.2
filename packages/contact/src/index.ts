@@ -15,6 +15,7 @@
 
 import { Mixin, plugin, Plugin, Property, Ref, Service, VDoc } from '@anticrm/platform'
 import { Asset, AnyComponent } from '@anticrm/platform-ui'
+import core from '@anticrm/platform-core'
 
 export interface Contact extends VDoc {
   phone?: string
@@ -33,7 +34,11 @@ export interface User extends Person {
   displayName: string
 }
 
-export default plugin('contact' as Plugin<Service>, {}, {
+export interface ContactService extends Service {
+  getUser (account: string): Promise<User>
+}
+
+export default plugin('contact' as Plugin<ContactService>, { core: core.id }, {
   icon: {
     Date: '' as Asset,
     Phone: '' as Asset,
