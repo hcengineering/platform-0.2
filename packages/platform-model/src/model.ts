@@ -41,6 +41,7 @@ export default (S: Builder) => {
   })
 
   S.createClass(core.class.VDoc, core.class.Doc, {
+    _space: S.attr(core.class.Type, {}),
     _createdOn: S.attr(core.class.Type, {}),
     _createdBy: S.attr(core.class.Type, {}),
     _modifiedOn: S.attr(core.class.Type, {}),
@@ -77,6 +78,9 @@ export default (S: Builder) => {
   S.createClass(core.class.Mixin, core.class.Class, {
   }, CoreDomain.Model)
 
+  S.createClass(core.class.Space, core.class.Doc, {
+  }, CoreDomain.Model)
+
   S.createClass(core.class.Tx, core.class.Doc, {
     _objectClass: S.attr(core.class.RefTo, { to: core.class.Class }),
     _objectId: S.attr(core.class.Type, {}),
@@ -92,5 +96,6 @@ export default (S: Builder) => {
 
   S.createClass(core.class.DeleteTx, core.class.Tx, {
   }, CoreDomain.Tx)
+
 
 }

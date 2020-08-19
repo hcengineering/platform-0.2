@@ -34,6 +34,11 @@ export default (S: UIBuilder) => {
     presenter: S.attr(core.class.Type, {})
   })
 
+  S.createMixin(ui.mixin.UXObject, core.class.Doc, {
+    label: S.attr(core.class.Type, {}),
+    icon: S.attr(core.class.Type, {})
+  })
+
   S.mixin(core.class.Type, ui.class.Presenter, {
     presenter: presentationUI.component.StringPresenter
   })

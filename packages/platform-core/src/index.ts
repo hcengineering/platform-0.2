@@ -27,7 +27,8 @@ import {
   plugin,
   Ref,
   Service,
-  Type
+  Type,
+  Space
 } from '@anticrm/platform'
 import { ModelDb } from './modeldb'
 
@@ -52,7 +53,7 @@ export interface ArrayOf<A> extends Type {
 // P L U G I N
 
 export interface CoreService extends Service, CoreProtocol {
-  getModel(): ModelDb
+  getModel (): ModelDb
   query (_class: Ref<Class<Doc>>, query: AnyLayout, listener: (result: Doc[]) => void): () => void
 }
 
@@ -64,5 +65,6 @@ export default plugin('core' as Plugin<CoreService>, {}, {
     Class: '' as Ref<Class<Class<Obj>>>,
     CreateTx: '' as Ref<Class<CreateTx>>,
     DeleteTx: '' as Ref<Class<DeleteTx>>,
+    Space: '' as Ref<Class<Space>>,
   }
 })

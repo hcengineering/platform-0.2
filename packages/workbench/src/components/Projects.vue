@@ -14,18 +14,39 @@
 -->
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, ref } from 'vue'
+import { Doc } from '@anticrm/platform'
+import { getCoreService } from '../utils'
+import core from '@anticrm/platform-core'
+import ui from '@anticrm/presentation-core'
 
 export default defineComponent({
+  setup (props) {
+    const coreService = getCoreService()
+    const model = coreService.getModel()
+
+    const spaces = ref<Doc[]>([])
+    model.find(core.class.Space, {}).then(s => spaces.value = model.cast(s, ui.mixin.UXObject))
+    return {
+      spaces
+    }
+  }
 })
 </script>
 
 <template>
   <div class="workbench-projects">
-    <div class="caption-3">Базы данных</div>
-    <div class="project">Задачи</div>
-    <div class="project">Контакты</div>
-    <div class="project">Рекрутинг</div>
+    <!-- <div class="caption-3">Запрос</div>
+    <div class="project">Хитромудрый запрос по бд `Контакт`</div>-->
+
+    <div class="caption-3">Пространства</div>
+    <div class="project" v-for="space in spaces" :key="space._id">#{{space.label}}</div>
+
+    <div class="caption-3">Тип</div>
+    <div class="project">Контакт</div>
+    <div class="project">Задача</div>
+    <div class="project">Кандидат</div>
+    <div class="project">Интервью</div>
   </div>
 </template>
 

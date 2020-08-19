@@ -81,9 +81,9 @@ export interface EClass<T extends E, E extends Obj> extends EClassifier<T, E> {
 
 export type Class<T extends Obj> = EClass<T, Obj>
 
-// P R O J E C T S
+// S P A C E S
 
-export interface Project extends Doc {
+export interface Space extends Doc {
 
 }
 
@@ -92,7 +92,7 @@ export interface Project extends Doc {
 export type DateProperty = Property<number, Date>
 
 export interface VDoc extends Doc {
-  _project: Ref<Project>
+  _space: Ref<Space>
   _createdOn: DateProperty
   _createdBy: StringProperty
   _modifiedOn?: DateProperty

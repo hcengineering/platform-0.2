@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Attribute, Class, Classifier, CoreDomain, Doc, MemDb, Mixin, Obj, Ref } from '@anticrm/platform'
+import { AnyLayout, Attribute, Class, Classifier, CoreDomain, Doc, MemDb, Mixin, Obj, Ref, Space } from '@anticrm/platform'
 import core from '.'
 
 interface Proxy {
@@ -22,7 +22,7 @@ interface Proxy {
 
 export class ModelDb extends MemDb {
 
-  constructor () {
+  constructor() {
     super(CoreDomain.Model)
   }
 
@@ -34,7 +34,7 @@ export class ModelDb extends MemDb {
   private prototypes = new Map<Ref<Classifier<Obj>>, Object>()
 
   createPrototype (classifier: Classifier<Obj>): Object {
-    const attributes = classifier._attributes as {[key: string]: Attribute}
+    const attributes = classifier._attributes as { [key: string]: Attribute }
     const descriptors = {} as PropertyDescriptorMap
     for (const key in attributes) {
       // const attribute = attributes[key]
@@ -65,6 +65,10 @@ export class ModelDb extends MemDb {
     const proxy = Object.create(this.getPrototype(mixin)) as Proxy & T
     proxy.__layout = doc
     return proxy
+  }
+
+  cast<T extends Doc> (docs: Doc[], mixin: Ref<Mixin<T>>): T[] {
+    return docs.map(doc => this.as(doc, mixin))
   }
 
   isMixedIn (obj: Doc, _class: Ref<Mixin<Doc>>): boolean {
