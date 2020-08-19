@@ -13,10 +13,13 @@
 // limitations under the License.
 //
 
+import { Ref, Class } from '@anticrm/platform'
 import { UIBuilder } from '@anticrm/presentation-model'
 import workbench from '@anticrm/workbench-model'
 import { Property, StringProperty } from '@anticrm/platform'
 import core from '@anticrm/platform-model'
+import contact from '@anticrm/contact-model'
+import { Person } from '@anticrm/contact'
 
 import chunter, { ChunterDomain } from '.'
 import { IntlString } from '@anticrm/platform-i18n'
@@ -44,8 +47,11 @@ export default (S: UIBuilder) => {
     })
   })
 
-  // S.mixin(chunter.class.Candidate as Ref<Class<Candidate>>, presentation.class.DetailsForm, {
-  //   form: recruitment.component.View2
-  // })
+  S.createMixin(chunter.mixin.ChunterInfo, core.class.Class, {
+    component: S.attr(core.class.Type, {})
+  })
 
+  S.mixin(contact.class.Person as Ref<Class<Person>>, chunter.mixin.ChunterInfo, { // TODO: type problems
+    component: chunter.component.ContactInfo
+  })
 }

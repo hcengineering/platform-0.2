@@ -13,10 +13,11 @@
 // limitations under the License.
 //
 
-import { DateProperty, Emb, plugin, Plugin, Service, StringProperty, VDoc } from '@anticrm/platform'
+import { DateProperty, Emb, plugin, Plugin, Service, StringProperty, VDoc, Ref, Mixin } from '@anticrm/platform'
 import { AnyComponent, Asset } from '@anticrm/platform-ui'
 import contact from '@anticrm/contact'
 import ui from '@anticrm/platform-ui'
+import { ComponentExtension } from '@anticrm/presentation-core'
 
 export interface Comment extends Emb {
   _createdOn: DateProperty
@@ -35,6 +36,10 @@ export default plugin('chunter' as Plugin<Service>, { ui: ui.id, contact: contac
     Chunter: '' as Asset,
   },
   component: {
-    ChunterView: '' as AnyComponent
+    ChunterView: '' as AnyComponent,
+    ContactInfo: '' as AnyComponent,
+  },
+  mixin: {
+    ChunterInfo: '' as Ref<Mixin<ComponentExtension<VDoc>>>
   }
 })

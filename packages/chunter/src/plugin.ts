@@ -18,6 +18,7 @@ import { ContactServiceInjectionKey } from './utils'
 import chunter from '.'
 
 import ChunterView from './components/ChunterView.vue'
+import ContactInfo from './components/ContactInfo.vue'
 import { ContactService } from '@anticrm/contact'
 import { UIService } from '@anticrm/platform-ui'
 
@@ -29,6 +30,7 @@ import { UIService } from '@anticrm/platform-ui'
 export default async (platform: Platform, deps: { ui: UIService, contact: ContactService }): Promise<Service> => {
 
   platform.setResource(chunter.component.ChunterView, ChunterView)
+  platform.setResource(chunter.component.ContactInfo, ContactInfo)
 
   deps.ui.getApp()
     .provide(ContactServiceInjectionKey, deps.contact)

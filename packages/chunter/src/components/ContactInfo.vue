@@ -18,9 +18,8 @@
 import { defineComponent, ref, PropType } from 'vue'
 import { CreateTx } from '@anticrm/platform'
 
-import { getPresentationCore, getContactService } from '../utils'
+import { getCoreService, getContactService } from '../utils'
 import { User } from '@anticrm/contact'
-import chunter from '..'
 
 export default defineComponent({
   components: {
@@ -29,46 +28,18 @@ export default defineComponent({
     tx: Object as PropType<CreateTx>
   },
   setup (props, context) {
-    const contactService = getContactService()
-    const presentationCore = getPresentationCore()
-
-    const user = ref<User | undefined>(undefined)
-
-    contactService.getUser(props.tx._user).then(u => user.value = u)
-
-    const component = presentationCore.getComponentExtension(props.tx._objectClass, chunter.mixin.ChunterInfo)
-
-    return { user, component }
   }
 })
 </script>
 
 <template>
-  <div class="chunter-chunter-item">
-    <img class="avatar" src="../../assets/ava2x48.jpg" />
-    <div class="details">
-      <b>{{user?.firstName}} {{user?.lastName}} {{ user?._id }}</b> 15:23
-      <div>
-        <widget :component="component" :tx="tx" />
-      </div>
-    </div>
+  <div class="chunter-contact-info">
+    Создал контакт
+    <b>{{tx._attributes.firstName}} {{tx._attributes.lastName}}</b>
   </div>
 </template>
 
 <style lang="scss">
-.chunter-chunter-item {
-  display: flex;
-  margin: 1em;
-
-  .avatar {
-    object-fit: cover;
-    border-radius: 4px;
-    width: 3em;
-    height: 3em;
-  }
-
-  .details {
-    padding-left: 1em;
-  }
+.chunter-contact-info {
 }
 </style>
