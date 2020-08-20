@@ -57,9 +57,11 @@ export default defineComponent({
       <span class="caption-1">Chunter</span>&nbsp;
       <!--      <a href="#" @click.prevent="add"><Icon :icon="workbench.icon.Add" class="icon-embed-2x"/></a>-->
     </div>
-    <div class="content">
-      <ChunterItem :tx="doc" v-for="doc in content" :key="doc._id" />
-    </div>
+    <ScrollView>
+      <div class="content">
+        <ChunterItem :tx="doc" v-for="doc in content" :key="doc._id" />
+      </div>
+    </ScrollView>
   </div>
 </template>
 
@@ -68,6 +70,10 @@ export default defineComponent({
   height: 100%;
   display: flex;
   flex-direction: column;
+
+  .sparkling-scroll-view {
+    height: 100%;
+  }
 
   .content {
     flex-grow: 1;
