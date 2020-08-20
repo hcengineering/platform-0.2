@@ -15,6 +15,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, PropType, ref } from 'vue'
+import { Ref } from '@anticrm/platform'
 
 import Nav from './nav/Nav.vue'
 import Home from './Home.vue'
@@ -74,6 +75,10 @@ export default defineComponent({
       uiService.navigate(uiService.toUrl({ app: undefined, path: [app._id] }))
     }
 
+    function navigateProject (ref: Ref<Doc>) {
+      uiService.navigate(uiService.toUrl({ app: undefined, path: [app.value, ref] }))
+    }
+
     const details = ref<Doc | null>(null)
 
     function open (object: Doc) {
@@ -85,7 +90,7 @@ export default defineComponent({
       details.value = null
     }
 
-    return { apps, app, appClass, mainComponent, navigateApp, open, done, details }
+    return { apps, app, appClass, mainComponent, navigateApp, navigateProject, open, done, details }
   }
 
 })
@@ -98,7 +103,7 @@ export default defineComponent({
     </nav>
 
     <div class="projects">
-      <Projects />
+      <Projects @navigate="navigateProject" />
     </div>
 
     <main>

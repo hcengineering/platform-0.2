@@ -40,7 +40,13 @@ export default defineComponent({
     <div class="project">Хитромудрый запрос по бд `Контакт`</div>-->
 
     <div class="caption-3">Пространства</div>
-    <div class="project" v-for="space in spaces" :key="space._id">#{{space.label}}</div>
+    <a
+      class="project"
+      v-for="space in spaces"
+      :key="space._id"
+      href="#"
+      @click.prevent="$emit('navigate', space._id)"
+    >#{{space.label}}</a>
 
     <div class="caption-3">Тип</div>
     <div class="project">Контакт</div>
@@ -53,10 +59,9 @@ export default defineComponent({
 <style lang="scss">
 .workbench-projects {
   .project {
-    // font-weight: bold;
-    // font-size: 11px;
     font-family: Raleway;
     margin: 0.5em;
+    text-decoration: none;
   }
 }
 </style>
