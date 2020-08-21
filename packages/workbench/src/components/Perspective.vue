@@ -14,21 +14,18 @@
 -->
 
 <script lang="ts">
-import { computed, defineComponent, PropType, ref } from 'vue'
-import { Ref } from '@anticrm/platform'
-
-import Nav from './nav/Nav.vue'
-import WorkbenchMain from './WorkbenchMain.vue'
+import { computed, defineComponent, PropType, ref, watch } from 'vue'
+import { Ref, Doc } from '@anticrm/platform'
 
 import { getCoreService, getUIService } from '../utils'
 import workbench, { Application } from '../..'
 import { Location } from '@anticrm/platform-ui'
 
-import { Doc } from '@anticrm/platform'
-
+import Projects from './Projects.vue'
+import Home from './Home.vue'
 
 export default defineComponent({
-  components: { Nav, WorkbenchMain },
+  components: { Projects, Home },
   props: {
     location: {
       type: Object as PropType<Location>,
@@ -37,46 +34,48 @@ export default defineComponent({
   },
   setup (props) {
     const app = computed(() => props.location.path[0])
+    const project = computed(() => props.location.path[1])
+    const component = ref('')
+
+    watch(() => props.location, location => {
+      component.value = location.path[1] + '.'
+    }, { immediate: true })
 
     const uiService = getUIService()
-
-    function navigateApp (app: Application) {
-      uiService.navigate(uiService.toUrl({ app: undefined, path: [app._id] }))
+    function navigate (project: Ref<Doc>) {
+      uiService.navigate(uiService.toUrl({ app: undefined, path: [app.value, project] }))
     }
 
-    return { app, navigateApp }
+    return { project, component, navigate }
   }
 
 })
 </script>
 
 <template>
-  <div id="workbench">
-    <nav>
-      <Nav :current="app" @navigate="navigateApp" />
-    </nav>
-
-    <main>
-      <WorkbenchMain :location="location" />
-    </main>
+  <div class="workbench-perspective">
+    <div class="projects">
+      <Projects @navigate="navigate" />
+    </div>
+    <div class="main">
+      {{component}}
+      <Home />
+    </div>
   </div>
 </template>
 
 <style lang="scss">
 @import "~@anticrm/sparkling-theme/css/_variables.scss";
 
-#workbench {
+.workbench-perspective {
   display: flex;
   height: 100%;
 
-  nav {
-    width: $pictogram-size;
-    background-color: $nav-bg-color;
-  }
+  .projects {
+    padding: 1em;
+    width: 20em;
 
-  main {
-    background-color: $content-bg-color;
-    width: 100%;
+    border-right: 1px solid $workspace-separator-color;
   }
 }
 </style>

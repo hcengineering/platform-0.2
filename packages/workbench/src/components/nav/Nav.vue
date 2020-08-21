@@ -14,8 +14,9 @@
 -->
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue'
-import { Application } from '../..'
+import { defineComponent, PropType, ref } from 'vue'
+import workbench, { Application } from '../..'
+import { getCoreService } from '../../utils'
 
 import Icon from '@anticrm/platform-ui/src/components/Icon.vue'
 import LinkTo from '@anticrm/platform-ui/src/components/LinkTo.vue'
@@ -23,14 +24,17 @@ import LinkTo from '@anticrm/platform-ui/src/components/LinkTo.vue'
 export default defineComponent({
   components: { Icon, LinkTo },
   props: {
-    apps: {
-      type: Array as PropType<Application[]>,
-      required: true
-    },
     current: String
   },
 
   setup (props) {
+    const apps = ref([] as Application[])
+    const coreService = getCoreService()
+    coreService.getModel().find(workbench.class.Application, {}).then(docs => {
+      apps.value = docs as Application[]
+    })
+
+    return { apps }
   }
 })
 </script>
@@ -43,11 +47,9 @@ export default defineComponent({
       :class="{'current-app': app._id === current}"
       :key="app._id"
     >
-      <!--      <LinkTo :path="[app._id]">-->
       <a href="#" @click.prevent="$emit('navigate', app)">
         <Icon :icon="app.icon" class="icon-embed-2x" />
       </a>
-      <!--      </LinkTo>-->
     </div>
     <div class="remainder"></div>
   </div>

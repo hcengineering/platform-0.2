@@ -57,4 +57,12 @@ export default (S: UIBuilder) => {
     icon: recruitment.icon.Recruitment,
     itemClass: recruitment.class.Candidate
   })
+
+  S.createDocument(core.class.Space, {
+  }, recruitment.space.Recruitment)
+
+  S.mixin(recruitment.space.Recruitment, presentation.mixin.UXObject, {
+    label: 'Рекрутинг' as IntlString
+  })
+
 }

@@ -13,8 +13,12 @@
 // limitations under the License.
 //
 
+import { Ref } from '@anticrm/platform'
 import { extendIds } from '@anticrm/platform-model'
-import workbench from '@anticrm/workbench'
+import workbench, { Application } from '@anticrm/workbench'
 
 export default extendIds(workbench, {
+  application: {
+    Default: '' as Ref<Application>
+  }
 })

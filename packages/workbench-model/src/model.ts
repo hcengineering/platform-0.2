@@ -15,6 +15,8 @@
 
 import core, { Builder } from '@anticrm/platform-model'
 import workbench from '.'
+import chunter from '@anticrm/chunter-model'
+import { StringProperty } from '@anticrm/platform'
 
 export default (S: Builder) => {
 
@@ -30,5 +32,12 @@ export default (S: Builder) => {
     icon: S.attr(core.class.Type, {}),
     itemClass: S.attr(core.class.Type, {}),
   })
+
+  S.createDocument(workbench.class.Application, {
+    label: 'Default' as StringProperty,
+    icon: chunter.icon.Chunter,
+    main: workbench.component.Browser,
+    appClass: chunter.class.Message
+  }, workbench.application.Default)
 
 }
