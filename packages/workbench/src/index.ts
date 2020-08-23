@@ -13,11 +13,10 @@
 // limitations under the License.
 //
 
-import { Class, Doc, plugin, Plugin, Ref, Service, StringProperty, VDoc, Mixin } from '@anticrm/platform'
+import { Class, Doc, plugin, Plugin, Ref, Service, StringProperty, VDoc, Mixin, Space } from '@anticrm/platform'
 import ui, { AnyComponent, Asset } from '@anticrm/platform-ui'
 import core from '@anticrm/platform-core'
 import presentationUI from '@anticrm/presentation-ui'
-import { ComponentExtension } from '@anticrm/presentation-core'
 
 export interface Application extends Doc {
   label: StringProperty
@@ -30,6 +29,10 @@ export interface WorkbenchCreateItem extends Doc {
   label: StringProperty
   icon: Asset
   itemClass: Ref<Class<VDoc>>
+}
+
+export interface SpaceExtension extends Space {
+  component: AnyComponent
 }
 
 export interface WorkbenchService extends Service {
@@ -51,6 +54,6 @@ export default plugin('workbench' as Plugin<WorkbenchService>, {
     Add: '' as Asset
   },
   mixin: {
-    SpaceComponent: '' as Ref<Mixin<ComponentExtension<VDoc>>>
+    SpaceExtension: '' as Ref<Mixin<SpaceExtension>>
   }
 })

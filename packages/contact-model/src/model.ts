@@ -77,11 +77,4 @@ export default (S: UIBuilder) => {
     itemClass: contact.mixin.User as Ref<Class<VDoc>> // TODO: fix itemClass type
   })
 
-  S.createDocument(core.class.Space, {
-  }, contact.space.Contact)
-
-  S.mixin(contact.space.Contact, presentation.mixin.UXObject, {
-    label: 'Контакты' as IntlString
-  })
-
 }

@@ -15,7 +15,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, PropType, ref, watch } from 'vue'
-import { Ref, Doc } from '@anticrm/platform'
+import { Ref, Doc, Space } from '@anticrm/platform'
 
 import { getCoreService, getUIService } from '../utils'
 import workbench, { Application } from '../..'
@@ -33,12 +33,17 @@ export default defineComponent({
     }
   },
   setup (props) {
+    const coreService = getCoreService()
+    const model = coreService.getModel()
+
     const app = computed(() => props.location.path[0])
     const project = computed(() => props.location.path[1])
-    const component = ref('')
+    const component = ref<string | null>(null)
 
     watch(() => props.location, location => {
-      component.value = location.path[1] + '.'
+      const space = model.get(location.path[1] as Ref<Space>)
+      const spaceExtension = model.as(space, workbench.mixin.SpaceExtension)
+      component.value = spaceExtension.component
     }, { immediate: true })
 
     const uiService = getUIService()
@@ -46,7 +51,9 @@ export default defineComponent({
       uiService.navigate(uiService.toUrl({ app: undefined, path: [app.value, project] }))
     }
 
-    return { project, component, navigate }
+    const type = ref('')
+
+    return { project, component, navigate, type }
   }
 
 })
@@ -55,11 +62,11 @@ export default defineComponent({
 <template>
   <div class="workbench-perspective">
     <div class="projects">
-      <Projects @navigate="navigate" />
+      <Projects @navigate="navigate" v-model:type="type" />
     </div>
     <div class="main">
-      {{component}}
-      <Home />
+      <widget v-if="component" :component="component" />
+      <Home v-else />
     </div>
   </div>
 </template>
@@ -76,6 +83,10 @@ export default defineComponent({
     width: 20em;
 
     border-right: 1px solid $workspace-separator-color;
+  }
+
+  .main {
+    width: 100%;
   }
 }
 </style>
