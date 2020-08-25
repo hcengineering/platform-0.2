@@ -22,10 +22,14 @@ import workbench, { Application } from '../..'
 import { Location } from '@anticrm/platform-ui'
 
 import Projects from './Projects.vue'
-import Home from './Home.vue'
+import InputControl from './InputControl.vue'
+import DetailsForm from './DetailsForm.vue'
+
+import presentationUI from '@anticrm/presentation-ui'
+import chunter from '@anticrm/chunter'
 
 export default defineComponent({
-  components: { Projects, Home },
+  components: { Projects, InputControl, DetailsForm },
   props: {
     location: {
       type: Object as PropType<Location>,
@@ -38,22 +42,33 @@ export default defineComponent({
 
     const app = computed(() => props.location.path[0])
     const project = computed(() => props.location.path[1])
-    const component = ref<string | null>(null)
 
-    watch(() => props.location, location => {
-      const space = model.get(location.path[1] as Ref<Space>)
-      const spaceExtension = model.as(space, workbench.mixin.SpaceExtension)
-      component.value = spaceExtension.component
-    }, { immediate: true })
+    const type = ref('')
+    const component = computed(() => type.value ? presentationUI.component.BrowseView : chunter.component.ChunterView)
+
+    // watch(() => props.location, location => {
+    //   const space = model.get(location.path[1] as Ref<Space>)
+    //   const spaceExtension = model.as(space, workbench.mixin.SpaceExtension)
+    //   component.value = spaceExtension.component
+    // }, { immediate: true })
 
     const uiService = getUIService()
     function navigate (project: Ref<Doc>) {
       uiService.navigate(uiService.toUrl({ app: undefined, path: [app.value, project] }))
     }
 
-    const type = ref('')
+    const details = ref<Doc | null>(null)
 
-    return { project, component, navigate, type }
+    function open (object: Doc) {
+      console.log('open')
+      details.value = object
+    }
+
+    function done () {
+      details.value = null
+    }
+
+    return { project, component, navigate, type, details, open, done }
   }
 
 })
@@ -62,12 +77,16 @@ export default defineComponent({
 <template>
   <div class="workbench-perspective">
     <div class="projects">
-      <Projects @navigate="navigate" v-model:type="type" />
+      <Projects @navigate="navigate" :space="project" v-model:type="type" />
     </div>
     <div class="main">
-      <widget v-if="component" :component="component" />
-      <Home v-else />
+      <widget :_class="type" :space="space" :component="component" @open="open" />
+      <InputControl />
     </div>
+
+    <aside>
+      <DetailsForm v-if="details" :object="details" @done="done" />
+    </aside>
   </div>
 </template>
 
@@ -87,6 +106,13 @@ export default defineComponent({
 
   .main {
     width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  aside {
+    background-color: $header-bg-color;
+    border-left: 1px solid $workspace-separator-color;
   }
 }
 </style>

@@ -60,8 +60,12 @@ export default defineComponent({
 
 <template>
   <div class="contact-person-properties">
-    <StringPresenter class="caption-1" :attribute="firstName" v-model="object[firstName.key]" />
-    <StringPresenter class="caption-2" :attribute="lastName" v-model="object[lastName.key]" />
+    <div>
+      <StringPresenter class="caption-1" :attribute="firstName" v-model="object[firstName.key]" />
+    </div>
+    <div>
+      <StringPresenter class="caption-2" :attribute="lastName" v-model="object[lastName.key]" />
+    </div>
 
     <div class="attributes">
       <OwnAttributes

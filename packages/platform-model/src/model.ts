@@ -89,6 +89,7 @@ export default (S: Builder) => {
   }, CoreDomain.Tx)
 
   S.createClass(core.class.CreateTx, core.class.Tx, {
+    _space: S.attr(core.class.Type, {}),
     _attributes: S.attr(core.class.BagOf, {
       of: S.newInstance(core.class.InstanceOf, { of: core.class.Type })
     })

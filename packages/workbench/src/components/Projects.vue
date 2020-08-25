@@ -47,14 +47,14 @@ export default defineComponent({
 <template>
   <div class="workbench-projects">
     <div class="caption-3">Пространства</div>
-    <div class="project">
+    <div class="project" :class="{selected: !space}">
       <a href="#" @click.prevent="$emit('navigate', undefined)">Все</a>
     </div>
-    <div v-for="space in spaces" :key="space._id" class="project">
-      <a href="#" @click.prevent="$emit('navigate', space._id)">#{{space.label}}</a>
+    <div v-for="s in spaces" :key="s._id" class="project" :class="{selected: s._id === space}">
+      <a href="#" @click.prevent="$emit('navigate', s._id)">#{{s.label}}</a>
     </div>
 
-    <div class="caption-3">Тип {{type}}</div>
+    <div class="caption-3">Тип</div>
     <div class="project">
       <a href="#" @click.prevent="$emit('update:type', undefined)">Все</a>
     </div>
@@ -65,10 +65,17 @@ export default defineComponent({
 </template>
 
 <style lang="scss">
+@import "~@anticrm/sparkling-theme/css/_variables.scss";
+
 .workbench-projects {
   .project {
     font-family: Raleway;
     margin: 0.5em;
+
+    &.selected {
+      color: $content-bg-color;
+      background-color: $content-color-dark;
+    }
 
     a {
       text-decoration: none;

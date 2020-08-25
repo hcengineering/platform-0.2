@@ -83,6 +83,7 @@ export async function createCache (dbname: string, modelDb: ModelDb): Promise<Co
 
   function createTx2VDoc (create: CreateTx): VDoc {
     const doc: VDoc = {
+      _space: create._space,
       _class: create._objectClass,
       _id: create._objectId,
       _createdBy: create._user,
@@ -173,7 +174,6 @@ export async function createCache (dbname: string, modelDb: ModelDb): Promise<Co
       const store = tx.objectStore(domain)
       let cursor = await store.openCursor(undefined, direction as any)
       while (cursor) {
-        // console.log('cursor value: ', cursor.value)
         result.push(cursor.value)
         cursor = await cursor.continue()
       }
