@@ -26,13 +26,23 @@ import { getCoreService, getPresentationCore } from '../utils'
 
 import Toolbar from '@anticrm/sparkling-controls/src/toolbar/Toolbar.vue'
 import ToolbarButton from '@anticrm/sparkling-controls/src/toolbar/Button.vue'
+
 import EditorContent from '@anticrm/sparkling-rich/src/EditorContent.vue'
+import { EditorContentEvent } from '@anticrm/sparkling-rich/src/index'
+
+import contact, { User, Contact } from '@anticrm/contact/src/index'
+
+import CompletionPopup, { CompletionItem } from './CompletionPopup.vue'
+
+function startsWith(str: string | undefined, prefix: string) {
+  return (str ?? '').startsWith(prefix)
+}
 
 export default defineComponent({
-  components: { Icon, CreateForm, CreateMenu, EditorContent, Toolbar, ToolbarButton },
+  components: { Icon, CreateForm, CreateMenu, EditorContent, Toolbar, ToolbarButton, CompletionPopup },
   props: {
   },
-  setup (props) {
+  setup(props) {
     const coreService = getCoreService()
     const model = coreService.getModel()
 
@@ -43,26 +53,105 @@ export default defineComponent({
     const createItem = ref<WorkbenchCreateItem | null>(null)
 
     let htmlValue = ref('')
-    let styleState = ref({ isEmpty: true })
+    let styleState = ref({ isEmpty: true, cursor: { left: 0, top: 0, bottom: 0, right: 0 } } as EditorContentEvent)
     const htmlEditor = ref(null)
     let stylesEnabled = ref(false)
+    let completions = ref({ selection: null as CompletionItem, items: [] as CompletionItem[] })
 
-    function add () {
+    function add() {
       showMenu.value = !showMenu.value
     }
 
-    function selectItem (item: WorkbenchCreateItem) {
+    function selectItem(item: WorkbenchCreateItem) {
       showMenu.value = false
       createItem.value = item
       component.value = presentationCoreService.getComponentExtension(item.itemClass, presentationCore.class.DetailForm)
     }
 
-    function done () {
+    function done() {
       component.value = ''
     }
-    function handleSubmit () {
-      htmlValue.value = ''
+    function updateStyle(event: EditorContentEvent) {
+      styleState.value = event
+
+      if (event.completionWord.length == 0) {
+        completions.value = {
+          selection: null as CompletionItem, items: []
+        }
+        return
+      }
+
+      if (event.completionWord.startsWith("@")) {
+        const userPrefix = event.completionWord.substring(1)
+        coreService.find(contact.mixin.User, {}).then(docs => {
+          let items: CompletionItem[] = []
+          const all = docs as User[]
+          for (const value of all) {
+            if (startsWith(value.account, userPrefix)) {
+              let kk = "@" + value.account
+              items.push({ key: kk, label: kk , title: kk + " - " + value.firstName + ' ' + value.lastName } as CompletionItem)
+            }
+          }
+          completions.value = {
+            selection: (items.length > 0 ? items[0] : null), items: items
+          }
+        })
+      } else {
+        // Calc some completions here.
+        let operations: CompletionItem[] = [
+          { key: "#1", label: "create task", title: "Perform a task creation" },
+          { key: "#1.2", label: "create contact" },
+          { key: "#2", label: "delete task" },
+          { key: "#2.2", label: "delete contact" },
+          { key: "#3", label: "search" },
+          { key: "#3.1", label: "search task" },
+          { key: "#3.2", label: "search contact" },
+          { key: "#4", label: "stop task" },
+        ]
+        let items = operations.filter((e) => e.label.startsWith(event.completionWord) && e.label !== event.completionWord)
+        completions.value = {
+          selection: (items.length > 0 ? items[0] : null), items: items
+        }
+      }
     }
+    function handlePopupSelected(value) {
+      htmlEditor.value.insert(value.substring(styleState.value.completionWord.length) + " ", styleState.value.selection.from, styleState.value.selection.to)
+      htmlEditor.value.focus()
+    }
+    function onKeyDown(event) {
+      if (completions.value.items.length > 0 && completions.value.selection != null) {
+        if (event.key === "ArrowUp") {
+          let pos = completions.value.items.indexOf(completions.value.selection)
+          if (pos > 0) {
+            completions.value.selection = completions.value.items[pos - 1]
+          }
+          event.preventDefault()
+          return
+        }
+        if (event.key === "ArrowDown") {
+          let pos = completions.value.items.indexOf(completions.value.selection)
+          if (pos < completions.value.items.length - 1) {
+            completions.value.selection = completions.value.items[pos + 1]
+          }
+          event.preventDefault()
+          return
+        }
+        if (event.key === "Enter") {
+          handlePopupSelected(completions.value.selection.label)
+          event.preventDefault()
+          return
+        }
+        if (event.key === "Escape") {
+          completions.value = { selection: null as CompletionItem, items: [] }
+          return
+        }
+      }
+      if (event.key === "Enter") {
+        htmlValue.value = ''
+        event.preventDefault()
+      }
+    }
+
 
     return {
       showMenu,
@@ -76,7 +165,10 @@ export default defineComponent({
       htmlEditor,
       styleState,
       stylesEnabled,
-      handleSubmit
+      updateStyle,
+      completions,
+      onKeyDown,
+      handlePopupSelected
     }
   }
 })
@@ -105,9 +197,18 @@ export default defineComponent({
           ref="htmlEditor"
           :class="{'edit-box-vertical':stylesEnabled, 'edit-box-horizontal': !stylesEnabled}"
           :content="htmlValue"
+          triggers="@#"
           @update:content="htmlValue = $event"
-          @styleEvent="styleState = $event"
-          @submit="handleSubmit()"
+          @styleEvent="updateStyle"
+          @keyDown="onKeyDown"
+        />
+        <completion-popup
+          ref="popupControl"
+          v-if="completions.items.length > 0 "
+          :selection="completions.selection.key || ''"
+          :items="completions.items"
+          :pos="styleState.cursor"
+          @select="handlePopupSelected"
         />
 
         <div v-if="stylesEnabled" class="separator" />

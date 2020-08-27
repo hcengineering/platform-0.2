@@ -28,9 +28,8 @@ export function buildKeymap() {
 
     bind("Alt-ArrowUp", joinUp)
     bind("Alt-ArrowDown", joinDown)
-    bind("Mod-BracketLeft", lift)
-    bind("Escape", selectParentNode)
 
+    bind("Mod-BracketLeft", lift)
 
     bind("Mod-b", Commands.toggleStrong)
     bind("Mod-B", Commands.toggleStrong)

@@ -16,7 +16,7 @@
 <script lang="ts">
 import { computed, defineComponent, onMounted, ref, watch } from 'vue'
 
-import { DOMParser } from 'prosemirror-model'
+import { DOMParser, Fragment, Slice } from 'prosemirror-model'
 
 import { schema } from './internal/schema'
 
@@ -29,9 +29,9 @@ import { keymap } from 'prosemirror-keymap'
 import { buildKeymap } from './internal/keymap'
 import { buildInputRules } from './internal/input_rules'
 import { Commands } from './internal/commands'
+import { EditorContentEvent } from './index'
 
 const mac = typeof navigator != "undefined" ? /Mac/.test(navigator.platform) : false
-
 
 export default defineComponent({
   components: {},
@@ -40,6 +40,10 @@ export default defineComponent({
     hoverMessage: {
       type: String,
       default: "Placeholder...",
+    },
+    triggers: {
+      type: String, // A set of completion separators
+      default: "",
     },
   },
   model: {
@@ -61,6 +65,30 @@ export default defineComponent({
       return checkEmpty(props.content)
     })
 
+    function findCompletionWord(sel): string {
+      var completionWord = ''
+      if (sel.$from.nodeBefore != null) {
+        let val = sel.$from.nodeBefore.textContent
+        let p = -1
+        for (p = val.length - 1; p >= 0; p--) {
+          if (val[p] === ' ' || val[p] === '\n') {
+            //Stop on WS
+            break
+          }
+          if (props.triggers.indexOf(val[p]) != -1) {
+            // we found trigger, -1 to pos
+            p--
+            break
+          }
+        }
+        if (p != -1) {
+          val = val.substring(p + 1)
+        }
+        completionWord = val
+      }
+      return completionWord
+    }
+
     let state = EditorState.create({
       schema,
       doc: DOMParser.fromSchema(schema).parse(element),
@@ -68,40 +96,45 @@ export default defineComponent({
         history(),
         buildInputRules(),
         keymap(buildKeymap()),
-        keymap({
-          'Enter': (state, dispatch) => {
-
-            context.emit('submit', view.dom.innerHTML)
-            return true;
-          }
-        }),
       ]
     })
+    let emitStyleEvent = function () {
+      let sel = view.state.selection
+      var completionWord = findCompletionWord(sel)
+
+      let cursor = view.coordsAtPos(sel.from - completionWord.length - 1)
+      // The box in which the tooltip is positioned, to use as base
+
+      let innerDOMValue = view.dom.innerHTML
+      context.emit("update:content", innerDOMValue)
+
+      // Check types
+      let marks = view.state.storedMarks || view.state.selection.$from.marks()
+
+      let isBold = schema.marks.strong.isInSet(marks) != null
+      let isItalic = schema.marks.em.isInSet(marks) != null
+      let isStrike = schema.marks.strike.isInSet(marks) != null
+      let isUnderline = schema.marks.underline.isInSet(marks) != null
+
+      let evt = {
+        isEmpty: checkEmpty(innerDOMValue),
+        bold: isBold, isBoldEnabled: Commands.toggleStrong(view.state, null),
+        italic: isItalic, isItalicEnabled: Commands.toggleItalic(view.state, null),
+        strike: isStrike, isStrikeEnabled: Commands.toggleStrike(view.state, null),
+        underline: isUnderline, isUnderlineEnabled: Commands.toggleUnderline(view.state, null),
+        cursor: { left: cursor.left, top: cursor.top, bottom: cursor.bottom, right: cursor.right },
+        completionWord,
+        selection: { from: sel.from, to: sel.to }
+      } as EditorContentEvent
+      context.emit("styleEvent", evt)
+    }
     let view = new EditorView(editRoot, {
       state,
       dispatchTransaction(transaction) {
         let newState = view.state.apply(transaction)
         view.updateState(newState)
 
-        let innerDOMValue = view.dom.innerHTML
-        context.emit("update:content", innerDOMValue)
-
-        // Check types
-        let marks = view.state.storedMarks || view.state.selection.$from.marks()
-
-        let isBold = schema.marks.strong.isInSet(marks) != null
-        let isItalic = schema.marks.em.isInSet(marks) != null
-        let isStrike = schema.marks.strike.isInSet(marks) != null
-        let isUnderline = schema.marks.underline.isInSet(marks) != null
-
-        let evt = {
-          isEmpty: checkEmpty(innerDOMValue),
-          bold: isBold, isBoldEnabled: Commands.toggleStrong(view.state, null),
-          italic: isItalic, isItalicEnabled: Commands.toggleItalic(view.state, null),
-          strike: isStrike, isStrikeEnabled: Commands.toggleStrike(view.state, null),
-          underline: isUnderline, isUnderlineEnabled: Commands.toggleUnderline(view.state, null)
-        }
-        context.emit("styleEvent", evt)
+        emitStyleEvent()
       }
     })
 
@@ -113,7 +146,6 @@ export default defineComponent({
 
         const parser = new window.DOMParser()
         const element = parser.parseFromString(props.content, 'text/html').body
-        // console.log("parser body:", element)
         let newDoc = DOMParser.fromSchema(schema).parse(element)
 
         let op = state.tr.setSelection(new AllSelection(state.doc)).replaceSelectionWith(newDoc);
@@ -125,11 +157,21 @@ export default defineComponent({
       }
     })
 
+    function insert(text: string, from: number, to: number) {
+      const node = schema.text(text);
+      const frag = Fragment.from(node);
+      const slice = new Slice(frag, 0, 0);
+
+      const t = view.state.tr.insertText(text, from, to);
+      const st = view.state.apply(t);
+      view.updateState(st);
+      emitStyleEvent()
+    }
+
     return {
       root,
       view,
       isEmpty,
-
       // Some operations
       toggleBold() {
         Commands.toggleStrong(view.state, view.dispatch)
@@ -154,7 +196,11 @@ export default defineComponent({
       toggleOrderedList() {
         Commands.toggleOrdered(view.state, view.dispatch)
         view.focus()
-      }
+      },
+      insert,
+      focus() {
+        view.focus()
+      },
     }
   },
 })
@@ -169,6 +215,8 @@ export default defineComponent({
 
 
 <style lang="scss">
+@import "~@anticrm/sparkling-theme/css/_variables.scss";
+@import "~prosemirror-view/style/prosemirror.css";
 .sparkling-rich-editor-content {
   .chunter-curson-span {
     width: 1px;
@@ -196,6 +244,26 @@ export default defineComponent({
   .hover-message {
     position: absolute;
     pointer-events: none;
+  }
+
+  .popup-bar {
+    display: flex;
+    flex-direction: column;
+    visibility: hidden;
+    background-color: $input-color;
+    color: #fff;
+    position: absolute;
+    border: 1px solid $content-color-dark;
+    border-radius: 3px;
+
+    &.show {
+      visibility: visible;
+    }
+    .item {
+      font-size: 14px;
+      font-family: Raleway;
+      white-space: no-wrap;
+    }
   }
 }
 </style>
