@@ -16,6 +16,6 @@
 import { CoreService } from '@anticrm/platform-core'
 import { CoreDomain, Doc } from '@anticrm/platform'
 
-export function buildModel(coreService: CoreService): Promise<Doc[]> {
-  return  coreService.loadDomain(CoreDomain.Tx, 'date', 'prev')
+export function buildModel (coreService: CoreService): Promise<Doc[]> {
+  return coreService.loadDomain(CoreDomain.Tx, 'date', 'prev')
 }

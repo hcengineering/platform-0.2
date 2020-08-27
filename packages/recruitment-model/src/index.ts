@@ -15,7 +15,7 @@
 
 import { extendIds } from '@anticrm/platform-model'
 import recruitment from '@anticrm/recruitment'
-import { Ref } from '@anticrm/platform'
+import { Ref, Space } from '@anticrm/platform'
 import { Application } from '@anticrm/workbench'
 import { Candidate } from '@anticrm/recruitment/src'
 import { ClassUI } from '@anticrm/presentation-core'
@@ -30,5 +30,8 @@ export default extendIds(recruitment, {
   },
   class: {
     Candidate: '' as Ref<ClassUI<Candidate>>
+  },
+  space: {
+    Recruitment: '' as Ref<Space>
   }
 })

@@ -15,6 +15,12 @@
 
 import core, { Builder } from '@anticrm/platform-model'
 import workbench from '.'
+import chunter from '@anticrm/chunter-model'
+import contact from '@anticrm/contact-model'
+import presentation from '@anticrm/presentation-core'
+
+import { StringProperty } from '@anticrm/platform'
+import { IntlString } from '@anticrm/platform-i18n'
 
 export default (S: Builder) => {
 
@@ -29,6 +35,28 @@ export default (S: Builder) => {
     label: S.attr(core.class.String, {}),
     icon: S.attr(core.class.Type, {}),
     itemClass: S.attr(core.class.Type, {}),
+  })
+
+  S.createDocument(workbench.class.Application, {
+    label: 'Default' as StringProperty,
+    icon: chunter.icon.Chunter,
+    main: workbench.component.Browser,
+    appClass: chunter.class.Message
+  }, workbench.application.Default)
+
+  S.createDocument(core.class.Space, {
+  }, contact.space.Contact)
+
+  S.mixin(contact.space.Contact, presentation.mixin.UXObject, {
+    label: 'Контакты' as IntlString
+  })
+
+  S.createMixin(workbench.mixin.SpaceExtension, core.class.Space, {
+    component: S.attr(core.class.Type, {})
+  })
+
+  S.mixin(contact.space.Contact, workbench.mixin.SpaceExtension, {
+    component: chunter.component.ChunterView
   })
 
 }

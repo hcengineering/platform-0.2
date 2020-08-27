@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Class, Doc, plugin, Plugin, Ref, Service, StringProperty, VDoc } from '@anticrm/platform'
+import { Class, Doc, plugin, Plugin, Ref, Service, StringProperty, VDoc, Mixin, Space } from '@anticrm/platform'
 import ui, { AnyComponent, Asset } from '@anticrm/platform-ui'
 import core from '@anticrm/platform-core'
 import presentationUI from '@anticrm/presentation-ui'
@@ -31,6 +31,10 @@ export interface WorkbenchCreateItem extends Doc {
   itemClass: Ref<Class<VDoc>>
 }
 
+export interface SpaceExtension extends Space {
+  component: AnyComponent
+}
+
 export interface WorkbenchService extends Service {
 }
 
@@ -43,10 +47,13 @@ export default plugin('workbench' as Plugin<WorkbenchService>, {
   },
   component: {
     Workbench: '' as AnyComponent,
-    Browse: '' as AnyComponent,
+    Browser: '' as AnyComponent,
     NewDocument: '' as AnyComponent,
   },
   icon: {
     Add: '' as Asset
+  },
+  mixin: {
+    SpaceExtension: '' as Ref<Mixin<SpaceExtension>>
   }
 })

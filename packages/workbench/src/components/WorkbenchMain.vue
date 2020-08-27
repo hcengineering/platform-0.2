@@ -17,8 +17,7 @@
 import { computed, defineComponent, PropType, ref } from 'vue'
 import { Ref } from '@anticrm/platform'
 
-import Nav from './nav/Nav.vue'
-import InputControl from './InputControl.vue'
+import Home from './Home.vue'
 
 import { getCoreService, getUIService } from '../utils'
 import workbench, { Application } from '../..'
@@ -28,7 +27,7 @@ import { Doc } from '@anticrm/platform'
 
 
 export default defineComponent({
-  components: { Nav, InputControl },
+  components: { Home },
   props: {
     location: {
       type: Object as PropType<Location>,
@@ -38,50 +37,26 @@ export default defineComponent({
   setup (props) {
     const coreService = getCoreService()
     const model = coreService.getModel()
+    const apps = ref([] as Application[])
 
-    const app = computed(() => props.location.path[0])
-    const perspective = computed(() => (model.get(props.location.path[0] as Ref<Doc>) as Application).main)
+    const component = computed(() => (model.get(props.location.path[0] as Ref<Doc>) as Application).main)
 
-    const uiService = getUIService()
-
-    function navigateApp (app: Application) {
-      uiService.navigate(uiService.toUrl({ app: undefined, path: [app._id] }))
-    }
-
-    return { app, navigateApp, perspective }
+    return { component }
   }
 
 })
 </script>
 
 <template>
-  <div id="workbench">
-    <nav>
-      <Nav :current="app" @navigate="navigateApp" />
-    </nav>
-
-    <main>
-      <!-- <WorkbenchMain :location="location" /> -->
-      <widget :component="perspective" :location="location" />
-    </main>
+  <div class="workbench-workbench-main">
+    <widget :component="component" :location="location" />
   </div>
 </template>
 
 <style lang="scss">
 @import "~@anticrm/sparkling-theme/css/_variables.scss";
 
-#workbench {
-  display: flex;
+.workbench-workbench-main {
   height: 100%;
-
-  nav {
-    width: $pictogram-size;
-    background-color: $nav-bg-color;
-  }
-
-  main {
-    background-color: $content-bg-color;
-    width: 100%;
-  }
 }
 </style>

@@ -107,6 +107,7 @@ export interface Tx extends Doc {
 }
 
 export interface CreateTx extends Tx {
+  _space: Ref<Space>
   _attributes: { [key: string]: PropertyType }
 }
 
