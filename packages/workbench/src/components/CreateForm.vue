@@ -48,13 +48,11 @@ export default defineComponent({
     const object = reactive({})
 
     function save () {
-      const objectId = generateId() as Ref<VDoc>
-
       const tx: CreateTx = {
         _class: core.class.CreateTx,
         _id: generateId() as Ref<Doc>,
 
-        _objectId: objectId,
+        _objectId: generateId() as Ref<VDoc>,
         _objectClass: props._class,
 
         _date: Date.now() as Property<number, Date>,

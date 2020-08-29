@@ -20,6 +20,7 @@ import { Property, StringProperty } from '@anticrm/platform'
 import core from '@anticrm/platform-model'
 import contact from '@anticrm/contact-model'
 import { Person } from '@anticrm/contact'
+import { Message } from '@anticrm/chunter'
 
 import chunter, { ChunterDomain } from '.'
 import { IntlString } from '@anticrm/platform-i18n'
@@ -54,4 +55,9 @@ export default (S: UIBuilder) => {
   S.mixin(contact.class.Person as Ref<Class<Person>>, chunter.mixin.ChunterInfo, { // TODO: type problems
     component: chunter.component.ContactInfo
   })
+
+  S.mixin(chunter.class.Message as Ref<Class<Message>>, chunter.mixin.ChunterInfo, { // TODO: type problems
+    component: chunter.component.MessageInfo
+  })
+
 }

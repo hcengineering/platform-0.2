@@ -19,6 +19,7 @@ import chunter from '.'
 
 import ChunterView from './components/ChunterView.vue'
 import ContactInfo from './components/ContactInfo.vue'
+import MessageInfo from './components/MessageInfo.vue'
 import { ContactService } from '@anticrm/contact'
 import { UIService } from '@anticrm/platform-ui'
 
@@ -31,6 +32,7 @@ export default async (platform: Platform, deps: { ui: UIService, contact: Contac
 
   platform.setResource(chunter.component.ChunterView, ChunterView)
   platform.setResource(chunter.component.ContactInfo, ContactInfo)
+  platform.setResource(chunter.component.MessageInfo, MessageInfo)
 
   deps.ui.getApp()
     .provide(ContactServiceInjectionKey, deps.contact)

@@ -17,7 +17,7 @@ import { DateProperty, Emb, plugin, Plugin, Service, StringProperty, VDoc, Ref, 
 import { AnyComponent, Asset } from '@anticrm/platform-ui'
 import contact from '@anticrm/contact'
 import ui from '@anticrm/platform-ui'
-import { ComponentExtension } from '@anticrm/presentation-core'
+import { ComponentExtension, ClassUI } from '@anticrm/presentation-core'
 
 export interface Comment extends Emb {
   _createdOn: DateProperty
@@ -38,8 +38,13 @@ export default plugin('chunter' as Plugin<Service>, { ui: ui.id, contact: contac
   component: {
     ChunterView: '' as AnyComponent,
     ContactInfo: '' as AnyComponent,
+    MessageInfo: '' as AnyComponent,
   },
   mixin: {
-    ChunterInfo: '' as Ref<Mixin<ComponentExtension<VDoc>>>
+    ChunterInfo: '' as Ref<Mixin<ComponentExtension<VDoc>>>,
+  },
+  class: {
+    Message: '' as Ref<ClassUI<Message>>
   }
+
 })

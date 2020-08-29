@@ -34,7 +34,7 @@ import contact, { User, Contact } from '@anticrm/contact/src/index'
 
 import CompletionPopup, { CompletionItem } from './CompletionPopup.vue'
 
-function startsWith(str: string | undefined, prefix: string) {
+function startsWith (str: string | undefined, prefix: string) {
   return (str ?? '').startsWith(prefix)
 }
 
@@ -42,7 +42,7 @@ export default defineComponent({
   components: { Icon, CreateForm, CreateMenu, EditorContent, Toolbar, ToolbarButton, CompletionPopup },
   props: {
   },
-  setup(props) {
+  setup (props, context) {
     const coreService = getCoreService()
     const model = coreService.getModel()
 
@@ -58,20 +58,20 @@ export default defineComponent({
     let stylesEnabled = ref(false)
     let completions = ref({ selection: null as CompletionItem, items: [] as CompletionItem[] })
 
-    function add() {
+    function add () {
       showMenu.value = !showMenu.value
     }
 
-    function selectItem(item: WorkbenchCreateItem) {
+    function selectItem (item: WorkbenchCreateItem) {
       showMenu.value = false
       createItem.value = item
       component.value = presentationCoreService.getComponentExtension(item.itemClass, presentationCore.class.DetailForm)
     }
 
-    function done() {
+    function done () {
       component.value = ''
     }
-    function updateStyle(event: EditorContentEvent) {
+    function updateStyle (event: EditorContentEvent) {
       styleState.value = event
 
       if (event.completionWord.length == 0) {
@@ -89,7 +89,7 @@ export default defineComponent({
           for (const value of all) {
             if (startsWith(value.account, userPrefix)) {
               let kk = "@" + value.account
-              items.push({ key: kk, label: kk , title: kk + " - " + value.firstName + ' ' + value.lastName } as CompletionItem)
+              items.push({ key: kk, label: kk, title: kk + " - " + value.firstName + ' ' + value.lastName } as CompletionItem)
             }
           }
           completions.value = {
@@ -114,11 +114,11 @@ export default defineComponent({
         }
       }
     }
-    function handlePopupSelected(value) {
+    function handlePopupSelected (value) {
       htmlEditor.value.insert(value.substring(styleState.value.completionWord.length) + " ", styleState.value.selection.from, styleState.value.selection.to)
       htmlEditor.value.focus()
     }
-    function onKeyDown(event) {
+    function onKeyDown (event) {
       if (completions.value.items.length > 0 && completions.value.selection != null) {
         if (event.key === "ArrowUp") {
           let pos = completions.value.items.indexOf(completions.value.selection)
@@ -147,6 +147,7 @@ export default defineComponent({
         }
       }
       if (event.key === "Enter") {
+        context.emit('message', htmlValue.value)
         htmlValue.value = ''
         event.preventDefault()
       }

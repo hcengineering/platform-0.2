@@ -15,10 +15,11 @@
 
 <script lang="ts">
 import { computed, defineComponent, PropType, ref, watch } from 'vue'
-import { Ref, Doc, Space } from '@anticrm/platform'
+import { Ref, Doc, Space, CreateTx, generateId, VDoc, Property } from '@anticrm/platform'
 
 import { getCoreService, getUIService } from '../utils'
 import workbench, { Application } from '../..'
+import core from '@anticrm/platform-core'
 import { Location } from '@anticrm/platform-ui'
 
 import Projects from './Projects.vue'
@@ -68,7 +69,28 @@ export default defineComponent({
       details.value = null
     }
 
-    return { project, component, navigate, type, details, open, done }
+    function message (msg: string) {
+      console.log(msg)
+      const tx: CreateTx = {
+        _class: core.class.CreateTx,
+        _id: generateId() as Ref<Doc>,
+
+        _objectId: generateId() as Ref<VDoc>,
+        _objectClass: chunter.class.Message,
+
+        _date: Date.now() as Property<number, Date>,
+        _user: 'andrey.v.platov@gmail.com' as Property<string, string>,
+
+        _attributes: {
+          message: msg as Property<string, string>
+        }
+      }
+
+      coreService.tx(tx)
+
+    }
+
+    return { project, component, navigate, type, details, open, done, message }
   }
 
 })
@@ -81,7 +103,9 @@ export default defineComponent({
     </div>
     <div class="main">
       <widget :_class="type" :space="space" :component="component" @open="open" />
-      <InputControl />
+      <div class="input-control">
+        <InputControl @message="message" />
+      </div>
     </div>
 
     <aside>
@@ -108,6 +132,10 @@ export default defineComponent({
     width: 100%;
     display: flex;
     flex-direction: column;
+
+    .input-control {
+      padding: 1em;
+    }
   }
 
   aside {
