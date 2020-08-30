@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "commonjs",
+    "rootDir": "./src",
+    "outDir": "./lib",
+    "strict": true,
+    "esModuleInterop": true,
+    "composite": true,
+    "declaration": true
+  },
+  "references": [
+    {
+      "path": "../accounts"
+    }
+  ]
+}

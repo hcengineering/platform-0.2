@@ -21,7 +21,7 @@ export class MemDb implements CoreProtocol {
   private objects = new Map<Ref<Doc>, Doc>()
   private byClass: Map<Ref<Class<Doc>>, Doc[]> | null = null
 
-  constructor (domain: string) {
+  constructor(domain: string) {
     this.domain = domain
   }
 
@@ -37,7 +37,7 @@ export class MemDb implements CoreProtocol {
 
   attributeKey (clazz: Classifier<Obj>, key: string): string {
     if (clazz._kind === ClassifierKind.MIXIN) {
-      return clazz._id + '|' + key
+      return key + '|' + clazz._id.replace('.', '~')
     }
     return key
   }

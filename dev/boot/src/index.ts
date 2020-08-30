@@ -22,7 +22,7 @@ console.log(modelJson)
 const stringsJson = JSON.stringify(Strings)
 console.log(stringsJson)
 
-function dumpToFile() {
+function dumpToFile () {
   const fs = require('fs')
 
   fs.writeFile(__dirname + "/../../prod/src/model.json", modelJson, 'utf8', function (err: Error) {
@@ -42,8 +42,8 @@ function dumpToFile() {
   })
 }
 
-function initDatabase(uri: string, tenant: string) {
-  MongoClient.connect(uri, {useUnifiedTopology: true}, (err, client) => {
+function initDatabase (uri: string, tenant: string) {
+  MongoClient.connect(uri, { useUnifiedTopology: true }, (err, client) => {
     const db = client.db(tenant)
     for (const domain in Model) {
       const model = Model[domain]
@@ -61,6 +61,6 @@ function initDatabase(uri: string, tenant: string) {
 
 const mongodbUri = process.env.MONGODB_URI || 'mongodb://localhost:27017'
 console.log('uploading new model to MongoDB ...' + mongodbUri.substring(25))
-//initDatabase(mongodbUri, 'latest-model')
-dumpToFile()
+initDatabase(mongodbUri, 'latest-model')
+//dumpToFile()
 

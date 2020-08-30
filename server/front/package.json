@@ -1,0 +1,32 @@
+{
+  "name": "@anticrm/server-front",
+  "version": "0.1.0",
+  "scripts": {
+    "build": "tsc --build",
+    "test": "jest",
+    "start": "node lib/index.js"
+  },
+  "author": "Anticrm Platform Contributors",
+  "license": "EPL-2.0",
+  "devDependencies": {
+    "@babel/preset-env": "^7.10.2",
+    "@babel/preset-typescript": "^7.10.1",
+    "@types/jest": "^26.0.0",
+    "@types/jwt-simple": "^0.5.33",
+    "@types/koa": "^2.11.3",
+    "@types/koa-bodyparser": "^4.3.0",
+    "@types/koa-router": "^7.4.1",
+    "@types/koa__cors": "^3.0.1",
+    "@types/mongodb": "^3.5.20",
+    "babel-jest": "^26.0.1",
+    "jest": "^26.0.1",
+    "typescript": "^3.9.5"
+  },
+  "dependencies": {
+    "@koa/cors": "^3.1.0",
+    "koa": "^2.12.1",
+    "koa-bodyparser": "^4.3.0",
+    "koa-router": "^9.0.1",
+    "mongodb": "^3.5.9"
+  }
+}

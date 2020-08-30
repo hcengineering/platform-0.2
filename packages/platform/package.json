@@ -1,6 +1,6 @@
 {
   "name": "@anticrm/platform",
-  "version": "0.1.8",
+  "version": "0.2.0",
   "main": "src/index.ts",
   "author": "Anticrm Platform Contributors (https://github.com/anticrm)",
   "license": "EPL-2.0",
