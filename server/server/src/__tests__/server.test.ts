@@ -79,7 +79,7 @@ describe('server', () => {
       const resp = getResponse(msg)
       conn.close()
       expect(resp.result instanceof Array).toBeTruthy()
-      console.log(resp.result)
+      // console.log(resp.result)
       done()
     })
   })
@@ -88,7 +88,7 @@ describe('server', () => {
     const conn = connect()
     conn.on('open', () => {
       conn.send(makeRequest({
-        method: 'load',
+        method: 'loadDomain',
         params: [
         ]
       }))

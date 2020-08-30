@@ -14,7 +14,7 @@
 //
 
 import methods from '@anticrm/accounts'
-import { makeErrorResponse, Response, Request } from '@anticrm/rpc'
+import { Response, Request, serialize } from '@anticrm/platform'
 import { MongoClient, Db } from 'mongodb'
 
 
@@ -35,7 +35,15 @@ router.post('rpc', '/rpc', async (ctx, next) => {
   console.log(request)
   const method = (methods as { [key: string]: (db: Db, request: Request<any>) => Response<any> })[request.method]
   if (!request.method) {
-    ctx.body = makeErrorResponse(0, request.id, 'unknown method')
+    const response: Response<void> = {
+      id: request.id,
+      error: {
+        code: 0,
+        message: 'unknown method',
+      },
+    }
+
+    ctx.body = serialize(response)
   }
 
   if (!client) {

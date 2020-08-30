@@ -14,7 +14,7 @@
 //
 
 import { Binary, Db, ObjectID } from 'mongodb'
-import { Request, Response } from '@anticrm/rpc'
+import { Request, Response } from '@anticrm/platform'
 import { randomBytes, pbkdf2Sync } from 'crypto'
 import { Buffer } from 'buffer'
 import { encode } from 'jwt-simple'
@@ -109,7 +109,8 @@ async function login (db: Db, request: Request<[string, string, string]>): Promi
           workspace,
           server,
           port,
-          token: encode({ email, workspace }, secret)
+          token: encode({ email, workspace }, secret),
+          email: 'andrey.v.platov@gmail.com'
         }
         return { result, id: request.id }
       }

@@ -38,7 +38,7 @@ export interface Response<R> {
   error?: RpcError
 }
 
-export function serialize(object: Request<any> | Response<any>): string {
+export function serialize (object: Request<any> | Response<any>): string {
   return JSON.stringify(object)
 }
 

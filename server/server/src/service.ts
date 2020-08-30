@@ -15,13 +15,11 @@
 
 import { MongoClient, Db } from 'mongodb'
 
-import { Ref, Class, Doc, MemDb, AnyLayout, CoreDomain } from '@anticrm/platform'
+import { Ref, Class, Doc, MemDb, AnyLayout, CoreDomain, CoreProtocol, Tx } from '@anticrm/platform'
 
 import WebSocket from 'ws'
 import { makeResponse, Response } from './rpc'
 import { PlatformServer } from './server'
-
-import { CoreProtocol } from '@anticrm/rpc'
 
 interface CommitInfo {
   created: Doc[]
@@ -39,15 +37,32 @@ export async function connect (uri: string, dbName: string, ws: WebSocket, serve
   const client = await MongoClient.connect(uri, { useUnifiedTopology: true })
   const db = client.db(dbName)
   const model = await db.collection('model').find({}).toArray()
-  console.log('model:')
-  console.log(model)
+  // console.log('model:')
+  // console.log(model)
   const memdb = new MemDb(CoreDomain.Model)
   memdb.loadModel(model)
 
+  function find (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc[]> {
+    const domain = memdb.getDomain(_class)
+    return db.collection(domain).find({ ...query, _class }).toArray()
+  }
+
   const clientControl = {
-    find (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Layout<Doc>[]> {
-      const domain = memdb.getDomain(_class)
-      return db.collection(domain).find({ ...query, _class }).toArray()
+
+    // C O R E  P R O T O C O L
+
+    find,
+
+    findOne (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc | undefined> {
+      return find(_class, query).then(result => result.length > 0 ? result[0] : undefined)
+    },
+
+    async tx (tx: Tx): Promise<void> {
+      console.log('tx not implemented')
+    },
+
+    async loadDomain (domain: string, index?: string, direction?: string): Promise<Doc[]> {
+      return memdb.dump()
     },
 
     delete (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<void> {
@@ -71,13 +86,9 @@ export async function connect (uri: string, dbName: string, ws: WebSocket, serve
       server.broadcast(clientControl, { result: commitInfo })
     },
 
-    async load (): Promise<Layout<Doc>[]> {
-      return memdb.dump()
-    },
+    // C O N T R O L
 
     async ping (): Promise<any> { return null },
-
-    // C O N T R O L
 
     send<R> (response: Response<R>): void {
       ws.send(makeResponse(response))

@@ -14,7 +14,7 @@
 //
 
 import { MongoClient, Db } from 'mongodb'
-import { Request } from '@anticrm/rpc'
+import { Request } from '@anticrm/platform'
 import methods from '..'
 
 describe('server', () => {
