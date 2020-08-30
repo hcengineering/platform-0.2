@@ -29,7 +29,7 @@
     "typescript": "~3.9.4"
   },
   "dependencies": {
-    "@anticrm/platform": "^0.1.4",
+    "@anticrm/platform": "^0.2.0",
     "@anticrm/platform-ui": "^0.1.0",
     "@anticrm/rpc": "^0.1.0",
     "jwt-simple": "^0.5.6"
