@@ -60,6 +60,7 @@ export interface CoreService extends Service, CoreProtocol {
 export default plugin('core' as Plugin<CoreService>, {}, {
   metadata: {
     Model: '' as Metadata<{ [key: string]: Doc[] }>,
+    Offline: '' as Metadata<boolean>,
     WSHost: '' as Metadata<string>,
     WSPort: '' as Metadata<string>
   },

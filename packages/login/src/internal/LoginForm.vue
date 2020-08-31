@@ -15,83 +15,83 @@
 
 <script lang="ts">
 
-  import { Request, Response } from '@anticrm/platform'
+import { Request, Response, serialize } from '@anticrm/platform'
 
-  import { defineComponent, ref } from 'vue'
-  import { getUIService } from '@anticrm/platform-ui'
+import { defineComponent, ref } from 'vue'
+import { getUIService } from '@anticrm/platform-ui'
 
-  import Form from './Form.vue'
+import Form from './Form.vue'
 
-  import login from '..'
-  import { getPlatform } from '@anticrm/platform-ui/src'
+import login from '..'
+import { getPlatform } from '@anticrm/platform-ui/src'
 
-  export default defineComponent({
-    components: {
-      Form
-    },
-    setup() {
-      const platform = getPlatform()
-      const uiService = getUIService()
+export default defineComponent({
+  components: {
+    Form
+  },
+  setup () {
+    const platform = getPlatform()
+    const uiService = getUIService()
 
-      const object = {username: '', password: '', workspace: ''}
-      const info = ref('')
-      const error = ref('')
+    const object = { username: '', password: '', workspace: '' }
+    const info = ref('')
+    const error = ref('')
 
-      function doSignup() {
-        uiService.navigate('/' + login.component.SignupForm)
-      }
-
-      async function doLogin() {
-        info.value = "Соединяюсь с сервером..."
-
-        const url = platform.getMetadata(login.metadata.LoginUrl)
-        if (!url) {
-          info.value = "no login server metadata provided."
-          return
-        }
-
-        const request: Request<[string, string, string]> = {
-          method: 'login',
-          params: [object.username, object.password, object.workspace]
-        }
-
-        try {
-          const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json;charset=utf-8'
-            },
-            body: JSON.stringify(request)
-          })
-          const result = await response.json() as Response<void>
-          if (result.error?.message) {
-            error.value = result.error.message
-          }
-        } catch (err) {
-          error.value = 'Не могу соедениться с сервером.'
-        }
-      }
-
-      return {doLogin, doSignup, object, info, error}
+    function doSignup () {
+      uiService.navigate('/' + login.component.SignupForm)
     }
-  })
+
+    async function doLogin () {
+      info.value = "Соединяюсь с сервером..."
+
+      const url = platform.getMetadata(login.metadata.LoginUrl)
+      if (!url) {
+        info.value = "no login server metadata provided."
+        return
+      }
+
+      const request: Request<[string, string, string]> = {
+        method: 'login',
+        params: [object.username, object.password, object.workspace]
+      }
+
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json;charset=utf-8'
+          },
+          body: serialize(request)
+        })
+        const result = await response.json() as Response<void>
+        if (result.error?.message) {
+          error.value = result.error.message
+        }
+      } catch (err) {
+        error.value = 'Не могу соедениться с сервером.'
+      }
+    }
+
+    return { doLogin, doSignup, object, info, error }
+  }
+})
 </script>
 
 <template>
   <Form
-      :actions="[
+    :actions="[
       { i18n: 'Создать пространство', func: doSignup },
       { i18n: 'Войти в систему', func: doLogin },
     ]"
-      :error="error"
-      :fields="{
+    :error="error"
+    :fields="{
       username: { i18n: 'Электропочта' },
       password: { i18n: 'Пароль', type: 'password'},
       workspace: { i18n: 'Рабочее пространство'}
     }"
-      :info="info"
-      :object="object"
-      caption="Вход в систему"
-      description="Нажмите 'Войти в систему' для продолжения."
+    :info="info"
+    :object="object"
+    caption="Вход в систему"
+    description="Нажмите 'Войти в систему' для продолжения."
   />
 </template>

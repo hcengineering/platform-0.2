@@ -14,7 +14,7 @@ yarn
 yarn workspace offline serve
 ```
 
-Go to http://localhost:8080/component:workbench.Workbench
+Go to http://localhost:8080/component:workbench.Workbench/application:workbench.Default
 
 # The Platform Documentation
 

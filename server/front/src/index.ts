@@ -47,7 +47,7 @@ router.post('rpc', '/rpc', async (ctx, next) => {
   }
 
   if (!client) {
-    client = await MongoClient.connect(dbUri)
+    client = await MongoClient.connect(dbUri, { useUnifiedTopology: true })
   }
   const db = client.db('accounts')
 
@@ -61,7 +61,7 @@ app.use(bodyParser())
 app.use(router.routes()).use(router.allowedMethods())
 
 app.listen(3000, () => {
-  console.log('server started')
+  console.log('server started on port 3000')
 })
 
 

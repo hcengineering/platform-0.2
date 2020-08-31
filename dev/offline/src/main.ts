@@ -23,6 +23,8 @@ import i18n from '@anticrm/platform-i18n'
 
 import { Model, Strings } from '@anticrm/boot/src/boot'
 
+platform.setMetadata(core.metadata.Offline, true)
+
 platform.setMetadata(core.metadata.Model, Model)
 platform.setMetadata(i18n.metadata.Strings, Strings)
 

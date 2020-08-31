@@ -110,7 +110,7 @@ async function login (db: Db, request: Request<[string, string, string]>): Promi
           server,
           port,
           token: encode({ email, workspace }, secret),
-          email: 'andrey.v.platov@gmail.com'
+          email
         }
         return { result, id: request.id }
       }

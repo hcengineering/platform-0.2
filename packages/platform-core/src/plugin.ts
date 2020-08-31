@@ -17,6 +17,7 @@ import { AnyLayout, Class, CoreDomain, Doc, Platform, Ref, Tx } from '@anticrm/p
 import core, { CoreService } from '.'
 import { ModelDb } from './modeldb'
 import { createCache } from './indexeddb'
+import rpcService from './rpc'
 
 /*!
  * Anticrm Platform™ Core Plugin
@@ -75,39 +76,50 @@ export default async (platform: Platform): Promise<CoreService> => {
     }
   }
 
-  function find (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc[]> {
-    return cache.find(_class, query)
-  }
+  // C O R E  P R O T O C O L  (C A C H E)
 
-  function findOne (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc | undefined> {
-    return cache.findOne(_class, query)
-  }
+  const findOffline = (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc[]> => cache.find(_class, query)
 
-  function tx (tx: Tx): Promise<void> {
-    const c = cache.tx(tx)
-    for (const q of queries) {
-      // TODO: check if given tx affect query results
-      find(q._class, q.query).then(result => {
-        q.listener(result)
-      })
-    }
-    return c
-  }
-
-  return {
-    getModel () {
-      return model
+  const coreOffline = {
+    find: findOffline,
+    findOne: (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc | undefined> => cache.findOne(_class, query),
+    tx: (tx: Tx): Promise<void> => {
+      const c = cache.tx(tx)
+      for (const q of queries) {
+        // TODO: check if given tx affect query results
+        findOffline(q._class, q.query).then(result => {
+          q.listener(result)
+        })
+      }
+      return c
     },
-    loadDomain (domain: string, index?: string, direction?: string): Promise<Doc[]> {
+    loadDomain: (domain: string, index?: string, direction?: string): Promise<Doc[]> => {
       if (domain === CoreDomain.Model) {
         return model.loadDomain(domain)
       } else {
         return cache.loadDomain(domain, index, direction)
       }
+    }
+  }
+
+  // C O R E  P R O T O C O L  (R P C)
+
+  const rpc = rpcService(platform)
+
+  const coreRpc = {
+    find: (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc[]> => rpc.request('find', _class, query),
+    findOne: (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc | undefined> => rpc.request('findOne', _class, query),
+    tx: (tx: Tx): Promise<void> => rpc.request('tx', tx),
+    loadDomain: (): Promise<Doc[]> => rpc.request('loadDomain', [])
+  }
+
+  const proto = platform.getMetadata(core.metadata.Offline) ? coreOffline : coreRpc
+
+  return {
+    getModel () {
+      return model
     },
     query,
-    find,
-    findOne,
-    tx
+    ...proto
   }
 }
