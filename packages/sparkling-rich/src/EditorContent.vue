@@ -16,11 +16,11 @@
 <script lang="ts">
 import { computed, defineComponent, onMounted, ref, watch } from 'vue'
 
-import { DOMParser, Fragment, Slice } from 'prosemirror-model'
+import { DOMParser, Fragment, Slice, Mark, MarkType } from 'prosemirror-model'
 
 import { schema } from './internal/schema'
 
-import { AllSelection, EditorState } from 'prosemirror-state'
+import { AllSelection, EditorState, Transaction } from 'prosemirror-state'
 import { EditorView } from 'prosemirror-view'
 
 import { history } from 'prosemirror-history'
@@ -45,6 +45,10 @@ export default defineComponent({
       type: String, // A set of completion separators
       default: "",
     },
+    markTypeDetector: { // A function to match and replace trigger with marker
+      type: Function,
+      default: null,
+    }
   },
   model: {
     'props': "content",
@@ -128,10 +132,43 @@ export default defineComponent({
       } as EditorContentEvent
       context.emit("styleEvent", evt)
     }
+    function transformInjections(state: EditorState): Transaction {
+      let tr: Transaction = null
+      state.doc.descendants((node, pos) => {
+        if (node.isText) {
+          // Check if we had trigger words without defined marker
+          const len = node.text.length
+          for (let i = 0; i < len; i++) {
+            console.log("checking", node.text[i])
+            if (props.triggers.indexOf(node.text[i]) != -1) {
+              // We found trigger, we need to call replace method
+              let detectResult = props.markTypeDetector(node.text.substring(i))
+              // If marker type is detected, we add endpos to i
+              if (detectResult != null) {
+                let end = i + detectResult.endpos
+                tr = (tr == null ? state.tr : tr).addMark(pos + i, end + 1, detectResult.markType.create())
+                console.log("detected:", node.text.substring(i, i + detectResult.endpos))
+                i = end// Move to next char
+              }
+            }
+          }
+          console.log("text:", node.text)
+        }
+      })
+      return tr
+    }
     let view = new EditorView(editRoot, {
       state,
       dispatchTransaction(transaction) {
         let newState = view.state.apply(transaction)
+
+        // Check and update triggers to update content.
+        if (props.markTypeDetector != null) {
+          let tr = transformInjections(newState)
+          if (tr != null) {
+            newState = newState.apply(tr)
+          }
+        }
         view.updateState(newState)
 
         emitStyleEvent()
@@ -148,7 +185,7 @@ export default defineComponent({
         const element = parser.parseFromString(props.content, 'text/html').body
         let newDoc = DOMParser.fromSchema(schema).parse(element)
 
-        let op = state.tr.setSelection(new AllSelection(state.doc)).replaceSelectionWith(newDoc);
+        let op = state.tr.setSelection(new AllSelection(state.doc)).replaceSelectionWith(newDoc)
         let newState = state.apply(op)
 
         view.updateState(newState)
@@ -158,13 +195,18 @@ export default defineComponent({
     })
 
     function insert(text: string, from: number, to: number) {
-      const node = schema.text(text);
-      const frag = Fragment.from(node);
-      const slice = new Slice(frag, 0, 0);
+      const t = view.state.tr.insertText(text, from, to)
+      const st = view.state.apply(t)
+      view.updateState(st)
+      emitStyleEvent()
+    }
+    function insertMark(text: string, from: number, to: number, mark: MarkType) {
+      // Ignore white spaces on end of text
+      let markLen = text.trim().length
 
-      const t = view.state.tr.insertText(text, from, to);
-      const st = view.state.apply(t);
-      view.updateState(st);
+      const t = view.state.tr.insertText(text, from, to).addMark(from, from + markLen, mark.create())
+      const st = view.state.apply(t)
+      view.updateState(st)
       emitStyleEvent()
     }
 
@@ -198,6 +240,7 @@ export default defineComponent({
         view.focus()
       },
       insert,
+      insertMark,
       focus() {
         view.focus()
       },

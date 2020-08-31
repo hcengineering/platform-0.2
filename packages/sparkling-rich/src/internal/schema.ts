@@ -174,6 +174,15 @@ export const marks = {
     code: {
         parseDOM: [{ tag: "code" }],
         toDOM() { return codeDOM }
+    },
+     // :: MarkSpec Code font mark. Represented as a `<code>` element.
+    person: {
+        parseDOM: [{ tag: "person" }],
+        toDOM() { return ["person", 0] }
+    },
+    space: {
+        parseDOM: [{ tag: "space" }],
+        toDOM() { return ["space", 0] }
     }
 } as MarkSpec
 
