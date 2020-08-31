@@ -19,7 +19,7 @@ import platform from '@anticrm/boot/src/platform'
 import ui from '@anticrm/platform-ui'
 import login from '@anticrm/login'
 
-const loginUrl = process.env.VUE_APP_LOGIN_URL || 'http://localhost:3000/rpc'
+const loginUrl = process.env.VUE_APP_LOGIN_URL
 
 platform.setMetadata(login.metadata.LoginUrl, loginUrl)
 
