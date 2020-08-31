@@ -4,7 +4,7 @@
   "scripts": {
     "build": "tsc --build",
     "test": "jest",
-    "start": "node lib/index.js"
+    "start": "ts-node src/index.ts"
   },
   "author": "Anticrm Platform Contributors",
   "license": "EPL-2.0",
