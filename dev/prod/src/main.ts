@@ -17,6 +17,11 @@ import { createApp } from 'vue'
 import ErrorPage from './components/ErrorPage.vue'
 import platform from '@anticrm/boot/src/platform'
 import ui from '@anticrm/platform-ui'
+import login from '@anticrm/login'
+
+const loginUrl = process.env.VUE_APP_LOGIN_URL || 'http://localhost:3000/rpc'
+
+platform.setMetadata(login.metadata.LoginUrl, loginUrl)
 
 async function boot (): Promise<void> {
   const uiService = await platform.getPlugin(ui.id)
