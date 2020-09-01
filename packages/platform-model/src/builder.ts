@@ -39,6 +39,7 @@ class Builder {
 
   constructor(memdb?: MemDb) {
     this.memdb = memdb ?? new MemDb(CoreDomain.Model)
+    this.domains.set(CoreDomain.Model, this.memdb)
   }
 
   load (model: (builder: Builder) => void) {
@@ -54,7 +55,7 @@ class Builder {
     for (const e of this.domains) {
       result[e[0]] = e[1].dump()
     }
-    result[CoreDomain.Model] = this.memdb.dump()
+    // result[CoreDomain.Model] = this.memdb.dump()
     return result
   }
 
@@ -74,6 +75,10 @@ class Builder {
     this.memdb.mixin(id, clazz, values)
   }
 
+  mixinDocument<T extends E, E extends Doc> (doc: E, clazz: Ref<Mixin<T>>, values: Omit<T, keyof E>): void {
+    this.memdb.mixinDocument(doc, clazz, values)
+  }
+
   newInstance<M extends Emb> (_class: Ref<Class<M>>, values: OptionalMethods<Omit<M, keyof Emb>>): M {
     const obj = { _class: _class as Ref<Class<Obj>>, ...values } as M
     return obj
@@ -84,8 +89,20 @@ class Builder {
     return { _class: core.class.Attribute, type } as unknown as Attribute
   }
 
-  createDocument<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Doc>, _id?: Ref<M>): void {
-    this.memdb.createDocument(_class, values, _id)
+  createDocument<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Doc>, _id?: Ref<M>): M {
+    const doc = this.memdb.createDocument(_class, values, _id)
+    if (_class === core.class.Class as Ref<Class<Doc>> || _class === core.class.Mixin as Ref<Class<Doc>>) {
+      this.memdb.add(doc)
+      console.log('add `model` ' + doc._id)
+    } else {
+      const domain = this.memdb.getDomain(_class)
+      if (!domain) {
+        throw new Error('domain not found for class: ' + _class)
+      }
+      console.log(`add '${domain}' ` + doc._id)
+      this.getDomain(domain).add(doc)
+    }
+    return doc as M
   }
 
   // createCls<T extends E, E extends Obj> (_id: Ref<Class<T>>, _extends: Ref<Class<E>>, values: Omit<Class<T>, keyof Classifier<Obj>>, _attributes: AllAttributes<T, E>) {

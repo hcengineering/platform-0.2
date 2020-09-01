@@ -26,7 +26,7 @@ export interface Person extends Contact {
   firstName: string
   lastName: string
 
-  birthDate: Property<number, Date>
+  birthDate?: Property<number, Date>
 }
 
 export interface User extends Person {

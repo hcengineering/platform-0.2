@@ -126,17 +126,20 @@ export class MemDb implements CoreProtocol {
   createDocument<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Doc>, _id?: Ref<M>): Doc {
     const layout = { _class, _id: _id ?? this.generateId() }
     this.assign(layout, _class, values as unknown as AnyLayout)
-    this.add(layout)
+    // this.add(layout)
     return layout
   }
 
-  mixin<T extends E, E extends Doc> (id: Ref<E>, clazz: Ref<Mixin<T>>, values: Omit<T, keyof E>): void {
-    const doc = this.get(id)
+  mixinDocument<T extends E, E extends Doc> (doc: E, clazz: Ref<Mixin<T>>, values: Omit<T, keyof E>): void {
     if (!doc._mixins) {
       doc._mixins = []
     }
     doc._mixins.push(clazz)
     this.assign(doc as unknown as AnyLayout, clazz as Ref<Classifier<Doc>>, values as unknown as AnyLayout)
+  }
+
+  mixin<T extends E, E extends Doc> (id: Ref<E>, clazz: Ref<Mixin<T>>, values: Omit<T, keyof E>): void {
+    this.mixinDocument(this.get(id) as E, clazz, values)
   }
 
   getClassHierarchy (cls: Ref<Class<Obj>>, top?: Ref<Class<Obj>>): Ref<Class<Obj>>[] {

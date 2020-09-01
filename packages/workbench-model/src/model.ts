@@ -19,7 +19,7 @@ import chunter from '@anticrm/chunter-model'
 import contact from '@anticrm/contact-model'
 import presentation from '@anticrm/presentation-core'
 
-import { StringProperty } from '@anticrm/platform'
+import { StringProperty, CoreDomain } from '@anticrm/platform'
 import { IntlString } from '@anticrm/platform-i18n'
 
 export default (S: Builder) => {
@@ -29,13 +29,13 @@ export default (S: Builder) => {
     icon: S.attr(core.class.Type, {}),
     appClass: S.attr(core.class.Type, {}),
     main: S.attr(core.class.Type, {})
-  })
+  }, CoreDomain.Model)
 
   S.createClass(workbench.class.WorkbenchCreateItem, core.class.Doc, {
     label: S.attr(core.class.String, {}),
     icon: S.attr(core.class.Type, {}),
     itemClass: S.attr(core.class.Type, {}),
-  })
+  }, CoreDomain.Model)
 
   S.createDocument(workbench.class.Application, {
     label: 'Default' as StringProperty,
