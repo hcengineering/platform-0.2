@@ -26,13 +26,6 @@ import rpcService from './rpc'
  */
 export default async (platform: Platform): Promise<CoreService> => {
   const model = new ModelDb()
-  const offline = platform.getMetadata(core.metadata.Model)
-  if (offline) {
-    model.loadModel(offline[CoreDomain.Model])
-  } else {
-    throw new Error('not implemented')
-  }
-
   const cache = await createCache('db5', model)
 
   interface Query {
@@ -44,13 +37,13 @@ export default async (platform: Platform): Promise<CoreService> => {
 
   const queries = [] as Query[]
 
-  function query (_class: Ref<Class<Doc>>, query: AnyLayout, listener: (result: Doc[]) => void): () => void {
+  function queryOffline (_class: Ref<Class<Doc>>, query: AnyLayout, listener: (result: Doc[]) => void): () => void {
     const q: Query = { _class, query, listener, instances: [] }
     queries.push(q)
 
     const done = false
 
-    cache.find(_class as Ref<Class<Doc>>, query)
+    findOffline(_class as Ref<Class<Doc>>, query)
       .then(result => {
         // network call may perform faster than cache access :),
         // so we do not return cached results in this case
@@ -59,6 +52,33 @@ export default async (platform: Platform): Promise<CoreService> => {
           listener(result)
         }
       })
+
+    return () => {
+      queries.splice(queries.indexOf(q), 1)
+    }
+  }
+
+  function queryOnline (_class: Ref<Class<Doc>>, query: AnyLayout, listener: (result: Doc[]) => void): () => void {
+    const q: Query = { _class, query, listener, instances: [] }
+    queries.push(q)
+
+    const done = false
+
+    findOnline(_class as Ref<Class<Doc>>, query)
+      .then(result => {
+        q.instances = result
+        listener(result)
+      })
+
+    // cache.find(_class as Ref<Class<Doc>>, query)
+    //   .then(result => {
+    //     // network call may perform faster than cache access :),
+    //     // so we do not return cached results in this case
+    //     if (!done) {
+    //       q.instances = result
+    //       listener(result)
+    //     }
+    //   })
 
     // coreProtocol.find(_class as Ref<Class<Doc>>, query) // !!!!! WRONG, need hibernate
     //   .then(async result => {
@@ -81,6 +101,7 @@ export default async (platform: Platform): Promise<CoreService> => {
   const findOffline = (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc[]> => cache.find(_class, query)
 
   const coreOffline = {
+    query: queryOffline,
     find: findOffline,
     findOne: (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc | undefined> => cache.findOne(_class, query),
     tx: (tx: Tx): Promise<void> => {
@@ -106,8 +127,11 @@ export default async (platform: Platform): Promise<CoreService> => {
 
   const rpc = rpcService(platform)
 
+  const findOnline = (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc[]> => rpc.request('find', _class, query)
+
   const coreRpc = {
-    find: (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc[]> => rpc.request('find', _class, query),
+    query: queryOnline,
+    find: findOnline,
     findOne: (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc | undefined> => rpc.request('findOne', _class, query),
     tx: (tx: Tx): Promise<void> => rpc.request('tx', tx),
     loadDomain: (): Promise<Doc[]> => rpc.request('loadDomain', [])
@@ -115,11 +139,20 @@ export default async (platform: Platform): Promise<CoreService> => {
 
   const proto = platform.getMetadata(core.metadata.Offline) ? coreOffline : coreRpc
 
-  return {
+  const service = {
     getModel () {
       return model
     },
-    query,
+    // query,
     ...proto
   }
+
+  const offline = platform.getMetadata(core.metadata.Model)
+  if (offline) {
+    model.loadModel(offline[CoreDomain.Model])
+  } else {
+    model.loadModel(await service.loadDomain(CoreDomain.Model))
+  }
+
+  return service
 }

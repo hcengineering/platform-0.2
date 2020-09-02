@@ -62,7 +62,8 @@ export default plugin('core' as Plugin<CoreService>, {}, {
     Model: '' as Metadata<{ [key: string]: Doc[] }>,
     Offline: '' as Metadata<boolean>,
     WSHost: '' as Metadata<string>,
-    WSPort: '' as Metadata<string>
+    WSPort: '' as Metadata<string>,
+    Token: '' as Metadata<string>
   },
   class: {
     Class: '' as Ref<Class<Class<Obj>>>,

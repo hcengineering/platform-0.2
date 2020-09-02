@@ -67,6 +67,7 @@ export default defineComponent({
         if (result.error?.message) {
           error.value = result.error.message
         }
+        console.log('result', result.result)
       } catch (err) {
         error.value = 'Не могу соедениться с сервером.'
       }

@@ -18,10 +18,17 @@ import ErrorPage from './components/ErrorPage.vue'
 import platform from '@anticrm/boot/src/platform'
 import ui from '@anticrm/platform-ui'
 import login from '@anticrm/login'
+import core from '@anticrm/platform-core'
 
 const loginUrl = process.env.VUE_APP_LOGIN_URL
+const host = process.env.VUE_APP_WSHOST
+const port = process.env.VUE_APP_WSPORT
+const token = process.env.VUE_APP_TOKEN
 
 platform.setMetadata(login.metadata.LoginUrl, loginUrl)
+platform.setMetadata(core.metadata.WSHost, host)
+platform.setMetadata(core.metadata.WSPort, port)
+platform.setMetadata(core.metadata.Token, token)
 
 async function boot (): Promise<void> {
   const uiService = await platform.getPlugin(ui.id)

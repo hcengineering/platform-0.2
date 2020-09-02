@@ -1,34 +1,22 @@
 //
 // Copyright © 2020 Anticrm Platform Contributors.
-//
+// 
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
 // obtain a copy of the License at https://www.eclipse.org/legal/epl-2.0
-//
+// 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//
+// 
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
 
-import { Metadata, Plugin, plugin, Response, Service } from '@anticrm/platform'
+import { encode } from 'jwt-simple'
 
-export const NetworkActivity = 'network-activity'
+const secret = 'secret'
+const email = 'demo@user.com'
+const workspace = 'latest-model'
 
-export type EventListener = (event: Response<unknown>) => void
-
-export interface RpcService extends Service {
-  request<R>(method: string, ...params: any[]): Promise<R>
-
-  addEventListener(listener: EventListener): void
-}
-
-export default plugin('rpc' as Plugin<RpcService>, {}, {
-  metadata: {
-    WSHost: '' as Metadata<string>,
-    WSPort: '' as Metadata<string>,
-    WSToken: '' as Metadata<string>
-  }
-})
+console.log('token', encode({ email, workspace }, secret))
