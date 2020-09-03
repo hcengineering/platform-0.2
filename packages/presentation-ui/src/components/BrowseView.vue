@@ -53,6 +53,7 @@ export default defineComponent({
       if (shutdown) { shutdown() }
       const q = props.space ? { space: props.space } as unknown as AnyLayout : {}
       shutdown = coreService.query(props._class, q, (result: Doc[]) => {
+        console.log('result: ', result)
         content.value = result
       })
     }, { immediate: true })

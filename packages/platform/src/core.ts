@@ -116,7 +116,7 @@ export interface VDoc extends Doc {
   _modifiedOn?: DateProperty
   _modifiedBy?: StringProperty
 
-  toStr: StringProperty
+  toStr?: StringProperty
 }
 
 export interface Tx extends Doc {
@@ -145,7 +145,6 @@ export enum CoreDomain {
   Model = 'model',
   Tx = 'tx'
 }
-
 
 // TODO: I really hate to have this here, but `server` in not platform based, so we share ids this way.
 export const core = identify('core' as AnyPlugin, {

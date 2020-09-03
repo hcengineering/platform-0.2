@@ -39,7 +39,6 @@ export default defineComponent({
   },
   setup (props, context) {
     const coreService = getCoreService()
-    const model = coreService.getModel()
 
     const content = ref([] as Doc[])
 
@@ -54,7 +53,7 @@ export default defineComponent({
       context.emit('open', object)
     }
 
-    return { core, open, content }
+    return { open, content }
   }
 })
 </script>

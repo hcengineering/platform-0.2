@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Class, Mixin, CoreProtocol, CreateTx, Doc, Ref, Tx, VDoc, Obj, ClassifierKind, Property } from '@anticrm/platform'
+import { AnyLayout, Class, Mixin, CoreProtocol, CreateTx, Doc, Ref, Tx, VDoc, Obj, ClassifierKind, TxProcessor } from '@anticrm/platform'
 
 import { openDB } from 'idb'
 import { ModelDb } from './modeldb'
@@ -44,7 +44,7 @@ export async function createCache (dbname: string, modelDb: ModelDb) {
     }
   })
 
-  async function store (docs: Doc[]): Promise<void> {
+  async function store (docs: VDoc[]): Promise<void> {
     if (docs.length === 0) { return }
     const domains = new Map<string, Doc[]>()
     for (const doc of docs) {
@@ -72,59 +72,24 @@ export async function createCache (dbname: string, modelDb: ModelDb) {
     return tx.done
   }
 
-  async function remove (_class: Ref<Class<Doc>>, doc: Ref<Doc>): Promise<void> {
-    const domain = modelDb.getDomain(_class)
-    const tx = db.transaction(domain, 'readwrite')
-    const store = tx.objectStore(domain)
-    store.delete(doc)
-    return tx.done
+
+  class CacheTxProcessor extends TxProcessor {
+
+    async store (doc: VDoc): Promise<void> {
+      return store([doc])
+    }
+
+    async remove (_class: Ref<Class<Doc>>, doc: Ref<Doc>): Promise<void> {
+      const domain = modelDb.getDomain(_class)
+      const tx = db.transaction(domain, 'readwrite')
+      const store = tx.objectStore(domain)
+      store.delete(doc)
+      return tx.done
+    }
+
   }
 
-  function createTx2VDoc (create: CreateTx): VDoc {
-    const doc: VDoc = {
-      _space: create._space,
-      _class: create._objectClass,
-      _id: create._objectId,
-      _createdBy: create._user,
-      _createdOn: create._date,
-      ...create._attributes
-    }
-    let _class = create._objectClass
-    while (true) {
-      const clazz = modelDb.get(_class) as Class<Obj>
-      if (clazz._kind === ClassifierKind.MIXIN) {
-        if (doc._mixins) {
-          doc._mixins.push(_class as Ref<Mixin<Doc>>)
-        } else {
-          doc._mixins = [_class as Ref<Mixin<Doc>>]
-        }
-        _class = clazz._extends as Ref<Class<VDoc>>
-      } else {
-        doc._class = _class
-        break
-      }
-    }
-    return doc
-  }
-
-  /**
-   * Apply given transaction to cached results.
-   * @param tx
-   */
-  function apply (tx: Tx): Promise<void> {
-    const _class = tx._class
-    switch (_class) {
-      case core.class.CreateTx: {
-        const doc = createTx2VDoc(tx as CreateTx)
-        return store([doc])
-      }
-      case core.class.DeleteTx: {
-        return remove(tx._objectClass, tx._objectId)
-      }
-      default:
-        throw new Error('not implemented (apply tx)')
-    }
-  }
+  const txProcessor = new CacheTxProcessor(modelDb)
 
   function getClass (_class: Ref<Class<Doc>>): Ref<Class<Doc>> {
     let cls = _class
@@ -164,7 +129,7 @@ export async function createCache (dbname: string, modelDb: ModelDb) {
     },
 
     tx (tx: Tx): Promise<void> {
-      return Promise.all([store([tx]), apply(tx)]).then()
+      return txProcessor.process(tx)
     },
 
     async loadDomain (domain: string, index?: string, direction?: string): Promise<Doc[]> {

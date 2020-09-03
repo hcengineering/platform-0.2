@@ -33,7 +33,6 @@ export default (platform: Platform): RpcService => {
     const host = platform.getMetadata(core.metadata.WSHost)
     const port = platform.getMetadata(core.metadata.WSPort)
 
-    // { tenant: 'latest-model' }
     const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0ZW5hbnQiOiJsYXRlc3QtbW9kZWwifQ.hKZDHkhxNL-eCOqk5NFToVh43KOGshLS4b6DgztJQqI'
 
     return new Promise<WebSocket>((resolve, reject) => {
@@ -53,9 +52,9 @@ export default (platform: Platform): RpcService => {
 
       ws.onmessage = (ev: MessageEvent) => {
         const response = readResponse(ev.data)
-        console.log('>>>>>>>>>')
-        console.log(ev.data)
-        console.log('----------')
+        // console.log('>>>>>>>>>')
+        // console.log(ev.data)
+        // console.log('----------')
         if (!response.id) {
           for (const listener of listeners) {
             listener(response)
@@ -91,8 +90,8 @@ export default (platform: Platform): RpcService => {
   }
 
   function request<R> (method: string, ...params: any[]): Promise<R> {
-    console.log('<<<<<<< ' + method)
-    console.log(params)
+    // console.log('<<<<<<< ' + method)
+    // console.log(params)
     return new Promise<any>(async (resolve, reject) => {
       const id = ++lastId
       // if (requests.size === 0) {

@@ -15,7 +15,7 @@
 
 import { MongoClient, Db } from 'mongodb'
 
-import { Ref, Class, Doc, MemDb, AnyLayout, CoreDomain, CoreProtocol, Tx, Graph, Node } from '@anticrm/platform'
+import { core, Ref, Class, Doc, MemDb, AnyLayout, CoreDomain, CoreProtocol, Tx, Graph, Node, TxProcessor, CreateTx } from '@anticrm/platform'
 
 import WebSocket from 'ws'
 import { makeResponse, Response } from './rpc'
@@ -53,6 +53,19 @@ export async function connect (uri: string, dbName: string, ws: WebSocket, serve
     return db.collection(domain).find({ ...query, _class }).toArray()
   }
 
+  class MongoTxProcessor extends TxProcessor {
+    async store (doc: Doc): Promise<void> {
+      const domain = this.modelDb.getDomain(doc._class)
+      return db.collection(domain).insertOne(doc).then(result => { })
+    }
+
+    async remove (_class: Ref<Class<Doc>>, doc: Ref<Doc>): Promise<void> {
+      throw new Error('Not implemented')
+    }
+  }
+
+  const txProcessor = new MongoTxProcessor(memdb)
+
   const clientControl = {
 
     // C O R E  P R O T O C O L
@@ -64,7 +77,7 @@ export async function connect (uri: string, dbName: string, ws: WebSocket, serve
     },
 
     async tx (tx: Tx): Promise<void> {
-      return db.collection(CoreDomain.Tx).insertOne(tx).then(result => {
+      return txProcessor.process(tx).then(() => {
         server.broadcast(clientControl, { result: tx })
       })
     },
