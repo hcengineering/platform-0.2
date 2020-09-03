@@ -15,7 +15,8 @@
 
 <script lang="ts">
 
-import { defineComponent, ref } from 'vue'
+import { defineComponent, ref, watch, onUnmounted } from 'vue'
+import { Doc } from '@anticrm/platform'
 
 import Table from '@anticrm/presentation-ui/src/components/Table.vue'
 import Icon from '@anticrm/platform-ui/src/components/Icon.vue'
@@ -38,9 +39,16 @@ export default defineComponent({
   },
   setup (props, context) {
     const coreService = getCoreService()
+    const model = coreService.getModel()
 
-    const content = ref([])
-    buildModel(coreService).then(model => content.value = model)
+    const content = ref([] as Doc[])
+
+    // const q = props.space ? { space: props.space } as unknown as AnyLayout : {}
+    const shutdown = coreService.query(core.class.CreateTx, {}, (result: Doc[]) => {
+      content.value = result
+    })
+
+    onUnmounted(() => shutdown())
 
     function open (object: Object) {
       context.emit('open', object)
