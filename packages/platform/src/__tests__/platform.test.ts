@@ -119,6 +119,18 @@ describe('platform', () => {
     expect(platform.getMetadata(ids.meta.M2)).toBe('there')
   })
 
+  it('should fail to load metadata', () => {
+    const ids = identify('test' as AnyPlugin, {
+      meta: {
+        M1: 'flag' as Metadata<boolean>
+      }
+    })
+
+    expect(() => platform.loadMetadata(ids.meta, {
+      M1: false
+    })).toThrowError()
+  })
+
   it('should call event listener', () => {
     let listenerCalled = false
     const myEvent = 'MyEvent'
