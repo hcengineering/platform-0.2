@@ -131,6 +131,17 @@ describe('platform', () => {
     })).toThrowError()
   })
 
+  it('should set metadata', () => {
+    const m1 = '' as Metadata<string>
+    const m2 = 'm2' as Metadata<string>
+
+    platform.setMetadata(m1, 'hello')
+    platform.setMetadata(m2, 'again')
+
+    expect(platform.getMetadata(m1)).toBe('hello')
+    expect(platform.getMetadata(m2)).toBe('again')
+  })
+
   it('should call event listener', () => {
     let listenerCalled = false
     const myEvent = 'MyEvent'
