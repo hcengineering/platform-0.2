@@ -13,9 +13,10 @@
 // limitations under the License.
 //
 
-import core, { ArrayOf, BagOf, InstanceOf, RefTo } from '@anticrm/platform-core'
+import core from '@anticrm/platform-core'
 import { extendIds } from './utils'
-import { Attribute, Class, Classifier, Doc, Emb, Mixin, Obj, Ref, Tx, Type, VDoc, Space } from '@anticrm/platform'
+import { Attribute, Class, Classifier, Doc, Emb, Mixin, Obj, Ref, Tx, Type, VDoc, Space, ArrayOf, BagOf, InstanceOf, RefTo } from '@anticrm/platform'
+import { ESFunc } from '@anticrm/platform/src/easyscript'
 
 export { extendIds }
 export { default as Builder } from './builder'
@@ -41,6 +42,8 @@ export default extendIds(core, {
     BagOf: '' as Ref<Class<BagOf<Type>>>,
     ArrayOf: '' as Ref<Class<ArrayOf<Type>>>,
 
-    String: '' as Ref<Class<Type>>
+    String: '' as Ref<Class<Type>>,
+
+    ESFunc: '' as Ref<Class<ESFunc>>
   },
 })

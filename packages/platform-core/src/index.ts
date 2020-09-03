@@ -32,24 +32,6 @@ import {
 } from '@anticrm/platform'
 import { ModelDb } from './modeldb'
 
-// T Y P E S
-
-export interface RefTo<T extends Doc> extends Type {
-  to: Ref<Class<T>>
-}
-
-export interface InstanceOf<T extends Emb> extends Type {
-  of: Ref<Class<T>>
-}
-
-export interface BagOf<A> extends Type {
-  of: Type
-}
-
-export interface ArrayOf<A> extends Type {
-  of: Type
-}
-
 // P L U G I N
 
 export interface CoreService extends Service, CoreProtocol {

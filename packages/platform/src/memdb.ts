@@ -14,9 +14,9 @@
 //
 
 import { generateId } from './objectid'
-import { AnyLayout, Class, Classifier, ClassifierKind, CoreProtocol, Doc, Mixin, Obj, PropertyType, Ref } from './core'
+import { AnyLayout, Class, Classifier, ClassifierKind, Doc, Mixin, Obj, PropertyType, Ref } from './core'
 
-export class MemDb implements CoreProtocol {
+export class MemDb {
   private domain: string
   private objects = new Map<Ref<Doc>, Doc>()
   private byClass: Map<Ref<Class<Doc>>, Doc[]> | null = null

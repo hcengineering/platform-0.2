@@ -13,18 +13,17 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Class, Mixin, CoreProtocol, CreateTx, Doc, Ref, Tx, VDoc, Obj, ClassifierKind } from '@anticrm/platform'
+import { AnyLayout, Class, Mixin, CoreProtocol, CreateTx, Doc, Ref, Tx, VDoc, Obj, ClassifierKind, Property } from '@anticrm/platform'
 
 import { openDB } from 'idb'
 import { ModelDb } from './modeldb'
 import core from '.'
-import { find } from 'lodash'
 
 export interface CacheControl {
   cache (docs: Doc[]): Promise<void>
 }
 
-export async function createCache (dbname: string, modelDb: ModelDb): Promise<CoreProtocol & CacheControl> {
+export async function createCache (dbname: string, modelDb: ModelDb) {
   const db = await openDB(dbname, 1, {
     upgrade (db) {
       const domains = new Map<string, string>()
@@ -156,7 +155,7 @@ export async function createCache (dbname: string, modelDb: ModelDb): Promise<Co
     return tx.done.then(() => result)
   }
 
-  const cache: CoreProtocol & CacheControl = {
+  const cache = {
 
     find,
 
