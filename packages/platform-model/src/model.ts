@@ -58,6 +58,9 @@ export default (S: Builder) => {
     _default: S.attr(core.class.Type, {})
   })
 
+  S.createClass(core.class.ESFunc, core.class.Type, {
+  })
+
   S.createClass(core.class.RefTo, core.class.Type, {
     to: S.attr(core.class.Type, {})
   })
