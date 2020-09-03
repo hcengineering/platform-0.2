@@ -108,7 +108,7 @@ export default async (platform: Platform): Promise<CoreService> => {
       const c = cache.tx(tx)
       for (const q of queries) {
         // TODO: check if given tx affect query results
-        findOffline(q._class, q.query).then(result => {
+        findOnline(q._class, q.query).then(result => {
           q.listener(result)
         })
       }

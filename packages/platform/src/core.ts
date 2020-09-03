@@ -146,7 +146,7 @@ export enum CoreDomain {
   Tx = 'tx'
 }
 
-// TODO: I really hate to have this here, but `server` in not platform based, so we share ids this way.
+// TODO: I really hate to have this here, but `server` in not platform (plugin) based, so we share ids this way.
 export const core = identify('core' as AnyPlugin, {
   class: {
     CreateTx: '' as Ref<Class<CreateTx>>,
