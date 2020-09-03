@@ -118,4 +118,23 @@ describe('platform', () => {
     expect(platform.getMetadata(ids.meta.M1)).toBe('hey')
     expect(platform.getMetadata(ids.meta.M2)).toBe('there')
   })
+
+  it('should call event listener', () => {
+    let listenerCalled = false
+    const myEvent = 'MyEvent'
+    const myData = 'test-data'
+    const myEventListener = function(event: string, data: any): Promise<void> {
+      listenerCalled = true
+      expect(event).toBe(myEvent)
+      expect(data).toBe(myData)
+      return Promise.resolve()
+    }
+
+    platform.addEventListener(myEvent, myEventListener)
+    platform.broadcastEvent(myEvent, myData)
+    expect(listenerCalled).toBe(true)
+
+    // remove listener to avoid calls from other tests
+    platform.removeEventListener(myEvent, myEventListener)
+  })
 })
