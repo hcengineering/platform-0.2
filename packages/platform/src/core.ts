@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Resource } from './platform'
+import { Resource, identify, AnyPlugin } from './platform'
 import { CombineObjects, KeysByType } from 'simplytyped'
 
 type MethodType = (...args: any[]) => any
@@ -132,3 +132,11 @@ export interface CoreProtocol {
   tx (tx: Tx): Promise<void>
   loadDomain (domain: string, index?: string, direction?: string): Promise<Doc[]>
 }
+
+// TODO: I really hate to have this here, but `server` in not platform based, so we share ids this way.
+export const core = identify('core' as AnyPlugin, {
+  class: {
+    CreateTx: '' as Ref<Class<CreateTx>>,
+    DeleteTx: '' as Ref<Class<DeleteTx>>
+  }
+})

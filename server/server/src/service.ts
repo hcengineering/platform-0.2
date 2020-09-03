@@ -58,7 +58,9 @@ export async function connect (uri: string, dbName: string, ws: WebSocket, serve
     },
 
     async tx (tx: Tx): Promise<void> {
-      console.log('tx not implemented')
+      return db.collection(CoreDomain.Tx).insertOne(tx).then(result => {
+        server.broadcast(clientControl, { result: tx })
+      })
     },
 
     async loadDomain (domain: string, index?: string, direction?: string): Promise<Doc[]> {

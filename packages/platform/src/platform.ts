@@ -51,7 +51,7 @@ export interface Service {
 
 /** Plugin identifier. */
 export type Plugin<S extends Service> = Resource<S>
-type AnyPlugin = Plugin<Service>
+export type AnyPlugin = Plugin<Service>
 
 /** A list of dependencies e.g. `{ core: core.id, ui: ui.id }`. */
 export interface PluginDependencies {
@@ -125,30 +125,30 @@ type ExtractType<T, X extends Record<string, Metadata<T>>> = {
 type EventListener = (event: string, data: any) => Promise<void>
 
 export interface Platform {
-  getMetadata<T>(id: Metadata<T>): T | undefined
-  setMetadata<T>(id: Metadata<T>, value: T): void
-  loadMetadata<T, X extends Record<string, Metadata<T>>>(ids: X, resources: ExtractType<T, X>): void
+  getMetadata<T> (id: Metadata<T>): T | undefined
+  setMetadata<T> (id: Metadata<T>, value: T): void
+  loadMetadata<T, X extends Record<string, Metadata<T>>> (ids: X, resources: ExtractType<T, X>): void
 
   addLocation<P extends Service, X extends PluginDependencies>
-  (plugin: PluginDescriptor<P, X>, module: PluginModule<P, X>): void
+    (plugin: PluginDescriptor<P, X>, module: PluginModule<P, X>): void
 
-  resolveDependencies(deps: PluginDependencies): Promise<{ [key: string]: Service }>
+  resolveDependencies (deps: PluginDependencies): Promise<{ [key: string]: Service }>
 
-  getPlugin<T extends Service>(id: Plugin<T>): Promise<T>
+  getPlugin<T extends Service> (id: Plugin<T>): Promise<T>
 
-  getResource<T>(resource: Resource<T>): Promise<T>
+  getResource<T> (resource: Resource<T>): Promise<T>
 
-  setResource<T>(resource: Resource<T>, value: T): void
+  setResource<T> (resource: Resource<T>, value: T): void
 
-  peekResource<T>(resource: Resource<T>): T | undefined
+  peekResource<T> (resource: Resource<T>): T | undefined
 
-  addEventListener(event: string, listener: EventListener): void
+  addEventListener (event: string, listener: EventListener): void
 
-  removeEventListener(event: string, listener: EventListener): void
+  removeEventListener (event: string, listener: EventListener): void
 
-  broadcastEvent(event: string, data: any): void
+  broadcastEvent (event: string, data: any): void
 
-  setPlatformStatus(status: Status): void
+  setPlatformStatus (status: Status): void
 }
 
 /*!
@@ -156,20 +156,20 @@ export interface Platform {
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */
-export function createPlatform(): Platform {
+export function createPlatform (): Platform {
   const resources = new Map<Resource<any>, any>()
 
   // M E T A D A T A
 
-  function getMetadata<T>(id: Metadata<T>): T | undefined {
+  function getMetadata<T> (id: Metadata<T>): T | undefined {
     return resources.get(id)
   }
 
-  function setMetadata<T>(id: Metadata<T>, value: T): void {
+  function setMetadata<T> (id: Metadata<T>, value: T): void {
     resources.set(id, value)
   }
 
-  function loadMetadata<T, X extends Record<string, Metadata<T>>>(ids: X, metadata: ExtractType<T, X>): void {
+  function loadMetadata<T, X extends Record<string, Metadata<T>>> (ids: X, metadata: ExtractType<T, X>): void {
     for (const key in ids) {
       const id = ids[key]
       const resource = metadata[key]
@@ -185,11 +185,11 @@ export function createPlatform(): Platform {
   const resolvingResources = new Map<Resource<any>, Promise<any>>()
 
   /** Peek does not resolve resource. Return resource if it's already loaded. */
-  function peekResource<T>(resource: Resource<T>): T | undefined {
+  function peekResource<T> (resource: Resource<T>): T | undefined {
     return resources.get(resource)
   }
 
-  async function getResource<T>(resource: Resource<T>): Promise<T> {
+  async function getResource<T> (resource: Resource<T>): Promise<T> {
     const resolved = resources.get(resource)
     if (resolved) {
       return resolved
@@ -217,7 +217,7 @@ export function createPlatform(): Platform {
     }
   }
 
-  function setResource<T>(resource: Resource<T>, value: T): void {
+  function setResource<T> (resource: Resource<T>, value: T): void {
     resources.set(resource, value)
   }
 
@@ -225,7 +225,7 @@ export function createPlatform(): Platform {
 
   const eventListeners = new Map<string, EventListener[]>()
 
-  function addEventListener(event: string, listener: EventListener) {
+  function addEventListener (event: string, listener: EventListener) {
     const listeners = eventListeners.get(event)
     if (listeners) {
       listeners.push(listener)
@@ -234,21 +234,21 @@ export function createPlatform(): Platform {
     }
   }
 
-  function removeEventListener(event: string, listener: EventListener) {
+  function removeEventListener (event: string, listener: EventListener) {
     const listeners = eventListeners.get(event)
     if (listeners) {
       listeners.splice(listeners.indexOf(listener), 1)
     }
   }
 
-  function broadcastEvent(event: string, data: any): void {
+  function broadcastEvent (event: string, data: any): void {
     const listeners = eventListeners.get(event)
     if (listeners) {
       listeners.forEach(listener => listener(event, data))
     }
   }
 
-  function setPlatformStatus(status: Status | Error | string) {
+  function setPlatformStatus (status: Status | Error | string) {
     if (typeof status === 'string') {
       broadcastEvent(PlatformStatus, new Status(Severity.INFO, 0, status))
     } else if (status instanceof Error) {
@@ -261,7 +261,7 @@ export function createPlatform(): Platform {
     }
   }
 
-  function createMonitor<T>(name: string, promise: Promise<T>): Promise<T> {
+  function createMonitor<T> (name: string, promise: Promise<T>): Promise<T> {
     return new Promise((resolve, reject) => {
       setPlatformStatus(name)
       promise.then(result => {
@@ -279,7 +279,7 @@ export function createPlatform(): Platform {
   const plugins = new Map<AnyPlugin, Promise<Service>>()
   const locations = [] as [AnyDescriptor, AnyModule][]
 
-  function getLocation(id: AnyPlugin): [AnyDescriptor, AnyModule] {
+  function getLocation (id: AnyPlugin): [AnyDescriptor, AnyModule] {
     for (const location of locations) {
       if (location[0].id === id) {
         return location
@@ -290,11 +290,11 @@ export function createPlatform(): Platform {
 
   // TODO #3 `PluginModule` type does not check against `PluginDescriptor`
   function addLocation<P extends Service, X extends PluginDependencies>
-  (plugin: PluginDescriptor<P, X>, module: PluginModule<P, X>) {
+    (plugin: PluginDescriptor<P, X>, module: PluginModule<P, X>) {
     locations.push([plugin, module as any])
   }
 
-  async function getPlugin<T extends Service>(id: Plugin<T>): Promise<T> {
+  async function getPlugin<T extends Service> (id: Plugin<T>): Promise<T> {
     const plugin = plugins.get(id)
     if (plugin) {
       return plugin as Promise<T>
@@ -310,7 +310,7 @@ export function createPlatform(): Platform {
     }
   }
 
-  async function resolveDependencies(deps: PluginDependencies): Promise<{ [key: string]: Service }> {
+  async function resolveDependencies (deps: PluginDependencies): Promise<{ [key: string]: Service }> {
     const result = {} as { [key: string]: Service }
     for (const key in deps) {
       const id = deps[key]
@@ -319,7 +319,7 @@ export function createPlatform(): Platform {
     return result
   }
 
-  function getPluginInfos(): PluginInfo[] {
+  function getPluginInfos (): PluginInfo[] {
     return locations.map(location => {
       const id = location[0].id
       const plugin = plugins.get(id)
@@ -359,7 +359,7 @@ export function createPlatform(): Platform {
 
 type Namespace = Record<string, Record<string, any>>
 
-function transform<N extends Namespace>(plugin: AnyPlugin, namespaces: N, f: (id: string, value: any) => any): N {
+function transform<N extends Namespace> (plugin: AnyPlugin, namespaces: N, f: (id: string, value: any) => any): N {
   const result = {} as Namespace
   for (const namespace in namespaces) {
     const extensions = namespaces[namespace]
@@ -372,13 +372,13 @@ function transform<N extends Namespace>(plugin: AnyPlugin, namespaces: N, f: (id
   return result as N
 }
 
-export function identify<N extends Namespace>(pluginId: AnyPlugin, namespace: N): N {
+export function identify<N extends Namespace> (pluginId: AnyPlugin, namespace: N): N {
   return transform(pluginId, namespace, (id: string, value) => value === '' ? id : value)
 }
 
 export function plugin<P extends Service, D extends PluginDependencies, N extends Namespace>
-(id: Plugin<P>, deps: D, namespace: N): PluginDescriptor<P, D> & N {
-  return {id, deps, ...identify(id, namespace)}
+  (id: Plugin<P>, deps: D, namespace: N): PluginDescriptor<P, D> & N {
+  return { id, deps, ...identify(id, namespace) }
 }
 
 // R E S O U R C E  I N F O
@@ -391,7 +391,7 @@ export interface ResourceInfo {
   id: string
 }
 
-export function getResourceInfo(resource: Resource<any>): ResourceInfo {
+export function getResourceInfo (resource: Resource<any>): ResourceInfo {
   const index = resource.indexOf(':')
   if (index === -1) {
     throw new Error('invalid resource id format')
@@ -400,5 +400,5 @@ export function getResourceInfo(resource: Resource<any>): ResourceInfo {
   const dot = resource.indexOf('.', index)
   const plugin = resource.substring(index + 1, dot) as AnyPlugin
   const id = resource.substring(dot)
-  return {kind, plugin, id}
+  return { kind, plugin, id }
 }

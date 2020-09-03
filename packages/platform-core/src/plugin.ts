@@ -133,7 +133,7 @@ export default async (platform: Platform): Promise<CoreService> => {
     query: queryOnline,
     find: findOnline,
     findOne: (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc | undefined> => rpc.request('findOne', _class, query),
-    tx: (tx: Tx): Promise<void> => rpc.request('tx', tx),
+    tx: (tx: Tx): Promise<void> => rpc.request('tx', tx).then(() => coreOffline.tx(tx)),
     loadDomain: (): Promise<Doc[]> => rpc.request('loadDomain', [])
   }
 

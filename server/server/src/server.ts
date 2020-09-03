@@ -45,8 +45,6 @@ export function start (port: number, dbUri: string, host?: string) {
   const server = createServer()
   const wss = new Server({ noServer: true })
 
-  // const clients = new Map<string, Promise<ClientService>>()
-
   const connections = [] as Promise<ClientService>[]
 
   const platformServer: PlatformServer = {
@@ -82,7 +80,6 @@ export function start (port: number, dbUri: string, host?: string) {
     const service = new Promise<ClientService>((resolve, reject) => {
       connect(uri, tenant, ws, platformServer).then(service => { resolve(service as unknown as ClientService) }).catch(err => reject(err))
     })
-    //clients.set(tenant, service)
     return service
   }
 
