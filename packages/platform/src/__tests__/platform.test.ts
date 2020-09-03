@@ -137,4 +137,96 @@ describe('platform', () => {
     // remove listener to avoid calls from other tests
     platform.removeEventListener(myEvent, myEventListener)
   })
+
+  it('should call many event listeners', () => {
+    class TestEventListener {
+      readonly eventName: string
+      readonly eventData: string
+      isCalled: boolean
+      listener: (event: string, data: string) => Promise<void>
+
+      constructor(eventName: string, eventData: string) {
+        this.eventName = eventName
+        this.eventData = eventData
+        this.isCalled = false
+
+        this.listener = (event: string, data: any): Promise<void> => {
+          this.isCalled = true
+          expect(event).toBe(this.eventName)
+          expect(data).toBe(this.eventData)
+          return Promise.resolve()
+        }
+      }
+
+      startListen() {
+        platform.addEventListener(this.eventName, this.listener)
+      }
+
+      stopListen() {
+        platform.removeEventListener(this.eventName, this.listener)
+      }
+
+      checkCalled() {
+        expect(this.isCalled).toBe(true)
+        this.isCalled = false  // reset flag for futher checks
+      }
+
+      checkNotCalled() {
+        expect(this.isCalled).toBe(false)
+      }
+    }
+
+    const event1 = 'MyEvent1'
+    const event2 = 'MyEvent2'
+    const data1 = 'data1'
+    const data2 = 'data2'
+
+    const firstListenerForEvent1 = new TestEventListener(event1, data1)
+    const secondListenerForEvent1 = new TestEventListener(event1, data1)
+    const firstListenerForEvent2 = new TestEventListener(event2, data2)
+    const secondListenerForEvent2 = new TestEventListener(event2, data2)
+
+    firstListenerForEvent1.startListen()
+    secondListenerForEvent1.startListen()
+    firstListenerForEvent2.startListen()
+    secondListenerForEvent2.startListen()
+
+    platform.broadcastEvent(event1, data1)
+    firstListenerForEvent1.checkCalled()
+    secondListenerForEvent1.checkCalled()
+    firstListenerForEvent2.checkNotCalled()
+    secondListenerForEvent2.checkNotCalled()
+
+    platform.broadcastEvent(event2, data2)
+    firstListenerForEvent1.checkNotCalled()
+    secondListenerForEvent1.checkNotCalled()
+    firstListenerForEvent2.checkCalled()
+    secondListenerForEvent2.checkCalled()
+
+    platform.broadcastEvent('ArbitraryEvent', 'anydata')
+    firstListenerForEvent1.checkNotCalled()
+    secondListenerForEvent1.checkNotCalled()
+    firstListenerForEvent2.checkNotCalled()
+    secondListenerForEvent2.checkNotCalled()
+
+    secondListenerForEvent1.stopListen()
+
+    platform.broadcastEvent(event1, data1)
+    firstListenerForEvent1.checkCalled()
+    secondListenerForEvent1.checkNotCalled()
+    firstListenerForEvent2.checkNotCalled()
+    secondListenerForEvent2.checkNotCalled()
+
+    firstListenerForEvent1.stopListen()
+    firstListenerForEvent2.stopListen()
+    secondListenerForEvent2.stopListen()
+
+    platform.broadcastEvent(event1, data1)
+    platform.broadcastEvent(event2, data2)
+
+    firstListenerForEvent1.checkNotCalled()
+    secondListenerForEvent1.checkNotCalled()
+    firstListenerForEvent2.checkNotCalled()
+    secondListenerForEvent2.checkNotCalled()
+  })
 })
