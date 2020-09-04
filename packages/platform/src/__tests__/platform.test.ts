@@ -15,7 +15,7 @@
 
 /* eslint-env jest */
 
-import { createPlatform, identify, Metadata, Plugin, Resource, Service } from '..'
+import { createPlatform, identify, Metadata, Plugin, Resource, Service, PlatformStatus, Status, Severity } from '..'
 
 import { descriptor1, descriptor2, descriptor3, plugin1, plugin1State, plugin2State, plugin3 } from './shared'
 
@@ -272,5 +272,41 @@ describe('platform', () => {
     secondListenerForEvent1.checkNotCalled()
     firstListenerForEvent2.checkNotCalled()
     secondListenerForEvent2.checkNotCalled()
+  })
+
+  function testSetPlatformStatus(status: any, expectedSeverity: Severity, expectedMessage: string) {
+    let listenerCalled = false
+    const listener = function(event: string, data: any): Promise<void> {
+      listenerCalled = true
+      expect(event).toBe(PlatformStatus)
+      expect(data).toBeInstanceOf(Status)
+      expect(data.severity).toBe(expectedSeverity)
+      expect(data.code).toBe(0)
+      expect(data.message).toBe(expectedMessage)
+      return Promise.resolve()
+    }
+
+    platform.addEventListener(PlatformStatus, listener)
+    platform.setPlatformStatus(status)
+    expect(listenerCalled).toBeTruthy()
+
+    // remove listener to avoid calls from other tests
+    platform.removeEventListener(PlatformStatus, listener)
+  }
+
+  it('should set string platform status', () => {
+    testSetPlatformStatus('custom string', Severity.INFO, 'custom string')
+  })
+
+  it('should set error platform status', () => {
+    testSetPlatformStatus(new Error('baga'), Severity.ERROR, 'baga')
+  })
+
+  it('should set custom platform status', () => {
+    testSetPlatformStatus(new Status(Severity.OK, 0, 'custom message'), Severity.OK, 'custom message')
+  })
+
+  it('should set unknown platform status', () => {
+    testSetPlatformStatus({x: 'y'}, Severity.WARNING, 'Unknown status: [object Object]')
   })
 })
