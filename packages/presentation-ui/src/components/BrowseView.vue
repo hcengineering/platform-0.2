@@ -53,20 +53,12 @@ export default defineComponent({
       if (shutdown) { shutdown() }
       const q = props.space ? { space: props.space } as unknown as AnyLayout : {}
       shutdown = coreService.query(props._class, q, (result: Doc[]) => {
+        console.log('result: ', result)
         content.value = result
       })
     }, { immediate: true })
 
     onUnmounted(() => shutdown())
-
-    // function add() {
-    //   const clazz = model.get(props._class) as Class<VDoc>
-    //   const details = model.as(clazz, presentation.class.DetailsForm)
-    //   context.emit('open', {
-    //     component: details.form || workbench.component.NewDocument,
-    //     document: props._class
-    //   })
-    // }
 
     function open (object: Object) {
       context.emit('open', object)

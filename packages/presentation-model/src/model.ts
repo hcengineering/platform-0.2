@@ -47,6 +47,10 @@ export default (S: UIBuilder) => {
     presenter: presentationUI.component.RefPresenter
   })
 
+  S.mixin(core.class.ESFunc, ui.class.Presenter, {
+    presenter: presentationUI.component.StringPresenter
+  })
+
   S.createMixin(ui.class.DetailForm, core.class.Class, {
     component: S.attr(core.class.Type, {})
   })

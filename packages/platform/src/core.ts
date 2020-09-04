@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Resource } from './platform'
+import { Resource, identify, AnyPlugin } from './platform'
 import { CombineObjects, KeysByType } from 'simplytyped'
 
 type MethodType = (...args: any[]) => any
@@ -81,6 +81,24 @@ export interface EClass<T extends E, E extends Obj> extends EClassifier<T, E> {
 
 export type Class<T extends Obj> = EClass<T, Obj>
 
+// T Y P E S
+
+export interface RefTo<T extends Doc> extends Type {
+  to: Ref<Class<T>>
+}
+
+export interface InstanceOf<T extends Emb> extends Type {
+  of: Ref<Class<T>>
+}
+
+export interface BagOf<A> extends Type {
+  of: Type
+}
+
+export interface ArrayOf<A> extends Type {
+  of: Type
+}
+
 // S P A C E S
 
 export interface Space extends Doc {
@@ -97,6 +115,8 @@ export interface VDoc extends Doc {
   _createdBy: StringProperty
   _modifiedOn?: DateProperty
   _modifiedBy?: StringProperty
+
+  toStr?: StringProperty
 }
 
 export interface Tx extends Doc {
@@ -126,9 +146,10 @@ export enum CoreDomain {
   Tx = 'tx'
 }
 
-export interface CoreProtocol {
-  find (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc[]>
-  findOne (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc | undefined>
-  tx (tx: Tx): Promise<void>
-  loadDomain (domain: string, index?: string, direction?: string): Promise<Doc[]>
-}
+// TODO: I really hate to have this here, but `server` in not platform (plugin) based, so we share ids this way.
+export const core = identify('core' as AnyPlugin, {
+  class: {
+    CreateTx: '' as Ref<Class<CreateTx>>,
+    DeleteTx: '' as Ref<Class<DeleteTx>>
+  }
+})

@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Class, CoreDomain, Doc, Platform, Ref, Tx } from '@anticrm/platform'
+import { AnyLayout, Class, CoreDomain, Doc, Platform, Ref, Tx, Node } from '@anticrm/platform'
 import core, { CoreService } from '.'
 import { ModelDb } from './modeldb'
 import { createCache } from './indexeddb'
@@ -108,7 +108,7 @@ export default async (platform: Platform): Promise<CoreService> => {
       const c = cache.tx(tx)
       for (const q of queries) {
         // TODO: check if given tx affect query results
-        findOffline(q._class, q.query).then(result => {
+        findOnline(q._class, q.query).then(result => {
           q.listener(result)
         })
       }
@@ -133,11 +133,13 @@ export default async (platform: Platform): Promise<CoreService> => {
     query: queryOnline,
     find: findOnline,
     findOne: (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc | undefined> => rpc.request('findOne', _class, query),
-    tx: (tx: Tx): Promise<void> => rpc.request('tx', tx),
-    loadDomain: (): Promise<Doc[]> => rpc.request('loadDomain', [])
+    tx: (tx: Tx): Promise<void> => rpc.request('tx', tx).then(() => coreOffline.tx(tx)),
+    loadDomain: (domain: string): Promise<Doc[]> => rpc.request('loadDomain', []),
+    loadGraph: (): Promise<Node[]> => rpc.request('loadGraph', [])
   }
 
-  const proto = platform.getMetadata(core.metadata.Offline) ? coreOffline : coreRpc
+  //const proto = platform.getMetadata(core.metadata.Offline) ? coreOffline : coreRpc
+  const proto = coreRpc
 
   const service = {
     getModel () {

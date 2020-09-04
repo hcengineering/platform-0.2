@@ -17,7 +17,7 @@ import { UIBuilder } from '@anticrm/presentation-model'
 import core from '@anticrm/platform-model'
 import presentation from '@anticrm/presentation-model'
 import workbench from '@anticrm/workbench-model'
-import { Class, VDoc, Ref, StringProperty, Property } from '@anticrm/platform'
+import { Class, VDoc, Ref, StringProperty, Property, EasyScript, THIS, GET, CONCAT } from '@anticrm/platform'
 
 import contact from '.'
 import { Person } from '@anticrm/contact'
@@ -51,6 +51,9 @@ export default (S: UIBuilder) => {
     birthDate: S.attrUI(core.class.Type, {}, {
       label: 'День рождения' as IntlString,
       icon: contact.icon.Date
+    }),
+    toStr: S.attr(core.class.ESFunc, {
+      _default: `${THIS},firstName,${GET},${THIS},lastName,${GET},${CONCAT}` as EasyScript<() => string>
     }),
   })
 

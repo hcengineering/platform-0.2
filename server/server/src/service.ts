@@ -15,7 +15,7 @@
 
 import { MongoClient, Db } from 'mongodb'
 
-import { Ref, Class, Doc, MemDb, AnyLayout, CoreDomain, CoreProtocol, Tx } from '@anticrm/platform'
+import { core, Ref, Class, Doc, MemDb, AnyLayout, CoreDomain, CoreProtocol, Tx, Graph, Node, TxProcessor, CreateTx } from '@anticrm/platform'
 
 import WebSocket from 'ws'
 import { makeResponse, Response } from './rpc'
@@ -36,16 +36,35 @@ export async function connect (uri: string, dbName: string, ws: WebSocket, serve
   console.log('use ' + dbName)
   const client = await MongoClient.connect(uri, { useUnifiedTopology: true })
   const db = client.db(dbName)
-  const model = await db.collection('model').find({}).toArray()
-  // console.log('model:')
-  // console.log(model)
+
   const memdb = new MemDb(CoreDomain.Model)
+  console.log('loading model...')
+  const model = await db.collection('model').find({}).toArray()
+  console.log('model loaded.')
   memdb.loadModel(model)
+
+  const graph = new Graph(memdb)
+  console.log('loading graph...')
+  db.collection(CoreDomain.Tx).find({}).forEach(tx => graph.updateGraph(tx), () => console.log(graph.dump()))
+  console.log('graph loaded.')
 
   function find (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc[]> {
     const domain = memdb.getDomain(_class)
     return db.collection(domain).find({ ...query, _class }).toArray()
   }
+
+  class MongoTxProcessor extends TxProcessor {
+    async store (doc: Doc): Promise<void> {
+      const domain = this.modelDb.getDomain(doc._class)
+      return db.collection(domain).insertOne(doc).then(result => { })
+    }
+
+    async remove (_class: Ref<Class<Doc>>, doc: Ref<Doc>): Promise<void> {
+      throw new Error('Not implemented')
+    }
+  }
+
+  const txProcessor = new MongoTxProcessor(memdb)
 
   const clientControl = {
 
@@ -58,12 +77,20 @@ export async function connect (uri: string, dbName: string, ws: WebSocket, serve
     },
 
     async tx (tx: Tx): Promise<void> {
-      console.log('tx not implemented')
+      return txProcessor.process(tx).then(() => {
+        server.broadcast(clientControl, { result: tx })
+      })
     },
 
     async loadDomain (domain: string, index?: string, direction?: string): Promise<Doc[]> {
       return memdb.dump()
     },
+
+    async loadGraph (): Promise<Node[]> {
+      return graph.dump()
+    },
+
+    // P R O T C O L  E X T E N S I O N S
 
     delete (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<void> {
       console.log('DELETE', _class, query)

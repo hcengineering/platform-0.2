@@ -45,7 +45,9 @@ export default (S: Builder) => {
     _createdOn: S.attr(core.class.Type, {}),
     _createdBy: S.attr(core.class.Type, {}),
     _modifiedOn: S.attr(core.class.Type, {}),
-    _modifiedBy: S.attr(core.class.Type, {})
+    _modifiedBy: S.attr(core.class.Type, {}),
+
+    toStr: S.attr(core.class.ESFunc, {})
   })
 
   S.createClass(core.class.Attribute, core.class.Emb, {
@@ -54,6 +56,9 @@ export default (S: Builder) => {
 
   S.createClass(core.class.Type, core.class.Emb, {
     _default: S.attr(core.class.Type, {})
+  })
+
+  S.createClass(core.class.ESFunc, core.class.Type, {
   })
 
   S.createClass(core.class.RefTo, core.class.Type, {
