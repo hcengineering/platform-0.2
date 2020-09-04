@@ -28,12 +28,27 @@ export default defineComponent({
     tx: Object as PropType<CreateTx>
   },
   setup (props, context) {
+    function parseMessage (message: string) {
+      const parser = new DOMParser()
+      const root = parser.parseFromString(message, 'text/xml')
+      const xmlDoc = root.childNodes[0]
+      for (let i = 0; i < xmlDoc.childNodes.length; i++) {
+        console.log(xmlDoc.childNodes[i]);
+      }
+      return ''
+    }
+
+    return {
+      parseMessage
+    }
   }
 })
 </script>
 
 <template>
-  <div class="chunter-message-info">{{tx._attributes?.message}}</div>
+  <div
+    class="chunter-message-info"
+  >{{tx._attributes?.message}} {{parseMessage(tx._attributes?.message)}}</div>
 </template>
 
 <style lang="scss">

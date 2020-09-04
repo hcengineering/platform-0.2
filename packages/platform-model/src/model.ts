@@ -14,7 +14,7 @@
 //
 
 import Builder from './builder'
-import { ClassifierKind, CoreDomain } from '@anticrm/platform'
+import { ClassifierKind, CoreDomain, EasyScript } from '@anticrm/platform'
 import core from '.'
 
 export { Builder }
@@ -47,7 +47,9 @@ export default (S: Builder) => {
     _modifiedOn: S.attr(core.class.Type, {}),
     _modifiedBy: S.attr(core.class.Type, {}),
 
-    toStr: S.attr(core.class.ESFunc, {})
+    toStr: S.attr(core.class.ESFunc, {
+      _default: 'title' as EasyScript<() => string>
+    })
   })
 
   S.createClass(core.class.Attribute, core.class.Emb, {

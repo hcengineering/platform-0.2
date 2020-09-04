@@ -16,7 +16,7 @@
 import { Ref, Class } from '@anticrm/platform'
 import { UIBuilder } from '@anticrm/presentation-model'
 import workbench from '@anticrm/workbench-model'
-import { Property, StringProperty } from '@anticrm/platform'
+import { Property, StringProperty, THIS, GET, EasyScript } from '@anticrm/platform'
 import core from '@anticrm/platform-model'
 import contact from '@anticrm/contact-model'
 import { Person } from '@anticrm/contact'
@@ -45,7 +45,7 @@ export default (S: UIBuilder) => {
     comments: S.attrUI(core.class.Type, {}, {
       label: 'Комментарии' as IntlString,
       icon: chunter.icon.Chunter
-    })
+    }),
   })
 
   S.createMixin(chunter.mixin.ChunterInfo, core.class.Class, {
