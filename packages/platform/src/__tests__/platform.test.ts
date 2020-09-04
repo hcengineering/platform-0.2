@@ -96,7 +96,7 @@ describe('platform', () => {
     })
   })
 
-  it('should set metadata', async () => {
+  it('should set resource', async () => {
     platform.setResource('xxx' as Resource<string>, 'meta-xxx')
     const resource = await platform.getResource('xxx' as Resource<string>)
     expect(resource).toBe('meta-xxx')
