@@ -15,7 +15,7 @@
 
 /* eslint-env jest */
 
-import { createPlatform, identify, Metadata, Plugin, Resource, Service, PlatformStatus, Status, Severity } from '..'
+import { createPlatform, getResourceInfo, identify, Metadata, Plugin, Resource, Service, PlatformStatus, Status, Severity } from '..'
 
 import { descriptor1, descriptor2, descriptor3, plugin1, plugin1State, plugin2State, plugin3 } from './shared'
 
@@ -108,6 +108,10 @@ describe('platform', () => {
       expect(deps.plugin1.id).toBe('plugin1')
       expect(deps.plugin2.id).toBe('plugin2')
     })
+  })
+
+  it('should fail to get resource info', () => {
+    expect(() => getResourceInfo('bad resource definition' as Resource<String>)).toThrowError('invalid resource id format')
   })
 
   it('should peek resource', () => {
