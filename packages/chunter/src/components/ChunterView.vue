@@ -26,7 +26,6 @@ import ChunterItem from './ChunterItem.vue'
 import core from '@anticrm/platform-core'
 
 import { getCoreService } from '../utils'
-import { buildModel } from '../model'
 
 export default defineComponent({
   components: {

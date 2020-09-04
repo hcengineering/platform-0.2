@@ -16,6 +16,43 @@
 import { CoreService } from '@anticrm/platform-core'
 import { CoreDomain, Doc } from '@anticrm/platform'
 
-export function buildModel (coreService: CoreService): Promise<Doc[]> {
-  return coreService.loadDomain(CoreDomain.Tx, 'date', 'prev')
+export enum MessageElementKind {
+  TEXT,
+  LINK
+}
+
+interface MessageElement {
+  kind: MessageElementKind
+}
+
+export interface MessageText extends MessageElement {
+  text: string
+}
+
+export interface MessageLink extends MessageElement {
+  text: string
+}
+
+export function parseMessage (message: string): MessageElement[] {
+  const result = []
+  const parser = new DOMParser()
+  const root = parser.parseFromString(message, 'text/xml')
+  const children = root.childNodes[0].childNodes
+  for (let i = 0; i < children.length; i++) {
+    const node = children[i]
+    console.log(node)
+    if (node.nodeType === Node.TEXT_NODE) {
+      result.push({
+        kind: MessageElementKind.TEXT,
+        text: node.nodeValue
+      } as MessageText)
+    } else if (node.nodeType === Node.ELEMENT_NODE) {
+      const text = node.childNodes[0].nodeValue
+      result.push({
+        kind: MessageElementKind.LINK,
+        text
+      } as MessageLink)
+    }
+  }
+  return result
 }
