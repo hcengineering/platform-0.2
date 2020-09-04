@@ -319,7 +319,7 @@ export function createPlatform (): Platform {
     return result
   }
 
-  function getPluginInfos (): PluginInfo[] {
+  /*function getPluginInfos (): PluginInfo[] {
     return locations.map(location => {
       const id = location[0].id
       const plugin = plugins.get(id)
@@ -330,7 +330,7 @@ export function createPlatform (): Platform {
       }
       return info
     })
-  }
+  }*/
 
   const platform = {
     getMetadata,
