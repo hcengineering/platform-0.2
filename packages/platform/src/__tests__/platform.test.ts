@@ -88,6 +88,18 @@ describe('platform', () => {
     })
   })
 
+  it('should fail to resolve wrong resource', (done) => {
+    const wrongResource = 'resource_wrong:plugin2.Resource' as Resource<string>
+    platform.getResource(wrongResource).then(res => { // eslint-disable-line
+      expect(true).toBe(false)
+      done()
+    }).catch(err => {
+      expect(err).toBeInstanceOf(Error)
+      expect(err.message).toBe(`resource not loaded: ${wrongResource}`)
+      done()
+    })
+  })
+
   it('should inject dependencies', () => {
     platform.addLocation(descriptor3, () => import('./plugin3'))
     const p3 = platform.getPlugin(plugin3)
