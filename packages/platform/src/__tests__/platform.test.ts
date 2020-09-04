@@ -69,8 +69,10 @@ describe('platform', () => {
     // platform.setResolver('resource2', plugin2)
     expect(plugin2State.parsed).toBe(false)
     expect(plugin2State.started).toBe(false)
-    const resolved = platform.getResource('resource2:plugin2.Resource' as Resource<string>)
+    let resolved = platform.getResource('resource2:plugin2.Resource' as Resource<string>)
     expect(resolved).toBeInstanceOf(Promise)
+    // get again to check repeated getting
+    resolved = platform.getResource('resource2:plugin2.Resource' as Resource<string>)
     return resolved.then(resource => {
       expect(resource).toBe('hello resource2:My.Resource')
       expect(plugin2State.parsed).toBe(true)
