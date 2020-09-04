@@ -96,6 +96,13 @@ describe('platform', () => {
     })
   })
 
+  it('should peek resource', () => {
+    const resource = 'resource' as Resource<String>
+    expect(platform.peekResource(resource)).toBeUndefined()
+    platform.setResource(resource, 'value')
+    expect(platform.peekResource(resource)).toBe('value')
+  })
+
   it('should set resource', async () => {
     platform.setResource('xxx' as Resource<string>, 'meta-xxx')
     const resource = await platform.getResource('xxx' as Resource<string>)
