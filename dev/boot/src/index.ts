@@ -15,6 +15,7 @@
 
 import { MongoClient } from 'mongodb'
 import { Model, Strings } from './boot'
+import { Doc } from '@anticrm/platform'
 
 const modelJson = JSON.stringify(Model, null, 2)
 console.log(modelJson)
@@ -43,18 +44,17 @@ function dumpToFile () {
 }
 
 function initDatabase (uri: string, tenant: string) {
+  const domains = { tx: [], ...Model } as { [key: string]: Doc[] }
   MongoClient.connect(uri, { useUnifiedTopology: true }, (err, client) => {
     const db = client.db(tenant)
-    for (const domain in Model) {
-      const model = Model[domain]
+    const ops = [] as Promise<any>[]
+    for (const domain in domains) {
+      const model = domains[domain]
       db.collection(domain, (err, coll) => {
-        coll.deleteMany({}, () => {
-          coll.insertMany(model).then(() => {
-            client.close()
-          })
-        })
+        ops.push(coll.deleteMany({}).then(() => model.length > 0 ? coll.insertMany(model) : null))
       })
     }
+    Promise.all(ops).then(() => client.close())
   })
 
 }
