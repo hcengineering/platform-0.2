@@ -14,7 +14,7 @@
 -->
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, ref, watch } from 'vue'
+import { computed, defineComponent, onMounted, ref, watch, PropType } from 'vue'
 
 import { DOMParser, Fragment, Slice, Mark, MarkType } from 'prosemirror-model'
 
@@ -42,11 +42,11 @@ export default defineComponent({
       default: "Placeholder...",
     },
     triggers: {
-      type: String, // A set of completion separators
+      type: Array as PropType<Array<String>>, // A set of completion separators
       default: "",
     },
-    markTypeDetector: { // A function to match and replace trigger with marker
-      type: Function,
+    transformInjections: { // A function to match and replace trigger with marker
+      type: Function, // transformInjections(state: EditorState): Transaction
       default: null,
     }
   },
@@ -69,8 +69,9 @@ export default defineComponent({
       return checkEmpty(props.content)
     })
 
-    function findCompletionWord(sel): string {
+    function findCompletion(sel): { completionWord: string, completionEnd: string } {
       var completionWord = ''
+      var completionEnd = ''
       if (sel.$from.nodeBefore != null) {
         let val = sel.$from.nodeBefore.textContent
         let p = -1
@@ -79,10 +80,13 @@ export default defineComponent({
             //Stop on WS
             break
           }
-          if (props.triggers.indexOf(val[p]) != -1) {
-            // we found trigger, -1 to pos
-            p--
-            break
+          for (let ti = 0; ti < props.triggers.length; ti++) {
+            let t = props.triggers[ti]
+            if (val.substring(p, t.length) == t) {
+              // we found trigger, -1 to pos
+              p -= t.length
+              break
+            }
           }
         }
         if (p != -1) {
@@ -90,7 +94,10 @@ export default defineComponent({
         }
         completionWord = val
       }
-      return completionWord
+      if (sel.$from.nodeAfter != null) {
+        completionEnd = sel.$from.nodeAfter.textContent
+      }
+      return { completionWord, completionEnd }
     }
 
     let state = EditorState.create({
@@ -104,7 +111,7 @@ export default defineComponent({
     })
     let emitStyleEvent = function () {
       let sel = view.state.selection
-      var completionWord = findCompletionWord(sel)
+      var { completionWord, completionEnd } = findCompletion(sel)
 
       let cursor = view.coordsAtPos(sel.from - completionWord.length - 1)
       // The box in which the tooltip is positioned, to use as base
@@ -128,34 +135,10 @@ export default defineComponent({
         underline: isUnderline, isUnderlineEnabled: Commands.toggleUnderline(view.state, null),
         cursor: { left: cursor.left, top: cursor.top, bottom: cursor.bottom, right: cursor.right },
         completionWord,
+        completionEnd,
         selection: { from: sel.from, to: sel.to }
       } as EditorContentEvent
       context.emit("styleEvent", evt)
-    }
-    function transformInjections(state: EditorState): Transaction {
-      let tr: Transaction = null
-      state.doc.descendants((node, pos) => {
-        if (node.isText) {
-          // Check if we had trigger words without defined marker
-          const len = node.text.length
-          for (let i = 0; i < len; i++) {
-            console.log("checking", node.text[i])
-            if (props.triggers.indexOf(node.text[i]) != -1) {
-              // We found trigger, we need to call replace method
-              let detectResult = props.markTypeDetector(node.text.substring(i))
-              // If marker type is detected, we add endpos to i
-              if (detectResult != null) {
-                let end = i + detectResult.endpos
-                tr = (tr == null ? state.tr : tr).addMark(pos + i, end + 1, detectResult.markType.create())
-                console.log("detected:", node.text.substring(i, i + detectResult.endpos))
-                i = end// Move to next char
-              }
-            }
-          }
-          console.log("text:", node.text)
-        }
-      })
-      return tr
     }
     let view = new EditorView(editRoot, {
       state,
@@ -163,10 +146,17 @@ export default defineComponent({
         let newState = view.state.apply(transaction)
 
         // Check and update triggers to update content.
-        if (props.markTypeDetector != null) {
-          let tr = transformInjections(newState)
+        if (props.transformInjections != null) {
+          let tr: Promise<Transaction> = props.transformInjections(newState)
           if (tr != null) {
-            newState = newState.apply(tr)
+            tr.then((res) => {
+              if (res != null) {
+                newState = newState.apply(res)
+                view.updateState(newState)
+
+                emitStyleEvent()
+              }
+            })
           }
         }
         view.updateState(newState)
@@ -200,16 +190,15 @@ export default defineComponent({
       view.updateState(st)
       emitStyleEvent()
     }
-    function insertMark(text: string, from: number, to: number, mark: MarkType) {
+    function insertMark(text: string, from: number, to: number, mark: MarkType, attrs?: { [key: string]: any }) {
       // Ignore white spaces on end of text
       let markLen = text.trim().length
 
-      const t = view.state.tr.insertText(text, from, to).addMark(from, from + markLen, mark.create())
+      const t = view.state.tr.insertText(text, from, to).addMark(from, from + markLen, mark.create(attrs))
       const st = view.state.apply(t)
       view.updateState(st)
       emitStyleEvent()
     }
-
     return {
       root,
       view,

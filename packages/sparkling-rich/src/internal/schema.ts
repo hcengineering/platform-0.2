@@ -175,15 +175,13 @@ export const marks = {
         parseDOM: [{ tag: "code" }],
         toDOM() { return codeDOM }
     },
-     // :: MarkSpec Code font mark. Represented as a `<code>` element.
-    person: {
-        parseDOM: [{ tag: "person" }],
-        toDOM() { return ["person", 0] }
+    // :: MarkSpec Code font mark. Represented as a `<code>` element.
+    reference: {
+        inclusive: false,
+        attrs: { id: {}, class: {} },
+        parseDOM: [{ tag: "reference" }],
+        toDOM(node: any) { return ["reference", { id: node.attrs.id, class: node.attrs.class }, 0] }
     },
-    space: {
-        parseDOM: [{ tag: "space" }],
-        toDOM() { return ["space", 0] }
-    }
 } as MarkSpec
 
 // :: Schema

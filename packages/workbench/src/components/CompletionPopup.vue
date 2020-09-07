@@ -35,7 +35,10 @@ export interface CompletionItem {
 export default defineComponent({
   components: { Icon, ScrollView },
   props: {
-    selection: String,
+    selection: {
+      type: String,
+      default: ""
+    },
     items: Array as PropType<Array<CompletionItem>>,
     pos: Object as PropType<{ left: number; right: number; top: number; bottom: number }>
   },

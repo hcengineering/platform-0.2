@@ -23,5 +23,6 @@ export interface EditorContentEvent {
     underline: boolean
     cursor: { left: number; right: number; top: number; bottom: number }
     completionWord: string
+    completionEnd: string
     selection: { from: number, to: number }
 }
