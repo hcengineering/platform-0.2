@@ -36,7 +36,8 @@ export default defineComponent({
     function computeSize (value: string) {
       if (!value || value.length == 0)
         value = props.placeholder
-      compute.value.innerHTML = value.replace(/ /g, '&nbsp;')
+      if (typeof value === 'string')
+        compute.value.innerHTML = value.replace(/ /g, '&nbsp;')
       const width = compute.value.clientWidth > props.maxWidth ? props.maxWidth : compute.value.clientWidth
       input.value.style.width = width + 'px'
     }

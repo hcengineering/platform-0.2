@@ -15,7 +15,7 @@
 
 <script lang="ts">
 
-import { defineComponent, PropType, ref, watch } from 'vue'
+import { defineComponent, PropType, ref, watch, onUnmounted } from 'vue'
 import { Class, DeleteTx, PushTx, Doc, generateId, Property, Ref, VDoc } from '@anticrm/platform'
 import presentationCore from '@anticrm/presentation-core'
 
@@ -29,8 +29,12 @@ import Button from '@anticrm/sparkling-controls/src/Button.vue'
 export default defineComponent({
   components: { InlineEdit, OwnAttributes, Button },
   props: {
-    object: {
-      type: Object as PropType<VDoc>,
+    _class: {
+      type: String as unknown as PropType<Ref<Class<VDoc>>>,
+      required: true
+    },
+    _id: {
+      type: String as unknown as PropType<Ref<VDoc>>,
       required: true
     }
   },
@@ -39,14 +43,24 @@ export default defineComponent({
     const presentationCoreService = getPresentationCore()
 
     const component = ref('')
-    const _class = ref('')
 
     const comment = ref('')
 
-    watch(() => props.object, object => {
-      component.value = presentationCoreService.getComponentExtension(props.object._class, presentationCore.class.DetailForm)
-      _class.value = props.object._class
+    let shutdown: any = null
+
+    const object = ref(null)
+
+    watch(() => props._id, _id => {
+      if (shutdown) { shutdown() }
+      shutdown = coreService.query(props._class, { _id }, (result: Doc[]) => {
+        console.log('object query: ', result)
+        object.value = result[0]
+      })
+
+      component.value = presentationCoreService.getComponentExtension(props._class, presentationCore.class.DetailForm)
     }, { immediate: true })
+
+    onUnmounted(() => shutdown())
 
     function cancel () {
       context.emit('done', 'cancel')
@@ -57,8 +71,8 @@ export default defineComponent({
         _class: core.class.DeleteTx,
         _id: generateId() as Ref<Doc>,
 
-        _objectId: props.object._id as Ref<VDoc>,
-        _objectClass: props.object._class as Ref<Class<VDoc>>,
+        _objectId: props._id as Ref<VDoc>,
+        _objectClass: props._class as Ref<Class<VDoc>>,
         _date: Date.now() as Property<number, Date>,
         _user: 'andrey.v.platov@gmail.com' as Property<string, string>,
       }
@@ -74,8 +88,8 @@ export default defineComponent({
         _class: core.class.PushTx,
         _id: generateId() as Ref<Doc>,
 
-        _objectId: props.object._id as Ref<VDoc>,
-        _objectClass: props.object._class as Ref<Class<VDoc>>,
+        _objectId: props._id as Ref<VDoc>,
+        _objectClass: props._class as Ref<Class<VDoc>>,
         _date: Date.now() as Property<number, Date>,
         _user: 'andrey.v.platov@gmail.com' as Property<string, string>,
 
@@ -86,11 +100,13 @@ export default defineComponent({
       }
 
       coreService.tx(tx)
+      comment.value = ''
     }
 
     return {
       component,
-      _class,
+      object,
+
       cancel,
       remove,
 
@@ -103,24 +119,26 @@ export default defineComponent({
 
 <template>
   <div class="recruiting-view">
-    <div class="header">
-      <div class="actions">
-        <Button @click="cancel">Cancel</Button>
-        <Button @click="remove">Delete</Button>
+    <div v-if="object !== null">
+      <div class="header">
+        <div class="actions">
+          <Button @click="cancel">Cancel</Button>
+          <Button @click="remove">Delete</Button>
+        </div>
       </div>
-    </div>
 
-    <div class="content">
-      <widget v-if="component !== ''" :component="component" :object="object" :_class="_class" />
-    </div>
-
-    <div class="comments">
-      <div class="caption-2">Комментарии</div>
-      <div>
-        <InlineEdit placeholder="Comment..." v-model="comment" />
-        <Button class="submit" @click="submit">Submit</Button>
+      <div class="content">
+        <widget v-if="component !== ''" :component="component" :object="object" :_class="_class" />
       </div>
-      <div v-for="(comment, index) in object.comments" :key="index">{{comment.message}}</div>
+
+      <div class="comments">
+        <div class="caption-2">Комментарии</div>
+        <div>
+          <InlineEdit placeholder="Comment..." v-model="comment" />
+          <Button class="submit" @click="submit">Submit</Button>
+        </div>
+        <div v-for="(comment, index) in object.comments" :key="index">{{comment.message}}</div>
+      </div>
     </div>
   </div>
 </template>

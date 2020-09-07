@@ -109,7 +109,7 @@ export default defineComponent({
     </div>
 
     <aside>
-      <DetailsForm v-if="details" :object="details" @done="done" />
+      <DetailsForm v-if="details" :_class="details._class" :_id="details._id" @done="done" />
     </aside>
   </div>
 </template>
