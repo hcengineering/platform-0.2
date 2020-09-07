@@ -171,7 +171,7 @@ describe('platform', () => {
     let listenerCalled = false
     const myEvent = 'MyEvent'
     const myData = 'test-data'
-    const myEventListener = function(event: string, data: any): Promise<void> {
+    const myEventListener = function (event: string, data: any): Promise<void> {
       listenerCalled = true
       expect(event).toBe(myEvent)
       expect(data).toBe(myData)
@@ -193,7 +193,7 @@ describe('platform', () => {
       isCalled: boolean
       listener: (event: string, data: string) => Promise<void>
 
-      constructor(eventName: string, eventData: string) {
+      constructor (eventName: string, eventData: string) {
         this.eventName = eventName
         this.eventData = eventData
         this.isCalled = false
@@ -206,20 +206,20 @@ describe('platform', () => {
         }
       }
 
-      startListen() {
+      startListen () {
         platform.addEventListener(this.eventName, this.listener)
       }
 
-      stopListen() {
+      stopListen () {
         platform.removeEventListener(this.eventName, this.listener)
       }
 
-      checkCalled() {
+      checkCalled () {
         expect(this.isCalled).toBe(true)
-        this.isCalled = false  // reset flag for futher checks
+        this.isCalled = false // reset flag for futher checks
       }
 
-      checkNotCalled() {
+      checkNotCalled () {
         expect(this.isCalled).toBe(false)
       }
     }
@@ -278,9 +278,9 @@ describe('platform', () => {
     secondListenerForEvent2.checkNotCalled()
   })
 
-  function testSetPlatformStatus(status: any, expectedSeverity: Severity, expectedMessage: string) {
+  function testSetPlatformStatus (status: any, expectedSeverity: Severity, expectedMessage: string) {
     let listenerCalled = false
-    const listener = function(event: string, data: any): Promise<void> {
+    const listener = function (event: string, data: any): Promise<void> {
       listenerCalled = true
       expect(event).toBe(PlatformStatus)
       expect(data).toBeInstanceOf(Status)
@@ -311,6 +311,6 @@ describe('platform', () => {
   })
 
   it('should set unknown platform status', () => {
-    testSetPlatformStatus({x: 'y'}, Severity.WARNING, 'Unknown status: [object Object]')
+    testSetPlatformStatus({ x: 'y' }, Severity.WARNING, 'Unknown status: [object Object]')
   })
 })
