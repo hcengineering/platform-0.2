@@ -15,9 +15,9 @@
 
 import { extendIds } from '@anticrm/platform-model'
 import chunter from '@anticrm/chunter'
-import { Ref } from '@anticrm/platform'
+import { Ref, Class } from '@anticrm/platform'
 import { Application } from '@anticrm/workbench'
-import { Message } from '@anticrm/chunter/src'
+import { Page } from '@anticrm/chunter'
 
 export enum ChunterDomain {
   Chunter = 'chunter'
@@ -27,4 +27,7 @@ export default extendIds(chunter, {
   application: {
     Chunter: '' as Ref<Application>
   },
+  class: {
+    Page: '' as Ref<Class<Page>>
+  }
 })

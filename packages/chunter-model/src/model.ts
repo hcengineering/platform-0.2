@@ -20,10 +20,11 @@ import { Property, StringProperty, THIS, GET, EasyScript } from '@anticrm/platfo
 import core from '@anticrm/platform-model'
 import contact from '@anticrm/contact-model'
 import { Person } from '@anticrm/contact'
-import { Message } from '@anticrm/chunter'
+import { Message, Page } from '@anticrm/chunter'
 
 import chunter, { ChunterDomain } from '.'
 import { IntlString } from '@anticrm/platform-i18n'
+import presentation, { ClassUI } from '@anticrm/presentation-core'
 
 export default (S: UIBuilder) => {
 
@@ -36,7 +37,7 @@ export default (S: UIBuilder) => {
 
   S.createClassUI(chunter.class.Message, core.class.VDoc, {
     _domain: ChunterDomain.Chunter as Property<string, string>,
-    label: 'Кандидат' as IntlString
+    label: 'Сообщение' as IntlString
   }, {
     message: S.attrUI(core.class.Type, {}, {
       label: 'Сообщение' as IntlString,
@@ -44,6 +45,16 @@ export default (S: UIBuilder) => {
     }),
     comments: S.attrUI(core.class.Type, {}, {
       label: 'Комментарии' as IntlString,
+      icon: chunter.icon.Chunter
+    }),
+  })
+
+  S.createClassUI(chunter.class.Page as unknown as Ref<ClassUI<Page>>, chunter.class.Message, {
+    _domain: ChunterDomain.Chunter as Property<string, string>,
+    label: 'Страница' as IntlString
+  }, {
+    title: S.attrUI(core.class.Type, {}, {
+      label: 'Название' as IntlString,
       icon: chunter.icon.Chunter
     }),
   })
@@ -58,6 +69,16 @@ export default (S: UIBuilder) => {
 
   S.mixin(chunter.class.Message as Ref<Class<Message>>, chunter.mixin.ChunterInfo, { // TODO: type problems
     component: chunter.component.MessageInfo
+  })
+
+  S.createDocument(workbench.class.WorkbenchCreateItem, {
+    label: 'Chunter / Страница' as StringProperty,
+    icon: contact.icon.Phone,
+    itemClass: chunter.class.Page
+  })
+
+  S.mixin(chunter.class.Page, presentation.class.DetailForm, {
+    component: chunter.component.PageProperties
   })
 
 }

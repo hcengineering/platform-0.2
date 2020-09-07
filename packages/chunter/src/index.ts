@@ -31,6 +31,10 @@ export interface Message extends VDoc {
   comments: Comment[]
 }
 
+export interface Page extends Message {
+  title: string
+}
+
 export default plugin('chunter' as Plugin<Service>, { ui: ui.id, contact: contact.id }, {
   icon: {
     Chunter: '' as Asset,
@@ -39,6 +43,7 @@ export default plugin('chunter' as Plugin<Service>, { ui: ui.id, contact: contac
     ChunterView: '' as AnyComponent,
     ContactInfo: '' as AnyComponent,
     MessageInfo: '' as AnyComponent,
+    PageProperties: '' as AnyComponent,
   },
   mixin: {
     ChunterInfo: '' as Ref<Mixin<ComponentExtension<VDoc>>>,
