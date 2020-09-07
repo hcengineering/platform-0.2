@@ -12,6 +12,7 @@ Use following commands to install and run demo application.
 yarn
 docker run -d -p 27017:27017 mongo
 yarn workspace @anticrm/boot dump
+yarn workspace @anticrm/server start
 yarn workspace prod serve
 ```
 
