@@ -41,6 +41,8 @@ export default defineComponent({
     const component = ref('')
     const _class = ref('')
 
+    const comment = ref('')
+
     watch(() => props.object, object => {
       component.value = presentationCoreService.getComponentExtension(props.object._class, presentationCore.class.DetailForm)
       _class.value = props.object._class
@@ -66,11 +68,18 @@ export default defineComponent({
       context.emit('done', 'delete')
     }
 
+    function submit () {
+      console.log(comment.value)
+    }
+
     return {
       component,
       _class,
       cancel,
-      remove
+      remove,
+
+      comment,
+      submit
     }
   }
 })
@@ -87,6 +96,14 @@ export default defineComponent({
 
     <div class="content">
       <widget v-if="component !== ''" :component="component" :object="object" :_class="_class" />
+    </div>
+
+    <div class="comments">
+      <div class="caption-2">Комментарии</div>
+      <div>
+        <InlineEdit placeholder="Comment..." v-model="comment" />
+        <Button class="submit" @click="submit">Submit</Button>
+      </div>
     </div>
   </div>
 </template>
@@ -116,20 +133,21 @@ export default defineComponent({
     margin: 1em;
   }
 
+  .comments {
+    .submit {
+      font-size: 10px;
+      margin-left: 1em;
+    }
+  }
+
   .attributes {
     display: flex;
     flex-wrap: wrap;
-
-    //display: grid;
-    //background-color: $content-color-dark;
-    //grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    //grid-gap: 1px;
 
     margin-top: 1em;
 
     .group {
       padding: 0.5em;
-      //background-color: $content-bg-color;
     }
   }
 }
