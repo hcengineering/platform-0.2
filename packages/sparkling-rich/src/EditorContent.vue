@@ -14,13 +14,13 @@
 -->
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, ref, watch } from 'vue'
+import { computed, defineComponent, onMounted, ref, watch, PropType } from 'vue'
 
-import { DOMParser, Fragment, Slice } from 'prosemirror-model'
+import { DOMParser, Fragment, Slice, Mark, MarkType } from 'prosemirror-model'
 
 import { schema } from './internal/schema'
 
-import { AllSelection, EditorState } from 'prosemirror-state'
+import { AllSelection, EditorState, Transaction } from 'prosemirror-state'
 import { EditorView } from 'prosemirror-view'
 
 import { history } from 'prosemirror-history'
@@ -42,9 +42,13 @@ export default defineComponent({
       default: "Placeholder...",
     },
     triggers: {
-      type: String, // A set of completion separators
+      type: Array as PropType<Array<String>>, // A set of completion separators
       default: "",
     },
+    transformInjections: { // A function to match and replace trigger with marker
+      type: Function, // transformInjections(state: EditorState): Transaction
+      default: null,
+    }
   },
   model: {
     'props': "content",
@@ -65,8 +69,9 @@ export default defineComponent({
       return checkEmpty(props.content)
     })
 
-    function findCompletionWord(sel): string {
+    function findCompletion(sel): { completionWord: string, completionEnd: string } {
       var completionWord = ''
+      var completionEnd = ''
       if (sel.$from.nodeBefore != null) {
         let val = sel.$from.nodeBefore.textContent
         let p = -1
@@ -75,10 +80,13 @@ export default defineComponent({
             //Stop on WS
             break
           }
-          if (props.triggers.indexOf(val[p]) != -1) {
-            // we found trigger, -1 to pos
-            p--
-            break
+          for (let ti = 0; ti < props.triggers.length; ti++) {
+            let t = props.triggers[ti]
+            if (val.substring(p, t.length) == t) {
+              // we found trigger, -1 to pos
+              p -= t.length
+              break
+            }
           }
         }
         if (p != -1) {
@@ -86,7 +94,10 @@ export default defineComponent({
         }
         completionWord = val
       }
-      return completionWord
+      if (sel.$from.nodeAfter != null) {
+        completionEnd = sel.$from.nodeAfter.textContent
+      }
+      return { completionWord, completionEnd }
     }
 
     let state = EditorState.create({
@@ -100,7 +111,7 @@ export default defineComponent({
     })
     let emitStyleEvent = function () {
       let sel = view.state.selection
-      var completionWord = findCompletionWord(sel)
+      var { completionWord, completionEnd } = findCompletion(sel)
 
       let cursor = view.coordsAtPos(sel.from - completionWord.length - 1)
       // The box in which the tooltip is positioned, to use as base
@@ -124,6 +135,7 @@ export default defineComponent({
         underline: isUnderline, isUnderlineEnabled: Commands.toggleUnderline(view.state, null),
         cursor: { left: cursor.left, top: cursor.top, bottom: cursor.bottom, right: cursor.right },
         completionWord,
+        completionEnd,
         selection: { from: sel.from, to: sel.to }
       } as EditorContentEvent
       context.emit("styleEvent", evt)
@@ -132,6 +144,21 @@ export default defineComponent({
       state,
       dispatchTransaction(transaction) {
         let newState = view.state.apply(transaction)
+
+        // Check and update triggers to update content.
+        if (props.transformInjections != null) {
+          let tr: Promise<Transaction> = props.transformInjections(newState)
+          if (tr != null) {
+            tr.then((res) => {
+              if (res != null) {
+                newState = newState.apply(res)
+                view.updateState(newState)
+
+                emitStyleEvent()
+              }
+            })
+          }
+        }
         view.updateState(newState)
 
         emitStyleEvent()
@@ -148,7 +175,7 @@ export default defineComponent({
         const element = parser.parseFromString(props.content, 'text/html').body
         let newDoc = DOMParser.fromSchema(schema).parse(element)
 
-        let op = state.tr.setSelection(new AllSelection(state.doc)).replaceSelectionWith(newDoc);
+        let op = state.tr.setSelection(new AllSelection(state.doc)).replaceSelectionWith(newDoc)
         let newState = state.apply(op)
 
         view.updateState(newState)
@@ -158,16 +185,20 @@ export default defineComponent({
     })
 
     function insert(text: string, from: number, to: number) {
-      const node = schema.text(text);
-      const frag = Fragment.from(node);
-      const slice = new Slice(frag, 0, 0);
-
-      const t = view.state.tr.insertText(text, from, to);
-      const st = view.state.apply(t);
-      view.updateState(st);
+      const t = view.state.tr.insertText(text, from, to)
+      const st = view.state.apply(t)
+      view.updateState(st)
       emitStyleEvent()
     }
+    function insertMark(text: string, from: number, to: number, mark: MarkType, attrs?: { [key: string]: any }) {
+      // Ignore white spaces on end of text
+      let markLen = text.trim().length
 
+      const t = view.state.tr.insertText(text, from, to).addMark(from, from + markLen, mark.create(attrs))
+      const st = view.state.apply(t)
+      view.updateState(st)
+      emitStyleEvent()
+    }
     return {
       root,
       view,
@@ -198,6 +229,7 @@ export default defineComponent({
         view.focus()
       },
       insert,
+      insertMark,
       focus() {
         view.focus()
       },

@@ -20,9 +20,13 @@ import CreateForm from './CreateForm.vue'
 import CreateMenu from './CreateMenu.vue'
 import workbench, { WorkbenchCreateItem } from '..'
 import ui from '@anticrm/platform-ui'
+
 import presentationCore from '@anticrm/presentation-core'
-import { Class, Ref, VDoc } from '@anticrm/platform'
+import { Class, Ref, VDoc, StringProperty } from '@anticrm/platform'
 import { getCoreService, getPresentationCore } from '../utils'
+
+import core from '@anticrm/platform-core'
+import pcore from '@anticrm/presentation-core'
 
 import Toolbar from '@anticrm/sparkling-controls/src/toolbar/Toolbar.vue'
 import ToolbarButton from '@anticrm/sparkling-controls/src/toolbar/Button.vue'
@@ -32,17 +36,28 @@ import { EditorContentEvent } from '@anticrm/sparkling-rich/src/index'
 
 import contact, { User, Contact } from '@anticrm/contact/src/index'
 
-import CompletionPopup, { CompletionItem } from './CompletionPopup.vue'
+import { Page } from '@anticrm/chunter/src/index'
+import chunter from '@anticrm/chunter-model/src/index'
 
-function startsWith (str: string | undefined, prefix: string) {
+import CompletionPopup, { CompletionItem } from './CompletionPopup.vue'
+import { schema } from '@anticrm/sparkling-rich/src/internal/schema'
+
+import { EditorState, Transaction } from 'prosemirror-state'
+
+function startsWith(str: string | undefined, prefix: string) {
   return (str ?? '').startsWith(prefix)
+}
+
+interface ItemRefefence {
+  id: string
+  class: string
 }
 
 export default defineComponent({
   components: { Icon, CreateForm, CreateMenu, EditorContent, Toolbar, ToolbarButton, CompletionPopup },
   props: {
   },
-  setup (props, context) {
+  setup(props, context) {
     const coreService = getCoreService()
     const model = coreService.getModel()
 
@@ -56,103 +71,256 @@ export default defineComponent({
     let styleState = ref({ isEmpty: true, cursor: { left: 0, top: 0, bottom: 0, right: 0 } } as EditorContentEvent)
     const htmlEditor = ref(null)
     let stylesEnabled = ref(false)
-    let completions = ref({ selection: null as CompletionItem, items: [] as CompletionItem[] })
 
-    function add () {
+    let completions = ref({ items: [] as CompletionItem[] })
+    let completionControl = ref(null)
+
+    function add() {
       showMenu.value = !showMenu.value
     }
 
-    function selectItem (item: WorkbenchCreateItem) {
+    function selectItem(item: WorkbenchCreateItem) {
       showMenu.value = false
       createItem.value = item
       component.value = presentationCoreService.getComponentExtension(item.itemClass, presentationCore.class.DetailForm)
     }
 
-    function done () {
+    function done() {
       component.value = ''
     }
-    function updateStyle (event: EditorContentEvent) {
+    function findSpaces(userPrefix: string): Promise<CompletionItem[]> {
+      return model.find(core.class.Space, {}).then(docs => {
+        let items: CompletionItem[] = []
+        const all = model.cast(docs, pcore.mixin.UXObject)
+        for (const value of all) {
+          if (startsWith(value.label, userPrefix) && value.label !== userPrefix) {
+            let kk = value.label
+            items.push({ key: kk, label: kk, title: kk + " - Space", class: core.class.Space, id: value._id } as CompletionItem)
+          }
+        }
+        return items
+      })
+    }
+    function findUsers(userPrefix: string): Promise<CompletionItem[]> {
+      return coreService.find(contact.mixin.User, {}).then(docs => {
+        const all = docs as User[]
+        let items: CompletionItem[] = []
+        for (const value of all) {
+          if (startsWith(value.account, userPrefix) && value.account !== userPrefix) {
+            let kk = value.account
+            items.push({ key: kk, label: kk, title: kk + " - " + value.firstName + ' ' + value.lastName, class: value._class, id: value._id } as CompletionItem)
+          }
+        }
+        return items
+      })
+    }
+    function findPages(userPrefix: string): Promise<CompletionItem[]> {
+      return coreService.find(chunter.class.Page, {}).then(docs => {
+        const all = docs as Page[]
+        let items: CompletionItem[] = []
+        for (const value of all) {
+          if (startsWith(value.title, userPrefix) && value.title !== userPrefix) {
+            let kk = value.title
+            items.push({ key: kk, label: kk, title: kk + "- Page", class: value._class, id: value._id } as CompletionItem)
+          }
+        }
+        return items
+      })
+    }
+
+    function findUser(title: string): Promise<ItemRefefence[]> {
+      return coreService.find(contact.mixin.User, { account: title as StringProperty }).then((docs) => {
+        return docs.filter((e) => (e as User).account == title).map((e) => {
+          return { id: e._id, class: e._class } as ItemRefefence
+        })
+      })
+    }
+
+
+    function findPage(title: string): Promise<ItemRefefence[]> {
+      return coreService.find(chunter.class.Page, { title: title as StringProperty }).then((docs) => {
+        return docs.filter((e) => (e as Page).title == title).map((e) => {
+          return { id: e._id, class: e._class } as ItemRefefence
+        })
+      })
+    }
+
+    function findSpace(title: string): Promise<ItemRefefence[]> {
+      return coreService.find(pcore.mixin.UXObject, { label: title as StringProperty }).then((docs) => {
+        return docs.map((e) => {
+          return { id: e._id, class: e._class } as ItemRefefence
+        })
+      })
+    }
+
+    function updateStyle(event: EditorContentEvent) {
       styleState.value = event
 
       if (event.completionWord.length == 0) {
         completions.value = {
-          selection: null as CompletionItem, items: []
+          items: []
         }
         return
       }
-
-      if (event.completionWord.startsWith("@")) {
-        const userPrefix = event.completionWord.substring(1)
-        coreService.find(contact.mixin.User, {}).then(docs => {
-          let items: CompletionItem[] = []
-          const all = docs as User[]
-          for (const value of all) {
-            if (startsWith(value.account, userPrefix)) {
-              let kk = "@" + value.account
-              items.push({ key: kk, label: kk, title: kk + " - " + value.firstName + ' ' + value.lastName } as CompletionItem)
-            }
-          }
+      let word = event.completionWord
+      if (word.startsWith("@")) {
+        findUsers(word.substring(1)).then((items) => {
           completions.value = {
-            selection: (items.length > 0 ? items[0] : null), items: items
+            items: items
           }
         })
+      } else if (word.startsWith("#")) {
+        findSpaces(word.substring(1)).then((items) => {
+          completions.value = {
+            items: items
+          }
+        })
+      } else if (event.completionWord.startsWith("[[")) {
+        const userPrefix = event.completionWord.substring(2)
+
+        Promise.all([findSpaces(userPrefix), findUsers(userPrefix), findPages(userPrefix)])
+          .then((result) => {
+            completions.value = {
+              items: result.reduce((acc, val) => {
+                return acc.concat(val)
+              }, [])
+            }
+          })
       } else {
-        // Calc some completions here.
-        let operations: CompletionItem[] = [
-          { key: "#1", label: "create task", title: "Perform a task creation" },
-          { key: "#1.2", label: "create contact" },
-          { key: "#2", label: "delete task" },
-          { key: "#2.2", label: "delete contact" },
-          { key: "#3", label: "search" },
-          { key: "#3.1", label: "search task" },
-          { key: "#3.2", label: "search contact" },
-          { key: "#4", label: "stop task" },
-        ]
-        let items = operations.filter((e) => e.label.startsWith(event.completionWord) && e.label !== event.completionWord)
         completions.value = {
-          selection: (items.length > 0 ? items[0] : null), items: items
+          items: []
         }
       }
     }
-    function handlePopupSelected (value) {
-      htmlEditor.value.insert(value.substring(styleState.value.completionWord.length) + " ", styleState.value.selection.from, styleState.value.selection.to)
+    function handlePopupSelected(value) {
+      let extra = 0
+      if (styleState.value.completionEnd != null && styleState.value.completionEnd.endsWith("]]")) {
+        extra = styleState.value.completionEnd.length
+      }
+      htmlEditor.value.insertMark(
+        "[[" + value.label + "]] ",
+        styleState.value.selection.from - styleState.value.completionWord.length,
+        styleState.value.selection.to + extra, schema.marks.reference, { id: value.id, class: value.class })
       htmlEditor.value.focus()
     }
-    function onKeyDown (event) {
-      if (completions.value.items.length > 0 && completions.value.selection != null) {
+    function handleSubmit() {
+      context.emit('message', htmlValue.value)
+      htmlValue.value = ''
+    }
+    function onKeyDown(event) {
+      if (completions.value.items.length > 0) {
         if (event.key === "ArrowUp") {
-          let pos = completions.value.items.indexOf(completions.value.selection)
-          if (pos > 0) {
-            completions.value.selection = completions.value.items[pos - 1]
-          }
+          completionControl.value.handleUp()
           event.preventDefault()
           return
         }
         if (event.key === "ArrowDown") {
-          let pos = completions.value.items.indexOf(completions.value.selection)
-          if (pos < completions.value.items.length - 1) {
-            completions.value.selection = completions.value.items[pos + 1]
-          }
+          completionControl.value.handleDown()
           event.preventDefault()
           return
         }
         if (event.key === "Enter") {
-          handlePopupSelected(completions.value.selection.label)
+          completionControl.value.handleSubmit()
           event.preventDefault()
           return
         }
         if (event.key === "Escape") {
-          completions.value = { selection: null as CompletionItem, items: [] }
+          completions.value = { items: [] }
           return
         }
       }
-      if (event.key === "Enter") {
-        context.emit('message', htmlValue.value)
-        htmlValue.value = ''
+      if (event.key === "Enter" && !event.shiftKey) {
+        handleSubmit()
         event.preventDefault()
       }
     }
+    function transformInjections(state: EditorState): Promise<Transaction> {
+      let tr: Transaction = null
 
+      let operations: ((Transaction) => Transaction)[] = []
+      let promises: Promise<void>[] = []
+
+      state.doc.descendants((node, pos) => {
+        if (node.isText) {
+
+          let prev = { id: "", class: "" } as ItemRefefence
+          // Check we had our reference marl
+          // Check if we had trigger words without defined marker
+          for (let i = 0; i < node.marks.length; i++) {
+            if (node.marks[i].type == schema.marks.reference) {
+              // We had our mark already, check if it name fit with document type
+              // If not fit we need to covert it to Page type.
+              if (!node.text.startsWith("[[") || !node.text.endsWith("]]")) {
+                operations.push((tr) => {
+                  return (tr == null ? state.tr : tr).removeMark(pos, pos + node.nodeSize, node.marks[i])
+                })
+              }
+              prev = { id: node.attrs.id, class: node.attrs.class }
+              break
+            }
+          }
+
+          const len = node.text.length
+          for (let i = 0; i < len; i++) {
+            let text = node.text.substring(i)
+            if (text.startsWith("[[")) {
+              // We found trigger, we need to call replace method
+              let endpos = text.indexOf("]]")
+              if (endpos != -1) {
+                let end = endpos + 2
+                if (end != i) {
+                  let refText = node.text.substring(i + 2, i + end - 2)
+                  let ci = i
+                  let cpos = pos
+                  let cend = end
+                  promises.push(Promise.all([
+                    findUser(refText),
+                    findPage(refText),
+                    //findSpace(refText)
+                  ])
+                    .then((result) => {
+                      let items = result.reduce((acc, val) => { return acc.concat(val) }, [])
+                      if (items.length > 1) {
+                        // Check if we had item selected already
+                        for (let ii = 0; ii < items.length; ii++) {
+                          if (items[ii].id == prev.id) {
+                            items = [items[ii]]
+                            break
+                          }
+                        }
+                      }
+                      if (items.length == 1) {
+                        operations.push((tr: Transaction): Transaction => {
+                          let mark = schema.marks.reference.create(items[0])
+                          return (tr == null ? state.tr : tr).addMark(cpos + ci, cpos + ci + cend, mark)
+                        })
+                      } else if (items.length == 0) {
+                        operations.push((tr: Transaction): Transaction => {
+                          let mark = schema.marks.reference.create({ id: 'undefined', class: "Page" })
+                          return (tr == null ? state.tr : tr).addMark(cpos + ci, cpos + ci + cend, mark)
+                        })
+                      }
+                    })
+                  )
+                  i = end// Move to next char
+                }
+              }
+            }
+          }
+        }
+      })
+
+      return Promise.all(promises).then(() => {
+        let tr: Transaction = null
+        for (let i = 0; i < operations.length; i++) {
+          let t = operations[i]
+          if (t != null) {
+            tr = t(tr)
+          }
+        }
+        return tr
+      })
+    }
 
     return {
       showMenu,
@@ -169,7 +337,11 @@ export default defineComponent({
       updateStyle,
       completions,
       onKeyDown,
-      handlePopupSelected
+      handlePopupSelected,
+      completionControl,
+      handleSubmit,
+      transformInjections,
+      triggers: ['@', '#', '[['] as Array<String>,
     }
   }
 })
@@ -198,15 +370,15 @@ export default defineComponent({
           ref="htmlEditor"
           :class="{'edit-box-vertical':stylesEnabled, 'edit-box-horizontal': !stylesEnabled}"
           :content="htmlValue"
-          triggers="@#"
+          :triggers="triggers"
+          :transformInjections="transformInjections"
           @update:content="htmlValue = $event"
           @styleEvent="updateStyle"
           @keyDown="onKeyDown"
         />
         <completion-popup
-          ref="popupControl"
+          ref="completionControl"
           v-if="completions.items.length > 0 "
-          :selection="completions.selection.key || ''"
           :items="completions.items"
           :pos="styleState.cursor"
           @select="handlePopupSelected"
@@ -266,8 +438,7 @@ export default defineComponent({
   border-radius: 4px;
   padding: 1em;
   box-sizing: border-box;
-
-  .flex-column {
+  yarn .flex-column {
     display: flex;
     flex-direction: column;
     align-items: stretch;
@@ -287,6 +458,12 @@ export default defineComponent({
     width: 100%;
     height: 100%;
     margin: 5px;
+  }
+  reference {
+    color: lightblue;
+  }
+  reference[id="undefined"] {
+    color: grey;
   }
 }
 </style>

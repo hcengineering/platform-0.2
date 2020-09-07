@@ -35,11 +35,26 @@ export interface CompletionItem {
 export default defineComponent({
   components: { Icon, ScrollView },
   props: {
-    selection: String,
+    selection: {
+      type: String,
+      default: ""
+    },
     items: Array as PropType<Array<CompletionItem>>,
     pos: Object as PropType<{ left: number; right: number; top: number; bottom: number }>
   },
   setup(props, context) {
+    let listElement = ref(null as HTMLElement)
+    let selElement = ref(null as HTMLElement)
+    let selection = ref((props.items[0] ?? { key: '' }) as CompletionItem)
+
+    let selOffset = computed(() => {
+      if (selElement.value != null) {
+        let pp = selElement.value.parentElement
+        return pp.offsetTop// + pp.clientHeight
+      }
+      return -1
+    })
+
     function selectItem(item: string) {
       context.emit('select', item)
     }
@@ -48,10 +63,28 @@ export default defineComponent({
       return `left: ${props.pos.left + 5}px; top: ${props.pos.top - 80}px;`
     })
 
-
     return {
       selectItem,
-      popupStyle
+      popupStyle,
+      listElement,
+      selElement,
+      selOffset,
+      selection,
+      handleUp() {
+        let pos = props.items.indexOf(selection.value)
+        if (pos > 0) {
+          selection.value = props.items[pos - 1]
+        }
+      },
+      handleDown() {
+        let pos = props.items.indexOf(selection.value)
+        if (pos < props.items.length - 1) {
+          selection.value = props.items[pos + 1]
+        }
+      },
+      handleSubmit() {
+        context.emit('select', selection.value)
+      }
     }
   }
 })
@@ -60,14 +93,22 @@ export default defineComponent({
 
 <template>
   <div class="workbench-completion-popup" :style="popupStyle">
-    <ScrollView style="height:100%;width: 100%;">
+    <ScrollView style="height:100%;width: 100%;" ref="listElement" :scrollPosition="selOffset">
       <div
         v-for="item in items"
         class="item"
         :key="item.key"
-        :class="{'selected': item.key == selection }"
+        :class="{'selected': item.key == selection.key }"
         @click.prevent="selectItem(item.key)"
-      >{{ item.title ?? item.label }}</div>
+      >
+        <div
+          class="focus-placeholder"
+          v-if="item.key== selection.key"
+          ref="selElement"
+          style="width:0px"
+        ></div>
+        {{ item.title ?? item.label }}
+      </div>
     </ScrollView>
   </div>
 </template>
