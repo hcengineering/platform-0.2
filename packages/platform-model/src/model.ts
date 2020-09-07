@@ -102,6 +102,19 @@ export default (S: Builder) => {
     })
   }, CoreDomain.Tx)
 
+  S.createClass(core.class.PushTx, core.class.Tx, {
+    _attribute: S.attr(core.class.Type, {}),
+    _attributes: S.attr(core.class.BagOf, {
+      of: S.newInstance(core.class.InstanceOf, { of: core.class.Type })
+    })
+  }, CoreDomain.Tx)
+
+  S.createClass(core.class.UpdateTx, core.class.Tx, {
+    _attributes: S.attr(core.class.BagOf, {
+      of: S.newInstance(core.class.InstanceOf, { of: core.class.Type })
+    })
+  }, CoreDomain.Tx)
+
   S.createClass(core.class.DeleteTx, core.class.Tx, {
   }, CoreDomain.Tx)
 

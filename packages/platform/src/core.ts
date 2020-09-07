@@ -131,6 +131,15 @@ export interface CreateTx extends Tx {
   _attributes: { [key: string]: PropertyType }
 }
 
+export interface PushTx extends Tx {
+  _attribute: StringProperty
+  _attributes: { [key: string]: PropertyType }
+}
+
+export interface UpdateTx extends Tx {
+  _attributes: { [key: string]: any }
+}
+
 export interface DeleteTx extends Tx {
 }
 
@@ -150,6 +159,8 @@ export enum CoreDomain {
 export const core = identify('core' as AnyPlugin, {
   class: {
     CreateTx: '' as Ref<Class<CreateTx>>,
+    PushTx: '' as Ref<Class<PushTx>>,
+    UpdateTx: '' as Ref<Class<UpdateTx>>,
     DeleteTx: '' as Ref<Class<DeleteTx>>
   }
 })

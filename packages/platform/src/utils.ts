@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { core, AnyLayout, Doc, Ref, Class, Tx, CreateTx, VDoc, ClassifierKind, Obj, Mixin } from './core'
+import { core, AnyLayout, Doc, Ref, Class, Tx, CreateTx, VDoc, ClassifierKind, Obj, Mixin, UpdateTx, PushTx } from './core'
 import { MemDb } from './memdb'
 import { Node } from './graph'
 
@@ -64,6 +64,8 @@ export abstract class TxProcessor {
   }
 
   protected abstract store (doc: Doc): Promise<void>
+  protected abstract push (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: any): Promise<void>
+  protected abstract update (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attributes: any): Promise<void>
   protected abstract remove (_class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<void>
 
   private apply (tx: Tx): Promise<void> {
@@ -72,6 +74,12 @@ export abstract class TxProcessor {
       case core.class.CreateTx: {
         const doc = this.createTx2VDoc(tx as CreateTx)
         return this.store(doc)
+      }
+      case core.class.PushTx: {
+        return this.push(tx._objectClass, tx._objectId, (tx as PushTx)._attribute, (tx as PushTx)._attributes)
+      }
+      case core.class.UpdateTx: {
+        return this.update(tx._objectClass, tx._objectId, (tx as UpdateTx)._attributes)
       }
       case core.class.DeleteTx: {
         return this.remove(tx._objectClass, tx._objectId)

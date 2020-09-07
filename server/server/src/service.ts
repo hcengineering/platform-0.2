@@ -59,6 +59,16 @@ export async function connect (uri: string, dbName: string, ws: WebSocket, serve
       return db.collection(domain).insertOne(doc).then(result => { })
     }
 
+    async push (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: any): Promise<void> {
+      const domain = this.modelDb.getDomain(_class)
+      return db.collection(domain).updateOne({ _id }, { $push: { [attribute]: attributes } }).then(result => { })
+    }
+
+    async update (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attributes: any): Promise<void> {
+      const domain = this.modelDb.getDomain(_class)
+      return db.collection(domain).updateOne({ _id }, attributes).then(result => { })
+    }
+
     async remove (_class: Ref<Class<Doc>>, doc: Ref<Doc>): Promise<void> {
       throw new Error('Not implemented')
     }

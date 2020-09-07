@@ -79,6 +79,14 @@ export async function createCache (dbname: string, modelDb: ModelDb) {
       return store([doc])
     }
 
+    async push (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: any): Promise<void> {
+      console.log('cache push')
+    }
+
+    async update (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attributes: any): Promise<void> {
+      console.log('cache update')
+    }
+
     async remove (_class: Ref<Class<Doc>>, doc: Ref<Doc>): Promise<void> {
       const domain = modelDb.getDomain(_class)
       const tx = db.transaction(domain, 'readwrite')

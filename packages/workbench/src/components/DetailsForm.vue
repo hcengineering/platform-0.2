@@ -16,7 +16,7 @@
 <script lang="ts">
 
 import { defineComponent, PropType, ref, watch } from 'vue'
-import { Class, DeleteTx, Doc, generateId, Property, Ref, VDoc } from '@anticrm/platform'
+import { Class, DeleteTx, PushTx, Doc, generateId, Property, Ref, VDoc } from '@anticrm/platform'
 import presentationCore from '@anticrm/presentation-core'
 
 import { getCoreService, getPresentationCore } from '../utils'
@@ -70,6 +70,22 @@ export default defineComponent({
 
     function submit () {
       console.log(comment.value)
+      const tx: PushTx = {
+        _class: core.class.PushTx,
+        _id: generateId() as Ref<Doc>,
+
+        _objectId: props.object._id as Ref<VDoc>,
+        _objectClass: props.object._class as Ref<Class<VDoc>>,
+        _date: Date.now() as Property<number, Date>,
+        _user: 'andrey.v.platov@gmail.com' as Property<string, string>,
+
+        _attribute: 'comments' as Property<string, string>,
+        _attributes: {
+          message: comment.value as Property<string, string>
+        }
+      }
+
+      coreService.tx(tx)
     }
 
     return {
@@ -104,6 +120,7 @@ export default defineComponent({
         <InlineEdit placeholder="Comment..." v-model="comment" />
         <Button class="submit" @click="submit">Submit</Button>
       </div>
+      <div v-for="(comment, index) in object.comments" :key="index">{{comment.message}}</div>
     </div>
   </div>
 </template>

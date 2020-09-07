@@ -18,6 +18,8 @@ import {
   Class,
   CoreProtocol,
   CreateTx,
+  PushTx,
+  UpdateTx,
   DeleteTx,
   Doc,
   Emb,
@@ -50,6 +52,8 @@ export default plugin('core' as Plugin<CoreService>, {}, {
   class: {
     Class: '' as Ref<Class<Class<Obj>>>,
     CreateTx: '' as Ref<Class<CreateTx>>,
+    PushTx: '' as Ref<Class<PushTx>>,
+    UpdateTx: '' as Ref<Class<UpdateTx>>,
     DeleteTx: '' as Ref<Class<DeleteTx>>,
     Space: '' as Ref<Class<Space>>,
   }
