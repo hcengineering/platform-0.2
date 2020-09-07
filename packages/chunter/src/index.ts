@@ -48,14 +48,13 @@ export enum MessageElementKind {
 
 export interface MessageElement {
   kind: MessageElementKind
+  text: string
 }
 
 export interface MessageText extends MessageElement {
-  text: string
 }
 
 export interface MessageLink extends MessageElement {
-  text: string
   _class: Ref<Class<VDoc>>
   _id: Ref<VDoc>
 }
@@ -64,7 +63,7 @@ export interface MessageLink extends MessageElement {
 
 export interface ChunterService extends Service {
   parseMessage (message: string): MessageElement[]
-  createMissedObjects (message: string): void
+  createMissedObjects (message: string): string
 }
 
 export const ChunterServiceInjectionKey = 'chunter-injection-key'

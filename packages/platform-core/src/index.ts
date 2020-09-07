@@ -39,8 +39,9 @@ import { ModelDb } from './modeldb'
 
 export interface CoreService extends Service, CoreProtocol {
   getModel (): ModelDb
+  generateId (): Ref<Doc>
   query (_class: Ref<Class<Doc>>, query: AnyLayout, listener: (result: Doc[]) => void): () => void
-  createVDoc<T extends VDoc> (_class: Ref<Class<T>>, _attributes: Omit<T, keyof VDoc>): Promise<void>
+  createVDoc<T extends VDoc> (_class: Ref<Class<T>>, _attributes: Omit<T, keyof VDoc>, _id?: Ref<T>): Promise<void>
 }
 
 export default plugin('core' as Plugin<CoreService>, {}, {

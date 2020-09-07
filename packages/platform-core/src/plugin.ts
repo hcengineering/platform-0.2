@@ -144,9 +144,9 @@ export default async (platform: Platform): Promise<CoreService> => {
   //const proto = platform.getMetadata(core.metadata.Offline) ? coreOffline : coreRpc
   const proto = coreRpc
 
-  function createVDoc<T extends VDoc> (_class: Ref<Class<T>>, _attributes: Omit<T, keyof VDoc>): Promise<void> {
+  function createVDoc<T extends VDoc> (_class: Ref<Class<T>>, _attributes: Omit<T, keyof VDoc>, _id?: Ref<T>): Promise<void> {
 
-    const objectId = generateId() as Ref<VDoc>
+    const objectId = _id ?? generateId() as Ref<T>
 
     const tx: CreateTx = {
       _space: null as unknown as Ref<Space>,
@@ -169,6 +169,7 @@ export default async (platform: Platform): Promise<CoreService> => {
     getModel () {
       return model
     },
+    generateId (): Ref<Doc> { return generateId() as Ref<Doc> },
     createVDoc,
     // query,
     ...proto

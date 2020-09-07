@@ -42,7 +42,9 @@ export default defineComponent({
 <template>
   <div class="chunter-message-info">
     <span v-for="(node, index) in parseMessage(tx._attributes?.message)" :key="index">
-      <span v-if="node.kind === 1">{{node}}</span>
+      <span v-if="node.kind === 1">
+        <a href="#" @click.prevent="$emit('open', node)">{{node.text}}</a>
+      </span>
       <span v-else>{{node.text}}</span>
     </span>
   </div>

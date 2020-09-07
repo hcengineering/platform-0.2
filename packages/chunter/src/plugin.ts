@@ -13,11 +13,11 @@
 // limitations under the License.
 //
 
-import { Platform, core } from '@anticrm/platform'
+import { Platform, Ref } from '@anticrm/platform'
 import { ContactServiceInjectionKey } from './utils'
 import chunter, {
   MessageElement, MessageElementKind,
-  MessageText, MessageLink, ChunterService, ChunterServiceInjectionKey
+  MessageText, MessageLink, ChunterService, ChunterServiceInjectionKey, Page
 } from '.'
 
 import ChunterView from './components/ChunterView.vue'
@@ -74,22 +74,43 @@ export default async (platform: Platform, deps: { core: CoreService, ui: UIServi
     return result
   }
 
-  function createMissedObjects (message: string) {
+  function toMessage (parsed: MessageElement[]): string {
+    let result = '<p>'
+    for (const element of parsed) {
+      if (element.kind === MessageElementKind.LINK) {
+        const link = element as MessageLink
+        result += `<reference id="${link._id}" class="${link._class}">${link.text}</reference>`
+      } else {
+        result += element.text
+      }
+    }
+    return result
+  }
+
+  function createMissedObjects (message: string): string {
     console.log('createMissedObjects', message)
+    const referenced = []
     const elements = parseMessage(message)
     for (const element of elements) {
       if (element.kind === MessageElementKind.LINK) {
         const link = element as MessageLink
         if (link._id === 'undefined') {
           const title = link.text.substring(2, link.text.length - 2)
+          const id = coreService.generateId() as Ref<Page>
           coreService.createVDoc(chunter.class.Page, {
             title,
             message: '',
             comments: []
-          })
+          }, id)
+          link._id = id
+          link._class = chunter.class.Page
+          referenced.push(link)
         }
+      } else {
+        referenced.push(element)
       }
     }
+    return toMessage(referenced)
   }
 
   const service = {

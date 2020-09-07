@@ -15,7 +15,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, PropType, ref, watch } from 'vue'
-import { Ref, Doc, Space, CreateTx, generateId, VDoc, Property } from '@anticrm/platform'
+import { Ref, Doc, Space, CreateTx, generateId, VDoc, Class, Property } from '@anticrm/platform'
 
 import { getCoreService, getUIService } from '../utils'
 import workbench, { Application } from '../..'
@@ -59,10 +59,10 @@ export default defineComponent({
       uiService.navigate(uiService.toUrl({ app: undefined, path: [app.value, project] }))
     }
 
-    const details = ref<Doc | null>(null)
+    const details = ref<{ _id: Ref<VDoc>, _class: Ref<Class<VDoc>> } | null>(null)
 
-    function open (object: Doc) {
-      console.log('open')
+    function open (object: { _id: Ref<VDoc>, _class: Ref<Class<VDoc>> }) {
+      console.log('open', object)
       details.value = object
     }
 
@@ -72,7 +72,7 @@ export default defineComponent({
 
     function message (msg: string) {
       console.log(msg)
-      chunterService.createMissedObjects(msg)
+      const newMessage = chunterService.createMissedObjects(msg)
       const tx: CreateTx = {
         _class: core.class.CreateTx,
         _id: generateId() as Ref<Doc>,
@@ -84,7 +84,7 @@ export default defineComponent({
         _user: 'andrey.v.platov@gmail.com' as Property<string, string>,
 
         _attributes: {
-          message: msg as Property<string, string>
+          message: newMessage as Property<string, string>
         }
       }
 

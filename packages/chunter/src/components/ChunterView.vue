@@ -48,10 +48,6 @@ export default defineComponent({
 
     onUnmounted(() => shutdown())
 
-    function open (object: Object) {
-      context.emit('open', object)
-    }
-
     return { open, content }
   }
 })
@@ -65,7 +61,7 @@ export default defineComponent({
     </div>
     <ScrollView>
       <div class="content">
-        <ChunterItem :tx="doc" v-for="doc in content" :key="doc._id" />
+        <ChunterItem :tx="doc" v-for="doc in content" :key="doc._id" @open="$emit('open', $event)" />
       </div>
     </ScrollView>
   </div>

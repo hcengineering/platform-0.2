@@ -49,7 +49,7 @@ export default defineComponent({
     <div class="details">
       <b>{{user?.firstName}} {{user?.lastName}} {{ user?._id }}</b> 15:23
       <div>
-        <widget :component="component" :tx="tx" />
+        <widget :component="component" :tx="tx" @open="$emit('open', $event)" />
       </div>
     </div>
   </div>
