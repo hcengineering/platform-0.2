@@ -63,6 +63,10 @@ export default (S: UIBuilder) => {
     component: S.attr(core.class.Type, {})
   })
 
+  S.mixin(chunter.class.Page, chunter.mixin.ChunterInfo, {
+    component: chunter.component.PageInfo
+  })
+
   S.mixin(contact.class.Person as Ref<Class<Person>>, chunter.mixin.ChunterInfo, { // TODO: type problems
     component: chunter.component.ContactInfo
   })
