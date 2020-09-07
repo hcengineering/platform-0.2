@@ -18,6 +18,7 @@ import { CoreService } from '@anticrm/platform-core'
 import workbench, { WorkbenchService } from '.'
 import { UIService } from '@anticrm/platform-ui'
 import { PresentationUI } from '@anticrm/presentation-ui'
+import { ChunterService } from '@anticrm/chunter'
 
 import { CoreInjectionKey, UIInjectionKey } from './utils'
 
@@ -30,7 +31,7 @@ import Perspective from './components/Perspective.vue'
  * Licensed under the Eclipse Public License, Version 2.0
  */
 export default async (platform: Platform, deps: {
-  core: CoreService, ui: UIService, presentationUI: PresentationUI
+  core: CoreService, ui: UIService, presentationUI: PresentationUI, chunter: ChunterService
 }): Promise<WorkbenchService> => {
 
   platform.setResource(workbench.component.Workbench, Workbench)

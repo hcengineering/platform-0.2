@@ -13,7 +13,10 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Class, CoreDomain, Doc, Platform, Ref, Tx, Node } from '@anticrm/platform'
+import {
+  AnyLayout, Class, CoreDomain, Doc, Platform, Ref, VDoc, Tx, Node,
+  generateId, CreateTx, PropertyType, Property, Space
+} from '@anticrm/platform'
 import core, { CoreService } from '.'
 import { ModelDb } from './modeldb'
 import { createCache } from './indexeddb'
@@ -141,10 +144,32 @@ export default async (platform: Platform): Promise<CoreService> => {
   //const proto = platform.getMetadata(core.metadata.Offline) ? coreOffline : coreRpc
   const proto = coreRpc
 
+  function createVDoc<T extends VDoc> (_class: Ref<Class<T>>, _attributes: Omit<T, keyof VDoc>): Promise<void> {
+
+    const objectId = generateId() as Ref<VDoc>
+
+    const tx: CreateTx = {
+      _space: null as unknown as Ref<Space>,
+      _class: core.class.CreateTx,
+      _id: generateId() as Ref<Doc>,
+
+      _objectId: objectId,
+      _objectClass: _class,
+
+      _date: Date.now() as Property<number, Date>,
+      _user: 'andrey.v.platov@gmail.com' as Property<string, string>,
+
+      _attributes: _attributes as unknown as { [key: string]: PropertyType }
+    }
+
+    return proto.tx(tx)
+  }
+
   const service = {
     getModel () {
       return model
     },
+    createVDoc,
     // query,
     ...proto
   }

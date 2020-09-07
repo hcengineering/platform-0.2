@@ -27,7 +27,7 @@ import InputControl from './InputControl.vue'
 import DetailsForm from './DetailsForm.vue'
 
 import presentationUI from '@anticrm/presentation-ui'
-import chunter from '@anticrm/chunter'
+import chunter, { getChunterService } from '@anticrm/chunter'
 
 export default defineComponent({
   components: { Projects, InputControl, DetailsForm },
@@ -40,6 +40,7 @@ export default defineComponent({
   setup (props) {
     const coreService = getCoreService()
     const model = coreService.getModel()
+    const chunterService = getChunterService()
 
     const app = computed(() => props.location.path[0])
     const project = computed(() => props.location.path[1])
@@ -71,6 +72,7 @@ export default defineComponent({
 
     function message (msg: string) {
       console.log(msg)
+      chunterService.createMissedObjects(msg)
       const tx: CreateTx = {
         _class: core.class.CreateTx,
         _id: generateId() as Ref<Doc>,

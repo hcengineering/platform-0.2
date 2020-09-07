@@ -13,11 +13,15 @@
 // limitations under the License.
 //
 
-import { DateProperty, Emb, plugin, Plugin, Service, StringProperty, VDoc, Ref, Mixin } from '@anticrm/platform'
+import { inject } from 'vue'
+import { DateProperty, Emb, plugin, Plugin, Service, StringProperty, VDoc, Ref, Mixin, Class } from '@anticrm/platform'
 import { AnyComponent, Asset } from '@anticrm/platform-ui'
 import contact from '@anticrm/contact'
+import core from '@anticrm/platform-core'
 import ui from '@anticrm/platform-ui'
 import { ComponentExtension, ClassUI } from '@anticrm/presentation-core'
+
+// P E R S I S T E N C E  M O D E L
 
 export interface Comment extends Emb {
   _createdOn: DateProperty
@@ -35,7 +39,41 @@ export interface Page extends Message {
   title: string
 }
 
-export default plugin('chunter' as Plugin<Service>, { ui: ui.id, contact: contact.id }, {
+// R U N T I M E  M O D E L
+
+export enum MessageElementKind {
+  TEXT = 0,
+  LINK = 1
+}
+
+export interface MessageElement {
+  kind: MessageElementKind
+}
+
+export interface MessageText extends MessageElement {
+  text: string
+}
+
+export interface MessageLink extends MessageElement {
+  text: string
+  _class: Ref<Class<VDoc>>
+  _id: Ref<VDoc>
+}
+
+// P L U G I N
+
+export interface ChunterService extends Service {
+  parseMessage (message: string): MessageElement[]
+  createMissedObjects (message: string): void
+}
+
+export const ChunterServiceInjectionKey = 'chunter-injection-key'
+
+export function getChunterService (): ChunterService {
+  return inject(ChunterServiceInjectionKey) as ChunterService
+}
+
+export default plugin('chunter' as Plugin<ChunterService>, { core: core.id, ui: ui.id, contact: contact.id }, {
   icon: {
     Chunter: '' as Asset,
   },
@@ -49,7 +87,8 @@ export default plugin('chunter' as Plugin<Service>, { ui: ui.id, contact: contac
     ChunterInfo: '' as Ref<Mixin<ComponentExtension<VDoc>>>,
   },
   class: {
-    Message: '' as Ref<ClassUI<Message>>
+    Message: '' as Ref<ClassUI<Message>>,
+    Page: '' as Ref<Class<Page>>
   }
 
 })

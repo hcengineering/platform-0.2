@@ -25,6 +25,7 @@ import {
   Emb,
   Metadata,
   Obj,
+  VDoc,
   Plugin,
   plugin,
   Ref,
@@ -39,6 +40,7 @@ import { ModelDb } from './modeldb'
 export interface CoreService extends Service, CoreProtocol {
   getModel (): ModelDb
   query (_class: Ref<Class<Doc>>, query: AnyLayout, listener: (result: Doc[]) => void): () => void
+  createVDoc<T extends VDoc> (_class: Ref<Class<T>>, _attributes: Omit<T, keyof VDoc>): Promise<void>
 }
 
 export default plugin('core' as Plugin<CoreService>, {}, {

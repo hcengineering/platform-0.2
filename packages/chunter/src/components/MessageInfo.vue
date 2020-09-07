@@ -21,7 +21,7 @@ import { CreateTx } from '@anticrm/platform'
 import { getCoreService, getContactService } from '../utils'
 import { User } from '@anticrm/contact'
 
-import { parseMessage } from '../model'
+import { getChunterService } from '..'
 
 export default defineComponent({
   components: {
@@ -30,8 +30,10 @@ export default defineComponent({
     tx: Object as PropType<CreateTx>
   },
   setup (props, context) {
+    const chunterService = getChunterService()
+
     return {
-      parseMessage
+      parseMessage: chunterService.parseMessage
     }
   }
 })
@@ -39,7 +41,10 @@ export default defineComponent({
 
 <template>
   <div class="chunter-message-info">
-    <span v-for="(node, index) in parseMessage(tx._attributes?.message)" :key="index">{{node.text}}</span>
+    <span v-for="(node, index) in parseMessage(tx._attributes?.message)" :key="index">
+      <span v-if="node.kind === 1">{{node}}</span>
+      <span v-else>{{node.text}}</span>
+    </span>
   </div>
 </template>
 

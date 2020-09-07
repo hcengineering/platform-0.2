@@ -17,6 +17,7 @@ import { Class, Doc, plugin, Plugin, Ref, Service, StringProperty, VDoc, Mixin, 
 import ui, { AnyComponent, Asset } from '@anticrm/platform-ui'
 import core from '@anticrm/platform-core'
 import presentationUI from '@anticrm/presentation-ui'
+import chunter from '@anticrm/chunter'
 
 export interface Application extends Doc {
   label: StringProperty
@@ -39,7 +40,7 @@ export interface WorkbenchService extends Service {
 }
 
 export default plugin('workbench' as Plugin<WorkbenchService>, {
-  core: core.id, ui: ui.id, presentationUI: presentationUI.id
+  core: core.id, ui: ui.id, presentationUI: presentationUI.id, chunter: chunter.id
 }, {
   class: {
     Application: '' as Ref<Class<Application>>,

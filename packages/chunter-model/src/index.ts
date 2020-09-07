@@ -28,6 +28,5 @@ export default extendIds(chunter, {
     Chunter: '' as Ref<Application>
   },
   class: {
-    Page: '' as Ref<Class<Page>>
   }
 })
