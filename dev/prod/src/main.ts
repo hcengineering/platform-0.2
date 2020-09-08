@@ -19,6 +19,7 @@ import platform from '@anticrm/boot/src/platform'
 import ui from '@anticrm/platform-ui'
 import login from '@anticrm/login'
 import core from '@anticrm/platform-core'
+import contact from '@anticrm/contact'
 
 const loginUrl = process.env.VUE_APP_LOGIN_URL
 const host = process.env.VUE_APP_WSHOST
@@ -29,6 +30,8 @@ platform.setMetadata(login.metadata.LoginUrl, loginUrl)
 platform.setMetadata(core.metadata.WSHost, host)
 platform.setMetadata(core.metadata.WSPort, port)
 platform.setMetadata(core.metadata.Token, token)
+
+platform.setMetadata(contact.metadata.WhoAmI, 'andrey.v.platov@gmail.com')
 
 async function boot (): Promise<void> {
   const uiService = await platform.getPlugin(ui.id)

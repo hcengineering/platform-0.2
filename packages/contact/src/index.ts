@@ -13,8 +13,9 @@
 // limitations under the License.
 //
 
-import { Mixin, plugin, Plugin, Property, Ref, Service, VDoc } from '@anticrm/platform'
-import { Asset, AnyComponent } from '@anticrm/platform-ui'
+import { inject } from 'vue'
+import { Mixin, plugin, Plugin, Property, Ref, Service, VDoc, Metadata } from '@anticrm/platform'
+import ui, { Asset, AnyComponent } from '@anticrm/platform-ui'
 import core from '@anticrm/platform-core'
 
 export interface Contact extends VDoc {
@@ -33,11 +34,23 @@ export interface User extends Person {
   account: string
 }
 
+// P L U G I N
+
 export interface ContactService extends Service {
   getUser (account: string): Promise<User>
+  getMyName (): Promise<string>
 }
 
-export default plugin('contact' as Plugin<ContactService>, { core: core.id }, {
+export const ContactServiceInjectionKey = 'contact-injection-key'
+
+export function getContactService (): ContactService {
+  return inject(ContactServiceInjectionKey) as ContactService
+}
+
+export default plugin('contact' as Plugin<ContactService>, { core: core.id, ui: ui.id }, {
+  metadata: {
+    WhoAmI: '' as Metadata<string>,
+  },
   icon: {
     Date: '' as Asset,
     Phone: '' as Asset,
@@ -45,7 +58,8 @@ export default plugin('contact' as Plugin<ContactService>, { core: core.id }, {
   },
   component: {
     PersonProperties: '' as AnyComponent,
-    UserLookup: '' as AnyComponent
+    UserLookup: '' as AnyComponent,
+    LoginWidget: '' as AnyComponent
   },
   mixin: {
     User: '' as Ref<Mixin<User>>

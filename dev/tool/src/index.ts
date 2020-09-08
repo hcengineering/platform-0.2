@@ -17,7 +17,7 @@
 import { program } from 'commander'
 import { createUser, removeUser } from './user'
 import { MongoClient, Db } from 'mongodb'
-import { builder } from '@anticrm/boot/src/boot'
+
 
 const mongodbUri = process.env.MONGODB_URI || 'mongodb://localhost:27017'
 
@@ -39,7 +39,7 @@ program
   .requiredOption('-w, --workspace <workspace>', 'workspace')
   .action((email, cmd) => {
     console.log(`create user ${email}, pass: ${cmd.password}, name: ${cmd.username}`)
-    withDatabase(mongodbUri, cmd.workspace, db => createUser(builder, db, cmd.username))
+    withDatabase(mongodbUri, cmd.workspace, db => createUser(db, email, cmd.username))
   })
 
 program

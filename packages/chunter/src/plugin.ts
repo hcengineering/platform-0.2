@@ -14,7 +14,6 @@
 //
 
 import { Platform, Ref } from '@anticrm/platform'
-import { ContactServiceInjectionKey } from './utils'
 import chunter, {
   MessageElement, MessageElementKind,
   MessageText, MessageLink, ChunterService, ChunterServiceInjectionKey, Page
@@ -119,7 +118,6 @@ export default async (platform: Platform, deps: { core: CoreService, ui: UIServi
   }
 
   deps.ui.getApp()
-    .provide(ContactServiceInjectionKey, deps.contact)
     .provide(ChunterServiceInjectionKey, service)
 
   return service

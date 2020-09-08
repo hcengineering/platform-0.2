@@ -24,12 +24,12 @@ export interface LoginInfo {
   token: string
 }
 
-export interface Account {
-  account: string
-  server: string
-  port: string
-  token: string
-}
+// export interface Account {
+//   account: string
+//   server: string
+//   port: string
+//   token: string
+// }
 
 // export function currentAccount (): Account | null {
 //   const account = localStorage.getItem('account')
@@ -48,7 +48,11 @@ export interface Account {
 //   vueService.navigate(login.component.LoginForm)
 // }
 
-const login = plugin('login' as Plugin<Service>, {}, {
+export interface LoginService extends Service {
+  whoAmI (): LoginInfo
+}
+
+const login = plugin('login' as Plugin<LoginService>, {}, {
   component: {
     LoginForm: '' as AnyComponent,
     SignupForm: '' as AnyComponent

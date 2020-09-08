@@ -15,7 +15,7 @@
 
 import { Platform, Service } from '@anticrm/platform'
 
-import login from '.'
+import login, { LoginInfo } from '.'
 import LoginForm from './internal/LoginForm.vue'
 import SignupForm from './internal/SignupForm.vue'
 
@@ -28,5 +28,11 @@ export default async (platform: Platform): Promise<Service> => {
   platform.setResource(login.component.LoginForm, LoginForm)
   platform.setResource(login.component.SignupForm, SignupForm)
 
-  return {}
+  return {
+    whoAmI (): LoginInfo {
+      return {
+        email: 'andrey.v.platov@gmail.com'
+      } as LoginInfo
+    }
+  }
 }

@@ -14,29 +14,55 @@
 //
 
 import { Platform, Service, StringProperty } from '@anticrm/platform'
+import contact, { User, ContactService, ContactServiceInjectionKey } from '.'
 
-import contact, { User, ContactService } from '.'
 import PersonProperties from './components/PersonProperties.vue'
 import UserLookup from './components/UserLookup.vue'
+import LoginWidget from './components/LoginWidget.vue'
+
 import { CoreService } from '@anticrm/platform-core'
+import { UIService } from '@anticrm/platform-ui'
 
 /*!
  * Anticrm Platform™ Contact Plugin
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */
-export default async (platform: Platform, deps: { core: CoreService }): Promise<ContactService> => {
+export default async (platform: Platform, deps: { core: CoreService, ui: UIService }): Promise<ContactService> => {
 
   platform.setResource(contact.component.PersonProperties, PersonProperties)
   platform.setResource(contact.component.UserLookup, UserLookup)
+  platform.setResource(contact.component.LoginWidget, LoginWidget)
 
   const coreService = deps.core
+  const uiService = deps.ui
 
   function getUser (account: string): Promise<User> {
+    console.log('getUser', account)
     return coreService.findOne(contact.mixin.User, { account: account as StringProperty }) as Promise<User>
   }
 
-  return {
-    getUser
+  async function getMyName (): Promise<string> {
+    const whoAmI = platform.getMetadata(contact.metadata.WhoAmI)
+    if (!whoAmI) {
+      return "Nobody"
+    }
+    return getUser(whoAmI).then(user => {
+      console.log(user)
+      return 'xxx'
+    })
   }
+
+  uiService.addWidget(contact.component.LoginWidget)
+
+  const service = {
+    getUser,
+    getMyName
+  }
+
+  deps.ui.getApp()
+    .provide(ContactServiceInjectionKey, service)
+
+  return service
+
 }

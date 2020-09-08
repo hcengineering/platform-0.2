@@ -127,6 +127,16 @@ export default async (platform: Platform): Promise<UIService> => {
     return '/' + app + '/' + path
   }
 
+  // W I D G E T S
+
+  const widgets = ref<AnyComponent[]>([])
+
+  function addWidget (widget: AnyComponent): void {
+    const w = widgets.value
+    w.push(widget)
+    widgets.value = w
+  }
+
 
   // C O M P O N E N T S
 
@@ -141,7 +151,10 @@ export default async (platform: Platform): Promise<UIService> => {
     },
     navigate,
     toUrl,
-    getLocation
+    getLocation,
+
+    widgets,
+    addWidget
   }
 
   app.provide(UIInjectionKey, service)

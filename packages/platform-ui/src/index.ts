@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { App, inject } from 'vue'
+import { App, inject, Ref } from 'vue'
 import {
   Metadata,
   Platform,
@@ -38,12 +38,15 @@ export interface Location {
 }
 
 export interface UIService extends Service {
-  getApp(): App
+  getApp (): App
 
-  navigate(url: string): void
-  toUrl(location: Location): string
+  navigate (url: string): void
+  toUrl (location: Location): string
 
-  getLocation(): Location
+  getLocation (): Location
+
+  widgets: Ref<AnyComponent[]>
+  addWidget (component: AnyComponent): void
 }
 
 export const PlatformInjectionKey = Symbol('platform')

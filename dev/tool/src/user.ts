@@ -15,13 +15,13 @@
 
 import { Db } from 'mongodb'
 import { User } from '@anticrm/contact'
-import { UIBuilder } from '@anticrm/presentation-model'
+import { builder } from '@anticrm/boot/src/boot'
 
 import contact from '@anticrm/contact-model'
 import { Person } from '@anticrm/contact'
 import { Ref, Space, Property, generateId } from '@anticrm/platform'
 
-export function createUser (builder: UIBuilder, db: Db, username: string) {
+export function createUser (db: Db, email: string, username: string) {
 
   const id = generateId() as Ref<Person>
   const user = builder.createDocument(contact.class.Person, {
@@ -29,11 +29,11 @@ export function createUser (builder: UIBuilder, db: Db, username: string) {
     lastName: 'User',
     _space: undefined as unknown as Ref<Space>,
     _createdOn: Date.now() as Property<number, Date>,
-    _createdBy: 'demo@user.com' as Property<string, string>,
+    _createdBy: 'system' as Property<string, string>,
   }, id)
 
   builder.mixinDocument(user, contact.mixin.User, {
-    account: 'demo@user.com',
+    account: email,
   })
 
   const model = builder.dumpAll()

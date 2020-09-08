@@ -18,8 +18,8 @@
 import { defineComponent, ref, PropType } from 'vue'
 import { CreateTx } from '@anticrm/platform'
 
-import { getPresentationCore, getContactService } from '../utils'
-import { User } from '@anticrm/contact'
+import { getPresentationCore } from '../utils'
+import { User, getContactService } from '@anticrm/contact'
 import chunter from '..'
 
 export default defineComponent({
