@@ -44,7 +44,7 @@ function dumpToFile () {
 }
 
 function initDatabase (uri: string, tenant: string) {
-  const domains = { tx: [], ...Model } as { [key: string]: Doc[] }
+  const domains = { ...Model } as { [key: string]: Doc[] }
   MongoClient.connect(uri, { useUnifiedTopology: true }, (err, client) => {
     const db = client.db(tenant)
     const ops = [] as Promise<any>[]

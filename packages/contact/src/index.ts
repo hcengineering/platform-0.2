@@ -31,7 +31,6 @@ export interface Person extends Contact {
 
 export interface User extends Person {
   account: string
-  displayName: string
 }
 
 export interface ContactService extends Service {

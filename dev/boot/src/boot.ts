@@ -25,11 +25,7 @@ import taskModel from '@anticrm/task-model/src/model'
 
 import taskStrings from '@anticrm/task-model/src/strings/ru'
 
-import contact from '@anticrm/contact-model'
-import { Person } from '@anticrm/contact'
-import { Ref, Space, Property } from '@anticrm/platform'
-
-const builder = new UIBuilder()
+export const builder = new UIBuilder()
 builder.load(platformModel)
 builder.load(presentationModel)
 builder.load(workbenchModel)
@@ -37,20 +33,6 @@ builder.load(contactModel)
 builder.load(chunterModel)
 builder.load(recruitmentModel)
 builder.load(taskModel)
-
-const id = 'demo.user' as Ref<Person>
-const user = builder.createDocument(contact.class.Person, {
-  firstName: 'Demo',
-  lastName: 'User',
-  _space: undefined as unknown as Ref<Space>,
-  _createdOn: Date.now() as Property<number, Date>,
-  _createdBy: 'demo@user.com' as Property<string, string>,
-}, id)
-
-builder.mixinDocument(user, contact.mixin.User, {
-  account: 'demo@user.com',
-  displayName: 'Demo User'
-})
 
 export const Model = builder.dumpAll()
 export const Strings = {

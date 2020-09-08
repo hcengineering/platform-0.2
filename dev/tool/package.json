@@ -1,0 +1,19 @@
+{
+  "name": "@anticrm/tool",
+  "version": "0.1.0",
+  "main": "src/index.ts",
+  "author": "Anticrm Platform Contributors",
+  "license": "EPL-2.0",
+  "devDependencies": {
+    "@types/mongodb": "^3.5.20",
+    "ts-node": "^8.10.1",
+    "typescript": "~3.9.4"
+  },
+  "scripts": {
+    "start": "ts-node -T src/index.ts"
+  },
+  "dependencies": {
+    "commander": "^6.1.0",
+    "mongodb": "^3.5.8"
+  }
+}
