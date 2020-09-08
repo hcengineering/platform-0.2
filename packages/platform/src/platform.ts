@@ -113,6 +113,15 @@ export class Status {
   }
 }
 
+export class PlatformError extends Error {
+  readonly status: Status
+
+  constructor(status: Status) {
+    super(status.message)
+    this.status = status
+  }
+}
+
 export const PlatformStatus = 'platform-status'
 
 // P L A T F O R M

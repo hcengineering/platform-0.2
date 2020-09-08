@@ -14,7 +14,7 @@
 //
 
 import { Binary, Db, ObjectID } from 'mongodb'
-import { Request, Response } from '@anticrm/platform'
+import { Request, Response, PlatformError, Status, Severity } from '@anticrm/platform'
 import { randomBytes, pbkdf2Sync } from 'crypto'
 import { Buffer } from 'buffer'
 import { encode } from 'jwt-simple'
@@ -72,36 +72,48 @@ function toAccountInfo (account: Account): AccountInfo {
   return result
 }
 
-async function getAccountInfo (db: Db, request: Request<[string, string]>): Promise<Response<AccountInfo>> {
-  const [email, password] = request.params
+async function createAccount (db: Db, email: string, password: string): Promise<AccountInfo> {
+  const salt = randomBytes(32)
+  const hash = hashWithSalt(password, salt)
 
-  const account = await db.collection(ACCOUNT_COLLECTION).findOne<Account>({ email })
-  if (!account) {
-    return { id: request.id, error: { code: Error.ACCOUNT_NOT_FOUND, message: 'Account not found.' } }
+  const insert = await db.collection(ACCOUNT_COLLECTION).insertOne({
+    email,
+    hash,
+    salt,
+    workspaces: [],
+  })
+  return {
+    _id: insert.insertedId,
+    email,
+    workspaces: []
   }
-
-  if (!verifyPassword(password, account.hash.buffer, account.salt.buffer)) {
-    return { id: request.id, error: { code: Error.INCORRECT_PASSWORD, message: 'Incorrect password.' } }
-  }
-
-  return { result: toAccountInfo(account), id: request.id }
 }
 
-async function login (db: Db, request: Request<[string, string, string]>): Promise<Response<LoginInfo>> {
-  const [email, password, workspace] = request.params
-
-  const response = await getAccountInfo(db, { method: 'getAccountInfo', params: [email, password] })
-  if (response.error) {
-    return response as unknown as Response<LoginInfo>
+async function getAccountInfo (db: Db, email: string, password: string, create?: boolean): Promise<AccountInfo> {
+  const account = await db.collection(ACCOUNT_COLLECTION).findOne<Account>({ email })
+  if (!account) {
+    if (create) {
+      return createAccount(db, email, password)
+    } else {
+      throw new PlatformError(new Status(Severity.ERROR, Error.ACCOUNT_NOT_FOUND, 'Account not found.'))
+    }
   }
+  if (!verifyPassword(password, account.hash.buffer, account.salt.buffer)) {
+    throw new PlatformError(new Status(Severity.ERROR, Error.INCORRECT_PASSWORD, 'Incorrect password.'))
+  }
+  return toAccountInfo(account)
+}
 
+async function login (db: Db, email: string, password: string, workspace: string): Promise<LoginInfo> {
+
+  const accountInfo = await getAccountInfo(db, email, password)
   const workspaceInfo = await db.collection(WORKSPACE_COLLECTION).findOne({
     workspace
   })
 
   if (workspaceInfo) {
 
-    const workspaces = (response.result as AccountInfo).workspaces
+    const workspaces = accountInfo.workspaces
 
     for (const w of workspaces) {
       if (w.equals(workspaceInfo._id)) {
@@ -112,88 +124,55 @@ async function login (db: Db, request: Request<[string, string, string]>): Promi
           token: encode({ email, workspace }, secret),
           email
         }
-        return { result, id: request.id }
+        return result
       }
     }
   }
 
-  return {
-    id: request.id, error: { code: Error.FORBIDDEN, message: 'Forbidden.' }
-  }
-
+  throw new PlatformError(new Status(Severity.ERROR, Error.FORBIDDEN, 'Forbidden.'))
 }
 
-async function createAccount (db: Db, request: Request<[string, string]>): Promise<Response<ObjectID>> {
-  const [email, password] = request.params
-
-  const salt = randomBytes(32)
-  const hash = hashWithSalt(password, salt)
-
-  try {
-    const insert = await db.collection(ACCOUNT_COLLECTION).insertOne({
-      email,
-      hash,
-      salt,
-      workspaces: [],
-    })
-    return { result: insert.insertedId, id: request.id }
-
-  } catch (err) {
-    return {
-      id: request.id, error: { code: 0, message: err.toString() }
-    }
-  }
-}
-
-async function createWorkspace (db: Db, request: Request<[string, string, string]>): Promise<Response<string>> {
-  const [email, password, organisation] = request.params
-
-  let accountId
-  const response = await getAccountInfo(db, { method: 'getAccountInfo', params: [email, password] })
-  if (response.error) {
-    switch (response.error.code) {
-      case Error.ACCOUNT_NOT_FOUND: {
-        const response = await createAccount(db, { method: 'createAccount', params: [email, password] })
-        if (response.error) {
-          return response as unknown as Response<string>
-        }
-        accountId = (response.result as ObjectID)
-        break
-      }
-      default:
-        return response as unknown as Response<string>
-    }
-  } else {
-    accountId = (response.result as AccountInfo)._id
-  }
+async function createWorkspace (db: Db, email: string, password: string, organisation: string): Promise<string> {
+  const accountInfo = await getAccountInfo(db, email, password, true)
+  const accountId = accountInfo._id
 
   const workspace = 'ws-' + randomBytes(8).toString('hex')
 
-  try {
-    const insert = await db.collection(WORKSPACE_COLLECTION).insertOne({
-      workspace,
-      organisation,
-      accounts: [accountId]
-    })
+  const insert = await db.collection(WORKSPACE_COLLECTION).insertOne({
+    workspace,
+    organisation,
+    accounts: [accountId]
+  })
 
-    await db.collection(ACCOUNT_COLLECTION).updateOne({ _id: accountId }, {
-      $push: { workspaces: insert.insertedId }
-    })
+  await db.collection(ACCOUNT_COLLECTION).updateOne({ _id: accountId }, {
+    $push: { workspaces: insert.insertedId }
+  })
 
-    return { result: workspace, id: request.id }
+  return workspace
+}
 
-  } catch (err) {
-    return {
-      id: request.id, error: { code: 0, message: err.toString() }
-    }
+////
+
+function wrap (f: (db: Db, ...args: any[]) => Promise<any>) {
+  return async function (db: Db, request: Request<[]>): Promise<Response<any>> {
+    return f(db, ...request.params)
+      .then(result => ({ id: request.id, result }))
+      .catch(err => {
+        if (err instanceof PlatformError) {
+          const pe = err as PlatformError
+          return { id: request.id, error: { code: pe.status.code, message: pe.status.message } }
+        } else {
+          return { id: request.id, error: { code: 0, message: err.message } }
+        }
+      })
   }
 }
 
 const methods = {
-  login,
-  getAccountInfo,
-  createAccount,
-  createWorkspace
+  login: wrap(login),
+  getAccountInfo: wrap(getAccountInfo),
+  createAccount: wrap(createAccount),
+  createWorkspace: wrap(createWorkspace),
 }
 
 export default methods
