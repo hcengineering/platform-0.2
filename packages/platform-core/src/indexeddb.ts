@@ -99,20 +99,9 @@ export async function createCache (dbname: string, modelDb: ModelDb) {
 
   const txProcessor = new CacheTxProcessor(modelDb)
 
-  function getClass (_class: Ref<Class<Doc>>): Ref<Class<Doc>> {
-    let cls = _class
-    while (cls) {
-      const clazz = modelDb.get(cls) as Class<Doc>
-      if (clazz._kind === ClassifierKind.CLASS)
-        return cls
-      cls = clazz._extends as Ref<Class<Doc>>
-    }
-    throw new Error('class not found in hierarchy: ' + _class)
-  }
-
   async function find (classOrMixin: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc[]> { // eslint-disable-line
     const result = [] as Doc[]
-    const _class = getClass(classOrMixin)
+    const _class = modelDb.getClass(classOrMixin)
     console.log('mixin: ' + classOrMixin + ', class: ' + _class)
     const domain = modelDb.getDomain(_class)
     const tx = db.transaction(domain)

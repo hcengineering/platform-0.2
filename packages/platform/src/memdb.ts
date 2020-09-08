@@ -91,6 +91,17 @@ export class MemDb {
     throw new Error('no domain found for class: ' + id)
   }
 
+  getClass (_class: Ref<Class<Doc>>): Ref<Class<Doc>> {
+    let cls = _class
+    while (cls) {
+      const clazz = this.get(cls) as Class<Doc>
+      if (clazz._kind === ClassifierKind.CLASS)
+        return cls
+      cls = clazz._extends as Ref<Class<Doc>>
+    }
+    throw new Error('class not found in hierarchy: ' + _class)
+  }
+
   /// A S S I G N
 
   private findAttributeKey<T extends Doc> (cls: Ref<Class<Obj>>, key: string): string {

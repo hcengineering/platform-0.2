@@ -50,7 +50,10 @@ export async function connect (uri: string, dbName: string, ws: WebSocket, serve
 
   function find (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc[]> {
     const domain = memdb.getDomain(_class)
-    return db.collection(domain).find({ ...query, _class }).toArray()
+    const cls = memdb.getClass(_class)
+    const q = {}
+    memdb.assign(q, _class, query)
+    return db.collection(domain).find({ ...q, _class: cls }).toArray()
   }
 
   class MongoTxProcessor extends TxProcessor {

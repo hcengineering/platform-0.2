@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Attribute, Class, Classifier, CoreDomain, Doc, MemDb, Mixin, Obj, Ref, Space } from '@anticrm/platform'
+import { AnyLayout, Attribute, Class, Classifier, CoreDomain, Doc, MemDb, Mixin, Obj, Ref, ClassifierKind } from '@anticrm/platform'
 import core from '.'
 
 interface Proxy {
@@ -74,4 +74,7 @@ export class ModelDb extends MemDb {
   isMixedIn (obj: Doc, _class: Ref<Mixin<Doc>>): boolean {
     return obj._mixins ? obj._mixins.includes(_class) : false
   }
+
+  ///
+
 }

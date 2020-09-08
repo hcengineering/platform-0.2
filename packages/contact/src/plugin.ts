@@ -47,10 +47,7 @@ export default async (platform: Platform, deps: { core: CoreService, ui: UIServi
     if (!whoAmI) {
       return "Nobody"
     }
-    return getUser(whoAmI).then(user => {
-      console.log(user)
-      return 'xxx'
-    })
+    return getUser(whoAmI).then(user => user?.firstName)
   }
 
   uiService.addWidget(contact.component.LoginWidget)
