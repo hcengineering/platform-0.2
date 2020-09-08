@@ -132,11 +132,11 @@ async function login (db: Db, email: string, password: string, workspace: string
   throw new PlatformError(new Status(Severity.ERROR, Error.FORBIDDEN, 'Forbidden.'))
 }
 
-async function createWorkspace (db: Db, email: string, password: string, organisation: string): Promise<string> {
+export async function createWorkspace (db: Db, email: string, password: string, organisation: string, ws?: string): Promise<string> {
   const accountInfo = await getAccountInfo(db, email, password, true)
   const accountId = accountInfo._id
 
-  const workspace = 'ws-' + randomBytes(8).toString('hex')
+  const workspace = ws ?? 'ws-' + randomBytes(8).toString('hex')
 
   const insert = await db.collection(WORKSPACE_COLLECTION).insertOne({
     workspace,

@@ -16,16 +16,18 @@
 
 import { program } from 'commander'
 import { createUser, removeUser } from './user'
+import { initDatabase } from './init'
 import { MongoClient, Db } from 'mongodb'
 
+import { createWorkspace } from '@anticrm/accounts'
 
 const mongodbUri = process.env.MONGODB_URI || 'mongodb://localhost:27017'
 
-function withDatabase (uri: string, workspace: string, f: (db: Db) => Promise<any>) {
-  console.log(`connecting to workspace '${workspace}'...`)
+function withDatabase (uri: string, f: (client: MongoClient) => Promise<any>) {
+  console.log(`connecting to database '${uri}'...`)
 
   return MongoClient.connect(uri, { useUnifiedTopology: true }).then(client => {
-    f(client.db(workspace)).then(() => client.close())
+    f(client).then(() => client.close())
   })
 }
 
@@ -35,11 +37,9 @@ program
   .command('create-user <email>')
   .description('create user and corresponding account in master database')
   .requiredOption('-p, --password <password>', 'user password')
-  .requiredOption('-u, --username <username>', 'full user name')
-  .requiredOption('-w, --workspace <workspace>', 'workspace')
+  .requiredOption('-f, --fullname <fullname>', 'full user name')
   .action((email, cmd) => {
-    console.log(`create user ${email}, pass: ${cmd.password}, name: ${cmd.username}`)
-    withDatabase(mongodbUri, cmd.workspace, db => createUser(db, email, cmd.username))
+    withDatabase(mongodbUri, client => createUser(client.db(cmd.workspace), email, cmd.fullname))
   })
 
 program
@@ -47,7 +47,24 @@ program
   .description('remove user and corresponding account in master database')
   .requiredOption('-w, --workspace <workspace>', 'workspace')
   .action((email, cmd) => {
-    withDatabase(mongodbUri, cmd.workspace, db => removeUser(db, email))
+    withDatabase(mongodbUri, client => removeUser(client.db(cmd.workspace), email))
+  })
+
+program
+  .command('create-workspace <email>')
+  .description('create workspace')
+  .requiredOption('-p, --password <password>', 'user password')
+  .requiredOption('-f, --fullname <fullname>', 'full user name')
+  .requiredOption('-w, --workspace <workspace>', 'workspace')
+  .action((email, cmd) => {
+    MongoClient.connect(mongodbUri, { useUnifiedTopology: true }).then(client => {
+      const db = client.db('accounts')
+      const p1 = createWorkspace(db, email, cmd.password, 'Organization', cmd.workspace)
+      const p2 = initDatabase(client, cmd.workspace).then(() => {
+        createUser(client.db(cmd.workspace), email, cmd.fullname)
+      })
+      Promise.all([p1, p2]).then(() => client.close())
+    })
   })
 
 program.parse(process.argv)
