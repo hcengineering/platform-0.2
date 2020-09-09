@@ -93,7 +93,7 @@ export default async (platform: Platform, deps: { core: CoreService, ui: UIServi
     for (const element of elements) {
       if (element.kind === MessageElementKind.LINK) {
         const link = element as MessageLink
-        if (link._id === 'undefined') {
+        if (link._id == undefined) {
           const title = link.text.substring(2, link.text.length - 2)
           const id = coreService.generateId() as Ref<Page>
           coreService.createVDoc(chunter.class.Page, {

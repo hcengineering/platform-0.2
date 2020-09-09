@@ -62,7 +62,7 @@ export default defineComponent({
     const element = parser.parseFromString(props.content, 'text/html').body
 
     function checkEmpty(value: string): boolean {
-      return value.length === 0 || value === "<p><br></p>"
+      return value.length === 0 || value === "<p><br></p>" || value === "<p></p>"
     }
 
     let isEmpty = computed(() => {

@@ -26,8 +26,12 @@ import OwnAttributes from '@anticrm/presentation-ui/src/components/OwnAttributes
 import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.vue'
 import Button from '@anticrm/sparkling-controls/src/Button.vue'
 
+import ReferenceInput from '@anticrm/presentation-ui/src/components/ReferenceInput.vue'
+
+import chunter, { getChunterService } from '@anticrm/chunter'
+
 export default defineComponent({
-  components: { InlineEdit, OwnAttributes, Button },
+  components: { InlineEdit, OwnAttributes, Button, ReferenceInput },
   props: {
     _class: {
       type: String as unknown as PropType<Ref<Class<VDoc>>>,
@@ -38,13 +42,12 @@ export default defineComponent({
       required: true
     }
   },
-  setup (props, context) {
+  setup(props, context) {
     const coreService = getCoreService()
     const presentationCoreService = getPresentationCore()
+    const chunterService = getChunterService()
 
     const component = ref('')
-
-    const comment = ref('')
 
     let shutdown: any = null
 
@@ -62,11 +65,11 @@ export default defineComponent({
 
     onUnmounted(() => shutdown())
 
-    function cancel () {
+    function cancel() {
       context.emit('done', 'cancel')
     }
 
-    function remove () {
+    function remove() {
       const tx: DeleteTx = {
         _class: core.class.DeleteTx,
         _id: generateId() as Ref<Doc>,
@@ -82,8 +85,9 @@ export default defineComponent({
       context.emit('done', 'delete')
     }
 
-    function submit () {
-      console.log(comment.value)
+    function submit(message) {
+      console.log(message)
+      const newMessage = chunterService.createMissedObjects(message)
       const tx: PushTx = {
         _class: core.class.PushTx,
         _id: generateId() as Ref<Doc>,
@@ -95,12 +99,11 @@ export default defineComponent({
 
         _attribute: 'comments' as Property<string, string>,
         _attributes: {
-          message: comment.value as Property<string, string>
+          message: newMessage as Property<string, string>
         }
       }
 
       coreService.tx(tx)
-      comment.value = ''
     }
 
     return {
@@ -109,8 +112,6 @@ export default defineComponent({
 
       cancel,
       remove,
-
-      comment,
       submit
     }
   }
@@ -133,11 +134,12 @@ export default defineComponent({
 
       <div class="comments">
         <div class="caption-2">Комментарии</div>
-        <div>
-          <InlineEdit placeholder="Comment..." v-model="comment" />
-          <Button class="submit" @click="submit">Submit</Button>
+        <div v-for="(comment, index) in object.comments" :key="index">
+          <div class="message">
+            <div v-html="comment.message" />
+          </div>
         </div>
-        <div v-for="(comment, index) in object.comments" :key="index">{{comment.message}}</div>
+        <ReferenceInput class="submit" placeholder="Comment..." @message="submit" />
       </div>
     </div>
   </div>
@@ -171,7 +173,11 @@ export default defineComponent({
   .comments {
     .submit {
       font-size: 10px;
-      margin-left: 1em;
+    }
+    .message {
+      margin-bottom: 5px;
+      background-color: $input-color;
+      padding: 5px;
     }
   }
 

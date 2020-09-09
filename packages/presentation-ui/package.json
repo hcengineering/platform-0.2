@@ -23,6 +23,7 @@
     "@anticrm/platform": "^0.2.0",
     "@anticrm/platform-core": "^0.1.0",
     "@anticrm/platform-ui": "^0.1.0",
-    "@anticrm/presentation-core": "^0.1.0"
+    "@anticrm/presentation-core": "^0.1.0",
+    "@anticrm/sparkling-rich": "^0.1.0"
   }
 }
