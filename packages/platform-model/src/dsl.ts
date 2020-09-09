@@ -14,7 +14,7 @@
 //
 
 import 'reflect-metadata'
-import { Ref, Class, Obj, Mixin, ClassifierKind, Classifier, Attribute, Type, Emb, Doc, Property } from '@anticrm/platform'
+import { Ref, Class, Obj, Mixin, ClassifierKind, Classifier, Attribute, Type, Emb, Doc, Property, mixinKey } from '@anticrm/platform'
 import core from '.'
 
 const classifierMetadataKey = Symbol("anticrm:classifier");
@@ -84,6 +84,21 @@ export function Prop () {
     attribute.type = type
   }
 }
+
+export function Primary () {
+
+  return function (target: any, propertyKey: string): void {
+    const classifier = getClassifier(target)
+    if (!classifier._mixins) {
+      classifier._mixins = [core.mixin.Indices]
+    } else {
+      classifier._mixins.push(core.mixin.Indices)
+    }
+    const doc = classifier as any
+    doc[mixinKey(core.mixin.Indices, 'primary')] = propertyKey
+  }
+}
+
 
 
 

@@ -117,8 +117,8 @@ export interface VDoc extends Doc {
   _modifiedBy?: StringProperty
 }
 
-export interface VClass extends Class<VDoc> {
-  identity: StringProperty
+export interface Indices extends Class<VDoc> {
+  primary: StringProperty
 }
 
 export interface Tx extends Doc {
@@ -164,5 +164,8 @@ export const core = identify('core' as AnyPlugin, {
     PushTx: '' as Ref<Class<PushTx>>,
     UpdateTx: '' as Ref<Class<UpdateTx>>,
     DeleteTx: '' as Ref<Class<DeleteTx>>
+  },
+  mixin: {
+    Indices: '' as Ref<Mixin<Indices>>,
   }
 })

@@ -15,7 +15,7 @@
 
 import { Ref, Class } from '@anticrm/platform'
 
-import core, { Builder, ModelClass, ModelMixin, Prop } from '@anticrm/platform-model'
+import core, { Builder, ModelClass, Primary, Prop } from '@anticrm/platform-model'
 import { UX } from '@anticrm/presentation-model'
 
 import workbench from '@anticrm/workbench-model'
@@ -40,7 +40,7 @@ class TMessage extends TVDoc implements Message {
 @ModelClass(chunter.class.Page, chunter.class.Message)
 @UX('Страница' as IntlString)
 class TPage extends TMessage implements Page {
-  @Prop() @UX('Название' as IntlString, chunter.icon.Chunter) title!: string
+  @Prop() @UX('Название' as IntlString, chunter.icon.Chunter) @Primary() title!: string
 }
 
 export default (S: Builder) => {
