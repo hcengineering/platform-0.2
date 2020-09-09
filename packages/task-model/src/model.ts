@@ -14,20 +14,32 @@
 //
 
 import { Class, Property, Ref, Doc, StringProperty } from '@anticrm/platform'
+import core, { Builder, ModelClass, ModelMixin, Prop } from '@anticrm/platform-model'
+import { UX } from '@anticrm/presentation-model'
 
-import presentation, { UIBuilder } from '@anticrm/presentation-model'
+import presentation from '@anticrm/presentation-model'
 import presentationUI from '@anticrm/presentation-ui'
 
-
-import core from '@anticrm/platform-model'
 import workbench from '@anticrm/workbench-model'
 import contact from '@anticrm/contact-model'
 import task, { TaskDomain } from '.'
 import { IntlString } from '@anticrm/platform-i18n'
 import { Task } from '@anticrm/task'
+import { User } from '@anticrm/contact'
+
+import { TVDoc } from '@anticrm/platform-model/src/model'
 
 
-export default (S: UIBuilder) => {
+@ModelClass(task.class.Task, core.class.VDoc)
+@UX('Задача' as IntlString)
+class TTask extends TVDoc implements Task {
+  @Prop() @UX(task.string.Task_name) title!: Property<string, string>
+  @Prop() @UX(task.string.Task_assignee) assignee!: Ref<User>
+}
+
+export default (S: Builder) => {
+
+  S.add(TTask)
 
   S.createDocument(workbench.class.Application, {
     label: 'Задачи' as StringProperty,
@@ -35,20 +47,6 @@ export default (S: UIBuilder) => {
     main: presentationUI.component.BrowseView,
     appClass: task.class.Task
   }, task.application.Task)
-
-  S.createClassUI(task.class.Task, core.class.VDoc, {
-    _domain: TaskDomain.Task as Property<string, string>,
-    label: 'Задача' as IntlString
-  }, {
-    title: S.attrUI(core.class.Type, {}, {
-      label: task.string.Task_name
-    }),
-    assignee: S.attrUI(core.class.RefTo, {
-      to: contact.mixin.User as Ref<Class<Doc>> // TODO: fix types
-    }, {
-      label: task.string.Task_assignee
-    }),
-  })
 
   S.mixin(task.class.Task as Ref<Class<Task>>, presentation.class.DetailForm, {
     component: task.component.View

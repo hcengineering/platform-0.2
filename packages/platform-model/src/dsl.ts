@@ -14,7 +14,7 @@
 //
 
 import 'reflect-metadata'
-import { Ref, Class, Obj, Mixin, ClassifierKind, Classifier, Attribute, Type, Emb, Doc } from '@anticrm/platform'
+import { Ref, Class, Obj, Mixin, ClassifierKind, Classifier, Attribute, Type, Emb, Doc, Property } from '@anticrm/platform'
 import core from '.'
 
 const classifierMetadataKey = Symbol("anticrm:classifier");
@@ -30,7 +30,7 @@ export function getClassifier (target: any): Classifier<Obj> {
   return classifier
 }
 
-function getAttribute (target: any, propertyKey: string): Attribute {
+export function getAttribute (target: any, propertyKey: string): Attribute {
   const classifier = getClassifier(target)
   let attribute = (classifier._attributes as any)[propertyKey] as Attribute
   if (!attribute) {
@@ -43,7 +43,7 @@ function getAttribute (target: any, propertyKey: string): Attribute {
 }
 
 
-export function ModelClass<T extends Obj> (id: Ref<Class<T>>) {
+export function ModelClass<T extends E, E extends Obj> (id: Ref<Class<T>>, _extends: Ref<Class<E>>, domain?: string) {
 
   return function classDecorator<C extends { new(): T }> (
     constructor: C
@@ -52,11 +52,17 @@ export function ModelClass<T extends Obj> (id: Ref<Class<T>>) {
     classifier._id = id
     classifier._class = core.class.Class
     classifier._kind = ClassifierKind.CLASS
+    if (id !== _extends) {
+      classifier._extends = _extends
+    }
+    if (domain) {
+      (classifier as Class<T>)._domain = domain as Property<string, string>
+    }
   }
 
 }
 
-export function ModelMixin<T extends Obj> (id: Ref<Mixin<T>>) {
+export function ModelMixin<T extends E, E extends Obj> (id: Ref<Mixin<T>>, _extends: Ref<Classifier<E>>) {
 
   return function classDecorator<C extends { new(): T }> (
     constructor: C
@@ -65,18 +71,9 @@ export function ModelMixin<T extends Obj> (id: Ref<Mixin<T>>) {
     classifier._id = id
     classifier._class = core.class.Mixin
     classifier._kind = ClassifierKind.MIXIN
+    classifier._extends = _extends
   }
 
-}
-
-export function Extends<T extends Obj> (id: Ref<Classifier<T>>) {
-
-  return function <C extends { new(): T }> (
-    constructor: C
-  ) {
-    const classifier = getClassifier(constructor.prototype)
-    classifier._extends = id
-  }
 }
 
 export function Prop () {
@@ -88,25 +85,6 @@ export function Prop () {
   }
 }
 
-////////////////////////////////////////////////////////////////
 
-@ModelClass(core.class.Obj)
-class TObj implements Obj {
-  _class!: Ref<Class<Obj>>
-}
 
-@ModelClass(core.class.Emb) @Extends(core.class.Obj)
-class TEmb extends TObj implements Emb {
-  __embedded!: true
-}
 
-@ModelClass(core.class.Doc) @Extends(core.class.Obj)
-class TDoc extends TObj implements Doc {
-  _class!: Ref<Class<Doc>>
-  @Prop()
-  _id!: Ref<Doc>
-  @Prop()
-  _mixins?: Ref<Mixin<Doc>>[]
-}
-
-export default [TObj, TEmb, TDoc]

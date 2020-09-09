@@ -32,10 +32,10 @@ export interface UXObject extends Doc {
   icon?: Asset
 }
 
-export interface ClassUI<T extends Obj> extends Class<T> {
-  label: IntlString
-  icon?: Asset
-}
+// export interface ClassUI<T extends Obj> extends Class<T> {
+//   label: IntlString
+//   icon?: Asset
+// }
 
 export interface Presenter<T extends Type> extends Class<T> {
   presenter: AnyComponent
@@ -93,7 +93,6 @@ export interface PresentationCore extends Service {
 export default plugin('presentation-core' as Plugin<PresentationCore>, { core: core.id, i18n: i18n.id }, {
   class: {
     AttributeUI: '' as Ref<Class<AttributeUI>>,
-    ClassUI: '' as Ref<Class<ClassUI<Obj>>>,
     Presenter: '' as Ref<Mixin<Presenter<Type>>>,
     DetailForm: '' as Ref<Mixin<ComponentExtension<VDoc>>>,
     LookupForm: '' as Ref<Mixin<ComponentExtension<VDoc>>>

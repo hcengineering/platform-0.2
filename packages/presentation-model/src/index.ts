@@ -17,7 +17,7 @@ import { extendIds } from '@anticrm/platform-model'
 
 import ui from '@anticrm/presentation-core'
 
-export { UIBuilder } from './builder'
+export * from './dsl'
 
 export default extendIds(ui, {
   class: {

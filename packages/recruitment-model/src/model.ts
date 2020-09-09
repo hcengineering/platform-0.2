@@ -13,10 +13,11 @@
 // limitations under the License.
 //
 
-import { UIBuilder } from '@anticrm/presentation-model'
+import core, { Builder, ModelClass, ModelMixin, Prop } from '@anticrm/platform-model'
+import { UX } from '@anticrm/presentation-model'
+
 import workbench from '@anticrm/workbench-model'
 import { Class, Property, Ref, StringProperty } from '@anticrm/platform'
-import core from '@anticrm/platform-model'
 import contact from '@anticrm/contact-model'
 import presentation from '@anticrm/presentation-core'
 import presentationUI from '@anticrm/presentation-ui'
@@ -25,7 +26,18 @@ import recruitment, { RecruitmentDomain } from '.'
 import { IntlString } from '@anticrm/platform-i18n'
 import { Candidate } from '@anticrm/recruitment/src'
 
-export default (S: UIBuilder) => {
+import { TPerson } from '@anticrm/contact-model/src/model'
+
+@ModelClass(recruitment.class.Candidate, contact.class.Person)
+@UX('Контактная информация' as IntlString)
+class TCandidate extends TPerson implements Candidate {
+  @Prop() @UX('Текущая должность' as IntlString, recruitment.icon.Position) currentPosition!: string
+  @Prop() @UX('Место работы' as IntlString, recruitment.icon.Employer) currentEmployer!: string
+}
+
+export default (S: Builder) => {
+
+  S.add(TCandidate)
 
   S.createDocument(workbench.class.Application, {
     label: 'Найм' as StringProperty,
@@ -33,20 +45,6 @@ export default (S: UIBuilder) => {
     main: presentationUI.component.BrowseView,
     appClass: recruitment.class.Candidate
   }, recruitment.application.Recruitment)
-
-  S.createClassUI(recruitment.class.Candidate, contact.class.Person, {
-    _domain: RecruitmentDomain.Recruitment as Property<string, string>,
-    label: 'Кандидат' as IntlString
-  }, {
-    currentPosition: S.attrUI(core.class.Type, {}, {
-      label: 'Текущая должность' as IntlString,
-      icon: recruitment.icon.Position
-    }),
-    currentEmployer: S.attrUI(core.class.Type, {}, {
-      label: 'Место работы' as IntlString,
-      icon: recruitment.icon.Employer
-    })
-  })
 
   // S.mixin(recruitment.class.Candidate as Ref<Class<Candidate>>, presentation.class.DetailsForm, {
   //   form: recruitment.component.View2

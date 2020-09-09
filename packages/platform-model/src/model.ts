@@ -16,41 +16,72 @@
 import Builder from './builder'
 import { ClassifierKind, CoreDomain, EasyScript } from '@anticrm/platform'
 import core from '.'
+import { ModelClass, Prop } from './dsl'
+import { Obj, Emb, Doc, Ref, Class, Mixin, VDoc, StringProperty, DateProperty, Space } from '@anticrm/platform'
 
 export { Builder }
 
+
+@ModelClass(core.class.Obj, core.class.Obj)
+class TObj implements Obj {
+  _class!: Ref<Class<Obj>>
+  constructor() { }
+}
+
+@ModelClass(core.class.Emb, core.class.Obj)
+class TEmb extends TObj implements Emb {
+  __embedded!: true
+}
+
+@ModelClass(core.class.Doc, core.class.Obj)
+class TDoc extends TObj implements Doc {
+  _class!: Ref<Class<Doc>>
+  @Prop()
+  _id!: Ref<Doc>
+  @Prop()
+  _mixins?: Ref<Mixin<Doc>>[]
+}
+
+@ModelClass(core.class.VDoc, core.class.Doc)
+export class TVDoc extends TDoc implements VDoc {
+  @Prop() _space!: Ref<Space>
+  @Prop() _createdOn!: DateProperty
+  @Prop() _createdBy!: StringProperty
+  @Prop() _modifiedOn?: DateProperty
+  @Prop() _modifiedBy?: StringProperty
+}
+
 export default (S: Builder) => {
-  S.createDocument(core.class.Class, {
-    _kind: ClassifierKind.CLASS,
-    _attributes: {}
-  }, core.class.Obj)
+  // S.createDocument(core.class.Class, {
+  //   _kind: ClassifierKind.CLASS,
+  //   _attributes: {}
+  // }, core.class.Obj)
 
-  S.createDocument(core.class.Class, {
-    _kind: ClassifierKind.CLASS,
-    _extends: core.class.Obj,
-    _attributes: {}
-  }, core.class.Emb)
+  // S.createDocument(core.class.Class, {
+  //   _kind: ClassifierKind.CLASS,
+  //   _extends: core.class.Obj,
+  //   _attributes: {}
+  // }, core.class.Emb)
 
-  S.createClass(core.class.Doc, core.class.Obj, {
-    _id: S.attr(core.class.RefTo, {
-      to: core.class.Doc
-    }),
-    _mixins: S.attr(core.class.ArrayOf, {
-      of: S.newInstance(core.class.RefTo, { to: core.class.Doc })
-    })
-  })
+  // S.createClass(core.class.Doc, core.class.Obj, {
+  //   _id: S.attr(core.class.RefTo, {
+  //     to: core.class.Doc
+  //   }),
+  //   _mixins: S.attr(core.class.ArrayOf, {
+  //     of: S.newInstance(core.class.RefTo, { to: core.class.Doc })
+  //   })
+  // })
 
-  S.createClass(core.class.VDoc, core.class.Doc, {
-    _space: S.attr(core.class.Type, {}),
-    _createdOn: S.attr(core.class.Type, {}),
-    _createdBy: S.attr(core.class.Type, {}),
-    _modifiedOn: S.attr(core.class.Type, {}),
-    _modifiedBy: S.attr(core.class.Type, {}),
+  // S.createClass(core.class.VDoc, core.class.Doc, {
+  //   _space: S.attr(core.class.Type, {}),
+  //   _createdOn: S.attr(core.class.Type, {}),
+  //   _createdBy: S.attr(core.class.Type, {}),
+  //   _modifiedOn: S.attr(core.class.Type, {}),
+  //   _modifiedBy: S.attr(core.class.Type, {}),
 
-    toStr: S.attr(core.class.ESFunc, {
-      _default: 'title' as EasyScript<() => string>
-    })
-  })
+  // })
+
+  S.add(TObj, TEmb, TDoc, TVDoc)
 
   S.createClass(core.class.Attribute, core.class.Emb, {
     type: S.attr(core.class.Type, {})

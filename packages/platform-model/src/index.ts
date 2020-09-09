@@ -22,6 +22,8 @@ export { extendIds }
 export { default as Builder } from './builder'
 export { verifyTranslation } from './utils'
 
+export * from './dsl'
+
 export default extendIds(core, {
   class: {
     Obj: '' as Ref<Class<Obj>>,
