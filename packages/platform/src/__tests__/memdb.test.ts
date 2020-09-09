@@ -14,7 +14,7 @@
 //
 
 import { MemDb, Plugin, Service, Ref, Class, identify } from '..'
-import { Doc, Property, core } from '../core'
+import { Doc, Property, core, Obj } from '../core'
 
 describe('memdb', () => {
   const memdb = new MemDb('testdomain')
@@ -22,22 +22,42 @@ describe('memdb', () => {
   const test = identify('test' as Plugin<Service>, {
     class: {
       Class: '' as Ref<Class<Class<Doc>>>,
-      TestDoc: '' as Ref<Class<Doc>>
+      Doc1: '' as Ref<Class<Doc>>,
+      Doc2: '' as Ref<Class<Doc>>,
+      Doc3: '' as Ref<Class<Doc>>,
     }
   })
 
-  const classDoc: Doc = {
+  const metaClass = {
     _class: test.class.Class,
-    _id: test.class.Class
+    _id: test.class.Class,
+    _domain: 'testdomain'
+  }
+
+  const domainDoc = {
+    _class: test.class.Class,
+    _id: test.class.Doc1,
+    _domain: 'domain1'
+  }
+
+  const noDomainDoc = {
+    _class: test.class.Class,
+    _id: test.class.Doc2
+  }
+
+  const extendDomainDoc = {
+    _class: test.class.Class,
+    _id: test.class.Doc3,
+    _extends: domainDoc._id
   }
 
   it('should add and get object', () => {
-    memdb.add(classDoc)
-    expect(memdb.get(classDoc._id)).toBe(classDoc)
+    memdb.add(metaClass)
+    expect(memdb.get(metaClass._id)).toBe(metaClass)
   })
 
   it('should fail to add object twice', () => {
-    expect(() => memdb.add(classDoc)).toThrowError('document added already ' + classDoc._id)
+    expect(() => memdb.add(metaClass)).toThrowError('document added already ' + metaClass._id)
   })
 
   it('should fail to get non existing object', () => {
@@ -46,14 +66,24 @@ describe('memdb', () => {
   })
 
   it('should index all and find object', () => {
-    const testDoc: Doc = {
-      _class: test.class.Class,
-      _id: test.class.TestDoc
-    }
-    memdb.add(testDoc)
-    const found: Doc[] = memdb.findSync(testDoc._class, {})
+    memdb.add(domainDoc)
+    const found: Doc[] = memdb.findSync(domainDoc._class, {})
     expect(found.length).toBe(2)
-    expect(found[0]).toBe(classDoc)
-    expect(found[1]).toBe(testDoc)
+    expect(found[0]).toBe(metaClass)
+    expect(found[1]).toBe(domainDoc)
+  })
+
+  it('should get domain', () => {
+    expect(memdb.getDomain(domainDoc._id)).toBe(domainDoc._domain)
+  })
+
+  it('should get domain from extending class', () => {
+    memdb.add(extendDomainDoc)
+    expect(memdb.getDomain(extendDomainDoc._id)).toBe(domainDoc._domain)
+  })
+
+  it('should fail to get domain', () => {
+    const badId = 'class:test.BadDoc' as Ref<Class<Doc>>
+    expect(() => memdb.getDomain(badId)).toThrowError('no domain found for class: ' + badId)
   })
 })
