@@ -31,23 +31,13 @@ describe('memdb', () => {
     _id: test.class.Class
   }
 
-  const testDoc: Doc = {
-    _class: test.class.Class,
-    _id: test.class.TestDoc
-  }
-
-  it('should set and get object', () => {
-    memdb.set(classDoc)
+  it('should add and get object', () => {
+    memdb.add(classDoc)
     expect(memdb.get(classDoc._id)).toBe(classDoc)
   })
 
-  it('should fail to set object twice', () => {
-    expect(() => memdb.set(classDoc)).toThrowError('document added already ' + classDoc._id)
-  })
-
-  it('should add and get object', () => {
-    memdb.add(testDoc)
-    expect(memdb.get(testDoc._id)).toBe(testDoc)
+  it('should fail to add object twice', () => {
+    expect(() => memdb.add(classDoc)).toThrowError('document added already ' + classDoc._id)
   })
 
   it('should fail to get non existing object', () => {
@@ -55,12 +45,13 @@ describe('memdb', () => {
     expect(() => memdb.get(badId)).toThrowError('document not found ' + badId)
   })
 
-  it('should fail to index because no index initialized', () => {
-    expect(() => memdb.index(classDoc)).toThrowError('index not created')
-  })
-
   it('should index all and find object', () => {
-    const found: Doc[] = memdb.findSync(classDoc._class, {})
+    const testDoc: Doc = {
+      _class: test.class.Class,
+      _id: test.class.TestDoc
+    }
+    memdb.add(testDoc)
+    const found: Doc[] = memdb.findSync(testDoc._class, {})
     expect(found.length).toBe(2)
     expect(found[0]).toBe(classDoc)
     expect(found[1]).toBe(testDoc)
