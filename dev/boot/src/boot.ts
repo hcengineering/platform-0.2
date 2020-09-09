@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { UIBuilder } from '@anticrm/presentation-model'
+import { Builder } from '@anticrm/platform-model'
 
 import platformModel from '@anticrm/platform-model/src/model'
 import presentationModel from '@anticrm/presentation-model/src/model'
@@ -25,7 +25,7 @@ import taskModel from '@anticrm/task-model/src/model'
 
 import taskStrings from '@anticrm/task-model/src/strings/ru'
 
-export const builder = new UIBuilder()
+export const builder = new Builder()
 builder.load(platformModel)
 builder.load(presentationModel)
 builder.load(workbenchModel)

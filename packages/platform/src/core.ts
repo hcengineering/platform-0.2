@@ -115,8 +115,6 @@ export interface VDoc extends Doc {
   _createdBy: StringProperty
   _modifiedOn?: DateProperty
   _modifiedBy?: StringProperty
-
-  toStr?: StringProperty
 }
 
 export interface VClass extends Class<VDoc> {

@@ -30,7 +30,9 @@ import {
   Ref,
   Resource
 } from '@anticrm/platform'
+
 import core from '.'
+import { getClassifier } from './dsl'
 
 class Builder {
   private memdb: MemDb
@@ -67,6 +69,14 @@ class Builder {
       return memdb
     }
     return memdb
+  }
+
+  add (...classes: { new(): Obj }[]) {
+    for (const ctor of classes) {
+      const classifier = getClassifier(ctor.prototype)
+      console.log('classifier', classifier)
+      this.memdb.add(classifier)
+    }
   }
 
   ///

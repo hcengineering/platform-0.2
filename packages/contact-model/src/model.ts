@@ -13,52 +13,41 @@
 // limitations under the License.
 //
 
-import { UIBuilder } from '@anticrm/presentation-model'
-import core from '@anticrm/platform-model'
+import core, { Builder, ModelClass, ModelMixin, Prop } from '@anticrm/platform-model'
+import { UX } from '@anticrm/presentation-model'
+
 import presentation from '@anticrm/presentation-model'
 import workbench from '@anticrm/workbench-model'
 import { Class, VDoc, Ref, StringProperty, Property, EasyScript, THIS, GET, CONCAT } from '@anticrm/platform'
 
 import contact from '.'
-import { Person } from '@anticrm/contact'
+import { Contact, Person, User } from '@anticrm/contact'
 import { IntlString } from '@anticrm/platform-i18n'
 
-export default (S: UIBuilder) => {
+import { TVDoc } from '@anticrm/platform-model/src/model'
 
-  S.createClassUI(contact.class.Contact, core.class.VDoc, {
-    label: 'Контактная информация' as IntlString,
-    _domain: 'contact' as Property<string, string>,
-  }, {
-    phone: S.attrUI(core.class.Type, {}, {
-      label: 'Телефон' as IntlString,
-      icon: contact.icon.Phone
-    }),
-    email: S.attrUI(core.class.Type, {}, {
-      label: 'Электропочта' as IntlString,
-      icon: contact.icon.Email
-    }),
-  })
+@ModelClass(contact.class.Contact, core.class.VDoc, 'contact')
+@UX('Контактная информация' as IntlString)
+class TContact extends TVDoc implements Contact {
+  @Prop() @UX('Телефон' as IntlString, contact.icon.Phone) phone?: string
+  @Prop() @UX('Электропочта' as IntlString, contact.icon.Email) email?: string
+}
 
-  S.createClassUI(contact.class.Person, contact.class.Contact, {
-    label: 'Персональная информация' as IntlString
-  }, {
-    name: S.attrUI(core.class.Type, {}, {
-      label: 'Имя' as IntlString
-    }),
-    birthDate: S.attrUI(core.class.Type, {}, {
-      label: 'День рождения' as IntlString,
-      icon: contact.icon.Date
-    }),
-    toStr: S.attr(core.class.ESFunc, {
-      _default: `${THIS},firstName,${GET},${THIS},lastName,${GET},${CONCAT}` as EasyScript<() => string>
-    }),
-  })
+@ModelClass(contact.class.Person, contact.class.Contact)
+@UX('Персональная информация' as IntlString)
+export class TPerson extends TContact implements Person {
+  @Prop() @UX('Имя' as IntlString) name!: string
+  @Prop() @UX('День рождения' as IntlString, contact.icon.Date) birthDate?: Property<number, Date>
+}
 
-  S.createMixin(contact.mixin.User, contact.class.Person, {
-    account: S.attrUI(core.class.Type, {}, {
-      label: 'Аккаунт' as IntlString
-    }),
-  })
+@ModelMixin(contact.mixin.User, contact.class.Person)
+class TUser extends TPerson implements User {
+  @Prop() @UX('Аккаунт' as IntlString) account!: string
+}
+
+export default (S: Builder) => {
+
+  S.add(TContact, TPerson, TUser)
 
   S.mixin(contact.class.Person as Ref<Class<Person>>, presentation.class.DetailForm, {
     component: contact.component.PersonProperties

@@ -19,7 +19,7 @@ import { AnyComponent, Asset } from '@anticrm/platform-ui'
 import contact from '@anticrm/contact'
 import core from '@anticrm/platform-core'
 import ui from '@anticrm/platform-ui'
-import { ComponentExtension, ClassUI } from '@anticrm/presentation-core'
+import { ComponentExtension } from '@anticrm/presentation-core'
 
 // P E R S I S T E N C E  M O D E L
 
@@ -32,7 +32,7 @@ export interface Comment extends Emb {
 
 export interface Message extends VDoc {
   message: string
-  comments: Comment[]
+  comments?: Comment[]
 }
 
 export interface Page extends Message {
@@ -87,7 +87,7 @@ export default plugin('chunter' as Plugin<ChunterService>, { core: core.id, ui: 
     ChunterInfo: '' as Ref<Mixin<ComponentExtension<VDoc>>>,
   },
   class: {
-    Message: '' as Ref<ClassUI<Message>>,
+    Message: '' as Ref<Class<Message>>,
     Page: '' as Ref<Class<Page>>
   }
 

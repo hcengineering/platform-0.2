@@ -33,44 +33,44 @@ export class Graph {
     this.modelDb = modelDb
   }
 
-  private getToString (_class: Ref<Classifier<VDoc>>): (this: VDoc) => string {
-    const cached = this.toStrings.get(_class)
-    if (cached) return cached
+  // private getToString (_class: Ref<Classifier<VDoc>>): (this: VDoc) => string {
+  //   const cached = this.toStrings.get(_class)
+  //   if (cached) return cached
 
-    // TODO: rework following with Instances
+  //   // TODO: rework following with Instances
 
-    let cls = _class as Ref<Class<Obj>> | undefined
-    while (cls) {
-      const clazz = this.modelDb.get(cls) as Classifier<VDoc>
-      const toString = clazz._attributes['toStr']
-      if (toString) {
-        const code = toString.type._default as EasyScript<() => string>
-        console.log(`toString code for class ${_class}: ${code}`)
-        const f = createESFunction<(this: VDoc) => string>(code)
-        this.toStrings.set(_class, f)
-        return f
-      }
-      cls = clazz._extends
-    }
-    const f = () => { console.log('no toString function defined for class: ' + _class); return 'no toString()' }
-    this.toStrings.set(_class, f)
-    return f
-  }
+  //   let cls = _class as Ref<Class<Obj>> | undefined
+  //   while (cls) {
+  //     const clazz = this.modelDb.get(cls) as Classifier<VDoc>
+  //     const toString = clazz._attributes['toStr']
+  //     if (toString) {
+  //       const code = toString.type._default as EasyScript<() => string>
+  //       console.log(`toString code for class ${_class}: ${code}`)
+  //       const f = createESFunction<(this: VDoc) => string>(code)
+  //       this.toStrings.set(_class, f)
+  //       return f
+  //     }
+  //     cls = clazz._extends
+  //   }
+  //   const f = () => { console.log('no toString function defined for class: ' + _class); return 'no toString()' }
+  //   this.toStrings.set(_class, f)
+  //   return f
+  // }
 
   updateGraph (tx: Tx) {
     switch (tx._class) {
       case core.class.CreateTx: {
-        const createTx = tx as CreateTx
+        // const createTx = tx as CreateTx
 
-        const _id = createTx._objectId
-        const toString = this.getToString(createTx._objectClass)
+        // const _id = createTx._objectId
+        // const toString = this.getToString(createTx._objectClass)
 
-        const node: Node = {
-          _class: createTx._objectClass,
-          _id,
-          title: toString.call(createTx._attributes as unknown as VDoc) // TODO: manage to have a VDoc instance
-        }
-        this.graph.set(_id, node)
+        // const node: Node = {
+        //   _class: createTx._objectClass,
+        //   _id,
+        //   title: toString.call(createTx._attributes as unknown as VDoc) // TODO: manage to have a VDoc instance
+        // }
+        // this.graph.set(_id, node)
         break
       }
     }

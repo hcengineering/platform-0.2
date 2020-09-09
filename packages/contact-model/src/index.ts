@@ -16,14 +16,13 @@
 import { extendIds } from '@anticrm/platform-model'
 import contact, { Contact, Person, User } from '@anticrm/contact'
 import { Ref, Mixin, Class, Space } from '@anticrm/platform'
-import { ClassUI } from '@anticrm/presentation-core'
 
 export default extendIds(contact, {
   application: {
   },
   class: {
-    Contact: '' as Ref<ClassUI<Contact>>,
-    Person: '' as Ref<ClassUI<Person>>
+    Contact: '' as Ref<Class<Contact>>,
+    Person: '' as Ref<Class<Person>>
   },
   // mixin: {
   //   User: '' as Ref<Mixin<User>>

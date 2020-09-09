@@ -14,7 +14,7 @@
 //
 
 import { Attribute, Class, Obj, Platform, Ref, Type, VDoc, Mixin } from '@anticrm/platform'
-import ui, { AttributeUI, AttrModel, ClassModel, ClassUI, GroupModel, PresentationCore, ComponentExtension } from '.'
+import ui, { AttributeUI, AttrModel, ClassModel, GroupModel, PresentationCore, ComponentExtension } from '.'
 import { CoreService } from '@anticrm/platform-core'
 import { AnyComponent, Asset } from '@anticrm/platform-ui'
 import { I18n, IntlString } from '@anticrm/platform-i18n'
@@ -30,13 +30,14 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
   const coreService = deps.core
   const i18nService = deps.i18n
 
-  async function getGroupModel (_class: Ref<ClassUI<Obj>>): Promise<GroupModel> {
+  async function getGroupModel (_class: Ref<Class<Obj>>): Promise<GroupModel> {
     const model = coreService.getModel()
-    const clazz = model.get(_class) as ClassUI<Obj>
-    console.log('class label: ', clazz)
-    const label = await i18nService.translate(clazz.label)
+    const clazz = model.get(_class) as Class<Obj>
+    const ux = model.as(clazz, ui.mixin.UXObject)
 
-    return { _class, label, icon: clazz.icon }
+    const label = await i18nService.translate(ux.label)
+
+    return { _class, label, icon: ux.icon }
   }
 
   async function getOwnAttrModel (_class: Ref<Class<Obj>>): Promise<AttrModel[]> {
@@ -164,7 +165,7 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
   async function getClassModel (_class: Ref<Class<Obj>>, top?: Ref<Class<Obj>>): Promise<ClassModel> {
     const model = coreService.getModel()
     const hierarchy = model.getClassHierarchy(_class, top)
-    const groupModels = hierarchy.map(_class => getGroupModel(_class as Ref<ClassUI<Obj>>))
+    const groupModels = hierarchy.map(_class => getGroupModel(_class as Ref<Class<Obj>>))
     const attrModels = hierarchy.map(_class => getOwnAttrModel(_class))
 
     const groups = await Promise.all(groupModels)

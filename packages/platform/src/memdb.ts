@@ -16,6 +16,10 @@
 import { generateId } from './objectid'
 import { AnyLayout, Class, Classifier, ClassifierKind, Doc, Mixin, Obj, PropertyType, Ref } from './core'
 
+export function mixinKey (mixin: Ref<Mixin<Doc>>, key: string): string {
+  return key + '|' + mixin.replace('.', '~')
+}
+
 export class MemDb {
   private domain: string
   private objects = new Map<Ref<Doc>, Doc>()
@@ -36,10 +40,7 @@ export class MemDb {
   }
 
   attributeKey (clazz: Classifier<Obj>, key: string): string {
-    if (clazz._kind === ClassifierKind.MIXIN) {
-      return key + '|' + clazz._id.replace('.', '~')
-    }
-    return key
+    return (clazz._kind === ClassifierKind.MIXIN) ? mixinKey(clazz._id as Ref<Mixin<Doc>>, key) : key
   }
 
   set (doc: Doc) {

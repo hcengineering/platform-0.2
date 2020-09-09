@@ -14,19 +14,38 @@
 //
 
 import { Ref, Class } from '@anticrm/platform'
-import { UIBuilder } from '@anticrm/presentation-model'
+
+import core, { Builder, ModelClass, ModelMixin, Prop } from '@anticrm/platform-model'
+import { UX } from '@anticrm/presentation-model'
+
 import workbench from '@anticrm/workbench-model'
 import { Property, StringProperty, THIS, GET, EasyScript } from '@anticrm/platform'
-import core from '@anticrm/platform-model'
 import contact from '@anticrm/contact-model'
 import { Person } from '@anticrm/contact'
-import { Message, Page } from '@anticrm/chunter'
+import { Message, Page, Comment } from '@anticrm/chunter'
 
 import chunter, { ChunterDomain } from '.'
 import { IntlString } from '@anticrm/platform-i18n'
-import presentation, { ClassUI } from '@anticrm/presentation-core'
+import presentation from '@anticrm/presentation-core'
 
-export default (S: UIBuilder) => {
+import { TVDoc } from '@anticrm/platform-model/src/model'
+
+@ModelClass(chunter.class.Message, core.class.VDoc, ChunterDomain.Chunter)
+@UX('Сообщение' as IntlString)
+class TMessage extends TVDoc implements Message {
+  @Prop() @UX('Сообщение' as IntlString, chunter.icon.Chunter) message!: string
+  @Prop() @UX('Комментарии' as IntlString, chunter.icon.Chunter) comments?: Comment[]
+}
+
+@ModelClass(chunter.class.Page, chunter.class.Message)
+@UX('Страница' as IntlString)
+class TPage extends TMessage implements Page {
+  @Prop() @UX('Название' as IntlString, chunter.icon.Chunter) title!: string
+}
+
+export default (S: Builder) => {
+
+  S.add(TMessage, TPage)
 
   S.createDocument(workbench.class.Application, {
     label: 'Chunter' as StringProperty,
@@ -34,30 +53,6 @@ export default (S: UIBuilder) => {
     main: chunter.component.ChunterView,
     appClass: chunter.class.Message
   }, chunter.application.Chunter)
-
-  S.createClassUI(chunter.class.Message, core.class.VDoc, {
-    _domain: ChunterDomain.Chunter as Property<string, string>,
-    label: 'Сообщение' as IntlString
-  }, {
-    message: S.attrUI(core.class.Type, {}, {
-      label: 'Сообщение' as IntlString,
-      icon: chunter.icon.Chunter
-    }),
-    comments: S.attrUI(core.class.Type, {}, {
-      label: 'Комментарии' as IntlString,
-      icon: chunter.icon.Chunter
-    }),
-  })
-
-  S.createClassUI(chunter.class.Page as unknown as Ref<ClassUI<Page>>, chunter.class.Message, {
-    _domain: ChunterDomain.Chunter as Property<string, string>,
-    label: 'Страница' as IntlString
-  }, {
-    title: S.attrUI(core.class.Type, {}, {
-      label: 'Название' as IntlString,
-      icon: chunter.icon.Chunter
-    }),
-  })
 
   S.createMixin(chunter.mixin.ChunterInfo, core.class.Class, {
     component: S.attr(core.class.Type, {})

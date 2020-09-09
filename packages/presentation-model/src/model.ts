@@ -13,16 +13,11 @@
 // limitations under the License.
 //
 
-import { UIBuilder } from './builder'
-import core from '@anticrm/platform-model'
+import core, { Builder } from '@anticrm/platform-model'
 import ui from '.'
 import presentationUI from '@anticrm/presentation-ui'
 
-export default (S: UIBuilder) => {
-  S.createClass(ui.class.ClassUI, core.class.Class, {
-    label: S.attr(core.class.Type, {}),
-    icon: S.attr(core.class.Type, {})
-  })
+export default (S: Builder) => {
 
   S.createClass(ui.class.AttributeUI, core.class.Attribute, {
     label: S.attr(core.class.Type, {}),
