@@ -14,7 +14,7 @@
 //
 
 import { MemDb, Plugin, Service, Ref, Class, identify } from '..'
-import { Doc, Property, core, Obj } from '../core'
+import { Doc, Property, core, Obj, ClassifierKind } from '../core'
 
 describe('memdb', () => {
   const memdb = new MemDb('testdomain')
@@ -37,7 +37,8 @@ describe('memdb', () => {
   const domainDoc = {
     _class: test.class.Class,
     _id: test.class.Doc1,
-    _domain: 'domain1'
+    _domain: 'domain1',
+    _kind: ClassifierKind.CLASS
   }
 
   const noDomainDoc = {
@@ -83,7 +84,15 @@ describe('memdb', () => {
   })
 
   it('should fail to get domain', () => {
-    const badId = 'class:test.BadDoc' as Ref<Class<Doc>>
-    expect(() => memdb.getDomain(badId)).toThrowError('no domain found for class: ' + badId)
+    memdb.add(noDomainDoc)
+    expect(() => memdb.getDomain(noDomainDoc._id)).toThrowError('no domain found for class: ' + noDomainDoc._id)
+  })
+
+  it('should get extending class', () => {
+    expect(memdb.getClass(extendDomainDoc._id)).toBe(domainDoc._id)
+  })
+
+  it('should fail to get class', () => {
+    expect(() => memdb.getClass(noDomainDoc._id)).toThrowError('class not found in hierarchy: ' + noDomainDoc._id)
   })
 })
