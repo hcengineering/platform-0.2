@@ -24,8 +24,7 @@ export interface Contact extends VDoc {
 }
 
 export interface Person extends Contact {
-  firstName: string
-  lastName: string
+  name: string
 
   birthDate?: Property<number, Date>
 }

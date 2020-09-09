@@ -119,6 +119,10 @@ export interface VDoc extends Doc {
   toStr?: StringProperty
 }
 
+export interface VClass extends Class<VDoc> {
+  identity: StringProperty
+}
+
 export interface Tx extends Doc {
   _date: DateProperty
   _user: StringProperty

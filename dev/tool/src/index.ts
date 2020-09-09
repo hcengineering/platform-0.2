@@ -68,4 +68,14 @@ program
     })
   })
 
+program
+  .command('upgrade-workspace <workspace>')
+  .description('upgrade workspace')
+  .action((workspace, cmd) => {
+    MongoClient.connect(mongodbUri, { useUnifiedTopology: true }).then(client => {
+      const tenant = client.db(workspace)
+      const p2 = initDatabase(tenant).then(() => client.close())
+    })
+  })
+
 program.parse(process.argv)

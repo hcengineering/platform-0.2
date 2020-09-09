@@ -49,7 +49,7 @@ export default async (platform: Platform, deps: { core: CoreService, ui: UIServi
     if (!whoAmI) {
       return "Nobody"
     }
-    return getUser(whoAmI).then(user => user?.firstName)
+    return getUser(whoAmI).then(user => user?.name)
   }
 
   uiService.addWidget(contact.component.LoginWidget)

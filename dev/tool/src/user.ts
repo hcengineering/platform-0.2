@@ -25,8 +25,7 @@ export function createUser (db: Db, email: string, username: string) {
 
   const id = generateId() as Ref<Person>
   const user = builder.createDocument(contact.class.Person, {
-    firstName: username,
-    lastName: 'User',
+    name: username,
     _space: undefined as unknown as Ref<Space>,
     _createdOn: Date.now() as Property<number, Date>,
     _createdBy: 'system' as Property<string, string>,

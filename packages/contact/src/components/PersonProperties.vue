@@ -38,21 +38,17 @@ export default defineComponent({
     const presentationCore = getPresentationCore()
     const ui = getPresentationUI()
 
-    const FIRST_NAME = 'firstName'
-    const LAST_NAME = 'lastName'
-    const firstName = ref(presentationCore.getEmptyAttribute(props._class))
-    const lastName = ref(presentationCore.getEmptyAttribute(props._class))
+    const NAME = 'name'
+    const name = ref(presentationCore.getEmptyAttribute(props._class))
 
     const model = ui.getClassModel(props, model => {
-      firstName.value = model.getAttribute(FIRST_NAME)
-      lastName.value = model.getAttribute(LAST_NAME)
-      return model.filterAttributes([FIRST_NAME, LAST_NAME])
+      name.value = model.getAttribute(NAME)
+      return model.filterAttributes([NAME])
     })
 
     return {
       model,
-      firstName,
-      lastName,
+      name,
     }
   }
 })
@@ -61,10 +57,7 @@ export default defineComponent({
 <template>
   <div class="contact-person-properties">
     <div>
-      <StringPresenter class="caption-1" :attribute="firstName" v-model="object[firstName.key]" />
-    </div>
-    <div>
-      <StringPresenter class="caption-2" :attribute="lastName" v-model="object[lastName.key]" />
+      <StringPresenter class="caption-1" :attribute="name" v-model="object[name.key]" />
     </div>
 
     <div class="attributes">

@@ -10,7 +10,8 @@
     "typescript": "~3.9.4"
   },
   "scripts": {
-    "create-workspace": "ts-node -T src/index.ts create-workspace"
+    "create-workspace": "ts-node -T src/index.ts create-workspace",
+    "upgrade-workspace": "ts-node -T src/index.ts upgrade-workspace"
   },
   "dependencies": {
     "commander": "^6.1.0",

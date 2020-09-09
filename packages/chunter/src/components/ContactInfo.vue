@@ -35,7 +35,7 @@ export default defineComponent({
 <template>
   <div class="chunter-contact-info">
     Создал контакт
-    <b>{{tx._attributes?.firstName}} {{tx._attributes?.lastName}}</b>
+    <b>{{tx._attributes?.name}}</b>
   </div>
 </template>
 

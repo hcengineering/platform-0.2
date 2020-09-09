@@ -42,11 +42,8 @@ export default (S: UIBuilder) => {
   S.createClassUI(contact.class.Person, contact.class.Contact, {
     label: 'Персональная информация' as IntlString
   }, {
-    firstName: S.attrUI(core.class.Type, {}, {
+    name: S.attrUI(core.class.Type, {}, {
       label: 'Имя' as IntlString
-    }),
-    lastName: S.attrUI(core.class.Type, {}, {
-      label: 'Фамилия' as IntlString
     }),
     birthDate: S.attrUI(core.class.Type, {}, {
       label: 'День рождения' as IntlString,
@@ -61,9 +58,6 @@ export default (S: UIBuilder) => {
     account: S.attrUI(core.class.Type, {}, {
       label: 'Аккаунт' as IntlString
     }),
-    displayName: S.attrUI(core.class.Type, {}, {
-      label: 'Погоняло' as IntlString
-    })
   })
 
   S.mixin(contact.class.Person as Ref<Class<Person>>, presentation.class.DetailForm, {

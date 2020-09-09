@@ -118,5 +118,7 @@ export default (S: Builder) => {
   S.createClass(core.class.DeleteTx, core.class.Tx, {
   }, CoreDomain.Tx)
 
-
+  S.createMixin(core.mixin.VClass, core.class.Class, {
+    identity: S.attr(core.class.Type, {})
+  })
 }

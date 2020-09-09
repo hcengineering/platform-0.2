@@ -47,7 +47,7 @@ export default defineComponent({
   <div class="chunter-chunter-item">
     <img class="avatar" src="../../assets/ava2x48.jpg" />
     <div class="details">
-      <b>{{user?.firstName}} {{user?.lastName}} {{ user?._id }}</b> 15:23
+      <b>{{user?.name}} {{ user?._id }}</b> 15:23
       <div>
         <widget :component="component" :tx="tx" @open="$emit('open', $event)" />
       </div>
