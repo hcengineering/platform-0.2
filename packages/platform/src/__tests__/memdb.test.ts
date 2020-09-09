@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { MemDb, Plugin, Service, Ref, Class, identify } from '..'
+import { MemDb, Plugin, Service, Ref, Class, Resource, identify } from '..'
 import { Doc, Property, core, Obj, ClassifierKind } from '../core'
 
 describe('memdb', () => {
@@ -38,18 +38,20 @@ describe('memdb', () => {
     _class: test.class.Class,
     _id: test.class.Doc1,
     _domain: 'domain1',
-    _kind: ClassifierKind.CLASS
-  }
-
-  const noDomainDoc = {
-    _class: test.class.Class,
-    _id: test.class.Doc2
+    _kind: ClassifierKind.CLASS,
+    _attributes: { attribute1: '', attribute2: '' }
   }
 
   const extendDomainDoc = {
     _class: test.class.Class,
-    _id: test.class.Doc3,
-    _extends: domainDoc._id
+    _id: test.class.Doc2,
+    _extends: domainDoc._id,
+    _attributes: { extendAttribute1: '', extendAttribute2: '' }
+  }
+
+  const noDomainDoc = {
+    _class: test.class.Class,
+    _id: test.class.Doc3
   }
 
   it('should add and get object', () => {
@@ -94,5 +96,27 @@ describe('memdb', () => {
 
   it('should fail to get class', () => {
     expect(() => memdb.getClass(noDomainDoc._id)).toThrowError('class not found in hierarchy: ' + noDomainDoc._id)
+  })
+
+  it('should assign', () => {
+    const layout = { key1: 'value1' as Resource<string> }
+    const assignValues = {
+      _underscore: 'underscoreValue' as Resource<string>,
+      attribute1: 'attributeValue1' as Resource<string>,
+      attribute2: 'attributeValue2' as Resource<string>,
+      extendAttribute1: 'extendAttributeValue1' as Resource<string>
+    }
+    memdb.assign(layout, extendDomainDoc._id, assignValues)
+    expect(layout.key1).toBe('value1')
+    expect(layout._underscore).toBe('underscoreValue')
+    expect(layout.attribute1).toBe('attributeValue1')
+    expect(layout.attribute2).toBe('attributeValue2')
+    expect(layout.extendAttribute1).toBe('extendAttributeValue1')
+  })
+
+  it('should fail to find attribute on assign', () => {
+    const layout = { key1: 'value1' as Resource<string> }
+    const assignValue = { badAttribute: 'badValue' as Resource<string> }
+    expect(() => memdb.assign(layout, extendDomainDoc._id, assignValue)).toThrowError('attribute not found: badAttribute')
   })
 })
