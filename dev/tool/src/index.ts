@@ -17,7 +17,7 @@
 import { program } from 'commander'
 import { createUser, removeUser } from './user'
 import { initDatabase } from './init'
-import { MongoClient, Db } from 'mongodb'
+import { MongoClient } from 'mongodb'
 
 import { createWorkspace } from '@anticrm/accounts'
 
@@ -60,8 +60,9 @@ program
     MongoClient.connect(mongodbUri, { useUnifiedTopology: true }).then(client => {
       const db = client.db('accounts')
       const p1 = createWorkspace(db, email, cmd.password, 'Organization', cmd.workspace)
-      const p2 = initDatabase(client, cmd.workspace).then(() => {
-        createUser(client.db(cmd.workspace), email, cmd.fullname)
+      const tenant = client.db(cmd.workspace)
+      const p2 = initDatabase(tenant).then(() => {
+        createUser(tenant, email, cmd.fullname)
       })
       Promise.all([p1, p2]).then(() => client.close())
     })

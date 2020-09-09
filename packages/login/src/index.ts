@@ -13,8 +13,9 @@
 // limitations under the License.
 //
 
+import { inject } from 'vue'
 import { Metadata, Plugin, plugin, Service } from '@anticrm/platform'
-import { AnyComponent } from '@anticrm/platform-ui'
+import ui, { AnyComponent } from '@anticrm/platform-ui'
 
 export interface LoginInfo {
   email: string
@@ -31,34 +32,46 @@ export interface LoginInfo {
 //   token: string
 // }
 
-// export function currentAccount (): Account | null {
-//   const account = localStorage.getItem('account')
-//   return account ? JSON.parse(account) : null
-// }
-//
-// export function setAccount (platform: Platform, account: Account) {
+export const ACCOUNT_KEY = 'anticrm-account'
+
+export function currentAccount (): LoginInfo | null {
+  const account = localStorage.getItem(ACCOUNT_KEY)
+  return account ? JSON.parse(account) : null
+}
+
+// export function setAccount (account: LoginInfo) {
 //   localStorage.setItem('account', JSON.stringify(account))
-//
-//   platform.setMetadata(rpc.metadata.WSHost, account.server)
-//   platform.setMetadata(rpc.metadata.WSPort, account.port)
+
+//   // platform.setMetadata(rpc.metadata.WSHost, account.server)
+//   // platform.setMetadata(rpc.metadata.WSPort, account.port)
 // }
-//
+
 // export function logout (vueService: VueService) {
 //   localStorage.removeItem('account')
 //   vueService.navigate(login.component.LoginForm)
 // }
 
+// P L U G I N
+
 export interface LoginService extends Service {
-  whoAmI (): LoginInfo
+  setLoginInfo (loginInfo: LoginInfo): void
 }
 
-const login = plugin('login' as Plugin<LoginService>, {}, {
+export const LoginServiceInjectionKey = 'login-injection-key'
+
+export function getLoginService (): LoginService {
+  return inject(LoginServiceInjectionKey) as LoginService
+}
+
+const login = plugin('login' as Plugin<LoginService>, { ui: ui.id }, {
   component: {
     LoginForm: '' as AnyComponent,
     SignupForm: '' as AnyComponent
   },
   metadata: {
-    LoginUrl: '' as Metadata<string>
+    LoginUrl: '' as Metadata<string>,
+    Token: '' as Metadata<string>,
+    WhoAmI: '' as Metadata<string>,
   }
 })
 

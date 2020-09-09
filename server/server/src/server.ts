@@ -23,7 +23,7 @@ import { connect, ClientControl } from './service'
 const ctlpassword = process.env.CTL_PASSWORD || '123pass'
 
 export interface Client {
-  tenant: string
+  workspace: string
 }
 
 interface Service {
@@ -76,15 +76,15 @@ export function start (port: number, dbUri: string, host?: string) {
     }
   }
 
-  function createClient (uri: string, tenant: string, ws: WebSocket): Promise<ClientService> {
+  function createClient (uri: string, workspace: string, ws: WebSocket): Promise<ClientService> {
     const service = new Promise<ClientService>((resolve, reject) => {
-      connect(uri, tenant, ws, platformServer).then(service => { resolve(service as unknown as ClientService) }).catch(err => reject(err))
+      connect(uri, workspace, ws, platformServer).then(service => { resolve(service as unknown as ClientService) }).catch(err => reject(err))
     })
     return service
   }
 
   wss.on('connection', function connection (ws: WebSocket, request: any, client: Client) {
-    const service = createClient(dbUri, client.tenant, ws)
+    const service = createClient(dbUri, client.workspace, ws)
     connections.push(service)
 
     ws.on('message', async (msg: string) => {
@@ -115,6 +115,7 @@ export function start (port: number, dbUri: string, host?: string) {
         socket.destroy()
         return
       }
+      console.log('client: ', client)
       wss.handleUpgrade(request, socket, head, function done (ws) {
         wss.emit('connection', ws, request, client);
       })

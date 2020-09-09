@@ -22,7 +22,7 @@ import { getUIService } from '@anticrm/platform-ui'
 
 import Form from './Form.vue'
 
-import login from '..'
+import login, { getLoginService } from '..'
 import { getPlatform } from '@anticrm/platform-ui/src'
 
 export default defineComponent({
@@ -32,6 +32,7 @@ export default defineComponent({
   setup () {
     const platform = getPlatform()
     const uiService = getUIService()
+    const loginService = getLoginService()
 
     const object = { username: '', password: '', workspace: '' }
     const info = ref('')
@@ -63,11 +64,15 @@ export default defineComponent({
           },
           body: serialize(request)
         })
-        const result = await response.json() as Response<void>
+        const result = await response.json() as Response<any>
         if (result.error?.message) {
           error.value = result.error.message
         }
-        console.log('result', result.result)
+        if (result.result) {
+          console.log('result', result.result)
+          loginService.setLoginInfo(result.result)
+          uiService.navigate('/component:workbench.Workbench/application:workbench.Default')
+        }
       } catch (err) {
         error.value = 'Не могу соедениться с сервером.'
       }

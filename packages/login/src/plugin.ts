@@ -15,24 +15,39 @@
 
 import { Platform, Service } from '@anticrm/platform'
 
-import login, { LoginInfo } from '.'
+import login, { LoginInfo, LoginService, ACCOUNT_KEY, LoginServiceInjectionKey } from '.'
 import LoginForm from './internal/LoginForm.vue'
 import SignupForm from './internal/SignupForm.vue'
+import { UIService } from '@anticrm/platform-ui'
 
 /*!
  * Anticrm Platform™ Login Plugin
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */
-export default async (platform: Platform): Promise<Service> => {
+export default async (platform: Platform, deps: { ui: UIService }): Promise<LoginService> => {
   platform.setResource(login.component.LoginForm, LoginForm)
   platform.setResource(login.component.SignupForm, SignupForm)
 
-  return {
-    whoAmI (): LoginInfo {
-      return {
-        email: 'andrey.v.platov@gmail.com'
-      } as LoginInfo
+  const service = {
+    // whoAmI (): LoginInfo | null {
+    //   const info = localStorage.getItem(loginInfoKey)
+    //   if (info) {
+    //     return JSON.parse(info)
+    //   }
+    //   return null
+    // },
+    setLoginInfo (loginInfo: LoginInfo) {
+      localStorage.setItem(ACCOUNT_KEY, JSON.stringify(loginInfo))
+
+      platform.setMetadata(login.metadata.WhoAmI, loginInfo.email)
+      platform.setMetadata(login.metadata.Token, loginInfo.token)
     }
   }
+
+  deps.ui.getApp()
+    .provide(LoginServiceInjectionKey, service)
+
+  return service
+
 }

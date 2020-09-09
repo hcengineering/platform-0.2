@@ -17,7 +17,7 @@ import { createApp } from 'vue'
 import ErrorPage from './components/ErrorPage.vue'
 import platform from '@anticrm/boot/src/platform'
 import ui from '@anticrm/platform-ui'
-import login from '@anticrm/login'
+import login, { currentAccount } from '@anticrm/login'
 import core from '@anticrm/platform-core'
 import contact from '@anticrm/contact'
 
@@ -31,7 +31,11 @@ platform.setMetadata(core.metadata.WSHost, host)
 platform.setMetadata(core.metadata.WSPort, port)
 platform.setMetadata(core.metadata.Token, token)
 
-platform.setMetadata(contact.metadata.WhoAmI, 'andrey.v.platov@gmail.com')
+const loginInfo = currentAccount()
+if (loginInfo) {
+  platform.setMetadata(login.metadata.WhoAmI, loginInfo.email)
+  platform.setMetadata(login.metadata.Token, loginInfo.token)
+}
 
 async function boot (): Promise<void> {
   const uiService = await platform.getPlugin(ui.id)

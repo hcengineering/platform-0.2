@@ -23,6 +23,8 @@ import LoginWidget from './components/LoginWidget.vue'
 import { CoreService } from '@anticrm/platform-core'
 import { UIService } from '@anticrm/platform-ui'
 
+import login from '@anticrm/login'
+
 /*!
  * Anticrm Platform™ Contact Plugin
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
@@ -43,7 +45,7 @@ export default async (platform: Platform, deps: { core: CoreService, ui: UIServi
   }
 
   async function getMyName (): Promise<string> {
-    const whoAmI = platform.getMetadata(contact.metadata.WhoAmI)
+    const whoAmI = platform.getMetadata(login.metadata.WhoAmI)
     if (!whoAmI) {
       return "Nobody"
     }

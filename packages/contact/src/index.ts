@@ -48,9 +48,6 @@ export function getContactService (): ContactService {
 }
 
 export default plugin('contact' as Plugin<ContactService>, { core: core.id, ui: ui.id }, {
-  metadata: {
-    WhoAmI: '' as Metadata<string>,
-  },
   icon: {
     Date: '' as Asset,
     Phone: '' as Asset,

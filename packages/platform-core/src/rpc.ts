@@ -15,6 +15,7 @@
 
 import { Platform, Response, ReqId, readResponse, serialize } from '@anticrm/platform'
 import core from '.'
+import login from '@anticrm/login'
 
 export type EventListener = (event: Response<unknown>) => void
 
@@ -32,8 +33,11 @@ export default (platform: Platform): RpcService => {
   function createWebsocket () {
     const host = platform.getMetadata(core.metadata.WSHost)
     const port = platform.getMetadata(core.metadata.WSPort)
+    const token = platform.getMetadata(login.metadata.Token)
 
-    const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0ZW5hbnQiOiJsYXRlc3QtbW9kZWwifQ.hKZDHkhxNL-eCOqk5NFToVh43KOGshLS4b6DgztJQqI'
+    console.log('token', platform.getMetadata(login.metadata.Token))
+
+    // const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0ZW5hbnQiOiJsYXRlc3QtbW9kZWwifQ.hKZDHkhxNL-eCOqk5NFToVh43KOGshLS4b6DgztJQqI'
 
     return new Promise<WebSocket>((resolve, reject) => {
       const ws = new WebSocket('ws://' + host + ':' + port + '/' + token)

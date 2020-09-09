@@ -13,13 +13,12 @@
 // limitations under the License.
 //
 
-import { MongoClient } from 'mongodb'
+import { Db } from 'mongodb'
 import { Model, Strings } from '@anticrm/boot/src/boot'
 import { Doc } from '@anticrm/platform'
 
-export function initDatabase (client: MongoClient, tenant: string) {
+export function initDatabase (db: Db) {
   const domains = { ...Model } as { [key: string]: Doc[] }
-  const db = client.db(tenant)
   const ops = [] as Promise<any>[]
   for (const domain in domains) {
     const model = domains[domain]
