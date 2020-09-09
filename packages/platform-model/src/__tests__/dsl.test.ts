@@ -15,12 +15,13 @@
 
 /* eslint-env jest */
 
-import classes from '../dsl'
+import classes, { getClassifier } from '../dsl'
 
 describe('dsl', () => {
 
   it('should', () => {
     console.log('classes', classes)
+    console.log('classifier', getClassifier(classes[2].prototype))
     expect(true).toBe(true)
   })
 

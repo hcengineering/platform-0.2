@@ -14,12 +14,12 @@
 //
 
 import 'reflect-metadata'
-import { Ref, Class, Obj, Mixin, ClassifierKind, Classifier, Attribute, Type, Emb } from '@anticrm/platform'
+import { Ref, Class, Obj, Mixin, ClassifierKind, Classifier, Attribute, Type, Emb, Doc } from '@anticrm/platform'
 import core from '.'
 
 const classifierMetadataKey = Symbol("anticrm:classifier");
 
-function getClassifier (target: any): Classifier<Obj> {
+export function getClassifier (target: any): Classifier<Obj> {
   let classifier = Reflect.getOwnMetadata(classifierMetadataKey, target) as Classifier<Obj>
   if (!classifier) {
     classifier = {
@@ -27,9 +27,6 @@ function getClassifier (target: any): Classifier<Obj> {
     } as Classifier<Obj>
     Reflect.defineMetadata(classifierMetadataKey, classifier, target)
   }
-  console.log('target: ', target)
-  console.log('target proto: ', target.prototype)
-  console.log('target proto proto: ', target.prototype.prototype)
   return classifier
 }
 
@@ -51,7 +48,8 @@ export function ModelClass<T extends Obj> (id: Ref<Class<T>>) {
   return function classDecorator<C extends { new(): T }> (
     constructor: C
   ) {
-    const classifier = getClassifier(constructor)
+    const classifier = getClassifier(constructor.prototype)
+    classifier._id = id
     classifier._class = core.class.Class
     classifier._kind = ClassifierKind.CLASS
   }
@@ -63,11 +61,22 @@ export function ModelMixin<T extends Obj> (id: Ref<Mixin<T>>) {
   return function classDecorator<C extends { new(): T }> (
     constructor: C
   ) {
-    const classifier = getClassifier(constructor)
+    const classifier = getClassifier(constructor.prototype)
+    classifier._id = id
     classifier._class = core.class.Mixin
     classifier._kind = ClassifierKind.MIXIN
   }
 
+}
+
+export function Extends<T extends Obj> (id: Ref<Classifier<T>>) {
+
+  return function <C extends { new(): T }> (
+    constructor: C
+  ) {
+    const classifier = getClassifier(constructor.prototype)
+    classifier._extends = id
+  }
 }
 
 export function Prop () {
@@ -86,9 +95,18 @@ class TObj implements Obj {
   _class!: Ref<Class<Obj>>
 }
 
-@ModelClass(core.class.Emb)
+@ModelClass(core.class.Emb) @Extends(core.class.Obj)
 class TEmb extends TObj implements Emb {
   __embedded!: true
 }
 
-export default [TObj, TEmb]
+@ModelClass(core.class.Doc) @Extends(core.class.Obj)
+class TDoc extends TObj implements Doc {
+  _class!: Ref<Class<Doc>>
+  @Prop()
+  _id!: Ref<Doc>
+  @Prop()
+  _mixins?: Ref<Mixin<Doc>>[]
+}
+
+export default [TObj, TEmb, TDoc]
