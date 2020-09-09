@@ -20,8 +20,15 @@ import presentationCore, { ClassModel } from '@anticrm/presentation-core'
 import ui, { AnyComponent } from '@anticrm/platform-ui'
 
 export interface PresentationUI extends Service {
-  getClassModel (props: { _class: String }, onChange?: (model: ClassModel) => ClassModel): Ref<ClassModel>
+  getClassModel(props: { _class: String }, onChange?: (model: ClassModel) => ClassModel): Ref<ClassModel>
 }
+
+export interface CompletionItem {
+  key: string
+  label: string
+  title?: string
+}
+
 
 export default plugin('presentation-ui' as Plugin<PresentationUI>, { ui: ui.id, presentationCore: presentationCore.id }, {
 

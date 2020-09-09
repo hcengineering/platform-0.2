@@ -17,20 +17,12 @@
 import { defineComponent, ref, PropType, computed } from 'vue'
 import Icon from '@anticrm/platform-ui/src/components/Icon.vue'
 
-import workbench from '../..'
-import { WorkbenchCreateItem } from '..'
-
 import ui from '@anticrm/platform-ui'
 import presentationCore from '@anticrm/presentation-core'
 import { Class, Ref, VDoc } from '@anticrm/platform'
 import { getCoreService } from '../utils'
 import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.vue'
-
-export interface CompletionItem {
-  key: string
-  label: string
-  title?: string
-}
+import { CompletionItem } from '../index'
 
 export default defineComponent({
   components: { Icon, ScrollView },
@@ -92,7 +84,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="workbench-completion-popup" :style="popupStyle">
+  <div class="presentation-completion-popup" :style="popupStyle">
     <ScrollView style="height:100%;width: 100%;" ref="listElement" :scrollPosition="selOffset">
       <div
         v-for="item in items"
@@ -116,7 +108,7 @@ export default defineComponent({
 <style lang="scss">
 @import "~@anticrm/sparkling-theme/css/_variables.scss";
 
-.workbench-completion-popup {
+.presentation-completion-popup {
   display: flex;
   flex-direction: column;
   background-color: $input-color;
