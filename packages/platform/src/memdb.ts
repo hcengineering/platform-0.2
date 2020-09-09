@@ -39,11 +39,11 @@ export class MemDb {
     return this.byClass.get(_class) ?? []
   }
 
-  attributeKey (clazz: Classifier<Obj>, key: string): string {
+  protected attributeKey (clazz: Classifier<Obj>, key: string): string {
     return (clazz._kind === ClassifierKind.MIXIN) ? mixinKey(clazz._id as Ref<Mixin<Doc>>, key) : key
   }
 
-  set (doc: Doc) {
+  private set (doc: Doc) {
     const id = doc._id
     if (this.objects.get(id)) {
       throw new Error('document added already ' + id)
@@ -51,7 +51,7 @@ export class MemDb {
     this.objects.set(id, doc)
   }
 
-  index (doc: Doc) {
+  private index (doc: Doc) {
     if (this.byClass === null) {
       throw new Error('index not created')
     }
