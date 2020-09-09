@@ -21,6 +21,7 @@ export default (platform: Platform) => {
   platform.loadMetadata(ui.icon, {
     Default: spritesUrl + '#error',
     Error: spritesUrl + '#error',
-    Network: spritesUrl + '#network'
+    Network: spritesUrl + '#network',
+    Search: spritesUrl + '#search'
   })
 }

@@ -25,10 +25,10 @@ import workbench, { Application } from '../..'
 import { Location } from '@anticrm/platform-ui'
 
 import { Doc } from '@anticrm/platform'
-
+import Spotlight from './Spotlight.vue'
 
 export default defineComponent({
-  components: { Nav, InputControl },
+  components: { Nav, InputControl, Spotlight },
   props: {
     location: {
       type: Object as PropType<Location>,
@@ -64,6 +64,8 @@ export default defineComponent({
       <!-- <WorkbenchMain :location="location" /> -->
       <widget :component="perspective" :location="location" />
     </main>
+
+    <Spotlight />
   </div>
 </template>
 

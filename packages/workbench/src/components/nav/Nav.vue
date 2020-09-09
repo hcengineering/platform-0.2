@@ -48,7 +48,7 @@ export default defineComponent({
       :key="app._id"
     >
       <a href="#" @click.prevent="$emit('navigate', app)">
-        <Icon :icon="app.icon" class="icon-embed-2x" />
+        <Icon :icon="app.icon" class="icon-2x" />
       </a>
     </div>
     <div class="remainder"></div>

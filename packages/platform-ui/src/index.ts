@@ -74,7 +74,8 @@ export default plugin('vue' as Plugin<UIService>, {}, {
   icon: {
     Default: '' as Asset,
     Error: '' as Asset,
-    Network: '' as Asset
+    Network: '' as Asset,
+    Search: '' as Asset,
   },
   component: {
     Spinner: '' as AnyComponent,
