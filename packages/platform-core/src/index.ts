@@ -31,14 +31,17 @@ import {
   Ref,
   Service,
   Type,
-  Space
+  Space,
+  Title
 } from '@anticrm/platform'
 import { ModelDb } from './modeldb'
+import { Graph } from './graph'
 
 // P L U G I N
 
 export interface CoreService extends Service, CoreProtocol {
   getModel (): ModelDb
+  getGraph (): Graph
   generateId (): Ref<Doc>
   query (_class: Ref<Class<Doc>>, query: AnyLayout, listener: (result: Doc[]) => void): () => void
   createVDoc<T extends VDoc> (_class: Ref<Class<T>>, _attributes: Omit<T, keyof VDoc>, _id?: Ref<T>): Promise<void>
@@ -59,5 +62,6 @@ export default plugin('core' as Plugin<CoreService>, {}, {
     UpdateTx: '' as Ref<Class<UpdateTx>>,
     DeleteTx: '' as Ref<Class<DeleteTx>>,
     Space: '' as Ref<Class<Space>>,
+    Title: '' as Ref<Class<Title>>,
   }
 })

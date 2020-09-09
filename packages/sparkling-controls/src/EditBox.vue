@@ -15,36 +15,36 @@
 
 
 <script lang="ts">
-  import { defineComponent } from 'vue'
+import { defineComponent } from 'vue'
 
-  export default defineComponent({
-    props: {
-      modelValue: String
-    }
-  })
+export default defineComponent({
+  props: {
+    modelValue: String
+  }
+})
 </script>
 
 <template>
   <input
-      :value="modelValue"
-      @input="$emit('update:modelValue', $event.target.value)"
-      class="sparkling-edit-box"
+    :value="modelValue"
+    @input="$emit('update:modelValue', $event.target.value)"
+    class="sparkling-edit-box"
   />
 </template>
 
 <style lang="scss">
-  @import "~@anticrm/sparkling-theme/css/_variables.scss";
+@import "~@anticrm/sparkling-theme/css/_variables.scss";
 
-  .sparkling-edit-box {
-    border: 1px solid $workspace-separator-color;
-    border-radius: 0.5em;
-    padding: 0.5em 0.75em;
-    background-color: $nav-bg-color;
-    box-sizing: border-box;
+.sparkling-edit-box {
+  // border: 1px solid $workspace-separator-color;
+  // border-radius: 0.5em;
+  // padding: 0.5em 0.75em;
+  background-color: $nav-bg-color;
+  // box-sizing: border-box;
 
-    &:focus {
-      outline: none;
-      border-color: $highlight-color;
-    }
+  &:focus {
+    outline: none;
+    border-color: $highlight-color;
   }
+}
 </style>

@@ -13,17 +13,18 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Class, Mixin, CoreProtocol, CreateTx, Doc, Ref, Tx, VDoc, Obj, ClassifierKind, TxProcessor } from '@anticrm/platform'
+import { AnyLayout, Class, Mixin, CoreProtocol, CreateTx, Doc, Ref, Tx, VDoc, Obj, ClassifierKind, TxProcessor, MemDb, Title } from '@anticrm/platform'
 
 import { openDB } from 'idb'
 import { ModelDb } from './modeldb'
 import core from '.'
+import { Graph } from './graph'
 
 export interface CacheControl {
   cache (docs: Doc[]): Promise<void>
 }
 
-export async function createCache (dbname: string, modelDb: ModelDb) {
+export async function createCache (dbname: string, modelDb: ModelDb, graph: Graph) {
   const db = await openDB(dbname, 1, {
     upgrade (db) {
       const domains = new Map<string, string>()
@@ -44,7 +45,7 @@ export async function createCache (dbname: string, modelDb: ModelDb) {
     }
   })
 
-  async function store (docs: VDoc[]): Promise<void> {
+  async function store (docs: Doc[]): Promise<void> {
     if (docs.length === 0) { return }
     const domains = new Map<string, Doc[]>()
     for (const doc of docs) {
@@ -75,7 +76,24 @@ export async function createCache (dbname: string, modelDb: ModelDb) {
 
   class CacheTxProcessor extends TxProcessor {
 
-    async store (doc: VDoc): Promise<void> {
+    private graph: Graph
+
+    constructor(modelDb: MemDb, graph: Graph) {
+      super(modelDb)
+      this.graph = graph
+    }
+
+    async store (doc: Doc): Promise<void> {
+      if (doc._class === core.class.Title) {
+        const title = doc as Title
+        console.log('got title, forward to graph')
+        this.graph.add({
+          _class: title._objectClass,
+          _id: title._id,
+          title: title.title
+        })
+        return
+      }
       return store([doc])
     }
 
@@ -97,7 +115,7 @@ export async function createCache (dbname: string, modelDb: ModelDb) {
 
   }
 
-  const txProcessor = new CacheTxProcessor(modelDb)
+  const txProcessor = new CacheTxProcessor(modelDb, graph)
 
   async function find (classOrMixin: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc[]> { // eslint-disable-line
     const result = [] as Doc[]

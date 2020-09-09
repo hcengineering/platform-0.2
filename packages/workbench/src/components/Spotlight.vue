@@ -14,19 +14,29 @@
 -->
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, onUnmounted } from 'vue'
+import { defineComponent, ref, onMounted, onUnmounted, watch } from 'vue'
 import Icon from '@anticrm/platform-ui/src/components/Icon.vue'
+import EditBox from '@anticrm/sparkling-controls/src/EditBox.vue'
 import ui from '@anticrm/platform-ui'
+import { getCoreService } from '../utils'
 
 export default defineComponent({
-  components: { Icon },
+  components: { Icon, EditBox },
   props: {
   },
   setup (props) {
+    const coreService = getCoreService()
+    const graph = coreService.getGraph()
+
     const visible = ref(false)
+    const results = ref([])
+    const query = ref('')
+
+    watch(() => query.value, query => {
+      results.value = graph.find(query)
+    })
 
     function keydown (ev: KeyboardEvent) {
-      console.log(ev.key)
       switch (ev.key) {
         case 'S':
           visible.value = !visible.value
@@ -44,7 +54,9 @@ export default defineComponent({
 
     return {
       ui,
-      visible
+      visible,
+      results,
+      query
     }
   }
 })
@@ -54,7 +66,10 @@ export default defineComponent({
   <div class="workbench-spotlight" v-if="visible">
     <div class="modal">
       <Icon :icon="ui.icon.Search" class="icon-embed-2x" />&nbsp;
-      <input />
+      <EditBox placeholder="Spotlight Search" v-model="query" />
+      <div>
+        <div v-for="(title, index) in results" :key="index">{{title.title}}</div>
+      </div>
     </div>
     <div class="modal-overlay"></div>
   </div>

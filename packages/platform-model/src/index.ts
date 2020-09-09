@@ -15,7 +15,7 @@
 
 import core from '@anticrm/platform-core'
 import { extendIds } from './utils'
-import { Attribute, Class, Classifier, Doc, Emb, Mixin, Obj, Ref, Tx, Type, VDoc, Space, ArrayOf, BagOf, InstanceOf, RefTo, Indices } from '@anticrm/platform'
+import { Attribute, Class, Classifier, Doc, Emb, Mixin, Obj, Ref, Tx, Type, VDoc, Space, ArrayOf, BagOf, InstanceOf, RefTo, Indices, Title } from '@anticrm/platform'
 import { ESFunc } from '@anticrm/platform/src/easyscript'
 
 export { extendIds }

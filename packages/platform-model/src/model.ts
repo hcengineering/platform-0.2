@@ -13,14 +13,13 @@
 // limitations under the License.
 //
 
+import { CoreDomain, Obj, Emb, Doc, Ref, Class, Mixin, VDoc, StringProperty, DateProperty, Space } from '@anticrm/platform'
+
 import Builder from './builder'
-import { ClassifierKind, CoreDomain, EasyScript } from '@anticrm/platform'
 import core from '.'
 import { ModelClass, Prop } from './dsl'
-import { Obj, Emb, Doc, Ref, Class, Mixin, VDoc, StringProperty, DateProperty, Space } from '@anticrm/platform'
 
 export { Builder }
-
 
 @ModelClass(core.class.Obj, core.class.Obj)
 class TObj implements Obj {
@@ -119,6 +118,12 @@ export default (S: Builder) => {
   S.createClass(core.class.Space, core.class.Doc, {
   }, CoreDomain.Model)
 
+  S.createClass(core.class.Title, core.class.Doc, {
+    _objectClass: S.attr(core.class.RefTo, { to: core.class.Class }),
+    _objectId: S.attr(core.class.Type, {}),
+    title: S.attr(core.class.Type, {}),
+  }, CoreDomain.Title)
+
   S.createClass(core.class.Tx, core.class.Doc, {
     _objectClass: S.attr(core.class.RefTo, { to: core.class.Class }),
     _objectId: S.attr(core.class.Type, {}),
@@ -149,7 +154,7 @@ export default (S: Builder) => {
   S.createClass(core.class.DeleteTx, core.class.Tx, {
   }, CoreDomain.Tx)
 
-  S.createMixin(core.mixin.VClass, core.class.Class, {
-    identity: S.attr(core.class.Type, {})
+  S.createMixin(core.mixin.Indices, core.class.Class, {
+    primary: S.attr(core.class.Type, {})
   })
 }

@@ -121,6 +121,12 @@ export interface Indices extends Class<VDoc> {
   primary: StringProperty
 }
 
+export interface Title extends Doc {
+  _objectClass: Ref<Classifier<Doc>>
+  _objectId: Ref<Doc>
+  title: string | number
+}
+
 export interface Tx extends Doc {
   _date: DateProperty
   _user: StringProperty
@@ -154,12 +160,14 @@ export interface AnyLayout {
 
 export enum CoreDomain {
   Model = 'model',
-  Tx = 'tx'
+  Tx = 'tx',
+  Title = 'title'
 }
 
 // TODO: I really hate to have this here, but `server` in not platform (plugin) based, so we share ids this way.
 export const core = identify('core' as AnyPlugin, {
   class: {
+    Title: '' as Ref<Class<Title>>,
     CreateTx: '' as Ref<Class<CreateTx>>,
     PushTx: '' as Ref<Class<PushTx>>,
     UpdateTx: '' as Ref<Class<UpdateTx>>,

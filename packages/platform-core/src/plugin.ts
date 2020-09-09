@@ -14,14 +14,15 @@
 //
 
 import {
-  AnyLayout, Class, CoreDomain, Doc, Platform, Ref, VDoc, Tx, Node,
-  generateId, CreateTx, PropertyType, Property, Space
+  AnyLayout, Class, CoreDomain, Doc, Platform, Ref, VDoc, Tx,
+  generateId, CreateTx, PropertyType, Property, Space, Title
 } from '@anticrm/platform'
 import core, { CoreService } from '.'
 import { ModelDb } from './modeldb'
 import { createCache } from './indexeddb'
 import rpcService from './rpc'
 import login from '@anticrm/login'
+import { Graph } from './graph'
 
 /*!
  * Anticrm Platform™ Core Plugin
@@ -30,7 +31,8 @@ import login from '@anticrm/login'
  */
 export default async (platform: Platform): Promise<CoreService> => {
   const model = new ModelDb()
-  const cache = await createCache('db5', model)
+  const graph = new Graph()
+  const cache = await createCache('db5', model, graph)
 
   interface Query {
     _class: Ref<Class<Doc>>
@@ -138,7 +140,7 @@ export default async (platform: Platform): Promise<CoreService> => {
     find: findOnline,
     findOne: (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc | undefined> => rpc.request('findOne', _class, query),
     tx: (tx: Tx): Promise<void> => rpc.request('tx', tx).then(() => coreOffline.tx(tx)),
-    loadDomain: (domain: string): Promise<Doc[]> => rpc.request('loadDomain', []),
+    loadDomain: (domain: string): Promise<Doc[]> => rpc.request('loadDomain', domain),
     loadGraph: (): Promise<Node[]> => rpc.request('loadGraph', [])
   }
 
@@ -167,9 +169,8 @@ export default async (platform: Platform): Promise<CoreService> => {
   }
 
   const service = {
-    getModel () {
-      return model
-    },
+    getModel () { return model },
+    getGraph () { return graph },
     generateId (): Ref<Doc> { return generateId() as Ref<Doc> },
     createVDoc,
     // query,
@@ -181,6 +182,17 @@ export default async (platform: Platform): Promise<CoreService> => {
     model.loadModel(offline[CoreDomain.Model])
   } else {
     model.loadModel(await service.loadDomain(CoreDomain.Model))
+    service.loadDomain(CoreDomain.Title).then(docs => {
+      const index = docs as Title[]
+      console.log('index', index)
+      for (const node of index) {
+        graph.add({
+          _class: node._objectClass,
+          _id: node._objectId,
+          title: node.title
+        })
+      }
+    })
   }
 
   return service
