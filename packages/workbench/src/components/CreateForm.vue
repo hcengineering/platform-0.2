@@ -48,20 +48,7 @@ export default defineComponent({
     const object = reactive({})
 
     function save () {
-      const tx: CreateTx = {
-        _class: core.class.CreateTx,
-        _id: generateId() as Ref<Doc>,
-
-        _objectId: generateId() as Ref<VDoc>,
-        _objectClass: props._class,
-
-        _date: Date.now() as Property<number, Date>,
-        _user: 'andrey.v.platov@gmail.com' as Property<string, string>,
-
-        _attributes: { ...object }
-      }
-
-      coreService.tx(tx)
+      coreService.createVDoc(props._class, object)
       context.emit('done', 'save')
     }
 

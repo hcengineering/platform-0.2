@@ -16,8 +16,8 @@
 import { Platform, Service } from '@anticrm/platform'
 import recruitment from '.'
 
-import View from './components/View.vue'
-import View2 from './components/View2.vue'
+// import View from './components/View.vue'
+// import View2 from './components/View2.vue'
 
 /*!
  * Anticrm Platform™ Recruitment Plugin
@@ -26,8 +26,8 @@ import View2 from './components/View2.vue'
  */
 export default async (platform: Platform): Promise<Service> => {
 
-  platform.setResource(recruitment.component.View, View)
-  platform.setResource(recruitment.component.View2, View2)
+  // platform.setResource(recruitment.component.View, View)
+  // platform.setResource(recruitment.component.View2, View2)
 
   return {}
 }

@@ -29,8 +29,8 @@ export default plugin('recruitment' as Plugin<Service>, {}, {
     Employer: '' as Asset
   },
   component: {
-    Main: '' as AnyComponent,
-    View: '' as AnyComponent,
-    View2: '' as AnyComponent
+    // Main: '' as AnyComponent,
+    // View: '' as AnyComponent,
+    // View2: '' as AnyComponent
   }
 })

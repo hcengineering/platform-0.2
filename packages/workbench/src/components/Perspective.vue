@@ -73,23 +73,7 @@ export default defineComponent({
     function message (msg: string) {
       console.log(msg)
       const newMessage = chunterService.createMissedObjects(msg)
-      const tx: CreateTx = {
-        _class: core.class.CreateTx,
-        _id: generateId() as Ref<Doc>,
-
-        _objectId: generateId() as Ref<VDoc>,
-        _objectClass: chunter.class.Message,
-
-        _date: Date.now() as Property<number, Date>,
-        _user: 'andrey.v.platov@gmail.com' as Property<string, string>,
-
-        _attributes: {
-          message: newMessage as Property<string, string>
-        }
-      }
-
-      coreService.tx(tx)
-
+      coreService.createVDoc(chunter.class.Message, { message: newMessage as Property<string, string>, comments: [] })
     }
 
     return { project, component, navigate, type, details, open, done, message }

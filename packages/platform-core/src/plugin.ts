@@ -21,6 +21,7 @@ import core, { CoreService } from '.'
 import { ModelDb } from './modeldb'
 import { createCache } from './indexeddb'
 import rpcService from './rpc'
+import login from '@anticrm/login'
 
 /*!
  * Anticrm Platform™ Core Plugin
@@ -157,7 +158,7 @@ export default async (platform: Platform): Promise<CoreService> => {
       _objectClass: _class,
 
       _date: Date.now() as Property<number, Date>,
-      _user: 'andrey.v.platov@gmail.com' as Property<string, string>,
+      _user: platform.getMetadata(login.metadata.WhoAmI) as Property<string, string>,
 
       _attributes: _attributes as unknown as { [key: string]: PropertyType }
     }
