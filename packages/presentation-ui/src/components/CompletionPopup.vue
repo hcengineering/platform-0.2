@@ -14,7 +14,7 @@
 -->
 
 <script lang="ts">
-import { defineComponent, ref, PropType, computed } from 'vue'
+import { defineComponent, ref, PropType, computed, watch } from 'vue'
 import Icon from '@anticrm/platform-ui/src/components/Icon.vue'
 
 import ui from '@anticrm/platform-ui'
@@ -24,20 +24,20 @@ import { getCoreService } from '../utils'
 import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.vue'
 import { CompletionItem } from '../index'
 
+function getFirst(items: CompletionItem[]): CompletionItem {
+  return (items.length > 0 ? items[0] : { key: '' }) as CompletionItem
+}
+
 export default defineComponent({
   components: { Icon, ScrollView },
   props: {
-    selection: {
-      type: String,
-      default: ""
-    },
     items: Array as PropType<Array<CompletionItem>>,
     pos: Object as PropType<{ left: number; right: number; top: number; bottom: number }>
   },
   setup(props, context) {
     let listElement = ref(null as HTMLElement)
     let selElement = ref(null as HTMLElement)
-    let selection = ref((props.items[0] ?? { key: '' }) as CompletionItem)
+    let selection = ref(getFirst(props.items))
 
     let selOffset = computed(() => {
       if (selElement.value != null) {
@@ -53,6 +53,15 @@ export default defineComponent({
 
     let popupStyle = computed(() => {
       return `left: ${props.pos.left + 5}px; top: ${props.pos.top - 80}px;`
+    })
+
+    watch(() => props.items, content => {
+
+      let cs = props.items.find((e) => e.key == selection.value.key)
+      if (cs == null) {
+        // Filtering caused selection to be wrong, select first
+        selection.value = getFirst(props.items)
+      }
     })
 
     return {
