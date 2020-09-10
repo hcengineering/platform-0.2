@@ -16,7 +16,7 @@
 import { Index, Storage } from '../utils'
 import { MemDb } from '../memdb'
 import { generateId } from '../objectid'
-import { Doc, CreateTx, Ref, Class, Obj, Attribute, PushTx } from '../core'
+import { Doc, CreateTx, Ref, Class, Obj, Attribute } from '../core'
 import {
   parseMessage, MessageElementKind, MessageLink,
   TEXT_TYPE_CLASS, BACKLINKS_CLASS, Backlink, Backlinks
@@ -27,7 +27,7 @@ export class TextIndex implements Index {
   private storage: Storage
   private textAttributes = new Map<Ref<Class<Obj>>, string[]>()
 
-  constructor(modelDb: MemDb, storage: Storage) {
+  constructor (modelDb: MemDb, storage: Storage) {
     this.modelDb = modelDb
     this.storage = storage
   }
@@ -77,8 +77,7 @@ export class TextIndex implements Index {
     return this.storage.store(doc)
   }
 
-  async onPush (tx: PushTx): Promise<any> {
+  async onPush (): Promise<any> {
     // return this.storage.push(tx._objectClass, tx._objectId, tx._attribute, tx._attributes)
   }
-
 }

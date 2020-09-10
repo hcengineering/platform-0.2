@@ -16,7 +16,7 @@
 import { Index, Storage } from '../utils'
 import { MemDb, mixinKey } from '../memdb'
 import { generateId } from '../objectid'
-import { core, CreateTx, VDoc, Ref, Class, Obj, Classifier, Title, PushTx } from '../core'
+import { core, CreateTx, VDoc, Ref, Class, Obj, Classifier, Title } from '../core'
 
 const NULL = '<null>'
 const primaryKey = mixinKey(core.mixin.Indices, 'primary')
@@ -26,7 +26,7 @@ export class TitleIndex implements Index {
   private storage: Storage
   private primaries = new Map<Ref<Classifier<VDoc>>, string>()
 
-  constructor(modelDb: MemDb, storage: Storage) {
+  constructor (modelDb: MemDb, storage: Storage) {
     this.modelDb = modelDb
     this.storage = storage
   }
@@ -67,8 +67,7 @@ export class TitleIndex implements Index {
     return this.storage.store(doc)
   }
 
-  async onPush (tx: PushTx): Promise<any> {
+  async onPush (): Promise<any> {
     // return this.storage.push(tx._objectClass, tx._objectId, tx._attribute, tx._attributes)
   }
-
 }

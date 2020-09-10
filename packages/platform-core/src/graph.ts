@@ -13,7 +13,8 @@
 // limitations under the License.
 //
 
-import { Ref, Classifier, Doc, Tx, CreateTx, VDoc, Class, Obj, Attribute } from '@anticrm/platform'
+import { Ref, Classifier, Doc, Class, Title, Storage } from '@anticrm/platform'
+import core from '.'
 
 export interface Node {
   _class: Ref<Classifier<Doc>>
@@ -21,7 +22,7 @@ export interface Node {
   title: string | number
 }
 
-export class Graph {
+export class Graph implements Storage {
 
   private graph = new Map<Ref<Doc>, Node>()
 
@@ -42,6 +43,31 @@ export class Graph {
         result.push(node)
     }
     return result
+  }
+
+  async store (doc: Doc): Promise<void> {
+    if (doc._class !== core.class.Title) {
+      throw new Error('assert doc._class !== core.class.Title')
+    }
+
+    const title = doc as Title
+    this.add({
+      _class: title._objectClass,
+      _id: title._objectId,
+      title: title.title
+    })
+  }
+
+  async push (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: any): Promise<void> {
+    console.log('graph push')
+  }
+
+  async update (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attributes: any): Promise<void> {
+    console.log('graph update')
+  }
+
+  async remove (_class: Ref<Class<Doc>>, doc: Ref<Doc>): Promise<void> {
+    console.log('graph remove')
   }
 
 }
