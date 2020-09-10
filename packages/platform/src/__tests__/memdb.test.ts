@@ -17,7 +17,8 @@ import { MemDb, Plugin, Service, Ref, Class, Mixin, Resource, identify } from '.
 import { Doc, ClassifierKind } from '../core'
 
 describe('memdb', () => {
-  const memdb = new MemDb('testdomain')
+  const domainName = 'testdomain'
+  const memdb = new MemDb(domainName)
 
   const test = identify('test' as Plugin<Service>, {
     class: {
@@ -49,7 +50,7 @@ describe('memdb', () => {
     _class: test.class.Class,
     _id: test.class.DomainDoc,
     _extends: test.class.Class,
-    _domain: 'testdomain',
+    _domain: domainName,
     _attributes: { attribute1: '', attribute2: '' }
   }
 
@@ -70,7 +71,7 @@ describe('memdb', () => {
     _class: test.class.Class,
     _id: test.class.MixinDoc,
     _extends: test.class.Mixin,
-    _domain: 'testdomain',
+    _domain: domainName,
     _attributes: { mixinAttribute1: '' }
   }
 
@@ -192,5 +193,23 @@ describe('memdb', () => {
 
   it('should dump all contents', () => {
     expect(memdb.dump()).toEqual([metaClass, metaMixin, domainDoc, extendDomainDoc, noDomainDoc, mixinDoc, mixableDoc])
+  })
+
+  it('should fail to load domain', () => {
+    const loadDomain = memdb.loadDomain('WrongDomain')
+    expect(loadDomain).toBeInstanceOf(Promise)
+
+    return loadDomain.then(docs => { // eslint-disable-line
+      fail('not expected successul loadDomain() call')
+    }).catch(err => {
+      expect(err).toBeInstanceOf(Error)
+      expect(err.message).toBe('domain does not match')
+    })
+  })
+
+  it('should load domain', () => {
+    return memdb.loadDomain(domainName).then(docs => {
+      expect(docs).toEqual([metaClass, metaMixin, domainDoc, extendDomainDoc, noDomainDoc, mixinDoc, mixableDoc])
+    })
   })
 })
