@@ -232,6 +232,7 @@ export default defineComponent({
     }
     return {
       root,
+      isEmpty,
       view,
       // Some operations
       toggleBold() {
