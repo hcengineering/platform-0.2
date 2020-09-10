@@ -13,20 +13,22 @@
 // limitations under the License.
 //
 
-import { Index } from '../utils'
+import { Index, Storage } from '../utils'
 import { MemDb, mixinKey } from '../memdb'
 import { generateId } from '../objectid'
-import { core, Doc, CreateTx, VDoc, Ref, Class, Obj, Classifier, Title } from '../core'
+import { core, CreateTx, VDoc, Ref, Class, Obj, Classifier, Title, PushTx } from '../core'
 
 const NULL = '<null>'
 const primaryKey = mixinKey(core.mixin.Indices, 'primary')
 
 export class TitleIndex implements Index {
   private modelDb: MemDb
+  private storage: Storage
   private primaries = new Map<Ref<Classifier<VDoc>>, string>()
 
-  constructor (modelDb: MemDb) {
+  constructor(modelDb: MemDb, storage: Storage) {
     this.modelDb = modelDb
+    this.storage = storage
   }
 
   private getPrimary (_class: Ref<Classifier<VDoc>>): string | null {
@@ -48,9 +50,9 @@ export class TitleIndex implements Index {
     return null
   }
 
-  onCreate (create: CreateTx): Doc | null {
+  async onCreate (create: CreateTx): Promise<any> {
     const primary = this.getPrimary(create._objectClass)
-    if (!primary) { return null }
+    if (!primary) { return }
 
     const title = create._attributes[primary] as string
 
@@ -62,6 +64,11 @@ export class TitleIndex implements Index {
       title
     }
 
-    return doc
+    return this.storage.store(doc)
   }
+
+  async onPush (tx: PushTx): Promise<any> {
+    // return this.storage.push(tx._objectClass, tx._objectId, tx._attribute, tx._attributes)
+  }
+
 }

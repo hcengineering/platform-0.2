@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Class, Doc, Ref, Tx, TxProcessor, MemDb, Title, Index } from '@anticrm/platform'
+import { AnyLayout, Class, Doc, Ref, Tx, TxProcessor, MemDb, Title, Storage } from '@anticrm/platform'
 
 import { openDB } from 'idb'
 import { ModelDb } from './modeldb'
@@ -22,6 +22,7 @@ import { Graph } from './graph'
 
 import { VDocIndex } from '@anticrm/platform/src/indices/vdoc'
 import { TitleIndex } from '@anticrm/platform/src/indices/title'
+import { TxIndex } from '@anticrm/platform/src/indices/tx'
 
 export interface CacheControl {
   cache (docs: Doc[]): Promise<void>
@@ -77,12 +78,12 @@ export async function createCache (dbname: string, modelDb: ModelDb, graph: Grap
   }
 
 
-  class CacheTxProcessor extends TxProcessor {
+  class CacheStorage implements Storage {
 
     private graph: Graph
 
-    constructor(modelDb: MemDb, indices: Index[], graph: Graph) {
-      super(modelDb, indices)
+    constructor() {
+      // super(modelDb, indices)
       this.graph = graph
     }
 
@@ -118,7 +119,13 @@ export async function createCache (dbname: string, modelDb: ModelDb, graph: Grap
 
   }
 
-  const txProcessor = new CacheTxProcessor(modelDb, [new VDocIndex(modelDb), new TitleIndex(modelDb)], graph)
+  const cacheStorage = new CacheStorage()
+
+  const txProcessor = new TxProcessor(modelDb, [
+    new VDocIndex(modelDb, cacheStorage),
+    new TitleIndex(modelDb, cacheStorage),
+    new TxIndex(modelDb, cacheStorage),
+  ])
 
   async function find (classOrMixin: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc[]> { // eslint-disable-line
     const result = [] as Doc[]

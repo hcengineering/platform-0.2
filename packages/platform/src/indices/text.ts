@@ -13,10 +13,10 @@
 // limitations under the License.
 //
 
-import { Index } from '../utils'
+import { Index, Storage } from '../utils'
 import { MemDb } from '../memdb'
 import { generateId } from '../objectid'
-import { Doc, CreateTx, Ref, Class, Obj, Attribute } from '../core'
+import { Doc, CreateTx, Ref, Class, Obj, Attribute, PushTx } from '../core'
 import {
   parseMessage, MessageElementKind, MessageLink,
   TEXT_TYPE_CLASS, BACKLINKS_CLASS, Backlink, Backlinks
@@ -24,10 +24,12 @@ import {
 
 export class TextIndex implements Index {
   private modelDb: MemDb
+  private storage: Storage
   private textAttributes = new Map<Ref<Class<Obj>>, string[]>()
 
-  constructor (modelDb: MemDb) {
+  constructor(modelDb: MemDb, storage: Storage) {
     this.modelDb = modelDb
+    this.storage = storage
   }
 
   private getTextAttibutes (_class: Ref<Class<Obj>>): string[] {
@@ -58,19 +60,25 @@ export class TextIndex implements Index {
       }))
   }
 
-  onCreate (create: CreateTx): Doc | null {
+  async onCreate (create: CreateTx): Promise<any> {
     const attributes = this.getTextAttibutes(create._objectClass)
     const backlinks = []
     for (const attr of attributes) {
       backlinks.push(...this.backlinks(create._attributes[attr] as string))
     }
-    if (backlinks.length === 0) { return null }
-    return {
+    if (backlinks.length === 0) { return }
+    const doc: Backlinks = {
       _class: BACKLINKS_CLASS,
       _id: generateId() as Ref<Backlinks>,
       _objectClass: create._objectClass,
       _objectId: create._objectId,
       backlinks
-    } as Backlinks
+    }
+    return this.storage.store(doc)
   }
+
+  async onPush (tx: PushTx): Promise<any> {
+    // return this.storage.push(tx._objectClass, tx._objectId, tx._attribute, tx._attributes)
+  }
+
 }
