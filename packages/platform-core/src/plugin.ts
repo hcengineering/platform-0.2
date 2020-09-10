@@ -15,7 +15,7 @@
 
 import {
   AnyLayout, Class, CoreDomain, Doc, Platform, Ref, VDoc, Tx,
-  generateId, CreateTx, PropertyType, Property, Space, Title
+  generateId, CreateTx, PropertyType, Property, Space, Title, CoreProtocol
 } from '@anticrm/platform'
 import core, { CoreService } from '.'
 import { ModelDb } from './modeldb'
@@ -30,7 +30,36 @@ import { Graph } from './graph'
  * Licensed under the Eclipse Public License, Version 2.0
  */
 export default async (platform: Platform): Promise<CoreService> => {
+
+  const rpc = rpcService(platform)
+
+  const coreProtocol: CoreProtocol = {
+    find: (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc[]> => rpc.request('find', _class, query),
+    findOne: (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc | undefined> => rpc.request('findOne', _class, query),
+    tx: (tx: Tx): Promise<void> => rpc.request('tx', tx).then(() => coreOffline.tx(tx)),
+    loadDomain: (domain: string): Promise<Doc[]> => rpc.request('loadDomain', domain),
+  }
+
   const model = new ModelDb()
+
+  const offline = platform.getMetadata(core.metadata.Model)
+  if (offline) {
+    model.loadModel(offline[CoreDomain.Model])
+  } else {
+    model.loadModel(await coreProtocol.loadDomain(CoreDomain.Model))
+    coreProtocol.loadDomain(CoreDomain.Title).then(docs => {
+      const index = docs as Title[]
+      console.log('index', index)
+      for (const node of index) {
+        graph.add({
+          _class: node._objectClass,
+          _id: node._objectId,
+          title: node.title
+        })
+      }
+    })
+  }
+
   const graph = new Graph()
   const cache = await createCache('db5', model, graph)
 
@@ -70,7 +99,7 @@ export default async (platform: Platform): Promise<CoreService> => {
 
     const done = false
 
-    findOnline(_class as Ref<Class<Doc>>, query)
+    coreProtocol.find(_class as Ref<Class<Doc>>, query)
       .then(result => {
         q.instances = result
         listener(result)
@@ -114,7 +143,7 @@ export default async (platform: Platform): Promise<CoreService> => {
       const c = cache.tx(tx)
       for (const q of queries) {
         // TODO: check if given tx affect query results
-        findOnline(q._class, q.query).then(result => {
+        coreProtocol.find(q._class, q.query).then(result => {
           q.listener(result)
         })
       }
@@ -129,19 +158,15 @@ export default async (platform: Platform): Promise<CoreService> => {
     }
   }
 
-  // C O R E  P R O T O C O L  (R P C)
-
-  const rpc = rpcService(platform)
-
-  const findOnline = (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc[]> => rpc.request('find', _class, query)
+  // const findOnline = (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc[]> => rpc.request('find', _class, query)
 
   const coreRpc = {
     query: queryOnline,
-    find: findOnline,
-    findOne: (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc | undefined> => rpc.request('findOne', _class, query),
-    tx: (tx: Tx): Promise<void> => rpc.request('tx', tx).then(() => coreOffline.tx(tx)),
-    loadDomain: (domain: string): Promise<Doc[]> => rpc.request('loadDomain', domain),
-    loadGraph: (): Promise<Node[]> => rpc.request('loadGraph', [])
+    ...coreProtocol
+    // find: findOnline,
+    // findOne: (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc | undefined> => rpc.request('findOne', _class, query),
+    // tx: (tx: Tx): Promise<void> => rpc.request('tx', tx).then(() => coreOffline.tx(tx)),
+    // loadDomain: (domain: string): Promise<Doc[]> => rpc.request('loadDomain', domain),
   }
 
   //const proto = platform.getMetadata(core.metadata.Offline) ? coreOffline : coreRpc
@@ -175,24 +200,6 @@ export default async (platform: Platform): Promise<CoreService> => {
     createVDoc,
     // query,
     ...proto
-  }
-
-  const offline = platform.getMetadata(core.metadata.Model)
-  if (offline) {
-    model.loadModel(offline[CoreDomain.Model])
-  } else {
-    model.loadModel(await service.loadDomain(CoreDomain.Model))
-    service.loadDomain(CoreDomain.Title).then(docs => {
-      const index = docs as Title[]
-      console.log('index', index)
-      for (const node of index) {
-        graph.add({
-          _class: node._objectClass,
-          _id: node._objectId,
-          title: node.title
-        })
-      }
-    })
   }
 
   return service

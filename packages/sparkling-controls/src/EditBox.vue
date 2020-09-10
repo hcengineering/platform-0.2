@@ -36,11 +36,11 @@ export default defineComponent({
 @import "~@anticrm/sparkling-theme/css/_variables.scss";
 
 .sparkling-edit-box {
-  // border: 1px solid $workspace-separator-color;
-  // border-radius: 0.5em;
-  // padding: 0.5em 0.75em;
+  border: 1px solid $workspace-separator-color;
+  border-radius: 0.5em;
+  padding: 0.5em 0.75em;
   background-color: $nav-bg-color;
-  // box-sizing: border-box;
+  box-sizing: border-box;
 
   &:focus {
     outline: none;
