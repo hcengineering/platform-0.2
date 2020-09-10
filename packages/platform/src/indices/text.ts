@@ -1,14 +1,14 @@
 //
 // Copyright © 2020 Anticrm Platform Contributors.
-// 
+//
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
 // obtain a copy of the License at https://www.eclipse.org/legal/epl-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// 
+//
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
@@ -26,7 +26,7 @@ export class TextIndex implements Index {
   private modelDb: MemDb
   private textAttributes = new Map<Ref<Class<Obj>>, string[]>()
 
-  constructor(modelDb: MemDb) {
+  constructor (modelDb: MemDb) {
     this.modelDb = modelDb
   }
 
@@ -43,8 +43,7 @@ export class TextIndex implements Index {
       }
     }
 
-    if (clazz._extends)
-      attributes.push(...this.getTextAttibutes(clazz._extends))
+    if (clazz._extends) { attributes.push(...this.getTextAttibutes(clazz._extends)) }
 
     this.textAttributes.set(_class, attributes)
     return attributes
@@ -65,8 +64,7 @@ export class TextIndex implements Index {
     for (const attr of attributes) {
       backlinks.push(...this.backlinks(create._attributes[attr] as string))
     }
-    if (backlinks.length === 0)
-      return null
+    if (backlinks.length === 0) { return null }
     return {
       _class: BACKLINKS_CLASS,
       _id: generateId() as Ref<Backlinks>,
