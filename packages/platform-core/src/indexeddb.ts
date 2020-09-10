@@ -17,17 +17,20 @@ import { AnyLayout, Class, Doc, Ref, Tx, TxProcessor, MemDb, Title, Storage } fr
 
 import { openDB } from 'idb'
 import { ModelDb } from './modeldb'
-import { Graph } from './graph'
+import { Titles } from './titles'
 
 import { VDocIndex } from '@anticrm/platform/src/indices/vdoc'
 import { TitleIndex } from '@anticrm/platform/src/indices/title'
+import { TextIndex } from '@anticrm/platform/src/indices/text'
 import { TxIndex } from '@anticrm/platform/src/indices/tx'
+
+import { Graph } from './graph'
 
 export interface CacheControl {
   cache (docs: Doc[]): Promise<void>
 }
 
-export async function createCache (dbname: string, modelDb: ModelDb, graph: Graph) {
+export async function createCache (dbname: string, modelDb: ModelDb, titles: Titles, graph: Graph) {
   const db = await openDB(dbname, 1, {
     upgrade (db) {
       const domains = new Map<string, string>()
@@ -100,7 +103,8 @@ export async function createCache (dbname: string, modelDb: ModelDb, graph: Grap
 
   const txProcessor = new TxProcessor(modelDb, [
     new VDocIndex(modelDb, cacheStorage),
-    new TitleIndex(modelDb, graph),
+    new TitleIndex(modelDb, titles),
+    new TextIndex(modelDb, graph),
     new TxIndex(modelDb, cacheStorage),
   ])
 

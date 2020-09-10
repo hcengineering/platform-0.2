@@ -42,7 +42,7 @@ export default defineComponent({
       required: true
     }
   },
-  setup(props, context) {
+  setup (props, context) {
     const coreService = getCoreService()
     const presentationCoreService = getPresentationCore()
     const chunterService = getChunterService()
@@ -52,6 +52,7 @@ export default defineComponent({
     let shutdown: any = null
 
     const object = ref(null)
+    const backlinks = ref([])
 
     watch(() => props._id, _id => {
       if (shutdown) { shutdown() }
@@ -60,16 +61,18 @@ export default defineComponent({
         object.value = result[0]
       })
 
+      backlinks.value = coreService.getGraph().find(_id).links
+
       component.value = presentationCoreService.getComponentExtension(props._class, presentationCore.class.DetailForm)
     }, { immediate: true })
 
     onUnmounted(() => shutdown())
 
-    function cancel() {
+    function cancel () {
       context.emit('done', 'cancel')
     }
 
-    function remove() {
+    function remove () {
       const tx: DeleteTx = {
         _class: core.class.DeleteTx,
         _id: generateId() as Ref<Doc>,
@@ -85,7 +88,7 @@ export default defineComponent({
       context.emit('done', 'delete')
     }
 
-    function submit(message) {
+    function submit (message) {
       console.log(message)
       const newMessage = chunterService.createMissedObjects(message)
       const tx: PushTx = {
@@ -109,6 +112,7 @@ export default defineComponent({
     return {
       component,
       object,
+      backlinks,
 
       cancel,
       remove,
@@ -140,6 +144,11 @@ export default defineComponent({
           </div>
         </div>
         <ReferenceInput class="submit" placeholder="Comment..." @message="submit" />
+      </div>
+
+      <div class="backlinks">
+        <div class="caption-2">Ссылки</div>
+        <div v-for="(link, index) in backlinks" :key="index">{{link}}</div>
       </div>
     </div>
   </div>

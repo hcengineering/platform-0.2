@@ -32,15 +32,18 @@ import {
   Service,
   Type,
   Space,
-  Title
+  Title,
+  BACKLINKS_CLASS
 } from '@anticrm/platform'
 import { ModelDb } from './modeldb'
+import { Titles } from './titles'
 import { Graph } from './graph'
 
 // P L U G I N
 
 export interface CoreService extends Service, CoreProtocol {
   getModel (): ModelDb
+  getTitles (): Titles
   getGraph (): Graph
   generateId (): Ref<Doc>
   query (_class: Ref<Class<Doc>>, query: AnyLayout, listener: (result: Doc[]) => void): () => void
@@ -63,5 +66,6 @@ export default plugin('core' as Plugin<CoreService>, {}, {
     DeleteTx: '' as Ref<Class<DeleteTx>>,
     Space: '' as Ref<Class<Space>>,
     Title: '' as Ref<Class<Title>>,
+    Backlinks: BACKLINKS_CLASS
   }
 })

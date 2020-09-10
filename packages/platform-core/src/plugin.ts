@@ -15,13 +15,14 @@
 
 import {
   AnyLayout, Class, CoreDomain, Doc, Platform, Ref, VDoc, Tx,
-  generateId, CreateTx, PropertyType, Property, Space, Title, CoreProtocol
+  generateId, CreateTx, PropertyType, Property, Space, Title, CoreProtocol, BACKLINKS_DOMAIN
 } from '@anticrm/platform'
 import core, { CoreService } from '.'
 import { ModelDb } from './modeldb'
 import { createCache } from './indexeddb'
 import rpcService from './rpc'
 import login from '@anticrm/login'
+import { Titles } from './titles'
 import { Graph } from './graph'
 
 /*!
@@ -41,27 +42,29 @@ export default async (platform: Platform): Promise<CoreService> => {
   }
 
   const model = new ModelDb()
+  const titles = new Titles()
+  const graph = new Graph()
 
   const offline = platform.getMetadata(core.metadata.Model)
   if (offline) {
     model.loadModel(offline[CoreDomain.Model])
   } else {
     model.loadModel(await coreProtocol.loadDomain(CoreDomain.Model))
-    coreProtocol.loadDomain(CoreDomain.Title).then(docs => {
-      const index = docs as Title[]
-      console.log('index', index)
-      for (const node of index) {
-        graph.add({
-          _class: node._objectClass,
-          _id: node._objectId,
-          title: node.title
-        })
-      }
-    })
   }
 
-  const graph = new Graph()
-  const cache = await createCache('db5', model, graph)
+  coreProtocol.loadDomain(CoreDomain.Title).then(docs => {
+    for (const doc of docs) {
+      titles.store(doc)
+    }
+  })
+
+  coreProtocol.loadDomain(BACKLINKS_DOMAIN).then(docs => {
+    for (const doc of docs) {
+      graph.store(doc)
+    }
+  })
+
+  const cache = await createCache('db5', model, titles, graph)
 
   interface Query {
     _class: Ref<Class<Doc>>
@@ -195,6 +198,7 @@ export default async (platform: Platform): Promise<CoreService> => {
 
   const service = {
     getModel () { return model },
+    getTitles () { return titles },
     getGraph () { return graph },
     generateId (): Ref<Doc> { return generateId() as Ref<Doc> },
     createVDoc,
