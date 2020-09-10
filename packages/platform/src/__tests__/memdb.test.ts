@@ -110,12 +110,23 @@ describe('memdb', () => {
     expect(() => memdb.get(domainDoc._id)).toThrowError('document not found ' + domainDoc._id)
   })
 
-  it('should index all and find object', () => {
+  it('should index all and find objects', () => {
     memdb.add(metaMixin)
     const found: Doc[] = memdb.findSync(test.class.Class, {})
     expect(found.length).toBe(2)
     expect(found[0]).toBe(metaClass)
     expect(found[1]).toBe(metaMixin)
+  })
+
+  it('should find objects', () => {
+    const findPromise = memdb.find(test.class.Class, {})
+    expect(findPromise).toBeInstanceOf(Promise)
+
+    return findPromise.then(docs => {
+      expect(docs.length).toBe(2)
+      expect(docs[0]).toBe(metaClass)
+      expect(docs[1]).toBe(metaMixin)
+    })
   })
 
   it('should get domain', () => {
@@ -256,5 +267,52 @@ describe('memdb', () => {
 
   it('should fail to create transaction', () => {
     expect(() => memdb.tx()).toThrowError('memdb is read only')
+  })
+
+  it('should find all classes', () => {
+    return memdb.find(test.class.Class, {}).then(docs => {
+      expect(docs).toEqual(expectedMemdbContents)
+    })
+  })
+
+  it('should not find any classes', () => {
+    const badFilter = { q: 'qq' as Resource<string> }
+    return memdb.find(test.class.Class, badFilter).then(docs => {
+      expect(docs.length).toBe(0)
+    })
+  })
+
+  it('should find first object', () => {
+    const firstDoc = memdb.createDocument(test.class.DomainDoc, { _first: true })
+    memdb.add(firstDoc)
+    memdb.add(memdb.createDocument(test.class.DomainDoc, {}))
+    memdb.add(memdb.createDocument(test.class.DomainDoc, {}))
+
+    const findOnePromise = memdb.findOne(test.class.DomainDoc, {})
+    expect(findOnePromise).toBeInstanceOf(Promise)
+
+    return findOnePromise.then(doc => {
+      expect(doc).toBe(firstDoc)
+    })
+  })
+
+  it('should not find non existing object', () => {
+    return memdb.findOne(test.class.ExtendDomainDoc, {}).then(doc => {
+      expect(doc).toBeUndefined()
+    })
+  })
+
+  it('should find object with filter', () => {
+    return memdb.find(test.class.Class, { _id: noDomainDoc._id }).then(docs => {
+      expect(docs.length).toBe(1)
+      expect(docs[0]).toBe(noDomainDoc)
+    })
+  })
+
+  it('should find object with double filter', () => {
+    return memdb.find(test.class.Class, { _class: test.class.Class, _domain: domainName as Resource<String> }).then(docs => {
+      expect(docs.length).toBe(3)
+      expect(docs).toEqual([domainDoc, mixinDoc, mixinDoc2])
+    })
   })
 })
