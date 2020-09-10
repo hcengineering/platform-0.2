@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Platform, Ref } from '@anticrm/platform'
+import { Platform, Ref, parseMessage } from '@anticrm/platform'
 import chunter, {
   MessageElement, MessageElementKind,
   MessageText, MessageLink, ChunterService, ChunterServiceInjectionKey, Page
@@ -44,7 +44,7 @@ export default async (platform: Platform, deps: { core: CoreService, ui: UIServi
   platform.setResource(chunter.component.MessageInfo, MessageInfo)
   platform.setResource(chunter.component.PageProperties, PageProperties)
 
-  function parseMessage (message: string): MessageElement[] {
+  function parseXMLMessage (message: string): MessageElement[] {
     const result = []
     const parser = new DOMParser()
     const root = parser.parseFromString(message, 'text/xml')
@@ -74,23 +74,25 @@ export default async (platform: Platform, deps: { core: CoreService, ui: UIServi
   }
 
   function toMessage (parsed: MessageElement[]): string {
-    let result = '<p>'
+    let result = ''
     for (const element of parsed) {
       if (element.kind === MessageElementKind.LINK) {
         const link = element as MessageLink
-        result += `<reference id="${link._id}" class="${link._class}">${link.text}</reference>`
+        // result += `<reference id="${link._id}" class="${link._class}">${link.text}</reference>`
+        result += `[[${link.text}|${link._class}|${link._id}]]`
       } else {
         result += element.text
       }
     }
-    result += '</p>'
+    // result += '</p>'
+    console.log('RESULT', result)
     return result
   }
 
   function createMissedObjects (message: string): string {
     console.log('createMissedObjects', message)
     const referenced = []
-    const elements = parseMessage(message)
+    const elements = parseXMLMessage(message)
     for (const element of elements) {
       if (element.kind === MessageElementKind.LINK) {
         const link = element as MessageLink
@@ -101,6 +103,7 @@ export default async (platform: Platform, deps: { core: CoreService, ui: UIServi
             title,
             comments: []
           }, id)
+          link.text = title
           link._id = id
           link._class = chunter.class.Page
           referenced.push(link)

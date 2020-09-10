@@ -13,7 +13,10 @@
 // limitations under the License.
 //
 
-import { CoreDomain, Obj, Emb, Doc, Ref, Class, Mixin, VDoc, StringProperty, DateProperty, Space } from '@anticrm/platform'
+import {
+  CoreDomain, Obj, Emb, Doc, Ref, Class, Mixin, VDoc,
+  StringProperty, DateProperty, Space, BACKLINKS_CLASS, Backlinks, Backlink, BACKLINKS_DOMAIN
+} from '@anticrm/platform'
 
 import Builder from './builder'
 import core from '.'
@@ -24,7 +27,6 @@ export { Builder }
 @ModelClass(core.class.Obj, core.class.Obj)
 class TObj implements Obj {
   _class!: Ref<Class<Obj>>
-  constructor() { }
 }
 
 @ModelClass(core.class.Emb, core.class.Obj)
@@ -35,10 +37,8 @@ class TEmb extends TObj implements Emb {
 @ModelClass(core.class.Doc, core.class.Obj)
 class TDoc extends TObj implements Doc {
   _class!: Ref<Class<Doc>>
-  @Prop()
-  _id!: Ref<Doc>
-  @Prop()
-  _mixins?: Ref<Mixin<Doc>>[]
+  @Prop() _id!: Ref<Doc>
+  @Prop() _mixins?: Ref<Mixin<Doc>>[]
 }
 
 @ModelClass(core.class.VDoc, core.class.Doc)
@@ -50,37 +50,16 @@ export class TVDoc extends TDoc implements VDoc {
   @Prop() _modifiedBy?: StringProperty
 }
 
+@ModelClass(BACKLINKS_CLASS, core.class.Doc, BACKLINKS_DOMAIN)
+class TBacklinks extends TDoc implements Backlinks {
+  @Prop() _objectId!: Ref<VDoc>
+  @Prop() _objectClass!: Ref<Class<VDoc>>
+  @Prop() backlinks!: Backlink[]
+}
+
 export default (S: Builder) => {
-  // S.createDocument(core.class.Class, {
-  //   _kind: ClassifierKind.CLASS,
-  //   _attributes: {}
-  // }, core.class.Obj)
 
-  // S.createDocument(core.class.Class, {
-  //   _kind: ClassifierKind.CLASS,
-  //   _extends: core.class.Obj,
-  //   _attributes: {}
-  // }, core.class.Emb)
-
-  // S.createClass(core.class.Doc, core.class.Obj, {
-  //   _id: S.attr(core.class.RefTo, {
-  //     to: core.class.Doc
-  //   }),
-  //   _mixins: S.attr(core.class.ArrayOf, {
-  //     of: S.newInstance(core.class.RefTo, { to: core.class.Doc })
-  //   })
-  // })
-
-  // S.createClass(core.class.VDoc, core.class.Doc, {
-  //   _space: S.attr(core.class.Type, {}),
-  //   _createdOn: S.attr(core.class.Type, {}),
-  //   _createdBy: S.attr(core.class.Type, {}),
-  //   _modifiedOn: S.attr(core.class.Type, {}),
-  //   _modifiedBy: S.attr(core.class.Type, {}),
-
-  // })
-
-  S.add(TObj, TEmb, TDoc, TVDoc)
+  S.add(TObj, TEmb, TDoc, TVDoc, TBacklinks)
 
   S.createClass(core.class.Attribute, core.class.Emb, {
     type: S.attr(core.class.Type, {})

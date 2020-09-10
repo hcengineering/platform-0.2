@@ -13,11 +13,15 @@
 // limitations under the License.
 //
 
-export * from './platform'
-export * from './core'
-export * from './memdb'
-export * from './rpc'
-export * from './objectid'
-export * from './utils'
-export * from './easyscript'
-export * from './text'
+/* eslint-env jest */
+
+import { parseMessage, MessageElementKind } from '../text'
+
+describe('easyscript', () => {
+  it('should execure easyscript', () => {
+    const parsed = parseMessage('hello [[there|class|id]]')
+    // console.log(parsed)
+    expect(parsed.length).toBe(2)
+    expect(parsed[1].kind).toBe(MessageElementKind.LINK)
+  })
+})

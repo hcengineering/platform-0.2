@@ -15,7 +15,10 @@
 
 import core from '@anticrm/platform-core'
 import { extendIds } from './utils'
-import { Attribute, Class, Classifier, Doc, Emb, Mixin, Obj, Ref, Tx, Type, VDoc, Space, ArrayOf, BagOf, InstanceOf, RefTo, Indices, Title } from '@anticrm/platform'
+import {
+  Attribute, Class, Classifier, Doc, Emb, Mixin, Obj, Ref, Tx, Type, VDoc,
+  ArrayOf, BagOf, InstanceOf, RefTo, Indices, TEXT_TYPE_CLASS
+} from '@anticrm/platform'
 import { ESFunc } from '@anticrm/platform/src/easyscript'
 
 export { extendIds }
@@ -35,6 +38,7 @@ export default extendIds(core, {
 
     Attribute: '' as Ref<Class<Attribute>>,
     Type: '' as Ref<Class<Type>>,
+    Text: TEXT_TYPE_CLASS,
 
     VDoc: '' as Ref<Class<VDoc>>,
     Tx: '' as Ref<Class<Tx>>,
