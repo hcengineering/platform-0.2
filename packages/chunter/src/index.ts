@@ -23,6 +23,10 @@ import { ComponentExtension } from '@anticrm/presentation-core'
 
 // P E R S I S T E N C E  M O D E L
 
+export interface Collab extends VDoc {
+  comments?: Comment[]
+}
+
 export interface Comment extends Emb {
   _createdOn: DateProperty
   _createdBy: StringProperty
@@ -30,12 +34,11 @@ export interface Comment extends Emb {
   message: string
 }
 
-export interface Message extends VDoc {
+export interface Message extends Collab {
   message: string
-  comments?: Comment[]
 }
 
-export interface Page extends Message {
+export interface Page extends Collab {
   title: string
 }
 
