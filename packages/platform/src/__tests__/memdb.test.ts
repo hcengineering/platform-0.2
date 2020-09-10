@@ -182,4 +182,9 @@ describe('memdb', () => {
     expect(mixableDoc._mixinUnderscore).toBe('mixinUnderscoreValue')
     expect(mixableDoc.mixinAttribute1).toBe('mixinValue1')
   })
+
+  it("should check 'is' method", () => {
+    expect(memdb.is(test.class.ExtendDomainDoc, test.class.Mixin)).toBeFalsy()
+    expect(memdb.is(test.class.ExtendDomainDoc, test.class.Class)).toBeTruthy()
+  })
 })
