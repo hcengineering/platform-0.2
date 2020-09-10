@@ -60,12 +60,25 @@ describe('memdb', () => {
     _attributes: { extendAttribute1: '', extendAttribute2: '' }
   }
 
+  const noDomainDoc = {
+    _class: test.class.Class,
+    _id: test.class.NoDomainDoc,
+    _extends: test.class.Class
+  }
+
   const mixinDoc = {
     _class: test.class.Class,
     _id: test.class.MixinDoc,
     _extends: test.class.Mixin,
     _domain: 'testdomain',
     _attributes: { mixinAttribute1: '' }
+  }
+
+  const mixableDoc = {
+    _class: test.class.Class,
+    _id: test.class.MixableDoc,
+    _extends: test.class.Class,
+    _attributes: {}
   }
 
   it('should add and get object', () => {
@@ -100,11 +113,6 @@ describe('memdb', () => {
   })
 
   it('should fail to get domain', () => {
-    const noDomainDoc = {
-      _class: test.class.Class,
-      _id: test.class.NoDomainDoc,
-      _extends: test.class.Class
-    }
     memdb.add(noDomainDoc)
     expect(() => memdb.getDomain(test.class.NoDomainDoc)).toThrowError('no domain found for class: ' + test.class.NoDomainDoc)
   })
@@ -167,12 +175,6 @@ describe('memdb', () => {
   })
 
   it('should make mixin class', () => {
-    const mixableDoc = {
-      _class: test.class.Class,
-      _id: test.class.MixableDoc,
-      _extends: test.class.Class,
-      _attributes: {}
-    }
     memdb.add(mixableDoc)
     memdb.mixin(mixableDoc._id, test.class.MixinDoc as Ref<Mixin<Class<Doc>>>, { mixinAttribute1: 'mixinValue1', _mixinUnderscore: 'mixinUnderscoreValue' })
 
@@ -186,5 +188,9 @@ describe('memdb', () => {
   it("should check 'is' method", () => {
     expect(memdb.is(test.class.ExtendDomainDoc, test.class.Mixin)).toBeFalsy()
     expect(memdb.is(test.class.ExtendDomainDoc, test.class.Class)).toBeTruthy()
+  })
+
+  it('should dump all contents', () => {
+    expect(memdb.dump()).toEqual([metaClass, metaMixin, domainDoc, extendDomainDoc, noDomainDoc, mixinDoc, mixableDoc])
   })
 })
