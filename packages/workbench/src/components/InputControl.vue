@@ -38,7 +38,7 @@ export default defineComponent({
   components: { Icon, CreateForm, CreateMenu, ReferenceInput },
   props: {
   },
-  setup(props, context) {
+  setup (props, context) {
     const coreService = getCoreService()
     const model = coreService.getModel()
 
@@ -49,20 +49,20 @@ export default defineComponent({
     const createItem = ref<WorkbenchCreateItem | null>(null)
 
 
-    function selectItem(item: WorkbenchCreateItem) {
+    function selectItem (item: WorkbenchCreateItem) {
       showMenu.value = false
       createItem.value = item
       component.value = presentationCoreService.getComponentExtension(item.itemClass, presentationCore.class.DetailForm)
     }
 
-    function add() {
+    function add () {
       showMenu.value = !showMenu.value
     }
-    function done() {
+    function done () {
       component.value = ''
     }
 
-    function handleSubmit(value) {
+    function handleSubmit (value) {
       context.emit('message', value)
     }
 
@@ -96,7 +96,7 @@ export default defineComponent({
       <template v-slot:default>
         <CreateMenu :visible="showMenu" @select="selectItem" />
         <a href="#" @click.prevent="add">
-          <Icon :icon="workbench.icon.Add" class="icon-embed-2x" />
+          <Icon :icon="workbench.icon.Add" class="icon-2x" />
         </a>
       </template>
     </ReferenceInput>
