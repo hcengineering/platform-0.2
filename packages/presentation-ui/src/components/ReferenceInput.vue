@@ -43,7 +43,7 @@ import { schema } from '@anticrm/sparkling-rich/src/internal/schema'
 
 import { EditorState, Transaction } from 'prosemirror-state'
 
-function startsWith (str: string | undefined, prefix: string) {
+function startsWith(str: string | undefined, prefix: string) {
   return (str ?? '').startsWith(prefix)
 }
 
@@ -56,7 +56,7 @@ export default defineComponent({
   components: { Icon, EditorContent, Toolbar, ToolbarButton, CompletionPopup },
   props: {
   },
-  setup (props, context) {
+  setup(props, context) {
     const coreService = getCoreService()
     const model = coreService.getModel()
 
@@ -73,14 +73,14 @@ export default defineComponent({
     let completions = ref({ items: [] as CompletionItem[] })
     let completionControl = ref(null)
 
-    function add () {
+    function add() {
       showMenu.value = !showMenu.value
     }
 
-    function done () {
+    function done() {
       component.value = ''
     }
-    function findSpaces (userPrefix: string): Promise<CompletionItem[]> {
+    function findSpaces(userPrefix: string): Promise<CompletionItem[]> {
       return model.find(core.class.Space, {}).then(docs => {
         let items: CompletionItem[] = []
         const all = model.cast(docs, pcore.mixin.UXObject)
@@ -93,7 +93,7 @@ export default defineComponent({
         return items
       })
     }
-    function findUsers (userPrefix: string): Promise<CompletionItem[]> {
+    function findUsers(userPrefix: string): Promise<CompletionItem[]> {
       return coreService.find(contact.mixin.User, {}).then(docs => {
         const all = docs as User[]
         let items: CompletionItem[] = []
@@ -106,7 +106,7 @@ export default defineComponent({
         return items
       })
     }
-    function findPages (userPrefix: string): Promise<CompletionItem[]> {
+    function findPages(userPrefix: string): Promise<CompletionItem[]> {
       return coreService.find(chunter.class.Page, {}).then(docs => {
         const all = docs as Page[]
         let items: CompletionItem[] = []
@@ -120,7 +120,7 @@ export default defineComponent({
       })
     }
 
-    function findUser (title: string): Promise<ItemRefefence[]> {
+    function findUser(title: string): Promise<ItemRefefence[]> {
       return coreService.find(contact.mixin.User, { account: title as StringProperty }).then((docs) => {
         return docs.filter((e) => (e as User).account == title).map((e) => {
           return { id: e._id, class: e._class } as ItemRefefence
@@ -129,7 +129,7 @@ export default defineComponent({
     }
 
 
-    function findPage (title: string): Promise<ItemRefefence[]> {
+    function findPage(title: string): Promise<ItemRefefence[]> {
       return coreService.find(chunter.class.Page, { title: title as StringProperty }).then((docs) => {
         return docs.filter((e) => (e as Page).title == title).map((e) => {
           return { id: e._id, class: e._class } as ItemRefefence
@@ -137,7 +137,7 @@ export default defineComponent({
       })
     }
 
-    function findSpace (title: string): Promise<ItemRefefence[]> {
+    function findSpace(title: string): Promise<ItemRefefence[]> {
       return coreService.find(pcore.mixin.UXObject, { label: title as StringProperty }).then((docs) => {
         return docs.map((e) => {
           return { id: e._id, class: e._class } as ItemRefefence
@@ -145,7 +145,7 @@ export default defineComponent({
       })
     }
 
-    function updateStyle (event: EditorContentEvent) {
+    function updateStyle(event: EditorContentEvent) {
       styleState.value = event
 
       if (event.completionWord.length == 0) {
@@ -184,7 +184,7 @@ export default defineComponent({
         }
       }
     }
-    function handlePopupSelected (value) {
+    function handlePopupSelected(value) {
       let extra = 0
       if (styleState.value.completionEnd != null && styleState.value.completionEnd.endsWith("]]")) {
         extra = styleState.value.completionEnd.length
@@ -195,13 +195,13 @@ export default defineComponent({
         styleState.value.selection.to + extra, schema.marks.reference, { id: value.id, class: value.class })
       htmlEditor.value.focus()
     }
-    function handleSubmit () {
+    function handleSubmit() {
       if (!styleState.value.isEmpty) {
         context.emit('message', htmlValue.value)
       }
       htmlValue.value = ''
     }
-    function onKeyDown (event) {
+    function onKeyDown(event) {
       if (completions.value.items.length > 0) {
         if (event.key === "ArrowUp") {
           completionControl.value.handleUp()
@@ -228,7 +228,7 @@ export default defineComponent({
         event.preventDefault()
       }
     }
-    function transformInjections (state: EditorState): Promise<Transaction> {
+    function transformInjections(state: EditorState): Promise<Transaction> {
       let tr: Transaction = null
 
       let operations: ((Transaction) => Transaction)[] = []
