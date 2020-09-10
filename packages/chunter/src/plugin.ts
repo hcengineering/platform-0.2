@@ -83,6 +83,7 @@ export default async (platform: Platform, deps: { core: CoreService, ui: UIServi
         result += element.text
       }
     }
+    result += '</p>'
     return result
   }
 
