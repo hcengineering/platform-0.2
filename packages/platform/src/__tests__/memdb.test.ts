@@ -241,7 +241,7 @@ describe('memdb', () => {
     expect(loadDomain).toBeInstanceOf(Promise)
 
     return loadDomain.then(docs => { // eslint-disable-line
-      fail('not expected successul loadDomain() call')
+      expect(true).toBe(false)
     }).catch(err => {
       expect(err).toBeInstanceOf(Error)
       expect(err.message).toBe('domain does not match')
