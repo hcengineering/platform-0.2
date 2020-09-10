@@ -25,7 +25,7 @@ const token = ''
 
 function connect () {
   const client: Client = {
-    tenant: 'latest-model'
+    workspace: 'latest-model'
   }
   const token = encode(client, 'secret')
   console.log(token)
