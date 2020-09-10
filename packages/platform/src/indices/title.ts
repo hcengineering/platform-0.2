@@ -1,14 +1,14 @@
 //
 // Copyright © 2020 Anticrm Platform Contributors.
-// 
+//
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
 // obtain a copy of the License at https://www.eclipse.org/legal/epl-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// 
+//
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
@@ -16,17 +16,16 @@
 import { Index } from '../utils'
 import { MemDb, mixinKey } from '../memdb'
 import { generateId } from '../objectid'
-import { core, Doc, CreateTx, VDoc, Ref, Mixin, Class, Obj, ClassifierKind, Classifier, Title } from '../core'
+import { core, Doc, CreateTx, VDoc, Ref, Class, Obj, Classifier, Title } from '../core'
 
 const NULL = '<null>'
 const primaryKey = mixinKey(core.mixin.Indices, 'primary')
 
 export class TitleIndex implements Index {
-
   private modelDb: MemDb
   private primaries = new Map<Ref<Classifier<VDoc>>, string>()
 
-  constructor(modelDb: MemDb) {
+  constructor (modelDb: MemDb) {
     this.modelDb = modelDb
   }
 
@@ -51,8 +50,7 @@ export class TitleIndex implements Index {
 
   onCreate (create: CreateTx): Doc | null {
     const primary = this.getPrimary(create._objectClass)
-    if (!primary)
-      return null
+    if (!primary) { return null }
 
     const title = create._attributes[primary] as string
 
@@ -66,5 +64,4 @@ export class TitleIndex implements Index {
 
     return doc
   }
-
 }
