@@ -15,7 +15,7 @@
 
 import { MongoClient, Db } from 'mongodb'
 
-import { core, Ref, Class, Doc, MemDb, AnyLayout, CoreDomain, CoreProtocol, Tx, TxProcessor, CreateTx } from '@anticrm/platform'
+import { core, Ref, Class, Doc, MemDb, AnyLayout, CoreDomain, CoreProtocol, Tx, TxProcessor, Storage } from '@anticrm/platform'
 
 import WebSocket from 'ws'
 import { makeResponse, Response } from './rpc'
@@ -24,6 +24,7 @@ import { PlatformServer } from './server'
 import { VDocIndex } from '@anticrm/platform/src/indices/vdoc'
 import { TitleIndex } from '@anticrm/platform/src/indices/title'
 import { TextIndex } from '@anticrm/platform/src/indices/text'
+import { TxIndex } from '@anticrm/platform/src/indices/tx'
 
 interface CommitInfo {
   created: Doc[]
@@ -60,29 +61,32 @@ export async function connect (uri: string, dbName: string, ws: WebSocket, serve
     return db.collection(domain).find({ ...q, _class: cls }).toArray()
   }
 
-  class MongoTxProcessor extends TxProcessor {
-    async store (doc: Doc): Promise<void> {
-      const domain = this.modelDb.getDomain(doc._class)
-      return db.collection(domain).insertOne(doc).then(result => { })
-    }
+  const mongoStorage: Storage = {
+    async store (doc: Doc): Promise<any> {
+      const domain = memdb.getDomain(doc._class)
+      return db.collection(domain).insertOne(doc)
+    },
 
-    async push (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: any): Promise<void> {
-      const domain = this.modelDb.getDomain(_class)
-      return db.collection(domain).updateOne({ _id }, { $push: { [attribute]: attributes } }).then(result => { })
-    }
+    async push (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: any): Promise<any> {
+      const domain = memdb.getDomain(_class)
+      return db.collection(domain).updateOne({ _id }, { $push: { [attribute]: attributes } })
+    },
 
-    async update (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attributes: any): Promise<void> {
-      const domain = this.modelDb.getDomain(_class)
-      return db.collection(domain).updateOne({ _id }, attributes).then(result => { })
-    }
+    async update (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attributes: any): Promise<any> {
+      const domain = memdb.getDomain(_class)
+      return db.collection(domain).updateOne({ _id }, attributes)
+    },
 
-    async remove (_class: Ref<Class<Doc>>, doc: Ref<Doc>): Promise<void> {
+    async remove (_class: Ref<Class<Doc>>, doc: Ref<Doc>): Promise<any> {
       throw new Error('Not implemented')
     }
   }
 
-  const txProcessor = new MongoTxProcessor(memdb, [
-    new VDocIndex(memdb), new TitleIndex(memdb), new TextIndex(memdb),
+  const txProcessor = new TxProcessor(memdb, [
+    new VDocIndex(memdb, mongoStorage),
+    new TitleIndex(memdb, mongoStorage),
+    new TextIndex(memdb, mongoStorage),
+    new TxIndex(memdb, mongoStorage),
   ])
 
   const clientControl = {

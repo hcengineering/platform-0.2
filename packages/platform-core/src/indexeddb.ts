@@ -13,15 +13,15 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Class, Doc, Ref, Tx, TxProcessor, MemDb, Title, Index } from '@anticrm/platform'
+import { AnyLayout, Class, Doc, Ref, Tx, TxProcessor, MemDb, Title, Storage } from '@anticrm/platform'
 
 import { openDB } from 'idb'
 import { ModelDb } from './modeldb'
-import core from '.'
 import { Graph } from './graph'
 
 import { VDocIndex } from '@anticrm/platform/src/indices/vdoc'
 import { TitleIndex } from '@anticrm/platform/src/indices/title'
+import { TxIndex } from '@anticrm/platform/src/indices/tx'
 
 export interface CacheControl {
   cache (docs: Doc[]): Promise<void>
@@ -76,37 +76,18 @@ export async function createCache (dbname: string, modelDb: ModelDb, graph: Grap
     return tx.done
   }
 
-
-  class CacheTxProcessor extends TxProcessor {
-
-    private graph: Graph
-
-    constructor(modelDb: MemDb, indices: Index[], graph: Graph) {
-      super(modelDb, indices)
-      this.graph = graph
-    }
-
+  const cacheStorage: Storage = {
     async store (doc: Doc): Promise<void> {
-      if (doc._class === core.class.Title) {
-        const title = doc as Title
-        console.log('got title, forward to graph')
-        this.graph.add({
-          _class: title._objectClass,
-          _id: title._id,
-          title: title.title
-        })
-        return
-      }
       return store([doc])
-    }
+    },
 
     async push (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: any): Promise<void> {
       console.log('cache push')
-    }
+    },
 
     async update (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attributes: any): Promise<void> {
       console.log('cache update')
-    }
+    },
 
     async remove (_class: Ref<Class<Doc>>, doc: Ref<Doc>): Promise<void> {
       const domain = modelDb.getDomain(_class)
@@ -115,10 +96,13 @@ export async function createCache (dbname: string, modelDb: ModelDb, graph: Grap
       store.delete(doc)
       return tx.done
     }
-
   }
 
-  const txProcessor = new CacheTxProcessor(modelDb, [new VDocIndex(modelDb), new TitleIndex(modelDb)], graph)
+  const txProcessor = new TxProcessor(modelDb, [
+    new VDocIndex(modelDb, cacheStorage),
+    new TitleIndex(modelDb, graph),
+    new TxIndex(modelDb, cacheStorage),
+  ])
 
   async function find (classOrMixin: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc[]> { // eslint-disable-line
     const result = [] as Doc[]

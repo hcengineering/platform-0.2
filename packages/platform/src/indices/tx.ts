@@ -15,9 +15,9 @@
 
 import { Index, Storage } from '../utils'
 import { MemDb } from '../memdb'
-import { Doc, CreateTx, VDoc, Ref, Mixin, Class, Obj, ClassifierKind, PushTx } from '../core'
+import { CreateTx, PushTx } from '../core'
 
-export class VDocIndex implements Index {
+export class TxIndex implements Index {
   private modelDb: MemDb
   private storage: Storage
 
@@ -27,33 +27,10 @@ export class VDocIndex implements Index {
   }
 
   onCreate (create: CreateTx): Promise<any> {
-    const doc: VDoc = {
-      _space: create._space,
-      _class: create._objectClass,
-      _id: create._objectId,
-      _createdBy: create._user,
-      _createdOn: create._date,
-      ...create._attributes
-    }
-    let _class = create._objectClass
-    while (true) {
-      const clazz = this.modelDb.get(_class) as Class<Obj>
-      if (clazz._kind === ClassifierKind.MIXIN) {
-        if (doc._mixins) {
-          doc._mixins.push(_class as Ref<Mixin<Doc>>)
-        } else {
-          doc._mixins = [_class as Ref<Mixin<Doc>>]
-        }
-        _class = clazz._extends as Ref<Class<VDoc>>
-      } else {
-        doc._class = _class
-        break
-      }
-    }
-    return this.storage.store(doc)
+    return this.storage.store(create)
   }
 
   onPush (tx: PushTx): Promise<any> {
-    return this.storage.push(tx._objectClass, tx._objectId, tx._attribute, tx._attributes)
+    return this.storage.store(tx)
   }
 }
