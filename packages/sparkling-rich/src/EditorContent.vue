@@ -14,7 +14,14 @@
 -->
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, ref, watch, PropType } from 'vue'
+import {
+  computed,
+  defineComponent,
+  onMounted,
+  ref,
+  watch,
+  PropType,
+} from 'vue'
 
 import { DOMParser, Fragment, Slice, Mark, MarkType } from 'prosemirror-model'
 
@@ -31,27 +38,29 @@ import { buildInputRules } from './internal/input_rules'
 import { Commands } from './internal/commands'
 import { EditorContentEvent } from './index'
 
-const mac = typeof navigator != "undefined" ? /Mac/.test(navigator.platform) : false
+const mac =
+  typeof navigator != 'undefined' ? /Mac/.test(navigator.platform) : false
 
 export default defineComponent({
   components: {},
   props: {
-    content: String,  // HTML content.
+    content: String, // HTML content.
     hoverMessage: {
       type: String,
-      default: "Placeholder...",
+      default: 'Placeholder...',
     },
     triggers: {
       type: Array as PropType<Array<String>>, // A set of completion separators
       default: "",
     },
-    transformInjections: { // A function to match and replace trigger with marker
+    transformInjections: {
+      // A function to match and replace trigger with marker
       type: Function, // transformInjections(state: EditorState): Transaction
       default: null,
-    }
+    },
   },
   model: {
-    'props': "content",
+    props: 'content',
   },
   setup(props, context) {
     const root = ref(null)
@@ -62,21 +71,25 @@ export default defineComponent({
     const element = parser.parseFromString(props.content, 'text/html').body
 
     function checkEmpty(value: string): boolean {
-      return value.length === 0 || value === "<p><br></p>" || value === "<p></p>"
+      return (
+        value.length === 0 || value === '<p><br></p>' || value === '<p></p>'
+      )
     }
 
     let isEmpty = computed(() => {
       return checkEmpty(props.content)
     })
 
-    function findCompletion(sel): { completionWord: string, completionEnd: string } {
+    function findCompletion(
+      sel
+    ): { completionWord: string; completionEnd: string } {
       var completionWord = ''
       var completionEnd = ''
       if (sel.$from.nodeBefore != null) {
         let val = sel.$from.nodeBefore.textContent
         let p = -1
         for (p = val.length - 1; p >= 0; p--) {
-          if (val[p] === ' ' || val[p] === '\n') {
+          if (val[p] === ' ' || val[p] === "\n") {
             //Stop on WS
             break
           }
@@ -103,11 +116,7 @@ export default defineComponent({
     let state = EditorState.create({
       schema,
       doc: DOMParser.fromSchema(schema).parse(element),
-      plugins: [
-        history(),
-        buildInputRules(),
-        keymap(buildKeymap()),
-      ]
+      plugins: [history(), buildInputRules(), keymap(buildKeymap())],
     })
     let emitStyleEvent = function () {
       let sel = view.state.selection
@@ -117,7 +126,7 @@ export default defineComponent({
       // The box in which the tooltip is positioned, to use as base
 
       let innerDOMValue = view.dom.innerHTML
-      context.emit("update:content", innerDOMValue)
+      context.emit('update:content', innerDOMValue)
 
       // Check types
       let marks = view.state.storedMarks || view.state.selection.$from.marks()
@@ -129,16 +138,25 @@ export default defineComponent({
 
       let evt = {
         isEmpty: checkEmpty(innerDOMValue),
-        bold: isBold, isBoldEnabled: Commands.toggleStrong(view.state, null),
-        italic: isItalic, isItalicEnabled: Commands.toggleItalic(view.state, null),
-        strike: isStrike, isStrikeEnabled: Commands.toggleStrike(view.state, null),
-        underline: isUnderline, isUnderlineEnabled: Commands.toggleUnderline(view.state, null),
-        cursor: { left: cursor.left, top: cursor.top, bottom: cursor.bottom, right: cursor.right },
+        bold: isBold,
+        isBoldEnabled: Commands.toggleStrong(view.state, null),
+        italic: isItalic,
+        isItalicEnabled: Commands.toggleItalic(view.state, null),
+        strike: isStrike,
+        isStrikeEnabled: Commands.toggleStrike(view.state, null),
+        underline: isUnderline,
+        isUnderlineEnabled: Commands.toggleUnderline(view.state, null),
+        cursor: {
+          left: cursor.left,
+          top: cursor.top,
+          bottom: cursor.bottom,
+          right: cursor.right,
+        },
         completionWord,
         completionEnd,
-        selection: { from: sel.from, to: sel.to }
+        selection: { from: sel.from, to: sel.to },
       } as EditorContentEvent
-      context.emit("styleEvent", evt)
+      context.emit('styleEvent', evt)
     }
     let view = new EditorView(editRoot, {
       state,
@@ -162,27 +180,32 @@ export default defineComponent({
         view.updateState(newState)
 
         emitStyleEvent()
-      }
+      },
     })
 
     onMounted(() => {
       root.value.appendChild(editRoot)
     })
-    watch(() => props.content, content => {
-      if (content != view.dom.innerHTML) {
+    watch(
+      () => props.content,
+      (content) => {
+        if (content != view.dom.innerHTML) {
+          const parser = new window.DOMParser()
+          const element = parser.parseFromString(props.content, 'text/html')
+            .body
+          let newDoc = DOMParser.fromSchema(schema).parse(element)
 
-        const parser = new window.DOMParser()
-        const element = parser.parseFromString(props.content, 'text/html').body
-        let newDoc = DOMParser.fromSchema(schema).parse(element)
+          let op = state.tr
+            .setSelection(new AllSelection(state.doc))
+            .replaceSelectionWith(newDoc)
+          let newState = state.apply(op)
 
-        let op = state.tr.setSelection(new AllSelection(state.doc)).replaceSelectionWith(newDoc)
-        let newState = state.apply(op)
+          view.updateState(newState)
 
-        view.updateState(newState)
-
-        view.focus()
+          view.focus()
+        }
       }
-    })
+    )
 
     function insert(text: string, from: number, to: number) {
       const t = view.state.tr.insertText(text, from, to)
@@ -190,11 +213,19 @@ export default defineComponent({
       view.updateState(st)
       emitStyleEvent()
     }
-    function insertMark(text: string, from: number, to: number, mark: MarkType, attrs?: { [key: string]: any }) {
+    function insertMark(
+      text: string,
+      from: number,
+      to: number,
+      mark: MarkType,
+      attrs?: { [key: string]: any }
+    ) {
       // Ignore white spaces on end of text
       let markLen = text.trim().length
 
-      const t = view.state.tr.insertText(text, from, to).addMark(from, from + markLen, mark.create(attrs))
+      const t = view.state.tr
+        .insertText(text, from, to)
+        .addMark(from, from + markLen, mark.create(attrs))
       const st = view.state.apply(t)
       view.updateState(st)
       emitStyleEvent()
@@ -202,7 +233,6 @@ export default defineComponent({
     return {
       root,
       view,
-      isEmpty,
       // Some operations
       toggleBold() {
         Commands.toggleStrong(view.state, view.dispatch)
@@ -258,6 +288,8 @@ export default defineComponent({
     color: #aaaaaa;
   }
   .edit-box {
+    overflow: scroll;
+    height: 100%;
     width: 100%;
     div {
       outline: none;
