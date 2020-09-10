@@ -21,6 +21,9 @@ import WebSocket from 'ws'
 import { makeResponse, Response } from './rpc'
 import { PlatformServer } from './server'
 
+import { VDocIndex } from '@anticrm/platform/src/indices/vdoc'
+import { TitleIndex } from '@anticrm/platform/src/indices/title'
+
 interface CommitInfo {
   created: Doc[]
 }
@@ -77,7 +80,7 @@ export async function connect (uri: string, dbName: string, ws: WebSocket, serve
     }
   }
 
-  const txProcessor = new MongoTxProcessor(memdb)
+  const txProcessor = new MongoTxProcessor(memdb, [new VDocIndex(memdb), new TitleIndex(memdb)])
 
   const clientControl = {
 
