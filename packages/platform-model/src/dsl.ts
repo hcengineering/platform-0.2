@@ -14,10 +14,10 @@
 //
 
 import 'reflect-metadata'
-import { Ref, Class, Obj, Mixin, ClassifierKind, Classifier, Attribute, Type, Emb, Doc, Property, mixinKey } from '@anticrm/platform'
+import { Ref, Class, Obj, Mixin, ClassifierKind, Classifier, Attribute, Type, Emb, Text, Property, mixinKey } from '@anticrm/platform'
 import core from '.'
 
-const classifierMetadataKey = Symbol("anticrm:classifier");
+const classifierMetadataKey = Symbol("anticrm:classifier")
 
 export function getClassifier (target: any): Classifier<Obj> {
   let classifier = Reflect.getOwnMetadata(classifierMetadataKey, target) as Classifier<Obj>
@@ -81,6 +81,15 @@ export function Prop () {
   return function (target: any, propertyKey: string): void {
     const attribute = getAttribute(target, propertyKey)
     const type = { _class: core.class.Type } as unknown as Type
+    attribute.type = type
+  }
+}
+
+export function Text () {
+
+  return function (target: any, propertyKey: string): void {
+    const attribute = getAttribute(target, propertyKey)
+    const type = { _class: core.class.Text } as unknown as Text
     attribute.type = type
   }
 }

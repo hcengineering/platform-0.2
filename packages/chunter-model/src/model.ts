@@ -15,7 +15,7 @@
 
 import { Ref, Class } from '@anticrm/platform'
 
-import core, { Builder, ModelClass, Primary, Prop } from '@anticrm/platform-model'
+import core, { Builder, ModelClass, Primary, Prop, Text } from '@anticrm/platform-model'
 import { UX } from '@anticrm/presentation-model'
 
 import workbench from '@anticrm/workbench-model'
@@ -39,7 +39,7 @@ class TCollab extends TVDoc implements Collab {
 @ModelClass(chunter.class.Message, chunter.class.Collab, ChunterDomain.Chunter)
 @UX('Сообщение' as IntlString)
 class TMessage extends TVDoc implements Message {
-  @Prop() @UX('Сообщение' as IntlString, chunter.icon.Chunter) message!: string
+  @Text() @UX('Сообщение' as IntlString, chunter.icon.Chunter) message!: string
 }
 
 @ModelClass(chunter.class.Page, chunter.class.Collab, ChunterDomain.Chunter)
