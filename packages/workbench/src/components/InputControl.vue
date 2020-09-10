@@ -95,7 +95,7 @@ export default defineComponent({
       </template>
       <template v-slot:default>
         <CreateMenu :visible="showMenu" @select="selectItem" />
-        <a href="#" @click.prevent="add">
+        <a class='add-button' href="#" @click.prevent="add">
           <Icon :icon="workbench.icon.Add" class="icon-2x" />
         </a>
       </template>
@@ -108,5 +108,8 @@ export default defineComponent({
 
 .workbench-input-control {
   width: 100%;
+  .add-button {
+    display: flex;
+  }
 }
 </style>
