@@ -14,8 +14,17 @@
 -->
 
 <script lang="ts">
-import { computed, defineComponent, PropType, ref, watch } from 'vue'
-import { Ref, Doc, Space, CreateTx, generateId, VDoc, Class, Property } from '@anticrm/platform'
+import { computed, defineComponent, PropType, ref, watch } from "vue"
+import {
+  Ref,
+  Doc,
+  Space,
+  CreateTx,
+  generateId,
+  VDoc,
+  Class,
+  Property,
+} from '@anticrm/platform'
 
 import { getCoreService, getUIService } from '../utils'
 import workbench, { Application } from '../..'
@@ -34,10 +43,10 @@ export default defineComponent({
   props: {
     location: {
       type: Object as PropType<Location>,
-      required: true
-    }
+      required: true,
+    },
   },
-  setup (props) {
+  setup(props) {
     const coreService = getCoreService()
     const model = coreService.getModel()
     const chunterService = getChunterService()
@@ -45,8 +54,12 @@ export default defineComponent({
     const app = computed(() => props.location.path[0])
     const project = computed(() => props.location.path[1])
 
-    const type = ref('')
-    const component = computed(() => type.value ? presentationUI.component.BrowseView : chunter.component.ChunterView)
+    const type = ref("")
+    const component = computed(() =>
+      type.value
+        ? presentationUI.component.BrowseView
+        : chunter.component.ChunterView
+    )
 
     // watch(() => props.location, location => {
     //   const space = model.get(location.path[1] as Ref<Space>)
@@ -55,31 +68,37 @@ export default defineComponent({
     // }, { immediate: true })
 
     const uiService = getUIService()
-    function navigate (project: Ref<Doc>) {
-      uiService.navigate(uiService.toUrl({ app: undefined, path: [app.value, project] }))
+    function navigate(project: Ref<Doc>) {
+      uiService.navigate(
+        uiService.toUrl({ app: undefined, path: [app.value, project] })
+      )
     }
 
-    const details = ref<{ _id: Ref<VDoc>, _class: Ref<Class<VDoc>> } | null>(null)
+    const details = ref<{ _id: Ref<VDoc>; _class: Ref<Class<VDoc>> } | null>(
+      null
+    )
 
-    function open (object: { _id: Ref<VDoc>, _class: Ref<Class<VDoc>> }) {
-      console.log('open', object)
+    function open(object: { _id: Ref<VDoc>; _class: Ref<Class<VDoc>> }) {
+      console.log("open", object)
       details.value = object
     }
 
-    function done () {
+    function done() {
       details.value = null
     }
 
-    function message (msg: string) {
+    function message(msg: string) {
       console.log(msg)
       const newMessage = chunterService.createMissedObjects(msg)
-      coreService.createVDoc(chunter.class.Message, { message: newMessage as Property<string, string>, comments: [] })
+      coreService.createVDoc(chunter.class.Message, {
+        message: newMessage as Property<string, string>,
+        comments: [],
+      })
     }
 
     return { project, component, navigate, type, details, open, done, message }
-  }
-
-})
+  },
+});
 </script>
 
 <template>
@@ -88,7 +107,9 @@ export default defineComponent({
       <Projects @navigate="navigate" :space="project" v-model:type="type" />
     </div>
     <div class="main">
-      <widget :_class="type" :space="space" :component="component" @open="open" />
+      <div class="main-content">
+        <widget :_class="type" :space="space" :component="component" @open="open" />
+      </div>
       <div class="input-control">
         <InputControl @message="message" />
       </div>
@@ -119,8 +140,13 @@ export default defineComponent({
     display: flex;
     flex-direction: column;
 
+    .main-content {
+      flex-grow: 2;
+    }
+
     .input-control {
       padding: 1em;
+      max-height: 400px;
     }
   }
 
