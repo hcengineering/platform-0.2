@@ -22,7 +22,7 @@ import workbench from '@anticrm/workbench-model'
 import { Property, StringProperty, THIS, GET, EasyScript } from '@anticrm/platform'
 import contact from '@anticrm/contact-model'
 import { Person } from '@anticrm/contact'
-import { Message, Page, Comment } from '@anticrm/chunter'
+import { Message, Page, Comment, Collab } from '@anticrm/chunter'
 
 import chunter, { ChunterDomain } from '.'
 import { IntlString } from '@anticrm/platform-i18n'
@@ -30,14 +30,19 @@ import presentation from '@anticrm/presentation-core'
 
 import { TVDoc } from '@anticrm/platform-model/src/model'
 
-@ModelClass(chunter.class.Message, core.class.VDoc, ChunterDomain.Chunter)
-@UX('Сообщение' as IntlString)
-class TMessage extends TVDoc implements Message {
-  @Prop() @UX('Сообщение' as IntlString, chunter.icon.Chunter) message!: string
+@ModelClass(chunter.class.Collab, core.class.VDoc)
+@UX('Collaboration' as IntlString)
+class TCollab extends TVDoc implements Collab {
   @Prop() @UX('Комментарии' as IntlString, chunter.icon.Chunter) comments?: Comment[]
 }
 
-@ModelClass(chunter.class.Page, chunter.class.Message)
+@ModelClass(chunter.class.Message, chunter.class.Collab, ChunterDomain.Chunter)
+@UX('Сообщение' as IntlString)
+class TMessage extends TVDoc implements Message {
+  @Prop() @UX('Сообщение' as IntlString, chunter.icon.Chunter) message!: string
+}
+
+@ModelClass(chunter.class.Page, chunter.class.Collab, ChunterDomain.Chunter)
 @UX('Страница' as IntlString)
 class TPage extends TMessage implements Page {
   @Prop() @UX('Название' as IntlString, chunter.icon.Chunter) @Primary() title!: string
@@ -45,7 +50,7 @@ class TPage extends TMessage implements Page {
 
 export default (S: Builder) => {
 
-  S.add(TMessage, TPage)
+  S.add(TCollab, TMessage, TPage)
 
   S.createDocument(workbench.class.Application, {
     label: 'Chunter' as StringProperty,

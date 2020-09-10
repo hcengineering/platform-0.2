@@ -99,7 +99,6 @@ export default async (platform: Platform, deps: { core: CoreService, ui: UIServi
           const id = coreService.generateId() as Ref<Page>
           coreService.createVDoc(chunter.class.Page, {
             title,
-            message: '',
             comments: []
           }, id)
           link._id = id
