@@ -254,21 +254,6 @@ describe('memdb', () => {
     })
   })
 
-  it('should load model', () => {
-    const doc1 = memdb.createDocument(test.class.DomainDoc, {})
-    const doc2 = memdb.createDocument(test.class.DomainDoc, {})
-    const doc3 = memdb.createDocument(test.class.DomainDoc, {})
-
-    memdb.loadModel([doc1, doc2, doc3])
-    expect(memdb.get(doc1._id)).toBe(doc1)
-    expect(memdb.get(doc2._id)).toBe(doc2)
-    expect(memdb.get(doc3._id)).toBe(doc3)
-  })
-
-  it('should fail to create transaction', () => {
-    expect(() => memdb.tx()).toThrowError('memdb is read only')
-  })
-
   it('should find all classes', () => {
     return memdb.find(test.class.Class, {}).then(docs => {
       expect(docs).toEqual(expectedMemdbContents)
@@ -314,5 +299,20 @@ describe('memdb', () => {
       expect(docs.length).toBe(3)
       expect(docs).toEqual([domainDoc, mixinDoc, mixinDoc2])
     })
+  })
+
+  it('should load model', () => {
+    const doc1 = memdb.createDocument(test.class.DomainDoc, {})
+    const doc2 = memdb.createDocument(test.class.DomainDoc, {})
+    const doc3 = memdb.createDocument(test.class.DomainDoc, {})
+
+    memdb.loadModel([doc1, doc2, doc3])
+    expect(memdb.get(doc1._id)).toBe(doc1)
+    expect(memdb.get(doc2._id)).toBe(doc2)
+    expect(memdb.get(doc3._id)).toBe(doc3)
+  })
+
+  it('should fail to create transaction', () => {
+    expect(() => memdb.tx()).toThrowError('memdb is read only')
   })
 })
