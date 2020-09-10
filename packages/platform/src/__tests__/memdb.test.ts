@@ -119,4 +119,14 @@ describe('memdb', () => {
     const assignValue = { badAttribute: 'badValue' as Resource<string> }
     expect(() => memdb.assign(layout, extendDomainDoc._id, assignValue)).toThrowError('attribute not found: badAttribute')
   })
+
+  it('should create document', () => {
+    const doc: Doc = memdb.createDocument(test.class.Doc1, { attribute1: 'value1', _underscore: 'underscoreValue' })
+    expect(doc._class).toBe(test.class.Doc1)
+    expect(doc._id).not.toBeNull()
+    expect(doc._id.length).toBeGreaterThan(0)
+    expect(doc._mixins).toBeUndefined()
+    expect(doc._underscore).toBe('underscoreValue')
+    expect(doc.attribute1).toBe('value1')
+  })
 })
