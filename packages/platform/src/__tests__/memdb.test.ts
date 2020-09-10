@@ -253,4 +253,8 @@ describe('memdb', () => {
     expect(memdb.get(doc2._id)).toBe(doc2)
     expect(memdb.get(doc3._id)).toBe(doc3)
   })
+
+  it('should fail to create transaction', () => {
+    expect(() => memdb.tx()).toThrowError('memdb is read only')
+  })
 })
