@@ -212,4 +212,15 @@ describe('memdb', () => {
       expect(docs).toEqual([metaClass, metaMixin, domainDoc, extendDomainDoc, noDomainDoc, mixinDoc, mixableDoc])
     })
   })
+
+  it('should load model', () => {
+    const doc1 = memdb.createDocument(test.class.DomainDoc, {})
+    const doc2 = memdb.createDocument(test.class.DomainDoc, {})
+    const doc3 = memdb.createDocument(test.class.DomainDoc, {})
+
+    memdb.loadModel([doc1, doc2, doc3])
+    expect(memdb.get(doc1._id)).toBe(doc1)
+    expect(memdb.get(doc2._id)).toBe(doc2)
+    expect(memdb.get(doc3._id)).toBe(doc3)
+  })
 })
