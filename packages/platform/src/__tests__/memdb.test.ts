@@ -30,7 +30,8 @@ describe('memdb', () => {
       ExtendDomainDoc: '' as Ref<Class<Doc>>,
       NoDomainDoc: '' as Ref<Class<Doc>>,
       MixableDoc: '' as Ref<Class<Doc>>,
-      MixinDoc: '' as Ref<Mixin<Doc>>
+      MixinDoc: '' as Ref<Mixin<Doc>>,
+      MixinDoc2: '' as Ref<Mixin<Doc>>
     }
   })
 
@@ -74,7 +75,17 @@ describe('memdb', () => {
     _id: test.class.MixinDoc,
     _extends: test.class.Mixin,
     _domain: domainName,
+    _kind: ClassifierKind.MIXIN,
     _attributes: { mixinAttribute1: '' }
+  }
+
+  const mixinDoc2 = {
+    _class: test.class.Class,
+    _id: test.class.MixinDoc2,
+    _extends: test.class.Mixin,
+    _domain: domainName,
+    _kind: ClassifierKind.MIXIN,
+    _attributes: { mixinAttribute1: '' } // the same attribute as in mixinDoc!
   }
 
   const mixableDoc = {
@@ -83,6 +94,8 @@ describe('memdb', () => {
     _extends: test.class.Class,
     _attributes: {}
   }
+
+  const expectedMemdbContents = [metaClass, metaMixin, domainDoc, extendDomainDoc, noDomainDoc, mixinDoc, mixableDoc, mixinDoc2]
 
   it('should add and get object', () => {
     memdb.add(metaClass)
@@ -174,7 +187,7 @@ describe('memdb', () => {
     expect(doc.attribute1).toBe('value1')
     expect(doc.attribute2).toBe('value2')
     expect(doc._mixinUnderscore).toBe('mixinUnderscoreValue')
-    expect(doc.mixinAttribute1).toBe('mixinValue1')
+    expect(doc['mixinAttribute1|class:test~MixinDoc']).toBe('mixinValue1')
   })
 
   it('should make mixin class', () => {
@@ -185,7 +198,22 @@ describe('memdb', () => {
     expect(mixableDoc._mixins.length).toBe(1)
     expect(mixableDoc._mixins[0]).toBe(test.class.MixinDoc)
     expect(mixableDoc._mixinUnderscore).toBe('mixinUnderscoreValue')
-    expect(mixableDoc.mixinAttribute1).toBe('mixinValue1')
+    expect(mixableDoc['mixinAttribute1|class:test~MixinDoc']).toBe('mixinValue1')
+  })
+
+  it('should make double mixin', () => {
+    memdb.add(mixinDoc2)
+
+    const doc: Doc = memdb.createDocument(test.class.DomainDoc, {})
+    memdb.mixinDocument(doc, test.class.MixinDoc, { mixinAttribute1: 'mixinValue1', _mixinUnderscore: 'mixinUnderscoreValue' })
+    memdb.mixinDocument(doc, test.class.MixinDoc2, { mixinAttribute1: 'mixinValue2' })
+
+    expect(doc._mixins?.length).toBe(2)
+    expect(doc._mixins[0]).toBe(test.class.MixinDoc)
+    expect(doc._mixins[1]).toBe(test.class.MixinDoc2)
+    expect(doc._mixinUnderscore).toBe('mixinUnderscoreValue')
+    expect(doc['mixinAttribute1|class:test~MixinDoc']).toBe('mixinValue1')
+    expect(doc['mixinAttribute1|class:test~MixinDoc2']).toBe('mixinValue2')
   })
 
   it("should check 'is' method", () => {
@@ -194,7 +222,7 @@ describe('memdb', () => {
   })
 
   it('should dump all contents', () => {
-    expect(memdb.dump()).toEqual([metaClass, metaMixin, domainDoc, extendDomainDoc, noDomainDoc, mixinDoc, mixableDoc])
+    expect(memdb.dump()).toEqual(expectedMemdbContents)
   })
 
   it('should fail to load domain', () => {
@@ -211,7 +239,7 @@ describe('memdb', () => {
 
   it('should load domain', () => {
     return memdb.loadDomain(domainName).then(docs => {
-      expect(docs).toEqual([metaClass, metaMixin, domainDoc, extendDomainDoc, noDomainDoc, mixinDoc, mixableDoc])
+      expect(docs).toEqual(expectedMemdbContents)
     })
   })
 
