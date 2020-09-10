@@ -13,6 +13,8 @@
 // limitations under the License.
 //
 
+/* eslint-env jest */
+
 import { MemDb, Plugin, Service, Ref, Class, Mixin, Resource, identify } from '..'
 import { Doc, ClassifierKind } from '../core'
 
