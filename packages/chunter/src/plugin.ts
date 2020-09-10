@@ -45,6 +45,7 @@ export default async (platform: Platform, deps: { core: CoreService, ui: UIServi
   platform.setResource(chunter.component.PageProperties, PageProperties)
 
   function parseXMLMessage (message: string): MessageElement[] {
+    console.log('parseXML:', message)
     const result = []
     const parser = new DOMParser()
     const root = parser.parseFromString(message, 'text/xml')
@@ -85,7 +86,7 @@ export default async (platform: Platform, deps: { core: CoreService, ui: UIServi
       }
     }
     // result += '</p>'
-    console.log('RESULT', result)
+    console.log('toMessage:', result)
     return result
   }
 
@@ -96,18 +97,18 @@ export default async (platform: Platform, deps: { core: CoreService, ui: UIServi
     for (const element of elements) {
       if (element.kind === MessageElementKind.LINK) {
         const link = element as MessageLink
+        const title = link.text.substring(2, link.text.length - 2)
+        link.text = title
         if (link._id == undefined) {
-          const title = link.text.substring(2, link.text.length - 2)
           const id = coreService.generateId() as Ref<Page>
           coreService.createVDoc(chunter.class.Page, {
             title,
             comments: []
           }, id)
-          link.text = title
           link._id = id
           link._class = chunter.class.Page
-          referenced.push(link)
         }
+        referenced.push(link)
       } else {
         referenced.push(element)
       }

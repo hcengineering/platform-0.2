@@ -13,57 +13,49 @@
 // limitations under the License.
 //
 
-import { Ref, Classifier, Doc, Class, Title, Storage, Backlinks } from '@anticrm/platform'
+import { Ref, Classifier, Doc, Class, Title, Storage } from '@anticrm/platform'
 import core from '.'
 
-interface Node {
-  _class: Ref<Class<Doc>>
-  links: Link[]
-}
-
-interface Link {
+export interface Node {
   _class: Ref<Classifier<Doc>>
   _id: Ref<Doc>
+  title: string | number
 }
 
-function hasLink (node: Node, _id: Ref<Doc>): boolean {
-  for (const link of node.links) {
-    if (link._id === _id) { return true }
-  }
-  return false
-}
-
-export class Graph implements Storage {
+export class Titles implements Storage {
 
   private graph = new Map<Ref<Doc>, Node>()
 
-  find (_id: Ref<Doc>) {
-    return this.graph.get(_id)
+  // load (nodes: Node[]) {
+  //   for (const node of nodes) {
+  //     this.graph.set(node._id, node)
+  //   }
+  // }
+
+  // add (node: Node) {
+  //   this.graph.set(node._id, node)
+  // }
+
+  find (prefix: string): Node[] {
+    const result = []
+    for (const node of this.graph.values()) {
+      if (typeof node.title === 'string' && node.title.startsWith(prefix))
+        result.push(node)
+    }
+    return result
   }
 
   async store (doc: Doc): Promise<void> {
-    if (doc._class !== core.class.Backlinks) {
-      throw new Error('assert doc._class !== core.class.Backlinks')
+    if (doc._class !== core.class.Title) {
+      throw new Error('assert doc._class !== core.class.Title')
     }
 
-    const backlinks = doc as Backlinks
-
-    for (const backlink of backlinks.backlinks) {
-      let node = this.graph.get(backlink._backlinkId)
-      if (!node) {
-        node = {
-          _class: backlink._backlinkClass,
-          links: []
-        }
-        this.graph.set(backlink._backlinkId, node)
-      }
-      if (!hasLink(node, backlinks._objectId)) {
-        node.links.push({
-          _class: backlinks._objectClass,
-          _id: backlinks._objectId
-        })
-      }
-    }
+    const title = doc as Title
+    this.graph.set(title._objectId, {
+      _class: title._objectClass,
+      _id: title._objectId,
+      title: title.title
+    })
   }
 
   async push (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: any): Promise<void> {

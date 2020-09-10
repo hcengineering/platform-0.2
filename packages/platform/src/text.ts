@@ -118,34 +118,11 @@ export function parseMessage (message: string): MessageElement[] {
     }
     ++pos
   }
+  if (text.length > 0) {
+    result.push({
+      kind: MessageElementKind.TEXT,
+      text
+    } as MessageText)
+  }
   return result
 }
-
-// export function parseXML (message: string): MessageElement[] {
-//   const result = []
-//   const parser = new DOMParser()
-//   const root = parser.parseFromString(message, 'text/xml')
-//   const children = root.childNodes[0].childNodes
-//   for (let i = 0; i < children.length; i++) {
-//     const node = children[i]
-//     console.log(node)
-//     if (node.nodeType === Node.TEXT_NODE) {
-//       result.push({
-//         kind: MessageElementKind.TEXT,
-//         text: node.nodeValue
-//       } as MessageText)
-//     } else if (node.nodeType === Node.ELEMENT_NODE) {
-//       const attrs = (node as Element).attributes
-//       const _class = attrs.getNamedItem('class')?.nodeValue
-//       const _id = attrs.getNamedItem('id')?.nodeValue
-//       const text = node.childNodes[0].nodeValue
-//       result.push({
-//         kind: MessageElementKind.LINK,
-//         text,
-//         _id,
-//         _class
-//       } as MessageLink)
-//     }
-//   }
-//   return result
-// }

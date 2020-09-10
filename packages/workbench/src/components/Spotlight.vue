@@ -26,14 +26,14 @@ export default defineComponent({
   },
   setup (props) {
     const coreService = getCoreService()
-    const graph = coreService.getGraph()
+    const titles = coreService.getTitles()
 
     const visible = ref(false)
     const results = ref([])
     const query = ref('')
 
     watch(() => query.value, query => {
-      results.value = graph.find(query)
+      results.value = titles.find(query)
     })
 
     function keydown (ev: KeyboardEvent) {
