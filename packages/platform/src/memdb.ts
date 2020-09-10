@@ -192,10 +192,8 @@ export class MemDb {
 
   loadModel (model: Doc[]) {
     for (const doc of model) {
-      this.set(doc)
+      this.add(doc)
     }
-    // if (this.byClass === null) { this.byClass = new Map<Ref<ClassLayout>, Doc[]>() }
-    // for (const doc of model) { this.index(doc) }
   }
 
   // Q U E R Y
