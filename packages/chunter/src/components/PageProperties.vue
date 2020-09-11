@@ -19,7 +19,7 @@ import { defineComponent, PropType, ref } from 'vue'
 import { Class, Ref, VDoc } from '@anticrm/platform'
 
 import { getPresentationUI } from '@anticrm/presentation-ui/src/utils'
-import { getPresentationCore } from '../utils'
+import { getCoreService, getPresentationCore } from '../utils'
 
 import OwnAttributes from '@anticrm/presentation-ui/src/components/OwnAttributes.vue'
 import StringPresenter from '@anticrm/presentation-ui/src/components/presenter/StringPresenter.vue'
@@ -35,6 +35,7 @@ export default defineComponent({
     object: Object
   },
   setup (props, context) {
+    const coreService = getCoreService()
     const presentationCore = getPresentationCore()
     const ui = getPresentationUI()
 
@@ -48,7 +49,11 @@ export default defineComponent({
 
     return {
       model,
-      title
+      title,
+      // onChange (key: string, value: string) {
+      //   console.log('key-value', key, value)
+      //   coreService.tx()
+      // }
     }
   }
 })
@@ -57,7 +62,12 @@ export default defineComponent({
 <template>
   <div class="chunter-page-properties">
     <div>
-      <StringPresenter class="caption-1" :attribute="title" v-model="object[title.key]" />
+      <StringPresenter
+        class="caption-1"
+        :attribute="title"
+        :modelValue="object[title.key]"
+        @update:modelValue="$emit('update', title.key, $event)"
+      />
     </div>
 
     <div class="attributes">

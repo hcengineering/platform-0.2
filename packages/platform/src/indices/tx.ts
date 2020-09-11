@@ -15,7 +15,7 @@
 
 import { Index, Storage } from '../utils'
 import { MemDb } from '../memdb'
-import { CreateTx, PushTx } from '../core'
+import { CreateTx, PushTx, UpdateTx } from '../core'
 
 export class TxIndex implements Index {
   private modelDb: MemDb
@@ -31,6 +31,10 @@ export class TxIndex implements Index {
   }
 
   onPush (tx: PushTx): Promise<any> {
+    return this.storage.store(tx)
+  }
+
+  onUpdate (tx: UpdateTx): Promise<any> {
     return this.storage.store(tx)
   }
 }

@@ -16,7 +16,7 @@
 <script lang="ts">
 
 import { defineComponent, PropType, ref, watch, onUnmounted } from 'vue'
-import { Class, DeleteTx, PushTx, Doc, generateId, Property, Ref, VDoc } from '@anticrm/platform'
+import { Class, DeleteTx, PushTx, Doc, generateId, Property, Ref, VDoc, UpdateTx } from '@anticrm/platform'
 import presentationCore from '@anticrm/presentation-core'
 
 import { getCoreService, getPresentationCore } from '../utils'
@@ -72,6 +72,25 @@ export default defineComponent({
       context.emit('done', 'cancel')
     }
 
+    function update (key: string, value: string) {
+      console.log('UPDATE: ' + key + ' ' + value)
+      const tx: UpdateTx = {
+        _class: core.class.UpdateTx,
+        _id: generateId() as Ref<Doc>,
+
+        _objectId: props._id as Ref<VDoc>,
+        _objectClass: props._class as Ref<Class<VDoc>>,
+        _date: Date.now() as Property<number, Date>,
+        _user: 'andrey.v.platov@gmail.com' as Property<string, string>,
+
+        _attributes: {
+          [key]: value as Property<string, string>
+        }
+      }
+
+      coreService.tx(tx)
+    }
+
     function remove () {
       const tx: DeleteTx = {
         _class: core.class.DeleteTx,
@@ -116,6 +135,7 @@ export default defineComponent({
 
       cancel,
       remove,
+      update,
       submit
     }
   }
@@ -133,7 +153,13 @@ export default defineComponent({
       </div>
 
       <div class="content">
-        <widget v-if="component !== ''" :component="component" :object="object" :_class="_class" />
+        <widget
+          v-if="component !== ''"
+          :component="component"
+          :object="object"
+          :_class="_class"
+          @update="update"
+        />
       </div>
 
       <div class="comments">

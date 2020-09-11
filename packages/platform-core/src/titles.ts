@@ -15,34 +15,32 @@
 
 import { Ref, Classifier, Doc, Class, Title, Storage } from '@anticrm/platform'
 import core from '.'
+import { ref } from 'vue'
 
 export interface Node {
   _class: Ref<Classifier<Doc>>
   _id: Ref<Doc>
-  title: string | number
+  title: string
 }
 
 export class Titles implements Storage {
 
   private graph = new Map<Ref<Doc>, Node>()
-
-  // load (nodes: Node[]) {
-  //   for (const node of nodes) {
-  //     this.graph.set(node._id, node)
-  //   }
-  // }
-
-  // add (node: Node) {
-  //   this.graph.set(node._id, node)
-  // }
+  private titleRef = ref(0)
 
   find (prefix: string): Node[] {
     const result = []
     for (const node of this.graph.values()) {
-      if (typeof node.title === 'string' && node.title.startsWith(prefix))
+      if (node.title.startsWith(prefix))
         result.push(node)
     }
     return result
+  }
+
+  queryTitle (_id: Ref<Doc>): string {
+    const touch = this.titleRef.value
+    const node = this.graph.get(_id)
+    return node ? node.title as string : 'not found'
   }
 
   async store (doc: Doc): Promise<void> {
@@ -54,7 +52,7 @@ export class Titles implements Storage {
     this.graph.set(title._objectId, {
       _class: title._objectClass,
       _id: title._objectId,
-      title: title.title
+      title: title.title as string
     })
   }
 

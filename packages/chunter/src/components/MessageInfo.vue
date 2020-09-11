@@ -15,10 +15,10 @@
 
 <script lang="ts">
 
-import { defineComponent, ref, PropType } from 'vue'
-import { CreateTx } from '@anticrm/platform'
+import { defineComponent, ref, PropType, computed, ComputedRef } from 'vue'
+import { CreateTx, Ref, Doc } from '@anticrm/platform'
 
-import { getCoreService, getContactService } from '../utils'
+import { getCoreService } from '../utils'
 import { User } from '@anticrm/contact'
 
 import { getChunterService } from '..'
@@ -30,10 +30,18 @@ export default defineComponent({
     tx: Object as PropType<CreateTx>
   },
   setup (props, context) {
+    const coreService = getCoreService()
     const chunterService = getChunterService()
 
+    function getNodeTitle (id: Ref<Doc>): ComputedRef<string> {
+      return computed(() =>
+        coreService.getTitles().queryTitle(id)
+      )
+    }
+
     return {
-      parseMessage: chunterService.parseMessage
+      parseMessage: chunterService.parseMessage,
+      getNodeTitle
     }
   }
 })
@@ -43,7 +51,7 @@ export default defineComponent({
   <div class="chunter-message-info">
     <span v-for="(node, index) in parseMessage(tx._attributes?.message)" :key="index">
       <span v-if="node.kind === 1">
-        <a href="#" @click.prevent="$emit('open', node)">{{node.text}}</a>
+        <a href="#" @click.prevent="$emit('open', node)">{{getNodeTitle(node._id).value}}</a>
       </span>
       <span v-else>{{node.text}}</span>
     </span>

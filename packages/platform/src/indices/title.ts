@@ -70,4 +70,8 @@ export class TitleIndex implements Index {
   async onPush (): Promise<any> {
     // return this.storage.push(tx._objectClass, tx._objectId, tx._attribute, tx._attributes)
   }
+
+  async onUpdate (): Promise<any> {
+    // return this.storage.push(tx._objectClass, tx._objectId, tx._attribute, tx._attributes)
+  }
 }

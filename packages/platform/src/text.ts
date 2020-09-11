@@ -59,7 +59,7 @@ enum State {
 }
 
 export function parseMessage (message: string): MessageElement[] {
-  console.log('parse', message)
+  // console.log('parse', message)
   const result = []
   let pos = 0
   let state = State.STATE_TEXT
