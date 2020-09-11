@@ -21,7 +21,7 @@ export class VDocIndex implements Index {
   private modelDb: MemDb
   private storage: Storage
 
-  constructor(modelDb: MemDb, storage: Storage) {
+  constructor (modelDb: MemDb, storage: Storage) {
     this.modelDb = modelDb
     this.storage = storage
   }
