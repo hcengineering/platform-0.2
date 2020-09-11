@@ -39,7 +39,7 @@ export default (S: Builder) => {
   S.createDocument(workbench.class.Application, {
     label: 'Default' as StringProperty,
     icon: chunter.icon.Chunter,
-    component: workbench.component.Browser,
+    component: workbench.component.Browser
     // appClass: chunter.class.Message
   }, workbench.application.Default)
 
