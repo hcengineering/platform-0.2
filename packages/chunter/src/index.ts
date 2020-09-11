@@ -15,10 +15,9 @@
 
 import { inject } from 'vue'
 import { DateProperty, Emb, plugin, Plugin, Service, StringProperty, VDoc, Ref, Mixin, Class } from '@anticrm/platform'
-import { AnyComponent, Asset } from '@anticrm/platform-ui'
+import ui, { AnyComponent, Asset } from '@anticrm/platform-ui'
 import contact from '@anticrm/contact'
 import core from '@anticrm/platform-core'
-import ui from '@anticrm/platform-ui'
 import { ComponentExtension } from '@anticrm/presentation-core'
 
 // P E R S I S T E N C E  M O D E L
@@ -77,21 +76,20 @@ export function getChunterService (): ChunterService {
 
 export default plugin('chunter' as Plugin<ChunterService>, { core: core.id, ui: ui.id, contact: contact.id }, {
   icon: {
-    Chunter: '' as Asset,
+    Chunter: '' as Asset
   },
   component: {
     ChunterView: '' as AnyComponent,
     PageInfo: '' as AnyComponent,
     ContactInfo: '' as AnyComponent,
     MessageInfo: '' as AnyComponent,
-    PageProperties: '' as AnyComponent,
+    PageProperties: '' as AnyComponent
   },
   mixin: {
-    ChunterInfo: '' as Ref<Mixin<ComponentExtension<VDoc>>>,
+    ChunterInfo: '' as Ref<Mixin<ComponentExtension<VDoc>>>
   },
   class: {
     Message: '' as Ref<Class<Message>>,
     Page: '' as Ref<Class<Page>>
   }
-
 })
