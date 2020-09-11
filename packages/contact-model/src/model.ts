@@ -14,11 +14,10 @@
 //
 
 import core, { Builder, ModelClass, ModelMixin, Prop } from '@anticrm/platform-model'
-import { UX } from '@anticrm/presentation-model'
+import presentation, { UX } from '@anticrm/presentation-model'
 
-import presentation from '@anticrm/presentation-model'
 import workbench from '@anticrm/workbench-model'
-import { Class, VDoc, Ref, StringProperty, Property, EasyScript, THIS, GET, CONCAT } from '@anticrm/platform'
+import { Class, VDoc, Ref, StringProperty, Property } from '@anticrm/platform'
 
 import contact from '.'
 import { Contact, Person, User } from '@anticrm/contact'
@@ -46,7 +45,6 @@ class TUser extends TPerson implements User {
 }
 
 export default (S: Builder) => {
-
   S.add(TContact, TPerson, TUser)
 
   S.mixin(contact.class.Person as Ref<Class<Person>>, presentation.class.DetailForm, {
@@ -62,5 +60,4 @@ export default (S: Builder) => {
     icon: contact.icon.Phone,
     itemClass: contact.mixin.User as Ref<Class<VDoc>> // TODO: fix itemClass type
   })
-
 }

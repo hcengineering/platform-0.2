@@ -16,9 +16,8 @@
 import { Attribute, Class, Obj, Platform, Ref, Type, VDoc, Mixin } from '@anticrm/platform'
 import ui, { AttributeUI, AttrModel, ClassModel, GroupModel, PresentationCore, ComponentExtension } from '.'
 import { CoreService } from '@anticrm/platform-core'
-import { AnyComponent, Asset } from '@anticrm/platform-ui'
+import vue, { AnyComponent, Asset } from '@anticrm/platform-ui'
 import { I18n, IntlString } from '@anticrm/platform-i18n'
-import vue from '@anticrm/platform-ui'
 
 /*!
  * Anticrm Platform™ Presentation Core Plugin
@@ -26,7 +25,6 @@ import vue from '@anticrm/platform-ui'
  * Licensed under the Eclipse Public License, Version 2.0
  */
 export default async (platform: Platform, deps: { core: CoreService, i18n: I18n }): Promise<PresentationCore> => {
-
   const coreService = deps.core
   const i18nService = deps.i18n
 
@@ -84,9 +82,10 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
   abstract class ClassModelBase implements ClassModel {
     filterAttributes (keys: string[]): ClassModel {
       const filter = {} as { [key: string]: {} }
-      keys.forEach(key => filter[key] = {})
+      keys.forEach(key => { filter[key] = {} })
       return new AttributeFilter(this, filter)
     }
+
     abstract getAttribute (key: string, _class?: Ref<Class<Obj>>): AttrModel | undefined
     abstract getGroups (): GroupModel[]
     abstract getOwnAttributes (_class: Ref<Class<Obj>>): AttrModel[]
@@ -95,11 +94,10 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
   }
 
   class TClassModel extends ClassModelBase {
-
     private readonly attributes: AttrModel[]
     private readonly groups: GroupModel[]
 
-    constructor(groups: GroupModel[], attributes: AttrModel[]) {
+    constructor (groups: GroupModel[], attributes: AttrModel[]) {
       super()
       this.attributes = attributes
       this.groups = groups
@@ -128,7 +126,7 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
     private readonly next: ClassModel
     private readonly filter: { [key: string]: {} }
 
-    constructor(next: ClassModel, filter: { [key: string]: {} }) {
+    constructor (next: ClassModel, filter: { [key: string]: {} }) {
       super()
       this.next = next
       this.filter = filter
@@ -209,6 +207,6 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
     getEmptyModel,
     getEmptyAttribute,
     getClassModel,
-    getComponentExtension,
+    getComponentExtension
   }
 }

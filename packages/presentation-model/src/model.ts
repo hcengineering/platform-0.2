@@ -18,7 +18,6 @@ import ui from '.'
 import presentationUI from '@anticrm/presentation-ui'
 
 export default (S: Builder) => {
-
   S.createClass(ui.class.AttributeUI, core.class.Attribute, {
     label: S.attr(core.class.Type, {}),
     placeholder: S.attr(core.class.Type, {}),
@@ -53,5 +52,4 @@ export default (S: Builder) => {
   S.createMixin(ui.class.LookupForm, core.class.Class, {
     component: S.attr(core.class.Type, {})
   })
-
 }

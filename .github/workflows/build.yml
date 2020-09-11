@@ -7,17 +7,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-node@v1
-      with:
-        node-version: 14
-        registry-url: 'https://registry.npmjs.org'
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 14
+          registry-url: "https://registry.npmjs.org"
 
-    - name: Run tests
-      run: |
-        yarn install
-        yarn workspace @anticrm/platform test
+      - name: Run tests
+        run: |
+          yarn install
+          yarn workspace @anticrm/platform test
+  lint:
+    runs-on: ubuntu-latest
 
-    - name: Run lint
-      run: |
-        yarn workspace @anticrm/platform lint
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 14
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Run lint
+        run: |
+          yarn install
+          yarn workspaces run lint

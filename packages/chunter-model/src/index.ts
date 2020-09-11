@@ -14,10 +14,9 @@
 //
 
 import { extendIds } from '@anticrm/platform-model'
-import chunter from '@anticrm/chunter'
+import chunter, { Collab } from '@anticrm/chunter'
 import { Ref, Class } from '@anticrm/platform'
 import { Application } from '@anticrm/workbench'
-import { Collab } from '@anticrm/chunter'
 
 export enum ChunterDomain {
   Chunter = 'chunter'

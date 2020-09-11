@@ -13,16 +13,16 @@
 // limitations under the License.
 //
 
-import core, { Builder, ModelClass, ModelMixin, Prop } from '@anticrm/platform-model'
+import core, { Builder, ModelClass, Prop } from '@anticrm/platform-model'
 import { UX } from '@anticrm/presentation-model'
 
 import workbench from '@anticrm/workbench-model'
-import { Class, Property, Ref, StringProperty } from '@anticrm/platform'
+import { StringProperty } from '@anticrm/platform'
 import contact from '@anticrm/contact-model'
 import presentation from '@anticrm/presentation-core'
 import presentationUI from '@anticrm/presentation-ui'
 
-import recruitment, { RecruitmentDomain } from '.'
+import recruitment from '.'
 import { IntlString } from '@anticrm/platform-i18n'
 import { Candidate } from '@anticrm/recruitment/src'
 
@@ -36,7 +36,6 @@ class TCandidate extends TPerson implements Candidate {
 }
 
 export default (S: Builder) => {
-
   S.add(TCandidate)
 
   S.createDocument(workbench.class.Application, {
@@ -62,5 +61,4 @@ export default (S: Builder) => {
   S.mixin(recruitment.space.Recruitment, presentation.mixin.UXObject, {
     label: 'Рекрутинг' as IntlString
   })
-
 }

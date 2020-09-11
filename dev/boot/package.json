@@ -11,7 +11,8 @@
   },
   "scripts": {
     "build": "tsc",
-    "dump": "ts-node -T src/index.ts"
+    "dump": "ts-node -T src/index.ts",
+    "lint": "echo 'No linting yet'"
   },
   "dependencies": {
     "mongodb": "^3.5.8"

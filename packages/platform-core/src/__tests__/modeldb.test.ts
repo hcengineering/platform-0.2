@@ -14,15 +14,12 @@
 //
 
 /* eslint-env jest */
-
-
 import { ModelDb } from '../modeldb'
 import { CoreDomain, Doc, Mixin, Ref, VDoc } from '@anticrm/platform'
 
 import model from './model'
 
 describe('modeldb', () => {
-
   it('should create mixin', () => {
     const modelDb = new ModelDb(CoreDomain.Model)
     modelDb.loadModel(model)

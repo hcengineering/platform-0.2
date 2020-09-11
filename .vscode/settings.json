@@ -7,5 +7,7 @@
   "editor.tabSize": 2,
   "vetur.format.defaultFormatter.ts": "vscode-typescript",
   "vetur.format.defaultFormatter.js": "vscode-typescript",
-  "typescript.format.insertSpaceBeforeFunctionParenthesis": true
+  "typescript.format.insertSpaceBeforeFunctionParenthesis": true,
+  "typescript.format.insertSpaceAfterConstructor": true,
+  "javascript.format.insertSpaceAfterConstructor": true
 }

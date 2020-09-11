@@ -71,7 +71,7 @@ const login = plugin('login' as Plugin<LoginService>, { ui: ui.id }, {
   metadata: {
     LoginUrl: '' as Metadata<string>,
     Token: '' as Metadata<string>,
-    WhoAmI: '' as Metadata<string>,
+    WhoAmI: '' as Metadata<string>
   }
 })
 
