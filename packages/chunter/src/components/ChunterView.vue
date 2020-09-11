@@ -28,7 +28,7 @@ import { getCoreService } from '../utils'
 export default defineComponent({
   components: {
     ScrollView,
-    ChunterItem,
+    ChunterItem
   },
   props: {
   },

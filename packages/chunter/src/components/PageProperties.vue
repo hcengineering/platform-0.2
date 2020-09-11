@@ -47,7 +47,7 @@ export default defineComponent({
 
     return {
       model,
-      title,
+      title
       // onChange (key: string, value: string) {
       //   console.log('key-value', key, value)
       //   coreService.tx()

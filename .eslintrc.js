@@ -5,7 +5,8 @@ module.exports = {
     node: true
   },
   extends: [
-    'plugin:vue/vue3-recommended',
+    'standard',
+    'plugin:vue/vue3-recommended'
     // '@vue/standard'
   ],
   globals: {

@@ -34,7 +34,7 @@ export default defineComponent({
 
     const user = ref<User | undefined>(undefined)
 
-    contactService.getUser(props.tx._user).then(u => user.value = u)
+    contactService.getUser(props.tx._user).then(u => { user.value = u })
 
     const component = presentationCore.getComponentExtension(props.tx._objectClass, chunter.mixin.ChunterInfo)
 
