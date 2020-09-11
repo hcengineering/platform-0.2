@@ -26,7 +26,7 @@ export interface Node {
 export class Titles implements Storage {
 
   private graph = new Map<Ref<Doc>, Node>()
-  private titleRef = ref(0)
+  // private titleRef = ref(0)
 
   find (prefix: string): Node[] {
     const result = []
@@ -38,7 +38,7 @@ export class Titles implements Storage {
   }
 
   queryTitle (_id: Ref<Doc>): string {
-    const touch = this.titleRef.value
+    // const touch = this.titleRef.value
     const node = this.graph.get(_id)
     return node ? node.title as string : 'not found'
   }
@@ -60,8 +60,14 @@ export class Titles implements Storage {
     console.log('graph push')
   }
 
-  async update (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attributes: any): Promise<void> {
-    console.log('graph update')
+  async update (_class: Ref<Class<Doc>>, selector: any, attributes: any): Promise<void> {
+    console.log('titles update', selector, attributes)
+    const _id = selector._objectId
+    const title = attributes.title
+    const node = this.graph.get(_id)
+    if (node) {
+      node.title = attributes.title
+    }
   }
 
   async remove (_class: Ref<Class<Doc>>, doc: Ref<Doc>): Promise<void> {

@@ -16,7 +16,7 @@
 import { Index, Storage } from '../utils'
 import { MemDb, mixinKey } from '../memdb'
 import { generateId } from '../objectid'
-import { core, CreateTx, VDoc, Ref, Class, Obj, Classifier, Title } from '../core'
+import { core, CreateTx, VDoc, Ref, Class, Obj, Classifier, Title, UpdateTx } from '../core'
 
 const NULL = '<null>'
 const primaryKey = mixinKey(core.mixin.Indices, 'primary')
@@ -26,7 +26,7 @@ export class TitleIndex implements Index {
   private storage: Storage
   private primaries = new Map<Ref<Classifier<VDoc>>, string>()
 
-  constructor (modelDb: MemDb, storage: Storage) {
+  constructor(modelDb: MemDb, storage: Storage) {
     this.modelDb = modelDb
     this.storage = storage
   }
@@ -71,7 +71,19 @@ export class TitleIndex implements Index {
     // return this.storage.push(tx._objectClass, tx._objectId, tx._attribute, tx._attributes)
   }
 
-  async onUpdate (): Promise<any> {
-    // return this.storage.push(tx._objectClass, tx._objectId, tx._attribute, tx._attributes)
+  async onUpdate (update: UpdateTx): Promise<any> {
+    const primary = this.getPrimary(update._objectClass)
+    if (!primary) { return }
+
+    let updated = false
+    for (const key in update._attributes) {
+      if (key === primary) {
+        updated = true
+        break
+      }
+    }
+    if (updated) {
+      this.storage.update(core.class.Title, { _objectId: update._objectId }, { title: update._attributes[primary] })
+    }
   }
 }

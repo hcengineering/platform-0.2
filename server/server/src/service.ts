@@ -72,9 +72,9 @@ export async function connect (uri: string, dbName: string, ws: WebSocket, serve
       return db.collection(domain).updateOne({ _id }, { $push: { [attribute]: attributes } })
     },
 
-    async update (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attributes: any): Promise<any> {
+    async update (_class: Ref<Class<Doc>>, selector: object, attributes: any): Promise<any> {
       const domain = memdb.getDomain(_class)
-      return db.collection(domain).updateOne({ _id }, { $set: attributes })
+      return db.collection(domain).updateOne(selector, { $set: attributes })
     },
 
     async remove (_class: Ref<Class<Doc>>, doc: Ref<Doc>): Promise<any> {
