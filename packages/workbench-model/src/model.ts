@@ -23,7 +23,6 @@ import { StringProperty, CoreDomain } from '@anticrm/platform'
 import { IntlString } from '@anticrm/platform-i18n'
 
 export default (S: Builder) => {
-
   S.createClass(workbench.class.Application, core.class.Doc, {
     label: S.attr(core.class.String, {}),
     icon: S.attr(core.class.Type, {}),
@@ -34,7 +33,7 @@ export default (S: Builder) => {
   S.createClass(workbench.class.WorkbenchCreateItem, core.class.Doc, {
     label: S.attr(core.class.String, {}),
     icon: S.attr(core.class.Type, {}),
-    itemClass: S.attr(core.class.Type, {}),
+    itemClass: S.attr(core.class.Type, {})
   }, CoreDomain.Model)
 
   S.createDocument(workbench.class.Application, {
@@ -58,5 +57,4 @@ export default (S: Builder) => {
   S.mixin(contact.space.Contact, workbench.mixin.SpaceExtension, {
     component: chunter.component.ChunterView
   })
-
 }

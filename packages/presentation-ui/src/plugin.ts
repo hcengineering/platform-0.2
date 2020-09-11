@@ -33,7 +33,6 @@ import RefPresenter from './components/presenter/RefPresenter.vue'
  * Licensed under the Eclipse Public License, Version 2.0
  */
 export default async (platform: Platform, deps: { ui: UIService, presentationCore: PresentationCore }): Promise<PresentationUI> => {
-
   platform.setResource(ui.component.Table, Table)
   platform.setResource(ui.component.BrowseView, BrowseView)
   platform.setResource(ui.component.StringPresenter, StringPresenter)

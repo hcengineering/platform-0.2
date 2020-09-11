@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
+/* eslint-env jest */
 
 import { makeRequest, getResponse } from '../rpc'
 import { start, Client } from '../server'
@@ -19,7 +20,6 @@ import WebSocket from 'ws'
 import { encode } from 'jwt-simple'
 
 describe('server', () => {
-
   const mongodbUri = process.env.MONGODB_URI || 'mongodb://localhost:27017'
   const shutdown = start(3333, mongodbUri)
 
@@ -57,7 +57,7 @@ describe('server', () => {
     conn.on('message', (msg: string) => {
       const resp = getResponse(msg)
       if (++received === total) {
-        console.log('Time: ', Date.now() - start)
+        console.log('resp:', resp, ' Time: ', Date.now() - start)
         conn.close()
         done()
       }

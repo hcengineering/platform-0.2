@@ -19,6 +19,6 @@ import recruitment from '..'
 export default (platform: Platform) => {
   const spritesUrl = require('../../assets/icons.svg')
   platform.loadMetadata(recruitment.icon, {
-    Chunter: spritesUrl + '#chunter',
+    Chunter: spritesUrl + '#chunter'
   })
 }

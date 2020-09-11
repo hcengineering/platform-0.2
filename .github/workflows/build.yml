@@ -20,4 +20,4 @@ jobs:
 
     - name: Run lint
       run: |
-        yarn workspace @anticrm/platform lint
+        yarn workspaces run lint

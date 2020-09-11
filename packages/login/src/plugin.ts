@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Platform, Service } from '@anticrm/platform'
+import { Platform } from '@anticrm/platform'
 
 import login, { LoginInfo, LoginService, ACCOUNT_KEY, LoginServiceInjectionKey } from '.'
 import LoginForm from './internal/LoginForm.vue'
@@ -49,5 +49,4 @@ export default async (platform: Platform, deps: { ui: UIService }): Promise<Logi
     .provide(LoginServiceInjectionKey, service)
 
   return service
-
 }

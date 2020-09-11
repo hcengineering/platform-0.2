@@ -22,17 +22,17 @@ export const CoreInjectionKey = 'core-injection-key'
 export const PresentationCoreInjectionKey = 'presentation-core-injection-key'
 export const PresentationUIInjectionKey = 'presentation-ui-injection-key'
 
-export function getCoreService(): CoreService {
+export function getCoreService (): CoreService {
   const core = inject(CoreInjectionKey)
   if (core) { return core as CoreService }
   throw new Error('`core` plugin not loaded.')
 }
 
-export function getPresentationCore(): PresentationCore {
+export function getPresentationCore (): PresentationCore {
   return inject(PresentationCoreInjectionKey) as PresentationCore
 }
 
-export function getPresentationUI(): PresentationUI {
+export function getPresentationUI (): PresentationUI {
   const ui = inject(PresentationUIInjectionKey)
   if (ui) { return ui as PresentationUI }
   throw new Error('`presentation-ui` plugin not loaded.')

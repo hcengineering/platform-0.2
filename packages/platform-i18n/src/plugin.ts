@@ -23,7 +23,6 @@ import { IntlMessageFormat, PrimitiveType } from 'intl-messageformat'
  * Licensed under the Eclipse Public License, Version 2.0
  */
 export default async (platform: Platform): Promise<I18n> => {
-
   const strings: Map<IntlString, string> = new Map()
   const imfCache: Map<IntlString, IntlMessageFormat> = new Map()
 

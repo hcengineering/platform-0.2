@@ -14,8 +14,8 @@
 //
 
 import { extendIds } from '@anticrm/platform-model'
-import contact, { Contact, Person, User } from '@anticrm/contact'
-import { Ref, Mixin, Class, Space } from '@anticrm/platform'
+import contact, { Contact, Person } from '@anticrm/contact'
+import { Ref, Class, Space } from '@anticrm/platform'
 
 export default extendIds(contact, {
   application: {

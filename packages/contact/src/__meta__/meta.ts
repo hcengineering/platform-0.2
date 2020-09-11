@@ -21,6 +21,6 @@ export default (platform: Platform) => {
   platform.loadMetadata(recruitment.icon, {
     Date: spritesUrl + '#date',
     Phone: spritesUrl + '#phone',
-    Email: spritesUrl + '#email',
+    Email: spritesUrl + '#email'
   })
 }

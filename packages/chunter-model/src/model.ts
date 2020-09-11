@@ -13,13 +13,12 @@
 // limitations under the License.
 //
 
-import { Ref, Class } from '@anticrm/platform'
+import { Ref, Class, StringProperty } from '@anticrm/platform'
 
 import core, { Builder, ModelClass, Primary, Prop, Text } from '@anticrm/platform-model'
 import { UX } from '@anticrm/presentation-model'
 
 import workbench from '@anticrm/workbench-model'
-import { Property, StringProperty, THIS, GET, EasyScript } from '@anticrm/platform'
 import contact from '@anticrm/contact-model'
 import { Person } from '@anticrm/contact'
 import { Message, Page, Comment, Collab } from '@anticrm/chunter'
@@ -49,7 +48,6 @@ class TPage extends TMessage implements Page {
 }
 
 export default (S: Builder) => {
-
   S.add(TCollab, TMessage, TPage)
 
   S.createDocument(workbench.class.Application, {
@@ -84,5 +82,4 @@ export default (S: Builder) => {
   S.mixin(chunter.class.Page, presentation.class.DetailForm, {
     component: chunter.component.PageProperties
   })
-
 }
