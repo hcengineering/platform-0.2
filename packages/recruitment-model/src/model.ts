@@ -20,7 +20,6 @@ import workbench from '@anticrm/workbench-model'
 import { StringProperty } from '@anticrm/platform'
 import contact from '@anticrm/contact-model'
 import presentation from '@anticrm/presentation-core'
-import presentationUI from '@anticrm/presentation-ui'
 
 import recruitment from '.'
 import { IntlString } from '@anticrm/platform-i18n'
@@ -38,12 +37,12 @@ class TCandidate extends TPerson implements Candidate {
 export default (S: Builder) => {
   S.add(TCandidate)
 
-  S.createDocument(workbench.class.Application, {
-    label: 'Найм' as StringProperty,
-    icon: recruitment.icon.Recruitment,
-    main: presentationUI.component.BrowseView,
-    appClass: recruitment.class.Candidate
-  }, recruitment.application.Recruitment)
+  // S.createDocument(workbench.class.Application, {
+  //   label: 'Найм' as StringProperty,
+  //   icon: recruitment.icon.Recruitment,
+  //   main: presentationUI.component.BrowseView,
+  //   appClass: recruitment.class.Candidate
+  // }, recruitment.application.Recruitment)
 
   // S.mixin(recruitment.class.Candidate as Ref<Class<Candidate>>, presentation.class.DetailsForm, {
   //   form: recruitment.component.View2
