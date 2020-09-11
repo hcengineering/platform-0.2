@@ -21,7 +21,7 @@ export class VDocIndex implements Index {
   private modelDb: MemDb
   private storage: Storage
 
-  constructor(modelDb: MemDb, storage: Storage) {
+  constructor (modelDb: MemDb, storage: Storage) {
     this.modelDb = modelDb
     this.storage = storage
   }
@@ -60,5 +60,4 @@ export class VDocIndex implements Index {
   onUpdate (tx: UpdateTx): Promise<any> {
     return this.storage.update(tx._objectClass, tx._objectId, tx._attributes)
   }
-
 }

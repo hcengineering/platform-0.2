@@ -21,7 +21,7 @@ export class TxIndex implements Index {
   private modelDb: MemDb
   private storage: Storage
 
-  constructor(modelDb: MemDb, storage: Storage) {
+  constructor (modelDb: MemDb, storage: Storage) {
     this.modelDb = modelDb
     this.storage = storage
   }
@@ -37,5 +37,4 @@ export class TxIndex implements Index {
   onUpdate (tx: UpdateTx): Promise<any> {
     return this.storage.store(tx)
   }
-
 }
