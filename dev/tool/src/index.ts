@@ -61,10 +61,8 @@ program
       const db = client.db('accounts')
       const p1 = createWorkspace(db, email, cmd.password, 'Organization', cmd.workspace)
       const tenant = client.db(cmd.workspace)
-      const p2 = initDatabase(tenant).then(() => {
-        createUser(tenant, email, cmd.fullname)
-      })
-      Promise.all([p1, p2]).then(() => client.close())
+      const p2 = initDatabase(tenant)
+      Promise.all([p1, p2]).then(() => createUser(tenant, email, cmd.fullname)).then(() => client.close())
     })
   })
 

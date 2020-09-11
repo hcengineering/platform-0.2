@@ -30,7 +30,7 @@ import { User } from '@anticrm/contact'
 import { TVDoc } from '@anticrm/platform-model/src/model'
 
 
-@ModelClass(task.class.Task, core.class.VDoc)
+@ModelClass(task.class.Task, core.class.VDoc, TaskDomain.Task)
 @UX('Задача' as IntlString)
 class TTask extends TVDoc implements Task {
   @Prop() @UX(task.string.Task_name) title!: Property<string, string>
@@ -41,12 +41,12 @@ export default (S: Builder) => {
 
   S.add(TTask)
 
-  S.createDocument(workbench.class.Application, {
-    label: 'Задачи' as StringProperty,
-    icon: task.icon.Task,
-    main: presentationUI.component.BrowseView,
-    appClass: task.class.Task
-  }, task.application.Task)
+  // S.createDocument(workbench.class.Application, {
+  //   label: 'Задачи' as StringProperty,
+  //   icon: task.icon.Task,
+  //   main: presentationUI.component.BrowseView,
+  //   appClass: task.class.Task
+  // }, task.application.Task)
 
   S.mixin(task.class.Task as Ref<Class<Task>>, presentation.class.DetailForm, {
     component: task.component.View

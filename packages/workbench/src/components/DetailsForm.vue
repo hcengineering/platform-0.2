@@ -61,7 +61,7 @@ export default defineComponent({
         object.value = result[0]
       })
 
-      backlinks.value = coreService.getGraph().find(_id).links
+      backlinks.value = coreService.getGraph().find(_id)?.links
 
       component.value = presentationCoreService.getComponentExtension(props._class, presentationCore.class.DetailForm)
     }, { immediate: true })

@@ -50,12 +50,12 @@ class TPage extends TMessage implements Page {
 export default (S: Builder) => {
   S.add(TCollab, TMessage, TPage)
 
-  S.createDocument(workbench.class.Application, {
-    label: 'Chunter' as StringProperty,
-    icon: chunter.icon.Chunter,
-    main: chunter.component.ChunterView,
-    appClass: chunter.class.Message
-  }, chunter.application.Chunter)
+  // S.createDocument(workbench.class.Application, {
+  //   label: 'Chunter' as StringProperty,
+  //   icon: chunter.icon.Chunter,
+  //   main: chunter.component.ChunterView,
+  //   appClass: chunter.class.Message
+  // }, chunter.application.Chunter)
 
   S.createMixin(chunter.mixin.ChunterInfo, core.class.Class, {
     component: S.attr(core.class.Type, {})

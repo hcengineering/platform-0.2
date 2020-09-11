@@ -40,7 +40,7 @@ export default defineComponent({
     const model = coreService.getModel()
 
     const app = computed(() => props.location.path[0])
-    const perspective = computed(() => (model.get(props.location.path[0] as Ref<Doc>) as Application).main)
+    const perspective = computed(() => (model.get(props.location.path[0] as Ref<Doc>) as Application).component)
 
     const uiService = getUIService()
 

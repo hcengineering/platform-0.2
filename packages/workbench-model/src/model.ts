@@ -26,8 +26,8 @@ export default (S: Builder) => {
   S.createClass(workbench.class.Application, core.class.Doc, {
     label: S.attr(core.class.String, {}),
     icon: S.attr(core.class.Type, {}),
-    appClass: S.attr(core.class.Type, {}),
-    main: S.attr(core.class.Type, {})
+    // appClass: S.attr(core.class.Type, {}),
+    component: S.attr(core.class.Type, {})
   }, CoreDomain.Model)
 
   S.createClass(workbench.class.WorkbenchCreateItem, core.class.Doc, {
@@ -39,8 +39,8 @@ export default (S: Builder) => {
   S.createDocument(workbench.class.Application, {
     label: 'Default' as StringProperty,
     icon: chunter.icon.Chunter,
-    main: workbench.component.Browser,
-    appClass: chunter.class.Message
+    component: workbench.component.Browser,
+    // appClass: chunter.class.Message
   }, workbench.application.Default)
 
   S.createDocument(core.class.Space, {

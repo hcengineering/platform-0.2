@@ -38,12 +38,12 @@ class TCandidate extends TPerson implements Candidate {
 export default (S: Builder) => {
   S.add(TCandidate)
 
-  S.createDocument(workbench.class.Application, {
-    label: 'Найм' as StringProperty,
-    icon: recruitment.icon.Recruitment,
-    main: presentationUI.component.BrowseView,
-    appClass: recruitment.class.Candidate
-  }, recruitment.application.Recruitment)
+  // S.createDocument(workbench.class.Application, {
+  //   label: 'Найм' as StringProperty,
+  //   icon: recruitment.icon.Recruitment,
+  //   main: presentationUI.component.BrowseView,
+  //   appClass: recruitment.class.Candidate
+  // }, recruitment.application.Recruitment)
 
   // S.mixin(recruitment.class.Candidate as Ref<Class<Candidate>>, presentation.class.DetailsForm, {
   //   form: recruitment.component.View2

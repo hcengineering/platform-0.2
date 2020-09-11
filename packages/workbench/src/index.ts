@@ -22,8 +22,7 @@ import chunter from '@anticrm/chunter'
 export interface Application extends Doc {
   label: StringProperty
   icon: Asset
-  main: AnyComponent
-  appClass: Ref<Class<VDoc>>
+  component: AnyComponent
 }
 
 export interface WorkbenchCreateItem extends Doc {
