@@ -15,11 +15,9 @@
 
 <script lang="ts">
 
-import { defineComponent, ref, watch, onUnmounted } from 'vue'
+import { defineComponent, ref, onUnmounted } from 'vue'
 import { Doc } from '@anticrm/platform'
 
-import Table from '@anticrm/presentation-ui/src/components/Table.vue'
-import Icon from '@anticrm/platform-ui/src/components/Icon.vue'
 import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.vue'
 import ChunterItem from './ChunterItem.vue'
 
@@ -30,13 +28,12 @@ import { getCoreService } from '../utils'
 export default defineComponent({
   components: {
     ScrollView,
-    Table,
-    Icon,
     ChunterItem,
   },
   props: {
   },
-  setup (props, context) {
+
+  setup (props, context) { // eslint-disable-line @typescript-eslint/no-unused-vars
     const coreService = getCoreService()
 
     const content = ref([] as Doc[])

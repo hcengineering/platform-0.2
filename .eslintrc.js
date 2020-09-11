@@ -5,19 +5,20 @@ module.exports = {
     node: true
   },
   extends: [
-    'standard'
+    'plugin:vue/vue3-recommended',
+    // '@vue/standard'
   ],
   globals: {
     Atomics: 'readonly',
     SharedArrayBuffer: 'readonly'
   },
-  parser: '@typescript-eslint/parser',
   parserOptions: {
+    parser: '@typescript-eslint/parser',
     ecmaVersion: 11,
     sourceType: 'module'
   },
   plugins: [
-    '@typescript-eslint'
+    '@typescript-eslint',
   ],
   rules: {
     'no-unused-vars': 'off',

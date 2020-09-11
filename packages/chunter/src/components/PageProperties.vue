@@ -19,14 +19,13 @@ import { defineComponent, PropType, ref } from 'vue'
 import { Class, Ref, VDoc } from '@anticrm/platform'
 
 import { getPresentationUI } from '@anticrm/presentation-ui/src/utils'
-import { getCoreService, getPresentationCore } from '../utils'
+import { getPresentationCore } from '../utils'
 
 import OwnAttributes from '@anticrm/presentation-ui/src/components/OwnAttributes.vue'
 import StringPresenter from '@anticrm/presentation-ui/src/components/presenter/StringPresenter.vue'
-import Button from '@anticrm/sparkling-controls/src/Button.vue'
 
 export default defineComponent({
-  components: { StringPresenter, OwnAttributes, Button },
+  components: { StringPresenter, OwnAttributes },
   props: {
     _class: {
       type: String as unknown as PropType<Ref<Class<VDoc>>>,
@@ -34,8 +33,7 @@ export default defineComponent({
     },
     object: Object
   },
-  setup (props, context) {
-    const coreService = getCoreService()
+  setup (props) {
     const presentationCore = getPresentationCore()
     const ui = getPresentationUI()
 
