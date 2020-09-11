@@ -15,13 +15,13 @@
 
 import { Index, Storage } from '../utils'
 import { MemDb } from '../memdb'
-import { Doc, CreateTx, VDoc, Ref, Mixin, Class, Obj, ClassifierKind, PushTx } from '../core'
+import { Doc, CreateTx, VDoc, Ref, Mixin, Class, Obj, ClassifierKind, PushTx, UpdateTx } from '../core'
 
 export class VDocIndex implements Index {
   private modelDb: MemDb
   private storage: Storage
 
-  constructor (modelDb: MemDb, storage: Storage) {
+  constructor(modelDb: MemDb, storage: Storage) {
     this.modelDb = modelDb
     this.storage = storage
   }
@@ -56,4 +56,9 @@ export class VDocIndex implements Index {
   onPush (tx: PushTx): Promise<any> {
     return this.storage.push(tx._objectClass, tx._objectId, tx._attribute, tx._attributes)
   }
+
+  onUpdate (tx: UpdateTx): Promise<any> {
+    return this.storage.update(tx._objectClass, tx._objectId, tx._attributes)
+  }
+
 }

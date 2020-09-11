@@ -26,6 +26,7 @@ export interface CoreProtocol {
 export interface Index {
   onCreate (create: CreateTx): Promise<any>
   onPush (push: PushTx): Promise<any>
+  onUpdate (update: UpdateTx): Promise<any>
 }
 
 export interface Storage {
@@ -62,7 +63,9 @@ export class TxProcessor {
         // return this.push(tx._objectClass, tx._objectId, (tx as PushTx)._attribute, (tx as PushTx)._attributes)
       }
       case core.class.UpdateTx: {
-        throw new Error('not implemented (apply tx)')
+        return Promise.all(
+          this.indices.map(index => index.onUpdate(tx as UpdateTx))
+        )
         // return this.update(tx._objectClass, tx._objectId, (tx as UpdateTx)._attributes)
       }
       case core.class.DeleteTx: {
