@@ -58,6 +58,6 @@ export class VDocIndex implements Index {
   }
 
   onUpdate (tx: UpdateTx): Promise<any> {
-    return this.storage.update(tx._objectClass, tx._objectId, tx._attributes)
+    return this.storage.update(tx._objectClass, { _id: tx._objectId }, tx._attributes)
   }
 }

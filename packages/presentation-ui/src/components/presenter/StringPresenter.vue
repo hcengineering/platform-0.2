@@ -38,8 +38,7 @@ export default defineComponent({
 
     return {
       value,
-      onChange (event) {
-        console.log('!!!!!!!ONCHANGE')
+      onUpdate (event) {
         context.emit('update:modelValue', value.value)
       }
     }
@@ -50,7 +49,7 @@ export default defineComponent({
 
 <template>
   <div>
-    <InlineEdit :placeholder="attribute.placeholder" v-model="value" @change="onChange" />
+    <InlineEdit :placeholder="attribute.placeholder" v-model="value" @update="onUpdate" />
   </div>
 </template>
 

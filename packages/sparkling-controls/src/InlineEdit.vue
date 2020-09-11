@@ -70,6 +70,7 @@ export default defineComponent({
         :placeholder="placeholder"
         @input="onInput($event.target.value)"
         @focus="computeSize($event.target.value)"
+        @change="$emit('update', $event.target.value)"
       />
     </div>
   </div>
