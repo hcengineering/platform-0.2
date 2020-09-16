@@ -21,13 +21,14 @@
   import Spinner from "./internal/Spinner.svelte";
   import Icon from "./Icon.svelte";
 
-  export let is: AnyComponent;
+  export let is: AnyComponent | undefined;
   export let props: any
 
   const platform = getContext("platform") as Platform
-  $: component = platform.getResource(is)
+  $: component = is ? platform.getResource(is) : null
 </script>
 
+{#if component}
 {#await component}
   <Spinner />
 {:then ctor}
@@ -35,3 +36,4 @@
 {:catch}
   <Icon icon={ui.icon.Error} clazz="icon-2x" />
 {/await}
+{/if}

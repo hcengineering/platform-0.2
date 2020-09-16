@@ -35,6 +35,7 @@ export interface UIService extends Service {
   createApp (root: HTMLElement): any
   getLocation (): Readable<Location>
   navigate (url: string): void
+  showModal (component: AnyComponent, props: any): void
 }
 
 export default plugin('ui' as Plugin<UIService>, {}, {
