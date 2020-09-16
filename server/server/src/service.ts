@@ -15,16 +15,16 @@
 
 import { MongoClient, Db } from 'mongodb'
 
-import { core, Ref, Class, Doc, MemDb, AnyLayout, CoreDomain, CoreProtocol, Tx, TxProcessor, Storage } from '@anticrm/platform'
+import { Ref, Class, Doc, Model, AnyLayout, MODEL_DOMAIN, CoreProtocol, Tx, TxProcessor, Storage } from '@anticrm/core'
 
 import WebSocket from 'ws'
 import { makeResponse, Response } from './rpc'
 import { PlatformServer } from './server'
 
-import { VDocIndex } from '@anticrm/platform/src/indices/vdoc'
-import { TitleIndex } from '@anticrm/platform/src/indices/title'
-import { TextIndex } from '@anticrm/platform/src/indices/text'
-import { TxIndex } from '@anticrm/platform/src/indices/tx'
+import { VDocIndex } from '@anticrm/core/src/indices/vdoc'
+import { TitleIndex } from '@anticrm/core/src/indices/title'
+import { TextIndex } from '@anticrm/core/src/indices/text'
+import { TxIndex } from '@anticrm/core/src/indices/tx'
 
 interface CommitInfo {
   created: Doc[]
@@ -42,7 +42,7 @@ export async function connect (uri: string, dbName: string, ws: WebSocket, serve
   const client = await MongoClient.connect(uri, { useUnifiedTopology: true })
   const db = client.db(dbName)
 
-  const memdb = new MemDb(CoreDomain.Model)
+  const memdb = new Model(MODEL_DOMAIN)
   console.log('loading model...')
   const model = await db.collection('model').find({}).toArray()
   console.log('model loaded.')
@@ -106,7 +106,7 @@ export async function connect (uri: string, dbName: string, ws: WebSocket, serve
     },
 
     async loadDomain (domain: string): Promise<Doc[]> {
-      if (domain === CoreDomain.Model)
+      if (domain === MODEL_DOMAIN)
         return memdb.dump()
       console.log('domain:', domain)
       return db.collection(domain).find({}).toArray()

@@ -13,28 +13,28 @@
 // limitations under the License.
 //
 
-import { Builder } from '@anticrm/platform-model'
+import { Builder } from '@anticrm/model'
 
-import platformModel from '@anticrm/platform-model/src/model'
-import presentationModel from '@anticrm/presentation-model/src/model'
-import workbenchModel from '@anticrm/workbench-model/src/model'
-import contactModel from '@anticrm/contact-model/src/model'
-import chunterModel from '@anticrm/chunter-model/src/model'
-import recruitmentModel from '@anticrm/recruitment-model/src/model'
-import taskModel from '@anticrm/task-model/src/model'
+import { model as platformCore } from '@anticrm/platform-core/src/__model__'
+import { model as presentation } from '@anticrm/presentation/src/__model__'
+import { model as contact } from '@anticrm/contact/src/__model__'
+import { model as workbench } from '@anticrm/workbench/src/__model__'
+import { model as task } from '@anticrm/task/src/__model__'
+// import chunterModel from '@anticrm/chunter-model/src/model'
+// import recruitmentModel from '@anticrm/recruitment-model/src/model'
 
-import taskStrings from '@anticrm/task-model/src/strings/ru'
+// import taskStrings from '@anticrm/task-model/src/strings/ru'
 
 export const builder = new Builder()
-builder.load(platformModel)
-builder.load(presentationModel)
-builder.load(workbenchModel)
-builder.load(contactModel)
-builder.load(chunterModel)
-builder.load(recruitmentModel)
-builder.load(taskModel)
+builder.load(platformCore)
+builder.load(presentation)
+builder.load(contact)
+builder.load(workbench)
+builder.load(task)
+// builder.load(chunterModel)
+// builder.load(recruitmentModel)
 
 export const Model = builder.dumpAll()
 export const Strings = {
-  ...taskStrings
+  // ...taskStrings
 }

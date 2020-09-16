@@ -17,9 +17,9 @@ import { Db } from 'mongodb'
 import { User } from '@anticrm/contact'
 import { builder } from '@anticrm/boot/src/boot'
 
-import contact from '@anticrm/contact-model'
+import contact from '@anticrm/contact/src/__model__'
 import { Person } from '@anticrm/contact'
-import { Ref, Space, Property, generateId } from '@anticrm/platform'
+import { Ref, Space, Property, generateId } from '@anticrm/core'
 
 export function createUser (db: Db, email: string, username: string) {
 

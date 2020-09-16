@@ -14,7 +14,8 @@
 //
 
 import { Binary, Db, ObjectID } from 'mongodb'
-import { Request, Response, PlatformError, Status, Severity } from '@anticrm/platform'
+import { PlatformError, Status, Severity } from '@anticrm/platform'
+import { Request, Response } from '@anticrm/core'
 import { randomBytes, pbkdf2Sync } from 'crypto'
 import { Buffer } from 'buffer'
 import { encode } from 'jwt-simple'
