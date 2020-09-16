@@ -14,11 +14,13 @@
 //
 
 import type { Platform } from '@anticrm/platform'
-import type { UIService } from '.'
+import type { UIService, AnyComponent } from '.'
 
 import { writable, derived } from 'svelte/store'
 
 import Root from './components/internal/Root.svelte'
+
+import { store } from './stores'
 
 /*!
  * Anticrm Platform™ UI Plugin
@@ -50,10 +52,15 @@ export default async (platform: Platform): Promise<UIService> => {
     locationWritable.set(windowLocation())
   }
 
+  function showModal (component: AnyComponent, props: any) {
+    store.set({ is: component, props })
+  }
+
   const ui = {
     createApp,
     getLocation,
     navigate,
+    showModal
   }
 
   return ui
