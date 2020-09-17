@@ -47,6 +47,7 @@ export default plugin('ui' as Plugin<UIService>, {}, {
     Error: '' as Asset,
     Network: '' as Asset,
     Search: '' as Asset,
+    Add: '' as Asset,
   },
   component: {
     Spinner: '' as AnyComponent,

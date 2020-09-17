@@ -15,12 +15,12 @@
 
 import {
   Attribute, Class, Classifier, Doc, Emb, Mixin, Obj, Ref, Tx, Type, VDoc,
-  ArrayOf, BagOf, InstanceOf, RefTo, Indices, CORE_CLASS_TEXT, Space,
+  ArrayOf, BagOf, InstanceOf, RefTo, Indices, CORE_CLASS_TEXT, Space, Application, List, CreateTx,
   DateProperty, StringProperty, Backlinks, Backlink, BACKLINKS_DOMAIN, MODEL_DOMAIN, TX_DOMAIN, TITLE_DOMAIN
 } from '@anticrm/core'
 
 import { extendIds, ModelClass, Prop, Builder } from '@anticrm/model'
-import _core, { Application } from '@anticrm/platform-core'
+import _core from '@anticrm/platform-core'
 
 const core = extendIds(_core, {
   class: {
@@ -76,8 +76,20 @@ export class TApplication extends TDoc implements Application {
 
 @ModelClass(core.class.Space, core.class.Doc, MODEL_DOMAIN)
 export class TSpace extends TDoc implements Space {
-  @Prop() label!: string
+  @Prop() name!: string
+  @Prop() lists!: List[]
 }
+
+// @ModelClass(core.class.Tx, core.class.Doc, TX_DOMAIN)
+// export class TTx extends TDoc implements Tx {
+//   @Prop() _date!: DateProperty
+//   @Prop() _user!: StringProperty
+// }
+
+// @ModelClass(core.class.CreateTx, core.class.Tx, TX_DOMAIN)
+// export class TCreateTx extends TTx implements CreateTx {
+//   @Prop() object!: Doc
+// }
 
 @ModelClass(core.class.VDoc, core.class.Doc)
 export class TVDoc extends TDoc implements VDoc {
@@ -136,20 +148,17 @@ export function model (S: Builder) {
   }, TITLE_DOMAIN)
 
   S.createClass(core.class.Tx, core.class.Doc, {
-    _objectClass: S.attr(core.class.RefTo, { to: core.class.Class }),
-    _objectId: S.attr(core.class.Type, {}),
     _date: S.attr(core.class.Type, {}),
     _user: S.attr(core.class.Type, {}),
   }, TX_DOMAIN)
 
   S.createClass(core.class.CreateTx, core.class.Tx, {
-    _space: S.attr(core.class.Type, {}),
-    _attributes: S.attr(core.class.BagOf, {
-      of: S.newInstance(core.class.InstanceOf, { of: core.class.Type })
-    })
+    object: S.attr(core.class.Type, {}),
   }, TX_DOMAIN)
 
   S.createClass(core.class.PushTx, core.class.Tx, {
+    _objectClass: S.attr(core.class.RefTo, { to: core.class.Class }),
+    _objectId: S.attr(core.class.Type, {}),
     _attribute: S.attr(core.class.Type, {}),
     _attributes: S.attr(core.class.BagOf, {
       of: S.newInstance(core.class.InstanceOf, { of: core.class.Type })
@@ -157,12 +166,16 @@ export function model (S: Builder) {
   }, TX_DOMAIN)
 
   S.createClass(core.class.UpdateTx, core.class.Tx, {
+    _objectClass: S.attr(core.class.RefTo, { to: core.class.Class }),
+    _objectId: S.attr(core.class.Type, {}),
     _attributes: S.attr(core.class.BagOf, {
       of: S.newInstance(core.class.InstanceOf, { of: core.class.Type })
     })
   }, TX_DOMAIN)
 
   S.createClass(core.class.DeleteTx, core.class.Tx, {
+    _objectClass: S.attr(core.class.RefTo, { to: core.class.Class }),
+    _objectId: S.attr(core.class.Type, {}),
   }, TX_DOMAIN)
 
   S.createMixin(core.mixin.Indices, core.class.Class, {

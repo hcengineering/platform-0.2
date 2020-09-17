@@ -17,9 +17,25 @@ import { AnyLayout, Class, CoreProtocol, Doc, Domain, QueryResult, Ref } from '@
 
 export class Cache implements Domain {
 
+  async store (doc: Doc): Promise<void> {
+    console.log('cache store')
+  }
+
+  async push (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: any): Promise<void> {
+    console.log('cache push')
+  }
+
+  async update (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attributes: any): Promise<void> {
+    console.log('cache update')
+  }
+
+  async remove (_class: Ref<Class<Doc>>, doc: Ref<Doc>): Promise<void> {
+    console.log('cache remove')
+  }
+
   private coreProtocol: CoreProtocol
 
-  constructor(coreProtocol: CoreProtocol) {
+  constructor (coreProtocol: CoreProtocol) {
     this.coreProtocol = coreProtocol
   }
 

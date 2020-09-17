@@ -13,16 +13,7 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Doc, Ref, Class, Classifier } from './core'
-import { Tx, CreateTx, VDoc, UpdateTx, PushTx } from './tx'
-import { Model } from './model'
-
-import {
-  CORE_CLASS_CREATETX,
-  CORE_CLASS_PUSHTX,
-  CORE_CLASS_UPDATETX,
-  CORE_CLASS_DELETETX
-} from './tx'
+import { AnyLayout, Doc, Ref, Class, Tx, Index, Storage } from './core'
 
 export interface CoreProtocol {
   find (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc[]>
@@ -31,58 +22,27 @@ export interface CoreProtocol {
   loadDomain (domain: string, index?: string, direction?: string): Promise<Doc[]>
 }
 
-export interface Index {
-  onCreate (create: CreateTx): Promise<any>
-  onPush (push: PushTx): Promise<any>
-  onUpdate (update: UpdateTx): Promise<any>
+type Subscriber<T> = (value: T) => void
+type Unsubscriber = () => void
+
+export interface QueryResult<T extends Doc> {
+  subscribe (run: Subscriber<T[]>): Unsubscriber
 }
 
-export interface Storage {
-  store (doc: Doc): Promise<void>
-  push (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: any): Promise<void>
-  update (_class: Ref<Class<Doc>>, selector: object, attributes: any): Promise<void>
-  remove (_class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<void>
+export interface Domain extends Storage {
+  find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]>
+  query<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): QueryResult<T>
 }
-
-// U T I L S
 
 export class TxProcessor {
-
-  protected modelDb: Model
   private indices: Index[]
 
-  constructor(modelDb: Model, indices: Index[]) {
-    this.modelDb = modelDb
+  constructor (indices: Index[]) {
     this.indices = indices
   }
 
   process (tx: Tx): Promise<any> {
-    const _class = tx._class
-    switch (_class) {
-      case CORE_CLASS_CREATETX: {
-        return Promise.all(
-          this.indices.map(index => index.onCreate(tx as CreateTx))
-        )
-      }
-      case CORE_CLASS_PUSHTX: {
-        return Promise.all(
-          this.indices.map(index => index.onPush(tx as PushTx))
-        )
-        // return this.push(tx._objectClass, tx._objectId, (tx as PushTx)._attribute, (tx as PushTx)._attributes)
-      }
-      case CORE_CLASS_UPDATETX: {
-        return Promise.all(
-          this.indices.map(index => index.onUpdate(tx as UpdateTx))
-        )
-        // return this.update(tx._objectClass, tx._objectId, (tx as UpdateTx)._attributes)
-      }
-      case CORE_CLASS_DELETETX: {
-        throw new Error('not implemented (apply tx)')
-        // return this.remove(tx._objectClass, tx._objectId)
-      }
-      default:
-        throw new Error('not implemented (apply tx)')
-    }
+    return Promise.all(this.indices.map(index => index.tx(tx)))
   }
 
 }

@@ -36,7 +36,15 @@
       status = platformStatus;
     }
   )
+
+  function handleKeydown(ev: KeyboardEvent) {
+    if (ev.key === 'Escape' && $modal.is) {
+      modal.set({ is: undefined, props: {} })
+    }
+  }
 </script>
+
+<svelte:window on:keydown={handleKeydown}/>
 
 <Theme>
   <div id="ui-root">

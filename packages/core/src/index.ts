@@ -15,10 +15,10 @@
 
 export * from './rpc'
 export * from './core'
-export * from './domain'
 export * from './model'
 export * from './text'
 export * from './tx'
 export * from './title'
+export * from './vdoc'
 export * from './objectid'
 export * from './utils'

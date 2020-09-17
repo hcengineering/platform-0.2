@@ -15,16 +15,13 @@
 
 import { MongoClient, Db } from 'mongodb'
 
-import { Ref, Class, Doc, Model, AnyLayout, MODEL_DOMAIN, CoreProtocol, Tx, TxProcessor, Storage } from '@anticrm/core'
+import { Ref, Class, Doc, Model, AnyLayout, MODEL_DOMAIN, CoreProtocol, Tx, TxProcessor, Storage, ModelIndex } from '@anticrm/core'
+import { VDocIndex, TitleIndex, TextIndex, TxIndex } from '@anticrm/core'
 
 import WebSocket from 'ws'
 import { makeResponse, Response } from './rpc'
 import { PlatformServer } from './server'
 
-import { VDocIndex } from '@anticrm/core/src/indices/vdoc'
-import { TitleIndex } from '@anticrm/core/src/indices/title'
-import { TextIndex } from '@anticrm/core/src/indices/text'
-import { TxIndex } from '@anticrm/core/src/indices/tx'
 
 interface CommitInfo {
   created: Doc[]
@@ -64,6 +61,7 @@ export async function connect (uri: string, dbName: string, ws: WebSocket, serve
   const mongoStorage: Storage = {
     async store (doc: Doc): Promise<any> {
       const domain = memdb.getDomain(doc._class)
+      console.log('STORE:', domain, doc)
       return db.collection(domain).insertOne(doc)
     },
 
@@ -82,11 +80,12 @@ export async function connect (uri: string, dbName: string, ws: WebSocket, serve
     }
   }
 
-  const txProcessor = new TxProcessor(memdb, [
+  const txProcessor = new TxProcessor([
+    new TxIndex(mongoStorage),
     new VDocIndex(memdb, mongoStorage),
     new TitleIndex(memdb, mongoStorage),
     new TextIndex(memdb, mongoStorage),
-    new TxIndex(memdb, mongoStorage),
+    new ModelIndex(memdb, mongoStorage)
   ])
 
   const clientControl = {

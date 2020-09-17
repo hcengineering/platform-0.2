@@ -14,12 +14,21 @@
 //
 
 import type { Platform } from '@anticrm/platform'
-import { Ref, Class, Doc, AnyLayout, Domain, MODEL_DOMAIN, CoreProtocol, Tx, QueryResult } from '@anticrm/core'
+import {
+  Ref, Class, Doc, AnyLayout, Domain, MODEL_DOMAIN, CoreProtocol, Tx,
+  QueryResult, VDoc, Space, generateId, CreateTx, Property, PropertyType, ModelIndex
+} from '@anticrm/core'
 import { ModelDb } from './modeldb'
 
-import type { CoreService } from '.'
+import core, { CoreService } from '.'
+import login from '@anticrm/login'
 import rpcService from './rpc'
+
+import { TxProcessor, VDocIndex, TitleIndex, TextIndex, TxIndex } from '@anticrm/core'
+
 import { Cache } from './cache'
+import { Titles } from './titles'
+import { Graph } from './graph'
 
 /*!
  * Anticrm Platform™ Workbench Plugin
@@ -37,12 +46,22 @@ export default async (platform: Platform): Promise<CoreService> => {
   }
 
   const model = new ModelDb()
-  model.loadModel(await coreProtocol.loadDomain(MODEL_DOMAIN))
-
   const cache = new Cache(coreProtocol)
+  const titles = new Titles()
+  const graph = new Graph()
+
+  model.loadModel(await coreProtocol.loadDomain(MODEL_DOMAIN))
 
   const domains = new Map<string, Domain>()
   domains.set(MODEL_DOMAIN, model)
+
+  const txProcessor = new TxProcessor([
+    new TxIndex(cache),
+    new VDocIndex(model, cache),
+    new TitleIndex(model, titles),
+    new TextIndex(model, graph),
+    new ModelIndex(model, model)
+  ])
 
   function find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
     const domainName = model.getDomain(_class)
@@ -62,10 +81,24 @@ export default async (platform: Platform): Promise<CoreService> => {
     return cache.query(_class, query)
   }
 
+  function createDoc<T extends Doc> (doc: Doc): Promise<void> {
+
+    const tx: CreateTx = {
+      _class: core.class.CreateTx,
+      _id: generateId() as Ref<Doc>,
+      _date: Date.now() as Property<number, Date>,
+      _user: platform.getMetadata(login.metadata.WhoAmI) as Property<string, string>,
+      object: doc
+    }
+
+    return coreProtocol.tx(tx)
+  }
+
   return {
     getModel () { return model },
     query,
-    find
+    find,
+    createDoc
   }
 
 }

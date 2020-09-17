@@ -16,7 +16,7 @@
 import { AnyComponent } from '.'
 import { writable } from 'svelte/store'
 
-export interface CompAndProps {
+interface CompAndProps {
   is: AnyComponent | undefined
   props: any
 }

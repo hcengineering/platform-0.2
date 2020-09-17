@@ -13,7 +13,11 @@
 // limitations under the License.
 //
 
-import { Ref, Class, Doc, Type } from './core'
+import { Ref, Class, Doc, Type, Obj, Attribute, Tx } from './core'
+import { CreateTx, CORE_CLASS_CREATETX } from './tx'
+import { Index, Storage } from './core'
+import { Model } from './model'
+import { generateId } from './objectid'
 
 export interface Backlink {
   _backlinkClass: Ref<Class<Doc>>
@@ -50,6 +54,76 @@ export interface MessageLink extends MessageElement {
   _class: Ref<Class<Doc>>
   _id: Ref<Doc>
 }
+
+// I N D E X
+
+export class TextIndex implements Index {
+  private modelDb: Model
+  private storage: Storage
+  private textAttributes = new Map<Ref<Class<Obj>>, string[]>()
+
+  constructor (modelDb: Model, storage: Storage) {
+    this.modelDb = modelDb
+    this.storage = storage
+  }
+
+  private getTextAttibutes (_class: Ref<Class<Obj>>): string[] {
+    const cached = this.textAttributes.get(_class)
+    if (cached) return cached
+
+    const attributes = []
+    const clazz = this.modelDb.get(_class) as Class<Doc>
+    for (const key in clazz._attributes) {
+      const attr = (clazz._attributes as { [key: string]: Attribute })[key]
+      if (attr.type._class === CORE_CLASS_TEXT) {
+        attributes.push(key)
+      }
+    }
+
+    if (clazz._extends) { attributes.push(...this.getTextAttibutes(clazz._extends)) }
+
+    this.textAttributes.set(_class, attributes)
+    return attributes
+  }
+
+  private backlinks (message: string): Backlink[] {
+    return parseMessage(message)
+      .filter(el => el.kind === MessageElementKind.LINK)
+      .map(el => ({
+        _backlinkId: (el as MessageLink)._id,
+        _backlinkClass: (el as MessageLink)._class
+      }))
+  }
+
+  async tx (tx: Tx): Promise<any> {
+    switch (tx._class) {
+      case CORE_CLASS_CREATETX:
+        return this.onCreate(tx as CreateTx)
+      default:
+        console.log('not implemented text tx', tx)
+    }
+  }
+
+  async onCreate (create: CreateTx): Promise<any> {
+    const attributes = this.getTextAttibutes(create.object._class)
+    const backlinks = []
+    for (const attr of attributes) {
+      backlinks.push(...this.backlinks((create.object as any)[attr] as string))
+    }
+    if (backlinks.length === 0) { return }
+    const doc: Backlinks = {
+      _class: CORE_CLASS_BACKLINKS,
+      _id: generateId() as Ref<Backlinks>,
+      _objectClass: create.object._class,
+      _objectId: create.object._id,
+      backlinks
+    }
+    return this.storage.store(doc)
+  }
+
+}
+
+// P A R S E R
 
 enum State {
   STATE_TEXT,
