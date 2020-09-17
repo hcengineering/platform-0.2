@@ -31,9 +31,3 @@ export function getUIService (): UIService {
 export function find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
   return getCoreService().then(coreService => coreService.find(_class, query))
 }
-
-export function findCast<T extends Doc> (_class: Ref<Class<Doc>>, query: AnyLayout, mixin: Ref<Mixin<T>>): Promise<T[]> {
-  return getCoreService()
-    .then(coreService => coreService.find(_class, query)
-      .then(docs => coreService.getModel().cast(docs, mixin)))
-}

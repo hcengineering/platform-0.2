@@ -15,7 +15,8 @@
 
 <script lang="ts">
   import { Ref, Space, Doc } from '@anticrm/core'
-  import { find, getUIService } from '../../utils'
+  import { onDestroy } from 'svelte'
+  import { find, getCoreService, getUIService } from '../../utils'
   import core from '@anticrm/platform-core'
   import ui from '@anticrm/platform-ui'
   import workbench, { WorkbenchApplication } from '../..'
@@ -38,7 +39,13 @@
 
   let space: Ref<Space>
   let spaces: Space[] = []
-  find(core.class.Space, {}).then(docs => {spaces = docs})
+  let spaceUnsubscribe: () => void | undefined
+
+  getCoreService()
+    .then(coreService => coreService.query(core.class.Space, {}))
+    .then(qr => { spaceUnsubscribe = qr.subscribe(docs => { spaces = docs }) })
+
+  onDestroy(() => { if (spaceUnsubscribe) spaceUnsubscribe() })
 
   let application: Ref<Doc>
   let applications: WorkbenchApplication[] = []

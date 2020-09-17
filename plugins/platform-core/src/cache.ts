@@ -13,9 +13,9 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Class, CoreProtocol, Doc, Domain, QueryResult, Ref } from '@anticrm/core'
+import { AnyLayout, Class, CoreProtocol, Doc, Storage, Ref } from '@anticrm/core'
 
-export class Cache implements Domain {
+export class Cache implements Storage {
 
   async store (doc: Doc): Promise<void> {
     console.log('cache store')
@@ -43,12 +43,12 @@ export class Cache implements Domain {
     return this.coreProtocol.find(_class, query) as Promise<T[]>
   }
 
-  query<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): QueryResult<T> {
-    return {
-      subscribe: (cb: (result: T[]) => void) => {
-        this.find(_class, query).then(result => { cb(result) })
-        return () => { }
-      }
-    }
-  }
+  // query<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): QueryResult<T> {
+  //   return {
+  //     subscribe: (cb: (result: T[]) => void) => {
+  //       this.find(_class, query).then(result => { cb(result) })
+  //       return () => { }
+  //     }
+  //   }
+  // }
 }
