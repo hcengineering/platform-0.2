@@ -14,8 +14,8 @@
 //
 
 import { generateId } from './objectid'
-import { AnyLayout, Class, Classifier, ClassifierKind, Doc, Mixin, Obj, PropertyType, Ref } from './core'
-import { Domain, QueryResult } from './domain'
+import { AnyLayout, Class, Classifier, ClassifierKind, Doc, Mixin, Obj, PropertyType, Ref, Storage, Index } from './core'
+import { QueryResult } from './utils'
 
 export function mixinKey (mixin: Ref<Mixin<Doc>>, key: string): string {
   return key + '|' + mixin.replace('.', '~')
@@ -23,12 +23,12 @@ export function mixinKey (mixin: Ref<Mixin<Doc>>, key: string): string {
 
 export const MODEL_DOMAIN = 'model'
 
-export class Model implements Domain {
+export class Model implements Storage {
   private domain: string
   private objects = new Map<Ref<Doc>, Doc>()
   private byClass: Map<Ref<Class<Doc>>, Doc[]> | null = null
 
-  constructor(domain: string) {
+  constructor (domain: string) {
     this.domain = domain
   }
 
@@ -230,10 +230,7 @@ export class Model implements Domain {
     return result === docs ? docs.concat() : result
   }
 
-  tx (): Promise<void> {
-    throw new Error('memdb is read only')
-  }
-
+  // TODO: move to platform core
   query<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): QueryResult<T> {
     return {
       subscribe: (cb: (result: T[]) => void) => {
@@ -241,6 +238,20 @@ export class Model implements Domain {
         return () => { }
       }
     }
+  }
+
+  async store (doc: Doc): Promise<void> {
+    this.add(doc)
+  }
+
+  push (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: any): Promise<void> {
+    throw new Error('Method not implemented. model push')
+  }
+  update (_class: Ref<Class<Doc>>, selector: object, attributes: any): Promise<void> {
+    throw new Error('Method not implemented. model update')
+  }
+  remove (_class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<void> {
+    throw new Error('Method not implemented. model remove')
   }
 
 }
@@ -254,3 +265,4 @@ function filterEq (docs: Doc[], propertyKey: string, value: PropertyType): Doc[]
   }
   return result
 }
+

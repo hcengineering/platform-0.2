@@ -19,6 +19,7 @@ import workbench, { WorkbenchService } from '.'
 import Workbench from './components/internal/Workbench.svelte'
 import DefaultPerspective from './components/internal/DefaultPerspective.svelte'
 import ActivityView from './components/internal/ActivityView.svelte'
+import CreateSpace from './components/internal/CreateSpace.svelte'
 
 /*!
  * Anticrm Platform™ Workbench Plugin
@@ -30,6 +31,7 @@ export default async (platform: Platform): Promise<WorkbenchService> => {
   platform.setResource(workbench.component.Workbench, Workbench)
   platform.setResource(workbench.component.DefaultPerspective, DefaultPerspective)
   platform.setResource(workbench.component.ActivityView, ActivityView)
+  platform.setResource(workbench.component.CreateSpace, CreateSpace)
 
   return {}
 

@@ -13,46 +13,32 @@
 // limitations under the License.
 //
 
-import { Property, Doc, StringProperty, Ref, Class, Classifier, PropertyType } from './core'
-
-export type DateProperty = Property<number, Date>
+import { DateProperty, Doc, StringProperty, Ref, Class, Emb, PropertyType, Tx } from './core'
+import { Index, Storage } from './core'
+import { Model, MODEL_DOMAIN } from './model'
 
 export const TX_DOMAIN = 'tx'
 
-export interface Space extends Doc {
-  label: string
-}
-
-export interface VDoc extends Doc {
-  _space: Ref<Space>
-  _createdOn: DateProperty
-  _createdBy: StringProperty
-  _modifiedOn?: DateProperty
-  _modifiedBy?: StringProperty
-}
-
-export interface Tx extends Doc {
-  _date: DateProperty
-  _user: StringProperty
-  _objectId: Ref<VDoc>
-  _objectClass: Ref<Class<VDoc>>
-}
-
 export interface CreateTx extends Tx {
-  _space: Ref<Space>
-  _attributes: { [key: string]: PropertyType }
+  object: Doc
 }
 
 export interface PushTx extends Tx {
+  _objectId: Ref<Doc>
+  _objectClass: Ref<Class<Doc>>
   _attribute: StringProperty
   _attributes: { [key: string]: PropertyType }
 }
 
 export interface UpdateTx extends Tx {
+  _objectId: Ref<Doc>
+  _objectClass: Ref<Class<Doc>>
   _attributes: { [key: string]: any }
 }
 
 export interface DeleteTx extends Tx {
+  _objectId: Ref<Doc>
+  _objectClass: Ref<Class<Doc>>
 }
 
 export const CORE_CLASS_CREATETX = 'class:core.CreateTx' as Ref<Class<CreateTx>>
@@ -60,4 +46,43 @@ export const CORE_CLASS_PUSHTX = 'class:core.PushTx' as Ref<Class<PushTx>>
 export const CORE_CLASS_UPDATETX = 'class:core.UpdateTx' as Ref<Class<UpdateTx>>
 export const CORE_CLASS_DELETETX = 'class:core.DeleteTx' as Ref<Class<DeleteTx>>
 
+export class TxIndex implements Index {
+  private storage: Storage
 
+  constructor (storage: Storage) {
+    this.storage = storage
+  }
+
+  tx (tx: Tx): Promise<any> {
+    return this.storage.store(tx)
+  }
+}
+
+export class ModelIndex implements Index {
+  private storage: Storage
+  private model: Model
+
+  constructor (model: Model, storage: Storage) {
+    this.model = model
+    this.storage = storage
+  }
+
+  async tx (tx: Tx): Promise<any> {
+    switch (tx._class) {
+      case CORE_CLASS_CREATETX:
+        const createTx = tx as CreateTx
+        if (this.model.getDomain(createTx.object._class) !== MODEL_DOMAIN)
+          return
+        else
+          return this.storage.store(createTx.object)
+      case CORE_CLASS_UPDATETX:
+        const updateTx = tx as UpdateTx
+        if (this.model.getDomain(updateTx._objectClass) !== MODEL_DOMAIN)
+          return
+        else
+          return this.storage.update(updateTx._objectClass, { _id: updateTx._objectId }, updateTx._attributes)
+      default:
+        console.log('not implemented model tx', tx)
+    }
+  }
+}

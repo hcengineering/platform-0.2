@@ -13,6 +13,8 @@
 // limitations under the License.
 //
 
+import { Ref, Doc } from './core'
+
 function toHex (value: number, chars: number): string {
   const result = value.toString(16)
   if (result.length < chars) {
@@ -34,6 +36,6 @@ function count (): string {
   return toHex(val, 6)
 }
 
-export function generateId (): string {
-  return timestamp() + random + count()
+export function generateId (): Ref<Doc> {
+  return timestamp() + random + count() as Ref<Doc>
 }

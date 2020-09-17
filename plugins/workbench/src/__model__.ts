@@ -62,11 +62,13 @@ export function model (S: Builder) {
   }, workbench.perspective.Default)
 
   S.createDocument(core.class.Space, {
-    label: 'Общее'
+    name: 'Общее',
+    lists: []
   }, workbench.space.General)
 
   S.createDocument(core.class.Space, {
-    label: 'Всякое'
+    name: 'Всякое',
+    lists: []
   }, workbench.space.Random)
 
   S.createDocument(workbench.class.WorkbenchApplication, {

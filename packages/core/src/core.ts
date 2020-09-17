@@ -42,6 +42,7 @@ export type PropertyType = Property<PrimitiveType, any>
   | { [key: string]: PropertyType }
 
 export type StringProperty = Property<string, string>
+export type DateProperty = Property<number, Date>
 
 export interface Type extends Emb {
   _default?: PropertyType
@@ -113,4 +114,22 @@ export const CORE_MIXIN_INDICES = 'mixin:core.Indices' as Ref<Mixin<Indices>>
 
 export interface AnyLayout {
   [key: string]: PropertyType
+}
+
+//
+
+export interface Tx extends Doc {
+  _date: DateProperty
+  _user: StringProperty
+}
+
+export interface Index {
+  tx (tx: Tx): Promise<any>
+}
+
+export interface Storage {
+  store (doc: Doc): Promise<void>
+  push (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: any): Promise<void>
+  update (_class: Ref<Class<Doc>>, selector: object, attributes: any): Promise<void>
+  remove (_class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<void>
 }

@@ -17,18 +17,21 @@
   import { Ref, Space, Doc } from '@anticrm/core'
   import { find, getUIService } from '../../utils'
   import core from '@anticrm/platform-core'
-
-  import LinkTo from '@anticrm/platform-ui/src/components/LinkTo.svelte'
+  import ui from '@anticrm/platform-ui'
   import workbench, { WorkbenchApplication } from '../..'
 
+  import LinkTo from '@anticrm/platform-ui/src/components/LinkTo.svelte'
+  import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import Component from '@anticrm/platform-ui/src/components/Component.svelte'
+
   import { AnyComponent } from '@anticrm/platform-ui';
 
   import InputControl from './InputControl.svelte'
 
-  let location: string[]
+  const uiService = getUIService()
 
-  const locationStore = getUIService().getLocation()
+  let location: string[]
+  const locationStore = uiService.getLocation()
   locationStore.subscribe(loc => {
     location = loc.pathname.split('/')
   })
@@ -55,13 +58,18 @@
 
 <div class="workbench-perspective">
   <div class="projects">
-    <div class="caption-3">Пространства</div>
+    <div class="caption-3">
+      Пространства
+      <a href="/" on:click|preventDefault = { () => { uiService.showModal(workbench.component.CreateSpace, {}) } }>
+        <Icon icon={ui.icon.Add} clazz="icon-embed"/>
+      </a>
+    </div>
     <div class="project" class:selected={!space}>
       <LinkTo href={'/' + location[1] + '/' + location[2]}><b>Все</b></LinkTo>
     </div>
     { #each spaces as s (s._id) }
       <div class="project" class:selected={s._id === space}>
-        <LinkTo href={'/' + location[1] + '/' + location[2] + '/' + s._id}>#{s.label}</LinkTo>
+        <LinkTo href={'/' + location[1] + '/' + location[2] + '/' + s._id}>#{s.name}</LinkTo>
       </div>
     { /each }
 
