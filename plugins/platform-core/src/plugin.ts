@@ -15,8 +15,8 @@
 
 import type { Platform } from '@anticrm/platform'
 import {
-  Ref, Class, Doc, AnyLayout, Domain, MODEL_DOMAIN, CoreProtocol, Tx,
-  QueryResult, VDoc, Space, generateId, CreateTx, Property, PropertyType, ModelIndex
+  Ref, Class, Doc, AnyLayout, MODEL_DOMAIN, CoreProtocol, Tx, TITLE_DOMAIN, BACKLINKS_DOMAIN,
+  VDoc, Space, generateId, CreateTx, Property, PropertyType, ModelIndex
 } from '@anticrm/core'
 import { ModelDb } from './modeldb'
 
@@ -26,12 +26,14 @@ import rpcService from './rpc'
 
 import { TxProcessor, VDocIndex, TitleIndex, TextIndex, TxIndex } from '@anticrm/core'
 
+import { QueryResult, QueriableStorage } from './queries'
+
 import { Cache } from './cache'
 import { Titles } from './titles'
 import { Graph } from './graph'
 
 /*!
- * Anticrm Platform™ Workbench Plugin
+ * Anticrm Platform™ Core Plugin
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */
@@ -45,22 +47,31 @@ export default async (platform: Platform): Promise<CoreService> => {
     loadDomain: (domain: string): Promise<Doc[]> => rpc.request('loadDomain', domain),
   }
 
+  // Storages
+
   const model = new ModelDb()
-  const cache = new Cache(coreProtocol)
   const titles = new Titles()
   const graph = new Graph()
+  const cache = new Cache(coreProtocol)
 
   model.loadModel(await coreProtocol.loadDomain(MODEL_DOMAIN))
 
-  const domains = new Map<string, Domain>()
-  domains.set(MODEL_DOMAIN, model)
+  const qModel = new QueriableStorage(model)
+  const qTitles = new QueriableStorage(titles)
+  const qGraph = new QueriableStorage(graph)
+  const qCache = new QueriableStorage(cache)
+
+  const domains = new Map<string, QueriableStorage>()
+  domains.set(MODEL_DOMAIN, qModel)
+  domains.set(TITLE_DOMAIN, qTitles)
+  domains.set(BACKLINKS_DOMAIN, qGraph)
 
   const txProcessor = new TxProcessor([
-    new TxIndex(cache),
-    new VDocIndex(model, cache),
-    new TitleIndex(model, titles),
-    new TextIndex(model, graph),
-    new ModelIndex(model, model)
+    new TxIndex(qCache),
+    new VDocIndex(model, qCache),
+    new TitleIndex(model, qTitles),
+    new TextIndex(model, qGraph),
+    new ModelIndex(model, qModel)
   ])
 
   function find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
@@ -78,10 +89,10 @@ export default async (platform: Platform): Promise<CoreService> => {
     if (domain) {
       return domain.query(_class, query)
     }
-    return cache.query(_class, query)
+    return qCache.query(_class, query)
   }
 
-  function createDoc<T extends Doc> (doc: Doc): Promise<void> {
+  function createDoc<T extends Doc> (doc: Doc): Promise<any> {
 
     const tx: CreateTx = {
       _class: core.class.CreateTx,
@@ -91,7 +102,7 @@ export default async (platform: Platform): Promise<CoreService> => {
       object: doc
     }
 
-    return coreProtocol.tx(tx)
+    return Promise.all([coreProtocol.tx(tx), txProcessor.process(tx)])
   }
 
   return {

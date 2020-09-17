@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Ref, Classifier, Doc, Class, Title, Storage, Backlinks } from '@anticrm/core'
+import { Ref, Classifier, Doc, Class, Storage, Backlinks, AnyLayout, Backlink } from '@anticrm/core'
 import core from '.'
 
 interface Node {
@@ -37,8 +37,25 @@ export class Graph implements Storage {
 
   private graph = new Map<Ref<Doc>, Node>()
 
-  find (_id: Ref<Doc>) {
-    return this.graph.get(_id)
+  async find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
+    const _id = query['_objectId'] as Ref<Doc>
+    const node = this.graph.get(_id)
+    const result = [] as Doc[]
+
+    if (node) {
+      const backlinks: Backlinks = {
+        _id: 'transient' as Ref<Doc>,
+        _class: core.class.Backlinks,
+        _objectClass: node?._class,
+        _objectId: _id,
+        backlinks: node.links.map(link => ({
+          _backlinkId: link._id,
+          _backlinkClass: link._class,
+        }))
+      }
+      result.push(backlinks)
+    }
+    return result as T[]
   }
 
   async store (doc: Doc): Promise<void> {

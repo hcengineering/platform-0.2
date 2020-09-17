@@ -77,6 +77,10 @@ export async function connect (uri: string, dbName: string, ws: WebSocket, serve
 
     async remove (_class: Ref<Class<Doc>>, doc: Ref<Doc>): Promise<any> {
       throw new Error('Not implemented')
+    },
+
+    async find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
+      throw new Error('find not implemented')
     }
   }
 

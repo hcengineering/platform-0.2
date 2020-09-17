@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Ref, Classifier, Doc, Class, Title, Storage } from '@anticrm/core'
+import { Ref, Classifier, Doc, Class, Title, Storage, AnyLayout } from '@anticrm/core'
 import core from '.'
 
 export interface Node {
@@ -27,13 +27,25 @@ export class Titles implements Storage {
   private graph = new Map<Ref<Doc>, Node>()
   // private titleRef = ref(0)
 
-  find (prefix: string): Node[] {
-    const result = []
-    for (const node of this.graph.values()) {
-      if (node.title.startsWith(prefix))
-        result.push(node)
+  async find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
+    const result = [] as Doc[]
+    if (_class as string !== core.class.Title) {
+      throw new Error('assert _class !== core.class.Title')
     }
-    return result
+    const prefix = query['title'] as string
+    for (const node of this.graph.values()) {
+      if (node.title.startsWith(prefix)) {
+        const title: Title = {
+          _id: 'transient' as Ref<Doc>,
+          _class: core.class.Title,
+          _objectClass: node._class,
+          _objectId: node._id,
+          title: node.title
+        }
+        result.push(title)
+      }
+    }
+    return result as T[]
   }
 
   queryTitle (_id: Ref<Doc>): string {

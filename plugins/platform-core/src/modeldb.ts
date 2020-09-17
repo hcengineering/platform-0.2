@@ -13,14 +13,14 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Attribute, Class, Classifier, MODEL_DOMAIN, Doc, Model, Mixin, Obj, Ref, Domain } from '@anticrm/core'
+import { AnyLayout, Attribute, Class, Classifier, MODEL_DOMAIN, Doc, Model, Mixin, Obj, Ref } from '@anticrm/core'
 import core from '.'
 
 interface Proxy {
   __layout: any
 }
 
-export class ModelDb extends Model implements Domain {
+export class ModelDb extends Model {
 
   constructor () {
     super(MODEL_DOMAIN)

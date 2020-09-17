@@ -22,18 +22,6 @@ export interface CoreProtocol {
   loadDomain (domain: string, index?: string, direction?: string): Promise<Doc[]>
 }
 
-type Subscriber<T> = (value: T) => void
-type Unsubscriber = () => void
-
-export interface QueryResult<T extends Doc> {
-  subscribe (run: Subscriber<T[]>): Unsubscriber
-}
-
-export interface Domain extends Storage {
-  find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]>
-  query<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): QueryResult<T>
-}
-
 export class TxProcessor {
   private indices: Index[]
 

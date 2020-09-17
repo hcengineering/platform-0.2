@@ -15,7 +15,6 @@
 
 import { generateId } from './objectid'
 import { AnyLayout, Class, Classifier, ClassifierKind, Doc, Mixin, Obj, PropertyType, Ref, Storage, Index } from './core'
-import { QueryResult } from './utils'
 
 export function mixinKey (mixin: Ref<Mixin<Doc>>, key: string): string {
   return key + '|' + mixin.replace('.', '~')
@@ -230,15 +229,7 @@ export class Model implements Storage {
     return result === docs ? docs.concat() : result
   }
 
-  // TODO: move to platform core
-  query<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): QueryResult<T> {
-    return {
-      subscribe: (cb: (result: T[]) => void) => {
-        this.find(_class, query).then(result => { cb(result) })
-        return () => { }
-      }
-    }
-  }
+  // S T O R A G E
 
   async store (doc: Doc): Promise<void> {
     this.add(doc)
