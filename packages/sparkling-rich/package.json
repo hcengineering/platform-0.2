@@ -1,0 +1,44 @@
+{
+  "name": "@anticrm/sparkling-rich",
+  "version": "0.2.0",
+  "description": "Sparkling Rich UI Controls",
+  "author": "Andrey Sobolev <haiodo@gmail.com>",
+  "license": "EPL-2.0",
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "echo 'no tests'",
+    "lint": "eslint src/**/*.ts"
+  },
+  "dependencies": {
+    "@anticrm/sparkling-theme": "^0.1.1",
+    "prosemirror-commands": "^1.1.4",
+    "prosemirror-history": "^1.1.3",
+    "prosemirror-inputrules": "^1.1.2",
+    "prosemirror-keymap": "^1.1.4",
+    "prosemirror-schema-basic": "^1.1.2",
+    "prosemirror-schema-list": "^1.1.2",
+    "prosemirror-view": "^1.15.2"
+  },
+  "devDependencies": {
+    "@types/prosemirror-commands": "^1.0.3",
+    "@types/prosemirror-history": "^1.0.1",
+    "@types/prosemirror-inputrules": "^1.0.2",
+    "@types/prosemirror-keymap": "^1.0.3",
+    "@types/prosemirror-model": "^1.7.2",
+    "@types/prosemirror-schema-basic": "^1.0.1",
+    "@types/prosemirror-schema-list": "^1.0.1",
+    "@types/prosemirror-view": "^1.15.0",
+    "@typescript-eslint/eslint-plugin": "^4.1.1",
+    "@typescript-eslint/parser": "^4.1.1",
+    "eslint": "^7.9.0",
+    "eslint-config-airbnb-typescript": "^10.0.0",
+    "eslint-config-standard": "^14.1.1",
+    "eslint-plugin-eslint-comments": "^3.2.0",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "eslint-plugin-svelte3": "^2.7.3"
+  }
+}
