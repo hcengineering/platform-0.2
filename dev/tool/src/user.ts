@@ -35,10 +35,8 @@ export function createUser (db: Db, email: string, username: string) {
     account: email,
   })
 
-  const model = builder.dumpAll()
-  console.log(model.contact[0])
-
-  return db.collection('contact').insertOne(model.contact[0])
+  console.log(user)
+  return db.collection('contact').insertOne(user)
 
 }
 
