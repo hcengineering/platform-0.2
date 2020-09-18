@@ -45,6 +45,9 @@ export default async (platform: Platform): Promise<CoreService> => {
   const titles = new Titles()
   const graph = new Graph()
 
+  // add listener to process data updates from backend
+  rpc.addEventListener(response => coreOffline.tx(response.result as Tx))
+
   const offline = platform.getMetadata(core.metadata.Model)
   if (offline) {
     model.loadModel(offline[CoreDomain.Model])
