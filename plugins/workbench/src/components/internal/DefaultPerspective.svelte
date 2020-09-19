@@ -89,14 +89,14 @@
   </div>
 
   <div class="main">
-    <div class="main-content">
+    <!-- <div class="main-content"> -->
       { #if component}
-        <Component is = {component} props={{_class: "class:task.Task"}} />
+        <Component is = {component} props={{ application }} />
       { /if }
-    </div>
+    <!-- </div>
     <div class="input-control">
       <InputControl />
-    </div>
+    </div> -->
   </div>
 
   <aside>
@@ -114,6 +114,7 @@
 .projects {
   padding: 1em;
   width: 20em;
+  overflow-y: auto;
 
   border-right: 1px solid var(--theme-separator-color);
 
@@ -140,17 +141,22 @@
 
 .main {
   width: 100%;
-  display: flex;
-  flex-direction: column;
+  height: 100%;
+  // background-color: blue;
+  // display: flex;
+  // flex-direction: column;
 
-  .main-content {
-    flex-grow: 2;
-  }
-
-  .input-control {
-    padding: 1em;
-    max-height: 400px;
-  }
+  // .main-content {
+  //   height: 100%;
+    // flex-grow: 2;
+    // align-items: stretch;
+  //   background-color: blue;
+  // }
+  
+  // .input-control {
+  //   padding: 1em;
+  //   max-height: 400px;
+  // }
 }
 
 aside {

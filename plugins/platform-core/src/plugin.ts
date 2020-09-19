@@ -83,6 +83,10 @@ export default async (platform: Platform): Promise<CoreService> => {
     return cache.find(_class, query)
   }
 
+  function findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined> {
+    return find(_class, query).then(docs => docs.length === 0 ? undefined : docs[0])
+  }
+
   function query<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): QueryResult<T> {
     const domainName = model.getDomain(_class)
     const domain = domains.get(domainName)
@@ -109,6 +113,7 @@ export default async (platform: Platform): Promise<CoreService> => {
     getModel () { return model },
     query,
     find,
+    findOne,
     createDoc
   }
 

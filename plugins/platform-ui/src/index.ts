@@ -36,6 +36,7 @@ export interface UIService extends Service {
   getLocation (): Readable<Location>
   navigate (url: string): void
   showModal (component: AnyComponent, props: any): void
+  closeModal (): void
 }
 
 export default plugin('ui' as Plugin<UIService>, {}, {

@@ -16,6 +16,7 @@
 import { Metadata, plugin, Plugin, Resource, Service } from '@anticrm/platform'
 import { StringProperty, Doc, Class, Ref, VDoc, Application } from '@anticrm/core'
 
+import core from '@anticrm/platform-core'
 import ui, { AnyComponent, Asset } from '@anticrm/platform-ui'
 import { IntlString } from '@anticrm/platform-i18n'
 
@@ -35,7 +36,7 @@ export interface WorkbenchApplication extends Application {
 export interface WorkbenchService extends Service {
 }
 
-export default plugin('workbench' as Plugin<WorkbenchService>, {}, {
+export default plugin('workbench' as Plugin<WorkbenchService>, { core: core.id, ui: ui.id }, {
   icon: {
     DefaultPerspective: '' as Asset
   },
@@ -44,6 +45,7 @@ export default plugin('workbench' as Plugin<WorkbenchService>, {}, {
     DefaultPerspective: '' as AnyComponent,
     ActivityView: '' as AnyComponent,
     CreateSpace: '' as AnyComponent,
+    Application: '' as AnyComponent,
   },
   class: {
     Perspective: '' as Ref<Class<Perspective>>,

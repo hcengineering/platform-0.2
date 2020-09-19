@@ -21,6 +21,7 @@ import vue, { AnyComponent, Asset } from '@anticrm/platform-ui'
 import { I18n, IntlString } from '@anticrm/platform-i18n'
 
 import ObjectBrowser from './components/internal/ObjectBrowser.svelte'
+import Properties from './components/internal/Properties.svelte'
 
 /*!
  * Anticrm Platform™ Presentation Core Plugin
@@ -32,6 +33,7 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
   const i18nService = deps.i18n
 
   platform.setResource(ui.component.ObjectBrowser, ObjectBrowser)
+  platform.setResource(ui.component.Properties, Properties)
 
   async function getGroupModel (_class: Ref<Class<Obj>>): Promise<GroupModel> {
     const model = coreService.getModel()
@@ -102,7 +104,7 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
     private readonly attributes: AttrModel[]
     private readonly groups: GroupModel[]
 
-    constructor(groups: GroupModel[], attributes: AttrModel[]) {
+    constructor (groups: GroupModel[], attributes: AttrModel[]) {
       super()
       this.attributes = attributes
       this.groups = groups
@@ -131,7 +133,7 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
     private readonly next: ClassModel
     private readonly filter: { [key: string]: {} }
 
-    constructor(next: ClassModel, filter: { [key: string]: {} }) {
+    constructor (next: ClassModel, filter: { [key: string]: {} }) {
       super()
       this.next = next
       this.filter = filter

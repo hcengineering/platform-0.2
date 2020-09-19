@@ -20,18 +20,23 @@ import Workbench from './components/internal/Workbench.svelte'
 import DefaultPerspective from './components/internal/DefaultPerspective.svelte'
 import ActivityView from './components/internal/ActivityView.svelte'
 import CreateSpace from './components/internal/CreateSpace.svelte'
+import Application from './components/internal/Application.svelte'
+
+import { CoreService } from '@anticrm/platform-core'
+import { UIService } from '@anticrm/platform-ui'
 
 /*!
  * Anticrm Platform™ Workbench Plugin
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */
-export default async (platform: Platform): Promise<WorkbenchService> => {
+export default async (platform: Platform, deps: { core: CoreService, ui: UIService }): Promise<WorkbenchService> => {
 
   platform.setResource(workbench.component.Workbench, Workbench)
   platform.setResource(workbench.component.DefaultPerspective, DefaultPerspective)
   platform.setResource(workbench.component.ActivityView, ActivityView)
   platform.setResource(workbench.component.CreateSpace, CreateSpace)
+  platform.setResource(workbench.component.Application, Application)
 
   return {}
 

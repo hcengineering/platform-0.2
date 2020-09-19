@@ -29,9 +29,6 @@ const task = extendIds(_task, {
   application: {
     Task: '' as Ref<Application>
   },
-  class: {
-    Task: '' as Ref<Class<Task>>
-  },
   string: {
     Task_name: '' as IntlString,
     Task_assignee: '' as IntlString,
@@ -54,12 +51,12 @@ export function model (S: Builder) {
   S.createDocument(workbench.class.WorkbenchApplication, {
     label: 'Задачи' as StringProperty,
     icon: workbench.icon.DefaultPerspective,
-    component: presentation.component.ObjectBrowser,
+    component: workbench.component.Application,
     classes: [task.class.Task]
   }, task.application.Task)
 
-  // S.mixin(task.class.Task as Ref<Class<Task>>, presentation.class.DetailForm, {
-  //   component: task.component.View
-  // })
+  S.mixin(task.class.Task as Ref<Class<Task>>, presentation.class.DetailForm, {
+    component: task.component.TaskProperties
+  })
 
 }

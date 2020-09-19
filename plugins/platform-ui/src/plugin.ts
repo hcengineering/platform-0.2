@@ -56,11 +56,16 @@ export default async (platform: Platform): Promise<UIService> => {
     store.set({ is: component, props })
   }
 
+  function closeModal () {
+    store.set({ is: undefined, props: {} })
+  }
+
   const ui = {
     createApp,
     getLocation,
     navigate,
-    showModal
+    showModal,
+    closeModal
   }
 
   return ui

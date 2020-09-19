@@ -13,20 +13,28 @@
 // limitations under the License.
 //
 
-import type { Platform } from '@anticrm/platform'
-import task, { TaskService } from '.'
+declare module '*.svelte' {
+  interface ComponentOptions<Props> {
+    target: HTMLElement;
+    anchor?: HTMLElement;
+    props?: Props;
+    hydrate?: boolean;
+    intro?: boolean;
+  }
 
-import TaskProperties from './components/internal/TaskProperties.svelte'
+  interface Component<Props> {
+    new(options: ComponentOptions<Props>): any;
+    $set: (props: {}) => any;
+    $on: (event: string, callback: (event: CustomEvent) => any) => any;
+    $destroy: () => any;
+    render: (props?: {}) => {
+      html: string;
+      css: { code: string; map?: string };
+      head?: string;
+    };
+  }
 
-/*!
- * Anticrm Platform™ Task Plugin
- * © 2020 Anticrm Platform Contributors. All Rights Reserved.
- * Licensed under the Eclipse Public License, Version 2.0
- */
-export default async (platform: Platform): Promise<TaskService> => {
+  const component: Component<{}>;
 
-  platform.setResource(task.component.TaskProperties, TaskProperties)
-
-  return {}
-
+  export default component;
 }
