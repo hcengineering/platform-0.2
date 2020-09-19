@@ -28,6 +28,11 @@
 			display: flex;
 			align-items: stretch;
 			flex-direction: row-reverse;
+			:global {
+				div {
+					display: inherit;
+				}
+			}
 		}
 	}
 </style>

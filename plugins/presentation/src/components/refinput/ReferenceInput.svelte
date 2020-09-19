@@ -86,7 +86,7 @@
 		return items
 	}
 	async function findSpace(title: string): Promise<ItemRefefence[]> {
-		let docs = await coreS.find(pcore.mixin.UXObject, {
+		let docs = await coreS.getModel().find(pcore.mixin.UXObject, {
 			label: title as StringProperty,
 		})
 		return docs.map((e) => {
@@ -344,52 +344,50 @@
 			{/if}
 			<Toolbar>
 				{#if stylesEnabled}
-					<div>
-						<slot />
-						<ToolbarButton
-							clazz="small"
-							style="font-weight:bold;"
-							on:click="{() => htmlEditor.toggleBold()}"
-							selected="{styleState.bold}"
-						>
-							B
-						</ToolbarButton>
-						<ToolbarButton
-							clazz="small"
-							on:click="{() => htmlEditor.toggleItalic()}"
-							style="font-weight:italic;"
-							selected="{styleState.italic}"
-						>
-							I
-						</ToolbarButton>
-						<ToolbarButton
-							clazz="small"
-							on:click="{() => htmlEditor.toggleUnderline()}"
-							style="font-weight:underline;"
-							selected="{styleState.underline}"
-						>
-							U
-						</ToolbarButton>
-						<ToolbarButton
-							clazz="small"
-							on:click="{() => htmlEditor.toggleStrike()}"
-							selected="{styleState.strike}"
-						>
-							~
-						</ToolbarButton>
-						<ToolbarButton
-							clazz="small"
-							on:click="{() => htmlEditor.toggleUnOrderedList()}"
-						>
-							L
-						</ToolbarButton>
-						<ToolbarButton
-							clazz="small"
-							on:click="{() => htmlEditor.toggleOrderedList()}"
-						>
-							O
-						</ToolbarButton>
-					</div>
+					<slot name="inner" />
+					<ToolbarButton
+						clazz="small"
+						style="font-weight:bold;"
+						on:click="{() => htmlEditor.toggleBold()}"
+						selected="{styleState.bold}"
+					>
+						B
+					</ToolbarButton>
+					<ToolbarButton
+						clazz="small"
+						on:click="{() => htmlEditor.toggleItalic()}"
+						style="font-weight:italic;"
+						selected="{styleState.italic}"
+					>
+						I
+					</ToolbarButton>
+					<ToolbarButton
+						clazz="small"
+						on:click="{() => htmlEditor.toggleUnderline()}"
+						style="font-weight:underline;"
+						selected="{styleState.underline}"
+					>
+						U
+					</ToolbarButton>
+					<ToolbarButton
+						clazz="small"
+						on:click="{() => htmlEditor.toggleStrike()}"
+						selected="{styleState.strike}"
+					>
+						~
+					</ToolbarButton>
+					<ToolbarButton
+						clazz="small"
+						on:click="{() => htmlEditor.toggleUnOrderedList()}"
+					>
+						L
+					</ToolbarButton>
+					<ToolbarButton
+						clazz="small"
+						on:click="{() => htmlEditor.toggleOrderedList()}"
+					>
+						O
+					</ToolbarButton>
 				{/if}
 				<div slot="right">
 					<ToolbarButton

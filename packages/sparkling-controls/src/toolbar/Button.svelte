@@ -55,7 +55,7 @@
 		&:hover {
 			border-color: var(--theme-highlight-color);
 			// color: $highlight-color;
-			// background-color: $highlight-color;
+			background-color: var(--theme-highlight-color);
 			// background-color: darken($highlight-color, 30%);
 		}
 	}
