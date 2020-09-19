@@ -13,27 +13,13 @@
 // limitations under the License.
 -->
 
-<script lang="ts">
-  import { Platform } from "@anticrm/platform";
-  import { getContext } from "svelte";
+<script type="ts">
+  import { AttrModel } from '../../..'
+  import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.svelte'
 
-  import ui, { AnyComponent } from "@anticrm/platform-ui";
-  import Spinner from "./internal/Spinner.svelte";
-  import Icon from "./Icon.svelte";
-
-  export let is: AnyComponent | undefined;
-  export let props: any
-
-  const platform = getContext("platform") as Platform
-  $: component = is ? platform.getResource(is) : null
+  export let value: string
+  export let attribute: AttrModel
+  export let maxWidth: number = 300
 </script>
 
-{#if component}
-{#await component}
-  <Spinner />
-{:then ctor}
-  <svelte:component this={ctor} {...props} on:change/>
-{:catch}
-  <Icon icon={ui.icon.Error} clazz="icon-2x" />
-{/await}
-{/if}
+<InlineEdit value={value} placeholder={attribute.placeholder} { maxWidth } on:change/>

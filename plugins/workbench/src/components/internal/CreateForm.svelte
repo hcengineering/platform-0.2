@@ -14,18 +14,29 @@
 -->
 
 <script lang="ts">
-  import { Ref, Class, Obj } from '@anticrm/core'
+  import { Ref, Class, Obj, generateId } from '@anticrm/core'
   import { AnyComponent } from '@anticrm/platform-ui'
   import presentation from '@anticrm/presentation'
-  import { getComponentExtension } from '../../utils'
+  import { getComponentExtension, getCoreService } from '../../utils'
 
   import Component from '@anticrm/platform-ui/src/components/Component.svelte'
 
   export let title: string
   export let _class: Ref<Class<Obj>>
+  let object = {}
 
   let component: AnyComponent
   $: getComponentExtension(_class, presentation.class.DetailForm).then(ext => { component = ext })
+
+  const coreService = getCoreService()
+
+  function save() {
+    coreService.then(coreService => {
+      const doc = { _class, _id: coreService.generateId(), ...object }
+      object = {}
+      coreService.createDoc(doc)
+    })
+  }
 </script>
 
 <div class="recruiting-view">
@@ -33,12 +44,12 @@
     <div class="caption-4">{title}</div>
     <div class="actions">
       <button class="button">Cancel</button>
-      <button class="button">Save</button>
+      <button class="button" on:click={save}>Save</button>
     </div>
   </div>
 
   <div class="content">
-    <Component is={component} props={{ _class  }} />
+    <Component is={component} props={{ _class, object  }} />
   </div>
 </div>
 
@@ -62,7 +73,6 @@
   }
 
   .content {
-    margin: 1em;
   }
 
   .attributes {

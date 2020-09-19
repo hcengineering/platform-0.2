@@ -35,7 +35,6 @@ const core = extendIds(_core, {
     Type: '' as Ref<Class<Type>>,
     Text: CORE_CLASS_TEXT,
 
-    VDoc: '' as Ref<Class<VDoc>>,
     Tx: '' as Ref<Class<Tx>>,
 
     RefTo: '' as Ref<Class<RefTo<Doc>>>,

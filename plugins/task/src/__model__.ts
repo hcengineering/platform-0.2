@@ -13,11 +13,11 @@
 // limitations under the License.
 //
 
+import { Application } from '@anticrm/core'
 import { extendIds, ModelClass, Prop, Builder } from '@anticrm/model'
 import core, { TVDoc } from '@anticrm/platform-core/src/__model__'
 import _task, { Task } from '.'
 import { Ref, Class, Property, StringProperty } from '@anticrm/core'
-import { Application } from '@anticrm/platform-core'
 import { IntlString } from '@anticrm/platform-i18n'
 import { User } from '@anticrm/contact'
 import presentation, { UX } from '@anticrm/presentation/src/__model__'
