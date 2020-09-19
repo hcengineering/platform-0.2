@@ -86,7 +86,7 @@
 	.presentation-completion-popup {
 		display: flex;
 		flex-direction: column;
-		background-color: var(--theme-input-color);
+		background-color: var(--theme-content-bg-color);
 		color: #fff;
 		position: absolute;
 		border: 1px solid var(--theme-content-color-dark);
