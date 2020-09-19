@@ -16,11 +16,12 @@
 <script lang="ts">
   import { Space, generateId } from '@anticrm/core'
   import core from '@anticrm/platform-core'
-  import { getCoreService } from '../../utils'
+  import { getCoreService, getUIService } from '../../utils'
 
   let name: string
 
   const coreService = getCoreService()
+  const uiService = getUIService()
 
   function createSpace() {
     console.log('create', name)
@@ -29,6 +30,7 @@
       _class: core.class.Space,
       name,
     }
+    uiService.closeModal()
     coreService.then(coreService => coreService.createDoc(space))
   }
 </script>

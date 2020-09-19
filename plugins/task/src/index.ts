@@ -29,4 +29,10 @@ export interface TaskService extends Service {
 }
 
 export default plugin('task' as Plugin<TaskService>, {}, {
+  class: {
+    Task: '' as Ref<Class<Task>>
+  },
+  component: {
+    TaskProperties: '' as AnyComponent
+  }
 })

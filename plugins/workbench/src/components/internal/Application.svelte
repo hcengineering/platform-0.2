@@ -15,30 +15,50 @@
 
 <script type="ts">
   import { Ref, Class, Doc, Application } from '@anticrm/core'
-  import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
-  import Table from './Table.svelte'
+  import { findOne } from '../../utils'
+  import workbench, { WorkbenchApplication } from '../..'
 
-  export let application: Ref<Application>
+  import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
+  import Table from '@anticrm/presentation/src/components/internal/Table.svelte'
+  import InputControl from './InputControl.svelte'
+  import CreateForm from './CreateForm.svelte'
+
+  export let application: Ref<WorkbenchApplication>
+  
+  let appInstance: WorkbenchApplication | undefined
+  $: findOne(workbench.class.WorkbenchApplication, { _id: application }).then(app => { appInstance = app })
 </script>
 
 <div class="workbench-browse">
+  { #if appInstance }
   <div>
-    <span class="caption-1">{application}</span>&nbsp;
+    <span class="caption-1">{appInstance.label}</span>&nbsp;
   </div>
   <div class="table">
-    <Table _class="class:task.Task" />
+    <Table _class={appInstance.classes[0]} />
   </div>
+  <div class="input-control">
+    <!-- <InputControl /> -->
+    <CreateForm _class={appInstance.classes[0]} title="Hello"/>
+  </div>
+  { /if }
 </div>
 
 <style lang="scss">
   .workbench-browse {
     height: 100%;
+    // background-color: red;
     display: flex;
     flex-direction: column;
   
     .table {
       flex-grow: 1;
-      height: 100%;
     }
+
+    .input-control {
+      padding: 1em;
+      //max-height: 400px;
+    }
+
   }
 </style>

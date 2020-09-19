@@ -1,4 +1,4 @@
-//
+<!--
 // Copyright © 2020 Anticrm Platform Contributors.
 // 
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
@@ -11,22 +11,18 @@
 // 
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
+-->
 
-import type { Platform } from '@anticrm/platform'
-import task, { TaskService } from '.'
+<script type="ts">
+  import task from '../..'
 
-import TaskProperties from './components/internal/TaskProperties.svelte'
+  import Properties from '@anticrm/presentation/src/components/internal/Properties.svelte'
+</script>
 
-/*!
- * Anticrm Platform™ Task Plugin
- * © 2020 Anticrm Platform Contributors. All Rights Reserved.
- * Licensed under the Eclipse Public License, Version 2.0
- */
-export default async (platform: Platform): Promise<TaskService> => {
+<!-- <div>
+  <StringPresenter class="caption-1" :attribute="name" v-model="object[name.key]" />
+</div> -->
 
-  platform.setResource(task.component.TaskProperties, TaskProperties)
+<Properties _class={task.class.Task} excludeAttributes={['title']} />
 
-  return {}
 
-}

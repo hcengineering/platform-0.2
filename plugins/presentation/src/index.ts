@@ -76,7 +76,7 @@ export interface GroupModel extends UIModel {
 export interface ClassModel {
   getGroups (): GroupModel[]
   getGroup (_class: Ref<Class<Obj>>): GroupModel | undefined
-  getOwnAttributes (_class: Ref<Class<Obj>>): AttrModel[]
+  getOwnAttributes (_class: Ref<Class<Obj>>): AttrModel[] // TODO: why do we have this here, but not within Group?
   getAttributes (): AttrModel[]
   getAttribute (key: string, _class?: Ref<Class<Obj>>): AttrModel | undefined
   filterAttributes (keys: string[]): ClassModel
@@ -101,6 +101,7 @@ export default plugin('presentation' as Plugin<PresentationService>, { core: cor
   },
   component: {
     ObjectBrowser: '' as AnyComponent,
+    Properties: '' as AnyComponent,
     NumberPresenter: '' as AnyComponent,
     StringPresenter: '' as AnyComponent,
     RefPresenter: '' as AnyComponent
