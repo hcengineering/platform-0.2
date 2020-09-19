@@ -16,22 +16,24 @@
 <script lang="ts">
   import { Ref, Class, Obj } from '@anticrm/core'
   import { ClassModel } from '../..'
+  import AttributeEditor from '../AttributeEditor.svelte'
 
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import { getPresentationService } from '../../utils'
 
-  export let _class: Ref<Class<Obj>>
-  export let excludeAttributes: string[] = []
+  // export let _class: Ref<Class<Obj>>
+  // export let excludeAttributes: string[] = []
 
-  let model: ClassModel | undefined
+  export let model: ClassModel
+  export let object: any
 
-  $: getPresentationService()
-    .then(service => service.getClassModel(_class))
-    .then(m => { model = m.filterAttributes(excludeAttributes) })
+  // $: getPresentationService()
+  //   .then(service => service.getClassModel(_class))
+  //   .then(m => { model = m.filterAttributes(excludeAttributes) })
 
 </script>
 
-{ #if model}
+<!-- { #if model} -->
 <div class= "attributes">
 { #each model.getGroups() as group (group._class) }
 <div class="group">
@@ -47,6 +49,7 @@
       </td>
       <td>
         <div class="edit">
+          <AttributeEditor attribute={attr} bind:value={object[attr.key]}/>
           <!-- <widget
             :component="attr.presenter"
             :attribute="attr"
@@ -61,7 +64,7 @@
 </div>
 { /each }
 </div>
-{ /if }
+<!-- { /if } -->
 
 <style lang="scss">
 

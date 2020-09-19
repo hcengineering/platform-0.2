@@ -21,6 +21,10 @@ import { UIService, CONTEXT_PLATFORM, CONTEXT_PLATFORM_UI, AnyComponent } from '
 import presentation, { PresentationService, ClassModel, GroupModel, AttrModel } from '.'
 import { IntlString } from '@anticrm/platform-i18n'
 
+export function getPlatform (): Platform {
+  return getContext(CONTEXT_PLATFORM) as Platform
+}
+
 export function getCoreService (): Promise<CoreService> {
   const platform = getContext(CONTEXT_PLATFORM) as Platform
   return platform.getPlugin(core.id)

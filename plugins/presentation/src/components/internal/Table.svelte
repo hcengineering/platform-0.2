@@ -14,7 +14,8 @@
 -->
 
 <script type="ts">
-  import { Ref, Class, Doc, QueryResult } from '@anticrm/core'
+  import { Ref, Class, Doc } from '@anticrm/core'
+  import { QueryResult } from '@anticrm/platform-core/src/queries'
   import { ClassModel } from '../..'
   import { getCoreService, getPresentationService, getEmptyModel } from '../../utils'
   import { onDestroy } from 'svelte'
@@ -54,7 +55,7 @@
       >
       { #each model.getAttributes() as attr (attr.key) }
         <div class="td">
-          <span>{ object[attr.key] || '&nbsp;' }</span>
+          <span>{ object[attr.key] || '' }</span>
         </div>
       { /each }
       </div>

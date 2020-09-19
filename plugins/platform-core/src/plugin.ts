@@ -16,7 +16,7 @@
 import type { Platform } from '@anticrm/platform'
 import {
   Ref, Class, Doc, AnyLayout, MODEL_DOMAIN, CoreProtocol, Tx, TITLE_DOMAIN, BACKLINKS_DOMAIN,
-  VDoc, Space, generateId, CreateTx, Property, PropertyType, ModelIndex
+  VDoc, Space, generateId as genId, CreateTx, Property, PropertyType, ModelIndex
 } from '@anticrm/core'
 import { ModelDb } from './modeldb'
 
@@ -96,6 +96,8 @@ export default async (platform: Platform): Promise<CoreService> => {
     return qCache.query(_class, query)
   }
 
+  function generateId () { return genId() as Ref<Doc> }
+
   function createDoc<T extends Doc> (doc: Doc): Promise<any> {
 
     const tx: CreateTx = {
@@ -109,12 +111,14 @@ export default async (platform: Platform): Promise<CoreService> => {
     return Promise.all([coreProtocol.tx(tx), txProcessor.process(tx)])
   }
 
+
   return {
     getModel () { return model },
     query,
     find,
     findOne,
-    createDoc
+    createDoc,
+    generateId
   }
 
 }

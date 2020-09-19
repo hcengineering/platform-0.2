@@ -23,6 +23,8 @@ import { I18n, IntlString } from '@anticrm/platform-i18n'
 import ObjectBrowser from './components/internal/ObjectBrowser.svelte'
 import Properties from './components/internal/Properties.svelte'
 
+import StringEditor from './components/internal/editors/StringEditor.svelte'
+
 /*!
  * Anticrm Platform™ Presentation Core Plugin
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
@@ -34,6 +36,8 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
 
   platform.setResource(ui.component.ObjectBrowser, ObjectBrowser)
   platform.setResource(ui.component.Properties, Properties)
+
+  platform.setResource(ui.component.StringPresenter, StringEditor)
 
   async function getGroupModel (_class: Ref<Class<Obj>>): Promise<GroupModel> {
     const model = coreService.getModel()

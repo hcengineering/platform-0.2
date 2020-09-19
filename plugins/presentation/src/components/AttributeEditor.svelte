@@ -13,27 +13,26 @@
 // limitations under the License.
 -->
 
-<script lang="ts">
-  import { Platform } from "@anticrm/platform";
-  import { getContext } from "svelte";
+<script type="ts">
+  import { AttrModel } from '..'
+  import { getPlatform } from '../utils'
+  import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
+  import ui from '@anticrm/platform-ui/'
 
-  import ui, { AnyComponent } from "@anticrm/platform-ui";
-  import Spinner from "./internal/Spinner.svelte";
-  import Icon from "./Icon.svelte";
+  export let value: string
+  export let attribute: AttrModel
+  export let maxWidth: number = 300
 
-  export let is: AnyComponent | undefined;
-  export let props: any
+  function onChange (ev: Event) { 
+    value = (ev.target as any).value 
+  }
 
-  const platform = getContext("platform") as Platform
-  $: component = is ? platform.getResource(is) : null
+  const platform = getPlatform()
+  $: component = platform.getResource(attribute.presenter)
 </script>
 
-{#if component}
-{#await component}
-  <Spinner />
-{:then ctor}
-  <svelte:component this={ctor} {...props} on:change/>
+{#await component then ctor}
+  <svelte:component this={ctor} {attribute} {maxWidth} {value} on:change={onChange}/>
 {:catch}
   <Icon icon={ui.icon.Error} clazz="icon-2x" />
 {/await}
-{/if}

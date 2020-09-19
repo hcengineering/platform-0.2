@@ -14,15 +14,38 @@
 -->
 
 <script type="ts">
-  import task from '../..'
+  import { Ref, Class, Obj } from '@anticrm/core'
+  import task, { Task } from '../..'
+  import core from '@anticrm/platform-core'
+  import { getPresentationService } from '../../utils'
+  import { AttrModel, ClassModel } from '@anticrm/presentation'
 
   import Properties from '@anticrm/presentation/src/components/internal/Properties.svelte'
+  import AttributeEditor from '@anticrm/presentation/src/components/AttributeEditor.svelte'
+
+  export let _class: Ref<Class<Obj>>
+  export let object: Task
+
+  let model: ClassModel | undefined
+  let title: AttrModel | undefined
+
+  $: getPresentationService()
+    .then(service => service.getClassModel(_class, core.class.VDoc))
+    .then(m => { 
+      title = m.getAttribute('title')
+      model = m.filterAttributes(['title']) 
+    })
 </script>
 
-<!-- <div>
-  <StringPresenter class="caption-1" :attribute="name" v-model="object[name.key]" />
-</div> -->
+{JSON.stringify(object)}
 
-<Properties _class={task.class.Task} excludeAttributes={['title']} />
+{ #if model }
+<div>
+  <!-- <StringPresenter class="caption-1" :attribute="name" v-model="object[name.key]" /> -->
+  <div class="caption-1"><AttributeEditor attribute={title} bind:value={object.title} /></div>
+</div>
 
+<!-- <Properties _class={task.class.Task} excludeAttributes={['title']} /> -->
+<Properties {model} bind:object={object}/>
+{ /if }
 

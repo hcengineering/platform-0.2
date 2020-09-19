@@ -16,7 +16,7 @@
 import { plugin, Plugin, Service, Metadata } from '@anticrm/platform'
 import {
   Ref, Class, Doc, AnyLayout, Obj,
-  CreateTx, PushTx, UpdateTx, DeleteTx, Space, Title, CORE_CLASS_BACKLINKS,
+  CreateTx, PushTx, UpdateTx, DeleteTx, Space, Title, CORE_CLASS_BACKLINKS, VDoc
 } from '@anticrm/core'
 
 import type { ModelDb } from './modeldb'
@@ -28,6 +28,7 @@ export interface CoreService extends Service {
   findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined>
   query<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): QueryResult<T>
   createDoc<T extends Doc> (doc: Doc): Promise<void>
+  generateId (): Ref<Doc>
 }
 
 export default plugin('core' as Plugin<CoreService>, {}, {
@@ -46,6 +47,7 @@ export default plugin('core' as Plugin<CoreService>, {}, {
     DeleteTx: '' as Ref<Class<DeleteTx>>,
     Space: '' as Ref<Class<Space>>,
     Title: '' as Ref<Class<Title>>,
-    Backlinks: CORE_CLASS_BACKLINKS
+    Backlinks: CORE_CLASS_BACKLINKS,
+    VDoc: '' as Ref<Class<VDoc>>,
   }
 })
