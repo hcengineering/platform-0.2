@@ -33,6 +33,7 @@ export default plugin('task' as Plugin<TaskService>, {}, {
     Task: '' as Ref<Class<Task>>
   },
   component: {
-    TaskProperties: '' as AnyComponent
+    TaskProperties: '' as AnyComponent,
+    TaskInfo: '' as AnyComponent
   }
 })

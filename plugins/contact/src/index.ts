@@ -37,8 +37,9 @@ export interface User extends Person {
 // P L U G I N
 
 export interface ContactService extends Service {
-  // getUser (account: string): Promise<User>
-  // getMyName (): Promise<string>
+  getUser (account: string): Promise<User>
+  getAvatar (user: Ref<User>): Asset
+  getMyName (): Promise<string>
 }
 
 export default plugin('contact' as Plugin<ContactService>, { core: core.id, ui: ui.id }, {

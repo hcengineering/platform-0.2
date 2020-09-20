@@ -14,7 +14,7 @@
 //
 
 import { Platform, Service } from '@anticrm/platform'
-import { StringProperty } from '@anticrm/core'
+import { StringProperty, Ref } from '@anticrm/core'
 import contact, { User, ContactService } from '.'
 
 // import PersonProperties from './components/PersonProperties.vue'
@@ -22,7 +22,7 @@ import contact, { User, ContactService } from '.'
 // import LoginWidget from './components/LoginWidget.vue'
 
 import { CoreService } from '@anticrm/platform-core'
-import { UIService } from '@anticrm/platform-ui'
+import { UIService, Asset } from '@anticrm/platform-ui'
 
 import login from '@anticrm/login'
 
@@ -37,33 +37,37 @@ export default async (platform: Platform, deps: { core: CoreService, ui: UIServi
   // platform.setResource(contact.component.UserLookup, UserLookup)
   // platform.setResource(contact.component.LoginWidget, LoginWidget)
 
-  // const coreService = deps.core
+  const coreService = deps.core
   // const uiService = deps.ui
 
-  // function getUser (account: string): Promise<User> {
-  //   console.log('getUser', account)
-  //   return coreService.findOne(contact.mixin.User, { account: account as StringProperty }) as Promise<User>
-  // }
+  function getUser (account: string): Promise<User> {
+    console.log('getUser', account)
+    return coreService.findOne(contact.mixin.User, { account: account as StringProperty }) as Promise<User>
+  }
 
-  // async function getMyName (): Promise<string> {
-  //   const whoAmI = platform.getMetadata(login.metadata.WhoAmI)
-  //   if (!whoAmI) {
-  //     return "Nobody"
-  //   }
-  //   return getUser(whoAmI).then(user => user?.name)
-  // }
+  async function getMyName (): Promise<string> {
+    const whoAmI = platform.getMetadata(login.metadata.WhoAmI)
+    if (!whoAmI) {
+      return "Nobody"
+    }
+    return getUser(whoAmI).then(user => user?.name)
+  }
+
+  function getAvatar (user: Ref<User>): Asset {
+    return require('../assets/ava2x48.jpg') as Asset
+  }
 
   // uiService.addWidget(contact.component.LoginWidget)
 
-  // const service = {
-  //   getUser,
-  //   getMyName
-  // }
+  const service = {
+    getUser,
+    getMyName,
+    getAvatar
+  }
 
   // deps.ui.getApp()
   //   .provide(ContactServiceInjectionKey, service)
 
-  // return service
+  return service
 
-  return {}
 }

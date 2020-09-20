@@ -22,6 +22,7 @@ import { IntlString } from '@anticrm/platform-i18n'
 import { User } from '@anticrm/contact'
 import presentation, { UX } from '@anticrm/presentation/src/__model__'
 import workbench from '@anticrm/workbench/src/__model__'
+import chunter from '@anticrm/chunter/src/__model__'
 
 export const DOMAIN_TASK = 'task'
 
@@ -57,6 +58,10 @@ export function model (S: Builder) {
 
   S.mixin(task.class.Task as Ref<Class<Task>>, presentation.class.DetailForm, {
     component: task.component.TaskProperties
+  })
+
+  S.mixin(task.class.Task, chunter.mixin.ActivityInfo, {
+    component: task.component.TaskInfo
   })
 
 }
