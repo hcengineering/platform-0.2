@@ -20,7 +20,7 @@ import { model as presentation } from '@anticrm/presentation/src/__model__'
 import { model as contact } from '@anticrm/contact/src/__model__'
 import { model as workbench } from '@anticrm/workbench/src/__model__'
 import { model as task } from '@anticrm/task/src/__model__'
-// import chunterModel from '@anticrm/chunter-model/src/model'
+import { model as chunter } from '@anticrm/chunter/src/__model__'
 // import recruitmentModel from '@anticrm/recruitment-model/src/model'
 
 // import taskStrings from '@anticrm/task-model/src/strings/ru'
@@ -30,8 +30,8 @@ builder.load(platformCore)
 builder.load(presentation)
 builder.load(contact)
 builder.load(workbench)
+builder.load(chunter)
 builder.load(task)
-// builder.load(chunterModel)
 // builder.load(recruitmentModel)
 
 export const Model = builder.dumpAll()

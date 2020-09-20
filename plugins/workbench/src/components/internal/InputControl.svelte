@@ -17,7 +17,7 @@
 
 	import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
 	import workbench, { WorkbenchApplication } from '../..'
-	import ActivityView from './ActivityView.svelte'
+	// import ActivityView from './ActivityView.svelte'
 
 	import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
 

@@ -1,4 +1,4 @@
-//
+<!--
 // Copyright © 2020 Anticrm Platform Contributors.
 // 
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
@@ -11,24 +11,20 @@
 // 
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
+-->
 
-import type { Platform } from '@anticrm/platform'
-import task, { TaskService } from '.'
+<script lang="ts">
+  import { Tx, CreateTx } from '@anticrm/core'
+  import core from '@anticrm/platform-core'
+  import { Task } from '../..'
 
-import TaskProperties from './components/internal/TaskProperties.svelte'
-import TaskInfo from './components/internal/TaskInfo.svelte'
+  export let tx: Tx
 
-/*!
- * Anticrm Platform™ Task Plugin
- * © 2020 Anticrm Platform Contributors. All Rights Reserved.
- * Licensed under the Eclipse Public License, Version 2.0
- */
-export default async (platform: Platform): Promise<TaskService> => {
+  function taskTitle() {
+    return ((tx as CreateTx).object as Task).title
+  }
+</script>
 
-  platform.setResource(task.component.TaskProperties, TaskProperties)
-  platform.setResource(task.component.TaskInfo, TaskInfo)
-
-  return {}
-
-}
+{ #if tx._class === core.class.CreateTx }
+  Создал задачу <b>{ taskTitle() }</b>
+{ /if }

@@ -20,13 +20,13 @@ import {
 } from '@anticrm/core'
 import { ModelDb } from './modeldb'
 
-import core, { CoreService } from '.'
+import core, { CoreService, QueryResult } from '.'
 import login from '@anticrm/login'
 import rpcService from './rpc'
 
 import { TxProcessor, VDocIndex, TitleIndex, TextIndex, TxIndex } from '@anticrm/core'
 
-import { QueryResult, QueriableStorage } from './queries'
+import { QueriableStorage } from './queries'
 
 import { Cache } from './cache'
 import { Titles } from './titles'

@@ -20,7 +20,13 @@ import {
 } from '@anticrm/core'
 
 import type { ModelDb } from './modeldb'
-import type { QueryResult } from './queries'
+
+export type Subscriber<T> = (value: T[]) => void
+export type Unsubscriber = () => void
+
+export interface QueryResult<T extends Doc> {
+  subscribe (run: Subscriber<T>): Unsubscriber
+}
 
 export interface CoreService extends Service {
   getModel (): ModelDb

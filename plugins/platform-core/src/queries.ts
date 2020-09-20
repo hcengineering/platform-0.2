@@ -14,13 +14,7 @@
 //
 
 import { Doc, Ref, Class, AnyLayout, Storage } from '@anticrm/core'
-
-type Subscriber<T> = (value: T[]) => void
-type Unsubscriber = () => void
-
-export interface QueryResult<T extends Doc> {
-  subscribe (run: Subscriber<T>): Unsubscriber
-}
+import { QueryResult, Subscriber, Unsubscriber } from '.'
 
 export interface Domain extends Storage {
   query<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): QueryResult<T>
@@ -46,7 +40,8 @@ export class QueriableStorage implements Domain {
   }
 
   private refresh<T extends Doc> (query: Query<T>) {
-    this.find(query._class, query.query).then(result => { query.subscriber(result) })
+    console.log('REFRESH: ', query)
+    this.find(query._class, query.query).then(result => { console.log('RESULT:', result); query.subscriber(result) })
   }
 
   store (doc: Doc): Promise<void> {

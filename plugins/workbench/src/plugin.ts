@@ -18,7 +18,6 @@ import workbench, { WorkbenchService } from '.'
 
 import Workbench from './components/internal/Workbench.svelte'
 import DefaultPerspective from './components/internal/DefaultPerspective.svelte'
-import ActivityView from './components/internal/ActivityView.svelte'
 import CreateSpace from './components/internal/CreateSpace.svelte'
 import Application from './components/internal/Application.svelte'
 
@@ -34,7 +33,6 @@ export default async (platform: Platform, deps: { core: CoreService, ui: UIServi
 
   platform.setResource(workbench.component.Workbench, Workbench)
   platform.setResource(workbench.component.DefaultPerspective, DefaultPerspective)
-  platform.setResource(workbench.component.ActivityView, ActivityView)
   platform.setResource(workbench.component.CreateSpace, CreateSpace)
   platform.setResource(workbench.component.Application, Application)
 

@@ -20,6 +20,7 @@ import { IntlString } from '@anticrm/platform-i18n'
 import core, { TApplication } from '@anticrm/platform-core/src/__model__'
 import { AnyComponent, Asset } from '@anticrm/platform-ui'
 import presentation from '@anticrm/presentation/src/__model__'
+import chunter from '@anticrm/chunter'
 
 import _workbench, { Perspective, WorkbenchApplication } from '.'
 
@@ -74,7 +75,7 @@ export function model (S: Builder) {
   S.createDocument(workbench.class.WorkbenchApplication, {
     label: 'Активность' as IntlString,
     icon: workbench.icon.DefaultPerspective,
-    component: workbench.component.ActivityView,
+    component: chunter.component.ActivityView,
     classes: []
   }, workbench.application.Activity)
 

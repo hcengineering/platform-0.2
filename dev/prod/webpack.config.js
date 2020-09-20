@@ -65,7 +65,9 @@ module.exports = {
 											},
 										},
 									],
+									"@babel/typescript"
 								],
+								plugins: ["@babel/plugin-proposal-optional-chaining"],
 							},
 						})
 					}
@@ -88,6 +90,16 @@ module.exports = {
 					loader: "file-loader",
 					options: {
 						name: "fonts/[name].[ext]",
+						esModule: false
+					},
+				},
+			},
+			{
+				test: /\.(jpg)$/,
+				use: {
+					loader: "file-loader",
+					options: {
+						name: "img/[name].[ext]",
 						esModule: false
 					},
 				},

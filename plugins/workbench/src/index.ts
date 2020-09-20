@@ -43,7 +43,6 @@ export default plugin('workbench' as Plugin<WorkbenchService>, { core: core.id, 
   component: {
     Workbench: '' as AnyComponent,
     DefaultPerspective: '' as AnyComponent,
-    ActivityView: '' as AnyComponent,
     CreateSpace: '' as AnyComponent,
     Application: '' as AnyComponent,
   },
