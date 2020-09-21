@@ -15,7 +15,7 @@
 
 <script type="ts">
   import { Ref, Class, Obj } from '@anticrm/core'
-  import task, { Task } from '../..'
+  import chunter, { Page } from '../..'
   import core from '@anticrm/platform-core'
   import { getPresentationService } from '../../utils'
   import { AttrModel, ClassModel } from '@anticrm/presentation'
@@ -24,7 +24,7 @@
   import AttributeEditor from '@anticrm/presentation/src/components/AttributeEditor.svelte'
 
   export let _class: Ref<Class<Obj>>
-  export let object: Task
+  export let object: Page
 
   let model: ClassModel | undefined
   let title: AttrModel | undefined
@@ -39,11 +39,8 @@
 
 { #if model && title }
 <div>
-  <!-- <StringPresenter class="caption-1" :attribute="name" v-model="object[name.key]" /> -->
   <div class="caption-1"><AttributeEditor attribute={title} bind:value={object.title} /></div>
 </div>
-
-<!-- <Properties _class={task.class.Task} excludeAttributes={['title']} /> -->
 <Properties {model} bind:object={object}/>
 { /if }
 

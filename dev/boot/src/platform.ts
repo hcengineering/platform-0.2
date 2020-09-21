@@ -28,7 +28,7 @@ import chunter from '@anticrm/chunter'
 
 import uiMeta from '@anticrm/platform-ui/src/__meta__/meta'
 import workbenchMeta from '@anticrm/workbench/src/__meta__'
-// import chunterMeta from '@anticrm/chunter/src/__meta__/meta'
+import chunterMeta from '@anticrm/chunter/src/__meta__'
 // import contactMeta from '@anticrm/contact/src/__meta__/meta'
 // import recruitmentMeta from '@anticrm/recruitment/src/__meta__/meta'
 // import taskMeta from '@anticrm/task/src/__meta__/meta'
@@ -50,7 +50,7 @@ platform.addLocation(chunter, () => import(/* webpackChunkName: "chunter" */ '@a
 
 uiMeta(platform)
 workbenchMeta(platform)
-// chunterMeta(platform)
+chunterMeta(platform)
 // recruitmentMeta(platform)
 // taskMeta(platform)
 // contactMeta(platform)
