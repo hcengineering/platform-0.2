@@ -51,6 +51,7 @@ export default plugin('workbench' as Plugin<WorkbenchService>, { core: core.id, 
     WorkbenchApplication: '' as Ref<Class<WorkbenchApplication>>
   },
   application: {
-    Activity: '' as Ref<WorkbenchApplication>
+    Activity: '' as Ref<WorkbenchApplication>,
+    Chat: '' as Ref<WorkbenchApplication>
   }
 })

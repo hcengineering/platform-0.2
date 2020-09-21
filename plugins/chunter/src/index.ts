@@ -57,6 +57,7 @@ export default plugin('chunter' as Plugin<ChunterService>, { core: core.id }, {
   },
   component: {
     ActivityView: '' as AnyComponent,
+    ChatView: '' as AnyComponent
     PageProperties: '' as AnyComponent,
     PageInfo: '' as AnyComponent,
   },
