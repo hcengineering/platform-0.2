@@ -99,6 +99,9 @@ export default async (platform: Platform): Promise<CoreService> => {
   function generateId () { return genId() as Ref<Doc> }
 
   function createDoc<T extends Doc> (doc: T): Promise<any> {
+    if (!doc._id) {
+      doc._id = generateId()
+    }
 
     const tx: CreateTx = {
       _class: core.class.CreateTx,

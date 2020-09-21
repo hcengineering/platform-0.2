@@ -19,6 +19,7 @@
   import ChatMessageItem from './ChatMessageItem.svelte'
   import { onDestroy } from 'svelte'
   import { QueryResult } from '@anticrm/platform-core';
+  import { VDoc } from '@anticrm/core'
   import { getChunterService, getCoreService } from '../../utils'
   import chunter, { Message } from '../..'
 
@@ -42,8 +43,9 @@
     chunterService.then(chunterService => {
       const parsedMessage = chunterService.createMissedObjects(message)
       coreService.then(coreService => {
-        const newMessage = { _class: chunter.class.Message, _id: coreService.generateId(), message: parsedMessage }
-        coreService.createVDoc(newMessage)
+        const newMessage = { _class: chunter.class.Message, message: parsedMessage }
+        // absent VDoc fields will be autofilled
+        coreService.createVDoc(newMessage as unknown as VDoc)
       })
     })
   }
