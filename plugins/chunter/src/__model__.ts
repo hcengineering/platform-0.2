@@ -83,9 +83,9 @@ export function model (S: Builder) {
   //   component: chunter.component.ContactInfo
   // })
 
-  // S.mixin(chunter.class.Message as Ref<Class<Message>>, chunter.mixin.ChunterInfo, { // TODO: type problems
-  //   component: chunter.component.MessageInfo
-  // })
+  S.mixin(chunter.class.Message, chunter.mixin.ActivityInfo, {
+    component: chunter.component.MessageInfo
+  })
 
   // S.createDocument(workbench.class.WorkbenchCreateItem, {
   //   label: 'Chunter / Страница' as StringProperty,

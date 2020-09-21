@@ -20,6 +20,7 @@ import chunter, { ChunterService, Page } from '.'
 
 import ActivityView from './components/internal/ActivityView.svelte'
 import ChatView from './components/internal/ChatView.svelte'
+import MessageInfo from './components/internal/MessageInfo.svelte'
 import PageProperties from './components/internal/PageProperties.svelte'
 import PageInfo from './components/internal/PageInfo.svelte'
 
@@ -32,6 +33,7 @@ export default async (platform: Platform, deps: { core: CoreService }): Promise<
 
   platform.setResource(chunter.component.ActivityView, ActivityView)
   platform.setResource(chunter.component.ChatView, ChatView)
+  platform.setResource(chunter.component.MessageInfo, MessageInfo)
   platform.setResource(chunter.component.PageProperties, PageProperties)
   platform.setResource(chunter.component.PageInfo, PageInfo)
 
