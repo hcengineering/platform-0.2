@@ -19,6 +19,9 @@ import { CoreService } from '@anticrm/platform-core'
 import chunter, { ChunterService, Page } from '.'
 
 import ActivityView from './components/internal/ActivityView.svelte'
+import ChatView from './components/internal/ChatView.svelte'
+import MessageInfo from './components/internal/MessageInfo.svelte'
+import SpaceInfo from './components/internal/SpaceInfo.svelte'
 import PageProperties from './components/internal/PageProperties.svelte'
 import PageInfo from './components/internal/PageInfo.svelte'
 
@@ -30,6 +33,9 @@ import PageInfo from './components/internal/PageInfo.svelte'
 export default async (platform: Platform, deps: { core: CoreService }): Promise<ChunterService> => {
 
   platform.setResource(chunter.component.ActivityView, ActivityView)
+  platform.setResource(chunter.component.ChatView, ChatView)
+  platform.setResource(chunter.component.MessageInfo, MessageInfo)
+  platform.setResource(chunter.component.SpaceInfo, SpaceInfo)
   platform.setResource(chunter.component.PageProperties, PageProperties)
   platform.setResource(chunter.component.PageInfo, PageInfo)
 

@@ -14,7 +14,7 @@
 -->
 
 <script lang="ts">
-  import { Ref, Class, Doc, generateId, Space } from '@anticrm/core'
+  import { Ref, Class, Doc, generateId, Space, VDoc } from '@anticrm/core'
   import { AnyComponent } from '@anticrm/platform-ui'
   import presentation from '@anticrm/presentation'
   import { getComponentExtension, getCoreService } from '../../utils'
@@ -33,9 +33,10 @@
 
   function save() {
     coreService.then(coreService => {
-      const doc = { _class, _id: coreService.generateId(), _space: space, ...object }
+      const doc = { _class, _space: space, ...object }
       object = {}
-      coreService.createDoc(doc)
+      // absent VDoc fields will be autofilled
+      coreService.createVDoc(doc as unknown as VDoc)
     })
   }
 </script>

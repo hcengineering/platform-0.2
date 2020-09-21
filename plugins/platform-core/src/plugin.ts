@@ -16,7 +16,7 @@
 import type { Platform } from '@anticrm/platform'
 import {
   Ref, Class, Doc, AnyLayout, MODEL_DOMAIN, CoreProtocol, Tx, TITLE_DOMAIN, BACKLINKS_DOMAIN,
-  VDoc, Space, generateId as genId, CreateTx, Property, PropertyType, ModelIndex
+  VDoc, Space, generateId as genId, CreateTx, Property, PropertyType, ModelIndex, DateProperty, StringProperty
 } from '@anticrm/core'
 import { ModelDb } from './modeldb'
 
@@ -98,7 +98,10 @@ export default async (platform: Platform): Promise<CoreService> => {
 
   function generateId () { return genId() as Ref<Doc> }
 
-  function createDoc<T extends Doc> (doc: Doc): Promise<any> {
+  function createDoc<T extends Doc> (doc: T): Promise<any> {
+    if (!doc._id) {
+      doc._id = generateId()
+    }
 
     const tx: CreateTx = {
       _class: core.class.CreateTx,
@@ -111,6 +114,15 @@ export default async (platform: Platform): Promise<CoreService> => {
     return Promise.all([coreProtocol.tx(tx), txProcessor.process(tx)])
   }
 
+  function createVDoc<T extends VDoc> (vdoc: T): Promise<void> {
+    if (!vdoc._createdBy) {
+      vdoc._createdBy = platform.getMetadata(login.metadata.WhoAmI) as StringProperty
+    }
+    if (!vdoc._createdOn) {
+      vdoc._createdOn = Date.now() as DateProperty
+    }
+    return createDoc(vdoc)
+  }
 
   return {
     getModel () { return model },
@@ -118,6 +130,7 @@ export default async (platform: Platform): Promise<CoreService> => {
     find,
     findOne,
     createDoc,
+    createVDoc,
     generateId
   }
 

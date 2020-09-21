@@ -20,6 +20,7 @@ import core, { CoreService } from '@anticrm/platform-core'
 import contact, { ContactService } from '@anticrm/contact'
 import { UIService, CONTEXT_PLATFORM, CONTEXT_PLATFORM_UI, AnyComponent } from '@anticrm/platform-ui'
 import presentation, { PresentationService, ComponentExtension } from '@anticrm/presentation'
+import chunter, { ChunterService } from '.'
 
 export function getPlatform (): Platform {
   return getContext(CONTEXT_PLATFORM) as Platform
@@ -37,6 +38,11 @@ export function getCoreService (): Promise<CoreService> {
 export function getContactService (): Promise<ContactService> {
   const platform = getContext(CONTEXT_PLATFORM) as Platform
   return platform.getPlugin(contact.id)
+}
+
+export function getChunterService (): Promise<ChunterService> {
+  const platform = getContext(CONTEXT_PLATFORM) as Platform
+  return platform.getPlugin(chunter.id)
 }
 
 export function find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {

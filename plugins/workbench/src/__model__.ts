@@ -79,4 +79,10 @@ export function model (S: Builder) {
     classes: []
   }, workbench.application.Activity)
 
+  S.createDocument(workbench.class.WorkbenchApplication, {
+    label: 'Чат' as IntlString,
+    icon: workbench.icon.DefaultPerspective,
+    component: chunter.component.ChatView,
+    classes: []
+  }, workbench.application.Chat)
 }
