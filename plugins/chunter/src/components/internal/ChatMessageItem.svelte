@@ -40,7 +40,7 @@
     <b>{username}</b> {timestamp}
     <div>
       { #each parseMessage(message.message) as pm }
-        <span>{@html pm.text}</span>
+        <span>{ pm.text }</span>
       { /each }
     </div>
   </div>

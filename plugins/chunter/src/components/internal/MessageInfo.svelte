@@ -29,7 +29,7 @@
 { #if tx._class === core.class.CreateTx }
   <div>
     { #each parseMessage(getMessage()) as pm }
-      <span>{@html pm.text}</span>
+      <span>{ pm.text }</span>
     { /each }
   </div>
 { /if }

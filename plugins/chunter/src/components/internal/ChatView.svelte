@@ -19,10 +19,11 @@
   import ChatMessageItem from './ChatMessageItem.svelte'
   import { onDestroy } from 'svelte'
   import { QueryResult } from '@anticrm/platform-core';
-  import { getCoreService } from '../../utils'
+  import { getChunterService, getCoreService } from '../../utils'
   import chunter, { Message } from '../..'
 
   const coreService = getCoreService()
+  const chunterService = getChunterService()
 
   let messages: Message[] = []
   let unsubscribe: () => void
@@ -38,12 +39,12 @@
   onDestroy(() => { if(unsubscribe) unsubscribe() })
 
   function createMessage(message: string) {
-    console.log('ChatView, user entered:', message)
-
-    coreService.then(service => {
-      // TODO: specify space
-      const newMessage = { _class: chunter.class.Message, _id: service.generateId(), message }
-      service.createVDoc(newMessage)
+    chunterService.then(chunterService => {
+      const parsedMessage = chunterService.createMissedObjects(message)
+      coreService.then(coreService => {
+        const newMessage = { _class: chunter.class.Message, _id: coreService.generateId(), message: parsedMessage }
+        coreService.createVDoc(newMessage)
+      })
     })
   }
 </script>
