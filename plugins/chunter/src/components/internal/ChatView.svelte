@@ -18,16 +18,18 @@
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
   import ChatMessageItem from './ChatMessageItem.svelte'
   import { onDestroy } from 'svelte'
-  import { QueryResult } from '@anticrm/platform-core';
+  import core, { QueryResult } from '@anticrm/platform-core';
   import { Ref, Space, VDoc } from '@anticrm/core'
   import { getChunterService, getCoreService } from '../../utils'
   import chunter, { Message } from '../..'
+
 
   const coreService = getCoreService()
   const chunterService = getChunterService()
 
   export let space: Ref<Space>
 
+  let spaceName: string
   let messages: Message[] = []
   let unsubscribe: () => void
 
@@ -36,7 +38,12 @@
     unsubscribe = queryResult.subscribe(docs => messages = docs)
   }
 
-  $: coreService.then(service => service.query(chunter.class.Message, { _space: space })).then(queryResult => subscribe(queryResult))
+  $: {
+    coreService.then(service => service.query(chunter.class.Message, { _space: space })).then(queryResult => subscribe(queryResult))
+
+    // TODO: use Titles index instead of getting the whole Space object
+    coreService.then(service => service.findOne(core.class.Space, { _id: space })).then(spaceObj => spaceName = spaceObj ? '#' + spaceObj.name : '')
+  }
 
   onDestroy(() => { if(unsubscribe) unsubscribe() })
 
@@ -54,7 +61,7 @@
 
 <div class="chat">
   <div>
-    <span class="caption-1">Чат</span>&nbsp;
+    <span class="caption-1">Чат {spaceName}</span>&nbsp;
   </div>
   <ScrollView stylez="height:100%;">
     <div class="content">
