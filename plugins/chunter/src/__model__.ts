@@ -112,4 +112,7 @@ export function model (S: Builder) {
     component: chunter.component.PageInfo
   })
 
+  S.mixin(core.class.Space, chunter.mixin.ActivityInfo, {
+    component: chunter.component.SpaceInfo
+  })
 }
