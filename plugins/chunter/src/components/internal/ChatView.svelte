@@ -16,10 +16,26 @@
 <script type="ts">
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
+  import { onDestroy } from 'svelte'
+  import { QueryResult } from '@anticrm/platform-core';
+  import { parseMessage } from '@anticrm/core'
   import { getCoreService } from '../../utils'
-  import chunter from '../..'
+  import chunter, { Message } from '../..'
 
   const coreService = getCoreService()
+
+  let messages: Message[] = []
+  let unsubscribe: () => void
+
+  function subscribe(queryResult: QueryResult<Message>) {
+    if (unsubscribe) unsubscribe()
+    unsubscribe = queryResult.subscribe(docs => messages = docs)
+  }
+
+  // TODO: select messages only for the active space
+  $: coreService.then(service => service.query(chunter.class.Message, {})).then(queryResult => subscribe(queryResult))
+
+  onDestroy(() => { if(unsubscribe) unsubscribe() })
 
   function createMessage(message: string) {
     console.log('ChatView, user entered:', message)
@@ -38,7 +54,14 @@
   </div>
   <ScrollView stylez="height:100%;">
     <div class="content">
-      <!-- TODO: show messages -->
+      { #each messages as message (message._id) }
+        <!-- TODO: pretty message representation (avatar, name, timestamp) -->
+        <div class="message-item">
+          { #each parseMessage(message.message) as pm }
+            <span>{@html pm.text}</span>
+          { /each }
+        </div>
+      { /each }
     </div>
   </ScrollView>
   <div>
@@ -51,8 +74,15 @@
     height: 100%;
     display: flex;
     flex-direction: column;  
-  }
-  .content {
-     flex-grow: 1;
+
+    .content {
+      flex-grow: 1;
+
+      .message-item {
+        display: flex;
+        margin: 1em;
+        padding-left: 1em;
+      }
+    }
   }
 </style>
