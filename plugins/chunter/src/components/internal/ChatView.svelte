@@ -19,12 +19,14 @@
   import ChatMessageItem from './ChatMessageItem.svelte'
   import { onDestroy } from 'svelte'
   import { QueryResult } from '@anticrm/platform-core';
-  import { VDoc } from '@anticrm/core'
+  import { Ref, Space, VDoc } from '@anticrm/core'
   import { getChunterService, getCoreService } from '../../utils'
   import chunter, { Message } from '../..'
 
   const coreService = getCoreService()
   const chunterService = getChunterService()
+
+  export let space: Ref<Space>
 
   let messages: Message[] = []
   let unsubscribe: () => void
@@ -34,8 +36,7 @@
     unsubscribe = queryResult.subscribe(docs => messages = docs)
   }
 
-  // TODO: select messages only for the active space
-  $: coreService.then(service => service.query(chunter.class.Message, {})).then(queryResult => subscribe(queryResult))
+  $: coreService.then(service => service.query(chunter.class.Message, { _space: space })).then(queryResult => subscribe(queryResult))
 
   onDestroy(() => { if(unsubscribe) unsubscribe() })
 
@@ -43,7 +44,7 @@
     chunterService.then(chunterService => {
       const parsedMessage = chunterService.createMissedObjects(message)
       coreService.then(coreService => {
-        const newMessage = { _class: chunter.class.Message, message: parsedMessage }
+        const newMessage = { _class: chunter.class.Message, _space: space, message: parsedMessage }
         // absent VDoc fields will be autofilled
         coreService.createVDoc(newMessage as unknown as VDoc)
       })
