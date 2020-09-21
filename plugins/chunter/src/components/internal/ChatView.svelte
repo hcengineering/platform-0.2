@@ -48,14 +48,16 @@
   onDestroy(() => { if(unsubscribe) unsubscribe() })
 
   function createMessage(message: string) {
-    chunterService.then(chunterService => {
-      const parsedMessage = chunterService.createMissedObjects(message)
-      coreService.then(coreService => {
-        const newMessage = { _class: chunter.class.Message, _space: space, message: parsedMessage }
-        // absent VDoc fields will be autofilled
-        coreService.createVDoc(newMessage as unknown as VDoc)
+    if (message) {
+      chunterService.then(chunterService => {
+        const parsedMessage = chunterService.createMissedObjects(message)
+        coreService.then(coreService => {
+          const newMessage = { _class: chunter.class.Message, _space: space, message: parsedMessage }
+          // absent VDoc fields will be autofilled
+          coreService.createVDoc(newMessage as unknown as VDoc)
+        })
       })
-    })
+    }
   }
 </script>
 
