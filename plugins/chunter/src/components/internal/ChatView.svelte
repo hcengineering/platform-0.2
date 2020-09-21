@@ -16,9 +16,19 @@
 <script type="ts">
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
+  import { getCoreService } from '../../utils'
+  import chunter from '../..'
 
-  function createMessage(value: string) {
-    console.log('user entered:', value)
+  const coreService = getCoreService()
+
+  function createMessage(message: string) {
+    console.log('ChatView, user entered:', message)
+
+    coreService.then(service => {
+      // TODO: specify space
+      const newMessage = { _class: chunter.class.Message, _id: service.generateId(), message }
+      service.createDoc(newMessage)
+    })
   }
 </script>
 
