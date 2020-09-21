@@ -57,6 +57,8 @@ export default plugin('chunter' as Plugin<ChunterService>, { core: core.id }, {
   },
   component: {
     ActivityView: '' as AnyComponent,
+    PageProperties: '' as AnyComponent,
+    PageInfo: '' as AnyComponent,
   },
   mixin: {
     ActivityInfo: '' as Ref<Mixin<ComponentExtension<VDoc>>>

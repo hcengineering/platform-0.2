@@ -40,8 +40,7 @@ export class QueriableStorage implements Domain {
   }
 
   private refresh<T extends Doc> (query: Query<T>) {
-    console.log('REFRESH: ', query)
-    this.find(query._class, query.query).then(result => { console.log('RESULT:', result); query.subscriber(result) })
+    this.find(query._class, query.query).then(result => { query.subscriber(result) })
   }
 
   store (doc: Doc): Promise<void> {

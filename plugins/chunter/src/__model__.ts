@@ -96,4 +96,20 @@ export function model (S: Builder) {
   // S.mixin(chunter.class.Page, presentation.class.DetailForm, {
   //   component: chunter.component.PageProperties
   // })
+
+  S.createDocument(workbench.class.WorkbenchApplication, {
+    label: 'Страницы' as IntlString,
+    icon: workbench.icon.DefaultPerspective,
+    component: workbench.component.Application,
+    classes: [chunter.class.Page]
+  })
+
+  S.mixin(chunter.class.Page, presentation.class.DetailForm, {
+    component: chunter.component.PageProperties
+  })
+
+  S.mixin(chunter.class.Page, chunter.mixin.ActivityInfo, {
+    component: chunter.component.PageInfo
+  })
+
 }
