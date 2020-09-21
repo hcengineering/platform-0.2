@@ -16,9 +16,9 @@
 <script type="ts">
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
+  import ChatMessageItem from './ChatMessageItem.svelte'
   import { onDestroy } from 'svelte'
   import { QueryResult } from '@anticrm/platform-core';
-  import { parseMessage } from '@anticrm/core'
   import { getCoreService } from '../../utils'
   import chunter, { Message } from '../..'
 
@@ -55,12 +55,7 @@
   <ScrollView stylez="height:100%;">
     <div class="content">
       { #each messages as message (message._id) }
-        <!-- TODO: pretty message representation (avatar, name, timestamp) -->
-        <div class="message-item">
-          { #each parseMessage(message.message) as pm }
-            <span>{@html pm.text}</span>
-          { /each }
-        </div>
+          <ChatMessageItem message={message} />
       { /each }
     </div>
   </ScrollView>
@@ -77,12 +72,6 @@
 
     .content {
       flex-grow: 1;
-
-      .message-item {
-        display: flex;
-        margin: 1em;
-        padding-left: 1em;
-      }
     }
   }
 </style>
