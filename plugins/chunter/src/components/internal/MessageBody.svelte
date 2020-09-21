@@ -14,10 +14,7 @@
 -->
 
 <script lang="ts">
-  import { Ref, parseMessage } from '@anticrm/core'
-  import { Asset } from '@anticrm/platform-ui'
-  import { User } from '@anticrm/contact'
-  import { getContactService } from '../../utils'
+  import { parseMessage, MessageElementKind } from '@anticrm/core'
   import { Message } from '../..'
 
   export let message: Message
@@ -25,7 +22,13 @@
 
 <div>
   { #each parseMessage(message.message) as pm }
-    <!-- TODO: add links -->
-    <span>{ pm.text }</span>
+    { #if pm.kind === MessageElementKind.LINK }
+      <span>
+        <!-- TODO: show object title as link and support opening of object details -->
+        <a href={'#'}>{ pm.text }</a>
+      </span>
+    { :else }
+      <span>{ pm.text }</span>
+    { /if }
   { /each }
 </div>
