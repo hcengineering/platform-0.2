@@ -14,7 +14,7 @@
 -->
 
 <script type="ts">
-  import { Ref, Class, Doc, Application, Tx } from '@anticrm/core'
+  import { Ref, Class, Doc, Application, Tx, Space } from '@anticrm/core'
   import { onDestroy } from 'svelte'
   import { findOne, getCoreService } from '../../utils'
   import workbench, { WorkbenchApplication } from '@anticrm/workbench'
@@ -24,6 +24,7 @@
   import ActivityItem from './ActivityItem.svelte'
 
   export let application: Ref<WorkbenchApplication>
+  export let space: Ref<Space>
   
   let objects: Tx[] = []
   let unsubscribe: () => void
@@ -33,7 +34,7 @@
     unsubscribe = qr.subscribe(docs => { objects = docs as Tx[] })
   }
 
-  $: getCoreService().then(c => c.query(core.class.CreateTx, {})).then(qr => subscribe(qr))
+  $: getCoreService().then(c => c.query(core.class.CreateTx, { })).then(qr => subscribe(qr))
 
   onDestroy(() => { if(unsubscribe) unsubscribe() })  
 

@@ -14,7 +14,7 @@
 -->
 
 <script lang="ts">
-  import { Ref, Class, Obj, generateId } from '@anticrm/core'
+  import { Ref, Class, Doc, generateId, Space } from '@anticrm/core'
   import { AnyComponent } from '@anticrm/platform-ui'
   import presentation from '@anticrm/presentation'
   import { getComponentExtension, getCoreService } from '../../utils'
@@ -22,7 +22,8 @@
   import Component from '@anticrm/platform-ui/src/components/Component.svelte'
 
   export let title: string
-  export let _class: Ref<Class<Obj>>
+  export let _class: Ref<Class<Doc>>
+  export let space: Ref<Space>
   let object = {}
 
   let component: AnyComponent
@@ -32,7 +33,7 @@
 
   function save() {
     coreService.then(coreService => {
-      const doc = { _class, _id: coreService.generateId(), ...object }
+      const doc = { _class, _id: coreService.generateId(), _space: space, ...object }
       object = {}
       coreService.createDoc(doc)
     })
@@ -41,7 +42,7 @@
 
 <div class="recruiting-view">
   <div class="header">
-    <div class="caption-4">{title}</div>
+    <div class="caption-4">{title} : {space}</div>
     <div class="actions">
       <button class="button">Cancel</button>
       <button class="button" on:click={save}>Save</button>

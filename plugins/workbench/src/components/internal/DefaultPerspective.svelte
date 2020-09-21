@@ -91,7 +91,7 @@
   <div class="main">
     <!-- <div class="main-content"> -->
       { #if component}
-        <Component is = {component} props={{ application }} />
+        <Component is = {component} props={{ application, space }} />
       { /if }
     <!-- </div>
     <div class="input-control">

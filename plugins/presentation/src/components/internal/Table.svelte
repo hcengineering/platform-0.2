@@ -14,13 +14,14 @@
 -->
 
 <script type="ts">
-  import { Ref, Class, Doc } from '@anticrm/core'
+  import { Ref, Class, Doc, Space } from '@anticrm/core'
   import { QueryResult } from '@anticrm/platform-core/src/queries'
   import { ClassModel } from '../..'
   import { getCoreService, getPresentationService, getEmptyModel } from '../../utils'
   import { onDestroy } from 'svelte'
 
   export let _class: Ref<Class<Doc>>
+  export let space: Ref<Space>
 
   let model: ClassModel = getEmptyModel()
 
@@ -34,7 +35,7 @@
     unsubscribe = qr.subscribe(docs => { objects = docs })
   }
 
-  $: getCoreService().then(c => c.query(_class, {})).then(qr => subscribe(qr))
+  $: getCoreService().then(c => c.query(_class, { _space: space })).then(qr => subscribe(qr))
 
   onDestroy(() => { if(unsubscribe) unsubscribe() })
 
