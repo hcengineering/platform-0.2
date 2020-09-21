@@ -14,19 +14,18 @@
 -->
 
 <script lang="ts">
-  import MessageBody from './MessageBody.svelte'
-  import { Tx, CreateTx } from '@anticrm/core'
-  import core from '@anticrm/platform-core'
+  import { Ref, parseMessage } from '@anticrm/core'
+  import { Asset } from '@anticrm/platform-ui'
+  import { User } from '@anticrm/contact'
+  import { getContactService } from '../../utils'
   import { Message } from '../..'
 
-  export let tx: Tx
-
-  function getMessage() {
-    return (tx as CreateTx).object as Message
-  }
+  export let message: Message
 </script>
 
-{ #if tx._class === core.class.CreateTx }
-  Написал сообщение:
-  <MessageBody message={getMessage()}/>
-{ /if }
+<div>
+  { #each parseMessage(message.message) as pm }
+    <!-- TODO: add links -->
+    <span>{ pm.text }</span>
+  { /each }
+</div>

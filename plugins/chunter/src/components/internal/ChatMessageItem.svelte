@@ -14,6 +14,7 @@
 -->
 
 <script lang="ts">
+  import MessageBody from './MessageBody.svelte'
   import { Ref, parseMessage } from '@anticrm/core'
   import { Asset } from '@anticrm/platform-ui'
   import { User } from '@anticrm/contact'
@@ -38,13 +39,9 @@
   <img class="avatar" src={avatar} alt="avatar"/>
   <div class="details">
     <b>{username}</b> {timestamp}
-    <div>
-      { #each parseMessage(message.message) as pm }
-        <span>{ pm.text }</span>
-      { /each }
-    </div>
+    <MessageBody message={message}/>
   </div>
-</div>    
+</div>
 
 <style lang="scss">
   .chat-message-item {
