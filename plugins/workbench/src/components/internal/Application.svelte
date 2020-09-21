@@ -14,7 +14,7 @@
 -->
 
 <script type="ts">
-  import { Ref, Class, Doc, Application } from '@anticrm/core'
+  import { Ref, Class, Doc, Application, Space } from '@anticrm/core'
   import { findOne } from '../../utils'
   import workbench, { WorkbenchApplication } from '../..'
 
@@ -24,10 +24,13 @@
   import CreateForm from './CreateForm.svelte'
 
   export let application: Ref<WorkbenchApplication>
+  export let space: Ref<Space>
   
   let appInstance: WorkbenchApplication | undefined
   $: findOne(workbench.class.WorkbenchApplication, { _id: application }).then(app => { appInstance = app })
 </script>
+
+{space}
 
 <div class="workbench-browse">
   { #if appInstance }
@@ -35,11 +38,11 @@
     <span class="caption-1">{appInstance.label}</span>&nbsp;
   </div>
   <div class="table">
-    <Table _class={appInstance.classes[0]} />
+    <Table _class={appInstance.classes[0]} {space}/>
   </div>
   <div class="input-control">
     <!-- <InputControl /> -->
-    <CreateForm _class={appInstance.classes[0]} title="Hello"/>
+    <CreateForm _class={appInstance.classes[0]} title="Hello" {space}/>
   </div>
   { /if }
 </div>
