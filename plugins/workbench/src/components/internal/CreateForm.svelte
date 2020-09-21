@@ -35,7 +35,7 @@
     coreService.then(coreService => {
       const doc = { _class, _id: coreService.generateId(), _space: space, ...object }
       object = {}
-      coreService.createDoc(doc)
+      coreService.createVDoc(doc)
     })
   }
 </script>

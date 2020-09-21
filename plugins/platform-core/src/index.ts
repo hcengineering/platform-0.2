@@ -33,7 +33,8 @@ export interface CoreService extends Service {
   find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]>
   findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined>
   query<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): QueryResult<T>
-  createDoc<T extends Doc> (doc: Doc): Promise<void>
+  createDoc<T extends Doc> (doc: T): Promise<void>
+  createVDoc<T extends VDoc> (vdoc: T): Promise<void>
   generateId (): Ref<Doc>
 }
 

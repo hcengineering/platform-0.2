@@ -43,7 +43,7 @@
     coreService.then(service => {
       // TODO: specify space
       const newMessage = { _class: chunter.class.Message, _id: service.generateId(), message }
-      service.createDoc(newMessage)
+      service.createVDoc(newMessage)
     })
   }
 </script>
