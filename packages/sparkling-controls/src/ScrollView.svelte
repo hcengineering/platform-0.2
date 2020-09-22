@@ -20,13 +20,15 @@
 
 	let container: HTMLElement
 
+	$: {
+	  if (container && !autoscroll && (scrollPosition > container.clientHeight || scrollPosition < container.scrollTop)) {
+			container.scrollTo(0, scrollPosition)
+		}
+	}
+
 	afterUpdate(() => {
 		if (autoscroll) {
 			container.scrollTo(0, container.scrollHeight)
-		}
-		// update top only if not fit
-		else if (scrollPosition > container.clientHeight || scrollPosition < container.scrollTop) {
-			container.scrollTo(0, scrollPosition)
 		}
 	})
 </script>
