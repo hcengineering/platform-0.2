@@ -51,10 +51,10 @@
       <Table _class={appInstance.classes[0]} {space}/>
     </div>
   </ScrollView>
-  <div class="input-control">
+  <!-- <div class="input-control"> -->
     <!-- <InputControl /> -->
-    <CreateForm _class={appInstance.classes[0]} title="Hello" {space}/>
-  </div>
+    <!-- <CreateForm _class={appInstance.classes[0]} title="Hello" {space}/> -->
+  <!-- </div> -->
   { /if }
 </div>
 
