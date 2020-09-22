@@ -60,7 +60,7 @@
 </script>
 
 <div class="presentation-completion-popup" style="{popupStyle}">
-	<!-- <ScrollView stylez="height:100%;width: 100%;" scrollPosition="{selOffset}"> -->
+	<ScrollView stylez="height:100%;width: 100%;" scrollPosition="{selOffset}">
 		<div bind:this="{listElement}">
 			{#each items as item (item.key)}
 				<div
@@ -79,7 +79,7 @@
 				</div>
 			{/each}
 		</div>
-	<!-- </ScrollView> -->
+	</ScrollView>
 </div>
 
 <style lang="scss">
