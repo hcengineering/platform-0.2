@@ -35,7 +35,7 @@ export interface UIService extends Service {
   createApp (root: HTMLElement): any
   getLocation (): Readable<Location>
   navigate (url: string): void
-  showModal (component: AnyComponent, props: any): void
+  showModal (component: AnyComponent, props: any, element?: HTMLElement): void
   closeModal (): void
 }
 

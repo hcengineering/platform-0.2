@@ -38,13 +38,15 @@ export interface WorkbenchService extends Service {
 
 export default plugin('workbench' as Plugin<WorkbenchService>, { core: core.id, ui: ui.id }, {
   icon: {
-    DefaultPerspective: '' as Asset
+    DefaultPerspective: '' as Asset,
+    Add: '' as Asset
   },
   component: {
     Workbench: '' as AnyComponent,
     DefaultPerspective: '' as AnyComponent,
     CreateSpace: '' as AnyComponent,
     Application: '' as AnyComponent,
+    CreateForm: '' as AnyComponent,
   },
   class: {
     Perspective: '' as Ref<Class<Perspective>>,

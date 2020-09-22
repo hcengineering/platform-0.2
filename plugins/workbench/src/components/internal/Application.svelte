@@ -17,14 +17,20 @@
   import { Ref, Class, Doc, Application, Space } from '@anticrm/core'
   import { findOne } from '../../utils'
   import workbench, { WorkbenchApplication } from '../..'
+  import { getUIService } from '../../utils'
 
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
   import Table from '@anticrm/presentation/src/components/internal/Table.svelte'
+  import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import InputControl from './InputControl.svelte'
   import CreateForm from './CreateForm.svelte'
 
   export let application: Ref<WorkbenchApplication>
   export let space: Ref<Space>
+
+  const uiService = getUIService()
+
+  let addIcon: HTMLElement
   
   let appInstance: WorkbenchApplication | undefined
   $: findOne(workbench.class.WorkbenchApplication, { _id: application }).then(app => { appInstance = app })
@@ -36,6 +42,9 @@
   { #if appInstance }
   <div>
     <span class="caption-1">{appInstance.label}</span>&nbsp;
+    <a bind:this={addIcon} href="/"  on:click|preventDefault = { () => { uiService.showModal(workbench.component.CreateForm, { _class: appInstance ? appInstance.classes[0] : undefined, title: 'The title', space }, addIcon) } }>    
+      <Icon icon={workbench.icon.Add} clazz="icon-2x"/>
+    </a>
   </div>
   <div class="table">
     <Table _class={appInstance.classes[0]} {space}/>

@@ -19,6 +19,7 @@ import { writable } from 'svelte/store'
 interface CompAndProps {
   is: AnyComponent | undefined
   props: any
+  element: HTMLElement | undefined
 }
 
-export const store = writable<CompAndProps>({ is: undefined, props: {} })
+export const store = writable<CompAndProps>({ is: undefined, props: {}, element: undefined })

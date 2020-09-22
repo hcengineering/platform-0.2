@@ -37,6 +37,7 @@
   <div class="control">
     <div bind:this={compute} class="compute-width" />
     <input
+      style = { 'max-width:' + maxWidth + 'px' }
       bind:this={input}
       type="text"
       bind:value={value}
