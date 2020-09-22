@@ -37,9 +37,11 @@
   <div>
     <span class="caption-1">{appInstance.label}</span>&nbsp;
   </div>
-  <div class="table">
-    <Table _class={appInstance.classes[0]} {space}/>
-  </div>
+  <ScrollView stylez="height:100%;">
+    <div class="table">
+      <Table _class={appInstance.classes[0]} {space}/>
+    </div>
+  </ScrollView>
   <div class="input-control">
     <!-- <InputControl /> -->
     <CreateForm _class={appInstance.classes[0]} title="Hello" {space}/>
