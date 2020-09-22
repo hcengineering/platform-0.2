@@ -11,12 +11,30 @@
 	//
 	// See the License for the specific language governing permissions and
 	// limitations under the License.
+
+	import { afterUpdate } from 'svelte'
+
 	export let stylez: string = ''
 	export let scrollPosition: number = 0
+	export let autoscroll: boolean = false
+
+	let container: HTMLElement
+
+	$: {
+	  if (container && !autoscroll && (scrollPosition > container.clientHeight || scrollPosition < container.scrollTop)) {
+			container.scrollTo(0, scrollPosition)
+		}
+	}
+
+	afterUpdate(() => {
+		if (autoscroll) {
+			container.scrollTo(0, container.scrollHeight)
+		}
+	})
 </script>
 
 <div class="scroll-view" style={stylez}>
-	<div class="container">
+	<div class="container" bind:this={container}>
 		<slot />
 	</div>
 </div>
@@ -26,8 +44,10 @@
 		position: relative;
 
 		.container {
-			overflow: scroll;
+			overflow: auto;
 			position: absolute;
+			border-bottom: 1px solid var(--theme-content-color-dark);
+			border-radius: 4px;
 			height: 100%;
 			width: 100%;
 		}

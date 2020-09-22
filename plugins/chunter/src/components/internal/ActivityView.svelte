@@ -44,11 +44,13 @@
   <div>
     <span class="caption-1">Activity</span>&nbsp;
   </div>
-  <div>
-    { #each objects as item (item._id) }
-      <ActivityItem tx={item} />
-    { /each }
-  </div>
+  <ScrollView stylez="height:100%;" autoscroll=true>
+    <div class="content">
+      { #each objects as item (item._id) }
+        <ActivityItem tx={item} />
+      { /each }
+    </div>
+  </ScrollView>
   <div>
     <!-- <InputControl /> -->
     <!-- <CreateForm _class={appInstance.classes[0]} title="Hello"/> -->
@@ -61,5 +63,9 @@
     // background-color: red;
     display: flex;
     flex-direction: column;  
+
+    .content {
+      flex-grow: 1;
+    }
   }
 </style>

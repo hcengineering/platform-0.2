@@ -46,9 +46,11 @@
       <Icon icon={workbench.icon.Add} clazz="icon-2x"/>
     </a>
   </div>
-  <div class="table">
-    <Table _class={appInstance.classes[0]} {space}/>
-  </div>
+  <ScrollView stylez="height:100%;">
+    <div class="table">
+      <Table _class={appInstance.classes[0]} {space}/>
+    </div>
+  </ScrollView>
   <div class="input-control">
     <!-- <InputControl /> -->
     <CreateForm _class={appInstance.classes[0]} title="Hello" {space}/>

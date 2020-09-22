@@ -290,7 +290,7 @@
 	}
 
 	.edit-box {
-		overflow: scroll;
+		overflow: auto;
 		height: 100%;
 		width: 100%;
 
