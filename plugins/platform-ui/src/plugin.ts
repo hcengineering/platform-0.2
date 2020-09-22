@@ -14,7 +14,7 @@
 //
 
 import type { Platform } from '@anticrm/platform'
-import type { UIService, AnyComponent } from '.'
+import type { UIService, AnyComponent, AnySvelteComponent } from '.'
 
 import { writable, derived } from 'svelte/store'
 
@@ -52,7 +52,7 @@ export default async (platform: Platform): Promise<UIService> => {
     locationWritable.set(windowLocation())
   }
 
-  function showModal (component: AnyComponent, props: any, element?: HTMLElement) {
+  function showModal (component: AnySvelteComponent, props: any, element?: HTMLElement) {
     store.set({ is: component, props, element: element })
   }
 

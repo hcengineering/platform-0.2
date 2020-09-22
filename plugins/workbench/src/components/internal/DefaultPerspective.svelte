@@ -28,6 +28,7 @@
   import { AnyComponent } from '@anticrm/platform-ui';
 
   import InputControl from './InputControl.svelte'
+  import CreateSpace from './CreateSpace.svelte'
 
   const uiService = getUIService()
 
@@ -67,7 +68,7 @@
   <div class="projects">
     <div class="caption-3">
       Пространства
-      <a href="/" on:click|preventDefault = { () => { uiService.showModal(workbench.component.CreateSpace, {}) } }>
+      <a href="/" on:click|preventDefault = { () => { uiService.showModal(CreateSpace, {}) } }>
         <Icon icon={ui.icon.Add} clazz="icon-embed"/>
       </a>
     </div>

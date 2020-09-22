@@ -13,11 +13,11 @@
 // limitations under the License.
 //
 
-import { AnyComponent } from '.'
+import { AnySvelteComponent } from '.'
 import { writable } from 'svelte/store'
 
 interface CompAndProps {
-  is: AnyComponent | undefined
+  is: AnySvelteComponent | undefined
   props: any
   element: HTMLElement | undefined
 }

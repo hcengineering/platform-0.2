@@ -19,9 +19,32 @@ import { Readable } from 'svelte/store'
 export type URL = string
 export type Asset = Metadata<URL>
 
-export type SvelteConstructor = object
-export type Component<C extends SvelteConstructor> = Resource<C>
-export type AnyComponent = Component<SvelteConstructor>
+// export type SvelteConstructor = object
+
+interface ComponentOptions<Props> {
+  target: HTMLElement
+  anchor?: HTMLElement
+  props?: Props
+  hydrate?: boolean
+  intro?: boolean
+}
+
+interface SvelteComponent<Props> {
+  new(options: ComponentOptions<Props>): any
+  $set: (props: {}) => any
+  $on: (event: string, callback: (event: CustomEvent) => any) => any
+  $destroy: () => any
+  render: (props?: {}) => {
+    html: string
+    css: { code: string; map?: string }
+    head?: string
+  }
+}
+
+export type AnySvelteComponent = SvelteComponent<{}>
+
+export type Component<C extends AnySvelteComponent> = Resource<C>
+export type AnyComponent = Component<AnySvelteComponent>
 
 export const CONTEXT_PLATFORM = 'platform'
 export const CONTEXT_PLATFORM_UI = 'platform-ui'
@@ -35,7 +58,7 @@ export interface UIService extends Service {
   createApp (root: HTMLElement): any
   getLocation (): Readable<Location>
   navigate (url: string): void
-  showModal (component: AnyComponent, props: any, element?: HTMLElement): void
+  showModal (component: AnySvelteComponent, props: any, element?: HTMLElement): void
   closeModal (): void
 }
 

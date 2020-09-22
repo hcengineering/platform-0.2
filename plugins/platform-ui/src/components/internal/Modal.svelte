@@ -16,11 +16,13 @@
 <script lang="ts">
   import { store as modal } from '../../stores'
 
-  import Component from '../Component.svelte'
+  function close() {
+    modal.set({ is: undefined, props: {}, element: undefined })
+  }
 
   function handleKeydown(ev: KeyboardEvent) {
     if (ev.key === 'Escape' && $modal.is) {
-      modal.set({ is: undefined, props: {}, element: undefined })
+      close()
     }
   }
 
@@ -39,7 +41,7 @@
 
 { #if $modal.is }
 <div class="modal" class:top-arrow={$modal.element} style={ getStyle($modal.element) }>
-  <Component {...$modal} />
+  <svelte:component this={$modal.is} {...$modal.props} on:close={close}/>
 </div>
 <div class="modal-overlay"></div>
 { /if }
