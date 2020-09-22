@@ -42,7 +42,7 @@
 		position: relative;
 
 		.container {
-			overflow: scroll;
+			overflow: auto;
 			position: absolute;
 			height: 100%;
 			width: 100%;
