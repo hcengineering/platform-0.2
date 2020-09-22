@@ -114,7 +114,20 @@ export default async (platform: Platform): Promise<CoreService> => {
       object: doc
     }
 
-    return Promise.all([coreProtocol.tx(tx), txProcessor.process(tx)])
+    const createTx = new Promise((resolve, reject) => {
+      coreProtocol.tx(tx).then(result => {
+
+        // update caches when the object has been successfully created
+        qModel.refreshAll()
+        qTitles.refreshAll()
+        qGraph.refreshAll()
+        qCache.refreshAll()
+
+        resolve(result)
+      }).catch(err => reject(err))
+    })
+
+    return Promise.all([createTx, txProcessor.process(tx)])
   }
 
   function createVDoc<T extends VDoc> (vdoc: T): Promise<void> {

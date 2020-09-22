@@ -35,7 +35,7 @@ export class QueriableStorage implements Domain {
     this.proxy = store
   }
 
-  private refreshAll () {
+  refreshAll () {
     this.queries.forEach(q => this.refresh(q))
   }
 
