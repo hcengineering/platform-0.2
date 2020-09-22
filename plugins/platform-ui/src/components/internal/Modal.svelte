@@ -79,7 +79,7 @@
 
   .modal-overlay {
     z-index: 1000;
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(0, 0, 0, 0.25);
     position: fixed;
     top: 0;
     left: 0;
