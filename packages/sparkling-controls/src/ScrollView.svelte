@@ -11,12 +11,24 @@
 	//
 	// See the License for the specific language governing permissions and
 	// limitations under the License.
+
+	import { afterUpdate } from 'svelte'
+
 	export let stylez: string = ''
 	export let scrollPosition: number = 0
+
+	let container: HTMLElement
+
+	afterUpdate(() => {
+		// update top only if not fit
+		if (scrollPosition > container.clientHeight || scrollPosition < container.scrollTop) {
+			container.scrollTo(0, scrollPosition)
+		}	
+	})
 </script>
 
 <div class="scroll-view" style={stylez}>
-	<div class="container">
+	<div class="container" bind:this={container}>
 		<slot />
 	</div>
 </div>
