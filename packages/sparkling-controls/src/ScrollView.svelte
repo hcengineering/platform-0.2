@@ -46,8 +46,8 @@
 		.container {
 			overflow: auto;
 			position: absolute;
-			border-bottom: 1px solid var(--theme-content-color-dark);
-			border-radius: 4px;
+			// border-bottom: 1px solid var(--theme-content-color-dark);
+			// border-radius: 4px;
 			height: 100%;
 			width: 100%;
 		}

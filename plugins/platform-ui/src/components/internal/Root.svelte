@@ -8,9 +8,8 @@
   import StatusComponent from "./Status.svelte"
   import Clock from "./Clock.svelte"
   import Component from "../Component.svelte"
+  import Modal from './Modal.svelte'
   
-  import { store as modal } from '../../stores'
-
   import { 
     CONTEXT_PLATFORM,
     CONTEXT_PLATFORM_UI,
@@ -36,15 +35,7 @@
       status = platformStatus;
     }
   )
-
-  function handleKeydown(ev: KeyboardEvent) {
-    if (ev.key === 'Escape' && $modal.is) {
-      modal.set({ is: undefined, props: {} })
-    }
-  }
 </script>
-
-<svelte:window on:keydown={handleKeydown}/>
 
 <Theme>
   <div id="ui-root">
@@ -72,12 +63,7 @@
       {/if}
     </div>
   </div>
-  { #if $modal.is }
-  <div class="modal">
-    <Component {...$modal} />
-  </div>
-  <div class="modal-overlay"></div>
-  { /if }
+  <Modal />
 </Theme>
 
 <style lang="scss">
@@ -148,30 +134,4 @@
       background-color: var(--theme-bg-color);
     }
   }
-
-  .modal {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 1001;
-
-    border: 1px solid var(--theme-separator-color);
-    border-radius: 0.5em;
-    padding: 1em 1em;
-    background-color: var(--theme-nav-color);
-
-    // width: 480px;
-  }
-
-  .modal-overlay {
-    z-index: 1000;
-    background: rgba(0, 0, 0, 0.4);
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-  }
-
 </style>

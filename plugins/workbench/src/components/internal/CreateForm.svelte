@@ -15,6 +15,7 @@
 
 <script lang="ts">
   import { Ref, Class, Doc, generateId, Space, VDoc } from '@anticrm/core'
+  import { createEventDispatcher } from 'svelte'
   import { AnyComponent } from '@anticrm/platform-ui'
   import presentation from '@anticrm/presentation'
   import { getComponentExtension, getCoreService } from '../../utils'
@@ -30,6 +31,7 @@
   $: getComponentExtension(_class, presentation.class.DetailForm).then(ext => { component = ext })
 
   const coreService = getCoreService()
+  const dispatch = createEventDispatcher()
 
   function save() {
     coreService.then(coreService => {
@@ -38,6 +40,7 @@
       // absent VDoc fields will be autofilled
       coreService.createVDoc(doc as unknown as VDoc)
     })
+    dispatch('close')
   }
 </script>
 
@@ -45,7 +48,7 @@
   <div class="header">
     <div class="caption-4">{title} : {space}</div>
     <div class="actions">
-      <button class="button">Cancel</button>
+      <button class="button" on:click={ () => { dispatch('close') } }>Cancel</button>
       <button class="button" on:click={save}>Save</button>
     </div>
   </div>

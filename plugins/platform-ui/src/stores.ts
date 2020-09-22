@@ -13,12 +13,13 @@
 // limitations under the License.
 //
 
-import { AnyComponent } from '.'
+import { AnySvelteComponent } from '.'
 import { writable } from 'svelte/store'
 
 interface CompAndProps {
-  is: AnyComponent | undefined
+  is: AnySvelteComponent | undefined
   props: any
+  element: HTMLElement | undefined
 }
 
-export const store = writable<CompAndProps>({ is: undefined, props: {} })
+export const store = writable<CompAndProps>({ is: undefined, props: {}, element: undefined })

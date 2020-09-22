@@ -19,6 +19,7 @@ import workbench from '.'
 export default (platform: Platform) => {
   const spritesUrl = require('../assets/icons.svg')
   platform.loadMetadata(workbench.icon, {
-    DefaultPerspective: spritesUrl + '#perspective'
+    DefaultPerspective: spritesUrl + '#perspective',
+    Add: spritesUrl + '#add'
   })
 }
