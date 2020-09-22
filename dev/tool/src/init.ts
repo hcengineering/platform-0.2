@@ -15,7 +15,7 @@
 
 import { Db } from 'mongodb'
 import { Model, Strings } from '@anticrm/boot/src/boot'
-import { Doc } from '@anticrm/platform'
+import { Doc } from '@anticrm/core'
 
 export function initDatabase (db: Db) {
   const domains = { ...Model } as { [key: string]: Doc[] }

@@ -15,16 +15,13 @@
 
 import { MongoClient, Db } from 'mongodb'
 
-import { core, Ref, Class, Doc, MemDb, AnyLayout, CoreDomain, CoreProtocol, Tx, TxProcessor, Storage } from '@anticrm/platform'
+import { Ref, Class, Doc, Model, AnyLayout, MODEL_DOMAIN, CoreProtocol, Tx, TxProcessor, Storage, ModelIndex } from '@anticrm/core'
+import { VDocIndex, TitleIndex, TextIndex, TxIndex } from '@anticrm/core'
 
 import WebSocket from 'ws'
 import { makeResponse, Response } from './rpc'
 import { PlatformServer } from './server'
 
-import { VDocIndex } from '@anticrm/platform/src/indices/vdoc'
-import { TitleIndex } from '@anticrm/platform/src/indices/title'
-import { TextIndex } from '@anticrm/platform/src/indices/text'
-import { TxIndex } from '@anticrm/platform/src/indices/tx'
 
 interface CommitInfo {
   created: Doc[]
@@ -42,7 +39,7 @@ export async function connect (uri: string, dbName: string, ws: WebSocket, serve
   const client = await MongoClient.connect(uri, { useUnifiedTopology: true })
   const db = client.db(dbName)
 
-  const memdb = new MemDb(CoreDomain.Model)
+  const memdb = new Model(MODEL_DOMAIN)
   console.log('loading model...')
   const model = await db.collection('model').find({}).toArray()
   console.log('model loaded.')
@@ -64,6 +61,7 @@ export async function connect (uri: string, dbName: string, ws: WebSocket, serve
   const mongoStorage: Storage = {
     async store (doc: Doc): Promise<any> {
       const domain = memdb.getDomain(doc._class)
+      console.log('STORE:', domain, doc)
       return db.collection(domain).insertOne(doc)
     },
 
@@ -79,14 +77,19 @@ export async function connect (uri: string, dbName: string, ws: WebSocket, serve
 
     async remove (_class: Ref<Class<Doc>>, doc: Ref<Doc>): Promise<any> {
       throw new Error('Not implemented')
+    },
+
+    async find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
+      throw new Error('find not implemented')
     }
   }
 
-  const txProcessor = new TxProcessor(memdb, [
+  const txProcessor = new TxProcessor([
+    new TxIndex(mongoStorage),
     new VDocIndex(memdb, mongoStorage),
     new TitleIndex(memdb, mongoStorage),
     new TextIndex(memdb, mongoStorage),
-    new TxIndex(memdb, mongoStorage),
+    new ModelIndex(memdb, mongoStorage)
   ])
 
   const clientControl = {
@@ -106,7 +109,7 @@ export async function connect (uri: string, dbName: string, ws: WebSocket, serve
     },
 
     async loadDomain (domain: string): Promise<Doc[]> {
-      if (domain === CoreDomain.Model)
+      if (domain === MODEL_DOMAIN)
         return memdb.dump()
       console.log('domain:', domain)
       return db.collection(domain).find({}).toArray()

@@ -16,7 +16,7 @@
 /* eslint-env jest */
 
 import { MongoClient, Db } from 'mongodb'
-import { Request } from '@anticrm/platform'
+import { Request } from '@anticrm/core'
 import methods from '..'
 
 describe('server', () => {

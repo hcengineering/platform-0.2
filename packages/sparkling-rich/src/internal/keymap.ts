@@ -10,12 +10,12 @@ import { liftListItem, sinkListItem, splitListItem } from 'prosemirror-schema-li
 import { schema } from './schema'
 import { Commands } from './commands'
 
-const mac = typeof navigator !== 'undefined' ? /Mac/.test(navigator.platform) : false
+const mac = typeof navigator !== 'undefined' ? navigator.platform.includes('Mac') : false
 
-export function buildKeymap () {
+export function buildKeymap (): { [key: string]: any } {
   const keys: { [key: string]: any } = {}
 
-  function bind (key: string, cmd: any) {
+  const bind = (key: string, cmd: any): void => {
     keys[key] = cmd
   }
 

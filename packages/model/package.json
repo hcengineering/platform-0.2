@@ -1,0 +1,20 @@
+{
+  "name": "@anticrm/model",
+  "version": "0.2.0",
+  "main": "src/index.ts",
+  "author": "Anticrm Platform Contributors (https://github.com/anticrm)",
+  "license": "EPL-2.0",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@anticrm/platform": "^0.2.0",
+    "lodash": "^4.17.20",
+    "reflect-metadata": "^0.1.13"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.161",
+    "simplytyped": "^3.3.0",
+    "typescript": "^3.9.4"
+  }
+}

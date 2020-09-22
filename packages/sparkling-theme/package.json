@@ -1,10 +1,14 @@
 {
   "name": "@anticrm/sparkling-theme",
   "version": "0.1.1",
+  "main": "src/index.ts",
   "author": "Andrey Platov <andrey.v.platov@gmail.com>",
   "license": "EPL-2.0",
   "scripts": {
     "test": "echo 'no tests'",
     "lint": "echo 'no linting'"
+  },
+  "devDependencies": {
+    "typescript": "^3.9.4"
   }
 }

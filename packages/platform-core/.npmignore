@@ -1,4 +1,0 @@
-lib
-src/__tests__
-.*.js
-*.config.js

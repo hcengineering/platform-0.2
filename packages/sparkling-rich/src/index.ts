@@ -13,7 +13,9 @@
 // limitations under the License.
 //
 
-export const copyright = "Copyright © 2020 Anticrm Platform Contributors."
+import { MarkType } from 'prosemirror-model'
+
+export const copyright = 'Copyright © 2020 Anticrm Platform Contributors.'
 
 export interface EditorContentEvent {
     isEmpty: boolean
@@ -25,4 +27,24 @@ export interface EditorContentEvent {
     completionWord: string
     completionEnd: string
     selection: { from: number, to: number }
+}
+
+// An actions interface, will be extended to allow operations.
+export interface EditorActions {
+    insertMark (
+        text: string,
+        from: number,
+        to: number,
+        mark: MarkType,
+        attrs?: { [key: string]: any }
+    ): void
+    insert (text: string, from: number, to: number): void
+
+    toggleBold (): void
+    toggleItalic (): void
+    toggleStrike (): void
+    toggleUnderline (): void
+    toggleUnOrderedList (): void
+    toggleOrderedList (): void
+    focus (): void
 }

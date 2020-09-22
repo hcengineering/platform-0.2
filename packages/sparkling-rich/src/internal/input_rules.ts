@@ -1,6 +1,7 @@
 import {
   ellipsis,
   emDash,
+  InputRule,
   inputRules,
   smartQuotes,
   textblockTypeInputRule,
@@ -10,25 +11,26 @@ import {
 import { schema } from './schema'
 
 import { NodeType } from 'prosemirror-model'
+import { Plugin } from 'prosemirror-state'
 
-function blockQuoteRule (nodeType: NodeType) {
+function blockQuoteRule (nodeType: NodeType): InputRule {
   return wrappingInputRule(/^\s*>\s$/, nodeType)
 }
 
-function orderedListRule (nodeType: NodeType) {
+function orderedListRule (nodeType: NodeType): InputRule {
   return wrappingInputRule(/^(\d+)\.\s$/, nodeType, match => ({ order: +match[1] }),
-    (match, node) => node.childCount + node.attrs.order === +match[1])
+    (match, node) => node.childCount + (node.attrs.order as number) === +match[1])
 }
 
-function bulletListRule (nodeType: NodeType) {
+function bulletListRule (nodeType: NodeType): InputRule {
   return wrappingInputRule(/^\s*([-+*])\s$/, nodeType)
 }
 
-function codeBlockRule (nodeType: NodeType) {
+function codeBlockRule (nodeType: NodeType): InputRule {
   return textblockTypeInputRule(/^```$/, nodeType)
 }
 
-export function buildInputRules () {
+export function buildInputRules (): Plugin {
   const rules = smartQuotes.concat(ellipsis, emDash)
   rules.push(blockQuoteRule(schema.nodes.blockquote))
   rules.push(orderedListRule(schema.nodes.ordered_list))

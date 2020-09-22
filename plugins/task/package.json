@@ -1,0 +1,16 @@
+{
+  "name": "@anticrm/task",
+  "version": "0.2.0",
+  "main": "src/index.ts",
+  "author": "Anticrm Platform Contributors (https://github.com/anticrm)",
+  "license": "EPL-2.0",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@anticrm/platform": "^0.2.0"
+  },
+  "devDependencies": {
+    "typescript": "^3.9.4"
+  }
+}
