@@ -65,7 +65,7 @@
   <div>
     <span class="caption-1">Чат {spaceName}</span>&nbsp;
   </div>
-  <ScrollView stylez="height:100%;">
+  <ScrollView stylez="height:100%;" autoscroll=true>
     <div class="content">
       { #each messages as message (message._id) }
           <ChatMessageItem message={message} />

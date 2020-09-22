@@ -16,14 +16,18 @@
 
 	export let stylez: string = ''
 	export let scrollPosition: number = 0
+	export let autoscroll: boolean = false
 
 	let container: HTMLElement
 
 	afterUpdate(() => {
+		if (autoscroll) {
+			container.scrollTo(0, container.scrollHeight)
+		}
 		// update top only if not fit
-		if (scrollPosition > container.clientHeight || scrollPosition < container.scrollTop) {
+		else if (scrollPosition > container.clientHeight || scrollPosition < container.scrollTop) {
 			container.scrollTo(0, scrollPosition)
-		}	
+		}
 	})
 </script>
 
