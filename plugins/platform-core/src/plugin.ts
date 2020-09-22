@@ -74,6 +74,9 @@ export default async (platform: Platform): Promise<CoreService> => {
     new ModelIndex(model, qModel)
   ])
 
+  // add listener to process data updates from backend
+  rpc.addEventListener(response => txProcessor.process(response.result as Tx))
+
   function find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
     const domainName = model.getDomain(_class)
     const domain = domains.get(domainName)
