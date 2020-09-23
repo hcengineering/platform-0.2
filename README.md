@@ -14,7 +14,7 @@ docker run -d -p 27017:27017 mongo
 yarn workspace @anticrm/tool create-workspace john.appleseed@gmail.com -w workspace -p 123 -f "John Appleseed"
 yarn workspace @anticrm/server start
 yarn workspace @anticrm/server-front start
-yarn workspace prod serve
+yarn workspace prod dev
 ```
 
 Go to http://localhost:8080
@@ -34,4 +34,3 @@ Go to http://localhost:8080
 
 * Build system deploy in-memory-database client to: https://platform-one.now.sh and/or branch-specific URLs (see particular commit comments).
 * Build system deploy production client to: http://anticrm-platform.s3-website.us-east-2.amazonaws.com/
-
