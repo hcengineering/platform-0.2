@@ -1,0 +1,21 @@
+{
+  "name": "@anticrm/guidebook",
+  "version": "0.2.0",
+  "main": "src/index.ts",
+  "author": "Anticrm Platform Contributors (https://github.com/anticrm)",
+  "license": "EPL-2.0",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@anticrm/platform": "^0.2.0",
+    "@anticrm/presentation": "^0.2.0",
+    "prism-svelte": "^0.4.7",
+    "prismjs": "^1.21.0"
+  },
+  "devDependencies": {
+    "prettier": "^2.1.2",
+    "prettier-plugin-svelte": "^1.2.1",
+    "typescript": "^3.9.4"
+  }
+}

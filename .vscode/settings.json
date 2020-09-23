@@ -10,5 +10,6 @@
 	"javascript.format.insertSpaceAfterConstructor": true,
 	"[svelte]": {
 		"editor.defaultFormatter": "esbenp.prettier-vscode"
-	}
+	},
+	"editor.defaultFormatter": "esbenp.prettier-vscode"
 }

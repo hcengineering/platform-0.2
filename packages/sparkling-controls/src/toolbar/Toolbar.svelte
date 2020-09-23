@@ -1,5 +1,4 @@
 <script type="ts">
-	export let clazz: string = ''
 </script>
 
 <div class="crm-toolbar-toolbar">
