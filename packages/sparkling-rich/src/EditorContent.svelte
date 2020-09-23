@@ -29,7 +29,7 @@
 	) => Promise<Transaction | null>
 
 	// Perform update of values are changed
-	$: updateValue()
+	$: updateValue(content)
 
 	// Internal variables
 	let view: EditorView
@@ -159,7 +159,7 @@
 		root.appendChild(rootElement)
 	})
 
-	function updateValue() {
+	function updateValue(content: string) {
 		if (content != view.dom.innerHTML) {
 			const element = parser.parseFromString(content, 'text/html').body
 			let newDoc = DOMParser.fromSchema(schema).parse(element)
