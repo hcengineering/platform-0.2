@@ -58,7 +58,7 @@
 	}
 	let completions: CompletionItem[] = []
 	let htmlValue: string = ''
-	let stylesEnabled: boolean = true
+	export let stylesEnabled: boolean = false
 	let completionControl: CompletionPopup
 
 	let htmlEditor: EditorContent

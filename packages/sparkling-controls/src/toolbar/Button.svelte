@@ -2,7 +2,6 @@
 	export let disabled: boolean = false
 	export let selected: boolean = false
 	export let style: string = ''
-	export let clazz: string = ''
 </script>
 
 <button
@@ -38,21 +37,13 @@
 			border-color: var(--theme-highlight-color);
 			box-shadow: inset 0px 0px 2px 0px var(--theme--highlight-color);
 		}
-
-		&.large {
-			padding: 0.75em 1.5em 0.75em;
-		}
-		&.small {
-			padding: 0 0.6em 0;
-		}
-
 		&.selected {
 			background-color: var(--theme-highlight-color);
 			font-weight: bold;
 			// background-color: darken(--theme-highlight-color, 10%);
 		}
 
-		&:hover {
+		&:hover:enabled {
 			border-color: var(--theme-highlight-color);
 			// color: $highlight-color;
 			background-color: var(--theme-highlight-color);
