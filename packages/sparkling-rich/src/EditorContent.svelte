@@ -1,319 +1,342 @@
 <script lang="ts">
-	import { DOMParser, Fragment, Slice, Mark, MarkType } from 'prosemirror-model'
+  import { DOMParser, Fragment, Slice, Mark, MarkType } from 'prosemirror-model'
 
-	import { schema } from './internal/schema'
+  import { schema } from './internal/schema'
 
-	import { AllSelection, EditorState, Transaction } from 'prosemirror-state'
-	import { EditorView } from 'prosemirror-view'
+  import { AllSelection, EditorState, Transaction } from 'prosemirror-state'
+  import { EditorView } from 'prosemirror-view'
 
-	import { history } from 'prosemirror-history'
-	import { keymap } from 'prosemirror-keymap'
+  import { history } from 'prosemirror-history'
+  import { keymap } from 'prosemirror-keymap'
 
-	import { buildKeymap } from './internal/keymap'
-	import { buildInputRules } from './internal/input_rules'
-	import { Commands } from './internal/commands'
-	import { EditorContentEvent } from './index'
+  import { buildKeymap } from './internal/keymap'
+  import { buildInputRules } from './internal/input_rules'
+  import { Commands } from './internal/commands'
+  import { EditorContentEvent } from './index'
 
-	import { createEventDispatcher, onMount } from 'svelte'
+  import { createEventDispatcher, onMount } from 'svelte'
 
-	const dispatch = createEventDispatcher()
+  const dispatch = createEventDispatcher()
 
-	const mac =
-		typeof navigator != 'undefined' ? /Mac/.test(navigator.platform) : false
+  const mac =
+    typeof navigator != 'undefined' ? /Mac/.test(navigator.platform) : false
 
-	export let content: string = ''
-	export let hoverMessage: string = 'Placeholder...'
-	export let triggers: string[] = []
-	export let transformInjections: (
-		state: EditorState
-	) => Promise<Transaction | null>
+  export let content: string = ''
+  export let hoverMessage: string = 'Placeholder...'
+  export let triggers: string[] = []
+  export let transformInjections: (
+    state: EditorState
+  ) => Promise<Transaction | null>
 
-	// Perform update of values are changed
-	$: updateValue(content)
+  // Perform update of values are changed
+  $: updateValue(content)
 
-	// Internal variables
-	let view: EditorView
-	let state: EditorState
-	let root: HTMLElement
-	let rootElement: HTMLElement
+  // Internal variables
+  let view: EditorView
+  let state: EditorState
+  let root: HTMLElement
 
-	let isEmpty: boolean = checkEmpty(content)
+  let rootElement: HTMLElement
 
-	function checkEmpty(value: string): boolean {
-		return value.length === 0 || value === '<p><br></p>' || value === '<p></p>'
-	}
+  let inputHeight: number
 
-	function findCompletion(
-		sel: any
-	): { completionWord: string; completionEnd: string } {
-		var completionWord = ''
-		var completionEnd = ''
-		if (sel.$from.nodeBefore != null) {
-			let val = sel.$from.nodeBefore.textContent
-			let p = -1
-			for (p = val.length - 1; p >= 0; p--) {
-				if (val[p] === ' ' || val[p] === '\n') {
-					//Stop on WS
-					break
-				}
-				for (let ti = 0; ti < triggers.length; ti++) {
-					let t = triggers[ti]
-					if (val.substring(p, t.length) == t) {
-						// we found trigger, -1 to pos
-						p -= t.length
-						break
-					}
-				}
-			}
-			if (p != -1) {
-				val = val.substring(p + 1)
-			}
-			completionWord = val
-		}
-		if (sel.$from.nodeAfter != null) {
-			completionEnd = sel.$from.nodeAfter.textContent
-		}
-		return { completionWord, completionEnd }
-	}
+  let isEmpty: boolean = checkEmpty(content)
 
-	function emitStyleEvent() {
-		let sel = view.state.selection
-		var { completionWord, completionEnd } = findCompletion(sel)
+  function checkEmpty(value: string): boolean {
+    return value.length === 0 || value === '<p><br></p>' || value === '<p></p>'
+  }
 
-		let cursor = view.coordsAtPos(sel.from - completionWord.length - 1)
-		// The box in which the tooltip is positioned, to use as base
+  function findCompletion(
+    sel: any
+  ): { completionWord: string; completionEnd: string } {
+    var completionWord = ''
+    var completionEnd = ''
+    if (sel.$from.nodeBefore != null) {
+      let val = sel.$from.nodeBefore.textContent
+      let p = -1
+      for (p = val.length - 1; p >= 0; p--) {
+        if (val[p] === ' ' || val[p] === '\n') {
+          //Stop on WS
+          break
+        }
+        for (let ti = 0; ti < triggers.length; ti++) {
+          let t = triggers[ti]
+          if (val.substring(p, t.length) == t) {
+            // we found trigger, -1 to pos
+            p -= t.length
+            break
+          }
+        }
+      }
+      if (p != -1) {
+        val = val.substring(p + 1)
+      }
+      completionWord = val
+    }
+    if (sel.$from.nodeAfter != null) {
+      completionEnd = sel.$from.nodeAfter.textContent
+    }
+    return { completionWord, completionEnd }
+  }
 
-		let innerDOMValue = view.dom.innerHTML
-		dispatch('content', innerDOMValue)
+  function emitStyleEvent() {
+    let sel = view.state.selection
+    var { completionWord, completionEnd } = findCompletion(sel)
 
-		// Check types
-		let marks = view.state.storedMarks || view.state.selection.$from.marks()
+    let posAtWindow = view.coordsAtPos(sel.from - completionWord.length - 1)
 
-		let isBold = schema.marks.strong.isInSet(marks) != null
-		let isItalic = schema.marks.em.isInSet(marks) != null
-		let isStrike = schema.marks.strike.isInSet(marks) != null
-		let isUnderline = schema.marks.underline.isInSet(marks) != null
-		isEmpty = checkEmpty(innerDOMValue)
-		let evt = {
-			isEmpty: isEmpty,
-			bold: isBold,
-			isBoldEnabled: Commands.toggleStrong(view.state),
-			italic: isItalic,
-			isItalicEnabled: Commands.toggleItalic(view.state),
-			strike: isStrike,
-			isStrikeEnabled: Commands.toggleStrike(view.state),
-			underline: isUnderline,
-			isUnderlineEnabled: Commands.toggleUnderline(view.state),
-			cursor: {
-				left: cursor.left,
-				top: cursor.top,
-				bottom: cursor.bottom,
-				right: cursor.right,
-			},
-			completionWord,
-			completionEnd,
-			selection: { from: sel.from, to: sel.to },
-		} as EditorContentEvent
-		dispatch('styleEvent', evt)
-	}
+    var viewportOffset = rootElement.getBoundingClientRect()
 
-	//****************************************************************
-	// Initialization of prosemirror stuff.
-	//****************************************************************
-	rootElement = document.createElement('div')
+    let cursor = {
+      left: posAtWindow.left - viewportOffset.left,
+      top: posAtWindow.top - viewportOffset.top,
+      right: posAtWindow.right - viewportOffset.left,
+      bottom: posAtWindow.bottom - viewportOffset.top
+    }
+    console.log('Cursor:', cursor)
+    // The box in which the tooltip is positioned, to use as base
 
-	const parser = new window.DOMParser()
-	const element = parser.parseFromString(content, 'text/html').body
+    let innerDOMValue = view.dom.innerHTML
+    dispatch('content', innerDOMValue)
 
-	state = EditorState.create({
-		schema,
-		doc: DOMParser.fromSchema(schema).parse(element),
-		plugins: [history(), buildInputRules(), keymap(buildKeymap())],
-	})
-	view = new EditorView(rootElement, {
-		state,
-		dispatchTransaction(transaction) {
-			let newState = view.state.apply(transaction)
+    // Check types
+    let marks = view.state.storedMarks || view.state.selection.$from.marks()
 
-			// Check and update triggers to update content.
-			if (transformInjections != null) {
-				let tr: Promise<Transaction | null> = transformInjections(newState)
-				if (tr != null) {
-					tr.then((res) => {
-						if (res != null) {
-							newState = newState.apply(res)
-							view.updateState(newState)
+    let isBold = schema.marks.strong.isInSet(marks) != null
+    let isItalic = schema.marks.em.isInSet(marks) != null
+    let isStrike = schema.marks.strike.isInSet(marks) != null
+    let isUnderline = schema.marks.underline.isInSet(marks) != null
+    isEmpty = checkEmpty(innerDOMValue)
+    let evt = {
+      isEmpty: isEmpty,
+      bold: isBold,
+      isBoldEnabled: Commands.toggleStrong(view.state),
+      italic: isItalic,
+      isItalicEnabled: Commands.toggleItalic(view.state),
+      strike: isStrike,
+      isStrikeEnabled: Commands.toggleStrike(view.state),
+      underline: isUnderline,
+      isUnderlineEnabled: Commands.toggleUnderline(view.state),
+      cursor: {
+        left: cursor.left,
+        top: cursor.top,
+        bottom: cursor.bottom,
+        right: cursor.right
+      },
+      completionWord,
+      completionEnd,
+      selection: { from: sel.from, to: sel.to },
+      inputHeight
+    } as EditorContentEvent
+    dispatch('styleEvent', evt)
+  }
 
-							emitStyleEvent()
-						}
-					})
-				}
-			}
-			view.updateState(newState)
+  //****************************************************************
+  // Initialization of prosemirror stuff.
+  //****************************************************************
+  rootElement = document.createElement('div')
 
-			emitStyleEvent()
-		},
-	})
+  const parser = new window.DOMParser()
+  const element = parser.parseFromString(content, 'text/html').body
 
-	onMount(() => {
-		root.appendChild(rootElement)
-	})
+  state = EditorState.create({
+    schema,
+    doc: DOMParser.fromSchema(schema).parse(element),
+    plugins: [history(), buildInputRules(), keymap(buildKeymap())]
+  })
+  view = new EditorView(rootElement, {
+    state,
+    dispatchTransaction(transaction) {
+      let newState = view.state.apply(transaction)
 
-	function updateValue(content: string) {
-		if (content != view.dom.innerHTML) {
-			const element = parser.parseFromString(content, 'text/html').body
-			let newDoc = DOMParser.fromSchema(schema).parse(element)
+      // Check and update triggers to update content.
+      if (transformInjections != null) {
+        let tr: Promise<Transaction | null> = transformInjections(newState)
+        if (tr != null) {
+          tr.then((res) => {
+            if (res != null) {
+              newState = newState.apply(res)
+              view.updateState(newState)
 
-			let op = state.tr
-				.setSelection(new AllSelection(state.doc))
-				.replaceSelectionWith(newDoc)
-			let newState = state.apply(op)
+              emitStyleEvent()
+            }
+          })
+        }
+      }
+      view.updateState(newState)
 
-			view.updateState(newState)
+      emitStyleEvent()
+    }
+  })
 
-			view.focus()
-		}
-	}
+  onMount(() => {
+    root.appendChild(rootElement)
+  })
 
-	export function insert(text: string, from: number, to: number) {
-		const t = view.state.tr.insertText(text, from, to)
-		const st = view.state.apply(t)
-		view.updateState(st)
-		emitStyleEvent()
-	}
+  function updateValue(content: string) {
+    if (content != view.dom.innerHTML) {
+      const element = parser.parseFromString(content, 'text/html').body
+      let newDoc = DOMParser.fromSchema(schema).parse(element)
 
-	export function insertMark(
-		text: string,
-		from: number,
-		to: number,
-		mark: MarkType,
-		attrs?: { [key: string]: any }
-	) {
-		// Ignore white spaces on end of text
-		let markLen = text.trim().length
+      let op = state.tr
+        .setSelection(new AllSelection(state.doc))
+        .replaceSelectionWith(newDoc)
+      let newState = state.apply(op)
 
-		const t = view.state.tr
-			.insertText(text, from, to)
-			.addMark(from, from + markLen, mark.create(attrs))
-		const st = view.state.apply(t)
-		view.updateState(st)
-		emitStyleEvent()
-	}
-	// Some operations
-	export function toggleBold() {
-		Commands.toggleStrong(view.state, view.dispatch)
-		view.focus()
-	}
-	export function toggleItalic() {
-		Commands.toggleItalic(view.state, view.dispatch)
-		view.focus()
-	}
-	export function toggleStrike() {
-		Commands.toggleStrike(view.state, view.dispatch)
-		view.focus()
-	}
-	export function toggleUnderline() {
-		Commands.toggleUnderline(view.state, view.dispatch)
-		view.focus()
-	}
-	export function toggleUnOrderedList() {
-		Commands.toggleUnOrdered(view.state, view.dispatch)
-		view.focus()
-	}
-	export function toggleOrderedList() {
-		Commands.toggleOrdered(view.state, view.dispatch)
-		view.focus()
-	}
-	export function focus() {
-		view.focus()
-	}
+      view.updateState(newState)
+
+      view.focus()
+    }
+  }
+
+  export function insert(text: string, from: number, to: number) {
+    const t = view.state.tr.insertText(text, from, to)
+    const st = view.state.apply(t)
+    view.updateState(st)
+    emitStyleEvent()
+  }
+
+  export function insertMark(
+    text: string,
+    from: number,
+    to: number,
+    mark: MarkType,
+    attrs?: { [key: string]: any }
+  ) {
+    // Ignore white spaces on end of text
+    let markLen = text.trim().length
+
+    const t = view.state.tr
+      .insertText(text, from, to)
+      .addMark(from, from + markLen, mark.create(attrs))
+    const st = view.state.apply(t)
+    view.updateState(st)
+    emitStyleEvent()
+  }
+  // Some operations
+  export function toggleBold() {
+    Commands.toggleStrong(view.state, view.dispatch)
+    view.focus()
+  }
+  export function toggleItalic() {
+    Commands.toggleItalic(view.state, view.dispatch)
+    view.focus()
+  }
+  export function toggleStrike() {
+    Commands.toggleStrike(view.state, view.dispatch)
+    view.focus()
+  }
+  export function toggleUnderline() {
+    Commands.toggleUnderline(view.state, view.dispatch)
+    view.focus()
+  }
+  export function toggleUnOrderedList() {
+    Commands.toggleUnOrdered(view.state, view.dispatch)
+    view.focus()
+  }
+  export function toggleOrderedList() {
+    Commands.toggleOrdered(view.state, view.dispatch)
+    view.focus()
+  }
+  export function focus() {
+    view.focus()
+  }
 </script>
 
-{#if isEmpty}
-	<div class="hover-message">{hoverMessage}</div>
-{/if}
-<div class="edit-box" bind:this="{root}"></div>
+<div
+  class="edit-box"
+  bind:this="{root}"
+  bind:clientHeight="{inputHeight}"
+></div>
+<div
+  class="hover-message"
+  style="{`top:${-1 * inputHeight}px;` +  //
+    `margin-bottom:${-1 * inputHeight}px;` +  //
+    `height:${inputHeight}px`}"
+>
+  {#if isEmpty}{hoverMessage}{/if}
+</div>
+<slot />
 
 <style lang="scss">
-	:global {
-		.ProseMirror {
-			position: relative;
-		}
+  :global {
+    .ProseMirror {
+      position: relative;
+    }
 
-		.ProseMirror {
-			word-wrap: break-word;
-			white-space: pre-wrap;
-			white-space: break-spaces;
-			-webkit-font-variant-ligatures: none;
-			font-variant-ligatures: none;
-			font-feature-settings: 'liga' 0; /* the above doesn't seem to work in Edge */
-		}
+    .ProseMirror {
+      word-wrap: break-word;
+      white-space: pre-wrap;
+      white-space: break-spaces;
+      -webkit-font-variant-ligatures: none;
+      font-variant-ligatures: none;
+      font-feature-settings: 'liga' 0; /* the above doesn't seem to work in Edge */
+    }
 
-		.ProseMirror pre {
-			white-space: pre-wrap;
-		}
+    .ProseMirror pre {
+      white-space: pre-wrap;
+    }
 
-		.ProseMirror li {
-			position: relative;
-		}
+    .ProseMirror li {
+      position: relative;
+    }
 
-		.ProseMirror-hideselection *::selection {
-			background: transparent;
-		}
-		.ProseMirror-hideselection *::-moz-selection {
-			background: transparent;
-		}
-		.ProseMirror-hideselection {
-			caret-color: transparent;
-		}
+    .ProseMirror-hideselection *::selection {
+      background: transparent;
+    }
+    .ProseMirror-hideselection *::-moz-selection {
+      background: transparent;
+    }
+    .ProseMirror-hideselection {
+      caret-color: transparent;
+    }
 
-		.ProseMirror-selectednode {
-			outline: 2px solid #8cf;
-		}
+    .ProseMirror-selectednode {
+      outline: 2px solid #8cf;
+    }
 
-		/* Make sure li selections wrap around markers */
+    /* Make sure li selections wrap around markers */
 
-		li.ProseMirror-selectednode {
-			outline: none;
-		}
+    li.ProseMirror-selectednode {
+      outline: none;
+    }
 
-		li.ProseMirror-selectednode:after {
-			content: '';
-			position: absolute;
-			left: -32px;
-			right: -2px;
-			top: -2px;
-			bottom: -2px;
-			border: 2px solid #8cf;
-			pointer-events: none;
-		}
-	}
+    li.ProseMirror-selectednode:after {
+      content: '';
+      position: absolute;
+      left: -32px;
+      right: -2px;
+      top: -2px;
+      bottom: -2px;
+      border: 2px solid #8cf;
+      pointer-events: none;
+    }
+  }
 
-	.edit-box {
-		overflow: auto;
-		height: 100%;
-		width: 100%;
+  .edit-box {
+    overflow: auto;
+    height: 100%;
+    width: 100%;
+    position: relative;
 
-		:global {
-			div {
-				outline: none;
-				p {
-					margin: 5px;
-				}
-				// blockquote {
-				//   border-left: 1.5px solid #bbb;
-				//   margin: 5px;
-				// }
-			}
-		}
-	}
-	.edit-box:focus {
-		outline: none;
-	}
-	.hover-message {
-		position: absolute;
-		pointer-events: none;
-		margin: 5px;
-		color: #aaaaaa;
-	}
+    :global {
+      div {
+        outline: none;
+        p {
+          margin: 5px;
+        }
+      }
+    }
+  }
+  .edit-box:focus {
+    outline: none;
+  }
+  .hover-message {
+    position: relative;
+    top: 0px;
+    pointer-events: none;
+    padding-left: 5px;
+    padding-top: 5px;
+    color: #aaaaaa;
+  }
 </style>

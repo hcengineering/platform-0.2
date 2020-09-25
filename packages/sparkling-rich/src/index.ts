@@ -27,6 +27,7 @@ export interface EditorContentEvent {
     completionWord: string
     completionEnd: string
     selection: { from: number, to: number }
+    inputHeight: number
 }
 
 // An actions interface, will be extended to allow operations.

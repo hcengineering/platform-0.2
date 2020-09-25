@@ -26,10 +26,10 @@
   :global {
     /* http://prismjs.com/download.html?themes=prism-okaidia&languages=markup+css+clike+javascript+coffeescript+handlebars+jade+less+markdown+php+scss+stylus&plugins=line-highlight+line-numbers+show-language */
     /**
- * okaidia theme for JavaScript, CSS and HTML
- * Loosely based on Monokai textmate theme by http://www.monokai.nl/
- * @author ocodia
- */
+    * okaidia theme for JavaScript, CSS and HTML
+    * Loosely based on Monokai textmate theme by http://www.monokai.nl/
+    * @author ocodia
+    */
 
     code[class*='language-'],
     pre[class*='language-'] {
@@ -55,8 +55,7 @@
 
     /* Code blocks */
     pre[class*='language-'] {
-      padding: 1em;
-      margin: 0.5em 0;
+      margin: 0 0;
       overflow: auto;
       border-radius: 0.3em;
     }
@@ -265,30 +264,30 @@
     }
   }
   .page-block {
-    width: 100%;
-    min-height: 200px;
     display: flex;
     flex-direction: row;
     align-items: stretch;
+    margin: 20px;
+    min-height: 200px;
 
     .text {
-      margin: 10px;
-      // flex-grow: 1;
-    }
-    .my-code {
-      background-color: hsl(210, 25%, 10%);
-      color: black;
-      // margin: 10px;
-      flex-grow: 2;
+      height: 100%;
+      flex: 1;
     }
     .preview {
       background-color: hsl(210, 25%, 20%);
+      border-radius: 8px;
       margin: 10px;
-      flex-grow: 2;
-      height: 100%;
+      flex: 2;
+    }
+    .my-code {
+      background-color: hsl(210, 25%, 10%);
+      border-radius: 8px;
+      color: black;
+      flex: 1;
     }
     .language-svelte {
-      // height: 100%;
+      height: 100%;
     }
   }
 </style>

@@ -39,6 +39,8 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.1",
-    "eslint-plugin-svelte3": "^2.7.3"
+    "eslint-plugin-svelte3": "^2.7.3",
+    "prettier": "^2.1.2",
+    "prettier-plugin-svelte": "^1.2.1"
   }
 }

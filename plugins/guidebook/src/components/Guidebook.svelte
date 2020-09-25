@@ -14,7 +14,7 @@
   import { Ref, Doc } from '@anticrm/core'
   import guidebook from '..'
   import { find, getUIService } from '../utils'
-  import { getContext, SvelteComponent } from 'svelte'
+  import { getContext, onMount } from 'svelte'
 
   import LinkTo from '@anticrm/platform-ui/src/components/LinkTo.svelte'
 
@@ -79,13 +79,15 @@
     <div class="remainder"></div>
   </nav>
 
-  <main>
-    <div>Component {currentPage.label}</div>
+  <div class="main">
+    <h1>Component {currentPage.label}</h1>
 
-    {#if currentPage != undefined}
-      <svelte:component this="{currentPage.component}" on:change />
-    {/if}
-  </main>
+    <div class="content">
+      {#if currentPage != undefined}
+        <svelte:component this="{currentPage.component}" on:change />
+      {/if}
+    </div>
+  </div>
 
   <!-- <Spotlight /> -->
 </div>
@@ -133,8 +135,15 @@
     }
   }
 
-  main {
+  .main {
+    flex-grow: 1;
+    min-width: 300px;
     background-color: var(--theme-content-bg-color);
-    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    .content {
+      overflow: auto;
+    }
   }
 </style>
