@@ -3,7 +3,6 @@
 
   import Toolbar from '@anticrm/sparkling-controls/src/toolbar/Toolbar.svelte'
   import ToolbarButton from '@anticrm/sparkling-controls/src/toolbar/Button.svelte'
-  import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
 
   let clickCount = 0
   function handler() {
@@ -13,92 +12,112 @@
 
 <h1>Toolbar/Button</h1>
 
-<ScrollView stylez="height:100%;">
-  <h2>Toolbar</h2>
+<h2>Toolbar</h2>
 
-  <span>Control to show buttons with horizontal alignment. accept any item and
-    show inside
-  </span>
+<span>Control to show buttons with horizontal alignment. accept any item and
+  show inside
+</span>
 
-  <h2>Toolbar/Button</h2>
+<h2>Toolbar/Button</h2>
 
-  <p>Individual button inside toolbar</p>
+<p>Individual button inside toolbar</p>
 
-  <span>Properties:</span>
-  <ul>
-    <li>
-      disabled (default false) - mark button as disabled, no clicks are allowed
-    </li>
-    <li>
-      selected (default false) - mark button as selected, it will had
-      alternative visual style
-    </li>
-    <li>style (default '') - override individual button style values</li>
-  </ul>
+<span>Properties:</span>
+<ul>
+  <li>
+    disabled (default false) - mark button as disabled, no clicks are allowed
+  </li>
+  <li>
+    selected (default false) - mark button as selected, it will had alternative
+    visual style
+  </li>
+  <li>style (default '') - override individual button style values</li>
+</ul>
 
-  <h2>Examples</h2>
+<h2>Examples</h2>
 
-  <PageBlock
-    label="Simple toolbar"
-    text="Toolbar is control with small selectable buttons"
-    code="{`<Toolbar>
-  <ToolbarButton on:click={handler}>Button1</ToolbarButton>
-  <ToolbarButton on:click={handler}>Button2</ToolbarButton>
+<PageBlock
+  label="Simple toolbar"
+  text="Toolbar is control with small selectable buttons"
+  code="{`<Toolbar>
+  <ToolbarButton on:click={handler}>
+    Button1
+  </ToolbarButton>
+  <ToolbarButton on:click={handler}>
+    Button2
+  </ToolbarButton>
 </Toolbar>`}"
-  >
-    <div class="preview-pane">
-      <Toolbar>
-        <ToolbarButton on:click="{handler}">Button1</ToolbarButton>
-        <ToolbarButton on:click="{handler}">Button2</ToolbarButton>
-      </Toolbar>
-    </div>
-    Click count: {clickCount}
-  </PageBlock>
+>
+  <div class="preview-pane">
+    <Toolbar>
+      <ToolbarButton on:click="{handler}">Button1</ToolbarButton>
+      <ToolbarButton on:click="{handler}">Button2</ToolbarButton>
+    </Toolbar>
+  </div>
+  Click count: {clickCount}
+</PageBlock>
 
-  <PageBlock
-    label="Button styles"
-    text="Different button styles could be used"
-    code="{`<Toolbar>
-  <ToolbarButton selected on:click={handler}>Selected</ToolbarButton>
-  <ToolbarButton disabled on:click={handler}>Disabled</ToolbarButton>
-  <ToolbarButton on:click={handler}>Other button</ToolbarButton>
-  <ToolbarButton on:click={handler}>Other button2</ToolbarButton>
+<PageBlock
+  label="Button styles"
+  text="Different button styles could be used"
+  code="{`<Toolbar>
+  <ToolbarButton
+    selected on:click={handler}>
+      Selected
+  </ToolbarButton>
+  <ToolbarButton
+    disabled on:click={handler}>
+      Disabled
+  </ToolbarButton>
+  <ToolbarButton
+    on:click={handler}>
+      Other button
+  </ToolbarButton>
+  <ToolbarButton
+    on:click={handler}>
+      Other button2
+  </ToolbarButton>
 </Toolbar>`}"
-  >
-    <div class="preview-pane">
-      <Toolbar>
-        <ToolbarButton selected on:click="{handler}">Selected</ToolbarButton>
-        <ToolbarButton disabled on:click="{handler}">Disabled</ToolbarButton>
-        <ToolbarButton on:click="{handler}">Other button</ToolbarButton>
-        <ToolbarButton on:click="{handler}">Other button2</ToolbarButton>
-      </Toolbar>
-    </div>
-    <div>Click count: {clickCount}</div>
-  </PageBlock>
+>
+  <div class="preview-pane">
+    <Toolbar>
+      <ToolbarButton selected on:click="{handler}">Selected</ToolbarButton>
+      <ToolbarButton disabled on:click="{handler}">Disabled</ToolbarButton>
+      <ToolbarButton on:click="{handler}">Other button</ToolbarButton>
+      <ToolbarButton on:click="{handler}">Other button2</ToolbarButton>
+    </Toolbar>
+  </div>
+  <div>Click count: {clickCount}</div>
+</PageBlock>
 
-  <PageBlock
-    label="Toolbar with right bar"
-    text="Toolbar is control with small selectable buttons"
-    code="{`<Toolbar>
-  <ToolbarButton on:click={handler}>Left BTN</ToolbarButton>
+<PageBlock
+  label="Toolbar with right bar"
+  text="Toolbar is control with small selectable buttons"
+  code="{`<Toolbar>
+  <ToolbarButton on:click={handler}>
+    Left BTN
+  </ToolbarButton>
   <div slot="right">
-    <ToolbarButton on:click={handler}>Right button1</ToolbarButton>
-    <ToolbarButton on:click={handler}>Right button2</ToolbarButton>
+    <ToolbarButton on:click={handler}>
+      Right button1
+    </ToolbarButton>
+    <ToolbarButton on:click={handler}>
+      Right button2
+    </ToolbarButton>
   </div>
 </Toolbar>`}"
-  >
-    <div class="preview-pane">
-      <Toolbar>
-        <ToolbarButton on:click="{handler}">Left BTN</ToolbarButton>
-        <div slot="right">
-          <ToolbarButton on:click="{handler}">Right button1</ToolbarButton>
-          <ToolbarButton on:click="{handler}">Right button2</ToolbarButton>
-        </div>
-      </Toolbar>
-    </div>
-    Click count: {clickCount}
-  </PageBlock>
-</ScrollView>
+>
+  <div class="preview-pane">
+    <Toolbar>
+      <ToolbarButton on:click="{handler}">Left BTN</ToolbarButton>
+      <div slot="right">
+        <ToolbarButton on:click="{handler}">Right button1</ToolbarButton>
+        <ToolbarButton on:click="{handler}">Right button2</ToolbarButton>
+      </div>
+    </Toolbar>
+  </div>
+  Click count: {clickCount}
+</PageBlock>
 
 <style lang="scss">
   .toolbar_table {
