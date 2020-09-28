@@ -32,6 +32,7 @@ export const SPACE_DOMAIN = 'space'
 export interface Space extends VDoc {
   name: string
   lists: List[]
+  users: string[] // user accounts (emails) that have access to the space
 }
 
 export interface VDoc extends Doc {

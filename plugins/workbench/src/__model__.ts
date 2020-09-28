@@ -65,6 +65,7 @@ export function model (S: Builder) {
   S.createDocument(core.class.Space, {
     name: 'Общее',
     lists: [],
+    users: [],
     _createdOn: Date.now() as DateProperty,
     _createdBy: 'system' as StringProperty
   }, workbench.space.General)
@@ -72,6 +73,7 @@ export function model (S: Builder) {
   S.createDocument(core.class.Space, {
     name: 'Всякое',
     lists: [],
+    users: [],
     _createdOn: Date.now() as DateProperty,
     _createdBy: 'system' as StringProperty
   }, workbench.space.Random)

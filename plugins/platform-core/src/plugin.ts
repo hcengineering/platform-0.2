@@ -128,10 +128,14 @@ export default async (platform: Platform): Promise<CoreService> => {
   }
 
   function createSpace (name: string): Promise<void> {
+    const currentUserAccount = platform.getMetadata(login.metadata.WhoAmI)
+
     const space = {
       _class: core.class.Space,
-      name
+      name,
+      users: [currentUserAccount]
     }
+
     return createVDoc(space as unknown as VDoc)
   }
 

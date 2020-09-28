@@ -98,6 +98,7 @@ export class TVDoc extends TDoc implements VDoc {
 export class TSpace extends TVDoc implements Space {
   @Prop() name!: string
   @Prop() lists!: List[]
+  @Prop() users!: string[]
 }
 
 @ModelClass(core.class.Backlinks, core.class.Doc, BACKLINKS_DOMAIN)
