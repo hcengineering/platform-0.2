@@ -13,9 +13,10 @@
 // limitations under the License.
 //
 
-import { MongoClient, Db } from 'mongodb'
+import { MongoClient } from 'mongodb'
 
-import { Ref, Class, Doc, Model, AnyLayout, MODEL_DOMAIN, CoreProtocol, Tx, TxProcessor, Storage, ModelIndex, Space, CORE_CLASS_SPACE } from '@anticrm/core'
+import { Ref, Class, Doc, Model, AnyLayout, MODEL_DOMAIN, CoreProtocol, Tx, TxProcessor, Storage, ModelIndex,
+  Space, CORE_CLASS_SPACE, CORE_CLASS_UPDATETX, UpdateTx, CORE_CLASS_CREATETX, CreateTx } from '@anticrm/core'
 import { VDocIndex, TitleIndex, TextIndex, TxIndex } from '@anticrm/core'
 
 import WebSocket from 'ws'
@@ -152,6 +153,37 @@ export async function connect (uri: string, dbName: string, account: string, ws:
     },
 
     async tx (tx: Tx): Promise<void> {
+      if (tx._class === CORE_CLASS_CREATETX) {
+        const createTx = tx as CreateTx
+        const spaceKey = '_space'
+
+        if (spaceKey in createTx.object) {
+          const objectSpace = (createTx.object as any)[spaceKey]
+
+          if (createTx.object._class !== CORE_CLASS_SPACE && (await getUserSpaces()).indexOf(objectSpace) < 0) {
+            // TODO: reply with error response here
+            console.log(`!!! The account '${account}' does not have access to the space '${objectSpace}' where it wanted to create an object`)
+            return
+          }
+
+          // TODO: use object's space to broadcast
+        } else {
+          // no space provided, all accounts will have access to the created object
+        }
+      } else if (tx._class === CORE_CLASS_UPDATETX) {
+        const updateTx = tx as UpdateTx
+        const updatingObject = await clientControl.findOne(updateTx._objectClass, { _id: updateTx._objectId})
+
+        if (!updatingObject) {
+          // TODO: reply with error response here
+          console.log(`!!! The object '${updateTx._id}' is not found or is not accessible to the account '${account}'`)
+          return
+        }
+
+        // TODO: use object's space to broadcast
+        //const spaceOfObject = '_space' in obj ? (obj as any)._space : undefined
+      }
+
       return txProcessor.process(tx).then(() => {
         server.broadcast(clientControl, { result: tx })
       })
