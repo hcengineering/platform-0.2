@@ -151,6 +151,7 @@ export function model (S: Builder) {
   S.createClass(core.class.Tx, core.class.Doc, {
     _date: S.attr(core.class.Type, {}),
     _user: S.attr(core.class.Type, {}),
+    _space: S.attr(core.class.Type, {})
   }, TX_DOMAIN)
 
   S.createClass(core.class.CreateTx, core.class.Tx, {

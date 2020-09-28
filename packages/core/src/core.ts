@@ -13,6 +13,8 @@
 // limitations under the License.
 //
 
+import { Space } from '.'
+
 type MethodType = (...args: any[]) => any
 
 type PrimitiveType = number | string | undefined
@@ -121,6 +123,7 @@ export interface AnyLayout {
 export interface Tx extends Doc {
   _date: DateProperty
   _user: StringProperty
+  _space?: Ref<Space>
 }
 
 export interface Index {

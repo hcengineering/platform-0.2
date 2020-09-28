@@ -75,7 +75,10 @@ export default async (platform: Platform): Promise<CoreService> => {
   ])
 
   // add listener to process data updates from backend
-  rpc.addEventListener(response => txProcessor.process(response.result as Tx))
+  rpc.addEventListener(response => {
+    console.log('eventListener: process response', response)
+    txProcessor.process(response.result as Tx)
+  })
 
   function find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
     const domainName = model.getDomain(_class)
@@ -111,6 +114,7 @@ export default async (platform: Platform): Promise<CoreService> => {
       _id: generateId() as Ref<Doc>,
       _date: Date.now() as Property<number, Date>,
       _user: platform.getMetadata(login.metadata.WhoAmI) as Property<string, string>,
+      _space: '_space' in doc ? (doc as any)['_space'] : undefined,
       object: doc
     }
 
@@ -165,6 +169,7 @@ export default async (platform: Platform): Promise<CoreService> => {
 
         _date: Date.now() as DateProperty,
         _user: platform.getMetadata(login.metadata.WhoAmI) as StringProperty,
+        _space: spaceId,
 
         _class: core.class.UpdateTx,
         _id: generateId()
