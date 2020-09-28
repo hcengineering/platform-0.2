@@ -76,11 +76,7 @@ export async function connect (uri: string, dbName: string, account: string, ws:
       'space:workbench.Random' as Ref<Space>
     ]
 
-    if (spaces) {
-      spaces.map(space => userSpaceIds.push(space._id))
-    }
-
-    return userSpaceIds
+    return spaces ? userSpaceIds.concat(spaces.map(space => space._id)) : userSpaceIds
   }
 
   async function find (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc[]> {
