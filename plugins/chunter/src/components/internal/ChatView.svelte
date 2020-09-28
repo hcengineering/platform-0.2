@@ -19,33 +19,79 @@
   import ChatMessageItem from './ChatMessageItem.svelte'
   import { onDestroy } from 'svelte'
   import core, { QueryResult } from '@anticrm/platform-core';
-  import { Ref, Space, VDoc } from '@anticrm/core'
+  import { Ref, Space, StringProperty, VDoc } from '@anticrm/core'
   import { getChunterService, getCoreService } from '../../utils'
   import chunter, { Message } from '../..'
-
+  import contact from '@anticrm/contact'
 
   const coreService = getCoreService()
   const chunterService = getChunterService()
 
   export let space: Ref<Space>
 
-  let spaceName: string
+  let spaceName: string = ''
   let messages: Message[] = []
-  let unsubscribe: () => void
+  let chatUsers: Set<string> = new Set<string>()
+  let unsubscribeFromMessages: () => void
+  let unsubscribeFromSpace: () => void
 
-  function subscribe(queryResult: QueryResult<Message>) {
-    if (unsubscribe) unsubscribe()
-    unsubscribe = queryResult.subscribe(docs => messages = docs)
+  function subscribeForMessages(queryResult: QueryResult<Message>) {
+    if (unsubscribeFromMessages) {
+      unsubscribeFromMessages()
+    }
+    unsubscribeFromMessages = queryResult.subscribe(docs => messages = docs)
+  }
+
+  function subscribeForSpace(queryResult: QueryResult<Space>) {
+    if (unsubscribeFromSpace) {
+      unsubscribeFromSpace()
+    }
+    unsubscribeFromSpace = queryResult.subscribe(spaces => {
+      if (spaces && spaces.length > 0) {
+        onSpaceUpdated(spaces[0]) // only one space expected here
+      } else {
+        spaceName = ''
+        chatUsers.clear()
+        chatUsers = chatUsers  // to track change by Svelte component
+      }
+    })
+  }
+
+  function onSpaceUpdated(space: Space) {
+    spaceName = '#' + space.name
+
+    if (space.users && space.users.length > 0) {
+      const accounts = space.users
+      coreService.then(service => {
+        for (const account of accounts) {
+          // TODO: should make one request for all users
+          service.findOne(contact.mixin.User, { account: account as StringProperty }).then(user => {
+            if (user) {
+              chatUsers = chatUsers.add(user.name)
+              console.log(`added user '${user.name}'`)
+            }
+          })
+        }
+      })
+    } else {
+      chatUsers.clear()
+      chatUsers = chatUsers  // to track change by Svelte component
+    }
   }
 
   $: {
-    coreService.then(service => service.query(chunter.class.Message, { _space: space })).then(queryResult => subscribe(queryResult))
-
-    // TODO: use Titles index instead of getting the whole Space object
-    coreService.then(service => service.findOne(core.class.Space, { _id: space })).then(spaceObj => spaceName = spaceObj ? '#' + spaceObj.name : '')
+    coreService.then(service => service.query(chunter.class.Message, { _space: space })).then(queryResult => subscribeForMessages(queryResult))
+    coreService.then(service => service.query(core.class.Space, { _id: space })).then(queryResult => subscribeForSpace(queryResult))
   }
 
-  onDestroy(() => { if(unsubscribe) unsubscribe() })
+  onDestroy(() => {
+    if(unsubscribeFromMessages) {
+      unsubscribeFromMessages()
+    }
+    if (unsubscribeFromSpace) {
+      unsubscribeFromSpace()
+    }
+  })
 
   function createMessage(message: string) {
     if (message) {
@@ -65,7 +111,16 @@
   <div>
     <span class="caption-1">Чат {spaceName}</span>&nbsp;
   </div>
-  <ScrollView stylez="height:100%;" autoscroll=true>
+  <div>
+    <span class="caption-4">Пользователи в чате: </span>
+    { #each Array.from(chatUsers.values()) as username, i }
+      <span>{username}</span>
+      { #if i < chatUsers.size-1 }
+        <span>,&nbsp;</span>
+      { /if }
+    { /each }
+  </div>
+  <ScrollView stylez="height:100%;" autoscroll={true}>
     <div class="content">
       { #each messages as message (message._id) }
           <ChatMessageItem message={message} />
