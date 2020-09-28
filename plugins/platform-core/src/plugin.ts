@@ -128,10 +128,13 @@ export default async (platform: Platform): Promise<CoreService> => {
   }
 
   function createSpace (name: string): Promise<void> {
+    const spaceId = generateId() as Ref<Space>
     const currentUserAccount = platform.getMetadata(login.metadata.WhoAmI)
 
     const space = {
+      _id: spaceId,
       _class: core.class.Space,
+      _space: spaceId, // the space is available to itself
       name,
       users: [currentUserAccount]
     }
