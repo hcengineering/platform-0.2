@@ -15,7 +15,7 @@
 
 import { MongoClient, Db } from 'mongodb'
 
-import { Ref, Class, Doc, Model, AnyLayout, MODEL_DOMAIN, CoreProtocol, Tx, TxProcessor, Storage, ModelIndex } from '@anticrm/core'
+import { Ref, Class, Doc, Model, AnyLayout, MODEL_DOMAIN, CoreProtocol, Tx, TxProcessor, Storage, ModelIndex, Space, CORE_CLASS_SPACE } from '@anticrm/core'
 import { VDocIndex, TitleIndex, TextIndex, TxIndex } from '@anticrm/core'
 
 import WebSocket from 'ws'
@@ -33,9 +33,10 @@ export interface ClientControl {
   shutdown (): Promise<void>
 }
 
-export async function connect (uri: string, dbName: string, ws: WebSocket, server: PlatformServer): Promise<CoreProtocol & ClientControl> {
+export async function connect (uri: string, dbName: string, account: string, ws: WebSocket, server: PlatformServer): Promise<CoreProtocol & ClientControl> {
   console.log('connecting to ' + uri.substring(25))
-  console.log('use ' + dbName)
+  console.log('use dbName ' + dbName)
+  console.log('connected client account ' + account)
   const client = await MongoClient.connect(uri, { useUnifiedTopology: true })
   const db = client.db(dbName)
 
@@ -50,12 +51,60 @@ export async function connect (uri: string, dbName: string, ws: WebSocket, serve
   // db.collection(CoreDomain.Tx).find({}).forEach(tx => graph.updateGraph(tx), () => console.log(graph.dump()))
   // console.log('graph loaded.')
 
-  function find (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc[]> {
+  async function getUserSpaces (): Promise<Ref<Space>[]> {
+    // find spaces where [users] contain the current account
+
+    const spaceClassId = CORE_CLASS_SPACE
+    const domain = memdb.getDomain(spaceClassId)
+    const cls = memdb.getClass(spaceClassId)
+
+    const spaces = await db.collection(domain)
+      .find({ users: { $elemMatch: { $eq: account }}, _class: cls })
+      .project({ _id: true }) // need only space ids
+      .toArray()
+
+    // pass null and undefined here to obtain documents not assigned to any space
+    // TODO: remove 'General' and 'Random' when implement public spaces concept
+    let userSpaceIds: Ref<Space>[] = [
+      null as unknown as Ref<Space>,
+      undefined as unknown as Ref<Space>,
+      'space:workbench.General' as Ref<Space>,
+      'space:workbench.Random' as Ref<Space>
+    ]
+
+    if (spaces) {
+      spaces.map(space => userSpaceIds.push(space._id))
+    }
+
+    return userSpaceIds
+  }
+
+  async function find (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc[]> {
     const domain = memdb.getDomain(_class)
     const cls = memdb.getClass(_class)
     const q = {}
     memdb.assign(q, _class, query)
-    return db.collection(domain).find({ ...q, _class: cls }).toArray()
+
+    const mongoQuery = { ...q, _class: cls}
+    const userSpaces = await getUserSpaces()
+    const spaceKey = '_space'
+
+    if (spaceKey in mongoQuery) {
+      // check user-given '_space' filter
+      const spaceInQuery = (mongoQuery as any)[spaceKey]
+
+      if (userSpaces.indexOf(spaceInQuery) >= 0) {
+        // OK, use that filter to query
+      } else {
+        // the requested space is NOT in the list of available to the user!
+        return []
+      }
+    } else {
+      // no user-given '_space' filter, use all spaces available to the user
+      (mongoQuery as any)[spaceKey] = { $in: userSpaces }
+    }
+
+    return db.collection(domain).find(mongoQuery).toArray()
   }
 
   const mongoStorage: Storage = {
@@ -112,7 +161,7 @@ export async function connect (uri: string, dbName: string, ws: WebSocket, serve
       if (domain === MODEL_DOMAIN)
         return memdb.dump()
       console.log('domain:', domain)
-      return db.collection(domain).find({}).toArray()
+      return db.collection(domain).find({ _space: { $in: await getUserSpaces() }}).toArray()
     },
 
     // P R O T C O L  E X T E N S I O N S

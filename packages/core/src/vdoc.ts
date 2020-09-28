@@ -44,6 +44,7 @@ export interface VDoc extends Doc {
 }
 
 export const CORE_CLASS_VDOC = 'class:core.VDoc' as Ref<Class<VDoc>>
+export const CORE_CLASS_SPACE = 'class:core.Space' as Ref<Class<Space>>
 
 export class VDocIndex implements Index {
   private modelDb: Model

@@ -24,6 +24,7 @@ const ctlpassword = process.env.CTL_PASSWORD || '123pass'
 
 export interface Client {
   workspace: string
+  email: string
 }
 
 interface Service {
@@ -76,15 +77,17 @@ export function start (port: number, dbUri: string, host?: string) {
     }
   }
 
-  function createClient (uri: string, workspace: string, ws: WebSocket): Promise<ClientService> {
+  function createClient (uri: string, workspace: string, email: string, ws: WebSocket): Promise<ClientService> {
     const service = new Promise<ClientService>((resolve, reject) => {
-      connect(uri, workspace, ws, platformServer).then(service => { resolve(service as unknown as ClientService) }).catch(err => reject(err))
+      connect(uri, workspace, email, ws, platformServer)
+        .then(service => { resolve(service as unknown as ClientService) })
+        .catch(err => reject(err))
     })
     return service
   }
 
   wss.on('connection', function connection (ws: WebSocket, request: any, client: Client) {
-    const service = createClient(dbUri, client.workspace, ws)
+    const service = createClient(dbUri, client.workspace, client.email, ws)
     connections.push(service)
 
     ws.on('message', async (msg: string) => {

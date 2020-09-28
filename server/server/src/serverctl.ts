@@ -25,7 +25,8 @@ const token = ''
 
 function connect () {
   const client: Client = {
-    workspace: 'latest-model'
+    workspace: 'latest-model',
+    email: 'demo@user.com'
   }
   const token = encode(client, 'secret')
   console.log(token)
