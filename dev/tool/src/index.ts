@@ -19,7 +19,7 @@ import { createUser, removeUser } from './user'
 import { initDatabase } from './init'
 import { MongoClient } from 'mongodb'
 
-import { createWorkspace } from '@anticrm/accounts'
+import { createWorkspace, createNewAccount } from '@anticrm/accounts'
 
 const mongodbUri = process.env.MONGODB_URI || 'mongodb://localhost:27017'
 
@@ -38,8 +38,11 @@ program
   .description('create user and corresponding account in master database')
   .requiredOption('-p, --password <password>', 'user password')
   .requiredOption('-f, --fullname <fullname>', 'full user name')
+  .requiredOption('-w, --workspace <workspace>', 'workspace')
   .action((email, cmd) => {
-    withDatabase(mongodbUri, client => createUser(client.db(cmd.workspace), email, cmd.fullname))
+    withDatabase(mongodbUri, client =>
+      createNewAccount(client.db('accounts'), email, cmd.password, cmd.workspace)
+      .then(() => createUser(client.db(cmd.workspace), email, cmd.fullname)))
   })
 
 program

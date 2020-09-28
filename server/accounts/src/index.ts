@@ -30,7 +30,9 @@ const ACCOUNT_COLLECTION = 'account'
 enum Error {
   ACCOUNT_NOT_FOUND = 1,
   INCORRECT_PASSWORD = 2,
-  FORBIDDEN = 3
+  FORBIDDEN = 3,
+  ACCOUNT_ALREADY_EXISTS = 4,
+  WORKSPACE_NOT_FOUND = 5
 }
 
 interface Account {
@@ -73,20 +75,41 @@ function toAccountInfo (account: Account): AccountInfo {
   return result
 }
 
-async function createAccount (db: Db, email: string, password: string): Promise<AccountInfo> {
+export async function createNewAccount (db: Db, email: string, password: string, workspace: string): Promise<AccountInfo> {
+  const account = await db.collection(ACCOUNT_COLLECTION).findOne<Account>({ email })
+  if (account) {
+    throw new PlatformError(new Status(Severity.ERROR, Error.ACCOUNT_ALREADY_EXISTS, `Account '${email}' already exists.`))
+  }
+
+  const ws = await db.collection(WORKSPACE_COLLECTION).findOne<Workspace>({ workspace })
+  if (!ws) {
+    throw new PlatformError(new Status(Severity.ERROR, Error.WORKSPACE_NOT_FOUND, `Workspace '${workspace}' not found.`))
+  }
+
+  const newAccountInfo = createAccount(db, email, password, ws._id)
+
+  await db.collection(WORKSPACE_COLLECTION).updateOne({ _id: ws._id }, {
+    $push: { accounts: (await newAccountInfo)._id }
+  })
+
+  return newAccountInfo
+}
+
+async function createAccount (db: Db, email: string, password: string, workspaceId?: ObjectID): Promise<AccountInfo> {
   const salt = randomBytes(32)
   const hash = hashWithSalt(password, salt)
+  const workspaces = workspaceId ? [workspaceId] : []
 
   const insert = await db.collection(ACCOUNT_COLLECTION).insertOne({
     email,
     hash,
     salt,
-    workspaces: [],
+    workspaces,
   })
   return {
     _id: insert.insertedId,
     email,
-    workspaces: []
+    workspaces
   }
 }
 

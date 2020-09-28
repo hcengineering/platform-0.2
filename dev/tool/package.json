@@ -12,6 +12,7 @@
   "scripts": {
     "create-workspace": "ts-node -T src/index.ts create-workspace",
     "upgrade-workspace": "ts-node -T src/index.ts upgrade-workspace",
+    "create-user": "ts-node -T src/index.ts create-user",
     "lint": "echo 'No linting yet'"
   },
   "dependencies": {
