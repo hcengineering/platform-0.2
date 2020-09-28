@@ -14,7 +14,7 @@
 -->
 
 <script lang="ts">
-  import { Space, generateId } from '@anticrm/core'
+  import { VDoc } from '@anticrm/core'
   import core from '@anticrm/platform-core'
   import { getCoreService, getUIService } from '../../utils'
 
@@ -24,14 +24,16 @@
   const uiService = getUIService()
 
   function createSpace() {
-    console.log('create', name)
-    const space: Space = {
-      _id: generateId(),
-      _class: core.class.Space,
-      name,
-    }
+    console.log(`create space '${name}`)
     uiService.closeModal()
-    coreService.then(coreService => coreService.createDoc(space))
+
+    const space = {
+      _class: core.class.Space,
+      name
+    }
+
+    // absent VDoc fields will be autofilled
+    coreService.then(coreService => coreService.createVDoc(space as unknown as VDoc))
   }
 </script>
 

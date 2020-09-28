@@ -132,7 +132,6 @@ export default async (platform: Platform): Promise<CoreService> => {
     query,
     find,
     findOne,
-    createDoc,
     createVDoc,
     generateId
   }

@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Ref, MODEL_DOMAIN, StringProperty, Space, VDoc, Class } from '@anticrm/core'
+import { Ref, MODEL_DOMAIN, StringProperty, Space, VDoc, Class, DateProperty } from '@anticrm/core'
 import { Builder, extendIds, ModelClass, Prop } from '@anticrm/model'
 import { IntlString } from '@anticrm/platform-i18n'
 
@@ -64,12 +64,16 @@ export function model (S: Builder) {
 
   S.createDocument(core.class.Space, {
     name: 'Общее',
-    lists: []
+    lists: [],
+    _createdOn: Date.now() as DateProperty,
+    _createdBy: 'system' as StringProperty
   }, workbench.space.General)
 
   S.createDocument(core.class.Space, {
     name: 'Всякое',
-    lists: []
+    lists: [],
+    _createdOn: Date.now() as DateProperty,
+    _createdBy: 'system' as StringProperty
   }, workbench.space.Random)
 
   S.createDocument(workbench.class.WorkbenchApplication, {
