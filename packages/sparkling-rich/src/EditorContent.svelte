@@ -21,6 +21,9 @@
   const mac =
     typeof navigator != 'undefined' ? /Mac/.test(navigator.platform) : false
 
+  // ********************************
+  // Properties
+  // ********************************
   export let content: string = ''
   export let hoverMessage: string = 'Placeholder...'
   export let triggers: string[] = []
@@ -28,6 +31,9 @@
     state: EditorState
   ) => Promise<Transaction | null>
 
+  // ********************************
+  // Functionality
+  // ********************************
   // Perform update of values are changed
   $: updateValue(content)
 
@@ -51,6 +57,7 @@
   ): { completionWord: string; completionEnd: string } {
     var completionWord = ''
     var completionEnd = ''
+
     if (sel.$from.nodeBefore != null) {
       let val = sel.$from.nodeBefore.textContent
       let p = -1
@@ -61,15 +68,12 @@
         }
         for (let ti = 0; ti < triggers.length; ti++) {
           let t = triggers[ti]
-          if (val.substring(p, t.length) == t) {
-            // we found trigger, -1 to pos
-            p -= t.length
+          let ss = val.substring(p, p + t.length)
+          if (ss == t) {
+            val = val.substring(p)
             break
           }
         }
-      }
-      if (p != -1) {
-        val = val.substring(p + 1)
       }
       completionWord = val
     }
@@ -83,7 +87,7 @@
     let sel = view.state.selection
     var { completionWord, completionEnd } = findCompletion(sel)
 
-    let posAtWindow = view.coordsAtPos(sel.from - completionWord.length - 1)
+    let posAtWindow = view.coordsAtPos(sel.from - completionWord.length)
 
     var viewportOffset = rootElement.getBoundingClientRect()
 
@@ -93,7 +97,6 @@
       right: posAtWindow.right - viewportOffset.left,
       bottom: posAtWindow.bottom - viewportOffset.top
     }
-    console.log('Cursor:', cursor)
     // The box in which the tooltip is positioned, to use as base
 
     let innerDOMValue = view.dom.innerHTML
@@ -205,7 +208,6 @@
   ) {
     // Ignore white spaces on end of text
     let markLen = text.trim().length
-
     const t = view.state.tr
       .insertText(text, from, to)
       .addMark(from, from + markLen, mark.create(attrs))
@@ -314,6 +316,7 @@
   }
 
   .edit-box {
+    min-width: 100px;
     overflow: auto;
     height: 100%;
     width: 100%;
