@@ -19,6 +19,7 @@ import WebSocket, { Server } from 'ws'
 
 import { decode } from 'jwt-simple'
 import { connect, ClientControl } from './service'
+import { Ref, Space } from '@anticrm/core'
 
 const ctlpassword = process.env.CTL_PASSWORD || '123pass'
 
@@ -34,7 +35,7 @@ interface Service {
 type ClientService = Service & ClientControl
 
 export interface PlatformServer {
-  broadcast<R> (from: ClientControl, response: Response<R>): void
+  broadcast<R> (from: ClientControl, spaceTouched: Ref<Space>, response: Response<R>): void
   shutdown (password: string): Promise<void>
 }
 
@@ -49,15 +50,21 @@ export function start (port: number, dbUri: string, host?: string) {
   const connections = [] as Promise<ClientService>[]
 
   const platformServer: PlatformServer = {
-    broadcast<R> (from: ClientControl, response: Response<R>) {
+    broadcast<R> (from: ClientControl, spaceTouched: Ref<Space>, response: Response<R>) {
       for (const client of connections) {
         console.log('broadcasting to ' + connections.length + ' connections')
         client.then(client => {
           if (client !== from) {
-            console.log('broadcasting to')
-            console.log(client)
-            console.log(response)
-            client.send(response)
+            client.getUserSpaces().then(spaces => {
+              if (spaces.indexOf(spaceTouched) >= 0) {
+                console.log('broadcasting to')
+                console.log(client)
+                console.log(response)
+                client.send(response)
+              } else {
+                console.log('do not broadcast to client without access to the changed space')
+              }
+            })
           } else {
             console.log('do not broadcast to self')
           }

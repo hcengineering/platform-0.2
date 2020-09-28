@@ -32,6 +32,7 @@ export interface ClientControl {
   ping (): Promise<void>
   send (response: Response<unknown>): void
   shutdown (): Promise<void>
+  getUserSpaces () : Promise<Ref<Space>[]>
 }
 
 export async function connect (uri: string, dbName: string, account: string, ws: WebSocket, server: PlatformServer): Promise<CoreProtocol & ClientControl> {
@@ -46,6 +47,8 @@ export async function connect (uri: string, dbName: string, account: string, ws:
   const model = await db.collection('model').find({}).toArray()
   console.log('model loaded.')
   memdb.loadModel(model)
+
+  const spaceKey = '_space'
 
   // const graph = new Graph(memdb)
   // console.log('loading graph...')
@@ -88,7 +91,6 @@ export async function connect (uri: string, dbName: string, account: string, ws:
 
     const mongoQuery = { ...q, _class: cls}
     const userSpaces = await getUserSpaces()
-    const spaceKey = '_space'
 
     if (spaceKey in mongoQuery) {
       // check user-given '_space' filter
@@ -153,9 +155,10 @@ export async function connect (uri: string, dbName: string, account: string, ws:
     },
 
     async tx (tx: Tx): Promise<void> {
+      let spaceTouched: Ref<Space>
+
       if (tx._class === CORE_CLASS_CREATETX) {
         const createTx = tx as CreateTx
-        const spaceKey = '_space'
 
         if (spaceKey in createTx.object) {
           const objectSpace = (createTx.object as any)[spaceKey]
@@ -166,9 +169,9 @@ export async function connect (uri: string, dbName: string, account: string, ws:
             return
           }
 
-          // TODO: use object's space to broadcast
+          spaceTouched = objectSpace
         } else {
-          // no space provided, all accounts will have access to the created object
+          // no space provided, all accounts will have access to the created object (leave spaceTouched undefined)
         }
       } else if (tx._class === CORE_CLASS_UPDATETX) {
         const updateTx = tx as UpdateTx
@@ -180,12 +183,13 @@ export async function connect (uri: string, dbName: string, account: string, ws:
           return
         }
 
-        // TODO: use object's space to broadcast
-        //const spaceOfObject = '_space' in obj ? (obj as any)._space : undefined
+        if (spaceKey in updatingObject) {
+          spaceTouched = (updatingObject as any)[spaceKey]
+        }
       }
 
       return txProcessor.process(tx).then(() => {
-        server.broadcast(clientControl, { result: tx })
+        server.broadcast(clientControl, spaceTouched, { result: tx })
       })
     },
 
@@ -216,7 +220,8 @@ export async function connect (uri: string, dbName: string, account: string, ws:
 
       await Promise.all(Array.from(byDomain.entries()).map(domain => db.collection(domain[0]).insertMany(domain[1])))
 
-      server.broadcast(clientControl, { result: commitInfo })
+      // TODO: get changed space(s) (from docs in commitInfo?)
+      server.broadcast(clientControl, undefined as unknown as Ref<Space>, { result: commitInfo })
     },
 
     // C O N T R O L
@@ -234,8 +239,9 @@ export async function connect (uri: string, dbName: string, account: string, ws:
 
     serverShutdown (password: string): Promise<void> {
       return server.shutdown(password)
-    }
+    },
 
+    getUserSpaces
   }
 
   return clientControl
