@@ -200,30 +200,6 @@ export async function connect (uri: string, dbName: string, account: string, ws:
       return db.collection(domain).find({ _space: { $in: await getUserSpaces() }}).toArray()
     },
 
-    // P R O T C O L  E X T E N S I O N S
-
-    delete (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<void> {
-      console.log('DELETE', _class, query)
-      const domain = memdb.getDomain(_class)
-      return db.collection(domain).deleteMany({ ...query }).then(result => { })
-    },
-
-    async commit (commitInfo: CommitInfo): Promise<void> {
-      // group by domain
-      const byDomain = commitInfo.created.reduce((group: Map<string, Doc[]>, doc) => {
-        const domain = memdb.getDomain(doc._class)
-        let g = group.get(domain)
-        if (!g) { group.set(domain, g = []) }
-        g.push(doc)
-        return group
-      }, new Map())
-
-      await Promise.all(Array.from(byDomain.entries()).map(domain => db.collection(domain[0]).insertMany(domain[1])))
-
-      // TODO: get changed space(s) (from docs in commitInfo?)
-      server.broadcast(clientControl, undefined as unknown as Ref<Space>, { result: commitInfo })
-    },
-
     // C O N T R O L
 
     async ping (): Promise<any> { return null },
