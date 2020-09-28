@@ -127,13 +127,21 @@ export default async (platform: Platform): Promise<CoreService> => {
     return createDoc(vdoc)
   }
 
+  function createSpace (name: string): Promise<void> {
+    const space = {
+      _class: core.class.Space,
+      name
+    }
+    return createVDoc(space as unknown as VDoc)
+  }
+
   return {
     getModel () { return model },
     query,
     find,
     findOne,
     createVDoc,
+    createSpace,
     generateId
   }
-
 }

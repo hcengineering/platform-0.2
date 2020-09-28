@@ -14,8 +14,6 @@
 -->
 
 <script lang="ts">
-  import { VDoc } from '@anticrm/core'
-  import core from '@anticrm/platform-core'
   import { getCoreService, getUIService } from '../../utils'
 
   let name: string
@@ -26,14 +24,7 @@
   function createSpace() {
     console.log(`create space '${name}`)
     uiService.closeModal()
-
-    const space = {
-      _class: core.class.Space,
-      name
-    }
-
-    // absent VDoc fields will be autofilled
-    coreService.then(coreService => coreService.createVDoc(space as unknown as VDoc))
+    coreService.then(coreService => coreService.createSpace(name))
   }
 </script>
 

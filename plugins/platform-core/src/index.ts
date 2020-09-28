@@ -34,6 +34,7 @@ export interface CoreService extends Service {
   findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined>
   query<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): QueryResult<T>
   createVDoc<T extends VDoc> (vdoc: T): Promise<void>
+  createSpace (name: string): Promise<void>
   generateId (): Ref<Doc>
 }
 
