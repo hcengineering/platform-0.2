@@ -16,7 +16,8 @@
 import {
   Attribute, Class, Classifier, Doc, Emb, Mixin, Obj, Ref, Tx, Type, VDoc,
   ArrayOf, BagOf, InstanceOf, RefTo, Indices, CORE_CLASS_TEXT, Space, Application, List, CreateTx,
-  DateProperty, StringProperty, Backlinks, Backlink, BACKLINKS_DOMAIN, MODEL_DOMAIN, TX_DOMAIN, TITLE_DOMAIN
+  DateProperty, StringProperty, Backlinks, Backlink, BACKLINKS_DOMAIN, MODEL_DOMAIN, TX_DOMAIN, TITLE_DOMAIN,
+  SPACE_DOMAIN
 } from '@anticrm/core'
 
 import { extendIds, ModelClass, Prop, Builder } from '@anticrm/model'
@@ -73,7 +74,7 @@ class TDoc extends TObj implements Doc {
 export class TApplication extends TDoc implements Application {
 }
 
-@ModelClass(core.class.Space, core.class.Doc, MODEL_DOMAIN)
+@ModelClass(core.class.Space, core.class.Doc, SPACE_DOMAIN)
 export class TSpace extends TDoc implements Space {
   @Prop() name!: string
   @Prop() lists!: List[]

@@ -27,6 +27,8 @@ export interface List extends Emb {
   application: Ref<Application>
 }
 
+export const SPACE_DOMAIN = 'space'
+
 export interface Space extends Doc {
   name: string
   lists: List[]
