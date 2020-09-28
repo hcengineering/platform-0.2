@@ -27,8 +27,9 @@
   let popupStyle = ''
 
   let clientHeight: number
+  let clientWidth: number
 
-  function selectItem(item: string) {
+  function selectItem(item: CompletionItem) {
     dispatch('select', item)
   }
 
@@ -36,7 +37,9 @@
 		popupStyle = `
 			left: ${pos.left}px;
 			top: ${pos.top - (ontop ? clientHeight : 0)}px;
-			margin-bottom:-${clientHeight + 2}px;
+      margin-bottom:-${clientHeight + 2}px;
+      margin-right:-${clientWidth}px;
+      z-index: 100000;
 		`
 
     let cs = items.find((e) => e.key == selection.key)
@@ -70,6 +73,7 @@
   class="presentation-completion-popup"
   style="{popupStyle}"
   bind:clientHeight
+  bind:clientWidth
 	on:blur
 >
   <ScrollView stylez="height:100%;width: 100%;" scrollPosition="{selOffset}">
@@ -78,7 +82,8 @@
         <div
           class="item"
           class:selected="{item.key == selection.key}"
-          on:click|preventDefault="{() => selectItem(item.key)}"
+          on:click|preventDefault="{() => selectItem(item)}"
+          on:mouseover={() => selection = item}
         >
           {#if item.key == selection.key}
             <div
@@ -122,11 +127,6 @@
         outline: none;
         border-color: var(--theme-highlight-color);
         box-shadow: inset 0px 0px 2px 0px var(--theme-highlight-color);
-      }
-
-      &:hover {
-        border-color: var(--theme-highlight-color);
-        background-color: gsl(var(--theme-highlight-color), 80%);
       }
     }
   }

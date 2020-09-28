@@ -1,8 +1,11 @@
 import { MarkSpec, NodeSpec, Schema } from 'prosemirror-model'
 import { bulletList, listItem, orderedList } from 'prosemirror-schema-list'
 
-const pDOM = ['p', 0]; const blockquoteDOM = ['blockquote', 0]; const hrDOM = ['hr']
-const preDOM = ['pre', ['code', 0]]; const brDOM = ['br']
+const pDOM = ['p', 0]
+const blockquoteDOM = ['blockquote', 0]
+const hrDOM = ['hr']
+const preDOM = ['pre', ['code', 0]]
+const brDOM = ['br']
 
 // :: Object
 // [Specs](#model.NodeSpec) for the nodes defined in this schema.
@@ -18,7 +21,9 @@ export const nodes: NodeSpec = {
     content: 'inline*',
     group: 'block',
     parseDOM: [{ tag: 'p' }],
-    toDOM () { return pDOM }
+    toDOM() {
+      return pDOM
+    }
   },
 
   // :: NodeSpec A blockquote (`<blockquote>`) wrapping one or more blocks.
@@ -27,14 +32,18 @@ export const nodes: NodeSpec = {
     group: 'block',
     defining: true,
     parseDOM: [{ tag: 'blockquote' }],
-    toDOM () { return blockquoteDOM }
+    toDOM() {
+      return blockquoteDOM
+    }
   },
 
   // :: NodeSpec A horizontal rule (`<hr>`).
   horizontal_rule: {
     group: 'block',
     parseDOM: [{ tag: 'hr' }],
-    toDOM () { return hrDOM }
+    toDOM() {
+      return hrDOM
+    }
   },
 
   // :: NodeSpec A heading textblock, with a `level` attribute that
@@ -51,8 +60,11 @@ export const nodes: NodeSpec = {
       { tag: 'h3', attrs: { level: 3 } },
       { tag: 'h4', attrs: { level: 4 } },
       { tag: 'h5', attrs: { level: 5 } },
-      { tag: 'h6', attrs: { level: 6 } }],
-    toDOM (node: any): any { return ['h' + String(node.attrs.level), 0] }
+      { tag: 'h6', attrs: { level: 6 } }
+    ],
+    toDOM(node: any): any {
+      return ['h' + String(node.attrs.level), 0]
+    }
   },
 
   // :: NodeSpec A code listing. Disallows marks or non-text inline
@@ -65,7 +77,9 @@ export const nodes: NodeSpec = {
     code: true,
     defining: true,
     parseDOM: [{ tag: 'pre', preserveWhitespace: 'full' }],
-    toDOM () { return preDOM }
+    toDOM() {
+      return preDOM
+    }
   },
 
   // :: NodeSpec The text node.
@@ -85,17 +99,22 @@ export const nodes: NodeSpec = {
     },
     group: 'inline',
     draggable: true,
-    parseDOM: [{
-      tag: 'img[src]',
-      getAttrs (dom: any) {
-        return {
-          src: dom.getAttribute('src'),
-          title: dom.getAttribute('title'),
-          alt: dom.getAttribute('alt')
+    parseDOM: [
+      {
+        tag: 'img[src]',
+        getAttrs(dom: any) {
+          return {
+            src: dom.getAttribute('src'),
+            title: dom.getAttribute('title'),
+            alt: dom.getAttribute('alt')
+          }
         }
       }
-    }],
-    toDOM (node: any) { const { src, alt, title } = node.attrs; return ['img', { src, alt, title }] }
+    ],
+    toDOM(node: any) {
+      const { src, alt, title } = node.attrs
+      return ['img', { src, alt, title }]
+    }
   },
 
   // :: NodeSpec A hard line break, represented in the DOM as `<br>`.
@@ -104,21 +123,27 @@ export const nodes: NodeSpec = {
     group: 'inline',
     selectable: false,
     parseDOM: [{ tag: 'br' }],
-    toDOM () { return brDOM }
+    toDOM() {
+      return brDOM
+    }
   },
   ordered_list: add(orderedList, { content: 'list_item+', group: 'block' }),
   bullet_list: add(bulletList, { content: 'list_item+', group: 'block' }),
   list_item: add(listItem, { content: 'paragraph block*' })
 }
 
-function add (obj: any, props: any): any {
+function add(obj: any, props: any): any {
   const copy: any = {}
   for (const prop in obj) copy[prop] = obj[prop]
   for (const prop in props) copy[prop] = props[prop]
   return copy
 }
 
-const emDOM = ['em', 0]; const strongDOM = ['strong', 0]; const codeDOM = ['code', 0]; const strikeDOM = ['s', 0]; const underlineDOM = ['u', 0]
+const emDOM = ['em', 0]
+const strongDOM = ['strong', 0]
+const codeDOM = ['code', 0]
+const strikeDOM = ['s', 0]
+const underlineDOM = ['u', 0]
 
 // :: Object [Specs](#model.MarkSpec) for the marks in the schema.
 export const marks: MarkSpec = {
@@ -131,32 +156,46 @@ export const marks: MarkSpec = {
       title: { default: null }
     },
     inclusive: false,
-    parseDOM: [{
-      tag: 'a[href]',
-      getAttrs (dom: any): any {
-        return { href: dom.getAttribute('href'), title: dom.getAttribute('title') }
+    parseDOM: [
+      {
+        tag: 'a[href]',
+        getAttrs(dom: any): any {
+          return {
+            href: dom.getAttribute('href'),
+            title: dom.getAttribute('title')
+          }
+        }
       }
-    }],
-    toDOM (node: any): any { const { href, title } = node.attrs; return ['a', { href, title }, 0] }
+    ],
+    toDOM(node: any): any {
+      const { href, title } = node.attrs
+      return ['a', { href, title }, 0]
+    }
   },
 
   // :: MarkSpec An emphasis mark. Rendered as an `<em>` element.
   // Has parse rules that also match `<i>` and `font-style: italic`.
   em: {
     parseDOM: [{ tag: 'i' }, { tag: 'em' }, { style: 'font-style=italic' }],
-    toDOM () { return emDOM }
+    toDOM() {
+      return emDOM
+    }
   },
   // :: MarkSpec An emphasis mark. Rendered as an `<em>` element.
   // Has parse rules that also match `<i>` and `font-style: italic`.
   strike: {
     parseDOM: [{ tag: 's' }],
-    toDOM () { return strikeDOM }
+    toDOM() {
+      return strikeDOM
+    }
   },
   // :: MarkSpec An emphasis mark. Rendered as an `<em>` element.
   // Has parse rules that also match `<i>` and `font-style: italic`.
   underline: {
     parseDOM: [{ tag: 'u' }],
-    toDOM () { return underlineDOM }
+    toDOM() {
+      return underlineDOM
+    }
   },
 
   // :: MarkSpec A strong mark. Rendered as `<strong>`, parse rules
@@ -167,22 +206,44 @@ export const marks: MarkSpec = {
       // This works around a Google Docs misbehavior where
       // pasted content will be inexplicably wrapped in `<b>`
       // tags with a font-weight normal.
-      { tag: 'b', getAttrs: (node: any): any => node.style.fontWeight !== 'normal' && null },
-      { style: 'font-weight', getAttrs: (value: any): any => /^(bold(er)?|[5-9]\d{2,})$/.test(value) && null }],
-    toDOM () { return strongDOM }
+      {
+        tag: 'b',
+        getAttrs: (node: any): any => node.style.fontWeight !== 'normal' && null
+      },
+      {
+        style: 'font-weight',
+        getAttrs: (value: any): any =>
+          /^(bold(er)?|[5-9]\d{2,})$/.test(value) && null
+      }
+    ],
+    toDOM() {
+      return strongDOM
+    }
   },
 
   // :: MarkSpec Code font mark. Represented as a `<code>` element.
   code: {
     parseDOM: [{ tag: 'code' }],
-    toDOM () { return codeDOM }
+    toDOM() {
+      return codeDOM
+    }
   },
   // :: MarkSpec Code font mark. Represented as a `<code>` element.
   reference: {
     inclusive: false,
     attrs: { id: {}, class: {} },
-    parseDOM: [{ tag: 'reference' }],
-    toDOM (node: any) { return ['reference', { id: node.attrs.id, class: node.attrs.class }, 0] }
+    parseDOM: [
+      {
+        tag: 'reference',
+        getAttrs: (node: any): any => {
+          console.log('parse DOM:', node)
+          return { id: node.id, class: node.class }
+        }
+      }
+    ],
+    toDOM (node: any) {
+      return ['reference', { id: node.attrs.id, class: node.attrs.class }, 0]
+    }
   }
 }
 
