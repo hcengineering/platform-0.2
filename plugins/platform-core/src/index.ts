@@ -35,6 +35,7 @@ export interface CoreService extends Service {
   query<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): QueryResult<T>
   createVDoc<T extends VDoc> (vdoc: T): Promise<void>
   createSpace (name: string): Promise<void>
+  addUserToSpace(account: string, space: Ref<Space>): Promise<void>
   generateId (): Ref<Doc>
 }
 

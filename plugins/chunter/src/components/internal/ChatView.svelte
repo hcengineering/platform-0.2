@@ -16,16 +16,20 @@
 <script type="ts">
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
+  import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import ChatMessageItem from './ChatMessageItem.svelte'
+  import AddUserToSpace from './AddUserToSpace.svelte'
   import { onDestroy } from 'svelte'
   import core, { QueryResult } from '@anticrm/platform-core';
   import { Ref, Space, StringProperty, VDoc } from '@anticrm/core'
-  import { getChunterService, getCoreService } from '../../utils'
+  import { getChunterService, getCoreService, getUIService } from '../../utils'
   import chunter, { Message } from '../..'
   import contact from '@anticrm/contact'
+  import ui from '@anticrm/platform-ui'
 
   const coreService = getCoreService()
   const chunterService = getChunterService()
+  const uiService = getUIService()
 
   export let space: Ref<Space>
 
@@ -105,6 +109,10 @@
       })
     }
   }
+
+  function addUserToSpace() {
+    uiService.showModal(AddUserToSpace, {space})
+  }
 </script>
 
 <div class="chat">
@@ -119,6 +127,9 @@
         <span>,&nbsp;</span>
       { /if }
     { /each }
+    <a href="/" on:click|preventDefault = {addUserToSpace}>
+      <Icon icon={ui.icon.Add} clazz="icon-embed"/>
+    </a>
   </div>
   <ScrollView stylez="height:100%;" autoscroll={true}>
     <div class="content">
