@@ -21,7 +21,7 @@
   import AddUserToSpace from './AddUserToSpace.svelte'
   import { onDestroy } from 'svelte'
   import core, { QueryResult } from '@anticrm/platform-core';
-  import { Ref, Space, StringProperty, VDoc } from '@anticrm/core'
+  import { AnyLayout, Ref, Space, VDoc } from '@anticrm/core'
   import { getChunterService, getCoreService, getUIService } from '../../utils'
   import chunter, { Message } from '../..'
   import contact from '@anticrm/contact'
@@ -35,7 +35,7 @@
 
   let spaceName: string = ''
   let messages: Message[] = []
-  let chatUsers: Set<string> = new Set<string>()
+  let chatUsers: string[] = []
   let unsubscribeFromMessages: () => void
   let unsubscribeFromSpace: () => void
 
@@ -51,12 +51,13 @@
       unsubscribeFromSpace()
     }
     unsubscribeFromSpace = queryResult.subscribe(spaces => {
+      console.log('spacesUpdated:', spaces)
+
       if (spaces && spaces.length > 0) {
         onSpaceUpdated(spaces[0]) // only one space expected here
       } else {
         spaceName = ''
-        chatUsers.clear()
-        chatUsers = chatUsers  // to track change by Svelte component
+        chatUsers = []
       }
     })
   }
@@ -65,21 +66,15 @@
     spaceName = '#' + space.name
 
     if (space.users && space.users.length > 0) {
-      const accounts = space.users
-      coreService.then(service => {
-        for (const account of accounts) {
-          // TODO: should make one request for all users
-          service.findOne(contact.mixin.User, { account: account as StringProperty }).then(user => {
-            if (user) {
-              chatUsers = chatUsers.add(user.name)
-              console.log(`added user '${user.name}'`)
-            }
+      coreService.then(service => service.find(contact.mixin.User, { account: { $in: space.users } } as unknown as AnyLayout))
+          .then(users => {
+            chatUsers = users ? users.map(u => u.name) : []
+          }).catch(err => {
+            console.log('error while getting list of space users', err)
+            chatUsers = []
           })
-        }
-      })
     } else {
-      chatUsers.clear()
-      chatUsers = chatUsers  // to track change by Svelte component
+      chatUsers = []
     }
   }
 
@@ -121,9 +116,9 @@
   </div>
   <div>
     <span class="caption-4">Пользователи в чате: </span>
-    { #each Array.from(chatUsers.values()) as username, i }
+    { #each chatUsers as username, i }
       <span>{username}</span>
-      { #if i < chatUsers.size-1 }
+      { #if i < chatUsers.length-1 }
         <span>,&nbsp;</span>
       { /if }
     { /each }
