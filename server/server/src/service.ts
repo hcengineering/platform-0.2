@@ -77,6 +77,11 @@ export async function connect (uri: string, dbName: string, account: string, ws:
     return spaces ? userSpaceIds.concat(spaces.map(space => space._id)) : userSpaceIds
   }
 
+  function getSpaceKey(_class: Ref<Class<Doc>>): string {
+    // for Space objects use their Id to filter available ones
+    return _class === CORE_CLASS_SPACE ? '_id' : '_space'
+  }
+
   async function getObjectSpace (_class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<Ref<Space>> {
     if (_class === CORE_CLASS_SPACE) {
       return _id as Ref<Space>
@@ -94,11 +99,11 @@ export async function connect (uri: string, dbName: string, account: string, ws:
 
     const mongoQuery = { ...q, _class: cls}
     const userSpaces = await getUserSpaces()
-    const spaceFilterKey = _class === CORE_CLASS_SPACE ? '_id' : '_space'  // for Space objects use their Id to filter available ones
+    const spaceKey = getSpaceKey(_class)
 
-    if (spaceFilterKey in mongoQuery) {
+    if (spaceKey in mongoQuery) {
       // check user-given '_space' filter
-      const spaceInQuery = (mongoQuery as any)[spaceFilterKey]
+      const spaceInQuery = (mongoQuery as any)[spaceKey]
 
       if (userSpaces.indexOf(spaceInQuery) < 0) {
         // the requested space is NOT in the list of available to the user!
@@ -107,7 +112,7 @@ export async function connect (uri: string, dbName: string, account: string, ws:
       // else OK, use that filter to query
     } else {
       // no user-given '_space' filter, use all spaces available to the user
-      (mongoQuery as any)[spaceFilterKey] = { $in: userSpaces }
+      (mongoQuery as any)[spaceKey] = { $in: userSpaces }
     }
 
     return db.collection(domain).find(mongoQuery).toArray()
@@ -173,10 +178,10 @@ export async function connect (uri: string, dbName: string, account: string, ws:
 
   async function checkRightsToCreate(object: Doc): Promise<CheckRightsResult> {
     let objectSpace: Ref<Space> = undefined as unknown as Ref<Space>
-    const spaceFilterKey = object._class === CORE_CLASS_SPACE ? '_id' : '_space'  // for Space objects use their Id to filter available ones
+    const spaceKey = getSpaceKey(object._class)
 
-    if (spaceFilterKey in object) {
-      objectSpace = (object as any)[spaceFilterKey]
+    if (spaceKey in object) {
+      objectSpace = (object as any)[spaceKey]
 
       if (object._class !== CORE_CLASS_SPACE && objectSpace && (await getUserSpaces()).indexOf(objectSpace) < 0) {
         return {
@@ -237,8 +242,13 @@ export async function connect (uri: string, dbName: string, account: string, ws:
     async loadDomain (domain: string): Promise<Doc[]> {
       if (domain === MODEL_DOMAIN)
         return memdb.dump()
-      console.log('domain:', domain)
-      return db.collection(domain).find({ _space: { $in: await getUserSpaces() }}).toArray()
+
+      console.log('loadDomain:', domain)
+      const spaceKey = getSpaceKey(domain === 'space' ? CORE_CLASS_SPACE : '' as Ref<Class<Doc>>)
+      const mongoQuery = {} as any
+      (mongoQuery as any)[spaceKey] = { $in: await getUserSpaces() }
+
+      return db.collection(domain).find(mongoQuery).toArray()
     },
 
     // C O N T R O L
