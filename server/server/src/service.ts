@@ -16,7 +16,8 @@
 import { MongoClient } from 'mongodb'
 
 import { Ref, Class, Doc, Model, AnyLayout, MODEL_DOMAIN, CoreProtocol, Tx, TxProcessor, Storage, ModelIndex,
-  Space, CORE_CLASS_SPACE, CORE_CLASS_UPDATETX, UpdateTx, CORE_CLASS_CREATETX, CreateTx, Attribute, CORE_CLASS_ARRAYOF, ArrayOf } from '@anticrm/core'
+  Space, CORE_CLASS_SPACE, CORE_CLASS_UPDATETX, UpdateTx, CORE_CLASS_CREATETX, CreateTx, Attribute,
+  CORE_CLASS_ARRAYOF, ArrayOf, CORE_CLASS_PUSHTX, CORE_CLASS_DELETETX, PushTx } from '@anticrm/core'
 import { VDocIndex, TitleIndex, TextIndex, TxIndex } from '@anticrm/core'
 
 import WebSocket from 'ws'
@@ -77,6 +78,12 @@ export async function connect (uri: string, dbName: string, account: string, ws:
     ]
 
     return spaces ? userSpaceIds.concat(spaces.map(space => space._id)) : userSpaceIds
+  }
+
+  async function getObjectSpace (_class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<Ref<Space>> {
+    const domain = memdb.getDomain(_class)
+    const doc = await db.collection(domain).findOne({ _id }, { projection: { _space: true }})
+    return doc ? doc._space : null
   }
 
   async function find (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc[]> {
@@ -163,21 +170,20 @@ export async function connect (uri: string, dbName: string, account: string, ws:
         const createTx = tx as CreateTx
 
         if (spaceKey in createTx.object) {
-          const objectSpace = (createTx.object as any)[spaceKey]
+          spaceTouched = (createTx.object as any)[spaceKey]
 
-          if (createTx.object._class !== CORE_CLASS_SPACE && (await getUserSpaces()).indexOf(objectSpace) < 0) {
+          if (createTx.object._class !== CORE_CLASS_SPACE && spaceTouched && (await getUserSpaces()).indexOf(spaceTouched) < 0) {
             // TODO: reply with error response here
-            console.log(`!!! The account '${account}' does not have access to the space '${objectSpace}' where it wanted to create an object`)
+            console.log(`!!! The account '${account}' does not have access to the space '${spaceTouched}' where it wanted to create an object`)
             return
           }
-
-          spaceTouched = objectSpace
         } else {
           // no space provided, all accounts will have access to the created object (leave spaceTouched undefined)
         }
       } else if (tx._class === CORE_CLASS_UPDATETX) {
+        // TODO: unify with PUSHTX case
         const updateTx = tx as UpdateTx
-        const updatingObject = await clientControl.findOne(updateTx._objectClass, { _id: updateTx._objectId})
+        const updatingObject = await clientControl.findOne(updateTx._objectClass, { _id: updateTx._objectId })
 
         if (!updatingObject) {
           // TODO: reply with error response here
@@ -188,6 +194,17 @@ export async function connect (uri: string, dbName: string, account: string, ws:
         if (spaceKey in updatingObject) {
           spaceTouched = (updatingObject as any)[spaceKey]
         }
+      } else if (tx._class === CORE_CLASS_PUSHTX) {
+        const pushTx = tx as PushTx
+        spaceTouched = await getObjectSpace(pushTx._objectClass, pushTx._objectId)
+
+        if (spaceTouched && (await getUserSpaces()).indexOf(spaceTouched) < 0) {
+          // TODO: reply with error response here
+          console.log(`!!! The account '${account}' does not have access to the space '${spaceTouched}' where it wanted to modify an object`)
+          return
+        }
+      } else if (tx._class === CORE_CLASS_DELETETX) {
+        // TODO: check client has rights to execute the transaction
       }
 
       return txProcessor.process(tx).then(() => {
