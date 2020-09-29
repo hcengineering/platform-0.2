@@ -35,7 +35,7 @@ interface Service {
 type ClientService = Service & ClientControl
 
 export interface PlatformServer {
-  broadcast<R> (from: ClientControl, spaceTouched: Ref<Space>, response: Response<R>): void
+  broadcast<R> (from: ClientControl, spaceTouched: Ref<Space>|undefined, response: Response<R>): void
   shutdown (password: string): Promise<void>
 }
 
@@ -50,12 +50,12 @@ export function start (port: number, dbUri: string, host?: string) {
   const connections = [] as Promise<ClientService>[]
 
   const platformServer: PlatformServer = {
-    broadcast<R> (from: ClientControl, spaceTouched: Ref<Space>, response: Response<R>) {
+    broadcast<R> (from: ClientControl, spaceTouched: Ref<Space>|undefined, response: Response<R>) {
+      console.log('broadcasting to ' + connections.length + ' connections')
       for (const client of connections) {
-        console.log('broadcasting to ' + connections.length + ' connections')
         client.then(client => {
           if (client !== from) {
-            client.getUserSpaces().then(spaces => {
+            (spaceTouched ? client.getUserSpaces() : Promise.resolve([spaceTouched])).then(spaces => {
               if (spaces.indexOf(spaceTouched) >= 0) {
                 console.log('broadcasting to')
                 console.log(client)

@@ -64,8 +64,7 @@ export async function connect (uri: string, dbName: string, account: string, ws:
     const cls = memdb.getClass(spaceClassId)
 
     const spaces = await db.collection(domain)
-      .find({ users: { $elemMatch: { $eq: account }}, _class: cls })
-      .project({ _id: true }) // need only space ids
+      .find({ users: { $elemMatch: { $eq: account }}, _class: cls }, { projection: { _id: true }})
       .toArray()
 
     // pass null and undefined here to obtain documents not assigned to any space
@@ -153,6 +152,57 @@ export async function connect (uri: string, dbName: string, account: string, ws:
     new ModelIndex(memdb, mongoStorage)
   ])
 
+  interface CheckRightsResult {
+    objectSpace?: Ref<Space>
+    error?: string
+  }
+
+  async function checkRightsToModify(_class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<CheckRightsResult> {
+    const objectSpace = await getObjectSpace(_class, _id)
+
+    if (objectSpace && (await getUserSpaces()).indexOf(objectSpace) < 0) {
+      return {
+        error: `The account '${account}' does not have access to the space '${objectSpace}' where it wanted to modify the object '${_id}'`
+      }
+    }
+
+    return { objectSpace }
+  }
+
+  async function checkRightsToCreate(object: Doc): Promise<CheckRightsResult> {
+    let objectSpace: Ref<Space> = undefined as unknown as Ref<Space>
+
+    if (spaceKey in object) {
+      objectSpace = (object as any)[spaceKey]
+
+      if (object._class !== CORE_CLASS_SPACE && objectSpace && (await getUserSpaces()).indexOf(objectSpace) < 0) {
+        return {
+          error: `The account '${account}' does not have access to the space '${objectSpace}' where it wanted to create the object '${object._id}'`
+        }
+      }
+    } // else no space provided, all accounts will have access to the created object
+
+    return { objectSpace }
+  }
+
+  async function checkRightsForTx(tx: Tx): Promise<CheckRightsResult> {
+    switch (tx._class) {
+      case CORE_CLASS_CREATETX:
+        return checkRightsToCreate((tx as CreateTx).object)
+      case CORE_CLASS_UPDATETX:
+        const updateTx = tx as UpdateTx
+        return checkRightsToModify(updateTx._objectClass, updateTx._objectId)
+      case CORE_CLASS_PUSHTX:
+        const pushTx = tx as PushTx
+        return checkRightsToModify(pushTx._objectClass, pushTx._objectId)
+      case CORE_CLASS_DELETETX:
+        // TODO
+        return {}
+      default:
+        return { error: `Bad transaction type '${tx._class}'` }
+    }
+  }
+
   const clientControl = {
 
     // C O R E  P R O T O C O L
@@ -164,48 +214,17 @@ export async function connect (uri: string, dbName: string, account: string, ws:
     },
 
     async tx (tx: Tx): Promise<void> {
-      let spaceTouched: Ref<Space>
+      const checkRightsResult = await checkRightsForTx(tx)
 
-      if (tx._class === CORE_CLASS_CREATETX) {
-        const createTx = tx as CreateTx
-
-        if (spaceKey in createTx.object) {
-          spaceTouched = (createTx.object as any)[spaceKey]
-
-          if (createTx.object._class !== CORE_CLASS_SPACE && spaceTouched && (await getUserSpaces()).indexOf(spaceTouched) < 0) {
-            // TODO: reply with error response here
-            console.log(`!!! The account '${account}' does not have access to the space '${spaceTouched}' where it wanted to create an object`)
-            return
-          }
-        } else {
-          // no space provided, all accounts will have access to the created object (leave spaceTouched undefined)
-        }
-      } else if (tx._class === CORE_CLASS_UPDATETX) {
-        // TODO: unify with PUSHTX case
-        const updateTx = tx as UpdateTx
-        const updatingObject = await clientControl.findOne(updateTx._objectClass, { _id: updateTx._objectId })
-
-        if (!updatingObject) {
-          // TODO: reply with error response here
-          console.log(`!!! The object '${updateTx._id}' is not found or is not accessible to the account '${account}'`)
-          return
-        }
-
-        if (spaceKey in updatingObject) {
-          spaceTouched = (updatingObject as any)[spaceKey]
-        }
-      } else if (tx._class === CORE_CLASS_PUSHTX) {
-        const pushTx = tx as PushTx
-        spaceTouched = await getObjectSpace(pushTx._objectClass, pushTx._objectId)
-
-        if (spaceTouched && (await getUserSpaces()).indexOf(spaceTouched) < 0) {
-          // TODO: reply with error response here
-          console.log(`!!! The account '${account}' does not have access to the space '${spaceTouched}' where it wanted to modify an object`)
-          return
-        }
-      } else if (tx._class === CORE_CLASS_DELETETX) {
-        // TODO: check client has rights to execute the transaction
+      if (checkRightsResult.error) {
+        // TODO: reply with error response here
+        console.log(checkRightsResult.error)
+        return
       }
+
+      // A space whose object will be modified by this transaction.
+      // All clients that have access to this space will get notifications about the change.
+      const spaceTouched = checkRightsResult.objectSpace
 
       return txProcessor.process(tx).then(() => {
         server.broadcast(clientControl, spaceTouched, { result: tx })
