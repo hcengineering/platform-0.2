@@ -16,7 +16,7 @@
 import type { Platform } from '@anticrm/platform'
 import {
   Ref, Class, Doc, AnyLayout, MODEL_DOMAIN, CoreProtocol, Tx, TITLE_DOMAIN, BACKLINKS_DOMAIN,
-  VDoc, Space, generateId as genId, CreateTx, Property, PropertyType, ModelIndex, DateProperty, StringProperty, UpdateTx, PushTx
+  VDoc, Space, generateId as genId, ModelIndex, DateProperty, StringProperty, SpaceIndex
 } from '@anticrm/core'
 import { ModelDb } from './modeldb'
 
@@ -68,6 +68,7 @@ export default async (platform: Platform): Promise<CoreService> => {
 
   const txProcessor = new TxProcessor([
     new TxIndex(qCache),
+    new SpaceIndex(model, qCache),
     new VDocIndex(model, qCache),
     new TitleIndex(model, qTitles),
     new TextIndex(model, qGraph),
