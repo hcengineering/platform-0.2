@@ -24,7 +24,7 @@
   import { AnyLayout, Ref, Space, VDoc } from '@anticrm/core'
   import { getChunterService, getCoreService, getUIService } from '../../utils'
   import chunter, { Message } from '../..'
-  import contact from '@anticrm/contact'
+  import contact, { User } from '@anticrm/contact'
   import ui from '@anticrm/platform-ui'
 
   const coreService = getCoreService()
@@ -34,8 +34,8 @@
   export let space: Ref<Space>
 
   let spaceName: string = ''
+  let spaceUsers: User[] = []
   let messages: Message[] = []
-  let chatUsers: string[] = []
   let unsubscribeFromMessages: () => void
   let unsubscribeFromSpace: () => void
 
@@ -57,7 +57,7 @@
         onSpaceUpdated(spaces[0]) // only one space expected here
       } else {
         spaceName = ''
-        chatUsers = []
+        spaceUsers = []
       }
     })
   }
@@ -67,14 +67,13 @@
 
     if (space.users && space.users.length > 0) {
       coreService.then(service => service.find(contact.mixin.User, { account: { $in: space.users } } as unknown as AnyLayout))
-          .then(users => {
-            chatUsers = users ? users.map(u => u.name) : []
-          }).catch(err => {
+          .then(users => spaceUsers = users ?? [])
+          .catch(err => {
             console.log('error while getting list of space users', err)
-            chatUsers = []
+            spaceUsers = []
           })
     } else {
-      chatUsers = []
+      spaceUsers = []
     }
   }
 
@@ -116,9 +115,9 @@
   </div>
   <div>
     <span class="caption-4">Пользователи в чате: </span>
-    { #each chatUsers as username, i }
-      <span>{username}</span>
-      { #if i < chatUsers.length-1 }
+    { #each spaceUsers as user, i }
+      <span>{user.name}</span>
+      { #if i < spaceUsers.length - 1 }
         <span>,&nbsp;</span>
       { /if }
     { /each }
