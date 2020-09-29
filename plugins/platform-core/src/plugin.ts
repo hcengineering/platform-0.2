@@ -117,43 +117,45 @@ export default async (platform: Platform): Promise<CoreService> => {
     return Promise.all([coreProtocol.tx(tx), txProcessor.process(tx)])
   }
 
-  function createDoc<T extends Doc> (doc: T): Promise<any> {
-    if (!doc._id) {
-      doc._id = generateId()
-    }
-
-    const createTx = {
-      _class: core.class.CreateTx,
-      _space: (doc as any)['_space'],
-      object: doc
-    }
-
-    return tx(createTx as unknown as Tx)
-  }
-
   function createVDoc<T extends VDoc> (vdoc: T): Promise<void> {
+    if (!vdoc._id) {
+      vdoc._id = generateId()
+    }
     if (!vdoc._createdBy) {
       vdoc._createdBy = platform.getMetadata(login.metadata.WhoAmI) as StringProperty
     }
     if (!vdoc._createdOn) {
       vdoc._createdOn = Date.now() as DateProperty
     }
-    return createDoc(vdoc)
+
+    const createTx = {
+      _class: core.class.CreateTx,
+      _space: vdoc._space,
+      object: vdoc
+    }
+
+    return tx(createTx as unknown as Tx)
   }
 
   function createSpace (name: string): Promise<void> {
     const spaceId = generateId() as Ref<Space>
-    const currentUserAccount = platform.getMetadata(login.metadata.WhoAmI)
+    const currentUserAccount = platform.getMetadata(login.metadata.WhoAmI) as StringProperty
 
-    const space = {
+    const space: Space = {
       _id: spaceId,
       _class: core.class.Space,
-      _space: spaceId, // the space is available to itself
       name,
+      lists: [],
       users: [currentUserAccount]
     }
 
-    return createVDoc(space as unknown as VDoc)
+    const createTx = {
+      _class: core.class.CreateTx,
+      _space: spaceId,
+      object: space
+    }
+
+    return tx(createTx as unknown as Tx)
   }
 
   return {

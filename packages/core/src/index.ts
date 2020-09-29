@@ -16,6 +16,7 @@
 export * from './rpc'
 export * from './core'
 export * from './model'
+export * from './space'
 export * from './text'
 export * from './tx'
 export * from './title'

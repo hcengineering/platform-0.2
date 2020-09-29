@@ -15,8 +15,9 @@
 
 import { Index, Storage, Tx } from './core'
 import { Model } from './model'
-import { Doc, Ref, Mixin, Class, Obj, Emb, DateProperty, StringProperty } from './core'
+import { Doc, Ref, Class, Emb, DateProperty, StringProperty } from './core'
 import { CreateTx, PushTx, UpdateTx, CORE_CLASS_CREATETX, CORE_CLASS_UPDATETX, CORE_CLASS_PUSHTX } from './tx'
+import { Space } from './space'
 
 export interface Application extends Doc {
 }
@@ -25,14 +26,6 @@ export interface List extends Emb {
   id: string
   name: string
   application: Ref<Application>
-}
-
-export const SPACE_DOMAIN = 'space'
-
-export interface Space extends VDoc {
-  name: string
-  lists: List[]
-  users: string[] // user accounts (emails) that have access to the space
 }
 
 export interface VDoc extends Doc {
@@ -44,7 +37,6 @@ export interface VDoc extends Doc {
 }
 
 export const CORE_CLASS_VDOC = 'class:core.VDoc' as Ref<Class<VDoc>>
-export const CORE_CLASS_SPACE = 'class:core.Space' as Ref<Class<Space>>
 
 export class VDocIndex implements Index {
   private modelDb: Model

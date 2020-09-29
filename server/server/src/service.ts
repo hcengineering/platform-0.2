@@ -17,7 +17,7 @@ import { MongoClient } from 'mongodb'
 
 import { Ref, Class, Doc, Model, AnyLayout, MODEL_DOMAIN, CoreProtocol, Tx, TxProcessor, Storage, ModelIndex,
   Space, CORE_CLASS_SPACE, CORE_CLASS_UPDATETX, UpdateTx, CORE_CLASS_CREATETX, CreateTx, Attribute,
-  CORE_CLASS_ARRAYOF, ArrayOf, CORE_CLASS_PUSHTX, CORE_CLASS_DELETETX, PushTx } from '@anticrm/core'
+  CORE_CLASS_ARRAYOF, ArrayOf, CORE_CLASS_PUSHTX, CORE_CLASS_DELETETX, PushTx, SpaceIndex } from '@anticrm/core'
 import { VDocIndex, TitleIndex, TextIndex, TxIndex } from '@anticrm/core'
 
 import WebSocket from 'ws'
@@ -48,8 +48,6 @@ export async function connect (uri: string, dbName: string, account: string, ws:
   const model = await db.collection('model').find({}).toArray()
   console.log('model loaded.')
   memdb.loadModel(model)
-
-  const spaceKey = '_space'
 
   // const graph = new Graph(memdb)
   // console.log('loading graph...')
@@ -93,20 +91,20 @@ export async function connect (uri: string, dbName: string, account: string, ws:
 
     const mongoQuery = { ...q, _class: cls}
     const userSpaces = await getUserSpaces()
+    const spaceFilterKey = _class === CORE_CLASS_SPACE ? '_id' : '_space'  // for Space objects use their Id to filter available ones
 
-    if (spaceKey in mongoQuery) {
+    if (spaceFilterKey in mongoQuery) {
       // check user-given '_space' filter
-      const spaceInQuery = (mongoQuery as any)[spaceKey]
+      const spaceInQuery = (mongoQuery as any)[spaceFilterKey]
 
-      if (userSpaces.indexOf(spaceInQuery) >= 0) {
-        // OK, use that filter to query
-      } else {
+      if (userSpaces.indexOf(spaceInQuery) < 0) {
         // the requested space is NOT in the list of available to the user!
         return []
       }
+      // else OK, use that filter to query
     } else {
       // no user-given '_space' filter, use all spaces available to the user
-      (mongoQuery as any)[spaceKey] = { $in: userSpaces }
+      (mongoQuery as any)[spaceFilterKey] = { $in: userSpaces }
     }
 
     return db.collection(domain).find(mongoQuery).toArray()
@@ -146,6 +144,7 @@ export async function connect (uri: string, dbName: string, account: string, ws:
 
   const txProcessor = new TxProcessor([
     new TxIndex(mongoStorage),
+    new SpaceIndex(memdb, mongoStorage),
     new VDocIndex(memdb, mongoStorage),
     new TitleIndex(memdb, mongoStorage),
     new TextIndex(memdb, mongoStorage),
@@ -171,9 +170,10 @@ export async function connect (uri: string, dbName: string, account: string, ws:
 
   async function checkRightsToCreate(object: Doc): Promise<CheckRightsResult> {
     let objectSpace: Ref<Space> = undefined as unknown as Ref<Space>
+    const spaceFilterKey = object._class === CORE_CLASS_SPACE ? '_id' : '_space'  // for Space objects use their Id to filter available ones
 
-    if (spaceKey in object) {
-      objectSpace = (object as any)[spaceKey]
+    if (spaceFilterKey in object) {
+      objectSpace = (object as any)[spaceFilterKey]
 
       if (object._class !== CORE_CLASS_SPACE && objectSpace && (await getUserSpaces()).indexOf(objectSpace) < 0) {
         return {
