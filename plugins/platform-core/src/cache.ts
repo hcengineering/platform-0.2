@@ -21,7 +21,7 @@ export class Cache implements Storage {
     console.log('cache store')
   }
 
-  async push (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: any): Promise<void> {
+  async push (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: any, avoidDuplicates: boolean): Promise<void> {
     console.log('cache push')
   }
 

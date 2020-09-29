@@ -235,7 +235,7 @@ export class Model implements Storage {
     this.add(doc)
   }
 
-  push (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: any): Promise<void> {
+  push (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: any, avoidDuplicates: boolean): Promise<void> {
     throw new Error('Method not implemented. model push')
   }
   update (_class: Ref<Class<Doc>>, selector: object, attributes: any): Promise<void> {

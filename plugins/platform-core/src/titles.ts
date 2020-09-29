@@ -67,7 +67,7 @@ export class Titles implements Storage {
     })
   }
 
-  async push (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: any): Promise<void> {
+  async push (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: any, avoidDuplicates: boolean): Promise<void> {
     console.log('graph push')
   }
 

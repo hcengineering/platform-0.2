@@ -47,8 +47,8 @@ export class QueriableStorage implements Domain {
     return this.proxy.store(doc).then(() => this.refreshAll())
   }
 
-  push (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: any): Promise<void> {
-    return this.proxy.push(_class, _id, attribute, attributes).then(() => this.refreshAll())
+  push (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: any, avoidDuplicates: boolean): Promise<void> {
+    return this.proxy.push(_class, _id, attribute, attributes, avoidDuplicates).then(() => this.refreshAll())
   }
 
   update (_class: Ref<Class<Doc>>, selector: object, attributes: any): Promise<void> {

@@ -161,7 +161,8 @@ export function model (S: Builder) {
     _attribute: S.attr(core.class.Type, {}),
     _attributes: S.attr(core.class.BagOf, {
       of: S.newInstance(core.class.InstanceOf, { of: core.class.Type })
-    })
+    }),
+    avoidDuplicates: S.attr(core.class.Type, {})
   }, TX_DOMAIN)
 
   S.createClass(core.class.UpdateTx, core.class.Tx, {

@@ -129,7 +129,7 @@ export interface Index {
 
 export interface Storage {
   store (doc: Doc): Promise<void>
-  push (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: any): Promise<void>
+  push (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: any, avoidDuplicates: boolean): Promise<void>
   update (_class: Ref<Class<Doc>>, selector: object, attributes: any): Promise<void>
   remove (_class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<void>
 
