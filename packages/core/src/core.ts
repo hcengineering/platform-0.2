@@ -96,11 +96,8 @@ export interface BagOf<A> extends Type {
 }
 
 export interface ArrayOf<A> extends Type {
-  of: Type
-}
-
-export interface SetOf<A> extends Type {
-  of: Type
+  of: Type,
+  unique: boolean
 }
 
 ///
@@ -115,7 +112,7 @@ export const CORE_CLASS_ATTRIBUTE = 'class:core.Attribute' as Ref<Class<Attribut
 export const CORE_CLASS_CLASS = 'class:core.Class' as Ref<Class<Class<Obj>>>
 export const CORE_CLASS_MIXIN = 'class:core.Mixin' as Ref<Class<Mixin<Doc>>>
 export const CORE_CLASS_TYPE = 'class:core.Type' as Ref<Class<Type>>
-export const CORE_CLASS_SETOF = 'class:core.SetOf' as Ref<Class<SetOf<Type>>>
+export const CORE_CLASS_ARRAYOF = 'class:core.ArrayOf' as Ref<Class<ArrayOf<Type>>>
 
 export const CORE_MIXIN_INDICES = 'mixin:core.Indices' as Ref<Mixin<Indices>>
 

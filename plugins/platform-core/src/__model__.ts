@@ -15,12 +15,12 @@
 
 import {
   Attribute, Class, Classifier, Doc, Emb, Mixin, Obj, Ref, Tx, Type, VDoc,
-  ArrayOf, SetOf, BagOf, InstanceOf, RefTo, Indices, CORE_CLASS_TEXT, Space, Application, List,
+  ArrayOf, BagOf, InstanceOf, RefTo, Indices, CORE_CLASS_TEXT, Space, Application, List,
   DateProperty, StringProperty, Backlinks, Backlink, BACKLINKS_DOMAIN, MODEL_DOMAIN, TX_DOMAIN, TITLE_DOMAIN,
   SPACE_DOMAIN
 } from '@anticrm/core'
 
-import { extendIds, ModelClass, Prop, Set, Builder } from '@anticrm/model'
+import { extendIds, ModelClass, Prop, Array, Builder } from '@anticrm/model'
 import _core from '@anticrm/platform-core'
 
 const core = extendIds(_core, {
@@ -42,7 +42,6 @@ const core = extendIds(_core, {
     InstanceOf: '' as Ref<Class<InstanceOf<Emb>>>,
     BagOf: '' as Ref<Class<BagOf<Type>>>,
     ArrayOf: '' as Ref<Class<ArrayOf<Type>>>,
-    SetOf: '' as Ref<Class<SetOf<Type>>>,
 
     String: '' as Ref<Class<Type>>,
     Application: '' as Ref<Class<Application>>
@@ -99,7 +98,7 @@ export class TVDoc extends TDoc implements VDoc {
 export class TSpace extends TVDoc implements Space {
   @Prop() name!: string
   @Prop() lists!: List[]
-  @Set() users!: string[] // set is treated as list with unique elements
+  @Array(true) users!: string[]
 }
 
 @ModelClass(core.class.Backlinks, core.class.Doc, BACKLINKS_DOMAIN)

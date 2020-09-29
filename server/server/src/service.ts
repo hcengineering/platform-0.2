@@ -16,7 +16,7 @@
 import { MongoClient } from 'mongodb'
 
 import { Ref, Class, Doc, Model, AnyLayout, MODEL_DOMAIN, CoreProtocol, Tx, TxProcessor, Storage, ModelIndex,
-  Space, CORE_CLASS_SPACE, CORE_CLASS_UPDATETX, UpdateTx, CORE_CLASS_CREATETX, CreateTx, Attribute, CORE_CLASS_SETOF } from '@anticrm/core'
+  Space, CORE_CLASS_SPACE, CORE_CLASS_UPDATETX, UpdateTx, CORE_CLASS_CREATETX, CreateTx, Attribute, CORE_CLASS_ARRAYOF, ArrayOf } from '@anticrm/core'
 import { VDocIndex, TitleIndex, TextIndex, TxIndex } from '@anticrm/core'
 
 import WebSocket from 'ws'
@@ -117,10 +117,10 @@ export async function connect (uri: string, dbName: string, account: string, ws:
       const domain = memdb.getDomain(_class)
       const clazz = memdb.get(_class) as Class<Doc>
       const attr = (clazz._attributes as any)[attribute] as Attribute
-      const addValueToSet = attr && memdb.is(attr.type._class, CORE_CLASS_SETOF)
+      const addToUniqueCollection = attr && memdb.is(attr.type._class, CORE_CLASS_ARRAYOF) && (attr.type as ArrayOf<any>).unique
 
       const updateValue = { [attribute]: attributes }
-      const updateQuery = addValueToSet ? { $addToSet : updateValue } : { $push: updateValue }
+      const updateQuery = addToUniqueCollection ? { $addToSet : updateValue } : { $push: updateValue }
       return db.collection(domain).updateOne({ _id }, updateQuery)
     },
 
