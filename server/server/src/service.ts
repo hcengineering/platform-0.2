@@ -78,6 +78,9 @@ export async function connect (uri: string, dbName: string, account: string, ws:
   }
 
   async function getObjectSpace (_class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<Ref<Space>> {
+    if (_class === CORE_CLASS_SPACE) {
+      return _id as Ref<Space>
+    }
     const domain = memdb.getDomain(_class)
     const doc = await db.collection(domain).findOne({ _id }, { projection: { _space: true }})
     return doc ? doc._space : null
