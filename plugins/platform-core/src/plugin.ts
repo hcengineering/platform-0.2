@@ -16,7 +16,7 @@
 import type { Platform } from '@anticrm/platform'
 import {
   Ref, Class, Doc, AnyLayout, MODEL_DOMAIN, CoreProtocol, Tx, TITLE_DOMAIN, BACKLINKS_DOMAIN,
-  VDoc, Space, generateId as genId, CreateTx, Property, PropertyType, ModelIndex, DateProperty, StringProperty, UpdateTx
+  VDoc, Space, generateId as genId, CreateTx, Property, PropertyType, ModelIndex, DateProperty, StringProperty, UpdateTx, PushTx
 } from '@anticrm/core'
 import { ModelDb } from './modeldb'
 
@@ -147,36 +147,21 @@ export default async (platform: Platform): Promise<CoreService> => {
   }
 
   function addUserToSpace (account: string, spaceId: Ref<Space>): Promise<any> {
-    return findOne(core.class.Space, { _id: spaceId }).then(space => {
-      if (!space) {
-        throw new Error(`No space found '${spaceId}'`)
-      }
+     const tx: PushTx = {
+      _objectId: spaceId,
+      _objectClass: core.class.Space,
+      _attribute: 'users' as StringProperty,
+      _attributes: account as StringProperty,
 
-      const users = space.users ?? []
+      _date: Date.now() as DateProperty,
+      _user: platform.getMetadata(login.metadata.WhoAmI) as StringProperty,
+      _space: spaceId,
 
-      if (users.indexOf(account) >= 0) {
-        // the space already has this user, nothing to do
-        return
-      }
+      _class: core.class.PushTx,
+      _id: generateId()
+    }
 
-      // the account assumed to be correct at this point (should be checked by upper code)
-      users.push(account)
-
-      const tx: UpdateTx = {
-        _objectId: space._id,
-        _objectClass: space._class,
-        _attributes: { users },
-
-        _date: Date.now() as DateProperty,
-        _user: platform.getMetadata(login.metadata.WhoAmI) as StringProperty,
-        _space: spaceId,
-
-        _class: core.class.UpdateTx,
-        _id: generateId()
-      }
-
-      return Promise.all([coreProtocol.tx(tx), txProcessor.process(tx)])
-    })
+    return Promise.all([coreProtocol.tx(tx), txProcessor.process(tx)])
   }
 
   return {
