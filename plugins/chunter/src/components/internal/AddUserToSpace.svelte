@@ -15,7 +15,8 @@
 
 <script lang="ts">
   import contact, { User } from '@anticrm/contact';
-  import { mixinKey, Ref, Space, StringProperty } from '@anticrm/core'
+  import { mixinKey, Ref, Space, StringProperty, Tx } from '@anticrm/core'
+  import core from '@anticrm/platform-core'
   import { getCoreService, getUIService } from '../../utils'
 
   export let space: Ref<Space>
@@ -49,10 +50,22 @@
       // first check that such user exists
       coreService.findOne(contact.mixin.User, { account: userAccountToAdd as StringProperty })
         .then(user => {
-          if (user) {
-            return coreService.addUserToSpace(userAccountToAdd, space)
+          if (!user) {
+            throw new Error(`user '${userAccountToAdd}' not found`)
           }
-          throw new Error(`user '${userAccountToAdd}' not found`)
+
+          // add new user account to the 'users' collection via Push transaction
+          const tx = {
+            _class: core.class.PushTx,
+            _objectId: space,
+            _objectClass: core.class.Space,
+            _attribute: 'users' as StringProperty,
+            _attributes: userAccountToAdd as StringProperty,
+            _space: space
+          }
+
+          // absent Tx fields will be autofilled
+          return coreService.tx(tx as unknown as Tx)
         }).catch(err => {
           // TODO: show pretty error message to the user
           console.log('Error adding user to the space!', err)

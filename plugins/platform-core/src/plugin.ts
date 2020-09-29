@@ -104,21 +104,31 @@ export default async (platform: Platform): Promise<CoreService> => {
 
   function generateId () { return genId() as Ref<Doc> }
 
+  function tx (tx: Tx): Promise<any> {
+    if (!tx._id) {
+      tx._id = generateId()
+    }
+    if (!tx._user) {
+      tx._user = platform.getMetadata(login.metadata.WhoAmI) as StringProperty
+    }
+    if (!tx._date) {
+      tx._date = Date.now() as DateProperty
+    }
+    return Promise.all([coreProtocol.tx(tx), txProcessor.process(tx)])
+  }
+
   function createDoc<T extends Doc> (doc: T): Promise<any> {
     if (!doc._id) {
       doc._id = generateId()
     }
 
-    const tx: CreateTx = {
+    const createTx = {
       _class: core.class.CreateTx,
-      _id: generateId() as Ref<Doc>,
-      _date: Date.now() as Property<number, Date>,
-      _user: platform.getMetadata(login.metadata.WhoAmI) as Property<string, string>,
-      _space: '_space' in doc ? (doc as any)['_space'] : undefined,
+      _space: (doc as any)['_space'],
       object: doc
     }
 
-    return Promise.all([coreProtocol.tx(tx), txProcessor.process(tx)])
+    return tx(createTx as unknown as Tx)
   }
 
   function createVDoc<T extends VDoc> (vdoc: T): Promise<void> {
@@ -146,24 +156,6 @@ export default async (platform: Platform): Promise<CoreService> => {
     return createVDoc(space as unknown as VDoc)
   }
 
-  function addUserToSpace (account: string, spaceId: Ref<Space>): Promise<any> {
-     const tx: PushTx = {
-      _objectId: spaceId,
-      _objectClass: core.class.Space,
-      _attribute: 'users' as StringProperty,
-      _attributes: account as StringProperty,
-
-      _date: Date.now() as DateProperty,
-      _user: platform.getMetadata(login.metadata.WhoAmI) as StringProperty,
-      _space: spaceId,
-
-      _class: core.class.PushTx,
-      _id: generateId()
-    }
-
-    return Promise.all([coreProtocol.tx(tx), txProcessor.process(tx)])
-  }
-
   return {
     getModel () { return model },
     query,
@@ -171,7 +163,7 @@ export default async (platform: Platform): Promise<CoreService> => {
     findOne,
     createVDoc,
     createSpace,
-    addUserToSpace,
-    generateId
+    generateId,
+    tx
   }
 }

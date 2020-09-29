@@ -22,7 +22,7 @@
   const uiService = getUIService()
 
   function createSpace() {
-    console.log(`create space '${name}`)
+    console.log(`create space '${name}'`)
     uiService.closeModal()
     coreService.then(coreService => coreService.createSpace(name))
   }

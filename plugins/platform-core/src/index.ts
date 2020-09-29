@@ -15,8 +15,8 @@
 
 import { plugin, Plugin, Service, Metadata } from '@anticrm/platform'
 import {
-  Ref, Class, Doc, AnyLayout, Obj,
-  CreateTx, PushTx, UpdateTx, DeleteTx, Space, Title, CORE_CLASS_BACKLINKS, VDoc
+  Ref, Class, Doc, VDoc, AnyLayout, Obj, Space, Title, Tx,
+  CreateTx, PushTx, UpdateTx, DeleteTx, CORE_CLASS_BACKLINKS
 } from '@anticrm/core'
 
 import type { ModelDb } from './modeldb'
@@ -35,8 +35,8 @@ export interface CoreService extends Service {
   query<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): QueryResult<T>
   createVDoc<T extends VDoc> (vdoc: T): Promise<void>
   createSpace (name: string): Promise<void>
-  addUserToSpace(account: string, space: Ref<Space>): Promise<void>
   generateId (): Ref<Doc>
+  tx (tx: Tx): Promise<any>
 }
 
 export default plugin('core' as Plugin<CoreService>, {}, {
