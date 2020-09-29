@@ -27,7 +27,7 @@ export interface PushTx extends Tx {
   _objectId: Ref<Doc>
   _objectClass: Ref<Class<Doc>>
   _attribute: StringProperty
-  _attributes: { [key: string]: PropertyType }
+  _attributes: { [key: string]: PropertyType } | PropertyType
 }
 
 export interface UpdateTx extends Tx {

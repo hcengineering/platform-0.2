@@ -16,7 +16,7 @@
 import { MongoClient } from 'mongodb'
 
 import { Ref, Class, Doc, Model, AnyLayout, MODEL_DOMAIN, CoreProtocol, Tx, TxProcessor, Storage, ModelIndex,
-  Space, CORE_CLASS_SPACE, CORE_CLASS_UPDATETX, UpdateTx, CORE_CLASS_CREATETX, CreateTx } from '@anticrm/core'
+  Space, CORE_CLASS_SPACE, CORE_CLASS_UPDATETX, UpdateTx, CORE_CLASS_CREATETX, CreateTx, Attribute, CORE_CLASS_SETOF } from '@anticrm/core'
 import { VDocIndex, TitleIndex, TextIndex, TxIndex } from '@anticrm/core'
 
 import WebSocket from 'ws'
@@ -115,7 +115,13 @@ export async function connect (uri: string, dbName: string, account: string, ws:
 
     async push (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: any): Promise<any> {
       const domain = memdb.getDomain(_class)
-      return db.collection(domain).updateOne({ _id }, { $push: { [attribute]: attributes } })
+      const clazz = memdb.get(_class) as Class<Doc>
+      const attr = (clazz._attributes as any)[attribute] as Attribute
+      const addValueToSet = attr && memdb.is(attr.type._class, CORE_CLASS_SETOF)
+
+      const updateValue = { [attribute]: attributes }
+      const updateQuery = addValueToSet ? { $addToSet : updateValue } : { $push: updateValue }
+      return db.collection(domain).updateOne({ _id }, updateQuery)
     },
 
     async update (_class: Ref<Class<Doc>>, selector: object, attributes: any): Promise<any> {
