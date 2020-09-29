@@ -105,7 +105,7 @@
   }
 
   function addUserToSpace() {
-    uiService.showModal(AddUserToSpace, {space})
+    uiService.showModal(AddUserToSpace, {space, spaceUsers})
   }
 </script>
 
