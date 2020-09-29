@@ -28,6 +28,14 @@
   import { createEventDispatcher } from 'svelte'
   const dispatch = createEventDispatcher()
 
+  // ********************************
+  // Properties
+  // ********************************
+  export let stylesEnabled: boolean = false
+
+  // ********************************
+  // Functionality
+  // ********************************
   function startsWith(str: string | undefined, prefix: string) {
     return (str ?? '').startsWith(prefix)
   }
@@ -54,12 +62,11 @@
     underline: false,
     completionWord: '',
     selection: { from: 0, to: 0 },
-		completionEnd: '',
-		inputHeight: 0
+    completionEnd: '',
+    inputHeight: 0
   }
   let completions: CompletionItem[] = []
   let htmlValue: string = ''
-  export let stylesEnabled: boolean = false
   let completionControl: CompletionPopup
 
   let htmlEditor: EditorContent
@@ -87,12 +94,18 @@
     return items
   }
   async function findSpace(title: string): Promise<ItemRefefence[]> {
-    let docs = await coreS.getModel().find(pcore.mixin.UXObject, {
-      label: title as StringProperty
-    })
-    return docs.map((e) => {
-      return { id: e._id, class: e._class } as ItemRefefence
-    })
+    let model = coreS.getModel()
+    let docs = await model.find(core.class.Space, {})
+
+    let items: CompletionItem[] = []
+    const all = model.cast(docs, pcore.mixin.UXObject)
+
+    for (const value of all) {
+      if (value._id === title) {
+        return [{ id: value._id, class: core.class.Space } as ItemRefefence]
+      }
+    }
+    return []
   }
   function updateStyle(event: EditorContentEvent) {
     styleState = event
@@ -219,7 +232,10 @@
                 )
               })
             }
-            prev = { id: node.attrs.id, class: node.attrs.class }
+            prev = {
+              id: node.marks[i].attrs.id,
+              class: node.marks[i].attrs.class
+            }
             break
           }
         }
