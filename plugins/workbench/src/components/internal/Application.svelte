@@ -14,7 +14,7 @@
 -->
 
 <script type="ts">
-  import { Ref, Class, Doc, Application, Space } from '@anticrm/core'
+  import { Ref, Class, Doc, Application, Space, VDoc } from '@anticrm/core'
   import { findOne } from '../../utils'
   import workbench, { WorkbenchApplication } from '../..'
   import { getUIService } from '../../utils'
@@ -22,21 +22,23 @@
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
   import Table from '@anticrm/presentation/src/components/internal/Table.svelte'
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
-  import InputControl from './InputControl.svelte'
+  import ObjectForm from './ObjectForm.svelte'
   import CreateForm from './CreateForm.svelte'
 
   export let application: Ref<WorkbenchApplication>
   export let space: Ref<Space>
+  let _id: Ref<VDoc> | undefined
 
   const uiService = getUIService()
 
   let addIcon: HTMLElement
   
   let appInstance: WorkbenchApplication | undefined
-  $: findOne(workbench.class.WorkbenchApplication, { _id: application }).then(app => { appInstance = app })
+  $: {
+    findOne(workbench.class.WorkbenchApplication, { _id: application }).then(app => { appInstance = app })
+    _id = undefined
+  }
 </script>
-
-{space}
 
 <div class="workbench-browse">
   { #if appInstance }
@@ -48,28 +50,30 @@
   </div>
   <ScrollView stylez="height:100%;">
     <div class="table">
-      <Table _class={appInstance.classes[0]} {space}/>
+      <Table _class={appInstance.classes[0]} {space} on:open={ (evt) => { _id = evt.detail._id } }/>
     </div>
   </ScrollView>
-  <!-- <div class="input-control"> -->
-    <!-- <InputControl /> -->
-    <!-- <CreateForm _class={appInstance.classes[0]} title="Hello" {space}/> -->
-  <!-- </div> -->
+    { #if _id}
+    <div class="details">
+      <ObjectForm _class={appInstance.classes[0]} title="Hello" { _id }/>
+    </div>
+    { /if }
   { /if }
 </div>
 
 <style lang="scss">
   .workbench-browse {
     height: 100%;
-    // background-color: red;
     display: flex;
     flex-direction: column;
   
     .table {
+      margin: 1em;
       flex-grow: 1;
     }
 
-    .input-control {
+    .details {
+      border-top: 1px solid var(--theme-separator-color);
       padding: 1em;
       //max-height: 400px;
     }

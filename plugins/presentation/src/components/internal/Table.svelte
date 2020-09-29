@@ -14,8 +14,9 @@
 -->
 
 <script type="ts">
+  import { createEventDispatcher } from 'svelte'
   import { Ref, Class, Doc, Space } from '@anticrm/core'
-  import { QueryResult } from '@anticrm/platform-core/src/queries'
+  import { QueryResult } from '@anticrm/platform-core'
   import { ClassModel } from '../..'
   import { getCoreService, getPresentationService, getEmptyModel } from '../../utils'
   import { onDestroy } from 'svelte'
@@ -23,8 +24,9 @@
   export let _class: Ref<Class<Doc>>
   export let space: Ref<Space>
 
-  let model: ClassModel = getEmptyModel()
+  const dispatch = createEventDispatcher()
 
+  let model: ClassModel = getEmptyModel()
   $: getPresentationService().then(p => p.getClassModel(_class)).then(m => model = m)
 
   let objects: any[] = []
@@ -52,7 +54,7 @@
   <div class="tbody">
     { #each objects as object (object._id) }
       <div
-        class="tr"
+        class="tr" on:click={ () => dispatch('open', { _id: object._id }) }
       >
       { #each model.getAttributes() as attr (attr.key) }
         <div class="td">
