@@ -33,7 +33,6 @@ export interface ClientControl {
   ping (): Promise<void>
   send (response: Response<unknown>): void
   shutdown (): Promise<void>
-  getUserSpaces () : Promise<Ref<Space>[]>
 }
 
 export async function connect (uri: string, dbName: string, account: string, ws: WebSocket, server: PlatformServer): Promise<CoreProtocol & ClientControl> {
@@ -80,6 +79,13 @@ export async function connect (uri: string, dbName: string, account: string, ws:
   function getSpaceKey (_class: Ref<Class<Doc>>): string {
     // for Space objects use their Id to filter available ones
     return _class === CORE_CLASS_SPACE ? '_id' : '_space'
+  }
+
+  async function getSpaceUsers (space: Ref<Space>): Promise<string[]> {
+    const spaceClassId = CORE_CLASS_SPACE
+    const domain = memdb.getDomain(spaceClassId)
+    const doc = await db.collection(domain).findOne({ _id: space }, { projection: { users: true }})
+    return doc ? doc.users : []
   }
 
   async function getObjectSpace (_class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<Ref<Space>> {
@@ -234,8 +240,9 @@ export async function connect (uri: string, dbName: string, account: string, ws:
       // All clients that have access to this space will get notifications about the change.
       const spaceTouched = checkRightsResult.objectSpace
 
-      return txProcessor.process(tx).then(() => {
-        server.broadcast(clientControl, spaceTouched, { result: tx })
+      return txProcessor.process(tx).then(async () => {
+        const spaceUsers = spaceTouched ? await getSpaceUsers(spaceTouched) : []
+        server.broadcast(clientControl, spaceUsers, { result: tx })
       })
     },
 
@@ -266,9 +273,7 @@ export async function connect (uri: string, dbName: string, account: string, ws:
 
     serverShutdown (password: string): Promise<void> {
       return server.shutdown(password)
-    },
-
-    getUserSpaces
+    }
   }
 
   return clientControl

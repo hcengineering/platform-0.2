@@ -35,7 +35,7 @@ interface Service {
 type ClientService = Service & ClientControl
 
 export interface PlatformServer {
-  broadcast<R> (from: ClientControl, spaceTouched: Ref<Space>|undefined, response: Response<R>): void
+  broadcast<R> (from: ClientControl, to: string[], response: Response<R>): void
   shutdown (password: string): Promise<void>
 }
 
@@ -46,29 +46,25 @@ export function start (port: number, dbUri: string, host?: string) {
 
   const server = createServer()
   const wss = new Server({ noServer: true })
-
-  const connections = [] as Promise<ClientService>[]
+  const connections = new Map<string, Promise<ClientService>[]>()
 
   const platformServer: PlatformServer = {
-    broadcast<R> (from: ClientControl, spaceTouched: Ref<Space>|undefined, response: Response<R>) {
-      console.log('broadcasting to ' + connections.length + ' connections')
-      for (const client of connections) {
-        client.then(client => {
-          if (client !== from) {
-            (spaceTouched ? client.getUserSpaces() : Promise.resolve([spaceTouched])).then(spaces => {
-              if (spaces.indexOf(spaceTouched) >= 0) {
-                console.log('broadcasting to')
-                console.log(client)
-                console.log(response)
+    broadcast<R> (from: ClientControl, to: string[], response: Response<R>) {
+      // If 'to' is absent or empty, then broadcast to all active connections.
+
+      for (const account of to && to.length > 0 ? to : connections.keys()) {
+        const accountConnections = connections.get(account)
+
+        if (accountConnections) {
+          for (const connection of accountConnections) {
+            connection.then(client => {
+              if (client && client !== from) {
+                console.log(`broadcasting to '${account}', response`, response)
                 client.send(response)
-              } else {
-                console.log('do not broadcast to client without access to the changed space')
               }
             })
-          } else {
-            console.log('do not broadcast to self')
           }
-        })
+        }
       }
     },
 
@@ -77,8 +73,10 @@ export function start (port: number, dbUri: string, host?: string) {
       if (password !== ctlpassword) {
         throw new Error('ctl password does not match')
       }
-      for (const client of connections) {
-        (await client).shutdown()
+      for (const clients of connections.values()) {
+        for (const client of clients) {
+          (await client).shutdown()
+        }
       }
       httpServer.close()
     }
@@ -95,7 +93,13 @@ export function start (port: number, dbUri: string, host?: string) {
 
   wss.on('connection', function connection (ws: WebSocket, request: any, client: Client) {
     const service = createClient(dbUri, client.workspace, client.email, ws)
-    connections.push(service)
+    const clientActiveConnections = connections.get(client.email)
+
+    if (clientActiveConnections) {
+      clientActiveConnections.push(service)
+    } else {
+      connections.set(client.email, [service])
+    }
 
     ws.on('message', async (msg: string) => {
       const request = getRequest(msg)
