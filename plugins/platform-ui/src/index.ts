@@ -74,6 +74,7 @@ export default plugin('ui' as Plugin<UIService>, {}, {
     Add: '' as Asset,
   },
   component: {
+    Icon: '' as AnyComponent,
     Spinner: '' as AnyComponent,
     BadComponent: '' as AnyComponent
   },
