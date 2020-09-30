@@ -77,7 +77,7 @@ export async function connect (uri: string, dbName: string, account: string, ws:
     return spaces ? userSpaceIds.concat(spaces.map(space => space._id)) : userSpaceIds
   }
 
-  function getSpaceKey(_class: Ref<Class<Doc>>): string {
+  function getSpaceKey (_class: Ref<Class<Doc>>): string {
     // for Space objects use their Id to filter available ones
     return _class === CORE_CLASS_SPACE ? '_id' : '_space'
   }
@@ -164,7 +164,7 @@ export async function connect (uri: string, dbName: string, account: string, ws:
     error?: string
   }
 
-  async function checkRightsToModify(_class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<CheckRightsResult> {
+  async function checkRightsToModify (_class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<CheckRightsResult> {
     const objectSpace = await getObjectSpace(_class, _id)
 
     if (objectSpace && (await getUserSpaces()).indexOf(objectSpace) < 0) {
@@ -176,7 +176,7 @@ export async function connect (uri: string, dbName: string, account: string, ws:
     return { objectSpace }
   }
 
-  async function checkRightsToCreate(object: Doc): Promise<CheckRightsResult> {
+  async function checkRightsToCreate (object: Doc): Promise<CheckRightsResult> {
     let objectSpace: Ref<Space> = undefined as unknown as Ref<Space>
     const spaceKey = getSpaceKey(object._class)
 
@@ -193,7 +193,7 @@ export async function connect (uri: string, dbName: string, account: string, ws:
     return { objectSpace }
   }
 
-  async function checkRightsForTx(tx: Tx): Promise<CheckRightsResult> {
+  async function checkRightsForTx (tx: Tx): Promise<CheckRightsResult> {
     switch (tx._class) {
       case CORE_CLASS_CREATETX:
         return checkRightsToCreate((tx as CreateTx).object)
