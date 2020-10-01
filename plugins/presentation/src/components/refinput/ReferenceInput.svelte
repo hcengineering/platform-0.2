@@ -1,15 +1,15 @@
 <script lang="ts">
-  import { Class, Ref, VDoc, StringProperty } from '@anticrm/core'
   import {
-    getCoreService,
-    getPresentationService,
-    getEmptyModel
-  } from '../../utils'
-
-  import { ClassModel } from '../..'
+    Class,
+    Ref,
+    VDoc,
+    StringProperty,
+    Property,
+    Title
+  } from '@anticrm/core'
+  import { getCoreService } from '../../utils'
 
   import core from '@anticrm/platform-core'
-  import pcore from '../../index'
 
   import Toolbar from '@anticrm/sparkling-controls/src/toolbar/Toolbar.svelte'
   import ToolbarButton from '@anticrm/sparkling-controls/src/toolbar/Button.svelte'
@@ -32,6 +32,7 @@
   // Properties
   // ********************************
   export let stylesEnabled: boolean = false
+  export let height: number = -1
 
   // ********************************
   // Functionality
@@ -73,36 +74,39 @@
 
   let triggers = ['@', '#', '[[']
 
-  async function findSpaces(userPrefix: string): Promise<CompletionItem[]> {
-    let model = coreS.getModel()
-    let docs = await model.find(core.class.Space, {})
-
+  async function findTitles(prefix: string): Promise<CompletionItem[]> {
+    let docs = await coreS.find(core.class.Title, {
+      title: prefix as Property<string, string>
+    })
+    console.log('Found docs: ', docs)
     let items: CompletionItem[] = []
-    const all = model.cast(docs, pcore.mixin.UXObject)
-    for (const value of all) {
-      if (startsWith(value.label, userPrefix) && value.label !== userPrefix) {
-        let kk = value._id
+    for (const value of docs) {
+      if (
+        startsWith(value.title.toString(), prefix) &&
+        value.title !== prefix
+      ) {
+        let kk = value.title
         items.push({
-          key: kk,
+          key: value._objectId,
           label: kk,
-          title: kk + ' - Space',
-          class: core.class.Space,
-          id: value._id
+          title: kk + ' - ' + value._objectClass,
+          class: value._objectClass,
+          id: value._objectId
         } as ExtendedCompletionItem)
       }
     }
     return items
   }
-  async function findSpace(title: string): Promise<ItemRefefence[]> {
-    let model = coreS.getModel()
-    let docs = await model.find(core.class.Space, {})
+  async function findTitle(title: string): Promise<ItemRefefence[]> {
+    let docs = await coreS.find(core.class.Title, {
+      title: title as Property<string, string>
+    })
 
-    let items: CompletionItem[] = []
-    const all = model.cast(docs, pcore.mixin.UXObject)
-
-    for (const value of all) {
-      if (value._id === title) {
-        return [{ id: value._id, class: core.class.Space } as ItemRefefence]
+    for (const value of docs) {
+      if (value.title.toString() === title) {
+        return [
+          { id: value._objectId, class: value._objectClass } as ItemRefefence
+        ]
       }
     }
     return []
@@ -114,41 +118,10 @@
       completions = []
       return
     }
-    let word = event.completionWord
-    if (word.startsWith('@')) {
-      // findUsers(word.substring(1)).then((items) => {
-      //   completions.value = {
-      //     items: items
-      //   }
-      // })
-      completions = [
-        {
-          key: 'u1',
-          label: 'andrey',
-          title: 'andrey' + ' - User',
-          class: core.class.Space,
-          id: 'id1'
-        } as CompletionItem,
-        {
-          key: 'u1',
-          label: 'haiodo',
-          title: 'haiodo' + ' - User',
-          class: core.class.Space,
-          id: 'id2'
-        } as CompletionItem
-      ]
-    } else if (word.startsWith('#')) {
-      findSpaces(word.substring(1)).then((items) => {
-        completions = items
-      })
-    } else if (event.completionWord.startsWith('[[')) {
+    if (event.completionWord.startsWith('[[')) {
       const userPrefix = event.completionWord.substring(2)
 
-      Promise.all([
-        findSpaces(userPrefix)
-        // findUsers(userPrefix),
-        // findPages(userPrefix),
-      ]).then((result) => {
+      Promise.all([findTitles(userPrefix)]).then((result) => {
         completions = result.reduce((acc, val) => {
           return acc.concat(val)
         }, [])
@@ -167,7 +140,7 @@
     }
     let vv = value as ExtendedCompletionItem
     htmlEditor.insertMark(
-      '[[' + value.label + ']] ',
+      '[[' + value.label + ']]',
       styleState.selection.from - styleState.completionWord.length,
       styleState.selection.to + extra,
       schema.marks.reference,
@@ -221,17 +194,6 @@
         // Check if we had trigger words without defined marker
         for (let i = 0; i < node.marks.length; i++) {
           if (node.marks[i].type == schema.marks.reference) {
-            // We had our mark already, check if it name fit with document type
-            // If not fit we need to covert it to Page type.
-            if (!node.text.startsWith('[[') || !node.text.endsWith(']]')) {
-              operations.push((tr) => {
-                return (tr == null ? state.tr : tr).removeMark(
-                  pos,
-                  pos + node.nodeSize,
-                  node.marks[i]
-                )
-              })
-            }
             prev = {
               id: node.marks[i].attrs.id,
               class: node.marks[i].attrs.class
@@ -255,11 +217,7 @@
                 let cpos = pos
                 let cend = end
                 promises.push(
-                  Promise.all([
-                    // findUser(refText),
-                    // findPage(refText),
-                    findSpace(refText)
-                  ]).then((result) => {
+                  Promise.all([findTitle(refText)]).then((result) => {
                     let items = result.reduce((acc, val) => {
                       return acc.concat(val)
                     }, [])
@@ -284,19 +242,21 @@
                         }
                       )
                     } else if (items.length == 0) {
-                      operations.push(
-                        (tr: Transaction | null): Transaction => {
-                          let mark = schema.marks.reference.create({
-                            id: null,
-                            class: 'Page'
-                          })
-                          return (tr == null ? state.tr : tr).addMark(
-                            cpos + ci,
-                            cpos + ci + cend,
-                            mark
-                          )
-                        }
-                      )
+                      if (prev.id == "") {
+                        operations.push(
+                          (tr: Transaction | null): Transaction => {
+                            let mark = schema.marks.reference.create({
+                              id: null,
+                              class: 'Page'
+                            })
+                            return (tr == null ? state.tr : tr).addMark(
+                              cpos + ci,
+                              cpos + ci + cend,
+                              mark
+                            )
+                          }
+                        )
+                      }
                     }
                   })
                 )
@@ -337,6 +297,7 @@
         class:edit-box-vertical="{stylesEnabled}"
         class:edit-box-horizontal="{!stylesEnabled}"
         on:keydown="{onKeyDown}"
+        style="{`height: ${height > 0 ? height + 'px' : ''}`}"
       >
         <EditorContent
           bind:this="{htmlEditor}"
@@ -407,7 +368,10 @@
             ▶️
           </ToolbarButton>
           <ToolbarButton>😀</ToolbarButton>
-          <ToolbarButton on:click="{() => (stylesEnabled = !stylesEnabled)}">
+          <ToolbarButton
+            selected="{stylesEnabled}"
+            on:click="{() => (stylesEnabled = !stylesEnabled)}"
+          >
             Aa
           </ToolbarButton>
         </div>
@@ -449,11 +413,13 @@
     .edit-box {
       max-height: 300px;
     }
-    reference {
-      color: lightblue;
-    }
-    reference:not([id]) {
-      color: grey;
+    :global {
+      reference {
+        color: lightblue;
+      }
+      reference:not([id]) {
+        color: grey;
+      }
     }
   }
 </style>

@@ -57,6 +57,21 @@
   </div>
 </PageBlock>
 
+<PageBlock
+  label="Wide input box"
+  text="Reference input control could be used to accept comments"
+  code="{`<ReferenceInput
+    on:message={handler}
+    stylesEnabled=true/>`}"
+>
+  <div class="preview-pane">
+    <ReferenceInput height={500} on:message="{(e) => add(e.detail)}" stylesEnabled="true" />
+  </div>
+  <div>
+    {@html message}
+  </div>
+</PageBlock>
+
 <style lang="scss">
   .toolbar_table {
     width: 100%;
