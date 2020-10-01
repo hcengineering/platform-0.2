@@ -163,16 +163,11 @@ export async function connect (uri: string, dbName: string, account: string, ws:
     },
 
     async loadDomain (domain: string): Promise<Doc[]> {
+      console.log('loadDomain:', domain)
       if (domain === MODEL_DOMAIN)
         return modelDb.dump()
 
-      // TODO: move implementation to SecurityIndex
-      console.log('loadDomain:', domain)
-      const spaceKey = getSpaceKey(domain === 'space' ? CORE_CLASS_SPACE : '' as Ref<Class<Doc>>)
-      const mongoQuery = {} as any
-      (mongoQuery as any)[spaceKey] = { $in: await spaceStorage.getUserSpaces(account) }
-
-      return mongoStorage.findInDomain(domain, mongoQuery)
+      return securityIndex.loadDomain(domain)
     },
 
     // C O N T R O L

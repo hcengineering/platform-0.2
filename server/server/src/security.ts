@@ -51,8 +51,16 @@ export class SecurityIndex implements Index {
     return this.storage.find(_class, query)
   }
 
+  async loadDomain (domain: string): Promise<Doc[]> {
+    const spaceKey = this.getSpaceKey(domain === 'space' ? CORE_CLASS_SPACE : '' as Ref<Class<Doc>>)
+    const mongoQuery = {} as any
+    mongoQuery[spaceKey] = { $in: await this.storage.getUserSpaces(this.account) }
+    return this.storage.findInDomain(domain, mongoQuery)
+  }
+
   private getSpaceKey (_class: Ref<Class<Doc>>): string {
     // for Space objects use _id to filter available ones
     return _class === CORE_CLASS_SPACE ? '_id' : '_space'
   }
+
 }

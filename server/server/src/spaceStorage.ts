@@ -14,11 +14,12 @@
 //
 
 import { AnyLayout, Class, CORE_CLASS_SPACE, Doc, Ref, Space, Storage } from '@anticrm/core'
+import { MongoStorage } from './mongo'
 
 export class SpaceStorage implements Storage {
-  private proxyStorage: Storage
+  private proxyStorage: MongoStorage
 
-  constructor (store: Storage) {
+  constructor (store: MongoStorage) {
     this.proxyStorage = store
   }
 
@@ -40,6 +41,10 @@ export class SpaceStorage implements Storage {
 
   find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout, options?: AnyLayout): Promise<T[]> {
     return this.proxyStorage.find(_class, query, options)
+  }
+
+  findInDomain<T extends Doc> (domain: string, query: AnyLayout, options?: AnyLayout): Promise<T[]> {
+    return this.proxyStorage.findInDomain(domain, query, options)
   }
 
   /**
