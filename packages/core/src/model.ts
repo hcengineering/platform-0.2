@@ -14,7 +14,7 @@
 //
 
 import { generateId } from './objectid'
-import { AnyLayout, Class, Classifier, ClassifierKind, Doc, Mixin, Obj, PropertyType, Ref, Storage, Index } from './core'
+import { AnyLayout, Class, Classifier, ClassifierKind, Doc, Mixin, Obj, PropertyType, Ref, Storage } from './core'
 
 export function mixinKey (mixin: Ref<Mixin<Doc>>, key: string): string {
   return key + '|' + mixin.replace('.', '~')

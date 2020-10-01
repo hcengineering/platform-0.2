@@ -138,5 +138,5 @@ export interface Storage {
   update (_class: Ref<Class<Doc>>, selector: object, attributes: any): Promise<void>
   remove (_class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<void>
 
-  find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]>
+  find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout, options?: AnyLayout): Promise<T[]>
 }

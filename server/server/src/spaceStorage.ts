@@ -38,7 +38,7 @@ export class SpaceStorage implements Storage {
     return this.proxyStorage.remove(_class, _id)
   }
 
-  find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
-    return this.proxyStorage.find(_class, query)
+  find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout, options?: AnyLayout): Promise<T[]> {
+    return this.proxyStorage.find(_class, query, options)
   }
 }
