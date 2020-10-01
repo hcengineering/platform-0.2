@@ -37,7 +37,7 @@
 	$: component = perspectives.find((h) => h._id === current)?.component
 
 	function handleKeydown(ev: KeyboardEvent) {
-    if (ev.key === 'S') {
+    if (ev.code === 'KeyS' && ev.ctrlKey) {
 			uiService.showModal(Spotlight, {})
     }
 	}
