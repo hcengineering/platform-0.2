@@ -20,9 +20,9 @@ export class SecurityIndex implements Index {
   private storage: SpaceStorage
   private account: string
 
-  constructor (account: string, store: SpaceStorage) {
+  constructor (account: string, storage: SpaceStorage) {
     this.account = account
-    this.storage = store
+    this.storage = storage
   }
 
   tx (tx: Tx): Promise<any> {
