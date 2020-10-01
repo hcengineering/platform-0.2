@@ -43,10 +43,6 @@ export class SpaceStorage implements Storage {
     return this.proxyStorage.find(_class, query, options)
   }
 
-  findInDomain<T extends Doc> (domain: string, query: AnyLayout, options?: AnyLayout): Promise<T[]> {
-    return this.proxyStorage.findInDomain(domain, query, options)
-  }
-
   /**
    * Gets spaces of the given user account.
    *

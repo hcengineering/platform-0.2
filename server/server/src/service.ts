@@ -134,13 +134,21 @@ export async function connect (uri: string, dbName: string, account: string, ws:
 
     // C O R E  P R O T O C O L
 
-    find (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc[]> {
-      return securityIndex.find(_class, query)
+    async find (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc[]> {
+      if (await securityIndex.filterQuery(_class, query)) {
+        return mongoStorage.find(_class, query)
+      }
+      return []
     },
 
-    findOne (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc | undefined> {
-      // TODO: more effective implementation is possible
-      return this.find(_class, query).then(result => result.length > 0 ? result[0] : undefined)
+    async findOne (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc | undefined> {
+      if (await securityIndex.filterQuery(_class, query)) {
+        const result = await mongoStorage.findOne(_class, query)
+        if (result) {
+          return result
+        }
+      }
+      return undefined
     },
 
     async tx (tx: Tx): Promise<void> {
@@ -164,10 +172,17 @@ export async function connect (uri: string, dbName: string, account: string, ws:
 
     async loadDomain (domain: string): Promise<Doc[]> {
       console.log('loadDomain:', domain)
-      if (domain === MODEL_DOMAIN)
-        return modelDb.dump()
 
-      return securityIndex.loadDomain(domain)
+      if (domain === MODEL_DOMAIN) {
+        return modelDb.dump()
+      }
+      const query = {}
+      const anyClassExceptSpace = '' as Ref<Class<Doc>>
+
+      if (await securityIndex.filterQuery(domain === 'space' ? CORE_CLASS_SPACE : anyClassExceptSpace, query)) {
+        return mongoStorage.findInDomain(domain, query)
+      }
+      return []
     },
 
     // C O N T R O L

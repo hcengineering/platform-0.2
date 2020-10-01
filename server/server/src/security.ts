@@ -30,7 +30,15 @@ export class SecurityIndex implements Index {
     return Promise.resolve()
   }
 
-  async find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
+  /**
+   * Filters the given query to satisfy current user account rights.
+   * The result query can be used to request objects the user has access to from the storage.
+   *
+   * @param _class the object's class to request
+   * @param query the query to filter
+   * @returns true if the query satisfies user's rights and can be used to request objects from the storage, false otherwise
+   */
+  async filterQuery (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<boolean> {
     const userSpaces = await this.storage.getUserSpaces(this.account)
     const spaceKey = this.getSpaceKey(_class)
 
@@ -40,7 +48,7 @@ export class SecurityIndex implements Index {
 
       if (userSpaces.indexOf(spaceInQuery) < 0) {
         // the requested space is NOT in the list of available to the user
-        return []
+        return false
       }
       // else OK, use that filter to query
     } else {
@@ -48,19 +56,11 @@ export class SecurityIndex implements Index {
       query[spaceKey] = { $in: userSpaces }
     }
 
-    return this.storage.find(_class, query)
-  }
-
-  async loadDomain (domain: string): Promise<Doc[]> {
-    const spaceKey = this.getSpaceKey(domain === 'space' ? CORE_CLASS_SPACE : '' as Ref<Class<Doc>>)
-    const mongoQuery = {} as any
-    mongoQuery[spaceKey] = { $in: await this.storage.getUserSpaces(this.account) }
-    return this.storage.findInDomain(domain, mongoQuery)
+    return true
   }
 
   private getSpaceKey (_class: Ref<Class<Doc>>): string {
     // for Space objects use _id to filter available ones
     return _class === CORE_CLASS_SPACE ? '_id' : '_space'
   }
-
 }
