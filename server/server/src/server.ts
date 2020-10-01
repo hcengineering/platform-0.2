@@ -104,11 +104,24 @@ export function start (port: number, dbUri: string, host?: string) {
     ws.on('message', async (msg: string) => {
       const request = getRequest(msg)
       const f = (await service)[request.method]
-      const result = await f.apply(null, request.params || [])
-      ws.send(makeResponse({
-        id: request.id,
-        result
-      }))
+
+      f.apply(null, request.params || [])
+        .then(result => {
+          ws.send(makeResponse({
+            id: request.id,
+            result
+          }))
+        })
+        .catch(err => {
+          ws.send(makeResponse({
+            id: request.id,
+            error: {
+              code: 0, // TODO: specify error numbers depending on exception type
+              message: err.message
+            }
+          }))
+        })
+
     })
   })
 

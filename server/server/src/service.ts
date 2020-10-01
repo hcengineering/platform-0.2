@@ -155,9 +155,8 @@ export async function connect (uri: string, dbName: string, account: string, ws:
       const checkRightsResult = await checkRightsForTx(tx)
 
       if (checkRightsResult.error) {
-        // TODO: reply with error response here
         console.log(checkRightsResult.error)
-        return
+        throw new Error(checkRightsResult.error)
       }
 
       // A space whose object will be modified by this transaction.
