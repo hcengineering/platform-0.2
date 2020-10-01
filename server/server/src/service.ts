@@ -99,18 +99,12 @@ export async function connect (uri: string, dbName: string, account: string, ws:
   }
 
   async function find (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc[]> {
-    const domain = memdb.getDomain(_class)
-    const cls = memdb.getClass(_class)
-    const q = {}
-    memdb.assign(q, _class, query)
-
-    const mongoQuery = { ...q, _class: cls}
     const userSpaces = await getUserSpaces()
     const spaceKey = getSpaceKey(_class)
 
-    if (spaceKey in mongoQuery) {
-      // check user-given '_space' filter
-      const spaceInQuery = (mongoQuery as any)[spaceKey]
+    if (spaceKey in query) {
+      // check user-given filter by space
+      const spaceInQuery = query[spaceKey] as Ref<Space>
 
       if (userSpaces.indexOf(spaceInQuery) < 0) {
         // the requested space is NOT in the list of available to the user!
@@ -118,11 +112,11 @@ export async function connect (uri: string, dbName: string, account: string, ws:
       }
       // else OK, use that filter to query
     } else {
-      // no user-given '_space' filter, use all spaces available to the user
-      (mongoQuery as any)[spaceKey] = { $in: userSpaces }
+      // the user didn't provide any filter by space, use all spaces available to the user
+      query[spaceKey] = { $in: userSpaces }
     }
 
-    return db.collection(domain).find(mongoQuery).toArray()
+    return mongoStorage.find(_class, query)
   }
 
   const mongoStorage: Storage = {
@@ -153,7 +147,11 @@ export async function connect (uri: string, dbName: string, account: string, ws:
     },
 
     async find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
-      throw new Error('find not implemented')
+      const domain = memdb.getDomain(_class)
+      const cls = memdb.getClass(_class)
+      const q = {}
+      memdb.assign(q, _class, query)
+      return db.collection(domain).find({ ...q, _class: cls}).toArray()
     }
   }
 
