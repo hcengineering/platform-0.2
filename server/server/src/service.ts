@@ -25,10 +25,6 @@ import { SpaceStorage } from './spaceStorage'
 import { MongoStorage } from './mongo'
 
 
-interface CommitInfo {
-  created: Doc[]
-}
-
 export interface ClientControl {
   ping (): Promise<void>
   send (response: Response<unknown>): void
