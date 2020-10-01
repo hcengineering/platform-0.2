@@ -66,7 +66,8 @@ export default async (platform: Platform): Promise<CoreService> => {
   domains.set(TITLE_DOMAIN, qTitles)
   domains.set(BACKLINKS_DOMAIN, qGraph)
 
-  const txProcessor = new TxProcessor([
+  const txProcessor = new TxProcessor()
+  txProcessor.add([
     new TxIndex(qCache),
     new SpaceIndex(model, qCache),
     new VDocIndex(model, qCache),

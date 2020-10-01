@@ -113,6 +113,7 @@ export function start (port: number, dbUri: string, host?: string) {
           }))
         })
         .catch(err => {
+          console.log('Error caught:', err)
           ws.send(makeResponse({
             id: request.id,
             error: {

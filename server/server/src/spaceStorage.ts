@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Class, CORE_CLASS_SPACE, Doc, Ref, Space, Storage } from '@anticrm/core'
+import { AnyLayout, Class, CORE_CLASS_SPACE, Doc, Ref, Space, Storage, Tx } from '@anticrm/core'
 import { MongoStorage } from './mongo'
 
 export class SpaceStorage implements Storage {
@@ -43,10 +43,15 @@ export class SpaceStorage implements Storage {
     return this.proxyStorage.find(_class, query, options)
   }
 
+  findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout, options?: AnyLayout): Promise<T|null> {
+    return this.proxyStorage.findOne(_class, query, options)
+  }
+
   /**
-   * Gets spaces of the given user account.
+   * Gets Ids of spaces that the given user account has access to.
    *
    * @param userAccount the user account to get spaces for
+   * @returns the list of space Ids
    */
   async getUserSpaces (userAccount: string): Promise<Ref<Space>[]> {
     if (!userAccount || userAccount.length == 0) {
@@ -71,5 +76,34 @@ export class SpaceStorage implements Storage {
     }
 
     return userSpaceIds
+  }
+
+  /**
+   * Gets list of user accounts that have access to the given space.
+   *
+   * @param space the space Id to ge list of user account for
+   * @returns the list of related user accounts
+   */
+  async getSpaceUsers (space: Ref<Space>): Promise<string[]> {
+    const getOnlyUsersOption = { projection: { users: true }} as unknown as AnyLayout
+    const doc = await this.findOne(CORE_CLASS_SPACE, { _id: space }, getOnlyUsersOption)
+    return doc && doc.users ? doc.users : []
+  }
+
+  /**
+   * Gets space Id of the given object.
+   *
+   * @param _class the object's class
+   * @param _id the object's Id
+   * @returns the space Id that the object belongs to
+   */
+  async getObjectSpace (_class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<Ref<Space>> {
+    if (_class === CORE_CLASS_SPACE) {
+      return _id as Ref<Space>
+    }
+
+    const getOnlySpaceOption = { projection: { _space: true }} as unknown as AnyLayout
+    const doc = await this.findOne(_class, { _id }, getOnlySpaceOption)
+    return doc ? (doc as any)._space : null
   }
 }

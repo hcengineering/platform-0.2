@@ -22,15 +22,35 @@ export interface CoreProtocol {
   loadDomain (domain: string, index?: string, direction?: string): Promise<Doc[]>
 }
 
+/**
+ * Processor of incoming transactions.
+ */
 export class TxProcessor {
-  private indices: Index[]
+  private indices: Index[][] = []
 
-  constructor (indices: Index[]) {
-    this.indices = indices
+  /**
+   * Adds new bunch of indices to process a transaction.
+   * All added bunches are run sequentially, in order, but indices inside every bunch process the transaction in parallel.
+   *
+   * @param indices the bunch of indicess for transaction processing
+   * @returns the processor instance itself
+   */
+  add (indices: Index[]) {
+    this.indices.push(indices)
+    return this
   }
 
-  process (tx: Tx): Promise<any> {
-    return Promise.all(this.indices.map(index => index.tx(tx)))
+  /**
+   * Processes the incoming transaction via stored bunches of indices.
+   *
+   * @param tx the transaction to process
+   * @returns promise of array of transaction processing results
+   */
+  async process (tx: Tx): Promise<any> {
+    const result: any[] = []
+    for (const bunch of this.indices) {
+      result.concat(await Promise.all(bunch.map(index => index.tx(tx))))
+    }
+    return result
   }
-
 }

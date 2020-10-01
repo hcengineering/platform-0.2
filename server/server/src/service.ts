@@ -14,8 +14,7 @@
 //
 
 import { Ref, Class, Doc, AnyLayout, MODEL_DOMAIN, CoreProtocol, Tx, TxProcessor, ModelIndex,
-  Space, CORE_CLASS_SPACE, CORE_CLASS_UPDATETX, UpdateTx, CORE_CLASS_CREATETX, CreateTx,
-  CORE_CLASS_PUSHTX, CORE_CLASS_DELETETX, PushTx, SpaceIndex } from '@anticrm/core'
+ CORE_CLASS_SPACE, SpaceIndex } from '@anticrm/core'
 import { VDocIndex, TitleIndex, TextIndex, TxIndex } from '@anticrm/core'
 
 import WebSocket from 'ws'
@@ -41,94 +40,17 @@ export async function connect (uri: string, dbName: string, account: string, ws:
   const spaceStorage = new SpaceStorage(mongoStorage)
   const securityIndex = new SecurityIndex(account, spaceStorage)
 
-  const txProcessor = new TxProcessor([
-    new TxIndex(mongoStorage),
-    new SpaceIndex(modelDb, spaceStorage),
-    new VDocIndex(modelDb, mongoStorage),
-    new TitleIndex(modelDb, mongoStorage),
-    new TextIndex(modelDb, mongoStorage),
-    new ModelIndex(modelDb, mongoStorage)
-  ])
-
-  // TODO: move to SpaceStorage/SecurityIndex
-  function getSpaceKey (_class: Ref<Class<Doc>>): string {
-    // for Space objects use their Id to filter available ones
-    return _class === CORE_CLASS_SPACE ? '_id' : '_space'
-  }
-
-  // TODO: move to SpaceStorage/SecurityIndex
-  async function getSpaceUsers (space: Ref<Space>): Promise<string[]> {
-    const getOnlyUsersOption = { projection: { users: true }} as unknown as AnyLayout
-    const doc = await mongoStorage.findOne(CORE_CLASS_SPACE, { _id: space }, getOnlyUsersOption)
-    return doc && doc.users ? doc.users : []
-  }
-
-  // TODO: move to SpaceStorage/SecurityIndex
-  async function getObjectSpace (_class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<Ref<Space>> {
-    if (_class === CORE_CLASS_SPACE) {
-      return _id as Ref<Space>
-    }
-
-    const getOnlySpaceOption = { projection: { _space: true }} as unknown as AnyLayout
-    const doc = await mongoStorage.findOne(_class, { _id }, getOnlySpaceOption)
-    return doc ? (doc as any)._space : null
-  }
-
-  // TODO move to SecurityIndex
-  interface CheckRightsResult {
-    objectSpace?: Ref<Space>
-    error?: string
-  }
-
-  // TODO move to SecurityIndex
-  async function checkRightsToModify (_class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<CheckRightsResult> {
-    const objectSpace = await getObjectSpace(_class, _id)
-
-    if (objectSpace && (await spaceStorage.getUserSpaces(account)).indexOf(objectSpace) < 0) {
-      return {
-        error: `The account '${account}' does not have access to the space '${objectSpace}' where it wanted to modify the object '${_id}'`
-      }
-    }
-
-    return { objectSpace }
-  }
-
-  // TODO move to SecurityIndex
-  async function checkRightsToCreate (object: Doc): Promise<CheckRightsResult> {
-    let objectSpace: Ref<Space> = undefined as unknown as Ref<Space>
-    const spaceKey = getSpaceKey(object._class)
-
-    if (spaceKey in object) {
-      objectSpace = (object as any)[spaceKey]
-
-      if (object._class !== CORE_CLASS_SPACE && objectSpace && (await spaceStorage.getUserSpaces(account)).indexOf(objectSpace) < 0) {
-        return {
-          error: `The account '${account}' does not have access to the space '${objectSpace}' where it wanted to create the object '${object._id}'`
-        }
-      }
-    } // else no space provided, all accounts will have access to the created object
-
-    return { objectSpace }
-  }
-
-  // TODO move to SecurityIndex
-  async function checkRightsForTx (tx: Tx): Promise<CheckRightsResult> {
-    switch (tx._class) {
-      case CORE_CLASS_CREATETX:
-        return checkRightsToCreate((tx as CreateTx).object)
-      case CORE_CLASS_UPDATETX:
-        const updateTx = tx as UpdateTx
-        return checkRightsToModify(updateTx._objectClass, updateTx._objectId)
-      case CORE_CLASS_PUSHTX:
-        const pushTx = tx as PushTx
-        return checkRightsToModify(pushTx._objectClass, pushTx._objectId)
-      case CORE_CLASS_DELETETX:
-        // TODO
-        return {}
-      default:
-        return { error: `Bad transaction type '${tx._class}'` }
-    }
-  }
+  const txProcessor = new TxProcessor()
+  txProcessor
+    .add([securityIndex])
+    .add([
+      new TxIndex(mongoStorage),
+      new SpaceIndex(modelDb, spaceStorage),
+      new VDocIndex(modelDb, mongoStorage),
+      new TitleIndex(modelDb, mongoStorage),
+      new TextIndex(modelDb, mongoStorage),
+      new ModelIndex(modelDb, mongoStorage)
+    ])
 
   const clientControl = {
 
@@ -152,20 +74,11 @@ export async function connect (uri: string, dbName: string, account: string, ws:
     },
 
     async tx (tx: Tx): Promise<void> {
-      const checkRightsResult = await checkRightsForTx(tx)
-
-      if (checkRightsResult.error) {
-        console.log(checkRightsResult.error)
-        throw new Error(checkRightsResult.error)
-      }
-
-      // A space whose object will be modified by this transaction.
-      // All clients that have access to this space will get notifications about the change.
-      const spaceTouched = checkRightsResult.objectSpace
-
       return txProcessor.process(tx).then(async () => {
-        const spaceUsers = spaceTouched ? await getSpaceUsers(spaceTouched) : []
-        server.broadcast(clientControl, spaceUsers, { result: tx })
+        // all active connecitons having access to this space should receive notification about the change
+        const spaceTouchedByTransaction = tx._space
+        const usersToNotify = spaceTouchedByTransaction ? await spaceStorage.getSpaceUsers(spaceTouchedByTransaction) : []
+        server.broadcast(clientControl, usersToNotify, { result: tx })
       })
     },
 
