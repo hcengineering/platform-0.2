@@ -50,7 +50,7 @@ export default async (platform: Platform): Promise<CoreService> => {
   // Storages
 
   const model = new ModelDb()
-  const titles = new Titles()
+  const titles = new Titles(model)
   const graph = new Graph()
   const cache = new Cache(coreProtocol)
 

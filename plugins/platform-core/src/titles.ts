@@ -15,6 +15,7 @@
 
 import { Ref, Classifier, Doc, Class, Title, Storage, AnyLayout } from '@anticrm/core'
 import core from '.'
+import { ModelDb } from './modeldb'
 
 export interface Node {
   _class: Ref<Classifier<Doc>>
@@ -25,7 +26,15 @@ export interface Node {
 export class Titles implements Storage {
 
   private graph = new Map<Ref<Doc>, Node>()
-  // private titleRef = ref(0)
+  private model: ModelDb
+
+  constructor (model: ModelDb) {
+    this.model = model
+  }
+
+  private implements (node: Node, _class: Ref<Classifier<Doc>> | undefined): boolean {
+    return _class ? this.model.is(node._class, _class) : true
+  }
 
   async find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
     const result = [] as Doc[]
@@ -34,9 +43,9 @@ export class Titles implements Storage {
     }
     const prefix = query['title'] as string
     for (const node of this.graph.values()) {
-      if (node.title.startsWith(prefix)) {
+      if (node.title.startsWith(prefix) && this.implements(node, query._objectClass as Ref<Classifier<Doc>>)) {
         const title: Title = {
-          _id: 'transient' as Ref<Doc>,
+          _id: ('title_' + node._id) as Ref<Doc>,
           _class: core.class.Title,
           _objectClass: node._class,
           _objectId: node._id,
