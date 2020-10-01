@@ -23,6 +23,7 @@ import { VDocIndex, TitleIndex, TextIndex, TxIndex } from '@anticrm/core'
 import WebSocket from 'ws'
 import { makeResponse, Response } from './rpc'
 import { PlatformServer } from './server'
+import { SpaceStorage } from './spaceStorage'
 
 
 interface CommitInfo {
@@ -158,7 +159,7 @@ export async function connect (uri: string, dbName: string, account: string, ws:
 
   const txProcessor = new TxProcessor([
     new TxIndex(mongoStorage),
-    new SpaceIndex(memdb, mongoStorage),
+    new SpaceIndex(memdb, new SpaceStorage(mongoStorage)),
     new VDocIndex(memdb, mongoStorage),
     new TitleIndex(memdb, mongoStorage),
     new TextIndex(memdb, mongoStorage),
