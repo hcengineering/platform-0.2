@@ -13,17 +13,16 @@
 // limitations under the License.
 //
 
-import { MongoClient } from 'mongodb'
-
-import { Ref, Class, Doc, Model, AnyLayout, MODEL_DOMAIN, CoreProtocol, Tx, TxProcessor, Storage, ModelIndex,
-  Space, CORE_CLASS_SPACE, CORE_CLASS_UPDATETX, UpdateTx, CORE_CLASS_CREATETX, CreateTx, Attribute,
-  CORE_CLASS_ARRAYOF, ArrayOf, CORE_CLASS_PUSHTX, CORE_CLASS_DELETETX, PushTx, SpaceIndex } from '@anticrm/core'
+import { Ref, Class, Doc, AnyLayout, MODEL_DOMAIN, CoreProtocol, Tx, TxProcessor, ModelIndex,
+  Space, CORE_CLASS_SPACE, CORE_CLASS_UPDATETX, UpdateTx, CORE_CLASS_CREATETX, CreateTx,
+  CORE_CLASS_PUSHTX, CORE_CLASS_DELETETX, PushTx, SpaceIndex } from '@anticrm/core'
 import { VDocIndex, TitleIndex, TextIndex, TxIndex } from '@anticrm/core'
 
 import WebSocket from 'ws'
 import { makeResponse, Response } from './rpc'
 import { PlatformServer } from './server'
 import { SpaceStorage } from './spaceStorage'
+import { MongoStorage } from './mongo'
 
 
 interface CommitInfo {
@@ -37,33 +36,17 @@ export interface ClientControl {
 }
 
 export async function connect (uri: string, dbName: string, account: string, ws: WebSocket, server: PlatformServer): Promise<CoreProtocol & ClientControl> {
-  console.log('connecting to ' + uri.substring(25))
-  console.log('use dbName ' + dbName)
-  console.log('connected client account ' + account)
-  const client = await MongoClient.connect(uri, { useUnifiedTopology: true })
-  const db = client.db(dbName)
 
-  const memdb = new Model(MODEL_DOMAIN)
-  console.log('loading model...')
-  const model = await db.collection('model').find({}).toArray()
-  console.log('model loaded.')
-  memdb.loadModel(model)
-
-  // const graph = new Graph(memdb)
-  // console.log('loading graph...')
-  // db.collection(CoreDomain.Tx).find({}).forEach(tx => graph.updateGraph(tx), () => console.log(graph.dump()))
-  // console.log('graph loaded.')
+  const mongoStorage = new MongoStorage()
+  await mongoStorage.initialize(uri, dbName)
+  const modelDb = mongoStorage.getModelDb()
 
   async function getUserSpaces (): Promise<Ref<Space>[]> {
     // find spaces where [users] contain the current account
 
-    const spaceClassId = CORE_CLASS_SPACE
-    const domain = memdb.getDomain(spaceClassId)
-    const cls = memdb.getClass(spaceClassId)
-
-    const spaces = await db.collection(domain)
-      .find({ users: { $elemMatch: { $eq: account }}, _class: cls }, { projection: { _id: true }})
-      .toArray()
+    const usersQuery = { users: { $elemMatch: { $eq: account }}} as unknown as AnyLayout
+    const getOnlyIdsOption = { projection: { _id: true }} as unknown as AnyLayout
+    const spaces: Space[] = await mongoStorage.find(CORE_CLASS_SPACE, usersQuery, getOnlyIdsOption)
 
     // pass null and undefined here to obtain documents not assigned to any space
     // TODO: remove 'General' and 'Random' when implement public spaces concept
@@ -74,7 +57,7 @@ export async function connect (uri: string, dbName: string, account: string, ws:
       'space:workbench.Random' as Ref<Space>
     ]
 
-    return spaces ? userSpaceIds.concat(spaces.map(space => space._id)) : userSpaceIds
+    return userSpaceIds.concat(spaces.map(space => space._id as Ref<Space>))
   }
 
   function getSpaceKey (_class: Ref<Class<Doc>>): string {
@@ -83,19 +66,19 @@ export async function connect (uri: string, dbName: string, account: string, ws:
   }
 
   async function getSpaceUsers (space: Ref<Space>): Promise<string[]> {
-    const spaceClassId = CORE_CLASS_SPACE
-    const domain = memdb.getDomain(spaceClassId)
-    const doc = await db.collection(domain).findOne({ _id: space }, { projection: { users: true }})
-    return doc ? doc.users : []
+    const getOnlyUsersOption = { projection: { users: true }} as unknown as AnyLayout
+    const doc = await mongoStorage.findOne(CORE_CLASS_SPACE, { _id: space }, getOnlyUsersOption)
+    return doc && doc.users ? doc.users : []
   }
 
   async function getObjectSpace (_class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<Ref<Space>> {
     if (_class === CORE_CLASS_SPACE) {
       return _id as Ref<Space>
     }
-    const domain = memdb.getDomain(_class)
-    const doc = await db.collection(domain).findOne({ _id }, { projection: { _space: true }})
-    return doc ? doc._space : null
+
+    const getOnlySpaceOption = { projection: { _space: true }} as unknown as AnyLayout
+    const doc = await mongoStorage.findOne(_class, { _id }, getOnlySpaceOption)
+    return doc ? (doc as any)._space : null
   }
 
   async function find (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc[]> {
@@ -119,49 +102,13 @@ export async function connect (uri: string, dbName: string, account: string, ws:
     return mongoStorage.find(_class, query)
   }
 
-  const mongoStorage: Storage = {
-    async store (doc: Doc): Promise<any> {
-      const domain = memdb.getDomain(doc._class)
-      console.log('STORE:', domain, doc)
-      return db.collection(domain).insertOne(doc)
-    },
-
-    async push (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: any): Promise<any> {
-      const domain = memdb.getDomain(_class)
-      const clazz = memdb.get(_class) as Class<Doc>
-      const attr = (clazz._attributes as any)[attribute] as Attribute
-      const addToUniqueCollection = attr && memdb.is(attr.type._class, CORE_CLASS_ARRAYOF) && (attr.type as ArrayOf<any>).unique
-
-      const updateValue = { [attribute]: attributes }
-      const updateQuery = addToUniqueCollection ? { $addToSet : updateValue } : { $push: updateValue }
-      return db.collection(domain).updateOne({ _id }, updateQuery)
-    },
-
-    async update (_class: Ref<Class<Doc>>, selector: object, attributes: any): Promise<any> {
-      const domain = memdb.getDomain(_class)
-      return db.collection(domain).updateOne(selector, { $set: attributes })
-    },
-
-    async remove (_class: Ref<Class<Doc>>, doc: Ref<Doc>): Promise<any> {
-      throw new Error('Not implemented')
-    },
-
-    async find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
-      const domain = memdb.getDomain(_class)
-      const cls = memdb.getClass(_class)
-      const q = {}
-      memdb.assign(q, _class, query)
-      return db.collection(domain).find({ ...q, _class: cls}).toArray()
-    }
-  }
-
   const txProcessor = new TxProcessor([
     new TxIndex(mongoStorage),
-    new SpaceIndex(memdb, new SpaceStorage(mongoStorage)),
-    new VDocIndex(memdb, mongoStorage),
-    new TitleIndex(memdb, mongoStorage),
-    new TextIndex(memdb, mongoStorage),
-    new ModelIndex(memdb, mongoStorage)
+    new SpaceIndex(modelDb, new SpaceStorage(mongoStorage)),
+    new VDocIndex(modelDb, mongoStorage),
+    new TitleIndex(modelDb, mongoStorage),
+    new TextIndex(modelDb, mongoStorage),
+    new ModelIndex(modelDb, mongoStorage)
   ])
 
   interface CheckRightsResult {
@@ -247,14 +194,14 @@ export async function connect (uri: string, dbName: string, account: string, ws:
 
     async loadDomain (domain: string): Promise<Doc[]> {
       if (domain === MODEL_DOMAIN)
-        return memdb.dump()
+        return modelDb.dump()
 
       console.log('loadDomain:', domain)
       const spaceKey = getSpaceKey(domain === 'space' ? CORE_CLASS_SPACE : '' as Ref<Class<Doc>>)
       const mongoQuery = {} as any
       (mongoQuery as any)[spaceKey] = { $in: await getUserSpaces() }
 
-      return db.collection(domain).find(mongoQuery).toArray()
+      return mongoStorage.findInDomain(domain, mongoQuery)
     },
 
     // C O N T R O L
@@ -267,7 +214,7 @@ export async function connect (uri: string, dbName: string, account: string, ws:
 
     // TODO rename to `close`
     shutdown (): Promise<void> {
-      return client.close()
+      return mongoStorage.close()
     },
 
     serverShutdown (password: string): Promise<void> {
