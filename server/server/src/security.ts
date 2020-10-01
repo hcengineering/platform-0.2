@@ -13,16 +13,16 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Class, Doc, Index, Ref, Tx } from '@anticrm/core'
+import { AnyLayout, Class, CORE_CLASS_SPACE, Doc, Index, Ref, Space, Tx } from '@anticrm/core'
 import { SpaceStorage } from './spaceStorage'
 
 export class SecurityIndex implements Index {
   private storage: SpaceStorage
   private account: string
 
-  constructor (store: SpaceStorage, account: string) {
-    this.storage = store
+  constructor (account: string, store: SpaceStorage) {
     this.account = account
+    this.storage = store
   }
 
   tx (tx: Tx): Promise<any> {
@@ -30,8 +30,29 @@ export class SecurityIndex implements Index {
     return Promise.resolve()
   }
 
-  find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
-    // TODO: add security filter to the query
+  async find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
+    const userSpaces = await this.storage.getUserSpaces(this.account)
+    const spaceKey = this.getSpaceKey(_class)
+
+    // check filter by space in the request
+    if (spaceKey in query) {
+      const spaceInQuery = query[spaceKey] as Ref<Space>
+
+      if (userSpaces.indexOf(spaceInQuery) < 0) {
+        // the requested space is NOT in the list of available to the user
+        return []
+      }
+      // else OK, use that filter to query
+    } else {
+      // no space filter provided, use all spaces available to the user
+      query[spaceKey] = { $in: userSpaces }
+    }
+
     return this.storage.find(_class, query)
+  }
+
+  private getSpaceKey (_class: Ref<Class<Doc>>): string {
+    // for Space objects use _id to filter available ones
+    return _class === CORE_CLASS_SPACE ? '_id' : '_space'
   }
 }

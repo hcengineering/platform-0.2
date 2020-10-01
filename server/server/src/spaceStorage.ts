@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Class, Doc, Ref, Storage } from '@anticrm/core'
+import { AnyLayout, Class, CORE_CLASS_SPACE, Doc, Ref, Space, Storage } from '@anticrm/core'
 
 export class SpaceStorage implements Storage {
   private proxyStorage: Storage
@@ -40,5 +40,35 @@ export class SpaceStorage implements Storage {
 
   find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout, options?: AnyLayout): Promise<T[]> {
     return this.proxyStorage.find(_class, query, options)
+  }
+
+  /**
+   * Gets spaces of the given user account.
+   *
+   * @param userAccount the user account to get spaces for
+   */
+  async getUserSpaces (userAccount: string): Promise<Ref<Space>[]> {
+    if (!userAccount || userAccount.length == 0) {
+      return []
+    }
+
+    const usersQuery = { users: { $elemMatch: { $eq: userAccount }}} as unknown as AnyLayout
+    const getOnlyIdsOption = { projection: { _id: true }} as unknown as AnyLayout
+    const spaces: Space[] = await this.find(CORE_CLASS_SPACE, usersQuery, getOnlyIdsOption)
+
+    // pass null and undefined here to obtain documents not assigned to any space
+    // TODO: remove 'General' and 'Random' when implement public spaces concept
+    let userSpaceIds = [
+      null as unknown as Ref<Space>,
+      undefined as unknown as Ref<Space>,
+      'space:workbench.General' as Ref<Space>,
+      'space:workbench.Random' as Ref<Space>
+    ]
+
+    for (const space of spaces) {
+      userSpaceIds.push(space._id as Ref<Space>)
+    }
+
+    return userSpaceIds
   }
 }

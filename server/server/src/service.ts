@@ -23,6 +23,7 @@ import { makeResponse, Response } from './rpc'
 import { PlatformServer } from './server'
 import { SpaceStorage } from './spaceStorage'
 import { MongoStorage } from './mongo'
+import { SecurityIndex } from './security'
 
 
 export interface ClientControl {
@@ -37,36 +38,32 @@ export async function connect (uri: string, dbName: string, account: string, ws:
   await mongoStorage.initialize(uri, dbName)
   const modelDb = mongoStorage.getModelDb()
 
-  async function getUserSpaces (): Promise<Ref<Space>[]> {
-    // find spaces where [users] contain the current account
+  const spaceStorage = new SpaceStorage(mongoStorage)
+  const securityIndex = new SecurityIndex(account, spaceStorage)
 
-    const usersQuery = { users: { $elemMatch: { $eq: account }}} as unknown as AnyLayout
-    const getOnlyIdsOption = { projection: { _id: true }} as unknown as AnyLayout
-    const spaces: Space[] = await mongoStorage.find(CORE_CLASS_SPACE, usersQuery, getOnlyIdsOption)
+  const txProcessor = new TxProcessor([
+    new TxIndex(mongoStorage),
+    new SpaceIndex(modelDb, spaceStorage),
+    new VDocIndex(modelDb, mongoStorage),
+    new TitleIndex(modelDb, mongoStorage),
+    new TextIndex(modelDb, mongoStorage),
+    new ModelIndex(modelDb, mongoStorage)
+  ])
 
-    // pass null and undefined here to obtain documents not assigned to any space
-    // TODO: remove 'General' and 'Random' when implement public spaces concept
-    let userSpaceIds: Ref<Space>[] = [
-      null as unknown as Ref<Space>,
-      undefined as unknown as Ref<Space>,
-      'space:workbench.General' as Ref<Space>,
-      'space:workbench.Random' as Ref<Space>
-    ]
-
-    return userSpaceIds.concat(spaces.map(space => space._id as Ref<Space>))
-  }
-
+  // TODO: move to SpaceStorage/SecurityIndex
   function getSpaceKey (_class: Ref<Class<Doc>>): string {
     // for Space objects use their Id to filter available ones
     return _class === CORE_CLASS_SPACE ? '_id' : '_space'
   }
 
+  // TODO: move to SpaceStorage/SecurityIndex
   async function getSpaceUsers (space: Ref<Space>): Promise<string[]> {
     const getOnlyUsersOption = { projection: { users: true }} as unknown as AnyLayout
     const doc = await mongoStorage.findOne(CORE_CLASS_SPACE, { _id: space }, getOnlyUsersOption)
     return doc && doc.users ? doc.users : []
   }
 
+  // TODO: move to SpaceStorage/SecurityIndex
   async function getObjectSpace (_class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<Ref<Space>> {
     if (_class === CORE_CLASS_SPACE) {
       return _id as Ref<Space>
@@ -77,45 +74,17 @@ export async function connect (uri: string, dbName: string, account: string, ws:
     return doc ? (doc as any)._space : null
   }
 
-  async function find (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc[]> {
-    const userSpaces = await getUserSpaces()
-    const spaceKey = getSpaceKey(_class)
-
-    if (spaceKey in query) {
-      // check user-given filter by space
-      const spaceInQuery = query[spaceKey] as Ref<Space>
-
-      if (userSpaces.indexOf(spaceInQuery) < 0) {
-        // the requested space is NOT in the list of available to the user!
-        return []
-      }
-      // else OK, use that filter to query
-    } else {
-      // the user didn't provide any filter by space, use all spaces available to the user
-      query[spaceKey] = { $in: userSpaces }
-    }
-
-    return mongoStorage.find(_class, query)
-  }
-
-  const txProcessor = new TxProcessor([
-    new TxIndex(mongoStorage),
-    new SpaceIndex(modelDb, new SpaceStorage(mongoStorage)),
-    new VDocIndex(modelDb, mongoStorage),
-    new TitleIndex(modelDb, mongoStorage),
-    new TextIndex(modelDb, mongoStorage),
-    new ModelIndex(modelDb, mongoStorage)
-  ])
-
+  // TODO move to SecurityIndex
   interface CheckRightsResult {
     objectSpace?: Ref<Space>
     error?: string
   }
 
+  // TODO move to SecurityIndex
   async function checkRightsToModify (_class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<CheckRightsResult> {
     const objectSpace = await getObjectSpace(_class, _id)
 
-    if (objectSpace && (await getUserSpaces()).indexOf(objectSpace) < 0) {
+    if (objectSpace && (await spaceStorage.getUserSpaces(account)).indexOf(objectSpace) < 0) {
       return {
         error: `The account '${account}' does not have access to the space '${objectSpace}' where it wanted to modify the object '${_id}'`
       }
@@ -124,6 +93,7 @@ export async function connect (uri: string, dbName: string, account: string, ws:
     return { objectSpace }
   }
 
+  // TODO move to SecurityIndex
   async function checkRightsToCreate (object: Doc): Promise<CheckRightsResult> {
     let objectSpace: Ref<Space> = undefined as unknown as Ref<Space>
     const spaceKey = getSpaceKey(object._class)
@@ -131,7 +101,7 @@ export async function connect (uri: string, dbName: string, account: string, ws:
     if (spaceKey in object) {
       objectSpace = (object as any)[spaceKey]
 
-      if (object._class !== CORE_CLASS_SPACE && objectSpace && (await getUserSpaces()).indexOf(objectSpace) < 0) {
+      if (object._class !== CORE_CLASS_SPACE && objectSpace && (await spaceStorage.getUserSpaces(account)).indexOf(objectSpace) < 0) {
         return {
           error: `The account '${account}' does not have access to the space '${objectSpace}' where it wanted to create the object '${object._id}'`
         }
@@ -141,6 +111,7 @@ export async function connect (uri: string, dbName: string, account: string, ws:
     return { objectSpace }
   }
 
+  // TODO move to SecurityIndex
   async function checkRightsForTx (tx: Tx): Promise<CheckRightsResult> {
     switch (tx._class) {
       case CORE_CLASS_CREATETX:
@@ -163,10 +134,13 @@ export async function connect (uri: string, dbName: string, account: string, ws:
 
     // C O R E  P R O T O C O L
 
-    find,
+    find (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc[]> {
+      return securityIndex.find(_class, query)
+    },
 
     findOne (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc | undefined> {
-      return find(_class, query).then(result => result.length > 0 ? result[0] : undefined)
+      // TODO: more effective implementation is possible
+      return this.find(_class, query).then(result => result.length > 0 ? result[0] : undefined)
     },
 
     async tx (tx: Tx): Promise<void> {
@@ -192,10 +166,11 @@ export async function connect (uri: string, dbName: string, account: string, ws:
       if (domain === MODEL_DOMAIN)
         return modelDb.dump()
 
+      // TODO: move implementation to SecurityIndex
       console.log('loadDomain:', domain)
       const spaceKey = getSpaceKey(domain === 'space' ? CORE_CLASS_SPACE : '' as Ref<Class<Doc>>)
       const mongoQuery = {} as any
-      (mongoQuery as any)[spaceKey] = { $in: await getUserSpaces() }
+      (mongoQuery as any)[spaceKey] = { $in: await spaceStorage.getUserSpaces(account) }
 
       return mongoStorage.findInDomain(domain, mongoQuery)
     },
