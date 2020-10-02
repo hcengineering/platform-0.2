@@ -62,6 +62,12 @@ export default async (platform: Platform): Promise<CoreService> => {
     }
   })
 
+  coreProtocol.loadDomain(BACKLINKS_DOMAIN).then(docs => {
+    for (const doc of docs) {
+      graph.store(doc)
+    }
+  })
+
   const qModel = new QueriableStorage(model)
   const qTitles = new QueriableStorage(titles)
   const qGraph = new QueriableStorage(graph)

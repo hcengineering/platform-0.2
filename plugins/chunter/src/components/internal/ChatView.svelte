@@ -20,7 +20,7 @@
   import { onDestroy } from 'svelte'
   import core, { QueryResult } from '@anticrm/platform-core';
   import { Ref, Space, VDoc } from '@anticrm/core'
-  import { getChunterService, getCoreService } from '../../utils'
+  import { getChunterService, getCoreService, query } from '../../utils'
   import chunter, { Message } from '../..'
 
 
@@ -33,13 +33,13 @@
   let messages: Message[] = []
   let unsubscribe: () => void
 
-  function subscribe(queryResult: QueryResult<Message>) {
-    if (unsubscribe) unsubscribe()
-    unsubscribe = queryResult.subscribe(docs => messages = docs)
-  }
+  // function subscribe(queryResult: QueryResult<Message>) {
+  //   if (unsubscribe) unsubscribe()
+  //   unsubscribe = queryResult.subscribe(docs => messages = docs)
+  // }
 
   $: {
-    coreService.then(service => service.query(chunter.class.Message, { _space: space })).then(queryResult => subscribe(queryResult))
+    unsubscribe = query(chunter.class.Message, { _space: space }, docs => { messages = docs })
 
     // TODO: use Titles index instead of getting the whole Space object
     coreService.then(service => service.findOne(core.class.Space, { _id: space })).then(spaceObj => spaceName = spaceObj ? '#' + spaceObj.name : '')
