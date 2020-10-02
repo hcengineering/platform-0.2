@@ -53,6 +53,7 @@ export class SpaceStorage implements Storage {
    * @param userAccount the user account to get spaces for
    * @returns the list of space Ids
    */
+  // TODO: implement cache for this method
   async getUserSpaces (userAccount: string): Promise<Ref<Space>[]> {
     if (!userAccount || userAccount.length == 0) {
       return []
@@ -84,6 +85,7 @@ export class SpaceStorage implements Storage {
    * @param space the space Id to ge list of user account for
    * @returns the list of related user accounts
    */
+  // TODO: implement cache for this method
   async getSpaceUsers (space: Ref<Space>): Promise<string[]> {
     const getOnlyUsersOption = { projection: { users: true }} as unknown as AnyLayout
     const doc = await this.findOne(CORE_CLASS_SPACE, { _id: space }, getOnlyUsersOption)
