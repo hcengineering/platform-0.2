@@ -16,7 +16,7 @@
 import { Ref, Class, Doc, AnyLayout, Mixin, Obj, VDoc } from '@anticrm/core'
 import { Platform } from '@anticrm/platform'
 import { getContext } from 'svelte'
-import core, { CoreService } from '@anticrm/platform-core'
+import core, { CoreService, QueryResult } from '@anticrm/platform-core'
 import { UIService, CONTEXT_PLATFORM, CONTEXT_PLATFORM_UI, AnyComponent } from '@anticrm/platform-ui'
 import presentation, { PresentationService, ComponentExtension } from '@anticrm/presentation'
 
@@ -44,4 +44,14 @@ export function getPresentationService (): Promise<PresentationService> {
 
 export function getComponentExtension (_class: Ref<Class<Obj>>, extension: Ref<Mixin<ComponentExtension<VDoc>>>): Promise<AnyComponent> {
   return getPresentationService().then(service => service.getComponentExtension(_class, extension))
+}
+
+export function query<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout, f: (docs: T[]) => void): () => void {
+  let unsubscribe: () => void
+  function subscribe (queryResult: QueryResult<T>) {
+    if (unsubscribe) unsubscribe()
+    unsubscribe = queryResult.subscribe(f)
+  }
+  getCoreService().then(service => service.query(_class, query)).then(queryResult => subscribe(queryResult))
+  return () => { unsubscribe() }
 }
