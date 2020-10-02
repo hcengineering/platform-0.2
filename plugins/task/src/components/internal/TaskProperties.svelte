@@ -14,10 +14,11 @@
 -->
 
 <script type="ts">
-  import { Ref, Class, Obj } from '@anticrm/core'
+  import { onDestroy } from 'svelte'
+  import { Ref, Class, Obj, Backlinks } from '@anticrm/core'
   import task, { Task } from '../..'
   import core from '@anticrm/platform-core'
-  import { getPresentationService } from '../../utils'
+  import { getPresentationService, find, query } from '../../utils'
   import { AttrModel, ClassModel } from '@anticrm/presentation'
 
   import Properties from '@anticrm/presentation/src/components/internal/Properties.svelte'
@@ -35,6 +36,12 @@
       title = m.getAttribute('title')
       model = m.filterAttributes(['title']) 
     })
+
+  let backlinks: Backlinks[]
+  let unsubscribe: () => void
+  $: unsubscribe = query(core.class.Backlinks, { _objectId: object._id }, docs => { backlinks = docs } )
+
+  onDestroy(() => { if(unsubscribe) unsubscribe() })
 </script>
 
 { #if model && title }
@@ -45,5 +52,12 @@
 
 <!-- <Properties _class={task.class.Task} excludeAttributes={['title']} /> -->
 <Properties {model} bind:object={object}/>
+
+<div class="caption-2">Backlinks</div>
+
+{ #each backlinks as backlink (backlink._id) }
+  <div>{JSON.stringify(backlink)}</div>
+{ /each }
+
 { /if }
 

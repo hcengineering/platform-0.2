@@ -22,7 +22,7 @@
   import { onDestroy } from 'svelte'
   import core, { QueryResult } from '@anticrm/platform-core';
   import { AnyLayout, Ref, Space, VDoc } from '@anticrm/core'
-  import { getChunterService, getCoreService, getUIService } from '../../utils'
+  import { getChunterService, getCoreService, getUIService, query } from '../../utils'
   import chunter, { Message } from '../..'
   import contact, { User } from '@anticrm/contact'
   import ui from '@anticrm/platform-ui'
@@ -38,29 +38,6 @@
   let messages: Message[] = []
   let unsubscribeFromMessages: () => void
   let unsubscribeFromSpace: () => void
-
-  function subscribeForMessages(queryResult: QueryResult<Message>) {
-    if (unsubscribeFromMessages) {
-      unsubscribeFromMessages()
-    }
-    unsubscribeFromMessages = queryResult.subscribe(docs => messages = docs)
-  }
-
-  function subscribeForSpace(queryResult: QueryResult<Space>) {
-    if (unsubscribeFromSpace) {
-      unsubscribeFromSpace()
-    }
-    unsubscribeFromSpace = queryResult.subscribe(spaces => {
-      console.log('spacesUpdated:', spaces)
-
-      if (spaces && spaces.length > 0) {
-        onSpaceUpdated(spaces[0]) // only one space expected here
-      } else {
-        spaceName = ''
-        spaceUsers = []
-      }
-    })
-  }
 
   function onSpaceUpdated(space: Space) {
     spaceName = '#' + space.name
@@ -78,8 +55,18 @@
   }
 
   $: {
-    coreService.then(service => service.query(chunter.class.Message, { _space: space })).then(queryResult => subscribeForMessages(queryResult))
-    coreService.then(service => service.query(core.class.Space, { _id: space })).then(queryResult => subscribeForSpace(queryResult))
+    unsubscribeFromMessages = query(chunter.class.Message, { _space: space }, docs => { messages = docs })
+
+    unsubscribeFromSpace = query(core.class.Space, { _id: space }, spaces => {
+      console.log('spacesUpdated:', spaces)
+
+      if (spaces && spaces.length > 0) {
+        onSpaceUpdated(spaces[0]) // only one space expected here
+      } else {
+        spaceName = ''
+        spaceUsers = []
+      }
+    })
   }
 
   onDestroy(() => {
