@@ -14,7 +14,7 @@
 -->
 
 <script lang="ts">
-  import { Ref, Space, Doc } from '@anticrm/core'
+  import { Ref, Space, Doc, Class, VDoc } from '@anticrm/core'
   import { onDestroy } from 'svelte'
   import { find, getCoreService, getUIService } from '../../utils'
   import core from '@anticrm/platform-core'
@@ -23,12 +23,13 @@
 
   import LinkTo from '@anticrm/platform-ui/src/components/LinkTo.svelte'
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
-  import Component from '@anticrm/platform-ui/src/components/Component.svelte'
 
   import { AnyComponent } from '@anticrm/platform-ui';
 
-  import InputControl from './InputControl.svelte'
   import CreateSpace from './CreateSpace.svelte'
+  import MainComponent from '../proxies/MainComponent.svelte'
+  
+  import ObjectForm from './ObjectForm.svelte'
 
   const uiService = getUIService()
 
@@ -48,7 +49,7 @@
 
   onDestroy(() => { if (spaceUnsubscribe) spaceUnsubscribe() })
 
-  let application: Ref<Doc>
+  let application: Ref<WorkbenchApplication>
   let applications: WorkbenchApplication[] = []
   find(workbench.class.WorkbenchApplication, {}).then(docs => {applications = docs})
 
@@ -61,6 +62,10 @@
     }
     component = applications.find(a => a._id === application)?.component
   }
+
+  function id<T extends Doc>(doc: T): Ref<T> { return doc._id as Ref<T> }
+
+  let details: { _id: Ref<VDoc>, _class: Ref<Class<VDoc>> }
 
 </script>
 
@@ -84,7 +89,7 @@
     <div class="caption-3">Приложения</div>
     { #each applications as app (app._id) }
     <div class="app" class:selected={app._id === application}>
-      <a href='/' on:click|preventDefault={ e => { application = app._id } }>{app.label}</a>
+      <a href='/' on:click|preventDefault={ e => { application = id(app) } }>{app.label}</a>
     </div>
     { /each}
   </div>
@@ -92,7 +97,7 @@
   <div class="main">
     <!-- <div class="main-content"> -->
       { #if component}
-        <Component is = {component} props={{ application, space }} />
+        <MainComponent is = {component} {application} {space} on:open = { e => {details = e.detail} }/>
       { /if }
     <!-- </div>
     <div class="input-control">
@@ -102,6 +107,9 @@
 
   <aside>
     <!-- <DetailsForm v-if="details" :_class="details._class" :_id="details._id" @done="done" /> -->
+    { #if details }
+    <ObjectForm {...details} title="Title"/>
+    { /if }
   </aside>
 </div>
 

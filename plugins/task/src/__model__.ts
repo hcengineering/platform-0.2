@@ -14,7 +14,7 @@
 //
 
 import { Application } from '@anticrm/core'
-import { extendIds, ModelClass, Prop, Builder } from '@anticrm/model'
+import { extendIds, ModelClass, Prop, Builder, Primary } from '@anticrm/model'
 import core, { TVDoc } from '@anticrm/platform-core/src/__model__'
 import _task, { Task } from '.'
 import { Ref, Class, Property, StringProperty } from '@anticrm/core'
@@ -41,7 +41,7 @@ export default task
 @ModelClass(task.class.Task, core.class.VDoc, DOMAIN_TASK)
 @UX('Задача' as IntlString)
 class TTask extends TVDoc implements Task {
-  @Prop() @UX(task.string.Task_name) title!: Property<string, string>
+  @Primary() @Prop() @UX(task.string.Task_name) title!: Property<string, string>
   @Prop() @UX(task.string.Task_assignee) assignee!: Ref<User>
 }
 

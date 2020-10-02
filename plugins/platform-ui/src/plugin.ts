@@ -21,6 +21,10 @@ import { writable, derived } from 'svelte/store'
 import Root from './components/internal/Root.svelte'
 
 import { store } from './stores'
+import ui from '.'
+
+import Spinner from './components/internal/Spinner.svelte'
+import Icon from './components/Icon.svelte'
 
 /*!
  * Anticrm Platform™ UI Plugin
@@ -29,8 +33,11 @@ import { store } from './stores'
  */
 export default async (platform: Platform): Promise<UIService> => {
 
+  platform.setResource(ui.component.Icon, Icon)
+  platform.setResource(ui.component.Spinner, Spinner)
+
   function createApp (target: HTMLElement) {
-    return new Root({ target, props: { platform, ui } })
+    return new Root({ target, props: { platform, ui: uiService } })
   }
 
   function windowLocation () {
@@ -60,7 +67,7 @@ export default async (platform: Platform): Promise<UIService> => {
     store.set({ is: undefined, props: {}, element: undefined })
   }
 
-  const ui = {
+  const uiService = {
     createApp,
     getLocation,
     navigate,
@@ -68,6 +75,6 @@ export default async (platform: Platform): Promise<UIService> => {
     closeModal
   }
 
-  return ui
+  return uiService
 
 }

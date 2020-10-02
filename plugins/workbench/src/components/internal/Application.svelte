@@ -27,7 +27,7 @@
 
   export let application: Ref<WorkbenchApplication>
   export let space: Ref<Space>
-  let _id: Ref<VDoc> | undefined
+  // let _id: Ref<VDoc> | undefined
 
   const uiService = getUIService()
 
@@ -36,7 +36,7 @@
   let appInstance: WorkbenchApplication | undefined
   $: {
     findOne(workbench.class.WorkbenchApplication, { _id: application }).then(app => { appInstance = app })
-    _id = undefined
+    // _id = undefined
   }
 </script>
 
@@ -50,14 +50,15 @@
   </div>
   <ScrollView stylez="height:100%;">
     <div class="table">
-      <Table _class={appInstance.classes[0]} {space} on:open={ (evt) => { _id = evt.detail._id } }/>
+      <Table _class={appInstance.classes[0]} {space} on:open/>
+        <!-- <Table _class={appInstance.classes[0]} {space} on:open={ (evt) => { _id = evt.detail._id } }/> -->
     </div>
   </ScrollView>
-    { #if _id}
+    <!-- { #if _id}
     <div class="details">
       <ObjectForm _class={appInstance.classes[0]} title="Hello" { _id }/>
     </div>
-    { /if }
+    { /if } -->
   { /if }
 </div>
 

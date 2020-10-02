@@ -54,7 +54,7 @@
   <div class="tbody">
     { #each objects as object (object._id) }
       <div
-        class="tr" on:click={ () => dispatch('open', { _id: object._id }) }
+        class="tr" on:click={ () => dispatch('open', { _id: object._id, _class: object._class }) }
       >
       { #each model.getAttributes() as attr (attr.key) }
         <div class="td">

@@ -19,11 +19,13 @@
 	import Component from '@anticrm/platform-ui/src/components/Component.svelte'
 	import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
 	import LinkTo from '@anticrm/platform-ui/src/components/LinkTo.svelte'
+	import Spotlight from './Spotlight.svelte'
 
 	let perspectives: Perspective[] = []
 	let current: Ref<Doc>
 
-	const location = getUIService().getLocation()
+	const uiService = getUIService()
+	const location = uiService.getLocation()
 	location.subscribe((loc) => {
 		current = loc.pathname.split('/')[2] as Ref<Doc>
 	})
@@ -33,6 +35,12 @@
 	})
 
 	$: component = perspectives.find((h) => h._id === current)?.component
+
+	function handleKeydown(ev: KeyboardEvent) {
+    if (ev.code === 'KeyS' && ev.ctrlKey) {
+			uiService.showModal(Spotlight, {})
+    }
+	}
 </script>
 
 <div id="workbench">
@@ -57,8 +65,9 @@
 		{/if}
 	</main>
 
-	<!-- <Spotlight /> -->
 </div>
+
+<svelte:window on:keydown={handleKeydown}/>
 
 <style lang="scss">
 	#workbench {

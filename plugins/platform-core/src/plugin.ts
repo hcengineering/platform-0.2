@@ -50,11 +50,17 @@ export default async (platform: Platform): Promise<CoreService> => {
   // Storages
 
   const model = new ModelDb()
-  const titles = new Titles()
+  const titles = new Titles(model)
   const graph = new Graph()
   const cache = new Cache(coreProtocol)
 
   model.loadModel(await coreProtocol.loadDomain(MODEL_DOMAIN))
+
+  coreProtocol.loadDomain(TITLE_DOMAIN).then(docs => {
+    for (const doc of docs) {
+      titles.store(doc)
+    }
+  })
 
   const qModel = new QueriableStorage(model)
   const qTitles = new QueriableStorage(titles)
