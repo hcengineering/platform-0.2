@@ -39,7 +39,7 @@
 
   let backlinks: Backlinks[]
   let unsubscribe: () => void
-  $: query(core.class.Backlinks, { _objectId: object._id }, docs => { backlinks = docs } )
+  $: unsubscribe = query(core.class.Backlinks, { _objectId: object._id }, docs => { backlinks = docs } )
 
   onDestroy(() => { if(unsubscribe) unsubscribe() })
 </script>
