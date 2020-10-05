@@ -236,12 +236,14 @@ export const marks: MarkSpec = {
       {
         tag: 'reference',
         getAttrs: (node: any): any => {
-          console.log('parse DOM:', node)
-          return { id: node.id, class: node.class }
+          return {
+            id: node.getAttribute('id'),
+            class: node.getAttribute('class')
+          }
         }
       }
     ],
-    toDOM (node: any) {
+    toDOM(node: any) {
       return ['reference', { id: node.attrs.id, class: node.attrs.class }, 0]
     }
   }
