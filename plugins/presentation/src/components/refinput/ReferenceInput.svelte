@@ -5,7 +5,8 @@
     VDoc,
     StringProperty,
     Property,
-    Title
+    Title,
+    parseMessage
   } from '@anticrm/core'
   import { getCoreService } from '../../utils'
 
@@ -68,6 +69,7 @@
   }
   let completions: CompletionItem[] = []
   let htmlValue: string = ''
+  let jsonValue: any = null
   let completionControl: CompletionPopup
 
   let htmlEditor: EditorContent
@@ -150,9 +152,10 @@
   }
   function handleSubmit() {
     if (!styleState.isEmpty) {
-      dispatch('message', htmlValue)
+      dispatch('message', { html: htmlValue, json: jsonValue })
     }
     htmlValue = ''
+    jsonValue = null
   }
   function onKeyDown(event: any) {
     if (completions.length > 0) {
@@ -162,11 +165,13 @@
         return
       }
       if (event.key === 'ArrowDown') {
+        console.log('HANDLE DOWN')
         completionControl.handleDown()
         event.preventDefault()
         return
       }
       if (event.key === 'Enter') {
+        console.log('HANDLE ENTER')
         completionControl.handleSubmit()
         event.preventDefault()
         return
@@ -242,7 +247,7 @@
                         }
                       )
                     } else if (items.length == 0) {
-                      if (prev.id == "") {
+                      if (prev.id == '') {
                         operations.push(
                           (tr: Transaction | null): Transaction => {
                             let mark = schema.marks.reference.create({
@@ -304,7 +309,10 @@
           bind:content="{htmlValue}"
           triggers="{triggers}"
           transformInjections="{transformInjections}"
-          on:content="{(event) => (htmlValue = event.detail)}"
+          on:content="{(event) => {
+            htmlValue = event.detail.html
+            jsonValue = event.detail.json
+          }}"
           on:styleEvent="{(e) => updateStyle(e.detail)}"
         >
           {#if completions.length > 0}

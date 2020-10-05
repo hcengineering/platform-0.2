@@ -100,7 +100,11 @@
     // The box in which the tooltip is positioned, to use as base
 
     let innerDOMValue = view.dom.innerHTML
-    dispatch('content', innerDOMValue)
+    let jsonDoc = view.state.toJSON().doc
+    dispatch('content', {
+      html: innerDOMValue,
+      json: jsonDoc
+    })
 
     // Check types
     let marks = view.state.storedMarks || view.state.selection.$from.marks()

@@ -1,21 +1,30 @@
 //
 // Copyright © 2020 Anticrm Platform Contributors.
-// 
+//
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
 // obtain a copy of the License at https://www.eclipse.org/legal/epl-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// 
+//
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
 
 import { plugin, Plugin, Service, Metadata } from '@anticrm/platform'
 import { Asset, AnyComponent } from '@anticrm/platform-ui'
-import { DateProperty, StringProperty, Emb, Class, Ref, VDoc, MessageElement, Mixin } from '@anticrm/core'
+import {
+  DateProperty,
+  StringProperty,
+  Emb,
+  Class,
+  Ref,
+  VDoc,
+  Mixin,
+  MessageDocument
+} from '@anticrm/core'
 import core from '@anticrm/platform-core'
 import { ComponentExtension } from '@anticrm/presentation'
 
@@ -43,27 +52,30 @@ export interface Page extends Collab {
 // P L U G I N
 
 export interface ChunterService extends Service {
-  parseMessage (message: string): MessageElement[]
-  createMissedObjects (message: string): string
+  createMissedObjects(html: string, json: any): string
 }
 
-export default plugin('chunter' as Plugin<ChunterService>, { core: core.id }, {
-  icon: {
-    Chunter: '' as Asset,
-  },
-  class: {
-    Message: '' as Ref<Class<Message>>,
-    Page: '' as Ref<Class<Page>>
-  },
-  component: {
-    ActivityView: '' as AnyComponent,
-    ChatView: '' as AnyComponent,
-    MessageInfo: '' as AnyComponent,
-    SpaceInfo: '' as AnyComponent,
-    PageProperties: '' as AnyComponent,
-    PageInfo: '' as AnyComponent,
-  },
-  mixin: {
-    ActivityInfo: '' as Ref<Mixin<ComponentExtension<VDoc>>>
+export default plugin(
+  'chunter' as Plugin<ChunterService>,
+  { core: core.id },
+  {
+    icon: {
+      Chunter: '' as Asset
+    },
+    class: {
+      Message: '' as Ref<Class<Message>>,
+      Page: '' as Ref<Class<Page>>
+    },
+    component: {
+      ActivityView: '' as AnyComponent,
+      ChatView: '' as AnyComponent,
+      MessageInfo: '' as AnyComponent,
+      SpaceInfo: '' as AnyComponent,
+      PageProperties: '' as AnyComponent,
+      PageInfo: '' as AnyComponent
+    },
+    mixin: {
+      ActivityInfo: '' as Ref<Mixin<ComponentExtension<VDoc>>>
+    }
   }
-})
+)

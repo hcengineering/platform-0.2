@@ -14,7 +14,7 @@
 //
 
 import { Platform } from '@anticrm/platform'
-import { Ref, parseMessage, MessageElement, MessageElementKind, MessageText, MessageLink } from '@anticrm/core'
+import { Ref, parseMessage, ReferenceMark } from '@anticrm/core'
 import { CoreService } from '@anticrm/platform-core'
 import chunter, { ChunterService, Page } from '.'
 
@@ -30,8 +30,10 @@ import PageInfo from './components/internal/PageInfo.svelte'
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */
-export default async (platform: Platform, deps: { core: CoreService }): Promise<ChunterService> => {
-
+export default async (
+  platform: Platform,
+  deps: { core: CoreService }
+): Promise<ChunterService> => {
   platform.setResource(chunter.component.ActivityView, ActivityView)
   platform.setResource(chunter.component.ChatView, ChatView)
   platform.setResource(chunter.component.MessageInfo, MessageInfo)
@@ -41,83 +43,35 @@ export default async (platform: Platform, deps: { core: CoreService }): Promise<
 
   const coreService = deps.core
 
-  function parseXMLMessage (message: string): MessageElement[] {
-    console.log('parseXML:', message)
-    const result = []
-    const parser = new DOMParser()
-    const root = parser.parseFromString(message, 'text/xml')
-    const children = root.childNodes[0].childNodes
-    for (let i = 0; i < children.length; i++) {
-      const node = children[i]
-      console.log(node)
-      if (node.nodeType === Node.TEXT_NODE) {
-        result.push({
-          kind: MessageElementKind.TEXT,
-          text: node.nodeValue
-        } as MessageText)
-      } else if (node.nodeType === Node.ELEMENT_NODE) {
-        const attrs = (node as Element).attributes
-        const _class = attrs.getNamedItem('class')?.nodeValue
-        const _id = attrs.getNamedItem('id')?.nodeValue
-        const text = node.childNodes[0].nodeValue
-        result.push({
-          kind: MessageElementKind.LINK,
-          text,
-          _id,
-          _class
-        } as MessageLink)
-      }
-    }
-    return result
-  }
+  function createMissedObjects(html: string, json: any): string {
+    console.log('createMissedObjects', json)
+    parseMessage(json).traverse((el) => {})
 
-  function toMessage (parsed: MessageElement[]): string {
-    let result = ''
-    for (const element of parsed) {
-      if (element.kind === MessageElementKind.LINK) {
-        const link = element as MessageLink
-        // result += `<reference id="${link._id}" class="${link._class}">${link.text}</reference>`
-        result += `[[${link.text}|${link._class}|${link._id}]]`
-      } else {
-        result += element.text
-      }
-    }
-    // result += '</p>'
-    console.log('toMessage:', result)
-    return result
-  }
-
-  function createMissedObjects (message: string): string {
-    console.log('createMissedObjects', message)
-    const referenced = []
-    const elements = parseXMLMessage(message)
-    for (const element of elements) {
-      if (element.kind === MessageElementKind.LINK) {
-        const link = element as MessageLink
-        const title = link.text.substring(2, link.text.length - 2)
-        link.text = title
-        if (link._id == undefined) {
-          const id = coreService.generateId() as Ref<Page>
-          // coreService.createVDoc(chunter.class.Page, {
-          //   title,
-          //   comments: []
-          // }, id)
-          link._id = id
-          link._class = chunter.class.Page
-        }
-        referenced.push(link)
-      } else {
-        referenced.push(element)
-      }
-    }
-    return toMessage(referenced)
+    // for (const element of elements) {
+    //   if (element.kind === MessageElementKind.LINK) {
+    //     const link = element as MessageLink
+    //     const title = link.text.substring(2, link.text.length - 2)
+    //     link.text = title
+    //     if (link._id == undefined) {
+    //       const id = coreService.generateId() as Ref<Page>
+    //       // coreService.createVDoc(chunter.class.Page, {
+    //       //   title,
+    //       //   comments: []
+    //       // }, id)
+    //       link._id = id
+    //       link._class = chunter.class.Page
+    //     }
+    //     referenced.push(link)
+    //   } else {
+    //     referenced.push(element)
+    //   }
+    // }
+    return JSON.stringify(json)
   }
 
   const service = {
-    parseMessage,
     createMissedObjects
   }
 
   return service
-
 }

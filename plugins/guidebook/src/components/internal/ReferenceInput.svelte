@@ -8,8 +8,8 @@
 
   let message: string = ''
 
-  function add(event: string) {
-    message += event
+  function add(event: {html: string, json: any}) {
+    message += event.html + ' <== <pre>' + JSON.stringify(event.json, null, 2) + '</pre>'
   }
 </script>
 
