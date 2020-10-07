@@ -1,0 +1,60 @@
+<!--
+// Copyright © 2020 Anticrm Platform Contributors.
+// 
+// Licensed under the Eclipse Public License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License. You may
+// obtain a copy of the License at https://www.eclipse.org/legal/epl-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// 
+// See the License for the specific language governing permissions and
+// limitations under the License.
+-->
+
+<script lang="ts">
+  import { onDestroy } from 'svelte'
+  import { Ref, Class, Doc, Backlinks, Property } from '@anticrm/core'
+  import { getCoreService, query } from '../../utils'
+  import core from '@anticrm/platform-core'
+  import chunter, { Collab, Comment } from '../..'
+  
+  import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
+
+  export let object: Collab
+
+  let backlinks: Backlinks[] = []
+  let unsubscribe: () => void
+  $: unsubscribe = query(core.class.Backlinks, { _objectId: object._id }, docs => { backlinks = docs } )
+
+  onDestroy(() => { if(unsubscribe) unsubscribe() })
+
+  const coreService = getCoreService()
+
+  function createComment(message: any): Promise<void> {
+    return coreService.then(coreService => {
+      const comment: Omit<Comment, '__embedded'> = {
+        _class: chunter.class.Comment,
+        _createdOn: Date.now() as Property<number, Date>,
+        _createdBy: 'john.appleseed@gmail.com' as Property<string, string>,
+        message
+      }
+      return coreService.push(object, 'comments', comment)
+    })
+  }
+</script>
+
+<div class="caption-2">Comments</div>
+
+{ #each object.comments || [] as comment }
+  <div>{JSON.stringify(comment)}</div>
+{ /each }
+
+<ReferenceInput on:message="{(e) => createComment(e.detail)}" />
+
+<div class="caption-2">Backlinks</div>
+
+{ #each backlinks as backlink (backlink._id) }
+  <div>{JSON.stringify(backlink)}</div>
+{ /each }

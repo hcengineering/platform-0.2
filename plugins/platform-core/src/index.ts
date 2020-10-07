@@ -15,7 +15,7 @@
 
 import { plugin, Plugin, Service, Metadata } from '@anticrm/platform'
 import {
-  Ref, Class, Doc, AnyLayout, Obj,
+  Ref, Class, Doc, AnyLayout, Obj, Emb,
   CreateTx, PushTx, UpdateTx, DeleteTx, Space, Title, CORE_CLASS_BACKLINKS, VDoc
 } from '@anticrm/core'
 
@@ -35,6 +35,7 @@ export interface CoreService extends Service {
   query<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): QueryResult<T>
   createDoc<T extends Doc> (doc: T): Promise<void>
   createVDoc<T extends VDoc> (vdoc: T): Promise<void>
+  push (vdoc: VDoc, attribute: string, element: Emb): Promise<void>
   generateId (): Ref<Doc>
 }
 
