@@ -14,7 +14,7 @@
 //
 
 import 'reflect-metadata'
-import { Ref, Class, Obj, Mixin, ClassifierKind, Classifier, Attribute, Type, Text, Property, mixinKey } from '@anticrm/core'
+import { Ref, Class, Obj, Mixin, ClassifierKind, Classifier, Attribute, Type, Text, Property, mixinKey, ArrayOf, Emb, InstanceOf } from '@anticrm/core'
 
 import {
   CORE_CLASS_MIXIN,
@@ -22,7 +22,9 @@ import {
   CORE_MIXIN_INDICES,
   CORE_CLASS_ATTRIBUTE,
   CORE_CLASS_CLASS,
-  CORE_CLASS_TEXT
+  CORE_CLASS_TEXT,
+  CORE_CLASS_ARRAY,
+  CORE_CLASS_INSTANCE
 } from '@anticrm/core'
 
 const classifierMetadataKey = Symbol("anticrm:classifier")
@@ -91,6 +93,19 @@ export function Prop () {
     const type = { _class: CORE_CLASS_TYPE } as unknown as Type
     attribute.type = type
   }
+}
+
+export function Array (of: Type) {
+
+  return function (target: any, propertyKey: string): void {
+    const attribute = getAttribute(target, propertyKey)
+    const arr = { _class: CORE_CLASS_ARRAY, of } as unknown as ArrayOf
+    attribute.type = arr
+  }
+}
+
+export function InstanceOf<T extends Emb> (of: Ref<Class<T>>): InstanceOf<T> {
+  return { _class: CORE_CLASS_INSTANCE, of } as unknown as InstanceOf<T>
 }
 
 export function Text () {

@@ -24,6 +24,7 @@ interface Node {
 interface Link {
   _class: Ref<Classifier<Doc>>
   _id: Ref<Doc>
+  pos: number
 }
 
 function hasLink (node: Node, _id: Ref<Doc>): boolean {
@@ -51,6 +52,7 @@ export class Graph implements Storage {
         backlinks: node.links.map(link => ({
           _backlinkId: link._id,
           _backlinkClass: link._class,
+          pos: link.pos
         }))
       }
       result.push(backlinks)
@@ -77,7 +79,8 @@ export class Graph implements Storage {
       if (!hasLink(node, backlinks._objectId)) {
         node.links.push({
           _class: backlinks._objectClass,
-          _id: backlinks._objectId
+          _id: backlinks._objectId,
+          pos: backlink.pos
         })
       }
     }

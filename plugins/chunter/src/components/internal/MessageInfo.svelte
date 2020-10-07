@@ -18,12 +18,13 @@
 
   export let tx: Tx
 
-  function getMessage() {
-    return (tx as CreateTx).object as Message
+  function getMessageText() {
+    const message = (tx as CreateTx).object as Message
+    return message.comments ? message.comments[0].message : ''
   }
 </script>
 
 {#if tx._class === core.class.CreateTx}
   Написал сообщение:
-  <MessageViewer message="{parseMessageText(getMessage().message)}" />
+  <MessageViewer message="{parseMessageText(getMessageText())}" />
 {/if}

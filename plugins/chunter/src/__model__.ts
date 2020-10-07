@@ -13,9 +13,9 @@
 // limitations under the License.
 //
 
-import { Application, Ref, Class, StringProperty } from '@anticrm/core'
+import { Application, Ref, Class, Property } from '@anticrm/core'
 
-import { extendIds, Builder, ModelClass, Primary, Prop, Text } from '@anticrm/model'
+import { extendIds, Builder, ModelClass, Primary, Prop, Text, Array, InstanceOf } from '@anticrm/model'
 import { UX } from '@anticrm/presentation/src/__model__'
 
 import workbench from '@anticrm/workbench/src/__model__'
@@ -26,7 +26,7 @@ import _chunter, { Message, Page, Comment, Collab } from '.'
 import { IntlString } from '@anticrm/platform-i18n'
 import presentation from '@anticrm/presentation'
 
-import core, { TVDoc } from '@anticrm/platform-core/src/__model__'
+import core, { TVDoc, TEmb } from '@anticrm/platform-core/src/__model__'
 
 export enum ChunterDomain {
   Chunter = 'chunter'
@@ -46,13 +46,21 @@ export default chunter
 @ModelClass(chunter.class.Collab, core.class.VDoc)
 @UX('Collaboration' as IntlString)
 class TCollab extends TVDoc implements Collab {
-  @Prop() @UX('Комментарии' as IntlString, chunter.icon.Chunter) comments?: Comment[]
+  @Array(InstanceOf(chunter.class.Comment)) @UX('Комментарии' as IntlString, chunter.icon.Chunter) comments?: Comment[]
+}
+
+@ModelClass(chunter.class.Comment, core.class.Emb)
+@UX('Комментарий' as IntlString)
+class TComment extends TEmb implements Comment {
+  @Prop() _createdBy!: Property<string, string>
+  @Prop() _createdOn!: Property<number, Date>
+  @Text() @UX('Сообщение' as IntlString, chunter.icon.Chunter) message!: string
 }
 
 @ModelClass(chunter.class.Message, chunter.class.Collab, ChunterDomain.Chunter)
 @UX('Сообщение' as IntlString)
 class TMessage extends TVDoc implements Message {
-  @Text() @UX('Сообщение' as IntlString, chunter.icon.Chunter) message!: string
+  // @Text() @UX('Сообщение' as IntlString, chunter.icon.Chunter) message!: string
 }
 
 @ModelClass(chunter.class.Page, chunter.class.Collab, ChunterDomain.Chunter)
@@ -62,7 +70,7 @@ class TPage extends TMessage implements Page {
 }
 
 export function model (S: Builder) {
-  S.add(TCollab, TMessage, TPage)
+  S.add(TCollab, TMessage, TComment, TPage)
 
   // S.createDocument(workbench.class.Application, {
   //   label: 'Chunter' as StringProperty,

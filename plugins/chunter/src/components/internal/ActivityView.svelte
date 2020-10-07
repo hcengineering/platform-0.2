@@ -44,7 +44,7 @@
   <div>
     <span class="caption-1">Activity</span>&nbsp;
   </div>
-  <ScrollView stylez="height:100%;" autoscroll=true>
+  <ScrollView stylez="height:100%;" autoscroll={true}>
     <div class="content">
       { #each objects as item (item._id) }
         <ActivityItem tx={item} />

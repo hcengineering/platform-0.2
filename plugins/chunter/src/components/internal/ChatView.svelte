@@ -16,9 +16,9 @@
   import ChatMessageItem from './ChatMessageItem.svelte'
   import { onDestroy } from 'svelte'
   import core, { QueryResult } from '@anticrm/platform-core'
-  import { Ref, Space, VDoc } from '@anticrm/core'
+  import { Ref, Space, VDoc, Property } from '@anticrm/core'
   import { getChunterService, getCoreService, query } from '../../utils'
-  import chunter, { Message } from '../..'
+  import chunter, { Message, Comment } from '../..'
 
   const coreService = getCoreService()
   const chunterService = getChunterService()
@@ -57,10 +57,16 @@
           message.json
         )
         coreService.then((coreService) => {
+          const comment: Omit<Comment, '__embedded'> = {
+            _class: chunter.class.Comment,
+            _createdOn: Date.now() as Property<number, Date>,
+            _createdBy: 'john.appleseed@gmail.com' as Property<string, string>,
+            message: parsedMessage
+          }
           const newMessage = {
             _class: chunter.class.Message,
             _space: space,
-            message: parsedMessage
+            comments: [comment]
           }
           // absent VDoc fields will be autofilled
           coreService.createVDoc((newMessage as unknown) as VDoc)
@@ -72,7 +78,7 @@
 
 <div class="chat">
   <div><span class="caption-1">Чат {spaceName}</span>&nbsp;</div>
-  <ScrollView stylez="height:100%;" autoscroll="true">
+  <ScrollView stylez="height:100%;" autoscroll={true}>
     <div class="content">
       {#each messages as message (message._id)}
         <ChatMessageItem message="{message}" />
