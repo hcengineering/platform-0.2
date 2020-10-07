@@ -37,9 +37,11 @@
   <div class="details">
     <b>{username}</b>
     {timestamp}
-    <!-- <pre>{JSON.stringify(JSON.parse(message.message),null, 2)}</pre> -->
-
-    <MessageViewer message="{parseMessageText(message.message)}" />
+    { #if message.comments }
+      <MessageViewer message={parseMessageText(message.comments[0].message)} />
+      <!-- { #if message.comments && message.comments.length > 1 }
+      { /if } -->
+    { /if }
   </div>
 </div>
 

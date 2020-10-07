@@ -14,7 +14,7 @@
 //
 
 import { generateId } from './objectid'
-import { AnyLayout, Class, Classifier, ClassifierKind, Doc, Mixin, Obj, PropertyType, Ref, Storage, Index } from './core'
+import { AnyLayout, Class, Classifier, ClassifierKind, Doc, Mixin, Obj, PropertyType, Ref, Storage, Attribute } from './core'
 
 export function mixinKey (mixin: Ref<Mixin<Doc>>, key: string): string {
   return key + '|' + mixin.replace('.', '~')
@@ -82,6 +82,24 @@ export class Model implements Storage {
     }
     return obj
   }
+
+  // U T I L I T Y
+
+  private _getAllAttributes (attributes: [string, Attribute][], _class: Ref<Class<Obj>>) {
+    const clazz = this.get(_class) as Class<Doc>
+    attributes.push(...Object.entries(clazz._attributes))
+
+    if (clazz._extends) {
+      this._getAllAttributes(attributes, clazz._extends)
+    }
+  }
+
+  getAllAttributes (_class: Ref<Class<Obj>>): [string, Attribute][] {
+    const attributes: [string, Attribute][] = []
+    this._getAllAttributes(attributes, _class)
+    return attributes
+  }
+
 
   // D O M A I N
 

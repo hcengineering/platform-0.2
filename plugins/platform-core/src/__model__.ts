@@ -16,7 +16,7 @@
 import {
   Attribute, Class, Classifier, Doc, Emb, Mixin, Obj, Ref, Tx, Type, VDoc,
   ArrayOf, BagOf, InstanceOf, RefTo, Indices, CORE_CLASS_TEXT, Space, Application, List, CreateTx,
-  DateProperty, StringProperty, Backlinks, Backlink, BACKLINKS_DOMAIN, MODEL_DOMAIN, TX_DOMAIN, TITLE_DOMAIN
+  DateProperty, StringProperty, Backlinks, Backlink, BACKLINKS_DOMAIN, MODEL_DOMAIN, TX_DOMAIN, TITLE_DOMAIN, CORE_CLASS_ARRAY
 } from '@anticrm/core'
 
 import { extendIds, ModelClass, Prop, Builder } from '@anticrm/model'
@@ -39,8 +39,8 @@ const core = extendIds(_core, {
 
     RefTo: '' as Ref<Class<RefTo<Doc>>>,
     InstanceOf: '' as Ref<Class<InstanceOf<Emb>>>,
-    BagOf: '' as Ref<Class<BagOf<Type>>>,
-    ArrayOf: '' as Ref<Class<ArrayOf<Type>>>,
+    BagOf: '' as Ref<Class<BagOf>>,
+    ArrayOf: CORE_CLASS_ARRAY,//'' as Ref<Class<ArrayOf<Type>>>,
 
     String: '' as Ref<Class<Type>>,
     Application: '' as Ref<Class<Application>>
@@ -58,7 +58,7 @@ class TObj implements Obj {
 }
 
 @ModelClass(core.class.Emb, core.class.Obj)
-class TEmb extends TObj implements Emb {
+export class TEmb extends TObj implements Emb {
   __embedded!: true
 }
 
@@ -120,6 +120,10 @@ export function model (S: Builder) {
 
   S.createClass(core.class.RefTo, core.class.Type, {
     to: S.attr(core.class.Type, {})
+  })
+
+  S.createClass(core.class.ArrayOf, core.class.Type, {
+    of: S.attr(core.class.Type, {})
   })
 
   S.createClass(core.class.Classifier, core.class.Doc, {

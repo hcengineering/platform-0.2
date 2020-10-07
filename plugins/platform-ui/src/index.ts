@@ -41,7 +41,7 @@ interface SvelteComponent<Props> {
   }
 }
 
-export type AnySvelteComponent = SvelteComponent<{}>
+export type AnySvelteComponent = any //SvelteComponent<{}>
 
 export type Component<C extends AnySvelteComponent> = Resource<C>
 export type AnyComponent = Component<AnySvelteComponent>

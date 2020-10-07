@@ -49,6 +49,10 @@ export function model (S: Builder) {
     presenter: ui.component.RefPresenter
   })
 
+  S.mixin(core.class.ArrayOf, ui.class.Presenter, {
+    presenter: ui.component.StringPresenter
+  })
+
   S.createMixin(ui.class.DetailForm, core.class.Class, {
     component: S.attr(core.class.Type, {})
   })
