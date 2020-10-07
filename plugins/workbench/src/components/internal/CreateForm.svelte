@@ -14,34 +14,72 @@
 -->
 
 <script lang="ts">
-  import { Ref, Class, Doc, generateId, Space, VDoc } from '@anticrm/core'
+  import { Ref, Class, Doc, generateId, Space, VDoc, Classifier, Obj, mixinKey, CORE_MIXIN_INDICES } from '@anticrm/core'
+  import core from '@anticrm/platform-core'
   import { createEventDispatcher } from 'svelte'
   import { AnyComponent } from '@anticrm/platform-ui'
   import presentation from '@anticrm/presentation'
-  import { getComponentExtension, getCoreService } from '../../utils'
+  import { _getPresentationService, getComponentExtension, _getCoreService } from '../../utils'
+  import { AttrModel, ClassModel } from '@anticrm/presentation'
 
-  import Component from '@anticrm/platform-ui/src/components/Component.svelte'
+  import AttributeEditor from '@anticrm/presentation/src/components/AttributeEditor.svelte'
+  import Properties from '@anticrm/presentation/src/components/internal/Properties.svelte'
 
   export let title: string
   export let _class: Ref<Class<Doc>>
   export let space: Ref<Space>
-  let object = {}
+  let object = {} as any
 
   let component: AnyComponent
   $: getComponentExtension(_class, presentation.class.DetailForm).then(ext => { component = ext })
 
-  const coreService = getCoreService()
+  const coreService = _getCoreService()
   const dispatch = createEventDispatcher()
 
   function save() {
-    coreService.then(coreService => {
-      const doc = { _class, _space: space, ...object }
-      object = {}
-      // absent VDoc fields will be autofilled
-      coreService.createVDoc(doc as unknown as VDoc)
-    })
+    const doc = { _class, _space: space, ...object }
+    object = {}
+    // absent VDoc fields will be autofilled
+    coreService.createVDoc(doc as unknown as VDoc)
     dispatch('close')
   }
+
+  let model: ClassModel | undefined
+  let primary: AttrModel | undefined
+
+  const primaryKey = mixinKey(CORE_MIXIN_INDICES, 'primary')
+
+  function getPrimary (_class: Ref<Classifier<Doc>>): string | null {
+    // TODO: temporary code
+    let cls = _class as Ref<Class<Obj>> | undefined
+    while (cls) {
+      const clazz = coreService.getModel().get(cls) as Classifier<VDoc>
+      const primary = (clazz as any)[primaryKey]
+      if (primary) {
+        console.log(`primary code for class ${_class}: ${primary}`)
+        return primary
+      }
+      cls = clazz._extends
+    }
+    return null
+  }
+
+  const presentationService = _getPresentationService()
+  console.log('presentationService', presentationService)
+
+  $: {
+    presentationService.getClassModel (_class, core.class.VDoc).then(m => { 
+      const primaryKey = getPrimary(_class)
+      if (primaryKey) {
+        primary = m.getAttribute(primaryKey)
+        model = m.filterAttributes([primaryKey]) 
+      } else {
+        primary = undefined
+        model = m
+      }
+    })
+  }    
+
 </script>
 
 <div class="recruiting-view">
@@ -54,7 +92,12 @@
   </div>
 
   <div class="content">
-    <Component is={component} props={{ _class, object  }} />
+    { #if primary }
+      <div class="caption-1"><AttributeEditor attribute={primary} bind:value={object[primary.key]} /></div>
+    { /if }
+    { #if model }
+      <Properties {model} bind:object={object}/>
+    { /if }
   </div>
 </div>
 

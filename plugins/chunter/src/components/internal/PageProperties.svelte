@@ -22,6 +22,7 @@
 
   import Properties from '@anticrm/presentation/src/components/internal/Properties.svelte'
   import AttributeEditor from '@anticrm/presentation/src/components/AttributeEditor.svelte'
+  import Comments from './Comments.svelte'
 
   export let _class: Ref<Class<Obj>>
   export let object: Page
@@ -42,5 +43,6 @@
   <div class="caption-1"><AttributeEditor attribute={title} bind:value={object.title} /></div>
 </div>
 <Properties {model} bind:object={object}/>
+<Comments object={object} />
 { /if }
 

@@ -15,8 +15,8 @@
 
 import type { Platform } from '@anticrm/platform'
 import {
-  Ref, Class, Doc, AnyLayout, MODEL_DOMAIN, CoreProtocol, Tx, TITLE_DOMAIN, BACKLINKS_DOMAIN,
-  VDoc, Space, generateId as genId, CreateTx, Property, PropertyType, ModelIndex, DateProperty, StringProperty
+  Ref, Class, Doc, AnyLayout, MODEL_DOMAIN, CoreProtocol, Tx, TITLE_DOMAIN, BACKLINKS_DOMAIN, Emb,
+  VDoc, Space, generateId as genId, CreateTx, Property, PropertyType, ModelIndex, DateProperty, StringProperty, PushTx
 } from '@anticrm/core'
 import { ModelDb } from './modeldb'
 
@@ -139,6 +139,21 @@ export default async (platform: Platform): Promise<CoreService> => {
     return createDoc(vdoc)
   }
 
+  function push (vdoc: VDoc, _attribute: string, element: Emb): Promise<any> {
+    const tx: PushTx = {
+      _class: core.class.PushTx,
+      _id: generateId() as Ref<Doc>,
+      _objectId: vdoc._id,
+      _objectClass: vdoc._class,
+      _date: Date.now() as Property<number, Date>,
+      _user: platform.getMetadata(login.metadata.WhoAmI) as Property<string, string>,
+      _attribute: _attribute as Property<string, string>,
+      _attributes: element as unknown as { [key: string]: PropertyType }
+    }
+    console.log('push', tx)
+    return Promise.all([coreProtocol.tx(tx), txProcessor.process(tx)])
+  }
+
   return {
     getModel () { return model },
     query,
@@ -146,6 +161,7 @@ export default async (platform: Platform): Promise<CoreService> => {
     findOne,
     createDoc,
     createVDoc,
+    push,
     generateId
   }
 

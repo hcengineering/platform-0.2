@@ -15,10 +15,10 @@
 
 <script lang="ts">
   import { Ref, Class, Doc, generateId, Space, VDoc } from '@anticrm/core'
-  import { createEventDispatcher } from 'svelte'
+  import { createEventDispatcher, onDestroy } from 'svelte'
   import { AnyComponent } from '@anticrm/platform-ui'
   import presentation from '@anticrm/presentation'
-  import { findOne, getComponentExtension, getCoreService } from '../../utils'
+  import { findOne, getComponentExtension, getCoreService, query } from '../../utils'
 
   import Component from '@anticrm/platform-ui/src/components/Component.svelte'
 
@@ -27,7 +27,17 @@
   export let _id: Ref<VDoc>
   
   let object: VDoc | undefined
-  $: findOne(_class, { _id }).then(obj => { object = obj })
+
+  let unsubscribe: () => void
+  $: 
+    unsubscribe = query(_class, { _id }, docs => {
+      object = docs.length > 0 ? docs[0] : undefined
+    })
+
+  onDestroy(() => {
+    if (unsubscribe) unsubscribe()
+  })    
+  // $: findOne(_class, { _id }).then(obj => { object = obj })
 
   let component: AnyComponent
   $: getComponentExtension(_class, presentation.class.DetailForm).then(ext => { component = ext })

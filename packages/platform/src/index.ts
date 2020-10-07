@@ -106,7 +106,7 @@ export class Status {
   code: number
   message: string
 
-  constructor(severity: Severity, code: number, message: string) {
+  constructor (severity: Severity, code: number, message: string) {
     this.severity = severity
     this.code = code
     this.message = message
@@ -116,7 +116,7 @@ export class Status {
 export class PlatformError extends Error {
   readonly status: Status
 
-  constructor(status: Status) {
+  constructor (status: Status) {
     super(status.message)
     this.status = status
   }
@@ -144,6 +144,7 @@ export interface Platform {
   resolveDependencies (deps: PluginDependencies): Promise<{ [key: string]: Service }>
 
   getPlugin<T extends Service> (id: Plugin<T>): Promise<T>
+  getRunningPlugin<T extends Service> (id: Plugin<T>): T
 
   getResource<T> (resource: Resource<T>): Promise<T>
 
@@ -287,6 +288,7 @@ export function createPlatform (): Platform {
 
   const plugins = new Map<AnyPlugin, Promise<Service>>()
   const locations = [] as [AnyDescriptor, AnyModule][]
+  const running = new Map<AnyPlugin, Service>()
 
   function getLocation (id: AnyPlugin): [AnyDescriptor, AnyModule] {
     for (const location of locations) {
@@ -312,11 +314,21 @@ export function createPlatform (): Platform {
       const plugin = resolveDependencies(location[0].deps).then(deps =>
         createMonitor(`Загружаю плагин '${id}...'`, location[1]())
           .then(module => module.default)
-          .then(f => f(platform, deps))
+          .then(f => {
+            const service = f(platform, deps)
+            service.then(s => running.set(id, s))
+            return service
+          })
       )
       plugins.set(id, plugin)
       return plugin as Promise<T>
     }
+  }
+
+  function getRunningPlugin<T extends Service> (id: Plugin<T>): T {
+    const service = running.get(id)
+    if (service) return service as T
+    throw new Error('plugin not running: ' + id)
   }
 
   async function resolveDependencies (deps: PluginDependencies): Promise<{ [key: string]: Service }> {
@@ -349,6 +361,7 @@ export function createPlatform (): Platform {
     addLocation,
     resolveDependencies,
     getPlugin,
+    getRunningPlugin,
 
     getResource,
     setResource,
