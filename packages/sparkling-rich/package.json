@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@anticrm/sparkling-theme": "^0.1.1",
+    "@anticrm/core": "^0.2.0",
     "prosemirror-commands": "^1.1.4",
     "prosemirror-history": "^1.1.3",
     "prosemirror-inputrules": "^1.1.2",

@@ -14,7 +14,12 @@
 //
 
 import { Platform } from '@anticrm/platform'
-import { Ref, parseMessage, ReferenceMark } from '@anticrm/core'
+import {
+  Ref,
+  parseMessage,
+  ReferenceMark,
+  MessageDocument
+} from '@anticrm/core'
 import { CoreService } from '@anticrm/platform-core'
 import chunter, { ChunterService, Page } from '.'
 
@@ -43,9 +48,8 @@ export default async (
 
   const coreService = deps.core
 
-  function createMissedObjects(html: string, json: any): string {
-    console.log('createMissedObjects', json)
-    parseMessage(json).traverse((el) => {})
+  function createMissedObjects(doc: MessageDocument): string {
+    doc.traverse((el) => {})
 
     // for (const element of elements) {
     //   if (element.kind === MessageElementKind.LINK) {
@@ -66,7 +70,7 @@ export default async (
     //     referenced.push(element)
     //   }
     // }
-    return JSON.stringify(json)
+    return JSON.stringify(doc)
   }
 
   const service = {

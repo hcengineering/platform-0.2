@@ -27,8 +27,19 @@ export class MessageNode {
     return result
   }
 }
-export class MessageDocument extends MessageNode {}
-export class MessageParagraph extends MessageNode {}
+export class MessageDocument extends MessageNode {
+  constructor() {
+    super()
+    this.type = 'doc'
+    this.content = [new MessageParagraph()]
+  }
+}
+export class MessageParagraph extends MessageNode {
+  constructor() {
+    super()
+    this.type = 'paragraph'
+  }
+}
 export class MessageBlockQuote extends MessageNode {}
 export class MessageHeading extends MessageNode {
   level: number = 1
