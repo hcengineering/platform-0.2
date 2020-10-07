@@ -8,8 +8,8 @@
 
   let message: string = ''
 
-  function add(event: {html: string, json: any}) {
-    message += event.html + ' <== <pre>' + JSON.stringify(event.json, null, 2) + '</pre>'
+  function add(event: any) {
+    message += '<pre>' + JSON.stringify(event, null, 2) + '</pre>'
   }
 </script>
 
@@ -65,7 +65,11 @@
     stylesEnabled=true/>`}"
 >
   <div class="preview-pane">
-    <ReferenceInput height={500} on:message="{(e) => add(e.detail)}" stylesEnabled="true" />
+    <ReferenceInput
+      height="{500}"
+      on:message="{(e) => add(e.detail)}"
+      stylesEnabled="true"
+    />
   </div>
   <div>
     {@html message}

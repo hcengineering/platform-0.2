@@ -1,9 +1,10 @@
 <script lang="ts">
+  import { MessageDocument, parseMessage } from '@anticrm/core'
   import { DOMParser, Fragment, Slice, Mark, MarkType } from 'prosemirror-model'
 
   import { schema } from './internal/schema'
 
-  import { AllSelection, EditorState, Transaction } from 'prosemirror-state'
+  import { TextSelection, EditorState, Transaction } from 'prosemirror-state'
   import { EditorView } from 'prosemirror-view'
 
   import { history } from 'prosemirror-history'
@@ -24,7 +25,7 @@
   // ********************************
   // Properties
   // ********************************
-  export let content: string = ''
+  export let content: MessageDocument
   export let hoverMessage: string = 'Placeholder...'
   export let triggers: string[] = []
   export let transformInjections: (
@@ -46,7 +47,7 @@
 
   let inputHeight: number
 
-  let isEmpty: boolean = checkEmpty(content)
+  let isEmpty: boolean = true
 
   function checkEmpty(value: string): boolean {
     return value.length === 0 || value === '<p><br></p>' || value === '<p></p>'
@@ -101,10 +102,7 @@
 
     let innerDOMValue = view.dom.innerHTML
     let jsonDoc = view.state.toJSON().doc
-    dispatch('content', {
-      html: innerDOMValue,
-      json: jsonDoc
-    })
+    dispatch('content', parseMessage(jsonDoc))
 
     // Check types
     let marks = view.state.storedMarks || view.state.selection.$from.marks()
@@ -138,19 +136,22 @@
     dispatch('styleEvent', evt)
   }
 
+  function createState(doc: MessageDocument): EditorState {
+    return EditorState.fromJSON(
+      {
+        schema,
+        plugins: [history(), buildInputRules(), keymap(buildKeymap())]
+      },
+      { doc: doc, selection: { type: 'text', head: 0, anchor: 0 } }
+    )
+  }
+
   //****************************************************************
   // Initialization of prosemirror stuff.
   //****************************************************************
   rootElement = document.createElement('div')
 
-  const parser = new window.DOMParser()
-  const element = parser.parseFromString(content, 'text/html').body
-
-  state = EditorState.create({
-    schema,
-    doc: DOMParser.fromSchema(schema).parse(element),
-    plugins: [history(), buildInputRules(), keymap(buildKeymap())]
-  })
+  state = createState(content)
   view = new EditorView(rootElement, {
     state,
     dispatchTransaction(transaction) {
@@ -180,15 +181,9 @@
     root.appendChild(rootElement)
   })
 
-  function updateValue(content: string) {
-    if (content != view.dom.innerHTML) {
-      const element = parser.parseFromString(content, 'text/html').body
-      let newDoc = DOMParser.fromSchema(schema).parse(element)
-
-      let op = state.tr
-        .setSelection(new AllSelection(state.doc))
-        .replaceSelectionWith(newDoc)
-      let newState = state.apply(op)
+  function updateValue(content: MessageDocument) {
+    if (JSON.stringify(content) != JSON.stringify(view.state.toJSON().doc)) {
+      let newState = createState(content)
 
       view.updateState(newState)
 

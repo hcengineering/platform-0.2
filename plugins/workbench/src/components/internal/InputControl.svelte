@@ -34,7 +34,7 @@
 	import { createEventDispatcher } from 'svelte'
 	const dispatch = createEventDispatcher()
 
-	function handleSubmit(value: string) {
+	function handleSubmit(value: any) {
 		dispatch('message', value)
 	}
 </script>

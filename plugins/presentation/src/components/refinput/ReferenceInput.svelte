@@ -6,7 +6,8 @@
     StringProperty,
     Property,
     Title,
-    parseMessage
+    parseMessage,
+    MessageDocument
   } from '@anticrm/core'
   import { getCoreService } from '../../utils'
 
@@ -68,8 +69,7 @@
     inputHeight: 0
   }
   let completions: CompletionItem[] = []
-  let htmlValue: string = ''
-  let jsonValue: any = null
+  let editorContent: MessageDocument = new MessageDocument()
   let completionControl: CompletionPopup
 
   let htmlEditor: EditorContent
@@ -152,10 +152,9 @@
   }
   function handleSubmit() {
     if (!styleState.isEmpty) {
-      dispatch('message', { html: htmlValue, json: jsonValue })
+      dispatch('message', editorContent)
     }
-    htmlValue = ''
-    jsonValue = null
+    editorContent = new MessageDocument()
   }
   function onKeyDown(event: any) {
     if (completions.length > 0) {
@@ -306,12 +305,11 @@
       >
         <EditorContent
           bind:this="{htmlEditor}"
-          bind:content="{htmlValue}"
+          bind:content="{editorContent}"
           triggers="{triggers}"
           transformInjections="{transformInjections}"
           on:content="{(event) => {
-            htmlValue = event.detail.html
-            jsonValue = event.detail.json
+            editorContent = event.detail
           }}"
           on:styleEvent="{(e) => updateStyle(e.detail)}"
         >
