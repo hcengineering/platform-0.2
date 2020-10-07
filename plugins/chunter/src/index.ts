@@ -22,7 +22,8 @@ import {
   Class,
   Ref,
   VDoc,
-  Mixin,, MessageDocument
+  Mixin,
+  MessageDocument
 } from '@anticrm/core'
 import core from '@anticrm/platform-core'
 import { ComponentExtension } from '@anticrm/presentation'
@@ -40,8 +41,7 @@ export interface Comment extends Emb {
   message: string
 }
 
-export interface Message extends Collab {
-}
+export interface Message extends Collab {}
 
 export interface Page extends Collab {
   title: string

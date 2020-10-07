@@ -25,7 +25,8 @@
     MessageListItem,
     MessageBulletList,
     StrikeMark,
-    ReferenceMark
+    ReferenceMark,
+MessageHardBreak
   } from '@anticrm/core'
 
   export let message: MessageNode
@@ -38,12 +39,14 @@
 
     reference: {
       state: boolean
-      _id: string = ''
-      _class: string = ''
+      _id: string
+      _class: string
       resolved: boolean
     } = {
       state: false,
-      resolved: false
+      resolved: false,
+      _id: '',
+      _class: ''
     }
   }
 
@@ -90,11 +93,15 @@
     class:underline="{style.underline}"
     class:strike="{style.strike}"
     class:resolved_reference="{style.reference.resolved}"
-    class:unknown_reference="{style.reference.state && !style.reference.resolved }"
+    class:unknown_reference="{style.reference.state && !style.reference.resolved}"
   >
     {#if style.reference.state}
       <!-- TODO: Add a proper click handler here-->
-      <a href={'#click-me:'+ style.reference._class + '/' + style.reference._id} class> {message.text || ''} </a>
+      <a
+        href="{'#click-me:' + style.reference._class + '/' + style.reference._id}"
+      >
+        {message.text || ''}
+      </a>
     {:else}{message.text || ''}{/if}
   </span>
 {:else if message instanceof MessageListItem}
@@ -114,6 +121,9 @@
       <svelte:self message="{c}" />
     {/each}
   </ol>
+  <!---->
+{:else if message instanceof MessageHardBreak}
+  <br/>
   <!---->
 {:else if message instanceof MessageBulletList}
   <ul>
