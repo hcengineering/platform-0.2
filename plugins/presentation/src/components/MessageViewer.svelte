@@ -14,19 +14,11 @@
 
   import {
     MessageNode,
-    MessageParagraph,
-    MessageText,
-    MessageDocument,
     MessageMark,
-    StrongMark,
-    ItalicMark,
-    UnderlineMark,
-    MessageOrderedList,
-    MessageListItem,
-    MessageBulletList,
-    StrikeMark,
     ReferenceMark,
-MessageHardBreak
+    MessageMarkType,
+    MessageNodeType,
+    messageContent
   } from '@anticrm/core'
 
   export let message: MessageNode
@@ -55,37 +47,39 @@ MessageHardBreak
   function computedStyle(marks: MessageMark[]): Style {
     let result = new Style()
     for (let mark of marks) {
-      if (mark instanceof StrongMark) {
-        result.bold = true
-      }
-      if (mark instanceof ItalicMark) {
-        result.italic = true
-      }
-      if (mark instanceof UnderlineMark) {
-        result.underline = true
-      }
-      if (mark instanceof StrikeMark) {
-        result.strike = true
-      }
-      if (mark instanceof ReferenceMark) {
-        let rm: ReferenceMark = mark
-        result.reference.state = true
-        result.reference._id = rm.attrs.id || ''
-        result.reference._class = rm.attrs.class
-        result.reference.resolved = result.reference._id != ''
+      switch (mark.type) {
+        case MessageMarkType.strong:
+          result.bold = true
+          break
+        case MessageMarkType.em:
+          result.italic = true
+          break
+        case MessageMarkType.underline:
+          result.underline = true
+          break
+        case MessageMarkType.strike:
+          result.strike = true
+          break
+        case MessageMarkType.reference:
+          let rm: ReferenceMark = mark as ReferenceMark
+          result.reference.state = true
+          result.reference._id = rm.attrs.id || ''
+          result.reference._class = rm.attrs.class
+          result.reference.resolved = result.reference._id != ''
+          break
       }
     }
     return result
   }
 </script>
 
-{#if message instanceof MessageParagraph}
+{#if message.type === MessageNodeType.paragraph}
   <p>
-    {#each message.childs() as c}
+    {#each messageContent(message) as c}
       <svelte:self message="{c}" />
     {/each}
   </p>
-{:else if message instanceof MessageText}
+{:else if message.type === MessageNodeType.text}
   <span
     class="inline-block"
     class:bold="{style.bold}"
@@ -104,30 +98,30 @@ MessageHardBreak
       </a>
     {:else}{message.text || ''}{/if}
   </span>
-{:else if message instanceof MessageListItem}
+{:else if message.type === MessageNodeType.list_item}
   <li>
-    {#each message.childs() as c}
+    {#each messageContent(message) as c}
       <svelte:self message="{c}" />
     {/each}
   </li>
-{:else if message instanceof MessageDocument}
-  {#each message.childs() as c}
+{:else if message.type === MessageNodeType.doc}
+  {#each messageContent(message) as c}
     <svelte:self message="{c}" />
   {/each}
   <!---->
-{:else if message instanceof MessageOrderedList}
+{:else if message.type === MessageNodeType.ordered_list}
   <ol type="1">
-    {#each message.childs() as c}
+    {#each messageContent(message) as c}
       <svelte:self message="{c}" />
     {/each}
   </ol>
   <!---->
-{:else if message instanceof MessageHardBreak}
-  <br/>
+{:else if message.type === MessageNodeType.hard_break}
+  <br />
   <!---->
-{:else if message instanceof MessageBulletList}
+{:else if message.type === MessageNodeType.bullet_list}
   <ul>
-    {#each message.childs() as c}
+    {#each messageContent(message) as c}
       <svelte:self message="{c}" />
     {/each}
   </ul>

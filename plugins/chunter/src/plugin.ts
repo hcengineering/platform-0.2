@@ -14,12 +14,7 @@
 //
 
 import { Platform } from '@anticrm/platform'
-import {
-  Ref,
-  parseMessage,
-  ReferenceMark,
-  MessageDocument
-} from '@anticrm/core'
+import { MessageNode, serializeMessage } from '@anticrm/core'
 import { CoreService } from '@anticrm/platform-core'
 import chunter, { ChunterService, Page } from '.'
 
@@ -48,9 +43,7 @@ export default async (
 
   const coreService = deps.core
 
-  function createMissedObjects(doc: MessageDocument): string {
-    doc.traverse((el) => {})
-
+  function createMissedObjects(doc: MessageNode): string {
     // for (const element of elements) {
     //   if (element.kind === MessageElementKind.LINK) {
     //     const link = element as MessageLink
@@ -70,7 +63,7 @@ export default async (
     //     referenced.push(element)
     //   }
     // }
-    return JSON.stringify(doc)
+    return serializeMessage(doc)
   }
 
   const service = {

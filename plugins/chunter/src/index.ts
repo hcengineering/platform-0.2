@@ -23,7 +23,7 @@ import {
   Ref,
   VDoc,
   Mixin,
-  MessageDocument
+  MessageNode,
 } from '@anticrm/core'
 import core from '@anticrm/platform-core'
 import { ComponentExtension } from '@anticrm/presentation'
@@ -50,7 +50,7 @@ export interface Page extends Collab {
 // P L U G I N
 
 export interface ChunterService extends Service {
-  createMissedObjects(doc: MessageDocument): string
+  createMissedObjects(doc: MessageNode): string
 }
 
 export default plugin(

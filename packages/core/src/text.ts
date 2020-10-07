@@ -13,13 +13,28 @@
 // limitations under the License.
 //
 
-import { Ref, Class, Doc, Type, Obj, Attribute, Tx, CORE_CLASS_ARRAY } from './core'
+import {
+  Ref,
+  Class,
+  Doc,
+  Type,
+  Obj,
+  Attribute,
+  Tx,
+  CORE_CLASS_ARRAY
+} from './core'
 import { CreateTx, CORE_CLASS_CREATETX } from './tx'
 import { Index, Storage } from './core'
 import { Model } from './model'
 import { generateId } from './objectid'
 
-import { MessageDocument, ReferenceMark, parseMessageText } from './textmodel'
+import {
+  MessageMarkType,
+  MessageNode,
+  ReferenceMark,
+  traverseMarks,
+  traverseMessage
+} from './textmodel'
 
 export interface Backlink {
   _backlinkClass: Ref<Class<Doc>>
@@ -33,9 +48,11 @@ export interface Backlinks extends Doc {
   backlinks: Backlink[]
 }
 
-export interface Text extends Type { }
+export interface Text extends Type {}
 
-export const CORE_CLASS_BACKLINKS = 'class:core.Backlinks' as Ref<Class<Backlinks>>
+export const CORE_CLASS_BACKLINKS = 'class:core.Backlinks' as Ref<
+  Class<Backlinks>
+>
 export const CORE_CLASS_TEXT = 'class:core.Text' as Ref<Class<Text>>
 export const BACKLINKS_DOMAIN = 'backlinks'
 
@@ -47,34 +64,40 @@ export class TextIndex implements Index {
   private textAttributes = new Map<Ref<Class<Obj>>, string[]>()
   private arrayAttributes = new Map<Ref<Class<Obj>>, string[]>()
 
-  constructor (modelDb: Model, storage: Storage) {
+  constructor(modelDb: Model, storage: Storage) {
     this.modelDb = modelDb
     this.storage = storage
   }
 
-  private getTextAttributes (_class: Ref<Class<Obj>>): string[] {
+  private getTextAttributes(_class: Ref<Class<Obj>>): string[] {
     const cached = this.textAttributes.get(_class)
     if (cached) return cached
 
-    const keys = this.modelDb.getAllAttributes(_class).filter(attr => attr[1].type._class === CORE_CLASS_TEXT).map(attr => attr[0])
+    const keys = this.modelDb
+      .getAllAttributes(_class)
+      .filter((attr) => attr[1].type._class === CORE_CLASS_TEXT)
+      .map((attr) => attr[0])
     this.textAttributes.set(_class, keys)
     return keys
   }
 
-  private getArrayAttributes (_class: Ref<Class<Obj>>): string[] {
+  private getArrayAttributes(_class: Ref<Class<Obj>>): string[] {
     const cached = this.arrayAttributes.get(_class)
     if (cached) return cached
 
-    const keys = this.modelDb.getAllAttributes(_class).filter(attr => attr[1].type._class === CORE_CLASS_ARRAY).map(attr => attr[0])
+    const keys = this.modelDb
+      .getAllAttributes(_class)
+      .filter((attr) => attr[1].type._class === CORE_CLASS_ARRAY)
+      .map((attr) => attr[0])
     this.arrayAttributes.set(_class, keys)
     return keys
   }
 
-  private backlinksFromMessage (message: string, pos: number): Backlink[] {
+  private backlinksFromMessage(message: string, pos: number): Backlink[] {
     let result: Backlink[] = []
-    parseMessageText(message).traverse((el) => {
-      el.traverseMarks((m) => {
-        if (m instanceof ReferenceMark) {
+    traverseMessage(JSON.parse(message) as MessageNode, (el) => {
+      traverseMarks(el, (m) => {
+        if (m.type == MessageMarkType.reference) {
           let rm = m as ReferenceMark
           result.push({
             _backlinkId: rm.attrs.id as Ref<Doc>,
@@ -87,7 +110,11 @@ export class TextIndex implements Index {
     return result
   }
 
-  private backlinks (_class: Ref<Class<Obj>>, obj: Obj, pos: number): Backlink[] {
+  private backlinks(
+    _class: Ref<Class<Obj>>,
+    obj: Obj,
+    pos: number
+  ): Backlink[] {
     const attributes = this.getTextAttributes(_class)
     const backlinks = []
     for (const attr of attributes) {
@@ -96,7 +123,7 @@ export class TextIndex implements Index {
     return backlinks
   }
 
-  async tx (tx: Tx): Promise<any> {
+  async tx(tx: Tx): Promise<any> {
     switch (tx._class) {
       case CORE_CLASS_CREATETX:
         return this.onCreate(tx as CreateTx)
@@ -105,7 +132,7 @@ export class TextIndex implements Index {
     }
   }
 
-  async onCreate (create: CreateTx): Promise<any> {
+  async onCreate(create: CreateTx): Promise<any> {
     const backlinks = this.backlinks(create.object._class, create.object, -1)
     const arrays = this.getArrayAttributes(create.object._class)
     for (const attr of arrays) {
