@@ -11,7 +11,7 @@
   //
   // See the License for the specific language governing permissions and
   // limitations under the License.
-  import { Tx, CreateTx, parseMessageText } from '@anticrm/core'
+  import { Tx, CreateTx, parseMessage } from '@anticrm/core'
   import core from '@anticrm/platform-core'
   import { Message } from '../..'
   import MessageViewer from '@anticrm/presentation/src/components/MessageViewer.svelte'
@@ -26,5 +26,5 @@
 
 {#if tx._class === core.class.CreateTx}
   Написал сообщение:
-  <MessageViewer message="{parseMessageText(getMessageText())}" />
+  <MessageViewer message="{parseMessage(getMessageText())}" />
 {/if}

@@ -11,7 +11,7 @@
   //
   // See the License for the specific language governing permissions and
   // limitations under the License.
-  import { Ref, parseMessage, parseMessageText } from '@anticrm/core'
+  import { Ref, parseMessage } from '@anticrm/core'
   import { Asset } from '@anticrm/platform-ui'
   import { User } from '@anticrm/contact'
   import { getContactService } from '../../utils'
@@ -38,7 +38,7 @@
     <b>{username}</b>
     {timestamp}
     { #if message.comments }
-      <MessageViewer message={parseMessageText(message.comments[0].message)} />
+      <MessageViewer message={parseMessage(message.comments[0].message)} />
       <!-- { #if message.comments && message.comments.length > 1 }
       { /if } -->
     { /if }

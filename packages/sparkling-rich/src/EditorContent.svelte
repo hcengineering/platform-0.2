@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { MessageDocument, parseMessage } from '@anticrm/core'
+  import { MessageNode } from '@anticrm/core'
   import { DOMParser, Fragment, Slice, Mark, MarkType } from 'prosemirror-model'
 
   import { schema } from './internal/schema'
@@ -25,7 +25,7 @@
   // ********************************
   // Properties
   // ********************************
-  export let content: MessageDocument
+  export let content: MessageNode
   export let hoverMessage: string = 'Placeholder...'
   export let triggers: string[] = []
   export let transformInjections: (
@@ -102,7 +102,7 @@
 
     let innerDOMValue = view.dom.innerHTML
     let jsonDoc = view.state.toJSON().doc
-    dispatch('content', parseMessage(jsonDoc))
+    dispatch('content', jsonDoc as MessageNode)
 
     // Check types
     let marks = view.state.storedMarks || view.state.selection.$from.marks()
@@ -136,7 +136,7 @@
     dispatch('styleEvent', evt)
   }
 
-  function createState(doc: MessageDocument): EditorState {
+  function createState(doc: MessageNode): EditorState {
     return EditorState.fromJSON(
       {
         schema,
@@ -181,7 +181,7 @@
     root.appendChild(rootElement)
   })
 
-  function updateValue(content: MessageDocument) {
+  function updateValue(content: MessageNode) {
     if (JSON.stringify(content) != JSON.stringify(view.state.toJSON().doc)) {
       let newState = createState(content)
 

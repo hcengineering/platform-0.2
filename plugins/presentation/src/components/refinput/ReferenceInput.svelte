@@ -1,14 +1,5 @@
 <script lang="ts">
-  import {
-    Class,
-    Ref,
-    VDoc,
-    StringProperty,
-    Property,
-    Title,
-    parseMessage,
-    MessageDocument
-  } from '@anticrm/core'
+  import { Property, MessageNode, newMessageDocument } from '@anticrm/core'
   import { getCoreService } from '../../utils'
 
   import core from '@anticrm/platform-core'
@@ -69,7 +60,7 @@
     inputHeight: 0
   }
   let completions: CompletionItem[] = []
-  let editorContent: MessageDocument = new MessageDocument()
+  let editorContent: MessageNode = newMessageDocument()
   let completionControl: CompletionPopup
 
   let htmlEditor: EditorContent
@@ -154,7 +145,7 @@
     if (!styleState.isEmpty) {
       dispatch('message', editorContent)
     }
-    editorContent = new MessageDocument()
+    editorContent = newMessageDocument()
   }
   function onKeyDown(event: any) {
     if (completions.length > 0) {
