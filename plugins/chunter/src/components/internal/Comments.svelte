@@ -19,8 +19,11 @@
   import { getCoreService, query } from '../../utils'
   import core from '@anticrm/platform-core'
   import chunter, { Collab, Comment } from '../..'
+  import { getService } from '@anticrm/platform-ui'
   
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
+  import CommentComponent from './Comment.svelte'
+  import Backlink from './Backlink.svelte'
 
   export let object: Collab
 
@@ -31,14 +34,16 @@
   onDestroy(() => { if(unsubscribe) unsubscribe() })
 
   const coreService = getCoreService()
+  const chunterService = getService(chunter.id) 
 
   function createComment(message: any): Promise<void> {
+    const parsedMessage = chunterService.createMissedObjects(message)
     return coreService.then(coreService => {
       const comment: Omit<Comment, '__embedded'> = {
         _class: chunter.class.Comment,
         _createdOn: Date.now() as Property<number, Date>,
         _createdBy: 'john.appleseed@gmail.com' as Property<string, string>,
-        message
+        message: parsedMessage
       }
       return coreService.push(object, 'comments', comment)
     })
@@ -48,13 +53,16 @@
 <div class="caption-2">Comments</div>
 
 { #each object.comments || [] as comment }
-  <div>{JSON.stringify(comment)}</div>
+  <CommentComponent message={comment}/>
 { /each }
 
 <ReferenceInput on:message="{(e) => createComment(e.detail)}" />
 
 <div class="caption-2">Backlinks</div>
 
-{ #each backlinks as backlink (backlink._id) }
-  <div>{JSON.stringify(backlink)}</div>
+{ #each backlinks as backlink }
+  <!-- <Backlink {backlink} /> -->
+  { #each backlink.backlinks as b }
+    <Backlink backlink={b} />
+  { /each}
 { /each }

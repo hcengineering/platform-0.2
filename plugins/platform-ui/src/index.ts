@@ -13,7 +13,8 @@
 // limitations under the License.
 //
 
-import { Metadata, plugin, Plugin, Resource, Service } from '@anticrm/platform'
+import { Metadata, plugin, Plugin, Resource, Service, Platform } from '@anticrm/platform'
+import { getContext } from 'svelte'
 import { Readable } from 'svelte/store'
 
 export type URL = string
@@ -82,3 +83,17 @@ export default plugin('ui' as Plugin<UIService>, {}, {
     AnAction: '' as Resource<(args: any) => void>
   }
 })
+
+// U T I L S
+
+export function getPlatform (): Platform {
+  return getContext(CONTEXT_PLATFORM) as Platform
+}
+
+export function getUIService (): UIService {
+  return getContext(CONTEXT_PLATFORM_UI) as UIService
+}
+
+export function getService<T extends Service> (id: Plugin<T>): T {
+  return getPlatform().getRunningPlugin(id)
+}

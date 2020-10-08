@@ -13,10 +13,10 @@
   // limitations under the License.
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
-  import ChatMessageItem from './ChatMessageItem.svelte'
+  import CommentComponent from './Comment.svelte'
   import { onDestroy } from 'svelte'
   import core, { QueryResult } from '@anticrm/platform-core'
-  import { MessageDocument, Ref, Space, VDoc } from '@anticrm/core'
+  import { MessageDocument, Ref, Space, VDoc, Property } from '@anticrm/core'
   import { getChunterService, getCoreService, query } from '../../utils'
   import chunter, { Message, Comment } from '../..'
 
@@ -78,7 +78,9 @@
   <ScrollView stylez="height:100%;" autoscroll="{true}">
     <div class="content">
       {#each messages as message (message._id)}
-        <ChatMessageItem message="{message}" />
+        { #if message.comments }
+          <CommentComponent message="{message.comments[0]}" />
+        { /if }
       {/each}
     </div>
   </ScrollView>
