@@ -15,10 +15,10 @@
   import { Asset } from '@anticrm/platform-ui'
   import { User } from '@anticrm/contact'
   import { getContactService } from '../../utils'
-  import { Message } from '../..'
+  import { Comment } from '../..'
   import MessageViewer from '@anticrm/presentation/src/components/MessageViewer.svelte'
 
-  export let message: Message
+  export let message: Comment
 
   let username: string
   let avatar: Asset
@@ -37,11 +37,7 @@
   <div class="details">
     <b>{username}</b>
     {timestamp}
-    { #if message.comments }
-      <MessageViewer message={parseMessage(message.comments[0].message)} />
-      <!-- { #if message.comments && message.comments.length > 1 }
-      { /if } -->
-    { /if }
+    <MessageViewer message={parseMessage(message.message)} />
   </div>
 </div>
 
