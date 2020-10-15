@@ -31,6 +31,7 @@ import { generateId } from './objectid'
 import {
   MessageMarkType,
   MessageNode,
+  parseMessage,
   ReferenceMark,
   traverseMarks,
   traverseMessage
@@ -95,7 +96,7 @@ export class TextIndex implements Index {
 
   private backlinksFromMessage(message: string, pos: number): Backlink[] {
     let result: Backlink[] = []
-    traverseMessage(JSON.parse(message) as MessageNode, (el) => {
+    traverseMessage(parseMessage(message) as MessageNode, (el) => {
       traverseMarks(el, (m) => {
         if (m.type == MessageMarkType.reference) {
           let rm = m as ReferenceMark

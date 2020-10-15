@@ -5,11 +5,13 @@
   import ToolbarButton from '@anticrm/sparkling-controls/src/toolbar/Button.svelte'
 
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
+import { serializeMessageMarkdown } from '@anticrm/core';
 
   let message: string = ''
 
   function add(event: any) {
-    message += '<pre>' + JSON.stringify(event, null, 2) + '</pre>'
+
+    message += '<pre>' + JSON.stringify(event) + '</pre> + <pre>' + serializeMessageMarkdown(event) + '</pre>'
   }
 </script>
 
@@ -37,7 +39,7 @@
   <div class="preview-pane">
     <ReferenceInput on:message="{(e) => add(e.detail)}" />
   </div>
-  <div>
+  <div class="message-panel">
     {@html message}
   </div>
 </PageBlock>
@@ -52,7 +54,7 @@
   <div class="preview-pane">
     <ReferenceInput on:message="{(e) => add(e.detail)}" stylesEnabled="true" />
   </div>
-  <div>
+  <div class="message-panel">
     {@html message}
   </div>
 </PageBlock>
@@ -71,7 +73,7 @@
       stylesEnabled="true"
     />
   </div>
-  <div>
+  <div class="message-panel">
     {@html message}
   </div>
 </PageBlock>
@@ -84,5 +86,9 @@
   .preview-pane {
     margin: 10px;
     background-color: hsl(210, 25%, 40%);
+  }
+  .message-panel {
+    max-width: 400px;
+    overflow: auto;
   }
 </style>
