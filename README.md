@@ -17,7 +17,7 @@ yarn workspace @anticrm/server-front start
 yarn workspace prod dev
 ```
 
-Go to http://localhost:8080
+Go to http://localhost:8080/component:workbench.Workbench/application:workbench.Default
 
 # The Platform Documentation
 
