@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import methods from '@anticrm/accounts'
+import {methods} from '@anticrm/accounts'
 import { Response, Request, serialize } from '@anticrm/core'
 import { MongoClient, Db } from 'mongodb'
 
@@ -49,7 +49,6 @@ router.post('rpc', '/rpc', async (ctx) => {
     client = await MongoClient.connect(dbUri, { useUnifiedTopology: true })
   }
   const db = client.db('accounts')
-
   const result = await method(db, request)
   console.log(result)
   ctx.body = result
