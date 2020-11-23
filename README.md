@@ -11,10 +11,18 @@ Use following commands to install and run demo application.
 ```
 yarn
 docker run -d -p 27017:27017 mongo
-yarn workspace @anticrm/tool create-workspace john.appleseed@gmail.com -w workspace -p 123 -f "John Appleseed"
+yarn workspace @anticrm/tool create-workspace workspace --organization "My Organization"
+yarn workspace @anticrm/tool create-user john.appleseed@gmail.com -w workspace -p 123 -f "John Appleseed"
+yarn workspace @anticrm/tool create-user brain.appleseed@gmail.com -w workspace -p 123 -f "Brain Appleseed"
 yarn workspace @anticrm/server start
 yarn workspace @anticrm/server-front start
 yarn workspace prod dev
+```
+
+Accessing from more users:
+
+```
+yarn workspace @anticrm/tool create-user john.someseed@gmail.com -w workspace -p 123 -f "John Someseed"
 ```
 
 Go to http://localhost:8080/component:workbench.Workbench/application:workbench.Default

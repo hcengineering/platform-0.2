@@ -139,7 +139,7 @@ export class Model implements Storage {
   }
 
   // from Builder
-  assign (layout: AnyLayout, _class: Ref<Classifier<Doc>>, values: AnyLayout) {
+  assign (layout: AnyLayout, _class: Ref<Classifier<Doc>>, values: AnyLayout): AnyLayout {
     const l = layout as unknown as AnyLayout
     const r = values as unknown as AnyLayout
     for (const key in values) {
@@ -149,6 +149,7 @@ export class Model implements Storage {
         l[this.findAttributeKey(_class, key)] = r[key]
       }
     }
+    return layout
   }
 
   generateId (): Ref<Doc> {
@@ -274,4 +275,3 @@ function filterEq (docs: Doc[], propertyKey: string, value: PropertyType): Doc[]
   }
   return result
 }
-
