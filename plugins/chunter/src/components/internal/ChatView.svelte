@@ -11,14 +11,14 @@
   //
   // See the License for the specific language governing permissions and
   // limitations under the License.
-  import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
+  import { MessageNode, Property, Ref, Space, VDoc } from '@anticrm/core'
+  import core from '@anticrm/platform-core'
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
-  import CommentComponent from './Comment.svelte'
+  import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
   import { onDestroy } from 'svelte'
-  import core, { QueryResult } from '@anticrm/platform-core'
-  import { MessageDocument, Ref, Space, VDoc, Property } from '@anticrm/core'
+  import chunter, { Comment, Message } from '../..'
   import { getChunterService, getCoreService, query } from '../../utils'
-  import chunter, { Message, Comment } from '../..'
+  import CommentComponent from './Comment.svelte'
 
   const coreService = getCoreService()
   const chunterService = getChunterService()
@@ -29,27 +29,23 @@
   let messages: Message[] = []
   let unsubscribe: () => void
 
-  // function subscribe(queryResult: QueryResult<Message>) {
-  //   if (unsubscribe) unsubscribe()
-  //   unsubscribe = queryResult.subscribe(docs => messages = docs)
-  // }
-
   $: {
+    if (unsubscribe) {
+      unsubscribe()
+    }
     unsubscribe = query(chunter.class.Message, { _space: space }, (docs) => {
       messages = docs
     })
 
     // TODO: use Titles index instead of getting the whole Space object
-    coreService
-      .then((service) => service.findOne(core.class.Space, { _id: space }))
-      .then((spaceObj) => (spaceName = spaceObj ? '#' + spaceObj.name : ''))
+    coreService.then((service) => service.findOne(core.class.Space, { _id: space })).then((spaceObj) => (spaceName = spaceObj ? '#' + spaceObj.name : ''))
   }
 
   onDestroy(() => {
     if (unsubscribe) unsubscribe()
   })
 
-  function createMessage(message: MessageDocument) {
+  function createMessage(message: MessageNode) {
     if (message) {
       chunterService.then((chunterService) => {
         const parsedMessage = chunterService.createMissedObjects(message)
@@ -78,9 +74,9 @@
   <ScrollView stylez="height:100%;" autoscroll="{true}">
     <div class="content">
       {#each messages as message (message._id)}
-        { #if message.comments }
+        {#if message.comments}
           <CommentComponent message="{message.comments[0]}" />
-        { /if }
+        {/if}
       {/each}
     </div>
   </ScrollView>
