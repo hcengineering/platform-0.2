@@ -56,12 +56,14 @@ export function start(port: number, dbUri: string, host?: string) {
         console.log(`broadcasting to ${connections.size} connections`)
         client.then((client) => {
           if (client !== from) {
-            console.log('broadcasting to')
-            console.log(client)
-            console.log(response)
+            console.log(`broadcasting to ${client}`, response)
             client.send(response)
           } else {
-            console.log('do not broadcast to self')
+            console.log('notify self about completeness without response')
+            client.send({
+              id: response.id,
+              error: response.error
+            } as Response<R>)
           }
         })
       }

@@ -1,22 +1,40 @@
 //
 // Copyright © 2020 Anticrm Platform Contributors.
-// 
+//
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
 // obtain a copy of the License at https://www.eclipse.org/legal/epl-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// 
+//
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
 
 import type { Platform } from '@anticrm/platform'
 import {
-  Ref, Class, Doc, AnyLayout, MODEL_DOMAIN, CoreProtocol, Tx, TITLE_DOMAIN, BACKLINKS_DOMAIN, Emb,
-  VDoc, Space, generateId as genId, CreateTx, Property, PropertyType, ModelIndex, DateProperty, StringProperty, PushTx
+  Ref,
+  Class,
+  Doc,
+  AnyLayout,
+  MODEL_DOMAIN,
+  CoreProtocol,
+  Tx,
+  TITLE_DOMAIN,
+  BACKLINKS_DOMAIN,
+  Emb,
+  VDoc,
+  Space,
+  generateId as genId,
+  CreateTx,
+  Property,
+  PropertyType,
+  ModelIndex,
+  DateProperty,
+  StringProperty,
+  PushTx
 } from '@anticrm/core'
 import { ModelDb } from './modeldb'
 
@@ -44,7 +62,7 @@ export default async (platform: Platform): Promise<CoreService> => {
     find: (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc[]> => rpc.request('find', _class, query),
     findOne: (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc | undefined> => rpc.request('findOne', _class, query),
     tx: (tx: Tx): Promise<void> => rpc.request('tx', tx),
-    loadDomain: (domain: string): Promise<Doc[]> => rpc.request('loadDomain', domain),
+    loadDomain: (domain: string): Promise<Doc[]> => rpc.request('loadDomain', domain)
   }
 
   // Storages
@@ -56,13 +74,13 @@ export default async (platform: Platform): Promise<CoreService> => {
 
   model.loadModel(await coreProtocol.loadDomain(MODEL_DOMAIN))
 
-  coreProtocol.loadDomain(TITLE_DOMAIN).then(docs => {
+  coreProtocol.loadDomain(TITLE_DOMAIN).then((docs) => {
     for (const doc of docs) {
       titles.store(doc)
     }
   })
 
-  coreProtocol.loadDomain(BACKLINKS_DOMAIN).then(docs => {
+  coreProtocol.loadDomain(BACKLINKS_DOMAIN).then((docs) => {
     for (const doc of docs) {
       graph.store(doc)
     }
@@ -87,9 +105,14 @@ export default async (platform: Platform): Promise<CoreService> => {
   ])
 
   // add listener to process data updates from backend
-  rpc.addEventListener(response => txProcessor.process(response.result as Tx))
+  rpc.addEventListener((response) => {
+    // Do not process if result is not passed, it could be if sources is our transaction.
+    if (response.result != null) {
+      txProcessor.process(response.result as Tx)
+    }
+  })
 
-  function find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
+  function find<T extends Doc>(_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
     const domainName = model.getDomain(_class)
     const domain = domains.get(domainName)
     if (domain) {
@@ -98,11 +121,11 @@ export default async (platform: Platform): Promise<CoreService> => {
     return cache.find(_class, query)
   }
 
-  function findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined> {
-    return find(_class, query).then(docs => docs.length === 0 ? undefined : docs[0])
+  function findOne<T extends Doc>(_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined> {
+    return find(_class, query).then((docs) => (docs.length === 0 ? undefined : docs[0]))
   }
 
-  function query<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): QueryResult<T> {
+  function query<T extends Doc>(_class: Ref<Class<T>>, query: AnyLayout): QueryResult<T> {
     const domainName = model.getDomain(_class)
     const domain = domains.get(domainName)
     if (domain) {
@@ -111,9 +134,22 @@ export default async (platform: Platform): Promise<CoreService> => {
     return qCache.query(_class, query)
   }
 
-  function generateId () { return genId() as Ref<Doc> }
+  function generateId() {
+    return genId() as Ref<Doc>
+  }
 
-  function createDoc<T extends Doc> (doc: T): Promise<any> {
+  function processTx(tx: Tx): Promise<any> {
+    console.log('processTx', tx)
+    return Promise.all([
+      // TODO: Remove extra processing of same transaction when server is ready with it.
+      coreProtocol.tx(tx).then(() => {
+        txProcessor.process(tx)
+      }),
+      txProcessor.process(tx)
+    ])
+  }
+
+  function createDoc<T extends Doc>(doc: T): Promise<any> {
     if (!doc._id) {
       doc._id = generateId()
     }
@@ -126,10 +162,10 @@ export default async (platform: Platform): Promise<CoreService> => {
       object: doc
     }
 
-    return Promise.all([coreProtocol.tx(tx), txProcessor.process(tx)])
+    return processTx(tx)
   }
 
-  function createVDoc<T extends VDoc> (vdoc: T): Promise<void> {
+  function createVDoc<T extends VDoc>(vdoc: T): Promise<void> {
     if (!vdoc._createdBy) {
       vdoc._createdBy = platform.getMetadata(login.metadata.WhoAmI) as StringProperty
     }
@@ -139,7 +175,7 @@ export default async (platform: Platform): Promise<CoreService> => {
     return createDoc(vdoc)
   }
 
-  function push (vdoc: VDoc, _attribute: string, element: Emb): Promise<any> {
+  function push(vdoc: VDoc, _attribute: string, element: Emb): Promise<any> {
     const tx: PushTx = {
       _class: core.class.PushTx,
       _id: generateId() as Ref<Doc>,
@@ -148,14 +184,13 @@ export default async (platform: Platform): Promise<CoreService> => {
       _date: Date.now() as Property<number, Date>,
       _user: platform.getMetadata(login.metadata.WhoAmI) as Property<string, string>,
       _attribute: _attribute as Property<string, string>,
-      _attributes: element as unknown as { [key: string]: PropertyType }
+      _attributes: (element as unknown) as { [key: string]: PropertyType }
     }
-    console.log('push', tx)
-    return Promise.all([coreProtocol.tx(tx), txProcessor.process(tx)])
+    return processTx(tx)
   }
 
   return {
-    getModel () { return model },
+    getModel: () => model,
     query,
     find,
     findOne,
@@ -164,5 +199,4 @@ export default async (platform: Platform): Promise<CoreService> => {
     push,
     generateId
   }
-
 }
