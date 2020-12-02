@@ -1,14 +1,14 @@
 <!--
 // Copyright © 2020 Anticrm Platform Contributors.
-// 
+//
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
 // obtain a copy of the License at https://www.eclipse.org/legal/epl-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// 
+//
 // See the License for the specific language governing permissions and
 // limitations under the License.
 -->
@@ -28,7 +28,7 @@
 
   import CreateSpace from './CreateSpace.svelte'
   import MainComponent from '../proxies/MainComponent.svelte'
-  
+
   import ObjectForm from './ObjectForm.svelte'
 
   const uiService = getUIService()
@@ -36,6 +36,7 @@
   let location: string[]
   const locationStore = uiService.getLocation()
   locationStore.subscribe(loc => {
+    console.log('LOCATION is ', loc)
     location = loc.pathname.split('/')
   })
 
@@ -50,17 +51,21 @@
   onDestroy(() => { if (spaceUnsubscribe) spaceUnsubscribe() })
 
   let application: Ref<WorkbenchApplication>
-  let applications: WorkbenchApplication[] = []
+  let applications: Array<WorkbenchApplication> = []
   find(workbench.class.WorkbenchApplication, {}).then(docs => {applications = docs})
 
   let component: AnyComponent | undefined
+
 
   $: {
     space = location[3] as Ref<Space>
     if (!application) {
       application = workbench.application.Activity
     }
-    component = applications.find(a => a._id === application)?.component
+    let apps = applications.filter(a => a._id === application)
+    if(apps.length == 1) {
+      component = apps[0].component
+    }
   }
 
   function id<T extends Doc>(doc: T): Ref<T> { return doc._id as Ref<T> }
@@ -145,7 +150,7 @@
     &.selected {
       background-color: var(--theme-content-color-dark);
     }
-  }  
+  }
 }
 
 .main {
@@ -161,7 +166,7 @@
     // align-items: stretch;
   //   background-color: blue;
   // }
-  
+
   // .input-control {
   //   padding: 1em;
   //   max-height: 400px;
@@ -173,4 +178,3 @@ aside {
   border-left: 1px solid var(--theme-separator-color);
 }
 </style>
-
