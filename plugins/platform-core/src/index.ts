@@ -38,16 +38,16 @@ export type Subscriber<T> = (value: T[]) => void
 export type Unsubscriber = () => void
 
 export interface QueryResult<T extends Doc> {
-  subscribe(run: Subscriber<T>): Unsubscriber
+  subscribe (run: Subscriber<T>): Unsubscriber
 }
 
 export interface CoreService extends Service, CoreProtocol {
-  getModel(): ModelDb
-  query<T extends Doc>(_class: Ref<Class<T>>, query: AnyLayout): QueryResult<T>
-  createDoc<T extends Doc>(doc: T): Promise<void>
-  createVDoc<T extends VDoc>(vdoc: T): Promise<void>
-  push(vdoc: VDoc, attribute: string, element: Emb): Promise<void>
-  generateId(): Ref<Doc>
+  getModel (): ModelDb
+  query<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): QueryResult<T>
+  createDoc<T extends Doc> (doc: T): Promise<void>
+  createVDoc<T extends VDoc> (vdoc: T): Promise<void>
+  push (vdoc: VDoc, attribute: string, element: Emb): Promise<void>
+  generateId (): Ref<Doc>
 }
 
 export default plugin(

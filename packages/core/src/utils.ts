@@ -16,23 +16,23 @@
 import { AnyLayout, Doc, Ref, Class, Tx, Index } from './core'
 
 export interface DocumentProtocol {
-  find<T extends Doc>(_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]>
-  findOne<T extends Doc>(_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined>
-  loadDomain(domain: string, index?: string, direction?: string): Promise<Doc[]>
+  find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]>
+  findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined>
+  loadDomain (domain: string, index?: string, direction?: string): Promise<Doc[]>
 }
 
 export interface CoreProtocol extends DocumentProtocol {
-  tx(tx: Tx): Promise<void>
+  tx (tx: Tx): Promise<void>
 }
 
 export class TxProcessor {
   private indices: Index[]
 
-  constructor(indices: Index[]) {
+  constructor (indices: Index[]) {
     this.indices = indices
   }
 
-  process(tx: Tx): Promise<any> {
+  process (tx: Tx): Promise<any> {
     return Promise.all(this.indices.map(index => index.tx(tx)))
   }
 }

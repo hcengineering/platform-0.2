@@ -27,15 +27,15 @@ export class Titles implements Storage {
   private graph = new Map<Ref<Doc>, Node>()
   private model: ModelDb
 
-  constructor(model: ModelDb) {
+  constructor (model: ModelDb) {
     this.model = model
   }
 
-  private implements(node: Node, _class: Ref<Classifier<Doc>> | undefined): boolean {
+  private implements (node: Node, _class: Ref<Classifier<Doc>> | undefined): boolean {
     return _class ? this.model.is(node._class, _class) : true
   }
 
-  async find<T extends Doc>(_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
+  async find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
     const result = [] as Doc[]
     if ((_class as string) !== core.class.Title) {
       throw new Error('assert _class !== core.class.Title')
@@ -56,13 +56,13 @@ export class Titles implements Storage {
     return result as T[]
   }
 
-  queryTitle(_id: Ref<Doc>): string {
+  queryTitle (_id: Ref<Doc>): string {
     // const touch = this.titleRef.value
     const node = this.graph.get(_id)
     return node ? (node.title as string) : 'not found'
   }
 
-  async store(doc: Doc): Promise<void> {
+  async store (doc: Doc): Promise<void> {
     if (doc._class !== core.class.Title) {
       throw new Error('assert doc._class !== core.class.Title')
     }
@@ -75,11 +75,11 @@ export class Titles implements Storage {
     })
   }
 
-  async push(_class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: any): Promise<void> {
+  async push (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: any): Promise<void> {
     console.log('graph push')
   }
 
-  async update(_class: Ref<Class<Doc>>, _id: Ref<Doc>, attributes: any): Promise<void> {
+  async update (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attributes: any): Promise<void> {
     console.log('titles update', _id, attributes)
     const node = this.graph.get(_id)
     if (node) {
@@ -87,7 +87,7 @@ export class Titles implements Storage {
     }
   }
 
-  async remove(_class: Ref<Class<Doc>>, doc: Ref<Doc>): Promise<void> {
+  async remove (_class: Ref<Class<Doc>>, doc: Ref<Doc>): Promise<void> {
     console.log('graph remove')
   }
 }

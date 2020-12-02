@@ -20,7 +20,6 @@ import WebSocket, { Server } from 'ws'
 import { decode } from 'jwt-simple'
 import { connect, ClientControl } from './service'
 import { connectWorkspace, WorkspaceProtocol } from './workspace'
-import { CoreProtocol } from '@anticrm/core'
 
 const ctlpassword = process.env.CTL_PASSWORD || '123pass'
 
@@ -35,11 +34,11 @@ interface Service {
 type ClientService = Service & ClientControl
 
 export interface PlatformServer {
-  broadcast<R>(from: ClientControl, response: Response<R>): void
-  shutdown(password: string): Promise<void>
+  broadcast<R> (from: ClientControl, response: Response<R>): void
+  shutdown (password: string): Promise<void>
 }
 
-export function start(port: number, dbUri: string, host?: string) {
+export function start (port: number, dbUri: string, host?: string) {
   console.log('starting server on port ' + port + '...')
   console.log('host: ' + host)
 
@@ -51,7 +50,7 @@ export function start(port: number, dbUri: string, host?: string) {
   let clientCounter = 0
 
   const platformServer: PlatformServer = {
-    broadcast<R>(from: ClientControl, response: Response<R>) {
+    broadcast<R> (from: ClientControl, response: Response<R>) {
       for (const client of connections.values()) {
         console.log(`broadcasting to ${connections.size} connections`)
         client.then(client => {
@@ -69,22 +68,22 @@ export function start(port: number, dbUri: string, host?: string) {
       }
     },
 
-    async shutdown(password: string) {
+    async shutdown (password: string) {
       console.log('shutting down...')
       if (password !== ctlpassword) {
         throw new Error('ctl password does not match')
       }
       for (const client of connections.values()) {
-        ;(await client).shutdown()
+        ; (await client).shutdown()
       }
       httpServer.close()
     }
   }
 
-  async function createClient(workspace: Promise<WorkspaceProtocol>, ws: WebSocket): Promise<ClientService> {
+  async function createClient (workspace: Promise<WorkspaceProtocol>, ws: WebSocket): Promise<ClientService> {
     return ((await connect(workspace, ws, platformServer)) as unknown) as ClientService
   }
-  async function getWorkspace(wsName: string): Promise<WorkspaceProtocol> {
+  async function getWorkspace (wsName: string): Promise<WorkspaceProtocol> {
     let workspace = workspaces.get(wsName)
     if (!workspace) {
       workspace = connectWorkspace(dbUri, wsName)
@@ -93,7 +92,7 @@ export function start(port: number, dbUri: string, host?: string) {
     return workspace
   }
 
-  wss.on('connection', function connection(ws: WebSocket, request: any, client: Client) {
+  wss.on('connection', function connection (ws: WebSocket, request: any, client: Client) {
     console.log('connect:', client)
     const workspace = getWorkspace(client.workspace)
     const service = createClient(workspace, ws)
@@ -116,7 +115,7 @@ export function start(port: number, dbUri: string, host?: string) {
     })
   })
 
-  function auth(request: IncomingMessage, done: (err: Error | null, client: Client | null) => void) {
+  function auth (request: IncomingMessage, done: (err: Error | null, client: Client | null) => void) {
     const token = request.url?.substring(1) // remove leading '/'
     if (!token) {
       done(new Error('no authorization token'), null)
@@ -130,7 +129,7 @@ export function start(port: number, dbUri: string, host?: string) {
     }
   }
 
-  server.on('upgrade', function upgrade(request: IncomingMessage, socket, head: Buffer) {
+  server.on('upgrade', function upgrade (request: IncomingMessage, socket, head: Buffer) {
     auth(request, (err: Error | null, client: Client | null) => {
       if (!client) {
         socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n')
@@ -138,7 +137,7 @@ export function start(port: number, dbUri: string, host?: string) {
         return
       }
       console.log('client: ', client)
-      wss.handleUpgrade(request, socket, head, function done(ws) {
+      wss.handleUpgrade(request, socket, head, function done (ws) {
         wss.emit('connection', ws, request, client)
       })
     })

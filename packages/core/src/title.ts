@@ -37,12 +37,12 @@ export class TitleIndex implements Index {
   private storage: Storage
   private primaries = new Map<Ref<Classifier<Doc>>, string>()
 
-  constructor(modelDb: Model, storage: Storage) {
+  constructor (modelDb: Model, storage: Storage) {
     this.modelDb = modelDb
     this.storage = storage
   }
 
-  private getPrimary(_class: Ref<Classifier<Doc>>): string | null {
+  private getPrimary (_class: Ref<Classifier<Doc>>): string | null {
     const cached = this.primaries.get(_class)
     if (cached) return cached === NULL ? null : cached
 
@@ -61,7 +61,7 @@ export class TitleIndex implements Index {
     return null
   }
 
-  async tx(tx: Tx): Promise<any> {
+  async tx (tx: Tx): Promise<any> {
     switch (tx._class) {
       case CORE_CLASS_CREATETX:
         return this.onCreate(tx as CreateTx)
@@ -72,7 +72,7 @@ export class TitleIndex implements Index {
     }
   }
 
-  async onCreate(create: CreateTx): Promise<any> {
+  async onCreate (create: CreateTx): Promise<any> {
     const primary = this.getPrimary(create.object._class)
     if (!primary) {
       return
@@ -91,7 +91,7 @@ export class TitleIndex implements Index {
     return this.storage.store(doc)
   }
 
-  async onUpdate(update: UpdateTx): Promise<any> {
+  async onUpdate (update: UpdateTx): Promise<any> {
     const primary = this.getPrimary(update._objectClass)
     if (!primary) {
       return

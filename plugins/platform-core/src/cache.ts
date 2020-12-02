@@ -16,29 +16,29 @@
 import { AnyLayout, Class, CoreProtocol, Doc, Storage, Ref } from '@anticrm/core'
 
 export class Cache implements Storage {
-  async store(doc: Doc): Promise<void> {
+  async store (doc: Doc): Promise<void> {
     console.log('cache store')
   }
 
-  async push(_class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: any): Promise<void> {
+  async push (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: any): Promise<void> {
     console.log('cache push')
   }
 
-  async update(_class: Ref<Class<Doc>>, _id: Ref<Doc>, attributes: any): Promise<void> {
+  async update (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attributes: any): Promise<void> {
     console.log('cache update')
   }
 
-  async remove(_class: Ref<Class<Doc>>, doc: Ref<Doc>): Promise<void> {
+  async remove (_class: Ref<Class<Doc>>, doc: Ref<Doc>): Promise<void> {
     console.log('cache remove')
   }
 
   private coreProtocol: CoreProtocol
 
-  constructor(coreProtocol: CoreProtocol) {
+  constructor (coreProtocol: CoreProtocol) {
     this.coreProtocol = coreProtocol
   }
 
-  find<T extends Doc>(_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
+  find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
     return this.coreProtocol.find(_class, query) as Promise<T[]>
   }
 }

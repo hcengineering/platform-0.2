@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { DateProperty, Doc, StringProperty, Ref, Class, Emb, PropertyType, Tx } from './core'
+import { Doc, StringProperty, Ref, Class, PropertyType, Tx } from './core'
 import { Index, Storage } from './core'
 import { Model, MODEL_DOMAIN } from './model'
 
@@ -69,18 +69,22 @@ export class ModelIndex implements Index {
 
   async tx (tx: Tx): Promise<any> {
     switch (tx._class) {
-      case CORE_CLASS_CREATETX:
+      case CORE_CLASS_CREATETX: {
         const createTx = tx as CreateTx
-        if (this.model.getDomain(createTx.object._class) !== MODEL_DOMAIN)
+        if (this.model.getDomain(createTx.object._class) !== MODEL_DOMAIN) {
           return
-        else
+        } else {
           return this.storage.store(createTx.object)
-      case CORE_CLASS_UPDATETX:
+        }
+      }
+      case CORE_CLASS_UPDATETX: {
         const updateTx = tx as UpdateTx
-        if (this.model.getDomain(updateTx._objectClass) !== MODEL_DOMAIN)
+        if (this.model.getDomain(updateTx._objectClass) !== MODEL_DOMAIN) {
           return
-        else
+        } else {
           return this.storage.update(updateTx._objectClass, updateTx._objectId, updateTx._attributes)
+        }
+      }
       default:
         console.log('not implemented model tx', tx)
     }

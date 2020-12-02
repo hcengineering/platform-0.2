@@ -14,8 +14,6 @@
     "prismjs": "^1.21.0"
   },
   "devDependencies": {
-    "prettier": "^2.1.2",
-    "prettier-plugin-svelte": "^1.2.1",
     "typescript": "^3.9.4"
   }
 }

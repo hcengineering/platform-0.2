@@ -37,12 +37,12 @@ interface CommitInfo {
   created: Doc[]
 }
 export interface WorkspaceProtocol extends CoreProtocol {
-  delete(_class: Ref<Class<Doc>>, query: AnyLayout): Promise<void>
-  commit(commitInfo: CommitInfo): Promise<void>
-  shutdown(): Promise<void>
+  delete (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<void>
+  commit (commitInfo: CommitInfo): Promise<void>
+  shutdown (): Promise<void>
 }
 
-export async function connectWorkspace(uri: string, workspace: string): Promise<CoreProtocol & WorkspaceProtocol> {
+export async function connectWorkspace (uri: string, workspace: string): Promise<CoreProtocol & WorkspaceProtocol> {
   console.log('connecting to ' + uri)
   const client = await MongoClient.connect(uri, { useUnifiedTopology: true })
   const db = withTenant(client, workspace)
@@ -54,31 +54,31 @@ export async function connectWorkspace(uri: string, workspace: string): Promise<
   console.log('model loaded.')
   memdb.loadModel(model)
 
-  function collection<T extends Doc>(_class: Ref<Class<Doc>>): Collection {
+  function collection<T extends Doc> (_class: Ref<Class<Doc>>): Collection {
     const domain = memdb.getDomain(_class)
     return db.collection(domain)
   }
 
   const mongoStorage: Storage = {
-    async store(doc: Doc): Promise<any> {
+    async store (doc: Doc): Promise<any> {
       const c = collection(doc._class)
       console.log('STORE:', c.namespace, doc)
       return c.insertOne(doc)
     },
 
-    async push(_class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: any): Promise<any> {
+    async push (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: any): Promise<any> {
       return collection(_class).updateOne({ _id }, { $push: { [attribute]: attributes } })
     },
 
-    async update(_class: Ref<Class<Doc>>, _id: Ref<Doc>, attributes: any): Promise<any> {
+    async update (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attributes: any): Promise<any> {
       return collection(_class).updateOne({ _id }, { $set: attributes })
     },
 
-    async remove(_class: Ref<Class<Doc>>, doc: Ref<Doc>): Promise<any> {
+    async remove (_class: Ref<Class<Doc>>, doc: Ref<Doc>): Promise<any> {
       return collection(_class).deleteOne({ _id: doc })
     },
 
-    async find<T extends Doc>(_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
+    async find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
       return collection(_class)
         .find({
           ...memdb.assign({}, _class, query),
@@ -99,7 +99,7 @@ export async function connectWorkspace(uri: string, workspace: string): Promise<
   const clientControl = {
     // C O R E  P R O T O C O L
 
-    find<T extends Doc>(_class: Ref<Class<Doc>>, query: AnyLayout): Promise<T[]> {
+    find<T extends Doc> (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<T[]> {
       return collection(_class)
         .find({
           ...memdb.assign({}, _class, query),
@@ -108,7 +108,7 @@ export async function connectWorkspace(uri: string, workspace: string): Promise<
         .toArray()
     },
 
-    async findOne(_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc | undefined> {
+    async findOne (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc | undefined> {
       const result = await collection(_class).findOne({
         ...memdb.assign({}, _class, query),
         _class: memdb.getClass(_class)
@@ -119,11 +119,11 @@ export async function connectWorkspace(uri: string, workspace: string): Promise<
       return result
     },
 
-    async tx(tx: Tx): Promise<void> {
+    async tx (tx: Tx): Promise<void> {
       return txProcessor.process(tx)
     },
 
-    async loadDomain(domain: string): Promise<Doc[]> {
+    async loadDomain (domain: string): Promise<Doc[]> {
       if (domain === MODEL_DOMAIN) return memdb.dump()
       console.log('domain:', domain)
       return db.collection(domain).find({}).toArray()
@@ -131,12 +131,12 @@ export async function connectWorkspace(uri: string, workspace: string): Promise<
 
     // P R O T C O L  E X T E N S I O N S
 
-    async delete(_class: Ref<Class<Doc>>, query: AnyLayout): Promise<void> {
+    async delete (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<void> {
       console.log('DELETE', _class, query)
       await collection(_class).deleteMany({ ...query })
     },
 
-    async commit(commitInfo: CommitInfo): Promise<void> {
+    async commit (commitInfo: CommitInfo): Promise<void> {
       // group by domain
       const byDomain = commitInfo.created.reduce((group: Map<string, Doc[]>, doc) => {
         const domain = memdb.getDomain(doc._class)
@@ -150,7 +150,7 @@ export async function connectWorkspace(uri: string, workspace: string): Promise<
 
       await Promise.all(Array.from(byDomain.entries()).map(domain => db.collection(domain[0]).insertMany(domain[1])))
     },
-    shutdown(): Promise<void> {
+    shutdown (): Promise<void> {
       return client.close()
     }
   }

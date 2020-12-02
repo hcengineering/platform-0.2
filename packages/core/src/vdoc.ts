@@ -17,7 +17,7 @@ import { Class, DateProperty, Doc, Emb, Index, Ref, Storage, StringProperty, Tx 
 import { Model } from './model'
 import { CORE_CLASS_CREATETX, CORE_CLASS_PUSHTX, CORE_CLASS_UPDATETX, CreateTx, PushTx, UpdateTx } from './tx'
 
-export interface Application extends Doc {}
+export interface Application extends Doc { }
 
 export interface List extends Emb {
   id: string
@@ -44,12 +44,12 @@ export class VDocIndex implements Index {
   private modelDb: Model
   private storage: Storage
 
-  constructor(modelDb: Model, storage: Storage) {
+  constructor (modelDb: Model, storage: Storage) {
     this.modelDb = modelDb
     this.storage = storage
   }
 
-  async tx(tx: Tx): Promise<any> {
+  async tx (tx: Tx): Promise<any> {
     switch (tx._class) {
       case CORE_CLASS_CREATETX:
         return this.onCreate(tx as CreateTx)
@@ -62,7 +62,7 @@ export class VDocIndex implements Index {
     }
   }
 
-  async onCreate(create: CreateTx): Promise<any> {
+  async onCreate (create: CreateTx): Promise<any> {
     if (!this.modelDb.is(create.object._class, CORE_CLASS_VDOC)) return
 
     // const doc: VDoc = {
@@ -91,11 +91,11 @@ export class VDocIndex implements Index {
     return this.storage.store(create.object)
   }
 
-  onPush(tx: PushTx): Promise<any> {
+  onPush (tx: PushTx): Promise<any> {
     return this.storage.push(tx._objectClass, tx._objectId, tx._attribute, tx._attributes)
   }
 
-  onUpdate(tx: UpdateTx): Promise<any> {
+  onUpdate (tx: UpdateTx): Promise<any> {
     return this.storage.update(tx._objectClass, tx._objectId, tx._attributes)
   }
 }

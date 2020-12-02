@@ -24,7 +24,6 @@ import {
   ClassifierKind,
   AllAttributes,
   Attribute,
-  CORE_CLASS_TYPE,
   CORE_CLASS_CLASS,
   CORE_CLASS_ATTRIBUTE,
   CORE_CLASS_ARRAY,
@@ -80,7 +79,7 @@ const doc1 = {
 
 const model = new Model('vdoc')
 
-function prop(_class: Ref<Class<Emb>> = CORE_CLASS_ATTRIBUTE, extra: Record<string, unknown> = {}): Attribute {
+function prop (_class: Ref<Class<Emb>> = CORE_CLASS_ATTRIBUTE, extra: Record<string, unknown> = {}): Attribute {
   return ({
     _class: CORE_CLASS_ATTRIBUTE,
     type: ({

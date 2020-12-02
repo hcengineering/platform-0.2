@@ -21,8 +21,8 @@ import login from '@anticrm/login'
 export type EventListener = (event: Response<unknown>) => void
 
 export interface RpcService {
-  request<R>(method: string, ...params: any[]): Promise<R>
-  addEventListener(listener: EventListener): void
+  request<R> (method: string, ...params: any[]): Promise<R>
+  addEventListener (listener: EventListener): void
 }
 
 export default (platform: Platform): RpcService => {
@@ -33,7 +33,7 @@ export default (platform: Platform): RpcService => {
   const requests = new Map<ReqId, PromiseInfo>()
   let lastId = 0
 
-  function createWebsocket() {
+  function createWebsocket () {
     const host = platform.getMetadata(core.metadata.WSHost)
     const port = platform.getMetadata(core.metadata.WSPort)
     const token = platform.getMetadata(login.metadata.Token)
@@ -90,14 +90,14 @@ export default (platform: Platform): RpcService => {
   }
 
   let websocket: WebSocket | null = null
-  async function getWebSocket() {
+  async function getWebSocket () {
     if (websocket === null || websocket.readyState === WebSocket.CLOSED || websocket.readyState === WebSocket.CLOSING) {
       websocket = await createWebsocket()
     }
     return websocket
   }
 
-  function request<R>(method: string, ...params: any[]): Promise<R> {
+  function request<R> (method: string, ...params: any[]): Promise<R> {
     // console.log('<<<<<<< ' + method)
     // console.log(params)
     return new Promise<any>((resolve, reject) => {
@@ -116,7 +116,7 @@ export default (platform: Platform): RpcService => {
 
   return {
     request,
-    addEventListener(listener: EventListener) {
+    addEventListener (listener: EventListener) {
       listeners.push(listener)
     }
   }

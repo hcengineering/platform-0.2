@@ -19,7 +19,7 @@ import core from '@anticrm/platform-core'
 import { Db, MongoClient } from 'mongodb'
 
 
-async function getTestWorkspace(uri: string): Promise<{ db: Db; client: MongoClient }> {
+async function getTestWorkspace (uri: string): Promise<{ db: Db; client: MongoClient }> {
   const client = await MongoClient.connect(uri, { useUnifiedTopology: true })
 
   // Drop Existing database
@@ -51,6 +51,6 @@ describe('workspace', () => {
   })
 
   afterAll(async () => {
-    ;(await workspace).client.close()
+    ; (await workspace).client.close()
   })
 })

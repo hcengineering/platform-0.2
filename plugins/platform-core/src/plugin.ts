@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import type { Platform } from '@anticrm/platform'
+import { Platform } from '@anticrm/platform'
 import {
   Ref,
   Class,
@@ -58,8 +58,8 @@ export default async (platform: Platform): Promise<CoreService> => {
   const rpc = rpcService(platform)
 
   const coreProtocol: CoreProtocol = {
-    find: <T extends Doc>(_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> => rpc.request('find', _class, query),
-    findOne: <T extends Doc>(_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined> => rpc.request('findOne', _class, query),
+    find: <T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> => rpc.request('find', _class, query),
+    findOne: <T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined> => rpc.request('findOne', _class, query),
     tx: (tx: Tx): Promise<void> => rpc.request('tx', tx),
     loadDomain: (domain: string): Promise<Doc[]> => rpc.request('loadDomain', domain)
   }
@@ -113,7 +113,7 @@ export default async (platform: Platform): Promise<CoreService> => {
     }
   })
 
-  function find<T extends Doc>(_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
+  function find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
     const domainName = model.getDomain(_class)
     const domain = domains.get(domainName)
     if (domain) {
@@ -122,11 +122,11 @@ export default async (platform: Platform): Promise<CoreService> => {
     return cache.find(_class, query)
   }
 
-  function findOne<T extends Doc>(_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined> {
+  function findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined> {
     return find(_class, query).then(docs => (docs.length === 0 ? undefined : docs[0]))
   }
 
-  function query<T extends Doc>(_class: Ref<Class<T>>, query: AnyLayout): QueryResult<T> {
+  function query<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): QueryResult<T> {
     const domainName = model.getDomain(_class)
     const domain = domains.get(domainName)
     if (domain) {
@@ -135,11 +135,11 @@ export default async (platform: Platform): Promise<CoreService> => {
     return qCache.query(_class, query)
   }
 
-  function generateId() {
+  function generateId () {
     return genId() as Ref<Doc>
   }
 
-  function processTx(tx: Tx): Promise<any> {
+  function processTx (tx: Tx): Promise<any> {
     console.log('processTx', tx)
 
     // TODO: Inform queriables about transaction is being processed
@@ -152,7 +152,7 @@ export default async (platform: Platform): Promise<CoreService> => {
     ])
   }
 
-  function createDoc<T extends Doc>(doc: T): Promise<any> {
+  function createDoc<T extends Doc> (doc: T): Promise<any> {
     if (!doc._id) {
       doc._id = generateId()
     }
@@ -168,7 +168,7 @@ export default async (platform: Platform): Promise<CoreService> => {
     return processTx(tx)
   }
 
-  function createVDoc<T extends VDoc>(vdoc: T): Promise<void> {
+  function createVDoc<T extends VDoc> (vdoc: T): Promise<void> {
     if (!vdoc._createdBy) {
       vdoc._createdBy = platform.getMetadata(login.metadata.WhoAmI) as StringProperty
     }
@@ -178,7 +178,7 @@ export default async (platform: Platform): Promise<CoreService> => {
     return createDoc(vdoc)
   }
 
-  function push(vdoc: VDoc, _attribute: string, element: Emb): Promise<any> {
+  function push (vdoc: VDoc, _attribute: string, element: Emb): Promise<any> {
     const tx: PushTx = {
       _class: core.class.PushTx,
       _id: generateId() as Ref<Doc>,
@@ -192,7 +192,7 @@ export default async (platform: Platform): Promise<CoreService> => {
     return processTx(tx)
   }
 
-  function loadDomain(domain: string, index?: string, direction?: string): Promise<Doc[]> {
+  function loadDomain (domain: string, index?: string, direction?: string): Promise<Doc[]> {
     return coreProtocol.loadDomain(domain, index, direction)
   }
 

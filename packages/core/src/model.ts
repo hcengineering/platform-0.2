@@ -32,7 +32,7 @@ import {
   ArrayOf
 } from './core'
 
-export function mixinKey(mixin: Ref<Mixin<Doc>>, key: string): string {
+export function mixinKey (mixin: Ref<Mixin<Doc>>, key: string): string {
   return key + '|' + mixin.replace('.', '~')
 }
 
@@ -43,11 +43,11 @@ export class Model implements Storage {
   private objects = new Map<Ref<Doc>, Doc>()
   private byClass: Map<Ref<Class<Doc>>, Doc[]> | null = null
 
-  constructor(domain: string) {
+  constructor (domain: string) {
     this.domain = domain
   }
 
-  protected objectsOfClass(_class: Ref<Class<Doc>>): Doc[] {
+  protected objectsOfClass (_class: Ref<Class<Doc>>): Doc[] {
     if (!this.byClass) {
       this.byClass = new Map<Ref<Class<Doc>>, Doc[]>()
       for (const doc of this.objects.values()) {
@@ -57,11 +57,11 @@ export class Model implements Storage {
     return this.byClass.get(_class) ?? []
   }
 
-  protected attributeKey(clazz: Classifier<Obj>, key: string): string {
+  protected attributeKey (clazz: Classifier<Obj>, key: string): string {
     return clazz._kind === ClassifierKind.MIXIN ? mixinKey(clazz._id as Ref<Mixin<Doc>>, key) : key
   }
 
-  private set(doc: Doc) {
+  private set (doc: Doc) {
     const id = doc._id
     if (this.objects.get(id)) {
       throw new Error('document added already ' + id)
@@ -69,7 +69,7 @@ export class Model implements Storage {
     this.objects.set(id, doc)
   }
 
-  private index(doc: Doc) {
+  private index (doc: Doc) {
     if (this.byClass === null) {
       throw new Error('index not created')
     }
@@ -86,12 +86,12 @@ export class Model implements Storage {
     })
   }
 
-  add(doc: Doc) {
+  add (doc: Doc) {
     this.set(doc)
     if (this.byClass) this.index(doc)
   }
 
-  get(id: Ref<Doc>): Doc {
+  get (id: Ref<Doc>): Doc {
     const obj = this.objects.get(id)
     if (!obj) {
       throw new Error('document not found ' + id)
@@ -101,7 +101,7 @@ export class Model implements Storage {
 
   // U T I L I T Y
 
-  private _getAllAttributes(attributes: [string, Attribute][], _class: Ref<Class<Obj>>) {
+  private _getAllAttributes (attributes: [string, Attribute][], _class: Ref<Class<Obj>>) {
     const clazz = this.get(_class) as Class<Doc>
     attributes.push(...Object.entries(clazz._attributes))
 
@@ -110,7 +110,7 @@ export class Model implements Storage {
     }
   }
 
-  getAllAttributes(_class: Ref<Class<Obj>>): [string, Attribute][] {
+  getAllAttributes (_class: Ref<Class<Obj>>): [string, Attribute][] {
     const attributes: [string, Attribute][] = []
     this._getAllAttributes(attributes, _class)
     return attributes
@@ -118,7 +118,7 @@ export class Model implements Storage {
 
   // D O M A I N
 
-  getDomain(id: Ref<Class<Doc>>): string {
+  getDomain (id: Ref<Class<Doc>>): string {
     let clazz = this.objects.get(id) as Class<Doc> | undefined
     while (clazz) {
       if (clazz._domain) return clazz._domain as string
@@ -127,7 +127,7 @@ export class Model implements Storage {
     throw new Error('no domain found for class: ' + id)
   }
 
-  getClass(_class: Ref<Class<Doc>>): Ref<Class<Doc>> {
+  getClass (_class: Ref<Class<Doc>>): Ref<Class<Doc>> {
     let cls = _class
     while (cls) {
       const clazz = this.get(cls) as Class<Doc>
@@ -139,7 +139,7 @@ export class Model implements Storage {
 
   /// A S S I G N
 
-  private findAttributeKey<T extends Doc>(cls: Ref<Class<Obj>>, key: string): string {
+  private findAttributeKey<T extends Doc> (cls: Ref<Class<Obj>>, key: string): string {
     // TODO: use memdb class hierarchy
     let _class = cls as Ref<Class<Obj>> | undefined
     while (_class) {
@@ -153,7 +153,7 @@ export class Model implements Storage {
   }
 
   // from Builder
-  assign(layout: AnyLayout, _class: Ref<Classifier<Doc>>, values: AnyLayout): AnyLayout {
+  assign (layout: AnyLayout, _class: Ref<Classifier<Doc>>, values: AnyLayout): AnyLayout {
     const l = (layout as unknown) as AnyLayout
     const r = (values as unknown) as AnyLayout
     for (const key in values) {
@@ -166,18 +166,18 @@ export class Model implements Storage {
     return layout
   }
 
-  generateId(): Ref<Doc> {
+  generateId (): Ref<Doc> {
     return generateId() as Ref<Doc>
   }
 
-  createDocument<M extends Doc>(_class: Ref<Class<M>>, values: Omit<M, keyof Doc>, _id?: Ref<M>): Doc {
+  createDocument<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Doc>, _id?: Ref<M>): Doc {
     const layout = { _class, _id: _id ?? this.generateId() }
     this.assign(layout, _class, (values as unknown) as AnyLayout)
     // this.add(layout)
     return layout
   }
 
-  mixinDocument<T extends E, E extends Doc>(doc: E, clazz: Ref<Mixin<T>>, values: Omit<T, keyof E>): void {
+  mixinDocument<T extends E, E extends Doc> (doc: E, clazz: Ref<Mixin<T>>, values: Omit<T, keyof E>): void {
     if (!doc._mixins) {
       doc._mixins = []
     }
@@ -185,11 +185,11 @@ export class Model implements Storage {
     this.assign((doc as unknown) as AnyLayout, clazz as Ref<Classifier<Doc>>, (values as unknown) as AnyLayout)
   }
 
-  mixin<T extends E, E extends Doc>(id: Ref<E>, clazz: Ref<Mixin<T>>, values: Omit<T, keyof E>): void {
+  mixin<T extends E, E extends Doc> (id: Ref<E>, clazz: Ref<Mixin<T>>, values: Omit<T, keyof E>): void {
     this.mixinDocument(this.get(id) as E, clazz, values)
   }
 
-  getClassHierarchy(cls: Ref<Class<Obj>>, top?: Ref<Class<Obj>>): Ref<Class<Obj>>[] {
+  getClassHierarchy (cls: Ref<Class<Obj>>, top?: Ref<Class<Obj>>): Ref<Class<Obj>>[] {
     const result = [] as Ref<Class<Obj>>[]
     let _class = cls as Ref<Class<Obj>> | undefined
     while (_class && _class !== top) {
@@ -199,7 +199,7 @@ export class Model implements Storage {
     return result
   }
 
-  is(_class: Ref<Class<Obj>>, a: Ref<Class<Obj>>): boolean {
+  is (_class: Ref<Class<Obj>>, a: Ref<Class<Obj>>): boolean {
     let cls = _class as Ref<Class<Obj>> | undefined
     while (cls) {
       if (cls === a) {
@@ -210,7 +210,7 @@ export class Model implements Storage {
     return false
   }
 
-  dump(): Doc[] {
+  dump (): Doc[] {
     const result = []
     for (const doc of this.objects.values()) {
       result.push(doc)
@@ -218,14 +218,14 @@ export class Model implements Storage {
     return result
   }
 
-  async loadDomain(domain: string): Promise<Doc[]> {
+  async loadDomain (domain: string): Promise<Doc[]> {
     if (this.domain !== domain) {
       throw new Error('domain does not match')
     }
     return this.dump()
   }
 
-  loadModel(model: Doc[]): void {
+  loadModel (model: Doc[]): void {
     for (const doc of model) {
       this.add(doc)
     }
@@ -233,23 +233,23 @@ export class Model implements Storage {
 
   // Q U E R Y
 
-  findSync(clazz: Ref<Class<Doc>>, query: AnyLayout): Doc[] {
+  findSync (clazz: Ref<Class<Doc>>, query: AnyLayout): Doc[] {
     const byClass = this.objectsOfClass(clazz)
     return this.findAll(byClass, clazz, query)
   }
 
-  async find<T extends Doc>(clazz: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
+  async find<T extends Doc> (clazz: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
     return this.findSync(clazz, query) as T[]
     // const byClass = this.objectsOfClass(clazz)
     // return this.findAll(byClass, clazz, query)
   }
 
-  async findOne(clazz: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc | undefined> {
+  async findOne (clazz: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc | undefined> {
     const result = await this.find(clazz, query)
     return result.length === 0 ? undefined : result[0]
   }
 
-  protected findAll(docs: Doc[], _class: Ref<Class<Doc>>, query: AnyLayout): Doc[] {
+  protected findAll (docs: Doc[], _class: Ref<Class<Doc>>, query: AnyLayout): Doc[] {
     const result: Doc[] = []
     for (const doc of docs) {
       if (this.matchQuery(_class, doc, query)) {
@@ -261,17 +261,17 @@ export class Model implements Storage {
 
   // S T O R A G E
 
-  async store(doc: Doc): Promise<void> {
+  async store (doc: Doc): Promise<void> {
     this.add(doc)
   }
 
-  push(_class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: any): Promise<void> {
+  push (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: any): Promise<void> {
     throw new Error('Method not implemented. model push')
   }
-  update(_class: Ref<Class<Doc>>, _id: Ref<Doc>, attributes: any): Promise<void> {
+  update (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attributes: any): Promise<void> {
     throw new Error('Method not implemented. model update')
   }
-  remove(_class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<void> {
+  remove (_class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<void> {
     throw new Error('Method not implemented. model remove')
   }
 
@@ -282,7 +282,7 @@ export class Model implements Storage {
    * @param doc  document to match agains.
    * @param query query to check.
    */
-  matchQuery(_class: Ref<Class<Doc>>, doc: Doc, query: AnyLayout): boolean {
+  matchQuery (_class: Ref<Class<Doc>>, doc: Doc, query: AnyLayout): boolean {
     if (_class !== doc._class) {
       // Class doesn't match so return false.
       return false
@@ -295,7 +295,7 @@ export class Model implements Storage {
    * @param doc
    * @param query
    */
-  matchObject(_class: Ref<Class<Obj>>, doc: Record<string, unknown>, query: AnyLayout): boolean {
+  matchObject (_class: Ref<Class<Obj>>, doc: Record<string, unknown>, query: AnyLayout): boolean {
     const ents = Object.entries(query)
     const docKeys = new Set(Object.keys(doc))
     let count = 0
@@ -321,7 +321,7 @@ export class Model implements Storage {
     return true
   }
 
-  private attributeClass(type: Type): Ref<Class<Doc>> | null {
+  private attributeClass (type: Type): Ref<Class<Doc>> | null {
     switch (type._class) {
       case CORE_CLASS_ARRAY:
         return this.attributeClass((type as ArrayOf).of)
@@ -331,7 +331,7 @@ export class Model implements Storage {
     return null
   }
 
-  private classAttribute(cls: Ref<Class<Obj>>, key: string): Attribute {
+  private classAttribute (cls: Ref<Class<Obj>>, key: string): Attribute {
     // TODO: use memdb class hierarchy
     let _class = cls as Ref<Class<Obj>> | undefined
     while (_class) {
@@ -345,7 +345,7 @@ export class Model implements Storage {
     throw new Error('attribute not found: ' + key)
   }
 
-  matchValue(fieldClass: Ref<Class<Doc>> | null, docValue: unknown, value: unknown): boolean {
+  matchValue (fieldClass: Ref<Class<Doc>> | null, docValue: unknown, value: unknown): boolean {
     const objDocValue = Object(docValue)
     if (objDocValue !== docValue) {
       // Check if value is primitive, so we will just compare
