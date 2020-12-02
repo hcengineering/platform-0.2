@@ -1,14 +1,14 @@
 //
 // Copyright © 2020 Anticrm Platform Contributors.
-// 
+//
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
 // obtain a copy of the License at https://www.eclipse.org/legal/epl-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// 
+//
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
@@ -21,17 +21,19 @@ import login from '@anticrm/login'
 export type EventListener = (event: Response<unknown>) => void
 
 export interface RpcService {
-  request<R> (method: string, ...params: any[]): Promise<R>
-  addEventListener (listener: EventListener): void
+  request<R>(method: string, ...params: any[]): Promise<R>
+  addEventListener(listener: EventListener): void
 }
 
 export default (platform: Platform): RpcService => {
-
-  interface PromiseInfo { resolve: (value?: any) => void, reject: (error: any) => void }
+  interface PromiseInfo {
+    resolve: (value?: any) => void
+    reject: (error: any) => void
+  }
   const requests = new Map<ReqId, PromiseInfo>()
   let lastId = 0
 
-  function createWebsocket () {
+  function createWebsocket() {
     const host = platform.getMetadata(core.metadata.WSHost)
     const port = platform.getMetadata(core.metadata.WSPort)
     const token = platform.getMetadata(login.metadata.Token)
@@ -40,6 +42,10 @@ export default (platform: Platform): RpcService => {
     // const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0ZW5hbnQiOiJsYXRlc3QtbW9kZWwifQ.hKZDHkhxNL-eCOqk5NFToVh43KOGshLS4b6DgztJQqI'
 
     return new Promise<WebSocket>((resolve, reject) => {
+      if (token === undefined) {
+        reject(new Error('authentication required'))
+        return
+      }
       const ws = new WebSocket('ws://' + host + ':' + port + '/' + token)
       ws.onopen = () => {
         resolve(ws)
@@ -84,26 +90,25 @@ export default (platform: Platform): RpcService => {
   }
 
   let websocket: WebSocket | null = null
-  async function getWebSocket () {
-    if (websocket === null ||
-      websocket.readyState === WebSocket.CLOSED ||
-      websocket.readyState === WebSocket.CLOSING) {
+  async function getWebSocket() {
+    if (websocket === null || websocket.readyState === WebSocket.CLOSED || websocket.readyState === WebSocket.CLOSING) {
       websocket = await createWebsocket()
     }
     return websocket
   }
 
-  function request<R> (method: string, ...params: any[]): Promise<R> {
+  function request<R>(method: string, ...params: any[]): Promise<R> {
     // console.log('<<<<<<< ' + method)
     // console.log(params)
-    return new Promise<any>(async (resolve, reject) => {
+    return new Promise<any>((resolve, reject) => {
       const id = ++lastId
       // if (requests.size === 0) {
       //   platform.broadcastEvent(NetworkActivity, true)
       // }
       requests.set(id, { resolve, reject })
-      const ws = await getWebSocket()
-      ws.send(serialize({ id, method, params }))
+      getWebSocket().then(ws => {
+        ws.send(serialize({ id, method, params }))
+      })
     })
   }
 
@@ -111,9 +116,8 @@ export default (platform: Platform): RpcService => {
 
   return {
     request,
-    addEventListener (listener: EventListener) {
+    addEventListener(listener: EventListener) {
       listeners.push(listener)
     }
   }
-
 }

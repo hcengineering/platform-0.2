@@ -30,7 +30,7 @@ export interface ClientControl {
 }
 
 export async function connect(workspaceProtocol: Promise<WorkspaceProtocol>, ws: WebSocket, server: PlatformServer): Promise<CoreProtocol & ClientControl> {
-  let workspace = await workspaceProtocol
+  const workspace = await workspaceProtocol
   const clientControl = {
     // C O R E  P R O T O C O L
     ...workspace,

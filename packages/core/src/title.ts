@@ -1,14 +1,14 @@
 //
 // Copyright © 2020 Anticrm Platform Contributors.
-// 
+//
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
 // obtain a copy of the License at https://www.eclipse.org/legal/epl-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// 
+//
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
@@ -37,12 +37,12 @@ export class TitleIndex implements Index {
   private storage: Storage
   private primaries = new Map<Ref<Classifier<Doc>>, string>()
 
-  constructor (modelDb: Model, storage: Storage) {
+  constructor(modelDb: Model, storage: Storage) {
     this.modelDb = modelDb
     this.storage = storage
   }
 
-  private getPrimary (_class: Ref<Classifier<Doc>>): string | null {
+  private getPrimary(_class: Ref<Classifier<Doc>>): string | null {
     const cached = this.primaries.get(_class)
     if (cached) return cached === NULL ? null : cached
 
@@ -61,7 +61,7 @@ export class TitleIndex implements Index {
     return null
   }
 
-  async tx (tx: Tx): Promise<any> {
+  async tx(tx: Tx): Promise<any> {
     switch (tx._class) {
       case CORE_CLASS_CREATETX:
         return this.onCreate(tx as CreateTx)
@@ -72,9 +72,11 @@ export class TitleIndex implements Index {
     }
   }
 
-  async onCreate (create: CreateTx): Promise<any> {
+  async onCreate(create: CreateTx): Promise<any> {
     const primary = this.getPrimary(create.object._class)
-    if (!primary) { return }
+    if (!primary) {
+      return
+    }
 
     const title = (create.object as any)[primary] as string
 
@@ -89,9 +91,11 @@ export class TitleIndex implements Index {
     return this.storage.store(doc)
   }
 
-  async onUpdate (update: UpdateTx): Promise<any> {
+  async onUpdate(update: UpdateTx): Promise<any> {
     const primary = this.getPrimary(update._objectClass)
-    if (!primary) { return }
+    if (!primary) {
+      return
+    }
 
     let updated = false
     for (const key in update._attributes) {
@@ -101,7 +105,7 @@ export class TitleIndex implements Index {
       }
     }
     if (updated) {
-      this.storage.update(CORE_CLASS_TITLE, { _objectId: update._objectId }, { title: update._attributes[primary] })
+      this.storage.update(CORE_CLASS_TITLE, update._objectId, { title: update._attributes[primary] })
     }
   }
 }

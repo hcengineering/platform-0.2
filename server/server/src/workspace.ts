@@ -45,7 +45,7 @@ export interface WorkspaceProtocol extends CoreProtocol {
 export async function connectWorkspace(uri: string, workspace: string): Promise<CoreProtocol & WorkspaceProtocol> {
   console.log('connecting to ' + uri)
   const client = await MongoClient.connect(uri, { useUnifiedTopology: true })
-  let db = withTenant(client, workspace)
+  const db = withTenant(client, workspace)
   console.log('use ' + db.databaseName)
 
   const memdb = new Model(MODEL_DOMAIN)
@@ -70,8 +70,8 @@ export async function connectWorkspace(uri: string, workspace: string): Promise<
       return collection(_class).updateOne({ _id }, { $push: { [attribute]: attributes } })
     },
 
-    async update(_class: Ref<Class<Doc>>, selector: object, attributes: any): Promise<any> {
-      return collection(_class).updateOne(selector, { $set: attributes })
+    async update(_class: Ref<Class<Doc>>, _id: Ref<Doc>, attributes: any): Promise<any> {
+      return collection(_class).updateOne({ _id }, { $set: attributes })
     },
 
     async remove(_class: Ref<Class<Doc>>, doc: Ref<Doc>): Promise<any> {
@@ -109,7 +109,7 @@ export async function connectWorkspace(uri: string, workspace: string): Promise<
     },
 
     async findOne(_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc | undefined> {
-      let result = await collection(_class).findOne({
+      const result = await collection(_class).findOne({
         ...memdb.assign({}, _class, query),
         _class: memdb.getClass(_class)
       })
@@ -131,11 +131,9 @@ export async function connectWorkspace(uri: string, workspace: string): Promise<
 
     // P R O T C O L  E X T E N S I O N S
 
-    delete(_class: Ref<Class<Doc>>, query: AnyLayout): Promise<void> {
+    async delete(_class: Ref<Class<Doc>>, query: AnyLayout): Promise<void> {
       console.log('DELETE', _class, query)
-      return collection(_class)
-        .deleteMany({ ...query })
-        .then((result) => {})
+      await collection(_class).deleteMany({ ...query })
     },
 
     async commit(commitInfo: CommitInfo): Promise<void> {
@@ -150,7 +148,7 @@ export async function connectWorkspace(uri: string, workspace: string): Promise<
         return group
       }, new Map())
 
-      await Promise.all(Array.from(byDomain.entries()).map((domain) => db.collection(domain[0]).insertMany(domain[1])))
+      await Promise.all(Array.from(byDomain.entries()).map(domain => db.collection(domain[0]).insertMany(domain[1])))
     },
     shutdown(): Promise<void> {
       return client.close()

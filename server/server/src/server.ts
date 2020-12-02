@@ -54,7 +54,7 @@ export function start(port: number, dbUri: string, host?: string) {
     broadcast<R>(from: ClientControl, response: Response<R>) {
       for (const client of connections.values()) {
         console.log(`broadcasting to ${connections.size} connections`)
-        client.then((client) => {
+        client.then(client => {
           if (client !== from) {
             console.log(`broadcasting to ${client}`, response)
             client.send(response)
@@ -95,9 +95,9 @@ export function start(port: number, dbUri: string, host?: string) {
 
   wss.on('connection', function connection(ws: WebSocket, request: any, client: Client) {
     console.log('connect:', client)
-    let workspace = getWorkspace(client.workspace)
+    const workspace = getWorkspace(client.workspace)
     const service = createClient(workspace, ws)
-    let id = 'c' + clientCounter++
+    const id = 'c' + clientCounter++
     connections.set(id, service)
     ws.on('close', async () => {
       connections.delete(id)
@@ -105,9 +105,10 @@ export function start(port: number, dbUri: string, host?: string) {
     ws.on('message', async (msg: string) => {
       const request = getRequest(msg)
       const f = (await service)[request.method]
-      //TODO: Check for method are exists.
+
+      // TODO: Check for method are exists.
       const result = await f.apply(null, request.params || [])
-      let response = makeResponse({
+      const response = makeResponse({
         id: request.id,
         result
       })
