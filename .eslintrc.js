@@ -4,7 +4,10 @@ module.exports = {
     es6: true,
     node: true
   },
-  extends: ['standard'],
+  extends: [
+    'plugin:@typescript-eslint/recommended',
+    'standard'
+  ],
   globals: {
     Atomics: 'readonly',
     SharedArrayBuffer: 'readonly'
@@ -12,7 +15,10 @@ module.exports = {
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 2020,
-    sourceType: 'module'
+    sourceType: 'module',
+    project: [
+      '**/tsconfig.json',
+    ],
   },
   plugins: ['@typescript-eslint', 'import'],
   rules: {

@@ -42,3 +42,9 @@ Go to http://localhost:8080/component:workbench.Workbench/application:workbench.
 
 * Build system deploy in-memory-database client to: https://platform-one.now.sh and/or branch-specific URLs (see particular commit comments).
 * Build system deploy production client to: http://anticrm-platform.s3-website.us-east-2.amazonaws.com/
+
+# Development
+
+## Enable project eslint
+
+`yarn add -D @typescript-eslint/eslint-plugin @typescript-eslint/parser eslint eslint-config-standard eslint-plugin-import eslint-plugin-node eslint-plugin-promise eslint-plugin-standard`
