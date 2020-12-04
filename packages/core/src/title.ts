@@ -14,7 +14,7 @@
 //
 
 import { Class, Doc, Ref, Classifier, CORE_MIXIN_INDICES, VDoc, Obj, Tx } from '@anticrm/core'
-import { Index, Storage } from './core'
+import { Index, Storage, TxContext } from './core'
 import { Model, mixinKey } from './model'
 import { CreateTx, UpdateTx, CORE_CLASS_CREATETX, CORE_CLASS_UPDATETX } from './tx'
 import { generateId } from './objectid'
@@ -61,18 +61,18 @@ export class TitleIndex implements Index {
     return null
   }
 
-  async tx (tx: Tx): Promise<any> {
+  async tx (ctx: TxContext, tx: Tx): Promise<any> {
     switch (tx._class) {
       case CORE_CLASS_CREATETX:
-        return this.onCreate(tx as CreateTx)
+        return this.onCreate(ctx, tx as CreateTx)
       case CORE_CLASS_UPDATETX:
-        return this.onUpdate(tx as UpdateTx)
+        return this.onUpdate(ctx, tx as UpdateTx)
       default:
         console.log('not implemented title tx', tx)
     }
   }
 
-  async onCreate (create: CreateTx): Promise<any> {
+  async onCreate (ctx: TxContext, create: CreateTx): Promise<any> {
     const primary = this.getPrimary(create.object._class)
     if (!primary) {
       return
@@ -88,10 +88,10 @@ export class TitleIndex implements Index {
       title
     }
 
-    return this.storage.store(doc)
+    return this.storage.store(ctx, doc)
   }
 
-  async onUpdate (update: UpdateTx): Promise<any> {
+  async onUpdate (ctx: TxContext, update: UpdateTx): Promise<any> {
     const primary = this.getPrimary(update._objectClass)
     if (!primary) {
       return
@@ -105,7 +105,7 @@ export class TitleIndex implements Index {
       }
     }
     if (updated) {
-      this.storage.update(CORE_CLASS_TITLE, update._objectId, { title: update._attributes[primary] })
+      this.storage.update(ctx, CORE_CLASS_TITLE, update._objectId, { title: update._attributes[primary] })
     }
   }
 }

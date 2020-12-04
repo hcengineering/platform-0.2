@@ -31,6 +31,8 @@ import {
 } from '@anticrm/core'
 import { Model } from '../model'
 
+import { ModelClass, Prop, Array, InstanceOf, InstOf, Builder } from '@anticrm/model'
+
 /* eslint-env jest */
 
 interface SubTask extends Emb {
@@ -38,7 +40,7 @@ interface SubTask extends Emb {
   rate?: number
 }
 
-interface TaskObj extends Doc {
+interface Task extends Doc {
   name: string
   lists: string[]
   tasks?: SubTask[]
@@ -46,88 +48,93 @@ interface TaskObj extends Doc {
   rate?: number
 }
 
-const ClassTask = 'core.class.TaskObj' as Ref<Class<TaskObj>>
-const ClassSubtask = 'core.class.SubTask' as Ref<Class<SubTask>>
+const core = {
+  class: {
+    Obj: 'core.class.Obj' as Ref<Class<Obj>>,
+    Emb: 'core.class.Emb' as Ref<Class<Emb>>,
+    Doc: 'core.class.Doc' as Ref<Class<Doc>>,
+    Task: 'core.class.TaskObj' as Ref<Class<Task>>,
+    Subtask: 'core.class.SubTask' as Ref<Class<SubTask>>
+  }
+}
 
 const doc1 = {
   _id: 'd1' as Ref<Doc>,
-  _class: ClassTask,
+  _class: core.class.Task,
   name: 'my-space',
   lists: ['val1', 'val2'],
   rate: 20,
   mainTask: {
     name: 'main-subtask',
     rate: 30,
-    _class: ClassSubtask,
+    _class: core.class.Subtask,
     __embedded: true
   } as SubTask,
   tasks: [
     {
       name: 'subtask1',
       rate: 31,
-      _class: ClassSubtask,
+      _class: core.class.Subtask,
       __embedded: true
     } as SubTask,
     {
       name: 'subtask2',
       rate: 33,
-      _class: ClassSubtask,
+      _class: core.class.Subtask,
       __embedded: true
     } as SubTask
   ]
-} as TaskObj
+} as Task
+
+@ModelClass(core.class.Obj, core.class.Obj)
+class TObj implements Obj {
+  _class!: Ref<Class<Obj>>
+}
+
+@ModelClass(core.class.Emb, core.class.Obj)
+export class TEmb extends TObj implements Emb {
+  __embedded!: true
+}
+
+@ModelClass(core.class.Doc, core.class.Obj)
+class TDoc extends TObj implements Doc {
+  _class!: Ref<Class<Doc>>
+  @Prop() _id!: Ref<Doc>
+}
+
+
+@ModelClass(core.class.Task, core.class.Doc)
+class TTask extends TDoc implements Task {
+  @Prop() name!: string
+  @Prop() rate!: number
+  @Prop() lists!: string[]
+
+  @InstOf(core.class.Subtask) mainTask!: SubTask
+  @Array(InstanceOf(core.class.Subtask)) tasks?: SubTask[]
+}
+
+@ModelClass(core.class.Subtask, core.class.Emb)
+class TSubTask extends TEmb implements SubTask {
+  @Prop() name!: string
+  @Prop() rate!: number
+}
 
 const model = new Model('vdoc')
 
-function prop (_class: Ref<Class<Emb>> = CORE_CLASS_ATTRIBUTE, extra: Record<string, unknown> = {}): Attribute {
-  return ({
-    _class: CORE_CLASS_ATTRIBUTE,
-    type: ({
-      ...extra,
-      _class: _class
-    } as unknown) as Type
-  } as unknown) as Attribute
-}
-
-model.loadModel([
-  {
-    _kind: ClassifierKind.CLASS,
-    _id: ClassTask,
-    _class: CORE_CLASS_CLASS,
-    _attributes: {
-      name: prop(),
-      lists: prop(),
-      tasks: prop(CORE_CLASS_ARRAY, {
-        of: { _class: CORE_CLASS_INSTANCE, of: ClassSubtask }
-      }),
-      mainTask: prop(CORE_CLASS_INSTANCE, {
-        of: ClassSubtask
-      }),
-      rate: prop()
-    } as AllAttributes<TaskObj, Doc>
-  } as Class<TaskObj>,
-  {
-    _kind: ClassifierKind.CLASS,
-    _id: ClassSubtask,
-    _class: CORE_CLASS_CLASS,
-    _attributes: {
-      name: prop(),
-      rate: prop()
-    } as AllAttributes<SubTask, Obj>
-  } as Class<SubTask>
-])
+let b = new Builder(model)
+b.add(TObj, TEmb, TDoc, TTask, TSubTask)
 
 describe('matching', () => {
   it('match object value', () => {
-    expect(model.matchQuery(ClassTask, doc1, { name: 'my-space' as Property<string, string> })).toEqual(true)
+    expect(model.matchQuery(core.class.Task, doc1, { name: 'my-space' as Property<string, string> })).toEqual(true)
   })
   it('match list value', () => {
-    expect(model.matchQuery(ClassTask, doc1, { lists: ['val1' as Property<string, string>, 'val2' as Property<string, string>] })).toEqual(true)
+    expect(model.matchQuery(core.class.Task, doc1, { lists: ['val1' as Property<string, string>, 'val2' as Property<string, string>] })).toEqual(true)
   })
 
   it('match embedded value', () => {
     expect(
-      model.matchQuery(ClassTask, doc1, {
+      model.matchQuery(core.class.Task, doc1, {
         mainTask: {
           name: 'main-subtask' as Property<string, string>
         }
@@ -136,7 +143,7 @@ describe('matching', () => {
   })
   it('match embedded list value', () => {
     expect(
-      model.matchQuery(ClassTask, doc1, {
+      model.matchQuery(core.class.Task, doc1, {
         tasks: [
           {
             name: 'subtask1' as Property<string, string>

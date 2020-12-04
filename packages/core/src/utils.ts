@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Doc, Ref, Class, Tx, Index } from './core'
+import { AnyLayout, Doc, Ref, Class, Tx, Index, TxContext } from './core'
 
 export interface DocumentProtocol {
   find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]>
@@ -32,7 +32,7 @@ export class TxProcessor {
     this.indices = indices
   }
 
-  process (tx: Tx): Promise<any> {
-    return Promise.all(this.indices.map(index => index.tx(tx)))
+  process (ctx: TxContext, tx: Tx): Promise<any> {
+    return Promise.all(this.indices.map(index => index.tx(ctx, tx)))
   }
 }

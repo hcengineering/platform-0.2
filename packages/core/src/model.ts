@@ -28,8 +28,9 @@ import {
   Attribute,
   CORE_CLASS_ARRAY,
   CORE_CLASS_INSTANCE,
-  InstanceOf,
-  ArrayOf
+  ArrayOf,
+  TxContext,
+  StringProperty
 } from './core'
 
 export function mixinKey (mixin: Ref<Mixin<Doc>>, key: string): string {
@@ -38,6 +39,9 @@ export function mixinKey (mixin: Ref<Mixin<Doc>>, key: string): string {
 
 export const MODEL_DOMAIN = 'model'
 
+/**
+ * Model is a storage for Class descriptors and usefull functions to match class instances to queries and apply values to them based on changes.
+ */
 export class Model implements Storage {
   private domain: string
   private objects = new Map<Ref<Doc>, Doc>()
@@ -139,7 +143,7 @@ export class Model implements Storage {
 
   /// A S S I G N
 
-  private findAttributeKey<T extends Doc> (cls: Ref<Class<Obj>>, key: string): string {
+  private findAttributeKey<T extends Doc> (cls: Ref<Class<T>>, key: string): string {
     // TODO: use memdb class hierarchy
     let _class = cls as Ref<Class<Obj>> | undefined
     while (_class) {
@@ -153,7 +157,7 @@ export class Model implements Storage {
   }
 
   // from Builder
-  assign (layout: AnyLayout, _class: Ref<Classifier<Doc>>, values: AnyLayout): AnyLayout {
+  assign (layout: AnyLayout, _class: Ref<Class<Doc>>, values: AnyLayout): AnyLayout {
     const l = (layout as unknown) as AnyLayout
     const r = (values as unknown) as AnyLayout
     for (const key in values) {
@@ -164,6 +168,26 @@ export class Model implements Storage {
       }
     }
     return layout
+  }
+
+  /**
+   * Perform update of document attributes
+   * @param doc - document to update
+   * @param attributes - new attribute values
+   */
+  public updateDocument (doc: Doc, attributes: AnyLayout): Doc {
+    this.assign((doc as unknown) as AnyLayout, doc._class, attributes)
+    return doc
+  }
+
+  /**
+   * Perform push operation on document and put new embedded object into document.
+   * @param doc - document to update
+   * @param attribute - attribute holding embedded, it could be InstanceoOf or ArrayOf
+   * @param embedded - embedded object value
+   */
+  public pushDocument (doc: Doc, attribute: StringProperty, embedded: AnyLayout): Doc {
+    return doc
   }
 
   generateId (): Ref<Doc> {
@@ -177,7 +201,7 @@ export class Model implements Storage {
     return layout
   }
 
-  mixinDocument<T extends E, E extends Doc> (doc: E, clazz: Ref<Mixin<T>>, values: Omit<T, keyof E>): void {
+  mixinDocument<E extends Doc, T extends E> (doc: E, clazz: Ref<Mixin<T>>, values: Omit<T, keyof E>): void {
     if (!doc._mixins) {
       doc._mixins = []
     }
@@ -185,7 +209,7 @@ export class Model implements Storage {
     this.assign((doc as unknown) as AnyLayout, clazz as Ref<Classifier<Doc>>, (values as unknown) as AnyLayout)
   }
 
-  mixin<T extends E, E extends Doc> (id: Ref<E>, clazz: Ref<Mixin<T>>, values: Omit<T, keyof E>): void {
+  mixin<E extends Doc, T extends E> (id: Ref<E>, clazz: Ref<Mixin<T>>, values: Omit<T, keyof E>): void {
     this.mixinDocument(this.get(id) as E, clazz, values)
   }
 
@@ -233,45 +257,55 @@ export class Model implements Storage {
 
   // Q U E R Y
 
-  findSync (clazz: Ref<Class<Doc>>, query: AnyLayout): Doc[] {
+  findSync (clazz: Ref<Class<Doc>>, query: AnyLayout, limit: number = -1): Doc[] {
     const byClass = this.objectsOfClass(clazz)
-    return this.findAll(byClass, clazz, query)
+    return this.findAll(byClass, clazz, query, limit)
   }
 
   async find<T extends Doc> (clazz: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
     return this.findSync(clazz, query) as T[]
-    // const byClass = this.objectsOfClass(clazz)
-    // return this.findAll(byClass, clazz, query)
   }
 
   async findOne (clazz: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc | undefined> {
-    const result = await this.find(clazz, query)
+    const result = await this.findSync(clazz, query, 1)
     return result.length === 0 ? undefined : result[0]
   }
 
-  protected findAll (docs: Doc[], _class: Ref<Class<Doc>>, query: AnyLayout): Doc[] {
+  /**
+   * Find all document macthing query
+   * @param docs - document to find in
+   * @param _class - to match agains
+   * @param query  - to match
+   * @param limit - a number of items to find, pass value <= 0 to find all
+   */
+  protected findAll (docs: Doc[], _class: Ref<Class<Doc>>, query: AnyLayout, limit: number = -1): Doc[] {
     const result: Doc[] = []
     for (const doc of docs) {
       if (this.matchQuery(_class, doc, query)) {
         result.push(doc)
+        if (limit > 0 && result.length > limit) {
+          return result
+        }
       }
     }
-    return result === docs ? docs.concat() : result
+    return (result.length === docs.length) ? docs.concat() : result
   }
 
   // S T O R A G E
 
-  async store (doc: Doc): Promise<void> {
+  async store (ctx: TxContext, doc: Doc): Promise<void> {
     this.add(doc)
   }
 
-  push (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: any): Promise<void> {
+  push (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: StringProperty, attributes: AnyLayout): Promise<void> { // eslint-disable-line
     throw new Error('Method not implemented. model push')
   }
-  update (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attributes: any): Promise<void> {
+
+  update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, attributes: AnyLayout): Promise<void> { // eslint-disable-line
     throw new Error('Method not implemented. model update')
   }
-  remove (_class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<void> {
+
+  remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<void> { // eslint-disable-line
     throw new Error('Method not implemented. model remove')
   }
 
@@ -295,7 +329,7 @@ export class Model implements Storage {
    * @param doc
    * @param query
    */
-  matchObject (_class: Ref<Class<Obj>>, doc: Record<string, unknown>, query: AnyLayout): boolean {
+  private matchObject (_class: Ref<Class<Obj>>, doc: Record<string, unknown>, query: AnyLayout): boolean {
     const ents = Object.entries(query)
     const docKeys = new Set(Object.keys(doc))
     let count = 0
@@ -345,7 +379,7 @@ export class Model implements Storage {
     throw new Error('attribute not found: ' + key)
   }
 
-  matchValue (fieldClass: Ref<Class<Doc>> | null, docValue: unknown, value: unknown): boolean {
+  private matchValue (fieldClass: Ref<Class<Doc>> | null, docValue: unknown, value: unknown): boolean {
     const objDocValue = Object(docValue)
     if (objDocValue !== docValue) {
       // Check if value is primitive, so we will just compare

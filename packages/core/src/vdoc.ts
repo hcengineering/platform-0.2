@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Class, DateProperty, Doc, Emb, Index, Ref, Storage, StringProperty, Tx } from './core'
+import { Class, DateProperty, Doc, Emb, Index, Ref, Storage, StringProperty, Tx, TxContext } from './core'
 import { Model } from './model'
 import { CORE_CLASS_CREATETX, CORE_CLASS_PUSHTX, CORE_CLASS_UPDATETX, CreateTx, PushTx, UpdateTx } from './tx'
 
@@ -49,20 +49,20 @@ export class VDocIndex implements Index {
     this.storage = storage
   }
 
-  async tx (tx: Tx): Promise<any> {
+  async tx (ctx: TxContext, tx: Tx): Promise<any> {
     switch (tx._class) {
       case CORE_CLASS_CREATETX:
-        return this.onCreate(tx as CreateTx)
+        return this.onCreate(ctx, tx as CreateTx)
       case CORE_CLASS_UPDATETX:
-        return this.onUpdate(tx as UpdateTx)
+        return this.onUpdate(ctx, tx as UpdateTx)
       case CORE_CLASS_PUSHTX:
-        return this.onPush(tx as PushTx)
+        return this.onPush(ctx, tx as PushTx)
       default:
         console.log('not implemented title tx', tx)
     }
   }
 
-  async onCreate (create: CreateTx): Promise<any> {
+  async onCreate (ctx: TxContext, create: CreateTx): Promise<any> {
     if (!this.modelDb.is(create.object._class, CORE_CLASS_VDOC)) return
 
     // const doc: VDoc = {
@@ -88,14 +88,14 @@ export class VDocIndex implements Index {
     //     break
     //   }
     // }
-    return this.storage.store(create.object)
+    return this.storage.store(ctx, create.object)
   }
 
-  onPush (tx: PushTx): Promise<any> {
-    return this.storage.push(tx._objectClass, tx._objectId, tx._attribute, tx._attributes)
+  onPush (ctx: TxContext, tx: PushTx): Promise<any> {
+    return this.storage.push(ctx, tx._objectClass, tx._objectId, tx._attribute, tx._attributes)
   }
 
-  onUpdate (tx: UpdateTx): Promise<any> {
-    return this.storage.update(tx._objectClass, tx._objectId, tx._attributes)
+  onUpdate (ctx: TxContext, tx: UpdateTx): Promise<any> {
+    return this.storage.update(ctx, tx._objectClass, tx._objectId, tx._attributes)
   }
 }

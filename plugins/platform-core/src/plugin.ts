@@ -29,19 +29,23 @@ import {
   generateId as genId,
   CreateTx,
   Property,
-  PropertyType,
   ModelIndex,
   DateProperty,
   StringProperty,
-  PushTx
+  PushTx,
+  txContext,
+  TxContextSource,
+  TxProcessor,
+  VDocIndex,
+  TitleIndex,
+  TextIndex,
+  TxIndex
 } from '@anticrm/core'
 import { ModelDb } from './modeldb'
 
 import core, { CoreService, QueryResult } from '.'
 import login from '@anticrm/login'
 import rpcService from './rpc'
-
-import { TxProcessor, VDocIndex, TitleIndex, TextIndex, TxIndex } from '@anticrm/core'
 
 import { QueriableStorage } from './queries'
 
@@ -74,14 +78,16 @@ export default async (platform: Platform): Promise<CoreService> => {
   model.loadModel(await coreProtocol.loadDomain(MODEL_DOMAIN))
 
   coreProtocol.loadDomain(TITLE_DOMAIN).then(docs => {
+    const ctx = txContext()
     for (const doc of docs) {
-      titles.store(doc)
+      titles.store(ctx, doc)
     }
   })
 
   coreProtocol.loadDomain(BACKLINKS_DOMAIN).then(docs => {
+    const ctx = txContext()
     for (const doc of docs) {
-      graph.store(doc)
+      graph.store(ctx, doc)
     }
   })
 
@@ -109,7 +115,7 @@ export default async (platform: Platform): Promise<CoreService> => {
   rpc.addEventListener(response => {
     // Do not process if result is not passed, it could be if sources is our transaction.
     if (response.result != null) {
-      txProcessor.process(response.result as Tx)
+      txProcessor.process(txContext(TxContextSource.Server), response.result as Tx)
     }
   })
 
@@ -144,11 +150,10 @@ export default async (platform: Platform): Promise<CoreService> => {
 
     // TODO: Inform queriables about transaction is being processed
 
+    const networkComplete = coreProtocol.tx(tx)
     return Promise.all([
-      coreProtocol.tx(tx).then(() => {
-        // TODO: Inform queriables about transaction is processed on server, it may require do some refresh.
-      }),
-      txProcessor.process(tx)
+      networkComplete,
+      txProcessor.process(txContext(TxContextSource.Client, networkComplete), tx)
     ])
   }
 
@@ -161,7 +166,7 @@ export default async (platform: Platform): Promise<CoreService> => {
       _class: core.class.CreateTx,
       _id: generateId() as Ref<Doc>,
       _date: Date.now() as Property<number, Date>,
-      _user: platform.getMetadata(login.metadata.WhoAmI) as Property<string, string>,
+      _user: platform.getMetadata(login.metadata.WhoAmI) as StringProperty,
       object: doc
     }
 
@@ -185,9 +190,9 @@ export default async (platform: Platform): Promise<CoreService> => {
       _objectId: vdoc._id,
       _objectClass: vdoc._class,
       _date: Date.now() as Property<number, Date>,
-      _user: platform.getMetadata(login.metadata.WhoAmI) as Property<string, string>,
-      _attribute: _attribute as Property<string, string>,
-      _attributes: (element as unknown) as { [key: string]: PropertyType }
+      _user: platform.getMetadata(login.metadata.WhoAmI) as StringProperty,
+      _attribute: _attribute as StringProperty,
+      _attributes: (element as unknown) as AnyLayout
     }
     return processTx(tx)
   }

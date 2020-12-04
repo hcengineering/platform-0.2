@@ -2,6 +2,7 @@
 // https://jestjs.io/docs/en/configuration.html
 
 module.exports = {
+  preset: 'ts-jest',
   coverageDirectory: 'coverage',
   testEnvironment: 'node',
   roots: [

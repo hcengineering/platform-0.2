@@ -13,22 +13,22 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Class, CoreProtocol, Doc, Storage, Ref } from '@anticrm/core'
+import { AnyLayout, Class, CoreProtocol, Doc, Storage, Ref, TxContext, StringProperty } from '@anticrm/core'
 
 export class Cache implements Storage {
-  async store (doc: Doc): Promise<void> {
+  async store (tx: TxContext, doc: Doc): Promise<void> {  // eslint-disable-line
     console.log('cache store')
   }
 
-  async push (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: any): Promise<void> {
+  async push (tx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: StringProperty, attributes: AnyLayout): Promise<void> { // eslint-disable-line
     console.log('cache push')
   }
 
-  async update (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attributes: any): Promise<void> {
+  async update (tx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, attributes: AnyLayout): Promise<void> { // eslint-disable-line
     console.log('cache update')
   }
 
-  async remove (_class: Ref<Class<Doc>>, doc: Ref<Doc>): Promise<void> {
+  async remove (tx: TxContext, _class: Ref<Class<Doc>>, doc: Ref<Doc>): Promise<void> { // eslint-disable-line
     console.log('cache remove')
   }
 

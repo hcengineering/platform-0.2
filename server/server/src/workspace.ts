@@ -26,6 +26,7 @@ import {
   TextIndex,
   TitleIndex,
   Tx,
+  TxContext,
   TxIndex,
   TxProcessor,
   VDocIndex
@@ -54,27 +55,27 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
   console.log('model loaded.')
   memdb.loadModel(model)
 
-  function collection<T extends Doc> (_class: Ref<Class<Doc>>): Collection {
+  function collection<T extends Doc> (_class: Ref<Class<T>>): Collection {
     const domain = memdb.getDomain(_class)
     return db.collection(domain)
   }
 
   const mongoStorage: Storage = {
-    async store (doc: Doc): Promise<any> {
+    async store (ctx: TxContext, doc: Doc): Promise<any> {
       const c = collection(doc._class)
       console.log('STORE:', c.namespace, doc)
       return c.insertOne(doc)
     },
 
-    async push (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: any): Promise<any> {
+    async push (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: any): Promise<any> {
       return collection(_class).updateOne({ _id }, { $push: { [attribute]: attributes } })
     },
 
-    async update (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attributes: any): Promise<any> {
+    async update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, attributes: any): Promise<any> {
       return collection(_class).updateOne({ _id }, { $set: attributes })
     },
 
-    async remove (_class: Ref<Class<Doc>>, doc: Ref<Doc>): Promise<any> {
+    async remove (ctx: TxContext, _class: Ref<Class<Doc>>, doc: Ref<Doc>): Promise<any> {
       return collection(_class).deleteOne({ _id: doc })
     },
 
@@ -119,8 +120,8 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
       return result
     },
 
-    async tx (tx: Tx): Promise<void> {
-      return txProcessor.process(tx)
+    async tx (ctx: TxContext, tx: Tx): Promise<void> {
+      return txProcessor.process(ctx, tx)
     },
 
     async loadDomain (domain: string): Promise<Doc[]> {

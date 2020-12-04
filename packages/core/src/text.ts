@@ -19,12 +19,13 @@ import {
   Doc,
   Type,
   Obj,
-  Attribute,
+  Index,
+  Storage,
   Tx,
-  CORE_CLASS_ARRAY
+  CORE_CLASS_ARRAY,
+  TxContext
 } from './core'
 import { CreateTx, CORE_CLASS_CREATETX } from './tx'
-import { Index, Storage } from './core'
 import { Model } from './model'
 import { generateId } from './objectid'
 
@@ -49,7 +50,7 @@ export interface Backlinks extends Doc {
   backlinks: Backlink[]
 }
 
-export interface Text extends Type {}
+export interface Text extends Type { }
 
 export const CORE_CLASS_BACKLINKS = 'class:core.Backlinks' as Ref<
   Class<Backlinks>
@@ -65,12 +66,12 @@ export class TextIndex implements Index {
   private textAttributes = new Map<Ref<Class<Obj>>, string[]>()
   private arrayAttributes = new Map<Ref<Class<Obj>>, string[]>()
 
-  constructor(modelDb: Model, storage: Storage) {
+  constructor (modelDb: Model, storage: Storage) {
     this.modelDb = modelDb
     this.storage = storage
   }
 
-  private getTextAttributes(_class: Ref<Class<Obj>>): string[] {
+  private getTextAttributes (_class: Ref<Class<Obj>>): string[] {
     const cached = this.textAttributes.get(_class)
     if (cached) return cached
 
@@ -82,7 +83,7 @@ export class TextIndex implements Index {
     return keys
   }
 
-  private getArrayAttributes(_class: Ref<Class<Obj>>): string[] {
+  private getArrayAttributes (_class: Ref<Class<Obj>>): string[] {
     const cached = this.arrayAttributes.get(_class)
     if (cached) return cached
 
@@ -94,12 +95,12 @@ export class TextIndex implements Index {
     return keys
   }
 
-  private backlinksFromMessage(message: string, pos: number): Backlink[] {
-    let result: Backlink[] = []
+  private backlinksFromMessage (message: string, pos: number): Backlink[] {
+    const result: Backlink[] = []
     traverseMessage(parseMessage(message) as MessageNode, (el) => {
       traverseMarks(el, (m) => {
-        if (m.type == MessageMarkType.reference) {
-          let rm = m as ReferenceMark
+        if (m.type === MessageMarkType.reference) {
+          const rm = m as ReferenceMark
           result.push({
             _backlinkId: rm.attrs.id as Ref<Doc>,
             _backlinkClass: rm.attrs.class as Ref<Class<Doc>>,
@@ -111,7 +112,7 @@ export class TextIndex implements Index {
     return result
   }
 
-  private backlinks(
+  private backlinks (
     _class: Ref<Class<Obj>>,
     obj: Obj,
     pos: number
@@ -124,16 +125,16 @@ export class TextIndex implements Index {
     return backlinks
   }
 
-  async tx(tx: Tx): Promise<any> {
+  async tx (ctx: TxContext, tx: Tx): Promise<any> {
     switch (tx._class) {
       case CORE_CLASS_CREATETX:
-        return this.onCreate(tx as CreateTx)
+        return this.onCreate(ctx, tx as CreateTx)
       default:
         console.log('not implemented text tx', tx)
     }
   }
 
-  async onCreate(create: CreateTx): Promise<any> {
+  async onCreate (ctx: TxContext, create: CreateTx): Promise<any> {
     const backlinks = this.backlinks(create.object._class, create.object, -1)
     const arrays = this.getArrayAttributes(create.object._class)
     for (const attr of arrays) {
@@ -154,6 +155,6 @@ export class TextIndex implements Index {
       _objectId: create.object._id,
       backlinks
     }
-    return this.storage.store(doc)
+    return this.storage.store(ctx, doc)
   }
 }
