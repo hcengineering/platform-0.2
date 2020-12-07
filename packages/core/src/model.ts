@@ -30,7 +30,9 @@ import {
   CORE_CLASS_INSTANCE,
   ArrayOf,
   TxContext,
-  StringProperty
+  StringProperty,
+  PropertyType,
+  Emb
 } from './core'
 
 export function mixinKey (mixin: Ref<Mixin<Doc>>, key: string): string {
@@ -144,27 +146,78 @@ export class Model implements Storage {
   /// A S S I G N
 
   private findAttributeKey<T extends Doc> (cls: Ref<Class<T>>, key: string): string {
+    const attr = this.classAttribute(cls, key)
+    return this.attributeKey(attr.clazz, attr.key)
+  }
+
+  private classAttribute (cls: Ref<Class<Obj>>, key: string): { attr: Attribute, clazz: Class<Obj>, key: string } {
     // TODO: use memdb class hierarchy
     let _class = cls as Ref<Class<Obj>> | undefined
     while (_class) {
       const clazz = this.get(_class) as Class<Obj>
-      if ((clazz._attributes as any)[key] !== undefined) {
-        return this.attributeKey(clazz, key)
+      const attr = (clazz._attributes as any)[key]
+      if (attr !== undefined) {
+        return { attr, clazz, key }
       }
       _class = clazz._extends
     }
     throw new Error('attribute not found: ' + key)
+  }
+  pushArrayValue (curValue: unknown, attrClass: Ref<Class<Doc>>, embedded: AnyLayout): Array<PropertyType> {
+    // Assign into  a proper classed values.
+    const objValue = this.assign({}, attrClass, embedded)
+    objValue['_class'] = attrClass
+    // Take current array and push value into it.
+    if (curValue === null || curValue === undefined) {
+      // Just assign a new Array
+      return [objValue]
+    } else if (curValue instanceof Array) {
+      let curArray = curValue as Array<PropertyType>
+      curArray.push(objValue)
+      return curArray
+    } else {
+      throw new Error('Invalid attribute type: ' + curValue)
+    }
   }
 
   // from Builder
   assign (layout: AnyLayout, _class: Ref<Class<Doc>>, values: AnyLayout): AnyLayout {
     const l = (layout as unknown) as AnyLayout
     const r = (values as unknown) as AnyLayout
-    for (const key in values) {
-      if (key.startsWith('_')) {
-        l[key] = r[key]
+    for (const rKey in values) {
+      if (rKey.startsWith('_')) {
+        l[rKey] = r[rKey]
       } else {
-        l[this.findAttributeKey(_class, key)] = r[key]
+        const { attr, key } = this.classAttribute(_class, rKey)
+
+        // Check if we need to perform inner assign based on field value and type
+        switch (attr.type._class) {
+          case CORE_CLASS_ARRAY: {
+            const attrClass = this.attributeClass((attr.type as ArrayOf).of)
+            if (attrClass) {
+              const lValue = r[rKey]
+              if (lValue instanceof Array) {
+                let value: unknown[] = []
+                for (const lv of (lValue as Array<unknown>)) {
+                  value = this.pushArrayValue(value, attrClass, lv as AnyLayout)
+                }
+                l[key] = (value as unknown) as AnyLayout
+              }
+            }
+            else {
+              throw new Error('attribute not found: ' + key)
+            }
+          }
+          case CORE_CLASS_INSTANCE: {
+            const attrClass = ((attr.type as unknown) as Record<string, unknown>).of as Ref<Class<Doc>>
+            if (attrClass) {
+              l[key] = this.assign({}, attrClass, r[rKey] as AnyLayout)
+            } else {
+              throw new Error('attribute not found: ' + key)
+            }
+          }
+        }
+        l[key] = r[rKey]
       }
     }
     return layout
@@ -187,6 +240,23 @@ export class Model implements Storage {
    * @param embedded - embedded object value
    */
   public pushDocument (doc: Doc, attribute: StringProperty, embedded: AnyLayout): Doc {
+    const { attr, key } = this.classAttribute(doc._class, attribute)
+    const l = (doc as unknown) as AnyLayout
+
+    switch (attr.type._class) {
+      case CORE_CLASS_ARRAY:
+        const attrClass = this.attributeClass((attr.type as ArrayOf).of)
+        if (attrClass === null) {
+          throw new Error('Invalid attribute type/class: ' + attr.type)
+        }
+        l[key] = this.pushArrayValue(l[key], attrClass, embedded)
+        return doc
+
+      default:
+        throw new Error('Invalid attribute type: ' + attr.type)
+
+    }
+
     return doc
   }
 
@@ -341,9 +411,9 @@ export class Model implements Storage {
       if (keyIn) {
         const docValue = doc[attrKey]
 
-        const attrClass = this.classAttribute(_class, key)
-        if (attrClass !== undefined) {
-          if (this.matchValue(this.attributeClass(attrClass.type), docValue, value)) {
+        const { attr } = this.classAttribute(_class, key)
+        if (attr !== undefined) {
+          if (this.matchValue(this.attributeClass(attr.type), docValue, value)) {
             count += 1
           }
         }
@@ -364,21 +434,6 @@ export class Model implements Storage {
     }
     return null
   }
-
-  private classAttribute (cls: Ref<Class<Obj>>, key: string): Attribute {
-    // TODO: use memdb class hierarchy
-    let _class = cls as Ref<Class<Obj>> | undefined
-    while (_class) {
-      const clazz = this.get(_class) as Class<Obj>
-      const attr = (clazz._attributes as any)[key]
-      if (attr !== undefined) {
-        return attr
-      }
-      _class = clazz._extends
-    }
-    throw new Error('attribute not found: ' + key)
-  }
-
   private matchValue (fieldClass: Ref<Class<Doc>> | null, docValue: unknown, value: unknown): boolean {
     const objDocValue = Object(docValue)
     if (objDocValue !== docValue) {

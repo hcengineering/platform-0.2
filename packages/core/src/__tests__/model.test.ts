@@ -13,27 +13,13 @@
 // limitations under the License.
 //
 
-import {
-  Ref,
-  Doc,
-  Property,
-  Emb,
-  Class,
-  Obj,
-  Type,
-  ClassifierKind,
-  AllAttributes,
-  Attribute,
-  CORE_CLASS_CLASS,
-  CORE_CLASS_ATTRIBUTE,
-  CORE_CLASS_ARRAY,
-  CORE_CLASS_INSTANCE
-} from '@anticrm/core'
+/* eslint-env jest */
+
+import { Ref, Doc, Property, Emb, Class, Obj } from '@anticrm/core'
 import { Model } from '../model'
 
 import { ModelClass, Prop, Array, InstanceOf, InstOf, Builder } from '@anticrm/model'
-
-/* eslint-env jest */
+import { AnyLayout, StringProperty } from '../core'
 
 interface SubTask extends Emb {
   name: string
@@ -58,31 +44,24 @@ const core = {
   }
 }
 
+function createSubtask (name: string, rate = 30): SubTask {
+  return {
+    name: name,
+    rate: rate,
+    __embedded: true
+  } as SubTask
+}
+
 const doc1 = {
   _id: 'd1' as Ref<Doc>,
   _class: core.class.Task,
   name: 'my-space',
   lists: ['val1', 'val2'],
   rate: 20,
-  mainTask: {
-    name: 'main-subtask',
-    rate: 30,
-    _class: core.class.Subtask,
-    __embedded: true
-  } as SubTask,
+  mainTask: createSubtask('main-subtask', 30),
   tasks: [
-    {
-      name: 'subtask1',
-      rate: 31,
-      _class: core.class.Subtask,
-      __embedded: true
-    } as SubTask,
-    {
-      name: 'subtask2',
-      rate: 33,
-      _class: core.class.Subtask,
-      __embedded: true
-    } as SubTask
+    createSubtask('subtask1', 31),
+    createSubtask('subtask2', 33)
   ]
 } as Task
 
@@ -102,7 +81,6 @@ class TDoc extends TObj implements Doc {
   @Prop() _id!: Ref<Doc>
 }
 
-
 @ModelClass(core.class.Task, core.class.Doc)
 class TTask extends TDoc implements Task {
   @Prop() name!: string
@@ -121,22 +99,22 @@ class TSubTask extends TEmb implements SubTask {
 
 const model = new Model('vdoc')
 
-let b = new Builder(model)
+const b = new Builder(model)
 b.add(TObj, TEmb, TDoc, TTask, TSubTask)
 
 describe('matching', () => {
   it('match object value', () => {
-    expect(model.matchQuery(core.class.Task, doc1, { name: 'my-space' as Property<string, string> })).toEqual(true)
+    expect(model.matchQuery(core.class.Task, doc1, { name: 'my-space' as StringProperty })).toEqual(true)
   })
   it('match list value', () => {
-    expect(model.matchQuery(core.class.Task, doc1, { lists: ['val1' as Property<string, string>, 'val2' as Property<string, string>] })).toEqual(true)
+    expect(model.matchQuery(core.class.Task, doc1, { lists: ['val1' as StringProperty, 'val2' as StringProperty] })).toEqual(true)
   })
 
   it('match embedded value', () => {
     expect(
       model.matchQuery(core.class.Task, doc1, {
         mainTask: {
-          name: 'main-subtask' as Property<string, string>
+          name: 'main-subtask' as StringProperty
         }
       })
     ).toEqual(true)
@@ -146,7 +124,7 @@ describe('matching', () => {
       model.matchQuery(core.class.Task, doc1, {
         tasks: [
           {
-            name: 'subtask1' as Property<string, string>
+            name: 'subtask1' as StringProperty
           },
           {
             rate: 33 as Property<number, number>
@@ -154,5 +132,42 @@ describe('matching', () => {
         ]
       })
     ).toEqual(true)
+  })
+
+  it('apply string value', () => {
+    const clone = Object.assign(doc1)
+    model.updateDocument(clone, { name: 'changed' as StringProperty } as AnyLayout)
+
+    expect(clone.name).toEqual('changed')
+  })
+  it('apply number value', () => {
+    const clone = Object.assign(doc1)
+    model.updateDocument(clone, { rate: 10 as Property<number, number> } as AnyLayout)
+
+    expect(clone.rate).toEqual(10)
+  })
+
+  it('apply task value', () => {
+    const clone = Object.assign(doc1) as Task
+    clone.mainTask = undefined
+    model.updateDocument(clone, { mainTask: createSubtask('subtask4') } as AnyLayout)
+
+    expect(clone.mainTask).toBeDefined()
+    expect(clone.mainTask!.name).toEqual('subtask4')
+  })
+
+  it('push subtask value', () => {
+    const clone = Object.assign(doc1)
+    model.pushDocument(clone, 'tasks' as StringProperty, (createSubtask('subtask3', 34) as unknown) as AnyLayout)
+
+    expect(clone.tasks.length).toEqual(3)
+  })
+
+  it('push a new subtask value', () => {
+    const clone = Object.assign(doc1)
+    clone.tasks = undefined
+    model.pushDocument(clone, 'tasks' as StringProperty, (createSubtask('subtask3', 34) as unknown) as AnyLayout)
+
+    expect(clone.tasks.length).toEqual(1)
   })
 })
