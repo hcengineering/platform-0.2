@@ -145,11 +145,6 @@ export class Model implements Storage {
 
   /// A S S I G N
 
-  private findAttributeKey<T extends Doc> (cls: Ref<Class<T>>, key: string): string {
-    const attr = this.classAttribute(cls, key)
-    return this.attributeKey(attr.clazz, attr.key)
-  }
-
   private classAttribute (cls: Ref<Class<Obj>>, key: string): { attr: Attribute, clazz: Class<Obj>, key: string } {
     // TODO: use memdb class hierarchy
     let _class = cls as Ref<Class<Obj>> | undefined
@@ -157,22 +152,24 @@ export class Model implements Storage {
       const clazz = this.get(_class) as Class<Obj>
       const attr = (clazz._attributes as any)[key]
       if (attr !== undefined) {
-        return { attr, clazz, key }
+        const attrKey = this.attributeKey(clazz, key)
+        return { attr, clazz, key: attrKey }
       }
       _class = clazz._extends
     }
     throw new Error('attribute not found: ' + key)
   }
+
   pushArrayValue (curValue: unknown, attrClass: Ref<Class<Doc>>, embedded: AnyLayout): Array<PropertyType> {
     // Assign into  a proper classed values.
     const objValue = this.assign({}, attrClass, embedded)
-    objValue['_class'] = attrClass
+    objValue._class = attrClass
     // Take current array and push value into it.
     if (curValue === null || curValue === undefined) {
       // Just assign a new Array
       return [objValue]
     } else if (curValue instanceof Array) {
-      let curArray = curValue as Array<PropertyType>
+      const curArray = curValue as Array<PropertyType>
       curArray.push(objValue)
       return curArray
     } else {
@@ -189,7 +186,6 @@ export class Model implements Storage {
         l[rKey] = r[rKey]
       } else {
         const { attr, key } = this.classAttribute(_class, rKey)
-
         // Check if we need to perform inner assign based on field value and type
         switch (attr.type._class) {
           case CORE_CLASS_ARRAY: {
@@ -202,19 +198,18 @@ export class Model implements Storage {
                   value = this.pushArrayValue(value, attrClass, lv as AnyLayout)
                 }
                 l[key] = (value as unknown) as AnyLayout
+                continue
               }
             }
-            else {
-              throw new Error('attribute not found: ' + key)
-            }
+            break
           }
           case CORE_CLASS_INSTANCE: {
             const attrClass = ((attr.type as unknown) as Record<string, unknown>).of as Ref<Class<Doc>>
             if (attrClass) {
               l[key] = this.assign({}, attrClass, r[rKey] as AnyLayout)
-            } else {
-              throw new Error('attribute not found: ' + key)
+              continue
             }
+            break
           }
         }
         l[key] = r[rKey]
@@ -244,20 +239,18 @@ export class Model implements Storage {
     const l = (doc as unknown) as AnyLayout
 
     switch (attr.type._class) {
-      case CORE_CLASS_ARRAY:
+      case CORE_CLASS_ARRAY: {
         const attrClass = this.attributeClass((attr.type as ArrayOf).of)
         if (attrClass === null) {
           throw new Error('Invalid attribute type/class: ' + attr.type)
         }
         l[key] = this.pushArrayValue(l[key], attrClass, embedded)
         return doc
+      }
 
       default:
         throw new Error('Invalid attribute type: ' + attr.type)
-
     }
-
-    return doc
   }
 
   generateId (): Ref<Doc> {
@@ -327,8 +320,9 @@ export class Model implements Storage {
 
   // Q U E R Y
 
-  findSync (clazz: Ref<Class<Doc>>, query: AnyLayout, limit: number = -1): Doc[] {
+  findSync (clazz: Ref<Class<Doc>>, query: AnyLayout, limit = -1): Doc[] {
     const byClass = this.objectsOfClass(clazz)
+
     return this.findAll(byClass, clazz, query, limit)
   }
 
@@ -348,7 +342,7 @@ export class Model implements Storage {
    * @param query  - to match
    * @param limit - a number of items to find, pass value <= 0 to find all
    */
-  protected findAll (docs: Doc[], _class: Ref<Class<Doc>>, query: AnyLayout, limit: number = -1): Doc[] {
+  protected findAll (docs: Doc[], _class: Ref<Class<Doc>>, query: AnyLayout, limit = -1): Doc[] {
     const result: Doc[] = []
     for (const doc of docs) {
       if (this.matchQuery(_class, doc, query)) {
@@ -434,6 +428,7 @@ export class Model implements Storage {
     }
     return null
   }
+
   private matchValue (fieldClass: Ref<Class<Doc>> | null, docValue: unknown, value: unknown): boolean {
     const objDocValue = Object(docValue)
     if (objDocValue !== docValue) {

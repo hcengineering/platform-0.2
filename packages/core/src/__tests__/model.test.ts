@@ -147,6 +147,13 @@ describe('matching', () => {
     expect(clone.rate).toEqual(10)
   })
 
+  it('apply array value', () => {
+    const clone = Object.assign(doc1)
+    model.updateDocument(clone, { lists: ['A' as StringProperty, 'B' as StringProperty] } as AnyLayout)
+
+    expect(clone.lists).toEqual(['A', 'B'])
+  })
+
   it('apply task value', () => {
     const clone = Object.assign(doc1) as Task
     clone.mainTask = undefined

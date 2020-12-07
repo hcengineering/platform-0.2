@@ -36,7 +36,7 @@ export async function connect (workspaceProtocol: Promise<WorkspaceProtocol>, ws
     ...workspace,
 
     // Handle sending from client.
-    async tx (tx: Tx): Promise<void> {
+    async tx (tx: Tx): Promise<any> {
       return workspace.tx(tx).then(() => {
         server.broadcast(clientControl, { result: tx })
       })

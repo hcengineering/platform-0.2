@@ -22,7 +22,7 @@ import { createWorkspace, createUserAccount, getUserAccount, assignWorkspace, ge
 
 const mongodbUri = process.env.MONGODB_URI || 'mongodb://localhost:27017'
 
-function withDatabase(uri: string, f: (client: MongoClient) => Promise<any>) {
+function withDatabase (uri: string, f: (client: MongoClient) => Promise<any>) {
   console.log(`connecting to database '${uri}'...`)
 
   return MongoClient.connect(uri, { useUnifiedTopology: true }).then((client) => {
@@ -87,8 +87,11 @@ program
   .command('upgrade-workspace <workspace>')
   .description('upgrade workspace')
   .action((workspace, cmd) => {
-    withDatabase(mongodbUri, (client) => {
+    withDatabase(mongodbUri, async (client) => {
       const tenant = withTenant(client, workspace)
+      for (const c of await tenant.collections()) {
+        await tenant.dropCollection(c.collectionName)
+      }
       return initDatabase(tenant)
     })
   })

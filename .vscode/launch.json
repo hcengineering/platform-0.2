@@ -16,7 +16,7 @@
     },
     {
       "name": "Debug server",
-      "type": "node",
+      "type": "node", 
       "request": "launch",
       "args": ["src/index.ts"],
       "runtimeArgs": ["--nolazy", "-r", "ts-node/register"],
