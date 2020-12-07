@@ -13,10 +13,14 @@ jobs:
           node-version: 14
           registry-url: "https://registry.npmjs.org"
 
+      - name: Start MongoDB
+        uses: supercharge/mongodb-github-action@1.3.0
+        with:
+          mongodb-version: 4.4
       - name: Run tests
         run: |
           yarn install
-          yarn workspace @anticrm/platform test
+          yarn workspaces run test
   lint:
     runs-on: ubuntu-latest
 
