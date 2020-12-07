@@ -6,6 +6,7 @@
   "license": "EPL-2.0",
   "scripts": {
     "build": "tsc",
+    "test": "echo 'no tests'",
     "lint": "eslint src/**/*.ts"
   },
   "dependencies": {

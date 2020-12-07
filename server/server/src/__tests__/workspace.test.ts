@@ -18,7 +18,6 @@ import { Doc, generateId, Ref, Space } from '@anticrm/core'
 import core from '@anticrm/platform-core'
 import { Db, MongoClient } from 'mongodb'
 
-
 async function getTestWorkspace (uri: string): Promise<{ db: Db; client: MongoClient }> {
   const client = await MongoClient.connect(uri, { useUnifiedTopology: true })
 
@@ -51,6 +50,6 @@ describe('workspace', () => {
   })
 
   afterAll(async () => {
-    ; (await workspace).client.close()
+    (await workspace).client.close()
   })
 })

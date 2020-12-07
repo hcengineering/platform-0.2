@@ -13,7 +13,8 @@
     "create-workspace": "ts-node -T src/index.ts create-workspace",
     "create-user": "ts-node -T src/index.ts create-user",
     "upgrade-workspace": "ts-node -T src/index.ts upgrade-workspace",
-    "lint": "echo 'No linting yet'"
+    "lint": "echo 'No linting yet'",
+    "test": "echo 'no tests'"
   },
   "dependencies": {
     "commander": "^6.1.0",

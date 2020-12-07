@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import {methods} from '@anticrm/accounts'
+import { methods } from '@anticrm/accounts'
 import { Response, Request, serialize } from '@anticrm/core'
 import { MongoClient, Db } from 'mongodb'
 

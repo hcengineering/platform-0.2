@@ -27,6 +27,8 @@
   "scripts": {
     "build": "cross-env NODE_ENV=production webpack",
     "dev": "webpack-dev-server --content-base public",
-    "start": "cross-env NODE_ENV=production webpack-dev-server --content-base public"
+    "start": "cross-env NODE_ENV=production webpack-dev-server --content-base public",
+    "test": "echo 'no tests'",
+    "lint": "echo 'no linting'"
   }
 }

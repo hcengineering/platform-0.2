@@ -16,12 +16,9 @@
 /* eslint-env jest */
 
 import { MongoClient, Db } from 'mongodb'
-import { Request } from '@anticrm/core'
 import { getAccount, getWorkspace, methods } from '..'
 import { randomBytes } from 'crypto'
 const DB_NAME = 'test_accounts'
-
-import { getUserAccount } from '@anticrm/accounts'
 
 describe('server', () => {
   const dbUri = process.env.MONGODB_URI || 'mongodb://localhost:27017'
@@ -147,7 +144,7 @@ describe('server', () => {
     expect((await getAccount(db, 'andrey'))!.workspaces.length).toEqual(1)
     expect((await getWorkspace(db, workspace))!.accounts.length).toEqual(1)
 
-    let resp = await methods.removeWorkspace(db, {
+    await methods.removeWorkspace(db, {
       method: 'removeWorkspace',
       params: ['andrey', workspace]
     })
