@@ -1,30 +1,29 @@
 //
 // Copyright © 2020 Anticrm Platform Contributors.
-// 
+//
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
 // obtain a copy of the License at https://www.eclipse.org/legal/epl-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// 
+//
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
 
-import { Ref, Classifier, Doc, Class, Storage, Backlinks, AnyLayout, Backlink } from '@anticrm/core'
+import { Ref, Classifier, Doc, Class, Storage, Backlinks, AnyLayout, TxContext, StringProperty } from '@anticrm/core'
 import core from '.'
-
-interface Node {
-  _class: Ref<Class<Doc>>
-  links: Link[]
-}
 
 interface Link {
   _class: Ref<Classifier<Doc>>
   _id: Ref<Doc>
   pos: number
+}
+interface Node {
+  _class: Ref<Class<Doc>>
+  links: Link[]
 }
 
 function hasLink (node: Node, _id: Ref<Doc>): boolean {
@@ -35,11 +34,10 @@ function hasLink (node: Node, _id: Ref<Doc>): boolean {
 }
 
 export class Graph implements Storage {
-
   private graph = new Map<Ref<Doc>, Node>()
 
   async find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
-    const _id = query['_objectId'] as Ref<Doc>
+    const _id = query._objectId as Ref<Doc>
     const node = this.graph.get(_id)
     const result = [] as Doc[]
 
@@ -60,7 +58,7 @@ export class Graph implements Storage {
     return result as T[]
   }
 
-  async store (doc: Doc): Promise<void> {
+  async store (ctx: TxContext, doc: Doc): Promise<void> {
     if (doc._class !== core.class.Backlinks) {
       throw new Error('assert doc._class !== core.class.Backlinks')
     }
@@ -86,16 +84,15 @@ export class Graph implements Storage {
     }
   }
 
-  async push (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: any): Promise<void> {
+  async push (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: StringProperty, attributes: AnyLayout): Promise<void> { // eslint-disable-line
     console.log('graph push')
   }
 
-  async update (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attributes: any): Promise<void> {
+  async update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, attributes: AnyLayout): Promise<void> { // eslint-disable-line
     console.log('graph update')
   }
 
-  async remove (_class: Ref<Class<Doc>>, doc: Ref<Doc>): Promise<void> {
+  async remove (ctx: TxContext, _class: Ref<Class<Doc>>, doc: Ref<Doc>): Promise<void> { // eslint-disable-line
     console.log('graph remove')
   }
-
 }

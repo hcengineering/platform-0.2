@@ -23,7 +23,7 @@ import { Commands } from './commands'
 const mac =
   typeof navigator !== 'undefined' ? navigator.platform.includes('Mac') : false
 
-export function buildKeymap(): { [key: string]: any } {
+export function buildKeymap (): { [key: string]: any } {
   const keys: { [key: string]: any } = {}
 
   const bind = (key: string, cmd: any): void => {
@@ -33,9 +33,9 @@ export function buildKeymap(): { [key: string]: any } {
   bind('Mod-z', undo)
   bind('Shift-Mod-z', redo)
 
-  const bs_rule = chainCommands((state: EditorState, dispatch: any) => {
+  const bsRule = chainCommands((state: EditorState, dispatch: any) => {
     if (liftListItem(schema.nodes.list_item)(state)) {
-      if (state.selection.$from.nodeBefore?.text == undefined) {
+      if (state.selection.$from.nodeBefore?.text === undefined) {
         liftListItem(schema.nodes.list_item)(state, dispatch)
 
         return true
@@ -43,7 +43,7 @@ export function buildKeymap(): { [key: string]: any } {
     }
     return false
   }, undoInputRule)
-  bind('Backspace', bs_rule)
+  bind('Backspace', bsRule)
 
   if (!mac) bind('Mod-y', redo)
 

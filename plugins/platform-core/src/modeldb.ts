@@ -21,7 +21,6 @@ interface Proxy {
 }
 
 export class ModelDb extends Model {
-
   constructor () {
     super(MODEL_DOMAIN)
   }
@@ -31,9 +30,9 @@ export class ModelDb extends Model {
     return this.findAll(classes, core.class.Class, query) as Class<Obj>[]
   }
 
-  private prototypes = new Map<Ref<Classifier<Obj>>, Object>()
+  private prototypes = new Map<Ref<Classifier<Obj>>, Record<string, unknown>>()
 
-  createPrototype (classifier: Classifier<Obj>): Object {
+  createPrototype (classifier: Classifier<Obj>): Record<string, unknown> {
     const attributes = classifier._attributes as { [key: string]: Attribute }
     const descriptors = {} as PropertyDescriptorMap
     for (const key in attributes) {
@@ -51,7 +50,7 @@ export class ModelDb extends Model {
     return Object.defineProperties(proto, descriptors)
   }
 
-  getPrototype (mixin: Ref<Classifier<Obj>>): Object {
+  getPrototype (mixin: Ref<Classifier<Obj>>): Record<string, unknown> {
     const proto = this.prototypes.get(mixin)
     if (!proto) {
       const proto = this.createPrototype(this.get(mixin) as Classifier<Doc>)
@@ -74,5 +73,4 @@ export class ModelDb extends Model {
   isMixedIn (obj: Doc, _class: Ref<Mixin<Doc>>): boolean {
     return obj._mixins ? obj._mixins.includes(_class) : false
   }
-
 }

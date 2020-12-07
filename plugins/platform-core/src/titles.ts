@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Ref, Classifier, Doc, Class, Title, Storage, AnyLayout } from '@anticrm/core'
+import { Ref, Classifier, Doc, Class, Title, Storage, AnyLayout, TxContext, StringProperty } from '@anticrm/core'
 import core from '.'
 import { ModelDb } from './modeldb'
 
@@ -24,7 +24,6 @@ export interface Node {
 }
 
 export class Titles implements Storage {
-
   private graph = new Map<Ref<Doc>, Node>()
   private model: ModelDb
 
@@ -38,10 +37,10 @@ export class Titles implements Storage {
 
   async find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
     const result = [] as Doc[]
-    if (_class as string !== core.class.Title) {
+    if ((_class as string) !== core.class.Title) {
       throw new Error('assert _class !== core.class.Title')
     }
-    const prefix = query['title'] as string
+    const prefix = query.title as string
     for (const node of this.graph.values()) {
       if (node.title && node.title.startsWith(prefix) && this.implements(node, query._objectClass as Ref<Classifier<Doc>>)) {
         const title: Title = {
@@ -60,10 +59,10 @@ export class Titles implements Storage {
   queryTitle (_id: Ref<Doc>): string {
     // const touch = this.titleRef.value
     const node = this.graph.get(_id)
-    return node ? node.title as string : 'not found'
+    return node ? (node.title as string) : 'not found'
   }
 
-  async store (doc: Doc): Promise<void> {
+  async store (ctx: TxContext, doc: Doc): Promise<void> {
     if (doc._class !== core.class.Title) {
       throw new Error('assert doc._class !== core.class.Title')
     }
@@ -76,22 +75,18 @@ export class Titles implements Storage {
     })
   }
 
-  async push (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: any): Promise<void> {
-    console.log('graph push')
+  async push (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: StringProperty, attributes: AnyLayout): Promise<void> { // eslint-disable-line
+    // Not required
   }
 
-  async update (_class: Ref<Class<Doc>>, selector: any, attributes: any): Promise<void> {
-    console.log('titles update', selector, attributes)
-    const _id = selector._objectId
-    const title = attributes.title
+  async update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, attributes: AnyLayout): Promise<void> {
     const node = this.graph.get(_id)
     if (node) {
-      node.title = attributes.title
+      node.title = attributes.title as string
     }
   }
 
-  async remove (_class: Ref<Class<Doc>>, doc: Ref<Doc>): Promise<void> {
-    console.log('graph remove')
+  async remove (ctx: TxContext, _class: Ref<Class<Doc>>, doc: Ref<Doc>): Promise<void> {
+    this.graph.delete(doc)
   }
-
 }

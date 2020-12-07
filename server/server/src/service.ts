@@ -24,19 +24,19 @@ interface CommitInfo {
 }
 
 export interface ClientControl {
-  ping(): Promise<void>
-  send(response: Response<unknown>): void
-  shutdown(): Promise<void>
+  ping (): Promise<void>
+  send (response: Response<unknown>): void
+  shutdown (): Promise<void>
 }
 
-export async function connect(workspaceProtocol: Promise<WorkspaceProtocol>, ws: WebSocket, server: PlatformServer): Promise<CoreProtocol & ClientControl> {
-  let workspace = await workspaceProtocol
+export async function connect (workspaceProtocol: Promise<WorkspaceProtocol>, ws: WebSocket, server: PlatformServer): Promise<CoreProtocol & ClientControl> {
+  const workspace = await workspaceProtocol
   const clientControl = {
     // C O R E  P R O T O C O L
     ...workspace,
 
     // Handle sending from client.
-    async tx(tx: Tx): Promise<void> {
+    async tx (tx: Tx): Promise<any> {
       return workspace.tx(tx).then(() => {
         server.broadcast(clientControl, { result: tx })
       })
@@ -44,14 +44,14 @@ export async function connect(workspaceProtocol: Promise<WorkspaceProtocol>, ws:
 
     // P R O T C O L  E X T E N S I O N S
 
-    delete(_class: Ref<Class<Doc>>, query: AnyLayout): Promise<void> {
+    delete (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<void> {
       return workspace.delete(_class, query).then(() => {
         // Do we need to send update on delete?
         // server.broadcast(fromClient, )
       })
     },
 
-    async commit(commitInfo: CommitInfo): Promise<void> {
+    async commit (commitInfo: CommitInfo): Promise<void> {
       workspace.commit(commitInfo).then(() => {
         server.broadcast(clientControl, { result: commitInfo })
       })
@@ -59,20 +59,20 @@ export async function connect(workspaceProtocol: Promise<WorkspaceProtocol>, ws:
 
     // C O N T R O L
 
-    async ping(): Promise<any> {
+    async ping (): Promise<any> {
       return null
     },
 
-    send<R>(response: Response<R>): void {
+    send<R> (response: Response<R>): void {
       ws.send(makeResponse(response))
     },
 
     // TODO rename to `close`
-    shutdown(): Promise<void> {
+    shutdown (): Promise<void> {
       return workspace.shutdown()
     },
 
-    serverShutdown(password: string): Promise<void> {
+    serverShutdown (password: string): Promise<void> {
       return server.shutdown(password)
     }
   }

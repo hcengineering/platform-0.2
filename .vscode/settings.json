@@ -9,7 +9,13 @@
 	"typescript.format.insertSpaceAfterConstructor": true,
 	"javascript.format.insertSpaceAfterConstructor": true,
 	"[svelte]": {
-		"editor.defaultFormatter": "esbenp.prettier-vscode"
+		"editor.defaultFormatter": "svelte.svelte-vscode"
 	},
-	"editor.defaultFormatter": "esbenp.prettier-vscode"
+	"editor.trimAutoWhitespace": true,
+	"[typescript]": {
+		"editor.defaultFormatter": "vscode.typescript-language-features",		
+	},
+	"[javascript]": {
+		"editor.defaultFormatter": "vscode.typescript-language-features",
+	}
 }

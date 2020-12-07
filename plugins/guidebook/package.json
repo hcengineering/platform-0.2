@@ -5,7 +5,9 @@
   "author": "Anticrm Platform Contributors (https://github.com/anticrm)",
   "license": "EPL-2.0",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "test": "echo 'no tests'",
+    "lint": "echo 'no linting'"
   },
   "dependencies": {
     "@anticrm/platform": "^0.2.0",
@@ -14,8 +16,6 @@
     "prismjs": "^1.21.0"
   },
   "devDependencies": {
-    "prettier": "^2.1.2",
-    "prettier-plugin-svelte": "^1.2.1",
     "typescript": "^3.9.4"
   }
 }

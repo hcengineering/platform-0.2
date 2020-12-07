@@ -4,7 +4,10 @@
     "module": "es6",
     "outDir": "./lib",
     "rootDir": "./src",
+    "sourceMap": true,
+    "declaration": true,
     "strict": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "experimentalDecorators": true
   }
 }

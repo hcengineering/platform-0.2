@@ -5,7 +5,9 @@
   "author": "Anticrm Platform Contributors (https://github.com/anticrm)",
   "license": "EPL-2.0",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "test": "echo 'no tests'",
+    "lint": "echo 'no linting'"
   },
   "dependencies": {
     "@anticrm/platform": "^0.2.0",

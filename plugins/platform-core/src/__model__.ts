@@ -1,21 +1,21 @@
 //
 // Copyright © 2020 Anticrm Platform Contributors.
-// 
+//
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
 // obtain a copy of the License at https://www.eclipse.org/legal/epl-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// 
+//
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
 
 import {
   Attribute, Class, Classifier, Doc, Emb, Mixin, Obj, Ref, Tx, Type, VDoc,
-  ArrayOf, BagOf, InstanceOf, RefTo, Indices, CORE_CLASS_TEXT, Space, Application, List, CreateTx,
+  BagOf, InstanceOf, RefTo, Indices, CORE_CLASS_TEXT, Space, Application, List,
   DateProperty, StringProperty, Backlinks, Backlink, BACKLINKS_DOMAIN, MODEL_DOMAIN, TX_DOMAIN, TITLE_DOMAIN, CORE_CLASS_ARRAY
 } from '@anticrm/core'
 
@@ -40,13 +40,13 @@ const core = extendIds(_core, {
     RefTo: '' as Ref<Class<RefTo<Doc>>>,
     InstanceOf: '' as Ref<Class<InstanceOf<Emb>>>,
     BagOf: '' as Ref<Class<BagOf>>,
-    ArrayOf: CORE_CLASS_ARRAY,//'' as Ref<Class<ArrayOf<Type>>>,
+    ArrayOf: CORE_CLASS_ARRAY, // '' as Ref<Class<ArrayOf<Type>>>,
 
     String: '' as Ref<Class<Type>>,
     Application: '' as Ref<Class<Application>>
   },
   mixin: {
-    Indices: '' as Ref<Mixin<Indices>>,
+    Indices: '' as Ref<Mixin<Indices>>
   }
 })
 
@@ -107,7 +107,6 @@ class TBacklinks extends TDoc implements Backlinks {
 }
 
 export function model (S: Builder) {
-
   S.add(TObj, TEmb, TDoc, TVDoc, TBacklinks, TApplication, TSpace)
 
   S.createClass(core.class.Attribute, core.class.Emb, {
@@ -147,16 +146,16 @@ export function model (S: Builder) {
   S.createClass(core.class.Title, core.class.Doc, {
     _objectClass: S.attr(core.class.RefTo, { to: core.class.Class }),
     _objectId: S.attr(core.class.Type, {}),
-    title: S.attr(core.class.Type, {}),
+    title: S.attr(core.class.Type, {})
   }, TITLE_DOMAIN)
 
   S.createClass(core.class.Tx, core.class.Doc, {
     _date: S.attr(core.class.Type, {}),
-    _user: S.attr(core.class.Type, {}),
+    _user: S.attr(core.class.Type, {})
   }, TX_DOMAIN)
 
   S.createClass(core.class.CreateTx, core.class.Tx, {
-    object: S.attr(core.class.Type, {}),
+    object: S.attr(core.class.Type, {})
   }, TX_DOMAIN)
 
   S.createClass(core.class.PushTx, core.class.Tx, {
@@ -178,7 +177,7 @@ export function model (S: Builder) {
 
   S.createClass(core.class.DeleteTx, core.class.Tx, {
     _objectClass: S.attr(core.class.RefTo, { to: core.class.Class }),
-    _objectId: S.attr(core.class.Type, {}),
+    _objectId: S.attr(core.class.Type, {})
   }, TX_DOMAIN)
 
   S.createMixin(core.mixin.Indices, core.class.Class, {

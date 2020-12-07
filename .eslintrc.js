@@ -5,6 +5,7 @@ module.exports = {
     node: true
   },
   extends: [
+    'plugin:@typescript-eslint/recommended',
     'standard'
   ],
   globals: {
@@ -13,12 +14,13 @@ module.exports = {
   },
   parser: '@typescript-eslint/parser',
   parserOptions: {
-    ecmaVersion: 11,
-    sourceType: 'module'
+    ecmaVersion: 2020,
+    sourceType: 'module',
+    project: [
+      '**/tsconfig.json',
+    ]
   },
-  plugins: [
-    '@typescript-eslint'
-  ],
+  plugins: ['@typescript-eslint', 'import'],
   rules: {
     'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': ['error']

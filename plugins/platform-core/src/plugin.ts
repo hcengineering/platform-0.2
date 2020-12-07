@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import type { Platform } from '@anticrm/platform'
+import { Platform } from '@anticrm/platform'
 import {
   Ref,
   Class,
@@ -26,23 +26,26 @@ import {
   BACKLINKS_DOMAIN,
   Emb,
   VDoc,
-  Space,
   generateId as genId,
   CreateTx,
   Property,
-  PropertyType,
   ModelIndex,
   DateProperty,
   StringProperty,
-  PushTx
+  PushTx,
+  txContext,
+  TxContextSource,
+  TxProcessor,
+  VDocIndex,
+  TitleIndex,
+  TextIndex,
+  TxIndex
 } from '@anticrm/core'
 import { ModelDb } from './modeldb'
 
 import core, { CoreService, QueryResult } from '.'
 import login from '@anticrm/login'
 import rpcService from './rpc'
-
-import { TxProcessor, VDocIndex, TitleIndex, TextIndex, TxIndex } from '@anticrm/core'
 
 import { QueriableStorage } from './queries'
 
@@ -59,9 +62,9 @@ export default async (platform: Platform): Promise<CoreService> => {
   const rpc = rpcService(platform)
 
   const coreProtocol: CoreProtocol = {
-    find: (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc[]> => rpc.request('find', _class, query),
-    findOne: (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc | undefined> => rpc.request('findOne', _class, query),
-    tx: (tx: Tx): Promise<void> => rpc.request('tx', tx),
+    find: <T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> => rpc.request('find', _class, query),
+    findOne: <T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined> => rpc.request('findOne', _class, query),
+    tx: (tx: Tx): Promise<any> => rpc.request('tx', tx),
     loadDomain: (domain: string): Promise<Doc[]> => rpc.request('loadDomain', domain)
   }
 
@@ -74,22 +77,26 @@ export default async (platform: Platform): Promise<CoreService> => {
 
   model.loadModel(await coreProtocol.loadDomain(MODEL_DOMAIN))
 
-  coreProtocol.loadDomain(TITLE_DOMAIN).then((docs) => {
+  coreProtocol.loadDomain(TITLE_DOMAIN).then(docs => {
+    const ctx = txContext()
     for (const doc of docs) {
-      titles.store(doc)
+      titles.store(ctx, doc)
     }
   })
 
-  coreProtocol.loadDomain(BACKLINKS_DOMAIN).then((docs) => {
+  coreProtocol.loadDomain(BACKLINKS_DOMAIN).then(docs => {
+    const ctx = txContext()
     for (const doc of docs) {
-      graph.store(doc)
+      graph.store(ctx, doc)
     }
   })
 
-  const qModel = new QueriableStorage(model)
-  const qTitles = new QueriableStorage(titles)
-  const qGraph = new QueriableStorage(graph)
-  const qCache = new QueriableStorage(cache)
+  const qModel = new QueriableStorage(model, model)
+  const qTitles = new QueriableStorage(model, titles)
+  const qGraph = new QueriableStorage(model, graph)
+  const qCache = new QueriableStorage(model, cache)
+
+  // const queriables = [qModel, qTitles, qGraph, qCache]
 
   const domains = new Map<string, QueriableStorage>()
   domains.set(MODEL_DOMAIN, qModel)
@@ -105,14 +112,14 @@ export default async (platform: Platform): Promise<CoreService> => {
   ])
 
   // add listener to process data updates from backend
-  rpc.addEventListener((response) => {
+  rpc.addEventListener(response => {
     // Do not process if result is not passed, it could be if sources is our transaction.
     if (response.result != null) {
-      txProcessor.process(response.result as Tx)
+      txProcessor.process(txContext(TxContextSource.Server), response.result as Tx)
     }
   })
 
-  function find<T extends Doc>(_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
+  function find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
     const domainName = model.getDomain(_class)
     const domain = domains.get(domainName)
     if (domain) {
@@ -121,11 +128,11 @@ export default async (platform: Platform): Promise<CoreService> => {
     return cache.find(_class, query)
   }
 
-  function findOne<T extends Doc>(_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined> {
-    return find(_class, query).then((docs) => (docs.length === 0 ? undefined : docs[0]))
+  function findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined> {
+    return find(_class, query).then(docs => (docs.length === 0 ? undefined : docs[0]))
   }
 
-  function query<T extends Doc>(_class: Ref<Class<T>>, query: AnyLayout): QueryResult<T> {
+  function query<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): QueryResult<T> {
     const domainName = model.getDomain(_class)
     const domain = domains.get(domainName)
     if (domain) {
@@ -134,22 +141,23 @@ export default async (platform: Platform): Promise<CoreService> => {
     return qCache.query(_class, query)
   }
 
-  function generateId() {
+  function generateId () {
     return genId() as Ref<Doc>
   }
 
-  function processTx(tx: Tx): Promise<any> {
+  function processTx (tx: Tx): Promise<any> {
     console.log('processTx', tx)
+
+    // TODO: Inform queriables about transaction is being processed
+
+    const networkComplete = coreProtocol.tx(tx)
     return Promise.all([
-      // TODO: Remove extra processing of same transaction when server is ready with it.
-      coreProtocol.tx(tx).then(() => {
-        txProcessor.process(tx)
-      }),
-      txProcessor.process(tx)
+      networkComplete,
+      txProcessor.process(txContext(TxContextSource.Client, networkComplete), tx)
     ])
   }
 
-  function createDoc<T extends Doc>(doc: T): Promise<any> {
+  function createDoc<T extends Doc> (doc: T): Promise<any> {
     if (!doc._id) {
       doc._id = generateId()
     }
@@ -158,14 +166,14 @@ export default async (platform: Platform): Promise<CoreService> => {
       _class: core.class.CreateTx,
       _id: generateId() as Ref<Doc>,
       _date: Date.now() as Property<number, Date>,
-      _user: platform.getMetadata(login.metadata.WhoAmI) as Property<string, string>,
+      _user: platform.getMetadata(login.metadata.WhoAmI) as StringProperty,
       object: doc
     }
 
     return processTx(tx)
   }
 
-  function createVDoc<T extends VDoc>(vdoc: T): Promise<void> {
+  function createVDoc<T extends VDoc> (vdoc: T): Promise<void> {
     if (!vdoc._createdBy) {
       vdoc._createdBy = platform.getMetadata(login.metadata.WhoAmI) as StringProperty
     }
@@ -175,28 +183,34 @@ export default async (platform: Platform): Promise<CoreService> => {
     return createDoc(vdoc)
   }
 
-  function push(vdoc: VDoc, _attribute: string, element: Emb): Promise<any> {
+  function push (vdoc: VDoc, _attribute: string, element: Emb): Promise<any> {
     const tx: PushTx = {
       _class: core.class.PushTx,
       _id: generateId() as Ref<Doc>,
       _objectId: vdoc._id,
       _objectClass: vdoc._class,
       _date: Date.now() as Property<number, Date>,
-      _user: platform.getMetadata(login.metadata.WhoAmI) as Property<string, string>,
-      _attribute: _attribute as Property<string, string>,
-      _attributes: (element as unknown) as { [key: string]: PropertyType }
+      _user: platform.getMetadata(login.metadata.WhoAmI) as StringProperty,
+      _attribute: _attribute as StringProperty,
+      _attributes: (element as unknown) as AnyLayout
     }
     return processTx(tx)
   }
 
+  function loadDomain (domain: string, index?: string, direction?: string): Promise<Doc[]> {
+    return coreProtocol.loadDomain(domain, index, direction)
+  }
+
   return {
     getModel: () => model,
+    loadDomain,
     query,
     find,
     findOne,
     createDoc,
     createVDoc,
     push,
-    generateId
-  }
+    generateId,
+    tx: processTx
+  } as CoreService
 }

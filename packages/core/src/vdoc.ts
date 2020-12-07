@@ -1,25 +1,23 @@
 //
 // Copyright © 2020 Anticrm Platform Contributors.
-// 
+//
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
 // obtain a copy of the License at https://www.eclipse.org/legal/epl-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// 
+//
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
 
-import { Index, Storage, Tx } from './core'
+import { Class, DateProperty, Doc, Emb, Index, Ref, Storage, StringProperty, Tx, TxContext } from './core'
 import { Model } from './model'
-import { Doc, Ref, Mixin, Class, Obj, Emb, DateProperty, StringProperty } from './core'
-import { CreateTx, PushTx, UpdateTx, CORE_CLASS_CREATETX, CORE_CLASS_UPDATETX, CORE_CLASS_PUSHTX } from './tx'
+import { CORE_CLASS_CREATETX, CORE_CLASS_PUSHTX, CORE_CLASS_UPDATETX, CreateTx, PushTx, UpdateTx } from './tx'
 
-export interface Application extends Doc {
-}
+export interface Application extends Doc { }
 
 export interface List extends Emb {
   id: string
@@ -51,22 +49,21 @@ export class VDocIndex implements Index {
     this.storage = storage
   }
 
-  async tx (tx: Tx): Promise<any> {
+  async tx (ctx: TxContext, tx: Tx): Promise<any> {
     switch (tx._class) {
       case CORE_CLASS_CREATETX:
-        return this.onCreate(tx as CreateTx)
+        return this.onCreate(ctx, tx as CreateTx)
       case CORE_CLASS_UPDATETX:
-        return this.onUpdate(tx as UpdateTx)
+        return this.onUpdate(ctx, tx as UpdateTx)
       case CORE_CLASS_PUSHTX:
-        return this.onPush(tx as PushTx)
+        return this.onPush(ctx, tx as PushTx)
       default:
         console.log('not implemented title tx', tx)
     }
   }
 
-  async onCreate (create: CreateTx): Promise<any> {
-    if (!this.modelDb.is(create.object._class, CORE_CLASS_VDOC))
-      return
+  async onCreate (ctx: TxContext, create: CreateTx): Promise<any> {
+    if (!this.modelDb.is(create.object._class, CORE_CLASS_VDOC)) return
 
     // const doc: VDoc = {
     //   _space: create._space,
@@ -91,14 +88,14 @@ export class VDocIndex implements Index {
     //     break
     //   }
     // }
-    return this.storage.store(create.object)
+    return this.storage.store(ctx, create.object)
   }
 
-  onPush (tx: PushTx): Promise<any> {
-    return this.storage.push(tx._objectClass, tx._objectId, tx._attribute, tx._attributes)
+  onPush (ctx: TxContext, tx: PushTx): Promise<any> {
+    return this.storage.push(ctx, tx._objectClass, tx._objectId, tx._attribute, tx._attributes)
   }
 
-  onUpdate (tx: UpdateTx): Promise<any> {
-    return this.storage.update(tx._objectClass, { _id: tx._objectId }, tx._attributes)
+  onUpdate (ctx: TxContext, tx: UpdateTx): Promise<any> {
+    return this.storage.update(ctx, tx._objectClass, tx._objectId, tx._attributes)
   }
 }

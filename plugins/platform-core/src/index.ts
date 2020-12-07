@@ -15,8 +15,21 @@
 
 import { plugin, Plugin, Service, Metadata } from '@anticrm/platform'
 import {
-  Ref, Class, Doc, AnyLayout, Obj, Emb,
-  CreateTx, PushTx, UpdateTx, DeleteTx, Space, Title, CORE_CLASS_BACKLINKS, VDoc
+  Ref,
+  Class,
+  Doc,
+  AnyLayout,
+  Obj,
+  Emb,
+  CreateTx,
+  PushTx,
+  UpdateTx,
+  DeleteTx,
+  Space,
+  Title,
+  CORE_CLASS_BACKLINKS,
+  VDoc,
+  CoreProtocol
 } from '@anticrm/core'
 
 import type { ModelDb } from './modeldb'
@@ -28,10 +41,8 @@ export interface QueryResult<T extends Doc> {
   subscribe (run: Subscriber<T>): Unsubscriber
 }
 
-export interface CoreService extends Service {
+export interface CoreService extends Service, CoreProtocol {
   getModel (): ModelDb
-  find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]>
-  findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined>
   query<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): QueryResult<T>
   createDoc<T extends Doc> (doc: T): Promise<void>
   createVDoc<T extends VDoc> (vdoc: T): Promise<void>
@@ -39,23 +50,27 @@ export interface CoreService extends Service {
   generateId (): Ref<Doc>
 }
 
-export default plugin('core' as Plugin<CoreService>, {}, {
-  metadata: {
-    Model: '' as Metadata<{ [key: string]: Doc[] }>,
-    Offline: '' as Metadata<boolean>,
-    WSHost: '' as Metadata<string>,
-    WSPort: '' as Metadata<string>,
-    Token: '' as Metadata<string>
-  },
-  class: {
-    Class: '' as Ref<Class<Class<Obj>>>,
-    CreateTx: '' as Ref<Class<CreateTx>>,
-    PushTx: '' as Ref<Class<PushTx>>,
-    UpdateTx: '' as Ref<Class<UpdateTx>>,
-    DeleteTx: '' as Ref<Class<DeleteTx>>,
-    Space: '' as Ref<Class<Space>>,
-    Title: '' as Ref<Class<Title>>,
-    Backlinks: CORE_CLASS_BACKLINKS,
-    VDoc: '' as Ref<Class<VDoc>>,
+export default plugin(
+  'core' as Plugin<CoreService>,
+  {},
+  {
+    metadata: {
+      Model: '' as Metadata<{ [key: string]: Doc[] }>,
+      Offline: '' as Metadata<boolean>,
+      WSHost: '' as Metadata<string>,
+      WSPort: '' as Metadata<string>,
+      Token: '' as Metadata<string>
+    },
+    class: {
+      Class: '' as Ref<Class<Class<Obj>>>,
+      CreateTx: '' as Ref<Class<CreateTx>>,
+      PushTx: '' as Ref<Class<PushTx>>,
+      UpdateTx: '' as Ref<Class<UpdateTx>>,
+      DeleteTx: '' as Ref<Class<DeleteTx>>,
+      Space: '' as Ref<Class<Space>>,
+      Title: '' as Ref<Class<Title>>,
+      Backlinks: CORE_CLASS_BACKLINKS,
+      VDoc: '' as Ref<Class<VDoc>>
+    }
   }
-})
+)

@@ -21,7 +21,7 @@ export const nodes: NodeSpec = {
     content: 'inline*',
     group: 'block',
     parseDOM: [{ tag: 'p' }],
-    toDOM() {
+    toDOM () {
       return pDOM
     }
   },
@@ -32,7 +32,7 @@ export const nodes: NodeSpec = {
     group: 'block',
     defining: true,
     parseDOM: [{ tag: 'blockquote' }],
-    toDOM() {
+    toDOM () {
       return blockquoteDOM
     }
   },
@@ -41,7 +41,7 @@ export const nodes: NodeSpec = {
   horizontal_rule: {
     group: 'block',
     parseDOM: [{ tag: 'hr' }],
-    toDOM() {
+    toDOM () {
       return hrDOM
     }
   },
@@ -62,7 +62,7 @@ export const nodes: NodeSpec = {
       { tag: 'h5', attrs: { level: 5 } },
       { tag: 'h6', attrs: { level: 6 } }
     ],
-    toDOM(node: any): any {
+    toDOM (node: any): any {
       return ['h' + String(node.attrs.level), 0]
     }
   },
@@ -77,7 +77,7 @@ export const nodes: NodeSpec = {
     code: true,
     defining: true,
     parseDOM: [{ tag: 'pre', preserveWhitespace: 'full' }],
-    toDOM() {
+    toDOM () {
       return preDOM
     }
   },
@@ -102,7 +102,7 @@ export const nodes: NodeSpec = {
     parseDOM: [
       {
         tag: 'img[src]',
-        getAttrs(dom: any) {
+        getAttrs (dom: any) {
           return {
             src: dom.getAttribute('src'),
             title: dom.getAttribute('title'),
@@ -111,7 +111,7 @@ export const nodes: NodeSpec = {
         }
       }
     ],
-    toDOM(node: any) {
+    toDOM (node: any) {
       const { src, alt, title } = node.attrs
       return ['img', { src, alt, title }]
     }
@@ -123,7 +123,7 @@ export const nodes: NodeSpec = {
     group: 'inline',
     selectable: false,
     parseDOM: [{ tag: 'br' }],
-    toDOM() {
+    toDOM () {
       return brDOM
     }
   },
@@ -132,7 +132,7 @@ export const nodes: NodeSpec = {
   list_item: add(listItem, { content: 'paragraph block*' })
 }
 
-function add(obj: any, props: any): any {
+function add (obj: any, props: any): any {
   const copy: any = {}
   for (const prop in obj) copy[prop] = obj[prop]
   for (const prop in props) copy[prop] = props[prop]
@@ -159,7 +159,7 @@ export const marks: MarkSpec = {
     parseDOM: [
       {
         tag: 'a[href]',
-        getAttrs(dom: any): any {
+        getAttrs (dom: any): any {
           return {
             href: dom.getAttribute('href'),
             title: dom.getAttribute('title')
@@ -167,7 +167,7 @@ export const marks: MarkSpec = {
         }
       }
     ],
-    toDOM(node: any): any {
+    toDOM (node: any): any {
       const { href, title } = node.attrs
       return ['a', { href, title }, 0]
     }
@@ -177,7 +177,7 @@ export const marks: MarkSpec = {
   // Has parse rules that also match `<i>` and `font-style: italic`.
   em: {
     parseDOM: [{ tag: 'i' }, { tag: 'em' }, { style: 'font-style=italic' }],
-    toDOM() {
+    toDOM () {
       return emDOM
     }
   },
@@ -185,7 +185,7 @@ export const marks: MarkSpec = {
   // Has parse rules that also match `<i>` and `font-style: italic`.
   strike: {
     parseDOM: [{ tag: 's' }],
-    toDOM() {
+    toDOM () {
       return strikeDOM
     }
   },
@@ -193,7 +193,7 @@ export const marks: MarkSpec = {
   // Has parse rules that also match `<i>` and `font-style: italic`.
   underline: {
     parseDOM: [{ tag: 'u' }],
-    toDOM() {
+    toDOM () {
       return underlineDOM
     }
   },
@@ -216,7 +216,7 @@ export const marks: MarkSpec = {
           /^(bold(er)?|[5-9]\d{2,})$/.test(value) && null
       }
     ],
-    toDOM() {
+    toDOM () {
       return strongDOM
     }
   },
@@ -224,7 +224,7 @@ export const marks: MarkSpec = {
   // :: MarkSpec Code font mark. Represented as a `<code>` element.
   code: {
     parseDOM: [{ tag: 'code' }],
-    toDOM() {
+    toDOM () {
       return codeDOM
     }
   },
@@ -243,7 +243,7 @@ export const marks: MarkSpec = {
         }
       }
     ],
-    toDOM(node: any) {
+    toDOM (node: any) {
       return ['reference', { id: node.attrs.id, class: node.attrs.class }, 0]
     }
   }

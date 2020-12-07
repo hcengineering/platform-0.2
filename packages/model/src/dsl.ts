@@ -104,6 +104,15 @@ export function Array (of: Type) {
   }
 }
 
+export function InstOf<T extends Emb> (of: Ref<Class<T>>) {
+
+  return function (target: any, propertyKey: string): void {
+    const attribute = getAttribute(target, propertyKey)
+    const arr = { _class: CORE_CLASS_INSTANCE, of } as unknown as InstanceOf<T>
+    attribute.type = arr
+  }
+}
+
 export function InstanceOf<T extends Emb> (of: Ref<Class<T>>): InstanceOf<T> {
   return { _class: CORE_CLASS_INSTANCE, of } as unknown as InstanceOf<T>
 }

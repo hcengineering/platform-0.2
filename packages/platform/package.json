@@ -6,7 +6,8 @@
   "license": "EPL-2.0",
   "scripts": {
     "build": "tsc",
-    "test": "echo 'no tests'"
+    "test": "echo 'no tests'",
+    "lint": "echo not defined yet"
   },
   "devDependencies": {
     "typescript": "^3.9.4"
