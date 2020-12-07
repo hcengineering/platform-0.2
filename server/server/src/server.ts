@@ -74,7 +74,7 @@ export function start (port: number, dbUri: string, host?: string) {
         throw new Error('ctl password does not match')
       }
       for (const client of connections.values()) {
-        ; (await client).shutdown()
+        (await client).shutdown()
       }
       httpServer.close()
     }
@@ -131,6 +131,9 @@ export function start (port: number, dbUri: string, host?: string) {
 
   server.on('upgrade', function upgrade (request: IncomingMessage, socket, head: Buffer) {
     auth(request, (err: Error | null, client: Client | null) => {
+      if (err != null) {
+        console.log(err)
+      }
       if (!client) {
         socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n')
         socket.destroy()

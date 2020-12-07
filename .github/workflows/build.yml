@@ -5,7 +5,6 @@ on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
@@ -22,7 +21,9 @@ jobs:
         run: yarn install
 
       - name: Run tests
-        run: yarn workspaces run test
+        run: |
+          yarn workspace @anticrm/tool create-workspace latest-model --organization "Create model for some of tests"
+          yarn workspaces run test
   lint:
     runs-on: ubuntu-latest
 

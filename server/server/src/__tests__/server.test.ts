@@ -23,25 +23,27 @@ describe('server', () => {
   const mongodbUri = process.env.MONGODB_URI || 'mongodb://localhost:27017'
   const shutdown = start(3333, mongodbUri)
 
-  function connect () {
+  let conn: WebSocket
+
+  beforeEach(() => {
     const client: Client = {
       workspace: 'latest-model'
     }
     const token = encode(client, 'secret')
     console.log(token)
-    return new WebSocket('ws://localhost:3333/' + token)
-  }
+    conn = new WebSocket('ws://localhost:3333/' + token)
+  })
+  afterEach(() => {
+    conn.close()
+  })
 
   it('should connect to server', (done) => {
-    const conn = connect()
     conn.on('open', () => {
-      conn.close()
       done()
     })
   })
 
   it('should send many requests', (done) => {
-    const conn = connect()
     const total = 10
     const start = Date.now()
     conn.on('open', () => {
@@ -58,14 +60,12 @@ describe('server', () => {
       const resp = getResponse(msg)
       if (++received === total) {
         console.log('resp:', resp, ' Time: ', Date.now() - start)
-        conn.close()
         done()
       }
     })
   })
 
   it('should send query', (done) => {
-    const conn = connect()
     conn.on('open', () => {
       conn.send(makeRequest({
         method: 'find',
@@ -77,7 +77,6 @@ describe('server', () => {
     })
     conn.on('message', (msg: string) => {
       const resp = getResponse(msg)
-      conn.close()
       expect(resp.result instanceof Array).toBeTruthy()
       // console.log(resp.result)
       done()
@@ -85,23 +84,22 @@ describe('server', () => {
   })
 
   it('should load domain', (done) => {
-    const conn = connect()
     conn.on('open', () => {
       conn.send(makeRequest({
         method: 'loadDomain',
         params: [
+          'model'
         ]
       }))
     })
     conn.on('message', (msg: string) => {
       const resp = getResponse(msg)
-      conn.close()
       expect(resp.result instanceof Array).toBeTruthy()
       done()
     })
   })
 
-  it('should close server', () => {
+  afterAll(() => {
     shutdown()
   })
 })

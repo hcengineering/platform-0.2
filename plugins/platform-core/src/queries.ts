@@ -90,12 +90,19 @@ export class QueriableStorage implements Domain {
     return this.proxy.update(ctx, _class, _id, attributes).then(() => {
       this.queries.forEach(q => {
         // Find doc, apply update of attributes and check if it is still matches, if not we need to perform request to server after transaction will be complete.
+        let pos = 0
         for (const r of q.results) {
           if (r._id === _id) {
             this.model.updateDocument(r, attributes)
-            ctx.network.then(() => this.refresh(q))
+
+            if (!this.model.matchQuery(q._class, r, q.query)) {
+              // Document is not matched anymore, we need to remove it.
+              q.results = q.results.slice(pos, pos + 1)
+            }
+            q.subscriber(q.results)
             return
           }
+          pos++
         }
 
         // TODO: Check if attributes modified had in query so we potentially need to fetch new matched objects from server.
