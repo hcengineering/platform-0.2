@@ -25,6 +25,13 @@ Accessing from more users:
 yarn workspace @anticrm/tool create-user john.someseed@gmail.com -w workspace -p 123 -f "John Someseed"
 ```
 
+
+Upgrading DB models:
+
+```
+yarn workspace @anticrm/tool upgrade-workspace workspace
+```
+
 Go to http://localhost:8080/component:workbench.Workbench/application:workbench.Default
 
 # The Platform Documentation

@@ -14,15 +14,19 @@
 //
 
 import { Db } from 'mongodb'
-import { Model, Strings } from '@anticrm/boot/src/boot'
+import { Model } from '@anticrm/boot/src/boot'
 import { Doc } from '@anticrm/core'
 
-export function initDatabase (db: Db): Promise<any> {
+export async function initDatabase (db: Db): Promise<any> {
   const domains = { ...Model } as { [key: string]: Doc[] }
   const ops = [] as Promise<any>[]
   for (const domain in domains) {
+    console.log('PROCESSING DOMAIN:', domain)
     const model = domains[domain]
     db.collection(domain, (err, coll) => {
+      if (err) {
+        console.log(err)
+      }
       ops.push(coll.deleteMany({}).then(() => model.length > 0 ? coll.insertMany(model) : null))
     })
   }

@@ -89,9 +89,6 @@ program
   .action((workspace, cmd) => {
     withDatabase(mongodbUri, async (client) => {
       const tenant = withTenant(client, workspace)
-      for (const c of await tenant.collections()) {
-        await tenant.dropCollection(c.collectionName)
-      }
       return initDatabase(tenant)
     })
   })
