@@ -22,7 +22,7 @@ export interface DocumentProtocol {
 }
 
 export interface CoreProtocol extends DocumentProtocol {
-  tx (tx: Tx): Promise<void>
+  tx (tx: Tx): Promise<any>
 }
 
 export class TxProcessor {

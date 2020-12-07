@@ -26,7 +26,9 @@ import {
   TextIndex,
   TitleIndex,
   Tx,
+  txContext,
   TxContext,
+  TxContextSource,
   TxIndex,
   TxProcessor,
   VDocIndex
@@ -100,7 +102,7 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
   const clientControl = {
     // C O R E  P R O T O C O L
 
-    find<T extends Doc> (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<T[]> {
+    find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
       return collection(_class)
         .find({
           ...memdb.assign({}, _class, query),
@@ -109,7 +111,7 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
         .toArray()
     },
 
-    async findOne (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc | undefined> {
+    async findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined> {
       const result = await collection(_class).findOne({
         ...memdb.assign({}, _class, query),
         _class: memdb.getClass(_class)
@@ -120,8 +122,8 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
       return result
     },
 
-    async tx (ctx: TxContext, tx: Tx): Promise<void> {
-      return txProcessor.process(ctx, tx)
+    async tx (tx: Tx): Promise<any> {
+      return txProcessor.process(txContext(TxContextSource.Server), tx)
     },
 
     async loadDomain (domain: string): Promise<Doc[]> {

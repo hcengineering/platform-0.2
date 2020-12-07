@@ -64,7 +64,7 @@ export default async (platform: Platform): Promise<CoreService> => {
   const coreProtocol: CoreProtocol = {
     find: <T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> => rpc.request('find', _class, query),
     findOne: <T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined> => rpc.request('findOne', _class, query),
-    tx: (tx: Tx): Promise<void> => rpc.request('tx', tx),
+    tx: (tx: Tx): Promise<any> => rpc.request('tx', tx),
     loadDomain: (domain: string): Promise<Doc[]> => rpc.request('loadDomain', domain)
   }
 
