@@ -18,7 +18,7 @@
 import { Ref, Doc, Property, Emb, Class, Obj } from '@anticrm/core'
 import { Model } from '../model'
 
-import { ModelClass, Prop, Array, InstanceOf, InstOf, Builder } from '@anticrm/model'
+import { ModelClass, Prop, Collection, Builder, Reference } from '@anticrm/model'
 import { AnyLayout, StringProperty } from '../core'
 
 interface SubTask extends Emb {
@@ -87,8 +87,11 @@ class TTask extends TDoc implements Task {
   @Prop() rate!: number
   @Prop() lists!: string[]
 
-  @InstOf(core.class.Subtask) mainTask!: SubTask
-  @Array(InstanceOf(core.class.Subtask)) tasks?: SubTask[]
+  @Reference(core.class.Subtask) mainTask!: SubTask
+
+  @Collection()
+  @Reference(core.class.Subtask)
+  tasks?: SubTask[]
 }
 
 @ModelClass(core.class.Subtask, core.class.Emb)

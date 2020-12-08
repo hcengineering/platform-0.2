@@ -398,8 +398,7 @@ export function identify<N extends Namespace> (pluginId: AnyPlugin, namespace: N
   return transform(pluginId, namespace, (id: string, value) => value === '' ? id : value)
 }
 
-export function plugin<P extends Service, D extends PluginDependencies, N extends Namespace>
-  (id: Plugin<P>, deps: D, namespace: N): PluginDescriptor<P, D> & N {
+export function plugin<P extends Service, D extends PluginDependencies, N extends Namespace> (id: Plugin<P>, deps: D, namespace: N): PluginDescriptor<P, D> & N {
   return { id, deps, ...identify(id, namespace) }
 }
 

@@ -38,7 +38,7 @@ export interface PlatformServer {
   shutdown (password: string): Promise<void>
 }
 
-export function start (port: number, dbUri: string, host?: string) {
+export function start (port: number, dbUri: string, host?: string): Promise<() => Promise<void>> {
   console.log('starting server on port ' + port + '...')
   console.log('host: ' + host)
 
@@ -68,7 +68,7 @@ export function start (port: number, dbUri: string, host?: string) {
       }
     },
 
-    async shutdown (password: string) {
+    async shutdown (password: string): Promise<void> {
       console.log('shutting down...')
       if (password !== ctlpassword) {
         throw new Error('ctl password does not match')
@@ -76,7 +76,7 @@ export function start (port: number, dbUri: string, host?: string) {
       for (const client of connections.values()) {
         (await client).shutdown()
       }
-      httpServer.close()
+      server.close()
     }
   }
 
@@ -146,11 +146,13 @@ export function start (port: number, dbUri: string, host?: string) {
     })
   })
 
-  const httpServer = server.listen(port, host)
-
-  console.log('server started.')
-
-  return () => {
-    platformServer.shutdown(ctlpassword)
-  }
+  return new Promise((resolve) => {
+    const httpServer = server.listen(port, host, () => {
+      console.log('server started.')
+      resolve(() => {
+        console.log('Shutting down server:', httpServer.address())
+        return platformServer.shutdown(ctlpassword)
+      })
+    })
+  })
 }

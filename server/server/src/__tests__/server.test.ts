@@ -18,43 +18,105 @@ import { makeRequest, getResponse } from '../rpc'
 import { start, Client } from '../server'
 import WebSocket from 'ws'
 import { encode } from 'jwt-simple'
+import { Db, MongoClient } from 'mongodb'
+import { withTenant } from '@anticrm/accounts'
+
+import { Builder } from '@anticrm/model'
+
+import { model as platformCore } from '@anticrm/platform-core/src/__model__'
+import { model as presentation } from '@anticrm/presentation/src/__model__'
+import { model as contact } from '@anticrm/contact/src/__model__'
+import { model as workbench } from '@anticrm/workbench/src/__model__'
+import { model as task } from '@anticrm/task/src/__model__'
+import { model as chunter } from '@anticrm/chunter/src/__model__'
+import { Doc } from '@anticrm/core'
+// import recruitmentModel from '@anticrm/recruitment-model/src/model'
+
+// import taskStrings from '@anticrm/task-model/src/strings/ru'
+
+export const builder = new Builder()
+builder.load(platformCore)
+builder.load(presentation)
+builder.load(contact)
+builder.load(workbench)
+builder.load(chunter)
+builder.load(task)
+// builder.load(recruitmentModel)
+
+const Model = builder.dumpAll()
 
 describe('server', () => {
   const mongodbUri = process.env.MONGODB_URI || 'mongodb://localhost:27017'
-  const shutdown = start(3333, mongodbUri)
+  let shutdown: () => Promise<void>
 
   let conn: WebSocket
 
-  beforeEach(() => {
-    const client: Client = {
-      workspace: 'latest-model'
+  function initDatabase (db: Db): Promise<any> {
+    const domains = { ...Model } as { [key: string]: Doc[] }
+    const ops = [] as Promise<any>[]
+    for (const domain in domains) {
+      const model = domains[domain]
+      db.collection(domain, (err, coll) => {
+        if (err) {
+          console.log(err)
+        }
+        ops.push(coll.deleteMany({}).then(() => model.length > 0 ? coll.insertMany(model) : null))
+      })
     }
-    const token = encode(client, 'secret')
-    console.log(token)
-    conn = new WebSocket('ws://localhost:3333/' + token)
-  })
-  afterEach(() => {
-    conn.close()
+    return Promise.all(ops)
+  }
+  const client: Client = {
+    workspace: 'test-latest-model'
+  }
+  const token = encode(client, 'secret')
+
+  beforeAll(async () => {
+    const dbClient = await MongoClient.connect(mongodbUri, { useUnifiedTopology: true })
+
+    const db = withTenant(dbClient, client.workspace)
+    for (const c of await db.collections()) {
+      await db.dropCollection(c.collectionName)
+    }
+
+    await initDatabase(db)
+    await dbClient.close()
+
+    shutdown = await start(3337, mongodbUri, 'localhost')
   })
 
-  it('should connect to server', (done) => {
-    conn.on('open', () => {
-      done()
+  async function connect (): Promise<WebSocket> {
+    return new Promise((resolve, reject) => {
+      conn = new WebSocket('ws://localhost:3337/' + token)
+      conn.on('open', () => {
+        resolve(conn)
+      })
+      conn.onerror = function (err) {
+        reject(err)
+      }
     })
+  }
+
+  beforeEach(async () => {
+    conn = await connect()
+  })
+
+  afterEach(() => {
+    if (conn && conn.readyState) {
+      conn.close()
+    }
+  })
+
+  afterAll(async () => {
+    await shutdown()
+  })
+
+  test('should connect to server', async () => {
+    expect(conn.readyState).toEqual(1)
   })
 
   it('should send many requests', (done) => {
     const total = 10
     const start = Date.now()
-    conn.on('open', () => {
-      for (let i = 0; i < total; i++) {
-        conn.send(makeRequest({
-          id: i,
-          method: 'ping',
-          params: []
-        }))
-      }
-    })
     let received = 0
     conn.on('message', (msg: string) => {
       const resp = getResponse(msg)
@@ -63,40 +125,42 @@ describe('server', () => {
         done()
       }
     })
+    for (let i = 0; i < total; i++) {
+      conn.send(makeRequest({
+        id: i,
+        method: 'ping',
+        params: []
+      }))
+    }
   })
 
   it('should send query', (done) => {
-    conn.on('open', () => {
-      conn.send(makeRequest({
-        method: 'find',
-        params: [
-          'class:core.Class',
-          {}
-        ]
-      }))
-    })
     conn.on('message', (msg: string) => {
       const resp = getResponse(msg)
       expect(resp.result instanceof Array).toBeTruthy()
-      // console.log(resp.result)
       done()
     })
+    conn.send(makeRequest({
+      method: 'find',
+      params: [
+        'class:core.Class',
+        {}
+      ]
+    }))
   })
 
   it('should load domain', (done) => {
-    conn.on('open', () => {
-      conn.send(makeRequest({
-        method: 'loadDomain',
-        params: [
-          'model'
-        ]
-      }))
-    })
     conn.on('message', (msg: string) => {
       const resp = getResponse(msg)
       expect(resp.result instanceof Array).toBeTruthy()
       done()
     })
+    conn.send(makeRequest({
+      method: 'loadDomain',
+      params: [
+        'model'
+      ]
+    }))
   })
 
   afterAll(() => {

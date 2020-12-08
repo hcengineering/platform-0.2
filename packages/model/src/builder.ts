@@ -39,7 +39,7 @@ import { CombineObjects, KeysByType } from 'simplytyped'
 
 type MethodType = (...args: any[]) => any
 
-export type OptionalMethods<T extends object> = CombineObjects<Omit<T, KeysByType<T, MethodType>>,
+export type OptionalMethods<T extends Record<string, unknown>> = CombineObjects<Omit<T, KeysByType<T, MethodType>>,
   Partial<Pick<T, KeysByType<T, MethodType>>>>
 
 class Builder {
@@ -47,12 +47,12 @@ class Builder {
 
   private domains = new Map<string, Model>()
 
-  constructor(memdb?: Model) {
+  constructor (memdb?: Model) {
     this.memdb = memdb ?? new Model(MODEL_DOMAIN)
     this.domains.set(MODEL_DOMAIN, this.memdb)
   }
 
-  load (model: (builder: Builder) => void) {
+  load (model: (builder: Builder) => void): void {
     model(this)
   }
 
@@ -69,7 +69,7 @@ class Builder {
     return result
   }
 
-  getDomain (domain: string) {
+  getDomain (domain: string): Model {
     const memdb = this.domains.get(domain)
     if (!memdb) {
       const memdb = new Model(domain)
@@ -79,10 +79,10 @@ class Builder {
     return memdb
   }
 
-  add (...classes: { new(): Obj }[]) {
+  add (...classes: { new(): Obj }[]): void {
     for (const ctor of classes) {
       const classifier = getClassifier(ctor.prototype)
-      console.log('classifier', classifier)
+      // console.log('classifier', classifier)
       this.memdb.add(classifier)
     }
   }
@@ -123,22 +123,14 @@ class Builder {
     return doc as M
   }
 
-  // createCls<T extends E, E extends Obj> (_id: Ref<Class<T>>, _extends: Ref<Class<E>>, values: Omit<Class<T>, keyof Classifier<Obj>>, _attributes: AllAttributes<T, E>) {
-  //   this.createDocument(core.class.Class as Ref<Class<Class<T>>>, {
-  //     _extends,
-  //     _attributes,
-  //     ...values
-  //   } as unknown as Class<T>, _id as Ref<Class<T>>)
-  // }
-
-  createClass<T extends E, E extends Obj> (_id: Ref<Class<T>>, _extends: Ref<Class<E>>, _attributes: AllAttributes<T, E>, _domain?: string, _native?: Resource<any>) {
-    this.createDocument(CORE_CLASS_CLASS as Ref<Class<EClass<T, E>>>,
+  createClass<E extends Obj, T extends E> (_id: Ref<Class<T>>, _extends: Ref<Class<E>>, _attributes: AllAttributes<T, E>, _domain?: string, _native?: Resource<any>): EClass<T, E> {
+    return this.createDocument(CORE_CLASS_CLASS as Ref<Class<EClass<T, E>>>,
       { _extends, _attributes, _domain, _native, _kind: ClassifierKind.CLASS } as EClass<T, E>,
       _id as Ref<EClass<T, E>>)
   }
 
-  createMixin<T extends E, E extends Doc> (_id: Ref<Mixin<T>>, _extends: Ref<Class<E>>, _attributes: AllAttributes<T, E>, _domain?: string, _native?: Resource<any>) {
-    this.createDocument(CORE_CLASS_MIXIN as Ref<Class<EClass<T, E>>>,
+  createMixin<E extends Doc, T extends E> (_id: Ref<Mixin<T>>, _extends: Ref<Class<E>>, _attributes: AllAttributes<T, E>, _domain?: string, _native?: Resource<any>): EClass<T, E> {
+    return this.createDocument(CORE_CLASS_MIXIN as Ref<Class<EClass<T, E>>>,
       { _extends, _attributes, _domain, _native, _kind: ClassifierKind.MIXIN } as EClass<T, E>,
       _id as Ref<EClass<T, E>>)
   }

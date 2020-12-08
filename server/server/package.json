@@ -19,6 +19,7 @@
     "@types/ws": "^7.2.5",
     "babel-jest": "^26.0.1",
     "jest": "^26.0.1",
+    "ts-jest": "^26.4.4",
     "typescript": "^3.9.5"
   },
   "dependencies": {
