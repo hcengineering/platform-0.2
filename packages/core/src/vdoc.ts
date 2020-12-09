@@ -63,7 +63,7 @@ export class VDocIndex implements Index {
   }
 
   async onCreate (ctx: TxContext, create: CreateTx): Promise<any> {
-    if (!this.modelDb.is(create.object._class, CORE_CLASS_VDOC)) return
+    if (!this.modelDb.is(create._objectClass, CORE_CLASS_VDOC)) return
 
     // const doc: VDoc = {
     //   _space: create._space,
@@ -88,7 +88,7 @@ export class VDocIndex implements Index {
     //     break
     //   }
     // }
-    return this.storage.store(ctx, create.object)
+    return this.storage.store(ctx, this.modelDb.newDoc(create._objectClass, create._objectId, create.object))
   }
 
   onPush (ctx: TxContext, tx: PushTx): Promise<any> {

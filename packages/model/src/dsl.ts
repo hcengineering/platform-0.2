@@ -1,3 +1,4 @@
+import { RefTo, Doc, BagOf, CORE_CLASS_BAGOF } from './../../core/src/core'
 //
 // Copyright © 2020 Anticrm Platform Contributors.
 //
@@ -18,7 +19,7 @@ import 'reflect-metadata'
 import {
   Ref, Class, Obj, Mixin, ClassifierKind, Classifier, Attribute, Type, Text, Property, mixinKey, ArrayOf, Emb, InstanceOf,
   CORE_CLASS_MIXIN, CORE_CLASS_TYPE, CORE_MIXIN_INDICES, CORE_CLASS_ATTRIBUTE, CORE_CLASS_CLASS, CORE_CLASS_TEXT,
-  CORE_CLASS_ARRAY, CORE_CLASS_INSTANCE
+  CORE_CLASS_ARRAY, CORE_CLASS_INSTANCEOF, CORE_CLASS_REFTO
 } from '@anticrm/core'
 
 const classifierMetadataKey = Symbol("anticrm:classifier")
@@ -46,11 +47,8 @@ export function getAttribute (target: any, propertyKey: string): Attribute {
   return attribute
 }
 
-
-export function ModelClass<E extends Obj, T extends E> (id: Ref<Class<T>>, _extends: Ref<Class<E>>, domain?: string) {
-  return function classDecorator<C extends { new(): T }> (
-    constructor: C
-  ) {
+export function Class$<E extends Obj, T extends E> (id: Ref<Class<T>>, _extends: Ref<Class<E>>, domain?: string) {
+  return function classDecorator<C extends { new(): T }> (constructor: C): void {
     const classifier = getClassifier(constructor.prototype)
     classifier._id = id
     classifier._class = CORE_CLASS_CLASS
@@ -64,10 +62,8 @@ export function ModelClass<E extends Obj, T extends E> (id: Ref<Class<T>>, _exte
   }
 }
 
-export function ModelMixin<T extends E, E extends Obj> (id: Ref<Mixin<T>>, _extends: Ref<Classifier<E>>) {
-  return function classDecorator<C extends { new(): T }> (
-    constructor: C
-  ) {
+export function Mixin$<E extends Obj, T extends E> (id: Ref<Mixin<T>>, _extends: Ref<Classifier<E>>) {
+  return function classDecorator<C extends { new(): T }> (constructor: C): void {
     const classifier = getClassifier(constructor.prototype)
     classifier._id = id
     classifier._class = CORE_CLASS_MIXIN
@@ -87,11 +83,27 @@ export function Prop () {
   }
 }
 
+export function RefTo$ (to: Ref<Class<Doc>>) {
+  return function (target: any, propertyKey: string): void {
+    const attribute = getAttribute(target, propertyKey)
+    const type = { _class: CORE_CLASS_REFTO, to: to } as unknown as RefTo<Doc>
+    attribute.type = type
+  }
+}
+export function BagOf$ () {
+  return function (target: any, propertyKey: string): void {
+    const attribute = getAttribute(target, propertyKey)
+    const type = attribute.type || { _class: CORE_CLASS_TYPE } as unknown as Type
+    const arr = { _class: CORE_CLASS_BAGOF, of: type } as unknown as BagOf
+    attribute.type = arr
+  }
+}
+
 /**
  * Mark attribute as collection, if attribute already had type,
  * it will be wrapped inside.
  */
-export function Collection () {
+export function ArrayOf$ () {
   return function (target: any, propertyKey: string): void {
     const attribute = getAttribute(target, propertyKey)
     const type = attribute.type || { _class: CORE_CLASS_TYPE } as unknown as Type
@@ -100,15 +112,15 @@ export function Collection () {
   }
 }
 
-export function Reference<T extends Emb> (of: Ref<Class<T>>) {
+export function InstanceOf$<T extends Emb> (of: Ref<Class<T>>) {
   return function (target: any, propertyKey: string): void {
     const attribute = getAttribute(target, propertyKey)
-    const arr = { _class: CORE_CLASS_INSTANCE, of } as unknown as InstanceOf<T>
+    const arr = { _class: CORE_CLASS_INSTANCEOF, of } as unknown as InstanceOf<T>
     attribute.type = arr
   }
 }
 
-export function Textual () {
+export function Text$ () {
   return function (target: any, propertyKey: string): void {
     const attribute = getAttribute(target, propertyKey)
     const type = { _class: CORE_CLASS_TEXT } as unknown as Text

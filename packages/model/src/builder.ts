@@ -123,13 +123,13 @@ class Builder {
     return doc as M
   }
 
-  createClass<E extends Obj, T extends E> (_id: Ref<Class<T>>, _extends: Ref<Class<E>>, _attributes: AllAttributes<T, E>, _domain?: string, _native?: Resource<any>): EClass<T, E> {
+  createClass<T extends E, E extends Obj> (_id: Ref<Class<T>>, _extends: Ref<Class<E>>, _attributes: AllAttributes<T, E>, _domain?: string, _native?: Resource<any>): EClass<T, E> {
     return this.createDocument(CORE_CLASS_CLASS as Ref<Class<EClass<T, E>>>,
       { _extends, _attributes, _domain, _native, _kind: ClassifierKind.CLASS } as EClass<T, E>,
       _id as Ref<EClass<T, E>>)
   }
 
-  createMixin<E extends Doc, T extends E> (_id: Ref<Mixin<T>>, _extends: Ref<Class<E>>, _attributes: AllAttributes<T, E>, _domain?: string, _native?: Resource<any>): EClass<T, E> {
+  createMixin<T extends E, E extends Doc> (_id: Ref<Mixin<T>>, _extends: Ref<Class<E>>, _attributes: AllAttributes<T, E>, _domain?: string, _native?: Resource<any>): EClass<T, E> {
     return this.createDocument(CORE_CLASS_MIXIN as Ref<Class<EClass<T, E>>>,
       { _extends, _attributes, _domain, _native, _kind: ClassifierKind.MIXIN } as EClass<T, E>,
       _id as Ref<EClass<T, E>>)

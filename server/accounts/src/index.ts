@@ -70,9 +70,7 @@ function verifyPassword (password: string, hash: Buffer, salt: Buffer): boolean 
 }
 
 function toAccountInfo (account: Account): AccountInfo {
-  const result = { ...account }
-  delete result.hash
-  delete result.salt
+  const { hash, salt, ...result } = account
   return result
 }
 

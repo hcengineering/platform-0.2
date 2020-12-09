@@ -14,12 +14,15 @@
 //
 
 import {
-  Attribute, Class, Classifier, Doc, Emb, Mixin, Obj, Ref, Tx, Type, VDoc,
-  BagOf, InstanceOf, RefTo, Indices, CORE_CLASS_TEXT, Space, Application, List,
-  DateProperty, StringProperty, Backlinks, Backlink, BACKLINKS_DOMAIN, MODEL_DOMAIN, TX_DOMAIN, TITLE_DOMAIN, CORE_CLASS_ARRAY
+  Attribute, Class, Classifier, Doc, Emb, Mixin, Obj, Ref, Tx, Type, VDoc, ArrayOf,
+  BagOf, InstanceOf, Indices, Space, Application, List,
+  DateProperty, StringProperty, PropertyType, Backlinks, Backlink,
+  ClassifierKind, AllAttributes,
+  BACKLINKS_DOMAIN, MODEL_DOMAIN, TX_DOMAIN, TITLE_DOMAIN, CORE_CLASS_ARRAY, CORE_CLASS_TEXT,
+  CreateTx, PushTx, UpdateTx, DeleteTx, RefTo, AnyLayout, Title
 } from '@anticrm/core'
 
-import { extendIds, ModelClass, Prop, Builder } from '@anticrm/model'
+import { extendIds, Class$, Prop, Builder, RefTo$, BagOf$, InstanceOf$, Mixin$ } from '@anticrm/model'
 import _core from '@anticrm/platform-core'
 
 const core = extendIds(_core, {
@@ -52,45 +55,34 @@ const core = extendIds(_core, {
 
 export default core
 
-@ModelClass(core.class.Obj, core.class.Obj)
+@Class$(core.class.Obj, core.class.Obj)
 class TObj implements Obj {
   _class!: Ref<Class<Obj>>
 }
 
-@ModelClass(core.class.Emb, core.class.Obj)
+@Class$(core.class.Emb, core.class.Obj)
 export class TEmb extends TObj implements Emb {
   __embedded!: true
 }
 
-@ModelClass(core.class.Doc, core.class.Obj)
+@Class$(core.class.Doc, core.class.Obj)
 class TDoc extends TObj implements Doc {
   _class!: Ref<Class<Doc>>
   @Prop() _id!: Ref<Doc>
   @Prop() _mixins?: Ref<Mixin<Doc>>[]
 }
 
-@ModelClass(core.class.Application, core.class.Doc, MODEL_DOMAIN)
+@Class$(core.class.Application, core.class.Doc, MODEL_DOMAIN)
 export class TApplication extends TDoc implements Application {
 }
 
-@ModelClass(core.class.Space, core.class.Doc, MODEL_DOMAIN)
+@Class$(core.class.Space, core.class.Doc, MODEL_DOMAIN)
 export class TSpace extends TDoc implements Space {
   @Prop() name!: string
   @Prop() lists!: List[]
 }
 
-// @ModelClass(core.class.Tx, core.class.Doc, TX_DOMAIN)
-// export class TTx extends TDoc implements Tx {
-//   @Prop() _date!: DateProperty
-//   @Prop() _user!: StringProperty
-// }
-
-// @ModelClass(core.class.CreateTx, core.class.Tx, TX_DOMAIN)
-// export class TCreateTx extends TTx implements CreateTx {
-//   @Prop() object!: Doc
-// }
-
-@ModelClass(core.class.VDoc, core.class.Doc)
+@Class$(core.class.VDoc, core.class.Doc)
 export class TVDoc extends TDoc implements VDoc {
   @Prop() _space!: Ref<Space>
   @Prop() _createdOn!: DateProperty
@@ -99,88 +91,110 @@ export class TVDoc extends TDoc implements VDoc {
   @Prop() _modifiedBy?: StringProperty
 }
 
-@ModelClass(core.class.Backlinks, core.class.Doc, BACKLINKS_DOMAIN)
+@Class$(core.class.Backlinks, core.class.Doc, BACKLINKS_DOMAIN)
 class TBacklinks extends TDoc implements Backlinks {
   @Prop() _objectId!: Ref<VDoc>
   @Prop() _objectClass!: Ref<Class<VDoc>>
   @Prop() backlinks!: Backlink[]
 }
 
-export function model (S: Builder) {
-  S.add(TObj, TEmb, TDoc, TVDoc, TBacklinks, TApplication, TSpace)
+@Class$(core.class.Attribute, core.class.Emb, MODEL_DOMAIN)
+class TAttribute extends TEmb implements Attribute {
+  @Prop() type!: Type
+}
 
-  S.createClass(core.class.Attribute, core.class.Emb, {
-    type: S.attr(core.class.Type, {})
-  })
+@Class$(core.class.Type, core.class.Emb, MODEL_DOMAIN)
+class TType extends TEmb implements Type {
+  @Prop() _default!: PropertyType
+}
 
-  S.createClass(core.class.Type, core.class.Emb, {
-    _default: S.attr(core.class.Type, {})
-  })
+@Class$(core.class.RefTo, core.class.Type, MODEL_DOMAIN)
+class TRefTo extends TType implements RefTo<Doc> {
+  @Prop() to!: Ref<Class<Doc>>
+}
 
-  S.createClass(core.class.RefTo, core.class.Type, {
-    to: S.attr(core.class.Type, {})
-  })
+@Class$(core.class.ArrayOf, core.class.Type, MODEL_DOMAIN)
+class TArrayOf extends TType implements ArrayOf {
+  @Prop() of!: Type
+}
 
-  S.createClass(core.class.ArrayOf, core.class.Type, {
-    of: S.attr(core.class.Type, {})
-  })
+@Class$(core.class.Classifier, core.class.Doc, MODEL_DOMAIN)
+class TClassifier extends TDoc implements Classifier<Doc> {
+  @Prop() _kind!: ClassifierKind
 
-  S.createClass(core.class.Classifier, core.class.Doc, {
-    _kind: S.attr(core.class.Type, {}),
-    _extends: S.attr(core.class.RefTo, {
-      to: core.class.Class
-    }),
-    _attributes: S.attr(core.class.BagOf, {
-      of: S.newInstance(core.class.InstanceOf, { of: core.class.Type })
-    })
-  })
+  @BagOf$()
+  @InstanceOf$(core.class.Type) _attributes!: AllAttributes<Doc, Obj>
 
-  S.createClass(core.class.Class, core.class.Classifier, {
-    _native: S.attr(core.class.Type, {}),
-    _domain: S.attr(core.class.Type, {})
-  }, MODEL_DOMAIN)
+  @RefTo$(core.class.Class) _extends?: Ref<Classifier<Doc>>
+}
 
-  S.createClass(core.class.Mixin, core.class.Class, {
-  }, MODEL_DOMAIN)
+@Class$(core.class.Class, core.class.Classifier, MODEL_DOMAIN)
+class TClass extends TClassifier implements Class<Doc> {
+  @Prop() _native?: StringProperty
+  @Prop() _domain?: StringProperty
+}
 
-  S.createClass(core.class.Title, core.class.Doc, {
-    _objectClass: S.attr(core.class.RefTo, { to: core.class.Class }),
-    _objectId: S.attr(core.class.Type, {}),
-    title: S.attr(core.class.Type, {})
-  }, TITLE_DOMAIN)
+@Class$(core.class.Mixin, core.class.Class, MODEL_DOMAIN)
+class TMixin extends TClass implements Mixin<Doc> {
+}
 
-  S.createClass(core.class.Tx, core.class.Doc, {
-    _date: S.attr(core.class.Type, {}),
-    _user: S.attr(core.class.Type, {})
-  }, TX_DOMAIN)
+@Class$(core.class.Title, core.class.Doc, TITLE_DOMAIN)
+class TTitle extends TDoc implements Title {
+  @RefTo$(core.class.Class) _objectClass!: Ref<Classifier<Doc>>
+  @Prop() _objectId!: Ref<Doc>
+  @Prop() title!: string | number
+}
 
-  S.createClass(core.class.CreateTx, core.class.Tx, {
-    object: S.attr(core.class.Type, {})
-  }, TX_DOMAIN)
+// T R A N S A C T I O N S
+@Class$(core.class.Tx, core.class.Doc, TX_DOMAIN)
+export class TTx extends TDoc implements Tx {
+  @Prop() _date!: DateProperty
+  @Prop() _user!: StringProperty
+}
 
-  S.createClass(core.class.PushTx, core.class.Tx, {
-    _objectClass: S.attr(core.class.RefTo, { to: core.class.Class }),
-    _objectId: S.attr(core.class.Type, {}),
-    _attribute: S.attr(core.class.Type, {}),
-    _attributes: S.attr(core.class.BagOf, {
-      of: S.newInstance(core.class.InstanceOf, { of: core.class.Type })
-    })
-  }, TX_DOMAIN)
+@Class$(core.class.CreateTx, core.class.Tx, TX_DOMAIN)
+export class TCreateTx extends TTx implements CreateTx {
+  @RefTo$(core.class.Doc) _objectId!: Ref<Doc>
+  @RefTo$(core.class.Class) _objectClass!: Ref<Class<Doc>>
 
-  S.createClass(core.class.UpdateTx, core.class.Tx, {
-    _objectClass: S.attr(core.class.RefTo, { to: core.class.Class }),
-    _objectId: S.attr(core.class.Type, {}),
-    _attributes: S.attr(core.class.BagOf, {
-      of: S.newInstance(core.class.InstanceOf, { of: core.class.Type })
-    })
-  }, TX_DOMAIN)
+  @BagOf$()
+  @InstanceOf$(core.class.Type) object!: AnyLayout
+}
 
-  S.createClass(core.class.DeleteTx, core.class.Tx, {
-    _objectClass: S.attr(core.class.RefTo, { to: core.class.Class }),
-    _objectId: S.attr(core.class.Type, {})
-  }, TX_DOMAIN)
+@Class$(core.class.PushTx, core.class.Tx, TX_DOMAIN)
+export class TPushTx extends TTx implements PushTx {
+  @RefTo$(core.class.Doc) _objectId!: Ref<Doc>
+  @RefTo$(core.class.Class) _objectClass!: Ref<Class<Doc>>
+  @Prop() _attribute!: StringProperty
 
-  S.createMixin(core.mixin.Indices, core.class.Class, {
-    primary: S.attr(core.class.Type, {})
-  })
+  @BagOf$()
+  @InstanceOf$(core.class.Type) _attributes!: AnyLayout
+}
+
+@Class$(core.class.UpdateTx, core.class.Tx, TX_DOMAIN)
+export class TUpdateTx extends TTx implements UpdateTx {
+  @RefTo$(core.class.Doc) _objectId!: Ref<Doc>
+  @RefTo$(core.class.Class) _objectClass!: Ref<Class<Doc>>
+
+  @BagOf$()
+  @InstanceOf$(core.class.Type) _attributes!: AnyLayout
+}
+
+@Class$(core.class.DeleteTx, core.class.Tx, TX_DOMAIN)
+export class TDeleteTx extends TTx implements DeleteTx {
+  @RefTo$(core.class.Doc) _objectId!: Ref<Doc>
+  @RefTo$(core.class.Class) _objectClass!: Ref<Class<Doc>>
+}
+
+@Mixin$(core.mixin.Indices, core.class.Class)
+export class TIndexesClass extends TMixin implements Indices {
+  @Prop() primary!: StringProperty
+}
+
+export function model (S: Builder): void {
+  S.add(TObj, TEmb, TDoc, TVDoc, TBacklinks, TApplication, TSpace, TAttribute, TType, TRefTo, TArrayOf, TClassifier, TClass, TMixin, TTitle)
+
+  S.add(TTx, TCreateTx, TPushTx, TUpdateTx, TDeleteTx)
+
+  S.add(TIndexesClass)
 }
