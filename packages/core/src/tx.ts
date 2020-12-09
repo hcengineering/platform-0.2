@@ -18,22 +18,20 @@ import { Model, MODEL_DOMAIN } from './model'
 
 export const TX_DOMAIN = 'tx'
 
-export interface CreateTx extends Tx {
+export interface ObjectTx extends Tx {
   _objectId: Ref<Doc>
   _objectClass: Ref<Class<Doc>>
+}
+export interface CreateTx extends ObjectTx {
   object: AnyLayout
 }
 
-export interface PushTx extends Tx {
-  _objectId: Ref<Doc>
-  _objectClass: Ref<Class<Doc>>
+export interface PushTx extends ObjectTx {
   _attribute: StringProperty
   _attributes: AnyLayout
 }
 
-export interface UpdateTx extends Tx {
-  _objectId: Ref<Doc>
-  _objectClass: Ref<Class<Doc>>
+export interface UpdateTx extends ObjectTx {
   _attributes: AnyLayout
 }
 

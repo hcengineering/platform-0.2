@@ -21,7 +21,7 @@
   export let tx: Tx
 
   function pageTitle() {
-    return ((tx as CreateTx).object as Page).title
+    return (((tx as CreateTx).object as unknown) as Page).title
   }
 </script>
 
