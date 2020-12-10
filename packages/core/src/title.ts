@@ -73,7 +73,7 @@ export class TitleIndex implements Index {
   }
 
   async onCreate (ctx: TxContext, create: CreateTx): Promise<any> {
-    const primary = this.getPrimary(create.object._class)
+    const primary = this.getPrimary(create._objectClass)
     if (!primary) {
       return
     }
@@ -83,8 +83,8 @@ export class TitleIndex implements Index {
     const doc: Title = {
       _class: CORE_CLASS_TITLE,
       _id: generateId() as Ref<Title>,
-      _objectClass: create.object._class,
-      _objectId: create.object._id,
+      _objectClass: create._objectClass,
+      _objectId: create._objectId,
       title
     }
 

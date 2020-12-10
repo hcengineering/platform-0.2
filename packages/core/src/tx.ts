@@ -13,25 +13,25 @@
 // limitations under the License.
 //
 
-import { Doc, StringProperty, Ref, Class, PropertyType, Tx, TxContext, Index, Storage, AnyLayout } from './core'
+import { Doc, StringProperty, Ref, Class, Tx, TxContext, Index, Storage, AnyLayout } from './core'
 import { Model, MODEL_DOMAIN } from './model'
 
 export const TX_DOMAIN = 'tx'
 
-export interface CreateTx extends Tx {
-  object: Doc
-}
-
-export interface PushTx extends Tx {
+export interface ObjectTx extends Tx {
   _objectId: Ref<Doc>
   _objectClass: Ref<Class<Doc>>
+}
+export interface CreateTx extends ObjectTx {
+  object: AnyLayout
+}
+
+export interface PushTx extends ObjectTx {
   _attribute: StringProperty
   _attributes: AnyLayout
 }
 
-export interface UpdateTx extends Tx {
-  _objectId: Ref<Doc>
-  _objectClass: Ref<Class<Doc>>
+export interface UpdateTx extends ObjectTx {
   _attributes: AnyLayout
 }
 
@@ -70,10 +70,10 @@ export class ModelIndex implements Index {
     switch (tx._class) {
       case CORE_CLASS_CREATETX: {
         const createTx = tx as CreateTx
-        if (this.model.getDomain(createTx.object._class) !== MODEL_DOMAIN) {
+        if (this.model.getDomain(createTx._objectClass) !== MODEL_DOMAIN) {
           return
         } else {
-          return this.storage.store(ctx, createTx.object)
+          return this.storage.store(ctx, this.model.newDoc(createTx._objectClass, createTx._objectId, createTx.object))
         }
       }
       case CORE_CLASS_UPDATETX: {

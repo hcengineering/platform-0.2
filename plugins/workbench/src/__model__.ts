@@ -13,13 +13,12 @@
 // limitations under the License.
 //
 
-import { Ref, MODEL_DOMAIN, StringProperty, Space, VDoc, Class } from '@anticrm/core'
-import { Builder, extendIds, ModelClass, Prop } from '@anticrm/model'
+import { Ref, MODEL_DOMAIN, Space, VDoc, Class } from '@anticrm/core'
+import { Builder, extendIds, Class$, Prop } from '@anticrm/model'
 import { IntlString } from '@anticrm/platform-i18n'
 
 import core, { TApplication } from '@anticrm/platform-core/src/__model__'
 import { AnyComponent, Asset } from '@anticrm/platform-ui'
-import presentation from '@anticrm/presentation/src/__model__'
 import chunter from '@anticrm/chunter'
 
 import _workbench, { Perspective, WorkbenchApplication } from '.'
@@ -38,7 +37,7 @@ const workbench = extendIds(_workbench, {
 
 export default workbench
 
-@ModelClass(workbench.class.WorkbenchApplication, core.class.Application, MODEL_DOMAIN)
+@Class$(workbench.class.WorkbenchApplication, core.class.Application, MODEL_DOMAIN)
 class TWorkbenchApplication extends TApplication implements WorkbenchApplication {
   @Prop() label!: IntlString
   @Prop() icon?: Asset
@@ -47,7 +46,6 @@ class TWorkbenchApplication extends TApplication implements WorkbenchApplication
 }
 
 export function model (S: Builder) {
-
   S.add(TWorkbenchApplication)
 
   S.createClass(workbench.class.Perspective, core.class.Doc, {

@@ -1,3 +1,4 @@
+import { AnyLayout } from '@anticrm/core';
 //
 // Copyright © 2020 Anticrm Platform Contributors.
 //
@@ -114,7 +115,7 @@ export class TextIndex implements Index {
 
   private backlinks (
     _class: Ref<Class<Obj>>,
-    obj: Obj,
+    obj: AnyLayout,
     pos: number
   ): Backlink[] {
     const attributes = this.getTextAttributes(_class)
@@ -135,8 +136,8 @@ export class TextIndex implements Index {
   }
 
   async onCreate (ctx: TxContext, create: CreateTx): Promise<any> {
-    const backlinks = this.backlinks(create.object._class, create.object, -1)
-    const arrays = this.getArrayAttributes(create.object._class)
+    const backlinks = this.backlinks(create._objectClass, create.object, -1)
+    const arrays = this.getArrayAttributes(create._objectClass)
     for (const attr of arrays) {
       const arr = (create.object as any)[attr]
       if (arr) {
@@ -151,8 +152,8 @@ export class TextIndex implements Index {
     const doc: Backlinks = {
       _class: CORE_CLASS_BACKLINKS,
       _id: generateId() as Ref<Backlinks>,
-      _objectClass: create.object._class,
-      _objectId: create.object._id,
+      _objectClass: create._objectClass,
+      _objectId: create._objectId,
       backlinks
     }
     return this.storage.store(ctx, doc)

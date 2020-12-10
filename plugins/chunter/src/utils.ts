@@ -16,7 +16,7 @@
 import { Ref, Class, Doc, AnyLayout, Mixin, Obj, VDoc } from '@anticrm/core'
 import { Platform } from '@anticrm/platform'
 import { getContext } from 'svelte'
-import core, { CoreService, QueryResult } from '@anticrm/platform-core'
+import core, { CoreService } from '@anticrm/platform-core'
 import contact, { ContactService } from '@anticrm/contact'
 import { UIService, CONTEXT_PLATFORM, CONTEXT_PLATFORM_UI, AnyComponent } from '@anticrm/platform-ui'
 import presentation, { PresentationService, ComponentExtension } from '@anticrm/presentation'
@@ -53,12 +53,12 @@ export function findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout)
   return getCoreService().then(coreService => coreService.findOne(_class, query))
 }
 
-export function query<T extends Doc>(_class: Ref<Class<T>>, query: AnyLayout, f: (docs: T[]) => void): () => void {
-  let unsubscriber = getCoreService()
+export function query<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout, f: (docs: T[]) => void): () => void {
+  const unsubscriber = getCoreService()
     .then((service) => service.query(_class, query))
     .then((queryResult) => queryResult.subscribe(f))
   return async () => {
-    ;(await unsubscriber)()
+    (await unsubscriber)()
   }
 }
 

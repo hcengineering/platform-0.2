@@ -27,12 +27,11 @@ import {
   Storage,
   Attribute,
   CORE_CLASS_ARRAY,
-  CORE_CLASS_INSTANCE,
+  CORE_CLASS_INSTANCEOF,
   ArrayOf,
   TxContext,
   StringProperty,
-  PropertyType,
-  Emb
+  PropertyType
 } from './core'
 
 export function mixinKey (mixin: Ref<Mixin<Doc>>, key: string): string {
@@ -92,7 +91,7 @@ export class Model implements Storage {
     })
   }
 
-  add (doc: Doc) {
+  add (doc: Doc): void {
     this.set(doc)
     if (this.byClass) this.index(doc)
   }
@@ -144,6 +143,18 @@ export class Model implements Storage {
   }
 
   /// A S S I G N
+
+  /**
+   * Construct a new proper document with all desired fields.
+   * @param _class
+   * @param _id
+   * @param layout
+   */
+  public newDoc (_class: Ref<Class<Doc>>, _id: Ref<Doc>, layout: AnyLayout): Doc {
+    const doc = (this.assign({}, _class, layout) as unknown) as Doc
+    doc._id = _id
+    return doc
+  }
 
   private classAttribute (cls: Ref<Class<Obj>>, key: string): { attr: Attribute, clazz: Class<Obj>, key: string } {
     // TODO: use memdb class hierarchy
@@ -203,7 +214,7 @@ export class Model implements Storage {
             }
             break
           }
-          case CORE_CLASS_INSTANCE: {
+          case CORE_CLASS_INSTANCEOF: {
             const attrClass = ((attr.type as unknown) as Record<string, unknown>).of as Ref<Class<Doc>>
             if (attrClass) {
               l[key] = this.assign({}, attrClass, r[rKey] as AnyLayout)
@@ -215,6 +226,8 @@ export class Model implements Storage {
         l[key] = r[rKey]
       }
     }
+    // Also assign a class to value
+    layout._class = _class
     return layout
   }
 
@@ -359,6 +372,7 @@ export class Model implements Storage {
 
   async store (ctx: TxContext, doc: Doc): Promise<void> {
     this.add(doc)
+    return Promise.resolve()
   }
 
   push (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: StringProperty, attributes: AnyLayout): Promise<void> { // eslint-disable-line
@@ -423,7 +437,7 @@ export class Model implements Storage {
     switch (type._class) {
       case CORE_CLASS_ARRAY:
         return this.attributeClass((type as ArrayOf).of)
-      case CORE_CLASS_INSTANCE:
+      case CORE_CLASS_INSTANCEOF:
         return ((type as unknown) as Record<string, unknown>).of as Ref<Class<Doc>>
     }
     return null

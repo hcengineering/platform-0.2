@@ -14,7 +14,7 @@
 -->
 
 <script lang="ts">
-  import { CreateTx, Tx, UpdateTx } from '@anticrm/core'
+  import { ObjectTx, Tx } from '@anticrm/core'
   import core from '@anticrm/platform-core'
   import { AnyComponent, Asset } from '@anticrm/platform-ui'
   import { User } from '@anticrm/contact'
@@ -34,7 +34,7 @@
   let info: AnyComponent
 
   $: {
-    const objectClass = tx._class === core.class.CreateTx ? (tx as CreateTx).object._class : (tx as UpdateTx)._objectClass
+    const objectClass = (tx as ObjectTx)._objectClass
     contactService.then(c => c.getUser(tx._user)).then(u => { user = u })
     contactService.then(c => c.getAvatar(tx._id)).then(a => { avatar = a })
     presentationService.then(p => { info = p.getComponentExtension(objectClass, chunter.mixin.ActivityInfo) })

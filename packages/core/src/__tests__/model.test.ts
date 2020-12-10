@@ -18,7 +18,7 @@
 import { Ref, Doc, Property, Emb, Class, Obj } from '@anticrm/core'
 import { Model } from '../model'
 
-import { ModelClass, Prop, Array, InstanceOf, InstOf, Builder } from '@anticrm/model'
+import { Class$, Prop, ArrayOf$, Builder, InstanceOf$, Primary } from '@anticrm/model'
 import { AnyLayout, StringProperty } from '../core'
 
 interface SubTask extends Emb {
@@ -65,33 +65,39 @@ const doc1 = {
   ]
 } as Task
 
-@ModelClass(core.class.Obj, core.class.Obj)
+@Class$(core.class.Obj, core.class.Obj)
 class TObj implements Obj {
   _class!: Ref<Class<Obj>>
 }
 
-@ModelClass(core.class.Emb, core.class.Obj)
+@Class$(core.class.Emb, core.class.Obj)
 export class TEmb extends TObj implements Emb {
   __embedded!: true
 }
 
-@ModelClass(core.class.Doc, core.class.Obj)
+@Class$(core.class.Doc, core.class.Obj)
 class TDoc extends TObj implements Doc {
   _class!: Ref<Class<Doc>>
   @Prop() _id!: Ref<Doc>
 }
 
-@ModelClass(core.class.Task, core.class.Doc)
+@Class$(core.class.Task, core.class.Doc)
 class TTask extends TDoc implements Task {
+  @Primary()
   @Prop() name!: string
+
   @Prop() rate!: number
+
   @Prop() lists!: string[]
 
-  @InstOf(core.class.Subtask) mainTask!: SubTask
-  @Array(InstanceOf(core.class.Subtask)) tasks?: SubTask[]
+  @InstanceOf$(core.class.Subtask) mainTask!: SubTask
+
+  @ArrayOf$()
+  @InstanceOf$(core.class.Subtask)
+  tasks?: SubTask[]
 }
 
-@ModelClass(core.class.Subtask, core.class.Emb)
+@Class$(core.class.Subtask, core.class.Emb)
 class TSubTask extends TEmb implements SubTask {
   @Prop() name!: string
   @Prop() rate!: number

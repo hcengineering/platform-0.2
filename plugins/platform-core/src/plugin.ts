@@ -162,12 +162,16 @@ export default async (platform: Platform): Promise<CoreService> => {
       doc._id = generateId()
     }
 
+    const { _id, _class, ...objValue } = doc
+
     const tx: CreateTx = {
       _class: core.class.CreateTx,
       _id: generateId() as Ref<Doc>,
       _date: Date.now() as Property<number, Date>,
       _user: platform.getMetadata(login.metadata.WhoAmI) as StringProperty,
-      object: doc
+      _objectId: _id,
+      _objectClass: _class,
+      object: (objValue as unknown) as AnyLayout
     }
 
     return processTx(tx)

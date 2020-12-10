@@ -2,10 +2,11 @@
 // https://jestjs.io/docs/en/configuration.html
 
 module.exports = {
-  coverageDirectory: "coverage",
-  testEnvironment: "node",
+  preset: 'ts-jest',
+  coverageDirectory: 'coverage',
+  testEnvironment: 'node',
   roots: [
     '<rootDir>/src'
   ],
-  testMatch: ["**/?(*.)+(spec|test).[jt]s?(x)"]
+  testMatch: ['**/?(*.)+(spec|test).[jt]s?(x)']
 }

@@ -110,7 +110,9 @@ export const CORE_CLASS_CLASS = 'class:core.Class' as Ref<Class<Class<Obj>>>
 export const CORE_CLASS_MIXIN = 'class:core.Mixin' as Ref<Class<Mixin<Doc>>>
 export const CORE_CLASS_TYPE = 'class:core.Type' as Ref<Class<Type>>
 export const CORE_CLASS_ARRAY = 'class:core.Array' as Ref<Class<ArrayOf>>
-export const CORE_CLASS_INSTANCE = 'class:core.Instance' as Ref<Class<InstanceOf<Emb>>>
+export const CORE_CLASS_REFTO = 'class:core.RefTo' as Ref<Class<ArrayOf>>
+export const CORE_CLASS_BAGOF = 'class:core.BagOf' as Ref<Class<ArrayOf>>
+export const CORE_CLASS_INSTANCEOF = 'class:core.InstanceOf' as Ref<Class<InstanceOf<Emb>>>
 
 export const CORE_MIXIN_INDICES = 'mixin:core.Indices' as Ref<Mixin<Indices>>
 
