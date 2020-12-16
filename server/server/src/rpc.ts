@@ -29,8 +29,8 @@ export interface RpcError {
   data?: any
 }
 
-export interface Response {
-  tx?: Tx
+export interface Response<R> {
+  result?: R
   id?: ReqId
   error?: RpcError
 }
@@ -43,10 +43,10 @@ export function getRequest<R extends any[]> (req: string): Request<R> {
   return JSON.parse(req as string)
 }
 
-export function makeResponse (response: Response): string {
+export function makeResponse (response: Response<any>): string {
   return JSON.stringify(response)
 }
 
-export function getResponse (res: string): Response {
+export function getResponse (res: string): Response<any> {
   return JSON.parse(res as string)
 }

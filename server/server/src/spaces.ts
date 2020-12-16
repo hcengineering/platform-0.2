@@ -45,6 +45,7 @@ export async function filterQuery (spaces: Map<string, SpaceUser>, _class: Ref<C
     for (const k of spaces.keys()) {
       userSpaces.push(k as StringProperty)
     }
+    userSpaces.push(null as unknown as StringProperty)
     query[spaceKey] = { $in: userSpaces }
   }
 

@@ -166,4 +166,5 @@ export interface Storage {
   remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<void>
 
   find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]>
+  findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined>
 }

@@ -58,6 +58,11 @@ export class Graph implements Storage {
     return result as T[]
   }
 
+  async findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined> {
+    const res = await this.find(_class, query)
+    return res.length > 0 ? res[0] : undefined
+  }
+
   async store (ctx: TxContext, doc: Doc): Promise<void> {
     if (doc._class !== core.class.Backlinks) {
       throw new Error('assert doc._class !== core.class.Backlinks')

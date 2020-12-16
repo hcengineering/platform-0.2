@@ -22,7 +22,7 @@ import { Broadcaster, Client, ClientService, ClientSocket } from './server'
 
 export interface ClientControl {
   ping (): Promise<void>
-  send (response: Response): Promise<void>
+  send (response: Response<any>): Promise<void>
   close (): Promise<void>
 }
 
@@ -36,7 +36,11 @@ export async function createClientService (workspaceProtocol: Promise<WorkspaceP
     async find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
       const { valid, filteredQuery } = await filterQuery(userSpaces, _class, query)
       if (valid) {
-        return workspace.find(_class, filteredQuery)
+        try {
+          return await workspace.find(_class, filteredQuery)
+        } catch (err) {
+          console.log(err)
+        }
       }
       return Promise.reject(new Error('Invalid space are spefified'))
     },
@@ -49,7 +53,8 @@ export async function createClientService (workspaceProtocol: Promise<WorkspaceP
     },
     async loadDomain (domain: string, index?: string, direction?: string): Promise<Doc[]> {
       const docs = await workspace.loadDomain(domain, index, direction)
-      return docs.filter((d) => isAcceptable(userSpaces, d._class, (d as unknown) as AnyLayout))
+      const filteredDocs = docs.filter((d) => isAcceptable(userSpaces, d._class, (d as unknown) as AnyLayout))
+      return filteredDocs
     },
 
     // Handle sending from client.
@@ -66,7 +71,7 @@ export async function createClientService (workspaceProtocol: Promise<WorkspaceP
       // Perform operation in workpace
       await workspace.tx(tx)
       // Perform all other active clients broadcast
-      broadcaster.broadcast(clientControl, { tx })
+      broadcaster.broadcast(clientControl, { result: tx })
     },
 
     // C O N T R O L
@@ -75,10 +80,10 @@ export async function createClientService (workspaceProtocol: Promise<WorkspaceP
       return null
     },
 
-    async send (response: Response): Promise<void> {
-      if (response.tx) {
+    async send (response: Response<any>): Promise<void> {
+      if (response.result) {
         // Process result as it from another client.
-        if (!await processSpaceTx(workspace, userSpaces, response.tx, client, false)) {
+        if (!await processSpaceTx(workspace, userSpaces, response.result, client, false)) {
           // Client is not allowed to recieve transaction
           return
         }

@@ -73,7 +73,8 @@ export default async (platform: Platform): Promise<CoreService> => {
   const graph = new Graph()
   const cache = new Cache(coreProtocol)
 
-  model.loadModel(await coreProtocol.loadDomain(MODEL_DOMAIN))
+  const modelDomain = await coreProtocol.loadDomain(MODEL_DOMAIN)
+  model.loadModel(modelDomain)
 
   coreProtocol.loadDomain(TITLE_DOMAIN).then(docs => {
     const ctx = txContext()
@@ -127,7 +128,12 @@ export default async (platform: Platform): Promise<CoreService> => {
   }
 
   function findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined> {
-    return find(_class, query).then(docs => (docs.length === 0 ? undefined : docs[0]))
+    const domainName = model.getDomain(_class)
+    const domain = domains.get(domainName)
+    if (domain) {
+      return domain.findOne(_class, query)
+    }
+    return cache.findOne(_class, query)
   }
 
   function query<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): QueryResult<T> {

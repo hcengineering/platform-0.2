@@ -41,4 +41,8 @@ export class Cache implements Storage {
   find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
     return this.coreProtocol.find(_class, query) as Promise<T[]>
   }
+
+  findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined> {
+    return this.coreProtocol.findOne(_class, query) as Promise<T | undefined>
+  }
 }

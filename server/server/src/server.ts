@@ -20,6 +20,7 @@ import WebSocket, { Server } from 'ws'
 import { decode } from 'jwt-simple'
 import { ClientControl, createClientService } from './service'
 import { connectWorkspace, WorkspaceProtocol } from './workspace'
+import { Tx } from '@anticrm/core'
 
 export interface Client {
   email: string
@@ -37,7 +38,7 @@ export type ClientService = Service & ClientControl & WorkspaceProtocol
 export type ClientServiceUnregister = () => void
 
 export interface Broadcaster {
-  broadcast (from: ClientService, response: Response): void
+  broadcast (from: ClientService, response: Response<Tx>): void
 }
 
 export interface ServerProtocol {
@@ -65,7 +66,7 @@ export function start (port: number, dbUri: string, host?: string): Promise<Serv
     }
   }
   const broadcaster: Broadcaster = {
-    broadcast (from: ClientService, response: Response): void {
+    broadcast (from: ClientService, response: Response<any>): void {
       console.log(`broadcasting to ${connections.size} connections`)
       for (const client of connections.values()) {
         client.then(client => {
@@ -77,7 +78,7 @@ export function start (port: number, dbUri: string, host?: string): Promise<Serv
             client.send({
               id: response.id,
               error: response.error
-            } as Response)
+            } as Response<any>)
           }
         })
       }
@@ -114,8 +115,9 @@ export function start (port: number, dbUri: string, host?: string): Promise<Serv
       const tx = await f.apply(null, request.params || [])
       const response = makeResponse({
         id: request.id,
-        tx
+        result: tx
       })
+      console.log('send', response)
       ws.send(response)
     })
   })

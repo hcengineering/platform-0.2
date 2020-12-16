@@ -83,6 +83,18 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
           _class: memdb.getClass(_class)
         })
         .toArray()
+    },
+
+    async findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined> {
+      const res = await collection(_class)
+        .findOne({
+          ...memdb.assign({}, _class, query),
+          _class: memdb.getClass(_class)
+        })
+      if (res === null) {
+        return undefined
+      }
+      return res
     }
   }
 
@@ -98,19 +110,22 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
     // C O R E  P R O T O C O L
 
     find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
+      const finalQuery = {
+        ...memdb.assign({}, _class, query),
+        _class: memdb.getClass(_class)
+      }
+      console.log('MONGO FIND', finalQuery)
       return collection(_class)
-        .find({
-          ...memdb.assign({}, _class, query),
-          _class: memdb.getClass(_class)
-        })
+        .find(finalQuery)
         .toArray()
     },
 
     async findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined> {
-      const result = await collection(_class).findOne({
+      const finalQuery = {
         ...memdb.assign({}, _class, query),
         _class: memdb.getClass(_class)
-      })
+      }
+      const result = await collection(_class).findOne(finalQuery)
       if (result == null) {
         return undefined
       }
