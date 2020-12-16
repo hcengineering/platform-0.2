@@ -15,7 +15,7 @@
 
 import {
   Attribute, Class, Classifier, Doc, Emb, Mixin, Obj, Ref, Tx, Type, VDoc, ArrayOf,
-  BagOf, InstanceOf, Indices, Space, Application, List,
+  BagOf, InstanceOf, Indices, Space, Application,
   DateProperty, StringProperty, PropertyType, Backlinks, Backlink,
   ClassifierKind, AllAttributes,
   BACKLINKS_DOMAIN, MODEL_DOMAIN, TX_DOMAIN, TITLE_DOMAIN, CORE_CLASS_ARRAY, CORE_CLASS_TEXT,

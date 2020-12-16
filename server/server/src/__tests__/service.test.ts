@@ -129,11 +129,6 @@ describe('service', () => {
     console.log('All stopped')
   })
 
-  const noopBroadcast: Broadcaster = {
-    // eslint-disable-next-line
-    broadcast: (_from, _response) => { }
-  }
-
   interface ClientInfo {
     client: ClientService
     socket: PipeClientSocket
@@ -159,7 +154,7 @@ describe('service', () => {
             client.ops.push(client.client.send({
               id: response.id,
               error: response.error
-            } as Response).catch((e) => { client.errors.push(e) }))
+            } as Response<any>).catch((e) => { client.errors.push(e) }))
           }
         }
       }
@@ -213,7 +208,7 @@ describe('service', () => {
       } as unknown as Space,
       'test@client1' as StringProperty
     )).then(() => {
-      fail('show not complete sucessfully')
+      expect(true).toEqual('show not complete sucessfully')
     }).catch((e) => {
       expect(e.message).toEqual('Space doesn\'t contain owner. Operation is not allowed')
     })
