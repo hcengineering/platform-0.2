@@ -138,7 +138,7 @@ describe('server', () => {
   it('should send query', (done) => {
     conn.on('message', (msg: string) => {
       const resp = getResponse(msg)
-      expect(resp.tx instanceof Array).toBeTruthy()
+      expect(resp.result instanceof Array).toBeTruthy()
       done()
     })
     conn.send(makeRequest({
@@ -153,7 +153,7 @@ describe('server', () => {
   it('should load domain', (done) => {
     conn.on('message', (msg: string) => {
       const resp = getResponse(msg)
-      expect(resp.tx instanceof Array).toBeTruthy()
+      expect(resp.result instanceof Array).toBeTruthy()
       done()
     })
     conn.send(makeRequest({

@@ -117,7 +117,6 @@ export function start (port: number, dbUri: string, host?: string): Promise<Serv
         id: request.id,
         result: tx
       })
-      console.log('send', response)
       ws.send(response)
     })
   })
