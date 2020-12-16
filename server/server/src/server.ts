@@ -18,70 +18,74 @@ import { createServer, IncomingMessage } from 'http'
 import WebSocket, { Server } from 'ws'
 
 import { decode } from 'jwt-simple'
-import { connect, ClientControl } from './service'
+import { ClientControl, createClientService } from './service'
 import { connectWorkspace, WorkspaceProtocol } from './workspace'
 
-const ctlpassword = process.env.CTL_PASSWORD || '123pass'
-
 export interface Client {
+  email: string
   workspace: string
 }
 
-interface Service {
+export interface Service {
   [key: string]: (...args: any[]) => Promise<any>
 }
-
-type ClientService = Service & ClientControl
-
-export interface PlatformServer {
-  broadcast<R> (from: ClientControl, response: Response<R>): void
-  shutdown (password: string): Promise<void>
+export interface ClientSocket {
+  send (response: string): void
 }
 
-export function start (port: number, dbUri: string, host?: string): Promise<() => Promise<void>> {
+export type ClientService = Service & ClientControl & WorkspaceProtocol
+export type ClientServiceUnregister = () => void
+
+export interface Broadcaster {
+  broadcast (from: ClientService, response: Response): void
+}
+
+export interface ServerProtocol {
+  shutdown (): Promise<void>
+  getWorkspace (wsName: string): Promise<WorkspaceProtocol>
+}
+
+export function start (port: number, dbUri: string, host?: string): Promise<ServerProtocol> {
   console.log('starting server on port ' + port + '...')
   console.log('host: ' + host)
 
   const server = createServer()
   const wss = new Server({ noServer: true })
 
-  const connections = new Map<string, Promise<ClientService>>()
   const workspaces = new Map<string, Promise<WorkspaceProtocol>>()
-  let clientCounter = 0
 
-  const platformServer: PlatformServer = {
-    broadcast<R> (from: ClientControl, response: Response<R>) {
+  let clientCounter = 0
+  const connections = new Map<string, Promise<ClientService>>()
+
+  function registerClient (service: Promise<ClientService>): ClientServiceUnregister {
+    const id = 'c' + clientCounter++
+    connections.set(id, service)
+    return () => {
+      connections.delete(id)
+    }
+  }
+  const broadcaster: Broadcaster = {
+    broadcast (from: ClientService, response: Response): void {
+      console.log(`broadcasting to ${connections.size} connections`)
       for (const client of connections.values()) {
-        console.log(`broadcasting to ${connections.size} connections`)
         client.then(client => {
           if (client !== from) {
-            console.log(`broadcasting to ${client}`, response)
+            console.log(`broadcasting to ${client.email}`, response)
             client.send(response)
           } else {
             console.log('notify self about completeness without response')
             client.send({
               id: response.id,
               error: response.error
-            } as Response<R>)
+            } as Response)
           }
         })
       }
-    },
-
-    async shutdown (password: string): Promise<void> {
-      console.log('shutting down...')
-      if (password !== ctlpassword) {
-        throw new Error('ctl password does not match')
-      }
-      for (const client of connections.values()) {
-        (await client).shutdown()
-      }
-      server.close()
     }
   }
 
-  async function createClient (workspace: Promise<WorkspaceProtocol>, ws: WebSocket): Promise<ClientService> {
-    return ((await connect(workspace, ws, platformServer)) as unknown) as ClientService
+  async function createClient (workspace: Promise<WorkspaceProtocol>, ws: ClientSocket & Client): Promise<ClientService> {
+    return await createClientService(workspace, ws, broadcaster)
   }
   async function getWorkspace (wsName: string): Promise<WorkspaceProtocol> {
     let workspace = workspaces.get(wsName)
@@ -95,21 +99,22 @@ export function start (port: number, dbUri: string, host?: string): Promise<() =
   wss.on('connection', function connection (ws: WebSocket, request: any, client: Client) {
     console.log('connect:', client)
     const workspace = getWorkspace(client.workspace)
-    const service = createClient(workspace, ws)
-    const id = 'c' + clientCounter++
-    connections.set(id, service)
+
+    const service = createClient(workspace, { ...client, send: (response) => { ws.send(response) } })
+
+    const unreg = registerClient(service)
     ws.on('close', async () => {
-      connections.delete(id)
+      unreg()
     })
     ws.on('message', async (msg: string) => {
       const request = getRequest(msg)
       const f = (await service)[request.method]
 
       // TODO: Check for method are exists.
-      const result = await f.apply(null, request.params || [])
+      const tx = await f.apply(null, request.params || [])
       const response = makeResponse({
         id: request.id,
-        result
+        tx
       })
       ws.send(response)
     })
@@ -149,10 +154,22 @@ export function start (port: number, dbUri: string, host?: string): Promise<() =
   return new Promise((resolve) => {
     const httpServer = server.listen(port, host, () => {
       console.log('server started.')
-      resolve(() => {
-        console.log('Shutting down server:', httpServer.address())
-        return platformServer.shutdown(ctlpassword)
-      })
+      resolve({
+        getWorkspace,
+        shutdown: async () => {
+          console.log('Shutting down server:', httpServer.address())
+
+          for (const ws of workspaces.values()) {
+            (await ws).close()
+          }
+
+          for (const conn of connections.values()) {
+            (await conn).close()
+          }
+          console.log('stop server itself')
+          httpServer.close()
+        }
+      } as ServerProtocol)
     })
   })
 }

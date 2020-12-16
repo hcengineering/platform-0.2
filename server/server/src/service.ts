@@ -13,48 +13,60 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Class, CoreProtocol, Doc, Ref, Tx } from '@anticrm/core'
-import WebSocket from 'ws'
+import { AnyLayout, Class, Doc, Ref, Tx, SpaceUser } from '@anticrm/core'
 import { makeResponse, Response } from './rpc'
-import { PlatformServer } from './server'
 import { WorkspaceProtocol } from './workspace'
 
-interface CommitInfo {
-  created: Doc[]
-}
+import { filterQuery, getUserSpaces, isAcceptable, processTx as processSpaceTx } from './spaces'
+import { Broadcaster, Client, ClientService, ClientSocket } from './server'
 
 export interface ClientControl {
   ping (): Promise<void>
-  send (response: Response<unknown>): void
-  shutdown (): Promise<void>
+  send (response: Response): Promise<void>
+  close (): Promise<void>
 }
 
-export async function connect (workspaceProtocol: Promise<WorkspaceProtocol>, ws: WebSocket, server: PlatformServer): Promise<CoreProtocol & ClientControl> {
+export async function createClientService (workspaceProtocol: Promise<WorkspaceProtocol>, client: ClientSocket & Client, broadcaster: Broadcaster): Promise<ClientService> {
   const workspace = await workspaceProtocol
-  const clientControl = {
+
+  const userSpaces: Map<string, SpaceUser> = await getUserSpaces(workspace, client.email)
+
+  const clientControl: ClientService = {
     // C O R E  P R O T O C O L
-    ...workspace,
+    async find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
+      const { valid, filteredQuery } = await filterQuery(userSpaces, _class, query)
+      if (valid) {
+        return workspace.find(_class, filteredQuery)
+      }
+      return Promise.reject(new Error('Invalid space are spefified'))
+    },
+    async findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined> {
+      const { valid, filteredQuery } = await filterQuery(userSpaces, _class, query)
+      if (valid) {
+        return workspace.findOne(_class, filteredQuery)
+      }
+      return Promise.reject(new Error('Invalid space are spefified'))
+    },
+    async loadDomain (domain: string, index?: string, direction?: string): Promise<Doc[]> {
+      const docs = await workspace.loadDomain(domain, index, direction)
+      return docs.filter((d) => isAcceptable(userSpaces, d._class, (d as unknown) as AnyLayout))
+    },
 
     // Handle sending from client.
     async tx (tx: Tx): Promise<any> {
-      return workspace.tx(tx).then(() => {
-        server.broadcast(clientControl, { result: tx })
-      })
-    },
+      if (tx._user !== client.email) {
+        return Promise.reject(new Error(`invalid user passed: ${tx._user}`))
+      }
 
-    // P R O T C O L  E X T E N S I O N S
+      // Process spaces update is allowed
+      if (!await processSpaceTx(workspace, userSpaces, tx, client, true)) {
+        return Promise.reject(new Error('operations is not allowed by space check'))
+      }
 
-    delete (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<void> {
-      return workspace.delete(_class, query).then(() => {
-        // Do we need to send update on delete?
-        // server.broadcast(fromClient, )
-      })
-    },
-
-    async commit (commitInfo: CommitInfo): Promise<void> {
-      workspace.commit(commitInfo).then(() => {
-        server.broadcast(clientControl, { result: commitInfo })
-      })
+      // Perform operation in workpace
+      await workspace.tx(tx)
+      // Perform all other active clients broadcast
+      broadcaster.broadcast(clientControl, { tx })
     },
 
     // C O N T R O L
@@ -63,17 +75,19 @@ export async function connect (workspaceProtocol: Promise<WorkspaceProtocol>, ws
       return null
     },
 
-    send<R> (response: Response<R>): void {
-      ws.send(makeResponse(response))
+    async send (response: Response): Promise<void> {
+      if (response.tx) {
+        // Process result as it from another client.
+        if (!await processSpaceTx(workspace, userSpaces, response.tx, client, false)) {
+          // Client is not allowed to recieve transaction
+          return
+        }
+      }
+      client.send(makeResponse(response))
     },
 
-    // TODO rename to `close`
-    shutdown (): Promise<void> {
-      return workspace.shutdown()
-    },
-
-    serverShutdown (password: string): Promise<void> {
-      return server.shutdown(password)
+    close (): Promise<void> {
+      return workspace.close()
     }
   }
 

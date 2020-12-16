@@ -27,12 +27,9 @@ import {
   Emb,
   VDoc,
   generateId as genId,
-  CreateTx,
-  Property,
   ModelIndex,
   DateProperty,
   StringProperty,
-  PushTx,
   txContext,
   TxContextSource,
   TxProcessor,
@@ -43,7 +40,7 @@ import {
 } from '@anticrm/core'
 import { ModelDb } from './modeldb'
 
-import core, { CoreService, QueryResult } from '.'
+import { CoreService, QueryResult } from '.'
 import login from '@anticrm/login'
 import rpcService from './rpc'
 
@@ -52,6 +49,7 @@ import { QueriableStorage } from './queries'
 import { Cache } from './cache'
 import { Titles } from './titles'
 import { Graph } from './graph'
+import { newCreateTx, newPushTx } from './tx'
 
 /*!
  * Anticrm Platform™ Core Plugin
@@ -147,9 +145,6 @@ export default async (platform: Platform): Promise<CoreService> => {
 
   function processTx (tx: Tx): Promise<any> {
     console.log('processTx', tx)
-
-    // TODO: Inform queriables about transaction is being processed
-
     const networkComplete = coreProtocol.tx(tx)
     return Promise.all([
       networkComplete,
@@ -162,19 +157,7 @@ export default async (platform: Platform): Promise<CoreService> => {
       doc._id = generateId()
     }
 
-    const { _id, _class, ...objValue } = doc
-
-    const tx: CreateTx = {
-      _class: core.class.CreateTx,
-      _id: generateId() as Ref<Doc>,
-      _date: Date.now() as Property<number, Date>,
-      _user: platform.getMetadata(login.metadata.WhoAmI) as StringProperty,
-      _objectId: _id,
-      _objectClass: _class,
-      object: (objValue as unknown) as AnyLayout
-    }
-
-    return processTx(tx)
+    return processTx(newCreateTx(doc, platform.getMetadata(login.metadata.WhoAmI) as StringProperty))
   }
 
   function createVDoc<T extends VDoc> (vdoc: T): Promise<void> {
@@ -188,17 +171,9 @@ export default async (platform: Platform): Promise<CoreService> => {
   }
 
   function push (vdoc: VDoc, _attribute: string, element: Emb): Promise<any> {
-    const tx: PushTx = {
-      _class: core.class.PushTx,
-      _id: generateId() as Ref<Doc>,
-      _objectId: vdoc._id,
-      _objectClass: vdoc._class,
-      _date: Date.now() as Property<number, Date>,
-      _user: platform.getMetadata(login.metadata.WhoAmI) as StringProperty,
-      _attribute: _attribute as StringProperty,
-      _attributes: (element as unknown) as AnyLayout
-    }
-    return processTx(tx)
+    return processTx(
+      newPushTx(vdoc, _attribute, element, platform.getMetadata(login.metadata.WhoAmI) as StringProperty)
+    )
   }
 
   function loadDomain (domain: string, index?: string, direction?: string): Promise<Doc[]> {

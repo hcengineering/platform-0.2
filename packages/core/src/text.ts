@@ -1,4 +1,4 @@
-import { AnyLayout } from '@anticrm/core';
+import { AnyLayout } from '@anticrm/core'
 //
 // Copyright © 2020 Anticrm Platform Contributors.
 //
@@ -24,7 +24,11 @@ import {
   Storage,
   Tx,
   CORE_CLASS_ARRAY,
-  TxContext
+  TxContext,
+  ArrayOf,
+  CORE_CLASS_INSTANCEOF,
+  InstanceOf,
+  Emb
 } from './core'
 import { CreateTx, CORE_CLASS_CREATETX } from './tx'
 import { Model } from './model'
@@ -59,13 +63,15 @@ export const CORE_CLASS_BACKLINKS = 'class:core.Backlinks' as Ref<
 export const CORE_CLASS_TEXT = 'class:core.Text' as Ref<Class<Text>>
 export const BACKLINKS_DOMAIN = 'backlinks'
 
+type ClassKey = { key: string, _class: Ref<Class<Emb>> }
+
 // I N D E X
 
 export class TextIndex implements Index {
   private modelDb: Model
   private storage: Storage
   private textAttributes = new Map<Ref<Class<Obj>>, string[]>()
-  private arrayAttributes = new Map<Ref<Class<Obj>>, string[]>()
+  private arrayAttributes = new Map<Ref<Class<Obj>>, ClassKey[]>()
 
   constructor (modelDb: Model, storage: Storage) {
     this.modelDb = modelDb
@@ -84,14 +90,14 @@ export class TextIndex implements Index {
     return keys
   }
 
-  private getArrayAttributes (_class: Ref<Class<Obj>>): string[] {
+  private getArrayAttributes (_class: Ref<Class<Obj>>): ClassKey[] {
     const cached = this.arrayAttributes.get(_class)
     if (cached) return cached
 
     const keys = this.modelDb
       .getAllAttributes(_class)
-      .filter((attr) => attr[1].type._class === CORE_CLASS_ARRAY)
-      .map((attr) => attr[0])
+      .filter((attr) => attr[1].type._class === CORE_CLASS_ARRAY && (attr[1].type as ArrayOf).of._class === CORE_CLASS_INSTANCEOF)
+      .map((attr) => { return { key: attr[0], _class: ((attr[1].type as ArrayOf).of as InstanceOf<Emb>).of } as ClassKey })
     this.arrayAttributes.set(_class, keys)
     return keys
   }
@@ -139,10 +145,10 @@ export class TextIndex implements Index {
     const backlinks = this.backlinks(create._objectClass, create.object, -1)
     const arrays = this.getArrayAttributes(create._objectClass)
     for (const attr of arrays) {
-      const arr = (create.object as any)[attr]
+      const arr = (create.object as any)[attr.key]
       if (arr) {
         for (let i = 0; i < arr.length; i++) {
-          backlinks.push(...this.backlinks(arr[i]._class, arr[i], i))
+          backlinks.push(...this.backlinks(attr._class, arr[i], i))
         }
       }
     }

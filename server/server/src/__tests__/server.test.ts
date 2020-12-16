@@ -15,7 +15,7 @@
 /* eslint-env jest */
 
 import { makeRequest, getResponse } from '../rpc'
-import { start, Client } from '../server'
+import { start, Client, ServerProtocol } from '../server'
 import WebSocket from 'ws'
 import { encode } from 'jwt-simple'
 import { Db, MongoClient } from 'mongodb'
@@ -47,9 +47,9 @@ const Model = builder.dumpAll()
 
 describe('server', () => {
   const mongodbUri = process.env.MONGODB_URI || 'mongodb://localhost:27017'
-  let shutdown: () => Promise<void>
 
   let conn: WebSocket
+  let server: ServerProtocol
 
   function initDatabase (db: Db): Promise<any> {
     const domains = { ...Model } as { [key: string]: Doc[] }
@@ -66,7 +66,8 @@ describe('server', () => {
     return Promise.all(ops)
   }
   const client: Client = {
-    workspace: 'test-latest-model'
+    workspace: 'test-latest-model',
+    email: 'test@client1'
   }
   const token = encode(client, 'secret')
 
@@ -81,7 +82,7 @@ describe('server', () => {
     await initDatabase(db)
     await dbClient.close()
 
-    shutdown = await start(3337, mongodbUri, 'localhost')
+    server = await start(3337, mongodbUri, 'localhost')
   })
 
   async function connect (): Promise<WebSocket> {
@@ -107,7 +108,7 @@ describe('server', () => {
   })
 
   afterAll(async () => {
-    await shutdown()
+    await server.shutdown()
   })
 
   test('should connect to server', async () => {
@@ -137,7 +138,7 @@ describe('server', () => {
   it('should send query', (done) => {
     conn.on('message', (msg: string) => {
       const resp = getResponse(msg)
-      expect(resp.result instanceof Array).toBeTruthy()
+      expect(resp.tx instanceof Array).toBeTruthy()
       done()
     })
     conn.send(makeRequest({
@@ -152,7 +153,7 @@ describe('server', () => {
   it('should load domain', (done) => {
     conn.on('message', (msg: string) => {
       const resp = getResponse(msg)
-      expect(resp.result instanceof Array).toBeTruthy()
+      expect(resp.tx instanceof Array).toBeTruthy()
       done()
     })
     conn.send(makeRequest({
@@ -161,9 +162,5 @@ describe('server', () => {
         'model'
       ]
     }))
-  })
-
-  afterAll(() => {
-    shutdown()
   })
 })

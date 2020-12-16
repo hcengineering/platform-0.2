@@ -62,12 +62,14 @@ export function model (S: Builder) {
 
   S.createDocument(core.class.Space, {
     name: 'Общее',
-    lists: []
+    isPublic: true, // Available for all
+    users: []
   }, workbench.space.General)
 
   S.createDocument(core.class.Space, {
     name: 'Всякое',
-    lists: []
+    isPublic: true,
+    users: []
   }, workbench.space.Random)
 
   S.createDocument(workbench.class.WorkbenchApplication, {

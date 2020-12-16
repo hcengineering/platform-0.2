@@ -19,10 +19,10 @@ import {
   DateProperty, StringProperty, PropertyType, Backlinks, Backlink,
   ClassifierKind, AllAttributes,
   BACKLINKS_DOMAIN, MODEL_DOMAIN, TX_DOMAIN, TITLE_DOMAIN, CORE_CLASS_ARRAY, CORE_CLASS_TEXT,
-  CreateTx, PushTx, UpdateTx, DeleteTx, RefTo, AnyLayout, Title
+  CreateTx, PushTx, UpdateTx, DeleteTx, RefTo, AnyLayout, Title, SpaceUser
 } from '@anticrm/core'
 
-import { extendIds, Class$, Prop, Builder, RefTo$, BagOf$, InstanceOf$, Mixin$ } from '@anticrm/model'
+import { extendIds, Class$, Prop, Builder, RefTo$, BagOf$, InstanceOf$, Mixin$, ArrayOf$ } from '@anticrm/model'
 import _core from '@anticrm/platform-core'
 
 const core = extendIds(_core, {
@@ -76,10 +76,20 @@ class TDoc extends TObj implements Doc {
 export class TApplication extends TDoc implements Application {
 }
 
+@Class$(core.class.SpaceUser, core.class.Emb, MODEL_DOMAIN)
+export class TSpaceUser extends TEmb implements SpaceUser {
+  @Prop() userId!: string
+  @Prop() owner!: boolean
+}
+
 @Class$(core.class.Space, core.class.Doc, MODEL_DOMAIN)
 export class TSpace extends TDoc implements Space {
   @Prop() name!: string
-  @Prop() lists!: List[]
+
+  @ArrayOf$()
+  @InstanceOf$(core.class.SpaceUser) users!: SpaceUser[]
+
+  @Prop() isPublic!: boolean
 }
 
 @Class$(core.class.VDoc, core.class.Doc)
@@ -192,9 +202,11 @@ export class TIndexesClass extends TMixin implements Indices {
 }
 
 export function model (S: Builder): void {
-  S.add(TObj, TEmb, TDoc, TVDoc, TBacklinks, TApplication, TSpace, TAttribute, TType, TRefTo, TArrayOf, TClassifier, TClass, TMixin, TTitle)
+  S.add(TObj, TEmb, TDoc, TVDoc, TBacklinks, TApplication, TAttribute, TType, TRefTo, TArrayOf, TClassifier, TClass, TMixin, TTitle)
 
   S.add(TTx, TCreateTx, TPushTx, TUpdateTx, TDeleteTx)
 
   S.add(TIndexesClass)
+
+  S.add(TSpace, TSpaceUser)
 }

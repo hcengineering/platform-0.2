@@ -15,7 +15,7 @@
 
 type MethodType = (...args: any[]) => any
 
-type PrimitiveType = number | string | undefined
+type PrimitiveType = number | string | boolean | undefined
 
 export type Property<P extends PrimitiveType, T> = P & { __property: T }
 export type Ref<T extends Doc> = string & { __ref: T }
@@ -113,6 +113,9 @@ export const CORE_CLASS_ARRAY = 'class:core.Array' as Ref<Class<ArrayOf>>
 export const CORE_CLASS_REFTO = 'class:core.RefTo' as Ref<Class<ArrayOf>>
 export const CORE_CLASS_BAGOF = 'class:core.BagOf' as Ref<Class<ArrayOf>>
 export const CORE_CLASS_INSTANCEOF = 'class:core.InstanceOf' as Ref<Class<InstanceOf<Emb>>>
+
+export const CORE_CLASS_SPACE = 'class:core.Space' as Ref<Class<Doc>>
+export const CORE_CLASS_SPACEUSER = 'class:core.SpaceUser' as Ref<Class<Emb>>
 
 export const CORE_MIXIN_INDICES = 'mixin:core.Indices' as Ref<Mixin<Indices>>
 

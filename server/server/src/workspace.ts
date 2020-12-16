@@ -36,13 +36,8 @@ import {
 import { Collection, MongoClient } from 'mongodb'
 import { withTenant } from '@anticrm/accounts'
 
-interface CommitInfo {
-  created: Doc[]
-}
 export interface WorkspaceProtocol extends CoreProtocol {
-  delete (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<void>
-  commit (commitInfo: CommitInfo): Promise<void>
-  shutdown (): Promise<void>
+  close (): Promise<void>
 }
 
 export async function connectWorkspace (uri: string, workspace: string): Promise<CoreProtocol & WorkspaceProtocol> {
@@ -132,28 +127,7 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
       return db.collection(domain).find({}).toArray()
     },
 
-    // P R O T C O L  E X T E N S I O N S
-
-    async delete (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<void> {
-      console.log('DELETE', _class, query)
-      await collection(_class).deleteMany({ ...query })
-    },
-
-    async commit (commitInfo: CommitInfo): Promise<void> {
-      // group by domain
-      const byDomain = commitInfo.created.reduce((group: Map<string, Doc[]>, doc) => {
-        const domain = memdb.getDomain(doc._class)
-        let g = group.get(domain)
-        if (!g) {
-          group.set(domain, (g = []))
-        }
-        g.push(doc)
-        return group
-      }, new Map())
-
-      await Promise.all(Array.from(byDomain.entries()).map(domain => db.collection(domain[0]).insertMany(domain[1])))
-    },
-    shutdown (): Promise<void> {
+    close (): Promise<void> {
       return client.close()
     }
   }
