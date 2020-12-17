@@ -415,6 +415,10 @@ export class Model implements Storage {
     let count = 0
     const clazz = this.get(_class) as Classifier<Obj>
     for (const [key, value] of ents) {
+      if (value === undefined) {
+        // Skip undefined as matched.
+        count += 1
+      }
       const attrKey = this.attributeKey(clazz, key)
 
       const keyIn = docKeys.has(attrKey)
