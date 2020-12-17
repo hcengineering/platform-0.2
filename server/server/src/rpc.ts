@@ -13,6 +13,8 @@
 // limitations under the License.
 //
 
+import { Tx } from '@anticrm/core'
+
 export type ReqId = string | number
 
 export interface Request<P extends any[]> {
@@ -41,10 +43,10 @@ export function getRequest<R extends any[]> (req: string): Request<R> {
   return JSON.parse(req as string)
 }
 
-export function makeResponse<R> (response: Response<R>): string {
+export function makeResponse (response: Response<any>): string {
   return JSON.stringify(response)
 }
 
-export function getResponse<R> (res: string): Response<R> {
+export function getResponse (res: string): Response<any> {
   return JSON.parse(res as string)
 }

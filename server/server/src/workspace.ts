@@ -36,13 +36,8 @@ import {
 import { Collection, MongoClient } from 'mongodb'
 import { withTenant } from '@anticrm/accounts'
 
-interface CommitInfo {
-  created: Doc[]
-}
 export interface WorkspaceProtocol extends CoreProtocol {
-  delete (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<void>
-  commit (commitInfo: CommitInfo): Promise<void>
-  shutdown (): Promise<void>
+  close (): Promise<void>
 }
 
 export async function connectWorkspace (uri: string, workspace: string): Promise<CoreProtocol & WorkspaceProtocol> {
@@ -88,6 +83,18 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
           _class: memdb.getClass(_class)
         })
         .toArray()
+    },
+
+    async findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined> {
+      const res = await collection(_class)
+        .findOne({
+          ...memdb.assign({}, _class, query),
+          _class: memdb.getClass(_class)
+        })
+      if (res === null) {
+        return undefined
+      }
+      return res
     }
   }
 
@@ -103,19 +110,22 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
     // C O R E  P R O T O C O L
 
     find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
+      const finalQuery = {
+        ...memdb.assign({}, _class, query),
+        _class: memdb.getClass(_class)
+      }
+      console.log('MONGO FIND', finalQuery)
       return collection(_class)
-        .find({
-          ...memdb.assign({}, _class, query),
-          _class: memdb.getClass(_class)
-        })
+        .find(finalQuery)
         .toArray()
     },
 
     async findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined> {
-      const result = await collection(_class).findOne({
+      const finalQuery = {
         ...memdb.assign({}, _class, query),
         _class: memdb.getClass(_class)
-      })
+      }
+      const result = await collection(_class).findOne(finalQuery)
       if (result == null) {
         return undefined
       }
@@ -132,28 +142,7 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
       return db.collection(domain).find({}).toArray()
     },
 
-    // P R O T C O L  E X T E N S I O N S
-
-    async delete (_class: Ref<Class<Doc>>, query: AnyLayout): Promise<void> {
-      console.log('DELETE', _class, query)
-      await collection(_class).deleteMany({ ...query })
-    },
-
-    async commit (commitInfo: CommitInfo): Promise<void> {
-      // group by domain
-      const byDomain = commitInfo.created.reduce((group: Map<string, Doc[]>, doc) => {
-        const domain = memdb.getDomain(doc._class)
-        let g = group.get(domain)
-        if (!g) {
-          group.set(domain, (g = []))
-        }
-        g.push(doc)
-        return group
-      }, new Map())
-
-      await Promise.all(Array.from(byDomain.entries()).map(domain => db.collection(domain[0]).insertMany(domain[1])))
-    },
-    shutdown (): Promise<void> {
+    close (): Promise<void> {
       return client.close()
     }
   }

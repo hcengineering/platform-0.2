@@ -41,13 +41,13 @@ program
   .action((email, cmd) => {
     withDatabase(mongodbUri, async (client) => {
       const db = client.db('accounts')
-      let user = createUserAccount(db, email, cmd.password) // Create user accont inside accounts
-      let workspace = getWorkspace(db, cmd.workspace) // a workspace
+      const user = createUserAccount(db, email, cmd.password) // Create user accont inside accounts
+      const workspace = getWorkspace(db, cmd.workspace) // a workspace
 
-      let assignDone = Promise.all([user, workspace]).then(() => {
+      const assignDone = Promise.all([user, workspace]).then(() => {
         return assignWorkspace(db, email, cmd.workspace)
       })
-      let contactDone = createContact(withTenant(client, cmd.workspace), email, cmd.fullname)
+      const contactDone = createContact(withTenant(client, cmd.workspace), email, cmd.fullname)
       return Promise.all([contactDone, assignDone])
     })
   })
@@ -62,7 +62,7 @@ program
       const db = client.db('accounts')
       return Promise.all([
         removeContact(withTenant(client, cmd.workspace), email), // Create contact
-        removeWorkspace(db, email, cmd.workspace), //
+        removeWorkspace(db, email, cmd.workspace) //
       ])
     })
   })

@@ -128,6 +128,10 @@ export class QueriableStorage implements Domain {
     return this.proxy.find(_class, query)
   }
 
+  findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined> {
+    return this.proxy.findOne(_class, query)
+  }
+
   // TODO: move to platform core
   query<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): QueryResult<T> {
     return {

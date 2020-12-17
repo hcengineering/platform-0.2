@@ -226,8 +226,10 @@ export class Model implements Storage {
         l[key] = r[rKey]
       }
     }
-    // Also assign a class to value
-    layout._class = _class
+    // Also assign a class to value if not specified
+    if (!layout._class) {
+      layout._class = _class
+    }
     return layout
   }
 
@@ -343,9 +345,9 @@ export class Model implements Storage {
     return this.findSync(clazz, query) as T[]
   }
 
-  async findOne (clazz: Ref<Class<Doc>>, query: AnyLayout): Promise<Doc | undefined> {
+  async findOne<T extends Doc> (clazz: Ref<Class<Doc>>, query: AnyLayout): Promise<T | undefined> {
     const result = await this.findSync(clazz, query, 1)
-    return result.length === 0 ? undefined : result[0]
+    return result.length === 0 ? undefined : result[0] as T
   }
 
   /**

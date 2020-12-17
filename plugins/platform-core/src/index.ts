@@ -29,7 +29,8 @@ import {
   Title,
   CORE_CLASS_BACKLINKS,
   VDoc,
-  CoreProtocol
+  CoreProtocol,
+  SpaceUser
 } from '@anticrm/core'
 
 import type { ModelDb } from './modeldb'
@@ -68,6 +69,7 @@ export default plugin(
       UpdateTx: '' as Ref<Class<UpdateTx>>,
       DeleteTx: '' as Ref<Class<DeleteTx>>,
       Space: '' as Ref<Class<Space>>,
+      SpaceUser: '' as Ref<Class<SpaceUser>>,
       Title: '' as Ref<Class<Title>>,
       Backlinks: CORE_CLASS_BACKLINKS,
       VDoc: '' as Ref<Class<VDoc>>

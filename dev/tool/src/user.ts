@@ -14,14 +14,13 @@
 //
 
 import { Db } from 'mongodb'
-import { User } from '@anticrm/contact'
+import { Person } from '@anticrm/contact'
 import { builder } from '@anticrm/boot/src/boot'
 
 import contact from '@anticrm/contact/src/__model__'
-import { Person } from '@anticrm/contact'
 import { Ref, Space, Property, generateId } from '@anticrm/core'
 
-export function createContact(db: Db, email: string, username: string): Promise<any> {
+export function createContact (db: Db, email: string, username: string): Promise<any> {
   const id = generateId() as Ref<Person>
   const user = builder.createDocument(
     contact.class.Person,
@@ -42,6 +41,6 @@ export function createContact(db: Db, email: string, username: string): Promise<
   return db.collection('contact').insertOne(user)
 }
 
-export function removeContact(db: Db, username: string) {
+export function removeContact (db: Db, username: string) {
   return db.collection('contact').deleteMany({ _mixins: contact.mixin.User })
 }

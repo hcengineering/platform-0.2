@@ -25,13 +25,23 @@ export interface List extends Emb {
   application: Ref<Application>
 }
 
+/**
+ * Define a space user- association, it hold some extra properties.
+ */
+export interface SpaceUser extends Emb {
+  userId: string // An user account id
+  owner: boolean // Make user as space owner
+}
+
 export interface Space extends Doc {
   name: string
-  lists: List[]
+
+  users: SpaceUser[] // A list of included user accounts
+  isPublic: boolean // If specified, a users are interpreted as include list, if not, as exclude list.
 }
 
 export interface VDoc extends Doc {
-  _space?: Ref<Space>
+  _space: Ref<Space>
   _createdOn: DateProperty
   _createdBy: StringProperty
   _modifiedOn?: DateProperty
