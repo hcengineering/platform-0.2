@@ -65,7 +65,6 @@ export class QueriableStorage implements Domain {
         // Find doc, apply attribute and check if it is still matches, if not we need to perform request to server after transaction will be complete.
 
         // Check if attribute are in query, so it could modify results.
-
         let pos = 0
         for (const r of q.results) {
           if (r._id === _id) {
@@ -73,7 +72,7 @@ export class QueriableStorage implements Domain {
 
             if (!this.model.matchQuery(q._class, r, q.query)) {
               // Document is not matched anymore, we need to remove it.
-              q.results = q.results.slice(pos, pos + 1)
+              q.results.splice(pos, 1)
             }
             q.subscriber(q.results)
             return
@@ -97,7 +96,7 @@ export class QueriableStorage implements Domain {
 
             if (!this.model.matchQuery(q._class, r, q.query)) {
               // Document is not matched anymore, we need to remove it.
-              q.results = q.results.slice(pos, pos + 1)
+              q.results.splice(pos, 1)
             }
             q.subscriber(q.results)
             return

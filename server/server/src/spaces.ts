@@ -81,7 +81,7 @@ function checkUpdateSpaces (spaces: Map<string, SpaceUser>, s: Space, spaceId: s
 
 function getObjectById (workspace: WorkspaceProtocol, _class: Ref<Class<Doc>>, id: Ref<Doc>): Promise<Doc | undefined> {
   // TODO: Think about some cache
-  return workspace.findOne(_class, { id })
+  return workspace.findOne(_class, { _id: id })
 }
 
 /**
