@@ -44,7 +44,7 @@
   { #if appInstance }
   <div>
     <span class="caption-1">{appInstance.label}</span>&nbsp;
-    <a bind:this={addIcon} href="/"  on:click|preventDefault = { () => { uiService.showModal(CreateForm, { _class: appInstance ? appInstance.classes[0] : undefined, title: 'The title', space }, addIcon) } }>    
+    <a bind:this={addIcon} href="/"  on:click|preventDefault = { () => { uiService.showModal(CreateForm, { _class: appInstance ? appInstance.classes[0] : undefined, title: 'The title', space }, addIcon) } }>
       <Icon icon={workbench.icon.Add} clazz="icon-2x"/>
     </a>
   </div>

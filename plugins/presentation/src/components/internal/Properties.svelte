@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 -->
-
 <script lang="ts">
-  import { Ref, Class, Obj } from '@anticrm/core'
+  import { Ref, Class, Obj } from '@anticrm/model'
   import { ClassModel } from '../..'
   import AttributeEditor from '../AttributeEditor.svelte'
 
@@ -30,44 +29,10 @@
   // $: getPresentationService()
   //   .then(service => service.getClassModel(_class))
   //   .then(m => { model = m.filterAttributes(excludeAttributes) })
-
 </script>
 
-<!-- { #if model} -->
-<div class= "attributes">
-{ #each model.getGroups() as group (group._class) }
-<div class="group">
-  <div class="caption-4">{ group.label }</div>
-  <table>
-    { #each model.getOwnAttributes(group._class) as attr (attr.key) }
-    <tr>
-      <td>
-        <Icon icon="{attr.icon}" clazz="icon-embed-15x" style="fill: var(--theme-content-color-dark)" />
-      </td>
-      <td width="120px">
-        <div class="label">{ attr.label }</div>
-      </td>
-      <td>
-        <div class="edit">
-          <AttributeEditor attribute={attr} bind:value={object[attr.key]}/>
-          <!-- <widget
-            :component="attr.presenter"
-            :attribute="attr"
-            v-model="object[attr.key]"
-            @update="update"
-          /> -->
-        </div>
-      </td>
-    </tr>
-    { /each }
-  </table>
-</div>
-{ /each }
-</div>
 <!-- { /if } -->
-
 <style lang="scss">
-
   .attributes {
     display: flex;
     flex-wrap: wrap;
@@ -87,5 +52,32 @@
     font-family: Raleway;
     font-size: 14px;
   }
-
 </style>
+
+<!-- { #if model} -->
+<div class="attributes">
+  {#each model.getGroups() as group (group._class)}
+    <div class="group">
+      <div class="caption-4">{group.label}</div>
+      <table>
+        {#each model.getOwnAttributes(group._class) as attr (attr.key)}
+          <tr>
+            <td>
+              {#if attr.icon}
+                <Icon icon={attr.icon} clazz="icon-embed-15x" style="fill: var(--theme-content-color-dark)" />
+              {/if}
+            </td>
+            <td width="120px">
+              <div class="label">{attr.label}</div>
+            </td>
+            <td>
+              <div class="edit">
+                <AttributeEditor attribute={attr} bind:value={object[attr.key]} />
+              </div>
+            </td>
+          </tr>
+        {/each}
+      </table>
+    </div>
+  {/each}
+</div>

@@ -13,8 +13,8 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Attribute, Class, Classifier, MODEL_DOMAIN, Doc, Model, Mixin, Obj, Ref } from '@anticrm/core'
-import core from '.'
+import { AnyLayout, Attribute, Class, Classifier, MODEL_DOMAIN, Doc, Model, Mixin, Obj, Ref } from '@anticrm/model'
+import core from '@anticrm/core'
 
 interface Proxy {
   __layout: any

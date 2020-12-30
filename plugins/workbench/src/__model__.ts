@@ -1,23 +1,24 @@
 //
 // Copyright © 2020 Anticrm Platform Contributors.
-// 
+//
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
 // obtain a copy of the License at https://www.eclipse.org/legal/epl-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// 
+//
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
 
-import { Ref, MODEL_DOMAIN, Space, VDoc, Class } from '@anticrm/core'
-import { Builder, extendIds, Class$, Prop } from '@anticrm/model'
+import { Ref, MODEL_DOMAIN, Class, Builder, extendIds, Class$, Prop } from '@anticrm/model'
+import core, { Space, VDoc } from '@anticrm/core'
 import { IntlString } from '@anticrm/platform-i18n'
 
-import core, { TApplication } from '@anticrm/platform-core/src/__model__'
+import { TApplication } from '@anticrm/core/src/__model__'
+import ux, { UXAttribute } from '@anticrm/presentation'
 import { AnyComponent, Asset } from '@anticrm/platform-ui'
 import chunter from '@anticrm/chunter'
 
@@ -31,7 +32,8 @@ const workbench = extendIds(_workbench, {
   },
   space: {
     General: '' as Ref<Space>,
-    Random: '' as Ref<Space>
+    Random: '' as Ref<Space>,
+    Other: '' as Ref<Space>
   }
 })
 
@@ -45,8 +47,26 @@ class TWorkbenchApplication extends TApplication implements WorkbenchApplication
   @Prop() classes!: Ref<Class<VDoc>>[]
 }
 
-export function model (S: Builder) {
+export function model (S: Builder): void {
   S.add(TWorkbenchApplication)
+
+  S.mixin(core.class.Space, ux.mixin.UXObject, {
+    label: 'Space' as IntlString,
+    attributes: {
+      name: {
+        label: 'Title' as IntlString
+      } as UXAttribute,
+      users: {
+        label: 'Members' as IntlString
+      } as UXAttribute,
+      isPublic: {
+        label: 'Make space public' as IntlString
+      } as UXAttribute,
+      autoJoin: {
+        label: 'Auto join(for public space)' as IntlString
+      } as UXAttribute
+    }
+  })
 
   S.createClass(workbench.class.Perspective, core.class.Doc, {
     label: S.attr(core.class.String, {}),
@@ -63,14 +83,23 @@ export function model (S: Builder) {
   S.createDocument(core.class.Space, {
     name: 'Общее',
     isPublic: true, // Available for all
+    autoJoin: true,
     users: []
   }, workbench.space.General)
 
   S.createDocument(core.class.Space, {
     name: 'Всякое',
     isPublic: true,
+    autoJoin: true,
     users: []
   }, workbench.space.Random)
+
+  S.createDocument(core.class.Space, {
+    name: 'Разное',
+    isPublic: true,
+    autoJoin: false,
+    users: []
+  }, workbench.space.Other)
 
   S.createDocument(workbench.class.WorkbenchApplication, {
     label: 'Активность' as IntlString,

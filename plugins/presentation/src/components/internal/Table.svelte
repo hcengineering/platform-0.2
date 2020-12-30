@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 -->
-
 <script type="ts">
   import { createEventDispatcher } from 'svelte'
-  import { Ref, Class, Doc, Space } from '@anticrm/core'
+  import { Ref, Class, Doc } from '@anticrm/model'
+  import { Space } from '@anticrm/core'
   import { QueryResult } from '@anticrm/platform-core'
   import { ClassModel } from '../..'
   import { getCoreService, getPresentationService, getEmptyModel } from '../../utils'
@@ -27,47 +27,30 @@
   const dispatch = createEventDispatcher()
 
   let model: ClassModel = getEmptyModel()
-  $: getPresentationService().then(p => p.getClassModel(_class)).then(m => model = m)
+  $: getPresentationService()
+    .then((p) => p.getClassModel(_class))
+    .then((m) => (model = m))
 
   let objects: any[] = []
   let unsubscribe: () => void
 
   function subscribe(qr: QueryResult<Doc>) {
     if (unsubscribe) unsubscribe()
-    unsubscribe = qr.subscribe(docs => { objects = docs })
+    unsubscribe = qr.subscribe((docs) => {
+      objects = docs
+    })
   }
 
-  $: getCoreService().then(c => c.query(_class, { _space: space })).then(qr => subscribe(qr))
+  $: getCoreService()
+    .then((c) => c.query(_class, { _space: space }))
+    .then((qr) => subscribe(qr))
 
-  onDestroy(() => { if(unsubscribe) unsubscribe() })
-
+  onDestroy(() => {
+    if (unsubscribe) unsubscribe()
+  })
 </script>
 
-<div class="erp-table">
-  <div class="thead">
-    <div class="tr">
-      { #each model.getAttributes() as attr (attr.key) }
-        <div class="th caption-4">{ attr.label }</div>
-      { /each }
-    </div>
-  </div>
-  <div class="tbody">
-    { #each objects as object (object._id) }
-      <div
-        class="tr" on:click={ () => dispatch('open', { _id: object._id, _class: object._class }) }
-      >
-      { #each model.getAttributes() as attr (attr.key) }
-        <div class="td">
-          <span>{ object[attr.key] || '' }</span>
-        </div>
-      { /each }
-      </div>
-    { /each }
-  </div>
-</div>
-
 <style lang="scss">
-
   .erp-table {
     display: table;
     border-collapse: collapse;
@@ -122,3 +105,22 @@
     // }
   }
 </style>
+
+<div class="erp-table">
+  <div class="thead">
+    <div class="tr">
+      {#each model.getAttributes() as attr (attr.key)}
+        <div class="th caption-4">{attr.label}</div>
+      {/each}
+    </div>
+  </div>
+  <div class="tbody">
+    {#each objects as object (object._id)}
+      <div class="tr" on:click={() => dispatch('open', { _id: object._id, _class: object._class })}>
+        {#each model.getAttributes() as attr (attr.key)}
+          <div class="td"><span>{object[attr.key] || ''}</span></div>
+        {/each}
+      </div>
+    {/each}
+  </div>
+</div>

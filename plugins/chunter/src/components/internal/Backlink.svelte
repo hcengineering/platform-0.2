@@ -12,9 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 -->
-
 <script lang="ts">
-
   import { Backlink } from '@anticrm/core'
   import { getService } from '@anticrm/platform-ui'
   import core from '@anticrm/platform-core'
@@ -28,10 +26,11 @@
 
   const coreService = getService(core.id)
 
-  $: coreService.findOne(backlink._backlinkClass, { _id: backlink._backlinkId }).then((doc: Message) => { message = doc})
-
+  $: coreService.findOne(backlink._backlinkClass, { _id: backlink._backlinkId }).then((doc: Message) => {
+    message = doc
+  })
 </script>
 
-{ #if message && message.comments && message.comments.length > backlink.pos }
-<CommentComponent message={message.comments[backlink.pos]} />
-{ /if }
+{#if message && message.comments && message.comments.length > backlink.pos}
+  <CommentComponent message={message.comments[backlink.pos]} />
+{/if}

@@ -16,9 +16,9 @@
 import { program } from 'commander'
 import { createContact, removeContact } from './user'
 import { initDatabase } from './init'
-import { Db, MongoClient } from 'mongodb'
+import { MongoClient } from 'mongodb'
 
-import { createWorkspace, createUserAccount, getUserAccount, assignWorkspace, getWorkspace, removeWorkspace, withTenant } from '@anticrm/accounts'
+import { createWorkspace, createUserAccount, assignWorkspace, getWorkspace, removeWorkspace, withTenant } from '@anticrm/accounts'
 
 const mongodbUri = process.env.MONGODB_URI || 'mongodb://localhost:27017'
 

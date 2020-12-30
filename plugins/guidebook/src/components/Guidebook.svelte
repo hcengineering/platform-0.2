@@ -11,7 +11,6 @@
   //
   // See the License for the specific language governing permissions and
   // limitations under the License.
-  import { Ref, Doc } from '@anticrm/core'
   import guidebook from '..'
   import { find, getUIService } from '../utils'
   import { getContext, onMount } from 'svelte'
@@ -41,56 +40,6 @@
 
   // $: component = perspectives.find((h) => h._id === current)?.component
 </script>
-
-<div id="guidebook">
-  <nav>
-    {#each pages as page (page.label)}
-      <div
-        class="app-icon"
-        class:current-app="{page.id === current}"
-        style="{'margin-left:' + page.level * 20 + 'px'}"
-      >
-        <div class="label">
-          <LinkTo href="{'/' + guidebook.component.GuideBook + '/' + page.id}">
-            {page.label}
-          </LinkTo>
-        </div>
-        {#if page.id == current}
-          <div class="icon-arrow">
-            <svg viewBox="0 0 24 24" width="100%" height="100%">
-              <line
-                x1="-20"
-                y1="12"
-                x2="19"
-                y2="12"
-                stroke="white"
-                fill="white"
-              ></line>
-              <polyline
-                points="12 5 19 12 12 19"
-                stroke="white"
-                fill="white"
-              ></polyline>
-            </svg>
-          </div>
-        {/if}
-      </div>
-    {/each}
-    <div class="remainder"></div>
-  </nav>
-
-  <div class="main">
-    <h1>Component {currentPage.label}</h1>
-
-    <div class="content">
-      {#if currentPage != undefined}
-        <svelte:component this="{currentPage.component}" on:change />
-      {/if}
-    </div>
-  </div>
-
-  <!-- <Spotlight /> -->
-</div>
 
 <style lang="scss">
   #guidebook {
@@ -147,3 +96,36 @@
     }
   }
 </style>
+
+<div id="guidebook">
+  <nav>
+    {#each pages as page (page.label)}
+      <div class="app-icon" class:current-app={page.id === current} style={'margin-left:' + page.level * 20 + 'px'}>
+        <div class="label">
+          <LinkTo href={'/' + guidebook.component.GuideBook + '/' + page.id}>{page.label}</LinkTo>
+        </div>
+        {#if page.id == current}
+          <div class="icon-arrow">
+            <svg viewBox="0 0 24 24" width="100%" height="100%">
+              <line x1="-20" y1="12" x2="19" y2="12" stroke="white" fill="white" />
+              <polyline points="12 5 19 12 12 19" stroke="white" fill="white" />
+            </svg>
+          </div>
+        {/if}
+      </div>
+    {/each}
+    <div class="remainder" />
+  </nav>
+
+  <div class="main">
+    <h1>Component {currentPage.label}</h1>
+
+    <div class="content">
+      {#if currentPage != undefined}
+        <svelte:component this={currentPage.component} on:change />
+      {/if}
+    </div>
+  </div>
+
+  <!-- <Spotlight /> -->
+</div>

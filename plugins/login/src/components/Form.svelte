@@ -1,40 +1,36 @@
 <script lang="ts">
-  import { Status, Severity } from "@anticrm/platform";
+  import { Status, Severity } from '@anticrm/platform'
 
   interface Field {
-    name: string;
-    i18n: string;
-    password?: boolean;
-    optional?: boolean;
+    name: string
+    i18n: string
+    password?: boolean
+    optional?: boolean
   }
 
   interface Action {
-    i18n: string;
-    func: () => Promise<void>;
+    i18n: string
+    func: () => Promise<void>
   }
 
-  export let caption: string;
-  export let status = new Status(Severity.OK, 0, "");
-  export let fields: Field[];
-  export let actions: Action[];
-  export let object: any;
+  export let caption: string
+  export let status = new Status(Severity.OK, 0, '')
+  export let fields: Field[]
+  export let actions: Action[]
+  export let object: any
 
-  $: description = status.message;
+  $: description = status.message
 
   function validate() {
     for (const field of fields) {
-      const v = object[field.name];
-      const f = field;
-      if (!f.optional && (!v || v === "")) {
-        status = new Status(
-          Severity.INFO,
-          0,
-          `Поле '${field.i18n}' обязательно к заполнению.`
-        );
-        return;
+      const v = object[field.name]
+      const f = field
+      if (!f.optional && (!v || v === '')) {
+        status = new Status(Severity.INFO, 0, `Поле '${field.i18n}' обязательно к заполнению.`)
+        return
       }
     }
-    status = new Status(Severity.OK, 0, "");
+    status = new Status(Severity.OK, 0, '')
   }
 </script>
 
@@ -102,12 +98,7 @@
 
   <div class="actions">
     {#each actions as action, i}
-      <button
-        class="button"
-        class:separator={i != 0}
-        on:click|preventDefault={action.func}>
-        {action.i18n}
-      </button>
+      <button class="button" class:separator={i != 0} on:click|preventDefault={action.func}> {action.i18n} </button>
     {/each}
   </div>
 </form>

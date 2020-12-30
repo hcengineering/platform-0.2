@@ -1,4 +1,4 @@
-import { RefTo, Doc, BagOf, CORE_CLASS_BAGOF } from './../../core/src/core'
+import { RefTo, Doc, BagOf } from './classes'
 //
 // Copyright © 2020 Anticrm Platform Contributors.
 //
@@ -16,11 +16,9 @@ import { RefTo, Doc, BagOf, CORE_CLASS_BAGOF } from './../../core/src/core'
 
 import 'reflect-metadata'
 
-import {
-  Ref, Class, Obj, Mixin, ClassifierKind, Classifier, Attribute, Type, Text, Property, mixinKey, ArrayOf, Emb, InstanceOf,
-  CORE_CLASS_MIXIN, CORE_CLASS_TYPE, CORE_MIXIN_INDICES, CORE_CLASS_ATTRIBUTE, CORE_CLASS_CLASS, CORE_CLASS_TEXT,
-  CORE_CLASS_ARRAY, CORE_CLASS_INSTANCEOF, CORE_CLASS_REFTO
-} from '@anticrm/core'
+import core, {
+  Ref, Class, Obj, Mixin, ClassifierKind, Classifier, Attribute, Type, Property, mixinKey, ArrayOf, Emb, InstanceOf
+} from '.'
 
 const classifierMetadataKey = Symbol("anticrm:classifier")
 
@@ -40,7 +38,7 @@ export function getAttribute (target: any, propertyKey: string): Attribute {
   let attribute = (classifier._attributes as any)[propertyKey] as Attribute
   if (!attribute) {
     attribute = {
-      _class: CORE_CLASS_ATTRIBUTE
+      _class: core.class.Attribute
     } as unknown as Attribute
     (classifier._attributes as any)[propertyKey] = attribute
   }
@@ -51,7 +49,7 @@ export function Class$<E extends Obj, T extends E> (id: Ref<Class<T>>, _extends:
   return function classDecorator<C extends { new(): T }> (constructor: C): void {
     const classifier = getClassifier(constructor.prototype)
     classifier._id = id
-    classifier._class = CORE_CLASS_CLASS
+    classifier._class = core.class.Class
     classifier._kind = ClassifierKind.CLASS
     if (id !== _extends) {
       classifier._extends = _extends
@@ -66,7 +64,7 @@ export function Mixin$<E extends Obj, T extends E> (id: Ref<Mixin<T>>, _extends:
   return function classDecorator<C extends { new(): T }> (constructor: C): void {
     const classifier = getClassifier(constructor.prototype)
     classifier._id = id
-    classifier._class = CORE_CLASS_MIXIN
+    classifier._class = core.class.Mixin
     classifier._kind = ClassifierKind.MIXIN
     classifier._extends = _extends
   }
@@ -75,26 +73,28 @@ export function Mixin$<E extends Obj, T extends E> (id: Ref<Mixin<T>>, _extends:
 /**
  * Construct a property
  */
-export function Prop () {
+export function Prop (type: Ref<Class<Type>> = core.class.Type) {
   return function (target: any, propertyKey: string): void {
+    // var t = Reflect.getMetadata('design:type', target, propertyKey)
+    // console.log('design type:', propertyKey, t)
+
     const attribute = getAttribute(target, propertyKey)
-    const type = { _class: CORE_CLASS_TYPE } as unknown as Type
-    attribute.type = type
+    attribute.type = { _class: type } as unknown as Type
   }
 }
 
 export function RefTo$ (to: Ref<Class<Doc>>) {
   return function (target: any, propertyKey: string): void {
     const attribute = getAttribute(target, propertyKey)
-    const type = { _class: CORE_CLASS_REFTO, to: to } as unknown as RefTo<Doc>
+    const type = { _class: core.class.RefTo, to: to } as unknown as RefTo<Doc>
     attribute.type = type
   }
 }
 export function BagOf$ () {
   return function (target: any, propertyKey: string): void {
     const attribute = getAttribute(target, propertyKey)
-    const type = attribute.type || { _class: CORE_CLASS_TYPE } as unknown as Type
-    const arr = { _class: CORE_CLASS_BAGOF, of: type } as unknown as BagOf
+    const type = attribute.type || { _class: core.class.Type } as unknown as Type
+    const arr = { _class: core.class.BagOf, of: type } as unknown as BagOf
     attribute.type = arr
   }
 }
@@ -106,8 +106,8 @@ export function BagOf$ () {
 export function ArrayOf$ () {
   return function (target: any, propertyKey: string): void {
     const attribute = getAttribute(target, propertyKey)
-    const type = attribute.type || { _class: CORE_CLASS_TYPE } as unknown as Type
-    const arr = { _class: CORE_CLASS_ARRAY, of: type } as unknown as ArrayOf
+    const type = attribute.type || { _class: core.class.Type } as unknown as Type
+    const arr = { _class: core.class.ArrayOf, of: type } as unknown as ArrayOf
     attribute.type = arr
   }
 }
@@ -115,16 +115,8 @@ export function ArrayOf$ () {
 export function InstanceOf$<T extends Emb> (of: Ref<Class<T>>) {
   return function (target: any, propertyKey: string): void {
     const attribute = getAttribute(target, propertyKey)
-    const arr = { _class: CORE_CLASS_INSTANCEOF, of } as unknown as InstanceOf<T>
+    const arr = { _class: core.class.InstanceOf, of } as unknown as InstanceOf<T>
     attribute.type = arr
-  }
-}
-
-export function Text$ () {
-  return function (target: any, propertyKey: string): void {
-    const attribute = getAttribute(target, propertyKey)
-    const type = { _class: CORE_CLASS_TEXT } as unknown as Text
-    attribute.type = type
   }
 }
 
@@ -132,11 +124,13 @@ export function Primary () {
   return function (target: any, propertyKey: string): void {
     const classifier = getClassifier(target)
     if (!classifier._mixins) {
-      classifier._mixins = [CORE_MIXIN_INDICES]
+      classifier._mixins = [core.mixin.Indices]
     } else {
-      classifier._mixins.push(CORE_MIXIN_INDICES)
+      if (classifier._mixins.indexOf(core.mixin.Indices) == -1) {
+        classifier._mixins.push(core.mixin.Indices)
+      }
     }
     const doc = classifier as any
-    doc[mixinKey(CORE_MIXIN_INDICES, 'primary')] = propertyKey
+    doc[mixinKey(core.mixin.Indices, 'primary')] = propertyKey
   }
 }

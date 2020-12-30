@@ -13,15 +13,14 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Class, Doc, Ref, Tx, CORE_CLASS_SPACE, Space, StringProperty, SpaceUser, CreateTx, UpdateTx, PushTx, DeleteTx, CORE_CLASS_CREATETX, CORE_CLASS_UPDATETX, CORE_CLASS_DELETETX, CORE_CLASS_PUSHTX } from '@anticrm/core'
+import { AnyLayout, Class, Doc, Ref, Tx, StringProperty } from '@anticrm/model'
+import core, { CreateTx, DeleteTx, PushTx, Space, SpaceUser, UpdateTx } from '@anticrm/core'
 import { Client } from './server'
 import { WorkspaceProtocol } from './workspace'
 
-import core from '@anticrm/platform-core'
-
 function getSpaceKey (_class: Ref<Class<Doc>>): string {
   // for Space objects use _id to filter available ones
-  return _class === CORE_CLASS_SPACE ? '_id' : '_space'
+  return _class === core.class.Space ? '_id' : '_space'
 }
 /**
    * Filters the given query to satisfy current user account rights.
@@ -68,7 +67,8 @@ export function isAcceptable (spaces: Map<string, SpaceUser>, _class: Ref<Class<
 }
 
 function checkUpdateSpaces (spaces: Map<string, SpaceUser>, s: Space, spaceId: string, email: string) {
-  let us = s.users.find(u => u.userId === email)
+  const users = s.users || []
+  let us = users.find(u => u.userId === email)
   if (s.isPublic && !us) {
     // Add in any case for public space
     us = ({ userId: email, owner: false } as SpaceUser)
@@ -90,13 +90,14 @@ function getObjectById (workspace: WorkspaceProtocol, _class: Ref<Class<Doc>>, i
  */
 export async function processTx (workspace: WorkspaceProtocol, spaces: Map<string, SpaceUser>, tx: Tx, client: Client, ownChange: boolean): Promise<boolean> {
   switch (tx._class) {
-    case CORE_CLASS_CREATETX: {
+    case core.class.CreateTx: {
       const createTx = tx as CreateTx
-      if (createTx._objectClass === CORE_CLASS_SPACE) {
+      if (createTx._objectClass === core.class.Space) {
         // Createion of a new space, we need to mark user as owner if this information is missing
         const s = (createTx.object as unknown) as Space
         if (ownChange) {
-          const us = s.users.find(u => u.userId === client.email)
+          const users = s.users || []
+          const us = users.find(u => u.userId === client.email)
           if (!s.isPublic && (!us || !us.owner)) {
             // Do not allow space with us not owner.
             return Promise.reject(new Error('Space doesn\'t contain owner. Operation is not allowed'))
@@ -112,27 +113,27 @@ export async function processTx (workspace: WorkspaceProtocol, spaces: Map<strin
       }
       return isAcceptable(spaces, createTx._objectClass, createTx.object)
     }
-    case CORE_CLASS_UPDATETX: {
+    case core.class.UpdateTx: {
       const updateTx = tx as UpdateTx
       const obj = await getObjectById(workspace, updateTx._class, updateTx._objectId)
 
       // Check if space, we need update out list
-      if (!ownChange && updateTx._objectClass === CORE_CLASS_SPACE) {
+      if (!ownChange && updateTx._objectClass === core.class.Space) {
         checkUpdateSpaces(spaces, (obj as unknown) as Space, updateTx._objectId, client.email)
       }
       return isAcceptable(spaces, updateTx._class, (obj as unknown) as AnyLayout)
     }
-    case CORE_CLASS_PUSHTX: {
+    case core.class.PushTx: {
       const pushTx = tx as PushTx
       const obj = await getObjectById(workspace, pushTx._objectClass, pushTx._objectId)
-      if (!ownChange && pushTx._objectClass === CORE_CLASS_SPACE) {
+      if (!ownChange && pushTx._objectClass === core.class.Space) {
         // Check if SpaceUser is we, since operation is already applied, we could check with Space object itself.
         const sp = (obj as unknown) as Space
         checkUpdateSpaces(spaces, sp, sp._id, client.email)
       }
       return isAcceptable(spaces, pushTx._class, (obj as unknown) as AnyLayout)
     }
-    case CORE_CLASS_DELETETX: {
+    case core.class.DeleteTx: {
       const delTx = tx as DeleteTx
       const obj = await getObjectById(workspace, delTx._objectClass, delTx._objectId)
       return isAcceptable(spaces, delTx._class, (obj as unknown) as AnyLayout)

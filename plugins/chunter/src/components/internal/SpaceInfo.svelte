@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 -->
-
 <script lang="ts">
-  import { Tx, CreateTx, Space } from '@anticrm/core'
-  import core from '@anticrm/platform-core'
+  import { CreateTx, Space } from '@anticrm/core'
+  import core from '@anticrm/core'
+  import { Tx } from '@anticrm/model'
 
   export let tx: Tx
 
@@ -24,6 +24,4 @@
   }
 </script>
 
-{ #if tx._class === core.class.CreateTx }
-  Создал пространство <b>{ spaceName() }</b>
-{ /if }
+{#if tx._class === core.class.CreateTx}Создал пространство <b>{spaceName()}</b>{/if}

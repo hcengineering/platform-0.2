@@ -16,7 +16,7 @@
 import { Platform } from '@anticrm/platform'
 import { MessageNode, serializeMessage } from '@anticrm/core'
 import { CoreService } from '@anticrm/platform-core'
-import chunter, { ChunterService, Page } from '.'
+import chunter, { ChunterService } from '.'
 
 import ActivityView from './components/internal/ActivityView.svelte'
 import ChatView from './components/internal/ChatView.svelte'
@@ -30,10 +30,7 @@ import PageInfo from './components/internal/PageInfo.svelte'
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */
-export default async (
-  platform: Platform,
-  deps: { core: CoreService }
-): Promise<ChunterService> => {
+export default async (platform: Platform, deps: { core: CoreService }): Promise<ChunterService> => {
   platform.setResource(chunter.component.ActivityView, ActivityView)
   platform.setResource(chunter.component.ChatView, ChatView)
   platform.setResource(chunter.component.MessageInfo, MessageInfo)
@@ -41,28 +38,7 @@ export default async (
   platform.setResource(chunter.component.PageProperties, PageProperties)
   platform.setResource(chunter.component.PageInfo, PageInfo)
 
-  const coreService = deps.core
-
-  function createMissedObjects(doc: MessageNode): string {
-    // for (const element of elements) {
-    //   if (element.kind === MessageElementKind.LINK) {
-    //     const link = element as MessageLink
-    //     const title = link.text.substring(2, link.text.length - 2)
-    //     link.text = title
-    //     if (link._id == undefined) {
-    //       const id = coreService.generateId() as Ref<Page>
-    //       // coreService.createVDoc(chunter.class.Page, {
-    //       //   title,
-    //       //   comments: []
-    //       // }, id)
-    //       link._id = id
-    //       link._class = chunter.class.Page
-    //     }
-    //     referenced.push(link)
-    //   } else {
-    //     referenced.push(element)
-    //   }
-    // }
+  function createMissedObjects (doc: MessageNode): string {
     return serializeMessage(doc)
   }
 

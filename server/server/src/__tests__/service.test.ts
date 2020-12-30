@@ -15,11 +15,11 @@
 /* eslint-env jest */
 
 import { ServerSuite } from './serversuite'
-import core from '@anticrm/platform-core'
 import chunter, { Page } from '@anticrm/chunter'
 
 import { newCreateTx } from '@anticrm/platform-core/src/tx'
-import { Property, Space, SpaceUser, StringProperty } from '@anticrm/core'
+import { Property, StringProperty } from '@anticrm/model'
+import core, { Space, SpaceUser } from '@anticrm/core'
 
 describe('service', () => {
   const wsName = 'test-service'
@@ -41,7 +41,7 @@ describe('service', () => {
     const { client } = (await server.newClients(1, ws))[0]
 
     const spaces = await client.find(core.class.Space, { isPublic: true as Property<boolean, boolean> })
-    expect(spaces.length).toEqual(2)
+    expect(spaces.length).toEqual(3)
   })
 
   it('should not allow to create private space without owner', async () => {
@@ -49,7 +49,7 @@ describe('service', () => {
     const { client } = (await server.newClients(1, ws))[0]
 
     const spaces = await client.find(core.class.Space, { isPublic: true as Property<boolean, boolean> })
-    expect(spaces.length).toEqual(2)
+    expect(spaces.length).toEqual(3)
 
     // Create a private space
     await client.tx(newCreateTx(
@@ -84,7 +84,7 @@ describe('service', () => {
     ))
 
     const spaces = await c1.find(core.class.Space, { isPublic: true as Property<boolean, boolean> })
-    expect(spaces.length).toEqual(3)
+    expect(spaces.length).toEqual(4)
     await clients[1].wait()
 
     await c1.tx(newCreateTx(

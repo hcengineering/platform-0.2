@@ -12,43 +12,60 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 -->
-
 <script type="ts">
-  import { Ref, Class, Doc, Application, Tx, Space } from '@anticrm/core'
+  import { Ref, Class, Doc, Tx } from '@anticrm/model'
   import { onDestroy } from 'svelte'
-  import { findOne, getCoreService } from '../../utils'
-  import workbench, { WorkbenchApplication } from '@anticrm/workbench'
-  import core, { QueryResult } from '@anticrm/platform-core' 
+  import { getCoreService } from '../../utils'
+  import { WorkbenchApplication } from '@anticrm/workbench'
+  import core from '@anticrm/core'
+  import { QueryResult } from '@anticrm/platform-core'
 
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
   import ActivityItem from './ActivityItem.svelte'
+  import { Space } from '@anticrm/core'
 
   export let application: Ref<WorkbenchApplication>
   export let space: Ref<Space>
-  
+
   let objects: Tx[] = []
   let unsubscribe: () => void
 
   function subscribe(qr: QueryResult<Doc>) {
     if (unsubscribe) unsubscribe()
-    unsubscribe = qr.subscribe(docs => { objects = docs as Tx[] })
+    unsubscribe = qr.subscribe((docs) => {
+      objects = docs as Tx[]
+    })
   }
 
-  $: getCoreService().then(c => c.query(core.class.CreateTx, { })).then(qr => subscribe(qr))
+  $: getCoreService()
+    .then((c) => c.query(core.class.CreateTx, {}))
+    .then((qr) => subscribe(qr))
 
-  onDestroy(() => { if(unsubscribe) unsubscribe() })  
-
+  onDestroy(() => {
+    if (unsubscribe) unsubscribe()
+  })
 </script>
 
+<style lang="scss">
+  .activity {
+    height: 100%;
+    // background-color: red;
+    display: flex;
+    flex-direction: column;
+
+    .content {
+      flex-grow: 1;
+    }
+  }
+</style>
+
 <div class="activity">
-  <div>
-    <span class="caption-1">Activity</span>&nbsp;
-  </div>
+  <div><span class="caption-1">Activity</span>&nbsp;</div>
   <ScrollView stylez="height:100%;" autoscroll={true}>
     <div class="content">
-      { #each objects as item (item._id) }
+      {#each objects as item (item._id)}
         <ActivityItem tx={item} />
-      { /each }
+      {/each}
     </div>
   </ScrollView>
   <div>
@@ -56,16 +73,3 @@
     <!-- <CreateForm _class={appInstance.classes[0]} title="Hello"/> -->
   </div>
 </div>
-
-<style lang="scss">
-  .activity {
-    height: 100%;
-    // background-color: red;
-    display: flex;
-    flex-direction: column;  
-
-    .content {
-      flex-grow: 1;
-    }
-  }
-</style>

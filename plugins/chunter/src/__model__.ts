@@ -13,18 +13,18 @@
 // limitations under the License.
 //
 
-import { Application, Ref, Class, Property } from '@anticrm/core'
-
-import { extendIds, Builder, Class$, Primary, Prop, ArrayOf$, InstanceOf$, Text$ } from '@anticrm/model'
+import { Ref, Class, Property, Builder, Class$, Primary, Prop, ArrayOf$, InstanceOf$, extendIds, Mixin$, Doc } from '@anticrm/model'
 import { UX } from '@anticrm/presentation/src/__model__'
 
 import workbench from '@anticrm/workbench/src/__model__'
 import _chunter, { Message, Page, Comment, Collab } from '.'
 
 import { IntlString } from '@anticrm/platform-i18n'
-import presentation from '@anticrm/presentation'
+import presentation, { ComponentExtension } from '@anticrm/presentation'
 
-import core, { TVDoc, TEmb } from '@anticrm/platform-core/src/__model__'
+import { TVDoc } from '@anticrm/core/src/__model__'
+import { TEmb, TMixin } from '@anticrm/model/src/__model__'
+import core, { Application, VDoc } from '@anticrm/core'
 
 export enum ChunterDomain {
   Chunter = 'chunter'
@@ -54,13 +54,17 @@ class TCollab extends TVDoc implements Collab {
 class TComment extends TEmb implements Comment {
   @Prop() _createdBy!: Property<string, string>
   @Prop() _createdOn!: Property<number, Date>
-  @Text$() @UX('Сообщение' as IntlString, chunter.icon.Chunter) message!: string
+
+  @UX('Сообщение' as IntlString, chunter.icon.Chunter)
+  @Prop(core.class.String) message!: string
 }
 
 @Class$(chunter.class.Message, chunter.class.Collab, ChunterDomain.Chunter)
 @UX('Сообщение' as IntlString)
 class TMessage extends TVDoc implements Message {
-  // @Text() @UX('Сообщение' as IntlString, chunter.icon.Chunter) message!: string
+  @UX('Сообщение' as IntlString, chunter.icon.Chunter)
+  @Prop(core.class.String)
+  message!: string
 }
 
 @Class$(chunter.class.Page, chunter.class.Collab, ChunterDomain.Chunter)
@@ -69,41 +73,17 @@ class TPage extends TMessage implements Page {
   @Prop() @UX('Название' as IntlString, chunter.icon.Chunter) @Primary() title!: string
 }
 
-export function model (S: Builder) {
-  S.add(TCollab, TMessage, TComment, TPage)
+@Mixin$(chunter.mixin.ActivityInfo, core.class.Mixin)
+class TActivityInfo extends TMixin<VDoc> implements ComponentExtension<VDoc> {
+  @Prop() component!: any
+}
 
-  // S.createDocument(workbench.class.Application, {
-  //   label: 'Chunter' as StringProperty,
-  //   icon: chunter.icon.Chunter,
-  //   main: chunter.component.ChunterView,
-  //   appClass: chunter.class.Message
-  // }, chunter.application.Chunter)
-
-  S.createMixin(chunter.mixin.ActivityInfo, core.class.Class, {
-    component: S.attr(core.class.Type, {})
-  })
-
-  // S.mixin(chunter.class.Page, chunter.mixin.ChunterInfo, {
-  //   component: chunter.component.PageInfo
-  // })
-
-  // S.mixin(contact.class.Person as Ref<Class<Person>>, chunter.mixin.ChunterInfo, { // TODO: type problems
-  //   component: chunter.component.ContactInfo
-  // })
+export function model (S: Builder): void {
+  S.add(TCollab, TMessage, TComment, TPage, TActivityInfo)
 
   S.mixin(chunter.class.Message, chunter.mixin.ActivityInfo, {
     component: chunter.component.MessageInfo
   })
-
-  // S.createDocument(workbench.class.WorkbenchCreateItem, {
-  //   label: 'Chunter / Страница' as StringProperty,
-  //   icon: contact.icon.Phone,
-  //   itemClass: chunter.class.Page
-  // })
-
-  // S.mixin(chunter.class.Page, presentation.class.DetailForm, {
-  //   component: chunter.component.PageProperties
-  // })
 
   S.createDocument(workbench.class.WorkbenchApplication, {
     label: 'Страницы' as IntlString,

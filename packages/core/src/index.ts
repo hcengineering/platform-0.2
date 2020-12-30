@@ -13,9 +13,37 @@
 // limitations under the License.
 //
 
+import model, { Class, Ref, Tx } from '@anticrm/model'
+import { AnyPlugin, mergeIds } from '@anticrm/platform'
+import { Backlinks } from './text'
+import { Title } from './title'
+import { CreateTx, DeleteTx, PushTx, UpdateTx } from './tx'
+import { Application, Space, SpaceUser, VDoc } from './vdoc'
+
+const core = mergeIds('core' as AnyPlugin, model, {
+  class: {
+    Tx: '' as Ref<Class<Tx>>,
+    CreateTx: '' as Ref<Class<CreateTx>>,
+    PushTx: '' as Ref<Class<PushTx>>,
+    UpdateTx: '' as Ref<Class<UpdateTx>>,
+    DeleteTx: '' as Ref<Class<DeleteTx>>,
+
+    Title: '' as Ref<Class<Title>>,
+
+    VDoc: '' as Ref<Class<VDoc>>,
+
+    Space: '' as Ref<Class<Space>>,
+    SpaceUser: '' as Ref<Class<SpaceUser>>,
+
+    Backlinks: '' as Ref<Class<Backlinks>>,
+
+    Application: '' as Ref<Class<Application>>
+  }
+})
+export default core
+
 export * from './rpc'
-export * from './core'
-export * from './model'
+export * from '@anticrm/model/src/model'
 export * from './text'
 export * from './textmodel'
 export * from './tx'

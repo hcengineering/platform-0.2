@@ -13,12 +13,12 @@
 // limitations under the License.
 //
 
-import { Metadata, plugin, Plugin, Resource, Service } from '@anticrm/platform'
-import { StringProperty, Doc, Class, Ref, VDoc, Application } from '@anticrm/core'
+import { plugin, Plugin, Service } from '@anticrm/platform'
+import { StringProperty, Class, Ref } from '@anticrm/model'
 
 import { User } from '@anticrm/contact'
-import ui, { AnyComponent, Asset } from '@anticrm/platform-ui'
-import { IntlString } from '@anticrm/platform-i18n'
+import { AnyComponent } from '@anticrm/platform-ui'
+import { VDoc } from '@anticrm/core'
 
 export interface Task extends VDoc {
   title: StringProperty

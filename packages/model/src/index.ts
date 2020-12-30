@@ -13,8 +13,44 @@
 // limitations under the License.
 //
 
+import { AnyPlugin, identify } from '@anticrm/platform'
+import { ArrayOf, Attribute, BagOf, Class, Classifier, Doc, Emb, Indices, InstanceOf, Mixin, Obj, Ref, RefTo, Type } from './classes'
 import Builder from './builder'
-export * from './utils'
-export * from './dsl'
+
+const modelIds = identify('model' as AnyPlugin, {
+  class: {
+    Obj: '' as Ref<Class<Obj>>,
+    Emb: '' as Ref<Class<Emb>>,
+    Doc: '' as Ref<Class<Doc>>,
+
+    Classifier: '' as Ref<Class<Classifier<Obj>>>,
+
+    Attribute: '' as Ref<Class<Attribute>>,
+    Class: '' as Ref<Class<Class<Obj>>>,
+    Mixin: '' as Ref<Class<Mixin<Obj>>>,
+
+    // Data types
+    Type: '' as Ref<Class<Type>>,
+    String: '' as Ref<Class<Type>>,
+    Number: '' as Ref<Class<Type>>,
+    Boolean: '' as Ref<Class<Type>>,
+    ArrayOf: '' as Ref<Class<ArrayOf>>,
+    RefTo: '' as Ref<Class<RefTo<Doc>>>,
+    BagOf: '' as Ref<Class<BagOf>>,
+    InstanceOf: '' as Ref<Class<InstanceOf<Type>>>
+  },
+  mixin: {
+    Indices: '' as Ref<Mixin<Indices>>
+  }
+})
+console.log('model ids', modelIds)
+export default modelIds
 
 export { Builder }
+
+export * from './utils'
+export * from './dsl'
+export * from './classes'
+export * from './tx'
+export * from './storage'
+export * from './model'

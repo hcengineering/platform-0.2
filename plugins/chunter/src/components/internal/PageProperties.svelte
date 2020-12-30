@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 -->
-
 <script type="ts">
-  import { Ref, Class, Obj } from '@anticrm/core'
+  import { Ref, Class, Obj } from '@anticrm/model'
   import chunter, { Page } from '../..'
-  import core from '@anticrm/platform-core'
+  import core from '@anticrm/core'
   import { getPresentationService } from '../../utils'
   import { AttrModel, ClassModel } from '@anticrm/presentation'
 
@@ -31,18 +30,19 @@
   let title: AttrModel | undefined
 
   $: getPresentationService()
-    .then(service => service.getClassModel(_class, core.class.VDoc))
-    .then(m => { 
+    .then((service) => service.getClassModel(_class, core.class.VDoc))
+    .then((m) => {
       title = m.getAttribute('title')
-      model = m.filterAttributes(['title']) 
+      model = m.filterAttributes(['title'])
     })
 </script>
 
-{ #if model && title }
-<div>
-  <div class="caption-1"><AttributeEditor attribute={title} bind:value={object.title} /></div>
-</div>
-<Properties {model} bind:object={object}/>
-<Comments object={object} />
-{ /if }
-
+{#if model && title}
+  <div>
+    <div class="caption-1">
+      <AttributeEditor attribute={title} bind:value={object.title} />
+    </div>
+  </div>
+  <Properties {model} bind:object />
+  <Comments {object} />
+{/if}

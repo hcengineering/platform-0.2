@@ -13,11 +13,12 @@
 // limitations under the License.
 //
 
-import { plugin, Plugin, Service, Metadata } from '@anticrm/platform'
-import { Mixin, Property, Ref, VDoc } from '@anticrm/core'
+import { plugin, Plugin, Service } from '@anticrm/platform'
+import { Mixin, Property, Ref } from '@anticrm/model'
 
 import ui, { Asset, AnyComponent } from '@anticrm/platform-ui'
 import core from '@anticrm/platform-core'
+import { VDoc } from '@anticrm/core'
 
 export interface Contact extends VDoc {
   phone?: string

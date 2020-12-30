@@ -13,11 +13,11 @@
 // limitations under the License.
 //
 
-import { Class, Doc, Ref, Classifier, CORE_MIXIN_INDICES, VDoc, Obj, Tx } from '@anticrm/core'
-import { Index, Storage, TxContext } from './core'
-import { Model, mixinKey } from './model'
-import { CreateTx, UpdateTx, CORE_CLASS_CREATETX, CORE_CLASS_UPDATETX } from './tx'
+import { Doc, Ref, Classifier, Tx, Index, Storage, TxContext } from '@anticrm/model'
+import { Model } from '@anticrm/model/src/model'
+import { CreateTx, UpdateTx } from './tx'
 import { generateId } from './objectid'
+import core from '.'
 
 export const TITLE_DOMAIN = 'title'
 
@@ -27,10 +27,7 @@ export interface Title extends Doc {
   title: string | number
 }
 
-export const CORE_CLASS_TITLE = 'class:core.Title' as Ref<Class<Title>>
-
 const NULL = '<null>'
-const primaryKey = mixinKey(CORE_MIXIN_INDICES, 'primary')
 
 export class TitleIndex implements Index {
   private modelDb: Model
@@ -46,16 +43,11 @@ export class TitleIndex implements Index {
     const cached = this.primaries.get(_class)
     if (cached) return cached === NULL ? null : cached
 
-    let cls = _class as Ref<Class<Obj>> | undefined
-    while (cls) {
-      const clazz = this.modelDb.get(cls) as Classifier<VDoc>
-      const primary = (clazz as any)[primaryKey]
-      if (primary) {
-        console.log(`primary code for class ${_class}: ${primary}`)
-        this.primaries.set(_class, primary)
-        return primary
-      }
-      cls = clazz._extends
+    const primary = this.modelDb.getPrimaryKey(_class)
+    if (primary) {
+      console.log(`primary code for class ${_class}: ${primary}`)
+      this.primaries.set(_class, primary)
+      return primary
     }
     this.primaries.set(_class, NULL)
     return null
@@ -63,9 +55,9 @@ export class TitleIndex implements Index {
 
   async tx (ctx: TxContext, tx: Tx): Promise<any> {
     switch (tx._class) {
-      case CORE_CLASS_CREATETX:
+      case core.class.CreateTx:
         return this.onCreate(ctx, tx as CreateTx)
-      case CORE_CLASS_UPDATETX:
+      case core.class.UpdateTx:
         return this.onUpdate(ctx, tx as UpdateTx)
       default:
         console.log('not implemented title tx', tx)
@@ -81,7 +73,7 @@ export class TitleIndex implements Index {
     const title = (create.object as any)[primary] as string
 
     const doc: Title = {
-      _class: CORE_CLASS_TITLE,
+      _class: core.class.Title,
       _id: generateId() as Ref<Title>,
       _objectClass: create._objectClass,
       _objectId: create._objectId,
@@ -105,7 +97,7 @@ export class TitleIndex implements Index {
       }
     }
     if (updated) {
-      this.storage.update(ctx, CORE_CLASS_TITLE, update._objectId, { title: update._attributes[primary] })
+      this.storage.update(ctx, core.class.Title, update._objectId, { title: update._attributes[primary] })
     }
   }
 }

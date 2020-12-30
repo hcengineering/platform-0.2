@@ -4,21 +4,23 @@ import { start, ServerProtocol, Broadcaster, ClientSocket, ClientService } from 
 import { Db, MongoClient } from 'mongodb'
 import { createWorkspace, getWorkspace, withTenant } from '@anticrm/accounts'
 
-import { Builder } from '@anticrm/model'
+import { Builder, Doc, Ref, Property } from '@anticrm/model'
 
-import { model as platformCorePlugin } from '@anticrm/platform-core/src/__model__'
+import { model } from '@anticrm/model/src/__model__'
+import { model as core } from '@anticrm/core/src/__model__'
 import { model as presentationPlugin } from '@anticrm/presentation/src/__model__'
 import contact, { model as contactPlugin } from '@anticrm/contact/src/__model__'
 import { model as workbenchPlugin } from '@anticrm/workbench/src/__model__'
 import { model as taskPlugin } from '@anticrm/task/src/__model__'
 import { model as chunterPlugin } from '@anticrm/chunter/src/__model__'
-import { Doc, Request, generateId, Ref, Space, Property } from '@anticrm/core'
 import { Person } from '@anticrm/contact'
 import { createClientService } from '../service'
 import { WorkspaceProtocol } from '../workspace'
+import { generateId, Request, Space } from '@anticrm/core'
 
 export const builder = new Builder()
-builder.load(platformCorePlugin)
+builder.load(model)
+builder.load(core)
 builder.load(presentationPlugin)
 builder.load(contactPlugin)
 builder.load(workbenchPlugin)
@@ -134,15 +136,15 @@ export class ServerSuite {
 
     const broadcast: Broadcaster = {
       broadcast: (from, response) => {
-        console.log(`broadcasting to ${clients.length} connections`)
+        // console.log(`broadcasting to ${clients.length} connections`)
         for (const client of clients) {
           if (client.client !== from) {
-            console.log(`broadcasting to ${client.client.email}`, response)
+            // console.log(`broadcasting to ${client.client.email}`, response)
             client.ops.push(client.client.send(response).catch((e) => {
               client.errors.push(e)
             }))
           } else {
-            console.log('notify self about completeness without response')
+            // console.log('notify self about completeness without response')
             client.ops.push(client.client.send({
               id: response.id,
               error: response.error

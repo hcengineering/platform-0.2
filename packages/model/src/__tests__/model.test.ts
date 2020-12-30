@@ -15,11 +15,7 @@
 
 /* eslint-env jest */
 
-import { Ref, Doc, Property, Emb, Class, Obj } from '@anticrm/core'
-import { Model } from '../model'
-
-import { Class$, Prop, ArrayOf$, Builder, InstanceOf$, Primary } from '@anticrm/model'
-import { AnyLayout, StringProperty } from '../core'
+import { Ref, Doc, Property, Emb, Class, Obj, AnyLayout, StringProperty, Class$, Prop, ArrayOf$, Builder, InstanceOf$, Primary, Model } from '..'
 
 interface SubTask extends Emb {
   name: string

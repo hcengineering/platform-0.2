@@ -13,7 +13,8 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Class, CoreProtocol, Doc, Storage, Ref, TxContext, StringProperty } from '@anticrm/core'
+import { CoreProtocol } from '@anticrm/core'
+import { AnyLayout, Class, Doc, Storage, Ref, TxContext, StringProperty } from '@anticrm/model'
 
 export class Cache implements Storage {
   async store (tx: TxContext, doc: Doc): Promise<void> {  // eslint-disable-line

@@ -2,23 +2,18 @@
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
 
   import ui from '@anticrm/platform-ui'
-  import { Class, Ref, VDoc } from '@anticrm/core'
+  import { Class, Ref } from '@anticrm/model'
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
 
   import { createEventDispatcher, onMount } from 'svelte'
 
-  import {
-    CompletionItem,
-    Position,
-    getFirst,
-    calcOffset
-  } from './CompletionPopupHelper'
+  import { CompletionItem, Position, getFirst, calcOffset } from './CompletionPopupHelper'
 
   const dispatch = createEventDispatcher()
 
   export let items: CompletionItem[] = []
   export let pos: Position
-  export let ontop:boolean = false
+  export let ontop: boolean = false
 
   let listElement: HTMLElement
   let selElement: HTMLElement
@@ -34,7 +29,7 @@
   }
 
   $: {
-		popupStyle = `
+    popupStyle = `
 			left: ${pos.left}px;
 			top: ${pos.top - (ontop ? clientHeight : 0)}px;
       margin-bottom:-${clientHeight + 2}px;
@@ -69,36 +64,6 @@
   }
 </script>
 
-<div
-  class="presentation-completion-popup"
-  style="{popupStyle}"
-  bind:clientHeight
-  bind:clientWidth
-	on:blur
->
-  <ScrollView stylez="height:100%;width: 100%;" scrollPosition="{selOffset}">
-    <div bind:this="{listElement}">
-      {#each items as item (item.key)}
-        <div
-          class="item"
-          class:selected="{item.key == selection.key}"
-          on:click|preventDefault="{() => selectItem(item)}"
-          on:mouseover={() => selection = item}
-        >
-          {#if item.key == selection.key}
-            <div
-              class="focus-placeholder"
-              bind:this="{selElement}"
-              style="width:0px"
-            ></div>
-          {/if}
-          {item.title || item.label}
-        </div>
-      {/each}
-    </div>
-  </ScrollView>
-</div>
-
 <style lang="scss">
   .presentation-completion-popup {
     display: flex;
@@ -131,3 +96,22 @@
     }
   }
 </style>
+
+<div class="presentation-completion-popup" style={popupStyle} bind:clientHeight bind:clientWidth on:blur>
+  <ScrollView stylez="height:100%;width: 100%;" scrollPosition={selOffset}>
+    <div bind:this={listElement}>
+      {#each items as item (item.key)}
+        <div
+          class="item"
+          class:selected={item.key == selection.key}
+          on:click|preventDefault={() => selectItem(item)}
+          on:mouseover={() => (selection = item)}>
+          {#if item.key == selection.key}
+            <div class="focus-placeholder" bind:this={selElement} style="width:0px" />
+          {/if}
+          {item.title || item.label}
+        </div>
+      {/each}
+    </div>
+  </ScrollView>
+</div>

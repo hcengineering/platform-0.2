@@ -13,27 +13,15 @@
 // limitations under the License.
 //
 
-import { plugin, Plugin, Service, Metadata } from '@anticrm/platform'
+import { plugin, Plugin, Service } from '@anticrm/platform'
 import { Asset, AnyComponent } from '@anticrm/platform-ui'
-import {
-  DateProperty,
-  StringProperty,
-  Emb,
-  Class,
-  Ref,
-  VDoc,
-  Mixin,
-  MessageNode,
-} from '@anticrm/core'
+import { VDoc, MessageNode } from '@anticrm/core'
+import { DateProperty, StringProperty, Emb, Class, Ref, Mixin, Doc } from '@anticrm/model'
+
 import core from '@anticrm/platform-core'
 import { ComponentExtension } from '@anticrm/presentation'
 
 // P E R S I S T E N C E  M O D E L
-
-export interface Collab extends VDoc {
-  comments?: Comment[]
-}
-
 export interface Comment extends Emb {
   _createdOn: DateProperty
   _createdBy: StringProperty
@@ -41,7 +29,11 @@ export interface Comment extends Emb {
   message: string
 }
 
-export interface Message extends Collab {}
+export interface Collab extends VDoc {
+  comments?: Comment[]
+}
+
+export interface Message extends Collab { }
 
 export interface Page extends Collab {
   title: string
@@ -50,7 +42,7 @@ export interface Page extends Collab {
 // P L U G I N
 
 export interface ChunterService extends Service {
-  createMissedObjects(doc: MessageNode): string
+  createMissedObjects (doc: MessageNode): string
 }
 
 export default plugin(

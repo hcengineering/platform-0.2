@@ -13,8 +13,8 @@
 // limitations under the License.
 //
 
-import { Doc, StringProperty, Ref, Class, Tx, TxContext, Index, Storage, AnyLayout } from './core'
-import { Model, MODEL_DOMAIN } from './model'
+import { Doc, StringProperty, Ref, Class, Tx, TxContext, Index, Storage, AnyLayout, Model, MODEL_DOMAIN } from '@anticrm/model'
+import core from '.'
 
 export const TX_DOMAIN = 'tx'
 
@@ -40,11 +40,6 @@ export interface DeleteTx extends Tx {
   _objectClass: Ref<Class<Doc>>
 }
 
-export const CORE_CLASS_CREATETX = 'class:core.CreateTx' as Ref<Class<CreateTx>>
-export const CORE_CLASS_PUSHTX = 'class:core.PushTx' as Ref<Class<PushTx>>
-export const CORE_CLASS_UPDATETX = 'class:core.UpdateTx' as Ref<Class<UpdateTx>>
-export const CORE_CLASS_DELETETX = 'class:core.DeleteTx' as Ref<Class<DeleteTx>>
-
 export class TxIndex implements Index {
   private storage: Storage
 
@@ -57,33 +52,54 @@ export class TxIndex implements Index {
   }
 }
 
+/**
+ * Perform model update and forward updates into chained storage if required.
+ */
 export class ModelIndex implements Index {
-  private storage: Storage
+  private storages: Storage[]
   private model: Model
 
-  constructor (model: Model, storage: Storage) {
+  constructor (model: Model, storages: Storage[]) {
     this.model = model
-    this.storage = storage
+    this.storages = storages
   }
 
   async tx (ctx: TxContext, tx: Tx): Promise<any> {
     switch (tx._class) {
-      case CORE_CLASS_CREATETX: {
+      case core.class.CreateTx: {
         const createTx = tx as CreateTx
         if (this.model.getDomain(createTx._objectClass) !== MODEL_DOMAIN) {
           return
         } else {
-          return this.storage.store(ctx, this.model.newDoc(createTx._objectClass, createTx._objectId, createTx.object))
+          const newDoc = this.model.newDoc(createTx._objectClass, createTx._objectId, createTx.object)
+          return Promise.all(this.storages.map((s) => s.store(ctx, newDoc)))
         }
       }
-      case CORE_CLASS_UPDATETX: {
+      case core.class.UpdateTx: {
         const updateTx = tx as UpdateTx
         if (this.model.getDomain(updateTx._objectClass) !== MODEL_DOMAIN) {
           return
         } else {
-          return this.storage.update(ctx, updateTx._objectClass, updateTx._objectId, updateTx._attributes)
+          return Promise.all(this.storages.map((s) => s.update(ctx, updateTx._objectClass, updateTx._objectId, updateTx._attributes)))
         }
       }
+      case core.class.PushTx: {
+        const pushTx = tx as PushTx
+        if (this.model.getDomain(pushTx._objectClass) !== MODEL_DOMAIN) {
+          return
+        } else {
+          return Promise.all(this.storages.map((s) => s.push(ctx, pushTx._objectClass, pushTx._objectId, pushTx._attribute, pushTx._attributes)))
+        }
+      }
+      case core.class.DeleteTx: {
+        const deleteTx = tx as DeleteTx
+        if (this.model.getDomain(deleteTx._objectClass) !== MODEL_DOMAIN) {
+          return
+        } else {
+          return Promise.all(this.storages.map((s) => s.remove(ctx, deleteTx._objectClass, deleteTx._objectId)))
+        }
+      }
+
       default:
         console.log('not implemented model tx', tx)
     }

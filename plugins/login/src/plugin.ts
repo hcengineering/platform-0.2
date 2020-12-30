@@ -28,7 +28,6 @@ import LoginForm from './components/LoginForm.svelte'
  * Licensed under the Eclipse Public License, Version 2.0
  */
 export default async (platform: Platform, deps: { ui: UIService }): Promise<LoginService> => {
-
   const uiService = deps.ui
 
   platform.setResource(login.component.LoginForm, LoginForm)
@@ -42,42 +41,42 @@ export default async (platform: Platform, deps: { ui: UIService }): Promise<Logi
   }
 
   async function doLogin (username: string, password: string, workspace: string): Promise<Status> {
-    const url = platform.getMetadata(login.metadata.LoginUrl);
+    const url = platform.getMetadata(login.metadata.LoginUrl)
     if (!url) {
-      return new Status(Severity.ERROR, 0, "no login server metadata provided.");
+      return new Status(Severity.ERROR, 0, 'no login server metadata provided.')
     }
 
     const request: Request<[string, string, string]> = {
-      method: "login",
-      params: [username, password, workspace],
-    };
+      method: 'login',
+      params: [username, password, workspace]
+    }
 
     try {
       const response = await fetch(url, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json;charset=utf-8",
+          'Content-Type': 'application/json;charset=utf-8',
         },
-        body: serialize(request),
-      });
-      const result = (await response.json()) as Response<any>;
+        body: serialize(request)
+      })
+      const result = (await response.json()) as Response<any>
       if (result.error?.message) {
         return toStatus(result)
       }
       if (result.result) {
-        console.log("result", result.result);
-        setLoginInfo(result.result);
+        console.log('result', result.result)
+        setLoginInfo(result.result)
         uiService.navigate(
-          "/component:workbench.Workbench/application:workbench.Default"
-        );
+          '/component:workbench.Workbench/application:workbench.Default'
+        )
       }
       return new Status(Severity.OK, 0, '')
     } catch (err) {
-      return new Status(Severity.ERROR, 0, "Не могу соедениться с сервером.");
+      return new Status(Severity.ERROR, 0, 'Не могу соедениться с сервером.')
     }
   }
 
   return {
-    doLogin,
+    doLogin
   }
 }

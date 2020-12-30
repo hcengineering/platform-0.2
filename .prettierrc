@@ -1,0 +1,12 @@
+{
+  semi: false,
+  singleQuote: true,
+  spaceBeforeFunctionParen: true,
+  trailingComma: "none",
+  parenSpacing: true,
+  printWidth: 120,
+  tabWidth: 2,
+  useTabs: false,
+  quoteProps: "as-needed",
+  bracketSpacing: true
+}

@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 -->
-
 <script lang="ts">
-  import { Ref, Class, Doc, generateId, Space, VDoc, Classifier, Obj, mixinKey, CORE_MIXIN_INDICES } from '@anticrm/core'
+  import { Ref, Class, Doc, Space, VDoc } from '@anticrm/core'
   import core from '@anticrm/platform-core'
   import { createEventDispatcher } from 'svelte'
   import { AnyComponent } from '@anticrm/platform-ui'
@@ -31,8 +30,6 @@
   let object = {} as any
 
   let component: AnyComponent
-  $: getComponentExtension(_class, presentation.class.DetailForm).then(ext => { component = ext })
-
   const coreService = _getCoreService()
   const dispatch = createEventDispatcher()
 
@@ -40,68 +37,31 @@
     const doc = { _class, _space: space, ...object }
     object = {}
     // absent VDoc fields will be autofilled
-    coreService.createVDoc(doc as unknown as VDoc)
+    coreService.createVDoc((doc as unknown) as VDoc)
     dispatch('close')
   }
 
   let model: ClassModel | undefined
   let primary: AttrModel | undefined
 
-  const primaryKey = mixinKey(CORE_MIXIN_INDICES, 'primary')
-
-  function getPrimary (_class: Ref<Classifier<Doc>>): string | null {
-    // TODO: temporary code
-    let cls = _class as Ref<Class<Obj>> | undefined
-    while (cls) {
-      const clazz = coreService.getModel().get(cls) as Classifier<VDoc>
-      const primary = (clazz as any)[primaryKey]
-      if (primary) {
-        console.log(`primary code for class ${_class}: ${primary}`)
-        return primary
-      }
-      cls = clazz._extends
-    }
-    return null
-  }
-
   const presentationService = _getPresentationService()
   console.log('presentationService', presentationService)
 
   $: {
-    presentationService.getClassModel (_class, core.class.VDoc).then(m => { 
-      const primaryKey = getPrimary(_class)
-      if (primaryKey) {
-        primary = m.getAttribute(primaryKey)
-        model = m.filterAttributes([primaryKey]) 
-      } else {
-        primary = undefined
-        model = m
-      }
+    getComponentExtension(_class, presentation.class.DetailForm).then((ext) => {
+      console.log("DETAIL_FORM:", ext)
+      component = ext
     })
-  }    
 
+    presentationService.getClassModel(_class, core.class.VDoc).then((m) => {
+      const mp = m.filterPrimary()
+      model = mp.model
+      primary = mp.primary
+    })
+  }
 </script>
 
-<div class="recruiting-view">
-  <div class="header">
-    <div class="caption-4">{title} : {space}</div>
-    <div class="actions">
-      <button class="button" on:click={ () => { dispatch('close') } }>Cancel</button>
-      <button class="button" on:click={save}>Save</button>
-    </div>
-  </div>
-
-  <div class="content">
-    { #if primary }
-      <div class="caption-1"><AttributeEditor attribute={primary} bind:value={object[primary.key]} /></div>
-    { /if }
-    { #if model }
-      <Properties {model} bind:object={object}/>
-    { /if }
-  </div>
-</div>
-
-<style lang="scss">  
+<style lang="scss">
   .recruiting-view {
     margin: 1em;
   }
@@ -140,3 +100,28 @@
     }
   }
 </style>
+
+<div class="recruiting-view">
+  <div class="header">
+    <div class="caption-4">{title} : {space}</div>
+    <div class="actions">
+      <button
+        class="button"
+        on:click={() => {
+          dispatch('close')
+        }}>Cancel</button>
+      <button class="button" on:click={save}>Save</button>
+    </div>
+  </div>
+
+  <div class="content">
+    {#if primary}
+      <div class="caption-1">
+        <AttributeEditor attribute={primary} bind:value={object[primary.key]} />
+      </div>
+    {/if}
+    {#if model}
+      <Properties {model} bind:object />
+    {/if}
+  </div>
+</div>
