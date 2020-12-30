@@ -13,8 +13,8 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { Ref, Class, Doc, Space, VDoc } from '@anticrm/core'
-  import core from '@anticrm/platform-core'
+  import { Ref, Class, Doc } from '@anticrm/model'
+  import core, { Space, VDoc } from '@anticrm/core'
   import { createEventDispatcher } from 'svelte'
   import { AnyComponent } from '@anticrm/platform-ui'
   import presentation from '@anticrm/presentation'
@@ -49,7 +49,7 @@
 
   $: {
     getComponentExtension(_class, presentation.class.DetailForm).then((ext) => {
-      console.log("DETAIL_FORM:", ext)
+      console.log('DETAIL_FORM:', ext)
       component = ext
     })
 
