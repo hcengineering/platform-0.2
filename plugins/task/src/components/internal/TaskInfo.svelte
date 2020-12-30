@@ -12,19 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 -->
-
 <script lang="ts">
-  import { Tx, CreateTx } from '@anticrm/core'
-  import core from '@anticrm/platform-core'
+  import { Tx } from '@anticrm/model'
+  import { CreateTx } from '@anticrm/core'
+  import core from '@anticrm/core'
   import { Task } from '../..'
 
   export let tx: Tx
 
   function taskTitle() {
-    return ((tx as CreateTx).object as Task).title
+    return (((tx as CreateTx).object as unknown) as Task).title
   }
 </script>
 
-{ #if tx._class === core.class.CreateTx }
-  Создал задачу <b>{ taskTitle() }</b>
-{ /if }
+{#if tx._class === core.class.CreateTx}Создал задачу <b>{taskTitle()}</b>{/if}
