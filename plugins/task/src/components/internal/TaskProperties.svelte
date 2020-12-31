@@ -12,9 +12,10 @@
   // See the License for the specific language governing permissions and
   // limitations under the License.
   import { onDestroy } from 'svelte'
-  import { Ref, Class, Obj, Backlinks } from '@anticrm/core'
+  import { Ref, Class, Obj } from '@anticrm/model'
+  import { Backlinks } from '@anticrm/core'
   import task, { Task } from '../..'
-  import core from '@anticrm/platform-core'
+  import core from '@anticrm/core'
   import { getPresentationService, find, query } from '../../utils'
   import { AttrModel, ClassModel } from '@anticrm/presentation'
 
@@ -54,12 +55,12 @@
   <div>
     <!-- <StringPresenter class="caption-1" :attribute="name" v-model="object[name.key]" /> -->
     <div class="caption-1">
-      <AttributeEditor attribute="{title}" bind:value="{object.title}" />
+      <AttributeEditor attribute={title} bind:value={object.title} />
     </div>
   </div>
 
   <!-- <Properties _class={task.class.Task} excludeAttributes={['title']} /> -->
-  <Properties model="{model}" bind:object />
+  <Properties {model} bind:object />
 
   <div class="caption-2">Backlinks</div>
 

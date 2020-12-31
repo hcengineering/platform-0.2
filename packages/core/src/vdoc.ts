@@ -13,9 +13,9 @@
 // limitations under the License.
 //
 
-import { Class, DateProperty, Doc, Emb, Index, Ref, Storage, StringProperty, Tx, TxContext } from './core'
-import { Model } from './model'
-import { CORE_CLASS_CREATETX, CORE_CLASS_PUSHTX, CORE_CLASS_UPDATETX, CreateTx, PushTx, UpdateTx } from './tx'
+import { DateProperty, Doc, Emb, Index, Ref, Storage, StringProperty, Tx, TxContext, Model } from '@anticrm/model'
+import { CreateTx, PushTx, UpdateTx } from './tx'
+import core from '.'
 
 export interface Application extends Doc { }
 
@@ -38,6 +38,7 @@ export interface Space extends Doc {
 
   users: SpaceUser[] // A list of included user accounts
   isPublic: boolean // If specified, a users are interpreted as include list, if not, as exclude list.
+  autoJoin: boolean // If specified, any new user will join proposed space.
 }
 
 export interface VDoc extends Doc {
@@ -47,8 +48,6 @@ export interface VDoc extends Doc {
   _modifiedOn?: DateProperty
   _modifiedBy?: StringProperty
 }
-
-export const CORE_CLASS_VDOC = 'class:core.VDoc' as Ref<Class<VDoc>>
 
 export class VDocIndex implements Index {
   private modelDb: Model
@@ -61,11 +60,11 @@ export class VDocIndex implements Index {
 
   async tx (ctx: TxContext, tx: Tx): Promise<any> {
     switch (tx._class) {
-      case CORE_CLASS_CREATETX:
+      case core.class.CreateTx:
         return this.onCreate(ctx, tx as CreateTx)
-      case CORE_CLASS_UPDATETX:
+      case core.class.UpdateTx:
         return this.onUpdate(ctx, tx as UpdateTx)
-      case CORE_CLASS_PUSHTX:
+      case core.class.PushTx:
         return this.onPush(ctx, tx as PushTx)
       default:
         console.log('not implemented title tx', tx)
@@ -73,31 +72,7 @@ export class VDocIndex implements Index {
   }
 
   async onCreate (ctx: TxContext, create: CreateTx): Promise<any> {
-    if (!this.modelDb.is(create._objectClass, CORE_CLASS_VDOC)) return
-
-    // const doc: VDoc = {
-    //   _space: create._space,
-    //   _class: create._objectClass,
-    //   _id: create._objectId,
-    //   _createdBy: create._user,
-    //   _createdOn: create._date,
-    //   ...create._attributes
-    // }
-    // let _class = create._objectClass
-    // while (true) {
-    //   const clazz = this.modelDb.get(_class) as Class<Obj>
-    //   if (clazz._kind === ClassifierKind.MIXIN) {
-    //     if (doc._mixins) {
-    //       doc._mixins.push(_class as Ref<Mixin<Doc>>)
-    //     } else {
-    //       doc._mixins = [_class as Ref<Mixin<Doc>>]
-    //     }
-    //     _class = clazz._extends as Ref<Class<VDoc>>
-    //   } else {
-    //     doc._class = _class
-    //     break
-    //   }
-    // }
+    if (!this.modelDb.is(create._objectClass, core.class.VDoc)) return
     return this.storage.store(ctx, this.modelDb.newDoc(create._objectClass, create._objectId, create.object))
   }
 

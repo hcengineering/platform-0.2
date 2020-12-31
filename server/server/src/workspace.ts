@@ -13,26 +13,8 @@
 // limitations under the License.
 //
 
-import {
-  AnyLayout,
-  Class,
-  CoreProtocol,
-  Doc,
-  Model,
-  ModelIndex,
-  MODEL_DOMAIN,
-  Ref,
-  Storage,
-  TextIndex,
-  TitleIndex,
-  Tx,
-  txContext,
-  TxContext,
-  TxContextSource,
-  TxIndex,
-  TxProcessor,
-  VDocIndex
-} from '@anticrm/core'
+import { AnyLayout, Class, Doc, Model, MODEL_DOMAIN, Ref, Storage, Tx, txContext, TxContext, TxContextSource } from '@anticrm/model'
+import { CoreProtocol, ModelIndex, TextIndex, TitleIndex, TxIndex, TxProcessor, VDocIndex } from '@anticrm/core'
 import { Collection, MongoClient } from 'mongodb'
 import { withTenant } from '@anticrm/accounts'
 
@@ -60,7 +42,6 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
   const mongoStorage: Storage = {
     async store (ctx: TxContext, doc: Doc): Promise<any> {
       const c = collection(doc._class)
-      console.log('STORE:', c.namespace, doc)
       return c.insertOne(doc)
     },
 
@@ -103,7 +84,7 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
     new VDocIndex(memdb, mongoStorage),
     new TitleIndex(memdb, mongoStorage),
     new TextIndex(memdb, mongoStorage),
-    new ModelIndex(memdb, mongoStorage)
+    new ModelIndex(memdb, [memdb, mongoStorage])
   ])
 
   const clientControl = {
@@ -114,7 +95,6 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
         ...memdb.assign({}, _class, query),
         _class: memdb.getClass(_class)
       }
-      console.log('MONGO FIND', finalQuery)
       return collection(_class)
         .find(finalQuery)
         .toArray()

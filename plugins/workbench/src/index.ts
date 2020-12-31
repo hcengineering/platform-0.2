@@ -13,12 +13,13 @@
 // limitations under the License.
 //
 
-import { Metadata, plugin, Plugin, Resource, Service } from '@anticrm/platform'
-import { StringProperty, Doc, Class, Ref, VDoc, Application } from '@anticrm/core'
+import { plugin, Plugin, Service } from '@anticrm/platform'
+import { Doc, Class, Ref } from '@anticrm/model'
 
 import core from '@anticrm/platform-core'
 import ui, { AnyComponent, Asset } from '@anticrm/platform-ui'
 import { IntlString } from '@anticrm/platform-i18n'
+import { Application, VDoc } from '@anticrm/core'
 
 export interface Perspective extends Doc {
   label: IntlString

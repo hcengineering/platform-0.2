@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 -->
-
 <script lang="ts">
-  import { Tx, CreateTx } from '@anticrm/core'
-  import core from '@anticrm/platform-core'
+  import core, { CreateTx } from '@anticrm/core'
+  import { Tx } from '@anticrm/model'
   import { Page } from '../..'
 
   export let tx: Tx
@@ -25,6 +24,4 @@
   }
 </script>
 
-{ #if tx._class === core.class.CreateTx }
-  Создал страницу <b>{ pageTitle() }</b>
-{ /if }
+{#if tx._class === core.class.CreateTx}Создал страницу <b>{pageTitle()}</b>{/if}

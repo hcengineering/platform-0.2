@@ -11,12 +11,13 @@
   //
   // See the License for the specific language governing permissions and
   // limitations under the License.
-  import { Ref, parseMessage } from '@anticrm/core'
+  import { parseMessage } from '@anticrm/core'
   import { Asset } from '@anticrm/platform-ui'
   import { User } from '@anticrm/contact'
   import { getContactService } from '../../utils'
   import { Comment } from '../..'
   import MessageViewer from '@anticrm/presentation/src/components/MessageViewer.svelte'
+  import { Ref } from '@anticrm/model'
 
   export let message: Comment
 
@@ -31,15 +32,6 @@
     })
   })
 </script>
-
-<div class="chat-message-item">
-  <img class="avatar" src="{avatar}" alt="avatar" />
-  <div class="details">
-    <b>{username}</b>
-    {timestamp}
-    <MessageViewer message={parseMessage(message.message)} />
-  </div>
-</div>
 
 <style lang="scss">
   .chat-message-item {
@@ -58,3 +50,12 @@
     }
   }
 </style>
+
+<div class="chat-message-item">
+  <img class="avatar" src={avatar} alt="avatar" />
+  <div class="details">
+    <b>{username}</b>
+    {timestamp}
+    <MessageViewer message={parseMessage(message.message)} />
+  </div>
+</div>

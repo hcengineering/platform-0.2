@@ -5,6 +5,8 @@
     "module": "esnext",
     "target": "es6",
     "allowJs": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
   }
 }

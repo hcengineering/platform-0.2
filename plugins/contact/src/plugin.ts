@@ -13,8 +13,8 @@
 // limitations under the License.
 //
 
-import { Platform, Service } from '@anticrm/platform'
-import { StringProperty, Ref } from '@anticrm/core'
+import { Platform } from '@anticrm/platform'
+import { StringProperty, Ref } from '@anticrm/model'
 import contact, { User, ContactService } from '.'
 
 // import PersonProperties from './components/PersonProperties.vue'
@@ -32,7 +32,6 @@ import login from '@anticrm/login'
  * Licensed under the Eclipse Public License, Version 2.0
  */
 export default async (platform: Platform, deps: { core: CoreService, ui: UIService }): Promise<ContactService> => {
-
   // platform.setResource(contact.component.PersonProperties, PersonProperties)
   // platform.setResource(contact.component.UserLookup, UserLookup)
   // platform.setResource(contact.component.LoginWidget, LoginWidget)
@@ -48,7 +47,7 @@ export default async (platform: Platform, deps: { core: CoreService, ui: UIServi
   async function getMyName (): Promise<string> {
     const whoAmI = platform.getMetadata(login.metadata.WhoAmI)
     if (!whoAmI) {
-      return "Nobody"
+      return 'Nobody'
     }
     return getUser(whoAmI).then(user => user?.name)
   }
@@ -69,5 +68,4 @@ export default async (platform: Platform, deps: { core: CoreService, ui: UIServi
   //   .provide(ContactServiceInjectionKey, service)
 
   return service
-
 }

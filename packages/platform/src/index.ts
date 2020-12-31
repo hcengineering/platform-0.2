@@ -13,6 +13,8 @@
 // limitations under the License.
 //
 
+import { mergeWith } from 'lodash'
+
 /**
  * Platform Resource Identifier.
  *
@@ -340,19 +342,6 @@ export function createPlatform (): Platform {
     return result
   }
 
-  /*function getPluginInfos (): PluginInfo[] {
-    return locations.map(location => {
-      const id = location[0].id
-      const plugin = plugins.get(id)
-      const info: PluginInfo = {
-        id,
-        version: '0.1.0',
-        status: plugin ? PluginStatus.RUNNING : PluginStatus.STOPPED
-      }
-      return info
-    })
-  }*/
-
   const platform = {
     getMetadata,
     setMetadata,
@@ -382,6 +371,7 @@ export function createPlatform (): Platform {
 type Namespace = Record<string, Record<string, any>>
 
 function transform<N extends Namespace> (plugin: AnyPlugin, namespaces: N, f: (id: string, value: any) => any): N {
+  console.log('transform')
   const result = {} as Namespace
   for (const namespace in namespaces) {
     const extensions = namespaces[namespace]
@@ -396,6 +386,14 @@ function transform<N extends Namespace> (plugin: AnyPlugin, namespaces: N, f: (i
 
 export function identify<N extends Namespace> (pluginId: AnyPlugin, namespace: N): N {
   return transform(pluginId, namespace, (id: string, value) => value === '' ? id : value)
+}
+
+export function mergeIds<D extends Namespace, N extends Namespace> (pluginId: AnyPlugin, a: D, b: N): D & N {
+  return mergeWith({}, a, identify(pluginId, b), (value) => {
+    if (typeof value === 'string') {
+      throw new Error('attempting to overwrite ' + value)
+    }
+  })
 }
 
 export function plugin<P extends Service, D extends PluginDependencies, N extends Namespace> (id: Plugin<P>, deps: D, namespace: N): PluginDescriptor<P, D> & N {

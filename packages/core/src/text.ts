@@ -1,4 +1,3 @@
-import { AnyLayout } from '@anticrm/core'
 //
 // Copyright © 2020 Anticrm Platform Contributors.
 //
@@ -14,34 +13,13 @@ import { AnyLayout } from '@anticrm/core'
 // limitations under the License.
 //
 
-import {
-  Ref,
-  Class,
-  Doc,
-  Type,
-  Obj,
-  Index,
-  Storage,
-  Tx,
-  CORE_CLASS_ARRAY,
-  TxContext,
-  ArrayOf,
-  CORE_CLASS_INSTANCEOF,
-  InstanceOf,
-  Emb
-} from './core'
-import { CreateTx, CORE_CLASS_CREATETX } from './tx'
-import { Model } from './model'
+import { Ref, Class, Doc, Obj, Index, Storage, Tx, TxContext, ArrayOf, InstanceOf, Emb, AnyLayout } from '@anticrm/model'
+import core from '.'
+import { CreateTx } from './tx'
+import { Model } from '@anticrm/model/src/model'
 import { generateId } from './objectid'
 
-import {
-  MessageMarkType,
-  MessageNode,
-  parseMessage,
-  ReferenceMark,
-  traverseMarks,
-  traverseMessage
-} from './textmodel'
+import { MessageMarkType, MessageNode, parseMessage, ReferenceMark, traverseMarks, traverseMessage } from './textmodel'
 
 export interface Backlink {
   _backlinkClass: Ref<Class<Doc>>
@@ -55,12 +33,6 @@ export interface Backlinks extends Doc {
   backlinks: Backlink[]
 }
 
-export interface Text extends Type { }
-
-export const CORE_CLASS_BACKLINKS = 'class:core.Backlinks' as Ref<
-  Class<Backlinks>
->
-export const CORE_CLASS_TEXT = 'class:core.Text' as Ref<Class<Text>>
 export const BACKLINKS_DOMAIN = 'backlinks'
 
 type ClassKey = { key: string, _class: Ref<Class<Emb>> }
@@ -84,7 +56,7 @@ export class TextIndex implements Index {
 
     const keys = this.modelDb
       .getAllAttributes(_class)
-      .filter((attr) => attr[1].type._class === CORE_CLASS_TEXT)
+      .filter((attr) => attr[1].type._class === core.class.String)
       .map((attr) => attr[0])
     this.textAttributes.set(_class, keys)
     return keys
@@ -96,7 +68,7 @@ export class TextIndex implements Index {
 
     const keys = this.modelDb
       .getAllAttributes(_class)
-      .filter((attr) => attr[1].type._class === CORE_CLASS_ARRAY && (attr[1].type as ArrayOf).of._class === CORE_CLASS_INSTANCEOF)
+      .filter((attr) => attr[1].type._class === core.class.ArrayOf && (attr[1].type as ArrayOf).of._class === core.class.InstanceOf)
       .map((attr) => { return { key: attr[0], _class: ((attr[1].type as ArrayOf).of as InstanceOf<Emb>).of } as ClassKey })
     this.arrayAttributes.set(_class, keys)
     return keys
@@ -134,7 +106,7 @@ export class TextIndex implements Index {
 
   async tx (ctx: TxContext, tx: Tx): Promise<any> {
     switch (tx._class) {
-      case CORE_CLASS_CREATETX:
+      case core.class.CreateTx:
         return this.onCreate(ctx, tx as CreateTx)
       default:
         console.log('not implemented text tx', tx)
@@ -156,7 +128,7 @@ export class TextIndex implements Index {
       return
     }
     const doc: Backlinks = {
-      _class: CORE_CLASS_BACKLINKS,
+      _class: core.class.Backlinks,
       _id: generateId() as Ref<Backlinks>,
       _objectClass: create._objectClass,
       _objectId: create._objectId,

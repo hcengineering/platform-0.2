@@ -15,7 +15,7 @@
 
 import { MongoClient } from 'mongodb'
 import { Model, Strings } from './boot'
-import { Doc } from '@anticrm/core'
+import { Doc } from '@anticrm/model'
 
 const modelJson = JSON.stringify(Model, null, 2)
 console.log(modelJson)

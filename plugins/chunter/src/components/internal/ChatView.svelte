@@ -11,8 +11,9 @@
   //
   // See the License for the specific language governing permissions and
   // limitations under the License.
-  import { MessageNode, Property, Ref, Space, VDoc } from '@anticrm/core'
-  import core from '@anticrm/platform-core'
+  import { Property, Ref } from '@anticrm/model'
+  import { MessageNode, Space, VDoc } from '@anticrm/core'
+  import core from '@anticrm/core'
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
   import { onDestroy } from 'svelte'
@@ -38,7 +39,9 @@
     })
 
     // TODO: use Titles index instead of getting the whole Space object
-    coreService.then((service) => service.findOne(core.class.Space, { _id: space })).then((spaceObj) => (spaceName = spaceObj ? '#' + spaceObj.name : ''))
+    coreService
+      .then((service) => service.findOne(core.class.Space, { _id: space }))
+      .then((spaceObj) => (spaceName = spaceObj ? '#' + spaceObj.name : ''))
   }
 
   onDestroy(() => {
@@ -69,22 +72,6 @@
   }
 </script>
 
-<div class="chat">
-  <div><span class="caption-1">Чат {spaceName}</span>&nbsp;</div>
-  <ScrollView stylez="height:100%;" autoscroll="{true}">
-    <div class="content">
-      {#each messages as message (message._id)}
-        {#if message.comments}
-          <CommentComponent message="{message.comments[0]}" />
-        {/if}
-      {/each}
-    </div>
-  </ScrollView>
-  <div>
-    <ReferenceInput on:message="{(e) => createMessage(e.detail)}" />
-  </div>
-</div>
-
 <style lang="scss">
   .chat {
     height: 100%;
@@ -96,3 +83,19 @@
     }
   }
 </style>
+
+<div class="chat">
+  <div><span class="caption-1">Чат {spaceName}</span>&nbsp;</div>
+  <ScrollView stylez="height:100%;" autoscroll={true}>
+    <div class="content">
+      {#each messages as message (message._id)}
+        {#if message.comments}
+          <CommentComponent message={message.comments[0]} />
+        {/if}
+      {/each}
+    </div>
+  </ScrollView>
+  <div>
+    <ReferenceInput on:message={(e) => createMessage(e.detail)} />
+  </div>
+</div>

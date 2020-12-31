@@ -19,21 +19,10 @@ import {
   Class,
   Doc,
   AnyLayout,
-  Obj,
-  Emb,
-  CreateTx,
-  PushTx,
-  UpdateTx,
-  DeleteTx,
-  Space,
-  Title,
-  CORE_CLASS_BACKLINKS,
-  VDoc,
-  CoreProtocol,
-  SpaceUser
-} from '@anticrm/core'
-
-import type { ModelDb } from './modeldb'
+  Emb
+} from '@anticrm/model'
+import { CoreProtocol, VDoc } from '@anticrm/core'
+import { ModelDb } from './modeldb'
 
 export type Subscriber<T> = (value: T[]) => void
 export type Unsubscriber = () => void
@@ -49,6 +38,7 @@ export interface CoreService extends Service, CoreProtocol {
   createVDoc<T extends VDoc> (vdoc: T): Promise<void>
   push (vdoc: VDoc, attribute: string, element: Emb): Promise<void>
   generateId (): Ref<Doc>
+  getUserId (): string
 }
 
 export default plugin(
@@ -61,18 +51,6 @@ export default plugin(
       WSHost: '' as Metadata<string>,
       WSPort: '' as Metadata<string>,
       Token: '' as Metadata<string>
-    },
-    class: {
-      Class: '' as Ref<Class<Class<Obj>>>,
-      CreateTx: '' as Ref<Class<CreateTx>>,
-      PushTx: '' as Ref<Class<PushTx>>,
-      UpdateTx: '' as Ref<Class<UpdateTx>>,
-      DeleteTx: '' as Ref<Class<DeleteTx>>,
-      Space: '' as Ref<Class<Space>>,
-      SpaceUser: '' as Ref<Class<SpaceUser>>,
-      Title: '' as Ref<Class<Title>>,
-      Backlinks: CORE_CLASS_BACKLINKS,
-      VDoc: '' as Ref<Class<VDoc>>
     }
   }
 )

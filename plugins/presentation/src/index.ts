@@ -1,36 +1,43 @@
 //
 // Copyright © 2020 Anticrm Platform Contributors.
-// 
+//
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
 // obtain a copy of the License at https://www.eclipse.org/legal/epl-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// 
+//
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
 
 import { Plugin, plugin, Service } from '@anticrm/platform'
-import { Attribute, Class, Mixin, Obj, Doc, Ref, Type, VDoc } from '@anticrm/core'
+import { Class, Mixin, Obj, Doc, Ref, Type, Emb } from '@anticrm/model'
 
 import core from '@anticrm/platform-core'
 import i18n, { IntlString } from '@anticrm/platform-i18n'
 import { AnyComponent, Asset } from '@anticrm/platform-ui'
+import { VDoc } from '@anticrm/core'
 
 // U I  E X T E N S I O N S
 
-export interface AttributeUI extends Attribute {
+/**
+ * Define attribute UI extra properties.
+ */
+export interface UXAttribute extends Emb {
   label: IntlString
   icon?: Asset
   placeholder?: IntlString
+  visible: boolean
 }
 
-export interface UXObject extends Doc {
+export interface UXObject<T extends Obj> extends Mixin<T> {
   label: IntlString
   icon?: Asset
+
+  attributes: Record<string, UXAttribute>
 }
 
 // export interface ClassUI<T extends Obj> extends Class<T> {
@@ -38,7 +45,7 @@ export interface UXObject extends Doc {
 //   icon?: Asset
 // }
 
-export interface Presenter<T extends Type> extends Class<T> {
+export interface Presenter<T extends Type> extends Mixin<T> {
   presenter: AnyComponent
 }
 
@@ -50,7 +57,7 @@ export interface Presenter<T extends Type> extends Class<T> {
 //   form: AnyComponent
 // }
 
-export interface ComponentExtension<T extends VDoc> extends Class<T> {
+export interface ComponentExtension<T extends VDoc> extends Mixin<T> {
   component: AnyComponent
 }
 
@@ -67,6 +74,7 @@ export interface AttrModel extends UIModel {
   presenter: AnyComponent
   placeholder: string
   type: Type
+  primary: boolean
 }
 
 export interface GroupModel extends UIModel {
@@ -80,6 +88,9 @@ export interface ClassModel {
   getAttributes (): AttrModel[]
   getAttribute (key: string, _class?: Ref<Class<Obj>>): AttrModel | undefined
   filterAttributes (keys: string[]): ClassModel
+  getPrimary (): AttrModel | undefined
+
+  filterPrimary (): { model: ClassModel, primary: AttrModel | undefined }
 }
 
 // S E R V I C E
@@ -91,19 +102,20 @@ export interface PresentationService extends Service {
 
 export default plugin('presentation' as Plugin<PresentationService>, { core: core.id, i18n: i18n.id }, {
   class: {
-    AttributeUI: '' as Ref<Class<AttributeUI>>,
+    UXAttribute: '' as Ref<Class<UXAttribute>>,
     Presenter: '' as Ref<Mixin<Presenter<Type>>>,
     DetailForm: '' as Ref<Mixin<ComponentExtension<VDoc>>>,
     LookupForm: '' as Ref<Mixin<ComponentExtension<VDoc>>>
   },
   mixin: {
-    UXObject: '' as Ref<Mixin<UXObject>>
+    UXObject: '' as Ref<Mixin<UXObject<Doc>>>
   },
   component: {
     ObjectBrowser: '' as AnyComponent,
     Properties: '' as AnyComponent,
     NumberPresenter: '' as AnyComponent,
     StringPresenter: '' as AnyComponent,
+    CheckboxPresenter: '' as AnyComponent,
     RefPresenter: '' as AnyComponent
   }
 })

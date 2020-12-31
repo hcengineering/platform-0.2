@@ -14,16 +14,18 @@
 //
 
 import { Platform } from '@anticrm/platform'
-import { Attribute, Class, Obj, Ref, Type, VDoc, Mixin } from '@anticrm/core'
-import ui, { AttributeUI, AttrModel, ClassModel, GroupModel, PresentationService, ComponentExtension } from '.'
+import { Attribute, Class, Obj, Ref, Type, Doc, Mixin } from '@anticrm/model'
+import ui, { AttrModel, ClassModel, GroupModel, PresentationService, ComponentExtension, UXObject } from '.'
 import { CoreService } from '@anticrm/platform-core'
 import vue, { AnyComponent, Asset } from '@anticrm/platform-ui'
-import { I18n, IntlString } from '@anticrm/platform-i18n'
+import { I18n } from '@anticrm/platform-i18n'
 
 import ObjectBrowser from './components/internal/ObjectBrowser.svelte'
 import Properties from './components/internal/Properties.svelte'
 
 import StringEditor from './components/internal/editors/StringEditor.svelte'
+import CheckboxEditor from './components/internal/editors/CheckboxEditor.svelte'
+import { VDoc } from '@anticrm/core'
 
 /*!
  * Anticrm Platform™ Presentation Core Plugin
@@ -38,6 +40,7 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
   platform.setResource(ui.component.Properties, Properties)
 
   platform.setResource(ui.component.StringPresenter, StringEditor)
+  platform.setResource(ui.component.CheckboxPresenter, CheckboxEditor)
 
   async function getGroupModel (_class: Ref<Class<Obj>>): Promise<GroupModel> {
     const model = coreService.getModel()
@@ -53,38 +56,62 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
     const result = [] as AttrModel[]
     const model = coreService.getModel()
     const clazz = model.get(_class) as Class<Obj>
+
+    const uxObject = model.as(clazz, ui.mixin.UXObject) as UXObject<Doc>
+
+    if (uxObject && uxObject.attributes) {
+      const attributes = clazz._attributes as { [key: string]: Attribute }
+      const primary = model.getPrimaryKey(_class)
+      for (const uxAttributeE of Object.entries(uxObject.attributes)) {
+        const key = uxAttributeE[0]
+        const uxAttribute = uxAttributeE[1]
+        const attribute = attributes[key]
+        const label = await i18nService.translate(uxAttribute.label)
+        const placeholder = uxAttribute.placeholder ? await i18nService.translate(uxAttribute.placeholder) : label
+        const icon: Asset | undefined = uxAttribute.icon
+
+        // get presenter
+        const typeClassId = attribute.type._class
+        const typeClass = model.get(typeClassId) as Class<Type>
+        if (!model.isMixedIn(typeClass, ui.class.Presenter)) {
+          throw new Error(`no presenter for type '${typeClassId}'`)
+        }
+        const presenter = model.as(typeClass, ui.class.Presenter)
+        result.push({
+          key,
+          _class,
+          icon,
+          label,
+          placeholder,
+          presenter: presenter.presenter,
+          type: attribute.type,
+          primary: primary === key
+        })
+      }
+      return result
+    }
+
+    // Class doesn't have defined uxObject, so let's generate one.
     const attributes = clazz._attributes as { [key: string]: Attribute }
+    const primary = model.getPrimaryKey(_class)
     for (const key in attributes) {
       const attribute = attributes[key]
-      let label = key
-      let placeholder = key
-      let icon: Asset | undefined
-      const coreModel = coreService.getModel()
-      if (coreModel.is(attribute._class, ui.class.AttributeUI)) {
-        const attributeUI = attribute as AttributeUI
-        label = await i18nService.translate(attributeUI.label)
-        if (attributeUI.placeholder) {
-          placeholder = await i18nService.translate(attributeUI.placeholder)
-        } else {
-          placeholder = label
-        }
-        icon = attributeUI.icon
-      }
       // get presenter
       const typeClassId = attribute.type._class
-      const typeClass = coreModel.get(typeClassId) as Class<Type>
-      if (!coreModel.isMixedIn(typeClass, ui.class.Presenter)) {
+      const typeClass = model.get(typeClassId) as Class<Type>
+      if (!model.isMixedIn(typeClass, ui.class.Presenter)) {
         throw new Error(`no presenter for type '${typeClassId}'`)
       }
-      const presenter = coreModel.as(typeClass, ui.class.Presenter)
+      const presenter = model.as(typeClass, ui.class.Presenter)
       result.push({
         key,
         _class,
-        icon,
-        label,
-        placeholder,
+        icon: undefined,
+        label: key,
+        placeholder: key,
         presenter: presenter.presenter,
-        type: attribute.type
+        type: attribute.type,
+        primary: primary === key
       })
     }
     return result
@@ -92,7 +119,7 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
 
   abstract class ClassModelBase implements ClassModel {
     filterAttributes (keys: string[]): ClassModel {
-      const filter = {} as { [key: string]: {} }
+      const filter = {} as { [key: string]: Record<string, unknown> }
       keys.forEach(key => { filter[key] = {} })
       return new AttributeFilter(this, filter)
     }
@@ -102,6 +129,8 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
     abstract getOwnAttributes (_class: Ref<Class<Obj>>): AttrModel[]
     abstract getAttributes (): AttrModel[]
     abstract getGroup (_class: Ref<Class<Obj>>): GroupModel | undefined
+    abstract getPrimary (): AttrModel | undefined
+    abstract filterPrimary (): { model: ClassModel, primary: AttrModel | undefined }
   }
 
   class TClassModel extends ClassModelBase {
@@ -131,13 +160,26 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
     getGroup (_class: Ref<Class<Obj>>): GroupModel | undefined {
       return this.groups.find(group => group._class === _class)
     }
+
+    getPrimary (): AttrModel | undefined {
+      return this.attributes.find(attr => attr.primary)
+    }
+
+    filterPrimary (): { model: ClassModel, primary: AttrModel | undefined } {
+      const primary = this.getPrimary()
+      if (primary !== undefined) {
+        return { model: this.filterAttributes([primary.key]), primary }
+      } else {
+        return { model: this, primary: undefined }
+      }
+    }
   }
 
   class AttributeFilter extends ClassModelBase {
     private readonly next: ClassModel
-    private readonly filter: { [key: string]: {} }
+    private readonly filter: { [key: string]: Record<string, unknown> }
 
-    constructor (next: ClassModel, filter: { [key: string]: {} }) {
+    constructor (next: ClassModel, filter: { [key: string]: Record<string, unknown> }) {
       super()
       this.next = next
       this.filter = filter
@@ -168,6 +210,14 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
       const result = this.next.getAttributes()
       const filtered = result.filter(attr => !this.filter[attr.key])
       return filtered
+    }
+
+    getPrimary (): AttrModel | undefined {
+      return this.next.getPrimary()
+    }
+
+    filterPrimary (): { model: ClassModel, primary: AttrModel | undefined } {
+      return this.next.filterPrimary()
     }
   }
 

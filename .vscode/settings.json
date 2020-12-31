@@ -7,13 +7,12 @@
 	"editor.tabSize": 2,
 	"typescript.format.insertSpaceBeforeFunctionParenthesis": true,
 	"typescript.format.insertSpaceAfterConstructor": true,
-	"javascript.format.insertSpaceAfterConstructor": true,
 	"[svelte]": {
 		"editor.defaultFormatter": "svelte.svelte-vscode"
 	},
 	"editor.trimAutoWhitespace": true,
 	"[typescript]": {
-		"editor.defaultFormatter": "vscode.typescript-language-features",		
+		"editor.defaultFormatter": "vscode.typescript-language-features",
 	},
 	"[javascript]": {
 		"editor.defaultFormatter": "vscode.typescript-language-features",

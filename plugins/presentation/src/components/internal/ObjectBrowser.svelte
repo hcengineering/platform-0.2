@@ -12,33 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 -->
-
 <script type="ts">
-  import { Ref, Class, Doc, Application } from '@anticrm/core'
+  import { Application } from '@anticrm/core'
+
+  import { Ref, Class, Doc } from '@anticrm/model'
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
   import Table from './Table.svelte'
 
   export let application: Ref<Application>
 </script>
 
-<div class="workbench-browse">
-  <div>
-    <span class="caption-1">{application}</span>&nbsp;
-  </div>
-  <div class="table">
-    <Table _class="class:task.Task" />
-  </div>
-</div>
-
 <style lang="scss">
   .workbench-browse {
     height: 100%;
     display: flex;
     flex-direction: column;
-  
+
     .table {
       flex-grow: 1;
       height: 100%;
     }
   }
 </style>
+
+<div class="workbench-browse">
+  <div><span class="caption-1">{application}</span>&nbsp;</div>
+  <div class="table">
+    <Table _class="class:task.Task" />
+  </div>
+</div>

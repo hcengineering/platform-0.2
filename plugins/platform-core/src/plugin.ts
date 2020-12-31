@@ -20,24 +20,13 @@ import {
   Doc,
   AnyLayout,
   MODEL_DOMAIN,
-  CoreProtocol,
   Tx,
-  TITLE_DOMAIN,
-  BACKLINKS_DOMAIN,
   Emb,
-  VDoc,
-  generateId as genId,
-  ModelIndex,
   DateProperty,
   StringProperty,
   txContext,
-  TxContextSource,
-  TxProcessor,
-  VDocIndex,
-  TitleIndex,
-  TextIndex,
-  TxIndex
-} from '@anticrm/core'
+  TxContextSource
+} from '@anticrm/model'
 import { ModelDb } from './modeldb'
 
 import { CoreService, QueryResult } from '.'
@@ -50,6 +39,10 @@ import { Cache } from './cache'
 import { Titles } from './titles'
 import { Graph } from './graph'
 import { newCreateTx, newPushTx } from './tx'
+import {
+  BACKLINKS_DOMAIN, CoreProtocol, ModelIndex, TextIndex, TitleIndex, TITLE_DOMAIN, TxIndex, TxProcessor, VDocIndex, VDoc,
+  generateId as genId
+} from '@anticrm/core'
 
 /*!
  * Anticrm Platform™ Core Plugin
@@ -107,7 +100,7 @@ export default async (platform: Platform): Promise<CoreService> => {
     new VDocIndex(model, qCache),
     new TitleIndex(model, qTitles),
     new TextIndex(model, qGraph),
-    new ModelIndex(model, qModel)
+    new ModelIndex(model, [qModel])
   ])
 
   // add listener to process data updates from backend
@@ -196,6 +189,7 @@ export default async (platform: Platform): Promise<CoreService> => {
     createVDoc,
     push,
     generateId,
-    tx: processTx
+    tx: processTx,
+    getUserId: () => platform.getMetadata(login.metadata.WhoAmI) as StringProperty
   } as CoreService
 }

@@ -13,8 +13,8 @@
 // limitations under the License.
 //
 
-import { generateId } from './objectid'
-import {
+import { generateId } from '@anticrm/core/src/objectid'
+import core, {
   AnyLayout,
   Class,
   Classifier,
@@ -26,17 +26,17 @@ import {
   Ref,
   Storage,
   Attribute,
-  CORE_CLASS_ARRAY,
-  CORE_CLASS_INSTANCEOF,
   ArrayOf,
   TxContext,
   StringProperty,
   PropertyType
-} from './core'
+} from '@anticrm/model'
 
 export function mixinKey (mixin: Ref<Mixin<Doc>>, key: string): string {
   return key + '|' + mixin.replace('.', '~')
 }
+
+console.log(core)
 
 export const MODEL_DOMAIN = 'model'
 
@@ -121,6 +121,20 @@ export class Model implements Storage {
     return attributes
   }
 
+  getPrimaryKey (_class: Ref<Class<Obj>>): string | null {
+    const primaryKey = mixinKey(core.mixin.Indices, 'primary')
+    let cls = _class as Ref<Class<Obj>> | undefined
+    while (cls) {
+      const clazz = this.get(cls) as Classifier<Doc>
+      const primary = (clazz as any)[primaryKey]
+      if (primary) {
+        return primary
+      }
+      cls = clazz._extends
+    }
+    return null
+  }
+
   // D O M A I N
 
   getDomain (id: Ref<Class<Doc>>): string {
@@ -199,7 +213,7 @@ export class Model implements Storage {
         const { attr, key } = this.classAttribute(_class, rKey)
         // Check if we need to perform inner assign based on field value and type
         switch (attr.type._class) {
-          case CORE_CLASS_ARRAY: {
+          case core.class.ArrayOf: {
             const attrClass = this.attributeClass((attr.type as ArrayOf).of)
             if (attrClass) {
               const lValue = r[rKey]
@@ -214,7 +228,7 @@ export class Model implements Storage {
             }
             break
           }
-          case CORE_CLASS_INSTANCEOF: {
+          case core.class.InstanceOf: {
             const attrClass = ((attr.type as unknown) as Record<string, unknown>).of as Ref<Class<Doc>>
             if (attrClass) {
               l[key] = this.assign({}, attrClass, r[rKey] as AnyLayout)
@@ -254,7 +268,7 @@ export class Model implements Storage {
     const l = (doc as unknown) as AnyLayout
 
     switch (attr.type._class) {
-      case CORE_CLASS_ARRAY: {
+      case core.class.ArrayOf: {
         const attrClass = this.attributeClass((attr.type as ArrayOf).of)
         if (attrClass === null) {
           throw new Error('Invalid attribute type/class: ' + attr.type)
@@ -378,15 +392,39 @@ export class Model implements Storage {
   }
 
   push (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: StringProperty, attributes: AnyLayout): Promise<void> { // eslint-disable-line
-    throw new Error('Method not implemented. model push')
+    const mdlObj = this.get(_id)
+    if (!mdlObj) {
+      return Promise.reject(new Error('No object found ' + (_id as string)))
+    }
+    this.pushDocument(mdlObj, attribute, attributes)
+    return Promise.resolve()
   }
 
   update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, attributes: AnyLayout): Promise<void> { // eslint-disable-line
-    throw new Error('Method not implemented. model update')
+    const mdlObj = this.get(_id)
+    if (!mdlObj) {
+      return Promise.reject(new Error('No object found ' + (_id as string)))
+    }
+    this.updateDocument(mdlObj, attributes)
+    return Promise.resolve()
   }
 
   remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<void> { // eslint-disable-line
-    throw new Error('Method not implemented. model remove')
+    const mdlObj = this.get(_id)
+    if (!mdlObj) {
+      return Promise.reject(new Error('No object found ' + (_id as string)))
+    }
+    this.objects.delete(_id)
+    if (this.byClass) {
+      const objs = this.byClass.get(_class)?.filter((e) => e._id !== _id)
+      if (objs) {
+        this.byClass.set(_class, objs)
+      } else {
+        // No items of class, so lets' remove it
+        this.byClass.delete(_class)
+      }
+    }
+    return Promise.resolve()
   }
 
   // Q U E R Y  P R O C E S S I N G
@@ -441,9 +479,9 @@ export class Model implements Storage {
 
   private attributeClass (type: Type): Ref<Class<Doc>> | null {
     switch (type._class) {
-      case CORE_CLASS_ARRAY:
+      case core.class.ArrayOf:
         return this.attributeClass((type as ArrayOf).of)
-      case CORE_CLASS_INSTANCEOF:
+      case core.class.InstanceOf:
         return ((type as unknown) as Record<string, unknown>).of as Ref<Class<Doc>>
     }
     return null

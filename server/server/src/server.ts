@@ -20,7 +20,7 @@ import WebSocket, { Server } from 'ws'
 import { decode } from 'jwt-simple'
 import { ClientControl, createClientService } from './service'
 import { connectWorkspace, WorkspaceProtocol } from './workspace'
-import { Tx } from '@anticrm/core'
+import { Tx } from '@anticrm/model'
 
 export interface Client {
   email: string
@@ -67,14 +67,14 @@ export function start (port: number, dbUri: string, host?: string): Promise<Serv
   }
   const broadcaster: Broadcaster = {
     broadcast (from: ClientService, response: Response<any>): void {
-      console.log(`broadcasting to ${connections.size} connections`)
+      // console.log(`broadcasting to ${connections.size} connections`)
       for (const client of connections.values()) {
         client.then(client => {
           if (client !== from) {
-            console.log(`broadcasting to ${client.email}`, response)
+            // console.log(`broadcasting to ${client.email}`, response)
             client.send(response)
           } else {
-            console.log('notify self about completeness without response')
+            // console.log('notify self about completeness without response')
             client.send({
               id: response.id,
               error: response.error
@@ -112,7 +112,7 @@ export function start (port: number, dbUri: string, host?: string): Promise<Serv
       const f = (await service)[request.method]
 
       // TODO: Check for method are exists.
-      const tx = await f.apply(null, request.params || [])
+      const tx = await f.apply(null, request.params || []) // eslint-disable-line
       const response = makeResponse({
         id: request.id,
         result: tx

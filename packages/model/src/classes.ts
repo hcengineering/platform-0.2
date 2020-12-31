@@ -23,6 +23,7 @@ export type Method<T extends MethodType> = T & { __method: T }
 
 export interface Obj {
   _class: Ref<Class<Obj>>
+  _mixins?: Ref<Mixin<Obj>>[]
 }
 
 export interface Emb extends Obj {
@@ -32,7 +33,6 @@ export interface Emb extends Obj {
 export interface Doc extends Obj {
   _class: Ref<Class<Doc>>
   _id: Ref<Doc>
-  _mixins?: Ref<Mixin<Doc>>[]
 }
 
 export type PropertyType = Property<PrimitiveType, any>
@@ -44,6 +44,7 @@ export type PropertyType = Property<PrimitiveType, any>
 export type StringProperty = Property<string, string>
 export type DateProperty = Property<number, Date>
 
+// An attribute type with some defined mixins inside.
 export interface Type extends Emb {
   _default?: PropertyType
 }
@@ -103,68 +104,6 @@ export interface Indices extends Class<Doc> {
   primary: StringProperty
 }
 
-///
-
-export const CORE_CLASS_ATTRIBUTE = 'class:core.Attribute' as Ref<Class<Attribute>>
-export const CORE_CLASS_CLASS = 'class:core.Class' as Ref<Class<Class<Obj>>>
-export const CORE_CLASS_MIXIN = 'class:core.Mixin' as Ref<Class<Mixin<Doc>>>
-export const CORE_CLASS_TYPE = 'class:core.Type' as Ref<Class<Type>>
-export const CORE_CLASS_ARRAY = 'class:core.Array' as Ref<Class<ArrayOf>>
-export const CORE_CLASS_REFTO = 'class:core.RefTo' as Ref<Class<ArrayOf>>
-export const CORE_CLASS_BAGOF = 'class:core.BagOf' as Ref<Class<ArrayOf>>
-export const CORE_CLASS_INSTANCEOF = 'class:core.InstanceOf' as Ref<Class<InstanceOf<Emb>>>
-
-export const CORE_CLASS_SPACE = 'class:core.Space' as Ref<Class<Doc>>
-export const CORE_CLASS_SPACEUSER = 'class:core.SpaceUser' as Ref<Class<Emb>>
-
-export const CORE_MIXIN_INDICES = 'mixin:core.Indices' as Ref<Mixin<Indices>>
-
 export interface AnyLayout {
   [key: string]: PropertyType
-}
-
-/**
- * Transaction operation being processed.
- */
-export interface Tx extends Doc {
-  _date: DateProperty
-  _user: StringProperty
-}
-
-/**
- * Operation direction, is it came from server or it is own operation.
- */
-export enum TxContextSource {
-  Client, Server
-}
-
-/**
- * Define a transaction processing context.
- */
-export interface TxContext {
-  // Define a network operations if required.
-  network: Promise<void>
-  // Define transaction source
-  source: TxContextSource
-}
-
-/**
- * Return a complete TxContext
- */
-export function txContext (source: TxContextSource = TxContextSource.Client, network: Promise<void> = Promise.resolve()): TxContext {
-  return { network, source } as TxContext
-}
-
-export interface Index {
-  tx (ctx: TxContext, tx: Tx): Promise<any>
-}
-
-export interface Storage {
-  store (ctx: TxContext, doc: Doc): Promise<void>
-  push (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: StringProperty, attributes: AnyLayout): Promise<void>
-  update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, attributes: AnyLayout): Promise<void>
-  remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<void>
-
-  find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]>
-  findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined>
 }

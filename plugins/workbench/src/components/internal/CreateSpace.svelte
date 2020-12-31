@@ -12,29 +12,103 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 -->
-
 <script lang="ts">
-  import { Space, generateId } from '@anticrm/core'
-  import core from '@anticrm/platform-core'
-  import { getCoreService, getUIService } from '../../utils'
+  import { Space, generateId, SpaceUser } from '@anticrm/core'
+  import core from '@anticrm/core'
+  import { createEventDispatcher } from 'svelte'
+  import { AnyComponent } from '@anticrm/platform-ui'
+  import presentation from '@anticrm/presentation'
+  import { _getPresentationService, getComponentExtension, _getCoreService } from '../../utils'
+  import { AttrModel, ClassModel } from '@anticrm/presentation'
+  import AttributeEditor from '@anticrm/presentation/src/components/AttributeEditor.svelte'
+  import Properties from '@anticrm/presentation/src/components/internal/Properties.svelte'
 
-  let name: string
+  let object = {} as any
 
-  const coreService = getCoreService()
-  const uiService = getUIService()
+  let component: AnyComponent
+  const coreService = _getCoreService()
+  const dispatch = createEventDispatcher()
 
-  function createSpace() {
-    console.log('create', name)
-    const space: Space = {
+  function save() {
+    console.log('create', object)
+    const space: Space = {      
+      ...object,
       _id: generateId(),
       _class: core.class.Space,
-      name,
+      users: [{ userId: coreService.getUserId(), owner: true } as SpaceUser],
     }
-    uiService.closeModal()
-    coreService.then(coreService => coreService.createDoc(space))
+    coreService.createDoc(space)
+    dispatch('close')
+  }
+  let model: ClassModel | undefined
+  let primary: AttrModel | undefined
+
+  const presentationService = _getPresentationService()
+  console.log('presentationService', presentationService)
+
+  $: {
+    getComponentExtension(core.class.Space, presentation.class.DetailForm).then((ext) => {
+      component = ext
+    })
+
+    presentationService.getClassModel(core.class.Space, core.class.Doc).then((m) => {
+      const mp = m.filterPrimary()
+      model = mp.model
+      primary = mp.primary
+    })
   }
 </script>
 
-<h1>Создать пространство</h1>
-<input type="text" class="editbox" bind:value={ name }/>
-<button class="button" on:click={createSpace}>Create</button>
+<style lang="scss">
+  .space-view {
+    margin: 1em;
+  }
+  .header {
+    display: flex;
+
+    .actions {
+      display: flex;
+      flex-grow: 1;
+      flex-direction: row-reverse;
+      font-size: 10px;
+
+      button {
+        margin-left: 0.5em;
+      }
+    }
+  }
+  .attributes {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 1em;
+    .group {
+      padding: 0.5em;
+      //background-color: $content-bg-color;
+    }
+  }
+</style>
+
+<div class="space-view">
+  <div class="header">
+    <div class="caption-4" />
+    <div class="actions">
+      <button
+        class="button"
+        on:click={() => {
+          dispatch('close')
+        }}>Cancel</button>
+      <button class="button" on:click={save}>Save</button>
+    </div>
+  </div>
+
+  <div class="content">
+    {#if primary}
+      <div class="caption-1">
+        <AttributeEditor attribute={primary} bind:value={object[primary.key]} />
+      </div>
+    {/if}
+    {#if model}
+      <Properties {model} bind:object />
+    {/if}
+  </div>
+</div>

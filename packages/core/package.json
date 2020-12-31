@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "@anticrm/platform": "0.2.0",
+    "@anticrm/model": "0.2.0",
     "markdown-it": "^11.0.1"
   }
 }

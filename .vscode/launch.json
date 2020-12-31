@@ -23,6 +23,16 @@
       "sourceMaps": true,
       "cwd": "${workspaceRoot}/server/server",
       "protocol": "inspector"
+    },
+    {
+      "name": "upgrade workspace",
+      "type": "node", 
+      "request": "launch",
+      "args": ["src/index.ts", "upgrade-workspace", "workspace"],      
+      "runtimeArgs": ["--nolazy", "-r", "ts-node/register"],
+      "sourceMaps": true,
+      "cwd": "${workspaceRoot}/dev/tool",
+      "protocol": "inspector"
     }
   ]
 }

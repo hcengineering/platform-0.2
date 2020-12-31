@@ -15,7 +15,7 @@
 
 import { Db } from 'mongodb'
 import { Model } from '@anticrm/boot/src/boot'
-import { Doc } from '@anticrm/core'
+import { Doc } from '@anticrm/model'
 
 export async function initDatabase (db: Db): Promise<any> {
   const domains = { ...Model } as { [key: string]: Doc[] }

@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Doc, Ref, Class, Tx, Index, TxContext } from './core'
+import { AnyLayout, Doc, Ref, Class, Tx, Index, TxContext } from '@anticrm/model'
 
 export interface DocumentProtocol {
   find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]>

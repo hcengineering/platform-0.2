@@ -30,7 +30,7 @@ interface ComponentOptions<Props> {
   intro?: boolean
 }
 
-interface SvelteComponent<Props> {
+export interface SvelteComponent<Props> {
   new(options: ComponentOptions<Props>): any
   $set: (props: {}) => any
   $on: (event: string, callback: (event: CustomEvent) => any) => any
@@ -42,7 +42,7 @@ interface SvelteComponent<Props> {
   }
 }
 
-export type AnySvelteComponent = any //SvelteComponent<{}>
+export type AnySvelteComponent = any // SvelteComponent<{}>
 
 export type Component<C extends AnySvelteComponent> = Resource<C>
 export type AnyComponent = Component<AnySvelteComponent>

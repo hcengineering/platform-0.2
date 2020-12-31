@@ -12,15 +12,16 @@
   // See the License for the specific language governing permissions and
   // limitations under the License.
   import { onDestroy } from 'svelte'
-  import { Ref, Class, Doc, Backlinks, Property } from '@anticrm/core'
+  import { Ref, Class, Doc, Property, Emb } from '@anticrm/model'
   import { getCoreService, query } from '../../utils'
-  import core from '@anticrm/platform-core'
+  import core from '@anticrm/core'
   import chunter, { Collab, Comment } from '../..'
   import { getService } from '@anticrm/platform-ui'
 
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
   import CommentComponent from './Comment.svelte'
   import Backlink from './Backlink.svelte'
+  import { Backlinks } from '@anticrm/core'
 
   export let object: Collab
 
@@ -45,12 +46,12 @@
   function createComment(message: any): Promise<void> {
     const parsedMessage = chunterService.createMissedObjects(message)
     return coreService.then((coreService) => {
-      const comment: Omit<Comment, '__embedded'> = {
+      const comment = ({
         _class: chunter.class.Comment,
         _createdOn: Date.now() as Property<number, Date>,
         _createdBy: 'john.appleseed@gmail.com' as Property<string, string>,
         message: parsedMessage
-      }
+      } as unknown) as Emb
       return coreService.push(object, 'comments', comment)
     })
   }
@@ -59,16 +60,16 @@
 <div class="caption-2">Comments</div>
 
 {#each object.comments || [] as comment}
-  <CommentComponent message="{comment}" />
+  <CommentComponent message={comment} />
 {/each}
 
-<ReferenceInput on:message="{(e) => createComment(e.detail)}" />
+<ReferenceInput on:message={(e) => createComment(e.detail)} />
 
 <div class="caption-2">Backlinks</div>
 
 {#each backlinks as backlink}
   <!-- <Backlink {backlink} /> -->
   {#each backlink.backlinks as b}
-    <Backlink backlink="{b}" />
+    <Backlink backlink={b} />
   {/each}
 {/each}

@@ -13,12 +13,13 @@
 // limitations under the License.
 //
 
-import { extendIds, Builder, Class$, Mixin$, Prop } from '@anticrm/model'
+import { extendIds, Builder, Class$, Mixin$, Prop, Class, Ref, Property } from '@anticrm/model'
+import core, { Space } from '@anticrm/core'
 import _contact, { Contact, Person, User } from '.'
-import { Class, Ref, Property, Space } from '@anticrm/core'
 import { IntlString } from '@anticrm/platform-i18n'
-import core, { TVDoc } from '@anticrm/platform-core/src/__model__'
-import presentation, { UX } from '@anticrm/presentation/src/__model__'
+import { TVDoc } from '@anticrm/core/src/__model__'
+import { UX } from '@anticrm/presentation/src/__model__'
+import presentation from '@anticrm/presentation'
 
 const contact = extendIds(_contact, {
   application: {
@@ -56,7 +57,7 @@ class TUser extends TPerson implements User {
   @Prop() @UX('Аккаунт' as IntlString) account!: string
 }
 
-export function model (S: Builder) {
+export function model (S: Builder): void {
   S.add(TContact, TPerson, TUser)
 
   S.mixin(contact.class.Person as Ref<Class<Person>>, presentation.class.DetailForm, {
