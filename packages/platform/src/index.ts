@@ -371,7 +371,6 @@ export function createPlatform (): Platform {
 type Namespace = Record<string, Record<string, any>>
 
 function transform<N extends Namespace> (plugin: AnyPlugin, namespaces: N, f: (id: string, value: any) => any): N {
-  console.log('transform')
   const result = {} as Namespace
   for (const namespace in namespaces) {
     const extensions = namespaces[namespace]
