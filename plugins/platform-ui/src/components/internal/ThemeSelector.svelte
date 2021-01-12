@@ -1,16 +1,16 @@
 <script lang="ts">
   import { getContext } from 'svelte'
-  import { themes as _themes } from "@anticrm/sparkling-theme/src/themes";
+  import { themes as _themes } from "@anticrm/sparkling-theme/src/themes"
 
-  const { setTheme } = getContext('theme');
+  const { setTheme } = getContext('theme')
   function changeTheme(event: any): void {
-    const sT = setTheme(event.srcElement.innerText);
+    const sT = setTheme(event.srcElement.innerText)
   }
-  const themes = [..._themes];
+  const themes = [..._themes]
 
-  let hidden = false;
+  let hidden = false
   function toggleMenu (): void {
-    hidden = !hidden;
+    hidden = !hidden
   }
 </script>
 
