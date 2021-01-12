@@ -7,6 +7,7 @@
   import Theme from "@anticrm/sparkling-theme/src/components/Theme.svelte"
   import StatusComponent from "./Status.svelte"
   import Clock from "./Clock.svelte"
+  import ThemeSelector from "./ThemeSelector.svelte"
   import Component from "../Component.svelte"
   import Modal from './Modal.svelte'
   
@@ -46,8 +47,11 @@
           <StatusComponent {status} />
         </div>
         <div class="widgets">
-          <div class="clock">
+          <div class="widget">
             <Clock />
+          </div>
+          <div class="widget">
+            <ThemeSelector />
           </div>
           <!-- <div v-for="widget in widgets" :key="widget" class="widget">
             <widget :component="widget" />
@@ -114,7 +118,7 @@
           //   font-weight: 700;
           // }
 
-          .clock {
+          .widget {
             border-left: 1px solid var(--theme-nav-color);
             padding-right: 1em;
             padding-left: 1em;
