@@ -1,26 +1,24 @@
 <script lang="ts">
  	import { getContext } from 'svelte';
-  import { writable } from "svelte/store";
   import { themes as _themes } from "@anticrm/sparkling-theme/src/themes";
-  //import type { Theme } from "@anticrm/sparkling-theme/src/themes";
-  //import Theme from '@anticrm/sparkling-theme/src/components/Theme.svelte';
 
-  let { setTheme } = getContext('theme');
-  function changeTheme(event): void {
-    let sT = setTheme(event.srcElement.innerText);
+  const { setTheme } = getContext('theme');
+  function changeTheme(event: any): void {
+    const sT = setTheme(event.srcElement.innerText);
   }
-  let themes = [..._themes];
+  const themes = [..._themes];
 
-  let h = false;
-  function toggleMenu () {
-    h = !h;
+  let hidden = false;
+  function toggleMenu (): void {
+    hidden = !hidden;
   }
 </script>
 
 <div class="menu" on:mouseenter={toggleMenu} on:mouseleave={toggleMenu}>
   Темы
-  <div class="subMenu" class:h={!h}>
+  <div class="subMenu" class:hidden={!hidden}>
     {#each themes as theme}
+      <!-- svelte-ignore a11y-invalid-attribute -->
       <div class="item"><a on:click|preventDefault={changeTheme} href="#">{theme.name}</a></div>
     {/each}
   </div>
@@ -35,7 +33,7 @@
   .menu:hover {
     color: var(--theme-highlight-color);
   }
-  .h {
+  .hidden {
     visibility: hidden;
   }
   .subMenu {

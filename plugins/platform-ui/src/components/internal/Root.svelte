@@ -47,10 +47,10 @@
           <StatusComponent {status} />
         </div>
         <div class="widgets">
-          <div class="clock">
+          <div class="widget">
             <Clock />
           </div>
-          <div class="themeSel">
+          <div class="widget">
             <ThemeSelector />
           </div>
           <!-- <div v-for="widget in widgets" :key="widget" class="widget">
@@ -118,14 +118,7 @@
           //   font-weight: 700;
           // }
 
-          .themeSel {
-            border-left: 1px solid var(--theme-nav-color);
-            padding-right: 1em;
-            padding-left: 1em;
-            font-weight: 700;
-          }
-
-          .clock {
+          .widget {
             border-left: 1px solid var(--theme-nav-color);
             padding-right: 1em;
             padding-left: 1em;
