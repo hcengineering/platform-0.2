@@ -1,5 +1,5 @@
 <script lang="ts">
- 	import { getContext } from 'svelte';
+  import { getContext } from 'svelte'
   import { themes as _themes } from "@anticrm/sparkling-theme/src/themes";
 
   const { setTheme } = getContext('theme');
