@@ -5,21 +5,34 @@
   const { setTheme } = getContext('theme')
   function changeTheme(event: any): void {
     const sT = setTheme(event.srcElement.innerText)
+    window.removeEventListener('click', handler)
   }
   const themes = [..._themes]
 
+  function handler(event: MouseEvent) {
+    const cl = event.target.classList[0]
+    if ((cl !== 'item') && (cl !== 'menu')) {
+      hidden = !hidden
+      window.removeEventListener('click', handler)
+    }
+  }
+  
   let hidden = false
   function toggleMenu (): void {
     hidden = !hidden
+    if (hidden) {
+      window.addEventListener('click', handler)
+    } else {
+      window.removeEventListener('click', handler)
+    }
   }
 </script>
 
-<div class="menu" on:mouseenter={toggleMenu} on:mouseleave={toggleMenu}>
+<div class="menu noselect" on:click={toggleMenu}>
   Темы
   <div class="subMenu" class:hidden={!hidden}>
     {#each themes as theme}
-      <!-- svelte-ignore a11y-invalid-attribute -->
-      <div class="item"><a on:click|preventDefault={changeTheme} href="#">{theme.name}</a></div>
+      <div class="item" class:hidden={!hidden} on:click|preventDefault={changeTheme}>{theme.name}</div>
     {/each}
   </div>
 </div>
@@ -28,8 +41,7 @@
   .menu {
     position: relative;
     cursor: pointer;
-    width: 100%;
-  }
+}
   .menu:hover {
     color: var(--theme-highlight-color);
   }
@@ -37,15 +49,25 @@
     visibility: hidden;
   }
   .subMenu {
-    width: 100%;
+    background-color: var(--theme-bg-color);
+    border: 1px solid var(--theme-separator-color);
+    border-radius: 4px;
+    width: 10em;
+    right: -1em;
+    padding: 1em;
+    text-align: right;
     position: absolute;
     display: flex;
     flex-direction: column;
+    z-index: 100;
   }
   .item {
+    padding: 0.5em;
+    border-radius: 4px;
     color: var(--theme-content-color);
   }
   .item:hover {
     color: var(--theme-highlight-color);
+    background-color: var(--theme-editbox-bg-color);
   }
 </style>
