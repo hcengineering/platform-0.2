@@ -90,15 +90,16 @@
   }
 
   .projects {
-    padding: 1em;
+    padding: 1em 1em;
     width: 20em;
     overflow-y: auto;
 
     border-right: 1px solid var(--theme-separator-color);
 
     .project {
-      font-family: Raleway;
+      font-family: var(--theme-font-content);
       padding: 0.5em;
+      margin-bottom: 0.25em;
       &.selected {
         // color: var(--theme-content-bg-color);
         background-color: var(--theme-content-color-dark);

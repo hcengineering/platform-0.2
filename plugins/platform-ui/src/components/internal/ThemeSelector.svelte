@@ -51,9 +51,9 @@
   .subMenu {
     background-color: var(--theme-bg-color);
     border: 1px solid var(--theme-separator-color);
-    border-radius: 4px;
+    border-radius: 0px 0px 4px 4px;
     width: 10em;
-    right: -1em;
+    right: calc(-1em - 1px);
     padding: 1em;
     text-align: right;
     position: absolute;

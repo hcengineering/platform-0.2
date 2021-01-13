@@ -213,9 +213,9 @@
     color: var(--theme-caption-color);
     // font-family: "Montserrat";
     // font-family: "Open Sans";
-    font-size: 14px;
-    font-weight: 400;
-    text-transform: uppercase;
+    font-size: 1.25em;
+    font-weight: 500;
+    padding: 1em 0.5em;
   }
 
   .caption-4 {
