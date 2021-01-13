@@ -86,7 +86,7 @@
     border: 1px solid var(--theme-separator-color);
     border-radius: 0.5em;
     padding: 0.5em 0.75em;
-    background-color: var(--theme-nav-color);
+    background-color: var(--theme-editbox-bg-color);
     box-sizing: border-box;
     color: inherit;
     font: inherit;
@@ -192,6 +192,7 @@
 
   .caption-1 {
     font-family: var(--theme-font-caption);
+    color: var(--theme-caption-color);
     // font-family: "Montserrat";
     // font-family: "Open Sans";
     font-size: 36px;
@@ -200,6 +201,7 @@
 
   .caption-2 {
     font-family: var(--theme-font-caption);
+    color: var(--theme-caption-color);
     // font-family: "Montserrat";
     // font-family: "Open Sans";
     font-size: 24px;
@@ -208,6 +210,7 @@
 
   .caption-3 {
     font-family: var(--theme-font-caption);
+    color: var(--theme-caption-color);
     // font-family: "Montserrat";
     // font-family: "Open Sans";
     font-size: 14px;
@@ -217,6 +220,7 @@
 
   .caption-4 {
     font-family: "IBM Plex Sans";
+    color: var(--theme-caption-color);
     font-size: 10px;
     font-weight: 700;
     text-transform: uppercase;
@@ -224,6 +228,7 @@
 
   .caption-5 {
     font-family: "IBM Plex Sans";
+    color: var(--theme-caption-color);
     font-size: 10px;
     font-weight: 400;
     text-transform: uppercase;
@@ -231,6 +236,7 @@
 
   .caption-6 {
     font-family: "IBM Plex Sans";
+    color: var(--theme-caption-color);
     font-size: 9px;
     font-weight: 700;
   }
@@ -288,6 +294,15 @@
     .caption {
       display: table-caption;
     }
+  }
+
+  .noselect {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
   }
 
   body {
