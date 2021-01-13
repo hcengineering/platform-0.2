@@ -151,12 +151,12 @@
 
   a {
     color: inherit;
-    // text-decoration: none;
+    text-decoration: none;
   }
 
   a:hover {
     color: var(--theme-highlight-color);
-    text-decoration: underline;
+    text-decoration: none;
   }
 
   .icon-embed {
@@ -309,7 +309,7 @@
     color: var(--theme-content-color);
 
     font-family: var(--theme-font-content);
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 400;
 
     -webkit-font-smoothing: antialiased;

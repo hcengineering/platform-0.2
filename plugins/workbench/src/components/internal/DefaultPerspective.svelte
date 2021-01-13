@@ -96,24 +96,35 @@
 
     border-right: 1px solid var(--theme-separator-color);
 
-    .project {
+    .item {
+      box-sizing: border-box;
       font-family: var(--theme-font-content);
+      font-weight: 500;
       padding: 0.5em;
+      padding-top: calc(0.5em + 1px);
       margin-bottom: 0.25em;
-      &.selected {
-        // color: var(--theme-content-bg-color);
-        background-color: var(--theme-content-color-dark);
-      }
-      a {
-        text-decoration: none;
-      }
-    }
+      height: 2.5em;
+      color: var(--theme-content-color);
+      background-color: var(--theme-bg-color);
+      cursor: pointer;
+      border-radius: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
 
-    .app {
-      font-family: Raleway;
-      padding: 0.5em;
       &.selected {
+        font-weight: 700;
+        color: var(--theme-caption-color);
         background-color: var(--theme-content-color-dark);
+        &:hover {
+          cursor: default;
+          color: var(--theme-caption-color);
+          background-color: var(--theme-content-color-dark);
+        }
+      }
+      &:hover {
+        color: var(--theme-highlight-color);
+        /*background-color: var(--theme-editbox-bg-color);*/
       }
     }
   }
@@ -157,23 +168,27 @@
         <Icon icon={ui.icon.Add} clazz="icon-embed" />
       </a>
     </div>
-    <div class="project" class:selected={!space}>
-      <LinkTo href={'/' + location[1] + '/' + location[2]}><b>Все</b></LinkTo>
-    </div>
-    {#each spaces as s (s._id)}
-      <div class="project" class:selected={s._id === space}>
-        <LinkTo href={'/' + location[1] + '/' + location[2] + '/' + s._id}>#{s.name}</LinkTo>
+    <LinkTo href={'/' + location[1] + '/' + location[2]}>
+      <div class="item" class:selected={!space}>
+        Все
+        <!-- <LinkTo href={'/' + location[1] + '/' + location[2]}><b>Все</b></LinkTo> -->
       </div>
+    </LinkTo>
+    {#each spaces as s (s._id)}
+      <LinkTo href={'/' + location[1] + '/' + location[2] + '/' + s._id}>
+        <div class="item" class:selected={s._id === space}>
+          # {s.name}
+          <!-- <LinkTo href={'/' + location[1] + '/' + location[2] + '/' + s._id}>#{s.name}</LinkTo> -->
+        </div>
+      </LinkTo>
     {/each}
 
     <div class="caption-3">Приложения</div>
     {#each applications as app (app._id)}
-      <div class="app" class:selected={app._id === application}>
-        <a
-          href="/"
-          on:click|preventDefault={(e) => {
-            application = id(app)
-          }}>{app.label}</a>
+      <div class="item" class:selected={app._id === application}
+        on:click|preventDefault={(e) => {
+          application = id(app)
+        }}>{app.label}
       </div>
     {/each}
   </div>
