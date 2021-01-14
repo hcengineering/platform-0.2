@@ -104,10 +104,6 @@
       padding-right: 1px;
       overflow-y: auto;
     }
-    .container::-webkit-scrollbar { width: 3px; height: 3px;}
-    .container::-webkit-scrollbar-button { display: none; background-color: #666; }
-    .container::-webkit-scrollbar-track-piece { background-color: #ddd; border-radius: 2px;}
-    .container::-webkit-scrollbar-thumb { height: 10px; background-color: #666; border-radius: 2px;}
     
     .hidden {
       visibility: hidden;

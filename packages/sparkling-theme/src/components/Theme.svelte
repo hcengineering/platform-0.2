@@ -33,12 +33,33 @@
 </script>
 
 <style lang="scss" global>
-  :root {
+  * {
     --theme-white-color: #fff;
     --theme-blue-color: #2D6AB9;
     --theme-green-color: #4396A2;
     --theme-grey-color: #78726D;
     --theme-maroon-color: #B92D52;
+
+    scrollbar-color: var(--theme-bg-dark-color) var(--theme-bg-accent-color);
+    scrollbar-width: thin;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  ::-webkit-scrollbar:horizontal {
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background-color: var(--theme-bg-color);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--theme-bg-accent-color);
+    border: 1px solid var(--theme-bg-dark-color);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--theme-bg-dark-color);
+    border: 1px solid var(--theme-bg-dark-color);
   }
 
   @font-face {
@@ -203,8 +224,8 @@
     color: var(--theme-caption-color);
     // font-family: "Montserrat";
     // font-family: "Open Sans";
-    font-size: 36px;
-    font-weight: 700;
+    font-size: 18px;
+    font-weight: 500;
   }
 
   .caption-2 {
