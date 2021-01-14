@@ -23,6 +23,7 @@ export default (platform: Platform) => {
     Error: spritesUrl + '#error',
     Network: spritesUrl + '#network',
     Search: spritesUrl + '#search',
-    Add: spritesUrl + '#add'
+    Add: spritesUrl + '#add',
+    Resize: spritesUrl + '#resize'
   })
 }

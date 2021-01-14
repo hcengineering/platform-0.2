@@ -54,7 +54,7 @@
     margin: 15px;
     min-width: 200px;
     background-color: var(--theme-bg-color);
-    border-right: solid 1px var(--theme-separator-color);
+    border-right: solid 1px var(--theme-bg-accent-color);
 
     display: flex;
     flex-direction: column;
@@ -87,7 +87,7 @@
   .main {
     flex-grow: 1;
     min-width: 300px;
-    background-color: var(--theme-content-bg-color);
+    background-color: var(--theme-bg-color);
     display: flex;
     flex-direction: column;
     align-items: stretch;

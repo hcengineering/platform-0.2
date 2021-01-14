@@ -81,6 +81,8 @@
 
   let details: { _id: Ref<VDoc>; _class: Ref<Class<VDoc>> }
   let addButton: HTMLElement
+
+  let hidden = true;
 </script>
 
 <style lang="scss">
@@ -90,11 +92,34 @@
   }
 
   .projects {
-    padding: 1em 1em;
-    width: 20em;
-    overflow-y: auto;
+    padding: 1em;
+    width: 18em;
+    min-width: 18em;
+    position: relative;
 
-    border-right: 1px solid var(--theme-separator-color);
+    border-right: 1px solid var(--theme-bg-accent-color);
+
+    .container {
+      height: 100%;
+      padding-right: 1px;
+      overflow-y: auto;
+    }
+    .container::-webkit-scrollbar { width: 3px; height: 3px;}
+    .container::-webkit-scrollbar-button { display: none; background-color: #666; }
+    .container::-webkit-scrollbar-track-piece { background-color: #ddd; border-radius: 2px;}
+    .container::-webkit-scrollbar-thumb { height: 10px; background-color: #666; border-radius: 2px;}
+    
+    .hidden {
+      visibility: hidden;
+    }
+    .headIcon {
+      position: absolute;
+      top: 1.5em;
+      right: 1.5em;
+    }
+    .footContainer {
+      text-align: center;
+    }
 
     .item {
       box-sizing: border-box;
@@ -114,19 +139,24 @@
 
       &.selected {
         font-weight: 700;
-        color: var(--theme-caption-color);
-        background-color: var(--theme-content-color-dark);
+        color: var(--theme-content-dark-color);
+        background-color: var(--theme-bg-accent-color);
         &:hover {
           cursor: default;
-          color: var(--theme-caption-color);
-          background-color: var(--theme-content-color-dark);
+          color: var(--theme-content-dark-color);
+          background-color: var(--theme-bg-accent-color);
         }
       }
       &:hover {
-        color: var(--theme-highlight-color);
-        /*background-color: var(--theme-editbox-bg-color);*/
+        color: var(--theme-blue-color);
+        /*background-color: var(--theme-bg-accent-color);*/
       }
     }
+  }
+  .mini {
+    box-sizing: border-box;
+    width: 4em;
+    min-width: 4em;
   }
 
   .main {
@@ -150,47 +180,53 @@
   }
 
   aside {
-    background-color: var(--theme-nav-color);
-    border-left: 1px solid var(--theme-separator-color);
+    background-color: var(--theme-bg-color);
+    border-left: 1px solid var(--theme-bg-accent-color);
   }
 </style>
 
 <div class="workbench-perspective">
-  <div class="projects">
-    <div class="caption-3">
-      Пространства
-      <a
-        bind:this={addButton}
-        href="/"
-        on:click|preventDefault={() => {
-          uiService.showModal(CreateSpace, {}, addButton)
-        }}>
-        <Icon icon={ui.icon.Add} clazz="icon-embed" />
-      </a>
+  <div class="projects" class:mini={!hidden}>
+    <div class="headIcon">
+      <a href="/" on:click|preventDefault={() => { hidden = !hidden}}>
+        <Icon icon={ui.icon.Resize} clazz="icon-embed" /></a>
     </div>
-    <LinkTo href={'/' + location[1] + '/' + location[2]}>
-      <div class="item" class:selected={!space}>
-        Все
-        <!-- <LinkTo href={'/' + location[1] + '/' + location[2]}><b>Все</b></LinkTo> -->
+    <div class="container" class:hidden={!hidden}>
+      <div class="caption-3">
+        Пространства
       </div>
-    </LinkTo>
-    {#each spaces as s (s._id)}
-      <LinkTo href={'/' + location[1] + '/' + location[2] + '/' + s._id}>
-        <div class="item" class:selected={s._id === space}>
-          # {s.name}
-          <!-- <LinkTo href={'/' + location[1] + '/' + location[2] + '/' + s._id}>#{s.name}</LinkTo> -->
+      <LinkTo href={'/' + location[1] + '/' + location[2]}>
+        <div class="item" class:selected={!space}>
+          Все
         </div>
       </LinkTo>
-    {/each}
-
-    <div class="caption-3">Приложения</div>
-    {#each applications as app (app._id)}
-      <div class="item" class:selected={app._id === application}
-        on:click|preventDefault={(e) => {
-          application = id(app)
-        }}>{app.label}
+      {#each spaces as s (s._id)}
+        <LinkTo href={'/' + location[1] + '/' + location[2] + '/' + s._id}>
+          <div class="item" class:selected={s._id === space}>
+            # {s.name}
+          </div>
+        </LinkTo>
+      {/each}
+      <div class="footContainer">
+        <a
+          bind:this={addButton}
+          href="/"
+          on:click|preventDefault={() => {
+            uiService.showModal(CreateSpace, {}, addButton)
+          }}>
+          <Icon icon={ui.icon.Add} clazz="icon-embed" />
+        </a>
       </div>
-    {/each}
+
+      <div class="caption-3">Приложения</div>
+      {#each applications as app (app._id)}
+        <div class="item" class:selected={app._id === application}
+          on:click|preventDefault={(e) => {
+            application = id(app)
+          }}>{app.label}
+        </div>
+      {/each}
+    </div>
   </div>
 
   <div class="main">

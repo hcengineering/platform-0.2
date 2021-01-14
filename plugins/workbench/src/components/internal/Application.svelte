@@ -74,7 +74,7 @@
     }
 
     .details {
-      border-top: 1px solid var(--theme-separator-color);
+      border-top: 1px solid var(--theme-bg-accent-color);
       padding: 1em;
       //max-height: 400px;
     }

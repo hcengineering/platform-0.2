@@ -34,19 +34,19 @@
 
 		&:focus {
 			outline: none;
-			border-color: var(--theme-highlight-color);
-			box-shadow: inset 0px 0px 2px 0px var(--theme--highlight-color);
+			border-color: var(--theme-blue-color);
+			box-shadow: inset 0px 0px 2px 0px var(--theme--blue-color);
 		}
 		&.selected {
-			background-color: var(--theme-highlight-color);
+			background-color: var(--theme-blue-color);
 			font-weight: bold;
-			// background-color: darken(--theme-highlight-color, 10%);
+			// background-color: darken(--theme-blue-color, 10%);
 		}
 
 		&:hover:enabled {
-			border-color: var(--theme-highlight-color);
+			border-color: var(--theme-blue-color);
 			// color: $highlight-color;
-			background-color: var(--theme-highlight-color);
+			background-color: var(--theme-blue-color);
 			// background-color: darken($highlight-color, 30%);
 		}
 	}

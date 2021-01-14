@@ -73,6 +73,7 @@ export default plugin('ui' as Plugin<UIService>, {}, {
     Network: '' as Asset,
     Search: '' as Asset,
     Add: '' as Asset,
+    Resize: '' as Asset,
   },
   component: {
     Icon: '' as AnyComponent,

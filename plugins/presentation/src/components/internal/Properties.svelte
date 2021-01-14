@@ -45,7 +45,7 @@
   }
 
   .label {
-    color: var(--theme-content-color-dark);
+    color: var(--theme-content-dark-color);
   }
 
   .edit {
@@ -64,7 +64,7 @@
           <tr>
             <td>
               {#if attr.icon}
-                <Icon icon={attr.icon} clazz="icon-embed-15x" style="fill: var(--theme-content-color-dark)" />
+                <Icon icon={attr.icon} clazz="icon-embed-15x" style="fill: var(--theme-content-dark-color)" />
               {/if}
             </td>
             <td width="120px">

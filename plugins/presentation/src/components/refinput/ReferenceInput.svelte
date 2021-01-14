@@ -265,8 +265,8 @@
   .presentation-reference-input-control {
     width: 100%;
 
-    background-color: var(--theme-input-color);
-    border: 1px solid var(--theme-content-color-dark);
+    background-color: var(--theme-bg-color);
+    border: 1px solid var(--theme-content-dark-color);
     border-radius: 4px;
     padding: 1em;
     box-sizing: border-box;

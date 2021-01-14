@@ -83,8 +83,8 @@
 		flex-direction: column;
 
 		.app-icon {
-			border-bottom: solid 1px var(--theme-separator-color);
-			border-right: solid 1px var(--theme-separator-color);
+			border-bottom: solid 1px var(--theme-bg-accent-color);
+			border-right: solid 1px var(--theme-bg-accent-color);
 
 			.icon {
 				padding: 1em;
@@ -92,18 +92,18 @@
 
 			&.current-app {
 				background-color: var(--theme-bg-color);
-				border-right: solid 1px var(--theme-content-bg-color);
+				border-right: solid 1px var(--theme-bg-color);
 			}
 		}
 
 		.remainder {
 			flex-grow: 1;
-			border-right: solid 1px var(--theme-separator-color);
+			border-right: solid 1px var(--theme-bg-accent-color);
 		}
 	}
 
 	main {
-		background-color: var(--theme-content-bg-color);
+		background-color: var(--theme-bg-color);
 		width: 100%;
 	}
 </style>
