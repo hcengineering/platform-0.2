@@ -81,12 +81,24 @@
     .content {
       flex-grow: 1;
     }
+
+    .captionContainer {
+      box-sizing: border-box;
+      width: 100%;
+      height: 5em;
+      padding: 2em;
+      border-bottom: 1px solid var(--theme-bg-accent-color);
+      display: flex;
+      align-items: center;
+    }
   }
 </style>
 
 <div class="chat">
-  <div><span class="caption-1">Чат {spaceName}</span>&nbsp;</div>
-  <ScrollView stylez="height:100%;" autoscroll={true}>
+  <div class="captionContainer">
+    <span class="caption-1">Чат {spaceName}</span>&nbsp;
+  </div>
+  <ScrollView stylez="height:100%; width:100%; margin: 2em" autoscroll={true}>
     <div class="content">
       {#each messages as message (message._id)}
         {#if message.comments}
