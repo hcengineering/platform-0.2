@@ -7,7 +7,9 @@
     "start": "sirv public",
     "validate": "svelte-check",
     "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "build-storybook": "build-storybook",
+    "test": "echo 'no tests'",
+    "lint": "echo 'no linting'"
   },
   "devDependencies": {
     "@babel/core": "^7.12.10",
