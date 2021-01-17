@@ -20,6 +20,7 @@
 		display: inline-block;
 		border: 0px solid currentColor;
 		border-radius: 2px;
+		margin: 4px;
 		padding: 0.5em 1em 0.5em;
 		box-sizing: border-box;
 		cursor: pointer;
@@ -38,15 +39,16 @@
 			box-shadow: inset 0px 0px 2px 0px var(--theme--blue-color);
 		}
 		&.selected {
-			background-color: var(--theme-blue-color);
+			background-color: var(--theme-bg-dark-color);
 			font-weight: bold;
 			// background-color: darken(--theme-blue-color, 10%);
 		}
 
 		&:hover:enabled {
+			color: var(--theme-caption-color);
 			border-color: var(--theme-blue-color);
 			// color: $highlight-color;
-			background-color: var(--theme-blue-color);
+			background-color: var(--theme-bg-dark-color);
 			// background-color: darken($highlight-color, 30%);
 		}
 	}

@@ -188,6 +188,19 @@
     text-decoration: none;
   }
 
+  .icon-brd {
+    height: 24px;
+    width: 24px;
+    fill: currentColor;
+    position: relative;
+  }
+  .icon-brd-max {
+    height: 42px;
+    width: 42px;
+    fill: currentColor;
+    position: relative;
+  }
+
   .icon-embed {
     height: 16px;
     width: 16px;

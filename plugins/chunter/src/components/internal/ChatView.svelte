@@ -91,6 +91,10 @@
       display: flex;
       align-items: center;
     }
+
+    .refContainer {
+      margin: 0 2em 2em 2em;
+    }
   }
 </style>
 
@@ -107,7 +111,7 @@
       {/each}
     </div>
   </ScrollView>
-  <div>
+  <div class="refContainer">
     <ReferenceInput on:message={(e) => createMessage(e.detail)} />
   </div>
 </div>

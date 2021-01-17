@@ -12,20 +12,21 @@
 
 <style lang="scss">
 	.crm-toolbar-toolbar {
+		box-sizing: border-box;
 		flex-direction: row;
 		display: flex;
-		min-height: 2em;
-		padding: 2px;
+		min-height: 24px;
+		align-items: center;
 		// background-color: #111111;
 
 		.left-panel {
 			display: flex;
-			align-items: stretch;
+			align-items: center;
 		}
 		.right-panel {
 			flex-grow: 1;
 			display: flex;
-			align-items: stretch;
+			align-items: center;
 			flex-direction: row-reverse;
 			:global {
 				div {

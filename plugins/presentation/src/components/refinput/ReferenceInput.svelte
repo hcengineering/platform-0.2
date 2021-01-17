@@ -19,6 +19,9 @@
 
   import { schema } from '@anticrm/sparkling-rich/src/internal/schema'
 
+  import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
+  import ui from '@anticrm/platform-ui'
+
   import { createEventDispatcher } from 'svelte'
   const dispatch = createEventDispatcher()
 
@@ -265,15 +268,15 @@
   .presentation-reference-input-control {
     width: 100%;
 
-    background-color: var(--theme-bg-color);
-    border: 1px solid var(--theme-content-dark-color);
+    background-color: var(--theme-bg-accent-color);
+    border: 1px solid var(--theme-bg-dark-color);
     border-radius: 4px;
-    padding: 1em;
+    padding: 8px;
     box-sizing: border-box;
     yarn .flex-column {
       display: flex;
       flex-direction: column;
-      align-items: stretch;
+      align-items: center;
     }
     .flex-row {
       display: flex;
@@ -284,6 +287,7 @@
     .edit-box-horizontal {
       width: 100%;
       height: 100%;
+      margin-top: 7px;
       align-self: center;
     }
     .edit-box-vertical {
@@ -301,6 +305,13 @@
       reference:not([id]) {
         color: grey;
       }
+    }
+
+    .tSeparator {
+      width: 2px;
+      height: 42px;
+      margin: 0 8px;
+      background-color: var(--theme-bg-dark-color);
     }
   }
 </style>
@@ -347,28 +358,58 @@
       <Toolbar>
         {#if stylesEnabled}
           <slot name="inner" />
-          <ToolbarButton style="font-weight:bold;" on:click={() => htmlEditor.toggleBold()} selected={styleState.bold}>
-            B
+          <ToolbarButton style="padding:0; width:24px; height:24px"
+            on:click={() => htmlEditor.toggleBold()} selected={styleState.bold}>
+            <Icon icon={ui.icon.brdBold} clazz="icon-brd" />
           </ToolbarButton>
-          <ToolbarButton
+          <ToolbarButton style="padding:0; width:24px; height:24px"
             on:click={() => htmlEditor.toggleItalic()}
-            style="font-weight:italic;"
             selected={styleState.italic}>
-            I
+            <Icon icon={ui.icon.brdItalic} clazz="icon-brd" />
           </ToolbarButton>
-          <ToolbarButton
+          <ToolbarButton style="padding:0; width:24px; height:24px"
             on:click={() => htmlEditor.toggleUnderline()}
-            style="font-weight:underline;"
             selected={styleState.underline}>
-            U
+            <Icon icon={ui.icon.brdUnder} clazz="icon-brd" />
           </ToolbarButton>
-          <ToolbarButton on:click={() => htmlEditor.toggleStrike()} selected={styleState.strike}>~</ToolbarButton>
-          <ToolbarButton on:click={() => htmlEditor.toggleUnOrderedList()}>L</ToolbarButton>
-          <ToolbarButton on:click={() => htmlEditor.toggleOrderedList()}>O</ToolbarButton>
+          <ToolbarButton style="padding:0; width:24px; height:24px"
+            on:click={() => htmlEditor.toggleStrike()} selected={styleState.strike}>
+            <Icon icon={ui.icon.brdStrike} clazz="icon-brd" />
+          </ToolbarButton>
+          <div class="tSeparator" />
+          <ToolbarButton style="padding:0; width:24px; height:24px">
+            <Icon icon={ui.icon.brdCode} clazz="icon-brd" />
+          </ToolbarButton>
+          <ToolbarButton style="padding:0; width:24px; height:24px"
+            on:click={() => htmlEditor.toggleUnOrderedList()}>
+            <Icon icon={ui.icon.brdUL} clazz="icon-brd" />
+          </ToolbarButton>
+          <ToolbarButton style="padding:0; width:24px; height:24px"
+            on:click={() => htmlEditor.toggleOrderedList()}>
+            <Icon icon={ui.icon.brdOL} clazz="icon-brd" />
+          </ToolbarButton>
+          <div class="tSeparator" />
+          <ToolbarButton style="padding:0; width:24px; height:24px">
+            <Icon icon={ui.icon.brdLink} clazz="icon-brd" />
+          </ToolbarButton>
+          <div class="tSeparator" />
+          <ToolbarButton style="padding:0; width:24px; height:24px">
+            <Icon icon={ui.icon.brdAddr} clazz="icon-brd" />
+          </ToolbarButton>
+          <ToolbarButton style="padding:0; width:24px; height:24px">
+            <Icon icon={ui.icon.brdClip} clazz="icon-brd" />
+          </ToolbarButton>
         {/if}
         <div slot="right">
-          <ToolbarButton on:click={() => handleSubmit()} selected={!styleState.isEmpty}>▶️</ToolbarButton>
-          <ToolbarButton>😀</ToolbarButton>
+          <ToolbarButton style="padding:0; width:42x; height:42px"
+            on:click={() => handleSubmit()} selected={!styleState.isEmpty}>
+            <Icon icon={ui.icon.brdSend} clazz="icon-brd-max" />
+            <!--▶️-->
+          </ToolbarButton>
+          <ToolbarButton style="padding:0; width:42px; height:42px">
+            <Icon icon={ui.icon.brdSmile} clazz="icon-brd-max" />
+            <!--😀-->
+          </ToolbarButton>
           <ToolbarButton selected={stylesEnabled} on:click={() => (stylesEnabled = !stylesEnabled)}>Aa</ToolbarButton>
         </div>
       </Toolbar>
