@@ -18,7 +18,8 @@ import { AnyPlugin, mergeIds } from '@anticrm/platform'
 import { Backlinks } from './text'
 import { Title } from './title'
 import { CreateTx, DeleteTx, PushTx, UpdateTx } from './tx'
-import { Application, Space, SpaceUser, VDoc } from './vdoc'
+import { Application, VDoc } from './vdoc'
+import { Space, SpaceUser } from './space'
 
 const core = mergeIds('core' as AnyPlugin, model, {
   class: {
@@ -48,6 +49,7 @@ export * from './text'
 export * from './textmodel'
 export * from './tx'
 export * from './title'
+export * from './space'
 export * from './vdoc'
 export * from './objectid'
 export * from './utils'

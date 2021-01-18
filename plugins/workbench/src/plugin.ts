@@ -18,7 +18,9 @@ import workbench, { WorkbenchService } from '.'
 
 import Workbench from './components/internal/Workbench.svelte'
 import DefaultPerspective from './components/internal/DefaultPerspective.svelte'
-import CreateSpace from './components/internal/CreateSpace.svelte'
+import CreateSpace from './components/internal/spaces/CreateSpace.svelte'
+import JoinSpace from './components/internal/spaces/JoinSpace.svelte'
+import BrowseSpace from './components/internal/spaces/BrowseSpace.svelte'
 import Application from './components/internal/Application.svelte'
 import CreateForm from './components/internal/CreateForm.svelte'
 
@@ -34,6 +36,8 @@ export default async (platform: Platform, deps: { core: CoreService, ui: UIServi
   platform.setResource(workbench.component.Workbench, Workbench)
   platform.setResource(workbench.component.DefaultPerspective, DefaultPerspective)
   platform.setResource(workbench.component.CreateSpace, CreateSpace)
+  platform.setResource(workbench.component.JoinSpace, JoinSpace)
+  platform.setResource(workbench.component.BrowseSpace, BrowseSpace)
   platform.setResource(workbench.component.Application, Application)
   platform.setResource(workbench.component.CreateForm, CreateForm)
 

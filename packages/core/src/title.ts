@@ -97,7 +97,7 @@ export class TitleIndex implements Index {
       }
     }
     if (updated) {
-      this.storage.update(ctx, core.class.Title, update._objectId, { title: update._attributes[primary] })
+      this.storage.update(ctx, core.class.Title, update._objectId, null, { title: update._attributes[primary] })
     }
   }
 }

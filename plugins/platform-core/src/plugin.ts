@@ -21,8 +21,6 @@ import {
   AnyLayout,
   MODEL_DOMAIN,
   Tx,
-  Emb,
-  DateProperty,
   StringProperty,
   txContext,
   TxContextSource
@@ -38,11 +36,11 @@ import { QueriableStorage } from './queries'
 import { Cache } from './cache'
 import { Titles } from './titles'
 import { Graph } from './graph'
-import { newCreateTx, newPushTx } from './tx'
 import {
-  BACKLINKS_DOMAIN, CoreProtocol, ModelIndex, TextIndex, TitleIndex, TITLE_DOMAIN, TxIndex, TxProcessor, VDocIndex, VDoc,
+  BACKLINKS_DOMAIN, CoreProtocol, ModelIndex, TextIndex, TitleIndex, TITLE_DOMAIN, TxIndex, TxProcessor, VDocIndex,
   generateId as genId
 } from '@anticrm/core'
+import { createOperations } from './operations'
 
 /*!
  * Anticrm Platform™ Core Plugin
@@ -150,30 +148,11 @@ export default async (platform: Platform): Promise<CoreService> => {
       txProcessor.process(txContext(TxContextSource.Client, networkComplete), tx)
     ])
   }
-
-  function createDoc<T extends Doc> (doc: T): Promise<any> {
-    if (!doc._id) {
-      doc._id = generateId()
-    }
-
-    return processTx(newCreateTx(doc, platform.getMetadata(login.metadata.WhoAmI) as StringProperty))
+  function getUserId () {
+    return platform.getMetadata(login.metadata.WhoAmI) as StringProperty
   }
 
-  function createVDoc<T extends VDoc> (vdoc: T): Promise<void> {
-    if (!vdoc._createdBy) {
-      vdoc._createdBy = platform.getMetadata(login.metadata.WhoAmI) as StringProperty
-    }
-    if (!vdoc._createdOn) {
-      vdoc._createdOn = Date.now() as DateProperty
-    }
-    return createDoc(vdoc)
-  }
-
-  function push (vdoc: VDoc, _attribute: string, element: Emb): Promise<any> {
-    return processTx(
-      newPushTx(vdoc, _attribute, element, platform.getMetadata(login.metadata.WhoAmI) as StringProperty)
-    )
-  }
+  const ops = createOperations(model, processTx, getUserId)
 
   function loadDomain (domain: string, index?: string, direction?: string): Promise<Doc[]> {
     return coreProtocol.loadDomain(domain, index, direction)
@@ -185,11 +164,9 @@ export default async (platform: Platform): Promise<CoreService> => {
     query,
     find,
     findOne,
-    createDoc,
-    createVDoc,
-    push,
+    ...ops,
     generateId,
     tx: processTx,
-    getUserId: () => platform.getMetadata(login.metadata.WhoAmI) as StringProperty
+    getUserId
   } as CoreService
 }

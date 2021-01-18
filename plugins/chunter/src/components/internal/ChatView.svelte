@@ -11,7 +11,7 @@
   //
   // See the License for the specific language governing permissions and
   // limitations under the License.
-  import { Property, Ref } from '@anticrm/model'
+  import { AnyLayout, Emb, Property, Ref, StringProperty } from '@anticrm/model'
   import { MessageNode, Space, VDoc } from '@anticrm/core'
   import core from '@anticrm/core'
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
@@ -55,19 +55,16 @@
       chunterService.then((chunterService) => {
         const parsedMessage = chunterService.createMissedObjects(message)
         coreService.then((coreService) => {
-          const comment: Omit<Comment, '__embedded'> = {
-            _class: chunter.class.Comment,
+          const comment = {
             _createdOn: Date.now() as Property<number, Date>,
-            _createdBy: 'john.appleseed@gmail.com' as Property<string, string>,
-            message: parsedMessage
-          }
-          const newMessage = {
-            _class: chunter.class.Message,
-            _space: space,
-            comments: [comment]
+            _createdBy: 'john.appleseed@gmail.com' as StringProperty,
+            message: parsedMessage as StringProperty
           }
           // absent VDoc fields will be autofilled
-          coreService.createVDoc((newMessage as unknown) as VDoc)
+          coreService.create(chunter.class.Message, {
+            _space: space,
+            comments: [comment]
+          })
         })
       })
     }

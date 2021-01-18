@@ -15,6 +15,7 @@
 
 import { DateProperty, Doc, Emb, Index, Ref, Storage, StringProperty, Tx, TxContext, Model } from '@anticrm/model'
 import { CreateTx, PushTx, UpdateTx } from './tx'
+import { Space } from './space'
 import core from '.'
 
 export interface Application extends Doc { }
@@ -23,22 +24,6 @@ export interface List extends Emb {
   id: string
   name: string
   application: Ref<Application>
-}
-
-/**
- * Define a space user- association, it hold some extra properties.
- */
-export interface SpaceUser extends Emb {
-  userId: string // An user account id
-  owner: boolean // Make user as space owner
-}
-
-export interface Space extends Doc {
-  name: string
-
-  users: SpaceUser[] // A list of included user accounts
-  isPublic: boolean // If specified, a users are interpreted as include list, if not, as exclude list.
-  autoJoin: boolean // If specified, any new user will join proposed space.
 }
 
 export interface VDoc extends Doc {
@@ -72,15 +57,23 @@ export class VDocIndex implements Index {
   }
 
   async onCreate (ctx: TxContext, create: CreateTx): Promise<any> {
-    if (!this.modelDb.is(create._objectClass, core.class.VDoc)) return
+    if (!this.modelDb.is(create._objectClass, core.class.VDoc)) {
+      return Promise.resolve()
+    }
     return this.storage.store(ctx, this.modelDb.newDoc(create._objectClass, create._objectId, create.object))
   }
 
   onPush (ctx: TxContext, tx: PushTx): Promise<any> {
-    return this.storage.push(ctx, tx._objectClass, tx._objectId, tx._attribute, tx._attributes)
+    if (!this.modelDb.is(tx._objectClass, core.class.VDoc)) {
+      return Promise.resolve()
+    }
+    return this.storage.push(ctx, tx._objectClass, tx._objectId, null, tx._attribute, tx._attributes)
   }
 
   onUpdate (ctx: TxContext, tx: UpdateTx): Promise<any> {
-    return this.storage.update(ctx, tx._objectClass, tx._objectId, tx._attributes)
+    if (!this.modelDb.is(tx._objectClass, core.class.VDoc)) {
+      return Promise.resolve()
+    }
+    return this.storage.update(ctx, tx._objectClass, tx._objectId, null, tx._attributes)
   }
 }

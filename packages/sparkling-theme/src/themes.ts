@@ -44,8 +44,8 @@ export const themes: Theme[] = [
       ['highlight-color']: '#2D6AB9',
       ['highlight-border']: '#000',
       ['content-trans-color']: 'rgba(255, 255, 255, 0.2)',
-      ['font-content']: `"IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto`,
-    },
+      ['font-content']: `"IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto`
+    }
   },
   {
     name: 'dark',

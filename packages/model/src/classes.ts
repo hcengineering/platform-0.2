@@ -42,6 +42,7 @@ export type PropertyType = Property<PrimitiveType, any>
   | { [key: string]: PropertyType }
 
 export type StringProperty = Property<string, string>
+export type BooleanProperty = Property<boolean, boolean>
 export type DateProperty = Property<number, Date>
 
 // An attribute type with some defined mixins inside.

@@ -37,7 +37,7 @@
     const doc = { _class, _space: space, ...object }
     object = {}
     // absent VDoc fields will be autofilled
-    coreService.createVDoc((doc as unknown) as VDoc)
+    coreService.create(_class, doc)
     dispatch('close')
   }
 

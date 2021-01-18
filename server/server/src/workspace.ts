@@ -20,9 +20,11 @@ import { withTenant } from '@anticrm/accounts'
 
 export interface WorkspaceProtocol extends CoreProtocol {
   close (): Promise<void>
+
+  getModel (): Promise<Model>
 }
 
-export async function connectWorkspace (uri: string, workspace: string): Promise<CoreProtocol & WorkspaceProtocol> {
+export async function connectWorkspace (uri: string, workspace: string): Promise<WorkspaceProtocol> {
   console.log('connecting to ' + uri)
   const client = await MongoClient.connect(uri, { useUnifiedTopology: true })
   const db = withTenant(client, workspace)
@@ -45,16 +47,20 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
       return c.insertOne(doc)
     },
 
-    async push (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: any): Promise<any> {
+    async push (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, query: AnyLayout | null, attribute: string, attributes: any): Promise<any> {
       return collection(_class).updateOne({ _id }, { $push: { [attribute]: attributes } })
     },
 
-    async update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, attributes: any): Promise<any> {
+    async update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, query: AnyLayout | null, attributes: any): Promise<any> {
       return collection(_class).updateOne({ _id }, { $set: attributes })
     },
 
-    async remove (ctx: TxContext, _class: Ref<Class<Doc>>, doc: Ref<Doc>): Promise<any> {
-      return collection(_class).deleteOne({ _id: doc })
+    async remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, query: AnyLayout | null): Promise<any> {
+      if (query !== null) {
+        // Operation over embedded child object, path to it should be matched by query object.
+
+      }
+      return collection(_class).deleteOne({ _id })
     },
 
     async find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
@@ -124,7 +130,9 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
 
     close (): Promise<void> {
       return client.close()
-    }
+    },
+
+    getModel: () => Promise.resolve(memdb)
   }
 
   return clientControl

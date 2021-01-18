@@ -11,12 +11,14 @@ import { model as core } from '@anticrm/core/src/__model__'
 import { model as presentationPlugin } from '@anticrm/presentation/src/__model__'
 import contact, { model as contactPlugin } from '@anticrm/contact/src/__model__'
 import { model as workbenchPlugin } from '@anticrm/workbench/src/__model__'
-import { model as taskPlugin } from '@anticrm/task/src/__model__'
 import { model as chunterPlugin } from '@anticrm/chunter/src/__model__'
 import { Person } from '@anticrm/contact'
 import { createClientService } from '../service'
 import { WorkspaceProtocol } from '../workspace'
 import { generateId, Request, Space } from '@anticrm/core'
+
+// Import a special tasks model package for generoc testing.
+import { model as taskPlugin } from '@anticrm/model/src/__tests__/test_tasks'
 
 export const builder = new Builder()
 builder.load(model)

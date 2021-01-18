@@ -19,20 +19,16 @@
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import ui from '@anticrm/platform-ui/'
 
-  export let value: string
+  export let value: unknown
   export let attribute: AttrModel
   export let maxWidth: number = 300
-
-  function onChange (ev: Event) { 
-    value = (ev.target as any).value 
-  }
 
   const platform = getPlatform()
   $: component = platform.getResource(attribute.presenter)
 </script>
 
 {#await component then ctor}
-  <svelte:component this={ctor} {attribute} {maxWidth} {value} on:change={onChange}/>
+  <svelte:component this={ctor} {attribute} {maxWidth} bind:value={value}/>
 {:catch}
   <Icon icon={ui.icon.Error} clazz="icon-2x" />
 {/await}

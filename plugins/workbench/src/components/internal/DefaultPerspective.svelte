@@ -15,7 +15,7 @@
 <script lang="ts">
   import { Ref, Doc, Class } from '@anticrm/model'
   import { onDestroy } from 'svelte'
-  import { find, getCoreService, getUIService } from '../../utils'
+  import { find, getCoreService, getUIService, _getCoreService } from '../../utils'
   import core, { Space, VDoc } from '@anticrm/core'
   import ui from '@anticrm/platform-ui'
   import workbench, { WorkbenchApplication } from '../..'
@@ -25,10 +25,11 @@
 
   import { AnyComponent } from '@anticrm/platform-ui'
 
-  import CreateSpace from './CreateSpace.svelte'
+  import JoinSpace from './spaces/JoinSpace.svelte'
   import MainComponent from '../proxies/MainComponent.svelte'
 
   import ObjectForm from './ObjectForm.svelte'
+  import { getSpaceName, isCurrentUserSpace } from './spaces/utils'
 
   const uiService = getUIService()
 
@@ -39,6 +40,8 @@
     location = loc.pathname.split('/')
   })
 
+  const curentUser = _getCoreService().getUserId()
+
   let space: Ref<Space>
   let spaces: Space[] = []
   let spaceUnsubscribe: () => void | undefined
@@ -48,7 +51,7 @@
     .then((qr) => {
       spaceUnsubscribe = qr.subscribe((docs) => {
         console.log('spaces:', docs)
-        spaces = docs
+        spaces = docs.filter((s) => isCurrentUserSpace(curentUser, s))
       })
     })
 
@@ -201,7 +204,7 @@
           bind:this={addButton}
           href="/"
           on:click|preventDefault={() => {
-            uiService.showModal(CreateSpace, {}, addButton)
+            uiService.showModal(JoinSpace, {}, addButton)
           }}>
           <Icon icon={ui.icon.Add} clazz="icon-embed" />
         </a>

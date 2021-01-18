@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 -->
-
 <script type="ts">
   import { AttrModel } from '../../..'
   import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.svelte'
@@ -22,4 +21,4 @@
   export let maxWidth: number = 300
 </script>
 
-<InlineEdit value={value} placeholder={attribute.placeholder} { maxWidth } on:change/>
+<InlineEdit bind:value placeholder={attribute.placeholder} {maxWidth} />

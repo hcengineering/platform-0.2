@@ -70,20 +70,25 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
         const placeholder = uxAttribute.placeholder ? await i18nService.translate(uxAttribute.placeholder) : label
         const icon: Asset | undefined = uxAttribute.icon
 
-        // get presenter
-        const typeClassId = attribute.type._class
-        const typeClass = model.get(typeClassId) as Class<Type>
-        if (!model.isMixedIn(typeClass, ui.class.Presenter)) {
-          throw new Error(`no presenter for type '${typeClassId}'`)
+        let presenter: AnyComponent = ui.component.StringPresenter // Use string presenter as default one
+        if (uxAttribute.presenter) {
+          presenter = uxAttribute.presenter
+        } else {
+          // get presenter
+          const typeClassId = attribute.type._class
+          const typeClass = model.get(typeClassId) as Class<Type>
+          if (!model.isMixedIn(typeClass, ui.class.Presenter)) {
+            throw new Error(`no presenter for type '${typeClassId}'`)
+          }
+          presenter = model.as(typeClass, ui.class.Presenter).presenter
         }
-        const presenter = model.as(typeClass, ui.class.Presenter)
         result.push({
           key,
           _class,
           icon,
           label,
           placeholder,
-          presenter: presenter.presenter,
+          presenter: presenter,
           type: attribute.type,
           primary: primary === key
         })

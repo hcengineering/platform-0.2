@@ -15,7 +15,7 @@
 
 import { Builder } from '@anticrm/model'
 
-import { model } from '@anticrm/model/src/__model__'
+import { model as modelModel } from '@anticrm/model/src/__model__'
 import { model as core } from '@anticrm/core/src/__model__'
 import { model as presentation } from '@anticrm/presentation/src/__model__'
 import { model as contact } from '@anticrm/contact/src/__model__'
@@ -27,7 +27,7 @@ import { model as chunter } from '@anticrm/chunter/src/__model__'
 // import taskStrings from '@anticrm/task-model/src/strings/ru'
 
 export const builder = new Builder()
-builder.load(model)
+builder.load(modelModel)
 builder.load(core)
 builder.load(presentation)
 builder.load(contact)

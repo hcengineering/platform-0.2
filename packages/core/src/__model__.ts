@@ -38,12 +38,14 @@ export class TSpace extends TDoc implements Space {
   @Primary()
   @Prop() name!: string
 
+  @Prop() description!: string
+
   @ArrayOf$()
   @InstanceOf$(core.class.SpaceUser) users!: SpaceUser[]
 
-  @Prop() isPublic!: boolean
+  @Prop(core.class.Boolean) isPublic!: boolean
 
-  @Prop() autoJoin!: boolean
+  @Prop(core.class.Boolean) autoJoin!: boolean
 }
 
 @Class$(core.class.VDoc, core.class.Doc)
@@ -97,6 +99,8 @@ export class TPushTx extends TTx implements PushTx {
 
   @BagOf$()
   @InstanceOf$(core.class.Emb) _attributes!: AnyLayout
+
+  @Prop() _query!: AnyLayout
 }
 
 @Class$(core.class.UpdateTx, core.class.Tx, TX_DOMAIN)
@@ -106,12 +110,16 @@ export class TUpdateTx extends TTx implements UpdateTx {
 
   @BagOf$()
   @InstanceOf$(core.class.Emb) _attributes!: AnyLayout
+
+  @Prop() _query!: AnyLayout
 }
 
 @Class$(core.class.DeleteTx, core.class.Tx, TX_DOMAIN)
 export class TDeleteTx extends TTx implements DeleteTx {
   @RefTo$(core.class.Doc) _objectId!: Ref<Doc>
   @RefTo$(core.class.Class) _objectClass!: Ref<Class<Doc>>
+
+  @Prop() _query!: unknown
 }
 
 export function model (S: Builder): void {

@@ -60,10 +60,12 @@ export function model (S: Builder): void {
         label: 'Members' as IntlString
       } as UXAttribute,
       isPublic: {
-        label: 'Make space public' as IntlString
+        label: 'Make space public' as IntlString,
+        presenter: ux.component.CheckboxPresenter
       } as UXAttribute,
       autoJoin: {
-        label: 'Auto join(for public space)' as IntlString
+        label: 'Auto join(for public space)' as IntlString,
+        presenter: ux.component.CheckboxPresenter
       } as UXAttribute
     }
   })
@@ -82,6 +84,7 @@ export function model (S: Builder): void {
 
   S.createDocument(core.class.Space, {
     name: 'Общее',
+    description: 'General space',
     isPublic: true, // Available for all
     autoJoin: true,
     users: []
@@ -89,6 +92,7 @@ export function model (S: Builder): void {
 
   S.createDocument(core.class.Space, {
     name: 'Всякое',
+    description: 'Other space',
     isPublic: true,
     autoJoin: true,
     users: []
@@ -96,6 +100,7 @@ export function model (S: Builder): void {
 
   S.createDocument(core.class.Space, {
     name: 'Разное',
+    description: 'Random space',
     isPublic: true,
     autoJoin: false,
     users: []

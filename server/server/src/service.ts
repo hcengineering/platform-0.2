@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Class, Doc, Ref, Tx } from '@anticrm/model'
+import { AnyLayout, Class, Doc, Model, Ref, Tx } from '@anticrm/model'
 import { makeResponse, Response } from './rpc'
 import { WorkspaceProtocol } from './workspace'
 
@@ -94,6 +94,10 @@ export async function createClientService (workspaceProtocol: Promise<WorkspaceP
 
     close (): Promise<void> {
       return workspace.close()
+    },
+
+    getModel (): Promise<Model> {
+      return workspace.getModel()
     }
   }
 

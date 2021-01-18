@@ -16,4 +16,13 @@
   export let value: boolean
 </script>
 
-<button type="checkbox" checked={value} on:change />
+<style lang="scss">
+  .presentation-checkbox {
+    width: 16px;
+    height: 16px;
+  }
+</style>
+
+<div class="presentation-checkbox">
+  <input type="checkbox" bind:checked={value} />
+</div>

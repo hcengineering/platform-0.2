@@ -36,6 +36,8 @@ import { model as chunter } from '@anticrm/chunter/src/__model__'
 
 // import taskStrings from '@anticrm/task-model/src/strings/ru'
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+
 export const builder = new Builder()
 builder.load(model)
 builder.load(coreModel)

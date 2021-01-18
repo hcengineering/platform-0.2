@@ -27,10 +27,20 @@ import { VDoc } from '@anticrm/core'
  * Define attribute UI extra properties.
  */
 export interface UXAttribute extends Emb {
+  // Declare label
   label: IntlString
+
+  // Declare an icon
   icon?: Asset
+
+  // Declare a placeholder
   placeholder?: IntlString
-  visible: boolean
+
+  // Declare if field should be not visible
+  visible?: boolean
+
+  // Declare a direct presenter for field
+  presenter?: AnyComponent
 }
 
 export interface UXObject<T extends Obj> extends Mixin<T> {
@@ -45,6 +55,9 @@ export interface UXObject<T extends Obj> extends Mixin<T> {
 //   icon?: Asset
 // }
 
+/**
+ * Define a mixin interface for class with a proposed presenter.
+ */
 export interface Presenter<T extends Type> extends Mixin<T> {
   presenter: AnyComponent
 }
