@@ -81,6 +81,8 @@
 
   let details: { _id: Ref<VDoc>; _class: Ref<Class<VDoc>> }
   let addButton: HTMLElement
+
+  let hidden = true;
 </script>
 
 <style lang="scss">
@@ -91,30 +93,66 @@
 
   .projects {
     padding: 1em;
-    width: 20em;
-    overflow-y: auto;
+    width: 18em;
+    min-width: 18em;
+    position: relative;
 
-    border-right: 1px solid var(--theme-separator-color);
+    border-right: 1px solid var(--theme-bg-accent-color);
 
-    .project {
-      font-family: Raleway;
-      padding: 0.5em;
-      &.selected {
-        // color: var(--theme-content-bg-color);
-        background-color: var(--theme-content-color-dark);
-      }
-      a {
-        text-decoration: none;
-      }
+    .container {
+      height: 100%;
+      padding-right: 1px;
+      overflow-y: auto;
+    }
+    
+    .hidden {
+      visibility: hidden;
+    }
+    .headIcon {
+      position: absolute;
+      top: 1.5em;
+      right: 1.5em;
+    }
+    .footContainer {
+      text-align: center;
     }
 
-    .app {
-      font-family: Raleway;
+    .item {
+      box-sizing: border-box;
+      font-family: var(--theme-font-content);
+      font-weight: 500;
       padding: 0.5em;
+      padding-top: calc(0.5em + 1px);
+      margin-bottom: 0.25em;
+      height: 2.5em;
+      color: var(--theme-content-color);
+      background-color: var(--theme-bg-color);
+      cursor: pointer;
+      border-radius: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
       &.selected {
-        background-color: var(--theme-content-color-dark);
+        font-weight: 700;
+        color: var(--theme-content-dark-color);
+        background-color: var(--theme-bg-accent-color);
+        &:hover {
+          cursor: default;
+          color: var(--theme-content-dark-color);
+          background-color: var(--theme-bg-accent-color);
+        }
+      }
+      &:hover {
+        color: var(--theme-blue-color);
+        /*background-color: var(--theme-bg-accent-color);*/
       }
     }
+  }
+  .mini {
+    box-sizing: border-box;
+    width: 4em;
+    min-width: 4em;
   }
 
   .main {
@@ -138,43 +176,53 @@
   }
 
   aside {
-    background-color: var(--theme-nav-color);
-    border-left: 1px solid var(--theme-separator-color);
+    background-color: var(--theme-bg-color);
+    border-left: 1px solid var(--theme-bg-accent-color);
   }
 </style>
 
 <div class="workbench-perspective">
-  <div class="projects">
-    <div class="caption-3">
-      Пространства
-      <a
-        bind:this={addButton}
-        href="/"
-        on:click|preventDefault={() => {
-          uiService.showModal(CreateSpace, {}, addButton)
-        }}>
-        <Icon icon={ui.icon.Add} clazz="icon-embed" />
-      </a>
+  <div class="projects" class:mini={!hidden}>
+    <div class="headIcon">
+      <a href="/" on:click|preventDefault={() => { hidden = !hidden}}>
+        <Icon icon={ui.icon.Resize} clazz="icon-embed" /></a>
     </div>
-    <div class="project" class:selected={!space}>
-      <LinkTo href={'/' + location[1] + '/' + location[2]}><b>Все</b></LinkTo>
-    </div>
-    {#each spaces as s (s._id)}
-      <div class="project" class:selected={s._id === space}>
-        <LinkTo href={'/' + location[1] + '/' + location[2] + '/' + s._id}>#{s.name}</LinkTo>
+    <div class="container" class:hidden={!hidden}>
+      <div class="caption-3">
+        Пространства
       </div>
-    {/each}
-
-    <div class="caption-3">Приложения</div>
-    {#each applications as app (app._id)}
-      <div class="app" class:selected={app._id === application}>
+      <LinkTo href={'/' + location[1] + '/' + location[2]}>
+        <div class="item" class:selected={!space}>
+          Все
+        </div>
+      </LinkTo>
+      {#each spaces as s (s._id)}
+        <LinkTo href={'/' + location[1] + '/' + location[2] + '/' + s._id}>
+          <div class="item" class:selected={s._id === space}>
+            # {s.name}
+          </div>
+        </LinkTo>
+      {/each}
+      <div class="footContainer">
         <a
+          bind:this={addButton}
           href="/"
+          on:click|preventDefault={() => {
+            uiService.showModal(CreateSpace, {}, addButton)
+          }}>
+          <Icon icon={ui.icon.Add} clazz="icon-embed" />
+        </a>
+      </div>
+
+      <div class="caption-3">Приложения</div>
+      {#each applications as app (app._id)}
+        <div class="item" class:selected={app._id === application}
           on:click|preventDefault={(e) => {
             application = id(app)
-          }}>{app.label}</a>
-      </div>
-    {/each}
+          }}>{app.label}
+        </div>
+      {/each}
+    </div>
   </div>
 
   <div class="main">

@@ -43,17 +43,17 @@
     cursor: pointer;
 }
   .menu:hover {
-    color: var(--theme-highlight-color);
+    color: var(--theme-blue-color);
   }
   .hidden {
     visibility: hidden;
   }
   .subMenu {
     background-color: var(--theme-bg-color);
-    border: 1px solid var(--theme-separator-color);
-    border-radius: 4px;
+    border: 1px solid var(--theme-bg-accent-color);
+    border-radius: 0px 0px 4px 4px;
     width: 10em;
-    right: -1em;
+    right: calc(-1em - 1px);
     padding: 1em;
     text-align: right;
     position: absolute;
@@ -67,7 +67,7 @@
     color: var(--theme-content-color);
   }
   .item:hover {
-    color: var(--theme-highlight-color);
-    background-color: var(--theme-editbox-bg-color);
+    color: var(--theme-blue-color);
+    background-color: var(--theme-bg-accent-color);
   }
 </style>

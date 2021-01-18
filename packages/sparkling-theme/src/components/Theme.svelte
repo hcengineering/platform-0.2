@@ -33,6 +33,35 @@
 </script>
 
 <style lang="scss" global>
+  * {
+    --theme-white-color: #fff;
+    --theme-blue-color: #2D6AB9;
+    --theme-green-color: #4396A2;
+    --theme-grey-color: #78726D;
+    --theme-maroon-color: #B92D52;
+
+    scrollbar-color: var(--theme-bg-dark-color) var(--theme-bg-accent-color);
+    scrollbar-width: thin;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  ::-webkit-scrollbar:horizontal {
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background-color: var(--theme-bg-color);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--theme-bg-accent-color);
+    border: 1px solid var(--theme-bg-dark-color);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--theme-bg-dark-color);
+    border: 1px solid var(--theme-bg-dark-color);
+  }
+
   @font-face {
     font-family: "IBM Plex Sans";
     font-style: normal;
@@ -83,17 +112,17 @@
   }
 
   .editbox {
-    border: 1px solid var(--theme-separator-color);
+    border: 1px solid var(--theme-bg-dark-color);
     border-radius: 0.5em;
     padding: 0.5em 0.75em;
-    background-color: var(--theme-editbox-bg-color);
+    background-color: var(--theme-bg-accent-color);
     box-sizing: border-box;
     color: inherit;
     font: inherit;
 
     &:focus {
       outline: none;
-      border-color: var(--theme-highlight-color);
+      border-color: var(--theme-blue-color);
     }
   }
 
@@ -115,8 +144,8 @@
 
     &:focus {
       outline: none;
-      border-color: var(--theme-highlight-color);
-      box-shadow: inset 0px 0px 2px 0px var(--theme-highlight-color);
+      border-color: var(--theme-blue-color);
+      box-shadow: inset 0px 0px 2px 0px var(--theme-blue-color);
     }
 
     &.large {
@@ -128,21 +157,21 @@
     }
 
     &:hover {
-      border-color: var(--theme-highlight-color);
+      border-color: var(--theme-blue-color);
       // color: $highlight-color;
       // background-color: $highlight-color;
-      background-color: var(--theme-highlight-color);
+      background-color: var(--theme-blue-color);
     }
 
     &.primary {
       // border-color: $highlight-color;
-      background-color: var(--theme-highlight-color);
+      background-color: var(--theme-blue-color);
       // color: $nav-bg-color;
       font-weight: bold;
     }
 
     &:hover.primary {
-      background-color: var(--theme-highlight-color);
+      background-color: var(--theme-blue-color);
       // border-color: $highlight-color;
       // box-shadow:inset 0px 0px 3px 0px currentColor;
       // color: $highlight-color;
@@ -151,17 +180,30 @@
 
   a {
     color: inherit;
-    // text-decoration: none;
+    text-decoration: none;
   }
 
   a:hover {
-    color: var(--theme-highlight-color);
-    text-decoration: underline;
+    color: var(--theme-blue-color);
+    text-decoration: none;
+  }
+
+  .icon-brd {
+    height: 24px;
+    width: 24px;
+    fill: currentColor;
+    position: relative;
+  }
+  .icon-brd-max {
+    height: 42px;
+    width: 42px;
+    fill: currentColor;
+    position: relative;
   }
 
   .icon-embed {
-    height: 1em;
-    width: 1em;
+    height: 16px;
+    width: 16px;
     fill: currentColor;
     top: 0.15em;
     position: relative;
@@ -195,8 +237,8 @@
     color: var(--theme-caption-color);
     // font-family: "Montserrat";
     // font-family: "Open Sans";
-    font-size: 36px;
-    font-weight: 700;
+    font-size: 18px;
+    font-weight: 500;
   }
 
   .caption-2 {
@@ -213,9 +255,9 @@
     color: var(--theme-caption-color);
     // font-family: "Montserrat";
     // font-family: "Open Sans";
-    font-size: 14px;
-    font-weight: 400;
-    text-transform: uppercase;
+    font-size: 1.25em;
+    font-weight: 500;
+    padding: 1em 0.5em;
   }
 
   .caption-4 {
@@ -247,7 +289,7 @@
   }
 
   .content-dark {
-    color: var(--theme-content-color-dark);
+    color: var(--theme-content-dark-color);
   }
 
   .crm-table {
@@ -271,7 +313,7 @@
       display: table-row-group;
 
       .tr {
-        border-bottom: 1px solid var(--theme-separator-color);
+        border-bottom: 1px solid var(--theme-bg-accent-color);
       }
     }
 
@@ -309,7 +351,7 @@
     color: var(--theme-content-color);
 
     font-family: var(--theme-font-content);
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 400;
 
     -webkit-font-smoothing: antialiased;

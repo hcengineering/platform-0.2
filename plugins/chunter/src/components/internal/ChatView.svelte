@@ -81,12 +81,28 @@
     .content {
       flex-grow: 1;
     }
+
+    .captionContainer {
+      box-sizing: border-box;
+      width: 100%;
+      height: 5em;
+      padding: 2em;
+      border-bottom: 1px solid var(--theme-bg-accent-color);
+      display: flex;
+      align-items: center;
+    }
+
+    .refContainer {
+      margin: 0 2em 2em 2em;
+    }
   }
 </style>
 
 <div class="chat">
-  <div><span class="caption-1">Чат {spaceName}</span>&nbsp;</div>
-  <ScrollView stylez="height:100%;" autoscroll={true}>
+  <div class="captionContainer">
+    <span class="caption-1">Чат {spaceName}</span>&nbsp;
+  </div>
+  <ScrollView stylez="height:100%; margin: 2em" autoscroll={true}>
     <div class="content">
       {#each messages as message (message._id)}
         {#if message.comments}
@@ -95,7 +111,7 @@
       {/each}
     </div>
   </ScrollView>
-  <div>
+  <div class="refContainer">
     <ReferenceInput on:message={(e) => createMessage(e.detail)} />
   </div>
 </div>

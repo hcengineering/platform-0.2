@@ -72,11 +72,11 @@
       display: table-row-group;
 
       .tr {
-        border-bottom: 1px solid var(--theme-separator-color);
+        border-bottom: 1px solid var(--theme-bg-accent-color);
 
         &:hover {
           background-color: var(--theme-content-color);
-          color: var(--theme-content-bg-color);
+          color: var(--theme-bg-color);
           cursor: pointer;
         }
       }

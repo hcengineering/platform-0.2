@@ -23,6 +23,21 @@ export default (platform: Platform) => {
     Error: spritesUrl + '#error',
     Network: spritesUrl + '#network',
     Search: spritesUrl + '#search',
-    Add: spritesUrl + '#add'
+    Add: spritesUrl + '#add',
+    Resize: spritesUrl + '#resize',
+    Finder: spritesUrl + '#finder',
+
+    brdBold: spritesUrl + '#brdBold',
+    brdItalic: spritesUrl + '#brdItalic',
+    brdUnder: spritesUrl + '#brdUnder',
+    brdStrike: spritesUrl + '#brdStrike',
+    brdCode: spritesUrl + '#brdCode',
+    brdUL: spritesUrl + '#brdUL',
+    brdOL: spritesUrl + '#brdOL',
+    brdLink: spritesUrl + '#brdLink',
+    brdAddr: spritesUrl + '#brdAddr',
+    brdClip: spritesUrl + '#brdClip',
+    brdSend: spritesUrl + '#brdSend',
+    brdSmile: spritesUrl + '#brdSmile',
   })
 }

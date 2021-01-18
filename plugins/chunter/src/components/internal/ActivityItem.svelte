@@ -54,17 +54,37 @@
 <style lang="scss">
   .activity-item {
     display: flex;
-    margin: 1em;
+    margin-bottom: 1em;
 
     .avatar {
       object-fit: cover;
-      border-radius: 4px;
-      width: 3em;
-      height: 3em;
+      border: 1px solid var(--theme-bg-dark-color);
+      box-shadow: 0 0 0 2px var(--theme-bg-color);
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      z-index: 51;
     }
 
     .details {
       padding-left: 1em;
+      position: relative;
+      &>b {
+        color: var(--theme-maroon-color);
+      }
+      &>span {
+        font-size: 11px;
+        color: var(--theme-content-trans-color);
+      }
+      &::before {
+        position: absolute;
+        content: '';
+        left: -18px;
+        height: calc(100% + 1em);
+        width: 1px;
+        background-color: var(--theme-bg-dark-color);
+        z-index: 50;
+      }
     }
   }
 </style>
@@ -73,7 +93,7 @@
   <img class="avatar" src={avatar} />
   <div class="details">
     <b>{user ? user.name : ''}</b>
-    15:23
+    <span>15:23</span>
     <div>
       <!-- {JSON.stringify(tx)} -->
       <Component is={info} props={{ tx }} />

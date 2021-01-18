@@ -56,12 +56,29 @@
     .content {
       flex-grow: 1;
     }
+
+    .captionContainer {
+      box-sizing: border-box;
+      width: 100%;
+      height: 5em;
+      padding: 2em;
+      border-bottom: 1px solid var(--theme-bg-accent-color);
+      display: flex;
+      align-items: center;
+    }
+    .container {
+      width: 100%;
+      height: 100%;
+      margin: 2em;
+    }
   }
 </style>
 
 <div class="activity">
-  <div><span class="caption-1">Activity</span>&nbsp;</div>
-  <ScrollView stylez="height:100%;" autoscroll={true}>
+  <div class="captionContainer">
+    <span class="caption-1">Activity</span>&nbsp;
+  </div>
+  <ScrollView stylez="height: 100%; margin: 2em" autoscroll={true}>
     <div class="content">
       {#each objects as item (item._id)}
         <ActivityItem tx={item} />

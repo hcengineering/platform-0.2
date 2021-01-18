@@ -68,10 +68,10 @@
   .presentation-completion-popup {
     display: flex;
     flex-direction: column;
-    background-color: var(--theme-content-bg-color);
+    background-color: var(--theme-bg-color);
     color: #fff;
     position: relative;
-    border: 1px solid var(--theme-content-color-dark);
+    border: 1px solid var(--theme-content-dark-color);
     border-radius: 3px;
     height: 75px;
     width: 300px;
@@ -83,15 +83,15 @@
       width: 100%;
 
       &.selected {
-        border-color: var(--theme-highlight-color);
-        background-color: var(--theme-highlight-color);
+        border-color: var(--theme-blue-color);
+        background-color: var(--theme-blue-color);
         position: sticky;
       }
 
       &:focus {
         outline: none;
-        border-color: var(--theme-highlight-color);
-        box-shadow: inset 0px 0px 2px 0px var(--theme-highlight-color);
+        border-color: var(--theme-blue-color);
+        box-shadow: inset 0px 0px 2px 0px var(--theme-blue-color);
       }
     }
   }

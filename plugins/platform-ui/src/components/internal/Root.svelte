@@ -85,7 +85,7 @@
       color: var(--theme-content-color);
       height: $status-bar-height;
       line-height: $status-bar-height;
-      border-bottom: 1px solid var(--theme-nav-color);
+      border-bottom: 1px solid var(--theme-bg-accent-color);
 
       .container {
         display: flex;
@@ -99,7 +99,7 @@
           font-size: 1.25em;
           font-weight: 700;
 
-          border-right: 1px solid var(--theme-nav-color);
+          border-right: 1px solid var(--theme-bg-accent-color);
         }
 
         .status-messages {
@@ -112,14 +112,14 @@
           flex-direction: row-reverse;
 
           // .widget {
-          //   border-left: 1px solid var(--theme-nav-color);
+          //   border-left: 1px solid var(--theme-bg-accent-color);
           //   padding-right: 1em;
           //   padding-left: 1em;
           //   font-weight: 700;
           // }
 
           .widget {
-            border-left: 1px solid var(--theme-nav-color);
+            border-left: 1px solid var(--theme-bg-accent-color);
             padding-right: 1em;
             padding-left: 1em;
             font-weight: 700;
