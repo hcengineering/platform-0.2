@@ -20,6 +20,8 @@
   import chunter, { Comment, Message } from '../..'
   import { getChunterService, getCoreService, query } from '../../utils'
   import CommentComponent from './Comment.svelte'
+  import Comments from './Comments.svelte'
+  import DateItem from './DateItem.svelte'
 
   const coreService = getCoreService()
   const chunterService = getChunterService()
@@ -109,6 +111,7 @@
           <CommentComponent message={message.comments[0]} />
         {/if}
       {/each}
+      <DateItem dateItem={new Date()} />
     </div>
   </ScrollView>
   <div class="refContainer">

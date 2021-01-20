@@ -45,10 +45,10 @@
   }
 
   ::-webkit-scrollbar {
-    width: 10px;
+    width: 8px;
   }
   ::-webkit-scrollbar:horizontal {
-    height: 10px;
+    height: 8px;
   }
   ::-webkit-scrollbar-track {
     background-color: var(--theme-bg-color);
@@ -56,10 +56,12 @@
   ::-webkit-scrollbar-thumb {
     background: var(--theme-bg-accent-color);
     border: 1px solid var(--theme-bg-dark-color);
+    border-radius: 2px;
   }
   ::-webkit-scrollbar-thumb:hover {
     background: var(--theme-bg-dark-color);
     border: 1px solid var(--theme-bg-dark-color);
+    border-radius: 2px;
   }
 
   @font-face {
