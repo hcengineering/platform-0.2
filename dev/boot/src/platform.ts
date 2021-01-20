@@ -30,6 +30,8 @@ import guidebook from '@anticrm/guidebook'
 import uiMeta from '@anticrm/platform-ui/src/__meta__/meta'
 import workbenchMeta from '@anticrm/workbench/src/__meta__'
 import chunterMeta from '@anticrm/chunter/src/__meta__'
+import taskMeta from '@anticrm/task/src/__meta__'
+import presentationMeta from '@anticrm/presentation/src/__meta__'
 // import contactMeta from '@anticrm/contact/src/__meta__/meta'
 // import recruitmentMeta from '@anticrm/recruitment/src/__meta__/meta'
 // import taskMeta from '@anticrm/task/src/__meta__/meta'
@@ -54,7 +56,8 @@ uiMeta(platform)
 workbenchMeta(platform)
 chunterMeta(platform)
 // recruitmentMeta(platform)
-// taskMeta(platform)
+taskMeta(platform)
+presentationMeta(platform)
 // contactMeta(platform)
 
 export default platform

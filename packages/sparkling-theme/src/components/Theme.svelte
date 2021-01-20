@@ -34,11 +34,11 @@
 
 <style lang="scss" global>
   * {
-    --theme-white-color: #fff;
-    --theme-blue-color: #2D6AB9;
-    --theme-green-color: #4396A2;
-    --theme-grey-color: #78726D;
-    --theme-maroon-color: #B92D52;
+    --white-color: #fff;
+    --status-blue-color: #2D6AB9;
+    --status-green-color: #4396A2;
+    --status-grey-color: #78726D;
+    --status-maroon-color: #B92D52;
 
     scrollbar-color: var(--theme-bg-dark-color) var(--theme-bg-accent-color);
     scrollbar-width: thin;
@@ -122,7 +122,7 @@
 
     &:focus {
       outline: none;
-      border-color: var(--theme-blue-color);
+      border-color: var(--theme-highlight-color);
     }
   }
 
@@ -144,8 +144,8 @@
 
     &:focus {
       outline: none;
-      border-color: var(--theme-blue-color);
-      box-shadow: inset 0px 0px 2px 0px var(--theme-blue-color);
+      border-color: var(--theme-highlight-color);
+      box-shadow: inset 0px 0px 2px 0px var(--theme-highlight-color);
     }
 
     &.large {
@@ -157,21 +157,21 @@
     }
 
     &:hover {
-      border-color: var(--theme-blue-color);
+      border-color: var(--theme-highlight-color);
       // color: $highlight-color;
       // background-color: $highlight-color;
-      background-color: var(--theme-blue-color);
+      background-color: var(--theme-highlight-color);
     }
 
     &.primary {
       // border-color: $highlight-color;
-      background-color: var(--theme-blue-color);
+      background-color: var(--theme-highlight-color);
       // color: $nav-bg-color;
       font-weight: bold;
     }
 
     &:hover.primary {
-      background-color: var(--theme-blue-color);
+      background-color: var(--theme-highlight-color);
       // border-color: $highlight-color;
       // box-shadow:inset 0px 0px 3px 0px currentColor;
       // color: $highlight-color;
@@ -184,7 +184,7 @@
   }
 
   a:hover {
-    color: var(--theme-blue-color);
+    color: var(--theme-highlight-color);
     text-decoration: none;
   }
 
@@ -199,6 +199,10 @@
     width: 42px;
     fill: currentColor;
     position: relative;
+  }
+  .icon-left {
+    width: 24px;
+    height: 24px;
   }
 
   .icon-embed {

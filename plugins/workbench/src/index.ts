@@ -40,7 +40,10 @@ export interface WorkbenchService extends Service {
 export default plugin('workbench' as Plugin<WorkbenchService>, { core: core.id, ui: ui.id }, {
   icon: {
     DefaultPerspective: '' as Asset,
-    Add: '' as Asset
+    Add: '' as Asset,
+    Pages: '' as Asset,
+    Resize: '' as Asset,
+    Finder: '' as Asset
   },
   component: {
     Workbench: '' as AnyComponent,

@@ -22,7 +22,11 @@ export interface Theme {
     ['content-color']: string
     ['content-dark-color']: string
     ['caption-color']: string
+    ['accent-color']: string
+    ['highlight-color']: string
+    ['highlight-border']: string
     ['content-trans-color']: string
+    ['font-content']: string
   }
 }
 
@@ -36,6 +40,9 @@ export const themes: Theme[] = [
       ['content-color']: '#505050',
       ['content-dark-color']: '#333333',
       ['caption-color']: '#000',
+      ['accent-color']: '#B92D52',
+      ['highlight-color']: '#2D6AB9',
+      ['highlight-border']: '#000',
       ['content-trans-color']: 'rgba(255, 255, 255, 0.2)',
       ['font-content']: `"IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto`,
     },
@@ -49,6 +56,9 @@ export const themes: Theme[] = [
       ['content-color']: '#999999',
       ['content-dark-color']: '#E5E5E5',
       ['caption-color']: '#FFFFFF',
+      ['accent-color']: '#B92D52',
+      ['highlight-color']: '#2D6AB9',
+      ['highlight-border']: '#fff',
       ['content-trans-color']: 'rgba(255, 255, 255, 0.2)',
       ['font-content']: `"IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto`,
     },
@@ -62,6 +72,9 @@ export const themes: Theme[] = [
       ['content-color']: '#65605C',
       ['content-dark-color']: '#32302E',
       ['caption-color']: '#000',
+      ['accent-color']: '#B92D52',
+      ['highlight-color']: '#2D6AB9',
+      ['highlight-border']: '#000',
       ['content-trans-color']: 'rgba(0, 0, 0, 0.2)',
       ['font-content']: `"IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto`,
     },

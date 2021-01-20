@@ -19,6 +19,8 @@ import chunter from '..'
 export default (platform: Platform) => {
   const spritesUrl = require('../assets/icons.svg')
   platform.loadMetadata(chunter.icon, {
-    Chunter: spritesUrl + '#chunter'
+    Chunter: spritesUrl + '#chunter',
+    ActivityView: spritesUrl + '#activityView',
+    ChatView: spritesUrl + '#chatView'
   })
 }

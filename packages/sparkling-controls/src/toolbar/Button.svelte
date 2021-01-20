@@ -35,18 +35,18 @@
 
 		&:focus {
 			outline: none;
-			border-color: var(--theme-blue-color);
-			box-shadow: inset 0px 0px 2px 0px var(--theme--blue-color);
+			border-color: var(--theme-highlight-color);
+			box-shadow: inset 0px 0px 2px 0px var(--theme--theme-highlight-color);
 		}
 		&.selected {
 			background-color: var(--theme-bg-dark-color);
 			font-weight: bold;
-			// background-color: darken(--theme-blue-color, 10%);
+			// background-color: darken(--theme-highlight-color, 10%);
 		}
 
 		&:hover:enabled {
 			color: var(--theme-caption-color);
-			border-color: var(--theme-blue-color);
+			border-color: var(--theme-highlight-color);
 			// color: $highlight-color;
 			background-color: var(--theme-bg-dark-color);
 			// background-color: darken($highlight-color, 30%);

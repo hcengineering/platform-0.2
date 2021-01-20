@@ -22,7 +22,7 @@
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
   import Table from '@anticrm/presentation/src/components/internal/Table.svelte'
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
-  import Finder from '@anticrm/platform-ui/src/components/Finder.svelte'
+  import Finder from './Finder.svelte'
   import ObjectForm from './ObjectForm.svelte'
   import CreateForm from './CreateForm.svelte'
 

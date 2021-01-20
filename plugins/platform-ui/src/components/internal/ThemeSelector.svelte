@@ -43,7 +43,7 @@
     cursor: pointer;
 }
   .menu:hover {
-    color: var(--theme-blue-color);
+    color: var(--theme-highlight-color);
   }
   .hidden {
     visibility: hidden;
@@ -67,7 +67,7 @@
     color: var(--theme-content-color);
   }
   .item:hover {
-    color: var(--theme-blue-color);
+    color: var(--theme-highlight-color);
     background-color: var(--theme-bg-accent-color);
   }
 </style>
