@@ -52,7 +52,7 @@ export default plugin(
     icon: {
       Chunter: '' as Asset,
       ActivityView: '' as Asset,
-      ChatView: '' as Asset
+      ChatView: '' as Asset,
     },
     class: {
       Message: '' as Ref<Class<Message>>,

@@ -21,6 +21,6 @@ export default (platform: Platform) => {
   platform.loadMetadata(chunter.icon, {
     Chunter: spritesUrl + '#chunter',
     ActivityView: spritesUrl + '#activityView',
-    ChatView: spritesUrl + '#chatView'
+    ChatView: spritesUrl + '#chatView',
   })
 }
