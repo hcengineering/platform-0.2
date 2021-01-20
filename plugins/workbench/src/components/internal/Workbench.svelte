@@ -117,7 +117,7 @@
 		}
 		.selectedApp {
 			padding: 1em;
-			fill: var(--theme-accent-color);
+			fill: var(--theme-bg-dark-color);
 		}
 
 		.remainder {
