@@ -17,7 +17,7 @@ import { plugin, Plugin, Service } from '@anticrm/platform'
 import { StringProperty, Class, Ref } from '@anticrm/model'
 
 import { User } from '@anticrm/contact'
-import { AnyComponent } from '@anticrm/platform-ui'
+import { AnyComponent, Asset } from '@anticrm/platform-ui'
 import { VDoc } from '@anticrm/core'
 
 export interface Task extends VDoc {
@@ -29,6 +29,9 @@ export interface TaskService extends Service {
 }
 
 export default plugin('task' as Plugin<TaskService>, {}, {
+  icon: {
+    Task: '' as Asset,
+  },
   class: {
     Task: '' as Ref<Class<Task>>
   },

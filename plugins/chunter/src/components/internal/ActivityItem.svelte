@@ -70,7 +70,7 @@
       padding-left: 1em;
       position: relative;
       &>b {
-        color: var(--theme-maroon-color);
+        color: var(--theme-accent-color);
       }
       &>span {
         font-size: 11px;
@@ -79,7 +79,7 @@
       &::before {
         position: absolute;
         content: '';
-        left: -18px;
+        left: -17px;
         height: calc(100% + 1em);
         width: 1px;
         background-color: var(--theme-bg-dark-color);

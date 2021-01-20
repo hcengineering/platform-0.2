@@ -15,6 +15,8 @@
 	import workbench, { Perspective } from '../..'
 	import { find, getUIService } from '../../utils'
 	import { getContext } from 'svelte'
+	import chunter from '@anticrm/chunter'
+	import task from '@anticrm/task'
 
 	import Component from '@anticrm/platform-ui/src/components/Component.svelte'
 	import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
@@ -41,6 +43,8 @@
 			uiService.showModal(Spotlight, {})
     }
 	}
+
+	let selected: number = 0;
 </script>
 
 <div id="workbench">
@@ -56,6 +60,16 @@
 				</LinkTo>
 			</div>
 		{/each}
+		<div class="app-icon">
+			<div class={(selected === 0) ? 'selectedApp' : 'iconApp'} on:click={() => {selected = 0}}>
+				<Icon icon="{chunter.icon.ActivityView}" clazz="icon-left" /></div>
+			<div class={(selected === 1) ? 'selectedApp' : 'iconApp'} on:click={() => {selected = 1}}>
+				<Icon icon="{chunter.icon.ChatView}" clazz="icon-left" /></div>
+			<div class={(selected === 2) ? 'selectedApp' : 'iconApp'} on:click={() => {selected = 2}}>
+				<Icon icon="{workbench.icon.Pages}" clazz="icon-left" /></div>
+			<div class={(selected === 3) ? 'selectedApp' : 'iconApp'} on:click={() => {selected = 3}}>
+				<Icon icon="{task.icon.Task}" clazz="icon-left" /></div>
+		</div>
 		<div class="remainder"></div>
 	</nav>
 
@@ -76,7 +90,7 @@
 	}
 
 	nav {
-		width: 48px;
+		width: 60px;
 		background-color: var(--theme-bg-color);
 
 		display: flex;
@@ -94,6 +108,16 @@
 				background-color: var(--theme-bg-color);
 				border-right: solid 1px var(--theme-bg-color);
 			}
+		}
+
+		.iconApp {
+			padding: 1em;
+			fill: var(--theme-content-dark-color);
+			cursor: pointer;
+		}
+		.selectedApp {
+			padding: 1em;
+			fill: var(--theme-accent-color);
 		}
 
 		.remainder {

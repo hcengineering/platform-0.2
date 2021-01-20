@@ -101,6 +101,20 @@ export interface PresentationService extends Service {
 }
 
 export default plugin('presentation' as Plugin<PresentationService>, { core: core.id, i18n: i18n.id }, {
+  icon: {
+    brdBold: '' as Asset,
+    brdItalic: '' as Asset,
+    brdUnder: '' as Asset,
+    brdStrike: '' as Asset,
+    brdCode: '' as Asset,
+    brdUL: '' as Asset,
+    brdOL: '' as Asset,
+    brdLink: '' as Asset,
+    brdAddr: '' as Asset,
+    brdClip: '' as Asset,
+    brdSend: '' as Asset,
+    brdSmile: '' as Asset,
+  },
   class: {
     UXAttribute: '' as Ref<Class<UXAttribute>>,
     Presenter: '' as Ref<Mixin<Presenter<Type>>>,

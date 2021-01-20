@@ -20,7 +20,7 @@
   import { schema } from '@anticrm/sparkling-rich/src/internal/schema'
 
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
-  import ui from '@anticrm/platform-ui'
+  import presentation from '@anticrm/presentation'
 
   import { createEventDispatcher } from 'svelte'
   const dispatch = createEventDispatcher()
@@ -311,7 +311,7 @@
       width: 2px;
       height: 42px;
       margin: 0 8px;
-      background-color: var(--theme-bg-dark-color);
+      background-color: var(--theme-bg-accent-color);
     }
   }
 </style>
@@ -360,54 +360,54 @@
           <slot name="inner" />
           <ToolbarButton style="padding:0; width:24px; height:24px"
             on:click={() => htmlEditor.toggleBold()} selected={styleState.bold}>
-            <Icon icon={ui.icon.brdBold} clazz="icon-brd" />
+            <Icon icon={presentation.icon.brdBold} clazz="icon-brd" />
           </ToolbarButton>
           <ToolbarButton style="padding:0; width:24px; height:24px"
             on:click={() => htmlEditor.toggleItalic()}
             selected={styleState.italic}>
-            <Icon icon={ui.icon.brdItalic} clazz="icon-brd" />
+            <Icon icon={presentation.icon.brdItalic} clazz="icon-brd" />
           </ToolbarButton>
           <ToolbarButton style="padding:0; width:24px; height:24px"
             on:click={() => htmlEditor.toggleUnderline()}
             selected={styleState.underline}>
-            <Icon icon={ui.icon.brdUnder} clazz="icon-brd" />
+            <Icon icon={presentation.icon.brdUnder} clazz="icon-brd" />
           </ToolbarButton>
           <ToolbarButton style="padding:0; width:24px; height:24px"
             on:click={() => htmlEditor.toggleStrike()} selected={styleState.strike}>
-            <Icon icon={ui.icon.brdStrike} clazz="icon-brd" />
+            <Icon icon={presentation.icon.brdStrike} clazz="icon-brd" />
           </ToolbarButton>
           <div class="tSeparator" />
           <ToolbarButton style="padding:0; width:24px; height:24px">
-            <Icon icon={ui.icon.brdCode} clazz="icon-brd" />
+            <Icon icon={presentation.icon.brdCode} clazz="icon-brd" />
           </ToolbarButton>
           <ToolbarButton style="padding:0; width:24px; height:24px"
             on:click={() => htmlEditor.toggleUnOrderedList()}>
-            <Icon icon={ui.icon.brdUL} clazz="icon-brd" />
+            <Icon icon={presentation.icon.brdUL} clazz="icon-brd" />
           </ToolbarButton>
           <ToolbarButton style="padding:0; width:24px; height:24px"
             on:click={() => htmlEditor.toggleOrderedList()}>
-            <Icon icon={ui.icon.brdOL} clazz="icon-brd" />
+            <Icon icon={presentation.icon.brdOL} clazz="icon-brd" />
           </ToolbarButton>
           <div class="tSeparator" />
           <ToolbarButton style="padding:0; width:24px; height:24px">
-            <Icon icon={ui.icon.brdLink} clazz="icon-brd" />
+            <Icon icon={presentation.icon.brdLink} clazz="icon-brd" />
           </ToolbarButton>
           <div class="tSeparator" />
           <ToolbarButton style="padding:0; width:24px; height:24px">
-            <Icon icon={ui.icon.brdAddr} clazz="icon-brd" />
+            <Icon icon={presentation.icon.brdAddr} clazz="icon-brd" />
           </ToolbarButton>
           <ToolbarButton style="padding:0; width:24px; height:24px">
-            <Icon icon={ui.icon.brdClip} clazz="icon-brd" />
+            <Icon icon={presentation.icon.brdClip} clazz="icon-brd" />
           </ToolbarButton>
         {/if}
         <div slot="right">
           <ToolbarButton style="padding:0; width:42x; height:42px"
             on:click={() => handleSubmit()} selected={!styleState.isEmpty}>
-            <Icon icon={ui.icon.brdSend} clazz="icon-brd-max" />
+            <Icon icon={presentation.icon.brdSend} clazz="icon-brd-max" />
             <!--▶️-->
           </ToolbarButton>
           <ToolbarButton style="padding:0; width:42px; height:42px">
-            <Icon icon={ui.icon.brdSmile} clazz="icon-brd-max" />
+            <Icon icon={presentation.icon.brdSmile} clazz="icon-brd-max" />
             <!--😀-->
           </ToolbarButton>
           <ToolbarButton selected={stylesEnabled} on:click={() => (stylesEnabled = !stylesEnabled)}>Aa</ToolbarButton>

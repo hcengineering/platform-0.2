@@ -50,7 +50,9 @@ export default plugin(
   { core: core.id },
   {
     icon: {
-      Chunter: '' as Asset
+      Chunter: '' as Asset,
+      ActivityView: '' as Asset,
+      ChatView: '' as Asset
     },
     class: {
       Message: '' as Ref<Class<Message>>,

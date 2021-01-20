@@ -1,6 +1,6 @@
 <script>
-  import ui, { Asset } from "@anticrm/platform-ui"
-  import Icon from "./Icon.svelte"
+  import workbench, { WorkbenchApplication } from '../..'
+  import Icon from "@anticrm/platform-ui/src/components/Icon.svelte"
 
   export let placeholder = 'Поиск по ...'
   let value = '';
@@ -8,7 +8,7 @@
 
 <div class="finder">
   <input class="input" type="text" {placeholder} {value} />
-  <Icon icon={ui.icon.Finder} clazz="icon-embed" style="top: 0" />
+  <Icon icon={workbench.icon.Finder} clazz="icon-embed" style="top: 0" />
 </div>
 
 <style lang="scss">

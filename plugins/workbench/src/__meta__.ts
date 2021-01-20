@@ -20,6 +20,9 @@ export default (platform: Platform) => {
   const spritesUrl = require('../assets/icons.svg')
   platform.loadMetadata(workbench.icon, {
     DefaultPerspective: spritesUrl + '#perspective',
-    Add: spritesUrl + '#add'
+    Add: spritesUrl + '#add',
+    Pages: spritesUrl + '#pages',
+    Resize: spritesUrl + '#resize',
+    Finder: spritesUrl + '#finder'
   })
 }

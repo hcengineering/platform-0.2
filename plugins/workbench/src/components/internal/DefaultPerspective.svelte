@@ -20,8 +20,8 @@
   import ui from '@anticrm/platform-ui'
   import workbench, { WorkbenchApplication } from '../..'
 
-  import LinkTo from '@anticrm/platform-ui/src/components/LinkTo.svelte'
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
+  import SpaceItem from './SpaceItem.svelte'
 
   import { AnyComponent } from '@anticrm/platform-ui'
 
@@ -144,8 +144,7 @@
         }
       }
       &:hover {
-        color: var(--theme-blue-color);
-        /*background-color: var(--theme-bg-accent-color);*/
+        color: var(--theme-highlight-color);
       }
     }
   }
@@ -185,23 +184,16 @@
   <div class="projects" class:mini={!hidden}>
     <div class="headIcon">
       <a href="/" on:click|preventDefault={() => { hidden = !hidden}}>
-        <Icon icon={ui.icon.Resize} clazz="icon-embed" /></a>
+        <Icon icon={workbench.icon.Resize} clazz="icon-embed" /></a>
     </div>
     <div class="container" class:hidden={!hidden}>
       <div class="caption-3">
         Пространства
       </div>
-      <LinkTo href={'/' + location[1] + '/' + location[2]}>
-        <div class="item" class:selected={!space}>
-          Все
-        </div>
-      </LinkTo>
+      <SpaceItem link={'/' + location[1] + '/' + location[2]} selected={!space} label="Все" count={Math.floor(Math.random()*50)} />
       {#each spaces as s (s._id)}
-        <LinkTo href={'/' + location[1] + '/' + location[2] + '/' + s._id}>
-          <div class="item" class:selected={s._id === space}>
-            # {s.name}
-          </div>
-        </LinkTo>
+        <SpaceItem link={'/' + location[1] + '/' + location[2] + '/' + s._id}
+          selected={s._id === space} label={'# ' + s.name} />
       {/each}
       <div class="footContainer">
         <a
