@@ -175,6 +175,7 @@
   }
 
   aside {
+    //max-width: 404px;
     background-color: var(--theme-bg-color);
     border-left: 1px solid var(--theme-bg-accent-color);
   }

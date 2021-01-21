@@ -23,6 +23,7 @@ export default (platform: Platform) => {
     Add: spritesUrl + '#add',
     Pages: spritesUrl + '#pages',
     Resize: spritesUrl + '#resize',
+    Close: spritesUrl + '#close',
     Finder: spritesUrl + '#finder'
   })
 }

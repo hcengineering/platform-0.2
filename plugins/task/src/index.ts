@@ -31,6 +31,7 @@ export interface TaskService extends Service {
 export default plugin('task' as Plugin<TaskService>, {}, {
   icon: {
     Task: '' as Asset,
+    ArrowDown: '' as Asset,
   },
   class: {
     Task: '' as Ref<Class<Task>>

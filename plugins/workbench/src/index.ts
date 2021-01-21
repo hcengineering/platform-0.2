@@ -43,6 +43,7 @@ export default plugin('workbench' as Plugin<WorkbenchService>, { core: core.id, 
     Add: '' as Asset,
     Pages: '' as Asset,
     Resize: '' as Asset,
+    Close: '' as Asset,
     Finder: '' as Asset
   },
   component: {
