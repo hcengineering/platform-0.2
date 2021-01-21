@@ -20,5 +20,6 @@ export default (platform: Platform) => {
   const spritesUrl = require('../assets/icons.svg')
   platform.loadMetadata(task.icon, {
     Task: spritesUrl + '#task',
+    ArrowDown: spritesUrl + '#arrowDown',
   })
 }

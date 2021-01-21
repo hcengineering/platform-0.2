@@ -22,6 +22,7 @@
 		.left-panel {
 			display: flex;
 			align-items: center;
+			flex-wrap: wrap;
 		}
 		.right-panel {
 			flex-grow: 1;

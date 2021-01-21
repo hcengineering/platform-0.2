@@ -18,6 +18,9 @@
   import { createEventDispatcher, onDestroy } from 'svelte'
   import { getComponentExtension, getCoreService, query } from '../../utils'
 
+  import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
+  import workbench from '../..'
+
   export let title: string
   export let _class: Ref<Class<VDoc>>
   export let _id: Ref<VDoc>
@@ -54,7 +57,7 @@
 </script>
 
 <div class="recruiting-view">
-  <div class="header">
+  <!-- <div class="header">
     <div class="caption-4">{title}</div>
     <div class="actions">
       <button
@@ -65,6 +68,10 @@
       >Cancel</button>
       <button class="button" on:click="{save}">Save</button>
     </div>
+  </div> -->
+  <div class="headIcon">
+    <a href="/" on:click|preventDefault={() => { dispatch('close') }}>
+      <Icon icon={workbench.icon.Close} clazz="icon-embed" /></a>
   </div>
   {#if object}
     <div class="content">
@@ -75,8 +82,17 @@
 
 <style lang="scss">
   .recruiting-view {
-    margin: 1em;
+    padding: 2em;
+    width: calc(404px - 4em);
+    position: relative;
+    
+    .headIcon {
+      position: absolute;
+      top: 1.5em;
+      right: 1.5em;
+    }
   }
+
   .header {
     display: flex;
 
