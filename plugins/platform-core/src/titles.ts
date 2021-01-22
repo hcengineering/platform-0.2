@@ -91,6 +91,7 @@ export class Titles implements Storage {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async remove (ctx: TxContext, _class: Ref<Class<Doc>>, doc: Ref<Doc>, _query: AnyLayout | null): Promise<void> {
     this.graph.delete(doc)
   }
