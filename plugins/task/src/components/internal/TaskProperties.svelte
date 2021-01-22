@@ -20,6 +20,8 @@
   import { AttrModel, ClassModel } from '@anticrm/presentation'
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
   import ActionButton from './ActionButton.svelte'
+  import UserInfo from './UserInfo.svelte'
+  import StatusLabel from './StatusLabel.svelte'
 
   import Properties from '@anticrm/presentation/src/components/internal/Properties.svelte'
   import AttributeEditor from '@anticrm/presentation/src/components/AttributeEditor.svelte'
@@ -77,19 +79,15 @@
     </div>
     <div class="taskStatusBar">
       <div class="taskName">DT-140</div>
-      <div class="taskStatus">В работе</div>
+      <StatusLabel type="1" />
     </div>
     <div class="created">
-      <div class="creator">
-        <img class="avatar" src="https://platform.exhale24.ru/images/photo-1.png" alt="">
-        <div class="user">Александр Алексеенко</div>
-      </div>
+      <UserInfo url="https://platform.exhale24.ru/images/photo-1.png"
+                title="Александр Алексеенко" />
       <div class="createdOn">30.11.20, 15:30</div>
     </div>
-    <div class="userInfo">
-      <img class="avatar" src="https://platform.exhale24.ru/images/photo-2.png" alt="">
-      <div class="user">Андрей Платов<span>Исполнитель</span></div>
-    </div>
+    <UserInfo url="https://platform.exhale24.ru/images/photo-2.png"
+              title="Андрей Платов" subtitle="Исполнитель" style="margin-bottom: 2em" />
 
     <div class="actionBar">
       <ActionButton style="leftButton" width="40%">Выполнено</ActionButton>
@@ -107,7 +105,7 @@
       </ul>
     </div>
 
-    <ReferenceInput on:message={(e) => createMessage(e.detail)} />
+    <ReferenceInput />
   </div>
 
 {/if}
@@ -130,35 +128,6 @@
         font-size: 14px;
         color: var(--status-blue-color);
       }
-      .taskStatus {
-        font-size: 11px;
-        line-height: 16px;
-        font-weight: 500;
-        padding: 2px 4px 0px 4px;
-        background-color: var(--status-green-color);
-        border-radius: 2px;
-        color: var(--white-color);
-      }
-    }
-    .avatar {
-      width: 32px;
-      height: 32px;
-      border: 1px solid var(--theme-content-trans-color);
-      border-radius: 16px;
-    }
-    .user {
-      padding-left: 1em;
-      font-size: 14px;
-      font-weight: 500;
-      line-height: 18px;
-      color: var(--theme-accent-color);
-
-      &>span {
-        display: block;
-        font-size: 11px;
-        line-height: 14px;
-        color: var(--status-grey-color);
-      }
     }
     .created {
       display: flex;
@@ -171,14 +140,6 @@
         font-weight: 500;
         color: var(--theme-content-trans-color);
       }
-    }
-    .creator, .userInfo {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-    }
-    .userInfo {
-      margin-bottom: 2em;
     }
 
     .actionBar {
