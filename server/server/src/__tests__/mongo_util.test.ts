@@ -16,9 +16,9 @@
 
 import { ServerSuite } from './serversuite'
 
-import { AnyLayout, BooleanProperty, Property, StringProperty } from '@anticrm/model'
+import { AnyLayout, BooleanProperty, StringProperty } from '@anticrm/model'
 import core from '@anticrm/core'
-import { createSetArrayFilter } from '../mongo_utils'
+import { createSetArrayFilters } from '../mongo_utils'
 
 import { taskIds as task, createSubtask, Task, TaskComment } from '@anticrm/model/src/__tests__/test_tasks'
 
@@ -43,7 +43,7 @@ describe('mongo operations', () => {
     const ws = await server.getWorkspace(wsName)
     const model = await ws.getModel()
 
-    const f1 = createSetArrayFilter(model, core.class.Space, {
+    const f1 = createSetArrayFilters(model, core.class.Space, {
       users: {
         userId: 'qwe.com' as StringProperty
       }
@@ -51,7 +51,7 @@ describe('mongo operations', () => {
 
     expect(f1).toEqual({
       updateOperation: {
-        'users.$[f0].owner': true
+        'users.$[f1].owner': true
       },
       arrayFilter: [
         {
@@ -65,7 +65,7 @@ describe('mongo operations', () => {
     const ws = await server.getWorkspace(wsName)
     const model = await ws.getModel()
 
-    const f1 = createSetArrayFilter(model, task.class.Task, {
+    const f1 = createSetArrayFilters(model, task.class.Task, {
       tasks: {
         name: 'subtask1' as StringProperty,
         comments: {
@@ -76,7 +76,7 @@ describe('mongo operations', () => {
 
     expect(f1).toEqual({
       updateOperation: {
-        'tasks.$[f0].comments.$[f1].author': 'Dart'
+        'tasks.$[f1].comments.$[f2].author': 'Dart'
       },
       arrayFilter: [
         {
@@ -102,12 +102,39 @@ describe('mongo operations', () => {
       ]
     } as Task
 
-    doc1.tasks![0].comments = [{ _id: '#0', message: 'qwe' } as TaskComment]
+    doc1.tasks![0].comments = [{
+      _id: '#0',
+      message: 'qwe'
+    } as TaskComment]
 
     const ops = createOperations(await ws.getModel(), ws.tx, () => 'qwe' as StringProperty)
 
     const d1 = await ops.create(task.class.Task, (doc1 as unknown) as AnyLayout)
-    await await ops.update(d1, {
+    const d2 = await ops.update(d1, {
+      tasks: {
+        name: 'subtask1' as StringProperty,
+        comments: {
+          _id: '#0' as StringProperty
+        }
+      }
+    }, {
+      author: 'Dart' as StringProperty,
+      message: 'Vaider is god or bad?' as StringProperty
+    })
+    expect(d2).toBeDefined()
+    // Now le's find and check value
+
+    const result = await ws.find(task.class.Task, { _id: d1._id })
+    expect(result.length).toEqual(1)
+    expect(result[0].tasks![0].comments!.length).toEqual(1)
+    expect(result[0].tasks![0].comments![0].author).toEqual('Dart')
+  })
+
+  it('check $set depth2-verify', async () => {
+    const ws = await server.getWorkspace(wsName)
+    const model = await ws.getModel()
+
+    const f1 = createSetArrayFilters(model, task.class.Task, {
       tasks: {
         name: 'subtask1' as StringProperty,
         comments: {
@@ -116,19 +143,97 @@ describe('mongo operations', () => {
       }
     }, { author: 'Dart' as StringProperty })
 
+    expect(f1).toEqual({
+      updateOperation: {
+        'tasks.$[f1].comments.$[f2].author': 'Dart'
+      },
+      arrayFilter: [
+        {
+          'f1.name': 'subtask1'
+        },
+        {
+          'f2._id': '#0'
+        }
+      ]
+    })
+  })
+  it('check $push with depth', async () => {
+    const ws = await server.getWorkspace(wsName)
+
+    const doc1 = {
+      name: 'my-space',
+      lists: ['val1', 'val2'],
+      rate: 20,
+      mainTask: createSubtask('main-subtask', 30),
+      tasks: [
+        createSubtask('subtask1', 31),
+        createSubtask('subtask2', 33)
+      ]
+    } as Task
+
+    doc1.tasks![0].comments = [{
+      _id: '#1',
+      message: 'qwe'
+    } as TaskComment]
+
+    const ops = createOperations(await ws.getModel(), ws.tx, () => 'qwe' as StringProperty)
+
+    const d1 = await ops.create(task.class.Task, (doc1 as unknown) as AnyLayout)
+    const d2 = await ops.push(d1,
+      {
+        tasks: {
+          name: 'subtask1' as StringProperty
+        }
+      }, 'comments' as StringProperty,
+      {
+        _id: '#2' as StringProperty,
+        message: 'qwe-comment' as StringProperty
+      })
+    expect(d2).toBeDefined()
     // Now le's find and check value
 
     const result = await ws.find(task.class.Task, { _id: d1._id })
     expect(result.length).toEqual(1)
+    expect(result[0].tasks![0].comments!.length).toEqual(2)
+    expect(result[0].tasks![0].comments![1].message).toEqual('qwe-comment')
   })
+  it('check $pull with depth', async () => {
+    const ws = await server.getWorkspace(wsName)
 
-  it('should send query existing Spaces', async () => {
-    const ws = server.getWorkspace(wsName)
-    const { client } = (await server.newClients(1, ws))[0]
+    const doc1 = {
+      name: 'my-space',
+      lists: ['val1', 'val2'],
+      rate: 20,
+      mainTask: createSubtask('main-subtask', 30),
+      tasks: [
+        createSubtask('subtask1', 31),
+        createSubtask('subtask2', 33)
+      ]
+    } as Task
 
-    const spaces = await client.find(core.class.Space, { isPublic: true as Property<boolean, boolean> })
-    expect(spaces.length).toEqual(3)
+    const ops = createOperations(await ws.getModel(), ws.tx, () => 'qwe' as StringProperty)
 
-    // Push value to space and try modify it.
+    const d1 = await ops.create(task.class.Task, (doc1 as unknown) as AnyLayout)
+    const d2 = await ops.remove(d1,
+      {
+        tasks: {
+          name: 'subtask2' as StringProperty
+        }
+      })
+    expect(d2).toBeDefined()
+    // Now le's find and check value
+
+    let result = await ws.find(task.class.Task, { _id: d1._id })
+    expect(result.length).toEqual(1)
+    expect(result[0].tasks!.length).toEqual(1)
+
+    const d3 = await ops.remove(d1,
+      {
+        mainTask: {}
+      })
+    expect(d3).toBeDefined()
+    result = await ws.find(task.class.Task, { _id: d1._id })
+    expect(result.length).toEqual(1)
+    expect(result[0].mainTask).toBeUndefined()
   })
 })

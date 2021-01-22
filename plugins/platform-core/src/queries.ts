@@ -109,7 +109,7 @@ export class QueriableStorage implements Domain {
   remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, _query: AnyLayout | null): Promise<void> {
     return this.proxy.remove(ctx, _class, _id, _query).then(() => {
       this.queries.forEach(q => {
-        const newResults = q.results.filter(e => e._id === _id)
+        const newResults = q.results.filter(e => !(e._id === _id && this.model.matchQuery(q._class, e, q.query)))
         if (newResults.length !== q.results.length) {
           // We had this item so need inform about it is removed.
           q.results = newResults
@@ -131,7 +131,12 @@ export class QueriableStorage implements Domain {
   query<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): QueryResult<T> {
     return {
       subscribe: (subscriber: Subscriber<T>) => {
-        const q: Query<Doc> = { _class, query, subscriber: subscriber as Subscriber<Doc>, results: [] }
+        const q: Query<Doc> = {
+          _class,
+          query,
+          subscriber: subscriber as Subscriber<Doc>,
+          results: []
+        }
         q.unsubscriber = () => {
           this.queries.splice(this.queries.indexOf(q), 1)
         }

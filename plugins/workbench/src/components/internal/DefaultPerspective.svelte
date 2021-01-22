@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 -->
-<script lang="ts">
+<script lang='ts'>
   import { Ref, Doc, Class } from '@anticrm/model'
   import { onDestroy } from 'svelte'
   import { find, getCoreService, getUIService, _getCoreService } from '../../utils'
@@ -78,17 +78,17 @@
     }
   }
 
-  function id<T extends Doc>(doc: T): Ref<T> {
+  function id<T extends Doc> (doc: T): Ref<T> {
     return doc._id as Ref<T>
   }
 
   let details: { _id: Ref<VDoc>; _class: Ref<Class<VDoc>> }
   let addButton: HTMLElement
 
-  let hidden = true;
+  let hidden = true
 </script>
 
-<style lang="scss">
+<style lang='scss'>
   .workbench-perspective {
     display: flex;
     height: 100%;
@@ -107,15 +107,17 @@
       padding-right: 1px;
       overflow-y: auto;
     }
-    
+
     .hidden {
       visibility: hidden;
     }
+
     .headIcon {
       position: absolute;
       top: 1.5em;
       right: 1.5em;
     }
+
     .footContainer {
       text-align: center;
     }
@@ -140,17 +142,20 @@
         font-weight: 700;
         color: var(--theme-content-dark-color);
         background-color: var(--theme-bg-accent-color);
+
         &:hover {
           cursor: default;
           color: var(--theme-content-dark-color);
           background-color: var(--theme-bg-accent-color);
         }
       }
+
       &:hover {
         color: var(--theme-highlight-color);
       }
     }
   }
+
   .mini {
     box-sizing: border-box;
     width: 4em;
@@ -184,36 +189,38 @@
   }
 </style>
 
-<div class="workbench-perspective">
-  <div class="projects" class:mini={!hidden}>
-    <div class="headIcon">
-      <a href="/" on:click|preventDefault={() => { hidden = !hidden}}>
-        <Icon icon={workbench.icon.Resize} clazz="icon-embed" /></a>
+<div class='workbench-perspective'>
+  <div class='projects' class:mini={!hidden}>
+    <div class='headIcon'>
+      <a href='/' on:click|preventDefault={() => { hidden = !hidden}}>
+        <Icon icon={workbench.icon.Resize} clazz='icon-embed' />
+      </a>
     </div>
-    <div class="container" class:hidden={!hidden}>
-      <div class="caption-3">
+    <div class='container' class:hidden={!hidden}>
+      <div class='caption-3'>
         Пространства
       </div>
-      <SpaceItem link={'/' + location[1] + '/' + location[2]} selected={!space} label="Все" count={Math.floor(Math.random()*50)} />
+      <SpaceItem link={'/' + location[1] + '/' + location[2]} selected={!space} label='Все'
+                 count={Math.floor(Math.random()*50)} />
       {#each spaces as s (s._id)}
         <SpaceItem link={'/' + location[1] + '/' + location[2] + '/' + s._id}
-          selected={s._id === space} label={'# ' + s.name} />
+                   selected={s._id === space} label={'# ' + s.name} />
       {/each}
-      <div class="footContainer">
+      <div class='footContainer'>
         <a
           bind:this={addButton}
-          href="/"
+          href='/'
           on:click|preventDefault={() => {
             uiService.showModal(JoinSpace, {}, addButton)
           }}>
-          <Icon icon={ui.icon.Add} clazz="icon-embed" />
+          <Icon icon={ui.icon.Add} clazz='icon-embed' />
         </a>
       </div>
 
-      <div class="caption-3">Приложения</div>
+      <div class='caption-3'>Приложения</div>
       {#each applications as app (app._id)}
-        <div class="item" class:selected={app._id === application}
-          on:click|preventDefault={(e) => {
+        <div class='item' class:selected={app._id === application}
+             on:click|preventDefault={(e) => {
             application = id(app)
           }}>{app.label}
         </div>
@@ -221,7 +228,7 @@
     </div>
   </div>
 
-  <div class="main">
+  <div class='main'>
     <!-- <div class="main-content"> -->
     {#if component}
       <MainComponent
@@ -241,7 +248,7 @@
   <aside>
     <!-- <DetailsForm v-if="details" :_class="details._class" :_id="details._id" @done="done" /> -->
     {#if details}
-      <ObjectForm {...details} title="Title" />
+      <ObjectForm {...details} title='Title' />
     {/if}
   </aside>
 </div>

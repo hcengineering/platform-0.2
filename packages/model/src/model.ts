@@ -58,7 +58,7 @@ export interface MatchResult {
   parentRef?: FieldRef
 }
 
-function isValidQuery (query: AnyLayout | null): boolean {
+export function isValidQuery (query: AnyLayout | null): boolean {
   return query !== null && Object.keys(query).length > 0
 }
 
