@@ -14,14 +14,8 @@
 //
 
 import { plugin, Plugin, Service, Metadata } from '@anticrm/platform'
-import {
-  Ref,
-  Class,
-  Doc,
-  AnyLayout,
-  Emb
-} from '@anticrm/model'
-import { CoreProtocol, VDoc } from '@anticrm/core'
+import { Ref, Class, Doc, AnyLayout, StringProperty } from '@anticrm/model'
+import { CoreProtocol } from '@anticrm/core'
 import { ModelDb } from './modeldb'
 
 export type Subscriber<T> = (value: T[]) => void
@@ -31,12 +25,52 @@ export interface QueryResult<T extends Doc> {
   subscribe (run: Subscriber<T>): Unsubscriber
 }
 
-export interface CoreService extends Service, CoreProtocol {
-  getModel (): ModelDb
+/**
+ * Define operations with live queries.
+ */
+export interface QueryProtocol {
   query<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): QueryResult<T>
-  createDoc<T extends Doc> (doc: T): Promise<void>
-  createVDoc<T extends VDoc> (vdoc: T): Promise<void>
-  push (vdoc: VDoc, attribute: string, element: Emb): Promise<void>
+}
+
+/**
+ * Define operations with object modifications.
+ *
+ * In case of query is not null, operation is performed over one of embedded objects, query should start with first array/instance
+ * accessor and define a query to match embedded object, values will be applied to it as is.
+ *
+ * Only one embedded object or main object is possible to modify with one operation.
+ */
+export interface OperationProtocol {
+  /**
+   * Perform creation of new document.
+   */
+  create<T extends Doc> (_class: Ref<Class<T>>, values: AnyLayout): Promise<T>
+
+  /**
+   * Push new embedded element and return a link to it.
+   * If query is specified, will find attribute of embedded object.
+   */
+  push<T extends Doc> (doc: T, query: AnyLayout | null, attribute: StringProperty, element: AnyLayout): Promise<T>
+
+  /**
+   * Perform update of document/embedded document inside document.
+   *
+   * If query is specified, will find and update embedded object instead.
+   *
+   */
+  update<T extends Doc> (doc: T, query: AnyLayout | null, values: AnyLayout): Promise<T>
+
+  /**
+   * Perform remove of object or any embedded object value.
+   *
+   * If query is specified, will find and update embedded object instead.
+   */
+  remove<T extends Doc> (doc: T, query: AnyLayout | null): Promise<T>
+}
+
+export interface CoreService extends Service, CoreProtocol, QueryProtocol, OperationProtocol {
+  getModel (): ModelDb
+
   generateId (): Ref<Doc>
   getUserId (): string
 }

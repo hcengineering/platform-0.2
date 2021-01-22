@@ -13,16 +13,32 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Class, Doc, Model, MODEL_DOMAIN, Ref, Storage, Tx, txContext, TxContext, TxContextSource } from '@anticrm/model'
+import {
+  AnyLayout,
+  Class,
+  Doc,
+  isValidQuery,
+  Model,
+  MODEL_DOMAIN,
+  Ref,
+  Storage, StringProperty,
+  Tx,
+  txContext,
+  TxContext,
+  TxContextSource
+} from '@anticrm/model'
 import { CoreProtocol, ModelIndex, TextIndex, TitleIndex, TxIndex, TxProcessor, VDocIndex } from '@anticrm/core'
 import { Collection, MongoClient } from 'mongodb'
 import { withTenant } from '@anticrm/accounts'
+import { createPullArrayFilters, createPushArrayFilters, createSetArrayFilters } from './mongo_utils'
 
 export interface WorkspaceProtocol extends CoreProtocol {
   close (): Promise<void>
+
+  getModel (): Promise<Model>
 }
 
-export async function connectWorkspace (uri: string, workspace: string): Promise<CoreProtocol & WorkspaceProtocol> {
+export async function connectWorkspace (uri: string, workspace: string): Promise<WorkspaceProtocol> {
   console.log('connecting to ' + uri)
   const client = await MongoClient.connect(uri, { useUnifiedTopology: true })
   const db = withTenant(client, workspace)
@@ -42,19 +58,42 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
   const mongoStorage: Storage = {
     async store (ctx: TxContext, doc: Doc): Promise<any> {
       const c = collection(doc._class)
-      return c.insertOne(doc)
+      return await c.insertOne(doc)
     },
 
-    async push (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: any): Promise<any> {
+    async push (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, query: AnyLayout | null, attribute: StringProperty, attributes: AnyLayout): Promise<any> {
+      if (isValidQuery(query)) {
+        const filters = createPushArrayFilters(memdb, _class, query!, attribute, attributes)
+        console.log('TRY PERFORM:',
+          _id,
+          filters.updateOperation,
+          filters.arrayFilters
+        )
+        return collection(_class).updateOne({ _id }, { $push: filters.updateOperation }, { arrayFilters: filters.arrayFilters })
+      }
       return collection(_class).updateOne({ _id }, { $push: { [attribute]: attributes } })
     },
 
-    async update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, attributes: any): Promise<any> {
+    async update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, query: AnyLayout | null, attributes: AnyLayout): Promise<any> {
+      if (isValidQuery(query)) {
+        const filters = createSetArrayFilters(memdb, _class, query!, attributes)
+        return collection(_class).updateOne({ _id }, { $set: filters.updateOperation },
+          { arrayFilters: filters.arrayFilter })
+      }
       return collection(_class).updateOne({ _id }, { $set: attributes })
     },
 
-    async remove (ctx: TxContext, _class: Ref<Class<Doc>>, doc: Ref<Doc>): Promise<any> {
-      return collection(_class).deleteOne({ _id: doc })
+    async remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, query: AnyLayout | null): Promise<any> {
+      if (isValidQuery(query)) {
+        // Operation over embedded child object, path to it should be matched by query object.
+        const filters = createPullArrayFilters(memdb, _class, query!)
+        if (filters.isArrayAttr) {
+          return collection(_class).updateOne({ _id }, { $pull: filters.updateOperation }, { arrayFilters: filters.arrayFilters })
+        } else {
+          return collection(_class).updateOne({ _id }, { $unset: filters.updateOperation }, { arrayFilters: filters.arrayFilters })
+        }
+      }
+      return collection(_class).deleteOne({ _id })
     },
 
     async find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
@@ -124,7 +163,9 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
 
     close (): Promise<void> {
       return client.close()
-    }
+    },
+
+    getModel: () => Promise.resolve(memdb)
   }
 
   return clientControl

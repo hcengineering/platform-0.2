@@ -1,68 +1,70 @@
 <!--
 // Copyright © 2020 Anticrm Platform Contributors.
-// 
+//
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
 // obtain a copy of the License at https://www.eclipse.org/legal/epl-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// 
+//
 // See the License for the specific language governing permissions and
 // limitations under the License.
 -->
-<script lang="ts">
+<script lang='ts'>
   import { Space, generateId, SpaceUser } from '@anticrm/core'
   import core from '@anticrm/core'
   import { createEventDispatcher } from 'svelte'
-  import { AnyComponent } from '@anticrm/platform-ui'
   import presentation from '@anticrm/presentation'
-  import { _getPresentationService, getComponentExtension, _getCoreService } from '../../utils'
+  import { getPresentationService, getComponentExtension, _getCoreService } from '../../../utils'
   import { AttrModel, ClassModel } from '@anticrm/presentation'
   import AttributeEditor from '@anticrm/presentation/src/components/AttributeEditor.svelte'
   import Properties from '@anticrm/presentation/src/components/internal/Properties.svelte'
+  import { getSpaceName } from './utils'
+  import { AnyLayout, Property, StringProperty } from '@anticrm/model'
 
   let object = {} as any
 
-  let component: AnyComponent
   const coreService = _getCoreService()
   const dispatch = createEventDispatcher()
 
-  function save() {
-    console.log('create', object)
-    const space: Space = {      
+  async function save () {
+    const space = {
       ...object,
-      _id: generateId(),
-      _class: core.class.Space,
-      users: [{ userId: coreService.getUserId(), owner: true } as SpaceUser],
+      users: [
+        {
+          userId: coreService.getUserId() as StringProperty,
+          owner: true as Property<boolean, boolean>
+        } as AnyLayout
+      ]
     }
-    coreService.createDoc(space)
+    coreService.create(core.class.Space, space)
     dispatch('close')
   }
+
   let model: ClassModel | undefined
   let primary: AttrModel | undefined
 
-  const presentationService = _getPresentationService()
+  const presentationService = getPresentationService()
   console.log('presentationService', presentationService)
 
   $: {
-    getComponentExtension(core.class.Space, presentation.class.DetailForm).then((ext) => {
-      component = ext
-    })
-
-    presentationService.getClassModel(core.class.Space, core.class.Doc).then((m) => {
-      const mp = m.filterPrimary()
-      model = mp.model
-      primary = mp.primary
-    })
+    presentationService.then((ps) =>
+      ps.getClassModel(core.class.Space, core.class.Doc).then((m) => {
+        const mp = m.filterPrimary()
+        model = mp.model
+        primary = mp.primary
+      })
+    )
   }
 </script>
 
-<style lang="scss">
+<style lang='scss'>
   .space-view {
     margin: 1em;
   }
+
   .header {
     display: flex;
 
@@ -77,33 +79,42 @@
       }
     }
   }
+
   .attributes {
     display: flex;
     flex-wrap: wrap;
     margin-top: 1em;
-    .group {
-      padding: 0.5em;
-      //background-color: $content-bg-color;
-    }
+  }
+
+  .separator {
+    width: 1em;
+  }
+
+  .space-kind {
+    width: 1em;
+    text-align: right;
+  }
+
+  .space-caption-1 {
+    display: flex;
   }
 </style>
 
-<div class="space-view">
-  <div class="header">
-    <div class="caption-4" />
-    <div class="actions">
-      <button
-        class="button"
-        on:click={() => {
-          dispatch('close')
-        }}>Cancel</button>
-      <button class="button" on:click={save}>Save</button>
+<div class='space-view'>
+  <div class='header'>
+    <div class='caption-4'>Create a new Space</div>
+    <div class='actions'>
+      <button class='button' on:click={() => dispatch('close')}>Cancel</button>
+      <button class='button' on:click={save}>Create</button>
+      <div class='separator' />
+      <button class='button' on:click={() => dispatch('browse')}>Browse space</button>
     </div>
   </div>
 
-  <div class="content">
+  <div class='content'>
     {#if primary}
-      <div class="caption-1">
+      <div class='caption-1 space-caption-1'>
+        <div class='space-kind'>{getSpaceName(object, false)}</div>
         <AttributeEditor attribute={primary} bind:value={object[primary.key]} />
       </div>
     {/if}

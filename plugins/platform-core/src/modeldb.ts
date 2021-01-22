@@ -13,64 +13,10 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Attribute, Class, Classifier, MODEL_DOMAIN, Doc, Model, Mixin, Obj, Ref } from '@anticrm/model'
-import core from '@anticrm/core'
-
-interface Proxy {
-  __layout: any
-}
+import { MODEL_DOMAIN, Model } from '@anticrm/model'
 
 export class ModelDb extends Model {
   constructor () {
     super(MODEL_DOMAIN)
-  }
-
-  findClasses (query: AnyLayout): Class<Obj>[] {
-    const classes = this.objectsOfClass(core.class.Class)
-    return this.findAll(classes, core.class.Class, query) as Class<Obj>[]
-  }
-
-  private prototypes = new Map<Ref<Classifier<Obj>>, Record<string, unknown>>()
-
-  createPrototype (classifier: Classifier<Obj>): Record<string, unknown> {
-    const attributes = classifier._attributes as { [key: string]: Attribute }
-    const descriptors = {} as PropertyDescriptorMap
-    for (const key in attributes) {
-      // const attribute = attributes[key]
-      const attributeKey = this.attributeKey(classifier, key)
-      const desc: PropertyDescriptor = {
-        get (this: Proxy) {
-          return this.__layout[attributeKey]
-        }
-      }
-      descriptors[key] = desc
-    }
-
-    const proto = Object.create(classifier._extends ? this.getPrototype(classifier._extends) : Object.prototype)
-    return Object.defineProperties(proto, descriptors)
-  }
-
-  getPrototype (mixin: Ref<Classifier<Obj>>): Record<string, unknown> {
-    const proto = this.prototypes.get(mixin)
-    if (!proto) {
-      const proto = this.createPrototype(this.get(mixin) as Classifier<Doc>)
-      this.prototypes.set(mixin, proto)
-      return proto
-    }
-    return proto
-  }
-
-  as<T extends Doc> (doc: Doc, mixin: Ref<Mixin<T>>): T {
-    const proxy = Object.create(this.getPrototype(mixin)) as Proxy & T
-    proxy.__layout = doc
-    return proxy
-  }
-
-  cast<T extends Doc> (docs: Doc[], mixin: Ref<Mixin<T>>): T[] {
-    return docs.map(doc => this.as(doc, mixin))
-  }
-
-  isMixedIn (obj: Doc, _class: Ref<Mixin<Doc>>): boolean {
-    return obj._mixins ? obj._mixins.includes(_class) : false
   }
 }

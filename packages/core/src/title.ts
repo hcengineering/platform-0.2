@@ -59,6 +59,7 @@ export class TitleIndex implements Index {
         return this.onCreate(ctx, tx as CreateTx)
       case core.class.UpdateTx:
         return this.onUpdate(ctx, tx as UpdateTx)
+      case core.class.PushTx:
       default:
         console.log('not implemented title tx', tx)
     }
@@ -97,7 +98,7 @@ export class TitleIndex implements Index {
       }
     }
     if (updated) {
-      this.storage.update(ctx, core.class.Title, update._objectId, { title: update._attributes[primary] })
+      this.storage.update(ctx, core.class.Title, update._objectId, null, { title: update._attributes[primary] })
     }
   }
 }

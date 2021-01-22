@@ -50,8 +50,10 @@ export default plugin('workbench' as Plugin<WorkbenchService>, { core: core.id, 
     Workbench: '' as AnyComponent,
     DefaultPerspective: '' as AnyComponent,
     CreateSpace: '' as AnyComponent,
+    JoinSpace: '' as AnyComponent,
+    BrowseSpace: '' as AnyComponent,
     Application: '' as AnyComponent,
-    CreateForm: '' as AnyComponent,
+    CreateForm: '' as AnyComponent
   },
   class: {
     Perspective: '' as Ref<Class<Perspective>>,

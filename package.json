@@ -6,6 +6,5 @@
     "plugins/*",
     "server/*",
     "dev/*"
-  ],
-  "dependencies": {}
+  ]
 }

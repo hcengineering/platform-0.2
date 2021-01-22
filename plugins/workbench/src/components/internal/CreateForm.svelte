@@ -1,18 +1,18 @@
 <!--
 // Copyright © 2020 Anticrm Platform Contributors.
-// 
+//
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
 // obtain a copy of the License at https://www.eclipse.org/legal/epl-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// 
+//
 // See the License for the specific language governing permissions and
 // limitations under the License.
 -->
-<script lang="ts">
+<script lang='ts'>
   import { Ref, Class, Doc } from '@anticrm/model'
   import core, { Space, VDoc } from '@anticrm/core'
   import { createEventDispatcher } from 'svelte'
@@ -33,11 +33,14 @@
   const coreService = _getCoreService()
   const dispatch = createEventDispatcher()
 
-  function save() {
-    const doc = { _class, _space: space, ...object }
+  function save () {
+    const doc = {
+      _class,
+      _space: space, ...object
+    }
     object = {}
     // absent VDoc fields will be autofilled
-    coreService.createVDoc((doc as unknown) as VDoc)
+    coreService.create (_class, doc)
     dispatch('close')
   }
 
@@ -48,7 +51,7 @@
   console.log('presentationService', presentationService)
 
   $: {
-    getComponentExtension(_class, presentation.class.DetailForm).then((ext) => {
+    getComponentExtension (_class, presentation.class.DetailForm).then((ext) => {
       console.log('DETAIL_FORM:', ext)
       component = ext
     })
@@ -61,10 +64,11 @@
   }
 </script>
 
-<style lang="scss">
+<style lang='scss'>
   .recruiting-view {
     margin: 1em;
   }
+
   .header {
     display: flex;
 
@@ -101,22 +105,23 @@
   }
 </style>
 
-<div class="recruiting-view">
-  <div class="header">
-    <div class="caption-4">{title} : {space}</div>
-    <div class="actions">
+<div class='recruiting-view'>
+  <div class='header'>
+    <div class='caption-4'>{title} : {space}</div>
+    <div class='actions'>
       <button
-        class="button"
+        class='button'
         on:click={() => {
           dispatch('close')
-        }}>Cancel</button>
-      <button class="button" on:click={save}>Save</button>
+        }}>Cancel
+      </button>
+      <button class='button' on:click={save}>Save</button>
     </div>
   </div>
 
-  <div class="content">
+  <div class='content'>
     {#if primary}
-      <div class="caption-1">
+      <div class='caption-1'>
         <AttributeEditor attribute={primary} bind:value={object[primary.key]} />
       </div>
     {/if}

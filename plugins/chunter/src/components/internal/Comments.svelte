@@ -52,7 +52,7 @@
         _createdBy: 'john.appleseed@gmail.com' as Property<string, string>,
         message: parsedMessage
       } as unknown) as Emb
-      return coreService.push(object, 'comments', comment)
+      return coreService.push(object, null, 'comments', comment)
     })
   }
 </script>

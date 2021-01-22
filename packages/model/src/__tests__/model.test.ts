@@ -15,106 +15,28 @@
 
 /* eslint-env jest */
 
-import { Ref, Doc, Property, Emb, Class, Obj, AnyLayout, StringProperty, Class$, Prop, ArrayOf$, Builder, InstanceOf$, Primary, Model } from '..'
+import { Property, AnyLayout, StringProperty, Builder } from '..'
+import { Model } from '../model'
 
-interface SubTask extends Emb {
-  name: string
-  rate?: number
-}
+import { taskIds, doc1, fullModel as mb, createSubtask } from './test_tasks'
 
-interface Task extends Doc {
-  name: string
-  lists: string[]
-  tasks?: SubTask[]
-  mainTask?: SubTask
-  rate?: number
-}
+const b = new Builder()
+mb(b)
 
-const core = {
-  class: {
-    Obj: 'core.class.Obj' as Ref<Class<Obj>>,
-    Emb: 'core.class.Emb' as Ref<Class<Emb>>,
-    Doc: 'core.class.Doc' as Ref<Class<Doc>>,
-    Task: 'core.class.TaskObj' as Ref<Class<Task>>,
-    Subtask: 'core.class.SubTask' as Ref<Class<SubTask>>
-  }
-}
-
-function createSubtask (name: string, rate = 30): SubTask {
-  return {
-    name: name,
-    rate: rate,
-    __embedded: true
-  } as SubTask
-}
-
-const doc1 = {
-  _id: 'd1' as Ref<Doc>,
-  _class: core.class.Task,
-  name: 'my-space',
-  lists: ['val1', 'val2'],
-  rate: 20,
-  mainTask: createSubtask('main-subtask', 30),
-  tasks: [
-    createSubtask('subtask1', 31),
-    createSubtask('subtask2', 33)
-  ]
-} as Task
-
-@Class$(core.class.Obj, core.class.Obj)
-class TObj implements Obj {
-  _class!: Ref<Class<Obj>>
-}
-
-@Class$(core.class.Emb, core.class.Obj)
-export class TEmb extends TObj implements Emb {
-  __embedded!: true
-}
-
-@Class$(core.class.Doc, core.class.Obj)
-class TDoc extends TObj implements Doc {
-  _class!: Ref<Class<Doc>>
-  @Prop() _id!: Ref<Doc>
-}
-
-@Class$(core.class.Task, core.class.Doc)
-class TTask extends TDoc implements Task {
-  @Primary()
-  @Prop() name!: string
-
-  @Prop() rate!: number
-
-  @Prop() lists!: string[]
-
-  @InstanceOf$(core.class.Subtask) mainTask!: SubTask
-
-  @ArrayOf$()
-  @InstanceOf$(core.class.Subtask)
-  tasks?: SubTask[]
-}
-
-@Class$(core.class.Subtask, core.class.Emb)
-class TSubTask extends TEmb implements SubTask {
-  @Prop() name!: string
-  @Prop() rate!: number
-}
-
-const model = new Model('vdoc')
-
-const b = new Builder(model)
-b.add(TObj, TEmb, TDoc, TTask, TSubTask)
+const model = new Model('vdocs')
+model.loadModel(b.dump())
 
 describe('matching', () => {
   it('match object value', () => {
-    expect(model.matchQuery(core.class.Task, doc1, { name: 'my-space' as StringProperty })).toEqual(true)
+    expect(model.matchQuery(taskIds.class.Task, doc1, { name: 'my-space' as StringProperty })).toEqual(true)
   })
   it('match list value', () => {
-    expect(model.matchQuery(core.class.Task, doc1, { lists: ['val1' as StringProperty, 'val2' as StringProperty] })).toEqual(true)
+    expect(model.matchQuery(taskIds.class.Task, doc1, { lists: ['val1' as StringProperty, 'val2' as StringProperty] })).toEqual(true)
   })
 
   it('match embedded value', () => {
     expect(
-      model.matchQuery(core.class.Task, doc1, {
+      model.matchQuery(taskIds.class.Task, doc1, {
         mainTask: {
           name: 'main-subtask' as StringProperty
         }
@@ -123,7 +45,7 @@ describe('matching', () => {
   })
   it('match embedded list value', () => {
     expect(
-      model.matchQuery(core.class.Task, doc1, {
+      model.matchQuery(taskIds.class.Task, doc1, {
         tasks: [
           {
             name: 'subtask1' as StringProperty
@@ -137,46 +59,70 @@ describe('matching', () => {
   })
 
   it('apply string value', () => {
-    const clone = Object.assign(doc1)
-    model.updateDocument(clone, { name: 'changed' as StringProperty } as AnyLayout)
+    const clone = model.createDocument(taskIds.class.Task, doc1)
+    model.updateDocument(clone, null, { name: 'changed' as StringProperty } as AnyLayout)
 
     expect(clone.name).toEqual('changed')
   })
   it('apply number value', () => {
-    const clone = Object.assign(doc1)
-    model.updateDocument(clone, { rate: 10 as Property<number, number> } as AnyLayout)
+    const clone = model.createDocument(taskIds.class.Task, doc1)
+    model.updateDocument(clone, null, { rate: 10 as Property<number, number> } as AnyLayout)
 
     expect(clone.rate).toEqual(10)
   })
 
   it('apply array value', () => {
-    const clone = Object.assign(doc1)
-    model.updateDocument(clone, { lists: ['A' as StringProperty, 'B' as StringProperty] } as AnyLayout)
+    const clone = model.createDocument(taskIds.class.Task, doc1)
+    model.updateDocument(clone, null, { lists: ['A' as StringProperty, 'B' as StringProperty] } as AnyLayout)
 
     expect(clone.lists).toEqual(['A', 'B'])
   })
 
   it('apply task value', () => {
-    const clone = Object.assign(doc1) as Task
+    const clone = model.createDocument(taskIds.class.Task, doc1)
     clone.mainTask = undefined
-    model.updateDocument(clone, { mainTask: createSubtask('subtask4') } as AnyLayout)
+    model.updateDocument(clone, null, { mainTask: createSubtask('subtask4') } as AnyLayout)
 
     expect(clone.mainTask).toBeDefined()
     expect(clone.mainTask!.name).toEqual('subtask4')
   })
 
   it('push subtask value', () => {
-    const clone = Object.assign(doc1)
-    model.pushDocument(clone, 'tasks' as StringProperty, (createSubtask('subtask3', 34) as unknown) as AnyLayout)
+    const clone = model.createDocument(taskIds.class.Task, doc1) ?? doc1
+    model.pushDocument(clone, null, 'tasks' as StringProperty, (createSubtask('subtask3', 34) as unknown) as AnyLayout)
 
-    expect(clone.tasks.length).toEqual(3)
+    expect(clone.tasks!.length).toEqual(3)
   })
 
   it('push a new subtask value', () => {
-    const clone = Object.assign(doc1)
-    clone.tasks = undefined
-    model.pushDocument(clone, 'tasks' as StringProperty, (createSubtask('subtask3', 34) as unknown) as AnyLayout)
+    const clone = model.createDocument(taskIds.class.Task, doc1)
+    const cloneResult = model.updateDocument(clone, { tasks: { name: 'subtask1' as StringProperty } }, {
+      rate: 44 as Property<number, number>
+    })
 
-    expect(clone.tasks.length).toEqual(1)
+    expect(cloneResult.tasks![0].rate).toEqual(44)
+  })
+
+  it('push a new comment to subtask', () => {
+    const clone = model.createDocument(taskIds.class.Task, doc1)
+    const cloneResult = model.pushDocument(clone, { tasks: { name: 'subtask1' as StringProperty } },
+      'comments' as StringProperty, {
+        message: 'my-msg' as StringProperty
+      })
+
+    expect(cloneResult.tasks![0].comments!.length).toEqual(1)
+  })
+  it('remove item from array', () => {
+    const clone = model.createDocument(taskIds.class.Task, doc1)
+    const cloneResult = model.removeDocument(clone, { tasks: { name: 'subtask1' as StringProperty } })
+
+    expect(cloneResult.tasks!.length).toEqual(1)
+    expect(cloneResult.tasks![0].name).toEqual('subtask2')
+  })
+  it('remove item from instance', () => {
+    const clone = model.createDocument(taskIds.class.Task, doc1)
+    const cloneResult = model.removeDocument(clone, { mainTask: { } })
+
+    expect(cloneResult.mainTask).toEqual(undefined)
   })
 })

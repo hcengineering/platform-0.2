@@ -59,8 +59,8 @@ export class QueriableStorage implements Domain {
     })
   }
 
-  push (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: StringProperty, attributes: AnyLayout): Promise<void> {
-    return this.proxy.push(ctx, _class, _id, attribute, attributes).then(() => {
+  push (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, _query: AnyLayout | null, attribute: StringProperty, attributes: AnyLayout): Promise<void> {
+    return this.proxy.push(ctx, _class, _id, _query, attribute, attributes).then(() => {
       this.queries.forEach(q => {
         // Find doc, apply attribute and check if it is still matches, if not we need to perform request to server after transaction will be complete.
 
@@ -68,8 +68,6 @@ export class QueriableStorage implements Domain {
         let pos = 0
         for (const r of q.results) {
           if (r._id === _id) {
-            this.model.pushDocument(r, attribute, attributes)
-
             if (!this.model.matchQuery(q._class, r, q.query)) {
               // Document is not matched anymore, we need to remove it.
               q.results.splice(pos, 1)
@@ -85,15 +83,13 @@ export class QueriableStorage implements Domain {
     })
   }
 
-  update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, attributes: AnyLayout): Promise<void> {
-    return this.proxy.update(ctx, _class, _id, attributes).then(() => {
+  update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, _query: AnyLayout | null, attributes: AnyLayout): Promise<void> {
+    return this.proxy.update(ctx, _class, _id, _query, attributes).then(() => {
       this.queries.forEach(q => {
         // Find doc, apply update of attributes and check if it is still matches, if not we need to perform request to server after transaction will be complete.
         let pos = 0
         for (const r of q.results) {
           if (r._id === _id) {
-            this.model.updateDocument(r, attributes)
-
             if (!this.model.matchQuery(q._class, r, q.query)) {
               // Document is not matched anymore, we need to remove it.
               q.results.splice(pos, 1)
@@ -110,10 +106,10 @@ export class QueriableStorage implements Domain {
     })
   }
 
-  remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<void> {
-    return this.proxy.remove(ctx, _class, _id).then(() => {
+  remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, _query: AnyLayout | null): Promise<void> {
+    return this.proxy.remove(ctx, _class, _id, _query).then(() => {
       this.queries.forEach(q => {
-        const newResults = q.results.filter(e => e._id === _id)
+        const newResults = q.results.filter(e => !(e._id === _id && this.model.matchQuery(q._class, e, q.query)))
         if (newResults.length !== q.results.length) {
           // We had this item so need inform about it is removed.
           q.results = newResults
@@ -135,7 +131,12 @@ export class QueriableStorage implements Domain {
   query<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): QueryResult<T> {
     return {
       subscribe: (subscriber: Subscriber<T>) => {
-        const q: Query<Doc> = { _class, query, subscriber: subscriber as Subscriber<Doc>, results: [] }
+        const q: Query<Doc> = {
+          _class,
+          query,
+          subscriber: subscriber as Subscriber<Doc>,
+          results: []
+        }
         q.unsubscriber = () => {
           this.queries.splice(this.queries.indexOf(q), 1)
         }

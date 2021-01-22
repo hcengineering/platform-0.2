@@ -29,15 +29,16 @@ export interface CreateTx extends ObjectTx {
 export interface PushTx extends ObjectTx {
   _attribute: StringProperty
   _attributes: AnyLayout
+  _query?: AnyLayout
 }
 
 export interface UpdateTx extends ObjectTx {
   _attributes: AnyLayout
+  _query?: AnyLayout
 }
 
-export interface DeleteTx extends Tx {
-  _objectId: Ref<Doc>
-  _objectClass: Ref<Class<Doc>>
+export interface DeleteTx extends ObjectTx {
+  _query?: unknown
 }
 
 export class TxIndex implements Index {
@@ -70,34 +71,30 @@ export class ModelIndex implements Index {
         const createTx = tx as CreateTx
         if (this.model.getDomain(createTx._objectClass) !== MODEL_DOMAIN) {
           return
-        } else {
-          const newDoc = this.model.newDoc(createTx._objectClass, createTx._objectId, createTx.object)
-          return Promise.all(this.storages.map((s) => s.store(ctx, newDoc)))
         }
+        const newDoc = this.model.newDoc(createTx._objectClass, createTx._objectId, createTx.object)
+        return Promise.all(this.storages.map((s) => s.store(ctx, newDoc)))
       }
       case core.class.UpdateTx: {
         const updateTx = tx as UpdateTx
         if (this.model.getDomain(updateTx._objectClass) !== MODEL_DOMAIN) {
           return
-        } else {
-          return Promise.all(this.storages.map((s) => s.update(ctx, updateTx._objectClass, updateTx._objectId, updateTx._attributes)))
         }
+        return Promise.all(this.storages.map((s) => s.update(ctx, updateTx._objectClass, updateTx._objectId, updateTx._query || null, updateTx._attributes)))
       }
       case core.class.PushTx: {
         const pushTx = tx as PushTx
         if (this.model.getDomain(pushTx._objectClass) !== MODEL_DOMAIN) {
           return
-        } else {
-          return Promise.all(this.storages.map((s) => s.push(ctx, pushTx._objectClass, pushTx._objectId, pushTx._attribute, pushTx._attributes)))
         }
+        return Promise.all(this.storages.map((s) => s.push(ctx, pushTx._objectClass, pushTx._objectId, pushTx._query || null, pushTx._attribute, pushTx._attributes)))
       }
       case core.class.DeleteTx: {
         const deleteTx = tx as DeleteTx
         if (this.model.getDomain(deleteTx._objectClass) !== MODEL_DOMAIN) {
           return
-        } else {
-          return Promise.all(this.storages.map((s) => s.remove(ctx, deleteTx._objectClass, deleteTx._objectId)))
         }
+        return Promise.all(this.storages.map((s) => s.remove(ctx, deleteTx._objectClass, deleteTx._objectId, (deleteTx._query || null) as AnyLayout)))
       }
 
       default:
