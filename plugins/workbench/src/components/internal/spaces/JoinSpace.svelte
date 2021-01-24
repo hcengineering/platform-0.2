@@ -31,7 +31,19 @@
     flex-direction: column;
     flex-flow: column nowrap;
     justify-content: space-evenly;
-    height: 6em;
+    //height: 6em;
+    .button {
+      font-size: 14px;
+      text-align: left;
+      padding: 0.5em 1em;
+      background-color: var(--theme-bg-accent-color);
+      border: none;
+      border-radius: 0;
+      margin: 0;
+      &:hover {
+        background-color: var(--theme-bg-dark-color);
+      }
+    }
   }
 </style>
 
