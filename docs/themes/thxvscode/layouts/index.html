@@ -1,0 +1,19 @@
+{{ define "header" }}
+{{ partial "header.html" . }}
+{{ end }}
+
+{{ define "main" }}
+
+<div role="main" id="main-content">
+    {{- if (or .Site.Params.images .Site.Params.bgImg) }}
+    <div class="bg-img"></div>
+    {{- end }}
+
+    {{ .Content }}
+</div>
+
+{{- if templates.Exists "partials/extra-foot.html" -}}
+{{ partial "extra-foot.html" . }}
+{{- end }}
+
+{{ end }}
