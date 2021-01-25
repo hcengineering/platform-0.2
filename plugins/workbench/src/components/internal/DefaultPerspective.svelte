@@ -114,12 +114,40 @@
 
     .headIcon {
       position: absolute;
+      background-color: var(--theme-bg-dark-color);
+      border-radius: 50%;
+      color: var(--white-color);
       top: 1.5em;
       right: 1.5em;
+      width: 16px;
+      height: 16px;
+
+      &:hover {
+        background-color: var(--theme-bg-dark-color);
+      }
+      &>a:hover {
+        color: var(--theme-highlight-color);
+      }
+    }
+
+    .addIcon {
+      background-color: var(--theme-bg-dark-color);
+      border-radius: 50%;
+      color: var(--white-color);
+      width: 16px;
+      height: 16px;
+
+      &:hover {
+        background-color: var(--theme-bg-dark-color);
+      }
+      &>a:hover {
+        color: var(--theme-highlight-color);
+      }
     }
 
     .footContainer {
-      text-align: center;
+      display: flex;
+      justify-content: center;
     }
 
     .item {
@@ -207,14 +235,16 @@
                    selected={s._id === space} label={'# ' + s.name} />
       {/each}
       <div class='footContainer'>
-        <a
-          bind:this={addButton}
-          href='/'
-          on:click|preventDefault={() => {
-            uiService.showModal(JoinSpace, {}, addButton)
-          }}>
-          <Icon icon={ui.icon.Add} clazz='icon-embed' />
-        </a>
+        <div class="addIcon">
+          <a
+            bind:this={addButton}
+            href='/'
+            on:click|preventDefault={() => {
+              uiService.showModal(JoinSpace, {}, addButton)
+            }}>
+            <Icon icon={ui.icon.Add} clazz='icon-embed' />
+          </a>
+        </div>
       </div>
 
       <div class='caption-3'>Приложения</div>

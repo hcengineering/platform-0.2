@@ -78,7 +78,19 @@
 
     .headIcon {
       align-self: baseline;
+      background-color: var(--theme-bg-dark-color);
+      border-radius: 50%;
+      color: var(--white-color);
       margin-left: 1em;
+      width: 16px;
+      height: 16px;
+
+      &:hover {
+        background-color: var(--theme-bg-dark-color);
+      }
+      &>a:hover {
+        color: var(--theme-highlight-color);
+      }
     }
     .actions {
       display: flex;
