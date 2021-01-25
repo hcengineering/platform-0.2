@@ -30,7 +30,7 @@
                             <a id="nav-{{ .Name }}" href="{{ .URL | relLangURL }}" class="has-children">{{ .Name }}</a>
                             <span class="sub-menu">
                                 {{- range .Children }}
-                                <a href="{{ .URL | absLangURL }}">{{ .Name }}</a>
+                                <a href="{{ .URL | relLangURL }}">{{ .Name }}</a>
                                 {{- end }}
                             </span>
                         </li>
