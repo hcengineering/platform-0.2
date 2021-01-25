@@ -6,5 +6,8 @@ lib
 dist
 yarn-error.log
 tsconfig.tsbuildinfo
+tsdoc-metadata.json
+_api-extractor-temp/
 /docs/bin/
 /docs/resources/
+/docs/content/apis/
