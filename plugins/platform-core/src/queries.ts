@@ -59,23 +59,29 @@ export class QueriableStorage implements Domain {
     })
   }
 
+  updateMatchQuery (_id: Ref<Doc>, q: Query<Doc>): boolean {
+    let pos = 0
+    for (const r of q.results) {
+      if (r._id === _id) {
+        if (!this.model.matchQuery(q._class, r, q.query)) {
+          // Document is not matched anymore, we need to remove it.
+          q.results.splice(pos, 1)
+        }
+        q.subscriber(q.results)
+        return true
+      }
+      pos++
+    }
+    return false
+  }
+
   push (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, _query: AnyLayout | null, attribute: StringProperty, attributes: AnyLayout): Promise<void> {
     return this.proxy.push(ctx, _class, _id, _query, attribute, attributes).then(() => {
       this.queries.forEach(q => {
         // Find doc, apply attribute and check if it is still matches, if not we need to perform request to server after transaction will be complete.
-
         // Check if attribute are in query, so it could modify results.
-        let pos = 0
-        for (const r of q.results) {
-          if (r._id === _id) {
-            if (!this.model.matchQuery(q._class, r, q.query)) {
-              // Document is not matched anymore, we need to remove it.
-              q.results.splice(pos, 1)
-            }
-            q.subscriber(q.results)
-            return
-          }
-          pos++
+        if (this.updateMatchQuery(_id, q)) {
+          return
         }
         // so we potentially need to fetch new matched objects from server, so do so.
         ctx.network.then(() => this.refresh(q))
@@ -87,20 +93,10 @@ export class QueriableStorage implements Domain {
     return this.proxy.update(ctx, _class, _id, _query, attributes).then(() => {
       this.queries.forEach(q => {
         // Find doc, apply update of attributes and check if it is still matches, if not we need to perform request to server after transaction will be complete.
-        let pos = 0
-        for (const r of q.results) {
-          if (r._id === _id) {
-            if (!this.model.matchQuery(q._class, r, q.query)) {
-              // Document is not matched anymore, we need to remove it.
-              q.results.splice(pos, 1)
-            }
-            q.subscriber(q.results)
-            return
-          }
-          pos++
+        if (this.updateMatchQuery(_id, q)) {
+          return
         }
-
-        // TODO: Check if attributes modified had in query so we potentially need to fetch new matched objects from server.
+        // so we potentially need to fetch new matched objects from server, so do so.
         ctx.network.then(() => this.refresh(q))
       })
     })
@@ -109,12 +105,11 @@ export class QueriableStorage implements Domain {
   remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, _query: AnyLayout | null): Promise<void> {
     return this.proxy.remove(ctx, _class, _id, _query).then(() => {
       this.queries.forEach(q => {
-        const newResults = q.results.filter(e => !(e._id === _id && this.model.matchQuery(q._class, e, q.query)))
-        if (newResults.length !== q.results.length) {
-          // We had this item so need inform about it is removed.
-          q.results = newResults
-          q.subscriber(q.results)
+        if (this.updateMatchQuery(_id, q)) {
+          return
         }
+        // so we potentially need to fetch new matched objects from server, so do so.
+        ctx.network.then(() => this.refresh(q))
       })
     })
   }

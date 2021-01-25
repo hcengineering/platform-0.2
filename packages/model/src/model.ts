@@ -623,7 +623,7 @@ export class Model implements Storage {
     }
   }
 
-  private attributeClass (type: Type): Ref<Class<Doc>> | null {
+  public attributeClass (type: Type): Ref<Class<Doc>> | null {
     switch (type._class) {
       case core.class.ArrayOf:
         return this.attributeClass((type as ArrayOf).of)
