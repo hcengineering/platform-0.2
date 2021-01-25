@@ -49,7 +49,11 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
 
     const label = await i18nService.translate(ux.label)
 
-    return { _class, label, icon: ux.icon }
+    return {
+      _class,
+      label,
+      icon: ux.icon
+    }
   }
 
   async function getOwnAttrModel (_class: Ref<Class<Obj>>): Promise<AttrModel[]> {
@@ -66,6 +70,10 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
         const key = uxAttributeE[0]
         const uxAttribute = uxAttributeE[1]
         const attribute = attributes[key]
+        if (!attribute) {
+          console.error('attribute:', key, ' is not found for', uxAttributeE)
+          continue
+        }
         const label = await i18nService.translate(uxAttribute.label)
         const placeholder = uxAttribute.placeholder ? await i18nService.translate(uxAttribute.placeholder) : label
         const icon: Asset | undefined = uxAttribute.icon
@@ -125,16 +133,24 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
   abstract class ClassModelBase implements ClassModel {
     filterAttributes (keys: string[]): ClassModel {
       const filter = {} as { [key: string]: Record<string, unknown> }
-      keys.forEach(key => { filter[key] = {} })
+      keys.forEach(key => {
+        filter[key] = {}
+      })
       return new AttributeFilter(this, filter)
     }
 
     abstract getAttribute (key: string, _class?: Ref<Class<Obj>>): AttrModel | undefined
+
     abstract getGroups (): GroupModel[]
+
     abstract getOwnAttributes (_class: Ref<Class<Obj>>): AttrModel[]
+
     abstract getAttributes (): AttrModel[]
+
     abstract getGroup (_class: Ref<Class<Obj>>): GroupModel | undefined
+
     abstract getPrimary (): AttrModel | undefined
+
     abstract filterPrimary (): { model: ClassModel, primary: AttrModel | undefined }
   }
 
@@ -160,7 +176,9 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
       return this.attributes.find(attr => attr.key === key && (_class ? _class === attr._class : true))
     }
 
-    getGroups (): GroupModel[] { return this.groups }
+    getGroups (): GroupModel[] {
+      return this.groups
+    }
 
     getGroup (_class: Ref<Class<Obj>>): GroupModel | undefined {
       return this.groups.find(group => group._class === _class)
@@ -173,9 +191,15 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
     filterPrimary (): { model: ClassModel, primary: AttrModel | undefined } {
       const primary = this.getPrimary()
       if (primary !== undefined) {
-        return { model: this.filterAttributes([primary.key]), primary }
+        return {
+          model: this.filterAttributes([primary.key]),
+          primary
+        }
       } else {
-        return { model: this, primary: undefined }
+        return {
+          model: this,
+          primary: undefined
+        }
       }
     }
   }

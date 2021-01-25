@@ -14,5 +14,5 @@ export function isCurrentUserSpace (currentUser: string, space: Space): boolean 
   return false
 }
 export function getSpaceName (space: Space, withTitle = true): string {
-  return (space.isPublic ? '#' : '%') + (withTitle ? space.name : '')
+  return (space.isPublic ? '#' : '$') + (withTitle ? space.name : '')
 }

@@ -45,7 +45,7 @@ export class TSpace extends TDoc implements Space {
 
   @Prop(core.class.Boolean) isPublic!: boolean
 
-  @Prop(core.class.Boolean) autoJoin!: boolean
+  @Prop(core.class.Boolean) archived!: boolean
 }
 
 @Class$(core.class.VDoc, core.class.Doc)

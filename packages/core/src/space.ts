@@ -15,5 +15,6 @@ export interface Space extends Doc {
   users: SpaceUser[] // A list of included user accounts, not all coult be active.
 
   isPublic: boolean // If specified, a users are interpreted as include list.
-  autoJoin: boolean // If specified, any new user will join proposed space.
+
+  archived: boolean // If specified, channel is marked as archived, only owner could archive space
 }

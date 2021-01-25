@@ -21,7 +21,7 @@
   import workbench, { WorkbenchApplication } from '../..'
 
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
-  import SpaceItem from './SpaceItem.svelte'
+  import SpaceItem from './spaces/SpaceItem.svelte'
 
   import { AnyComponent } from '@anticrm/platform-ui'
 
@@ -125,7 +125,8 @@
       &:hover {
         background-color: var(--theme-bg-dark-color);
       }
-      &>a:hover {
+
+      & > a:hover {
         color: var(--theme-highlight-color);
       }
     }
@@ -140,7 +141,8 @@
       &:hover {
         background-color: var(--theme-bg-dark-color);
       }
-      &>a:hover {
+
+      & > a:hover {
         color: var(--theme-highlight-color);
       }
     }
@@ -228,14 +230,16 @@
       <div class='caption-3'>
         Пространства
       </div>
-      <SpaceItem link={'/' + location[1] + '/' + location[2]} selected={!space} label='Все'
+      <SpaceItem link={'/' + location[1] + '/' + location[2]} selected={!space} space={{ name: 'Все', isPublic: true }}
                  count={Math.floor(Math.random()*50)} />
       {#each spaces as s (s._id)}
-        <SpaceItem link={'/' + location[1] + '/' + location[2] + '/' + s._id}
-                   selected={s._id === space} label={'# ' + s.name} />
+        {#if !s.archived}
+          <SpaceItem link={'/' + location[1] + '/' + location[2] + '/' + s._id}
+                     selected={s._id === space} space={s} />
+        {/if}
       {/each}
       <div class='footContainer'>
-        <div class="addIcon">
+        <div class='addIcon'>
           <a
             bind:this={addButton}
             href='/'
