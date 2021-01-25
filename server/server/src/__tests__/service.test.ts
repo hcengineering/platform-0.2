@@ -139,7 +139,7 @@ describe('service', () => {
 
     // Client2 had access to client1 private-space, it should not.
     spaces = await c2.find(core.class.Space, { isPublic: false as Property<boolean, boolean> })
-    expect(spaces.length).toEqual(1)
+    expect(spaces.length).toEqual(0)
 
     pages = await c2.find(chunter.class.Page, {})
     expect(pages.length).toEqual(0) // c2 is not allowed to see page from private space of c1

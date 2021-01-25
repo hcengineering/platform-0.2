@@ -28,14 +28,18 @@
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import workbench from '@anticrm/workbench'
 
-  let object = {} as any
+  let makePrivate: boolean = false
+  let title: string = ''
+  let description: string = ''
 
   const coreService = _getCoreService()
   const dispatch = createEventDispatcher()
 
   async function save () {
     const space = {
-      ...object,
+      name: title as StringProperty,
+      description: description as StringProperty,
+      isPublic: !makePrivate as Property<boolean, boolean>,
       users: [
         {
           userId: coreService.getUserId() as StringProperty,
@@ -62,8 +66,6 @@
       })
     )
   }
-
-  let chkBox: boolean = false;
 </script>
 
 <style lang='scss'>
@@ -89,10 +91,12 @@
       &:hover {
         background-color: var(--theme-bg-dark-color);
       }
-      &>a:hover {
+
+      & > a:hover {
         color: var(--theme-highlight-color);
       }
     }
+
     .actions {
       display: flex;
       flex-grow: 1;
@@ -138,7 +142,8 @@
           font-weight: 500;
           margin-bottom: 0.25em;
           color: var(--theme-content-color);
-          &>span {
+
+          & > span {
             color: var(--theme-content-trans-color);
             font-size: 11px;
             font-weight: normal;
@@ -162,9 +167,11 @@
           }
         }
       }
+
       .checkbox-label {
         font-weight: 500;
-        &>span {
+
+        & > span {
           display: block;
           font-size: 11px;
           font-weight: normal;
@@ -194,6 +201,7 @@
             color: var(--theme-caption-color);
             box-shadow: 0 0 2px 2px var(--theme-highlight-color);
           }
+
           &:focus {
             outline: none;
           }
@@ -205,53 +213,35 @@
 
 <div class='space-view'>
   <div class='header'>
-    <div class='caption-1'>Create a new {(chkBox) ? 'private ' : ''}Space</div>
+    <div class='caption-1'>Create a new {(makePrivate) ? 'private ' : ''}Space</div>
     <div class='headIcon'>
       <a href='/' on:click|preventDefault={() => dispatch('close')}>
         <Icon icon={workbench.icon.Close} clazz='icon-embed' />
       </a>
     </div>
-    <!--<div class='actions'>
-      <button class='button' on:click={() => dispatch('close')}>Cancel</button>
-      <button class='button' on:click={save}>Create</button>
-      <div class='separator' />
-      <button class='button' on:click={() => dispatch('browse')}>Browse space</button>
-    </div>-->
   </div>
 
-  <!--<div class='content'>
-    {#if primary}
-      <div class='caption-1 space-caption-1'>
-        <div class='space-kind'>{getSpaceName(object, false)}</div>
-        <AttributeEditor attribute={primary} bind:value={object[primary.key]} />
-      </div>
-    {/if}
-    {#if model}
-      <Properties {model} bind:object />
-    {/if}
-  </div>-->
-
-  <div class="content">
-    <form class="form">
-      <div class="input-container">
-        <label class="input-label" for="input__name">
+  <div class='content'>
+    <form class='form'>
+      <div class='input-container'>
+        <label class='input-label' for='input__name'>
           Name
         </label>
-        <input type="text" class="input input__name" />
+        <input type='text' class='input input__name' id='input__name' bind:value={title}>
       </div>
-      <div class="input-container">
-        <label class="input-label" for="input__description">
+      <div class='input-container'>
+        <label class='input-label' for='input__description'>
           Description <span>(optional)</span>
         </label>
-        <input type="text" class="input input__description" />
+        <input type='text' class='input input__description' id='input__description' bind:value={description}>
       </div>
-      <CheckBox bind:checked={chkBox} right="true">
-        <div class="checkbox-label">
+      <CheckBox bind:checked={makePrivate} right='true'>
+        <div class='checkbox-label'>
           Make private <span>When a channel is set to private, it can only be viewed or joined by invitation.</span>
         </div>
       </CheckBox>
-      <div class="buttons">
-        <button type="button" class="createButton">Create</button>
+      <div class='buttons'>
+        <button type='button' class='createButton' on:click={() => save()}>Create</button>
       </div>
     </form>
   </div>

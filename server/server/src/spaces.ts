@@ -28,13 +28,6 @@ function getSpaceKey (_class: Ref<Class<Doc>>): string {
  * The result query can be used to request objects the user has access to from the storage.
  */
 export async function filterQuery (spaces: Map<string, SpaceUser>, _class: Ref<Class<Doc>>, query: AnyLayout): Promise<{ valid: boolean, filteredQuery: AnyLayout }> {
-  if (_class === core.class.Space) {
-    // No need to filter, since we should list all spaces.
-    return {
-      valid: true,
-      filteredQuery: query
-    }
-  }
   const spaceKey = getSpaceKey(_class)
 
   // check filter by space in the request
