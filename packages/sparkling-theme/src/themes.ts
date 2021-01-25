@@ -18,13 +18,14 @@ export interface Theme {
   colors: {
     ['bg-color']: string
     ['bg-dark-color']: string
-    ['bg-accent-color']: string,
+    ['bg-accent-color']: string
+    ['bg-dark-hover']: string
+    ['bg-accent-hover']: string
     ['content-color']: string
     ['content-dark-color']: string
     ['caption-color']: string
     ['accent-color']: string
     ['highlight-color']: string
-    ['highlight-border']: string
     ['content-trans-color']: string
     ['font-content']: string
   }
@@ -37,12 +38,13 @@ export const themes: Theme[] = [
       ['bg-color']: '#fff',
       ['bg-dark-color']: '#E0E0E0',
       ['bg-accent-color']: '#F2F2F2',
+      ['bg-dark-hover']: '#C4C4C4',
+      ['bg-accent-hover']: '#CFCFCF',
       ['content-color']: '#505050',
       ['content-dark-color']: '#333333',
       ['caption-color']: '#000',
       ['accent-color']: '#B92D52',
       ['highlight-color']: '#2D6AB9',
-      ['highlight-border']: '#000',
       ['content-trans-color']: 'rgba(0, 0, 0, 0.2)',
       ['font-content']: `"IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto`
     }
@@ -53,12 +55,13 @@ export const themes: Theme[] = [
       ['bg-color']: '#1E1E1E',
       ['bg-dark-color']: '#4D4D4D',
       ['bg-accent-color']: '#333333',
+      ['bg-dark-hover']: '#5F5F5F',
+      ['bg-accent-hover']: '#474747',
       ['content-color']: '#999999',
       ['content-dark-color']: '#E5E5E5',
       ['caption-color']: '#FFFFFF',
       ['accent-color']: '#B92D52',
       ['highlight-color']: '#2D6AB9',
-      ['highlight-border']: '#fff',
       ['content-trans-color']: 'rgba(255, 255, 255, 0.2)',
       ['font-content']: `"IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto`,
     },
@@ -69,12 +72,13 @@ export const themes: Theme[] = [
       ['bg-color']: '#FDF1E6',
       ['bg-dark-color']: '#CAC1B8',
       ['bg-accent-color']: '#EFE0D0',
+      ['bg-dark-hover']: '#A49D95',
+      ['bg-accent-hover']: '#D7CABB',
       ['content-color']: '#65605C',
       ['content-dark-color']: '#32302E',
       ['caption-color']: '#000',
       ['accent-color']: '#B92D52',
       ['highlight-color']: '#2D6AB9',
-      ['highlight-border']: '#000',
       ['content-trans-color']: 'rgba(0, 0, 0, 0.2)',
       ['font-content']: `"IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto`,
     },

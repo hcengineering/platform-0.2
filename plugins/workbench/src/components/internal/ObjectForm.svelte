@@ -18,7 +18,7 @@
   import { createEventDispatcher, onDestroy } from 'svelte'
   import { getComponentExtension, getCoreService, query } from '../../utils'
 
-  import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
+  import IconButton from '@anticrm/platform-ui/src/components/IconButton.svelte'
   import workbench from '../..'
 
   export let title: string
@@ -69,10 +69,8 @@
       <button class="button" on:click="{save}">Save</button>
     </div>
   </div> -->
-  <div class="headIcon">
-    <a href="/" on:click|preventDefault={() => { dispatch('close') }}>
-      <Icon icon={workbench.icon.Close} clazz="icon-embed" /></a>
-  </div>
+  <a href="/" on:click|preventDefault={() => { dispatch('close') }}>
+    <IconButton icon={workbench.icon.Close} style='position:absolute;top:1.5em;right:1.5em;' /></a>
   {#if object}
     <div class="content">
       <Component is="{component}" props="{{ _class, object }}" />
@@ -85,12 +83,6 @@
     padding: 2em;
     width: calc(404px - 4em);
     position: relative;
-    
-    .headIcon {
-      position: absolute;
-      top: 1.5em;
-      right: 1.5em;
-    }
   }
 
   .header {

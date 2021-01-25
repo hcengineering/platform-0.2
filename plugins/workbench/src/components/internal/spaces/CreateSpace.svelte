@@ -25,7 +25,7 @@
   import { AnyLayout, Property, StringProperty } from '@anticrm/model'
   import CheckBox from '@anticrm/sparkling-controls/src/CheckBox.svelte'
 
-  import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
+  import IconButton from '@anticrm/platform-ui/src/components/IconButton.svelte'
   import workbench from '@anticrm/workbench'
 
   let makePrivate: boolean = false
@@ -78,24 +78,6 @@
     display: flex;
     justify-content: space-between;
     margin-bottom: 1.5em;
-
-    .headIcon {
-      align-self: baseline;
-      background-color: var(--theme-bg-dark-color);
-      border-radius: 50%;
-      color: var(--white-color);
-      margin-left: 1em;
-      width: 16px;
-      height: 16px;
-
-      &:hover {
-        background-color: var(--theme-bg-dark-color);
-      }
-
-      & > a:hover {
-        color: var(--theme-highlight-color);
-      }
-    }
 
     .actions {
       display: flex;
@@ -214,11 +196,9 @@
 <div class='space-view'>
   <div class='header'>
     <div class='caption-1'>Create a new {(makePrivate) ? 'private ' : ''}Space</div>
-    <div class='headIcon'>
-      <a href='/' on:click|preventDefault={() => dispatch('close')}>
-        <Icon icon={workbench.icon.Close} clazz='icon-embed' />
-      </a>
-    </div>
+    <a href='/' on:click|preventDefault={() => dispatch('close')}>
+      <IconButton icon={workbench.icon.Close} />
+    </a>
   </div>
 
   <div class='content'>

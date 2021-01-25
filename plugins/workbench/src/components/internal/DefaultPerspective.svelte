@@ -20,7 +20,7 @@
   import ui from '@anticrm/platform-ui'
   import workbench, { WorkbenchApplication } from '../..'
 
-  import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
+  import IconButton from '@anticrm/platform-ui/src/components/IconButton.svelte'
   import SpaceItem from './spaces/SpaceItem.svelte'
 
   import { AnyComponent } from '@anticrm/platform-ui'
@@ -112,41 +112,6 @@
       visibility: hidden;
     }
 
-    .headIcon {
-      position: absolute;
-      background-color: var(--theme-bg-dark-color);
-      border-radius: 50%;
-      color: var(--white-color);
-      top: 1.5em;
-      right: 1.5em;
-      width: 16px;
-      height: 16px;
-
-      &:hover {
-        background-color: var(--theme-bg-dark-color);
-      }
-
-      & > a:hover {
-        color: var(--theme-highlight-color);
-      }
-    }
-
-    .addIcon {
-      background-color: var(--theme-bg-dark-color);
-      border-radius: 50%;
-      color: var(--white-color);
-      width: 16px;
-      height: 16px;
-
-      &:hover {
-        background-color: var(--theme-bg-dark-color);
-      }
-
-      & > a:hover {
-        color: var(--theme-highlight-color);
-      }
-    }
-
     .footContainer {
       display: flex;
       justify-content: center;
@@ -221,11 +186,9 @@
 
 <div class='workbench-perspective'>
   <div class='projects' class:mini={!hidden}>
-    <div class='headIcon'>
-      <a href='/' on:click|preventDefault={() => { hidden = !hidden}}>
-        <Icon icon={workbench.icon.Resize} clazz='icon-embed' />
-      </a>
-    </div>
+    <a href='/' on:click|preventDefault={() => { hidden = !hidden}}>
+      <IconButton icon={workbench.icon.Resize} style='position:absolute;top:1.5em;right:1.5em;' />
+    </a>
     <div class='container' class:hidden={!hidden}>
       <div class='caption-3'>
         Пространства
@@ -239,16 +202,14 @@
         {/if}
       {/each}
       <div class='footContainer'>
-        <div class='addIcon'>
-          <a
-            bind:this={addButton}
-            href='/'
-            on:click|preventDefault={() => {
-              uiService.showModal(JoinSpace, {}, addButton)
-            }}>
-            <Icon icon={ui.icon.Add} clazz='icon-embed' />
-          </a>
-        </div>
+        <a
+          bind:this={addButton}
+          href='/'
+          on:click|preventDefault={() => {
+            uiService.showModal(JoinSpace, {}, addButton)
+          }}>
+          <IconButton icon={ui.icon.Add} />
+        </a>
       </div>
 
       <div class='caption-3'>Приложения</div>
