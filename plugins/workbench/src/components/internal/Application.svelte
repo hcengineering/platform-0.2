@@ -26,6 +26,7 @@
   import ObjectForm from './ObjectForm.svelte'
   import CreateForm from './CreateForm.svelte'
   import { Ref } from '@anticrm/model'
+import IconButton from '@anticrm/platform-ui/src/components/IconButton.svelte';
 
   export let application: Ref<WorkbenchApplication>
   export let space: Ref<Space>
@@ -42,6 +43,12 @@
     })
     // _id = undefined
   }
+
+  function getLabel(str: string): string {
+    if (str === 'Страницы') return 'Новая страница'
+    if (str === 'Задачи') return 'Новая задача'
+    return 'Добавить'
+  }
 </script>
 
 <div class='workbench-browse'>
@@ -50,7 +57,7 @@
       <span class='caption-1' style='padding-right:1em'>{appInstance.label}</span>&nbsp;
       <a class='icon' bind:this={addIcon} href='/'
          on:click|preventDefault={ () => { uiService.showModal(CreateForm, { _class: appInstance ? appInstance.classes[0] : undefined, title: 'The title', space }, addIcon) } }>
-        <Icon icon={workbench.icon.Add} clazz='icon-embed' />
+        <IconButton icon={workbench.icon.Add} label={getLabel(appInstance.label)} />
       </a>
       <div style='flex-grow:1'></div>
       <Finder placeholder='Поиск по {appInstance.label}...' />
