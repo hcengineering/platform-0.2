@@ -2,7 +2,7 @@
 
 Anticrm Platform enforces the Developer Certificate of Origin (DCO) on Pull Requests. It requires all commit messages to contain the `Signed-off-by` line with an email address that matches the commit author and the name on your GitHub account. The Developer Certificate of Origin (DCO) is a lightweight way for contributors to certify that they wrote or otherwise have the right to submit the code they are contributing to the project. 
 
-Contributors sign-off that they adhere to the DCO requirements by adding a `Signed-off-by` line to commit messages. Find out how to sign-off commits [here](docs/how-to-signoff.md).
+Contributors sign-off that they adhere to the DCO requirements by adding a `Signed-off-by` line to commit messages. Find out how to sign-off commits [here](help/how-to-signoff.md).
 
 ## Developer's Certificate of Origin 1.1
 
@@ -34,7 +34,7 @@ By making a contribution to this project, I certify that:
 
 The Anticrm Platform project uses a DCO bot for all GitHub pulls to verify that each commit is signed off. When you create your pull request, it will automatically be verified by this bot. An example of what to expect is below.
 
-![DCO Failure](docs/images/dco-failure.png)
+![DCO Failure](help/images/dco-failure.png)
 
 If you have authored a commit that is missing the signed-off-by line, you can amend your commit and push it to GitHub
 ```
