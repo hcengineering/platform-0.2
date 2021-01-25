@@ -37,28 +37,30 @@
     spaces = docs
   })
 
-  function joinLeave (s: Space): () => void {
-    return () => {
-      if (!isCurrentUserSpace(curentUser, s)) {
-        console.log('Join space', s)
-        coreService.push(s, null, 'users' as StringProperty, {
-          userId: curentUser as StringProperty,
-          owner: false as Property<number, number>
-        })
-      } else {
-        console.log('Leave space', s)
-        coreService.remove(s, {
-          users: {
-            userId: curentUser as StringProperty
-          }
-        })
+  // Join public space
+  function joinSpace (s: Space) {
+    coreService.push(s, null, 'users' as StringProperty, {
+      userId: curentUser as StringProperty,
+      owner: false as Property<number, number>
+    })
+  }
+
+  // Leave public space
+  function leaveSpace (s: Space) {
+    coreService.remove(s, {
+      users: {
+        userId: curentUser as StringProperty
       }
-    }
+    })
+  }
+
+  function archivedSpaceUpdate (s: Space, value: boolean) {
+    coreService.update(s, null, {
+      archived: value as Property<boolean, boolean>
+    })
   }
 
   const presentationService = getPresentationService()
-  console.log('presentationService', presentationService)
-
   onDestroy(() => {
     if (spaceUnsubscribe) spaceUnsubscribe()
   })
@@ -84,18 +86,23 @@
             {s.users !== undefined ? s.users.length : 0}
             <br />
             {isCurrentUserSpace(curentUser, s) ? 'Joined' : ''}
+            {s.archived ? 'Archived' : ''}
           </div>
           <div class='actions'>
             {#if hoverSpace === s._id}
               {#if isCurrentUserSpace(curentUser, s)}
                 {#if s.isPublic }
-                  <button class='button' on:click={joinLeave(s)}>
-                    'Leave'
+                  <button class='button' on:click={() => leaveSpace(s)}>
+                    Leave
+                  </button>
+                {:else}
+                  <button class='button' on:click={() => archivedSpaceUpdate(s, !s.archived)}>
+                    {s.archived ? 'Unarchive' : 'Archive'}
                   </button>
                 {/if}
               {:else}
-                <button class='button' on:click={joinLeave(s)}>
-                  'Join'
+                <button class='button' on:click={() =>  joinSpace(s)}>
+                  Join
                 </button>
               {/if}
             {/if}
