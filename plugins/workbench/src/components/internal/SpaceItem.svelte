@@ -50,15 +50,18 @@
 
   .counter {
     box-sizing: border-box;
-    display: inline-block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     color: var(--white-color);
     background-color: var(--theme-highlight-color);
     font-weight: 700;
     font-size: 11px;
+    line-height: 11px;
 
     height: 16px;
     margin: 0;
-    padding: 2px 4px;
+    padding: 0 4px;
     border-radius: 8px;
   }
 </style>
