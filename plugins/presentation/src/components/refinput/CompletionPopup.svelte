@@ -69,18 +69,23 @@
     display: flex;
     flex-direction: column;
     background-color: var(--theme-bg-color);
-    color: #fff;
+    color: var(--theme-content-color);
     position: relative;
-    border: 1px solid var(--theme-content-dark-color);
-    border-radius: 3px;
-    height: 75px;
+    border: 1px solid var(--theme-bg-dark-color);
+    border-radius: 4px;
+    height: 150px;
     width: 300px;
+    padding: 1em;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
 
     .item {
       font-size: 14px;
-      font-family: Raleway;
+      font-family: var(--theme-font-caption);
+      color: var(--theme-content-color);
       white-space: no-wrap;
-      width: 100%;
+      padding: 0.5em;
+      border-radius: 4px;
+      cursor: pointer;
 
       &.selected {
         border-color: var(--theme-highlight-color);
@@ -92,6 +97,7 @@
         outline: none;
         border-color: var(--theme-highlight-color);
         box-shadow: inset 0px 0px 2px 0px var(--theme-highlight-color);
+        color: var(--theme-caption-color);
       }
     }
   }

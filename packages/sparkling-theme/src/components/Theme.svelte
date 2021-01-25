@@ -63,6 +63,11 @@
     border: 1px solid var(--theme-bg-dark-color);
     border-radius: 2px;
   }
+  ::-webkit-scrollbar-corner {
+    background: var(--theme-bg-accent-color);
+    border: 1px solid var(--theme-bg-dark-color);
+    border-radius: 2px;
+  }
 
   @font-face {
     font-family: "IBM Plex Sans";

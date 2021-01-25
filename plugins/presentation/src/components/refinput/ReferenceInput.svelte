@@ -410,7 +410,7 @@
             <Icon icon={presentation.icon.brdSmile} clazz="icon-brd-max" />
             <!--😀-->
           </ToolbarButton>
-          <ToolbarButton selected={stylesEnabled} on:click={() => (stylesEnabled = !stylesEnabled)}>Aa</ToolbarButton>
+          <ToolbarButton style="font-weight:bold" selected={stylesEnabled} on:click={() => (stylesEnabled = !stylesEnabled)}>Aa</ToolbarButton>
         </div>
       </Toolbar>
     </div>
