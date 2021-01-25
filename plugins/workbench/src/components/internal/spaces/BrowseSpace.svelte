@@ -87,9 +87,17 @@
           </div>
           <div class='actions'>
             {#if hoverSpace === s._id}
-              <button class='button' on:click={joinLeave(s)}>
-                {isCurrentUserSpace(curentUser, s) ? 'Leave' : 'Join'}
-              </button>
+              {#if isCurrentUserSpace(curentUser, s)}
+                {#if s.isPublic }
+                  <button class='button' on:click={joinLeave(s)}>
+                    'Leave'
+                  </button>
+                {/if}
+              {:else}
+                <button class='button' on:click={joinLeave(s)}>
+                  'Join'
+                </button>
+              {/if}
             {/if}
           </div>
         </div>

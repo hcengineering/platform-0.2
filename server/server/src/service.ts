@@ -23,7 +23,9 @@ import { SpaceUser } from '@anticrm/core'
 
 export interface ClientControl {
   ping (): Promise<void>
+
   send (response: Response<any>): Promise<void>
+
   close (): Promise<void>
 }
 
@@ -35,7 +37,10 @@ export async function createClientService (workspaceProtocol: Promise<WorkspaceP
   const clientControl: ClientService = {
     // C O R E  P R O T O C O L
     async find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
-      const { valid, filteredQuery } = await filterQuery(userSpaces, _class, query)
+      const {
+        valid,
+        filteredQuery
+      } = await filterQuery(userSpaces, _class, query)
       if (valid) {
         try {
           return await workspace.find(_class, filteredQuery)
@@ -46,7 +51,10 @@ export async function createClientService (workspaceProtocol: Promise<WorkspaceP
       return Promise.reject(new Error('Invalid space are spefified'))
     },
     async findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined> {
-      const { valid, filteredQuery } = await filterQuery(userSpaces, _class, query)
+      const {
+        valid,
+        filteredQuery
+      } = await filterQuery(userSpaces, _class, query)
       if (valid) {
         return workspace.findOne(_class, filteredQuery)
       }
@@ -54,7 +62,7 @@ export async function createClientService (workspaceProtocol: Promise<WorkspaceP
     },
     async loadDomain (domain: string, index?: string, direction?: string): Promise<Doc[]> {
       const docs = await workspace.loadDomain(domain, index, direction)
-      const filteredDocs = docs.filter((d) => isAcceptable(userSpaces, d._class, (d as unknown) as AnyLayout))
+      const filteredDocs = docs.filter((d) => isAcceptable(userSpaces, d._class, (d as unknown) as AnyLayout), false)
       return filteredDocs
     },
 

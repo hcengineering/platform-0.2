@@ -22,11 +22,19 @@ function getSpaceKey (_class: Ref<Class<Doc>>): string {
   // for Space objects use _id to filter available ones
   return _class === core.class.Space ? '_id' : '_space'
 }
+
 /**
-   * Filters the given query to satisfy current user account rights.
-   * The result query can be used to request objects the user has access to from the storage.
-   */
+ * Filters the given query to satisfy current user account rights.
+ * The result query can be used to request objects the user has access to from the storage.
+ */
 export async function filterQuery (spaces: Map<string, SpaceUser>, _class: Ref<Class<Doc>>, query: AnyLayout): Promise<{ valid: boolean, filteredQuery: AnyLayout }> {
+  if (_class === core.class.Space) {
+    // No need to filter, since we should list all spaces.
+    return {
+      valid: true,
+      filteredQuery: query
+    }
+  }
   const spaceKey = getSpaceKey(_class)
 
   // check filter by space in the request
@@ -35,7 +43,10 @@ export async function filterQuery (spaces: Map<string, SpaceUser>, _class: Ref<C
 
     if (!spaces.has(spaceInQuery)) {
       // the requested space is NOT in the list of available to the user
-      return { valid: false, filteredQuery: query }
+      return {
+        valid: false,
+        filteredQuery: query
+      }
     }
     // else OK, use that filter to query
   } else {
@@ -48,7 +59,10 @@ export async function filterQuery (spaces: Map<string, SpaceUser>, _class: Ref<C
     query[spaceKey] = { $in: userSpaces }
   }
 
-  return { valid: true, filteredQuery: query }
+  return {
+    valid: true,
+    filteredQuery: query
+  }
 }
 
 /**
@@ -60,6 +74,7 @@ export function isAcceptable (spaces: Map<string, SpaceUser>, _class: Ref<Class<
   }
   const spaceKey = getSpaceKey(_class)
   const spaceId = doc[spaceKey] as Ref<Space>
+
   if (spaceId) {
     return spaces.has(spaceId)
   }
@@ -71,7 +86,10 @@ function checkUpdateSpaces (spaces: Map<string, SpaceUser>, s: Space, spaceId: s
   let us = users.find(u => u.userId === email)
   if (s.isPublic && !us) {
     // Add in any case for public space
-    us = ({ userId: email, owner: false } as SpaceUser)
+    us = ({
+      userId: email,
+      owner: false
+    } as SpaceUser)
   }
   if (us) {
     // Add space to us since it is now accessible
@@ -121,7 +139,7 @@ export async function processTx (workspace: WorkspaceProtocol, spaces: Map<strin
       if (!ownChange && updateTx._objectClass === core.class.Space) {
         checkUpdateSpaces(spaces, (obj as unknown) as Space, updateTx._objectId, client.email)
       }
-      return isAcceptable(spaces, updateTx._class, (obj as unknown) as AnyLayout)
+      return isAcceptable(spaces, updateTx._objectClass, (obj as unknown) as AnyLayout)
     }
     case core.class.PushTx: {
       const pushTx = tx as PushTx
@@ -131,7 +149,7 @@ export async function processTx (workspace: WorkspaceProtocol, spaces: Map<strin
         const sp = (obj as unknown) as Space
         checkUpdateSpaces(spaces, sp, sp._id, client.email)
       }
-      return isAcceptable(spaces, pushTx._class, (obj as unknown) as AnyLayout)
+      return isAcceptable(spaces, pushTx._objectClass, (obj as unknown) as AnyLayout)
     }
     case core.class.DeleteTx: {
       const delTx = tx as DeleteTx
@@ -150,7 +168,10 @@ export async function getUserSpaces (workspace: WorkspaceProtocol, email: string
     let us = s.users.find(u => u.userId === email)
     if (s.isPublic) {
       // Add in any case for public space
-      us = us || ({ userId: email, owner: false } as SpaceUser)
+      us = us || ({
+        userId: email,
+        owner: false
+      } as SpaceUser)
     }
     if (us) {
       userSpaces.set(s._id, us)

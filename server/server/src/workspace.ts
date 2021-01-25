@@ -57,21 +57,28 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
 
   const mongoStorage: Storage = {
     async store (ctx: TxContext, doc: Doc): Promise<any> {
-      const c = collection(doc._class)
-      return await c.insertOne(doc)
+      return await collection(doc._class).insertOne(doc)
     },
 
     async push (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, query: AnyLayout | null, attribute: StringProperty, attributes: AnyLayout): Promise<any> {
       if (isValidQuery(query)) {
         const filters = createPushArrayFilters(memdb, _class, query!, attribute, attributes)
-        console.log('TRY PERFORM:',
-          _id,
-          filters.updateOperation,
-          filters.arrayFilters
-        )
         return collection(_class).updateOne({ _id }, { $push: filters.updateOperation }, { arrayFilters: filters.arrayFilters })
       }
-      return collection(_class).updateOne({ _id }, { $push: { [attribute]: attributes } })
+      const value = {
+        ...attributes
+      }
+      // We need to put attribute class as part of embedded object.
+      const attr = memdb.classAttribute(_class, attribute)
+      const attrClass = memdb.attributeClass(attr.attr.type)
+      if (attrClass !== null) {
+        value._class = attrClass // We need to have class for further operations to work well
+      }
+      return collection(_class).updateOne({ _id }, {
+        $push: {
+          [attr.key]: value
+        }
+      })
     },
 
     async update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, query: AnyLayout | null, attributes: AnyLayout): Promise<any> {
@@ -88,7 +95,7 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
         // Operation over embedded child object, path to it should be matched by query object.
         const filters = createPullArrayFilters(memdb, _class, query!)
         if (filters.isArrayAttr) {
-          return collection(_class).updateOne({ _id }, { $pull: filters.updateOperation }, { arrayFilters: filters.arrayFilters })
+          return await collection(_class).updateOne({ _id }, { $pull: filters.updateOperation }, { arrayFilters: filters.arrayFilters })
         } else {
           return collection(_class).updateOne({ _id }, { $unset: filters.updateOperation }, { arrayFilters: filters.arrayFilters })
         }

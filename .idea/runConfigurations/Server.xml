@@ -1,0 +1,5 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Server" type="NodeJSConfigurationType" node-parameters="--nolazy -r ts-node/register" path-to-js-file="src/index.ts" working-dir="$PROJECT_DIR$/server/server">
+    <method v="2" />
+  </configuration>
+</component>
