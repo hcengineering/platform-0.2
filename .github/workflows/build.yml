@@ -3,16 +3,26 @@ name: CI
 on: [push, pull_request]
 
 jobs:
-  build:
+  gen-docs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Install yarn deps
+
+      - name: Install deps
         run: yarn install
 
-      - name: Run tests
+      - name: Build packages
         run: |
           yarn workspace @anticrm/platform run build
+
+      - name: Extract APIs
+        run: |
+          yarn workspace @anticrm/platform run build:docs
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: extracted-api
+          path: _api-extractor-temp/
 
   test:
     runs-on: ubuntu-latest
