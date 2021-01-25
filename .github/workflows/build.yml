@@ -7,6 +7,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Install yarn deps
+        run: yarn install
+
+      - name: Run tests
+        run: |
+          yarn workspace @anticrm/platform run build
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
           node-version: 14
