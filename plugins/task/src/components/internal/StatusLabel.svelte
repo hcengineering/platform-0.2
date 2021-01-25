@@ -23,11 +23,13 @@
 
 <style lang="scss">
   .status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: 11px;
-    line-height: 16px;
+    line-height: 11px;
     font-weight: 500;
-    text-align: center;
-    padding: 2px 4px 0px 4px;
+    padding: 0px 4px;
     background-color: var(--status-green-color);
     border-radius: 2px;
     color: var(--white-color);

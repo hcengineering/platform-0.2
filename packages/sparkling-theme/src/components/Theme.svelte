@@ -63,6 +63,11 @@
     border: 1px solid var(--theme-bg-dark-color);
     border-radius: 2px;
   }
+  ::-webkit-scrollbar-corner {
+    background: var(--theme-bg-accent-color);
+    border: 1px solid var(--theme-bg-dark-color);
+    border-radius: 2px;
+  }
 
   @font-face {
     font-family: "IBM Plex Sans";
@@ -131,7 +136,7 @@
   .button {
     display: inline-block;
     border: 1px solid currentColor;
-    border-radius: 2em;
+    border-radius: 4px;
     padding: 0.5em 1.33em 0.5em;
     box-sizing: border-box;
     cursor: pointer;
@@ -211,7 +216,7 @@
     height: 16px;
     width: 16px;
     fill: currentColor;
-    top: 0.15em;
+    //top: 0.15em;
     position: relative;
   }
 

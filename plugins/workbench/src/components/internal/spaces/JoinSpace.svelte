@@ -36,12 +36,12 @@
       font-size: 14px;
       text-align: left;
       padding: 0.5em 1em;
-      background-color: var(--theme-bg-accent-color);
+      background-color: var(--theme-bg-color);
       border: none;
       border-radius: 0;
       margin: 0;
       &:hover {
-        background-color: var(--theme-bg-dark-color);
+        background-color: var(--theme-bg-accent-color);
       }
     }
   }

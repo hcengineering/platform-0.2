@@ -15,7 +15,6 @@
   .finder {
     box-sizing: border-box;
     height: 3em;
-    width: 27em;
     padding: 0em 1em;
     border: 1px solid var(--theme-bg-dark-color);
     border-radius: 4px;

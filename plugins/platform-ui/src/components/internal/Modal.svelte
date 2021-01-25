@@ -68,7 +68,7 @@
               0 8px 8px rgba(0,0,0,0.12),
               0 16px 16px rgba(0,0,0,0.12);
     */
-    background-color: var(--theme-bg-accent-color);
+    background-color: var(--theme-bg-color);
     border: solid 1px var(--theme-bg-dark-color);
     border-radius: 4px;
     padding: 0.5em 0px;

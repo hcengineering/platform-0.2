@@ -23,6 +23,10 @@
   import Properties from '@anticrm/presentation/src/components/internal/Properties.svelte'
   import { getSpaceName } from './utils'
   import { AnyLayout, Property, StringProperty } from '@anticrm/model'
+  import CheckBox from '@anticrm/sparkling-controls/src/CheckBox.svelte'
+
+  import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
+  import workbench from '@anticrm/workbench'
 
   let object = {} as any
 
@@ -58,16 +62,37 @@
       })
     )
   }
+
+  let chkBox: boolean = false;
 </script>
 
 <style lang='scss'>
   .space-view {
-    margin: 1em;
+    padding: 1em 1.5em;
+    position: relative;
   }
 
   .header {
     display: flex;
+    justify-content: space-between;
+    margin-bottom: 1.5em;
 
+    .headIcon {
+      align-self: baseline;
+      background-color: var(--theme-bg-dark-color);
+      border-radius: 50%;
+      color: var(--white-color);
+      margin-left: 1em;
+      width: 16px;
+      height: 16px;
+
+      &:hover {
+        background-color: var(--theme-bg-dark-color);
+      }
+      &>a:hover {
+        color: var(--theme-highlight-color);
+      }
+    }
     .actions {
       display: flex;
       flex-grow: 1;
@@ -98,20 +123,103 @@
   .space-caption-1 {
     display: flex;
   }
+
+  .content {
+    display: flex;
+    flex-direction: column;
+
+    .form {
+      .input-container {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 1em;
+
+        .input-label {
+          font-weight: 500;
+          margin-bottom: 0.25em;
+          color: var(--theme-content-color);
+          &>span {
+            color: var(--theme-content-trans-color);
+            font-size: 11px;
+            font-weight: normal;
+          }
+        }
+
+        .input {
+          background-color: var(--theme-bg-color);
+          border: solid 1px var(--theme-bg-accent-color);
+          border-radius: 4px;
+          padding: 0.5em;
+          color: var(--theme-caption-color);
+          font-size: 14px;
+          transition: all .2s ease-in-out;
+
+          &:focus {
+            outline: none;
+            background-color: var(--theme-bg-color);
+            border: solid 1px var(--theme-bg-dark-color);
+            box-shadow: 0 0 2px 2px var(--theme-highlight-color);
+          }
+        }
+      }
+      .checkbox-label {
+        font-weight: 500;
+        &>span {
+          display: block;
+          font-size: 11px;
+          font-weight: normal;
+          max-width: 20em;
+        }
+      }
+
+      .buttons {
+        margin-top: 1.5em;
+        width: 100%;
+        display: flex;
+        flex-direction: row-reverse;
+
+        .createButton {
+          background-color: var(--theme-bg-accent-color);
+          border: solid 1px var(--theme-bg-dark-color);
+          border-radius: 4px;
+          color: var(--theme-content-color);
+          font-weight: 500;
+          padding: 0.5em 1em;
+          cursor: pointer;
+          transition: all .3s ease-in-out;
+
+          &:hover {
+            border: solid 1px var(--theme-bg-dark-color);
+            background-color: var(--theme-bg-dark-color);
+            color: var(--theme-caption-color);
+            box-shadow: 0 0 2px 2px var(--theme-highlight-color);
+          }
+          &:focus {
+            outline: none;
+          }
+        }
+      }
+    }
+  }
 </style>
 
 <div class='space-view'>
   <div class='header'>
-    <div class='caption-4'>Create a new Space</div>
-    <div class='actions'>
+    <div class='caption-1'>Create a new {(chkBox) ? 'private ' : ''}Space</div>
+    <div class='headIcon'>
+      <a href='/' on:click|preventDefault={() => dispatch('close')}>
+        <Icon icon={workbench.icon.Close} clazz='icon-embed' />
+      </a>
+    </div>
+    <!--<div class='actions'>
       <button class='button' on:click={() => dispatch('close')}>Cancel</button>
       <button class='button' on:click={save}>Create</button>
       <div class='separator' />
       <button class='button' on:click={() => dispatch('browse')}>Browse space</button>
-    </div>
+    </div>-->
   </div>
 
-  <div class='content'>
+  <!--<div class='content'>
     {#if primary}
       <div class='caption-1 space-caption-1'>
         <div class='space-kind'>{getSpaceName(object, false)}</div>
@@ -121,5 +229,30 @@
     {#if model}
       <Properties {model} bind:object />
     {/if}
+  </div>-->
+
+  <div class="content">
+    <form class="form">
+      <div class="input-container">
+        <label class="input-label" for="input__name">
+          Name
+        </label>
+        <input type="text" class="input input__name" />
+      </div>
+      <div class="input-container">
+        <label class="input-label" for="input__description">
+          Description <span>(optional)</span>
+        </label>
+        <input type="text" class="input input__description" />
+      </div>
+      <CheckBox bind:checked={chkBox} right="true">
+        <div class="checkbox-label">
+          Make private <span>When a channel is set to private, it can only be viewed or joined by invitation.</span>
+        </div>
+      </CheckBox>
+      <div class="buttons">
+        <button type="button" class="createButton">Create</button>
+      </div>
+    </form>
   </div>
 </div>
