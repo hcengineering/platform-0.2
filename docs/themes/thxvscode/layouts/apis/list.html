@@ -30,7 +30,7 @@
 
                         {{ range where $packagePages "Params.package" . }}
                         <tr>
-                            <td><a href="{{ .Permalink | safeURL }}" title="{{ .Title }}">{{ .Title }}</a></td>
+                            <td><a href="{{ .Permalink }}" title="{{ .Title }}">{{ .Title }}</a></td>
                             <td>{{ truncate 170 (.Params.Summary | markdownify) }}</td>
                         </tr>
                         {{ end }}
