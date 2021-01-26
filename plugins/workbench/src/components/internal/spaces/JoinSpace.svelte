@@ -15,6 +15,7 @@
 <script lang='ts'>
   import BrowseSpace from './BrowseSpace.svelte'
   import CreateSpace from './CreateSpace.svelte'
+  import SimplePopup from '@anticrm/presentation/src/components/SimplePopup.svelte'
 
   enum Mode {
     Select,
@@ -23,35 +24,17 @@
   }
 
   let mode: Mode = Mode.Select
+  let actions = [{
+    name: 'Create',
+    action: () => mode = Mode.Create
+  }, {
+    name: 'Browse',
+    action: () => mode = Mode.Browse
+  }]
 </script>
 
-<style lang='scss'>
-  .space-join-view {
-    display: flex;
-    flex-direction: column;
-    flex-flow: column nowrap;
-    justify-content: space-evenly;
-    //height: 6em;
-    .button {
-      font-size: 14px;
-      text-align: left;
-      padding: 0.5em 1em;
-      background-color: var(--theme-bg-color);
-      border: none;
-      border-radius: 0;
-      margin: 0;
-      &:hover {
-        background-color: var(--theme-bg-accent-color);
-      }
-    }
-  }
-</style>
-
 {#if mode == Mode.Select}
-  <div class='space-join-view'>
-    <button class='button' on:click={() => (mode = Mode.Create)}>Create space</button>
-    <button class='button' on:click={() => (mode = Mode.Browse)}>Browse space</button>
-  </div>
+  <SimplePopup items={actions}></SimplePopup>
 {:else if mode == Mode.Create}
   <CreateSpace on:close on:browse={() => (mode = Mode.Browse)} />
 {:else if mode == Mode.Browse}

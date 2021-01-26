@@ -17,10 +17,12 @@
   import core from '@anticrm/core'
   import { createEventDispatcher } from 'svelte'
   import { getPresentationService, _getCoreService, getCoreService } from '../../../utils'
-  import { getSpaceName, isCurrentUserSpace } from './utils'
+  import { getSpaceName, getCurrentUserSpace } from './utils'
   import { onDestroy } from 'svelte'
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
   import { Doc, Property, Ref, StringProperty } from '@anticrm/model'
+
+  import { leaveSpace, joinSpace, archivedSpaceUpdate } from './utils'
 
   const dispatch = createEventDispatcher()
   let spaceUnsubscribe: () => void | undefined
@@ -36,29 +38,6 @@
     console.log('spaces:', docs)
     spaces = docs
   })
-
-  // Join public space
-  function joinSpace (s: Space) {
-    coreService.push(s, null, 'users' as StringProperty, {
-      userId: curentUser as StringProperty,
-      owner: false as Property<number, number>
-    })
-  }
-
-  // Leave public space
-  function leaveSpace (s: Space) {
-    coreService.remove(s, {
-      users: {
-        userId: curentUser as StringProperty
-      }
-    })
-  }
-
-  function archivedSpaceUpdate (s: Space, value: boolean) {
-    coreService.update(s, null, {
-      archived: value as Property<boolean, boolean>
-    })
-  }
 
   const presentationService = getPresentationService()
   onDestroy(() => {
@@ -85,23 +64,23 @@
             Members:
             {s.users !== undefined ? s.users.length : 0}
             <br />
-            {isCurrentUserSpace(curentUser, s) ? 'Joined' : ''}
+            {getCurrentUserSpace(curentUser, s) ? 'Joined' : ''}
             {s.archived ? 'Archived' : ''}
           </div>
           <div class='actions'>
             {#if hoverSpace === s._id}
-              {#if isCurrentUserSpace(curentUser, s)}
-                {#if s.isPublic }
-                  <button class='button' on:click={() => leaveSpace(s)}>
+              {#if getCurrentUserSpace(curentUser, s)}
+                {#if s.isPublic || !getCurrentUserSpace(curentUser, s).owner  }
+                  <button class='button' on:click={() => leaveSpace(coreService, s)}>
                     Leave
                   </button>
                 {:else}
-                  <button class='button' on:click={() => archivedSpaceUpdate(s, !s.archived)}>
+                  <button class='button' on:click={() => archivedSpaceUpdate(coreService, s, !s.archived)}>
                     {s.archived ? 'Unarchive' : 'Archive'}
                   </button>
                 {/if}
               {:else}
-                <button class='button' on:click={() =>  joinSpace(s)}>
+                <button class='button' on:click={() =>  joinSpace(coreService, s)}>
                   Join
                 </button>
               {/if}

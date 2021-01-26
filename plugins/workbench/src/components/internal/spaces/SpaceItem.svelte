@@ -1,12 +1,27 @@
 <script lang='ts'>
   import LinkTo from '@anticrm/platform-ui/src/components/LinkTo.svelte'
   import { Space } from '@anticrm/core'
-  import { getSpaceName } from './utils'
+  import { archivedSpaceUpdate, getCurrentUserSpace, getSpaceName, leaveSpace } from './utils'
+  import { _getCoreService, getUIService } from '../../../utils'
+  import SpaceOptions from './SpaceOptions.svelte'
 
   export let link: string = '/'
   export let selected: boolean = false
   export let space: Space = {} as Space
   export let count: number = 0
+
+  const coreService = _getCoreService()
+  const uiService = getUIService()
+
+  let optionsButton: HTMLElement
+
+  function addUser () {
+
+  }
+
+  function showSpaceOptions () {
+
+  }
 </script>
 
 <LinkTo href={link}>
@@ -14,6 +29,12 @@
     {getSpaceName(space)}
     {#if count > 0}
       <div class='counter'>{count}</div>
+    {/if}
+    {#if selected}
+      <div bind:this={optionsButton} class='options' on:click|preventDefault={() => {
+            uiService.showModal(SpaceOptions, {space}, optionsButton)
+          }}>︙
+      </div>
     {/if}
   </div>
 </LinkTo>
@@ -68,4 +89,42 @@
     padding: 0 4px;
     border-radius: 8px;
   }
+
+  .options {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white-color);
+    font-weight: 700;
+    font-size: 11px;
+    line-height: 11px;
+
+    height: 16px;
+    width: 16px;
+    margin: 0;
+    cursor: pointer;
+    transition: all .2s ease-in-out;
+
+    &::before {
+      content: '';
+      position: absolute;
+      background-color: var(--theme-bg-accent-color);
+      border-radius: 4px;
+      width: 16px;
+      height: 16px;
+      top: 2px;
+      left: 2px;
+      transition: all .2s ease-in-out;
+    }
+
+    &:hover {
+      border: solid 1px var(--theme-bg-dark-color);
+      box-shadow: 0 0 2px 2px var(--theme-highlight-color);
+
+      &::before {
+        background-color: var(--theme-bg-dark-color);
+      }
+    }
+  }
+
 </style>
