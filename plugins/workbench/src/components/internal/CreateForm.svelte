@@ -23,6 +23,11 @@
 
   import AttributeEditor from '@anticrm/presentation/src/components/AttributeEditor.svelte'
   import Properties from '@anticrm/presentation/src/components/internal/Properties.svelte'
+  import IconButton from '@anticrm/platform-ui/src/components/IconButton.svelte'
+  import workbench from '@anticrm/workbench'
+  import UserInfo from '@anticrm/task/src/components/internal/UserInfo.svelte'
+  import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
+  import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.svelte'
 
   export let title: string
   export let _class: Ref<Class<Doc>>
@@ -66,11 +71,21 @@
 
 <style lang='scss'>
   .recruiting-view {
-    margin: 1em;
+    padding: 1em 1.5em;
+    display: flex;
+    flex-direction: column;
   }
 
   .header {
     display: flex;
+    margin-bottom: 0.5em;
+
+    .caption {
+      flex-grow: 1;
+      .caption-edit {
+        width: 100%;
+      }
+    }
 
     .actions {
       display: flex;
@@ -85,6 +100,18 @@
   }
 
   .content {
+    .taskLabel {
+      color: var(--theme-doclink-color);
+      margin-bottom: 1em;
+    }
+  }
+
+  .buttons {
+    width: 100%;
+    margin-top: 1em;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 1em;
   }
 
   .attributes {
@@ -106,6 +133,31 @@
 </style>
 
 <div class='recruiting-view'>
+  <div class='header'>
+    <div class='caption-1 caption'>
+      <InlineEdit value='Дизайн Конструктора в личном кабинете' />
+    </div>
+    <a href='/' on:click|preventDefault={() => dispatch('close')}>
+      <IconButton icon={workbench.icon.Close} style='margin-left:1.5em' />
+    </a>
+  </div>
+
+  <div class="content">
+    <div class="taskLabel">
+      DT-925
+    </div>
+    <UserInfo url="https://platform.exhale24.ru/images/photo-2.png"
+              title="Андрей Платов" subtitle="Исполнитель" style="margin-bottom: 1em" />
+    <ReferenceInput stylesEnabled="true" />
+  </div>
+
+  <div class="buttons">
+    <button type='button' class='button primary' on:click={save}>Принять</button>
+    <button type='button' class='button' on:click={() => dispatch('close')}>Отказаться</button>
+  </div>
+</div>
+
+<!--<div class='recruiting-view'>
   <div class='header'>
     <div class='caption-4'>{title} : {space}</div>
     <div class='actions'>
@@ -130,3 +182,4 @@
     {/if}
   </div>
 </div>
+-->

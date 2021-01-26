@@ -52,7 +52,7 @@
       padding-left: 1em;
       position: relative;
       &>b {
-        color: var(--theme-accent-color);
+        color: var(--theme-userlink-color);
       }
       &>span {
         font-size: 11px;

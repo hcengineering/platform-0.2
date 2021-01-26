@@ -34,15 +34,15 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    color: var(--theme-caption-color);
+    color: var(--theme-content-color);
 
     &:hover {
-      color: var(--theme-highlight-color);
+      color: var(--theme-content-color);
     }
     &:hover .bIcon {
-      background-color: var(--theme-bg-dark-color);
-      border: solid 1px var(--theme-bg-dark-color);
-      color: var(--theme-bg-color);
+      background-color: var(--theme-bg-accent-hover);
+      border: solid 1px var(--theme-bg-dark-hover);
+      color: var(--theme-content-color);
     }
   }
   .separator {
@@ -52,17 +52,18 @@
     background-color: var(--theme-bg-accent-color);
     border: solid 1px var(--theme-bg-dark-color);
     border-radius: 50%;
-    color: var(--theme-caption-color);
+    color: var(--theme-content-color);
     width: 16px;
     height: 16px;
 
     &:hover {
-      background-color: var(--theme-bg-dark-color);
-      border: solid 1px var(--theme-bg-dark-color);
-      color: var(--theme-bg-color);
+      background-color: var(--theme-bg-accent-hover);
+      border: solid 1px var(--theme-bg-dark-hover);
+      color: var(--theme-content-color);
     }
   }
   .text {
+    padding-top: 2px;
     font-weight: 500;
   }
 </style>

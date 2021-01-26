@@ -120,7 +120,7 @@
 
   .editbox {
     border: 1px solid var(--theme-bg-dark-color);
-    border-radius: 0.5em;
+    border-radius: 4px;
     padding: 0.5em 0.75em;
     background-color: var(--theme-bg-accent-color);
     box-sizing: border-box;
@@ -129,13 +129,14 @@
 
     &:focus {
       outline: none;
-      border-color: var(--theme-highlight-color);
+      background-color: var(--theme-bg-accent-hover);
+      border-color: var(--theme-bg-dark-hover);
     }
   }
 
   .button {
     display: inline-block;
-    border: 1px solid currentColor;
+    border: 1px solid var(--theme-bg-dark-color);
     border-radius: 4px;
     padding: 0.5em 1.33em 0.5em;
     box-sizing: border-box;
@@ -144,15 +145,13 @@
     text-align: center;
 
     font: inherit;
-    font-weight: 400;
+    font-weight: 500;
 
-    color: inherit;
-    background-color: inherit;
+    color: var(--theme-content-color);
+    background-color: var(--theme-bg-accent-color);
 
     &:focus {
       outline: none;
-      border-color: var(--theme-highlight-color);
-      box-shadow: inset 0px 0px 2px 0px var(--theme-highlight-color);
     }
 
     &.large {
@@ -164,24 +163,32 @@
     }
 
     &:hover {
-      border-color: var(--theme-highlight-color);
+      border-color: var(--theme-bg-dark-hover);
       // color: $highlight-color;
       // background-color: $highlight-color;
-      background-color: var(--theme-highlight-color);
+      background-color: var(--theme-bg-accent-hover);
+      color: var(--theme-content-dark-color);
     }
 
     &.primary {
       // border-color: $highlight-color;
-      background-color: var(--theme-highlight-color);
+      background-color: var(--theme-content-color);
       // color: $nav-bg-color;
-      font-weight: bold;
+      border-color: var(--theme-content-color);
+      color: var(--theme-bg-color);
     }
 
     &:hover.primary {
-      background-color: var(--theme-highlight-color);
+      background-color: var(--theme-content-dark-color);
+      border-color: var(--theme-content-dark-color);
+      color: var(--theme-bg-color);
       // border-color: $highlight-color;
       // box-shadow:inset 0px 0px 3px 0px currentColor;
       // color: $highlight-color;
+    }
+
+    &.w100 {
+      flex-grow: 1;
     }
   }
 
@@ -191,7 +198,7 @@
   }
 
   a:hover {
-    color: var(--theme-highlight-color);
+    color: var(--theme-doclink-color);
     text-decoration: none;
   }
 

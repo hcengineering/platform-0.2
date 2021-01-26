@@ -44,7 +44,7 @@
       }
     }
     &:hover {
-      color: var(--theme-highlight-color);
+      color: var(--theme-doclink-color);
     }
   }
 
@@ -54,7 +54,7 @@
     align-items: center;
     justify-content: center;
     color: var(--white-color);
-    background-color: var(--theme-highlight-color);
+    background-color: var(--theme-doclink-color);
     font-weight: 700;
     font-size: 11px;
     line-height: 11px;
