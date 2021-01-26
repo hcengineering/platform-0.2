@@ -107,7 +107,6 @@
   }
 
   .buttons {
-    width: 100%;
     margin-top: 1em;
     display: grid;
     grid-template-columns: 1fr 1fr;

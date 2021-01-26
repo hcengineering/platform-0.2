@@ -186,10 +186,6 @@
       // box-shadow:inset 0px 0px 3px 0px currentColor;
       // color: $highlight-color;
     }
-
-    &.w100 {
-      flex-grow: 1;
-    }
   }
 
   a {
