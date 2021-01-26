@@ -126,7 +126,7 @@ export async function processTx (workspace: WorkspaceProtocol, spaces: Map<strin
     }
     case core.class.UpdateTx: {
       const updateTx = tx as UpdateTx
-      const obj = await getObjectById(workspace, updateTx._class, updateTx._objectId)
+      const obj = await getObjectById(workspace, updateTx._objectClass, updateTx._objectId)
 
       // Check if space, we need update out list
       if (!ownChange && updateTx._objectClass === core.class.Space) {
