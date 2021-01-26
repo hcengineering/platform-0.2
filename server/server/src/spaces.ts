@@ -74,7 +74,10 @@ export function isAcceptable (spaces: Map<string, SpaceUser>, _class: Ref<Class<
   return true
 }
 
-function checkUpdateSpaces (spaces: Map<string, SpaceUser>, s: Space, spaceId: string, email: string) {
+/**
+ * Check and update current user set of spaces, and return information if spaceId is added to list of user spaces.
+ */
+function checkUpdateSpaces (spaces: Map<string, SpaceUser>, s: Space, spaceId: string, email: string): Space | null {
   const users = s.users || []
   let us = users.find(u => u.userId === email)
   if (s.isPublic && !us) {
@@ -87,7 +90,14 @@ function checkUpdateSpaces (spaces: Map<string, SpaceUser>, s: Space, spaceId: s
   if (us) {
     // Add space to us since it is now accessible
     spaces.set(spaceId, us)
+    return s
   }
+  // Check if spaces had this space, we need to remove it
+  if (spaces.has(spaceId)) {
+    spaces.delete(spaceId)
+    return s
+  }
+  return null
 }
 
 function getObjectById (workspace: WorkspaceProtocol, _class: Ref<Class<Doc>>, id: Ref<Doc>): Promise<Doc | undefined> {
@@ -97,14 +107,14 @@ function getObjectById (workspace: WorkspaceProtocol, _class: Ref<Class<Doc>>, i
 
 /**
  * Process transaction and update userSpaces in case of proper space operation.
- * Return true if opertaion is allowed by user.
+ * Return true if operation is allowed by user.
  */
-export async function processTx (workspace: WorkspaceProtocol, spaces: Map<string, SpaceUser>, tx: Tx, client: Client, ownChange: boolean): Promise<boolean> {
+export async function processTx (workspace: WorkspaceProtocol, spaces: Map<string, SpaceUser>, tx: Tx, client: Client, ownChange: boolean): Promise<{ allowed: boolean, sendSpace: Space | null }> {
   switch (tx._class) {
     case core.class.CreateTx: {
       const createTx = tx as CreateTx
       if (createTx._objectClass === core.class.Space) {
-        // Createion of a new space, we need to mark user as owner if this information is missing
+        // Creation of a new space, we need to mark user as owner if this information is missing
         const s = (createTx.object as unknown) as Space
         if (ownChange) {
           const users = s.users || []
@@ -114,40 +124,63 @@ export async function processTx (workspace: WorkspaceProtocol, spaces: Map<strin
             return Promise.reject(new Error('Space doesn\'t contain owner. Operation is not allowed'))
           }
         }
-        checkUpdateSpaces(spaces, s, createTx._objectId, client.email)
+        const sendSpace = checkUpdateSpaces(spaces, s, createTx._objectId, client.email)
 
         // It is not yet created, so Space object doesn't have _id specified.
         if (!spaces.has(createTx._objectId)) {
           return Promise.reject(new Error('Space doesn\'t contain owner. Operation is not allowed'))
         }
-        return true
+        return {
+          allowed: true,
+          sendSpace
+        }
       }
-      return isAcceptable(spaces, createTx._objectClass, createTx.object)
+      return {
+        allowed: isAcceptable(spaces, createTx._objectClass, createTx.object),
+        sendSpace: null
+      }
     }
     case core.class.UpdateTx: {
       const updateTx = tx as UpdateTx
       const obj = await getObjectById(workspace, updateTx._objectClass, updateTx._objectId)
 
       // Check if space, we need update out list
+      let sendSpace: Space | null = null
       if (!ownChange && updateTx._objectClass === core.class.Space) {
-        checkUpdateSpaces(spaces, (obj as unknown) as Space, updateTx._objectId, client.email)
+        sendSpace = checkUpdateSpaces(spaces, (obj as unknown) as Space, updateTx._objectId, client.email)
       }
-      return isAcceptable(spaces, updateTx._objectClass, (obj as unknown) as AnyLayout)
+      return {
+        allowed: isAcceptable(spaces, updateTx._objectClass, (obj as unknown) as AnyLayout),
+        sendSpace
+      }
     }
     case core.class.PushTx: {
       const pushTx = tx as PushTx
       const obj = await getObjectById(workspace, pushTx._objectClass, pushTx._objectId)
+      let sendSpace: Space | null = null
       if (!ownChange && pushTx._objectClass === core.class.Space) {
         // Check if SpaceUser is we, since operation is already applied, we could check with Space object itself.
         const sp = (obj as unknown) as Space
-        checkUpdateSpaces(spaces, sp, sp._id, client.email)
+        sendSpace = checkUpdateSpaces(spaces, sp, sp._id, client.email)
       }
-      return isAcceptable(spaces, pushTx._objectClass, (obj as unknown) as AnyLayout)
+      return {
+        allowed: isAcceptable(spaces, pushTx._objectClass, (obj as unknown) as AnyLayout),
+        sendSpace
+      }
     }
     case core.class.DeleteTx: {
       const delTx = tx as DeleteTx
       const obj = await getObjectById(workspace, delTx._objectClass, delTx._objectId)
-      return isAcceptable(spaces, delTx._class, (obj as unknown) as AnyLayout)
+      let sendSpace: Space | null = null
+      if (!ownChange && delTx._objectClass === core.class.Space) {
+        // Check if SpaceUser is we, since operation is already applied, we could check with Space object itself.
+        const sp = (obj as unknown) as Space
+        sendSpace = checkUpdateSpaces(spaces, sp, sp._id, client.email)
+      }
+      return {
+        allowed: isAcceptable(spaces, delTx._class, (obj as unknown) as AnyLayout),
+        sendSpace
+      }
     }
     default:
       throw new Error(`Bad transaction type '${tx._class}'`)
