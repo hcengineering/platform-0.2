@@ -13,13 +13,14 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Class, Doc, Model, Ref, Tx } from '@anticrm/model'
+import { AnyLayout, Class, Doc, Model, Ref, StringProperty, Tx } from '@anticrm/model'
 import { makeResponse, Response } from './rpc'
 import { WorkspaceProtocol } from './workspace'
 
 import { filterQuery, getUserSpaces, isAcceptable, processTx as processSpaceTx } from './spaces'
 import { Broadcaster, Client, ClientService, ClientSocket } from './server'
-import { SpaceUser } from '@anticrm/core'
+import core, { CreateTx, SpaceUser } from '@anticrm/core'
+import { newCreateTx } from '@anticrm/platform-core/src/tx'
 
 export interface ClientControl {
   ping (): Promise<void>
@@ -73,12 +74,16 @@ export async function createClientService (workspaceProtocol: Promise<WorkspaceP
       }
 
       // Process spaces update is allowed
-      if (!await processSpaceTx(workspace, userSpaces, tx, client, true)) {
+      const spaceResult = await processSpaceTx(workspace, userSpaces, tx, client, true)
+      if (!spaceResult.allowed) {
         return Promise.reject(new Error('operations is not allowed by space check'))
       }
-
-      // Perform operation in workpace
+      // Perform operation in workspace
       await workspace.tx(tx)
+
+      if (spaceResult.sendSpace) {
+        // We need to send space create event before to allow client to accept our modification
+      }
       // Perform all other active clients broadcast
       broadcaster.broadcast(clientControl, { result: tx })
     },
@@ -92,9 +97,24 @@ export async function createClientService (workspaceProtocol: Promise<WorkspaceP
     async send (response: Response<any>): Promise<void> {
       if (response.result) {
         // Process result as it from another client.
-        if (!await processSpaceTx(workspace, userSpaces, response.result, client, false)) {
-          // Client is not allowed to recieve transaction
+        const spaceTxResult = await processSpaceTx(workspace, userSpaces, response.result, client, false)
+        if (!spaceTxResult.allowed) {
+          // Client is not allowed to receive transaction
           return
+        }
+        if (spaceTxResult.sendSpace) {
+          // We need to send a create transaction for this space object creation, to allow process.
+          const createSpaceTx = await workspace.findOne(core.class.CreateTx, {
+            _objectClass: core.class.Space,
+            _objectId: spaceTxResult.sendSpace._id
+          })
+          if (createSpaceTx) {
+            // update object value to latest one
+            createSpaceTx.object = (spaceTxResult.sendSpace as unknown) as AnyLayout
+            client.send(makeResponse({ result: createSpaceTx }))
+            // No need to send space update operation, since client will recieve a full and final space object
+            return
+          }
         }
       }
       client.send(makeResponse(response))

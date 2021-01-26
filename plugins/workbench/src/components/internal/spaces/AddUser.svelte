@@ -13,63 +13,38 @@
 // limitations under the License.
 -->
 <script lang='ts'>
-  import { Space, generateId, SpaceUser } from '@anticrm/core'
-  import core from '@anticrm/core'
-  import { createEventDispatcher } from 'svelte'
-  import presentation from '@anticrm/presentation'
-  import { getPresentationService, getComponentExtension, _getCoreService } from '../../../utils'
-  import { AttrModel, ClassModel } from '@anticrm/presentation'
-  import AttributeEditor from '@anticrm/presentation/src/components/AttributeEditor.svelte'
-  import Properties from '@anticrm/presentation/src/components/internal/Properties.svelte'
-  import { getSpaceName } from './utils'
-  import { AnyLayout, Property, StringProperty } from '@anticrm/model'
-  import CheckBox from '@anticrm/sparkling-controls/src/CheckBox.svelte'
+  import core, { Space } from '@anticrm/core'
+  import { createEventDispatcher, onDestroy } from 'svelte'
+  import { _getCoreService, getPresentationService } from '../../../utils'
+  import { Doc, Property, Ref, StringProperty } from '@anticrm/model'
 
   import IconButton from '@anticrm/platform-ui/src/components/IconButton.svelte'
   import workbench from '@anticrm/workbench'
+  import CheckBox from '@anticrm/sparkling-controls/src/CheckBox.svelte'
 
-  let makePrivate: boolean = false
-  let title: string = ''
-  let description: string = ''
+  export let space: Space
+  let userName: string = ''
+  let isOwner: boolean = false
 
   const coreService = _getCoreService()
   const dispatch = createEventDispatcher()
 
-  async function save () {
-    const space = {
-      name: title as StringProperty,
-      description: description as StringProperty,
-      isPublic: !makePrivate as Property<boolean, boolean>,
-      users: [
-        {
-          userId: coreService.getUserId() as StringProperty,
-          owner: true as Property<boolean, boolean>
-        }
-      ]
-    }
-    coreService.create(core.class.Space, space)
-    dispatch('close')
-  }
-
-  let model: ClassModel | undefined
-  let primary: AttrModel | undefined
-
+  const curentUser = coreService.getUserId()
   const presentationService = getPresentationService()
-  console.log('presentationService', presentationService)
 
-  $: {
-    presentationService.then((ps) =>
-      ps.getClassModel(core.class.Space, core.class.Doc).then((m) => {
-        const mp = m.filterPrimary()
-        model = mp.model
-        primary = mp.primary
-      })
-    )
+  async function save () {
+
+    coreService.push(space, null, 'users' as StringProperty, {
+      userId: userName as StringProperty,
+      owner: isOwner as Property<boolean, boolean>
+    })
+
+    dispatch('close')
   }
 </script>
 
 <style lang='scss'>
-  .space-view {
+  .add-user-space-view {
     padding: 1em 1.5em;
     position: relative;
   }
@@ -145,7 +120,7 @@
             outline: none;
             background-color: var(--theme-bg-color);
             border: solid 1px var(--theme-bg-dark-color);
-            box-shadow: 0 0 2px 2px var(--theme-doclink-color);
+            box-shadow: 0 0 2px 2px var(--theme-highlight-color);
           }
         }
       }
@@ -181,7 +156,7 @@
             border: solid 1px var(--theme-bg-dark-color);
             background-color: var(--theme-bg-dark-color);
             color: var(--theme-caption-color);
-            box-shadow: 0 0 2px 2px var(--theme-doclink-color);
+            box-shadow: 0 0 2px 2px var(--theme-highlight-color);
           }
 
           &:focus {
@@ -193,9 +168,9 @@
   }
 </style>
 
-<div class='space-view'>
+<div class='add-user-space-view'>
   <div class='header'>
-    <div class='caption-1'>Create a new {(makePrivate) ? 'private ' : ''}Space</div>
+    <div class='caption-1'>Add user to {space.name}</div>
     <a href='/' on:click|preventDefault={() => dispatch('close')}>
       <IconButton icon={workbench.icon.Close} />
     </a>
@@ -205,19 +180,13 @@
     <form class='form'>
       <div class='input-container'>
         <label class='input-label' for='input__name'>
-          Name
+          User Name
         </label>
-        <input type='text' class='input input__name' id='input__name' bind:value={title}>
+        <input type='text' class='input input__name' id='input__name' bind:value={userName}>
       </div>
-      <div class='input-container'>
-        <label class='input-label' for='input__description'>
-          Description <span>(optional)</span>
-        </label>
-        <input type='text' class='input input__description' id='input__description' bind:value={description}>
-      </div>
-      <CheckBox bind:checked={makePrivate} right='true'>
+      <CheckBox bind:checked={isOwner} right='true'>
         <div class='checkbox-label'>
-          Make private <span>When a channel is set to private, it can only be viewed or joined by invitation.</span>
+          Make owner <span>When defined user will have all rights to space.</span>
         </div>
       </CheckBox>
       <div class='buttons'>
