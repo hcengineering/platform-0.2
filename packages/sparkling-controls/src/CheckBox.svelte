@@ -25,11 +25,10 @@
     margin-bottom: 0.5em;
     cursor: pointer;
     &:hover>.checkbox {
-      border: solid 1px var(--theme-bg-dark-color);
-      box-shadow: 0 0 2px 2px var(--theme-doclink-color);
+      border: solid 1px var(--theme-bg-dark-hover);
     }
     &:hover>.checkbox::before {
-      background-color: var(--theme-bg-dark-color);
+      background-color: var(--theme-bg-dark-hover);
     }
 
     .separator {
@@ -39,7 +38,7 @@
     .checkbox {
       width: 35px;
       height: 20px;
-      border: solid 1px var(--theme-bg-accent-color);
+      border: solid 1px var(--theme-bg-dark-color);
       border-radius: 4px;
       position: relative;
       cursor: pointer;
@@ -48,7 +47,7 @@
       &::before {
         content: '';
         position: absolute;
-        background-color: var(--theme-bg-accent-color);
+        background-color: var(--theme-bg-dark-color);
         border-radius: 4px;
         width: 16px;
         height: 16px;
@@ -57,11 +56,10 @@
         transition: all .2s ease-in-out;
       }
       &:hover {
-        border: solid 1px var(--theme-bg-dark-color);
-        box-shadow: 0 0 2px 2px var(--theme-doclink-color);
+        border: solid 1px var(--theme-bg-dark-hover);
 
         &::before {
-          background-color: var(--theme-bg-dark-color);
+          background-color: var(--theme-bg-dark-hover);
         }
       }
     }

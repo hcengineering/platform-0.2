@@ -134,7 +134,8 @@
 <div class='recruiting-view'>
   <div class='header'>
     <div class='caption-1 caption'>
-      <InlineEdit value='Дизайн Конструктора в личном кабинете' />
+      <input class='editbox-trans w100' value='Дизайн Конструктора в личном кабинете' />
+      <!-- <InlineEdit value='Дизайн Конструктора в личном кабинете' /> -->
     </div>
     <a href='/' on:click|preventDefault={() => dispatch('close')}>
       <IconButton icon={workbench.icon.Close} style='margin-left:1.5em' />

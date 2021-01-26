@@ -121,16 +121,35 @@
   .editbox {
     border: 1px solid var(--theme-bg-dark-color);
     border-radius: 4px;
-    padding: 0.5em 0.75em;
+    padding: 1em 1em;
     background-color: var(--theme-bg-accent-color);
     box-sizing: border-box;
-    color: inherit;
+    color: var(--theme-content-color);
     font: inherit;
 
     &:focus {
       outline: none;
       background-color: var(--theme-bg-accent-hover);
       border-color: var(--theme-bg-dark-hover);
+      color: var(--theme-content-color);
+    }
+
+    &-trans {
+      border: solid 1px transparent;
+      background-color: var(--theme-bg-color);
+      border-radius: 4px;
+      color: inherit;
+      font: inherit;
+      margin-left: -2px;
+      margin-top: -2px;
+
+      &:focus {
+        outline: none;
+        border-color: var(--theme-bg-dark-color);
+      }
+      &.w100 {
+        width: 100%;
+      }
     }
   }
 
