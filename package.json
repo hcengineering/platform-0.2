@@ -1,6 +1,11 @@
 {
   "name": "root",
   "private": true,
+  "scripts": {
+    "build": "yarn workspace @anticrm/platform build",
+    "build:docs": "yarn workspace @anticrm/platform build:docs",
+    "gen-docs": "cd docs && npm install && npm run build"
+  },
   "workspaces": [
     "packages/*",
     "plugins/*",
