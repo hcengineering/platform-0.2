@@ -88,15 +88,15 @@
       cursor: pointer;
 
       &.selected {
-        border-color: var(--theme-highlight-color);
-        background-color: var(--theme-highlight-color);
+        border-color: var(--theme-doclink-color);
+        background-color: var(--theme-doclink-color);
         position: sticky;
       }
 
       &:focus {
         outline: none;
-        border-color: var(--theme-highlight-color);
-        box-shadow: inset 0px 0px 2px 0px var(--theme-highlight-color);
+        border-color: var(--theme-doclink-color);
+        box-shadow: inset 0px 0px 2px 0px var(--theme-doclink-color);
         color: var(--theme-caption-color);
       }
     }

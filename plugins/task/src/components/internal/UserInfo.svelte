@@ -33,7 +33,7 @@
     font-size: 14px;
     font-weight: 500;
     line-height: 18px;
-    color: var(--theme-accent-color);
+    color: var(--theme-userlink-color);
 
     &>span {
       display: block;

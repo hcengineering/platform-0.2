@@ -64,7 +64,7 @@
     border-radius: 2px;
 
     &:focus-within {
-      border-color: var(--theme-highlight-color);
+      border-color: var(--theme-bg-dark-color);
     }
 
     .compute-width {

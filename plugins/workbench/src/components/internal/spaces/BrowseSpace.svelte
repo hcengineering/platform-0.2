@@ -162,7 +162,7 @@
       }
 
       .space:hover {
-        color: var(--theme-highlight-color);
+        color: var(--theme-doclink-color);
         background-color: var(--theme-editbox-bg-color);
       }
     }

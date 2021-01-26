@@ -26,7 +26,7 @@
   import ObjectForm from './ObjectForm.svelte'
   import CreateForm from './CreateForm.svelte'
   import { Ref } from '@anticrm/model'
-import IconButton from '@anticrm/platform-ui/src/components/IconButton.svelte';
+  import IconButton from '@anticrm/platform-ui/src/components/IconButton.svelte';
 
   export let application: Ref<WorkbenchApplication>
   export let space: Ref<Space>

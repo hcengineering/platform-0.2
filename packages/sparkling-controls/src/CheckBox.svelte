@@ -26,7 +26,7 @@
     cursor: pointer;
     &:hover>.checkbox {
       border: solid 1px var(--theme-bg-dark-color);
-      box-shadow: 0 0 2px 2px var(--theme-highlight-color);
+      box-shadow: 0 0 2px 2px var(--theme-doclink-color);
     }
     &:hover>.checkbox::before {
       background-color: var(--theme-bg-dark-color);
@@ -58,7 +58,7 @@
       }
       &:hover {
         border: solid 1px var(--theme-bg-dark-color);
-        box-shadow: 0 0 2px 2px var(--theme-highlight-color);
+        box-shadow: 0 0 2px 2px var(--theme-doclink-color);
 
         &::before {
           background-color: var(--theme-bg-dark-color);

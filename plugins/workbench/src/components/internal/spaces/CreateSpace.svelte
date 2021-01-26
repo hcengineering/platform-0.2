@@ -145,7 +145,7 @@
             outline: none;
             background-color: var(--theme-bg-color);
             border: solid 1px var(--theme-bg-dark-color);
-            box-shadow: 0 0 2px 2px var(--theme-highlight-color);
+            box-shadow: 0 0 2px 2px var(--theme-doclink-color);
           }
         }
       }
@@ -181,7 +181,7 @@
             border: solid 1px var(--theme-bg-dark-color);
             background-color: var(--theme-bg-dark-color);
             color: var(--theme-caption-color);
-            box-shadow: 0 0 2px 2px var(--theme-highlight-color);
+            box-shadow: 0 0 2px 2px var(--theme-doclink-color);
           }
 
           &:focus {

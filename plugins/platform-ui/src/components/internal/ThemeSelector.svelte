@@ -43,7 +43,7 @@
     cursor: pointer;
 }
   .menu:hover {
-    color: var(--theme-highlight-color);
+    color: var(--theme-doclink-color);
   }
   .hidden {
     visibility: hidden;
@@ -67,7 +67,7 @@
     color: var(--theme-content-color);
   }
   .item:hover {
-    color: var(--theme-highlight-color);
+    color: var(--theme-doclink-color);
     background-color: var(--theme-bg-accent-color);
   }
 </style>
