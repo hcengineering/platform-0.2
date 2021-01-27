@@ -6,6 +6,7 @@
   "license": "EPL-2.0",
   "scripts": {
     "build": "tsc",
+    "build:docs": "api-extractor run --local && copyfiles -u 1 ./_api-extractor-temp/doc-models/* ../../_api-extractor-temp/",
     "test": "echo 'no tests'",
     "lint": "echo 'no linting'"
   },
@@ -15,6 +16,7 @@
     "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
+    "@microsoft/api-extractor": "^7.13.0",
     "@types/lodash": "^4.14.161",
     "simplytyped": "^3.3.0",
     "ts-jest": "^26.4.4",
