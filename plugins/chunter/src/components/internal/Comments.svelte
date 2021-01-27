@@ -1,4 +1,4 @@
-<script lang="ts">
+<script lang='ts'>
   // Copyright © 2020 Anticrm Platform Contributors.
   //
   // Licensed under the Eclipse Public License, Version 2.0 (the "License");
@@ -12,11 +12,10 @@
   // See the License for the specific language governing permissions and
   // limitations under the License.
   import { onDestroy } from 'svelte'
-  import { Ref, Class, Doc, Property, Emb } from '@anticrm/model'
-  import { getCoreService, query } from '../../utils'
+  import { Ref, Class, Doc, Property, Emb, StringProperty } from '@anticrm/model'
   import core from '@anticrm/core'
   import chunter, { Collab, Comment } from '../..'
-  import { getService } from '@anticrm/platform-ui'
+  import { getCoreService, getService } from '@anticrm/platform-ui'
 
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
   import CommentComponent from './Comment.svelte'
@@ -26,38 +25,32 @@
   export let object: Collab
 
   let backlinks: Backlinks[] = []
-  let unsubscribe: () => void
-  $: {
-    if (unsubscribe) {
-      unsubscribe()
-    }
-    unsubscribe = query(core.class.Backlinks, { _objectId: object._id }, (docs) => {
-      backlinks = docs
-    })
-  }
 
-  onDestroy(() => {
-    if (unsubscribe) unsubscribe()
-  })
+  getCoreService().subscribe(core.class.Backlinks, { _objectId: object._id }, (docs) => {
+    backlinks = docs
+  }, onDestroy)
+
+  getCoreService().subscribe(object._class, { _id: object._id }, (docs) => {
+    console.log('MSG update', docs)
+    object = docs[0] as Collab
+  }, onDestroy)
 
   const coreService = getCoreService()
   const chunterService = getService(chunter.id)
 
-  function createComment(message: any): Promise<void> {
+  function createComment (message: any): Promise<void> {
     const parsedMessage = chunterService.createMissedObjects(message)
-    return coreService.then((coreService) => {
-      const comment = ({
-        _class: chunter.class.Comment,
-        _createdOn: Date.now() as Property<number, Date>,
-        _createdBy: 'john.appleseed@gmail.com' as Property<string, string>,
-        message: parsedMessage
-      } as unknown) as Emb
-      return coreService.push(object, null, 'comments', comment)
-    })
+    const comment = {
+      _class: chunter.class.Comment,
+      _createdOn: Date.now() as Property<number, Date>,
+      _createdBy: coreService.getUserId() as Property<string, string>,
+      message: parsedMessage as StringProperty
+    }
+    return coreService.push(object, null, 'comments' as StringProperty, comment).then()
   }
 </script>
 
-<div class="caption-2">Comments</div>
+<div class='caption-2'>Comments</div>
 
 {#each object.comments || [] as comment}
   <CommentComponent message={comment} />
@@ -65,7 +58,7 @@
 
 <ReferenceInput on:message={(e) => createComment(e.detail)} />
 
-<div class="caption-2">Backlinks</div>
+<div class='caption-2'>Backlinks</div>
 
 {#each backlinks as backlink}
   <!-- <Backlink {backlink} /> -->

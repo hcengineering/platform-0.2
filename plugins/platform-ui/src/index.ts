@@ -16,6 +16,7 @@
 import { Metadata, plugin, Plugin, Resource, Service, Platform } from '@anticrm/platform'
 import { getContext } from 'svelte'
 import { Readable } from 'svelte/store'
+import core, { CoreService } from '@anticrm/platform-core'
 
 export type URL = string
 export type Asset = Metadata<URL>
@@ -31,7 +32,8 @@ interface ComponentOptions<Props> {
 }
 
 export interface SvelteComponent<Props> {
-  new(options: ComponentOptions<Props>): any
+  new (options: ComponentOptions<Props>): any
+
   $set: (props: {}) => any
   $on: (event: string, callback: (event: CustomEvent) => any) => any
   $destroy: () => any
@@ -57,9 +59,13 @@ export interface Location {
 
 export interface UIService extends Service {
   createApp (root: HTMLElement): any
+
   getLocation (): Readable<Location>
+
   navigate (url: string): void
+
   showModal (component: AnySvelteComponent, props: any, element?: HTMLElement): void
+
   closeModal (): void
 }
 
@@ -73,7 +79,7 @@ export default plugin('ui' as Plugin<UIService>, {}, {
     Network: '' as Asset,
     Search: '' as Asset,
     Add: '' as Asset,
-    Resize: '' as Asset,
+    Resize: '' as Asset
   },
   component: {
     Icon: '' as AnyComponent,
@@ -89,6 +95,10 @@ export default plugin('ui' as Plugin<UIService>, {}, {
 
 export function getPlatform (): Platform {
   return getContext(CONTEXT_PLATFORM) as Platform
+}
+
+export function getCoreService (): CoreService {
+  return getPlatform().getRunningPlugin(core.id) as CoreService
 }
 
 export function getUIService (): UIService {
