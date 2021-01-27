@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Anticrm Platform Contributors.
+// Copyright © 2020, 2021 Anticrm Platform Contributors.
 //
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
+
+// Following imports does not used directly but required for `api-extractor` to work. Do not remove.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { Obj, Emb, Doc, Classifier, Attribute, Mixin, Type, ArrayOf, RefTo, InstanceOf, BagOf, Indices } from '@anticrm/model'
 
 import model, { Class, Ref, Tx } from '@anticrm/model'
 import { AnyPlugin, mergeIds } from '@anticrm/platform'

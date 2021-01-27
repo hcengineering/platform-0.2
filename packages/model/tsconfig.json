@@ -4,6 +4,7 @@
     "module": "esnext",
     "outDir": "./lib",
     "rootDir": "./src",
+    "declaration": true,
     "strict": true,
     "moduleResolution": "node",
     "experimentalDecorators": true,
