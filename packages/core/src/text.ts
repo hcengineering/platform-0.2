@@ -13,9 +13,9 @@
 // limitations under the License.
 //
 
-import { Ref, Class, Doc, Obj, DomainIndex, Storage, Tx, TxContext, ArrayOf, InstanceOf, Emb, AnyLayout } from '@anticrm/model'
+import { Ref, Class, Doc, Obj, ArrayOf, InstanceOf, Emb, AnyLayout } from '@anticrm/model'
 import core from '.'
-import { CreateTx } from './tx'
+import { CreateTx, DomainIndex, Storage, Tx, TxContext } from './tx'
 import { Model } from '@anticrm/model/src/model'
 import { generateId } from './objectid'
 

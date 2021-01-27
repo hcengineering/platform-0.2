@@ -13,14 +13,13 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Class, Doc, Model, Ref, StringProperty, Tx } from '@anticrm/model'
+import { AnyLayout, Class, Doc, Model, Ref } from '@anticrm/model'
 import { makeResponse, Response } from './rpc'
 import { WorkspaceProtocol } from './workspace'
 
 import { filterQuery, getUserSpaces, isAcceptable, processTx as processSpaceTx } from './spaces'
 import { Broadcaster, Client, ClientService, ClientSocket } from './server'
-import core, { CreateTx, SpaceUser } from '@anticrm/core'
-import { newCreateTx } from '@anticrm/platform-core/src/tx'
+import core, { Tx, SpaceUser } from '@anticrm/core'
 
 export interface ClientControl {
   ping (): Promise<void>
