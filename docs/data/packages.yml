@@ -1,4 +1,4 @@
 platform:
   - "@anticrm/platform"
   - "@anticrm/model"
-  - "@anticrm/code"
+  - "@anticrm/core"
