@@ -257,14 +257,16 @@ export function createPlatform (): Platform {
     }
   }
 
-  function setPlatformStatus (status: Status | Error | string) {
+  function setPlatformStatus (status: Status | Error | string | unknown) {
     if (typeof status === 'string') {
       broadcastEvent(PlatformStatus, new Status(Severity.INFO, 0, status))
     } else if (status instanceof Error) {
       const err = status as Error
       broadcastEvent(PlatformStatus, new Status(Severity.ERROR, 0, err.message))
-    } else {
+    } else if (status instanceof Status) {
       broadcastEvent(PlatformStatus, status)
+    } else {
+      broadcastEvent(PlatformStatus, new Status(Severity.WARNING, 0, 'Unknown status: ' + status))
     }
   }
 
