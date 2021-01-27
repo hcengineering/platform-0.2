@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Doc, StringProperty, Ref, Class, Storage, AnyLayout, Model, MODEL_DOMAIN, DateProperty } from '@anticrm/model'
+import { Doc, StringProperty, Ref, Class, AnyLayout, Model, MODEL_DOMAIN, DateProperty } from '@anticrm/model'
 import core from '.'
 
 /**
@@ -50,6 +50,16 @@ export function txContext (source: TxContextSource = TxContextSource.Client, net
 
 export interface DomainIndex {
   tx (ctx: TxContext, tx: Tx): Promise<any>
+}
+
+export interface Storage {
+  store (ctx: TxContext, doc: Doc): Promise<void>
+  push (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, query: AnyLayout | null, attribute: StringProperty, attributes: AnyLayout): Promise<void>
+  update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, query: AnyLayout | null, attributes: AnyLayout): Promise<void>
+  remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, query: AnyLayout | null): Promise<void>
+
+  find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]>
+  findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined>
 }
 
 export const TX_DOMAIN = 'tx'

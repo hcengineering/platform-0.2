@@ -21,9 +21,9 @@ import {
   Model,
   MODEL_DOMAIN,
   Ref,
-  Storage, StringProperty
+  StringProperty
 } from '@anticrm/model'
-import { CoreProtocol, ModelIndex, TextIndex, TitleIndex, TxIndex, TxProcessor, VDocIndex, Tx, txContext, TxContext, TxContextSource } from '@anticrm/core'
+import { CoreProtocol, ModelIndex, TextIndex, TitleIndex, TxIndex, TxProcessor, VDocIndex, Tx, txContext, TxContext, TxContextSource, Storage } from '@anticrm/core'
 import { Collection, MongoClient } from 'mongodb'
 import { withTenant } from '@anticrm/accounts'
 import { createPullArrayFilters, createPushArrayFilters, createSetArrayFilters } from './mongo_utils'
