@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { DateProperty, Doc, Emb, Index, Ref, Storage, StringProperty, Tx, TxContext, Model } from '@anticrm/model'
+import { DateProperty, Doc, Emb, TxIndex, Ref, Storage, StringProperty, Tx, TxContext, Model } from '@anticrm/model'
 import { CreateTx, PushTx, UpdateTx } from './tx'
 import { Space } from './space'
 import core from '.'
@@ -34,7 +34,7 @@ export interface VDoc extends Doc {
   _modifiedBy?: StringProperty
 }
 
-export class VDocIndex implements Index {
+export class VDocIndex implements TxIndex {
   private modelDb: Model
   private storage: Storage
 

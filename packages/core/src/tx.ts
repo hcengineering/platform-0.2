@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Doc, StringProperty, Ref, Class, Tx, TxContext, Index, Storage, AnyLayout, Model, MODEL_DOMAIN } from '@anticrm/model'
+import { Doc, StringProperty, Ref, Class, Tx, TxContext, TxIndex, Storage, AnyLayout, Model, MODEL_DOMAIN } from '@anticrm/model'
 import core from '.'
 
 export const TX_DOMAIN = 'tx'
@@ -41,7 +41,7 @@ export interface DeleteTx extends ObjectTx {
   _query?: unknown
 }
 
-export class TxIndex implements Index {
+export class TxIndex implements TxIndex {
   private storage: Storage
 
   constructor (storage: Storage) {
@@ -56,7 +56,7 @@ export class TxIndex implements Index {
 /**
  * Perform model update and forward updates into chained storage if required.
  */
-export class ModelIndex implements Index {
+export class ModelIndex implements TxIndex {
   private storages: Storage[]
   private model: Model
 

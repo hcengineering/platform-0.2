@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Doc, Ref, Classifier, Tx, Index, Storage, TxContext } from '@anticrm/model'
+import { Doc, Ref, Classifier, Tx, TxIndex, Storage, TxContext } from '@anticrm/model'
 import { Model } from '@anticrm/model/src/model'
 import { CreateTx, UpdateTx } from './tx'
 import { generateId } from './objectid'
@@ -29,7 +29,7 @@ export interface Title extends Doc {
 
 const NULL = '<null>'
 
-export class TitleIndex implements Index {
+export class TitleIndex implements TxIndex {
   private modelDb: Model
   private storage: Storage
   private primaries = new Map<Ref<Classifier<Doc>>, string>()
