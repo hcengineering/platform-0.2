@@ -13,13 +13,14 @@
 // limitations under the License.
 //
 
-import { Plugin, plugin, Service } from '@anticrm/platform'
+import { Platform, Plugin, plugin, Service } from '@anticrm/platform'
 import { Class, Mixin, Obj, Doc, Ref, Type, Emb } from '@anticrm/model'
 
 import core from '@anticrm/platform-core'
 import i18n, { IntlString } from '@anticrm/platform-i18n'
-import { AnyComponent, Asset } from '@anticrm/platform-ui'
+import { AnyComponent, Asset, CONTEXT_PLATFORM } from '@anticrm/platform-ui'
 import { VDoc } from '@anticrm/core'
+import { getContext } from 'svelte'
 
 // U I  E X T E N S I O N S
 
@@ -96,11 +97,16 @@ export interface GroupModel extends UIModel {
 
 export interface ClassModel {
   getGroups (): GroupModel[]
+
   getGroup (_class: Ref<Class<Obj>>): GroupModel | undefined
+
   getOwnAttributes (_class: Ref<Class<Obj>>): AttrModel[] // TODO: why do we have this here, but not within Group?
   getAttributes (): AttrModel[]
+
   getAttribute (key: string, _class?: Ref<Class<Obj>>): AttrModel | undefined
+
   filterAttributes (keys: string[]): ClassModel
+
   getPrimary (): AttrModel | undefined
 
   filterPrimary (): { model: ClassModel, primary: AttrModel | undefined }
@@ -110,10 +116,14 @@ export interface ClassModel {
 
 export interface PresentationService extends Service {
   getClassModel (_class: Ref<Class<Obj>>, top?: Ref<Class<Obj>>): Promise<ClassModel>
+
   getComponentExtension (_class: Ref<Class<Obj>>, extension: Ref<Mixin<ComponentExtension<VDoc>>>): AnyComponent
 }
 
-export default plugin('presentation' as Plugin<PresentationService>, { core: core.id, i18n: i18n.id }, {
+const presentationPlugin = plugin('presentation' as Plugin<PresentationService>, {
+  core: core.id,
+  i18n: i18n.id
+}, {
   icon: {
     brdBold: '' as Asset,
     brdItalic: '' as Asset,
@@ -126,7 +136,7 @@ export default plugin('presentation' as Plugin<PresentationService>, { core: cor
     brdAddr: '' as Asset,
     brdClip: '' as Asset,
     brdSend: '' as Asset,
-    brdSmile: '' as Asset,
+    brdSmile: '' as Asset
   },
   class: {
     UXAttribute: '' as Ref<Class<UXAttribute>>,
@@ -146,3 +156,10 @@ export default plugin('presentation' as Plugin<PresentationService>, { core: cor
     RefPresenter: '' as AnyComponent
   }
 })
+
+export default presentationPlugin
+
+export function getPresentationService (): Promise<PresentationService> {
+  const platform = getContext(CONTEXT_PLATFORM) as Platform
+  return platform.getPlugin(presentationPlugin.id)
+}

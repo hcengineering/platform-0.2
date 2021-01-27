@@ -13,8 +13,8 @@
 // limitations under the License.
 //
 
-import { plugin, Plugin, Service, Metadata } from '@anticrm/platform'
-import { Ref, Class, Doc, AnyLayout, StringProperty } from '@anticrm/model'
+import { Metadata, Plugin, plugin, Service } from '@anticrm/platform'
+import { AnyLayout, Class, Doc, Ref, StringProperty } from '@anticrm/model'
 import { CoreProtocol } from '@anticrm/core'
 import { ModelDb } from './modeldb'
 
@@ -25,11 +25,28 @@ export interface QueryResult<T extends Doc> {
   subscribe (run: Subscriber<T>): Unsubscriber
 }
 
+export type RefFinalizer = (op: () => void) => void
+
 /**
  * Define operations with live queries.
  */
 export interface QueryProtocol {
+  /**
+   * Perform query construction, it will be possible to subscribe to query results.
+   * @param _class - object class
+   * @param query - query
+   */
   query<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): QueryResult<T>
+
+  /**
+   * Perform subscribe to query with some helper finalizer to use
+   * @param _class
+   * @param query
+   */
+  subscribe<T extends Doc> (_class: Ref<Class<T>>,
+    query: AnyLayout,
+    action: (docs: T[]) => void,
+    regFinalizer: RefFinalizer): void
 }
 
 /**
@@ -72,6 +89,7 @@ export interface CoreService extends Service, CoreProtocol, QueryProtocol, Opera
   getModel (): ModelDb
 
   generateId (): Ref<Doc>
+
   getUserId (): string
 }
 

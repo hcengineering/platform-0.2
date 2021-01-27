@@ -27,7 +27,7 @@ import {
 } from '@anticrm/model'
 import { ModelDb } from './modeldb'
 
-import { CoreService, QueryResult } from '.'
+import { CoreService, QueryResult, RefFinalizer } from '.'
 import login from '@anticrm/login'
 import rpcService from './rpc'
 
@@ -84,7 +84,7 @@ export default async (platform: Platform): Promise<CoreService> => {
   const qModel = new QueriableStorage(model, model)
   const qTitles = new QueriableStorage(model, titles)
   const qGraph = new QueriableStorage(model, graph)
-  const qCache = new QueriableStorage(model, cache)
+  const qCache = new QueriableStorage(model, cache, true)
 
   // const queriables = [qModel, qTitles, qGraph, qCache]
 
@@ -136,6 +136,14 @@ export default async (platform: Platform): Promise<CoreService> => {
     return qCache.query(_class, query)
   }
 
+  function subscribe<T extends Doc> (_class: Ref<Class<T>>, _query: AnyLayout, action: (docs: T[]) => void, regFinalizer: RefFinalizer): void {
+    const q = query(_class, _query)
+    const unsubscriber = q.subscribe(action)
+    regFinalizer(() => {
+      unsubscriber()
+    })
+  }
+
   function generateId () {
     return genId() as Ref<Doc>
   }
@@ -148,6 +156,7 @@ export default async (platform: Platform): Promise<CoreService> => {
       txProcessor.process(txContext(TxContextSource.Client, networkComplete), tx)
     ])
   }
+
   function getUserId () {
     return platform.getMetadata(login.metadata.WhoAmI) as StringProperty
   }
@@ -162,6 +171,7 @@ export default async (platform: Platform): Promise<CoreService> => {
     getModel: () => model,
     loadDomain,
     query,
+    subscribe,
     find,
     findOne,
     ...ops,
