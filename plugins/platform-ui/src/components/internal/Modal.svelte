@@ -31,7 +31,7 @@
       const rect = element.getBoundingClientRect()
       console.log('rect', rect)
       //return `top: ${rect.top + rect.height + 12}px; left: ${rect.left - 24 - 5 + (rect.width / 2)}px;`
-      return `top: ${rect.top + rect.height + 2}px; left: ${rect.left - 8 + (rect.width / 2)}px;`
+      return `top: ${rect.top + rect.height + 2}px; left: ${rect.left}px;`
     } else
       return 'top: 50%; left: 50%; transform: translate(-50%, -50%);'
   }

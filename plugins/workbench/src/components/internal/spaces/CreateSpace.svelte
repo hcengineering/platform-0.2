@@ -207,13 +207,13 @@
         <label class='input-label' for='input__name'>
           Name
         </label>
-        <input type='text' class='input input__name' id='input__name' bind:value={title}>
+        <input type='text' class='editbox input__name' id='input__name' bind:value={title}>
       </div>
       <div class='input-container'>
         <label class='input-label' for='input__description'>
           Description <span>(optional)</span>
         </label>
-        <input type='text' class='input input__description' id='input__description' bind:value={description}>
+        <input type='text' class='editbox input__description' id='input__description' bind:value={description}>
       </div>
       <CheckBox bind:checked={makePrivate} right='true'>
         <div class='checkbox-label'>
@@ -221,7 +221,7 @@
         </div>
       </CheckBox>
       <div class='buttons'>
-        <button type='button' class='createButton' on:click={() => save()}>Create</button>
+        <button type='button' class='button primary' on:click={() => save()}>Create</button>
       </div>
     </form>
   </div>
