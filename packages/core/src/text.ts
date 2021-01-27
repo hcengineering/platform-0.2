@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Ref, Class, Doc, Obj, Index, Storage, Tx, TxContext, ArrayOf, InstanceOf, Emb, AnyLayout } from '@anticrm/model'
+import { Ref, Class, Doc, Obj, DomainIndex, Storage, Tx, TxContext, ArrayOf, InstanceOf, Emb, AnyLayout } from '@anticrm/model'
 import core from '.'
 import { CreateTx } from './tx'
 import { Model } from '@anticrm/model/src/model'
@@ -39,7 +39,7 @@ type ClassKey = { key: string, _class: Ref<Class<Emb>> }
 
 // I N D E X
 
-export class TextIndex implements Index {
+export class TextIndex implements DomainIndex {
   private modelDb: Model
   private storage: Storage
   private textAttributes = new Map<Ref<Class<Obj>>, string[]>()
