@@ -13,26 +13,11 @@
 // limitations under the License.
 //
 
-/**
- * Platform Resource Identifier.
- *
- * 'Resource' is simply any JavaScript object. There is a plugin exists, which 'resolve' PRI into actual object.
- * This is a difference from Metadata. Metadata object 'resolved' by Platform instance, so we may consider Metadata as
- * a Resource, provided by Platform itself. Because there is always a plugin, which resolve `Resource` resolution is
- * asynchronous process.
- *
- * `Resource` is a string of `kind:plugin.id` format. Since Metadata is a kind of Resource.
- * Metadata also can be resolved using resource API.
- *
- * Examples of `Resource`:
- * ```typescript
- *   `class:contact.Person` as Resource<Class<Person>> // database object with id === `class:contact.Person`
- *   `string:class.ClassLabel` as Resource<string> // translated string according to current language and i18n settings
- *   `asset:ui.Icons` as Resource<URL> // URL to SVG sprites
- *   `easyscript:2+2` as Resource<() => number> // function
- * ```
- */
-export type Resource<T> = string & { __resource: T }
+import type { Resource } from '@anticrm/foundation'
+import { Status, Severity } from '@anticrm/foundation'
+
+export { Resource, Severity, Status }
+export { PlatformError } from '@anticrm/foundation'
 
 /**
  * Platform Metadata Identifier (PMI).
@@ -92,36 +77,6 @@ export interface PluginInfo {
   status: PluginStatus
 }
 
-// S T A T U S
-
-export enum Severity {
-  OK,
-  INFO,
-  WARNING,
-  ERROR
-}
-
-export class Status {
-  severity: Severity
-  code: number
-  message: string
-
-  constructor (severity: Severity, code: number, message: string) {
-    this.severity = severity
-    this.code = code
-    this.message = message
-  }
-}
-
-export class PlatformError extends Error {
-  readonly status: Status
-
-  constructor (status: Status) {
-    super(status.message)
-    this.status = status
-  }
-}
-
 export const PlatformStatus = 'platform-status'
 
 // P L A T F O R M
@@ -139,22 +94,16 @@ export interface Platform {
   loadMetadata<T, X extends Record<string, Metadata<T>>> (ids: X, resources: ExtractType<T, X>): void
 
   addLocation<P extends Service, X extends PluginDependencies> (plugin: PluginDescriptor<P, X>, module: PluginModule<P, X>): void
-
   resolveDependencies (deps: PluginDependencies): Promise<{ [key: string]: Service }>
-
   getPlugin<T extends Service> (id: Plugin<T>): Promise<T>
   getRunningPlugin<T extends Service> (id: Plugin<T>): T
 
   getResource<T> (resource: Resource<T>): Promise<T>
-
   setResource<T> (resource: Resource<T>, value: T): void
-
   peekResource<T> (resource: Resource<T>): T | undefined
 
   addEventListener (event: string, listener: EventListener): void
-
   removeEventListener (event: string, listener: EventListener): void
-
   broadcastEvent (event: string, data: any): void
 
   setPlatformStatus (status: Status): void
@@ -298,7 +247,6 @@ export function createPlatform (): Platform {
     throw new Error('no location provided for plugin: ' + id)
   }
 
-  // TODO #3 `PluginModule` type does not check against `PluginDescriptor`
   function addLocation<P extends Service, X extends PluginDependencies>
   (plugin: PluginDescriptor<P, X>, module: PluginModule<P, X>) {
     locations.push([plugin, module as any])
