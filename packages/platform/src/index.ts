@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Anticrm Platform Contributors.
+// Copyright © 2020, 2021 Anticrm Platform Contributors.
 //
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
@@ -13,8 +13,6 @@
 // limitations under the License.
 //
 
-import { mergeWith } from 'lodash'
-
 /**
  * Platform Resource Identifier.
  *
@@ -24,7 +22,7 @@ import { mergeWith } from 'lodash'
  * asynchronous process.
  *
  * `Resource` is a string of `kind:plugin.id` format. Since Metadata is a kind of Resource.
- * Metadata also can be reolved using resource API.
+ * Metadata also can be resolved using resource API.
  *
  * Examples of `Resource`:
  * ```typescript
@@ -48,8 +46,7 @@ export type Metadata<T> = Resource<T> & { __metadata: true }
 // P L U G I N S
 
 /** Base interface for a plugin service. */
-export interface Service {
-}
+export type Service = Record<string, unknown>
 
 /** Plugin identifier. */
 export type Plugin<S extends Service> = Resource<S>
@@ -79,6 +76,7 @@ export interface PluginDescriptor<S extends Service, D extends PluginDependencie
 type AnyDescriptor = PluginDescriptor<Service, PluginDependencies>
 
 type PluginModule<P extends Service, D extends PluginDependencies> = () => Promise<{
+  // eslint-disable-next-line no-use-before-define
   default: (platform: Platform, deps: PluginServices<D>) => Promise<P>
 }>
 type AnyModule = PluginModule<Service, PluginDependencies>
@@ -140,8 +138,7 @@ export interface Platform {
   setMetadata<T> (id: Metadata<T>, value: T): void
   loadMetadata<T, X extends Record<string, Metadata<T>>> (ids: X, resources: ExtractType<T, X>): void
 
-  addLocation<P extends Service, X extends PluginDependencies>
-    (plugin: PluginDescriptor<P, X>, module: PluginModule<P, X>): void
+  addLocation<P extends Service, X extends PluginDependencies> (plugin: PluginDescriptor<P, X>, module: PluginModule<P, X>): void
 
   resolveDependencies (deps: PluginDependencies): Promise<{ [key: string]: Service }>
 
@@ -165,7 +162,7 @@ export interface Platform {
 
 /*!
  * Anticrm Platform™
- * © 2020 Anticrm Platform Contributors. All Rights Reserved.
+ * © 2020, 2021 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */
 export function createPlatform (): Platform {
@@ -213,7 +210,7 @@ export function createPlatform (): Platform {
 
       resolving = new Promise((resolve, reject) => {
         const info = getResourceInfo(resource)
-        getPlugin(info.plugin).then(plugin => {
+        getPlugin(info.plugin).then(() => {
           const value = resources.get(resource)
           if (!value) {
             throw new Error('resource not loaded: ' + resource)
@@ -260,7 +257,7 @@ export function createPlatform (): Platform {
     }
   }
 
-  function setPlatformStatus (status: Status | Error | string) {
+  function setPlatformStatus (status: Status | Error | string | unknown) {
     if (typeof status === 'string') {
       broadcastEvent(PlatformStatus, new Status(Severity.INFO, 0, status))
     } else if (status instanceof Error) {
@@ -303,7 +300,7 @@ export function createPlatform (): Platform {
 
   // TODO #3 `PluginModule` type does not check against `PluginDescriptor`
   function addLocation<P extends Service, X extends PluginDependencies>
-    (plugin: PluginDescriptor<P, X>, module: PluginModule<P, X>) {
+  (plugin: PluginDescriptor<P, X>, module: PluginModule<P, X>) {
     locations.push([plugin, module as any])
   }
 
@@ -387,16 +384,12 @@ export function identify<N extends Namespace> (pluginId: AnyPlugin, namespace: N
   return transform(pluginId, namespace, (id: string, value) => value === '' ? id : value)
 }
 
-export function mergeIds<D extends Namespace, N extends Namespace> (pluginId: AnyPlugin, a: D, b: N): D & N {
-  return mergeWith({}, a, identify(pluginId, b), (value) => {
-    if (typeof value === 'string') {
-      throw new Error('attempting to overwrite ' + value)
-    }
-  })
-}
-
 export function plugin<P extends Service, D extends PluginDependencies, N extends Namespace> (id: Plugin<P>, deps: D, namespace: N): PluginDescriptor<P, D> & N {
-  return { id, deps, ...identify(id, namespace) }
+  return {
+    id,
+    deps,
+    ...identify(id, namespace)
+  }
 }
 
 // R E S O U R C E  I N F O
@@ -418,5 +411,9 @@ export function getResourceInfo (resource: Resource<any>): ResourceInfo {
   const dot = resource.indexOf('.', index)
   const plugin = resource.substring(index + 1, dot) as AnyPlugin
   const id = resource.substring(dot)
-  return { kind, plugin, id }
+  return {
+    kind,
+    plugin,
+    id
+  }
 }

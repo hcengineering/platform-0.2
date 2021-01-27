@@ -18,12 +18,23 @@
 import type { Obj, Emb, Doc, Classifier, Attribute, Mixin, Type, ArrayOf, RefTo, InstanceOf, BagOf, Indices } from '@anticrm/model'
 
 import model, { Class, Ref, Tx } from '@anticrm/model'
-import { AnyPlugin, mergeIds } from '@anticrm/platform'
+import { AnyPlugin, identify } from '@anticrm/platform'
 import { Backlinks } from './text'
 import { Title } from './title'
 import { CreateTx, DeleteTx, PushTx, UpdateTx } from './tx'
 import { Application, VDoc } from './vdoc'
 import { Space, SpaceUser } from './space'
+import { mergeWith } from 'lodash'
+
+type Namespace = Record<string, Record<string, any>>
+
+function mergeIds<D extends Namespace, N extends Namespace> (pluginId: AnyPlugin, a: D, b: N): D & N {
+  return mergeWith({}, a, identify(pluginId, b), (value) => {
+    if (typeof value === 'string') {
+      throw new Error('attempting to overwrite ' + value)
+    }
+  })
+}
 
 const core = mergeIds('core' as AnyPlugin, model, {
   class: {
