@@ -23,6 +23,10 @@
  *
  * @remarks
  *
+ * Almost anything in the Anticrm Platform is a `Resource`. Resources referenced by Platform Resource Identifier (PRI).
+ *
+ * TODO: understand Resource better. Is this just a `platform` thing or should be in `core` as well
+ *
  * 'Resource' is simply any JavaScript object. There is a plugin exists, which 'resolve' PRI into actual object.
  * This is a difference from Metadata. Metadata object 'resolved' by Platform instance, so we may consider Metadata as
  * a Resource, provided by Platform itself. Because there is always a plugin, which resolve `Resource` resolution is
@@ -32,7 +36,7 @@
  * Metadata also can be resolved using resource API.
  *
  * @example
- * ```
+ * ```typescript
  *   `class:contact.Person` as Resource<Class<Person>> // database object with id === `class:contact.Person`
  *   `string:class.ClassLabel` as Resource<string> // translated string according to current language and i18n settings
  *   `asset:ui.Icons` as Resource<URL> // URL to SVG sprites
