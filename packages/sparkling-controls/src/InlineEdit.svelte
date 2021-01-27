@@ -19,7 +19,6 @@
   export let value: string
   export let placeholder: string
   export let fullWidth: boolean = false
-  export let style: string = ''
 
   let compute: HTMLElement
   let input: HTMLElement
@@ -36,7 +35,7 @@
   }
 </script>
 
-<div class="inline-edit" class:w100={fullWidth} {style}>
+<div class="inline-edit" class:w100={fullWidth}>
   <div class="control" class:w100={fullWidth}>
     <div bind:this={compute} class="compute-width" class:w100={fullWidth} />
     <input
@@ -67,11 +66,10 @@
     display: inline-flex;
     box-sizing: border-box;
 
-    border: 1px solid transparent;
-    border-radius: 2px;
+    border-radius: 4px;
 
     &:focus-within {
-      border-color: var(--theme-bg-dark-color);
+      box-shadow: 0px 0px 0px 1px var(--theme-bg-dark-color);
     }
 
     .compute-width {

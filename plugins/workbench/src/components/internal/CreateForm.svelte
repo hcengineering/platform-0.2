@@ -134,7 +134,7 @@
 <div class='recruiting-view'>
   <div class='header'>
     <div class='caption-1 caption'>
-      <InlineEdit value='Дизайн Конструктора в личном кабинете' fullWidth='true' style='margin-top:-2px;margin-left:-2px' />
+      <InlineEdit value='Дизайн Конструктора в личном кабинете' fullWidth='true' />
     </div>
     <a href='/' on:click|preventDefault={() => dispatch('close')}>
       <IconButton icon={workbench.icon.Close} style='margin-left:1.5em' />
