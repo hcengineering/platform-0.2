@@ -32,6 +32,6 @@ export function txContext (source: TxContextSource = TxContextSource.Client, net
   return { network, source } as TxContext
 }
 
-export interface Index {
+export interface DomainIndex {
   tx (ctx: TxContext, tx: Tx): Promise<any>
 }

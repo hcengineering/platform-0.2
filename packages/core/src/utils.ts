@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Doc, Ref, Class, Tx, Index, TxContext } from '@anticrm/model'
+import { AnyLayout, Doc, Ref, Class, Tx, DomainIndex, TxContext } from '@anticrm/model'
 
 export interface DocumentProtocol {
   find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]>
@@ -26,9 +26,9 @@ export interface CoreProtocol extends DocumentProtocol {
 }
 
 export class TxProcessor {
-  private indices: Index[]
+  private indices: DomainIndex[]
 
-  constructor (indices: Index[]) {
+  constructor (indices: DomainIndex[]) {
     this.indices = indices
   }
 
