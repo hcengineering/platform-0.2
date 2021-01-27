@@ -24,6 +24,7 @@
   import { getSpaceName } from './utils'
   import { AnyLayout, Property, StringProperty } from '@anticrm/model'
   import CheckBox from '@anticrm/sparkling-controls/src/CheckBox.svelte'
+  import EditBox from '@anticrm/sparkling-controls/src/EditBox.svelte'
 
   import IconButton from '@anticrm/platform-ui/src/components/IconButton.svelte'
   import workbench from '@anticrm/workbench'
@@ -168,13 +169,13 @@
         <label class='input-label' for='input__name'>
           Name
         </label>
-        <input type='text' class='editbox input__name' id='input__name' bind:value={title}>
+        <EditBox bind:value={title} />
       </div>
       <div class='input-container'>
         <label class='input-label' for='input__description'>
           Description <span>(optional)</span>
         </label>
-        <input type='text' class='editbox input__description' id='input__description' bind:value={description}>
+        <EditBox bind:value={description} />
       </div>
       <CheckBox bind:checked={makePrivate} right='true'>
         <div class='checkbox-label'>

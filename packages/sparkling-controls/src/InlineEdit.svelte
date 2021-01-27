@@ -56,7 +56,8 @@
   .inline-edit {
     min-width: 12em;
     display: inline-block;
-    
+    margin-top: -2px;
+    margin-left: -2px;
   }
   .w100 {
     width: 100%;

@@ -21,6 +21,7 @@
   import IconButton from '@anticrm/platform-ui/src/components/IconButton.svelte'
   import workbench from '@anticrm/workbench'
   import CheckBox from '@anticrm/sparkling-controls/src/CheckBox.svelte'
+  import EditBox from '@anticrm/sparkling-controls/src/EditBox.svelte'
 
   export let space: Space
   let userName: string = ''
@@ -143,7 +144,8 @@
         <label class='input-label' for='input__name'>
           User Name
         </label>
-        <input type='text' class='editbox input__name' id='input__name' bind:value={userName}>
+        <EditBox bind:value={userName} />
+        <!-- <input type='text' class='editbox input__name' id='input__name' bind:value={userName}> -->
       </div>
       <CheckBox bind:checked={isOwner} right='true'>
         <div class='checkbox-label'>

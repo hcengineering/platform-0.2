@@ -128,7 +128,7 @@
     font: inherit;
     transition: all .2s ease-in-out;
 
-    &:focus {
+    &:focus-within {
       outline: none;
       background-color: var(--theme-bg-accent-hover);
       border-color: var(--theme-bg-dark-hover);
