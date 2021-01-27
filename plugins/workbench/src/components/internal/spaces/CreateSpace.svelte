@@ -131,23 +131,6 @@
             font-weight: normal;
           }
         }
-
-        .input {
-          background-color: var(--theme-bg-color);
-          border: solid 1px var(--theme-bg-accent-color);
-          border-radius: 4px;
-          padding: 0.5em;
-          color: var(--theme-caption-color);
-          font-size: 14px;
-          transition: all .2s ease-in-out;
-
-          &:focus {
-            outline: none;
-            background-color: var(--theme-bg-color);
-            border: solid 1px var(--theme-bg-dark-color);
-            box-shadow: 0 0 2px 2px var(--theme-doclink-color);
-          }
-        }
       }
 
       .checkbox-label {
@@ -166,28 +149,6 @@
         width: 100%;
         display: flex;
         flex-direction: row-reverse;
-
-        .createButton {
-          background-color: var(--theme-bg-accent-color);
-          border: solid 1px var(--theme-bg-dark-color);
-          border-radius: 4px;
-          color: var(--theme-content-color);
-          font-weight: 500;
-          padding: 0.5em 1em;
-          cursor: pointer;
-          transition: all .3s ease-in-out;
-
-          &:hover {
-            border: solid 1px var(--theme-bg-dark-color);
-            background-color: var(--theme-bg-dark-color);
-            color: var(--theme-caption-color);
-            box-shadow: 0 0 2px 2px var(--theme-doclink-color);
-          }
-
-          &:focus {
-            outline: none;
-          }
-        }
       }
     }
   }
