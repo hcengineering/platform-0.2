@@ -7,11 +7,14 @@
 Here's the breakdown of the repo:
 
 * Packages:
+  * [@anticrm/foundation](./packages/foundation) –- Anticrm Platform Foundation Types.
   * [@anticrm/platform](./packages/platform) -- Plugin architecture and implementation. Client-side only. 
   * [@anticrm/core](./packages/core) -- Core concepts shared by Client plugins and Server components.
   * [@anticrm/model](./packages/model) -- Utils to define and manage domain models. Used by tooling, not a part of client/server runtimes.
   
 * Plugins:
+
+More on [Code Structure](https://platform-one.now.sh/docs/concepts/code-structure/).
 
 ## Install and Run
 

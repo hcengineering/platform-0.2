@@ -13,6 +13,11 @@
 // limitations under the License.
 //
 
+/**
+ * Plugin architecture and implementation
+ * @packageDocumentation
+ */
+
 import type { Resource } from '@anticrm/foundation'
 import { Status, Severity } from '@anticrm/foundation'
 
