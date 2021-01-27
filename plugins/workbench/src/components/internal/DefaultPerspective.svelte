@@ -29,7 +29,7 @@
   import MainComponent from '../proxies/MainComponent.svelte'
 
   import ObjectForm from './ObjectForm.svelte'
-  import { getSpaceName, isCurrentUserSpace } from './spaces/utils'
+  import { getSpaceName, getCurrentUserSpace } from './spaces/utils'
 
   const uiService = getUIService()
 
@@ -51,7 +51,7 @@
     .then((qr) => {
       spaceUnsubscribe = qr.subscribe((docs) => {
         console.log('spaces:', docs)
-        spaces = docs.filter((s) => isCurrentUserSpace(curentUser, s))
+        spaces = docs.filter((s) => getCurrentUserSpace(curentUser, s))
       })
     })
 
