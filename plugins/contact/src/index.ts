@@ -1,14 +1,14 @@
 //
 // Copyright © 2020 Anticrm Platform Contributors.
-// 
+//
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
 // obtain a copy of the License at https://www.eclipse.org/legal/epl-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// 
+//
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
@@ -16,7 +16,7 @@
 import { plugin, Plugin, Service } from '@anticrm/platform'
 import { Mixin, Property, Ref } from '@anticrm/model'
 
-import ui, { Asset, AnyComponent } from '@anticrm/platform-ui'
+import ui, { Asset, AnyComponent, getPlatform } from '@anticrm/platform-ui'
 import core from '@anticrm/platform-core'
 import { VDoc } from '@anticrm/core'
 
@@ -39,11 +39,16 @@ export interface User extends Person {
 
 export interface ContactService extends Service {
   getUser (account: string): Promise<User>
+
   getAvatar (user: Ref<User>): Asset
+
   getMyName (): Promise<string>
 }
 
-export default plugin('contact' as Plugin<ContactService>, { core: core.id, ui: ui.id }, {
+const contactPlugin = plugin('contact' as Plugin<ContactService>, {
+  core: core.id,
+  ui: ui.id
+}, {
   icon: {
     Date: '' as Asset,
     Phone: '' as Asset,
@@ -58,3 +63,8 @@ export default plugin('contact' as Plugin<ContactService>, { core: core.id, ui: 
     User: '' as Ref<Mixin<User>>
   }
 })
+export default contactPlugin
+
+export function getContactService (): Promise<ContactService> {
+  return getPlatform().getPlugin(contactPlugin.id)
+}

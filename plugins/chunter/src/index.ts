@@ -14,9 +14,9 @@
 //
 
 import { plugin, Plugin, Service } from '@anticrm/platform'
-import { Asset, AnyComponent } from '@anticrm/platform-ui'
+import { Asset, AnyComponent, getPlatform } from '@anticrm/platform-ui'
 import { VDoc, MessageNode } from '@anticrm/core'
-import { DateProperty, StringProperty, Emb, Class, Ref, Mixin, Doc } from '@anticrm/model'
+import { DateProperty, StringProperty, Emb, Class, Ref, Mixin } from '@anticrm/model'
 
 import core from '@anticrm/platform-core'
 import { ComponentExtension } from '@anticrm/presentation'
@@ -33,7 +33,7 @@ export interface Collab extends VDoc {
   comments?: Comment[]
 }
 
-export interface Message extends Collab { }
+export type Message = Collab
 
 export interface Page extends Collab {
   title: string
@@ -45,14 +45,14 @@ export interface ChunterService extends Service {
   createMissedObjects (doc: MessageNode): string
 }
 
-export default plugin(
+const chunterPlugin = plugin(
   'chunter' as Plugin<ChunterService>,
   { core: core.id },
   {
     icon: {
       Chunter: '' as Asset,
       ActivityView: '' as Asset,
-      ChatView: '' as Asset,
+      ChatView: '' as Asset
     },
     class: {
       Message: '' as Ref<Class<Message>>,
@@ -72,3 +72,9 @@ export default plugin(
     }
   }
 )
+
+export default chunterPlugin
+
+export function getChunterService (): Promise<ChunterService> {
+  return getPlatform().getPlugin(chunterPlugin.id)
+}

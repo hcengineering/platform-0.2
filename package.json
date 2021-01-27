@@ -2,8 +2,8 @@
   "name": "root",
   "private": true,
   "scripts": {
-    "build": "yarn workspace @anticrm/platform build && yarn workspace @anticrm/model build && yarn workspace @anticrm/core build",
-    "build:docs": "yarn workspace @anticrm/platform build:docs && yarn workspace @anticrm/model build:docs && yarn workspace @anticrm/core build:docs",
+    "build": "yarn workspace @anticrm/foundation build && yarn workspace @anticrm/platform build && yarn workspace @anticrm/model build && yarn workspace @anticrm/core build",
+    "build:docs": "yarn workspace @anticrm/foundation build:docs && yarn workspace @anticrm/platform build:docs && yarn workspace @anticrm/model build:docs && yarn workspace @anticrm/core build:docs",
     "gen-docs": "cd docs && npm install && npm run build"
   },
   "workspaces": [

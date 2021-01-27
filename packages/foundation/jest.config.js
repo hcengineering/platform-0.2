@@ -13,28 +13,14 @@
 // limitations under the License.
 //
 
-declare module '*.svelte' {
-  interface ComponentOptions<Props> {
-    target: HTMLElement;
-    anchor?: HTMLElement;
-    props?: Props;
-    hydrate?: boolean;
-    intro?: boolean;
-  }
+// For a detailed explanation regarding each configuration property, visit:
+// https://jestjs.io/docs/en/configuration.html
 
-  interface Component<Props> {
-    new(options: ComponentOptions<Props>): any;
-    $set: (props: {}) => any;
-    $on: (event: string, callback: (event: CustomEvent) => any) => any;
-    $destroy: () => any;
-    render: (props?: {}) => {
-      html: string;
-      css: { code: string; map?: string };
-      head?: string;
-    };
-  }
-
-  const component: Component<{}>;
-
-  export default component;
+module.exports = {
+  coverageDirectory: 'coverage',
+  testEnvironment: 'node',
+  roots: [
+    '<rootDir>/src'
+  ],
+  testMatch: ['**/?(*.)+(spec|test).[jt]s?(x)']
 }

@@ -1,4 +1,4 @@
-<script type="ts">
+<script type='ts'>
   // Copyright © 2020 Anticrm Platform Contributors.
   //
   // Licensed under the Eclipse Public License, Version 2.0 (the "License");
@@ -11,17 +11,15 @@
   //
   // See the License for the specific language governing permissions and
   // limitations under the License.
-  import { AnyLayout, Emb, Property, Ref, StringProperty } from '@anticrm/model'
-  import { MessageNode, Space, VDoc } from '@anticrm/core'
-  import core from '@anticrm/core'
+  import { Property, Ref, StringProperty } from '@anticrm/model'
+  import core, { MessageNode, Space } from '@anticrm/core'
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
   import { onDestroy } from 'svelte'
-  import chunter, { Comment, Message } from '../..'
-  import { getChunterService, getCoreService, query } from '../../utils'
+  import chunter, { getChunterService, Message } from '../..'
   import CommentComponent from './Comment.svelte'
-  import Comments from './Comments.svelte'
   import DateItem from './DateItem.svelte'
+  import { getCoreService } from '@anticrm/platform-ui'
 
   const coreService = getCoreService()
   const chunterService = getChunterService()
@@ -30,48 +28,38 @@
 
   let spaceName: string
   let messages: Message[] = []
-  let unsubscribe: () => void
 
   $: {
-    if (unsubscribe) {
-      unsubscribe()
-    }
-    unsubscribe = query(chunter.class.Message, { _space: space }, (docs) => {
+    getCoreService().subscribe(chunter.class.Message, { _space: space }, (docs) => {
       messages = docs
-    })
+    }, onDestroy)
 
     // TODO: use Titles index instead of getting the whole Space object
-    coreService
-      .then((service) => service.findOne(core.class.Space, { _id: space }))
+    coreService.findOne(core.class.Space, { _id: space })
       .then((spaceObj) => (spaceName = spaceObj ? '#' + spaceObj.name : ''))
   }
-
-  onDestroy(() => {
-    if (unsubscribe) unsubscribe()
-  })
-
-  function createMessage(message: MessageNode) {
+  
+  function createMessage (message: MessageNode) {
     if (message) {
       chunterService.then((chunterService) => {
         const parsedMessage = chunterService.createMissedObjects(message)
-        coreService.then((coreService) => {
-          const comment = {
-            _createdOn: Date.now() as Property<number, Date>,
-            _createdBy: 'john.appleseed@gmail.com' as StringProperty,
-            message: parsedMessage as StringProperty
-          }
-          // absent VDoc fields will be autofilled
-          coreService.create(chunter.class.Message, {
-            _space: space,
-            comments: [comment]
-          })
+
+        const comment = {
+          _createdOn: Date.now() as Property<number, Date>,
+          _createdBy: coreService.getUserId() as StringProperty,
+          message: parsedMessage as StringProperty
+        }
+        // absent VDoc fields will be autofilled
+        coreService.create(chunter.class.Message, {
+          _space: space,
+          comments: [comment]
         })
       })
     }
   }
 </script>
 
-<style lang="scss">
+<style lang='scss'>
   .chat {
     height: 100%;
     display: flex;
@@ -97,12 +85,12 @@
   }
 </style>
 
-<div class="chat">
-  <div class="captionContainer">
-    <span class="caption-1">Чат {spaceName}</span>&nbsp;
+<div class='chat'>
+  <div class='captionContainer'>
+    <span class='caption-1'>Чат {spaceName}</span>&nbsp;
   </div>
-  <ScrollView stylez="height:100%; margin: 2em" autoscroll={true}>
-    <div class="content">
+  <ScrollView stylez='height:100%; margin: 2em' autoscroll={true}>
+    <div class='content'>
       {#each messages as message (message._id)}
         {#if message.comments}
           <CommentComponent message={message.comments[0]} />
@@ -111,7 +99,7 @@
       <DateItem dateItem={new Date()} />
     </div>
   </ScrollView>
-  <div class="refContainer">
+  <div class='refContainer'>
     <ReferenceInput on:message={(e) => createMessage(e.detail)} />
   </div>
 </div>

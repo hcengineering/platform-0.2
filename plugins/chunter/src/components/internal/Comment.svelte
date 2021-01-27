@@ -1,4 +1,4 @@
-<script lang="ts">
+<script lang='ts'>
   // Copyright © 2020 Anticrm Platform Contributors.
   //
   // Licensed under the Eclipse Public License, Version 2.0 (the "License");
@@ -13,8 +13,7 @@
   // limitations under the License.
   import { parseMessage } from '@anticrm/core'
   import { Asset } from '@anticrm/platform-ui'
-  import { User } from '@anticrm/contact'
-  import { getContactService } from '../../utils'
+  import { getContactService, User } from '@anticrm/contact'
   import { Comment } from '../..'
   import MessageViewer from '@anticrm/presentation/src/components/MessageViewer.svelte'
   import { Ref } from '@anticrm/model'
@@ -33,7 +32,7 @@
   })
 </script>
 
-<style lang="scss">
+<style lang='scss'>
   .chat-message-item {
     display: flex;
     margin-bottom: 1em;
@@ -51,13 +50,16 @@
     .details {
       padding-left: 1em;
       position: relative;
-      &>b {
+
+      & > b {
         color: var(--theme-userlink-color);
       }
-      &>span {
+
+      & > span {
         font-size: 11px;
         color: var(--theme-content-trans-color);
       }
+
       &::before {
         position: absolute;
         content: '';
@@ -71,9 +73,9 @@
   }
 </style>
 
-<div class="chat-message-item">
-  <img class="avatar" src={avatar} alt="avatar" />
-  <div class="details">
+<div class='chat-message-item'>
+  <img class='avatar' src={avatar} alt='avatar' />
+  <div class='details'>
     <b>{username}</b>
     <span>{timestamp}</span>
     <MessageViewer message={parseMessage(message.message)} />
