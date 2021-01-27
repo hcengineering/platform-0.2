@@ -14,7 +14,7 @@
 //
 
 import {
-  Class, Classifier, Doc, Ref, Tx,
+  Class, Classifier, Doc, Ref,
   DateProperty, StringProperty,
   MODEL_DOMAIN, AnyLayout, Class$, Prop, Builder, RefTo$, BagOf$, InstanceOf$, ArrayOf$, Primary
 } from '@anticrm/model'
@@ -24,7 +24,7 @@ import { TDoc, TEmb } from '@anticrm/model/src/__model__'
 import core, { Space, SpaceUser, VDoc } from '.'
 import { Backlink, Backlinks, BACKLINKS_DOMAIN } from './text'
 import { Title, TITLE_DOMAIN } from './title'
-import { CreateTx, DeleteTx, PushTx, TX_DOMAIN, UpdateTx } from './tx'
+import { CreateTx, DeleteTx, PushTx, TX_DOMAIN, UpdateTx, Tx } from './tx'
 import { Application } from './vdoc'
 
 @Class$(core.class.SpaceUser, core.class.Emb, MODEL_DOMAIN)
