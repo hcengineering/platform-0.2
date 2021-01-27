@@ -24,13 +24,13 @@ import core, {
   Type,
   Obj,
   Ref,
-  Storage,
   Attribute,
   ArrayOf,
-  TxContext,
   StringProperty,
   PropertyType
 } from '@anticrm/model'
+
+import { Storage, TxContext } from '@anticrm/core'
 
 export function mixinKey (mixin: Ref<Mixin<Doc>>, key: string): string {
   return key + '|' + mixin.replace('.', '~')
