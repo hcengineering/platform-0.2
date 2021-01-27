@@ -133,24 +133,6 @@
       border-color: var(--theme-bg-dark-hover);
       color: var(--theme-content-color);
     }
-
-    &-trans {
-      border: solid 1px transparent;
-      background-color: var(--theme-bg-color);
-      border-radius: 4px;
-      color: inherit;
-      font: inherit;
-      margin-left: -2px;
-      margin-top: -2px;
-
-      &:focus {
-        outline: none;
-        border-color: var(--theme-bg-dark-color);
-      }
-      &.w100 {
-        width: 100%;
-      }
-    }
   }
 
   .button {

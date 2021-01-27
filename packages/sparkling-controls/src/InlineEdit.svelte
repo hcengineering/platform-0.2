@@ -18,6 +18,8 @@
   export let maxWidth: number = 300
   export let value: string
   export let placeholder: string
+  export let fullWidth: boolean = false
+  export let style: string = ''
 
   let compute: HTMLElement
   let input: HTMLElement
@@ -29,15 +31,16 @@
     if (typeof value === 'string')
       compute.innerHTML = value.replace(/ /g, '&nbsp;')
     const width = compute.clientWidth > maxWidth ? maxWidth : compute.clientWidth
-    input.style.width = width + 'px'
+    if (fullWidth) input.style.width = '100%'
+    else input.style.width = width + 'px'
   }
 </script>
 
-<div class="inline-edit">
-  <div class="control">
-    <div bind:this={compute} class="compute-width" />
+<div class="inline-edit" class:w100={fullWidth} {style}>
+  <div class="control" class:w100={fullWidth}>
+    <div bind:this={compute} class="compute-width" class:w100={fullWidth} />
     <input
-      style = { 'max-width:' + maxWidth + 'px' }
+      style = { (fullWidth) ? 'width: 100%' : 'max-width:' + maxWidth + 'px' }
       bind:this={input}
       type="text"
       bind:value={value}
@@ -54,6 +57,10 @@
   .inline-edit {
     min-width: 12em;
     display: inline-block;
+    
+  }
+  .w100 {
+    width: 100%;
   }
   
   .control {
