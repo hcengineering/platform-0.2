@@ -14,7 +14,14 @@
 //
 
 /**
- * Platform Resource Identifier.
+ * Anticrm Platform Foundation Types
+ * @packageDocumentation
+ */
+
+/**
+ * Platform Resource Identifier (PRI)
+ *
+ * @remarks
  *
  * 'Resource' is simply any JavaScript object. There is a plugin exists, which 'resolve' PRI into actual object.
  * This is a difference from Metadata. Metadata object 'resolved' by Platform instance, so we may consider Metadata as
@@ -24,18 +31,21 @@
  * `Resource` is a string of `kind:plugin.id` format. Since Metadata is a kind of Resource.
  * Metadata also can be resolved using resource API.
  *
- * Examples of `Resource`:
- * ```typescript
+ * @example
+ * ```
  *   `class:contact.Person` as Resource<Class<Person>> // database object with id === `class:contact.Person`
  *   `string:class.ClassLabel` as Resource<string> // translated string according to current language and i18n settings
  *   `asset:ui.Icons` as Resource<URL> // URL to SVG sprites
  *   `easyscript:2+2` as Resource<() => number> // function
  * ```
+ *
+ * @public
  */
 export type Resource<T> = string & { __resource: T }
 
 /**
  * Status severity
+ * @public
  */
 export enum Severity {
   OK,
@@ -46,6 +56,7 @@ export enum Severity {
 
 /**
  * Status of an operation
+ * @public
  */
 export class Status {
   severity: Severity
@@ -61,6 +72,7 @@ export class Status {
 
 /**
  * Error object wrapping `Status`
+ * @public
  */
 export class PlatformError extends Error {
   readonly status: Status
