@@ -47,11 +47,11 @@
 
     .separator {
       font-size: 14px;
-      background-color: var(--theme-bg-color);
-      border-bottom: 1px solid var(--theme-bg-accent-color);
+      background-color: var(--theme-bg-dark-color);
+      //border-bottom: 1px solid var(--theme-bg-accent-color);
       height: 1px;
       border-radius: 0;
-      margin: 0;
+      margin: 0px 1em;
     }
   }
 </style>

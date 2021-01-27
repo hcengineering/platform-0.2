@@ -27,6 +27,7 @@
 <LinkTo href={link}>
   <div class='item' class:selected={selected}>
     {getSpaceName(space)}
+    <div class="separator"></div>
     {#if count > 0}
       <div class='counter'>{count}</div>
     {/if}
@@ -73,6 +74,10 @@
     }
   }
 
+  .separator {
+    flex-grow: 1;
+  }
+
   .counter {
     box-sizing: border-box;
     display: flex;
@@ -98,12 +103,14 @@
     font-weight: 700;
     font-size: 11px;
     line-height: 11px;
+    position: relative;
 
     height: 16px;
     width: 16px;
-    margin: 0;
+    margin: 0 0 0 .5em;
     cursor: pointer;
     transition: all .2s ease-in-out;
+    border: solid 1px var(--theme-bg-accent-color);
 
     &::before {
       content: '';
@@ -115,6 +122,7 @@
       top: 2px;
       left: 2px;
       transition: all .2s ease-in-out;
+      z-index: -1;
     }
 
     &:hover {

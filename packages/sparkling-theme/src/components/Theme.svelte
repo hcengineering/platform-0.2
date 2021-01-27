@@ -126,6 +126,7 @@
     box-sizing: border-box;
     color: var(--theme-content-color);
     font: inherit;
+    transition: all .2s ease-in-out;
 
     &:focus {
       outline: none;
@@ -150,6 +151,7 @@
 
     color: var(--theme-content-color);
     background-color: var(--theme-bg-accent-color);
+    transition: all .2s ease-in-out;
 
     &:focus {
       outline: none;
