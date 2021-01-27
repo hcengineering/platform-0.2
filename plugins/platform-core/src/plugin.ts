@@ -20,10 +20,7 @@ import {
   Doc,
   AnyLayout,
   MODEL_DOMAIN,
-  Tx,
-  StringProperty,
-  txContext,
-  TxContextSource
+  StringProperty
 } from '@anticrm/model'
 import { ModelDb } from './modeldb'
 
@@ -37,6 +34,7 @@ import { Cache } from './cache'
 import { Titles } from './titles'
 import { Graph } from './graph'
 import {
+  Tx, txContext, TxContextSource,
   BACKLINKS_DOMAIN, CoreProtocol, ModelIndex, TextIndex, TitleIndex, TITLE_DOMAIN, TxIndex, TxProcessor, VDocIndex,
   generateId as genId
 } from '@anticrm/core'
