@@ -51,6 +51,5 @@ export { Builder }
 export * from './utils'
 export * from './dsl'
 export * from './classes'
-export * from './tx'
 export * from './storage'
 export * from './model'
