@@ -35,6 +35,10 @@
       width: 1em;
     }
 
+    .input-label {
+      flex-grow: 1;
+    }
+
     .checkbox {
       width: 35px;
       height: 20px;
