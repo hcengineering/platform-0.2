@@ -4,6 +4,9 @@
   import { archivedSpaceUpdate, getCurrentUserSpace, getSpaceName, leaveSpace } from './utils'
   import { _getCoreService, getUIService } from '../../../utils'
   import SpaceOptions from './SpaceOptions.svelte'
+  import ToolbarButton from '@anticrm/sparkling-controls/src/toolbar/Button.svelte'
+  import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
+  import workbench from '../../..'
 
   export let link: string = '/'
   export let selected: boolean = false
@@ -32,10 +35,18 @@
       <div class='counter'>{count}</div>
     {/if}
     {#if selected}
-      <div bind:this={optionsButton} class='options' on:click|preventDefault={() => {
+      <div bind:this={optionsButton}>
+        <ToolbarButton style="padding:0; width:16px; height:16px"
+          on:click={() => {
+            uiService.showModal(SpaceOptions, {space}, optionsButton)
+          }}>
+          <Icon icon={workbench.icon.Burger} clazz="icon-embed" />
+        </ToolbarButton>
+      </div>
+      <!-- <div bind:this={optionsButton} class='options' on:click|preventDefault={() => {
             uiService.showModal(SpaceOptions, {space}, optionsButton)
           }}>︙
-      </div>
+      </div> -->
     {/if}
   </div>
 </LinkTo>

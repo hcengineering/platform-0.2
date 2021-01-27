@@ -14,14 +14,23 @@
 -->
 
 <script lang="ts">
+  import Icon from './Icon.svelte'
+  import { Asset } from "@anticrm/platform-ui";
+
+  export let icon: Asset | undefined  
   export let width: string = '300px'
   export let value: string
   export let placeholder: string
+  export let right: boolean = false
 
   let input: HTMLElement
 </script>
 
-<div class="editbox" style='width: {width}' on:click={input.focus()}>
+<div class="editbox wIcon" style='width: {width}' on:click={input.focus()}>
+  {#if (!right)}
+    <Icon {icon} clazz="icon-embed" />
+    <div class="separator"></div>
+  {/if}
   <input
     bind:this={input}
     type="text"
@@ -31,17 +40,25 @@
     on:focus
     on:change
   />
+  {#if (right)}
+    <div class="separator"></div>
+    <Icon {icon} clazz="icon-embed" />
+  {/if}
 </div>
 
 <style lang="scss">
-  .inline-edit {
-    min-width: 12em;
-    display: inline-block;
+  .wIcon {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+  .separator {
+    width: 7px;
   }
 
   input {
     border: none;
-    width: calc(100% - 2px);
+    width: 100%;
     color: var(--theme-content-color);
     background-color: transparent;
     font: inherit;

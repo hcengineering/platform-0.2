@@ -24,6 +24,9 @@ export default (platform: Platform) => {
     Pages: spritesUrl + '#pages',
     Resize: spritesUrl + '#resize',
     Close: spritesUrl + '#close',
-    Finder: spritesUrl + '#finder'
+    Finder: spritesUrl + '#finder',
+    Lock: spritesUrl + '#lock',
+    Sharp: spritesUrl + '#sharp',
+    Burger: spritesUrl + '#burger'
   })
 }

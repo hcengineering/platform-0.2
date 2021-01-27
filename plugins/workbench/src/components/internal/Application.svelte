@@ -22,11 +22,11 @@
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
   import Table from '@anticrm/presentation/src/components/internal/Table.svelte'
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
-  import Finder from './Finder.svelte'
   import ObjectForm from './ObjectForm.svelte'
   import CreateForm from './CreateForm.svelte'
   import { Ref } from '@anticrm/model'
   import IconButton from '@anticrm/platform-ui/src/components/IconButton.svelte';
+  import EditBox from '@anticrm/platform-ui/src/components/EditBox.svelte';
 
   export let application: Ref<WorkbenchApplication>
   export let space: Ref<Space>
@@ -60,7 +60,7 @@
         <IconButton icon={workbench.icon.Add} label={getLabel(appInstance.label)} />
       </a>
       <div style='flex-grow:1'></div>
-      <Finder placeholder='Поиск по {appInstance.label}...' />
+      <EditBox icon={workbench.icon.Finder} placeholder='Поиск по {appInstance.label}...' right='true' />
     </div>
     <ScrollView stylez='height:100%; margin: 2em'>
       <div class='table'>

@@ -25,7 +25,7 @@
   import { AnyLayout, Property, StringProperty } from '@anticrm/model'
   import CheckBox from '@anticrm/sparkling-controls/src/CheckBox.svelte'
   import EditBox from '@anticrm/sparkling-controls/src/EditBox.svelte'
-
+  import EditIconBox from '@anticrm/platform-ui/src/components/EditBox.svelte'
   import IconButton from '@anticrm/platform-ui/src/components/IconButton.svelte'
   import workbench from '@anticrm/workbench'
 
@@ -169,7 +169,7 @@
         <label class='input-label' for='input__name'>
           Name
         </label>
-        <EditBox bind:value={title} />
+        <EditIconBox bind:value={title} icon={(makePrivate) ? workbench.icon.Lock : workbench.icon.Sharp} />
       </div>
       <div class='input-container'>
         <label class='input-label' for='input__description'>

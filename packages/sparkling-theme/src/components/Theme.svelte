@@ -121,11 +121,10 @@
   .editbox {
     border: 1px solid var(--theme-bg-dark-color);
     border-radius: 4px;
-    padding: 1em 1em;
+    padding: 0.75em 1em;
     background-color: var(--theme-bg-accent-color);
     box-sizing: border-box;
     color: var(--theme-content-color);
-    font: inherit;
     transition: all .2s ease-in-out;
 
     &:focus-within {
