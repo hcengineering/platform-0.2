@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Anticrm Platform Contributors.
+// Copyright © 2020, 2021 Anticrm Platform Contributors.
 //
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
@@ -13,13 +13,12 @@
 // limitations under the License.
 //
 
-type MethodType = (...args: any[]) => any
-
 type PrimitiveType = number | string | boolean | undefined
 
 export type Property<P extends PrimitiveType, T> = P & { __property: T }
 export type Ref<T extends Doc> = string & { __ref: T }
-export type Method<T extends MethodType> = T & { __method: T }
+// type MethodType = (...args: any[]) => any
+// export type Method<T extends MethodType> = T & { __method: T }
 
 export interface Obj {
   _class: Ref<Class<Obj>>

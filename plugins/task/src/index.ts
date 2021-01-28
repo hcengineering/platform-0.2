@@ -14,11 +14,10 @@
 //
 
 import { plugin, Plugin, Service } from '@anticrm/platform'
-import { StringProperty, Class, Ref } from '@anticrm/model'
+import { StringProperty, Class, Ref, VDoc } from '@anticrm/core'
 
 import { User } from '@anticrm/contact'
 import { AnyComponent, Asset } from '@anticrm/platform-ui'
-import { VDoc } from '@anticrm/core'
 
 export interface Task extends VDoc {
   title: StringProperty

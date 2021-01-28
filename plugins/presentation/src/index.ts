@@ -14,12 +14,11 @@
 //
 
 import { Platform, Plugin, plugin, Service } from '@anticrm/platform'
-import { Class, Mixin, Obj, Doc, Ref, Type, Emb } from '@anticrm/model'
+import { Class, Mixin, Obj, Doc, Ref, Type, Emb, VDoc } from '@anticrm/core'
 
 import core from '@anticrm/platform-core'
 import i18n, { IntlString } from '@anticrm/platform-i18n'
 import { AnyComponent, Asset, CONTEXT_PLATFORM } from '@anticrm/platform-ui'
-import { VDoc } from '@anticrm/core'
 import { getContext } from 'svelte'
 
 // U I  E X T E N S I O N S

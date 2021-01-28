@@ -14,7 +14,7 @@
 //
 
 import { AnyPlugin, identify } from '@anticrm/platform'
-import { ArrayOf, Attribute, BagOf, Class, Classifier, Doc, Emb, Indices, InstanceOf, Mixin, Obj, Ref, RefTo, Type } from './classes'
+import { ArrayOf, Attribute, BagOf, Class, Classifier, Doc, Emb, Indices, InstanceOf, Mixin, Obj, Ref, RefTo, Type } from '@anticrm/core'
 import Builder from './builder'
 
 const modelIds = identify('model' as AnyPlugin, {
@@ -50,5 +50,3 @@ export { Builder }
 
 export * from './utils'
 export * from './dsl'
-export * from './classes'
-export * from './model'

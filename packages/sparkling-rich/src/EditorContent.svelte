@@ -1,4 +1,4 @@
-<script lang="ts">
+<script lang='ts'>
   import { MessageNode } from '@anticrm/core'
   import { DOMParser, Fragment, Slice, Mark, MarkType } from 'prosemirror-model'
 
@@ -49,11 +49,11 @@
 
   let isEmpty: boolean = true
 
-  function checkEmpty(value: string): boolean {
+  function checkEmpty (value: string): boolean {
     return value.length === 0 || value === '<p><br></p>' || value === '<p></p>'
   }
 
-  function findCompletion(
+  function findCompletion (
     sel: any
   ): { completionWord: string; completionEnd: string } {
     var completionWord = ''
@@ -81,12 +81,18 @@
     if (sel.$from.nodeAfter != null) {
       completionEnd = sel.$from.nodeAfter.textContent
     }
-    return { completionWord, completionEnd }
+    return {
+      completionWord,
+      completionEnd
+    }
   }
 
-  function emitStyleEvent() {
+  function emitStyleEvent () {
     let sel = view.state.selection
-    var { completionWord, completionEnd } = findCompletion(sel)
+    var {
+      completionWord,
+      completionEnd
+    } = findCompletion(sel)
 
     let posAtWindow = view.coordsAtPos(sel.from - completionWord.length)
 
@@ -109,8 +115,6 @@
 
     let isBold = schema.marks.strong.isInSet(marks) != null
     let isItalic = schema.marks.em.isInSet(marks) != null
-    let isStrike = schema.marks.strike.isInSet(marks) != null
-    let isUnderline = schema.marks.underline.isInSet(marks) != null
     isEmpty = checkEmpty(innerDOMValue)
     let evt = {
       isEmpty: isEmpty,
@@ -118,10 +122,6 @@
       isBoldEnabled: Commands.toggleStrong(view.state),
       italic: isItalic,
       isItalicEnabled: Commands.toggleItalic(view.state),
-      strike: isStrike,
-      isStrikeEnabled: Commands.toggleStrike(view.state),
-      underline: isUnderline,
-      isUnderlineEnabled: Commands.toggleUnderline(view.state),
       cursor: {
         left: cursor.left,
         top: cursor.top,
@@ -130,19 +130,29 @@
       },
       completionWord,
       completionEnd,
-      selection: { from: sel.from, to: sel.to },
+      selection: {
+        from: sel.from,
+        to: sel.to
+      },
       inputHeight
     } as EditorContentEvent
     dispatch('styleEvent', evt)
   }
 
-  function createState(doc: MessageNode): EditorState {
+  function createState (doc: MessageNode): EditorState {
     return EditorState.fromJSON(
       {
         schema,
         plugins: [history(), buildInputRules(), keymap(buildKeymap())]
       },
-      { doc: doc, selection: { type: 'text', head: 0, anchor: 0 } }
+      {
+        doc: doc,
+        selection: {
+          type: 'text',
+          head: 0,
+          anchor: 0
+        }
+      }
     )
   }
 
@@ -154,7 +164,7 @@
   state = createState(content)
   view = new EditorView(rootElement, {
     state,
-    dispatchTransaction(transaction) {
+    dispatchTransaction (transaction) {
       let newState = view.state.apply(transaction)
 
       // Check and update triggers to update content.
@@ -181,7 +191,7 @@
     root.appendChild(rootElement)
   })
 
-  function updateValue(content: MessageNode) {
+  function updateValue (content: MessageNode) {
     if (JSON.stringify(content) != JSON.stringify(view.state.toJSON().doc)) {
       let newState = createState(content)
 
@@ -191,14 +201,14 @@
     }
   }
 
-  export function insert(text: string, from: number, to: number) {
+  export function insert (text: string, from: number, to: number) {
     const t = view.state.tr.insertText(text, from, to)
     const st = view.state.apply(t)
     view.updateState(st)
     emitStyleEvent()
   }
 
-  export function insertMark(
+  export function insertMark (
     text: string,
     from: number,
     to: number,
@@ -214,52 +224,49 @@
     view.updateState(st)
     emitStyleEvent()
   }
+
   // Some operations
-  export function toggleBold() {
+  export function toggleBold () {
     Commands.toggleStrong(view.state, view.dispatch)
     view.focus()
   }
-  export function toggleItalic() {
+
+  export function toggleItalic () {
     Commands.toggleItalic(view.state, view.dispatch)
     view.focus()
   }
-  export function toggleStrike() {
-    Commands.toggleStrike(view.state, view.dispatch)
-    view.focus()
-  }
-  export function toggleUnderline() {
-    Commands.toggleUnderline(view.state, view.dispatch)
-    view.focus()
-  }
-  export function toggleUnOrderedList() {
+
+  export function toggleUnOrderedList () {
     Commands.toggleUnOrdered(view.state, view.dispatch)
     view.focus()
   }
-  export function toggleOrderedList() {
+
+  export function toggleOrderedList () {
     Commands.toggleOrdered(view.state, view.dispatch)
     view.focus()
   }
-  export function focus() {
+
+  export function focus () {
     view.focus()
   }
 </script>
 
 <div
-  class="edit-box"
-  bind:this="{root}"
-  bind:clientHeight="{inputHeight}"
+  class='edit-box'
+  bind:this='{root}'
+  bind:clientHeight='{inputHeight}'
 ></div>
 <div
-  class="hover-message"
-  style="{`top:${-1 * inputHeight}px;` +  //
+  class='hover-message'
+  style='{`top:${-1 * inputHeight}px;` +  //
     `margin-bottom:${-1 * inputHeight}px;` +  //
-    `height:${inputHeight}px`}"
+    `height:${inputHeight}px`}'
 >
   {#if isEmpty}{hoverMessage}{/if}
 </div>
 <slot />
 
-<style lang="scss">
+<style lang='scss'>
   :global {
     .ProseMirror {
       position: relative;
@@ -268,7 +275,7 @@
     .ProseMirror {
       word-wrap: break-word;
       white-space: pre-wrap;
-      white-space: break-spaces;
+      //white-space: break-spaces;
       -webkit-font-variant-ligatures: none;
       font-variant-ligatures: none;
       font-feature-settings: 'liga' 0; /* the above doesn't seem to work in Edge */
@@ -285,9 +292,11 @@
     .ProseMirror-hideselection *::selection {
       background: transparent;
     }
+
     .ProseMirror-hideselection *::-moz-selection {
       background: transparent;
     }
+
     .ProseMirror-hideselection {
       caret-color: transparent;
     }
@@ -324,15 +333,18 @@
     :global {
       div {
         outline: none;
+
         p {
           margin: 5px;
         }
       }
     }
   }
+
   .edit-box:focus {
     outline: none;
   }
+
   .hover-message {
     position: relative;
     top: 0px;

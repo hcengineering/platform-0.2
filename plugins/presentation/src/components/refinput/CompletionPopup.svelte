@@ -2,7 +2,7 @@
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
 
   import ui from '@anticrm/platform-ui'
-  import { Class, Ref } from '@anticrm/model'
+  import { Class, Ref } from '@anticrm/core'
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
 
   import { createEventDispatcher, onMount } from 'svelte'

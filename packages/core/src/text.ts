@@ -13,10 +13,10 @@
 // limitations under the License.
 //
 
-import { Ref, Class, Doc, Obj, ArrayOf, InstanceOf, Emb, AnyLayout } from '@anticrm/model'
+import { Ref, Class, Doc, Obj, ArrayOf, InstanceOf, Emb, AnyLayout } from './classes'
 import core from '.'
 import { CreateTx, DomainIndex, Storage, Tx, TxContext } from './tx'
-import { Model } from '@anticrm/model/src/model'
+import { Model } from './model'
 import { generateId } from './objectid'
 
 import { MessageMarkType, MessageNode, parseMessage, ReferenceMark, traverseMarks, traverseMessage } from './textmodel'

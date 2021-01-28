@@ -13,7 +13,7 @@
 // limitations under the License.
 -->
 <script lang='ts'>
-  import { Ref, Doc, Class } from '@anticrm/model'
+  import { Ref, Doc, Class } from '@anticrm/core'
   import { onDestroy } from 'svelte'
   import { find, getCoreService, getUIService, _getCoreService } from '../../utils'
   import core, { Space, VDoc } from '@anticrm/core'

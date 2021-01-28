@@ -14,11 +14,10 @@
 //
 
 import { plugin, Plugin, Service } from '@anticrm/platform'
-import { Mixin, Property, Ref } from '@anticrm/model'
+import { Mixin, Property, Ref, VDoc } from '@anticrm/core'
 
 import ui, { Asset, AnyComponent, getPlatform } from '@anticrm/platform-ui'
 import core from '@anticrm/platform-core'
-import { VDoc } from '@anticrm/core'
 
 export interface Contact extends VDoc {
   phone?: string

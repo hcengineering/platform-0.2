@@ -15,9 +15,10 @@
 
 // Following imports does not used directly but required for `api-extractor` to work. Do not remove.
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type { Obj, Emb, Doc, Classifier, Attribute, Mixin, Type, ArrayOf, RefTo, InstanceOf, BagOf, Indices } from '@anticrm/model'
+import type { Obj, Emb, Doc, Classifier, Attribute, Mixin, Type, ArrayOf, RefTo, InstanceOf, BagOf, Indices } from './classes'
 
-import model, { Class, Ref } from '@anticrm/model'
+import model from '@anticrm/model'
+import { Class, Ref } from './classes'
 import { AnyPlugin, identify } from '@anticrm/platform'
 import { Backlinks } from './text'
 import { Title } from './title'
@@ -59,7 +60,8 @@ const core = mergeIds('core' as AnyPlugin, model, {
 export default core
 
 export * from './rpc'
-export * from '@anticrm/model/src/model'
+export * from './classes'
+export * from './model'
 export * from './text'
 export * from './textmodel'
 export * from './tx'

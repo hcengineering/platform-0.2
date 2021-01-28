@@ -29,7 +29,6 @@
         name: 'Add user',
         action: () => {
           uiService.showModal(AddUser, { space }, optionsButton)
-          // dispatch('close')
         }
       }, {
         name: '-',

@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Anticrm Platform Contributors.
+// Copyright © 2020, 2021 Anticrm Platform Contributors.
 //
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
@@ -13,13 +13,11 @@
 // limitations under the License.
 //
 
-
 import { Resource } from '@anticrm/platform'
 
 import { getClassifier } from './dsl'
 import { CombineObjects, KeysByType } from 'simplytyped'
-import { Model, MODEL_DOMAIN } from '.'
-import { AllAttributes, Attribute, Class, ClassifierKind, Doc, EClass, Emb, Mixin, Obj, Ref, StringProperty } from './classes'
+import { AllAttributes, Attribute, Class, ClassifierKind, Doc, EClass, Emb, Mixin, Obj, Ref, StringProperty, Model, MODEL_DOMAIN } from '@anticrm/core'
 import core from '.'
 
 type MethodType = (...args: any[]) => any

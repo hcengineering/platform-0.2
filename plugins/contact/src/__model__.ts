@@ -13,8 +13,8 @@
 // limitations under the License.
 //
 
-import { extendIds, Builder, Class$, Mixin$, Prop, Class, Ref, Property } from '@anticrm/model'
-import core, { Space } from '@anticrm/core'
+import { extendIds, Builder, Class$, Mixin$, Prop } from '@anticrm/model'
+import core, { Space, Class, Ref, Property } from '@anticrm/core'
 import _contact, { Contact, Person, User } from '.'
 import { IntlString } from '@anticrm/platform-i18n'
 import { TVDoc } from '@anticrm/core/src/__model__'

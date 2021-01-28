@@ -1,4 +1,3 @@
-import { RefTo, Doc, BagOf } from './classes'
 //
 // Copyright © 2020 Anticrm Platform Contributors.
 //
@@ -16,9 +15,10 @@ import { RefTo, Doc, BagOf } from './classes'
 
 import 'reflect-metadata'
 
-import core, {
-  Ref, Class, Obj, Mixin, ClassifierKind, Classifier, Attribute, Type, Property, mixinKey, ArrayOf, Emb, InstanceOf
-} from '.'
+import core from '.'
+import {
+  Ref, Class, Obj, Mixin, ClassifierKind, Classifier, Attribute, Type, Property, ArrayOf, Emb, InstanceOf, RefTo, Doc, BagOf, mixinKey
+} from '@anticrm/core'
 
 const classifierMetadataKey = Symbol("anticrm:classifier")
 

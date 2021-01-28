@@ -14,7 +14,7 @@
 //
 
 import { generateId } from '@anticrm/core/src/objectid'
-import core, {
+import {
   AnyLayout,
   Class,
   Classifier,
@@ -28,9 +28,9 @@ import core, {
   ArrayOf,
   StringProperty,
   PropertyType
-} from '@anticrm/model'
-
-import { Storage, TxContext } from '@anticrm/core'
+} from './classes'
+import { Storage, TxContext } from './tx'
+import core from '@anticrm/model'
 
 export function mixinKey (mixin: Ref<Mixin<Doc>>, key: string): string {
   return key + '|' + mixin.replace('.', '~')

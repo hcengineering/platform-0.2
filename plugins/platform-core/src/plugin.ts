@@ -14,14 +14,6 @@
 //
 
 import { Platform } from '@anticrm/platform'
-import {
-  Ref,
-  Class,
-  Doc,
-  AnyLayout,
-  MODEL_DOMAIN,
-  StringProperty
-} from '@anticrm/model'
 import { ModelDb } from './modeldb'
 
 import { CoreService, QueryResult, RefFinalizer } from '.'
@@ -35,6 +27,11 @@ import { Titles } from './titles'
 import { Graph } from './graph'
 import {
   Tx, txContext, TxContextSource,
+  Ref,
+  Class,
+  Doc,
+  AnyLayout,
+  StringProperty, MODEL_DOMAIN,
   BACKLINKS_DOMAIN, CoreProtocol, ModelIndex, TextIndex, TitleIndex, TITLE_DOMAIN, TxIndex, TxProcessor, VDocIndex,
   generateId as genId
 } from '@anticrm/core'

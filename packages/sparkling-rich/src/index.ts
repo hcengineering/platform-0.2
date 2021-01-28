@@ -21,8 +21,6 @@ export interface EditorContentEvent {
     isEmpty: boolean
     bold: boolean
     italic: boolean
-    strike: boolean
-    underline: boolean
     cursor: { left: number; right: number; top: number; bottom: number }
     completionWord: string
     completionEnd: string

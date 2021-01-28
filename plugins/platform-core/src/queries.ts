@@ -13,8 +13,7 @@
 // limitations under the License.
 //
 
-import { Doc, Ref, Class, AnyLayout, Model, StringProperty } from '@anticrm/model'
-import { Storage, TxContext } from '@anticrm/core'
+import { Storage, TxContext, StringProperty, Doc, Ref, Class, AnyLayout, Model } from '@anticrm/core'
 import { QueryResult, Subscriber, Unsubscriber } from '.'
 
 export interface Domain extends Storage {

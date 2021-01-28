@@ -13,8 +13,7 @@
 // limitations under the License.
 //
 
-import core, { Backlinks, TxContext, Storage } from '@anticrm/core'
-import { Ref, Classifier, Doc, Class, AnyLayout, StringProperty } from '@anticrm/model'
+import core, { Backlinks, TxContext, Storage, Ref, Classifier, Doc, Class, AnyLayout, StringProperty } from '@anticrm/core'
 
 interface Link {
   _class: Ref<Classifier<Doc>>

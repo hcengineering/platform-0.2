@@ -21,9 +21,9 @@ import { encode } from 'jwt-simple'
 import { Db, MongoClient } from 'mongodb'
 import { withTenant } from '@anticrm/accounts'
 
-import { Builder, Doc } from '@anticrm/model'
+import { Builder } from '@anticrm/model'
 
-import core from '@anticrm/core'
+import core, { Doc } from '@anticrm/core'
 
 import { model } from '@anticrm/model/src/__model__'
 import { model as coreModel } from '@anticrm/core/src/__model__'

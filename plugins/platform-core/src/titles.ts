@@ -13,8 +13,7 @@
 // limitations under the License.
 //
 
-import { Ref, Classifier, Doc, Class, AnyLayout, StringProperty } from '@anticrm/model'
-import core, { Title, TxContext, Storage } from '@anticrm/core'
+import core, { Title, TxContext, Storage, Ref, Classifier, Doc, Class, AnyLayout, StringProperty } from '@anticrm/core'
 import { ModelDb } from './modeldb'
 
 export interface Node {
