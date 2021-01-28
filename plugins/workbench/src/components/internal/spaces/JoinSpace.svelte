@@ -16,27 +16,21 @@
   import BrowseSpace from './BrowseSpace.svelte'
   import CreateSpace from './CreateSpace.svelte'
   import SimplePopup from '@anticrm/presentation/src/components/SimplePopup.svelte'
+  import { getUIService } from '../../../utils'
 
-  enum Mode {
-    Select,
-    Create,
-    Browse
-  }
+  const uiService = getUIService()
 
-  let mode: Mode = Mode.Select
   let actions = [{
     name: 'Create',
-    action: () => mode = Mode.Create
+    action: () => {
+      uiService.showModal(CreateSpace, {})
+    }
   }, {
     name: 'Browse',
-    action: () => mode = Mode.Browse
+    action: () => {
+      uiService.showModal(BrowseSpace, {})
+    }
   }]
 </script>
 
-{#if mode == Mode.Select}
-  <SimplePopup items={actions}></SimplePopup>
-{:else if mode == Mode.Create}
-  <CreateSpace on:close on:browse={() => (mode = Mode.Browse)} />
-{:else if mode == Mode.Browse}
-  <BrowseSpace on:close on:create={() => (mode = Mode.Create)} />
-{/if}
+<SimplePopup items={actions}></SimplePopup>
