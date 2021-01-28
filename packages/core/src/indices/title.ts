@@ -15,8 +15,7 @@
 
 import { Doc, Ref, Classifier } from '../classes'
 import { Model } from '../model'
-import { CreateTx, UpdateTx, Tx, DomainIndex, Storage, TxContext } from '../tx'
-import { generateId } from '../objectid'
+import { CreateTx, UpdateTx, Tx, DomainIndex, Storage, TxContext, generateId } from '../tx'
 import core from '../index'
 import { Title } from '../domains'
 

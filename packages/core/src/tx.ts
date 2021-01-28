@@ -97,3 +97,54 @@ export class TxIndex implements DomainIndex {
     return this.storage.store(ctx, tx)
   }
 }
+
+///
+
+export interface DocumentProtocol {
+  find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]>
+  findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined>
+  loadDomain (domain: string, index?: string, direction?: string): Promise<Doc[]>
+}
+
+export interface CoreProtocol extends DocumentProtocol {
+  tx (tx: Tx): Promise<any>
+}
+
+export class TxProcessor {
+  private indices: DomainIndex[]
+
+  constructor (indices: DomainIndex[]) {
+    this.indices = indices
+  }
+
+  process (ctx: TxContext, tx: Tx): Promise<any> {
+    return Promise.all(this.indices.map(index => index.tx(ctx, tx)))
+  }
+}
+
+///
+
+function toHex (value: number, chars: number): string {
+  const result = value.toString(16)
+  if (result.length < chars) {
+    return '0'.repeat(chars - result.length) + result
+  }
+  return result
+}
+
+let counter = Math.random() * (1 << 24) | 0
+const random = toHex(Math.random() * (1 << 24) | 0, 6) + toHex(Math.random() * (1 << 16) | 0, 4)
+
+function timestamp (): string {
+  const time = (Date.now() / 1000) | 0
+  return toHex(time, 8)
+}
+
+function count (): string {
+  const val = counter++ & 0xffffff
+  return toHex(val, 6)
+}
+
+export function generateId (): Ref<Doc> {
+  return timestamp() + random + count() as Ref<Doc>
+}

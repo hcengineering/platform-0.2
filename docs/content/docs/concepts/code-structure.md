@@ -18,16 +18,14 @@ File Dependencies:
 graph BT
     platform/index --> foundation/index
     core/domains --> core/classes
-    core/objectid --> core/classes
     core/rpc --> foundation/index
     core/tx --> core/classes
-    core/model --> core/classes & core/tx & core/objectid
+    core/model --> core/classes & core/tx
     core/textmodel
-    core/utils --> core/classes & core/tx
     core/indices/model --> core/classes & core/tx & core/model
     core/indices/vdoc --> core/tx & core/model
-    core/indices/text --> core/classes & core/tx & core/objectid & core/model & core/domains
-    core/indices/title --> core/classes & core/tx & core/objectid & core/model & core/domains
+    core/indices/text --> core/classes & core/tx &  core/model & core/domains
+    core/indices/title --> core/classes & core/tx & core/model & core/domains
 
 {{< /mermaid >}}
 

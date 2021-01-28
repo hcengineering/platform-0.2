@@ -15,9 +15,8 @@
 
 import { Ref, Class, Doc, Obj, ArrayOf, InstanceOf, Emb, AnyLayout } from '../classes'
 import core from '../index'
-import { CreateTx, DomainIndex, Storage, Tx, TxContext } from '../tx'
+import { CreateTx, DomainIndex, Storage, Tx, TxContext, generateId } from '../tx'
 import { Model } from '../model'
-import { generateId } from '../objectid'
 import { Backlink, Backlinks } from '../domains'
 
 import { MessageMarkType, MessageNode, parseMessage, ReferenceMark, traverseMarks, traverseMessage } from '../textmodel'
