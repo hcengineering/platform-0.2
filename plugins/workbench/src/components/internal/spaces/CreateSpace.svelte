@@ -13,16 +13,10 @@
 // limitations under the License.
 -->
 <script lang='ts'>
-  import { Space, generateId, SpaceUser } from '@anticrm/core'
-  import core from '@anticrm/core'
+  import core, { Property, StringProperty } from '@anticrm/core'
   import { createEventDispatcher } from 'svelte'
-  import presentation from '@anticrm/presentation'
-  import { getPresentationService, getComponentExtension, _getCoreService } from '../../../utils'
   import { AttrModel, ClassModel } from '@anticrm/presentation'
-  import AttributeEditor from '@anticrm/presentation/src/components/AttributeEditor.svelte'
-  import Properties from '@anticrm/presentation/src/components/internal/Properties.svelte'
-  import { getSpaceName } from './utils'
-  import { AnyLayout, Property, StringProperty } from '@anticrm/model'
+  import { _getCoreService, getPresentationService } from '../../../utils'
   import CheckBox from '@anticrm/sparkling-controls/src/CheckBox.svelte'
   import EditBox from '@anticrm/sparkling-controls/src/EditBox.svelte'
 
@@ -166,16 +160,16 @@
   <div class='content'>
     <form class='form'>
       <div class='input-container'>
-        <label class='input-label' for='input__name'>
+        <label class='input-label' for='create_space__input__name'>
           Name
         </label>
-        <EditBox bind:value={title} />
+        <EditBox id='create_space__input__name' bind:value={title} />
       </div>
       <div class='input-container'>
-        <label class='input-label' for='input__description'>
+        <label class='input-label' for='create_space__input__description'>
           Description <span>(optional)</span>
         </label>
-        <EditBox bind:value={description} />
+        <EditBox id='create_space__input__description' bind:value={description} />
       </div>
       <CheckBox bind:checked={makePrivate} right='true'>
         <div class='checkbox-label'>

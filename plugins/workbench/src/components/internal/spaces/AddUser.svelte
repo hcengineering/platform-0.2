@@ -16,7 +16,7 @@
   import core, { Space } from '@anticrm/core'
   import { createEventDispatcher, onDestroy } from 'svelte'
   import { _getCoreService, getPresentationService } from '../../../utils'
-  import { Doc, Property, Ref, StringProperty } from '@anticrm/model'
+  import { Doc, Property, Ref, StringProperty } from '@anticrm/core'
 
   import IconButton from '@anticrm/platform-ui/src/components/IconButton.svelte'
   import workbench from '@anticrm/workbench'
@@ -48,83 +48,84 @@
   .add-user-space-view {
     padding: 1em 1.5em;
     position: relative;
-  }
 
-  .header {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 1.5em;
 
-    .actions {
+    .header {
       display: flex;
-      flex-grow: 1;
-      flex-direction: row-reverse;
-      font-size: 10px;
+      justify-content: space-between;
+      margin-bottom: 1.5em;
 
-      button {
-        margin-left: 0.5em;
+      .actions {
+        display: flex;
+        flex-grow: 1;
+        flex-direction: row-reverse;
+        font-size: 10px;
+
+        button {
+          margin-left: 0.5em;
+        }
       }
     }
-  }
 
-  .attributes {
-    display: flex;
-    flex-wrap: wrap;
-    margin-top: 1em;
-  }
+    .attributes {
+      display: flex;
+      flex-wrap: wrap;
+      margin-top: 1em;
+    }
 
-  .separator {
-    width: 1em;
-  }
+    .separator {
+      width: 1em;
+    }
 
-  .space-kind {
-    width: 1em;
-    text-align: right;
-  }
+    .space-kind {
+      width: 1em;
+      text-align: right;
+    }
 
-  .space-caption-1 {
-    display: flex;
-  }
+    .space-caption-1 {
+      display: flex;
+    }
 
-  .content {
-    display: flex;
-    flex-direction: column;
+    .content {
+      display: flex;
+      flex-direction: column;
 
-    .form {
-      .input-container {
-        display: flex;
-        flex-direction: column;
-        margin-bottom: 1em;
+      .form {
+        .input-container {
+          display: flex;
+          flex-direction: column;
+          margin-bottom: 1em;
 
-        .input-label {
-          font-weight: 500;
-          margin-bottom: 0.25em;
-          color: var(--theme-content-color);
+          .input-label {
+            font-weight: 500;
+            margin-bottom: 0.25em;
+            color: var(--theme-content-color);
 
-          & > span {
-            color: var(--theme-content-trans-color);
-            font-size: 11px;
-            font-weight: normal;
+            & > span {
+              color: var(--theme-content-trans-color);
+              font-size: 11px;
+              font-weight: normal;
+            }
           }
         }
-      }
 
-      .checkbox-label {
-        font-weight: 500;
+        .checkbox-label {
+          font-weight: 500;
 
-        & > span {
-          display: block;
-          font-size: 11px;
-          font-weight: normal;
-          max-width: 20em;
+          & > span {
+            display: block;
+            font-size: 11px;
+            font-weight: normal;
+            max-width: 20em;
+          }
         }
-      }
 
-      .buttons {
-        margin-top: 1.5em;
-        width: 100%;
-        display: flex;
-        flex-direction: row-reverse;
+        .buttons {
+          margin-top: 1.5em;
+          width: 100%;
+          display: flex;
+          flex-direction: row-reverse;
+        }
       }
     }
   }
@@ -144,7 +145,7 @@
         <label class='input-label' for='input__name'>
           User Name
         </label>
-        <EditBox bind:value={userName} />
+        <EditBox id='input__name' bind:value={userName} />
         <!-- <input type='text' class='editbox input__name' id='input__name' bind:value={userName}> -->
       </div>
       <CheckBox bind:checked={isOwner} right='true'>

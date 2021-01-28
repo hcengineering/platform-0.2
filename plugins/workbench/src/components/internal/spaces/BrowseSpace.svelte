@@ -16,33 +16,34 @@
   import { Space, SpaceUser } from '@anticrm/core'
   import core from '@anticrm/core'
   import { createEventDispatcher } from 'svelte'
-  import { getPresentationService, _getCoreService, getCoreService } from '../../../utils'
+  import { getPresentationService, _getCoreService, getCoreService, getUIService } from '../../../utils'
   import { getSpaceName, getCurrentUserSpace } from './utils'
   import { onDestroy } from 'svelte'
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
-  import { Doc, Property, Ref, StringProperty } from '@anticrm/model'
+  import { Doc, Property, Ref, StringProperty } from '@anticrm/core'
 
   import { leaveSpace, joinSpace, archivedSpaceUpdate } from './utils'
 
+  import CreateSpace from './CreateSpace.svelte'
+
   const dispatch = createEventDispatcher()
-  let spaceUnsubscribe: () => void | undefined
+
+  const uiService = getUIService()
+
   let spaces: Space[ ] = []
   let filter: string
   let hoverSpace: Ref<Doc>
 
   const coreService = _getCoreService()
-  const curentUser = coreService.getUserId()
-  const qr = coreService.query(core.class.Space, {})
+  const presentationService = getPresentationService()
 
-  spaceUnsubscribe = qr.subscribe((docs) => {
+  const curentUser = coreService.getUserId()
+  coreService.subscribe(core.class.Space, {}, (docs) => {
     console.log('spaces:', docs)
     spaces = docs
-  })
+  }, onDestroy)
 
-  const presentationService = getPresentationService()
-  onDestroy(() => {
-    if (spaceUnsubscribe) spaceUnsubscribe()
-  })
+
 </script>
 
 <div class='space-browse-view'>
@@ -51,7 +52,10 @@
     <div class='actions'>
       <button class='button' on:click={() => dispatch('close')}>Cancel</button>
       <div class='separator' />
-      <button class='button' on:click={() => dispatch('create')}>Create space</button>
+      <button class='button' on:click={() => {
+        uiService.showModal(CreateSpace, {})
+      }}>Create space
+      </button>
     </div>
   </div>
 
