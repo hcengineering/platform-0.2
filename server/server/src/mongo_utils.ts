@@ -13,7 +13,8 @@
 // limitations under the License.
 //
 
-import core, { AnyLayout, ArrayOf, Class, Doc, Emb, InstanceOf, Obj, Ref, StringProperty, Type, Model } from '@anticrm/core'
+import { AnyLayout, ArrayOf, Class, Doc, Emb, InstanceOf, Obj, Ref, StringProperty, Type, Model } from '@anticrm/core'
+import core from '@anticrm/model'
 
 // Some various mongo db utils.
 

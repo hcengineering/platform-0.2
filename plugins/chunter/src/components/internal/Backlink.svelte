@@ -13,7 +13,7 @@
 // limitations under the License.
 -->
 <script lang='ts'>
-  import { Backlink } from '@anticrm/core'
+  import { Backlink } from '@anticrm/domains'
   import { getCoreService } from '@anticrm/platform-ui'
   import { Message } from '../..'
   import { onDestroy } from 'svelte'

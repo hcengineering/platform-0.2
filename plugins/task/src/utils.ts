@@ -13,7 +13,8 @@
 // limitations under the License.
 //
 
-import { Ref, Class, Doc, AnyLayout, Mixin, Obj, VDoc } from '@anticrm/core'
+import { Ref, Class, Doc, AnyLayout, Mixin, Obj } from '@anticrm/core'
+import type { VDoc } from '@anticrm/domains'
 import { Platform } from '@anticrm/platform'
 import { getContext } from 'svelte'
 import core, { CoreService, QueryResult } from '@anticrm/platform-core'

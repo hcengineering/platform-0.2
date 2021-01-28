@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { extendIds, Class$, Prop, Builder, Primary } from '@anticrm/model'
+import core, { extendIds, Class$, Prop, Builder, Primary } from '@anticrm/model'
 import _task, { Task } from '.'
 import { IntlString } from '@anticrm/platform-i18n'
 import { User } from '@anticrm/contact'
@@ -21,8 +21,9 @@ import { UX } from '@anticrm/presentation/src/__model__'
 import presentation from '@anticrm/presentation'
 import workbench from '@anticrm/workbench/src/__model__'
 import chunter from '@anticrm/chunter/src/__model__'
-import core, { Application, Ref, Property, StringProperty } from '@anticrm/core'
-import { TVDoc } from '@anticrm/core/src/__model__'
+import { Ref, Property, StringProperty } from '@anticrm/core'
+import { Application } from '@anticrm/domains'
+import { TVDoc } from '@anticrm/model/src/__model__'
 
 export const DOMAIN_TASK = 'task'
 

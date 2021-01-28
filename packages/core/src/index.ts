@@ -13,51 +13,6 @@
 // limitations under the License.
 //
 
-// Following imports does not used directly but required for `api-extractor` to work. Do not remove.
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type { Obj, Emb, Doc, Classifier, Attribute, Mixin, Type, ArrayOf, RefTo, InstanceOf, BagOf, Indices } from './classes'
-
-import model from '@anticrm/model'
-import { Class, Ref } from './classes'
-import { AnyPlugin, identify } from '@anticrm/platform'
-import { Backlinks, Application, VDoc, Space, SpaceUser, Title } from './domains'
-import { CreateTx, DeleteTx, PushTx, UpdateTx, Tx } from './tx'
-import { mergeWith } from 'lodash'
-
-type Namespace = Record<string, Record<string, any>>
-
-function mergeIds<D extends Namespace, N extends Namespace> (pluginId: AnyPlugin, a: D, b: N): D & N {
-  return mergeWith({}, a, identify(pluginId, b), (value) => {
-    if (typeof value === 'string') {
-      throw new Error('attempting to overwrite ' + value)
-    }
-  })
-}
-
-const core = mergeIds('core' as AnyPlugin, model, {
-  class: {
-    Tx: '' as Ref<Class<Tx>>,
-    CreateTx: '' as Ref<Class<CreateTx>>,
-    PushTx: '' as Ref<Class<PushTx>>,
-    UpdateTx: '' as Ref<Class<UpdateTx>>,
-    DeleteTx: '' as Ref<Class<DeleteTx>>,
-
-    Title: '' as Ref<Class<Title>>,
-
-    VDoc: '' as Ref<Class<VDoc>>,
-
-    Space: '' as Ref<Class<Space>>,
-    SpaceUser: '' as Ref<Class<SpaceUser>>,
-
-    Backlinks: '' as Ref<Class<Backlinks>>,
-
-    Application: '' as Ref<Class<Application>>
-  }
-})
-export default core
-
-export * from './rpc'
 export * from './classes'
 export * from './model'
-export * from './tx'
-export * from './domains'
+export * from './storage'

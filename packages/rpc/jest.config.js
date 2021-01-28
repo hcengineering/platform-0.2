@@ -1,4 +1,4 @@
-<!--
+//
 // Copyright © 2020 Anticrm Platform Contributors.
 // 
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
@@ -11,16 +11,16 @@
 // 
 // See the License for the specific language governing permissions and
 // limitations under the License.
--->
-<script lang="ts">
-  import { CreateTx, Space, CORE_CLASS_CREATE_TX } from '@anticrm/domains'
-  import { Tx } from '@anticrm/core'
+//
 
-  export let tx: Tx
+// For a detailed explanation regarding each configuration property, visit:
+// https://jestjs.io/docs/en/configuration.html
 
-  function spaceName() {
-    return (((tx as CreateTx).object as unknown) as Space).name
-  }
-</script>
-
-{#if tx._class === CORE_CLASS_CREATE_TX}Создал пространство <b>{spaceName()}</b>{/if}
+module.exports = {
+  coverageDirectory: 'coverage',
+  testEnvironment: 'node',
+  roots: [
+    '<rootDir>/src'
+  ],
+  testMatch: ['**/?(*.)+(spec|test).[jt]s?(x)']
+}

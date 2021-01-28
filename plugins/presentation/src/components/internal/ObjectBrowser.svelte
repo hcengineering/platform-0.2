@@ -13,9 +13,9 @@
 // limitations under the License.
 -->
 <script type="ts">
-  import { Application } from '@anticrm/core'
+  import { Application } from '@anticrm/domains'
 
-  import { Ref, Class, Doc } from '@anticrm/model'
+  import { Ref, Class, Doc } from '@anticrm/core'
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
   import Table from './Table.svelte'
 

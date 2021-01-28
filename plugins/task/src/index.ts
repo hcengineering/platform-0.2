@@ -14,7 +14,8 @@
 //
 
 import { plugin, Plugin, Service } from '@anticrm/platform'
-import { StringProperty, Class, Ref, VDoc } from '@anticrm/core'
+import { StringProperty, Class, Ref } from '@anticrm/core'
+import type { VDoc } from '@anticrm/domains'
 
 import { User } from '@anticrm/contact'
 import { AnyComponent, Asset } from '@anticrm/platform-ui'

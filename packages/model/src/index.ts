@@ -13,11 +13,46 @@
 // limitations under the License.
 //
 
+// following line is only to make api-documenter happy.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { Space, DeleteTx, PushTx, UpdateTx, CreateTx } from '@anticrm/domains'
+
 import { AnyPlugin, identify } from '@anticrm/platform'
-import { ArrayOf, Attribute, BagOf, Class, Classifier, Doc, Emb, Indices, InstanceOf, Mixin, Obj, Ref, RefTo, Type } from '@anticrm/core'
+import {
+  ArrayOf,
+  Attribute,
+  BagOf,
+  Class,
+  Classifier,
+  Doc,
+  Emb,
+  Indices,
+  InstanceOf,
+  Mixin,
+  Obj,
+  Ref,
+  RefTo,
+  Type,
+  Tx,
+  CORE_CLASS_STRING
+} from '@anticrm/core'
+
+import {
+  Backlinks,
+  Application,
+  VDoc,
+  SpaceUser,
+  Title,
+  CORE_CLASS_SPACE,
+  CORE_CLASS_DELETE_TX,
+  CORE_CLASS_PUSH_TX,
+  CORE_CLASS_UPDATE_TX,
+  CORE_CLASS_CREATE_TX
+} from '@anticrm/domains'
+
 import Builder from './builder'
 
-const modelIds = identify('model' as AnyPlugin, {
+const modelIds = identify('core' as AnyPlugin, {
   class: {
     Obj: '' as Ref<Class<Obj>>,
     Emb: '' as Ref<Class<Emb>>,
@@ -31,13 +66,31 @@ const modelIds = identify('model' as AnyPlugin, {
 
     // Data types
     Type: '' as Ref<Class<Type>>,
-    String: '' as Ref<Class<Type>>,
+    String: CORE_CLASS_STRING,
     Number: '' as Ref<Class<Type>>,
     Boolean: '' as Ref<Class<Type>>,
     ArrayOf: '' as Ref<Class<ArrayOf>>,
     RefTo: '' as Ref<Class<RefTo<Doc>>>,
     BagOf: '' as Ref<Class<BagOf>>,
-    InstanceOf: '' as Ref<Class<InstanceOf<Type>>>
+    InstanceOf: '' as Ref<Class<InstanceOf<Type>>>,
+
+    Tx: '' as Ref<Class<Tx>>,
+    CreateTx: CORE_CLASS_CREATE_TX,
+    PushTx: CORE_CLASS_PUSH_TX,
+    UpdateTx: CORE_CLASS_UPDATE_TX,
+    DeleteTx: CORE_CLASS_DELETE_TX,
+
+    Title: '' as Ref<Class<Title>>,
+
+    VDoc: '' as Ref<Class<VDoc>>,
+
+    Space: CORE_CLASS_SPACE,
+    SpaceUser: '' as Ref<Class<SpaceUser>>,
+
+    Backlinks: '' as Ref<Class<Backlinks>>,
+
+    Application: '' as Ref<Class<Application>>
+
   },
   mixin: {
     Indices: '' as Ref<Mixin<Indices>>

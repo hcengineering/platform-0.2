@@ -107,3 +107,12 @@ export interface Indices extends Class<Doc> {
 export interface AnyLayout {
   [key: string]: PropertyType
 }
+
+///
+
+export const CORE_CLASS_STRING = 'class:core.String' as Ref<Class<Type>>
+
+export const CORE_CLASS_ARRAY_OF = 'class:core.ArrayOf' as Ref<Class<ArrayOf>>
+export const CORE_CLASS_INSTANCE_OF = 'class:core.InstanceOf' as Ref<Class<InstanceOf<Emb>>>
+
+export const CORE_MIXIN_INDICES = 'mixin:core.Indices' as Ref<Mixin<Indices>>

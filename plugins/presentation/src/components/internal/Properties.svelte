@@ -13,7 +13,7 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { Ref, Class, Obj } from '@anticrm/model'
+  import { Ref, Class, Obj } from '@anticrm/core'
   import { ClassModel } from '../..'
   import AttributeEditor from '../AttributeEditor.svelte'
 

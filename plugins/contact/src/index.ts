@@ -14,7 +14,8 @@
 //
 
 import { plugin, Plugin, Service } from '@anticrm/platform'
-import { Mixin, Property, Ref, VDoc } from '@anticrm/core'
+import { Mixin, Property, Ref } from '@anticrm/core'
+import { VDoc } from '@anticrm/domains'
 
 import ui, { Asset, AnyComponent, getPlatform } from '@anticrm/platform-ui'
 import core from '@anticrm/platform-core'

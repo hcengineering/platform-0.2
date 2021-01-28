@@ -13,9 +13,8 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { Tx } from '@anticrm/model'
-  import { CreateTx } from '@anticrm/core'
-  import core from '@anticrm/core'
+  import { Tx } from '@anticrm/core'
+  import { CreateTx, CORE_CLASS_CREATE_TX } from '@anticrm/domains'
   import { Task } from '../..'
 
   export let tx: Tx
@@ -25,4 +24,4 @@
   }
 </script>
 
-{#if tx._class === core.class.CreateTx}Создал задачу <b>{taskTitle()}</b>{/if}
+{#if tx._class === CORE_CLASS_CREATE_TX}Создал задачу <b>{taskTitle()}</b>{/if}

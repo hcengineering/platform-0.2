@@ -13,14 +13,14 @@
 // limitations under the License.
 -->
 <script type="ts">
-  import { Class, Obj, Ref } from '@anticrm/model'
+  import { Class, Obj, Ref } from '@anticrm/core'
   import { Page } from '../..'
-  import core from '@anticrm/core'
   import { AttrModel, ClassModel, getPresentationService } from '@anticrm/presentation'
 
   import Properties from '@anticrm/presentation/src/components/internal/Properties.svelte'
   import AttributeEditor from '@anticrm/presentation/src/components/AttributeEditor.svelte'
   import Comments from './Comments.svelte'
+  import { CORE_CLASS_VDOC } from '@anticrm/domains'
 
   export let _class: Ref<Class<Obj>>
   export let object: Page
@@ -29,7 +29,7 @@
   let title: AttrModel | undefined
 
   $: getPresentationService()
-    .then((service) => service.getClassModel(_class, core.class.VDoc))
+    .then((service) => service.getClassModel(_class, CORE_CLASS_VDOC))
     .then((m) => {
       title = m.getAttribute('title')
       model = m.filterAttributes(['title'])
