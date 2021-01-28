@@ -5,3 +5,4 @@ platform:
   - "@anticrm/core"
   - "@anticrm/domains"
   - "@anticrm/text"
+  - "@anticrm/rpc"
