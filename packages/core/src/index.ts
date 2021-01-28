@@ -17,11 +17,11 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { Obj, Emb, Doc, Classifier, Attribute, Mixin, Type, ArrayOf, RefTo, InstanceOf, BagOf, Indices } from '@anticrm/model'
 
-import model, { Class, Ref, Tx } from '@anticrm/model'
+import model, { Class, Ref } from '@anticrm/model'
 import { AnyPlugin, identify } from '@anticrm/platform'
 import { Backlinks } from './text'
 import { Title } from './title'
-import { CreateTx, DeleteTx, PushTx, UpdateTx } from './tx'
+import { CreateTx, DeleteTx, PushTx, UpdateTx, Tx } from './tx'
 import { Application, VDoc } from './vdoc'
 import { Space, SpaceUser } from './space'
 import { mergeWith } from 'lodash'

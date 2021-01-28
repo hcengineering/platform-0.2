@@ -13,9 +13,9 @@
 // limitations under the License.
 //
 
-import { Doc, Ref, Classifier, Tx, DomainIndex, Storage, TxContext } from '@anticrm/model'
+import { Doc, Ref, Classifier } from '@anticrm/model'
 import { Model } from '@anticrm/model/src/model'
-import { CreateTx, UpdateTx } from './tx'
+import { CreateTx, UpdateTx, Tx, DomainIndex, Storage, TxContext } from './tx'
 import { generateId } from './objectid'
 import core from '.'
 

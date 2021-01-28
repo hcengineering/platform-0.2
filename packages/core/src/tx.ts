@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Anticrm Platform Contributors.
+// Copyright © 2020, 2021 Anticrm Platform Contributors.
 //
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
@@ -13,8 +13,54 @@
 // limitations under the License.
 //
 
-import { Doc, StringProperty, Ref, Class, Tx, TxContext, DomainIndex, Storage, AnyLayout, Model, MODEL_DOMAIN } from '@anticrm/model'
+import { Doc, StringProperty, Ref, Class, AnyLayout, Model, MODEL_DOMAIN, DateProperty } from '@anticrm/model'
 import core from '.'
+
+/**
+ * Transaction operation being processed.
+ */
+export interface Tx extends Doc {
+  _date: DateProperty
+  _user: StringProperty
+}
+
+/**
+ * Operation direction, is it came from server or it is own operation.
+ */
+export enum TxContextSource {
+  Client, Server
+}
+
+/**
+ * Define a transaction processing context.
+ */
+export interface TxContext {
+  // Define a network operations if required.
+  network: Promise<void>
+  // Define transaction source
+  source: TxContextSource
+}
+
+/**
+ * Return a complete TxContext
+ */
+export function txContext (source: TxContextSource = TxContextSource.Client, network: Promise<void> = Promise.resolve()): TxContext {
+  return { network, source } as TxContext
+}
+
+export interface DomainIndex {
+  tx (ctx: TxContext, tx: Tx): Promise<any>
+}
+
+export interface Storage {
+  store (ctx: TxContext, doc: Doc): Promise<void>
+  push (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, query: AnyLayout | null, attribute: StringProperty, attributes: AnyLayout): Promise<void>
+  update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, query: AnyLayout | null, attributes: AnyLayout): Promise<void>
+  remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, query: AnyLayout | null): Promise<void>
+
+  find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]>
+  findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined>
+}
 
 export const TX_DOMAIN = 'tx'
 

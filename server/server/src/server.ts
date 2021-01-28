@@ -20,7 +20,7 @@ import WebSocket, { Server } from 'ws'
 import { decode } from 'jwt-simple'
 import { ClientControl, createClientService } from './service'
 import { connectWorkspace, WorkspaceProtocol } from './workspace'
-import { Tx } from '@anticrm/model'
+import { Tx } from '@anticrm/core'
 
 export interface Client {
   email: string

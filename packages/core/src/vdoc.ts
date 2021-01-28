@@ -13,8 +13,8 @@
 // limitations under the License.
 //
 
-import { DateProperty, Doc, Emb, DomainIndex, Ref, Storage, StringProperty, Tx, TxContext, Model } from '@anticrm/model'
-import { CreateTx, PushTx, UpdateTx } from './tx'
+import { DateProperty, Doc, Emb, Ref, StringProperty, Model } from '@anticrm/model'
+import { CreateTx, PushTx, UpdateTx, Storage, DomainIndex, Tx, TxContext } from './tx'
 import { Space } from './space'
 import core from '.'
 
