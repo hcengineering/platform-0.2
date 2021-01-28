@@ -19,7 +19,7 @@
   import { _getCoreService, getPresentationService } from '../../../utils'
   import CheckBox from '@anticrm/sparkling-controls/src/CheckBox.svelte'
   import EditBox from '@anticrm/sparkling-controls/src/EditBox.svelte'
-
+  import EditIconBox from '@anticrm/platform-ui/src/components/EditBox.svelte'
   import IconButton from '@anticrm/platform-ui/src/components/IconButton.svelte'
   import workbench from '@anticrm/workbench'
 

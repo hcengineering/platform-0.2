@@ -4,6 +4,9 @@
   import { archivedSpaceUpdate, getCurrentUserSpace, getSpaceName, leaveSpace } from './utils'
   import { _getCoreService, getUIService } from '../../../utils'
   import SpaceOptions from './SpaceOptions.svelte'
+  import ToolbarButton from '@anticrm/sparkling-controls/src/toolbar/Button.svelte'
+  import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
+  import workbench from '../../..'
 
   export let link: string = '/'
   export let selected: boolean = false
@@ -24,23 +27,29 @@
   }
 </script>
 
-<div class='spaces-space-item'>
-  <LinkTo href={link}>
-    <div class='item' class:selected={selected}>
-      {getSpaceName(space)}
-      <div class='separator'></div>
-      {#if count > 0}
-        <div class='counter'>{count}</div>
-      {/if}
-      {#if selected}
-        <div bind:this={optionsButton} class='options' on:click|preventDefault={() => {
+<LinkTo href={link}>
+  <div class='item' class:selected={selected}>
+    {getSpaceName(space)}
+    <div class="separator"></div>
+    {#if count > 0}
+      <div class='counter'>{count}</div>
+    {/if}
+    {#if selected}
+      <div bind:this={optionsButton}>
+        <ToolbarButton style="padding:0; width:16px; height:16px"
+          on:click={() => {
+            uiService.showModal(SpaceOptions, {space}, optionsButton)
+          }}>
+          <Icon icon={workbench.icon.Burger} clazz="icon-embed" />
+        </ToolbarButton>
+      </div>
+      <!-- <div bind:this={optionsButton} class='options' on:click|preventDefault={() => {
             uiService.showModal(SpaceOptions, {space}, optionsButton)
           }}>︙
-        </div>
-      {/if}
-    </div>
-  </LinkTo>
-</div>
+      </div> -->
+    {/if}
+  </div>
+</LinkTo>
 
 <style lang='scss'>
   .spaces-space-item {
