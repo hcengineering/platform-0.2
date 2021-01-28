@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Anticrm Platform Contributors.
+// Copyright © 2020, 2021 Anticrm Platform Contributors.
 //
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
@@ -13,7 +13,8 @@
 // limitations under the License.
 //
 
-import { Ref, Class, Doc, AnyLayout, Mixin, Obj, VDoc } from '@anticrm/core'
+import { Ref, Class, Doc, AnyLayout, Mixin, Obj } from '@anticrm/core'
+import { VDoc } from '@anticrm/domains'
 import { Platform } from '@anticrm/platform'
 import { getContext } from 'svelte'
 import core, { CoreService } from '@anticrm/platform-core'

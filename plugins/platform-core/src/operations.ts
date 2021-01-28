@@ -13,7 +13,8 @@
 // limitations under the License.
 //
 
-import { generateId, VDoc, Tx, Ref, StringProperty, AnyLayout, Class, DateProperty, Doc, Model, CORE_CLASS_VDOC } from '@anticrm/core'
+import { generateId, Tx, Ref, StringProperty, AnyLayout, Class, DateProperty, Doc, Model } from '@anticrm/core'
+import { VDoc, CORE_CLASS_VDOC } from '@anticrm/domains'
 import { OperationProtocol } from '.'
 import { newCreateTx, newDeleteTx, newPushTx, newUpdateTx } from './tx'
 

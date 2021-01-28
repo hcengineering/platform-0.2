@@ -18,7 +18,8 @@ import { WorkspaceProtocol } from './workspace'
 
 import { filterQuery, getUserSpaces, isAcceptable, processTx as processSpaceTx } from './spaces'
 import { Broadcaster, Client, ClientService, ClientSocket } from './server'
-import { Tx, SpaceUser, AnyLayout, Class, Doc, Model, Ref, CORE_CLASS_SPACE, CORE_CLASS_CREATE_TX } from '@anticrm/core'
+import { Tx, AnyLayout, Class, Doc, Model, Ref } from '@anticrm/core'
+import { SpaceUser, CORE_CLASS_SPACE, CORE_CLASS_CREATE_TX } from '@anticrm/domains'
 
 export interface ClientControl {
   ping (): Promise<void>

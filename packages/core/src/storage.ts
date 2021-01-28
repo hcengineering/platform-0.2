@@ -1,36 +1,8 @@
-//
-// Copyright © 2020, 2021 Anticrm Platform Contributors.
-//
-// Licensed under the Eclipse Public License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License. You may
-// obtain a copy of the License at https://www.eclipse.org/legal/epl-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
-
-import { Doc, StringProperty, Ref, Class, AnyLayout, DateProperty } from './classes'
-
-export const CORE_CLASS_CREATE_TX = 'class:core.CreateTx' as Ref<Class<CreateTx>>
-export const CORE_CLASS_UPDATE_TX = 'class:core.UpdateTx' as Ref<Class<UpdateTx>>
-export const CORE_CLASS_DELETE_TX = 'class:core.DeleteTx' as Ref<Class<DeleteTx>>
-export const CORE_CLASS_PUSH_TX = 'class:core.PushTx' as Ref<Class<PushTx>>
-
-/**
- * Transaction operation being processed.
- */
-export interface Tx extends Doc {
-  _date: DateProperty
-  _user: StringProperty
-}
-
 /**
  * Operation direction, is it came from server or it is own operation.
  */
+import { AnyLayout, Class, DateProperty, Doc, Ref, StringProperty } from './classes'
+
 export enum TxContextSource {
   Client, Server
 }
@@ -52,10 +24,6 @@ export function txContext (source: TxContextSource = TxContextSource.Client, net
   return { network, source } as TxContext
 }
 
-export interface DomainIndex {
-  tx (ctx: TxContext, tx: Tx): Promise<any>
-}
-
 export interface Storage {
   store (ctx: TxContext, doc: Doc): Promise<void>
   push (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, query: AnyLayout | null, attribute: StringProperty, attributes: AnyLayout): Promise<void>
@@ -66,41 +34,18 @@ export interface Storage {
   findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined>
 }
 
-export const TX_DOMAIN = 'tx'
+///
 
-export interface ObjectTx extends Tx {
-  _objectId: Ref<Doc>
-  _objectClass: Ref<Class<Doc>>
-}
-export interface CreateTx extends ObjectTx {
-  object: AnyLayout
-}
-
-export interface PushTx extends ObjectTx {
-  _attribute: StringProperty
-  _attributes: AnyLayout
-  _query?: AnyLayout
+/**
+ * Transaction operation being processed.
+ */
+export interface Tx extends Doc {
+  _date: DateProperty
+  _user: StringProperty
 }
 
-export interface UpdateTx extends ObjectTx {
-  _attributes: AnyLayout
-  _query?: AnyLayout
-}
-
-export interface DeleteTx extends ObjectTx {
-  _query?: unknown
-}
-
-export class TxIndex implements DomainIndex {
-  private storage: Storage
-
-  constructor (storage: Storage) {
-    this.storage = storage
-  }
-
-  tx (ctx: TxContext, tx: Tx): Promise<any> {
-    return this.storage.store(ctx, tx)
-  }
+export interface DomainIndex {
+  tx (ctx: TxContext, tx: Tx): Promise<any>
 }
 
 ///

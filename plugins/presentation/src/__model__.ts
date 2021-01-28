@@ -16,7 +16,8 @@
 import core, { Builder, getClassifier, Class$, Prop, Mixin$, ArrayOf$, InstanceOf$ } from '@anticrm/model'
 import { TEmb, TMixin } from '@anticrm/model/src/__model__'
 
-import { VDoc, Doc, Obj, Type, mixinKey } from '@anticrm/core'
+import { Doc, Obj, Type, mixinKey } from '@anticrm/core'
+import { VDoc } from '@anticrm/domains'
 import { IntlString } from '@anticrm/platform-i18n'
 import { AnyComponent, Asset } from '@anticrm/platform-ui'
 import ui, { UXAttribute, Presenter, UXObject, ComponentExtension } from '.'

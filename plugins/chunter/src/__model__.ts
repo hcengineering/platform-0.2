@@ -23,7 +23,8 @@ import { IntlString } from '@anticrm/platform-i18n'
 import presentation, { ComponentExtension } from '@anticrm/presentation'
 
 import { TEmb, TMixin, TVDoc } from '@anticrm/model/src/__model__'
-import { Application, VDoc, Ref, Class, Property } from '@anticrm/core'
+import { Ref, Class, Property } from '@anticrm/core'
+import { Application, VDoc } from '@anticrm/domains'
 
 export enum ChunterDomain {
   Chunter = 'chunter'

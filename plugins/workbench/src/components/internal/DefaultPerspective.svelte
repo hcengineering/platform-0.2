@@ -16,7 +16,7 @@
   import { Ref, Doc, Class } from '@anticrm/core'
   import { onDestroy } from 'svelte'
   import { find, getCoreService, getUIService, _getCoreService } from '../../utils'
-  import { Space, VDoc, CORE_CLASS_SPACE } from '@anticrm/core'
+  import { Space, VDoc, CORE_CLASS_SPACE } from '@anticrm/domains'
   import ui from '@anticrm/platform-ui'
   import workbench, { WorkbenchApplication } from '../..'
 

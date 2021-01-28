@@ -13,10 +13,8 @@
 // limitations under the License.
 //
 
-import { Doc, Ref, Classifier } from '../classes'
-import { Model } from '../model'
-import { CreateTx, UpdateTx, Tx, DomainIndex, Storage, TxContext, generateId, CORE_CLASS_CREATE_TX, CORE_CLASS_UPDATE_TX, CORE_CLASS_PUSH_TX } from '../tx'
-import { CORE_CLASS_TITLE, Title } from '../domains'
+import { Doc, Ref, Classifier, Model, Tx, DomainIndex, Storage, TxContext, generateId } from '@anticrm/core'
+import { CreateTx, UpdateTx, CORE_CLASS_CREATE_TX, CORE_CLASS_UPDATE_TX, CORE_CLASS_PUSH_TX, CORE_CLASS_TITLE, Title } from '..'
 
 const NULL = '<null>'
 

@@ -23,11 +23,11 @@ import {
   Emb,
   AnyLayout,
   CORE_CLASS_STRING,
-  CORE_CLASS_ARRAY_OF, CORE_CLASS_INSTANCE_OF
-} from '../classes'
-import { CreateTx, DomainIndex, Storage, Tx, TxContext, generateId, CORE_CLASS_CREATE_TX } from '../tx'
-import { Model } from '../model'
-import { Backlink, Backlinks, CORE_CLASS_BACKLINKS } from '../domains'
+  CORE_CLASS_ARRAY_OF, CORE_CLASS_INSTANCE_OF,
+  DomainIndex, Storage, Tx, TxContext, generateId,
+  Model
+} from '@anticrm/core'
+import { Backlink, Backlinks, CORE_CLASS_BACKLINKS, CreateTx, CORE_CLASS_CREATE_TX } from '..'
 
 import { MessageMarkType, MessageNode, parseMessage, ReferenceMark, traverseMarks, traverseMessage } from '@anticrm/text'
 

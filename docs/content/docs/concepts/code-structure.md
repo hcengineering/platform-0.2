@@ -9,6 +9,7 @@ Here's the breakdown of the repo:
 * [@anticrm/foundation](/apis/foundation) -- Anticrm Platform Foundation Types.
 * [@anticrm/platform](/apis/platform) -- Plugin architecture and implementation. Client-side only.
 * [@anticrm/core](/apis/core) -- Core concepts shared by Client plugins and Server components.
+* [@anticrm/domains](/apis/domains) -- Indexers and Domains.
 * [@anticrm/text](/apis/text) -- Markdown related utilities.
 * [@anticrm/model](/apis/model) -- Utils to define and manage domain models. Used by tooling, not a part of client/server runtimes.
 

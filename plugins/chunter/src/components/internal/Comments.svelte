@@ -12,21 +12,20 @@
   // See the License for the specific language governing permissions and
   // limitations under the License.
   import { onDestroy } from 'svelte'
-  import { Ref, Class, Doc, Property, Emb, StringProperty } from '@anticrm/model'
-  import core from '@anticrm/core'
+  import { Ref, Class, Doc, Property, Emb, StringProperty } from '@anticrm/core'
   import chunter, { Collab, Comment } from '../..'
   import { getCoreService, getService } from '@anticrm/platform-ui'
 
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
   import CommentComponent from './Comment.svelte'
   import Backlink from './Backlink.svelte'
-  import { Backlinks } from '@anticrm/core'
+  import { Backlinks, CORE_CLASS_BACKLINKS } from '@anticrm/domains'
 
   export let object: Collab
 
   let backlinks: Backlinks[] = []
 
-  getCoreService().subscribe(core.class.Backlinks, { _objectId: object._id }, (docs) => {
+  getCoreService().subscribe(CORE_CLASS_BACKLINKS, { _objectId: object._id }, (docs) => {
     backlinks = docs
   }, onDestroy)
 

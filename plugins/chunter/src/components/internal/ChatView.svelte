@@ -12,7 +12,8 @@
   // See the License for the specific language governing permissions and
   // limitations under the License.
 
-  import { Space, Property, Ref, StringProperty, CORE_CLASS_SPACE } from '@anticrm/core'
+  import { Property, Ref, StringProperty } from '@anticrm/core'
+  import { Space, CORE_CLASS_SPACE } from '@anticrm/domains'
   import { MessageNode } from '@anticrm/text'
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'

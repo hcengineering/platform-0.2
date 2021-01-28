@@ -14,7 +14,8 @@
 //
 
 import { Platform } from '@anticrm/platform'
-import { Attribute, Class, Obj, Ref, Type, Doc, Mixin, VDoc } from '@anticrm/core'
+import { Attribute, Class, Obj, Ref, Type, Doc, Mixin } from '@anticrm/core'
+import { VDoc } from '@anticrm/domains'
 import ui, { AttrModel, ClassModel, GroupModel, PresentationService, ComponentExtension, UXObject } from '.'
 import { CoreService } from '@anticrm/platform-core'
 import vue, { AnyComponent, Asset } from '@anticrm/platform-ui'

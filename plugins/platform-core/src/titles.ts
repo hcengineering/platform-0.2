@@ -14,7 +14,6 @@
 //
 
 import {
-  Title,
   TxContext,
   Storage,
   Ref,
@@ -22,9 +21,9 @@ import {
   Doc,
   Class,
   AnyLayout,
-  StringProperty,
-  CORE_CLASS_TITLE
+  StringProperty
 } from '@anticrm/core'
+import { Title, CORE_CLASS_TITLE } from '@anticrm/domains'
 import { ModelDb } from './modeldb'
 
 export interface Node {

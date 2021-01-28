@@ -13,7 +13,8 @@
 // limitations under the License.
 //
 
-import { CreateTx, DeleteTx, PushTx, Space, SpaceUser, UpdateTx, Tx, AnyLayout, Class, Doc, Ref, StringProperty, CORE_CLASS_CREATE_TX, CORE_CLASS_UPDATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_PUSH_TX, CORE_CLASS_SPACE } from '@anticrm/core'
+import { Tx, AnyLayout, Class, Doc, Ref, StringProperty } from '@anticrm/core'
+import { CreateTx, DeleteTx, PushTx, Space, SpaceUser, UpdateTx, CORE_CLASS_CREATE_TX, CORE_CLASS_UPDATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_PUSH_TX, CORE_CLASS_SPACE } from '@anticrm/domains'
 import { Client } from './server'
 import { WorkspaceProtocol } from './workspace'
 

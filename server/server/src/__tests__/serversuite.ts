@@ -28,7 +28,8 @@ import { model as chunterPlugin } from '@anticrm/chunter/src/__model__'
 import { Person } from '@anticrm/contact'
 import { createClientService } from '../service'
 import { WorkspaceProtocol } from '../workspace'
-import { generateId, Request, Space, Doc, Ref, Property } from '@anticrm/core'
+import { generateId, Request, Doc, Ref, Property } from '@anticrm/core'
+import { Space } from '@anticrm/domains'
 
 // Import a special tasks model package for generoc testing.
 import { model as taskPlugin } from '@anticrm/model/src/__tests__/test_tasks'

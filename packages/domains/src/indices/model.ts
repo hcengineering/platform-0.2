@@ -13,20 +13,15 @@
 // limitations under the License.
 //
 
-import { Model, MODEL_DOMAIN } from '../model'
-import { AnyLayout } from '../classes'
+import { Model, MODEL_DOMAIN, AnyLayout, DomainIndex, Storage, Tx, TxContext } from '@anticrm/core'
 import {
   CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_PUSH_TX,
   CORE_CLASS_UPDATE_TX,
   CreateTx,
   DeleteTx,
-  DomainIndex,
   PushTx,
-  Storage,
-  Tx,
-  TxContext,
   UpdateTx
-} from '../tx'
+} from '..'
 
 /**
  * Perform model update and forward updates into chained storage if required.

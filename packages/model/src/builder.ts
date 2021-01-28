@@ -65,7 +65,7 @@ class Builder {
   add (...classes: { new(): Obj }[]): void {
     for (const ctor of classes) {
       const classifier = getClassifier(ctor.prototype)
-      console.log('classifier', classifier)
+      // console.log('classifier', classifier)
       this.memdb.add(classifier)
     }
   }

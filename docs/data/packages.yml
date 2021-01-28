@@ -3,4 +3,5 @@ platform:
   - "@anticrm/platform"
   - "@anticrm/model"
   - "@anticrm/core"
+  - "@anticrm/domains"
   - "@anticrm/text"

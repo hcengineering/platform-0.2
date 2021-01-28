@@ -14,7 +14,6 @@
 //
 
 import {
-  Backlinks,
   TxContext,
   Storage,
   Ref,
@@ -22,9 +21,10 @@ import {
   Doc,
   Class,
   AnyLayout,
-  StringProperty,
-  CORE_CLASS_BACKLINKS
+  StringProperty
 } from '@anticrm/core'
+
+import { Backlinks, CORE_CLASS_BACKLINKS } from '@anticrm/domains'
 
 interface Link {
   _class: Ref<Classifier<Doc>>

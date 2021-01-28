@@ -13,19 +13,8 @@
 // limitations under the License.
 //
 
-import { Model } from '../model'
-import {
-  CreateTx,
-  PushTx,
-  UpdateTx,
-  Storage,
-  DomainIndex,
-  Tx,
-  TxContext,
-  CORE_CLASS_CREATE_TX,
-  CORE_CLASS_UPDATE_TX, CORE_CLASS_PUSH_TX
-} from '../tx'
-import { CORE_CLASS_VDOC } from '../domains'
+import { Model, Storage, DomainIndex, Tx, TxContext } from '@anticrm/core'
+import { CreateTx, PushTx, UpdateTx, CORE_CLASS_CREATE_TX, CORE_CLASS_UPDATE_TX, CORE_CLASS_PUSH_TX, CORE_CLASS_VDOC } from '..'
 
 export class VDocIndex implements DomainIndex {
   private modelDb: Model

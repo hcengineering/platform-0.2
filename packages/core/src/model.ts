@@ -13,7 +13,6 @@
 // limitations under the License.
 //
 
-import { generateId } from '@anticrm/core'
 import {
   AnyLayout,
   Class,
@@ -32,7 +31,7 @@ import {
   CORE_CLASS_ARRAY_OF,
   CORE_CLASS_INSTANCE_OF
 } from './classes'
-import { Storage, TxContext } from './tx'
+import { Storage, TxContext, generateId } from './storage'
 
 export function mixinKey (mixin: Ref<Mixin<Doc>>, key: string): string {
   return key + '|' + mixin.replace('.', '~')

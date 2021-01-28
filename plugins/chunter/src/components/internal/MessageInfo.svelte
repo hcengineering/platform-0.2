@@ -12,7 +12,8 @@
   // See the License for the specific language governing permissions and
   // limitations under the License.
 
-  import { CreateTx, Tx, CORE_CLASS_CREATE_TX } from '@anticrm/core'
+  import { Tx } from '@anticrm/core'
+  import { CreateTx, CORE_CLASS_CREATE_TX } from '@anticrm/domains'
   import { parseMessage } from '@anticrm/text'
   import { Message } from '../..'
   import MessageViewer from '@anticrm/presentation/src/components/MessageViewer.svelte'

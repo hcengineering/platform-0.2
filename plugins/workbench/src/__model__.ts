@@ -14,7 +14,8 @@
 //
 
 import core, { Builder, extendIds, Class$, Prop } from '@anticrm/model'
-import { Space, VDoc, Ref, Class, MODEL_DOMAIN } from '@anticrm/core'
+import { Ref, Class, MODEL_DOMAIN } from '@anticrm/core'
+import { Space, VDoc } from '@anticrm/domains'
 import { IntlString } from '@anticrm/platform-i18n'
 
 import { TApplication } from '@anticrm/model/src/__model__'

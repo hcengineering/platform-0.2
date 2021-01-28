@@ -15,7 +15,7 @@
 
 // following line is only to make api-documenter happy.
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type { Space, DeleteTx, PushTx, UpdateTx, CreateTx } from '@anticrm/core'
+import type { Space, DeleteTx, PushTx, UpdateTx, CreateTx } from '@anticrm/domains'
 
 import { AnyPlugin, identify } from '@anticrm/platform'
 import {
@@ -33,19 +33,22 @@ import {
   Ref,
   RefTo,
   Type,
+  Tx,
+  CORE_CLASS_STRING
+} from '@anticrm/core'
+
+import {
   Backlinks,
   Application,
   VDoc,
   SpaceUser,
   Title,
-  Tx,
   CORE_CLASS_SPACE,
   CORE_CLASS_DELETE_TX,
   CORE_CLASS_PUSH_TX,
   CORE_CLASS_UPDATE_TX,
-  CORE_CLASS_CREATE_TX,
-  CORE_CLASS_STRING
-} from '@anticrm/core'
+  CORE_CLASS_CREATE_TX
+} from '@anticrm/domains'
 
 import Builder from './builder'
 

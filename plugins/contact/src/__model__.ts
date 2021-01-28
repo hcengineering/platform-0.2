@@ -14,7 +14,8 @@
 //
 
 import core, { extendIds, Builder, Class$, Mixin$, Prop } from '@anticrm/model'
-import { Space, Class, Ref, Property } from '@anticrm/core'
+import { Class, Ref, Property } from '@anticrm/core'
+import { Space } from '@anticrm/domains'
 import _contact, { Contact, Person, User } from '.'
 import { IntlString } from '@anticrm/platform-i18n'
 import { TVDoc } from '@anticrm/model/src/__model__'

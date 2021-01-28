@@ -35,16 +35,21 @@ import {
   AllAttributes,
   RefTo,
   MODEL_DOMAIN,
+  DateProperty,
+  Tx,
+  AnyLayout
+} from '@anticrm/core'
+
+import {
   SpaceUser,
   Space,
   VDoc,
-  DateProperty,
   Application,
   BACKLINKS_DOMAIN,
   Backlinks,
   Backlink,
-  TITLE_DOMAIN, Title, TX_DOMAIN, Tx, CreateTx, AnyLayout, PushTx, UpdateTx, DeleteTx
-} from '@anticrm/core'
+  TITLE_DOMAIN, Title, TX_DOMAIN, CreateTx, PushTx, UpdateTx, DeleteTx
+} from '@anticrm/domains'
 
 @Class$(core.class.Obj, core.class.Obj)
 export class TObj implements Obj {
