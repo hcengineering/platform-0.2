@@ -13,8 +13,8 @@
 // limitations under the License.
 //
 
-import { Ref, MODEL_DOMAIN, Class, Builder, extendIds, Class$, Prop } from '@anticrm/model'
-import core, { Space, VDoc } from '@anticrm/core'
+import { MODEL_DOMAIN, Builder, extendIds, Class$, Prop } from '@anticrm/model'
+import core, { Space, VDoc, Ref, Class } from '@anticrm/core'
 import { IntlString } from '@anticrm/platform-i18n'
 
 import { TApplication } from '@anticrm/core/src/__model__'
