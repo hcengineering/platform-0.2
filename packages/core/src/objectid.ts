@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Ref, Doc } from '@anticrm/model'
+import { Ref, Doc } from './classes'
 
 function toHex (value: number, chars: number): string {
   const result = value.toString(16)

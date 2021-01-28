@@ -14,7 +14,7 @@
 //
 
 import { Platform } from '@anticrm/platform'
-import { StringProperty, Ref } from '@anticrm/model'
+import { StringProperty, Ref } from '@anticrm/core'
 import contact, { User, ContactService } from '.'
 
 // import PersonProperties from './components/PersonProperties.vue'

@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Doc, Ref, Classifier } from '@anticrm/model'
+import { Doc, Ref, Classifier } from './classes'
 import { Model } from '@anticrm/model/src/model'
 import { CreateTx, UpdateTx, Tx, DomainIndex, Storage, TxContext } from './tx'
 import { generateId } from './objectid'

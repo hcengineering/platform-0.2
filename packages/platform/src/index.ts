@@ -36,7 +36,7 @@ export type Metadata<T> = Resource<T> & { __metadata: true }
 // P L U G I N S
 
 /** Base interface for a plugin service. */
-export type Service = Record<string, unknown>
+export interface Service {}
 
 /** Plugin identifier. */
 export type Plugin<S extends Service> = Resource<S>

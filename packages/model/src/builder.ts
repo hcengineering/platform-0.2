@@ -19,7 +19,7 @@ import { Resource } from '@anticrm/platform'
 import { getClassifier } from './dsl'
 import { CombineObjects, KeysByType } from 'simplytyped'
 import { Model, MODEL_DOMAIN } from '.'
-import { AllAttributes, Attribute, Class, ClassifierKind, Doc, EClass, Emb, Mixin, Obj, Ref, StringProperty } from './classes'
+import { AllAttributes, Attribute, Class, ClassifierKind, Doc, EClass, Emb, Mixin, Obj, Ref, StringProperty } from '@anticrm/core'
 import core from '.'
 
 type MethodType = (...args: any[]) => any

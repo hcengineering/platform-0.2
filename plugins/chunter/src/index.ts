@@ -15,8 +15,7 @@
 
 import { plugin, Plugin, Service } from '@anticrm/platform'
 import { Asset, AnyComponent, getPlatform } from '@anticrm/platform-ui'
-import { VDoc, MessageNode } from '@anticrm/core'
-import { DateProperty, StringProperty, Emb, Class, Ref, Mixin } from '@anticrm/model'
+import { DateProperty, StringProperty, Emb, Class, Ref, Mixin, VDoc, MessageNode } from '@anticrm/core'
 
 import core from '@anticrm/platform-core'
 import { ComponentExtension } from '@anticrm/presentation'

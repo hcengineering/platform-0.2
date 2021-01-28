@@ -14,16 +14,11 @@
 //
 
 import {
-  AnyLayout,
-  Class,
-  Doc,
   isValidQuery,
   Model,
-  MODEL_DOMAIN,
-  Ref,
-  StringProperty
+  MODEL_DOMAIN
 } from '@anticrm/model'
-import { CoreProtocol, ModelIndex, TextIndex, TitleIndex, TxIndex, TxProcessor, VDocIndex, Tx, txContext, TxContext, TxContextSource, Storage } from '@anticrm/core'
+import { CoreProtocol, ModelIndex, TextIndex, TitleIndex, TxIndex, TxProcessor, VDocIndex, Tx, txContext, TxContext, TxContextSource, Storage, Ref, StringProperty, AnyLayout, Class, Doc } from '@anticrm/core'
 import { Collection, MongoClient } from 'mongodb'
 import { withTenant } from '@anticrm/accounts'
 import { createPullArrayFilters, createPushArrayFilters, createSetArrayFilters } from './mongo_utils'

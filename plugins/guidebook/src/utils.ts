@@ -13,13 +13,12 @@
 // limitations under the License.
 //
 
-import { Ref, Class, Doc, AnyLayout, Mixin, Obj } from '@anticrm/model'
+import { Ref, Class, Doc, AnyLayout, Mixin, Obj, VDoc } from '@anticrm/core'
 import { Platform } from '@anticrm/platform'
 import { getContext } from 'svelte'
 import core, { CoreService } from '@anticrm/platform-core'
 import { UIService, CONTEXT_PLATFORM, CONTEXT_PLATFORM_UI, AnyComponent } from '@anticrm/platform-ui'
 import presentation, { PresentationService, ComponentExtension } from '@anticrm/presentation'
-import { VDoc } from '@anticrm/core'
 
 export function getUIService (): UIService {
   return getContext(CONTEXT_PLATFORM_UI) as UIService

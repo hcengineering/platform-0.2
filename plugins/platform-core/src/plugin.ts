@@ -15,12 +15,7 @@
 
 import { Platform } from '@anticrm/platform'
 import {
-  Ref,
-  Class,
-  Doc,
-  AnyLayout,
-  MODEL_DOMAIN,
-  StringProperty
+  MODEL_DOMAIN
 } from '@anticrm/model'
 import { ModelDb } from './modeldb'
 
@@ -35,6 +30,11 @@ import { Titles } from './titles'
 import { Graph } from './graph'
 import {
   Tx, txContext, TxContextSource,
+  Ref,
+  Class,
+  Doc,
+  AnyLayout,
+  StringProperty,
   BACKLINKS_DOMAIN, CoreProtocol, ModelIndex, TextIndex, TitleIndex, TITLE_DOMAIN, TxIndex, TxProcessor, VDocIndex,
   generateId as genId
 } from '@anticrm/core'

@@ -18,8 +18,7 @@ import { ServerSuite } from './serversuite'
 import chunter, { Page } from '@anticrm/chunter'
 
 import { newCreateTx } from '@anticrm/platform-core/src/tx'
-import { Property, StringProperty } from '@anticrm/model'
-import core, { Space, SpaceUser } from '@anticrm/core'
+import core, { Space, SpaceUser, Property, StringProperty } from '@anticrm/core'
 
 describe('service', () => {
   const wsName = 'test-service'

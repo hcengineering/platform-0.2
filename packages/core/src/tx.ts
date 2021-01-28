@@ -13,7 +13,8 @@
 // limitations under the License.
 //
 
-import { Doc, StringProperty, Ref, Class, AnyLayout, Model, MODEL_DOMAIN, DateProperty } from '@anticrm/model'
+import { Model, MODEL_DOMAIN } from '@anticrm/model'
+import { Doc, StringProperty, Ref, Class, AnyLayout, DateProperty } from './classes'
 import core from '.'
 
 /**

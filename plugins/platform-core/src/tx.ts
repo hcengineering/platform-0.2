@@ -1,5 +1,4 @@
-import { AnyLayout, Doc, Property, Ref, StringProperty } from '@anticrm/model'
-import core, { CreateTx, DeleteTx, generateId, PushTx, UpdateTx } from '@anticrm/core'
+import core, { CreateTx, DeleteTx, generateId, PushTx, UpdateTx, AnyLayout, Doc, Property, Ref, StringProperty } from '@anticrm/core'
 
 export function newCreateTx<T extends Doc> (doc: T, _user: StringProperty): CreateTx {
   if (!doc._id) {

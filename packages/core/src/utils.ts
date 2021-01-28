@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Doc, Ref, Class } from '@anticrm/model'
+import { AnyLayout, Doc, Ref, Class } from './classes'
 import type { Tx, DomainIndex, TxContext } from './tx'
 
 export interface DocumentProtocol {

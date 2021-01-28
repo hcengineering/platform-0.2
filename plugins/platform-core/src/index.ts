@@ -14,8 +14,7 @@
 //
 
 import { Metadata, Plugin, plugin, Service } from '@anticrm/platform'
-import { AnyLayout, Class, Doc, Ref, StringProperty } from '@anticrm/model'
-import { CoreProtocol } from '@anticrm/core'
+import { CoreProtocol, AnyLayout, Class, Doc, Ref, StringProperty } from '@anticrm/core'
 import { ModelDb } from './modeldb'
 
 export type Subscriber<T> = (value: T[]) => void

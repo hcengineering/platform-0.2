@@ -1,6 +1,5 @@
-import { Space, SpaceUser } from '@anticrm/core'
+import { Space, SpaceUser, Property, StringProperty } from '@anticrm/core'
 import { CoreService } from '@anticrm/platform-core'
-import { Property, StringProperty } from '@anticrm/model'
 
 /**
  * Check if current user is joined a proposed space.
