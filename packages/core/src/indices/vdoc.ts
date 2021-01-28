@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Anticrm Platform Contributors.
+// Copyright © 2020, 2021 Anticrm Platform Contributors.
 //
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
@@ -13,27 +13,9 @@
 // limitations under the License.
 //
 
-import { Model } from './model'
-import { DateProperty, Doc, Emb, Ref, StringProperty } from './classes'
-import { CreateTx, PushTx, UpdateTx, Storage, DomainIndex, Tx, TxContext } from './tx'
-import { Space } from './space'
-import core from '.'
-
-export interface Application extends Doc { }
-
-export interface List extends Emb {
-  id: string
-  name: string
-  application: Ref<Application>
-}
-
-export interface VDoc extends Doc {
-  _space: Ref<Space>
-  _createdOn: DateProperty
-  _createdBy: StringProperty
-  _modifiedOn?: DateProperty
-  _modifiedBy?: StringProperty
-}
+import { Model } from '../model'
+import { CreateTx, PushTx, UpdateTx, Storage, DomainIndex, Tx, TxContext } from '../tx'
+import core from '../index'
 
 export class VDocIndex implements DomainIndex {
   private modelDb: Model

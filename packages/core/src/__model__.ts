@@ -24,11 +24,9 @@ import { MODEL_DOMAIN } from './model'
 
 import { TDoc, TEmb } from '@anticrm/model/src/__model__'
 
-import core, { Space, SpaceUser, VDoc } from '.'
-import { Backlink, Backlinks, BACKLINKS_DOMAIN } from './text'
-import { Title, TITLE_DOMAIN } from './title'
+import core from '.'
+import { Space, SpaceUser, VDoc, Backlink, Backlinks, BACKLINKS_DOMAIN, Title, TITLE_DOMAIN, Application } from './domains'
 import { CreateTx, DeleteTx, PushTx, TX_DOMAIN, UpdateTx, Tx } from './tx'
-import { Application } from './vdoc'
 
 @Class$(core.class.SpaceUser, core.class.Emb, MODEL_DOMAIN)
 export class TSpaceUser extends TEmb implements SpaceUser {

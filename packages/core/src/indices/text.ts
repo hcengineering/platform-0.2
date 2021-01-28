@@ -13,27 +13,14 @@
 // limitations under the License.
 //
 
-import { Ref, Class, Doc, Obj, ArrayOf, InstanceOf, Emb, AnyLayout } from './classes'
-import core from '.'
-import { CreateTx, DomainIndex, Storage, Tx, TxContext } from './tx'
-import { Model } from './model'
-import { generateId } from './objectid'
+import { Ref, Class, Doc, Obj, ArrayOf, InstanceOf, Emb, AnyLayout } from '../classes'
+import core from '../index'
+import { CreateTx, DomainIndex, Storage, Tx, TxContext } from '../tx'
+import { Model } from '../model'
+import { generateId } from '../objectid'
+import { Backlink, Backlinks } from '../domains'
 
-import { MessageMarkType, MessageNode, parseMessage, ReferenceMark, traverseMarks, traverseMessage } from './textmodel'
-
-export interface Backlink {
-  _backlinkClass: Ref<Class<Doc>>
-  _backlinkId: Ref<Doc>
-  pos: number
-}
-
-export interface Backlinks extends Doc {
-  _objectId: Ref<Doc>
-  _objectClass: Ref<Class<Doc>>
-  backlinks: Backlink[]
-}
-
-export const BACKLINKS_DOMAIN = 'backlinks'
+import { MessageMarkType, MessageNode, parseMessage, ReferenceMark, traverseMarks, traverseMessage } from '../textmodel'
 
 type ClassKey = { key: string, _class: Ref<Class<Emb>> }
 
