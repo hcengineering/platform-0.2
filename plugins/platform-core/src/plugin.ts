@@ -32,10 +32,15 @@ import {
   Doc,
   AnyLayout,
   StringProperty, MODEL_DOMAIN,
-  BACKLINKS_DOMAIN, CoreProtocol, ModelIndex, TextIndex, TitleIndex, TITLE_DOMAIN, TxIndex, TxProcessor, VDocIndex,
+  BACKLINKS_DOMAIN, CoreProtocol, TITLE_DOMAIN, TxIndex, TxProcessor,
   generateId as genId
 } from '@anticrm/core'
 import { createOperations } from './operations'
+
+import { ModelIndex } from '@anticrm/core/src/indices/model'
+import { TextIndex } from '@anticrm/core/src/indices/text'
+import { TitleIndex } from '@anticrm/core/src/indices/title'
+import { VDocIndex } from '@anticrm/core/src/indices/vdoc'
 
 /*!
  * Anticrm Platform™ Core Plugin

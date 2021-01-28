@@ -13,9 +13,7 @@
 // limitations under the License.
 //
 
-import { Model, MODEL_DOMAIN } from './model'
 import { Doc, StringProperty, Ref, Class, AnyLayout, DateProperty } from './classes'
-import core from '.'
 
 /**
  * Transaction operation being processed.
@@ -100,52 +98,53 @@ export class TxIndex implements DomainIndex {
   }
 }
 
-/**
- * Perform model update and forward updates into chained storage if required.
- */
-export class ModelIndex implements DomainIndex {
-  private storages: Storage[]
-  private model: Model
+///
 
-  constructor (model: Model, storages: Storage[]) {
-    this.model = model
-    this.storages = storages
+export interface DocumentProtocol {
+  find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]>
+  findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined>
+  loadDomain (domain: string, index?: string, direction?: string): Promise<Doc[]>
+}
+
+export interface CoreProtocol extends DocumentProtocol {
+  tx (tx: Tx): Promise<any>
+}
+
+export class TxProcessor {
+  private indices: DomainIndex[]
+
+  constructor (indices: DomainIndex[]) {
+    this.indices = indices
   }
 
-  async tx (ctx: TxContext, tx: Tx): Promise<any> {
-    switch (tx._class) {
-      case core.class.CreateTx: {
-        const createTx = tx as CreateTx
-        if (this.model.getDomain(createTx._objectClass) !== MODEL_DOMAIN) {
-          return
-        }
-        const newDoc = this.model.newDoc(createTx._objectClass, createTx._objectId, createTx.object)
-        return Promise.all(this.storages.map((s) => s.store(ctx, newDoc)))
-      }
-      case core.class.UpdateTx: {
-        const updateTx = tx as UpdateTx
-        if (this.model.getDomain(updateTx._objectClass) !== MODEL_DOMAIN) {
-          return
-        }
-        return Promise.all(this.storages.map((s) => s.update(ctx, updateTx._objectClass, updateTx._objectId, updateTx._query || null, updateTx._attributes)))
-      }
-      case core.class.PushTx: {
-        const pushTx = tx as PushTx
-        if (this.model.getDomain(pushTx._objectClass) !== MODEL_DOMAIN) {
-          return
-        }
-        return Promise.all(this.storages.map((s) => s.push(ctx, pushTx._objectClass, pushTx._objectId, pushTx._query || null, pushTx._attribute, pushTx._attributes)))
-      }
-      case core.class.DeleteTx: {
-        const deleteTx = tx as DeleteTx
-        if (this.model.getDomain(deleteTx._objectClass) !== MODEL_DOMAIN) {
-          return
-        }
-        return Promise.all(this.storages.map((s) => s.remove(ctx, deleteTx._objectClass, deleteTx._objectId, (deleteTx._query || null) as AnyLayout)))
-      }
-
-      default:
-        console.log('not implemented model tx', tx)
-    }
+  process (ctx: TxContext, tx: Tx): Promise<any> {
+    return Promise.all(this.indices.map(index => index.tx(ctx, tx)))
   }
+}
+
+///
+
+function toHex (value: number, chars: number): string {
+  const result = value.toString(16)
+  if (result.length < chars) {
+    return '0'.repeat(chars - result.length) + result
+  }
+  return result
+}
+
+let counter = Math.random() * (1 << 24) | 0
+const random = toHex(Math.random() * (1 << 24) | 0, 6) + toHex(Math.random() * (1 << 16) | 0, 4)
+
+function timestamp (): string {
+  const time = (Date.now() / 1000) | 0
+  return toHex(time, 8)
+}
+
+function count (): string {
+  const val = counter++ & 0xffffff
+  return toHex(val, 6)
+}
+
+export function generateId (): Ref<Doc> {
+  return timestamp() + random + count() as Ref<Doc>
 }

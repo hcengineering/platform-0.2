@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Anticrm Platform Contributors.
+// Copyright © 2020, 2021 Anticrm Platform Contributors.
 //
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
@@ -13,10 +13,15 @@
 // limitations under the License.
 //
 
-import { CoreProtocol, ModelIndex, TextIndex, TitleIndex, TxIndex, TxProcessor, VDocIndex, Tx, txContext, TxContext, TxContextSource, Storage, Ref, StringProperty, AnyLayout, Class, Doc, Model, MODEL_DOMAIN, isValidQuery } from '@anticrm/core'
+import { CoreProtocol, TxIndex, TxProcessor, Tx, txContext, TxContext, TxContextSource, Storage, Ref, StringProperty, AnyLayout, Class, Doc, Model, MODEL_DOMAIN, isValidQuery } from '@anticrm/core'
 import { Collection, MongoClient } from 'mongodb'
 import { withTenant } from '@anticrm/accounts'
 import { createPullArrayFilters, createPushArrayFilters, createSetArrayFilters } from './mongo_utils'
+
+import { ModelIndex } from '@anticrm/core/src/indices/model'
+import { TextIndex } from '@anticrm/core/src/indices/text'
+import { TitleIndex } from '@anticrm/core/src/indices/title'
+import { VDocIndex } from '@anticrm/core/src/indices/vdoc'
 
 export interface WorkspaceProtocol extends CoreProtocol {
   close (): Promise<void>

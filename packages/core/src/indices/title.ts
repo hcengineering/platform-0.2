@@ -13,19 +13,11 @@
 // limitations under the License.
 //
 
-import { Doc, Ref, Classifier } from './classes'
-import { Model } from './model'
-import { CreateTx, UpdateTx, Tx, DomainIndex, Storage, TxContext } from './tx'
-import { generateId } from './objectid'
-import core from '.'
-
-export const TITLE_DOMAIN = 'title'
-
-export interface Title extends Doc {
-  _objectClass: Ref<Classifier<Doc>>
-  _objectId: Ref<Doc>
-  title: string | number
-}
+import { Doc, Ref, Classifier } from '../classes'
+import { Model } from '../model'
+import { CreateTx, UpdateTx, Tx, DomainIndex, Storage, TxContext, generateId } from '../tx'
+import core from '../index'
+import { Title } from '../domains'
 
 const NULL = '<null>'
 

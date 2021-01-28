@@ -13,7 +13,9 @@
 // limitations under the License.
 //
 
-import { Doc, Emb } from './classes'
+import { Class, Classifier, DateProperty, Doc, Emb, Ref, StringProperty } from './classes'
+
+// S P A C E
 
 /**
  * Define a space user - association, it hold some extra properties.
@@ -30,4 +32,48 @@ export interface Space extends Doc {
   users: SpaceUser[] // A list of included user accounts, not all may be active.
   isPublic: boolean // If specified, a users are interpreted as include list.
   archived: boolean // If specified, channel is marked as archived, only owner could archive space
+}
+
+// V D O C
+
+export interface Application extends Doc { }
+
+export interface List extends Emb {
+  id: string
+  name: string
+  application: Ref<Application>
+}
+
+export interface VDoc extends Doc {
+  _space: Ref<Space>
+  _createdOn: DateProperty
+  _createdBy: StringProperty
+  _modifiedOn?: DateProperty
+  _modifiedBy?: StringProperty
+}
+
+// B A C K L I N K S
+
+export interface Backlink {
+  _backlinkClass: Ref<Class<Doc>>
+  _backlinkId: Ref<Doc>
+  pos: number
+}
+
+export interface Backlinks extends Doc {
+  _objectId: Ref<Doc>
+  _objectClass: Ref<Class<Doc>>
+  backlinks: Backlink[]
+}
+
+export const BACKLINKS_DOMAIN = 'backlinks'
+
+// T I T L E
+
+export const TITLE_DOMAIN = 'title'
+
+export interface Title extends Doc {
+  _objectClass: Ref<Classifier<Doc>>
+  _objectId: Ref<Doc>
+  title: string | number
 }
