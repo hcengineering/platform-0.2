@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Model, MODEL_DOMAIN } from '@anticrm/model'
+import { Model, MODEL_DOMAIN } from './model'
 import { Doc, StringProperty, Ref, Class, AnyLayout, DateProperty } from './classes'
 import core from '.'
 

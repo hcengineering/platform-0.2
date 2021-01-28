@@ -15,11 +15,9 @@
 
 import 'reflect-metadata'
 
-import core, {
-  mixinKey
-} from '.'
+import core from '.'
 import {
-  Ref, Class, Obj, Mixin, ClassifierKind, Classifier, Attribute, Type, Property, ArrayOf, Emb, InstanceOf, RefTo, Doc, BagOf
+  Ref, Class, Obj, Mixin, ClassifierKind, Classifier, Attribute, Type, Property, ArrayOf, Emb, InstanceOf, RefTo, Doc, BagOf, mixinKey
 } from '@anticrm/core'
 
 const classifierMetadataKey = Symbol("anticrm:classifier")

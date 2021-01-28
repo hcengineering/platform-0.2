@@ -16,8 +16,7 @@
 /* eslint-env jest */
 
 import { Builder } from '..'
-import { Property, AnyLayout, StringProperty } from '@anticrm/core'
-import { Model } from '../model'
+import { Property, AnyLayout, StringProperty, Model } from '@anticrm/core'
 
 import { taskIds, doc1, fullModel as mb, createSubtask } from './test_tasks'
 

@@ -50,4 +50,3 @@ export { Builder }
 
 export * from './utils'
 export * from './dsl'
-export * from './model'
