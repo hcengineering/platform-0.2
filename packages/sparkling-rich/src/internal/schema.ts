@@ -142,8 +142,8 @@ function add (obj: any, props: any): any {
 const emDOM = ['em', 0]
 const strongDOM = ['strong', 0]
 const codeDOM = ['code', 0]
-const strikeDOM = ['s', 0]
-const underlineDOM = ['u', 0]
+// const strikeDOM = ['s', 0]
+// const underlineDOM = ['u', 0]
 
 // :: Object [Specs](#model.MarkSpec) for the marks in the schema.
 export const marks: MarkSpec = {
@@ -179,22 +179,6 @@ export const marks: MarkSpec = {
     parseDOM: [{ tag: 'i' }, { tag: 'em' }, { style: 'font-style=italic' }],
     toDOM () {
       return emDOM
-    }
-  },
-  // :: MarkSpec An emphasis mark. Rendered as an `<em>` element.
-  // Has parse rules that also match `<i>` and `font-style: italic`.
-  strike: {
-    parseDOM: [{ tag: 's' }],
-    toDOM () {
-      return strikeDOM
-    }
-  },
-  // :: MarkSpec An emphasis mark. Rendered as an `<em>` element.
-  // Has parse rules that also match `<i>` and `font-style: italic`.
-  underline: {
-    parseDOM: [{ tag: 'u' }],
-    toDOM () {
-      return underlineDOM
     }
   },
 

@@ -14,11 +14,10 @@ export enum MessageNodeType {
   bullet_list = 'bullet_list', // eslint-disable-line
   list_item = 'list_item'// eslint-disable-line
 }
+
 export enum MessageMarkType {
   link = 'link',
   em = 'em',
-  strike = 'strike',
-  underline = 'underline',
   strong = 'strong',
   code = 'code',
   reference = 'reference'
@@ -57,12 +56,10 @@ export interface IState {
   renderContent (parent: MessageNode): void
   renderInline (parent: any): void
   renderList (node: any, delim: string, firstDelim: any): void
-
   esc (str: string, startOfLine?: boolean): string
   quote (str: string): string
   repeat (str: string, n: number): string
   markString (mark: any, open: any, parent: any, index: number): string
-
   getEnclosingWhitespace (text: string): { leading: string, trailing: string }
 }
 
@@ -74,6 +71,7 @@ export function traverseMessage (node: MessageNode, f: (el: MessageNode) => void
     }
   }
 }
+
 export function traverseMarks (node: MessageNode, f: (el: MessageMark) => void): void {
   if (node.marks !== undefined && node.marks !== null) {
     for (const c of node.marks) {
@@ -102,6 +100,7 @@ function addToSet (mark: MessageMark, marks: MessageMark[]): MessageMark[] {
   result.push(mark)
   return result
 }
+
 function removeFromSet (markType: MessageMarkType, marks: MessageMark[]): MessageMark[] {
   for (let i = 0; i < marks.length; i++) {
     if (marks[i].type === markType) {
@@ -123,6 +122,7 @@ function sameSet (a: MessageMark[] | undefined, b: MessageMark[] | undefined): b
   }
   return true
 }
+
 function markEq (first: MessageMark, other: MessageMark): boolean {
   return (
     first === other || (first.type === other.type && compareDeep(first.attrs, other.attrs))
@@ -153,6 +153,7 @@ export function messageContent (node: MessageNode): MessageNode[] {
   }
   return result
 }
+
 export function messageMarks (node: MessageNode): MessageMark[] {
   const result: MessageMark[] = []
   if (node.marks !== undefined && node.marks !== null) {
@@ -167,6 +168,7 @@ function nodeAttrs (node: MessageNode): { [key: string]: string } {
   }
   return {}
 }
+
 function markAttrs (mark: MessageMark): { [key: string]: string } {
   if (mark.attrs !== undefined) {
     return mark.attrs
@@ -185,13 +187,16 @@ export interface LinkMark extends MessageMark {
   href: string
   title: string
 }
+
 export interface ReferenceMark extends MessageMark {
   attrs: { id: string; class: string }
 }
+
 export function parseMessage (message: string): MessageNode {
   // return JSON.parse(message) as MessageNode
   return parseMessageMarkdown(message)
 }
+
 export function serializeMessage (node: MessageNode): string {
   // return JSON.stringify(node)
   return serializeMessageMarkdown(node)
@@ -202,6 +207,7 @@ export function serializeMessageMarkdown (node: MessageNode): string {
   state.renderContent(node)
   return state.out
 }
+
 export function parseMessageMarkdown (message: string): MessageNode {
   const parser = new MarkdownParser()
   return parser.parse(message || '')
@@ -299,25 +305,26 @@ const storeNodes: { [key: string]: NodeProcessor } = {
 
 interface MarkProcessor {
   open:
-  | ((
+    | ((
     _state: IState,
     mark: MessageMark,
     parent: MessageNode,
     index: number
   ) => void)
-  | string
+    | string
   close:
-  | ((
+    | ((
     _state: IState,
     mark: MessageMark,
     parent: MessageNode,
     index: number
   ) => void)
-  | string
+    | string
   mixable: boolean
   expelEnclosingWhitespace: boolean
   escape: boolean
 }
+
 const storeMarks: { [key: string]: MarkProcessor } = {
   em: {
     open: '*',
@@ -420,6 +427,7 @@ function isPlainURL (
   const next = parentContent[index + (side < 0 ? -2 : 1)]
   return !isInSet(link, messageMarks(next))
 }
+
 class State implements IState {
   nodes: { [key: string]: NodeProcessor }
   marks: { [key: string]: MarkProcessor }
@@ -428,6 +436,7 @@ class State implements IState {
   closed: any
   inTightList: boolean
   options: any
+
   constructor (nodes: any, marks: any, options: any) {
     this.nodes = nodes
     this.marks = marks
@@ -650,8 +659,9 @@ class State implements IState {
   // `firstDelim` is a function going from an item index to a
   // delimiter for the first line of the item.
   renderList (node: any, delim: string, firstDelim: any) {
-    if (this.closed && this.closed.type === node.type) this.flushClose(3)
-    else if (this.inTightList) this.flushClose(1)
+    if (this.closed && this.closed.type === node.type) {
+      this.flushClose(3)
+    } else if (this.inTightList) this.flushClose(1)
 
     const isTight =
       node.attrs != null &&
@@ -686,7 +696,7 @@ class State implements IState {
 
   quote (str: string): string {
     const wrap =
-      str.indexOf('"') === -1 ? '""' : str.indexOf("'") === -1 ? "''" : '()'
+      str.indexOf('"') === -1 ? '""' : str.indexOf('\'') === -1 ? '\'\'' : '()'
     return wrap[0] + str + wrap[1]
   }
 
@@ -720,6 +730,7 @@ class State implements IState {
     }
   }
 }
+
 function withText (node: MessageNode, text: string): MessageNode {
   if (node.text === text) {
     return node
@@ -746,13 +757,19 @@ interface StateElement {
   content: MessageNode[]
   attrs: { [key: string]: string }
 }
+
 // Object used to track the context of a running parse.
 class MarkdownParseState {
   stack: StateElement[]
   marks: MessageMark[]
   tokenHandlers: { [key: string]: any }
+
   constructor (tokenHandlers: { [key: string]: any }) {
-    this.stack = [{ type: MessageNodeType.doc, attrs: {}, content: [] }]
+    this.stack = [{
+      type: MessageNodeType.doc,
+      attrs: {},
+      content: []
+    }]
     this.marks = []
     this.tokenHandlers = tokenHandlers
   }
@@ -783,7 +800,10 @@ class MarkdownParseState {
           // Convert any url with ref to reference mark
           result.push({
             type: MessageMarkType.reference,
-            attrs: { id: url.hash.substring(1), class: 'class:' + url.hostname }
+            attrs: {
+              id: url.hash.substring(1),
+              class: 'class:' + url.hostname
+            }
           })
         }
       }
@@ -810,7 +830,9 @@ class MarkdownParseState {
     let merged: MessageNode | undefined
     if (last && (merged = maybeMerge(last, node))) {
       nodes[nodes.length - 1] = merged
-    } else nodes.push(node)
+    } else {
+      nodes.push(node)
+    }
   }
 
   // : (Mark)
@@ -862,7 +884,11 @@ class MarkdownParseState {
   // : (NodeType, ?Object)
   // Wrap subsequent content in a node of the given type.
   openNode (type: MessageNodeType, attrs: { [key: string]: string }) {
-    this.stack.push({ type: type, attrs, content: [] })
+    this.stack.push({
+      type: type,
+      attrs,
+      content: []
+    })
   }
 
   // : () → ?Node
@@ -878,10 +904,14 @@ class MarkdownParseState {
 }
 
 function attrs (spec: any, token: any): { [key: string]: string } {
-  if (spec.getAttrs) return spec.getAttrs(token)
-  // For backwards compatibility when `attrs` is a Function
-  else if (spec.attrs instanceof Function) return spec.attrs(token)
-  else return spec.attrs
+  if (spec.getAttrs) {
+    return spec.getAttrs(token)
+  }// For backwards compatibility when `attrs` is a Function
+  else if (spec.attrs instanceof Function) {
+    return spec.attrs(token)
+  } else {
+    return spec.attrs
+  }
 }
 
 // Code content is represented as a single token with a `content`
@@ -931,7 +961,10 @@ function tokenHandlers (tokens: { [key: string]: ParsingRule }) {
         }
       } else {
         handlers[type + '_open'] = (state: MarkdownParseState, tok: any) =>
-          state.openMark({ type: spec.mark!, attrs: attrs(spec, tok) })
+          state.openMark({
+            type: spec.mark!,
+            attrs: attrs(spec, tok)
+          })
         handlers[type + '_close'] = (state: MarkdownParseState) => {
           state.closeMark(spec.mark!)
         }
@@ -963,7 +996,10 @@ const tokens: { [key: string]: ParsingRule } = {
     block: MessageNodeType.heading,
     getAttrs: (tok: any) => ({ level: +tok.tag.slice(1) })
   },
-  code_block: { block: MessageNodeType.code_block, noCloseToken: true },
+  code_block: {
+    block: MessageNodeType.code_block,
+    noCloseToken: true
+  },
   fence: {
     block: MessageNodeType.code_block,
     getAttrs: (tok: any) => ({ params: tok.info || '' }),
@@ -989,12 +1025,16 @@ const tokens: { [key: string]: ParsingRule } = {
       title: tok.attrGet('title') || null
     })
   },
-  code_inline: { mark: MessageMarkType.code, noCloseToken: true }
+  code_inline: {
+    mark: MessageMarkType.code,
+    noCloseToken: true
+  }
 }
 
 export class MarkdownParser {
   tokenizer: any
   tokenHandlers: any
+
   constructor () {
     this.tokenizer = MarkdownIt('commonmark', { html: false })
     this.tokenHandlers = tokenHandlers(tokens)

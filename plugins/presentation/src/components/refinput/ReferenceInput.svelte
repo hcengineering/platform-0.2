@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Property } from '@anticrm/model'
+  import { Property } from '@anticrm/core'
   import { MessageNode, newMessageDocument } from '@anticrm/core'
   import { getCoreService } from '../../utils'
 
@@ -56,8 +56,6 @@
     cursor: { left: 0, top: 0, bottom: 0, right: 0 },
     bold: false,
     italic: false,
-    strike: false,
-    underline: false,
     completionWord: '',
     selection: { from: 0, to: 0 },
     completionEnd: '',
@@ -366,15 +364,6 @@
             on:click={() => htmlEditor.toggleItalic()}
             selected={styleState.italic}>
             <Icon icon={presentation.icon.brdItalic} clazz="icon-brd" />
-          </ToolbarButton>
-          <ToolbarButton style="padding:0; width:24px; height:24px"
-            on:click={() => htmlEditor.toggleUnderline()}
-            selected={styleState.underline}>
-            <Icon icon={presentation.icon.brdUnder} clazz="icon-brd" />
-          </ToolbarButton>
-          <ToolbarButton style="padding:0; width:24px; height:24px"
-            on:click={() => htmlEditor.toggleStrike()} selected={styleState.strike}>
-            <Icon icon={presentation.icon.brdStrike} clazz="icon-brd" />
           </ToolbarButton>
           <div class="tSeparator" />
           <ToolbarButton style="padding:0; width:24px; height:24px">

@@ -60,6 +60,7 @@
     </codeStyleSettings>
     <codeStyleSettings language="TypeScript">
       <option name="KEEP_BLANK_LINES_IN_CODE" value="1" />
+      <option name="BLANK_LINES_AROUND_METHOD_IN_INTERFACE" value="0" />
       <option name="ALIGN_MULTILINE_PARAMETERS" value="false" />
       <option name="ALIGN_MULTILINE_FOR" value="false" />
       <option name="SPACE_BEFORE_METHOD_PARENTHESES" value="true" />
