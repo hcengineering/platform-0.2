@@ -13,11 +13,11 @@
 // limitations under the License.
 //
 
-import { Builder, extendIds, Class$, Prop } from '@anticrm/model'
-import core, { Space, VDoc, Ref, Class, MODEL_DOMAIN } from '@anticrm/core'
+import core, { Builder, extendIds, Class$, Prop } from '@anticrm/model'
+import { Space, VDoc, Ref, Class, MODEL_DOMAIN } from '@anticrm/core'
 import { IntlString } from '@anticrm/platform-i18n'
 
-import { TApplication } from '@anticrm/core/src/__model__'
+import { TApplication } from '@anticrm/model/src/__model__'
 import ux, { UXAttribute } from '@anticrm/presentation'
 import { AnyComponent, Asset } from '@anticrm/platform-ui'
 import chunter from '@anticrm/chunter'

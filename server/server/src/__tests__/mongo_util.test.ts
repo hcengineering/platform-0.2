@@ -16,7 +16,8 @@
 
 import { ServerSuite } from './serversuite'
 
-import core, { AnyLayout, BooleanProperty, StringProperty } from '@anticrm/core'
+import { AnyLayout, BooleanProperty, StringProperty } from '@anticrm/core'
+import core from '@anticrm/model'
 import { createSetArrayFilters } from '../mongo_utils'
 
 import { taskIds as task, createSubtask, Task, TaskComment } from '@anticrm/model/src/__tests__/test_tasks'

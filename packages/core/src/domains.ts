@@ -25,6 +25,8 @@ export interface SpaceUser extends Emb {
   owner: boolean // Make user as space owner
 }
 
+export const CORE_CLASS_SPACE = 'class:core.Space' as Ref<Class<Space>>
+
 export interface Space extends Doc {
   name: string // a space name
   description: string // a space optional description.
@@ -44,6 +46,8 @@ export interface List extends Emb {
   application: Ref<Application>
 }
 
+export const CORE_CLASS_VDOC = 'class:core.VDoc' as Ref<Class<VDoc>>
+
 export interface VDoc extends Doc {
   _space: Ref<Space>
   _createdOn: DateProperty
@@ -60,6 +64,8 @@ export interface Backlink {
   pos: number
 }
 
+export const CORE_CLASS_BACKLINKS = 'class:core.Backlinks' as Ref<Class<Backlinks>>
+
 export interface Backlinks extends Doc {
   _objectId: Ref<Doc>
   _objectClass: Ref<Class<Doc>>
@@ -71,6 +77,7 @@ export const BACKLINKS_DOMAIN = 'backlinks'
 // T I T L E
 
 export const TITLE_DOMAIN = 'title'
+export const CORE_CLASS_TITLE = 'class:core.Title' as Ref<Class<Title>>
 
 export interface Title extends Doc {
   _objectClass: Ref<Classifier<Doc>>

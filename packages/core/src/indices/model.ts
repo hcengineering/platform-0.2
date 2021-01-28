@@ -14,9 +14,19 @@
 //
 
 import { Model, MODEL_DOMAIN } from '../model'
-import core from '../index'
 import { AnyLayout } from '../classes'
-import { CreateTx, DeleteTx, DomainIndex, PushTx, Storage, Tx, TxContext, UpdateTx } from '../tx'
+import {
+  CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_PUSH_TX,
+  CORE_CLASS_UPDATE_TX,
+  CreateTx,
+  DeleteTx,
+  DomainIndex,
+  PushTx,
+  Storage,
+  Tx,
+  TxContext,
+  UpdateTx
+} from '../tx'
 
 /**
  * Perform model update and forward updates into chained storage if required.
@@ -32,7 +42,7 @@ export class ModelIndex implements DomainIndex {
 
   async tx (ctx: TxContext, tx: Tx): Promise<any> {
     switch (tx._class) {
-      case core.class.CreateTx: {
+      case CORE_CLASS_CREATE_TX: {
         const createTx = tx as CreateTx
         if (this.model.getDomain(createTx._objectClass) !== MODEL_DOMAIN) {
           return
@@ -40,21 +50,21 @@ export class ModelIndex implements DomainIndex {
         const newDoc = this.model.newDoc(createTx._objectClass, createTx._objectId, createTx.object)
         return Promise.all(this.storages.map((s) => s.store(ctx, newDoc)))
       }
-      case core.class.UpdateTx: {
+      case CORE_CLASS_UPDATE_TX: {
         const updateTx = tx as UpdateTx
         if (this.model.getDomain(updateTx._objectClass) !== MODEL_DOMAIN) {
           return
         }
         return Promise.all(this.storages.map((s) => s.update(ctx, updateTx._objectClass, updateTx._objectId, updateTx._query || null, updateTx._attributes)))
       }
-      case core.class.PushTx: {
+      case CORE_CLASS_PUSH_TX: {
         const pushTx = tx as PushTx
         if (this.model.getDomain(pushTx._objectClass) !== MODEL_DOMAIN) {
           return
         }
         return Promise.all(this.storages.map((s) => s.push(ctx, pushTx._objectClass, pushTx._objectId, pushTx._query || null, pushTx._attribute, pushTx._attributes)))
       }
-      case core.class.DeleteTx: {
+      case CORE_CLASS_DELETE_TX: {
         const deleteTx = tx as DeleteTx
         if (this.model.getDomain(deleteTx._objectClass) !== MODEL_DOMAIN) {
           return

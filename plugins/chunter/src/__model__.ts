@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Builder, Class$, Primary, Prop, ArrayOf$, InstanceOf$, extendIds, Mixin$ } from '@anticrm/model'
+import core, { Builder, Class$, Primary, Prop, ArrayOf$, InstanceOf$, extendIds, Mixin$ } from '@anticrm/model'
 import { UX } from '@anticrm/presentation/src/__model__'
 
 import workbench from '@anticrm/workbench/src/__model__'
@@ -22,9 +22,8 @@ import _chunter, { Message, Page, Comment, Collab } from '.'
 import { IntlString } from '@anticrm/platform-i18n'
 import presentation, { ComponentExtension } from '@anticrm/presentation'
 
-import { TVDoc } from '@anticrm/core/src/__model__'
-import { TEmb, TMixin } from '@anticrm/model/src/__model__'
-import core, { Application, VDoc, Ref, Class, Property } from '@anticrm/core'
+import { TEmb, TMixin, TVDoc } from '@anticrm/model/src/__model__'
+import { Application, VDoc, Ref, Class, Property } from '@anticrm/core'
 
 export enum ChunterDomain {
   Chunter = 'chunter'

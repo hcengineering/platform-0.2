@@ -1,4 +1,4 @@
-<!--
+//
 // Copyright © 2020 Anticrm Platform Contributors.
 // 
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
@@ -11,16 +11,16 @@
 // 
 // See the License for the specific language governing permissions and
 // limitations under the License.
--->
-<script lang="ts">
-  import { CreateTx, Tx, CORE_CLASS_CREATE_TX } from '@anticrm/core'
-  import { Task } from '../..'
+//
 
-  export let tx: Tx
+// For a detailed explanation regarding each configuration property, visit:
+// https://jestjs.io/docs/en/configuration.html
 
-  function taskTitle() {
-    return (((tx as CreateTx).object as unknown) as Task).title
-  }
-</script>
-
-{#if tx._class === CORE_CLASS_CREATE_TX}Создал задачу <b>{taskTitle()}</b>{/if}
+module.exports = {
+  coverageDirectory: 'coverage',
+  testEnvironment: 'node',
+  roots: [
+    '<rootDir>/src'
+  ],
+  testMatch: ['**/?(*.)+(spec|test).[jt]s?(x)']
+}

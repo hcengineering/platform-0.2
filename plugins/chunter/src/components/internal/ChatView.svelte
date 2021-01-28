@@ -11,8 +11,9 @@
   //
   // See the License for the specific language governing permissions and
   // limitations under the License.
-  import { Property, Ref, StringProperty } from '@anticrm/model'
-  import core, { MessageNode, Space } from '@anticrm/core'
+
+  import { Space, Property, Ref, StringProperty, CORE_CLASS_SPACE } from '@anticrm/core'
+  import { MessageNode } from '@anticrm/text'
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
   import { onDestroy } from 'svelte'
@@ -35,7 +36,7 @@
     }, onDestroy)
 
     // TODO: use Titles index instead of getting the whole Space object
-    coreService.findOne(core.class.Space, { _id: space })
+    coreService.findOne(CORE_CLASS_SPACE, { _id: space })
       .then((spaceObj) => (spaceName = spaceObj ? '#' + spaceObj.name : ''))
   }
   

@@ -13,11 +13,21 @@
 // limitations under the License.
 //
 
-import { Ref, Class, Doc, Obj, ArrayOf, InstanceOf, Emb, AnyLayout } from '../classes'
-import core from '../index'
-import { CreateTx, DomainIndex, Storage, Tx, TxContext, generateId } from '../tx'
+import {
+  Ref,
+  Class,
+  Doc,
+  Obj,
+  ArrayOf,
+  InstanceOf,
+  Emb,
+  AnyLayout,
+  CORE_CLASS_STRING,
+  CORE_CLASS_ARRAY_OF, CORE_CLASS_INSTANCE_OF
+} from '../classes'
+import { CreateTx, DomainIndex, Storage, Tx, TxContext, generateId, CORE_CLASS_CREATE_TX } from '../tx'
 import { Model } from '../model'
-import { Backlink, Backlinks } from '../domains'
+import { Backlink, Backlinks, CORE_CLASS_BACKLINKS } from '../domains'
 
 import { MessageMarkType, MessageNode, parseMessage, ReferenceMark, traverseMarks, traverseMessage } from '@anticrm/text'
 
@@ -42,7 +52,7 @@ export class TextIndex implements DomainIndex {
 
     const keys = this.modelDb
       .getAllAttributes(_class)
-      .filter((attr) => attr[1].type._class === core.class.String)
+      .filter((attr) => attr[1].type._class === CORE_CLASS_STRING)
       .map((attr) => attr[0])
     this.textAttributes.set(_class, keys)
     return keys
@@ -54,7 +64,7 @@ export class TextIndex implements DomainIndex {
 
     const keys = this.modelDb
       .getAllAttributes(_class)
-      .filter((attr) => attr[1].type._class === core.class.ArrayOf && (attr[1].type as ArrayOf).of._class === core.class.InstanceOf)
+      .filter((attr) => attr[1].type._class === CORE_CLASS_ARRAY_OF && (attr[1].type as ArrayOf).of._class === CORE_CLASS_INSTANCE_OF)
       .map((attr) => { return { key: attr[0], _class: ((attr[1].type as ArrayOf).of as InstanceOf<Emb>).of } as ClassKey })
     this.arrayAttributes.set(_class, keys)
     return keys
@@ -92,7 +102,7 @@ export class TextIndex implements DomainIndex {
 
   async tx (ctx: TxContext, tx: Tx): Promise<any> {
     switch (tx._class) {
-      case core.class.CreateTx:
+      case CORE_CLASS_CREATE_TX:
         return this.onCreate(ctx, tx as CreateTx)
       default:
         console.log('not implemented text tx', tx)
@@ -114,7 +124,7 @@ export class TextIndex implements DomainIndex {
       return
     }
     const doc: Backlinks = {
-      _class: core.class.Backlinks,
+      _class: CORE_CLASS_BACKLINKS,
       _id: generateId() as Ref<Backlinks>,
       _objectClass: create._objectClass,
       _objectId: create._objectId,

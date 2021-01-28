@@ -13,13 +13,13 @@
 // limitations under the License.
 //
 
-import core, { CreateTx, DeleteTx, PushTx, Space, SpaceUser, UpdateTx, Tx, AnyLayout, Class, Doc, Ref, StringProperty } from '@anticrm/core'
+import { CreateTx, DeleteTx, PushTx, Space, SpaceUser, UpdateTx, Tx, AnyLayout, Class, Doc, Ref, StringProperty, CORE_CLASS_CREATE_TX, CORE_CLASS_UPDATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_PUSH_TX, CORE_CLASS_SPACE } from '@anticrm/core'
 import { Client } from './server'
 import { WorkspaceProtocol } from './workspace'
 
 function getSpaceKey (_class: Ref<Class<Doc>>): string {
   // for Space objects use _id to filter available ones
-  return _class === core.class.Space ? '_id' : '_space'
+  return _class === CORE_CLASS_SPACE ? '_id' : '_space'
 }
 
 /**
@@ -110,9 +110,9 @@ function getObjectById (workspace: WorkspaceProtocol, _class: Ref<Class<Doc>>, i
  */
 export async function processTx (workspace: WorkspaceProtocol, spaces: Map<string, SpaceUser>, tx: Tx, client: Client, ownChange: boolean): Promise<{ allowed: boolean, sendSpace: Space | null }> {
   switch (tx._class) {
-    case core.class.CreateTx: {
+    case CORE_CLASS_CREATE_TX: {
       const createTx = tx as CreateTx
-      if (createTx._objectClass === core.class.Space) {
+      if (createTx._objectClass === CORE_CLASS_SPACE) {
         // Creation of a new space, we need to mark user as owner if this information is missing
         const s = (createTx.object as unknown) as Space
         if (ownChange) {
@@ -139,13 +139,13 @@ export async function processTx (workspace: WorkspaceProtocol, spaces: Map<strin
         sendSpace: null
       }
     }
-    case core.class.UpdateTx: {
+    case CORE_CLASS_UPDATE_TX: {
       const updateTx = tx as UpdateTx
       const obj = await getObjectById(workspace, updateTx._objectClass, updateTx._objectId)
 
       // Check if space, we need update out list
       let sendSpace: Space | null = null
-      if (!ownChange && updateTx._objectClass === core.class.Space) {
+      if (!ownChange && updateTx._objectClass === CORE_CLASS_SPACE) {
         sendSpace = checkUpdateSpaces(spaces, (obj as unknown) as Space, updateTx._objectId, client.email)
       }
       return {
@@ -153,11 +153,11 @@ export async function processTx (workspace: WorkspaceProtocol, spaces: Map<strin
         sendSpace
       }
     }
-    case core.class.PushTx: {
+    case CORE_CLASS_PUSH_TX: {
       const pushTx = tx as PushTx
       const obj = await getObjectById(workspace, pushTx._objectClass, pushTx._objectId)
       let sendSpace: Space | null = null
-      if (!ownChange && pushTx._objectClass === core.class.Space) {
+      if (!ownChange && pushTx._objectClass === CORE_CLASS_SPACE) {
         // Check if SpaceUser is we, since operation is already applied, we could check with Space object itself.
         const sp = (obj as unknown) as Space
         sendSpace = checkUpdateSpaces(spaces, sp, sp._id, client.email)
@@ -167,11 +167,11 @@ export async function processTx (workspace: WorkspaceProtocol, spaces: Map<strin
         sendSpace
       }
     }
-    case core.class.DeleteTx: {
+    case CORE_CLASS_DELETE_TX: {
       const delTx = tx as DeleteTx
       const obj = await getObjectById(workspace, delTx._objectClass, delTx._objectId)
       let sendSpace: Space | null = null
-      if (!ownChange && delTx._objectClass === core.class.Space) {
+      if (!ownChange && delTx._objectClass === CORE_CLASS_SPACE) {
         // Check if SpaceUser is we, since operation is already applied, we could check with Space object itself.
         const sp = (obj as unknown) as Space
         sendSpace = checkUpdateSpaces(spaces, sp, sp._id, client.email)
@@ -188,7 +188,7 @@ export async function processTx (workspace: WorkspaceProtocol, spaces: Map<strin
 
 export async function getUserSpaces (workspace: WorkspaceProtocol, email: string): Promise<Map<string, SpaceUser>> {
   const userSpaces = new Map<string, SpaceUser>()
-  const allSpaces = await workspace.find(core.class.Space, {})
+  const allSpaces = await workspace.find(CORE_CLASS_SPACE, {})
   for (const s of allSpaces) {
     let us = s.users.find(u => u.userId === email)
     if (s.isPublic) {

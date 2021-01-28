@@ -16,7 +16,7 @@
   import { Ref, Doc, Class } from '@anticrm/core'
   import { onDestroy } from 'svelte'
   import { find, getCoreService, getUIService, _getCoreService } from '../../utils'
-  import core, { Space, VDoc } from '@anticrm/core'
+  import { Space, VDoc, CORE_CLASS_SPACE } from '@anticrm/core'
   import ui from '@anticrm/platform-ui'
   import workbench, { WorkbenchApplication } from '../..'
 
@@ -47,7 +47,7 @@
   let spaceUnsubscribe: () => void | undefined
 
   getCoreService()
-    .then((coreService) => coreService.query(core.class.Space, {}))
+    .then((coreService) => coreService.query(CORE_CLASS_SPACE, {}))
     .then((qr) => {
       spaceUnsubscribe = qr.subscribe((docs) => {
         console.log('spaces:', docs)

@@ -14,8 +14,18 @@
 //
 
 import { Model } from '../model'
-import { CreateTx, PushTx, UpdateTx, Storage, DomainIndex, Tx, TxContext } from '../tx'
-import core from '../index'
+import {
+  CreateTx,
+  PushTx,
+  UpdateTx,
+  Storage,
+  DomainIndex,
+  Tx,
+  TxContext,
+  CORE_CLASS_CREATE_TX,
+  CORE_CLASS_UPDATE_TX, CORE_CLASS_PUSH_TX
+} from '../tx'
+import { CORE_CLASS_VDOC } from '../domains'
 
 export class VDocIndex implements DomainIndex {
   private modelDb: Model
@@ -28,11 +38,11 @@ export class VDocIndex implements DomainIndex {
 
   async tx (ctx: TxContext, tx: Tx): Promise<any> {
     switch (tx._class) {
-      case core.class.CreateTx:
+      case CORE_CLASS_CREATE_TX:
         return this.onCreate(ctx, tx as CreateTx)
-      case core.class.UpdateTx:
+      case CORE_CLASS_UPDATE_TX:
         return this.onUpdate(ctx, tx as UpdateTx)
-      case core.class.PushTx:
+      case CORE_CLASS_PUSH_TX:
         return this.onPush(ctx, tx as PushTx)
       default:
         console.log('not implemented title tx', tx)
@@ -40,21 +50,21 @@ export class VDocIndex implements DomainIndex {
   }
 
   async onCreate (ctx: TxContext, create: CreateTx): Promise<any> {
-    if (!this.modelDb.is(create._objectClass, core.class.VDoc)) {
+    if (!this.modelDb.is(create._objectClass, CORE_CLASS_VDOC)) {
       return Promise.resolve()
     }
     return this.storage.store(ctx, this.modelDb.newDoc(create._objectClass, create._objectId, create.object))
   }
 
   onPush (ctx: TxContext, tx: PushTx): Promise<any> {
-    if (!this.modelDb.is(tx._objectClass, core.class.VDoc)) {
+    if (!this.modelDb.is(tx._objectClass, CORE_CLASS_VDOC)) {
       return Promise.resolve()
     }
     return this.storage.push(ctx, tx._objectClass, tx._objectId, null, tx._attribute, tx._attributes)
   }
 
   onUpdate (ctx: TxContext, tx: UpdateTx): Promise<any> {
-    if (!this.modelDb.is(tx._objectClass, core.class.VDoc)) {
+    if (!this.modelDb.is(tx._objectClass, CORE_CLASS_VDOC)) {
       return Promise.resolve()
     }
     return this.storage.update(ctx, tx._objectClass, tx._objectId, null, tx._attributes)

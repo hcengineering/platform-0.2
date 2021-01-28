@@ -18,7 +18,7 @@ import { WorkspaceProtocol } from './workspace'
 
 import { filterQuery, getUserSpaces, isAcceptable, processTx as processSpaceTx } from './spaces'
 import { Broadcaster, Client, ClientService, ClientSocket } from './server'
-import core, { Tx, SpaceUser, AnyLayout, Class, Doc, Model, Ref } from '@anticrm/core'
+import { Tx, SpaceUser, AnyLayout, Class, Doc, Model, Ref, CORE_CLASS_SPACE, CORE_CLASS_CREATE_TX } from '@anticrm/core'
 
 export interface ClientControl {
   ping (): Promise<void>
@@ -102,8 +102,8 @@ export async function createClientService (workspaceProtocol: Promise<WorkspaceP
         }
         if (spaceTxResult.sendSpace) {
           // We need to send a create transaction for this space object creation, to allow process.
-          const createSpaceTx = await workspace.findOne(core.class.CreateTx, {
-            _objectClass: core.class.Space,
+          const createSpaceTx = await workspace.findOne(CORE_CLASS_CREATE_TX, {
+            _objectClass: CORE_CLASS_SPACE,
             _objectId: spaceTxResult.sendSpace._id
           })
           if (createSpaceTx) {

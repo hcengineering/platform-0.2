@@ -27,16 +27,16 @@ import {
   Attribute,
   ArrayOf,
   StringProperty,
-  PropertyType
+  PropertyType,
+  CORE_MIXIN_INDICES,
+  CORE_CLASS_ARRAY_OF,
+  CORE_CLASS_INSTANCE_OF
 } from './classes'
 import { Storage, TxContext } from './tx'
-import core from '@anticrm/model'
 
 export function mixinKey (mixin: Ref<Mixin<Doc>>, key: string): string {
   return key + '|' + mixin.replace('.', '~')
 }
-
-console.log(core)
 
 export const MODEL_DOMAIN = 'model'
 
@@ -144,7 +144,7 @@ export class Model implements Storage {
   }
 
   getPrimaryKey (_class: Ref<Class<Obj>>): string | null {
-    const primaryKey = mixinKey(core.mixin.Indices, 'primary')
+    const primaryKey = mixinKey(CORE_MIXIN_INDICES, 'primary')
     let cls = _class as Ref<Class<Obj>> | undefined
     while (cls) {
       const clazz = this.get(cls) as Classifier<Doc>
@@ -242,7 +242,7 @@ export class Model implements Storage {
         } = this.classAttribute(_class, rKey)
         // Check if we need to perform inner assign based on field value and type
         switch (attr.type._class) {
-          case core.class.ArrayOf: {
+          case CORE_CLASS_ARRAY_OF: {
             const attrClass = this.attributeClass((attr.type as ArrayOf).of)
             if (attrClass) {
               const lValue = r[rKey]
@@ -257,7 +257,7 @@ export class Model implements Storage {
             }
             break
           }
-          case core.class.InstanceOf: {
+          case CORE_CLASS_INSTANCE_OF: {
             const attrClass = ((attr.type as unknown) as Record<string, unknown>).of as Ref<Class<Doc>>
             if (attrClass) {
               l[key] = this.assign({}, attrClass, r[rKey] as AnyLayout)
@@ -299,6 +299,7 @@ export class Model implements Storage {
   /**
    * Perform push operation on document and put new embedded object into document.
    * @param doc - document to update
+   * @param query - query
    * @param attribute - attribute holding embedded, it could be InstanceOf or ArrayOf
    * @param embedded - embedded object value
    */
@@ -320,7 +321,7 @@ export class Model implements Storage {
 
     const l = (queryObject as unknown) as AnyLayout
     switch (attr.type._class) {
-      case core.class.ArrayOf: {
+      case CORE_CLASS_ARRAY_OF: {
         const attrClass = this.attributeClass((attr.type as ArrayOf).of)
         if (attrClass === null) {
           throw new Error('Invalid attribute type/class: ' + attr.type)
@@ -527,13 +528,13 @@ export class Model implements Storage {
         const parentObj = (result.parentRef.parent as unknown) as AnyLayout
 
         switch (result.parentRef.field.type._class) {
-          case core.class.ArrayOf: {
+          case CORE_CLASS_ARRAY_OF: {
             const parentArray = (parentObj[result.parentRef.key] as unknown) as Obj[]
             // We assume it will be found.
             parentArray.splice(parentArray.indexOf(result.match), 1)
             break
           }
-          case core.class.InstanceOf: {
+          case CORE_CLASS_INSTANCE_OF: {
             delete (parentObj as any)[result.parentRef.key]
             break
           }
@@ -625,9 +626,9 @@ export class Model implements Storage {
 
   public attributeClass (type: Type): Ref<Class<Doc>> | null {
     switch (type._class) {
-      case core.class.ArrayOf:
+      case CORE_CLASS_ARRAY_OF:
         return this.attributeClass((type as ArrayOf).of)
-      case core.class.InstanceOf:
+      case CORE_CLASS_INSTANCE_OF:
         return ((type as unknown) as Record<string, unknown>).of as Ref<Class<Doc>>
     }
     return null

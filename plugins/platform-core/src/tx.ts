@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import core, { CreateTx, DeleteTx, generateId, PushTx, UpdateTx, AnyLayout, Doc, Property, Ref, StringProperty } from '@anticrm/core'
+import { CreateTx, DeleteTx, generateId, PushTx, UpdateTx, AnyLayout, Doc, Property, Ref, StringProperty, CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_UPDATE_TX, CORE_CLASS_PUSH_TX} from '@anticrm/core'
 
 export function newCreateTx<T extends Doc> (doc: T, _user: StringProperty): CreateTx {
   if (!doc._id) {
@@ -23,7 +23,7 @@ export function newCreateTx<T extends Doc> (doc: T, _user: StringProperty): Crea
   const { _id, _class, ...objValue } = doc
 
   const tx: CreateTx = {
-    _class: core.class.CreateTx,
+    _class: CORE_CLASS_CREATE_TX,
     _id: generateId() as Ref<Doc>,
     _date: Date.now() as Property<number, Date>,
     _user,
@@ -36,7 +36,7 @@ export function newCreateTx<T extends Doc> (doc: T, _user: StringProperty): Crea
 
 export function newPushTx (doc: Doc, _query: AnyLayout | undefined, _attribute: StringProperty, element: AnyLayout, _user: StringProperty): PushTx {
   const tx: PushTx = {
-    _class: core.class.PushTx,
+    _class: CORE_CLASS_PUSH_TX,
     _id: generateId() as Ref<Doc>,
     _objectId: doc._id,
     _objectClass: doc._class,
@@ -51,7 +51,7 @@ export function newPushTx (doc: Doc, _query: AnyLayout | undefined, _attribute: 
 
 export function newUpdateTx (doc: Doc, _query: AnyLayout | undefined, values: AnyLayout, _user: StringProperty): UpdateTx {
   const tx: UpdateTx = {
-    _class: core.class.UpdateTx,
+    _class: CORE_CLASS_UPDATE_TX,
     _id: generateId() as Ref<Doc>,
     _objectId: doc._id,
     _objectClass: doc._class,
@@ -64,7 +64,7 @@ export function newUpdateTx (doc: Doc, _query: AnyLayout | undefined, values: An
 }
 export function newDeleteTx (doc: Doc, _query: AnyLayout | undefined, _user: StringProperty): DeleteTx {
   const tx: DeleteTx = {
-    _class: core.class.DeleteTx,
+    _class: CORE_CLASS_DELETE_TX,
     _id: generateId() as Ref<Doc>,
     _objectId: doc._id,
     _objectClass: doc._class,

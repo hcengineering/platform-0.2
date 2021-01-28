@@ -13,7 +13,18 @@
 // limitations under the License.
 //
 
-import core, { Backlinks, TxContext, Storage, Ref, Classifier, Doc, Class, AnyLayout, StringProperty } from '@anticrm/core'
+import {
+  Backlinks,
+  TxContext,
+  Storage,
+  Ref,
+  Classifier,
+  Doc,
+  Class,
+  AnyLayout,
+  StringProperty,
+  CORE_CLASS_BACKLINKS
+} from '@anticrm/core'
 
 interface Link {
   _class: Ref<Classifier<Doc>>
@@ -43,7 +54,7 @@ export class Graph implements Storage {
     if (node) {
       const backlinks: Backlinks = {
         _id: 'transient' as Ref<Doc>,
-        _class: core.class.Backlinks,
+        _class: CORE_CLASS_BACKLINKS,
         _objectClass: node?._class,
         _objectId: _id,
         backlinks: node.links.map(link => ({
@@ -63,7 +74,7 @@ export class Graph implements Storage {
   }
 
   async store (ctx: TxContext, doc: Doc): Promise<void> {
-    if (doc._class !== core.class.Backlinks) {
+    if (doc._class !== CORE_CLASS_BACKLINKS) {
       throw new Error('assert doc._class !== core.class.Backlinks')
     }
 

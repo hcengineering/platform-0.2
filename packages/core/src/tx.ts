@@ -15,6 +15,11 @@
 
 import { Doc, StringProperty, Ref, Class, AnyLayout, DateProperty } from './classes'
 
+export const CORE_CLASS_CREATE_TX = 'class:core.CreateTx' as Ref<Class<CreateTx>>
+export const CORE_CLASS_UPDATE_TX = 'class:core.UpdateTx' as Ref<Class<UpdateTx>>
+export const CORE_CLASS_DELETE_TX = 'class:core.DeleteTx' as Ref<Class<DeleteTx>>
+export const CORE_CLASS_PUSH_TX = 'class:core.PushTx' as Ref<Class<PushTx>>
+
 /**
  * Transaction operation being processed.
  */
