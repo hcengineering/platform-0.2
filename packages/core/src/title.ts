@@ -14,7 +14,7 @@
 //
 
 import { Doc, Ref, Classifier } from './classes'
-import { Model } from '@anticrm/model/src/model'
+import { Model } from './model'
 import { CreateTx, UpdateTx, Tx, DomainIndex, Storage, TxContext } from './tx'
 import { generateId } from './objectid'
 import core from '.'

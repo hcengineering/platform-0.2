@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Anticrm Platform Contributors.
+// Copyright © 2020, 2021 Anticrm Platform Contributors.
 //
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
@@ -14,12 +14,13 @@
 //
 
 import {
-  MODEL_DOMAIN, Class$, Prop, Builder, RefTo$, BagOf$, InstanceOf$, ArrayOf$, Primary
+  Class$, Prop, Builder, RefTo$, BagOf$, InstanceOf$, ArrayOf$, Primary
 } from '@anticrm/model'
 import {
   Class, Classifier, Doc, Ref,
   DateProperty, StringProperty, AnyLayout
 } from './classes'
+import { MODEL_DOMAIN } from './model'
 
 import { TDoc, TEmb } from '@anticrm/model/src/__model__'
 

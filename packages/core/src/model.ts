@@ -27,10 +27,9 @@ import {
   Attribute,
   ArrayOf,
   StringProperty,
-  PropertyType,
-  Storage,
-  TxContext
-} from '@anticrm/core'
+  PropertyType
+} from './classes'
+import { Storage, TxContext } from './tx'
 import core from '@anticrm/model'
 
 export function mixinKey (mixin: Ref<Mixin<Doc>>, key: string): string {

@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Model } from '@anticrm/model'
+import { Model } from './model'
 import { DateProperty, Doc, Emb, Ref, StringProperty } from './classes'
 import { CreateTx, PushTx, UpdateTx, Storage, DomainIndex, Tx, TxContext } from './tx'
 import { Space } from './space'

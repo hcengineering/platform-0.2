@@ -61,7 +61,7 @@ export default core
 
 export * from './rpc'
 export * from './classes'
-export * from '@anticrm/model/src/model'
+export * from './model'
 export * from './text'
 export * from './textmodel'
 export * from './tx'

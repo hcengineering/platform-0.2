@@ -14,9 +14,6 @@
 //
 
 import { Platform } from '@anticrm/platform'
-import {
-  MODEL_DOMAIN
-} from '@anticrm/model'
 import { ModelDb } from './modeldb'
 
 import { CoreService, QueryResult, RefFinalizer } from '.'
@@ -34,7 +31,7 @@ import {
   Class,
   Doc,
   AnyLayout,
-  StringProperty,
+  StringProperty, MODEL_DOMAIN,
   BACKLINKS_DOMAIN, CoreProtocol, ModelIndex, TextIndex, TitleIndex, TITLE_DOMAIN, TxIndex, TxProcessor, VDocIndex,
   generateId as genId
 } from '@anticrm/core'

@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { MODEL_DOMAIN, Model } from '@anticrm/model'
+import { MODEL_DOMAIN, Model } from '@anticrm/core'
 
 export class ModelDb extends Model {
   constructor () {
