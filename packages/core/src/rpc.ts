@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Anticrm Platform Contributors.
+// Copyright © 2020, 2021 Anticrm Platform Contributors.
 //
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Status, Severity } from '@anticrm/platform'
+import { Status, Severity } from '@anticrm/foundation'
 
 export type ReqId = string | number
 
@@ -22,7 +22,7 @@ export class Request<P extends any[]> {
   method: string
   params: P
 
-  constructor(method: string, ...params: P) {
+  constructor (method: string, ...params: P) {
     this.method = method
     this.params = params
   }
