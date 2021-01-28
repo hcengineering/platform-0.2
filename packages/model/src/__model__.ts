@@ -14,12 +14,16 @@
 //
 
 import core, {
+  MODEL_DOMAIN, Class$, Prop, Builder, RefTo$, BagOf$, InstanceOf$, Mixin$
+} from '.'
+
+import {
   Attribute, Class, Classifier, Doc, Emb, Mixin, Obj, Ref, Type, ArrayOf,
   Indices,
   StringProperty, PropertyType,
   ClassifierKind, AllAttributes,
-  MODEL_DOMAIN, RefTo, Class$, Prop, Builder, RefTo$, BagOf$, InstanceOf$, Mixin$
-} from '.'
+  RefTo
+} from '@anticrm/core'
 
 @Class$(core.class.Obj, core.class.Obj)
 export class TObj implements Obj {
