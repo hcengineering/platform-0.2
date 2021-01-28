@@ -13,6 +13,10 @@
 // limitations under the License.
 //
 
+// following line is only to make api-documenter happy.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { Space, DeleteTx, PushTx, UpdateTx, CreateTx } from '@anticrm/core'
+
 import { AnyPlugin, identify } from '@anticrm/platform'
 import {
   ArrayOf,
