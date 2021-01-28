@@ -19,7 +19,7 @@ import { CreateTx, DomainIndex, Storage, Tx, TxContext, generateId } from '../tx
 import { Model } from '../model'
 import { Backlink, Backlinks } from '../domains'
 
-import { MessageMarkType, MessageNode, parseMessage, ReferenceMark, traverseMarks, traverseMessage } from '../textmodel'
+import { MessageMarkType, MessageNode, parseMessage, ReferenceMark, traverseMarks, traverseMessage } from '@anticrm/text'
 
 type ClassKey = { key: string, _class: Ref<Class<Emb>> }
 

@@ -11,12 +11,12 @@
   //
   // See the License for the specific language governing permissions and
   // limitations under the License.
-  import { parseMessage } from '@anticrm/core'
+  import { parseMessage } from '@anticrm/text'
   import { Asset } from '@anticrm/platform-ui'
   import { getContactService, User } from '@anticrm/contact'
   import { Comment } from '../..'
   import MessageViewer from '@anticrm/presentation/src/components/MessageViewer.svelte'
-  import { Ref } from '@anticrm/model'
+  import { Ref } from '@anticrm/core'
 
   export let message: Comment
 
