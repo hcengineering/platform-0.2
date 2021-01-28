@@ -1,5 +1,5 @@
-import core, { generateId, VDoc, Tx } from '@anticrm/core'
-import { AnyLayout, Class, DateProperty, Doc, Model, Ref, StringProperty } from '@anticrm/model'
+import core, { generateId, VDoc, Tx, Ref, StringProperty, AnyLayout, Class, DateProperty, Doc } from '@anticrm/core'
+import { Model } from '@anticrm/model'
 import { OperationProtocol } from '.'
 import { newCreateTx, newDeleteTx, newPushTx, newUpdateTx } from './tx'
 

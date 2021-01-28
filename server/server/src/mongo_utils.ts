@@ -1,5 +1,5 @@
-import { AnyLayout, ArrayOf, Class, Doc, Emb, InstanceOf, Model, Obj, Ref, StringProperty, Type } from '@anticrm/model'
-import core from '@anticrm/core'
+import { Model } from '@anticrm/model'
+import core, { AnyLayout, ArrayOf, Class, Doc, Emb, InstanceOf, Obj, Ref, StringProperty, Type } from '@anticrm/core'
 
 // Some various mongo db utils.
 

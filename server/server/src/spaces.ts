@@ -13,8 +13,7 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Class, Doc, Ref, StringProperty } from '@anticrm/model'
-import core, { CreateTx, DeleteTx, PushTx, Space, SpaceUser, UpdateTx, Tx } from '@anticrm/core'
+import core, { CreateTx, DeleteTx, PushTx, Space, SpaceUser, UpdateTx, Tx, AnyLayout, Class, Doc, Ref, StringProperty } from '@anticrm/core'
 import { Client } from './server'
 import { WorkspaceProtocol } from './workspace'
 

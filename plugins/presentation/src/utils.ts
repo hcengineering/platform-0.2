@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Ref, Class, Obj, Type } from '@anticrm/model'
+import { Ref, Class, Obj, Type } from '@anticrm/core'
 import { Platform } from '@anticrm/platform'
 import { getContext } from 'svelte'
 import core, { CoreService } from '@anticrm/platform-core'

@@ -14,7 +14,7 @@
 //
 
 import { Platform } from '@anticrm/platform'
-import { Attribute, Class, Obj, Ref, Type, Doc, Mixin } from '@anticrm/model'
+import { Attribute, Class, Obj, Ref, Type, Doc, Mixin, VDoc } from '@anticrm/core'
 import ui, { AttrModel, ClassModel, GroupModel, PresentationService, ComponentExtension, UXObject } from '.'
 import { CoreService } from '@anticrm/platform-core'
 import vue, { AnyComponent, Asset } from '@anticrm/platform-ui'
@@ -25,7 +25,6 @@ import Properties from './components/internal/Properties.svelte'
 
 import StringEditor from './components/internal/editors/StringEditor.svelte'
 import CheckboxEditor from './components/internal/editors/CheckboxEditor.svelte'
-import { VDoc } from '@anticrm/core'
 
 /*!
  * Anticrm Platform™ Presentation Core Plugin

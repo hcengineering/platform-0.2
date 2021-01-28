@@ -1,4 +1,4 @@
-import { Doc, Emb } from '@anticrm/model'
+import { Doc, Emb } from './classes'
 
 /**
  * Define a space user - association, it hold some extra properties.

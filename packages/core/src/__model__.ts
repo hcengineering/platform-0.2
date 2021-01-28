@@ -14,10 +14,12 @@
 //
 
 import {
-  Class, Classifier, Doc, Ref,
-  DateProperty, StringProperty,
-  MODEL_DOMAIN, AnyLayout, Class$, Prop, Builder, RefTo$, BagOf$, InstanceOf$, ArrayOf$, Primary
+  MODEL_DOMAIN, Class$, Prop, Builder, RefTo$, BagOf$, InstanceOf$, ArrayOf$, Primary
 } from '@anticrm/model'
+import {
+  Class, Classifier, Doc, Ref,
+  DateProperty, StringProperty, AnyLayout
+} from './classes'
 
 import { TDoc, TEmb } from '@anticrm/model/src/__model__'
 
