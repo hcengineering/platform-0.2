@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { CreateTx, DeleteTx, generateId, PushTx, UpdateTx, AnyLayout, Doc, Property, Ref, StringProperty, CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_UPDATE_TX, CORE_CLASS_PUSH_TX} from '@anticrm/core'
+import { CreateTx, DeleteTx, generateId, PushTx, UpdateTx, AnyLayout, Doc, Property, Ref, StringProperty, CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_UPDATE_TX, CORE_CLASS_PUSH_TX } from '@anticrm/core'
 
 export function newCreateTx<T extends Doc> (doc: T, _user: StringProperty): CreateTx {
   if (!doc._id) {
