@@ -59,6 +59,5 @@ export default core
 export * from './rpc'
 export * from './classes'
 export * from './model'
-export * from './textmodel'
 export * from './tx'
 export * from './domains'

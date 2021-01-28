@@ -19,7 +19,7 @@
     MessageMarkType,
     MessageNodeType,
     messageContent
-  } from '@anticrm/core'
+  } from '@anticrm/text'
 
   export let message: MessageNode
 

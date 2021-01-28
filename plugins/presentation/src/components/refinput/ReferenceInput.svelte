@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Property } from '@anticrm/core'
-  import { MessageNode, newMessageDocument } from '@anticrm/core'
+  import { MessageNode, newMessageDocument } from '@anticrm/text'
   import { getCoreService } from '../../utils'
 
   import core from '@anticrm/core'

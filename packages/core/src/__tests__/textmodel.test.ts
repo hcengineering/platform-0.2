@@ -18,7 +18,7 @@ import {
   MessageNode,
   parseMessageMarkdown,
   serializeMessageMarkdown
-} from '../textmodel'
+} from '@anticrm/text'
 
 describe('server', () => {
   it('Check reference output', async () => {

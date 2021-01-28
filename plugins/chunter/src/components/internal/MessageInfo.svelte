@@ -11,11 +11,12 @@
   //
   // See the License for the specific language governing permissions and
   // limitations under the License.
-  import { CreateTx, parseMessage } from '@anticrm/core'
+
+  import { CreateTx, Tx } from '@anticrm/core'
+  import { parseMessage } from '@anticrm/text'
   import core from '@anticrm/core'
   import { Message } from '../..'
   import MessageViewer from '@anticrm/presentation/src/components/MessageViewer.svelte'
-  import { Tx } from '@anticrm/model'
 
   export let tx: Tx
 

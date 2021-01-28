@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Anticrm Platform Contributors.
+// Copyright © 2020, 2021 Anticrm Platform Contributors.
 //
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
@@ -15,7 +15,8 @@
 
 import { plugin, Plugin, Service } from '@anticrm/platform'
 import { Asset, AnyComponent, getPlatform } from '@anticrm/platform-ui'
-import { DateProperty, StringProperty, Emb, Class, Ref, Mixin, VDoc, MessageNode } from '@anticrm/core'
+import { DateProperty, StringProperty, Emb, Class, Ref, Mixin, VDoc } from '@anticrm/core'
+import { MessageNode } from '@anticrm/text'
 
 import core from '@anticrm/platform-core'
 import { ComponentExtension } from '@anticrm/presentation'
