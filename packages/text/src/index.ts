@@ -208,12 +208,10 @@ export interface ReferenceMark extends MessageMark {
 }
 
 export function parseMessage (message: string): MessageNode {
-  // return JSON.parse(message) as MessageNode
   return parseMessageMarkdown(message)
 }
 
 export function serializeMessage (node: MessageNode): string {
-  // return JSON.stringify(node)
   return serializeMessageMarkdown(node)
 }
 

@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Anticrm Platform Contributors.
+// Copyright © 2020, 2021 Anticrm Platform Contributors.
 //
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
@@ -13,11 +13,8 @@
 // limitations under the License.
 //
 
-import { Doc, Ref, Classifier } from '../classes'
-import { Model } from '../model'
-import { CreateTx, UpdateTx, Tx, DomainIndex, Storage, TxContext, generateId } from '../tx'
-import core from '../index'
-import { Title } from '../domains'
+import { Doc, Ref, Classifier, Model, Tx, DomainIndex, Storage, TxContext, generateId } from '@anticrm/core'
+import { CreateTx, UpdateTx, CORE_CLASS_CREATE_TX, CORE_CLASS_UPDATE_TX, CORE_CLASS_PUSH_TX, CORE_CLASS_TITLE, Title } from '..'
 
 const NULL = '<null>'
 
@@ -47,11 +44,11 @@ export class TitleIndex implements DomainIndex {
 
   async tx (ctx: TxContext, tx: Tx): Promise<any> {
     switch (tx._class) {
-      case core.class.CreateTx:
+      case CORE_CLASS_CREATE_TX:
         return this.onCreate(ctx, tx as CreateTx)
-      case core.class.UpdateTx:
+      case CORE_CLASS_UPDATE_TX:
         return this.onUpdate(ctx, tx as UpdateTx)
-      case core.class.PushTx:
+      case CORE_CLASS_PUSH_TX:
       default:
         console.log('not implemented title tx', tx)
     }
@@ -66,7 +63,7 @@ export class TitleIndex implements DomainIndex {
     const title = (create.object as any)[primary] as string
 
     const doc: Title = {
-      _class: core.class.Title,
+      _class: CORE_CLASS_TITLE,
       _id: generateId() as Ref<Title>,
       _objectClass: create._objectClass,
       _objectId: create._objectId,
@@ -90,7 +87,7 @@ export class TitleIndex implements DomainIndex {
       }
     }
     if (updated) {
-      this.storage.update(ctx, core.class.Title, update._objectId, null, { title: update._attributes[primary] })
+      this.storage.update(ctx, CORE_CLASS_TITLE, update._objectId, null, { title: update._attributes[primary] })
     }
   }
 }

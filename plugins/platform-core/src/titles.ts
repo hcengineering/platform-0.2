@@ -13,7 +13,17 @@
 // limitations under the License.
 //
 
-import core, { Title, TxContext, Storage, Ref, Classifier, Doc, Class, AnyLayout, StringProperty } from '@anticrm/core'
+import {
+  TxContext,
+  Storage,
+  Ref,
+  Classifier,
+  Doc,
+  Class,
+  AnyLayout,
+  StringProperty
+} from '@anticrm/core'
+import { Title, CORE_CLASS_TITLE } from '@anticrm/domains'
 import { ModelDb } from './modeldb'
 
 export interface Node {
@@ -36,7 +46,7 @@ export class Titles implements Storage {
 
   async find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
     const result = [] as Doc[]
-    if ((_class as string) !== core.class.Title) {
+    if ((_class as string) !== CORE_CLASS_TITLE) {
       throw new Error('assert _class !== core.class.Title')
     }
     const prefix = query.title as string
@@ -44,7 +54,7 @@ export class Titles implements Storage {
       if (node.title && node.title.startsWith(prefix) && this.implements(node, query._objectClass as Ref<Classifier<Doc>>)) {
         const title: Title = {
           _id: ('title_' + node._id) as Ref<Doc>,
-          _class: core.class.Title,
+          _class: CORE_CLASS_TITLE,
           _objectClass: node._class,
           _objectId: node._id,
           title: node.title
@@ -67,7 +77,7 @@ export class Titles implements Storage {
   }
 
   async store (ctx: TxContext, doc: Doc): Promise<void> {
-    if (doc._class !== core.class.Title) {
+    if (doc._class !== CORE_CLASS_TITLE) {
       throw new Error('assert doc._class !== core.class.Title')
     }
 

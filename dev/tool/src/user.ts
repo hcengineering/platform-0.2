@@ -18,8 +18,8 @@ import { Person } from '@anticrm/contact'
 import { builder } from '@anticrm/boot/src/boot'
 
 import contact from '@anticrm/contact/src/__model__'
-import { Ref, Property } from '@anticrm/model'
-import { Space, generateId } from '@anticrm/core'
+import { Ref, Property, generateId } from '@anticrm/core'
+import { Space } from '@anticrm/domains'
 
 export function createContact (db: Db, email: string, username: string): Promise<any> {
   const id = generateId() as Ref<Person>

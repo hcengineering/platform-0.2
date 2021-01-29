@@ -13,16 +13,29 @@
 // limitations under the License.
 //
 
-import core, { AnyLayout, ArrayOf, Class, Doc, Emb, InstanceOf, Obj, Ref, StringProperty, Type, Model } from '@anticrm/core'
+import {
+  AnyLayout,
+  ArrayOf,
+  Class,
+  Doc,
+  Emb,
+  InstanceOf,
+  Obj,
+  Ref,
+  StringProperty,
+  Type,
+  Model,
+  CORE_CLASS_ARRAY_OF, CORE_CLASS_INSTANCE_OF
+} from '@anticrm/core'
 
 // Some various mongo db utils.
 
 function isArrayOf (_type: Type): boolean {
-  return _type._class === core.class.ArrayOf
+  return _type._class === CORE_CLASS_ARRAY_OF
 }
 
 function isInstanceOf (_type: Type): boolean {
-  return _type._class === core.class.InstanceOf
+  return _type._class === CORE_CLASS_INSTANCE_OF
 }
 
 function extractArrayFilter (model: Model, _class: Ref<Class<Doc>>, query: AnyLayout, isPull: boolean): {

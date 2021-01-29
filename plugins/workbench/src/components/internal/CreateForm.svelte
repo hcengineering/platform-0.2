@@ -13,8 +13,7 @@
 // limitations under the License.
 -->
 <script lang='ts'>
-  import { Ref, Class, Doc } from '@anticrm/model'
-  import core, { Space, VDoc } from '@anticrm/core'
+  import { Ref, Class, Doc } from '@anticrm/core'
   import { createEventDispatcher } from 'svelte'
   import { AnyComponent } from '@anticrm/platform-ui'
   import presentation from '@anticrm/presentation'
@@ -28,6 +27,7 @@
   import workbench from '@anticrm/workbench'
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
   import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.svelte'
+  import { CORE_CLASS_VDOC, Space } from '@anticrm/domains'
 
   export let title: string
   export let _class: Ref<Class<Doc>>
@@ -61,7 +61,7 @@
       component = ext
     })
 
-    presentationService.getClassModel(_class, core.class.VDoc).then((m) => {
+    presentationService.getClassModel(_class, CORE_CLASS_VDOC).then((m) => {
       const mp = m.filterPrimary()
       model = mp.model
       primary = mp.primary

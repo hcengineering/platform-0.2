@@ -12,10 +12,9 @@
   // See the License for the specific language governing permissions and
   // limitations under the License.
   import { onDestroy } from 'svelte'
-  import { Ref, Class, Obj } from '@anticrm/model'
-  import { Backlinks } from '@anticrm/core'
+  import { Ref, Class, Obj } from '@anticrm/core'
+  import { Backlinks, CORE_CLASS_VDOC, CORE_CLASS_BACKLINKS } from '@anticrm/domains'
   import task, { Task } from '../..'
-  import core from '@anticrm/core'
   import { getPresentationService, find, query } from '../../utils'
   import { AttrModel, ClassModel } from '@anticrm/presentation'
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
@@ -33,7 +32,7 @@
   let title: AttrModel | undefined
 
   $: getPresentationService()
-    .then((service) => service.getClassModel(_class, core.class.VDoc))
+    .then((service) => service.getClassModel(_class, CORE_CLASS_VDOC))
     .then((m) => {
       title = m.getAttribute('title')
       model = m.filterAttributes(['title'])
@@ -45,7 +44,7 @@
     if (unsubscribe) {
       unsubscribe()
     }
-    unsubscribe = query(core.class.Backlinks, { _objectId: object._id }, (docs) => {
+    unsubscribe = query(CORE_CLASS_BACKLINKS, { _objectId: object._id }, (docs) => {
       backlinks = docs
     })
   }

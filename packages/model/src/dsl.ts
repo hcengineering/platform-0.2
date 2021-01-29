@@ -20,7 +20,7 @@ import {
   Ref, Class, Obj, Mixin, ClassifierKind, Classifier, Attribute, Type, Property, ArrayOf, Emb, InstanceOf, RefTo, Doc, BagOf, mixinKey
 } from '@anticrm/core'
 
-const classifierMetadataKey = Symbol("anticrm:classifier")
+const classifierMetadataKey = Symbol('anticrm:classifier')
 
 export function getClassifier (target: any): Classifier<Obj> {
   let classifier = Reflect.getOwnMetadata(classifierMetadataKey, target) as Classifier<Obj>
@@ -46,7 +46,7 @@ export function getAttribute (target: any, propertyKey: string): Attribute {
 }
 
 export function Class$<E extends Obj, T extends E> (id: Ref<Class<T>>, _extends: Ref<Class<E>>, domain?: string) {
-  return function classDecorator<C extends { new(): T }> (constructor: C): void {
+  return function classDecorator<C extends { new (): T }> (constructor: C): void {
     const classifier = getClassifier(constructor.prototype)
     classifier._id = id
     classifier._class = core.class.Class

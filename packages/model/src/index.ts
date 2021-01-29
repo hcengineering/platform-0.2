@@ -13,31 +13,89 @@
 // limitations under the License.
 //
 
+// following is only to make api-documenter happy.
+// DO NOT REMOVE LINES BELOW!!!
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { Emb } from '@anticrm/core'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { Space, DeleteTx, PushTx, UpdateTx, CreateTx } from '@anticrm/domains'
+// DO NOT REMOVE LINES ABOVE !!!
+import {
+  Application,
+  Backlinks,
+  CORE_CLASS_CREATE_TX,
+  CORE_CLASS_DELETE_TX,
+  CORE_CLASS_PUSH_TX,
+  CORE_CLASS_UPDATE_TX,
+  CORE_CLASS_SPACE,
+  SpaceUser,
+  Title,
+  VDoc
+} from '@anticrm/domains'
+
 import { AnyPlugin, identify } from '@anticrm/platform'
-import { ArrayOf, Attribute, BagOf, Class, Classifier, Doc, Emb, Indices, InstanceOf, Mixin, Obj, Ref, RefTo, Type } from '@anticrm/core'
+import {
+  ArrayOf,
+  Attribute,
+  BagOf,
+  Class,
+  Classifier,
+  Doc,
+  Indices,
+  InstanceOf,
+  Mixin,
+  Obj,
+  Ref,
+  RefTo,
+  Tx,
+  Type,
+  CORE_CLASS_DOC,
+  CORE_CLASS_EMB,
+  CORE_CLASS_CLASS,
+  CORE_CLASS_STRING
+} from '@anticrm/core'
+
 import Builder from './builder'
 
-const modelIds = identify('model' as AnyPlugin, {
+const modelIds = identify('core' as AnyPlugin, {
   class: {
     Obj: '' as Ref<Class<Obj>>,
-    Emb: '' as Ref<Class<Emb>>,
-    Doc: '' as Ref<Class<Doc>>,
+    Emb: CORE_CLASS_EMB,
+    Doc: CORE_CLASS_DOC,
 
     Classifier: '' as Ref<Class<Classifier<Obj>>>,
 
     Attribute: '' as Ref<Class<Attribute>>,
-    Class: '' as Ref<Class<Class<Obj>>>,
+    Class: CORE_CLASS_CLASS,
     Mixin: '' as Ref<Class<Mixin<Obj>>>,
 
     // Data types
     Type: '' as Ref<Class<Type>>,
-    String: '' as Ref<Class<Type>>,
+    String: CORE_CLASS_STRING,
     Number: '' as Ref<Class<Type>>,
     Boolean: '' as Ref<Class<Type>>,
     ArrayOf: '' as Ref<Class<ArrayOf>>,
     RefTo: '' as Ref<Class<RefTo<Doc>>>,
     BagOf: '' as Ref<Class<BagOf>>,
-    InstanceOf: '' as Ref<Class<InstanceOf<Type>>>
+    InstanceOf: '' as Ref<Class<InstanceOf<Type>>>,
+
+    Tx: '' as Ref<Class<Tx>>,
+    CreateTx: CORE_CLASS_CREATE_TX,
+    PushTx: CORE_CLASS_PUSH_TX,
+    UpdateTx: CORE_CLASS_UPDATE_TX,
+    DeleteTx: CORE_CLASS_DELETE_TX,
+
+    Title: '' as Ref<Class<Title>>,
+
+    VDoc: '' as Ref<Class<VDoc>>,
+
+    Space: CORE_CLASS_SPACE,
+    SpaceUser: '' as Ref<Class<SpaceUser>>,
+
+    Backlinks: '' as Ref<Class<Backlinks>>,
+
+    Application: '' as Ref<Class<Application>>
+
   },
   mixin: {
     Indices: '' as Ref<Mixin<Indices>>

@@ -14,7 +14,7 @@
 //
 
 import { methods } from '@anticrm/accounts'
-import { Response, Request, serialize } from '@anticrm/core'
+import { Response, Request, serialize } from '@anticrm/rpc'
 import { MongoClient, Db } from 'mongodb'
 
 import Koa from 'koa'

@@ -13,10 +13,10 @@
 // limitations under the License.
 -->
 <script type='ts'>
-  import { Ref, Tx } from '@anticrm/model'
+  import { Ref, Tx } from '@anticrm/core'
   import { onDestroy } from 'svelte'
   import { WorkbenchApplication } from '@anticrm/workbench'
-  import core, { Space } from '@anticrm/core'
+  import { Space, CORE_CLASS_CREATE_TX } from '@anticrm/domains'
 
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
   import ActivityItem from './ActivityItem.svelte'
@@ -27,7 +27,7 @@
 
   let objects: Tx[] = []
 
-  getCoreService().subscribe(core.class.CreateTx, {}, (docs) => {
+  getCoreService().subscribe(CORE_CLASS_CREATE_TX, {}, (docs) => {
     objects = docs
   }, onDestroy)
 

@@ -5,7 +5,7 @@
   import ToolbarButton from '@anticrm/sparkling-controls/src/toolbar/Button.svelte'
 
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
-  import { serializeMessageMarkdown } from '@anticrm/core'
+  import { serializeMessageMarkdown } from '@anticrm/text'
 
   let message: string = ''
 

@@ -13,7 +13,39 @@
 // limitations under the License.
 //
 
-import { Class, Classifier, DateProperty, Doc, Emb, Ref, StringProperty } from './classes'
+import { AnyLayout, Class, Classifier, DateProperty, Doc, Emb, Ref, StringProperty, Tx } from '@anticrm/core'
+
+// TXes
+
+export const CORE_CLASS_CREATE_TX = 'class:core.CreateTx' as Ref<Class<CreateTx>>
+export const CORE_CLASS_UPDATE_TX = 'class:core.UpdateTx' as Ref<Class<UpdateTx>>
+export const CORE_CLASS_DELETE_TX = 'class:core.DeleteTx' as Ref<Class<DeleteTx>>
+export const CORE_CLASS_PUSH_TX = 'class:core.PushTx' as Ref<Class<PushTx>>
+
+export const TX_DOMAIN = 'tx'
+
+export interface ObjectTx extends Tx {
+  _objectId: Ref<Doc>
+  _objectClass: Ref<Class<Doc>>
+}
+export interface CreateTx extends ObjectTx {
+  object: AnyLayout
+}
+
+export interface PushTx extends ObjectTx {
+  _attribute: StringProperty
+  _attributes: AnyLayout
+  _query?: AnyLayout
+}
+
+export interface UpdateTx extends ObjectTx {
+  _attributes: AnyLayout
+  _query?: AnyLayout
+}
+
+export interface DeleteTx extends ObjectTx {
+  _query?: AnyLayout
+}
 
 // S P A C E
 
@@ -24,6 +56,8 @@ export interface SpaceUser extends Emb {
   userId: string // An user account id
   owner: boolean // Make user as space owner
 }
+
+export const CORE_CLASS_SPACE = 'class:core.Space' as Ref<Class<Space>>
 
 export interface Space extends Doc {
   name: string // a space name
@@ -44,6 +78,8 @@ export interface List extends Emb {
   application: Ref<Application>
 }
 
+export const CORE_CLASS_VDOC = 'class:core.VDoc' as Ref<Class<VDoc>>
+
 export interface VDoc extends Doc {
   _space: Ref<Space>
   _createdOn: DateProperty
@@ -60,6 +96,8 @@ export interface Backlink {
   pos: number
 }
 
+export const CORE_CLASS_BACKLINKS = 'class:core.Backlinks' as Ref<Class<Backlinks>>
+
 export interface Backlinks extends Doc {
   _objectId: Ref<Doc>
   _objectClass: Ref<Class<Doc>>
@@ -71,6 +109,7 @@ export const BACKLINKS_DOMAIN = 'backlinks'
 // T I T L E
 
 export const TITLE_DOMAIN = 'title'
+export const CORE_CLASS_TITLE = 'class:core.Title' as Ref<Class<Title>>
 
 export interface Title extends Doc {
   _objectClass: Ref<Classifier<Doc>>

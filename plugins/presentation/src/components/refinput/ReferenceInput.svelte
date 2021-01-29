@@ -3,7 +3,7 @@
   import { MessageNode, newMessageDocument } from '@anticrm/text'
   import { getCoreService } from '../../utils'
 
-  import core from '@anticrm/core'
+  import core from '@anticrm/platform-core'
 
   import Toolbar from '@anticrm/sparkling-controls/src/toolbar/Toolbar.svelte'
   import ToolbarButton from '@anticrm/sparkling-controls/src/toolbar/Button.svelte'
@@ -23,6 +23,7 @@
   import presentation from '@anticrm/presentation'
 
   import { createEventDispatcher } from 'svelte'
+  import { CORE_CLASS_TITLE } from '@anticrm/domains'
   const dispatch = createEventDispatcher()
 
   // ********************************
@@ -70,7 +71,7 @@
   let triggers = ['@', '#', '[[']
 
   async function findTitles(prefix: string): Promise<CompletionItem[]> {
-    let docs = await coreS.find(core.class.Title, {
+    let docs = await coreS.find(CORE_CLASS_TITLE, {
       title: prefix as Property<string, string>
     })
     console.log('Found docs: ', docs)
@@ -90,7 +91,7 @@
     return items
   }
   async function findTitle(title: string): Promise<ItemRefefence[]> {
-    let docs = await coreS.find(core.class.Title, {
+    let docs = await coreS.find(CORE_CLASS_TITLE, {
       title: title as Property<string, string>
     })
 

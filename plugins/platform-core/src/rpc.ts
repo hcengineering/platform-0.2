@@ -14,7 +14,7 @@
 //
 
 import { Platform } from '@anticrm/platform'
-import { Response, ReqId, readResponse, serialize } from '@anticrm/core'
+import { Response, ReqId, readResponse, serialize } from '@anticrm/rpc'
 import core from '.'
 import login from '@anticrm/login'
 

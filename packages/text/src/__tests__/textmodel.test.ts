@@ -18,7 +18,7 @@ import {
   MessageNode,
   parseMessageMarkdown,
   serializeMessageMarkdown
-} from '@anticrm/text'
+} from '..'
 
 describe('server', () => {
   it('Check reference output', async () => {
@@ -46,7 +46,6 @@ describe('server', () => {
     const t1 =
       'Hello [Page1](ref://chunter.Page#5f8043dc1b592de172c26181) and [Page3](ref://Page#)'
     const msg = parseMessageMarkdown(t1)
-    console.log(msg)
     expect(msg.type).toEqual('doc')
 
     const md = serializeMessageMarkdown(msg)

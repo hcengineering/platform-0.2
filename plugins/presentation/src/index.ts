@@ -14,7 +14,8 @@
 //
 
 import { Platform, Plugin, plugin, Service } from '@anticrm/platform'
-import { Class, Mixin, Obj, Doc, Ref, Type, Emb, VDoc } from '@anticrm/core'
+import { Class, Mixin, Obj, Doc, Ref, Type, Emb } from '@anticrm/core'
+import { VDoc } from '@anticrm/domains'
 
 import core from '@anticrm/platform-core'
 import i18n, { IntlString } from '@anticrm/platform-i18n'

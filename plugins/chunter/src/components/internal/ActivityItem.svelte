@@ -13,8 +13,8 @@
 // limitations under the License.
 -->
 <script lang='ts'>
-  import { ObjectTx } from '@anticrm/core'
-  import { Tx } from '@anticrm/model'
+  import { ObjectTx } from '@anticrm/domains'
+  import { Tx } from '@anticrm/core'
   import core from '@anticrm/platform-core'
   import { AnyComponent, Asset, getPlatform } from '@anticrm/platform-ui'
   import { User } from '@anticrm/contact'

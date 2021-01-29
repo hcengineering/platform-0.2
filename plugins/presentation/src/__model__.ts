@@ -13,13 +13,14 @@
 // limitations under the License.
 //
 
-import { Builder, getClassifier, Class$, Prop, Mixin$, ArrayOf$, InstanceOf$ } from '@anticrm/model'
-import { TEmb, TMixin } from '@anticrm/model/src/__model__'
+import core, { Builder, getClassifier, Class$, Prop, Mixin$, ArrayOf$, InstanceOf$ } from '@anticrm/model'
 
-import core, { VDoc, Doc, Obj, Type, mixinKey } from '@anticrm/core'
+import { Doc, Obj, Type, mixinKey } from '@anticrm/core'
+import { VDoc } from '@anticrm/domains'
 import { IntlString } from '@anticrm/platform-i18n'
 import { AnyComponent, Asset } from '@anticrm/platform-ui'
 import ui, { UXAttribute, Presenter, UXObject, ComponentExtension } from '.'
+import { TEmb, TMixin } from '@anticrm/model/src/__model__'
 
 @Class$(ui.class.UXAttribute, core.class.Emb)
 export class TUXAttribute extends TEmb implements UXAttribute {
@@ -119,7 +120,11 @@ export function UX (label: IntlString, icon?: Asset): any {
     }
     const attr = Object.entries(attrs).find(a => a[0] === propertyKey)
     if (attr === undefined) {
-      attrs[propertyKey] = { label, icon, visible: true } as UXAttribute
+      attrs[propertyKey] = {
+        label,
+        icon,
+        visible: true
+      } as UXAttribute
     } else {
       // Just update existing
       attr[1].label = label
@@ -127,7 +132,7 @@ export function UX (label: IntlString, icon?: Asset): any {
     }
   }
 
-  function uxClass<C extends { new(): Doc }> (
+  function uxClass<C extends { new (): Doc }> (
     constructor: C
   ) {
     const classifier = getClassifier(constructor.prototype)
@@ -148,7 +153,7 @@ export function UX (label: IntlString, icon?: Asset): any {
   return function (this: unknown, ...args: unknown[]): unknown {
     switch (args.length) {
       case 1:
-        return uxClass.apply(this, args as [{ new(): Doc }])
+        return uxClass.apply(this, args as [{ new (): Doc }])
       case 2:
       case 3:
         return uxProp.apply(this, args as [any, string])

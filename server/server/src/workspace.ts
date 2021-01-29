@@ -13,15 +13,16 @@
 // limitations under the License.
 //
 
-import { CoreProtocol, TxIndex, TxProcessor, Tx, txContext, TxContext, TxContextSource, Storage, Ref, StringProperty, AnyLayout, Class, Doc, Model, MODEL_DOMAIN, isValidQuery } from '@anticrm/core'
+import { CoreProtocol, TxProcessor, Tx, txContext, TxContext, TxContextSource, Storage, Ref, StringProperty, AnyLayout, Class, Doc, Model, MODEL_DOMAIN, isValidQuery } from '@anticrm/core'
 import { Collection, MongoClient } from 'mongodb'
 import { withTenant } from '@anticrm/accounts'
 import { createPullArrayFilters, createPushArrayFilters, createSetArrayFilters } from './mongo_utils'
 
-import { ModelIndex } from '@anticrm/core/src/indices/model'
-import { TextIndex } from '@anticrm/core/src/indices/text'
-import { TitleIndex } from '@anticrm/core/src/indices/title'
-import { VDocIndex } from '@anticrm/core/src/indices/vdoc'
+import { ModelIndex } from '@anticrm/domains/src/indices/model'
+import { BacklinkIndex } from '@anticrm/domains/src/indices/text'
+import { TitleIndex } from '@anticrm/domains/src/indices/title'
+import { VDocIndex } from '@anticrm/domains/src/indices/vdoc'
+import { TxIndex } from '@anticrm/domains/src/indices/tx'
 
 export interface WorkspaceProtocol extends CoreProtocol {
   close (): Promise<void>
@@ -120,7 +121,7 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
     new TxIndex(mongoStorage),
     new VDocIndex(memdb, mongoStorage),
     new TitleIndex(memdb, mongoStorage),
-    new TextIndex(memdb, mongoStorage),
+    new BacklinkIndex(memdb, mongoStorage),
     new ModelIndex(memdb, [memdb, mongoStorage])
   ])
 
