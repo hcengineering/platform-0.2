@@ -163,6 +163,8 @@
         <label class='input-label' for='create_space__input__name'>
           Name
         </label>
+        <!-- <EditIconBox id='create_space__input__name' bind:value={title}
+                     icon={(makePrivate) ? workbench.icon.Lock : workbench.icon.Sharp} /> -->
         <EditBox id='create_space__input__name' bind:value={title} />
       </div>
       <div class='input-container'>

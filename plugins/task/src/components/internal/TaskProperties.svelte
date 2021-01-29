@@ -20,7 +20,7 @@
   import { AttrModel, ClassModel } from '@anticrm/presentation'
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
   import ActionButton from './ActionButton.svelte'
-  import UserInfo from './UserInfo.svelte'
+  import UserInfo from '@anticrm/sparkling-controls/src/UserInfo.svelte'
   import StatusLabel from './StatusLabel.svelte'
 
   import Properties from '@anticrm/presentation/src/components/internal/Properties.svelte'
@@ -87,7 +87,7 @@
       <div class="createdOn">30.11.20, 15:30</div>
     </div>
     <UserInfo url="https://platform.exhale24.ru/images/photo-2.png"
-              title="Андрей Платов" subtitle="Исполнитель" style="margin-bottom: 2em" />
+              title="Андрей Платов" subtitle="Исполнитель" />
 
     <div class="actionBar">
       <ActionButton style="leftButton" width="40%">Выполнено</ActionButton>
@@ -145,6 +145,7 @@
     .actionBar {
       width: 100%;
       display: flex;
+      margin-top: 2em;
       margin-bottom: 2em;
     }
 

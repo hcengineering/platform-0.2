@@ -24,8 +24,8 @@
   import AttributeEditor from '@anticrm/presentation/src/components/AttributeEditor.svelte'
   import Properties from '@anticrm/presentation/src/components/internal/Properties.svelte'
   import IconButton from '@anticrm/platform-ui/src/components/IconButton.svelte'
+  import ComboUserBox from '@anticrm/platform-ui/src/components/ComboUserBox.svelte'
   import workbench from '@anticrm/workbench'
-  import UserInfo from '@anticrm/task/src/components/internal/UserInfo.svelte'
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
   import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.svelte'
 
@@ -67,6 +67,15 @@
       primary = mp.primary
     })
   }
+  
+  let users: Array = [{ id: 0, url: 'https://platform.exhale24.ru/images/photo-1.png',
+                        name: 'Александр Алексеенко' },
+                      { id: 1, url: 'https://platform.exhale24.ru/images/photo-2.png',
+                        name: 'Андрей Платов'},
+                      { id: 2, url: 'https://platform.exhale24.ru/images/photo-3.png',
+                        name: 'Сергей Буевич'},
+                      { id: 3, url: 'https://platform.exhale24.ru/images/photo-4.png',
+                        name: 'Андрей Соболев'}]
 </script>
 
 <style lang='scss'>
@@ -103,6 +112,10 @@
     .taskLabel {
       color: var(--theme-doclink-color);
       margin-bottom: 1em;
+    }
+
+    .separator {
+      height: 1em;
     }
   }
 
@@ -145,8 +158,8 @@
     <div class="taskLabel">
       DT-925
     </div>
-    <UserInfo url="https://platform.exhale24.ru/images/photo-2.png"
-              title="Андрей Платов" subtitle="Исполнитель" style="margin-bottom: 1em" />
+    <ComboUserBox items={users} />
+    <div class="separator"></div>
     <ReferenceInput stylesEnabled="true" />
   </div>
 

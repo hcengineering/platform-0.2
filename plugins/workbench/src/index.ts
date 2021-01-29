@@ -46,7 +46,8 @@ export default plugin('workbench' as Plugin<WorkbenchService>, { core: core.id, 
     Finder: '' as Asset,
     Lock: '' as Asset,
     Sharp: '' as Asset,
-    Burger: '' as Asset
+    Burger: '' as Asset,
+    ArrowDown: '' as Asset
   },
   component: {
     Workbench: '' as AnyComponent,

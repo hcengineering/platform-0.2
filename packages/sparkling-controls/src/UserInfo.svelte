@@ -3,10 +3,9 @@
   export const title: string = ''
   export const subtitle: string = ''
   export const color: string = ''
-  export const style: string = ''
 </script>
 
-<div class="userInfo" style={style}>
+<div class="userInfo">
   <img class="avatar" src="{url}" alt="">
   <div class="user">
     {title}
