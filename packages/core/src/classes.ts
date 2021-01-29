@@ -112,9 +112,9 @@ export interface AnyLayout {
 
 export const CORE_CLASS_DOC = 'class:core.Doc' as Ref<Class<Doc>>
 export const CORE_CLASS_EMB = 'class:core.Emb' as Ref<Class<Emb>>
+export const CORE_CLASS_CLASS = 'class:core.Class' as Ref<Class<Class<Obj>>>
 
 export const CORE_CLASS_STRING = 'class:core.String' as Ref<Class<Type>>
-export const CORE_CLASS_CLASS = 'class:core.Class' as Ref<Class<Type>>
 
 export const CORE_CLASS_ARRAY_OF = 'class:core.ArrayOf' as Ref<Class<ArrayOf>>
 export const CORE_CLASS_INSTANCE_OF = 'class:core.InstanceOf' as Ref<Class<InstanceOf<Emb>>>
