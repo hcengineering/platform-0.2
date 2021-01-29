@@ -40,7 +40,7 @@ import { BACKLINKS_DOMAIN, TITLE_DOMAIN } from '@anticrm/domains'
 import { createOperations } from './operations'
 
 import { ModelIndex } from '@anticrm/domains/src/indices/model'
-import { TextIndex } from '@anticrm/domains/src/indices/text'
+import { BacklinkIndex } from '@anticrm/domains/src/indices/text'
 import { TitleIndex } from '@anticrm/domains/src/indices/title'
 import { VDocIndex } from '@anticrm/domains/src/indices/vdoc'
 import { TxIndex } from '@anticrm/domains/src/indices/tx'
@@ -100,7 +100,7 @@ export default async (platform: Platform): Promise<CoreService> => {
     new TxIndex(qCache),
     new VDocIndex(model, qCache),
     new TitleIndex(model, qTitles),
-    new TextIndex(model, qGraph),
+    new BacklinkIndex(model, qGraph),
     new ModelIndex(model, [qModel])
   ])
 

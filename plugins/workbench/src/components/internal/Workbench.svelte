@@ -11,7 +11,7 @@
   //
   // See the License for the specific language governing permissions and
   // limitations under the License.
-  import { Ref, Doc } from '@anticrm/model'
+  import { Ref, Doc } from '@anticrm/core'
   import workbench, { Perspective } from '../..'
   import { find, getUIService } from '../../utils'
   import { getContext } from 'svelte'

@@ -29,13 +29,26 @@ import {
 } from '@anticrm/core'
 import { Backlink, Backlinks, CORE_CLASS_BACKLINKS, CreateTx, CORE_CLASS_CREATE_TX } from '..'
 
-import { MessageMarkType, MessageNode, parseMessage, ReferenceMark, traverseMarks, traverseMessage } from '@anticrm/text'
+import {
+  MessageMarkType,
+  MessageNode,
+  parseMessage,
+  ReferenceMark,
+  traverseMarks,
+  traverseMessage
+} from '@anticrm/text'
 
 type ClassKey = { key: string, _class: Ref<Class<Emb>> }
 
-// I N D E X
-
-export class TextIndex implements DomainIndex {
+/**
+ * I N D E X
+ *
+ * Parses object's and find backlinks in string values with reference format [Name](ref://class#id)
+ *
+ * Example:
+ * Hello [Zaz](ref://chunter.Page#600eb7121900e6e361085f20)
+ */
+export class BacklinkIndex implements DomainIndex {
   private modelDb: Model
   private storage: Storage
   private textAttributes = new Map<Ref<Class<Obj>>, string[]>()
@@ -65,7 +78,12 @@ export class TextIndex implements DomainIndex {
     const keys = this.modelDb
       .getAllAttributes(_class)
       .filter((attr) => attr[1].type._class === CORE_CLASS_ARRAY_OF && (attr[1].type as ArrayOf).of._class === CORE_CLASS_INSTANCE_OF)
-      .map((attr) => { return { key: attr[0], _class: ((attr[1].type as ArrayOf).of as InstanceOf<Emb>).of } as ClassKey })
+      .map((attr) => {
+        return {
+          key: attr[0],
+          _class: ((attr[1].type as ArrayOf).of as InstanceOf<Emb>).of
+        } as ClassKey
+      })
     this.arrayAttributes.set(_class, keys)
     return keys
   }

@@ -44,7 +44,7 @@ export interface UpdateTx extends ObjectTx {
 }
 
 export interface DeleteTx extends ObjectTx {
-  _query?: unknown
+  _query?: AnyLayout
 }
 
 // S P A C E

@@ -22,7 +22,7 @@ import _chunter, { Message, Page, Comment, Collab } from '.'
 import { IntlString } from '@anticrm/platform-i18n'
 import presentation, { ComponentExtension } from '@anticrm/presentation'
 
-import { TEmb, TMixin, TVDoc } from '@anticrm/model/src/__model__'
+import { TVDoc, TEmb, TMixin } from '@anticrm/model/src/__model__'
 import { Ref, Class, Property } from '@anticrm/core'
 import { Application, VDoc } from '@anticrm/domains'
 

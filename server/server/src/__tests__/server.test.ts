@@ -21,9 +21,9 @@ import { encode } from 'jwt-simple'
 import { Db, MongoClient } from 'mongodb'
 import { withTenant } from '@anticrm/accounts'
 
-import core, { Builder } from '@anticrm/model'
+import { Builder } from '@anticrm/model'
 
-import { Doc } from '@anticrm/core'
+import { CORE_CLASS_CLASS, Doc } from '@anticrm/core'
 
 import { model } from '@anticrm/model/src/__model__'
 import { model as presentation } from '@anticrm/presentation/src/__model__'
@@ -147,7 +147,7 @@ describe('server', () => {
     conn.send(makeRequest({
       method: 'find',
       params: [
-        core.class.Class,
+        CORE_CLASS_CLASS,
         {}
       ]
     }))

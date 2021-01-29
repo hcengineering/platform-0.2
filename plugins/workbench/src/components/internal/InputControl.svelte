@@ -12,8 +12,7 @@
   // See the License for the specific language governing permissions and
   // limitations under the License.
 
-  import { Ref, Doc } from '@anticrm/model'
-  import { VDoc } from '@anticrm/core'
+  import { Ref, Doc } from '@anticrm/core'
   import { find } from '../../utils'
 
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
@@ -35,7 +34,8 @@
   let showMenu = false
 
   import { createEventDispatcher } from 'svelte'
-  import { Class } from '@anticrm/model'
+  import { Class } from '@anticrm/core'
+  import { VDoc } from '@anticrm/domains'
 
   const dispatch = createEventDispatcher()
 

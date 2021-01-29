@@ -17,12 +17,12 @@
 import { ServerSuite } from './serversuite'
 
 import { AnyLayout, BooleanProperty, StringProperty } from '@anticrm/core'
-import core from '@anticrm/model'
 import { createSetArrayFilters } from '../mongo_utils'
 
 import { taskIds as task, createSubtask, Task, TaskComment } from '@anticrm/model/src/__tests__/test_tasks'
 
 import { createOperations } from '@anticrm/platform-core/src/operations'
+import { CORE_CLASS_SPACE } from '@anticrm/domains'
 
 describe('mongo operations', () => {
   const wsName = 'test-service-mongo'
@@ -43,7 +43,7 @@ describe('mongo operations', () => {
     const ws = await server.getWorkspace(wsName)
     const model = await ws.getModel()
 
-    const f1 = createSetArrayFilters(model, core.class.Space, {
+    const f1 = createSetArrayFilters(model, CORE_CLASS_SPACE, {
       users: {
         userId: 'qwe.com' as StringProperty
       }
