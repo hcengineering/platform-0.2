@@ -16,8 +16,10 @@
 // following is only to make api-documenter happy.
 // DO NOT REMOVE LINES BELOW!!!
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { Emb } from '@anticrm/core'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { Space, DeleteTx, PushTx, UpdateTx, CreateTx } from '@anticrm/domains'
-// DO NOT REMOVE LINE ABOVE !!!
+// DO NOT REMOVE LINES ABOVE !!!
 import {
   Application,
   Backlinks,
@@ -38,9 +40,7 @@ import {
   BagOf,
   Class,
   Classifier,
-  CORE_CLASS_STRING,
   Doc,
-  Emb,
   Indices,
   InstanceOf,
   Mixin,
@@ -48,7 +48,11 @@ import {
   Ref,
   RefTo,
   Tx,
-  Type
+  Type,
+  CORE_CLASS_DOC,
+  CORE_CLASS_EMB,
+  CORE_CLASS_CLASS,
+  CORE_CLASS_STRING
 } from '@anticrm/core'
 
 import Builder from './builder'
@@ -56,13 +60,13 @@ import Builder from './builder'
 const modelIds = identify('core' as AnyPlugin, {
   class: {
     Obj: '' as Ref<Class<Obj>>,
-    Emb: '' as Ref<Class<Emb>>,
-    Doc: '' as Ref<Class<Doc>>,
+    Emb: CORE_CLASS_EMB,
+    Doc: CORE_CLASS_DOC,
 
     Classifier: '' as Ref<Class<Classifier<Obj>>>,
 
     Attribute: '' as Ref<Class<Attribute>>,
-    Class: '' as Ref<Class<Class<Obj>>>,
+    Class: CORE_CLASS_CLASS,
     Mixin: '' as Ref<Class<Mixin<Obj>>>,
 
     // Data types
