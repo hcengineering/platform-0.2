@@ -15,7 +15,7 @@
 
 import core, { Class$, Prop, ArrayOf$, Builder, InstanceOf$, Primary } from '..'
 import { Ref, Doc, Emb, Class, MODEL_DOMAIN } from '@anticrm/core'
-import { TDoc, TEmb, TObj } from '../__model__'
+import { TDoc, TEmb, TObj } from '../models/core'
 
 export interface TaskComment extends Emb {
   _id: string

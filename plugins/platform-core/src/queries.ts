@@ -65,7 +65,9 @@ export class QueriableStorage implements Domain {
     let pos = 0
     for (const r of q.results) {
       if (r._id === _id) {
-        apply(r)
+        if (this.updateResults) {
+          apply(r)
+        }
         if (!this.model.matchQuery(q._class, r, q.query)) {
           // Document is not matched anymore, we need to remove it.
           q.results.splice(pos, 1)

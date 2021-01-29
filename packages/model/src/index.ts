@@ -15,7 +15,18 @@
 
 // following line is only to make api-documenter happy.
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type { Space, DeleteTx, PushTx, UpdateTx, CreateTx } from '@anticrm/domains'
+import {
+  Application,
+  Backlinks,
+  CORE_CLASS_CREATE_TX,
+  CORE_CLASS_DELETE_TX,
+  CORE_CLASS_PUSH_TX,
+  CORE_CLASS_SPACE,
+  CORE_CLASS_UPDATE_TX,
+  SpaceUser,
+  Title,
+  VDoc
+} from '@anticrm/domains'
 
 import { AnyPlugin, identify } from '@anticrm/platform'
 import {
@@ -24,6 +35,7 @@ import {
   BagOf,
   Class,
   Classifier,
+  CORE_CLASS_STRING,
   Doc,
   Emb,
   Indices,
@@ -32,23 +44,9 @@ import {
   Obj,
   Ref,
   RefTo,
-  Type,
   Tx,
-  CORE_CLASS_STRING
+  Type
 } from '@anticrm/core'
-
-import {
-  Backlinks,
-  Application,
-  VDoc,
-  SpaceUser,
-  Title,
-  CORE_CLASS_SPACE,
-  CORE_CLASS_DELETE_TX,
-  CORE_CLASS_PUSH_TX,
-  CORE_CLASS_UPDATE_TX,
-  CORE_CLASS_CREATE_TX
-} from '@anticrm/domains'
 
 import Builder from './builder'
 

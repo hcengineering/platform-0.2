@@ -13,7 +13,7 @@
 // limitations under the License.
 -->
 <script lang='ts'>
-  import core, { Property, StringProperty } from '@anticrm/core'
+  import { CORE_CLASS_DOC, Property, StringProperty } from '@anticrm/core'
   import { createEventDispatcher } from 'svelte'
   import { AttrModel, ClassModel } from '@anticrm/presentation'
   import { _getCoreService, getPresentationService } from '../../../utils'
@@ -22,6 +22,7 @@
   import EditIconBox from '@anticrm/platform-ui/src/components/EditBox.svelte'
   import IconButton from '@anticrm/platform-ui/src/components/IconButton.svelte'
   import workbench from '@anticrm/workbench'
+  import { CORE_CLASS_SPACE } from '@anticrm/domains'
 
   let makePrivate: boolean = false
   let title: string = ''
@@ -42,7 +43,7 @@
         }
       ]
     }
-    coreService.create(core.class.Space, space)
+    coreService.create(CORE_CLASS_SPACE, space)
     dispatch('close')
   }
 
@@ -54,7 +55,7 @@
 
   $: {
     presentationService.then((ps) =>
-      ps.getClassModel(core.class.Space, core.class.Doc).then((m) => {
+      ps.getClassModel(CORE_CLASS_SPACE, CORE_CLASS_DOC).then((m) => {
         const mp = m.filterPrimary()
         model = mp.model
         primary = mp.primary

@@ -19,7 +19,7 @@ import { withTenant } from '@anticrm/accounts'
 import { createPullArrayFilters, createPushArrayFilters, createSetArrayFilters } from './mongo_utils'
 
 import { ModelIndex } from '@anticrm/domains/src/indices/model'
-import { TextIndex } from '@anticrm/domains/src/indices/text'
+import { BacklinkIndex } from '@anticrm/domains/src/indices/text'
 import { TitleIndex } from '@anticrm/domains/src/indices/title'
 import { VDocIndex } from '@anticrm/domains/src/indices/vdoc'
 import { TxIndex } from '@anticrm/domains/src/indices/tx'
@@ -121,7 +121,7 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
     new TxIndex(mongoStorage),
     new VDocIndex(memdb, mongoStorage),
     new TitleIndex(memdb, mongoStorage),
-    new TextIndex(memdb, mongoStorage),
+    new BacklinkIndex(memdb, mongoStorage),
     new ModelIndex(memdb, [memdb, mongoStorage])
   ])
 

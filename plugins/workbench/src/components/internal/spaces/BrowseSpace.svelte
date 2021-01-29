@@ -13,8 +13,7 @@
 // limitations under the License.
 -->
 <script lang='ts'>
-  import { Space, SpaceUser } from '@anticrm/core'
-  import core from '@anticrm/core'
+  import { CORE_CLASS_SPACE, Space, SpaceUser } from '@anticrm/domains'
   import { createEventDispatcher } from 'svelte'
   import { getPresentationService, _getCoreService, getCoreService, getUIService } from '../../../utils'
   import { getSpaceName, getCurrentUserSpace } from './utils'
@@ -38,7 +37,7 @@
   const presentationService = getPresentationService()
 
   const curentUser = coreService.getUserId()
-  coreService.subscribe(core.class.Space, {}, (docs) => {
+  coreService.subscribe(CORE_CLASS_SPACE, {}, (docs) => {
     console.log('spaces:', docs)
     spaces = docs
   }, onDestroy)

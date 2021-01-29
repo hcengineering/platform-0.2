@@ -14,19 +14,16 @@
 -->
 
 <script type='ts'>
-  import { Application, Space, VDoc } from '@anticrm/core'
-  import { findOne } from '../../utils'
+  import { Ref } from '@anticrm/core'
+  import { findOne, getUIService } from '../../utils'
   import workbench, { WorkbenchApplication } from '../..'
-  import { getUIService } from '../../utils'
 
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
   import Table from '@anticrm/presentation/src/components/internal/Table.svelte'
-  import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
-  import ObjectForm from './ObjectForm.svelte'
   import CreateForm from './CreateForm.svelte'
-  import { Ref } from '@anticrm/model'
-  import IconButton from '@anticrm/platform-ui/src/components/IconButton.svelte';
-  import EditBox from '@anticrm/platform-ui/src/components/EditBox.svelte';
+  import IconButton from '@anticrm/platform-ui/src/components/IconButton.svelte'
+  import EditBox from '@anticrm/platform-ui/src/components/EditBox.svelte'
+  import { Space } from '@anticrm/domains'
 
   export let application: Ref<WorkbenchApplication>
   export let space: Ref<Space>

@@ -19,8 +19,7 @@ import chunter, { Page } from '@anticrm/chunter'
 
 import { newCreateTx } from '@anticrm/platform-core/src/tx'
 import { Property, StringProperty } from '@anticrm/core'
-import { Space, SpaceUser } from '@anticrm/domains'
-import core from '@anticrm/model'
+import { CORE_CLASS_SPACE, Space, SpaceUser } from '@anticrm/domains'
 
 describe('service', () => {
   const wsName = 'test-service'
@@ -41,7 +40,7 @@ describe('service', () => {
     const ws = server.getWorkspace(wsName)
     const { client } = (await server.newClients(1, ws))[0]
 
-    const spaces = await client.find(core.class.Space, { isPublic: true as Property<boolean, boolean> })
+    const spaces = await client.find(CORE_CLASS_SPACE, { isPublic: true as Property<boolean, boolean> })
     expect(spaces.length).toEqual(3)
   })
 
@@ -49,13 +48,13 @@ describe('service', () => {
     const ws = server.getWorkspace(wsName)
     const { client } = (await server.newClients(1, ws))[0]
 
-    const spaces = await client.find(core.class.Space, { isPublic: true as Property<boolean, boolean> })
+    const spaces = await client.find(CORE_CLASS_SPACE, { isPublic: true as Property<boolean, boolean> })
     expect(spaces.length).toEqual(3)
 
     // Create a private space
     await client.tx(newCreateTx(
       {
-        _class: core.class.Space,
+        _class: CORE_CLASS_SPACE,
         name: 'private-space',
         users: [{ userId: 'test@client1' } as unknown as SpaceUser],
         isPublic: false
@@ -76,7 +75,7 @@ describe('service', () => {
 
     await c1.tx(newCreateTx(
       {
-        _class: core.class.Space,
+        _class: CORE_CLASS_SPACE,
         name: 'public-space',
         users: [],
         isPublic: true
@@ -84,7 +83,7 @@ describe('service', () => {
       'test@client1' as StringProperty
     ))
 
-    const spaces = await c1.find(core.class.Space, { isPublic: true as Property<boolean, boolean> })
+    const spaces = await c1.find(CORE_CLASS_SPACE, { isPublic: true as Property<boolean, boolean> })
     expect(spaces.length).toEqual(4)
     await clients[1].wait()
 
@@ -114,14 +113,14 @@ describe('service', () => {
     // Create a private space
     await c1.tx(newCreateTx(
       {
-        _class: core.class.Space,
+        _class: CORE_CLASS_SPACE,
         name: 'private-space',
         users: [{ userId: 'test@client1', owner: true } as unknown as SpaceUser],
         isPublic: false
       } as unknown as Space,
       'test@client1' as StringProperty
     ))
-    let spaces = await c1.find(core.class.Space, { isPublic: false as Property<boolean, boolean> })
+    let spaces = await c1.find(CORE_CLASS_SPACE, { isPublic: false as Property<boolean, boolean> })
     expect(spaces.length).toEqual(1)
     // Let's create task inside private space and check c2 is not recieve it.
 
@@ -139,7 +138,7 @@ describe('service', () => {
     await clients[1].wait()
 
     // Client2 had access to client1 private-space, it should not.
-    spaces = await c2.find(core.class.Space, { isPublic: false as Property<boolean, boolean> })
+    spaces = await c2.find(CORE_CLASS_SPACE, { isPublic: false as Property<boolean, boolean> })
     expect(spaces.length).toEqual(0)
 
     pages = await c2.find(chunter.class.Page, {})
@@ -155,7 +154,7 @@ describe('service', () => {
     // Create a shared private space
     await c1.tx(newCreateTx(
       {
-        _class: core.class.Space,
+        _class: CORE_CLASS_SPACE,
         name: 'shared-space',
         users: [{ userId: 'test@client1', owner: true } as unknown as SpaceUser, { userId: 'test@client2', owner: false } as unknown as SpaceUser],
         isPublic: false
@@ -163,7 +162,7 @@ describe('service', () => {
       'test@client1' as StringProperty
     ))
 
-    let spaces = await c1.find(core.class.Space, { name: 'shared-space' as StringProperty })
+    let spaces = await c1.find(CORE_CLASS_SPACE, { name: 'shared-space' as StringProperty })
 
     await c1.tx(newCreateTx(
       {
@@ -184,7 +183,7 @@ describe('service', () => {
     expect(pages.length).toEqual(1) // c2 is not allowed to see page from private space of c1
 
     // Client2 should have access to shared-space and recieve update about it.
-    spaces = await c2.find(core.class.Space, { isPublic: false as Property<boolean, boolean> })
+    spaces = await c2.find(CORE_CLASS_SPACE, { isPublic: false as Property<boolean, boolean> })
     expect(spaces.length).toEqual(1)
   })
 })
