@@ -19,6 +19,7 @@
 
   export let icon: Asset | undefined  
   export let width: string = '300px'
+  export let id: string
   export let value: string
   export let placeholder: string
   export let right: boolean = false
@@ -33,6 +34,7 @@
   {/if}
   <input
     bind:this={input}
+    id={id}
     type="text"
     bind:value={value}
     {placeholder}

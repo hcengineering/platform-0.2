@@ -27,6 +27,7 @@ export default (platform: Platform) => {
     Finder: spritesUrl + '#finder',
     Lock: spritesUrl + '#lock',
     Sharp: spritesUrl + '#sharp',
-    Burger: spritesUrl + '#burger'
+    Burger: spritesUrl + '#burger',
+    ArrowDown: spritesUrl + '#arrowDown'
   })
 }

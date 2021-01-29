@@ -125,7 +125,7 @@
     background-color: var(--theme-bg-accent-color);
     box-sizing: border-box;
     color: var(--theme-content-color);
-    transition: all .2s ease-in-out;
+    //transition: all .2s ease-in-out;
 
     &:focus-within {
       outline: none;
