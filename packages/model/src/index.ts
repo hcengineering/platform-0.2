@@ -13,8 +13,9 @@
 // limitations under the License.
 //
 
-// following line is only to make api-documenter happy.
+// following line is only to make api-documenter happy. DO NOT DELETE!!!!!!!
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { Space, DeleteTx, PushTx, UpdateTx, CreateTx } from '@anticrm/domains'
 import {
   Application,
   Backlinks,
