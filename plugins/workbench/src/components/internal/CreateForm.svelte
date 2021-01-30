@@ -23,7 +23,7 @@
   import AttributeEditor from '@anticrm/presentation/src/components/AttributeEditor.svelte'
   import Properties from '@anticrm/presentation/src/components/internal/Properties.svelte'
   import IconButton from '@anticrm/platform-ui/src/components/IconButton.svelte'
-  import ComboUserBox from '@anticrm/platform-ui/src/components/ComboUserBox.svelte'
+  import UserBox from '@anticrm/platform-ui/src/components/UserBox.svelte'
   import workbench from '@anticrm/workbench'
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
   import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.svelte'
@@ -158,7 +158,7 @@
     <div class="taskLabel">
       DT-925
     </div>
-    <ComboUserBox items={users} />
+    <UserBox items={users} />
     <div class="separator"></div>
     <ReferenceInput stylesEnabled="true" />
   </div>

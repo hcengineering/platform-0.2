@@ -1,8 +1,8 @@
 <script lang='ts'>
   import UserInfo from '@anticrm/sparkling-controls/src/UserInfo.svelte'
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
-  import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
-  import EditBox from '@anticrm/platform-ui/src/components/EditBox.svelte'
+  import Icon from './Icon.svelte'
+  import EditBox from './EditBox.svelte'
   import workbench from '@anticrm/workbench'
 
   export let items: Array
