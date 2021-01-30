@@ -81,6 +81,7 @@
         top: 2px;
         left: calc(100% - 18px);
         transition: all .2s ease-in-out;
+        z-index: 2;
       }
       &::after {
         content: '';
@@ -90,6 +91,7 @@
         top: 4px;
         left: 3px;
         position: absolute;
+        z-index: 1;
       }
     }
   }
