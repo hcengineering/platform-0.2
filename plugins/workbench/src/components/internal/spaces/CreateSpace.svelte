@@ -20,7 +20,7 @@
   import CheckBox from '@anticrm/sparkling-controls/src/CheckBox.svelte'
   import EditBox from '@anticrm/sparkling-controls/src/EditBox.svelte'
   import EditIconBox from '@anticrm/platform-ui/src/components/EditBox.svelte'
-  import IconButton from '@anticrm/platform-ui/src/components/IconButton.svelte'
+  import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import workbench from '@anticrm/workbench'
   import { CORE_CLASS_SPACE } from '@anticrm/domains'
 
@@ -154,7 +154,7 @@
   <div class='header'>
     <div class='caption-1'>Create a new {(makePrivate) ? 'private ' : ''}Space</div>
     <a href='/' on:click|preventDefault={() => dispatch('close')}>
-      <IconButton icon={workbench.icon.Close} />
+      <Icon icon={workbench.icon.Close} clazz='icon-button' />
     </a>
   </div>
 
@@ -164,9 +164,9 @@
         <label class='input-label' for='create_space__input__name'>
           Name
         </label>
-        <!-- <EditIconBox id='create_space__input__name' bind:value={title}
-                     icon={(makePrivate) ? workbench.icon.Lock : workbench.icon.Sharp} /> -->
-        <EditBox id='create_space__input__name' bind:value={title} />
+        <EditIconBox id='create_space__input__name' bind:value={title}
+                     icon={(makePrivate) ? workbench.icon.Lock : workbench.icon.Sharp} />
+        <!-- <EditBox id='create_space__input__name' bind:value={title} /> -->
       </div>
       <div class='input-container'>
         <label class='input-label' for='create_space__input__description'>

@@ -5,12 +5,12 @@
 
   export let icon: Asset | undefined
   export let clazz: string = ''
-  export let style: string = ''
 
   const platform = getContext("platform") as Platform;
-  const url = platform.getMetadata(icon || ui.icon.Default) || 'https://anticrm.org/logo.svg'
+  let url
+  $: url = platform.getMetadata(icon || ui.icon.Default) || 'https://anticrm.org/logo.svg'
 </script>
 
-<svg class={clazz} {style}>
-  <use xlink:href={url} />
+<svg class={clazz}>
+  <use href={url} />
 </svg>

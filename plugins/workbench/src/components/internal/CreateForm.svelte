@@ -22,7 +22,7 @@
 
   import AttributeEditor from '@anticrm/presentation/src/components/AttributeEditor.svelte'
   import Properties from '@anticrm/presentation/src/components/internal/Properties.svelte'
-  import IconButton from '@anticrm/platform-ui/src/components/IconButton.svelte'
+  import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import UserBox from '@anticrm/platform-ui/src/components/UserBox.svelte'
   import workbench from '@anticrm/workbench'
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
@@ -149,8 +149,8 @@
     <div class='caption-1 caption'>
       <InlineEdit value='Дизайн Конструктора в личном кабинете' fullWidth='true' />
     </div>
-    <a href='/' on:click|preventDefault={() => dispatch('close')}>
-      <IconButton icon={workbench.icon.Close} style='margin-left:1.5em' />
+    <a href='/' style='margin-left:1.5em' on:click|preventDefault={() => dispatch('close')}>
+      <Icon icon={workbench.icon.Close} clazz='icon-button' />
     </a>
   </div>
 

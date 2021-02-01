@@ -64,7 +64,9 @@
           <tr>
             <td>
               {#if attr.icon}
-                <Icon icon={attr.icon} clazz="icon-embed-15x" style="fill: var(--theme-content-dark-color)" />
+                <span style="fill: var(--theme-content-dark-color)">
+                  <Icon icon={attr.icon} clazz="icon-embed-15x" />
+                </span>
               {/if}
             </td>
             <td width="120px">

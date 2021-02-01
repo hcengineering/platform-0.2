@@ -18,7 +18,7 @@
   import { _getCoreService, getPresentationService } from '../../../utils'
   import { Doc, Property, Ref, StringProperty } from '@anticrm/core'
 
-  import IconButton from '@anticrm/platform-ui/src/components/IconButton.svelte'
+  import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import workbench from '@anticrm/workbench'
   import CheckBox from '@anticrm/sparkling-controls/src/CheckBox.svelte'
   import EditBox from '@anticrm/sparkling-controls/src/EditBox.svelte'
@@ -135,7 +135,7 @@
   <div class='header'>
     <div class='caption-1'>Add user to {space.name}</div>
     <a href='/' on:click|preventDefault={() => dispatch('close')}>
-      <IconButton icon={workbench.icon.Close} />
+      <Icon icon={workbench.icon.Close} clazz='icon-button' />
     </a>
   </div>
 

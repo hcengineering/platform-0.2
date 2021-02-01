@@ -12,7 +12,9 @@
 
 <span>
   {#if status.severity === Severity.ERROR}
-    <Icon icon={ui.icon.Error} clazz="icon-embed" style="fill: #C21F39" />
+    <span style="fill: #C21F39">
+      <Icon icon={ui.icon.Error} clazz="icon-embed" />
+    </span>
   {/if}
   {status.message}
 </span>

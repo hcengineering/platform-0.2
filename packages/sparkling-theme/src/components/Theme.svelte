@@ -125,7 +125,7 @@
     background-color: var(--theme-bg-accent-color);
     box-sizing: border-box;
     color: var(--theme-content-color);
-    //transition: all .2s ease-in-out;
+    transition: border-color .2s, color .2s, background-color .2s;
 
     &:focus-within {
       outline: none;
@@ -150,7 +150,7 @@
 
     color: var(--theme-content-color);
     background-color: var(--theme-bg-accent-color);
-    transition: all .2s ease-in-out;
+    transition: border-color .2s, color .2s, background-color .2s;
 
     &:focus {
       outline: none;
@@ -217,6 +217,21 @@
     height: 24px;
   }
 
+  .icon-button {
+    background-color: var(--theme-bg-accent-color);
+    border: solid 1px var(--theme-bg-dark-color);
+    border-radius: 50%;
+    fill: var(--theme-content-color);
+    width: 16px;
+    height: 16px;
+
+    &:hover {
+      background-color: var(--theme-bg-accent-hover);
+      border-color: var(--theme-bg-dark-hover);
+      fill: var(--theme-content-color);
+    }
+  }
+
   .icon-embed {
     height: 16px;
     width: 16px;
@@ -246,6 +261,16 @@
     width: 2em;
     fill: currentColor;
     position: relative;
+  }
+
+  .popup, .popup-16 {
+    height: 1.5em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .popup-16 {
+    height: 16px;
   }
 
   .caption-1 {

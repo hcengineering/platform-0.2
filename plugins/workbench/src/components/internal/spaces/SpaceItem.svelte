@@ -7,6 +7,9 @@
   import ToolbarButton from '@anticrm/sparkling-controls/src/toolbar/Button.svelte'
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import workbench from '../../..'
+  import PopupMenu from '@anticrm/sparkling-controls/src/menu/PopupMenu.svelte'
+  import PopupItem from '@anticrm/sparkling-controls/src/menu/PopupItem.svelte'
+  import AddUser from './AddUser.svelte'
 
   export let link: string = '/'
   export let selected: boolean = false
@@ -35,13 +38,17 @@
       <div class='counter'>{count}</div>
     {/if}
     {#if selected}
-      <div bind:this={optionsButton}>
-        <ToolbarButton style="padding:0; width:16px; height:16px"
-          on:click={() => {
-            uiService.showModal(SpaceOptions, {space}, optionsButton)
-          }}>
-          <Icon icon={workbench.icon.Burger} clazz="icon-embed" />
-        </ToolbarButton>
+      <div bind:this={optionsButton} class='optionsButton'>
+        <PopupMenu>
+          <div class='popup-16' slot='trigger'><Icon icon={workbench.icon.Burger} clazz="icon-embed" /></div>
+          <PopupItem on:click={() => {
+            uiService.showModal(AddUser, { space }, optionsButton)
+          }}>Add user</PopupItem>
+          <PopupItem separator='true' />
+          <PopupItem on:click={() => {
+            leaveSpace(coreService, space)
+          }}>Leave</PopupItem>
+        </PopupMenu>
       </div>
     {/if}
   </div>
@@ -100,5 +107,9 @@
     margin: 0;
     padding: 0 4px;
     border-radius: 8px;
+  }
+
+  .optionsButton {
+    margin-left: .5em;
   }
 </style>

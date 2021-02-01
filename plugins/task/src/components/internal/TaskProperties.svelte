@@ -21,6 +21,10 @@
   import ActionButton from './ActionButton.svelte'
   import UserInfo from '@anticrm/sparkling-controls/src/UserInfo.svelte'
   import StatusLabel from './StatusLabel.svelte'
+  import PopupMenu from '@anticrm/sparkling-controls/src/menu/PopupMenu.svelte'
+  import PopupItem from '@anticrm/sparkling-controls/src/menu/PopupItem.svelte'
+  import Button from '@anticrm/sparkling-controls/src/Button.svelte'
+  import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
 
   import Properties from '@anticrm/presentation/src/components/internal/Properties.svelte'
   import AttributeEditor from '@anticrm/presentation/src/components/AttributeEditor.svelte'
@@ -89,9 +93,17 @@
               title="Андрей Платов" subtitle="Исполнитель" />
 
     <div class="actionBar">
-      <ActionButton style="leftButton" width="40%">Выполнено</ActionButton>
-      <ActionButton style="centerButton" width="40%">В работе</ActionButton>
-      <ActionButton style="rightButton" width="20%" combo=true>Ещё</ActionButton>
+      <Button clazz="leftAB actionButton w40">Выполнено</Button>
+      <Button clazz="centerAB actionButton w40">В работе</Button>
+      <PopupMenu buttonClass='rightAB actionButton w20'>
+        <span class='popup-16' slot='trigger'>
+          Ещё <Icon icon={task.icon.ArrowDown} clazz='icon-embed' />
+        </span>
+        <PopupItem>Action 3</PopupItem>
+        <PopupItem>Action 4</PopupItem>
+        <PopupItem>Action 5</PopupItem>
+        <PopupItem>Action 6</PopupItem>
+      </PopupMenu>
     </div>
 
     <div class="description">
@@ -144,6 +156,7 @@
     .actionBar {
       width: 100%;
       display: flex;
+      flex-direction: row;
       margin-top: 2em;
       margin-bottom: 2em;
     }
