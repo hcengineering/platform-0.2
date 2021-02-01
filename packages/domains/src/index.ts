@@ -28,6 +28,7 @@ export interface ObjectTx extends Tx {
   _objectId: Ref<Doc>
   _objectClass: Ref<Class<Doc>>
 }
+
 export interface CreateTx extends ObjectTx {
   object: AnyLayout
 }
@@ -70,7 +71,8 @@ export interface Space extends Doc {
 
 // V D O C
 
-export interface Application extends Doc { }
+export interface Application extends Doc {
+}
 
 export interface List extends Emb {
   id: string
@@ -88,23 +90,27 @@ export interface VDoc extends Doc {
   _modifiedBy?: StringProperty
 }
 
-// B A C K L I N K S
+// R E F E R E N C E S
 
-export interface Backlink {
-  _backlinkClass: Ref<Class<Doc>>
-  _backlinkId: Ref<Doc>
-  pos: number
+export const CORE_CLASS_REFERENCE = 'class:core.Reference' as Ref<Class<Reference>>
+
+/**
+ * A reference object from and source to any target
+ *
+ * source - define a source object with class and properties.
+ * target - define a target object with class and properties.
+ */
+export interface Reference extends Doc {
+  _sourceId?: Ref<Doc>
+  _sourceClass: Ref<Class<Doc>>
+  _sourceProps?: Record<string, unknown>
+
+  _targetId?: Ref<Doc>
+  _targetClass: Ref<Class<Doc>>
+  _targetProps?: Record<string, unknown>
 }
 
-export const CORE_CLASS_BACKLINKS = 'class:core.Backlinks' as Ref<Class<Backlinks>>
-
-export interface Backlinks extends Doc {
-  _objectId: Ref<Doc>
-  _objectClass: Ref<Class<Doc>>
-  backlinks: Backlink[]
-}
-
-export const BACKLINKS_DOMAIN = 'backlinks'
+export const REFERENCE_DOMAIN = 'references'
 
 // T I T L E
 

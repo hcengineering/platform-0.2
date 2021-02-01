@@ -14,8 +14,7 @@
 //
 /* eslint-env jest */
 
-import { makeRequest, getResponse } from '../rpc'
-import { start, Client, ServerProtocol } from '../server'
+import { Client, ServerProtocol, start } from '../server'
 import WebSocket from 'ws'
 import { encode } from 'jwt-simple'
 import { Db, MongoClient } from 'mongodb'
@@ -31,6 +30,7 @@ import { model as contact } from '@anticrm/contact/src/__model__'
 import { model as workbench } from '@anticrm/workbench/src/__model__'
 import { model as task } from '@anticrm/task/src/__model__'
 import { model as chunter } from '@anticrm/chunter/src/__model__'
+import { readResponse, serialize } from '@anticrm/rpc'
 // import recruitmentModel from '@anticrm/recruitment-model/src/model'
 
 // import taskStrings from '@anticrm/task-model/src/strings/ru'
@@ -123,14 +123,14 @@ describe('server', () => {
     const start = Date.now()
     let received = 0
     conn.on('message', (msg: string) => {
-      const resp = getResponse(msg)
+      const resp = readResponse(msg)
       if (++received === total) {
         console.log('resp:', resp, ' Time: ', Date.now() - start)
         done()
       }
     })
     for (let i = 0; i < total; i++) {
-      conn.send(makeRequest({
+      conn.send(serialize({
         id: i,
         method: 'ping',
         params: []
@@ -140,11 +140,11 @@ describe('server', () => {
 
   it('should send query', (done) => {
     conn.on('message', (msg: string) => {
-      const resp = getResponse(msg)
+      const resp = readResponse(msg)
       expect(resp.result instanceof Array).toBeTruthy()
       done()
     })
-    conn.send(makeRequest({
+    conn.send(serialize({
       method: 'find',
       params: [
         CORE_CLASS_CLASS,
@@ -155,11 +155,11 @@ describe('server', () => {
 
   it('should load domain', (done) => {
     conn.on('message', (msg: string) => {
-      const resp = getResponse(msg)
+      const resp = readResponse(msg)
       expect(resp.result instanceof Array).toBeTruthy()
       done()
     })
-    conn.send(makeRequest({
+    conn.send(serialize({
       method: 'loadDomain',
       params: [
         'model'

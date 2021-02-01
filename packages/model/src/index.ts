@@ -18,11 +18,10 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { Emb } from '@anticrm/core'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type { Space, DeleteTx, PushTx, UpdateTx, CreateTx } from '@anticrm/domains'
+import type { Space, DeleteTx, PushTx, UpdateTx, CreateTx, Reference } from '@anticrm/domains'
 // DO NOT REMOVE LINES ABOVE !!!
 import {
   Application,
-  Backlinks,
   CORE_CLASS_CREATE_TX,
   CORE_CLASS_DELETE_TX,
   CORE_CLASS_PUSH_TX,
@@ -92,7 +91,7 @@ const modelIds = identify('core' as AnyPlugin, {
     Space: CORE_CLASS_SPACE,
     SpaceUser: '' as Ref<Class<SpaceUser>>,
 
-    Backlinks: '' as Ref<Class<Backlinks>>,
+    Reference: '' as Ref<Class<Reference>>,
 
     Application: '' as Ref<Class<Application>>
 

@@ -24,10 +24,10 @@ import {
   AnyLayout,
   CORE_CLASS_STRING,
   CORE_CLASS_ARRAY_OF, CORE_CLASS_INSTANCE_OF,
-  DomainIndex, Storage, Tx, TxContext, generateId,
-  Model
+  DomainIndex, Storage, Tx, TxContext,
+  Model, generateId
 } from '@anticrm/core'
-import { Backlink, Backlinks, CORE_CLASS_BACKLINKS, CreateTx, CORE_CLASS_CREATE_TX } from '..'
+import { CreateTx, CORE_CLASS_CREATE_TX, Reference, CORE_CLASS_REFERENCE } from '..'
 
 import {
   MessageMarkType,
@@ -48,7 +48,7 @@ type ClassKey = { key: string, _class: Ref<Class<Emb>> }
  * Example:
  * Hello [Zaz](ref://chunter.Page#600eb7121900e6e361085f20)
  */
-export class BacklinkIndex implements DomainIndex {
+export class ReferenceIndex implements DomainIndex {
   private modelDb: Model
   private storage: Storage
   private textAttributes = new Map<Ref<Class<Obj>>, string[]>()
@@ -88,16 +88,21 @@ export class BacklinkIndex implements DomainIndex {
     return keys
   }
 
-  private backlinksFromMessage (message: string, pos: number): Backlink[] {
-    const result: Backlink[] = []
+  private referencesFromMessage (_class: Ref<Class<Doc>>, _id: Ref<Doc> | undefined, message: string, props: Record<string, unknown>, index: { value: number }): Reference[] {
+    const result: Reference[] = []
     traverseMessage(parseMessage(message) as MessageNode, (el) => {
       traverseMarks(el, (m) => {
         if (m.type === MessageMarkType.reference) {
           const rm = m as ReferenceMark
+          index.value++
           result.push({
-            _backlinkId: rm.attrs.id as Ref<Doc>,
-            _backlinkClass: rm.attrs.class as Ref<Class<Doc>>,
-            pos
+            _class: CORE_CLASS_REFERENCE,
+            _id: ((_id as string) + index.value) as Ref<Doc>, // Generate a sequence id based on source object id.
+            _targetId: rm.attrs.id as Ref<Doc>,
+            _targetClass: rm.attrs.class as Ref<Class<Doc>>,
+            _sourceId: _id,
+            _sourceClass: _class,
+            _sourceProps: props
           })
         }
       })
@@ -105,15 +110,11 @@ export class BacklinkIndex implements DomainIndex {
     return result
   }
 
-  private backlinks (
-    _class: Ref<Class<Obj>>,
-    obj: AnyLayout,
-    pos: number
-  ): Backlink[] {
+  private references (_class: Ref<Class<Doc>>, _id: Ref<Doc> | undefined, obj: AnyLayout, props: Record<string, unknown>, index: { value: number }): Reference[] {
     const attributes = this.getTextAttributes(_class)
     const backlinks = []
     for (const attr of attributes) {
-      backlinks.push(...this.backlinksFromMessage((obj as any)[attr], pos))
+      backlinks.push(...this.referencesFromMessage(_class, _id, (obj as any)[attr], props, index))
     }
     return backlinks
   }
@@ -128,26 +129,26 @@ export class BacklinkIndex implements DomainIndex {
   }
 
   async onCreate (ctx: TxContext, create: CreateTx): Promise<any> {
-    const backlinks = this.backlinks(create._objectClass, create.object, -1)
+    const index = { value: 0 }
+    const backlinks = this.references(create._objectClass, create._objectId, create.object, { pos: -1 }, index)
     const arrays = this.getArrayAttributes(create._objectClass)
     for (const attr of arrays) {
       const arr = (create.object as any)[attr.key]
       if (arr) {
         for (let i = 0; i < arr.length; i++) {
-          backlinks.push(...this.backlinks(attr._class, arr[i], i))
+          backlinks.push(...this.references(create._objectClass, create._objectId, arr[i], {
+            pos: i,
+            key: attr.key,
+            attrClass: attr._class
+          }, index))
         }
       }
     }
     if (backlinks.length === 0) {
       return
     }
-    const doc: Backlinks = {
-      _class: CORE_CLASS_BACKLINKS,
-      _id: generateId() as Ref<Backlinks>,
-      _objectClass: create._objectClass,
-      _objectId: create._objectId,
-      backlinks
-    }
-    return this.storage.store(ctx, doc)
+    return Promise.all(backlinks.map((d) => {
+      return this.storage.store(ctx, d)
+    }))
   }
 }

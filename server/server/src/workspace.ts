@@ -13,18 +13,35 @@
 // limitations under the License.
 //
 
-import { CoreProtocol, TxProcessor, Tx, txContext, TxContext, TxContextSource, Storage, Ref, StringProperty, AnyLayout, Class, Doc, Model, MODEL_DOMAIN, isValidQuery } from '@anticrm/core'
+import {
+  TxProcessor,
+  Tx,
+  TxContext,
+  Storage,
+  Ref,
+  StringProperty,
+  AnyLayout,
+  Class,
+  Doc,
+  Model,
+  MODEL_DOMAIN,
+  isValidQuery, DocumentProtocol
+} from '@anticrm/core'
 import { Collection, MongoClient } from 'mongodb'
 import { withTenant } from '@anticrm/accounts'
-import { createPullArrayFilters, createPushArrayFilters, createSetArrayFilters } from './mongo_utils'
+import { createPullArrayFilters, createPushArrayFilters, createQuery, createSetArrayFilters } from './mongo_utils'
 
 import { ModelIndex } from '@anticrm/domains/src/indices/model'
-import { BacklinkIndex } from '@anticrm/domains/src/indices/text'
+import { ReferenceIndex } from '@anticrm/domains/src/indices/reference'
 import { TitleIndex } from '@anticrm/domains/src/indices/title'
 import { VDocIndex } from '@anticrm/domains/src/indices/vdoc'
 import { TxIndex } from '@anticrm/domains/src/indices/tx'
+import { ClientTxStorage } from '@anticrm/platform-core/src/clienttx'
 
-export interface WorkspaceProtocol extends CoreProtocol {
+export interface WorkspaceProtocol extends DocumentProtocol {
+
+  tx (txContext: TxContext, tx: Tx): Promise<any>
+
   close (): Promise<void>
 
   getModel (): Promise<Model>
@@ -117,11 +134,14 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
     }
   }
 
+  // Will construct a client transactions on derived data operations.
+  const clientTxMongo = new ClientTxStorage(mongoStorage)
+
   const txProcessor = new TxProcessor([
     new TxIndex(mongoStorage),
     new VDocIndex(memdb, mongoStorage),
-    new TitleIndex(memdb, mongoStorage),
-    new BacklinkIndex(memdb, mongoStorage),
+    new TitleIndex(memdb, clientTxMongo),
+    new ReferenceIndex(memdb, clientTxMongo),
     new ModelIndex(memdb, [memdb, mongoStorage])
   ])
 
@@ -129,29 +149,21 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
     // C O R E  P R O T O C O L
 
     find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
-      const finalQuery = {
-        ...memdb.assign({}, _class, query),
-        _class: memdb.getClass(_class)
-      }
       return collection(_class)
-        .find(finalQuery)
+        .find(createQuery(memdb, _class, query))
         .toArray()
     },
 
     async findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined> {
-      const finalQuery = {
-        ...memdb.assign({}, _class, query),
-        _class: memdb.getClass(_class)
-      }
-      const result = await collection(_class).findOne(finalQuery)
+      const result = await collection(_class).findOne(createQuery(memdb, _class, query))
       if (result == null) {
         return undefined
       }
       return result
     },
 
-    async tx (tx: Tx): Promise<any> {
-      return txProcessor.process(txContext(TxContextSource.Server), tx)
+    async tx (txContext: TxContext, tx: Tx): Promise<any> {
+      return txProcessor.process(txContext, tx)
     },
 
     async loadDomain (domain: string): Promise<Doc[]> {

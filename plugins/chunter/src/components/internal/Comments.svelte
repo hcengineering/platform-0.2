@@ -19,20 +19,26 @@
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
   import CommentComponent from './Comment.svelte'
   import Backlink from './Backlink.svelte'
-  import { Backlinks, CORE_CLASS_BACKLINKS } from '@anticrm/domains'
+  import { Reference, CORE_CLASS_REFERENCE } from '@anticrm/domains'
 
   export let object: Collab
 
-  let backlinks: Backlinks[] = []
+  let references: Reference[] = []
 
-  getCoreService().subscribe(CORE_CLASS_BACKLINKS, { _objectId: object._id }, (docs) => {
-    backlinks = docs
+  const refS = getCoreService().subscribe(CORE_CLASS_REFERENCE, { _targetId: object._id }, (docs) => {
+    references = docs
   }, onDestroy)
 
-  getCoreService().subscribe(object._class, { _id: object._id }, (docs) => {
-    console.log('MSG update', docs)
+  const oS = getCoreService().subscribe(object._class, { _id: object._id }, (docs) => {
     object = docs[0] as Collab
   }, onDestroy)
+
+  $: {
+    if (object) {
+      refS({ _targetId: object._id })
+      oS({ _id: object._id })
+    }
+  }
 
   const coreService = getCoreService()
   const chunterService = getService(chunter.id)
@@ -59,9 +65,7 @@
 
 <div class='caption-2'>Backlinks</div>
 
-{#each backlinks as backlink}
+{#each references as ref}
   <!-- <Backlink {backlink} /> -->
-  {#each backlink.backlinks as b}
-    <Backlink backlink={b} />
-  {/each}
+  <Backlink backlink={ref} />
 {/each}

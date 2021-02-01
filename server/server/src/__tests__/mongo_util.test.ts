@@ -16,7 +16,7 @@
 
 import { ServerSuite } from './serversuite'
 
-import { AnyLayout, BooleanProperty, StringProperty } from '@anticrm/core'
+import { AnyLayout, BooleanProperty, StringProperty, Tx, txContext } from '@anticrm/core'
 import { createSetArrayFilters } from '../mongo_utils'
 
 import { taskIds as task, createSubtask, Task, TaskComment } from '@anticrm/model/src/__tests__/test_tasks'
@@ -107,7 +107,9 @@ describe('mongo operations', () => {
       message: 'qwe'
     } as TaskComment]
 
-    const ops = createOperations(await ws.getModel(), ws.tx, () => 'qwe' as StringProperty)
+    const processTx = (tx: Tx) => ws.tx(txContext(), tx)
+
+    const ops = createOperations(await ws.getModel(), processTx, () => 'qwe' as StringProperty)
 
     const d1 = await ops.create(task.class.Task, (doc1 as unknown) as AnyLayout)
     const d2 = await ops.update(d1, {
@@ -176,7 +178,8 @@ describe('mongo operations', () => {
       message: 'qwe'
     } as TaskComment]
 
-    const ops = createOperations(await ws.getModel(), ws.tx, () => 'qwe' as StringProperty)
+    const processTx = (tx: Tx) => ws.tx(txContext(), tx)
+    const ops = createOperations(await ws.getModel(), processTx, () => 'qwe' as StringProperty)
 
     const d1 = await ops.create(task.class.Task, (doc1 as unknown) as AnyLayout)
     const d2 = await ops.push(d1,
@@ -211,7 +214,8 @@ describe('mongo operations', () => {
       ]
     } as Task
 
-    const ops = createOperations(await ws.getModel(), ws.tx, () => 'qwe' as StringProperty)
+    const processTx = (tx: Tx) => ws.tx(txContext(), tx)
+    const ops = createOperations(await ws.getModel(), processTx, () => 'qwe' as StringProperty)
 
     const d1 = await ops.create(task.class.Task, (doc1 as unknown) as AnyLayout)
     const d2 = await ops.remove(d1,
