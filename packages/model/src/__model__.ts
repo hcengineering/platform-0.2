@@ -15,13 +15,10 @@
 
 import core, { ArrayOf$, Builder, Class$, InstanceOf$, Primary, Prop, RefTo$ } from '.'
 
-import { Class, Classifier, DateProperty, Doc, MODEL_DOMAIN, Ref, StringProperty, Type } from '@anticrm/core'
+import { Classifier, DateProperty, Doc, MODEL_DOMAIN, Ref, StringProperty, Type } from '@anticrm/core'
 
 import {
   Application,
-  Backlink,
-  Backlinks,
-  BACKLINKS_DOMAIN,
   Space,
   SpaceUser,
   Title,
@@ -43,9 +40,11 @@ import {
   TType
 } from './models/core'
 import { TCreateTx, TDeleteTx, TPushTx, TTx, TUpdateTx } from './models/tx'
+import { TReference } from './models/references'
 
 export * from './models/core'
 export * from './models/tx'
+export * from './models/references'
 
 // Primitive types
 
@@ -97,13 +96,6 @@ export class TVDoc extends TDoc implements VDoc {
 export class TApplication extends TDoc implements Application {
 }
 
-@Class$(core.class.Backlinks, core.class.Doc, BACKLINKS_DOMAIN)
-class TBacklinks extends TDoc implements Backlinks {
-  @Prop() _objectId!: Ref<VDoc>
-  @Prop() _objectClass!: Ref<Class<VDoc>>
-  @Prop() backlinks!: Backlink[]
-}
-
 @Class$(core.class.Title, core.class.Doc, TITLE_DOMAIN)
 class TTitle extends TDoc implements Title {
   @RefTo$(core.class.Class) _objectClass!: Ref<Classifier<Doc>>
@@ -115,7 +107,7 @@ export function model (S: Builder): void {
   S.add(TObj, TEmb, TDoc, TAttribute, TType, TRefTo, TArrayOf, TClassifier, TClass, TMixin)
   S.add(TIndexesClass)
   S.add(TStringType, TNumberType, TBooleanType)
-  S.add(TVDoc, TBacklinks, TTitle, TApplication)
+  S.add(TVDoc, TReference, TTitle, TApplication)
   S.add(TTx, TCreateTx, TPushTx, TUpdateTx, TDeleteTx)
   S.add(TSpace, TSpaceUser)
 }

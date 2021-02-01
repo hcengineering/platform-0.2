@@ -14,7 +14,20 @@
 //
 
 import { Tx, AnyLayout, Class, Doc, Ref, StringProperty } from '@anticrm/core'
-import { CreateTx, DeleteTx, PushTx, Space, SpaceUser, UpdateTx, CORE_CLASS_CREATE_TX, CORE_CLASS_UPDATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_PUSH_TX, CORE_CLASS_SPACE } from '@anticrm/domains'
+import {
+  CreateTx,
+  DeleteTx,
+  PushTx,
+  Space,
+  SpaceUser,
+  UpdateTx,
+  CORE_CLASS_CREATE_TX,
+  CORE_CLASS_UPDATE_TX,
+  CORE_CLASS_DELETE_TX,
+  CORE_CLASS_PUSH_TX,
+  CORE_CLASS_SPACE,
+  CORE_CLASS_TITLE, CORE_CLASS_REFERENCE
+} from '@anticrm/domains'
 import { Client } from './server'
 import { WorkspaceProtocol } from './workspace'
 
@@ -28,6 +41,13 @@ function getSpaceKey (_class: Ref<Class<Doc>>): string {
  * The result query can be used to request objects the user has access to from the storage.
  */
 export async function filterQuery (spaces: Map<string, SpaceUser>, _class: Ref<Class<Doc>>, query: AnyLayout): Promise<{ valid: boolean, filteredQuery: AnyLayout }> {
+  if (_class === CORE_CLASS_TITLE || _class === CORE_CLASS_REFERENCE) {
+    // Allow to proceed with title and references
+    return {
+      valid: true,
+      filteredQuery: query
+    }
+  }
   const spaceKey = getSpaceKey(_class)
 
   // check filter by space in the request

@@ -13,13 +13,13 @@
 // limitations under the License.
 //
 
-import { makeResponse, Response } from './rpc'
 import { WorkspaceProtocol } from './workspace'
 
 import { filterQuery, getUserSpaces, isAcceptable, processTx as processSpaceTx } from './spaces'
 import { Broadcaster, Client, ClientService, ClientSocket } from './server'
-import { Tx, AnyLayout, Class, Doc, Model, Ref } from '@anticrm/core'
-import { SpaceUser, CORE_CLASS_SPACE, CORE_CLASS_CREATE_TX } from '@anticrm/domains'
+import { AnyLayout, Class, Doc, Ref, Tx, txContext, TxContextSource } from '@anticrm/core'
+import { CORE_CLASS_CREATE_TX, CORE_CLASS_SPACE, SpaceUser } from '@anticrm/domains'
+import { Response, serialize } from '@anticrm/rpc'
 
 export interface ClientControl {
   ping (): Promise<void>
@@ -60,14 +60,14 @@ export async function createClientService (workspaceProtocol: Promise<WorkspaceP
       }
       return Promise.reject(new Error('Invalid space are spefified'))
     },
-    async loadDomain (domain: string, index?: string, direction?: string): Promise<Doc[]> {
-      const docs = await workspace.loadDomain(domain, index, direction)
+    async loadDomain (domain: string): Promise<Doc[]> {
+      const docs = await workspace.loadDomain(domain)
       const filteredDocs = docs.filter((d) => isAcceptable(userSpaces, d._class, (d as unknown) as AnyLayout), false)
       return filteredDocs
     },
 
     // Handle sending from client.
-    async tx (tx: Tx): Promise<any> {
+    async tx (tx: Tx): Promise<Tx[]> {
       if (tx._user !== client.email) {
         return Promise.reject(new Error(`invalid user passed: ${tx._user}`))
       }
@@ -77,14 +77,16 @@ export async function createClientService (workspaceProtocol: Promise<WorkspaceP
       if (!spaceResult.allowed) {
         return Promise.reject(new Error('operations is not allowed by space check'))
       }
+      const context = txContext(TxContextSource.Server)
       // Perform operation in workspace
-      await workspace.tx(tx)
+      await workspace.tx(context, tx)
 
-      if (spaceResult.sendSpace) {
-        // We need to send space create event before to allow client to accept our modification
-      }
       // Perform all other active clients broadcast
-      broadcaster.broadcast(clientControl, { result: tx })
+      broadcaster.broadcast(clientControl, {
+        result: tx,
+        clientTx: context.clientTx
+      })
+      return context.clientTx
     },
 
     // C O N T R O L
@@ -110,21 +112,17 @@ export async function createClientService (workspaceProtocol: Promise<WorkspaceP
           if (createSpaceTx) {
             // update object value to latest one
             createSpaceTx.object = (spaceTxResult.sendSpace as unknown) as AnyLayout
-            client.send(makeResponse({ result: createSpaceTx }))
+            client.send(serialize({}))
             // No need to send space update operation, since client will recieve a full and final space object
             return
           }
         }
       }
-      client.send(makeResponse(response))
+      client.send(serialize(response))
     },
 
     close (): Promise<void> {
       return workspace.close()
-    },
-
-    getModel (): Promise<Model> {
-      return workspace.getModel()
     }
   }
 

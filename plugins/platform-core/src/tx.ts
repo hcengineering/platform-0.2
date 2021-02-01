@@ -13,15 +13,28 @@
 // limitations under the License.
 //
 
-import { generateId, AnyLayout, Doc, Property, Ref, StringProperty } from '@anticrm/core'
-import { CreateTx, DeleteTx, PushTx, UpdateTx, CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_UPDATE_TX, CORE_CLASS_PUSH_TX } from '@anticrm/domains'
+import { generateId, AnyLayout, Doc, Property, Ref, StringProperty, Class } from '@anticrm/core'
+import {
+  CreateTx,
+  DeleteTx,
+  PushTx,
+  UpdateTx,
+  CORE_CLASS_CREATE_TX,
+  CORE_CLASS_DELETE_TX,
+  CORE_CLASS_UPDATE_TX,
+  CORE_CLASS_PUSH_TX
+} from '@anticrm/domains'
 
 export function newCreateTx<T extends Doc> (doc: T, _user: StringProperty): CreateTx {
   if (!doc._id) {
     doc._id = generateId()
   }
 
-  const { _id, _class, ...objValue } = doc
+  const {
+    _id,
+    _class,
+    ...objValue
+  } = doc
 
   const tx: CreateTx = {
     _class: CORE_CLASS_CREATE_TX,
@@ -35,12 +48,12 @@ export function newCreateTx<T extends Doc> (doc: T, _user: StringProperty): Crea
   return tx
 }
 
-export function newPushTx (doc: Doc, _query: AnyLayout | undefined, _attribute: StringProperty, element: AnyLayout, _user: StringProperty): PushTx {
+export function newPushTx (_class: Ref<Class<Doc>>, _id: Ref<Doc>, _query: AnyLayout | undefined, _attribute: StringProperty, element: AnyLayout, _user: StringProperty): PushTx {
   const tx: PushTx = {
     _class: CORE_CLASS_PUSH_TX,
     _id: generateId() as Ref<Doc>,
-    _objectId: doc._id,
-    _objectClass: doc._class,
+    _objectId: _id,
+    _objectClass: _class,
     _date: Date.now() as Property<number, Date>,
     _user,
     _attribute: _attribute,
@@ -50,12 +63,12 @@ export function newPushTx (doc: Doc, _query: AnyLayout | undefined, _attribute: 
   return tx
 }
 
-export function newUpdateTx (doc: Doc, _query: AnyLayout | undefined, values: AnyLayout, _user: StringProperty): UpdateTx {
+export function newUpdateTx (_class: Ref<Class<Doc>>, _id: Ref<Doc>, _query: AnyLayout | undefined, values: AnyLayout, _user: StringProperty): UpdateTx {
   const tx: UpdateTx = {
     _class: CORE_CLASS_UPDATE_TX,
     _id: generateId() as Ref<Doc>,
-    _objectId: doc._id,
-    _objectClass: doc._class,
+    _objectId: _id,
+    _objectClass: _class,
     _date: Date.now() as Property<number, Date>,
     _user,
     _attributes: values,
@@ -63,12 +76,13 @@ export function newUpdateTx (doc: Doc, _query: AnyLayout | undefined, values: An
   }
   return tx
 }
-export function newDeleteTx (doc: Doc, _query: AnyLayout | undefined, _user: StringProperty): DeleteTx {
+
+export function newDeleteTx (_class: Ref<Class<Doc>>, _id: Ref<Doc>, _query: AnyLayout | undefined, _user: StringProperty): DeleteTx {
   const tx: DeleteTx = {
     _class: CORE_CLASS_DELETE_TX,
     _id: generateId() as Ref<Doc>,
-    _objectId: doc._id,
-    _objectClass: doc._class,
+    _objectId: _id,
+    _objectClass: _class,
     _date: Date.now() as Property<number, Date>,
     _user,
     _query

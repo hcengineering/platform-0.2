@@ -24,7 +24,6 @@ import { QueriableStorage } from './queries'
 
 import { Cache } from './cache'
 import { Titles } from './titles'
-import { Graph } from './graph'
 import {
   Tx, txContext, TxContextSource,
   Ref,
@@ -35,15 +34,16 @@ import {
   CoreProtocol, TxProcessor,
   generateId as genId
 } from '@anticrm/core'
-import { BACKLINKS_DOMAIN, TITLE_DOMAIN } from '@anticrm/domains'
+import { CORE_CLASS_REFERENCE, TITLE_DOMAIN } from '@anticrm/domains'
 
 import { createOperations } from './operations'
 
 import { ModelIndex } from '@anticrm/domains/src/indices/model'
-import { BacklinkIndex } from '@anticrm/domains/src/indices/text'
-import { TitleIndex } from '@anticrm/domains/src/indices/title'
 import { VDocIndex } from '@anticrm/domains/src/indices/vdoc'
 import { TxIndex } from '@anticrm/domains/src/indices/tx'
+import { RPC_CALL_FIND, RPC_CALL_FINDONE, RPC_CALL_LOAD_DOMAIN, RPC_CALL_TX } from '@anticrm/rpc'
+import { TitleIndex } from '@anticrm/domains/src/indices/title'
+import { FilterIndex } from '@anticrm/domains/src/indices/filter'
 
 /*!
  * Anticrm Platform™ Core Plugin
@@ -53,18 +53,24 @@ import { TxIndex } from '@anticrm/domains/src/indices/tx'
 export default async (platform: Platform): Promise<CoreService> => {
   const rpc = rpcService(platform)
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  let processClientTx: (tx: Tx[]) => void = (tx) => {
+    // Dummy
+  }
+
   const coreProtocol: CoreProtocol = {
-    find: <T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> => rpc.request('find', _class, query),
-    findOne: <T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined> => rpc.request('findOne', _class, query),
-    tx: (tx: Tx): Promise<any> => rpc.request('tx', tx),
-    loadDomain: (domain: string): Promise<Doc[]> => rpc.request('loadDomain', domain)
+    find: <T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> => rpc.request(RPC_CALL_FIND, _class, query),
+    findOne: <T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined> => rpc.request(RPC_CALL_FINDONE, _class, query),
+    tx: (tx: Tx): Promise<any> => rpc.request(RPC_CALL_TX, tx).then(tx => {
+      processClientTx(tx as Tx[])
+    }),
+    loadDomain: (domain: string): Promise<Doc[]> => rpc.request(RPC_CALL_LOAD_DOMAIN, domain)
   }
 
   // Storages
 
   const model = new ModelDb()
   const titles = new Titles(model)
-  const graph = new Graph()
   const cache = new Cache(coreProtocol)
 
   const modelDomain = await coreProtocol.loadDomain(MODEL_DOMAIN)
@@ -77,16 +83,8 @@ export default async (platform: Platform): Promise<CoreService> => {
     }
   })
 
-  coreProtocol.loadDomain(BACKLINKS_DOMAIN).then(docs => {
-    const ctx = txContext()
-    for (const doc of docs) {
-      graph.store(ctx, doc)
-    }
-  })
-
   const qModel = new QueriableStorage(model, model)
   const qTitles = new QueriableStorage(model, titles)
-  const qGraph = new QueriableStorage(model, graph)
   const qCache = new QueriableStorage(model, cache, true)
 
   // const queriables = [qModel, qTitles, qGraph, qCache]
@@ -94,21 +92,32 @@ export default async (platform: Platform): Promise<CoreService> => {
   const domains = new Map<string, QueriableStorage>()
   domains.set(MODEL_DOMAIN, qModel)
   domains.set(TITLE_DOMAIN, qTitles)
-  domains.set(BACKLINKS_DOMAIN, qGraph)
 
   const txProcessor = new TxProcessor([
     new TxIndex(qCache),
     new VDocIndex(model, qCache),
     new TitleIndex(model, qTitles),
-    new BacklinkIndex(model, qGraph),
+    new FilterIndex(model, qCache, CORE_CLASS_REFERENCE), // Construct a filter index to update references
     new ModelIndex(model, [qModel])
   ])
+
+  processClientTx = (txx: Tx[]): void => {
+    if (txx) {
+      console.log('PROCESS CLIEN TX', txx)
+      for (const tx of txx) {
+        txProcessor.process(txContext(TxContextSource.ServerTransient), tx)
+      }
+    }
+  }
 
   // add listener to process data updates from backend
   rpc.addEventListener(response => {
     // Do not process if result is not passed, it could be if sources is our transaction.
     if (response.result != null) {
       txProcessor.process(txContext(TxContextSource.Server), response.result as Tx)
+    }
+    if (response.clientTx && response.clientTx.length > 0) {
+      processClientTx(response.clientTx)
     }
   })
 
@@ -139,12 +148,23 @@ export default async (platform: Platform): Promise<CoreService> => {
     return qCache.query(_class, query)
   }
 
-  function subscribe<T extends Doc> (_class: Ref<Class<T>>, _query: AnyLayout, action: (docs: T[]) => void, regFinalizer: RefFinalizer): void {
+  function subscribe<T extends Doc> (_class: Ref<Class<T>>, _query: AnyLayout, action: (docs: T[]) => void, regFinalizer: RefFinalizer): (query: AnyLayout) => void {
+    let oldQuery = _query
     const q = query(_class, _query)
-    const unsubscriber = q.subscribe(action)
+    let unsubscriber = q.subscribe(action)
     regFinalizer(() => {
       unsubscriber()
     })
+    return (newQuery: AnyLayout) => {
+      if (JSON.stringify(oldQuery) === JSON.stringify(newQuery)) {
+        return
+      }
+      console.log('updateQuery', oldQuery, newQuery)
+      unsubscriber()
+      const q = query(_class, newQuery)
+      unsubscriber = q.subscribe(action)
+      oldQuery = newQuery
+    }
   }
 
   function generateId () {
@@ -166,8 +186,8 @@ export default async (platform: Platform): Promise<CoreService> => {
 
   const ops = createOperations(model, processTx, getUserId)
 
-  function loadDomain (domain: string, index?: string, direction?: string): Promise<Doc[]> {
-    return coreProtocol.loadDomain(domain, index, direction)
+  function loadDomain (domain: string): Promise<Doc[]> {
+    return coreProtocol.loadDomain(domain)
   }
 
   return {

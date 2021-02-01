@@ -42,19 +42,26 @@ export function createOperations (model: Model, processTx: (tx: Tx) => Promise<a
 
   function push<T extends Doc> (doc: Doc, query: AnyLayout | null, _attribute: StringProperty, element: AnyLayout): Promise<T> {
     return processTx(
-      newPushTx(doc, query || undefined, _attribute, element, getUserId())
+      newPushTx(doc._class, doc._id, query || undefined, _attribute, element, getUserId())
     ).then(() => doc as T)
   }
 
   function update<T extends Doc> (doc: T, query: AnyLayout | null, values: AnyLayout): Promise<T> {
     return processTx(
-      newUpdateTx(doc, query || undefined, values, getUserId())
+      newUpdateTx(doc._class, doc._id, query || undefined, values, getUserId())
     ).then(() => doc as T)
   }
+
   function remove<T extends Doc> (doc: T, query: AnyLayout | null): Promise<T> {
     return processTx(
-      newDeleteTx(doc, query || undefined, getUserId())
+      newDeleteTx(doc._class, doc._id, query || undefined, getUserId())
     ).then(() => doc as T)
   }
-  return { create, push, update, remove }
+
+  return {
+    create,
+    push,
+    update,
+    remove
+  }
 }

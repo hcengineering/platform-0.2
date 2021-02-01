@@ -210,7 +210,7 @@ export class Model implements Storage {
     throw new Error('attribute not found: ' + key)
   }
 
-  pushArrayValue (curValue: unknown, attrClass: Ref<Class<Doc>>, embedded: AnyLayout): Array<PropertyType> {
+  public pushArrayValue (curValue: unknown, attrClass: Ref<Class<Doc>>, embedded: AnyLayout): Array<PropertyType> {
     // Assign into  a proper classed values.
     const objValue = this.assign({}, attrClass, embedded)
     objValue._class = attrClass
@@ -244,11 +244,11 @@ export class Model implements Storage {
           case CORE_CLASS_ARRAY_OF: {
             const attrClass = this.attributeClass((attr.type as ArrayOf).of)
             if (attrClass) {
-              const lValue = r[rKey]
-              if (lValue instanceof Array) {
+              const rValue = r[rKey]
+              if (rValue instanceof Array) {
                 let value: unknown[] = []
-                for (const lv of (lValue as Array<unknown>)) {
-                  value = this.pushArrayValue(value, attrClass, lv as AnyLayout)
+                for (const rv of (rValue as Array<unknown>)) {
+                  value = this.pushArrayValue(value, attrClass, rv as AnyLayout)
                 }
                 l[key] = (value as unknown) as AnyLayout
                 continue

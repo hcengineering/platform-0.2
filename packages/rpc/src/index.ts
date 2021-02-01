@@ -14,6 +14,7 @@
 //
 
 import { Status, Severity } from '@anticrm/foundation'
+import { Tx } from '@anticrm/core'
 
 export type ReqId = string | number
 
@@ -34,10 +35,18 @@ export interface RpcError {
   data?: any
 }
 
+/**
+ * Response object define a server response on transaction request.
+ *
+ * Also used to inform other clients about operations being performed by server.
+ */
 export interface Response<R> {
   result?: R
   id?: ReqId
   error?: RpcError
+
+  // A list of transactions to make client state be equal to server state in case of live queries of derived data
+  clientTx?: Tx[]
 }
 
 export function serialize (object: Request<any> | Response<any>): string {
@@ -55,3 +64,8 @@ export function readRequest<P extends any[]> (request: string): Request<P> {
 export function toStatus (response: Response<any>): Status {
   return new Status(Severity.ERROR, response.error?.code as number, response.error?.message as string)
 }
+
+export const RPC_CALL_FIND = 'find'
+export const RPC_CALL_FINDONE = 'findOne'
+export const RPC_CALL_LOAD_DOMAIN = 'loadDomain'
+export const RPC_CALL_TX = 'tx'

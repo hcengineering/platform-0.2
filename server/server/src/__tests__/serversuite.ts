@@ -13,8 +13,7 @@
 // limitations under the License.
 //
 
-import { getRequest, Response } from '../rpc'
-import { start, ServerProtocol, Broadcaster, ClientSocket, ClientService } from '../server'
+import { Broadcaster, ClientService, ClientSocket, ServerProtocol, start } from '../server'
 import { Db, MongoClient } from 'mongodb'
 import { createWorkspace, getWorkspace, withTenant } from '@anticrm/accounts'
 
@@ -28,8 +27,8 @@ import { model as chunterPlugin } from '@anticrm/chunter/src/__model__'
 import { Person } from '@anticrm/contact'
 import { createClientService } from '../service'
 import { WorkspaceProtocol } from '../workspace'
-import { generateId, Doc, Ref, Property } from '@anticrm/core'
-import { Request } from '@anticrm/rpc'
+import { Doc, generateId, Property, Ref } from '@anticrm/core'
+import { Response, readRequest, Request } from '@anticrm/rpc'
 import { Space } from '@anticrm/domains'
 
 // Import a special tasks model package for generoc testing.
@@ -56,7 +55,7 @@ class PipeClientSocket implements ClientSocket {
   }
 
   send (response: string): void {
-    this.responses.push(getRequest(response))
+    this.responses.push(readRequest(response))
   }
 }
 
@@ -67,6 +66,7 @@ export interface ClientInfo {
   errors: Error[]
   wait (): void
 }
+
 export function createContact (db: Db, email: string, username: string): Promise<any> {
   const id = generateId() as Ref<Person>
   const user = builder.createDocument(
@@ -164,7 +164,9 @@ export class ServerSuite {
             client.ops.push(client.client.send({
               id: response.id,
               error: response.error
-            } as Response<any>).catch((e) => { client.errors.push(e) }))
+            } as Response<any>).catch((e) => {
+              client.errors.push(e)
+            }))
           }
         }
       }

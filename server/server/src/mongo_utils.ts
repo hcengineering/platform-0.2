@@ -220,3 +220,18 @@ export function createPullArrayFilters (model: Model, _class: Ref<Class<Doc>>, q
     isArrayAttr
   }
 }
+
+/**
+ * Creates a mongodb query based on object on platform object query.
+ *
+ * 1. Verify query is fully compatible with class model it designed for and throw error if not.
+ *
+ * @param model - model to use for validation.
+ * @param _class - a class query is designed for.
+ * @param _query - a query object to convert to.
+ */
+export function createQuery (model: Model, _class: Ref<Class<Doc>>, _query: AnyLayout): AnyLayout {
+  const query = model.assign({}, _class, _query)
+  query._class = model.getClass(_class)
+  return query
+}
