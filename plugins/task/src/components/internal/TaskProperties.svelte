@@ -92,11 +92,11 @@
               title='Андрей Платов' subtitle='Исполнитель' />
 
     <div class="actionBar">
-      <Button clazz="leftAB actionButton w40">Выполнено</Button>
-      <Button clazz="centerAB actionButton w40">В работе</Button>
-      <PopupMenu buttonClass='rightAB actionButton w20'>
-        <span class='popup-16' slot='trigger'>
-          Ещё <Icon icon={task.icon.ArrowDown} clazz='icon-embed' />
+      <Button className="actionButtonLeft w40">Выполнено</Button>
+      <Button className="actionButtonCenter w40">В работе</Button>
+      <PopupMenu buttonClass='actionButtonRight w20'>
+        <span class='popup' slot='trigger'>
+          Ещё <Icon icon={task.icon.ArrowDown} className='icon-embed' />
         </span>
         <PopupItem>Action 3</PopupItem>
         <PopupItem>Action 4</PopupItem>

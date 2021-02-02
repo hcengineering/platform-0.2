@@ -55,15 +55,15 @@
       <span class='caption-1' style='padding-right:1em'>{appInstance.label}</span>&nbsp;
       <!-- <a class='icon' bind:this={addIcon} href='/'
          on:click|preventDefault={ () => { uiService.showModal(CreateForm, { _class: appInstance ? appInstance.classes[0] : undefined, title: 'The title', space }, addIcon) } }>
-        <Icon icon={workbench.icon.Add} clazz='icon-button' /> {getLabel(appInstance.label)}
+        <Icon icon={workbench.icon.Add} className='icon-button' /> {getLabel(appInstance.label)}
       </a> -->
       <div bind:this={addIcon}>
-        <Button clazz='transperent'
+        <Button className='transparent'
           on:click={ () => {
             uiService.showModal(CreateForm, { _class: appInstance ? appInstance.classes[0] : undefined, title: 'The title', space }, addIcon)
           } }
         >
-          <Icon icon={workbench.icon.Add} clazz='icon-button' /><span style='padding-left:.5em'>{getLabel(appInstance.label)}
+          <Icon icon={workbench.icon.Add} className='icon-button' /><span style='padding-left:.5em'>{getLabel(appInstance.label)}
         </Button>
       </div>
       <div style='flex-grow:1'></div>

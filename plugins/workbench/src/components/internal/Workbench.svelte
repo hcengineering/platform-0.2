@@ -57,23 +57,23 @@
           href="{'/' + workbench.component.Workbench + '/' + perspective._id}"
         >
           <div class='icon'>
-            <Icon icon='{perspective.icon}' clazz='icon-2x' />
+            <Icon icon='{perspective.icon}' className='icon-2x' />
           </div>
         </LinkTo>
       </div>
     {/each}
     <div class='app-icon'>
       <div class={(selected === 0) ? 'selectedApp' : 'iconApp'} on:click={() => {selected = 0}}>
-        <Icon icon='{chunter.icon.ActivityView}' clazz='icon-left' />
+        <Icon icon='{chunter.icon.ActivityView}' className='icon-left' />
       </div>
       <div class={(selected === 1) ? 'selectedApp' : 'iconApp'} on:click={() => {selected = 1}}>
-        <Icon icon='{chunter.icon.ChatView}' clazz='icon-left' />
+        <Icon icon='{chunter.icon.ChatView}' className='icon-left' />
       </div>
       <div class={(selected === 2) ? 'selectedApp' : 'iconApp'} on:click={() => {selected = 2}}>
-        <Icon icon='{workbench.icon.Pages}' clazz='icon-left' />
+        <Icon icon='{workbench.icon.Pages}' className='icon-left' />
       </div>
       <div class={(selected === 3) ? 'selectedApp' : 'iconApp'} on:click={() => {selected = 3}}>
-        <Icon icon='{task.icon.Task}' clazz='icon-left' />
+        <Icon icon='{task.icon.Task}' className='icon-left' />
       </div>
     </div>
     <div class='remainder'></div>

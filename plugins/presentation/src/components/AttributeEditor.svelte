@@ -30,5 +30,5 @@
 {#await component then ctor}
   <svelte:component this={ctor} {attribute} {maxWidth} bind:value={value}/>
 {:catch}
-  <Icon icon={ui.icon.Error} clazz="icon-2x" />
+  <Icon icon={ui.icon.Error} className="icon-2x" />
 {/await}

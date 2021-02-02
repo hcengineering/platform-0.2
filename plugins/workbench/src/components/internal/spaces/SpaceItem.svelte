@@ -40,7 +40,7 @@
     {#if selected}
       <div bind:this={optionsButton} class='optionsButton'>
         <PopupMenu>
-          <div class='popup-16' slot='trigger'><Icon icon={workbench.icon.Burger} clazz="icon-embed" /></div>
+          <div class='popup-16' slot='trigger'><Icon icon={workbench.icon.Burger} className="icon-embed" /></div>
           <PopupItem on:click={() => {
             uiService.showModal(AddUser, { space }, optionsButton)
           }}>Add user</PopupItem>

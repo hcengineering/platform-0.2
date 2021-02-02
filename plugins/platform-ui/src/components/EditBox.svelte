@@ -22,14 +22,14 @@
   export let id: string
   export let value: string
   export let placeholder: string
-  export let right: boolean = false
+  export let iconRight: boolean = false
 
   let input: HTMLElement
 </script>
 
 <div class="editbox wIcon" style='width: {width}' on:click={input.focus()}>
-  {#if (!right)}
-    <Icon {icon} clazz="icon-embed" />
+  {#if (!iconRight)}
+    <Icon {icon} className="icon-embed" />
     <div class="separator"></div>
   {/if}
   <input
@@ -42,9 +42,9 @@
     on:focus
     on:change
   />
-  {#if (right)}
+  {#if (iconRight)}
     <div class="separator"></div>
-    <Icon {icon} clazz="icon-embed" />
+    <Icon {icon} className="icon-embed" />
   {/if}
 </div>
 

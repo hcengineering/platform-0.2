@@ -1,17 +1,17 @@
 <script lang="ts">
-  export let clazz: string = ''
+  export let className: string = ''
 </script>
 
 <button
   type="button"
-  class="button {clazz}"
+  class="button {className}"
   on:click
 >
   <slot />
 </button>
 
 <style lang="scss">
-  .transperent {
+  .transparent {
     display: flex;
     border: none;
     cursor: pointer;
@@ -34,22 +34,26 @@
     }
   }
 
-  .actionButton {
+  .actionButtonLeft {
     display: flex;
     align-items: center;
     justify-content: center;
-  }
-  .leftAB {
     padding: 0.25em;
     border-radius: 4px 0 0 4px;
   }
-  .centerAB {
+  .actionButtonCenter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding: 0.25em;
     border-radius: 0px;
     border-left: none;
     border-right: none;
   }
-  .rightAB {
+  .actionButtonRight {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding: 0.25em;
     border-radius: 0 4px 4px 0;
   }

@@ -30,7 +30,7 @@
   $: find(CORE_CLASS_TITLE, { title: query as Property<string, string> }).then(docs => { console.log('search', docs); result = docs })
 </script>
 
-<Icon icon={ui.icon.Search} clazz="icon-embed-2x" />&nbsp;
+<Icon icon={ui.icon.Search} className="icon-embed-2x" />&nbsp;
 <input type="text" class="editbox" placeholder="Spotlight Search" bind:value={query} />
 <div>
   { #each result as title }

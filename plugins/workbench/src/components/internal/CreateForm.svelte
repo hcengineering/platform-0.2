@@ -165,7 +165,7 @@
       <InlineEdit bind:value={title} fullWidth='true' />
     </div>
     <a href='/' style='margin-left:1.5em' on:click|preventDefault={() => dispatch('close')}>
-      <Icon icon={workbench.icon.Close} clazz='icon-button' />
+      <Icon icon={workbench.icon.Close} className='icon-button' />
     </a>
   </div>
 
