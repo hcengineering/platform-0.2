@@ -18,7 +18,6 @@
   import { getPresentationService, find, query } from '../../utils'
   import { AttrModel, ClassModel } from '@anticrm/presentation'
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
-  import ActionButton from './ActionButton.svelte'
   import UserInfo from '@anticrm/sparkling-controls/src/UserInfo.svelte'
   import StatusLabel from './StatusLabel.svelte'
   import PopupMenu from '@anticrm/sparkling-controls/src/menu/PopupMenu.svelte'
