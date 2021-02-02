@@ -36,7 +36,7 @@
   let location: string[]
   const locationStore = uiService.getLocation()
   locationStore.subscribe((loc) => {
-    console.log('LOCATION is ', loc)
+    // console.log('LOCATION is ', loc)
     location = loc.pathname.split('/')
   })
 
@@ -50,7 +50,6 @@
     .then((coreService) => coreService.query(CORE_CLASS_SPACE, {}))
     .then((qr) => {
       spaceUnsubscribe = qr.subscribe((docs) => {
-        console.log('spaces:', docs)
         spaces = docs.filter((s) => getCurrentUserSpace(curentUser, s))
       })
     })

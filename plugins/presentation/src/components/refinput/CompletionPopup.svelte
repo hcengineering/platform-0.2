@@ -44,7 +44,6 @@
     }
 
     selOffset = calcOffset(selElement)
-    console.log(items)
   }
 
   export function handleUp() {

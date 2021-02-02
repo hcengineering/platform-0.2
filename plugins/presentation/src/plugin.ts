@@ -265,7 +265,6 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
   function getComponentExtension (_class: Ref<Class<Obj>>, extension: Ref<Mixin<ComponentExtension<VDoc>>>): AnyComponent {
     const model = coreService.getModel()
     while (_class) {
-      console.log(_class)
       const clazz = model.get(_class) as Class<VDoc>
       if (model.isMixedIn(clazz, extension)) {
         const properties = model.as(clazz, extension)

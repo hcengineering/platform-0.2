@@ -74,7 +74,6 @@
     let docs = await coreS.find(CORE_CLASS_TITLE, {
       title: prefix as Property<string, string>
     })
-    console.log('Found docs: ', docs)
     let items: CompletionItem[] = []
     for (const value of docs) {
       if (startsWith(value.title.toString(), prefix) && value.title !== prefix) {
@@ -150,13 +149,11 @@
         return
       }
       if (event.key === 'ArrowDown') {
-        console.log('HANDLE DOWN')
         completionControl.handleDown()
         event.preventDefault()
         return
       }
       if (event.key === 'Enter') {
-        console.log('HANDLE ENTER')
         completionControl.handleSubmit()
         event.preventDefault()
         return
