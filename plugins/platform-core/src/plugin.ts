@@ -18,7 +18,7 @@ import { ModelDb } from './modeldb'
 
 import { CoreService, QueryResult, RefFinalizer } from '.'
 import login from '@anticrm/login'
-import rpcService from './rpc'
+import rpcService, { EventType } from './rpc'
 
 import { QueriableStorage } from './queries'
 
@@ -53,17 +53,10 @@ import { FilterIndex } from '@anticrm/domains/src/indices/filter'
 export default async (platform: Platform): Promise<CoreService> => {
   const rpc = rpcService(platform)
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  let processClientTx: (tx: Tx[]) => void = (tx) => {
-    // Dummy
-  }
-
   const coreProtocol: CoreProtocol = {
     find: <T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> => rpc.request(RPC_CALL_FIND, _class, query),
     findOne: <T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined> => rpc.request(RPC_CALL_FINDONE, _class, query),
-    tx: (tx: Tx): Promise<any> => rpc.request(RPC_CALL_TX, tx).then(tx => {
-      processClientTx(tx as Tx[])
-    }),
+    tx: (tx: Tx): Promise<any> => rpc.request(RPC_CALL_TX, tx),
     loadDomain: (domain: string): Promise<Doc[]> => rpc.request(RPC_CALL_LOAD_DOMAIN, domain)
   }
 
@@ -101,23 +94,15 @@ export default async (platform: Platform): Promise<CoreService> => {
     new ModelIndex(model, [qModel])
   ])
 
-  processClientTx = (txx: Tx[]): void => {
-    if (txx) {
-      console.log('PROCESS CLIEN TX', txx)
-      for (const tx of txx) {
-        txProcessor.process(txContext(TxContextSource.ServerTransient), tx)
-      }
-    }
-  }
+  // add listener to process data updates from backend for data transactions.
+  rpc.addEventListener(EventType.Transaction, result => {
+    txProcessor.process(txContext(TxContextSource.Server), result as Tx)
+  })
 
-  // add listener to process data updates from backend
-  rpc.addEventListener(response => {
-    // Do not process if result is not passed, it could be if sources is our transaction.
-    if (response.result != null) {
-      txProcessor.process(txContext(TxContextSource.Server), response.result as Tx)
-    }
-    if (response.clientTx && response.clientTx.length > 0) {
-      processClientTx(response.clientTx)
+  // Add a client transaction event listener
+  rpc.addEventListener(EventType.TransientTransaction, txs => {
+    for (const tx of (txs as Tx[])) {
+      txProcessor.process(txContext(TxContextSource.ServerTransient), tx)
     }
   })
 
@@ -159,7 +144,6 @@ export default async (platform: Platform): Promise<CoreService> => {
       if (JSON.stringify(oldQuery) === JSON.stringify(newQuery)) {
         return
       }
-      console.log('updateQuery', oldQuery, newQuery)
       unsubscriber()
       const q = query(_class, newQuery)
       unsubscriber = q.subscribe(action)

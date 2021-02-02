@@ -67,7 +67,7 @@ export async function createClientService (workspaceProtocol: Promise<WorkspaceP
     },
 
     // Handle sending from client.
-    async tx (tx: Tx): Promise<Tx[]> {
+    async tx (tx: Tx): Promise<{ clientTx: Tx[] }> {
       if (tx._user !== client.email) {
         return Promise.reject(new Error(`invalid user passed: ${tx._user}`))
       }
@@ -86,7 +86,9 @@ export async function createClientService (workspaceProtocol: Promise<WorkspaceP
         result: tx,
         clientTx: context.clientTx
       })
-      return context.clientTx
+      return {
+        clientTx: context.clientTx
+      }
     },
 
     // C O N T R O L
