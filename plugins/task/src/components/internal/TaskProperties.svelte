@@ -92,7 +92,6 @@
     <UserInfo url='https://platform.exhale24.ru/images/photo-2.png'
               title='Андрей Платов' subtitle='Исполнитель' />
 
-<<<<<<< HEAD
     <div class="actionBar">
       <Button clazz="leftAB actionButton w40">Выполнено</Button>
       <Button clazz="centerAB actionButton w40">В работе</Button>
@@ -105,12 +104,6 @@
         <PopupItem>Action 5</PopupItem>
         <PopupItem>Action 6</PopupItem>
       </PopupMenu>
-=======
-    <div class='actionBar'>
-      <ActionButton style='leftButton' width='40%'>Выполнено</ActionButton>
-      <ActionButton style='centerButton' width='40%'>В работе</ActionButton>
-      <ActionButton style='rightButton' width='20%' combo='true'>Ещё</ActionButton>
->>>>>>> upstream/master
     </div>
 
     <div class='description'>
