@@ -4,7 +4,9 @@
 import { AnyLayout, Class, DateProperty, Doc, Ref, StringProperty } from './classes'
 
 export enum TxContextSource {
-  Client, Server
+  Client, // A pure client operation
+  Server, // A pure server operation
+  ServerTransient// A server restore state transaction
 }
 
 /**
@@ -15,13 +17,19 @@ export interface TxContext {
   network: Promise<void>
   // Define transaction source
   source: TxContextSource
+
+  // A list of client only transactions
+  clientTx: Tx[]
 }
 
 /**
  * Return a complete TxContext
  */
 export function txContext (source: TxContextSource = TxContextSource.Client, network: Promise<void> = Promise.resolve()): TxContext {
-  return { network, source } as TxContext
+  return {
+    network,
+    source
+  } as TxContext
 }
 
 export interface Storage {
@@ -53,7 +61,7 @@ export interface DomainIndex {
 export interface DocumentProtocol {
   find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]>
   findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined>
-  loadDomain (domain: string, index?: string, direction?: string): Promise<Doc[]>
+  loadDomain (domain: string): Promise<Doc[]>
 }
 
 export interface CoreProtocol extends DocumentProtocol {

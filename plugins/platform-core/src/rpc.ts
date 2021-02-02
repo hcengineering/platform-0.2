@@ -30,6 +30,7 @@ export default (platform: Platform): RpcService => {
     resolve: (value?: any) => void
     reject: (error: any) => void
   }
+
   const requests = new Map<ReqId, PromiseInfo>()
   let lastId = 0
 
@@ -62,9 +63,6 @@ export default (platform: Platform): RpcService => {
 
       ws.onmessage = (ev: MessageEvent) => {
         const response = readResponse(ev.data)
-        // console.log('>>>>>>>>>')
-        // console.log(ev.data)
-        // console.log('----------')
         if (!response.id) {
           for (const listener of listeners) {
             listener(response)
@@ -78,9 +76,6 @@ export default (platform: Platform): RpcService => {
               promise.resolve(response.result)
             }
             requests.delete(response.id)
-            // if (requests.size === 0) {
-            //   platform.broadcastEvent(NetworkActivity, false)
-            // }
           } else {
             throw new Error('unknown rpc id')
           }
@@ -90,6 +85,7 @@ export default (platform: Platform): RpcService => {
   }
 
   let websocket: WebSocket | null = null
+
   async function getWebSocket () {
     if (websocket === null || websocket.readyState === WebSocket.CLOSED || websocket.readyState === WebSocket.CLOSING) {
       websocket = await createWebsocket()
@@ -98,16 +94,18 @@ export default (platform: Platform): RpcService => {
   }
 
   function request<R> (method: string, ...params: any[]): Promise<R> {
-    // console.log('<<<<<<< ' + method)
-    // console.log(params)
     return new Promise<any>((resolve, reject) => {
       const id = ++lastId
-      // if (requests.size === 0) {
-      //   platform.broadcastEvent(NetworkActivity, true)
-      // }
-      requests.set(id, { resolve, reject })
+      requests.set(id, {
+        resolve,
+        reject
+      })
       getWebSocket().then(ws => {
-        ws.send(serialize({ id, method, params }))
+        ws.send(serialize({
+          id,
+          method,
+          params
+        }))
       })
     })
   }

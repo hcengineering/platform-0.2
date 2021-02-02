@@ -13,28 +13,37 @@
 // limitations under the License.
 //
 
-import { makeResponse, getRequest, Response } from './rpc'
 import { createServer, IncomingMessage } from 'http'
 import WebSocket, { Server } from 'ws'
 
 import { decode } from 'jwt-simple'
 import { ClientControl, createClientService } from './service'
 import { connectWorkspace, WorkspaceProtocol } from './workspace'
-import { Tx } from '@anticrm/core'
+import { AnyLayout, Class, Doc, DocumentProtocol, Ref, Tx } from '@anticrm/core'
+import {
+  readRequest,
+  serialize,
+  Response,
+  RPC_CALL_FINDONE,
+  RPC_CALL_FIND,
+  RPC_CALL_TX,
+  RPC_CALL_LOAD_DOMAIN
+} from '@anticrm/rpc'
 
 export interface Client {
   email: string
   workspace: string
 }
 
-export interface Service {
-  [key: string]: (...args: any[]) => Promise<any>
-}
 export interface ClientSocket {
   send (response: string): void
 }
 
-export type ClientService = Service & ClientControl & WorkspaceProtocol
+export interface ClientTxProtocol {
+  tx (tx: Tx): Promise<Tx[]>
+}
+
+export type ClientService = ClientControl & DocumentProtocol & ClientTxProtocol
 export type ClientServiceUnregister = () => void
 
 export interface Broadcaster {
@@ -65,6 +74,7 @@ export function start (port: number, dbUri: string, host?: string): Promise<Serv
       connections.delete(id)
     }
   }
+
   const broadcaster: Broadcaster = {
     broadcast (from: ClientService, response: Response<any>): void {
       // console.log(`broadcasting to ${connections.size} connections`)
@@ -73,12 +83,6 @@ export function start (port: number, dbUri: string, host?: string): Promise<Serv
           if (client !== from) {
             // console.log(`broadcasting to ${client.email}`, response)
             client.send(response)
-          } else {
-            // console.log('notify self about completeness without response')
-            client.send({
-              id: response.id,
-              error: response.error
-            } as Response<any>)
           }
         })
       }
@@ -88,6 +92,7 @@ export function start (port: number, dbUri: string, host?: string): Promise<Serv
   async function createClient (workspace: Promise<WorkspaceProtocol>, ws: ClientSocket & Client): Promise<ClientService> {
     return await createClientService(workspace, ws, broadcaster)
   }
+
   async function getWorkspace (wsName: string): Promise<WorkspaceProtocol> {
     let workspace = workspaces.get(wsName)
     if (!workspace) {
@@ -101,23 +106,38 @@ export function start (port: number, dbUri: string, host?: string): Promise<Serv
     console.log('connect:', client)
     const workspace = getWorkspace(client.workspace)
 
-    const service = createClient(workspace, { ...client, send: (response) => { ws.send(response) } })
+    const service = createClient(workspace, {
+      ...client,
+      send: (response) => {
+        ws.send(response)
+      }
+    })
 
     const unreg = registerClient(service)
     ws.on('close', async () => {
       unreg()
     })
     ws.on('message', async (msg: string) => {
-      const request = getRequest(msg)
-      const f = (await service)[request.method]
+      const request = readRequest(msg)
+      const ss = (await service)
 
-      // TODO: Check for method are exists.
-      const tx = await f.apply(null, request.params || []) // eslint-disable-line
-      const response = makeResponse({
-        id: request.id,
-        result: tx
-      })
-      ws.send(response)
+      const response: Response<any> = { id: request.id }
+      switch (request.method) {
+        case RPC_CALL_FINDONE:
+          response.result = await ss.findOne(request.params[0] as Ref<Class<Doc>>, request.params[1] as AnyLayout)
+          break
+        case RPC_CALL_FIND:
+          response.result = await ss.find(request.params[0] as Ref<Class<Doc>>, request.params[1] as AnyLayout)
+          break
+        case RPC_CALL_TX: {
+          response.result = await ss.tx(request.params[0] as Tx)
+          break
+        }
+        case RPC_CALL_LOAD_DOMAIN:
+          response.result = await ss.loadDomain(request.params[0] as string)
+          break
+      }
+      ws.send(serialize(response))
     })
   })
 

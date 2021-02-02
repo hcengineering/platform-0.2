@@ -13,14 +13,19 @@
 // limitations under the License.
 //
 
-import { Model, Storage } from '@anticrm/core'
-import {
-  CORE_CLASS_VDOC
-} from '..'
-import { FilterIndex } from './filter'
+import { Class$, Prop } from '../dsl'
+import core from '../index'
+import { Reference, REFERENCE_DOMAIN } from '@anticrm/domains'
+import { TDoc } from './core'
+import { Class, Doc, Ref } from '@anticrm/core'
 
-export class VDocIndex extends FilterIndex {
-  constructor (modelDb: Model, storage: Storage) {
-    super(modelDb, storage, CORE_CLASS_VDOC)
-  }
+@Class$(core.class.Reference, core.class.Doc, REFERENCE_DOMAIN)
+export class TReference extends TDoc implements Reference {
+  @Prop() _sourceId?: Ref<Doc>
+  @Prop() _sourceClass!: Ref<Class<Doc>>
+  @Prop() _sourceProps?: Record<string, unknown>
+
+  @Prop() _targetId?: Ref<Doc>
+  @Prop() _targetClass!: Ref<Class<Doc>>
+  @Prop() _targetProps?: Record<string, unknown>
 }

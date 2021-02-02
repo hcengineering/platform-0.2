@@ -31,16 +31,17 @@
   let spaceName: string
   let messages: Message[] = []
 
-  $: {
-    getCoreService().subscribe(chunter.class.Message, { _space: space }, (docs) => {
-      messages = docs
-    }, onDestroy)
+  const ms = getCoreService().subscribe(chunter.class.Message, { _space: space }, (docs) => {
+    messages = docs
+  }, onDestroy)
 
+  $: {
+    ms({ _space: space })
     // TODO: use Titles index instead of getting the whole Space object
     coreService.findOne(CORE_CLASS_SPACE, { _id: space })
       .then((spaceObj) => (spaceName = spaceObj ? '#' + spaceObj.name : ''))
   }
-  
+
   function createMessage (message: MessageNode) {
     if (message) {
       chunterService.then((chunterService) => {

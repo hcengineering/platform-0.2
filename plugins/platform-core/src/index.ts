@@ -41,11 +41,12 @@ export interface QueryProtocol {
    * Perform subscribe to query with some helper finalizer to use
    * @param _class
    * @param query
+   * @return a function to re-subscribe with a new query variant for same action.
    */
   subscribe<T extends Doc> (_class: Ref<Class<T>>,
     query: AnyLayout,
     action: (docs: T[]) => void,
-    regFinalizer: RefFinalizer): void
+    regFinalizer: RefFinalizer): (query: AnyLayout) => void
 }
 
 /**

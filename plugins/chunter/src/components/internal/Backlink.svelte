@@ -13,22 +13,24 @@
 // limitations under the License.
 -->
 <script lang='ts'>
-  import { Backlink } from '@anticrm/domains'
+  import { Reference } from '@anticrm/domains'
   import { getCoreService } from '@anticrm/platform-ui'
   import { Message } from '../..'
   import { onDestroy } from 'svelte'
 
   import CommentComponent from './Comment.svelte'
 
-  export let backlink: Backlink
+  export let backlink: Reference
 
   let message: Message
 
-  getCoreService().subscribe(backlink._backlinkClass, { _id: backlink._backlinkId }, (docs) => {
+  const qs = getCoreService().subscribe(backlink._sourceClass, { _id: backlink._sourceId }, (docs) => {
     message = docs[0] as Message
   }, onDestroy)
+
+  $: qs({ _id: backlink._sourceId })
 </script>
 
-{#if message && message.comments && message.comments.length > backlink.pos}
-  <CommentComponent message={message.comments[backlink.pos]} />
+{#if message && message.comments && message.comments.length > backlink._sourceProps.pos}
+  <CommentComponent message={message.comments[backlink._sourceProps.pos]} />
 {/if}

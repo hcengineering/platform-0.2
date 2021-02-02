@@ -13,10 +13,10 @@
 // limitations under the License.
 //
 
-import { makeRequest } from './rpc'
 import { Client } from './server'
 import WebSocket from 'ws'
 import { encode } from 'jwt-simple'
+import { serialize } from '@anticrm/rpc'
 
 const ctlpassword = process.env.CTL_PASSWORD || '123pass'
 
@@ -24,7 +24,8 @@ const port = '18080'
 
 function connect () {
   const client: Client = {
-    workspace: 'latest-model'
+    workspace: 'latest-model',
+    email: 'john'
   }
   const token = encode(client, 'secret')
   console.log(token)
@@ -39,7 +40,7 @@ conn.onerror = (event) => {
 }
 
 conn.on('open', () => {
-  conn.send(makeRequest({
+  conn.send(serialize({
     method: 'serverShutdown',
     params: [ctlpassword]
   }))

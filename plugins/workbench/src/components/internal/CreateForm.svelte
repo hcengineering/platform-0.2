@@ -38,25 +38,27 @@
   const coreService = _getCoreService()
   const dispatch = createEventDispatcher()
 
-  function save () {
-    const doc = {
-      _class,
-      _space: space, ...object
-    }
-    object = {}
-    // absent VDoc fields will be autofilled
-    coreService.create (_class, doc)
-    dispatch('close')
-  }
-
   let model: ClassModel | undefined
   let primary: AttrModel | undefined
 
   const presentationService = _getPresentationService()
   console.log('presentationService', presentationService)
 
+  function save () {
+    const doc = {
+      _class,
+      [primary?.key || 'name']: title,
+      _space: space, ...object
+    }
+    object = {}
+    // absent VDoc fields will be autofilled
+    coreService.create(_class, doc)
+    dispatch('close')
+  }
+
+
   $: {
-    getComponentExtension (_class, presentation.class.DetailForm).then((ext) => {
+    getComponentExtension(_class, presentation.class.DetailForm).then((ext) => {
       console.log('DETAIL_FORM:', ext)
       component = ext
     })
@@ -67,15 +69,27 @@
       primary = mp.primary
     })
   }
-  
-  let users: Array = [{ id: 0, url: 'https://platform.exhale24.ru/images/photo-1.png',
-                        name: 'Александр Алексеенко' },
-                      { id: 1, url: 'https://platform.exhale24.ru/images/photo-2.png',
-                        name: 'Андрей Платов'},
-                      { id: 2, url: 'https://platform.exhale24.ru/images/photo-3.png',
-                        name: 'Сергей Буевич'},
-                      { id: 3, url: 'https://platform.exhale24.ru/images/photo-4.png',
-                        name: 'Андрей Соболев'}]
+
+  let users: Array<{}> = [{
+    id: 0,
+    url: 'https://platform.exhale24.ru/images/photo-1.png',
+    name: 'Александр Алексеенко'
+  },
+    {
+      id: 1,
+      url: 'https://platform.exhale24.ru/images/photo-2.png',
+      name: 'Андрей Платов'
+    },
+    {
+      id: 2,
+      url: 'https://platform.exhale24.ru/images/photo-3.png',
+      name: 'Сергей Буевич'
+    },
+    {
+      id: 3,
+      url: 'https://platform.exhale24.ru/images/photo-4.png',
+      name: 'Андрей Соболев'
+    }]
 </script>
 
 <style lang='scss'>
@@ -91,6 +105,7 @@
 
     .caption {
       flex-grow: 1;
+
       .caption-edit {
         width: 100%;
       }
@@ -147,23 +162,23 @@
 <div class='recruiting-view'>
   <div class='header'>
     <div class='caption-1 caption'>
-      <InlineEdit value='Дизайн Конструктора в личном кабинете' fullWidth='true' />
+      <InlineEdit bind:value={title} fullWidth='true' />
     </div>
     <a href='/' style='margin-left:1.5em' on:click|preventDefault={() => dispatch('close')}>
       <Icon icon={workbench.icon.Close} clazz='icon-button' />
     </a>
   </div>
 
-  <div class="content">
-    <div class="taskLabel">
+  <div class='content'>
+    <div class='taskLabel'>
       DT-925
     </div>
     <UserBox items={users} />
-    <div class="separator"></div>
-    <ReferenceInput stylesEnabled="true" />
+    <div class='separator'></div>
+    <ReferenceInput stylesEnabled='true' />
   </div>
 
-  <div class="buttons">
+  <div class='buttons'>
     <button type='button' class='button primary' on:click={save}>Принять</button>
     <button type='button' class='button' on:click={() => dispatch('close')}>Отказаться</button>
   </div>

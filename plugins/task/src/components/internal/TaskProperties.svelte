@@ -1,4 +1,4 @@
-<script type="ts">
+<script type='ts'>
   // Copyright © 2020 Anticrm Platform Contributors.
   //
   // Licensed under the Eclipse Public License, Version 2.0 (the "License");
@@ -13,7 +13,7 @@
   // limitations under the License.
   import { onDestroy } from 'svelte'
   import { Ref, Class, Obj } from '@anticrm/core'
-  import { Backlinks, CORE_CLASS_VDOC, CORE_CLASS_BACKLINKS } from '@anticrm/domains'
+  import { Reference, CORE_CLASS_VDOC, CORE_CLASS_REFERENCE } from '@anticrm/domains'
   import task, { Task } from '../..'
   import { getPresentationService, find, query } from '../../utils'
   import { AttrModel, ClassModel } from '@anticrm/presentation'
@@ -42,13 +42,13 @@
       model = m.filterAttributes(['title'])
     })
 
-  let backlinks: Backlinks[]
+  let backlinks: Reference[]
   let unsubscribe: () => void
   $: {
     if (unsubscribe) {
       unsubscribe()
     }
-    unsubscribe = query(CORE_CLASS_BACKLINKS, { _objectId: object._id }, (docs) => {
+    unsubscribe = query(CORE_CLASS_REFERENCE, { _targetId: object._id }, (docs) => {
       backlinks = docs
     })
   }
@@ -61,11 +61,11 @@
 {#if model && title}
 
   <!-- <div> -->
-    <!--<StringPresenter class="caption-1" :attribute="name" v-model="object[name.key]" />-->
-    <!-- <div class="caption-1">
-      <AttributeEditor attribute={title} bind:value={object.title} />
-    </div>
-  </div> -->
+  <!--<StringPresenter class="caption-1" :attribute="name" v-model="object[name.key]" />-->
+  <!-- <div class="caption-1">
+    <AttributeEditor attribute={title} bind:value={object.title} />
+  </div>
+</div> -->
 
   <!-- <Properties _class={task.class.Task} excludeAttributes={['title']} /> -->
   <!-- <Properties {model} bind:object />
@@ -76,22 +76,23 @@
     <div>{JSON.stringify(backlink)}</div>
   {/each} -->
 
-  <div class="taskContent">
-    <div class="caption caption-1">
+  <div class='taskContent'>
+    <div class='caption caption-1'>
       {object.title}
     </div>
-    <div class="taskStatusBar">
-      <div class="taskName">DT-140</div>
-      <StatusLabel type="1" />
+    <div class='taskStatusBar'>
+      <div class='taskName'>DT-140</div>
+      <StatusLabel type='1' />
     </div>
-    <div class="created">
-      <UserInfo url="https://platform.exhale24.ru/images/photo-1.png"
-                title="Александр Алексеенко" />
-      <div class="createdOn">30.11.20, 15:30</div>
+    <div class='created'>
+      <UserInfo url='https://platform.exhale24.ru/images/photo-1.png'
+                title='Александр Алексеенко' />
+      <div class='createdOn'>30.11.20, 15:30</div>
     </div>
-    <UserInfo url="https://platform.exhale24.ru/images/photo-2.png"
-              title="Андрей Платов" subtitle="Исполнитель" />
+    <UserInfo url='https://platform.exhale24.ru/images/photo-2.png'
+              title='Андрей Платов' subtitle='Исполнитель' />
 
+<<<<<<< HEAD
     <div class="actionBar">
       <Button clazz="leftAB actionButton w40">Выполнено</Button>
       <Button clazz="centerAB actionButton w40">В работе</Button>
@@ -104,15 +105,22 @@
         <PopupItem>Action 5</PopupItem>
         <PopupItem>Action 6</PopupItem>
       </PopupMenu>
+=======
+    <div class='actionBar'>
+      <ActionButton style='leftButton' width='40%'>Выполнено</ActionButton>
+      <ActionButton style='centerButton' width='40%'>В работе</ActionButton>
+      <ActionButton style='rightButton' width='20%' combo='true'>Ещё</ActionButton>
+>>>>>>> upstream/master
     </div>
 
-    <div class="description">
+    <div class='description'>
       <p>Привет!</p>
-      <p>Просим отрисовать дизайн писем для опроса о качестве сервиса. Текст письма можно скопировать по ссылке (внизу страницы), также прилагаю скриншоты.</p>
+      <p>Просим отрисовать дизайн писем для опроса о качестве сервиса. Текст письма можно скопировать по ссылке (внизу
+        страницы), также прилагаю скриншоты.</p>
       <p>Для физического лица</p>
-      <ul class="files">
-        <li><a href="/">interfaceRpcErrors.docx</a></li>
-        <li><a href="/">interfaceRpcErrors..docx</a></li>
+      <ul class='files'>
+        <li><a href='/'>interfaceRpcErrors.docx</a></li>
+        <li><a href='/'>interfaceRpcErrors..docx</a></li>
       </ul>
     </div>
 
@@ -121,7 +129,7 @@
 
 {/if}
 
-<style lang="scss">
+<style lang='scss'>
   .taskContent {
     display: flex;
     flex-direction: column;
@@ -131,15 +139,18 @@
       max-width: 18em;
       margin-bottom: 0.5em;
     }
+
     .taskStatusBar {
       display: flex;
       justify-content: space-between;
       margin-bottom: 1em;
+
       .taskName {
         font-size: 14px;
         color: var(--status-blue-color);
       }
     }
+
     .created {
       display: flex;
       justify-content: space-between;
@@ -169,11 +180,13 @@
         margin: 0;
         padding: 0;
         margin-bottom: 1em;
-        &>li {
+
+        & > li {
           margin-bottom: 0.2em;
           margin-left: 2em;
           margin-top: 5px;
           position: relative;
+
           &::before {
             position: absolute;
             content: '';
