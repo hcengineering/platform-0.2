@@ -17,7 +17,7 @@ import { WorkspaceProtocol } from './workspace'
 
 import { filterQuery, getUserSpaces, isAcceptable, processTx as processSpaceTx } from './spaces'
 import { Broadcaster, Client, ClientService, ClientSocket } from './server'
-import { AnyLayout, Class, Doc, Ref, Tx, txContext, TxContextSource } from '@anticrm/core'
+import { AnyLayout, Class, Doc, generateId, Ref, Tx, txContext, TxContextSource } from '@anticrm/core'
 import { CORE_CLASS_CREATE_TX, CORE_CLASS_SPACE, SpaceUser } from '@anticrm/domains'
 import { Response, serialize } from '@anticrm/rpc'
 
@@ -27,14 +27,21 @@ export interface ClientControl {
   send (response: Response<any>): Promise<void>
 
   close (): Promise<void>
+
+  getId (): string
 }
+
+let clientIndex = 0
 
 export async function createClientService (workspaceProtocol: Promise<WorkspaceProtocol>, client: ClientSocket & Client, broadcaster: Broadcaster): Promise<ClientService> {
   const workspace = await workspaceProtocol
 
   const userSpaces: Map<string, SpaceUser> = await getUserSpaces(workspace, client.email)
 
+  const clientId = generateId() + (clientIndex++)
+
   const clientControl: ClientService = {
+    getId: () => clientId,
     // C O R E  P R O T O C O L
     async find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
       const {

@@ -23,7 +23,6 @@ import rpcService, { EventType } from './rpc'
 import { QueriableStorage } from './queries'
 
 import { Cache } from './cache'
-import { Titles } from './titles'
 import {
   Tx, txContext, TxContextSource,
   Ref,
@@ -34,7 +33,7 @@ import {
   CoreProtocol, TxProcessor,
   generateId as genId
 } from '@anticrm/core'
-import { CORE_CLASS_REFERENCE, TITLE_DOMAIN } from '@anticrm/domains'
+import { CORE_CLASS_REFERENCE, CORE_CLASS_TITLE, TITLE_DOMAIN } from '@anticrm/domains'
 
 import { createOperations } from './operations'
 
@@ -42,8 +41,7 @@ import { ModelIndex } from '@anticrm/domains/src/indices/model'
 import { VDocIndex } from '@anticrm/domains/src/indices/vdoc'
 import { TxIndex } from '@anticrm/domains/src/indices/tx'
 import { RPC_CALL_FIND, RPC_CALL_FINDONE, RPC_CALL_LOAD_DOMAIN, RPC_CALL_TX } from '@anticrm/rpc'
-import { TitleIndex } from '@anticrm/domains/src/indices/title'
-import { FilterIndex } from '@anticrm/domains/src/indices/filter'
+import { PassthroughsIndex } from '@anticrm/domains/src/indices/filter'
 
 /*!
  * Anticrm Platform™ Core Plugin
@@ -63,21 +61,13 @@ export default async (platform: Platform): Promise<CoreService> => {
   // Storages
 
   const model = new ModelDb()
-  const titles = new Titles(model)
   const cache = new Cache(coreProtocol)
 
   const modelDomain = await coreProtocol.loadDomain(MODEL_DOMAIN)
   model.loadModel(modelDomain)
 
-  coreProtocol.loadDomain(TITLE_DOMAIN).then(docs => {
-    const ctx = txContext()
-    for (const doc of docs) {
-      titles.store(ctx, doc)
-    }
-  })
-
   const qModel = new QueriableStorage(model, model)
-  const qTitles = new QueriableStorage(model, titles)
+  const qTitles = new QueriableStorage(model, cache)
   const qCache = new QueriableStorage(model, cache, true)
 
   // const queriables = [qModel, qTitles, qGraph, qCache]
@@ -89,18 +79,20 @@ export default async (platform: Platform): Promise<CoreService> => {
   const txProcessor = new TxProcessor([
     new TxIndex(qCache),
     new VDocIndex(model, qCache),
-    new TitleIndex(model, qTitles),
-    new FilterIndex(model, qCache, CORE_CLASS_REFERENCE), // Construct a filter index to update references
+    new PassthroughsIndex(model, qTitles, CORE_CLASS_TITLE), // Just for live queries.
+    new PassthroughsIndex(model, qCache, CORE_CLASS_REFERENCE), // Construct a pass index to update references
     new ModelIndex(model, [qModel])
   ])
 
   // add listener to process data updates from backend for data transactions.
   rpc.addEventListener(EventType.Transaction, result => {
+    console.log('process Transaction', result)
     txProcessor.process(txContext(TxContextSource.Server), result as Tx)
   })
 
   // Add a client transaction event listener
   rpc.addEventListener(EventType.TransientTransaction, txs => {
+    console.log('process TransientTransaction', txs)
     for (const tx of (txs as Tx[])) {
       txProcessor.process(txContext(TxContextSource.ServerTransient), tx)
     }
@@ -144,6 +136,7 @@ export default async (platform: Platform): Promise<CoreService> => {
       if (JSON.stringify(oldQuery) === JSON.stringify(newQuery)) {
         return
       }
+      console.log('updateQuery', oldQuery, newQuery)
       unsubscriber()
       const q = query(_class, newQuery)
       unsubscriber = q.subscribe(action)

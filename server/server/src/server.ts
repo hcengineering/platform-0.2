@@ -80,7 +80,7 @@ export function start (port: number, dbUri: string, host?: string): Promise<Serv
       // console.log(`broadcasting to ${connections.size} connections`)
       for (const client of connections.values()) {
         client.then(client => {
-          if (client !== from) {
+          if (client.getId() !== from.getId()) {
             // console.log(`broadcasting to ${client.email}`, response)
             client.send(response)
           }

@@ -3,21 +3,23 @@ import {
   CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX,
   CORE_CLASS_PUSH_TX,
   CORE_CLASS_UPDATE_TX,
-  CORE_CLASS_VDOC,
   CreateTx, DeleteTx,
   PushTx,
   UpdateTx
 } from '../index'
 
-export class FilterIndex implements DomainIndex {
+/**
+ * Index to pass through a specified class to storage.
+ */
+export class PassthroughsIndex implements DomainIndex {
   private modelDb: Model
   private storage: Storage
-  private filterClass: Ref<Class<Doc>>
+  private matchClass: Ref<Class<Doc>>
 
-  constructor (modelDb: Model, storage: Storage, filterClass: Ref<Class<Doc>>) {
+  constructor (modelDb: Model, storage: Storage, matchClass: Ref<Class<Doc>>) {
     this.modelDb = modelDb
     this.storage = storage
-    this.filterClass = filterClass
+    this.matchClass = matchClass
   }
 
   async tx (ctx: TxContext, tx: Tx): Promise<any> {
@@ -36,28 +38,28 @@ export class FilterIndex implements DomainIndex {
   }
 
   async onCreate (ctx: TxContext, create: CreateTx): Promise<any> {
-    if (!this.modelDb.is(create._objectClass, this.filterClass)) {
+    if (!this.modelDb.is(create._objectClass, this.matchClass)) {
       return Promise.resolve()
     }
     return this.storage.store(ctx, this.modelDb.newDoc(create._objectClass, create._objectId, create.object))
   }
 
   onPush (ctx: TxContext, tx: PushTx): Promise<any> {
-    if (!this.modelDb.is(tx._objectClass, this.filterClass)) {
+    if (!this.modelDb.is(tx._objectClass, this.matchClass)) {
       return Promise.resolve()
     }
     return this.storage.push(ctx, tx._objectClass, tx._objectId, null, tx._attribute, tx._attributes)
   }
 
   onDelete (ctx: TxContext, tx: DeleteTx): Promise<any> {
-    if (!this.modelDb.is(tx._objectClass, this.filterClass)) {
+    if (!this.modelDb.is(tx._objectClass, this.matchClass)) {
       return Promise.resolve()
     }
     return this.storage.remove(ctx, tx._objectClass, tx._objectId, tx._query || null)
   }
 
   onUpdate (ctx: TxContext, tx: UpdateTx): Promise<any> {
-    if (!this.modelDb.is(tx._objectClass, this.filterClass)) {
+    if (!this.modelDb.is(tx._objectClass, this.matchClass)) {
       return Promise.resolve()
     }
     return this.storage.update(ctx, tx._objectClass, tx._objectId, null, tx._attributes)
