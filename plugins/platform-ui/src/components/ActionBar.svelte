@@ -63,7 +63,7 @@
     const rectBody = document.body.getBoundingClientRect()
     if (rectTrigger.left + rectPopup.width >= rectBody.width) thisPopup.style.right = rectBody.width - rectTrigger.right + 'px'
     else thisPopup.style.left = rectTrigger.left + 'px'
-    thisPopup.style.top = rectTrigger.y + rectTrigger.height - 1 + 'px'
+    thisPopup.style.top = rectTrigger.y + rectTrigger.height + 4 + 'px'
 
     if (firstOpen) {
       firstOpen = false
@@ -93,15 +93,23 @@
       <button class='button actionButton {item.style}' on:click={item.action}>{item.name}</button>
     {/each}
     {#if popups.length > 0}
-      <button bind:this={thisTrigger} class='button actionButton abRight wOther'
+      <button bind:this={thisTrigger} class='button actionButton abRight w100 wOther'
+        class:selected={(visible === 'visible')}
         on:click={() => {
-          if (visible === 'hidden') visible = 'visible'
-          else visible = 'hidden'
+          if (visible === 'hidden') {
+            visible = 'visible'
+          } else {
+            visible = 'hidden'
+          }
         }}><span>Ещё</span><Icon icon={ui.icon.ArrowDown} className='icon-embed' />
       </button>
-      <div bind:this={thisPopup} class='popup-menu-view' style='width: 150px; visibility: {visible}'>
+      <div bind:this={thisPopup} class='popup-menu-view' style='visibility: {visible}'>
         {#each popups as popup (popup.id)}
-          <button class='button actionButton {popup.style}' on:click={popup.action}>{popup.name}</button>
+          {#if popup.name === '-'}
+            <div class="popup-separator"></div>
+          {:else}
+            <button class='{popup.style}' on:click={popup.action}>{popup.name}</button>
+          {/if}
         {/each}
       </div>
     {/if}
@@ -128,6 +136,7 @@
     align-items: center;
     justify-content: center;
     padding: 0.25em;
+    color: var(--theme-content-dark-color);
   }
   .abLeft {
     border-radius: 4px 0 0 4px;
@@ -140,17 +149,36 @@
   .abRight {
     border-radius: 0 4px 4px 0;
   }
+  .selected {
+    background-color: var(--theme-bg-accent-hover);
+    border-color: var(--theme-bg-dark-hover);
+  }
   .popup-item {
-    border-radius: 0;
+    margin: 4px 0;
+    padding: 8px;
+    background-color: var(--theme-bg-accent-color);
+    border-radius: 4px;
     border: none;
+    text-align: left;
+    color: var(--theme-content-dark-color);
+    cursor: pointer;
+
+    &:hover {
+      background-color: var(--theme-bg-accent-hover);
+    }
+  }
+  .popup-separator {
+    height: 1px;
+    background-color: var(--theme-bg-dark-color);
   }
   .w100 {
     flex-basis: 100%;
     width: 100%;
   }
   .wOther {
-    flex-basis: 80px;
-    width: 80px;
+    // flex-basis: 76px;
+    // width: 76px;
+    // min-width: 76px;
     &>span {
       margin-right: 5px;
     }
@@ -164,8 +192,8 @@
     background-color: var(--theme-bg-accent-color);
     border: solid 1px var(--theme-bg-dark-color);
     border-radius: 4px;
-    padding: .5em 0;
-    box-shadow: 0px 6px 9px rgba(0, 0, 0, 0.1);
+    padding: 4px 8px;
+    box-shadow: var(--theme-shadow);
     z-index: 1000;
   }
 </style>

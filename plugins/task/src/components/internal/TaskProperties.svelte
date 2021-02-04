@@ -60,11 +60,11 @@
   let actions: Array<Action> = []
   actions.push({ name: 'Выполнено', action: () => { alert('Выполнено') } })
   actions.push({ name: 'В работе', action: () => { alert('В работе') } })
-  actions.push({ name: 'Action 3', action: () => { alert('Action 3') } })
-  actions.push({ name: 'Action 4', action: () => { alert('Action 4') } })
-  actions.push({ name: 'Action 5', action: () => { alert('Action 5') } })
-  actions.push({ name: 'Action 6', action: () => { alert('Action 6') } })
-  actions.push({ name: 'Action 7', action: () => { alert('Action 7') } })
+  actions.push({ name: 'Произвольный статус', action: () => { alert('Произвольный статус') } })
+  actions.push({ name: 'Назначить исполнителя', action: () => { alert('Назначить исполнителя') } })
+  actions.push({ name: 'Назначить наблюдателя', action: () => { alert('Назначить наблюдателя') } })
+  actions.push({ name: '-', action: undefined })
+  actions.push({ name: 'Закрыть задачу', action: () => { alert('Закрыть задачу') } })
 </script>
 
 {#if model && title}
