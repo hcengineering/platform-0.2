@@ -54,7 +54,7 @@
   <Icon icon={workbench.icon.ArrowDown} className="icon-embed" />
 
   <div bind:this={comboDrop} class="comboBox-drop">
-    <EditBox id='select-user-combobox' icon={workbench.icon.Finder} right='true' width='100%' />
+    <EditBox id='select-user-combobox' icon={workbench.icon.Finder} iconRight='true' width='100%' />
     <div class="separator"></div>
     <div bind:this={comboItems} class="comboBox-drop__items">
       <ScrollView stylez="height:100%;width: 100%;">

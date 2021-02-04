@@ -201,8 +201,8 @@
   }
 
   .icon-brd {
-    height: 24px;
-    width: 24px;
+    height: 1.5em;
+    width: 1.5em;
     fill: currentColor;
     position: relative;
   }
@@ -222,8 +222,8 @@
     border: solid 1px var(--theme-bg-dark-color);
     border-radius: 50%;
     fill: var(--theme-content-color);
-    width: 16px;
-    height: 16px;
+    width: 1em;
+    height: 1em;
 
     &:hover {
       background-color: var(--theme-bg-accent-hover);
@@ -233,8 +233,8 @@
   }
 
   .icon-embed {
-    height: 16px;
-    width: 16px;
+    height: 1em;
+    width: 1em;
     fill: currentColor;
     //top: 0.15em;
     position: relative;

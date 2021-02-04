@@ -64,16 +64,16 @@
     {/each}
     <div class='app-icon'>
       <div class={(selected === 0) ? 'selectedApp' : 'iconApp'} on:click={() => {selected = 0}}>
-        <Icon icon='{chunter.icon.ActivityView}' className='icon-left' />
+        <Icon icon='{chunter.icon.ActivityView}' className='icon-brd' />
       </div>
       <div class={(selected === 1) ? 'selectedApp' : 'iconApp'} on:click={() => {selected = 1}}>
-        <Icon icon='{chunter.icon.ChatView}' className='icon-left' />
+        <Icon icon='{chunter.icon.ChatView}' className='icon-brd' />
       </div>
       <div class={(selected === 2) ? 'selectedApp' : 'iconApp'} on:click={() => {selected = 2}}>
-        <Icon icon='{workbench.icon.Pages}' className='icon-left' />
+        <Icon icon='{workbench.icon.Pages}' className='icon-brd' />
       </div>
       <div class={(selected === 3) ? 'selectedApp' : 'iconApp'} on:click={() => {selected = 3}}>
-        <Icon icon='{task.icon.Task}' className='icon-left' />
+        <Icon icon='{task.icon.Task}' className='icon-brd' />
       </div>
     </div>
     <div class='remainder'></div>
@@ -118,13 +118,13 @@
 
     .iconApp {
       padding: 1em;
-      fill: var(--theme-content-dark-color);
+      color: var(--theme-content-dark-color);
       cursor: pointer;
     }
 
     .selectedApp {
       padding: 1em;
-      fill: var(--theme-bg-dark-color);
+      color: var(--theme-bg-dark-color);
     }
 
     .remainder {

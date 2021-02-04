@@ -24,6 +24,6 @@ export default (platform: Platform) => {
     Network: spritesUrl + '#network',
     Search: spritesUrl + '#search',
     Add: spritesUrl + '#add',
-    Resize: spritesUrl + '#resize',
+    ArrowDown: spritesUrl + '#arrowDown',
   })
 }

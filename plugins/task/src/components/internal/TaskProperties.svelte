@@ -24,6 +24,7 @@
   import PopupItem from '@anticrm/sparkling-controls/src/menu/PopupItem.svelte'
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
+  import ActionBar, { Action } from '@anticrm/platform-ui/src/components/ActionBar.svelte'
 
   import Properties from '@anticrm/presentation/src/components/internal/Properties.svelte'
   import AttributeEditor from '@anticrm/presentation/src/components/AttributeEditor.svelte'
@@ -55,6 +56,15 @@
   onDestroy(() => {
     if (unsubscribe) unsubscribe()
   })
+
+  let actions: Array<Action> = []
+  actions.push({ name: 'Выполнено', action: () => { alert('Выполнено') } })
+  actions.push({ name: 'В работе', action: () => { alert('В работе') } })
+  actions.push({ name: 'Action 3', action: () => { alert('Action 3') } })
+  actions.push({ name: 'Action 4', action: () => { alert('Action 4') } })
+  actions.push({ name: 'Action 5', action: () => { alert('Action 5') } })
+  actions.push({ name: 'Action 6', action: () => { alert('Action 6') } })
+  actions.push({ name: 'Action 7', action: () => { alert('Action 7') } })
 </script>
 
 {#if model && title}
@@ -91,7 +101,7 @@
     <UserInfo url='https://platform.exhale24.ru/images/photo-2.png'
               title='Андрей Платов' subtitle='Исполнитель' />
 
-    <div class="actionBar">
+    <!-- <div class="actionBar">
       <Button className="actionButtonLeft w40">Выполнено</Button>
       <Button className="actionButtonCenter w40">В работе</Button>
       <PopupMenu buttonClass='actionButtonRight w20'>
@@ -103,7 +113,9 @@
         <PopupItem>Action 5</PopupItem>
         <PopupItem>Action 6</PopupItem>
       </PopupMenu>
-    </div>
+    </div> -->
+
+    <ActionBar onTop='2' {actions} />
 
     <div class='description'>
       <p>Привет!</p>

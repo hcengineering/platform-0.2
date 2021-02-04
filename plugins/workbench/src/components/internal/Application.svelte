@@ -67,7 +67,7 @@
         </Button>
       </div>
       <div style='flex-grow:1'></div>
-      <EditBox icon={workbench.icon.Finder} placeholder='Поиск по {appInstance.label}...' right='true' />
+      <EditBox icon={workbench.icon.Finder} placeholder='Поиск по {appInstance.label}...' iconRight='true' />
     </div>
     <ScrollView stylez='height:100%; margin: 2em'>
       <div class='table'>
