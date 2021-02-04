@@ -18,7 +18,7 @@
 import { Builder } from '..'
 import { Property, AnyLayout, StringProperty, Model } from '@anticrm/core'
 
-import { taskIds, doc1, fullModel as mb, createSubtask } from './test_tasks'
+import { taskIds, doc1, fullModel as mb, createSubtask, createTask } from './test_tasks'
 
 const b = new Builder()
 mb(b)
@@ -121,8 +121,20 @@ describe('matching', () => {
   })
   it('remove item from instance', () => {
     const clone = model.createDocument(taskIds.class.Task, doc1)
-    const cloneResult = model.removeDocument(clone, { mainTask: { } })
+    const cloneResult = model.removeDocument(clone, { mainTask: {} })
 
     expect(cloneResult.mainTask).toEqual(undefined)
+  })
+
+  it('match regex value', async () => {
+    const model = new Model('vdocs')
+    model.loadModel(b.dump())
+
+    model.add(model.createDocument(taskIds.class.Task, createTask('t1', 10, 'test task1')))
+    model.add(model.createDocument(taskIds.class.Task, createTask('t2t', 11, 'test task2')))
+
+    const result = await model.find(taskIds.class.Task, { name: { $regex: 't.*t' as StringProperty } })
+
+    expect(result.length).toEqual(1)
   })
 })

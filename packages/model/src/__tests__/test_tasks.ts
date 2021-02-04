@@ -14,8 +14,8 @@
 //
 
 import core, { Class$, Prop, ArrayOf$, Builder, InstanceOf$, Primary } from '..'
-import { Ref, Doc, Emb, Class, MODEL_DOMAIN } from '@anticrm/core'
-import { TDoc, TEmb, TObj } from '../models/core'
+import { Ref, Doc, Emb, Class, MODEL_DOMAIN, generateId } from '@anticrm/core'
+import { TAttribute, TClass, TClassifier, TDoc, TEmb, TMixin, TObj, TType } from '../models/core'
 
 export interface TaskComment extends Emb {
   _id: string
@@ -56,6 +56,21 @@ export function createSubtask (name: string, rate = 30): SubTask {
     __embedded: true,
     _class: taskIds.class.Subtask
   } as SubTask
+}
+
+/**
+ * Create a random task with name specified
+ * @param name
+ */
+export function createTask (name: string, rate: number, description: string): Task {
+  return {
+    _id: generateId() as Ref<Doc>,
+    _class: taskIds.class.Task,
+    name,
+    description,
+    lists: [name],
+    rate
+  } as Task
 }
 
 export const doc1 = {
@@ -127,6 +142,6 @@ export function model (S: Builder): void {
 }
 
 export function fullModel (S: Builder): void {
-  S.add(TObj, TEmb, TDoc)
+  S.add(TObj, TEmb, TDoc, TClassifier, TClass, TAttribute, TType, TMixin)
   model(S)
 }
