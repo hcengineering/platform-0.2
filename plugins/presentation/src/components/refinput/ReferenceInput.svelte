@@ -89,7 +89,6 @@
   }
 
   titleSearch = coreService.subscribe(CORE_CLASS_TITLE, query(currentPrefix), (docs) => {
-    console.log('updateTitles:', docs)
     completions = updateTitles(docs)
   }, onDestroy)
 
@@ -116,11 +115,11 @@
 
   async function findTitle (title: string): Promise<ItemRefefence[]> {
     let docs = await coreService.find(CORE_CLASS_TITLE, {
-      title
+      title: title as StringProperty
     })
 
     for (const value of docs) {
-      if (value.title.toString() === title) {
+      if (value.title === title) {
         return [{
           id: value._objectId,
           class: value._objectClass
@@ -197,6 +196,7 @@
       }
       if (event.key === 'Escape') {
         completions = []
+        popupVisible = false
         return
       }
     }
@@ -231,56 +231,54 @@
         const len = node.text.length
         let i = 0
         while (i < len) {
-          let text = node.text.substring(i)
-          if (text.startsWith('[[')) {
+          if (node.text.startsWith('[[', i)) {
             // We found trigger, we need to call replace method
-            let endpos = text.indexOf(']]')
+            let endpos = node.text.indexOf(']]', i)
             if (endpos !== -1) {
               let end = endpos + 2
-              if (end !== i) {
-                let refText = node.text.substring(i + 2, i + end - 2)
-                let ci = i
-                let cpos = pos
-                let cend = end
-                promises.push(
-                  Promise.all([findTitle(refText)]).then((result) => {
-                    let items = result.reduce((acc, val) => {
-                      return acc.concat(val)
-                    }, [])
-                    if (items.length > 1) {
-                      // Check if we had item selected already
-                      for (let ii = 0; ii < items.length; ii++) {
-                        if (items[ii].id == prev.id) {
-                          items = [items[ii]]
-                          break
-                        }
+
+              let refText = node.text.substring(i + 2, end - 2)
+              let ci = i
+              let cpos = pos
+              let cend = end
+              promises.push(
+                Promise.all([findTitle(refText)]).then((result) => {
+                  let items = result.reduce((acc, val) => {
+                    return acc.concat(val)
+                  }, [])
+                  if (items.length > 1) {
+                    // Check if we had item selected already
+                    for (let ii = 0; ii < items.length; ii++) {
+                      if (items[ii].id == prev.id) {
+                        items = [items[ii]]
+                        break
                       }
                     }
-                    if (items.length == 1) {
+                  }
+                  if (items.length == 1) {
+                    operations.push(
+                      (tr: Transaction | null): Transaction => {
+                        let mark = schema.marks.reference.create(items[0])
+                        return (tr == null ? state.tr : tr).addMark(cpos + ci, cpos + cend, mark)
+                      }
+                    )
+                  } else if (items.length == 0) {
+                    if (prev.id == '') {
                       operations.push(
                         (tr: Transaction | null): Transaction => {
-                          let mark = schema.marks.reference.create(items[0])
-                          return (tr == null ? state.tr : tr).addMark(cpos + ci, cpos + ci + cend, mark)
+                          let mark = schema.marks.reference.create({
+                            id: null,
+                            class: 'Page'
+                          })
+                          return (tr == null ? state.tr : tr).addMark(cpos + ci, cpos + cend, mark)
                         }
                       )
-                    } else if (items.length == 0) {
-                      if (prev.id == '') {
-                        operations.push(
-                          (tr: Transaction | null): Transaction => {
-                            let mark = schema.marks.reference.create({
-                              id: null,
-                              class: 'Page'
-                            })
-                            return (tr == null ? state.tr : tr).addMark(cpos + ci, cpos + ci + cend, mark)
-                          }
-                        )
-                      }
                     }
-                  })
-                )
-                i += end // Move to next char after ]]
-                continue
-              }
+                  }
+                })
+              )
+              i = end // Move to next char after ]]
+              continue
             }
           }
           i++
