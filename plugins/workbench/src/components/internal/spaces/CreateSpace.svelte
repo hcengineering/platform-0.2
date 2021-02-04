@@ -154,7 +154,7 @@
   <div class='header'>
     <div class='caption-1'>Create a new {(makePrivate) ? 'private ' : ''}Space</div>
     <a href='/' on:click|preventDefault={() => dispatch('close')}>
-      <Icon icon={workbench.icon.Close} className='icon-button' />
+      <Icon icon={workbench.icon.Close} button='true' />
     </a>
   </div>
 
@@ -180,7 +180,7 @@
         </div>
       </CheckBox>
       <div class='buttons'>
-        <button type='button' class='button primary' on:click={() => save()}>Create</button>
+        <button type='button' class='button large primary' on:click={() => save()}>Create</button>
       </div>
     </form>
   </div>

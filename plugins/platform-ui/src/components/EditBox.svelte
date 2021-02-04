@@ -29,7 +29,7 @@
 
 <div class="editbox wIcon" style='width: {width}' on:click={input.focus()}>
   {#if (!iconRight)}
-    <Icon {icon} className="icon-embed" />
+    <Icon {icon} />
     <div class="separator"></div>
   {/if}
   <input
@@ -44,7 +44,7 @@
   />
   {#if (iconRight)}
     <div class="separator"></div>
-    <Icon {icon} className="icon-embed" />
+    <Icon {icon} />
   {/if}
 </div>
 

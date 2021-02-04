@@ -137,6 +137,7 @@
 
   .button {
     display: inline-block;
+    height: 32px;
     border: 1px solid var(--theme-bg-dark-color);
     border-radius: 4px;
     padding: 0.5em 1.33em 0.5em;
@@ -157,10 +158,12 @@
     }
 
     &.large {
+      height: 42px;
       padding: 0.75em 1.5em 0.75em;
     }
 
     &.small {
+      height: 24px;
       padding: 0 0.6em 0;
     }
 
@@ -194,36 +197,36 @@
     color: inherit;
     text-decoration: none;
   }
-
   a:hover {
     color: var(--theme-doclink-color);
     text-decoration: none;
   }
 
-  .icon-brd {
-    height: 1.5em;
-    width: 1.5em;
+  .icon {
     fill: currentColor;
     position: relative;
   }
-  .icon-brd-max {
-    height: 42px;
-    width: 42px;
-    fill: currentColor;
-    position: relative;
+  .icon-16 {
+    height: 16px;
+    width: 16px;
   }
-  .icon-left {
-    width: 24px;
+  .icon-24 {
     height: 24px;
+    width: 24px;
   }
-
+  .icon-32 {
+    width: 32px;
+    height: 32px;
+  }
+  .icon-42 {
+    width: 42px;
+    height: 42px;
+  }
   .icon-button {
     background-color: var(--theme-bg-accent-color);
     border: solid 1px var(--theme-bg-dark-color);
     border-radius: 50%;
     fill: var(--theme-content-color);
-    width: 1em;
-    height: 1em;
 
     &:hover {
       background-color: var(--theme-bg-accent-hover);
@@ -232,45 +235,11 @@
     }
   }
 
-  .icon-embed {
-    height: 1em;
-    width: 1em;
-    fill: currentColor;
-    //top: 0.15em;
-    position: relative;
-  }
-
-  .icon-embed-15x {
-    height: 1.5em;
-    width: 1.5em;
-    fill: currentColor;
-    top: 0.25em;
-    position: relative;
-  }
-
-  .icon-embed-2x {
-    height: 2em;
-    width: 2em;
-    top: 0.3em;
-    fill: currentColor;
-    position: relative;
-  }
-
-  .icon-2x {
-    height: 2em;
-    width: 2em;
-    fill: currentColor;
-    position: relative;
-  }
-
-  .popup, .popup-16 {
-    height: 1.5em;
+  .popup {
+    //height: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
-  }
-  .popup-16 {
-    height: 16px;
   }
 
   .caption-1 {

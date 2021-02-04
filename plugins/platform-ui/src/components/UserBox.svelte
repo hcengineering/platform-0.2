@@ -51,7 +51,7 @@
 
 <div bind:this={comboRoot} class="comboBox" on:click={handler}>
   <UserInfo url={items[selected].url} title={items[selected].name} subtitle="Исполнитель" />
-  <Icon icon={workbench.icon.ArrowDown} className="icon-embed" />
+  <Icon icon={workbench.icon.ArrowDown} />
 
   <div bind:this={comboDrop} class="comboBox-drop">
     <EditBox id='select-user-combobox' icon={workbench.icon.Finder} iconRight='true' width='100%' />

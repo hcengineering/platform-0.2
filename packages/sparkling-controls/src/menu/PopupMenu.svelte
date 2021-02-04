@@ -1,7 +1,7 @@
 <script lang='ts'>
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
 
-  export let buttonClass: string = 'transparent'
+  export let kind: string = 'transparent'
   export const width: Number = 150
   export let visible: String = 'hidden'
 
@@ -38,7 +38,7 @@
 </script>
 
 
-<Button className={buttonClass}
+<Button {kind}
   on:click={() => {
     if (visible === 'hidden') visible = 'visible'
     else visible = 'hidden'
@@ -59,8 +59,8 @@
     background-color: var(--theme-bg-accent-color);
     border: solid 1px var(--theme-bg-dark-color);
     border-radius: 4px;
-    padding: .5em 0;
-    box-shadow: 0px 6px 9px rgba(0, 0, 0, 0.1);
+    padding: 4px 8px;
+    box-shadow: var(--theme-shadow);
     z-index: 1000;
   }
 </style>

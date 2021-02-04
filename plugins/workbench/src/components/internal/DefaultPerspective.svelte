@@ -192,7 +192,7 @@
 <div class='workbench-perspective'>
   <div class='projects' class:mini={!hidden}>
     <a href='/' style='position:absolute;top:1.5em;right:1.5em;' on:click|preventDefault={() => { hidden = !hidden}}>
-      <Icon icon={workbench.icon.Resize} className='icon-button' />
+      <Icon icon={workbench.icon.Resize} button='true' />
     </a>
     <div class='container' class:hidden={!hidden}>
       <div class='caption-3'>
@@ -209,7 +209,7 @@
       <div class='footContainer'>
         <span>
           <PopupMenu>
-            <div class='popup' slot='trigger'><Icon icon={ui.icon.Add} className='icon-button' /></div>
+            <div class='popup' slot='trigger'><Icon icon={ui.icon.Add} button='true' /></div>
             <PopupItem on:click={() => {
               uiService.showModal(CreateSpace, {})
             }}>Create</PopupItem>

@@ -27,6 +27,7 @@
   import workbench from '@anticrm/workbench'
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
   import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.svelte'
+  import Button from '@anticrm/sparkling-controls/src/Button.svelte'
   import { CORE_CLASS_VDOC, Space } from '@anticrm/domains'
 
   export let title: string
@@ -165,7 +166,7 @@
       <InlineEdit bind:value={title} fullWidth='true' />
     </div>
     <a href='/' style='margin-left:1.5em' on:click|preventDefault={() => dispatch('close')}>
-      <Icon icon={workbench.icon.Close} className='icon-button' />
+      <Icon icon={workbench.icon.Close} button='true' />
     </a>
   </div>
 
@@ -179,8 +180,8 @@
   </div>
 
   <div class='buttons'>
-    <button type='button' class='button primary' on:click={save}>Принять</button>
-    <button type='button' class='button' on:click={() => dispatch('close')}>Отказаться</button>
+    <Button kind='primary' on:click={save}>Принять</Button>
+    <Button on:click={() => dispatch('close')}>Отказаться</Button>
   </div>
 </div>
 

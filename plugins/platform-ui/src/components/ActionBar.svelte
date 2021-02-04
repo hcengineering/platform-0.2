@@ -101,7 +101,7 @@
           } else {
             visible = 'hidden'
           }
-        }}><span>Ещё</span><Icon icon={ui.icon.ArrowDown} className='icon-embed' />
+        }}><span>Ещё</span><Icon icon={ui.icon.ArrowDown} />
       </button>
       <div bind:this={thisPopup} class='popup-menu-view' style='visibility: {visible}'>
         {#each popups as popup (popup.id)}

@@ -70,7 +70,7 @@
     </div>
   </div> -->
   <a href="/" style='position:absolute;top:1.5em;right:1.5em;' on:click|preventDefault={() => { dispatch('close') }}>
-    <Icon icon={workbench.icon.Close} className='icon-button' /></a>
+    <Icon icon={workbench.icon.Close} button='true' /></a>
   {#if object}
     <div class="content">
       <Component is="{component}" props="{{ _class, object }}" />

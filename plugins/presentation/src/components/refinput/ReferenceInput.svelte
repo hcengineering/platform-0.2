@@ -359,45 +359,45 @@
           <slot name="inner" />
           <ToolbarButton style="padding:0; width:24px; height:24px"
             on:click={() => htmlEditor.toggleBold()} selected={styleState.bold}>
-            <Icon icon={presentation.icon.brdBold} className="icon-brd" />
+            <Icon icon={presentation.icon.brdBold} size="24" />
           </ToolbarButton>
           <ToolbarButton style="padding:0; width:24px; height:24px"
             on:click={() => htmlEditor.toggleItalic()}
             selected={styleState.italic}>
-            <Icon icon={presentation.icon.brdItalic} className="icon-brd" />
+            <Icon icon={presentation.icon.brdItalic} size="24" />
           </ToolbarButton>
           <div class="tSeparator" />
           <ToolbarButton style="padding:0; width:24px; height:24px">
-            <Icon icon={presentation.icon.brdCode} className="icon-brd" />
+            <Icon icon={presentation.icon.brdCode} size="24" />
           </ToolbarButton>
           <ToolbarButton style="padding:0; width:24px; height:24px"
             on:click={() => htmlEditor.toggleUnOrderedList()}>
-            <Icon icon={presentation.icon.brdUL} className="icon-brd" />
+            <Icon icon={presentation.icon.brdUL} size="24" />
           </ToolbarButton>
           <ToolbarButton style="padding:0; width:24px; height:24px"
             on:click={() => htmlEditor.toggleOrderedList()}>
-            <Icon icon={presentation.icon.brdOL} className="icon-brd" />
+            <Icon icon={presentation.icon.brdOL} size="24" />
           </ToolbarButton>
           <div class="tSeparator" />
           <ToolbarButton style="padding:0; width:24px; height:24px">
-            <Icon icon={presentation.icon.brdLink} className="icon-brd" />
+            <Icon icon={presentation.icon.brdLink} size="24" />
           </ToolbarButton>
           <div class="tSeparator" />
           <ToolbarButton style="padding:0; width:24px; height:24px">
-            <Icon icon={presentation.icon.brdAddr} className="icon-brd" />
+            <Icon icon={presentation.icon.brdAddr} size="24" />
           </ToolbarButton>
           <ToolbarButton style="padding:0; width:24px; height:24px">
-            <Icon icon={presentation.icon.brdClip} className="icon-brd" />
+            <Icon icon={presentation.icon.brdClip} size="24" />
           </ToolbarButton>
         {/if}
         <div slot="right">
           <ToolbarButton style="padding:0; width:42x; height:42px"
             on:click={() => handleSubmit()} selected={!styleState.isEmpty}>
-            <Icon icon={presentation.icon.brdSend} className="icon-brd-max" />
+            <Icon icon={presentation.icon.brdSend} size="42" />
             <!--▶️-->
           </ToolbarButton>
           <ToolbarButton style="padding:0; width:42px; height:42px">
-            <Icon icon={presentation.icon.brdSmile} className="icon-brd-max" />
+            <Icon icon={presentation.icon.brdSmile} size="42" />
             <!--😀-->
           </ToolbarButton>
           <ToolbarButton style="font-weight:bold" selected={stylesEnabled} on:click={() => (stylesEnabled = !stylesEnabled)}>Aa</ToolbarButton>

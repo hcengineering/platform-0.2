@@ -106,7 +106,7 @@
       <Button className="actionButtonCenter w40">В работе</Button>
       <PopupMenu buttonClass='actionButtonRight w20'>
         <span class='popup' slot='trigger'>
-          Ещё <Icon icon={task.icon.ArrowDown} className='icon-embed' />
+          Ещё <Icon icon={task.icon.ArrowDown} />
         </span>
         <PopupItem>Action 3</PopupItem>
         <PopupItem>Action 4</PopupItem>

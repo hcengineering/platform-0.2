@@ -65,7 +65,7 @@
             <td>
               {#if attr.icon}
                 <span style="fill: var(--theme-content-dark-color)">
-                  <Icon icon={attr.icon} className="icon-embed-15x" />
+                  <Icon icon={attr.icon} size="24" />
                 </span>
               {/if}
             </td>
