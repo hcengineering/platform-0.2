@@ -71,7 +71,7 @@
     background-color: var(--theme-bg-color);
     border: solid 1px var(--theme-bg-dark-color);
     border-radius: 4px;
-    padding: 0.5em 0px;
+    padding: 0px;
     box-shadow: 0px 6px 9px rgba(0, 0, 0, 0.1);
   }
 

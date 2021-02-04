@@ -22,7 +22,6 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    margin-bottom: 0.5em;
     cursor: pointer;
     &:hover>.checkbox {
       border: solid 1px var(--theme-bg-dark-hover);
@@ -32,7 +31,7 @@
     }
 
     .separator {
-      width: 1em;
+      width: 8px;
     }
 
     .input-label {
@@ -40,58 +39,50 @@
     }
 
     .checkbox {
-      width: 35px;
-      height: 20px;
+      width: 43px;
+      height: 22px;
+      background-color: var(--theme-bg-accent-color);
       border: solid 1px var(--theme-bg-dark-color);
-      border-radius: 4px;
+      border-radius: 16px;
       position: relative;
       cursor: pointer;
       transition: all .2s ease-in-out;
 
-      &::before {
+      &::after {
         content: '';
         position: absolute;
-        background-color: var(--theme-bg-dark-color);
-        border-radius: 4px;
+        background-color: var(--theme-content-color);
+        border-radius: 50%;
         width: 16px;
         height: 16px;
-        top: 2px;
-        left: 2px;
+        top: 3px;
+        left: 3px;
         transition: all .2s ease-in-out;
       }
       &:hover {
-        border: solid 1px var(--theme-bg-dark-hover);
-
-        &::before {
-          background-color: var(--theme-bg-dark-hover);
-        }
+        background-color: var(--theme-bg-accent-hover);
+        border-color: var(--theme-bg-dark-hover);
       }
     }
     .active {
-      background-color: var(--theme-bg-accent-color);
-      border: solid 1px var(--theme-bg-dark-color);
+      background-color: var(--theme-bg-dark-hover);
+      border: solid 1px var(--theme-bg-dark-hover);
 
-      &::before {
-        content: '';
-        position: absolute;
-        background-color: var(--theme-bg-dark-color);
-        border-radius: 4px;
-        width: 16px;
-        height: 16px;
-        top: 2px;
-        left: calc(100% - 18px);
-        transition: all .2s ease-in-out;
-        z-index: 2;
-      }
       &::after {
         content: '';
-        background-image: url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 24 24' fill='white' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M9 16.17L4.83 12L3.41 13.41L9 19L21 7L19.59 5.59L9 16.17Z'/%3E%3C/svg%3E%0A");
-        width: 12px;
-        height: 12px;
-        top: 4px;
-        left: 3px;
         position: absolute;
-        z-index: 1;
+        background-color: var(--theme-content-color);
+        border-radius: 16px;
+        width: 16px;
+        height: 16px;
+        top: 3px;
+        left: calc(100% - 19px);
+        z-index: 1002;
+        transition: all .2s ease-in-out;
+      }
+      &:hover {
+        background-color: var(--theme-bg-dark-hover);
+        border-color: var(--theme-content-color);
       }
     }
   }

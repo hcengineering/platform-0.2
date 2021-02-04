@@ -121,7 +121,7 @@
   .editbox {
     border: 1px solid var(--theme-bg-dark-color);
     border-radius: 4px;
-    padding: 0.75em 1em;
+    padding: 8px 16px;
     background-color: var(--theme-bg-accent-color);
     box-sizing: border-box;
     color: var(--theme-content-color);
@@ -132,6 +132,10 @@
       background-color: var(--theme-bg-accent-hover);
       border-color: var(--theme-bg-dark-hover);
       color: var(--theme-content-color);
+    }
+    &-label {
+      height: 54px;
+      padding: 6px 16px 4px;
     }
   }
 

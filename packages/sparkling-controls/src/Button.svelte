@@ -1,16 +1,16 @@
 <script lang="ts">
-  // --- prop 'size': small, large --- //
+  // --- 'small', 'large' --- //
   export let size: string = ''
-  // --- prop 'kind': primary, transparent --- //
+  // --- 'primary', 'transparent' --- //
   export let kind: string = ''
-
-  if ((size !== 'small') || (size !== 'large')) size = ''
-  if ((kind !== 'primary') || (kind !== 'transparent')) size = ''
+  // --- ex: '100px', '25%' --- //
+  export let width: string = ''
 </script>
 
 <button
   type="button"
   class="button {size} {kind}"
+  style="{(width !== '') ? 'width:' + width : ''}"
   on:click
 >
   <slot />
