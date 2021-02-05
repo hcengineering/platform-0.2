@@ -17,34 +17,41 @@
   import Icon from './Icon.svelte'
   import { Asset } from "@anticrm/platform-ui";
 
-  export let icon: Asset | undefined  
+  export let icon: Asset | undefined = undefined
   export let width: string = '300px'
   export let id: string
   export let value: string
-  export let placeholder: string
-  export let right: boolean = false
+  export let placeholder: string = ''
+  export let label: string = ''
+  export let iconRight: boolean = false
+  export let hoverState: boolean = false
 
   let input: HTMLElement
 </script>
 
-<div class="editbox wIcon" style='width: {width}' on:click={input.focus()}>
-  {#if (!right)}
-    <Icon {icon} clazz="icon-embed" />
+<div class="editbox wIcon" class:editbox-label={(label !== '')} class:editbox-hoverState={hoverState}
+     style='width: {width}' on:click={input.focus()}>
+  {#if ((!iconRight) && (typeof(icon) !== 'undefined'))}
+    <Icon {icon} />
     <div class="separator"></div>
   {/if}
-  <input
-    bind:this={input}
-    id={id}
-    type="text"
-    bind:value={value}
-    {placeholder}
-    on:input
-    on:focus
-    on:change
-  />
-  {#if (right)}
+  {#if (label !== '')}
+    <div class="wLabel">
+      <div class="label">{label}</div>
+      <input bind:this={input} {id} type="text"
+        bind:value={value} {placeholder}
+        on:input on:focus on:change
+      />
+    </div>
+  {:else}
+    <input bind:this={input} {id} type="text"
+      bind:value={value} {placeholder}
+      on:input on:focus on:change
+    />
+  {/if}
+  {#if ((iconRight) && (typeof(icon) !== 'undefined'))}
     <div class="separator"></div>
-    <Icon {icon} clazz="icon-embed" />
+    <Icon {icon} />
   {/if}
 </div>
 
@@ -54,6 +61,17 @@
     flex-direction: row;
     align-items: center;
   }
+  .wLabel {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  .label {
+    color: var(--theme-content-color);
+    font-size: 11px;
+    font-weight: 400;
+    margin-bottom: 4px;
+  }
   .separator {
     width: 7px;
   }
@@ -61,7 +79,8 @@
   input {
     border: none;
     width: 100%;
-    color: var(--theme-content-color);
+    margin-left: -2px;
+    color: var(--theme-content-dark-color);
     background-color: transparent;
     font: inherit;
 

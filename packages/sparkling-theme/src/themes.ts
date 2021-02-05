@@ -29,6 +29,7 @@ export interface Theme {
     ['userlink-hover']: string
     ['doclink-hover']: string
     ['content-trans-color']: string
+    ['shadow']: string
     ['font-content']: string
   }
 }
@@ -50,6 +51,7 @@ export const themes: Theme[] = [
       ['userlink-hover']: '#B92D52',
       ['doclink-hover']: '#2D6AB9',
       ['content-trans-color']: 'rgba(0, 0, 0, 0.2)',
+      ['shadow']: '0px 4px 8px rgba(202, 193, 184, 0.5)',
       ['font-content']: `"IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto`
     }
   },
@@ -69,6 +71,7 @@ export const themes: Theme[] = [
       ['userlink-hover']: '#B92D52',
       ['doclink-hover']: '#2D6AB9',
       ['content-trans-color']: 'rgba(255, 255, 255, 0.2)',
+      ['shadow']: '0px 4px 8px rgba(15, 15, 15, 0.5)',
       ['font-content']: `"IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto`,
     },
   },
@@ -88,6 +91,7 @@ export const themes: Theme[] = [
       ['userlink-hover']: '#B92D52',
       ['doclink-hover']: '#2D6AB9',
       ['content-trans-color']: 'rgba(0, 0, 0, 0.2)',
+      ['shadow']: '0px 4px 8px rgba(202, 193, 184, 0.5)',
       ['font-content']: `"IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto`,
     },
   },

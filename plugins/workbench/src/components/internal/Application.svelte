@@ -20,8 +20,9 @@
 
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
   import Table from '@anticrm/presentation/src/components/internal/Table.svelte'
+  import Button from '@anticrm/sparkling-controls/src/Button.svelte'
   import CreateForm from './CreateForm.svelte'
-  import IconButton from '@anticrm/platform-ui/src/components/IconButton.svelte'
+  import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import EditBox from '@anticrm/platform-ui/src/components/EditBox.svelte'
   import { Space } from '@anticrm/domains'
 
@@ -52,12 +53,21 @@
   { #if appInstance }
     <div class='captionContainer'>
       <span class='caption-1' style='padding-right:1em'>{appInstance.label}</span>&nbsp;
-      <a class='icon' bind:this={addIcon} href='/'
+      <!-- <a class='icon' bind:this={addIcon} href='/'
          on:click|preventDefault={ () => { uiService.showModal(CreateForm, { _class: appInstance ? appInstance.classes[0] : undefined, title: 'The title', space }, addIcon) } }>
-        <IconButton icon={workbench.icon.Add} label={getLabel(appInstance.label)} />
-      </a>
+        <Icon icon={workbench.icon.Add} button='true' /> {getLabel(appInstance.label)}
+      </a> -->
+      <div bind:this={addIcon}>
+        <Button kind='transparent'
+          on:click={ () => {
+            uiService.showModal(CreateForm, { _class: appInstance ? appInstance.classes[0] : undefined, title: 'The title', space }, addIcon)
+          } }
+        >
+          <Icon icon={workbench.icon.Add} button='true' /><span style='padding-left:.5em'>{getLabel(appInstance.label)}
+        </Button>
+      </div>
       <div style='flex-grow:1'></div>
-      <EditBox icon={workbench.icon.Finder} placeholder='Поиск по {appInstance.label}...' right='true' />
+      <EditBox icon={workbench.icon.Finder} placeholder='Поиск по {appInstance.label}...' iconRight='true' />
     </div>
     <ScrollView stylez='height:100%; margin: 2em'>
       <div class='table'>

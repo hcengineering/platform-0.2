@@ -17,6 +17,7 @@
 	export let stylez: string = ''
 	export let scrollPosition: number = 0
 	export let autoscroll: boolean = false
+	export let accentColor: boolean = false
 
 	let container: HTMLElement
 
@@ -34,7 +35,7 @@
 </script>
 
 <div class="scroll-view" style={stylez}>
-	<div class="container" bind:this={container}>
+	<div class="container" class:accent-color={accentColor} bind:this={container}>
 		<slot />
 	</div>
 </div>
@@ -50,6 +51,9 @@
 			// border-radius: 4px;
 			height: 100%;
 			width: 100%;
+		}
+		.accent-color::-webkit-scrollbar-track {
+			background-color: var(--theme-bg-accent-color);
 		}
 	}
 </style>

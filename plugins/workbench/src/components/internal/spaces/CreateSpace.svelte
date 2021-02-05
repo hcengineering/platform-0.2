@@ -18,9 +18,9 @@
   import { AttrModel, ClassModel } from '@anticrm/presentation'
   import { _getCoreService, getPresentationService } from '../../../utils'
   import CheckBox from '@anticrm/sparkling-controls/src/CheckBox.svelte'
-  import EditBox from '@anticrm/sparkling-controls/src/EditBox.svelte'
-  import EditIconBox from '@anticrm/platform-ui/src/components/EditBox.svelte'
-  import IconButton from '@anticrm/platform-ui/src/components/IconButton.svelte'
+  import Button from '@anticrm/sparkling-controls/src/Button.svelte'
+  import EditBox from '@anticrm/platform-ui/src/components/EditBox.svelte'
+  import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import workbench from '@anticrm/workbench'
   import { CORE_CLASS_SPACE } from '@anticrm/domains'
 
@@ -65,85 +65,36 @@
 
 <style lang='scss'>
   .space-view {
-    padding: 1em 1.5em;
+    width: 364px;
+    padding: 24px;
     position: relative;
-  }
 
-  .header {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 1.5em;
-
-    .actions {
+    .header {
       display: flex;
-      flex-grow: 1;
-      flex-direction: row-reverse;
-      font-size: 10px;
-
-      button {
-        margin-left: 0.5em;
-      }
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
     }
-  }
 
-  .attributes {
-    display: flex;
-    flex-wrap: wrap;
-    margin-top: 1em;
-  }
+    .content {
+      display: flex;
+      flex-direction: column;
 
-  .separator {
-    width: 1em;
-  }
-
-  .space-kind {
-    width: 1em;
-    text-align: right;
-  }
-
-  .space-caption-1 {
-    display: flex;
-  }
-
-  .content {
-    display: flex;
-    flex-direction: column;
-
-    .form {
-      .input-container {
-        display: flex;
-        flex-direction: column;
-        margin-bottom: 1em;
-
-        .input-label {
-          font-weight: 500;
-          margin-bottom: 0.25em;
-          color: var(--theme-content-color);
-
-          & > span {
-            color: var(--theme-content-trans-color);
-            font-size: 11px;
-            font-weight: normal;
-          }
+      .form {
+        .input-container {
+          display: flex;
+          flex-direction: column;
+          margin-bottom: 20px;
         }
-      }
-
-      .checkbox-label {
-        font-weight: 500;
-
-        & > span {
-          display: block;
-          font-size: 11px;
-          font-weight: normal;
-          max-width: 20em;
+        .separator {
+          height: 8px;
+          margin: 20px 0;
         }
-      }
-
-      .buttons {
-        margin-top: 1.5em;
-        width: 100%;
-        display: flex;
-        flex-direction: row-reverse;
+        .buttons {
+          width: 100%;
+          display: flex;
+          flex-direction: row;
+        }
       }
     }
   }
@@ -151,35 +102,28 @@
 
 <div class='space-view'>
   <div class='header'>
-    <div class='caption-1'>Create a new {(makePrivate) ? 'private ' : ''}Space</div>
+    <div class='caption-1'>Новое {(makePrivate) ? 'частное ' : ''}пространство</div>
     <a href='/' on:click|preventDefault={() => dispatch('close')}>
-      <IconButton icon={workbench.icon.Close} />
+      <Icon icon={workbench.icon.Close} button='true' />
     </a>
   </div>
 
   <div class='content'>
     <form class='form'>
       <div class='input-container'>
-        <label class='input-label' for='create_space__input__name'>
-          Name
-        </label>
-        <!-- <EditIconBox id='create_space__input__name' bind:value={title}
-                     icon={(makePrivate) ? workbench.icon.Lock : workbench.icon.Sharp} /> -->
-        <EditBox id='create_space__input__name' bind:value={title} />
+        <EditBox id='create_space__input__name' bind:value={title} width='100%'
+                 label='Имя' placeholder='Пространство вседозволенности' />
       </div>
       <div class='input-container'>
-        <label class='input-label' for='create_space__input__description'>
-          Description <span>(optional)</span>
-        </label>
-        <EditBox id='create_space__input__description' bind:value={description} />
+        <EditBox id='create_space__input__description' bind:value={description} width='100%'
+                 label='Описание' placeholder='Владелец: Сергей Никифоров' />
       </div>
-      <CheckBox bind:checked={makePrivate} right='true'>
-        <div class='checkbox-label'>
-          Make private <span>When a channel is set to private, it can only be viewed or joined by invitation.</span>
-        </div>
+      <CheckBox bind:checked={makePrivate}>
+        Сделать частным пространством
       </CheckBox>
+      <div class="separator"></div>
       <div class='buttons'>
-        <button type='button' class='button primary' on:click={() => save()}>Create</button>
+        <Button size='large' kind='primary' width='164px' on:click={() => save()}>Создать</Button>
       </div>
     </form>
   </div>

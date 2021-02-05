@@ -121,14 +121,23 @@
   .editbox {
     border: 1px solid var(--theme-bg-dark-color);
     border-radius: 4px;
-    padding: 0.75em 1em;
+    padding: 8px 16px;
     background-color: var(--theme-bg-accent-color);
     box-sizing: border-box;
     color: var(--theme-content-color);
-    //transition: all .2s ease-in-out;
+    transition: border-color .2s, color .2s, background-color .2s;
 
     &:focus-within {
       outline: none;
+      background-color: var(--theme-bg-accent-hover);
+      border-color: var(--theme-bg-dark-hover);
+      color: var(--theme-content-color);
+    }
+    &-label {
+      height: 54px;
+      padding: 6px 16px 4px;
+    }
+    &-hoverState {
       background-color: var(--theme-bg-accent-hover);
       border-color: var(--theme-bg-dark-hover);
       color: var(--theme-content-color);
@@ -137,6 +146,7 @@
 
   .button {
     display: inline-block;
+    height: 32px;
     border: 1px solid var(--theme-bg-dark-color);
     border-radius: 4px;
     padding: 0.5em 1.33em 0.5em;
@@ -150,17 +160,19 @@
 
     color: var(--theme-content-color);
     background-color: var(--theme-bg-accent-color);
-    transition: all .2s ease-in-out;
+    transition: border-color .2s, color .2s, background-color .2s;
 
     &:focus {
       outline: none;
     }
 
     &.large {
+      height: 42px;
       padding: 0.75em 1.5em 0.75em;
     }
 
     &.small {
+      height: 24px;
       padding: 0 0.6em 0;
     }
 
@@ -194,58 +206,49 @@
     color: inherit;
     text-decoration: none;
   }
-
   a:hover {
     color: var(--theme-doclink-color);
     text-decoration: none;
   }
 
-  .icon-brd {
-    height: 24px;
-    width: 24px;
+  .icon {
     fill: currentColor;
     position: relative;
   }
-  .icon-brd-max {
-    height: 42px;
-    width: 42px;
-    fill: currentColor;
-    position: relative;
-  }
-  .icon-left {
-    width: 24px;
-    height: 24px;
-  }
-
-  .icon-embed {
+  .icon-16 {
     height: 16px;
     width: 16px;
-    fill: currentColor;
-    //top: 0.15em;
-    position: relative;
+  }
+  .icon-24 {
+    height: 24px;
+    width: 24px;
+  }
+  .icon-32 {
+    width: 32px;
+    height: 32px;
+  }
+  .icon-42 {
+    width: 42px;
+    height: 42px;
+  }
+  .icon-button {
+    background-color: var(--theme-bg-accent-color);
+    border: solid 1px var(--theme-bg-dark-color);
+    border-radius: 50%;
+    fill: var(--theme-content-color);
+
+    &:hover {
+      background-color: var(--theme-bg-accent-hover);
+      border-color: var(--theme-bg-dark-hover);
+      fill: var(--theme-content-color);
+    }
   }
 
-  .icon-embed-15x {
-    height: 1.5em;
-    width: 1.5em;
-    fill: currentColor;
-    top: 0.25em;
-    position: relative;
-  }
-
-  .icon-embed-2x {
-    height: 2em;
-    width: 2em;
-    top: 0.3em;
-    fill: currentColor;
-    position: relative;
-  }
-
-  .icon-2x {
-    height: 2em;
-    width: 2em;
-    fill: currentColor;
-    position: relative;
+  .popup {
+    //height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .caption-1 {

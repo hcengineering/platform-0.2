@@ -15,8 +15,8 @@
 
   function showCombo(): void {
     const rect = comboRoot.getBoundingClientRect()
-    comboDrop.style.top = rect.height - 2 + 'px'
-    comboDrop.style.left = '4px'
+    comboDrop.style.top = rect.height + 3 + 'px'
+    comboDrop.style.left = '-1px'
     comboDrop.style.visibility = 'visible'
     comboHidden = false
     window.addEventListener('click', toggleCombo)
@@ -49,19 +49,20 @@
   }
 </script>
 
-<div bind:this={comboRoot} class="comboBox" on:click={handler}>
-  <UserInfo url={items[selected].url} title={items[selected].name} subtitle="Исполнитель" />
-  <Icon icon={workbench.icon.ArrowDown} clazz="icon-embed" />
+<div bind:this={comboRoot} class="comboBox" class:selectedCombo={!comboHidden} on:click={handler}>
+  <UserInfo url={items[selected].url} title={items[selected].name}
+            subtitle="Новый исполнитель" subtitleOnTop='true' userColor='var(--theme-content-dark-color)' />
+  <Icon icon={workbench.icon.ArrowDown} />
 
   <div bind:this={comboDrop} class="comboBox-drop">
-    <EditBox id='select-user-combobox' icon={workbench.icon.Finder} right='true' width='100%' />
+    <EditBox id='select-user-combobox' icon={workbench.icon.Finder} iconRight='true' width='100%' hoverState='true' />
     <div class="separator"></div>
     <div bind:this={comboItems} class="comboBox-drop__items">
-      <ScrollView stylez="height:100%;width: 100%;">
+      <ScrollView stylez="height:100%;width: 100%;" accentColor='true'>
         {#each items as item (item.id)}
           <div class="comboBox-drop__item" class:selected={item.id === selected}
                on:click={() => { selected = item.id }}>
-            <UserInfo url={item.url} title={item.name} />
+            <UserInfo url={item.url} title={item.name} userColor='var(--theme-content-dark-color)' />
           </div>
         {/each}
       </ScrollView>
@@ -72,7 +73,7 @@
 <style lang="scss">
   .comboBox {
     position: relative;
-    background-color: var(--theme-bg-color);
+    background-color: var(--theme-bg-accent-color);
     border: solid 1px var(--theme-bg-dark-color);
     border-radius: 4px;
     padding: .5em 1em .5em .5em;
@@ -84,10 +85,9 @@
     &:hover {
       background-color: var(--theme-bg-accent-hover);
       border-color: var(--theme-bg-dark-hover);
-      box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
     }
     &:hover comboBox-drop {
-      box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+      box-shadow: var(--theme-shadow);
     }
 
     &-drop {
@@ -95,12 +95,13 @@
       visibility: hidden;
       display: flex;
       flex-direction: column;
-      width: calc(100% - 10px - 2em);
-      background-color: var(--theme-bg-color);
+      width: calc(100% - 2em);
+      background-color: var(--theme-bg-accent-color);
       border: solid 1px var(--theme-bg-dark-color);
-      border-radius: 0px 0px 4px 4px;
+      border-radius: 4px;
       padding: 1em;
       z-index: 1000;
+      box-shadow: var(--theme-shadow);
 
       &__items {
         height: 10em;
@@ -117,7 +118,7 @@
         }
       }
       .selected {
-        background-color: var(--theme-bg-accent-color);
+        background-color: var(--theme-bg-accent-hover);
         &:hover {
           background-color: var(--theme-bg-accent-hover);
         }
@@ -127,5 +128,9 @@
         height: .5em;
       }
     }
+  }
+  .selectedCombo {
+    background-color: var(--theme-bg-accent-hover);
+    border-color: var(--theme-bg-dark-hover);
   }
 </style>

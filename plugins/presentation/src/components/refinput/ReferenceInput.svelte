@@ -398,48 +398,48 @@
       {/if}
       <Toolbar>
         {#if stylesEnabled}
-          <slot name='inner' />
-          <ToolbarButton style='padding:0; width:24px; height:24px'
-                         on:click={() => htmlEditor.toggleBold()} selected={styleState.bold}>
-            <Icon icon={presentation.icon.brdBold} clazz='icon-brd' />
+          <slot name="inner" />
+          <ToolbarButton style="padding:0; width:24px; height:24px"
+            on:click={() => htmlEditor.toggleBold()} selected={styleState.bold}>
+            <Icon icon={presentation.icon.brdBold} size="24" />
           </ToolbarButton>
-          <ToolbarButton style='padding:0; width:24px; height:24px'
-                         on:click={() => htmlEditor.toggleItalic()}
-                         selected={styleState.italic}>
-            <Icon icon={presentation.icon.brdItalic} clazz='icon-brd' />
+          <ToolbarButton style="padding:0; width:24px; height:24px"
+            on:click={() => htmlEditor.toggleItalic()}
+            selected={styleState.italic}>
+            <Icon icon={presentation.icon.brdItalic} size="24" />
           </ToolbarButton>
-          <div class='tSeparator' />
-          <ToolbarButton style='padding:0; width:24px; height:24px'>
-            <Icon icon={presentation.icon.brdCode} clazz='icon-brd' />
+          <div class="tSeparator" />
+          <ToolbarButton style="padding:0; width:24px; height:24px">
+            <Icon icon={presentation.icon.brdCode} size="24" />
           </ToolbarButton>
-          <ToolbarButton style='padding:0; width:24px; height:24px'
-                         on:click={() => htmlEditor.toggleUnOrderedList()}>
-            <Icon icon={presentation.icon.brdUL} clazz='icon-brd' />
+          <ToolbarButton style="padding:0; width:24px; height:24px"
+            on:click={() => htmlEditor.toggleUnOrderedList()}>
+            <Icon icon={presentation.icon.brdUL} size="24" />
           </ToolbarButton>
-          <ToolbarButton style='padding:0; width:24px; height:24px'
-                         on:click={() => htmlEditor.toggleOrderedList()}>
-            <Icon icon={presentation.icon.brdOL} clazz='icon-brd' />
+          <ToolbarButton style="padding:0; width:24px; height:24px"
+            on:click={() => htmlEditor.toggleOrderedList()}>
+            <Icon icon={presentation.icon.brdOL} size="24" />
           </ToolbarButton>
-          <div class='tSeparator' />
-          <ToolbarButton style='padding:0; width:24px; height:24px'>
-            <Icon icon={presentation.icon.brdLink} clazz='icon-brd' />
+          <div class="tSeparator" />
+          <ToolbarButton style="padding:0; width:24px; height:24px">
+            <Icon icon={presentation.icon.brdLink} size="24" />
           </ToolbarButton>
-          <div class='tSeparator' />
-          <ToolbarButton style='padding:0; width:24px; height:24px'>
-            <Icon icon={presentation.icon.brdAddr} clazz='icon-brd' />
+          <div class="tSeparator" />
+          <ToolbarButton style="padding:0; width:24px; height:24px">
+            <Icon icon={presentation.icon.brdAddr} size="24" />
           </ToolbarButton>
-          <ToolbarButton style='padding:0; width:24px; height:24px'>
-            <Icon icon={presentation.icon.brdClip} clazz='icon-brd' />
+          <ToolbarButton style="padding:0; width:24px; height:24px">
+            <Icon icon={presentation.icon.brdClip} size="24" />
           </ToolbarButton>
         {/if}
-        <div slot='right'>
-          <ToolbarButton style='padding:0; width:42x; height:42px'
-                         on:click={() => handleSubmit()} selected={!styleState.isEmpty}>
-            <Icon icon={presentation.icon.brdSend} clazz='icon-brd-max' />
+        <div slot="right">
+          <ToolbarButton style="padding:0; width:42x; height:42px"
+            on:click={() => handleSubmit()} selected={!styleState.isEmpty}>
+            <Icon icon={presentation.icon.brdSend} size="42" />
             <!--▶️-->
           </ToolbarButton>
-          <ToolbarButton style='padding:0; width:42px; height:42px'>
-            <Icon icon={presentation.icon.brdSmile} clazz='icon-brd-max' />
+          <ToolbarButton style="padding:0; width:42px; height:42px">
+            <Icon icon={presentation.icon.brdSmile} size="42" />
             <!--😀-->
           </ToolbarButton>
           <ToolbarButton style='font-weight:bold' selected={stylesEnabled}

@@ -64,7 +64,7 @@
         href='/'
         on:click|preventDefault='{() => (showMenu = !showMenu)}'
       >
-        <Icon icon='{workbench.icon.DefaultPerspective}' clazz='icon-2x' />
+        <Icon icon='{workbench.icon.DefaultPerspective}' size='32' />
       </a>
     </div>
   </ReferenceInput>

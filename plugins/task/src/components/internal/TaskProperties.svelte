@@ -18,9 +18,13 @@
   import { getPresentationService, find, query } from '../../utils'
   import { AttrModel, ClassModel } from '@anticrm/presentation'
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
-  import ActionButton from './ActionButton.svelte'
   import UserInfo from '@anticrm/sparkling-controls/src/UserInfo.svelte'
   import StatusLabel from './StatusLabel.svelte'
+  import PopupMenu from '@anticrm/sparkling-controls/src/menu/PopupMenu.svelte'
+  import PopupItem from '@anticrm/sparkling-controls/src/menu/PopupItem.svelte'
+  import Button from '@anticrm/sparkling-controls/src/Button.svelte'
+  import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
+  import ActionBar, { Action } from '@anticrm/platform-ui/src/components/ActionBar.svelte'
 
   import Properties from '@anticrm/presentation/src/components/internal/Properties.svelte'
   import AttributeEditor from '@anticrm/presentation/src/components/AttributeEditor.svelte'
@@ -52,6 +56,15 @@
   onDestroy(() => {
     if (unsubscribe) unsubscribe()
   })
+
+  let actions: Array<Action> = []
+  actions.push({ name: 'Выполнено', action: () => { alert('Выполнено') } })
+  actions.push({ name: 'В работе', action: () => { alert('В работе') } })
+  actions.push({ name: 'Произвольный статус', action: () => { alert('Произвольный статус') } })
+  actions.push({ name: 'Назначить исполнителя', action: () => { alert('Назначить исполнителя') } })
+  actions.push({ name: 'Назначить наблюдателя', action: () => { alert('Назначить наблюдателя') } })
+  actions.push({ name: '-', action: undefined })
+  actions.push({ name: 'Закрыть задачу', action: () => { alert('Закрыть задачу') } })
 </script>
 
 {#if model && title}
@@ -88,11 +101,21 @@
     <UserInfo url='https://platform.exhale24.ru/images/photo-2.png'
               title='Андрей Платов' subtitle='Исполнитель' />
 
-    <div class='actionBar'>
-      <ActionButton style='leftButton' width='40%'>Выполнено</ActionButton>
-      <ActionButton style='centerButton' width='40%'>В работе</ActionButton>
-      <ActionButton style='rightButton' width='20%' combo='true'>Ещё</ActionButton>
-    </div>
+    <!-- <div class="actionBar">
+      <Button className="actionButtonLeft w40">Выполнено</Button>
+      <Button className="actionButtonCenter w40">В работе</Button>
+      <PopupMenu buttonClass='actionButtonRight w20'>
+        <span class='popup' slot='trigger'>
+          Ещё <Icon icon={task.icon.ArrowDown} />
+        </span>
+        <PopupItem>Action 3</PopupItem>
+        <PopupItem>Action 4</PopupItem>
+        <PopupItem>Action 5</PopupItem>
+        <PopupItem>Action 6</PopupItem>
+      </PopupMenu>
+    </div> -->
+
+    <ActionBar onTop='2' {actions} />
 
     <div class='description'>
       <p>Привет!</p>
@@ -148,6 +171,7 @@
     .actionBar {
       width: 100%;
       display: flex;
+      flex-direction: row;
       margin-top: 2em;
       margin-bottom: 2em;
     }

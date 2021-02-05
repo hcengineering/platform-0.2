@@ -34,6 +34,6 @@
 {:then ctor}
   <svelte:component this={ctor} {...props} on:change/>
 {:catch}
-  <Icon icon={ui.icon.Error} clazz="icon-2x" />
+  <Icon icon={ui.icon.Error} size="32" />
 {/await}
 {/if}

@@ -20,8 +20,12 @@
   import ui from '@anticrm/platform-ui'
   import workbench, { WorkbenchApplication } from '../..'
 
-  import IconButton from '@anticrm/platform-ui/src/components/IconButton.svelte'
+  import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import SpaceItem from './spaces/SpaceItem.svelte'
+  import PopupMenu from '@anticrm/sparkling-controls/src/menu/PopupMenu.svelte'
+  import PopupItem from '@anticrm/sparkling-controls/src/menu/PopupItem.svelte'
+  import BrowseSpace from './spaces/BrowseSpace.svelte'
+  import CreateSpace from './spaces/CreateSpace.svelte'
 
   import { AnyComponent } from '@anticrm/platform-ui'
 
@@ -85,6 +89,7 @@
   let addButton: HTMLElement
 
   let hidden = true
+  //let showPopup: string = 'hidden';
 </script>
 
 <style lang='scss'>
@@ -185,8 +190,8 @@
 
 <div class='workbench-perspective'>
   <div class='projects' class:mini={!hidden}>
-    <a href='/' on:click|preventDefault={() => { hidden = !hidden}}>
-      <IconButton icon={workbench.icon.Resize} style='position:absolute;top:1.5em;right:1.5em;' />
+    <a href='/' style='position:absolute;top:1.5em;right:1.5em;' on:click|preventDefault={() => { hidden = !hidden}}>
+      <Icon icon={workbench.icon.Resize} button='true' />
     </a>
     <div class='container' class:hidden={!hidden}>
       <div class='caption-3'>
@@ -201,14 +206,17 @@
         {/if}
       {/each}
       <div class='footContainer'>
-        <a
-          bind:this={addButton}
-          href='/'
-          on:click|preventDefault={() => {
-            uiService.showModal(JoinSpace, {}, addButton)
-          }}>
-          <IconButton icon={ui.icon.Add} />
-        </a>
+        <span>
+          <PopupMenu>
+            <div class='popup' slot='trigger'><Icon icon={ui.icon.Add} button='true' /></div>
+            <PopupItem on:click={() => {
+              uiService.showModal(CreateSpace, {})
+            }}>Create</PopupItem>
+            <PopupItem on:click={() => {
+              uiService.showModal(BrowseSpace, {})
+            }}>Browse</PopupItem>
+          </PopupMenu>
+        </span>
       </div>
 
       <div class='caption-3'>Приложения</div>
