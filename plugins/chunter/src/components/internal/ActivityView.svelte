@@ -66,7 +66,7 @@
   <div class='captionContainer'>
     <span class='caption-1'>Activity</span>&nbsp;
   </div>
-  <ScrollView stylez='height: 100%; margin: 2em' autoscroll={true}>
+  <ScrollView width="100%" height="100%" margin="2em" autoscroll={true}>
     <div class='content'>
       {#each objects as item (item._id)}
         <ActivityItem tx={item} />

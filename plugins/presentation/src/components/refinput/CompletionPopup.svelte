@@ -103,7 +103,7 @@
 </style>
 
 <div class="presentation-completion-popup" style={popupStyle} bind:clientHeight bind:clientWidth on:blur>
-  <ScrollView stylez="height:100%;width: 100%;" scrollPosition={selOffset}>
+  <ScrollView width="100%" height="100%" scrollPosition={selOffset}>
     <div bind:this={listElement}>
       {#each items as item (item.key)}
         <div

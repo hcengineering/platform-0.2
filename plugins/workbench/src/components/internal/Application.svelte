@@ -69,7 +69,7 @@
       <div style='flex-grow:1'></div>
       <EditBox icon={workbench.icon.Finder} placeholder='Поиск по {appInstance.label}...' iconRight='true' />
     </div>
-    <ScrollView stylez='height:100%; margin: 2em'>
+    <ScrollView height="100%" margin="2em">
       <div class='table'>
         <Table _class={appInstance.classes[0]} {space} on:open />
         <!-- <Table _class={appInstance.classes[0]} {space} on:open={ (evt) => { _id = evt.detail._id } }/> -->

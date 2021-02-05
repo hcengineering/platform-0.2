@@ -58,7 +58,7 @@
     <EditBox id='select-user-combobox' icon={workbench.icon.Finder} iconRight='true' width='100%' hoverState='true' />
     <div class="separator"></div>
     <div bind:this={comboItems} class="comboBox-drop__items">
-      <ScrollView stylez="height:100%;width: 100%;" accentColor='true'>
+      <ScrollView width="100%" height="100%" accentColor='true'>
         {#each items as item (item.id)}
           <div class="comboBox-drop__item" class:selected={item.id === selected}
                on:click={() => { selected = item.id }}>

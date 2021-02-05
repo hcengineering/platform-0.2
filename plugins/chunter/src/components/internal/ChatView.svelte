@@ -92,7 +92,7 @@
   <div class='captionContainer'>
     <span class='caption-1'>Чат {spaceName}</span>&nbsp;
   </div>
-  <ScrollView stylez='height:100%; margin: 2em' autoscroll={true}>
+  <ScrollView height="100%" margin="2em" autoscroll={true}>
     <div class='content'>
       {#each messages as message (message._id)}
         {#if message.comments}

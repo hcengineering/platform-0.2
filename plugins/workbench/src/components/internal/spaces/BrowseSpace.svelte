@@ -58,7 +58,7 @@
   </div>
 
   <div class='content'>
-    <ScrollView stylez='height:90%;'>
+    <ScrollView height="90%">
       {#each spaces as s (s._id)}
         <div class='space' on:mouseover={() => (hoverSpace = s._id)}>
           <div class='info'>
