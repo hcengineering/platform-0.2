@@ -27,7 +27,15 @@ import {
   DomainIndex, Storage, Tx, TxContext,
   Model, generateId
 } from '@anticrm/core'
-import { CreateTx, CORE_CLASS_CREATE_TX, Reference, CORE_CLASS_REFERENCE } from '..'
+import {
+  CreateTx,
+  CORE_CLASS_CREATE_TX,
+  Reference,
+  CORE_CLASS_REFERENCE,
+  CORE_CLASS_UPDATE_TX,
+  UpdateTx,
+  CORE_CLASS_PUSH_TX, PushTx, CORE_CLASS_DELETE_TX, DeleteTx
+} from '..'
 
 import {
   MessageMarkType,
@@ -123,20 +131,26 @@ export class ReferenceIndex implements DomainIndex {
     switch (tx._class) {
       case CORE_CLASS_CREATE_TX:
         return this.onCreate(ctx, tx as CreateTx)
+      case CORE_CLASS_UPDATE_TX:
+        return this.onUpdateTx(ctx, tx as UpdateTx)
+      case CORE_CLASS_PUSH_TX:
+        return this.onPushTx(ctx, tx as PushTx)
+      case CORE_CLASS_DELETE_TX:
+        return this.onDeleteTx(ctx, tx as DeleteTx)
       default:
         console.log('not implemented text tx', tx)
     }
   }
 
-  async onCreate (ctx: TxContext, create: CreateTx): Promise<any> {
+  private collect (_objectClass: Ref<Class<Doc>>, _objectId: Ref<Doc>, object: AnyLayout): Reference[] {
     const index = { value: 0 }
-    const backlinks = this.references(create._objectClass, create._objectId, create.object, { pos: -1 }, index)
-    const arrays = this.getArrayAttributes(create._objectClass)
+    const backlinks = this.references(_objectClass, _objectId, object, { pos: -1 }, index)
+    const arrays = this.getArrayAttributes(_objectClass)
     for (const attr of arrays) {
-      const arr = (create.object as any)[attr.key]
+      const arr = (object as any)[attr.key]
       if (arr) {
         for (let i = 0; i < arr.length; i++) {
-          backlinks.push(...this.references(create._objectClass, create._objectId, arr[i], {
+          backlinks.push(...this.references(_objectClass, _objectId, arr[i], {
             pos: i,
             key: attr.key,
             attrClass: attr._class
@@ -144,11 +158,98 @@ export class ReferenceIndex implements DomainIndex {
         }
       }
     }
-    if (backlinks.length === 0) {
+    return backlinks
+  }
+
+  private async onCreate (ctx: TxContext, create: CreateTx): Promise<any> {
+    const refereces = this.collect(create._objectClass, create._objectId, create.object)
+    if (refereces.length === 0) {
       return
     }
-    return Promise.all(backlinks.map((d) => {
+    return Promise.all(refereces.map((d) => {
       return this.storage.store(ctx, d)
     }))
+  }
+
+  private async onUpdateTx (ctx: TxContext, update: UpdateTx): Promise<any> {
+    const obj = await this.storage.findOne(update._objectClass, { _id: update._objectId }) as Doc
+    this.modelDb.updateDocument(obj, update._query || null, update._attributes)
+    if (!obj) {
+      throw new Error('object not found')
+    }
+
+    // Find current refs for this object
+    const refs = await this.storage.find(CORE_CLASS_REFERENCE, {
+      _sourceId: update._objectId,
+      _sourceClass: update._objectClass
+    })
+    const newRefs = this.collect(update._objectClass, update._objectId, (obj as unknown) as AnyLayout)
+
+    return this.diffApply(refs, newRefs, ctx)
+  }
+
+  private diffApply (refs: Reference[], newRefs: Reference[], ctx: TxContext): Promise<void[][]> {
+    // Do diff from old refs to remove only missing.
+    const deletes: Reference[] = []
+    const existing: Reference[] = []
+
+    for (const ref of refs) {
+      const refData = Object.assign({}, ref)
+      delete refData._id
+
+      for (const newRef of newRefs) {
+        const newRefData = Object.assign({}, newRef)
+        delete newRefData._id
+        if (JSON.stringify(refData) !== JSON.stringify(newRefData)) {
+          // We had existing link, no op required for it.
+          existing.push(newRef)
+          break
+        }
+        // Not found, so let's remove it.
+        deletes.push(ref)
+      }
+    }
+    const additions = newRefs.filter(e => existing.indexOf(e) === -1)
+    const stored = Promise.all(additions.map((d) => {
+      return this.storage.store(ctx, d)
+    }))
+    const deleted = Promise.all(deletes.map((d) => {
+      return this.storage.remove(ctx, d._class, d._id, null)
+    }))
+    return Promise.all([stored, deleted])
+  }
+
+  private async onPushTx (ctx: TxContext, pushTx: PushTx): Promise<any> {
+    const obj = await this.storage.findOne(pushTx._objectClass, { _id: pushTx._objectId }) as Doc
+    if (!obj) {
+      throw new Error('object not found')
+    }
+
+    this.modelDb.pushDocument(obj, pushTx._query || null, pushTx._attribute, pushTx._attributes)
+
+    // Find current refs for this object
+    const refs = await this.storage.find(CORE_CLASS_REFERENCE, {
+      _sourceId: pushTx._objectId,
+      _sourceClass: pushTx._objectClass
+    })
+
+    const newRefs = this.collect(pushTx._objectClass, pushTx._objectId, (obj as unknown) as AnyLayout)
+
+    return this.diffApply(refs, newRefs, ctx)
+  }
+
+  private async onDeleteTx (ctx: TxContext, deleteTx: DeleteTx): Promise<any> {
+    if (deleteTx._query) {
+      // Delete on some embedded value
+      return
+    }
+
+    // Find current refs for this object to clean all of them.
+    const refs = await this.storage.find(CORE_CLASS_REFERENCE, {
+      _sourceId: deleteTx._objectId,
+      _sourceClass: deleteTx._objectClass
+    })
+
+    return this.diffApply(refs, [], ctx)
   }
 }

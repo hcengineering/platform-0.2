@@ -40,7 +40,7 @@ export interface ClientSocket {
 }
 
 export interface ClientTxProtocol {
-  tx (tx: Tx): Promise<Tx[]>
+  tx (tx: Tx): Promise<{ clientTx: Tx[] }>
 }
 
 export type ClientService = ClientControl & DocumentProtocol & ClientTxProtocol
@@ -80,7 +80,7 @@ export function start (port: number, dbUri: string, host?: string): Promise<Serv
       // console.log(`broadcasting to ${connections.size} connections`)
       for (const client of connections.values()) {
         client.then(client => {
-          if (client !== from) {
+          if (client.getId() !== from.getId()) {
             // console.log(`broadcasting to ${client.email}`, response)
             client.send(response)
           }
@@ -130,7 +130,9 @@ export function start (port: number, dbUri: string, host?: string): Promise<Serv
           response.result = await ss.find(request.params[0] as Ref<Class<Doc>>, request.params[1] as AnyLayout)
           break
         case RPC_CALL_TX: {
-          response.result = await ss.tx(request.params[0] as Tx)
+          const { clientTx } = await ss.tx(request.params[0] as Tx)
+          // response.result == undefined  => Do not pass result, since it is same.
+          response.clientTx = clientTx
           break
         }
         case RPC_CALL_LOAD_DOMAIN:

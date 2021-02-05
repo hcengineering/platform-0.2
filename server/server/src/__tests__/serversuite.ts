@@ -84,7 +84,6 @@ export function createContact (db: Db, email: string, username: string): Promise
     account: email
   })
 
-  console.log(user)
   return db.collection('contact').insertOne(user)
 }
 

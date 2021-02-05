@@ -31,7 +31,6 @@ const router = new Router()
 
 router.post('rpc', '/rpc', async (ctx) => {
   const request = ctx.request.body
-  console.log(request)
   const method = (methods as { [key: string]: (db: Db, request: Request<any>) => Response<any> })[request.method]
   if (!request.method) {
     const response: Response<void> = {

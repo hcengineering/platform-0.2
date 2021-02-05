@@ -40,7 +40,6 @@ export default async (platform: Platform, deps: { core: CoreService, ui: UIServi
   // const uiService = deps.ui
 
   function getUser (account: string): Promise<User> {
-    console.log('getUser', account)
     return coreService.findOne(contact.mixin.User, { account: account as StringProperty }) as Promise<User>
   }
 

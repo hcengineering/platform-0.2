@@ -43,7 +43,6 @@
   let primary: AttrModel | undefined
 
   const presentationService = _getPresentationService()
-  console.log('presentationService', presentationService)
 
   function save () {
     const doc = {
@@ -60,7 +59,6 @@
 
   $: {
     getComponentExtension(_class, presentation.class.DetailForm).then((ext) => {
-      console.log('DETAIL_FORM:', ext)
       component = ext
     })
 

@@ -51,7 +51,6 @@
   let primary: AttrModel | undefined
 
   const presentationService = getPresentationService()
-  console.log('presentationService', presentationService)
 
   $: {
     presentationService.then((ps) =>

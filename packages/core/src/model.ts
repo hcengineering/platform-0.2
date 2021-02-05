@@ -637,6 +637,16 @@ export class Model implements Storage {
     const objDocValue = Object(docValue)
     if (objDocValue !== docValue) {
       // Check if value is primitive, so we will just compare
+      if (value instanceof Object) {
+        // Check for mongo line matching instructions.
+        const vObj = value as Record<string, unknown>
+        const regex = vObj.$regex
+        if (regex as string) {
+          const options = vObj.$options
+          const reg = RegExp(regex as string, (options as string) || '')
+          return { result: reg.test(docValue as string) }
+        }
+      }
       if (docValue === value) {
         return { result: true }
       }

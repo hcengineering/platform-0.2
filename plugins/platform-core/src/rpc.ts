@@ -14,15 +14,20 @@
 //
 
 import { Platform } from '@anticrm/platform'
-import { Response, ReqId, readResponse, serialize } from '@anticrm/rpc'
+import { ReqId, readResponse, serialize } from '@anticrm/rpc'
 import core from '.'
 import login from '@anticrm/login'
 
-export type EventListener = (event: Response<unknown>) => void
+export type EventListener = (event: unknown) => void
+
+export enum EventType {
+  Transaction, // A normal transaction with data modification
+  TransientTransaction // A transient transaction with derived data modification.
+}
 
 export interface RpcService {
   request<R> (method: string, ...params: any[]): Promise<R>
-  addEventListener (listener: EventListener): void
+  addEventListener (type: EventType, listener: EventListener): void
 }
 
 export default (platform: Platform): RpcService => {
@@ -64,8 +69,10 @@ export default (platform: Platform): RpcService => {
       ws.onmessage = (ev: MessageEvent) => {
         const response = readResponse(ev.data)
         if (!response.id) {
-          for (const listener of listeners) {
-            listener(response)
+          if (response.result) {
+            for (const listener of (listeners.get(EventType.Transaction) || [])) {
+              listener(response.result)
+            }
           }
         } else {
           const promise = requests.get(response.id)
@@ -78,6 +85,11 @@ export default (platform: Platform): RpcService => {
             requests.delete(response.id)
           } else {
             throw new Error('unknown rpc id')
+          }
+        }
+        if (response.clientTx && response.clientTx.length > 0) {
+          for (const listener of (listeners.get(EventType.TransientTransaction) || [])) {
+            listener(response.clientTx)
           }
         }
       }
@@ -110,12 +122,17 @@ export default (platform: Platform): RpcService => {
     })
   }
 
-  const listeners: EventListener[] = []
+  const listeners: Map<EventType, EventListener[]> = new Map()
 
   return {
     request,
-    addEventListener (listener: EventListener) {
-      listeners.push(listener)
+    addEventListener (type: EventType, listener: EventListener) {
+      let val = listeners.get(type)
+      if (!val) {
+        val = []
+        listeners.set(type, val)
+      }
+      val.push(listener)
     }
   }
 }

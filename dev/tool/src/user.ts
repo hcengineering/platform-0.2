@@ -37,8 +37,6 @@ export function createContact (db: Db, email: string, username: string): Promise
   builder.mixinDocument(user, contact.mixin.User, {
     account: email
   })
-
-  console.log(user)
   return db.collection('contact').insertOne(user)
 }
 

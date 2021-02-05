@@ -1,17 +1,15 @@
-<script lang="ts">
-  import { Property } from '@anticrm/core'
+<script lang='ts'>
+  import { AnyLayout, StringProperty } from '@anticrm/core'
   import { MessageNode, newMessageDocument } from '@anticrm/text'
-  import { getCoreService } from '../../utils'
+  import { _getCoreService } from '../../utils'
 
-  import core from '@anticrm/platform-core'
+  import { CoreService } from '@anticrm/platform-core'
 
   import Toolbar from '@anticrm/sparkling-controls/src/toolbar/Toolbar.svelte'
   import ToolbarButton from '@anticrm/sparkling-controls/src/toolbar/Button.svelte'
 
   import EditorContent from '@anticrm/sparkling-rich/src/EditorContent.svelte'
   import { EditorContentEvent } from '@anticrm/sparkling-rich/src/index'
-
-  import { CoreService } from '@anticrm/platform-core'
   import { EditorState, Transaction } from 'prosemirror-state'
 
   import CompletionPopup from './CompletionPopup.svelte'
@@ -22,8 +20,9 @@
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import presentation from '@anticrm/presentation'
 
-  import { createEventDispatcher } from 'svelte'
-  import { CORE_CLASS_TITLE } from '@anticrm/domains'
+  import { createEventDispatcher, onDestroy } from 'svelte'
+  import { CORE_CLASS_TITLE, Title } from '@anticrm/domains'
+
   const dispatch = createEventDispatcher()
 
   // ********************************
@@ -35,7 +34,7 @@
   // ********************************
   // Functionality
   // ********************************
-  function startsWith(str: string | undefined, prefix: string) {
+  function startsWith (str: string | undefined, prefix: string) {
     return (str ?? '').startsWith(prefix)
   }
 
@@ -44,21 +43,24 @@
     class: string
   }
 
-  interface ExtendedCompletionItem extends CompletionItem, ItemRefefence {}
-
-  let coreS: CoreService
-
-  $: getCoreService().then((s) => {
-    coreS = s
-  })
+  interface ExtendedCompletionItem extends CompletionItem, ItemRefefence {
+  }
 
   let styleState: EditorContentEvent = {
     isEmpty: true,
-    cursor: { left: 0, top: 0, bottom: 0, right: 0 },
+    cursor: {
+      left: 0,
+      top: 0,
+      bottom: 0,
+      right: 0
+    },
     bold: false,
     italic: false,
     completionWord: '',
-    selection: { from: 0, to: 0 },
+    selection: {
+      from: 0,
+      to: 0
+    },
     completionEnd: '',
     inputHeight: 0
   }
@@ -70,58 +72,86 @@
 
   let triggers = ['@', '#', '[[']
 
-  async function findTitles(prefix: string): Promise<CompletionItem[]> {
-    let docs = await coreS.find(CORE_CLASS_TITLE, {
-      title: prefix as Property<string, string>
-    })
-    console.log('Found docs: ', docs)
+  let currentPrefix = ''
+  let popupVisible = false
+
+  let titleSearch: (query: AnyLayout) => void
+
+  let coreService: CoreService = _getCoreService()
+
+  function query (prefix: string): AnyLayout {
+    return {
+      title: {
+        $regex: prefix + '.*' as StringProperty,
+        $options: 'i' as StringProperty
+      }
+    }
+  }
+
+  titleSearch = coreService.subscribe(CORE_CLASS_TITLE, query(currentPrefix), (docs) => {
+    completions = updateTitles(docs)
+  }, onDestroy)
+
+  $: {
+    titleSearch(query(currentPrefix))
+  }
+
+  function updateTitles (docs: Title[]): CompletionItem[] {
     let items: CompletionItem[] = []
     for (const value of docs) {
-      if (startsWith(value.title.toString(), prefix) && value.title !== prefix) {
-        let kk = value.title
-        items.push({
-          key: value._objectId,
-          label: kk,
-          title: kk + ' - ' + value._objectClass,
-          class: value._objectClass,
-          id: value._objectId
-        } as ExtendedCompletionItem)
-      }
+      // if (startsWith(value.title.toString(), currentPrefix)) {
+      let kk = value.title
+      items.push({
+        key: value._objectId,
+        label: kk,
+        title: kk + ' - ' + value._objectClass,
+        class: value._objectClass,
+        id: value._objectId
+      } as ExtendedCompletionItem)
+      // }
     }
     return items
   }
-  async function findTitle(title: string): Promise<ItemRefefence[]> {
-    let docs = await coreS.find(CORE_CLASS_TITLE, {
-      title: title as Property<string, string>
+
+  async function findTitle (title: string): Promise<ItemRefefence[]> {
+    let docs = await coreService.find(CORE_CLASS_TITLE, {
+      title: title as StringProperty
     })
 
     for (const value of docs) {
-      if (value.title.toString() === title) {
-        return [{ id: value._objectId, class: value._objectClass } as ItemRefefence]
+      if (value.title === title) {
+        return [{
+          id: value._objectId,
+          class: value._objectClass
+        } as ItemRefefence]
       }
     }
     return []
   }
-  function updateStyle(event: EditorContentEvent) {
+
+  function updateStyle (event: EditorContentEvent) {
     styleState = event
 
     if (event.completionWord.length == 0) {
-      completions = []
+      currentPrefix = ''
+      popupVisible = false
       return
     }
     if (event.completionWord.startsWith('[[')) {
-      const userPrefix = event.completionWord.substring(2)
-
-      Promise.all([findTitles(userPrefix)]).then((result) => {
-        completions = result.reduce((acc, val) => {
-          return acc.concat(val)
-        }, [])
-      })
+      if (event.completionWord.endsWith(']')) {
+        popupVisible = false
+        currentPrefix = ''
+      } else {
+        currentPrefix = event.completionWord.substring(2)
+        popupVisible = true
+      }
     } else {
-      completions = []
+      currentPrefix = ''
+      popupVisible = false
     }
   }
-  function handlePopupSelected(value: CompletionItem) {
+
+  function handlePopupSelected (value: CompletionItem) {
     let extra = 0
     if (styleState.completionEnd != null && styleState.completionEnd.endsWith(']]')) {
       extra = styleState.completionEnd.length
@@ -132,37 +162,41 @@
       styleState.selection.from - styleState.completionWord.length,
       styleState.selection.to + extra,
       schema.marks.reference,
-      { id: vv.id, class: vv.class }
+      {
+        id: vv.id,
+        class: vv.class
+      }
     )
     htmlEditor.focus()
   }
-  function handleSubmit() {
+
+  function handleSubmit () {
     if (!styleState.isEmpty) {
       dispatch('message', editorContent)
     }
     editorContent = newMessageDocument()
   }
-  function onKeyDown(event: any) {
-    if (completions.length > 0) {
+
+  function onKeyDown (event: any) {
+    if (popupVisible > 0) {
       if (event.key === 'ArrowUp') {
         completionControl.handleUp()
         event.preventDefault()
         return
       }
       if (event.key === 'ArrowDown') {
-        console.log('HANDLE DOWN')
         completionControl.handleDown()
         event.preventDefault()
         return
       }
       if (event.key === 'Enter') {
-        console.log('HANDLE ENTER')
         completionControl.handleSubmit()
         event.preventDefault()
         return
       }
       if (event.key === 'Escape') {
         completions = []
+        popupVisible = false
         return
       }
     }
@@ -171,13 +205,17 @@
       event.preventDefault()
     }
   }
-  function transformInjections(state: EditorState): Promise<Transaction | null> {
+
+  function transformInjections (state: EditorState): Promise<Transaction | null> {
     let operations: ((tr: Transaction | null) => Transaction)[] = []
     let promises: Promise<void>[] = []
 
     state.doc.descendants((node, pos) => {
       if (node.isText && node.text != null) {
-        let prev = { id: '', class: '' } as ItemRefefence
+        let prev = {
+          id: '',
+          class: ''
+        } as ItemRefefence
         // Check we had our reference marl
         // Check if we had trigger words without defined marker
         for (let i = 0; i < node.marks.length; i++) {
@@ -193,56 +231,54 @@
         const len = node.text.length
         let i = 0
         while (i < len) {
-          let text = node.text.substring(i)
-          if (text.startsWith('[[')) {
+          if (node.text.startsWith('[[', i)) {
             // We found trigger, we need to call replace method
-            let endpos = text.indexOf(']]')
+            let endpos = node.text.indexOf(']]', i)
             if (endpos !== -1) {
               let end = endpos + 2
-              if (end !== i) {
-                let refText = node.text.substring(i + 2, i + end - 2)
-                let ci = i
-                let cpos = pos
-                let cend = end
-                promises.push(
-                  Promise.all([findTitle(refText)]).then((result) => {
-                    let items = result.reduce((acc, val) => {
-                      return acc.concat(val)
-                    }, [])
-                    if (items.length > 1) {
-                      // Check if we had item selected already
-                      for (let ii = 0; ii < items.length; ii++) {
-                        if (items[ii].id == prev.id) {
-                          items = [items[ii]]
-                          break
-                        }
+
+              let refText = node.text.substring(i + 2, end - 2)
+              let ci = i
+              let cpos = pos
+              let cend = end
+              promises.push(
+                Promise.all([findTitle(refText)]).then((result) => {
+                  let items = result.reduce((acc, val) => {
+                    return acc.concat(val)
+                  }, [])
+                  if (items.length > 1) {
+                    // Check if we had item selected already
+                    for (let ii = 0; ii < items.length; ii++) {
+                      if (items[ii].id == prev.id) {
+                        items = [items[ii]]
+                        break
                       }
                     }
-                    if (items.length == 1) {
+                  }
+                  if (items.length == 1) {
+                    operations.push(
+                      (tr: Transaction | null): Transaction => {
+                        let mark = schema.marks.reference.create(items[0])
+                        return (tr == null ? state.tr : tr).addMark(cpos + ci, cpos + cend, mark)
+                      }
+                    )
+                  } else if (items.length == 0) {
+                    if (prev.id == '') {
                       operations.push(
                         (tr: Transaction | null): Transaction => {
-                          let mark = schema.marks.reference.create(items[0])
-                          return (tr == null ? state.tr : tr).addMark(cpos + ci, cpos + ci + cend, mark)
+                          let mark = schema.marks.reference.create({
+                            id: null,
+                            class: 'Page'
+                          })
+                          return (tr == null ? state.tr : tr).addMark(cpos + ci, cpos + cend, mark)
                         }
                       )
-                    } else if (items.length == 0) {
-                      if (prev.id == '') {
-                        operations.push(
-                          (tr: Transaction | null): Transaction => {
-                            let mark = schema.marks.reference.create({
-                              id: null,
-                              class: 'Page'
-                            })
-                            return (tr == null ? state.tr : tr).addMark(cpos + ci, cpos + ci + cend, mark)
-                          }
-                        )
-                      }
                     }
-                  })
-                )
-                i += end // Move to next char after ]]
-                continue
-              }
+                  }
+                })
+              )
+              i = end // Move to next char after ]]
+              continue
             }
           }
           i++
@@ -263,7 +299,7 @@
   }
 </script>
 
-<style lang="scss">
+<style lang='scss'>
   .presentation-reference-input-control {
     width: 100%;
 
@@ -272,11 +308,13 @@
     border-radius: 4px;
     padding: 8px;
     box-sizing: border-box;
+
     yarn .flex-column {
       display: flex;
       flex-direction: column;
       align-items: center;
     }
+
     .flex-row {
       display: flex;
       flex-direction: row;
@@ -289,18 +327,22 @@
       margin-top: 7px;
       align-self: center;
     }
+
     .edit-box-vertical {
       width: 100%;
       height: 100%;
       margin: 4px;
     }
+
     .edit-box {
       max-height: 300px;
     }
+
     :global {
       reference {
         color: lightblue;
       }
+
       reference:not([id]) {
         color: grey;
       }
@@ -315,13 +357,13 @@
   }
 </style>
 
-<div class="presentation-reference-input-control">
-  <slot name="top" />
+<div class='presentation-reference-input-control'>
+  <slot name='top' />
   <div>
     <div class:flex-column={stylesEnabled} class:flex-row={!stylesEnabled}>
       {#if !stylesEnabled}
         <Toolbar>
-          <slot name="inner" />
+          <slot name='inner' />
         </Toolbar>
       {/if}
 
@@ -339,7 +381,7 @@
             editorContent = event.detail
           }}
           on:styleEvent={(e) => updateStyle(e.detail)}>
-          {#if completions.length > 0}
+          {#if popupVisible}
             <CompletionPopup
               bind:this={completionControl}
               on:blur={(e) => (completions = [])}
@@ -352,7 +394,7 @@
       </div>
 
       {#if stylesEnabled}
-        <div class="separator" />
+        <div class='separator' />
       {/if}
       <Toolbar>
         {#if stylesEnabled}
@@ -400,7 +442,9 @@
             <Icon icon={presentation.icon.brdSmile} size="42" />
             <!--😀-->
           </ToolbarButton>
-          <ToolbarButton style="font-weight:bold" selected={stylesEnabled} on:click={() => (stylesEnabled = !stylesEnabled)}>Aa</ToolbarButton>
+          <ToolbarButton style='font-weight:bold' selected={stylesEnabled}
+                         on:click={() => (stylesEnabled = !stylesEnabled)}>Aa
+          </ToolbarButton>
         </div>
       </Toolbar>
     </div>
