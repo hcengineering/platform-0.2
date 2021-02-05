@@ -137,6 +137,11 @@
       height: 54px;
       padding: 6px 16px 4px;
     }
+    &-hoverState {
+      background-color: var(--theme-bg-accent-hover);
+      border-color: var(--theme-bg-dark-hover);
+      color: var(--theme-content-color);
+    }
   }
 
   .button {

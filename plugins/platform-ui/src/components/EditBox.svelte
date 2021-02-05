@@ -24,11 +24,13 @@
   export let placeholder: string = ''
   export let label: string = ''
   export let iconRight: boolean = false
+  export let hoverState: boolean = false
 
   let input: HTMLElement
 </script>
 
-<div class="editbox wIcon" class:editbox-label={(label !== '')} style='width: {width}' on:click={input.focus()}>
+<div class="editbox wIcon" class:editbox-label={(label !== '')} class:editbox-hoverState={hoverState}
+     style='width: {width}' on:click={input.focus()}>
   {#if ((!iconRight) && (typeof(icon) !== 'undefined'))}
     <Icon {icon} />
     <div class="separator"></div>

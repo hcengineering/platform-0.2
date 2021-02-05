@@ -3,14 +3,21 @@
   export const title: string = ''
   export const subtitle: string = ''
   export const color: string = ''
+  export const userColor: string = ''
+  export const subtitleOnTop: boolean = false
 </script>
 
 <div class="userInfo">
   <img class="avatar" src="{url}" alt="">
-  <div class="user">
-    {title}
+  <div class="user" style="{(userColor !== '') ? 'color:' + userColor : ''}">
+    {#if (!subtitleOnTop)}
+      {title}
+    {/if}
     {#if (subtitle !== '')}
       <span style="{(color !== '') ? 'color:' + color : ''}">{subtitle}</span>
+    {/if}
+    {#if (subtitleOnTop)}
+      {title}
     {/if}
   </div>
 </div>
