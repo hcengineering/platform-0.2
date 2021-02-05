@@ -93,14 +93,14 @@
 
 <style lang='scss'>
   .recruiting-view {
-    padding: 1em 1.5em;
+    padding: 24px 32px 32px 32px;
     display: flex;
     flex-direction: column;
   }
 
   .header {
     display: flex;
-    margin-bottom: 0.5em;
+    margin-bottom: 9px;
 
     .caption {
       flex-grow: 1;
@@ -125,19 +125,19 @@
   .content {
     .taskLabel {
       color: var(--theme-doclink-color);
-      margin-bottom: 1em;
+      margin-bottom: 16px;
     }
 
     .separator {
-      height: 1em;
+      height: 16px;
     }
   }
 
   .buttons {
-    margin-top: 1em;
+    margin-top: 16px;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    column-gap: 1em;
+    column-gap: 16px;
   }
 
   .attributes {

@@ -21,7 +21,8 @@
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import workbench from '@anticrm/workbench'
   import CheckBox from '@anticrm/sparkling-controls/src/CheckBox.svelte'
-  import EditBox from '@anticrm/sparkling-controls/src/EditBox.svelte'
+  import EditBox from '@anticrm/platform-ui/src/components/EditBox.svelte'
+  import Button from '@anticrm/sparkling-controls/src/Button.svelte'
 
   export let space: Space
   let userName: string = ''
@@ -46,44 +47,14 @@
 
 <style lang='scss'>
   .add-user-space-view {
-    padding: 1em 1.5em;
+    width: 364px;
+    padding: 24px;
     position: relative;
-
 
     .header {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 1.5em;
-
-      .actions {
-        display: flex;
-        flex-grow: 1;
-        flex-direction: row-reverse;
-        font-size: 10px;
-
-        button {
-          margin-left: 0.5em;
-        }
-      }
-    }
-
-    .attributes {
-      display: flex;
-      flex-wrap: wrap;
-      margin-top: 1em;
-    }
-
-    .separator {
-      width: 1em;
-    }
-
-    .space-kind {
-      width: 1em;
-      text-align: right;
-    }
-
-    .space-caption-1 {
-      display: flex;
+      margin-bottom: 20px;
     }
 
     .content {
@@ -94,37 +65,16 @@
         .input-container {
           display: flex;
           flex-direction: column;
-          margin-bottom: 1em;
-
-          .input-label {
-            font-weight: 500;
-            margin-bottom: 0.25em;
-            color: var(--theme-content-color);
-
-            & > span {
-              color: var(--theme-content-trans-color);
-              font-size: 11px;
-              font-weight: normal;
-            }
-          }
+          margin-bottom: 20px;
         }
-
-        .checkbox-label {
-          font-weight: 500;
-
-          & > span {
-            display: block;
-            font-size: 11px;
-            font-weight: normal;
-            max-width: 20em;
-          }
+        .separator {
+          height: 8px;
+          margin: 20px 0;
         }
-
         .buttons {
-          margin-top: 1.5em;
           width: 100%;
           display: flex;
-          flex-direction: row-reverse;
+          flex-direction: row;
         }
       }
     }
@@ -142,19 +92,15 @@
   <div class='content'>
     <form class='form'>
       <div class='input-container'>
-        <label class='input-label' for='input__name'>
-          User Name
-        </label>
-        <EditBox id='input__name' bind:value={userName} />
-        <!-- <input type='text' class='editbox input__name' id='input__name' bind:value={userName}> -->
+        <EditBox id='input__name' bind:value={userName} width='100%'
+                 label='Имя пользователя' />
       </div>
-      <CheckBox bind:checked={isOwner} right='true'>
-        <div class='checkbox-label'>
-          Make owner <span>When defined user will have all rights to space.</span>
-        </div>
+      <CheckBox bind:checked={isOwner}>
+        Сделать частным
       </CheckBox>
+      <div class="separator"></div>
       <div class='buttons'>
-        <button type='button' class='button primary' on:click={() => save()}>Create</button>
+        <Button size='large' kind='primary' width='164px' on:click={() => save()}>Создать</Button>
       </div>
     </form>
   </div>
