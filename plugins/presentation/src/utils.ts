@@ -29,6 +29,10 @@ export function getCoreService (): Promise<CoreService> {
   const platform = getContext(CONTEXT_PLATFORM) as Platform
   return platform.getPlugin(core.id)
 }
+export function _getCoreService (): CoreService {
+  const platform = getContext(CONTEXT_PLATFORM) as Platform
+  return platform.getRunningPlugin(core.id)
+}
 
 export function getUIService (): UIService {
   return getContext(CONTEXT_PLATFORM_UI) as UIService

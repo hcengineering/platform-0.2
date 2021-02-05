@@ -17,19 +17,15 @@ import { CoreProtocol, TxContext, Storage, AnyLayout, Class, Doc, Ref, StringPro
 
 export class Cache implements Storage {
   async store (tx: TxContext, doc: Doc): Promise<void> {  // eslint-disable-line
-    console.log('cache store')
   }
 
   async push (tx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, _query: AnyLayout | null, attribute: StringProperty, attributes: AnyLayout): Promise<void> { // eslint-disable-line
-    console.log('cache push')
   }
 
   async update (tx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, _query: AnyLayout | null, attributes: AnyLayout): Promise<void> { // eslint-disable-line
-    console.log('cache update')
   }
 
   async remove (tx: TxContext, _class: Ref<Class<Doc>>, doc: Ref<Doc>, _query: AnyLayout | null): Promise<void> { // eslint-disable-line
-    console.log('cache remove')
   }
 
   private coreProtocol: CoreProtocol

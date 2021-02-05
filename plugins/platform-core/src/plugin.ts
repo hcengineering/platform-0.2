@@ -18,12 +18,11 @@ import { ModelDb } from './modeldb'
 
 import { CoreService, QueryResult, RefFinalizer } from '.'
 import login from '@anticrm/login'
-import rpcService from './rpc'
+import rpcService, { EventType } from './rpc'
 
 import { QueriableStorage } from './queries'
 
 import { Cache } from './cache'
-import { Titles } from './titles'
 import {
   Tx, txContext, TxContextSource,
   Ref,
@@ -34,7 +33,7 @@ import {
   CoreProtocol, TxProcessor,
   generateId as genId
 } from '@anticrm/core'
-import { CORE_CLASS_REFERENCE, TITLE_DOMAIN } from '@anticrm/domains'
+import { CORE_CLASS_REFERENCE, CORE_CLASS_TITLE, TITLE_DOMAIN } from '@anticrm/domains'
 
 import { createOperations } from './operations'
 
@@ -42,8 +41,7 @@ import { ModelIndex } from '@anticrm/domains/src/indices/model'
 import { VDocIndex } from '@anticrm/domains/src/indices/vdoc'
 import { TxIndex } from '@anticrm/domains/src/indices/tx'
 import { RPC_CALL_FIND, RPC_CALL_FINDONE, RPC_CALL_LOAD_DOMAIN, RPC_CALL_TX } from '@anticrm/rpc'
-import { TitleIndex } from '@anticrm/domains/src/indices/title'
-import { FilterIndex } from '@anticrm/domains/src/indices/filter'
+import { PassthroughsIndex } from '@anticrm/domains/src/indices/filter'
 
 /*!
  * Anticrm Platform™ Core Plugin
@@ -53,38 +51,23 @@ import { FilterIndex } from '@anticrm/domains/src/indices/filter'
 export default async (platform: Platform): Promise<CoreService> => {
   const rpc = rpcService(platform)
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  let processClientTx: (tx: Tx[]) => void = (tx) => {
-    // Dummy
-  }
-
   const coreProtocol: CoreProtocol = {
     find: <T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> => rpc.request(RPC_CALL_FIND, _class, query),
     findOne: <T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined> => rpc.request(RPC_CALL_FINDONE, _class, query),
-    tx: (tx: Tx): Promise<any> => rpc.request(RPC_CALL_TX, tx).then(tx => {
-      processClientTx(tx as Tx[])
-    }),
+    tx: (tx: Tx): Promise<any> => rpc.request(RPC_CALL_TX, tx),
     loadDomain: (domain: string): Promise<Doc[]> => rpc.request(RPC_CALL_LOAD_DOMAIN, domain)
   }
 
   // Storages
 
   const model = new ModelDb()
-  const titles = new Titles(model)
   const cache = new Cache(coreProtocol)
 
   const modelDomain = await coreProtocol.loadDomain(MODEL_DOMAIN)
   model.loadModel(modelDomain)
 
-  coreProtocol.loadDomain(TITLE_DOMAIN).then(docs => {
-    const ctx = txContext()
-    for (const doc of docs) {
-      titles.store(ctx, doc)
-    }
-  })
-
   const qModel = new QueriableStorage(model, model)
-  const qTitles = new QueriableStorage(model, titles)
+  const qTitles = new QueriableStorage(model, cache)
   const qCache = new QueriableStorage(model, cache, true)
 
   // const queriables = [qModel, qTitles, qGraph, qCache]
@@ -96,28 +79,22 @@ export default async (platform: Platform): Promise<CoreService> => {
   const txProcessor = new TxProcessor([
     new TxIndex(qCache),
     new VDocIndex(model, qCache),
-    new TitleIndex(model, qTitles),
-    new FilterIndex(model, qCache, CORE_CLASS_REFERENCE), // Construct a filter index to update references
+    new PassthroughsIndex(model, qTitles, CORE_CLASS_TITLE), // Just for live queries.
+    new PassthroughsIndex(model, qCache, CORE_CLASS_REFERENCE), // Construct a pass index to update references
     new ModelIndex(model, [qModel])
   ])
 
-  processClientTx = (txx: Tx[]): void => {
-    if (txx) {
-      console.log('PROCESS CLIEN TX', txx)
-      for (const tx of txx) {
-        txProcessor.process(txContext(TxContextSource.ServerTransient), tx)
-      }
-    }
-  }
+  // add listener to process data updates from backend for data transactions.
+  rpc.addEventListener(EventType.Transaction, result => {
+    console.log('process Transaction', result)
+    txProcessor.process(txContext(TxContextSource.Server), result as Tx)
+  })
 
-  // add listener to process data updates from backend
-  rpc.addEventListener(response => {
-    // Do not process if result is not passed, it could be if sources is our transaction.
-    if (response.result != null) {
-      txProcessor.process(txContext(TxContextSource.Server), response.result as Tx)
-    }
-    if (response.clientTx && response.clientTx.length > 0) {
-      processClientTx(response.clientTx)
+  // Add a client transaction event listener
+  rpc.addEventListener(EventType.TransientTransaction, txs => {
+    console.log('process TransientTransaction', txs)
+    for (const tx of (txs as Tx[])) {
+      txProcessor.process(txContext(TxContextSource.ServerTransient), tx)
     }
   })
 

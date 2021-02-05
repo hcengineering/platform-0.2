@@ -38,7 +38,6 @@
 
   const curentUser = coreService.getUserId()
   coreService.subscribe(CORE_CLASS_SPACE, {}, (docs) => {
-    console.log('spaces:', docs)
     spaces = docs
   }, onDestroy)
 

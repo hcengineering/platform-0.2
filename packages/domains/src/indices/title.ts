@@ -14,7 +14,15 @@
 //
 
 import { Doc, Ref, Classifier, Model, Tx, DomainIndex, Storage, TxContext, generateId } from '@anticrm/core'
-import { CreateTx, UpdateTx, CORE_CLASS_CREATE_TX, CORE_CLASS_UPDATE_TX, CORE_CLASS_PUSH_TX, CORE_CLASS_TITLE, Title } from '..'
+import {
+  CreateTx,
+  UpdateTx,
+  CORE_CLASS_CREATE_TX,
+  CORE_CLASS_UPDATE_TX,
+  CORE_CLASS_PUSH_TX,
+  CORE_CLASS_TITLE,
+  Title, CORE_CLASS_DELETE_TX, DeleteTx
+} from '..'
 
 const NULL = '<null>'
 
@@ -49,6 +57,10 @@ export class TitleIndex implements DomainIndex {
       case CORE_CLASS_UPDATE_TX:
         return this.onUpdate(ctx, tx as UpdateTx)
       case CORE_CLASS_PUSH_TX:
+        // primary is not an array, so no opeation is required.
+        return Promise.resolve()
+      case CORE_CLASS_DELETE_TX:
+        return this.onDelete(ctx, tx as DeleteTx)
       default:
         console.log('not implemented title tx', tx)
     }
@@ -89,5 +101,9 @@ export class TitleIndex implements DomainIndex {
     if (updated) {
       this.storage.update(ctx, CORE_CLASS_TITLE, update._objectId, null, { title: update._attributes[primary] })
     }
+  }
+
+  private onDelete (ctx: TxContext, deleteTx: DeleteTx): Promise<any> {
+    return this.storage.remove(ctx, CORE_CLASS_TITLE, deleteTx._objectId, null)
   }
 }

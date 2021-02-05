@@ -50,7 +50,6 @@ export default async (platform: Platform): Promise<I18n> => {
 
   const meta = platform.getMetadata(i18n.metadata.Strings)
   if (meta) {
-    console.log(meta)
     loadStrings(meta)
   }
 
