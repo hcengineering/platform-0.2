@@ -1,11 +1,9 @@
 <script lang='ts'>
-  import UserInfo from '@anticrm/sparkling-controls/src/UserInfo.svelte'
-  import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
-  import EditBox from './EditBox.svelte'
-  import workbench from '@anticrm/workbench'
+  import ScrollView from './ScrollView.svelte'
 
-  export let items: Array
+  export let items: Array = []
   export let selected: number = 0
+  export let label: string = 'Значение'
 
   let comboHidden: boolean = true
   let comboRoot: HTMLElement
@@ -49,19 +47,19 @@
 </script>
 
 <div bind:this={comboRoot} class="comboBox" class:selectedCombo={!comboHidden} on:click={handler}>
-  <UserInfo url={items[selected].url} title={items[selected].name}
-            subtitle="Новый исполнитель" subtitleOnTop='true' userColor='var(--theme-content-dark-color)' />
+  <div class="selectedItem">
+    <div class="selectedItem__label">{label}</div>
+    <div class="selectedItem__value">{items[selected].comboValue}</div>
+  </div>
   <div class="arrowDown"></div>
 
   <div bind:this={comboDrop} class="comboBox-drop">
-    <EditBox id='select-user-combobox' icon={workbench.icon.Finder} iconRight='true' width='100%' hoverState='true' />
-    <div class="separator"></div>
     <div bind:this={comboItems} class="comboBox-drop__items">
       <ScrollView width="100%" height="100%" accentColor='true'>
         {#each items as item (item.id)}
           <div class="comboBox-drop__item" class:selected={item.id === selected}
                on:click={() => { selected = item.id }}>
-            <UserInfo url={item.url} title={item.name} userColor='var(--theme-content-dark-color)' />
+            {item.comboValue}
           </div>
         {/each}
       </ScrollView>
@@ -75,7 +73,7 @@
     background-color: var(--theme-bg-accent-color);
     border: solid 1px var(--theme-bg-dark-color);
     border-radius: 4px;
-    padding: .5em 1em .5em .5em;
+    padding: 8px 16px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -89,16 +87,32 @@
       box-shadow: var(--theme-shadow);
     }
 
+    .selectedItem {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+
+      &__label {
+        font-size: 11px;
+        color: var(--theme-content-color);
+        margin-bottom: 4px;
+      }
+      &__value {
+        font-size: 14px;
+        color: var(--theme-content-dark-color);
+      }
+    }
+
     &-drop {
       position: absolute;
       visibility: hidden;
       display: flex;
       flex-direction: column;
-      width: calc(100% - 2em);
+      width: calc(100% - 16px);
       background-color: var(--theme-bg-accent-color);
       border: solid 1px var(--theme-bg-dark-color);
       border-radius: 4px;
-      padding: 1em;
+      padding: 8px;
       z-index: 1000;
       box-shadow: var(--theme-shadow);
 
@@ -108,12 +122,19 @@
       }
 
       &__item {
-        margin: 0;
-        padding: .5em;
+        margin: 4px 0;
+        padding: 8px;
         border-radius: 4px;
+        color: var(--theme-content-dark-color);
 
         &:hover {
           background-color: var(--theme-bg-accent-hover);
+        }
+        &:first-child {
+          margin-top: 0;
+        }
+        &:last-child {
+          margin-bottom: 0;
         }
       }
       .selected {

@@ -18,6 +18,7 @@
   import { AttrModel, ClassModel } from '@anticrm/presentation'
   import { _getCoreService, getPresentationService } from '../../../utils'
   import CheckBox from '@anticrm/sparkling-controls/src/CheckBox.svelte'
+  import Button from '@anticrm/sparkling-controls/src/Button.svelte'
   import EditBox from '@anticrm/platform-ui/src/components/EditBox.svelte'
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import workbench from '@anticrm/workbench'
