@@ -19,6 +19,7 @@ import presentation from '..'
 export default (platform: Platform) => {
   const spritesUrl = require('../assets/icons.svg')
   platform.loadMetadata(presentation.icon, {
+    Finder: spritesUrl + '#finder',
     brdBold: spritesUrl + '#brdBold',
     brdItalic: spritesUrl + '#brdItalic',
     brdUnder: spritesUrl + '#brdUnder',

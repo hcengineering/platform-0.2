@@ -1,5 +1,7 @@
 <script lang="ts">
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
+  import EditBox from '@anticrm/platform-ui/src/components/EditBox.svelte'
+  import presentation from '@anticrm/presentation'
 
   import ui from '@anticrm/platform-ui'
   import { Class, Ref } from '@anticrm/core'
@@ -67,7 +69,7 @@
   .presentation-completion-popup {
     display: flex;
     flex-direction: column;
-    background-color: var(--theme-bg-color);
+    background-color: var(--theme-bg-accent-color);
     color: var(--theme-content-color);
     position: relative;
     border: 1px solid var(--theme-bg-dark-color);
@@ -75,20 +77,22 @@
     height: 150px;
     width: 300px;
     padding: 1em;
-    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--theme-shadow);
 
     .item {
       font-size: 14px;
       font-family: var(--theme-font-caption);
-      color: var(--theme-content-color);
+      color: var(--theme-content-dark-color);
       white-space: no-wrap;
-      padding: 0.5em;
+      margin: 4px 0;
+      padding: 8px;
       border-radius: 4px;
       cursor: pointer;
+      transition: background-color .2s;
 
       &.selected {
-        border-color: var(--theme-doclink-color);
-        background-color: var(--theme-doclink-color);
+        // border-color: var(--theme-doclink-color);
+        background-color: var(--theme-bg-accent-hover);
         position: sticky;
       }
 
@@ -98,12 +102,25 @@
         box-shadow: inset 0px 0px 2px 0px var(--theme-doclink-color);
         color: var(--theme-caption-color);
       }
+
+      &:first-child {
+        margin-top: 0;
+      }
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    .separator {
+      height: 4px;
     }
   }
 </style>
 
 <div class="presentation-completion-popup" style={popupStyle} bind:clientHeight bind:clientWidth on:blur>
-  <ScrollView stylez="height:100%;width: 100%;" scrollPosition={selOffset}>
+  <EditBox icon={presentation.icon.Finder} iconRight />
+  <div class="separator"></div>
+  <ScrollView width="100%" height="100%" scrollPosition={selOffset} accentColor>
     <div bind:this={listElement}>
       {#each items as item (item.key)}
         <div

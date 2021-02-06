@@ -42,7 +42,7 @@
         <PopupMenu>
           <div class='popup' slot='trigger'><Icon icon={workbench.icon.Burger} /></div>
           <PopupItem on:click={() => {
-            uiService.showModal(AddUser, { space }, optionsButton)
+            uiService.showModal(AddUser, { space })
           }}>Add user</PopupItem>
           <PopupItem separator='true' />
           <PopupItem on:click={() => {

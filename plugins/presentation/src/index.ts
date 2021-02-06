@@ -125,6 +125,7 @@ const presentationPlugin = plugin('presentation' as Plugin<PresentationService>,
   i18n: i18n.id
 }, {
   icon: {
+    Finder: '' as Asset,
     brdBold: '' as Asset,
     brdItalic: '' as Asset,
     brdUnder: '' as Asset,

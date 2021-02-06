@@ -14,12 +14,19 @@
 
 	import { afterUpdate } from 'svelte'
 
-	export let stylez: string = ''
 	export let scrollPosition: number = 0
 	export let autoscroll: boolean = false
 	export let accentColor: boolean = false
+	export let width: string = ''
+	export let height: string = ''
+	export let margin: string = ''
 
 	let container: HTMLElement
+	let style: string = ''
+
+	if (width !== '') style += 'width: ' + width + ';'
+	if (height !== '') style += 'height: ' + height + ';'
+	if (margin !== '') style += 'margin: ' + margin + ';'
 
 	$: {
 	  if (container && !autoscroll && (scrollPosition > container.clientHeight || scrollPosition < container.scrollTop)) {
@@ -34,7 +41,7 @@
 	})
 </script>
 
-<div class="scroll-view" style={stylez}>
+<div class="scroll-view" {style}>
 	<div class="container" class:accent-color={accentColor} bind:this={container}>
 		<slot />
 	</div>
