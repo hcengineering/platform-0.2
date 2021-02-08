@@ -13,7 +13,7 @@
 // limitations under the License.
 -->
 
-<script type='ts'>
+<script type="ts">
   import { Ref } from '@anticrm/core'
   import { findOne, getUIService } from '../../utils'
   import workbench, { WorkbenchApplication } from '../..'
@@ -42,35 +42,36 @@
     // _id = undefined
   }
 
-  function getLabel(str: string): string {
+  function getLabel (str: string): string {
     if (str === 'Страницы') return 'Новая страница'
     if (str === 'Задачи') return 'Новая задача'
     return 'Добавить'
   }
 </script>
 
-<div class='workbench-browse'>
+<div class="workbench-browse">
   { #if appInstance }
-    <div class='captionContainer'>
-      <span class='caption-1' style='padding-right:1em'>{appInstance.label}</span>&nbsp;
+    <div class="captionContainer">
+      <span class="caption-1" style="padding-right:1em">{appInstance.label}</span>&nbsp;
       <!-- <a class='icon' bind:this={addIcon} href='/'
          on:click|preventDefault={ () => { uiService.showModal(CreateForm, { _class: appInstance ? appInstance.classes[0] : undefined, title: 'The title', space }, addIcon) } }>
         <Icon icon={workbench.icon.Add} button='true' /> {getLabel(appInstance.label)}
       </a> -->
       <div bind:this={addIcon}>
-        <Button kind='transparent'
-          on:click={ () => {
-            uiService.showModal(CreateForm, { _class: appInstance ? appInstance.classes[0] : undefined, title: 'The title', space }, addIcon)
+        <Button kind="transparent"
+                on:click={ () => {
+            uiService.showModal(CreateForm, { _class: appInstance ? appInstance.classes[0] : undefined, space }, addIcon)
           } }
         >
-          <Icon icon={workbench.icon.Add} button='true' /><span style='padding-left:.5em'>{getLabel(appInstance.label)}
+          <Icon icon={workbench.icon.Add} button="true" />
+          <span style="padding-left:.5em">{getLabel(appInstance.label)}</span>
         </Button>
       </div>
-      <div style='flex-grow:1'></div>
-      <EditBox icon={workbench.icon.Finder} placeholder='Поиск по {appInstance.label}...' iconRight='true' />
+      <div style="flex-grow:1"></div>
+      <EditBox icon={workbench.icon.Finder} placeholder="Поиск по {appInstance.label}..." iconRight="true" />
     </div>
     <ScrollView height="100%" margin="2em">
-      <div class='table'>
+      <div class="table">
         <Table _class={appInstance.classes[0]} {space} on:open />
         <!-- <Table _class={appInstance.classes[0]} {space} on:open={ (evt) => { _id = evt.detail._id } }/> -->
       </div>
@@ -80,10 +81,10 @@
       <ObjectForm _class={appInstance.classes[0]} title="Hello" { _id }/>
     </div>
     { /if } -->
-  { /if  }
+  { /if   }
 </div>
 
-<style lang='scss'>
+<style lang="scss">
   .workbench-browse {
     height: 100%;
     display: flex;

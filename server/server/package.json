@@ -5,6 +5,7 @@
     "build": "tsc",
     "test": "jest",
     "start": "ts-node src/index.ts",
+    "dev": "ts-node-dev src/index.ts",
     "shutdown": "ts-node src/serverctl.ts",
     "lint": "eslint src/**/*.ts"
   },
@@ -20,12 +21,13 @@
     "babel-jest": "^26.0.1",
     "jest": "^26.0.1",
     "ts-jest": "^26.4.4",
+    "ts-node-dev": "^1.1.1",
     "typescript": "^3.9.5"
   },
   "dependencies": {
+    "@anticrm/platform": "^0.2.0",
     "jwt-simple": "^0.5.6",
     "mongodb": "^3.5.9",
-    "ws": "^7.3.0",
-    "@anticrm/platform": "^0.2.0"
+    "ws": "^7.3.0"
   }
 }

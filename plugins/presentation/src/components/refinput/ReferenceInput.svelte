@@ -1,5 +1,5 @@
-<script lang='ts'>
-  import { AnyLayout, StringProperty } from '@anticrm/core'
+<script lang="ts">
+  import { AnyLayout, Class, Doc, Ref, StringProperty } from '@anticrm/core'
   import { MessageNode, newMessageDocument } from '@anticrm/text'
   import { _getCoreService } from '../../utils'
 
@@ -29,7 +29,9 @@
   // Properties
   // ********************************
   export let stylesEnabled: boolean = false
-  export let height: number = -1
+  // If specified, submit button will be enabled, message will be send on any modify operation
+  export let submitEnabled: boolean = true
+  export let lines: number = 1
 
   // ********************************
   // Functionality
@@ -75,7 +77,7 @@
   let currentPrefix = ''
   let popupVisible = false
 
-  let titleSearch: (query: AnyLayout) => void
+  let titleSearch: (_class: Ref<Class<Doc>>, query: AnyLayout) => void
 
   let coreService: CoreService = _getCoreService()
 
@@ -93,7 +95,7 @@
   }, onDestroy)
 
   $: {
-    titleSearch(query(currentPrefix))
+    titleSearch(CORE_CLASS_TITLE, query(currentPrefix))
   }
 
   function updateTitles (docs: Title[]): CompletionItem[] {
@@ -149,6 +151,7 @@
       currentPrefix = ''
       popupVisible = false
     }
+    dispatch('update', editorContent)
   }
 
   function handlePopupSelected (value: CompletionItem) {
@@ -299,7 +302,7 @@
   }
 </script>
 
-<style lang='scss'>
+<style lang="scss">
   .presentation-reference-input-control {
     width: 100%;
 
@@ -357,13 +360,13 @@
   }
 </style>
 
-<div class='presentation-reference-input-control'>
-  <slot name='top' />
+<div class="presentation-reference-input-control">
+  <slot name="top" />
   <div>
     <div class:flex-column={stylesEnabled} class:flex-row={!stylesEnabled}>
       {#if !stylesEnabled}
         <Toolbar>
-          <slot name='inner' />
+          <slot name="inner" />
         </Toolbar>
       {/if}
 
@@ -371,7 +374,7 @@
         class:edit-box-vertical={stylesEnabled}
         class:edit-box-horizontal={!stylesEnabled}
         on:keydown={onKeyDown}
-        style={`height: ${height > 0 ? height + 'px' : ''}`}>
+        style={`height: ${lines+1}em;`}>
         <EditorContent
           bind:this={htmlEditor}
           bind:content={editorContent}
@@ -394,18 +397,18 @@
       </div>
 
       {#if stylesEnabled}
-        <div class='separator' />
+        <div class="separator" />
       {/if}
       <Toolbar>
         {#if stylesEnabled}
           <slot name="inner" />
           <ToolbarButton style="padding:0; width:24px; height:24px"
-            on:click={() => htmlEditor.toggleBold()} selected={styleState.bold}>
+                         on:click={() => htmlEditor.toggleBold()} selected={styleState.bold}>
             <Icon icon={presentation.icon.brdBold} size="24" />
           </ToolbarButton>
           <ToolbarButton style="padding:0; width:24px; height:24px"
-            on:click={() => htmlEditor.toggleItalic()}
-            selected={styleState.italic}>
+                         on:click={() => htmlEditor.toggleItalic()}
+                         selected={styleState.italic}>
             <Icon icon={presentation.icon.brdItalic} size="24" />
           </ToolbarButton>
           <div class="tSeparator" />
@@ -413,11 +416,11 @@
             <Icon icon={presentation.icon.brdCode} size="24" />
           </ToolbarButton>
           <ToolbarButton style="padding:0; width:24px; height:24px"
-            on:click={() => htmlEditor.toggleUnOrderedList()}>
+                         on:click={() => htmlEditor.toggleUnOrderedList()}>
             <Icon icon={presentation.icon.brdUL} size="24" />
           </ToolbarButton>
           <ToolbarButton style="padding:0; width:24px; height:24px"
-            on:click={() => htmlEditor.toggleOrderedList()}>
+                         on:click={() => htmlEditor.toggleOrderedList()}>
             <Icon icon={presentation.icon.brdOL} size="24" />
           </ToolbarButton>
           <div class="tSeparator" />
@@ -433,16 +436,18 @@
           </ToolbarButton>
         {/if}
         <div slot="right">
-          <ToolbarButton style="padding:0; width:42x; height:42px"
-            on:click={() => handleSubmit()} selected={!styleState.isEmpty}>
-            <Icon icon={presentation.icon.brdSend} size="42" />
-            <!--▶️-->
-          </ToolbarButton>
+          {#if submitEnabled}
+            <ToolbarButton style="padding:0; width:42px; height:42px"
+                           on:click={() => handleSubmit()} selected={!styleState.isEmpty}>
+              <Icon icon={presentation.icon.brdSend} size="42" />
+              <!--▶️-->
+            </ToolbarButton>
+          {/if}
           <ToolbarButton style="padding:0; width:42px; height:42px">
             <Icon icon={presentation.icon.brdSmile} size="42" />
             <!--😀-->
           </ToolbarButton>
-          <ToolbarButton style='font-weight:bold' selected={stylesEnabled}
+          <ToolbarButton style="font-weight:bold" selected={stylesEnabled}
                          on:click={() => (stylesEnabled = !stylesEnabled)}>Aa
           </ToolbarButton>
         </div>

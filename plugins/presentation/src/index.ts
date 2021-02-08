@@ -101,6 +101,7 @@ export interface ClassModel {
   getGroup (_class: Ref<Class<Obj>>): GroupModel | undefined
 
   getOwnAttributes (_class: Ref<Class<Obj>>): AttrModel[] // TODO: why do we have this here, but not within Group?
+
   getAttributes (): AttrModel[]
 
   getAttribute (key: string, _class?: Ref<Class<Obj>>): AttrModel | undefined
@@ -117,7 +118,10 @@ export interface ClassModel {
 export interface PresentationService extends Service {
   getClassModel (_class: Ref<Class<Obj>>, top?: Ref<Class<Obj>>): Promise<ClassModel>
 
-  getComponentExtension (_class: Ref<Class<Obj>>, extension: Ref<Mixin<ComponentExtension<VDoc>>>): AnyComponent
+  /**
+   * Return a component extension registered for specified class, return undefined if not specified.
+   */
+  getComponentExtension (_class: Ref<Class<Obj>>, extension: Ref<Mixin<ComponentExtension<VDoc>>>): AnyComponent | undefined
 }
 
 const presentationPlugin = plugin('presentation' as Plugin<PresentationService>, {
@@ -143,6 +147,9 @@ const presentationPlugin = plugin('presentation' as Plugin<PresentationService>,
     UXAttribute: '' as Ref<Class<UXAttribute>>,
     Presenter: '' as Ref<Mixin<Presenter<Type>>>,
     DetailForm: '' as Ref<Mixin<ComponentExtension<VDoc>>>,
+
+    // Define a form to create a new instance of specified class.
+    CreateForm: '' as Ref<Mixin<ComponentExtension<VDoc>>>,
     LookupForm: '' as Ref<Mixin<ComponentExtension<VDoc>>>
   },
   mixin: {
@@ -163,4 +170,8 @@ export default presentationPlugin
 export function getPresentationService (): Promise<PresentationService> {
   const platform = getContext(CONTEXT_PLATFORM) as Platform
   return platform.getPlugin(presentationPlugin.id)
+}
+
+export function getComponentExtension (_class: Ref<Class<Obj>>, extension: Ref<Mixin<ComponentExtension<VDoc>>>): Promise<AnyComponent | undefined> {
+  return getPresentationService().then(service => service.getComponentExtension(_class, extension))
 }

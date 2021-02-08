@@ -43,7 +43,7 @@ export default chunter
 
 @Class$(chunter.class.Collab, core.class.VDoc)
 @UX('Collaboration' as IntlString)
-class TCollab extends TVDoc implements Collab {
+export class TCollab extends TVDoc implements Collab {
   @ArrayOf$()
   @InstanceOf$(chunter.class.Comment)
   @UX('Комментарии' as IntlString, chunter.icon.Chunter) comments?: Comment[]
@@ -51,7 +51,7 @@ class TCollab extends TVDoc implements Collab {
 
 @Class$(chunter.class.Comment, core.class.Emb)
 @UX('Комментарий' as IntlString)
-class TComment extends TEmb implements Comment {
+export class TComment extends TEmb implements Comment {
   @Prop() _createdBy!: Property<string, string>
   @Prop() _createdOn!: Property<number, Date>
 
@@ -61,7 +61,7 @@ class TComment extends TEmb implements Comment {
 
 @Class$(chunter.class.Message, chunter.class.Collab, ChunterDomain.Chunter)
 @UX('Сообщение' as IntlString)
-class TMessage extends TVDoc implements Message {
+export class TMessage extends TVDoc implements Message {
   @UX('Сообщение' as IntlString, chunter.icon.Chunter)
   @Prop(core.class.String)
   message!: string

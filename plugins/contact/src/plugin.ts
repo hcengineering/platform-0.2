@@ -51,7 +51,9 @@ export default async (platform: Platform, deps: { core: CoreService, ui: UIServi
     return getUser(whoAmI).then(user => user?.name)
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   function getAvatar (user: Ref<User>): Asset {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     return require('../assets/ava2x48.jpg') as Asset
   }
 

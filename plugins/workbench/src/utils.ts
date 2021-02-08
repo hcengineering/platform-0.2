@@ -53,16 +53,6 @@ export function _getPresentationService (): PresentationService {
   return platform.getRunningPlugin(presentation.id)
 }
 
-export function getComponentExtension (_class: Ref<Class<Obj>>, extension: Ref<Mixin<ComponentExtension<VDoc>>>): Promise<AnyComponent> {
+export function getComponentExtension (_class: Ref<Class<Obj>>, extension: Ref<Mixin<ComponentExtension<VDoc>>>): Promise<AnyComponent | undefined> {
   return getPresentationService().then(service => service.getComponentExtension(_class, extension))
-}
-
-export function query<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout, f: (docs: T[]) => void): () => void {
-  let unsubscribe: () => void
-  function subscribe (queryResult: QueryResult<T>) {
-    if (unsubscribe) unsubscribe()
-    unsubscribe = queryResult.subscribe(f)
-  }
-  getCoreService().then(service => service.query(_class, query)).then(queryResult => subscribe(queryResult))
-  return () => { unsubscribe() }
 }

@@ -71,8 +71,14 @@ export class TLookupForm<T extends VDoc> extends TMixin<T> implements ComponentE
   component!: AnyComponent
 }
 
+@Mixin$(ui.class.CreateForm, core.class.Mixin)
+export class TCreateForm<T extends VDoc> extends TMixin<T> implements ComponentExtension<T> {
+  @Prop()
+  component!: AnyComponent
+}
+
 export function model (S: Builder): void {
-  S.add(TUXAttribute, TPresenter, TUXObject, TDetailForm, TLookupForm)
+  S.add(TUXAttribute, TPresenter, TUXObject, TDetailForm, TLookupForm, TCreateForm)
 
   S.mixin(core.class.Type, ui.class.Presenter, {
     presenter: ui.component.StringPresenter

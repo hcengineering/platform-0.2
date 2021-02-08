@@ -75,7 +75,7 @@
     on:message={handler}
     stylesEnabled=true/>`}>
   <div class="preview-pane">
-    <ReferenceInput height={500} on:message={(e) => add(e.detail)} stylesEnabled="true" />
+    <ReferenceInput lines={20} on:message={(e) => add(e.detail)} stylesEnabled="true" />
   </div>
   <div class="message-panel">
     {@html message}

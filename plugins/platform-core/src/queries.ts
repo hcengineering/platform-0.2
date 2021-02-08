@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Storage, TxContext, StringProperty, Doc, Ref, Class, AnyLayout, Model } from '@anticrm/core'
+import { Storage, TxContext, StringProperty, Doc, Ref, Class, AnyLayout, Model, generateId } from '@anticrm/core'
 import { QueryResult, Subscriber, Unsubscriber } from '.'
 
 export interface Domain extends Storage {
@@ -21,6 +21,7 @@ export interface Domain extends Storage {
 }
 
 interface Query<T extends Doc> {
+  _id: Ref<Doc>
   _class: Ref<Class<T>>
   query: AnyLayout
   subscriber: Subscriber<T>
@@ -32,7 +33,7 @@ interface Query<T extends Doc> {
 
 export class QueriableStorage implements Domain {
   private proxy: Storage
-  private queries: Query<Doc>[] = []
+  private queries: Map<string, Query<Doc>> = new Map()
   private model: Model
   private updateResults: boolean
 
@@ -51,13 +52,13 @@ export class QueriableStorage implements Domain {
 
   async store (ctx: TxContext, doc: Doc): Promise<void> {
     await this.proxy.store(ctx, doc).then(() => {
-      this.queries.forEach(q => {
+      for (const q of this.queries.values()) {
         if (this.model.matchQuery(q._class, doc, q.query)) {
           // If document is matched, assume we add it to end of list. But it's order could be changed after transaction will be complete.
           q.results.push(doc)
           q.subscriber(q.results)
         }
-      })
+      }
     })
   }
 
@@ -82,40 +83,40 @@ export class QueriableStorage implements Domain {
 
   push (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, _query: AnyLayout | null, attribute: StringProperty, attributes: AnyLayout): Promise<void> {
     return this.proxy.push(ctx, _class, _id, _query, attribute, attributes).then(() => {
-      this.queries.forEach(q => {
+      for (const q of this.queries.values()) {
         // Find doc, apply attribute and check if it is still matches, if not we need to perform request to server after transaction will be complete.
         // Check if attribute are in query, so it could modify results.
         if (this.updateMatchQuery(_id, q, (doc) => this.model.pushDocument(doc, _query, attribute, attributes))) {
-          return
+          continue
         }
         // so we potentially need to fetch new matched objects from server, so do so.
         ctx.network.then(() => this.refresh(q))
-      })
+      }
     })
   }
 
   update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, _query: AnyLayout | null, attributes: AnyLayout): Promise<void> {
     return this.proxy.update(ctx, _class, _id, _query, attributes).then(() => {
-      this.queries.forEach(q => {
+      for (const q of this.queries.values()) {
         // Find doc, apply update of attributes and check if it is still matches, if not we need to perform request to server after transaction will be complete.
         if (this.updateMatchQuery(_id, q, (doc) => this.model.updateDocument(doc, _query, attributes))) {
-          return
+          continue
         }
         // so we potentially need to fetch new matched objects from server, so do so.
         ctx.network.then(() => this.refresh(q))
-      })
+      }
     })
   }
 
   remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, _query: AnyLayout | null): Promise<void> {
     return this.proxy.remove(ctx, _class, _id, _query).then(() => {
-      this.queries.forEach(q => {
+      for (const q of this.queries.values()) {
         if (this.updateMatchQuery(_id, q, (doc) => this.model.removeDocument(doc, _query))) {
-          return
+          continue
         }
         // so we potentially need to fetch new matched objects from server, so do so.
         ctx.network.then(() => this.refresh(q))
-      })
+      }
     })
   }
 
@@ -132,15 +133,16 @@ export class QueriableStorage implements Domain {
     return {
       subscribe: (subscriber: Subscriber<T>) => {
         const q: Query<Doc> = {
+          _id: generateId(),
           _class,
           query,
           subscriber: subscriber as Subscriber<Doc>,
           results: []
         }
         q.unsubscriber = () => {
-          this.queries.splice(this.queries.indexOf(q), 1)
+          this.queries.delete(q._id)
         }
-        this.queries.push(q)
+        this.queries.set(q._id, q)
         this.refresh(q)
         return q.unsubscriber
       }

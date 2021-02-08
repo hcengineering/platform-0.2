@@ -36,7 +36,7 @@
   }, onDestroy)
 
   $: {
-    ms({ _space: space })
+    ms(chunter.class.Message, { _space: space })
     // TODO: use Titles index instead of getting the whole Space object
     coreService.findOne(CORE_CLASS_SPACE, { _id: space })
       .then((spaceObj) => (spaceName = spaceObj ? '#' + spaceObj.name : ''))

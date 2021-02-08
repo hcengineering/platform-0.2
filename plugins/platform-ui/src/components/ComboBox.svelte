@@ -4,8 +4,9 @@
   import EditBox from './EditBox.svelte'
   import workbench from '@anticrm/workbench'
   import { Action } from './actions'
+  import { onDestroy } from 'svelte'
 
-  export let items: unknown[]
+  export let items: Action[]
   export let selected: number = 0
 
   let comboHidden: boolean = true
@@ -51,22 +52,23 @@
   function handler (event: MouseEvent): void {
     if (comboHidden) window.addEventListener('click', toggleCombo)
   }
+
+  onDestroy(() => {
+    hideCombo()
+  })
 </script>
 
 <div bind:this={comboRoot} class="comboBox" class:selectedCombo={!comboHidden} on:click={handler}>
-  <UserInfo url={items[selected].url} title={items[selected].name}
-            subtitle="Новый исполнитель" subtitleOnTop="true" userColor="var(--theme-content-dark-color)" />
+  <slot name="title" />
   <div class="arrowDown"></div>
 
   <div bind:this={comboDrop} class="comboBox-drop">
-    <EditBox id="select-user-combobox" icon={workbench.icon.Finder} iconRight="true" width="100%" hoverState="true" />
-    <div class="separator"></div>
     <div bind:this={comboItems} class="comboBox-drop__items">
       <ScrollView width="100%" height="100%" accentColor="true">
         {#each items as item (item.id)}
           <div class="comboBox-drop__item" class:selected={item.id === selected}
                on:click={() => { selected = item.id }}>
-            <UserInfo url={item.url} title={item.name} userColor="var(--theme-content-dark-color)" />
+            <div on:click={() => item.action()}>{item.name}</div>
           </div>
         {/each}
       </ScrollView>

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 -->
-<script lang='ts'>
+<script lang="ts">
   import { Ref, Doc, Class } from '@anticrm/core'
   import { onDestroy } from 'svelte'
   import { find, getCoreService, getUIService, _getCoreService } from '../../utils'
@@ -72,6 +72,13 @@
 
   $: {
     space = location[3] as Ref<Space>
+    // Check if space are in list of spaces, and if not use first available space
+    if (spaces.length > 0) {
+      if (!spaces.find(s => s._id === space)) {
+        space = spaces[0]._id as Ref<Space>
+        console.log('space is changed to:', space)
+      }
+    }
     if (!application) {
       application = workbench.application.Activity
     }
@@ -85,14 +92,14 @@
     return doc._id as Ref<T>
   }
 
-  let details: { _id: Ref<VDoc>; _class: Ref<Class<VDoc>> }
+  let details: { _id: Ref<Doc>; _class: Ref<Class<Doc>> }
   let addButton: HTMLElement
 
   let hidden = true
   //let showPopup: string = 'hidden';
 </script>
 
-<style lang='scss'>
+<style lang="scss">
   .workbench-perspective {
     display: flex;
     height: 100%;
@@ -188,13 +195,13 @@
   }
 </style>
 
-<div class='workbench-perspective'>
-  <div class='projects' class:mini={!hidden}>
-    <a href='/' style='position:absolute;top:1.5em;right:1.5em;' on:click|preventDefault={() => { hidden = !hidden}}>
-      <Icon icon={workbench.icon.Resize} button='true' />
+<div class="workbench-perspective">
+  <div class="projects" class:mini={!hidden}>
+    <a href="/" style="position:absolute;top:1.5em;right:1.5em;" on:click|preventDefault={() => { hidden = !hidden}}>
+      <Icon icon={workbench.icon.Resize} button="true" />
     </a>
-    <div class='container' class:hidden={!hidden}>
-      <div class='caption-3'>
+    <div class="container" class:hidden={!hidden}>
+      <div class="caption-3">
         Пространства
       </div>
       <SpaceItem link={'/' + location[1] + '/' + location[2]} selected={!space} space={{ name: 'Все', isPublic: true }}
@@ -205,10 +212,10 @@
                      selected={s._id === space} space={s} />
         {/if}
       {/each}
-      <div class='footContainer'>
+      <div class="footContainer">
         <span>
           <PopupMenu>
-            <div class='popup' slot='trigger'><Icon icon={ui.icon.Add} button='true' /></div>
+            <div class="popup" slot="trigger"><Icon icon={ui.icon.Add} button="true" /></div>
             <PopupItem on:click={() => {
               uiService.showModal(CreateSpace, {})
             }}>Create</PopupItem>
@@ -219,9 +226,9 @@
         </span>
       </div>
 
-      <div class='caption-3'>Приложения</div>
+      <div class="caption-3">Приложения</div>
       {#each applications as app (app._id)}
-        <div class='item' class:selected={app._id === application}
+        <div class="item" class:selected={app._id === application}
              on:click|preventDefault={(e) => {
             application = id(app)
           }}>{app.label}
@@ -230,7 +237,7 @@
     </div>
   </div>
 
-  <div class='main'>
+  <div class="main">
     <!-- <div class="main-content"> -->
     {#if component}
       <MainComponent
@@ -250,7 +257,7 @@
   <aside>
     <!-- <DetailsForm v-if="details" :_class="details._class" :_id="details._id" @done="done" /> -->
     {#if details}
-      <ObjectForm {...details} title='Title' />
+      <ObjectForm {...details} title="Title" />
     {/if}
   </aside>
 </div>

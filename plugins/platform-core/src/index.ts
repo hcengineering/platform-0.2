@@ -46,7 +46,7 @@ export interface QueryProtocol {
   subscribe<T extends Doc> (_class: Ref<Class<T>>,
     query: AnyLayout,
     action: (docs: T[]) => void,
-    regFinalizer: RefFinalizer): (query: AnyLayout) => void
+    regFinalizer: RefFinalizer): (_class: Ref<Class<T>>, query: AnyLayout) => void
 }
 
 /**
@@ -61,13 +61,13 @@ export interface OperationProtocol {
   /**
    * Perform creation of new document.
    */
-  create<T extends Doc> (_class: Ref<Class<T>>, values: AnyLayout): Promise<T>
+  create<T extends Doc> (_class: Ref<Class<T>>, values: AnyLayout | Doc): Promise<T>
 
   /**
    * Push new embedded element and return a link to it.
    * If query is specified, will find attribute of embedded object.
    */
-  push<T extends Doc> (doc: T, query: AnyLayout | null, attribute: StringProperty, element: AnyLayout): Promise<T>
+  push<T extends Doc> (doc: T, query: AnyLayout | null, attribute: StringProperty, element: AnyLayout | Doc): Promise<T>
 
   /**
    * Perform update of document/embedded document inside document.
