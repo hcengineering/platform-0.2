@@ -13,29 +13,19 @@
 // limitations under the License.
 //
 
-import { Ref, Class, Doc, AnyLayout, Mixin, Obj } from '@anticrm/core'
-import type { VDoc } from '@anticrm/domains'
 import { Platform } from '@anticrm/platform'
 import { getContext } from 'svelte'
-import core, { CoreService, QueryResult } from '@anticrm/platform-core'
-import { UIService, CONTEXT_PLATFORM, CONTEXT_PLATFORM_UI, AnyComponent } from '@anticrm/platform-ui'
-import presentation, { PresentationService, ComponentExtension } from '@anticrm/presentation'
+import core, { CoreService } from '@anticrm/platform-core'
+import { CONTEXT_PLATFORM, CONTEXT_PLATFORM_UI, UIService } from '@anticrm/platform-ui'
+import presentation, { PresentationService } from '@anticrm/presentation'
 
 export function getUIService (): UIService {
   return getContext(CONTEXT_PLATFORM_UI) as UIService
 }
 
-export function getCoreService (): Promise<CoreService> {
+export function getCoreService (): CoreService {
   const platform = getContext(CONTEXT_PLATFORM) as Platform
-  return platform.getPlugin(core.id)
-}
-
-export function find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
-  return getCoreService().then(coreService => coreService.find(_class, query))
-}
-
-export function findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined> {
-  return getCoreService().then(coreService => coreService.findOne(_class, query))
+  return platform.getRunningPlugin(core.id)
 }
 
 export function getPresentationService (): Promise<PresentationService> {
@@ -43,16 +33,3 @@ export function getPresentationService (): Promise<PresentationService> {
   return platform.getPlugin(presentation.id)
 }
 
-export function getComponentExtension (_class: Ref<Class<Obj>>, extension: Ref<Mixin<ComponentExtension<VDoc>>>): Promise<AnyComponent> {
-  return getPresentationService().then(service => service.getComponentExtension(_class, extension))
-}
-
-export function query<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout, f: (docs: T[]) => void): () => void {
-  let unsubscribe: () => void
-  function subscribe (queryResult: QueryResult<T>) {
-    if (unsubscribe) unsubscribe()
-    unsubscribe = queryResult.subscribe(f)
-  }
-  getCoreService().then(service => service.query(_class, query)).then(queryResult => subscribe(queryResult))
-  return () => { unsubscribe() }
-}

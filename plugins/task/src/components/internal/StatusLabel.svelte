@@ -4,10 +4,22 @@
   export const color: string = ''
   export const style: string = ''
 
-  const status: Array = [{ text: 'К исполнению', color: 'var(--status-blue-color)'},
-                         { text: 'В работе', color: 'var(--status-green-color)'},
-                         { text: 'Сделано', color: 'var(--status-grey-color)'},
-                         { text: 'Просрочено', color: 'var(--status-maroon-color)'}]
+  const status = [{
+    text: 'К исполнению',
+    color: 'var(--status-blue-color)'
+  },
+    {
+      text: 'В работе',
+      color: 'var(--status-green-color)'
+    },
+    {
+      text: 'Сделано',
+      color: 'var(--status-grey-color)'
+    },
+    {
+      text: 'Просрочено',
+      color: 'var(--status-maroon-color)'
+    }]
   let textOut: string = ''
   let colorOut: string = 'var(--status-grey-color)'
   if ((type >= 0) && (type <= status.length - 1)) {

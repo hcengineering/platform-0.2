@@ -13,32 +13,36 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { Class, Doc, Ref } from '@anticrm/core'
-  import { createEventDispatcher } from 'svelte'
-  import { AnyComponent, getPlatform } from '@anticrm/platform-ui'
-  import presentation, { AttrModel, ClassModel } from '@anticrm/presentation'
-  import { _getCoreService, _getPresentationService, getComponentExtension } from '../../utils'
+  import { Ref, Class, Doc } from '@anticrm/core'
+  import { createEventDispatcher, onMount } from 'svelte'
+  import { AnyComponent } from '@anticrm/platform-ui'
+  import presentation, { getComponentExtension } from '@anticrm/presentation'
+  import { AttrModel, ClassModel } from '@anticrm/presentation'
+
+  import AttributeEditor from '@anticrm/presentation/src/components/AttributeEditor.svelte'
   import Properties from '@anticrm/presentation/src/components/internal/Properties.svelte'
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
+  import UserBox from '@anticrm/platform-ui/src/components/UserBox.svelte'
   import workbench from '@anticrm/workbench'
+  import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
   import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.svelte'
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
   import { CORE_CLASS_VDOC, Space } from '@anticrm/domains'
-  import Component from '../../../../platform-ui/src/components/Component.svelte'
+  import { getCoreService, getPresentationService } from '../../utils'
 
-  export let title: string = ''
+  export let title: string
   export let _class: Ref<Class<Doc>>
   export let space: Ref<Space>
   let object = {} as any
 
-  let createFormComponent: AnyComponent | undefined = undefined
-  const coreService = _getCoreService()
+  let createFormComponent: AnyComponent
+  const coreService = getCoreService()
   const dispatch = createEventDispatcher()
 
   let model: ClassModel | undefined
   let primary: AttrModel | undefined
 
-  const presentationService = _getPresentationService()
+  const presentationService = getPresentationService()
 
   function save () {
     const doc = {
@@ -53,15 +57,33 @@
   }
 
   const init = Promise.all([
-    getComponentExtension(_class, presentation.class.CreateForm).then((ext) => {
-      console.log('Found createForm: ', ext)
-      createFormComponent = ext
-    }),
-    presentationService.getClassModel(_class, CORE_CLASS_VDOC).then((m) => {
+    presentationService.then(ps => ps.getClassModel(_class, CORE_CLASS_VDOC)).then((m) => {
       const mp = m.filterPrimary()
       model = mp.model
       primary = mp.primary
-    })])
+    })
+  ])
+
+  let users: Array<{}> = [{
+    id: 0,
+    url: 'https://platform.exhale24.ru/images/photo-1.png',
+    name: 'Александр Алексеенко'
+  },
+    {
+      id: 1,
+      url: 'https://platform.exhale24.ru/images/photo-2.png',
+      name: 'Андрей Платов'
+    },
+    {
+      id: 2,
+      url: 'https://platform.exhale24.ru/images/photo-3.png',
+      name: 'Сергей Буевич'
+    },
+    {
+      id: 3,
+      url: 'https://platform.exhale24.ru/images/photo-4.png',
+      name: 'Андрей Соболев'
+    }]
 </script>
 
 <style lang="scss">
@@ -131,28 +153,28 @@
   }
 </style>
 
-{#await init then _}
-  {#if createFormComponent}
-    <Component is={createFormComponent} {object} on:change on:close={()=>dispatch('close')} />
-  {:else}
-    <div class="recruiting-view">
-      <div class="header">
-        <div class="caption-1 caption">
-          <InlineEdit bind:value={title} placeholder="Title" fullWidth="true" />
-        </div>
-        <a href="/" style="margin-left:1.5em" on:click|preventDefault={() => dispatch('close')}>
-          <Icon icon={workbench.icon.Close} button="true" />
-        </a>
-      </div>
-
-      <div class="content">
-        <Properties {model} bind:object />
-      </div>
-      <div class="buttons">
-        <Button kind="primary" on:click={save}>Принять</Button>
-        <Button on:click={() => dispatch('close')}>Отказаться</Button>
-      </div>
+<div class="recruiting-view">
+  <div class="header">
+    <div class="caption-1 caption">
+      <InlineEdit bind:value={title} placeholder="Name" fullWidth="true" />
     </div>
-  {/if}
-{/await}
+    <a href="/" style="margin-left:1.5em" on:click|preventDefault={() => dispatch('close')}>
+      <Icon icon={workbench.icon.Close} button="true" />
+    </a>
+  </div>
+
+  <div class="content">
+    <div class="taskLabel">
+      DT-925
+    </div>
+    <UserBox items={users} />
+    <div class="separator"></div>
+    <ReferenceInput stylesEnabled="true" />
+  </div>
+
+  <div class="buttons">
+    <Button kind="primary" on:click={save}>Принять</Button>
+    <Button on:click={() => dispatch('close')}>Отказаться</Button>
+  </div>
+</div>
 

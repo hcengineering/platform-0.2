@@ -1,4 +1,4 @@
-<script type='ts'>
+<script type="ts">
   // Copyright © 2020 Anticrm Platform Contributors.
   //
   // Licensed under the Eclipse Public License, Version 2.0 (the "License");
@@ -12,28 +12,23 @@
   // See the License for the specific language governing permissions and
   // limitations under the License.
   import { onDestroy } from 'svelte'
-  import { Ref, Class, Obj } from '@anticrm/core'
-  import { Reference, CORE_CLASS_VDOC, CORE_CLASS_REFERENCE } from '@anticrm/domains'
-  import task, { Task } from '../..'
-  import { getPresentationService, find, query } from '../../utils'
+  import { Class, Obj, Ref } from '@anticrm/core'
+  import { CORE_CLASS_REFERENCE, CORE_CLASS_VDOC, Reference } from '@anticrm/domains'
+  import { Task } from '../..'
+  import { getCoreService, getPresentationService } from '../../utils'
   import { AttrModel, ClassModel } from '@anticrm/presentation'
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
   import UserInfo from '@anticrm/sparkling-controls/src/UserInfo.svelte'
   import StatusLabel from './StatusLabel.svelte'
-  import PopupMenu from '@anticrm/sparkling-controls/src/menu/PopupMenu.svelte'
-  import PopupItem from '@anticrm/sparkling-controls/src/menu/PopupItem.svelte'
-  import Button from '@anticrm/sparkling-controls/src/Button.svelte'
-  import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import ActionBar, { Action } from '@anticrm/platform-ui/src/components/ActionBar.svelte'
-
-  import Properties from '@anticrm/presentation/src/components/internal/Properties.svelte'
-  import AttributeEditor from '@anticrm/presentation/src/components/AttributeEditor.svelte'
 
   export let _class: Ref<Class<Obj>>
   export let object: Task
 
   let model: ClassModel | undefined
   let title: AttrModel | undefined
+
+  const coreService = getCoreService()
 
   $: getPresentationService()
     .then((service) => service.getClassModel(_class, CORE_CLASS_VDOC))
@@ -43,28 +38,52 @@
     })
 
   let backlinks: Reference[]
-  let unsubscribe: () => void
-  $: {
-    if (unsubscribe) {
-      unsubscribe()
+
+  coreService.subscribe(CORE_CLASS_REFERENCE, { _targetId: object._id }, (docs) => {
+    backlinks = docs
+  }, onDestroy)
+
+  let actions: Action[] = []
+  actions.push({
+    name: 'Выполнено',
+    action: () => {
+      alert('Выполнено')
     }
-    unsubscribe = query(CORE_CLASS_REFERENCE, { _targetId: object._id }, (docs) => {
-      backlinks = docs
-    })
-  }
-
-  onDestroy(() => {
-    if (unsubscribe) unsubscribe()
   })
-
-  let actions: Array<Action> = []
-  actions.push({ name: 'Выполнено', action: () => { alert('Выполнено') } })
-  actions.push({ name: 'В работе', action: () => { alert('В работе') } })
-  actions.push({ name: 'Произвольный статус', action: () => { alert('Произвольный статус') } })
-  actions.push({ name: 'Назначить исполнителя', action: () => { alert('Назначить исполнителя') } })
-  actions.push({ name: 'Назначить наблюдателя', action: () => { alert('Назначить наблюдателя') } })
-  actions.push({ name: '-', action: undefined })
-  actions.push({ name: 'Закрыть задачу', action: () => { alert('Закрыть задачу') } })
+  actions.push({
+    name: 'В работе',
+    action: () => {
+      alert('В работе')
+    }
+  })
+  actions.push({
+    name: 'Произвольный статус',
+    action: () => {
+      alert('Произвольный статус')
+    }
+  })
+  actions.push({
+    name: 'Назначить исполнителя',
+    action: () => {
+      alert('Назначить исполнителя')
+    }
+  })
+  actions.push({
+    name: 'Назначить наблюдателя',
+    action: () => {
+      alert('Назначить наблюдателя')
+    }
+  })
+  actions.push({
+    name: '-',
+    action: undefined
+  })
+  actions.push({
+    name: 'Закрыть задачу',
+    action: () => {
+      alert('Закрыть задачу')
+    }
+  })
 </script>
 
 {#if model && title}
@@ -85,21 +104,21 @@
     <div>{JSON.stringify(backlink)}</div>
   {/each} -->
 
-  <div class='taskContent'>
-    <div class='caption caption-1'>
+  <div class="taskContent">
+    <div class="caption caption-1">
       {object.title}
     </div>
-    <div class='taskStatusBar'>
-      <div class='taskName'>DT-140</div>
-      <StatusLabel type='1' />
+    <div class="taskStatusBar">
+      <div class="taskName">DT-140</div>
+      <StatusLabel type="1" />
     </div>
-    <div class='created'>
-      <UserInfo url='https://platform.exhale24.ru/images/photo-1.png'
-                title='Александр Алексеенко' />
-      <div class='createdOn'>30.11.20, 15:30</div>
+    <div class="created">
+      <UserInfo url="https://platform.exhale24.ru/images/photo-1.png"
+                title="Александр Алексеенко" />
+      <div class="createdOn">30.11.20, 15:30</div>
     </div>
-    <UserInfo url='https://platform.exhale24.ru/images/photo-2.png'
-              title='Андрей Платов' subtitle='Исполнитель' />
+    <UserInfo url="https://platform.exhale24.ru/images/photo-2.png"
+              title="Андрей Платов" subtitle="Исполнитель" />
 
     <!-- <div class="actionBar">
       <Button className="actionButtonLeft w40">Выполнено</Button>
@@ -115,16 +134,16 @@
       </PopupMenu>
     </div> -->
 
-    <ActionBar onTop='2' {actions} />
+    <ActionBar onTop="2" {actions} />
 
-    <div class='description'>
+    <div class="description">
       <p>Привет!</p>
       <p>Просим отрисовать дизайн писем для опроса о качестве сервиса. Текст письма можно скопировать по ссылке (внизу
         страницы), также прилагаю скриншоты.</p>
       <p>Для физического лица</p>
-      <ul class='files'>
-        <li><a href='/'>interfaceRpcErrors.docx</a></li>
-        <li><a href='/'>interfaceRpcErrors..docx</a></li>
+      <ul class="files">
+        <li><a href="/">interfaceRpcErrors.docx</a></li>
+        <li><a href="/">interfaceRpcErrors..docx</a></li>
       </ul>
     </div>
 
@@ -133,7 +152,7 @@
 
 {/if}
 
-<style lang='scss'>
+<style lang="scss">
   .taskContent {
     display: flex;
     flex-direction: column;
