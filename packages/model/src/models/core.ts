@@ -89,7 +89,7 @@ export class TArrayOf extends TType implements ArrayOf {
   @Prop() of!: Type
 }
 
-@Mixin$(core.mixin.Indices, core.class.Class)
+@Mixin$(core.mixin.Indices, core.class.Mixin)
 export class TIndexesClass<T extends Doc> extends TMixin<T> implements Indices {
   @Prop() primary!: StringProperty
 }

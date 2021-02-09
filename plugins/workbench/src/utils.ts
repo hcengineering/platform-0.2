@@ -53,7 +53,7 @@ export function _getPresentationService (): PresentationService {
   return platform.getRunningPlugin(presentation.id)
 }
 
-export function getComponentExtension (_class: Ref<Class<Obj>>, extension: Ref<Mixin<ComponentExtension<VDoc>>>): Promise<AnyComponent> {
+export function getComponentExtension (_class: Ref<Class<Obj>>, extension: Ref<Mixin<ComponentExtension<VDoc>>>): Promise<AnyComponent | undefined> {
   return getPresentationService().then(service => service.getComponentExtension(_class, extension))
 }
 

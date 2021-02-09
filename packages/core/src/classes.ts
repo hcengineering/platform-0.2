@@ -69,7 +69,8 @@ export interface EClassifier<T extends E, E extends Obj> extends Doc {
 
 export type Classifier<T extends Obj> = EClassifier<T, Obj>
 
-export interface EMixin<T extends E, E extends Obj> extends EClass<T, E> { }
+export interface EMixin<T extends E, E extends Obj> extends EClass<T, E> {
+}
 
 export type Mixin<T extends Obj> = EMixin<T, Obj>
 
@@ -100,7 +101,7 @@ export interface ArrayOf extends Type {
 
 ///
 
-export interface Indices extends Class<Doc> {
+export interface Indices extends Mixin<Doc> {
   primary: StringProperty
 }
 

@@ -18,7 +18,7 @@ import { Attribute, Class, Obj, Ref, Type, Doc, Mixin } from '@anticrm/core'
 import { VDoc } from '@anticrm/domains'
 import ui, { AttrModel, ClassModel, GroupModel, PresentationService, ComponentExtension, UXObject } from '.'
 import { CoreService } from '@anticrm/platform-core'
-import vue, { AnyComponent, Asset } from '@anticrm/platform-ui'
+import { AnyComponent, Asset } from '@anticrm/platform-ui'
 import { I18n } from '@anticrm/platform-i18n'
 
 import ObjectBrowser from './components/internal/ObjectBrowser.svelte'
@@ -262,7 +262,7 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
     return new TClassModel(groups, attributes)
   }
 
-  function getComponentExtension (_class: Ref<Class<Obj>>, extension: Ref<Mixin<ComponentExtension<VDoc>>>): AnyComponent {
+  function getComponentExtension (_class: Ref<Class<Obj>>, extension: Ref<Mixin<ComponentExtension<VDoc>>>): AnyComponent | undefined {
     const model = coreService.getModel()
     while (_class) {
       const clazz = model.get(_class) as Class<VDoc>
@@ -274,7 +274,7 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
       }
     }
     console.log('ERROR: detail form not mixed in: ', _class)
-    return vue.component.BadComponent
+    return undefined
   }
 
   return {

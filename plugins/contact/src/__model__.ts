@@ -18,7 +18,7 @@ import { Class, Ref, Property } from '@anticrm/core'
 import { Space } from '@anticrm/domains'
 import _contact, { Contact, Person, User } from '.'
 import { IntlString } from '@anticrm/platform-i18n'
-import { TVDoc } from '@anticrm/model/src/__model__'
+import { TMixin, TVDoc } from '@anticrm/model/src/__model__'
 import { UX } from '@anticrm/presentation/src/__model__'
 import presentation from '@anticrm/presentation'
 
@@ -54,7 +54,7 @@ export class TPerson extends TContact implements Person {
 }
 
 @Mixin$(contact.mixin.User, contact.class.Person)
-class TUser extends TPerson implements User {
+export class TUser extends TPerson implements User {
   @Prop() @UX('Аккаунт' as IntlString) account!: string
 }
 

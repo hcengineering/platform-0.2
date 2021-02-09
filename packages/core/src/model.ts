@@ -33,7 +33,7 @@ import {
 } from './classes'
 import { Storage, TxContext, generateId } from './storage'
 
-export function mixinKey (mixin: Ref<Mixin<Doc>>, key: string): string {
+export function mixinKey (mixin: Ref<Mixin<Obj>>, key: string): string {
   return key + '|' + mixin.replace('.', '~')
 }
 
@@ -95,7 +95,16 @@ export class Model implements Storage {
     this.objects.set(id, doc)
   }
 
-  private index (doc: Doc) {
+  private unset (id: Ref<Doc>): Doc {
+    const result = this.objects.get(id)
+    if (!result) {
+      throw new Error('document is not found ' + id)
+    }
+    this.objects.delete(id)
+    return result
+  }
+
+  private index (doc: Doc, add = true) {
     if (this.byClass === null) {
       throw new Error('index not created')
     }
@@ -105,7 +114,12 @@ export class Model implements Storage {
       const cls = _class as Ref<Class<Doc>>
       const list = byClass.get(cls)
       if (list) {
-        list.push(doc)
+        if (add) {
+          list.push(doc)
+        } else {
+          // Replace without our document
+          byClass.set(cls, list.filter((dd) => dd._id !== doc._id))
+        }
       } else {
         byClass.set(cls, [doc])
       }
@@ -115,6 +129,11 @@ export class Model implements Storage {
   add (doc: Doc): void {
     this.set(doc)
     if (this.byClass) this.index(doc)
+  }
+
+  del (id: Ref<Doc>): void {
+    const doc = this.unset(id)
+    if (this.byClass) this.index(doc, false)
   }
 
   get (id: Ref<Doc>): Doc {
