@@ -14,7 +14,9 @@
 //
 
 import { Platform } from '@anticrm/platform'
-import { Attribute, Class, Obj, Ref, Type, Doc, Mixin } from '@anticrm/core'
+import {
+  Attribute, Class, Obj, Ref, Type, Doc, Mixin, CORE_CLASS_ARRAY_OF, CORE_CLASS_INSTANCE_OF
+} from '@anticrm/core'
 import { VDoc } from '@anticrm/domains'
 import ui, { AttrModel, ClassModel, GroupModel, PresentationService, ComponentExtension, UXObject } from '.'
 import { CoreService } from '@anticrm/platform-core'

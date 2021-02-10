@@ -64,7 +64,6 @@ export default async (platform: Platform, deps: { ui: UIService }): Promise<Logi
         return toStatus(result)
       }
       if (result.result) {
-        console.log('result', result.result)
         setLoginInfo(result.result)
         uiService.navigate(
           '/component:workbench.Workbench/application:workbench.Default'

@@ -28,7 +28,7 @@
     message = docs[0] as Message
   }, onDestroy)
 
-  $: qs({ _id: backlink._sourceId })
+  $: qs(backlink._sourceClass, { _id: backlink._sourceId })
 </script>
 
 {#if message && message.comments && message.comments.length > backlink._sourceProps.pos}

@@ -19,7 +19,7 @@
 
   import Properties from '@anticrm/presentation/src/components/internal/Properties.svelte'
   import AttributeEditor from '@anticrm/presentation/src/components/AttributeEditor.svelte'
-  import Comments from './Comments.svelte'
+  import Comments from '../Comments.svelte'
   import { CORE_CLASS_VDOC } from '@anticrm/domains'
 
   export let _class: Ref<Class<Obj>>

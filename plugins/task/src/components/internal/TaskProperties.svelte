@@ -14,143 +14,97 @@
   import { onDestroy } from 'svelte'
   import { Class, Obj, Ref } from '@anticrm/core'
   import { CORE_CLASS_REFERENCE, CORE_CLASS_VDOC, Reference } from '@anticrm/domains'
-  import { Task } from '../..'
+  import task, { Task, TaskFieldType, TaskFieldValue } from '../..'
   import { getCoreService, getPresentationService } from '../../utils'
   import { AttrModel, ClassModel } from '@anticrm/presentation'
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
   import UserInfo from '@anticrm/sparkling-controls/src/UserInfo.svelte'
   import StatusLabel from './StatusLabel.svelte'
-  import ActionBar, { Action } from '@anticrm/platform-ui/src/components/ActionBar.svelte'
+  import ActionBar from '@anticrm/platform-ui/src/components/ActionBar.svelte'
+  import { Action } from '@anticrm/platform-ui/src/components/actions'
+  import Comments from '@anticrm/chunter/src/components/Comments.svelte'
+  import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.svelte'
 
   export let _class: Ref<Class<Obj>>
   export let object: Task
 
-  let model: ClassModel | undefined
-  let title: AttrModel | undefined
-
   const coreService = getCoreService()
 
-  $: getPresentationService()
-    .then((service) => service.getClassModel(_class, CORE_CLASS_VDOC))
-    .then((m) => {
-      title = m.getAttribute('title')
-      model = m.filterAttributes(['title'])
-    })
+  let fieldValues: Map<TaskFieldType, TaskFieldValue[]> = new Map()
 
-  let backlinks: Reference[]
+  let status: TaskFieldValue | undefined
 
-  coreService.subscribe(CORE_CLASS_REFERENCE, { _targetId: object._id }, (docs) => {
-    backlinks = docs
+  // Load and subscribe to any task status values.
+  coreService.subscribe(task.class.TaskFieldValue, {}, (docs) => {
+    const fValues: Map<TaskFieldType, TaskFieldValue[]> = new Map()
+    for (const d of docs) {
+      let val = fValues.get(d.type)
+      if (!val) {
+        val = []
+        fValues.set(d.type, val)
+      }
+      val.push(d)
+    }
+    fieldValues = fValues
   }, onDestroy)
 
-  let actions: Action[] = []
-  actions.push({
-    name: 'Выполнено',
-    action: () => {
-      alert('Выполнено')
+  let statusActions: Action[] = []
+
+  $: {
+    let sv = fieldValues.get(TaskFieldType.Status) || []
+    let acts: Action[] = []
+    for (const s of sv) {
+      if (!status) {
+        status = s
+      }
+      if (object.status === s._id) {
+        status = s
+      }
+      if (object.status !== s._id) {
+        acts.push({
+          name: s.action,
+          action: () => {
+            coreService.update(object, null, { status: s._id })
+          }
+        })
+      }
     }
-  })
-  actions.push({
-    name: 'В работе',
-    action: () => {
-      alert('В работе')
-    }
-  })
-  actions.push({
-    name: 'Произвольный статус',
-    action: () => {
-      alert('Произвольный статус')
-    }
-  })
-  actions.push({
-    name: 'Назначить исполнителя',
-    action: () => {
-      alert('Назначить исполнителя')
-    }
-  })
-  actions.push({
-    name: 'Назначить наблюдателя',
-    action: () => {
-      alert('Назначить наблюдателя')
-    }
-  })
-  actions.push({
-    name: '-',
-    action: undefined
-  })
-  actions.push({
-    name: 'Закрыть задачу',
-    action: () => {
-      alert('Закрыть задачу')
-    }
-  })
+    statusActions = acts
+  }
 </script>
 
-{#if model && title}
-
-  <!-- <div> -->
-  <!--<StringPresenter class="caption-1" :attribute="name" v-model="object[name.key]" />-->
-  <!-- <div class="caption-1">
-    <AttributeEditor attribute={title} bind:value={object.title} />
+<div class="taskContent">
+  <div class="caption caption-1">
+    <InlineEdit id="create_task__input__name" bind:value={object.title} width="100%"
+                label="Name" placeholder="Name"
+                on:change={() => {coreService.update(object, null, {title: object.title})}} />
   </div>
-</div> -->
-
-  <!-- <Properties _class={task.class.Task} excludeAttributes={['title']} /> -->
-  <!-- <Properties {model} bind:object />
-
-  <div class="caption-2">Backlinks</div>
-
-  {#each backlinks as backlink (backlink._id)}
-    <div>{JSON.stringify(backlink)}</div>
-  {/each} -->
-
-  <div class="taskContent">
-    <div class="caption caption-1">
-      {object.title}
-    </div>
-    <div class="taskStatusBar">
-      <div class="taskName">DT-140</div>
-      <StatusLabel type="1" />
-    </div>
-    <div class="created">
-      <UserInfo url="https://platform.exhale24.ru/images/photo-1.png"
-                title="Александр Алексеенко" />
-      <div class="createdOn">30.11.20, 15:30</div>
-    </div>
-    <UserInfo url="https://platform.exhale24.ru/images/photo-2.png"
-              title="Андрей Платов" subtitle="Исполнитель" />
-
-    <!-- <div class="actionBar">
-      <Button className="actionButtonLeft w40">Выполнено</Button>
-      <Button className="actionButtonCenter w40">В работе</Button>
-      <PopupMenu buttonClass='actionButtonRight w20'>
-        <span class='popup' slot='trigger'>
-          Ещё <Icon icon={task.icon.ArrowDown} />
-        </span>
-        <PopupItem>Action 3</PopupItem>
-        <PopupItem>Action 4</PopupItem>
-        <PopupItem>Action 5</PopupItem>
-        <PopupItem>Action 6</PopupItem>
-      </PopupMenu>
-    </div> -->
-
-    <ActionBar onTop="2" {actions} />
-
-    <div class="description">
-      <p>Привет!</p>
-      <p>Просим отрисовать дизайн писем для опроса о качестве сервиса. Текст письма можно скопировать по ссылке (внизу
-        страницы), также прилагаю скриншоты.</p>
-      <p>Для физического лица</p>
-      <ul class="files">
-        <li><a href="/">interfaceRpcErrors.docx</a></li>
-        <li><a href="/">interfaceRpcErrors..docx</a></li>
-      </ul>
-    </div>
-
-    <ReferenceInput />
+  <div class="taskStatusBar">
+    <div class="taskName">DT-140</div>
+    {#if status}
+      <StatusLabel text={status.title} color={status.color} />
+    {/if}
   </div>
+  <div class="created">
+    <UserInfo url="https://platform.exhale24.ru/images/photo-1.png"
+              title="Александр Алексеенко" />
+    <div class="createdOn">30.11.20, 15:30</div>
+  </div>
+  <UserInfo url="https://platform.exhale24.ru/images/photo-2.png"
+            title="Андрей Платов" subtitle="Исполнитель" />
 
-{/if}
+  {#if statusActions.length > 0 }
+    <ActionBar onTop="2" actions={statusActions} />
+  {/if}
+
+  <div class="description">
+    <Comments {object} />
+    <ul class="files">
+      <li><a href="/">interfaceRpcErrors.docx</a></li>
+      <li><a href="/">interfaceRpcErrors..docx</a></li>
+    </ul>
+  </div>
+</div>
 
 <style lang="scss">
   .taskContent {

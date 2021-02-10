@@ -42,8 +42,10 @@ export interface TaskFieldValue extends Doc {
 
   type: TaskFieldType // A type to filter faster
   title: string // A title to be displayed for user
+  action: string // A action title, to perform switch to this state.
   description?: string // A description could be used to show
   icon?: Asset // Icon to display if suitable
+  color?: Asset // Define a item color if appropriate
 }
 
 /**
@@ -97,6 +99,9 @@ export interface WorkLog extends Emb {
 export interface Task extends Collab {
   title: StringProperty
 
+  // Define a status field
+  status: Ref<TaskFieldValue>
+
   // A current assignee user
   assignee?: Ref<User>[]
 
@@ -108,9 +113,6 @@ export interface Task extends Collab {
 
   // A list of watch users, they will be notified about task status changes according.
   // watchers: Ref<User>[]
-
-  // Define a status field
-  status: Ref<TaskFieldValue>
 }
 
 /**
@@ -151,6 +153,8 @@ export interface VersionedTask extends Task {
 
 export interface TaskService extends Service {
 }
+
+export const TASK_STATUS_OPEN = 'task:status.Open' as Ref<TaskFieldValue>
 
 export default plugin('task' as Plugin<TaskService>, {}, {
   icon: {

@@ -18,7 +18,7 @@ import task, { TaskService } from '.'
 
 import TaskProperties from './components/internal/TaskProperties.svelte'
 import TaskInfo from './components/internal/TaskInfo.svelte'
-import CreateForm from './components/internal/CreateForm.svelte'
+import CreateForm from './components/internal/NewTaskForm.svelte'
 
 /*!
  * Anticrm Platform™ Task Plugin

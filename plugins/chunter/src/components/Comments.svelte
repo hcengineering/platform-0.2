@@ -1,4 +1,4 @@
-<script lang='ts'>
+<script lang="ts">
   // Copyright © 2020 Anticrm Platform Contributors.
   //
   // Licensed under the Eclipse Public License, Version 2.0 (the "License");
@@ -13,13 +13,14 @@
   // limitations under the License.
   import { onDestroy } from 'svelte'
   import { Ref, Class, Doc, Property, Emb, StringProperty } from '@anticrm/core'
-  import chunter, { Collab, Comment } from '../..'
+  import chunter, { Collab, Comment } from '../index'
   import { getCoreService, getService } from '@anticrm/platform-ui'
 
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
-  import CommentComponent from './Comment.svelte'
-  import Backlink from './Backlink.svelte'
+  import CommentComponent from './internal/Comment.svelte'
+  import Backlink from './internal/Backlink.svelte'
   import { Reference, CORE_CLASS_REFERENCE } from '@anticrm/domains'
+  import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
 
   export let object: Collab
 
@@ -29,14 +30,9 @@
     references = docs
   }, onDestroy)
 
-  const oS = getCoreService().subscribe(object._class, { _id: object._id }, (docs) => {
-    object = docs[0] as Collab
-  }, onDestroy)
-
   $: {
     if (object) {
-      refS({ _targetId: object._id })
-      oS({ _id: object._id })
+      refS(CORE_CLASS_REFERENCE, { _targetId: object._id })
     }
   }
 
@@ -55,17 +51,23 @@
   }
 </script>
 
-<div class='caption-2'>Comments</div>
+{#if references.length > 0 }
+  <div class="caption-2">References</div>
+  {#each references as ref}
+    <!-- <Backlink {backlink} /> -->
+    <Backlink backlink={ref} />
+  {/each}
+{/if}
 
-{#each object.comments || [] as comment}
-  <CommentComponent message={comment} />
-{/each}
+<div class="caption-2">Comments</div>
+
+{#if object && object.comments}
+  <ScrollView width="100%" height="20em" accentColor="true">
+  {#each object.comments || [] as comment}
+    <CommentComponent message={comment} />
+  {/each}
+  </ScrollView>
+{/if}
 
 <ReferenceInput on:message={(e) => createComment(e.detail)} />
 
-<div class='caption-2'>Backlinks</div>
-
-{#each references as ref}
-  <!-- <Backlink {backlink} /> -->
-  <Backlink backlink={ref} />
-{/each}

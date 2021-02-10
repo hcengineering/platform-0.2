@@ -13,16 +13,11 @@
 // limitations under the License.
 //
 
-import core, { extendIds, Class$, Prop, Builder, Primary, InstanceOf$, ArrayOf$, RefTo$, Mixin$ } from '@anticrm/model'
+import core, { ArrayOf$, Builder, Class$, extendIds, InstanceOf$, Mixin$, Primary, Prop, RefTo$ } from '@anticrm/model'
 import _task, {
-  PrioritizedTask,
-  Task,
-  TaskFieldType,
-  TaskFieldValue,
-  TaskLink,
-  TaskLinkType, TaskTimeDuration, TimeManagedTask,
-  TypedTask,
-  VersionedTask, WorkLog
+  PrioritizedTask, Task, TASK_STATUS_OPEN, TaskFieldType, TaskFieldValue, TaskLink, TaskLinkType, TaskTimeDuration,
+  TimeManagedTask,
+  TypedTask, VersionedTask, WorkLog
 } from '.'
 import { IntlString } from '@anticrm/platform-i18n'
 import { User } from '@anticrm/contact'
@@ -32,7 +27,7 @@ import workbench from '@anticrm/workbench/src/__model__'
 import chunter, { TCollab } from '@anticrm/chunter/src/__model__'
 import { DateProperty, Ref, StringProperty } from '@anticrm/core'
 import { Application, Space } from '@anticrm/domains'
-import { TDoc, TMixin, TVDoc } from '@anticrm/model/src/__model__'
+import { TDoc, TVDoc } from '@anticrm/model/src/__model__'
 import contact from '@anticrm/contact/src/__model__'
 import { Asset } from '@anticrm/platform-ui'
 
@@ -56,6 +51,14 @@ const task = extendIds(_task, {
     Task_completeDue: '' as IntlString,
     Task_fixVersion: '' as IntlString,
     Task_affectsVersion: '' as IntlString
+  },
+  status: {
+    Open: TASK_STATUS_OPEN,
+    ReOpened: '' as Ref<TaskFieldValue>,
+    InProgress: '' as Ref<TaskFieldValue>,
+    UnderReview: '' as Ref<TaskFieldValue>,
+    Resolved: '' as Ref<TaskFieldValue>,
+    Closed: '' as Ref<TaskFieldValue>
   }
 })
 
@@ -67,8 +70,10 @@ export class TTaskFieldValue extends TDoc implements TaskFieldValue {
 
   @Prop() type!: TaskFieldType
   @Prop() title!: string
+  @Prop() action!: string
   @Prop() description?: string
   @Prop() icon?: Asset
+  @Prop() color?: Asset
 }
 
 @Class$(task.class.TaskLink, core.class.VDoc, DOMAIN_TASK)
@@ -145,7 +150,7 @@ class TVersionedTask extends TTask implements VersionedTask {
 }
 
 export function model (S: Builder): void {
-  S.add(TTask)
+  S.add(TTask, TTaskFieldValue, TTaskLink)
   S.add(TTypeTask, TPrioritizedTask, TVersionedTask, TTimeManagedTask)
 
   S.createDocument(workbench.class.WorkbenchApplication, {
@@ -166,4 +171,52 @@ export function model (S: Builder): void {
   S.mixin(task.class.Task, chunter.mixin.ActivityInfo, {
     component: task.component.TaskInfo
   })
+
+  // Define some task default styles
+  const statuses = [
+    {
+      id: task.status.Open,
+      title: 'Open',
+      action: 'Open',
+      description: 'Task is ready to be started',
+      color: ''
+    },
+    {
+      id: task.status.Closed,
+      title: 'Closed',
+      action: 'Close',
+      description: 'Task is complete and verified',
+      color: 'var(--status-red-color)'
+    },
+    {
+      id: task.status.InProgress,
+      title: 'In progress',
+      action: 'Start progress',
+      description: 'Work on task are started',
+      color: 'var(--status-blue-color)'
+    },
+    {
+      id: task.status.UnderReview,
+      title: 'Under review',
+      action: 'Begin review',
+      description: 'Task is being reviewed',
+      color: 'var(--status-orange-color)'
+    },
+    {
+      id: task.status.Resolved,
+      title: 'Resolved',
+      action: 'Resolve',
+      description: 'Work on task are complete, but verifcation are required',
+      color: 'var(--status-grey-color)'
+    }
+  ]
+  for (const s of statuses) {
+    S.createDocument(task.class.TaskFieldValue, {
+      type: TaskFieldType.Status,
+      title: s.title,
+      action: s.action,
+      description: s.description,
+      color: s.color
+    } as TaskFieldValue, s.id)
+  }
 }

@@ -16,7 +16,7 @@
 import { Platform } from '@anticrm/platform'
 import { ModelDb } from './modeldb'
 
-import { CoreService, QueryResult, RefFinalizer } from '.'
+import { CoreService, QueryResult, RefFinalizer, Unsubscriber } from '.'
 import login from '@anticrm/login'
 import rpcService, { EventType } from './rpc'
 
@@ -125,23 +125,29 @@ export default async (platform: Platform): Promise<CoreService> => {
     return qCache.query(_class, query)
   }
 
-  function subscribe<T extends Doc> (_class: Ref<Class<T>>, _query: AnyLayout, action: (docs: T[]) => void, regFinalizer: RefFinalizer): (query: AnyLayout) => void {
-    let oldQuery = _query
-    const q = query(_class, _query)
-    let unsubscriber = q.subscribe(action)
+  function subscribe<T extends Doc> (_class: Ref<Class<T>>, _query: AnyLayout, action: (docs: T[]) => void, regFinalizer: RefFinalizer): (_class: Ref<Class<T>>, query: AnyLayout) => void {
+    let oldQuery: AnyLayout
+    let oldClass: Ref<Class<T>>
+    let unsubscriber: Unsubscriber
     regFinalizer(() => {
-      unsubscriber()
+      if (unsubscriber) {
+        unsubscriber()
+      }
     })
-    return (newQuery: AnyLayout) => {
-      if (JSON.stringify(oldQuery) === JSON.stringify(newQuery)) {
+    const result = (newClass: Ref<Class<T>>, newQuery: AnyLayout) => {
+      if (JSON.stringify(oldQuery) === JSON.stringify(newQuery) && oldClass === newClass) {
         return
       }
-      console.log('updateQuery', oldQuery, newQuery)
-      unsubscriber()
-      const q = query(_class, newQuery)
-      unsubscriber = q.subscribe(action)
+      if (unsubscriber) {
+        unsubscriber()
+      }
       oldQuery = newQuery
+      oldClass = newClass
+      const q = query(newClass, newQuery)
+      unsubscriber = q.subscribe(action)
     }
+    result(_class, _query)
+    return result
   }
 
   function generateId () {

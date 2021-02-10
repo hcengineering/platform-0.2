@@ -1,14 +1,14 @@
 <!--
 // Copyright © 2020 Anticrm Platform Contributors.
-// 
+//
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
 // obtain a copy of the License at https://www.eclipse.org/legal/epl-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// 
+//
 // See the License for the specific language governing permissions and
 // limitations under the License.
 -->
@@ -18,7 +18,7 @@
   import { Space } from '@anticrm/domains'
   import { QueryResult } from '@anticrm/platform-core'
   import { ClassModel } from '../..'
-  import { getCoreService, getPresentationService, getEmptyModel } from '../../utils'
+  import { getCoreService, getPresentationService, getEmptyModel, _getCoreService } from '../../utils'
   import { onDestroy } from 'svelte'
 
   export let _class: Ref<Class<Doc>>
@@ -32,21 +32,13 @@
     .then((m) => (model = m))
 
   let objects: any[] = []
-  let unsubscribe: () => void
 
-  function subscribe(qr: QueryResult<Doc>) {
-    if (unsubscribe) unsubscribe()
-    unsubscribe = qr.subscribe((docs) => {
-      objects = docs
-    })
-  }
+  const queryUpdate = _getCoreService().subscribe(_class, { _space: space }, (docs) => {
+    objects = docs
+  }, onDestroy)
 
-  $: getCoreService()
-    .then((c) => c.query(_class, { _space: space }))
-    .then((qr) => subscribe(qr))
-
-  onDestroy(() => {
-    if (unsubscribe) unsubscribe()
+  $: queryUpdate(_class, {
+    _space: space
   })
 </script>
 
