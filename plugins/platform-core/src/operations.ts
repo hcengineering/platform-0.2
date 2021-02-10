@@ -19,13 +19,13 @@ import { OperationProtocol } from '.'
 import { newCreateTx, newDeleteTx, newPushTx, newUpdateTx } from './tx'
 
 export function createOperations (model: Model, processTx: (tx: Tx) => Promise<any>, getUserId: () => StringProperty): OperationProtocol {
-  function create<T extends Doc> (_class: Ref<Class<T>>, values: AnyLayout): Promise<T> {
+  function create<T extends Doc> (_class: Ref<Class<T>>, values: AnyLayout | Doc): Promise<T> {
     const clazz = model.get(_class)
     if (clazz === undefined) {
       return Promise.reject(new Error('Class ' + _class + ' not found'))
     }
 
-    const doc = model.newDoc(_class, generateId(), values)
+    const doc = model.newDoc(_class, generateId(), (values as unknown) as AnyLayout)
 
     if (model.is(_class, CORE_CLASS_VDOC)) {
       const vdoc = (doc as unknown) as VDoc
@@ -40,9 +40,9 @@ export function createOperations (model: Model, processTx: (tx: Tx) => Promise<a
     return processTx(newCreateTx(doc, getUserId())).then(() => doc)
   }
 
-  function push<T extends Doc> (doc: Doc, query: AnyLayout | null, _attribute: StringProperty, element: AnyLayout): Promise<T> {
+  function push<T extends Doc> (doc: Doc, query: AnyLayout | null, _attribute: StringProperty, element: AnyLayout | Doc): Promise<T> {
     return processTx(
-      newPushTx(doc._class, doc._id, query || undefined, _attribute, element, getUserId())
+      newPushTx(doc._class, doc._id, query || undefined, _attribute, (element as unknown) as AnyLayout, getUserId())
     ).then(() => doc as T)
   }
 

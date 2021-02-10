@@ -92,7 +92,7 @@
     return doc._id as Ref<T>
   }
 
-  let details: { _id: Ref<VDoc>; _class: Ref<Class<VDoc>> }
+  let details: { _id: Ref<Doc>; _class: Ref<Class<Doc>> }
   let addButton: HTMLElement
 
   let hidden = true

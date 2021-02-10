@@ -11,66 +11,46 @@
   //
   // See the License for the specific language governing permissions and
   // limitations under the License.
-  import { Class, Ref, VDoc } from '@anticrm/core'
+  import { AnyLayout, Class, Doc, Ref } from '@anticrm/core'
   import { AnyComponent } from '@anticrm/platform-ui'
   import Component from '@anticrm/platform-ui/src/components/Component.svelte'
   import presentation from '@anticrm/presentation'
   import { createEventDispatcher, onDestroy } from 'svelte'
-  import { getComponentExtension, getCoreService, query } from '../../utils'
+  import { _getCoreService, getComponentExtension, getCoreService } from '../../utils'
 
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import workbench from '../..'
 
   export let title: string
-  export let _class: Ref<Class<VDoc>>
-  export let _id: Ref<VDoc>
+  export let _class: Ref<Class<Doc>>
+  export let _id: Ref<Doc>
 
-  let object: VDoc | undefined
+  let object: Doc | undefined
 
-  let unsubscribe: () => void
+  let queryUpdate: (_clas: Ref<Class<Doc>>, query: AnyLayout) => void
 
+  const coreService = _getCoreService()
+
+  queryUpdate = coreService.subscribe(_class, { _id }, (docs) => {
+    object = docs.length > 0 ? docs[0] : undefined
+  }, onDestroy)
+
+  let component: AnyComponent
   $: {
-    if (unsubscribe) {
-      unsubscribe()
-    }
-    unsubscribe = query(_class, { _id }, (docs) => {
-      object = docs.length > 0 ? docs[0] : undefined
+    queryUpdate(_class, { _id })
+
+    getComponentExtension(_class, presentation.class.DetailForm).then((ext) => {
+      component = ext
     })
   }
 
-  onDestroy(() => {
-    if (unsubscribe) unsubscribe()
-  })
-  // $: findOne(_class, { _id }).then(obj => { object = obj })
-
-  let component: AnyComponent
-  $: getComponentExtension(_class, presentation.class.DetailForm).then((ext) => {
-    component = ext
-  })
-
-  const coreService = getCoreService()
   const dispatch = createEventDispatcher()
-
-  function save() {
-    dispatch('close')
-  }
 </script>
 
 <div class="recruiting-view">
-  <!-- <div class="header">
-    <div class="caption-4">{title}</div>
-    <div class="actions">
-      <button
-        class="button"
-        on:click="{() => {
-          dispatch('close')
-        }}"
-      >Cancel</button>
-      <button class="button" on:click="{save}">Save</button>
-    </div>
-  </div> -->
-  <a href="/" style='position:absolute;top:1.5em;right:1.5em;' on:click|preventDefault={() => { dispatch('close') }}>
-    <Icon icon={workbench.icon.Close} button='true' /></a>
+  <a href="/" style="position:absolute;top:1.5em;right:1.5em;" on:click|preventDefault={() => { dispatch('close') }}>
+    <Icon icon={workbench.icon.Close} button="true" />
+  </a>
   {#if object}
     <div class="content">
       <Component is="{component}" props="{{ _class, object }}" />
@@ -106,11 +86,6 @@
   .attributes {
     display: flex;
     flex-wrap: wrap;
-
-    //display: grid;
-    //background-color: $content-color-dark;
-    //grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    //grid-gap: 1px;
 
     margin-top: 1em;
 

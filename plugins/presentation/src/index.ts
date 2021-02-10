@@ -101,6 +101,7 @@ export interface ClassModel {
   getGroup (_class: Ref<Class<Obj>>): GroupModel | undefined
 
   getOwnAttributes (_class: Ref<Class<Obj>>): AttrModel[] // TODO: why do we have this here, but not within Group?
+
   getAttributes (): AttrModel[]
 
   getAttribute (key: string, _class?: Ref<Class<Obj>>): AttrModel | undefined

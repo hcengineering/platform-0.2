@@ -54,7 +54,6 @@
 
   const init = Promise.all([
     getComponentExtension(_class, presentation.class.CreateForm).then((ext) => {
-      console.log('Found createForm: ', ext)
       createFormComponent = ext
     }),
     presentationService.getClassModel(_class, CORE_CLASS_VDOC).then((m) => {
@@ -133,7 +132,8 @@
 
 {#await init then _}
   {#if createFormComponent}
-    <Component is={createFormComponent} {object} on:change on:close={()=>dispatch('close')} />
+    <Component is={createFormComponent} props={{space:space}} on:change
+               on:close={()=>dispatch('close')} />
   {:else}
     <div class="recruiting-view">
       <div class="header">

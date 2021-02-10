@@ -1,14 +1,14 @@
 <!--
 // Copyright © 2020 Anticrm Platform Contributors.
-// 
+//
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
 // obtain a copy of the License at https://www.eclipse.org/legal/epl-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// 
+//
 // See the License for the specific language governing permissions and
 // limitations under the License.
 -->
@@ -29,8 +29,6 @@
   function getStyle(element: HTMLElement | undefined) {
     if (element) {
       const rect = element.getBoundingClientRect()
-      console.log('rect', rect)
-      //return `top: ${rect.top + rect.height + 12}px; left: ${rect.left - 24 - 5 + (rect.width / 2)}px;`
       return `top: ${rect.top + rect.height + 2}px; left: ${rect.left}px;`
     } else
       return 'top: 50%; left: 50%; transform: translate(-50%, -50%);'
@@ -61,10 +59,10 @@
     padding: 1em 1em;
     background-color: var(--theme-bg-color);
 
-    
-    box-shadow: 0 1px 1px rgba(0,0,0,0.12), 
-              0 2px 2px rgba(0,0,0,0.12), 
-              0 4px 4px rgba(0,0,0,0.12), 
+
+    box-shadow: 0 1px 1px rgba(0,0,0,0.12),
+              0 2px 2px rgba(0,0,0,0.12),
+              0 4px 4px rgba(0,0,0,0.12),
               0 8px 8px rgba(0,0,0,0.12),
               0 16px 16px rgba(0,0,0,0.12);
     */
@@ -84,7 +82,7 @@
     border-width: 5px;
     border-style: solid;
     border-color: transparent transparent var(--theme-bg-accent-color) transparent;
-  } */ 
+  } */
 
   .modal-overlay {
     z-index: 1000;
