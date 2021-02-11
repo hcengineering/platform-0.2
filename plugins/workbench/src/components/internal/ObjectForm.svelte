@@ -55,7 +55,7 @@
     </a>
   </div>
   <div class="content">
-    <ScrollView width="100%" height="100%">
+    <ScrollView height="100%">
       <div class="component-content">
         {#if object}
           <Component is="{component}" props="{{ _class, object }}" />
