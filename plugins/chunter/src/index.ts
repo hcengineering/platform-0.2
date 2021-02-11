@@ -53,7 +53,8 @@ const chunterPlugin = plugin(
     icon: {
       Chunter: '' as Asset,
       ActivityView: '' as Asset,
-      ChatView: '' as Asset
+      ChatView: '' as Asset,
+      PagesView: '' as Asset
     },
     class: {
       Message: '' as Ref<Class<Message>>,
@@ -63,6 +64,7 @@ const chunterPlugin = plugin(
     component: {
       ActivityView: '' as AnyComponent,
       ChatView: '' as AnyComponent,
+
       MessageInfo: '' as AnyComponent,
       SpaceInfo: '' as AnyComponent,
       PageProperties: '' as AnyComponent,

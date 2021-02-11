@@ -1,15 +1,13 @@
-<script lang='ts'>
+<script lang="ts">
   import LinkTo from '@anticrm/platform-ui/src/components/LinkTo.svelte'
-  import { Space } from '@anticrm/core'
-  import { archivedSpaceUpdate, getCurrentUserSpace, getSpaceName, leaveSpace } from './utils'
+  import { getSpaceName, leaveSpace } from './utils'
   import { _getCoreService, getUIService } from '../../../utils'
-  import SpaceOptions from './SpaceOptions.svelte'
-  import ToolbarButton from '@anticrm/sparkling-controls/src/toolbar/Button.svelte'
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import workbench from '../../..'
   import PopupMenu from '@anticrm/sparkling-controls/src/menu/PopupMenu.svelte'
   import PopupItem from '@anticrm/sparkling-controls/src/menu/PopupItem.svelte'
   import AddUser from './AddUser.svelte'
+  import { Space } from '@anticrm/domains'
 
   export let link: string = '/'
   export let selected: boolean = false
@@ -31,30 +29,34 @@
 </script>
 
 <LinkTo href={link}>
-  <div class='item' class:selected={selected}>
+  <div class="item" class:selected={selected}>
     {getSpaceName(space)}
     <div class="separator"></div>
     {#if count > 0}
-      <div class='counter'>{count}</div>
+      <div class="counter">{count}</div>
     {/if}
     {#if selected}
-      <div bind:this={optionsButton} class='optionsButton'>
+      <div bind:this={optionsButton} class="optionsButton">
         <PopupMenu>
-          <div class='popup' slot='trigger'><Icon icon={workbench.icon.Burger} /></div>
+          <div class="popup" slot="trigger">
+            <Icon icon={workbench.icon.Burger} />
+          </div>
           <PopupItem on:click={() => {
             uiService.showModal(AddUser, { space })
-          }}>Add user</PopupItem>
-          <PopupItem separator='true' />
+          }}>Add user
+          </PopupItem>
+          <PopupItem separator="true" />
           <PopupItem on:click={() => {
             leaveSpace(coreService, space)
-          }}>Leave</PopupItem>
+          }}>Leave
+          </PopupItem>
         </PopupMenu>
       </div>
     {/if}
   </div>
 </LinkTo>
 
-<style lang='scss'>
+<style lang="scss">
   .item {
     box-sizing: border-box;
     font-family: var(--theme-font-content);

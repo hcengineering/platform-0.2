@@ -86,8 +86,22 @@ export function model (S: Builder): void {
   })
 
   S.createDocument(workbench.class.WorkbenchApplication, {
+    label: 'Активность' as IntlString,
+    icon: chunter.icon.ActivityView,
+    component: chunter.component.ActivityView,
+    classes: []
+  }, workbench.application.Activity)
+
+  S.createDocument(workbench.class.WorkbenchApplication, {
+    label: 'Чат' as IntlString,
+    icon: chunter.icon.ChatView,
+    component: chunter.component.ChatView,
+    classes: []
+  }, workbench.application.Chat)
+
+  S.createDocument(workbench.class.WorkbenchApplication, {
     label: 'Страницы' as IntlString,
-    icon: workbench.icon.DefaultPerspective,
+    icon: chunter.icon.PagesView,
     component: workbench.component.Application,
     classes: [chunter.class.Page]
   })

@@ -15,7 +15,7 @@
 <script lang="ts">
   import { Ref, Doc, Class } from '@anticrm/core'
   import { onDestroy } from 'svelte'
-  import { find, getCoreService, getUIService, _getCoreService } from '../../utils'
+  import { getUIService, _getCoreService } from '../../utils'
   import { Space, VDoc, CORE_CLASS_SPACE } from '@anticrm/domains'
   import ui from '@anticrm/platform-ui'
   import workbench, { WorkbenchApplication } from '../..'
@@ -29,11 +29,10 @@
 
   import { AnyComponent } from '@anticrm/platform-ui'
 
-  import JoinSpace from './spaces/JoinSpace.svelte'
   import MainComponent from '../proxies/MainComponent.svelte'
 
   import ObjectForm from './ObjectForm.svelte'
-  import { getSpaceName, getCurrentUserSpace } from './spaces/utils'
+  import { getCurrentUserSpace } from './spaces/utils'
 
   const uiService = getUIService()
 
@@ -44,29 +43,22 @@
     location = loc.pathname.split('/')
   })
 
-  const curentUser = _getCoreService().getUserId()
+  const coreService = _getCoreService()
+
+  const curentUser = coreService.getUserId()
 
   let space: Ref<Space>
   let spaces: Space[] = []
-  let spaceUnsubscribe: () => void | undefined
 
-  getCoreService()
-    .then((coreService) => coreService.query(CORE_CLASS_SPACE, {}))
-    .then((qr) => {
-      spaceUnsubscribe = qr.subscribe((docs) => {
-        spaces = docs.filter((s) => getCurrentUserSpace(curentUser, s))
-      })
-    })
-
-  onDestroy(() => {
-    if (spaceUnsubscribe) spaceUnsubscribe()
-  })
+  coreService.subscribe(CORE_CLASS_SPACE, {}, (docs) => {
+    spaces = docs.filter((s) => getCurrentUserSpace(curentUser, s))
+  }, onDestroy)
 
   let application: Ref<WorkbenchApplication>
   let applications: Array<WorkbenchApplication> = []
-  find(workbench.class.WorkbenchApplication, {}).then((docs) => {
+  coreService.subscribe(workbench.class.WorkbenchApplication, {}, (docs) => {
     applications = docs
-  })
+  }, onDestroy)
 
   let component: AnyComponent | undefined
 
@@ -76,7 +68,6 @@
     if (spaces.length > 0) {
       if (!spaces.find(s => s._id === space)) {
         space = spaces[0]._id as Ref<Space>
-        console.log('space is changed to:', space)
       }
     }
     if (!application) {
@@ -96,13 +87,50 @@
   let addButton: HTMLElement
 
   let hidden = true
-  //let showPopup: string = 'hidden';
 </script>
 
 <style lang="scss">
   .workbench-perspective {
     display: flex;
     height: 100%;
+  }
+
+  nav {
+    width: 60px;
+    background-color: var(--theme-bg-color);
+
+    display: flex;
+    flex-direction: column;
+
+    .app-icon {
+      border-bottom: solid 1px var(--theme-bg-accent-color);
+      border-right: solid 1px var(--theme-bg-accent-color);
+
+      .icon {
+        padding: 1em;
+      }
+
+      &.current-app {
+        background-color: var(--theme-bg-color);
+        border-right: solid 1px var(--theme-bg-color);
+      }
+    }
+
+    .iconApp {
+      padding: 1em;
+      color: var(--theme-content-dark-color);
+      cursor: pointer;
+    }
+
+    .selectedApp {
+      padding: 1em;
+      color: var(--theme-bg-dark-color);
+    }
+
+    .remainder {
+      flex-grow: 1;
+      border-right: solid 1px var(--theme-bg-accent-color);
+    }
   }
 
   .projects {
@@ -171,31 +199,28 @@
   .main {
     width: 100%;
     height: 100%;
-    // background-color: blue;
-    // display: flex;
-    // flex-direction: column;
-
-    // .main-content {
-    //   height: 100%;
-    // flex-grow: 2;
-    // align-items: stretch;
-    //   background-color: blue;
-    // }
-
-    // .input-control {
-    //   padding: 1em;
-    //   max-height: 400px;
-    // }
   }
 
   aside {
     //max-width: 404px;
+    height: 100%;
     background-color: var(--theme-bg-color);
     border-left: 1px solid var(--theme-bg-accent-color);
   }
 </style>
 
 <div class="workbench-perspective">
+  <nav>
+    <div class="app-icon">
+      {#each applications as app}
+        <div class={( app._id === application) ? 'selectedApp' : 'iconApp'}
+             on:click={() => {application = app._id; console.log('APP is', app)}}>
+          <Icon icon={app.icon} size="24" />
+        </div>
+      {/each}
+    </div>
+    <div class="remainder"></div>
+  </nav>
   <div class="projects" class:mini={!hidden}>
     <a href="/" style="position:absolute;top:1.5em;right:1.5em;" on:click|preventDefault={() => { hidden = !hidden}}>
       <Icon icon={workbench.icon.Resize} button="true" />
@@ -204,8 +229,6 @@
       <div class="caption-3">
         Пространства
       </div>
-      <SpaceItem link={'/' + location[1] + '/' + location[2]} selected={!space} space={{ name: 'Все', isPublic: true }}
-                 count={Math.floor(Math.random()*50)} />
       {#each spaces as s (s._id)}
         {#if !s.archived}
           <SpaceItem link={'/' + location[1] + '/' + location[2] + '/' + s._id}
@@ -226,14 +249,14 @@
         </span>
       </div>
 
-      <div class="caption-3">Приложения</div>
-      {#each applications as app (app._id)}
-        <div class="item" class:selected={app._id === application}
-             on:click|preventDefault={(e) => {
-            application = id(app)
-          }}>{app.label}
-        </div>
-      {/each}
+      <!--      <div class="caption-3">Приложения</div>-->
+      <!--      {#each applications as app (app._id)}-->
+      <!--        <div class="item" class:selected={app._id === application}-->
+      <!--             on:click|preventDefault={(e) => {-->
+      <!--            application = id(app)-->
+      <!--          }}>{app.label}-->
+      <!--        </div>-->
+      <!--      {/each}-->
     </div>
   </div>
 
@@ -248,16 +271,12 @@
           details = e.detail
         }} />
     {/if}
-    <!-- </div>
-    <div class="input-control">
-      <InputControl />
-    </div> -->
   </div>
 
   <aside>
     <!-- <DetailsForm v-if="details" :_class="details._class" :_id="details._id" @done="done" /> -->
     {#if details}
-      <ObjectForm {...details} title="Title" />
+      <ObjectForm {...details} title="Title" on:close={()=> {details = undefined}} />
     {/if}
   </aside>
 </div>

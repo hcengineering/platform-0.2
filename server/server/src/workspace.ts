@@ -37,6 +37,8 @@ import { TitleIndex } from '@anticrm/domains/src/indices/title'
 import { VDocIndex } from '@anticrm/domains/src/indices/vdoc'
 import { TxIndex } from '@anticrm/domains/src/indices/tx'
 import { ClientTxStorage } from '@anticrm/platform-core/src/clienttx'
+import { PassthroughsIndex } from '@anticrm/domains/src/indices/filter'
+import { CORE_CLASS_SPACE } from '@anticrm/domains'
 
 export interface WorkspaceProtocol extends DocumentProtocol {
 
@@ -142,6 +144,7 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
     new VDocIndex(memdb, mongoStorage),
     new TitleIndex(memdb, clientTxMongo),
     new ReferenceIndex(memdb, clientTxMongo),
+    new PassthroughsIndex(memdb, mongoStorage, CORE_CLASS_SPACE),
     new ModelIndex(memdb, [memdb, mongoStorage])
   ])
 

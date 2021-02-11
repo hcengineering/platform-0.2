@@ -37,7 +37,10 @@ export interface WorkbenchApplication extends Application {
 export interface WorkbenchService extends Service {
 }
 
-export default plugin('workbench' as Plugin<WorkbenchService>, { core: core.id, ui: ui.id }, {
+export default plugin('workbench' as Plugin<WorkbenchService>, {
+  core: core.id,
+  ui: ui.id
+}, {
   icon: {
     DefaultPerspective: '' as Asset,
     Add: '' as Asset,
@@ -57,7 +60,12 @@ export default plugin('workbench' as Plugin<WorkbenchService>, { core: core.id, 
     JoinSpace: '' as AnyComponent,
     BrowseSpace: '' as AnyComponent,
     Application: '' as AnyComponent,
-    CreateForm: '' as AnyComponent
+    CreateForm: '' as AnyComponent,
+
+    // A table presentation layout
+    TableLayout: '' as AnyComponent,
+    // A card line display layout
+    CardLayout: '' as AnyComponent
   },
   class: {
     Perspective: '' as Ref<Class<Perspective>>,
@@ -66,5 +74,8 @@ export default plugin('workbench' as Plugin<WorkbenchService>, { core: core.id, 
   application: {
     Activity: '' as Ref<WorkbenchApplication>,
     Chat: '' as Ref<WorkbenchApplication>
+  },
+  perspective: {
+    Default: '' as Ref<Perspective>
   }
 })

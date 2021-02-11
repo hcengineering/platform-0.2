@@ -15,7 +15,7 @@
 
 import { Platform } from '@anticrm/platform'
 import {
-  Attribute, Class, Obj, Ref, Type, Doc, Mixin, CORE_CLASS_ARRAY_OF, CORE_CLASS_INSTANCE_OF
+  Attribute, Class, Obj, Ref, Type, Doc, Mixin
 } from '@anticrm/core'
 import { VDoc } from '@anticrm/domains'
 import ui, { AttrModel, ClassModel, GroupModel, PresentationService, ComponentExtension, UXObject } from '.'
@@ -28,6 +28,7 @@ import Properties from './components/internal/Properties.svelte'
 
 import StringEditor from './components/internal/editors/StringEditor.svelte'
 import CheckboxEditor from './components/internal/editors/CheckboxEditor.svelte'
+import TablePresenter from './components/internal/TablePresenter.svelte'
 
 /*!
  * Anticrm Platform™ Presentation Core Plugin
@@ -43,6 +44,8 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
 
   platform.setResource(ui.component.StringPresenter, StringEditor)
   platform.setResource(ui.component.CheckboxPresenter, CheckboxEditor)
+
+  platform.setResource(ui.component.TablePresenter, TablePresenter)
 
   async function getGroupModel (_class: Ref<Class<Obj>>): Promise<GroupModel> {
     const model = coreService.getModel()

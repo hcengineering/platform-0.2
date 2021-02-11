@@ -1,4 +1,4 @@
-<script lang='ts'>
+<script lang="ts">
   // Copyright © 2020 Anticrm Platform Contributors.
   //
   // Licensed under the Eclipse Public License, Version 2.0 (the "License");
@@ -11,77 +11,62 @@
   //
   // See the License for the specific language governing permissions and
   // limitations under the License.
-  import { Ref, Doc } from '@anticrm/core'
+  import { Doc, Ref } from '@anticrm/core'
   import workbench, { Perspective } from '../..'
-  import { find, getUIService } from '../../utils'
-  import { getContext } from 'svelte'
-  import chunter from '@anticrm/chunter'
-  import task from '@anticrm/task'
+  import { _getCoreService, getUIService } from '../../utils'
+  import { onDestroy } from 'svelte'
 
   import Component from '@anticrm/platform-ui/src/components/Component.svelte'
-  import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
-  import LinkTo from '@anticrm/platform-ui/src/components/LinkTo.svelte'
   import Spotlight from './Spotlight.svelte'
   import { AnyComponent } from '@anticrm/platform-ui'
 
   let perspectives: Perspective[] = []
-  let current: Ref<Doc>
+  let activePerspective: Ref<Doc>
   let component: AnyComponent | undefined
 
+  const coreService = _getCoreService()
   const uiService = getUIService()
   const location = uiService.getLocation()
   location.subscribe((loc) => {
-    current = loc.pathname.split('/')[2] as Ref<Doc>
+    activePerspective = loc.pathname.split('/')[2] as Ref<Doc>
   })
 
-  find(workbench.class.Perspective, {}).then((p) => {
+  coreService.subscribe(workbench.class.Perspective, {}, (p) => {
     perspectives = p
-  })
+  }, onDestroy)
 
-  $: component = perspectives.find((h) => h._id === current)?.component
+  function findPerspective (perspectives: Perspective[]): Perspective | undefined {
+    if (perspectives) {
+      return perspectives.find((h) => h._id === activePerspective)
+    }
+    return undefined
+  }
+
+  function getCurrentComponent (perspectives: Perspective[]): AnyComponent | undefined {
+    return findPerspective(perspectives)?.component
+  }
+
+  $: {
+    if (perspectives) {
+      if (!findPerspective(perspectives) && perspectives.length > 0) {
+        activePerspective = perspectives[0]._id
+      }
+
+      component = getCurrentComponent(perspectives)
+    }
+  }
 
   function handleKeydown (ev: KeyboardEvent) {
     if (ev.code === 'KeyS' && ev.ctrlKey) {
       uiService.showModal(Spotlight, {})
     }
   }
-
-  let selected: number = 0
 </script>
 
-<div id='workbench'>
-  <nav>
-    {#each perspectives as perspective (perspective._id)}
-      <div class='app-icon' class:current-app='{perspective._id === current}'>
-        <LinkTo
-          href="{'/' + workbench.component.Workbench + '/' + perspective._id}"
-        >
-          <div class='icon'>
-            <Icon icon='{perspective.icon}' size='32' />
-          </div>
-        </LinkTo>
-      </div>
-    {/each}
-    <div class='app-icon'>
-      <div class={(selected === 0) ? 'selectedApp' : 'iconApp'} on:click={() => {selected = 0}}>
-        <Icon icon='{chunter.icon.ActivityView}' size='24' />
-      </div>
-      <div class={(selected === 1) ? 'selectedApp' : 'iconApp'} on:click={() => {selected = 1}}>
-        <Icon icon='{chunter.icon.ChatView}' size='24' />
-      </div>
-      <div class={(selected === 2) ? 'selectedApp' : 'iconApp'} on:click={() => {selected = 2}}>
-        <Icon icon='{workbench.icon.Pages}' size='24' />
-      </div>
-      <div class={(selected === 3) ? 'selectedApp' : 'iconApp'} on:click={() => {selected = 3}}>
-        <Icon icon='{task.icon.Task}' size='24' />
-      </div>
-    </div>
-    <div class='remainder'></div>
-  </nav>
-
+<div id="workbench">
   <main>
     {#if component}
-      <Component is='{component}' />
+      <Component is="{component}" props={activePerspective} />
     {/if}
   </main>
 
@@ -89,48 +74,10 @@
 
 <svelte:window on:keydown={handleKeydown} />
 
-<style lang='scss'>
+<style lang="scss">
   #workbench {
     display: flex;
     height: 100%;
-  }
-
-  nav {
-    width: 60px;
-    background-color: var(--theme-bg-color);
-
-    display: flex;
-    flex-direction: column;
-
-    .app-icon {
-      border-bottom: solid 1px var(--theme-bg-accent-color);
-      border-right: solid 1px var(--theme-bg-accent-color);
-
-      .icon {
-        padding: 1em;
-      }
-
-      &.current-app {
-        background-color: var(--theme-bg-color);
-        border-right: solid 1px var(--theme-bg-color);
-      }
-    }
-
-    .iconApp {
-      padding: 1em;
-      color: var(--theme-content-dark-color);
-      cursor: pointer;
-    }
-
-    .selectedApp {
-      padding: 1em;
-      color: var(--theme-bg-dark-color);
-    }
-
-    .remainder {
-      flex-grow: 1;
-      border-right: solid 1px var(--theme-bg-accent-color);
-    }
   }
 
   main {

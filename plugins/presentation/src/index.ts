@@ -44,7 +44,7 @@ export interface UXAttribute extends Emb {
   presenter?: AnyComponent
 }
 
-export interface UXObject<T extends Obj> extends Mixin<T> {
+export interface UXObject<T extends Obj> extends Class<T> {
   label: IntlString
   icon?: Asset
 
@@ -59,7 +59,7 @@ export interface UXObject<T extends Obj> extends Mixin<T> {
 /**
  * Define a mixin interface for class with a proposed presenter.
  */
-export interface Presenter<T extends Type> extends Mixin<T> {
+export interface Presenter<T extends Type> extends Class<T> {
   presenter: AnyComponent
 }
 
@@ -71,7 +71,17 @@ export interface Presenter<T extends Type> extends Mixin<T> {
 //   form: AnyComponent
 // }
 
-export interface ComponentExtension<T extends VDoc> extends Mixin<T> {
+export interface ComponentExtension<T extends VDoc> extends Class<T> {
+  component: AnyComponent
+}
+
+/**
+ * Definition of class display layout for a class
+ */
+export interface ClassPresenter extends Doc {
+  displayClass: Ref<Class<Doc>>
+  label: IntlString
+  icon?: Asset
   component: AnyComponent
 }
 
@@ -150,7 +160,8 @@ const presentationPlugin = plugin('presentation' as Plugin<PresentationService>,
 
     // Define a form to create a new instance of specified class.
     CreateForm: '' as Ref<Mixin<ComponentExtension<VDoc>>>,
-    LookupForm: '' as Ref<Mixin<ComponentExtension<VDoc>>>
+    LookupForm: '' as Ref<Mixin<ComponentExtension<VDoc>>>,
+    ClassPresenter: '' as Ref<Mixin<ClassPresenter>>
   },
   mixin: {
     UXObject: '' as Ref<Mixin<UXObject<Doc>>>
@@ -161,7 +172,8 @@ const presentationPlugin = plugin('presentation' as Plugin<PresentationService>,
     NumberPresenter: '' as AnyComponent,
     StringPresenter: '' as AnyComponent,
     CheckboxPresenter: '' as AnyComponent,
-    RefPresenter: '' as AnyComponent
+    RefPresenter: '' as AnyComponent,
+    TablePresenter: '' as AnyComponent
   }
 })
 

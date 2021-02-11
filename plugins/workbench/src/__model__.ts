@@ -13,24 +13,19 @@
 // limitations under the License.
 //
 
-import core, { Builder, extendIds, Class$, Prop } from '@anticrm/model'
-import { Ref, Class, MODEL_DOMAIN } from '@anticrm/core'
+import core, { Builder, Class$, extendIds, Prop } from '@anticrm/model'
+import { Class, MODEL_DOMAIN, Ref } from '@anticrm/core'
 import { Space, VDoc } from '@anticrm/domains'
 import { IntlString } from '@anticrm/platform-i18n'
 
 import { TApplication } from '@anticrm/model/src/__model__'
 import ux, { UXAttribute } from '@anticrm/presentation'
 import { AnyComponent, Asset } from '@anticrm/platform-ui'
-import chunter from '@anticrm/chunter'
 
-import _workbench, { Perspective, WorkbenchApplication } from '.'
+import _workbench, { WorkbenchApplication } from '.'
 
 const workbench = extendIds(_workbench, {
-  component: {
-  },
-  perspective: {
-    Default: '' as Ref<Perspective>
-  },
+  component: {},
   space: {
     General: '' as Ref<Space>,
     Random: '' as Ref<Space>,
@@ -102,18 +97,4 @@ export function model (S: Builder): void {
     archived: false,
     users: []
   }, workbench.space.Other)
-
-  S.createDocument(workbench.class.WorkbenchApplication, {
-    label: 'Активность' as IntlString,
-    icon: workbench.icon.DefaultPerspective,
-    component: chunter.component.ActivityView,
-    classes: []
-  }, workbench.application.Activity)
-
-  S.createDocument(workbench.class.WorkbenchApplication, {
-    label: 'Чат' as IntlString,
-    icon: workbench.icon.DefaultPerspective,
-    component: chunter.component.ChatView,
-    classes: []
-  }, workbench.application.Chat)
 }

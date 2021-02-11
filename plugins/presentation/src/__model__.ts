@@ -13,14 +13,14 @@
 // limitations under the License.
 //
 
-import core, { Builder, getClassifier, Class$, Prop, Mixin$, ArrayOf$, InstanceOf$ } from '@anticrm/model'
+import core, { Builder, getClassifier, Class$, Prop, Mixin$, ArrayOf$, InstanceOf$, RefTo$ } from '@anticrm/model'
 
-import { Doc, Obj, Type, mixinKey } from '@anticrm/core'
+import { Doc, Obj, Type, mixinKey, MODEL_DOMAIN, Ref, Class } from '@anticrm/core'
 import { VDoc } from '@anticrm/domains'
 import { IntlString } from '@anticrm/platform-i18n'
 import { AnyComponent, Asset } from '@anticrm/platform-ui'
-import ui, { UXAttribute, Presenter, UXObject, ComponentExtension } from '.'
-import { TEmb, TMixin } from '@anticrm/model/src/__model__'
+import ui, { UXAttribute, Presenter, UXObject, ComponentExtension, ClassPresenter } from '.'
+import { TDoc, TEmb, TMixin } from '@anticrm/model/src/__model__'
 
 @Class$(ui.class.UXAttribute, core.class.Emb)
 export class TUXAttribute extends TEmb implements UXAttribute {
@@ -77,8 +77,18 @@ export class TCreateForm<T extends VDoc> extends TMixin<T> implements ComponentE
   component!: AnyComponent
 }
 
+@Class$(ui.class.ClassPresenter, core.class.Doc, MODEL_DOMAIN)
+export class TClassPresenter extends TDoc implements ClassPresenter {
+  @RefTo$(core.class.Class)
+  displayClass!: Ref<Class<Doc>>
+
+  @Prop() label!: IntlString
+  @Prop() icon?: Asset
+  @Prop() component!: AnyComponent
+}
+
 export function model (S: Builder): void {
-  S.add(TUXAttribute, TPresenter, TUXObject, TDetailForm, TLookupForm, TCreateForm)
+  S.add(TUXAttribute, TPresenter, TUXObject, TDetailForm, TLookupForm, TCreateForm, TClassPresenter)
 
   S.mixin(core.class.Type, ui.class.Presenter, {
     presenter: ui.component.StringPresenter
@@ -102,6 +112,12 @@ export function model (S: Builder): void {
 
   S.mixin(core.class.ArrayOf, ui.class.Presenter, {
     presenter: ui.component.StringPresenter
+  })
+
+  S.createDocument(ui.class.ClassPresenter, {
+    displayClass: core.class.Doc,
+    label: 'Table' as IntlString,
+    component: ui.component.TablePresenter
   })
 }
 

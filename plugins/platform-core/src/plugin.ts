@@ -33,7 +33,7 @@ import {
   CoreProtocol, TxProcessor,
   generateId as genId
 } from '@anticrm/core'
-import { CORE_CLASS_REFERENCE, CORE_CLASS_TITLE, TITLE_DOMAIN } from '@anticrm/domains'
+import { CORE_CLASS_REFERENCE, CORE_CLASS_SPACE, CORE_CLASS_TITLE, TITLE_DOMAIN } from '@anticrm/domains'
 
 import { createOperations } from './operations'
 
@@ -81,6 +81,7 @@ export default async (platform: Platform): Promise<CoreService> => {
     new VDocIndex(model, qCache),
     new PassthroughsIndex(model, qTitles, CORE_CLASS_TITLE), // Just for live queries.
     new PassthroughsIndex(model, qCache, CORE_CLASS_REFERENCE), // Construct a pass index to update references
+    new PassthroughsIndex(model, qCache, CORE_CLASS_SPACE), // Construct a pass index to update references
     new ModelIndex(model, [qModel])
   ])
 

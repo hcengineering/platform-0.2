@@ -15,7 +15,7 @@
 
 import core, { ArrayOf$, Builder, Class$, InstanceOf$, Primary, Prop, RefTo$ } from '.'
 
-import { Classifier, DateProperty, Doc, MODEL_DOMAIN, Ref, StringProperty, Type } from '@anticrm/core'
+import { Classifier, DateProperty, Doc, MODEL_DOMAIN, Ref, SPACE_DOMAIN, StringProperty, Type } from '@anticrm/core'
 
 import {
   Application,
@@ -62,13 +62,13 @@ class TBooleanType extends TType implements Type {
 
 ///
 
-@Class$(core.class.SpaceUser, core.class.Emb, MODEL_DOMAIN)
+@Class$(core.class.SpaceUser, core.class.Emb, SPACE_DOMAIN)
 export class TSpaceUser extends TEmb implements SpaceUser {
   @Prop() userId!: string
   @Prop() owner!: boolean
 }
 
-@Class$(core.class.Space, core.class.Doc, MODEL_DOMAIN)
+@Class$(core.class.Space, core.class.Doc, SPACE_DOMAIN)
 export class TSpace extends TDoc implements Space {
   @Primary()
   @Prop() name!: string
@@ -83,7 +83,7 @@ export class TSpace extends TDoc implements Space {
   @Prop(core.class.Boolean) archived!: boolean
 }
 
-@Class$(core.class.VDoc, core.class.Doc)
+@Class$(core.class.VDoc, core.class.Doc, MODEL_DOMAIN)
 export class TVDoc extends TDoc implements VDoc {
   @Prop() _space!: Ref<Space>
   @Prop() _createdOn!: DateProperty
