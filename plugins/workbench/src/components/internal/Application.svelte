@@ -14,8 +14,8 @@
 -->
 
 <script type="ts">
-  import { Ref } from '@anticrm/core'
-  import { findOne, getUIService } from '../../utils'
+  import { Class, Ref } from '@anticrm/core'
+  import { getUIService, _getCoreService } from '../../utils'
   import workbench, { WorkbenchApplication } from '../..'
 
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
@@ -25,21 +25,56 @@
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import EditBox from '@anticrm/platform-ui/src/components/EditBox.svelte'
   import { Space } from '@anticrm/domains'
+  import { onDestroy } from 'svelte'
+  import ui, { ClassPresenter } from '@anticrm/presentation'
+  import PresenterItem from './PresenterItem.svelte'
+  import Component from '../../../../platform-ui/src/components/Component.svelte'
 
   export let application: Ref<WorkbenchApplication>
   export let space: Ref<Space>
-  // let _id: Ref<VDoc> | undefined
 
+  const coreService = _getCoreService()
   const uiService = getUIService()
 
   let addIcon: HTMLElement
-
   let appInstance: WorkbenchApplication | undefined
-  $: {
-    findOne(workbench.class.WorkbenchApplication, { _id: application }).then(app => {
-      appInstance = app
+
+  // Represent all possible presenters
+  let presenters: ClassPresenter[] = []
+  let availablePresenters: ClassPresenter[] = []
+  let selectedPresenter: ClassPresenter | undefined
+
+  coreService.subscribe(ui.class.ClassPresenter, {}, (docs) => {
+    presenters = docs
+  }, onDestroy)
+
+  const appSearch = coreService.subscribe(workbench.class.WorkbenchApplication, { _id: application }, apps => {
+    appInstance = apps[0]
+  }, onDestroy)
+
+  const model = coreService.getModel()
+
+  function filterAvailablePresenters (appInstance: WorkbenchApplication): ClassPresenter[] {
+    return presenters.filter((d) => {
+      for (const cc of appInstance?.classes) {
+        if (model.is(cc, d.displayClass)) {
+          return true
+        }
+      }
+      return false
     })
-    // _id = undefined
+  }
+
+  $: {
+    appSearch(workbench.class.WorkbenchApplication, { _id: application })
+
+    if (appInstance) {
+      // Update available presenters based on application
+      availablePresenters = filterAvailablePresenters(appInstance)
+      if (availablePresenters.length > 0 && !selectedPresenter) {
+        selectedPresenter = availablePresenters[0]
+      }
+    }
   }
 
   function getLabel (str: string): string {
@@ -53,10 +88,6 @@
   { #if appInstance }
     <div class="captionContainer">
       <span class="caption-1" style="padding-right:1em">{appInstance.label}</span>&nbsp;
-      <!-- <a class='icon' bind:this={addIcon} href='/'
-         on:click|preventDefault={ () => { uiService.showModal(CreateForm, { _class: appInstance ? appInstance.classes[0] : undefined, title: 'The title', space }, addIcon) } }>
-        <Icon icon={workbench.icon.Add} button='true' /> {getLabel(appInstance.label)}
-      </a> -->
       <div bind:this={addIcon}>
         <Button kind="transparent"
                 on:click={ () => {
@@ -70,18 +101,18 @@
       <div style="flex-grow:1"></div>
       <EditBox icon={workbench.icon.Finder} placeholder="Поиск по {appInstance.label}..." iconRight="true" />
     </div>
-    <ScrollView height="100%" margin="2em">
-      <div class="table">
-        <Table _class={appInstance.classes[0]} {space} on:open />
-        <!-- <Table _class={appInstance.classes[0]} {space} on:open={ (evt) => { _id = evt.detail._id } }/> -->
-      </div>
-    </ScrollView>
-    <!-- { #if _id}
-    <div class="details">
-      <ObjectForm _class={appInstance.classes[0]} title="Hello" { _id }/>
+    <div class="presentation">
+      {#each availablePresenters as p}
+        <PresenterItem presenter={p} selected={p == selectedPresenter} on:select={() => selectedPresenter = p} />
+      {/each}
     </div>
-    { /if } -->
-  { /if   }
+    <ScrollView height="100%" margin="2em">
+      {#if selectedPresenter && selectedPresenter.component}
+        <Component is={selectedPresenter.component} props={{_class: appInstance.classes[0], space: space}} on:open />
+        <!--      <Table _class={appInstance.classes[0]} {space} on:open />-->
+      {/if}
+    </ScrollView>
+  { /if                              }
 </div>
 
 <style lang="scss">
@@ -110,6 +141,11 @@
       border-top: 1px solid var(--theme-bg-accent-color);
       padding: 1em;
       //max-height: 400px;
+    }
+
+    .presentation {
+      display: flex;
+      flex-direction: row-reverse;
     }
 
   }

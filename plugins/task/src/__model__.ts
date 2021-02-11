@@ -25,11 +25,12 @@ import { UX } from '@anticrm/presentation/src/__model__'
 import presentation from '@anticrm/presentation'
 import workbench from '@anticrm/workbench/src/__model__'
 import chunter, { TCollab } from '@anticrm/chunter/src/__model__'
-import { DateProperty, Ref, StringProperty } from '@anticrm/core'
+import { DateProperty, MODEL_DOMAIN, Ref, StringProperty } from '@anticrm/core'
 import { Application, Space } from '@anticrm/domains'
 import { TDoc, TVDoc } from '@anticrm/model/src/__model__'
 import contact from '@anticrm/contact/src/__model__'
 import { Asset } from '@anticrm/platform-ui'
+import ui from '@anticrm/presentation'
 
 export const DOMAIN_TASK = 'task'
 
@@ -64,7 +65,7 @@ const task = extendIds(_task, {
 
 export default task
 
-@Class$(task.class.TaskFieldValue, core.class.Doc, DOMAIN_TASK)
+@Class$(task.class.TaskFieldValue, core.class.Doc, MODEL_DOMAIN)
 export class TTaskFieldValue extends TDoc implements TaskFieldValue {
   @RefTo$(core.class.Space) _space?: Ref<Space>
 
@@ -155,7 +156,7 @@ export function model (S: Builder): void {
 
   S.createDocument(workbench.class.WorkbenchApplication, {
     label: 'Задачи' as StringProperty,
-    icon: workbench.icon.DefaultPerspective,
+    icon: task.icon.Task,
     component: workbench.component.Application,
     classes: [task.class.Task]
   }, task.application.Task)
@@ -219,4 +220,10 @@ export function model (S: Builder): void {
       color: s.color
     } as TaskFieldValue, s.id)
   }
+
+  S.createDocument(ui.class.ClassPresenter, {
+    displayClass: task.class.Task,
+    label: 'Card' as IntlString,
+    component: task.component.TaskCardPresenter
+  })
 }

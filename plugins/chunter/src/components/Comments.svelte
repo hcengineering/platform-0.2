@@ -20,7 +20,6 @@
   import CommentComponent from './internal/Comment.svelte'
   import Backlink from './internal/Backlink.svelte'
   import { Reference, CORE_CLASS_REFERENCE } from '@anticrm/domains'
-  import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
 
   export let object: Collab
 
@@ -62,11 +61,9 @@
 <div class="caption-2">Comments</div>
 
 {#if object && object.comments}
-  <ScrollView width="100%" height="20em" accentColor="true">
   {#each object.comments || [] as comment}
     <CommentComponent message={comment} />
   {/each}
-  </ScrollView>
 {/if}
 
 <ReferenceInput on:message={(e) => createComment(e.detail)} />

@@ -176,6 +176,7 @@ export default plugin('task' as Plugin<TaskService>, {}, {
   component: {
     TaskProperties: '' as AnyComponent,
     CreateTask: '' as AnyComponent,
-    TaskInfo: '' as AnyComponent
+    TaskInfo: '' as AnyComponent,
+    TaskCardPresenter: '' as AnyComponent
   }
 })

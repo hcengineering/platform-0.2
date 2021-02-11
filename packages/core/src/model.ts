@@ -38,6 +38,7 @@ export function mixinKey (mixin: Ref<Mixin<Obj>>, key: string): string {
 }
 
 export const MODEL_DOMAIN = 'model'
+export const SPACE_DOMAIN = 'space'
 
 interface Proxy {
   __layout: Record<string, unknown>

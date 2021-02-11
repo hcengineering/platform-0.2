@@ -20,8 +20,9 @@
 
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import workbench from '../..'
+  import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
 
-  export let title: string
+  let title: string
   export let _class: Ref<Class<Doc>>
   export let _id: Ref<Doc>
 
@@ -48,50 +49,43 @@
 </script>
 
 <div class="recruiting-view">
-  <a href="/" style="position:absolute;top:1.5em;right:1.5em;" on:click|preventDefault={() => { dispatch('close') }}>
-    <Icon icon={workbench.icon.Close} button="true" />
-  </a>
-  {#if object}
-    <div class="content">
-      <Component is="{component}" props="{{ _class, object }}" />
-    </div>
-  {/if}
+  <div class="toolbar">
+    <a href="/" on:click|preventDefault={() => { dispatch('close') }}>
+      <Icon icon={workbench.icon.Close} button="true" />
+    </a>
+  </div>
+  <div class="content">
+    <ScrollView width="100%" height="100%">
+      <div class="component-content">
+        {#if object}
+          <Component is="{component}" props="{{ _class, object }}" />
+        {/if}
+      </div>
+    </ScrollView>
+  </div>
 </div>
 
 <style lang="scss">
   .recruiting-view {
-    padding: 2em;
-    width: calc(404px - 4em);
-    position: relative;
-  }
-
-  .header {
-    display: flex;
-
-    .actions {
-      display: flex;
-      flex-grow: 1;
-      flex-direction: row-reverse;
-      font-size: 10px;
-
-      button {
-        margin-left: 0.5em;
-      }
-    }
-  }
-
-  .content {
-  }
-
-  .attributes {
-    display: flex;
-    flex-wrap: wrap;
-
     margin-top: 1em;
+    width: calc(404px);
+    position: relative;
+    height: 95%;
 
-    .group {
-      padding: 0.5em;
-      //background-color: $content-bg-color;
+    .toolbar {
+      display: flex;
+      flex-direction: row-reverse;
+      margin: 1em
+    }
+
+    .content {
+      height: 95%;
+    }
+
+    .component-content {
+      padding: 2em;
     }
   }
+
+
 </style>

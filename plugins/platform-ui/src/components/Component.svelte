@@ -32,9 +32,9 @@
   {#await component }
     <Spinner />
   {:then ctor}
-    <svelte:component this={ctor} {...props} on:change on:close />
+    <svelte:component this={ctor} {...props} on:change on:close on:open />
   {:catch err}
-    {{ err }}
+    ERROR: {JSON.stringify(component)} {props} { err }
     <Icon icon={ui.icon.Error} size="32" />
   {/await}
 {/if}
