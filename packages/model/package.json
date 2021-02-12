@@ -7,7 +7,8 @@
   "scripts": {
     "build": "tsc",
     "build:docs": "api-extractor run --local && copyfiles -u 1 ./_api-extractor-temp/doc-models/* ../../_api-extractor-temp/",
-    "test": "echo 'no tests'",
+    "test": "jest",
+    "genmodel": "ts-node src/__tests__/genmodel.ts",
     "lint": "echo 'no linting'"
   },
   "dependencies": {
@@ -20,6 +21,7 @@
     "@types/lodash": "^4.14.161",
     "simplytyped": "^3.3.0",
     "ts-jest": "^26.4.4",
+    "ts-node": "^9.1.1",
     "typescript": "^3.9.4"
   }
 }
