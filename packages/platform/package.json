@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc",
     "build:docs": "api-extractor run --local && copyfiles -u 1 ./_api-extractor-temp/doc-models/* ../../_api-extractor-temp/",
-    "test": "echo 'no tests'",
+    "test": "jest",
     "lint": "echo not defined yet"
   },
   "devDependencies": {
