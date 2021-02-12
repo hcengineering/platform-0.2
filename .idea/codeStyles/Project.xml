@@ -25,7 +25,6 @@
       <option name="PREFER_EXPLICIT_TYPES_VARS_FIELDS" value="true" />
       <option name="PREFER_EXPLICIT_TYPES_FUNCTION_RETURNS" value="true" />
       <option name="ENFORCE_TRAILING_COMMA" value="Remove" />
-      <option name="OBJECT_LITERAL_WRAP" value="2" />
       <option name="IMPORTS_WRAP" value="1" />
       <option name="SPACES_WITHIN_OBJECT_LITERAL_BRACES" value="true" />
       <option name="SPACES_WITHIN_IMPORTS" value="true" />
@@ -74,12 +73,6 @@
         <option name="INDENT_SIZE" value="2" />
         <option name="CONTINUATION_INDENT_SIZE" value="2" />
         <option name="TAB_SIZE" value="2" />
-      </indentOptions>
-    </codeStyleSettings>
-    <codeStyleSettings language="Vue">
-      <option name="SOFT_MARGINS" value="120" />
-      <indentOptions>
-        <option name="CONTINUATION_INDENT_SIZE" value="2" />
       </indentOptions>
     </codeStyleSettings>
   </code_scheme>

@@ -14,24 +14,10 @@
 //
 
 import {
-  AnyLayout,
-  Class,
-  Classifier,
-  ClassifierKind,
-  Doc,
-  Mixin,
-  Type,
-  Obj,
-  Ref,
-  Attribute,
-  ArrayOf,
-  StringProperty,
-  PropertyType,
-  CORE_MIXIN_INDICES,
-  CORE_CLASS_ARRAY_OF,
-  CORE_CLASS_INSTANCE_OF
+  AnyLayout, ArrayOf, Attribute, Class, Classifier, ClassifierKind, CORE_CLASS_ARRAY_OF, CORE_CLASS_INSTANCE_OF,
+  CORE_MIXIN_INDICES, Doc, Mixin, Obj, PropertyType, Ref, StringProperty, Type
 } from './classes'
-import { Storage, TxContext, generateId } from './storage'
+import { generateId, Storage, TxContext } from './storage'
 
 export function mixinKey (mixin: Ref<Mixin<Obj>>, key: string): string {
   return key + '|' + mixin.replace('.', '~')
@@ -333,10 +319,7 @@ export class Model implements Storage {
       }
     }
 
-    const {
-      attr,
-      key
-    } = this.classAttribute(queryObject._class, attribute)
+    const { attr, key } = this.classAttribute(queryObject._class, attribute)
 
     const l = (queryObject as unknown) as AnyLayout
     switch (attr.type._class) {
