@@ -19,7 +19,7 @@ import { ServerSuite } from './serversuite'
 import { AnyLayout, BooleanProperty, StringProperty, Tx, txContext } from '@anticrm/core'
 import { createSetArrayFilters } from '../mongo_utils'
 
-import { taskIds as task, createSubtask, Task, TaskComment } from '@anticrm/model/src/__tests__/test_tasks'
+import { taskIds as task, createSubtask, Task, TaskComment } from '@anticrm/core/src/__tests__/tasks'
 
 import { createOperations } from '@anticrm/platform-core/src/operations'
 import { CORE_CLASS_SPACE } from '@anticrm/domains'

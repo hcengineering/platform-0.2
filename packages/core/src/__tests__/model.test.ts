@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Anticrm Platform Contributors.
+// Copyright © 2020, 2021 Anticrm Platform Contributors.
 //
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
@@ -15,16 +15,16 @@
 
 /* eslint-env jest */
 
-import { Builder } from '..'
-import { Property, AnyLayout, StringProperty, Model } from '@anticrm/core'
+import { AnyLayout, Property, StringProperty } from '../classes'
+import { Model } from '../model'
+import { createSubtask, createTask, doc1, taskIds } from './tasks'
 
-import { taskIds, doc1, fullModel as mb, createSubtask, createTask } from './test_tasks'
+import { readFileSync } from 'fs'
 
-const b = new Builder()
-mb(b)
+const data = JSON.parse(readFileSync('src/__tests__/model.json', 'utf8'))
 
 const model = new Model('vdocs')
-model.loadModel(b.dump())
+model.loadModel(data)
 
 describe('matching', () => {
   it('match object value', () => {
@@ -112,6 +112,7 @@ describe('matching', () => {
 
     expect(cloneResult.tasks![0].comments!.length).toEqual(1)
   })
+
   it('remove item from array', () => {
     const clone = model.createDocument(taskIds.class.Task, doc1)
     const cloneResult = model.removeDocument(clone, { tasks: { name: 'subtask1' as StringProperty } })
@@ -119,6 +120,7 @@ describe('matching', () => {
     expect(cloneResult.tasks!.length).toEqual(1)
     expect(cloneResult.tasks![0].name).toEqual('subtask2')
   })
+
   it('remove item from instance', () => {
     const clone = model.createDocument(taskIds.class.Task, doc1)
     const cloneResult = model.removeDocument(clone, { mainTask: {} })
@@ -128,7 +130,7 @@ describe('matching', () => {
 
   it('match regex value', async () => {
     const model = new Model('vdocs')
-    model.loadModel(b.dump())
+    model.loadModel(data)
 
     model.add(model.createDocument(taskIds.class.Task, createTask('t1', 10, 'test task1')))
     model.add(model.createDocument(taskIds.class.Task, createTask('t2t', 11, 'test task2')))

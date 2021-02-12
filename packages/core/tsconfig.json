@@ -1,12 +1,13 @@
 {
   "compilerOptions": {
-    "target": "es6",
-    "module": "es6",
+    "target": "esnext",
+    "module": "commonjs",
     "outDir": "./lib",
     "rootDir": "./src",
     "sourceMap": true,
     "declaration": true,
     "strict": true,
+    "esModuleInterop": true,
     "moduleResolution": "node",
     "experimentalDecorators": true
   }

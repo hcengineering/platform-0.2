@@ -43,7 +43,7 @@ jobs:
 
       - name: Run tests
         run: |
-          yarn run jest
+          yarn test
   lint:
     runs-on: ubuntu-latest
 

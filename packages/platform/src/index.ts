@@ -21,8 +21,8 @@
 import type { Resource } from '@anticrm/foundation'
 import { Status, Severity } from '@anticrm/foundation'
 
-export { Resource, Severity, Status }
-export { PlatformError } from '@anticrm/foundation'
+export type { Resource } from '@anticrm/foundation'
+export { Status, Severity, PlatformError } from '@anticrm/foundation'
 
 /**
  * Platform Metadata Identifier (PMI).

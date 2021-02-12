@@ -14,83 +14,15 @@
 //
 
 import core, { Class$, Prop, ArrayOf$, Builder, InstanceOf$, Primary } from '..'
-import { Ref, Doc, Emb, Class, MODEL_DOMAIN, generateId } from '@anticrm/core'
+import { MODEL_DOMAIN } from '@anticrm/core'
 import { TAttribute, TClass, TClassifier, TDoc, TEmb, TMixin, TObj, TType } from '../models/core'
-
-export interface TaskComment extends Emb {
-  _id: string
-  message: string
-  author: string
-  date: Date
-  oldVersion: TaskComment[]
-}
-
-export interface SubTask extends Emb {
-  name: string
-  rate?: number
-  comments?: TaskComment[]
-}
-
-export interface Task extends Doc {
-  name: string
-  description: string
-  lists: string[]
-  tasks?: SubTask[]
-  mainTask?: SubTask
-  rate?: number
-  comments?: TaskComment[]
-}
-
-export const taskIds = {
-  class: {
-    Task: 'core.class.TaskObj' as Ref<Class<Task>>,
-    Subtask: 'core.class.SubTask' as Ref<Class<SubTask>>,
-    TaskComment: 'core.class.TaskComment' as Ref<Class<TaskComment>>
-  }
-}
-
-export function createSubtask (name: string, rate = 30): SubTask {
-  return {
-    name: name,
-    rate: rate,
-    __embedded: true,
-    _class: taskIds.class.Subtask
-  } as SubTask
-}
-
-/**
- * Create a random task with name specified
- * @param name
- */
-export function createTask (name: string, rate: number, description: string): Task {
-  return {
-    _id: generateId() as Ref<Doc>,
-    _class: taskIds.class.Task,
-    name,
-    description,
-    lists: [name],
-    rate
-  } as Task
-}
-
-export const doc1 = {
-  _id: 'd1' as Ref<Doc>,
-  _class: taskIds.class.Task,
-  name: 'my-space',
-  description: 'some-value',
-  lists: ['val1', 'val2'],
-  rate: 20,
-  mainTask: createSubtask('main-subtask', 30),
-  tasks: [
-    createSubtask('subtask1', 31),
-    createSubtask('subtask2', 33)
-  ]
-} as Task
+import { taskIds, SubTask, Task, TaskComment } from '@anticrm/core/src/__tests__/tasks'
 
 @Class$(taskIds.class.Task, core.class.Doc, MODEL_DOMAIN)
 export class TTask extends TDoc implements Task {
   @Primary()
   @Prop() name!: string
+
   @Prop() description!: string
 
   @Prop() rate!: number
