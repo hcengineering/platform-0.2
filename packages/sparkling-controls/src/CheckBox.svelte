@@ -1,19 +1,26 @@
 <script lang="ts">
   export let checked: boolean = false
   export const right: boolean = false
+  export let editable: boolean = true
+
+  function toggleState () {
+    if (editable) {
+      checked = !checked
+    }
+  }
 </script>
 
 <div class="checkbox-container">
   {#if (!right)}
-    <div class="checkbox" class:active={checked} on:click={() => {checked = !checked}}></div>
+    <div class="checkbox" class:active={checked} on:click={toggleState}></div>
     <div class="separator"></div>
   {/if}
-  <div class="input-label" on:click={() => {checked = !checked}}>
+  <div class="input-label" on:click={toggleState}>
     <slot />
   </div>
   {#if (right)}
     <div class="separator"></div>
-    <div class="checkbox" class:active={checked} on:click={() => {checked = !checked}}></div>
+    <div class="checkbox" class:active={checked} on:click={toggleState}></div>
   {/if}
 </div>
 
@@ -23,10 +30,12 @@
     flex-direction: row;
     align-items: center;
     cursor: pointer;
-    &:hover>.checkbox {
+
+    &:hover > .checkbox {
       border: solid 1px var(--theme-bg-dark-hover);
     }
-    &:hover>.checkbox::before {
+
+    &:hover > .checkbox::before {
       background-color: var(--theme-bg-dark-hover);
     }
 
@@ -59,11 +68,13 @@
         left: 3px;
         transition: all .2s ease-in-out;
       }
+
       &:hover {
         background-color: var(--theme-bg-accent-hover);
         border-color: var(--theme-bg-dark-hover);
       }
     }
+
     .active {
       background-color: var(--theme-bg-dark-hover);
       border: solid 1px var(--theme-bg-dark-hover);
@@ -80,6 +91,7 @@
         z-index: 1002;
         transition: all .2s ease-in-out;
       }
+
       &:hover {
         background-color: var(--theme-bg-dark-hover);
         border-color: var(--theme-content-color);

@@ -23,6 +23,7 @@ import JoinSpace from './components/internal/spaces/JoinSpace.svelte'
 import BrowseSpace from './components/internal/spaces/BrowseSpace.svelte'
 import Application from './components/internal/Application.svelte'
 import CreateForm from './components/internal/CreateForm.svelte'
+import SpacePresenter from './components/internal/spaces/SpacePresenter.svelte'
 
 import { CoreService } from '@anticrm/platform-core'
 import { UIService } from '@anticrm/platform-ui'
@@ -40,6 +41,7 @@ export default async (platform: Platform, deps: { core: CoreService, ui: UIServi
   platform.setResource(workbench.component.BrowseSpace, BrowseSpace)
   platform.setResource(workbench.component.Application, Application)
   platform.setResource(workbench.component.CreateForm, CreateForm)
+  platform.setResource(workbench.component.SpacePresenter, SpacePresenter)
 
   return {}
 }

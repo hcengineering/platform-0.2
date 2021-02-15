@@ -20,6 +20,7 @@ import TaskProperties from './components/internal/TaskProperties.svelte'
 import TaskInfo from './components/internal/TaskInfo.svelte'
 import CreateForm from './components/internal/NewTaskForm.svelte'
 import TaskCardPresenter from './components/internal/TaskCardPresenter.svelte'
+import StatusPresenter from './components/internal/presenters/StatusPresenter.svelte'
 
 /*!
  * Anticrm Platform™ Task Plugin
@@ -31,6 +32,7 @@ export default async (platform: Platform): Promise<TaskService> => {
   platform.setResource(task.component.TaskInfo, TaskInfo)
   platform.setResource(task.component.CreateTask, CreateForm)
   platform.setResource(task.component.TaskCardPresenter, TaskCardPresenter)
+  platform.setResource(task.component.StatusPresenter, StatusPresenter)
 
   return {}
 }

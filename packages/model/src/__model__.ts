@@ -85,7 +85,7 @@ export class TSpace extends TDoc implements Space {
 
 @Class$(core.class.VDoc, core.class.Doc, MODEL_DOMAIN)
 export class TVDoc extends TDoc implements VDoc {
-  @Prop() _space!: Ref<Space>
+  @RefTo$(core.class.Space) _space!: Ref<Space>
   @Prop() _createdOn!: DateProperty
   @Prop() _createdBy!: StringProperty
   @Prop() _modifiedOn?: DateProperty
@@ -99,7 +99,7 @@ export class TApplication extends TDoc implements Application {
 @Class$(core.class.Title, core.class.Doc, TITLE_DOMAIN)
 class TTitle extends TDoc implements Title {
   @RefTo$(core.class.Class) _objectClass!: Ref<Classifier<Doc>>
-  @Prop() _objectId!: Ref<Doc>
+  @RefTo$(core.class.Doc) _objectId!: Ref<Doc>
   @Prop() title!: string | number
 }
 

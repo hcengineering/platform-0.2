@@ -106,7 +106,7 @@ export function model (S: Builder): void {
     classes: [chunter.class.Page]
   })
 
-  S.mixin(chunter.class.Page, presentation.class.DetailForm, {
+  S.mixin(chunter.class.Page, presentation.mixin.DetailForm, {
     component: chunter.component.PageProperties
   })
 

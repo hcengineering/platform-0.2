@@ -18,13 +18,12 @@ import { Class, Ref, Property } from '@anticrm/core'
 import { Space } from '@anticrm/domains'
 import _contact, { Contact, Person, User } from '.'
 import { IntlString } from '@anticrm/platform-i18n'
-import { TMixin, TVDoc } from '@anticrm/model/src/__model__'
+import { TVDoc } from '@anticrm/model/src/__model__'
 import { UX } from '@anticrm/presentation/src/__model__'
 import presentation from '@anticrm/presentation'
 
 const contact = extendIds(_contact, {
-  application: {
-  },
+  application: {},
   class: {
     Contact: '' as Ref<Class<Contact>>,
     Person: '' as Ref<Class<Person>>
@@ -61,11 +60,11 @@ export class TUser extends TPerson implements User {
 export function model (S: Builder): void {
   S.add(TContact, TPerson, TUser)
 
-  S.mixin(contact.class.Person as Ref<Class<Person>>, presentation.class.DetailForm, {
+  S.mixin(contact.class.Person as Ref<Class<Person>>, presentation.mixin.DetailForm, {
     component: contact.component.PersonProperties
   })
 
-  S.mixin(contact.mixin.User, presentation.class.LookupForm, {
+  S.mixin(contact.mixin.User, presentation.mixin.LookupForm, {
     component: contact.component.UserLookup
   })
 

@@ -30,7 +30,6 @@ import { Application, Space } from '@anticrm/domains'
 import { TDoc, TVDoc } from '@anticrm/model/src/__model__'
 import contact from '@anticrm/contact/src/__model__'
 import { Asset } from '@anticrm/platform-ui'
-import ui from '@anticrm/presentation'
 
 export const DOMAIN_TASK = 'task'
 
@@ -62,8 +61,6 @@ const task = extendIds(_task, {
     Closed: '' as Ref<TaskFieldValue>
   }
 })
-
-export default task
 
 @Class$(task.class.TaskFieldValue, core.class.Doc, MODEL_DOMAIN)
 export class TTaskFieldValue extends TDoc implements TaskFieldValue {
@@ -106,7 +103,7 @@ export class TTask extends TCollab implements Task {
   @ArrayOf$()
   @RefTo$(task.class.TaskFieldValue) labels!: Ref<TaskFieldValue>[]
 
-  @UX(task.string.Task_status)
+  @UX(task.string.Task_status, undefined, task.component.StatusPresenter)
   @ArrayOf$()
   @RefTo$(task.class.TaskFieldValue) status!: Ref<TaskFieldValue>
 }
@@ -161,11 +158,11 @@ export function model (S: Builder): void {
     classes: [task.class.Task]
   }, task.application.Task)
 
-  S.mixin(task.class.Task, presentation.class.DetailForm, {
+  S.mixin(task.class.Task, presentation.mixin.DetailForm, {
     component: task.component.TaskProperties
   })
 
-  S.mixin(task.class.Task, presentation.class.CreateForm, {
+  S.mixin(task.class.Task, presentation.mixin.CreateForm, {
     component: task.component.CreateTask
   })
 
@@ -221,7 +218,7 @@ export function model (S: Builder): void {
     } as TaskFieldValue, s.id)
   }
 
-  S.createDocument(ui.class.ClassPresenter, {
+  S.createDocument(presentation.mixin.ClassPresenter, {
     displayClass: task.class.Task,
     label: 'Card' as IntlString,
     component: task.component.TaskCardPresenter

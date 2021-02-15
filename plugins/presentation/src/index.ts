@@ -154,7 +154,10 @@ const presentationPlugin = plugin('presentation' as Plugin<PresentationService>,
     brdSmile: '' as Asset
   },
   class: {
-    UXAttribute: '' as Ref<Class<UXAttribute>>,
+    UXAttribute: '' as Ref<Class<UXAttribute>>
+  },
+  mixin: {
+    UXObject: '' as Ref<Mixin<UXObject<Doc>>>,
     Presenter: '' as Ref<Mixin<Presenter<Type>>>,
     DetailForm: '' as Ref<Mixin<ComponentExtension<VDoc>>>,
 
@@ -162,9 +165,6 @@ const presentationPlugin = plugin('presentation' as Plugin<PresentationService>,
     CreateForm: '' as Ref<Mixin<ComponentExtension<VDoc>>>,
     LookupForm: '' as Ref<Mixin<ComponentExtension<VDoc>>>,
     ClassPresenter: '' as Ref<Mixin<ClassPresenter>>
-  },
-  mixin: {
-    UXObject: '' as Ref<Mixin<UXObject<Doc>>>
   },
   component: {
     ObjectBrowser: '' as AnyComponent,

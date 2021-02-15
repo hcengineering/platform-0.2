@@ -23,6 +23,7 @@ import ux, { UXAttribute } from '@anticrm/presentation'
 import { AnyComponent, Asset } from '@anticrm/platform-ui'
 
 import _workbench, { WorkbenchApplication } from '.'
+import ui from '@anticrm/presentation'
 
 const workbench = extendIds(_workbench, {
   component: {},
@@ -60,6 +61,10 @@ export function model (S: Builder): void {
         presenter: ux.component.CheckboxPresenter
       } as UXAttribute
     }
+  })
+
+  S.mixin(core.class.Space, ux.mixin.Presenter, {
+    presenter: workbench.component.SpacePresenter
   })
 
   S.createClass(workbench.class.Perspective, core.class.Doc, {

@@ -40,7 +40,7 @@ export class TUXAttribute extends TEmb implements UXAttribute {
   visible!: boolean
 }
 
-@Mixin$(ui.class.Presenter, core.class.Mixin)
+@Mixin$(ui.mixin.Presenter, core.class.Mixin)
 export class TPresenter<T extends Type> extends TMixin<T> implements Presenter<T> {
   @Prop()
   presenter!: AnyComponent
@@ -59,25 +59,25 @@ export class TUXObject<T extends Obj> extends TMixin<T> implements UXObject<T> {
   attributes!: Record<string, UXAttribute>
 }
 
-@Mixin$(ui.class.DetailForm, core.class.Mixin)
+@Mixin$(ui.mixin.DetailForm, core.class.Mixin)
 export class TDetailForm<T extends VDoc> extends TMixin<T> implements ComponentExtension<T> {
   @Prop()
   component!: AnyComponent
 }
 
-@Mixin$(ui.class.LookupForm, core.class.Mixin)
+@Mixin$(ui.mixin.LookupForm, core.class.Mixin)
 export class TLookupForm<T extends VDoc> extends TMixin<T> implements ComponentExtension<T> {
   @Prop()
   component!: AnyComponent
 }
 
-@Mixin$(ui.class.CreateForm, core.class.Mixin)
+@Mixin$(ui.mixin.CreateForm, core.class.Mixin)
 export class TCreateForm<T extends VDoc> extends TMixin<T> implements ComponentExtension<T> {
   @Prop()
   component!: AnyComponent
 }
 
-@Class$(ui.class.ClassPresenter, core.class.Doc, MODEL_DOMAIN)
+@Class$(ui.mixin.ClassPresenter, core.class.Doc, MODEL_DOMAIN)
 export class TClassPresenter extends TDoc implements ClassPresenter {
   @RefTo$(core.class.Class)
   displayClass!: Ref<Class<Doc>>
@@ -90,38 +90,38 @@ export class TClassPresenter extends TDoc implements ClassPresenter {
 export function model (S: Builder): void {
   S.add(TUXAttribute, TPresenter, TUXObject, TDetailForm, TLookupForm, TCreateForm, TClassPresenter)
 
-  S.mixin(core.class.Type, ui.class.Presenter, {
+  S.mixin(core.class.Type, ui.mixin.Presenter, {
     presenter: ui.component.StringPresenter
   })
 
-  S.mixin(core.class.String, ui.class.Presenter, {
+  S.mixin(core.class.String, ui.mixin.Presenter, {
     presenter: ui.component.StringPresenter
   })
 
-  S.mixin(core.class.Number, ui.class.Presenter, {
+  S.mixin(core.class.Number, ui.mixin.Presenter, {
     presenter: ui.component.StringPresenter
   })
 
-  S.mixin(core.class.Boolean, ui.class.Presenter, {
+  S.mixin(core.class.Boolean, ui.mixin.Presenter, {
     presenter: ui.component.CheckboxPresenter
   })
 
-  S.mixin(core.class.RefTo, ui.class.Presenter, {
+  S.mixin(core.class.RefTo, ui.mixin.Presenter, {
     presenter: ui.component.RefPresenter
   })
 
-  S.mixin(core.class.ArrayOf, ui.class.Presenter, {
+  S.mixin(core.class.ArrayOf, ui.mixin.Presenter, {
     presenter: ui.component.StringPresenter
   })
 
-  S.createDocument(ui.class.ClassPresenter, {
+  S.createDocument(ui.mixin.ClassPresenter, {
     displayClass: core.class.Doc,
     label: 'Table' as IntlString,
     component: ui.component.TablePresenter
   })
 }
 
-export function UX (label: IntlString, icon?: Asset): any {
+export function UX (label: IntlString, icon?: Asset, presenter?: AnyComponent): any {
   function uxProp (target: any, propertyKey: string): void {
     const classifier = getClassifier(target)
 
@@ -145,12 +145,18 @@ export function UX (label: IntlString, icon?: Asset): any {
       attrs[propertyKey] = {
         label,
         icon,
-        visible: true
+        visible: true,
+        presenter
       } as UXAttribute
     } else {
       // Just update existing
       attr[1].label = label
-      attr[1].icon = icon
+      if (icon) {
+        attr[1].icon = icon
+      }
+      if (presenter) {
+        attr[1].presenter = presenter
+      }
     }
   }
 
