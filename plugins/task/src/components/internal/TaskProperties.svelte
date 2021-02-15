@@ -57,10 +57,10 @@
       if (!status) {
         status = s
       }
-      if (object.status === s._id) {
+      if (object && object.status === s._id) {
         status = s
       }
-      if (object.status !== s._id) {
+      if (object && object.status !== s._id) {
         acts.push({
           name: s.action,
           action: () => {

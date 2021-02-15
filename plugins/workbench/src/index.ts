@@ -65,7 +65,9 @@ export default plugin('workbench' as Plugin<WorkbenchService>, {
     // A table presentation layout
     TableLayout: '' as AnyComponent,
     // A card line display layout
-    CardLayout: '' as AnyComponent
+    CardLayout: '' as AnyComponent,
+
+    SpacePresenter: '' as AnyComponent
   },
   class: {
     Perspective: '' as Ref<Class<Perspective>>,
@@ -79,3 +81,4 @@ export default plugin('workbench' as Plugin<WorkbenchService>, {
     Default: '' as Ref<Perspective>
   }
 })
+

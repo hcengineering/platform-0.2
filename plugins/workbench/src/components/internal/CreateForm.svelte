@@ -53,7 +53,7 @@
   }
 
   const init = Promise.all([
-    getComponentExtension(_class, presentation.class.CreateForm).then((ext) => {
+    getComponentExtension(_class, presentation.mixin.CreateForm).then((ext) => {
       createFormComponent = ext
     }),
     presentationService.getClassModel(_class, CORE_CLASS_VDOC).then((m) => {

@@ -39,9 +39,11 @@ export interface QueryProtocol {
 
   /**
    * Perform subscribe to query with some helper finalizer to use
-   * @param _class
-   * @param query
-   * @return a function to re-subscribe with a new query variant for same action.
+   * @param _class - a class to perform search against
+   * @param query - a query to match object.
+   * @param action - callback with list of results.
+   * @param regFinalizer - a factory to register unsubscribe for underline query.
+   * @return a function to re-query with a new parameters for same action.
    */
   subscribe<T extends Doc> (_class: Ref<Class<T>>,
     query: AnyLayout,

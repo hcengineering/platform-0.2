@@ -44,7 +44,7 @@
   let availablePresenters: ClassPresenter[] = []
   let selectedPresenter: ClassPresenter | undefined
 
-  coreService.subscribe(ui.class.ClassPresenter, {}, (docs) => {
+  coreService.subscribe(ui.mixin.ClassPresenter, {}, (docs) => {
     presenters = docs
   }, onDestroy)
 
@@ -108,7 +108,7 @@
     </div>
     <ScrollView height="100%" margin="2em">
       {#if selectedPresenter && selectedPresenter.component}
-        <Component is={selectedPresenter.component} props={{_class: appInstance.classes[0], space: space}} on:open />
+        <Component is={selectedPresenter.component} props={{_class: appInstance.classes[0], space: space, editable: false}} on:open />
         <!--      <Table _class={appInstance.classes[0]} {space} on:open />-->
       {/if}
     </ScrollView>

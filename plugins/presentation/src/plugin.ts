@@ -14,11 +14,9 @@
 //
 
 import { Platform } from '@anticrm/platform'
-import {
-  Attribute, Class, Obj, Ref, Type, Doc, Mixin
-} from '@anticrm/core'
+import { Attribute, Class, Doc, Mixin, Obj, Ref, Type } from '@anticrm/core'
 import { VDoc } from '@anticrm/domains'
-import ui, { AttrModel, ClassModel, GroupModel, PresentationService, ComponentExtension, UXObject } from '.'
+import ui, { AttrModel, ClassModel, ComponentExtension, GroupModel, PresentationService, UXObject } from '.'
 import { CoreService } from '@anticrm/platform-core'
 import { AnyComponent, Asset } from '@anticrm/platform-ui'
 import { I18n } from '@anticrm/platform-i18n'
@@ -26,9 +24,10 @@ import { I18n } from '@anticrm/platform-i18n'
 import ObjectBrowser from './components/internal/ObjectBrowser.svelte'
 import Properties from './components/internal/Properties.svelte'
 
-import StringEditor from './components/internal/editors/StringEditor.svelte'
-import CheckboxEditor from './components/internal/editors/CheckboxEditor.svelte'
-import TablePresenter from './components/internal/TablePresenter.svelte'
+import StringEditor from './components/internal/presenters/value/StringEditor.svelte'
+import CheckboxEditor from './components/internal/presenters/value/CheckboxEditor.svelte'
+import TablePresenter from './components/internal/presenters/class/TablePresenter.svelte'
+import RefPresenter from './components/internal/presenters/value/RefPresenter.svelte'
 
 /*!
  * Anticrm Platform™ Presentation Core Plugin
@@ -46,6 +45,7 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
   platform.setResource(ui.component.CheckboxPresenter, CheckboxEditor)
 
   platform.setResource(ui.component.TablePresenter, TablePresenter)
+  platform.setResource(ui.component.RefPresenter, RefPresenter)
 
   async function getGroupModel (_class: Ref<Class<Obj>>): Promise<GroupModel> {
     const model = coreService.getModel()
@@ -86,14 +86,18 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
         let presenter: AnyComponent = ui.component.StringPresenter // Use string presenter as default one
         if (uxAttribute.presenter) {
           presenter = uxAttribute.presenter
+          console.log('found attribute defined presenter for ', uxAttribute.label, presenter)
         } else {
           // get presenter
           const typeClassId = attribute.type._class
           const typeClass = model.get(typeClassId) as Class<Type>
-          if (!model.isMixedIn(typeClass, ui.class.Presenter)) {
-            throw new Error(`no presenter for type '${typeClassId}'`)
+          if (!model.isMixedIn(typeClass, ui.mixin.Presenter)) {
+            console.log(new Error(`no presenter for type '${typeClassId}'`))
+            // Use string presenter
+          } else {
+            presenter = model.as(typeClass, ui.mixin.Presenter).presenter
+            console.log('found class defined presenter for', uxAttribute.label, presenter)
           }
-          presenter = model.as(typeClass, ui.class.Presenter).presenter
         }
         result.push({
           key,
@@ -117,10 +121,10 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
       // get presenter
       const typeClassId = attribute.type._class
       const typeClass = model.get(typeClassId) as Class<Type>
-      if (!model.isMixedIn(typeClass, ui.class.Presenter)) {
+      if (!model.isMixedIn(typeClass, ui.mixin.Presenter)) {
         throw new Error(`no presenter for type '${typeClassId}'`)
       }
-      const presenter = model.as(typeClass, ui.class.Presenter)
+      const presenter = model.as(typeClass, ui.mixin.Presenter)
       result.push({
         key,
         _class,

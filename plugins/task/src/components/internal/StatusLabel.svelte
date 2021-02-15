@@ -1,5 +1,4 @@
 <script lang="ts">
-  export const type: number = 0
   export const text: string = ''
   export const color: string = ''
 </script>

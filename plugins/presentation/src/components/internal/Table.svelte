@@ -14,22 +14,36 @@
 -->
 <script type="ts">
   import { createEventDispatcher } from 'svelte'
-  import { Ref, Class, Doc } from '@anticrm/core'
-  import { Space } from '@anticrm/domains'
-  import { QueryResult } from '@anticrm/platform-core'
-  import { ClassModel } from '../..'
-  import { getCoreService, getPresentationService, getEmptyModel, _getCoreService } from '../../utils'
+  import { Ref, Class, Doc, CORE_CLASS_DOC } from '@anticrm/core'
+  import { CORE_CLASS_VDOC, Space } from '@anticrm/domains'
+  import { AttrModel, ClassModel, UXAttribute } from '../..'
+  import { getPresentationService, getEmptyModel, _getCoreService } from '../../utils'
   import { onDestroy } from 'svelte'
+  import Presenter from './presenters/Presenter.svelte'
 
   export let _class: Ref<Class<Doc>>
   export let space: Ref<Space>
+  export let editable: boolean = true
 
   const dispatch = createEventDispatcher()
 
   let model: ClassModel = getEmptyModel()
-  $: getPresentationService()
-    .then((p) => p.getClassModel(_class))
-    .then((m) => (model = m))
+  let modelClass: Ref<Class<Doc>>
+  let attributes: AttrModel[] = []
+
+
+  $: {
+    if (_class && _class != modelClass) {
+      getPresentationService()
+        .then((p) => p.getClassModel(_class, CORE_CLASS_DOC))
+        .then((m) => {
+          model = m
+          modelClass = _class
+          attributes = model.getAttributes()
+          console.log('all attributes', attributes)
+        })
+    }
+  }
 
   let objects: any[] = []
 
@@ -77,31 +91,14 @@
     .td {
       display: table-cell;
       padding: 0.5em;
-
-      // &.Boolean {
-      //   text-align: center;
-      // }
     }
-
-    // .tfoot {
-    //   display: table-footer-group;
-    // }
-    // .col {
-    //   display: table-column;
-    // }
-    // .colgroup {
-    //   display: table-column-group;
-    // }
-    // .caption {
-    //   display: table-caption;
-    // }
   }
 </style>
 
 <div class="erp-table">
   <div class="thead">
     <div class="tr">
-      {#each model.getAttributes() as attr (attr.key)}
+      {#each attributes as attr (attr.key)}
         <div class="th caption-4">{attr.label}</div>
       {/each}
     </div>
@@ -109,8 +106,14 @@
   <div class="tbody">
     {#each objects as object (object._id)}
       <div class="tr" on:click={() => dispatch('open', { _id: object._id, _class: object._class })}>
-        {#each model.getAttributes() as attr (attr.key)}
-          <div class="td"><span>{object[attr.key] || ''}</span></div>
+        {#each attributes as attr (attr.key)}
+          <div class="td">
+            {#if attr.presenter}
+              <Presenter is={attr.presenter} value={object[attr.key] || '' } attribute={attr} {editable} />
+            {:else}
+              <span>{object[attr.key] || ''}</span>
+            {/if}
+          </div>
         {/each}
       </div>
     {/each}

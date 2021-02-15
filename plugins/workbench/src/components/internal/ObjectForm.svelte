@@ -40,7 +40,7 @@
   $: {
     queryUpdate(_class, { _id })
 
-    getComponentExtension(_class, presentation.class.DetailForm).then((ext) => {
+    getComponentExtension(_class, presentation.mixin.DetailForm).then((ext) => {
       component = ext
     })
   }
