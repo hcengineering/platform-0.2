@@ -1,4 +1,5 @@
-import Button from './Button.svelte';
+import Button from './Button.svelte'
+import ThemeDecorator from './ThemeDecorator.svelte'
 
 export default {
   title: 'Example/Button',
@@ -12,7 +13,18 @@ export default {
     },
     onClick: { action: 'onClick' },
   },
-};
+  decorators:  [(storyFn) => {
+    const story = storyFn();
+
+    return {
+      Component: ThemeDecorator,
+      props: {
+        child: story.Component,
+        props: story.props
+      }
+    }
+  }]
+}
 
 const Template = ({ onClick, ...args }) => ({
   Component: Button,
