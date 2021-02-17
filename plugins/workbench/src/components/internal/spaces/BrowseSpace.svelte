@@ -20,6 +20,9 @@
   import { onDestroy } from 'svelte'
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
   import { Doc, Property, Ref, StringProperty } from '@anticrm/core'
+  import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
+  import workbench from '@anticrm/workbench'
+  import Button from '@anticrm/sparkling-controls/src/Button.svelte'
 
   import { leaveSpace, joinSpace, archivedSpaceUpdate } from './utils'
 
@@ -44,79 +47,77 @@
 
 </script>
 
-<div class='space-browse-view'>
-  <div class='header'>
-    <div class='caption-4'>Space browser</div>
-    <div class='actions'>
-      <button class='button' on:click={() => dispatch('close')}>Cancel</button>
-      <div class='separator' />
-      <button class='button' on:click={() => {
-        uiService.showModal(CreateSpace, {})
-      }}>Create space
-      </button>
-    </div>
+<div class="space-browse-view">
+  <div class="header">
+    <div class="caption-1">Навигатор пространств</div>
+    <a href="/" on:click|preventDefault={() => dispatch('close')}>
+      <Icon icon={workbench.icon.Close} button="true" />
+    </a>
   </div>
 
-  <div class='content'>
-    <ScrollView height="90%">
+  <div class="content">
+    <div>
+      <Button kind="transparent"
+              on:click={ () => {
+          uiService.showModal(CreateSpace, {})
+        } }
+      >
+        <Icon icon={workbench.icon.Add} button="true" />
+        <span style="padding-left:.5em">Новое пространство</span>
+      </Button>
+    </div>
+    <div class="separator"></div>
+    <ScrollView height="165px">
       {#each spaces as s (s._id)}
-        <div class='space' on:mouseover={() => (hoverSpace = s._id)}>
-          <div class='info'>
-            <div class='caption-2'>{getSpaceName(s)}</div>
+        <div class="space" on:mouseover={() => (hoverSpace = s._id)}>
+          <div class="info">
+            <div class="caption-2">{getSpaceName(s)}</div>
             Members:
             {s.users !== undefined ? s.users.length : 0}
-            <br />
+            |
             {getCurrentUserSpace(curentUser, s) ? 'Joined' : ''}
             {s.archived ? 'Archived' : ''}
           </div>
-          <div class='actions'>
+          <div class="actions">
             {#if hoverSpace === s._id}
               {#if getCurrentUserSpace(curentUser, s)}
                 {#if s.isPublic || !getCurrentUserSpace(curentUser, s).owner  }
-                  <button class='button' on:click={() => leaveSpace(coreService, s)}>
-                    Leave
-                  </button>
+                  <Button width="100px" on:click={() => leaveSpace(coreService, s)}>Leave</Button>
                 {:else}
-                  <button class='button' on:click={() => archivedSpaceUpdate(coreService, s, !s.archived)}>
+                  <Button width="100px" on:click={() => archivedSpaceUpdate(coreService, s, !s.archived)}>
                     {s.archived ? 'Unarchive' : 'Archive'}
-                  </button>
+                  </Button>
                 {/if}
               {:else}
-                <button class='button' on:click={() =>  joinSpace(coreService, s)}>
+                <Button width="100px" on:click={() =>  joinSpace(coreService, s)}>
                   Join
-                </button>
+                </Button>
               {/if}
             {/if}
           </div>
         </div>
       {/each}
     </ScrollView>
-  </div>
+</div>
 </div>
 
 <style lang='scss'>
   .space-browse-view {
-    margin: 1em;
-    height: 20em;
-    width: 30em;
+    width: 412px;
+    padding: 24px;
+    position: relative;
 
     .header {
       display: flex;
-
-      .actions {
-        display: flex;
-        flex-grow: 1;
-        flex-direction: row-reverse;
-        font-size: 10px;
-
-        button {
-          margin-left: 0.5em;
-        }
-      }
+      justify-content: space-between;
+      margin-bottom: 20px;
     }
 
     .separator {
-      width: 1em;
+      margin-top: 20px;
+      margin-bottom: 4px;
+      height: 1px;
+      background-color: var(--theme-bg-accent-hover);
     }
 
     .content {
@@ -128,23 +129,37 @@
       .space {
         display: flex;
         flex-direction: row;
-        border-bottom: #313131 1px solid;
-        padding: 0.5em;
+        margin-top: 4px;
+        padding: 8px 8px;
+        border-radius: 4px;
         color: var(--theme-content-color);
 
         .info {
           flex-grow: 1;
+          font-size: 11px;
+          color: var(--theme-content-color);
+
+          .caption-2 {
+            margin-bottom: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--theme-userlink-color)
+          }
         }
 
         .actions {
           display: flex;
           align-items: center;
         }
+
+        &:first-child {
+          margin-top: 0px;
+        }
       }
 
       .space:hover {
         color: var(--theme-doclink-color);
-        background-color: var(--theme-editbox-bg-color);
+        background-color: var(--theme-bg-accent-hover);
       }
     }
   }
