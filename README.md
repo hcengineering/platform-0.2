@@ -20,7 +20,7 @@ More on [Code Structure](https://platform-one.now.sh/docs/concepts/code-structur
 
 **Note:** Please use *nodejs* version 14.x or later!
 
-Use following commands to install and run demo application.
+Use following commands to install and run demo application:
 
 ```
 yarn
@@ -29,7 +29,17 @@ yarn workspace @anticrm/tool create-workspace workspace --organization "My Organ
 yarn workspace @anticrm/tool create-user john.appleseed@gmail.com -w workspace -p 123 -f "John Appleseed"
 yarn workspace @anticrm/tool create-user brain.appleseed@gmail.com -w workspace -p 123 -f "Brain Appleseed"
 yarn workspace @anticrm/server start
+```
+
+Open new console and run:
+
+```
 yarn workspace @anticrm/server-front start
+```
+
+Open one more console and run:
+
+```
 yarn workspace prod dev
 ```
 
