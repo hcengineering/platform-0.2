@@ -23,7 +23,6 @@ import ux, { UXAttribute } from '@anticrm/presentation'
 import { AnyComponent, Asset } from '@anticrm/platform-ui'
 
 import _workbench, { WorkbenchApplication } from '.'
-import ui from '@anticrm/presentation'
 
 const workbench = extendIds(_workbench, {
   component: {},
@@ -84,6 +83,7 @@ export function model (S: Builder): void {
     description: 'General space',
     isPublic: true, // Available for all
     archived: false,
+    spaceKey: 'GEN',
     users: []
   }, workbench.space.General)
 
@@ -91,6 +91,7 @@ export function model (S: Builder): void {
     name: 'Всякое',
     description: 'Other space',
     isPublic: true,
+    spaceKey: 'OVR',
     archived: false,
     users: []
   }, workbench.space.Random)
@@ -99,6 +100,7 @@ export function model (S: Builder): void {
     name: 'Разное',
     description: 'Random space',
     isPublic: true,
+    spaceKey: 'RAND',
     archived: false,
     users: []
   }, workbench.space.Other)
