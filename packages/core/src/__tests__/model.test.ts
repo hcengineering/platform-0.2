@@ -169,10 +169,10 @@ describe('matching', () => {
     model.add(doc)
 
     // call to find() initialzes lazy loaded byClass model's attribute
-    await model.find(taskIds.class.Task, {name: doc.name as StringProperty})
-    
+    await model.find(taskIds.class.Task, { name: doc.name as StringProperty })
+
     model.removeDocument(doc, null)
-    const result = await model.find(taskIds.class.Task, {name: doc.name as StringProperty})
+    const result = await model.find(taskIds.class.Task, { name: doc.name as StringProperty })
     expect(result.length).toEqual(0)
   })
 })
