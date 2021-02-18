@@ -158,7 +158,7 @@ describe('matching', () => {
     model.add(model.createDocument(taskIds.class.Task, createTask('t1', 10, 'test task1')))
 
     const result = await model.findOne(taskIds.class.Task, { name: { $regex: 't3' as StringProperty } })
-    expect(result).toBeUndefined();
+    expect(result).toBeUndefined()
   })
 
   it('remove document without "query" argument', async () => {
