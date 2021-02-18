@@ -44,7 +44,6 @@ export default plugin('workbench' as Plugin<WorkbenchService>, {
   icon: {
     DefaultPerspective: '' as Asset,
     Add: '' as Asset,
-    Pages: '' as Asset,
     Resize: '' as Asset,
     Close: '' as Asset,
     Finder: '' as Asset,

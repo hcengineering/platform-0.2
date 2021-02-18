@@ -22,6 +22,6 @@ export default (platform: Platform) => {
     Chunter: spritesUrl + '#chunter',
     ActivityView: spritesUrl + '#activityView',
     ChatView: spritesUrl + '#chatView',
-    PagesView: spritesUrl + '#chatView',
+    PagesView: spritesUrl + '#pagesView',
   })
 }
