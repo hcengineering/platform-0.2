@@ -59,7 +59,7 @@ yarn workspace @anticrm/tool upgrade-workspace workspace
 # The Platform Documentation
 
 * [Platform Architecture](https://platform-one.now.sh/docs/concepts/architecture/)
-* [Мотивацонная статья](https://medium.com/платформа/го-я-создал-4250ec3dab76)
+* [Мотивационная статья](https://medium.com/платформа/го-я-создал-4250ec3dab76)
 
 ## Run with Server and MongoDb (obsolete, version 1)
 
