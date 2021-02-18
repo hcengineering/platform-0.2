@@ -67,30 +67,42 @@
 
     .thead {
       display: table-header-group;
+      border-bottom: 1px solid var(--theme-bg-accent-color);
+      color: var(--theme-content-color);
+      font-size: 11px;
+      font-weight: 400;
     }
 
     .th {
       display: table-cell;
-      padding: 0.5em;
+      padding: 12px 8px;
     }
 
     .tbody {
       display: table-row-group;
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--theme-content-dark-color);
 
       .tr {
-        border-bottom: 1px solid var(--theme-bg-accent-color);
+        background-color: var(--theme-bg-color);
+        // border-bottom: 1px solid var(--theme-bg-accent-color);
 
-        &:hover {
-          background-color: var(--theme-content-color);
-          color: var(--theme-bg-color);
-          cursor: pointer;
+        // &:hover {
+        //   background-color: var(--theme-content-color);
+        //   color: var(--theme-bg-color);
+        //   cursor: pointer;
+        // }
+
+        &:nth-child(odd) {
+          background-color: var(--theme-bg-accent-color);
         }
       }
     }
 
     .td {
       display: table-cell;
-      padding: 0.5em;
+      padding: 12px 8px;
     }
   }
 </style>
@@ -99,7 +111,7 @@
   <div class="thead">
     <div class="tr">
       {#each attributes as attr (attr.key)}
-        <div class="th caption-4">{attr.label}</div>
+        <div class="th">{attr.label}</div>
       {/each}
     </div>
   </div>
