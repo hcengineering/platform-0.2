@@ -13,7 +13,7 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { Property, Ref, StringProperty } from '@anticrm/core'
+  import { Property, Ref } from '@anticrm/core'
   import { createEventDispatcher } from 'svelte'
   import { AttrModel, ClassModel } from '@anticrm/presentation'
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
@@ -21,9 +21,9 @@
   import workbench from '@anticrm/workbench'
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
-  import { Space } from '@anticrm/domains'
+  import { CORE_MIXIN_SHORTID, Space } from '@anticrm/domains'
   import { getCoreService, getPresentationService } from '../../utils'
-  import task, { Task, TASK_STATUS_OPEN } from '../../index'
+  import task, { TASK_STATUS_OPEN } from '../../index'
   import EditBox from '@anticrm/platform-ui/src/components/EditBox.svelte'
   import chunter, { Comment, getChunterService } from '@anticrm/chunter'
 
@@ -42,9 +42,9 @@
 
   const presentationService = getPresentationService()
 
-  function save () {
-    const doc = {
-      _class: task.class.Task,
+  async function save () {
+    let modelDb = coreService.getModel()
+    const newTask = modelDb.newDoc(task.class.Task, coreService.generateId(), {
       title,
       _space: space, ...object,
       status: TASK_STATUS_OPEN,
@@ -54,10 +54,18 @@
         _createdOn: Date.now() as Property<number, Date>,
         _createdBy: coreService.getUserId() as Property<string, string>
       } as Comment]
-    } as Task
+    })
+    try {
+      const asShortId = modelDb.cast(newTask, CORE_MIXIN_SHORTID)
+      asShortId.shortId = await coreService.genRefId(space)
+    } catch (e) {
+      // Ignore
+      console.log(e)
+    }
+
     object = {}
     // absent VDoc fields will be autofilled
-    coreService.create(task.class.Task, doc)
+    coreService.create(task.class.Task, newTask)
     dispatch('close')
   }
 
@@ -154,9 +162,6 @@
 <div class="recruiting-view">
   <div class="header">
     <div class="caption-1 caption">
-      <div class="taskLabel">
-        DT-925
-      </div>
       <EditBox id="create_task__input__name" bind:value={title} width="100%"
                label="Name" placeholder="Name" />
     </div>

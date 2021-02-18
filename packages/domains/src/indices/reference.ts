@@ -14,36 +14,16 @@
 //
 
 import {
-  Ref,
-  Class,
-  Doc,
-  Obj,
-  ArrayOf,
-  InstanceOf,
-  Emb,
-  AnyLayout,
-  CORE_CLASS_STRING,
-  CORE_CLASS_ARRAY_OF, CORE_CLASS_INSTANCE_OF,
-  DomainIndex, Storage, Tx, TxContext,
-  Model, generateId
+  AnyLayout, ArrayOf, Class, CORE_CLASS_ARRAY_OF, CORE_CLASS_INSTANCE_OF, CORE_CLASS_STRING, Doc, DomainIndex, Emb,
+  InstanceOf, Model, Obj, Ref, Storage, Tx, TxContext
 } from '@anticrm/core'
 import {
-  CreateTx,
-  CORE_CLASS_CREATE_TX,
-  Reference,
-  CORE_CLASS_REFERENCE,
-  CORE_CLASS_UPDATE_TX,
-  UpdateTx,
-  CORE_CLASS_PUSH_TX, PushTx, CORE_CLASS_DELETE_TX, DeleteTx
+  CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_PUSH_TX, CORE_CLASS_REFERENCE, CORE_CLASS_UPDATE_TX, CreateTx,
+  DeleteTx, PushTx, Reference, UpdateTx
 } from '..'
 
 import {
-  MessageMarkType,
-  MessageNode,
-  parseMessage,
-  ReferenceMark,
-  traverseMarks,
-  traverseMessage
+  MessageMarkType, MessageNode, parseMessage, ReferenceMark, traverseMarks, traverseMessage
 } from '@anticrm/text'
 
 type ClassKey = { key: string, _class: Ref<Class<Emb>> }
@@ -98,20 +78,25 @@ export class ReferenceIndex implements DomainIndex {
 
   private referencesFromMessage (_class: Ref<Class<Doc>>, _id: Ref<Doc> | undefined, message: string, props: Record<string, unknown>, index: { value: number }): Reference[] {
     const result: Reference[] = []
+    const refMatcher = new Set()
     traverseMessage(parseMessage(message) as MessageNode, (el) => {
       traverseMarks(el, (m) => {
         if (m.type === MessageMarkType.reference) {
           const rm = m as ReferenceMark
-          index.value++
-          result.push({
-            _class: CORE_CLASS_REFERENCE,
-            _id: ((_id as string) + index.value) as Ref<Doc>, // Generate a sequence id based on source object id.
-            _targetId: rm.attrs.id as Ref<Doc>,
-            _targetClass: rm.attrs.class as Ref<Class<Doc>>,
-            _sourceId: _id,
-            _sourceClass: _class,
-            _sourceProps: props
-          })
+          const key = rm.attrs.id + rm.attrs.class
+          if (!refMatcher.has(key)) {
+            refMatcher.add(key)
+            index.value++
+            result.push({
+              _class: CORE_CLASS_REFERENCE,
+              _id: ((_id as string) + index.value) as Ref<Doc>, // Generate a sequence id based on source object id.
+              _targetId: rm.attrs.id as Ref<Doc>,
+              _targetClass: rm.attrs.class as Ref<Class<Doc>>,
+              _sourceId: _id,
+              _sourceClass: _class,
+              _sourceProps: props
+            })
+          }
         }
       })
     })

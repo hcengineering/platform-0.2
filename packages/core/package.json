@@ -28,7 +28,6 @@
     "typescript": "^3.9.4"
   },
   "dependencies": {
-    "@anticrm/model": "0.2.0",
     "@anticrm/platform": "0.2.0",
     "markdown-it": "^11.0.1"
   }

@@ -33,14 +33,14 @@ import {
   CoreProtocol, TxProcessor,
   generateId as genId
 } from '@anticrm/core'
-import { CORE_CLASS_REFERENCE, CORE_CLASS_SPACE, CORE_CLASS_TITLE, TITLE_DOMAIN } from '@anticrm/domains'
+import { CORE_CLASS_REFERENCE, CORE_CLASS_SPACE, CORE_CLASS_TITLE, Space, TITLE_DOMAIN, VDoc } from '@anticrm/domains'
 
 import { createOperations } from './operations'
 
 import { ModelIndex } from '@anticrm/domains/src/indices/model'
 import { VDocIndex } from '@anticrm/domains/src/indices/vdoc'
 import { TxIndex } from '@anticrm/domains/src/indices/tx'
-import { RPC_CALL_FIND, RPC_CALL_FINDONE, RPC_CALL_LOAD_DOMAIN, RPC_CALL_TX } from '@anticrm/rpc'
+import { RPC_CALL_FIND, RPC_CALL_FINDONE, RPC_CALL_GEN_REF_ID, RPC_CALL_LOAD_DOMAIN, RPC_CALL_TX } from '@anticrm/rpc'
 import { PassthroughsIndex } from '@anticrm/domains/src/indices/filter'
 
 /*!
@@ -55,7 +55,8 @@ export default async (platform: Platform): Promise<CoreService> => {
     find: <T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> => rpc.request(RPC_CALL_FIND, _class, query),
     findOne: <T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined> => rpc.request(RPC_CALL_FINDONE, _class, query),
     tx: (tx: Tx): Promise<any> => rpc.request(RPC_CALL_TX, tx),
-    loadDomain: (domain: string): Promise<Doc[]> => rpc.request(RPC_CALL_LOAD_DOMAIN, domain)
+    loadDomain: (domain: string): Promise<Doc[]> => rpc.request(RPC_CALL_LOAD_DOMAIN, domain),
+    genRefId: (_space: Ref<Space>) => rpc.request(RPC_CALL_GEN_REF_ID, _space)
   }
 
   // Storages
@@ -174,6 +175,10 @@ export default async (platform: Platform): Promise<CoreService> => {
     return coreProtocol.loadDomain(domain)
   }
 
+  function genRefId (_space: Ref<Space>): Promise<Ref<VDoc>> {
+    return coreProtocol.genRefId(_space)
+  }
+
   return {
     getModel: () => model,
     loadDomain,
@@ -184,6 +189,7 @@ export default async (platform: Platform): Promise<CoreService> => {
     ...ops,
     generateId,
     tx: processTx,
-    getUserId
+    getUserId,
+    genRefId
   } as CoreService
 }

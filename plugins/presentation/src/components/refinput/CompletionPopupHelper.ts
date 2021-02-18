@@ -1,6 +1,7 @@
 
 export interface CompletionItem {
   key: string
+  completion: string
   label: string
   title?: string
 }

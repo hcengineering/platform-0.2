@@ -14,18 +14,8 @@
 //
 
 import {
-  TxProcessor,
-  Tx,
-  TxContext,
-  Storage,
-  Ref,
-  StringProperty,
-  AnyLayout,
-  Class,
-  Doc,
-  Model,
-  MODEL_DOMAIN,
-  isValidQuery, DocumentProtocol
+  AnyLayout, Class, Doc, DocumentProtocol, isValidQuery, Model, MODEL_DOMAIN, Ref, Storage, StringProperty, Tx,
+  TxContext, TxProcessor
 } from '@anticrm/core'
 import { Collection, MongoClient } from 'mongodb'
 import { withTenant } from '@anticrm/accounts'
@@ -38,11 +28,13 @@ import { VDocIndex } from '@anticrm/domains/src/indices/vdoc'
 import { TxIndex } from '@anticrm/domains/src/indices/tx'
 import { ClientTxStorage } from '@anticrm/platform-core/src/clienttx'
 import { PassthroughsIndex } from '@anticrm/domains/src/indices/filter'
-import { CORE_CLASS_SPACE } from '@anticrm/domains'
+import { CORE_CLASS_SPACE, Space, VDoc } from '@anticrm/domains'
 
 export interface WorkspaceProtocol extends DocumentProtocol {
 
   tx (txContext: TxContext, tx: Tx): Promise<any>
+
+  genRefId (_space: Ref<Space>): Promise<Ref<Doc>>
 
   close (): Promise<void>
 
@@ -60,6 +52,8 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
   const model = await db.collection('model').find({}).toArray()
   console.log('model loaded.')
   memdb.loadModel(model)
+
+  const workspace_system = db.collection('system')
 
   function collection<T extends Doc> (_class: Ref<Class<T>>): Collection {
     const domain = memdb.getDomain(_class)
@@ -173,6 +167,27 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
       if (domain === MODEL_DOMAIN) return memdb.dump()
       console.log('domain:', domain)
       return db.collection(domain).find({}).toArray()
+    },
+
+    async genRefId (_space: Ref<Space>): Promise<Ref<Doc>> {
+      const space = await this.findOne(CORE_CLASS_SPACE, { _id: _space })
+      if (!space) {
+        return Promise.reject(new Error('Space with id ' + _space + ' is not found'))
+      }
+
+      async function getValue () {
+        return await workspace_system.findOneAndUpdate(
+          { _space },
+          { $inc: { value: 1 } },
+          { upsert: true }
+        )
+      }
+
+      let res = await getValue()
+      if (!res.value) {
+        res = await getValue()
+      }
+      return (space.spaceKey + '-' + res.value.value) as Ref<VDoc>
     },
 
     close (): Promise<void> {

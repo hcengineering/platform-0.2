@@ -13,31 +13,14 @@
 // limitations under the License.
 //
 
-import core, { ArrayOf$, Builder, Class$, InstanceOf$, Primary, Prop, RefTo$ } from '.'
+import core, { ArrayOf$, Builder, Class$, InstanceOf$, Mixin$, Primary, Prop, RefTo$ } from '.'
 
 import { Classifier, DateProperty, Doc, MODEL_DOMAIN, Ref, SPACE_DOMAIN, StringProperty, Type } from '@anticrm/core'
 
-import {
-  Application,
-  Space,
-  SpaceUser,
-  Title,
-  TITLE_DOMAIN,
-  VDoc
-} from '@anticrm/domains'
+import { Application, ShortID, Space, SpaceUser, Title, TITLE_DOMAIN, VDoc } from '@anticrm/domains'
 
 import {
-  TArrayOf,
-  TAttribute,
-  TClass,
-  TClassifier,
-  TDoc,
-  TEmb,
-  TIndexesClass,
-  TMixin,
-  TObj,
-  TRefTo,
-  TType
+  TArrayOf, TAttribute, TClass, TClassifier, TDoc, TEmb, TIndexesClass, TMixin, TObj, TRefTo, TType
 } from './models/core'
 import { TCreateTx, TDeleteTx, TPushTx, TTx, TUpdateTx } from './models/tx'
 import { TReference } from './models/references'
@@ -75,6 +58,8 @@ export class TSpace extends TDoc implements Space {
 
   @Prop() description!: string
 
+  @Prop() spaceKey!: string
+
   @ArrayOf$()
   @InstanceOf$(core.class.SpaceUser) users!: SpaceUser[]
 
@@ -92,12 +77,17 @@ export class TVDoc extends TDoc implements VDoc {
   @Prop() _modifiedBy?: StringProperty
 }
 
+@Mixin$(core.mixin.ShortID, core.class.VDoc)
+export class TVShortID extends TVDoc implements ShortID {
+  @Prop() shortId!: string
+}
+
 @Class$(core.class.Application, core.class.Doc, MODEL_DOMAIN)
 export class TApplication extends TDoc implements Application {
 }
 
 @Class$(core.class.Title, core.class.Doc, TITLE_DOMAIN)
-class TTitle extends TDoc implements Title {
+export class TTitle extends TDoc implements Title {
   @RefTo$(core.class.Class) _objectClass!: Ref<Classifier<Doc>>
   @RefTo$(core.class.Doc) _objectId!: Ref<Doc>
   @Prop() title!: string | number
@@ -105,7 +95,7 @@ class TTitle extends TDoc implements Title {
 
 export function model (S: Builder): void {
   S.add(TObj, TEmb, TDoc, TAttribute, TType, TRefTo, TArrayOf, TClassifier, TClass, TMixin)
-  S.add(TIndexesClass)
+  S.add(TIndexesClass, TVShortID)
   S.add(TStringType, TNumberType, TBooleanType)
   S.add(TVDoc, TReference, TTitle, TApplication)
   S.add(TTx, TCreateTx, TPushTx, TUpdateTx, TDeleteTx)

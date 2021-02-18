@@ -16,43 +16,20 @@
 // following is only to make api-documenter happy.
 // DO NOT REMOVE LINES BELOW!!!
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type { Emb } from '@anticrm/core'
+import {
+  ArrayOf, Attribute, BagOf, Class, Classifier, CORE_CLASS_CLASS, CORE_CLASS_DOC, CORE_CLASS_EMB, CORE_CLASS_STRING,
+  Doc, Indices, InstanceOf, Mixin, Obj, Ref, RefTo, Tx, Type
+} from '@anticrm/core'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type { Space, DeleteTx, PushTx, UpdateTx, CreateTx, Reference } from '@anticrm/domains'
+import type { Reference, ShortID } from '@anticrm/domains'
 // DO NOT REMOVE LINES ABOVE !!!
 import {
-  Application,
-  CORE_CLASS_CREATE_TX,
-  CORE_CLASS_DELETE_TX,
-  CORE_CLASS_PUSH_TX,
-  CORE_CLASS_UPDATE_TX,
-  CORE_CLASS_SPACE,
-  SpaceUser,
-  Title,
-  VDoc
+  Application, CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_PUSH_TX, CORE_CLASS_SPACE, CORE_CLASS_UPDATE_TX,
+  CORE_MIXIN_SHORTID,
+  SpaceUser, Title, VDoc
 } from '@anticrm/domains'
 
 import { AnyPlugin, identify } from '@anticrm/platform'
-import {
-  ArrayOf,
-  Attribute,
-  BagOf,
-  Class,
-  Classifier,
-  Doc,
-  Indices,
-  InstanceOf,
-  Mixin,
-  Obj,
-  Ref,
-  RefTo,
-  Tx,
-  Type,
-  CORE_CLASS_DOC,
-  CORE_CLASS_EMB,
-  CORE_CLASS_CLASS,
-  CORE_CLASS_STRING
-} from '@anticrm/core'
 
 import Builder from './builder'
 
@@ -94,10 +71,10 @@ const modelIds = identify('core' as AnyPlugin, {
     Reference: '' as Ref<Class<Reference>>,
 
     Application: '' as Ref<Class<Application>>
-
   },
   mixin: {
-    Indices: '' as Ref<Mixin<Indices>>
+    Indices: '' as Ref<Mixin<Indices>>,
+    ShortID: CORE_MIXIN_SHORTID
   }
 })
 console.log('model ids', modelIds)

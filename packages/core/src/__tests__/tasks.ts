@@ -16,6 +16,9 @@
 import { Class, Doc, Emb, Ref } from '../classes'
 import { generateId } from '../storage'
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+export const data = require('./model.json')
+
 export interface TaskComment extends Emb {
   _id: string
   message: string

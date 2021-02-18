@@ -2,6 +2,7 @@
  * Operation direction, is it came from server or it is own operation.
  */
 import { AnyLayout, Class, DateProperty, Doc, Ref, StringProperty } from './classes'
+import { Space, VDoc } from '@anticrm/domains'
 
 export enum TxContextSource {
   Client, // A pure client operation
@@ -65,7 +66,19 @@ export interface DocumentProtocol {
 }
 
 export interface CoreProtocol extends DocumentProtocol {
+  /**
+   * Process a transaction on server
+   * @param tx
+   */
   tx (tx: Tx): Promise<any>
+
+  /**
+   * Generate a sequence, short object reference.
+   * @param _space
+   * @param _class
+   * @return a generated reference Id,
+   */
+  genRefId (_space: Ref<Space>): Promise<Ref<VDoc>>
 }
 
 export class TxProcessor {
