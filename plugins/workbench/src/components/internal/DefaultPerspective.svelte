@@ -124,7 +124,7 @@
 
     .selectedApp {
       padding: 1em;
-      color: var(--theme-bg-dark-color);
+      color: var(--theme-userlink-color);
     }
 
     .remainder {

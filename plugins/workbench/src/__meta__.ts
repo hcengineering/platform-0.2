@@ -21,7 +21,6 @@ export default (platform: Platform) => {
   platform.loadMetadata(workbench.icon, {
     DefaultPerspective: spritesUrl + '#perspective',
     Add: spritesUrl + '#add',
-    Pages: spritesUrl + '#pages',
     Resize: spritesUrl + '#resize',
     Close: spritesUrl + '#close',
     Finder: spritesUrl + '#finder',
