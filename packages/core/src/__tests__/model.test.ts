@@ -160,4 +160,19 @@ describe('matching', () => {
     const result = await model.findOne(taskIds.class.Task, { name: { $regex: 't3' as StringProperty } })
     expect(result).toBeUndefined();
   })
+
+  it('remove document without "query" argument', async () => {
+    const model = new Model('vdocs')
+    model.loadModel(data)
+
+    const doc = model.createDocument(taskIds.class.Task, doc1)
+    model.add(doc)
+
+    // call to find() initialzes lazy loaded byClass model's attribute
+    await model.find(taskIds.class.Task, {name: doc.name as StringProperty})
+    
+    model.removeDocument(doc, null)
+    const result = await model.find(taskIds.class.Task, {name: doc.name as StringProperty})
+    expect(result.length).toEqual(0)
+  })
 })
