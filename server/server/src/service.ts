@@ -18,7 +18,7 @@ import { WorkspaceProtocol } from './workspace'
 import { filterQuery, getUserSpaces, isAcceptable, processTx as processSpaceTx } from './spaces'
 import { Broadcaster, Client, ClientService, ClientSocket } from './server'
 import { AnyLayout, Class, Doc, generateId, Ref, Tx, txContext, TxContextSource } from '@anticrm/core'
-import { CORE_CLASS_CREATE_TX, CORE_CLASS_SPACE, SpaceUser } from '@anticrm/domains'
+import { CORE_CLASS_CREATE_TX, CORE_CLASS_SPACE, Space, SpaceUser, VDoc } from '@anticrm/domains'
 import { Response, serialize } from '@anticrm/rpc'
 
 export interface ClientControl {
@@ -96,6 +96,12 @@ export async function createClientService (workspaceProtocol: Promise<WorkspaceP
       return {
         clientTx: context.clientTx
       }
+    },
+    async genRefId (_space: Ref<Space>): Promise<Ref<Doc>> {
+      if (userSpaces.has(_space)) {
+        return workspace.genRefId(_space)
+      }
+      return Promise.reject(new Error('User not included into space ' + _space))
     },
 
     // C O N T R O L

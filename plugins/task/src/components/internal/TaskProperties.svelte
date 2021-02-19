@@ -13,11 +13,9 @@
   // limitations under the License.
   import { onDestroy } from 'svelte'
   import { Class, Obj, Ref } from '@anticrm/core'
-  import { CORE_CLASS_REFERENCE, CORE_CLASS_VDOC, Reference } from '@anticrm/domains'
+  import { CORE_MIXIN_SHORTID, ShortID } from '@anticrm/domains'
   import task, { Task, TaskFieldType, TaskFieldValue } from '../..'
-  import { getCoreService, getPresentationService } from '../../utils'
-  import { AttrModel, ClassModel } from '@anticrm/presentation'
-  import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
+  import { getCoreService } from '../../utils'
   import UserInfo from '@anticrm/sparkling-controls/src/UserInfo.svelte'
   import StatusLabel from './StatusLabel.svelte'
   import ActionBar from '@anticrm/platform-ui/src/components/ActionBar.svelte'
@@ -34,6 +32,8 @@
 
   let status: TaskFieldValue | undefined
 
+  const model = coreService.getModel()
+
   // Load and subscribe to any task status values.
   coreService.subscribe(task.class.TaskFieldValue, {}, (docs) => {
     const fValues: Map<TaskFieldType, TaskFieldValue[]> = new Map()
@@ -49,6 +49,7 @@
   }, onDestroy)
 
   let statusActions: Action[] = []
+  let taskShortId: ShortID
 
   $: {
     let sv = fieldValues.get(TaskFieldType.Status) || []
@@ -70,6 +71,7 @@
       }
     }
     statusActions = acts
+    taskShortId = model.as(object, CORE_MIXIN_SHORTID)
   }
 </script>
 
@@ -80,7 +82,7 @@
                 on:change={() => {coreService.update(object, null, {title: object.title})}} />
   </div>
   <div class="taskStatusBar">
-    <div class="taskName">DT-140</div>
+    <div class="taskName">{taskShortId.shortId}</div>
     {#if status}
       <StatusLabel text={status.title} color={status.color} />
     {/if}

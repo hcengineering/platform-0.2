@@ -15,7 +15,7 @@
 
 import core, { Class$, Prop, ArrayOf$, Builder, InstanceOf$, Primary } from '..'
 import { MODEL_DOMAIN } from '@anticrm/core'
-import { TAttribute, TClass, TClassifier, TDoc, TEmb, TMixin, TObj, TType } from '../models/core'
+import { TAttribute, TClass, TClassifier, TDoc, TEmb, TMixin, TObj, TType, TTitle, TVShortID } from '../__model__'
 import { taskIds, SubTask, Task, TaskComment } from '@anticrm/core/src/__tests__/tasks'
 
 @Class$(taskIds.class.Task, core.class.Doc, MODEL_DOMAIN)
@@ -74,6 +74,6 @@ export function model (S: Builder): void {
 }
 
 export function fullModel (S: Builder): void {
-  S.add(TObj, TEmb, TDoc, TClassifier, TClass, TAttribute, TType, TMixin)
+  S.add(TObj, TEmb, TDoc, TClassifier, TClass, TAttribute, TType, TMixin, TTitle, TVShortID)
   model(S)
 }

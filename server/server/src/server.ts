@@ -27,8 +27,9 @@ import {
   RPC_CALL_FINDONE,
   RPC_CALL_FIND,
   RPC_CALL_TX,
-  RPC_CALL_LOAD_DOMAIN
+  RPC_CALL_LOAD_DOMAIN, RPC_CALL_GEN_REF_ID
 } from '@anticrm/rpc'
+import { Space, VDoc } from '@anticrm/domains'
 
 export interface Client {
   email: string
@@ -41,6 +42,8 @@ export interface ClientSocket {
 
 export interface ClientTxProtocol {
   tx (tx: Tx): Promise<{ clientTx: Tx[] }>
+
+  genRefId (_space: Ref<Space>): Promise<Ref<Doc>>
 }
 
 export type ClientService = ClientControl & DocumentProtocol & ClientTxProtocol
@@ -128,6 +131,9 @@ export function start (port: number, dbUri: string, host?: string): Promise<Serv
           break
         case RPC_CALL_FIND:
           response.result = await ss.find(request.params[0] as Ref<Class<Doc>>, request.params[1] as AnyLayout)
+          break
+        case RPC_CALL_GEN_REF_ID:
+          response.result = await ss.genRefId(request.params[0] as Ref<Space>)
           break
         case RPC_CALL_TX: {
           const { clientTx } = await ss.tx(request.params[0] as Tx)

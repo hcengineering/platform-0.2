@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Class, Classifier, DateProperty, Doc, Emb, Ref, StringProperty, Tx } from '@anticrm/core'
+import { AnyLayout, Class, Classifier, DateProperty, Doc, Emb, Mixin, Ref, StringProperty, Tx } from '@anticrm/core'
 
 // TXes
 
@@ -64,6 +64,8 @@ export interface Space extends Doc {
   name: string // a space name
   description: string // a space optional description.
 
+  spaceKey: string // A space shortId prefix.
+
   users: SpaceUser[] // A list of included user accounts, not all may be active.
   isPublic: boolean // If specified, a users are interpreted as include list.
   archived: boolean // If specified, channel is marked as archived, only owner could archive space
@@ -93,6 +95,7 @@ export interface VDoc extends Doc {
 // R E F E R E N C E S
 
 export const CORE_CLASS_REFERENCE = 'class:core.Reference' as Ref<Class<Reference>>
+export const CORE_MIXIN_SHORTID = 'mixin:core.ShortID' as Ref<Mixin<ShortID>>
 
 /**
  * A reference object from and source to any target
@@ -108,6 +111,16 @@ export interface Reference extends Doc {
   _targetId?: Ref<Doc>
   _targetClass: Ref<Class<Doc>>
   _targetProps?: Record<string, unknown>
+}
+
+/**
+ * Define a list of space references for this object, this is a mixin.
+ */
+export interface ShortID extends VDoc {
+  /**
+   * A useful short Id for this object.
+   */
+  shortId: string
 }
 
 export const REFERENCE_DOMAIN = 'references'

@@ -23,6 +23,14 @@ export function mixinKey (mixin: Ref<Mixin<Obj>>, key: string): string {
   return key + '|' + mixin.replace('.', '~')
 }
 
+export function mixinFromKey (key: string): { mixin: Ref<Mixin<Obj>>, key: string } {
+  const pos = key.indexOf('|')
+  return {
+    mixin: key.substring(pos + 1).replace('~', '.') as Ref<Mixin<Doc>>,
+    key: key.substring(0, pos)
+  }
+}
+
 export const MODEL_DOMAIN = 'model'
 export const SPACE_DOMAIN = 'space'
 
@@ -237,9 +245,18 @@ export class Model implements Storage {
   assign (layout: AnyLayout, _class: Ref<Class<Obj>>, values: AnyLayout): AnyLayout {
     const l = (layout as unknown) as AnyLayout
     const r = (values as unknown) as AnyLayout
+
+    // Also assign a class to value if not specified
+    if (!layout._class) {
+      layout._class = _class
+    }
     for (const rKey in values) {
       if (rKey.startsWith('_')) {
         l[rKey] = r[rKey]
+      } else if (rKey.indexOf('|') > 0) {
+        // So key is probable mixin, let's find a mixin class and try assign value.
+        const { mixin, key } = mixinFromKey(rKey)
+        this.assign(layout, mixin, { [key]: r[rKey] })
       } else {
         const {
           attr,
@@ -273,10 +290,6 @@ export class Model implements Storage {
         }
         l[key] = r[rKey]
       }
-    }
-    // Also assign a class to value if not specified
-    if (!layout._class) {
-      layout._class = _class
     }
     return layout
   }
@@ -351,14 +364,18 @@ export class Model implements Storage {
     return (layout as unknown) as M
   }
 
-  public mixinDocument<E extends Doc, T extends E> (doc: E, clazz: Ref<Mixin<T>>, values: Omit<T, keyof E>): void {
+  public mixinDocument<E extends Doc, T extends Doc> (doc: E, clazz: Ref<Mixin<T>>, values: Omit<T, keyof E>): void {
+    this.includeMixin(doc, clazz)
+    this.assign((doc as unknown) as AnyLayout, clazz as Ref<Classifier<Doc>>, (values as unknown) as AnyLayout)
+  }
+
+  private includeMixin<E extends Doc, T extends Doc> (doc: E, clazz: Ref<Mixin<T>>): void {
     if (!doc._mixins) {
       doc._mixins = []
     }
     if (doc._mixins.indexOf(clazz) === -1) {
       doc._mixins.push(clazz)
     }
-    this.assign((doc as unknown) as AnyLayout, clazz as Ref<Classifier<Doc>>, (values as unknown) as AnyLayout)
   }
 
   mixin<E extends Doc, T extends E> (id: Ref<E>, clazz: Ref<Mixin<T>>, values: Omit<T, keyof E>): void {
@@ -455,6 +472,9 @@ export class Model implements Storage {
       descriptors[key] = {
         get (this: Proxy) {
           return this.__layout[attributeKey]
+        },
+        set (this: Proxy, value: any) {
+          this.__layout[attributeKey] = value
         }
       }
     }
@@ -473,14 +493,26 @@ export class Model implements Storage {
     return proto
   }
 
+  /**
+   * Cast to some mixin, if mixin is not present in class list it will not be added.
+   * isMixidIn should be used to ensure if mixin is on place, before modifications.
+   * @param doc - incoming document
+   * @param mixin - a mixin class
+   */
   public as<T extends Doc> (doc: Doc, mixin: Ref<Mixin<T>>): T {
     const proxy = Object.create(this.getPrototype(mixin)) as Proxy & T
     proxy.__layout = (doc as unknown) as Record<string, unknown>
     return proxy
   }
 
-  public cast<T extends Doc> (docs: Doc[], mixin: Ref<Mixin<T>>): T[] {
-    return docs.map(doc => this.as(doc, mixin))
+  /**
+   * Perform as for a list of documents and if mixin is not present it will be added.
+   * @param doc
+   * @param mixin
+   */
+  public cast<T extends Doc> (doc: Doc, mixin: Ref<Mixin<T>>): T {
+    this.includeMixin(doc, mixin)
+    return this.as(doc, mixin)
   }
 
   public isMixedIn (obj: Doc, _class: Ref<Mixin<Doc>>): boolean {

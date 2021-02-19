@@ -17,11 +17,7 @@
 
 import { AnyLayout, Property, StringProperty } from '../classes'
 import { Model } from '../model'
-import { createSubtask, createTask, doc1, taskIds } from './tasks'
-
-import { readFileSync } from 'fs'
-
-const data = JSON.parse(readFileSync('src/__tests__/model.json', 'utf8'))
+import { createSubtask, createTask, doc1, taskIds, data } from './tasks'
 
 const model = new Model('vdocs')
 model.loadModel(data)
@@ -88,7 +84,7 @@ describe('matching', () => {
   })
 
   it('push subtask value', () => {
-    const clone = model.createDocument(taskIds.class.Task, doc1) ?? doc1
+    const clone = model.createDocument(taskIds.class.Task, doc1)
     model.pushDocument(clone, null, 'tasks' as StringProperty, (createSubtask('subtask3', 34) as unknown) as AnyLayout)
 
     expect(clone.tasks!.length).toEqual(3)

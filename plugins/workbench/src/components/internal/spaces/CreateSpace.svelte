@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 -->
-<script lang='ts'>
+<script lang="ts">
   import { CORE_CLASS_DOC, Property, StringProperty } from '@anticrm/core'
   import { createEventDispatcher } from 'svelte'
   import { AttrModel, ClassModel } from '@anticrm/presentation'
@@ -27,6 +27,8 @@
   let makePrivate: boolean = false
   let title: string = ''
   let description: string = ''
+  let spaceKey: string = ''
+  let spaceKeyChanged: boolean = false
 
   const coreService = _getCoreService()
   const dispatch = createEventDispatcher()
@@ -36,6 +38,7 @@
       name: title as StringProperty,
       description: description as StringProperty,
       isPublic: !makePrivate as Property<boolean, boolean>,
+      spaceKey: spaceKey as StringProperty,
       users: [
         {
           userId: coreService.getUserId() as StringProperty,
@@ -43,7 +46,7 @@
         }
       ]
     }
-    coreService.create(CORE_CLASS_SPACE, space)
+    await coreService.create(CORE_CLASS_SPACE, space)
     dispatch('close')
   }
 
@@ -61,9 +64,26 @@
       })
     )
   }
+
+  function updateSpaceKey () {
+    if (spaceKeyChanged) {
+      return
+    }
+
+    let sk = title.toUpperCase().replace(/[^a-z0-9]/gmi, '_')
+
+    while (true) {
+      const l = sk.length
+      sk = sk.replaceAll('__', '_')
+      if (sk.length == l) {
+        break
+      }
+    }
+    spaceKey = sk
+  }
 </script>
 
-<style lang='scss'>
+<style lang="scss">
   .space-view {
     width: 364px;
     padding: 24px;
@@ -86,10 +106,12 @@
           flex-direction: column;
           margin-bottom: 20px;
         }
+
         .separator {
           height: 8px;
           margin: 20px 0;
         }
+
         .buttons {
           width: 100%;
           display: flex;
@@ -100,30 +122,35 @@
   }
 </style>
 
-<div class='space-view'>
-  <div class='header'>
-    <div class='caption-1'>Новое {(makePrivate) ? 'частное ' : ''}пространство</div>
-    <a href='/' on:click|preventDefault={() => dispatch('close')}>
-      <Icon icon={workbench.icon.Close} button='true' />
+<div class="space-view">
+  <div class="header">
+    <div class="caption-1">Новое {(makePrivate) ? 'частное ' : ''}пространство</div>
+    <a href="/" on:click|preventDefault={() => dispatch('close')}>
+      <Icon icon={workbench.icon.Close} button="true" />
     </a>
   </div>
 
-  <div class='content'>
-    <form class='form'>
-      <div class='input-container'>
-        <EditBox id='create_space__input__name' bind:value={title} width='100%'
-                 label='Имя' placeholder='Пространство вседозволенности' />
+  <div class="content">
+    <form class="form">
+      <div class="input-container">
+        <EditBox id="create_space__input__name" bind:value={title} width="100%"
+                 label="Имя" placeholder="Пространство вседозволенности" on:change={updateSpaceKey} />
       </div>
-      <div class='input-container'>
-        <EditBox id='create_space__input__description' bind:value={description} width='100%'
-                 label='Описание' placeholder='Владелец: Сергей Никифоров' />
+      <div class="input-container">
+        <EditBox id="create_space__input__shortId" bind:value={spaceKey} width="100%"
+                 label="Space Key" placeholder="A space Key (will be used with short ids)"
+                 on:change={() => spaceKeyChanged = true} />
+      </div>
+      <div class="input-container">
+        <EditBox id="create_space__input__description" bind:value={description} width="100%"
+                 label="Описание" placeholder="Владелец: Сергей Никифоров" />
       </div>
       <CheckBox bind:checked={makePrivate}>
         Сделать частным пространством
       </CheckBox>
       <div class="separator"></div>
-      <div class='buttons'>
-        <Button size='large' kind='primary' width='164px' on:click={() => save()}>Создать</Button>
+      <div class="buttons">
+        <Button size="large" kind="primary" width="164px" on:click={() => save()}>Создать</Button>
       </div>
     </form>
   </div>

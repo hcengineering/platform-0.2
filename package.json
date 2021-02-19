@@ -5,7 +5,7 @@
     "build": "yarn workspace @anticrm/text build && yarn workspace @anticrm/foundation build && yarn workspace @anticrm/rpc build && yarn workspace @anticrm/platform build && yarn workspace @anticrm/model build && yarn workspace @anticrm/core build && yarn workspace @anticrm/domains build",
     "build:docs": "yarn workspace @anticrm/text build:docs && yarn workspace @anticrm/foundation build:docs && yarn workspace @anticrm/rpc build:docs && yarn workspace @anticrm/platform build:docs && yarn workspace @anticrm/model build:docs && yarn workspace @anticrm/core build:docs && yarn workspace @anticrm/domains build:docs",
     "gen-docs": "cd docs && npm install && npm run build",
-    "test": "yarn workspace @anticrm/platform test && yarn workspace @anticrm/core test && yarn workspace @anticrm/server test"
+    "test": "yarn workspace @anticrm/platform test && yarn workspace @anticrm/core test && yarn workspace @anticrm/domains test && yarn workspace @anticrm/server test"
   },
   "workspaces": [
     "packages/*",
