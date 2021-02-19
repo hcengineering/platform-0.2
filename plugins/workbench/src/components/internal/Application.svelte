@@ -14,21 +14,21 @@
 -->
 
 <script type="ts">
-  import { Class, Ref } from '@anticrm/core'
-  import { getUIService, _getCoreService } from '../../utils'
+  import { Ref } from '@anticrm/core'
+  import { _getCoreService, getUIService } from '../../utils'
   import workbench, { WorkbenchApplication } from '../..'
 
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
-  import Table from '@anticrm/presentation/src/components/internal/Table.svelte'
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
   import CreateForm from './CreateForm.svelte'
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import EditBox from '@anticrm/platform-ui/src/components/EditBox.svelte'
   import { Space } from '@anticrm/domains'
   import { onDestroy } from 'svelte'
-  import ui, { ClassPresenter } from '@anticrm/presentation'
-  import PresenterItem from './PresenterItem.svelte'
-  import Component from '../../../../platform-ui/src/components/Component.svelte'
+  import ui, { Viewlet } from '@anticrm/presentation'
+  import Component from '@anticrm/platform-ui/src/components/Component.svelte'
+  import ActionBar from '@anticrm/platform-ui/src/components/ActionBar.svelte'
+  import { Action } from '@anticrm/platform-ui'
 
   export let application: Ref<WorkbenchApplication>
   export let space: Ref<Space>
@@ -40,11 +40,12 @@
   let appInstance: WorkbenchApplication | undefined
 
   // Represent all possible presenters
-  let presenters: ClassPresenter[] = []
-  let availablePresenters: ClassPresenter[] = []
-  let selectedPresenter: ClassPresenter | undefined
+  let presenters: Viewlet[] = []
 
-  coreService.subscribe(ui.mixin.ClassPresenter, {}, (docs) => {
+  let viewletActions: Action[] = []
+  let activeViewlet: Viewlet | undefined
+
+  coreService.subscribe(ui.mixin.Viewlet, {}, (docs) => {
     presenters = docs
   }, onDestroy)
 
@@ -54,7 +55,7 @@
 
   const model = coreService.getModel()
 
-  function filterAvailablePresenters (appInstance: WorkbenchApplication): ClassPresenter[] {
+  function filterViewlets (appInstance: WorkbenchApplication): Viewlet[] {
     return presenters.filter((d) => {
       for (const cc of appInstance?.classes) {
         if (model.is(cc, d.displayClass)) {
@@ -65,15 +66,26 @@
     })
   }
 
+  function getViewletActions (appInstance: WorkbenchApplication, sp: Viewlet | undefined, viewlets: Viewlet[]): Action[] {
+    return viewlets.map(p => {
+      return {
+        name: p.label, icon: p.icon, toggleState: p._id === sp?._id, action: () => {
+          activeViewlet = p
+        }
+      }
+    })
+  }
+
   $: {
     appSearch(workbench.class.WorkbenchApplication, { _id: application })
 
     if (appInstance) {
       // Update available presenters based on application
-      availablePresenters = filterAvailablePresenters(appInstance)
-      if (availablePresenters.length > 0 && !selectedPresenter) {
-        selectedPresenter = availablePresenters[0]
+      const viewlets = filterViewlets(appInstance)
+      if (viewlets.length > 0 && !activeViewlet) {
+        activeViewlet = viewlets[0]
       }
+      viewletActions = getViewletActions(appInstance, activeViewlet, viewlets)
     }
   }
 
@@ -102,17 +114,16 @@
       <EditBox icon={workbench.icon.Finder} placeholder="Поиск по {appInstance.label}..." iconRight="true" />
     </div>
     <div class="presentation">
-      {#each availablePresenters as p}
-        <PresenterItem presenter={p} selected={p == selectedPresenter} on:select={() => selectedPresenter = p} />
-      {/each}
+      <ActionBar actions={viewletActions} />
     </div>
     <ScrollView height="100%" margin="2em">
-      {#if selectedPresenter && selectedPresenter.component}
-        <Component is={selectedPresenter.component} props={{_class: appInstance.classes[0], space: space, editable: false}} on:open />
+      {#if activeViewlet && activeViewlet.component}
+        <Component is={activeViewlet.component}
+                   props={{_class: appInstance.classes[0], space: space, editable: false}} on:open />
         <!--      <Table _class={appInstance.classes[0]} {space} on:open />-->
       {/if}
     </ScrollView>
-  { /if                              }
+  { /if                                             }
 </div>
 
 <style lang="scss">
@@ -146,6 +157,7 @@
     .presentation {
       display: flex;
       flex-direction: row-reverse;
+      margin-right: 1em;
     }
 
   }

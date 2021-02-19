@@ -19,7 +19,7 @@ import { Doc, Obj, Type, mixinKey, MODEL_DOMAIN, Ref, Class } from '@anticrm/cor
 import { VDoc } from '@anticrm/domains'
 import { IntlString } from '@anticrm/platform-i18n'
 import { AnyComponent, Asset } from '@anticrm/platform-ui'
-import ui, { UXAttribute, Presenter, UXObject, ComponentExtension, ClassPresenter } from '.'
+import ui, { UXAttribute, Presenter, UXObject, ComponentExtension, Viewlet } from '.'
 import { TDoc, TEmb, TMixin } from '@anticrm/model/src/__model__'
 
 @Class$(ui.class.UXAttribute, core.class.Emb)
@@ -77,8 +77,8 @@ export class TCreateForm<T extends VDoc> extends TMixin<T> implements ComponentE
   component!: AnyComponent
 }
 
-@Class$(ui.mixin.ClassPresenter, core.class.Doc, MODEL_DOMAIN)
-export class TClassPresenter extends TDoc implements ClassPresenter {
+@Class$(ui.mixin.Viewlet, core.class.Doc, MODEL_DOMAIN)
+export class TViewlet extends TDoc implements Viewlet {
   @RefTo$(core.class.Class)
   displayClass!: Ref<Class<Doc>>
 
@@ -88,7 +88,7 @@ export class TClassPresenter extends TDoc implements ClassPresenter {
 }
 
 export function model (S: Builder): void {
-  S.add(TUXAttribute, TPresenter, TUXObject, TDetailForm, TLookupForm, TCreateForm, TClassPresenter)
+  S.add(TUXAttribute, TPresenter, TUXObject, TDetailForm, TLookupForm, TCreateForm, TViewlet)
 
   S.mixin(core.class.Type, ui.mixin.Presenter, {
     presenter: ui.component.StringPresenter
@@ -114,7 +114,7 @@ export function model (S: Builder): void {
     presenter: ui.component.StringPresenter
   })
 
-  S.createDocument(ui.mixin.ClassPresenter, {
+  S.createDocument(ui.mixin.Viewlet, {
     displayClass: core.class.Doc,
     label: 'Table' as IntlString,
     component: ui.component.TablePresenter

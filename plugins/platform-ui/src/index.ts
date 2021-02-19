@@ -69,6 +69,16 @@ export interface UIService extends Service {
   closeModal (): void
 }
 
+/**
+ * Useful interface to provide action operations.
+ */
+export interface Action {
+  name: string // A name to be displayed
+  icon?: Asset // An optional icon to be displayed
+  action?: () => void // Action to be performed on click
+  toggled?: boolean // If passed action item will looks like it is toggled
+}
+
 export default plugin('ui' as Plugin<UIService>, {}, {
   metadata: {
     DefaultApplication: '' as Metadata<AnyComponent>

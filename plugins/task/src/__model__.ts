@@ -218,7 +218,7 @@ export function model (S: Builder): void {
     } as TaskFieldValue, s.id)
   }
 
-  S.createDocument(presentation.mixin.ClassPresenter, {
+  S.createDocument(presentation.mixin.Viewlet, {
     displayClass: task.class.Task,
     label: 'Card' as IntlString,
     component: task.component.TaskCardPresenter

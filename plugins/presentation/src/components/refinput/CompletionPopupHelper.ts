@@ -1,4 +1,3 @@
-
 export interface CompletionItem {
   key: string
   completion: string

@@ -13,15 +13,15 @@
   // limitations under the License.
   import { onDestroy } from 'svelte'
   import { Class, Obj, Ref } from '@anticrm/core'
-  import { CORE_MIXIN_SHORTID, ShortID } from '@anticrm/domains'
   import task, { Task, TaskFieldType, TaskFieldValue } from '../..'
   import { getCoreService } from '../../utils'
   import UserInfo from '@anticrm/sparkling-controls/src/UserInfo.svelte'
   import StatusLabel from './StatusLabel.svelte'
   import ActionBar from '@anticrm/platform-ui/src/components/ActionBar.svelte'
-  import { Action } from '@anticrm/platform-ui/src/components/actions'
+  import { Action } from '@anticrm/platform-ui'
   import Comments from '@anticrm/chunter/src/components/Comments.svelte'
   import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.svelte'
+  import { CORE_MIXIN_SHORTID, ShortID } from '@anticrm/domains'
 
   export let _class: Ref<Class<Obj>>
   export let object: Task

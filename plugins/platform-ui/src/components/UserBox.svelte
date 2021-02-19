@@ -3,7 +3,6 @@
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
   import EditBox from './EditBox.svelte'
   import workbench from '@anticrm/workbench'
-  import { Action } from './actions'
 
   export let items: unknown[]
   export let selected: number = 0

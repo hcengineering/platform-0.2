@@ -14,14 +14,14 @@
 //
 
 import type { Platform } from '@anticrm/platform'
-import type { UIService, AnySvelteComponent } from '.'
+import type { AnySvelteComponent, UIService } from '.'
+import ui from '.'
 
-import { writable, derived } from 'svelte/store'
+import { derived, writable } from 'svelte/store'
 
 import Root from './components/internal/Root.svelte'
 
 import { store } from './stores'
-import ui from '.'
 
 import Spinner from './components/internal/Spinner.svelte'
 import Icon from './components/Icon.svelte'
