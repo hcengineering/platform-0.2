@@ -3,7 +3,7 @@
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
   import EditBox from './EditBox.svelte'
   import workbench from '@anticrm/workbench'
-  import { Action } from './actions'
+  import { Action } from '..'
   import { onDestroy } from 'svelte'
 
   export let items: Action[]

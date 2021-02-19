@@ -78,7 +78,7 @@ export interface ComponentExtension<T extends VDoc> extends Class<T> {
 /**
  * Definition of class display layout for a class
  */
-export interface ClassPresenter extends Doc {
+export interface Viewlet extends Doc {
   displayClass: Ref<Class<Doc>>
   label: IntlString
   icon?: Asset
@@ -164,7 +164,7 @@ const presentationPlugin = plugin('presentation' as Plugin<PresentationService>,
     // Define a form to create a new instance of specified class.
     CreateForm: '' as Ref<Mixin<ComponentExtension<VDoc>>>,
     LookupForm: '' as Ref<Mixin<ComponentExtension<VDoc>>>,
-    ClassPresenter: '' as Ref<Mixin<ClassPresenter>>
+    Viewlet: '' as Ref<Mixin<Viewlet>>
   },
   component: {
     ObjectBrowser: '' as AnyComponent,

@@ -202,7 +202,6 @@
   }
 
   aside {
-    //max-width: 404px;
     height: 100%;
     background-color: var(--theme-bg-color);
     border-left: 1px solid var(--theme-bg-accent-color);

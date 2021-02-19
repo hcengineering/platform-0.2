@@ -1,158 +1,79 @@
 <script lang="ts">
   import Icon from './Icon.svelte'
   import ui from '../'
-  import { Action } from './actions'
+  import { Action } from '..'
+  import { onDestroy } from 'svelte'
 
-  interface ActionF {
+  interface ActionF extends Action {
     id: Number
     style?: String
-    name: String
-    action?: () => void
   }
 
   export let onTop: Number = 2
   export let actions: Action[] = []
 
-  // Format list
-  let items: ActionF[] = []
-  let popups: ActionF[] = []
-  let error: boolean = false
-
-  function formatActions (its: Array<Action>): { items: ActionF[], popups: ActionF[] } {
-    let ac: ActionF[] = []
-    let acP: ActionF[] = []
-    ac.push({
-      id: 0,
-      style: 'abLeft w100',
-      name: its[0].name,
-      action: its[0].action
-    })
-    for (let i = 1; i < its.length; i++) {
-      if (i < onTop) {
-        ac.push({
-          id: i,
-          style: 'abCenter w100',
-          name: its[i].name,
-          action: its[i].action
-        })
-      } else {
-        acP.push({
-          id: i,
-          style: 'popup-item',
-          name: its[i].name,
-          action: its[i].action
-        })
-      }
+  function getStyle (pos: number, total: number, onTop: number): string {
+    if (total == 1) {
+      return 'w100' // A full row, since one item
     }
-    return {
-      items: ac,
-      popups: acP
+    if (pos == 0) {
+      return 'abLeft w100'
     }
-  }
-
-  $: {
-    if ((typeof (actions) === 'undefined') || (actions.length == 0) || (actions.length < onTop)) {
-      error = true
-      console.log('actions ERROR', actions)
-      items.push({
-        id: 0,
-        name: 'Ошибка!'
-      })
-    } else {
-      if (actions.length === 1) {
-        items.push({
-          id: 0,
-          style: 'w100',
-          name: actions[0].name,
-          action: actions[0].action
-        })
-      } else if ((actions.length == 2) && (onTop == 2)) {
-        items.push({
-          id: 0,
-          style: 'abLeft w100',
-          name: actions[0].name,
-          action: actions[0].action
-        })
-        items.push({
-          id: 1,
-          style: 'abRight w100',
-          name: actions[1].name,
-          action: actions[1].action
-        })
-      } else {
-        let arr = formatActions(actions)
-        items = arr.items
-        popups = arr.popups
-      }
+    if (pos == total - 1 && total == onTop) {
+      // All items are on top, we need to add right style
+      return 'abRight w100'
     }
+    if (pos < onTop) {
+      return 'abCenter w100'
+    }
+    return 'popup-item'
   }
 
   // Popup
   let thisPopup: HTMLElement
   let thisTrigger: HTMLElement
-  let firstOpen: boolean = true
-  let visible: String = 'hidden'
+  let visible: boolean = false
+
+  let popups: number = 0
 
   function handler (event: MouseEvent): void {
-    const rectPopup = thisPopup.getBoundingClientRect()
-    const rectTrigger = thisTrigger.getBoundingClientRect()
-    const rectBody = document.body.getBoundingClientRect()
-    if (rectTrigger.left + rectPopup.width >= rectBody.width) {
-      thisPopup.style.right = rectBody.width - rectTrigger.right + 'px'
-    } else {
-      thisPopup.style.left = rectTrigger.left + 'px'
-    }
-    thisPopup.style.top = rectTrigger.y + rectTrigger.height + 4 + 'px'
-
-    if (firstOpen) {
-      firstOpen = false
-    } else {
-      if (visible === 'visible') {
-        visible = 'hidden'
-        window.removeEventListener('click', handler)
-      }
+    if (event.target !== thisPopup || event.target !== this.Trigger) {
+      visible = false
     }
   }
 
-  $: {
-    if (visible === 'visible') {
-      firstOpen = true
-      window.addEventListener('click', handler, false)
-    } else {
-      window.removeEventListener('click', handler)
-    }
+  function handleAction (action: Action) {
+    action.action()
   }
 </script>
 
+<svelte:window on:click={()=>visible = false} />
 <div class="actionBar-view">
-  {#if error}
-    <div class="error">{items[0].name}</div>
-  {:else}
-    {#each items as item (item.id)}
-      <button class="button actionButton {item.style}" on:click={item.action}>{item.name}</button>
-    {/each}
-    {#if popups.length > 0}
-      <button bind:this={thisTrigger} class="button actionButton abRight w100 wOther"
-              class:selected={(visible === 'visible')}
-              on:click={() => {
-          if (visible === 'hidden') {
-            visible = 'visible'
-          } else {
-            visible = 'hidden'
-          }
-        }}><span>Ещё</span>
+  {#each actions.slice(0, onTop) as item}
+    <button class="button actionButton {getStyle(actions.indexOf(item), actions.length, onTop)}"
+            class:toggleState={item.toggleState}
+            on:click={() => {item.action(); visible = false;}}>{item.name}</button>
+  {/each}
+  {#if (actions.length - onTop) > 0}
+    <button bind:this={thisTrigger} class="button actionButton abRight w100 wOther" class:selected={visible}
+            on:click|stopPropagation={() => { visible = !visible}}>
+      <div class="chevron">
+        <span>Ещё</span>
         <Icon icon={ui.icon.ArrowDown} />
-      </button>
-      <div bind:this={thisPopup} class="popup-menu-view" style="visibility: {visible}">
-        {#each popups as popup (popup.id)}
-          {#if popup.name === '-'}
-            <div class="popup-separator"></div>
-          {:else}
-            <button class="{popup.style}" on:click={popup.action}>{popup.name}</button>
-          {/if}
-        {/each}
       </div>
-    {/if}
+      {#if visible}
+        <div bind:this={thisPopup} class="popup-menu-view">
+          {#each actions.slice(onTop) as popup}
+            {#if popup.name === '-'}
+              <div class="popup-separator"></div>
+            {:else}
+              <button class="popup-item"
+                      on:click={handleAction(popup)}>{popup.name}</button>
+            {/if}
+          {/each}
+        </div>
+      {/if}
+    </button>
   {/if}
 </div>
 
@@ -199,19 +120,9 @@
     border-color: var(--theme-bg-dark-hover);
   }
 
-  .popup-item {
-    margin: 4px 0;
-    padding: 8px;
-    background-color: var(--theme-bg-accent-color);
-    border-radius: 4px;
-    border: none;
-    text-align: left;
-    color: var(--theme-content-dark-color);
-    cursor: pointer;
-
-    &:hover {
-      background-color: var(--theme-bg-accent-hover);
-    }
+  .toggleState {
+    background-color: var(--theme-bg-dark-color);
+    font-weight: bold;
   }
 
   .popup-separator {
@@ -225,24 +136,47 @@
   }
 
   .wOther {
-    // flex-basis: 76px;
-    // width: 76px;
-    // min-width: 76px;
+    display: block;
+
     & > span {
       margin-right: 5px;
     }
-  }
 
-  .popup-menu-view {
-    position: fixed;
-    display: flex;
-    flex-direction: column;
-    flex-flow: column nowrap;
-    background-color: var(--theme-bg-accent-color);
-    border: solid 1px var(--theme-bg-dark-color);
-    border-radius: 4px;
-    padding: 4px 8px;
-    box-shadow: var(--theme-shadow);
-    z-index: 1000;
+    .chevron {
+      width: 100%;
+      height: 100%;
+      align-items: center;
+      justify-content: center;
+      display: flex;
+    }
+
+    .popup-menu-view {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      flex-flow: column nowrap;
+      background-color: var(--theme-bg-accent-color);
+      border: solid 1px var(--theme-bg-dark-color);
+      border-radius: 4px;
+      box-shadow: var(--theme-shadow);
+      margin: 10px -0.25em 0 -0.25em;
+      z-index: 100000;
+
+      .popup-item {
+        margin: 4px 0;
+        padding: 8px;
+        width: 100%;
+        text-align: left;
+        background-color: var(--theme-bg-accent-color);
+        border-radius: 4px;
+        border: none;
+        color: var(--theme-content-dark-color);
+        cursor: pointer;
+
+        &:hover {
+          background-color: var(--theme-bg-accent-hover);
+        }
+      }
+    }
   }
 </style>
