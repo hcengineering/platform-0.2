@@ -13,20 +13,15 @@
 // limitations under the License.
 //
 
-// following is only to make api-documenter happy.
-// DO NOT REMOVE LINES BELOW!!!
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { Emb } from '@anticrm/core'
 import {
   ArrayOf, Attribute, BagOf, Class, Classifier, CORE_CLASS_CLASS, CORE_CLASS_DOC, CORE_CLASS_EMB, CORE_CLASS_STRING,
   Doc, Indices, InstanceOf, Mixin, Obj, Ref, RefTo, Tx, Type
 } from '@anticrm/core'
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type { Reference, ShortID } from '@anticrm/domains'
-// DO NOT REMOVE LINES ABOVE !!!
+import type { CreateTx, DeleteTx, PushTx, Reference, Space, UpdateTx } from '@anticrm/domains'
 import {
   Application, CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_PUSH_TX, CORE_CLASS_SPACE, CORE_CLASS_UPDATE_TX,
-  CORE_MIXIN_SHORTID,
-  SpaceUser, Title, VDoc
+  CORE_MIXIN_SHORTID, ShortID, SpaceUser, Title, VDoc
 } from '@anticrm/domains'
 
 import { AnyPlugin, identify } from '@anticrm/platform'
@@ -36,18 +31,18 @@ import Builder from './builder'
 const modelIds = identify('core' as AnyPlugin, {
   class: {
     Obj: '' as Ref<Class<Obj>>,
-    Emb: CORE_CLASS_EMB,
-    Doc: CORE_CLASS_DOC,
+    Emb: CORE_CLASS_EMB as Ref<Class<Emb>>,
+    Doc: CORE_CLASS_DOC as Ref<Class<Doc>>,
 
     Classifier: '' as Ref<Class<Classifier<Obj>>>,
 
     Attribute: '' as Ref<Class<Attribute>>,
-    Class: CORE_CLASS_CLASS,
+    Class: CORE_CLASS_CLASS as Ref<Class<Class<Obj>>>,
     Mixin: '' as Ref<Class<Mixin<Obj>>>,
 
     // Data types
     Type: '' as Ref<Class<Type>>,
-    String: CORE_CLASS_STRING,
+    String: CORE_CLASS_STRING as Ref<Class<Type>>,
     Number: '' as Ref<Class<Type>>,
     Boolean: '' as Ref<Class<Type>>,
     ArrayOf: '' as Ref<Class<ArrayOf>>,
@@ -56,16 +51,16 @@ const modelIds = identify('core' as AnyPlugin, {
     InstanceOf: '' as Ref<Class<InstanceOf<Type>>>,
 
     Tx: '' as Ref<Class<Tx>>,
-    CreateTx: CORE_CLASS_CREATE_TX,
-    PushTx: CORE_CLASS_PUSH_TX,
-    UpdateTx: CORE_CLASS_UPDATE_TX,
-    DeleteTx: CORE_CLASS_DELETE_TX,
+    CreateTx: CORE_CLASS_CREATE_TX as Ref<Class<CreateTx>>,
+    PushTx: CORE_CLASS_PUSH_TX as Ref<Class<PushTx>>,
+    UpdateTx: CORE_CLASS_UPDATE_TX as Ref<Class<UpdateTx>>,
+    DeleteTx: CORE_CLASS_DELETE_TX as Ref<Class<DeleteTx>>,
 
     Title: '' as Ref<Class<Title>>,
 
     VDoc: '' as Ref<Class<VDoc>>,
 
-    Space: CORE_CLASS_SPACE,
+    Space: CORE_CLASS_SPACE as Ref<Class<Space>>,
     SpaceUser: '' as Ref<Class<SpaceUser>>,
 
     Reference: '' as Ref<Class<Reference>>,
@@ -74,7 +69,7 @@ const modelIds = identify('core' as AnyPlugin, {
   },
   mixin: {
     Indices: '' as Ref<Mixin<Indices>>,
-    ShortID: CORE_MIXIN_SHORTID
+    ShortID: CORE_MIXIN_SHORTID as Ref<Mixin<ShortID>>
   }
 })
 console.log('model ids', modelIds)
