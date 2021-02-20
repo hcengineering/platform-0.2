@@ -1,18 +1,16 @@
-import Button from './Button.svelte'
+import Button_SB from './Button_SB.svelte'
 import ThemeDecorator from './ThemeDecorator.svelte'
 
 export default {
-  title: 'Platform/Button',
-  component: Button,
+  title: 'Example/Button_SB',
+  component: Button_SB,
   argTypes: {
+    label: { control: 'text' },
+    primary: { control: 'boolean' },
+    backgroundColor: { control: 'color' },
     size: {
-      control: { type: 'select', options: ['small', 'default', 'large'] },
+      control: { type: 'select', options: ['small', 'medium', 'large'] },
     },
-    kind: {
-      control: { type: 'select', options: ['primary', 'default', 'transparent'] },
-    },
-    width: { control: 'text' },
-    content: { control: 'text' },
     onClick: { action: 'onClick' },
   },
   decorators:  [(storyFn) => {
@@ -22,15 +20,15 @@ export default {
       Component: ThemeDecorator,
       props: {
         child: story.Component,
-        props: story.props,
+        props: story.props
       }
     }
   }]
 }
 
 const Template = ({ onClick, ...args }) => ({
-  Component: Button,
-  props: { content: 'Button', ...args },
+  Component: Button_SB,
+  props: args,
   on: {
     click: onClick,
   },
@@ -38,25 +36,23 @@ const Template = ({ onClick, ...args }) => ({
 
 export const Primary = Template.bind({});
 Primary.args = {
-  kind: 'primary'
+  primary: true,
+  label: 'Button',
 };
 
 export const Secondary = Template.bind({});
 Secondary.args = {
-
+  label: 'Button',
 };
 
 export const Large = Template.bind({});
 Large.args = {
-  size: 'large'
+  size: 'large',
+  label: 'Button',
 };
 
 export const Small = Template.bind({});
 Small.args = {
-  size: 'small'
-};
-
-export const Transparent = Template.bind({});
-Transparent.args = {
-  kind: 'transparent'
+  size: 'small',
+  label: 'Button',
 };

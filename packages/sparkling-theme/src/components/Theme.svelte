@@ -178,16 +178,12 @@
 
     &:hover {
       border-color: var(--theme-bg-dark-hover);
-      // color: $highlight-color;
-      // background-color: $highlight-color;
       background-color: var(--theme-bg-accent-hover);
       color: var(--theme-content-dark-color);
     }
 
     &.primary {
-      // border-color: $highlight-color;
       background-color: var(--theme-content-color);
-      // color: $nav-bg-color;
       border-color: var(--theme-content-color);
       color: var(--theme-bg-color);
     }
@@ -196,9 +192,29 @@
       background-color: var(--theme-content-dark-color);
       border-color: var(--theme-content-dark-color);
       color: var(--theme-bg-color);
-      // border-color: $highlight-color;
-      // box-shadow:inset 0px 0px 3px 0px currentColor;
-      // color: $highlight-color;
+    }
+
+    &.transparent {
+      display: flex;
+      border: none;
+      cursor: pointer;
+      user-select: none;
+      font-weight: 500;
+      color: var(--theme-content-color);
+      background-color: transparent;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: nowrap;
+      padding: 0;
+      margin: 0;
+
+      &:focus {
+        outline: none;
+      }
+
+      &:hover {
+        color: var(--theme-caption-color);
+      }
     }
   }
 
