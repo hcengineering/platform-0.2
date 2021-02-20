@@ -9,15 +9,19 @@
   let status: Status
 
   const platform = getContext('platform') as Platform
+  const loginService = platform.getPlugin(login.id)
 
-  async function doLogin() {
+  async function doLogin () {
     status = new Status(Severity.INFO, 0, 'Соединяюсь с сервером...')
 
-    const loginService = await platform.getPlugin(login.id)
-    status = await loginService.doLogin(object.username, object.password, object.workspace)
+    status = await (await loginService).doLogin(object.username, object.password, object.workspace)
   }
 
-  async function doSignup() {}
+  async function doSignup () {
+  }
+
+  // Auto forward to default application
+  loginService.then((ls) => ls.checkLoginForward())
 </script>
 
 <Form

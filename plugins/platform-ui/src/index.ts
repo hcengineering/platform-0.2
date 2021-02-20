@@ -53,8 +53,8 @@ export const CONTEXT_PLATFORM = 'platform'
 export const CONTEXT_PLATFORM_UI = 'platform-ui'
 
 export interface Location {
-  pathname: string
-  search: string
+  pathname: string // a row value of path
+  search: string // a raw value of search + fragment
 }
 
 export interface UIService extends Service {
