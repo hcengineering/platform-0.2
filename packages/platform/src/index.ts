@@ -311,7 +311,7 @@ export function createPlatform (): Platform {
     broadcastEvent,
 
     setPlatformStatus
-  }
+  } as Platform
 
   return platform
 }

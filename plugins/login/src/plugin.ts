@@ -31,6 +31,7 @@ export default async (platform: Platform, deps: { ui: UIService }): Promise<Logi
   const uiService = deps.ui
 
   platform.setResource(login.component.LoginForm, LoginForm)
+
   // platform.setResource(login.component.SignupForm, SignupForm)
 
   function setLoginInfo (loginInfo: LoginInfo) {
@@ -38,6 +39,19 @@ export default async (platform: Platform, deps: { ui: UIService }): Promise<Logi
 
     platform.setMetadata(login.metadata.WhoAmI, loginInfo.email)
     platform.setMetadata(login.metadata.Token, loginInfo.token)
+  }
+
+  function checkLoginForward () {
+    const account = localStorage.getItem(ACCOUNT_KEY)
+    if (!account) {
+      // no forward are reqiured
+      return
+    }
+    const accountInfo = JSON.parse(account) as LoginInfo
+    if (accountInfo) {
+      uiService.navigate(
+        '/component:workbench.Workbench/application:workbench.Default')
+    }
   }
 
   async function doLogin (username: string, password: string, workspace: string): Promise<Status> {
@@ -55,7 +69,7 @@ export default async (platform: Platform, deps: { ui: UIService }): Promise<Logi
       const response = await fetch(url, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json;charset=utf-8',
+          'Content-Type': 'application/json;charset=utf-8'
         },
         body: serialize(request)
       })
@@ -65,9 +79,7 @@ export default async (platform: Platform, deps: { ui: UIService }): Promise<Logi
       }
       if (result.result) {
         setLoginInfo(result.result)
-        uiService.navigate(
-          '/component:workbench.Workbench/application:workbench.Default'
-        )
+        checkLoginForward()
       }
       return new Status(Severity.OK, 0, '')
     } catch (err) {
@@ -76,6 +88,7 @@ export default async (platform: Platform, deps: { ui: UIService }): Promise<Logi
   }
 
   return {
-    doLogin
+    doLogin,
+    checkLoginForward
   }
 }

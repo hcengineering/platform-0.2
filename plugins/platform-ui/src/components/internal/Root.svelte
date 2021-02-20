@@ -1,39 +1,45 @@
 <script lang="ts">
-  import type { Platform, Status } from "@anticrm/platform"
-  import { PlatformStatus, Severity } from "@anticrm/platform"
-  import type { UIService, AnyComponent } from "../.."
-  import { setContext } from "svelte"
+  import type { Platform, Status } from '@anticrm/platform'
+  import { PlatformStatus, Severity } from '@anticrm/platform'
+  import type { UIService, AnyComponent } from '../..'
+  import { setContext } from 'svelte'
 
-  import Theme from "@anticrm/sparkling-theme/src/components/Theme.svelte"
-  import StatusComponent from "./Status.svelte"
-  import Clock from "./Clock.svelte"
-  import ThemeSelector from "./ThemeSelector.svelte"
-  import Component from "../Component.svelte"
+  import Theme from '@anticrm/sparkling-theme/src/components/Theme.svelte'
+  import StatusComponent from './Status.svelte'
+  import Clock from './Clock.svelte'
+  import ThemeSelector from './ThemeSelector.svelte'
+  import Component from '../Component.svelte'
   import Modal from './Modal.svelte'
-  
-  import { 
+  import uiPlugin from '../../.'
+
+  import {
     CONTEXT_PLATFORM,
-    CONTEXT_PLATFORM_UI,
+    CONTEXT_PLATFORM_UI
   } from '../..'
 
-  export let platform: Platform;
-  export let ui: UIService;
+  export let platform: Platform
+  export let ui: UIService
 
   setContext(CONTEXT_PLATFORM, platform)
   setContext(CONTEXT_PLATFORM_UI, ui)
 
-  let currentApp: AnyComponent;
+  const defaultApp = platform.getMetadata(uiPlugin.metadata.DefaultApplication) as AnyComponent
+
+  let currentApp: AnyComponent
   const location = ui.getLocation()
   location.subscribe((loc) => {
-    currentApp = loc.pathname.split("/")[1] as AnyComponent;
-  });
+    currentApp = loc.pathname.split('/')[1] as AnyComponent
+    if (!currentApp) {
+      currentApp = defaultApp
+    }
+  })
 
-  let status: Status = { severity: Severity.OK, code: 0, message: "" };
+  let status: Status = { severity: Severity.OK, code: 0, message: '' }
 
   platform.addEventListener(
     PlatformStatus,
     async (event: string, platformStatus: Status) => {
-      status = platformStatus;
+      status = platformStatus
     }
   )
 </script>
@@ -61,7 +67,7 @@
     </div>
     <div class="app">
       {#if currentApp}
-        <Component is={currentApp} props={{}}/>
+        <Component is={currentApp} props={{}} />
       {:else}
         <div class="caption-1 error">No application provided. {currentApp}</div>
       {/if}
