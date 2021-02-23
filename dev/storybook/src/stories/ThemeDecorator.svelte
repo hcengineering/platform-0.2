@@ -22,14 +22,14 @@
 </script>
 
 <Theme>
-  <div style="position: relative; width: 100%; height: 100vh; background-color: var(--theme-bg-color);">
-    {#if typeof(props.content) !== 'undefined'}
-      <svelte:component this={child} {...props} >{props.content}</svelte:component>
-    {:else}
-      <svelte:component this={child} {...props} />
-    {/if}
-    <div style="position: absolute; right: 0; top: 0; width: 150px; border: 1px solid var(--theme-bg-dark-color); text-align: center">
-      <ThemeSelector />
-    </div>
+  <svelte:component this={child} {...props} />
+  <div style="position: absolute; right: 15px; top: 0px; width: 150px; border: 1px solid var(--theme-bg-dark-color); text-align: center">
+    <ThemeSelector />
   </div>
 </Theme>
+
+<style global>
+  body {
+    background-color: var(--theme-bg-color);
+  }
+</style>
