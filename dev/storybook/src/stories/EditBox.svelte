@@ -14,12 +14,25 @@
 -->
 
 <script lang="ts">
+  import { createEventDispatcher } from 'svelte';
+
   export let width: string = '300px'
   export let value: string
   export let placeholder: string
   export let id: string
 
   let input: HTMLElement
+
+  const dispatch = createEventDispatcher();
+  function onInput(event) {
+    dispatch('input', event);
+  }
+  function onFocus(event) {
+    dispatch('focus', event);
+  }
+  function onChange(event) {
+    dispatch('change', event);
+  }
 </script>
 
 <div class="editbox" style='width: {width}' on:click={input.focus()}>
@@ -29,9 +42,9 @@
     type="text"
     bind:value={value}
     {placeholder}
-    on:input
-    on:focus
-    on:change
+    on:input={onInput}
+    on:focus={onFocus}
+    on:change={onChange}
   />
 </div>
 
