@@ -48,22 +48,24 @@
   const dispatch = createEventDispatcher()
 </script>
 
-<div class="recruiting-view">
-  <div class="toolbar">
-    <a href="/" on:click|preventDefault={() => { dispatch('close') }}>
-      <Icon icon={workbench.icon.Close} button="true" />
-    </a>
+{#if object }
+  <div class="recruiting-view">
+    <div class="toolbar">
+      <a href="/" on:click|preventDefault={() => { dispatch('close') }}>
+        <Icon icon={workbench.icon.Close} button="true" />
+      </a>
+    </div>
+    <div class="content">
+      <ScrollView height="100%">
+        <div class="component-content">
+          {#if object}
+            <Component is="{component}" props="{{ _class, object }}" />
+          {/if}
+        </div>
+      </ScrollView>
+    </div>
   </div>
-  <div class="content">
-    <ScrollView height="100%">
-      <div class="component-content">
-        {#if object}
-          <Component is="{component}" props="{{ _class, object }}" />
-        {/if}
-      </div>
-    </ScrollView>
-  </div>
-</div>
+{/if}
 
 <style lang="scss">
   .recruiting-view {

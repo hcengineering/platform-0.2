@@ -28,7 +28,7 @@
   const location = getUIService().getLocation()
 
   location.subscribe((loc) => {
-    current = loc.pathname.split('/')[2] as string
+    current = loc.path[2] as string
     let cp = pageIndex.get(current)
     console.log(cp)
     if (cp == undefined) {

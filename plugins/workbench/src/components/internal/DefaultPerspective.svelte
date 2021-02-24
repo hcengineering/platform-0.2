@@ -17,7 +17,7 @@
   import { onDestroy } from 'svelte'
   import { getUIService, _getCoreService } from '../../utils'
   import { Space, VDoc, CORE_CLASS_SPACE } from '@anticrm/domains'
-  import ui from '@anticrm/platform-ui'
+  import ui, { Location } from '@anticrm/platform-ui'
   import workbench, { WorkbenchApplication } from '../..'
 
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
@@ -33,25 +33,19 @@
 
   import ObjectForm from './ObjectForm.svelte'
   import { getCurrentUserSpace } from './spaces/utils'
+  import LinkTo from '../../../../platform-ui/src/components/LinkTo.svelte'
 
   const uiService = getUIService()
 
-  let location: string[]
-  const locationStore = uiService.getLocation()
-  locationStore.subscribe((loc) => {
-    // console.log('LOCATION is ', loc)
-    location = loc.pathname.split('/')
-  })
-
   const coreService = _getCoreService()
 
-  const curentUser = coreService.getUserId()
+  const currentUser = coreService.getUserId()
 
   let space: Ref<Space>
   let spaces: Space[] = []
 
   coreService.subscribe(CORE_CLASS_SPACE, {}, (docs) => {
-    spaces = docs.filter((s) => getCurrentUserSpace(curentUser, s))
+    spaces = docs.filter((s) => getCurrentUserSpace(currentUser, s))
   }, onDestroy)
 
   let application: Ref<WorkbenchApplication>
@@ -61,15 +55,27 @@
   }, onDestroy)
 
   let component: AnyComponent | undefined
+  let details: { _id: Ref<Doc>; _class: Ref<Class<Doc>> }
 
-  $: {
-    space = location[3] as Ref<Space>
+  let location: Location
+  uiService.subscribeLocation((loc) => {
+    location = loc
+
+    space = loc.query.space as Ref<Space>
     // Check if space are in list of spaces, and if not use first available space
     if (spaces.length > 0) {
       if (!spaces.find(s => s._id === space)) {
         space = spaces[0]._id as Ref<Space>
       }
     }
+    application = loc.query.application as Ref<WorkbenchApplication>
+
+    if (loc.query._class && loc.query._id) {
+      details = { _id: loc.query._id as Ref<Doc>, _class: loc.query._class as Ref<Class<Doc>> }
+    }
+  }, onDestroy)
+
+  $: {
     if (!application) {
       application = workbench.application.Activity
     }
@@ -83,7 +89,6 @@
     return doc._id as Ref<T>
   }
 
-  let details: { _id: Ref<Doc>; _class: Ref<Class<Doc>> }
   let addButton: HTMLElement
 
   let hidden = true
@@ -212,10 +217,11 @@
   <nav>
     <div class="app-icon">
       {#each applications as app}
-        <div class={( app._id === application) ? 'selectedApp' : 'iconApp'}
-             on:click={() => {application = app._id; console.log('APP is', app)}}>
-          <Icon icon={app.icon} size="24" />
-        </div>
+        <LinkTo query={{application: app._id}}>
+          <div class={( app._id === application) ? 'selectedApp' : 'iconApp'}>
+            <Icon icon={app.icon} size="24" />
+          </div>
+        </LinkTo>
       {/each}
     </div>
     <div class="remainder"></div>
@@ -230,8 +236,9 @@
       </div>
       {#each spaces as s (s._id)}
         {#if !s.archived}
-          <SpaceItem link={'/' + location[1] + '/' + location[2] + '/' + s._id}
-                     selected={s._id === space} space={s} />
+          <LinkTo query={{space: s._id}}>
+            <SpaceItem selected={s._id === space} space={s} />
+          </LinkTo>
         {/if}
       {/each}
       <div class="footContainer">
@@ -247,33 +254,22 @@
           </PopupMenu>
         </span>
       </div>
-
-      <!--      <div class="caption-3">Приложения</div>-->
-      <!--      {#each applications as app (app._id)}-->
-      <!--        <div class="item" class:selected={app._id === application}-->
-      <!--             on:click|preventDefault={(e) => {-->
-      <!--            application = id(app)-->
-      <!--          }}>{app.label}-->
-      <!--        </div>-->
-      <!--      {/each}-->
     </div>
   </div>
 
   <div class="main">
-    <!-- <div class="main-content"> -->
     {#if component}
       <MainComponent
         is={component}
         {application}
         {space}
         on:open={(e) => {
-          details = e.detail
+          uiService.navigate(undefined, {_class: e.detail._class, _id: e.detail._id})
         }} />
     {/if}
   </div>
 
   <aside>
-    <!-- <DetailsForm v-if="details" :_class="details._class" :_id="details._id" @done="done" /> -->
     {#if details}
       <ObjectForm {...details} title="Title" on:close={()=> {details = undefined}} />
     {/if}
