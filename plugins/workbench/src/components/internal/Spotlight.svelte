@@ -14,26 +14,38 @@
 -->
 
 <script lang="ts">
-  import { Property, Title } from '@anticrm/core'
-
-  import core from '@anticrm/platform-core'
+  import { AnyLayout, Property, StringProperty } from '@anticrm/core'
   import ui from '@anticrm/platform-ui'
 
-  import { find } from '../../utils'
-
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
-  import { CORE_CLASS_TITLE } from '@anticrm/domains'
+  import { CORE_CLASS_TITLE, Title } from '@anticrm/domains'
+  import { _getCoreService } from '../../utils'
+  import { onDestroy } from 'svelte'
 
   let query: string
   let result: Title[] = []
 
-  $: find(CORE_CLASS_TITLE, { title: query as Property<string, string> }).then(docs => { console.log('search', docs); result = docs })
+  function q (query: string): AnyLayout {
+    return {
+      title: {
+        $regex: query + '.*' as StringProperty,
+        $options: 'i' as StringProperty
+      }
+    }
+  }
+
+  const update = _getCoreService().subscribe(CORE_CLASS_TITLE, q(query), docs => {
+    console.log('search', docs)
+    result = docs
+  }, onDestroy)
+
+  $: update(CORE_CLASS_TITLE, q(query))
 </script>
 
 <Icon icon={ui.icon.Search} size="32" />&nbsp;
 <input type="text" class="editbox" placeholder="Spotlight Search" bind:value={query} />
 <div>
-  { #each result as title }
-  <div>{title.title}</div>
-  { /each }
+  {#each result as title}
+    <div>{title.title}</div>
+  {/each}
 </div>

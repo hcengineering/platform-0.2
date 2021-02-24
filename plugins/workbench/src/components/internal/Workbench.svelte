@@ -26,10 +26,10 @@
 
   const coreService = _getCoreService()
   const uiService = getUIService()
-  const location = uiService.getLocation()
-  location.subscribe((loc) => {
-    activePerspective = loc.pathname.split('/')[2] as Ref<Doc>
-  })
+
+  uiService.subscribeLocation((loc) => {
+    activePerspective = loc.query.perspective as Ref<Doc>
+  }, onDestroy)
 
   coreService.subscribe(workbench.class.Perspective, {}, (p) => {
     perspectives = p

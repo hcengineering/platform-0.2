@@ -2,7 +2,7 @@
   import type { Platform, Status } from '@anticrm/platform'
   import { PlatformStatus, Severity } from '@anticrm/platform'
   import type { UIService, AnyComponent } from '../..'
-  import { setContext } from 'svelte'
+  import { onDestroy, setContext } from 'svelte'
 
   import Theme from '@anticrm/sparkling-theme/src/components/Theme.svelte'
   import StatusComponent from './Status.svelte'
@@ -14,7 +14,7 @@
 
   import {
     CONTEXT_PLATFORM,
-    CONTEXT_PLATFORM_UI
+    CONTEXT_PLATFORM_UI, Location
   } from '../..'
 
   export let platform: Platform
@@ -26,13 +26,13 @@
   const defaultApp = platform.getMetadata(uiPlugin.metadata.DefaultApplication) as AnyComponent
 
   let currentApp: AnyComponent
-  const location = ui.getLocation()
-  location.subscribe((loc) => {
-    currentApp = loc.pathname.split('/')[1] as AnyComponent
+
+  ui.subscribeLocation((loc) => {
+    currentApp = loc.path[0] as AnyComponent
     if (!currentApp) {
       currentApp = defaultApp
     }
-  })
+  }, onDestroy)
 
   let status: Status = { severity: Severity.OK, code: 0, message: '' }
 

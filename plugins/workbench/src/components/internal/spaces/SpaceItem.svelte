@@ -9,7 +9,6 @@
   import AddUser from './AddUser.svelte'
   import { Space } from '@anticrm/domains'
 
-  export let link: string = '/'
   export let selected: boolean = false
   export let space: Space = {} as Space
   export let count: number = 0
@@ -28,33 +27,31 @@
   }
 </script>
 
-<LinkTo href={link}>
-  <div class="item" class:selected={selected}>
-    {getSpaceName(space)}
-    <div class="separator"></div>
-    {#if count > 0}
-      <div class="counter">{count}</div>
-    {/if}
-    {#if selected}
-      <div bind:this={optionsButton} class="optionsButton">
-        <PopupMenu>
-          <div class="popup" slot="trigger">
-            <Icon icon={workbench.icon.Burger} />
-          </div>
-          <PopupItem on:click={() => {
+<div class="item" class:selected={selected}>
+  {getSpaceName(space)}
+  <div class="separator"></div>
+  {#if count > 0}
+    <div class="counter">{count}</div>
+  {/if}
+  {#if selected}
+    <div bind:this={optionsButton} class="optionsButton">
+      <PopupMenu>
+        <div class="popup" slot="trigger">
+          <Icon icon={workbench.icon.Burger} />
+        </div>
+        <PopupItem on:click={() => {
             uiService.showModal(AddUser, { space })
           }}>Add user
-          </PopupItem>
-          <PopupItem separator="true" />
-          <PopupItem on:click={() => {
+        </PopupItem>
+        <PopupItem separator="true" />
+        <PopupItem on:click={() => {
             leaveSpace(coreService, space)
           }}>Leave
-          </PopupItem>
-        </PopupMenu>
-      </div>
-    {/if}
-  </div>
-</LinkTo>
+        </PopupItem>
+      </PopupMenu>
+    </div>
+  {/if}
+</div>
 
 <style lang="scss">
   .item {

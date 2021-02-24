@@ -17,7 +17,7 @@ import type { Platform } from '@anticrm/platform'
 import type { AnySvelteComponent, Location, UIService } from '.'
 import ui from '.'
 
-import { derived, writable, Writable, Readable } from 'svelte/store'
+import { derived, writable, Readable } from 'svelte/store'
 
 import Root from './components/internal/Root.svelte'
 
@@ -25,6 +25,7 @@ import { store } from './stores'
 
 import Spinner from './components/internal/Spinner.svelte'
 import Icon from './components/Icon.svelte'
+import { locationToUrl, parseLocation } from './location'
 
 /*!
  * Anticrm Platform™ UI Plugin
@@ -40,9 +41,10 @@ export default async (platform: Platform): Promise<UIService> => {
   }
 
   function windowLocation (): Location {
-    return { pathname: window.location.pathname, search: window.location.search }
+    return parseLocation(window.location)
   }
-  const locationWritable: Writable<Location> = writable(windowLocation())
+
+  const locationWritable = writable(windowLocation())
   window.addEventListener('popstate', () => {
     locationWritable.set(windowLocation())
   })
@@ -53,8 +55,29 @@ export default async (platform: Platform): Promise<UIService> => {
     return location
   }
 
-  function navigate (url: string) {
-    history.pushState(null, '', url)
+  function subscribeLocation (listener: (location: Location) => void, destroyFactory: (op: () => void) => void): void {
+    const unsubscribe = location.subscribe((location) => {
+      listener(location)
+    })
+    destroyFactory(unsubscribe)
+  }
+
+  function navigate (path: string[] | undefined, query: Record<string, string> | undefined, fragment: string | undefined) {
+    const newLocation = windowLocation()
+    if (path) {
+      newLocation.path = path
+    }
+    if (query) {
+      // For query we do replace
+      const currentQuery = newLocation.query || {}
+      for (const kv of Object.entries(query)) {
+        currentQuery[kv[0]] = kv[1]
+      }
+    }
+    if (fragment) {
+      newLocation.fragment = fragment
+    }
+    history.pushState(null, '', locationToUrl(newLocation))
     locationWritable.set(windowLocation())
   }
 
@@ -69,6 +92,7 @@ export default async (platform: Platform): Promise<UIService> => {
   const uiService = {
     createApp,
     getLocation,
+    subscribeLocation,
     navigate,
     showModal,
     closeModal

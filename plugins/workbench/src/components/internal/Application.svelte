@@ -28,7 +28,7 @@
   import ui, { Viewlet } from '@anticrm/presentation'
   import Component from '@anticrm/platform-ui/src/components/Component.svelte'
   import ActionBar from '@anticrm/platform-ui/src/components/ActionBar.svelte'
-  import { Action } from '@anticrm/platform-ui'
+  import { Action, Location } from '@anticrm/platform-ui'
 
   export let application: Ref<WorkbenchApplication>
   export let space: Ref<Space>
@@ -44,6 +44,11 @@
 
   let viewletActions: Action[] = []
   let activeViewlet: Viewlet | undefined
+
+  let location: Location
+  uiService.subscribeLocation((loc) => {
+    location = loc
+  }, onDestroy)
 
   coreService.subscribe(ui.mixin.Viewlet, {}, (docs) => {
     presenters = docs
@@ -70,7 +75,7 @@
     return viewlets.map(p => {
       return {
         name: p.label, icon: p.icon, toggleState: p._id === sp?._id, action: () => {
-          activeViewlet = p
+          uiService.navigate(undefined, { viewlet: p._id }, undefined)
         }
       }
     })
@@ -82,6 +87,11 @@
     if (appInstance) {
       // Update available presenters based on application
       const viewlets = filterViewlets(appInstance)
+
+      const vid = location.query.viewlet
+      if (vid) {
+        activeViewlet = viewlets.find(p => p._id == vid)
+      }
       if (viewlets.length > 0 && !activeViewlet) {
         activeViewlet = viewlets[0]
       }
@@ -120,10 +130,9 @@
       {#if activeViewlet && activeViewlet.component}
         <Component is={activeViewlet.component}
                    props={{_class: appInstance.classes[0], space: space, editable: false}} on:open />
-        <!--      <Table _class={appInstance.classes[0]} {space} on:open />-->
       {/if}
     </ScrollView>
-  { /if                                             }
+  { /if                                                 }
 </div>
 
 <style lang="scss">

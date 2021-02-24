@@ -49,8 +49,7 @@ export default async (platform: Platform, deps: { ui: UIService }): Promise<Logi
     }
     const accountInfo = JSON.parse(account) as LoginInfo
     if (accountInfo) {
-      uiService.navigate(
-        '/component:workbench.Workbench/application:workbench.Default')
+      uiService.navigate(['component:workbench.Workbench'], undefined, undefined)
     }
   }
 

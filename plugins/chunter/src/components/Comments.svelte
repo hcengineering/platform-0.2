@@ -13,8 +13,8 @@
   // limitations under the License.
   import { onDestroy } from 'svelte'
   import { Ref, Class, Doc, Property, Emb, StringProperty } from '@anticrm/core'
-  import chunter, { Collab, Comment } from '../index'
-  import { getCoreService, getService } from '@anticrm/platform-ui'
+  import chunter, { Collab, Comment, getChunterService } from '../index'
+  import { getCoreService } from '@anticrm/platform-ui'
 
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
   import CommentComponent from './internal/Comment.svelte'
@@ -36,17 +36,17 @@
   }
 
   const coreService = getCoreService()
-  const chunterService = getService(chunter.id)
+  const chunterService = getChunterService()
 
-  function createComment (message: any): Promise<void> {
-    const parsedMessage = chunterService.createMissedObjects(message)
+  async function createComment (message: any): Promise<void> {
+    const parsedMessage = (await chunterService).createMissedObjects(message)
     const comment = {
       _class: chunter.class.Comment,
       _createdOn: Date.now() as Property<number, Date>,
       _createdBy: coreService.getUserId() as Property<string, string>,
       message: parsedMessage as StringProperty
     }
-    return coreService.push(object, null, 'comments' as StringProperty, comment).then()
+    await coreService.push(object, null, 'comments' as StringProperty, comment)
   }
 </script>
 
