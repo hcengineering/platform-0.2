@@ -1,5 +1,5 @@
 import EditBox from './EditBox.svelte'
-import ThemeDecorator from './ThemeDecorator.svelte'
+import ThemeDecorator from '../ThemeDecorator.svelte'
 
 export default {
   title: 'Platform/EditBox',

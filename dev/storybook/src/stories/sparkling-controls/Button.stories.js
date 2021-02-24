@@ -1,5 +1,5 @@
 import Button from './Button.svelte'
-import ThemeDecorator from './ThemeDecorator.svelte'
+import ThemeDecorator from '../ThemeDecorator.svelte'
 
 export default {
   title: 'Platform/Button',

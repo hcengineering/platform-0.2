@@ -1,5 +1,5 @@
 import CheckBox from './CheckBox.svelte'
-import ThemeDecorator from './ThemeDecorator.svelte'
+import ThemeDecorator from '../ThemeDecorator.svelte'
 
 export default {
   title: 'Platform/CheckBox',
@@ -33,7 +33,7 @@ export default {
   }]
 }
 
-const Template = ({ onInput, onFocus, onChange, ...args }) => ({
+const Template = ({ ...args }) => ({
   Component: CheckBox,
   props: { ...args },
 });
