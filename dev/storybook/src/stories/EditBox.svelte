@@ -14,6 +14,8 @@
 -->
 
 <script lang="ts">
+  import { createEventDispatcher } from 'svelte';
+
   export let width: string = '300px'
   export let label: string = ''
   export let value: string
@@ -22,8 +24,18 @@
   export let hoverState: boolean = false
 
   let input: HTMLElement
-</script>
 
+  const dispatch = createEventDispatcher();
+  function onInput(event) {
+    dispatch('input', event);
+  }
+  function onFocus(event) {
+    dispatch('focus', event);
+  }
+  function onChange(event) {
+    dispatch('change', event);
+  }
+</script>
 
 <div class="editbox" class:editbox-label={(label !== '')} class:editbox-hoverState={hoverState}
      style='width: {width}' on:click={input.focus()}>

@@ -11,7 +11,7 @@ export default {
     kind: {
       control: { type: 'select', options: ['primary', 'default', 'transparent'] },
     },
-    width: { control: 'text', placeholder: 'hhh' },
+    width: { control: 'text' },
     label: { control: 'text' },
     onClick: { action: 'onClick' },
   },
