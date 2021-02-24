@@ -1,8 +1,10 @@
 <script lang="ts">
   export let checked: boolean = false
-  export const toRight: boolean = false
+  export let toRight: boolean = false
   export let editable: boolean = true
   export let fullWidth: boolean = true
+
+  export let label: string = 'Text'
 
   function toggleState () {
     if (editable) {
@@ -17,7 +19,7 @@
     <div class="separator"></div>
   {/if}
   <div class="{fullWidth ? 'input-label-full' : 'input-label'}" on:click={toggleState}>
-    <slot />
+    {label}
   </div>
   {#if (toRight)}
     <div class="separator"></div>
