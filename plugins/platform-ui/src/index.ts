@@ -53,8 +53,9 @@ export const CONTEXT_PLATFORM = 'platform'
 export const CONTEXT_PLATFORM_UI = 'platform-ui'
 
 export interface Location {
-  pathname: string // a row value of path
-  search: string // a raw value of search + fragment
+  path: string[] // A useful path value
+  query: Record<string, string> // a value of query parameters, no duplication are supported
+  fragment: string // a value of fragment
 }
 
 export interface UIService extends Service {
@@ -62,7 +63,9 @@ export interface UIService extends Service {
 
   getLocation (): Readable<Location>
 
-  navigate (url: string): void
+  subscribeLocation (listener: (location: Location) => void, destroyFactory: (op: () => void) => void): void
+
+  navigate (path: string[] | undefined, query: Record<string, string> | undefined, fragment: string | undefined): void
 
   showModal (component: AnySvelteComponent, props: any, element?: HTMLElement): void
 
@@ -113,8 +116,4 @@ export function getCoreService (): CoreService {
 
 export function getUIService (): UIService {
   return getContext(CONTEXT_PLATFORM_UI) as UIService
-}
-
-export function getService<T extends Service> (id: Plugin<T>): T {
-  return getPlatform().getRunningPlugin(id)
 }

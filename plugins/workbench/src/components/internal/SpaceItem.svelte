@@ -1,20 +1,17 @@
 <script lang="ts">
   import LinkTo from '@anticrm/platform-ui/src/components/LinkTo.svelte'
 
-  export let link: string = '/'
   export let selected: boolean = false
   export let label: string = ''
-  export let count: number = 0;
+  export let count: number = 0
 </script>
 
-<LinkTo href={link}>
-  <div class="item" class:selected={selected}>
-    {label}
-    {#if count > 0}
-      <div class="counter">{count}</div>
-    {/if}
-  </div>
-</LinkTo>
+<div class="item" class:selected={selected}>
+  {label}
+  {#if count > 0}
+    <div class="counter">{count}</div>
+  {/if}
+</div>
 
 <style lang="scss">
   .item {
@@ -37,12 +34,14 @@
       font-weight: 700;
       color: var(--theme-content-dark-color);
       background-color: var(--theme-bg-accent-color);
+
       &:hover {
         cursor: default;
         color: var(--theme-content-dark-color);
         background-color: var(--theme-bg-accent-color);
       }
     }
+
     &:hover {
       color: var(--theme-doclink-color);
     }
