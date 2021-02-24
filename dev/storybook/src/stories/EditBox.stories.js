@@ -6,9 +6,11 @@ export default {
   component: EditBox,
   argTypes: {
     width: { control: 'text' },
+    label: { control: 'text' },
     value: { control: 'text' },
     placeholder: { control: 'text' },
     id: { control: 'text' },
+    hoverState: { control: 'boolean' },
     onInput: { action: 'onInput' },
     onFocus: { action: 'onFocus' },
     onChange: { action: 'onChange' },
@@ -48,4 +50,11 @@ const Template = ({ onInput, onFocus, onChange, ...args }) => ({
 export const Default = Template.bind({});
 Default.args = {
   placeholder: 'Edit text here'
+};
+
+export const Labeled = Template.bind({});
+Labeled.args = {
+  placeholder: 'Edit text here',
+  label: 'Label',
+  hoverState: false
 };

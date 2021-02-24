@@ -15,30 +15,39 @@
 
 <script lang="ts">
   export let width: string = '300px'
+  export let label: string = ''
   export let value: string
   export let placeholder: string
   export let id: string
+  export let hoverState: boolean = false
 
   let input: HTMLElement
 </script>
 
-<div class="editbox" style='width: {width}' on:click={input.focus()}>
-  <input
-    bind:this={input}
-    id={id}
-    type="text"
-    bind:value={value}
-    {placeholder}
-    on:input
-    on:focus
-    on:change
-  />
+
+<div class="editbox" class:editbox-label={(label !== '')} class:editbox-hoverState={hoverState}
+     style='width: {width}' on:click={input.focus()}>
+  {#if (label !== '')}
+    <div class="wLabel">
+      <div class="label">{label}</div>
+      <input bind:this={input} {id} type="text"
+        bind:value={value} {placeholder}
+        on:input={onInput} on:focus={onFocus} on:change={onChange}
+      />
+    </div>
+  {:else}
+    <input bind:this={input} {id} type="text"
+      bind:value={value} {placeholder}
+      on:input={onInput} on:focus={onFocus} on:change={onChange}
+    />
+  {/if}
 </div>
 
 <style lang="scss">
   input {
     border: none;
     width: calc(100% - 2px);
+    padding: 0;
     color: var(--theme-content-color);
     background-color: transparent;
     font: inherit;
@@ -63,5 +72,26 @@
       border-color: var(--theme-bg-dark-hover);
       color: var(--theme-content-color);
     }
+    &-label {
+      height: 54px;
+      padding: 6px 16px 4px;
+    }
+    &-hoverState {
+      background-color: var(--theme-bg-accent-hover);
+      border-color: var(--theme-bg-dark-hover);
+      color: var(--theme-content-color);
+    }
+  }
+
+  .wLabel {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  .label {
+    color: var(--theme-content-color);
+    font-size: 11px;
+    font-weight: 400;
+    margin: 2px 0 6px;
   }
 </style>
