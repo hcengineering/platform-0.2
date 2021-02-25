@@ -46,6 +46,7 @@
 <div class="scroll-view" {style}>
   <div class="container" class:accent-color={accentColor} bind:this={container}>
     {content}
+    <slot />
   </div>
 </div>
 
