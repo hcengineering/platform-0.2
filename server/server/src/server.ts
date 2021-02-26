@@ -21,15 +21,11 @@ import { ClientControl, createClientService } from './service'
 import { connectWorkspace, WorkspaceProtocol } from './workspace'
 import { AnyLayout, Class, Doc, DocumentProtocol, Ref, Tx } from '@anticrm/core'
 import {
-  readRequest,
-  serialize,
-  Response,
-  RPC_CALL_FINDONE,
-  RPC_CALL_FIND,
-  RPC_CALL_TX,
-  RPC_CALL_LOAD_DOMAIN, RPC_CALL_GEN_REF_ID
+  readRequest, Response, RPC_CALL_FIND, RPC_CALL_FINDONE, RPC_CALL_GEN_REF_ID, RPC_CALL_LOAD_DOMAIN, RPC_CALL_TX,
+  RpcError,
+  serialize
 } from '@anticrm/rpc'
-import { Space, VDoc } from '@anticrm/domains'
+import { Space } from '@anticrm/domains'
 
 export interface Client {
   email: string
@@ -58,7 +54,12 @@ export interface ServerProtocol {
   getWorkspace (wsName: string): Promise<WorkspaceProtocol>
 }
 
-export function start (port: number, dbUri: string, host?: string): Promise<ServerProtocol> {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function isClientExpired (client: Client): boolean {
+  return false
+}
+
+export async function start (port: number, dbUri: string, host?: string): Promise<ServerProtocol> {
   console.log('starting server on port ' + port + '...')
   console.log('host: ' + host)
 
@@ -120,9 +121,15 @@ export function start (port: number, dbUri: string, host?: string): Promise<Serv
     ws.on('close', async () => {
       unreg()
     })
+
     ws.on('message', async (msg: string) => {
       const request = readRequest(msg)
       const ss = (await service)
+
+      if (isClientExpired(client)) {
+        ws.send(serialize({ id: request.id, error: { code: 0, message: 'token is expired' } as RpcError }))
+        return
+      }
 
       const response: Response<any> = { id: request.id }
       switch (request.method) {
@@ -164,7 +171,7 @@ export function start (port: number, dbUri: string, host?: string): Promise<Serv
   }
 
   server.on('upgrade', function upgrade (request: IncomingMessage, socket, head: Buffer) {
-    auth(request, (err: Error | null, client: Client | null) => {
+    auth(request, async (err: Error | null, client: Client | null) => {
       if (err != null) {
         console.log(err)
       }
@@ -173,6 +180,7 @@ export function start (port: number, dbUri: string, host?: string): Promise<Serv
         socket.destroy()
         return
       }
+
       console.log('client: ', client)
       wss.handleUpgrade(request, socket, head, function done (ws) {
         wss.emit('connection', ws, request, client)

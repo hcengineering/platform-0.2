@@ -21,10 +21,8 @@ import contact, { User, ContactService } from '.'
 // import UserLookup from './components/UserLookup.vue'
 // import LoginWidget from './components/LoginWidget.vue'
 
-import { CoreService } from '@anticrm/platform-core'
+import core, { CoreService } from '@anticrm/platform-core'
 import { UIService, Asset } from '@anticrm/platform-ui'
-
-import login from '@anticrm/login'
 
 /*!
  * Anticrm Platform™ Contact Plugin
@@ -37,6 +35,7 @@ export default async (platform: Platform, deps: { core: CoreService, ui: UIServi
   // platform.setResource(contact.component.LoginWidget, LoginWidget)
 
   const coreService = deps.core
+
   // const uiService = deps.ui
 
   function getUser (account: string): Promise<User> {
@@ -44,7 +43,7 @@ export default async (platform: Platform, deps: { core: CoreService, ui: UIServi
   }
 
   async function getMyName (): Promise<string> {
-    const whoAmI = platform.getMetadata(login.metadata.WhoAmI)
+    const whoAmI = platform.getMetadata(core.metadata.WhoAmI)
     if (!whoAmI) {
       return 'Nobody'
     }

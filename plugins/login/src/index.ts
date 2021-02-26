@@ -40,9 +40,19 @@ export interface LoginService extends Service {
   doLogin (username: string, password: string, workspace: string): Promise<Status>
 
   /**
-   * Check and auto forward to default application if login is already was done.
+   * Check and auto return login information if available.
    */
-  checkLoginForward (): void
+  getLoginInfo (): Promise<LoginInfo | undefined>
+
+  /**
+   * Do navigate to default application if defined.
+   */
+  navigateApp (): void
+
+  /**
+   * Do logout from current logged in account
+   */
+  doLogout (): Promise<void>
 }
 
 const login = plugin('login' as Plugin<LoginService>, { ui: ui.id }, {
@@ -51,9 +61,7 @@ const login = plugin('login' as Plugin<LoginService>, { ui: ui.id }, {
     SignupForm: '' as AnyComponent
   },
   metadata: {
-    LoginUrl: '' as Metadata<string>,
-    Token: '' as Metadata<string>,
-    WhoAmI: '' as Metadata<string>
+    AccountsUrl: '' as Metadata<string>
   }
 })
 

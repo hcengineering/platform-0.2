@@ -25,11 +25,20 @@
   export let props: any
 
   const platform = getContext('platform') as Platform
-  $: component = is ? platform.getResource(is) : null
+  let component: Promise<void>
+  $: {
+    console.log('Component is updated:', is, props)
+    component = is ? platform.getResource(is).then(e => {
+      console.log('component is resolved:', e)
+      return e
+    }) : null
+    console.log('component promise: ', component)
+  }
 </script>
 
 {#if component}
   {#await component }
+    Waiting: {is} {component}
     <Spinner />
   {:then ctor}
     <svelte:component this={ctor} {...props} on:change on:close on:open />
