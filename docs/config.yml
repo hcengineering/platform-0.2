@@ -1,4 +1,5 @@
-#baseURL: "https://anticrm.org/"
+---
+# baseURL: "https://anticrm.org/"
 languageCode: "en-us"
 refLinksErrorLevel: "WARNING"
 theme: "thxvscode"
