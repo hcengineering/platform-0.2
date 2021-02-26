@@ -1,3 +1,4 @@
+---
 name: CI
 
 on: [push, pull_request]
@@ -58,3 +59,10 @@ jobs:
         run: |
           yarn install
           yarn workspaces run lint
+
+  yamllint:
+    name: yamllint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run yamllint
+        uses: actions/checkout@v2

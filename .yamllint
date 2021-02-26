@@ -1,0 +1,13 @@
+---
+extends: default
+
+yaml-files:
+  - '*.yaml'
+  - '*.yml'
+  - '.yamllint'
+ 
+rules:
+  truthy: disable
+  line-length: disable
+
+locale: en_US.UTF-8
