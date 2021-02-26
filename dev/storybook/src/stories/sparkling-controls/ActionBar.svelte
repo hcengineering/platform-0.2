@@ -1,16 +1,6 @@
 <script lang="ts">
-  import Icon from './Icon.svelte'
-  import ui from '../'
-  import { Action } from '..'
-  import { onDestroy } from 'svelte'
-
-  interface ActionF extends Action {
-    id: Number
-    style?: String
-  }
-
   export let onTop: Number = 2
-  export let actions: Action[] = []
+  export let actions: Array<Object> = []
 
   function getStyle (pos: number, total: number, onTop: number): string {
     if (total == 1) {
@@ -52,23 +42,23 @@
   {#each actions.slice(0, onTop) as item}
     <button class="button actionButton {getStyle(actions.indexOf(item), actions.length, onTop)}"
             class:toggleState={item.toggleState}
-            on:click={() => {item.action(); visible = false;}}>{item.name}</button>
+            on:click={() => {item.action(); visible = false;}}>{item.label}</button>
   {/each}
   {#if (actions.length - onTop) > 0}
     <button bind:this={thisTrigger} class="button actionButton abRight w100 wOther" class:selected={visible}
             on:click|stopPropagation={() => { visible = !visible}}>
       <div class="chevron">
         <span>Ещё</span>
-        <Icon icon={ui.icon.ArrowDown} />
+        <span class="arrowDown"></span>
       </div>
       {#if visible}
         <div bind:this={thisPopup} class="popup-menu-view">
           {#each actions.slice(onTop) as popup}
-            {#if popup.name === '-'}
+            {#if popup.label === '-'}
               <div class="popup-separator"></div>
             {:else}
               <button class="popup-item"
-                      on:click={handleAction(popup)}>{popup.name}</button>
+                      on:click={handleAction(popup)}>{popup.label}</button>
             {/if}
           {/each}
         </div>
@@ -81,7 +71,36 @@
   .actionBar-view {
     display: flex;
     flex-direction: row;
-    margin: 1em 0;
+    margin: 0;
+    padding: 0;
+  }
+
+  .button {
+    display: inline-block;
+    height: 32px;
+    border: 1px solid var(--theme-bg-dark-color);
+    border-radius: 4px;
+    padding: 0.5em 1.33em 0.5em;
+    box-sizing: border-box;
+    cursor: pointer;
+    user-select: none;
+    text-align: center;
+
+    font: inherit;
+    font-weight: 500;
+
+    color: var(--theme-content-color);
+    background-color: var(--theme-bg-accent-color);
+    transition: border-color .2s, color .2s, background-color .2s;
+
+    &:focus {
+      outline: none;
+    }
+    &:hover {
+      border-color: var(--theme-bg-dark-hover);
+      background-color: var(--theme-bg-accent-hover);
+      color: var(--theme-content-dark-color);
+    }
   }
 
   .error {
@@ -138,10 +157,6 @@
   .wOther {
     display: block;
 
-    & > span {
-      margin-right: 5px;
-    }
-
     .chevron {
       width: 100%;
       height: 100%;
@@ -158,19 +173,18 @@
       background-color: var(--theme-bg-accent-color);
       border: solid 1px var(--theme-bg-dark-color);
       border-radius: 4px;
-      box-shadow: var(--theme-shadow);
-      padding: 4px 8px;
       margin: 10px -0.25em 0 -0.25em;
-      z-index: 100000;
+      padding: 4px 8px;
+      box-shadow: var(--theme-shadow);
+      z-index: 1000;
 
       .popup-item {
         margin: 4px 0;
         padding: 8px;
-        width: 100%;
-        text-align: left;
         background-color: var(--theme-bg-accent-color);
         border-radius: 4px;
         border: none;
+        text-align: left;
         color: var(--theme-content-dark-color);
         cursor: pointer;
 
@@ -179,5 +193,36 @@
         }
       }
     }
+  }
+
+  .arrowDown {
+    position: relative;
+    width: 16px;
+    height: 16px;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      width: 1px;
+      height: 6px;
+      left: calc(50% + 2px);
+      top: 50%;
+      transform: translateY(-50%) rotate(45deg);
+      background-color: var(--theme-content-color);
+    }
+    &::before {
+      content: '';
+      position: absolute;
+      width: 1px;
+      height: 6px;
+      left: calc(50% - 2px);
+      top: 50%;
+      transform: translateY(-50%) rotate(-45deg);
+      background-color: var(--theme-content-color);
+    }
+  }
+
+  button + button {
+    margin-left: 0;
   }
 </style>

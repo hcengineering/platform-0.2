@@ -48,19 +48,49 @@
 </div>
 
 <style lang="scss">
-	.scroll-view {
-		position: relative;
+  .scroll-view {
+    position: relative;
 
-		.container {
-			overflow: auto;
-			position: absolute;
-			// border-bottom: 1px solid var(--theme-content-color-dark);
-			// border-radius: 4px;
-			height: 100%;
-			width: 100%;
-		}
-		.accent-color::-webkit-scrollbar-track {
-			background-color: var(--theme-bg-accent-color);
-		}
-	}
+    // FireFox
+    scrollbar-color: var(--theme-bg-dark-color) var(--theme-bg-accent-color);
+    scrollbar-width: thin;
+
+    // Other
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+    &::-webkit-scrollbar:horizontal {
+      height: 8px;
+    }
+    &::-webkit-scrollbar-track {
+      background-color: var(--theme-bg-color);
+    }
+    &::-webkit-scrollbar-thumb {
+      background: var(--theme-bg-accent-color);
+      border: 1px solid var(--theme-bg-dark-color);
+      border-radius: 2px;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+      background: var(--theme-bg-dark-color);
+      border: 1px solid var(--theme-bg-dark-color);
+      border-radius: 2px;
+    }
+    &::-webkit-scrollbar-corner {
+      background: var(--theme-bg-accent-color);
+      border: 1px solid var(--theme-bg-dark-color);
+      border-radius: 2px;
+    }
+
+    .container {
+      overflow: auto;
+      position: absolute;
+      // border-bottom: 1px solid var(--theme-content-color-dark);
+      // border-radius: 4px;
+      height: 100%;
+      width: 100%;
+    }
+    .accent-color::-webkit-scrollbar-track {
+      background-color: var(--theme-bg-accent-color);
+    }
+  }
 </style>

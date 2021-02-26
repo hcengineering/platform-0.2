@@ -1,17 +1,17 @@
 <script lang='ts'>
   import ScrollView from './ScrollView.svelte'
 
-  export let items: Array = []
+  export let items: Array<Object> = []
   export let selected: number = 0
   export let label: string = 'Значение'
   export let width: string = ''
-
-  let widthStr: string = (width !== '') ? `width: ${width}` : '' 
 
   let comboHidden: boolean = true
   let comboRoot: HTMLElement
   let comboDrop: HTMLElement
   let comboItems: HTMLElement
+
+  let widthStr: string = (width !== '') ? `width: ${width}` : '' 
 
   function showCombo(): void {
     const rect = comboRoot.getBoundingClientRect()
