@@ -125,25 +125,31 @@ export function start (port: number, dbUri: string, host?: string): Promise<Serv
       const ss = (await service)
 
       const response: Response<any> = { id: request.id }
-      switch (request.method) {
-        case RPC_CALL_FINDONE:
-          response.result = await ss.findOne(request.params[0] as Ref<Class<Doc>>, request.params[1] as AnyLayout)
-          break
-        case RPC_CALL_FIND:
-          response.result = await ss.find(request.params[0] as Ref<Class<Doc>>, request.params[1] as AnyLayout)
-          break
-        case RPC_CALL_GEN_REF_ID:
-          response.result = await ss.genRefId(request.params[0] as Ref<Space>)
-          break
-        case RPC_CALL_TX: {
-          const { clientTx } = await ss.tx(request.params[0] as Tx)
-          // response.result == undefined  => Do not pass result, since it is same.
-          response.clientTx = clientTx
-          break
+      try {
+        switch (request.method) {
+          case RPC_CALL_FINDONE:
+            response.result = await ss.findOne(request.params[0] as Ref<Class<Doc>>, request.params[1] as AnyLayout)
+            break
+          case RPC_CALL_FIND:
+            response.result = await ss.find(request.params[0] as Ref<Class<Doc>>, request.params[1] as AnyLayout)
+            break
+          case RPC_CALL_GEN_REF_ID:
+            response.result = await ss.genRefId(request.params[0] as Ref<Space>)
+            break
+          case RPC_CALL_TX:
+          {
+            const { clientTx } = await ss.tx(request.params[0] as Tx)
+            // response.result == undefined  => Do not pass result, since it is same.
+            response.clientTx = clientTx
+            break
+          }
+          case RPC_CALL_LOAD_DOMAIN:
+            response.result = await ss.loadDomain(request.params[0] as string)
+            break
         }
-        case RPC_CALL_LOAD_DOMAIN:
-          response.result = await ss.loadDomain(request.params[0] as string)
-          break
+      } catch (error) {
+        // Send response with empty result
+        console.log('Error occurred during processing websocket message:', error)
       }
       ws.send(serialize(response))
     })
