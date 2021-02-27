@@ -56,7 +56,7 @@
       </a>
     </div>
     <div class="content">
-      <ScrollView height="100%">
+      <ScrollView height="100%" width="100%">
         <div class="component-content">
           {#if object}
             <Component is="{component}" props="{{ _class, object }}" />
@@ -70,14 +70,15 @@
 <style lang="scss">
   .recruiting-view {
     margin-top: 1em;
-    width: calc(404px);
+    // width: calc(404px);
+    width: 100%;
     position: relative;
     height: 95%;
 
     .toolbar {
       display: flex;
       flex-direction: row-reverse;
-      margin: 1em
+      margin: 1em;
     }
 
     .content {

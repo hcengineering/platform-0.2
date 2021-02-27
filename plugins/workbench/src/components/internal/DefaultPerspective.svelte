@@ -34,6 +34,10 @@
   import ObjectForm from './ObjectForm.svelte'
   import { getCurrentUserSpace } from './spaces/utils'
   import LinkTo from '../../../../platform-ui/src/components/LinkTo.svelte'
+  import Splitter from '@anticrm/sparkling-controls/src/Splitter.svelte'
+
+  let prevDiv: HTMLElement
+  let nextDiv: HTMLElement
 
   const uiService = getUIService()
 
@@ -207,7 +211,8 @@
   }
 
   aside {
-    height: 100%;
+    width: 404px;
+    min-width: 404px;
     background-color: var(--theme-bg-color);
     border-left: 1px solid var(--theme-bg-accent-color);
   }
@@ -257,7 +262,7 @@
     </div>
   </div>
 
-  <div class="main">
+  <div bind:this={prevDiv} class="main">
     {#if component}
       <MainComponent
         is={component}
@@ -268,10 +273,10 @@
         }} />
     {/if}
   </div>
-
-  <aside>
-    {#if details}
+  {#if details}
+    <Splitter {prevDiv} {nextDiv} minWidth="404" />
+    <aside bind:this={nextDiv}>
       <ObjectForm {...details} title="Title" on:close={()=> {details = undefined}} />
-    {/if}
-  </aside>
+    </aside>
+  {/if}
 </div>
