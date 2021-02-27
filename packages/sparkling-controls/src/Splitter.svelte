@@ -15,6 +15,8 @@
   let nextRect: DOMRect
   let startX: Number
 
+  let hoverMode: boolean = false
+
   function onMouseMove(event: MouseEvent): void {
     let dX: Number = event.clientX - startX
     if (dX < 0) {
@@ -34,6 +36,7 @@
 
   function onMouseUp(event: MouseEvent): void {
     coverPrev.style.visibility = coverNext.style.visibility = 'hidden'
+    hoverMode = false
     window.removeEventListener('mousemove', onMouseMove)
     window.removeEventListener('mouseup', onMouseUp)
   }
@@ -42,6 +45,7 @@
     prevRect = prevDiv.getBoundingClientRect()
     nextRect = nextDiv.getBoundingClientRect()
     startX = event.clientX
+    hoverMode = true
 
     setCoverSize(coverPrev, prevDiv)
     setCoverSize(coverNext, nextDiv)
@@ -68,11 +72,11 @@
 
 <div bind:this={coverPrev} class="cover" class:coverDev={devMode}></div>
 <div bind:this={coverNext} class="cover" class:coverDev={devMode} style="background-color: #ff0"></div>
-<div bind:this={splitterDiv} class="splitter" on:mousedown={onMouseDown}>
+<div bind:this={splitterDiv} class="splitter" class:splitter-statehover={hoverMode} on:mousedown={onMouseDown}>
   <div bind:this={splitterIcon} class="splitIcon" on:mousedown={onMouseDown}></div>
 </div>
 
-<style>
+<style lang='scss'>
   .splitter {
     position: relative;
     box-sizing: border-box;
@@ -81,13 +85,15 @@
     height: 100%;
     background-color: var(--theme-bg-accent-color);
     cursor: col-resize;
-  }
-  .splitter:hover {
-    background-color: var(--theme-bg-accent-hover);
-  }
-  .splitter:hover > .splitIcon {
-    visibility: visible;
-    background-color: var(--theme-bg-accent-hover);
+
+    &:hover, &-statehover {
+      background-color: var(--theme-bg-accent-hover);
+
+      & > .splitIcon {
+        visibility: visible;
+        background-color: var(--theme-bg-accent-hover);
+      }
+    }
   }
   .splitIcon {
     visibility: hidden;
