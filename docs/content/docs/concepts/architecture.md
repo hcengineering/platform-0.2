@@ -5,18 +5,18 @@ menuPosition: 1
 
 # The Platform
 
-Antierp Platform built around a few simple concepts:
+Antierp Platform is built around a few simple concepts:
 
 * `Platform Object` -- a piece of information, typically persisted by the platform in a database. May refer another platform object and `Resource`s
 * `Resource` -- something we can't persist in the database (e.g. JavaScript function, or "mailing service"), but want to refer from a `Platform Object`.
 * `Plugin` -- piece of code, which provide `Resources` to the platform, and code to deal with `Platform Objects`.
 
 Any Platform application is nothing but a bunch of installed plugins.
-At the very core Platform is a simple piece of code, which connects plugins together and route resource requests.
+At the very core Platform is a simple piece of code, which connects plugins together and routes resource requests.
 
 ## Platform Objects
 
-Platform Objects utilize classical object-oriented model, so every platform object belongs to a particualar class. A `Class` may extend another class, and implement a number of interfaces. `Interface` may extend another interface as well. There is also concept of `Mixin`, which we'll describe later.
+Platform Objects utilize classical object-oriented model, so every platform object belongs to a particualar class. A `Class` may extend another class, and implement a number of interfaces. `Interface` may extend another interface as well. There is also a concept of `Mixin`, which we'll describe later.
 
 {{< mermaid >}}
 classDiagram
@@ -66,7 +66,7 @@ Plugin is an *isolated* piece of software, and a plugin never directly `import` 
 
 ### Why Resources?
 
-Platform persists `Platform Objects` in the database. Platform objects uniquely identified and belongs to a `Class`. Any platform object may have properties, which can be:
+Platform persists `Platform Objects` in the database. Platform objects are uniquely identified and belong to a `Class`. Any platform object may have properties, which can be:
 
 * A reference to another platform object
 * Embedded object (structure)
@@ -91,12 +91,12 @@ Examples of `Resource`:
 `object:5679fd5a459245ccb435` as Resource<Doc> // db object
 ```
 
-Plugins loaded asynchonously, on-demand thus everything in the `Platform` wired together via asynchronous communications.
+Plugins are loaded asynchonously, on-demand thus everything in the `Platform` is wired together via asynchronous communications.
 A `Plugin` itself is also a Platform `Resource`, so you can request access to a plugin's API using same approach.
 
 ## Plugins
 
-Following is a plugin package structure. It is not a mandatory, but the structure I tend to use now.
+Following is a plugin package structure. It is not mandatory, but the structure I tend to use now.
 
 ```text
 __tests__
@@ -109,11 +109,11 @@ plugin.ts // plugin entry point
 *.ts  // implementation-related stuff
 ```
 
-Plugin API defined in `index.ts`. It should not export any code (including internal) and should not have any side effects.
+Plugin API is defined in `index.ts`. It should not export any code (including internal) and should not have any side effects.
 Only API and plugin's PRIs.
 
 Basically, if a plugin depends on another, importing dependant's `index.ts` must be sufficient to start communicating with a plugin.
 
-A `plugin.ts` available to `Platform` only. So you should never import anything from another plugin besides `index.ts`.
+A `plugin.ts` is available to `Platform` only. So you should never import anything from another plugin besides `index.ts`.
 
-Runtime code not allowed to import anything from `__model__` folder. This is solely for tooling/configuration purposes, and does not exists at runtime.
+Runtime code is not allowed to import anything from `__model__` folder. This is solely for tooling/configuration purposes, and does not exists at runtime.
