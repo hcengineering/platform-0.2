@@ -148,7 +148,7 @@ export function start (port: number, dbUri: string, host?: string): Promise<Serv
             break
         }
       } catch (error) {
-        // Send response with empty result
+        response.error = error?.toString();
         console.log('Error occurred during processing websocket message:', error)
       }
       ws.send(serialize(response))
