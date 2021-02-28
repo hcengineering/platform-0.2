@@ -28,7 +28,7 @@ export class Cache implements Storage {
   async remove (tx: TxContext, _class: Ref<Class<Doc>>, doc: Ref<Doc>, _query: AnyLayout | null): Promise<void> { // eslint-disable-line
   }
 
-  private coreProtocol: CoreProtocol
+  private readonly coreProtocol: CoreProtocol
 
   constructor (coreProtocol: CoreProtocol) {
     this.coreProtocol = coreProtocol

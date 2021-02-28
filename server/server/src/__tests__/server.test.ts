@@ -122,7 +122,7 @@ describe('server', () => {
   })
 
   test('should connect to server', async () => {
-    expect(conn.readyState).toEqual(1)
+    expect(await Promise.resolve(conn.readyState)).toEqual(WebSocket.OPEN)
   })
 
   it('should send many requests', (done) => {
