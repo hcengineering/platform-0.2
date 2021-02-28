@@ -93,7 +93,7 @@
 </style>
 
 <div class='activity-item'>
-  <img class='avatar' src={avatar} />
+  <img class='avatar' src={avatar} alt='avatar'/>
   <div class='details'>
     <b>{user ? user.name : ''}</b>
     <span>15:23</span>
