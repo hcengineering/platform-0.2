@@ -152,17 +152,6 @@
       align-items: center;
     }
 
-    .table {
-      margin: 1em;
-      flex-grow: 1;
-    }
-
-    .details {
-      border-top: 1px solid var(--theme-bg-accent-color);
-      padding: 1em;
-      //max-height: 400px;
-    }
-
     .presentation {
       display: flex;
       flex-direction: row-reverse;
