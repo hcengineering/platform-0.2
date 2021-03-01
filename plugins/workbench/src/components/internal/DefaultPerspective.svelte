@@ -115,10 +115,6 @@
       border-bottom: solid 1px var(--theme-bg-accent-color);
       border-right: solid 1px var(--theme-bg-accent-color);
 
-      .icon {
-        padding: 1em;
-      }
-
       &.current-app {
         background-color: var(--theme-bg-color);
         border-right: solid 1px var(--theme-bg-color);

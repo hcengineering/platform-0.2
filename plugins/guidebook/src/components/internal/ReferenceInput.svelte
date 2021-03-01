@@ -15,10 +15,6 @@
 </script>
 
 <style lang="scss">
-  .toolbar_table {
-    width: 100%;
-    border: 1px solid white;
-  }
   .preview-pane {
     margin: 10px;
     background-color: hsl(210, 25%, 40%);

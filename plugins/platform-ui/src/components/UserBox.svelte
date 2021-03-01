@@ -33,9 +33,9 @@
     let pathItems: boolean = false
     var path = event['path'] || (event.composedPath && event.composedPath())
     path.find((el) => {
-      if (el.className === comboRoot.className) pathRoot = true
-      if (el.className === comboDrop.className) pathDrop = true
-      if (el.className === comboItems.className) pathItems = true
+      if (el.className === comboRoot?.className) pathRoot = true
+      if (el.className === comboDrop?.className) pathDrop = true
+      if (el.className === comboItems?.className) pathItems = true
     })
     if (pathRoot && !pathDrop) {
       if (comboHidden) {
