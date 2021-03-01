@@ -111,7 +111,7 @@ export function model (S: Builder): void {
   })
 
   S.mixin(core.class.ArrayOf, ui.mixin.Presenter, {
-    presenter: ui.component.StringPresenter
+    presenter: ui.component.ArrayPresenter
   })
 
   S.createDocument(ui.mixin.Viewlet, {

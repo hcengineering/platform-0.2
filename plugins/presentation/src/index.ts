@@ -173,7 +173,8 @@ const presentationPlugin = plugin('presentation' as Plugin<PresentationService>,
     StringPresenter: '' as AnyComponent,
     CheckboxPresenter: '' as AnyComponent,
     RefPresenter: '' as AnyComponent,
-    TablePresenter: '' as AnyComponent
+    TablePresenter: '' as AnyComponent,
+    ArrayPresenter: '' as AnyComponent,
   }
 })
 
