@@ -24,7 +24,6 @@
   export let _class: Ref<Class<Doc>>
   export let space: Ref<Space>
   export let editable: boolean = true
-  export let columnMaxWidth: number = 300
 
   const dispatch = createEventDispatcher()
 
@@ -122,9 +121,7 @@
         {#each attributes as attr (attr.key)}
           <div class="td">
             {#if attr.presenter}
-              <div style={ (columnMaxWidth) ? 'max-width:' + columnMaxWidth + 'px' : '' }>
-                <Presenter is={attr.presenter} value={object[attr.key] || '' } attribute={attr} {editable} componentProps={{textWrap: !!columnMaxWidth}} />
-              </div>
+              <Presenter is={attr.presenter} value={object[attr.key] || '' } attribute={attr} {editable} />
             {:else}
               <span>{object[attr.key] || ''}</span>
             {/if}

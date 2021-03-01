@@ -36,9 +36,15 @@
 </style>
 
 {#if readOnlyField}
-  <div class:wrapped-text={textWrap}>
+  {#if maxWidth}
+    <div style={ 'max-width:' + maxWidth + 'px' }>
+      <div class="wrapped-text">
+        {value}
+      </div>
+    </div>
+  {:else}
     {value}
-  </div>
+  {/if}
 {:else}
   <InlineEdit bind:value placeholder={attribute.placeholder || ""} {maxWidth} {editable} />
 {/if}
