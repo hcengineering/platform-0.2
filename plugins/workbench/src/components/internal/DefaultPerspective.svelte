@@ -33,7 +33,7 @@
 
   import ObjectForm from './ObjectForm.svelte'
   import { getCurrentUserSpace } from './spaces/utils'
-  import LinkTo from '../../../../platform-ui/src/components/LinkTo.svelte'
+  import LinkTo from '@anticrm/platform-ui/src/components/LinkTo.svelte'
   import Splitter from '@anticrm/sparkling-controls/src/Splitter.svelte'
 
   let prevDiv: HTMLElement

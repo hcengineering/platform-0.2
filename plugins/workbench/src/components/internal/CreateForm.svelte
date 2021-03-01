@@ -24,7 +24,7 @@
   import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.svelte'
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
   import { CORE_CLASS_VDOC, Space } from '@anticrm/domains'
-  import Component from '../../../../platform-ui/src/components/Component.svelte'
+  import Component from '@anticrm/platform-ui/src/components/Component.svelte'
 
   export let title: string = ''
   export let _class: Ref<Class<Doc>>
