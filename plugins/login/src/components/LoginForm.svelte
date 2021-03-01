@@ -4,7 +4,7 @@
   import login, { LoginService } from '..'
 
   import Form from './Form.svelte'
-  import Button from '../../../../dev/storybook/src/stories/Button.svelte'
+  import Button from '@anticrm/sparkling-controls/src/Button.svelte'
 
   let object = { username: '', password: '', workspace: '' }
   let status: Status
@@ -69,10 +69,8 @@
         Workspace: {object.workspace}
       </div>
       <div class="actions">
-        <Button label="Logout" width="100px"
-                on:click={ logout  }></Button>
-        <Button label="Switch to Application" width="100px"
-                on:click={ navigateApp }></Button>
+        <Button width="100px" on:click={ logout  }>Logout</Button>
+        <Button width="100px" on:click={ navigateApp }>Switch to Application</Button>
       </div>
     </div>
   {:else}
