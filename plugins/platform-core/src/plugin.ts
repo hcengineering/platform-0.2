@@ -16,8 +16,9 @@
 import { Platform } from '@anticrm/platform'
 import { ModelDb } from './modeldb'
 
+import core from './index'
+
 import { CoreService, QueryResult, RefFinalizer, Unsubscriber } from '.'
-import login from '@anticrm/login'
 import rpcService, { EventType } from './rpc'
 
 import { QueriableStorage } from './queries'
@@ -65,7 +66,9 @@ export default async (platform: Platform): Promise<CoreService> => {
   const cache = new Cache(coreProtocol)
 
   const modelDomain = await coreProtocol.loadDomain(MODEL_DOMAIN)
+  console.log('##### LOAD_DOMAIN')
   model.loadModel(modelDomain)
+  console.log('##### LOAD_DOMAIN_DONE')
 
   const qModel = new QueriableStorage(model, model)
   const qTitles = new QueriableStorage(model, cache)
@@ -166,7 +169,7 @@ export default async (platform: Platform): Promise<CoreService> => {
   }
 
   function getUserId () {
-    return platform.getMetadata(login.metadata.WhoAmI) as StringProperty
+    return platform.getMetadata(core.metadata.WhoAmI) as StringProperty
   }
 
   const ops = createOperations(model, processTx, getUserId)

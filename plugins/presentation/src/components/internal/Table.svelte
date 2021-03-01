@@ -40,7 +40,6 @@
           model = m
           modelClass = _class
           attributes = model.getAttributes()
-          console.log('all attributes', attributes)
         })
     }
   }

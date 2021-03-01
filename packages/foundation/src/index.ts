@@ -58,6 +58,11 @@ export enum Severity {
   ERROR
 }
 
+export enum PlatformStatusCodes {
+  AUTHENTICATON_OK = 101,
+  AUTHENTICATON_REQUIRED
+}
+
 /**
  * Status of an operation
  * @public

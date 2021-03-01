@@ -13,10 +13,10 @@
 // limitations under the License.
 //
 
-import { Platform } from '@anticrm/platform'
-import { ReqId, readResponse, serialize } from '@anticrm/rpc'
+import { Platform, PlatformStatus, Severity, Status } from '@anticrm/platform'
+import { readResponse, ReqId, serialize } from '@anticrm/rpc'
 import core from '.'
-import login from '@anticrm/login'
+import { PlatformStatusCodes } from '@anticrm/foundation'
 
 export type EventListener = (event: unknown) => void
 
@@ -39,19 +39,18 @@ export default (platform: Platform): RpcService => {
   const requests = new Map<ReqId, PromiseInfo>()
   let lastId = 0
 
-  function createWebsocket () {
+  async function createWebsocket () {
     const host = platform.getMetadata(core.metadata.WSHost)
     const port = platform.getMetadata(core.metadata.WSPort)
-    const token = platform.getMetadata(login.metadata.Token)
 
-    // console.log('token', platform.getMetadata(login.metadata.Token))
-    // const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0ZW5hbnQiOiJsYXRlc3QtbW9kZWwifQ.hKZDHkhxNL-eCOqk5NFToVh43KOGshLS4b6DgztJQqI'
+    const token = platform.getMetadata(core.metadata.Token)
 
-    return new Promise<WebSocket>((resolve, reject) => {
-      if (token === undefined) {
-        reject(new Error('authentication required'))
-        return
-      }
+    if (!token) {
+      platform.broadcastEvent(PlatformStatus, new Status(Severity.ERROR, PlatformStatusCodes.AUTHENTICATON_REQUIRED, 'Authentication is required'))
+      return Promise.reject(new Error('authentication required'))
+    }
+    return new Promise<WebSocket>((resolve) => {
+      // Let's sure token is valid one
       const ws = new WebSocket('ws://' + host + ':' + port + '/' + token)
       ws.onopen = () => {
         resolve(ws)
@@ -105,7 +104,7 @@ export default (platform: Platform): RpcService => {
     return websocket
   }
 
-  function request<R> (method: string, ...params: any[]): Promise<R> {
+  async function request<R> (method: string, ...params: any[]): Promise<R> {
     return new Promise<any>((resolve, reject) => {
       const id = ++lastId
       requests.set(id, {
@@ -118,6 +117,8 @@ export default (platform: Platform): RpcService => {
           method,
           params
         }))
+      }).catch(err => {
+        reject(err)
       })
     })
   }

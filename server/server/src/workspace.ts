@@ -53,7 +53,7 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
   console.log('model loaded.')
   memdb.loadModel(model)
 
-  const workspace_system = db.collection('system')
+  const workspaceSystem = db.collection('system')
 
   function collection<T extends Doc> (_class: Ref<Class<T>>): Collection {
     const domain = memdb.getDomain(_class)
@@ -176,7 +176,7 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
       }
 
       async function getValue () {
-        return await workspace_system.findOneAndUpdate(
+        return await workspaceSystem.findOneAndUpdate(
           { _space },
           { $inc: { value: 1 } },
           { upsert: true }

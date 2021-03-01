@@ -13,14 +13,16 @@
 // limitations under the License.
 //
 
-import { Platform, Status, Severity } from '@anticrm/platform'
+import { Platform, PlatformStatus, Severity, Status } from '@anticrm/platform'
+import platformIds from '@anticrm/platform-core'
 import { Request, Response, serialize, toStatus } from '@anticrm/rpc'
 
 import { UIService } from '@anticrm/platform-ui'
 
-import login, { LoginService, LoginInfo, ACCOUNT_KEY } from '.'
+import login, { ACCOUNT_KEY, LoginInfo, LoginService } from '.'
 
 import LoginForm from './components/LoginForm.svelte'
+import { PlatformStatusCodes } from '@anticrm/foundation'
 
 /*!
  * Anticrm Platform™ Login Plugin
@@ -30,6 +32,11 @@ import LoginForm from './components/LoginForm.svelte'
 export default async (platform: Platform, deps: { ui: UIService }): Promise<LoginService> => {
   const uiService = deps.ui
 
+  const accountsUrl = platform.getMetadata(login.metadata.AccountsUrl)
+  if (!accountsUrl) {
+    throw new Status(Severity.ERROR, 0, 'no accounts server metadata provided.')
+  }
+
   platform.setResource(login.component.LoginForm, LoginForm)
 
   // platform.setResource(login.component.SignupForm, SignupForm)
@@ -37,35 +44,48 @@ export default async (platform: Platform, deps: { ui: UIService }): Promise<Logi
   function setLoginInfo (loginInfo: LoginInfo) {
     localStorage.setItem(ACCOUNT_KEY, JSON.stringify(loginInfo))
 
-    platform.setMetadata(login.metadata.WhoAmI, loginInfo.email)
-    platform.setMetadata(login.metadata.Token, loginInfo.token)
+    platform.setMetadata(platformIds.metadata.WhoAmI, loginInfo.email)
+    platform.setMetadata(platformIds.metadata.Token, loginInfo.token)
+
+    // TODO: It should be updated from here, but not working now.
+    // platform.setMetadata(platformIds.metadata.WSHost, loginInfo.server)
+    // platform.setMetadata(platformIds.metadata.WSPort, loginInfo.port)
   }
 
-  function checkLoginForward () {
+  function clearLoginInfo () {
+    localStorage.removeItem(ACCOUNT_KEY)
+
+    platform.setMetadata(platformIds.metadata.WhoAmI, undefined)
+    platform.setMetadata(platformIds.metadata.Token, undefined)
+  }
+
+  async function getLoginInfo (): Promise<LoginInfo | undefined> {
     const account = localStorage.getItem(ACCOUNT_KEY)
     if (!account) {
-      // no forward are reqiured
-      return
+      return undefined
     }
-    const accountInfo = JSON.parse(account) as LoginInfo
-    if (accountInfo) {
-      uiService.navigate(['component:workbench.Workbench'], undefined, undefined)
+    const loginInfo = JSON.parse(account) as LoginInfo
+
+    const token = platform.getMetadata(platformIds.metadata.Token)
+    if (!token) {
+      return undefined
     }
+    // Do some operation to check if token is expired or not.
+    return loginInfo
+  }
+
+  function navigateApp (): void {
+    uiService.navigate(['component:workbench.Workbench'], undefined, undefined)
   }
 
   async function doLogin (username: string, password: string, workspace: string): Promise<Status> {
-    const url = platform.getMetadata(login.metadata.LoginUrl)
-    if (!url) {
-      return new Status(Severity.ERROR, 0, 'no login server metadata provided.')
-    }
-
     const request: Request<[string, string, string]> = {
       method: 'login',
       params: [username, password, workspace]
     }
 
     try {
-      const response = await fetch(url, {
+      const response = await fetch(accountsUrl!, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json;charset=utf-8'
@@ -78,7 +98,10 @@ export default async (platform: Platform, deps: { ui: UIService }): Promise<Logi
       }
       if (result.result) {
         setLoginInfo(result.result)
-        checkLoginForward()
+
+        platform.broadcastEvent(PlatformStatus, new Status(Severity.OK, PlatformStatusCodes.AUTHENTICATON_OK, ''))
+        console.log('do navigate')
+        navigateApp()
       }
       return new Status(Severity.OK, 0, '')
     } catch (err) {
@@ -86,8 +109,18 @@ export default async (platform: Platform, deps: { ui: UIService }): Promise<Logi
     }
   }
 
+  async function doLogout (): Promise<void> {
+    const token = platform.getMetadata(platformIds.metadata.Token)
+    if (!token) {
+      return
+    }
+    clearLoginInfo()
+  }
+
   return {
     doLogin,
-    checkLoginForward
+    doLogout,
+    getLoginInfo,
+    navigateApp
   }
 }

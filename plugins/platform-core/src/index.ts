@@ -104,6 +104,8 @@ export default plugin(
       Offline: '' as Metadata<boolean>,
       WSHost: '' as Metadata<string>,
       WSPort: '' as Metadata<string>,
+
+      WhoAmI: '' as Metadata<string>,
       Token: '' as Metadata<string>
     }
   }

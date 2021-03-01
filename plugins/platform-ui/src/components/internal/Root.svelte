@@ -1,7 +1,8 @@
 <script lang="ts">
   import type { Platform, Status } from '@anticrm/platform'
   import { PlatformStatus, Severity } from '@anticrm/platform'
-  import type { UIService, AnyComponent } from '../..'
+  import type { AnyComponent, Location, UIService } from '../..'
+  import { CONTEXT_PLATFORM, CONTEXT_PLATFORM_UI } from '../..'
   import { onDestroy, setContext } from 'svelte'
 
   import Theme from '@anticrm/sparkling-theme/src/components/Theme.svelte'
@@ -11,11 +12,7 @@
   import Component from '../Component.svelte'
   import Modal from './Modal.svelte'
   import uiPlugin from '../../.'
-
-  import {
-    CONTEXT_PLATFORM,
-    CONTEXT_PLATFORM_UI, Location
-  } from '../..'
+  import { PlatformStatusCodes } from '@anticrm/foundation'
 
   export let platform: Platform
   export let ui: UIService
@@ -27,7 +24,9 @@
 
   let currentApp: AnyComponent
 
+  let location: Location
   ui.subscribeLocation((loc) => {
+    location = loc
     currentApp = loc.path[0] as AnyComponent
     if (!currentApp) {
       currentApp = defaultApp
@@ -38,8 +37,19 @@
 
   platform.addEventListener(
     PlatformStatus,
-    async (event: string, platformStatus: Status) => {
-      status = platformStatus
+    async (event, platformStatus) => {
+      status = (platformStatus as unknown) as Status
+      console.log('Status:', status)
+      if (status.severity === Severity.ERROR && status.code === PlatformStatusCodes.AUTHENTICATON_REQUIRED) {
+        currentApp = defaultApp
+      }
+      if( status.severity === Severity.OK && status.code === PlatformStatusCodes.AUTHENTICATON_OK) {
+        currentApp = location.path[0] as AnyComponent
+        if (!currentApp) {
+          currentApp = defaultApp
+        }
+        console.log('current APP:', currentApp)
+      }
     }
   )
 </script>

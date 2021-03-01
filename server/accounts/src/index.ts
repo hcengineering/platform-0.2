@@ -18,7 +18,7 @@ import { PlatformError, Status, Severity } from '@anticrm/platform'
 import { Request, Response } from '@anticrm/rpc'
 import { randomBytes, pbkdf2Sync } from 'crypto'
 import { Buffer } from 'buffer'
-import { encode } from 'jwt-simple'
+import { decode, encode } from 'jwt-simple'
 
 const server = '3.12.129.141'
 const port = '18080'
@@ -70,6 +70,7 @@ function verifyPassword (password: string, hash: Buffer, salt: Buffer): boolean 
 }
 
 function toAccountInfo (account: Account): AccountInfo {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { hash, salt, ...result } = account
   return result
 }
@@ -106,6 +107,7 @@ export async function getWorkspace (db: Db, workspace: string): Promise<Workspac
 export async function getAccount (db: Db, email: string): Promise<Account | null> {
   return db.collection(ACCOUNT_COLLECTION).findOne<Account>({ email })
 }
+
 async function getAccountInfo (db: Db, email: string, password: string, create?: boolean): Promise<AccountInfo> {
   const account = await getAccount(db, email)
   if (!account) {
@@ -196,6 +198,7 @@ export async function removeWorkspace (db: Db, email: string, workspace: string)
 export async function createUserAccount (db: Db, email: string, password: string): Promise<ObjectID> {
   return (await getAccountInfo(db, email, password, true))._id
 }
+
 export async function getUserAccount (db: Db, email: string): Promise<ObjectID | null> {
   const account = await getAccount(db, email)
   if (account != null) {
@@ -203,8 +206,13 @@ export async function getUserAccount (db: Db, email: string): Promise<ObjectID |
   }
   return null
 }
+
 export function withTenant (client: MongoClient, workspace: string): Db {
   return client.db('ws-' + workspace)
+}
+
+export function accountsDb (client: MongoClient): Db {
+  return client.db('accounts')
 }
 
 function wrap (f: (db: Db, ...args: any[]) => Promise<any>) {

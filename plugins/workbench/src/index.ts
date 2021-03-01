@@ -80,4 +80,3 @@ export default plugin('workbench' as Plugin<WorkbenchService>, {
     Default: '' as Ref<Perspective>
   }
 })
-

@@ -36,7 +36,8 @@ export type Metadata<T> = Resource<T> & { __metadata: true }
 // P L U G I N S
 
 /** Base interface for a plugin service. */
-export interface Service {}
+export interface Service {
+}
 
 /** Plugin identifier. */
 export type Plugin<S extends Service> = Resource<S>
@@ -99,7 +100,7 @@ export interface Platform {
   loadMetadata<T, X extends Record<string, Metadata<T>>> (ids: X, resources: ExtractType<T, X>): void
 
   addLocation<P extends Service, X extends PluginDependencies> (plugin: PluginDescriptor<P, X>, module: PluginModule<P, X>): void
-  resolveDependencies (deps: PluginDependencies): Promise<{ [key: string]: Service }>
+  resolveDependencies (id: Plugin<any>, deps: PluginDependencies): Promise<{ [key: string]: Service }>
   getPlugin<T extends Service> (id: Plugin<T>): Promise<T>
   getRunningPlugin<T extends Service> (id: Plugin<T>): T
 
@@ -153,6 +154,7 @@ export function createPlatform (): Platform {
   }
 
   async function getResource<T> (resource: Resource<T>): Promise<T> {
+    console.log('GET-PLUGIN:', resource, plugins, running, locations, resources, resolvingResources)
     const resolved = resources.get(resource)
     if (resolved) {
       return resolved
@@ -172,6 +174,9 @@ export function createPlatform (): Platform {
           resolve(value)
         }).catch(err => {
           reject(err)
+        }).finally(() => {
+          // Clear resolving map
+          resolvingResources.delete(resource)
         })
       })
 
@@ -224,17 +229,16 @@ export function createPlatform (): Platform {
     }
   }
 
-  function createMonitor<T> (name: string, promise: Promise<T>): Promise<T> {
-    return new Promise((resolve, reject) => {
-      setPlatformStatus(name)
-      promise.then(result => {
-        setPlatformStatus(new Status(Severity.OK, 0, ''))
-        resolve(result)
-      }).catch(error => {
-        setPlatformStatus(error)
-        reject(error)
-      })
-    })
+  async function createMonitor<T> (name: string, promise: Promise<T>): Promise<T> {
+    setPlatformStatus(name)
+    try {
+      const result = await promise
+      setPlatformStatus(new Status(Severity.OK, 0, ''))
+      return result
+    } catch (err) {
+      setPlatformStatus(err)
+      throw err
+    }
   }
 
   // P L U G I N S
@@ -262,19 +266,27 @@ export function createPlatform (): Platform {
     if (plugin) {
       return plugin as Promise<T>
     } else {
-      const location = getLocation(id)
-      const plugin = resolveDependencies(location[0].deps).then(deps =>
-        createMonitor(`Загружаю плагин '${id}...'`, location[1]())
-          .then(module => module.default)
-          .then(f => {
-            const service = f(platform, deps)
-            service.then(s => running.set(id, s))
-            return service
-          })
-      )
-      plugins.set(id, plugin)
+      const plugin = resolvePlugin(id)
+      try {
+        plugins.set(id, plugin)
+        await plugin as Promise<T>
+      } catch (ex) {
+        // remove plugin, and try on next attempt.
+        plugins.delete(id)
+      }
       return plugin as Promise<T>
     }
+  }
+
+  async function resolvePlugin<T extends Service> (id: Plugin<T>): Promise<Service> {
+    const location = getLocation(id)
+    const deps = await resolveDependencies(id, location[0].deps)
+
+    const loadedPlugin = await createMonitor(`Загружаю плагин '${id}...'`, location[1]())
+    const f = loadedPlugin.default
+    const service = await f(platform, deps)
+    running.set(id, service)
+    return service
   }
 
   function getRunningPlugin<T extends Service> (id: Plugin<T>): T {
@@ -283,7 +295,7 @@ export function createPlatform (): Platform {
     throw new Error('plugin not running: ' + id)
   }
 
-  async function resolveDependencies (deps: PluginDependencies): Promise<{ [key: string]: Service }> {
+  async function resolveDependencies (parentId: Plugin<any>, deps: PluginDependencies): Promise<{ [key: string]: Service }> {
     const result = {} as { [key: string]: Service }
     for (const key in deps) {
       const id = deps[key]
