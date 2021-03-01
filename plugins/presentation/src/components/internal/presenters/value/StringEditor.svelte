@@ -21,7 +21,6 @@
   export let attribute: AttrModel
   export let maxWidth: number = 300
   export let editable: boolean
-  export let textWrap: boolean
 
   // Do not allow edit of arrays and instances by this string presenter.
   $: readOnlyField = !editable || (attribute && (attribute.type._class === CORE_CLASS_ARRAY_OF || attribute.type._class === CORE_CLASS_INSTANCE_OF))
