@@ -59,7 +59,7 @@ describe('platform', () => {
   })
 
   it('should throw exeption when ask for non running plugin', () => {
-    expect(() => platform.getRunningPlugin('xxx' as Plugin<{}>)).toThrowError()
+    expect(() => platform.getRunningPlugin('xxx' as Plugin<Record<string, any>>)).toThrowError()
   })
 
   it('should not resolve resource (no plugin location)', (done) => {
@@ -119,11 +119,11 @@ describe('platform', () => {
   })
 
   it('should fail to get resource info', () => {
-    expect(() => getResourceInfo('bad resource definition' as Resource<String>)).toThrowError('invalid resource id format')
+    expect(() => getResourceInfo('bad resource definition' as Resource<string>)).toThrowError('invalid resource id format')
   })
 
   it('should peek resource', () => {
-    const resource = 'resource' as Resource<String>
+    const resource = 'resource' as Resource<string>
     expect(platform.peekResource(resource)).toBeUndefined()
     platform.setResource(resource, 'value')
     expect(platform.peekResource(resource)).toBe('value')
