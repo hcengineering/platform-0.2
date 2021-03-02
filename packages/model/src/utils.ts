@@ -16,7 +16,7 @@
 import { mergeWith } from 'lodash'
 import { identify, Plugin, PluginDescriptor, Service, Resource } from '@anticrm/platform'
 
-type IntlString = Resource<string> & { __intl_string: true }
+type IntlString = Resource<string> & { __intl_string: true } // eslint-disable-line
 type PluginIds = { [key: string]: { [key: string]: any } }
 
 export function mergeIds<A extends PluginIds, B extends PluginIds> (a: A, b: B): A & B {
