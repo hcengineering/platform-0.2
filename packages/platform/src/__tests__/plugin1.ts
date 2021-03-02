@@ -16,10 +16,11 @@
 import { Platform } from '..'
 
 import { plugin1, plugin1State } from './shared'
+import { PluginDependencies } from '../index'
 
 plugin1State.parsed = true
 
-export default async (platform: Platform, deps: {}) => { // eslint-disable-line @typescript-eslint/no-unused-vars
+export default async (platform: Platform, deps: PluginDependencies) => { // eslint-disable-line @typescript-eslint/no-unused-vars
   plugin1State.started = true
   return {
     id: plugin1

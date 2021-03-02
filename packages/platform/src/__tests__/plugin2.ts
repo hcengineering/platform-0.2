@@ -16,10 +16,11 @@
 import { Platform, Resource } from '..'
 
 import { plugin2, plugin2State } from './shared'
+import { PluginDependencies } from '../index'
 
 plugin2State.parsed = true
 
-export default async (platform: Platform, deps: {}) => { // eslint-disable-line @typescript-eslint/no-unused-vars
+export default async (platform: Platform, deps: PluginDependencies) => { // eslint-disable-line @typescript-eslint/no-unused-vars
   plugin2State.started = true
   platform.setResource('resource2:plugin2.Resource' as Resource<string>, 'hello resource2:My.Resource')
   return {
