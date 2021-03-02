@@ -9,7 +9,7 @@
     "build:docs": "api-extractor run --local && copyfiles -u 1 ./_api-extractor-temp/doc-models/* ../../_api-extractor-temp/",
     "test": "jest",
     "genmodel": "ts-node src/__tests__/genmodel.ts",
-    "lint": "echo 'no linting'"
+    "lint": "eslint src"
   },
   "dependencies": {
     "@anticrm/platform": "^0.2.0",
@@ -19,6 +19,14 @@
   "devDependencies": {
     "@microsoft/api-extractor": "^7.13.0",
     "@types/lodash": "^4.14.161",
+    "@typescript-eslint/eslint-plugin": "^4.9.0",
+    "@typescript-eslint/parser": "^4.9.0",
+    "eslint": "^7.14.0",
+    "eslint-config-standard": "^16.0.2",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^5.0.0",
     "simplytyped": "^3.3.0",
     "ts-jest": "^26.4.4",
     "ts-node": "^9.1.1",
