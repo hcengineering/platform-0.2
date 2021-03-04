@@ -51,5 +51,6 @@
   .spacing {
     width: 0;
     height: 0;
+    user-select: none;
   }
 </style>
