@@ -8,14 +8,15 @@
   export let devMode: boolean = false
   export let minWidth: Number = 150
   export let spacing: Number = 0
+  export let horizontal: boolean = false
 
   let prevDiv: HTMLElement
   let nextDiv: HTMLElement
-  let prevSpace: HTMLElement
-  let nextSpace: HTMLElement
+
+  let orientedProp: string = horizontal ? 'height' : 'width'
 </script>
 
-<div class="container" style="width: {width}; height: {height}">
+<div class="container" style="width: {width}; height: {height}; flex-direction: {horizontal ? 'column' : 'row'}">
   <div class="wrap" bind:this={prevDiv}>
     {#if typeof(prevContent) === 'undefined'}
       <slot name="prevContent" />
@@ -23,9 +24,9 @@
       {prevContent}
     {/if}
   </div>
-  <div class="spacing" style="width: {spacing}px; min-width: {spacing}px"></div>
-  <Splitter {prevDiv} {nextDiv} {minWidth} {devMode} />
-  <div class="spacing" style="width: {spacing}px; min-width: {spacing}px"></div>
+  <div class="spacing" style="{orientedProp}: {spacing}px; min-{orientedProp}: {spacing}px"></div>
+  <Splitter {prevDiv} {nextDiv} {minWidth} {devMode} {horizontal} />
+  <div class="spacing" style="{orientedProp}: {spacing}px; min-{orientedProp}: {spacing}px"></div>
   <div class="wrap" bind:this={nextDiv}>
     {#if typeof(nextContent) === 'undefined'}
       <slot name="nextContent" />

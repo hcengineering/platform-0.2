@@ -5,6 +5,7 @@
   export let nextDiv: HTMLElement
   export let minWidth: Number = 150
   export let devMode: boolean = false
+  export let horizontal: boolean = false
 
   let splitterDiv: HTMLElement
   let splitterIcon: HTMLElement
@@ -13,21 +14,38 @@
 
   let prevRect: DOMRect
   let nextRect: DOMRect
-  let startX: Number
+  let startCoord: Number
 
   let hoverMode: boolean = false
+  let splitterStyle: string = horizontal ? 'width: 100%; height: 4px; min-height: 4px; cursor: row-resize;' : 'height: 100%; width: 4px; min-width: 4px; cursor: col-resize;'
 
   function onMouseMove(event: MouseEvent): void {
-    let dX: Number = event.clientX - startX
-    if (dX < 0) {
-      if (prevRect.width - Math.abs(dX) >= minWidth) {
-        prevDiv.style.width = prevRect.width - Math.abs(dX) + 'px'
-        nextDiv.style.width = nextRect.width + Math.abs(dX) + 'px'
+    let dCoord: Number
+    if (horizontal) {
+      dCoord = event.clientY - startCoord
+      if (dCoord < 0) {
+        if (prevRect.height - Math.abs(dCoord) >= minWidth) {
+          prevDiv.style.height = prevRect.height - Math.abs(dCoord) + 'px'
+          nextDiv.style.height = nextRect.height + Math.abs(dCoord) + 'px'
+        }
+      } else {
+        if (nextRect.height - dCoord >= minWidth) {
+          prevDiv.style.height = prevRect.height + dCoord + 'px'
+          nextDiv.style.height = nextRect.height - dCoord + 'px'
+        }
       }
     } else {
-      if (nextRect.width - dX >= minWidth) {
-        prevDiv.style.width = prevRect.width + dX + 'px'
-        nextDiv.style.width = nextRect.width - dX + 'px'
+      dCoord = event.clientX - startCoord
+      if (dCoord < 0) {
+        if (prevRect.width - Math.abs(dCoord) >= minWidth) {
+          prevDiv.style.width = prevRect.width - Math.abs(dCoord) + 'px'
+          nextDiv.style.width = nextRect.width + Math.abs(dCoord) + 'px'
+        }
+      } else {
+        if (nextRect.width - dCoord >= minWidth) {
+          prevDiv.style.width = prevRect.width + dCoord + 'px'
+          nextDiv.style.width = nextRect.width - dCoord + 'px'
+        }
       }
     }
     setCoverSize(coverPrev, prevDiv)
@@ -45,7 +63,8 @@
   function onMouseDown(event : MouseEvent): void {
     prevRect = prevDiv.getBoundingClientRect()
     nextRect = nextDiv.getBoundingClientRect()
-    startX = event.clientX
+    if (horizontal) startCoord = event.clientY
+    else startCoord = event.clientX
     hoverMode = true
 
     setCoverSize(coverPrev, prevDiv)
@@ -74,19 +93,15 @@
 
 <div bind:this={coverPrev} class="cover" class:coverDev={devMode}></div>
 <div bind:this={coverNext} class="cover" class:coverDev={devMode} style="background-color: #ff0"></div>
-<div bind:this={splitterDiv} class="splitter" class:splitter-statehover={hoverMode} on:mousedown={onMouseDown}>
-  <div bind:this={splitterIcon} class="splitIcon" on:mousedown={onMouseDown}></div>
+<div bind:this={splitterDiv} class="splitter" class:splitter-statehover={hoverMode} style="{splitterStyle}" on:mousedown={onMouseDown}>
+  <div bind:this={splitterIcon} class="splitIcon" class:rotateSplit={horizontal} on:mousedown={onMouseDown}></div>
 </div>
 
 <style lang='scss'>
   .splitter {
     position: relative;
     box-sizing: border-box;
-    width: 4px;
-    min-width: 4px;
-    height: 100%;
     background-color: var(--theme-bg-accent-color);
-    cursor: col-resize;
 
     &:hover, &-statehover {
       background-color: var(--theme-bg-accent-hover);
@@ -102,12 +117,18 @@
     position: absolute;
     user-select: none;
     top: 50%;
+    left: 50%;
     width: 20px;
     height: 20px;
     border-radius: 50%;
     background-color: var(--theme-bg-accent-color);
-    transform: translate(calc(-50% + 2px), -50%);
+    transform: translate(-50%, -50%);
     z-index: 1005;
+
+    &.rotateSplit {
+      transform-origin: center center;
+      transform: translateY(-50%) rotate(90deg);
+    }
   }
   .splitIcon::after, .splitIcon::before {
     content: '';
