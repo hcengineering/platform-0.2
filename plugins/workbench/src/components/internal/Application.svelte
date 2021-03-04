@@ -90,9 +90,9 @@
   }
 
   function getLabel (str: string): string {
-    if (str === 'Страницы') return 'Новая страница'
-    if (str === 'Задачи') return 'Новая задача'
-    return 'Добавить'
+    if (str === 'Pages') return 'New page'
+    if (str === 'Tasks') return 'New task'
+    return 'Add'
   }
 </script>
 

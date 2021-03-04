@@ -90,7 +90,7 @@
 
 <div class='chat'>
   <div class='captionContainer'>
-    <span class='caption-1'>Чат {spaceName}</span>&nbsp;
+    <span class='caption-1'>Chat {spaceName}</span>&nbsp;
   </div>
   <ScrollView height="100%" margin="2em" autoscroll={true}>
     <div class='content'>

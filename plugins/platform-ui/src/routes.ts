@@ -49,6 +49,12 @@ export interface ApplicationRouter<T> {
    * @param values
    */
   location (values: Partial<T>): Location
+
+  /**
+   * Use new constructed location value and platform UI to navigate
+   * @param values
+   */
+  navigate (values: Partial<T>): void
 }
 
 export class Router<T> implements ApplicationRouter<T> {
@@ -70,13 +76,22 @@ export class Router<T> implements ApplicationRouter<T> {
 
   private matched = false
 
-  constructor (pattern: string, parent: Router<any> | undefined = undefined, defaults: T | undefined = undefined) {
+  private doNavigate: (newLoc: Location) => void
+
+  constructor (pattern: string, parent: Router<any> | undefined = undefined, defaults: T | undefined, doNavigate: (newLoc: Location) => void) {
     this.pattern = pattern
     this.parentRouter = parent
     if (defaults) {
       this.defaults = defaults
     }
     this.parsePattern()
+    this.doNavigate = doNavigate
+  }
+
+  navigate (values: Partial<T>): void {
+    if (this.doNavigate) {
+      this.doNavigate(this.location(values))
+    }
   }
 
   public subscribe (matcher: (match: T) => void) {
@@ -162,7 +177,7 @@ export class Router<T> implements ApplicationRouter<T> {
   }
 
   newRouter<P> (pattern: string, defaults: P | undefined = undefined): Router<P> {
-    this.childRouter = new Router<P>(pattern, this, defaults)
+    this.childRouter = new Router<P>(pattern, this, defaults, this.doNavigate)
     this.chainUpdate()
     return this.childRouter as Router<P>
   }

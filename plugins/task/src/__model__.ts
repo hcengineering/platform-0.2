@@ -84,11 +84,11 @@ export class TTaskLink extends TVDoc implements TaskLink {
 }
 
 @Class$(task.class.Task, chunter.class.Collab, DOMAIN_TASK)
-@UX('Задача' as IntlString)
+@UX('Task' as IntlString)
 export class TTask extends TCollab implements Task {
   @Primary()
   @Prop()
-  @UX('Имя' as IntlString)
+  @UX('Name' as IntlString)
   title!: StringProperty
 
   @UX(task.string.Task_assignee)
@@ -153,7 +153,7 @@ export function model (S: Builder): void {
 
   S.createDocument(workbench.class.WorkbenchApplication, {
     route: 'tasks',
-    label: 'Задачи' as StringProperty,
+    label: 'Tasks' as StringProperty,
     icon: task.icon.Task,
     component: workbench.component.Application,
     classes: [task.class.Task]

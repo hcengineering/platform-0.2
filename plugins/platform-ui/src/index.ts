@@ -126,13 +126,15 @@ export function getUIService (): UIService {
 }
 
 const CONTEXT_ROUTE_VALUE = 'routes.context'
+
 export function newRouter<T> (pattern: string, matcher: (match: T) => void, defaults: T | undefined = undefined): ApplicationRouter<T> {
+  const uiService = getUIService()
   const r = getContext(CONTEXT_ROUTE_VALUE) as Router<any>
-  const result = r ? r.newRouter<T>(pattern, defaults) : new Router<T>(pattern, r, defaults)
+  const result = r ? r.newRouter<T>(pattern, defaults) : new Router<T>(pattern, r, defaults, uiService.navigate)
   result.subscribe(matcher)
   if (!r) {
     // No parent, we need to subscribe for location changes.
-    getUIService().subscribeLocation((loc) => {
+    uiService.subscribeLocation((loc) => {
       result.update(loc)
     }, onDestroy)
   }

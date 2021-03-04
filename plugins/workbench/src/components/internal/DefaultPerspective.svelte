@@ -223,7 +223,7 @@
   <nav>
     <div class="app-icon">
       {#each applications as app}
-        <LinkTo on:click={uiService.navigate(router.location({app: app.route}))}>
+        <LinkTo on:click={router.navigate({app: app.route})}>
           <div class={( app._id === application._id) ? 'selectedApp' : 'iconApp'}>
             <Icon icon={app.icon} size="24" />
           </div>
@@ -238,11 +238,11 @@
     </a>
     <div class="container" class:hidden={!hidden}>
       <div class="caption-3">
-        Пространства
+        Spaces
       </div>
       {#each spaces as s (s._id)}
         {#if !s.archived}
-          <LinkTo on:click={uiService.navigate(router.location({ space: s.spaceKey }))}>
+          <LinkTo on:click={router.navigate({ space: s.spaceKey })}>
             <SpaceItem selected={s._id === space._id} space={s} />
           </LinkTo>
         {/if}
@@ -270,7 +270,7 @@
         {application}
         {space}
         on:open={(e) => {
-          uiService.navigate(router.location({_class: e.detail._class, _id: e.detail._id}))
+          router.navigate({_class: e.detail._class, _id: e.detail._id})
         }} />
     {/if}
   </div>
@@ -278,7 +278,7 @@
     <Splitter {prevDiv} {nextDiv} minWidth="404" />
     <aside bind:this={nextDiv}>
       <ObjectForm {...details} title="Title"
-                  on:close={()=> {uiService.navigate(router.location({_class: undefined, _id: undefined}))}} />
+                  on:close={()=> {router.navigate({_class: undefined, _id: undefined})}} />
     </aside>
   {/if}
 </div>

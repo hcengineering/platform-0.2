@@ -83,7 +83,7 @@ export function model (S: Builder): void {
   }, workbench.perspective.Default)
 
   S.createDocument(core.class.Space, {
-    name: 'Общее',
+    name: 'General',
     description: 'General space',
     isPublic: true, // Available for all
     archived: false,
@@ -92,7 +92,7 @@ export function model (S: Builder): void {
   }, workbench.space.General)
 
   S.createDocument(core.class.Space, {
-    name: 'Всякое',
+    name: 'Other',
     description: 'Other space',
     isPublic: true,
     spaceKey: 'OVR',
@@ -101,7 +101,7 @@ export function model (S: Builder): void {
   }, workbench.space.Random)
 
   S.createDocument(core.class.Space, {
-    name: 'Разное',
+    name: 'Random',
     description: 'Random space',
     isPublic: true,
     spaceKey: 'RAND',
