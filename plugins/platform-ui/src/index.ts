@@ -126,7 +126,6 @@ export function getUIService (): UIService {
 }
 
 const CONTEXT_ROUTE_VALUE = 'routes.context'
-
 export function newRouter<T> (pattern: string, matcher: (match: T) => void, defaults: T | undefined = undefined): ApplicationRouter<T> {
   const r = getContext(CONTEXT_ROUTE_VALUE) as Router<any>
   const result = r ? r.newRouter<T>(pattern, defaults) : new Router<T>(pattern, r, defaults)

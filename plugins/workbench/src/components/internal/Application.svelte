@@ -14,7 +14,6 @@
 -->
 
 <script type="ts">
-  import { Ref } from '@anticrm/core'
   import { _getCoreService, getUIService } from '../../utils'
   import workbench, { WorkbenchApplication } from '../..'
 
@@ -31,7 +30,7 @@
   import { Action, Location } from '@anticrm/platform-ui'
 
   export let application: WorkbenchApplication
-  export let space: Ref<Space>
+  export let space: Space
 
   const coreService = _getCoreService()
   const uiService = getUIService()
@@ -104,7 +103,7 @@
       <div bind:this={addIcon}>
         <Button kind="transparent"
                 on:click={ () => {
-            uiService.showModal(CreateForm, { _class: application ? application.classes[0] : undefined, space }, addIcon)
+            uiService.showModal(CreateForm, { _class: application ? application.classes[0] : undefined, space: space._id }, addIcon)
           } }
         >
           <Icon icon={workbench.icon.Add} button="true" />
@@ -123,7 +122,7 @@
                    props={{_class: application.classes[0], space: space, editable: false}} on:open />
       {/if}
     </ScrollView>
-  { /if                                                  }
+  { /if                                                   }
 </div>
 
 <style lang="scss">
