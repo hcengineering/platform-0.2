@@ -1,5 +1,5 @@
 <script lang='ts'>
-  import Splitter from './Splitter.svelte'
+  import Splitter from '@anticrm/sparkling-controls/src/internal/Splitter.svelte'
 
   export let prevContent: any
   export let nextContent: any

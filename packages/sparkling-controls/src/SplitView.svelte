@@ -1,5 +1,5 @@
 <script lang='ts'>
-  import Splitter from './Splitter.svelte'
+  import Splitter from './internal/Splitter.svelte'
 
   export let prevContent: any
   export let nextContent: any
