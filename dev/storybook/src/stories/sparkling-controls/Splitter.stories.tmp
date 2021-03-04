@@ -1,0 +1,43 @@
+import Splitter from './Splitter.svelte'
+import ScrollView from './ScrollView.stories'
+import ThemeDecorator from '../ThemeDecorator.svelte'
+
+export default {
+  title: 'Platform/Splitter',
+  component: Splitter,
+  argTypes: {
+    prevDiv: { control: 'object' },
+    nextDiv: { control: 'object' },
+    minWidth: { control: 'number' },
+    devMode: { control: 'boolean' },
+  },
+  parameters: {
+    backgrounds: {
+      values: [
+        { name: 'light', value: '#fff' },
+        { name: 'dark', value: '#1E1E1E' },
+        { name: 'biege', value: '#FDF1E6' },
+      ],
+    },
+  },
+  decorators:  [(storyFn) => {
+    const story = storyFn();
+
+    return {
+      Component: ThemeDecorator,
+      props: {
+        child: story.Component,
+        props: story.props,
+      }
+    }
+  }]
+}
+
+const Template = ({ ...args }) => ({
+  Component: Splitter,
+  props: { ...args },
+});
+
+export const Default = Template.bind({});
+Default.args = {
+};

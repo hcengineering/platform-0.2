@@ -22,7 +22,7 @@
   style="{(width !== '') ? 'width:' + width : ''}"
   on:click={onClick}
 >
-  {label}
+  <slot>{label}</slot>
 </button>
 
 <style lang="scss">

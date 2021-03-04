@@ -34,7 +34,7 @@ export default {
   }]
 }
 
-const Template = ({ onInput, onFocus, onChange, ...args }) => ({
+const Template = ({ ...args }) => ({
   Component: ScrollView,
   props: { ...args },
 });
