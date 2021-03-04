@@ -22,7 +22,8 @@ import { TApplication } from '@anticrm/model/src/__model__'
 import ux, { UXAttribute } from '@anticrm/presentation'
 import { AnyComponent, Asset } from '@anticrm/platform-ui'
 
-import _workbench, { WorkbenchApplication } from '.'
+import _workbench, { Perspective, WorkbenchApplication } from '.'
+import { TDoc } from '@anticrm/model/lib/models/core'
 
 const workbench = extendIds(_workbench, {
   component: {},
@@ -37,14 +38,23 @@ export default workbench
 
 @Class$(workbench.class.WorkbenchApplication, core.class.Application, MODEL_DOMAIN)
 class TWorkbenchApplication extends TApplication implements WorkbenchApplication {
+  @Prop() route!: string
   @Prop() label!: IntlString
   @Prop() icon?: Asset
   @Prop() component!: AnyComponent
   @Prop() classes!: Ref<Class<VDoc>>[]
 }
 
+@Class$(workbench.class.Perspective, core.class.Doc, MODEL_DOMAIN)
+class TPerspective extends TDoc implements Perspective {
+  @Prop() name!: string // A uniq short name
+  @Prop() label!: IntlString
+  @Prop() icon?: Asset
+  @Prop() component!: AnyComponent
+}
+
 export function model (S: Builder): void {
-  S.add(TWorkbenchApplication)
+  S.add(TWorkbenchApplication, TPerspective)
 
   S.mixin(core.class.Space, ux.mixin.UXObject, {
     label: 'Space' as IntlString,
@@ -66,13 +76,8 @@ export function model (S: Builder): void {
     presenter: workbench.component.SpacePresenter
   })
 
-  S.createClass(workbench.class.Perspective, core.class.Doc, {
-    label: S.attr(core.class.String, {}),
-    icon: S.attr(core.class.Type, {}),
-    component: S.attr(core.class.Type, {})
-  }, MODEL_DOMAIN)
-
   S.createDocument(workbench.class.Perspective, {
+    name: 'default',
     label: 'Default' as IntlString,
     icon: workbench.icon.DefaultPerspective,
     component: workbench.component.DefaultPerspective

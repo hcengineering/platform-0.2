@@ -32,13 +32,12 @@ import workbenchMeta from '@anticrm/workbench/src/__meta__'
 import chunterMeta from '@anticrm/chunter/src/__meta__'
 import taskMeta from '@anticrm/task/src/__meta__'
 import presentationMeta from '@anticrm/presentation/src/__meta__'
+import loginMeta from '@anticrm/login/src/__meta__'
 // import contactMeta from '@anticrm/contact/src/__meta__/meta'
 // import recruitmentMeta from '@anticrm/recruitment/src/__meta__/meta'
 // import taskMeta from '@anticrm/task/src/__meta__/meta'
 
 const platform = createPlatform()
-
-platform.setMetadata(ui.metadata.DefaultApplication, login.component.LoginForm)
 
 platform.addLocation(ui, () => import(/* webpackChunkName: "platform-ui" */ '@anticrm/platform-ui/src/plugin'))
 platform.addLocation(core, () => import(/* webpackChunkName: "platform-core" */ '@anticrm/platform-core/src/plugin'))
@@ -58,6 +57,7 @@ chunterMeta(platform)
 // recruitmentMeta(platform)
 taskMeta(platform)
 presentationMeta(platform)
+loginMeta(platform)
 // contactMeta(platform)
 
 export default platform

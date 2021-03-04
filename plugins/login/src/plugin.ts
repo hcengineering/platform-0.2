@@ -17,7 +17,7 @@ import { Platform, PlatformStatus, Severity, Status } from '@anticrm/platform'
 import platformIds from '@anticrm/platform-core'
 import { Request, Response, serialize, toStatus } from '@anticrm/rpc'
 
-import { UIService } from '@anticrm/platform-ui'
+import uiPlugin, { ApplicationRoute, UIService } from '@anticrm/platform-ui'
 
 import login, { ACCOUNT_KEY, LoginInfo, LoginService } from '.'
 
@@ -75,7 +75,8 @@ export default async (platform: Platform, deps: { ui: UIService }): Promise<Logi
   }
 
   function navigateApp (): void {
-    uiService.navigate(['component:workbench.Workbench'], undefined, undefined)
+    const defaultApp = platform.getMetadata(uiPlugin.metadata.DefaultApplication) as ApplicationRoute
+    uiService.navigateJoin([defaultApp.route], undefined, undefined)
   }
 
   async function doLogin (username: string, password: string, workspace: string): Promise<Status> {

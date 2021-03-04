@@ -30,14 +30,13 @@
   import ActionBar from '@anticrm/platform-ui/src/components/ActionBar.svelte'
   import { Action, Location } from '@anticrm/platform-ui'
 
-  export let application: Ref<WorkbenchApplication>
+  export let application: WorkbenchApplication
   export let space: Ref<Space>
 
   const coreService = _getCoreService()
   const uiService = getUIService()
 
   let addIcon: HTMLElement
-  let appInstance: WorkbenchApplication | undefined
 
   // Represent all possible presenters
   let presenters: Viewlet[] = []
@@ -54,15 +53,11 @@
     presenters = docs
   }, onDestroy)
 
-  const appSearch = coreService.subscribe(workbench.class.WorkbenchApplication, { _id: application }, apps => {
-    appInstance = apps[0]
-  }, onDestroy)
-
   const model = coreService.getModel()
 
   function filterViewlets (appInstance: WorkbenchApplication): Viewlet[] {
     return presenters.filter((d) => {
-      for (const cc of appInstance?.classes) {
+      for (const cc of application?.classes) {
         if (model.is(cc, d.displayClass)) {
           return true
         }
@@ -75,28 +70,24 @@
     return viewlets.map(p => {
       return {
         name: p.label, icon: p.icon, toggleState: p._id === sp?._id, action: () => {
-          uiService.navigate(undefined, { viewlet: p._id }, undefined)
+          uiService.navigateJoin(undefined, { viewlet: p._id }, undefined)
         }
       }
     })
   }
 
   $: {
-    appSearch(workbench.class.WorkbenchApplication, { _id: application })
+    // Update available presenters based on application
+    const viewlets = filterViewlets(application)
 
-    if (appInstance) {
-      // Update available presenters based on application
-      const viewlets = filterViewlets(appInstance)
-
-      const vid = location.query.viewlet
-      if (vid) {
-        activeViewlet = viewlets.find(p => p._id == vid)
-      }
-      if (viewlets.length > 0 && !activeViewlet) {
-        activeViewlet = viewlets[0]
-      }
-      viewletActions = getViewletActions(appInstance, activeViewlet, viewlets)
+    const vid = location.query.viewlet
+    if (vid) {
+      activeViewlet = viewlets.find(p => p._id == vid)
     }
+    if (viewlets.length > 0 && !activeViewlet) {
+      activeViewlet = viewlets[0]
+    }
+    viewletActions = getViewletActions(application, activeViewlet, viewlets)
   }
 
   function getLabel (str: string): string {
@@ -107,21 +98,21 @@
 </script>
 
 <div class="workbench-browse">
-  { #if appInstance }
+  { #if application }
     <div class="captionContainer">
-      <span class="caption-1" style="padding-right:1em">{appInstance.label}</span>&nbsp;
+      <span class="caption-1" style="padding-right:1em">{application.label}</span>&nbsp;
       <div bind:this={addIcon}>
         <Button kind="transparent"
                 on:click={ () => {
-            uiService.showModal(CreateForm, { _class: appInstance ? appInstance.classes[0] : undefined, space }, addIcon)
+            uiService.showModal(CreateForm, { _class: application ? application.classes[0] : undefined, space }, addIcon)
           } }
         >
           <Icon icon={workbench.icon.Add} button="true" />
-          <span style="padding-left:.5em">{getLabel(appInstance.label)}</span>
+          <span style="padding-left:.5em">{getLabel(application.label)}</span>
         </Button>
       </div>
       <div style="flex-grow:1"></div>
-      <EditBox icon={workbench.icon.Finder} placeholder="Поиск по {appInstance.label}..." iconRight="true" />
+      <EditBox icon={workbench.icon.Finder} placeholder="Поиск по {application.label}..." iconRight="true" />
     </div>
     <div class="presentation">
       <ActionBar actions={viewletActions} />
@@ -129,10 +120,10 @@
     <ScrollView height="100%" margin="2em">
       {#if activeViewlet && activeViewlet.component}
         <Component is={activeViewlet.component}
-                   props={{_class: appInstance.classes[0], space: space, editable: false}} on:open />
+                   props={{_class: application.classes[0], space: space, editable: false}} on:open />
       {/if}
     </ScrollView>
-  { /if                                                 }
+  { /if                                                  }
 </div>
 
 <style lang="scss">

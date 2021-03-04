@@ -13,13 +13,14 @@
 // limitations under the License.
 //
 
-import { Metadata, plugin, Plugin, Resource, Service, Platform } from '@anticrm/platform'
-import { getContext } from 'svelte'
-import { Readable } from 'svelte/store'
+import { Metadata, Platform, Plugin, plugin, Resource, Service } from '@anticrm/platform'
+import { getContext, onDestroy, setContext } from 'svelte'
 import core, { CoreService } from '@anticrm/platform-core'
+import { ApplicationRoute, ApplicationRouter, Location, Router } from './routes'
 
 export type URL = string
 export type Asset = Metadata<URL>
+export { Location, ApplicationRoute }
 
 // export type SvelteConstructor = object
 
@@ -34,9 +35,11 @@ interface ComponentOptions<Props> {
 export interface SvelteComponent<Props> {
   new (options: ComponentOptions<Props>): any
 
+  // eslint-disable-next-line @typescript-eslint/ban-types
   $set: (props: {}) => any
   $on: (event: string, callback: (event: CustomEvent) => any) => any
   $destroy: () => any
+  // eslint-disable-next-line @typescript-eslint/ban-types
   render: (props?: {}) => {
     html: string
     css: { code: string; map?: string }
@@ -52,23 +55,26 @@ export type AnyComponent = Component<AnySvelteComponent>
 export const CONTEXT_PLATFORM = 'platform'
 export const CONTEXT_PLATFORM_UI = 'platform-ui'
 
-export interface Location {
-  path: string[] // A useful path value
-  query: Record<string, string> // a value of query parameters, no duplication are supported
-  fragment: string // a value of fragment
-}
-
 export interface UIService extends Service {
   createApp (root: HTMLElement): any
 
-  getLocation (): Readable<Location>
-
   subscribeLocation (listener: (location: Location) => void, destroyFactory: (op: () => void) => void): void
 
-  navigate (path: string[] | undefined, query: Record<string, string> | undefined, fragment: string | undefined): void
+  /**
+   * Will join a current location with a path, query values or fragment
+   * @param path
+   * @param query
+   * @param fragment
+   */
+  navigateJoin (path: string[] | undefined, query: Record<string, string> | undefined, fragment: string | undefined): void
+
+  /**
+   * Navigate to full location
+   * @param location
+   */
+  navigate (location: Location): void
 
   showModal (component: AnySvelteComponent, props: any, element?: HTMLElement): void
-
   closeModal (): void
 }
 
@@ -84,7 +90,8 @@ export interface Action {
 
 export default plugin('ui' as Plugin<UIService>, {}, {
   metadata: {
-    DefaultApplication: '' as Metadata<AnyComponent>
+    LoginApplication: '' as Metadata<ApplicationRoute>,
+    DefaultApplication: '' as Metadata<ApplicationRoute>
   },
   icon: {
     Default: '' as Asset,
@@ -116,4 +123,20 @@ export function getCoreService (): CoreService {
 
 export function getUIService (): UIService {
   return getContext(CONTEXT_PLATFORM_UI) as UIService
+}
+
+const CONTEXT_ROUTE_VALUE = 'routes.context'
+
+export function newRouter<T> (pattern: string, matcher: (match: T) => void, defaults: T | undefined = undefined): ApplicationRouter<T> {
+  const r = getContext(CONTEXT_ROUTE_VALUE) as Router<any>
+  const result = r ? r.newRouter<T>(pattern, defaults) : new Router<T>(pattern, r, defaults)
+  result.subscribe(matcher)
+  if (!r) {
+    // No parent, we need to subscribe for location changes.
+    getUIService().subscribeLocation((loc) => {
+      result.update(loc)
+    }, onDestroy)
+  }
+  setContext(CONTEXT_ROUTE_VALUE, result)
+  return result
 }

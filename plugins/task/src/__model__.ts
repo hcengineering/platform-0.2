@@ -152,6 +152,7 @@ export function model (S: Builder): void {
   S.add(TTypeTask, TPrioritizedTask, TVersionedTask, TTimeManagedTask)
 
   S.createDocument(workbench.class.WorkbenchApplication, {
+    route: 'tasks',
     label: 'Задачи' as StringProperty,
     icon: task.icon.Task,
     component: workbench.component.Application,

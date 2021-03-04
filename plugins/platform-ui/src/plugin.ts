@@ -17,7 +17,7 @@ import type { Platform } from '@anticrm/platform'
 import type { AnySvelteComponent, Location, UIService } from '.'
 import ui from '.'
 
-import { derived, writable, Readable } from 'svelte/store'
+import { derived, Readable, writable } from 'svelte/store'
 
 import Root from './components/internal/Root.svelte'
 
@@ -51,10 +51,6 @@ export default async (platform: Platform): Promise<UIService> => {
 
   const location: Readable<Location> = derived(locationWritable, loc => loc)
 
-  function getLocation (): Readable<Location> {
-    return location
-  }
-
   function subscribeLocation (listener: (location: Location) => void, destroyFactory: (op: () => void) => void): void {
     const unsubscribe = location.subscribe((location) => {
       listener(location)
@@ -62,7 +58,17 @@ export default async (platform: Platform): Promise<UIService> => {
     destroyFactory(unsubscribe)
   }
 
-  function navigate (path: string[] | undefined, query: Record<string, string> | undefined, fragment: string | undefined) {
+  function navigate (location: Location) {
+    const newUrl = locationToUrl(location)
+    const curUrl = locationToUrl(windowLocation())
+    if (curUrl === newUrl) {
+      return
+    }
+    history.pushState(null, '', newUrl)
+    locationWritable.set(windowLocation())
+  }
+
+  function navigateJoin (path: string[] | undefined, query: Record<string, string> | undefined, fragment: string | undefined) {
     const newLocation = windowLocation()
     if (path) {
       newLocation.path = path
@@ -77,8 +83,7 @@ export default async (platform: Platform): Promise<UIService> => {
     if (fragment) {
       newLocation.fragment = fragment
     }
-    history.pushState(null, '', locationToUrl(newLocation))
-    locationWritable.set(windowLocation())
+    navigate(newLocation)
   }
 
   function showModal (component: AnySvelteComponent, props: any, element?: HTMLElement) {
@@ -91,8 +96,8 @@ export default async (platform: Platform): Promise<UIService> => {
 
   const uiService = {
     createApp,
-    getLocation,
     subscribeLocation,
+    navigateJoin,
     navigate,
     showModal,
     closeModal

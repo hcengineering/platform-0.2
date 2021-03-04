@@ -16,18 +16,20 @@
 import { plugin, Plugin, Service } from '@anticrm/platform'
 
 import core from '@anticrm/platform-core'
-import ui, { AnyComponent, Asset } from '@anticrm/platform-ui'
+import ui, { AnyComponent, ApplicationRoute, Asset } from '@anticrm/platform-ui'
 import { IntlString } from '@anticrm/platform-i18n'
 import { Ref, Class, Doc } from '@anticrm/core'
 import { Application, VDoc } from '@anticrm/domains'
 
 export interface Perspective extends Doc {
+  name: string // A uniq short name
   label: IntlString
   icon?: Asset
   component: AnyComponent
 }
 
 export interface WorkbenchApplication extends Application {
+  route: string // An application route segment, will be applied after global route
   label: IntlString
   icon?: Asset
   component: AnyComponent
@@ -71,10 +73,6 @@ export default plugin('workbench' as Plugin<WorkbenchService>, {
   class: {
     Perspective: '' as Ref<Class<Perspective>>,
     WorkbenchApplication: '' as Ref<Class<WorkbenchApplication>>
-  },
-  application: {
-    Activity: '' as Ref<WorkbenchApplication>,
-    Chat: '' as Ref<WorkbenchApplication>
   },
   perspective: {
     Default: '' as Ref<Perspective>

@@ -32,7 +32,10 @@ export enum ChunterDomain {
 
 const chunter = extendIds(_chunter, {
   application: {
-    Chunter: '' as Ref<Application>
+    Chunter: '' as Ref<Application>,
+    Activity: '' as Ref<Application>,
+    Chat: '' as Ref<Application>,
+    Pages: '' as Ref<Application>
   },
   class: {
     Collab: '' as Ref<Class<Collab>>
@@ -86,25 +89,28 @@ export function model (S: Builder): void {
   })
 
   S.createDocument(workbench.class.WorkbenchApplication, {
+    route: 'activity',
     label: 'Активность' as IntlString,
     icon: chunter.icon.ActivityView,
     component: chunter.component.ActivityView,
     classes: []
-  }, workbench.application.Activity)
+  }, chunter.application.Activity)
 
   S.createDocument(workbench.class.WorkbenchApplication, {
+    route: 'chat',
     label: 'Чат' as IntlString,
     icon: chunter.icon.ChatView,
     component: chunter.component.ChatView,
     classes: []
-  }, workbench.application.Chat)
+  }, chunter.application.Chat)
 
   S.createDocument(workbench.class.WorkbenchApplication, {
+    route: 'pages',
     label: 'Страницы' as IntlString,
     icon: chunter.icon.PagesView,
     component: workbench.component.Application,
     classes: [chunter.class.Page]
-  })
+  }, chunter.application.Pages)
 
   S.mixin(chunter.class.Page, presentation.mixin.DetailForm, {
     component: chunter.component.PageProperties
