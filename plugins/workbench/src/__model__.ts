@@ -18,12 +18,11 @@ import { Class, MODEL_DOMAIN, Ref } from '@anticrm/core'
 import { Space, VDoc } from '@anticrm/domains'
 import { IntlString } from '@anticrm/platform-i18n'
 
-import { TApplication } from '@anticrm/model/src/__model__'
+import { TApplication, TDoc } from '@anticrm/model/src/__model__'
 import ux, { UXAttribute } from '@anticrm/presentation'
 import { AnyComponent, Asset } from '@anticrm/platform-ui'
 
 import _workbench, { Perspective, WorkbenchApplication } from '.'
-import { TDoc } from '@anticrm/model/lib/models/core'
 
 const workbench = extendIds(_workbench, {
   component: {},
