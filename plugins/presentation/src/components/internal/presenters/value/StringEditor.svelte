@@ -19,7 +19,6 @@
 
   export let value: string
   export let attribute: AttrModel
-  export let maxWidth: number = 300
   export let editable: boolean
 
   // Do not allow edit of arrays and instances by this string presenter.
@@ -35,15 +34,9 @@
 </style>
 
 {#if readOnlyField}
-  {#if maxWidth}
-    <div style={ 'max-width:' + maxWidth + 'px' }>
-      <div class="wrapped-text">
-        {value}
-      </div>
-    </div>
-  {:else}
+  <div class="wrapped-text">
     {value}
-  {/if}
+  </div>
 {:else}
-  <InlineEdit bind:value placeholder={attribute.placeholder || ""} {maxWidth} {editable} />
+  <InlineEdit bind:value placeholder={attribute.placeholder || ""} {editable} />
 {/if}

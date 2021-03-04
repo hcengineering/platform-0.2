@@ -21,7 +21,6 @@
 
   export let value: Ref<Doc>
   export let attribute: AttrModel
-  export let maxWidth: number = 300
   export let editable: boolean
 
   let doc: Doc
