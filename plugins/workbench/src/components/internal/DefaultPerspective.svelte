@@ -34,7 +34,7 @@
   import ObjectForm from './ObjectForm.svelte'
   import { getCurrentUserSpace } from './spaces/utils'
   import LinkTo from '@anticrm/platform-ui/src/components/LinkTo.svelte'
-  import Splitter from '@anticrm/sparkling-controls/src/Splitter.svelte'
+  import Splitter from '@anticrm/sparkling-controls/src/internal/Splitter.svelte'
 
   let prevDiv: HTMLElement
   let nextDiv: HTMLElement
