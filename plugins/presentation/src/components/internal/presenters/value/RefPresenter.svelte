@@ -47,7 +47,6 @@
       // Use string presenter
     } else {
       presenter = model.as(typeClass, ui.mixin.Presenter).presenter
-      console.log('found class defined presenter for', attribute.label, presenter)
     }
   }
 </script>

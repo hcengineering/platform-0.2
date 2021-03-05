@@ -55,7 +55,7 @@
         }
         // absent VDoc fields will be autofilled
         coreService.create(chunter.class.Message, {
-          _space: space,
+          _space: space._id,
           comments: [comment]
         })
       })

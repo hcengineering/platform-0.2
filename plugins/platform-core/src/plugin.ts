@@ -66,9 +66,7 @@ export default async (platform: Platform): Promise<CoreService> => {
   const cache = new Cache(coreProtocol)
 
   const modelDomain = await coreProtocol.loadDomain(MODEL_DOMAIN)
-  console.log('##### LOAD_DOMAIN')
   model.loadModel(modelDomain)
-  console.log('##### LOAD_DOMAIN_DONE')
 
   const qModel = new QueriableStorage(model, model)
   const qTitles = new QueriableStorage(model, cache)
