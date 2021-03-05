@@ -27,19 +27,19 @@
   const coreService = getCoreService()
   const chunterService = getChunterService()
 
-  export let space: Ref<Space>
+  export let space: Space
 
   let spaceName: string
   let messages: Message[] = []
 
-  const ms = getCoreService().subscribe(chunter.class.Message, { _space: space }, (docs) => {
+  const ms = getCoreService().subscribe(chunter.class.Message, { _space: space._id }, (docs) => {
     messages = docs
   }, onDestroy)
 
   $: {
-    ms(chunter.class.Message, { _space: space })
+    ms(chunter.class.Message, { _space: space._id })
     // TODO: use Titles index instead of getting the whole Space object
-    coreService.findOne(CORE_CLASS_SPACE, { _id: space })
+    coreService.findOne(CORE_CLASS_SPACE, { _id: space._id })
       .then((spaceObj) => (spaceName = spaceObj ? '#' + spaceObj.name : ''))
   }
 
@@ -91,7 +91,7 @@
 
 <div class='chat'>
   <div class='captionContainer'>
-    <span class='caption-1'>Чат {spaceName}</span>&nbsp;
+    <span class='caption-1'>Chat {spaceName}</span>&nbsp;
   </div>
   <ScrollView height="100%" margin="2em" autoscroll={true}>
     <div class='content'>

@@ -154,7 +154,6 @@ export function createPlatform (): Platform {
   }
 
   async function getResource<T> (resource: Resource<T>): Promise<T> {
-    console.log('GET-PLUGIN:', resource, plugins, running, locations, resources, resolvingResources)
     const resolved = resources.get(resource)
     if (resolved) {
       return resolved

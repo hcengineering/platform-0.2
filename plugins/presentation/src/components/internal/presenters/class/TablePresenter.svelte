@@ -4,7 +4,7 @@
   import { Space } from '@anticrm/domains'
 
   export let _class: Ref<Class<Doc>>
-  export let space: Ref<Space>
+  export let space: Space
   export let editable: boolean = true
 
 </script>

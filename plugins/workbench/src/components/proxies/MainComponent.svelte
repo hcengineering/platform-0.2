@@ -26,7 +26,7 @@
   import { Space } from '@anticrm/domains'
 
   export let is: AnyComponent | undefined
-  export let application: Ref<WorkbenchApplication>
+  export let application: WorkbenchApplication
   export let space: Ref<Space>
 
   const platform = getContext('platform') as Platform

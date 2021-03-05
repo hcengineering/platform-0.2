@@ -5,6 +5,9 @@
     "outDir": "./lib",
     "rootDir": "./src",
     "strict": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "esModuleInterop": true
   }
 }
