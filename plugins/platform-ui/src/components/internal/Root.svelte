@@ -50,7 +50,6 @@
   platform.addEventListener(
     PlatformStatus,
     async (event, status) => {
-      console.log('Status:', status)
       if (status.severity === Severity.ERROR && status.code === PlatformStatusCodes.AUTHENTICATON_REQUIRED) {
         authenticationRequired = true
       } else if (status.severity === Severity.OK && status.code === PlatformStatusCodes.AUTHENTICATON_OK) {

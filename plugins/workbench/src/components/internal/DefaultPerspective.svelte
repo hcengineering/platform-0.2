@@ -264,7 +264,7 @@
   </div>
 
   <div bind:this={prevDiv} class="main">
-    {#if component}
+    {#if component && space && application}
       <MainComponent
         is={component}
         {application}

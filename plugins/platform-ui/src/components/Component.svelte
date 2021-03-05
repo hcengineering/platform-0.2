@@ -27,12 +27,9 @@
   const platform = getContext('platform') as Platform
   let component: Promise<void>
   $: {
-    console.log('Component is updated:', is, props)
     component = is ? platform.getResource(is).then(e => {
-      console.log('component is resolved:', e)
       return e
     }) : null
-    console.log('component promise: ', component)
   }
 </script>
 
