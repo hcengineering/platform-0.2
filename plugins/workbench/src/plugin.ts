@@ -33,7 +33,7 @@ import { UIService } from '@anticrm/platform-ui'
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */
-export default async (platform: Platform, deps: { core: CoreService, ui: UIService }): Promise<WorkbenchService> => {
+export default async (platform: Platform, deps: { core: CoreService, ui: UIService }): Promise<WorkbenchService> => { // eslint-disable-line @typescript-eslint/no-unused-vars
   platform.setResource(workbench.component.Workbench, Workbench)
   platform.setResource(workbench.component.DefaultPerspective, DefaultPerspective)
   platform.setResource(workbench.component.CreateSpace, CreateSpace)

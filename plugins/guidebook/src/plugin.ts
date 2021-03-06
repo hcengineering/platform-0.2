@@ -28,7 +28,7 @@ import { UIService } from '@anticrm/platform-ui'
  */
 export default async (
   platform: Platform,
-  deps: { core: CoreService; ui: UIService }
+  deps: { core: CoreService; ui: UIService } // eslint-disable-line @typescript-eslint/no-unused-vars
 ): Promise<GuidebookService> => {
   platform.setResource(guidebook.component.GuideBook, Guidebook)
 

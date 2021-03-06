@@ -43,7 +43,6 @@ export function getPresentationService (): Promise<PresentationService> {
   return platform.getPlugin(presentation.id)
 }
 
-
 export function getEmptyModel (): ClassModel {
   return {
     getGroups (): GroupModel[] { return [] },
