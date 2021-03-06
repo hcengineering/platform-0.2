@@ -32,4 +32,3 @@ export function getPresentationService (): Promise<PresentationService> {
   const platform = getContext(CONTEXT_PLATFORM) as Platform
   return platform.getPlugin(presentation.id)
 }
-
