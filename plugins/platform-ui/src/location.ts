@@ -1,7 +1,7 @@
 import { Location as PlatformLocation } from './index'
 
 export function locationToUrl (location: PlatformLocation): string {
-  let result = ''
+  let result = '/'
   if (location.path) {
     result += location.path.map(p => encodeURIComponent(p)).join('/')
   }
@@ -33,14 +33,14 @@ export function parseLocation (location: Location): PlatformLocation {
   }
 }
 
-function parseQuery (query: string): Record<string, string> {
+export function parseQuery (query: string): Record<string, string | null> {
   query = query.trim()
   if (query.length === 0 || !query.startsWith('?')) {
     return {}
   }
   query = query.substring(1)
   const vars = query.split('&')
-  const result: Record<string, string> = {}
+  const result: Record<string, string | null> = {}
   for (var i = 0; i < vars.length; i++) {
     const pair = vars[i].split('=')
     const key = decodeURIComponent(pair[0])
@@ -49,21 +49,21 @@ function parseQuery (query: string): Record<string, string> {
         const value = decodeURIComponent(pair[1])
         result[key] = value
       } else {
-        result[key] = ''
+        result[key] = null
       }
     }
   }
   return result
 }
 
-function parsePath (path: string): string[] {
+export function parsePath (path: string): string[] {
   const split = path.split('/').map(ps => decodeURIComponent(ps))
-  if (split.length > 1) {
+  if (split.length >= 1) {
     if (split[0] === '') {
       split.splice(0, 1)
     }
   }
-  if (split.length > 1) {
+  if (split.length >= 1) {
     if (split[split.length - 1] === '') {
       split.splice(split.length - 1, 1)
     }
@@ -71,7 +71,7 @@ function parsePath (path: string): string[] {
   return split
 }
 
-function parseHash (hash: any): string {
+export function parseHash (hash: any): string {
   if (hash.startsWith('#')) {
     return hash.substring(1)
   }

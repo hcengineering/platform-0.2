@@ -13,7 +13,7 @@
   // limitations under the License.
   import guidebook from '..'
   import { find, getUIService } from '../utils'
-  import { getContext, onMount } from 'svelte'
+  import { getContext, onMount, onDestroy } from 'svelte'
 
   import LinkTo from '@anticrm/platform-ui/src/components/LinkTo.svelte'
 
@@ -25,9 +25,7 @@
   let current: string
   let currentPage: GuideBookPage
 
-  const location = getUIService().getLocation()
-
-  location.subscribe((loc) => {
+  getUIService().subscribeLocation((loc) => {
     current = loc.path[2] as string
     let cp = pageIndex.get(current)
     console.log(cp)
@@ -36,7 +34,7 @@
     } else {
       currentPage = cp
     }
-  })
+  }, onDestroy)
 
   // $: component = perspectives.find((h) => h._id === current)?.component
 </script>

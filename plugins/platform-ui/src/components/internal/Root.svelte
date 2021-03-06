@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Platform, Status } from '@anticrm/platform'
   import { PlatformStatus, Severity } from '@anticrm/platform'
-  import type { AnyComponent, Location, UIService } from '../..'
+  import type { ApplicationRoute, Location, UIService } from '../..'
   import { CONTEXT_PLATFORM, CONTEXT_PLATFORM_UI } from '../..'
   import { onDestroy, setContext } from 'svelte'
 
@@ -13,6 +13,7 @@
   import Modal from './Modal.svelte'
   import uiPlugin from '../../.'
   import { PlatformStatusCodes } from '@anticrm/foundation'
+  import { newRouter } from '../../'
 
   export let platform: Platform
   export let ui: UIService
@@ -20,35 +21,39 @@
   setContext(CONTEXT_PLATFORM, platform)
   setContext(CONTEXT_PLATFORM_UI, ui)
 
-  const defaultApp = platform.getMetadata(uiPlugin.metadata.DefaultApplication) as AnyComponent
+  const defaultApp = platform.getMetadata(uiPlugin.metadata.DefaultApplication) as ApplicationRoute
+  const authApp = platform.getMetadata(uiPlugin.metadata.LoginApplication) as ApplicationRoute
 
-  let currentApp: AnyComponent
+  let authenticationRequired = false
 
-  let location: Location
-  ui.subscribeLocation((loc) => {
-    location = loc
-    currentApp = loc.path[0] as AnyComponent
-    if (!currentApp) {
-      currentApp = defaultApp
+  let currentApp: ApplicationRoute | undefined
+
+  interface ApplicationInfo {
+    application: string
+  }
+
+  const router = newRouter<ApplicationInfo>(':application', (route) => {
+    switch (route.application) {
+      case defaultApp.route:
+        currentApp = defaultApp
+        break
+      case authApp.route:
+        currentApp = authApp
+        break
+      default:
+        currentApp = { route: route.application } as ApplicationRoute
     }
-  }, onDestroy)
+  }, { application: defaultApp.route })
 
   let status: Status = { severity: Severity.OK, code: 0, message: '' }
 
   platform.addEventListener(
     PlatformStatus,
-    async (event, platformStatus) => {
-      status = (platformStatus as unknown) as Status
-      console.log('Status:', status)
+    async (event, status) => {
       if (status.severity === Severity.ERROR && status.code === PlatformStatusCodes.AUTHENTICATON_REQUIRED) {
-        currentApp = defaultApp
-      }
-      if( status.severity === Severity.OK && status.code === PlatformStatusCodes.AUTHENTICATON_OK) {
-        currentApp = location.path[0] as AnyComponent
-        if (!currentApp) {
-          currentApp = defaultApp
-        }
-        console.log('current APP:', currentApp)
+        authenticationRequired = true
+      } else if (status.severity === Severity.OK && status.code === PlatformStatusCodes.AUTHENTICATON_OK) {
+        authenticationRequired = false
       }
     }
   )
@@ -77,7 +82,7 @@
     </div>
     <div class="app">
       {#if currentApp}
-        <Component is={currentApp} props={{}} />
+        <Component is={currentApp.component} props={{}} />
       {:else}
         <div class="caption-1 error">No application provided. {currentApp}</div>
       {/if}

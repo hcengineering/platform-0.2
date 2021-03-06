@@ -88,7 +88,6 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
         let presenter: AnyComponent = ui.component.StringPresenter // Use string presenter as default one
         if (uxAttribute.presenter) {
           presenter = uxAttribute.presenter
-          console.log('found attribute defined presenter for ', uxAttribute.label, presenter)
         } else {
           // get presenter
           const typeClassId = attribute.type._class
@@ -98,7 +97,6 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
             // Use string presenter
           } else {
             presenter = model.as(typeClass, ui.mixin.Presenter).presenter
-            console.log('found class defined presenter for', uxAttribute.label, presenter)
           }
         }
         result.push({

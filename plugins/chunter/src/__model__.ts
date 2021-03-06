@@ -32,7 +32,10 @@ export enum ChunterDomain {
 
 const chunter = extendIds(_chunter, {
   application: {
-    Chunter: '' as Ref<Application>
+    Chunter: '' as Ref<Application>,
+    Activity: '' as Ref<Application>,
+    Chat: '' as Ref<Application>,
+    Pages: '' as Ref<Application>
   },
   class: {
     Collab: '' as Ref<Class<Collab>>
@@ -46,31 +49,31 @@ export default chunter
 export class TCollab extends TVDoc implements Collab {
   @ArrayOf$()
   @InstanceOf$(chunter.class.Comment)
-  @UX('Комментарии' as IntlString, chunter.icon.Chunter) comments?: Comment[]
+  @UX('Comments' as IntlString, chunter.icon.Chunter) comments?: Comment[]
 }
 
 @Class$(chunter.class.Comment, core.class.Emb)
-@UX('Комментарий' as IntlString)
+@UX('Comment' as IntlString)
 export class TComment extends TEmb implements Comment {
   @Prop() _createdBy!: Property<string, string>
   @Prop() _createdOn!: Property<number, Date>
 
-  @UX('Сообщение' as IntlString, chunter.icon.Chunter)
+  @UX('Message' as IntlString, chunter.icon.Chunter)
   @Prop(core.class.String) message!: string
 }
 
 @Class$(chunter.class.Message, chunter.class.Collab, ChunterDomain.Chunter)
-@UX('Сообщение' as IntlString)
+@UX('Message' as IntlString)
 export class TMessage extends TVDoc implements Message {
-  @UX('Сообщение' as IntlString, chunter.icon.Chunter)
+  @UX('Message' as IntlString, chunter.icon.Chunter)
   @Prop(core.class.String)
   message!: string
 }
 
 @Class$(chunter.class.Page, chunter.class.Collab, ChunterDomain.Chunter)
-@UX('Страница' as IntlString)
+@UX('Page' as IntlString)
 class TPage extends TMessage implements Page {
-  @Prop() @UX('Название' as IntlString, chunter.icon.Chunter) @Primary() title!: string
+  @Prop() @UX('Title' as IntlString, chunter.icon.Chunter) @Primary() title!: string
 }
 
 @Mixin$(chunter.mixin.ActivityInfo, core.class.Mixin)
@@ -86,25 +89,28 @@ export function model (S: Builder): void {
   })
 
   S.createDocument(workbench.class.WorkbenchApplication, {
-    label: 'Активность' as IntlString,
+    route: 'activity',
+    label: 'Activity' as IntlString,
     icon: chunter.icon.ActivityView,
     component: chunter.component.ActivityView,
     classes: []
-  }, workbench.application.Activity)
+  }, chunter.application.Activity)
 
   S.createDocument(workbench.class.WorkbenchApplication, {
-    label: 'Чат' as IntlString,
+    route: 'chat',
+    label: 'Chat' as IntlString,
     icon: chunter.icon.ChatView,
     component: chunter.component.ChatView,
     classes: []
-  }, workbench.application.Chat)
+  }, chunter.application.Chat)
 
   S.createDocument(workbench.class.WorkbenchApplication, {
-    label: 'Страницы' as IntlString,
+    route: 'pages',
+    label: 'Pages' as IntlString,
     icon: chunter.icon.PagesView,
     component: workbench.component.Application,
     classes: [chunter.class.Page]
-  })
+  }, chunter.application.Pages)
 
   S.mixin(chunter.class.Page, presentation.mixin.DetailForm, {
     component: chunter.component.PageProperties

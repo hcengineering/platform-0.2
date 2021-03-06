@@ -22,7 +22,7 @@
   import Presenter from './presenters/Presenter.svelte'
 
   export let _class: Ref<Class<Doc>>
-  export let space: Ref<Space>
+  export let space: Space
   export let editable: boolean = true
 
   const dispatch = createEventDispatcher()
@@ -30,7 +30,6 @@
   let model: ClassModel = getEmptyModel()
   let modelClass: Ref<Class<Doc>>
   let attributes: AttrModel[] = []
-
 
   $: {
     if (_class && _class != modelClass) {
@@ -46,12 +45,12 @@
 
   let objects: any[] = []
 
-  const queryUpdate = _getCoreService().subscribe(_class, { _space: space }, (docs) => {
+  const queryUpdate = _getCoreService().subscribe(_class, { _space: space._id }, (docs) => {
     objects = docs
   }, onDestroy)
 
   $: queryUpdate(_class, {
-    _space: space
+    _space: space._id
   })
 </script>
 

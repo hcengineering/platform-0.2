@@ -27,12 +27,9 @@
   const platform = getContext('platform') as Platform
   let component: Promise<void>
   $: {
-    console.log('Component is updated:', is, props)
     component = is ? platform.getResource(is).then(e => {
-      console.log('component is resolved:', e)
       return e
     }) : null
-    console.log('component promise: ', component)
   }
 </script>
 
@@ -43,7 +40,7 @@
   {:then ctor}
     <svelte:component this={ctor} {...props} on:change on:close on:open />
   {:catch err}
-    ERROR: {JSON.stringify(component)} {props} { err }
+    ERROR: {console.log(err, JSON.stringify(component))} {props} { err }
     <Icon icon={ui.icon.Error} size="32" />
   {/await}
 {/if}

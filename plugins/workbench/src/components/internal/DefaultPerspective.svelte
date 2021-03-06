@@ -17,7 +17,7 @@
   import { onDestroy } from 'svelte'
   import { getUIService, _getCoreService } from '../../utils'
   import { Space, VDoc, CORE_CLASS_SPACE } from '@anticrm/domains'
-  import ui, { Location } from '@anticrm/platform-ui'
+  import ui, { Location, newRouter } from '@anticrm/platform-ui'
   import workbench, { WorkbenchApplication } from '../..'
 
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
@@ -33,8 +33,8 @@
 
   import ObjectForm from './ObjectForm.svelte'
   import { getCurrentUserSpace } from './spaces/utils'
-  import LinkTo from '../../../../platform-ui/src/components/LinkTo.svelte'
-  import Splitter from '@anticrm/sparkling-controls/src/Splitter.svelte'
+  import LinkTo from '@anticrm/platform-ui/src/components/LinkTo.svelte'
+  import Splitter from '@anticrm/sparkling-controls/src/internal/Splitter.svelte'
 
   let prevDiv: HTMLElement
   let nextDiv: HTMLElement
@@ -45,49 +45,54 @@
 
   const currentUser = coreService.getUserId()
 
-  let space: Ref<Space>
+  let space: Space
   let spaces: Space[] = []
+
+  let application: WorkbenchApplication
+  let applications: WorkbenchApplication[] = []
+
+  let component: AnyComponent | undefined
+  let details: { _id: Ref<Doc>; _class: Ref<Class<Doc>> } | undefined
+
+  interface WorkbenchRouteInfo {
+    space: string // A ref of space name
+    app: Ref<WorkbenchApplication>
+
+    _class?: Ref<Class<Doc>>
+    _id?: Ref<Doc>
+  }
+
+  function routeDefaults (): WorkbenchRouteInfo {
+    return {
+      space: spaces.length > 0 ? spaces[0].name : '#undefined',
+      app: applications.length > 0 ? applications[0].route : '#undefined' as Ref<WorkbenchApplication>
+    } as WorkbenchRouteInfo
+  }
+
+  const router = newRouter<WorkbenchRouteInfo>(':space/:app?_class#_id', (info) => {
+    if (spaces.length > 0) {
+      space = spaces.find((s) => (s._id === info.space as Ref<Space>) || s.spaceKey === info.space) || spaces[0]
+    }
+    if (applications.length > 0) {
+      application = applications.find((a) => (a._id === info.app || a.route === info.app || a.label === info.app)) || applications[0]
+      component = application?.component
+    }
+    if (info._id && info._class) {
+      details = { _id: info._id, _class: info._class }
+    } else {
+      details = undefined
+    }
+  }, routeDefaults())
 
   coreService.subscribe(CORE_CLASS_SPACE, {}, (docs) => {
     spaces = docs.filter((s) => getCurrentUserSpace(currentUser, s))
+    router.setDefaults(routeDefaults())
   }, onDestroy)
 
-  let application: Ref<WorkbenchApplication>
-  let applications: Array<WorkbenchApplication> = []
   coreService.subscribe(workbench.class.WorkbenchApplication, {}, (docs) => {
     applications = docs
+    router.setDefaults(routeDefaults())
   }, onDestroy)
-
-  let component: AnyComponent | undefined
-  let details: { _id: Ref<Doc>; _class: Ref<Class<Doc>> }
-
-  let location: Location
-  uiService.subscribeLocation((loc) => {
-    location = loc
-
-    space = loc.query.space as Ref<Space>
-    // Check if space are in list of spaces, and if not use first available space
-    if (spaces.length > 0) {
-      if (!spaces.find(s => s._id === space)) {
-        space = spaces[0]._id as Ref<Space>
-      }
-    }
-    application = loc.query.application as Ref<WorkbenchApplication>
-
-    if (loc.query._class && loc.query._id) {
-      details = { _id: loc.query._id as Ref<Doc>, _class: loc.query._class as Ref<Class<Doc>> }
-    }
-  }, onDestroy)
-
-  $: {
-    if (!application) {
-      application = workbench.application.Activity
-    }
-    let apps = applications.filter((a) => a._id === application)
-    if (apps.length == 1) {
-      component = apps[0].component
-    }
-  }
 
   function id<T extends Doc> (doc: T): Ref<T> {
     return doc._id as Ref<T>
@@ -218,8 +223,8 @@
   <nav>
     <div class="app-icon">
       {#each applications as app}
-        <LinkTo query={{application: app._id}}>
-          <div class={( app._id === application) ? 'selectedApp' : 'iconApp'}>
+        <LinkTo on:click={router.navigate({app: app.route})}>
+          <div class={( app._id === application._id) ? 'selectedApp' : 'iconApp'}>
             <Icon icon={app.icon} size="24" />
           </div>
         </LinkTo>
@@ -233,12 +238,12 @@
     </a>
     <div class="container" class:hidden={!hidden}>
       <div class="caption-3">
-        Пространства
+        Spaces
       </div>
       {#each spaces as s (s._id)}
         {#if !s.archived}
-          <LinkTo query={{space: s._id}}>
-            <SpaceItem selected={s._id === space} space={s} />
+          <LinkTo on:click={router.navigate({ space: s.spaceKey })}>
+            <SpaceItem selected={s._id === space._id} space={s} />
           </LinkTo>
         {/if}
       {/each}
@@ -259,20 +264,21 @@
   </div>
 
   <div bind:this={prevDiv} class="main">
-    {#if component}
+    {#if component && space && application}
       <MainComponent
         is={component}
         {application}
         {space}
         on:open={(e) => {
-          uiService.navigate(undefined, {_class: e.detail._class, _id: e.detail._id})
+          router.navigate({_class: e.detail._class, _id: e.detail._id})
         }} />
     {/if}
   </div>
   {#if details}
     <Splitter {prevDiv} {nextDiv} minWidth="404" />
     <aside bind:this={nextDiv}>
-      <ObjectForm {...details} title="Title" on:close={()=> {details = undefined}} />
+      <ObjectForm {...details} title="Title"
+                  on:close={()=> {router.navigate({_class: undefined, _id: undefined})}} />
     </aside>
   {/if}
 </div>

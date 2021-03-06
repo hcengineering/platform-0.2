@@ -1,4 +1,4 @@
-<!--
+//
 // Copyright © 2020 Anticrm Platform Contributors.
 //
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
@@ -11,14 +11,15 @@
 //
 // See the License for the specific language governing permissions and
 // limitations under the License.
--->
+//
 
-<script lang="ts">
-  import { getContext } from 'svelte'
-  import { CONTEXT_PLATFORM_UI, UIService } from '..'
-  import { ApplicationRouter } from '../routes'
-</script>
+import { Platform } from '@anticrm/platform'
+import ui from '@anticrm/platform-ui'
+import login from '.'
 
-<a href="/" on:click|preventDefault>
-  <slot />
-</a>
+export default (platform: Platform) => {
+  platform.setMetadata(ui.metadata.LoginApplication, {
+    route: 'login',
+    component: login.component.LoginForm
+  })
+}

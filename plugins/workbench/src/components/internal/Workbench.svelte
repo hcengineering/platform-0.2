@@ -18,43 +18,36 @@
 
   import Component from '@anticrm/platform-ui/src/components/Component.svelte'
   import Spotlight from './Spotlight.svelte'
-  import { AnyComponent } from '@anticrm/platform-ui'
-
-  let perspectives: Perspective[] = []
-  let activePerspective: Ref<Doc>
-  let component: AnyComponent | undefined
+  import { AnyComponent, newRouter } from '@anticrm/platform-ui'
 
   const coreService = _getCoreService()
   const uiService = getUIService()
 
-  uiService.subscribeLocation((loc) => {
-    activePerspective = loc.query.perspective as Ref<Doc>
-  }, onDestroy)
+  interface PerspectiveInfo {
+    perspective: string
+  }
+
+  let perspectives: Perspective[] = []
+  let component: AnyComponent | undefined
+
+  let activePerspective: string
+
+  const router = newRouter<PerspectiveInfo>(':perspective', (info) => {
+    activePerspective = info.perspective
+
+    if (perspectives.length > 0 && activePerspective) {
+      var pp = perspectives.find((h) => h.name === activePerspective) || perspectives[0]
+      component = pp?.component
+      console.log('COMPONENT:', pp, component, perspectives, activePerspective)
+    }
+  }, { perspective: '#none' })
 
   coreService.subscribe(workbench.class.Perspective, {}, (p) => {
     perspectives = p
+    if (perspectives.length > 0) {
+      router.setDefaults({ perspective: perspectives[0].name })
+    }
   }, onDestroy)
-
-  function findPerspective (perspectives: Perspective[]): Perspective | undefined {
-    if (perspectives) {
-      return perspectives.find((h) => h._id === activePerspective)
-    }
-    return undefined
-  }
-
-  function getCurrentComponent (perspectives: Perspective[]): AnyComponent | undefined {
-    return findPerspective(perspectives)?.component
-  }
-
-  $: {
-    if (perspectives) {
-      if (!findPerspective(perspectives) && perspectives.length > 0) {
-        activePerspective = perspectives[0]._id
-      }
-
-      component = getCurrentComponent(perspectives)
-    }
-  }
 
   function handleKeydown (ev: KeyboardEvent) {
     if (ev.code === 'KeyS' && ev.ctrlKey) {
