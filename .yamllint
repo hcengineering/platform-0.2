@@ -5,7 +5,10 @@ yaml-files:
   - '*.yaml'
   - '*.yml'
   - '.yamllint'
- 
+
+ignore: |
+  node_modules
+
 rules:
   truthy: disable
   line-length: disable

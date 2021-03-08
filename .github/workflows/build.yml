@@ -1,20 +1,38 @@
 ---
 name: CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
 
 jobs:
-  gen-docs:
+  build-and-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 14.x
 
-      - name: Install deps
+      - name: Install yarn deps
         run: yarn install
 
       - name: Build packages
         run: |
           yarn workspace @anticrm/platform run build
+
+      - name: Start MongoDB
+        uses: supercharge/mongodb-github-action@1.3.0
+        with:
+          mongodb-version: 4.4
+
+      - name: Run tests
+        run: |
+          yarn test
 
       - name: Extract APIs
         run: |
@@ -25,36 +43,14 @@ jobs:
           name: extracted-api
           path: _api-extractor-temp/
 
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-        with:
-          node-version: 14
-          registry-url: "https://registry.npmjs.org"
-
-      - name: Start MongoDB
-        uses: supercharge/mongodb-github-action@1.3.0
-        with:
-          mongodb-version: 4.4
-
-      - name: Install yarn deps
-        run: yarn install
-
-      - name: Run tests
-        run: |
-          yarn test
   lint:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v2
         with:
-          node-version: 14
-          registry-url: "https://registry.npmjs.org"
-
+          node-version: 14.x
       - name: Run lint
         run: |
           yarn install
@@ -64,5 +60,8 @@ jobs:
     name: yamllint
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
       - name: Run yamllint
-        uses: actions/checkout@v2
+        uses: ibiqlik/action-yamllint@v3
+        with:
+          strict: true
