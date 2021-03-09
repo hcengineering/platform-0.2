@@ -54,7 +54,7 @@
 
   const model = coreService.getModel()
 
-  function filterViewlets (appInstance: WorkbenchApplication): Viewlet[] {
+  function filterViewlets (presenters: Viewlet[]): Viewlet[] {
     return presenters.filter((d) => {
       for (const cc of application?.classes) {
         if (model.is(cc, d.displayClass)) {
@@ -77,7 +77,7 @@
 
   $: {
     // Update available presenters based on application
-    const viewlets = filterViewlets(application)
+    const viewlets = filterViewlets(presenters)
 
     const vid = location.query.viewlet
     if (vid) {
