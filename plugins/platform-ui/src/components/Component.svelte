@@ -15,7 +15,7 @@
 
 <script lang="ts">
   import { Platform } from '@anticrm/platform'
-  import { getContext } from 'svelte'
+  import { getContext, onMount } from 'svelte'
 
   import ui, { AnyComponent } from '@anticrm/platform-ui'
   import Spinner from './internal/Spinner.svelte'
@@ -25,22 +25,30 @@
   export let props: any
 
   const platform = getContext('platform') as Platform
-  let component: Promise<void>
+  let component: AnyComponent
+  const compUpdate = e => {
+    if (component !== e) {
+      component = e
+    }
+    return e
+  }
+  let componentPromise = new Promise((resolve) => {
+    if (is) {
+      platform.getResource(is).then(compUpdate).then(() => resolve())
+    }
+  })
   $: {
-    component = is ? platform.getResource(is).then(e => {
-      return e
-    }) : null
+    if (is) {
+      componentPromise = platform.getResource(is).then(compUpdate)
+    }
   }
 </script>
 
-{#if component}
-  {#await component }
-    Waiting: {is} {component}
-    <Spinner />
-  {:then ctor}
-    <svelte:component this={ctor} {...props} on:change on:close on:open />
-  {:catch err}
-    ERROR: {console.log(err, JSON.stringify(component))} {props} { err }
-    <Icon icon={ui.icon.Error} size="32" />
-  {/await}
-{/if}
+{#await componentPromise }
+  <Spinner />
+{:then ctor}
+  <svelte:component this={ctor} {...props} on:change on:close on:open />
+{:catch err}
+  ERROR: {console.log(err, JSON.stringify(component))} {props} { err }
+  <Icon icon={ui.icon.Error} size="32" />
+{/await}

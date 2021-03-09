@@ -38,15 +38,19 @@
     if (perspectives.length > 0 && activePerspective) {
       var pp = perspectives.find((h) => h.name === activePerspective) || perspectives[0]
       component = pp?.component
-      console.log('COMPONENT:', pp, component, perspectives, activePerspective)
     }
   }, { perspective: '#none' })
 
+  let perspectiveOkResolve: () => void
+  const perspectiveOk = new Promise((resolve) => {
+    perspectiveOkResolve = resolve
+  })
   coreService.subscribe(workbench.class.Perspective, {}, (p) => {
     perspectives = p
     if (perspectives.length > 0) {
       router.setDefaults({ perspective: perspectives[0].name })
     }
+    perspectiveOkResolve()
   }, onDestroy)
 
   function handleKeydown (ev: KeyboardEvent) {
@@ -58,9 +62,11 @@
 
 <div id="workbench">
   <main>
-    {#if component}
-      <Component is="{component}" props={activePerspective} />
-    {/if}
+    {#await perspectiveOk then ct}
+      {#if component}
+        <Component is="{component}" props={activePerspective} />
+      {/if}
+    {/await}
   </main>
 
 </div>

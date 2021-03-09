@@ -1,4 +1,4 @@
-<script lang='ts'>
+<script lang="ts">
   // Copyright © 2020 Anticrm Platform Contributors.
   //
   // Licensed under the Eclipse Public License, Version 2.0 (the "License");
@@ -12,7 +12,6 @@
   // See the License for the specific language governing permissions and
   // limitations under the License.
   import { parseMessage } from '@anticrm/text'
-  import { Asset } from '@anticrm/platform-ui'
   import { getContactService, User } from '@anticrm/contact'
   import { Comment } from '../..'
   import MessageViewer from '@anticrm/presentation/src/components/MessageViewer.svelte'
@@ -21,18 +20,17 @@
   export let message: Comment
 
   let username: string
-  let avatar: Asset
   let timestamp: string = new Date(message._createdOn).toLocaleString()
 
-  getContactService().then((service) => {
-    service.getUser(message._createdBy).then((user) => {
+  $: avatar = getContactService().then((service) => {
+    return service.getUser(message._createdBy).then((user) => {
       username = user.name
-      avatar = service.getAvatar(user._id as Ref<User>)
+      return service.getAvatar(user._id as Ref<User>)
     })
   })
 </script>
 
-<style lang='scss'>
+<style lang="scss">
   .chat-message-item {
     display: flex;
     margin-bottom: 1em;
@@ -40,6 +38,7 @@
     .avatar {
       object-fit: cover;
       border: 1px solid var(--theme-bg-dark-color);
+      background-color: white;
       box-shadow: 0 0 0 2px var(--theme-bg-color);
       border-radius: 50%;
       width: 32px;
@@ -71,11 +70,20 @@
       }
     }
   }
+
+  .author-padding {
+    margin-bottom: 1em;
+  }
 </style>
 
-<div class='chat-message-item'>
-  <img class='avatar' src={avatar} alt='avatar' />
-  <div class='details'>
+<div class="chat-message-item">
+  {#await avatar}
+    <div class="avatar">
+    </div>
+  {:then avt}
+    <img class="avatar" src={avt} alt="avatar" />
+  {/await}
+  <div class="details">
     <b>{username}</b>
     <span>{timestamp}</span>
     <MessageViewer message={parseMessage(message.message)} />
