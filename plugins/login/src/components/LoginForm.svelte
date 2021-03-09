@@ -75,10 +75,10 @@
     </div>
   {:else}
     <Form
-      actions={[{ i18n: 'Создать пространство', func: doSignup }, { i18n: 'Войти в систему', func: doLogin }]}
-      fields={[{ name: 'username', i18n: 'Электропочта' }, { name: 'password', i18n: 'Пароль', password: true }, { name: 'workspace', i18n: 'Рабочее пространство' }]}
+      actions={[{ i18n: 'Create Space', func: doSignup }, { i18n: 'Login', func: doLogin }]}
+      fields={[{ name: 'username', i18n: 'Username' }, { name: 'password', i18n: 'Password', password: true }, { name: 'workspace', i18n: 'Workspace' }]}
       {object}
-      caption="Вход в систему"
+      caption="Login into system"
       {status} />
   {/if}
 {/await}
