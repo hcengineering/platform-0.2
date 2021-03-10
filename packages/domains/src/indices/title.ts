@@ -14,12 +14,11 @@
 //
 
 import {
-  AnyLayout,
-  Class, Classifier, Doc, DomainIndex, generateId, mixinKey, Model, Ref, Storage, Tx, TxContext
+  AnyLayout, Class, Classifier, Doc, DomainIndex, generateId, mixinKey, Model, Ref, Storage, Tx, TxContext
 } from '@anticrm/core'
 import {
   CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_PUSH_TX, CORE_CLASS_TITLE, CORE_CLASS_UPDATE_TX,
-  CORE_MIXIN_SHORTID, CreateTx, DeleteTx, Title, UpdateTx
+  CORE_MIXIN_SHORTID, CreateTx, DeleteTx, Title, TitleSource, UpdateTx
 } from '..'
 
 const NULL = '<null>'
@@ -79,6 +78,7 @@ export class TitleIndex implements DomainIndex {
       _id: this.getPrimaryID(create._objectId), // Use same object Id, so we will be able to update it in case of title change.
       _objectClass: create._objectClass,
       _objectId: create._objectId,
+      source: TitleSource.Title,
       title
     }
 
@@ -110,7 +110,8 @@ export class TitleIndex implements DomainIndex {
         _id: generateId() as Ref<Title>,
         _objectClass: _class,
         _objectId: _id,
-        title: shortId
+        title: shortId,
+        source: TitleSource.ShortId
       }
       await this.storage.store(ctx, doc)
     }

@@ -149,7 +149,11 @@ export default async (platform: Platform): Promise<CoreService> => {
       const q = query(newClass, newQuery)
       unsubscriber = q.subscribe(action)
     }
-    result(_class, _query)
+    try {
+      result(_class, _query)
+    } catch (ex) {
+      console.error(ex)
+    }
     return result
   }
 

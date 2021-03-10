@@ -76,9 +76,9 @@ export class Router<T> implements ApplicationRouter<T> {
 
   private matched = false
 
-  private doNavigate: (newLoc: Location) => void
+  private doNavigate: ((newLoc: Location) => void) | undefined
 
-  constructor (pattern: string, parent: Router<any> | undefined = undefined, defaults: T | undefined, doNavigate: (newLoc: Location) => void) {
+  constructor (pattern: string, parent: Router<any> | undefined = undefined, defaults: T | undefined = undefined, doNavigate: ((newLoc: Location) => void) | undefined = undefined) {
     this.pattern = pattern
     this.parentRouter = parent
     if (defaults) {

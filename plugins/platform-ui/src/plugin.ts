@@ -14,8 +14,8 @@
 //
 
 import type { Platform } from '@anticrm/platform'
-import type { AnySvelteComponent, Location, UIService } from '.'
-import ui from '.'
+import type { AnySvelteComponent, DocumentProvider, Location, UIService } from '.'
+import ui, { ApplicationRouter } from '.'
 
 import { derived, Readable, writable } from 'svelte/store'
 
@@ -26,6 +26,9 @@ import { store } from './stores'
 import Spinner from './components/internal/Spinner.svelte'
 import Icon from './components/Icon.svelte'
 import { locationToUrl, parseLocation } from './location'
+import { Router } from './routes'
+import { getContext, onDestroy, setContext } from 'svelte'
+import { Class, Doc, Ref } from '@anticrm/core'
 
 /*!
  * Anticrm Platform™ UI Plugin
@@ -94,13 +97,54 @@ export default async (platform: Platform): Promise<UIService> => {
     store.set({ is: undefined, props: {}, element: undefined })
   }
 
+  const CONTEXT_ROUTE_VALUE = 'routes.context'
+
+  function newRouter<T> (pattern: string, matcher: (match: T) => void, defaults: T | undefined = undefined): ApplicationRouter<T> {
+    const r = getContext(CONTEXT_ROUTE_VALUE) as Router<any>
+    const result = r ? r.newRouter<T>(pattern, defaults) : new Router<T>(pattern, r, defaults, navigate)
+    result.subscribe(matcher)
+    if (!r) {
+      // No parent, we need to subscribe for location changes.
+      uiService.subscribeLocation((loc) => {
+        result.update(loc)
+      }, onDestroy)
+    }
+    setContext(CONTEXT_ROUTE_VALUE, result)
+    return result
+  }
+
+  let documentProvider: DocumentProvider | undefined
+
+  function open (_class: Ref<Class<Doc>>, _objectId: Ref<Doc>): Promise<void> {
+    if (documentProvider) {
+      return documentProvider.open(_class, _objectId)
+    }
+    return Promise.reject(new Error('Document provder is not registred'))
+  }
+
+  function selection (): { _class: Ref<Class<Doc>>; _objectId: Ref<Doc> } | undefined {
+    if (documentProvider) {
+      return documentProvider.selection()
+    }
+    return undefined
+  }
+
+  function registerDocumentProvider (provider: DocumentProvider): void {
+    documentProvider = provider
+  }
+
   const uiService = {
     createApp,
     subscribeLocation,
     navigateJoin,
     navigate,
+    newRouter,
     showModal,
-    closeModal
+    closeModal,
+
+    open,
+    selection,
+    registerDocumentProvider
   } as UIService
 
   return uiService

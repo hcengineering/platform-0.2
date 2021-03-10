@@ -17,7 +17,7 @@ import core, { ArrayOf$, Builder, Class$, InstanceOf$, Mixin$, Primary, Prop, Re
 
 import { Classifier, DateProperty, Doc, MODEL_DOMAIN, Ref, SPACE_DOMAIN, StringProperty, Type } from '@anticrm/core'
 
-import { Application, ShortID, Space, SpaceUser, Title, TITLE_DOMAIN, VDoc } from '@anticrm/domains'
+import { Application, ShortID, Space, SpaceUser, Title, TITLE_DOMAIN, TitleSource, VDoc } from '@anticrm/domains'
 
 import {
   TArrayOf, TAttribute, TClass, TClassifier, TDoc, TEmb, TIndexesClass, TMixin, TObj, TRefTo, TType
@@ -91,6 +91,7 @@ export class TTitle extends TDoc implements Title {
   @RefTo$(core.class.Class) _objectClass!: Ref<Classifier<Doc>>
   @RefTo$(core.class.Doc) _objectId!: Ref<Doc>
   @Prop() title!: string | number
+  @Prop() source!: TitleSource
 }
 
 export function model (S: Builder): void {
