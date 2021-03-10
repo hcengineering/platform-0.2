@@ -130,8 +130,16 @@ export const REFERENCE_DOMAIN = 'references'
 export const TITLE_DOMAIN = 'title'
 export const CORE_CLASS_TITLE = 'class:core.Title' as Ref<Class<Title>>
 
+/**
+ * Define a title source, ShortId titles will be used to reference documents with short form.
+ */
+export enum TitleSource {
+  Title, ShortId
+}
+
 export interface Title extends Doc {
   _objectClass: Ref<Classifier<Doc>>
   _objectId: Ref<Doc>
   title: string | number
+  source: TitleSource
 }

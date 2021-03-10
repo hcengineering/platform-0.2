@@ -223,7 +223,9 @@ export function serializeMessageMarkdown (node: MessageNode): string {
 
 export function parseMessageMarkdown (message: string): MessageNode {
   const parser = new MarkdownParser()
-  return parser.parse(message || '')
+  const result = parser.parse(message || '')
+  console.log('PARSE:', message, result)
+  return result
 }
 
 type NodeProcessor = (
@@ -815,7 +817,7 @@ class MarkdownParseState {
             type: MessageMarkType.reference,
             attrs: {
               id: url.hash.substring(1),
-              class: 'class:' + url.hostname
+              class: 'class:' + url.pathname.substring(2)
             }
           })
         }

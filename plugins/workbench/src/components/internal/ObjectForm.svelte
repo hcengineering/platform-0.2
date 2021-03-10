@@ -24,7 +24,7 @@
 
   let title: string
   export let _class: Ref<Class<Doc>>
-  export let _id: Ref<Doc>
+  export let _objectId: Ref<Doc>
 
   let object: Doc | undefined
   let counter = 0
@@ -33,13 +33,13 @@
 
   const coreService = _getCoreService()
 
-  queryUpdate = coreService.subscribe(_class, { _id }, (docs) => {
+  queryUpdate = coreService.subscribe(_class, { _id: _objectId }, (docs) => {
     object = docs.length > 0 ? docs[0] : undefined
   }, onDestroy)
 
   let component: AnyComponent
   $: {
-    queryUpdate(_class, { _id })
+    queryUpdate(_class, { _id: _objectId })
 
     getComponentExtension(_class, presentation.mixin.DetailForm).then((ext) => {
       if (component !== ext) {

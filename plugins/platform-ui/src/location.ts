@@ -9,9 +9,9 @@ export function locationToUrl (location: PlatformLocation): string {
     const queryValue = Object.entries(location.query).map(e => {
       if (e[1]) {
         // Had value
-        return encodeURIComponent(e[0]) + '=' + encodeURIComponent(e[1])
+        return e[0] + '=' + e[1]
       } else {
-        return encodeURIComponent(e[0])
+        return e[0]
       }
     }).join('&')
     if (queryValue.length > 0) {
@@ -19,7 +19,7 @@ export function locationToUrl (location: PlatformLocation): string {
     }
   }
   if (location.fragment && location.fragment.length > 0) {
-    result += '#' + encodeURIComponent(location.fragment)
+    result += '#' + location.fragment
   }
 
   return result
@@ -43,10 +43,10 @@ export function parseQuery (query: string): Record<string, string | null> {
   const result: Record<string, string | null> = {}
   for (var i = 0; i < vars.length; i++) {
     const pair = vars[i].split('=')
-    const key = decodeURIComponent(pair[0])
+    const key = pair[0]
     if (key.length > 0) {
       if (pair.length > 1) {
-        const value = decodeURIComponent(pair[1])
+        const value = pair[1]
         result[key] = value
       } else {
         result[key] = null

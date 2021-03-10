@@ -11,28 +11,34 @@
   //
   // See the License for the specific language governing permissions and
   // limitations under the License.
-  import { Doc, Ref } from '@anticrm/core'
-  import workbench, { Perspective } from '../..'
+  import workbench, { Perspective, WorkbenchApplication } from '../..'
   import { _getCoreService, getUIService } from '../../utils'
   import { onDestroy } from 'svelte'
 
   import Component from '@anticrm/platform-ui/src/components/Component.svelte'
   import Spotlight from './Spotlight.svelte'
   import { AnyComponent, newRouter } from '@anticrm/platform-ui'
+  import { Ref } from '@anticrm/core'
 
   const coreService = _getCoreService()
   const uiService = getUIService()
-
-  interface PerspectiveInfo {
-    perspective: string
-  }
 
   let perspectives: Perspective[] = []
   let component: AnyComponent | undefined
 
   let activePerspective: string
 
-  const router = newRouter<PerspectiveInfo>(':perspective', (info) => {
+  export interface PerspectiveReference {
+    perspective: string
+  }
+
+  export interface WorkbenchRouterReference {
+    space: string // A ref of space name
+    app: Ref<WorkbenchApplication>
+  }
+
+
+  const router = newRouter<PerspectiveReference>(':perspective', (info) => {
     activePerspective = info.perspective
 
     if (perspectives.length > 0 && activePerspective) {
@@ -41,16 +47,11 @@
     }
   }, { perspective: '#none' })
 
-  let perspectiveOkResolve: () => void
-  const perspectiveOk = new Promise((resolve) => {
-    perspectiveOkResolve = resolve
-  })
   coreService.subscribe(workbench.class.Perspective, {}, (p) => {
     perspectives = p
     if (perspectives.length > 0) {
       router.setDefaults({ perspective: perspectives[0].name })
     }
-    perspectiveOkResolve()
   }, onDestroy)
 
   function handleKeydown (ev: KeyboardEvent) {
@@ -62,11 +63,9 @@
 
 <div id="workbench">
   <main>
-    {#await perspectiveOk then ct}
-      {#if component}
-        <Component is="{component}" props={activePerspective} />
-      {/if}
-    {/await}
+    {#if component}
+      <Component is="{component}" props={activePerspective} />
+    {/if}
   </main>
 
 </div>
