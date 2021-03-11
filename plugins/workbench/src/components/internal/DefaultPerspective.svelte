@@ -18,7 +18,7 @@
   import { getUIService, _getCoreService } from '../../utils'
   import { Space, VDoc, CORE_CLASS_SPACE, Title, CORE_CLASS_TITLE, TitleSource } from '@anticrm/domains'
   import ui, { Location, newRouter } from '@anticrm/platform-ui'
-  import workbench, { WorkbenchApplication } from '../..'
+  import workbench, { WorkbenchApplication, WorkbenchDocument } from '../..'
 
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import SpaceItem from './spaces/SpaceItem.svelte'
@@ -52,7 +52,7 @@
   let applications: WorkbenchApplication[] = []
 
   let component: AnyComponent | undefined
-  let details: { _objectId: Ref<Doc>; _class: Ref<Class<Doc>> } | undefined
+  let details: WorkbenchDocument | undefined
 
   interface WorkbenchRouteInfo {
     space: string // A ref of space name
@@ -94,7 +94,7 @@
       })
       if (title) {
         // So we had a title,
-        details = { _class: title._objectClass, _objectId: title._objectId }
+        details = { _class: title._objectClass, _id: title._objectId }
       } else {
         // try extract class name from doc and find objectId.
         const pos = match.doc.lastIndexOf(':')
@@ -111,7 +111,7 @@
             return
           }
           // We failed to find a title, use as is
-          details = { _class: _class as Ref<Class<Doc>>, _objectId: _objectId as Ref<Doc> }
+          details = { _class: _class as Ref<Class<Doc>>, _id: _objectId as Ref<Doc> }
         } else {
           details = undefined
         }
@@ -121,15 +121,15 @@
     }
   })
 
-  async function navigateDocument (_class: Ref<Class<Doc>>, _objectId: Ref<Doc>): Promise<void> {
-    if (!_class || !_objectId) {
+  async function navigateDocument (doc: WorkbenchDocument): Promise<void> {
+    if (!doc._class || !doc._id) {
       documentRouter.navigate({ _class: undefined, doc: undefined })
       return
     }
     // Find if object has a shortId.
     const title = await coreService.findOne<Title>(CORE_CLASS_TITLE, {
-      _objectId: _objectId,
-      _objectClass: _class,
+      _objectId: doc._id,
+      _objectClass: doc._class,
       source: TitleSource.ShortId as Property<TitleSource, number>
     })
 
@@ -138,13 +138,13 @@
       documentRouter.navigate({ doc: `${title.title}` })
     } else {
       // There is not short Id, we should navigate using a full _class and objectId.
-      documentRouter.navigate({ doc: `${_class}:${_objectId}` })
+      documentRouter.navigate({ doc: `${doc._class}:${doc._id}` })
     }
   }
 
   uiService.registerDocumentProvider({
     open: navigateDocument,
-    selection (): { _class: Ref<Class<Doc>>; _objectId: Ref<Doc> } | undefined {
+    selection (): WorkbenchDocument | undefined {
       return details
     }
   })

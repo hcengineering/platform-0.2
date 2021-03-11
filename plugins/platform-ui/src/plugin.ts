@@ -15,7 +15,7 @@
 
 import type { Platform } from '@anticrm/platform'
 import type { AnySvelteComponent, DocumentProvider, Location, UIService } from '.'
-import ui, { ApplicationRouter } from '.'
+import ui, { ApplicationRouter, Document } from '.'
 
 import { derived, Readable, writable } from 'svelte/store'
 
@@ -28,7 +28,6 @@ import Icon from './components/Icon.svelte'
 import { locationToUrl, parseLocation } from './location'
 import { Router } from './routes'
 import { getContext, onDestroy, setContext } from 'svelte'
-import { Class, Doc, Ref } from '@anticrm/core'
 
 /*!
  * Anticrm Platform™ UI Plugin
@@ -117,14 +116,14 @@ export default async (platform: Platform): Promise<UIService> => {
 
   let documentProvider: DocumentProvider | undefined
 
-  function open (_class: Ref<Class<Doc>>, _objectId: Ref<Doc>): Promise<void> {
+  function open (doc: Document): Promise<void> {
     if (documentProvider) {
-      return documentProvider.open(_class, _objectId)
+      return documentProvider.open(doc)
     }
     return Promise.reject(new Error('Document provder is not registred'))
   }
 
-  function selection (): { _class: Ref<Class<Doc>>; _objectId: Ref<Doc> } | undefined {
+  function selection (): Document | undefined {
     if (documentProvider) {
       return documentProvider.selection()
     }
