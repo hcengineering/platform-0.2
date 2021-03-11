@@ -89,7 +89,7 @@
       <!-- TODO: Add a proper click handler here-->
       <a
         href="#"
-        on:click={()=>{uiService.open(style.reference._class, style.reference._id )}}>
+        on:click={()=>{uiService.open({ _class: style.reference._class, _id: style.reference._id })}}>
         {message.text || ''}
       </a>
     {:else}{message.text || ''}{/if}

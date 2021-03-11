@@ -18,7 +18,8 @@
   import { getUIService, _getCoreService } from '../../utils'
   import { Space, VDoc, CORE_CLASS_SPACE, Title, CORE_CLASS_TITLE, TitleSource } from '@anticrm/domains'
   import ui, { Location, newRouter } from '@anticrm/platform-ui'
-  import workbench, { WorkbenchApplication, WorkbenchDocument } from '../..'
+  import workbench, { WorkbenchApplication } from '../..'
+  import { CoreDocument } from '@anticrm/presentation'
 
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import SpaceItem from './spaces/SpaceItem.svelte'
@@ -52,7 +53,7 @@
   let applications: WorkbenchApplication[] = []
 
   let component: AnyComponent | undefined
-  let details: WorkbenchDocument | undefined
+  let details: CoreDocument | undefined
 
   interface WorkbenchRouteInfo {
     space: string // A ref of space name
@@ -121,9 +122,9 @@
     }
   })
 
-  async function navigateDocument (doc: WorkbenchDocument): Promise<void> {
-    if (!doc._class || !doc._id) {
-      documentRouter.navigate({ _class: undefined, doc: undefined })
+  async function navigateDocument (doc?: CoreDocument): Promise<void> {
+    if (!doc) {
+      documentRouter.navigate({ doc: undefined })
       return
     }
     // Find if object has a shortId.
@@ -144,7 +145,7 @@
 
   uiService.registerDocumentProvider({
     open: navigateDocument,
-    selection (): WorkbenchDocument | undefined {
+    selection (): CoreDocument | undefined {
       return details
     }
   })
@@ -338,14 +339,14 @@
         is={component}
         {application}
         {space}
-        on:open={(e) => navigateDocument(e.detail._class, e.detail._id)} />
+        on:open={(e) => navigateDocument({ _class: e.detail._class, _id: e.detail._id })} />
     {/if}
   </div>
   {#if details}
     <Splitter {prevDiv} {nextDiv} minWidth="404" />
     <aside bind:this={nextDiv}>
       <ObjectForm {...details} title="Title"
-                  on:close={()=> navigateDocument(undefined, undefined)} />
+                  on:close={()=> navigateDocument(undefined)} />
     </aside>
   {/if}
 </div>

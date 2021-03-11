@@ -36,11 +36,6 @@ export interface WorkbenchApplication extends Application {
   classes: Ref<Class<VDoc>>[]
 }
 
-export interface WorkbenchDocument extends Document {
-  _class: Ref<Class<Doc>>
-  _id: Ref<Doc>,
-}
-
 export interface WorkbenchService extends Service {
 }
 
