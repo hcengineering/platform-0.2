@@ -84,7 +84,7 @@
     doc: string | undefined
   }
 
-  const documentRouter = newRouter<DocumentMatcher>('?doc&_class', async (match) => {
+  const documentRouter = newRouter<DocumentMatcher>('?doc', async (match) => {
     // Parse browse and convert it to _class and objectId
     if (match.doc) {
       // Check find a title
@@ -96,8 +96,25 @@
         // So we had a title,
         details = { _class: title._objectClass, _objectId: title._objectId }
       } else {
-        // We failed to find a title, use as is
-        details = { _class: match._class as Ref<Class<Doc>>, _objectId: match.doc as Ref<Doc> }
+        // try extract class name from doc and find objectId.
+        const pos = match.doc.lastIndexOf(':')
+        if (pos) {
+          const _class = match.doc.substring(0, pos)
+          const _objectId = match.doc.substring(pos + 1)
+
+          // Try find a class to be sure it is available.
+          try {
+            coreService.getModel().getClass(_class as Ref<Class<Doc>>)
+          } catch (ex) {
+            console.error(ex)
+            details = undefined
+            return
+          }
+          // We failed to find a title, use as is
+          details = { _class: _class as Ref<Class<Doc>>, _objectId: _objectId as Ref<Doc> }
+        } else {
+          details = undefined
+        }
       }
     } else {
       details = undefined
@@ -118,10 +135,10 @@
 
     if (title && title.title) {
       // Navigate using shortId
-      documentRouter.navigate({ doc: `${title.title}`, _class: undefined })
+      documentRouter.navigate({ doc: `${title.title}` })
     } else {
       // There is not short Id, we should navigate using a full _class and objectId.
-      documentRouter.navigate({ _class: _class, doc: _objectId })
+      documentRouter.navigate({ doc: `${_class}:${_objectId}` })
     }
   }
 
