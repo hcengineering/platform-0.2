@@ -4,6 +4,11 @@
 
 ## Code structure
 
+Anticrm code falls into three major parts: [packages](./packages), [plugins](./plugins) and [server](./server). 
+* [packages](./packages) contains code shared among client and server, except [packages/platform](./packages/platform) which defines plugin architecture and client-side only. _These packages defines most of the core Anticrm concepts._
+* [plugins](./plugins) contains client-side code packaged in form of Anticrm Plugins.
+* [server](./server) contains server-side platform code.
+
 Here's the breakdown of the repo:
 
 * Packages:
