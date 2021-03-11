@@ -6,10 +6,11 @@
   import Form from './Form.svelte'
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
 
-  let object = { username: '', password: '', workspace: '' }
+  let object = { username: '', password: '', workspace: '', secondFactorCode: '' }
   let status: Status
 
   let loginActive: boolean = false
+  let needSecondFactor: boolean = false
 
   const platform = getContext('platform') as Platform
   const loginService = platform.getPlugin(login.id)
@@ -17,7 +18,11 @@
   async function doLogin () {
     status = new Status(Severity.INFO, 0, 'Соединяюсь с сервером...')
 
-    status = await (await loginService).doLogin(object.username, object.password, object.workspace)
+    status = await (await loginService).doLogin(object.username, object.password, object.workspace, object.secondFactorCode)
+
+    if (status.code == 7) {
+      needSecondFactor = true;
+    }
   }
 
   async function doSignup () {
@@ -36,22 +41,26 @@
   let timer: number
   // Auto forward to default application
   const loginCheck = loginService.then(async (ls) => {
-    await checkLoginInfo(ls)
+  await checkLoginInfo(ls)
 
-    timer = setInterval(async () => {
-      await checkLoginInfo(ls)
+  timer = setInterval(async () => {
+    await checkLoginInfo(ls)
     }, 1 * 1000)
   })
 
   onDestroy(() => {
     if (timer) {
-      clearInterval(timer)
+    clearInterval(timer)
     }
   })
 
   async function logout (): Promise<void> {
     (await loginService).doLogout()
     loginActive = false
+  }
+
+  async function navigateProfileSetting(): Promise<void>{
+    (await loginService).navigateProfileSetting()
   }
 
   async function navigateApp (): Promise<void> {
@@ -70,9 +79,18 @@
       </div>
       <div class="actions">
         <Button width="100px" on:click={ logout  }>Logout</Button>
+        <Button width="100px" on:click={ navigateProfileSetting }>Settings</Button>
         <Button width="100px" on:click={ navigateApp }>Switch to Application</Button>
       </div>
     </div>
+{:else}
+  {#if needSecondFactor }
+    <Form
+      actions={[{ i18n: 'Create Space', func: doSignup }, { i18n: 'Login', func: doLogin }]}
+      fields={[{ name: 'username', i18n: 'Username' }, { name: 'password', i18n: 'Password', password: true }, { name: 'workspace', i18n: 'Workspace' }, { name: 'secondFactorCode', i18n: 'Confirm code' }]}
+      {object}
+      caption="Login into system"
+      {status} />
   {:else}
     <Form
       actions={[{ i18n: 'Create Space', func: doSignup }, { i18n: 'Login', func: doLogin }]}
@@ -80,6 +98,7 @@
       {object}
       caption="Login into system"
       {status} />
+    {/if}
   {/if}
 {/await}
 

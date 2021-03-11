@@ -41,6 +41,7 @@ const platform = createPlatform()
 
 platform.setMetadata(ui.metadata.LoginApplication, 'login')
 platform.setMetadata(ui.metadata.DefaultApplication, 'workbench')
+platform.setMetadata(ui.metadata.SettingApplication, 'setting')
 
 platform.addLocation(ui, () => import(/* webpackChunkName: "platform-ui" */ '@anticrm/platform-ui/src/plugin'))
 platform.addLocation(core, () => import(/* webpackChunkName: "platform-core" */ '@anticrm/platform-core/src/plugin'))

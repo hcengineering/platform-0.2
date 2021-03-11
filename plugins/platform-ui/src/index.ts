@@ -121,6 +121,7 @@ export interface Action {
 export default plugin('ui' as Plugin<UIService>, {}, {
   metadata: {
     LoginApplication: '' as Metadata<string>,
+    SettingApplication: '' as Metadata<string>,
     DefaultApplication: '' as Metadata<string>
   },
   icon: {

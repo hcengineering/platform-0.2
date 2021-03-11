@@ -20,6 +20,8 @@ import { randomBytes, pbkdf2Sync } from 'crypto'
 import { Buffer } from 'buffer'
 import { decode, encode } from 'jwt-simple'
 
+const secondFactor = require('node-2fa')
+
 const server = '3.12.129.141'
 const port = '18080'
 const secret = 'secret'
@@ -28,37 +30,42 @@ const WORKSPACE_COLLECTION = 'workspace'
 const ACCOUNT_COLLECTION = 'account'
 
 enum Error {
-  ACCOUNT_NOT_FOUND = 1,
-  ACCOUNT_DUPLICATE = 2,
-  INCORRECT_PASSWORD = 3,
-  FORBIDDEN = 4,
-  WORKSPACE_ALREADY_EXISTS = 5,
-  WORKSPACE_NOT_FOUND = 6
+    ACCOUNT_NOT_FOUND = 1,
+    ACCOUNT_DUPLICATE = 2,
+    INCORRECT_PASSWORD = 3,
+    FORBIDDEN = 4,
+    WORKSPACE_ALREADY_EXISTS = 5,
+    WORKSPACE_NOT_FOUND = 6,
+    CLIENT_VALIDATE_REQUIRED = 7,
+    INCORRECT_SECOND_FACTOR_CODE = 8
 }
 
 interface Account {
-  _id: ObjectID
-  email: string
-  hash: Binary
-  salt: Binary
-  workspaces: ObjectID[]
+    _id: ObjectID
+    email: string
+    hash: Binary
+    salt: Binary
+    workspaces: ObjectID[]
+    clientSecret: string
+    clientIds: string[]
 }
 
 type AccountInfo = Omit<Account, 'hash' | 'salt'>
 
 export interface Workspace {
-  _id: ObjectID
-  workspace: string
-  organisation: string
-  accounts: ObjectID[]
+    _id: ObjectID
+    workspace: string
+    organisation: string
+    accounts: ObjectID[]
 }
 
 interface LoginInfo {
-  email: string
-  workspace: string
-  server: string
-  port: string
-  token: string
+    email: string
+    workspace: string
+    server: string
+    port: string
+    token: string
+    secondFactorEnabled: boolean
 }
 
 function hashWithSalt (password: string, salt: Buffer): Buffer {
@@ -88,13 +95,59 @@ async function createAccount (db: Db, email: string, password: string): Promise<
     email,
     hash,
     salt,
-    workspaces: []
+    workspaces: [],
+    clientIds: []
   })
   return {
     _id: insert.insertedId,
     email,
-    workspaces: []
+    workspaces: [],
+    clientIds: [],
+    clientSecret: ''
   }
+}
+
+async function updateAccount (db: Db, email: string, password: string, newPassword: string, secondFactorEnabled:boolean, clientSecret: string, secondFactorCode: string): Promise<AccountInfo> {
+  let account = await getAccount(db, email)
+
+  if (!account) {
+    throw new PlatformError(new Status(Severity.ERROR, Error.ACCOUNT_NOT_FOUND, 'Account not found.'))
+  }
+  if (!verifyPassword(password, account.hash.buffer, account.salt.buffer)) {
+    throw new PlatformError(new Status(Severity.ERROR, Error.INCORRECT_PASSWORD, 'Incorrect password.'))
+  }
+
+  if (clientSecret) {
+    if (!secondFactor.verifyToken(clientSecret, secondFactorCode)) {
+      throw new PlatformError(new Status(Severity.ERROR, Error.INCORRECT_SECOND_FACTOR_CODE, 'Incorrect second factor code.'))
+    }
+  }
+
+  if (secondFactorEnabled && !clientSecret) clientSecret = account.clientSecret
+
+  let hash = hashWithSalt(password, account.salt.buffer)
+  if (newPassword) {
+    hash = hashWithSalt(newPassword, account.salt.buffer)
+  }
+
+  db.collection(ACCOUNT_COLLECTION).updateOne({ _id: account._id }, { $set: { hash: hash, clientSecret: clientSecret } })
+
+  account = await getAccount(db, email)
+
+  if (!account) {
+    throw new PlatformError(new Status(Severity.ERROR, Error.ACCOUNT_NOT_FOUND, 'Account not found.'))
+  }
+  return toAccountInfo(account)
+}
+
+async function pushClientId (db: Db, email: string, clientId: string) {
+  const account = await getAccount(db, email)
+
+  if (!account) {
+    throw new PlatformError(new Status(Severity.ERROR, Error.ACCOUNT_NOT_FOUND, 'Account not found.'))
+  }
+
+  db.collection(ACCOUNT_COLLECTION).updateOne({ _id: account._id }, { $push: { clientIds: clientId } })
 }
 
 // getWorkspaceInfo - return a workspace information promise
@@ -108,23 +161,40 @@ export async function getAccount (db: Db, email: string): Promise<Account | null
   return db.collection(ACCOUNT_COLLECTION).findOne<Account>({ email })
 }
 
-async function getAccountInfo (db: Db, email: string, password: string, create?: boolean): Promise<AccountInfo> {
+async function getAccountInfo (db: Db, email: string, password: string, clientId: string, secondFactorCode: string): Promise<AccountInfo> {
   const account = await getAccount(db, email)
   if (!account) {
-    if (create) {
-      return createAccount(db, email, password)
-    } else {
-      throw new PlatformError(new Status(Severity.ERROR, Error.ACCOUNT_NOT_FOUND, 'Account not found.'))
-    }
+    throw new PlatformError(new Status(Severity.ERROR, Error.ACCOUNT_NOT_FOUND, 'Account not found.'))
   }
   if (!verifyPassword(password, account.hash.buffer, account.salt.buffer)) {
     throw new PlatformError(new Status(Severity.ERROR, Error.INCORRECT_PASSWORD, 'Incorrect password.'))
   }
+
+  if (account.clientSecret) {
+    if (secondFactorCode) {
+      if (!secondFactor.verifyToken(account.clientSecret, secondFactorCode)) {
+        throw new PlatformError(new Status(Severity.ERROR, Error.INCORRECT_SECOND_FACTOR_CODE, 'Incorrect second factor code.'))
+      }
+      await pushClientId(db, email, clientId)
+      return toAccountInfo(account)
+    }
+
+    if (!clientId) {
+      throw new PlatformError(new Status(Severity.WARNING, Error.CLIENT_VALIDATE_REQUIRED, 'Unknown client'))
+    }
+
+    for (const id of account.clientIds) {
+      if (id === clientId) return toAccountInfo(account)
+    }
+    throw new PlatformError(new Status(Severity.WARNING, Error.CLIENT_VALIDATE_REQUIRED, 'Unknown client'))
+  }
+
+  await pushClientId(db, email, clientId)
   return toAccountInfo(account)
 }
 
-async function login (db: Db, email: string, password: string, workspace: string): Promise<LoginInfo> {
-  const accountInfo = await getAccountInfo(db, email, password)
+async function login (db: Db, email: string, password: string, workspace: string, clientId: string, secondFactorCode: string): Promise<LoginInfo> {
+  const accountInfo = await getAccountInfo(db, email, password, clientId, secondFactorCode)
   const workspaceInfo = await getWorkspace(db, workspace)
 
   if (workspaceInfo) {
@@ -137,7 +207,8 @@ async function login (db: Db, email: string, password: string, workspace: string
           server,
           port,
           token: encode({ email, workspace }, secret),
-          email
+          email,
+          secondFactorEnabled: accountInfo.clientSecret?.length > 0
         }
         return result
       }
@@ -196,7 +267,7 @@ export async function removeWorkspace (db: Db, email: string, workspace: string)
 }
 
 export async function createUserAccount (db: Db, email: string, password: string): Promise<ObjectID> {
-  return (await getAccountInfo(db, email, password, true))._id
+  return (await createAccount(db, email, password))._id
 }
 
 export async function getUserAccount (db: Db, email: string): Promise<ObjectID | null> {
@@ -236,5 +307,6 @@ export const methods = {
   createAccount: wrap(createAccount),
   createWorkspace: wrap(createWorkspace),
   assignWorkspace: wrap(assignWorkspace),
-  removeWorkspace: wrap(removeWorkspace)
+  removeWorkspace: wrap(removeWorkspace),
+  updateAccount: wrap(updateAccount)
 }
