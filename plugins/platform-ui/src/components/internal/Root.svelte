@@ -1,9 +1,9 @@
 <script lang="ts">
-  import type { Platform, Status } from '@anticrm/platform'
+  import type { Metadata, Platform, Resource, Status } from '@anticrm/platform'
   import { PlatformStatus, Severity } from '@anticrm/platform'
-  import type { ApplicationRoute, Location, UIService } from '../..'
-  import { CONTEXT_PLATFORM, CONTEXT_PLATFORM_UI } from '../..'
-  import { onDestroy, setContext } from 'svelte'
+  import type { AnyComponent, ApplicationRoute, UIService } from '../..'
+  import { CONTEXT_PLATFORM, CONTEXT_PLATFORM_UI, routeMeta } from '../..'
+  import { setContext } from 'svelte'
 
   import Theme from '@anticrm/sparkling-theme/src/components/Theme.svelte'
   import StatusComponent from './Status.svelte'
@@ -21,29 +21,36 @@
   setContext(CONTEXT_PLATFORM, platform)
   setContext(CONTEXT_PLATFORM_UI, ui)
 
-  const defaultApp = platform.getMetadata(uiPlugin.metadata.DefaultApplication) as ApplicationRoute
-  const authApp = platform.getMetadata(uiPlugin.metadata.LoginApplication) as ApplicationRoute
+  const defaultApp = platform.getMetadata(uiPlugin.metadata.DefaultApplication) || ''
+  const authMeta = platform.getMetadata(uiPlugin.metadata.LoginApplication) || ''
+  const authApp = platform.getMetadata(routeMeta(authMeta))
 
   let authenticationRequired = false
 
   let currentApp: ApplicationRoute | undefined
+  let currentAppErr: string | undefined
 
   interface ApplicationInfo {
     application: string
   }
 
   const router = newRouter<ApplicationInfo>(':application', (route) => {
-    switch (route.application) {
-      case defaultApp.route:
-        currentApp = defaultApp
-        break
-      case authApp.route:
-        currentApp = authApp
-        break
-      default:
-        currentApp = { route: route.application } as ApplicationRoute
+    let appRoute: Metadata<ApplicationRoute> = routeMeta(defaultApp)
+    if (route.application && route.application.length > 0 && route.application !== '#default') {
+      appRoute = routeMeta(route.application)
     }
-  }, { application: defaultApp.route })
+    if (appRoute) {
+      const routeAppComponent = platform.getMetadata(appRoute)
+      if (routeAppComponent) {
+        currentAppErr = undefined
+        currentApp = routeAppComponent
+        return
+      }
+    }
+    if (!currentApp) {
+      currentAppErr = `There is no application route defined for ${appRoute}`
+    }
+  }, { application: '#default' })
 
   let status: Status = { severity: Severity.OK, code: 0, message: '' }
 
@@ -81,10 +88,15 @@
       </div>
     </div>
     <div class="app">
-      {#if currentApp}
-        <Component is={currentApp.component} props={{}} />
+      {#if authenticationRequired}
+        <Component is={authApp.component} props={{}} />
       {:else}
-        <div class="caption-1 error">No application provided. {currentApp}</div>
+        {#if currentApp}
+          <Component is={currentApp.component} props={{}} />
+        {:else}
+          <div class="caption-1 error">Could not find application: "{currentAppErr}"
+          </div>
+        {/if}
       {/if}
     </div>
   </div>

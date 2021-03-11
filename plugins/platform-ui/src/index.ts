@@ -15,12 +15,12 @@
 
 import { Metadata, Platform, Plugin, plugin, Resource, Service } from '@anticrm/platform'
 import { getContext } from 'svelte'
-import { ApplicationRoute, ApplicationRouter, Location } from './routes'
+import { ApplicationRouter, Location } from './routes'
 import { Class, Doc, Ref } from '@anticrm/core'
 
 export type URL = string
 export type Asset = Metadata<URL>
-export { Location, ApplicationRoute, ApplicationRouter }
+export * from './routes'
 
 // export type SvelteConstructor = object
 
@@ -84,10 +84,10 @@ export interface UIService extends Service, DocumentProvider {
   navigateJoin (path: string[] | undefined, query: Record<string, string> | undefined, fragment: string | undefined): void
 
   /**
-   * Navigate to full location
-   * @param location
+   * Navigate to new URL
+   * @param newUrl
    */
-  navigate (location: Location): void
+  navigate (newUrl: string): void
 
   /**
    * Construct a new router to perform operations in component.
@@ -119,8 +119,8 @@ export interface Action {
 
 export default plugin('ui' as Plugin<UIService>, {}, {
   metadata: {
-    LoginApplication: '' as Metadata<ApplicationRoute>,
-    DefaultApplication: '' as Metadata<ApplicationRoute>
+    LoginApplication: '' as Metadata<string>,
+    DefaultApplication: '' as Metadata<string>
   },
   icon: {
     Default: '' as Asset,

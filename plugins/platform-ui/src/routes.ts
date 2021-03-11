@@ -1,5 +1,6 @@
 import { AnyComponent } from './index'
 import { parseHash, parsePath, parseQuery } from './location'
+import { Metadata } from '@anticrm/platform'
 
 export interface Location {
   path: string[] // A useful path value
@@ -13,6 +14,10 @@ export interface Location {
 export interface ApplicationRoute {
   route: string
   component: AnyComponent
+}
+
+export function routeMeta (name: string): Metadata<ApplicationRoute> {
+  return ('routes:' + name) as Metadata<ApplicationRoute>
 }
 
 /**

@@ -12,3 +12,5 @@ _api-extractor-temp/
 /docs/resources/
 /docs/content/apis/
 /docs/public/
+.idea/markdown-navigator.xml
+.idea/markdown-navigator-enh.xml

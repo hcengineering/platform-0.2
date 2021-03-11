@@ -15,7 +15,7 @@
 
 // P L U G I N
 
-import { plugin, Metadata, Service, Plugin, Status } from '@anticrm/platform'
+import { Metadata, plugin, Plugin, Service, Status } from '@anticrm/platform'
 import ui, { AnyComponent } from '@anticrm/platform-ui'
 
 export interface LoginInfo {
