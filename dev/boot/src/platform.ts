@@ -15,7 +15,7 @@
 
 import { createPlatform } from '@anticrm/platform'
 
-import ui from '@anticrm/platform-ui'
+import ui, { routeMeta } from '@anticrm/platform-ui'
 import core from '@anticrm/platform-core'
 import i18n from '@anticrm/platform-i18n'
 import login from '@anticrm/login'
@@ -38,6 +38,9 @@ import loginMeta from '@anticrm/login/src/__meta__'
 // import taskMeta from '@anticrm/task/src/__meta__/meta'
 
 const platform = createPlatform()
+
+platform.setMetadata(ui.metadata.LoginApplication, 'login')
+platform.setMetadata(ui.metadata.DefaultApplication, 'workbench')
 
 platform.addLocation(ui, () => import(/* webpackChunkName: "platform-ui" */ '@anticrm/platform-ui/src/plugin'))
 platform.addLocation(core, () => import(/* webpackChunkName: "platform-core" */ '@anticrm/platform-core/src/plugin'))

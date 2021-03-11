@@ -17,7 +17,7 @@ import { Platform, PlatformStatus, Severity, Status } from '@anticrm/platform'
 import platformIds from '@anticrm/platform-core'
 import { Request, Response, serialize, toStatus } from '@anticrm/rpc'
 
-import uiPlugin, { ApplicationRoute, UIService } from '@anticrm/platform-ui'
+import uiPlugin, { UIService } from '@anticrm/platform-ui'
 
 import login, { ACCOUNT_KEY, LoginInfo, LoginService } from '.'
 
@@ -36,7 +36,6 @@ export default async (platform: Platform, deps: { ui: UIService }): Promise<Logi
   if (!accountsUrl) {
     throw new Status(Severity.ERROR, 0, 'no accounts server metadata provided.')
   }
-
   platform.setResource(login.component.LoginForm, LoginForm)
 
   // platform.setResource(login.component.SignupForm, SignupForm)
@@ -74,9 +73,11 @@ export default async (platform: Platform, deps: { ui: UIService }): Promise<Logi
     return loginInfo
   }
 
-  function navigateApp (): void {
-    const defaultApp = platform.getMetadata(uiPlugin.metadata.DefaultApplication) as ApplicationRoute
-    uiService.navigateJoin([defaultApp.route], undefined, undefined)
+  async function navigateApp (): Promise<void> {
+    const defaultApp = platform.getMetadata(uiPlugin.metadata.DefaultApplication)
+    if (defaultApp) {
+      uiService.navigateJoin([defaultApp], undefined, undefined)
+    }
   }
 
   async function doLogin (username: string, password: string, workspace: string): Promise<Status> {
@@ -102,7 +103,7 @@ export default async (platform: Platform, deps: { ui: UIService }): Promise<Logi
 
         platform.broadcastEvent(PlatformStatus, new Status(Severity.OK, PlatformStatusCodes.AUTHENTICATON_OK, ''))
         console.log('do navigate')
-        navigateApp()
+        await navigateApp()
       }
       return new Status(Severity.OK, 0, '')
     } catch (err) {

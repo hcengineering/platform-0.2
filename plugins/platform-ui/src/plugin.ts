@@ -61,8 +61,7 @@ export default async (platform: Platform): Promise<UIService> => {
     destroyFactory(unsubscribe)
   }
 
-  function navigate (location: Location) {
-    const newUrl = locationToUrl(location)
+  function navigate (newUrl: string) {
     const curUrl = locationToUrl(windowLocation())
     if (curUrl === newUrl) {
       return
@@ -86,7 +85,7 @@ export default async (platform: Platform): Promise<UIService> => {
     if (fragment) {
       newLocation.fragment = fragment
     }
-    navigate(newLocation)
+    navigate(locationToUrl(newLocation))
   }
 
   function showModal (component: AnySvelteComponent, props: any, element?: HTMLElement) {
@@ -101,7 +100,10 @@ export default async (platform: Platform): Promise<UIService> => {
 
   function newRouter<T> (pattern: string, matcher: (match: T) => void, defaults: T | undefined = undefined): ApplicationRouter<T> {
     const r = getContext(CONTEXT_ROUTE_VALUE) as Router<any>
-    const result = r ? r.newRouter<T>(pattern, defaults) : new Router<T>(pattern, r, defaults, navigate)
+    const navigateOp = (loc: Location) => {
+      navigate(locationToUrl(loc))
+    }
+    const result = r ? r.newRouter<T>(pattern, defaults) : new Router<T>(pattern, r, defaults, navigateOp)
     result.subscribe(matcher)
     if (!r) {
       // No parent, we need to subscribe for location changes.
