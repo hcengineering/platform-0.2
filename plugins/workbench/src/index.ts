@@ -16,7 +16,7 @@
 import { plugin, Plugin, Service } from '@anticrm/platform'
 
 import core from '@anticrm/platform-core'
-import ui, { AnyComponent, Asset, Document } from '@anticrm/platform-ui'
+import ui, { AnyComponent, Asset } from '@anticrm/platform-ui'
 import { IntlString } from '@anticrm/platform-i18n'
 import { Class, Doc, Ref } from '@anticrm/core'
 import { Application, VDoc } from '@anticrm/domains'
