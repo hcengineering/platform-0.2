@@ -16,7 +16,8 @@
   import { Ref } from '@anticrm/core'
   import { AttrModel } from '@anticrm/presentation'
   import task, { TaskFieldValue } from '../../../index'
-  import { getCoreService } from '@anticrm/platform-ui'
+  import { getRunningService } from '@anticrm/platform-ui'
+  import core from '@anticrm/platform-core'
   import { onDestroy } from 'svelte'
   import StatusLabel from '../StatusLabel.svelte'
 
@@ -28,7 +29,7 @@
   let text: string = ''
   let color: string = ''
 
-  const update = getCoreService().subscribe(task.class.TaskFieldValue, { _id: value }, (docs) => {
+  const update = getRunningService(core.id).subscribe(task.class.TaskFieldValue, { _id: value }, (docs) => {
     if (docs.length > 0) {
       text = docs[0].title
       color = docs[0].color

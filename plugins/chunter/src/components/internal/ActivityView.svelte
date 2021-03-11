@@ -20,14 +20,15 @@
 
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
   import ActivityItem from './ActivityItem.svelte'
-  import { getCoreService } from '@anticrm/platform-ui'
+  import { getRunningService } from '@anticrm/platform-ui'
+  import core from '@anticrm/platform-core'
 
   export let application: Ref<WorkbenchApplication>
   export let space: Ref<Space>
 
   let objects: Tx[] = []
 
-  getCoreService().subscribe(CORE_CLASS_CREATE_TX, {}, (docs) => {
+  getRunningService(core.id).subscribe(CORE_CLASS_CREATE_TX, {}, (docs) => {
     objects = docs
   }, onDestroy)
 

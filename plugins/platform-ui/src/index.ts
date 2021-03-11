@@ -15,7 +15,6 @@
 
 import { Metadata, Platform, Plugin, plugin, Resource, Service } from '@anticrm/platform'
 import { getContext } from 'svelte'
-import core, { CoreService } from '@anticrm/platform-core'
 import { ApplicationRoute, ApplicationRouter, Location } from './routes'
 import { Class, Doc, Ref } from '@anticrm/core'
 
@@ -147,12 +146,12 @@ export function getPlatform (): Platform {
   return getContext(CONTEXT_PLATFORM) as Platform
 }
 
-export function getCoreService (): CoreService {
-  return getPlatform().getRunningPlugin(core.id) as CoreService
-}
-
 export function getUIService (): UIService {
   return getContext(CONTEXT_PLATFORM_UI) as UIService
+}
+
+export function getRunningService<S extends Service> (id: Plugin<S>): S {
+  return getPlatform().getRunningPlugin(id)
 }
 
 export function newRouter<T> (pattern: string, matcher: (match: T) => void, defaults: T | undefined = undefined): ApplicationRouter<T> {
