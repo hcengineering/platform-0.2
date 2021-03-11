@@ -223,9 +223,7 @@ export function serializeMessageMarkdown (node: MessageNode): string {
 
 export function parseMessageMarkdown (message: string): MessageNode {
   const parser = new MarkdownParser()
-  const result = parser.parse(message || '')
-  console.log('PARSE:', message, result)
-  return result
+  return parser.parse(message || '')
 }
 
 type NodeProcessor = (
