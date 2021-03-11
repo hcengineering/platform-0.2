@@ -11,10 +11,12 @@
   //
   // See the License for the specific language governing permissions and
   // limitations under the License.
+
   import { onDestroy } from 'svelte'
+  import core from '@anticrm/platform-core'
+  import { getRunningService } from '@anticrm/platform-ui'
   import { Property, StringProperty } from '@anticrm/core'
   import chunter, { Collab, getChunterService } from '../index'
-  import { getCoreService } from '@anticrm/platform-ui'
 
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
   import CommentComponent from './internal/Comment.svelte'
@@ -25,7 +27,8 @@
 
   let references: Reference[] = []
 
-  const refS = getCoreService().subscribe(CORE_CLASS_REFERENCE, { _targetId: object._id }, (docs) => {
+  const coreService = getRunningService(core.id)
+  const refS = coreService.subscribe(CORE_CLASS_REFERENCE, { _targetId: object._id }, (docs) => {
     references = docs
   }, onDestroy)
 
@@ -35,7 +38,6 @@
     }
   }
 
-  const coreService = getCoreService()
   const chunterService = getChunterService()
 
   async function createComment (message: any): Promise<void> {
