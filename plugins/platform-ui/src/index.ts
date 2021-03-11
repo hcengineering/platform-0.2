@@ -16,7 +16,6 @@
 import { Metadata, Platform, Plugin, plugin, Resource, Service } from '@anticrm/platform'
 import { getContext } from 'svelte'
 import { ApplicationRouter, Location } from './routes'
-import { Class, Doc, Ref } from '@anticrm/core'
 
 export type URL = string
 export type Asset = Metadata<URL>
@@ -55,6 +54,8 @@ export type AnyComponent = Component<AnySvelteComponent>
 export const CONTEXT_PLATFORM = 'platform'
 export const CONTEXT_PLATFORM_UI = 'platform-ui'
 
+export interface Document {}
+
 /**
  * Allow to control currently selected document.
  */
@@ -62,12 +63,12 @@ export interface DocumentProvider {
   /**
    * Opening a document
    * */
-  open (_class: Ref<Class<Doc>>, _objectId: Ref<Doc>): Promise<void>
+  open (doc: Document): Promise<void>
 
   /**
    * Return currently selected document, if one.
    */
-  selection (): { _class: Ref<Class<Doc>>, _objectId: Ref<Doc> } | undefined
+  selection (): Document | undefined
 }
 
 export interface UIService extends Service, DocumentProvider {
