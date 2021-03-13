@@ -58,9 +58,6 @@
   interface WorkbenchRouteInfo {
     space: string // A ref of space name
     app: Ref<WorkbenchApplication>
-
-    _class?: Ref<Class<Doc>>
-    _id?: Ref<Doc>
   }
 
   function routeDefaults (): WorkbenchRouteInfo {
@@ -81,7 +78,6 @@
   }, routeDefaults())
 
   interface DocumentMatcher {
-    _class: string | undefined
     doc: string | undefined
   }
 
