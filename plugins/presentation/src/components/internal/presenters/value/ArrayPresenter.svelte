@@ -53,15 +53,15 @@
 <div class="array-container">
   {#if arrayValues && itemAttributes}
     {#each arrayValues as item (item.message)}
-      {#each itemAttributes as attr (attr.key)}
-        <div class="attributes-container">
+      <div class="attributes-container">
+        {#each itemAttributes as attr (attr.key)}
           {#if attr.presenter}
             <Presenter is={attr.presenter} value={item[attr.key] || '' } attribute={attr} />
           {:else}
             <span>{item[attr.key] || ''}</span>
           {/if}
-        </div>
-      {/each}
+        {/each}
+      </div>
     {/each}
   {/if}
 </div>
