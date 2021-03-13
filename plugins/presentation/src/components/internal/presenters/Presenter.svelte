@@ -26,6 +26,7 @@
   export let value: any
   export let attribute: AttrModel
   export let editable: boolean = true
+  export let maxWidth: number = 300
 
   let component: Promise<any>
 
@@ -37,7 +38,9 @@
   {#await component }
     <Spinner />
   {:then ctor}
-    <svelte:component this={ctor} {attribute} {value} on:change />
+    <div style={ 'max-width:' + maxWidth + 'px' }>
+      <svelte:component this={ctor} {attribute} {value} on:change />
+    </div>
   {:catch err}
     <Icon icon={ui.icon.Error} size="32" />
   {/await}

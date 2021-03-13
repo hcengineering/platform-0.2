@@ -14,13 +14,12 @@
 //
 
 import { Metadata, Platform, Plugin, plugin, Resource, Service } from '@anticrm/platform'
-import { getContext, onDestroy, setContext } from 'svelte'
-import core, { CoreService } from '@anticrm/platform-core'
-import { ApplicationRoute, ApplicationRouter, Location, Router } from './routes'
+import { getContext } from 'svelte'
+import { ApplicationRouter, Location } from './routes'
 
 export type URL = string
 export type Asset = Metadata<URL>
-export { Location, ApplicationRoute }
+export * from './routes'
 
 // export type SvelteConstructor = object
 
@@ -55,7 +54,24 @@ export type AnyComponent = Component<AnySvelteComponent>
 export const CONTEXT_PLATFORM = 'platform'
 export const CONTEXT_PLATFORM_UI = 'platform-ui'
 
-export interface UIService extends Service {
+export interface Document {}
+
+/**
+ * Allow to control currently selected document.
+ */
+export interface DocumentProvider {
+  /**
+   * Opening a document
+   * */
+  open (doc: Document): Promise<void>
+
+  /**
+   * Return currently selected document, if one.
+   */
+  selection (): Document | undefined
+}
+
+export interface UIService extends Service, DocumentProvider {
   createApp (root: HTMLElement): any
 
   subscribeLocation (listener: (location: Location) => void, destroyFactory: (op: () => void) => void): void
@@ -69,13 +85,27 @@ export interface UIService extends Service {
   navigateJoin (path: string[] | undefined, query: Record<string, string> | undefined, fragment: string | undefined): void
 
   /**
-   * Navigate to full location
-   * @param location
+   * Navigate to new URL
+   * @param newUrl
    */
-  navigate (location: Location): void
+  navigate (newUrl: string): void
+
+  /**
+   * Construct a new router to perform operations in component.
+   * @param pattern
+   * @param matcher
+   * @param defaults
+   */
+  newRouter<T> (pattern: string, matcher: (match: T) => void, defaults: T | undefined): ApplicationRouter<T>
 
   showModal (component: AnySvelteComponent, props: any, element?: HTMLElement): void
   closeModal (): void
+
+  /**
+   * Register active document provider.
+   * @param provider
+   */
+  registerDocumentProvider (provider: DocumentProvider | undefined): void
 }
 
 /**
@@ -90,8 +120,8 @@ export interface Action {
 
 export default plugin('ui' as Plugin<UIService>, {}, {
   metadata: {
-    LoginApplication: '' as Metadata<ApplicationRoute>,
-    DefaultApplication: '' as Metadata<ApplicationRoute>
+    LoginApplication: '' as Metadata<string>,
+    DefaultApplication: '' as Metadata<string>
   },
   icon: {
     Default: '' as Asset,
@@ -117,27 +147,14 @@ export function getPlatform (): Platform {
   return getContext(CONTEXT_PLATFORM) as Platform
 }
 
-export function getCoreService (): CoreService {
-  return getPlatform().getRunningPlugin(core.id) as CoreService
-}
-
 export function getUIService (): UIService {
   return getContext(CONTEXT_PLATFORM_UI) as UIService
 }
 
-const CONTEXT_ROUTE_VALUE = 'routes.context'
+export function getRunningService<S extends Service> (id: Plugin<S>): S {
+  return getPlatform().getRunningPlugin(id)
+}
 
 export function newRouter<T> (pattern: string, matcher: (match: T) => void, defaults: T | undefined = undefined): ApplicationRouter<T> {
-  const uiService = getUIService()
-  const r = getContext(CONTEXT_ROUTE_VALUE) as Router<any>
-  const result = r ? r.newRouter<T>(pattern, defaults) : new Router<T>(pattern, r, defaults, uiService.navigate)
-  result.subscribe(matcher)
-  if (!r) {
-    // No parent, we need to subscribe for location changes.
-    uiService.subscribeLocation((loc) => {
-      result.update(loc)
-    }, onDestroy)
-  }
-  setContext(CONTEXT_ROUTE_VALUE, result)
-  return result
+  return getUIService().newRouter(pattern, matcher, defaults)
 }

@@ -15,7 +15,7 @@ export const pageIndex: Map<string, GuideBookPage> = new Map()
 // Components
 // ****************************************************************
 
-function addPage(page: GuideBookPage) {
+function addPage (page: GuideBookPage) {
   pages.push(page)
   pageIndex.set(page.id, page)
 }

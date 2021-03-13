@@ -4,14 +4,19 @@
 
 ## Code structure
 
+Anticrm code falls into three major parts: [packages](./packages), [plugins](./plugins) and [server](./server). 
+* [packages](./packages) contains code shared among client and server, except [packages/platform](./packages/platform) which defines plugin architecture and client-side only. _These packages defines most of the core Anticrm concepts._
+* [plugins](./plugins) contains client-side code packaged in form of Anticrm Plugins.
+* [server](./server) contains server-side platform code.
+
 Here's the breakdown of the repo:
 
 * Packages:
   * [@anticrm/foundation](./packages/foundation) –- Anticrm Platform Foundation Types.
-  * [@anticrm/platform](./packages/platform) -- Plugin architecture and implementation. Client-side only. 
+  * [@anticrm/platform](./packages/platform) -- Plugin architecture and implementation. Client-side only.
   * [@anticrm/core](./packages/core) -- Core concepts shared by Client plugins and Server components.
   * [@anticrm/model](./packages/model) -- Utils to define and manage domain models. Used by tooling, not a part of client/server runtimes.
-  
+
 * Plugins:
 
 More on [Code Structure](https://platform-one.now.sh/docs/concepts/code-structure/).
@@ -43,8 +48,8 @@ Open one more console and run:
 yarn workspace prod dev
 ```
 
-You need to log in first, go to: http://localhost:8080/component:login.LoginForm
-Then, go to http://localhost:8080/component:workbench.Workbench/application:workbench.Default
+You need to log in first, go to: http://localhost:8080  
+After login you will be redirected to default application (ex: 'workbench')
 
 Add more users:
 ```

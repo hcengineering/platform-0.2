@@ -26,3 +26,11 @@ graph BT
 
 {{< /mermaid >}}
 
+Plugin Dependencies:
+
+{{< mermaid >}}
+
+graph BT
+    ui
+
+{{< /mermaid >}}

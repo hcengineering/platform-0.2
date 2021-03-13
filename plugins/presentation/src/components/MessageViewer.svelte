@@ -21,7 +21,11 @@
     messageContent
   } from '@anticrm/text'
 
+  import { getUIService } from '@anticrm/platform-ui'
+
   export let message: MessageNode
+
+  const uiService = getUIService()
 
   class Style {
     bold: boolean = false
@@ -44,7 +48,7 @@
 
   $: style = computedStyle(message.marks || [])
 
-  function computedStyle(marks: MessageMark[]): Style {
+  function computedStyle (marks: MessageMark[]): Style {
     let result = new Style()
     for (let mark of marks) {
       switch (mark.type) {
@@ -53,12 +57,6 @@
           break
         case MessageMarkType.em:
           result.italic = true
-          break
-        case MessageMarkType.underline:
-          result.underline = true
-          break
-        case MessageMarkType.strike:
-          result.strike = true
           break
         case MessageMarkType.reference:
           let rm: ReferenceMark = mark as ReferenceMark
@@ -84,16 +82,14 @@
     class="inline-block"
     class:bold="{style.bold}"
     class:italic="{style.italic}"
-    class:underline="{style.underline}"
-    class:strike="{style.strike}"
     class:resolved_reference="{style.reference.resolved}"
     class:unknown_reference="{style.reference.state && !style.reference.resolved}"
   >
     {#if style.reference.state}
       <!-- TODO: Add a proper click handler here-->
       <a
-        href="{'#click-me:' + style.reference._class + '/' + style.reference._id}"
-      >
+        href="#"
+        on:click={()=>{uiService.open({ _class: style.reference._class, _id: style.reference._id })}}>
         {message.text || ''}
       </a>
     {:else}{message.text || ''}{/if}
@@ -133,18 +129,19 @@
     display: inline-block;
     white-space: pre;
   }
+
   .bold {
     font-weight: bold;
   }
+
   .italic {
     font-style: italic;
   }
-  .underline {
-    text-decoration: underline;
-  }
+
   .resolved_reference {
     color: lightblue;
   }
+
   .unknown_reference {
     color: grey;
   }

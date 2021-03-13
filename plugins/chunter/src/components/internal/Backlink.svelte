@@ -14,7 +14,8 @@
 -->
 <script lang='ts'>
   import { Reference } from '@anticrm/domains'
-  import { getCoreService } from '@anticrm/platform-ui'
+  import { getRunningService } from '@anticrm/platform-ui'
+  import core from '@anticrm/platform-core'
   import { Message } from '../..'
   import { onDestroy } from 'svelte'
 
@@ -24,7 +25,7 @@
 
   let message: Message
 
-  const qs = getCoreService().subscribe(backlink._sourceClass, { _id: backlink._sourceId }, (docs) => {
+  const qs = getRunningService(core.id).subscribe(backlink._sourceClass, { _id: backlink._sourceId }, (docs) => {
     message = docs[0] as Message
   }, onDestroy)
 

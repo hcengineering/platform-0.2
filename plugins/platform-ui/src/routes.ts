@@ -1,5 +1,6 @@
 import { AnyComponent } from './index'
 import { parseHash, parsePath, parseQuery } from './location'
+import { Metadata } from '@anticrm/platform'
 
 export interface Location {
   path: string[] // A useful path value
@@ -13,6 +14,10 @@ export interface Location {
 export interface ApplicationRoute {
   route: string
   component: AnyComponent
+}
+
+export function routeMeta (name: string): Metadata<ApplicationRoute> {
+  return ('routes:' + name) as Metadata<ApplicationRoute>
 }
 
 /**
@@ -76,9 +81,9 @@ export class Router<T> implements ApplicationRouter<T> {
 
   private matched = false
 
-  private doNavigate: (newLoc: Location) => void
+  private doNavigate: ((newLoc: Location) => void) | undefined
 
-  constructor (pattern: string, parent: Router<any> | undefined = undefined, defaults: T | undefined, doNavigate: (newLoc: Location) => void) {
+  constructor (pattern: string, parent: Router<any> | undefined = undefined, defaults: T | undefined = undefined, doNavigate: ((newLoc: Location) => void) | undefined = undefined) {
     this.pattern = pattern
     this.parentRouter = parent
     if (defaults) {

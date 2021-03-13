@@ -17,11 +17,11 @@ import { Platform } from '@anticrm/platform'
 import chunter from '..'
 
 export default (platform: Platform) => {
-  const spritesUrl = require('../assets/icons.svg')
+  const spritesUrl = require('../assets/icons.svg') // eslint-disable-line
   platform.loadMetadata(chunter.icon, {
     Chunter: spritesUrl + '#chunter',
     ActivityView: spritesUrl + '#activityView',
     ChatView: spritesUrl + '#chatView',
-    PagesView: spritesUrl + '#pagesView',
+    PagesView: spritesUrl + '#pagesView'
   })
 }

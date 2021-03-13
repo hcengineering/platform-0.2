@@ -11,21 +11,24 @@
   //
   // See the License for the specific language governing permissions and
   // limitations under the License.
+
   import { onDestroy } from 'svelte'
-  import { Ref, Class, Doc, Property, Emb, StringProperty } from '@anticrm/core'
-  import chunter, { Collab, Comment, getChunterService } from '../index'
-  import { getCoreService } from '@anticrm/platform-ui'
+  import core from '@anticrm/platform-core'
+  import { getRunningService } from '@anticrm/platform-ui'
+  import { Property, StringProperty } from '@anticrm/core'
+  import chunter, { Collab, getChunterService } from '../index'
 
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
   import CommentComponent from './internal/Comment.svelte'
   import Backlink from './internal/Backlink.svelte'
-  import { Reference, CORE_CLASS_REFERENCE } from '@anticrm/domains'
+  import { CORE_CLASS_REFERENCE, Reference } from '@anticrm/domains'
 
   export let object: Collab
 
   let references: Reference[] = []
 
-  const refS = getCoreService().subscribe(CORE_CLASS_REFERENCE, { _targetId: object._id }, (docs) => {
+  const coreService = getRunningService(core.id)
+  const refS = coreService.subscribe(CORE_CLASS_REFERENCE, { _targetId: object._id }, (docs) => {
     references = docs
   }, onDestroy)
 
@@ -35,7 +38,6 @@
     }
   }
 
-  const coreService = getCoreService()
   const chunterService = getChunterService()
 
   async function createComment (message: any): Promise<void> {
@@ -53,15 +55,14 @@
 {#if references.length > 0 }
   <div class="caption-2">References</div>
   {#each references as ref}
-    <!-- <Backlink {backlink} /> -->
     <Backlink backlink={ref} />
   {/each}
 {/if}
 
 <div class="caption-2">Comments</div>
 
-{#if object && object.comments}
-  {#each object.comments || [] as comment}
+{#if object.comments}
+  {#each object.comments as comment}
     <CommentComponent message={comment} />
   {/each}
 {/if}

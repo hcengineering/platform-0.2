@@ -13,12 +13,13 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { Ref, Doc, Class } from '@anticrm/core'
+  import { Ref, Doc, Class, StringProperty, Property } from '@anticrm/core'
   import { onDestroy } from 'svelte'
   import { getUIService, _getCoreService } from '../../utils'
-  import { Space, VDoc, CORE_CLASS_SPACE } from '@anticrm/domains'
+  import { Space, VDoc, CORE_CLASS_SPACE, Title, CORE_CLASS_TITLE, TitleSource } from '@anticrm/domains'
   import ui, { Location, newRouter } from '@anticrm/platform-ui'
   import workbench, { WorkbenchApplication } from '../..'
+  import { CoreDocument } from '@anticrm/presentation'
 
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import SpaceItem from './spaces/SpaceItem.svelte'
@@ -52,7 +53,7 @@
   let applications: WorkbenchApplication[] = []
 
   let component: AnyComponent | undefined
-  let details: { _id: Ref<Doc>; _class: Ref<Class<Doc>> } | undefined
+  let details: CoreDocument | undefined
 
   interface WorkbenchRouteInfo {
     space: string // A ref of space name
@@ -69,7 +70,7 @@
     } as WorkbenchRouteInfo
   }
 
-  const router = newRouter<WorkbenchRouteInfo>(':space/:app?_class#_id', (info) => {
+  const router = newRouter<WorkbenchRouteInfo>(':space/:app', (info) => {
     if (spaces.length > 0) {
       space = spaces.find((s) => (s._id === info.space as Ref<Space>) || s.spaceKey === info.space) || spaces[0]
     }
@@ -77,12 +78,81 @@
       application = applications.find((a) => (a._id === info.app || a.route === info.app || a.label === info.app)) || applications[0]
       component = application?.component
     }
-    if (info._id && info._class) {
-      details = { _id: info._id, _class: info._class }
+  }, routeDefaults())
+
+  interface DocumentMatcher {
+    _class: string | undefined
+    doc: string | undefined
+  }
+
+  const documentRouter = newRouter<DocumentMatcher>('?doc', async (match) => {
+    // Parse browse and convert it to _class and objectId
+    if (match.doc) {
+      // Check find a title
+      const title = await coreService.findOne<Title>(CORE_CLASS_TITLE, {
+        title: match.doc as StringProperty,
+        source: TitleSource.ShortId as Property<TitleSource, number>
+      })
+      if (title) {
+        // So we had a title,
+        details = { _class: title._objectClass, _id: title._objectId }
+      } else {
+        // try extract class name from doc and find objectId.
+        const pos = match.doc.lastIndexOf(':')
+        if (pos) {
+          const _class = match.doc.substring(0, pos)
+          const _objectId = match.doc.substring(pos + 1)
+
+          // Try find a class to be sure it is available.
+          try {
+            coreService.getModel().getClass(_class as Ref<Class<Doc>>)
+          } catch (ex) {
+            console.error(ex)
+            details = undefined
+            return
+          }
+          // We failed to find a title, use as is
+          details = { _class: _class as Ref<Class<Doc>>, _id: _objectId as Ref<Doc> }
+        } else {
+          details = undefined
+        }
+      }
     } else {
       details = undefined
     }
-  }, routeDefaults())
+  })
+
+  async function navigateDocument (doc?: CoreDocument): Promise<void> {
+    if (!doc) {
+      documentRouter.navigate({ doc: undefined })
+      return
+    }
+    // Find if object has a shortId.
+    const title = await coreService.findOne<Title>(CORE_CLASS_TITLE, {
+      _objectId: doc._id,
+      _objectClass: doc._class,
+      source: TitleSource.ShortId as Property<TitleSource, number>
+    })
+
+    if (title && title.title) {
+      // Navigate using shortId
+      documentRouter.navigate({ doc: `${title.title}` })
+    } else {
+      // There is not short Id, we should navigate using a full _class and objectId.
+      documentRouter.navigate({ doc: `${doc._class}:${doc._id}` })
+    }
+  }
+
+  uiService.registerDocumentProvider({
+    open: navigateDocument,
+    selection (): CoreDocument | undefined {
+      return details
+    }
+  })
+
+  onDestroy(() => {
+    uiService.registerDocumentProvider(undefined)
+  })
 
   coreService.subscribe(CORE_CLASS_SPACE, {}, (docs) => {
     spaces = docs.filter((s) => getCurrentUserSpace(currentUser, s))
@@ -269,16 +339,14 @@
         is={component}
         {application}
         {space}
-        on:open={(e) => {
-          router.navigate({_class: e.detail._class, _id: e.detail._id})
-        }} />
+        on:open={(e) => navigateDocument({ _class: e.detail._class, _id: e.detail._id })} />
     {/if}
   </div>
   {#if details}
     <Splitter {prevDiv} {nextDiv} minWidth="404" />
     <aside bind:this={nextDiv}>
       <ObjectForm {...details} title="Title"
-                  on:close={()=> {router.navigate({_class: undefined, _id: undefined})}} />
+                  on:close={()=> navigateDocument(undefined)} />
     </aside>
   {/if}
 </div>

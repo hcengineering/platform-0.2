@@ -15,19 +15,20 @@
 <script lang="ts">
   import { Class, Doc, Ref, RefTo, Type } from '@anticrm/core'
   import ui, { AttrModel } from '@anticrm/presentation'
-  import { AnyComponent, getCoreService } from '@anticrm/platform-ui'
+  import { AnyComponent, getRunningService } from '@anticrm/platform-ui'
+  import core from '@anticrm/platform-core'
   import { onDestroy } from 'svelte'
   import Presenter from '../Presenter.svelte'
 
   export let value: Ref<Doc>
   export let attribute: AttrModel
-  export let maxWidth: number = 300
   export let editable: boolean
 
-  let doc: Doc
+  let doc: Doc | undefined
   let presenter: AnyComponent
 
-  const update = getCoreService().subscribe((attribute.type as RefTo<Doc>).to, { _id: value }, (docs) => {
+  const coreService = getRunningService(core.id)
+  const update = coreService.subscribe((attribute.type as RefTo<Doc>).to, { _id: value }, (docs) => {
     if (docs.length > 0) {
       doc = docs[0]
     } else {
@@ -35,7 +36,7 @@
     }
   }, onDestroy)
 
-  const model = getCoreService().getModel()
+  const model = coreService.getModel()
 
   $: {
     const objClass = (attribute.type as RefTo<Doc>).to

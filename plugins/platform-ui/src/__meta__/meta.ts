@@ -17,13 +17,13 @@ import { Platform } from '@anticrm/platform'
 import ui from '..'
 
 export default (platform: Platform) => {
-  const spritesUrl = require('../../assets/icons.svg')
+  const spritesUrl = require('../../assets/icons.svg') // eslint-disable-line
   platform.loadMetadata(ui.icon, {
     Default: spritesUrl + '#error',
     Error: spritesUrl + '#error',
     Network: spritesUrl + '#network',
     Search: spritesUrl + '#search',
     Add: spritesUrl + '#add',
-    ArrowDown: spritesUrl + '#arrowDown',
+    ArrowDown: spritesUrl + '#arrowDown'
   })
 }

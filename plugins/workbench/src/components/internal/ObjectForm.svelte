@@ -16,7 +16,7 @@
   import Component from '@anticrm/platform-ui/src/components/Component.svelte'
   import presentation from '@anticrm/presentation'
   import { createEventDispatcher, onDestroy } from 'svelte'
-  import { _getCoreService, getComponentExtension, getCoreService } from '../../utils'
+  import { _getCoreService, getComponentExtension } from '../../utils'
 
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import workbench from '../..'
@@ -24,24 +24,27 @@
 
   let title: string
   export let _class: Ref<Class<Doc>>
-  export let _id: Ref<Doc>
+  export let _objectId: Ref<Doc>
 
   let object: Doc | undefined
+  let counter = 0
 
-  let queryUpdate: (_clas: Ref<Class<Doc>>, query: AnyLayout) => void
+  let queryUpdate: (_class: Ref<Class<Doc>>, query: AnyLayout) => void
 
   const coreService = _getCoreService()
 
-  queryUpdate = coreService.subscribe(_class, { _id }, (docs) => {
+  queryUpdate = coreService.subscribe(_class, { _id: _objectId }, (docs) => {
     object = docs.length > 0 ? docs[0] : undefined
   }, onDestroy)
 
   let component: AnyComponent
   $: {
-    queryUpdate(_class, { _id })
+    queryUpdate(_class, { _id: _objectId })
 
     getComponentExtension(_class, presentation.mixin.DetailForm).then((ext) => {
-      component = ext
+      if (component !== ext) {
+        component = ext
+      }
     })
   }
 
@@ -58,9 +61,7 @@
     <div class="content">
       <ScrollView height="100%" width="100%">
         <div class="component-content">
-          {#if object}
-            <Component is="{component}" props="{{ _class, object }}" />
-          {/if}
+          <Component is="{component}" props="{{ _class, object }}" />
         </div>
       </ScrollView>
     </div>

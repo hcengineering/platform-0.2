@@ -15,7 +15,7 @@
 
 import { Platform } from '@anticrm/platform'
 import workbench from '.'
-import ui from '@anticrm/platform-ui'
+import { routeMeta } from '@anticrm/platform-ui'
 
 export default (platform: Platform) => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -32,8 +32,5 @@ export default (platform: Platform) => {
     ArrowDown: spritesUrl + '#arrowDown'
   })
 
-  platform.setMetadata(ui.metadata.DefaultApplication, {
-    route: 'workbench',
-    component: workbench.component.Workbench
-  })
+  platform.setMetadata(routeMeta('workbench'), { route: 'workbench', component: workbench.component.Workbench })
 }

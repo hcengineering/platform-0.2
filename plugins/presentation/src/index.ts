@@ -19,7 +19,7 @@ import { VDoc } from '@anticrm/domains'
 
 import core from '@anticrm/platform-core'
 import i18n, { IntlString } from '@anticrm/platform-i18n'
-import { AnyComponent, Asset, CONTEXT_PLATFORM } from '@anticrm/platform-ui'
+import { AnyComponent, Asset, CONTEXT_PLATFORM, Document } from '@anticrm/platform-ui'
 import { getContext } from 'svelte'
 
 // U I  E X T E N S I O N S
@@ -121,6 +121,11 @@ export interface ClassModel {
   getPrimary (): AttrModel | undefined
 
   filterPrimary (): { model: ClassModel, primary: AttrModel | undefined }
+}
+
+export interface CoreDocument extends Document {
+  _class: Ref<Class<Doc>>
+  _id: Ref<Doc>
 }
 
 // S E R V I C E

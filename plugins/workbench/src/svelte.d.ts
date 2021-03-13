@@ -24,17 +24,17 @@ declare module '*.svelte' {
 
   interface Component<Props> {
     new(options: ComponentOptions<Props>): any;
-    $set: (props: {}) => any;
+    $set: (props: Props) => any;
     $on: (event: string, callback: (event: CustomEvent) => any) => any;
     $destroy: () => any;
-    render: (props?: {}) => {
+    render: (props?: Props) => {
       html: string;
       css: { code: string; map?: string };
       head?: string;
     };
   }
 
-  const component: Component<{}>
+  const component: Component<Record<string, unknown>>
 
-  export default component;
+  export default component
 }

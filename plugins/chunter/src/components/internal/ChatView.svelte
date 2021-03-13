@@ -21,10 +21,11 @@
   import chunter, { getChunterService, Message } from '../..'
   import CommentComponent from './Comment.svelte'
   import DateItem from './DateItem.svelte'
-  import { getCoreService } from '@anticrm/platform-ui'
+  import { getRunningService } from '@anticrm/platform-ui'
+  import core from '@anticrm/platform-core'
   import SplitView from '@anticrm/sparkling-controls/src/SplitView.svelte'
 
-  const coreService = getCoreService()
+  const coreService = getRunningService(core.id)
   const chunterService = getChunterService()
 
   export let space: Space
@@ -32,7 +33,7 @@
   let spaceName: string
   let messages: Message[] = []
 
-  const ms = getCoreService().subscribe(chunter.class.Message, { _space: space._id }, (docs) => {
+  const ms = coreService.subscribe(chunter.class.Message, { _space: space._id }, (docs) => {
     messages = docs
   }, onDestroy)
 

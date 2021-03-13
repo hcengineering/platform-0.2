@@ -17,7 +17,7 @@ import { Platform } from '@anticrm/platform'
 import presentation from '..'
 
 export default (platform: Platform) => {
-  const spritesUrl = require('../assets/icons.svg')
+  const spritesUrl = require('../assets/icons.svg') // eslint-disable-line
   platform.loadMetadata(presentation.icon, {
     Finder: spritesUrl + '#finder',
     brdBold: spritesUrl + '#brdBold',

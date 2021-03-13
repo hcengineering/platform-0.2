@@ -815,7 +815,7 @@ class MarkdownParseState {
             type: MessageMarkType.reference,
             attrs: {
               id: url.hash.substring(1),
-              class: 'class:' + url.hostname
+              class: 'class:' + url.pathname.substring(2)
             }
           })
         }
