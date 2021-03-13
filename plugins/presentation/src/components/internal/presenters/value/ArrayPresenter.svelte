@@ -13,21 +13,55 @@
 // limitations under the License.
 -->
 <script lang="ts">
+  import { Class, Type, ArrayOf, InstanceOf, CORE_CLASS_DOC } from '@anticrm/core'
   import { AttrModel } from '../../../../index'
+  import { getPresentationService, getEmptyModel, _getCoreService } from '../../../../utils'
+  import Presenter from '../Presenter.svelte'
 
-  export let value: array
+  export let value: any
   export let attribute: AttrModel
+
+  let itemAttributes: AttrModel[] = []
+
+  $: arrayValues = value
+  const arrayOf = attribute.type as ArrayOf
+  if (arrayOf) {
+    const instanceOf = arrayOf.of as InstanceOf<Type>;
+    const itemClass = instanceOf?.of;
+    if (itemClass) {
+       getPresentationService()
+              .then((p) => p.getClassModel(itemClass, CORE_CLASS_DOC))
+              .then((model) => {
+                itemAttributes = model.getAttributes()
+              })
+    }
+  }
 </script>
 
 <style lang="scss">
-  .container {
+  .array-container {
     display: flex;
     flex-direction: column;
   }
+
+  .attributes-container {
+    display: flex;
+  }
+
 </style>
 
-<div class="container">
-  {#each value as item (item.key)}
-    {value}
-  {/each}
+<div class="array-container">
+  {#if arrayValues && itemAttributes}
+    {#each arrayValues as item (item.message)}
+      {#each itemAttributes as attr (attr.key)}
+        <div class="attributes-container">
+          {#if attr.presenter}
+            <Presenter is={attr.presenter} value={item[attr.key] || '' } attribute={attr} />
+          {:else}
+            <span>{item[attr.key] || ''}</span>
+          {/if}
+        </div>
+      {/each}
+    {/each}
+  {/if}
 </div>
