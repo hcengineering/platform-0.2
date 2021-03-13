@@ -35,6 +35,8 @@ module.exports = {
     '@typescript-eslint/no-unused-vars': ['error']
   },
   settings: {
-    'svelte3/typescript': require('typescript')
+    'svelte3/typescript': require('typescript'),
+    // Ignore styles since SASS preprocessor is not supported in svelte plugin: https://github.com/sveltejs/eslint-plugin-svelte3/issues/10
+    'svelte3/ignore-styles': () => true
   }
 }
