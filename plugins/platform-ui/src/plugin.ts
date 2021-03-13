@@ -110,6 +110,10 @@ export default async (platform: Platform): Promise<UIService> => {
         result.update(loc)
       }, onDestroy)
     }
+    if (r) {
+      // We need to remove child router from parent, if component is destroyed
+      onDestroy(r.clearChildRouter)
+    }
     setContext(CONTEXT_ROUTE_VALUE, result)
     return result
   }

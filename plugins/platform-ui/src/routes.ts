@@ -2,6 +2,9 @@ import { AnyComponent } from './index'
 import { parseHash, parsePath, parseQuery } from './location'
 import { Metadata } from '@anticrm/platform'
 
+/**
+ * Describe a browser URI location parsed to path, query and fragment.
+ */
 export interface Location {
   path: string[] // A useful path value
   query: Record<string, string | null> // a value of query parameters, no duplication are supported
@@ -25,13 +28,13 @@ export function routeMeta (name: string): Metadata<ApplicationRoute> {
  */
 export interface ApplicationRouter<T> {
   /**
-   * Return parent route match.
+   * Return parent router if defined.
    */
   parent (): ApplicationRouter<any> | undefined
 
   /**
    * Construct a child router based on current matched state
-   * Internal child router is just one, and calling twise will replace one.
+   * Internal child router is just one, and calling twice will replace existing.
    */
   newRouter<P> (pattern: string): ApplicationRouter<P>
 
@@ -40,23 +43,39 @@ export interface ApplicationRouter<T> {
    */
   match (): boolean
 
+  /**
+   * Return current matched set.
+   */
   properties (): T
 
+  /**
+   * Replace defaults passed with constructor, will call matcher function passed with constructor.
+   * @param defaults - a new defaults
+   */
   setDefaults (defaults: T): void
+
+  /**
+   * Replace a matcher function passed with constructor.
+   * @param matcher
+   */
+  subscribe (matcher: (match: T) => void): void
 
   // Construct a new navigate using combined query parameters
   queries (vars: Partial<T>): Record<string, any> | undefined
-  path (vars: Partial<T>): string[] // Construct a current path with all applied variables
+  // Construct a current path with all applied variables
+  path (vars: Partial<T>): string[]
+  // Construct a current fragment with app applied variables
   fragment (vars: Partial<T>): string | undefined
 
   /**
-   * Construct a full new location based on values of T
+   * Construct a full new location based on values of T.
+   * Other values will be taken from stored parent and child routers.
    * @param values
    */
   location (values: Partial<T>): Location
 
   /**
-   * Use new constructed location value and platform UI to navigate
+   * Use new constructed location value and platform UI to navigate.
    * @param values
    */
   navigate (values: Partial<T>): void
@@ -380,5 +399,9 @@ export class Router<T> implements ApplicationRouter<T> {
       }
     }
     return result
+  }
+
+  clearChildRouter (): void {
+    this.childRouter = undefined
   }
 }

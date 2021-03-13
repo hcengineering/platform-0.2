@@ -21,8 +21,6 @@ export type URL = string
 export type Asset = Metadata<URL>
 export * from './routes'
 
-// export type SvelteConstructor = object
-
 interface ComponentOptions<Props> {
   target: HTMLElement
   anchor?: HTMLElement
@@ -54,7 +52,8 @@ export type AnyComponent = Component<AnySvelteComponent>
 export const CONTEXT_PLATFORM = 'platform'
 export const CONTEXT_PLATFORM_UI = 'platform-ui'
 
-export interface Document {}
+export interface Document {
+}
 
 /**
  * Allow to control currently selected document.
@@ -74,6 +73,12 @@ export interface DocumentProvider {
 export interface UIService extends Service, DocumentProvider {
   createApp (root: HTMLElement): any
 
+  /**
+   * Ask UI service to subscribe for browser location changes.
+   *
+   * @param listener - listener to be notified on location changes, will be triggered for first time on subscribe.
+   * @param destroyFactory - a factory to register unsubscribe function to.
+   */
   subscribeLocation (listener: (location: Location) => void, destroyFactory: (op: () => void) => void): void
 
   /**
