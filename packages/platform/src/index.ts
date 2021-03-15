@@ -224,7 +224,7 @@ export function createPlatform (): Platform {
     } else if (status instanceof Status) {
       broadcastEvent(PlatformStatus, status)
     } else {
-      broadcastEvent(PlatformStatus, new Status(Severity.WARNING, 0, 'Unknown status: ' + status))
+      broadcastEvent(PlatformStatus, new Status(Severity.WARNING, 0, `Unknown status: ${status}`))
     }
   }
 

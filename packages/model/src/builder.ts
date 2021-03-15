@@ -26,9 +26,9 @@ export type OptionalMethods<T extends Record<string, unknown>> = CombineObjects<
   Partial<Pick<T, KeysByType<T, MethodType>>>>
 
 class Builder {
-  private memdb: Model
+  private readonly memdb: Model
 
-  private domains = new Map<string, Model>()
+  private readonly domains = new Map<string, Model>()
 
   constructor (memdb?: Model) {
     this.memdb = memdb ?? new Model(MODEL_DOMAIN)

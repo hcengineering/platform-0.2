@@ -37,10 +37,10 @@ type ClassKey = { key: string, _class: Ref<Class<Emb>> }
  * Hello [Zaz](ref://chunter.Page#600eb7121900e6e361085f20)
  */
 export class ReferenceIndex implements DomainIndex {
-  private modelDb: Model
-  private storage: Storage
-  private textAttributes = new Map<Ref<Class<Obj>>, string[]>()
-  private arrayAttributes = new Map<Ref<Class<Obj>>, ClassKey[]>()
+  private readonly modelDb: Model
+  private readonly storage: Storage
+  private readonly textAttributes = new Map<Ref<Class<Obj>>, string[]>()
+  private readonly arrayAttributes = new Map<Ref<Class<Obj>>, ClassKey[]>()
 
   constructor (modelDb: Model, storage: Storage) {
     this.modelDb = modelDb
@@ -89,7 +89,7 @@ export class ReferenceIndex implements DomainIndex {
             index.value++
             result.push({
               _class: CORE_CLASS_REFERENCE,
-              _id: ((_id as string) + index.value) as Ref<Doc>, // Generate a sequence id based on source object id.
+              _id: `${_id}${index.value}` as Ref<Doc>, // Generate a sequence id based on source object id.
               _targetId: rm.attrs.id as Ref<Doc>,
               _targetClass: rm.attrs.class as Ref<Class<Doc>>,
               _sourceId: _id,

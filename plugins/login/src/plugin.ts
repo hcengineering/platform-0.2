@@ -29,7 +29,7 @@ import { PlatformStatusCodes } from '@anticrm/foundation'
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */
-export default async (platform: Platform, deps: { ui: UIService }): Promise<LoginService> => {
+export default (platform: Platform, deps: { ui: UIService }): Promise<LoginService> => {
   const uiService = deps.ui
 
   const accountsUrl = platform.getMetadata(login.metadata.AccountsUrl)
@@ -58,26 +58,27 @@ export default async (platform: Platform, deps: { ui: UIService }): Promise<Logi
     platform.setMetadata(platformIds.metadata.Token, undefined)
   }
 
-  async function getLoginInfo (): Promise<LoginInfo | undefined> {
+  function getLoginInfo (): Promise<LoginInfo | undefined> {
     const account = localStorage.getItem(ACCOUNT_KEY)
     if (!account) {
-      return undefined
+      return Promise.resolve(undefined)
     }
     const loginInfo = JSON.parse(account) as LoginInfo
 
     const token = platform.getMetadata(platformIds.metadata.Token)
     if (!token) {
-      return undefined
+      return Promise.resolve(undefined)
     }
     // Do some operation to check if token is expired or not.
-    return loginInfo
+    return Promise.resolve(loginInfo)
   }
 
-  async function navigateApp (): Promise<void> {
+  function navigateApp (): Promise<void> {
     const defaultApp = platform.getMetadata(uiPlugin.metadata.DefaultApplication)
     if (defaultApp) {
       uiService.navigateJoin([defaultApp], undefined, undefined)
     }
+    return Promise.resolve()
   }
 
   async function doLogin (username: string, password: string, workspace: string): Promise<Status> {
@@ -111,18 +112,18 @@ export default async (platform: Platform, deps: { ui: UIService }): Promise<Logi
     }
   }
 
-  async function doLogout (): Promise<void> {
+  function doLogout (): Promise<void> {
     const token = platform.getMetadata(platformIds.metadata.Token)
-    if (!token) {
-      return
+    if (token) {
+      clearLoginInfo()
     }
-    clearLoginInfo()
+    return Promise.resolve()
   }
 
-  return {
+  return Promise.resolve({
     doLogin,
     doLogout,
     getLoginInfo,
     navigateApp
-  }
+  })
 }

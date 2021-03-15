@@ -30,7 +30,7 @@ import PageInfo from './components/internal/PageInfo.svelte'
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */
-export default async (platform: Platform, deps: { core: CoreService }): Promise<ChunterService> => { // eslint-disable-line @typescript-eslint/no-unused-vars
+export default (platform: Platform, deps: { core: CoreService }): Promise<ChunterService> => { // eslint-disable-line @typescript-eslint/no-unused-vars
   platform.setResource(chunter.component.ActivityView, ActivityView)
   platform.setResource(chunter.component.ChatView, ChatView)
   platform.setResource(chunter.component.MessageInfo, MessageInfo)
@@ -46,5 +46,5 @@ export default async (platform: Platform, deps: { core: CoreService }): Promise<
     createMissedObjects
   }
 
-  return service
+  return Promise.resolve(service)
 }

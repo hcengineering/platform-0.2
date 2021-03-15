@@ -51,7 +51,7 @@ export default (platform: Platform): RpcService => {
     }
     return new Promise<WebSocket>((resolve) => {
       // Let's sure token is valid one
-      const ws = new WebSocket('ws://' + host + ':' + port + '/' + token)
+      const ws = new WebSocket(`ws://${host}:${port}/${token}`)
       ws.onopen = () => {
         resolve(ws)
       }

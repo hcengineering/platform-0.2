@@ -20,9 +20,9 @@ import { PluginDependencies } from '../index'
 
 plugin1State.parsed = true
 
-export default async (platform: Platform, deps: PluginDependencies) => { // eslint-disable-line @typescript-eslint/no-unused-vars
+export default (platform: Platform, deps: PluginDependencies) => { // eslint-disable-line @typescript-eslint/no-unused-vars
   plugin1State.started = true
-  return {
+  return Promise.resolve({
     id: plugin1
-  }
+  })
 }
