@@ -12,15 +12,14 @@
   // See the License for the specific language governing permissions and
   // limitations under the License.
   import workbench, { Perspective, WorkbenchApplication } from '../..'
-  import { _getCoreService, getUIService } from '../../utils'
+  import { createLiveQuery } from '@anticrm/presentation'
   import { onDestroy } from 'svelte'
 
   import Component from '@anticrm/platform-ui/src/components/Component.svelte'
   import Spotlight from './Spotlight.svelte'
-  import { AnyComponent, newRouter } from '@anticrm/platform-ui'
+  import { AnyComponent, newRouter, getUIService } from '@anticrm/platform-ui'
   import { Ref } from '@anticrm/core'
 
-  const coreService = _getCoreService()
   const uiService = getUIService()
 
   let perspectives: Perspective[] = []
@@ -37,17 +36,16 @@
     app: Ref<WorkbenchApplication>
   }
 
-
   const router = newRouter<PerspectiveReference>(':perspective', (info) => {
     activePerspective = info.perspective
 
     if (perspectives.length > 0 && activePerspective) {
-      var pp = perspectives.find((h) => h.name === activePerspective) || perspectives[0]
+      const pp = perspectives.find((h) => h.name === activePerspective) || perspectives[0]
       component = pp?.component
     }
   }, { perspective: '#none' })
 
-  coreService.subscribe(workbench.class.Perspective, {}, (p) => {
+  createLiveQuery(workbench.class.Perspective, {}, (p) => {
     perspectives = p
     if (perspectives.length > 0) {
       router.setDefaults({ perspective: perspectives[0].name })

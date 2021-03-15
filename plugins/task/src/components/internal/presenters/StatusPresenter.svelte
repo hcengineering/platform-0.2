@@ -14,10 +14,8 @@
 -->
 <script lang="ts">
   import { Ref } from '@anticrm/core'
-  import { AttrModel } from '@anticrm/presentation'
+  import { AttrModel, createLiveQuery, updateLiveQuery } from '@anticrm/presentation'
   import task, { TaskFieldValue } from '../../../index'
-  import { getRunningService } from '@anticrm/platform-ui'
-  import core from '@anticrm/platform-core'
   import { onDestroy } from 'svelte'
   import StatusLabel from '../StatusLabel.svelte'
 
@@ -29,14 +27,14 @@
   let text: string = ''
   let color: string = ''
 
-  const update = getRunningService(core.id).subscribe(task.class.TaskFieldValue, { _id: value }, (docs) => {
+  const update = createLiveQuery(task.class.TaskFieldValue, { _id: value }, (docs) => {
     if (docs.length > 0) {
       text = docs[0].title
       color = docs[0].color
     }
   }, onDestroy)
 
-  $: update(task.class.TaskFieldValue, { _id: value })
+  $: updateLiveQuery( update, task.class.TaskFieldValue, { _id: value })
 </script>
 
 <StatusLabel {text} {color} />

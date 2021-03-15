@@ -1,5 +1,4 @@
 <script lang="ts">
-  import LinkTo from '@anticrm/platform-ui/src/components/LinkTo.svelte'
 
   export let selected: boolean = false
   export let label: string = ''

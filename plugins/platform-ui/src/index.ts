@@ -156,10 +156,6 @@ export function getUIService (): UIService {
   return getContext(CONTEXT_PLATFORM_UI) as UIService
 }
 
-export function getRunningService<S extends Service> (id: Plugin<S>): S {
-  return getPlatform().getRunningPlugin(id)
-}
-
 export function newRouter<T> (pattern: string, matcher: (match: T) => void, defaults: T | undefined = undefined): ApplicationRouter<T> {
   return getUIService().newRouter(pattern, matcher, defaults)
 }

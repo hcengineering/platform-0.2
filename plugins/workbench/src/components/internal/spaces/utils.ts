@@ -36,24 +36,24 @@ export function getSpaceName (space: Space, withTitle = true): string {
 }
 
 // Join public space
-export function joinSpace (service: CoreService, s: Space) {
-  service.push(s, null, 'users' as StringProperty, {
-    userId: service.getUserId() as StringProperty,
+export function joinSpace (service: Promise<CoreService>, s: Space): void {
+  service.then(cs => cs.push(s, null, 'users' as StringProperty, {
+    userId: cs.getUserId() as StringProperty,
     owner: false as Property<boolean, boolean>
-  })
+  }))
 }
 
 // Leave public space
-export function leaveSpace (service: CoreService, s: Space) {
-  service.remove(s, {
+export function leaveSpace (service: Promise<CoreService>, s: Space): void {
+  service.then(cs => cs.remove(s, {
     users: {
-      userId: service.getUserId() as StringProperty
+      userId: cs.getUserId() as StringProperty
     }
-  })
+  }))
 }
 
-export function archivedSpaceUpdate (service: CoreService, s: Space, value: boolean) {
-  service.update(s, null, {
+export function archivedSpaceUpdate (service: Promise<CoreService>, s: Space, value: boolean): void {
+  service.then(cs => cs.update(s, null, {
     archived: value as Property<boolean, boolean>
-  })
+  }))
 }

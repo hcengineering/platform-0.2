@@ -14,7 +14,6 @@
   import { onDestroy } from 'svelte'
   import { Class, Obj, Ref } from '@anticrm/core'
   import task, { Task, TaskFieldType, TaskFieldValue } from '../..'
-  import { getCoreService } from '../../utils'
   import UserInfo from '@anticrm/sparkling-controls/src/UserInfo.svelte'
   import StatusLabel from './StatusLabel.svelte'
   import ActionBar from '@anticrm/platform-ui/src/components/ActionBar.svelte'
@@ -22,6 +21,7 @@
   import Comments from '@anticrm/chunter/src/components/Comments.svelte'
   import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.svelte'
   import { CORE_MIXIN_SHORTID, ShortID } from '@anticrm/domains'
+  import { createLiveQuery, getCoreService } from '@anticrm/presentation'
 
   export let _class: Ref<Class<Obj>>
   export let object: Task
@@ -32,10 +32,8 @@
 
   let status: TaskFieldValue | undefined
 
-  const model = coreService.getModel()
-
   // Load and subscribe to any task status values.
-  coreService.subscribe(task.class.TaskFieldValue, {}, (docs) => {
+  createLiveQuery(task.class.TaskFieldValue, {}, (docs) => {
     const fValues: Map<TaskFieldType, TaskFieldValue[]> = new Map()
     for (const d of docs) {
       let val = fValues.get(d.type)
@@ -65,13 +63,15 @@
         acts.push({
           name: s.action,
           action: () => {
-            coreService.update(object, null, { status: s._id })
+            coreService.then(cs => cs.update(object, null, { status: s._id }))
           }
         })
       }
     }
     statusActions = acts
-    taskShortId = model.as(object, CORE_MIXIN_SHORTID)
+    coreService.then(cs => {
+      taskShortId = cs.getModel().as(object, CORE_MIXIN_SHORTID)
+    })
   }
 </script>
 
@@ -82,7 +82,11 @@
                 on:change={() => {coreService.update(object, null, {title: object.title})}} />
   </div>
   <div class="taskStatusBar">
-    <div class="taskName">{taskShortId.shortId}</div>
+    <div class="taskName">
+      {#if taskShortId}
+        {taskShortId.shortId}
+      {/if}
+    </div>
     {#if status}
       <StatusLabel text={status.title} color={status.color} />
     {/if}

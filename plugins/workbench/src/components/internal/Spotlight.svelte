@@ -14,13 +14,13 @@
 -->
 
 <script lang="ts">
-  import { AnyLayout, Property, StringProperty } from '@anticrm/core'
+  import { AnyLayout, StringProperty } from '@anticrm/core'
   import ui from '@anticrm/platform-ui'
 
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import { CORE_CLASS_TITLE, Title } from '@anticrm/domains'
-  import { _getCoreService } from '../../utils'
   import { onDestroy } from 'svelte'
+  import { createLiveQuery, updateLiveQuery } from '@anticrm/presentation'
 
   let query: string
   let result: Title[] = []
@@ -34,12 +34,12 @@
     }
   }
 
-  const update = _getCoreService().subscribe(CORE_CLASS_TITLE, q(query), docs => {
+  const update = createLiveQuery(CORE_CLASS_TITLE, q(query), docs => {
     console.log('search', docs)
     result = docs
   }, onDestroy)
 
-  $: update(CORE_CLASS_TITLE, q(query))
+  $: updateLiveQuery(update, CORE_CLASS_TITLE, q(query))
 </script>
 
 <Icon icon={ui.icon.Search} size="32" />&nbsp;

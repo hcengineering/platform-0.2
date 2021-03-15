@@ -13,46 +13,107 @@
 // limitations under the License.
 //
 
-import { Ref, Class, Obj, Type } from '@anticrm/core'
+import { AnyLayout, Class, Doc, Mixin, Obj, Ref, StringProperty, Type } from '@anticrm/core'
 import { Platform } from '@anticrm/platform'
 import { getContext } from 'svelte'
-import core, { CoreService } from '@anticrm/platform-core'
-import { UIService, CONTEXT_PLATFORM, CONTEXT_PLATFORM_UI, AnyComponent } from '@anticrm/platform-ui'
-import presentation, { PresentationService, ClassModel, GroupModel, AttrModel } from '.'
+import core, { CoreService, QueryUpdater, RefFinalizer, Unsubscriber } from '@anticrm/platform-core'
+import { AnyComponent, CONTEXT_PLATFORM } from '@anticrm/platform-ui'
+import presentationPlugin, { AttrModel, ClassModel, ComponentExtension, GroupModel, PresentationService } from '.'
 import { IntlString } from '@anticrm/platform-i18n'
-
-export function getPlatform (): Platform {
-  return getContext(CONTEXT_PLATFORM) as Platform
-}
+import { VDoc } from '@anticrm/domains'
 
 export function getCoreService (): Promise<CoreService> {
   const platform = getContext(CONTEXT_PLATFORM) as Platform
   return platform.getPlugin(core.id)
 }
-export function _getCoreService (): CoreService {
-  const platform = getContext(CONTEXT_PLATFORM) as Platform
-  return platform.getRunningPlugin(core.id)
-}
-
-export function getUIService (): UIService {
-  return getContext(CONTEXT_PLATFORM_UI) as UIService
-}
 
 export function getPresentationService (): Promise<PresentationService> {
   const platform = getContext(CONTEXT_PLATFORM) as Platform
-  return platform.getPlugin(presentation.id)
+  return platform.getPlugin(presentationPlugin.id)
+}
+
+export function getComponentExtension (_class: Ref<Class<Obj>>, extension: Ref<Mixin<ComponentExtension<VDoc>>>): Promise<AnyComponent | undefined> {
+  return getPresentationService().then(service => service.getComponentExtension(_class, extension))
+}
+
+export function getUserId (): string {
+  const platform = getContext(CONTEXT_PLATFORM) as Platform
+  return platform.getMetadata(core.metadata.WhoAmI) as StringProperty
+}
+
+/**
+ * Perform subscribe to query with some helper finalizer to use
+ * @param _class - a class to perform search against
+ * @param _query - a query to match object.
+ * @param action - callback with list of results.
+ * @param regFinalizer - a factory to register unsubscribe for underline query.
+ * @return a function to re-query with a new parameters for same action.
+ */
+export async function createLiveQuery<T extends Doc> (_class: Ref<Class<T>>, _query: AnyLayout,
+  action: (docs: T[]) => void, regFinalizer: RefFinalizer): Promise<QueryUpdater<T>> {
+  let oldQuery: AnyLayout
+  let oldClass: Ref<Class<T>>
+  let unsubscribe: Unsubscriber
+  regFinalizer(() => {
+    if (unsubscribe) {
+      unsubscribe()
+    }
+  })
+  const coreService = await getCoreService()
+  const result = (newClass: Ref<Class<T>>, newQuery: AnyLayout) => {
+    console.log('QUERY UPDATE', newQuery)
+    if (JSON.stringify(oldQuery) === JSON.stringify(newQuery) && oldClass === newClass) {
+      return
+    }
+    if (unsubscribe) {
+      unsubscribe()
+    }
+    oldQuery = newQuery
+    oldClass = newClass
+    const q = coreService.query(newClass, newQuery)
+    unsubscribe = q.subscribe(action)
+  }
+  try {
+    result(_class, _query)
+  } catch (ex) {
+    console.error(ex)
+  }
+  return Promise.resolve(result)
+}
+
+/**
+ * Perform updating of query, waiting for promise and perform update operation.
+ */
+export function updateLiveQuery<T extends Doc> (qu: Promise<QueryUpdater<T>>, _class: Ref<Class<T>>, query: AnyLayout): void {
+  qu.then((q) => q(_class, query))
 }
 
 export function getEmptyModel (): ClassModel {
   return {
-    getGroups (): GroupModel[] { return [] },
-    getGroup (_class: Ref<Class<Obj>>): GroupModel | undefined { return undefined }, // eslint-disable-line
-    getOwnAttributes (_class: Ref<Class<Obj>>): AttrModel[] { return [] }, // eslint-disable-line
-    getAttributes (): AttrModel[] { return [] },
-    getAttribute (key: string, _class?: Ref<Class<Obj>>): AttrModel | undefined { return undefined }, // eslint-disable-line
-    filterAttributes (keys: string[]): ClassModel { return this }, // eslint-disable-line
-    getPrimary (): AttrModel | undefined { return undefined },
-    filterPrimary (): { model: ClassModel, primary: AttrModel | undefined } { return { model: this, primary: undefined } }
+    getGroups (): GroupModel[] {
+      return []
+    },
+    getGroup (_class: Ref<Class<Obj>>): GroupModel | undefined {
+      return undefined
+    }, // eslint-disable-line
+    getOwnAttributes (_class: Ref<Class<Obj>>): AttrModel[] {
+      return []
+    }, // eslint-disable-line
+    getAttributes (): AttrModel[] {
+      return []
+    },
+    getAttribute (key: string, _class?: Ref<Class<Obj>>): AttrModel | undefined {
+      return undefined
+    }, // eslint-disable-line
+    filterAttributes (keys: string[]): ClassModel {
+      return this
+    }, // eslint-disable-line
+    getPrimary (): AttrModel | undefined {
+      return undefined
+    },
+    filterPrimary (): { model: ClassModel, primary: AttrModel | undefined } {
+      return { model: this, primary: undefined }
+    }
   }
 }
 

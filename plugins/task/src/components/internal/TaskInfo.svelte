@@ -14,7 +14,7 @@
 -->
 <script lang="ts">
   import { Tx } from '@anticrm/core'
-  import { CreateTx, CORE_CLASS_CREATE_TX } from '@anticrm/domains'
+  import { CORE_CLASS_CREATE_TX, CreateTx } from '@anticrm/domains'
   import { Task } from '../..'
 
   export let tx: Tx

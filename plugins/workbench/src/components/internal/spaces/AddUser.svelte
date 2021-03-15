@@ -12,31 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 -->
-<script lang='ts'>
-  import core, { Space } from '@anticrm/core'
-  import { createEventDispatcher, onDestroy } from 'svelte'
-  import { _getCoreService, getPresentationService } from '../../../utils'
-  import { Doc, Property, Ref, StringProperty } from '@anticrm/core'
+<script lang="ts">
+  import { Property, StringProperty } from '@anticrm/core'
+  import { createEventDispatcher } from 'svelte'
 
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import workbench from '@anticrm/workbench'
   import CheckBox from '@anticrm/sparkling-controls/src/CheckBox.svelte'
   import EditBox from '@anticrm/platform-ui/src/components/EditBox.svelte'
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
+  import { Space } from '@anticrm/domains'
+  import { getCoreService } from '@anticrm/presentation'
 
   export let space: Space
   let userName: string = ''
   let isOwner: boolean = false
 
-  const coreService = _getCoreService()
+  const coreService = getCoreService()
   const dispatch = createEventDispatcher()
 
-  const curentUser = coreService.getUserId()
-  const presentationService = getPresentationService()
-
   async function save () {
-
-    coreService.push(space, null, 'users' as StringProperty, {
+    const cs = await coreService
+    await cs.push(space, null, 'users' as StringProperty, {
       userId: userName as StringProperty,
       owner: isOwner as Property<boolean, boolean>
     })
@@ -45,7 +42,7 @@
   }
 </script>
 
-<style lang='scss'>
+<style lang="scss">
   .add-user-space-view {
     width: 364px;
     padding: 24px;
@@ -67,10 +64,12 @@
           flex-direction: column;
           margin-bottom: 20px;
         }
+
         .separator {
           height: 8px;
           margin: 20px 0;
         }
+
         .buttons {
           width: 100%;
           display: flex;
@@ -81,26 +80,26 @@
   }
 </style>
 
-<div class='add-user-space-view'>
-  <div class='header'>
-    <div class='caption-1'>Add user to {space.name}</div>
-    <a href='/' on:click|preventDefault={() => dispatch('close')}>
-      <Icon icon={workbench.icon.Close} button='true' />
+<div class="add-user-space-view">
+  <div class="header">
+    <div class="caption-1">Add user to {space.name}</div>
+    <a href="/" on:click|preventDefault={() => dispatch('close')}>
+      <Icon icon={workbench.icon.Close} button="true" />
     </a>
   </div>
 
-  <div class='content'>
-    <form class='form'>
-      <div class='input-container'>
-        <EditBox id='input__name' bind:value={userName} width='100%'
-                 label='Имя пользователя' />
+  <div class="content">
+    <form class="form">
+      <div class="input-container">
+        <EditBox id="input__name" bind:value={userName} width="100%"
+                 label="Имя пользователя" />
       </div>
       <CheckBox bind:checked={isOwner}>
         Сделать частным
       </CheckBox>
       <div class="separator"></div>
-      <div class='buttons'>
-        <Button size='large' kind='primary' width='164px' on:click={() => save()}>Создать</Button>
+      <div class="buttons">
+        <Button size="large" kind="primary" width="164px" on:click={() => save()}>Создать</Button>
       </div>
     </form>
   </div>

@@ -14,9 +14,8 @@
 -->
 <script lang="ts">
   import { Class, Doc, Ref, RefTo, Type } from '@anticrm/core'
-  import ui, { AttrModel } from '@anticrm/presentation'
-  import { AnyComponent, getRunningService } from '@anticrm/platform-ui'
-  import core from '@anticrm/platform-core'
+  import ui, { AttrModel, createLiveQuery, getCoreService, updateLiveQuery } from '@anticrm/presentation'
+  import { AnyComponent } from '@anticrm/platform-ui'
   import { onDestroy } from 'svelte'
   import Presenter from '../Presenter.svelte'
 
@@ -27,8 +26,8 @@
   let doc: Doc | undefined
   let presenter: AnyComponent
 
-  const coreService = getRunningService(core.id)
-  const update = coreService.subscribe((attribute.type as RefTo<Doc>).to, { _id: value }, (docs) => {
+  const coreService = getCoreService()
+  const update = createLiveQuery((attribute.type as RefTo<Doc>).to, { _id: value }, (docs) => {
     if (docs.length > 0) {
       doc = docs[0]
     } else {
@@ -36,19 +35,20 @@
     }
   }, onDestroy)
 
-  const model = coreService.getModel()
-
   $: {
     const objClass = (attribute.type as RefTo<Doc>).to
-    update(objClass, { _id: value })
+    updateLiveQuery(update, objClass, { _id: value })
 
-    const typeClass = model.get(objClass) as Class<Type>
-    if (!model.isMixedIn(typeClass, ui.mixin.Presenter)) {
-      console.log(new Error(`no presenter for type '${objClass}'`))
-      // Use string presenter
-    } else {
-      presenter = model.as(typeClass, ui.mixin.Presenter).presenter
-    }
+    coreService.then(cs => {
+      const model = cs.getModel()
+      const typeClass = model.get(objClass) as Class<Type>
+      if (!model.isMixedIn(typeClass, ui.mixin.Presenter)) {
+        console.log(new Error(`no presenter for type '${objClass}'`))
+        // Use string presenter
+      } else {
+        presenter = model.as(typeClass, ui.mixin.Presenter).presenter
+      }
+    })
   }
 </script>
 

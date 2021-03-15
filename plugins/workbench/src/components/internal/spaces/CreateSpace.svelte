@@ -15,8 +15,7 @@
 <script lang="ts">
   import { CORE_CLASS_DOC, Property, StringProperty } from '@anticrm/core'
   import { createEventDispatcher } from 'svelte'
-  import { AttrModel, ClassModel } from '@anticrm/presentation'
-  import { _getCoreService, getPresentationService } from '../../../utils'
+  import { AttrModel, ClassModel, getCoreService, getPresentationService } from '@anticrm/presentation'
   import CheckBox from '@anticrm/sparkling-controls/src/CheckBox.svelte'
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
   import EditBox from '@anticrm/platform-ui/src/components/EditBox.svelte'
@@ -32,10 +31,11 @@
   let spaceKey: string = ''
   let spaceKeyChanged: boolean = false
 
-  const coreService = _getCoreService()
   const dispatch = createEventDispatcher()
+  const coreService = getCoreService()
 
   async function save () {
+    const cs = await coreService
     const space = {
       name: title as StringProperty,
       description: description as StringProperty,
@@ -44,12 +44,12 @@
       spaceKey: spaceKey as StringProperty,
       users: [
         {
-          userId: coreService.getUserId() as StringProperty,
+          userId: cs.getUserId() as StringProperty,
           owner: true as Property<boolean, boolean>
         }
       ]
     }
-    await coreService.create(CORE_CLASS_SPACE, space)
+    await cs.create(CORE_CLASS_SPACE, space)
     dispatch('close')
   }
 

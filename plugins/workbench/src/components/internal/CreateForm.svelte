@@ -15,9 +15,10 @@
 <script lang="ts">
   import { Class, Doc, Ref } from '@anticrm/core'
   import { createEventDispatcher } from 'svelte'
-  import { AnyComponent, getPlatform } from '@anticrm/platform-ui'
-  import presentation, { AttrModel, ClassModel } from '@anticrm/presentation'
-  import { _getCoreService, _getPresentationService, getComponentExtension } from '../../utils'
+  import { AnyComponent } from '@anticrm/platform-ui'
+  import presentation, {
+    AttrModel, ClassModel, getComponentExtension, getPresentationService, getCoreService
+  } from '@anticrm/presentation'
   import Properties from '@anticrm/presentation/src/components/internal/Properties.svelte'
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import workbench from '@anticrm/workbench'
@@ -31,24 +32,28 @@
   export let space: Ref<Space>
   let object = {} as any
 
+  const coreService = getCoreService()
+
   let createFormComponent: AnyComponent | undefined = undefined
-  const coreService = _getCoreService()
   const dispatch = createEventDispatcher()
 
   let model: ClassModel | undefined
   let primary: AttrModel | undefined
 
-  const presentationService = _getPresentationService()
+  const presentationService = getPresentationService()
 
-  function save () {
+  async function save () {
     const doc = {
       _class,
       [primary?.key || 'name']: title,
       _space: space, ...object
     }
+
     object = {}
+
     // absent VDoc fields will be autofilled
-    coreService.create(_class, doc)
+    const cs = await coreService
+    await cs.create(_class, doc)
     dispatch('close')
   }
 
@@ -56,11 +61,11 @@
     getComponentExtension(_class, presentation.mixin.CreateForm).then((ext) => {
       createFormComponent = ext
     }),
-    presentationService.getClassModel(_class, CORE_CLASS_VDOC).then((m) => {
+    presentationService.then(ps => ps.getClassModel(_class, CORE_CLASS_VDOC).then((m) => {
       const mp = m.filterPrimary()
       model = mp.model
       primary = mp.primary
-    })])
+    }))])
 </script>
 
 <style lang="scss">

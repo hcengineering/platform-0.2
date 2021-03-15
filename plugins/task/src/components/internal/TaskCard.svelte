@@ -1,6 +1,6 @@
 <script lang="ts">
   import { spring } from 'svelte/motion'
-	import { pannable } from './pannable'
+  import { pannable } from './pannable'
   import { createEventDispatcher } from 'svelte'
 
   export let idCard: Number

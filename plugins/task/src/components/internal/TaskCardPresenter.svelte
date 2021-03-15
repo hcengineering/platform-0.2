@@ -1,5 +1,4 @@
 <script type="ts">
-  import Table from '@anticrm/presentation/src/components/internal/Table.svelte'
   import { Class, Doc, Ref } from '@anticrm/core'
   import { Space } from '@anticrm/domains'
   import TaskCard from './TaskCard.svelte'
@@ -115,7 +114,7 @@
       {#if stat.hidden}
         <a href="/" class="resizer" on:click|preventDefault={() => { changeStat(stat.id) }}>
           <Icon icon={workbench.icon.Resize} button="true" />
-        </a>    
+        </a>
       {/if}
       <div class="status__label" class:sl-mini={stat.hidden}>
         <button class="status__button" class:rotated={stat.hidden} style="background-color: {stat.color}"
