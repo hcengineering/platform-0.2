@@ -20,12 +20,23 @@ module.exports = {
       '**/tsconfig.json',
     ]
   },
-  plugins: ['@typescript-eslint', 'import'],
+  plugins: ['@typescript-eslint', 'import', 'svelte3'],
+  overrides: [
+    {
+      files: ['**/*.svelte'],
+      processor: 'svelte3/svelte3'
+    }
+  ],
   rules: {
     'no-unused-vars': 'off',
     'no-use-before-define': 'off',
     '@typescript-eslint/no-empty-interface': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-unused-vars': ['error']
+  },
+  settings: {
+    'svelte3/typescript': require('typescript'),
+    // Ignore styles since SASS preprocessor is not supported in svelte plugin: https://github.com/sveltejs/eslint-plugin-svelte3/issues/10
+    'svelte3/ignore-styles': () => true
   }
 }
