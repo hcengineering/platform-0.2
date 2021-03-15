@@ -15,14 +15,13 @@
 <script lang="ts">
   import { Property, Ref } from '@anticrm/core'
   import { createEventDispatcher } from 'svelte'
-  import { AttrModel, ClassModel } from '@anticrm/presentation'
+  import { AttrModel, ClassModel, getCoreService, getPresentationService } from '@anticrm/presentation'
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import UserBox from '@anticrm/platform-ui/src/components/UserBox.svelte'
   import workbench from '@anticrm/workbench'
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
   import { CORE_MIXIN_SHORTID, Space } from '@anticrm/domains'
-  import { getCoreService, getPresentationService } from '../../utils'
   import task, { TASK_STATUS_OPEN } from '../../index'
   import EditBox from '@anticrm/platform-ui/src/components/EditBox.svelte'
   import chunter, { Comment, getChunterService } from '@anticrm/chunter'
@@ -43,8 +42,9 @@
   const presentationService = getPresentationService()
 
   async function save () {
-    let modelDb = coreService.getModel()
-    const newTask = modelDb.newDoc(task.class.Task, coreService.generateId(), {
+    const cs = await coreService
+    let modelDb = cs.getModel()
+    const newTask = modelDb.newDoc(task.class.Task, cs.generateId(), {
       title,
       _space: space, ...object,
       status: TASK_STATUS_OPEN,
@@ -52,12 +52,12 @@
         message: message,
         _class: chunter.class.Comment,
         _createdOn: Date.now() as Property<number, Date>,
-        _createdBy: coreService.getUserId() as Property<string, string>
+        _createdBy: cs.getUserId() as Property<string, string>
       } as Comment]
     })
     try {
       const asShortId = modelDb.cast(newTask, CORE_MIXIN_SHORTID)
-      asShortId.shortId = await coreService.genRefId(space)
+      asShortId.shortId = await cs.genRefId(space)
     } catch (e) {
       // Ignore
       console.log(e)
@@ -65,7 +65,7 @@
 
     object = {}
     // absent VDoc fields will be autofilled
-    coreService.create(task.class.Task, newTask)
+    await cs.create(task.class.Task, newTask)
     dispatch('close')
   }
 

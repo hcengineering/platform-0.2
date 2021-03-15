@@ -15,7 +15,7 @@
 
 import { createPlatform } from '@anticrm/platform'
 
-import ui, { routeMeta } from '@anticrm/platform-ui'
+import ui from '@anticrm/platform-ui'
 import core from '@anticrm/platform-core'
 import i18n from '@anticrm/platform-i18n'
 import login from '@anticrm/login'
@@ -26,7 +26,6 @@ import contact from '@anticrm/contact'
 import chunter from '@anticrm/chunter'
 import guidebook from '@anticrm/guidebook'
 // import recruitment from '@anticrm/recruitment'
-
 import uiMeta from '@anticrm/platform-ui/src/__meta__/meta'
 import workbenchMeta from '@anticrm/workbench/src/__meta__'
 import chunterMeta from '@anticrm/chunter/src/__meta__'

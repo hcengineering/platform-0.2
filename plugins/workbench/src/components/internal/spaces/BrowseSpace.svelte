@@ -12,35 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 -->
-<script lang='ts'>
-  import { CORE_CLASS_SPACE, Space, SpaceUser } from '@anticrm/domains'
-  import { createEventDispatcher } from 'svelte'
-  import { getPresentationService, _getCoreService, getCoreService, getUIService } from '../../../utils'
-  import { getSpaceName, getCurrentUserSpace } from './utils'
-  import { onDestroy } from 'svelte'
+<script lang="ts">
+  import { CORE_CLASS_SPACE, Space } from '@anticrm/domains'
+  import { createEventDispatcher, onDestroy } from 'svelte'
+  import { createLiveQuery, getCoreService, getUserId } from '@anticrm/presentation'
+  import { getUIService } from '@anticrm/platform-ui'
+  import { archivedSpaceUpdate, getCurrentUserSpace, getSpaceName, joinSpace, leaveSpace } from './utils'
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
-  import { Doc, Property, Ref, StringProperty } from '@anticrm/core'
+  import { Doc, Ref } from '@anticrm/core'
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import workbench from '@anticrm/workbench'
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
-
-  import { leaveSpace, joinSpace, archivedSpaceUpdate } from './utils'
 
   import CreateSpace from './CreateSpace.svelte'
 
   const dispatch = createEventDispatcher()
 
+  const coreService = getCoreService()
   const uiService = getUIService()
 
   let spaces: Space[ ] = []
   let filter: string
   let hoverSpace: Ref<Doc>
 
-  const coreService = _getCoreService()
-  const presentationService = getPresentationService()
+  const curentUser = getUserId()
 
-  const curentUser = coreService.getUserId()
-  coreService.subscribe(CORE_CLASS_SPACE, {}, (docs) => {
+  createLiveQuery(CORE_CLASS_SPACE, {}, (docs) => {
     spaces = docs
   }, onDestroy)
 
@@ -98,10 +95,10 @@
         </div>
       {/each}
     </ScrollView>
-</div>
+  </div>
 </div>
 
-<style lang='scss'>
+<style lang="scss">
   .space-browse-view {
     width: 412px;
     padding: 24px;

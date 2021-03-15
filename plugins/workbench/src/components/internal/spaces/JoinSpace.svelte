@@ -16,7 +16,7 @@
   import BrowseSpace from './BrowseSpace.svelte'
   import CreateSpace from './CreateSpace.svelte'
   import SimplePopup from '@anticrm/presentation/src/components/SimplePopup.svelte'
-  import { getUIService } from '../../../utils'
+  import { getUIService } from '@anticrm/platform-ui'
 
   const uiService = getUIService()
 

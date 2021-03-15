@@ -13,8 +13,6 @@
   // limitations under the License.
 
   import { onDestroy } from 'svelte'
-  import core from '@anticrm/platform-core'
-  import { getRunningService } from '@anticrm/platform-ui'
   import { Property, StringProperty } from '@anticrm/core'
   import chunter, { Collab, getChunterService } from '../index'
 
@@ -22,33 +20,33 @@
   import CommentComponent from './internal/Comment.svelte'
   import Backlink from './internal/Backlink.svelte'
   import { CORE_CLASS_REFERENCE, Reference } from '@anticrm/domains'
+  import { createLiveQuery, getCoreService, getUserId, updateLiveQuery } from '@anticrm/presentation'
 
   export let object: Collab
 
   let references: Reference[] = []
 
-  const coreService = getRunningService(core.id)
-  const refS = coreService.subscribe(CORE_CLASS_REFERENCE, { _targetId: object._id }, (docs) => {
+  const refS = createLiveQuery(CORE_CLASS_REFERENCE, { _targetId: object._id }, (docs) => {
     references = docs
   }, onDestroy)
 
   $: {
     if (object) {
-      refS(CORE_CLASS_REFERENCE, { _targetId: object._id })
+      updateLiveQuery(refS, CORE_CLASS_REFERENCE, { _targetId: object._id })
     }
   }
 
   const chunterService = getChunterService()
-
+  const coreService = getCoreService()
   async function createComment (message: any): Promise<void> {
     const parsedMessage = (await chunterService).createMissedObjects(message)
     const comment = {
       _class: chunter.class.Comment,
       _createdOn: Date.now() as Property<number, Date>,
-      _createdBy: coreService.getUserId() as Property<string, string>,
+      _createdBy: (await coreService).getUserId() as Property<string, string>,
       message: parsedMessage as StringProperty
     }
-    await coreService.push(object, null, 'comments' as StringProperty, comment)
+    await (await coreService).push(object, null, 'comments' as StringProperty, comment)
   }
 </script>
 

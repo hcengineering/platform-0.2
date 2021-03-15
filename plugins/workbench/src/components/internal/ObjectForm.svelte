@@ -11,12 +11,11 @@
   //
   // See the License for the specific language governing permissions and
   // limitations under the License.
-  import { AnyLayout, Class, Doc, Ref } from '@anticrm/core'
+  import { Class, Doc, Ref } from '@anticrm/core'
   import { AnyComponent } from '@anticrm/platform-ui'
   import Component from '@anticrm/platform-ui/src/components/Component.svelte'
-  import presentation from '@anticrm/presentation'
+  import presentation, { createLiveQuery, getComponentExtension, updateLiveQuery } from '@anticrm/presentation'
   import { createEventDispatcher, onDestroy } from 'svelte'
-  import { _getCoreService, getComponentExtension } from '../../utils'
 
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import workbench from '../..'
@@ -29,17 +28,15 @@
   let object: Doc | undefined
   let counter = 0
 
-  let queryUpdate: (_class: Ref<Class<Doc>>, query: AnyLayout) => void
-
-  const coreService = _getCoreService()
-
-  queryUpdate = coreService.subscribe(_class, { _id: _objectId }, (docs) => {
+  let queryUpdate = createLiveQuery(_class, { _id: _objectId }, (docs) => {
+    console.log("OBJ", docs)
     object = docs.length > 0 ? docs[0] : undefined
   }, onDestroy)
 
   let component: AnyComponent
   $: {
-    queryUpdate(_class, { _id: _objectId })
+    console.log("QUPDATE", _class, _objectId)
+    updateLiveQuery(queryUpdate, _class, { _id: _objectId })
 
     getComponentExtension(_class, presentation.mixin.DetailForm).then((ext) => {
       if (component !== ext) {

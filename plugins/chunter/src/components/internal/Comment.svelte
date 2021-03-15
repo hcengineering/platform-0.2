@@ -16,11 +16,13 @@
   import { Comment } from '../..'
   import MessageViewer from '@anticrm/presentation/src/components/MessageViewer.svelte'
   import { Ref } from '@anticrm/core'
+  import { Asset } from '@anticrm/platform-ui'
 
   export let message: Comment
 
   let username: string
   let timestamp: string = new Date(message._createdOn).toLocaleString()
+  let avatar: Promise<Asset>
 
   $: avatar = getContactService().then((service) => {
     return service.getUser(message._createdBy).then((user) => {

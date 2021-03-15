@@ -10,7 +10,8 @@
     "lint": "eslint src"
   },
   "dependencies": {
-    "@anticrm/platform": "^0.2.0"
+    "@anticrm/platform": "^0.2.0",
+    "@anticrm/presentation": "^0.2.0"
   },
   "devDependencies": {
     "typescript": "^3.9.4",

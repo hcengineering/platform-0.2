@@ -102,7 +102,6 @@ export interface Platform {
   addLocation<P extends Service, X extends PluginDependencies> (plugin: PluginDescriptor<P, X>, module: PluginModule<P, X>): void
   resolveDependencies (id: Plugin<any>, deps: PluginDependencies): Promise<{ [key: string]: Service }>
   getPlugin<T extends Service> (id: Plugin<T>): Promise<T>
-  getRunningPlugin<T extends Service> (id: Plugin<T>): T
 
   getResource<T> (resource: Resource<T>): Promise<T>
   setResource<T> (resource: Resource<T>, value: T): void
@@ -288,12 +287,6 @@ export function createPlatform (): Platform {
     return service
   }
 
-  function getRunningPlugin<T extends Service> (id: Plugin<T>): T {
-    const service = running.get(id)
-    if (service) return service as T
-    throw new Error('plugin not running: ' + id)
-  }
-
   async function resolveDependencies (parentId: Plugin<any>, deps: PluginDependencies): Promise<{ [key: string]: Service }> {
     const result = {} as { [key: string]: Service }
     for (const key in deps) {
@@ -311,7 +304,6 @@ export function createPlatform (): Platform {
     addLocation,
     resolveDependencies,
     getPlugin,
-    getRunningPlugin,
 
     getResource,
     setResource,

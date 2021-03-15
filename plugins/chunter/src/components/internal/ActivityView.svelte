@@ -16,19 +16,18 @@
   import { Ref, Tx } from '@anticrm/core'
   import { onDestroy } from 'svelte'
   import { WorkbenchApplication } from '@anticrm/workbench'
-  import { Space, CORE_CLASS_CREATE_TX } from '@anticrm/domains'
+  import { CORE_CLASS_CREATE_TX, Space } from '@anticrm/domains'
 
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
   import ActivityItem from './ActivityItem.svelte'
-  import { getRunningService } from '@anticrm/platform-ui'
-  import core from '@anticrm/platform-core'
+  import { createLiveQuery } from '@anticrm/presentation'
 
   export let application: Ref<WorkbenchApplication>
   export let space: Ref<Space>
 
   let objects: Tx[] = []
 
-  getRunningService(core.id).subscribe(CORE_CLASS_CREATE_TX, {}, (docs) => {
+  createLiveQuery(CORE_CLASS_CREATE_TX, {}, (docs) => {
     objects = docs
   }, onDestroy)
 

@@ -13,14 +13,13 @@
 // limitations under the License.
 //
 
-import { Platform, Plugin, plugin, Service } from '@anticrm/platform'
-import { Class, Mixin, Obj, Doc, Ref, Type, Emb } from '@anticrm/core'
+import { Plugin, plugin, Service } from '@anticrm/platform'
+import { Class, Doc, Emb, Mixin, Obj, Ref, Type } from '@anticrm/core'
 import { VDoc } from '@anticrm/domains'
 
 import core from '@anticrm/platform-core'
 import i18n, { IntlString } from '@anticrm/platform-i18n'
-import { AnyComponent, Asset, CONTEXT_PLATFORM, Document } from '@anticrm/platform-ui'
-import { getContext } from 'svelte'
+import { AnyComponent, Asset, Document } from '@anticrm/platform-ui'
 
 // U I  E X T E N S I O N S
 
@@ -185,11 +184,4 @@ const presentationPlugin = plugin('presentation' as Plugin<PresentationService>,
 
 export default presentationPlugin
 
-export function getPresentationService (): Promise<PresentationService> {
-  const platform = getContext(CONTEXT_PLATFORM) as Platform
-  return platform.getPlugin(presentationPlugin.id)
-}
-
-export function getComponentExtension (_class: Ref<Class<Obj>>, extension: Ref<Mixin<ComponentExtension<VDoc>>>): Promise<AnyComponent | undefined> {
-  return getPresentationService().then(service => service.getComponentExtension(_class, extension))
-}
+export * from './utils'
