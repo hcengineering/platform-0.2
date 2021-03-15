@@ -22,7 +22,7 @@ import { IntlMessageFormat, PrimitiveType } from 'intl-messageformat'
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */
-export default async (platform: Platform): Promise<I18n> => {
+export default (platform: Platform): Promise<I18n> => {
   const strings: Map<IntlString, string> = new Map()
   const imfCache: Map<IntlString, IntlMessageFormat> = new Map()
 
@@ -32,10 +32,10 @@ export default async (platform: Platform): Promise<I18n> => {
     }
   }
 
-  async function translate (string: IntlString, params?: Record<string, PrimitiveType> | undefined): Promise<string> {
+  function translate (string: IntlString, params?: Record<string, PrimitiveType> | undefined): Promise<string> {
     const translation = strings.get(string)
     if (!translation) {
-      return string
+      return Promise.resolve(string)
     }
     if (params) {
       let imf = imfCache.get(string)
@@ -43,9 +43,9 @@ export default async (platform: Platform): Promise<I18n> => {
         imf = new IntlMessageFormat(translation, 'ru-RU')
         imfCache.set(string, imf)
       }
-      return imf.format(params) as string
+      return Promise.resolve(imf.format(params) as string)
     }
-    return translation
+    return Promise.resolve(translation)
   }
 
   const meta = platform.getMetadata(i18n.metadata.Strings)
@@ -53,8 +53,8 @@ export default async (platform: Platform): Promise<I18n> => {
     loadStrings(meta)
   }
 
-  return {
+  return Promise.resolve({
     loadStrings,
     translate
-  }
+  })
 }

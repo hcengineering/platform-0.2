@@ -35,7 +35,7 @@ import ArrayPresenter from './components/internal/presenters/value/ArrayPresente
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */
-export default async (platform: Platform, deps: { core: CoreService, i18n: I18n }): Promise<PresentationService> => {
+export default (platform: Platform, deps: { core: CoreService, i18n: I18n }): Promise<PresentationService> => {
   const coreService = deps.core
   const i18nService = deps.i18n
 
@@ -286,8 +286,8 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
     return undefined
   }
 
-  return {
+  return Promise.resolve({
     getClassModel,
     getComponentExtension
-  }
+  })
 }

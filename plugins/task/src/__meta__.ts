@@ -19,7 +19,7 @@ import task from '..'
 export default (platform: Platform) => {
   const spritesUrl = require('../assets/icons.svg') // eslint-disable-line
   platform.loadMetadata(task.icon, {
-    Task: spritesUrl + '#task',
-    ArrowDown: spritesUrl + '#arrowDown'
+    Task: `${spritesUrl}#task`,
+    ArrowDown: `${spritesUrl}#arrowDown`
   })
 }

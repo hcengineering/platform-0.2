@@ -21,15 +21,15 @@ export default (platform: Platform) => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const spritesUrl = require('../assets/icons.svg')
   platform.loadMetadata(workbench.icon, {
-    DefaultPerspective: spritesUrl + '#perspective',
-    Add: spritesUrl + '#add',
-    Resize: spritesUrl + '#resize',
-    Close: spritesUrl + '#close',
-    Finder: spritesUrl + '#finder',
-    Lock: spritesUrl + '#lock',
-    Sharp: spritesUrl + '#sharp',
-    Burger: spritesUrl + '#burger',
-    ArrowDown: spritesUrl + '#arrowDown'
+    DefaultPerspective: `${spritesUrl}#perspective`,
+    Add: `${spritesUrl}#add`,
+    Resize: `${spritesUrl}#resize`,
+    Close: `${spritesUrl}#close`,
+    Finder: `${spritesUrl}#finder`,
+    Lock: `${spritesUrl}#lock`,
+    Sharp: `${spritesUrl}#sharp`,
+    Burger: `${spritesUrl}#burger`,
+    ArrowDown: `${spritesUrl}#arrowDown`
   })
 
   platform.setMetadata(routeMeta('workbench'), { route: 'workbench', component: workbench.component.Workbench })

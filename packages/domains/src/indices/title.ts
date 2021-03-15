@@ -24,9 +24,9 @@ import {
 const NULL = '<null>'
 
 export class TitleIndex implements DomainIndex {
-  private modelDb: Model
-  private storage: Storage
-  private primaries = new Map<Ref<Classifier<Doc>>, string>()
+  private readonly modelDb: Model
+  private readonly storage: Storage
+  private readonly primaries = new Map<Ref<Classifier<Doc>>, string>()
 
   constructor (modelDb: Model, storage: Storage) {
     this.modelDb = modelDb

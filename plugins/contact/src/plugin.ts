@@ -29,7 +29,7 @@ import { UIService, Asset } from '@anticrm/platform-ui'
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */
-export default async (platform: Platform, deps: { core: CoreService, ui: UIService }): Promise<ContactService> => {
+export default (platform: Platform, deps: { core: CoreService, ui: UIService }): Promise<ContactService> => {
   // platform.setResource(contact.component.PersonProperties, PersonProperties)
   // platform.setResource(contact.component.UserLookup, UserLookup)
   // platform.setResource(contact.component.LoginWidget, LoginWidget)
@@ -67,5 +67,5 @@ export default async (platform: Platform, deps: { core: CoreService, ui: UIServi
   // deps.ui.getApp()
   //   .provide(ContactServiceInjectionKey, service)
 
-  return service
+  return Promise.resolve(service)
 }

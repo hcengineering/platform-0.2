@@ -82,12 +82,12 @@ export interface ApplicationRouter<T> {
 }
 
 export class Router<T> implements ApplicationRouter<T> {
-  private pattern: string
+  private readonly pattern: string
   private segments: string[] = []
   private queryNames: string[] = []
   private fragmentName = ''
 
-  private parentRouter: Router<any> | undefined
+  private readonly parentRouter: Router<any> | undefined
   private childRouter: Router<any> | undefined
 
   private rawLocation: Location | undefined // current location
@@ -100,7 +100,7 @@ export class Router<T> implements ApplicationRouter<T> {
 
   private matched = false
 
-  private doNavigate: ((newLoc: Location) => void) | undefined
+  private readonly doNavigate: ((newLoc: Location) => void) | undefined
 
   constructor (pattern: string, parent: Router<any> | undefined = undefined, defaults: T | undefined = undefined, doNavigate: ((newLoc: Location) => void) | undefined = undefined) {
     this.pattern = pattern
