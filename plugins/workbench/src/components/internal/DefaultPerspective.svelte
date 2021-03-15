@@ -46,13 +46,12 @@
 
   const currentUser = coreService.getUserId()
 
-  let space: Space
+  let space: Space | undefined
   let spaces: Space[] = []
 
   let application: WorkbenchApplication
   let applications: WorkbenchApplication[] = []
 
-  let component: AnyComponent | undefined
   let details: CoreDocument | undefined
 
   interface WorkbenchRouteInfo {
@@ -67,13 +66,12 @@
     } as WorkbenchRouteInfo
   }
 
-  const router = newRouter<WorkbenchRouteInfo>(':space/:app', (info) => {
+  const router = newRouter<WorkbenchRouteInfo>(':app?space', (info) => {
     if (spaces.length > 0) {
-      space = spaces.find((s) => (s._id === info.space as Ref<Space>) || s.spaceKey === info.space) || spaces[0]
+      space = spaces.find((s) => (s._id === info.space as Ref<Space>) || s.spaceKey === info.space)
     }
     if (applications.length > 0) {
       application = applications.find((a) => (a._id === info.app || a.route === info.app || a.label === info.app)) || applications[0]
-      component = application?.component
     }
   }, routeDefaults())
 
@@ -151,6 +149,7 @@
   })
 
   coreService.subscribe(CORE_CLASS_SPACE, {}, (docs) => {
+    console.log('SPACES!!!', docs)
     spaces = docs.filter((s) => getCurrentUserSpace(currentUser, s))
     router.setDefaults(routeDefaults())
   }, onDestroy)
@@ -167,6 +166,10 @@
   let addButton: HTMLElement
 
   let hidden = true
+
+  function appSpaces (spaces: Space[], app: WorkbenchApplication): Space[] {
+    return spaces.filter((sp) => sp.application === app._id)
+  }
 </script>
 
 <style lang="scss">
@@ -283,14 +286,46 @@
     background-color: var(--theme-bg-color);
     border-left: 1px solid var(--theme-bg-accent-color);
   }
+
+  .app-selector {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+
+    .nav-link {
+      flex-grow: 1;
+    }
+
+    .selected {
+      color: var(--theme-userlink-color);
+    }
+
+    .labeled-icon {
+      display: flex;
+
+      span {
+        margin-left: 0.5em;
+      }
+    }
+
+    margin-bottom: 0.5em;
+  }
+
+  .application-box {
+    margin: 1em;
+
+    .content {
+      margin-left: 1em;
+    }
+  }
 </style>
 
 <div class="workbench-perspective">
   <nav>
     <div class="app-icon">
       {#each applications as app}
-        <LinkTo on:click={router.navigate({app: app.route})}>
-          <div class={( app._id === application._id) ? 'selectedApp' : 'iconApp'}>
+        <LinkTo on:click={() => router.navigate({app: app.route})}>
+          <div class="iconApp">
             <Icon icon={app.icon} size="24" />
           </div>
         </LinkTo>
@@ -304,37 +339,65 @@
     </a>
     <div class="container" class:hidden={!hidden}>
       <div class="caption-3">
-        Spaces
+        Applications
       </div>
-      {#each spaces as s (s._id)}
-        {#if !s.archived}
-          <LinkTo on:click={router.navigate({ space: s.spaceKey })}>
-            <SpaceItem selected={s._id === space._id} space={s} />
-          </LinkTo>
-        {/if}
+      {#each applications as app}
+        <div class="application-box">
+          <div class="app-selector">
+            <div class="nav-link" class:selected={( app._id === application._id)}>
+              <LinkTo on:click={() => router.navigate({app: app.route, space: undefined})}>
+                <div class="labeled-icon">
+                  <Icon icon={app.icon} size="16" />
+                  <span> {app.label}</span>
+                </div>
+              </LinkTo>
+            </div>
+            {#if app._id === application._id && app.supportSpaces}
+              <PopupMenu>
+                <div class="popup" slot="trigger">
+                  <Icon icon={ui.icon.Add} button="true" />
+                </div>
+                <PopupItem on:click={() => {
+              uiService.showModal(CreateSpace, {application: app})
+            }}>Create
+                </PopupItem>
+                <PopupItem on:click={() => {
+              uiService.showModal(BrowseSpace, {application: app})
+            }}>Browse
+                </PopupItem>
+              </PopupMenu>
+            {/if}
+          </div>
+          <div class="content">
+            {#each appSpaces(spaces, app) as s (s._id)}
+              {#if !s.archived}
+                <LinkTo on:click={() => router.navigate({ app: app.route, space: s.spaceKey })}>
+                  <SpaceItem selected={space && s._id === space._id} space={s} />
+                </LinkTo>
+              {/if}
+            {/each}
+          </div>
+        </div>
       {/each}
-      <div class="footContainer">
-        <span>
-          <PopupMenu>
-            <div class="popup" slot="trigger"><Icon icon={ui.icon.Add} button="true" /></div>
-            <PopupItem on:click={() => {
-              uiService.showModal(CreateSpace, {})
-            }}>Create</PopupItem>
-            <PopupItem on:click={() => {
-              uiService.showModal(BrowseSpace, {})
-            }}>Browse</PopupItem>
-          </PopupMenu>
-        </span>
-      </div>
     </div>
   </div>
 
   <div bind:this={prevDiv} class="main">
-    {#if component && space && application}
+    {#if space && application && application.component}
       <MainComponent
-        is={component}
+        is={application.component}
         {application}
         {space}
+        on:open={(e) => navigateDocument({ _class: e.detail._class, _id: e.detail._id })} />
+    {:else if application && application.rootComponent}
+      <MainComponent
+        is={application.rootComponent}
+        {application}
+        on:open={(e) => navigateDocument({ _class: e.detail._class, _id: e.detail._id })} />
+    {:else}
+      <MainComponent
+        is={workbench.component.ApplicationDashboard}
+        {application}
         on:open={(e) => navigateDocument({ _class: e.detail._class, _id: e.detail._id })} />
     {/if}
   </div>

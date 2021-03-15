@@ -21,8 +21,10 @@
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
   import EditBox from '@anticrm/platform-ui/src/components/EditBox.svelte'
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
-  import workbench from '@anticrm/workbench'
+  import workbench, { WorkbenchApplication } from '@anticrm/workbench'
   import { CORE_CLASS_SPACE } from '@anticrm/domains'
+
+  export let application: WorkbenchApplication
 
   let makePrivate: boolean = false
   let title: string = ''
@@ -37,6 +39,7 @@
     const space = {
       name: title as StringProperty,
       description: description as StringProperty,
+      application: application._id,
       isPublic: !makePrivate as Property<boolean, boolean>,
       spaceKey: spaceKey as StringProperty,
       users: [
@@ -124,7 +127,7 @@
 
 <div class="space-view">
   <div class="header">
-    <div class="caption-1">Новое {(makePrivate) ? 'частное ' : ''}пространство</div>
+    <div class="caption-1">Create {(makePrivate) ? 'private ' : ''} {application.spaceTitle}</div>
     <a href="/" on:click|preventDefault={() => dispatch('close')}>
       <Icon icon={workbench.icon.Close} button="true" />
     </a>
@@ -134,19 +137,20 @@
     <form class="form">
       <div class="input-container">
         <EditBox id="create_space__input__name" bind:value={title} width="100%"
-                 label="Имя" placeholder="Пространство вседозволенности" on:change={updateSpaceKey} />
+                 label="Name" placeholder={`A ${application.spaceTitle} Name`} on:change={updateSpaceKey} />
       </div>
       <div class="input-container">
         <EditBox id="create_space__input__shortId" bind:value={spaceKey} width="100%"
-                 label="Space Key" placeholder="A space Key (will be used with short ids)"
+                 label={application.spaceTitle + ' Key'}
+                 placeholder={`A ${application.spaceTitle} Key (will be used with short ids)`}
                  on:change={() => spaceKeyChanged = true} />
       </div>
       <div class="input-container">
         <EditBox id="create_space__input__description" bind:value={description} width="100%"
-                 label="Описание" placeholder="Владелец: Сергей Никифоров" />
+                 label="Description" placeholder={`Write a ${application.spaceTitle} description`} />
       </div>
       <CheckBox bind:checked={makePrivate}>
-        Сделать частным пространством
+        Create a private {application.spaceTitle}
       </CheckBox>
       <div class="separator"></div>
       <div class="buttons">

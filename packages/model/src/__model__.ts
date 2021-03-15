@@ -15,7 +15,9 @@
 
 import core, { ArrayOf$, Builder, Class$, InstanceOf$, Mixin$, Primary, Prop, RefTo$ } from '.'
 
-import { Classifier, DateProperty, Doc, MODEL_DOMAIN, Ref, SPACE_DOMAIN, StringProperty, Type } from '@anticrm/core'
+import {
+  Classifier, DateProperty, Doc, Emb, MODEL_DOMAIN, Ref, SPACE_DOMAIN, StringProperty, Type
+} from '@anticrm/core'
 
 import { Application, ShortID, Space, SpaceUser, Title, TITLE_DOMAIN, TitleSource, VDoc } from '@anticrm/domains'
 
@@ -57,6 +59,9 @@ export class TSpace extends TDoc implements Space {
   @Prop() name!: string
 
   @Prop() description!: string
+
+  @RefTo$(core.class.Application) application!: Ref<Application>
+  @InstanceOf$(core.class.Emb) applicationSettings?: Emb
 
   @Prop() spaceKey!: string
 
