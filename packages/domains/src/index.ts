@@ -60,9 +60,18 @@ export interface SpaceUser extends Emb {
 
 export const CORE_CLASS_SPACE = 'class:core.Space' as Ref<Class<Space>>
 
+/**
+ * Define an application descriptor.
+ */
+export interface Application extends Doc {
+}
+
 export interface Space extends Doc {
   name: string // a space name
   description: string // a space optional description.
+
+  application: Ref<Application> // An application space is belong to.
+  applicationSettings?: Emb // Some custom application settings.
 
   spaceKey: string // A space shortId prefix.
 
@@ -72,9 +81,6 @@ export interface Space extends Doc {
 }
 
 // V D O C
-
-export interface Application extends Doc {
-}
 
 export interface List extends Emb {
   id: string

@@ -156,7 +156,9 @@ export function model (S: Builder): void {
     label: 'Tasks' as StringProperty,
     icon: task.icon.Task,
     component: workbench.component.Application,
-    classes: [task.class.Task]
+    classes: [task.class.Task],
+    supportSpaces: true,
+    spaceTitle: 'Project'
   }, task.application.Task)
 
   S.mixin(task.class.Task, presentation.mixin.DetailForm, {

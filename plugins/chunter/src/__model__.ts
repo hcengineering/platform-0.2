@@ -92,8 +92,9 @@ export function model (S: Builder): void {
     route: 'activity',
     label: 'Activity' as IntlString,
     icon: chunter.icon.ActivityView,
-    component: chunter.component.ActivityView,
-    classes: []
+    rootComponent: chunter.component.ActivityView,
+    classes: [],
+    supportSpaces: false
   }, chunter.application.Activity)
 
   S.createDocument(workbench.class.WorkbenchApplication, {
@@ -101,7 +102,9 @@ export function model (S: Builder): void {
     label: 'Chat' as IntlString,
     icon: chunter.icon.ChatView,
     component: chunter.component.ChatView,
-    classes: []
+    classes: [],
+    spaceTitle: 'Channel',
+    supportSpaces: true
   }, chunter.application.Chat)
 
   S.createDocument(workbench.class.WorkbenchApplication, {
@@ -109,7 +112,9 @@ export function model (S: Builder): void {
     label: 'Pages' as IntlString,
     icon: chunter.icon.PagesView,
     component: workbench.component.Application,
-    classes: [chunter.class.Page]
+    classes: [chunter.class.Page],
+    spaceTitle: 'Folder',
+    supportSpaces: true
   }, chunter.application.Pages)
 
   S.mixin(chunter.class.Page, presentation.mixin.DetailForm, {
@@ -123,4 +128,34 @@ export function model (S: Builder): void {
   S.mixin(core.class.Space, chunter.mixin.ActivityInfo, {
     component: chunter.component.SpaceInfo
   })
+
+  S.createDocument(core.class.Space, {
+    name: 'General',
+    description: 'General channel',
+    application: chunter.application.Chat,
+    isPublic: true, // Available for all
+    archived: false,
+    spaceKey: 'GEN',
+    users: []
+  }, workbench.space.General)
+
+  S.createDocument(core.class.Space, {
+    name: 'Other',
+    description: 'Other space',
+    application: chunter.application.Chat,
+    isPublic: true,
+    spaceKey: 'OVR',
+    archived: false,
+    users: []
+  }, workbench.space.Random)
+
+  S.createDocument(core.class.Space, {
+    name: 'Home',
+    description: 'Pages home',
+    application: chunter.application.Pages,
+    isPublic: true,
+    spaceKey: 'RAND',
+    archived: false,
+    users: []
+  }, workbench.space.Other)
 }
