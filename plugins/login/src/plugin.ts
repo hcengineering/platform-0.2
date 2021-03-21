@@ -23,6 +23,7 @@ import login, { ACCOUNT_KEY, LoginInfo, LoginService } from '.'
 
 import LoginForm from './components/LoginForm.svelte'
 import SettingForm from './components/SettingForm.svelte'
+import MainLoginForm from './components/MainLoginForm.svelte'
 import { PlatformStatusCodes } from '@anticrm/foundation'
 import FingerprintJS from '@fingerprintjs/fingerprintjs'
 
@@ -39,6 +40,7 @@ export default async (platform: Platform, deps: { ui: UIService }): Promise<Logi
     throw new Status(Severity.ERROR, 0, 'no accounts server metadata provided.')
   }
   platform.setResource(login.component.LoginForm, LoginForm)
+  platform.setResource(login.component.MainLoginForm, MainLoginForm)
   platform.setResource(login.component.SettingForm, SettingForm)
 
   // platform.setResource(login.component.SignupForm, SignupForm)
@@ -83,20 +85,13 @@ export default async (platform: Platform, deps: { ui: UIService }): Promise<Logi
     }
   }
 
-  async function navigateProfileSetting (): Promise<void> {
-    const settingApp = platform.getMetadata(uiPlugin.metadata.SettingApplication)
-    if (settingApp) {
-      uiService.navigateJoin([settingApp], undefined, undefined)
-    }
-  }
-
   async function navigateLoginForm (): Promise<void> {
     const loginApp = platform.getMetadata(uiPlugin.metadata.LoginApplication)
     if (loginApp) {
       uiService.navigateJoin([loginApp], undefined, undefined)
     }
   }
-
+  
   async function saveSetting (password: string, newPassword: string, secondFactorEnabled:boolean, clientSecret: string, secondFactorCode: string): Promise<Status> {
     const loginInfo = await getLoginInfo()
     if (!loginInfo) return new Status(Severity.ERROR, 0, 'Необходимо авторизоваться')
@@ -119,8 +114,6 @@ export default async (platform: Platform, deps: { ui: UIService }): Promise<Logi
       }
       if (result.result) {
         setLoginInfo(result.result)
-
-        navigateLoginForm()
       }
       return new Status(Severity.OK, 0, '')
     } catch (err) {
@@ -176,7 +169,6 @@ export default async (platform: Platform, deps: { ui: UIService }): Promise<Logi
     doLogout,
     getLoginInfo,
     navigateApp,
-    navigateProfileSetting,
     navigateLoginForm,
     saveSetting
   }

@@ -19,12 +19,12 @@ import { Metadata, plugin, Plugin, Service, Status } from '@anticrm/platform'
 import ui, { AnyComponent } from '@anticrm/platform-ui'
 
 export interface LoginInfo {
-    email: string
-    workspace: string
-    server: string
-    port: string
-    token: string
-    secondFactorEnabled: boolean
+  email: string
+  workspace: string
+  server: string
+  port: string
+  token: string
+  secondFactorEnabled: boolean
 }
 
 export const ACCOUNT_KEY = 'anticrm-account'
@@ -35,46 +35,42 @@ export function currentAccount (): LoginInfo | null {
 }
 
 export interface LoginService extends Service {
-    /**
-     * Perform a login operation to required workspace with user credentials.
-     */
-    doLogin (username: string, password: string, workspace: string, secondFactorCode: string): Promise<Status>
+  /**
+   * Perform a login operation to required workspace with user credentials.
+   */
+  doLogin (username: string, password: string, workspace: string, secondFactorCode: string): Promise<Status>
 
-    /**
-     * Check and auto return login information if available.
-     */
-    getLoginInfo (): Promise<LoginInfo | undefined>
+  /**
+   * Check and auto return login information if available.
+   */
+  getLoginInfo (): Promise<LoginInfo | undefined>
 
-    /**
-     * Do navigate to default application if defined.
-     */
-    navigateApp (): void
+  /**
+   * Do navigate to default application if defined.
+   */
+  navigateApp (): void
 
-    /**
-    * Do navigate to user profile settings
-    */
-    navigateProfileSetting (): void
+  /**
+  * Do navigate to login form
+  */
+  navigateLoginForm (): void
 
-    /**
-    * Do navigate to login form
-    */
-    navigateLoginForm (): void
+  /**
+  * Save profile settings
+  */
+  saveSetting (password: string, newPassword: string, secondFactorEnabled:boolean, clientSecret: string, secondFactorCode: string): Promise<Status>
 
-    /**
-    * Save profile settings
-    */
-    saveSetting (password: string, newPassword: string, secondFactorEnabled:boolean, clientSecret: string, secondFactorCode: string): Promise<Status>
-
-    /**
-     * Do logout from current logged in account
-     */
-    doLogout (): Promise<void>
+  /**
+   * Do logout from current logged in account
+   */
+  doLogout (): Promise<void>
 }
 
 const login = plugin('login' as Plugin<LoginService>, { ui: ui.id }, {
   component: {
     LoginForm: '' as AnyComponent,
     SettingForm: '' as AnyComponent,
+    MainLoginForm: '' as AnyComponent,
     SignupForm: '' as AnyComponent
   },
   metadata: {

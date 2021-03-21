@@ -1,11 +1,24 @@
+// Copyright © 2020 Anticrm Platform Contributors.
+//
+// Licensed under the Eclipse Public License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License. You may
+// obtain a copy of the License at https://www.eclipse.org/legal/epl-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//
+// See the License for the specific language governing permissions and
+// limitations under the License.
 <script lang="ts">
   import { Platform, Severity, Status } from '@anticrm/platform'
   import { getContext } from 'svelte'
   import login from '..'
-
   import CheckBox from '@anticrm/sparkling-controls/src/CheckBox.svelte'
+  import { ApplicationRoute, ApplicationRouter } from '@anticrm/platform-ui';
   const twofactor = require("node-2fa");
-
+  
+  export let router: ApplicationRouter<ApplicationRoute>;
   let object = { oldPassword: '', newPassword: '', newPasswordConfirm: '', clientSecret: '', secondFactorCode: '' }
   let changePassword = false;
   let status = new Status(Severity.OK, 0, '')
@@ -27,8 +40,8 @@
     });
   })
 
-  async function cancelSaveSetting(): Promise<void> {
-    (await loginService).navigateLoginForm()
+  async function navigateLoginForm(): Promise<void> {
+    router.navigate({route: ''})
   }
   
   $: description = status.message
@@ -57,6 +70,7 @@
     status = new Status(Severity.INFO, 0, 'Соединяюсь с сервером...');
 
     status = await (await loginService).saveSetting(object.oldPassword, object.newPassword, secondFactorEnabled, object.clientSecret, object.secondFactorCode);
+    navigateLoginForm()
   }
 </script>
 
@@ -124,7 +138,7 @@
     {/if}
   {/await}
   <div class="buttons">
-    <button class="button" on:click|preventDefault={cancelSaveSetting}> Отменить </button>
+    <button class="button" on:click|preventDefault={navigateLoginForm}> Отменить </button>
     <button class="button" on:click|preventDefault={saveSetting}> Сохранить </button>
   </div>
 </form>
@@ -135,6 +149,8 @@
     margin-left: auto;
     margin-right: auto;
     width: 50%;
+    border: 1px;
+    border-style: solid;
   }
   
   form {
