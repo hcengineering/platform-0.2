@@ -2,6 +2,8 @@ import { AnyComponent } from './index'
 import { parseHash, parsePath, parseQuery } from './location'
 import { Metadata } from '@anticrm/platform'
 
+import { deepEqual } from 'fast-equals'
+
 /**
  * Describe a browser URI location parsed to path, query and fragment.
  */
@@ -118,7 +120,7 @@ export class Router<T> implements ApplicationRouter<T> {
     }
   }
 
-  public subscribe (matcher: (match: T) => void) {
+  public subscribe (matcher: (match: T) => void): void {
     this.matcher = matcher
     if (this.matched && this.matcher) {
       this.matcher(this.variables as T)
@@ -127,13 +129,15 @@ export class Router<T> implements ApplicationRouter<T> {
 
   /**
    * Will received new location
-   * @param loc
+   * @param loc - a new location
+   * @param forceUpdate - if true will force updating
    */
-  update (loc: Location) {
+  update (loc: Location, forceUpdate = false): void {
     this.rawLocation = loc
+    const oldVars = this.variables
     this.matched = this.doMatch()
     this.chainUpdate()
-    if (this.matcher) {
+    if (this.matcher && (!deepEqual(oldVars, this.variables) || forceUpdate)) {
       this.matcher(this.variables as T)
     }
   }
@@ -213,7 +217,7 @@ export class Router<T> implements ApplicationRouter<T> {
   setDefaults (defaults: T): void {
     this.defaults = defaults
     if (this.rawLocation) {
-      this.update(this.rawLocation)
+      this.update(this.rawLocation, true)
     }
   }
 

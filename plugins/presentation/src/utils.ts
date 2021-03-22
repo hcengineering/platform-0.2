@@ -22,6 +22,8 @@ import presentationPlugin, { AttrModel, ClassModel, ComponentExtension, GroupMod
 import { IntlString } from '@anticrm/platform-i18n'
 import { VDoc } from '@anticrm/domains'
 
+import { deepEqual } from 'fast-equals'
+
 export function getCoreService (): Promise<CoreService> {
   const platform = getContext(CONTEXT_PLATFORM) as Platform
   return platform.getPlugin(core.id)
@@ -46,7 +48,6 @@ export function getUserId (): string {
  * @param _class - a class to perform search against
  * @param _query - a query to match object.
  * @param action - callback with list of results.
- * @param regFinalizer - a factory to register unsubscribe for underline query.
  * @return a function to re-query with a new parameters for same action.
  */
 export async function createLiveQuery<T extends Doc> (_class: Ref<Class<T>>, _query: AnyLayout,
@@ -61,7 +62,7 @@ export async function createLiveQuery<T extends Doc> (_class: Ref<Class<T>>, _qu
   })
   const coreService = await getCoreService()
   const result = (newClass: Ref<Class<T>>, newQuery: AnyLayout) => {
-    if (JSON.stringify(oldQuery) === JSON.stringify(newQuery) && oldClass === newClass) {
+    if (deepEqual(oldQuery, newQuery) && oldClass === newClass) {
       return
     }
     if (unsubscribe) {
