@@ -15,7 +15,7 @@
   import { AnyComponent } from '@anticrm/platform-ui'
   import Component from '@anticrm/platform-ui/src/components/Component.svelte'
   import presentation, { createLiveQuery, getComponentExtension, updateLiveQuery } from '@anticrm/presentation'
-  import { createEventDispatcher, onDestroy } from 'svelte'
+  import { createEventDispatcher } from 'svelte'
 
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import workbench from '../..'
@@ -28,14 +28,17 @@
   let object: Doc | undefined
   let counter = 0
 
+  const dispatch = createEventDispatcher()
+
   let queryUpdate = createLiveQuery(_class, { _id: _objectId }, (docs) => {
-    console.log("OBJ", docs)
     object = docs.length > 0 ? docs[0] : undefined
-  }, onDestroy)
+    if (!object) {
+      dispatch('noobject')
+    }
+  })
 
   let component: AnyComponent
   $: {
-    console.log("QUPDATE", _class, _objectId)
     updateLiveQuery(queryUpdate, _class, { _id: _objectId })
 
     getComponentExtension(_class, presentation.mixin.DetailForm).then((ext) => {
@@ -44,8 +47,6 @@
       }
     })
   }
-
-  const dispatch = createEventDispatcher()
 </script>
 
 {#if object }
