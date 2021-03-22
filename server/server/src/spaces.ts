@@ -37,7 +37,7 @@ export interface SpaceCheckResult {
 }
 
 export interface SecurityContext {
-  docs: Doc[] // A list of touched documents.
+  docs?: Doc[] // A list of touched documents.
 }
 
 function getSpaceKey (_class: Ref<Class<Doc>>): string {
@@ -130,13 +130,18 @@ function checkUpdateSpaces (spaces: Map<string, SpaceUser>, s: Space, spaceId: s
 }
 
 async function getObjectById (ctx: SecurityContext, workspace: WorkspaceProtocol, _class: Ref<Class<Doc>>, id: Ref<Doc>): Promise<Doc | undefined> {
-  for (const d of ctx.docs) {
-    if (d._id === id) {
-      return Promise.resolve(d)
+  if (ctx.docs) {
+    for (const d of ctx.docs) {
+      if (d._id === id) {
+        return Promise.resolve(d)
+      }
     }
   }
   const result = await workspace.findOne(_class, { _id: id })
   if (result) {
+    if (!ctx.docs) {
+      ctx.docs = []
+    }
     ctx.docs.push(result)
   }
   return result
