@@ -58,7 +58,7 @@ export interface LoginService extends Service {
   /**
   * Save profile settings
   */
-  saveSetting (password: string, newPassword: string, secondFactorEnabled:boolean, clientSecret: string, secondFactorCode: string): Promise<Status>
+  saveSetting (password: string, newPassword: string, secondFactorEnabled: boolean, clientSecret: string, secondFactorCode: string): Promise<Status>
 
   /**
    * Do logout from current logged in account

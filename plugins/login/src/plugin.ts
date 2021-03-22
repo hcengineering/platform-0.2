@@ -86,14 +86,15 @@ export default (platform: Platform, deps: { ui: UIService }): Promise<LoginServi
     return Promise.resolve()
   }
 
-  async function navigateLoginForm (): Promise<void> {
+  function navigateLoginForm (): Promise<void> {
     const loginApp = platform.getMetadata(uiPlugin.metadata.LoginApplication)
     if (loginApp) {
       uiService.navigateJoin([loginApp], undefined, undefined)
     }
+    return Promise.resolve()
   }
   
-  async function saveSetting (password: string, newPassword: string, secondFactorEnabled:boolean, clientSecret: string, secondFactorCode: string): Promise<Status> {
+  async function saveSetting (password: string, newPassword: string, secondFactorEnabled: boolean, clientSecret: string, secondFactorCode: string): Promise<Status> {
     const loginInfo = await getLoginInfo()
     if (!loginInfo) return new Status(Severity.ERROR, 0, 'Необходимо авторизоваться')
     const request: Request<[string, string, string, boolean, string, string]> = {
