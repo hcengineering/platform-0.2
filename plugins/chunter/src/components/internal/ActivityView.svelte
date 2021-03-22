@@ -14,7 +14,6 @@
 -->
 <script type='ts'>
   import { Ref, Tx } from '@anticrm/core'
-  import { onDestroy } from 'svelte'
   import { WorkbenchApplication } from '@anticrm/workbench'
   import { CORE_CLASS_CREATE_TX, Space } from '@anticrm/domains'
 
@@ -29,7 +28,7 @@
 
   createLiveQuery(CORE_CLASS_CREATE_TX, {}, (docs) => {
     objects = docs
-  }, onDestroy)
+  })
 
 </script>
 

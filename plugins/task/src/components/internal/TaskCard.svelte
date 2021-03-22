@@ -16,66 +16,66 @@
 
   const dispatch = createEventDispatcher()
 
-	const coords = spring({ x: 0, y: 0 }, {
-		stiffness: 0.2,
-		damping: 0.4
-	})
+  const coords = spring({ x: 0, y: 0 }, {
+    stiffness: 0.2,
+    damping: 0.4
+  })
 
-	function handlePanStart() {
-		coords.stiffness = coords.damping = 1
+  function handlePanStart () {
+    coords.stiffness = coords.damping = 1
     divTask.style.zIndex = '+1'
     drag = true
     dispatch('drag', { id: idCard, value: true, top: divTask.offsetTop })
-	}
+  }
 
-	function handlePanMove(event: MouseEvent) {
-		coords.update($coords => ({
-			x: $coords.x + event.detail.dx,
-			y: $coords.y + event.detail.dy
-		}))
+  function handlePanMove (event: MouseEvent) {
+    coords.update($coords => ({
+      x: $coords.x + event.detail.dx,
+      y: $coords.y + event.detail.dy
+    }))
     dispatch('move', { id: idCard, value: true, coords: $coords, event: event })
-	}
+  }
 
-	function handlePanEnd(event: MouseEvent) {
-		coords.stiffness = 0.2
-		coords.damping = 0.4
-		coords.set({ x: 0, y: 0 })
+  function handlePanEnd (event: MouseEvent) {
+    coords.stiffness = 0.2
+    coords.damping = 0.4
+    coords.set({ x: 0, y: 0 })
     divTask.style.zIndex = '0'
     drag = false
     dispatch('drag', { id: idCard, value: false, top: divTask.offsetTop })
     dispatch('move', { id: idCard, value: false, coords: $coords, event: event })
-	}
+  }
 </script>
 
 {#if ghost || dublicate}
-<div class="card-view" class:ghost={ghost} class:dublicate={dublicate}
-	style="transform:
+  <div class="card-view" class:ghost={ghost} class:dublicate={dublicate}
+       style="transform:
 		translate(0px,{topGhost}px)"
->
-  <div class="card-head">
-    <img class="card-head__avatar" src="{avatar}" alt="">
-    <div class="card-head__caption">{caption}</div>
+  >
+    <div class="card-head">
+      <img class="card-head__avatar" src="{avatar}" alt="">
+      <div class="card-head__caption">{caption}</div>
+    </div>
+    <div class="card-body">{desc}</div>
   </div>
-  <div class="card-body">{desc}</div>
-</div>
 
 {:else}
 
-<div bind:this={divTask} class="card-view" class:drag={drag}
-  use:pannable
-	on:panstart={handlePanStart}
-	on:panmove={handlePanMove}
-	on:panend={handlePanEnd}
-	style="transform:
+  <div bind:this={divTask} class="card-view" class:drag={drag}
+       use:pannable
+       on:panstart={handlePanStart}
+       on:panmove={handlePanMove}
+       on:panend={handlePanEnd}
+       style="transform:
 		translate({$coords.x}px,{$coords.y}px)
 		rotate({$coords.x * 0.03}deg)"
->
-  <div class="card-head">
-    <img class="card-head__avatar" src="{avatar}" alt="">
-    <div class="card-head__caption">{caption}</div>
+  >
+    <div class="card-head">
+      <img class="card-head__avatar" src="{avatar}" alt="">
+      <div class="card-head__caption">{caption}</div>
+    </div>
+    <div class="card-body">{desc}</div>
   </div>
-  <div class="card-body">{desc}</div>
-</div>
 {/if}
 
 <style lang="scss">
@@ -99,23 +99,28 @@
         height: 32px;
         border-radius: 16px;
       }
+
       &__caption {
         padding-left: 8px;
         color: var(--theme-doclink-color);
       }
     }
+
     .card-body {
       margin-top: 8px;
     }
   }
+
   .drag {
     border-color: var(--theme-bg-dark-color);
     box-shadow: var(--theme-shadow);
   }
+
   .ghost {
     position: absolute;
     opacity: .5;
   }
+
   .dublicate {
     border-color: var(--theme-bg-dark-color);
     opacity: .5;

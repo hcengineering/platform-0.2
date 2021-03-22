@@ -17,7 +17,6 @@
   import { MessageNode } from '@anticrm/text'
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
-  import { onDestroy } from 'svelte'
   import chunter, { getChunterService, Message } from '../..'
   import CommentComponent from './Comment.svelte'
   import DateItem from './DateItem.svelte'
@@ -34,7 +33,7 @@
 
   const ms = createLiveQuery(chunter.class.Message, { _space: space._id }, (docs) => {
     messages = docs
-  }, onDestroy)
+  })
 
   const userId = getUserId()
 

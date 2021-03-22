@@ -26,19 +26,19 @@
 
 
 <div class="editbox" class:editbox-label={(label !== '')} class:editbox-hoverState={hoverState}
-     style='width: {width}' on:click={input.focus()}>
+     style="width: {width}" on:click={input.focus()}>
   {#if (label !== '')}
     <div class="wLabel">
       <div class="label">{label}</div>
       <input bind:this={input} {id} type="text"
-        bind:value={value} {placeholder}
-        on:input={onInput} on:focus={onFocus} on:change={onChange}
+             bind:value={value} {placeholder}
+             on:input on:focus on:change
       />
     </div>
   {:else}
     <input bind:this={input} {id} type="text"
-      bind:value={value} {placeholder}
-      on:input={onInput} on:focus={onFocus} on:change={onChange}
+           bind:value={value} {placeholder}
+           on:input on:focus on:change
     />
   {/if}
 </div>
@@ -72,10 +72,12 @@
       border-color: var(--theme-bg-dark-hover);
       color: var(--theme-content-color);
     }
+
     &-label {
       height: 54px;
       padding: 6px 16px 4px;
     }
+
     &-hoverState {
       background-color: var(--theme-bg-accent-hover);
       border-color: var(--theme-bg-dark-hover);
@@ -88,6 +90,7 @@
     display: flex;
     flex-direction: column;
   }
+
   .label {
     color: var(--theme-content-color);
     font-size: 11px;

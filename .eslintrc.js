@@ -17,7 +17,7 @@ module.exports = {
     ecmaVersion: 2020,
     sourceType: 'module',
     project: [
-      '**/tsconfig.json',
+      '**/tsconfig.json'
     ]
   },
   plugins: ['@typescript-eslint', 'import', 'svelte3'],
@@ -35,16 +35,24 @@ module.exports = {
     '@typescript-eslint/no-empty-interface': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-useless-constructor': 'error',
-    '@typescript-eslint/no-unused-vars': ['error'],
     '@typescript-eslint/prefer-readonly': ['error'],
     '@typescript-eslint/restrict-plus-operands': 'error',
     '@typescript-eslint/require-await': 'error',
     '@typescript-eslint/return-await': 'error',
-    '@typescript-eslint/type-annotation-spacing': ['error', { 'before': false, 'after': true, 'overrides': { 'arrow': { 'before': true, 'after': true }}}],
+    '@typescript-eslint/type-annotation-spacing': ['error', {
+      'before': false,
+      'after': true,
+      'overrides': {
+        'arrow': {
+          'before': true,
+          'after': true
+        }
+      }
+    }],
     '@typescript-eslint/no-unused-vars': ['error', { 'args': 'none' }],
     '@typescript-eslint/no-unused-expressions': 'error',
-    'prefer-arrow-callback': [ 'error', { 'allowUnboundThis': false } ],
-    '@typescript-eslint/no-misused-promises': [ 'error', { 'checksVoidReturn': false } ],
+    'prefer-arrow-callback': ['error', { 'allowUnboundThis': false }],
+    '@typescript-eslint/no-misused-promises': ['error', { 'checksVoidReturn': false }]
   },
   settings: {
     'svelte3/typescript': require('typescript'),

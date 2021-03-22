@@ -27,19 +27,33 @@
 
   export let is: AnyComponent | undefined
   export let application: WorkbenchApplication
-  export let space: Ref<Space>
+  export let space: Space | undefined
 
   const platform = getContext('platform') as Platform
-  $: component = is ? platform.getResource(is) : null
+  let component: AnyComponent
+  const compUpdate = e => {
+    if (component !== e) {
+      component = e
+    }
+    return e
+  }
+  let componentPromise = new Promise((resolve) => {
+    if (is) {
+      platform.getResource(is).then(compUpdate).then(() => resolve())
+    }
+  })
+  $: {
+    if (is) {
+      componentPromise = platform.getResource(is).then(compUpdate)
+    }
+  }
 </script>
 
-{#if component}
-  {#await component}
-    <Spinner />
-  {:then ctor}
-    <svelte:component this={ctor} {application} {space} on:open />
-  {:catch err}
-    <Icon icon={ui.icon.Error} size="32" />
-    {{ err }}
-  {/await}
-{/if}
+{#await componentPromise}
+  <Spinner />
+{:then ctor}
+  <svelte:component this={component} {application} {space} on:open />
+{:catch err}
+  <Icon icon={ui.icon.Error} size="32" />
+  {{ err }}
+{/await}

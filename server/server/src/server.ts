@@ -26,6 +26,7 @@ import {
   serialize
 } from '@anticrm/rpc'
 import { Space } from '@anticrm/domains'
+import { SecurityContext } from './spaces'
 
 export interface Client {
   email: string
@@ -46,7 +47,7 @@ export type ClientService = ClientControl & DocumentProtocol & ClientTxProtocol
 export type ClientServiceUnregister = () => void
 
 export interface Broadcaster {
-  broadcast (from: ClientService, response: Response<Tx>): void
+  broadcast (from: ClientService, response: Response<Tx>, ctx: SecurityContext): void
 }
 
 export interface ServerProtocol {
@@ -60,8 +61,8 @@ function isClientExpired (client: Client): boolean {
 }
 
 export async function start (port: number, dbUri: string, host?: string): Promise<ServerProtocol> {
-  console.log('starting server on port ' + port + '...')
-  console.log('host: ' + host)
+  console.log(`starting server on port ${port}...`)
+  console.log(`host: ${host}`)
 
   const server = createServer()
   const wss = new Server({ noServer: true })
@@ -72,7 +73,7 @@ export async function start (port: number, dbUri: string, host?: string): Promis
   const connections = new Map<string, Promise<ClientService>>()
 
   function registerClient (service: Promise<ClientService>): ClientServiceUnregister {
-    const id = 'c' + clientCounter++
+    const id = `c${clientCounter++}`
     connections.set(id, service)
     return () => {
       connections.delete(id)
@@ -80,21 +81,21 @@ export async function start (port: number, dbUri: string, host?: string): Promis
   }
 
   const broadcaster: Broadcaster = {
-    broadcast (from: ClientService, response: Response<any>): void {
+    broadcast (from: ClientService, response: Response<any>, ctx: SecurityContext): void {
       // console.log(`broadcasting to ${connections.size} connections`)
       for (const client of connections.values()) {
         client.then(client => {
           if (client.getId() !== from.getId()) {
             // console.log(`broadcasting to ${client.email}`, response)
-            client.send(response)
+            client.send(ctx, response)
           }
         })
       }
     }
   }
 
-  async function createClient (workspace: Promise<WorkspaceProtocol>, ws: ClientSocket & Client): Promise<ClientService> {
-    return await createClientService(workspace, ws, broadcaster)
+  function createClient (workspace: Promise<WorkspaceProtocol>, ws: ClientSocket & Client): Promise<ClientService> {
+    return createClientService(workspace, ws, broadcaster)
   }
 
   async function getWorkspace (wsName: string): Promise<WorkspaceProtocol> {
@@ -106,7 +107,7 @@ export async function start (port: number, dbUri: string, host?: string): Promis
     return workspace
   }
 
-  wss.on('connection', function connection (ws: WebSocket, request: any, client: Client) {
+  wss.on('connection', (ws: WebSocket, request: any, client: Client) => {
     console.log('connect:', client)
     const workspace = getWorkspace(client.workspace)
 
@@ -118,7 +119,7 @@ export async function start (port: number, dbUri: string, host?: string): Promis
     })
 
     const unreg = registerClient(service)
-    ws.on('close', async () => {
+    ws.on('close', () => {
       unreg()
     })
 
@@ -143,8 +144,7 @@ export async function start (port: number, dbUri: string, host?: string): Promis
           case RPC_CALL_GEN_REF_ID:
             response.result = await ss.genRefId(request.params[0] as Ref<Space>)
             break
-          case RPC_CALL_TX:
-          {
+          case RPC_CALL_TX: {
             const { clientTx } = await ss.tx(request.params[0] as Tx)
             // response.result == undefined  => Do not pass result, since it is same.
             response.clientTx = clientTx
@@ -155,7 +155,7 @@ export async function start (port: number, dbUri: string, host?: string): Promis
             break
         }
       } catch (error) {
-        response.error = error?.toString();
+        response.error = error?.toString()
         console.log('Error occurred during processing websocket message:', error)
       }
       ws.send(serialize(response))
@@ -176,8 +176,8 @@ export async function start (port: number, dbUri: string, host?: string): Promis
     }
   }
 
-  server.on('upgrade', function upgrade (request: IncomingMessage, socket, head: Buffer) {
-    auth(request, async (err: Error | null, client: Client | null) => {
+  server.on('upgrade', (request: IncomingMessage, socket, head: Buffer) => {
+    auth(request, (err: Error | null, client: Client | null) => {
       if (err != null) {
         console.log(err)
       }
@@ -188,7 +188,7 @@ export async function start (port: number, dbUri: string, host?: string): Promis
       }
 
       console.log('client: ', client)
-      wss.handleUpgrade(request, socket, head, function done (ws) {
+      wss.handleUpgrade(request, socket, head, ws => {
         wss.emit('connection', ws, request, client)
       })
     })
