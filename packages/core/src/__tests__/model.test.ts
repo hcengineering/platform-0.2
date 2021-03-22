@@ -20,10 +20,10 @@ import { mixinFromKey, mixinKey, Model } from '../model'
 import { txContext } from '../storage'
 import { createSubtask, createTask, doc1, taskIds, data, Task } from './tasks'
 
-const model = new Model('vdocs')
-model.loadModel(data)
-
 describe('matching', () => {
+  const model = new Model('vdocs')
+  model.loadModel(data)
+
   it('match object value', () => {
     expect(model.matchQuery(taskIds.class.Task, doc1, { name: 'my-space' as StringProperty })).toEqual(true)
   })
@@ -104,8 +104,8 @@ describe('matching', () => {
     const clone = model.createDocument(taskIds.class.Task, doc1)
     const cloneResult = model.pushDocument(clone, { tasks: { name: 'subtask1' as StringProperty } },
       'comments' as StringProperty, {
-      message: 'my-msg' as StringProperty
-    })
+        message: 'my-msg' as StringProperty
+      })
 
     expect(cloneResult.tasks![0].comments!.length).toEqual(1)
   })
@@ -271,9 +271,66 @@ describe('invalid cases', () => {
   )
 })
 
+const VDocClass = {
+  _id: 'class:core.VDoc',
+  _attributes: {
+    _space: {
+      _class: 'class:core.Attribute',
+      type: {
+        _class: 'class:core.RefTo',
+        to: 'class:core.Space'
+      }
+    },
+    _createdOn: {
+      _class: 'class:core.Attribute',
+      type: {
+        _class: 'class:core.Type'
+      }
+    },
+    _createdBy: {
+      _class: 'class:core.Attribute',
+      type: {
+        _class: 'class:core.Type'
+      }
+    },
+    _modifiedOn: {
+      _class: 'class:core.Attribute',
+      type: {
+        _class: 'class:core.Type'
+      }
+    },
+    _modifiedBy: {
+      _class: 'class:core.Attribute',
+      type: {
+        _class: 'class:core.Type'
+      }
+    }
+  },
+  _class: 'class:core.Class',
+  _kind: 0,
+  _extends: 'class:core.Doc',
+  _domain: 'model'
+} as any
+
+const refsMixin = {
+  _attributes: {
+    shortId: {
+      _class: 'class:core.Attribute',
+      type: {
+        _class: 'class:core.Type'
+      }
+    }
+  },
+  _id: 'mixin:core.References',
+  _class: 'class:core.Mixin',
+  _kind: 1,
+  _extends: 'class:core.VDoc'
+} as any
+
 describe('Model domain', () => {
   const model = new Model('vdocs')
   model.loadModel(data)
+  model.add(VDocClass)
 
   it('returns domains', () => {
     expect(model.getDomain('class:core.Classifier' as Ref<Class<Doc>>))
@@ -294,7 +351,7 @@ describe('Model domain', () => {
   it('returns classes', () => {
     expect(model.getClass('class:core.Obj' as Ref<Class<Doc>>))
       .toEqual('class:core.Obj')
-    expect(model.getClass('mixin:core.References' as Ref<Class<Doc>>))
+    expect(model.getClass('mixin:core.ShortID' as Ref<Class<Doc>>))
       .toBe('class:core.VDoc')
   })
 
@@ -307,6 +364,16 @@ describe('Model domain', () => {
 describe('Model utilities', () => {
   const model = new Model('vdocs')
   model.loadModel(data)
+  model.add(
+    {
+      _attributes: {},
+      _id: 'core.class.DerivedTaskObj',
+      _class: 'class:core.Class',
+      _kind: 0,
+      _extends: 'core.class.TaskObj',
+      _domain: 'model'
+    } as any
+  )
 
   it('returns all attributes of class', () => {
     expect(model.getAllAttributes('class:core.Obj' as Ref<Class<Doc>>))
@@ -344,6 +411,8 @@ describe('Model mixin', () => {
   it('creates new proto with \'as\' method', () => {
     const model = new Model('vdocs')
     model.loadModel(data)
+    model.add(VDocClass)
+    model.add(refsMixin)
 
     const shortId = 'short-id'
     const target = {
@@ -363,6 +432,8 @@ describe('Model mixin', () => {
   it('reuses proto with \'as\' method', () => {
     const model = new Model('vdocs')
     model.loadModel(data)
+    model.add(VDocClass)
+    model.add(refsMixin)
 
     const shortId = 'short-id'
     const target = {
@@ -383,6 +454,8 @@ describe('Model mixin', () => {
   it('casts doc', () => {
     const model = new Model('vdocs')
     model.loadModel(data)
+    model.add(VDocClass)
+    model.add(refsMixin)
 
     const shortId = 'short-id'
     const target = {
@@ -425,6 +498,11 @@ describe('Model mixin', () => {
 describe('Model assign tools', () => {
   const model = new Model('vdocs')
   model.loadModel(data)
+
+  const additionalModels = [VDocClass, refsMixin]
+  additionalModels.forEach(x => model.add(x))
+
+  const actualData = data.concat(additionalModels)
 
   it('assigns class if missing', () => {
     const res = model.assign({}, 'class' as Ref<Class<Obj>>, {})
@@ -496,15 +574,15 @@ describe('Model assign tools', () => {
   it('dumps properly', () => {
     const dump = model.dump()
 
-    expect(dump.length).toEqual(data.length)
-    expect(dump).toEqual(expect.arrayContaining(data))
+    expect(dump.length).toEqual(actualData.length)
+    expect(dump).toEqual(expect.arrayContaining(actualData))
   })
 
   it('loads domain properly', async () => {
     const dump = await model.loadDomain('vdocs')
 
-    expect(dump.length).toEqual(data.length)
-    expect(dump).toEqual(expect.arrayContaining(data))
+    expect(dump.length).toEqual(actualData.length)
+    expect(dump).toEqual(expect.arrayContaining(actualData))
   })
 })
 
