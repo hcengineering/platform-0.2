@@ -243,8 +243,8 @@ export class Model implements Storage {
 
   // from Builder
   assign (layout: AnyLayout, _class: Ref<Class<Obj>>, values: AnyLayout): AnyLayout {
-    const l = (layout as unknown) as AnyLayout
-    const r = (values as unknown) as AnyLayout
+    const l = layout
+    const r = values
 
     // Also assign a class to value if not specified
     if (!layout._class) {

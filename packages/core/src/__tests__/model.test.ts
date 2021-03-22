@@ -15,9 +15,10 @@
 
 /* eslint-env jest */
 
-import { AnyLayout, Property, StringProperty } from '../classes'
-import { Model } from '../model'
-import { createSubtask, createTask, doc1, taskIds, data } from './tasks'
+import { AnyLayout, Class, Doc, Mixin, Obj, Property, PropertyType, Ref, StringProperty } from '../classes'
+import { mixinFromKey, mixinKey, Model } from '../model'
+import { txContext } from '../storage'
+import { createSubtask, createTask, doc1, taskIds, data, Task } from './tasks'
 
 const model = new Model('vdocs')
 model.loadModel(data)
@@ -103,8 +104,8 @@ describe('matching', () => {
     const clone = model.createDocument(taskIds.class.Task, doc1)
     const cloneResult = model.pushDocument(clone, { tasks: { name: 'subtask1' as StringProperty } },
       'comments' as StringProperty, {
-        message: 'my-msg' as StringProperty
-      })
+      message: 'my-msg' as StringProperty
+    })
 
     expect(cloneResult.tasks![0].comments!.length).toEqual(1)
   })
@@ -171,4 +172,445 @@ describe('matching', () => {
     const result = await model.find(taskIds.class.Task, { name: doc.name as StringProperty })
     expect(result.length).toEqual(0)
   })
+})
+
+describe('invalid cases', () => {
+  it('throws on adding existing doc', () => {
+    const model = new Model('vdocs')
+    model.loadModel(data)
+
+    const doc = Object.assign(
+      model.createDocument(
+        taskIds.class.Task,
+        createTask('', 0, '')
+      ),
+      { _id: 'id' as Ref<Task> }
+    )
+
+    model.add(doc)
+    expect(() => model.add(doc)).toThrowError()
+  })
+
+  it('rejects on storing existing doc', () => {
+    const model = new Model('vdocs')
+    model.loadModel(data)
+
+    const doc = Object.assign(
+      model.createDocument(
+        taskIds.class.Task,
+        createTask('', 0, '')
+      ),
+      { _id: 'id' as Ref<Task> }
+    )
+
+    model.store(txContext(), doc)
+    expect(model.store(txContext(), doc)).rejects.toThrowError()
+  })
+
+  it('throws on deleting missing doc', () => {
+    const model = new Model('vdocs')
+    model.loadModel(data)
+
+    expect(() => model.del('id' as Ref<Doc>)).toThrowError()
+  })
+
+  it('rejects on removing missing doc', () => {
+    const model = new Model('vdocs')
+    model.loadModel(data)
+
+    expect(() => model.remove(txContext(), {} as Ref<Class<Doc>>, 'id' as Ref<Doc>, null)).toThrowError()
+  })
+
+  it('throws on getting missing doc', () => {
+    const model = new Model('vdocs')
+    model.loadModel(data)
+
+    expect(() => model.get('id' as Ref<Doc>)).toThrowError()
+  })
+
+  it('throws on pushing to missing object', () => {
+    const model = new Model('vdocs')
+    model.loadModel(data)
+
+    const doc = model.createDocument(
+      taskIds.class.Task,
+      createTask('', 0, '')
+    )
+
+    expect(
+      () => model.pushDocument(
+        doc,
+        { name: 'Not exist' as StringProperty },
+        'tasks' as StringProperty,
+        (createSubtask('subtask3', 34) as unknown) as AnyLayout
+      )
+    ).toThrowError()
+  })
+
+  it('throws on pushing to missing attribute', () => {
+    const model = new Model('vdocs')
+    model.loadModel(data)
+
+    const doc = model.createDocument(
+      taskIds.class.Task,
+      createTask('', 0, '')
+    )
+
+    expect(
+      () => model.pushDocument(
+        doc,
+        null,
+        'Not exist' as StringProperty,
+        (createSubtask('subtask3', 34) as unknown) as AnyLayout
+      )
+    ).toThrowError()
+  })
+
+  it('throws on loading non-matching domain', () =>
+    expect(new Model('vdocs').loadDomain('vdocs2')).rejects.toThrowError()
+  )
+})
+
+describe('Model domain', () => {
+  const model = new Model('vdocs')
+  model.loadModel(data)
+
+  it('returns domains', () => {
+    expect(model.getDomain('class:core.Classifier' as Ref<Class<Doc>>))
+      .toEqual('model')
+    expect(model.getDomain('class:core.Type' as Ref<Class<Doc>>))
+      .toEqual('model')
+    expect(model.getDomain('class:core.Class' as Ref<Class<Doc>>))
+      .toEqual('model')
+    expect(model.getDomain('class:core.Title' as Ref<Class<Doc>>))
+      .toEqual('title')
+  })
+
+  it('throws if domain does not exist', () => {
+    expect(() => model.getDomain('class:core.Obj' as Ref<Class<Doc>>))
+      .toThrowError()
+  })
+
+  it('returns classes', () => {
+    expect(model.getClass('class:core.Obj' as Ref<Class<Doc>>))
+      .toEqual('class:core.Obj')
+    expect(model.getClass('mixin:core.References' as Ref<Class<Doc>>))
+      .toBe('class:core.VDoc')
+  })
+
+  it('throws if class cannot be found', () => {
+    expect(() => model.getClass('class:MISSING' as Ref<Class<Doc>>))
+      .toThrowError()
+  })
+})
+
+describe('Model utilities', () => {
+  const model = new Model('vdocs')
+  model.loadModel(data)
+
+  it('returns all attributes of class', () => {
+    expect(model.getAllAttributes('class:core.Obj' as Ref<Class<Doc>>))
+      .toEqual([])
+
+    const getAttrs = (id: string) => Object.entries(
+      data.find((x: any) => x._id === id)?._attributes ?? {}
+    )
+
+    const docID = 'class:core.Doc'
+    const docAttrs = getAttrs(docID)
+    expect(model.getAllAttributes(docID as Ref<Class<Doc>>))
+      .toEqual(docAttrs)
+
+    const classifierID = 'class:core.Classifier'
+    const classifierOwnAttrs = getAttrs(classifierID)
+    const classifierAttrs = classifierOwnAttrs
+      .concat(docAttrs)
+
+    expect(model.getAllAttributes(classifierID as Ref<Class<Doc>>))
+      .toEqual(classifierAttrs)
+  })
+
+  it('returns primary key of class', () => {
+    expect(model.getPrimaryKey('class:core.Obj' as Ref<Class<Doc>>))
+      .toBeNull()
+    expect(model.getPrimaryKey('core.class.TaskObj' as Ref<Class<Doc>>))
+      .toEqual('name')
+    expect(model.getPrimaryKey('core.class.DerivedTaskObj' as Ref<Class<Doc>>))
+      .toEqual('name')
+  })
+})
+
+describe('Model mixin', () => {
+  it('creates new proto with \'as\' method', () => {
+    const model = new Model('vdocs')
+    model.loadModel(data)
+
+    const shortId = 'short-id'
+    const target = {
+      ...doc1,
+      'shortId|mixin:core~References': shortId
+    }
+    const res = model.as({ ...target }, 'mixin:core.References' as Ref<Mixin<any>>)
+
+    expect(res.__layout).toEqual(target)
+    expect(res.shortId).toEqual(shortId)
+
+    res.shortId = 'another-short-id'
+
+    expect(res.shortId).toBe('another-short-id')
+  })
+
+  it('reuses proto with \'as\' method', () => {
+    const model = new Model('vdocs')
+    model.loadModel(data)
+
+    const shortId = 'short-id'
+    const target = {
+      ...doc1,
+      'shortId|mixin:core~References': shortId
+    }
+    model.as({ ...target }, 'mixin:core.References' as Ref<Mixin<any>>)
+    const res = model.as(target, 'mixin:core.References' as Ref<Mixin<any>>)
+
+    expect(res.__layout).toEqual(target)
+    expect(res.shortId).toEqual(shortId)
+
+    res.shortId = 'another-short-id'
+
+    expect(res.shortId).toBe('another-short-id')
+  })
+
+  it('casts doc', () => {
+    const model = new Model('vdocs')
+    model.loadModel(data)
+
+    const shortId = 'short-id'
+    const target = {
+      ...doc1,
+      'shortId|mixin:core~References': shortId
+    }
+    const res = model.cast({ ...target }, 'mixin:core.References' as Ref<Mixin<any>>)
+
+    const expectedLayout = {
+      ...target,
+      _mixins: ['mixin:core.References']
+    }
+
+    expect(res.__layout).toEqual(expectedLayout)
+    expect(res.shortId).toEqual(shortId)
+
+    res.shortId = 'another-short-id'
+
+    expect(res.shortId).toBe('another-short-id')
+  })
+
+  it('checks if mixin list includes target', () => {
+    const model = new Model('vdocs')
+    model.loadModel(data)
+
+    const withMixin = {
+      ...doc1,
+      _mixins: ['mixin:core.References'] as Ref<Mixin<Obj>>[]
+    }
+
+    expect(model.isMixedIn(doc1, 'mixin:core.References' as Ref<Mixin<Doc>>))
+      .toEqual(false)
+    expect(model.isMixedIn(withMixin, 'mixin:core.References' as Ref<Mixin<Doc>>))
+      .toEqual(true)
+    expect(model.isMixedIn(withMixin, 'mixin:missing.one' as Ref<Mixin<Doc>>))
+      .toEqual(false)
+  })
+})
+
+describe('Model assign tools', () => {
+  const model = new Model('vdocs')
+  model.loadModel(data)
+
+  it('assigns class if missing', () => {
+    const res = model.assign({}, 'class' as Ref<Class<Obj>>, {})
+
+    expect(res).toEqual({ _class: 'class' })
+  })
+
+  it('doesn\'t change class if it exists', () => {
+    const res = model.assign(
+      { _class: 'class' as Ref<Class<Obj>> },
+      'other_class' as Ref<Class<Obj>>,
+      {}
+    )
+
+    expect(res).toEqual({ _class: 'class' })
+  })
+
+  it('assigns own properties', () => {
+    const res = model.assign(
+      {},
+      'class' as Ref<Class<Obj>>,
+      { _property: 42 as PropertyType }
+    )
+
+    expect(res).toEqual({ _class: 'class', _property: 42 })
+  })
+
+  it('assigns mixin properties', () => {
+    const res = model.assign(
+      {},
+      'class' as Ref<Class<Obj>>,
+      { 'shortId|mixin:core~References': 42 as PropertyType }
+    )
+
+    expect(res).toEqual({ _class: 'class', 'shortId|mixin:core~References': 42 })
+  })
+
+  it('creates new doc', () => {
+    const res = model.newDoc(
+      'class' as Ref<Class<Doc>>,
+      'id' as Ref<Doc>,
+      { _property: 42 as PropertyType }
+    )
+
+    expect(res).toEqual({
+      _id: 'id',
+      _class: 'class',
+      _property: 42
+    })
+  })
+
+  it('compares classes', () => {
+    expect(model.is(
+      'class:core.Doc' as Ref<Class<Doc>>,
+      'class:core.Doc' as Ref<Class<Doc>>
+    )).toEqual(true)
+
+    expect(model.is(
+      'class:core.Doc' as Ref<Class<Doc>>,
+      'class:core.Obj' as Ref<Class<Doc>>
+    )).toEqual(true)
+
+    expect(model.is(
+      'class:core.Obj' as Ref<Class<Doc>>,
+      'class:core.Doc' as Ref<Class<Doc>>
+    )).toEqual(false)
+  })
+
+  it('dumps properly', () => {
+    const dump = model.dump()
+
+    expect(dump.length).toEqual(data.length)
+    expect(dump).toEqual(expect.arrayContaining(data))
+  })
+
+  it('loads domain properly', async () => {
+    const dump = await model.loadDomain('vdocs')
+
+    expect(dump.length).toEqual(data.length)
+    expect(dump).toEqual(expect.arrayContaining(data))
+  })
+})
+
+describe('Model storage', () => {
+  it('pushes attributes', async () => {
+    const model = new Model('vdocs')
+    model.loadModel(data)
+
+    const doc = model.createDocument(taskIds.class.Task, doc1)
+    model.add(doc)
+
+    const existingSubtasks = [...doc.tasks ?? []]
+    const newSubtask = createSubtask('subtask3', 34)
+    const expectedDoc = {
+      ...doc,
+      tasks: [...existingSubtasks, newSubtask]
+    }
+
+    await model.push(
+      txContext(),
+      '' as Ref<Class<Doc>>,
+      doc._id,
+      null,
+      'tasks' as StringProperty,
+      newSubtask as never as AnyLayout
+    )
+
+    const updatedDoc = model.get(doc._id) as Task
+
+    expect(updatedDoc).toEqual(expectedDoc)
+  })
+
+  it('updates doc', async () => {
+    const model = new Model('vdocs')
+    model.loadModel(data)
+
+    const doc = model.createDocument(taskIds.class.Task, doc1)
+    model.add(doc)
+
+    const newName = 'your-space'
+    const expectedDoc = {
+      ...doc,
+      name: newName
+    }
+
+    await model.update(
+      txContext(),
+      '' as Ref<Class<Doc>>,
+      doc._id,
+      null,
+      { name: newName as PropertyType }
+    )
+
+    const updatedDoc = model.get(doc._id) as Task
+
+    expect(updatedDoc).toEqual(expectedDoc)
+  })
+
+  it('removes doc', async () => {
+    const model = new Model('vdocs')
+    model.loadModel(data)
+
+    const doc = model.createDocument(taskIds.class.Task, doc1)
+    model.add(doc)
+
+    await model.remove(
+      txContext(),
+      '' as Ref<Class<Doc>>,
+      doc._id,
+      null
+    )
+
+    expect(() => model.get(doc._id)).toThrowError()
+  })
+})
+
+describe('mixin tools', () => {
+  const noSpecCharsKey = 'key'
+  const specCharsKey = 'prefix|a~b'
+
+  const noSpecCharsMixin = {
+    mixin: 'key' as Ref<Mixin<Obj>>,
+    key: ''
+  }
+  const specCharsMixin = {
+    mixin: 'a.b' as Ref<Mixin<Obj>>,
+    key: 'prefix'
+  }
+
+  it('builds mixin without special chars', () =>
+    expect(mixinFromKey(noSpecCharsKey))
+      .toEqual(noSpecCharsMixin)
+  )
+
+  it('builds mixin with special chars', () =>
+    expect(mixinFromKey(specCharsKey))
+      .toEqual(specCharsMixin)
+  )
+
+  it('builds key from mixin without special chars', () =>
+    expect(mixinKey(noSpecCharsMixin.mixin, noSpecCharsMixin.key))
+      .toEqual(`|${noSpecCharsKey}`)
+  )
+
+  it('builds key from mixin with special chars', () =>
+    expect(mixinKey(specCharsMixin.mixin, specCharsMixin.key))
+      .toEqual(specCharsKey)
+  )
 })
