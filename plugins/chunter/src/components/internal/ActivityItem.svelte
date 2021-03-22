@@ -15,10 +15,8 @@
 <script lang='ts'>
   import { ObjectTx } from '@anticrm/domains'
   import { Tx } from '@anticrm/core'
-  import core from '@anticrm/platform-core'
-  import { AnyComponent, Asset, getPlatform } from '@anticrm/platform-ui'
-  import { User } from '@anticrm/contact'
-  import { getContactService } from '@anticrm/contact'
+  import { AnyComponent, Asset } from '@anticrm/platform-ui'
+  import { getContactService, User } from '@anticrm/contact'
   import chunter from '../..'
   import { getPresentationService } from '@anticrm/presentation'
 

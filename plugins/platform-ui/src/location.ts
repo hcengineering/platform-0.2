@@ -41,7 +41,7 @@ export function parseQuery (query: string): Record<string, string | null> {
   query = query.substring(1)
   const vars = query.split('&')
   const result: Record<string, string | null> = {}
-  for (var i = 0; i < vars.length; i++) {
+  for (let i = 0; i < vars.length; i++) {
     const pair = vars[i].split('=')
     const key = pair[0]
     if (key.length > 0) {

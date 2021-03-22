@@ -7,7 +7,7 @@ const systemUser = 'system' as StringProperty
  * A storage to create a client transactions into txContext and pass execution to delegate
  */
 export class ClientTxStorage implements Storage {
-  private delegateStorage: Storage
+  private readonly delegateStorage: Storage
 
   constructor (delegateStorage: Storage) {
     this.delegateStorage = delegateStorage

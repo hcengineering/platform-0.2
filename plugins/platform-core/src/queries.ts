@@ -32,10 +32,10 @@ interface Query<T extends Doc> {
 }
 
 export class QueriableStorage implements Domain {
-  private proxy: Storage
-  private queries: Map<string, Query<Doc>> = new Map()
-  private model: Model
-  private updateResults: boolean
+  private readonly proxy: Storage
+  private readonly queries: Map<string, Query<Doc>> = new Map()
+  private readonly model: Model
+  private readonly updateResults: boolean
 
   constructor (model: Model, store: Storage, updateResults = false) {
     this.model = model

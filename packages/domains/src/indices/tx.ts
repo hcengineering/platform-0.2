@@ -16,7 +16,7 @@
 import { DomainIndex, Storage, TxContext, Tx } from '@anticrm/core'
 
 export class TxIndex implements DomainIndex {
-  private storage: Storage
+  private readonly storage: Storage
 
   constructor (storage: Storage) {
     this.storage = storage

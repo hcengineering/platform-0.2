@@ -13,12 +13,8 @@
 // limitations under the License.
 -->
 
-<script lang="ts">
-  import { getContext } from 'svelte'
-  import { CONTEXT_PLATFORM_UI, UIService } from '..'
-  import { ApplicationRouter } from '../routes'
-</script>
+<script lang="ts"></script>
 
-<a href="/" on:click|preventDefault>
+<a class="link" href="/" on:click|preventDefault>
   <slot />
 </a>

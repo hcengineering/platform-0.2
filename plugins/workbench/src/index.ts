@@ -32,8 +32,13 @@ export interface WorkbenchApplication extends Application {
   route: string // An application route segment, will be applied after global route
   label: IntlString
   icon?: Asset
-  component: AnyComponent
+  rootComponent?: AnyComponent // A component to be shown if application itself is selected.
+  component?: AnyComponent // A component to be shown in generic application.
   classes: Ref<Class<VDoc>>[]
+
+  supportSpaces: boolean // If set to true, application will support spaces.
+  spaceTitle?: string // A title for show spaces as
+  spaceComponent?: AnyComponent // If defined will show component for space selection, instead of default one.
 }
 
 export interface WorkbenchService extends Service {
@@ -61,6 +66,7 @@ export default plugin('workbench' as Plugin<WorkbenchService>, {
     JoinSpace: '' as AnyComponent,
     BrowseSpace: '' as AnyComponent,
     Application: '' as AnyComponent,
+    ApplicationDashboard: '' as AnyComponent,
     CreateForm: '' as AnyComponent,
 
     // A table presentation layout

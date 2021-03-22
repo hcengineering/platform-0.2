@@ -25,6 +25,7 @@ export interface QueryResult<T extends Doc> {
 }
 
 export type RefFinalizer = (op: () => void) => void
+export type QueryUpdater<T extends Doc> = (_class: Ref<Class<T>>, query: AnyLayout) => void
 
 /**
  * Define operations with live queries.
@@ -45,10 +46,7 @@ export interface QueryProtocol {
    * @param regFinalizer - a factory to register unsubscribe for underline query.
    * @return a function to re-query with a new parameters for same action.
    */
-  subscribe<T extends Doc> (_class: Ref<Class<T>>,
-    query: AnyLayout,
-    action: (docs: T[]) => void,
-    regFinalizer: RefFinalizer): (_class: Ref<Class<T>>, query: AnyLayout) => void
+  // subscribe<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout, action: (docs: T[]) => void): Promise<QueryUpdater<T>>
 }
 
 /**

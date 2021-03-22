@@ -1,30 +1,22 @@
 <script lang="ts">
-  import LinkTo from '@anticrm/platform-ui/src/components/LinkTo.svelte'
-  import { getSpaceName, leaveSpace } from './utils'
-  import { _getCoreService, getUIService } from '../../../utils'
+  import { archivedSpaceUpdate, getSpaceName, leaveSpace } from './utils'
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import workbench from '../../..'
   import PopupMenu from '@anticrm/sparkling-controls/src/menu/PopupMenu.svelte'
   import PopupItem from '@anticrm/sparkling-controls/src/menu/PopupItem.svelte'
   import AddUser from './AddUser.svelte'
   import { Space } from '@anticrm/domains'
+  import { getCoreService } from '@anticrm/presentation'
+  import { getUIService } from '@anticrm/platform-ui'
 
   export let selected: boolean = false
   export let space: Space = {} as Space
   export let count: number = 0
 
-  const coreService = _getCoreService()
+  const coreService = getCoreService()
   const uiService = getUIService()
 
   let optionsButton: HTMLElement
-
-  function addUser () {
-
-  }
-
-  function showSpaceOptions () {
-
-  }
 </script>
 
 <div class="item" class:selected={selected}>
@@ -48,6 +40,12 @@
             leaveSpace(coreService, space)
           }}>Leave
         </PopupItem>
+        <PopupItem on:click={() => {
+            archivedSpaceUpdate(coreService, space, !space.archived)
+          }}>Archive
+        </PopupItem>
+        }
+        })
       </PopupMenu>
     </div>
   {/if}

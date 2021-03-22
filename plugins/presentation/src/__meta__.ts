@@ -19,18 +19,18 @@ import presentation from '..'
 export default (platform: Platform) => {
   const spritesUrl = require('../assets/icons.svg') // eslint-disable-line
   platform.loadMetadata(presentation.icon, {
-    Finder: spritesUrl + '#finder',
-    brdBold: spritesUrl + '#brdBold',
-    brdItalic: spritesUrl + '#brdItalic',
-    brdUnder: spritesUrl + '#brdUnder',
-    brdStrike: spritesUrl + '#brdStrike',
-    brdCode: spritesUrl + '#brdCode',
-    brdUL: spritesUrl + '#brdUL',
-    brdOL: spritesUrl + '#brdOL',
-    brdLink: spritesUrl + '#brdLink',
-    brdAddr: spritesUrl + '#brdAddr',
-    brdClip: spritesUrl + '#brdClip',
-    brdSend: spritesUrl + '#brdSend',
-    brdSmile: spritesUrl + '#brdSmile'
+    Finder: `${spritesUrl}#finder`,
+    brdBold: `${spritesUrl}#brdBold`,
+    brdItalic: `${spritesUrl}#brdItalic`,
+    brdUnder: `${spritesUrl}#brdUnder`,
+    brdStrike: `${spritesUrl}#brdStrike`,
+    brdCode: `${spritesUrl}#brdCode`,
+    brdUL: `${spritesUrl}#brdUL`,
+    brdOL: `${spritesUrl}#brdOL`,
+    brdLink: `${spritesUrl}#brdLink`,
+    brdAddr: `${spritesUrl}#brdAddr`,
+    brdClip: `${spritesUrl}#brdClip`,
+    brdSend: `${spritesUrl}#brdSend`,
+    brdSmile: `${spritesUrl}#brdSmile`
   })
 }

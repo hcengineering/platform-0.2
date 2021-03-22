@@ -13,13 +13,13 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { Ref, Doc, Class, StringProperty, Property } from '@anticrm/core'
+  import { Class, Doc, Property, Ref, StringProperty } from '@anticrm/core'
   import { onDestroy } from 'svelte'
-  import { getUIService, _getCoreService } from '../../utils'
-  import { Space, VDoc, CORE_CLASS_SPACE, Title, CORE_CLASS_TITLE, TitleSource } from '@anticrm/domains'
-  import ui, { Location, newRouter } from '@anticrm/platform-ui'
+  import { CORE_CLASS_SPACE, CORE_CLASS_TITLE, Space, Title, TitleSource } from '@anticrm/domains'
+  import ui, { newRouter } from '@anticrm/platform-ui'
   import workbench, { WorkbenchApplication } from '../..'
-  import { CoreDocument } from '@anticrm/presentation'
+  import { CoreDocument, createLiveQuery, getCoreService, getUserId } from '@anticrm/presentation'
+  import { getUIService } from '@anticrm/platform-ui'
 
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import SpaceItem from './spaces/SpaceItem.svelte'
@@ -27,8 +27,6 @@
   import PopupItem from '@anticrm/sparkling-controls/src/menu/PopupItem.svelte'
   import BrowseSpace from './spaces/BrowseSpace.svelte'
   import CreateSpace from './spaces/CreateSpace.svelte'
-
-  import { AnyComponent } from '@anticrm/platform-ui'
 
   import MainComponent from '../proxies/MainComponent.svelte'
 
@@ -41,26 +39,21 @@
   let nextDiv: HTMLElement
 
   const uiService = getUIService()
+  const coreService = getCoreService()
 
-  const coreService = _getCoreService()
+  let currentUser: string = getUserId()
 
-  const currentUser = coreService.getUserId()
-
-  let space: Space
+  let space: Space | undefined
   let spaces: Space[] = []
 
   let application: WorkbenchApplication
   let applications: WorkbenchApplication[] = []
 
-  let component: AnyComponent | undefined
   let details: CoreDocument | undefined
 
   interface WorkbenchRouteInfo {
     space: string // A ref of space name
     app: Ref<WorkbenchApplication>
-
-    _class?: Ref<Class<Doc>>
-    _id?: Ref<Doc>
   }
 
   function routeDefaults (): WorkbenchRouteInfo {
@@ -70,18 +63,16 @@
     } as WorkbenchRouteInfo
   }
 
-  const router = newRouter<WorkbenchRouteInfo>(':space/:app', (info) => {
+  const router = newRouter<WorkbenchRouteInfo>(':app?space', (info) => {
     if (spaces.length > 0) {
-      space = spaces.find((s) => (s._id === info.space as Ref<Space>) || s.spaceKey === info.space) || spaces[0]
+      space = spaces.find((s) => (s._id === info.space as Ref<Space>) || s.spaceKey === info.space)
     }
     if (applications.length > 0) {
       application = applications.find((a) => (a._id === info.app || a.route === info.app || a.label === info.app)) || applications[0]
-      component = application?.component
     }
   }, routeDefaults())
 
   interface DocumentMatcher {
-    _class: string | undefined
     doc: string | undefined
   }
 
@@ -89,7 +80,7 @@
     // Parse browse and convert it to _class and objectId
     if (match.doc) {
       // Check find a title
-      const title = await coreService.findOne<Title>(CORE_CLASS_TITLE, {
+      const title = await (await coreService).findOne<Title>(CORE_CLASS_TITLE, {
         title: match.doc as StringProperty,
         source: TitleSource.ShortId as Property<TitleSource, number>
       })
@@ -105,7 +96,7 @@
 
           // Try find a class to be sure it is available.
           try {
-            coreService.getModel().getClass(_class as Ref<Class<Doc>>)
+            (await coreService).getModel().getClass(_class as Ref<Class<Doc>>)
           } catch (ex) {
             console.error(ex)
             details = undefined
@@ -128,7 +119,7 @@
       return
     }
     // Find if object has a shortId.
-    const title = await coreService.findOne<Title>(CORE_CLASS_TITLE, {
+    const title = await (await coreService).findOne<Title>(CORE_CLASS_TITLE, {
       _objectId: doc._id,
       _objectClass: doc._class,
       source: TitleSource.ShortId as Property<TitleSource, number>
@@ -154,12 +145,12 @@
     uiService.registerDocumentProvider(undefined)
   })
 
-  coreService.subscribe(CORE_CLASS_SPACE, {}, (docs) => {
+  createLiveQuery(CORE_CLASS_SPACE, {}, (docs) => {
     spaces = docs.filter((s) => getCurrentUserSpace(currentUser, s))
     router.setDefaults(routeDefaults())
   }, onDestroy)
 
-  coreService.subscribe(workbench.class.WorkbenchApplication, {}, (docs) => {
+  createLiveQuery(workbench.class.WorkbenchApplication, {}, (docs) => {
     applications = docs
     router.setDefaults(routeDefaults())
   }, onDestroy)
@@ -168,9 +159,11 @@
     return doc._id as Ref<T>
   }
 
-  let addButton: HTMLElement
-
   let hidden = true
+
+  function appSpaces (spaces: Space[], app: WorkbenchApplication): Space[] {
+    return spaces.filter((sp) => sp.application === app._id)
+  }
 </script>
 
 <style lang="scss">
@@ -287,14 +280,46 @@
     background-color: var(--theme-bg-color);
     border-left: 1px solid var(--theme-bg-accent-color);
   }
+
+  .app-selector {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+
+    .nav-link {
+      flex-grow: 1;
+    }
+
+    .selected {
+      color: var(--theme-userlink-color);
+    }
+
+    .labeled-icon {
+      display: flex;
+
+      span {
+        margin-left: 0.5em;
+      }
+    }
+
+    margin-bottom: 0.5em;
+  }
+
+  .application-box {
+    margin: 1em;
+
+    .content {
+      margin-left: 1em;
+    }
+  }
 </style>
 
 <div class="workbench-perspective">
   <nav>
     <div class="app-icon">
       {#each applications as app}
-        <LinkTo on:click={router.navigate({app: app.route})}>
-          <div class={( app._id === application._id) ? 'selectedApp' : 'iconApp'}>
+        <LinkTo on:click={() => router.navigate({app: app.route})}>
+          <div class="iconApp">
             <Icon icon={app.icon} size="24" />
           </div>
         </LinkTo>
@@ -308,44 +333,72 @@
     </a>
     <div class="container" class:hidden={!hidden}>
       <div class="caption-3">
-        Spaces
+        Applications
       </div>
-      {#each spaces as s (s._id)}
-        {#if !s.archived}
-          <LinkTo on:click={router.navigate({ space: s.spaceKey })}>
-            <SpaceItem selected={s._id === space._id} space={s} />
-          </LinkTo>
-        {/if}
+      {#each applications as app}
+        <div class="application-box">
+          <div class="app-selector">
+            <div class="nav-link" class:selected={( app._id === application._id)}>
+              <LinkTo on:click={() => router.navigate({app: app.route, space: undefined})}>
+                <div class="labeled-icon">
+                  <Icon icon={app.icon} size="16" />
+                  <span> {app.label}</span>
+                </div>
+              </LinkTo>
+            </div>
+            {#if app._id === application._id && app.supportSpaces}
+              <PopupMenu>
+                <div class="popup" slot="trigger">
+                  <Icon icon={ui.icon.Add} button="true" />
+                </div>
+                <PopupItem on:click={() => {
+              uiService.showModal(CreateSpace, {application: app})
+            }}>Create
+                </PopupItem>
+                <PopupItem on:click={() => {
+              uiService.showModal(BrowseSpace, {application: app})
+            }}>Browse
+                </PopupItem>
+              </PopupMenu>
+            {/if}
+          </div>
+          <div class="content">
+            {#each appSpaces(spaces, app) as s (s._id)}
+              {#if !s.archived}
+                <LinkTo on:click={() => router.navigate({ app: app.route, space: s.spaceKey })}>
+                  <SpaceItem selected={space && s._id === space._id} space={s} />
+                </LinkTo>
+              {/if}
+            {/each}
+          </div>
+        </div>
       {/each}
-      <div class="footContainer">
-        <span>
-          <PopupMenu>
-            <div class="popup" slot="trigger"><Icon icon={ui.icon.Add} button="true" /></div>
-            <PopupItem on:click={() => {
-              uiService.showModal(CreateSpace, {})
-            }}>Create</PopupItem>
-            <PopupItem on:click={() => {
-              uiService.showModal(BrowseSpace, {})
-            }}>Browse</PopupItem>
-          </PopupMenu>
-        </span>
-      </div>
     </div>
   </div>
 
   <div bind:this={prevDiv} class="main">
-    {#if component && space && application}
+    {#if space && application && application.component}
       <MainComponent
-        is={component}
+        is={application.component}
         {application}
         {space}
+        on:open={(e) => navigateDocument({ _class: e.detail._class, _id: e.detail._id })} />
+    {:else if application && application.rootComponent}
+      <MainComponent
+        is={application.rootComponent}
+        {application}
+        on:open={(e) => navigateDocument({ _class: e.detail._class, _id: e.detail._id })} />
+    {:else}
+      <MainComponent
+        is={workbench.component.ApplicationDashboard}
+        {application}
         on:open={(e) => navigateDocument({ _class: e.detail._class, _id: e.detail._id })} />
     {/if}
   </div>
   {#if details}
     <Splitter {prevDiv} {nextDiv} minWidth="404" />
     <aside bind:this={nextDiv}>
-      <ObjectForm {...details} title="Title"
+      <ObjectForm _class={details._class} _objectId={details._id} title="Title"
                   on:close={()=> navigateDocument(undefined)} />
     </aside>
   {/if}

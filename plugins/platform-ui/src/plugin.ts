@@ -34,7 +34,7 @@ import { getContext, onDestroy, setContext } from 'svelte'
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */
-export default async (platform: Platform): Promise<UIService> => {
+export default (platform: Platform): Promise<UIService> => {
   platform.setResource(ui.component.Icon, Icon)
   platform.setResource(ui.component.Spinner, Spinner)
 
@@ -110,6 +110,10 @@ export default async (platform: Platform): Promise<UIService> => {
         result.update(loc)
       }, onDestroy)
     }
+    if (r) {
+      // We need to remove child router from parent, if component is destroyed
+      onDestroy(r.clearChildRouter)
+    }
     setContext(CONTEXT_ROUTE_VALUE, result)
     return result
   }
@@ -148,5 +152,5 @@ export default async (platform: Platform): Promise<UIService> => {
     registerDocumentProvider
   } as UIService
 
-  return uiService
+  return Promise.resolve(uiService)
 }

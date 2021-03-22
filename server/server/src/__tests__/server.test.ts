@@ -121,8 +121,8 @@ describe('server', () => {
     await server.shutdown()
   })
 
-  test('should connect to server', async () => {
-    expect(conn.readyState).toEqual(1)
+  test('should connect to server', () => {
+    expect(conn.readyState).toEqual(WebSocket.OPEN)
   })
 
   it('should send many requests', (done) => {

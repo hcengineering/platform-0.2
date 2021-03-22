@@ -54,14 +54,6 @@ describe('platform', () => {
     })
   })
 
-  it('should return running plugin', () => {
-    expect(platform.getRunningPlugin(plugin1)).toBeDefined()
-  })
-
-  it('should throw exeption when ask for non running plugin', () => {
-    expect(() => platform.getRunningPlugin('xxx' as Plugin<Record<string, any>>)).toThrowError()
-  })
-
   it('should not resolve resource (no plugin location)', (done) => {
     platform.getResource('resource:NotExists.Resource' as Resource<string>).then(res => { // eslint-disable-line
       expect(true).toBe(false)

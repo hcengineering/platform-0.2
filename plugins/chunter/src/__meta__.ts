@@ -19,9 +19,9 @@ import chunter from '..'
 export default (platform: Platform) => {
   const spritesUrl = require('../assets/icons.svg') // eslint-disable-line
   platform.loadMetadata(chunter.icon, {
-    Chunter: spritesUrl + '#chunter',
-    ActivityView: spritesUrl + '#activityView',
-    ChatView: spritesUrl + '#chatView',
-    PagesView: spritesUrl + '#pagesView'
+    Chunter: `${spritesUrl}'#chunter`,
+    ActivityView: `${spritesUrl}#activityView`,
+    ChatView: `${spritesUrl}#chatView`,
+    PagesView: `${spritesUrl}#pagesView`
   })
 }

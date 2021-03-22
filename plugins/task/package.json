@@ -10,7 +10,8 @@
     "lint": "eslint src"
   },
   "dependencies": {
-    "@anticrm/platform": "^0.2.0"
+    "@anticrm/platform": "^0.2.0",
+    "@anticrm/presentation": "^0.2.0"
   },
   "devDependencies": {
     "typescript": "^3.9.4",
@@ -21,6 +22,7 @@
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-standard": "^5.0.0"
+    "eslint-plugin-standard": "^5.0.0",
+    "eslint-plugin-svelte3": "^3.1.2"
   }
 }

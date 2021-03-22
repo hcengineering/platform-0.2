@@ -1,15 +1,15 @@
 <script lang="ts">
-  import { AnyLayout, Class, Doc, Ref, StringProperty } from '@anticrm/core'
+  import { AnyLayout, StringProperty } from '@anticrm/core'
   import { MessageNode, newMessageDocument } from '@anticrm/text'
-  import { _getCoreService } from '../../utils'
+  import { createLiveQuery, getCoreService, updateLiveQuery } from '../../utils'
 
-  import { CoreService } from '@anticrm/platform-core'
+  import { QueryUpdater } from '@anticrm/platform-core'
 
   import Toolbar from '@anticrm/sparkling-controls/src/toolbar/Toolbar.svelte'
   import ToolbarButton from '@anticrm/sparkling-controls/src/toolbar/Button.svelte'
 
   import EditorContent from '@anticrm/sparkling-rich/src/EditorContent.svelte'
-  import { EditorContentEvent } from '@anticrm/sparkling-rich/src/index'
+  import { EditorContentEvent } from '@anticrm/sparkling-rich'
   import { EditorState, Transaction } from 'prosemirror-state'
 
   import CompletionPopup from './CompletionPopup.svelte'
@@ -24,6 +24,7 @@
   import { CORE_CLASS_TITLE, Title } from '@anticrm/domains'
 
   const dispatch = createEventDispatcher()
+  const coreService = getCoreService()
 
   // ********************************
   // Properties
@@ -77,9 +78,7 @@
   let currentPrefix = ''
   let popupVisible = false
 
-  let titleSearch: (_class: Ref<Class<Doc>>, query: AnyLayout) => void
-
-  let coreService: CoreService = _getCoreService()
+  let titleSearch: Promise<QueryUpdater<Title>>
 
   function query (prefix: string): AnyLayout {
     return {
@@ -90,13 +89,11 @@
     }
   }
 
-  titleSearch = coreService.subscribe(CORE_CLASS_TITLE, query(currentPrefix), (docs) => {
+  titleSearch = createLiveQuery(CORE_CLASS_TITLE, query(currentPrefix), (docs) => {
     completions = updateTitles(docs)
   }, onDestroy)
 
-  $: {
-    titleSearch(CORE_CLASS_TITLE, query(currentPrefix))
-  }
+  $: updateLiveQuery(titleSearch, CORE_CLASS_TITLE, query(currentPrefix))
 
   function updateTitles (docs: Title[]): CompletionItem[] {
     let items: CompletionItem[] = []
@@ -117,7 +114,7 @@
   }
 
   async function findTitle (title: string): Promise<ItemRefefence[]> {
-    let docs = await coreService.find(CORE_CLASS_TITLE, {
+    let docs = await (await coreService).find(CORE_CLASS_TITLE, {
       title: title as StringProperty
     })
 

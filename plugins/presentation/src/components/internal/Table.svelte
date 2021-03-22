@@ -13,12 +13,11 @@
 // limitations under the License.
 -->
 <script type="ts">
-  import { createEventDispatcher } from 'svelte'
-  import { Ref, Class, Doc, CORE_CLASS_DOC } from '@anticrm/core'
-  import { CORE_CLASS_VDOC, Space } from '@anticrm/domains'
-  import { AttrModel, ClassModel, UXAttribute } from '../..'
-  import { getPresentationService, getEmptyModel, _getCoreService } from '../../utils'
-  import { onDestroy } from 'svelte'
+  import { createEventDispatcher, onDestroy } from 'svelte'
+  import { Class, CORE_CLASS_DOC, Doc, Ref } from '@anticrm/core'
+  import { Space } from '@anticrm/domains'
+  import { AttrModel, ClassModel } from '../..'
+  import { createLiveQuery, getEmptyModel, getPresentationService } from '../../utils'
   import Presenter from './presenters/Presenter.svelte'
 
   export let _class: Ref<Class<Doc>>
@@ -45,13 +44,13 @@
 
   let objects: any[] = []
 
-  const queryUpdate = _getCoreService().subscribe(_class, { _space: space._id }, (docs) => {
+  const queryUpdate = createLiveQuery(_class, { _space: space._id }, (docs) => {
     objects = docs
   }, onDestroy)
 
-  $: queryUpdate(_class, {
+  $: queryUpdate.then(qu => qu(_class, {
     _space: space._id
-  })
+  }))
 </script>
 
 <style lang="scss">

@@ -12,9 +12,6 @@
   // See the License for the specific language governing permissions and
   // limitations under the License.
 
-  import chunter from '@anticrm/chunter'
-  import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
-  
   export let dateItem: Date
 
   const month = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];

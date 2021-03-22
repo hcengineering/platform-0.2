@@ -15,14 +15,15 @@
 <script lang="ts">
   import { CORE_CLASS_DOC, Property, StringProperty } from '@anticrm/core'
   import { createEventDispatcher } from 'svelte'
-  import { AttrModel, ClassModel } from '@anticrm/presentation'
-  import { _getCoreService, getPresentationService } from '../../../utils'
+  import { AttrModel, ClassModel, getCoreService, getPresentationService } from '@anticrm/presentation'
   import CheckBox from '@anticrm/sparkling-controls/src/CheckBox.svelte'
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
   import EditBox from '@anticrm/platform-ui/src/components/EditBox.svelte'
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
-  import workbench from '@anticrm/workbench'
+  import workbench, { WorkbenchApplication } from '@anticrm/workbench'
   import { CORE_CLASS_SPACE } from '@anticrm/domains'
+
+  export let application: WorkbenchApplication
 
   let makePrivate: boolean = false
   let title: string = ''
@@ -30,23 +31,25 @@
   let spaceKey: string = ''
   let spaceKeyChanged: boolean = false
 
-  const coreService = _getCoreService()
   const dispatch = createEventDispatcher()
+  const coreService = getCoreService()
 
   async function save () {
+    const cs = await coreService
     const space = {
       name: title as StringProperty,
       description: description as StringProperty,
+      application: application._id,
       isPublic: !makePrivate as Property<boolean, boolean>,
       spaceKey: spaceKey as StringProperty,
       users: [
         {
-          userId: coreService.getUserId() as StringProperty,
+          userId: cs.getUserId() as StringProperty,
           owner: true as Property<boolean, boolean>
         }
       ]
     }
-    await coreService.create(CORE_CLASS_SPACE, space)
+    await cs.create(CORE_CLASS_SPACE, space)
     dispatch('close')
   }
 
@@ -124,7 +127,7 @@
 
 <div class="space-view">
   <div class="header">
-    <div class="caption-1">Новое {(makePrivate) ? 'частное ' : ''}пространство</div>
+    <div class="caption-1">Create {(makePrivate) ? 'private ' : ''} {application.spaceTitle}</div>
     <a href="/" on:click|preventDefault={() => dispatch('close')}>
       <Icon icon={workbench.icon.Close} button="true" />
     </a>
@@ -134,19 +137,20 @@
     <form class="form">
       <div class="input-container">
         <EditBox id="create_space__input__name" bind:value={title} width="100%"
-                 label="Имя" placeholder="Пространство вседозволенности" on:change={updateSpaceKey} />
+                 label="Name" placeholder={`A ${application.spaceTitle} Name`} on:change={updateSpaceKey} />
       </div>
       <div class="input-container">
         <EditBox id="create_space__input__shortId" bind:value={spaceKey} width="100%"
-                 label="Space Key" placeholder="A space Key (will be used with short ids)"
+                 label={application.spaceTitle + ' Key'}
+                 placeholder={`A ${application.spaceTitle} Key (will be used with short ids)`}
                  on:change={() => spaceKeyChanged = true} />
       </div>
       <div class="input-container">
         <EditBox id="create_space__input__description" bind:value={description} width="100%"
-                 label="Описание" placeholder="Владелец: Сергей Никифоров" />
+                 label="Description" placeholder={`Write a ${application.spaceTitle} description`} />
       </div>
       <CheckBox bind:checked={makePrivate}>
-        Сделать частным пространством
+        Create a private {application.spaceTitle}
       </CheckBox>
       <div class="separator"></div>
       <div class="buttons">

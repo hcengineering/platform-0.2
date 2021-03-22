@@ -28,13 +28,14 @@ import StringEditor from './components/internal/presenters/value/StringEditor.sv
 import CheckboxEditor from './components/internal/presenters/value/CheckboxEditor.svelte'
 import TablePresenter from './components/internal/presenters/class/TablePresenter.svelte'
 import RefPresenter from './components/internal/presenters/value/RefPresenter.svelte'
+import ArrayPresenter from './components/internal/presenters/value/ArrayPresenter.svelte'
 
 /*!
  * Anticrm Platform™ Presentation Core Plugin
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */
-export default async (platform: Platform, deps: { core: CoreService, i18n: I18n }): Promise<PresentationService> => {
+export default (platform: Platform, deps: { core: CoreService, i18n: I18n }): Promise<PresentationService> => {
   const coreService = deps.core
   const i18nService = deps.i18n
 
@@ -43,6 +44,7 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
 
   platform.setResource(ui.component.StringPresenter, StringEditor)
   platform.setResource(ui.component.CheckboxPresenter, CheckboxEditor)
+  platform.setResource(ui.component.ArrayPresenter, ArrayPresenter)
 
   platform.setResource(ui.component.TablePresenter, TablePresenter)
   platform.setResource(ui.component.RefPresenter, RefPresenter)
@@ -284,8 +286,8 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
     return undefined
   }
 
-  return {
+  return Promise.resolve({
     getClassModel,
     getComponentExtension
-  }
+  })
 }

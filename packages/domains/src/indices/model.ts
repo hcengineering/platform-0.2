@@ -27,8 +27,8 @@ import {
  * Perform model update and forward updates into chained storage if required.
  */
 export class ModelIndex implements DomainIndex {
-  private storages: Storage[]
-  private model: Model
+  private readonly storages: Storage[]
+  private readonly model: Model
 
   constructor (model: Model, storages: Storage[]) {
     this.model = model

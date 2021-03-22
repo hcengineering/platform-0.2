@@ -14,7 +14,6 @@
 -->
 
 <script type="ts">
-  import { _getCoreService, getUIService } from '../../utils'
   import workbench, { WorkbenchApplication } from '../..'
 
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
@@ -24,15 +23,17 @@
   import EditBox from '@anticrm/platform-ui/src/components/EditBox.svelte'
   import { Space } from '@anticrm/domains'
   import { onDestroy } from 'svelte'
-  import ui, { Viewlet } from '@anticrm/presentation'
+  import ui, { createLiveQuery, getCoreService, Viewlet } from '@anticrm/presentation'
+  import { getUIService } from '@anticrm/platform-ui'
   import Component from '@anticrm/platform-ui/src/components/Component.svelte'
   import ActionBar from '@anticrm/platform-ui/src/components/ActionBar.svelte'
   import { Action, Location } from '@anticrm/platform-ui'
+  import { Model } from '@anticrm/core'
 
   export let application: WorkbenchApplication
   export let space: Space
 
-  const coreService = _getCoreService()
+  const coreService = getCoreService()
   const uiService = getUIService()
 
   let addIcon: HTMLElement
@@ -48,13 +49,11 @@
     location = loc
   }, onDestroy)
 
-  coreService.subscribe(ui.mixin.Viewlet, {}, (docs) => {
+  createLiveQuery(ui.mixin.Viewlet, {}, (docs) => {
     presenters = docs
   }, onDestroy)
 
-  const model = coreService.getModel()
-
-  function filterViewlets (presenters: Viewlet[]): Viewlet[] {
+  function filterViewlets (model: Model, presenters: Viewlet[]): Viewlet[] {
     return presenters.filter((d) => {
       for (const cc of application?.classes) {
         if (model.is(cc, d.displayClass)) {
@@ -77,16 +76,20 @@
 
   $: {
     // Update available presenters based on application
-    const viewlets = filterViewlets(presenters)
+    coreService.then(cs => {
+      const model = cs.getModel()
 
-    const vid = location.query.viewlet
-    if (vid) {
-      activeViewlet = viewlets.find(p => p._id == vid)
-    }
-    if (viewlets.length > 0 && !activeViewlet) {
-      activeViewlet = viewlets[0]
-    }
-    viewletActions = getViewletActions(application, activeViewlet, viewlets)
+      const viewlets = filterViewlets(model, presenters)
+
+      const vid = location.query.viewlet
+      if (vid) {
+        activeViewlet = viewlets.find(p => p._id == vid)
+      }
+      if (viewlets.length > 0 && !activeViewlet) {
+        activeViewlet = viewlets[0]
+      }
+      viewletActions = getViewletActions(application, activeViewlet, viewlets)
+    })
   }
 
   function getLabel (str: string): string {
@@ -122,7 +125,7 @@
                    props={{_class: application.classes[0], space: space, editable: false}} on:open />
       {/if}
     </ScrollView>
-  { /if                                                   }
+  {/if}
 </div>
 
 <style lang="scss">

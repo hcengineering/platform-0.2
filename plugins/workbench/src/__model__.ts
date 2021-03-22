@@ -40,8 +40,13 @@ class TWorkbenchApplication extends TApplication implements WorkbenchApplication
   @Prop() route!: string
   @Prop() label!: IntlString
   @Prop() icon?: Asset
+  @Prop() rootComponent?: AnyComponent
   @Prop() component!: AnyComponent
   @Prop() classes!: Ref<Class<VDoc>>[]
+
+  @Prop() supportSpaces!: boolean
+  @Prop() spaceTitle?: string
+  @Prop() spaceComponent?: AnyComponent
 }
 
 @Class$(workbench.class.Perspective, core.class.Doc, MODEL_DOMAIN)
@@ -81,31 +86,4 @@ export function model (S: Builder): void {
     icon: workbench.icon.DefaultPerspective,
     component: workbench.component.DefaultPerspective
   }, workbench.perspective.Default)
-
-  S.createDocument(core.class.Space, {
-    name: 'General',
-    description: 'General space',
-    isPublic: true, // Available for all
-    archived: false,
-    spaceKey: 'GEN',
-    users: []
-  }, workbench.space.General)
-
-  S.createDocument(core.class.Space, {
-    name: 'Other',
-    description: 'Other space',
-    isPublic: true,
-    spaceKey: 'OVR',
-    archived: false,
-    users: []
-  }, workbench.space.Random)
-
-  S.createDocument(core.class.Space, {
-    name: 'Random',
-    description: 'Random space',
-    isPublic: true,
-    spaceKey: 'RAND',
-    archived: false,
-    users: []
-  }, workbench.space.Other)
 }

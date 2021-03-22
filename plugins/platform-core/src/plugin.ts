@@ -18,21 +18,15 @@ import { ModelDb } from './modeldb'
 
 import core from './index'
 
-import { CoreService, QueryResult, RefFinalizer, Unsubscriber } from '.'
+import { CoreService, QueryResult } from '.'
 import rpcService, { EventType } from './rpc'
 
 import { QueriableStorage } from './queries'
 
 import { Cache } from './cache'
 import {
-  Tx, txContext, TxContextSource,
-  Ref,
-  Class,
-  Doc,
-  AnyLayout,
-  StringProperty, MODEL_DOMAIN,
-  CoreProtocol, TxProcessor,
-  generateId as genId
+  AnyLayout, Class, CoreProtocol, Doc, generateId as genId, MODEL_DOMAIN, Ref, StringProperty, Tx, txContext,
+  TxContextSource, TxProcessor
 } from '@anticrm/core'
 import { CORE_CLASS_REFERENCE, CORE_CLASS_SPACE, CORE_CLASS_TITLE, Space, TITLE_DOMAIN, VDoc } from '@anticrm/domains'
 
@@ -128,35 +122,6 @@ export default async (platform: Platform): Promise<CoreService> => {
     return qCache.query(_class, query)
   }
 
-  function subscribe<T extends Doc> (_class: Ref<Class<T>>, _query: AnyLayout, action: (docs: T[]) => void, regFinalizer: RefFinalizer): (_class: Ref<Class<T>>, query: AnyLayout) => void {
-    let oldQuery: AnyLayout
-    let oldClass: Ref<Class<T>>
-    let unsubscriber: Unsubscriber
-    regFinalizer(() => {
-      if (unsubscriber) {
-        unsubscriber()
-      }
-    })
-    const result = (newClass: Ref<Class<T>>, newQuery: AnyLayout) => {
-      if (JSON.stringify(oldQuery) === JSON.stringify(newQuery) && oldClass === newClass) {
-        return
-      }
-      if (unsubscriber) {
-        unsubscriber()
-      }
-      oldQuery = newQuery
-      oldClass = newClass
-      const q = query(newClass, newQuery)
-      unsubscriber = q.subscribe(action)
-    }
-    try {
-      result(_class, _query)
-    } catch (ex) {
-      console.error(ex)
-    }
-    return result
-  }
-
   function generateId () {
     return genId() as Ref<Doc>
   }
@@ -188,7 +153,6 @@ export default async (platform: Platform): Promise<CoreService> => {
     getModel: () => model,
     loadDomain,
     query,
-    subscribe,
     find,
     findOne,
     ...ops,

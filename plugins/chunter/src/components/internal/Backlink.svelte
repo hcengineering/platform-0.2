@@ -12,24 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 -->
-<script lang='ts'>
+<script lang="ts">
   import { Reference } from '@anticrm/domains'
-  import { getRunningService } from '@anticrm/platform-ui'
-  import core from '@anticrm/platform-core'
   import { Message } from '../..'
   import { onDestroy } from 'svelte'
 
   import CommentComponent from './Comment.svelte'
+  import { createLiveQuery, updateLiveQuery } from '@anticrm/presentation'
 
   export let backlink: Reference
 
   let message: Message
 
-  const qs = getRunningService(core.id).subscribe(backlink._sourceClass, { _id: backlink._sourceId }, (docs) => {
+  const qs = createLiveQuery(backlink._sourceClass, { _id: backlink._sourceId }, (docs) => {
     message = docs[0] as Message
   }, onDestroy)
 
-  $: qs(backlink._sourceClass, { _id: backlink._sourceId })
+  $: updateLiveQuery(qs, backlink._sourceClass, { _id: backlink._sourceId })
 </script>
 
 {#if message && message.comments && message.comments.length > backlink._sourceProps.pos}

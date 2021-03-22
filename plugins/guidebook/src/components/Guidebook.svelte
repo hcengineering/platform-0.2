@@ -12,12 +12,12 @@
   // See the License for the specific language governing permissions and
   // limitations under the License.
   import guidebook from '..'
-  import { find, getUIService } from '../utils'
   import { getContext, onMount, onDestroy } from 'svelte'
 
   import LinkTo from '@anticrm/platform-ui/src/components/LinkTo.svelte'
 
   import { GuideBookPage, pages, pageIndex } from '../registry'
+  import { getUIService } from '@anticrm/platform-ui'
 
   //****************************************************************
 
@@ -72,6 +72,7 @@
         width: 40px;
         height: 20px;
       }
+
       &.current-app {
         background-color: var(--theme-bg-color);
       }
@@ -89,6 +90,7 @@
     display: flex;
     flex-direction: column;
     align-items: stretch;
+
     .content {
       overflow: auto;
     }

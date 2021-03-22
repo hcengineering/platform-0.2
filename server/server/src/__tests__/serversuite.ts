@@ -171,7 +171,7 @@ export class ServerSuite {
       }
     }
     for (let i = 0; i < n; i++) {
-      const socket = new PipeClientSocket('test@client' + (i + 1), this.wsName)
+      const socket = new PipeClientSocket(`test@client${i + 1}`, this.wsName)
       const client = await createClientService(ws, socket, broadcast)
       const info = {
         client,
