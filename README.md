@@ -29,7 +29,7 @@ Use following commands to install and run demo application:
 
 ```
 yarn
-docker run -d -p 27017:27017 mongo
+docker run -d -p 127.0.0.1:27017:27017 mongo
 yarn workspace @anticrm/tool create-workspace workspace --organization "My Organization"
 yarn workspace @anticrm/tool create-user john.appleseed@gmail.com -w workspace -p 123 -f "John Appleseed"
 yarn workspace @anticrm/tool create-user brain.appleseed@gmail.com -w workspace -p 123 -f "Brain Appleseed"
