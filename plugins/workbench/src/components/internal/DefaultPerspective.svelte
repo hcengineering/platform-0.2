@@ -173,7 +173,7 @@
   }
 
   nav {
-    width: 60px;
+    width: 52px;
     background-color: var(--theme-bg-color);
 
     display: flex;
@@ -265,8 +265,9 @@
 
   .mini {
     box-sizing: border-box;
-    width: 4em;
-    min-width: 4em;
+    width: 60px;
+    min-width: 60px;
+    max-width: 60px;
   }
 
   .main {
