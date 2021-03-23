@@ -32,13 +32,13 @@
       <div class="label">{label}</div>
       <input bind:this={input} {id} type="text"
         bind:value={value} {placeholder}
-        on:input={onInput} on:focus={onFocus} on:change={onChange}
+        on:input on:focus on:change
       />
     </div>
   {:else}
     <input bind:this={input} {id} type="text"
       bind:value={value} {placeholder}
-      on:input={onInput} on:focus={onFocus} on:change={onChange}
+      on:input on:focus on:change
     />
   {/if}
 </div>

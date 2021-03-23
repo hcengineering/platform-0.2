@@ -20,7 +20,7 @@
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
   import CreateForm from './CreateForm.svelte'
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
-  import EditBox from '@anticrm/platform-ui/src/components/EditBox.svelte'
+  import IconEditBox from '@anticrm/platform-ui/src/components/IconEditBox.svelte'
   import { Space } from '@anticrm/domains'
   import { onDestroy } from 'svelte'
   import ui, { createLiveQuery, getCoreService, Viewlet } from '@anticrm/presentation'
@@ -114,7 +114,7 @@
         </Button>
       </div>
       <div style="flex-grow:1"></div>
-      <EditBox icon={workbench.icon.Finder} placeholder="Поиск по {application.label}..." iconRight="true" />
+      <IconEditBox icon={workbench.icon.Finder} placeholder="Поиск по {application.label}..." iconRight="true" />
     </div>
     <div class="presentation">
       <ActionBar actions={viewletActions} />

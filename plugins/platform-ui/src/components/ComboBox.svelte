@@ -1,7 +1,7 @@
 <script lang="ts">
   import UserInfo from '@anticrm/sparkling-controls/src/UserInfo.svelte'
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
-  import EditBox from './EditBox.svelte'
+  import IconEditBox from './IconEditBox.svelte'
   import workbench from '@anticrm/workbench'
   import { Action } from '..'
   import { onDestroy } from 'svelte'

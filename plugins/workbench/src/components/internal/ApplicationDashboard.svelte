@@ -15,7 +15,7 @@
 
 <script type="ts">
   import workbench, { WorkbenchApplication } from '../..'
-  import EditBox from '@anticrm/platform-ui/src/components/EditBox.svelte'
+  import IconEditBox from '@anticrm/platform-ui/src/components/IconEditBox.svelte'
 
   export let application: WorkbenchApplication
 
@@ -27,7 +27,7 @@
     <div class="captionContainer">
       <span class="caption-1" style="padding-right:1em">{application.label}</span>&nbsp;
       <div style="flex-grow:1"></div>
-      <EditBox icon={workbench.icon.Finder} placeholder="Поиск по {application.label}..." iconRight="true" />
+      <IconEditBox icon={workbench.icon.Finder} placeholder="Поиск по {application.label}..." iconRight="true" />
     </div>
   {/if}
 </div>
