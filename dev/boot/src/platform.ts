@@ -25,6 +25,7 @@ import task from '@anticrm/task'
 import contact from '@anticrm/contact'
 import chunter from '@anticrm/chunter'
 import guidebook from '@anticrm/guidebook'
+import datagen from '@anticrm/data-generator'
 // import recruitment from '@anticrm/recruitment'
 import uiMeta from '@anticrm/platform-ui/src/__meta__/meta'
 import workbenchMeta from '@anticrm/workbench/src/__meta__'
@@ -35,6 +36,8 @@ import loginMeta from '@anticrm/login/src/__meta__'
 // import contactMeta from '@anticrm/contact/src/__meta__/meta'
 // import recruitmentMeta from '@anticrm/recruitment/src/__meta__/meta'
 // import taskMeta from '@anticrm/task/src/__meta__/meta'
+
+import dataGenMeta from '@anticrm/data-generator/src/__meta__'
 
 const platform = createPlatform()
 
@@ -53,6 +56,8 @@ platform.addLocation(chunter, () => import(/* webpackChunkName: "chunter" */ '@a
 platform.addLocation(guidebook, () => import(/* webpackChunkName: "guidebook" */ '@anticrm/guidebook/src/plugin'))
 // platform.addLocation(recruitment, () => import(/* webpackChunkName: "recruitment" */ '@anticrm/recruitment/src/plugin'))
 
+platform.addLocation(datagen, () => import(/* webpackChunkName: "datagen" */ '@anticrm/data-generator/src/plugin'))
+
 uiMeta(platform)
 workbenchMeta(platform)
 chunterMeta(platform)
@@ -61,5 +66,6 @@ taskMeta(platform)
 presentationMeta(platform)
 loginMeta(platform)
 // contactMeta(platform)
+dataGenMeta(platform)
 
 export default platform
