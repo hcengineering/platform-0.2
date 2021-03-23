@@ -24,7 +24,6 @@ export interface QueryResult<T extends Doc> {
   subscribe (run: Subscriber<T>): Unsubscriber
 }
 
-export type RefFinalizer = (op: () => void) => void
 export type QueryUpdater<T extends Doc> = (_class: Ref<Class<T>>, query: AnyLayout) => void
 
 /**

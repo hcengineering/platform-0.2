@@ -20,7 +20,7 @@
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import presentation from '@anticrm/presentation'
 
-  import { createEventDispatcher, onDestroy } from 'svelte'
+  import { createEventDispatcher } from 'svelte'
   import { CORE_CLASS_TITLE, Title } from '@anticrm/domains'
 
   const dispatch = createEventDispatcher()
@@ -91,7 +91,7 @@
 
   titleSearch = createLiveQuery(CORE_CLASS_TITLE, query(currentPrefix), (docs) => {
     completions = updateTitles(docs)
-  }, onDestroy)
+  })
 
   $: updateLiveQuery(titleSearch, CORE_CLASS_TITLE, query(currentPrefix))
 

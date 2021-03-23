@@ -43,6 +43,7 @@ export type PropertyType = Property<PrimitiveType, any>
 export type StringProperty = Property<string, string>
 export type BooleanProperty = Property<boolean, boolean>
 export type DateProperty = Property<number, Date>
+export type NumberProperty = Property<number, number>
 
 // An attribute type with some defined mixins inside.
 export interface Type extends Emb {

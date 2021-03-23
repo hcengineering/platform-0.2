@@ -13,11 +13,10 @@
   // limitations under the License.
   import workbench, { Perspective, WorkbenchApplication } from '../..'
   import { createLiveQuery } from '@anticrm/presentation'
-  import { onDestroy } from 'svelte'
 
   import Component from '@anticrm/platform-ui/src/components/Component.svelte'
   import Spotlight from './Spotlight.svelte'
-  import { AnyComponent, newRouter, getUIService } from '@anticrm/platform-ui'
+  import { AnyComponent, getUIService, newRouter } from '@anticrm/platform-ui'
   import { Ref } from '@anticrm/core'
 
   const uiService = getUIService()
@@ -50,7 +49,7 @@
     if (perspectives.length > 0) {
       router.setDefaults({ perspective: perspectives[0].name })
     }
-  }, onDestroy)
+  })
 
   function handleKeydown (ev: KeyboardEvent) {
     if (ev.code === 'KeyS' && ev.ctrlKey) {

@@ -15,8 +15,8 @@
 
 import { AnyLayout, Class, Doc, Mixin, Obj, Ref, StringProperty, Type } from '@anticrm/core'
 import { Platform } from '@anticrm/platform'
-import { getContext } from 'svelte'
-import core, { CoreService, QueryUpdater, RefFinalizer, Unsubscriber } from '@anticrm/platform-core'
+import { getContext, onDestroy } from 'svelte'
+import core, { CoreService, QueryUpdater, Unsubscriber } from '@anticrm/platform-core'
 import { AnyComponent, CONTEXT_PLATFORM } from '@anticrm/platform-ui'
 import presentationPlugin, { AttrModel, ClassModel, ComponentExtension, GroupModel, PresentationService } from '.'
 import { IntlString } from '@anticrm/platform-i18n'
@@ -50,18 +50,17 @@ export function getUserId (): string {
  * @return a function to re-query with a new parameters for same action.
  */
 export async function createLiveQuery<T extends Doc> (_class: Ref<Class<T>>, _query: AnyLayout,
-  action: (docs: T[]) => void, regFinalizer: RefFinalizer): Promise<QueryUpdater<T>> {
+  action: (docs: T[]) => void): Promise<QueryUpdater<T>> {
   let oldQuery: AnyLayout
   let oldClass: Ref<Class<T>>
   let unsubscribe: Unsubscriber
-  regFinalizer(() => {
+  onDestroy(() => {
     if (unsubscribe) {
       unsubscribe()
     }
   })
   const coreService = await getCoreService()
   const result = (newClass: Ref<Class<T>>, newQuery: AnyLayout) => {
-    console.log('QUERY UPDATE', newQuery)
     if (JSON.stringify(oldQuery) === JSON.stringify(newQuery) && oldClass === newClass) {
       return
     }

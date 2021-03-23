@@ -83,13 +83,11 @@ export default async (platform: Platform): Promise<CoreService> => {
 
   // add listener to process data updates from backend for data transactions.
   rpc.addEventListener(EventType.Transaction, result => {
-    console.log('process Transaction', result)
     txProcessor.process(txContext(TxContextSource.Server), result as Tx)
   })
 
   // Add a client transaction event listener
   rpc.addEventListener(EventType.TransientTransaction, txs => {
-    console.log('process TransientTransaction', txs)
     for (const tx of (txs as Tx[])) {
       txProcessor.process(txContext(TxContextSource.ServerTransient), tx)
     }

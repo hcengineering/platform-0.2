@@ -24,10 +24,9 @@
   import { Space } from '@anticrm/domains'
   import { onDestroy } from 'svelte'
   import ui, { createLiveQuery, getCoreService, Viewlet } from '@anticrm/presentation'
-  import { getUIService } from '@anticrm/platform-ui'
+  import { Action, getUIService, Location } from '@anticrm/platform-ui'
   import Component from '@anticrm/platform-ui/src/components/Component.svelte'
   import ActionBar from '@anticrm/platform-ui/src/components/ActionBar.svelte'
-  import { Action, Location } from '@anticrm/platform-ui'
   import { Model } from '@anticrm/core'
 
   export let application: WorkbenchApplication
@@ -44,14 +43,9 @@
   let viewletActions: Action[] = []
   let activeViewlet: Viewlet | undefined
 
-  let location: Location
-  uiService.subscribeLocation((loc) => {
-    location = loc
-  }, onDestroy)
-
   createLiveQuery(ui.mixin.Viewlet, {}, (docs) => {
     presenters = docs
-  }, onDestroy)
+  })
 
   function filterViewlets (model: Model, presenters: Viewlet[]): Viewlet[] {
     return presenters.filter((d) => {
@@ -68,7 +62,7 @@
     return viewlets.map(p => {
       return {
         name: p.label, icon: p.icon, toggleState: p._id === sp?._id, action: () => {
-          uiService.navigateJoin(undefined, { viewlet: p._id }, undefined)
+          activeViewlet = p
         }
       }
     })
@@ -80,11 +74,6 @@
       const model = cs.getModel()
 
       const viewlets = filterViewlets(model, presenters)
-
-      const vid = location.query.viewlet
-      if (vid) {
-        activeViewlet = viewlets.find(p => p._id == vid)
-      }
       if (viewlets.length > 0 && !activeViewlet) {
         activeViewlet = viewlets[0]
       }

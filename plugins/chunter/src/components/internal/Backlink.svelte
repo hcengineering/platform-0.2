@@ -15,7 +15,6 @@
 <script lang="ts">
   import { Reference } from '@anticrm/domains'
   import { Message } from '../..'
-  import { onDestroy } from 'svelte'
 
   import CommentComponent from './Comment.svelte'
   import { createLiveQuery, updateLiveQuery } from '@anticrm/presentation'
@@ -26,7 +25,7 @@
 
   const qs = createLiveQuery(backlink._sourceClass, { _id: backlink._sourceId }, (docs) => {
     message = docs[0] as Message
-  }, onDestroy)
+  })
 
   $: updateLiveQuery(qs, backlink._sourceClass, { _id: backlink._sourceId })
 </script>
