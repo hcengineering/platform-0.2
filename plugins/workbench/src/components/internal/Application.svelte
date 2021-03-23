@@ -24,10 +24,9 @@
   import { Space } from '@anticrm/domains'
   import { onDestroy } from 'svelte'
   import ui, { createLiveQuery, getCoreService, Viewlet } from '@anticrm/presentation'
-  import { getUIService } from '@anticrm/platform-ui'
+  import { Action, getUIService, Location } from '@anticrm/platform-ui'
   import Component from '@anticrm/platform-ui/src/components/Component.svelte'
   import ActionBar from '@anticrm/platform-ui/src/components/ActionBar.svelte'
-  import { Action, Location } from '@anticrm/platform-ui'
   import { Model } from '@anticrm/core'
 
   export let application: WorkbenchApplication
@@ -51,7 +50,7 @@
 
   createLiveQuery(ui.mixin.Viewlet, {}, (docs) => {
     presenters = docs
-  }, onDestroy)
+  })
 
   function filterViewlets (model: Model, presenters: Viewlet[]): Viewlet[] {
     return presenters.filter((d) => {

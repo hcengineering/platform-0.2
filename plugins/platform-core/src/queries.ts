@@ -31,6 +31,11 @@ interface Query<T extends Doc> {
   results: T[]
 }
 
+enum UpdateOp {
+  None,
+  Remove
+}
+
 export class QueriableStorage implements Domain {
   private readonly proxy: Storage
   private readonly queries: Map<string, Query<Doc>> = new Map()
@@ -62,14 +67,15 @@ export class QueriableStorage implements Domain {
     })
   }
 
-  updateMatchQuery (_id: Ref<Doc>, q: Query<Doc>, apply: (doc: Doc) => void): boolean {
+  updateMatchQuery (_id: Ref<Doc>, q: Query<Doc>, apply: (doc: Doc) => UpdateOp): boolean {
     let pos = 0
     for (const r of q.results) {
       if (r._id === _id) {
+        let updateOp = UpdateOp.None
         if (this.updateResults) {
-          apply(r)
+          updateOp = apply(r)
         }
-        if (!this.model.matchQuery(q._class, r, q.query)) {
+        if (!this.model.matchQuery(q._class, r, q.query) || updateOp === UpdateOp.Remove) {
           // Document is not matched anymore, we need to remove it.
           q.results.splice(pos, 1)
         }
@@ -86,7 +92,10 @@ export class QueriableStorage implements Domain {
       for (const q of this.queries.values()) {
         // Find doc, apply attribute and check if it is still matches, if not we need to perform request to server after transaction will be complete.
         // Check if attribute are in query, so it could modify results.
-        if (this.updateMatchQuery(_id, q, (doc) => this.model.pushDocument(doc, _query, attribute, attributes))) {
+        if (this.updateMatchQuery(_id, q, (doc) => {
+          this.model.pushDocument(doc, _query, attribute, attributes)
+          return UpdateOp.None
+        })) {
           continue
         }
         // so we potentially need to fetch new matched objects from server, so do so.
@@ -99,7 +108,10 @@ export class QueriableStorage implements Domain {
     return this.proxy.update(ctx, _class, _id, _query, attributes).then(() => {
       for (const q of this.queries.values()) {
         // Find doc, apply update of attributes and check if it is still matches, if not we need to perform request to server after transaction will be complete.
-        if (this.updateMatchQuery(_id, q, (doc) => this.model.updateDocument(doc, _query, attributes))) {
+        if (this.updateMatchQuery(_id, q, (doc) => {
+          this.model.updateDocument(doc, _query, attributes)
+          return UpdateOp.None
+        })) {
           continue
         }
         // so we potentially need to fetch new matched objects from server, so do so.
@@ -111,7 +123,10 @@ export class QueriableStorage implements Domain {
   remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, _query: AnyLayout | null): Promise<void> {
     return this.proxy.remove(ctx, _class, _id, _query).then(() => {
       for (const q of this.queries.values()) {
-        if (this.updateMatchQuery(_id, q, (doc) => this.model.removeDocument(doc, _query))) {
+        if (this.updateMatchQuery(_id, q, (doc) => {
+          this.model.removeDocument(doc, _query)
+          return UpdateOp.Remove
+        })) {
           continue
         }
         // so we potentially need to fetch new matched objects from server, so do so.

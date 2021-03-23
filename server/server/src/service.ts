@@ -15,16 +15,16 @@
 
 import { WorkspaceProtocol } from './workspace'
 
-import { filterQuery, getUserSpaces, isAcceptable, processTx as processSpaceTx } from './spaces'
+import { filterQuery, getUserSpaces, isAcceptable, processTx as processSpaceTx, SecurityContext } from './spaces'
 import { Broadcaster, Client, ClientService, ClientSocket } from './server'
 import { AnyLayout, Class, Doc, generateId, Ref, Tx, txContext, TxContextSource } from '@anticrm/core'
-import { CORE_CLASS_CREATE_TX, CORE_CLASS_SPACE, Space, SpaceUser, VDoc } from '@anticrm/domains'
+import { CORE_CLASS_CREATE_TX, CORE_CLASS_SPACE, Space, SpaceUser } from '@anticrm/domains'
 import { Response, serialize } from '@anticrm/rpc'
 
 export interface ClientControl {
   ping (): Promise<void>
 
-  send (response: Response<any>): Promise<void>
+  send (ctx: SecurityContext, response: Response<any>): Promise<void>
 
   close (): Promise<void>
 
@@ -38,7 +38,7 @@ export async function createClientService (workspaceProtocol: Promise<WorkspaceP
 
   const userSpaces: Map<string, SpaceUser> = await getUserSpaces(workspace, client.email)
 
-  const clientId = generateId() + (clientIndex++)
+  const clientId = `${generateId()} ${(clientIndex++)}`
 
   const clientControl: ClientService = {
     getId: () => clientId,
@@ -47,7 +47,7 @@ export async function createClientService (workspaceProtocol: Promise<WorkspaceP
       const {
         valid,
         filteredQuery
-      } = await filterQuery(userSpaces, _class, query)
+      } = filterQuery(userSpaces, _class, query)
       if (valid) {
         try {
           return await workspace.find(_class, filteredQuery)
@@ -61,7 +61,7 @@ export async function createClientService (workspaceProtocol: Promise<WorkspaceP
       const {
         valid,
         filteredQuery
-      } = await filterQuery(userSpaces, _class, query)
+      } = filterQuery(userSpaces, _class, query)
       if (valid) {
         return workspace.findOne(_class, filteredQuery)
       }
@@ -69,8 +69,7 @@ export async function createClientService (workspaceProtocol: Promise<WorkspaceP
     },
     async loadDomain (domain: string): Promise<Doc[]> {
       const docs = await workspace.loadDomain(domain)
-      const filteredDocs = docs.filter((d) => isAcceptable(userSpaces, d._class, (d as unknown) as AnyLayout), false)
-      return filteredDocs
+      return docs.filter((d) => isAcceptable(userSpaces, d._class, (d as unknown) as AnyLayout), false)
     },
 
     // Handle sending from client.
@@ -80,7 +79,9 @@ export async function createClientService (workspaceProtocol: Promise<WorkspaceP
       }
 
       // Process spaces update is allowed
-      const spaceResult = await processSpaceTx(workspace, userSpaces, tx, client, true)
+      const ctx: SecurityContext = { docs: [] }
+
+      const spaceResult = await processSpaceTx(ctx, workspace, userSpaces, tx, client, true)
       if (!spaceResult.allowed) {
         return Promise.reject(new Error('operations is not allowed by space check'))
       }
@@ -92,7 +93,7 @@ export async function createClientService (workspaceProtocol: Promise<WorkspaceP
       broadcaster.broadcast(clientControl, {
         result: tx,
         clientTx: context.clientTx
-      })
+      }, ctx)
       return {
         clientTx: context.clientTx
       }
@@ -106,14 +107,14 @@ export async function createClientService (workspaceProtocol: Promise<WorkspaceP
 
     // C O N T R O L
 
-    async ping (): Promise<any> {
-      return null
+    ping (): Promise<any> {
+      return Promise.resolve()
     },
 
-    async send (response: Response<any>): Promise<void> {
+    async send (ctx: SecurityContext, response: Response<any>): Promise<void> {
       if (response.result) {
         // Process result as it from another client.
-        const spaceTxResult = await processSpaceTx(workspace, userSpaces, response.result, client, false)
+        const spaceTxResult = await processSpaceTx(ctx, workspace, userSpaces, response.result, client, false)
         if (!spaceTxResult.allowed) {
           // Client is not allowed to receive transaction
           return

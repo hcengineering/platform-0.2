@@ -31,6 +31,15 @@ import {
 import { Client } from './server'
 import { WorkspaceProtocol } from './workspace'
 
+export interface SpaceCheckResult {
+  allowed: boolean,
+  sendSpace: Space | null
+}
+
+export interface SecurityContext {
+  docs?: Doc[] // A list of touched documents.
+}
+
 function getSpaceKey (_class: Ref<Class<Doc>>): string {
   // for Space objects use _id to filter available ones
   return _class === CORE_CLASS_SPACE ? '_id' : '_space'
@@ -40,7 +49,7 @@ function getSpaceKey (_class: Ref<Class<Doc>>): string {
  * Filters the given query to satisfy current user account rights.
  * The result query can be used to request objects the user has access to from the storage.
  */
-export async function filterQuery (spaces: Map<string, SpaceUser>, _class: Ref<Class<Doc>>, query: AnyLayout): Promise<{ valid: boolean, filteredQuery: AnyLayout }> {
+export function filterQuery (spaces: Map<string, SpaceUser>, _class: Ref<Class<Doc>>, query: AnyLayout): { valid: boolean, filteredQuery: AnyLayout } {
   if (_class === CORE_CLASS_TITLE || _class === CORE_CLASS_REFERENCE) {
     // Allow to proceed with title and references
     return {
@@ -120,16 +129,29 @@ function checkUpdateSpaces (spaces: Map<string, SpaceUser>, s: Space, spaceId: s
   return null
 }
 
-function getObjectById (workspace: WorkspaceProtocol, _class: Ref<Class<Doc>>, id: Ref<Doc>): Promise<Doc | undefined> {
-  // TODO: Think about some cache
-  return workspace.findOne(_class, { _id: id })
+async function getObjectById (ctx: SecurityContext, workspace: WorkspaceProtocol, _class: Ref<Class<Doc>>, id: Ref<Doc>): Promise<Doc | undefined> {
+  if (ctx.docs) {
+    for (const d of ctx.docs) {
+      if (d._id === id) {
+        return Promise.resolve(d)
+      }
+    }
+  }
+  const result = await workspace.findOne(_class, { _id: id })
+  if (result) {
+    if (!ctx.docs) {
+      ctx.docs = []
+    }
+    ctx.docs.push(result)
+  }
+  return result
 }
 
 /**
  * Process transaction and update userSpaces in case of proper space operation.
  * Return true if operation is allowed by user.
  */
-export async function processTx (workspace: WorkspaceProtocol, spaces: Map<string, SpaceUser>, tx: Tx, client: Client, ownChange: boolean): Promise<{ allowed: boolean, sendSpace: Space | null }> {
+export async function processTx (ctx: SecurityContext, workspace: WorkspaceProtocol, spaces: Map<string, SpaceUser>, tx: Tx, client: Client, ownChange: boolean): Promise<SpaceCheckResult> {
   switch (tx._class) {
     case CORE_CLASS_CREATE_TX: {
       const createTx = tx as CreateTx
@@ -162,8 +184,11 @@ export async function processTx (workspace: WorkspaceProtocol, spaces: Map<strin
     }
     case CORE_CLASS_UPDATE_TX: {
       const updateTx = tx as UpdateTx
-      const obj = await getObjectById(workspace, updateTx._objectClass, updateTx._objectId)
+      const obj = await getObjectById(ctx, workspace, updateTx._objectClass, updateTx._objectId)
 
+      if (!obj) {
+        throw new Error(`Document for update ${updateTx._objectClass} ${updateTx._objectId} is not found'`)
+      }
       // Check if space, we need update out list
       let sendSpace: Space | null = null
       if (!ownChange && updateTx._objectClass === CORE_CLASS_SPACE) {
@@ -176,7 +201,10 @@ export async function processTx (workspace: WorkspaceProtocol, spaces: Map<strin
     }
     case CORE_CLASS_PUSH_TX: {
       const pushTx = tx as PushTx
-      const obj = await getObjectById(workspace, pushTx._objectClass, pushTx._objectId)
+      const obj = await getObjectById(ctx, workspace, pushTx._objectClass, pushTx._objectId)
+      if (!obj) {
+        throw new Error(`Document for update ${pushTx._objectClass} ${pushTx._objectId} is not found'`)
+      }
       let sendSpace: Space | null = null
       if (!ownChange && pushTx._objectClass === CORE_CLASS_SPACE) {
         // Check if SpaceUser is we, since operation is already applied, we could check with Space object itself.
@@ -190,7 +218,10 @@ export async function processTx (workspace: WorkspaceProtocol, spaces: Map<strin
     }
     case CORE_CLASS_DELETE_TX: {
       const delTx = tx as DeleteTx
-      const obj = await getObjectById(workspace, delTx._objectClass, delTx._objectId)
+      const obj = await getObjectById(ctx, workspace, delTx._objectClass, delTx._objectId)
+      if (!obj) {
+        throw new Error(`Document for delete ${delTx._objectClass} ${delTx._objectId} is not found'`)
+      }
       let sendSpace: Space | null = null
       if (!ownChange && delTx._objectClass === CORE_CLASS_SPACE) {
         // Check if SpaceUser is we, since operation is already applied, we could check with Space object itself.

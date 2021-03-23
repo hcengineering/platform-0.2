@@ -16,7 +16,6 @@
   import { Ref } from '@anticrm/core'
   import { AttrModel, createLiveQuery, updateLiveQuery } from '@anticrm/presentation'
   import task, { TaskFieldValue } from '../../../index'
-  import { onDestroy } from 'svelte'
   import StatusLabel from '../StatusLabel.svelte'
 
   export let value: Ref<TaskFieldValue>
@@ -32,7 +31,7 @@
       text = docs[0].title
       color = docs[0].color
     }
-  }, onDestroy)
+  })
 
   $: updateLiveQuery( update, task.class.TaskFieldValue, { _id: value })
 </script>

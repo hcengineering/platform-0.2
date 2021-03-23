@@ -13,7 +13,7 @@
 // limitations under the License.
 -->
 <script type="ts">
-  import { createEventDispatcher, onDestroy } from 'svelte'
+  import { createEventDispatcher } from 'svelte'
   import { Class, CORE_CLASS_DOC, Doc, Ref } from '@anticrm/core'
   import { Space } from '@anticrm/domains'
   import { AttrModel, ClassModel } from '../..'
@@ -46,7 +46,7 @@
 
   const queryUpdate = createLiveQuery(_class, { _space: space._id }, (docs) => {
     objects = docs
-  }, onDestroy)
+  })
 
   $: queryUpdate.then(qu => qu(_class, {
     _space: space._id

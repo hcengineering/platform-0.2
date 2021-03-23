@@ -16,8 +16,7 @@
 import core, { ArrayOf$, Builder, Class$, extendIds, InstanceOf$, Mixin$, Primary, Prop, RefTo$ } from '@anticrm/model'
 import _task, {
   PrioritizedTask, Task, TASK_STATUS_OPEN, TaskFieldType, TaskFieldValue, TaskLink, TaskLinkType, TaskTimeDuration,
-  TimeManagedTask,
-  TypedTask, VersionedTask, WorkLog
+  TimeManagedTask, TypedTask, VersionedTask, WorkLog
 } from '.'
 import { IntlString } from '@anticrm/platform-i18n'
 import { User } from '@anticrm/contact'
@@ -26,7 +25,7 @@ import presentation from '@anticrm/presentation'
 import workbench from '@anticrm/workbench/src/__model__'
 import chunter, { TCollab } from '@anticrm/chunter/src/__model__'
 import { DateProperty, MODEL_DOMAIN, Ref, StringProperty } from '@anticrm/core'
-import { Application, Space } from '@anticrm/domains'
+import { Space } from '@anticrm/domains'
 import { TDoc, TVDoc } from '@anticrm/model/src/__model__'
 import contact from '@anticrm/contact/src/__model__'
 import { Asset } from '@anticrm/platform-ui'
@@ -34,9 +33,6 @@ import { Asset } from '@anticrm/platform-ui'
 export const DOMAIN_TASK = 'task'
 
 const task = extendIds(_task, {
-  application: {
-    Task: '' as Ref<Application>
-  },
   string: {
     Task_name: '' as IntlString,
     Task_assignee: '' as IntlString,

@@ -16,7 +16,6 @@
   import { Class, Doc, Ref, RefTo, Type } from '@anticrm/core'
   import ui, { AttrModel, createLiveQuery, getCoreService, updateLiveQuery } from '@anticrm/presentation'
   import { AnyComponent } from '@anticrm/platform-ui'
-  import { onDestroy } from 'svelte'
   import Presenter from '../Presenter.svelte'
 
   export let value: Ref<Doc>
@@ -33,7 +32,7 @@
     } else {
       doc = undefined
     }
-  }, onDestroy)
+  })
 
   $: {
     const objClass = (attribute.type as RefTo<Doc>).to
