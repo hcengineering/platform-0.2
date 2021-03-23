@@ -43,11 +43,6 @@
   let viewletActions: Action[] = []
   let activeViewlet: Viewlet | undefined
 
-  let location: Location
-  uiService.subscribeLocation((loc) => {
-    location = loc
-  }, onDestroy)
-
   createLiveQuery(ui.mixin.Viewlet, {}, (docs) => {
     presenters = docs
   })
@@ -67,7 +62,7 @@
     return viewlets.map(p => {
       return {
         name: p.label, icon: p.icon, toggleState: p._id === sp?._id, action: () => {
-          uiService.navigateJoin(undefined, { viewlet: p._id }, undefined)
+          activeViewlet = p
         }
       }
     })
@@ -79,11 +74,6 @@
       const model = cs.getModel()
 
       const viewlets = filterViewlets(model, presenters)
-
-      const vid = location.query.viewlet
-      if (vid) {
-        activeViewlet = viewlets.find(p => p._id == vid)
-      }
       if (viewlets.length > 0 && !activeViewlet) {
         activeViewlet = viewlets[0]
       }
