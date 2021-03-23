@@ -1,7 +1,7 @@
 <script lang="ts">
   import UserInfo from '@anticrm/sparkling-controls/src/UserInfo.svelte'
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
-  import EditBox from './EditBox.svelte'
+  import IconEditBox from './IconEditBox.svelte'
   import workbench from '@anticrm/workbench'
 
   export let items: unknown[]
@@ -58,7 +58,7 @@
   <div class="arrowDown"></div>
 
   <div bind:this={comboDrop} class="comboBox-drop">
-    <EditBox id="select-user-combobox" icon={workbench.icon.Finder} iconRight="true" width="100%" hoverState="true" />
+    <IconEditBox id="select-user-combobox" icon={workbench.icon.Finder} iconRight="true" width="100%" hoverState="true" />
     <div class="separator"></div>
     <div bind:this={comboItems} class="comboBox-drop__items">
       <ScrollView width="100%" height="100%" accentColor="true">

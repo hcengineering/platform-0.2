@@ -1,6 +1,6 @@
 <script lang="ts">
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
-  import EditBox from '@anticrm/platform-ui/src/components/EditBox.svelte'
+  import IconEditBox from '@anticrm/platform-ui/src/components/IconEditBox.svelte'
   import presentation from '@anticrm/presentation'
 
   import ui from '@anticrm/platform-ui'
@@ -118,7 +118,7 @@
 </style>
 
 <div class="presentation-completion-popup" style={popupStyle} bind:clientHeight bind:clientWidth on:blur>
-  <EditBox icon={presentation.icon.Finder} iconRight />
+  <IconEditBox icon={presentation.icon.Finder} iconRight />
   <div class="separator"></div>
   <ScrollView width="100%" height="100%" scrollPosition={selOffset} accentColor>
     <div bind:this={listElement}>

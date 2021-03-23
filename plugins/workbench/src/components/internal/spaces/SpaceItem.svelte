@@ -44,8 +44,6 @@
             archivedSpaceUpdate(coreService, space, !space.archived)
           }}>Archive
         </PopupItem>
-        }
-        })
       </PopupMenu>
     </div>
   {/if}
