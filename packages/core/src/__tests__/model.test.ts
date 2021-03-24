@@ -15,7 +15,7 @@
 
 /* eslint-env jest */
 
-import { AnyLayout, Class, Doc, Mixin, Obj, Property, PropertyType, Ref, StringProperty } from '../classes'
+import { AnyLayout, Attribute, Class, CORE_CLASS_ATTRIBUTE, CORE_CLASS_CLASS, CORE_CLASS_DOC, CORE_CLASS_EMB, CORE_CLASS_OBJ, Doc, Mixin, Obj, Property, PropertyType, Ref, StringProperty } from '../classes'
 import { mixinFromKey, mixinKey, Model } from '../model'
 import { txContext } from '../storage'
 import { createSubtask, createTask, doc1, taskIds, data, Task } from './tasks'
@@ -271,86 +271,25 @@ describe('invalid cases', () => {
   )
 })
 
-const VDocClass = {
-  _id: 'class:core.VDoc',
-  _attributes: {
-    _space: {
-      _class: 'class:core.Attribute',
-      type: {
-        _class: 'class:core.RefTo',
-        to: 'class:core.Space'
-      }
-    },
-    _createdOn: {
-      _class: 'class:core.Attribute',
-      type: {
-        _class: 'class:core.Type'
-      }
-    },
-    _createdBy: {
-      _class: 'class:core.Attribute',
-      type: {
-        _class: 'class:core.Type'
-      }
-    },
-    _modifiedOn: {
-      _class: 'class:core.Attribute',
-      type: {
-        _class: 'class:core.Type'
-      }
-    },
-    _modifiedBy: {
-      _class: 'class:core.Attribute',
-      type: {
-        _class: 'class:core.Type'
-      }
-    }
-  },
-  _class: 'class:core.Class',
-  _kind: 0,
-  _extends: 'class:core.Doc',
-  _domain: 'model'
-} as any
-
-const refsMixin = {
-  _attributes: {
-    shortId: {
-      _class: 'class:core.Attribute',
-      type: {
-        _class: 'class:core.Type'
-      }
-    }
-  },
-  _id: 'mixin:core.References',
-  _class: 'class:core.Mixin',
-  _kind: 1,
-  _extends: 'class:core.VDoc'
-} as any
-
 describe('Model domain', () => {
   const model = new Model('vdocs')
   model.loadModel(data)
-  model.add(VDocClass)
 
   it('returns domains', () => {
-    expect(model.getDomain('class:core.Classifier' as Ref<Class<Doc>>))
-      .toEqual('model')
-    expect(model.getDomain('class:core.Type' as Ref<Class<Doc>>))
-      .toEqual('model')
-    expect(model.getDomain('class:core.Class' as Ref<Class<Doc>>))
+    expect(model.getDomain(CORE_CLASS_CLASS))
       .toEqual('model')
     expect(model.getDomain('class:core.Title' as Ref<Class<Doc>>))
       .toEqual('title')
   })
 
   it('throws if domain does not exist', () => {
-    expect(() => model.getDomain('class:core.Obj' as Ref<Class<Doc>>))
+    expect(() => model.getDomain(CORE_CLASS_DOC))
       .toThrowError()
   })
 
   it('returns classes', () => {
-    expect(model.getClass('class:core.Obj' as Ref<Class<Doc>>))
-      .toEqual('class:core.Obj')
+    expect(model.getClass(CORE_CLASS_CLASS))
+      .toEqual(CORE_CLASS_CLASS.toString())
     expect(model.getClass('mixin:core.ShortID' as Ref<Class<Doc>>))
       .toBe('class:core.VDoc')
   })
@@ -364,41 +303,27 @@ describe('Model domain', () => {
 describe('Model utilities', () => {
   const model = new Model('vdocs')
   model.loadModel(data)
-  model.add(
-    {
-      _attributes: {},
-      _id: 'core.class.DerivedTaskObj',
-      _class: 'class:core.Class',
-      _kind: 0,
-      _extends: 'core.class.TaskObj',
-      _domain: 'model'
-    } as any
-  )
 
   it('returns all attributes of class', () => {
-    expect(model.getAllAttributes('class:core.Obj' as Ref<Class<Doc>>))
+    expect(model.getAllAttributes(CORE_CLASS_EMB))
       .toEqual([])
 
-    const getAttrs = (id: string) => Object.entries(
+    const getAttrs = (id: string) => Object.entries<Attribute>(
       data.find((x: any) => x._id === id)?._attributes ?? {}
     )
 
-    const docID = 'class:core.Doc'
-    const docAttrs = getAttrs(docID)
-    expect(model.getAllAttributes(docID as Ref<Class<Doc>>))
-      .toEqual(docAttrs)
+    expect(model.getAllAttributes(CORE_CLASS_DOC))
+      .toEqual(getAttrs(CORE_CLASS_DOC))
 
-    const classifierID = 'class:core.Classifier'
-    const classifierOwnAttrs = getAttrs(classifierID)
-    const classifierAttrs = classifierOwnAttrs
-      .concat(docAttrs)
-
-    expect(model.getAllAttributes(classifierID as Ref<Class<Doc>>))
-      .toEqual(classifierAttrs)
+    expect(model.getAllAttributes(CORE_CLASS_ATTRIBUTE))
+      .toEqual([
+        getAttrs(CORE_CLASS_ATTRIBUTE),
+        getAttrs(CORE_CLASS_EMB)
+      ].reduce((r, x) => r.concat(x)))
   })
 
   it('returns primary key of class', () => {
-    expect(model.getPrimaryKey('class:core.Obj' as Ref<Class<Doc>>))
+    expect(model.getPrimaryKey(CORE_CLASS_EMB))
       .toBeNull()
     expect(model.getPrimaryKey('core.class.TaskObj' as Ref<Class<Doc>>))
       .toEqual('name')
@@ -408,18 +333,18 @@ describe('Model utilities', () => {
 })
 
 describe('Model mixin', () => {
+  const mixin = 'mixin:core.ShortID' as Ref<Mixin<any>>
+
   it('creates new proto with \'as\' method', () => {
     const model = new Model('vdocs')
     model.loadModel(data)
-    model.add(VDocClass)
-    model.add(refsMixin)
 
     const shortId = 'short-id'
     const target = {
       ...doc1,
-      'shortId|mixin:core~References': shortId
+      [mixinKey(mixin, 'shortId')]: shortId
     }
-    const res = model.as({ ...target }, 'mixin:core.References' as Ref<Mixin<any>>)
+    const res = model.as({ ...target }, mixin)
 
     expect(res.__layout).toEqual(target)
     expect(res.shortId).toEqual(shortId)
@@ -432,16 +357,14 @@ describe('Model mixin', () => {
   it('reuses proto with \'as\' method', () => {
     const model = new Model('vdocs')
     model.loadModel(data)
-    model.add(VDocClass)
-    model.add(refsMixin)
 
     const shortId = 'short-id'
     const target = {
       ...doc1,
-      'shortId|mixin:core~References': shortId
+      [mixinKey(mixin, 'shortId')]: shortId
     }
-    model.as({ ...target }, 'mixin:core.References' as Ref<Mixin<any>>)
-    const res = model.as(target, 'mixin:core.References' as Ref<Mixin<any>>)
+    model.as({ ...target }, mixin)
+    const res = model.as(target, mixin)
 
     expect(res.__layout).toEqual(target)
     expect(res.shortId).toEqual(shortId)
@@ -454,19 +377,17 @@ describe('Model mixin', () => {
   it('casts doc', () => {
     const model = new Model('vdocs')
     model.loadModel(data)
-    model.add(VDocClass)
-    model.add(refsMixin)
 
     const shortId = 'short-id'
     const target = {
       ...doc1,
-      'shortId|mixin:core~References': shortId
+      [mixinKey(mixin, 'shortId')]: shortId
     }
-    const res = model.cast({ ...target }, 'mixin:core.References' as Ref<Mixin<any>>)
+    const res = model.cast({ ...target }, mixin)
 
     const expectedLayout = {
       ...target,
-      _mixins: ['mixin:core.References']
+      _mixins: [mixin]
     }
 
     expect(res.__layout).toEqual(expectedLayout)
@@ -483,12 +404,12 @@ describe('Model mixin', () => {
 
     const withMixin = {
       ...doc1,
-      _mixins: ['mixin:core.References'] as Ref<Mixin<Obj>>[]
+      _mixins: [mixin]
     }
 
-    expect(model.isMixedIn(doc1, 'mixin:core.References' as Ref<Mixin<Doc>>))
+    expect(model.isMixedIn(doc1, mixin as Ref<Mixin<Doc>>))
       .toEqual(false)
-    expect(model.isMixedIn(withMixin, 'mixin:core.References' as Ref<Mixin<Doc>>))
+    expect(model.isMixedIn(withMixin, mixin as Ref<Mixin<Doc>>))
       .toEqual(true)
     expect(model.isMixedIn(withMixin, 'mixin:missing.one' as Ref<Mixin<Doc>>))
       .toEqual(false)
@@ -498,11 +419,6 @@ describe('Model mixin', () => {
 describe('Model assign tools', () => {
   const model = new Model('vdocs')
   model.loadModel(data)
-
-  const additionalModels = [VDocClass, refsMixin]
-  additionalModels.forEach(x => model.add(x))
-
-  const actualData = data.concat(additionalModels)
 
   it('assigns class if missing', () => {
     const res = model.assign({}, 'class' as Ref<Class<Obj>>, {})
@@ -531,13 +447,15 @@ describe('Model assign tools', () => {
   })
 
   it('assigns mixin properties', () => {
+    const mixin = 'mixin:core.ShortID' as Ref<Mixin<any>>
+    const mKey = mixinKey(mixin, 'shortId')
     const res = model.assign(
       {},
       'class' as Ref<Class<Obj>>,
-      { 'shortId|mixin:core~References': 42 as PropertyType }
+      { [mKey]: 42 as PropertyType }
     )
 
-    expect(res).toEqual({ _class: 'class', 'shortId|mixin:core~References': 42 })
+    expect(res).toEqual({ _class: 'class', [mKey]: 42 })
   })
 
   it('creates new doc', () => {
@@ -556,33 +474,33 @@ describe('Model assign tools', () => {
 
   it('compares classes', () => {
     expect(model.is(
-      'class:core.Doc' as Ref<Class<Doc>>,
-      'class:core.Doc' as Ref<Class<Doc>>
+      CORE_CLASS_DOC,
+      CORE_CLASS_DOC
     )).toEqual(true)
 
     expect(model.is(
-      'class:core.Doc' as Ref<Class<Doc>>,
-      'class:core.Obj' as Ref<Class<Doc>>
+      CORE_CLASS_DOC,
+      CORE_CLASS_OBJ
     )).toEqual(true)
 
     expect(model.is(
-      'class:core.Obj' as Ref<Class<Doc>>,
-      'class:core.Doc' as Ref<Class<Doc>>
+      CORE_CLASS_OBJ,
+      CORE_CLASS_DOC
     )).toEqual(false)
   })
 
   it('dumps properly', () => {
     const dump = model.dump()
 
-    expect(dump.length).toEqual(actualData.length)
-    expect(dump).toEqual(expect.arrayContaining(actualData))
+    expect(dump.length).toEqual(data.length)
+    expect(dump).toEqual(expect.arrayContaining(data))
   })
 
   it('loads domain properly', async () => {
     const dump = await model.loadDomain('vdocs')
 
-    expect(dump.length).toEqual(actualData.length)
-    expect(dump).toEqual(expect.arrayContaining(actualData))
+    expect(dump.length).toEqual(data.length)
+    expect(dump).toEqual(expect.arrayContaining(data))
   })
 })
 
