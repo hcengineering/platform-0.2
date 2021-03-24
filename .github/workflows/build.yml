@@ -67,7 +67,7 @@ jobs:
         run: |
           echo "A=$A"
         env:
-          A: ${{ github }}
+          A: ${{ github.repository_owner }}
 
       - name: Install dependencies
         run: yarn
