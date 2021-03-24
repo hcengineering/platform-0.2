@@ -10,7 +10,7 @@
     "build-storybook": "build-storybook",
     "test": "echo 'no tests'",
     "lint": "echo 'no linting'",
-    "chromatic": "npx chromatic --project-token CHROMATIC_PROJECT_TOKEN --exit-zero-on-changes"
+    "chromatic": "npx chromatic --project-token 2dc55737a394 --exit-zero-on-changes"
   },
   "devDependencies": {
     "@babel/core": "^7.12.10",
