@@ -34,7 +34,7 @@ const Template = ({ ...args }) => ({
   Component: ActionBar,
   props: { 
     actions: [{
-      label: 'Action Item 1', action: () => alert('PopupItem1.Action()')
+      label: 'Action Item 1 !!!', action: () => alert('PopupItem1.Action()')
     }, {
       label: 'Action Item 2', action: () => alert('PopupItem2.Action()')
     }, {
