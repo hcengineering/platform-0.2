@@ -93,7 +93,7 @@ export default (platform: Platform, deps: { ui: UIService }): Promise<LoginServi
     }
     return Promise.resolve()
   }
-  
+
   async function saveSetting (password: string, newPassword: string, secondFactorEnabled: boolean, clientSecret: string, secondFactorCode: string): Promise<Status> {
     const loginInfo = await getLoginInfo()
     if (!loginInfo) return new Status(Severity.ERROR, 0, 'Необходимо авторизоваться')

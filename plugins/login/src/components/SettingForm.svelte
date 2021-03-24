@@ -1,4 +1,5 @@
-// Copyright © 2020 Anticrm Platform Contributors.
+<!--
+// Copyright © 2020, 2021 Anticrm Platform Contributors.
 //
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
@@ -10,6 +11,7 @@
 //
 // See the License for the specific language governing permissions and
 // limitations under the License.
+-->
 <script lang="ts">
   import { Platform, Severity, Status } from '@anticrm/platform'
   import { getContext } from 'svelte'
@@ -52,25 +54,26 @@
       return;
     }
     
-    if (object.newPassword != object.newPasswordConfirm) {
+    if (changePassword && object.newPassword != object.newPasswordConfirm) {
       status = new Status(Severity.INFO, 0, `Пароль и подтверждения пароля не совпадают`);
       return;
     }
     
-    if (object.clientSecret && !object.secondFactorCode){
+    if (secondFactorCurrentEnabled && object.clientSecret && !object.secondFactorCode){
       status = new Status(Severity.INFO, 0, `Поле код подтверждения обязательно для заполнения`);
       return;
     }
     
-    if (!object.clientSecret && object.secondFactorCode){
+    if (secondFactorCurrentEnabled && !object.clientSecret && object.secondFactorCode){
       status = new Status(Severity.INFO, 0, `Поле секретный код обязательно для заполнения`);
       return;
     }
     
     status = new Status(Severity.INFO, 0, 'Соединяюсь с сервером...');
 
-    status = await (await loginService).saveSetting(object.oldPassword, object.newPassword, secondFactorEnabled, object.clientSecret, object.secondFactorCode);
-    navigateLoginForm()
+    status = await (await loginService).saveSetting(object.oldPassword, changePassword ? object.newPassword : '', secondFactorEnabled, secondFactorCurrentEnabled ? object.clientSecret : '', secondFactorCurrentEnabled ? object.secondFactorCode : '');
+    if (status.severity === Severity.OK)
+      navigateLoginForm()
   }
 </script>
 

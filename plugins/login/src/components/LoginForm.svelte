@@ -1,4 +1,5 @@
-// Copyright © 2020 Anticrm Platform Contributors.
+<!--
+// Copyright © 2020, 2021 Anticrm Platform Contributors.
 //
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
@@ -10,13 +11,15 @@
 //
 // See the License for the specific language governing permissions and
 // limitations under the License.
+-->
 <script lang="ts">
   import { Platform, Severity, Status } from '@anticrm/platform'
   import { getContext, onDestroy } from 'svelte'
   import login, { LoginService } from '..'
   import Form from './Form.svelte'
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
-  import { ApplicationRoute, ApplicationRouter } from '@anticrm/platform-ui';
+  import { ApplicationRoute, ApplicationRouter } from '@anticrm/platform-ui'
+  import { PlatformStatusCodes } from '@anticrm/foundation'
 
   export let router: ApplicationRouter<ApplicationRoute>;
   let object = { username: '', password: '', workspace: '', secondFactorCode: '' }
@@ -35,7 +38,7 @@
 
     status = await (await loginService).doLogin(object.username, object.password, object.workspace, object.secondFactorCode)
 
-    if (status.code === 7) {
+    if (status.code === PlatformStatusCodes.CLIENT_VALIDATE_REQUIRED) {
       needSecondFactor = true;
     }
   }

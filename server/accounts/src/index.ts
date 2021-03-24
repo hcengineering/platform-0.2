@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Anticrm Platform Contributors.
+// Copyright © 2020, 2021 Anticrm Platform Contributors.
 //
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
@@ -19,6 +19,7 @@ import { Request, Response } from '@anticrm/rpc'
 import { randomBytes, pbkdf2Sync } from 'crypto'
 import { Buffer } from 'buffer'
 import { decode, encode } from 'jwt-simple'
+import { PlatformStatusCodes } from '@anticrm/foundation'
 
 const secondFactor = require('node-2fa')
 
@@ -28,17 +29,6 @@ const secret = 'secret'
 
 const WORKSPACE_COLLECTION = 'workspace'
 const ACCOUNT_COLLECTION = 'account'
-
-enum Error {
-    ACCOUNT_NOT_FOUND = 1,
-    ACCOUNT_DUPLICATE = 2,
-    INCORRECT_PASSWORD = 3,
-    FORBIDDEN = 4,
-    WORKSPACE_ALREADY_EXISTS = 5,
-    WORKSPACE_NOT_FOUND = 6,
-    CLIENT_VALIDATE_REQUIRED = 7,
-    INCORRECT_SECOND_FACTOR_CODE = 8
-}
 
 interface Account {
     _id: ObjectID
@@ -88,7 +78,7 @@ async function createAccount (db: Db, email: string, password: string): Promise<
 
   const account = await getAccount(db, email)
   if (account != null) {
-    throw new PlatformError(new Status(Severity.ERROR, Error.ACCOUNT_DUPLICATE, 'Account already exists.'))
+    throw new PlatformError(new Status(Severity.ERROR, PlatformStatusCodes.ACCOUNT_DUPLICATE, 'Account already exists.'))
   }
 
   const insert = await db.collection(ACCOUNT_COLLECTION).insertOne({
@@ -111,15 +101,15 @@ async function updateAccount (db: Db, email: string, password: string, newPasswo
   let account = await getAccount(db, email)
 
   if (!account) {
-    throw new PlatformError(new Status(Severity.ERROR, Error.ACCOUNT_NOT_FOUND, 'Account not found.'))
+    throw new PlatformError(new Status(Severity.ERROR, PlatformStatusCodes.ACCOUNT_NOT_FOUND, 'Account not found.'))
   }
   if (!verifyPassword(password, account.hash.buffer, account.salt.buffer)) {
-    throw new PlatformError(new Status(Severity.ERROR, Error.INCORRECT_PASSWORD, 'Incorrect password.'))
+    throw new PlatformError(new Status(Severity.ERROR, PlatformStatusCodes.INCORRECT_PASSWORD, 'Incorrect password.'))
   }
 
   if (clientSecret) {
     if (!secondFactor.verifyToken(clientSecret, secondFactorCode)) {
-      throw new PlatformError(new Status(Severity.ERROR, Error.INCORRECT_SECOND_FACTOR_CODE, 'Incorrect second factor code.'))
+      throw new PlatformError(new Status(Severity.ERROR, PlatformStatusCodes.INCORRECT_SECOND_FACTOR_CODE, 'Incorrect second factor code.'))
     }
   }
 
@@ -135,7 +125,7 @@ async function updateAccount (db: Db, email: string, password: string, newPasswo
   account = await getAccount(db, email)
 
   if (!account) {
-    throw new PlatformError(new Status(Severity.ERROR, Error.ACCOUNT_NOT_FOUND, 'Account not found.'))
+    throw new PlatformError(new Status(Severity.ERROR, PlatformStatusCodes.ACCOUNT_NOT_FOUND, 'Account not found.'))
   }
   return toAccountInfo(account)
 }
@@ -144,9 +134,13 @@ async function pushClientId (db: Db, email: string, clientId: string) {
   const account = await getAccount(db, email)
 
   if (!account) {
-    throw new PlatformError(new Status(Severity.ERROR, Error.ACCOUNT_NOT_FOUND, 'Account not found.'))
+    throw new PlatformError(new Status(Severity.ERROR, PlatformStatusCodes.ACCOUNT_NOT_FOUND, 'Account not found.'))
   }
 
+  for (const id of account.clientIds) {
+    if (id === clientId) return
+  }
+  
   db.collection(ACCOUNT_COLLECTION).updateOne({ _id: account._id }, { $push: { clientIds: clientId } })
 }
 
@@ -164,29 +158,29 @@ export async function getAccount (db: Db, email: string): Promise<Account | null
 async function getAccountInfo (db: Db, email: string, password: string, clientId: string, secondFactorCode: string): Promise<AccountInfo> {
   const account = await getAccount(db, email)
   if (!account) {
-    throw new PlatformError(new Status(Severity.ERROR, Error.ACCOUNT_NOT_FOUND, 'Account not found.'))
+    throw new PlatformError(new Status(Severity.ERROR, PlatformStatusCodes.ACCOUNT_NOT_FOUND, 'Account not found.'))
   }
   if (!verifyPassword(password, account.hash.buffer, account.salt.buffer)) {
-    throw new PlatformError(new Status(Severity.ERROR, Error.INCORRECT_PASSWORD, 'Incorrect password.'))
+    throw new PlatformError(new Status(Severity.ERROR, PlatformStatusCodes.INCORRECT_PASSWORD, 'Incorrect password.'))
   }
 
   if (account.clientSecret) {
     if (secondFactorCode) {
       if (!secondFactor.verifyToken(account.clientSecret, secondFactorCode)) {
-        throw new PlatformError(new Status(Severity.ERROR, Error.INCORRECT_SECOND_FACTOR_CODE, 'Incorrect second factor code.'))
+        throw new PlatformError(new Status(Severity.ERROR, PlatformStatusCodes.INCORRECT_SECOND_FACTOR_CODE, 'Incorrect second factor code.'))
       }
       await pushClientId(db, email, clientId)
       return toAccountInfo(account)
     }
 
     if (!clientId) {
-      throw new PlatformError(new Status(Severity.WARNING, Error.CLIENT_VALIDATE_REQUIRED, 'Unknown client'))
+      throw new PlatformError(new Status(Severity.WARNING, PlatformStatusCodes.CLIENT_VALIDATE_REQUIRED, 'Unknown client'))
     }
 
     for (const id of account.clientIds) {
       if (id === clientId) return toAccountInfo(account)
     }
-    throw new PlatformError(new Status(Severity.WARNING, Error.CLIENT_VALIDATE_REQUIRED, 'Unknown client'))
+    throw new PlatformError(new Status(Severity.WARNING, PlatformStatusCodes.CLIENT_VALIDATE_REQUIRED, 'Unknown client'))
   }
 
   await pushClientId(db, email, clientId)
@@ -215,13 +209,13 @@ async function login (db: Db, email: string, password: string, workspace: string
     }
   }
 
-  throw new PlatformError(new Status(Severity.ERROR, Error.FORBIDDEN, 'Forbidden.'))
+  throw new PlatformError(new Status(Severity.ERROR, PlatformStatusCodes.FORBIDDEN, 'Forbidden.'))
 }
 
 export async function createWorkspace (db: Db, workspace: string, organisation: string): Promise<string> {
   // Ensure workspace is not exists yet.
   if ((await getWorkspace(db, workspace)) != null) {
-    throw new PlatformError(new Status(Severity.ERROR, Error.WORKSPACE_ALREADY_EXISTS, 'Workspace already exists and could not be created.'))
+    throw new PlatformError(new Status(Severity.ERROR, PlatformStatusCodes.WORKSPACE_ALREADY_EXISTS, 'Workspace already exists and could not be created.'))
   }
   // Create a new workspace record
   return db
@@ -236,12 +230,12 @@ export async function createWorkspace (db: Db, workspace: string, organisation: 
 async function getWorkspaceAndAccount (db: Db, email: string, workspace: string): Promise<{ accountId: ObjectID; workspaceId: ObjectID }> {
   const wsPromise = await getWorkspace(db, workspace)
   if (wsPromise == null) {
-    throw new PlatformError(new Status(Severity.ERROR, Error.WORKSPACE_NOT_FOUND, `Workspace ${workspace} not found`))
+    throw new PlatformError(new Status(Severity.ERROR, PlatformStatusCodes.WORKSPACE_NOT_FOUND, `Workspace ${workspace} not found`))
   }
   const workspaceId = wsPromise._id
   const account = await getAccount(db, email)
   if (account == null) {
-    throw new PlatformError(new Status(Severity.ERROR, Error.ACCOUNT_NOT_FOUND, 'Account not found.'))
+    throw new PlatformError(new Status(Severity.ERROR, PlatformStatusCodes.ACCOUNT_NOT_FOUND, 'Account not found.'))
   }
   const accountId = account!._id
   return { accountId, workspaceId }
