@@ -5350,6 +5350,11 @@ data-urls@^2.0.0:
     whatwg-mimetype "^2.3.0"
     whatwg-url "^8.0.0"
 
+date-fns@^2.19.0:
+  version "2.19.0"
+  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.19.0.tgz#65193348635a28d5d916c43ec7ce6fbd145059e1"
+  integrity sha512-X3bf2iTPgCAQp9wvjOQytnf5vO5rESYRXlPIVcgSbtT5OTScPcsf9eZU+B/YIkKAtYr5WeCii58BgATrNitlWg==
+
 dateformat@~1.0.4-1.2.3:
   version "1.0.12"
   resolved "https://registry.yarnpkg.com/dateformat/-/dateformat-1.0.12.tgz#9f124b67594c937ff706932e4a642cca8dbbfee9"
@@ -14376,6 +14381,18 @@ xmlchars@^2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/xmlchars/-/xmlchars-2.2.0.tgz#060fe1bcb7f9c76fe2a17db86a9bc3ab894210cb"
   integrity sha512-JZnDKK8B0RCDw84FNdDAIpZK+JuJw+s7Lz8nksI7SIuU3UXJJslUthsi+uWBUYOwPFwW7W7PRLRfUKpxjtjFCw==
+
+xstate-svelte@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/xstate-svelte/-/xstate-svelte-1.0.1.tgz#728fffea150a2169e8bac29876ec14ca732f4a94"
+  integrity sha512-vp5NgOBDSa0XBP/EiIZsIlb/Ca5DxcVfUK8f49v+oWKvehOMmwDzvGVcJZBZgFC9F97Ji1eLCo8lvvj2pRqTvw==
+  dependencies:
+    tslib "^2.0.3"
+
+xstate@^4.17.0:
+  version "4.17.0"
+  resolved "https://registry.yarnpkg.com/xstate/-/xstate-4.17.0.tgz#4b3ecd86fba081dd57d39a1817a61a0a7a730eea"
+  integrity sha512-4DCayqvvVt06UidsNrCzigzgbmyiTO6kPd32ESOFlZFmM4aPS1CG161fetyGGLXrBZPjTyQyeq63aFtqZ1Y3ng==
 
 xtend@^4.0.0, xtend@^4.0.1, xtend@~4.0.1:
   version "4.0.2"

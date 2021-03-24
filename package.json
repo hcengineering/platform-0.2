@@ -12,5 +12,10 @@
     "plugins/*",
     "server/*",
     "dev/*"
-  ]
+  ],
+  "dependencies": {
+    "date-fns": "^2.19.0",
+    "xstate": "^4.17.0",
+    "xstate-svelte": "^1.0.1"
+  }
 }
