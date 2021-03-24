@@ -64,6 +64,8 @@ jobs:
         with:
           fetch-depth: 0
       - uses: FranzDiebold/github-env-vars-action@v1.2.0
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
       - name: Print environment variables
         run: |
           echo "GITHUB_REPOSITORY_SLUG=$GITHUB_REPOSITORY_SLUG"
