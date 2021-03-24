@@ -9,7 +9,8 @@
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
     "test": "echo 'no tests'",
-    "lint": "echo 'no linting'"
+    "lint": "echo 'no linting'",
+    "chromatic": "npx chromatic"
   },
   "devDependencies": {
     "@babel/core": "^7.12.10",
@@ -22,6 +23,7 @@
     "@storybook/svelte": "^6.1.11",
     "@tsconfig/svelte": "^1.0.0",
     "babel-loader": "^8.2.2",
+    "chromatic": "^5.7.0",
     "rollup": "^2.3.4",
     "rollup-plugin-css-only": "^3.1.0",
     "rollup-plugin-livereload": "^2.0.0",
