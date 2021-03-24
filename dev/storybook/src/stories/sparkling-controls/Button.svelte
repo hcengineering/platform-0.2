@@ -21,7 +21,7 @@
   class="button {size} {kind}"
   style="{(width !== '') ? 'width:' + width : ''}"
   on:click={onClick}
->
+> XXX
   <slot>{label}</slot>
 </button>
 
