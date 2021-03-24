@@ -43,11 +43,14 @@ export interface Task extends Doc {
   comments?: TaskComment[]
 }
 
+export interface DerivedTask extends Task {}
+
 export const taskIds = {
   class: {
     Task: 'core.class.TaskObj' as Ref<Class<Task>>,
     Subtask: 'core.class.SubTask' as Ref<Class<SubTask>>,
-    TaskComment: 'core.class.TaskComment' as Ref<Class<TaskComment>>
+    TaskComment: 'core.class.TaskComment' as Ref<Class<TaskComment>>,
+    DerivedTask: 'core.class.DerivedTaskObj' as Ref<Class<DerivedTask>>
   }
 }
 
