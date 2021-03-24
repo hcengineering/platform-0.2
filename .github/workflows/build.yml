@@ -66,8 +66,12 @@ jobs:
       - name: Print environment variables
         run: |
           echo "A=$A"
+          echo "B=$B"
+          echo "C=$C"
         env:
-          A: ${{ github.repository_owner }}
+          A: ${{ github.base_ref }}
+          B: ${{ github.head_ref }}
+          C: ${{ github.ref }}
 
       - name: Install dependencies
         run: yarn
