@@ -65,8 +65,9 @@ jobs:
           fetch-depth: 0
       - name: Install dependencies
         run: yarn
+      - uses: nelonoel/branch-name@v1
       - name: Build storybook
-        run: yarn workspace storybook chromatic ${GITHUB_REF}
+        run: yarn workspace storybook chromatic ${BRANCH_NAME}
 
   yamllint:
     name: yamllint
