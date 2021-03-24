@@ -67,8 +67,6 @@ jobs:
         run: yarn
       - name: Build storybook
         run: yarn workspace storybook chromatic
-        env:
-          CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
 
   yamllint:
     name: yamllint
