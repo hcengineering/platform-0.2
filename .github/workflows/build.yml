@@ -69,7 +69,7 @@ jobs:
           echo "B=$B"
           echo "C=$C"
         env:
-          A: ${{ github.base_ref }}
+          A: ${{ github.actor }}
           B: ${{ github.head_ref }}
           C: ${{ github.ref }}
 
