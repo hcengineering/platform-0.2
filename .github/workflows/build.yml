@@ -78,7 +78,7 @@ jobs:
       - name: Build storybook
         run: yarn workspace storybook chromatic ${BRANCH}
         env:
-          BRANCH: ${{ github.actor }}:${{ github.head_ref }}
+          BRANCH: --branch-name=${{ github.actor }}:${{ github.head_ref }}
 
   yamllint:
     name: yamllint
