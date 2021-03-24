@@ -1,5 +1,5 @@
 {
-  "name": "svelte-app",
+  "name": "storybook",
   "version": "1.0.0",
   "scripts": {
     "build": "rollup -c",
@@ -10,7 +10,7 @@
     "build-storybook": "build-storybook",
     "test": "echo 'no tests'",
     "lint": "echo 'no linting'",
-    "chromatic": "npx chromatic"
+    "chromatic": "npx chromatic --project-token 2dc55737a394 --exit-zero-on-changes"
   },
   "devDependencies": {
     "@babel/core": "^7.12.10",
