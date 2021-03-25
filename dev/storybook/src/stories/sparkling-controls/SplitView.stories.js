@@ -59,7 +59,7 @@ const Template = ({ ...args }) => ({
 export const Default = Template.bind({})
 Default.args = {
   width: '100%',
-  height: 'calc(100vh - 32px)',
+  height: 'calc(100vh - 32px)'
 }
 
 export const Horizontal = Template.bind({})
