@@ -9,25 +9,25 @@ export default {
     checked: { control: 'boolean' },
     toRight: { control: 'boolean' },
     editable: { control: 'boolean' },
-    fullWidth: { control: 'boolean' },
+    fullWidth: { control: 'boolean' }
   },
   parameters: {
     backgrounds: {
       values: [
         { name: 'light', value: '#fff' },
         { name: 'dark', value: '#1E1E1E' },
-        { name: 'biege', value: '#FDF1E6' },
-      ],
-    },
+        { name: 'biege', value: '#FDF1E6' }
+      ]
+    }
   },
-  decorators:  [(storyFn) => {
-    const story = storyFn();
+  decorators: [(storyFn) => {
+    const story = storyFn()
 
     return {
       Component: ThemeDecorator,
       props: {
         child: story.Component,
-        props: story.props,
+        props: story.props
       }
     }
   }]
@@ -35,30 +35,30 @@ export default {
 
 const Template = ({ ...args }) => ({
   Component: CheckBox,
-  props: { ...args },
-});
+  props: { ...args }
+})
 
-export const Default = Template.bind({});
+export const Default = Template.bind({})
 Default.args = {
-  label: 'Label for CheckBox',
-};
+  label: 'Label for CheckBox'
+}
 
-export const Checked = Template.bind({});
+export const Checked = Template.bind({})
 Checked.args = {
   label: 'Label for CheckBox',
-  checked: true,
-};
+  checked: true
+}
 
-export const toRight = Template.bind({});
+export const toRight = Template.bind({})
 toRight.args = {
   label: 'Label for CheckBox',
   toRight: true,
   fullWidth: false
-};
+}
 
-export const toRightFullWidth = Template.bind({});
+export const toRightFullWidth = Template.bind({})
 toRightFullWidth.args = {
   label: 'Label for CheckBox',
   toRight: true,
   fullWidth: true
-};
+}

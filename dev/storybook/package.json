@@ -9,7 +9,7 @@
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
     "test": "echo 'no tests'",
-    "lint": "echo 'no linting'"
+    "lint": "eslint src"
   },
   "devDependencies": {
     "@babel/core": "^7.12.10",
@@ -32,7 +32,16 @@
     "svelte-loader": "^2.13.6",
     "svelte-preprocess": "^4.0.0",
     "tslib": "^2.0.0",
-    "typescript": "^3.9.3"
+    "typescript": "^3.9.3",
+    "@typescript-eslint/eslint-plugin": "^4.9.0",
+    "@typescript-eslint/parser": "^4.9.0",
+    "eslint": "^7.14.0",
+    "eslint-config-standard": "^16.0.2",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^5.0.0",
+    "eslint-plugin-svelte3": "^3.1.2"
   },
   "dependencies": {
     "sirv-cli": "^1.0.0"

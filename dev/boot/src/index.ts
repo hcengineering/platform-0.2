@@ -16,6 +16,7 @@
 import { MongoClient } from 'mongodb'
 import { Model, Strings } from './boot'
 import { Doc } from '@anticrm/core'
+import path from 'path'
 
 const modelJson = JSON.stringify(Model, null, 2)
 console.log(modelJson)
@@ -24,9 +25,9 @@ const stringsJson = JSON.stringify(Strings)
 console.log(stringsJson)
 
 export function dumpToFile () {
-  const fs = require('fs')
+  const fs = require('fs') // eslint-disable-line @typescript-eslint/no-var-requires
 
-  fs.writeFile(__dirname + '/../../prod/src/model.json', modelJson, 'utf8', function (err: Error) {
+  fs.writeFile(path.join(__dirname, '/../../prod/src/model.json'), modelJson, 'utf8', function (err: Error) {
     if (err) {
       console.log('An error occured while writing JSON Object to File.')
       return console.log(err)
@@ -34,7 +35,7 @@ export function dumpToFile () {
     console.log('model saved.')
   })
 
-  fs.writeFile(__dirname + '/../../prod/src/strings.json', stringsJson, 'utf8', function (err: Error) {
+  fs.writeFile(path.join(__dirname, '/../../prod/src/strings.json'), stringsJson, 'utf8', function (err: Error) {
     if (err) {
       console.log('An error occured while writing JSON Object to File.')
       return console.log(err)
@@ -46,11 +47,19 @@ export function dumpToFile () {
 function initDatabase (uri: string, tenant: string) {
   const domains = { ...Model } as { [key: string]: Doc[] }
   MongoClient.connect(uri, { useUnifiedTopology: true }, (err, client) => {
+    if (err) {
+      console.error(`An error occurred while connecting to database ${uri}: ${err}`)
+      throw err
+    }
     const db = client.db(tenant)
     const ops = [] as Promise<any>[]
     for (const domain in domains) {
       const model = domains[domain]
       db.collection(domain, (err, coll) => {
+        if (err) {
+          console.error(`An error occurred while calling db.collection for database ${uri}: ${err}`)
+          throw err
+        }
         ops.push(coll.deleteMany({}).then(() => model.length > 0 ? coll.insertMany(model) : null))
       })
     }

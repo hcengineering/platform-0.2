@@ -6,25 +6,25 @@ export default {
   component: ActionBar,
   argTypes: {
     actions: { control: 'array' },
-    onTop: { control: 'number' },
+    onTop: { control: 'number' }
   },
   parameters: {
     backgrounds: {
       values: [
         { name: 'light', value: '#fff' },
         { name: 'dark', value: '#1E1E1E' },
-        { name: 'biege', value: '#FDF1E6' },
-      ],
-    },
+        { name: 'biege', value: '#FDF1E6' }
+      ]
+    }
   },
-  decorators:  [(storyFn) => {
-    const story = storyFn();
+  decorators: [(storyFn) => {
+    const story = storyFn()
 
     return {
       Component: ThemeDecorator,
       props: {
         child: story.Component,
-        props: story.props,
+        props: story.props
       }
     }
   }]
@@ -32,7 +32,7 @@ export default {
 
 const Template = ({ ...args }) => ({
   Component: ActionBar,
-  props: { 
+  props: {
     actions: [{
       label: 'Action Item 1', action: () => alert('PopupItem1.Action()')
     }, {
@@ -45,10 +45,10 @@ const Template = ({ ...args }) => ({
       label: 'Action Item 4', action: () => alert('PopupItem4.Action()')
     }],
     ...args
-  },
-});
+  }
+})
 
-export const Default = Template.bind({});
+export const Default = Template.bind({})
 Default.args = {
-  onTop: 2,
-};
+  onTop: 2
+}

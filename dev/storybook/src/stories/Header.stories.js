@@ -1,4 +1,4 @@
-import Header from './Header.svelte';
+import Header from './Header.svelte'
 
 export default {
   title: 'Example/Header',
@@ -6,9 +6,9 @@ export default {
   argTypes: {
     onLogin: { action: 'onLogin' },
     onLogout: { action: 'onLogout' },
-    onCreateAccount: { action: 'onCreateAccount' },
-  },
-};
+    onCreateAccount: { action: 'onCreateAccount' }
+  }
+}
 
 const Template = ({ onLogin, onLogout, onCreateAccount, ...args }) => ({
   Component: Header,
@@ -16,14 +16,14 @@ const Template = ({ onLogin, onLogout, onCreateAccount, ...args }) => ({
   on: {
     login: onLogin,
     logout: onLogout,
-    createAccount: onCreateAccount,
-  },
-});
+    createAccount: onCreateAccount
+  }
+})
 
-export const LoggedIn = Template.bind({});
+export const LoggedIn = Template.bind({})
 LoggedIn.args = {
-  user: {},
-};
+  user: {}
+}
 
-export const LoggedOut = Template.bind({});
-LoggedOut.args = {};
+export const LoggedOut = Template.bind({})
+LoggedOut.args = {}

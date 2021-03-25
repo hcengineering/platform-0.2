@@ -9,25 +9,25 @@ export default {
     style: { control: 'text' },
     disabled: { control: 'boolean' },
     selected: { control: 'boolean' },
-    onClick: { action: 'onClick' },
+    onClick: { action: 'onClick' }
   },
   parameters: {
     backgrounds: {
       values: [
         { name: 'light', value: '#fff' },
         { name: 'dark', value: '#1E1E1E' },
-        { name: 'biege', value: '#FDF1E6' },
-      ],
-    },
+        { name: 'biege', value: '#FDF1E6' }
+      ]
+    }
   },
-  decorators:  [(storyFn) => {
-    const story = storyFn();
+  decorators: [(storyFn) => {
+    const story = storyFn()
 
     return {
       Component: ThemeDecorator,
       props: {
         child: story.Component,
-        props: story.props,
+        props: story.props
       }
     }
   }]
@@ -37,23 +37,23 @@ const Template = ({ onClick, ...args }) => ({
   Component: Button,
   props: { ...args },
   on: {
-    click: onClick,
-  },
-});
+    click: onClick
+  }
+})
 
-export const Default = Template.bind({});
+export const Default = Template.bind({})
 Default.args = {
-  label: 'TB Button',
-};
+  label: 'TB Button'
+}
 
-export const Selected = Template.bind({});
+export const Selected = Template.bind({})
 Selected.args = {
   label: 'TB Button',
   selected: true
-};
+}
 
-export const Disabled = Template.bind({});
+export const Disabled = Template.bind({})
 Disabled.args = {
   label: 'TB Button',
   disabled: true
-};
+}

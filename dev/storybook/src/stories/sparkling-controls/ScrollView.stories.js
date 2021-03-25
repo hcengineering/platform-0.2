@@ -10,25 +10,25 @@ export default {
     accentColor: { control: 'boolean' },
     width: { control: 'text' },
     height: { control: 'text' },
-    margin: { control: 'text' },
+    margin: { control: 'text' }
   },
   parameters: {
     backgrounds: {
       values: [
         { name: 'light', value: '#fff' },
         { name: 'dark', value: '#1E1E1E' },
-        { name: 'biege', value: '#FDF1E6' },
-      ],
-    },
+        { name: 'biege', value: '#FDF1E6' }
+      ]
+    }
   },
-  decorators:  [(storyFn) => {
-    const story = storyFn();
+  decorators: [(storyFn) => {
+    const story = storyFn()
 
     return {
       Component: ThemeDecorator,
       props: {
         child: story.Component,
-        props: story.props,
+        props: story.props
       }
     }
   }]
@@ -36,10 +36,10 @@ export default {
 
 const Template = ({ ...args }) => ({
   Component: ScrollView,
-  props: { ...args },
-});
+  props: { ...args }
+})
 
-export const Default = Template.bind({});
+export const Default = Template.bind({})
 Default.args = {
   width: '300px',
   height: '300px',
@@ -52,5 +52,5 @@ Default.args = {
   Voluptates reprehenderit repellat eligendi dignissimos ratione aliquid distinctio, dolorem eius alias laborum perferendis nihil ipsam quisquam! Sunt id in neque doloribus. Commodi labore facere sapiente dicta voluptate eaque necessitatibus animi.
   Molestias omnis quasi esse, vero rerum asperiores culpa distinctio commodi laudantium error dicta ullam earum, eveniet magnam harum porro adipisci vitae, fuga odit. Ducimus ex vitae facilis accusantium cupiditate corrupti?
   Enim labore sit corporis blanditiis aliquam nesciunt harum quas quae sapiente non officiis asperiores, quo, quasi nam repellendus laborum commodi nisi iure fuga autem. Quaerat voluptate sequi enim ut hic?
-  Magnam saepe iusto voluptatibus nostrum quos eligendi suscipit minima iste, earum corrupti officiis molestias enim recusandae at aspernatur repudiandae praesentium, eveniet amet odio illum deserunt asperiores? Natus officia culpa et.`,
-};
+  Magnam saepe iusto voluptatibus nostrum quos eligendi suscipit minima iste, earum corrupti officiis molestias enim recusandae at aspernatur repudiandae praesentium, eveniet amet odio illum deserunt asperiores? Natus officia culpa et.`
+}
