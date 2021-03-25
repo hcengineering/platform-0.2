@@ -1,5 +1,5 @@
 {
-  "name": "svelte-app",
+  "name": "storybook",
   "version": "1.0.0",
   "scripts": {
     "build": "rollup -c",
@@ -9,7 +9,8 @@
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
     "test": "echo 'no tests'",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "chromatic": "npx chromatic --project-token 2dc55737a394 --exit-zero-on-changes"
   },
   "devDependencies": {
     "@babel/core": "^7.12.10",
@@ -22,6 +23,7 @@
     "@storybook/svelte": "^6.1.11",
     "@tsconfig/svelte": "^1.0.0",
     "babel-loader": "^8.2.2",
+    "chromatic": "^5.7.0",
     "rollup": "^2.3.4",
     "rollup-plugin-css-only": "^3.1.0",
     "rollup-plugin-livereload": "^2.0.0",
