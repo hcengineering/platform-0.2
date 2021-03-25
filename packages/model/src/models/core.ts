@@ -16,20 +16,8 @@
 import { BagOf$, Class$, InstanceOf$, Mixin$, Prop, RefTo$ } from '../dsl'
 import core from '../index'
 import {
-  AllAttributes, ArrayOf,
-  Attribute,
-  Class,
-  Classifier,
-  ClassifierKind,
-  Doc,
-  Emb, Indices,
-  Mixin,
-  MODEL_DOMAIN,
-  Obj,
-  PropertyType,
-  Ref, RefTo,
-  StringProperty,
-  Type
+  AllAttributes, ArrayOf, Attribute, Class, Classifier, ClassifierKind, Doc, Emb, Enum, EnumKey, EnumLiteral,
+  EnumLiterals, Indices, Mixin, MODEL_DOMAIN, Obj, PropertyType, Ref, RefTo, StringProperty, Type
 } from '@anticrm/core'
 
 @Class$(core.class.Obj, core.class.Obj)
@@ -60,23 +48,41 @@ export class TType extends TEmb implements Type {
 }
 
 @Class$(core.class.Classifier, core.class.Doc, MODEL_DOMAIN)
-export class TClassifier<T extends Obj> extends TDoc implements Classifier<T> {
+export class TClassifier extends TDoc implements Classifier {
   @Prop() _kind!: ClassifierKind
-
-  @BagOf$()
-  @InstanceOf$(core.class.Emb) _attributes!: AllAttributes<T, Obj>
-
-  @RefTo$(core.class.Class) _extends?: Ref<Classifier<Doc>>
 }
 
 @Class$(core.class.Class, core.class.Classifier, MODEL_DOMAIN)
-export class TClass<T extends Obj> extends TClassifier<T> implements Class<T> {
+export class TClass<T extends Obj> extends TClassifier implements Class<T> {
+  @BagOf$()
+  @InstanceOf$(core.class.Attribute) _attributes!: AllAttributes<T, Obj>
+
+  @RefTo$(core.class.Class) _extends?: Ref<Class<Doc>>
+
   @Prop() _native?: StringProperty
   @Prop() _domain?: StringProperty
 }
 
 @Class$(core.class.Mixin, core.class.Class, MODEL_DOMAIN)
 export class TMixin<T extends Obj> extends TClass<T> implements Mixin<T> {
+  @BagOf$()
+  @InstanceOf$(core.class.Attribute) _attributes!: AllAttributes<T, Obj>
+
+  @RefTo$(core.class.Class) _extends?: Ref<Class<Doc>>
+}
+
+@Class$(core.class.EnumLiteral, core.class.Emb, MODEL_DOMAIN)
+export class TEnumLiteral extends TEmb implements EnumLiteral {
+  @Prop() ordinal!: number
+  @Prop() label!: string
+}
+
+@Class$(core.class.Enum, core.class.Classifier, MODEL_DOMAIN)
+export class TEnum<T extends EnumKey> extends TClassifier implements Enum<T> {
+  @BagOf$()
+  @InstanceOf$(core.class.EnumLiteral) _literals!: EnumLiterals<T, EnumLiteral>
+
+  @Prop() _domain?: StringProperty
 }
 
 @Class$(core.class.RefTo, core.class.Type, MODEL_DOMAIN)

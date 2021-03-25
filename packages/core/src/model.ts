@@ -61,7 +61,7 @@ export function isValidQuery (query: AnyLayout | null): boolean {
  */
 export class Model implements Storage {
   private readonly domain: string
-  private objects = new Map<Ref<Doc>, Doc>()
+  private readonly objects = new Map<Ref<Doc>, Doc>()
   private byClass: Map<Ref<Class<Doc>>, Doc[]> | null = null
 
   constructor (domain: string) {
@@ -78,7 +78,7 @@ export class Model implements Storage {
     return this.byClass.get(_class) ?? []
   }
 
-  protected attributeKey (clazz: Classifier<Obj>, key: string): string {
+  protected attributeKey (clazz: Classifier, key: string): string {
     return clazz._kind === ClassifierKind.MIXIN ? mixinKey(clazz._id as Ref<Mixin<Doc>>, key) : key
   }
 
@@ -160,7 +160,7 @@ export class Model implements Storage {
     const primaryKey = mixinKey(CORE_MIXIN_INDICES, 'primary')
     let cls = _class as Ref<Class<Obj>> | undefined
     while (cls) {
-      const clazz = this.get(cls) as Classifier<Doc>
+      const clazz = this.get(cls) as Class<Doc>
       const primary = (clazz as any)[primaryKey]
       if (primary) {
         return primary
@@ -237,7 +237,7 @@ export class Model implements Storage {
       curArray.push(objValue)
       return curArray
     } else {
-      throw new Error('Invalid attribute type: ' + curValue)
+      throw new Error(`Invalid attribute type: ${curValue}`)
     }
   }
 
@@ -308,7 +308,7 @@ export class Model implements Storage {
         this.assign((result.match as unknown) as AnyLayout, result.match._class, attributes)
         return doc
       }
-      throw new Error('failed to match embedded object by query:' + query)
+      throw new Error(`failed to match embedded object by query:${query}`)
     }
     this.assign((doc as unknown) as AnyLayout, doc._class, attributes)
     return doc
@@ -328,7 +328,7 @@ export class Model implements Storage {
       if (result.result && result.match) {
         queryObject = result.match
       } else {
-        throw new Error('failed to match embedded object by query:' + query)
+        throw new Error(`failed to match embedded object by query:${query}`)
       }
     }
 
@@ -339,14 +339,14 @@ export class Model implements Storage {
       case CORE_CLASS_ARRAY_OF: {
         const attrClass = this.attributeClass((attr.type as ArrayOf).of)
         if (attrClass === null) {
-          throw new Error('Invalid attribute type/class: ' + attr.type)
+          throw new Error(`Invalid attribute type/class: ${attr.type}`)
         }
         l[key] = this.pushArrayValue(l[key], attrClass, embedded)
         return doc
       }
 
       default:
-        throw new Error('Invalid attribute type: ' + attr.type)
+        throw new Error(`Invalid attribute type: ${attr.type}`)
     }
   }
 
@@ -364,12 +364,12 @@ export class Model implements Storage {
     return (layout as unknown) as M
   }
 
-  public mixinDocument<E extends Doc, T extends Doc> (doc: E, clazz: Ref<Mixin<T>>, values: Omit<T, keyof E>): void {
-    this.includeMixin(doc, clazz)
-    this.assign((doc as unknown) as AnyLayout, clazz as Ref<Classifier<Doc>>, (values as unknown) as AnyLayout)
+  public mixinDocument<E extends Obj, T extends Obj> (doc: E, clazz: Ref<Mixin<T>>, values: Partial<Omit<T, keyof E>>): void {
+    Model.includeMixin(doc, clazz)
+    this.assign((doc as unknown) as AnyLayout, clazz as Ref<Class<Obj>>, (values as unknown) as AnyLayout)
   }
 
-  private includeMixin<E extends Doc, T extends Doc> (doc: E, clazz: Ref<Mixin<T>>): void {
+  public static includeMixin<E extends Obj, T extends Obj> (doc: E, clazz: Ref<Mixin<T>>): void {
     if (!doc._mixins) {
       doc._mixins = []
     }
@@ -415,7 +415,7 @@ export class Model implements Storage {
     if (this.domain !== domain) {
       throw new Error('domain does not match')
     }
-    return this.dump()
+    return Promise.resolve(this.dump())
   }
 
   loadModel (model: Doc[]): void {
@@ -433,7 +433,7 @@ export class Model implements Storage {
   }
 
   async find<T extends Doc> (clazz: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
-    return this.findSync(clazz, query) as T[]
+    return (await this.findSync(clazz, query)) as T[]
   }
 
   async findOne<T extends Doc> (clazz: Ref<Class<Doc>>, query: AnyLayout): Promise<T | undefined> {
@@ -462,9 +462,9 @@ export class Model implements Storage {
   }
 
   // M I X I N S
-  private prototypes = new Map<Ref<Classifier<Obj>>, Record<string, unknown>>()
+  private readonly prototypes = new Map<Ref<Class<Obj>>, Record<string, unknown>>()
 
-  private createPrototype (classifier: Classifier<Obj>): Record<string, unknown> {
+  private createPrototype (classifier: Class<Obj>): Record<string, unknown> {
     const attributes = classifier._attributes as { [key: string]: Attribute }
     const descriptors = {} as PropertyDescriptorMap
     for (const key in attributes) {
@@ -483,10 +483,10 @@ export class Model implements Storage {
     return Object.defineProperties(proto, descriptors)
   }
 
-  private getPrototype (mixin: Ref<Classifier<Obj>>): Record<string, unknown> {
+  private getPrototype (mixin: Ref<Class<Obj>>): Record<string, unknown> {
     const proto = this.prototypes.get(mixin)
     if (!proto) {
-      const proto = this.createPrototype(this.get(mixin) as Classifier<Doc>)
+      const proto = this.createPrototype(this.get(mixin) as Class<Doc>)
       this.prototypes.set(mixin, proto)
       return proto
     }
@@ -495,11 +495,11 @@ export class Model implements Storage {
 
   /**
    * Cast to some mixin, if mixin is not present in class list it will not be added.
-   * isMixidIn should be used to ensure if mixin is on place, before modifications.
+   * isMixedIn should be used to ensure if mixin is on place, before modifications.
    * @param doc - incoming document
    * @param mixin - a mixin class
    */
-  public as<T extends Doc> (doc: Doc, mixin: Ref<Mixin<T>>): T {
+  public as<T extends Obj> (doc: Obj, mixin: Ref<Mixin<T>>): T {
     const proxy = Object.create(this.getPrototype(mixin)) as Proxy & T
     proxy.__layout = (doc as unknown) as Record<string, unknown>
     return proxy
@@ -511,11 +511,11 @@ export class Model implements Storage {
    * @param mixin
    */
   public cast<T extends Doc> (doc: Doc, mixin: Ref<Mixin<T>>): T {
-    this.includeMixin(doc, mixin)
+    Model.includeMixin(doc, mixin)
     return this.as(doc, mixin)
   }
 
-  public isMixedIn (obj: Doc, _class: Ref<Mixin<Doc>>): boolean {
+  public isMixedIn (obj: Obj, _class: Ref<Mixin<Obj>>): boolean {
     return obj._mixins ? obj._mixins.includes(_class) : false
   }
 
@@ -614,7 +614,7 @@ export class Model implements Storage {
     const queryEntries = Object.entries(query || {})
     const docKeys = new Set(Object.keys(doc))
     let count = 0
-    const clazz = this.get(_class) as Classifier<Obj>
+    const clazz = this.get(_class) as Class<Obj>
 
     let match: MatchResult = { // Assume initial match is document itself
       result: false,

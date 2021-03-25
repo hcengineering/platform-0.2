@@ -59,33 +59,54 @@ export type AllAttributes<T extends E, E extends Obj> = Required<Attributes<T, E
 
 export enum ClassifierKind {
   CLASS,
-  MIXIN
+  MIXIN,
+  ENUM
 }
 
-export interface EClassifier<T extends E, E extends Obj> extends Doc {
+export interface Classifier extends Doc {
   _kind: ClassifierKind
-  _attributes: AllAttributes<T, E>
-  _extends?: Ref<Classifier<E>>
 }
-
-export type Classifier<T extends Obj> = EClassifier<T, Obj>
 
 export interface EMixin<T extends E, E extends Obj> extends EClass<T, E> {
 }
 
 export type Mixin<T extends Obj> = EMixin<T, Obj>
 
-export interface EClass<T extends E, E extends Obj> extends EClassifier<T, E> {
-  _native?: StringProperty
+export interface EDomainClassifier {
   _domain?: StringProperty
 }
 
+export interface EClass<T extends E, E extends Obj> extends Classifier, EDomainClassifier {
+  _attributes: AllAttributes<T, E>
+  _extends?: Ref<Class<E>>
+
+  _native?: StringProperty
+}
+
 export type Class<T extends Obj> = EClass<T, Obj>
+
+export interface EnumLiteral extends Emb {
+  label: string
+  ordinal: string | number
+}
+
+export type EnumKey = string | number | symbol
+export type EnumLiterals<T extends EnumKey, E extends EnumLiteral> = { [Q in T]: E }
+
+export interface EEnum<T extends EnumKey, E extends EnumLiteral> extends Classifier, EDomainClassifier {
+  _literals: EnumLiterals<T, E>
+}
+
+export type Enum<T extends EnumKey> = EEnum<T, EnumLiteral>
 
 // T Y P E S
 
 export interface RefTo<T extends Doc> extends Type {
   to: Ref<Class<T>>
+}
+
+export interface EnumValue<T extends EnumKey> extends Type {
+  to: Ref<Enum<T>>
 }
 
 export interface InstanceOf<T extends Emb> extends Type {
@@ -116,6 +137,8 @@ export const CORE_CLASS_OBJ = 'class:core.Obj' as Ref<Class<Obj>>
 export const CORE_CLASS_DOC = 'class:core.Doc' as Ref<Class<Doc>>
 export const CORE_CLASS_EMB = 'class:core.Emb' as Ref<Class<Emb>>
 export const CORE_CLASS_CLASS = 'class:core.Class' as Ref<Class<Class<Obj>>>
+export const CORE_CLASS_ENUM = 'class:core.Enum' as Ref<Class<Enum<any>>>
+
 export const CORE_CLASS_STRING = 'class:core.String' as Ref<Class<Type>>
 export const CORE_CLASS_ATTRIBUTE = 'class:core.Attribute' as Ref<Class<Attribute>>
 export const CORE_CLASS_TYPE = 'class:core.Type' as Ref<Class<Type>>

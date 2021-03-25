@@ -13,17 +13,17 @@
 // limitations under the License.
 //
 
-import core, { Builder, getClassifier, Class$, Prop, Mixin$, ArrayOf$, InstanceOf$, RefTo$ } from '@anticrm/model'
+import core, { Builder, Class$, getClass, loadClassifierChild, Mixin$, Prop, RefTo$ } from '@anticrm/model'
 
-import { Doc, Obj, Type, mixinKey, MODEL_DOMAIN, Ref, Class } from '@anticrm/core'
+import { Class, Doc, MODEL_DOMAIN, Obj, Ref, Type } from '@anticrm/core'
 import { VDoc } from '@anticrm/domains'
 import { IntlString } from '@anticrm/platform-i18n'
 import { AnyComponent, Asset } from '@anticrm/platform-ui'
-import ui, { UXAttribute, Presenter, UXObject, ComponentExtension, Viewlet } from '.'
-import { TDoc, TEmb, TMixin } from '@anticrm/model/src/__model__'
+import ui, { ComponentExtension, Presenter, UXAttribute, UXObject, Viewlet } from '.'
+import { TAttribute, TDoc, TMixin } from '@anticrm/model/src/__model__'
 
-@Class$(ui.class.UXAttribute, core.class.Emb)
-export class TUXAttribute extends TEmb implements UXAttribute {
+@Mixin$(ui.mixin.UXAttribute, core.class.Attribute)
+export class TUXAttribute extends TAttribute implements UXAttribute {
   @Prop()
   key!: string
 
@@ -38,6 +38,12 @@ export class TUXAttribute extends TEmb implements UXAttribute {
 
   @Prop()
   visible!: boolean
+
+  @Prop()
+  presenter?: AnyComponent
+
+  @Prop()
+  color?: Asset
 }
 
 @Mixin$(ui.mixin.Presenter, core.class.Mixin)
@@ -53,10 +59,6 @@ export class TUXObject<T extends Obj> extends TMixin<T> implements UXObject<T> {
 
   @Prop()
   icon?: Asset
-
-  @ArrayOf$()
-  @InstanceOf$(ui.class.UXAttribute)
-  attributes!: Record<string, UXAttribute>
 }
 
 @Mixin$(ui.mixin.DetailForm, core.class.Mixin)
@@ -121,61 +123,44 @@ export function model (S: Builder): void {
   })
 }
 
-export function UX (label: IntlString, icon?: Asset, presenter?: AnyComponent): any {
+// A possible set of options
+export interface UXOptions {
+  // Declare an icon
+  icon?: Asset
+
+  // Declare a placeholder
+  placeholder?: IntlString
+
+  // Declare a direct presenter for field
+  presenter?: AnyComponent
+
+  color?: Asset // Define a item color if appropriate
+}
+
+export function UX (label: IntlString, options: Partial<UXOptions> = {}): any {
   function uxProp (target: any, propertyKey: string): void {
-    const classifier = getClassifier(target)
+    const classifier = getClass(target)
 
-    if (!classifier._mixins) {
-      classifier._mixins = [ui.mixin.UXObject]
-    } else {
-      if (classifier._mixins.indexOf(ui.mixin.UXObject) === -1) {
-        classifier._mixins.push(ui.mixin.UXObject)
+    const attr = loadClassifierChild(target, propertyKey)
+    classifier.postProcessing.push((model, cl) => {
+      if (attr) {
+        model.mixinDocument(attr, ui.mixin.UXAttribute, {
+          ...options,
+          label,
+          visible: true
+        })
       }
-    }
-
-    const attrsKey = mixinKey(ui.mixin.UXObject, 'attributes')
-    const doc = (classifier as unknown) as Record<string, unknown>
-    let attrs = doc[attrsKey] as Record<string, UXAttribute>
-    if (!attrs) {
-      attrs = {}
-      doc[attrsKey] = attrs
-    }
-    const attr = Object.entries(attrs).find(a => a[0] === propertyKey)
-    if (attr === undefined) {
-      attrs[propertyKey] = {
-        label,
-        icon,
-        visible: true,
-        presenter
-      } as UXAttribute
-    } else {
-      // Just update existing
-      attr[1].label = label
-      if (icon) {
-        attr[1].icon = icon
-      }
-      if (presenter) {
-        attr[1].presenter = presenter
-      }
-    }
+    })
   }
 
-  function uxClass<C extends { new (): Doc }> (
-    constructor: C
-  ) {
-    const classifier = getClassifier(constructor.prototype)
-    if (!classifier._mixins) {
-      classifier._mixins = [ui.mixin.UXObject]
-    } else {
-      if (classifier._mixins.indexOf(ui.mixin.UXObject) === -1) {
-        classifier._mixins.push(ui.mixin.UXObject)
-      }
-    }
-    const doc = (classifier as unknown) as Record<string, unknown>
-    doc[mixinKey(ui.mixin.UXObject, 'label')] = label
-    if (icon) {
-      doc[mixinKey(ui.mixin.UXObject, 'icon')] = icon
-    }
+  function uxClass<C extends { new (): Doc }> (constructor: C) {
+    const classifier = getClass(constructor.prototype)
+    classifier.postProcessing.push((model, cl) => {
+      model.mixinDocument(cl, ui.mixin.UXObject, {
+        icon: options.icon,
+        label
+      })
+    })
   }
 
   return function (this: unknown, ...args: unknown[]): unknown {

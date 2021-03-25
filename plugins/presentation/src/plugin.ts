@@ -14,9 +14,9 @@
 //
 
 import { Platform } from '@anticrm/platform'
-import { Attribute, Class, Doc, Mixin, Obj, Ref, Type } from '@anticrm/core'
+import { Attribute, Class, Mixin, Obj, Ref, Type } from '@anticrm/core'
 import { VDoc } from '@anticrm/domains'
-import ui, { AttrModel, ClassModel, ComponentExtension, GroupModel, PresentationService, UXObject } from '.'
+import ui, { AttrModel, ClassModel, ComponentExtension, GroupModel, PresentationService } from '.'
 import { CoreService } from '@anticrm/platform-core'
 import { AnyComponent, Asset } from '@anticrm/platform-ui'
 import { I18n } from '@anticrm/platform-i18n'
@@ -68,19 +68,17 @@ export default (platform: Platform, deps: { core: CoreService, i18n: I18n }): Pr
     const model = coreService.getModel()
     const clazz = model.get(_class) as Class<Obj>
 
-    const uxObject = model.as(clazz, ui.mixin.UXObject) as UXObject<Doc>
+    // if (uxObject) {
+    const attributes = clazz._attributes as { [key: string]: Attribute }
+    const primary = model.getPrimaryKey(_class)
 
-    if (uxObject && uxObject.attributes) {
-      const attributes = clazz._attributes as { [key: string]: Attribute }
-      const primary = model.getPrimaryKey(_class)
-      for (const uxAttributeE of Object.entries(uxObject.attributes)) {
-        const key = uxAttributeE[0]
-        const uxAttribute = uxAttributeE[1]
-        const attribute = attributes[key]
-        if (!attribute) {
-          console.error('attribute:', key, ' is not found for', uxAttributeE)
-          continue
-        }
+    // Class doesn't have defined uxObject, so let's generate one.
+    for (const key in attributes) {
+      const attribute = attributes[key]
+
+      if (model.isMixedIn(attribute, ui.mixin.UXAttribute)) {
+        const uxAttribute = model.as(attribute, ui.mixin.UXAttribute)
+
         const label = await i18nService.translate(uxAttribute.label)
         const placeholder = uxAttribute.placeholder ? await i18nService.translate(uxAttribute.placeholder) : label
         const icon: Asset | undefined = uxAttribute.icon
@@ -109,32 +107,25 @@ export default (platform: Platform, deps: { core: CoreService, i18n: I18n }): Pr
           type: attribute.type,
           primary: primary === key
         })
+      } else {
+        // get presenter
+        const typeClassId = attribute.type._class
+        const typeClass = model.get(typeClassId) as Class<Type>
+        if (!model.isMixedIn(typeClass, ui.mixin.Presenter)) {
+          throw new Error(`no presenter for type '${typeClassId}'`)
+        }
+        const presenter = model.as(typeClass, ui.mixin.Presenter)
+        result.push({
+          key,
+          _class,
+          icon: undefined,
+          label: key,
+          placeholder: key,
+          presenter: presenter.presenter,
+          type: attribute.type,
+          primary: primary === key
+        })
       }
-      return result
-    }
-
-    // Class doesn't have defined uxObject, so let's generate one.
-    const attributes = clazz._attributes as { [key: string]: Attribute }
-    const primary = model.getPrimaryKey(_class)
-    for (const key in attributes) {
-      const attribute = attributes[key]
-      // get presenter
-      const typeClassId = attribute.type._class
-      const typeClass = model.get(typeClassId) as Class<Type>
-      if (!model.isMixedIn(typeClass, ui.mixin.Presenter)) {
-        throw new Error(`no presenter for type '${typeClassId}'`)
-      }
-      const presenter = model.as(typeClass, ui.mixin.Presenter)
-      result.push({
-        key,
-        _class,
-        icon: undefined,
-        label: key,
-        placeholder: key,
-        presenter: presenter.presenter,
-        type: attribute.type,
-        primary: primary === key
-      })
     }
     return result
   }
@@ -240,14 +231,12 @@ export default (platform: Platform, deps: { core: CoreService, i18n: I18n }): Pr
 
     getOwnAttributes (_class: Ref<Class<Obj>>): AttrModel[] {
       const result = this.next.getOwnAttributes(_class)
-      const filtered = result.filter(attr => !this.filter[attr.key])
-      return filtered
+      return result.filter(attr => !this.filter[attr.key])
     }
 
     getAttributes (): AttrModel[] {
       const result = this.next.getAttributes()
-      const filtered = result.filter(attr => !this.filter[attr.key])
-      return filtered
+      return result.filter(attr => !this.filter[attr.key])
     }
 
     getPrimary (): AttrModel | undefined {

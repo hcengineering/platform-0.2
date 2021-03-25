@@ -14,3 +14,4 @@ _api-extractor-temp/
 /docs/public/
 .idea/markdown-navigator.xml
 .idea/markdown-navigator-enh.xml
+.idea/jsLibraryMappings.xml

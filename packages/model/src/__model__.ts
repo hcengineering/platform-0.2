@@ -15,14 +15,12 @@
 
 import core, { ArrayOf$, Builder, Class$, InstanceOf$, Mixin$, Primary, Prop, RefTo$ } from '.'
 
-import {
-  Classifier, DateProperty, Doc, Emb, MODEL_DOMAIN, Ref, SPACE_DOMAIN, StringProperty, Type
-} from '@anticrm/core'
+import { Class, DateProperty, Doc, Emb, MODEL_DOMAIN, Ref, SPACE_DOMAIN, StringProperty, Type } from '@anticrm/core'
 
 import { Application, ShortID, Space, SpaceUser, Title, TITLE_DOMAIN, TitleSource, VDoc } from '@anticrm/domains'
 
 import {
-  TArrayOf, TAttribute, TClass, TClassifier, TDoc, TEmb, TIndexesClass, TMixin, TObj, TRefTo, TType
+  TArrayOf, TAttribute, TClass, TClassifier, TDoc, TEmb, TEnum, TEnumLiteral, TIndexesClass, TMixin, TObj, TRefTo, TType
 } from './models/core'
 import { TCreateTx, TDeleteTx, TPushTx, TTx, TUpdateTx } from './models/tx'
 import { TReference } from './models/references'
@@ -93,14 +91,14 @@ export class TApplication extends TDoc implements Application {
 
 @Class$(core.class.Title, core.class.Doc, TITLE_DOMAIN)
 export class TTitle extends TDoc implements Title {
-  @RefTo$(core.class.Class) _objectClass!: Ref<Classifier<Doc>>
+  @RefTo$(core.class.Class) _objectClass!: Ref<Class<Doc>>
   @RefTo$(core.class.Doc) _objectId!: Ref<Doc>
   @Prop() title!: string | number
   @Prop() source!: TitleSource
 }
 
 export function model (S: Builder): void {
-  S.add(TObj, TEmb, TDoc, TAttribute, TType, TRefTo, TArrayOf, TClassifier, TClass, TMixin)
+  S.add(TObj, TEmb, TDoc, TAttribute, TType, TRefTo, TArrayOf, TClassifier, TClass, TMixin, TEnumLiteral, TEnum)
   S.add(TIndexesClass, TVShortID)
   S.add(TStringType, TNumberType, TBooleanType)
   S.add(TVDoc, TReference, TTitle, TApplication)

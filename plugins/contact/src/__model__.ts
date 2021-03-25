@@ -41,15 +41,15 @@ export default contact
 @Class$(contact.class.Contact, core.class.VDoc, 'contact')
 @UX('Контактная информация' as IntlString)
 class TContact extends TVDoc implements Contact {
-  @Prop() @UX('Телефон' as IntlString, contact.icon.Phone) phone?: string
-  @Prop() @UX('Электропочта' as IntlString, contact.icon.Email) email?: string
+  @Prop() @UX('Телефон' as IntlString, { icon: contact.icon.Phone }) phone?: string
+  @Prop() @UX('Электропочта' as IntlString, { icon: contact.icon.Email }) email?: string
 }
 
 @Class$(contact.class.Person, contact.class.Contact)
 @UX('Персональная информация' as IntlString)
 export class TPerson extends TContact implements Person {
   @Prop() @UX('Имя' as IntlString) name!: string
-  @Prop() @UX('День рождения' as IntlString, contact.icon.Date) birthDate?: Property<number, Date>
+  @Prop() @UX('День рождения' as IntlString, { icon: contact.icon.Date }) birthDate?: Property<number, Date>
 }
 
 @Mixin$(contact.mixin.User, contact.class.Person)

@@ -1,32 +1,58 @@
 <script type="ts">
-  import { Class, Doc, Ref } from '@anticrm/core'
+  import { Class, CORE_CLASS_ENUM, Doc, Enum, Ref } from '@anticrm/core'
   import { Space } from '@anticrm/domains'
   import TaskCard from './TaskCard.svelte'
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import workbench from '@anticrm/workbench'
+  import { Task, TaskStatus } from '../..'
+  import task from '@anticrm/task'
+  import { getCoreService, UXAttribute } from '@anticrm/presentation'
 
   export let _class: Ref<Class<Doc>>
   export let space: Ref<Space>
+  const coreService = getCoreService()
 
   let topGhost: string = ''
   let dragId: Number = -1
   let dragIn: Number = -1
 
-  let statuses: Array<{}> = [{
-      id: 0, label: 'К исполнению', color: 'var(--status-grey-color)',
-      hidden: false, divTasks: HTMLElement
-    }, {
-      id: 1, label: 'В работе', color: 'var(--status-blue-color)',
-      hidden: false, divTasks: HTMLElement
-    }, {
-      id: 2, label: 'Сделано', color: 'var(--status-green-color)',
-      hidden: false, divTasks: HTMLElement
-    }, {
-      id: 3, label: 'Просрочено', color: 'var(--status-maroon-color)',
-      hidden: false, divTasks: HTMLElement
-    }]
+  interface StatUses {
+    id: number
+    label: string
+    color: string
+    hidden: boolean
+    divTasks: any
+  }
 
-  let tasks: Array<{}> = [{
+  interface TaskItem {
+    id: number
+    task: Task
+  }
+
+  let statuses: Array<StatUses> = []
+  // Load and subscribe to any task status values.
+  coreService.then(cs => {
+      cs.findOne<Enum<TaskStatus>>(CORE_CLASS_ENUM, { _id: task.enum.TaskStatus }).then(taskStatus => {
+        if (taskStatus) {
+          const newSt: StatUses[] = []
+          for (const st of Object.entries(taskStatus._literals)) {
+            const lit = cs.getModel().as<UXAttribute>(st[1], ui.mixin.UXAttribute)
+            newSt.push({
+              id: st[0] as number,
+              label: lit.label,
+              color: lit.color as string,
+              hidden: false,
+              divTasks: HTMLElement
+            })
+          }
+          statuses = newSt
+        }
+      })
+    }
+  )
+
+  let tasks: Array<any> = [
+    {
       id: 0,
       avatar: 'https://platform.exhale24.ru/images/photo-1.png',
       task_id: 'ER-925',
@@ -73,38 +99,43 @@
       desc: 'Задачи в виде канбан-доски в AntiCRM...',
       status: 0,
       drag: false
-    }]
+    }
+  ]
 
-  function changeStat(sid: Number): void {
+  function changeStat (sid: number): void {
     statuses[sid].hidden = !statuses[sid].hidden
   }
-  function onDrag(value: unknown): void {
+
+  function onDrag (value: unknown): void {
     tasks[value.detail.id].drag = value.detail.value
     topGhost = value.detail.top
     if (value.detail.value) {
       dragId = value.detail.id
     } else {
-      if ((tasks[dragId].status !== dragIn) && (dragIn !== -1)) tasks[dragId].status = dragIn
+      if (tasks[dragId].status !== dragIn && dragIn !== -1) tasks[dragId].status = dragIn
       dragIn = -1
     }
   }
-  function onMove(value: unknown): void {
+
+  function onMove (value: unknown): void {
     const coords = value.detail.coords
     const event = value.detail.event
     if (dragIn !== whereInStatus(event.detail.x)) {
       dragIn = whereInStatus(event.detail.x)
     }
   }
-  function whereInStatus(coordX: Number): Number {
+
+  function whereInStatus (coordX: Number): Number {
     let resault: Number = -1
     statuses.forEach((el) => {
       const obj = el.divTasks.getBoundingClientRect()
-      if ((coordX >= obj.left) && (coordX <= obj.right)) resault = el.id
+      if (coordX >= obj.left && coordX <= obj.right) resault = el.id
     })
     return resault
   }
-  function checkNull(id: Number): Boolean {
-    return tasks.find(el => el.status == id)
+
+  function checkNull (id: Number): Boolean {
+    return tasks.find((el) => el.status == id)
   }
 </script>
 
@@ -112,30 +143,61 @@
   {#each statuses as stat (stat.id)}
     <div class="cards-status" class:thin={stat.hidden}>
       {#if stat.hidden}
-        <a href="/" class="resizer" on:click|preventDefault={() => { changeStat(stat.id) }}>
+        <a
+          href="/"
+          class="resizer"
+          on:click|preventDefault={() => {
+            changeStat(stat.id)
+          }}
+        >
           <Icon icon={workbench.icon.Resize} button="true" />
         </a>
       {/if}
       <div class="status__label" class:sl-mini={stat.hidden}>
-        <button class="status__button" class:rotated={stat.hidden} style="background-color: {stat.color}"
-          on:click={() => { changeStat(stat.id) }}>{stat.label}</button>
+        <button
+          class="status__button"
+          class:rotated={stat.hidden}
+          style="background-color: {stat.color}"
+          on:click={() => {
+            changeStat(stat.id)
+          }}>{stat.label}</button
+        >
       </div>
       <div bind:this={stat.divTasks} class="status__tasks" class:hidden={stat.hidden}>
-        {#each tasks.filter(t => t.status == stat.id) as task (task.id)}
-          <div class="separator"></div>
-          <TaskCard idCard="{task.id}" avatar="{task.avatar}" caption="{task.task_id}" desc="{task.desc}"
-            on:drag={onDrag} on:move={onMove} />
+        {#each tasks.filter((t) => t.status == stat.id) as task (task.id)}
+          <div class="separator" />
+          <TaskCard
+            idCard={task.id}
+            avatar={task.avatar}
+            caption={task.task_id}
+            desc={task.desc}
+            on:drag={onDrag}
+            on:move={onMove}
+          />
           {#if task.drag}
-            <TaskCard idCard="{task.id}" avatar="{task.avatar}" caption="{task.task_id}" desc="{task.desc}" ghost="true" {topGhost} />
+            <TaskCard
+              idCard={task.id}
+              avatar={task.avatar}
+              caption={task.task_id}
+              desc={task.desc}
+              ghost="true"
+              {topGhost}
+            />
           {/if}
         {/each}
-        {#if ((dragIn == stat.id) && (dragIn !== tasks[dragId].status))}
-          <div class="separator"></div>
-          <TaskCard idCard="{tasks[dragId].id}" avatar="{tasks[dragId].avatar}" caption="{tasks[dragId].task_id}" desc="{tasks[dragId].desc}" dublicate="true" />
+        {#if dragIn == stat.id && dragIn !== tasks[dragId].status}
+          <div class="separator" />
+          <TaskCard
+            idCard={tasks[dragId].id}
+            avatar={tasks[dragId].avatar}
+            caption={tasks[dragId].task_id}
+            desc={tasks[dragId].desc}
+            dublicate="true"
+          />
         {/if}
       </div>
     </div>
-    <div class="status-separator"></div>
+    <div class="status-separator" />
   {/each}
 </div>
 
@@ -160,6 +222,7 @@
         justify-content: center;
         align-items: center;
       }
+
       .status__button {
         display: flex;
         width: 100%;
@@ -174,12 +237,14 @@
         outline: none;
         cursor: pointer;
       }
+
       .rotated {
         width: 120px;
         max-width: 120px;
         min-width: 120px;
         transform: rotate(-90deg) translate(calc(-50% + 12px), 0px);
       }
+
       .status__tasks {
         position: relative;
         display: flex;
@@ -191,23 +256,29 @@
         height: 12px;
       }
     }
+
     .thin {
       width: 24px;
       max-width: 24px;
     }
   }
+
   .hidden {
     visibility: hidden;
   }
+
   .sl-mini {
     width: 24px;
   }
+
   .status-separator {
     min-width: 16px;
+
     &:last-child {
       min-width: 0px;
     }
   }
+
   .resizer {
     position: absolute;
     top: 132px;

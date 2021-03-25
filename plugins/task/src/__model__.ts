@@ -13,10 +13,13 @@
 // limitations under the License.
 //
 
-import core, { ArrayOf$, Builder, Class$, extendIds, InstanceOf$, Mixin$, Primary, Prop, RefTo$ } from '@anticrm/model'
+import core, {
+  ArrayOf$, Builder, Class$, Enum$, EnumValue$, extendIds, InstanceOf$, Literal, Mixin$, Primary, Prop, RefTo$,
+  withMixin
+} from '@anticrm/model'
 import _task, {
-  PrioritizedTask, Task, TASK_STATUS_OPEN, TaskFieldType, TaskFieldValue, TaskLink, TaskLinkType, TaskTimeDuration,
-  TimeManagedTask, TypedTask, VersionedTask, WorkLog
+  PrioritizedTask, Task, TaskLabel, TaskLink, TaskLinkType, TaskPriority, TaskStatus, TaskStatusAction,
+  TaskTimeDuration, TaskType, TimeManagedTask, TypedTask, VersionedTask, WorkLog
 } from '.'
 import { IntlString } from '@anticrm/platform-i18n'
 import { User } from '@anticrm/contact'
@@ -25,10 +28,10 @@ import presentation from '@anticrm/presentation'
 import workbench from '@anticrm/workbench/src/__model__'
 import chunter, { TCollab } from '@anticrm/chunter/src/__model__'
 import { DateProperty, MODEL_DOMAIN, Ref, StringProperty } from '@anticrm/core'
-import { Space } from '@anticrm/domains'
-import { TDoc, TVDoc } from '@anticrm/model/src/__model__'
+import { TEmb, TEnum, TVDoc } from '@anticrm/model/src/__model__'
 import contact from '@anticrm/contact/src/__model__'
 import { Asset } from '@anticrm/platform-ui'
+import { Metadata } from '@anticrm/platform'
 
 export const DOMAIN_TASK = 'task'
 
@@ -47,27 +50,13 @@ const task = extendIds(_task, {
     Task_completeDue: '' as IntlString,
     Task_fixVersion: '' as IntlString,
     Task_affectsVersion: '' as IntlString
-  },
-  status: {
-    Open: TASK_STATUS_OPEN,
-    ReOpened: '' as Ref<TaskFieldValue>,
-    InProgress: '' as Ref<TaskFieldValue>,
-    UnderReview: '' as Ref<TaskFieldValue>,
-    Resolved: '' as Ref<TaskFieldValue>,
-    Closed: '' as Ref<TaskFieldValue>
   }
 })
 
-@Class$(task.class.TaskFieldValue, core.class.Doc, MODEL_DOMAIN)
-export class TTaskFieldValue extends TDoc implements TaskFieldValue {
-  @RefTo$(core.class.Space) _space?: Ref<Space>
-
-  @Prop() type!: TaskFieldType
+@Class$(task.class.TaskLabel, core.class.VDoc, MODEL_DOMAIN)
+export class TTaskLabel extends TVDoc implements TaskLabel {
   @Prop() title!: string
-  @Prop() action!: string
-  @Prop() description?: string
-  @Prop() icon?: Asset
-  @Prop() color?: Asset
+  @Prop() color!: Asset
 }
 
 @Class$(task.class.TaskLink, core.class.VDoc, DOMAIN_TASK)
@@ -97,25 +86,22 @@ export class TTask extends TCollab implements Task {
 
   @UX(task.string.Task_labels)
   @ArrayOf$()
-  @RefTo$(task.class.TaskFieldValue) labels!: Ref<TaskFieldValue>[]
+  @RefTo$(task.class.TaskLabel) labels!: Ref<TaskLabel>[]
 
-  @UX(task.string.Task_status, undefined, task.component.StatusPresenter)
-  @ArrayOf$()
-  @RefTo$(task.class.TaskFieldValue) status!: Ref<TaskFieldValue>
+  @UX(task.string.Task_status, { presenter: task.component.StatusPresenter })
+  @EnumValue$(task.enum.TaskStatus) status!: TaskStatus
 }
 
 @Mixin$(task.mixin.TypedTask, task.class.Task)
 class TTypeTask extends TTask implements TypedTask {
   @UX(task.string.Task_type)
-  @ArrayOf$()
-  @RefTo$(task.class.TaskFieldValue) type!: Ref<TaskFieldValue>
+  @EnumValue$(task.enum.TaskType) type!: TaskType
 }
 
 @Mixin$(task.mixin.PrioritizedTask, task.class.Task)
 class TPrioritizedTask extends TTask implements PrioritizedTask {
   @UX(task.string.Task_priority)
-  @ArrayOf$()
-  @RefTo$(task.class.TaskFieldValue) priority!: Ref<TaskFieldValue>
+  @EnumValue$(task.enum.TaskPriority) priority!: TaskPriority
 }
 
 @Mixin$(task.mixin.TimeManagedTask, task.class.Task)
@@ -143,8 +129,69 @@ class TVersionedTask extends TTask implements VersionedTask {
   @ArrayOf$() affectsVersion!: string[]
 }
 
+@Mixin$(task.mixin.TaskStatusAction, core.class.Emb)
+class TTaskStatusAction extends TEmb implements TaskStatusAction {
+  @Prop() action!: string // A action title, to perform switch to this state.
+  @Prop() description?: string // A description could be used to show
+}
+
+@Enum$(task.enum.TaskStatus)
+class TTaskStatusEnum extends TEnum<TaskStatus> {
+  @UX('Open' as IntlString, {
+    color: 'var(--status-green-color)' as Metadata<string>
+  })
+  @withMixin(task.mixin.TaskStatusAction, {
+    action: 'Open',
+    description: 'Task is ready to be started'
+  })
+  @Literal(TaskStatus) [TaskStatus.Open]!: any
+
+  @UX('Close' as IntlString, { color: 'var(--status-grey-color)' as Metadata<string> })
+  @withMixin(task.mixin.TaskStatusAction, {
+    action: 'Close',
+    description: 'Task is complete and verified'
+  })
+  @Literal(TaskStatus) [TaskStatus.Closed]!: any
+
+  @UX('InProgress' as IntlString, { color: 'var(--status-green-color)' as Metadata<string> })
+  @withMixin(task.mixin.TaskStatusAction, {
+    action: 'Start progress',
+    description: 'Work on task are started'
+  })
+  @Literal(TaskStatus) [TaskStatus.InProgress]!: any
+
+  @UX('UnderReview' as IntlString, { color: 'var(--status-orange-color)' as Metadata<string> })
+  @withMixin(task.mixin.TaskStatusAction, {
+    action: 'Begin review',
+    description: 'Task is being reviewed'
+  })
+  @Literal(TaskStatus) [TaskStatus.UnderReview]!: any
+
+  @UX('Resolved' as IntlString, { color: 'var(--status-orange-color)' as Metadata<string> })
+  @withMixin(task.mixin.TaskStatusAction, {
+    action: 'Resolve',
+    description: 'Work on task are complete, but verification are required'
+  })
+  @Literal(TaskStatus) [TaskStatus.Resolved]!: any
+}
+
+@Enum$(task.enum.TaskPriority)
+class TTaskPriorityEnum extends TEnum<TaskPriority> {
+  @Literal(TaskPriority) [TaskPriority.Blocker]!: any
+  @Literal(TaskPriority) [TaskPriority.High]!: any
+  @Literal(TaskPriority) [TaskPriority.Medium]!: any
+  @Literal(TaskPriority) [TaskPriority.Low]!: any
+}
+
+@Enum$(task.enum.TaskType)
+class TTaskTypeEnum extends TEnum<TaskType> {
+  @Literal(TaskType) [TaskType.Task]!: any
+  @Literal(TaskType) [TaskType.Defect]!: any
+  @Literal(TaskType) [TaskType.Issue]!: any
+}
+
 export function model (S: Builder): void {
-  S.add(TTask, TTaskFieldValue, TTaskLink)
+  S.add(TTask, TTaskLabel, TTaskLink, TTaskStatusAction, TTaskStatusEnum, TTaskPriorityEnum, TTaskTypeEnum)
   S.add(TTypeTask, TPrioritizedTask, TVersionedTask, TTimeManagedTask)
 
   S.createDocument(workbench.class.WorkbenchApplication, {
@@ -169,57 +216,19 @@ export function model (S: Builder): void {
     component: task.component.TaskInfo
   })
 
-  // Define some task default styles
-  const statuses = [
-    {
-      id: task.status.Open,
-      title: 'Open',
-      action: 'Open',
-      description: 'Task is ready to be started',
-      color: ''
-    },
-    {
-      id: task.status.Closed,
-      title: 'Closed',
-      action: 'Close',
-      description: 'Task is complete and verified',
-      color: 'var(--status-red-color)'
-    },
-    {
-      id: task.status.InProgress,
-      title: 'In progress',
-      action: 'Start progress',
-      description: 'Work on task are started',
-      color: 'var(--status-blue-color)'
-    },
-    {
-      id: task.status.UnderReview,
-      title: 'Under review',
-      action: 'Begin review',
-      description: 'Task is being reviewed',
-      color: 'var(--status-orange-color)'
-    },
-    {
-      id: task.status.Resolved,
-      title: 'Resolved',
-      action: 'Resolve',
-      description: 'Work on task are complete, but verifcation are required',
-      color: 'var(--status-grey-color)'
-    }
-  ]
-  for (const s of statuses) {
-    S.createDocument(task.class.TaskFieldValue, {
-      type: TaskFieldType.Status,
-      title: s.title,
-      action: s.action,
-      description: s.description,
-      color: s.color
-    } as TaskFieldValue, s.id)
-  }
-
   S.createDocument(presentation.mixin.Viewlet, {
     displayClass: task.class.Task,
     label: 'Card' as IntlString,
     component: task.component.TaskCardPresenter
+  })
+
+  S.createDocument(core.class.Space, {
+    name: 'My Project',
+    description: 'General test project',
+    application: task.application.Task,
+    isPublic: true, // Available for all
+    archived: false,
+    spaceKey: 'TSK',
+    users: []
   })
 }

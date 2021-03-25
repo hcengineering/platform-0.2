@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Class, Classifier, DateProperty, Doc, Emb, Mixin, Ref, StringProperty, Tx } from '@anticrm/core'
+import { AnyLayout, Class, DateProperty, Doc, Emb, Mixin, Ref, StringProperty, Tx } from '@anticrm/core'
 
 // TXes
 
@@ -144,7 +144,7 @@ export enum TitleSource {
 }
 
 export interface Title extends Doc {
-  _objectClass: Ref<Classifier<Doc>>
+  _objectClass: Ref<Class<Doc>>
   _objectId: Ref<Doc>
   title: string | number
   source: TitleSource
