@@ -2,7 +2,7 @@ import Button from '@anticrm/sparkling-controls/src/Button.svelte'
 import ThemeDecorator from '../ThemeDecorator.svelte'
 
 export default {
-  title: 'Platform/Button',
+  title: 'Platform/Button', 
   component: Button,
   argTypes: {
     size: {
@@ -36,6 +36,7 @@ export default {
     }
   }]
 }
+
 
 const Template = ({ onClick, ...args }) => ({
   Component: Button,
