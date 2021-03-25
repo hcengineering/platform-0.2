@@ -27,7 +27,7 @@ console.log(stringsJson)
 export function dumpToFile () {
   const fs = require('fs') // eslint-disable-line @typescript-eslint/no-var-requires
 
-  fs.writeFile(path.join(__dirname, '/../../prod/src/model.json'), modelJson, 'utf8', function (err: Error) {
+  fs.writeFile(path.join(__dirname, '/../../prod/src/model.json'), modelJson, 'utf8', (err: Error) => {
     if (err) {
       console.log('An error occured while writing JSON Object to File.')
       return console.log(err)
@@ -35,7 +35,7 @@ export function dumpToFile () {
     console.log('model saved.')
   })
 
-  fs.writeFile(path.join(__dirname, '/../../prod/src/strings.json'), stringsJson, 'utf8', function (err: Error) {
+  fs.writeFile(path.join(__dirname, '/../../prod/src/strings.json'), stringsJson, 'utf8', (err: Error) => {
     if (err) {
       console.log('An error occured while writing JSON Object to File.')
       return console.log(err)
