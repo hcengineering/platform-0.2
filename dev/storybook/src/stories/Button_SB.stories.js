@@ -1,4 +1,4 @@
-import Button_SB from './Button_SB.svelte'
+import Button_SB from './Button_SB.svelte' // eslint-disable-line camelcase
 import ThemeDecorator from './ThemeDecorator.svelte'
 
 export default {
@@ -9,12 +9,12 @@ export default {
     primary: { control: 'boolean' },
     backgroundColor: { control: 'color' },
     size: {
-      control: { type: 'select', options: ['small', 'medium', 'large'] },
+      control: { type: 'select', options: ['small', 'medium', 'large'] }
     },
-    onClick: { action: 'onClick' },
+    onClick: { action: 'onClick' }
   },
-  decorators:  [(storyFn) => {
-    const story = storyFn();
+  decorators: [(storyFn) => {
+    const story = storyFn()
 
     return {
       Component: ThemeDecorator,
@@ -30,29 +30,29 @@ const Template = ({ onClick, ...args }) => ({
   Component: Button_SB,
   props: args,
   on: {
-    click: onClick,
-  },
-});
+    click: onClick
+  }
+})
 
-export const Primary = Template.bind({});
+export const Primary = Template.bind({})
 Primary.args = {
   primary: true,
-  label: 'Button',
-};
+  label: 'Button'
+}
 
-export const Secondary = Template.bind({});
+export const Secondary = Template.bind({})
 Secondary.args = {
-  label: 'Button',
-};
+  label: 'Button'
+}
 
-export const Large = Template.bind({});
+export const Large = Template.bind({})
 Large.args = {
   size: 'large',
-  label: 'Button',
-};
+  label: 'Button'
+}
 
-export const Small = Template.bind({});
+export const Small = Template.bind({})
 Small.args = {
   size: 'small',
-  label: 'Button',
-};
+  label: 'Button'
+}

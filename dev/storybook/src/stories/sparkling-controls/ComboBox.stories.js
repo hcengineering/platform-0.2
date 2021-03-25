@@ -8,25 +8,25 @@ export default {
     items: { control: 'array' },
     selected: { control: 'number' },
     label: { control: 'text' },
-    width: { control: 'text' },
+    width: { control: 'text' }
   },
   parameters: {
     backgrounds: {
       values: [
         { name: 'light', value: '#fff' },
         { name: 'dark', value: '#1E1E1E' },
-        { name: 'biege', value: '#FDF1E6' },
-      ],
-    },
+        { name: 'biege', value: '#FDF1E6' }
+      ]
+    }
   },
-  decorators:  [(storyFn) => {
-    const story = storyFn();
+  decorators: [(storyFn) => {
+    const story = storyFn()
 
     return {
       Component: ThemeDecorator,
       props: {
         child: story.Component,
-        props: story.props,
+        props: story.props
       }
     }
   }]
@@ -34,10 +34,10 @@ export default {
 
 const Template = ({ ...args }) => ({
   Component: ComboBox,
-  props: { ...args },
-});
+  props: { ...args }
+})
 
-export const Default = Template.bind({});
+export const Default = Template.bind({})
 Default.args = {
   label: 'Label',
   selected: 0,
@@ -55,5 +55,5 @@ Default.args = {
     id: 5, comboValue: 'Item 6'
   }, {
     id: 6, comboValue: 'Item 7'
-  }],
-};
+  }]
+}

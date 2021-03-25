@@ -7,13 +7,21 @@
   "devDependencies": {
     "@types/mongodb": "^3.5.20",
     "ts-node": "^8.10.1",
-    "typescript": "~3.9.4"
+    "typescript": "~3.9.4",
+    "@typescript-eslint/eslint-plugin": "^4.9.0",
+    "@typescript-eslint/parser": "^4.9.0",
+    "eslint": "^7.14.0",
+    "eslint-config-standard": "^16.0.2",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^5.0.0"
   },
   "scripts": {
     "create-workspace": "ts-node -T src/index.ts create-workspace",
     "create-user": "ts-node -T src/index.ts create-user",
     "upgrade-workspace": "ts-node -T src/index.ts upgrade-workspace",
-    "lint": "echo 'No linting yet'",
+    "lint": "eslint src",
     "test": "echo 'no tests'"
   },
   "dependencies": {
