@@ -14,7 +14,7 @@
 //
 
 import { Plugin, plugin, Service } from '@anticrm/platform'
-import { Class, Doc, Emb, Mixin, Obj, Ref, Type } from '@anticrm/core'
+import { Attribute, Class, Doc, Mixin, Obj, Ref, Type } from '@anticrm/core'
 import { VDoc } from '@anticrm/domains'
 
 import core from '@anticrm/platform-core'
@@ -26,7 +26,7 @@ import { AnyComponent, Asset, Document } from '@anticrm/platform-ui'
 /**
  * Define attribute UI extra properties.
  */
-export interface UXAttribute extends Emb {
+export interface UXAttribute extends Attribute {
   // Declare label
   label: IntlString
 
@@ -41,13 +41,13 @@ export interface UXAttribute extends Emb {
 
   // Declare a direct presenter for field
   presenter?: AnyComponent
+
+  color?: Asset // Define a item color if appropriate
 }
 
 export interface UXObject<T extends Obj> extends Class<T> {
   label: IntlString
   icon?: Asset
-
-  attributes: Record<string, UXAttribute>
 }
 
 // export interface ClassUI<T extends Obj> extends Class<T> {
@@ -157,11 +157,9 @@ const presentationPlugin = plugin('presentation' as Plugin<PresentationService>,
     brdSend: '' as Asset,
     brdSmile: '' as Asset
   },
-  class: {
-    UXAttribute: '' as Ref<Class<UXAttribute>>
-  },
   mixin: {
     UXObject: '' as Ref<Mixin<UXObject<Doc>>>,
+    UXAttribute: '' as Ref<Mixin<UXAttribute>>,
     Presenter: '' as Ref<Mixin<Presenter<Type>>>,
     DetailForm: '' as Ref<Mixin<ComponentExtension<VDoc>>>,
 

@@ -15,9 +15,12 @@
 
 import { Resource } from '@anticrm/platform'
 
-import { getClassifier } from './dsl'
+import { loadClassifier } from './dsl'
 import { CombineObjects, KeysByType } from 'simplytyped'
-import { AllAttributes, Attribute, Class, ClassifierKind, Doc, EClass, Emb, Mixin, Obj, Ref, StringProperty, Model, MODEL_DOMAIN } from '@anticrm/core'
+import {
+  AllAttributes, Attribute, Class, ClassifierKind, Doc, EClass, Emb, Mixin, Model, MODEL_DOMAIN, Obj, Ref,
+  StringProperty
+} from '@anticrm/core'
 import core from '.'
 
 type MethodType = (...args: any[]) => any
@@ -62,11 +65,19 @@ class Builder {
     return memdb
   }
 
-  add (...classes: { new(): Obj }[]): void {
+  add (...classes: { new (): Obj }[]): void {
     for (const ctor of classes) {
-      const classifier = getClassifier(ctor.prototype)
-      // console.log('classifier', classifier)
-      this.memdb.add(classifier)
+      const classifier = loadClassifier(ctor.prototype)
+      this.memdb.add(classifier.doc)
+    }
+    for (const ctor of classes) {
+      const classifier = loadClassifier(ctor.prototype)
+      if (classifier.postProcessing.length > 0) {
+        for (const op of classifier.postProcessing) {
+          // We use modelDB to find core stuff.
+          op(this.memdb, classifier.doc)
+        }
+      }
     }
   }
 
@@ -81,8 +92,7 @@ class Builder {
   }
 
   newInstance<M extends Emb> (_class: Ref<Class<M>>, values: OptionalMethods<Omit<M, keyof Emb>>): M {
-    const obj = { _class: _class as Ref<Class<Obj>>, ...values } as M
-    return obj
+    return { _class: _class as Ref<Class<Obj>>, ...values } as M
   }
 
   attr<M extends Emb> (_class: Ref<Class<M>>, values: OptionalMethods<Omit<M, keyof Emb>>): Attribute {
@@ -107,14 +117,30 @@ class Builder {
   }
 
   createClass<T extends E, E extends Obj> (_id: Ref<Class<T>>, _extends: Ref<Class<E>>, _attributes: AllAttributes<T, E>, _domain?: string, _native?: Resource<any>): EClass<T, E> {
-    const _eclass: EClass<T, E> = { _id, _class: core.class.Class, _extends, _domain: _domain as StringProperty, _native: (_native as string) as StringProperty, _attributes, _kind: ClassifierKind.CLASS }
+    const _eclass: EClass<T, E> = {
+      _id,
+      _class: core.class.Class,
+      _extends,
+      _domain: _domain as StringProperty,
+      _native: (_native as string) as StringProperty,
+      _attributes,
+      _kind: ClassifierKind.CLASS
+    }
     return this.createDocument(core.class.Class as Ref<Class<EClass<T, E>>>,
       _eclass,
       _id as Ref<EClass<T, E>>)
   }
 
   createMixin<T extends E, E extends Doc> (_id: Ref<Mixin<T>>, _extends: Ref<Class<E>>, _attributes: AllAttributes<T, E>, _domain?: string, _native?: Resource<any>): EClass<T, E> {
-    const _eclass: EClass<T, E> = { _id, _class: core.class.Mixin, _extends, _attributes, _domain: _domain as StringProperty, _native: (_native as string) as StringProperty, _kind: ClassifierKind.MIXIN }
+    const _eclass: EClass<T, E> = {
+      _id,
+      _class: core.class.Mixin,
+      _extends,
+      _attributes,
+      _domain: _domain as StringProperty,
+      _native: (_native as string) as StringProperty,
+      _kind: ClassifierKind.MIXIN
+    }
     return this.createDocument(core.class.Mixin as Ref<Class<EClass<T, E>>>,
       _eclass,
       _id as Ref<EClass<T, E>>)

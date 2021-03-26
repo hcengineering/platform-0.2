@@ -15,7 +15,9 @@
 
 /* eslint-env jest */
 
-import { createPlatform, getResourceInfo, identify, Metadata, Plugin, Resource, Service, PlatformStatus, Status, Severity } from '..'
+import {
+  createPlatform, getResourceInfo, identify, Metadata, PlatformStatus, Plugin, Resource, Service, Severity, Status
+} from '..'
 
 import { descriptor1, descriptor2, descriptor3, plugin1, plugin1State, plugin2State, plugin3 } from './shared'
 

@@ -19,7 +19,7 @@ import { Space, VDoc } from '@anticrm/domains'
 import { IntlString } from '@anticrm/platform-i18n'
 
 import { TApplication, TDoc } from '@anticrm/model/src/__model__'
-import ux, { UXAttribute } from '@anticrm/presentation'
+import ux from '@anticrm/presentation'
 import { AnyComponent, Asset } from '@anticrm/platform-ui'
 
 import _workbench, { Perspective, WorkbenchApplication } from '.'
@@ -59,22 +59,6 @@ class TPerspective extends TDoc implements Perspective {
 
 export function model (S: Builder): void {
   S.add(TWorkbenchApplication, TPerspective)
-
-  S.mixin(core.class.Space, ux.mixin.UXObject, {
-    label: 'Space' as IntlString,
-    attributes: {
-      name: {
-        label: 'Title' as IntlString
-      } as UXAttribute,
-      users: {
-        label: 'Members' as IntlString
-      } as UXAttribute,
-      isPublic: {
-        label: 'Make a public space' as IntlString,
-        presenter: ux.component.CheckboxPresenter
-      } as UXAttribute
-    }
-  })
 
   S.mixin(core.class.Space, ux.mixin.Presenter, {
     presenter: workbench.component.SpacePresenter

@@ -14,7 +14,7 @@
 //
 
 import {
-  AnyLayout, Class, Classifier, Doc, DomainIndex, generateId, mixinKey, Model, Ref, Storage, Tx, TxContext
+  AnyLayout, Class, Doc, DomainIndex, generateId, mixinKey, Model, Ref, Storage, Tx, TxContext
 } from '@anticrm/core'
 import {
   CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_PUSH_TX, CORE_CLASS_TITLE, CORE_CLASS_UPDATE_TX,
@@ -26,14 +26,14 @@ const NULL = '<null>'
 export class TitleIndex implements DomainIndex {
   private readonly modelDb: Model
   private readonly storage: Storage
-  private readonly primaries = new Map<Ref<Classifier<Doc>>, string>()
+  private readonly primaries = new Map<Ref<Class<Doc>>, string>()
 
   constructor (modelDb: Model, storage: Storage) {
     this.modelDb = modelDb
     this.storage = storage
   }
 
-  private getPrimary (_class: Ref<Classifier<Doc>>): string | null {
+  private getPrimary (_class: Ref<Class<Doc>>): string | null {
     const cached = this.primaries.get(_class)
     if (cached) return cached === NULL ? null : cached
 

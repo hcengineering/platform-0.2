@@ -1,4 +1,4 @@
-export function pannable (node: HTMLElement) {
+export function pannable (node: HTMLElement): { destroy: () => void } {
   let x: number
   let y: number
 

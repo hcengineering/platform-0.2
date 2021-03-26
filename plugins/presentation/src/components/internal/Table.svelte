@@ -118,7 +118,7 @@
         {#each attributes as attr (attr.key)}
           <div class="td">
             {#if attr.presenter}
-              <Presenter is={attr.presenter} value={object[attr.key] || '' } attribute={attr} {editable} />
+              <Presenter is={attr.presenter} value={object[attr.key] } attribute={attr} {editable} />
             {:else}
               <span>{object[attr.key] || ''}</span>
             {/if}

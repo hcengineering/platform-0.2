@@ -35,7 +35,7 @@
 
 {#if readOnlyField}
   <div class="wrapped-text">
-    {value}
+    {value || ''}
   </div>
 {:else}
   <InlineEdit bind:value placeholder={attribute.placeholder || ""} {editable} />
