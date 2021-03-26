@@ -1,4 +1,4 @@
-import EditBox from './EditBox.svelte'
+import EditBox from '@anticrm/sparkling-controls/src/EditBox.svelte'
 import ThemeDecorator from '../ThemeDecorator.svelte'
 
 export default {

@@ -1,4 +1,4 @@
-import ComboBox from './ComboBox.svelte'
+import ComboBox from '@anticrm/sparkling-controls/src/ComboBox.svelte'
 import ThemeDecorator from '../ThemeDecorator.svelte'
 
 export default {
