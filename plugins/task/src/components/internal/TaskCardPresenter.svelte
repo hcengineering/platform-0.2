@@ -6,7 +6,7 @@
   import workbench from '@anticrm/workbench'
   import { Task, TaskStatus } from '../..'
   import task from '@anticrm/task'
-  import { getCoreService, UXAttribute } from '@anticrm/presentation'
+  import ui, { getCoreService, UXAttribute } from '@anticrm/presentation'
 
   export let _class: Ref<Class<Doc>>
   export let space: Ref<Space>
