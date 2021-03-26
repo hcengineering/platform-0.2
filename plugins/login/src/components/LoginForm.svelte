@@ -1,15 +1,34 @@
+<!--
+// Copyright © 2020, 2021 Anticrm Platform Contributors.
+//
+// Licensed under the Eclipse Public License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License. You may
+// obtain a copy of the License at https://www.eclipse.org/legal/epl-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//
+// See the License for the specific language governing permissions and
+// limitations under the License.
+-->
 <script lang="ts">
   import { Platform, Severity, Status } from '@anticrm/platform'
   import { getContext, onDestroy } from 'svelte'
   import login, { LoginService } from '..'
-
   import Form from './Form.svelte'
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
+  import { ApplicationRoute, ApplicationRouter } from '@anticrm/platform-ui'
+  import { PlatformStatusCodes } from '@anticrm/foundation'
 
-  let object = { username: '', password: '', workspace: '' }
+  export let router: ApplicationRouter<ApplicationRoute>;
+  let object = { username: '', password: '', workspace: '', secondFactorCode: '' }
   let status: Status
 
   let loginActive: boolean = false
+  let needSecondFactor: boolean = false
+  const baseFields = [{ name: 'username', i18n: 'Username' }, { name: 'password', i18n: 'Password', password: true }, { name: 'workspace', i18n: 'Workspace' }];
+  $: fields = needSecondFactor ? baseFields.concat({ name: 'secondFactorCode', i18n: 'Confirm code' }) : baseFields; 
 
   const platform = getContext('platform') as Platform
   const loginService = platform.getPlugin(login.id)
@@ -17,7 +36,11 @@
   async function doLogin () {
     status = new Status(Severity.INFO, 0, 'Соединяюсь с сервером...')
 
-    status = await (await loginService).doLogin(object.username, object.password, object.workspace)
+    status = await (await loginService).doLogin(object.username, object.password, object.workspace, object.secondFactorCode)
+
+    if (status.code === PlatformStatusCodes.CLIENT_VALIDATE_REQUIRED) {
+      needSecondFactor = true;
+    }
   }
 
   async function doSignup () {
@@ -25,7 +48,6 @@
 
   async function checkLoginInfo (ls: LoginService) {
     const info = await ls.getLoginInfo()
-    console.log('login info:', info)
     if (info) {
       loginActive = true
       object.username = info.email
@@ -49,13 +71,17 @@
     }
   })
 
+ async function navigateApp (): Promise<void> {
+    (await loginService).navigateApp()
+  }
+
   async function logout (): Promise<void> {
     (await loginService).doLogout()
     loginActive = false
   }
 
-  async function navigateApp (): Promise<void> {
-    (await loginService).navigateApp()
+  function navigateSetting(): void {
+    router.navigate({route: 'setting'})
   }
 </script>
 
@@ -69,14 +95,15 @@
         Workspace: {object.workspace}
       </div>
       <div class="actions">
-        <Button width="100px" on:click={ logout  }>Logout</Button>
+        <Button width="100px" on:click={ logout }>Logout</Button>
+        <Button width="100px" on:click={ navigateSetting }>Settings</Button>
         <Button width="100px" on:click={ navigateApp }>Switch to Application</Button>
       </div>
     </div>
   {:else}
     <Form
       actions={[{ i18n: 'Create Space', func: doSignup }, { i18n: 'Login', func: doLogin }]}
-      fields={[{ name: 'username', i18n: 'Username' }, { name: 'password', i18n: 'Password', password: true }, { name: 'workspace', i18n: 'Workspace' }]}
+      {fields}
       {object}
       caption="Login into system"
       {status} />

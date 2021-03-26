@@ -8,6 +8,8 @@
   // --- ex: '100px', '25%' --- //
   export let width: string = ''
 
+  export let label: string = ''
+
   const dispatch = createEventDispatcher();
   function onClick(event) {
     dispatch('click', event);
@@ -20,7 +22,7 @@
   style="{(width !== '') ? 'width:' + width : ''}"
   on:click={onClick}
 >
-  <slot />
+  <slot />{label}
 </button>
 
 <style lang="scss">

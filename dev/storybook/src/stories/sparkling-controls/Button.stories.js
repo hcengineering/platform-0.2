@@ -1,4 +1,4 @@
-import Button from './Button.svelte'
+import Button from '@anticrm/sparkling-controls/src/Button.svelte'
 import ThemeDecorator from '../ThemeDecorator.svelte'
 
 export default {

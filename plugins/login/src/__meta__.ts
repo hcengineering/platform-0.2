@@ -18,5 +18,5 @@ import login from './index'
 import { routeMeta } from '@anticrm/platform-ui'
 
 export default (platform: Platform) => {
-  platform.setMetadata(routeMeta('login'), { route: 'login', component: login.component.LoginForm })
+  platform.setMetadata(routeMeta('login'), { route: 'login', component: login.component.MainLoginForm })
 }

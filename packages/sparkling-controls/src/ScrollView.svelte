@@ -20,6 +20,7 @@
 	export let width: string = ''
 	export let height: string = ''
 	export let margin: string = ''
+	export let content: string = ''
 
 	let container: HTMLElement
 	let style: string = ''
@@ -43,7 +44,7 @@
 
 <div class="scroll-view" {style}>
 	<div class="container" class:accent-color={accentColor} bind:this={container}>
-		<slot />
+		<slot />{content}
 	</div>
 </div>
 

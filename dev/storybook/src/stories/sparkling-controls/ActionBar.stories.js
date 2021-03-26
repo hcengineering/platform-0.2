@@ -1,4 +1,4 @@
-import ActionBar from './ActionBar.svelte'
+import ActionBar from '@anticrm/sparkling-controls/src/ActionBar.svelte'
 import ThemeDecorator from '../ThemeDecorator.svelte'
 
 export default {
@@ -51,4 +51,9 @@ const Template = ({ ...args }) => ({
 export const Default = Template.bind({})
 Default.args = {
   onTop: 2
+}
+
+export const OnTop0 = Template.bind({})
+OnTop0.args = {
+  onTop: 0
 }
