@@ -22,11 +22,13 @@ import { model as workbench } from '@anticrm/workbench/src/__model__'
 import { model as task } from '@anticrm/task/src/__model__'
 import { model as chunter } from '@anticrm/chunter/src/__model__'
 import { model as datagen } from '@anticrm/data-generator/src/__model__'
+import { model as personExtras } from '@anticrm/person-extras/src/__model__'
 
 export const builder = new Builder()
 builder.load(modelModel)
 builder.load(presentation)
 builder.load(contact)
+builder.load(personExtras)
 builder.load(workbench)
 builder.load(chunter)
 builder.load(task)

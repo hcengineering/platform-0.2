@@ -14,7 +14,7 @@
 //
 
 import { plugin, Plugin, Service } from '@anticrm/platform'
-import { Mixin, Property, Ref } from '@anticrm/core'
+import { Class, Mixin, Property, Ref } from '@anticrm/core'
 import { VDoc } from '@anticrm/domains'
 
 import ui, { Asset, AnyComponent, getPlatform } from '@anticrm/platform-ui'
@@ -53,6 +53,9 @@ const contactPlugin = plugin('contact' as Plugin<ContactService>, {
     Date: '' as Asset,
     Phone: '' as Asset,
     Email: '' as Asset
+  },
+  class: {
+    Person: '' as Ref<Class<Person>>
   },
   component: {
     PersonProperties: '' as AnyComponent,
