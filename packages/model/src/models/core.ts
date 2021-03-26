@@ -81,8 +81,6 @@ export class TEnumLiteral extends TEmb implements EnumLiteral {
 export class TEnum<T extends EnumKey> extends TClassifier implements Enum<T> {
   @BagOf$()
   @InstanceOf$(core.class.EnumLiteral) _literals!: EnumLiterals<T, EnumLiteral>
-
-  @Prop() _domain?: StringProperty
 }
 
 @Class$(core.class.RefTo, core.class.Type, MODEL_DOMAIN)

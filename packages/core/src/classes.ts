@@ -93,7 +93,7 @@ export interface EnumLiteral extends Emb {
 export type EnumKey = string | number | symbol
 export type EnumLiterals<T extends EnumKey, E extends EnumLiteral> = { [Q in T]: E }
 
-export interface EEnum<T extends EnumKey, E extends EnumLiteral> extends Classifier, EDomainClassifier {
+export interface EEnum<T extends EnumKey, E extends EnumLiteral> extends Classifier {
   _literals: EnumLiterals<T, E>
 }
 
