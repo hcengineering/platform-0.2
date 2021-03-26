@@ -1,4 +1,4 @@
-import UserInfo from './UserInfo.svelte'
+import UserInfo from '@anticrm/sparkling-controls/src/UserInfo.svelte'
 import ThemeDecorator from '../ThemeDecorator.svelte'
 
 export default {

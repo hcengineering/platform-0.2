@@ -1,4 +1,4 @@
-import CheckBox from './CheckBox.svelte'
+import CheckBox from '@anticrm/sparkling-controls/src/CheckBox.svelte'
 import ThemeDecorator from '../ThemeDecorator.svelte'
 
 export default {

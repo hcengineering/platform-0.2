@@ -1,5 +1,5 @@
 <script lang='ts'>
-  import Button from '../Button.svelte'
+  import Button from '@anticrm/sparkling-controls/src/Button.svelte'
   import PopupItem from './PopupItem.svelte'
 
   export let kind: string = 'transparent'
