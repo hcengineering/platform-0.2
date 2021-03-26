@@ -11,8 +11,8 @@
   //
   // See the License for the specific language governing permissions and
   // limitations under the License.
-  import { Class, Obj, Ref } from '@anticrm/core'
-  import task, { Task, TaskFieldType, TaskFieldValue } from '../..'
+  import { Class, CORE_CLASS_ENUM, Enum, Model, NumberProperty, Obj, Ref } from '@anticrm/core'
+  import task, { Task, TaskStatus } from '../..'
   import UserInfo from '@anticrm/sparkling-controls/src/UserInfo.svelte'
   import StatusLabel from './StatusLabel.svelte'
   import ActionBar from '@anticrm/platform-ui/src/components/ActionBar.svelte'
@@ -20,65 +20,63 @@
   import Comments from '@anticrm/chunter/src/components/Comments.svelte'
   import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.svelte'
   import { CORE_MIXIN_SHORTID, ShortID } from '@anticrm/domains'
-  import { createLiveQuery, getCoreService } from '@anticrm/presentation'
+  import ux, { getCoreService } from '@anticrm/presentation'
 
   export let _class: Ref<Class<Obj>>
   export let object: Task
 
   const coreService = getCoreService()
+  let model: Model
 
-  let fieldValues: Map<TaskFieldType, TaskFieldValue[]> = new Map()
+  let statusType: Enum<TaskStatus> | undefined
+  let status: TaskStatus = TaskStatus.Open
 
-  let status: TaskFieldValue | undefined
+  let statusColors: Map<TaskStatus, string> = new Map()
 
-  // Load and subscribe to any task status values.
-  createLiveQuery(task.class.TaskFieldValue, {}, (docs) => {
-    const fValues: Map<TaskFieldType, TaskFieldValue[]> = new Map()
-    for (const d of docs) {
-      let val = fValues.get(d.type)
-      if (!val) {
-        val = []
-        fValues.set(d.type, val)
-      }
-      val.push(d)
-    }
-    fieldValues = fValues
+  coreService.then(async cs => {
+    model = cs.getModel()
+    statusType = await cs.findOne(CORE_CLASS_ENUM, { _id: task.enum.TaskStatus })
   })
 
   let statusActions: Action[] = []
   let taskShortId: ShortID
 
   $: {
-    let sv = fieldValues.get(TaskFieldType.Status) || []
-    let acts: Action[] = []
-    for (const s of sv) {
-      if (!status) {
-        status = s
-      }
-      if (object && object.status === s._id) {
-        status = s
-      }
-      if (object && object.status !== s._id) {
-        acts.push({
-          name: s.action,
-          action: () => {
-            coreService.then(cs => cs.update(object, null, { status: s._id }))
+    if (statusType) {
+      let acts: Action[] = []
+      for (const s of Object.entries(statusType._literals)) {
+        const statKey = parseInt(s[0]) as TaskStatus
+        if (object && object.status === statKey) {
+          status = statKey
+        }
+        if (object && object.status !== statKey) {
+          const lit = model.as(s[1], ux.mixin.UXAttribute)
+          statusColors.set(statKey, lit.color as string)
+          const act = model.as(s[1], task.mixin.TaskStatusAction)
+          if (act) {
+            acts.push({
+              name: act.action,
+              action: () => {
+                coreService.then(cs => cs.update(object, null, { status: statKey as NumberProperty }))
+              }
+            })
           }
-        })
+        }
       }
+      statusActions = acts
+      coreService.then(cs => {
+        taskShortId = cs.getModel().as(object, CORE_MIXIN_SHORTID)
+      })
     }
-    statusActions = acts
-    coreService.then(cs => {
-      taskShortId = cs.getModel().as(object, CORE_MIXIN_SHORTID)
-    })
   }
+
 </script>
 
 <div class="taskContent">
   <div class="caption caption-1">
     <InlineEdit id="create_task__input__name" bind:value={object.title} width="100%"
                 label="Name" placeholder="Name"
-                on:change={() => {coreService.update(object, null, {title: object.title})}} />
+                on:change={async () => {(await coreService).update(object, null, {title: object.title})}} />
   </div>
   <div class="taskStatusBar">
     <div class="taskName">
@@ -86,9 +84,7 @@
         {taskShortId.shortId}
       {/if}
     </div>
-    {#if status}
-      <StatusLabel text={status.title} color={status.color} />
-    {/if}
+    <StatusLabel text={TaskStatus[status]} color={statusColors.get(status)} />
   </div>
   <div class="created">
     <UserInfo url="https://platform.exhale24.ru/images/photo-1.png"

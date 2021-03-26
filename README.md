@@ -4,18 +4,21 @@
 
 ## Code structure
 
-Anticrm code falls into three major parts: [packages](./packages), [plugins](./plugins) and [server](./server). 
-* [packages](./packages) contains code shared among client and server, except [packages/platform](./packages/platform) which defines plugin architecture and client-side only. _These packages defines most of the core Anticrm concepts._
+Anticrm code falls into three major parts: [packages](./packages), [plugins](./plugins) and [server](./server).
+
+* [packages](./packages) contains code shared among client and server, except [packages/platform](./packages/platform)
+  which defines plugin architecture and client-side only. _These packages defines most of the core Anticrm concepts._
 * [plugins](./plugins) contains client-side code packaged in form of Anticrm Plugins.
 * [server](./server) contains server-side platform code.
 
 Here's the breakdown of the repo:
 
 * Packages:
-  * [@anticrm/foundation](./packages/foundation) –- Anticrm Platform Foundation Types.
-  * [@anticrm/platform](./packages/platform) -- Plugin architecture and implementation. Client-side only.
-  * [@anticrm/core](./packages/core) -- Core concepts shared by Client plugins and Server components.
-  * [@anticrm/model](./packages/model) -- Utils to define and manage domain models. Used by tooling, not a part of client/server runtimes.
+    * [@anticrm/foundation](./packages/foundation) –- Anticrm Platform Foundation Types.
+    * [@anticrm/platform](./packages/platform) -- Plugin architecture and implementation. Client-side only.
+    * [@anticrm/core](./packages/core) -- Core concepts shared by Client plugins and Server components.
+    * [@anticrm/model](./packages/model) -- Utils to define and manage domain models. Used by tooling, not a part of
+      client/server runtimes.
 
 * Plugins:
 
@@ -27,9 +30,23 @@ More on [Code Structure](https://platform-one.now.sh/docs/concepts/code-structur
 
 Use following commands to install and run demo application:
 
-```
-yarn
+Running MongoDB in docker:
+
+```bash
 docker run -d -p 127.0.0.1:27017:27017 mongo
+```
+
+Running MongoDB for MacOS using brew:
+
+```bash
+brew tap mongodb/brew # Only first time 
+brew install mongodb-community # Only first time
+brew services start mongodb-community # Stop could be used to stop.
+```
+
+```bash
+yarn
+# start Mongo using Docker or locally
 yarn workspace @anticrm/tool create-workspace workspace --organization "My Organization"
 yarn workspace @anticrm/tool create-user john.appleseed@gmail.com -w workspace -p 123 -f "John Appleseed"
 yarn workspace @anticrm/tool create-user brain.appleseed@gmail.com -w workspace -p 123 -f "Brain Appleseed"
@@ -38,13 +55,13 @@ yarn workspace @anticrm/server start
 
 Open new console and run:
 
-```
+```bash
 yarn workspace @anticrm/server-front start
 ```
 
 Open one more console and run:
 
-```
+```bash
 yarn workspace prod dev
 ```
 
@@ -52,12 +69,14 @@ You need to log in first, go to: http://localhost:8080
 After login you will be redirected to default application (ex: 'workbench')
 
 Add more users:
-```
+
+```bash
 yarn workspace @anticrm/tool create-user john.someseed@gmail.com -w workspace -p 123 -f "John Someseed"
 ```
 
 Upgrade DB models:
-```
+
+```bash
 yarn workspace @anticrm/tool upgrade-workspace workspace
 ```
 
@@ -68,18 +87,25 @@ yarn workspace @anticrm/tool upgrade-workspace workspace
 
 ## Run with Server and MongoDb (obsolete, version 1)
 
-1. You have to run mongodb instance locally. Easiest way to do this is to run official mongodb container: `docker run -d -p 27017:27017 mongo`.
-2. Initialize database with `boot` package: `yarn && ./scripts/build-packages.sh && yarn workspace @anticrm/dev-boot dump`. Note: the `boot` will use `MONGODB_URI` environment variable, failover to `localhost` and default mongodb port if variable not present.
-3. From the Cloud repo run WebSocket server: `yarn && yarn workspace @anticrm/server build && yarn workspace @anticrm/server start`.
+1. You have to run mongodb instance locally. Easiest way to do this is to run official mongodb
+   container: `docker run -d -p 27017:27017 mongo`.
+2. Initialize database with `boot`
+   package: `yarn && ./scripts/build-packages.sh && yarn workspace @anticrm/dev-boot dump`. Note: the `boot` will
+   use `MONGODB_URI` environment variable, fail over to `localhost` and default mongodb port if variable not present.
+3. From the Cloud repo run WebSocket
+   server: `yarn && yarn workspace @anticrm/server build && yarn workspace @anticrm/server start`.
 4. From the Platform (this) repo run `prod` launcher: `yarn workspace prod serve`.
 
 ## Continuous Integration (obsolete, version 1)
 
-* Build system deploy in-memory-database client to: https://platform-one.now.sh and/or branch-specific URLs (see particular commit comments).
+* Build system deploy in-memory-database client to: https://platform-one.now.sh and/or branch-specific URLs (see
+  particular commit comments).
 * Build system deploy production client to: http://anticrm-platform.s3-website.us-east-2.amazonaws.com/
 
 # Development
 
 ## Enable project eslint
 
-`yarn add -D @typescript-eslint/eslint-plugin @typescript-eslint/parser eslint eslint-config-standard eslint-plugin-import eslint-plugin-node eslint-plugin-promise eslint-plugin-standard`
+```bash
+yarn add -D @typescript-eslint/eslint-plugin @typescript-eslint/parser eslint eslint-config-standard eslint-plugin-import eslint-plugin-node eslint-plugin-promise eslint-plugin-standard`
+```
