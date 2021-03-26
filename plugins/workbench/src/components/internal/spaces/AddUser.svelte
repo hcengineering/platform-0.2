@@ -19,7 +19,7 @@
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import workbench from '@anticrm/workbench'
   import CheckBox from '@anticrm/sparkling-controls/src/CheckBox.svelte'
-  import EditBox from '@anticrm/platform-ui/src/components/EditBox.svelte'
+  import EditBox from '@anticrm/sparkling-controls/src/EditBox.svelte'
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
   import { Space } from '@anticrm/domains'
   import { getCoreService } from '@anticrm/presentation'

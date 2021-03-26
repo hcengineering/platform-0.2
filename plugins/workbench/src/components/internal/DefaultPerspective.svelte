@@ -16,10 +16,9 @@
   import { Class, Doc, Property, Ref, StringProperty } from '@anticrm/core'
   import { onDestroy } from 'svelte'
   import { CORE_CLASS_SPACE, CORE_CLASS_TITLE, Space, Title, TitleSource } from '@anticrm/domains'
-  import ui, { newRouter } from '@anticrm/platform-ui'
+  import ui, { getUIService, newRouter } from '@anticrm/platform-ui'
   import workbench, { WorkbenchApplication } from '../..'
   import { CoreDocument, createLiveQuery, getCoreService, getUserId } from '@anticrm/presentation'
-  import { getUIService } from '@anticrm/platform-ui'
 
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import SpaceItem from './spaces/SpaceItem.svelte'
@@ -90,7 +89,7 @@
       } else {
         // try extract class name from doc and find objectId.
         const pos = match.doc.lastIndexOf(':')
-        if (pos) {
+        if (pos !== -1) {
           const _class = match.doc.substring(0, pos)
           const _objectId = match.doc.substring(pos + 1)
 
@@ -148,12 +147,12 @@
   createLiveQuery(CORE_CLASS_SPACE, {}, (docs) => {
     spaces = docs.filter((s) => getCurrentUserSpace(currentUser, s))
     router.setDefaults(routeDefaults())
-  }, onDestroy)
+  })
 
   createLiveQuery(workbench.class.WorkbenchApplication, {}, (docs) => {
     applications = docs
     router.setDefaults(routeDefaults())
-  }, onDestroy)
+  })
 
   function id<T extends Doc> (doc: T): Ref<T> {
     return doc._id as Ref<T>
@@ -173,7 +172,7 @@
   }
 
   nav {
-    width: 60px;
+    width: 52px;
     background-color: var(--theme-bg-color);
 
     display: flex;
@@ -265,8 +264,9 @@
 
   .mini {
     box-sizing: border-box;
-    width: 4em;
-    min-width: 4em;
+    width: 60px;
+    min-width: 60px;
+    max-width: 60px;
   }
 
   .main {
@@ -399,7 +399,7 @@
     <Splitter {prevDiv} {nextDiv} minWidth="404" />
     <aside bind:this={nextDiv}>
       <ObjectForm _class={details._class} _objectId={details._id} title="Title"
-                  on:close={()=> navigateDocument(undefined)} />
+                  on:close={()=> navigateDocument(undefined)} on:noobject={()=> details = undefined} />
     </aside>
   {/if}
 </div>

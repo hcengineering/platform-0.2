@@ -61,8 +61,8 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
   }
 
   const mongoStorage: Storage = {
-    async store (ctx: TxContext, doc: Doc): Promise<any> {
-      return await collection(doc._class).insertOne(doc)
+    store (ctx: TxContext, doc: Doc): Promise<any> {
+      return collection(doc._class).insertOne(doc)
     },
 
     async push (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, query: AnyLayout | null, attribute: StringProperty, attributes: AnyLayout): Promise<any> {
@@ -100,7 +100,7 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
         // Operation over embedded child object, path to it should be matched by query object.
         const filters = createPullArrayFilters(memdb, _class, query!)
         if (filters.isArrayAttr) {
-          return await collection(_class).updateOne({ _id }, { $pull: filters.updateOperation }, { arrayFilters: filters.arrayFilters })
+          return collection(_class).updateOne({ _id }, { $pull: filters.updateOperation }, { arrayFilters: filters.arrayFilters })
         } else {
           return collection(_class).updateOne({ _id }, { $unset: filters.updateOperation }, { arrayFilters: filters.arrayFilters })
         }
@@ -170,13 +170,13 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
     },
 
     async genRefId (_space: Ref<Space>): Promise<Ref<Doc>> {
-      const space = await this.findOne(CORE_CLASS_SPACE, { _id: _space })
+      const space = await clientControl.findOne(CORE_CLASS_SPACE, { _id: _space })
       if (!space) {
         return Promise.reject(new Error('Space with id ' + _space + ' is not found'))
       }
 
-      async function getValue () {
-        return await workspaceSystem.findOneAndUpdate(
+      function getValue () {
+        return workspaceSystem.findOneAndUpdate(
           { _space },
           { $inc: { value: 1 } },
           { upsert: true }
@@ -187,7 +187,7 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
       if (!res.value) {
         res = await getValue()
       }
-      return (space.spaceKey + '-' + res.value.value) as Ref<VDoc>
+      return (`${space.spaceKey}-${res.value.value}`) as Ref<VDoc>
     },
 
     close (): Promise<void> {

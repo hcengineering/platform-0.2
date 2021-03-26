@@ -112,7 +112,7 @@ export default (platform: Platform): Promise<UIService> => {
     }
     if (r) {
       // We need to remove child router from parent, if component is destroyed
-      onDestroy(r.clearChildRouter)
+      onDestroy(() => r.clearChildRouter())
     }
     setContext(CONTEXT_ROUTE_VALUE, result)
     return result
@@ -124,7 +124,7 @@ export default (platform: Platform): Promise<UIService> => {
     if (documentProvider) {
       return documentProvider.open(doc)
     }
-    return Promise.reject(new Error('Document provder is not registred'))
+    return Promise.reject(new Error('Document provider is not registred'))
   }
 
   function selection (): Document | undefined {

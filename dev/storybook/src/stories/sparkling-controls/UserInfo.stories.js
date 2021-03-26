@@ -10,25 +10,25 @@ export default {
     subtitle: { control: 'text' },
     color: { control: 'color' },
     userColor: { control: 'color' },
-    subtitleOnTop: { control: 'boolean' },
+    subtitleOnTop: { control: 'boolean' }
   },
   parameters: {
     backgrounds: {
       values: [
         { name: 'light', value: '#fff' },
         { name: 'dark', value: '#1E1E1E' },
-        { name: 'biege', value: '#FDF1E6' },
-      ],
-    },
+        { name: 'biege', value: '#FDF1E6' }
+      ]
+    }
   },
-  decorators:  [(storyFn) => {
-    const story = storyFn();
+  decorators: [(storyFn) => {
+    const story = storyFn()
 
     return {
       Component: ThemeDecorator,
       props: {
         child: story.Component,
-        props: story.props,
+        props: story.props
       }
     }
   }]
@@ -36,26 +36,26 @@ export default {
 
 const Template = ({ ...args }) => ({
   Component: UserInfo,
-  props: { ...args },
-});
+  props: { ...args }
+})
 
-export const Default = Template.bind({});
+export const Default = Template.bind({})
 Default.args = {
   url: 'https://platform.exhale24.ru/images/photo-1.png',
-  title: 'User Name',
-};
+  title: 'User Name'
+}
 
-export const WithSubtitle = Template.bind({});
+export const WithSubtitle = Template.bind({})
 WithSubtitle.args = {
   url: 'https://platform.exhale24.ru/images/photo-1.png',
   title: 'User Name',
   subtitle: 'Designer'
-};
+}
 
-export const SubtitleOnTop = Template.bind({});
+export const SubtitleOnTop = Template.bind({})
 SubtitleOnTop.args = {
   url: 'https://platform.exhale24.ru/images/photo-1.png',
   title: 'User Name',
   subtitle: 'Designer',
   subtitleOnTop: true
-};
+}

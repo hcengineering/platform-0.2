@@ -41,5 +41,5 @@ async function boot (): Promise<void> {
 }
 
 boot().catch(err => {
-  new ErrorPage({ target: document.body, props: { error: err.message } })
+  new ErrorPage({ target: document.body, props: { error: err.message } }) // eslint-disable-line no-new
 })

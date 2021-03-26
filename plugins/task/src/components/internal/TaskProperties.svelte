@@ -11,7 +11,6 @@
   //
   // See the License for the specific language governing permissions and
   // limitations under the License.
-  import { onDestroy } from 'svelte'
   import { Class, Obj, Ref } from '@anticrm/core'
   import task, { Task, TaskFieldType, TaskFieldValue } from '../..'
   import UserInfo from '@anticrm/sparkling-controls/src/UserInfo.svelte'
@@ -44,7 +43,7 @@
       val.push(d)
     }
     fieldValues = fValues
-  }, onDestroy)
+  })
 
   let statusActions: Action[] = []
   let taskShortId: ShortID

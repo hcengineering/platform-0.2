@@ -12,25 +12,25 @@ export default {
     minWidth: { control: 'text' },
     spacing: { control: 'number' },
     devMode: { control: 'boolean' },
-    horizontal: { control: 'boolean' },
+    horizontal: { control: 'boolean' }
   },
   parameters: {
     backgrounds: {
       values: [
         { name: 'light', value: '#fff' },
         { name: 'dark', value: '#1E1E1E' },
-        { name: 'biege', value: '#FDF1E6' },
-      ],
-    },
+        { name: 'biege', value: '#FDF1E6' }
+      ]
+    }
   },
-  decorators:  [(storyFn) => {
-    const story = storyFn();
+  decorators: [(storyFn) => {
+    const story = storyFn()
 
     return {
       Component: ThemeDecorator,
       props: {
         child: story.Component,
-        props: story.props,
+        props: story.props
       }
     }
   }]
@@ -60,21 +60,21 @@ const Template = ({ ...args }) => ({
     Enim labore sit corporis blanditiis aliquam nesciunt harum quas quae sapiente non officiis asperiores, quo, quasi nam repellendus laborum commodi nisi iure fuga autem. Quaerat voluptate sequi enim ut hic?
     Magnam saepe iusto voluptatibus nostrum quos eligendi suscipit minima iste, earum corrupti officiis molestias enim recusandae at aspernatur repudiandae praesentium, eveniet amet odio illum deserunt asperiores? Natus officia culpa et.`,
     ...args
-  },
-});
+  }
+})
 
-export const Default = Template.bind({});
+export const Default = Template.bind({})
 Default.args = {
   width: '100%',
   height: 'calc(100vh - 32px)',
-  spacing: 10,
-};
+  spacing: 10
+}
 
-export const Horizontal = Template.bind({});
+export const Horizontal = Template.bind({})
 Horizontal.args = {
   width: '100%',
   height: 'calc(100vh - 32px)',
   spacing: 10,
   horizontal: true,
   minWidth: 50
-};
+}

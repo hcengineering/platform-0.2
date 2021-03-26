@@ -23,7 +23,7 @@
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
   import { CORE_MIXIN_SHORTID, Space } from '@anticrm/domains'
   import task, { TASK_STATUS_OPEN } from '../../index'
-  import EditBox from '@anticrm/platform-ui/src/components/EditBox.svelte'
+  import EditBox from '@anticrm/sparkling-controls/src/EditBox.svelte'
   import chunter, { Comment, getChunterService } from '@anticrm/chunter'
 
   export let title: string

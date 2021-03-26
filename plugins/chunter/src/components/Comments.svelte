@@ -12,7 +12,6 @@
   // See the License for the specific language governing permissions and
   // limitations under the License.
 
-  import { onDestroy } from 'svelte'
   import { Property, StringProperty } from '@anticrm/core'
   import chunter, { Collab, getChunterService } from '../index'
 
@@ -20,7 +19,7 @@
   import CommentComponent from './internal/Comment.svelte'
   import Backlink from './internal/Backlink.svelte'
   import { CORE_CLASS_REFERENCE, Reference } from '@anticrm/domains'
-  import { createLiveQuery, getCoreService, getUserId, updateLiveQuery } from '@anticrm/presentation'
+  import { createLiveQuery, getCoreService, updateLiveQuery } from '@anticrm/presentation'
 
   export let object: Collab
 
@@ -28,7 +27,7 @@
 
   const refS = createLiveQuery(CORE_CLASS_REFERENCE, { _targetId: object._id }, (docs) => {
     references = docs
-  }, onDestroy)
+  })
 
   $: {
     if (object) {

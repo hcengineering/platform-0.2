@@ -7,25 +7,25 @@ export default {
   argTypes: {
     label: { control: 'text' },
     separator: { control: 'boolean' },
-    onClick: { action: 'onClick' },
+    onClick: { action: 'onClick' }
   },
   parameters: {
     backgrounds: {
       values: [
         { name: 'light', value: '#fff' },
         { name: 'dark', value: '#1E1E1E' },
-        { name: 'biege', value: '#FDF1E6' },
-      ],
-    },
+        { name: 'biege', value: '#FDF1E6' }
+      ]
+    }
   },
-  decorators:  [(storyFn) => {
-    const story = storyFn();
+  decorators: [(storyFn) => {
+    const story = storyFn()
 
     return {
       Component: ThemeDecorator,
       props: {
         child: story.Component,
-        props: story.props,
+        props: story.props
       }
     }
   }]
@@ -35,16 +35,16 @@ const Template = ({ onClick, ...args }) => ({
   Component: PopupItem,
   props: { ...args },
   on: {
-    click: onClick,
-  },
-});
+    click: onClick
+  }
+})
 
-export const Default = Template.bind({});
+export const Default = Template.bind({})
 Default.args = {
-  label: 'Popup Item',
-};
+  label: 'Popup Item'
+}
 
-export const Separator = Template.bind({});
+export const Separator = Template.bind({})
 Separator.args = {
   separator: true
-};
+}

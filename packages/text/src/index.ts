@@ -808,14 +808,16 @@ class MarkdownParseState {
         continue
       }
       if (m.attrs.href) {
-        const url = new URL(m.attrs.href)
-        if (url.protocol === 'ref:') {
+        const ref = m.attrs.href as string
+        const refPrefix = 'ref://'
+        const hashPos = ref.indexOf('#')
+        if (ref.startsWith(refPrefix) && hashPos !== -1) {
           // Convert any url with ref to reference mark
           result.push({
             type: MessageMarkType.reference,
             attrs: {
-              id: url.hash.substring(1),
-              class: 'class:' + url.pathname.substring(2)
+              id: ref.substring(hashPos + 1),
+              class: 'class:' + ref.substring(refPrefix.length, hashPos)
             }
           })
         }

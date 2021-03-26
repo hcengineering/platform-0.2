@@ -18,7 +18,7 @@
   import { AttrModel, ClassModel, getCoreService, getPresentationService } from '@anticrm/presentation'
   import CheckBox from '@anticrm/sparkling-controls/src/CheckBox.svelte'
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
-  import EditBox from '@anticrm/platform-ui/src/components/EditBox.svelte'
+  import EditBox from '@anticrm/sparkling-controls/src/EditBox.svelte'
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import workbench, { WorkbenchApplication } from '@anticrm/workbench'
   import { CORE_CLASS_SPACE } from '@anticrm/domains'

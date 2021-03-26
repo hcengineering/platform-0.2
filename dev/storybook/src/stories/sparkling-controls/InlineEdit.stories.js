@@ -10,25 +10,25 @@ export default {
     placeholder: { control: 'text' },
     fullWidth: { control: 'boolean' },
     editable: { control: 'boolean' },
-    onChange: { action: 'onChange' },
+    onChange: { action: 'onChange' }
   },
   parameters: {
     backgrounds: {
       values: [
         { name: 'light', value: '#fff' },
         { name: 'dark', value: '#1E1E1E' },
-        { name: 'biege', value: '#FDF1E6' },
-      ],
-    },
+        { name: 'biege', value: '#FDF1E6' }
+      ]
+    }
   },
-  decorators:  [(storyFn) => {
-    const story = storyFn();
+  decorators: [(storyFn) => {
+    const story = storyFn()
 
     return {
       Component: ThemeDecorator,
       props: {
         child: story.Component,
-        props: story.props,
+        props: story.props
       }
     }
   }]
@@ -38,17 +38,17 @@ const Template = ({ onChange, ...args }) => ({
   Component: InlineEdit,
   props: { ...args },
   on: {
-    change: onChange,
-  },
-});
+    change: onChange
+  }
+})
 
-export const Default = Template.bind({});
+export const Default = Template.bind({})
 Default.args = {
   placeholder: 'Edit text here'
-};
+}
 
-export const FullWidth = Template.bind({});
+export const FullWidth = Template.bind({})
 FullWidth.args = {
   placeholder: 'Edit text here',
-  fullWidth: true,
-};
+  fullWidth: true
+}

@@ -19,7 +19,6 @@
 
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import { CORE_CLASS_TITLE, Title } from '@anticrm/domains'
-  import { onDestroy } from 'svelte'
   import { createLiveQuery, updateLiveQuery } from '@anticrm/presentation'
 
   let query: string
@@ -37,7 +36,7 @@
   const update = createLiveQuery(CORE_CLASS_TITLE, q(query), docs => {
     console.log('search', docs)
     result = docs
-  }, onDestroy)
+  })
 
   $: updateLiveQuery(update, CORE_CLASS_TITLE, q(query))
 </script>

@@ -1,8 +1,5 @@
 <script lang="ts">
-  import UserInfo from '@anticrm/sparkling-controls/src/UserInfo.svelte'
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
-  import EditBox from './EditBox.svelte'
-  import workbench from '@anticrm/workbench'
   import { Action } from '..'
   import { onDestroy } from 'svelte'
 
@@ -65,7 +62,7 @@
   <div bind:this={comboDrop} class="comboBox-drop">
     <div bind:this={comboItems} class="comboBox-drop__items">
       <ScrollView width="100%" height="100%" accentColor="true">
-        {#each items as item (item.id)}
+        {#each items as item}
           <div class="comboBox-drop__item" class:selected={item.id === selected}
                on:click={() => { selected = item.id }}>
             <div on:click={() => item.action()}>{item.name}</div>

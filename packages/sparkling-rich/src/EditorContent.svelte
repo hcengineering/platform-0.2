@@ -1,10 +1,10 @@
 <script lang='ts'>
   import { MessageNode } from '@anticrm/core'
-  import { DOMParser, Fragment, Slice, Mark, MarkType } from 'prosemirror-model'
+  import { MarkType } from 'prosemirror-model'
 
   import { schema } from './internal/schema'
 
-  import { TextSelection, EditorState, Transaction } from 'prosemirror-state'
+  import { EditorState, Transaction } from 'prosemirror-state'
   import { EditorView } from 'prosemirror-view'
 
   import { history } from 'prosemirror-history'

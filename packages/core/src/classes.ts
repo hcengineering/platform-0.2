@@ -43,6 +43,7 @@ export type PropertyType = Property<PrimitiveType, any>
 export type StringProperty = Property<string, string>
 export type BooleanProperty = Property<boolean, boolean>
 export type DateProperty = Property<number, Date>
+export type NumberProperty = Property<number, number>
 
 // An attribute type with some defined mixins inside.
 export interface Type extends Emb {
@@ -111,11 +112,13 @@ export interface AnyLayout {
 
 ///
 
+export const CORE_CLASS_OBJ = 'class:core.Obj' as Ref<Class<Obj>>
 export const CORE_CLASS_DOC = 'class:core.Doc' as Ref<Class<Doc>>
 export const CORE_CLASS_EMB = 'class:core.Emb' as Ref<Class<Emb>>
 export const CORE_CLASS_CLASS = 'class:core.Class' as Ref<Class<Class<Obj>>>
-
 export const CORE_CLASS_STRING = 'class:core.String' as Ref<Class<Type>>
+export const CORE_CLASS_ATTRIBUTE = 'class:core.Attribute' as Ref<Class<Attribute>>
+export const CORE_CLASS_TYPE = 'class:core.Type' as Ref<Class<Type>>
 
 export const CORE_CLASS_ARRAY_OF = 'class:core.ArrayOf' as Ref<Class<ArrayOf>>
 export const CORE_CLASS_INSTANCE_OF = 'class:core.InstanceOf' as Ref<Class<InstanceOf<Emb>>>

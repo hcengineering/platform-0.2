@@ -20,6 +20,7 @@ import type { Space, VDoc } from '@anticrm/domains'
 import { User } from '@anticrm/contact'
 import { AnyComponent, Asset } from '@anticrm/platform-ui'
 import { Collab } from '@anticrm/chunter'
+import { Application } from '@anticrm/domains'
 
 export enum TaskFieldType {
   Type, // possible values: task, feature, defect
@@ -179,5 +180,8 @@ export default plugin('task' as Plugin<TaskService>, {}, {
     TaskInfo: '' as AnyComponent,
     TaskCardPresenter: '' as AnyComponent,
     StatusPresenter: '' as AnyComponent
+  },
+  application: {
+    Task: '' as Ref<Application>
   }
 })

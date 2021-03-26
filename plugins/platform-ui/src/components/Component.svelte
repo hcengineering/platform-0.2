@@ -47,7 +47,7 @@
 {#await componentPromise }
   <Spinner />
 {:then ctor}
-  <svelte:component this={ctor} {...props} on:change on:close on:open />
+  <svelte:component this={component} {...props} on:change on:close on:open />
 {:catch err}
   ERROR: {console.log(err, JSON.stringify(component))} {props} { err }
   <Icon icon={ui.icon.Error} size="32" />

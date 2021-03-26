@@ -21,7 +21,7 @@ import {
 } from '..'
 
 describe('server', () => {
-  it('Check reference output', async () => {
+  it('Check reference output', () => {
     const t1 =
       '{"content":[{"content":[{"text":"Hello ","type":"text"},{"marks":[{"attrs":{"class":"class:chunter.Page","id":"5f8043dc1b592de172c26181"},"type":"reference"}],"text":"[[Page1]]","type":"text"},{"text":" and ","type":"text"},{"marks":[{"attrs":{"class":"Page","id":null},"type":"reference"}],"text":"[[Page3]]","type":"text"}],"type":"paragraph"}],"type":"doc"}'
     const msg = serializeMessageMarkdown(JSON.parse(t1) as MessageNode)
@@ -30,7 +30,7 @@ describe('server', () => {
       'Hello [Page1](ref://chunter.Page#5f8043dc1b592de172c26181) and [Page3](ref://Page#)'
     )
   })
-  it('check list with bold and italic', async () => {
+  it('check list with bold and italic', () => {
     const msg = serializeMessageMarkdown(
       JSON.parse(
         '{"content": [{"content": [{"content": [{"content": [{"text": "test1 ", "type": "text"}, {"text": "Italic", "marks": [{"type": "em"}], "type": "text"}], "type": "paragraph"}], "type": "list_item"}, {"content": [{"content": [{"text": "test2 ", "type": "text"}, {"text": "BOLD", "marks": [{"type": "strong"}], "type": "text"}], "type": "paragraph"}], "type": "list_item"}], "type": "bullet_list"}], "type": "doc"}'
@@ -42,7 +42,7 @@ describe('server', () => {
 
   // Test parser
 
-  it('Check parsing', async () => {
+  it('Check parsing', () => {
     const t1 =
       'Hello [Page1](ref://chunter.Page#5f8043dc1b592de172c26181) and [Page3](ref://Page#)'
     const msg = parseMessageMarkdown(t1)

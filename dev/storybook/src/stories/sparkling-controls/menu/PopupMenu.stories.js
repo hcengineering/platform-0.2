@@ -7,32 +7,32 @@ export default {
   argTypes: {
     label: { control: 'text' },
     size: {
-      control: { type: 'select', options: ['small', 'default', 'large'] },
+      control: { type: 'select', options: ['small', 'default', 'large'] }
     },
     kind: {
-      control: { type: 'select', options: ['primary', 'default', 'transparent'] },
+      control: { type: 'select', options: ['primary', 'default', 'transparent'] }
     },
     items: { control: 'array' },
     width: { control: 'number' },
-    visible: { control: 'boolean' },
+    visible: { control: 'boolean' }
   },
   parameters: {
     backgrounds: {
       values: [
         { name: 'light', value: '#fff' },
         { name: 'dark', value: '#1E1E1E' },
-        { name: 'biege', value: '#FDF1E6' },
-      ],
-    },
+        { name: 'biege', value: '#FDF1E6' }
+      ]
+    }
   },
-  decorators:  [(storyFn) => {
-    const story = storyFn();
+  decorators: [(storyFn) => {
+    const story = storyFn()
 
     return {
       Component: ThemeDecorator,
       props: {
         child: story.Component,
-        props: story.props,
+        props: story.props
       }
     }
   }]
@@ -40,7 +40,7 @@ export default {
 
 const Template = ({ ...args }) => ({
   Component: PopupMenu,
-  props: { 
+  props: {
     items: [{
       label: 'Popup Item 1', action: () => alert('PopupItem1.Action()')
     }, {
@@ -51,22 +51,22 @@ const Template = ({ ...args }) => ({
       label: 'Popup Item 3', action: () => alert('PopupItem3.Action()')
     }],
     ...args
-  },
-});
+  }
+})
 
-export const Default = Template.bind({});
+export const Default = Template.bind({})
 Default.args = {
-  label: 'Click Me',
-};
+  label: 'Click Me'
+}
 
-export const NormalButton = Template.bind({});
+export const NormalButton = Template.bind({})
 NormalButton.args = {
   label: 'Click Me',
   kind: 'primary'
-};
+}
 
-export const SmallTransparent = Template.bind({});
+export const SmallTransparent = Template.bind({})
 SmallTransparent.args = {
   label: '+',
   size: 'small'
-};
+}

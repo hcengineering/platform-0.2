@@ -40,6 +40,6 @@ export function createContact (db: Db, email: string, username: string): Promise
   return db.collection('contact').insertOne(user)
 }
 
-export function removeContact (db: Db, username: string) {
+export function removeContact (db: Db, username: string) { // eslint-disable-line @typescript-eslint/no-unused-vars
   return db.collection('contact').deleteMany({ _mixins: contact.mixin.User })
 }

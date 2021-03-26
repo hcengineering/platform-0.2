@@ -15,7 +15,7 @@
 
 <script lang="ts">
   import Icon from './Icon.svelte'
-  import { Asset } from "@anticrm/platform-ui";
+  import { Asset } from '@anticrm/platform-ui'
 
   export let icon: Asset | undefined = undefined
   export let width: string = '300px'
@@ -56,6 +56,45 @@
 </div>
 
 <style lang="scss">
+  input {
+    border: none;
+    width: calc(100% - 2px);
+    padding: 0;
+    color: var(--theme-content-color);
+    background-color: transparent;
+    font: inherit;
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  .editbox {
+    border: 1px solid var(--theme-bg-dark-color);
+    border-radius: 4px;
+    padding: 8px 16px;
+    background-color: var(--theme-bg-accent-color);
+    box-sizing: border-box;
+    color: var(--theme-content-color);
+    transition: border-color .2s, color .2s, background-color .2s;
+
+    &:focus-within {
+      outline: none;
+      background-color: var(--theme-bg-accent-hover);
+      border-color: var(--theme-bg-dark-hover);
+      color: var(--theme-content-color);
+    }
+    &-label {
+      height: 54px;
+      padding: 6px 16px 4px;
+    }
+    &-hoverState {
+      background-color: var(--theme-bg-accent-hover);
+      border-color: var(--theme-bg-dark-hover);
+      color: var(--theme-content-color);
+    }
+  }
+
   .wIcon {
     display: flex;
     flex-direction: row;

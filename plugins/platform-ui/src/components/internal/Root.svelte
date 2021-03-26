@@ -105,7 +105,7 @@
 
 <style lang="scss">
   $status-bar-height: 20px;
-  $pictogram-size: 48px;
+  $pictogram-size: 51px;
 
   #ui-root {
     display: flex;

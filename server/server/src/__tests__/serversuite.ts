@@ -155,12 +155,12 @@ export class ServerSuite {
         for (const client of clients) {
           if (client.client !== from) {
             // console.log(`broadcasting to ${client.client.email}`, response)
-            client.ops.push(client.client.send(response).catch((e) => {
+            client.ops.push(client.client.send({}, response).catch((e) => {
               client.errors.push(e)
             }))
           } else {
             // console.log('notify self about completeness without response')
-            client.ops.push(client.client.send({
+            client.ops.push(client.client.send({}, {
               id: response.id,
               error: response.error
             } as Response<any>).catch((e) => {

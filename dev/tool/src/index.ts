@@ -86,7 +86,7 @@ program
 program
   .command('upgrade-workspace <workspace>')
   .description('upgrade workspace')
-  .action((workspace, cmd) => {
+  .action((workspace, cmd) => { // eslint-disable-line @typescript-eslint/no-unused-vars
     withDatabase(mongodbUri, async (client) => {
       const tenant = withTenant(client, workspace)
       return initDatabase(tenant)

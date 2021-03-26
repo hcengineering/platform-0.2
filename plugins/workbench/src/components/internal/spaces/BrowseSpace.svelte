@@ -14,7 +14,7 @@
 -->
 <script lang="ts">
   import { CORE_CLASS_SPACE, Space } from '@anticrm/domains'
-  import { createEventDispatcher, onDestroy } from 'svelte'
+  import { createEventDispatcher } from 'svelte'
   import { createLiveQuery, getCoreService, getUserId } from '@anticrm/presentation'
   import { getUIService } from '@anticrm/platform-ui'
   import { archivedSpaceUpdate, getCurrentUserSpace, getSpaceName, joinSpace, leaveSpace } from './utils'
@@ -39,7 +39,7 @@
 
   createLiveQuery(CORE_CLASS_SPACE, {}, (docs) => {
     spaces = docs
-  }, onDestroy)
+  })
 
 
 </script>
