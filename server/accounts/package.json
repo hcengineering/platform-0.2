@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "jwt-simple": "^0.5.6",
-    "mongodb": "^3.5.9"
+    "mongodb": "^3.5.9",
+    "node-2fa": "^2.0.1"
   }
 }
