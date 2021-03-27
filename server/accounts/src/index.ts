@@ -14,11 +14,11 @@
 //
 
 import { Binary, Db, MongoClient, ObjectID } from 'mongodb'
-import { PlatformError, Status, Severity } from '@anticrm/platform'
+import { PlatformError, Status, Severity } from '@anticrm/foundation'
 import { Request, Response } from '@anticrm/rpc'
 import { randomBytes, pbkdf2Sync } from 'crypto'
 import { Buffer } from 'buffer'
-import { decode, encode } from 'jwt-simple'
+import { encode } from 'jwt-simple'
 
 const server = '3.12.129.141'
 const port = '18080'
