@@ -14,7 +14,7 @@
 //
 
 import { plugin, Plugin, Service } from '@anticrm/platform'
-import { StringProperty, Class, Ref, Doc, DateProperty } from '@anticrm/core'
+import { Class, Ref, Doc, Enum } from '@anticrm/core'
 
 import { User } from '@anticrm/contact'
 import { Collab } from '@anticrm/chunter'
@@ -27,37 +27,57 @@ export enum RecurrenceType {
     Yearly
 }
 
+export enum CalendarEventType {
+  PTO,
+  SICK_LEAVE,
+  EXTRA_WORK,
+  ORGANIZATION_EVENT,
+  CUSTOM
+}
+
 export interface RecurrenceProperty extends Doc {
     type: RecurrenceType
     interval: number
-    startDate: DateProperty
-    endDate?: DateProperty
+    startDate: Date
+    endDate?: Date
+}
+
+export interface Calendar extends Collab {
+    name: string
+
+    participants: Ref<User>[]
 }
 
 /*
- * Define a personal event object.
+ * Define a calendar event object.
  */
-export interface PersonalEvent extends Collab {
-    summary: StringProperty
+export interface CalendarEvent extends Collab {
+    summary: string
+
+    type: CalendarEventType
 
     participants: Ref<User>[]
 
-    startDate: DateProperty
+    startDate: Date
 
-    endDate: DateProperty
+    endDate: Date
 
     recurrence: RecurrenceProperty
 }
 
-export interface PersonalEventService extends Service {
+export interface CalendarService extends Service {
 }
 
-export default plugin('personalEvent' as Plugin<PersonalEventService>, {}, {
+export default plugin('Calendar' as Plugin<CalendarService>, {}, {
   class: {
-    PersonalEvent: '' as Ref<Class<PersonalEvent>>,
+    CalendarEvent: '' as Ref<Class<CalendarEvent>>,
     RecurrenceProperty: '' as Ref<Class<RecurrenceProperty>>
   },
+  enum: {
+    RecurrenceType: '' as Ref<Enum<RecurrenceType>>,
+    CalendarEventType: '' as Ref<Enum<CalendarEventType>>
+  },
   application: {
-    PersonalEvent: '' as Ref<Application>
+    Calendar: '' as Ref<Application>
   }
 })
