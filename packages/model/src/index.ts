@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import type { Emb } from '@anticrm/core'
+import type { Emb, Enum, EnumLiteral } from '@anticrm/core'
 import {
   ArrayOf, Attribute, BagOf, Class, Classifier, CORE_CLASS_CLASS, CORE_CLASS_DOC, CORE_CLASS_EMB, CORE_CLASS_STRING,
   Doc, Indices, InstanceOf, Mixin, Obj, Ref, RefTo, Tx, Type
@@ -34,11 +34,14 @@ const modelIds = identify('core' as AnyPlugin, {
     Emb: CORE_CLASS_EMB as Ref<Class<Emb>>,
     Doc: CORE_CLASS_DOC as Ref<Class<Doc>>,
 
-    Classifier: '' as Ref<Class<Classifier<Obj>>>,
+    Classifier: '' as Ref<Class<Classifier>>,
 
     Attribute: '' as Ref<Class<Attribute>>,
     Class: CORE_CLASS_CLASS as Ref<Class<Class<Obj>>>,
     Mixin: '' as Ref<Class<Mixin<Obj>>>,
+
+    EnumLiteral: '' as Ref<Class<EnumLiteral>>,
+    Enum: '' as Ref<Class<Enum<any>>>,
 
     // Data types
     Type: '' as Ref<Class<Type>>,

@@ -13,10 +13,12 @@
 // limitations under the License.
 //
 
-import core, { Class$, Prop, ArrayOf$, Builder, InstanceOf$, Primary } from '..'
+import core, { ArrayOf$, Builder, Class$, InstanceOf$, Primary, Prop } from '..'
 import { MODEL_DOMAIN } from '@anticrm/core'
-import { TAttribute, TClass, TClassifier, TDoc, TEmb, TMixin, TObj, TType, TTitle, TVShortID } from '../__model__'
-import { taskIds, SubTask, Task, TaskComment } from '@anticrm/core/src/__tests__/tasks'
+import {
+  TAttribute, TClass, TClassifier, TDoc, TEmb, TMixin, TObj, TTitle, TType, TVDoc, TVShortID
+} from '../__model__'
+import { SubTask, Task, TaskComment, taskIds } from '@anticrm/core/src/__tests__/tasks'
 
 @Class$(taskIds.class.Task, core.class.Doc, MODEL_DOMAIN)
 export class TTask extends TDoc implements Task {
@@ -69,11 +71,14 @@ export class TTaskComment extends TEmb implements TaskComment {
   oldVersion!: TaskComment[]
 }
 
+@Class$(taskIds.class.DerivedTask, taskIds.class.Task, MODEL_DOMAIN)
+export class TDerivedTask extends TTask {}
+
 export function model (S: Builder): void {
-  S.add(TTask, TSubTask, TTaskComment)
+  S.add(TTask, TDerivedTask, TSubTask, TTaskComment)
 }
 
 export function fullModel (S: Builder): void {
-  S.add(TObj, TEmb, TDoc, TClassifier, TClass, TAttribute, TType, TMixin, TTitle, TVShortID)
+  S.add(TObj, TEmb, TDoc, TVDoc, TClassifier, TClass, TAttribute, TType, TMixin, TTitle, TVShortID)
   model(S)
 }

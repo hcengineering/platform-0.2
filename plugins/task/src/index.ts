@@ -14,39 +14,38 @@
 //
 
 import { plugin, Plugin, Service } from '@anticrm/platform'
-import { StringProperty, Class, Ref, Doc, Emb, DateProperty, Mixin } from '@anticrm/core'
-import type { Space, VDoc } from '@anticrm/domains'
+import { Class, DateProperty, Emb, Enum, Mixin, Ref, StringProperty } from '@anticrm/core'
+import type { VDoc } from '@anticrm/domains'
+import { Application } from '@anticrm/domains'
 
 import { User } from '@anticrm/contact'
 import { AnyComponent, Asset } from '@anticrm/platform-ui'
 import { Collab } from '@anticrm/chunter'
-import { Application } from '@anticrm/domains'
 
-export enum TaskFieldType {
-  Type, // possible values: task, feature, defect
-  Priority, // 1-high, 2-medium, etc.
-  Status = 2,
-  Link, // A link category, Blocked by, Caused by, etc.
-  Label// A some labels used by tasks
+export enum TaskStatus {
+  Open,
+  Closed,
+  InProgress,
+  UnderReview,
+  Resolved
 }
 
-/**
- * Define a value of some field targeted by type.
- */
-export interface TaskFieldValue extends Doc {
-  // _id, it should be uniq across a field type, and it will be used as value for task fields
-  _space?: Ref<Space> // a space, to allow per space customization
+export enum TaskType {
+  Task,
+  Issue,
+  Defect
+}
 
-  // TODO: Not sure if this kind of customization is required.
-  // _overrideId: Ref<TaskFieldValue> // If defined, will extend and override some base field value.
-  // _visible?: boolean // If specified per _space and had same, _id, will allow to hide
+export enum TaskPriority {
+  Blocker,
+  High,
+  Medium,
+  Low
+}
 
-  type: TaskFieldType // A type to filter faster
-  title: string // A title to be displayed for user
+export interface TaskStatusAction extends Emb {
   action: string // A action title, to perform switch to this state.
   description?: string // A description could be used to show
-  icon?: Asset // Icon to display if suitable
-  color?: Asset // Define a item color if appropriate
 }
 
 /**
@@ -94,6 +93,14 @@ export interface WorkLog extends Emb {
   spendTime: TaskTimeDuration
 }
 
+/**
+ * Define a label value.
+ */
+export interface TaskLabel extends VDoc {
+  title: string
+  color: Asset
+}
+
 /*
  * Define a task object.
  */
@@ -101,7 +108,7 @@ export interface Task extends Collab {
   title: StringProperty
 
   // Define a status field
-  status: Ref<TaskFieldValue>
+  status: TaskStatus
 
   // A current assignee user
   assignee?: Ref<User>[]
@@ -110,7 +117,7 @@ export interface Task extends Collab {
   participants: Ref<User>[]
 
   // A set of labels
-  labels: Ref<TaskFieldValue>[]
+  labels: Ref<TaskLabel>[]
 
   // A list of watch users, they will be notified about task status changes according.
   // watchers: Ref<User>[]
@@ -121,7 +128,7 @@ export interface Task extends Collab {
  */
 export interface TypedTask extends Task {
   // Define a task type
-  type: Ref<TaskFieldValue> // Value will be selectable from a TaskFieldValue.type == Type
+  type: TaskType // Value will be selectable from a TaskFieldValue.type == Type
 }
 
 /**
@@ -129,7 +136,7 @@ export interface TypedTask extends Task {
  */
 export interface PrioritizedTask extends Task {
   // Define a task priority
-  priority: Ref<TaskFieldValue> // Value will be selectable from a TaskFieldValue.type == Type
+  priority: TaskPriority // Value will be selectable from a TaskFieldValue.type == Type
 }
 
 /**
@@ -155,8 +162,6 @@ export interface VersionedTask extends Task {
 export interface TaskService extends Service {
 }
 
-export const TASK_STATUS_OPEN = 'task:status.Open' as Ref<TaskFieldValue>
-
 export default plugin('task' as Plugin<TaskService>, {}, {
   icon: {
     Task: '' as Asset,
@@ -164,15 +169,22 @@ export default plugin('task' as Plugin<TaskService>, {}, {
   },
   class: {
     Task: '' as Ref<Class<Task>>,
-    TaskFieldValue: '' as Ref<Class<TaskFieldValue>>,
     TaskLink: '' as Ref<Class<TaskLink>>,
-    WorkLog: '' as Ref<Class<WorkLog>>
+    WorkLog: '' as Ref<Class<WorkLog>>,
+    TaskLabel: '' as Ref<Class<TaskLabel>>
+  },
+  enum: {
+    TaskStatus: '' as Ref<Enum<TaskStatus>>,
+    TaskPriority: '' as Ref<Enum<TaskPriority>>,
+    TaskType: '' as Ref<Enum<TaskType>>
   },
   mixin: {
     TypedTask: '' as Ref<Mixin<TypedTask>>,
     PrioritizedTask: '' as Ref<Mixin<PrioritizedTask>>,
     VersionedTask: '' as Ref<Mixin<VersionedTask>>,
-    TimeManagedTask: '' as Ref<Mixin<TimeManagedTask>>
+    TimeManagedTask: '' as Ref<Mixin<TimeManagedTask>>,
+
+    TaskStatusAction: '' as Ref<Mixin<TaskStatusAction>>
   },
   component: {
     TaskProperties: '' as AnyComponent,

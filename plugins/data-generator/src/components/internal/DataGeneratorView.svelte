@@ -23,7 +23,7 @@
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
   import EditBox from '@anticrm/sparkling-controls/src/EditBox.svelte'
   import ComboBox from '@anticrm/platform-ui/src/components/ComboBox.svelte'
-  import task, { TASK_STATUS_OPEN, TaskFieldType, TaskFieldValue } from '@anticrm/task'
+  import task, { TaskStatus } from '@anticrm/task'
   import chunter, { Comment } from '@anticrm/chunter'
   import { Action } from '@anticrm/platform-ui'
 
@@ -34,14 +34,9 @@
   let taskCount = 50
   let taskSpace: Space | undefined
   let spaces: Space[] = []
-  let taskStatus: TaskFieldValue[] = []
 
   createLiveQuery(CORE_CLASS_SPACE, {}, (docs) => {
     spaces = docs
-  })
-
-  createLiveQuery(task.class.TaskFieldValue, { type: TaskFieldType.Status as NumberProperty }, (docs) => {
-    taskStatus = docs
   })
 
   function filterSpaces (spaces: Space[], app: Ref<Application>): Space[] {
@@ -62,6 +57,14 @@
 
   const coreService = getCoreService()
 
+  function randomEnum<T> (anEnum: T): T[keyof T] {
+    const enumValues = Object.keys(anEnum)
+      .map(n => Number.parseInt(n))
+      .filter(n => !Number.isNaN(n)) as unknown as T[keyof T][]
+    const randomIndex = Math.floor(Math.random() * enumValues.length)
+    return enumValues[randomIndex]
+  }
+
   async function generateTasks () {
     if (!taskSpace) {
       return
@@ -73,7 +76,7 @@
       const newTask = modelDb.newDoc(task.class.Task, cs.generateId(), {
         title: faker.commerce.productName() as StringProperty,
         _space: taskSpace._id,
-        status: taskStatus[(faker.random.number() as number) % taskStatus.length]._id,
+        status: randomEnum(TaskStatus) as NumberProperty,
         comments: [{
           message: faker.commerce.productDescription(),
           _class: chunter.class.Comment,

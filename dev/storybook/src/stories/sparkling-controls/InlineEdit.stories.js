@@ -1,4 +1,4 @@
-import InlineEdit from './InlineEdit.svelte'
+import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.svelte'
 import ThemeDecorator from '../ThemeDecorator.svelte'
 
 export default {
@@ -45,6 +45,12 @@ const Template = ({ onChange, ...args }) => ({
 export const Default = Template.bind({})
 Default.args = {
   placeholder: 'Edit text here'
+}
+
+export const NotEditable = Template.bind({})
+NotEditable.args = {
+  placeholder: 'Don\'t edit text here',
+  editable: false
 }
 
 export const FullWidth = Template.bind({})

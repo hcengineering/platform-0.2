@@ -13,12 +13,12 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { Ref } from '@anticrm/core'
-  import { AttrModel, createLiveQuery, updateLiveQuery } from '@anticrm/presentation'
-  import task, { TaskFieldValue } from '../../../index'
+  import { CORE_CLASS_ENUM, Enum, Model } from '@anticrm/core'
+  import ux, { AttrModel, getCoreService, UXAttribute } from '@anticrm/presentation'
+  import task, { TaskStatus } from '../../../index'
   import StatusLabel from '../StatusLabel.svelte'
 
-  export let value: Ref<TaskFieldValue>
+  export let value: TaskStatus = TaskStatus.Open
   export let attribute: AttrModel
   export let maxWidth: number = 300
   export let editable: boolean
@@ -26,14 +26,24 @@
   let text: string = ''
   let color: string = ''
 
-  const update = createLiveQuery(task.class.TaskFieldValue, { _id: value }, (docs) => {
-    if (docs.length > 0) {
-      text = docs[0].title
-      color = docs[0].color
-    }
+  let statusType: Enum<TaskStatus> | undefined
+
+  let model: Model
+
+  getCoreService().then(async cs => {
+    statusType = await cs.findOne(CORE_CLASS_ENUM, { _id: task.enum.TaskStatus })
+    model = cs.getModel()
   })
 
-  $: updateLiveQuery( update, task.class.TaskFieldValue, { _id: value })
+  $: if (statusType) {
+    const status = statusType._literals[value]
+
+    if (status && model.isMixedIn<UXAttribute>(status, ux.mixin.UXAttribute)) {
+      const lit = model.as<UXAttribute>(status, ux.mixin.UXAttribute)
+      text = status.label
+      color = lit.color as string
+    }
+  }
 </script>
 
 <StatusLabel {text} {color} />

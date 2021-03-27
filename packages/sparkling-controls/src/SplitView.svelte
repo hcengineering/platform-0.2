@@ -7,7 +7,7 @@
   export let height: string = '100%'
   export let devMode: boolean = false
   export let minWidth: Number = 150
-  export let spacing: Number = 0
+  export let spacing: Number = 10
   export let horizontal: boolean = false
 
   let prevDiv: HTMLElement
