@@ -29,6 +29,7 @@
   import ActionBar from '@anticrm/platform-ui/src/components/ActionBar.svelte'
   import { Action, Location } from '@anticrm/platform-ui'
   import { Model } from '@anticrm/core'
+  import HabitControl from '@anticrm/habit/src/components/internal/HabitControl.svelte'
 
   export let application: WorkbenchApplication
   export let space: Space
@@ -95,6 +96,7 @@
   function getLabel (str: string): string {
     if (str === 'Pages') return 'New page'
     if (str === 'Tasks') return 'New task'
+    if (str === 'Habits') return 'New habit'
     return 'Add'
   }
 </script>
@@ -119,12 +121,16 @@
     <div class="presentation">
       <ActionBar actions={viewletActions} />
     </div>
-    <ScrollView height="100%" margin="2em">
-      {#if activeViewlet && activeViewlet.component}
-        <Component is={activeViewlet.component}
-                   props={{_class: application.classes[0], space: space, editable: false}} on:open />
-      {/if}
-    </ScrollView>
+    {#if application.label === 'Habits'}
+      <HabitControl></HabitControl>
+    {:else }
+      <ScrollView height="100%" margin="2em">
+        {#if activeViewlet && activeViewlet.component}
+          <Component is={activeViewlet.component}
+                     props={{_class: application.classes[0], space: space, editable: false}} on:open />
+        {/if}
+      </ScrollView>
+    {/if}
   {/if}
 </div>
 

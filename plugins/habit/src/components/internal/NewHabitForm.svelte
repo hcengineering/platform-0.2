@@ -68,27 +68,6 @@
     await cs.create(habit.class.Habit, newHabit)
     dispatch('close')
   }
-
-  let users: Array<{}> = [{
-    id: 0,
-    url: 'https://platform.exhale24.ru/images/photo-1.png',
-    name: 'Александр Алексеенко'
-  },
-    {
-      id: 1,
-      url: 'https://platform.exhale24.ru/images/photo-2.png',
-      name: 'Андрей Платов'
-    },
-    {
-      id: 2,
-      url: 'https://platform.exhale24.ru/images/photo-3.png',
-      name: 'Сергей Буевич'
-    },
-    {
-      id: 3,
-      url: 'https://platform.exhale24.ru/images/photo-4.png',
-      name: 'Андрей Соболев'
-    }]
 </script>
 
 <style lang="scss">
@@ -171,7 +150,6 @@
   </div>
 
   <div class="content">
-    <UserBox items={users} />
     <div class="separator"></div>
     <ReferenceInput stylesEnabled={false} submitEnabled={false} lines={10} on:update={ (msg) => {
          chunterService.then( (cs) => {
