@@ -247,6 +247,7 @@ export function createPlatform (): Platform {
 
   function getLocation (id: AnyPlugin): [AnyDescriptor, AnyModule] {
     for (const location of locations) {
+      console.log(location[0].id)
       if (location[0].id === id) {
         return location
       }

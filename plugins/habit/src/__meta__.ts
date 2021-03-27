@@ -1,5 +1,5 @@
 //
-// Copyright © 2020, 2021 Anticrm Platform Contributors.
+// Copyright © 2020 Anticrm Platform Contributors.
 //
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
@@ -13,18 +13,13 @@
 // limitations under the License.
 //
 
-import { Builder } from '../index'
-import { fullModel } from './test_tasks'
-import { fullModelHabit } from './test_habits'
-import { writeFile } from 'fs'
+import { Platform } from '@anticrm/platform'
+import habit from '..'
 
-const builder = new Builder()
-fullModel(builder)
-fullModelHabit(builder)
-
-writeFile('../core/src/__tests__/model.json', JSON.stringify(builder.dump()), (err: Error | null) => {
-  if (err) {
-    return console.log(err)
-  }
-  console.log('model saved')
-})
+export default (platform: Platform) => {
+  const spritesUrl = require('../assets/icons.svg') // eslint-disable-line
+  platform.loadMetadata(habit.icon, {
+    Habit: `${spritesUrl}#habit`,
+    ArrowDown: `${spritesUrl}#arrowDown`
+  })
+}

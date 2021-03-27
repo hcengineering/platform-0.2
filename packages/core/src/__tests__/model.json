@@ -1,1 +1,445 @@
-[{"_attributes":{},"_id":"class:core.Obj","_class":"class:core.Class","_kind":0},{"_attributes":{},"_id":"class:core.Emb","_class":"class:core.Class","_kind":0,"_extends":"class:core.Obj"},{"_attributes":{"_id":{"_class":"class:core.Attribute","type":{"_class":"class:core.Type"}},"_mixins":{"_class":"class:core.Attribute","type":{"_class":"class:core.Type"}}},"_id":"class:core.Doc","_class":"class:core.Class","_kind":0,"_extends":"class:core.Obj"},{"_attributes":{"_kind":{"_class":"class:core.Attribute","type":{"_class":"class:core.Type"}},"_attributes":{"_class":"class:core.Attribute","type":{"_class":"class:core.BagOf","of":{"_class":"class:core.InstanceOf","of":"class:core.Emb"}}},"_extends":{"_class":"class:core.Attribute","type":{"_class":"class:core.RefTo","to":"class:core.Class"}}},"_id":"class:core.Classifier","_class":"class:core.Class","_kind":0,"_extends":"class:core.Doc","_domain":"model"},{"_attributes":{"_native":{"_class":"class:core.Attribute","type":{"_class":"class:core.Type"}},"_domain":{"_class":"class:core.Attribute","type":{"_class":"class:core.Type"}}},"_id":"class:core.Class","_class":"class:core.Class","_kind":0,"_extends":"class:core.Classifier","_domain":"model"},{"_attributes":{"type":{"_class":"class:core.Attribute","type":{"_class":"class:core.Type"}}},"_id":"class:core.Attribute","_class":"class:core.Class","_kind":0,"_extends":"class:core.Emb","_domain":"model"},{"_attributes":{"_default":{"_class":"class:core.Attribute","type":{"_class":"class:core.Type"}}},"_id":"class:core.Type","_class":"class:core.Class","_kind":0,"_extends":"class:core.Emb","_domain":"model"},{"_attributes":{},"_id":"class:core.Mixin","_class":"class:core.Class","_kind":0,"_extends":"class:core.Class","_domain":"model"},{"_attributes":{"_objectClass":{"_class":"class:core.Attribute","type":{"_class":"class:core.RefTo","to":"class:core.Class"}},"_objectId":{"_class":"class:core.Attribute","type":{"_class":"class:core.RefTo","to":"class:core.Doc"}},"title":{"_class":"class:core.Attribute","type":{"_class":"class:core.Type"}}},"_id":"class:core.Title","_class":"class:core.Class","_kind":0,"_extends":"class:core.Doc","_domain":"title"},{"_attributes":{"shortId":{"_class":"class:core.Attribute","type":{"_class":"class:core.Type"}}},"_id":"mixin:core.References","_class":"class:core.Mixin","_kind":1,"_extends":"class:core.VDoc"},{"_attributes":{"name":{"_class":"class:core.Attribute","type":{"_class":"class:core.Type"}},"description":{"_class":"class:core.Attribute","type":{"_class":"class:core.Type"}},"rate":{"_class":"class:core.Attribute","type":{"_class":"class:core.Type"}},"lists":{"_class":"class:core.Attribute","type":{"_class":"class:core.Type"}},"mainTask":{"_class":"class:core.Attribute","type":{"_class":"class:core.InstanceOf","of":"core.class.SubTask"}},"tasks":{"_class":"class:core.Attribute","type":{"_class":"class:core.ArrayOf","of":{"_class":"class:core.InstanceOf","of":"core.class.SubTask"}}},"comments":{"_class":"class:core.Attribute","type":{"_class":"class:core.ArrayOf","of":{"_class":"class:core.InstanceOf","of":"core.class.TaskComment"}}}},"_mixins":["mixin:core.Indices"],"primary|mixin:core~Indices":"name","_id":"core.class.TaskObj","_class":"class:core.Class","_kind":0,"_extends":"class:core.Doc","_domain":"model"},{"_attributes":{"name":{"_class":"class:core.Attribute","type":{"_class":"class:core.Type"}},"rate":{"_class":"class:core.Attribute","type":{"_class":"class:core.Type"}},"comments":{"_class":"class:core.Attribute","type":{"_class":"class:core.ArrayOf","of":{"_class":"class:core.InstanceOf","of":"core.class.TaskComment"}}}},"_id":"core.class.SubTask","_class":"class:core.Class","_kind":0,"_extends":"class:core.Emb","_domain":"model"},{"_attributes":{"_id":{"_class":"class:core.Attribute","type":{"_class":"class:core.Type"}},"message":{"_class":"class:core.Attribute","type":{"_class":"class:core.Type"}},"author":{"_class":"class:core.Attribute","type":{"_class":"class:core.Type"}},"date":{"_class":"class:core.Attribute","type":{"_class":"class:core.Type"}},"oldVersion":{"_class":"class:core.Attribute","type":{"_class":"class:core.ArrayOf","of":{"_class":"class:core.InstanceOf","of":"core.class.TaskComment"}}}},"_id":"core.class.TaskComment","_class":"class:core.Class","_kind":0,"_extends":"class:core.Emb","_domain":"model"}]
+[
+  {
+    "_attributes": {},
+    "_id": "class:core.Obj",
+    "_class": "class:core.Class",
+    "_kind": 0
+  },
+  {
+    "_attributes": {},
+    "_id": "class:core.Emb",
+    "_class": "class:core.Class",
+    "_kind": 0,
+    "_extends": "class:core.Obj"
+  },
+  {
+    "_attributes": {
+      "_id": {
+        "_class": "class:core.Attribute",
+        "type": {
+          "_class": "class:core.Type"
+        }
+      },
+      "_mixins": {
+        "_class": "class:core.Attribute",
+        "type": {
+          "_class": "class:core.Type"
+        }
+      }
+    },
+    "_id": "class:core.Doc",
+    "_class": "class:core.Class",
+    "_kind": 0,
+    "_extends": "class:core.Obj"
+  },
+  {
+    "_attributes": {
+      "_kind": {
+        "_class": "class:core.Attribute",
+        "type": {
+          "_class": "class:core.Type"
+        }
+      },
+      "_attributes": {
+        "_class": "class:core.Attribute",
+        "type": {
+          "_class": "class:core.BagOf",
+          "of": {
+            "_class": "class:core.InstanceOf",
+            "of": "class:core.Emb"
+          }
+        }
+      },
+      "_extends": {
+        "_class": "class:core.Attribute",
+        "type": {
+          "_class": "class:core.RefTo",
+          "to": "class:core.Class"
+        }
+      }
+    },
+    "_id": "class:core.Classifier",
+    "_class": "class:core.Class",
+    "_kind": 0,
+    "_extends": "class:core.Doc",
+    "_domain": "model"
+  },
+  {
+    "_attributes": {
+      "_native": {
+        "_class": "class:core.Attribute",
+        "type": {
+          "_class": "class:core.Type"
+        }
+      },
+      "_domain": {
+        "_class": "class:core.Attribute",
+        "type": {
+          "_class": "class:core.Type"
+        }
+      }
+    },
+    "_id": "class:core.Class",
+    "_class": "class:core.Class",
+    "_kind": 0,
+    "_extends": "class:core.Classifier",
+    "_domain": "model"
+  },
+  {
+    "_attributes": {
+      "type": {
+        "_class": "class:core.Attribute",
+        "type": {
+          "_class": "class:core.Type"
+        }
+      }
+    },
+    "_id": "class:core.Attribute",
+    "_class": "class:core.Class",
+    "_kind": 0,
+    "_extends": "class:core.Emb",
+    "_domain": "model"
+  },
+  {
+    "_attributes": {
+      "_default": {
+        "_class": "class:core.Attribute",
+        "type": {
+          "_class": "class:core.Type"
+        }
+      }
+    },
+    "_id": "class:core.Type",
+    "_class": "class:core.Class",
+    "_kind": 0,
+    "_extends": "class:core.Emb",
+    "_domain": "model"
+  },
+  {
+    "_attributes": {},
+    "_id": "class:core.Mixin",
+    "_class": "class:core.Class",
+    "_kind": 0,
+    "_extends": "class:core.Class",
+    "_domain": "model"
+  },
+  {
+    "_attributes": {
+      "_objectClass": {
+        "_class": "class:core.Attribute",
+        "type": {
+          "_class": "class:core.RefTo",
+          "to": "class:core.Class"
+        }
+      },
+      "_objectId": {
+        "_class": "class:core.Attribute",
+        "type": {
+          "_class": "class:core.RefTo",
+          "to": "class:core.Doc"
+        }
+      },
+      "title": {
+        "_class": "class:core.Attribute",
+        "type": {
+          "_class": "class:core.Type"
+        }
+      }
+    },
+    "_id": "class:core.Title",
+    "_class": "class:core.Class",
+    "_kind": 0,
+    "_extends": "class:core.Doc",
+    "_domain": "title"
+  },
+  {
+    "_attributes": {
+      "shortId": {
+        "_class": "class:core.Attribute",
+        "type": {
+          "_class": "class:core.Type"
+        }
+      }
+    },
+    "_id": "mixin:core.References",
+    "_class": "class:core.Mixin",
+    "_kind": 1,
+    "_extends": "class:core.VDoc"
+  },
+  {
+    "_attributes": {
+      "name": {
+        "_class": "class:core.Attribute",
+        "type": {
+          "_class": "class:core.Type"
+        }
+      },
+      "description": {
+        "_class": "class:core.Attribute",
+        "type": {
+          "_class": "class:core.Type"
+        }
+      },
+      "rate": {
+        "_class": "class:core.Attribute",
+        "type": {
+          "_class": "class:core.Type"
+        }
+      },
+      "lists": {
+        "_class": "class:core.Attribute",
+        "type": {
+          "_class": "class:core.Type"
+        }
+      },
+      "mainHabit": {
+        "_class": "class:core.Attribute",
+        "type": {
+          "_class": "class:core.InstanceOf",
+          "of": "core.class.SubHabit"
+        }
+      },
+      "habits": {
+        "_class": "class:core.Attribute",
+        "type": {
+          "_class": "class:core.ArrayOf",
+          "of": {
+            "_class": "class:core.InstanceOf",
+            "of": "core.class.SubHabit"
+          }
+        }
+      },
+      "comments": {
+        "_class": "class:core.Attribute",
+        "type": {
+          "_class": "class:core.ArrayOf",
+          "of": {
+            "_class": "class:core.InstanceOf",
+            "of": "core.class.HabitComment"
+          }
+        }
+      }
+    },
+    "_mixins": [
+      "mixin:core.Indices"
+    ],
+    "primary|mixin:core~Indices": "name",
+    "_id": "core.class.HabitObj",
+    "_class": "class:core.Class",
+    "_kind": 0,
+    "_extends": "class:core.Doc",
+    "_domain": "model"
+  },
+  {
+    "_attributes": {
+      "name": {
+        "_class": "class:core.Attribute",
+        "type": {
+          "_class": "class:core.Type"
+        }
+      },
+      "rate": {
+        "_class": "class:core.Attribute",
+        "type": {
+          "_class": "class:core.Type"
+        }
+      },
+      "comments": {
+        "_class": "class:core.Attribute",
+        "type": {
+          "_class": "class:core.ArrayOf",
+          "of": {
+            "_class": "class:core.InstanceOf",
+            "of": "core.class.HabitComment"
+          }
+        }
+      }
+    },
+    "_id": "core.class.SubHabit",
+    "_class": "class:core.Class",
+    "_kind": 0,
+    "_extends": "class:core.Emb",
+    "_domain": "model"
+  },
+  {
+    "_attributes": {
+      "_id": {
+        "_class": "class:core.Attribute",
+        "type": {
+          "_class": "class:core.Type"
+        }
+      },
+      "message": {
+        "_class": "class:core.Attribute",
+        "type": {
+          "_class": "class:core.Type"
+        }
+      },
+      "author": {
+        "_class": "class:core.Attribute",
+        "type": {
+          "_class": "class:core.Type"
+        }
+      },
+      "date": {
+        "_class": "class:core.Attribute",
+        "type": {
+          "_class": "class:core.Type"
+        }
+      },
+      "oldVersion": {
+        "_class": "class:core.Attribute",
+        "type": {
+          "_class": "class:core.ArrayOf",
+          "of": {
+            "_class": "class:core.InstanceOf",
+            "of": "core.class.HabitComment"
+          }
+        }
+      }
+    },
+    "_id": "core.class.HabitComment",
+    "_class": "class:core.Class",
+    "_kind": 0,
+    "_extends": "class:core.Emb",
+    "_domain": "model"
+  },
+  {
+    "_attributes": {
+      "name": {
+        "_class": "class:core.Attribute",
+        "type": {
+          "_class": "class:core.Type"
+        }
+      },
+      "description": {
+        "_class": "class:core.Attribute",
+        "type": {
+          "_class": "class:core.Type"
+        }
+      },
+      "rate": {
+        "_class": "class:core.Attribute",
+        "type": {
+          "_class": "class:core.Type"
+        }
+      },
+      "lists": {
+        "_class": "class:core.Attribute",
+        "type": {
+          "_class": "class:core.Type"
+        }
+      },
+      "mainTask": {
+        "_class": "class:core.Attribute",
+        "type": {
+          "_class": "class:core.InstanceOf",
+          "of": "core.class.SubTask"
+        }
+      },
+      "tasks": {
+        "_class": "class:core.Attribute",
+        "type": {
+          "_class": "class:core.ArrayOf",
+          "of": {
+            "_class": "class:core.InstanceOf",
+            "of": "core.class.SubTask"
+          }
+        }
+      },
+      "comments": {
+        "_class": "class:core.Attribute",
+        "type": {
+          "_class": "class:core.ArrayOf",
+          "of": {
+            "_class": "class:core.InstanceOf",
+            "of": "core.class.TaskComment"
+          }
+        }
+      }
+    },
+    "_mixins": [
+      "mixin:core.Indices"
+    ],
+    "primary|mixin:core~Indices": "name",
+    "_id": "core.class.TaskObj",
+    "_class": "class:core.Class",
+    "_kind": 0,
+    "_extends": "class:core.Doc",
+    "_domain": "model"
+  },
+  {
+    "_attributes": {
+      "name": {
+        "_class": "class:core.Attribute",
+        "type": {
+          "_class": "class:core.Type"
+        }
+      },
+      "rate": {
+        "_class": "class:core.Attribute",
+        "type": {
+          "_class": "class:core.Type"
+        }
+      },
+      "comments": {
+        "_class": "class:core.Attribute",
+        "type": {
+          "_class": "class:core.ArrayOf",
+          "of": {
+            "_class": "class:core.InstanceOf",
+            "of": "core.class.TaskComment"
+          }
+        }
+      }
+    },
+    "_id": "core.class.SubTask",
+    "_class": "class:core.Class",
+    "_kind": 0,
+    "_extends": "class:core.Emb",
+    "_domain": "model"
+  },
+  {
+    "_attributes": {
+      "_id": {
+        "_class": "class:core.Attribute",
+        "type": {
+          "_class": "class:core.Type"
+        }
+      },
+      "message": {
+        "_class": "class:core.Attribute",
+        "type": {
+          "_class": "class:core.Type"
+        }
+      },
+      "author": {
+        "_class": "class:core.Attribute",
+        "type": {
+          "_class": "class:core.Type"
+        }
+      },
+      "date": {
+        "_class": "class:core.Attribute",
+        "type": {
+          "_class": "class:core.Type"
+        }
+      },
+      "oldVersion": {
+        "_class": "class:core.Attribute",
+        "type": {
+          "_class": "class:core.ArrayOf",
+          "of": {
+            "_class": "class:core.InstanceOf",
+            "of": "core.class.TaskComment"
+          }
+        }
+      }
+    },
+    "_id": "core.class.TaskComment",
+    "_class": "class:core.Class",
+    "_kind": 0,
+    "_extends": "class:core.Emb",
+    "_domain": "model"
+  }
+]

@@ -13,18 +13,28 @@
 // limitations under the License.
 //
 
-import { Builder } from '../index'
-import { fullModel } from './test_tasks'
-import { fullModelHabit } from './test_habits'
-import { writeFile } from 'fs'
-
-const builder = new Builder()
-fullModel(builder)
-fullModelHabit(builder)
-
-writeFile('../core/src/__tests__/model.json', JSON.stringify(builder.dump()), (err: Error | null) => {
-  if (err) {
-    return console.log(err)
+declare module '*.svelte' {
+  interface ComponentOptions<Props> {
+    target: HTMLElement;
+    anchor?: HTMLElement;
+    props?: Props;
+    hydrate?: boolean;
+    intro?: boolean;
   }
-  console.log('model saved')
-})
+
+  interface Component<Props> {
+    new(options: ComponentOptions<Props>): any;
+    $set: (props: Props) => any;
+    $on: (event: string, callback: (event: CustomEvent) => any) => any;
+    $destroy: () => any;
+    render: (props?: Props) => {
+      html: string;
+      css: { code: string; map?: string };
+      head?: string;
+    };
+  }
+
+  const component: Component<Record<string, unknown>>
+
+  export default component
+}

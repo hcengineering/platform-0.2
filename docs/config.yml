@@ -67,6 +67,7 @@ markup:
         strikethrough: true
         table: true
         taskList: true
+        habitList: true
         typographer: true
 
   highlight:

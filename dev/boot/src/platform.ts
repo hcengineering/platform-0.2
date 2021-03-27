@@ -22,6 +22,7 @@ import login from '@anticrm/login'
 import workbench from '@anticrm/workbench'
 import presentation from '@anticrm/presentation'
 import task from '@anticrm/task'
+import habit from '@anticrm/habit'
 import contact from '@anticrm/contact'
 import chunter from '@anticrm/chunter'
 import guidebook from '@anticrm/guidebook'
@@ -30,6 +31,7 @@ import uiMeta from '@anticrm/platform-ui/src/__meta__/meta'
 import workbenchMeta from '@anticrm/workbench/src/__meta__'
 import chunterMeta from '@anticrm/chunter/src/__meta__'
 import taskMeta from '@anticrm/task/src/__meta__'
+import habitMeta from '@anticrm/habit/src/__meta__'
 import presentationMeta from '@anticrm/presentation/src/__meta__'
 import loginMeta from '@anticrm/login/src/__meta__'
 // import contactMeta from '@anticrm/contact/src/__meta__/meta'
@@ -48,6 +50,7 @@ platform.addLocation(login, () => import(/* webpackChunkName: "login" */ '@antic
 platform.addLocation(presentation, () => import(/* webpackChunkName: "presentation" */ '@anticrm/presentation/src/plugin'))
 platform.addLocation(workbench, () => import(/* webpackChunkName: "workbench" */ '@anticrm/workbench/src/plugin'))
 platform.addLocation(task, () => import(/* webpackChunkName: "task" */ '@anticrm/task/src/plugin'))
+platform.addLocation(habit, () => import(/* webpackChunkName: "habit" */ '@anticrm/habit/src/plugin'))
 platform.addLocation(contact, () => import(/* webpackChunkName: "contact" */ '@anticrm/contact/src/plugin'))
 platform.addLocation(chunter, () => import(/* webpackChunkName: "chunter" */ '@anticrm/chunter/src/plugin'))
 platform.addLocation(guidebook, () => import(/* webpackChunkName: "guidebook" */ '@anticrm/guidebook/src/plugin'))
@@ -58,6 +61,7 @@ workbenchMeta(platform)
 chunterMeta(platform)
 // recruitmentMeta(platform)
 taskMeta(platform)
+habitMeta(platform)
 presentationMeta(platform)
 loginMeta(platform)
 // contactMeta(platform)

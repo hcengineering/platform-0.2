@@ -1,5 +1,5 @@
-//
-// Copyright © 2020, 2021 Anticrm Platform Contributors.
+<!--
+// Copyright © 2020 Anticrm Platform Contributors.
 //
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
@@ -11,20 +11,17 @@
 //
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
+-->
+<script lang="ts">
+  import { Tx } from '@anticrm/core'
+  import { CORE_CLASS_CREATE_TX, CreateTx } from '@anticrm/domains'
+  import { Habit } from '../..'
 
-import { Builder } from '../index'
-import { fullModel } from './test_tasks'
-import { fullModelHabit } from './test_habits'
-import { writeFile } from 'fs'
+  export let tx: Tx
 
-const builder = new Builder()
-fullModel(builder)
-fullModelHabit(builder)
-
-writeFile('../core/src/__tests__/model.json', JSON.stringify(builder.dump()), (err: Error | null) => {
-  if (err) {
-    return console.log(err)
+  function habitTitle () {
+    return (((tx as CreateTx).object as unknown) as Habit).title
   }
-  console.log('model saved')
-})
+</script>
+
+{#if tx._class === CORE_CLASS_CREATE_TX}Создал задачу <b>{habitTitle()}</b>{/if}
