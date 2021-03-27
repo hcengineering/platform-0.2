@@ -19,6 +19,7 @@
   import { AttrModel, ClassModel } from '../..'
   import { createLiveQuery, getEmptyModel, getPresentationService } from '../../utils'
   import Presenter from './presenters/Presenter.svelte'
+  import HabitControl from '@anticrm/habit/src/components/internal/HabitControl.svelte'
 
   export let _class: Ref<Class<Doc>>
   export let space: Space
@@ -104,27 +105,41 @@
   }
 </style>
 
-<div class="erp-table">
-  <div class="thead">
-    <div class="tr">
-      {#each attributes as attr (attr.key)}
-        <div class="th">{attr.label}</div>
+{#if modelClass === 'class:habit.Habit'}
+  <HabitControl {objects} {attributes} {dispatch}></HabitControl>
+<!--  <HabitControl></HabitControl>-->
+<!--  {#each objects as object (object._id)}-->
+<!--    <div class="tr" on:click={() => dispatch('open', { _id: object._id, _class: object._class })}>-->
+<!--      {#each attributes as attr (attr.key)}-->
+<!--        {#if attr.label === 'Name'}-->
+<!--          <div>{object[attr.key] || ''}</div>-->
+<!--        {/if}-->
+<!--      {/each}-->
+<!--    </div>-->
+<!--  {/each}-->
+{:else }
+  <div class="erp-table">
+    <div class="thead">
+      <div class="tr">
+        {#each attributes as attr (attr.key)}
+          <div class="th">{attr.label}</div>
+        {/each}
+      </div>
+    </div>
+    <div class="tbody">
+      {#each objects as object (object._id)}
+        <div class="tr" on:click={() => dispatch('open', { _id: object._id, _class: object._class })}>
+          {#each attributes as attr (attr.key)}
+            <div class="td">
+              {#if attr.presenter}
+                <Presenter is={attr.presenter} value={object[attr.key] || '' } attribute={attr} {editable} />
+              {:else}
+                <span>{object[attr.key] || ''}</span>
+              {/if}
+            </div>
+          {/each}
+        </div>
       {/each}
     </div>
   </div>
-  <div class="tbody">
-    {#each objects as object (object._id)}
-      <div class="tr" on:click={() => dispatch('open', { _id: object._id, _class: object._class })}>
-        {#each attributes as attr (attr.key)}
-          <div class="td">
-            {#if attr.presenter}
-              <Presenter is={attr.presenter} value={object[attr.key] || '' } attribute={attr} {editable} />
-            {:else}
-              <span>{object[attr.key] || ''}</span>
-            {/if}
-          </div>
-        {/each}
-      </div>
-    {/each}
-  </div>
-</div>
+{/if}
