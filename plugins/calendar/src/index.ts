@@ -28,6 +28,7 @@ export enum RecurrenceType {
 }
 
 export enum CalendarEventType {
+  VACATION,
   PTO,
   SICK_LEAVE,
   EXTRA_WORK,
