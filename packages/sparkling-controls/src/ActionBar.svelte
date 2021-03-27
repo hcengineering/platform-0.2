@@ -25,6 +25,8 @@
   let visible: boolean = false
 
   let popups: number = 0
+  if (onTop < 0) onTop = 2
+  if (onTop > actions.length) onTop = actions.length
 
   function handler (event: MouseEvent): void {
     if (event.target !== thisPopup || event.target !== this.Trigger) {
@@ -40,12 +42,14 @@
 <svelte:window on:click={()=>visible = false} />
 <div class="actionBar-view">
   {#each actions.slice(0, onTop) as item}
-    <button class="button actionButton {getStyle(actions.indexOf(item), actions.length, onTop)}"
-            class:toggleState={item.toggleState}
-            on:click={() => {item.action(); visible = false;}}>{item.label}</button>
+    {#if item.label !== '-'}
+      <button class="button actionButton {getStyle(actions.indexOf(item), actions.length, onTop)}"
+              class:toggleState={item.toggleState}
+              on:click={() => {item.action(); visible = false;}}>{item.label}</button>
+    {/if}
   {/each}
   {#if (actions.length - onTop) > 0}
-    <button bind:this={thisTrigger} class="button actionButton abRight w100 wOther" class:selected={visible}
+    <button bind:this={thisTrigger} class="button actionButton {onTop !== 0 ? 'abRight' : ''} w100 wOther" class:selected={visible}
             on:click|stopPropagation={() => { visible = !visible}}>
       <div class="chevron">
         <span>Ещё</span>

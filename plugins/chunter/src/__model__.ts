@@ -49,7 +49,7 @@ export default chunter
 export class TCollab extends TVDoc implements Collab {
   @ArrayOf$()
   @InstanceOf$(chunter.class.Comment)
-  @UX('Comments' as IntlString, chunter.icon.Chunter) comments?: Comment[]
+  @UX('Comments' as IntlString, { icon: chunter.icon.Chunter }) comments?: Comment[]
 }
 
 @Class$(chunter.class.Comment, core.class.Emb)
@@ -58,14 +58,14 @@ export class TComment extends TEmb implements Comment {
   @Prop() _createdBy!: Property<string, string>
   @Prop() _createdOn!: Property<number, Date>
 
-  @UX('Message' as IntlString, chunter.icon.Chunter)
+  @UX('Message' as IntlString, { icon: chunter.icon.Chunter })
   @Prop(core.class.String) message!: string
 }
 
 @Class$(chunter.class.Message, chunter.class.Collab, ChunterDomain.Chunter)
 @UX('Message' as IntlString)
 export class TMessage extends TVDoc implements Message {
-  @UX('Message' as IntlString, chunter.icon.Chunter)
+  @UX('Message' as IntlString, { icon: chunter.icon.Chunter })
   @Prop(core.class.String)
   message!: string
 }
@@ -73,7 +73,7 @@ export class TMessage extends TVDoc implements Message {
 @Class$(chunter.class.Page, chunter.class.Collab, ChunterDomain.Chunter)
 @UX('Page' as IntlString)
 class TPage extends TMessage implements Page {
-  @Prop() @UX('Title' as IntlString, chunter.icon.Chunter) @Primary() title!: string
+  @Prop() @UX('Title' as IntlString, { icon: chunter.icon.Chunter }) @Primary() title!: string
 }
 
 @Mixin$(chunter.mixin.ActivityInfo, core.class.Mixin)

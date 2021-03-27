@@ -22,7 +22,7 @@
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
   import { CORE_MIXIN_SHORTID, Space } from '@anticrm/domains'
-  import task, { TASK_STATUS_OPEN } from '../../index'
+  import task, { TaskStatus } from '../../index'
   import EditBox from '@anticrm/sparkling-controls/src/EditBox.svelte'
   import chunter, { Comment, getChunterService } from '@anticrm/chunter'
 
@@ -47,7 +47,7 @@
     const newTask = modelDb.newDoc(task.class.Task, cs.generateId(), {
       title,
       _space: space, ...object,
-      status: TASK_STATUS_OPEN,
+      status: TaskStatus.Open,
       comments: [{
         message: message,
         _class: chunter.class.Comment,
