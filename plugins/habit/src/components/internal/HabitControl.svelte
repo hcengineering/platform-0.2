@@ -1,17 +1,12 @@
 <script lang="ts">
   import { format, isSameMonth } from 'date-fns'
   import { send, state } from '../../HabitMachine'
-  // import Day from './Day.svelte'
-  // import AddHabit from './AddHabit.svelte'
-  // import { Habit } from '../../Habit'
 
   export let objects: any
   export let attributes: any
-  export let dispatch: any
 
   $: currentDate = $state.context.currentDate
   $: currentMonth = $state.context.currentMonth
-  $: habits = $state.context.habits
 
   document.addEventListener('keydown', (e) => {
     switch (e.code) {
@@ -37,21 +32,17 @@
   </div>
 
 </main>
-<div class="grid auto-fit">
+<div class="grid auto-fill">
   {#each currentMonth as day (day.toDateString())}
-    <main>
       <div class="day"><b>{format(day, 'EEE. do')}</b>
         {#each objects as object (object._id)}
-          <div class="tr" on:click={() => dispatch('open', { _id: object._id, _class: object._class })}>
             {#each attributes as attr (attr.key)}
               {#if attr.label === 'Name'}
-                <div>{object[attr.key] || ''}</div>
+                  <div>{object[attr.key] || ''}<input type="checkbox"/></div>
               {/if}
             {/each}
-          </div>
         {/each}
       </div>
-    </main>
   {/each}
 </div>
 
@@ -62,13 +53,6 @@
         margin: 0 auto;
     }
 
-    h1 {
-        color: #ff3e00;
-        text-transform: uppercase;
-        /*font-size: 4em;*/
-        font-weight: 100;
-    }
-
     .grid {
         display: grid;
         grid-gap: 2vw;
@@ -76,7 +60,7 @@
     }
 
     .grid > div {
-        font-size: 5vw;
+        /*font-size: 5vw;*/
         padding: .5em;
         background: gold;
         text-align: center;
@@ -103,9 +87,5 @@
     div.day:hover {
         background-color: #999999;
         color: black;
-    }
-
-    div.toggle-habit {
-        text-decoration: line-through;
     }
 </style>

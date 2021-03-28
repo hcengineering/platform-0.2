@@ -2,12 +2,6 @@ import { addDays, eachDayOfInterval, endOfMonth, endOfWeek, isToday, startOfMont
 import { assign, createMachine } from 'xstate'
 import { useMachine } from 'xstate-svelte'
 
-const loadHabits = () =>
-  (JSON.parse(localStorage.getItem('habits')) ?? []) as Habit[]
-
-const saveHabits = (habits: Habit[]) =>
-  localStorage.setItem('habits', JSON.stringify(habits))
-
 export interface Habit {
   name: string;
 }
@@ -19,11 +13,7 @@ export interface AppContext {
 }
 
 export type AppEvent =
-  | { type: 'NAVIGATE'; direction: 'BACK' | 'HOME' | 'FORWARD' }
-  | { type: 'EDIT' }
-  | { type: 'CANCEL_EDIT' }
-  | { type: 'ADD_HABIT'; habit: Habit }
-  | { type: 'RESET' };
+  | { type: 'NAVIGATE'; direction: 'BACK' | 'HOME' | 'FORWARD' };
 
 const buildContext = (date: Date, habits: Habit[]): AppContext => ({
   currentDate: date,
@@ -36,7 +26,7 @@ const buildContext = (date: Date, habits: Habit[]): AppContext => ({
 
 export const habitMachine = createMachine<AppContext, AppEvent>({
   initial: 'idle',
-  context: buildContext(new Date(), loadHabits()),
+  context: buildContext(new Date(), []),
   states: {
     idle: {
       on: {
@@ -60,29 +50,8 @@ export const habitMachine = createMachine<AppContext, AppEvent>({
           cond: (ctx, evt) =>
             !(evt.direction === 'HOME' && isToday(ctx.currentDate))
         },
-        EDIT: 'edit',
-        RESET: {
-          actions: [
-            assign(buildContext(new Date(), [])),
-            () => localStorage.clear()
-          ]
-        }
       }
     },
-    edit: {
-      on: {
-        CANCEL_EDIT: 'idle',
-        ADD_HABIT: {
-          target: 'idle',
-          actions: [
-            assign({
-              habits: (ctx, evt) => ctx.habits.concat([evt.habit])
-            }),
-            (ctx) => saveHabits(ctx.habits)
-          ]
-        }
-      }
-    }
   }
 })
 

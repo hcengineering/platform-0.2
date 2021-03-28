@@ -106,17 +106,7 @@
 </style>
 
 {#if modelClass === 'class:habit.Habit'}
-  <HabitControl {objects} {attributes} {dispatch}></HabitControl>
-<!--  <HabitControl></HabitControl>-->
-<!--  {#each objects as object (object._id)}-->
-<!--    <div class="tr" on:click={() => dispatch('open', { _id: object._id, _class: object._class })}>-->
-<!--      {#each attributes as attr (attr.key)}-->
-<!--        {#if attr.label === 'Name'}-->
-<!--          <div>{object[attr.key] || ''}</div>-->
-<!--        {/if}-->
-<!--      {/each}-->
-<!--    </div>-->
-<!--  {/each}-->
+  <HabitControl {objects} {attributes}></HabitControl>
 {:else }
   <div class="erp-table">
     <div class="thead">

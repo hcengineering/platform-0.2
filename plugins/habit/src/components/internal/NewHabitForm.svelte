@@ -149,15 +149,6 @@
     </a>
   </div>
 
-  <div class="content">
-    <div class="separator"></div>
-    <ReferenceInput stylesEnabled={false} submitEnabled={false} lines={10} on:update={ (msg) => {
-         chunterService.then( (cs) => {
-           message = cs.createMissedObjects(msg.detail)
-           })
-      }} height="10em" placeholder="Description" />
-  </div>
-
   <div class="buttons">
     <Button kind="primary" on:click={save}>Принять</Button>
     <Button on:click={() => dispatch('close')}>Отказаться</Button>
