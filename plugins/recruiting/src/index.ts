@@ -33,7 +33,7 @@ export default plugin(
   { core: core.id },
   {
     icon: {
-      Candidate: '' as Asset
+      Recruiting: '' as Asset
     },
     class: {
       Candidate: '' as Ref<Class<Candidate>>
@@ -47,7 +47,7 @@ export default plugin(
       Candidate: '' as AnyComponent
     },
     application: {
-      Candidate: '' as Ref<Application>
+      Vacancies: '' as Ref<Application>
     }
   }
 )

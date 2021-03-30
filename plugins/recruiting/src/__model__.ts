@@ -15,14 +15,15 @@ import { TEmb } from '@anticrm/model/src/__model__'
 import { IntlString } from '@anticrm/platform-i18n'
 import presentation from '@anticrm/presentation'
 import { UX } from '@anticrm/presentation/src/__model__'
-import contact, { TPerson } from '@anticrm/contact/src/__model__'
+import contact from '@anticrm/contact/src/__model__'
 import workbench from '@anticrm/workbench/src/__model__'
 import { TWithResume } from '@anticrm/person-extras/src/__model__'
 import personExtras from '@anticrm/person-extras'
 
-import candidate, { Candidate, WithCandidateProps } from '.'
+import recruiting, { Candidate, WithCandidateProps } from '.'
 
-@Class$(candidate.class.Candidate, core.class.Emb)
+@Class$(recruiting.class.Candidate, core.class.Emb)
+@UX('Candidate' as IntlString)
 export class TCandidate extends TEmb implements Candidate {
   @Prop()
   @UX('Bio' as IntlString)
@@ -37,36 +38,36 @@ export class TCandidate extends TEmb implements Candidate {
   salaryExpectation!: number
 }
 
-@Mixin$(candidate.mixin.WithCandidateProps, personExtras.mixin.WithResume)
+@Mixin$(recruiting.mixin.WithCandidateProps, personExtras.mixin.WithResume)
 export class TWithCandidateProps extends TWithResume implements WithCandidateProps {
   @Prop()
-  @InstanceOf$(candidate.class.Candidate)
+  @InstanceOf$(recruiting.class.Candidate)
   candidate!: Candidate
 }
 
 export function model (S: Builder): void {
-  console.log(TWithCandidateProps)
   S.add(TCandidate, TWithCandidateProps)
   S.createDocument(workbench.class.WorkbenchApplication, {
-    route: 'candidates',
-    label: 'Candidates' as IntlString,
-    icon: candidate.icon.Candidate,
-    rootComponent: workbench.component.Application,
-    classes: [candidate.mixin.WithCandidateProps],
-    supportSpaces: false
-  }, candidate.application.Candidate)
+    route: 'vacancies',
+    label: 'Vacancies' as IntlString,
+    icon: recruiting.icon.Recruiting,
+    component: workbench.component.Application,
+    classes: [recruiting.mixin.WithCandidateProps],
+    spaceTitle: 'Vacancy',
+    supportSpaces: true
+  }, recruiting.application.Vacancies)
 
   S.createDocument(presentation.mixin.Viewlet, {
     displayClass: contact.class.Person,
     label: 'Card' as IntlString,
-    component: candidate.component.CandidateList
+    component: recruiting.component.CandidateList
   })
 
-  S.mixin(candidate.mixin.WithCandidateProps, presentation.mixin.CreateForm, {
-    component: candidate.component.NewCandidate
+  S.mixin(recruiting.mixin.WithCandidateProps, presentation.mixin.CreateForm, {
+    component: recruiting.component.NewCandidate
   })
 
-  S.mixin(candidate.mixin.WithCandidateProps, presentation.mixin.DetailForm, {
-    component: candidate.component.Candidate
+  S.mixin(recruiting.mixin.WithCandidateProps, presentation.mixin.DetailForm, {
+    component: recruiting.component.Candidate
   })
 }

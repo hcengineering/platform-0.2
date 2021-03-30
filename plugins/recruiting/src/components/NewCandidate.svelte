@@ -15,7 +15,8 @@ limitations under the License.
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
 
-  import { DateProperty, generateId, StringProperty } from '@anticrm/core'
+  import { DateProperty, generateId, Ref, StringProperty } from '@anticrm/core'
+  import { Space } from '@anticrm/domains'
   import contact, { Person } from '@anticrm/contact'
   import personExtras from '@anticrm/person-extras'
   import { getCoreService } from '@anticrm/presentation'
@@ -29,6 +30,8 @@ limitations under the License.
 
   import candidate, { WithCandidateProps } from '..'
 
+  export let space: Ref<Space>
+
   const coreP = getCoreService()
   const modelP = coreP.then((c) => c.getModel())
   const dispatch = createEventDispatcher()
@@ -36,7 +39,7 @@ limitations under the License.
   const personM: Person = {
     _id: generateId(),
     _class: contact.class.Person,
-    _space: workbench.space.General,
+    _space: space,
     _createdBy: '' as StringProperty,
     _createdOn: Date.now() as DateProperty,
     name: ''
@@ -65,6 +68,7 @@ limitations under the License.
 
     const doc = {
       ...personM,
+      _space: space, // Just to get latest space
       _createBy: core.getUserId()
     }
 

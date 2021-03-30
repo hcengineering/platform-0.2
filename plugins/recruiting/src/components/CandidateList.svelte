@@ -15,13 +15,17 @@ limitations under the License.
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
 
+  import { Ref } from '@anticrm/core'
+  import { Space } from '@anticrm/domains'
   import contact from '@anticrm/contact/src/__model__'
-  import { createLiveQuery, getCoreService } from '@anticrm/presentation'
+  import { createLiveQuery, getCoreService, updateLiveQuery } from '@anticrm/presentation'
 
   import UserInfo from '@anticrm/sparkling-controls/src/UserInfo.svelte'
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
 
-  import candidate, { Candidate, WithCandidateProps } from '..'
+  import candidate, { WithCandidateProps } from '..'
+
+  export let space: Space
 
   const core = getCoreService()
   const model = core.then((s) => s.getModel())
@@ -29,9 +33,20 @@ limitations under the License.
 
   let candidates: WithCandidateProps[] = []
 
-  createLiveQuery(contact.class.Person, { _mixins: candidate.mixin.WithCandidateProps }, (docs) => {
-    model.then((m) => docs.map((x) => m.as(x, candidate.mixin.WithCandidateProps))).then((xs) => (candidates = xs))
-  })
+  const query = createLiveQuery(
+    contact.class.Person,
+    { _mixins: candidate.mixin.WithCandidateProps, _space: space._id },
+    (docs) => {
+      model.then((m) => docs.map((x) => m.as(x, candidate.mixin.WithCandidateProps))).then((xs) => (candidates = xs))
+    }
+  )
+
+  $: {
+    updateLiveQuery(query, contact.class.Person, {
+      _mixins: candidate.mixin.WithCandidateProps,
+      _space: space._id
+    })
+  }
 </script>
 
 <ScrollView width="100%" height="100%">
