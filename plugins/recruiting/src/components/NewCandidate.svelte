@@ -17,7 +17,7 @@ limitations under the License.
 
   import { DateProperty, generateId, StringProperty } from '@anticrm/core'
   import contact, { Person } from '@anticrm/contact'
-  import personExtras, { Resume, WithResume } from '@anticrm/person-extras'
+  import personExtras from '@anticrm/person-extras'
   import { getCoreService } from '@anticrm/presentation'
   import workbench from '@anticrm/workbench/src/__model__'
 
@@ -27,7 +27,7 @@ limitations under the License.
   import ResumeEditor from '@anticrm/person-extras/src/components/ResumeEditor.svelte'
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
 
-  import candidate, { Candidate, WithCandidateProps } from '..'
+  import candidate, { WithCandidateProps } from '..'
 
   const coreP = getCoreService()
   const modelP = coreP.then((c) => c.getModel())
@@ -42,25 +42,21 @@ limitations under the License.
     name: ''
   }
 
-  let candidateM: Partial<WithCandidateProps> & { candidate: Candidate } = {
-    candidate: {
-      __embedded: true,
-      _class: candidate.class.Candidate,
-      bio: '',
-      role: '',
-      salaryExpectation: 0
-    }
+  let candidateM: WithCandidateProps['candidate'] = {
+    __embedded: true,
+    _class: candidate.class.Candidate,
+    bio: '',
+    role: '',
+    salaryExpectation: 0
   }
 
-  let resumeM: Partial<WithResume> & { resume: Resume } = {
-    resume: {
-      __embedded: true,
-      _class: personExtras.class.Resume,
-      skills: [],
-      hobbies: [],
-      experience: [],
-      profInterests: []
-    }
+  let resumeM: WithCandidateProps['resume'] = {
+    __embedded: true,
+    _class: personExtras.class.Resume,
+    skills: [],
+    hobbies: [],
+    experience: [],
+    profInterests: []
   }
 
   async function save() {
@@ -72,8 +68,10 @@ limitations under the License.
       _createBy: core.getUserId()
     }
 
-    model.mixinDocument(doc, candidate.mixin.WithCandidateProps, candidateM)
-    model.mixinDocument(doc, personExtras.mixin.WithResume, resumeM)
+    model.mixinDocument(doc, candidate.mixin.WithCandidateProps, {
+      candidate: candidateM,
+      resume: resumeM
+    })
 
     await core.create(contact.class.Person, doc)
 
@@ -93,14 +91,9 @@ limitations under the License.
       <EditBox bind:value={personM.name} width="100%" label="Name" placeholder="Name" />
       <EditBox bind:value={personM.email} width="100%" label="Email" placeholder="vasya@email.com" />
       <EditBox bind:value={personM.phone} width="100%" label="Phone" placeholder="+71234567890" />
-      <EditBox bind:value={candidateM.candidate.bio} width="100%" label="Bio" />
-      <EditBox bind:value={candidateM.candidate.role} width="100%" label="Role" placeholder="Повар" />
-      <EditBox
-        bind:value={candidateM.candidate.salaryExpectation}
-        width="100%"
-        label="Salary Expectation"
-        placeholder="100500"
-      />
+      <EditBox bind:value={candidateM.bio} width="100%" label="Bio" />
+      <EditBox bind:value={candidateM.role} width="100%" label="Role" placeholder="Повар" />
+      <EditBox bind:value={candidateM.salaryExpectation} width="100%" label="Salary Expectation" placeholder="100500" />
       <ResumeEditor bind:resume={resumeM} />
     </div>
   </ScrollView>

@@ -17,7 +17,6 @@ limitations under the License.
 
   import { createLiveQuery, getCoreService, updateLiveQuery } from '@anticrm/presentation'
   import contact from '@anticrm/contact/src/__model__'
-  import personExtras, { WithResume } from '@anticrm/person-extras'
 
   import UserInfo from '@anticrm/sparkling-controls/src/UserInfo.svelte'
   import ResumeProps from '@anticrm/person-extras/src/components/ResumeProps.svelte'
@@ -30,7 +29,7 @@ limitations under the License.
   export let object: WithCandidateProps
   let person: Person | undefined
   let candidate: WithCandidateProps['candidate'] | undefined
-  let resume: WithResume['resume'] | undefined
+  let resume: WithCandidateProps['resume'] | undefined
 
   const query = createLiveQuery(
     contact.class.Person,
@@ -38,8 +37,10 @@ limitations under the License.
     (docs) =>
       model.then((m) => {
         person = docs[0]
-        candidate = person && m.as(person, candidatePlugin.mixin.WithCandidateProps).candidate
-        resume = person && m.as(person, personExtras.mixin.WithResume).resume
+
+        const candidateMixin = person && m.as(person, candidatePlugin.mixin.WithCandidateProps)
+        candidate = candidateMixin?.candidate
+        resume = candidateMixin?.resume
       })
   )
 

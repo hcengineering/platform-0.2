@@ -17,6 +17,8 @@ import presentation from '@anticrm/presentation'
 import { UX } from '@anticrm/presentation/src/__model__'
 import contact, { TPerson } from '@anticrm/contact/src/__model__'
 import workbench from '@anticrm/workbench/src/__model__'
+import { TWithResume } from '@anticrm/person-extras/src/__model__'
+import personExtras from '@anticrm/person-extras'
 
 import candidate, { Candidate, WithCandidateProps } from '.'
 
@@ -35,14 +37,15 @@ export class TCandidate extends TEmb implements Candidate {
   salaryExpectation!: number
 }
 
-@Mixin$(candidate.mixin.WithCandidateProps, contact.class.Person)
-export class TWithCandidateProps extends TPerson implements WithCandidateProps {
+@Mixin$(candidate.mixin.WithCandidateProps, personExtras.mixin.WithResume)
+export class TWithCandidateProps extends TWithResume implements WithCandidateProps {
   @Prop()
   @InstanceOf$(candidate.class.Candidate)
   candidate!: Candidate
 }
 
 export function model (S: Builder): void {
+  console.log(TWithCandidateProps)
   S.add(TCandidate, TWithCandidateProps)
   S.createDocument(workbench.class.WorkbenchApplication, {
     route: 'candidates',

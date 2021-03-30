@@ -15,7 +15,7 @@ import core from '@anticrm/platform-core'
 import { Plugin, plugin, Service } from '@anticrm/platform'
 import { Application } from '@anticrm/domains'
 import { Asset, AnyComponent } from '@anticrm/platform-ui'
-import { Person } from '@anticrm/contact'
+import { WithResume } from '@anticrm/person-extras'
 
 export interface Candidate extends Emb {
   bio: string
@@ -23,7 +23,7 @@ export interface Candidate extends Emb {
   salaryExpectation: number
 }
 
-export interface WithCandidateProps extends Person {
+export interface WithCandidateProps extends WithResume {
   candidate: Candidate
 }
 

@@ -18,9 +18,9 @@ limitations under the License.
 
   import { Resume, WithResume } from '..'
 
-  export let resume: Partial<WithResume> & { resume: Resume }
+  export let resume: Resume
 </script>
 
-<SkillsEditor bind:skills={resume.resume.skills} />
-<StringListEditor bind:items={resume.resume.profInterests} label="Interest" />
-<StringListEditor bind:items={resume.resume.hobbies} label="Hobby" />
+<SkillsEditor bind:skills={resume.skills} />
+<StringListEditor bind:items={resume.profInterests} label="Interest" />
+<StringListEditor bind:items={resume.hobbies} label="Hobby" />
