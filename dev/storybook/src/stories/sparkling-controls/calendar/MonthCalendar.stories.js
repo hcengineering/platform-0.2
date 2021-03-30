@@ -43,24 +43,26 @@ const Template = ({ onClick, ...args }) => ({
 
 export const Default = Template.bind({})
 Default.args = {
-  weekFormat: 'short'
+  weekFormat: 'short',
+  selectedDate: new Date(2020, 4, 1)
 }
 
 export const SelectedDay = Template.bind({})
 SelectedDay.args = {
   weekFormat: 'short',
-  selectedDate: new Date
+  selectedDate: new Date(2020, 4, 1)
 }
 
 export const MondayFirst = Template.bind({})
 MondayFirst.args = {
   mondayStart: true,
-  weekFormat: 'short'
+  weekFormat: 'short',
+  selectedDate: new Date(2020, 4, 1)
 }
 
 export const TomorrowSelected = Template.bind({})
 TomorrowSelected.args = {
   mondayStart: true,
   weekFormat: 'long',
-  selectedDate: new Date(new Date - 86400000)
+  selectedDate: new Date(new Date(2020, 4, 1) - 86400000)
 }
