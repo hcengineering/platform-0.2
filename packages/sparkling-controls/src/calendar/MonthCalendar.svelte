@@ -20,6 +20,7 @@
     day,
     firstDay,
     getMonthName,
+    getWeekDayName,
     incrementMonth,
     isWeekend,
     weekday
@@ -31,13 +32,6 @@
 
   let currentDate: Date = new Date()
   let firstDayOfCurrentMonth: Date = firstDay(currentDate, mondayStart)
-
-  function getWeekDayName(weekDay: Date): string {
-    let locale = new Intl.NumberFormat().resolvedOptions().locale;
-    return new Intl.DateTimeFormat(locale, {
-      weekday: weekFormat
-    }).format(weekDay)
-  }
 
   function onSelect(date: Date) {
     selectedDate = date;
@@ -101,7 +95,7 @@
   </div>
   <div class="days-of-week-header">
     {#each [...Array(7).keys()] as dayOfWeek}
-      <div class="day-name">{getWeekDayName(day(firstDayOfCurrentMonth, dayOfWeek))}</div>
+      <div class="day-name">{getWeekDayName(day(firstDayOfCurrentMonth, dayOfWeek), weekFormat)}</div>
     {/each}
   </div>
   <div class="days-of-month">
