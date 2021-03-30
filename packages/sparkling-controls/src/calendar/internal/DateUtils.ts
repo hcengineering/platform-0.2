@@ -39,15 +39,18 @@ export function day (firstDay: Date, offset: number): Date {
   return new Date(firstDay.getTime() + offset * MILLISECONDS_IN_DAY)
 }
 
-export function weekday (firstDay: Date, w: any, d: number): Date {
-  return day(firstDay, (w - 1) * DAYS_IN_WEEK + (d - 1))
+export function weekday (firstDay: Date, w: number, d: number): Date {
+  return day(firstDay, w * DAYS_IN_WEEK + d)
 }
 
-export function areDatesEqual (firstDate: Date, secondDate: Date): boolean {
+export function areDatesEqual (firstDate: Date | undefined, secondDate: Date | undefined): boolean {
+  if (firstDate === undefined || secondDate === undefined) {
+    return false
+  }
   return (
     firstDate.getFullYear() === secondDate.getFullYear() &&
-        firstDate.getMonth() === secondDate.getMonth() &&
-        firstDate.getDate() === secondDate.getDate()
+    firstDate.getMonth() === secondDate.getMonth() &&
+    firstDate.getDate() === secondDate.getDate()
   )
 }
 

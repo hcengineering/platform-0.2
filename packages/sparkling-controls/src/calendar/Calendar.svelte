@@ -14,27 +14,23 @@
 -->
 
 <script type="ts">
-  import {} from './DateUtils';
+  import Button from '@anticrm/sparkling-controls/src/Button.svelte'
+  import {
+    areDatesEqual, 
+    day,
+    firstDay,
+    getMonthName,
+    incrementMonth,
+    isWeekend,
+    weekday
+  } from './internal/DateUtils';
 
   export let mondayStart: boolean = false
   export let weekFormat: "narrow" | "short" | "long" | undefined = 'short'
-  export let date: Date = new Date()
-  let currentDate: Date = new Date()
-  let selected: Date = new Date()
+  export let selectedDate: Date | undefined = undefined
 
-  function firstDay(): Date {
-    let firstDayOfMonth = new Date(date)
-    firstDayOfMonth.setDate(1) // First day of month
-    let result = new Date(firstDayOfMonth)
-    result.setDate(
-      result.getDate() - result.getDay() + (mondayStart ? 1 : 0)
-    )
-    // Check if we Need add one more week
-    if (result.getTime() > firstDayOfMonth.getTime()) {
-      result.setDate(result.getDate() - 7)
-    }
-    return result
-  }
+  let currentDate: Date = new Date()
+  let firstDayOfCurrentMonth: Date = firstDay(currentDate, mondayStart)
 
   function getWeekDayName(weekDay: Date): string {
     let locale = new Intl.NumberFormat().resolvedOptions().locale;
@@ -43,55 +39,21 @@
     }).format(weekDay)
   }
 
-  function day(offset: number): Date {
-   return new Date(firstDay().getTime() + offset * 86400000)
-  }
-
-  function wday(w: any, d: number): Date {
-        return day((w - 1) * 7 + (d - 1));
-  }
-
-  function isToday(date: Date) {
-        let now = new Date()
-        return (
-          date.getFullYear() == now.getFullYear() &&
-          date.getMonth() == now.getMonth() &&
-          date.getDate() == now.getDate()
-        )
-      }
-
-  function isSelected(date: Date) {
-        let s = selected
-        return (
-          date.getFullYear() == s.getFullYear() &&
-          date.getMonth() == s.getMonth() &&
-          date.getDate() == s.getDate()
-        )
-      }
-
-  function isWeekend(date: Date) {
-        return date.getDay() == 0 || date.getDay() == 6
-  }
   function onSelect(date: Date) {
-        selected = date;
+    selectedDate = date;
   }
-  function getMonthName(date: Date): string {
-        let locale = new Intl.NumberFormat().resolvedOptions().locale
-        return new Intl.DateTimeFormat(locale, { month: "long" }).format(date)
+
+  function incMonth(count: number) {
+    if (count) {
+      currentDate = incrementMonth(currentDate, count);
+      firstDayOfCurrentMonth = firstDay(currentDate, mondayStart);
+    }
   }
-  function incMonth(val: number) {
-        if (val == 0) {
-          currentDate = new Date();
-          return;
-        }
-        let dte = new Date(currentDate);
-        dte.setMonth(dte.getMonth() + val);
-        currentDate = dte;
-      }
 </script>
 
 <style lang="scss">
-  .selected-month {
+  .day-name,
+  .selected-month-controller {
     display: flex;
     justify-content: center;
   }
@@ -100,10 +62,61 @@
     display: grid;
     grid-template-columns: repeat(7, 1fr);
   }
+  .weekend {
+    background-color: var(--theme-bg-accent-color);
+  }
+  .today {
+    color: #a66600;
+  }
+  .selected {
+    border-radius: 3px;
+    color: var(--theme-content-dark-color);
+  	background-color: var(--theme-bg-dark-color);
+  }
+  .cell {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .cell:hover {
+    border-radius: 3px;
+    background-color: var(--theme-bg-dark-hover);
+    color: var(--theme-content-color);
+  }
+  .month-name {
+    color: var(--theme-content-dark-color);
+    font-size: 14px;
+    font-weight: bold;
+    margin: 0 5px;
+  }
 </style>
 
 <div class="month-calendar">
-  <div class="selected-month">
-    <div class="monthName">{getMonthName(currentDate) + " " + currentDate.getFullYear()}</div>
+  <div class="selected-month-controller">
+    <Button size="small" on:click={() => incMonth(-1)}>&lt;</Button>
+    <div class="month-name">{getMonthName(currentDate) + " " + currentDate.getFullYear()}</div>
+    <Button size="small" on:click={() => incMonth(1)}>&gt;</Button>
+  </div>
+  <div class="days-of-week-header">
+    {#each [...Array(7).keys()] as dayOfWeek}
+      <div class="day-name">{getWeekDayName(day(firstDayOfCurrentMonth, dayOfWeek))}</div>
+    {/each}
+  </div>
+  <div class="days-of-month">
+    {#each [...Array(6).keys()] as weekIndex}
+      {#each [...Array(7).keys()] as dayOfWeek}
+        <div 
+          class="cell"
+          class:weekend={isWeekend(weekday(firstDayOfCurrentMonth, weekIndex, dayOfWeek))}
+          class:today={areDatesEqual(new Date(), weekday(firstDayOfCurrentMonth, weekIndex, dayOfWeek))}
+          class:selected={areDatesEqual(selectedDate, weekday(firstDayOfCurrentMonth, weekIndex, dayOfWeek))}
+          on:click={() => onSelect(weekday(firstDayOfCurrentMonth, weekIndex, dayOfWeek))}
+        >
+          {weekday(firstDayOfCurrentMonth, weekIndex, dayOfWeek).getDate()}
+        </div>
+      {/each}
+    {/each}
   </div>
 </div>
