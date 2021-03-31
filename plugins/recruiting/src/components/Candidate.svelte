@@ -32,26 +32,16 @@ limitations under the License.
   let resume: WithCandidateProps['resume'] | undefined
 
   const query = createLiveQuery(
-    contact.class.Person,
-    { _mixins: candidatePlugin.mixin.WithCandidateProps, _id: object._id },
-    (docs) =>
-      model.then((m) => {
-        person = docs[0]
-
-        const candidateMixin = person && m.as(person, candidatePlugin.mixin.WithCandidateProps)
-        candidate = candidateMixin?.candidate
-        resume = candidateMixin?.resume
-      })
+    candidatePlugin.mixin.WithCandidateProps, { _id: object._id },
+    (docs) => {
+      person = docs[0]
+      const candidateMixin = docs[0]
+      candidate = candidateMixin?.candidate
+      resume = candidateMixin?.resume
+    }
   )
 
-  $: {
-    if (object) {
-      updateLiveQuery(query, contact.class.Person, {
-        _mixins: candidatePlugin.mixin.WithCandidateProps,
-        _id: object._id
-      })
-    }
-  }
+  $: updateLiveQuery(query, candidatePlugin.mixin.WithCandidateProps, { _id: object._id })
 </script>
 
 <div class="root">

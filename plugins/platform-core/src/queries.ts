@@ -60,7 +60,7 @@ export class QueriableStorage implements Domain {
       for (const q of this.queries.values()) {
         if (this.model.matchQuery(q._class, doc, q.query)) {
           // If document is matched, assume we add it to end of list. But it's order could be changed after transaction will be complete.
-          q.results.push(doc)
+          q.results.push(this.model.as(doc, q._class))
           q.subscriber(q.results)
         }
       }

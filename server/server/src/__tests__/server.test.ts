@@ -18,7 +18,7 @@ import { Client, ServerProtocol, start } from '../server'
 import WebSocket from 'ws'
 import { encode } from 'jwt-simple'
 import { Db, MongoClient } from 'mongodb'
-import { accountsDb, createUserAccount, withTenant } from '@anticrm/accounts'
+import { accountsDb, createUserAccount, getUserAccount, withTenant } from '@anticrm/accounts'
 
 import { Builder } from '@anticrm/model'
 
@@ -88,7 +88,9 @@ describe('server', () => {
     // Create user and put session inside
 
     const accounts = accountsDb(dbClient)
-    await createUserAccount(accounts, client.email, 'pass')
+    if (await getUserAccount(accounts, client.email) == null) {
+      await createUserAccount(accounts, client.email, 'pass')
+    }
 
     await dbClient.close()
 
