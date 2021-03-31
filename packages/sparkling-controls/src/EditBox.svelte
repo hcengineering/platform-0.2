@@ -13,7 +13,7 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  export let width: string = '300px'
+  export let width: string = '100%'
   export let label: string = ''
   export let value: string | undefined = ''
   export let placeholder: string

@@ -136,17 +136,17 @@
   <div class="content">
     <form class="form">
       <div class="input-container">
-        <EditBox id="create_space__input__name" bind:value={title} width="100%"
+        <EditBox id="create_space__input__name" bind:value={title}
                  label="Name" placeholder={`A ${application.spaceTitle} Name`} on:change={updateSpaceKey} />
       </div>
       <div class="input-container">
-        <EditBox id="create_space__input__shortId" bind:value={spaceKey} width="100%"
+        <EditBox id="create_space__input__shortId" bind:value={spaceKey}
                  label={application.spaceTitle + ' Key'}
                  placeholder={`A ${application.spaceTitle} Key (will be used with short ids)`}
                  on:change={() => spaceKeyChanged = true} />
       </div>
       <div class="input-container">
-        <EditBox id="create_space__input__description" bind:value={description} width="100%"
+        <EditBox id="create_space__input__description" bind:value={description}
                  label="Description" placeholder={`Write a ${application.spaceTitle} description`} />
       </div>
       <CheckBox bind:checked={makePrivate}>

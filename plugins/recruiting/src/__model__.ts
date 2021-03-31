@@ -15,26 +15,25 @@ import { TEmb } from '@anticrm/model/src/__model__'
 import { IntlString } from '@anticrm/platform-i18n'
 import presentation from '@anticrm/presentation'
 import { UX } from '@anticrm/presentation/src/__model__'
-import contact from '@anticrm/contact/src/__model__'
 import workbench from '@anticrm/workbench/src/__model__'
 import { TWithResume } from '@anticrm/person-extras/src/__model__'
 import personExtras from '@anticrm/person-extras'
 
 import recruiting, { Candidate, WithCandidateProps } from '.'
 
-@Class$(recruiting.class.Candidate, core.class.Emb)
 @UX('Candidate' as IntlString)
+@Class$(recruiting.class.Candidate, core.class.Emb)
 export class TCandidate extends TEmb implements Candidate {
-  @Prop()
   @UX('Bio' as IntlString)
+  @Prop()
   bio!: string
 
-  @Prop()
   @UX('Role' as IntlString)
+  @Prop()
   role!: string
 
-  @Prop()
   @UX('Expected Salary' as IntlString)
+  @Prop()
   salaryExpectation!: number
 }
 
@@ -58,7 +57,7 @@ export function model (S: Builder): void {
   }, recruiting.application.Vacancies)
 
   S.createDocument(presentation.mixin.Viewlet, {
-    displayClass: contact.class.Person,
+    displayClass: recruiting.mixin.WithCandidateProps,
     label: 'Card' as IntlString,
     component: recruiting.component.CandidateList
   })

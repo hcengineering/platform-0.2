@@ -22,14 +22,15 @@ limitations under the License.
   export let label: string
 
   function addSkill() {
-    items = [...items, '']
+    items.push('')
+    items = items
   }
 </script>
 
 {#if items.length > 0}
   <div class="root">
     {#each items as item}
-      <EditBox bind:value={item} width="100%" {label} placeholder={label} />
+      <EditBox bind:value={item} {label} placeholder={label} />
     {/each}
   </div>
 {/if}

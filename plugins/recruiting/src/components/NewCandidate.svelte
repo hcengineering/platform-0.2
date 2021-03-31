@@ -92,12 +92,12 @@ limitations under the License.
   </div>
   <ScrollView height="500px">
     <div class="form">
-      <EditBox bind:value={personM.name} width="100%" label="Name" placeholder="Name" />
-      <EditBox bind:value={personM.email} width="100%" label="Email" placeholder="vasya@email.com" />
-      <EditBox bind:value={personM.phone} width="100%" label="Phone" placeholder="+71234567890" />
-      <EditBox bind:value={candidateM.bio} width="100%" label="Bio" />
-      <EditBox bind:value={candidateM.role} width="100%" label="Role" placeholder="Повар" />
-      <EditBox bind:value={candidateM.salaryExpectation} width="100%" label="Salary Expectation" placeholder="100500" />
+      <EditBox bind:value={personM.name} label="Name" placeholder="Name" />
+      <EditBox bind:value={personM.email} label="Email" placeholder="vasya@email.com" />
+      <EditBox bind:value={personM.phone} label="Phone" placeholder="+71234567890" />
+      <EditBox bind:value={candidateM.bio} label="Bio" />
+      <EditBox bind:value={candidateM.role} label="Role" placeholder="Повар" />
+      <EditBox bind:value={candidateM.salaryExpectation} label="Salary Expectation" placeholder="100500" />
       <ResumeEditor bind:resume={resumeM} />
     </div>
   </ScrollView>

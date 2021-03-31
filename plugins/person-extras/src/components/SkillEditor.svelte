@@ -21,8 +21,8 @@ limitations under the License.
 </script>
 
 <div class="root">
-  <EditBox bind:value={skill.skill} width="100%" label="Skill" placeholder="Skill" />
-  <EditBox bind:value={skill.level} width="100%" label="Level" placeholder="Level" />
+  <EditBox bind:value={skill.skill} label="Skill" placeholder="Skill" />
+  <EditBox bind:value={skill.level} label="Level" placeholder="Level" />
 </div>
 
 <style lang="scss">

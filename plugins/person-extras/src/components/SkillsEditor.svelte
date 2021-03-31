@@ -22,15 +22,14 @@ limitations under the License.
   export let skills: Skill[]
 
   function addSkill() {
-    skills = [
-      ...skills,
-      {
-        __embedded: true,
-        _class: personExtras.class.Skill,
-        level: 0,
-        skill: ''
-      }
-    ]
+    skills.push({
+      __embedded: true,
+      _class: personExtras.class.Skill,
+      level: 0,
+      skill: ''
+    })
+
+    skills = skills
   }
 </script>
 

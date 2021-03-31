@@ -15,7 +15,6 @@ limitations under the License.
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
 
-  import { Ref } from '@anticrm/core'
   import { Space } from '@anticrm/domains'
   import contact from '@anticrm/contact/src/__model__'
   import { createLiveQuery, getCoreService, updateLiveQuery } from '@anticrm/presentation'
