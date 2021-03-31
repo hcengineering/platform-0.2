@@ -84,6 +84,7 @@
   function getLabel (str: string): string {
     if (str === 'Pages') return 'New page'
     if (str === 'Tasks') return 'New task'
+    if (str === 'Vacancies') return 'Add candidate'
     return 'Add'
   }
 </script>

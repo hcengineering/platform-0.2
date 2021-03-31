@@ -91,7 +91,7 @@
   <div class="content">
     <form class="form">
       <div class="input-container">
-        <EditBox id="input__name" bind:value={userName} width="100%"
+        <EditBox id="input__name" bind:value={userName}
                  label="Имя пользователя" />
       </div>
       <CheckBox bind:checked={isOwner}>

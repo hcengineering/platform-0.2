@@ -48,6 +48,7 @@ const modelIds = identify('core' as AnyPlugin, {
     String: CORE_CLASS_STRING as Ref<Class<Type>>,
     Number: '' as Ref<Class<Type>>,
     Boolean: '' as Ref<Class<Type>>,
+    Date: '' as Ref<Class<Type>>,
     ArrayOf: '' as Ref<Class<ArrayOf>>,
     RefTo: '' as Ref<Class<RefTo<Doc>>>,
     BagOf: '' as Ref<Class<BagOf>>,

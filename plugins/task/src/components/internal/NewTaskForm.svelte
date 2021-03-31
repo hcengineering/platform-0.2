@@ -162,7 +162,7 @@
 <div class="recruiting-view">
   <div class="header">
     <div class="caption-1 caption">
-      <EditBox id="create_task__input__name" bind:value={title} width="100%"
+      <EditBox id="create_task__input__name" bind:value={title}
                label="Name" placeholder="Name" />
     </div>
     <a href="/" style="margin-left:1.5em" on:click|preventDefault={() => dispatch('close')}>

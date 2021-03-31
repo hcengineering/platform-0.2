@@ -164,7 +164,7 @@
             </div>
           </ComboBox>
         </div>
-        <EditBox id="create_task__input__name" bind:value={taskCount} width="100%"
+        <EditBox id="create_task__input__name" bind:value={taskCount}
                  label="Name" placeholder="Name" />
 
         <div>
