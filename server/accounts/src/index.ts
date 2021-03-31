@@ -14,14 +14,12 @@
 //
 
 import { Binary, Db, MongoClient, ObjectID } from 'mongodb'
-import { PlatformError, Status, Severity } from '@anticrm/platform'
+import { PlatformStatusCodes, PlatformError, Status, Severity } from '@anticrm/foundation'
 import { Request, Response } from '@anticrm/rpc'
 import { randomBytes, pbkdf2Sync } from 'crypto'
 import { Buffer } from 'buffer'
-import { decode, encode } from 'jwt-simple'
-import { PlatformStatusCodes } from '@anticrm/foundation'
-
-const secondFactor = require('node-2fa')
+import { encode } from 'jwt-simple'
+import secondFactor from 'node-2fa'
 
 const server = '3.12.129.141'
 const port = '18080'
@@ -97,7 +95,7 @@ async function createAccount (db: Db, email: string, password: string): Promise<
   }
 }
 
-async function updateAccount (db: Db, email: string, password: string, newPassword: string, secondFactorEnabled:boolean, clientSecret: string, secondFactorCode: string): Promise<AccountInfo> {
+async function updateAccount (db: Db, email: string, password: string, newPassword: string, secondFactorEnabled: boolean, clientSecret: string, secondFactorCode: string): Promise<AccountInfo> {
   let account = await getAccount(db, email)
 
   if (!account) {
@@ -140,7 +138,7 @@ async function pushClientId (db: Db, email: string, clientId: string) {
   for (const id of account.clientIds) {
     if (id === clientId) return
   }
-  
+
   db.collection(ACCOUNT_COLLECTION).updateOne({ _id: account._id }, { $push: { clientIds: clientId } })
 }
 
