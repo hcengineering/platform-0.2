@@ -90,7 +90,7 @@
       border-color: var(--theme-bg-dark-hover);
     }
 
-    &:hover comboBox-drop {
+    &:hover .comboBox-drop {
       box-shadow: var(--theme-shadow);
     }
 

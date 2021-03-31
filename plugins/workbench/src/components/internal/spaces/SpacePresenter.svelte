@@ -13,14 +13,13 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { AttrModel } from '@anticrm/presentation'
   import { Space } from '@anticrm/domains'
   import { getSpaceName } from './utils'
 
   export let value: Space
-  export let attribute: AttrModel
-  export let maxWidth: number = 300
-  export let editable: boolean
+  // export let attribute: AttrModel
+  // export let maxWidth: number = 300
+  // export let editable: boolean
 
 </script>
 

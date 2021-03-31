@@ -1,19 +1,19 @@
-<script lang='ts'>
+<script lang="ts">
   import ScrollView from './ScrollView.svelte'
 
-  export let items: Array = []
+  export let items: Array<any> = []
   export let selected: number = 0
   export let label: string = 'Значение'
   export let width: string = ''
 
-  let widthStr: string = (width !== '') ? `width: ${width}` : '' 
+  let widthStr: string = (width !== '') ? `width: ${width}` : ''
 
   let comboHidden: boolean = true
   let comboRoot: HTMLElement
   let comboDrop: HTMLElement
   let comboItems: HTMLElement
 
-  function showCombo(): void {
+  function showCombo (): void {
     const rect = comboRoot.getBoundingClientRect()
     comboDrop.style.top = rect.height + 3 + 'px'
     comboDrop.style.left = '-1px'
@@ -22,13 +22,13 @@
     window.addEventListener('click', toggleCombo)
   }
 
-  function hideCombo(): void {
+  function hideCombo (): void {
     comboDrop.style.visibility = 'hidden'
     comboHidden = true
     window.removeEventListener('click', toggleCombo)
   }
 
-  function toggleCombo(event: MouseEvent): void {
+  function toggleCombo (event: MouseEvent): void {
     let pathRoot: boolean = false
     let pathDrop: boolean = false
     let pathItems: boolean = false
@@ -38,13 +38,16 @@
       if (el.className === comboItems.className) pathItems = true
     })
     if (pathRoot && !pathDrop) {
-      if (comboHidden) showCombo()
-      else hideCombo()
+      if (comboHidden) {
+        showCombo()
+      } else {
+        hideCombo()
+      }
     } else if (!pathDrop) hideCombo()
     if (pathItems) hideCombo()
   }
 
-  function handler(event: MouseEvent): void {
+  function handler (event: MouseEvent): void {
     if (comboHidden) window.addEventListener('click', toggleCombo)
   }
 </script>
@@ -97,6 +100,7 @@
         color: var(--theme-content-color);
         margin-bottom: 4px;
       }
+
       &__value {
         font-size: 14px;
         color: var(--theme-content-dark-color);
@@ -130,30 +134,36 @@
         &:hover {
           background-color: var(--theme-bg-accent-hover);
         }
+
         &:first-child {
           margin-top: 0;
         }
+
         &:last-child {
           margin-bottom: 0;
         }
       }
+
       .selected {
         background-color: var(--theme-bg-accent-hover);
+
         &:hover {
           background-color: var(--theme-bg-accent-hover);
         }
       }
     }
   }
+
   .selectedCombo {
     background-color: var(--theme-bg-accent-hover);
     border-color: var(--theme-bg-dark-hover);
   }
+
   .arrowDown {
     position: relative;
     width: 16px;
     height: 16px;
-    
+
     &::after {
       content: '';
       position: absolute;
@@ -164,6 +174,7 @@
       transform: translateY(-50%) rotate(45deg);
       background-color: var(--theme-content-color);
     }
+
     &::before {
       content: '';
       position: absolute;

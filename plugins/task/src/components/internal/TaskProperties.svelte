@@ -11,7 +11,7 @@
   //
   // See the License for the specific language governing permissions and
   // limitations under the License.
-  import { Class, CORE_CLASS_ENUM, Enum, Model, NumberProperty, Obj, Ref } from '@anticrm/core'
+  import { CORE_CLASS_ENUM, Enum, Model, NumberProperty } from '@anticrm/core'
   import task, { Task, TaskStatus } from '../..'
   import UserInfo from '@anticrm/sparkling-controls/src/UserInfo.svelte'
   import StatusLabel from './StatusLabel.svelte'
@@ -22,7 +22,6 @@
   import { CORE_MIXIN_SHORTID, ShortID } from '@anticrm/domains'
   import ux, { getCoreService } from '@anticrm/presentation'
 
-  export let _class: Ref<Class<Obj>>
   export let object: Task
 
   const coreService = getCoreService()
@@ -140,14 +139,6 @@
         font-weight: 500;
         color: var(--theme-content-trans-color);
       }
-    }
-
-    .actionBar {
-      width: 100%;
-      display: flex;
-      flex-direction: row;
-      margin-top: 2em;
-      margin-bottom: 2em;
     }
 
     .description {

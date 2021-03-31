@@ -39,7 +39,7 @@
     <Spinner />
   {:then ctor}
     <div style={ 'max-width:' + maxWidth + 'px' }>
-      <svelte:component this={ctor} {attribute} {value} on:change />
+      <svelte:component this={ctor} {attribute} {value} {editable} on:change />
     </div>
   {:catch err}
     <Icon icon={ui.icon.Error} size="32" />
