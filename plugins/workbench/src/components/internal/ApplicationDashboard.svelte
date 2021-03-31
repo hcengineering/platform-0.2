@@ -48,12 +48,5 @@
       justify-content: space-between;
       align-items: center;
     }
-
-    .presentation {
-      display: flex;
-      flex-direction: row-reverse;
-      margin-right: 1em;
-    }
-
   }
 </style>

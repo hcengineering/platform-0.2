@@ -88,7 +88,7 @@
     {#if style.reference.state}
       <!-- TODO: Add a proper click handler here-->
       <a
-        href="#"
+        href="/"
         on:click={()=>{uiService.open({ _class: style.reference._class, _id: style.reference._id })}}>
         {message.text || ''}
       </a>

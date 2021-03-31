@@ -5,7 +5,7 @@
 
   export let _class: Ref<Class<Doc>>
   export let space: Space
-  export let editable: boolean = true
+  export let editable: boolean = false
 
 </script>
 

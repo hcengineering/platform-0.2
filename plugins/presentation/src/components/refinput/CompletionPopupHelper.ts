@@ -12,6 +12,12 @@ export interface Position {
   bottom: number
 }
 
+export interface CompletionPopupActions {
+  handleUp (): void
+  handleDown (): void
+  handleSubmit (): void
+}
+
 export function getFirst (items: CompletionItem[]): CompletionItem {
   return (items.length > 0 ? items[0] : { key: '' }) as CompletionItem
 }

@@ -72,10 +72,6 @@
       }
     }
   }
-
-  .author-padding {
-    margin-bottom: 1em;
-  }
 </style>
 
 <div class="chat-message-item">

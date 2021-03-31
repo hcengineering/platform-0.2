@@ -1,6 +1,5 @@
 <script type="ts">
-  import { Class, CORE_CLASS_ENUM, Doc, Enum, Ref } from '@anticrm/core'
-  import { Space } from '@anticrm/domains'
+  import { CORE_CLASS_ENUM, Enum } from '@anticrm/core'
   import TaskCard from './TaskCard.svelte'
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import workbench from '@anticrm/workbench'
@@ -8,8 +7,8 @@
   import task from '@anticrm/task'
   import ui, { getCoreService, UXAttribute } from '@anticrm/presentation'
 
-  export let _class: Ref<Class<Doc>>
-  export let space: Ref<Space>
+  // export let _class: Ref<Class<Doc>>
+  // export let space: Ref<Space>
   const coreService = getCoreService()
 
   let topGhost: string = ''

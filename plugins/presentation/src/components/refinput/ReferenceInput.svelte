@@ -9,11 +9,11 @@
   import ToolbarButton from '@anticrm/sparkling-controls/src/toolbar/Button.svelte'
 
   import EditorContent from '@anticrm/sparkling-rich/src/EditorContent.svelte'
-  import { EditorContentEvent } from '@anticrm/sparkling-rich'
+  import { EditorActions, EditorContentEvent } from '@anticrm/sparkling-rich'
   import { EditorState, Transaction } from 'prosemirror-state'
 
   import CompletionPopup from './CompletionPopup.svelte'
-  import { CompletionItem } from './CompletionPopupHelper'
+  import { CompletionItem, CompletionPopupActions } from './CompletionPopupHelper'
 
   import { schema } from '@anticrm/sparkling-rich/src/internal/schema'
 
@@ -69,9 +69,9 @@
   }
   let completions: CompletionItem[] = []
   let editorContent: MessageNode = newMessageDocument()
-  let completionControl: CompletionPopup
+  let completionControl: CompletionPopup & CompletionPopupActions
 
-  let htmlEditor: EditorContent
+  let htmlEditor: EditorContent & EditorActions
 
   let triggers = ['@', '#', '[[']
 
@@ -310,7 +310,7 @@
     padding: 8px;
     box-sizing: border-box;
 
-    yarn .flex-column {
+    .flex-column {
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -333,10 +333,6 @@
       width: 100%;
       height: 100%;
       margin: 4px;
-    }
-
-    .edit-box {
-      max-height: 300px;
     }
 
     :global {

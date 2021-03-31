@@ -14,14 +14,14 @@
 -->
 <script lang="ts">
   import { CORE_CLASS_ENUM, Enum, Model } from '@anticrm/core'
-  import ux, { AttrModel, getCoreService, UXAttribute } from '@anticrm/presentation'
+  import ux, { getCoreService, UXAttribute } from '@anticrm/presentation'
   import task, { TaskStatus } from '../../../index'
   import StatusLabel from '../StatusLabel.svelte'
 
   export let value: TaskStatus = TaskStatus.Open
-  export let attribute: AttrModel
-  export let maxWidth: number = 300
-  export let editable: boolean
+  // export let attribute: AttrModel
+  // export let maxWidth: number = 300
+  // export let editable: boolean
 
   let text: string = ''
   let color: string = ''
