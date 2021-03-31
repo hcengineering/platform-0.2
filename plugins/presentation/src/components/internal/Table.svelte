@@ -114,7 +114,7 @@
   </div>
   <div class="tbody">
     {#each objects as object (object._id)}
-      <div class="tr" on:click={() => dispatch('open', { _id: object._id, _class: object._class })}>
+      <div class="tr" on:click={() => dispatch('open', { _id: object._id, _class: _class })}>
         {#each attributes as attr (attr.key)}
           <div class="td">
             {#if attr.presenter}
