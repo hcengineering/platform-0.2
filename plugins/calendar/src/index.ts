@@ -28,12 +28,12 @@ export enum RecurrenceType {
 }
 
 export enum CalendarEventType {
-  VACATION,
+  Vacation,
   PTO,
-  SICK_LEAVE,
-  EXTRA_WORK,
-  ORGANIZATION_EVENT,
-  CUSTOM
+  SickLeave,
+  ExtraWork,
+  OrganizationEvent,
+  Custom
 }
 
 export interface RecurrenceProperty extends Doc {
@@ -43,7 +43,7 @@ export interface RecurrenceProperty extends Doc {
     endDate?: Date
 }
 
-export interface Calendar extends Collab {
+export interface Calendar extends Doc {
     name: string
 
     participants: Ref<User>[]
@@ -52,10 +52,12 @@ export interface Calendar extends Collab {
 /*
  * Define a calendar event object.
  */
-export interface CalendarEvent extends Collab {
+export interface CalendarEvent extends Doc {
     summary: string
 
     type: CalendarEventType
+
+    calendar: Ref<Calendar>
 
     participants: Ref<User>[]
 
@@ -63,7 +65,7 @@ export interface CalendarEvent extends Collab {
 
     endDate: Date
 
-    recurrence: RecurrenceProperty
+    recurrence: Ref<RecurrenceProperty>
 }
 
 export interface CalendarService extends Service {
@@ -71,6 +73,7 @@ export interface CalendarService extends Service {
 
 export default plugin('Calendar' as Plugin<CalendarService>, {}, {
   class: {
+    Calendar: '' as Ref<Class<Calendar>>,
     CalendarEvent: '' as Ref<Class<CalendarEvent>>,
     RecurrenceProperty: '' as Ref<Class<RecurrenceProperty>>
   },

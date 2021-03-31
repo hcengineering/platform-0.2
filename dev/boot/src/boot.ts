@@ -22,6 +22,7 @@ import { model as workbench } from '@anticrm/workbench/src/__model__'
 import { model as task } from '@anticrm/task/src/__model__'
 import { model as chunter } from '@anticrm/chunter/src/__model__'
 import { model as datagen } from '@anticrm/data-generator/src/__model__'
+import { model as calendar } from '@anticrm/calendar/src/__model__'
 
 export const builder = new Builder()
 builder.load(modelModel)
@@ -31,6 +32,7 @@ builder.load(workbench)
 builder.load(chunter)
 builder.load(task)
 builder.load(datagen)
+builder.load(calendar)
 
 export const Model = builder.dumpAll()
 export const Strings = {

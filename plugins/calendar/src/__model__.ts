@@ -13,16 +13,15 @@
 // limitations under the License.
 //
 import core, { ArrayOf$, Builder, Class$, Enum$, EnumValue$, extendIds, Literal, Primary, Prop, RefTo$ } from '@anticrm/model'
-import chunter, { TCollab } from '@anticrm/chunter/src/__model__'
 
 import _calendar, {
-  CalendarEvent, RecurrenceProperty, RecurrenceType, CalendarEventType
+  Calendar, CalendarEvent, RecurrenceProperty, RecurrenceType, CalendarEventType
 } from '.'
 import { IntlString } from '@anticrm/platform-i18n'
 import { User } from '@anticrm/contact'
 import { MODEL_DOMAIN, Ref } from '@anticrm/core'
 import { UX } from '@anticrm/presentation/src/__model__'
-import { TDoc, TEnum } from '@anticrm/model/src/__model__'
+import { TDoc, TEnum, TVDoc } from '@anticrm/model/src/__model__'
 import workbench from '@anticrm/workbench/src/__model__'
 import contact from '@anticrm/contact/src/__model__'
 
@@ -33,7 +32,8 @@ const calendar = extendIds(_calendar, {
     Event_startDate: '' as IntlString,
     Event_endDate: '' as IntlString,
     Event_recurrence: '' as IntlString,
-    Event_type: '' as IntlString
+    Event_type: '' as IntlString,
+    Calendar_participants: '' as IntlString
   }
 })
 
@@ -70,9 +70,22 @@ export class TRecurrenceProperty extends TDoc implements RecurrenceProperty {
     endDate?: string
 }
 
-@Class$(calendar.class.CalendarEvent, chunter.class.Collab, MODEL_DOMAIN)
+@Class$(calendar.class.Calendar, core.class.VDoc, MODEL_DOMAIN)
+@UX('Calendar' as IntlString)
+export class TCalendar extends TVDoc implements Calendar {
+    @Primary()
+    @Prop()
+    @UX('Name' as IntlString)
+    name!: string
+
+    @UX(calendar.string.Event_participants)
+    @ArrayOf$()
+    @RefTo$(contact.mixin.User) participants!: Ref<User>[]
+}
+
+@Class$(calendar.class.CalendarEvent, core.class.VDoc, MODEL_DOMAIN)
 @UX('Event' as IntlString)
-export class TCalendarEvent extends TCollab implements CalendarEvent {
+export class TCalendarEvent extends TVDoc implements CalendarEvent {
     @Primary()
     @Prop()
     @UX('Summary' as IntlString)
@@ -96,11 +109,12 @@ export class TCalendarEvent extends TCollab implements CalendarEvent {
     endDate: Date
 
     @UX(calendar.string.Event_recurrence)
-    @RefTo$(calendar.class.RecurrenceProperty) recurrence!: Ref<RecurrenceProperty>
+    @RefTo$(calendar.class.RecurrenceProperty)
+    recurrence!: Ref<RecurrenceProperty>
 }
 
 export function model (S: Builder): void {
-  S.add(TCalendarEvent, TRecurrenceProperty, TCalendarEventType, TRecurrenceType)
+  S.add(TCalendar, TCalendarEvent, TRecurrenceProperty, TCalendarEventType, TRecurrenceType)
 
   S.createDocument(workbench.class.WorkbenchApplication, {
     route: 'calendar',
