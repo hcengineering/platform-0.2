@@ -32,7 +32,7 @@ export class TEmb extends TObj implements Emb {
 
 @Class$(core.class.Doc, core.class.Obj)
 export class TDoc extends TObj implements Doc {
-  _class!: Ref<Class<Doc>>
+  @RefTo$(core.class.Class) _class!: Ref<Class<Doc>>
   @Prop() _id!: Ref<Doc>
   @Prop() _mixins?: Ref<Mixin<Doc>>[]
 }

@@ -45,18 +45,32 @@ import { PassthroughsIndex } from '@anticrm/domains/src/indices/filter'
  */
 export default async (platform: Platform): Promise<CoreService> => {
   const rpc = rpcService(platform)
+  const model = new ModelDb()
 
   const coreProtocol: CoreProtocol = {
-    find: <T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> => rpc.request(RPC_CALL_FIND, _class, query),
-    findOne: <T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined> => rpc.request(RPC_CALL_FINDONE, _class, query),
-    tx: (tx: Tx): Promise<any> => rpc.request(RPC_CALL_TX, tx),
-    loadDomain: (domain: string): Promise<Doc[]> => rpc.request(RPC_CALL_LOAD_DOMAIN, domain),
-    genRefId: (_space: Ref<Space>) => rpc.request(RPC_CALL_GEN_REF_ID, _space)
+    async find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
+      const result = (await rpc.request(RPC_CALL_FIND, _class, query)) as T[]
+      return result.map((it) => model.as(it, _class))
+    },
+    async findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined> {
+      const result = (await rpc.request(RPC_CALL_FINDONE, _class, query)) as (T | undefined)
+      if (result) {
+        return model.as(result, _class)
+      }
+      return result
+    },
+    tx (tx: Tx): Promise<any> {
+      return rpc.request(RPC_CALL_TX, tx)
+    },
+    loadDomain (domain: string): Promise<Doc[]> {
+      return rpc.request(RPC_CALL_LOAD_DOMAIN, domain)
+    },
+    genRefId (_space: Ref<Space>) {
+      return rpc.request(RPC_CALL_GEN_REF_ID, _space)
+    }
   }
 
   // Storages
-
-  const model = new ModelDb()
   const cache = new Cache(coreProtocol)
 
   const modelDomain = await coreProtocol.loadDomain(MODEL_DOMAIN)

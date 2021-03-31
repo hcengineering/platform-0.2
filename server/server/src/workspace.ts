@@ -19,7 +19,7 @@ import {
 } from '@anticrm/core'
 import { Collection, MongoClient } from 'mongodb'
 import { withTenant } from '@anticrm/accounts'
-import { createPullArrayFilters, createPushArrayFilters, createQuery, createSetArrayFilters } from './mongo_utils'
+import { createPullArrayFilters, createPushArrayFilters, createSetArrayFilters } from './mongo_utils'
 
 import { ModelIndex } from '@anticrm/domains/src/indices/model'
 import { ReferenceIndex } from '@anticrm/domains/src/indices/reference'
@@ -147,12 +147,12 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
 
     find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
       return collection(_class)
-        .find(createQuery(memdb, _class, query))
+        .find(memdb.createQuery(_class, query))
         .toArray()
     },
 
     async findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined> {
-      const result = await collection(_class).findOne(createQuery(memdb, _class, query))
+      const result = await collection(_class).findOne(memdb.createQuery(_class, query))
       if (result == null) {
         return undefined
       }

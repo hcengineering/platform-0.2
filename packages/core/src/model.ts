@@ -424,12 +424,29 @@ export class Model implements Storage {
     }
   }
 
+  /**
+   * Creates a query with filled class and mixin information properly set.
+   **
+   * @param _class - a class query is designed for.
+   * @param _query - a query object to convert to.
+   */
+  createQuery (_class: Ref<Class<Doc>>, _query: AnyLayout): AnyLayout {
+    const query = this.assign({}, _class, _query)
+    query._class = this.getClass(_class)
+    if (query._class !== _class) {
+      // We should also put a _mixin in list for query
+      query._mixins = _class
+    }
+    return query
+  }
+
   // Q U E R Y
 
   findSync (clazz: Ref<Class<Doc>>, query: AnyLayout, limit = -1): Doc[] {
-    const byClass = this.objectsOfClass(clazz)
+    const realQuery = this.createQuery(clazz, query)
+    const byClass = this.objectsOfClass(realQuery._class as Ref<Class<Doc>>)
 
-    return this.findAll(byClass, clazz, query, limit)
+    return this.findAll(byClass, clazz, realQuery, limit)
   }
 
   find<T extends Doc> (clazz: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
@@ -450,9 +467,16 @@ export class Model implements Storage {
    */
   protected findAll (docs: Doc[], _class: Ref<Class<Doc>>, query: AnyLayout, limit = -1): Doc[] {
     const result: Doc[] = []
+    const clazz = this.getClass(_class)
     for (const doc of docs) {
       if (this.matchQuery(_class, doc, query)) {
-        result.push(doc)
+        if (clazz === _class) {
+          // Push original document.
+          result.push(doc)
+        } else {
+          // In case of mixin we need to cast
+          result.push(this.as(doc, _class as Ref<Mixin<Doc>>))
+        }
         if (limit > 0 && result.length > limit) {
           return result
         }
@@ -479,6 +503,13 @@ export class Model implements Storage {
       }
     }
 
+    // Override _class to return a mixin value.
+    descriptors._class = {
+      get (this: Proxy) {
+        return classifier._id
+      }
+    }
+
     const proto = Object.create(classifier._extends ? this.getPrototype(classifier._extends) : Object.prototype)
     return Object.defineProperties(proto, descriptors)
   }
@@ -500,6 +531,10 @@ export class Model implements Storage {
    * @param mixin - a mixin class
    */
   public as<T extends Obj> (doc: Obj, mixin: Ref<Mixin<T>>): T {
+    if (doc._class === mixin) {
+      // If we already have a proper class specified.
+      return doc as T
+    }
     const proxy = Object.create(this.getPrototype(mixin)) as Proxy & T
     proxy.__layout = (doc as unknown) as Record<string, unknown>
     return proxy
@@ -598,7 +633,8 @@ export class Model implements Storage {
    * @param query query to check.
    */
   matchQuery (_class: Ref<Class<Doc>>, doc: Doc, query: AnyLayout): boolean {
-    if (_class !== doc._class) {
+    const clazz = this.getClass(_class)
+    if (clazz !== doc._class) {
       // Class doesn't match so return false.
       return false
     }
@@ -626,13 +662,13 @@ export class Model implements Storage {
         // Skip undefined as matched.
         count += 1
       }
-      const attrKey = this.attributeKey(clazz, key)
+
+      const attr = this.classAttribute(_class, key)
+      const attrKey = this.attributeKey(attr.clazz, key)
 
       const keyIn = docKeys.has(attrKey)
       if (keyIn) {
         const docValue = l[attrKey]
-
-        const attr = this.classAttribute(_class, key)
         if (attr.attr !== undefined) {
           const mResult = this.matchValue({
             parent: doc,
