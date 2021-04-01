@@ -18,6 +18,7 @@ import { Class, Ref, Enum, Emb } from '@anticrm/core'
 
 import { User } from '@anticrm/contact'
 import { Application, VDoc } from '@anticrm/domains'
+import { AnyComponent } from '@anticrm/platform-ui'
 
 export enum RecurrenceType {
     Daily,
@@ -79,6 +80,9 @@ export default plugin('Calendar' as Plugin<CalendarService>, {}, {
   enum: {
     RecurrenceType: '' as Ref<Enum<RecurrenceType>>,
     CalendarEventType: '' as Ref<Enum<CalendarEventType>>
+  },
+  component: {
+    NewCalendar: '' as AnyComponent
   },
   application: {
     Calendar: '' as Ref<Application>

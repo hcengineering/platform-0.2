@@ -1,4 +1,4 @@
-//
+<!--
 // Copyright © 2021 Anticrm Platform Contributors.
 //
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
@@ -11,20 +11,8 @@
 //
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
+-->
+<script type="ts">
+</script>
 
-import type { Platform } from '@anticrm/platform'
-import { CalendarService } from '.'
-import NewCalendar from './components/NewCalendar.svelte'
-
-import calendar from '.'
-
-/*!
- * Anticrm Platform™ Task Plugin
- * © 2021 Anticrm Platform Contributors. All Rights Reserved.
- * Licensed under the Eclipse Public License, Version 2.0
- */
-export default (platform: Platform): Promise<CalendarService> => {
-  platform.setResource(calendar.component.NewCalendar, NewCalendar)
-  return Promise.resolve({})
-}
+<div />

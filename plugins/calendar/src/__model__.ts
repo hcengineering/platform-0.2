@@ -24,6 +24,7 @@ import { UX } from '@anticrm/presentation/src/__model__'
 import { TEmb, TEnum, TVDoc } from '@anticrm/model/src/__model__'
 import workbench from '@anticrm/workbench/src/__model__'
 import contact from '@anticrm/contact/src/__model__'
+import presentation from '@anticrm/presentation'
 
 const calendar = extendIds(_calendar, {
   string: {
@@ -113,6 +114,10 @@ export function model (S: Builder): void {
     component: workbench.component.Application,
     classes: [calendar.class.CalendarEvent],
     supportSpaces: true,
-    spaceTitle: 'Project'
+    spaceTitle: 'Calendar'
   }, calendar.application.Calendar)
+
+  S.mixin(calendar.class.Calendar, presentation.mixin.CreateForm, {
+    component: calendar.component.NewCalendar
+  })
 }
