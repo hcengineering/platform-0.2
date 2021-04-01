@@ -15,26 +15,22 @@ limitations under the License.
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
 
-  import { Mixin, Ref } from '@anticrm/core'
-  import type { Space, CORE_CLASS_VDOC } from '@anticrm/domains'
-  import { VDoc } from '@anticrm/domains'
+  import { Ref } from '@anticrm/core'
+  import type { Space } from '@anticrm/domains'
+  import { CORE_CLASS_VDOC } from '@anticrm/domains'
   import type { AttrModel, ClassModel } from '@anticrm/presentation'
-  import presentation, { getComponentExtension, getPresentationService, getCoreService } from '@anticrm/presentation'
+  import presentation, { getComponentExtension, getPresentationService } from '@anticrm/presentation'
   import type { AnyComponent } from '@anticrm/platform-ui'
   import workbench, { ItemCreator } from '@anticrm/workbench'
 
-  import Properties from '@anticrm/presentation/src/components/internal/Properties.svelte'
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
-  import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.svelte'
-  import Button from '@anticrm/sparkling-controls/src/Button.svelte'
   import Component from '@anticrm/platform-ui/src/components/Component.svelte'
 
-  export let creator: ItemCreator
-  export let space: Ref<Space>
-  let title = ''
-  let object = {} as any
+  import DefaultForm from './DefaultForm.svelte'
 
-  const coreService = getCoreService()
+  export let creator: ItemCreator
+  export let space: Ref<Space> | undefined
+  export let spaces: Space[] | undefined
 
   let createFormComponent: AnyComponent | undefined = creator.component
   const dispatch = createEventDispatcher()
@@ -45,21 +41,6 @@ limitations under the License.
   const presentationService = getPresentationService()
 
   const onClose = () => dispatch('close')
-  async function save() {
-    const doc = {
-      _class: creator.class as Ref<Mixin<VDoc>>,
-      [primary?.key || 'name']: title,
-      _space: space,
-      ...object
-    }
-
-    object = {}
-
-    // absent VDoc fields will be autofilled
-    const cs = await coreService
-    await cs.create(creator.class, doc)
-    dispatch('close')
-  }
 
   const init = Promise.all([
     createFormComponent
@@ -88,18 +69,9 @@ limitations under the License.
       </div>
     </div>
     {#if createFormComponent}
-      <Component is={createFormComponent} props={{ space: space }} on:change />
+      <Component is={createFormComponent} props={{ space, spaces }} on:change on:close={onClose} />
     {:else}
-      <div class="caption">
-        <InlineEdit bind:value={title} placeholder="Title" fullWidth={true} />
-      </div>
-
-      <Properties {model} bind:object />
-
-      <div class="buttons">
-        <Button kind="primary" on:click={save}>Принять</Button>
-        <Button on:click={onClose}>Отказаться</Button>
-      </div>
+      <DefaultForm {creator} {model} {primary} {space} {spaces} on:close={onClose} />
     {/if}
   </div>
 {/await}
@@ -137,16 +109,5 @@ limitations under the License.
 
     font-size: 18px;
     font-weight: 500;
-  }
-
-  .caption {
-    padding-bottom: 10px;
-    flex-grow: 1;
-  }
-  .buttons {
-    margin-top: 16px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    column-gap: 16px;
   }
 </style>

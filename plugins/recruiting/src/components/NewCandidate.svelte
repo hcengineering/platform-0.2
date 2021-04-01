@@ -27,20 +27,30 @@ limitations under the License.
   import EditBox from '@anticrm/sparkling-controls/src/EditBox.svelte'
   import ResumeEditor from '@anticrm/person-extras/src/components/ResumeEditor.svelte'
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
+  import ComboBox from '@anticrm/sparkling-controls/src/ComboBox.svelte'
 
   import type { WithCandidateProps } from '..'
   import candidate from '..'
 
-  export let space: Ref<Space>
+  export let space: Ref<Space> | undefined
+  export let spaces: Space[] | undefined
+
+  let selectedSpaceIdx = 0
+  let spaceItems = spaces?.map((x, idx) => ({
+    id: idx,
+    comboValue: x.name
+  }))
 
   const coreP = getCoreService()
   const modelP = coreP.then((c) => c.getModel())
   const dispatch = createEventDispatcher()
 
+  const getSpace = () => space || (spaces?.[selectedSpaceIdx]._id as Ref<Space>) || ('' as Ref<Space>)
+
   const personM: Person = {
     _id: generateId(),
     _class: contact.class.Person,
-    _space: space,
+    _space: getSpace(),
     _createdBy: '' as StringProperty,
     _createdOn: Date.now() as DateProperty,
     name: ''
@@ -69,7 +79,7 @@ limitations under the License.
 
     const doc = {
       ...personM,
-      _space: space, // Just to get latest space
+      _space: getSpace(), // Just to get latest space
       _createBy: core.getUserId()
     }
 
@@ -87,6 +97,13 @@ limitations under the License.
 <div class="root">
   <ScrollView height="500px">
     <div class="form">
+      {#if spaces && spaceItems && spaceItems.length > 0}
+        <ComboBox label="Vacancy" items={spaceItems} bind:selected={selectedSpaceIdx}>
+          <div slot="title">
+            {spaces[selectedSpaceIdx].name}
+          </div>
+        </ComboBox>
+      {/if}
       <EditBox bind:value={personM.name} label="Name" placeholder="Name" />
       <EditBox bind:value={personM.email} label="Email" placeholder="vasya@email.com" />
       <EditBox bind:value={personM.phone} label="Phone" placeholder="+71234567890" />

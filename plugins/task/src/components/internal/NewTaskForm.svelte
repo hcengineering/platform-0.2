@@ -17,6 +17,7 @@
   import { createEventDispatcher } from 'svelte'
   import { getCoreService } from '@anticrm/presentation'
   import UserBox from '@anticrm/platform-ui/src/components/UserBox.svelte'
+  import ComboBox from '@anticrm/sparkling-controls/src/ComboBox.svelte'
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
   import type { Space } from '@anticrm/domains'
@@ -28,8 +29,15 @@
 
   export let title: string
   let message = ''
-  export let space: Ref<Space>
+  export let space: Ref<Space> | undefined
+  export let spaces: Space[] | undefined
   let object = {} as any
+
+  let selectedSpaceIdx = 0
+  const spaceItems = spaces?.map((x, idx) => ({
+    id: idx,
+    comboValue: x.name
+  }))
 
   const coreService = getCoreService()
   const dispatch = createEventDispatcher()
@@ -41,7 +49,7 @@
     const modelDb = cs.getModel()
     const newTask = modelDb.newDoc(task.class.Task, cs.generateId(), {
       title,
-      _space: space,
+      _space: space ?? spaces?.[selectedSpaceIdx]._id,
       ...object,
       status: TaskStatus.Open,
       comments: [
@@ -92,6 +100,16 @@
 </script>
 
 <div class="recruiting-view">
+  {#if spaces && spaceItems && spaceItems.length > 0}
+    <div class="spaceSelector">
+      <ComboBox label="Project" items={spaceItems} bind:selected={selectedSpaceIdx}>
+        <div slot="title">
+          {spaces[selectedSpaceIdx].name}
+        </div>
+      </ComboBox>
+    </div>
+  {/if}
+
   <div class="header">
     <div class="caption-1 caption">
       <EditBox id="create_task__input__name" bind:value={title} label="Name" placeholder="Name" />
@@ -129,7 +147,7 @@
 
   .header {
     display: flex;
-    margin-bottom: 9px;
+    margin-bottom: 10px;
 
     .caption {
       flex-grow: 1;
@@ -141,5 +159,9 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     column-gap: 16px;
+  }
+
+  .spaceSelector {
+    padding-bottom: 10px;
   }
 </style>
