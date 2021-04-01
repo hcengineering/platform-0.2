@@ -13,22 +13,21 @@
 // limitations under the License.
 -->
 <script type="ts">
-  import type { WorkbenchApplication } from '../..'
+  import type { ItemCreator, WorkbenchApplication } from '../..'
   import workbench from '../..'
 
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
-  import Button from '@anticrm/sparkling-controls/src/Button.svelte'
   import CreateForm from './CreateForm.svelte'
-  import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import IconEditBox from '@anticrm/platform-ui/src/components/IconEditBox.svelte'
   import type { Space } from '@anticrm/domains'
   import type { Viewlet } from '@anticrm/presentation'
-  import ui, { createLiveQuery, getCoreService } from '@anticrm/presentation'
+  import ui, { createLiveQuery, updateLiveQuery, getCoreService } from '@anticrm/presentation'
   import type { Action } from '@anticrm/platform-ui'
   import { getUIService } from '@anticrm/platform-ui'
   import Component from '@anticrm/platform-ui/src/components/Component.svelte'
   import ActionBar from '@anticrm/platform-ui/src/components/ActionBar.svelte'
   import type { Model } from '@anticrm/core'
+  import CreateControl from './CreateControl.svelte'
 
   export let application: WorkbenchApplication
   export let space: Space
@@ -36,19 +35,26 @@
   const coreService = getCoreService()
   const uiService = getUIService()
 
-  let addIcon: HTMLElement
-
   // Represent all possible presenters
   let presenters: Viewlet[] = []
+  let creators: ItemCreator[] = []
 
   let viewletActions: Action[] = []
   let activeViewlet: Viewlet | undefined
+
+  const onCreatorClick = (creator: ItemCreator) => uiService.showModal(CreateForm, { creator, space: space._id })
+
+  const creatorsQuery = createLiveQuery(workbench.class.ItemCreator, { app: application._id }, (docs) => {
+    creators = docs
+  })
+
+  $: updateLiveQuery(creatorsQuery, workbench.class.ItemCreator, { app: application._id })
 
   createLiveQuery(ui.mixin.Viewlet, {}, (docs) => {
     presenters = docs
   })
 
-  function filterViewlets (model: Model, presenters: Viewlet[]): Viewlet[] {
+  function filterViewlets(model: Model, presenters: Viewlet[]): Viewlet[] {
     return presenters.filter((d) => {
       for (const cc of application?.classes) {
         if (model.is(cc, d.displayClass)) {
@@ -88,35 +94,15 @@
       viewletActions = getViewletActions(application, activeViewlet, viewlets)
     })
   }
-
-  function getLabel (str: string): string {
-    if (str === 'Pages') return 'New page'
-    if (str === 'Tasks') return 'New task'
-    if (str === 'Vacancies') return 'Add candidate'
-    return 'Add'
-  }
 </script>
 
 <div class="workbench-browse">
   {#if application}
     <div class="captionContainer">
       <span class="caption-1" style="padding-right:1em">{application.label}</span>&nbsp;
-      <div bind:this={addIcon}>
-        <Button
-          kind="transparent"
-          on:click={() => {
-            uiService.showModal(
-              CreateForm,
-              { _class: application ? application.classes[0] : undefined, space: space._id },
-              addIcon
-            )
-          }}>
-          <Icon icon={workbench.icon.Add} button="true" />
-          <span style="padding-left:.5em">{getLabel(application.label)}</span>
-        </Button>
-      </div>
+      <CreateControl {creators} {onCreatorClick} />
       <div style="flex-grow:1" />
-      <IconEditBox icon={workbench.icon.Finder} placeholder="Поиск по {application.label}..." iconRight="true" />
+      <IconEditBox icon={workbench.icon.Finder} placeholder="Поиск по {application.label}..." iconRight={true} />
     </div>
     <div class="presentation">
       <ActionBar actions={viewletActions} />

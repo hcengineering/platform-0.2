@@ -22,11 +22,9 @@ limitations under the License.
   import contact from '@anticrm/contact'
   import personExtras from '@anticrm/person-extras'
   import { getCoreService } from '@anticrm/presentation'
-  import workbench from '@anticrm/workbench/src/__model__'
 
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
   import EditBox from '@anticrm/sparkling-controls/src/EditBox.svelte'
-  import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import ResumeEditor from '@anticrm/person-extras/src/components/ResumeEditor.svelte'
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
 
@@ -113,7 +111,6 @@ limitations under the License.
 <style lang="scss">
   .root {
     min-width: 450px;
-    padding: 25px;
   }
 
   .header {

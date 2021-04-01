@@ -20,6 +20,8 @@ import { TWithResume } from '@anticrm/person-extras/src/__model__'
 import personExtras from '@anticrm/person-extras'
 
 import recruiting, { Candidate, WithCandidateProps } from '.'
+import { WorkbenchApplication } from '@anticrm/workbench'
+import { Class, Ref } from '@anticrm/core'
 
 @UX('Candidate' as IntlString)
 @Class$(recruiting.class.Candidate, core.class.Emb)
@@ -60,6 +62,20 @@ export function model (S: Builder): void {
     displayClass: recruiting.mixin.WithCandidateProps,
     label: 'Card' as IntlString,
     component: recruiting.component.CandidateList
+  })
+
+  S.createDocument(workbench.class.ItemCreator, {
+    app: recruiting.application.Vacancies as Ref<Class<WorkbenchApplication>>,
+    class: recruiting.mixin.WithCandidateProps,
+    name: 'Candidate' as IntlString
+  })
+
+  // This is just a temporary example
+  S.createDocument(workbench.class.ItemCreator, {
+    app: recruiting.application.Vacancies as Ref<Class<WorkbenchApplication>>,
+    class: recruiting.mixin.WithCandidateProps,
+    name: 'Candidate with custom component' as IntlString,
+    component: recruiting.component.NewCandidate
   })
 
   S.mixin(recruiting.mixin.WithCandidateProps, presentation.mixin.CreateForm, {

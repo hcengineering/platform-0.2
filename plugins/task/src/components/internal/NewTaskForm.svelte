@@ -127,7 +127,6 @@
 
 <style lang="scss">
   .recruiting-view {
-    padding: 24px 32px 32px 32px;
     width: 40em;
     display: flex;
     flex-direction: column;

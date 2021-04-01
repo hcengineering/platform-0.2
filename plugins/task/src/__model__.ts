@@ -27,11 +27,12 @@ import { UX } from '@anticrm/presentation/src/__model__'
 import presentation from '@anticrm/presentation'
 import workbench from '@anticrm/workbench/src/__model__'
 import chunter, { TCollab } from '@anticrm/chunter/src/__model__'
-import { DateProperty, MODEL_DOMAIN, Ref, StringProperty } from '@anticrm/core'
+import { Class, DateProperty, MODEL_DOMAIN, Ref, StringProperty } from '@anticrm/core'
 import { TEmb, TEnum, TVDoc } from '@anticrm/model/src/__model__'
 import contact from '@anticrm/contact/src/__model__'
 import { Asset } from '@anticrm/platform-ui'
 import { Metadata } from '@anticrm/platform'
+import { WorkbenchApplication } from '@anticrm/workbench'
 
 export const DOMAIN_TASK = 'task'
 
@@ -210,6 +211,12 @@ export function model (S: Builder): void {
 
   S.mixin(task.class.Task, presentation.mixin.CreateForm, {
     component: task.component.CreateTask
+  })
+
+  S.createDocument(workbench.class.ItemCreator, {
+    app: task.application.Task as Ref<Class<WorkbenchApplication>>,
+    class: task.class.Task,
+    name: 'Task' as IntlString
   })
 
   S.mixin(task.class.Task, chunter.mixin.ActivityInfo, {
