@@ -12,17 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 -->
-<script type='ts'>
-  import { Ref, Tx } from '@anticrm/core'
-  import { WorkbenchApplication } from '@anticrm/workbench'
-  import { CORE_CLASS_CREATE_TX, Space } from '@anticrm/domains'
+<script type="ts">
+  import { Tx } from '@anticrm/core'
+  import { CORE_CLASS_CREATE_TX } from '@anticrm/domains'
 
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
   import ActivityItem from './ActivityItem.svelte'
   import { createLiveQuery } from '@anticrm/presentation'
 
-  export let application: Ref<WorkbenchApplication>
-  export let space: Ref<Space>
+  // export let application: Ref<WorkbenchApplication>
+  // export let space: Space
 
   let objects: Tx[] = []
 
@@ -32,7 +31,7 @@
 
 </script>
 
-<style lang='scss'>
+<style lang="scss">
   .activity {
     height: 100%;
     // background-color: red;
@@ -55,12 +54,12 @@
   }
 </style>
 
-<div class='activity'>
-  <div class='captionContainer'>
-    <span class='caption-1'>Activity</span>&nbsp;
+<div class="activity">
+  <div class="captionContainer">
+    <span class="caption-1">Activity</span>&nbsp;
   </div>
   <ScrollView height="100%" margin="2em" autoscroll={true}>
-    <div class='content'>
+    <div class="content">
       {#each objects as item (item._id)}
         <ActivityItem tx={item} />
       {/each}

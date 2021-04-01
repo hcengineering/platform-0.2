@@ -181,22 +181,12 @@
     .app-icon {
       border-bottom: solid 1px var(--theme-bg-accent-color);
       border-right: solid 1px var(--theme-bg-accent-color);
-
-      &.current-app {
-        background-color: var(--theme-bg-color);
-        border-right: solid 1px var(--theme-bg-color);
-      }
     }
 
     .iconApp {
       padding: 1em;
       color: var(--theme-content-dark-color);
       cursor: pointer;
-    }
-
-    .selectedApp {
-      padding: 1em;
-      color: var(--theme-userlink-color);
     }
 
     .remainder {
@@ -221,44 +211,6 @@
 
     .hidden {
       visibility: hidden;
-    }
-
-    .footContainer {
-      display: flex;
-      justify-content: center;
-    }
-
-    .item {
-      box-sizing: border-box;
-      font-family: var(--theme-font-content);
-      font-weight: 500;
-      padding: 0.5em;
-      padding-top: calc(0.5em + 1px);
-      margin-bottom: 0.25em;
-      height: 2.5em;
-      color: var(--theme-content-color);
-      background-color: var(--theme-bg-color);
-      cursor: pointer;
-      border-radius: 4px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-
-      &.selected {
-        font-weight: 700;
-        color: var(--theme-content-dark-color);
-        background-color: var(--theme-bg-accent-color);
-
-        &:hover {
-          cursor: default;
-          color: var(--theme-content-dark-color);
-          background-color: var(--theme-bg-accent-color);
-        }
-      }
-
-      &:hover {
-        color: var(--theme-doclink-color);
-      }
     }
   }
 

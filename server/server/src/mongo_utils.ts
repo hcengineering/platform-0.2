@@ -14,18 +14,8 @@
 //
 
 import {
-  AnyLayout,
-  ArrayOf,
-  Class,
-  Doc,
-  Emb,
-  InstanceOf,
-  Obj,
-  Ref,
-  StringProperty,
-  Type,
-  Model,
-  CORE_CLASS_ARRAY_OF, CORE_CLASS_INSTANCE_OF
+  AnyLayout, ArrayOf, Class, CORE_CLASS_ARRAY_OF, CORE_CLASS_INSTANCE_OF, Doc, Emb, InstanceOf, Model, Obj, Ref,
+  StringProperty, Type
 } from '@anticrm/core'
 
 // Some various mongo db utils.
@@ -56,8 +46,8 @@ function extractArrayFilter (model: Model, _class: Ref<Class<Doc>>, query: AnyLa
   while (nextQuery !== null) {
     const filter: AnyLayout = {}
     const curI = index++
-    const filterName = 'f' + curI
-    const nextFilterName = 'f' + (curI + 1)
+    const filterName = `f${curI}`
+    const nextFilterName = `f${curI + 1}`
     const currentQuery = nextQuery
     const curClass = clazz
     nextQuery = null
@@ -219,19 +209,4 @@ export function createPullArrayFilters (model: Model, _class: Ref<Class<Doc>>, q
     arrayFilters: arrayFilter,
     isArrayAttr
   }
-}
-
-/**
- * Creates a mongodb query based on object on platform object query.
- *
- * 1. Verify query is fully compatible with class model it designed for and throw error if not.
- *
- * @param model - model to use for validation.
- * @param _class - a class query is designed for.
- * @param _query - a query object to convert to.
- */
-export function createQuery (model: Model, _class: Ref<Class<Doc>>, _query: AnyLayout): AnyLayout {
-  const query = model.assign({}, _class, _query)
-  query._class = model.getClass(_class)
-  return query
 }

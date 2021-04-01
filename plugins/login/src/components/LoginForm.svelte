@@ -21,14 +21,20 @@
   import { ApplicationRoute, ApplicationRouter } from '@anticrm/platform-ui'
   import { PlatformStatusCodes } from '@anticrm/foundation'
 
-  export let router: ApplicationRouter<ApplicationRoute>;
+  export let router: ApplicationRouter<ApplicationRoute>
   let object = { username: '', password: '', workspace: '', secondFactorCode: '' }
   let status: Status
 
   let loginActive: boolean = false
   let needSecondFactor: boolean = false
-  const baseFields = [{ name: 'username', i18n: 'Username' }, { name: 'password', i18n: 'Password', password: true }, { name: 'workspace', i18n: 'Workspace' }];
-  $: fields = needSecondFactor ? baseFields.concat({ name: 'secondFactorCode', i18n: 'Confirm code' }) : baseFields; 
+  const baseFields = [{ name: 'username', i18n: 'Username' }, {
+    name: 'password',
+    i18n: 'Password',
+    password: true
+  }, { name: 'workspace', i18n: 'Workspace' }]
+
+  let fields
+  $: fields = needSecondFactor ? baseFields.concat({ name: 'secondFactorCode', i18n: 'Confirm code' }) : baseFields
 
   const platform = getContext('platform') as Platform
   const loginService = platform.getPlugin(login.id)
@@ -39,7 +45,7 @@
     status = await (await loginService).doLogin(object.username, object.password, object.workspace, object.secondFactorCode)
 
     if (status.code === PlatformStatusCodes.CLIENT_VALIDATE_REQUIRED) {
-      needSecondFactor = true;
+      needSecondFactor = true
     }
   }
 
@@ -62,7 +68,7 @@
 
     timer = setInterval(async () => {
       await checkLoginInfo(ls)
-    }, 1 * 1000)
+    }, 1000)
   })
 
   onDestroy(() => {
@@ -71,7 +77,7 @@
     }
   })
 
- async function navigateApp (): Promise<void> {
+  async function navigateApp (): Promise<void> {
     (await loginService).navigateApp()
   }
 
@@ -80,8 +86,8 @@
     loginActive = false
   }
 
-  function navigateSetting(): void {
-    router.navigate({route: 'setting'})
+  function navigateSetting (): void {
+    router.navigate({ route: 'setting' })
   }
 </script>
 
@@ -112,36 +118,15 @@
 
 <style lang="scss">
   .login-form-info {
-    margin: auto;
-    margin-top: 20vh;
+    margin: 20vh auto auto;
     width: 30em;
     padding: 2em;
     border: 1px solid var(--theme-bg-accent-color);
     border-radius: 1em;
 
-    .status {
-      margin-top: 0.5em;
-    }
-
-    .field {
-      .editbox {
-        width: 100%;
-      }
-
-      margin: 1em 0;
-    }
-
     .actions {
       display: flex;
       margin-top: 1.5em;
-
-      .button {
-        flex: 1;
-
-        &.separator {
-          margin-left: 1em;
-        }
-      }
     }
   }
 </style>

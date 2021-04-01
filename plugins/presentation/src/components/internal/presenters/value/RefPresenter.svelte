@@ -52,7 +52,7 @@
 </script>
 
 {#if doc && presenter }
-  <Presenter is={presenter} value={doc} {attribute} />
+  <Presenter is={presenter} value={doc} {attribute} {editable} />
 {:else}
   {value}
 {/if}

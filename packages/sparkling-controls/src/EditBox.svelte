@@ -12,34 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 -->
-
 <script lang="ts">
-  export let width: string = '300px'
+  export let width: string = '100%'
   export let label: string = ''
-  export let value: string
+  export let value: string | undefined = ''
   export let placeholder: string
-  export let id: string
+  export let id: string | undefined = undefined
   export let hoverState: boolean = false
 
   let input: HTMLElement
 </script>
 
-
-<div class="editbox" class:editbox-label={(label !== '')} class:editbox-hoverState={hoverState}
-     style="width: {width}" on:click={input.focus()}>
-  {#if (label !== '')}
+<div
+  class="editbox"
+  class:editbox-label={label !== ''}
+  class:editbox-hoverState={hoverState}
+  style="width: {width}"
+  on:click={input.focus()}
+>
+  {#if label !== ''}
     <div class="wLabel">
       <div class="label">{label}</div>
-      <input bind:this={input} {id} type="text"
-             bind:value={value} {placeholder}
-             on:input on:focus on:change
-      />
+      <input bind:this={input} {id} type="text" bind:value {placeholder} on:input on:focus on:change />
     </div>
   {:else}
-    <input bind:this={input} {id} type="text"
-           bind:value={value} {placeholder}
-           on:input on:focus on:change
-    />
+    <input bind:this={input} {id} type="text" bind:value {placeholder} on:input on:focus on:change />
   {/if}
 </div>
 
@@ -64,7 +61,7 @@
     background-color: var(--theme-bg-accent-color);
     box-sizing: border-box;
     color: var(--theme-content-color);
-    transition: border-color .2s, color .2s, background-color .2s;
+    transition: border-color 0.2s, color 0.2s, background-color 0.2s;
 
     &:focus-within {
       outline: none;

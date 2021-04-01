@@ -68,7 +68,7 @@
               <div class="popup-separator"></div>
             {:else}
               <button class="popup-item"
-                      on:click={handleAction(popup)}>{popup.name}</button>
+                      on:click={() => handleAction(popup)}>{popup.name}</button>
             {/if}
           {/each}
         </div>
@@ -137,10 +137,6 @@
 
   .wOther {
     display: block;
-
-    & > span {
-      margin-right: 5px;
-    }
 
     .chevron {
       width: 100%;

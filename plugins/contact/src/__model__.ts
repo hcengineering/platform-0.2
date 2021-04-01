@@ -25,8 +25,7 @@ import presentation from '@anticrm/presentation'
 const contact = extendIds(_contact, {
   application: {},
   class: {
-    Contact: '' as Ref<Class<Contact>>,
-    Person: '' as Ref<Class<Person>>
+    Contact: '' as Ref<Class<Contact>>
   },
   // mixin: {
   //   User: '' as Ref<Mixin<User>>

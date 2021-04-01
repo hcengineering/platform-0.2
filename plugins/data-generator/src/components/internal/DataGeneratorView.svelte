@@ -15,7 +15,6 @@
 <script type="ts">
 
   import { NumberProperty, Property, Ref, StringProperty } from '@anticrm/core'
-  import { WorkbenchApplication } from '@anticrm/workbench'
   import { Application, CORE_CLASS_SPACE, CORE_MIXIN_SHORTID, Space } from '@anticrm/domains'
 
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
@@ -27,9 +26,7 @@
   import chunter, { Comment } from '@anticrm/chunter'
   import { Action } from '@anticrm/platform-ui'
 
-  const faker = require('faker')
-
-  export let application: WorkbenchApplication
+  import faker from 'faker'
 
   let taskCount = 50
   let taskSpace: Space | undefined
@@ -164,7 +161,7 @@
             </div>
           </ComboBox>
         </div>
-        <EditBox id="create_task__input__name" bind:value={taskCount} width="100%"
+        <EditBox id="create_task__input__name" bind:value={taskCount}
                  label="Name" placeholder="Name" />
 
         <div>

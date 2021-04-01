@@ -105,32 +105,6 @@
 
     .caption {
       flex-grow: 1;
-
-      .caption-edit {
-        width: 100%;
-      }
-    }
-
-    .actions {
-      display: flex;
-      flex-grow: 1;
-      flex-direction: row-reverse;
-      font-size: 10px;
-
-      button {
-        margin-left: 0.5em;
-      }
-    }
-  }
-
-  .content {
-    .taskLabel {
-      color: var(--theme-doclink-color);
-      margin-bottom: 16px;
-    }
-
-    .separator {
-      height: 16px;
     }
   }
 
@@ -140,29 +114,12 @@
     grid-template-columns: 1fr 1fr;
     column-gap: 16px;
   }
-
-  .attributes {
-    display: flex;
-    flex-wrap: wrap;
-
-    //display: grid;
-    //background-color: $content-color-dark;
-    //grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    //grid-gap: 1px;
-
-    margin-top: 1em;
-
-    .group {
-      padding: 0.5em;
-      //background-color: $content-bg-color;
-    }
-  }
 </style>
 
 <div class="recruiting-view">
   <div class="header">
     <div class="caption-1 caption">
-      <EditBox id="create_task__input__name" bind:value={title} width="100%"
+      <EditBox id="create_task__input__name" bind:value={title}
                label="Name" placeholder="Name" />
     </div>
     <a href="/" style="margin-left:1.5em" on:click|preventDefault={() => dispatch('close')}>

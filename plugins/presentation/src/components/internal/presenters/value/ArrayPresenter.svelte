@@ -19,6 +19,7 @@
   import Presenter from '../Presenter.svelte'
 
   export let value: any
+  export let editable: boolean = true
   export let attribute: AttrModel
 
   let itemAttributes: AttrModel[] = []
@@ -45,6 +46,7 @@
 
   .attributes-container {
     display: flex;
+    flex-direction: column;
   }
 
 </style>
@@ -55,7 +57,7 @@
       <div class="attributes-container">
         {#each itemAttributes as attr (attr.key)}
           {#if attr.presenter}
-            <Presenter is={attr.presenter} value={item[attr.key] || '' } attribute={attr} />
+            <Presenter is={attr.presenter} {editable} value={item[attr.key] || '' } attribute={attr} />
           {:else}
             <span>{item[attr.key] || ''}</span>
           {/if}

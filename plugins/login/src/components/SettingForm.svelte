@@ -17,63 +17,80 @@
   import { getContext } from 'svelte'
   import login from '..'
   import CheckBox from '@anticrm/sparkling-controls/src/CheckBox.svelte'
-  import { ApplicationRoute, ApplicationRouter } from '@anticrm/platform-ui';
-  const twofactor = require("node-2fa");
-  
-  export let router: ApplicationRouter<ApplicationRoute>;
+  import { ApplicationRoute, ApplicationRouter } from '@anticrm/platform-ui'
+  import twofactor from 'node-2fa'
+  import { Options } from 'node-2fa/dist/interfaces'
+
+  export let router: ApplicationRouter<ApplicationRoute>
   let object = { oldPassword: '', newPassword: '', newPasswordConfirm: '', clientSecret: '', secondFactorCode: '' }
-  let changePassword = false;
+  let changePassword = false
   let status = new Status(Severity.OK, 0, '')
-  
+
   const platform = getContext('platform') as Platform
   const loginService = platform.getPlugin(login.id)
-  
-  let secondFactorInitEnabled = false;
-  let secondFactorEnabled = false;
-  $: secondFactorCurrentEnabled = secondFactorEnabled && !secondFactorInitEnabled;
-  $: newSecret = secondFactorCurrentEnabled && twofactor.generateSecret({name: "Anticrm"});
-  $: src = newSecret.qr;
-  $: object.clientSecret = newSecret.secret;
+
+  let secondFactorInitEnabled = false
+  let secondFactorEnabled = false
+  let secondFactorCurrentEnabled = false
+  let newSecret: {
+    secret: string
+    uri: string
+    qr: string
+  } | false
+  let src: string
+
+  $: secondFactorCurrentEnabled = secondFactorEnabled && !secondFactorInitEnabled
+  $: newSecret = secondFactorCurrentEnabled && twofactor.generateSecret({ name: 'Anticrm' } as Options)
+  $: src = newSecret.qr
+  $: object.clientSecret = newSecret.secret
 
   const secondFactorCheck = loginService.then(ls => {
     ls.getLoginInfo().then(li => {
-      secondFactorInitEnabled = li?.secondFactorEnabled ? true : false;
-      secondFactorEnabled = secondFactorInitEnabled;
-    });
+      secondFactorInitEnabled = !!li?.secondFactorEnabled
+      secondFactorEnabled = secondFactorInitEnabled
+    })
   })
 
-  async function navigateLoginForm(): Promise<void> {
-    router.navigate({route: ''})
+  async function navigateLoginForm (): Promise<void> {
+    router.navigate({ route: '' })
   }
-  
+
+  let description: string
   $: description = status.message
 
   async function saveSetting (): Promise<void> {
     if (!object.oldPassword) {
-      status = new Status(Severity.INFO, 0, `Поле пароль обязательно к заполнению.`);
-      return;
+      status = new Status(Severity.INFO, 0, `Поле пароль обязательно к заполнению.`)
+      return
     }
-    
-    if (changePassword && object.newPassword != object.newPasswordConfirm) {
-      status = new Status(Severity.INFO, 0, `Пароль и подтверждения пароля не совпадают`);
-      return;
-    }
-    
-    if (secondFactorCurrentEnabled && object.clientSecret && !object.secondFactorCode){
-      status = new Status(Severity.INFO, 0, `Поле код подтверждения обязательно для заполнения`);
-      return;
-    }
-    
-    if (secondFactorCurrentEnabled && !object.clientSecret && object.secondFactorCode){
-      status = new Status(Severity.INFO, 0, `Поле секретный код обязательно для заполнения`);
-      return;
-    }
-    
-    status = new Status(Severity.INFO, 0, 'Соединяюсь с сервером...');
 
-    status = await (await loginService).saveSetting(object.oldPassword, changePassword ? object.newPassword : '', secondFactorEnabled, secondFactorCurrentEnabled ? object.clientSecret : '', secondFactorCurrentEnabled ? object.secondFactorCode : '');
-    if (status.severity === Severity.OK)
-      navigateLoginForm()
+    if (changePassword && object.newPassword != object.newPasswordConfirm) {
+      status = new Status(Severity.INFO, 0, `Пароль и подтверждения пароля не совпадают`)
+      return
+    }
+
+    if (secondFactorCurrentEnabled) {
+      if (object.clientSecret && !object.secondFactorCode) {
+        status = new Status(Severity.INFO, 0, `Поле код подтверждения обязательно для заполнения`)
+        return
+      }
+
+      if (!object.clientSecret && object.secondFactorCode) {
+        status = new Status(Severity.INFO, 0, `Поле секретный код обязательно для заполнения`)
+        return
+      }
+    }
+
+    status = new Status(Severity.INFO, 0, 'Соединяюсь с сервером...')
+
+    status = await (await loginService).saveSetting(
+      object.oldPassword,
+      changePassword ? object.newPassword : '',
+      secondFactorEnabled,
+      secondFactorCurrentEnabled ? object.clientSecret : '', secondFactorCurrentEnabled ? object.secondFactorCode : '')
+    if (status.severity === Severity.OK) {
+      await navigateLoginForm()
+    }
   }
 </script>
 
@@ -81,11 +98,11 @@
   <div class="status">{description}</div>
   <div class="field">
     <input
-          class="editbox"
-          name="oldPassword"
-          placeholder="Пароль"
-          type="password"
-          bind:value={object.oldPassword} />
+      class="editbox"
+      name="oldPassword"
+      placeholder="Пароль"
+      type="password"
+      bind:value={object.oldPassword} />
   </div>
   <div class="field">
     <CheckBox bind:checked={changePassword}>
@@ -93,22 +110,22 @@
     </CheckBox>
   </div>
   {#if changePassword}
-  <div class="field">
-    <input
-          class="editbox"
-          name="newPassword"
-          placeholder="Новый пароль"
-          type="password"
-          bind:value={object.newPassword} />
-  </div>
-  <div class="field">
-    <input
-          class="editbox"
-          name="newPasswordConfirm"
-          placeholder="Подтверждение пароля"
-          type="password"
-          bind:value={object.newPasswordConfirm}/>
-  </div>
+    <div class="field">
+      <input
+        class="editbox"
+        name="newPassword"
+        placeholder="Новый пароль"
+        type="password"
+        bind:value={object.newPassword} />
+    </div>
+    <div class="field">
+      <input
+        class="editbox"
+        name="newPasswordConfirm"
+        placeholder="Подтверждение пароля"
+        type="password"
+        bind:value={object.newPasswordConfirm} />
+    </div>
   {/if}
   {#await secondFactorCheck then value}
     <div class="field">
@@ -119,11 +136,11 @@
     {#if secondFactorCurrentEnabled}
       <div class="field">
         <input
-              class="editbox"
-              name="clientSecret"
-              placeholder="Секретный код"
-              type="text"
-              bind:value={object.clientSecret}/>
+          class="editbox"
+          name="clientSecret"
+          placeholder="Секретный код"
+          type="text"
+          bind:value={object.clientSecret} />
       </div>
       {#if src}
         <div>
@@ -132,17 +149,17 @@
       {/if}
       <div class="field">
         <input
-              class="editbox"
-              name="secondFactorCode"
-              placeholder="Код подтверждения"
-              type="text"
-              bind:value={object.secondFactorCode}/>
+          class="editbox"
+          name="secondFactorCode"
+          placeholder="Код подтверждения"
+          type="text"
+          bind:value={object.secondFactorCode} />
       </div>
     {/if}
   {/await}
   <div class="buttons">
-    <button class="button" on:click|preventDefault={navigateLoginForm}> Отменить </button>
-    <button class="button" on:click|preventDefault={saveSetting}> Сохранить </button>
+    <button class="button" on:click|preventDefault={navigateLoginForm}> Отменить</button>
+    <button class="button" on:click|preventDefault={saveSetting}> Сохранить</button>
   </div>
 </form>
 
@@ -155,7 +172,7 @@
     border: 1px;
     border-style: solid;
   }
-  
+
   form {
     margin: auto;
     margin-top: 3vh;
@@ -174,19 +191,6 @@
       }
 
       margin: 1em 0;
-    }
-
-    .actions {
-      display: flex;
-      margin-top: 1.5em;
-
-      .button {
-        flex: 1;
-
-        &.separator {
-          margin-left: 1em;
-        }
-      }
     }
   }
 </style>
