@@ -15,6 +15,7 @@ limitations under the License.
 <script lang="ts">
   import ui from '@anticrm/platform-ui'
 
+  import Button from '@anticrm/sparkling-controls/src/Button.svelte'
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import PopupMenu from '@anticrm/sparkling-controls/src/menu/PopupMenu.svelte'
   import PopupItem from '@anticrm/sparkling-controls/src/menu/PopupItem.svelte'
@@ -28,10 +29,10 @@ limitations under the License.
 {#if creators.length === 0}
   <div />
 {:else if creators.length === 1}
-  <div class="control" on:click={() => onCreatorClick(creators[0])}>
+  <Button kind="transparent" on:click={() => onCreatorClick(creators[0])}>
     <Icon icon={ui.icon.Add} button={true} />
     <div class="controlLabel">New {creators[0].name}</div>
-  </div>
+  </Button>
 {:else}
   <PopupMenu>
     <div class="control" slot="trigger">

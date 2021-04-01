@@ -85,12 +85,6 @@ limitations under the License.
 </script>
 
 <div class="root">
-  <div class="header">
-    <div class="description">Add Candidate</div>
-    <div on:click={() => dispatch('close')}>
-      <Icon icon={workbench.icon.Close} button={true} />
-    </div>
-  </div>
   <ScrollView height="500px">
     <div class="form">
       <EditBox bind:value={personM.name} label="Name" placeholder="Name" />
@@ -111,17 +105,6 @@ limitations under the License.
 <style lang="scss">
   .root {
     min-width: 450px;
-  }
-
-  .header {
-    display: flex;
-    padding-bottom: 10px;
-  }
-
-  .description {
-    flex-grow: 1;
-    font-size: 18px;
-    font-weight: 500;
   }
 
   .form {

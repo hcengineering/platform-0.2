@@ -79,16 +79,19 @@ limitations under the License.
 
 {#await init then _}
   <div class="root">
+    <div class="header">
+      <div class="title-container">
+        <div class="title">New {creator.name}</div>
+      </div>
+      <div class="close" on:click={onClose}>
+        <Icon icon={workbench.icon.Close} button={true} />
+      </div>
+    </div>
     {#if createFormComponent}
-      <Component is={createFormComponent} props={{ space: space }} on:change on:close={onClose} />
+      <Component is={createFormComponent} props={{ space: space }} on:change />
     {:else}
-      <div class="header">
-        <div class="caption">
-          <InlineEdit bind:value={title} placeholder="Title" fullWidth={true} />
-        </div>
-        <a href="/" style="margin-left:1.5em" on:click|preventDefault={onClose}>
-          <Icon icon={workbench.icon.Close} button={true} />
-        </a>
+      <div class="caption">
+        <InlineEdit bind:value={title} placeholder="Title" fullWidth={true} />
       </div>
 
       <Properties {model} bind:object />
@@ -110,13 +113,35 @@ limitations under the License.
     max-height: 80vh;
   }
 
+  .close {
+    cursor: pointer;
+  }
+
   .header {
     display: flex;
-    margin-bottom: 9px;
+    justify-content: space-between;
 
-    .caption {
-      flex-grow: 1;
-    }
+    padding-bottom: 10px;
+  }
+
+  .title-container {
+    flex: 1;
+    min-width: 0;
+    max-width: 300px;
+  }
+
+  .title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    font-size: 18px;
+    font-weight: 500;
+  }
+
+  .caption {
+    padding-bottom: 10px;
+    flex-grow: 1;
   }
   .buttons {
     margin-top: 16px;

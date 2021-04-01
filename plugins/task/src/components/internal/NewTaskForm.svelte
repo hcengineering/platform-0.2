@@ -16,9 +16,7 @@
   import type { Property, Ref } from '@anticrm/core'
   import { createEventDispatcher } from 'svelte'
   import { getCoreService } from '@anticrm/presentation'
-  import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import UserBox from '@anticrm/platform-ui/src/components/UserBox.svelte'
-  import workbench from '@anticrm/workbench'
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
   import type { Space } from '@anticrm/domains'
@@ -98,9 +96,6 @@
     <div class="caption-1 caption">
       <EditBox id="create_task__input__name" bind:value={title} label="Name" placeholder="Name" />
     </div>
-    <a href="/" style="margin-left:1.5em" on:click|preventDefault={() => dispatch('close')}>
-      <Icon icon={workbench.icon.Close} button="true" />
-    </a>
   </div>
 
   <div class="content">
