@@ -1,5 +1,5 @@
 {
-  "name": "@anticrm/personal-event",
+  "name": "@anticrm/calendar",
   "version": "0.2.0",
   "main": "src/index.ts",
   "author": "Anticrm Platform Contributors (https://github.com/anticrm)",

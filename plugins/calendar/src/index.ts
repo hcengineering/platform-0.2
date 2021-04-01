@@ -14,11 +14,10 @@
 //
 
 import { plugin, Plugin, Service } from '@anticrm/platform'
-import { Class, Ref, Doc, Enum } from '@anticrm/core'
+import { Class, Ref, Enum, Emb } from '@anticrm/core'
 
 import { User } from '@anticrm/contact'
-import { Collab } from '@anticrm/chunter'
-import { Application } from '@anticrm/domains'
+import { Application, VDoc } from '@anticrm/domains'
 
 export enum RecurrenceType {
     Daily,
@@ -36,14 +35,14 @@ export enum CalendarEventType {
   Custom
 }
 
-export interface RecurrenceProperty extends Doc {
+export interface RecurrenceProperty extends Emb {
     type: RecurrenceType
     interval: number
     startDate: Date
     endDate?: Date
 }
 
-export interface Calendar extends Doc {
+export interface Calendar extends VDoc {
     name: string
 
     participants: Ref<User>[]
@@ -52,7 +51,7 @@ export interface Calendar extends Doc {
 /*
  * Define a calendar event object.
  */
-export interface CalendarEvent extends Doc {
+export interface CalendarEvent extends VDoc {
     summary: string
 
     type: CalendarEventType
@@ -63,9 +62,9 @@ export interface CalendarEvent extends Doc {
 
     startDate: Date
 
-    endDate: Date
+    endDate?: Date
 
-    recurrence: Ref<RecurrenceProperty>
+    recurrence?: RecurrenceProperty
 }
 
 export interface CalendarService extends Service {
