@@ -25,8 +25,7 @@ import { QueriableStorage } from './queries'
 
 import { Cache } from './cache'
 import {
-  AnyLayout, Class, combineStorage, CoreProtocol, Doc, generateId as genId, MODEL_DOMAIN, Ref, StringProperty, Tx,
-  txContext,
+  AnyLayout, Class, CoreProtocol, Doc, generateId as genId, MODEL_DOMAIN, Ref, StringProperty, Tx, txContext,
   TxContextSource, TxProcessor
 } from '@anticrm/core'
 import { CORE_CLASS_REFERENCE, CORE_CLASS_SPACE, CORE_CLASS_TITLE, Space, TITLE_DOMAIN, VDoc } from '@anticrm/domains'
