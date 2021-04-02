@@ -21,7 +21,7 @@
   import CommentComponent from './Comment.svelte'
   import DateItem from './DateItem.svelte'
   import SplitView from '@anticrm/sparkling-controls/src/SplitView.svelte'
-  import { createLiveQuery, getCoreService, getUserId, updateLiveQuery } from '@anticrm/presentation'
+  import { createLiveQuery, getCoreService, getUserId, liveQuery, updateLiveQuery } from '@anticrm/presentation'
 
   const coreService = getCoreService()
   const chunterService = getChunterService()
@@ -31,18 +31,13 @@
   let spaceName: string
   let messages: Message[] = []
 
-  const ms = createLiveQuery(chunter.class.Message, { _space: space._id }, (docs) => {
+  const userId = getUserId()
+
+  $: ms = liveQuery(ms, chunter.class.Message, { _space: space._id }, (docs) => {
     messages = docs
   })
 
-  const userId = getUserId()
-
-  $: {
-    updateLiveQuery(ms, chunter.class.Message, { _space: space._id })
-    // TODO: use Titles index instead of getting the whole Space object
-    coreService.then(cs => cs.findOne(CORE_CLASS_SPACE, { _id: space._id })
-      .then((spaceObj) => (spaceName = spaceObj ? '#' + spaceObj.name : '')))
-  }
+  $: spaceName = space ? '#' + space.name : ''
 
   function createMessage (message: MessageNode) {
     if (message) {

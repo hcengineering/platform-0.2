@@ -18,7 +18,7 @@
   import { Application, CORE_CLASS_SPACE, CORE_MIXIN_SHORTID, Space } from '@anticrm/domains'
 
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
-  import { createLiveQuery, getCoreService } from '@anticrm/presentation'
+  import { getCoreService, liveQuery } from '@anticrm/presentation'
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
   import EditBox from '@anticrm/sparkling-controls/src/EditBox.svelte'
   import ComboBox from '@anticrm/platform-ui/src/components/ComboBox.svelte'
@@ -32,7 +32,7 @@
   let taskSpace: Space | undefined
   let spaces: Space[] = []
 
-  createLiveQuery(CORE_CLASS_SPACE, {}, (docs) => {
+  $: lq = liveQuery(lq, CORE_CLASS_SPACE, {}, (docs) => {
     spaces = docs
   })
 

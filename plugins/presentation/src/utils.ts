@@ -88,6 +88,29 @@ export function updateLiveQuery<T extends Doc> (qu: Promise<QueryUpdater<T>>, _c
   qu.then((q) => q(_class, query))
 }
 
+/**
+ * Construct and register a live query.
+ *
+ * Usage:
+ *
+ * $: liveQuery(_class, query, action)
+ * @param liveQuery - a live query identifier.
+ * @param _class
+ * @param _query
+ * @param action
+ */
+export function liveQuery<T extends Doc> (
+  liveQuery: Promise<QueryUpdater<T>> | undefined,
+  _class: Ref<Class<T>>,
+  _query: AnyLayout,
+  action: (docs: T[]) => void): Promise<QueryUpdater<T>> {
+  if (liveQuery) {
+    updateLiveQuery(liveQuery as Promise<QueryUpdater<T>>, _class, _query)
+    return liveQuery
+  }
+  return createLiveQuery(_class, _query, action)
+}
+
 export function getEmptyModel (): ClassModel {
   return {
     getGroups (): GroupModel[] {

@@ -17,17 +17,15 @@
   import { Message } from '../..'
 
   import CommentComponent from './Comment.svelte'
-  import { createLiveQuery, updateLiveQuery } from '@anticrm/presentation'
+  import { liveQuery } from '@anticrm/presentation'
 
   export let backlink: Reference
 
   let message: Message
 
-  const qs = createLiveQuery(backlink._sourceClass, { _id: backlink._sourceId }, (docs) => {
+  $: qs = liveQuery(qs, backlink._sourceClass, { _id: backlink._sourceId }, (docs) => {
     message = docs[0] as Message
   })
-
-  $: updateLiveQuery(qs, backlink._sourceClass, { _id: backlink._sourceId })
 </script>
 
 {#if message && message.comments && message.comments.length > backlink._sourceProps.pos}
