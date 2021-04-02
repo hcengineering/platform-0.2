@@ -99,9 +99,10 @@
 <div class="workbench-browse">
   {#if application}
     <div class="captionContainer">
-      <span class="caption-1" style="padding-right:1em">{application.label}</span>&nbsp;
-      <CreateControl {creators} {onCreatorClick} />
-      <div style="flex-grow:1" />
+      <div class="captionLeftItems">
+        <span class="caption-1" style="padding-right:1em">{application.label}</span>&nbsp;
+        <CreateControl {creators} {onCreatorClick} />
+      </div>
       <IconEditBox icon={workbench.icon.Finder} placeholder="Поиск по {application.label}..." iconRight={true} />
     </div>
     <div class="presentation">
@@ -132,6 +133,11 @@
       border-bottom: 1px solid var(--theme-bg-accent-color);
       display: flex;
       justify-content: space-between;
+      align-items: center;
+    }
+
+    .captionLeftItems {
+      display: flex;
       align-items: center;
     }
 
