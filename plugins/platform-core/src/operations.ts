@@ -13,8 +13,7 @@
 // limitations under the License.
 //
 
-import { generateId, Tx, Ref, StringProperty, AnyLayout, Class, DateProperty, Doc, Model } from '@anticrm/core'
-import { VDoc, CORE_CLASS_VDOC } from '@anticrm/domains'
+import { AnyLayout, Class, Doc, generateId, Model, Ref, StringProperty, Tx } from '@anticrm/core'
 import { OperationProtocol } from '.'
 import { newCreateTx, newDeleteTx, newPushTx, newUpdateTx } from './tx'
 
@@ -26,17 +25,6 @@ export function createOperations (model: Model, processTx: (tx: Tx) => Promise<a
     }
 
     const doc = model.newDoc(_class, generateId(), (values as unknown) as AnyLayout)
-
-    if (model.is(_class, CORE_CLASS_VDOC)) {
-      const vdoc = (doc as unknown) as VDoc
-      if (!vdoc._createdBy) {
-        vdoc._createdBy = getUserId()
-      }
-      if (!vdoc._createdOn) {
-        vdoc._createdOn = Date.now() as DateProperty
-      }
-    }
-
     return processTx(newCreateTx(doc, getUserId())).then(() => doc)
   }
 

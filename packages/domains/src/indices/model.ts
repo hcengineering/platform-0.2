@@ -27,12 +27,12 @@ import {
  * Perform model update and forward updates into chained storage if required.
  */
 export class ModelIndex implements DomainIndex {
-  private readonly storages: Storage[]
+  private readonly storage: Storage
   private readonly model: Model
 
-  constructor (model: Model, storages: Storage[]) {
+  constructor (model: Model, storage: Storage) {
     this.model = model
-    this.storages = storages
+    this.storage = storage
   }
 
   async tx (ctx: TxContext, tx: Tx): Promise<any> {
@@ -43,28 +43,28 @@ export class ModelIndex implements DomainIndex {
           return
         }
         const newDoc = this.model.newDoc(createTx._objectClass, createTx._objectId, createTx.object)
-        return Promise.all(this.storages.map((s) => s.store(ctx, newDoc)))
+        return this.storage.store(ctx, newDoc)
       }
       case CORE_CLASS_UPDATE_TX: {
         const updateTx = tx as UpdateTx
         if (this.model.getDomain(updateTx._objectClass) !== MODEL_DOMAIN) {
           return
         }
-        return Promise.all(this.storages.map((s) => s.update(ctx, updateTx._objectClass, updateTx._objectId, updateTx._query || null, updateTx._attributes)))
+        return this.storage.update(ctx, updateTx._objectClass, updateTx._objectId, updateTx._query || null, updateTx._attributes)
       }
       case CORE_CLASS_PUSH_TX: {
         const pushTx = tx as PushTx
         if (this.model.getDomain(pushTx._objectClass) !== MODEL_DOMAIN) {
           return
         }
-        return Promise.all(this.storages.map((s) => s.push(ctx, pushTx._objectClass, pushTx._objectId, pushTx._query || null, pushTx._attribute, pushTx._attributes)))
+        return this.storage.push(ctx, pushTx._objectClass, pushTx._objectId, pushTx._query || null, pushTx._attribute, pushTx._attributes)
       }
       case CORE_CLASS_DELETE_TX: {
         const deleteTx = tx as DeleteTx
         if (this.model.getDomain(deleteTx._objectClass) !== MODEL_DOMAIN) {
           return
         }
-        return Promise.all(this.storages.map((s) => s.remove(ctx, deleteTx._objectClass, deleteTx._objectId, (deleteTx._query || null) as AnyLayout)))
+        return this.storage.remove(ctx, deleteTx._objectClass, deleteTx._objectId, (deleteTx._query || null) as AnyLayout)
       }
 
       default:

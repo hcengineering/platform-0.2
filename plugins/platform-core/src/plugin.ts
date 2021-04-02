@@ -25,7 +25,8 @@ import { QueriableStorage } from './queries'
 
 import { Cache } from './cache'
 import {
-  AnyLayout, Class, CoreProtocol, Doc, generateId as genId, MODEL_DOMAIN, Ref, StringProperty, Tx, txContext,
+  AnyLayout, Class, combineStorage, CoreProtocol, Doc, generateId as genId, MODEL_DOMAIN, Ref, StringProperty, Tx,
+  txContext,
   TxContextSource, TxProcessor
 } from '@anticrm/core'
 import { CORE_CLASS_REFERENCE, CORE_CLASS_SPACE, CORE_CLASS_TITLE, Space, TITLE_DOMAIN, VDoc } from '@anticrm/domains'
@@ -92,7 +93,7 @@ export default async (platform: Platform): Promise<CoreService> => {
     new PassthroughsIndex(model, qTitles, CORE_CLASS_TITLE), // Just for live queries.
     new PassthroughsIndex(model, qCache, CORE_CLASS_REFERENCE), // Construct a pass index to update references
     new PassthroughsIndex(model, qCache, CORE_CLASS_SPACE), // Construct a pass index to update references
-    new ModelIndex(model, [qModel])
+    new ModelIndex(model, qModel)
   ])
 
   // add listener to process data updates from backend for data transactions.
@@ -102,6 +103,7 @@ export default async (platform: Platform): Promise<CoreService> => {
 
   // Add a client transaction event listener
   rpc.addEventListener(EventType.TransientTransaction, txs => {
+    console.log('processTransient', txs)
     for (const tx of (txs as Tx[])) {
       txProcessor.process(txContext(TxContextSource.ServerTransient), tx)
     }

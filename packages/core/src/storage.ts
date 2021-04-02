@@ -75,14 +75,13 @@ export interface CoreProtocol extends DocumentProtocol {
   /**
    * Generate a sequence, short object reference.
    * @param _space
-   * @param _class
    * @return a generated reference Id,
    */
   genRefId (_space: Ref<Space>): Promise<Ref<VDoc>>
 }
 
 export class TxProcessor {
-  private indices: DomainIndex[]
+  private readonly indices: DomainIndex[]
 
   constructor (indices: DomainIndex[]) {
     this.indices = indices
@@ -118,4 +117,47 @@ function count (): string {
 
 export function generateId (): Ref<Doc> {
   return timestamp() + random + count() as Ref<Doc>
+}
+
+/**
+ * Perform model update and forward updates into chained storage if required.
+ */
+class CombineStorage implements Storage {
+  private readonly storages: Storage[]
+
+  constructor (storages: Storage[]) {
+    this.storages = storages
+  }
+
+  async find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
+    return (await Promise.all(this.storages.map((s) => s.find(_class, query)))).reduce((p, c) => p.concat(c))
+  }
+
+  findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined> {
+    return Promise.race(this.storages.map((s) => s.findOne(_class, query)))
+  }
+
+  push (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, query: AnyLayout | null, attribute: StringProperty, attributes: AnyLayout): Promise<void> {
+    return Promise.all(this.storages.map((s) => s.push(ctx, _class, _id, query, attribute, attributes))).then()
+  }
+
+  remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, query: AnyLayout | null): Promise<void> {
+    return Promise.all(this.storages.map((s) => s.remove(ctx, _class, _id, query))).then()
+  }
+
+  store (ctx: TxContext, doc: Doc): Promise<void> {
+    return Promise.all(this.storages.map((s) => s.store(ctx, doc))).then()
+  }
+
+  update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, query: AnyLayout | null, attributes: AnyLayout): Promise<void> {
+    return Promise.all(this.storages.map((s) => s.update(ctx, _class, _id, query, attributes))).then()
+  }
+}
+
+/**
+ * Return a combined storage
+ * @param storages
+ */
+export function combineStorage (...storages: Storage[]): Storage {
+  return new CombineStorage(storages)
 }

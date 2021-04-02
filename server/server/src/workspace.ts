@@ -14,7 +14,8 @@
 //
 
 import {
-  AnyLayout, Class, Doc, DocumentProtocol, isValidQuery, Model, MODEL_DOMAIN, Ref, Storage, StringProperty, Tx,
+  AnyLayout, Class, combineStorage, Doc, DocumentProtocol, isValidQuery, Model, MODEL_DOMAIN, Ref, Storage,
+  StringProperty, Tx,
   TxContext, TxProcessor
 } from '@anticrm/core'
 import { Collection, MongoClient } from 'mongodb'
@@ -135,11 +136,11 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
 
   const txProcessor = new TxProcessor([
     new TxIndex(mongoStorage),
-    new VDocIndex(memdb, mongoStorage),
+    new VDocIndex(memdb, mongoStorage, clientTxMongo),
     new TitleIndex(memdb, clientTxMongo),
     new ReferenceIndex(memdb, clientTxMongo),
     new PassthroughsIndex(memdb, mongoStorage, CORE_CLASS_SPACE),
-    new ModelIndex(memdb, [memdb, mongoStorage])
+    new ModelIndex(memdb, combineStorage(memdb, mongoStorage))
   ])
 
   const clientControl = {
