@@ -27,7 +27,7 @@ limitations under the License.
   import EditBox from '@anticrm/sparkling-controls/src/EditBox.svelte'
   import ResumeEditor from '@anticrm/person-extras/src/components/ResumeEditor.svelte'
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
-  import ComboBox from '@anticrm/sparkling-controls/src/ComboBox.svelte'
+  import SpaceBox from '@anticrm/platform-ui/src/components/SpaceBox.svelte'
 
   import type { WithCandidateProps } from '..'
   import candidate from '..'
@@ -35,17 +35,13 @@ limitations under the License.
   export let space: Ref<Space> | undefined
   export let spaces: Space[] | undefined
 
-  let selectedSpaceIdx = 0
-  let spaceItems = spaces?.map((x, idx) => ({
-    id: idx,
-    comboValue: x.name
-  }))
+  let selectedSpace = 0
 
   const coreP = getCoreService()
   const modelP = coreP.then((c) => c.getModel())
   const dispatch = createEventDispatcher()
 
-  const getSpace = () => space || (spaces?.[selectedSpaceIdx]._id as Ref<Space>) || ('' as Ref<Space>)
+  const getSpace = () => space || (spaces?.[selectedSpace]._id as Ref<Space>) || ('' as Ref<Space>)
 
   const personM: Person = {
     _id: generateId(),
@@ -97,12 +93,8 @@ limitations under the License.
 <div class="root">
   <ScrollView height="500px">
     <div class="form">
-      {#if spaces && spaceItems && spaceItems.length > 0}
-        <ComboBox label="Vacancy" items={spaceItems} bind:selected={selectedSpaceIdx}>
-          <div slot="title">
-            {spaces[selectedSpaceIdx].name}
-          </div>
-        </ComboBox>
+      {#if spaces && spaces.length > 1}
+        <SpaceBox label="Vacancy" {spaces} bind:selected={selectedSpace} />
       {/if}
       <EditBox bind:value={personM.name} label="Name" placeholder="Name" />
       <EditBox bind:value={personM.email} label="Email" placeholder="vasya@email.com" />

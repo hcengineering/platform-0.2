@@ -22,8 +22,8 @@ limitations under the License.
 
   import Properties from '@anticrm/presentation/src/components/internal/Properties.svelte'
   import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.svelte'
-  import ComboBox from '@anticrm/sparkling-controls/src/ComboBox.svelte'
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
+  import SpaceBox from '@anticrm/platform-ui/src/components/SpaceBox.svelte'
 
   export let creator: ItemCreator
   export let space: Ref<Space> | undefined
@@ -33,11 +33,7 @@ limitations under the License.
 
   let object = {} as any
   let title = ''
-  let selectedSpaceIdx = 0
-  let spaceItems = spaces?.map((x, idx) => ({
-    id: idx,
-    comboValue: x.name
-  }))
+  let selectedSpace = 0
 
   const dispatch = createEventDispatcher()
   const coreService = getCoreService()
@@ -47,7 +43,7 @@ limitations under the License.
     const doc = {
       _class: creator.class,
       [primary?.key || 'name']: title,
-      _space: space ?? spaces?.[selectedSpaceIdx]._id,
+      _space: space ?? spaces?.[selectedSpace]._id,
       ...object
     }
 
@@ -63,12 +59,8 @@ limitations under the License.
   <InlineEdit bind:value={title} placeholder="Title" fullWidth={true} />
 </div>
 
-{#if spaces && spaceItems && spaceItems.length > 0}
-  <ComboBox label="Space" items={spaceItems} bind:selected={selectedSpaceIdx}>
-    <div slot="title">
-      {spaces[selectedSpaceIdx].name}
-    </div>
-  </ComboBox>
+{#if spaces && spaces.length > 1}
+  <SpaceBox {spaces} bind:selected={selectedSpace} />
 {/if}
 
 <Properties {model} bind:object />
