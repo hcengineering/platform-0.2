@@ -13,9 +13,9 @@
 import { Class, Emb, Mixin, Ref } from '@anticrm/core'
 import core from '@anticrm/platform-core'
 import { Plugin, plugin, Service } from '@anticrm/platform'
-import { Application } from '@anticrm/domains'
 import { Asset, AnyComponent } from '@anticrm/platform-ui'
 import { WithResume } from '@anticrm/person-extras'
+import { WorkbenchApplication } from '@anticrm/workbench'
 
 export interface Candidate extends Emb {
   bio: string
@@ -47,7 +47,7 @@ export default plugin(
       Candidate: '' as AnyComponent
     },
     application: {
-      Vacancies: '' as Ref<Application>
+      Vacancies: '' as Ref<WorkbenchApplication>
     }
   }
 )

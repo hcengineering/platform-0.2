@@ -61,7 +61,7 @@ class TPerspective extends TDoc implements Perspective {
 class TItemCreator extends TDoc implements ItemCreator {
   @Prop() name!: IntlString
   @Prop() class!: Ref<Class<VDoc>>
-  @Prop() app!: Ref<Class<WorkbenchApplication>>
+  @Prop() app!: Ref<WorkbenchApplication>
   @Prop() component?: AnyComponent
 }
 

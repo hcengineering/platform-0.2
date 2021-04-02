@@ -20,8 +20,6 @@ import { TWithResume } from '@anticrm/person-extras/src/__model__'
 import personExtras from '@anticrm/person-extras'
 
 import recruiting, { Candidate, WithCandidateProps } from '.'
-import { WorkbenchApplication } from '@anticrm/workbench'
-import { Class, Ref } from '@anticrm/core'
 
 @UX('Candidate' as IntlString)
 @Class$(recruiting.class.Candidate, core.class.Emb)
@@ -65,14 +63,14 @@ export function model (S: Builder): void {
   })
 
   S.createDocument(workbench.class.ItemCreator, {
-    app: recruiting.application.Vacancies as Ref<Class<WorkbenchApplication>>,
+    app: recruiting.application.Vacancies,
     class: recruiting.mixin.WithCandidateProps,
     name: 'Candidate' as IntlString
   })
 
   // This is just a temporary example
   S.createDocument(workbench.class.ItemCreator, {
-    app: recruiting.application.Vacancies as Ref<Class<WorkbenchApplication>>,
+    app: recruiting.application.Vacancies,
     class: recruiting.mixin.WithCandidateProps,
     name: 'Candidate with custom component' as IntlString,
     component: recruiting.component.NewCandidate

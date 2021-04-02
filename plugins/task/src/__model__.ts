@@ -27,12 +27,11 @@ import { UX } from '@anticrm/presentation/src/__model__'
 import presentation from '@anticrm/presentation'
 import workbench from '@anticrm/workbench/src/__model__'
 import chunter, { TCollab } from '@anticrm/chunter/src/__model__'
-import { Class, DateProperty, MODEL_DOMAIN, Ref, StringProperty } from '@anticrm/core'
+import { DateProperty, MODEL_DOMAIN, Ref, StringProperty } from '@anticrm/core'
 import { TEmb, TEnum, TVDoc } from '@anticrm/model/src/__model__'
 import contact from '@anticrm/contact/src/__model__'
 import { Asset } from '@anticrm/platform-ui'
 import { Metadata } from '@anticrm/platform'
-import { WorkbenchApplication } from '@anticrm/workbench'
 
 export const DOMAIN_TASK = 'task'
 
@@ -197,7 +196,7 @@ export function model (S: Builder): void {
 
   S.createDocument(workbench.class.WorkbenchApplication, {
     route: 'tasks',
-    label: 'Tasks' as StringProperty,
+    label: 'Tasks' as IntlString,
     icon: task.icon.Task,
     component: workbench.component.Application,
     classes: [task.class.Task],
@@ -214,7 +213,7 @@ export function model (S: Builder): void {
   })
 
   S.createDocument(workbench.class.ItemCreator, {
-    app: task.application.Task as Ref<Class<WorkbenchApplication>>,
+    app: task.application.Task,
     class: task.class.Task,
     name: 'Task' as IntlString
   })

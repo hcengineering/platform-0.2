@@ -44,7 +44,7 @@ export interface WorkbenchApplication extends Application {
 export interface ItemCreator extends Doc {
   name: IntlString
   class: Ref<Class<VDoc>>
-  app: Ref<Class<WorkbenchApplication>>
+  app: Ref<WorkbenchApplication>
   component?: AnyComponent
 }
 

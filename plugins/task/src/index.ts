@@ -16,7 +16,7 @@
 import { plugin, Plugin, Service } from '@anticrm/platform'
 import { Class, DateProperty, Emb, Enum, Mixin, Ref, StringProperty } from '@anticrm/core'
 import type { VDoc } from '@anticrm/domains'
-import { Application } from '@anticrm/domains'
+import { WorkbenchApplication } from '@anticrm/workbench'
 
 import { User } from '@anticrm/contact'
 import { AnyComponent, Asset } from '@anticrm/platform-ui'
@@ -194,6 +194,6 @@ export default plugin('task' as Plugin<TaskService>, {}, {
     StatusPresenter: '' as AnyComponent
   },
   application: {
-    Task: '' as Ref<Application>
+    Task: '' as Ref<WorkbenchApplication>
   }
 })
