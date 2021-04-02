@@ -1,7 +1,7 @@
 <script lang="ts">
   import { AnyLayout, StringProperty } from '@anticrm/core'
   import { MessageNode, newMessageDocument } from '@anticrm/text'
-  import { createLiveQuery, getCoreService, updateLiveQuery } from '../../utils'
+  import { getCoreService, liveQuery } from '../../utils'
 
   import { QueryUpdater } from '@anticrm/platform-core'
 
@@ -89,11 +89,9 @@
     }
   }
 
-  titleSearch = createLiveQuery(CORE_CLASS_TITLE, query(currentPrefix), (docs) => {
+  $: titleSearch = liveQuery(titleSearch, CORE_CLASS_TITLE, query(currentPrefix), (docs) => {
     completions = updateTitles(docs)
   })
-
-  $: updateLiveQuery(titleSearch, CORE_CLASS_TITLE, query(currentPrefix))
 
   function updateTitles (docs: Title[]): CompletionItem[] {
     let items: CompletionItem[] = []

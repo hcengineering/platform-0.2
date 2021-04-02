@@ -14,7 +14,7 @@
 -->
 <script lang="ts">
   import { Class, Doc, Ref, RefTo, Type } from '@anticrm/core'
-  import ui, { AttrModel, createLiveQuery, getCoreService, updateLiveQuery } from '@anticrm/presentation'
+  import ui, { AttrModel, createLiveQuery, getCoreService, liveQuery, updateLiveQuery } from '@anticrm/presentation'
   import { AnyComponent } from '@anticrm/platform-ui'
   import Presenter from '../Presenter.svelte'
 
@@ -26,7 +26,7 @@
   let presenter: AnyComponent
 
   const coreService = getCoreService()
-  const update = createLiveQuery((attribute.type as RefTo<Doc>).to, { _id: value }, (docs) => {
+  $: lq = liveQuery(lq, (attribute.type as RefTo<Doc>).to, { _id: value }, (docs) => {
     if (docs.length > 0) {
       doc = docs[0]
     } else {
@@ -35,11 +35,9 @@
   })
 
   $: {
-    const objClass = (attribute.type as RefTo<Doc>).to
-    updateLiveQuery(update, objClass, { _id: value })
-
     coreService.then(cs => {
       const model = cs.getModel()
+      const objClass = (attribute.type as RefTo<Doc>).to
       const typeClass = model.get(objClass) as Class<Type>
       if (!model.isMixedIn(typeClass, ui.mixin.Presenter)) {
         console.log(new Error(`no presenter for type '${objClass}'`))

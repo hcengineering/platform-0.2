@@ -19,21 +19,15 @@
   import CommentComponent from './internal/Comment.svelte'
   import Backlink from './internal/Backlink.svelte'
   import { CORE_CLASS_REFERENCE, Reference } from '@anticrm/domains'
-  import { createLiveQuery, getCoreService, updateLiveQuery } from '@anticrm/presentation'
+  import { getCoreService, liveQuery } from '@anticrm/presentation'
 
   export let object: Collab
 
   let references: Reference[] = []
 
-  const refS = createLiveQuery(CORE_CLASS_REFERENCE, { _targetId: object._id }, (docs) => {
+  $: refS = liveQuery(refS, CORE_CLASS_REFERENCE, { _targetId: object._id }, (docs) => {
     references = docs
   })
-
-  $: {
-    if (object) {
-      updateLiveQuery(refS, CORE_CLASS_REFERENCE, { _targetId: object._id })
-    }
-  }
 
   const chunterService = getChunterService()
   const coreService = getCoreService()
