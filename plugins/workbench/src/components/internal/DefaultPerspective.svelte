@@ -13,12 +13,16 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { Class, Doc, Property, Ref, StringProperty } from '@anticrm/core'
+  import type { Class, Doc, Property, Ref, StringProperty } from '@anticrm/core'
   import { onDestroy } from 'svelte'
-  import { CORE_CLASS_SPACE, CORE_CLASS_TITLE, Space, Title, TitleSource } from '@anticrm/domains'
+  import type { Space, Title } from '@anticrm/domains'
+  import { TitleSource } from '@anticrm/domains'
+  import { CORE_CLASS_SPACE, CORE_CLASS_TITLE } from '@anticrm/domains'
   import ui, { getUIService, newRouter } from '@anticrm/platform-ui'
-  import workbench, { WorkbenchApplication } from '../..'
-  import { CoreDocument, createLiveQuery, getCoreService, getUserId } from '@anticrm/presentation'
+  import type { WorkbenchApplication } from '../..'
+  import workbench from '../..'
+  import type { CoreDocument } from '@anticrm/presentation'
+  import { createLiveQuery, getCoreService, getUserId } from '@anticrm/presentation'
 
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import SpaceItem from './spaces/SpaceItem.svelte'

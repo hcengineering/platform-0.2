@@ -13,8 +13,8 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { Reference } from '@anticrm/domains'
-  import { Message } from '../..'
+  import type { Reference } from '@anticrm/domains'
+  import type { Message } from '../..'
 
   import CommentComponent from './Comment.svelte'
   import { liveQuery } from '@anticrm/presentation'

@@ -13,14 +13,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <script lang="ts">
-  import { Person } from '@anticrm/contact'
+  import type { Person } from '@anticrm/contact'
 
-  import { createLiveQuery, getCoreService, liveQuery, updateLiveQuery } from '@anticrm/presentation'
+  import { getCoreService, liveQuery } from '@anticrm/presentation'
 
   import UserInfo from '@anticrm/sparkling-controls/src/UserInfo.svelte'
   import ResumeProps from '@anticrm/person-extras/src/components/ResumeProps.svelte'
 
-  import candidatePlugin, { WithCandidateProps } from '..'
+  import type { WithCandidateProps } from '..'
+  import candidatePlugin from '..'
 
   const core = getCoreService()
   const model = core.then((s) => s.getModel())

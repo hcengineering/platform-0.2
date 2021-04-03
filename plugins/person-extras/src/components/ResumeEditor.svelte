@@ -16,7 +16,7 @@ limitations under the License.
   import SkillsEditor from './SkillsEditor.svelte'
   import StringListEditor from './StringListEditor.svelte'
 
-  import { Resume, WithResume } from '..'
+  import type { Resume } from '..'
 
   export let resume: Resume
 </script>

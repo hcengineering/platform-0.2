@@ -13,18 +13,18 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { Class, Doc, Ref } from '@anticrm/core'
+  import type { Class, Doc, Ref } from '@anticrm/core'
   import { createEventDispatcher } from 'svelte'
-  import { AnyComponent } from '@anticrm/platform-ui'
-  import presentation, {
-    AttrModel, ClassModel, getComponentExtension, getPresentationService, getCoreService
-  } from '@anticrm/presentation'
+  import type { AnyComponent } from '@anticrm/platform-ui'
+  import type { AttrModel, ClassModel } from '@anticrm/presentation'
+  import presentation, { getComponentExtension, getCoreService, getPresentationService } from '@anticrm/presentation'
   import Properties from '@anticrm/presentation/src/components/internal/Properties.svelte'
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import workbench from '@anticrm/workbench'
   import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.svelte'
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
-  import { CORE_CLASS_VDOC, Space } from '@anticrm/domains'
+  import type { Space } from '@anticrm/domains'
+  import { CORE_CLASS_VDOC } from '@anticrm/domains'
   import Component from '@anticrm/platform-ui/src/components/Component.svelte'
 
   export let title: string = ''

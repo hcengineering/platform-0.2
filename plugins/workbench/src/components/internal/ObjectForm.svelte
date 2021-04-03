@@ -11,8 +11,8 @@
   //
   // See the License for the specific language governing permissions and
   // limitations under the License.
-  import { Class, Doc, Ref } from '@anticrm/core'
-  import { AnyComponent } from '@anticrm/platform-ui'
+  import type { Class, Doc, Ref } from '@anticrm/core'
+  import type { AnyComponent } from '@anticrm/platform-ui'
   import Component from '@anticrm/platform-ui/src/components/Component.svelte'
   import presentation, { createLiveQuery, getComponentExtension, updateLiveQuery } from '@anticrm/presentation'
   import { createEventDispatcher } from 'svelte'

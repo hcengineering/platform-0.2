@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <script lang="ts">
-  import { WithResume } from '..'
+  import type { WithResume } from '..'
 
   export let resume: WithResume['resume']
 </script>

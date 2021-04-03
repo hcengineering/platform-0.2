@@ -13,9 +13,10 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { Class, Doc, Ref, RefTo, Type } from '@anticrm/core'
-  import ui, { AttrModel, createLiveQuery, getCoreService, liveQuery, updateLiveQuery } from '@anticrm/presentation'
-  import { AnyComponent } from '@anticrm/platform-ui'
+  import type { Class, Doc, Ref, RefTo, Type } from '@anticrm/core'
+  import type { AttrModel } from '@anticrm/presentation'
+  import ui, { getCoreService, liveQuery } from '@anticrm/presentation'
+  import type { AnyComponent } from '@anticrm/platform-ui'
   import Presenter from '../Presenter.svelte'
 
   export let value: Ref<Doc>

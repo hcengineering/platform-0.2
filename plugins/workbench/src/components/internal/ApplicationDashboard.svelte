@@ -14,7 +14,8 @@
 -->
 
 <script type="ts">
-  import workbench, { WorkbenchApplication } from '../..'
+  import type { WorkbenchApplication } from '../..'
+  import workbench from '../..'
   import IconEditBox from '@anticrm/platform-ui/src/components/IconEditBox.svelte'
 
   export let application: WorkbenchApplication

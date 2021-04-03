@@ -1,19 +1,20 @@
 <script lang="ts">
-  import { AnyLayout, StringProperty } from '@anticrm/core'
-  import { MessageNode, newMessageDocument } from '@anticrm/text'
+  import type { AnyLayout, StringProperty } from '@anticrm/core'
+  import type { MessageNode } from '@anticrm/text'
+  import { newMessageDocument } from '@anticrm/text'
   import { getCoreService, liveQuery } from '../../utils'
 
-  import { QueryUpdater } from '@anticrm/platform-core'
+  import type { QueryUpdater } from '@anticrm/platform-core'
 
   import Toolbar from '@anticrm/sparkling-controls/src/toolbar/Toolbar.svelte'
   import ToolbarButton from '@anticrm/sparkling-controls/src/toolbar/Button.svelte'
 
   import EditorContent from '@anticrm/sparkling-rich/src/EditorContent.svelte'
-  import { EditorActions, EditorContentEvent } from '@anticrm/sparkling-rich'
+  import type { EditorActions, EditorContentEvent } from '@anticrm/sparkling-rich'
   import { EditorState, Transaction } from 'prosemirror-state'
 
   import CompletionPopup from './CompletionPopup.svelte'
-  import { CompletionItem, CompletionPopupActions } from './CompletionPopupHelper'
+  import type { CompletionItem, CompletionPopupActions } from './CompletionPopupHelper'
 
   import { schema } from '@anticrm/sparkling-rich/src/internal/schema'
 
@@ -21,7 +22,8 @@
   import presentation from '@anticrm/presentation'
 
   import { createEventDispatcher } from 'svelte'
-  import { CORE_CLASS_TITLE, Title } from '@anticrm/domains'
+  import type { Title } from '@anticrm/domains'
+  import { CORE_CLASS_TITLE } from '@anticrm/domains'
 
   const dispatch = createEventDispatcher()
   const coreService = getCoreService()

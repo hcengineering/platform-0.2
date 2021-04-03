@@ -14,14 +14,15 @@
 -->
 
 <script lang="ts">
-  import { AnyLayout, StringProperty } from '@anticrm/core'
+  import type { AnyLayout, StringProperty } from '@anticrm/core'
   import ui from '@anticrm/platform-ui'
 
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
-  import { CORE_CLASS_TITLE, Title } from '@anticrm/domains'
+  import type { Title } from '@anticrm/domains'
+  import { CORE_CLASS_TITLE } from '@anticrm/domains'
   import { liveQuery } from '@anticrm/presentation'
 
-  let query: string
+  let query: string = ''
   let result: Title[] = []
 
   function q (query: string): AnyLayout {

@@ -1,4 +1,5 @@
 <script type="ts">
+  import type { Enum, Model, NumberProperty } from '@anticrm/core'
   // Copyright © 2020 Anticrm Platform Contributors.
   //
   // Licensed under the Eclipse Public License, Version 2.0 (the "License");
@@ -11,15 +12,17 @@
   //
   // See the License for the specific language governing permissions and
   // limitations under the License.
-  import { CORE_CLASS_ENUM, Enum, Model, NumberProperty } from '@anticrm/core'
-  import task, { Task, TaskStatus } from '../..'
+  import { CORE_CLASS_ENUM } from '@anticrm/core'
+  import type { Task } from '../..'
+  import task, { TaskStatus } from '../..'
   import UserInfo from '@anticrm/sparkling-controls/src/UserInfo.svelte'
   import StatusLabel from './StatusLabel.svelte'
   import ActionBar from '@anticrm/platform-ui/src/components/ActionBar.svelte'
-  import { Action } from '@anticrm/platform-ui'
+  import type { Action } from '@anticrm/platform-ui'
   import Comments from '@anticrm/chunter/src/components/Comments.svelte'
   import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.svelte'
-  import { CORE_MIXIN_SHORTID, ShortID } from '@anticrm/domains'
+  import type { ShortID } from '@anticrm/domains'
+  import { CORE_MIXIN_SHORTID } from '@anticrm/domains'
   import ux, { getCoreService } from '@anticrm/presentation'
 
   export let object: Task

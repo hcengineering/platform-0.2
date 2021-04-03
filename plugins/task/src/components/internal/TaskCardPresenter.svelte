@@ -1,11 +1,14 @@
 <script type="ts">
-  import { CORE_CLASS_ENUM, Enum } from '@anticrm/core'
+  import type { Enum } from '@anticrm/core'
+  import { CORE_CLASS_ENUM } from '@anticrm/core'
   import TaskCard from './TaskCard.svelte'
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import workbench from '@anticrm/workbench'
-  import { Task, TaskStatus } from '../..'
+  import type { Task } from '../..'
+  import { TaskStatus } from '../..'
   import task from '@anticrm/task'
-  import ui, { getCoreService, UXAttribute } from '@anticrm/presentation'
+  import type { UXAttribute } from '@anticrm/presentation'
+  import ui, { getCoreService } from '@anticrm/presentation'
 
   // export let _class: Ref<Class<Doc>>
   // export let space: Ref<Space>

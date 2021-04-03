@@ -1,6 +1,6 @@
 <script lang="ts">
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
-  import { Action } from '..'
+  import type { Action } from '..'
   import { onDestroy } from 'svelte'
 
   export let items: Action[]

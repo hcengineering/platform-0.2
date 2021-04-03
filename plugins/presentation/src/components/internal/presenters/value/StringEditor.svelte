@@ -13,7 +13,7 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { AttrModel } from '../../../../index'
+  import type { AttrModel } from '../../../../index'
   import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.svelte'
   import { CORE_CLASS_ARRAY_OF, CORE_CLASS_INSTANCE_OF } from '@anticrm/core'
 

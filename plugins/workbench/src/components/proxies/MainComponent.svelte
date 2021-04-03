@@ -14,16 +14,16 @@
 -->
 
 <script lang="ts">
-  import { Platform } from '@anticrm/platform'
-  import { Ref } from '@anticrm/core'
+  import type { Platform } from '@anticrm/platform'
   import { getContext } from 'svelte'
 
-  import ui, { AnyComponent } from '@anticrm/platform-ui'
-  import { WorkbenchApplication } from '../..'
+  import type { AnyComponent } from '@anticrm/platform-ui'
+  import ui from '@anticrm/platform-ui'
+  import type { WorkbenchApplication } from '../..'
 
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import Spinner from '@anticrm/platform-ui/src/components/internal/Spinner.svelte'
-  import { Space } from '@anticrm/domains'
+  import type { Space } from '@anticrm/domains'
 
   export let is: AnyComponent | undefined
   export let application: WorkbenchApplication

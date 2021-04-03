@@ -1,7 +1,8 @@
 <script lang="ts">
-  import type { Platform } from "@anticrm/platform";
-  import ui, { Asset } from "@anticrm/platform-ui";
-  import { getContext } from "svelte";
+  import type { Platform } from '@anticrm/platform'
+  import type { Asset } from '@anticrm/platform-ui'
+  import ui from '@anticrm/platform-ui'
+  import { getContext } from 'svelte'
 
   export let icon: Asset | undefined
   // --- prop 'size' in 'px': '16', '24', '32', '42' --- //

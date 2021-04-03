@@ -14,8 +14,9 @@
 -->
 <script type="ts">
 
-  import { NumberProperty, Property, Ref, StringProperty } from '@anticrm/core'
-  import { Application, CORE_CLASS_SPACE, CORE_MIXIN_SHORTID, Space } from '@anticrm/domains'
+  import type { NumberProperty, Property, Ref, StringProperty } from '@anticrm/core'
+  import type { Application, Space } from '@anticrm/domains'
+  import { CORE_CLASS_SPACE, CORE_MIXIN_SHORTID } from '@anticrm/domains'
 
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
   import { getCoreService, liveQuery } from '@anticrm/presentation'
@@ -23,8 +24,9 @@
   import EditBox from '@anticrm/sparkling-controls/src/EditBox.svelte'
   import ComboBox from '@anticrm/platform-ui/src/components/ComboBox.svelte'
   import task, { TaskStatus } from '@anticrm/task'
-  import chunter, { Comment } from '@anticrm/chunter'
-  import { Action } from '@anticrm/platform-ui'
+  import type { Comment } from '@anticrm/chunter'
+  import chunter from '@anticrm/chunter'
+  import type { Action } from '@anticrm/platform-ui'
 
   import faker from 'faker'
 

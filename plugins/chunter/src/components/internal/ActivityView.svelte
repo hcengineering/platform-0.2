@@ -13,7 +13,7 @@
 // limitations under the License.
 -->
 <script type="ts">
-  import { Tx } from '@anticrm/core'
+  import type { Tx } from '@anticrm/core'
   import { CORE_CLASS_CREATE_TX } from '@anticrm/domains'
 
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
