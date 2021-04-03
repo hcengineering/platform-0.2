@@ -633,8 +633,7 @@ export class Model implements Storage {
    * @param query query to check.
    */
   matchQuery (_class: Ref<Class<Doc>>, doc: Doc, query: AnyLayout): boolean {
-    const clazz = this.getClass(_class)
-    if (clazz !== doc._class) {
+    if (!this.is(_class, doc._class)) {
       // Class doesn't match so return false.
       return false
     }
@@ -647,10 +646,13 @@ export class Model implements Storage {
    * If used as false, it will find at least one match for object with array value.
    */
   private matchObject (_class: Ref<Class<Doc>>, doc: Obj, query: AnyLayout | null, fullMatch = true): MatchResult {
+    if ((doc as any).__layout) {
+      // This is our proxy, we should unwrap it.
+      doc = (doc as any).__layout
+    }
     const queryEntries = Object.entries(query || {})
     const docKeys = new Set(Object.keys(doc))
     let count = 0
-    const clazz = this.get(_class) as Class<Obj>
 
     let match: MatchResult = { // Assume initial match is document itself
       result: false,
