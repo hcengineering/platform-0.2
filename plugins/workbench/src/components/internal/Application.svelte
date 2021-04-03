@@ -21,7 +21,7 @@
   import IconEditBox from '@anticrm/platform-ui/src/components/IconEditBox.svelte'
   import type { Space } from '@anticrm/domains'
   import type { Viewlet } from '@anticrm/presentation'
-  import ui, { createLiveQuery, updateLiveQuery, getCoreService } from '@anticrm/presentation'
+  import ui, { createLiveQuery, getCoreService, liveQuery, Query } from '@anticrm/presentation'
   import type { Action } from '@anticrm/platform-ui'
   import { getUIService } from '@anticrm/platform-ui'
   import Component from '@anticrm/platform-ui/src/components/Component.svelte'
@@ -41,14 +41,13 @@
 
   let viewletActions: Action[] = []
   let activeViewlet: Viewlet | undefined
+  let creatorsQuery: Query<ItemCreator> | undefined
 
   const onCreatorClick = (creator: ItemCreator) => uiService.showModal(CreateForm, { creator, space: space._id })
 
-  const creatorsQuery = createLiveQuery(workbench.class.ItemCreator, { app: application._id }, (docs) => {
+  $: creatorsQuery = liveQuery(creatorsQuery, workbench.class.ItemCreator, { app: application._id }, (docs) => {
     creators = docs
   })
-
-  $: updateLiveQuery(creatorsQuery, workbench.class.ItemCreator, { app: application._id })
 
   createLiveQuery(ui.mixin.Viewlet, {}, (docs) => {
     presenters = docs

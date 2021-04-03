@@ -43,6 +43,8 @@ export function getUserId (): string {
   return platform.getMetadata(core.metadata.WhoAmI) as StringProperty
 }
 
+export type Query<T extends Doc> = Promise<QueryUpdater<T>>
+
 /**
  * Perform subscribe to query with some helper finalizer to use
  * @param _class - a class to perform search against
@@ -51,7 +53,7 @@ export function getUserId (): string {
  * @return a function to re-query with a new parameters for same action.
  */
 export async function createLiveQuery<T extends Doc> (_class: Ref<Class<T>>, _query: AnyLayout,
-  action: (docs: T[]) => void): Promise<QueryUpdater<T>> {
+  action: (docs: T[]) => void): Query<T> {
   let oldQuery: AnyLayout
   let oldClass: Ref<Class<T>>
   let unsubscribe: Unsubscriber
@@ -84,7 +86,7 @@ export async function createLiveQuery<T extends Doc> (_class: Ref<Class<T>>, _qu
 /**
  * Perform updating of query, waiting for promise and perform update operation.
  */
-export function updateLiveQuery<T extends Doc> (qu: Promise<QueryUpdater<T>>, _class: Ref<Class<T>>, query: AnyLayout): void {
+export function updateLiveQuery<T extends Doc> (qu: Query<T>, _class: Ref<Class<T>>, query: AnyLayout): void {
   qu.then((q) => q(_class, query))
 }
 
@@ -100,12 +102,12 @@ export function updateLiveQuery<T extends Doc> (qu: Promise<QueryUpdater<T>>, _c
  * @param action
  */
 export function liveQuery<T extends Doc> (
-  liveQuery: Promise<QueryUpdater<T>> | undefined,
+  liveQuery: Query<T> | undefined,
   _class: Ref<Class<T>>,
   _query: AnyLayout,
-  action: (docs: T[]) => void): Promise<QueryUpdater<T>> {
+  action: (docs: T[]) => void): Query<T> {
   if (liveQuery) {
-    updateLiveQuery(liveQuery as Promise<QueryUpdater<T>>, _class, _query)
+    updateLiveQuery(liveQuery as Query<T>, _class, _query)
     return liveQuery
   }
   return createLiveQuery(_class, _query, action)
