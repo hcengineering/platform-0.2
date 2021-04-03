@@ -21,17 +21,19 @@
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
   import { Doc, Ref } from '@anticrm/core'
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
-  import workbench from '@anticrm/workbench'
+  import workbench, { WorkbenchApplication } from '@anticrm/workbench'
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
 
   import CreateSpace from './CreateSpace.svelte'
+
+  export let application: WorkbenchApplication
 
   const dispatch = createEventDispatcher()
 
   const coreService = getCoreService()
   const uiService = getUIService()
 
-  let spaces: Space[ ] = []
+  let spaces: Space[] = []
   let filter: string
   let hoverSpace: Ref<Doc>
 
@@ -40,8 +42,6 @@
   createLiveQuery(CORE_CLASS_SPACE, {}, (docs) => {
     spaces = docs
   })
-
-
 </script>
 
 <div class="space-browse-view">
@@ -54,16 +54,17 @@
 
   <div class="content">
     <div>
-      <Button kind="transparent"
-              on:click={ () => {
-          uiService.showModal(CreateSpace, {})
-        } }
+      <Button
+        kind="transparent"
+        on:click={() => {
+          uiService.showModal(CreateSpace, { application })
+        }}
       >
         <Icon icon={workbench.icon.Add} button="true" />
         <span style="padding-left:.5em">Новое пространство</span>
       </Button>
     </div>
-    <div class="separator"></div>
+    <div class="separator" />
     <ScrollView height="165px">
       {#each spaces as s (s._id)}
         <div class="space" on:mouseover={() => (hoverSpace = s._id)}>
@@ -78,7 +79,7 @@
           <div class="actions">
             {#if hoverSpace === s._id}
               {#if getCurrentUserSpace(curentUser, s)}
-                {#if s.isPublic || !getCurrentUserSpace(curentUser, s).owner  }
+                {#if s.isPublic || !getCurrentUserSpace(curentUser, s).owner}
                   <Button width="100px" on:click={() => leaveSpace(coreService, s)}>Leave</Button>
                 {:else}
                   <Button width="100px" on:click={() => archivedSpaceUpdate(coreService, s, !s.archived)}>
@@ -86,9 +87,7 @@
                   </Button>
                 {/if}
               {:else}
-                <Button width="100px" on:click={() =>  joinSpace(coreService, s)}>
-                  Join
-                </Button>
+                <Button width="100px" on:click={() => joinSpace(coreService, s)}>Join</Button>
               {/if}
             {/if}
           </div>
@@ -140,7 +139,7 @@
             margin-bottom: 4px;
             font-size: 14px;
             font-weight: 500;
-            color: var(--theme-userlink-color)
+            color: var(--theme-userlink-color);
           }
         }
 
