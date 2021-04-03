@@ -13,13 +13,14 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { CORE_CLASS_SPACE, Space } from '@anticrm/domains'
+  import type { Space } from '@anticrm/domains'
+  import { CORE_CLASS_SPACE } from '@anticrm/domains'
   import { createEventDispatcher } from 'svelte'
   import { createLiveQuery, getCoreService, getUserId } from '@anticrm/presentation'
   import { getUIService } from '@anticrm/platform-ui'
   import { archivedSpaceUpdate, getCurrentUserSpace, getSpaceName, joinSpace, leaveSpace } from './utils'
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
-  import { Doc, Ref } from '@anticrm/core'
+  import type { Doc, Ref } from '@anticrm/core'
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import workbench from '@anticrm/workbench'
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'

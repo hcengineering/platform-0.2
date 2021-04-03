@@ -14,13 +14,14 @@
 -->
 
 <script lang="ts">
-  import { Platform, Resource } from '@anticrm/platform'
+  import type { Platform } from '@anticrm/platform'
   import { getContext } from 'svelte'
 
-  import ui, { AnyComponent } from '@anticrm/platform-ui'
+  import type { AnyComponent } from '@anticrm/platform-ui'
+  import ui from '@anticrm/platform-ui'
   import Spinner from '@anticrm/platform-ui/src/components/internal/Spinner.svelte'
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
-  import { AttrModel } from '../../../index'
+  import type { AttrModel } from '../../../index'
 
   export let is: AnyComponent | undefined
   export let value: any

@@ -14,7 +14,7 @@
 -->
 <script type="ts">
   import CheckBox from '@anticrm/sparkling-controls/src/CheckBox.svelte'
-  import { AttrModel } from '../../../../index'
+  import type { AttrModel } from '../../../../index'
   import { CORE_CLASS_ARRAY_OF, CORE_CLASS_INSTANCE_OF } from '@anticrm/core'
 
   export let value: boolean

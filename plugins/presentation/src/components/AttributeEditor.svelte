@@ -14,7 +14,7 @@
 -->
 
 <script type="ts">
-  import { AttrModel } from '..'
+  import type { AttrModel } from '..'
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import ui, { getPlatform } from '@anticrm/platform-ui/'
 

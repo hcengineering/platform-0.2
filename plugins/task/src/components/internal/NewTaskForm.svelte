@@ -13,18 +13,21 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { Property, Ref } from '@anticrm/core'
+  import type { Property, Ref } from '@anticrm/core'
   import { createEventDispatcher } from 'svelte'
-  import { AttrModel, ClassModel, getCoreService, getPresentationService } from '@anticrm/presentation'
+  import type { AttrModel, ClassModel } from '@anticrm/presentation'
+  import { getCoreService, getPresentationService } from '@anticrm/presentation'
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import UserBox from '@anticrm/platform-ui/src/components/UserBox.svelte'
   import workbench from '@anticrm/workbench'
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
-  import { CORE_MIXIN_SHORTID, Space } from '@anticrm/domains'
+  import type { Space } from '@anticrm/domains'
+  import { CORE_MIXIN_SHORTID } from '@anticrm/domains'
   import task, { TaskStatus } from '../../index'
   import EditBox from '@anticrm/sparkling-controls/src/EditBox.svelte'
-  import chunter, { Comment, getChunterService } from '@anticrm/chunter'
+  import type { Comment } from '@anticrm/chunter'
+  import chunter, { getChunterService } from '@anticrm/chunter'
 
   export let title: string
   let message: string = ''

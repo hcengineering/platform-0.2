@@ -13,8 +13,9 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { CORE_CLASS_CREATE_TX, CreateTx, Space } from '@anticrm/domains'
-  import { Tx } from '@anticrm/core'
+  import type { CreateTx, Space } from '@anticrm/domains'
+  import { CORE_CLASS_CREATE_TX } from '@anticrm/domains'
+  import type { Tx } from '@anticrm/core'
 
   export let tx: Tx
 

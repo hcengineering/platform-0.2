@@ -50,8 +50,9 @@ module.exports = {
         use: {
           loader: 'svelte-loader-hot',
           options: {
+            dev: !prod,
             emitCss: true,
-            hotReload: true,
+            hotReload: !prod,
             preprocess: require('svelte-preprocess')({
               babel: {
                 presets: [

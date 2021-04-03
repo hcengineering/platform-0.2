@@ -12,11 +12,12 @@
   // See the License for the specific language governing permissions and
   // limitations under the License.
   import guidebook from '..'
-  import { getContext, onMount, onDestroy } from 'svelte'
+  import { onDestroy } from 'svelte'
 
   import LinkTo from '@anticrm/platform-ui/src/components/LinkTo.svelte'
 
-  import { GuideBookPage, pages, pageIndex } from '../registry'
+  import type { GuideBookPage } from '../registry'
+  import { pageIndex, pages } from '../registry'
   import { getUIService } from '@anticrm/platform-ui'
 
   //****************************************************************

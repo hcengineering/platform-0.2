@@ -12,10 +12,11 @@
   // See the License for the specific language governing permissions and
   // limitations under the License.
 
-  import { Tx } from '@anticrm/core'
-  import { CORE_CLASS_CREATE_TX, CreateTx } from '@anticrm/domains'
+  import type { Tx } from '@anticrm/core'
+  import type { CreateTx } from '@anticrm/domains'
+  import { CORE_CLASS_CREATE_TX } from '@anticrm/domains'
   import { parseMessage } from '@anticrm/text'
-  import { Message } from '../..'
+  import type { Message } from '../..'
   import MessageViewer from '@anticrm/presentation/src/components/MessageViewer.svelte'
 
   export let tx: Tx

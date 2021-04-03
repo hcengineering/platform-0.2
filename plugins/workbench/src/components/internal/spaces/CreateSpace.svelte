@@ -13,14 +13,17 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { CORE_CLASS_DOC, Property, StringProperty } from '@anticrm/core'
+  import type { Property, StringProperty } from '@anticrm/core'
+  import { CORE_CLASS_DOC } from '@anticrm/core'
   import { createEventDispatcher } from 'svelte'
-  import { AttrModel, ClassModel, getCoreService, getPresentationService } from '@anticrm/presentation'
+  import type { AttrModel, ClassModel } from '@anticrm/presentation'
+  import { getCoreService, getPresentationService } from '@anticrm/presentation'
   import CheckBox from '@anticrm/sparkling-controls/src/CheckBox.svelte'
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
   import EditBox from '@anticrm/sparkling-controls/src/EditBox.svelte'
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
-  import workbench, { WorkbenchApplication } from '@anticrm/workbench'
+  import type { WorkbenchApplication } from '@anticrm/workbench'
+  import workbench from '@anticrm/workbench'
   import { CORE_CLASS_SPACE } from '@anticrm/domains'
 
   export let application: WorkbenchApplication

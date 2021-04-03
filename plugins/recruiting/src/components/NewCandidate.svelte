@@ -15,9 +15,11 @@ limitations under the License.
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
 
-  import { DateProperty, generateId, Ref, StringProperty } from '@anticrm/core'
-  import { Space } from '@anticrm/domains'
-  import contact, { Person } from '@anticrm/contact'
+  import type { DateProperty, Ref, StringProperty } from '@anticrm/core'
+  import { generateId } from '@anticrm/core'
+  import type { Space } from '@anticrm/domains'
+  import type { Person } from '@anticrm/contact'
+  import contact from '@anticrm/contact'
   import personExtras from '@anticrm/person-extras'
   import { getCoreService } from '@anticrm/presentation'
   import workbench from '@anticrm/workbench/src/__model__'
@@ -28,7 +30,8 @@ limitations under the License.
   import ResumeEditor from '@anticrm/person-extras/src/components/ResumeEditor.svelte'
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
 
-  import candidate, { WithCandidateProps } from '..'
+  import type { WithCandidateProps } from '..'
+  import candidate from '..'
 
   export let space: Ref<Space>
 
@@ -62,7 +65,7 @@ limitations under the License.
     profInterests: []
   }
 
-  async function save() {
+  async function save () {
     const core = await coreP
     const model = await modelP
 

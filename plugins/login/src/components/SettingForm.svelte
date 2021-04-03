@@ -13,13 +13,14 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { Platform, Severity, Status } from '@anticrm/platform'
+  import type { Platform } from '@anticrm/platform'
+  import { Severity, Status } from '@anticrm/platform'
   import { getContext } from 'svelte'
   import login from '..'
   import CheckBox from '@anticrm/sparkling-controls/src/CheckBox.svelte'
-  import { ApplicationRoute, ApplicationRouter } from '@anticrm/platform-ui'
+  import type { ApplicationRoute, ApplicationRouter } from '@anticrm/platform-ui'
   import twofactor from 'node-2fa'
-  import { Options } from 'node-2fa/dist/interfaces'
+  import type { Options } from 'node-2fa/dist/interfaces'
 
   export let router: ApplicationRouter<ApplicationRoute>
   let object = { oldPassword: '', newPassword: '', newPasswordConfirm: '', clientSecret: '', secondFactorCode: '' }

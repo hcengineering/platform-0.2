@@ -13,10 +13,11 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import login  from '..'
-  import { AnyComponent, ApplicationRoute, newRouter } from '@anticrm/platform-ui'
+  import login from '..'
+  import type { AnyComponent, ApplicationRoute } from '@anticrm/platform-ui'
+  import { newRouter } from '@anticrm/platform-ui'
   import Component from '@anticrm/platform-ui/src/components/Component.svelte'
-  
+
   let form: ApplicationRoute
   let forms: ApplicationRoute[] = [
     {route: 'setting', component: login.component.SettingForm}
@@ -27,8 +28,8 @@
   function routeDefaults (): ApplicationRoute  {
     return {
       route: '#undefined',
-      component: login.component.LoginForm 
-    } as ApplicationRoute 
+      component: login.component.LoginForm
+    } as ApplicationRoute
   }
 
   const router = newRouter<ApplicationRoute>(':route', (info) => {

@@ -14,9 +14,11 @@
 -->
 <script type="ts">
   import { createEventDispatcher } from 'svelte'
-  import { Class, CORE_CLASS_DOC, Doc, Ref } from '@anticrm/core'
-  import { Space } from '@anticrm/domains'
-  import { AttrModel, ClassModel, liveQuery } from '../..'
+  import type { Class, Doc, Ref } from '@anticrm/core'
+  import { CORE_CLASS_DOC } from '@anticrm/core'
+  import type { Space } from '@anticrm/domains'
+  import type { AttrModel, ClassModel } from '../..'
+  import { liveQuery } from '../..'
   import { getEmptyModel, getPresentationService } from '../../utils'
   import Presenter from './presenters/Presenter.svelte'
 

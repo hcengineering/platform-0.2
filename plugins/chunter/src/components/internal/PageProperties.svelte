@@ -13,9 +13,10 @@
 // limitations under the License.
 -->
 <script type="ts">
-  import { Class, Obj, Ref } from '@anticrm/core'
-  import { Page } from '../..'
-  import { AttrModel, ClassModel, getPresentationService } from '@anticrm/presentation'
+  import type { Class, Obj, Ref } from '@anticrm/core'
+  import type { Page } from '../..'
+  import type { AttrModel, ClassModel } from '@anticrm/presentation'
+  import { getPresentationService } from '@anticrm/presentation'
 
   import Properties from '@anticrm/presentation/src/components/internal/Properties.svelte'
   import AttributeEditor from '@anticrm/presentation/src/components/AttributeEditor.svelte'
@@ -36,7 +37,7 @@
     })
 </script>
 
-{#if model  && title}
+{#if model && title}
   <div>
     <div class="caption-1">
       <AttributeEditor attribute={title} bind:value={object.title} />

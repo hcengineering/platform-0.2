@@ -14,19 +14,22 @@
 -->
 
 <script type="ts">
-  import workbench, { WorkbenchApplication } from '../..'
+  import type { WorkbenchApplication } from '../..'
+  import workbench from '../..'
 
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
   import CreateForm from './CreateForm.svelte'
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import IconEditBox from '@anticrm/platform-ui/src/components/IconEditBox.svelte'
-  import { Space } from '@anticrm/domains'
-  import ui, { createLiveQuery, getCoreService, Viewlet } from '@anticrm/presentation'
-  import { Action, getUIService } from '@anticrm/platform-ui'
+  import type { Space } from '@anticrm/domains'
+  import type { Viewlet } from '@anticrm/presentation'
+  import ui, { createLiveQuery, getCoreService } from '@anticrm/presentation'
+  import type { Action } from '@anticrm/platform-ui'
+  import { getUIService } from '@anticrm/platform-ui'
   import Component from '@anticrm/platform-ui/src/components/Component.svelte'
   import ActionBar from '@anticrm/platform-ui/src/components/ActionBar.svelte'
-  import { Model } from '@anticrm/core'
+  import type { Model } from '@anticrm/core'
 
   export let application: WorkbenchApplication
   export let space: Space

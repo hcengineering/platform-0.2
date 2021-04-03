@@ -5,7 +5,7 @@
   import PopupMenu from '@anticrm/sparkling-controls/src/menu/PopupMenu.svelte'
   import PopupItem from '@anticrm/sparkling-controls/src/menu/PopupItem.svelte'
   import AddUser from './AddUser.svelte'
-  import { Space } from '@anticrm/domains'
+  import type { Space } from '@anticrm/domains'
   import { getCoreService } from '@anticrm/presentation'
   import { getUIService } from '@anticrm/platform-ui'
 

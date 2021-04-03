@@ -13,13 +13,14 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { Tx } from '@anticrm/core'
-  import { CORE_CLASS_CREATE_TX, CreateTx } from '@anticrm/domains'
-  import { Page } from '../..'
+  import type { Tx } from '@anticrm/core'
+  import { CORE_CLASS_CREATE_TX } from '@anticrm/domains'
+  import type { CreateTx } from '@anticrm/domains'
+  import type { Page } from '../..'
 
   export let tx: Tx
 
-  function pageTitle() {
+  function pageTitle () {
     return (((tx as CreateTx).object as unknown) as Page).title
   }
 </script>
