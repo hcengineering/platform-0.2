@@ -52,7 +52,7 @@ const modelIds = identify('core' as AnyPlugin, {
     ArrayOf: '' as Ref<Class<ArrayOf>>,
     RefTo: '' as Ref<Class<RefTo<Doc>>>,
     BagOf: '' as Ref<Class<BagOf>>,
-    InstanceOf: '' as Ref<Class<InstanceOf<Type>>>,
+    InstanceOf: '' as Ref<Class<InstanceOf<Emb>>>,
 
     Tx: '' as Ref<Class<Tx>>,
     CreateTx: CORE_CLASS_CREATE_TX as Ref<Class<CreateTx>>,
