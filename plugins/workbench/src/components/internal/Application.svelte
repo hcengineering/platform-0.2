@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 -->
-
 <script type="ts">
   import type { WorkbenchApplication } from '../..'
   import workbench from '../..'
@@ -49,7 +48,7 @@
     presenters = docs
   })
 
-  function filterViewlets (model: Model, presenters: Viewlet[]): Viewlet[] {
+  function filterViewlets(model: Model, presenters: Viewlet[]): Viewlet[] {
     return presenters.filter((d) => {
       for (const cc of application?.classes) {
         if (model.is(cc, d.displayClass)) {
@@ -60,10 +59,17 @@
     })
   }
 
-  function getViewletActions (appInstance: WorkbenchApplication, sp: Viewlet | undefined, viewlets: Viewlet[]): Action[] {
-    return viewlets.map(p => {
+  function getViewletActions(
+    appInstance: WorkbenchApplication,
+    sp: Viewlet | undefined,
+    viewlets: Viewlet[]
+  ): Action[] {
+    return viewlets.map((p) => {
       return {
-        name: p.label, icon: p.icon, toggleState: p._id === sp?._id, action: () => {
+        name: p.label,
+        icon: p.icon,
+        toggleState: p._id === sp?._id,
+        action: () => {
           activeViewlet = p
         }
       }
@@ -72,7 +78,7 @@
 
   $: {
     // Update available presenters based on application
-    coreService.then(cs => {
+    coreService.then((cs) => {
       const model = cs.getModel()
 
       const viewlets = filterViewlets(model, presenters)
@@ -83,29 +89,35 @@
     })
   }
 
-  function getLabel (str: string): string {
+  function getLabel(str: string): string {
     if (str === 'Pages') return 'New page'
     if (str === 'Tasks') return 'New task'
     if (str === 'Vacancies') return 'Add candidate'
+    if (str === 'Calendar') return 'Add event'
     return 'Add'
   }
 </script>
 
 <div class="workbench-browse">
-  { #if application }
+  {#if application}
     <div class="captionContainer">
       <span class="caption-1" style="padding-right:1em">{application.label}</span>&nbsp;
       <div bind:this={addIcon}>
-        <Button kind="transparent"
-                on:click={ () => {
-            uiService.showModal(CreateForm, { _class: application ? application.classes[0] : undefined, space: space._id }, addIcon)
-          } }
+        <Button
+          kind="transparent"
+          on:click={() => {
+            uiService.showModal(
+              CreateForm,
+              { _class: application ? application.classes[0] : undefined, space: space._id },
+              addIcon
+            )
+          }}
         >
           <Icon icon={workbench.icon.Add} button="true" />
           <span style="padding-left:.5em">{getLabel(application.label)}</span>
         </Button>
       </div>
-      <div style="flex-grow:1"></div>
+      <div style="flex-grow:1" />
       <IconEditBox icon={workbench.icon.Finder} placeholder="Поиск по {application.label}..." iconRight="true" />
     </div>
     <div class="presentation">
@@ -113,8 +125,11 @@
     </div>
     <ScrollView height="100%" margin="2em">
       {#if activeViewlet && activeViewlet.component}
-        <Component is={activeViewlet.component}
-                   props={{_class: application.classes[0], space: space, editable: false}} on:open />
+        <Component
+          is={activeViewlet.component}
+          props={{ _class: application.classes[0], space: space, editable: false }}
+          on:open
+        />
       {/if}
     </ScrollView>
   {/if}
@@ -142,6 +157,5 @@
       flex-direction: row-reverse;
       margin-right: 1em;
     }
-
   }
 </style>

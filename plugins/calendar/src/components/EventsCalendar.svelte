@@ -22,19 +22,70 @@
 
   export let space: Space
 
+  interface EventCoordinates {
+    gridColumnStart: number
+    gridColumnEnd: number
+    gridRowStart: number
+    gridRowEnd: number
+    displayLayer: number
+  }
+
   function getDate(date: Date | string) {
     if (typeof date === 'string') {
-      return new Date(Date.parse(date as string)).getDate()
+      return new Date(Date.parse(date as string))
     }
-    return date.getDate()
+    return date
+  }
+
+  function isDateInInterval(eventDate: Date | undefined, intervalStart: Date, intervalEnd: Date | undefined): boolean {
+    return (
+      eventDate !== undefined &&
+      eventDate.getTime() >= intervalStart.getTime() &&
+      (intervalEnd === undefined || eventDate.getTime() <= intervalEnd.getTime())
+    )
   }
 
   let events: CalendarEvent[] = []
+  let eventCoordinatesMap = new Map<string, EventCoordinates>()
 
   let firstDayOfCurrentMonth: Date
 
   const query = createLiveQuery(calendar.class.CalendarEvent, { _space: space._id }, (docs) => {
-    events = docs
+    events = docs.filter(
+      (value) =>
+        isDateInInterval(getDate(value.startDate), firstDayOfCurrentMonth, lastDisplayedDate) ||
+        isDateInInterval(value.endDate && getDate(value.endDate), firstDayOfCurrentMonth, lastDisplayedDate)
+    )
+
+    let lastDisplayedDate = new Date(firstDayOfCurrentMonth)
+    lastDisplayedDate.setDate(lastDisplayedDate.getDate() + 42)
+    eventCoordinatesMap.clear()
+    let processedEvents: CalendarEvent[] = []
+    events.forEach((event) => {
+      const startDate = getDate(event.startDate)
+      const endDate = event.endDate && getDate(event.endDate)
+      const parentItemLayer = processedEvents
+        .filter(
+          (pe) =>
+            isDateInInterval(startDate, getDate(pe.startDate), pe.endDate && getDate(pe.endDate)) ||
+            isDateInInterval(endDate, getDate(pe.startDate), pe.endDate && getDate(pe.endDate))
+        )
+        .map((pe) => eventCoordinatesMap.get(pe._id)?.displayLayer || 0)
+        .reduce((a, b) => (a > b ? a : b), 0)
+
+      const startDateDiff = Math.floor((startDate.getTime() - firstDayOfCurrentMonth.getTime()) / (1000 * 60 * 60 * 24))
+      const endDateDiff = Math.floor(
+        ((endDate || startDate).getTime() - firstDayOfCurrentMonth.getTime()) / (1000 * 60 * 60 * 24)
+      )
+      eventCoordinatesMap.set(event._id, {
+        gridColumnStart: (startDateDiff % 7) + 1,
+        gridColumnEnd: (endDateDiff % 7) + 1,
+        gridRowStart: Math.trunc(startDateDiff / 7) + 1,
+        gridRowEnd: Math.trunc(endDateDiff / 7) + 1,
+        displayLayer: parentItemLayer + 1
+      })
+      processedEvents.push(event)
+    })
   })
 
   $: {
@@ -46,24 +97,26 @@
 
 <MonthCalendar bind:firstDayOfCurrentMonth>
   {#each events as e}
-    <div
-      style={`
-        grid-column-start: ${(Math.max(0, getDate(e.startDate) - getDate(firstDayOfCurrentMonth)) % 7) + 1}; 
-        grid-column-end: ${getDate(e.endDate || e.startDate) - (firstDayOfCurrentMonth.getDate() % 7) + 1};
-        grid-row-start: ${Math.trunc(getDate(e.endDate || e.startDate) - firstDayOfCurrentMonth.getDate() / 7 + 1)};
-        grid-row-end: ${Math.trunc(getDate(e.endDate || e.startDate) - firstDayOfCurrentMonth.getDate() / 7) + 1};
+    {#if eventCoordinatesMap.has(e._id)}
+      <div
+        style={`
+        grid-column-start: ${eventCoordinatesMap.get(e._id).gridColumnStart}; 
+        grid-column-end: ${eventCoordinatesMap.get(e._id).gridColumnEnd};
+        grid-row-start: ${eventCoordinatesMap.get(e._id).gridRowStart};
+        grid-row-end: ${eventCoordinatesMap.get(e._id).gridRowEnd};
+        margin-top: ${21 * (eventCoordinatesMap.get(e._id).displayLayer || 1)}px;
       `}
-    >
-      <div class="event">
-        {e.summary}
+      >
+        <div class="event">
+          {e.summary}
+        </div>
       </div>
-    </div>
+    {/if}
   {/each}
 </MonthCalendar>
 
 <style lang="scss">
   .event {
-    margin-top: 20px;
     height: 20px;
     width: 100%;
     color: var(--theme-content-dark-color);

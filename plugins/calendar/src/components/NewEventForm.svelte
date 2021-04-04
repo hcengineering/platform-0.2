@@ -65,8 +65,8 @@ limitations under the License.
   <ScrollView height="500px">
     <div class="form">
       <EditBox bind:value={newEvent.summary} label="Summary" placeholder="Summary" />
-      <EditBox bind:value={newEvent.startDate} label="Summary" placeholder="Summary" />
-      <EditBox bind:value={newEvent.endDate} label="Summary" placeholder="Summary" />
+      <EditBox bind:value={newEvent.startDate} label="Start date" placeholder="Start date" />
+      <EditBox bind:value={newEvent.endDate} label="End date" placeholder="End date" />
     </div>
   </ScrollView>
   <div class="footer">
