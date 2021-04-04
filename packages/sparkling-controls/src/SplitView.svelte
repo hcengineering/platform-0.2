@@ -1,34 +1,34 @@
-<script lang='ts'>
+<script lang="ts">
   import Splitter from './internal/Splitter.svelte'
 
   export let prevContent: any
   export let nextContent: any
-  export let width: string = '100%'
-  export let height: string = '100%'
-  export let devMode: boolean = false
-  export let minWidth: Number = 150
-  export let spacing: Number = 10
-  export let horizontal: boolean = false
+  export let width = '100%'
+  export let height = '100%'
+  export let devMode = false
+  export let minWidth = 150
+  export let spacing = 10
+  export let horizontal = false
 
   let prevDiv: HTMLElement
   let nextDiv: HTMLElement
 
-  let orientedProp: string = horizontal ? 'height' : 'width'
+  const orientedProp: string = horizontal ? 'height' : 'width'
 </script>
 
 <div class="container" style="width: {width}; height: {height}; flex-direction: {horizontal ? 'column' : 'row'}">
   <div class="wrap" bind:this={prevDiv}>
-    {#if typeof(prevContent) === 'undefined'}
+    {#if typeof prevContent === 'undefined'}
       <slot name="prevContent" />
     {:else}
       {prevContent}
     {/if}
   </div>
-  <div class="spacing" style="{orientedProp}: {spacing}px; min-{orientedProp}: {spacing}px"></div>
+  <div class="spacing" style="{orientedProp}: {spacing}px; min-{orientedProp}: {spacing}px" />
   <Splitter {prevDiv} {nextDiv} {minWidth} {devMode} {horizontal} />
-  <div class="spacing" style="{orientedProp}: {spacing}px; min-{orientedProp}: {spacing}px"></div>
+  <div class="spacing" style="{orientedProp}: {spacing}px; min-{orientedProp}: {spacing}px" />
   <div class="wrap" bind:this={nextDiv}>
-    {#if typeof(nextContent) === 'undefined'}
+    {#if typeof nextContent === 'undefined'}
       <slot name="nextContent" />
     {:else}
       {nextContent}

@@ -2,20 +2,20 @@
   import ScrollView from './ScrollView.svelte'
 
   export let items: Array<any> = []
-  export let selected: number = 0
-  export let label: string = 'Значение'
-  export let width: string = ''
+  export let selected = 0
+  export let label = 'Значение'
+  export let width = ''
 
-  let widthStr: string = (width !== '') ? `width: ${width}` : ''
+  const widthStr: string = width !== '' ? `width: ${width}` : ''
 
-  let comboHidden: boolean = true
+  let comboHidden = true
   let comboRoot: HTMLElement
   let comboDrop: HTMLElement
   let comboItems: HTMLElement
 
   function showCombo (): void {
     const rect = comboRoot.getBoundingClientRect()
-    comboDrop.style.top = rect.height + 3 + 'px'
+    comboDrop.style.top = `${rect.height + 3}px`
     comboDrop.style.left = '-1px'
     comboDrop.style.visibility = 'visible'
     comboHidden = false
@@ -29,13 +29,15 @@
   }
 
   function toggleCombo (event: MouseEvent): void {
-    let pathRoot: boolean = false
-    let pathDrop: boolean = false
-    let pathItems: boolean = false
+    let pathRoot = false
+    let pathDrop = false
+    let pathItems = false
     event.path.find((el) => {
       if (el.className === comboRoot.className) pathRoot = true
       if (el.className === comboDrop.className) pathDrop = true
       if (el.className === comboItems.className) pathItems = true
+
+      return false
     })
     if (pathRoot && !pathDrop) {
       if (comboHidden) {
@@ -52,19 +54,23 @@
   }
 </script>
 
-<div bind:this={comboRoot} class="comboBox" class:selectedCombo={!comboHidden} style="{widthStr}" on:click={handler}>
+<div bind:this={comboRoot} class="comboBox" class:selectedCombo={!comboHidden} style={widthStr} on:click={handler}>
   <div class="selectedItem">
     <div class="selectedItem__label">{label}</div>
     <div class="selectedItem__value">{items[selected].comboValue}</div>
   </div>
-  <div class="arrowDown"></div>
+  <div class="arrowDown" />
 
   <div bind:this={comboDrop} class="comboBox-drop">
     <div bind:this={comboItems} class="comboBox-drop__items">
       <ScrollView width="100%" height="100%" accentColor="true">
         {#each items as item (item.id)}
-          <div class="comboBox-drop__item" class:selected={item.id === selected}
-               on:click={() => { selected = item.id }}>
+          <div
+            class="comboBox-drop__item"
+            class:selected={item.id === selected}
+            on:click={() => {
+              selected = item.id
+            }}>
             {item.comboValue}
           </div>
         {/each}

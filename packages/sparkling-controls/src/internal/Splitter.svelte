@@ -1,11 +1,11 @@
-<script lang='ts'>
+<script lang="ts">
   import { onDestroy } from 'svelte'
 
   export let prevDiv: HTMLElement
   export let nextDiv: HTMLElement
-  export let minWidth: Number = 150
-  export let devMode: boolean = false
-  export let horizontal: boolean = false
+  export let minWidth = 150
+  export let devMode = false
+  export let horizontal = false
 
   let splitterDiv: HTMLElement
   let splitterIcon: HTMLElement
@@ -14,37 +14,39 @@
 
   let prevRect: DOMRect
   let nextRect: DOMRect
-  let startCoord: Number
+  let startCoord: number
 
-  let hoverMode: boolean = false
-  let splitterStyle: string = horizontal ? 'width: 100%; height: 4px; min-height: 4px; cursor: row-resize;' : 'height: 100%; width: 4px; min-width: 4px; cursor: col-resize;'
+  let hoverMode = false
+  const splitterStyle: string = horizontal
+    ? 'width: 100%; height: 4px; min-height: 4px; cursor: row-resize;'
+    : 'height: 100%; width: 4px; min-width: 4px; cursor: col-resize;'
 
-  function onMouseMove(event: MouseEvent): void {
-    let dCoord: Number
+  function onMouseMove (event: MouseEvent): void {
+    let dCoord: number
     if (horizontal) {
       dCoord = event.clientY - startCoord
       if (dCoord < 0) {
         if (prevRect.height - Math.abs(dCoord) >= minWidth) {
-          prevDiv.style.height = prevRect.height - Math.abs(dCoord) + 'px'
-          nextDiv.style.height = nextRect.height + Math.abs(dCoord) + 'px'
+          prevDiv.style.height = `${prevRect.height - Math.abs(dCoord)}px`
+          nextDiv.style.height = `${nextRect.height + Math.abs(dCoord)}px`
         }
       } else {
         if (nextRect.height - dCoord >= minWidth) {
-          prevDiv.style.height = prevRect.height + dCoord + 'px'
-          nextDiv.style.height = nextRect.height - dCoord + 'px'
+          prevDiv.style.height = `${prevRect.height + dCoord}px`
+          nextDiv.style.height = `${nextRect.height - dCoord}px`
         }
       }
     } else {
       dCoord = event.clientX - startCoord
       if (dCoord < 0) {
         if (prevRect.width - Math.abs(dCoord) >= minWidth) {
-          prevDiv.style.width = prevRect.width - Math.abs(dCoord) + 'px'
-          nextDiv.style.width = nextRect.width + Math.abs(dCoord) + 'px'
+          prevDiv.style.width = `${prevRect.width - Math.abs(dCoord)}px`
+          nextDiv.style.width = `${nextRect.width + Math.abs(dCoord)}px`
         }
       } else {
         if (nextRect.width - dCoord >= minWidth) {
-          prevDiv.style.width = prevRect.width + dCoord + 'px'
-          nextDiv.style.width = nextRect.width - dCoord + 'px'
+          prevDiv.style.width = `${prevRect.width + dCoord}px`
+          nextDiv.style.width = `${nextRect.width - dCoord}px`
         }
       }
     }
@@ -52,7 +54,7 @@
     setCoverSize(coverNext, nextDiv)
   }
 
-  function onMouseUp(event: MouseEvent): void {
+  function onMouseUp (event: MouseEvent): void {
     coverPrev.style.visibility = coverNext.style.visibility = 'hidden'
     prevDiv.style.userSelect = nextDiv.style.userSelect = 'auto'
     hoverMode = false
@@ -60,7 +62,7 @@
     window.removeEventListener('mouseup', onMouseUp)
   }
 
-  function onMouseDown(event : MouseEvent): void {
+  function onMouseDown (event: MouseEvent): void {
     prevRect = prevDiv.getBoundingClientRect()
     nextRect = nextDiv.getBoundingClientRect()
     if (horizontal) startCoord = event.clientY
@@ -76,34 +78,40 @@
     window.addEventListener('mouseup', onMouseUp)
   }
 
-  function setCoverSize(elCover: HTMLElement, elSource: HTMLElement): void {
-    let rect = elSource.getBoundingClientRect()
+  function setCoverSize (elCover: HTMLElement, elSource: HTMLElement): void {
+    const rect = elSource.getBoundingClientRect()
 
-    elCover.style.top = rect.top + 'px'
-    elCover.style.left = rect.left + 'px'
-    elCover.style.width = rect.width + 'px'
-    elCover.style.height = rect.height + 'px'
+    elCover.style.top = `${rect.top}px`
+    elCover.style.left = `${rect.left}px`
+    elCover.style.width = `${rect.width}px`
+    elCover.style.height = `${rect.height}px`
   }
 
   onDestroy(() => {
     prevDiv.style = ''
     nextDiv.style = ''
-	})
+  })
 </script>
 
-<div bind:this={coverPrev} class="cover" class:coverDev={devMode}></div>
-<div bind:this={coverNext} class="cover" class:coverDev={devMode} style="background-color: #ff0"></div>
-<div bind:this={splitterDiv} class="splitter" class:splitter-statehover={hoverMode} style="{splitterStyle}" on:mousedown={onMouseDown}>
-  <div bind:this={splitterIcon} class="splitIcon" class:rotateSplit={horizontal} on:mousedown={onMouseDown}></div>
+<div bind:this={coverPrev} class="cover" class:coverDev={devMode} />
+<div bind:this={coverNext} class="cover" class:coverDev={devMode} style="background-color: #ff0" />
+<div
+  bind:this={splitterDiv}
+  class="splitter"
+  class:splitter-statehover={hoverMode}
+  style={splitterStyle}
+  on:mousedown={onMouseDown}>
+  <div bind:this={splitterIcon} class="splitIcon" class:rotateSplit={horizontal} on:mousedown={onMouseDown} />
 </div>
 
-<style lang='scss'>
+<style lang="scss">
   .splitter {
     position: relative;
     box-sizing: border-box;
     background-color: var(--theme-bg-accent-color);
 
-    &:hover, &-statehover {
+    &:hover,
+    &-statehover {
       background-color: var(--theme-bg-accent-hover);
 
       & > .splitIcon {
@@ -130,7 +138,8 @@
       transform: translateY(-50%) rotate(90deg);
     }
   }
-  .splitIcon::after, .splitIcon::before {
+  .splitIcon::after,
+  .splitIcon::before {
     content: '';
     position: absolute;
     width: 0px;
@@ -153,6 +162,6 @@
     z-index: 1000;
   }
   .coverDev {
-    opacity: .5;
+    opacity: 0.5;
   }
 </style>

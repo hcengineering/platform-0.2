@@ -12,21 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 -->
-
 <script lang="ts">
-
-  export let maxWidth: number = 300
+  export let maxWidth = 300
   export let value: string
   export let placeholder: string
-  export let fullWidth: boolean = false
-  export let editable: boolean = true
+  export let fullWidth = false
+  export let editable = true
 
   let compute: HTMLElement
   let input: HTMLElement
 
   function computeSize (ev: Event) {
     let value = (ev.target as any).value
-    if (!value || value.length == 0) {
+    if (!value || value.length === 0) {
       value = placeholder
     }
     if (typeof value === 'string') {
@@ -36,7 +34,7 @@
     if (fullWidth) {
       input.style.width = '100%'
     } else {
-      input.style.width = width + 'px'
+      input.style.width = `${width}px`
     }
   }
 </script>
@@ -46,33 +44,30 @@
     <div bind:this={compute} class="compute-width" class:w100={fullWidth} />
     {#if editable}
       <input
-        style={ (fullWidth) ? 'width: 100%' : 'max-width:' + maxWidth + 'px' }
+        style={fullWidth ? 'width: 100%' : `max-width: ${maxWidth}px`}
         bind:this={input}
         type="text"
-        bind:value={value}
+        bind:value
         {placeholder}
         on:input={computeSize}
         on:focus={computeSize}
-        on:change
-      />
+        on:change />
     {:else}
       <input
-        style={ (fullWidth) ? 'width: 100%' : 'max-width:' + maxWidth + 'px' }
+        style={fullWidth ? 'width: 100%' : `max-width: ${maxWidth}px`}
         bind:this={input}
         type="text"
         readonly
-        bind:value={value}
+        bind:value
         {placeholder}
         on:input={computeSize}
         on:focus={computeSize}
-        on:change
-      />
+        on:change />
     {/if}
   </div>
 </div>
 
 <style lang="scss">
-
   .inline-edit {
     min-width: 12em;
     display: inline-block;

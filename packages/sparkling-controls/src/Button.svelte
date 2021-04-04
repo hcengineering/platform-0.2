@@ -2,26 +2,21 @@
   import { createEventDispatcher } from 'svelte'
 
   // --- 'small', 'large' --- //
-  export let size: string = ''
+  export let size = ''
   // --- 'primary', 'transparent' --- //
-  export let kind: string = ''
+  export let kind = ''
   // --- ex: '100px', '25%' --- //
-  export let width: string = ''
+  export let width = ''
 
-  export let label: string = ''
+  export let label = ''
 
-  const dispatch = createEventDispatcher();
-  function onClick(event) {
-    dispatch('click', event);
+  const dispatch = createEventDispatcher()
+  function onClick (event) {
+    dispatch('click', event)
   }
 </script>
 
-<button
-  type="button"
-  class="button {size} {kind}"
-  style="{(width !== '') ? 'width:' + width : ''}"
-  on:click={onClick}
->
+<button type="button" class="button {size} {kind}" style={width !== '' ? 'width:' + width : ''} on:click={onClick}>
   <slot />{label}
 </button>
 
@@ -41,7 +36,7 @@
 
     color: var(--theme-content-color);
     background-color: var(--theme-bg-accent-color);
-    transition: border-color .2s, color .2s, background-color .2s;
+    transition: border-color 0.2s, color 0.2s, background-color 0.2s;
 
     &:focus {
       outline: none;
