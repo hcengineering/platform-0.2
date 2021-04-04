@@ -12,22 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 -->
-
 <script type="ts">
   import type { WorkbenchApplication } from '../..'
   import workbench from '../..'
   import IconEditBox from '@anticrm/platform-ui/src/components/IconEditBox.svelte'
 
   export let application: WorkbenchApplication
-
-  let addIcon: HTMLElement
 </script>
 
 <div class="workbench-browse">
   {#if application}
     <div class="captionContainer">
       <span class="caption-1" style="padding-right:1em">{application.label}</span>&nbsp;
-      <div style="flex-grow:1"></div>
+      <div style="flex-grow:1" />
       <IconEditBox icon={workbench.icon.Finder} placeholder="Поиск по {application.label}..." iconRight="true" />
     </div>
   {/if}

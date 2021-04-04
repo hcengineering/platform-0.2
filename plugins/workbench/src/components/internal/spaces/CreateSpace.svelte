@@ -28,11 +28,11 @@
 
   export let application: WorkbenchApplication
 
-  let makePrivate: boolean = false
-  let title: string = ''
-  let description: string = ''
-  let spaceKey: string = ''
-  let spaceKeyChanged: boolean = false
+  let makePrivate = false
+  let title = ''
+  let description = ''
+  let spaceKey = ''
+  let spaceKeyChanged = false
 
   const dispatch = createEventDispatcher()
   const coreService = getCoreService()
@@ -76,18 +76,62 @@
       return
     }
 
-    let sk = title.toUpperCase().replace(/[^a-z0-9]/gmi, '_')
+    let sk = title.toUpperCase().replace(/[^a-z0-9]/gim, '_')
 
     while (true) {
       const l = sk.length
       sk = sk.replaceAll('__', '_')
-      if (sk.length == l) {
+      if (sk.length === l) {
         break
       }
     }
     spaceKey = sk
   }
 </script>
+
+<div class="space-view">
+  <div class="header">
+    <div class="caption-1">Create {makePrivate ? 'private ' : ''} {application.spaceTitle}</div>
+    <a href="/" on:click|preventDefault={() => dispatch('close')}>
+      <Icon icon={workbench.icon.Close} button="true" />
+    </a>
+  </div>
+
+  <div class="content">
+    <form class="form">
+      <div class="input-container">
+        <EditBox
+          id="create_space__input__name"
+          bind:value={title}
+          label="Name"
+          placeholder={`A ${application.spaceTitle} Name`}
+          on:change={updateSpaceKey} />
+      </div>
+      <div class="input-container">
+        <EditBox
+          id="create_space__input__shortId"
+          bind:value={spaceKey}
+          label={(application.spaceTitle || '') + ' Key'}
+          placeholder={`A ${application.spaceTitle} Key (will be used with short ids)`}
+          on:change={() => (spaceKeyChanged = true)} />
+      </div>
+      <div class="input-container">
+        <EditBox
+          id="create_space__input__description"
+          bind:value={description}
+          label="Description"
+          placeholder={`Write a ${application.spaceTitle} description`} />
+      </div>
+      <CheckBox bind:checked={makePrivate}>
+        Create a private {application.spaceTitle}
+      </CheckBox>
+      <div class="separator" />
+      <div class="buttons">
+        <Button size="large" kind="primary" width="164px" on:click={() => save()}>Создать</Button>
+      </div>
+    </form>
+  </div>
+</div>
 
 <style lang="scss">
   .space-view {
@@ -127,38 +171,3 @@
     }
   }
 </style>
-
-<div class="space-view">
-  <div class="header">
-    <div class="caption-1">Create {(makePrivate) ? 'private ' : ''} {application.spaceTitle}</div>
-    <a href="/" on:click|preventDefault={() => dispatch('close')}>
-      <Icon icon={workbench.icon.Close} button="true" />
-    </a>
-  </div>
-
-  <div class="content">
-    <form class="form">
-      <div class="input-container">
-        <EditBox id="create_space__input__name" bind:value={title}
-                 label="Name" placeholder={`A ${application.spaceTitle} Name`} on:change={updateSpaceKey} />
-      </div>
-      <div class="input-container">
-        <EditBox id="create_space__input__shortId" bind:value={spaceKey}
-                 label={application.spaceTitle + ' Key'}
-                 placeholder={`A ${application.spaceTitle} Key (will be used with short ids)`}
-                 on:change={() => spaceKeyChanged = true} />
-      </div>
-      <div class="input-container">
-        <EditBox id="create_space__input__description" bind:value={description}
-                 label="Description" placeholder={`Write a ${application.spaceTitle} description`} />
-      </div>
-      <CheckBox bind:checked={makePrivate}>
-        Create a private {application.spaceTitle}
-      </CheckBox>
-      <div class="separator"></div>
-      <div class="buttons">
-        <Button size="large" kind="primary" width="164px" on:click={() => save()}>Создать</Button>
-      </div>
-    </form>
-  </div>
-</div>

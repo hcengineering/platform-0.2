@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 -->
-<script lang='ts'>
+<script lang="ts">
   import BrowseSpace from './BrowseSpace.svelte'
   import CreateSpace from './CreateSpace.svelte'
   import SimplePopup from '@anticrm/presentation/src/components/SimplePopup.svelte'
@@ -20,17 +20,20 @@
 
   const uiService = getUIService()
 
-  let actions = [{
-    name: 'Create',
-    action: () => {
-      uiService.showModal(CreateSpace, {})
+  const actions = [
+    {
+      name: 'Create',
+      action: () => {
+        uiService.showModal(CreateSpace, {})
+      }
+    },
+    {
+      name: 'Browse',
+      action: () => {
+        uiService.showModal(BrowseSpace, {})
+      }
     }
-  }, {
-    name: 'Browse',
-    action: () => {
-      uiService.showModal(BrowseSpace, {})
-    }
-  }]
+  ]
 </script>
 
-<SimplePopup items={actions}></SimplePopup>
+<SimplePopup items={actions} />

@@ -20,8 +20,8 @@
   export let value: Space
   export let attribute: AttrModel
   export let editable: boolean
-
 </script>
+
 {#if attribute && !editable}
   {getSpaceName(value)}
 {/if}
