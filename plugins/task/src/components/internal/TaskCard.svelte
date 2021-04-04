@@ -1,25 +1,29 @@
 <script lang="ts">
   import { spring } from 'svelte/motion'
   import { pannable } from './pannable'
+  import type { PanMoveEvent, PanEndEvent } from './pannable'
   import { createEventDispatcher } from 'svelte'
 
-  export let idCard: Number
-  export let avatar: string = ''
-  export let caption: string = ''
-  export let desc: string = ''
-  export let ghost: Boolean = false
-  export let dublicate: Boolean = false
-  export let topGhost: Number = 0
+  export let idCard: number
+  export let avatar = ''
+  export let caption = ''
+  export let desc = ''
+  export let ghost = false
+  export let dublicate = false
+  export let topGhost = 0
 
   let divTask: HTMLElement
-  let drag: Boolean = false
+  let drag = false
 
   const dispatch = createEventDispatcher()
 
-  const coords = spring({ x: 0, y: 0 }, {
-    stiffness: 0.2,
-    damping: 0.4
-  })
+  const coords = spring(
+    { x: 0, y: 0 },
+    {
+      stiffness: 0.2,
+      damping: 0.4
+    }
+  )
 
   function handlePanStart () {
     coords.stiffness = coords.damping = 1
@@ -28,15 +32,15 @@
     dispatch('drag', { id: idCard, value: true, top: divTask.offsetTop })
   }
 
-  function handlePanMove (event: MouseEvent) {
-    coords.update($coords => ({
+  function handlePanMove (event: PanMoveEvent) {
+    coords.update(($coords) => ({
       x: $coords.x + event.detail.dx,
       y: $coords.y + event.detail.dy
     }))
     dispatch('move', { id: idCard, value: true, coords: $coords, event: event })
   }
 
-  function handlePanEnd (event: MouseEvent) {
+  function handlePanEnd (event: PanEndEvent) {
     coords.stiffness = 0.2
     coords.damping = 0.4
     coords.set({ x: 0, y: 0 })
@@ -48,30 +52,28 @@
 </script>
 
 {#if ghost || dublicate}
-  <div class="card-view" class:ghost={ghost} class:dublicate={dublicate}
-       style="transform:
-		translate(0px,{topGhost}px)"
-  >
+  <div class="card-view" class:ghost class:dublicate style="transform:
+		translate(0px,{topGhost}px)">
     <div class="card-head">
-      <img class="card-head__avatar" src="{avatar}" alt="">
+      <img class="card-head__avatar" src={avatar} alt="" />
       <div class="card-head__caption">{caption}</div>
     </div>
     <div class="card-body">{desc}</div>
   </div>
-
 {:else}
-
-  <div bind:this={divTask} class="card-view" class:drag={drag}
-       use:pannable
-       on:panstart={handlePanStart}
-       on:panmove={handlePanMove}
-       on:panend={handlePanEnd}
-       style="transform:
+  <div
+    bind:this={divTask}
+    class="card-view"
+    class:drag
+    use:pannable
+    on:panstart={handlePanStart}
+    on:panmove={handlePanMove}
+    on:panend={handlePanEnd}
+    style="transform:
 		translate({$coords.x}px,{$coords.y}px)
-		rotate({$coords.x * 0.03}deg)"
-  >
+		rotate({$coords.x * 0.03}deg)">
     <div class="card-head">
-      <img class="card-head__avatar" src="{avatar}" alt="">
+      <img class="card-head__avatar" src={avatar} alt="" />
       <div class="card-head__caption">{caption}</div>
     </div>
     <div class="card-body">{desc}</div>
@@ -87,7 +89,7 @@
     border-radius: 4px;
     display: flex;
     flex-direction: column;
-    transition: border-color .3s ease-in, box-shadow .3s ease-in;
+    transition: border-color 0.3s ease-in, box-shadow 0.3s ease-in;
 
     .card-head {
       display: flex;
@@ -118,11 +120,11 @@
 
   .ghost {
     position: absolute;
-    opacity: .5;
+    opacity: 0.5;
   }
 
   .dublicate {
     border-color: var(--theme-bg-dark-color);
-    opacity: .5;
+    opacity: 0.5;
   }
 </style>
