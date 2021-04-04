@@ -22,7 +22,7 @@ limitations under the License.
 
   export let skills: Skill[]
 
-  function addSkill() {
+  function addSkill () {
     skills.push({
       __embedded: true,
       _class: personExtras.class.Skill,
