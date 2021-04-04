@@ -116,6 +116,10 @@ export function model (S: Builder): void {
     presenter: ui.component.ArrayPresenter
   })
 
+  S.mixin(core.class.Date, ui.mixin.Presenter, {
+    presenter: ui.component.StringPresenter
+  })
+
   S.createDocument(ui.mixin.Viewlet, {
     displayClass: core.class.Doc,
     label: 'Table' as IntlString,
