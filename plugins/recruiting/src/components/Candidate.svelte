@@ -13,15 +13,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <script lang="ts">
-  import { Person } from '@anticrm/contact'
+  import type { Person } from '@anticrm/contact'
 
-  import { createLiveQuery, getCoreService, updateLiveQuery } from '@anticrm/presentation'
-  import contact from '@anticrm/contact/src/__model__'
+  import { getCoreService, liveQuery } from '@anticrm/presentation'
 
   import UserInfo from '@anticrm/sparkling-controls/src/UserInfo.svelte'
   import ResumeProps from '@anticrm/person-extras/src/components/ResumeProps.svelte'
 
-  import candidatePlugin, { WithCandidateProps } from '..'
+  import type { WithCandidateProps } from '..'
+  import candidatePlugin from '..'
 
   const core = getCoreService()
   const model = core.then((s) => s.getModel())
@@ -31,7 +31,7 @@ limitations under the License.
   let candidate: WithCandidateProps['candidate'] | undefined
   let resume: WithCandidateProps['resume'] | undefined
 
-  const query = createLiveQuery(
+  $: lq = liveQuery(lq,
     candidatePlugin.mixin.WithCandidateProps, { _id: object._id },
     (docs) => {
       person = docs[0]
@@ -40,8 +40,6 @@ limitations under the License.
       resume = candidateMixin?.resume
     }
   )
-
-  $: updateLiveQuery(query, candidatePlugin.mixin.WithCandidateProps, { _id: object._id })
 </script>
 
 <div class="root">

@@ -14,14 +14,15 @@
 -->
 
 <script lang="ts">
-  import { AnyLayout, StringProperty } from '@anticrm/core'
+  import type { AnyLayout, StringProperty } from '@anticrm/core'
   import ui from '@anticrm/platform-ui'
 
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
-  import { CORE_CLASS_TITLE, Title } from '@anticrm/domains'
-  import { createLiveQuery, updateLiveQuery } from '@anticrm/presentation'
+  import type { Title } from '@anticrm/domains'
+  import { CORE_CLASS_TITLE } from '@anticrm/domains'
+  import { liveQuery } from '@anticrm/presentation'
 
-  let query: string
+  let query: string = ''
   let result: Title[] = []
 
   function q (query: string): AnyLayout {
@@ -33,12 +34,9 @@
     }
   }
 
-  const update = createLiveQuery(CORE_CLASS_TITLE, q(query), docs => {
-    console.log('search', docs)
+  $: lq = liveQuery(lq, CORE_CLASS_TITLE, q(query), docs => {
     result = docs
   })
-
-  $: updateLiveQuery(update, CORE_CLASS_TITLE, q(query))
 </script>
 
 <Icon icon={ui.icon.Search} size="32" />&nbsp;

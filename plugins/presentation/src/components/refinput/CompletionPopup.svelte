@@ -1,15 +1,12 @@
 <script lang="ts">
-  import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import IconEditBox from '@anticrm/platform-ui/src/components/IconEditBox.svelte'
   import presentation from '@anticrm/presentation'
-
-  import ui from '@anticrm/platform-ui'
-  import { Class, Ref } from '@anticrm/core'
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
 
-  import { createEventDispatcher, onMount } from 'svelte'
+  import { createEventDispatcher } from 'svelte'
 
-  import { CompletionItem, Position, getFirst, calcOffset } from './CompletionPopupHelper'
+  import type { CompletionItem, Position } from './CompletionPopupHelper'
+  import { calcOffset, getFirst } from './CompletionPopupHelper'
 
   const dispatch = createEventDispatcher()
 

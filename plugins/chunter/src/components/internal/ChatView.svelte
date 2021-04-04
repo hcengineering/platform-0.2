@@ -12,16 +12,17 @@
   // See the License for the specific language governing permissions and
   // limitations under the License.
 
-  import { Property, StringProperty } from '@anticrm/core'
-  import { CORE_CLASS_SPACE, Space } from '@anticrm/domains'
-  import { MessageNode } from '@anticrm/text'
+  import type { Property, StringProperty } from '@anticrm/core'
+  import type { Space } from '@anticrm/domains'
+  import type { MessageNode } from '@anticrm/text'
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
-  import chunter, { getChunterService, Message } from '../..'
+  import type { Message } from '../..'
+  import chunter, { getChunterService } from '../..'
   import CommentComponent from './Comment.svelte'
   import DateItem from './DateItem.svelte'
   import SplitView from '@anticrm/sparkling-controls/src/SplitView.svelte'
-  import { createLiveQuery, getCoreService, getUserId, updateLiveQuery } from '@anticrm/presentation'
+  import { getCoreService, getUserId, liveQuery } from '@anticrm/presentation'
 
   const coreService = getCoreService()
   const chunterService = getChunterService()
@@ -31,18 +32,13 @@
   let spaceName: string
   let messages: Message[] = []
 
-  const ms = createLiveQuery(chunter.class.Message, { _space: space._id }, (docs) => {
+  const userId = getUserId()
+
+  $: ms = liveQuery(ms, chunter.class.Message, { _space: space._id }, (docs) => {
     messages = docs
   })
 
-  const userId = getUserId()
-
-  $: {
-    updateLiveQuery(ms, chunter.class.Message, { _space: space._id })
-    // TODO: use Titles index instead of getting the whole Space object
-    coreService.then(cs => cs.findOne(CORE_CLASS_SPACE, { _id: space._id })
-      .then((spaceObj) => (spaceName = spaceObj ? '#' + spaceObj.name : '')))
-  }
+  $: spaceName = space ? '#' + space.name : ''
 
   function createMessage (message: MessageNode) {
     if (message) {

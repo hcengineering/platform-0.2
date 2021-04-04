@@ -14,10 +14,12 @@
 -->
 <script type="ts">
   import { createEventDispatcher } from 'svelte'
-  import { Class, CORE_CLASS_DOC, Doc, Ref } from '@anticrm/core'
-  import { Space } from '@anticrm/domains'
-  import { AttrModel, ClassModel } from '../..'
-  import { createLiveQuery, getEmptyModel, getPresentationService } from '../../utils'
+  import type { Class, Doc, Ref } from '@anticrm/core'
+  import { CORE_CLASS_DOC } from '@anticrm/core'
+  import type { Space } from '@anticrm/domains'
+  import type { AttrModel, ClassModel } from '../..'
+  import { liveQuery } from '../..'
+  import { getEmptyModel, getPresentationService } from '../../utils'
   import Presenter from './presenters/Presenter.svelte'
 
   export let _class: Ref<Class<Doc>>
@@ -44,13 +46,9 @@
 
   let objects: any[] = []
 
-  const queryUpdate = createLiveQuery(_class, { _space: space._id }, (docs) => {
+  $: lq = liveQuery(lq, _class, { _space: space._id }, (docs) => {
     objects = docs
   })
-
-  $: queryUpdate.then(qu => qu(_class, {
-    _space: space._id
-  }))
 </script>
 
 <style lang="scss">

@@ -1,5 +1,5 @@
 <script lang='ts'>
-  import { MessageNode } from '@anticrm/core'
+  import type { MessageNode } from '@anticrm/text'
   import { MarkType } from 'prosemirror-model'
 
   import { schema } from './internal/schema'
@@ -13,7 +13,7 @@
   import { buildKeymap } from './internal/keymap'
   import { buildInputRules } from './internal/input_rules'
   import { Commands } from './internal/commands'
-  import { EditorContentEvent } from './index'
+  import type { EditorContentEvent } from './index'
 
   import { createEventDispatcher, onMount } from 'svelte'
 

@@ -13,12 +13,14 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { Platform, Severity, Status } from '@anticrm/platform'
+  import type { Platform } from '@anticrm/platform'
+  import { Severity, Status } from '@anticrm/platform'
   import { getContext, onDestroy } from 'svelte'
-  import login, { LoginService } from '..'
+  import type { LoginService } from '..'
+  import login from '..'
   import Form from './Form.svelte'
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
-  import { ApplicationRoute, ApplicationRouter } from '@anticrm/platform-ui'
+  import type { ApplicationRoute, ApplicationRouter } from '@anticrm/platform-ui'
   import { PlatformStatusCodes } from '@anticrm/foundation'
 
   export let router: ApplicationRouter<ApplicationRoute>

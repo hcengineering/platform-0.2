@@ -15,7 +15,7 @@ limitations under the License.
 <script lang="ts">
   import EditBox from '@anticrm/sparkling-controls/src/EditBox.svelte'
 
-  import { Skill } from '..'
+  import type { Skill } from '..'
 
   export let skill: Skill
 </script>

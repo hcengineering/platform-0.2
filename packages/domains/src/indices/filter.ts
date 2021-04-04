@@ -12,8 +12,8 @@ import {
  * Index to pass through a specified class to storage.
  */
 export class PassthroughsIndex implements DomainIndex {
-  private readonly modelDb: Model
-  private readonly storage: Storage
+  protected readonly modelDb: Model
+  protected readonly storage: Storage
   private readonly matchClass: Ref<Class<Doc>>
 
   constructor (modelDb: Model, storage: Storage, matchClass: Ref<Class<Doc>>) {

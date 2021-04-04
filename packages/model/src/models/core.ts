@@ -17,7 +17,7 @@ import { BagOf$, Class$, InstanceOf$, Mixin$, Prop, RefTo$ } from '../dsl'
 import core from '../index'
 import {
   AllAttributes, ArrayOf, Attribute, Class, Classifier, ClassifierKind, Doc, Emb, Enum, EnumKey, EnumLiteral,
-  EnumLiterals, Indices, Mixin, MODEL_DOMAIN, Obj, PropertyType, Ref, RefTo, StringProperty, Type
+  EnumLiterals, Indices, InstanceOf, Mixin, MODEL_DOMAIN, Obj, PropertyType, Ref, RefTo, StringProperty, Type
 } from '@anticrm/core'
 
 @Class$(core.class.Obj, core.class.Obj)
@@ -86,6 +86,11 @@ export class TEnum<T extends EnumKey> extends TClassifier implements Enum<T> {
 @Class$(core.class.RefTo, core.class.Type, MODEL_DOMAIN)
 export class TRefTo extends TType implements RefTo<Doc> {
   @Prop() to!: Ref<Class<Doc>>
+}
+
+@Class$(core.class.InstanceOf, core.class.Type, MODEL_DOMAIN)
+export class TInstanceOf extends TType implements InstanceOf<Emb> {
+  @Prop() of!: Ref<Class<Emb>>
 }
 
 @Class$(core.class.ArrayOf, core.class.Type, MODEL_DOMAIN)

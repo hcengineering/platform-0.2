@@ -92,7 +92,7 @@ export default async (platform: Platform): Promise<CoreService> => {
     new PassthroughsIndex(model, qTitles, CORE_CLASS_TITLE), // Just for live queries.
     new PassthroughsIndex(model, qCache, CORE_CLASS_REFERENCE), // Construct a pass index to update references
     new PassthroughsIndex(model, qCache, CORE_CLASS_SPACE), // Construct a pass index to update references
-    new ModelIndex(model, [qModel])
+    new ModelIndex(model, qModel)
   ])
 
   // add listener to process data updates from backend for data transactions.

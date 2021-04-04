@@ -12,14 +12,8 @@
   // See the License for the specific language governing permissions and
   // limitations under the License.
 
-  import {
-    MessageNode,
-    MessageMark,
-    ReferenceMark,
-    MessageMarkType,
-    MessageNodeType,
-    messageContent
-  } from '@anticrm/text'
+  import type { MessageMark, MessageNode, ReferenceMark } from '@anticrm/text'
+  import { messageContent, MessageMarkType, MessageNodeType } from '@anticrm/text'
 
   import { getUIService } from '@anticrm/platform-ui'
 
@@ -30,7 +24,6 @@
   class Style {
     bold: boolean = false
     italic: boolean = false
-    underline: boolean = false
     strike: boolean = false
 
     reference: {

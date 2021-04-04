@@ -13,8 +13,9 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { ArrayOf, CORE_CLASS_DOC, InstanceOf, Type } from '@anticrm/core'
-  import { AttrModel } from '../../../../index'
+  import type { ArrayOf, InstanceOf, Type } from '@anticrm/core'
+  import { CORE_CLASS_DOC } from '@anticrm/core'
+  import type { AttrModel } from '../../../../index'
   import { getPresentationService } from '../../../../utils'
   import Presenter from '../Presenter.svelte'
 

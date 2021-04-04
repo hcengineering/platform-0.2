@@ -13,7 +13,7 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { Property, StringProperty } from '@anticrm/core'
+  import type { Property, StringProperty } from '@anticrm/core'
   import { createEventDispatcher } from 'svelte'
 
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
@@ -21,7 +21,7 @@
   import CheckBox from '@anticrm/sparkling-controls/src/CheckBox.svelte'
   import EditBox from '@anticrm/sparkling-controls/src/EditBox.svelte'
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
-  import { Space } from '@anticrm/domains'
+  import type { Space } from '@anticrm/domains'
   import { getCoreService } from '@anticrm/presentation'
 
   export let space: Space

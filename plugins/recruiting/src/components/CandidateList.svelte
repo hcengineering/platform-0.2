@@ -15,14 +15,15 @@ limitations under the License.
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
 
-  import { Space } from '@anticrm/domains'
+  import type { Space } from '@anticrm/domains'
   import contact from '@anticrm/contact/src/__model__'
-  import { createLiveQuery, getCoreService, updateLiveQuery } from '@anticrm/presentation'
+  import { getCoreService, liveQuery } from '@anticrm/presentation'
 
   import UserInfo from '@anticrm/sparkling-controls/src/UserInfo.svelte'
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
 
-  import candidate, { WithCandidateProps } from '..'
+  import candidate from '..'
+  import type { WithCandidateProps } from '..'
 
   export let space: Space
 
@@ -32,20 +33,13 @@ limitations under the License.
 
   let candidates: WithCandidateProps[] = []
 
-  const query = createLiveQuery(
+  $: lq = liveQuery(lq,
     contact.class.Person,
     { _mixins: candidate.mixin.WithCandidateProps, _space: space._id },
     (docs) => {
       model.then((m) => docs.map((x) => m.as(x, candidate.mixin.WithCandidateProps))).then((xs) => (candidates = xs))
     }
   )
-
-  $: {
-    updateLiveQuery(query, contact.class.Person, {
-      _mixins: candidate.mixin.WithCandidateProps,
-      _space: space._id
-    })
-  }
 </script>
 
 <ScrollView width="100%" height="100%">

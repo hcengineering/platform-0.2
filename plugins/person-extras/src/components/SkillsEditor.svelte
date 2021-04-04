@@ -17,7 +17,8 @@ limitations under the License.
 
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import SkillEditor from './SkillEditor.svelte'
-  import personExtras, { Skill } from '..'
+  import type { Skill } from '..'
+  import personExtras from '..'
 
   export let skills: Skill[]
 

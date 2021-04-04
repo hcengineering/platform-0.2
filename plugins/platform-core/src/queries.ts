@@ -13,7 +13,9 @@
 // limitations under the License.
 //
 
-import { Storage, TxContext, StringProperty, Doc, Ref, Class, AnyLayout, Model, generateId } from '@anticrm/core'
+import {
+  AnyLayout, Class, Doc, generateId, isValidQuery, Model, Ref, Storage, StringProperty, TxContext
+} from '@anticrm/core'
 import { QueryResult, Subscriber, Unsubscriber } from '.'
 
 export interface Domain extends Storage {
@@ -125,7 +127,8 @@ export class QueriableStorage implements Domain {
       for (const q of this.queries.values()) {
         if (this.updateMatchQuery(_id, q, (doc) => {
           this.model.removeDocument(doc, _query)
-          return UpdateOp.Remove
+          // We should not remove object in case we modify embedded array
+          return isValidQuery(_query) ? UpdateOp.None : UpdateOp.Remove
         })) {
           continue
         }

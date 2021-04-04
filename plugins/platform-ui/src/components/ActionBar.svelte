@@ -1,8 +1,7 @@
 <script lang="ts">
   import Icon from './Icon.svelte'
   import ui from '../'
-  import { Action } from '..'
-  import { onDestroy } from 'svelte'
+  import type { Action } from '..'
 
   interface ActionF extends Action {
     id: Number

@@ -14,10 +14,11 @@
 -->
 
 <script lang="ts">
-  import { Platform } from '@anticrm/platform'
-  import { getContext, onMount } from 'svelte'
+  import type { Platform } from '@anticrm/platform'
+  import { getContext } from 'svelte'
 
-  import ui, { AnyComponent } from '@anticrm/platform-ui'
+  import type { AnyComponent } from '@anticrm/platform-ui'
+  import ui from '@anticrm/platform-ui'
   import Spinner from './internal/Spinner.svelte'
   import Icon from './Icon.svelte'
 

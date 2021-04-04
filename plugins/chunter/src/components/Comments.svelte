@@ -12,28 +12,24 @@
   // See the License for the specific language governing permissions and
   // limitations under the License.
 
-  import { Property, StringProperty } from '@anticrm/core'
-  import chunter, { Collab, getChunterService } from '../index'
+  import type { Property, StringProperty } from '@anticrm/core'
+  import type { Collab } from '../index'
+  import chunter, { getChunterService } from '../index'
 
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
   import CommentComponent from './internal/Comment.svelte'
   import Backlink from './internal/Backlink.svelte'
-  import { CORE_CLASS_REFERENCE, Reference } from '@anticrm/domains'
-  import { createLiveQuery, getCoreService, updateLiveQuery } from '@anticrm/presentation'
+  import type { Reference } from '@anticrm/domains'
+  import { CORE_CLASS_REFERENCE } from '@anticrm/domains'
+  import { getCoreService, liveQuery } from '@anticrm/presentation'
 
   export let object: Collab
 
   let references: Reference[] = []
 
-  const refS = createLiveQuery(CORE_CLASS_REFERENCE, { _targetId: object._id }, (docs) => {
+  $: refS = liveQuery(refS, CORE_CLASS_REFERENCE, { _targetId: object._id }, (docs) => {
     references = docs
   })
-
-  $: {
-    if (object) {
-      updateLiveQuery(refS, CORE_CLASS_REFERENCE, { _targetId: object._id })
-    }
-  }
 
   const chunterService = getChunterService()
   const coreService = getCoreService()

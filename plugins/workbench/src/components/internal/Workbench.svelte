@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { Perspective, WorkbenchApplication } from '../..'
   // Copyright © 2020 Anticrm Platform Contributors.
   //
   // Licensed under the Eclipse Public License, Version 2.0 (the "License");
@@ -11,13 +12,14 @@
   //
   // See the License for the specific language governing permissions and
   // limitations under the License.
-  import workbench, { Perspective, WorkbenchApplication } from '../..'
+  import workbench from '../..'
   import { createLiveQuery } from '@anticrm/presentation'
 
   import Component from '@anticrm/platform-ui/src/components/Component.svelte'
   import Spotlight from './Spotlight.svelte'
-  import { AnyComponent, getUIService, newRouter } from '@anticrm/platform-ui'
-  import { Ref } from '@anticrm/core'
+  import type { AnyComponent } from '@anticrm/platform-ui'
+  import { getUIService, newRouter } from '@anticrm/platform-ui'
+  import type { Ref } from '@anticrm/core'
 
   const uiService = getUIService()
 
