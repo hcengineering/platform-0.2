@@ -45,7 +45,7 @@
   }
 </script>
 
-{#if references.length > 0 }
+{#if references.length > 0}
   <div class="caption-2">References</div>
   {#each references as ref}
     <Backlink backlink={ref} />
@@ -61,4 +61,3 @@
 {/if}
 
 <ReferenceInput on:message={(e) => createComment(e.detail)} />
-
