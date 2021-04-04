@@ -9,7 +9,8 @@
     "build:docs": "api-extractor run --local && copyfiles -u 1 ./_api-extractor-temp/doc-models/* ../../_api-extractor-temp/",
     "test": "jest",
     "genmodel": "ts-node src/__tests__/genmodel.ts",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "lint:fix": "eslint --fix src"
   },
   "dependencies": {
     "@anticrm/platform": "^0.2.0",
