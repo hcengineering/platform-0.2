@@ -33,7 +33,8 @@ limitations under the License.
 
   let candidates: WithCandidateProps[] = []
 
-  $: lq = liveQuery(lq,
+  $: lq = liveQuery(
+    lq,
     contact.class.Person,
     { _mixins: candidate.mixin.WithCandidateProps, _space: space._id },
     (docs) => {
@@ -47,8 +48,7 @@ limitations under the License.
     {#each candidates as c}
       <div
         class="candidate"
-        on:click={() => dispatch('open', { _id: c._id, _class: candidate.mixin.WithCandidateProps })}
-      >
+        on:click={() => dispatch('open', { _id: c._id, _class: candidate.mixin.WithCandidateProps })}>
         <UserInfo url={`https://robohash.org/${c.name}.png?set=set3`} title={c.name} subtitle={c.candidate.role} />
       </div>
     {/each}
