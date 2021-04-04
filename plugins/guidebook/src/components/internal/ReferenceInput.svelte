@@ -1,29 +1,15 @@
 <script type="ts">
   import PageBlock from './PageBlock.svelte'
 
-  import Toolbar from '@anticrm/sparkling-controls/src/toolbar/Toolbar.svelte'
-  import ToolbarButton from '@anticrm/sparkling-controls/src/toolbar/Button.svelte'
-
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
   import { serializeMessageMarkdown } from '@anticrm/text'
 
-  let message: string = ''
+  let message = ''
 
-  function add(event: any) {
+  function add (event: any) {
     message += '<pre>' + JSON.stringify(event) + '</pre> + <pre>' + serializeMessageMarkdown(event) + '</pre>'
   }
 </script>
-
-<style lang="scss">
-  .preview-pane {
-    margin: 10px;
-    background-color: hsl(210, 25%, 40%);
-  }
-  .message-panel {
-    max-width: 400px;
-    overflow: auto;
-  }
-</style>
 
 <h1>Reference Input</h1>
 
@@ -77,3 +63,14 @@
     {@html message}
   </div>
 </PageBlock>
+
+<style lang="scss">
+  .preview-pane {
+    margin: 10px;
+    background-color: hsl(210, 25%, 40%);
+  }
+  .message-panel {
+    max-width: 400px;
+    overflow: auto;
+  }
+</style>
