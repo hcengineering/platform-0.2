@@ -18,7 +18,7 @@
 import { AnyLayout, Attribute, Class, CORE_CLASS_ATTRIBUTE, CORE_CLASS_CLASS, CORE_CLASS_DOC, CORE_CLASS_EMB, CORE_CLASS_OBJ, Doc, Mixin, Obj, Property, PropertyType, Ref, StringProperty } from '../classes'
 import { mixinFromKey, mixinKey, Model } from '../model'
 import { txContext } from '../storage'
-import { createSubtask, createTask, doc1, taskIds, data, Task } from './tasks'
+import { createSubtask, createTask, doc1, taskIds, data, Task, SubTask } from './tasks'
 
 describe('matching', () => {
   const model = new Model('vdocs')
@@ -81,14 +81,14 @@ describe('matching', () => {
     model.updateDocument(clone, null, { mainTask: createSubtask('subtask4') } as AnyLayout)
 
     expect(clone.mainTask).toBeDefined()
-    expect(clone.mainTask!.name).toEqual('subtask4')
+    expect((clone.mainTask as never as SubTask).name).toEqual('subtask4')
   })
 
   it('push subtask value', () => {
     const clone = model.createDocument(taskIds.class.Task, doc1)
     model.pushDocument(clone, null, 'tasks' as StringProperty, (createSubtask('subtask3', 34) as unknown) as AnyLayout)
 
-    expect(clone.tasks!.length).toEqual(3)
+    expect(clone.tasks?.length).toEqual(3)
   })
 
   it('push a new subtask value', () => {
@@ -97,7 +97,7 @@ describe('matching', () => {
       rate: 44 as Property<number, number>
     })
 
-    expect(cloneResult.tasks![0].rate).toEqual(44)
+    expect(cloneResult.tasks?.[0].rate).toEqual(44)
   })
 
   it('push a new comment to subtask', () => {
@@ -107,15 +107,15 @@ describe('matching', () => {
         message: 'my-msg' as StringProperty
       })
 
-    expect(cloneResult.tasks![0].comments!.length).toEqual(1)
+    expect(cloneResult.tasks?.[0].comments?.length).toEqual(1)
   })
 
   it('remove item from array', () => {
     const clone = model.createDocument(taskIds.class.Task, doc1)
     const cloneResult = model.removeDocument(clone, { tasks: { name: 'subtask1' as StringProperty } })
 
-    expect(cloneResult.tasks!.length).toEqual(1)
-    expect(cloneResult.tasks![0].name).toEqual('subtask2')
+    expect(cloneResult.tasks?.length).toEqual(1)
+    expect(cloneResult.tasks?.[0].name).toEqual('subtask2')
   })
 
   it('remove item from instance', () => {
