@@ -22,8 +22,20 @@
   export let editable: boolean
 
   // Do not allow edit of arrays and instances by this string presenter.
-  $: readOnlyField = !editable || (attribute && (attribute.type._class === CORE_CLASS_ARRAY_OF || attribute.type._class === CORE_CLASS_INSTANCE_OF))
+  let readOnlyField = false
+
+  $: readOnlyField =
+    !editable ||
+    (attribute && (attribute.type._class === CORE_CLASS_ARRAY_OF || attribute.type._class === CORE_CLASS_INSTANCE_OF))
 </script>
+
+{#if readOnlyField}
+  <div class="wrapped-text">
+    {value || ''}
+  </div>
+{:else}
+  <InlineEdit bind:value placeholder={attribute.placeholder || ''} {editable} />
+{/if}
 
 <style lang="scss">
   .wrapped-text {
@@ -32,11 +44,3 @@
     hyphens: auto;
   }
 </style>
-
-{#if readOnlyField}
-  <div class="wrapped-text">
-    {value || ''}
-  </div>
-{:else}
-  <InlineEdit bind:value placeholder={attribute.placeholder || ""} {editable} />
-{/if}

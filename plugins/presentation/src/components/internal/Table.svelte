@@ -24,7 +24,7 @@
 
   export let _class: Ref<Class<Doc>>
   export let space: Space
-  export let editable: boolean = true
+  export let editable = true
 
   const dispatch = createEventDispatcher()
 
@@ -33,7 +33,7 @@
   let attributes: AttrModel[] = []
 
   $: {
-    if (_class && _class != modelClass) {
+    if (_class && _class !== modelClass) {
       getPresentationService()
         .then((p) => p.getClassModel(_class, CORE_CLASS_DOC))
         .then((m) => {
@@ -50,6 +50,31 @@
     objects = docs
   })
 </script>
+
+<div class="erp-table">
+  <div class="thead">
+    <div class="tr">
+      {#each attributes as attr (attr.key)}
+        <div class="th">{attr.label}</div>
+      {/each}
+    </div>
+  </div>
+  <div class="tbody">
+    {#each objects as object (object._id)}
+      <div class="tr" on:click={() => dispatch('open', { _id: object._id, _class: _class })}>
+        {#each attributes as attr (attr.key)}
+          <div class="td">
+            {#if attr.presenter}
+              <Presenter is={attr.presenter} value={object[attr.key]} attribute={attr} {editable} />
+            {:else}
+              <span>{object[attr.key] || ''}</span>
+            {/if}
+          </div>
+        {/each}
+      </div>
+    {/each}
+  </div>
+</div>
 
 <style lang="scss">
   .erp-table {
@@ -101,28 +126,3 @@
     }
   }
 </style>
-
-<div class="erp-table">
-  <div class="thead">
-    <div class="tr">
-      {#each attributes as attr (attr.key)}
-        <div class="th">{attr.label}</div>
-      {/each}
-    </div>
-  </div>
-  <div class="tbody">
-    {#each objects as object (object._id)}
-      <div class="tr" on:click={() => dispatch('open', { _id: object._id, _class: _class })}>
-        {#each attributes as attr (attr.key)}
-          <div class="td">
-            {#if attr.presenter}
-              <Presenter is={attr.presenter} value={object[attr.key] } attribute={attr} {editable} />
-            {:else}
-              <span>{object[attr.key] || ''}</span>
-            {/if}
-          </div>
-        {/each}
-      </div>
-    {/each}
-  </div>
-</div>

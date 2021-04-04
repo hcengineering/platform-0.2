@@ -12,7 +12,7 @@
 
   export let items: CompletionItem[] = []
   export let pos: Position
-  export let ontop: boolean = false
+  export let ontop = false
 
   let listElement: HTMLElement
   let selElement: HTMLElement
@@ -23,20 +23,20 @@
   let clientHeight: number
   let clientWidth: number
 
-  function selectItem(item: CompletionItem) {
+  function selectItem (item: CompletionItem) {
     dispatch('select', item)
   }
 
   $: {
     popupStyle = `
-			left: ${pos.left}px;
-			top: ${pos.top - (ontop ? clientHeight : 0)}px;
+      left: ${pos.left}px;
+      top: ${pos.top - (ontop ? clientHeight : 0)}px;
       margin-bottom:-${clientHeight + 2}px;
       margin-right:-${clientWidth}px;
       z-index: 100000;
-		`
+    `
 
-    let cs = items.find((e) => e.key == selection.key)
+    const cs = items.find((e) => e.key === selection.key)
     if (cs == null) {
       // Filtering caused selection to be wrong, select first
       selection = getFirst(items)
@@ -45,22 +45,43 @@
     selOffset = calcOffset(selElement)
   }
 
-  export function handleUp() {
-    let pos = items.indexOf(selection)
+  export function handleUp (): void {
+    const pos = items.indexOf(selection)
     if (pos > 0) {
       selection = items[pos - 1]
     }
   }
-  export function handleDown() {
-    let pos = items.indexOf(selection)
+  export function handleDown (): void {
+    const pos = items.indexOf(selection)
     if (pos < items.length - 1) {
       selection = items[pos + 1]
     }
   }
-  export function handleSubmit() {
+  export function handleSubmit (): void {
     dispatch('select', selection)
   }
 </script>
+
+<div class="presentation-completion-popup" style={popupStyle} bind:clientHeight bind:clientWidth on:blur>
+  <IconEditBox icon={presentation.icon.Finder} iconRight />
+  <div class="separator" />
+  <ScrollView width="100%" height="100%" scrollPosition={selOffset} accentColor>
+    <div bind:this={listElement}>
+      {#each items as item (item.key)}
+        <div
+          class="item"
+          class:selected={item.key === selection.key}
+          on:click|preventDefault={() => selectItem(item)}
+          on:mouseover={() => (selection = item)}>
+          {#if item.key === selection.key}
+            <div class="focus-placeholder" bind:this={selElement} style="width:0px" />
+          {/if}
+          {item.title || item.label}
+        </div>
+      {/each}
+    </div>
+  </ScrollView>
+</div>
 
 <style lang="scss">
   .presentation-completion-popup {
@@ -85,7 +106,7 @@
       padding: 8px;
       border-radius: 4px;
       cursor: pointer;
-      transition: background-color .2s;
+      transition: background-color 0.2s;
 
       &.selected {
         // border-color: var(--theme-doclink-color);
@@ -113,24 +134,3 @@
     }
   }
 </style>
-
-<div class="presentation-completion-popup" style={popupStyle} bind:clientHeight bind:clientWidth on:blur>
-  <IconEditBox icon={presentation.icon.Finder} iconRight />
-  <div class="separator"></div>
-  <ScrollView width="100%" height="100%" scrollPosition={selOffset} accentColor>
-    <div bind:this={listElement}>
-      {#each items as item (item.key)}
-        <div
-          class="item"
-          class:selected={item.key == selection.key}
-          on:click|preventDefault={() => selectItem(item)}
-          on:mouseover={() => (selection = item)}>
-          {#if item.key == selection.key}
-            <div class="focus-placeholder" bind:this={selElement} style="width:0px" />
-          {/if}
-          {item.title || item.label}
-        </div>
-      {/each}
-    </div>
-  </ScrollView>
-</div>

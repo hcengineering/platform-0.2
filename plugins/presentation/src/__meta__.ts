@@ -16,7 +16,7 @@
 import { Platform } from '@anticrm/platform'
 import presentation from '..'
 
-export default (platform: Platform) => {
+export default (platform: Platform): any => {
   const spritesUrl = require('../assets/icons.svg') // eslint-disable-line
   platform.loadMetadata(presentation.icon, {
     Finder: `${spritesUrl}#finder`,

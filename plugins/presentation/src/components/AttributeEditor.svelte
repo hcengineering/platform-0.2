@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 -->
-
 <script type="ts">
   import type { AttrModel } from '..'
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
@@ -20,14 +19,16 @@
 
   export let value: unknown
   export let attribute: AttrModel
-  export let maxWidth: number = 300
+  export let maxWidth = 300
+
+  let component: Promise<any>
 
   const platform = getPlatform()
   $: component = platform.getResource(attribute.presenter)
 </script>
 
 {#await component then ctor}
-  <svelte:component this={ctor} {attribute} {maxWidth} bind:value={value} />
+  <svelte:component this={ctor} {attribute} {maxWidth} bind:value />
 {:catch err}
   <Icon icon={ui.icon.Error} size="32" /> {err}
 {/await}
