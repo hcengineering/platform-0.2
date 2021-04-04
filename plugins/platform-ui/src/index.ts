@@ -17,43 +17,42 @@ import { Metadata, Platform, Plugin, plugin, Resource, Service } from '@anticrm/
 import { getContext } from 'svelte'
 import { ApplicationRouter, Location } from './routes'
 
-export type URL = string
-export type Asset = Metadata<URL>
+export type URL = string;
+export type Asset = Metadata<URL>;
 export * from './routes'
 
 interface ComponentOptions<Props> {
-  target: HTMLElement
-  anchor?: HTMLElement
-  props?: Props
-  hydrate?: boolean
-  intro?: boolean
+  target: HTMLElement;
+  anchor?: HTMLElement;
+  props?: Props;
+  hydrate?: boolean;
+  intro?: boolean;
 }
 
 export interface SvelteComponent<Props> {
-  new (options: ComponentOptions<Props>): any
+  new (options: ComponentOptions<Props>): any;
 
   // eslint-disable-next-line @typescript-eslint/ban-types
-  $set: (props: {}) => any
-  $on: (event: string, callback: (event: CustomEvent) => any) => any
-  $destroy: () => any
+  $set: (props: {}) => any;
+  $on: (event: string, callback: (event: CustomEvent) => any) => any;
+  $destroy: () => any;
   // eslint-disable-next-line @typescript-eslint/ban-types
   render: (props?: {}) => {
-    html: string
-    css: { code: string; map?: string }
-    head?: string
-  }
+    html: string;
+    css: { code: string; map?: string };
+    head?: string;
+  };
 }
 
-export type AnySvelteComponent = any // SvelteComponent<{}>
+export type AnySvelteComponent = any; // SvelteComponent<{}>
 
-export type Component<C extends AnySvelteComponent> = Resource<C>
-export type AnyComponent = Component<AnySvelteComponent>
+export type Component<C extends AnySvelteComponent> = Resource<C>;
+export type AnyComponent = Component<AnySvelteComponent>;
 
 export const CONTEXT_PLATFORM = 'platform'
 export const CONTEXT_PLATFORM_UI = 'platform-ui'
 
-export interface Document {
-}
+export interface Document {}
 
 /**
  * Allow to control currently selected document.
@@ -62,16 +61,16 @@ export interface DocumentProvider {
   /**
    * Opening a document
    * */
-  open (doc: Document): Promise<void>
+  open(doc: Document): Promise<void>;
 
   /**
    * Return currently selected document, if one.
    */
-  selection (): Document | undefined
+  selection(): Document | undefined;
 }
 
 export interface UIService extends Service, DocumentProvider {
-  createApp (root: HTMLElement): any
+  createApp(root: HTMLElement): any;
 
   /**
    * Ask UI service to subscribe for browser location changes.
@@ -79,7 +78,7 @@ export interface UIService extends Service, DocumentProvider {
    * @param listener - listener to be notified on location changes, will be triggered for first time on subscribe.
    * @param destroyFactory - a factory to register unsubscribe function to.
    */
-  subscribeLocation (listener: (location: Location) => void, destroyFactory: (op: () => void) => void): void
+  subscribeLocation(listener: (location: Location) => void, destroyFactory: (op: () => void) => void): void;
 
   /**
    * Will join a current location with a path, query values or fragment
@@ -87,13 +86,17 @@ export interface UIService extends Service, DocumentProvider {
    * @param query
    * @param fragment
    */
-  navigateJoin (path: string[] | undefined, query: Record<string, string> | undefined, fragment: string | undefined): void
+  navigateJoin(
+    path: string[] | undefined,
+    query: Record<string, string> | undefined,
+    fragment: string | undefined
+  ): void;
 
   /**
    * Navigate to new URL
    * @param newUrl
    */
-  navigate (newUrl: string): void
+  navigate(newUrl: string): void;
 
   /**
    * Construct a new router to perform operations in component.
@@ -101,50 +104,54 @@ export interface UIService extends Service, DocumentProvider {
    * @param matcher
    * @param defaults
    */
-  newRouter<T> (pattern: string, matcher: (match: T) => void, defaults: T | undefined): ApplicationRouter<T>
+  newRouter<T>(pattern: string, matcher: (match: T) => void, defaults: T | undefined): ApplicationRouter<T>;
 
-  showModal (component: AnySvelteComponent, props: any, element?: HTMLElement): void
-  closeModal (): void
+  showModal(component: AnySvelteComponent, props: any, element?: HTMLElement): void;
+  closeModal(): void;
 
   /**
    * Register active document provider.
    * @param provider
    */
-  registerDocumentProvider (provider: DocumentProvider | undefined): void
+  registerDocumentProvider(provider: DocumentProvider | undefined): void;
 }
 
 /**
  * Useful interface to provide action operations.
  */
 export interface Action {
-  name: string // A name to be displayed
-  icon?: Asset // An optional icon to be displayed
-  action?: () => void // Action to be performed on click
-  toggled?: boolean // If passed action item will looks like it is toggled
+  name: string; // A name to be displayed
+  icon?: Asset; // An optional icon to be displayed
+  action?: () => void; // Action to be performed on click
+  toggled?: boolean; // If passed action item will looks like it is toggled
 }
 
-export default plugin('ui' as Plugin<UIService>, {}, {
-  metadata: {
-    LoginApplication: '' as Metadata<string>,
-    DefaultApplication: '' as Metadata<string>
-  },
-  icon: {
-    Default: '' as Asset,
-    Error: '' as Asset,
-    Network: '' as Asset,
-    Search: '' as Asset,
-    Add: '' as Asset,
-    ArrowDown: '' as Asset
-  },
-  component: {
-    Icon: '' as AnyComponent,
-    Spinner: '' as AnyComponent,
-    BadComponent: '' as AnyComponent
-  },
-  method: {
-    AnAction: '' as Resource<(args: any) => void>
+export default plugin(
+  'ui' as Plugin<UIService>,
+  {},
+  {
+    metadata: {
+      LoginApplication: '' as Metadata<string>,
+      DefaultApplication: '' as Metadata<string>
+    },
+    icon: {
+      Default: '' as Asset,
+      Error: '' as Asset,
+      Network: '' as Asset,
+      Search: '' as Asset,
+      Add: '' as Asset,
+      ArrowDown: '' as Asset
+    },
+    component: {
+      Icon: '' as AnyComponent,
+      Spinner: '' as AnyComponent,
+      BadComponent: '' as AnyComponent
+    },
+    method: {
+      AnAction: '' as Resource<(args: any) => void>
+    }
   }
-})
+)
 
 // U T I L S
 
@@ -156,6 +163,10 @@ export function getUIService (): UIService {
   return getContext(CONTEXT_PLATFORM_UI) as UIService
 }
 
-export function newRouter<T> (pattern: string, matcher: (match: T) => void, defaults: T | undefined = undefined): ApplicationRouter<T> {
+export function newRouter<T> (
+  pattern: string,
+  matcher: (match: T) => void,
+  defaults: T | undefined = undefined
+): ApplicationRouter<T> {
   return getUIService().newRouter(pattern, matcher, defaults)
 }

@@ -5,16 +5,16 @@
   import workbench from '@anticrm/workbench'
 
   export let items: unknown[]
-  export let selected: number = 0
+  export let selected = 0
 
-  let comboHidden: boolean = true
+  let comboHidden = true
   let comboRoot: HTMLElement
   let comboDrop: HTMLElement
   let comboItems: HTMLElement
 
   function showCombo (): void {
     const rect = comboRoot.getBoundingClientRect()
-    comboDrop.style.top = rect.height + 3 + 'px'
+    comboDrop.style.top = `${rect.height + 3}px`
     comboDrop.style.left = '-1px'
     comboDrop.style.visibility = 'visible'
     comboHidden = false
@@ -28,14 +28,16 @@
   }
 
   function toggleCombo (event: MouseEvent): void {
-    let pathRoot: boolean = false
-    let pathDrop: boolean = false
-    let pathItems: boolean = false
-    var path = event['path'] || (event.composedPath && event.composedPath())
+    let pathRoot = false
+    let pathDrop = false
+    let pathItems = false
+    const path = event.path || (event.composedPath && event.composedPath())
     path.find((el) => {
       if (el.className === comboRoot?.className) pathRoot = true
       if (el.className === comboDrop?.className) pathDrop = true
       if (el.className === comboItems?.className) pathItems = true
+
+      return false
     })
     if (pathRoot && !pathDrop) {
       if (comboHidden) {
@@ -53,18 +55,31 @@
 </script>
 
 <div bind:this={comboRoot} class="comboBox" class:selectedCombo={!comboHidden} on:click={handler}>
-  <UserInfo url={items[selected].url} title={items[selected].name}
-            subtitle="Новый исполнитель" subtitleOnTop="true" userColor="var(--theme-content-dark-color)" />
-  <div class="arrowDown"></div>
+  <UserInfo
+    url={items[selected].url}
+    title={items[selected].name}
+    subtitle="Новый исполнитель"
+    subtitleOnTop="true"
+    userColor="var(--theme-content-dark-color)" />
+  <div class="arrowDown" />
 
   <div bind:this={comboDrop} class="comboBox-drop">
-    <IconEditBox id="select-user-combobox" icon={workbench.icon.Finder} iconRight="true" width="100%" hoverState="true" />
-    <div class="separator"></div>
+    <IconEditBox
+      id="select-user-combobox"
+      icon={workbench.icon.Finder}
+      iconRight="true"
+      width="100%"
+      hoverState="true" />
+    <div class="separator" />
     <div bind:this={comboItems} class="comboBox-drop__items">
       <ScrollView width="100%" height="100%" accentColor="true">
         {#each items as item (item.id)}
-          <div class="comboBox-drop__item" class:selected={item.id === selected}
-               on:click={() => { selected = item.id }}>
+          <div
+            class="comboBox-drop__item"
+            class:selected={item.id === selected}
+            on:click={() => {
+              selected = item.id
+            }}>
             <UserInfo url={item.url} title={item.name} userColor="var(--theme-content-dark-color)" />
           </div>
         {/each}
@@ -79,7 +94,7 @@
     background-color: var(--theme-bg-accent-color);
     border: solid 1px var(--theme-bg-dark-color);
     border-radius: 4px;
-    padding: .5em 1em .5em .5em;
+    padding: 0.5em 1em 0.5em 0.5em;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -114,7 +129,7 @@
 
       &__item {
         margin: 0;
-        padding: .5em;
+        padding: 0.5em;
         border-radius: 4px;
 
         &:hover {
@@ -131,7 +146,7 @@
       }
 
       .separator {
-        height: .5em;
+        height: 0.5em;
       }
     }
   }

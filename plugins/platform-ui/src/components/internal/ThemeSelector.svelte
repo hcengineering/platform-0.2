@@ -1,22 +1,22 @@
 <script lang="ts">
   import { getContext } from 'svelte'
-  import { themes as _themes } from "@anticrm/sparkling-theme/src/themes"
+  import { themes as _themes } from '@anticrm/sparkling-theme/src/themes'
 
   const { setTheme } = getContext('theme')
-  function changeTheme(event: any): void {
-    const sT = setTheme(event.srcElement.innerText)
+  function changeTheme (event: any): void {
+    setTheme(event.srcElement.innerText)
     window.removeEventListener('click', handler)
   }
   const themes = [..._themes]
 
-  function handler(event: MouseEvent) {
+  function handler (event: MouseEvent) {
     const cl = event.target.classList[0]
-    if ((cl !== 'item') && (cl !== 'menu')) {
+    if (cl !== 'item' && cl !== 'menu') {
       hidden = !hidden
       window.removeEventListener('click', handler)
     }
   }
-  
+
   let hidden = false
   function toggleMenu (): void {
     hidden = !hidden
@@ -32,7 +32,9 @@
   Темы
   <div class="subMenu" class:hidden={!hidden}>
     {#each themes as theme}
-      <div class="item" class:hidden={!hidden} on:click|preventDefault={changeTheme}>{theme.name}</div>
+      <div class="item" class:hidden={!hidden} on:click|preventDefault={changeTheme}>
+        {theme.name}
+      </div>
     {/each}
   </div>
 </div>
@@ -41,7 +43,7 @@
   .menu {
     position: relative;
     cursor: pointer;
-}
+  }
   .menu:hover {
     color: var(--theme-doclink-color);
   }

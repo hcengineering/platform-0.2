@@ -23,11 +23,13 @@ declare module '*.svelte' {
   }
 
   interface Component<Props> {
-    new(options: ComponentOptions<Props>): any;
+    new (options: ComponentOptions<Props>): any;
     $set: (props: Props) => any;
     $on: (event: string, callback: (event: CustomEvent) => any) => any;
     $destroy: () => any;
-    render: (props?: Props) => {
+    render: (
+      props?: Props
+    ) => {
       html: string;
       css: { code: string; map?: string };
       head?: string;

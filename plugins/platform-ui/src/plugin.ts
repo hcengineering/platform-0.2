@@ -51,7 +51,7 @@ export default (platform: Platform): Promise<UIService> => {
     locationWritable.set(windowLocation())
   })
 
-  const location: Readable<Location> = derived(locationWritable, loc => loc)
+  const location: Readable<Location> = derived(locationWritable, (loc) => loc)
 
   function subscribeLocation (listener: (location: Location) => void, destroyFactory: (op: () => void) => void): void {
     const unsubscribe = location.subscribe((location) => {
@@ -69,7 +69,11 @@ export default (platform: Platform): Promise<UIService> => {
     locationWritable.set(windowLocation())
   }
 
-  function navigateJoin (path: string[] | undefined, query: Record<string, string> | undefined, fragment: string | undefined) {
+  function navigateJoin (
+    path: string[] | undefined,
+    query: Record<string, string> | undefined,
+    fragment: string | undefined
+  ) {
     const newLocation = windowLocation()
     if (path) {
       newLocation.path = path
@@ -97,7 +101,11 @@ export default (platform: Platform): Promise<UIService> => {
 
   const CONTEXT_ROUTE_VALUE = 'routes.context'
 
-  function newRouter<T> (pattern: string, matcher: (match: T) => void, defaults: T | undefined = undefined): ApplicationRouter<T> {
+  function newRouter<T> (
+    pattern: string,
+    matcher: (match: T) => void,
+    defaults: T | undefined = undefined
+  ): ApplicationRouter<T> {
     const r = getContext(CONTEXT_ROUTE_VALUE) as Router<any>
     const navigateOp = (loc: Location) => {
       navigate(locationToUrl(loc))

@@ -1,7 +1,7 @@
 <script lang="ts">
-  import type { Metadata, Platform, Resource, Status } from '@anticrm/platform'
+  import type { Metadata, Platform, Status } from '@anticrm/platform'
   import { PlatformStatus, Severity } from '@anticrm/platform'
-  import type { AnyComponent, ApplicationRoute, UIService } from '../..'
+  import type { ApplicationRoute, UIService } from '../..'
   import { CONTEXT_PLATFORM, CONTEXT_PLATFORM_UI, routeMeta } from '../..'
   import { setContext } from 'svelte'
 
@@ -34,36 +34,39 @@
     application: string
   }
 
-  const router = newRouter<ApplicationInfo>(':application', (route) => {
-    let appRoute: Metadata<ApplicationRoute> = routeMeta(defaultApp)
-    if (route.application && route.application.length > 0 && route.application !== '#default') {
-      appRoute = routeMeta(route.application)
-    }
-    if (appRoute) {
-      const routeAppComponent = platform.getMetadata(appRoute)
-      if (routeAppComponent) {
-        currentAppErr = undefined
-        currentApp = routeAppComponent
-        return
+  newRouter<ApplicationInfo>(
+    ':application',
+    (route) => {
+      let appRoute: Metadata<ApplicationRoute> = routeMeta(defaultApp)
+      if (route.application && route.application.length > 0 && route.application !== '#default') {
+        appRoute = routeMeta(route.application)
       }
-    }
-    if (!currentApp) {
-      currentAppErr = `There is no application route defined for ${appRoute}`
-    }
-  }, { application: '#default' })
-
-  let status: Status = { severity: Severity.OK, code: 0, message: '' }
-
-  platform.addEventListener(
-    PlatformStatus,
-    async (event, status) => {
-      if (status.severity === Severity.ERROR && status.code === PlatformStatusCodes.AUTHENTICATON_REQUIRED) {
-        authenticationRequired = true
-      } else if (status.severity === Severity.OK && status.code === PlatformStatusCodes.AUTHENTICATON_OK) {
-        authenticationRequired = false
+      if (appRoute) {
+        const routeAppComponent = platform.getMetadata(appRoute)
+        if (routeAppComponent) {
+          currentAppErr = undefined
+          currentApp = routeAppComponent
+          return
+        }
       }
-    }
+      if (!currentApp) {
+        currentAppErr = `There is no application route defined for ${appRoute}`
+      }
+    },
+    { application: '#default' }
   )
+
+  const status: Status = { severity: Severity.OK, code: 0, message: '' }
+
+  platform.addEventListener(PlatformStatus, (_event, status) => {
+    if (status.severity === Severity.ERROR && status.code === PlatformStatusCodes.AUTHENTICATON_REQUIRED) {
+      authenticationRequired = true
+    } else if (status.severity === Severity.OK && status.code === PlatformStatusCodes.AUTHENTICATON_OK) {
+      authenticationRequired = false
+    }
+
+    return Promise.resolve()
+  })
 </script>
 
 <Theme>
@@ -90,13 +93,12 @@
     <div class="app">
       {#if authenticationRequired}
         <Component is={authApp.component} props={{}} />
+      {:else if currentApp}
+        <Component is={currentApp.component} props={{}} />
       {:else}
-        {#if currentApp}
-          <Component is={currentApp.component} props={{}} />
-        {:else}
-          <div class="caption-1 error">Could not find application: "{currentAppErr}"
-          </div>
-        {/if}
+        <div class="caption-1 error">
+          Could not find application: "{currentAppErr}"
+        </div>
       {/if}
     </div>
   </div>

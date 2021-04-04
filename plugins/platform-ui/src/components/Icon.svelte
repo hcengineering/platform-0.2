@@ -6,11 +6,11 @@
 
   export let icon: Asset | undefined
   // --- prop 'size' in 'px': '16', '24', '32', '42' --- //
-  export let size: string = '16'
-  export let button: boolean = false
-  export let color: string = ''
+  export let size = '16'
+  export let button = false
+  export let color = ''
 
-  const platform = getContext("platform") as Platform;
+  const platform = getContext('platform') as Platform
   let url
   $: url = platform.getMetadata(icon || ui.icon.Default) || 'https://anticrm.org/logo.svg'
 
@@ -32,6 +32,6 @@
   else cl = 'icon'
 </script>
 
-<svg class='{cl} {fs}' style="{(color !== '') ? 'fill:' + color : ''}">
+<svg class="{cl} {fs}" style={color !== '' ? 'fill:' + color : ''}>
   <use href={url} />
 </svg>
