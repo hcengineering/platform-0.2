@@ -63,8 +63,8 @@ export class TRecurrenceProperty extends TEmb implements RecurrenceProperty {
     type!: RecurrenceType
 
     @Prop(core.class.Number) interval!: number
-    @Prop(core.class.Date) startDate!: Date
-    @Prop(core.class.Date) endDate?: Date
+    startDate!: Date
+    endDate?: Date
 }
 
 @Class$(calendar.class.Calendar, core.class.VDoc, MODEL_DOMAIN)
@@ -92,9 +92,6 @@ export class TCalendarEvent extends TVDoc implements CalendarEvent {
     @EnumValue$(calendar.enum.CalendarEventType)
     type!: CalendarEventType
 
-    @RefTo$(calendar.class.Calendar)
-    calendar!: Ref<Calendar>
-
     @ArrayOf$()
     @RefTo$(contact.mixin.User) participants!: Ref<User>[]
 
@@ -117,7 +114,13 @@ export function model (S: Builder): void {
     spaceTitle: 'Calendar'
   }, calendar.application.Calendar)
 
-  S.mixin(calendar.class.Calendar, presentation.mixin.CreateForm, {
-    component: calendar.component.NewCalendar
+  S.createDocument(presentation.mixin.Viewlet, {
+    displayClass: calendar.class.CalendarEvent,
+    label: 'Calendar' as IntlString,
+    component: calendar.component.EventsCalendar
+  })
+
+  S.mixin(calendar.class.CalendarEvent, presentation.mixin.CreateForm, {
+    component: calendar.component.NewEventForm
   })
 }

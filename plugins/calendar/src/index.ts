@@ -57,8 +57,6 @@ export interface CalendarEvent extends VDoc {
 
     type: CalendarEventType
 
-    calendar: Ref<Calendar>
-
     participants: Ref<User>[]
 
     startDate: Date
@@ -82,7 +80,8 @@ export default plugin('Calendar' as Plugin<CalendarService>, {}, {
     CalendarEventType: '' as Ref<Enum<CalendarEventType>>
   },
   component: {
-    NewCalendar: '' as AnyComponent
+    NewEventForm: '' as AnyComponent,
+    EventsCalendar: '' as AnyComponent
   },
   application: {
     Calendar: '' as Ref<Application>

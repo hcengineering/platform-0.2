@@ -14,10 +14,9 @@
 //
 
 import type { Platform } from '@anticrm/platform'
-import { CalendarService } from '.'
-import NewCalendar from './components/NewCalendar.svelte'
-
-import calendar from '.'
+import calendar, { CalendarService } from '.'
+import NewEventForm from './components/NewEventForm.svelte'
+import EventsCalendar from './components/EventsCalendar.svelte'
 
 /*!
  * Anticrm Platform™ Task Plugin
@@ -25,6 +24,7 @@ import calendar from '.'
  * Licensed under the Eclipse Public License, Version 2.0
  */
 export default (platform: Platform): Promise<CalendarService> => {
-  platform.setResource(calendar.component.NewCalendar, NewCalendar)
+  platform.setResource(calendar.component.NewEventForm, NewEventForm)
+  platform.setResource(calendar.component.EventsCalendar, EventsCalendar)
   return Promise.resolve({})
 }
