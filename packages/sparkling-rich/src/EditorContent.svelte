@@ -1,4 +1,4 @@
-<script lang='ts'>
+<script lang="ts">
   import type { MessageNode } from '@anticrm/text'
   import { MarkType } from 'prosemirror-model'
 
@@ -19,18 +19,13 @@
 
   const dispatch = createEventDispatcher()
 
-  const mac =
-    typeof navigator != 'undefined' ? /Mac/.test(navigator.platform) : false
-
   // ********************************
   // Properties
   // ********************************
   export let content: MessageNode
-  export let hoverMessage: string = 'Placeholder...'
+  export let hoverMessage = 'Placeholder...'
   export let triggers: string[] = []
-  export let transformInjections: (
-    state: EditorState
-  ) => Promise<Transaction | null>
+  export let transformInjections: (state: EditorState) => Promise<Transaction | null>
 
   // ********************************
   // Functionality
@@ -47,30 +42,28 @@
 
   let inputHeight: number
 
-  let isEmpty: boolean = true
+  let isEmpty = true
 
   function checkEmpty (value: string): boolean {
     return value.length === 0 || value === '<p><br></p>' || value === '<p></p>'
   }
 
-  function findCompletion (
-    sel: any
-  ): { completionWord: string; completionEnd: string } {
-    var completionWord = ''
-    var completionEnd = ''
+  function findCompletion (sel: any): { completionWord: string; completionEnd: string } {
+    let completionWord = ''
+    let completionEnd = ''
 
     if (sel.$from.nodeBefore != null) {
       let val = sel.$from.nodeBefore.textContent
       let p = -1
       for (p = val.length - 1; p >= 0; p--) {
         if (val[p] === ' ' || val[p] === '\n') {
-          //Stop on WS
+          // Stop on WS
           break
         }
         for (let ti = 0; ti < triggers.length; ti++) {
-          let t = triggers[ti]
-          let ss = val.substring(p, p + t.length)
-          if (ss == t) {
+          const t = triggers[ti]
+          const ss = val.substring(p, p + t.length)
+          if (ss === t) {
             val = val.substring(p)
             break
           }
@@ -88,17 +81,14 @@
   }
 
   function emitStyleEvent () {
-    let sel = view.state.selection
-    var {
-      completionWord,
-      completionEnd
-    } = findCompletion(sel)
+    const sel = view.state.selection
+    const { completionWord, completionEnd } = findCompletion(sel)
 
-    let posAtWindow = view.coordsAtPos(sel.from - completionWord.length)
+    const posAtWindow = view.coordsAtPos(sel.from - completionWord.length)
 
-    var viewportOffset = rootElement.getBoundingClientRect()
+    const viewportOffset = rootElement.getBoundingClientRect()
 
-    let cursor = {
+    const cursor = {
       left: posAtWindow.left - viewportOffset.left,
       top: posAtWindow.top - viewportOffset.top,
       right: posAtWindow.right - viewportOffset.left,
@@ -106,17 +96,17 @@
     }
     // The box in which the tooltip is positioned, to use as base
 
-    let innerDOMValue = view.dom.innerHTML
-    let jsonDoc = view.state.toJSON().doc
+    const innerDOMValue = view.dom.innerHTML
+    const jsonDoc = view.state.toJSON().doc
     dispatch('content', jsonDoc as MessageNode)
 
     // Check types
-    let marks = view.state.storedMarks || view.state.selection.$from.marks()
+    const marks = view.state.storedMarks || view.state.selection.$from.marks()
 
-    let isBold = schema.marks.strong.isInSet(marks) != null
-    let isItalic = schema.marks.em.isInSet(marks) != null
+    const isBold = schema.marks.strong.isInSet(marks) != null
+    const isItalic = schema.marks.em.isInSet(marks) != null
     isEmpty = checkEmpty(innerDOMValue)
-    let evt = {
+    const evt = {
       isEmpty: isEmpty,
       bold: isBold,
       isBoldEnabled: Commands.toggleStrong(view.state),
@@ -156,9 +146,9 @@
     )
   }
 
-  //****************************************************************
+  //* ***************************************************************
   // Initialization of prosemirror stuff.
-  //****************************************************************
+  //* ***************************************************************
   rootElement = document.createElement('div')
 
   state = createState(content)
@@ -169,7 +159,7 @@
 
       // Check and update triggers to update content.
       if (transformInjections != null) {
-        let tr: Promise<Transaction | null> = transformInjections(newState)
+        const tr: Promise<Transaction | null> = transformInjections(newState)
         if (tr != null) {
           tr.then((res) => {
             if (res != null) {
@@ -192,8 +182,8 @@
   })
 
   function updateValue (content: MessageNode) {
-    if (JSON.stringify(content) != JSON.stringify(view.state.toJSON().doc)) {
-      let newState = createState(content)
+    if (JSON.stringify(content) !== JSON.stringify(view.state.toJSON().doc)) {
+      const newState = createState(content)
 
       view.updateState(newState)
 
@@ -201,7 +191,7 @@
     }
   }
 
-  export function insert (text: string, from: number, to: number) {
+  export function insert (text: string, from: number, to: number): void {
     const t = view.state.tr.insertText(text, from, to)
     const st = view.state.apply(t)
     view.updateState(st)
@@ -214,59 +204,50 @@
     to: number,
     mark: MarkType,
     attrs?: { [key: string]: any }
-  ) {
+  ): void {
     // Ignore white spaces on end of text
-    let markLen = text.trim().length
-    const t = view.state.tr
-      .insertText(text, from, to)
-      .addMark(from, from + markLen, mark.create(attrs))
+    const markLen = text.trim().length
+    const t = view.state.tr.insertText(text, from, to).addMark(from, from + markLen, mark.create(attrs))
     const st = view.state.apply(t)
     view.updateState(st)
     emitStyleEvent()
   }
 
   // Some operations
-  export function toggleBold () {
+  export function toggleBold (): void {
     Commands.toggleStrong(view.state, view.dispatch)
     view.focus()
   }
 
-  export function toggleItalic () {
+  export function toggleItalic (): void {
     Commands.toggleItalic(view.state, view.dispatch)
     view.focus()
   }
 
-  export function toggleUnOrderedList () {
+  export function toggleUnOrderedList (): void {
     Commands.toggleUnOrdered(view.state, view.dispatch)
     view.focus()
   }
 
-  export function toggleOrderedList () {
+  export function toggleOrderedList (): void {
     Commands.toggleOrdered(view.state, view.dispatch)
     view.focus()
   }
 
-  export function focus () {
+  export function focus (): void {
     view.focus()
   }
 </script>
 
+<div class="edit-box" bind:this={root} bind:clientHeight={inputHeight} />
 <div
-  class='edit-box'
-  bind:this='{root}'
-  bind:clientHeight='{inputHeight}'
-></div>
-<div
-  class='hover-message'
-  style='{`top:${-1 * inputHeight}px;` +  //
-    `margin-bottom:${-1 * inputHeight}px;` +  //
-    `height:${inputHeight}px`}'
->
+  class="hover-message"
+  style={[`top:${-1 * inputHeight}px;`, `margin-bottom:${-1 * inputHeight}px;`, `height:${inputHeight}px`].join('')}>
   {#if isEmpty}{hoverMessage}{/if}
 </div>
 <slot />
 
-<style lang='scss'>
+<style lang="scss">
   :global {
     .ProseMirror {
       position: relative;
