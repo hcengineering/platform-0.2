@@ -15,9 +15,9 @@
 <script lang="ts">
   export let width = '100%'
   export let label = ''
-  export let value: string | undefined = ''
+  export let value = ''
   export let placeholder: string
-  export let id: string | undefined
+  export let id: string | undefined = undefined
   export let hoverState = false
 
   let input: HTMLElement

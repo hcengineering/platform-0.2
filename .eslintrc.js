@@ -32,7 +32,8 @@ module.exports = {
         'import/no-duplicates': 'off',
         'import/no-mutable-exports': 'off',
         'import/no-unresolved': 'off',
-        'no-multiple-empty-lines': 'off'
+        'no-multiple-empty-lines': 'off',
+        'no-undef-init': 'off'
       }
     }
   ],

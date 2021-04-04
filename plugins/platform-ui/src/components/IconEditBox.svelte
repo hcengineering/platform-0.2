@@ -16,9 +16,9 @@
   import Icon from './Icon.svelte'
   import type { Asset } from '@anticrm/platform-ui'
 
-  export let icon: Asset | undefined
+  export let icon: Asset | undefined = undefined
   export let width = '300px'
-  export let id: string
+  export let id: string | undefined = undefined
   export let value: string
   export let placeholder = ''
   export let label = ''
