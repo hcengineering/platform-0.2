@@ -19,25 +19,27 @@
   import Component from '@anticrm/platform-ui/src/components/Component.svelte'
 
   let form: ApplicationRoute
-  let forms: ApplicationRoute[] = [
-    {route: 'setting', component: login.component.SettingForm}
-  ]
+  const forms: ApplicationRoute[] = [{ route: 'setting', component: login.component.SettingForm }]
 
   let component: AnyComponent | undefined
 
-  function routeDefaults (): ApplicationRoute  {
+  function routeDefaults (): ApplicationRoute {
     return {
       route: '#undefined',
       component: login.component.LoginForm
     } as ApplicationRoute
   }
 
-  const router = newRouter<ApplicationRoute>(':route', (info) => {
-    if (forms.length > 0) {
-      form = forms.find((a) => (a.route === info.route)) || routeDefaults()
-      component = form?.component
-    }
-  }, routeDefaults())
+  const router = newRouter<ApplicationRoute>(
+    ':route',
+    (info) => {
+      if (forms.length > 0) {
+        form = forms.find((a) => a.route === info.route) || routeDefaults()
+        component = form?.component
+      }
+    },
+    routeDefaults()
+  )
 </script>
 
-<Component is={component} props={{router}}/>
+<Component is={component} props={{ router }} />
