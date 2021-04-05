@@ -26,14 +26,13 @@ limitations under the License.
   import SpaceBox from '@anticrm/platform-ui/src/components/SpaceBox.svelte'
 
   export let creator: ItemCreator
-  export let space: Ref<Space> | undefined
-  export let spaces: Space[] | undefined
+  export let spaces: Space[]
   export let model: ClassModel | undefined
   export let primary: AttrModel | undefined
 
+  let space: Space | undefined = spaces[0]
   let object = {} as any
   let title = ''
-  let selectedSpace = 0
 
   const dispatch = createEventDispatcher()
   const coreService = getCoreService()
@@ -43,7 +42,7 @@ limitations under the License.
     const doc = {
       _class: creator.class,
       [primary?.key || 'name']: title,
-      _space: space ?? spaces?.[selectedSpace]._id,
+      _space: space?._id,
       ...object
     }
 
@@ -60,7 +59,7 @@ limitations under the License.
 </div>
 
 {#if spaces && spaces.length > 1}
-  <SpaceBox {spaces} bind:selected={selectedSpace} />
+  <SpaceBox {spaces} bind:space />
 {/if}
 
 <Properties {model} bind:object />

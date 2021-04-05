@@ -16,9 +16,13 @@ limitations under the License.
   import { Space } from '@anticrm/domains'
   import ComboBox from '@anticrm/sparkling-controls/src/ComboBox.svelte'
 
+  let selected = 0
+
   export let spaces: Space[]
-  export let selected: number
+  export let space: Space | undefined = spaces[0]
   export let label: string = 'Space'
+
+  $: space = spaces[selected]
 
   let items = spaces?.map((x, idx) => ({
     id: idx,

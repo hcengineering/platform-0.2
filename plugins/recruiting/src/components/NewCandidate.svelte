@@ -32,21 +32,18 @@ limitations under the License.
   import type { WithCandidateProps } from '..'
   import candidate from '..'
 
-  export let space: Ref<Space> | undefined
-  export let spaces: Space[] | undefined
+  export let spaces: Space[]
 
-  let selectedSpace = 0
+  let space = spaces[0]
 
   const coreP = getCoreService()
   const modelP = coreP.then((c) => c.getModel())
   const dispatch = createEventDispatcher()
 
-  const getSpace = () => space || (spaces?.[selectedSpace]._id as Ref<Space>) || ('' as Ref<Space>)
-
   const personM: Person = {
     _id: generateId(),
     _class: contact.class.Person,
-    _space: getSpace(),
+    _space: space?._id as Ref<Space>,
     _createdBy: '' as StringProperty,
     _createdOn: Date.now() as DateProperty,
     name: ''
@@ -69,13 +66,13 @@ limitations under the License.
     profInterests: []
   }
 
-  async function save () {
+  async function save() {
     const core = await coreP
     const model = await modelP
 
     const doc = {
       ...personM,
-      _space: getSpace(), // Just to get latest space
+      _space: space?._id,
       _createBy: core.getUserId()
     }
 
@@ -94,7 +91,7 @@ limitations under the License.
   <ScrollView height="500px">
     <div class="form">
       {#if spaces && spaces.length > 1}
-        <SpaceBox label="Vacancy" {spaces} bind:selected={selectedSpace} />
+        <SpaceBox label="Vacancy" {spaces} bind:space />
       {/if}
       <EditBox bind:value={personM.name} label="Name" placeholder="Name" />
       <EditBox bind:value={personM.email} label="Email" placeholder="vasya@email.com" />

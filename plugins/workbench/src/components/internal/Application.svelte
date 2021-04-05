@@ -43,7 +43,7 @@
   let activeViewlet: Viewlet | undefined
   let creatorsQuery: Query<ItemCreator> | undefined
 
-  const onCreatorClick = (creator: ItemCreator) => uiService.showModal(CreateForm, { creator, space: space._id })
+  const onCreatorClick = (creator: ItemCreator) => uiService.showModal(CreateForm, { creator, spaces: [space] })
 
   $: creatorsQuery = liveQuery(creatorsQuery, workbench.class.ItemCreator, { app: application._id }, (docs) => {
     creators = docs

@@ -28,12 +28,11 @@
   import chunter, { getChunterService } from '@anticrm/chunter'
 
   export let title: string
-  let message = ''
-  export let space: Ref<Space> | undefined
-  export let spaces: Space[] | undefined
+  let message: string = ''
+  export let spaces: Space[]
   let object = {} as any
 
-  let selectedSpace = 0
+  let space: Space | undefined = spaces[0]
 
   const coreService = getCoreService()
   const dispatch = createEventDispatcher()
@@ -45,7 +44,7 @@
     const modelDb = cs.getModel()
     const newTask = modelDb.newDoc(task.class.Task, cs.generateId(), {
       title,
-      _space: space ?? spaces?.[selectedSpace]._id,
+      _space: space?._id,
       ...object,
       status: TaskStatus.Open,
       comments: [
@@ -59,7 +58,10 @@
     })
     try {
       const asShortId = modelDb.cast(newTask, CORE_MIXIN_SHORTID)
-      asShortId.shortId = await cs.genRefId(space)
+
+      if (space) {
+        asShortId.shortId = await cs.genRefId(space._id as Ref<Space>)
+      }
     } catch (e) {
       // Ignore
       console.log(e)
@@ -98,7 +100,7 @@
 <div class="recruiting-view">
   {#if spaces && spaces.length > 1}
     <div class="spaceSelector">
-      <SpaceBox label="Project" {spaces} bind:selected={selectedSpace} />
+      <SpaceBox label="Project" {spaces} bind:space />
     </div>
   {/if}
 

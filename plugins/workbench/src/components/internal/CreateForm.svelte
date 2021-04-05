@@ -29,8 +29,7 @@ limitations under the License.
   import DefaultForm from './DefaultForm.svelte'
 
   export let creator: ItemCreator
-  export let space: Ref<Space> | undefined
-  export let spaces: Space[] | undefined
+  export let spaces: Space[]
 
   let createFormComponent: AnyComponent | undefined = creator.component
   const dispatch = createEventDispatcher()
@@ -69,9 +68,9 @@ limitations under the License.
       </div>
     </div>
     {#if createFormComponent}
-      <Component is={createFormComponent} props={{ space, spaces }} on:change on:close={onClose} />
+      <Component is={createFormComponent} props={{ spaces }} on:change on:close={onClose} />
     {:else}
-      <DefaultForm {creator} {model} {primary} {space} {spaces} on:close={onClose} />
+      <DefaultForm {creator} {model} {primary} {spaces} on:close={onClose} />
     {/if}
   </div>
 {/await}
