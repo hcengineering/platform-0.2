@@ -1,21 +1,21 @@
 <script>
-  import './page.css';
-  import Header from './Header.svelte';
+  import './page.css'
+  import Header from './Header.svelte'
 
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher } from 'svelte'
 
-  export let user = null;
+  export let user = null
 
-  const dispatch = createEventDispatcher();
+  const dispatch = createEventDispatcher()
 
-  function onLogin(event) {
-    dispatch('login', event);
+  function onLogin (event) {
+    dispatch('login', event)
   }
-  function onLogout(event) {
-    dispatch('logout', event);
+  function onLogout (event) {
+    dispatch('logout', event)
   }
-  function onCreateAccount(event) {
-    dispatch('createAccount', event);
+  function onCreateAccount (event) {
+    dispatch('createAccount', event)
   }
 </script>
 
@@ -35,25 +35,19 @@
       process starting with atomic components and ending with pages.
     </p>
     <p>
-      Render pages with mock data. This makes it easy to build and review page states without
-      needing to navigate to them in your app. Here are some handy patterns for managing page data
-      in Storybook:
+      Render pages with mock data. This makes it easy to build and review page states without needing to navigate to
+      them in your app. Here are some handy patterns for managing page data in Storybook:
     </p>
     <ul>
       <li>
-        Use a higher-level connected component. Storybook helps you compose such data from the
-        "args" of child component stories
+        Use a higher-level connected component. Storybook helps you compose such data from the "args" of child component
+        stories
       </li>
-      <li>
-        Assemble data in the page component from your services. You can mock these services out
-        using Storybook.
-      </li>
+      <li>Assemble data in the page component from your services. You can mock these services out using Storybook.</li>
     </ul>
     <p>
       Get a guided tutorial on component-driven development at
-      <a href="https://www.learnstorybook.com" target="_blank" rel="noopener noreferrer">
-        Learn Storybook
-      </a>
+      <a href="https://www.learnstorybook.com" target="_blank" rel="noopener noreferrer"> Learn Storybook </a>
       . Read more in the
       <a href="https://storybook.js.org/docs" target="_blank" rel="noopener noreferrer">docs</a>
       .

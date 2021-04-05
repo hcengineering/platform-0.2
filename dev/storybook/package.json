@@ -9,7 +9,9 @@
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
     "test": "echo 'no tests'",
+    "preformat-svelte": "prettier -w **/*.svelte",
     "lint": "eslint src",
+    "lint:fix": "yarn preformat-svelte && eslint --fix src",
     "chromatic": "npx chromatic"
   },
   "devDependencies": {
@@ -24,6 +26,8 @@
     "@tsconfig/svelte": "^1.0.0",
     "babel-loader": "^8.2.2",
     "chromatic": "^5.7.0",
+    "prettier": "^2.2.1",
+    "prettier-plugin-svelte": "^2.2.0",
     "rollup": "^2.3.4",
     "rollup-plugin-css-only": "^3.1.0",
     "rollup-plugin-livereload": "^2.0.0",
