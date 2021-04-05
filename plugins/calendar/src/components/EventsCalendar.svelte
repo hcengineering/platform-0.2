@@ -46,22 +46,30 @@
   }
 
   let events: CalendarEvent[] = []
+  let visibleEvents: CalendarEvent[] = []
   let eventCoordinatesMap = new Map<string, EventCoordinates>()
 
   let firstDayOfCurrentMonth: Date
 
   const query = createLiveQuery(calendar.class.CalendarEvent, { _space: space._id }, (docs) => {
-    events = docs.filter(
+    events = docs
+  })
+
+  $: {
+    updateLiveQuery(query, calendar.class.CalendarEvent, {
+      _space: space._id
+    })
+
+    eventCoordinatesMap.clear()
+    let lastDisplayedDate = new Date(firstDayOfCurrentMonth)
+    lastDisplayedDate.setDate(lastDisplayedDate.getDate() + 42)
+    visibleEvents = events.filter(
       (value) =>
         isDateInInterval(getDate(value.startDate), firstDayOfCurrentMonth, lastDisplayedDate) ||
         isDateInInterval(value.endDate && getDate(value.endDate), firstDayOfCurrentMonth, lastDisplayedDate)
     )
-
-    let lastDisplayedDate = new Date(firstDayOfCurrentMonth)
-    lastDisplayedDate.setDate(lastDisplayedDate.getDate() + 42)
-    eventCoordinatesMap.clear()
     let processedEvents: CalendarEvent[] = []
-    events.forEach((event) => {
+    visibleEvents.forEach((event) => {
       const startDate = getDate(event.startDate)
       const endDate = event.endDate && getDate(event.endDate)
       const parentItemLayer = processedEvents
@@ -86,17 +94,11 @@
       })
       processedEvents.push(event)
     })
-  })
-
-  $: {
-    updateLiveQuery(query, calendar.class.CalendarEvent, {
-      _space: space._id
-    })
   }
 </script>
 
-<MonthCalendar bind:firstDayOfCurrentMonth>
-  {#each events as e}
+<MonthCalendar cellHeight={120} bind:firstDayOfCurrentMonth>
+  {#each visibleEvents as e}
     {#if eventCoordinatesMap.has(e._id)}
       <div
         style={`

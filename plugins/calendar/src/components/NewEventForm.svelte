@@ -17,8 +17,8 @@ limitations under the License.
   import workbench from '@anticrm/workbench/src/__model__'
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
   import EditBox from '@anticrm/sparkling-controls/src/EditBox.svelte'
+  import DateInput from '@anticrm/sparkling-controls/src/DateInput.svelte'
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
-  import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
   import { CalendarEvent, CalendarEventType } from '../index'
   import calendar from '..'
 
@@ -62,13 +62,11 @@ limitations under the License.
       <Icon icon={workbench.icon.Close} button={true} />
     </div>
   </div>
-  <ScrollView height="500px">
-    <div class="form">
-      <EditBox bind:value={newEvent.summary} label="Summary" placeholder="Summary" />
-      <EditBox bind:value={newEvent.startDate} label="Start date" placeholder="Start date" />
-      <EditBox bind:value={newEvent.endDate} label="End date" placeholder="End date" />
-    </div>
-  </ScrollView>
+  <div class="form">
+    <EditBox bind:value={newEvent.summary} label="Summary" placeholder="Summary" />
+    <DateInput bind:value={newEvent.startDate} label="Start date" placeholder="Start date" />
+    <DateInput bind:value={newEvent.endDate} label="End date" placeholder="End date" />
+  </div>
   <div class="footer">
     <Button kind="primary" on:click={save} width="100%">Принять</Button>
     <Button on:click={() => dispatch('close')} width="100%">Отказаться</Button>
