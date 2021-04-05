@@ -21,6 +21,7 @@
     "build": "tsc",
     "dump": "ts-node -T src/index.ts",
     "lint": "eslint src",
+    "lint:fix": "eslint --fix src",
     "test": "echo 'no tests'"
   },
   "dependencies": {
