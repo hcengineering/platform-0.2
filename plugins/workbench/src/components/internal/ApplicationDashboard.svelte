@@ -15,7 +15,7 @@
 <script type="ts">
   import type { ItemCreator, WorkbenchApplication } from '../..'
   import workbench from '../..'
-  import type { Query } from '@anticrm/presentation'
+  import type { QueryUpdater } from '@anticrm/platform-core'
   import { getCoreService, liveQuery } from '@anticrm/presentation'
   import { getUIService } from '@anticrm/platform-ui'
 
@@ -31,14 +31,14 @@
   const uiService = getUIService()
 
   let creators: ItemCreator[] = []
-  let creatorsQuery: Query<ItemCreator> | undefined
+  let creatorsQuery: Promise<QueryUpdater<ItemCreator>> | undefined
 
   $: creatorsQuery = liveQuery(creatorsQuery, workbench.class.ItemCreator, { app: application._id }, (docs) => {
     creators = docs
   })
 
   let spaces: Space[] = []
-  let spacesQuery: Query<Space> | undefined
+  let spacesQuery: Promise<QueryUpdater<Space>> | undefined
   let userId: string | undefined
 
   coreP.then((core) => {

@@ -16,6 +16,7 @@
   import type { ItemCreator, WorkbenchApplication } from '../..'
   import workbench from '../..'
 
+  import type { QueryUpdater } from '@anticrm/platform-core'
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
   import CreateForm from './CreateForm.svelte'
   import IconEditBox from '@anticrm/platform-ui/src/components/IconEditBox.svelte'
@@ -41,7 +42,7 @@
 
   let viewletActions: Action[] = []
   let activeViewlet: Viewlet | undefined
-  let creatorsQuery: Query<ItemCreator> | undefined
+  let creatorsQuery: Promise<QueryUpdater<ItemCreator>> | undefined
 
   const onCreatorClick = (creator: ItemCreator) => uiService.showModal(CreateForm, { creator, spaces: [space] })
 
