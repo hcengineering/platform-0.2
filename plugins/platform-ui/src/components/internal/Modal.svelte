@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 -->
-
 <script lang="ts">
   import { store as modal } from '../../stores'
 
@@ -34,17 +33,16 @@
       return 'top: 50%; left: 50%; transform: translate(-50%, -50%);'
     }
   }
-
 </script>
 
-<svelte:window on:keydown={handleKeydown}/>
+<svelte:window on:keydown={handleKeydown} />
 
-{ #if $modal.is }
-<div class="modal" class:top-arrow={$modal.element} style={ getStyle($modal.element) }>
-  <svelte:component this={$modal.is} {...$modal.props} on:close={close}/>
-</div>
-<div class="modal-overlay"></div>
-{ /if }
+{#if $modal.is}
+  <div class="modal" class:top-arrow={$modal.element} style={getStyle($modal.element)}>
+    <svelte:component this={$modal.is} {...$modal.props} on:close={close} />
+  </div>
+  <div class="modal-overlay" />
+{/if}
 
 <style lang="scss">
   .modal {
@@ -74,7 +72,7 @@
     box-shadow: 0px 6px 9px rgba(0, 0, 0, 0.1);
   }
 
-/*  .top-arrow::after {
+  /*  .top-arrow::after {
     content: "";
     position: absolute;
     top: -10px;
@@ -94,5 +92,4 @@
     width: 100%;
     height: 100%;
   }
-
 </style>

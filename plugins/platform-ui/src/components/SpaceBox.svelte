@@ -20,11 +20,11 @@ limitations under the License.
 
   export let spaces: Space[]
   export let space: Space | undefined = spaces[0]
-  export let label: string = 'Space'
+  export let label = 'Space'
 
   $: space = spaces[selected]
 
-  let items = spaces?.map((x, idx) => ({
+  const items = spaces?.map((x, idx) => ({
     id: idx,
     comboValue: x.name
   }))

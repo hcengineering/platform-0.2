@@ -22,7 +22,7 @@
   import IconEditBox from '@anticrm/platform-ui/src/components/IconEditBox.svelte'
   import type { Space } from '@anticrm/domains'
   import type { Viewlet } from '@anticrm/presentation'
-  import ui, { createLiveQuery, getCoreService, liveQuery, Query } from '@anticrm/presentation'
+  import ui, { createLiveQuery, getCoreService, liveQuery } from '@anticrm/presentation'
   import type { Action } from '@anticrm/platform-ui'
   import { getUIService } from '@anticrm/platform-ui'
   import Component from '@anticrm/platform-ui/src/components/Component.svelte'
@@ -54,7 +54,7 @@
     presenters = docs
   })
 
-  function filterViewlets(model: Model, presenters: Viewlet[]): Viewlet[] {
+  function filterViewlets (model: Model, presenters: Viewlet[]): Viewlet[] {
     return presenters.filter((d) => {
       for (const cc of application?.classes) {
         if (model.is(cc, d.displayClass)) {

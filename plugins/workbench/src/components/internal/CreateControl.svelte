@@ -23,7 +23,7 @@ limitations under the License.
   import { ItemCreator } from '../..'
 
   export let creators: ItemCreator[] = []
-  export let onCreatorClick: (_id: ItemCreator) => void = () => {}
+  export let onCreatorClick: (_id: ItemCreator) => void = () => undefined
 </script>
 
 {#if creators.length === 0}

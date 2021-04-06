@@ -15,7 +15,6 @@ limitations under the License.
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
 
-  import { Ref } from '@anticrm/core'
   import type { Space } from '@anticrm/domains'
   import { CORE_CLASS_VDOC } from '@anticrm/domains'
   import type { AttrModel, ClassModel } from '@anticrm/presentation'
@@ -45,8 +44,8 @@ limitations under the License.
     createFormComponent
       ? Promise.resolve()
       : getComponentExtension(creator.class, presentation.mixin.CreateForm).then((ext) => {
-          createFormComponent = ext
-        }),
+        createFormComponent = ext
+      }),
     presentationService.then((ps) =>
       ps.getClassModel(creator.class, CORE_CLASS_VDOC).then((m) => {
         const mp = m.filterPrimary()

@@ -66,7 +66,7 @@ limitations under the License.
     profInterests: []
   }
 
-  async function save() {
+  async function save () {
     const core = await coreP
     const model = await modelP
 

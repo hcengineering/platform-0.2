@@ -15,7 +15,6 @@ limitations under the License.
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
 
-  import { Ref } from '@anticrm/core'
   import { Space } from '@anticrm/domains'
   import { AttrModel, ClassModel, getCoreService } from '@anticrm/presentation'
   import { ItemCreator } from '@anticrm/workbench'
@@ -38,7 +37,7 @@ limitations under the License.
   const coreService = getCoreService()
 
   const onClose = () => dispatch('close')
-  async function onSave() {
+  async function onSave () {
     const doc = {
       _class: creator.class,
       [primary?.key || 'name']: title,

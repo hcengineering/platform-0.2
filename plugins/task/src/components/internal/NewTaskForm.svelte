@@ -28,7 +28,7 @@
   import chunter, { getChunterService } from '@anticrm/chunter'
 
   export let title: string
-  let message: string = ''
+  let message = ''
   export let spaces: Space[]
   let object = {} as any
 
