@@ -27,15 +27,6 @@ export enum RecurrenceType {
     Yearly
 }
 
-export enum CalendarEventType {
-  Vacation,
-  PTO,
-  SickLeave,
-  ExtraWork,
-  OrganizationEvent,
-  Custom
-}
-
 export interface RecurrenceProperty extends Emb {
     type: RecurrenceType
     interval: number
@@ -54,8 +45,6 @@ export interface Calendar extends VDoc {
  */
 export interface CalendarEvent extends VDoc {
     summary: string
-
-    type: CalendarEventType
 
     participants: Ref<User>[]
 
@@ -76,8 +65,7 @@ export default plugin('Calendar' as Plugin<CalendarService>, {}, {
     RecurrenceProperty: '' as Ref<Class<RecurrenceProperty>>
   },
   enum: {
-    RecurrenceType: '' as Ref<Enum<RecurrenceType>>,
-    CalendarEventType: '' as Ref<Enum<CalendarEventType>>
+    RecurrenceType: '' as Ref<Enum<RecurrenceType>>
   },
   component: {
     NewEventForm: '' as AnyComponent,

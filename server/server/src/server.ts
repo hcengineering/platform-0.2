@@ -156,7 +156,7 @@ export async function start (port: number, dbUri: string, host?: string): Promis
         }
       } catch (error) {
         response.error = error?.toString()
-        console.log('Error occurred during processing websocket message:', error)
+        console.log(`Error occurred during processing websocket message '${request.method}': `, error)
       }
       ws.send(serialize(response))
     })

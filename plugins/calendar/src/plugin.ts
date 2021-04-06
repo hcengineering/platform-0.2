@@ -19,7 +19,7 @@ import NewEventForm from './components/NewEventForm.svelte'
 import EventsCalendar from './components/EventsCalendar.svelte'
 
 /*!
- * Anticrm Platform™ Task Plugin
+ * Anticrm Platform™ Calendar Plugin
  * © 2021 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */

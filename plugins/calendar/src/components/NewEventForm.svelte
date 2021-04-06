@@ -11,24 +11,22 @@ limitations under the License.
 -->
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
-  import { DateProperty, generateId, Ref, StringProperty } from '@anticrm/core'
-  import { Space } from '@anticrm/domains'
+  import type { DateProperty, Ref, StringProperty } from '@anticrm/core'
+  import { generateId } from '@anticrm/core'
+  import type { Space } from '@anticrm/domains'
   import { getCoreService } from '@anticrm/presentation'
   import workbench from '@anticrm/workbench/src/__model__'
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
   import EditBox from '@anticrm/sparkling-controls/src/EditBox.svelte'
   import DateInput from '@anticrm/sparkling-controls/src/DateInput.svelte'
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
-  import { CalendarEvent, CalendarEventType } from '../index'
+  import type { CalendarEvent } from '..'
   import calendar from '..'
 
   export let space: Ref<Space>
-  const coreP = getCoreService()
-  const modelP = coreP.then((c) => c.getModel())
+  const coreService = getCoreService()
   const dispatch = createEventDispatcher()
-  // TODO
-  const endDate = new Date()
-  endDate.setDate(endDate.getDate() + 1)
+
   const newEvent: CalendarEvent = {
     _id: generateId(),
     _space: space,
@@ -37,16 +35,31 @@ limitations under the License.
     _createdOn: Date.now() as DateProperty,
     summary: '',
     startDate: new Date() as Date,
-    endDate: endDate as Date,
-    participants: [],
-    type: CalendarEventType.Custom
+    endDate: new Date() as Date,
+    participants: []
+  }
+
+  function getAllDayEventStart(date: Date) {
+    let eventStart = new Date(date.getTime())
+    eventStart.setHours(0, 0, 0, 0)
+    return eventStart
+  }
+
+  function getAllDayEventEnd(date: Date | undefined) {
+    if (!date) {
+      return undefined
+    }
+    let eventEnd = new Date(date.getTime())
+    eventEnd.setHours(23, 59, 59, 999)
+    return eventEnd
   }
 
   async function save() {
-    const core = await coreP
-    const model = await modelP
+    const core = await coreService
     const doc = {
       ...newEvent,
+      startDate: getAllDayEventStart(newEvent.startDate),
+      endDate: getAllDayEventEnd(newEvent.endDate),
       _space: space, // Just to get latest space
       _createBy: core.getUserId()
     }

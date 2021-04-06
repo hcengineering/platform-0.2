@@ -12,31 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-import core, { ArrayOf$, Builder, Class$, Enum$, EnumValue$, extendIds, Literal, Primary, Prop, RefTo$ } from '@anticrm/model'
+import core, { ArrayOf$, Builder, Class$, Enum$, EnumValue$, Literal, Primary, Prop, RefTo$ } from '@anticrm/model'
 
-import _calendar, {
-  Calendar, CalendarEvent, RecurrenceProperty, RecurrenceType, CalendarEventType
+import calendar, {
+  Calendar, CalendarEvent, RecurrenceProperty, RecurrenceType
 } from '.'
 import { IntlString } from '@anticrm/platform-i18n'
 import { User } from '@anticrm/contact'
-import { MODEL_DOMAIN, Ref } from '@anticrm/core'
+import { Ref } from '@anticrm/core'
 import { UX } from '@anticrm/presentation/src/__model__'
 import { TEmb, TEnum, TVDoc } from '@anticrm/model/src/__model__'
 import workbench from '@anticrm/workbench/src/__model__'
 import contact from '@anticrm/contact/src/__model__'
 import presentation from '@anticrm/presentation'
-
-const calendar = extendIds(_calendar, {
-  string: {
-    Event_summary: '' as IntlString,
-    Event_participants: '' as IntlString,
-    Event_startDate: '' as IntlString,
-    Event_endDate: '' as IntlString,
-    Event_recurrence: '' as IntlString,
-    Event_type: '' as IntlString,
-    Calendar_participants: '' as IntlString
-  }
-})
 
 @Enum$(calendar.enum.RecurrenceType)
 class TRecurrenceType extends TEnum<RecurrenceType> {
@@ -46,19 +34,8 @@ class TRecurrenceType extends TEnum<RecurrenceType> {
   @Literal(RecurrenceType) [RecurrenceType.Yearly]!: any
 }
 
-@Enum$(calendar.enum.CalendarEventType)
-class TCalendarEventType extends TEnum<CalendarEventType> {
-  @Literal(CalendarEventType) [CalendarEventType.Vacation]!: any
-  @Literal(CalendarEventType) [CalendarEventType.PTO]!: any
-  @Literal(CalendarEventType) [CalendarEventType.SickLeave]!: any
-  @Literal(CalendarEventType) [CalendarEventType.ExtraWork]!: any
-  @Literal(CalendarEventType) [CalendarEventType.OrganizationEvent]!: any
-  @Literal(CalendarEventType) [CalendarEventType.Custom]!: any
-}
-
-@Class$(calendar.class.RecurrenceProperty, core.class.Emb, MODEL_DOMAIN)
+@Class$(calendar.class.RecurrenceProperty, core.class.Emb)
 export class TRecurrenceProperty extends TEmb implements RecurrenceProperty {
-    @UX(calendar.string.Event_type)
     @EnumValue$(calendar.enum.RecurrenceType)
     type!: RecurrenceType
 
@@ -67,7 +44,7 @@ export class TRecurrenceProperty extends TEmb implements RecurrenceProperty {
     endDate?: Date
 }
 
-@Class$(calendar.class.Calendar, core.class.VDoc, MODEL_DOMAIN)
+@Class$(calendar.class.Calendar, core.class.VDoc)
 @UX('Calendar' as IntlString)
 export class TCalendar extends TVDoc implements Calendar {
     @Primary()
@@ -75,22 +52,18 @@ export class TCalendar extends TVDoc implements Calendar {
     @UX('Name' as IntlString)
     name!: string
 
-    @UX(calendar.string.Event_participants)
     @ArrayOf$()
     @RefTo$(contact.mixin.User)
     participants!: Ref<User>[]
 }
 
-@Class$(calendar.class.CalendarEvent, core.class.VDoc, MODEL_DOMAIN)
+@Class$(calendar.class.CalendarEvent, core.class.VDoc)
 @UX('Event' as IntlString)
 export class TCalendarEvent extends TVDoc implements CalendarEvent {
     @Primary()
     @Prop()
     @UX('Summary' as IntlString)
     summary!: string
-
-    @EnumValue$(calendar.enum.CalendarEventType)
-    type!: CalendarEventType
 
     @ArrayOf$()
     @RefTo$(contact.mixin.User) participants!: Ref<User>[]
@@ -103,7 +76,7 @@ export class TCalendarEvent extends TVDoc implements CalendarEvent {
 }
 
 export function model (S: Builder): void {
-  S.add(TCalendar, TCalendarEvent, TRecurrenceProperty, TCalendarEventType, TRecurrenceType)
+  S.add(TCalendar, TCalendarEvent, TRecurrenceProperty, TRecurrenceType)
 
   S.createDocument(workbench.class.WorkbenchApplication, {
     route: 'calendar',

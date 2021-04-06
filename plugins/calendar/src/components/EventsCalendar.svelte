@@ -13,10 +13,11 @@
 // limitations under the License.
 -->
 <script type="ts">
-  import { Space } from '@anticrm/domains'
+  import type { Space } from '@anticrm/domains'
   import { createLiveQuery, updateLiveQuery } from '@anticrm/presentation'
 
-  import calendar, { CalendarEvent } from '..'
+  import type { CalendarEvent } from '..'
+  import calendar from '..'
 
   import MonthCalendar from '@anticrm/sparkling-controls/src/calendar/MonthCalendar.svelte'
 
@@ -50,6 +51,7 @@
   let eventCoordinatesMap = new Map<string, EventCoordinates>()
 
   let firstDayOfCurrentMonth: Date
+  let displayedWeeksCount: number
 
   const query = createLiveQuery(calendar.class.CalendarEvent, { _space: space._id }, (docs) => {
     events = docs
@@ -62,7 +64,7 @@
 
     eventCoordinatesMap.clear()
     let lastDisplayedDate = new Date(firstDayOfCurrentMonth)
-    lastDisplayedDate.setDate(lastDisplayedDate.getDate() + 42)
+    lastDisplayedDate.setDate(lastDisplayedDate.getDate() + 7 * displayedWeeksCount)
     visibleEvents = events.filter(
       (value) =>
         isDateInInterval(getDate(value.startDate), firstDayOfCurrentMonth, lastDisplayedDate) ||
@@ -87,7 +89,7 @@
       )
       eventCoordinatesMap.set(event._id, {
         gridColumnStart: (startDateDiff % 7) + 1,
-        gridColumnEnd: (endDateDiff % 7) + 1,
+        gridColumnEnd: (endDateDiff % 7) + 2,
         gridRowStart: Math.trunc(startDateDiff / 7) + 1,
         gridRowEnd: Math.trunc(endDateDiff / 7) + 1,
         displayLayer: parentItemLayer + 1
@@ -97,9 +99,15 @@
   }
 </script>
 
-<MonthCalendar cellHeight={120} bind:firstDayOfCurrentMonth>
+<!--TODO 
+  1. Display events that do not fit in one week
+  2. Display user name
+  3. Support events delete
+  4. Display popup for events with displayLayer > 5
+-->
+<MonthCalendar mondayStart={true} cellHeight={125} bind:firstDayOfCurrentMonth bind:displayedWeeksCount>
   {#each visibleEvents as e}
-    {#if eventCoordinatesMap.has(e._id)}
+    {#if eventCoordinatesMap.has(e._id) && eventCoordinatesMap.get(e._id).displayLayer <= 5}
       <div
         style={`
         grid-column-start: ${eventCoordinatesMap.get(e._id).gridColumnStart}; 
