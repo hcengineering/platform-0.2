@@ -3,17 +3,19 @@ import { Location as PlatformLocation } from './index'
 export function locationToUrl (location: PlatformLocation): string {
   let result = '/'
   if (location.path) {
-    result += location.path.map(p => encodeURIComponent(p)).join('/')
+    result += location.path.map((p) => encodeURIComponent(p)).join('/')
   }
   if (location.query) {
-    const queryValue = Object.entries(location.query).map(e => {
-      if (e[1]) {
-        // Had value
-        return e[0] + '=' + e[1]
-      } else {
-        return e[0]
-      }
-    }).join('&')
+    const queryValue = Object.entries(location.query)
+      .map((e) => {
+        if (e[1]) {
+          // Had value
+          return e[0] + '=' + e[1]
+        } else {
+          return e[0]
+        }
+      })
+      .join('&')
     if (queryValue.length > 0) {
       result += '?' + queryValue
     }
@@ -57,7 +59,7 @@ export function parseQuery (query: string): Record<string, string | null> {
 }
 
 export function parsePath (path: string): string[] {
-  const split = path.split('/').map(ps => decodeURIComponent(ps))
+  const split = path.split('/').map((ps) => decodeURIComponent(ps))
   if (split.length >= 1) {
     if (split[0] === '') {
       split.splice(0, 1)
@@ -71,7 +73,7 @@ export function parsePath (path: string): string[] {
   return split
 }
 
-export function parseHash (hash: any): string {
+export function parseHash (hash: string): string {
   if (hash.startsWith('#')) {
     return hash.substring(1)
   }

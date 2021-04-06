@@ -1,22 +1,22 @@
 <script lang="ts">
-  export let url: string = ''
-  export let title: string = ''
-  export let subtitle: string = ''
-  export let color: string = ''
-  export let userColor: string = ''
-  export let subtitleOnTop: boolean = false
+  export let url = ''
+  export let title = ''
+  export let subtitle = ''
+  export let color = ''
+  export let userColor = ''
+  export let subtitleOnTop = false
 </script>
 
 <div class="userInfo">
-  <img class="avatar" src="{url}" alt="">
-  <div class="user" style="{(userColor !== '') ? 'color:' + userColor : ''}">
-    {#if (!subtitleOnTop)}
+  <img class="avatar" src={url} alt="" />
+  <div class="user" style={userColor !== '' ? 'color:' + userColor : ''}>
+    {#if !subtitleOnTop}
       {title}
     {/if}
-    {#if (subtitle !== '')}
-      <span style="{(color !== '') ? 'color:' + color : ''}">{subtitle}</span>
+    {#if subtitle !== ''}
+      <span style={color !== '' ? 'color:' + color : ''}>{subtitle}</span>
     {/if}
-    {#if (subtitleOnTop)}
+    {#if subtitleOnTop}
       {title}
     {/if}
   </div>
@@ -41,7 +41,7 @@
     line-height: 18px;
     color: var(--theme-userlink-color);
 
-    &>span {
+    & > span {
       display: block;
       font-size: 11px;
       line-height: 14px;

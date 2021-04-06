@@ -21,7 +21,7 @@
 
   $: description = status.message
 
-  function validate() {
+  function validate () {
     for (const field of fields) {
       const v = object[field.name]
       const f = field
@@ -33,6 +33,39 @@
     status = new Status(Severity.OK, 0, '')
   }
 </script>
+
+<form>
+  <div class="caption-2">{caption}</div>
+  <div class="status">{description}</div>
+
+  {#each fields as field (field.name)}
+    <div class="field">
+      {#if field.password}
+        <input
+          class="editbox"
+          name={field.name}
+          placeholder={field.i18n}
+          type="password"
+          bind:value={object[field.name]}
+          on:keyup={validate} />
+      {:else}
+        <input
+          class="editbox"
+          name={field.name}
+          placeholder={field.i18n}
+          type="text"
+          bind:value={object[field.name]}
+          on:keyup={validate} />
+      {/if}
+    </div>
+  {/each}
+
+  <div class="actions">
+    {#each actions as action, i}
+      <button class="button" class:separator={i !== 0} on:click|preventDefault={action.func}> {action.i18n} </button>
+    {/each}
+  </div>
+</form>
 
 <style lang="scss">
   form {
@@ -69,36 +102,3 @@
     }
   }
 </style>
-
-<form>
-  <div class="caption-2">{caption}</div>
-  <div class="status">{description}</div>
-
-  {#each fields as field (field.name)}
-    <div class="field">
-      {#if field.password}
-        <input
-          class="editbox"
-          name={field.name}
-          placeholder={field.i18n}
-          type="password"
-          bind:value={object[field.name]}
-          on:keyup={validate} />
-      {:else}
-        <input
-          class="editbox"
-          name={field.name}
-          placeholder={field.i18n}
-          type="text"
-          bind:value={object[field.name]}
-          on:keyup={validate} />
-      {/if}
-    </div>
-  {/each}
-
-  <div class="actions">
-    {#each actions as action, i}
-      <button class="button" class:separator={i != 0} on:click|preventDefault={action.func}> {action.i18n} </button>
-    {/each}
-  </div>
-</form>

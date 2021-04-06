@@ -1,21 +1,21 @@
-<script lang='ts'>
+<script lang="ts">
   import { createEventDispatcher } from 'svelte'
 
-  export let separator: boolean = false
+  export let separator = false
   export let label: string
 
-  const dispatch = createEventDispatcher();
-  function onClick(event) {
-    dispatch('click', event);
+  const dispatch = createEventDispatcher()
+  function onClick (event) {
+    dispatch('click', event)
   }
 </script>
 
-{#if (!separator)}
+{#if !separator}
   <div class="popup-item-view" on:click={onClick}>
     {label}
   </div>
 {:else}
-  <div class="popup-separator"></div>
+  <div class="popup-separator" />
 {/if}
 
 <style lang="scss">

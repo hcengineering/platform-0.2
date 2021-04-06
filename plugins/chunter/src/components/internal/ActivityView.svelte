@@ -28,8 +28,24 @@
   createLiveQuery(CORE_CLASS_CREATE_TX, {}, (docs) => {
     objects = docs
   })
-
 </script>
+
+<div class="activity">
+  <div class="captionContainer">
+    <span class="caption-1">Activity</span>&nbsp;
+  </div>
+  <ScrollView height="100%" margin="2em" autoscroll={true}>
+    <div class="content">
+      {#each objects as item (item._id)}
+        <ActivityItem tx={item} />
+      {/each}
+    </div>
+  </ScrollView>
+  <div>
+    <!-- <InputControl /> -->
+    <!-- <CreateForm _class={appInstance.classes[0]} title="Hello"/> -->
+  </div>
+</div>
 
 <style lang="scss">
   .activity {
@@ -53,20 +69,3 @@
     }
   }
 </style>
-
-<div class="activity">
-  <div class="captionContainer">
-    <span class="caption-1">Activity</span>&nbsp;
-  </div>
-  <ScrollView height="100%" margin="2em" autoscroll={true}>
-    <div class="content">
-      {#each objects as item (item._id)}
-        <ActivityItem tx={item} />
-      {/each}
-    </div>
-  </ScrollView>
-  <div>
-    <!-- <InputControl /> -->
-    <!-- <CreateForm _class={appInstance.classes[0]} title="Hello"/> -->
-  </div>
-</div>

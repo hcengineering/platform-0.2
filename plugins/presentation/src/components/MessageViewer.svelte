@@ -22,9 +22,9 @@
   const uiService = getUIService()
 
   class Style {
-    bold: boolean = false
-    italic: boolean = false
-    strike: boolean = false
+    bold = false
+    italic = false
+    strike = false
 
     reference: {
       state: boolean
@@ -42,8 +42,8 @@
   $: style = computedStyle(message.marks || [])
 
   function computedStyle (marks: MessageMark[]): Style {
-    let result = new Style()
-    for (let mark of marks) {
+    const result = new Style()
+    for (const mark of marks) {
       switch (mark.type) {
         case MessageMarkType.strong:
           result.bold = true
@@ -51,13 +51,14 @@
         case MessageMarkType.em:
           result.italic = true
           break
-        case MessageMarkType.reference:
-          let rm: ReferenceMark = mark as ReferenceMark
+        case MessageMarkType.reference: {
+          const rm: ReferenceMark = mark as ReferenceMark
           result.reference.state = true
           result.reference._id = rm.attrs.id || ''
           result.reference._class = rm.attrs.class
-          result.reference.resolved = result.reference._id != ''
+          result.reference.resolved = result.reference._id !== ''
           break
+        }
       }
     }
     return result
@@ -67,22 +68,23 @@
 {#if message.type === MessageNodeType.paragraph}
   <p>
     {#each messageContent(message) as c}
-      <svelte:self message="{c}" />
+      <svelte:self message={c} />
     {/each}
   </p>
 {:else if message.type === MessageNodeType.text}
   <span
     class="inline-block"
-    class:bold="{style.bold}"
-    class:italic="{style.italic}"
-    class:resolved_reference="{style.reference.resolved}"
-    class:unknown_reference="{style.reference.state && !style.reference.resolved}"
-  >
+    class:bold={style.bold}
+    class:italic={style.italic}
+    class:resolved_reference={style.reference.resolved}
+    class:unknown_reference={style.reference.state && !style.reference.resolved}>
     {#if style.reference.state}
       <!-- TODO: Add a proper click handler here-->
       <a
         href="/"
-        on:click={()=>{uiService.open({ _class: style.reference._class, _id: style.reference._id })}}>
+        on:click={() => {
+          uiService.open({ _class: style.reference._class, _id: style.reference._id })
+        }}>
         {message.text || ''}
       </a>
     {:else}{message.text || ''}{/if}
@@ -90,18 +92,18 @@
 {:else if message.type === MessageNodeType.list_item}
   <li>
     {#each messageContent(message) as c}
-      <svelte:self message="{c}" />
+      <svelte:self message={c} />
     {/each}
   </li>
 {:else if message.type === MessageNodeType.doc}
   {#each messageContent(message) as c}
-    <svelte:self message="{c}" />
+    <svelte:self message={c} />
   {/each}
   <!---->
 {:else if message.type === MessageNodeType.ordered_list}
   <ol type="1">
     {#each messageContent(message) as c}
-      <svelte:self message="{c}" />
+      <svelte:self message={c} />
     {/each}
   </ol>
   <!---->
@@ -111,7 +113,7 @@
 {:else if message.type === MessageNodeType.bullet_list}
   <ul>
     {#each messageContent(message) as c}
-      <svelte:self message="{c}" />
+      <svelte:self message={c} />
     {/each}
   </ul>
   <!---->

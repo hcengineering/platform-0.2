@@ -18,13 +18,23 @@ module.exports = {
     sourceType: 'module',
     project: [
       '**/tsconfig.json'
-    ]
+    ],
+    extraFileExtensions: ['.svelte']
   },
-  plugins: ['@typescript-eslint', 'import', 'svelte3'],
+  plugins: ['svelte3', '@typescript-eslint', 'import'],
   overrides: [
     {
       files: ['**/*.svelte'],
-      processor: 'svelte3/svelte3'
+      processor: 'svelte3/svelte3',
+      // https://github.com/sveltejs/eslint-plugin-svelte3/blob/master/OTHER_PLUGINS.md#eslint-plugin-import
+      rules: {
+        'import/first': 'off',
+        'import/no-duplicates': 'off',
+        'import/no-mutable-exports': 'off',
+        'import/no-unresolved': 'off',
+        'no-multiple-empty-lines': 'off',
+        'no-undef-init': 'off'
+      }
     }
   ],
   rules: {

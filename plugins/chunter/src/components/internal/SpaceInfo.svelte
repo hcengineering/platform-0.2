@@ -19,7 +19,7 @@
 
   export let tx: Tx
 
-  function spaceName() {
+  function spaceName () {
     return (((tx as CreateTx).object as unknown) as Space).name
   }
 </script>

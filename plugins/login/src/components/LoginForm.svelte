@@ -24,16 +24,20 @@
   import { PlatformStatusCodes } from '@anticrm/foundation'
 
   export let router: ApplicationRouter<ApplicationRoute>
-  let object = { username: '', password: '', workspace: '', secondFactorCode: '' }
+  const object = { username: '', password: '', workspace: '', secondFactorCode: '' }
   let status: Status
 
-  let loginActive: boolean = false
-  let needSecondFactor: boolean = false
-  const baseFields = [{ name: 'username', i18n: 'Username' }, {
-    name: 'password',
-    i18n: 'Password',
-    password: true
-  }, { name: 'workspace', i18n: 'Workspace' }]
+  let loginActive = false
+  let needSecondFactor = false
+  const baseFields = [
+    { name: 'username', i18n: 'Username' },
+    {
+      name: 'password',
+      i18n: 'Password',
+      password: true
+    },
+    { name: 'workspace', i18n: 'Workspace' }
+  ]
 
   let fields
   $: fields = needSecondFactor ? baseFields.concat({ name: 'secondFactorCode', i18n: 'Confirm code' }) : baseFields
@@ -44,15 +48,20 @@
   async function doLogin () {
     status = new Status(Severity.INFO, 0, 'Соединяюсь с сервером...')
 
-    status = await (await loginService).doLogin(object.username, object.password, object.workspace, object.secondFactorCode)
+    status = await (await loginService).doLogin(
+      object.username,
+      object.password,
+      object.workspace,
+      object.secondFactorCode
+    )
 
     if (status.code === PlatformStatusCodes.CLIENT_VALIDATE_REQUIRED) {
       needSecondFactor = true
     }
   }
 
-  async function doSignup () {
-  }
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  async function doSignup () {}
 
   async function checkLoginInfo (ls: LoginService) {
     const info = await ls.getLoginInfo()
@@ -94,7 +103,7 @@
 </script>
 
 {#await loginCheck then value}
-  {#if loginActive }
+  {#if loginActive}
     <div class="login-form-info">
       <div class="field">
         Logged in as: {object.username}
@@ -103,14 +112,17 @@
         Workspace: {object.workspace}
       </div>
       <div class="actions">
-        <Button width="100px" on:click={ logout }>Logout</Button>
-        <Button width="100px" on:click={ navigateSetting }>Settings</Button>
-        <Button width="100px" on:click={ navigateApp }>Switch to Application</Button>
+        <Button width="100px" on:click={logout}>Logout</Button>
+        <Button width="100px" on:click={navigateSetting}>Settings</Button>
+        <Button width="100px" on:click={navigateApp}>Switch to Application</Button>
       </div>
     </div>
   {:else}
     <Form
-      actions={[{ i18n: 'Create Space', func: doSignup }, { i18n: 'Login', func: doLogin }]}
+      actions={[
+        { i18n: 'Create Space', func: doSignup },
+        { i18n: 'Login', func: doLogin }
+      ]}
       {fields}
       {object}
       caption="Login into system"

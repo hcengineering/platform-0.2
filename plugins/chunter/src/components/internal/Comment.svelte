@@ -22,7 +22,7 @@
   export let message: Comment
 
   let username: string
-  let timestamp: string = new Date(message._createdOn).toLocaleString()
+  const timestamp: string = new Date(message._createdOn).toLocaleString()
   let avatar: Promise<Asset>
 
   $: avatar = getContactService().then((service) => {
@@ -32,6 +32,19 @@
     })
   })
 </script>
+
+<div class="chat-message-item">
+  {#await avatar}
+    <div class="avatar" />
+  {:then avt}
+    <img class="avatar" src={avt} alt="avatar" />
+  {/await}
+  <div class="details">
+    <b>{username}</b>
+    <span>{timestamp}</span>
+    <MessageViewer message={parseMessage(message.message)} />
+  </div>
+</div>
 
 <style lang="scss">
   .chat-message-item {
@@ -74,17 +87,3 @@
     }
   }
 </style>
-
-<div class="chat-message-item">
-  {#await avatar}
-    <div class="avatar">
-    </div>
-  {:then avt}
-    <img class="avatar" src={avt} alt="avatar" />
-  {/await}
-  <div class="details">
-    <b>{username}</b>
-    <span>{timestamp}</span>
-    <MessageViewer message={parseMessage(message.message)} />
-  </div>
-</div>

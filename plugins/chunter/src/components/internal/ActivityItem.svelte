@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 -->
-<script lang='ts'>
+<script lang="ts">
   import type { ObjectTx } from '@anticrm/domains'
   import type { Tx } from '@anticrm/core'
   import type { AnyComponent, Asset } from '@anticrm/platform-ui'
@@ -50,7 +50,19 @@
   }
 </script>
 
-<style lang='scss'>
+<div class="activity-item">
+  <img class="avatar" src={avatar} alt="avatar" />
+  <div class="details">
+    <b>{user ? user.name : ''}</b>
+    <span>15:23</span>
+    <div>
+      <!-- {JSON.stringify(tx)} -->
+      <Component is={info} props={{ tx }} />
+    </div>
+  </div>
+</div>
+
+<style lang="scss">
   .activity-item {
     display: flex;
     margin-bottom: 1em;
@@ -90,15 +102,3 @@
     }
   }
 </style>
-
-<div class='activity-item'>
-  <img class='avatar' src={avatar} alt='avatar'/>
-  <div class='details'>
-    <b>{user ? user.name : ''}</b>
-    <span>15:23</span>
-    <div>
-      <!-- {JSON.stringify(tx)} -->
-      <Component is={info} props={{ tx }} />
-    </div>
-  </div>
-</div>

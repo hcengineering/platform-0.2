@@ -20,6 +20,13 @@
   export let application: Ref<Application>
 </script>
 
+<div class="workbench-browse">
+  <div><span class="caption-1">{application}</span>&nbsp;</div>
+  <div class="table">
+    <Table _class="class:task.Task" />
+  </div>
+</div>
+
 <style lang="scss">
   .workbench-browse {
     height: 100%;
@@ -32,10 +39,3 @@
     }
   }
 </style>
-
-<div class="workbench-browse">
-  <div><span class="caption-1">{application}</span>&nbsp;</div>
-  <div class="table">
-    <Table _class="class:task.Task" />
-  </div>
-</div>

@@ -59,7 +59,7 @@
     })
   }
 
-  function getViewletActions(
+  function getViewletActions (
     appInstance: WorkbenchApplication,
     sp: Viewlet | undefined,
     viewlets: Viewlet[]
@@ -111,8 +111,7 @@
               { _class: application ? application.classes[0] : undefined, space: space._id },
               addIcon
             )
-          }}
-        >
+          }}>
           <Icon icon={workbench.icon.Add} button="true" />
           <span style="padding-left:.5em">{getLabel(application.label)}</span>
         </Button>
@@ -128,8 +127,7 @@
         <Component
           is={activeViewlet.component}
           props={{ _class: application.classes[0], space: space, editable: false }}
-          on:open
-        />
+          on:open />
       {/if}
     </ScrollView>
   {/if}

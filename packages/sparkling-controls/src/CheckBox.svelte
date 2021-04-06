@@ -1,9 +1,9 @@
 <script lang="ts">
-  export let checked: boolean = false
-  export let toRight: boolean = false
-  export let editable: boolean = true
-  export let fullWidth: boolean = true
-  export let label: string = ''
+  export let checked = false
+  export let toRight = false
+  export let editable = true
+  export let fullWidth = true
+  export let label = ''
 
   function toggleState () {
     if (editable) {
@@ -13,16 +13,16 @@
 </script>
 
 <div class="checkbox-container">
-  {#if (!toRight)}
-    <div class="checkbox" class:active={checked} on:click={toggleState}></div>
-    <div class="separator"></div>
+  {#if !toRight}
+    <div class="checkbox" class:active={checked} on:click={toggleState} />
+    <div class="separator" />
   {/if}
-  <div class="{fullWidth ? 'input-label-full' : 'input-label'}" on:click={toggleState}>
+  <div class={fullWidth ? 'input-label-full' : 'input-label'} on:click={toggleState}>
     <slot />{label}
   </div>
-  {#if (toRight)}
-    <div class="separator"></div>
-    <div class="checkbox" class:active={checked} on:click={toggleState}></div>
+  {#if toRight}
+    <div class="separator" />
+    <div class="checkbox" class:active={checked} on:click={toggleState} />
   {/if}
 </div>
 
@@ -60,7 +60,7 @@
       border-radius: 16px;
       position: relative;
       cursor: pointer;
-      transition: all .2s ease-in-out;
+      transition: all 0.2s ease-in-out;
 
       &::after {
         content: '';
@@ -71,7 +71,7 @@
         height: 16px;
         top: 3px;
         left: 3px;
-        transition: all .2s ease-in-out;
+        transition: all 0.2s ease-in-out;
       }
 
       &:hover {
@@ -94,7 +94,7 @@
         top: 3px;
         left: calc(100% - 19px);
         z-index: 1002;
-        transition: all .2s ease-in-out;
+        transition: all 0.2s ease-in-out;
       }
 
       &:hover {

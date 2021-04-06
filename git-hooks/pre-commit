@@ -1,0 +1,18 @@
+#!/usr/bin/env sh
+
+FILES=$(git diff --cached --name-only --diff-filter=ACMR "*.ts" "*.svelte" | sed 's| |\\ |g')
+[ -z "$FILES" ] && exit 0
+
+echo "Format and autofix changed files..."
+SVELTE_FILES=$(echo "$FILES" | grep "\.svelte$")
+
+if [ -n "$SVELTE_FILES" ]; then
+  echo "$SVELTE_FILES" | xargs yarn prettier --plugin-search-dir=. --write > /dev/null
+fi
+
+echo "$FILES" | xargs yarn eslint --fix > /dev/null
+echo "Done."
+
+echo "$FILES" | xargs git add
+
+exit 0

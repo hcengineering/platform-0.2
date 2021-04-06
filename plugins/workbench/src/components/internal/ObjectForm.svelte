@@ -21,16 +21,14 @@
   import workbench from '../..'
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
 
-  let title: string
   export let _class: Ref<Class<Doc>>
   export let _objectId: Ref<Doc>
 
   let object: Doc | undefined
-  let counter = 0
 
   const dispatch = createEventDispatcher()
 
-  let queryUpdate = createLiveQuery(_class, { _id: _objectId }, (docs) => {
+  const queryUpdate = createLiveQuery(_class, { _id: _objectId }, (docs) => {
     object = docs.length > 0 ? docs[0] : undefined
     if (!object) {
       dispatch('noobject')
@@ -49,17 +47,21 @@
   }
 </script>
 
-{#if object }
+{#if object}
   <div class="recruiting-view">
     <div class="toolbar">
-      <a href="/" on:click|preventDefault={() => { dispatch('close') }}>
+      <a
+        href="/"
+        on:click|preventDefault={() => {
+          dispatch('close')
+        }}>
         <Icon icon={workbench.icon.Close} button="true" />
       </a>
     </div>
     <div class="content">
       <ScrollView height="100%" width="100%">
         <div class="component-content">
-          <Component is="{component}" props="{{ _class, object }}" />
+          <Component is={component} props={{ _class, object }} />
         </div>
       </ScrollView>
     </div>
@@ -88,6 +90,4 @@
       padding: 2em;
     }
   }
-
-
 </style>

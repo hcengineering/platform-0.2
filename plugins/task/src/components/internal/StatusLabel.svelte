@@ -1,6 +1,6 @@
 <script lang="ts">
-  export const text: string = ''
-  export const color: string = ''
+  export const text = ''
+  export const color = ''
 </script>
 
 <div class="status" style="background-color: {color};">{text}</div>

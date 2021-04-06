@@ -24,14 +24,14 @@
   export let attribute: AttrModel
   export let editable: boolean
 
-  let text: string = ''
-  let color: string = ''
+  let text = ''
+  let color = ''
 
   let statusType: Enum<TaskStatus> | undefined
 
   let model: Model
 
-  getCoreService().then(async cs => {
+  getCoreService().then(async (cs) => {
     statusType = await cs.findOne(CORE_CLASS_ENUM, { _id: task.enum.TaskStatus })
     model = cs.getModel()
   })

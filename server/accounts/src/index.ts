@@ -235,11 +235,11 @@ async function getWorkspaceAndAccount (db: Db, email: string, workspace: string)
   if (account == null) {
     throw new PlatformError(new Status(Severity.ERROR, PlatformStatusCodes.ACCOUNT_NOT_FOUND, 'Account not found.'))
   }
-  const accountId = account!._id
+  const accountId = account?._id
   return { accountId, workspaceId }
 }
 
-export async function assignWorkspace (db: Db, email: string, workspace: string) {
+export async function assignWorkspace (db: Db, email: string, workspace: string): Promise<void> {
   const { workspaceId, accountId } = await getWorkspaceAndAccount(db, email, workspace)
   // Add account into workspace.
   await db.collection(WORKSPACE_COLLECTION).updateOne({ _id: workspaceId }, { $push: { accounts: accountId } })
@@ -248,7 +248,7 @@ export async function assignWorkspace (db: Db, email: string, workspace: string)
   await db.collection(ACCOUNT_COLLECTION).updateOne({ _id: accountId }, { $push: { workspaces: workspaceId } })
 }
 
-export async function removeWorkspace (db: Db, email: string, workspace: string) {
+export async function removeWorkspace (db: Db, email: string, workspace: string): Promise<void> {
   const { workspaceId, accountId } = await getWorkspaceAndAccount(db, email, workspace)
 
   // Add account into workspace.

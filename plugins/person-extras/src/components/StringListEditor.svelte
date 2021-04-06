@@ -21,7 +21,7 @@ limitations under the License.
   export let items: string[]
   export let label: string
 
-  function addSkill() {
+  function addSkill () {
     items.push('')
     items = items
   }

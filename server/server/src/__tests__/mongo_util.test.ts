@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 //
 // Copyright © 2020 Anticrm Platform Contributors.
 //

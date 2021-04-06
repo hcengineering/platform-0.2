@@ -31,25 +31,21 @@
   // ********************************
   // Properties
   // ********************************
-  export let stylesEnabled: boolean = false
+  export let stylesEnabled = false
   // If specified, submit button will be enabled, message will be send on any modify operation
-  export let submitEnabled: boolean = true
-  export let lines: number = 1
+  export let submitEnabled = true
+  export let lines = 1
 
   // ********************************
   // Functionality
   // ********************************
-  function startsWith (str: string | undefined, prefix: string) {
-    return (str ?? '').startsWith(prefix)
-  }
 
   interface ItemRefefence {
     id: string
     class: string
   }
 
-  interface ExtendedCompletionItem extends CompletionItem, ItemRefefence {
-  }
+  interface ExtendedCompletionItem extends CompletionItem, ItemRefefence {}
 
   let styleState: EditorContentEvent = {
     isEmpty: true,
@@ -75,7 +71,7 @@
 
   let htmlEditor: EditorContent & EditorActions
 
-  let triggers = ['@', '#', '[[']
+  const triggers = ['@', '#', '[[']
 
   let currentPrefix = ''
   let popupVisible = false
@@ -85,7 +81,7 @@
   function query (prefix: string): AnyLayout {
     return {
       title: {
-        $regex: prefix + '.*' as StringProperty,
+        $regex: (prefix + '.*') as StringProperty,
         $options: 'i' as StringProperty
       }
     }
@@ -96,15 +92,15 @@
   })
 
   function updateTitles (docs: Title[]): CompletionItem[] {
-    let items: CompletionItem[] = []
+    const items: CompletionItem[] = []
     for (const value of docs) {
       // if (startsWith(value.title.toString(), currentPrefix)) {
-      let kk = value.title
+      const kk = value.title
       items.push({
-        key: value._objectId + value.title,
+        key: `${value._objectId}${value.title}`,
         completion: value._objectId,
         label: kk,
-        title: kk + ' - ' + value._objectClass,
+        title: `${kk} - ${value._objectClass}`,
         class: value._objectClass,
         id: value._objectId
       } as ExtendedCompletionItem)
@@ -114,16 +110,18 @@
   }
 
   async function findTitle (title: string): Promise<ItemRefefence[]> {
-    let docs = await (await coreService).find(CORE_CLASS_TITLE, {
+    const docs = await (await coreService).find(CORE_CLASS_TITLE, {
       title: title as StringProperty
     })
 
     for (const value of docs) {
       if (value.title === title) {
-        return [{
-          id: value._objectId,
-          class: value._objectClass
-        } as ItemRefefence]
+        return [
+          {
+            id: value._objectId,
+            class: value._objectClass
+          } as ItemRefefence
+        ]
       }
     }
     return []
@@ -132,7 +130,7 @@
   function updateStyle (event: EditorContentEvent) {
     styleState = event
 
-    if (event.completionWord.length == 0) {
+    if (event.completionWord.length === 0) {
       currentPrefix = ''
       popupVisible = false
       return
@@ -157,7 +155,7 @@
     if (styleState.completionEnd != null && styleState.completionEnd.endsWith(']]')) {
       extra = styleState.completionEnd.length
     }
-    let vv = value as ExtendedCompletionItem
+    const vv = value as ExtendedCompletionItem
     htmlEditor.insertMark(
       '[[' + value.label + ']]',
       styleState.selection.from - styleState.completionWord.length,
@@ -179,7 +177,7 @@
   }
 
   function onKeyDown (event: any) {
-    if (popupVisible > 0) {
+    if (popupVisible) {
       if (event.key === 'ArrowUp') {
         completionControl.handleUp()
         event.preventDefault()
@@ -208,8 +206,8 @@
   }
 
   function transformInjections (state: EditorState): Promise<Transaction | null> {
-    let operations: ((tr: Transaction | null) => Transaction)[] = []
-    let promises: Promise<void>[] = []
+    const operations: ((tr: Transaction | null) => Transaction)[] = []
+    const promises: Promise<void>[] = []
 
     state.doc.descendants((node, pos) => {
       if (node.isText && node.text != null) {
@@ -220,7 +218,7 @@
         // Check we had our reference marl
         // Check if we had trigger words without defined marker
         for (let i = 0; i < node.marks.length; i++) {
-          if (node.marks[i].type == schema.marks.reference) {
+          if (node.marks[i].type === schema.marks.reference) {
             prev = {
               id: node.marks[i].attrs.id,
               class: node.marks[i].attrs.class
@@ -234,14 +232,14 @@
         while (i < len) {
           if (node.text.startsWith('[[', i)) {
             // We found trigger, we need to call replace method
-            let endpos = node.text.indexOf(']]', i)
+            const endpos = node.text.indexOf(']]', i)
             if (endpos !== -1) {
-              let end = endpos + 2
+              const end = endpos + 2
 
-              let refText = node.text.substring(i + 2, end - 2)
-              let ci = i
-              let cpos = pos
-              let cend = end
+              const refText = node.text.substring(i + 2, end - 2)
+              const ci = i
+              const cpos = pos
+              const cend = end
               promises.push(
                 Promise.all([findTitle(refText)]).then((result) => {
                   let items = result.reduce((acc, val) => {
@@ -250,24 +248,24 @@
                   if (items.length > 1) {
                     // Check if we had item selected already
                     for (let ii = 0; ii < items.length; ii++) {
-                      if (items[ii].id == prev.id) {
+                      if (items[ii].id === prev.id) {
                         items = [items[ii]]
                         break
                       }
                     }
                   }
-                  if (items.length == 1) {
+                  if (items.length === 1) {
                     operations.push(
                       (tr: Transaction | null): Transaction => {
-                        let mark = schema.marks.reference.create(items[0])
+                        const mark = schema.marks.reference.create(items[0])
                         return (tr == null ? state.tr : tr).addMark(cpos + ci, cpos + cend, mark)
                       }
                     )
-                  } else if (items.length == 0) {
-                    if (prev.id == '') {
+                  } else if (items.length === 0) {
+                    if (prev.id === '') {
                       operations.push(
                         (tr: Transaction | null): Transaction => {
-                          let mark = schema.marks.reference.create({
+                          const mark = schema.marks.reference.create({
                             id: null,
                             class: 'Page'
                           })
@@ -290,7 +288,7 @@
     return Promise.all(promises).then(() => {
       let tr: Transaction | null = null
       for (let i = 0; i < operations.length; i++) {
-        let t = operations[i]
+        const t = operations[i]
         if (t != null) {
           tr = t(tr)
         }
@@ -299,6 +297,113 @@
     })
   }
 </script>
+
+<div class="presentation-reference-input-control">
+  <slot name="top" />
+  <div>
+    <div class:flex-column={stylesEnabled} class:flex-row={!stylesEnabled}>
+      {#if !stylesEnabled}
+        <Toolbar>
+          <slot name="inner" />
+        </Toolbar>
+      {/if}
+
+      <div
+        class:edit-box-vertical={stylesEnabled}
+        class:edit-box-horizontal={!stylesEnabled}
+        on:keydown={onKeyDown}
+        style={`height: ${lines + 1}em;`}>
+        <EditorContent
+          bind:this={htmlEditor}
+          bind:content={editorContent}
+          {triggers}
+          {transformInjections}
+          on:content={(event) => {
+            editorContent = event.detail
+          }}
+          on:styleEvent={(e) => updateStyle(e.detail)}>
+          {#if popupVisible}
+            <CompletionPopup
+              bind:this={completionControl}
+              on:blur={(e) => (completions = [])}
+              ontop={true}
+              items={completions}
+              pos={{
+                left: styleState.cursor.left + 15,
+                top: styleState.cursor.top - styleState.inputHeight,
+                right: styleState.cursor.right + 15,
+                bottom: styleState.cursor.bottom - styleState.inputHeight
+              }}
+              on:select={(e) => handlePopupSelected(e.detail)} />
+          {/if}
+        </EditorContent>
+      </div>
+
+      {#if stylesEnabled}
+        <div class="separator" />
+      {/if}
+      <Toolbar>
+        {#if stylesEnabled}
+          <slot name="inner" />
+          <ToolbarButton
+            style="padding:0; width:24px; height:24px"
+            on:click={() => htmlEditor.toggleBold()}
+            selected={styleState.bold}>
+            <Icon icon={presentation.icon.brdBold} size="24" />
+          </ToolbarButton>
+          <ToolbarButton
+            style="padding:0; width:24px; height:24px"
+            on:click={() => htmlEditor.toggleItalic()}
+            selected={styleState.italic}>
+            <Icon icon={presentation.icon.brdItalic} size="24" />
+          </ToolbarButton>
+          <div class="tSeparator" />
+          <ToolbarButton style="padding:0; width:24px; height:24px">
+            <Icon icon={presentation.icon.brdCode} size="24" />
+          </ToolbarButton>
+          <ToolbarButton style="padding:0; width:24px; height:24px" on:click={() => htmlEditor.toggleUnOrderedList()}>
+            <Icon icon={presentation.icon.brdUL} size="24" />
+          </ToolbarButton>
+          <ToolbarButton style="padding:0; width:24px; height:24px" on:click={() => htmlEditor.toggleOrderedList()}>
+            <Icon icon={presentation.icon.brdOL} size="24" />
+          </ToolbarButton>
+          <div class="tSeparator" />
+          <ToolbarButton style="padding:0; width:24px; height:24px">
+            <Icon icon={presentation.icon.brdLink} size="24" />
+          </ToolbarButton>
+          <div class="tSeparator" />
+          <ToolbarButton style="padding:0; width:24px; height:24px">
+            <Icon icon={presentation.icon.brdAddr} size="24" />
+          </ToolbarButton>
+          <ToolbarButton style="padding:0; width:24px; height:24px">
+            <Icon icon={presentation.icon.brdClip} size="24" />
+          </ToolbarButton>
+        {/if}
+        <div slot="right">
+          {#if submitEnabled}
+            <ToolbarButton
+              style="padding:0; width:42px; height:42px"
+              on:click={() => handleSubmit()}
+              selected={!styleState.isEmpty}>
+              <Icon icon={presentation.icon.brdSend} size="42" />
+              <!--▶️-->
+            </ToolbarButton>
+          {/if}
+          <ToolbarButton style="padding:0; width:42px; height:42px">
+            <Icon icon={presentation.icon.brdSmile} size="42" />
+            <!--😀-->
+          </ToolbarButton>
+          <ToolbarButton
+            style="font-weight:bold"
+            selected={stylesEnabled}
+            on:click={() => (stylesEnabled = !stylesEnabled)}
+            >Aa
+          </ToolbarButton>
+        </div>
+      </Toolbar>
+    </div>
+  </div>
+</div>
 
 <style lang="scss">
   .presentation-reference-input-control {
@@ -353,99 +458,3 @@
     }
   }
 </style>
-
-<div class="presentation-reference-input-control">
-  <slot name="top" />
-  <div>
-    <div class:flex-column={stylesEnabled} class:flex-row={!stylesEnabled}>
-      {#if !stylesEnabled}
-        <Toolbar>
-          <slot name="inner" />
-        </Toolbar>
-      {/if}
-
-      <div
-        class:edit-box-vertical={stylesEnabled}
-        class:edit-box-horizontal={!stylesEnabled}
-        on:keydown={onKeyDown}
-        style={`height: ${lines+1}em;`}>
-        <EditorContent
-          bind:this={htmlEditor}
-          bind:content={editorContent}
-          {triggers}
-          {transformInjections}
-          on:content={(event) => {
-            editorContent = event.detail
-          }}
-          on:styleEvent={(e) => updateStyle(e.detail)}>
-          {#if popupVisible}
-            <CompletionPopup
-              bind:this={completionControl}
-              on:blur={(e) => (completions = [])}
-              ontop={true}
-              items={completions}
-              pos={{ left: styleState.cursor.left + 15, top: styleState.cursor.top - styleState.inputHeight, right: styleState.cursor.right + 15, bottom: styleState.cursor.bottom - styleState.inputHeight }}
-              on:select={(e) => handlePopupSelected(e.detail)} />
-          {/if}
-        </EditorContent>
-      </div>
-
-      {#if stylesEnabled}
-        <div class="separator" />
-      {/if}
-      <Toolbar>
-        {#if stylesEnabled}
-          <slot name="inner" />
-          <ToolbarButton style="padding:0; width:24px; height:24px"
-                         on:click={() => htmlEditor.toggleBold()} selected={styleState.bold}>
-            <Icon icon={presentation.icon.brdBold} size="24" />
-          </ToolbarButton>
-          <ToolbarButton style="padding:0; width:24px; height:24px"
-                         on:click={() => htmlEditor.toggleItalic()}
-                         selected={styleState.italic}>
-            <Icon icon={presentation.icon.brdItalic} size="24" />
-          </ToolbarButton>
-          <div class="tSeparator" />
-          <ToolbarButton style="padding:0; width:24px; height:24px">
-            <Icon icon={presentation.icon.brdCode} size="24" />
-          </ToolbarButton>
-          <ToolbarButton style="padding:0; width:24px; height:24px"
-                         on:click={() => htmlEditor.toggleUnOrderedList()}>
-            <Icon icon={presentation.icon.brdUL} size="24" />
-          </ToolbarButton>
-          <ToolbarButton style="padding:0; width:24px; height:24px"
-                         on:click={() => htmlEditor.toggleOrderedList()}>
-            <Icon icon={presentation.icon.brdOL} size="24" />
-          </ToolbarButton>
-          <div class="tSeparator" />
-          <ToolbarButton style="padding:0; width:24px; height:24px">
-            <Icon icon={presentation.icon.brdLink} size="24" />
-          </ToolbarButton>
-          <div class="tSeparator" />
-          <ToolbarButton style="padding:0; width:24px; height:24px">
-            <Icon icon={presentation.icon.brdAddr} size="24" />
-          </ToolbarButton>
-          <ToolbarButton style="padding:0; width:24px; height:24px">
-            <Icon icon={presentation.icon.brdClip} size="24" />
-          </ToolbarButton>
-        {/if}
-        <div slot="right">
-          {#if submitEnabled}
-            <ToolbarButton style="padding:0; width:42px; height:42px"
-                           on:click={() => handleSubmit()} selected={!styleState.isEmpty}>
-              <Icon icon={presentation.icon.brdSend} size="42" />
-              <!--▶️-->
-            </ToolbarButton>
-          {/if}
-          <ToolbarButton style="padding:0; width:42px; height:42px">
-            <Icon icon={presentation.icon.brdSmile} size="42" />
-            <!--😀-->
-          </ToolbarButton>
-          <ToolbarButton style="font-weight:bold" selected={stylesEnabled}
-                         on:click={() => (stylesEnabled = !stylesEnabled)}>Aa
-          </ToolbarButton>
-        </div>
-      </Toolbar>
-    </div>
-  </div>
-</div>

@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 -->
-
 <script lang="ts">
   import type { AnyLayout, StringProperty } from '@anticrm/core'
   import ui from '@anticrm/platform-ui'
@@ -22,19 +21,19 @@
   import { CORE_CLASS_TITLE } from '@anticrm/domains'
   import { liveQuery } from '@anticrm/presentation'
 
-  let query: string = ''
+  let query = ''
   let result: Title[] = []
 
   function q (query: string): AnyLayout {
     return {
       title: {
-        $regex: query + '.*' as StringProperty,
+        $regex: (query + '.*') as StringProperty,
         $options: 'i' as StringProperty
       }
     }
   }
 
-  $: lq = liveQuery(lq, CORE_CLASS_TITLE, q(query), docs => {
+  $: lq = liveQuery(lq, CORE_CLASS_TITLE, q(query), (docs) => {
     result = docs
   })
 </script>

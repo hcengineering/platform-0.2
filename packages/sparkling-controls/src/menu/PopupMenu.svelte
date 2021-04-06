@@ -1,21 +1,21 @@
-<script lang='ts'>
+<script lang="ts">
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
 
-  export let kind: string = 'transparent'
-  export const width: Number = 150
-  export let visible: String = 'hidden'
+  export let kind = 'transparent'
+  export const width = 150
+  export let visible = 'hidden'
 
   let thisPopup: HTMLElement
   let thisTrigger: HTMLElement
-  let firstOpen: boolean = true
+  let firstOpen = true
 
-  function handler(event: MouseEvent): void {
+  function handler (event: MouseEvent): void {
     const rectPopup = thisPopup.getBoundingClientRect()
     const rectTrigger = thisTrigger.getBoundingClientRect()
     const rectBody = document.body.getBoundingClientRect()
     if (rectTrigger.left + rectPopup.width >= rectBody.width) thisPopup.style.right = '1em'
-    else thisPopup.style.left = rectTrigger.left + 'px'
-    thisPopup.style.top = rectTrigger.y + rectTrigger.height + 1 + 'px'
+    else thisPopup.style.left = `${rectTrigger.left}px`
+    thisPopup.style.top = `${rectTrigger.y + rectTrigger.height + 1}px`
 
     if (firstOpen) {
       firstOpen = false
@@ -37,16 +37,16 @@
   }
 </script>
 
-
-<Button {kind}
+<Button
+  {kind}
   on:click={() => {
     if (visible === 'hidden') visible = 'visible'
     else visible = 'hidden'
   }}>
-  <slot name='trigger'>+</slot>
+  <slot name="trigger">+</slot>
 </Button>
-<div bind:this={thisTrigger}></div>
-<div bind:this={thisPopup} class="popup-menu-view" style='width: {width}px; visibility: {visible}'>
+<div bind:this={thisTrigger} />
+<div bind:this={thisPopup} class="popup-menu-view" style="width: {width}px; visibility: {visible}">
   <slot />
 </div>
 

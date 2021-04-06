@@ -25,8 +25,8 @@
   import { getCoreService } from '@anticrm/presentation'
 
   export let space: Space
-  let userName: string = ''
-  let isOwner: boolean = false
+  let userName = ''
+  let isOwner = false
 
   const coreService = getCoreService()
   const dispatch = createEventDispatcher()
@@ -41,6 +41,28 @@
     dispatch('close')
   }
 </script>
+
+<div class="add-user-space-view">
+  <div class="header">
+    <div class="caption-1">Add user to {space.name}</div>
+    <a href="/" on:click|preventDefault={() => dispatch('close')}>
+      <Icon icon={workbench.icon.Close} button="true" />
+    </a>
+  </div>
+
+  <div class="content">
+    <form class="form">
+      <div class="input-container">
+        <EditBox id="input__name" bind:value={userName} label="Имя пользователя" />
+      </div>
+      <CheckBox bind:checked={isOwner}>Сделать частным</CheckBox>
+      <div class="separator" />
+      <div class="buttons">
+        <Button size="large" kind="primary" width="164px" on:click={() => save()}>Создать</Button>
+      </div>
+    </form>
+  </div>
+</div>
 
 <style lang="scss">
   .add-user-space-view {
@@ -79,28 +101,3 @@
     }
   }
 </style>
-
-<div class="add-user-space-view">
-  <div class="header">
-    <div class="caption-1">Add user to {space.name}</div>
-    <a href="/" on:click|preventDefault={() => dispatch('close')}>
-      <Icon icon={workbench.icon.Close} button="true" />
-    </a>
-  </div>
-
-  <div class="content">
-    <form class="form">
-      <div class="input-container">
-        <EditBox id="input__name" bind:value={userName}
-                 label="Имя пользователя" />
-      </div>
-      <CheckBox bind:checked={isOwner}>
-        Сделать частным
-      </CheckBox>
-      <div class="separator"></div>
-      <div class="buttons">
-        <Button size="large" kind="primary" width="164px" on:click={() => save()}>Создать</Button>
-      </div>
-    </form>
-  </div>
-</div>

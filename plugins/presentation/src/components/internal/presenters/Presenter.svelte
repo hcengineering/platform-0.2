@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 -->
-
 <script lang="ts">
   import type { Platform } from '@anticrm/platform'
   import { getContext } from 'svelte'
@@ -26,8 +25,8 @@
   export let is: AnyComponent | undefined
   export let value: any
   export let attribute: AttrModel
-  export let editable: boolean = true
-  export let maxWidth: number = 300
+  export let editable = true
+  export let maxWidth = 300
 
   let component: Promise<any>
 
@@ -36,10 +35,10 @@
 </script>
 
 {#if component}
-  {#await component }
+  {#await component}
     <Spinner />
   {:then ctor}
-    <div style={ 'max-width:' + maxWidth + 'px' }>
+    <div style={`max-width: ${maxWidth}px`}>
       <svelte:component this={ctor} {attribute} {value} {editable} on:change />
     </div>
   {:catch err}

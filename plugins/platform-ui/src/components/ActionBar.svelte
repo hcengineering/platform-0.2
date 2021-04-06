@@ -3,22 +3,17 @@
   import ui from '../'
   import type { Action } from '..'
 
-  interface ActionF extends Action {
-    id: Number
-    style?: String
-  }
-
-  export let onTop: Number = 2
+  export let onTop = 2
   export let actions: Action[] = []
 
   function getStyle (pos: number, total: number, onTop: number): string {
-    if (total == 1) {
+    if (total === 1) {
       return 'w100' // A full row, since one item
     }
-    if (pos == 0) {
+    if (pos === 0) {
       return 'abLeft w100'
     }
-    if (pos == total - 1 && total == onTop) {
+    if (pos === total - 1 && total === onTop) {
       // All items are on top, we need to add right style
       return 'abRight w100'
     }
@@ -31,31 +26,35 @@
   // Popup
   let thisPopup: HTMLElement
   let thisTrigger: HTMLElement
-  let visible: boolean = false
-
-  let popups: number = 0
-
-  function handler (event: MouseEvent): void {
-    if (event.target !== thisPopup || event.target !== this.Trigger) {
-      visible = false
-    }
-  }
+  let visible = false
 
   function handleAction (action: Action) {
-    action.action()
+    action.action?.()
   }
 </script>
 
-<svelte:window on:click={()=>visible = false} />
+<svelte:window
+  on:click={() => {
+    visible = false
+  }} />
 <div class="actionBar-view">
   {#each actions.slice(0, onTop) as item}
-    <button class="button actionButton {getStyle(actions.indexOf(item), actions.length, onTop)}"
-            class:toggleState={item.toggleState}
-            on:click={() => {item.action(); visible = false;}}>{item.name}</button>
+    <button
+      class="button actionButton {getStyle(actions.indexOf(item), actions.length, onTop)}"
+      class:toggleState={item.toggleState}
+      on:click={() => {
+        if (item.action) item.action()
+        visible = false
+      }}>{item.name}</button>
   {/each}
-  {#if (actions.length - onTop) > 0}
-    <button bind:this={thisTrigger} class="button actionButton abRight w100 wOther" class:selected={visible}
-            on:click|stopPropagation={() => { visible = !visible}}>
+  {#if actions.length - onTop > 0}
+    <button
+      bind:this={thisTrigger}
+      class="button actionButton abRight w100 wOther"
+      class:selected={visible}
+      on:click|stopPropagation={() => {
+        visible = !visible
+      }}>
       <div class="chevron">
         <span>Ещё</span>
         <Icon icon={ui.icon.ArrowDown} />
@@ -64,10 +63,9 @@
         <div bind:this={thisPopup} class="popup-menu-view">
           {#each actions.slice(onTop) as popup}
             {#if popup.name === '-'}
-              <div class="popup-separator"></div>
+              <div class="popup-separator" />
             {:else}
-              <button class="popup-item"
-                      on:click={() => handleAction(popup)}>{popup.name}</button>
+              <button class="popup-item" on:click={() => handleAction(popup)}>{popup.name}</button>
             {/if}
           {/each}
         </div>

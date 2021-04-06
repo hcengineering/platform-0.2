@@ -56,6 +56,22 @@ jobs:
           yarn install
           yarn workspaces run lint
 
+  formatting:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 14.x
+      - name: Check svelte files formatting
+        run: |
+          yarn install
+          ./scripts/format-svelte.sh
+          [ -z "$(git diff --name-only '*.svelte')" ]
+
   chromatic:
     runs-on: ubuntu-latest
 

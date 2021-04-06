@@ -23,7 +23,7 @@
   import type { Options } from 'node-2fa/dist/interfaces'
 
   export let router: ApplicationRouter<ApplicationRoute>
-  let object = { oldPassword: '', newPassword: '', newPasswordConfirm: '', clientSecret: '', secondFactorCode: '' }
+  const object = { oldPassword: '', newPassword: '', newPasswordConfirm: '', clientSecret: '', secondFactorCode: '' }
   let changePassword = false
   let status = new Status(Severity.OK, 0, '')
 
@@ -33,11 +33,13 @@
   let secondFactorInitEnabled = false
   let secondFactorEnabled = false
   let secondFactorCurrentEnabled = false
-  let newSecret: {
-    secret: string
-    uri: string
-    qr: string
-  } | false
+  let newSecret:
+    | {
+        secret: string
+        uri: string
+        qr: string
+      }
+    | false
   let src: string
 
   $: secondFactorCurrentEnabled = secondFactorEnabled && !secondFactorInitEnabled
@@ -45,15 +47,15 @@
   $: src = newSecret.qr
   $: object.clientSecret = newSecret.secret
 
-  const secondFactorCheck = loginService.then(ls => {
-    ls.getLoginInfo().then(li => {
+  const secondFactorCheck = loginService.then((ls) => {
+    ls.getLoginInfo().then((li) => {
       secondFactorInitEnabled = !!li?.secondFactorEnabled
       secondFactorEnabled = secondFactorInitEnabled
     })
   })
 
-  async function navigateLoginForm (): Promise<void> {
-    router.navigate({ route: '' })
+  function navigateLoginForm (): Promise<void> {
+    return Promise.resolve(router.navigate({ route: '' }))
   }
 
   let description: string
@@ -61,23 +63,23 @@
 
   async function saveSetting (): Promise<void> {
     if (!object.oldPassword) {
-      status = new Status(Severity.INFO, 0, `Поле пароль обязательно к заполнению.`)
+      status = new Status(Severity.INFO, 0, 'Поле пароль обязательно к заполнению.')
       return
     }
 
-    if (changePassword && object.newPassword != object.newPasswordConfirm) {
-      status = new Status(Severity.INFO, 0, `Пароль и подтверждения пароля не совпадают`)
+    if (changePassword && object.newPassword !== object.newPasswordConfirm) {
+      status = new Status(Severity.INFO, 0, 'Пароль и подтверждения пароля не совпадают')
       return
     }
 
     if (secondFactorCurrentEnabled) {
       if (object.clientSecret && !object.secondFactorCode) {
-        status = new Status(Severity.INFO, 0, `Поле код подтверждения обязательно для заполнения`)
+        status = new Status(Severity.INFO, 0, 'Поле код подтверждения обязательно для заполнения')
         return
       }
 
       if (!object.clientSecret && object.secondFactorCode) {
-        status = new Status(Severity.INFO, 0, `Поле секретный код обязательно для заполнения`)
+        status = new Status(Severity.INFO, 0, 'Поле секретный код обязательно для заполнения')
         return
       }
     }
@@ -88,7 +90,9 @@
       object.oldPassword,
       changePassword ? object.newPassword : '',
       secondFactorEnabled,
-      secondFactorCurrentEnabled ? object.clientSecret : '', secondFactorCurrentEnabled ? object.secondFactorCode : '')
+      secondFactorCurrentEnabled ? object.clientSecret : '',
+      secondFactorCurrentEnabled ? object.secondFactorCode : ''
+    )
     if (status.severity === Severity.OK) {
       await navigateLoginForm()
     }
@@ -98,17 +102,10 @@
 <form class="form">
   <div class="status">{description}</div>
   <div class="field">
-    <input
-      class="editbox"
-      name="oldPassword"
-      placeholder="Пароль"
-      type="password"
-      bind:value={object.oldPassword} />
+    <input class="editbox" name="oldPassword" placeholder="Пароль" type="password" bind:value={object.oldPassword} />
   </div>
   <div class="field">
-    <CheckBox bind:checked={changePassword}>
-      Изменить пароль
-    </CheckBox>
+    <CheckBox bind:checked={changePassword}>Изменить пароль</CheckBox>
   </div>
   {#if changePassword}
     <div class="field">
@@ -130,9 +127,7 @@
   {/if}
   {#await secondFactorCheck then value}
     <div class="field">
-      <CheckBox bind:checked={secondFactorEnabled}>
-        Включить двухфакторную авторизацию
-      </CheckBox>
+      <CheckBox bind:checked={secondFactorEnabled}>Включить двухфакторную авторизацию</CheckBox>
     </div>
     {#if secondFactorCurrentEnabled}
       <div class="field">
@@ -145,7 +140,7 @@
       </div>
       {#if src}
         <div>
-          <img {src} alt="qr code">
+          <img {src} alt="qr code" />
         </div>
       {/if}
       <div class="field">

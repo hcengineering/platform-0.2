@@ -19,10 +19,10 @@ import { plugin3State, TestPlugin } from './shared'
 
 plugin3State.parsed = true
 
-export default (platform: Platform, deps: {
+export default (_platform: Platform, deps: {
   plugin1: TestPlugin,
   plugin2: Service
-}) => {
+}): Promise<{deps: typeof deps}> => {
   plugin3State.started = true
   return Promise.resolve({
     deps

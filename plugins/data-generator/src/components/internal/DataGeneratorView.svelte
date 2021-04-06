@@ -13,7 +13,6 @@
 // limitations under the License.
 -->
 <script type="ts">
-
   import type { NumberProperty, Property, Ref, StringProperty } from '@anticrm/core'
   import type { Application, Space } from '@anticrm/domains'
   import { CORE_CLASS_SPACE, CORE_MIXIN_SHORTID } from '@anticrm/domains'
@@ -39,11 +38,11 @@
   })
 
   function filterSpaces (spaces: Space[], app: Ref<Application>): Space[] {
-    return spaces.filter(sp => sp.application === app)
+    return spaces.filter((sp) => sp.application === app)
   }
 
   function getActions (spaces: Space[], app: Ref<Application>): Action[] {
-    return filterSpaces(spaces, app).map(sp => {
+    return filterSpaces(spaces, app).map((sp) => {
       return {
         id: sp._id,
         name: sp.name,
@@ -57,9 +56,9 @@
   const coreService = getCoreService()
 
   function randomEnum<T> (anEnum: T): T[keyof T] {
-    const enumValues = Object.keys(anEnum)
-      .map(n => Number.parseInt(n))
-      .filter(n => !Number.isNaN(n)) as unknown as T[keyof T][]
+    const enumValues = (Object.keys(anEnum)
+      .map((n) => Number.parseInt(n))
+      .filter((n) => !Number.isNaN(n)) as unknown) as T[keyof T][]
     const randomIndex = Math.floor(Math.random() * enumValues.length)
     return enumValues[randomIndex]
   }
@@ -70,18 +69,19 @@
     }
     const cs = await coreService
     for (let i = 0; i < taskCount; i++) {
-
-      let modelDb = cs.getModel()
+      const modelDb = cs.getModel()
       const newTask = modelDb.newDoc(task.class.Task, cs.generateId(), {
         title: faker.commerce.productName() as StringProperty,
         _space: taskSpace._id,
         status: randomEnum(TaskStatus) as NumberProperty,
-        comments: [{
-          message: faker.commerce.productDescription(),
-          _class: chunter.class.Comment,
-          _createdOn: Date.now() as Property<number, Date>,
-          _createdBy: cs.getUserId() as Property<string, string>
-        } as Comment]
+        comments: [
+          {
+            message: faker.commerce.productDescription(),
+            _class: chunter.class.Comment,
+            _createdOn: Date.now() as Property<number, Date>,
+            _createdBy: cs.getUserId() as Property<string, string>
+          } as Comment
+        ]
       })
       try {
         const asShortId = modelDb.cast(newTask, CORE_MIXIN_SHORTID)
@@ -115,8 +115,35 @@
       }
     }
   }
-
 </script>
+
+<div class="activity">
+  <div class="captionContainer">
+    <span class="caption-1">Data Generator</span>&nbsp;
+  </div>
+  <ScrollView height="100%" margin="2em" autoscroll={true}>
+    <div class="content">
+      Task Generator:
+      <div class="actions">
+        <div style="width: 300px">
+          <ComboBox label="Space" items={getActions(spaces, task.application.Task)}>
+            <div slot="title">
+              {#if taskSpace}
+                {taskSpace.name}
+              {/if}
+            </div>
+          </ComboBox>
+        </div>
+        <EditBox id="create_task__input__name" bind:value={taskCount} label="Name" placeholder="Name" />
+
+        <div>
+          <Button width="100px" on:click={() => generateTasks()}>Generate Tasks</Button>
+          <Button width="100px" on:click={() => removeTasks()}>Remove All Tasks</Button>
+        </div>
+      </div>
+    </div>
+  </ScrollView>
+</div>
 
 <style lang="scss">
   .activity {
@@ -145,32 +172,3 @@
     }
   }
 </style>
-
-<div class="activity">
-  <div class="captionContainer">
-    <span class="caption-1">Data Generator</span>&nbsp;
-  </div>
-  <ScrollView height="100%" margin="2em" autoscroll={true}>
-    <div class="content">
-      Task Generator:
-      <div class="actions">
-        <div style="width: 300px">
-          <ComboBox label="Space" items={getActions(spaces, task.application.Task)}>
-            <div slot="title">
-              {#if taskSpace}
-                {taskSpace.name}
-              {/if}
-            </div>
-          </ComboBox>
-        </div>
-        <EditBox id="create_task__input__name" bind:value={taskCount}
-                 label="Name" placeholder="Name" />
-
-        <div>
-          <Button width="100px" on:click={()=> generateTasks()}>Generate Tasks</Button>
-          <Button width="100px" on:click={()=> removeTasks()}>Remove All Tasks</Button>
-        </div>
-      </div>
-    </div>
-  </ScrollView>
-</div>

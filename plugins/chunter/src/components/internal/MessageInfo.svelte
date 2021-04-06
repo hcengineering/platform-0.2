@@ -21,7 +21,7 @@
 
   export let tx: Tx
 
-  function getMessageText() {
+  function getMessageText () {
     const message = ((tx as CreateTx).object as unknown) as Message
     return message.comments ? message.comments[0].message : ''
   }

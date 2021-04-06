@@ -20,7 +20,7 @@
   import Presenter from '../Presenter.svelte'
 
   export let value: any
-  export let editable: boolean = true
+  export let editable = true
   export let attribute: AttrModel
 
   let itemAttributes: AttrModel[] = []
@@ -39,6 +39,22 @@
   }
 </script>
 
+<div class="array-container">
+  {#if value && itemAttributes}
+    {#each value as item (item.message)}
+      <div class="attributes-container">
+        {#each itemAttributes as attr (attr.key)}
+          {#if attr.presenter}
+            <Presenter is={attr.presenter} {editable} value={item[attr.key] || ''} attribute={attr} />
+          {:else}
+            <span>{item[attr.key] || ''}</span>
+          {/if}
+        {/each}
+      </div>
+    {/each}
+  {/if}
+</div>
+
 <style lang="scss">
   .array-container {
     display: flex;
@@ -49,21 +65,4 @@
     display: flex;
     flex-direction: column;
   }
-
 </style>
-
-<div class="array-container">
-  {#if value && itemAttributes}
-    {#each value as item (item.message)}
-      <div class="attributes-container">
-        {#each itemAttributes as attr (attr.key)}
-          {#if attr.presenter}
-            <Presenter is={attr.presenter} {editable} value={item[attr.key] || '' } attribute={attr} />
-          {:else}
-            <span>{item[attr.key] || ''}</span>
-          {/if}
-        {/each}
-      </div>
-    {/each}
-  {/if}
-</div>
