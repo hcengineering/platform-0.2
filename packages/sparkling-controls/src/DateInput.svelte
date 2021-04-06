@@ -40,9 +40,7 @@
       <input type="text" {placeholder} value={value && value.toDateString()} />
     {/if}
   </div>
-  <div class="calendar-container">
-    <MonthCalendar bind:selectedDate={value} />
-  </div>
+  <MonthCalendar bind:selectedDate={value} />
 </PopupMenu>
 
 <style lang="scss">
