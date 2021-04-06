@@ -22,7 +22,8 @@
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
   import type { Doc, Ref } from '@anticrm/core'
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
-  import workbench, { WorkbenchApplication } from '@anticrm/workbench'
+  import workbench from '@anticrm/workbench'
+  import type { WorkbenchApplication } from '@anticrm/workbench'
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
 
   import CreateSpace from './CreateSpace.svelte'
@@ -35,7 +36,6 @@
   const uiService = getUIService()
 
   let spaces: Space[] = []
-  let filter: string
   let hoverSpace: Ref<Doc>
 
   const curentUser = getUserId()
@@ -59,8 +59,7 @@
         kind="transparent"
         on:click={() => {
           uiService.showModal(CreateSpace, { application })
-        }}
-      >
+        }}>
         <Icon icon={workbench.icon.Add} button="true" />
         <span style="padding-left:.5em">Новое пространство</span>
       </Button>

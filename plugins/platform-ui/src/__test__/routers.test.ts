@@ -21,18 +21,18 @@ import { Class, Doc, Ref } from '@anticrm/core'
 import { locationToUrl } from '../location'
 
 interface MyProps {
-  spaceId: Ref<Space>
-  objId: Ref<Doc>
-  _class: Ref<Class<Doc>>
+  spaceId: Ref<Space>;
+  objId: Ref<Doc>;
+  _class: Ref<Class<Doc>>;
 }
 
 interface ChildProps {
-  docId: Ref<Doc>
-  filter: string
+  docId: Ref<Doc>;
+  filter: string;
 }
 
 interface ParentProps {
-  author: string
+  author: string;
 }
 
 describe('routes', () => {

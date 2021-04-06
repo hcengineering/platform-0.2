@@ -14,14 +14,33 @@
 
   export let dateItem: Date
 
-  const month = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
-	const days = ['воскресенье', 'понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота'];
+  const month = [
+    'января',
+    'февраля',
+    'марта',
+    'апреля',
+    'мая',
+    'июня',
+    'июля',
+    'августа',
+    'сентября',
+    'октября',
+    'ноября',
+    'декабря'
+  ]
+  const days = ['воскресенье', 'понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота']
 
   const day: number = new Date(dateItem).getDate()
   const iDay: number = new Date(dateItem).getDay()
   const iMonth: number = new Date(dateItem).getMonth()
-
 </script>
+
+<div class="message-item">
+  <div class="icon" class:holy={!iDay}>{day}</div>
+  <div class="details">
+    {month[iMonth + 1]}, {days[iDay]}
+  </div>
+</div>
 
 <style lang="scss">
   .message-item {
@@ -36,7 +55,7 @@
       font-family: var(--theme-font-content);
       text-align: center;
       font-weight: 500;
-      color: #32302E;
+      color: #32302e;
       position: relative;
       z-index: 100;
       &::before {
@@ -76,10 +95,3 @@
     }
   }
 </style>
-
-<div class="message-item">
-  <div class="icon" class:holy={!iDay}>{day}</div>
-  <div class="details">
-    {month[iMonth + 1]}, {days[iDay]}
-  </div>
-</div>

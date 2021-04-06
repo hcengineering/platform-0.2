@@ -48,7 +48,7 @@ limitations under the License.
     name: ''
   }
 
-  let candidateM: WithCandidateProps['candidate'] = {
+  const candidateM: WithCandidateProps['candidate'] = {
     __embedded: true,
     _class: candidate.class.Candidate,
     bio: '',

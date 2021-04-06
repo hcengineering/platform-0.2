@@ -1,3 +1,17 @@
+export type PanMoveEvent = CustomEvent<{
+    x: number
+    y: number
+    dx: number
+    dy: number
+}>
+
+export type PanStartEvent = CustomEvent<{
+  x: number
+  y: number
+}>
+
+export type PanEndEvent = PanStartEvent
+
 export function pannable (node: HTMLElement): { destroy: () => void } {
   let x: number
   let y: number
@@ -6,9 +20,11 @@ export function pannable (node: HTMLElement): { destroy: () => void } {
     x = event.clientX
     y = event.clientY
 
-    node.dispatchEvent(new CustomEvent('panstart', {
+    const panStartEvt = new CustomEvent('panstart', {
       detail: { x, y }
-    }))
+    })
+
+    node.dispatchEvent(panStartEvt)
 
     window.addEventListener('mousemove', handleMousemove)
     window.addEventListener('mouseup', handleMouseup)
@@ -20,18 +36,21 @@ export function pannable (node: HTMLElement): { destroy: () => void } {
     x = event.clientX
     y = event.clientY
 
-    node.dispatchEvent(new CustomEvent('panmove', {
+    const panMoveEvt: PanMoveEvent = new CustomEvent('panmove', {
       detail: { x, y, dx, dy }
-    }))
+    })
+
+    node.dispatchEvent(panMoveEvt)
   }
 
   function handleMouseup (event: MouseEvent) {
     x = event.clientX
     y = event.clientY
 
-    node.dispatchEvent(new CustomEvent('panend', {
+    const panEndEvt: PanEndEvent = new CustomEvent('panend', {
       detail: { x, y }
-    }))
+    })
+    node.dispatchEvent(panEndEvt)
 
     window.removeEventListener('mousemove', handleMousemove)
     window.removeEventListener('mouseup', handleMouseup)

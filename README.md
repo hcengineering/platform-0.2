@@ -6,27 +6,28 @@
 
 Anticrm code falls into three major parts: [packages](./packages), [plugins](./plugins) and [server](./server).
 
-* [packages](./packages) contains code shared among client and server, except [packages/platform](./packages/platform)
+- [packages](./packages) contains code shared among client and server, except [packages/platform](./packages/platform)
   which defines plugin architecture and client-side only. _These packages defines most of the core Anticrm concepts._
-* [plugins](./plugins) contains client-side code packaged in form of Anticrm Plugins.
-* [server](./server) contains server-side platform code.
+- [plugins](./plugins) contains client-side code packaged in form of Anticrm Plugins.
+- [server](./server) contains server-side platform code.
 
 Here's the breakdown of the repo:
 
-* Packages:
-    * [@anticrm/foundation](./packages/foundation) –- Anticrm Platform Foundation Types.
-    * [@anticrm/platform](./packages/platform) -- Plugin architecture and implementation. Client-side only.
-    * [@anticrm/core](./packages/core) -- Core concepts shared by Client plugins and Server components.
-    * [@anticrm/model](./packages/model) -- Utils to define and manage domain models. Used by tooling, not a part of
-      client/server runtimes.
+- Packages:
 
-* Plugins:
+  - [@anticrm/foundation](./packages/foundation) –- Anticrm Platform Foundation Types.
+  - [@anticrm/platform](./packages/platform) -- Plugin architecture and implementation. Client-side only.
+  - [@anticrm/core](./packages/core) -- Core concepts shared by Client plugins and Server components.
+  - [@anticrm/model](./packages/model) -- Utils to define and manage domain models. Used by tooling, not a part of
+    client/server runtimes.
+
+- Plugins:
 
 More on [Code Structure](https://platform-one.now.sh/docs/concepts/code-structure/).
 
 ## Install and Run
 
-**Note:** Please use *nodejs* version 14.x or later!
+**Note:** Please use _nodejs_ version 14.x or later!
 
 Use following commands to install and run demo application:
 
@@ -39,7 +40,7 @@ docker run -d -p 127.0.0.1:27017:27017 mongo
 Running MongoDB for MacOS using brew:
 
 ```bash
-brew tap mongodb/brew # Only first time 
+brew tap mongodb/brew # Only first time
 brew install mongodb-community # Only first time
 brew services start mongodb-community # Stop could be used to stop.
 ```
@@ -82,8 +83,8 @@ yarn workspace @anticrm/tool upgrade-workspace workspace
 
 # The Platform Documentation
 
-* [Platform Architecture](https://platform-one.now.sh/docs/concepts/architecture/)
-* [Мотивационная статья](https://medium.com/платформа/го-я-создал-4250ec3dab76)
+- [Platform Architecture](https://platform-one.now.sh/docs/concepts/architecture/)
+- [Мотивационная статья](https://medium.com/платформа/го-я-создал-4250ec3dab76)
 
 ## Run with Server and MongoDb (obsolete, version 1)
 
@@ -98,9 +99,9 @@ yarn workspace @anticrm/tool upgrade-workspace workspace
 
 ## Continuous Integration (obsolete, version 1)
 
-* Build system deploy in-memory-database client to: https://platform-one.now.sh and/or branch-specific URLs (see
+- Build system deploy in-memory-database client to: https://platform-one.now.sh and/or branch-specific URLs (see
   particular commit comments).
-* Build system deploy production client to: http://anticrm-platform.s3-website.us-east-2.amazonaws.com/
+- Build system deploy production client to: http://anticrm-platform.s3-website.us-east-2.amazonaws.com/
 
 # Development
 
@@ -108,4 +109,14 @@ yarn workspace @anticrm/tool upgrade-workspace workspace
 
 ```bash
 yarn add -D @typescript-eslint/eslint-plugin @typescript-eslint/parser eslint eslint-config-standard eslint-plugin-import eslint-plugin-node eslint-plugin-promise eslint-plugin-standard`
+```
+
+## Git hooks
+
+### pre-commit
+
+Create symlink to format and autofix changed files on commit:
+
+```bash
+ln -s ../../git-hooks/pre-commit .git/hooks/pre-commit
 ```

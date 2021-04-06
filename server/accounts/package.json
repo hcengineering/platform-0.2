@@ -6,7 +6,8 @@
     "build": "tsc --build",
     "test": "jest",
     "token": "ts-node src/token.ts",
-    "lint": "eslint src/**/*.ts"
+    "lint": "eslint src",
+    "lint:fix": "eslint --fix src"
   },
   "author": "Anticrm Platform Contributors",
   "license": "EPL-2.0",

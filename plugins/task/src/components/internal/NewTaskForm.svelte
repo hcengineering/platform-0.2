@@ -15,8 +15,7 @@
 <script lang="ts">
   import type { Property, Ref } from '@anticrm/core'
   import { createEventDispatcher } from 'svelte'
-  import type { AttrModel, ClassModel } from '@anticrm/presentation'
-  import { getCoreService, getPresentationService } from '@anticrm/presentation'
+  import { getCoreService } from '@anticrm/presentation'
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import UserBox from '@anticrm/platform-ui/src/components/UserBox.svelte'
   import workbench from '@anticrm/workbench'
@@ -30,7 +29,7 @@
   import chunter, { getChunterService } from '@anticrm/chunter'
 
   export let title: string
-  let message: string = ''
+  let message = ''
   export let space: Ref<Space>
   let object = {} as any
 
@@ -39,24 +38,22 @@
 
   const chunterService = getChunterService()
 
-  let model: ClassModel | undefined
-  let primary: AttrModel | undefined
-
-  const presentationService = getPresentationService()
-
   async function save () {
     const cs = await coreService
-    let modelDb = cs.getModel()
+    const modelDb = cs.getModel()
     const newTask = modelDb.newDoc(task.class.Task, cs.generateId(), {
       title,
-      _space: space, ...object,
+      _space: space,
+      ...object,
       status: TaskStatus.Open,
-      comments: [{
-        message: message,
-        _class: chunter.class.Comment,
-        _createdOn: Date.now() as Property<number, Date>,
-        _createdBy: cs.getUserId() as Property<string, string>
-      } as Comment]
+      comments: [
+        {
+          message: message,
+          _class: chunter.class.Comment,
+          _createdOn: Date.now() as Property<number, Date>,
+          _createdBy: cs.getUserId() as Property<string, string>
+        } as Comment
+      ]
     })
     try {
       const asShortId = modelDb.cast(newTask, CORE_MIXIN_SHORTID)
@@ -72,11 +69,12 @@
     dispatch('close')
   }
 
-  let users: Array<{}> = [{
-    id: 0,
-    url: 'https://platform.exhale24.ru/images/photo-1.png',
-    name: 'Александр Алексеенко'
-  },
+  const users: Array<unknown> = [
+    {
+      id: 0,
+      url: 'https://platform.exhale24.ru/images/photo-1.png',
+      name: 'Александр Алексеенко'
+    },
     {
       id: 1,
       url: 'https://platform.exhale24.ru/images/photo-2.png',
@@ -91,8 +89,41 @@
       id: 3,
       url: 'https://platform.exhale24.ru/images/photo-4.png',
       name: 'Андрей Соболев'
-    }]
+    }
+  ]
 </script>
+
+<div class="recruiting-view">
+  <div class="header">
+    <div class="caption-1 caption">
+      <EditBox id="create_task__input__name" bind:value={title} label="Name" placeholder="Name" />
+    </div>
+    <a href="/" style="margin-left:1.5em" on:click|preventDefault={() => dispatch('close')}>
+      <Icon icon={workbench.icon.Close} button="true" />
+    </a>
+  </div>
+
+  <div class="content">
+    <UserBox items={users} />
+    <div class="separator" />
+    <ReferenceInput
+      stylesEnabled={false}
+      submitEnabled={false}
+      lines={10}
+      on:update={(msg) => {
+        chunterService.then((cs) => {
+          message = cs.createMissedObjects(msg.detail)
+        })
+      }}
+      height="10em"
+      placeholder="Description" />
+  </div>
+
+  <div class="buttons">
+    <Button kind="primary" on:click={save}>Принять</Button>
+    <Button on:click={() => dispatch('close')}>Отказаться</Button>
+  </div>
+</div>
 
 <style lang="scss">
   .recruiting-view {
@@ -118,31 +149,3 @@
     column-gap: 16px;
   }
 </style>
-
-<div class="recruiting-view">
-  <div class="header">
-    <div class="caption-1 caption">
-      <EditBox id="create_task__input__name" bind:value={title}
-               label="Name" placeholder="Name" />
-    </div>
-    <a href="/" style="margin-left:1.5em" on:click|preventDefault={() => dispatch('close')}>
-      <Icon icon={workbench.icon.Close} button="true" />
-    </a>
-  </div>
-
-  <div class="content">
-    <UserBox items={users} />
-    <div class="separator"></div>
-    <ReferenceInput stylesEnabled={false} submitEnabled={false} lines={10} on:update={ (msg) => {
-         chunterService.then( (cs) => {
-           message = cs.createMissedObjects(msg.detail)
-           })
-      }} height="10em" placeholder="Description" />
-  </div>
-
-  <div class="buttons">
-    <Button kind="primary" on:click={save}>Принять</Button>
-    <Button on:click={() => dispatch('close')}>Отказаться</Button>
-  </div>
-</div>
-

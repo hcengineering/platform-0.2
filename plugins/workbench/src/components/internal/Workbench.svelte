@@ -37,14 +37,18 @@
     app: Ref<WorkbenchApplication>
   }
 
-  const router = newRouter<PerspectiveReference>(':perspective', (info) => {
-    activePerspective = info.perspective
+  const router = newRouter<PerspectiveReference>(
+    ':perspective',
+    (info) => {
+      activePerspective = info.perspective
 
-    if (perspectives.length > 0 && activePerspective) {
-      const pp = perspectives.find((h) => h.name === activePerspective) || perspectives[0]
-      component = pp?.component
-    }
-  }, { perspective: '#none' })
+      if (perspectives.length > 0 && activePerspective) {
+        const pp = perspectives.find((h) => h.name === activePerspective) || perspectives[0]
+        component = pp?.component
+      }
+    },
+    { perspective: '#none' }
+  )
 
   createLiveQuery(workbench.class.Perspective, {}, (p) => {
     perspectives = p
@@ -63,10 +67,9 @@
 <div id="workbench">
   <main>
     {#if component}
-      <Component is="{component}" props={activePerspective} />
+      <Component is={component} props={activePerspective} />
     {/if}
   </main>
-
 </div>
 
 <svelte:window on:keydown={handleKeydown} />

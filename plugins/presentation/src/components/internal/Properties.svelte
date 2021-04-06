@@ -29,29 +29,6 @@
   //   .then(m => { model = m.filterAttributes(excludeAttributes) })
 </script>
 
-<!-- { /if } -->
-<style lang="scss">
-  .attributes {
-    display: flex;
-    flex-wrap: wrap;
-
-    margin-top: 1em;
-
-    .group {
-      padding: 0.5em;
-    }
-  }
-
-  .label {
-    color: var(--theme-content-dark-color);
-  }
-
-  .edit {
-    font-family: Raleway;
-    font-size: 14px;
-  }
-</style>
-
 <!-- { #if model} -->
 <div class="attributes">
   {#each model.getGroups() as group (group._class)}
@@ -81,3 +58,26 @@
     </div>
   {/each}
 </div>
+
+<!-- { /if } -->
+<style lang="scss">
+  .attributes {
+    display: flex;
+    flex-wrap: wrap;
+
+    margin-top: 1em;
+
+    .group {
+      padding: 0.5em;
+    }
+  }
+
+  .label {
+    color: var(--theme-content-dark-color);
+  }
+
+  .edit {
+    font-family: Raleway;
+    font-size: 14px;
+  }
+</style>

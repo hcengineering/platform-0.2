@@ -19,9 +19,10 @@
 
   export let value: boolean
   export let attribute: AttrModel
-  export let editable: boolean = true
+  export let editable = true
 
-  $: readOnlyField = attribute && (attribute.type._class === CORE_CLASS_ARRAY_OF || attribute.type._class === CORE_CLASS_INSTANCE_OF)
+  $: readOnlyField =
+    attribute && (attribute.type._class === CORE_CLASS_ARRAY_OF || attribute.type._class === CORE_CLASS_INSTANCE_OF)
 </script>
 
 <CheckBox bind:checked={value} placeholder={attribute.placeholder} {editable} />

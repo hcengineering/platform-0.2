@@ -14,17 +14,21 @@
 
 // Component define a simple popup menu with a set of actions.
 -->
-<script lang='ts'>
-
-  interface Item {
-    name: string
-    action: () => void
-  }
-
+<script lang="ts">
   export let items: unknown[]
 </script>
 
-<style lang='scss'>
+<div class="simple-popup-view">
+  {#each items as item}
+    {#if item.style === 'separator'}
+      <div class="separator" />
+    {:else}
+      <button class="button" on:click={item.action}>{item.name}</button>
+    {/if}
+  {/each}
+</div>
+
+<style lang="scss">
   .simple-popup-view {
     display: flex;
     flex-direction: column;
@@ -55,13 +59,3 @@
     }
   }
 </style>
-
-<div class='simple-popup-view'>
-  {#each items as item}
-    {#if item.style === 'separator'}
-      <div class='separator' />
-    {:else}
-      <button class='button' on:click={item.action}>{item.name}</button>
-    {/if}
-  {/each}
-</div>

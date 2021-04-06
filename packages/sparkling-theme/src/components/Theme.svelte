@@ -1,44 +1,47 @@
 <script lang="ts">
-  import { setContext, onMount } from "svelte";
-  import { writable } from "svelte/store";
-  import { themes as _themes } from "../themes";
-  import type { Theme } from "../themes";
+  import { setContext, onMount } from 'svelte'
+  import { writable } from 'svelte/store'
+  import { themes as _themes } from '../themes'
+  import type { Theme } from '../themes'
 
-  export let themes = [..._themes];
-  const getTheme = (name: string): Theme =>
-    themes.find((h) => h.name === name) as Theme;
-  let current = getTheme("dark");
-  const Theme = writable(current);
+  export let themes = [..._themes]
+  const getTheme = (name: string): Theme => themes.find((h) => h.name === name) as Theme
+  const current = getTheme('dark')
+  const ThemeStore = writable(current)
 
-  setContext("theme", {
-    theme: Theme,
+  setContext('theme', {
+    theme: ThemeStore,
     setTheme: (name: string) => {
-      const theme = getTheme(name);
-      setRootColors(theme);
-      Theme.update(() => theme);
-    },
-  });
+      const theme = getTheme(name)
+      setRootColors(theme)
+      ThemeStore.update(() => theme)
+    }
+  })
 
   const setRootColors = (theme: Theme) => {
-    for (let [prop, color] of Object.entries(theme.colors)) {
-      let varString = `--theme-${prop}`;
-      document.documentElement.style.setProperty(varString, color);
+    for (const [prop, color] of Object.entries(theme.colors)) {
+      const varString = `--theme-${prop}`
+      document.documentElement.style.setProperty(varString, color)
     }
-    document.documentElement.style.setProperty("--theme-name", theme.name);
-  };
+    document.documentElement.style.setProperty('--theme-name', theme.name)
+  }
 
   onMount(() => {
-    setRootColors(current);
-  });
+    setRootColors(current)
+  })
 </script>
+
+<slot>
+  <!-- content will go here -->
+</slot>
 
 <style lang="scss" global>
   * {
     --white-color: #fff;
-    --status-blue-color: #2D6AB9;
-    --status-green-color: #4396A2;
-    --status-grey-color: #78726D;
-    --status-maroon-color: #B92D52;
+    --status-blue-color: #2d6ab9;
+    --status-green-color: #4396a2;
+    --status-grey-color: #78726d;
+    --status-maroon-color: #b92d52;
 
     scrollbar-color: var(--theme-bg-dark-color) var(--theme-bg-accent-color);
     scrollbar-width: thin;
@@ -70,52 +73,44 @@
   }
 
   @font-face {
-    font-family: "IBM Plex Sans";
+    font-family: 'IBM Plex Sans';
     font-style: normal;
     font-weight: 400;
-    src: local("IBM Plex Sans"), local("IBMPlexSans"),
-      url("~@anticrm/sparkling-theme/fonts/complete/woff2/IBMPlexSans-Regular.woff2")
-        format("woff2"),
-      url("~@anticrm/sparkling-theme/fonts/complete/woff/IBMPlexSans-Regular.woff")
-        format("woff");
+    src: local('IBM Plex Sans'), local('IBMPlexSans'),
+      url('~@anticrm/sparkling-theme/fonts/complete/woff2/IBMPlexSans-Regular.woff2') format('woff2'),
+      url('~@anticrm/sparkling-theme/fonts/complete/woff/IBMPlexSans-Regular.woff') format('woff');
   }
 
   @font-face {
-    font-family: "IBM Plex Sans";
+    font-family: 'IBM Plex Sans';
     font-style: normal;
     font-weight: 500;
-    src: local("IBM Plex Sans Medium"), local("IBMPlexSans-Medium"),
-      url("~@anticrm/sparkling-theme/fonts/complete/woff2/IBMPlexSans-Medium.woff2")
-        format("woff2"),
-      url("~@anticrm/sparkling-theme/fonts/complete/woff/IBMPlexSans-Medium.woff")
-        format("woff");
+    src: local('IBM Plex Sans Medium'), local('IBMPlexSans-Medium'),
+      url('~@anticrm/sparkling-theme/fonts/complete/woff2/IBMPlexSans-Medium.woff2') format('woff2'),
+      url('~@anticrm/sparkling-theme/fonts/complete/woff/IBMPlexSans-Medium.woff') format('woff');
   }
 
   @font-face {
-    font-family: "IBM Plex Sans";
+    font-family: 'IBM Plex Sans';
     font-style: normal;
     font-weight: 700;
-    src: local("IBM Plex Sans Bold"), local("IBMPlexSans-Bold"),
-      url("~@anticrm/sparkling-theme/fonts/complete/woff2/IBMPlexSans-Bold.woff2")
-        format("woff2"),
-      url("~@anticrm/sparkling-theme/fonts/complete/woff/IBMPlexSans-Bold.woff")
-        format("woff");
+    src: local('IBM Plex Sans Bold'), local('IBMPlexSans-Bold'),
+      url('~@anticrm/sparkling-theme/fonts/complete/woff2/IBMPlexSans-Bold.woff2') format('woff2'),
+      url('~@anticrm/sparkling-theme/fonts/complete/woff/IBMPlexSans-Bold.woff') format('woff');
   }
 
   @font-face {
-    font-family: "Raleway";
+    font-family: 'Raleway';
     font-style: normal;
     font-weight: 400;
-    src: local("Raleway"),
-      url("~@anticrm/sparkling-theme/fonts/complete/otf/Raleway-Regular.otf");
+    src: local('Raleway'), url('~@anticrm/sparkling-theme/fonts/complete/otf/Raleway-Regular.otf');
   }
 
   @font-face {
-    font-family: "Raleway";
+    font-family: 'Raleway';
     font-style: normal;
     font-weight: 700;
-    src: local("Raleway Bold"),
-      url("~@anticrm/sparkling-theme/fonts/complete/otf/Raleway-Bold.otf");
+    src: local('Raleway Bold'), url('~@anticrm/sparkling-theme/fonts/complete/otf/Raleway-Bold.otf');
   }
 
   .editbox {
@@ -125,7 +120,7 @@
     background-color: var(--theme-bg-accent-color);
     box-sizing: border-box;
     color: var(--theme-content-color);
-    transition: border-color .2s, color .2s, background-color .2s;
+    transition: border-color 0.2s, color 0.2s, background-color 0.2s;
 
     &:focus-within {
       outline: none;
@@ -160,7 +155,7 @@
 
     color: var(--theme-content-color);
     background-color: var(--theme-bg-accent-color);
-    transition: border-color .2s, color .2s, background-color .2s;
+    transition: border-color 0.2s, color 0.2s, background-color 0.2s;
 
     &:focus {
       outline: none;
@@ -296,7 +291,7 @@
   }
 
   .caption-4 {
-    font-family: "IBM Plex Sans";
+    font-family: 'IBM Plex Sans';
     color: var(--theme-caption-color);
     font-size: 10px;
     font-weight: 700;
@@ -304,7 +299,7 @@
   }
 
   .caption-5 {
-    font-family: "IBM Plex Sans";
+    font-family: 'IBM Plex Sans';
     color: var(--theme-caption-color);
     font-size: 10px;
     font-weight: 400;
@@ -312,7 +307,7 @@
   }
 
   .caption-6 {
-    font-family: "IBM Plex Sans";
+    font-family: 'IBM Plex Sans';
     color: var(--theme-caption-color);
     font-size: 9px;
     font-weight: 700;
@@ -393,7 +388,3 @@
     -moz-osx-font-smoothing: grayscale;
   }
 </style>
-
-<slot>
-  <!-- content will go here -->
-</slot>

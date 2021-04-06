@@ -27,14 +27,14 @@
   import { CORE_CLASS_VDOC } from '@anticrm/domains'
   import Component from '@anticrm/platform-ui/src/components/Component.svelte'
 
-  export let title: string = ''
+  export let title = ''
   export let _class: Ref<Class<Doc>>
   export let space: Ref<Space>
   let object = {} as any
 
   const coreService = getCoreService()
 
-  let createFormComponent: AnyComponent | undefined = undefined
+  let createFormComponent: AnyComponent | undefined
   const dispatch = createEventDispatcher()
 
   let model: ClassModel | undefined
@@ -46,7 +46,8 @@
     const doc = {
       _class,
       [primary?.key || 'name']: title,
-      _space: space, ...object
+      _space: space,
+      ...object
     }
 
     object = {}
@@ -61,12 +62,38 @@
     getComponentExtension(_class, presentation.mixin.CreateForm).then((ext) => {
       createFormComponent = ext
     }),
-    presentationService.then(ps => ps.getClassModel(_class, CORE_CLASS_VDOC).then((m) => {
-      const mp = m.filterPrimary()
-      model = mp.model
-      primary = mp.primary
-    }))])
+    presentationService.then((ps) =>
+      ps.getClassModel(_class, CORE_CLASS_VDOC).then((m) => {
+        const mp = m.filterPrimary()
+        model = mp.model
+        primary = mp.primary
+      })
+    )
+  ])
 </script>
+
+{#await init then _}
+  {#if createFormComponent}
+    <Component is={createFormComponent} props={{ space: space }} on:change on:close={() => dispatch('close')} />
+  {:else}
+    <div class="recruiting-view">
+      <div class="header">
+        <div class="caption-1 caption">
+          <InlineEdit bind:value={title} placeholder="Title" fullWidth="true" />
+        </div>
+        <a href="/" style="margin-left:1.5em" on:click|preventDefault={() => dispatch('close')}>
+          <Icon icon={workbench.icon.Close} button="true" />
+        </a>
+      </div>
+
+      <Properties {model} bind:object />
+      <div class="buttons">
+        <Button kind="primary" on:click={save}>Принять</Button>
+        <Button on:click={() => dispatch('close')}>Отказаться</Button>
+      </div>
+    </div>
+  {/if}
+{/await}
 
 <style lang="scss">
   .recruiting-view {
@@ -91,28 +118,3 @@
     column-gap: 16px;
   }
 </style>
-
-{#await init then _}
-  {#if createFormComponent}
-    <Component is={createFormComponent} props={{space:space}} on:change
-               on:close={()=>dispatch('close')} />
-  {:else}
-    <div class="recruiting-view">
-      <div class="header">
-        <div class="caption-1 caption">
-          <InlineEdit bind:value={title} placeholder="Title" fullWidth="true" />
-        </div>
-        <a href="/" style="margin-left:1.5em" on:click|preventDefault={() => dispatch('close')}>
-          <Icon icon={workbench.icon.Close} button="true" />
-        </a>
-      </div>
-
-      <Properties {model} bind:object />
-      <div class="buttons">
-        <Button kind="primary" on:click={save}>Принять</Button>
-        <Button on:click={() => dispatch('close')}>Отказаться</Button>
-      </div>
-    </div>
-  {/if}
-{/await}
-

@@ -24,7 +24,7 @@ console.log(modelJson)
 const stringsJson = JSON.stringify(Strings)
 console.log(stringsJson)
 
-export function dumpToFile () {
+export function dumpToFile (): void {
   const fs = require('fs') // eslint-disable-line @typescript-eslint/no-var-requires
 
   fs.writeFile(path.join(__dirname, '/../../prod/src/model.json'), modelJson, 'utf8', (err: Error) => {

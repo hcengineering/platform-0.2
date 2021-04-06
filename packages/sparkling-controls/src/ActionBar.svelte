@@ -1,15 +1,15 @@
 <script lang="ts">
-  export let onTop: Number = 2
-  export let actions: Array<Object> = []
+  export let onTop = 2
+  export let actions: Array<unknown> = []
 
   function getStyle (pos: number, total: number, onTop: number): string {
-    if (total == 1) {
+    if (total === 1) {
       return 'w100' // A full row, since one item
     }
-    if (pos == 0) {
+    if (pos === 0) {
       return 'abLeft w100'
     }
-    if (pos == total - 1 && total == onTop) {
+    if (pos === total - 1 && total === onTop) {
       // All items are on top, we need to add right style
       return 'abRight w100'
     }
@@ -22,47 +22,51 @@
   // Popup
   let thisPopup: HTMLElement
   let thisTrigger: HTMLElement
-  let visible: boolean = false
+  let visible = false
 
-  let popups: number = 0
   if (onTop < 0) onTop = 2
   if (onTop > actions.length) onTop = actions.length
 
-  function handler (event: MouseEvent): void {
-    if (event.target !== thisPopup || event.target !== this.Trigger) {
-      visible = false
-    }
-  }
-
-  function handleAction (action: Action) {
-    action.action()
+  function handleAction (action: any) {
+    action.action?.()
   }
 </script>
 
-<svelte:window on:click={()=>visible = false} />
+<svelte:window
+  on:click={() => {
+    visible = false
+  }} />
 <div class="actionBar-view">
   {#each actions.slice(0, onTop) as item}
     {#if item.label !== '-'}
-      <button class="button actionButton {getStyle(actions.indexOf(item), actions.length, onTop)}"
-              class:toggleState={item.toggleState}
-              on:click={() => {item.action(); visible = false;}}>{item.label}</button>
+      <button
+        class="button actionButton {getStyle(actions.indexOf(item), actions.length, onTop)}"
+        class:toggleState={item.toggleState}
+        on:click={() => {
+          item.action()
+          visible = false
+        }}>{item.label}</button>
     {/if}
   {/each}
-  {#if (actions.length - onTop) > 0}
-    <button bind:this={thisTrigger} class="button actionButton {onTop !== 0 ? 'abRight' : ''} w100 wOther" class:selected={visible}
-            on:click|stopPropagation={() => { visible = !visible}}>
+  {#if actions.length - onTop > 0}
+    <button
+      bind:this={thisTrigger}
+      class="button actionButton {onTop !== 0 ? 'abRight' : ''} w100 wOther"
+      class:selected={visible}
+      on:click|stopPropagation={() => {
+        visible = !visible
+      }}>
       <div class="chevron">
         <span>Ещё</span>
-        <span class="arrowDown"></span>
+        <span class="arrowDown" />
       </div>
       {#if visible}
         <div bind:this={thisPopup} class="popup-menu-view">
           {#each actions.slice(onTop) as popup}
             {#if popup.label === '-'}
-              <div class="popup-separator"></div>
+              <div class="popup-separator" />
             {:else}
-              <button class="popup-item"
-                      on:click={handleAction(popup)}>{popup.label}</button>
+              <button class="popup-item" on:click={handleAction(popup)}>{popup.label}</button>
             {/if}
           {/each}
         </div>
@@ -95,7 +99,7 @@
 
     color: var(--theme-content-color);
     background-color: var(--theme-bg-accent-color);
-    transition: border-color .2s, color .2s, background-color .2s;
+    transition: border-color 0.2s, color 0.2s, background-color 0.2s;
 
     &:focus {
       outline: none;
@@ -203,7 +207,7 @@
     position: relative;
     width: 16px;
     height: 16px;
-    
+
     &::after {
       content: '';
       position: absolute;

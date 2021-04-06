@@ -67,8 +67,8 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
     },
 
     async push (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, query: AnyLayout | null, attribute: StringProperty, attributes: AnyLayout): Promise<any> {
-      if (isValidQuery(query)) {
-        const filters = createPushArrayFilters(memdb, _class, query!, attribute, attributes)
+      if (query && isValidQuery(query)) {
+        const filters = createPushArrayFilters(memdb, _class, query, attribute, attributes)
         return collection(_class).updateOne({ _id }, { $push: filters.updateOperation }, { arrayFilters: filters.arrayFilters })
       }
       const value = {
@@ -88,8 +88,8 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
     },
 
     async update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, query: AnyLayout | null, attributes: AnyLayout): Promise<any> {
-      if (isValidQuery(query)) {
-        const filters = createSetArrayFilters(memdb, _class, query!, attributes)
+      if (query && isValidQuery(query)) {
+        const filters = createSetArrayFilters(memdb, _class, query, attributes)
         return collection(_class).updateOne({ _id }, { $set: filters.updateOperation },
           { arrayFilters: filters.arrayFilter })
       }
@@ -97,9 +97,9 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
     },
 
     async remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, query: AnyLayout | null): Promise<any> {
-      if (isValidQuery(query)) {
+      if (query && isValidQuery(query)) {
         // Operation over embedded child object, path to it should be matched by query object.
-        const filters = createPullArrayFilters(memdb, _class, query!)
+        const filters = createPullArrayFilters(memdb, _class, query)
         if (filters.isArrayAttr) {
           return collection(_class).updateOne({ _id }, { $pull: filters.updateOperation }, { arrayFilters: filters.arrayFilters })
         } else {

@@ -141,15 +141,15 @@ describe('server', () => {
     })
 
     // Check we had one
-    expect((await getAccount(db, 'andrey'))!.workspaces.length).toEqual(1)
-    expect((await getWorkspace(db, workspace))!.accounts.length).toEqual(1)
+    expect((await getAccount(db, 'andrey'))?.workspaces.length).toEqual(1)
+    expect((await getWorkspace(db, workspace))?.accounts.length).toEqual(1)
 
     await methods.removeWorkspace(db, {
       method: 'removeWorkspace',
       params: ['andrey', workspace]
     })
-    expect((await getAccount(db, 'andrey'))!.workspaces.length).toEqual(0)
-    expect((await getWorkspace(db, workspace))!.accounts.length).toEqual(0)
+    expect((await getAccount(db, 'andrey'))?.workspaces.length).toEqual(0)
+    expect((await getWorkspace(db, workspace))?.accounts.length).toEqual(0)
   })
 
   afterAll(async () => {

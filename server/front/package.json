@@ -5,7 +5,8 @@
     "build": "tsc --build",
     "test": "echo 'no tests'",
     "start": "ts-node src/index.ts",
-    "lint": "eslint src/**/*.ts"
+    "lint": "eslint src",
+    "lint:fix": "eslint --fix src"
   },
   "author": "Anticrm Platform Contributors",
   "license": "EPL-2.0",

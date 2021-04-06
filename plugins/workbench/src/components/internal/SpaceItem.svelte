@@ -1,11 +1,10 @@
 <script lang="ts">
-
-  export let selected: boolean = false
-  export let label: string = ''
-  export let count: number = 0
+  export let selected = false
+  export let label = ''
+  export let count = 0
 </script>
 
-<div class="item" class:selected={selected}>
+<div class="item" class:selected>
   {label}
   {#if count > 0}
     <div class="counter">{count}</div>

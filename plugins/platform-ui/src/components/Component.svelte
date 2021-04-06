@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 -->
-
 <script lang="ts">
   import type { Platform } from '@anticrm/platform'
   import { getContext } from 'svelte'
@@ -27,7 +26,7 @@
 
   const platform = getContext('platform') as Platform
   let component: AnyComponent
-  const compUpdate = e => {
+  const compUpdate = (e) => {
     if (component !== e) {
       component = e
     }
@@ -35,7 +34,10 @@
   }
   let componentPromise = new Promise((resolve) => {
     if (is) {
-      platform.getResource(is).then(compUpdate).then(() => resolve())
+      platform
+        .getResource(is)
+        .then(compUpdate)
+        .then(() => resolve())
     }
   })
   $: {
@@ -45,11 +47,13 @@
   }
 </script>
 
-{#await componentPromise }
+{#await componentPromise}
   <Spinner />
 {:then ctor}
   <svelte:component this={component} {...props} on:change on:close on:open />
 {:catch err}
-  ERROR: {console.log(err, JSON.stringify(component))} {props} { err }
+  ERROR: {console.log(err, JSON.stringify(component))}
+  {props}
+  {err}
   <Icon icon={ui.icon.Error} size="32" />
 {/await}

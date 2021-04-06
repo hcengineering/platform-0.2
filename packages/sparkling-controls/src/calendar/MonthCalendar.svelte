@@ -25,19 +25,19 @@
     weekday
   } from './internal/DateUtils'
 
-  export let mondayStart: boolean = false
+  export let mondayStart = false
   export let weekFormat: 'narrow' | 'short' | 'long' | undefined = 'short'
-  export let selectedDate: Date | undefined = undefined
+  export let selectedDate: Date | undefined
   export let todayDate: Date = new Date()
 
   let currentDate: Date = selectedDate || todayDate
   let firstDayOfCurrentMonth: Date = firstDay(currentDate, mondayStart)
 
-  function onSelect(date: Date) {
+  function onSelect (date: Date) {
     selectedDate = date
   }
 
-  function incMonth(count: number) {
+  function incMonth (count: number) {
     if (count) {
       currentDate = incrementMonth(currentDate, count)
       firstDayOfCurrentMonth = firstDay(currentDate, mondayStart)
@@ -48,7 +48,7 @@
 <div class="month-calendar">
   <div class="selected-month-controller">
     <Button size="small" on:click={() => incMonth(-1)}>&lt;</Button>
-    <div class="month-name">{getMonthName(currentDate) + ' ' + currentDate.getFullYear()}</div>
+    <div class="month-name">{`${getMonthName(currentDate)} ${currentDate.getFullYear()}`}</div>
     <Button size="small" on:click={() => incMonth(1)}>&gt;</Button>
   </div>
   <div class="days-of-week-header">
@@ -64,8 +64,7 @@
           class:weekend={isWeekend(weekday(firstDayOfCurrentMonth, weekIndex, dayOfWeek))}
           class:today={areDatesEqual(todayDate, weekday(firstDayOfCurrentMonth, weekIndex, dayOfWeek))}
           class:selected={areDatesEqual(selectedDate, weekday(firstDayOfCurrentMonth, weekIndex, dayOfWeek))}
-          on:click={() => onSelect(weekday(firstDayOfCurrentMonth, weekIndex, dayOfWeek))}
-        >
+          on:click={() => onSelect(weekday(firstDayOfCurrentMonth, weekIndex, dayOfWeek))}>
           {weekday(firstDayOfCurrentMonth, weekIndex, dayOfWeek).getDate()}
         </div>
       {/each}

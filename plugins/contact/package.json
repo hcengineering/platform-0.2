@@ -7,7 +7,8 @@
   "scripts": {
     "build": "tsc",
     "test": "echo 'no tests'",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "lint:fix": "eslint --fix src"
   },
   "dependencies": {
     "@anticrm/platform": "^0.2.0"

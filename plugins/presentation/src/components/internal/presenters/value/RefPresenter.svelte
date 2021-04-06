@@ -36,7 +36,7 @@
   })
 
   $: {
-    coreService.then(cs => {
+    coreService.then((cs) => {
       const model = cs.getModel()
       const objClass = (attribute.type as RefTo<Doc>).to
       const typeClass = model.get(objClass) as Class<Type>
@@ -50,10 +50,8 @@
   }
 </script>
 
-{#if doc && presenter }
+{#if doc && presenter}
   <Presenter is={presenter} value={doc} {attribute} {editable} />
 {:else}
   {value}
 {/if}
-
-

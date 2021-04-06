@@ -1,13 +1,13 @@
-<script lang='ts'>
-  export const separator: boolean = false
+<script lang="ts">
+  export const separator = false
 </script>
 
-{#if (!separator)}
+{#if !separator}
   <div class="popup-item-view" on:click>
     <slot />
   </div>
 {:else}
-  <div class="popup-separator"></div>
+  <div class="popup-separator" />
 {/if}
 
 <style lang="scss">

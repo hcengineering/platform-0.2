@@ -103,6 +103,7 @@ export default (platform: Platform, deps: { ui: UIService }): Promise<LoginServi
     }
 
     try {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const response = await fetch(accountsUrl!, {
         method: 'POST',
         headers: {
@@ -134,6 +135,7 @@ export default (platform: Platform, deps: { ui: UIService }): Promise<LoginServi
     }
 
     try {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const response = await fetch(accountsUrl!, {
         method: 'POST',
         headers: {

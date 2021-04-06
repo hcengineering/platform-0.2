@@ -33,9 +33,9 @@
   let statusType: Enum<TaskStatus> | undefined
   let status: TaskStatus = TaskStatus.Open
 
-  let statusColors: Map<TaskStatus, string> = new Map()
+  const statusColors: Map<TaskStatus, string> = new Map()
 
-  coreService.then(async cs => {
+  coreService.then(async (cs) => {
     model = cs.getModel()
     statusType = await cs.findOne(CORE_CLASS_ENUM, { _id: task.enum.TaskStatus })
   })
@@ -45,7 +45,7 @@
 
   $: {
     if (statusType) {
-      let acts: Action[] = []
+      const acts: Action[] = []
       for (const s of Object.entries(statusType._literals)) {
         const statKey = parseInt(s[0]) as TaskStatus
         if (object && object.status === statKey) {
@@ -59,26 +59,31 @@
             acts.push({
               name: act.action,
               action: () => {
-                coreService.then(cs => cs.update(object, null, { status: statKey as NumberProperty }))
+                coreService.then((cs) => cs.update(object, null, { status: statKey as NumberProperty }))
               }
             })
           }
         }
       }
       statusActions = acts
-      coreService.then(cs => {
+      coreService.then((cs) => {
         taskShortId = cs.getModel().as(object, CORE_MIXIN_SHORTID)
       })
     }
   }
-
 </script>
 
 <div class="taskContent">
   <div class="caption caption-1">
-    <InlineEdit id="create_task__input__name" bind:value={object.title} width="100%"
-                label="Name" placeholder="Name"
-                on:change={async () => {(await coreService).update(object, null, {title: object.title})}} />
+    <InlineEdit
+      id="create_task__input__name"
+      bind:value={object.title}
+      width="100%"
+      label="Name"
+      placeholder="Name"
+      on:change={async () => {
+        (await coreService).update(object, null, { title: object.title })
+      }} />
   </div>
   <div class="taskStatusBar">
     <div class="taskName">
@@ -89,14 +94,12 @@
     <StatusLabel text={TaskStatus[status]} color={statusColors.get(status)} />
   </div>
   <div class="created">
-    <UserInfo url="https://platform.exhale24.ru/images/photo-1.png"
-              title="Александр Алексеенко" />
+    <UserInfo url="https://platform.exhale24.ru/images/photo-1.png" title="Александр Алексеенко" />
     <div class="createdOn">30.11.20, 15:30</div>
   </div>
-  <UserInfo url="https://platform.exhale24.ru/images/photo-2.png"
-            title="Андрей Платов" subtitle="Исполнитель" />
+  <UserInfo url="https://platform.exhale24.ru/images/photo-2.png" title="Андрей Платов" subtitle="Исполнитель" />
 
-  {#if statusActions.length > 0 }
+  {#if statusActions.length > 0}
     <ActionBar onTop="2" actions={statusActions} />
   {/if}
 

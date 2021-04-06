@@ -9,9 +9,9 @@
   import { getCoreService } from '@anticrm/presentation'
   import { getUIService } from '@anticrm/platform-ui'
 
-  export let selected: boolean = false
+  export let selected = false
   export let space: Space = {} as Space
-  export let count: number = 0
+  export let count = 0
 
   const coreService = getCoreService()
   const uiService = getUIService()
@@ -19,9 +19,9 @@
   let optionsButton: HTMLElement
 </script>
 
-<div class="item" class:selected={selected}>
+<div class="item" class:selected>
   {getSpaceName(space)}
-  <div class="separator"></div>
+  <div class="separator" />
   {#if count > 0}
     <div class="counter">{count}</div>
   {/if}
@@ -31,18 +31,24 @@
         <div class="popup" slot="trigger">
           <Icon icon={workbench.icon.Burger} />
         </div>
-        <PopupItem on:click={() => {
+        <PopupItem
+          on:click={() => {
             uiService.showModal(AddUser, { space })
-          }}>Add user
+          }}
+          >Add user
         </PopupItem>
         <PopupItem separator="true" />
-        <PopupItem on:click={() => {
+        <PopupItem
+          on:click={() => {
             leaveSpace(coreService, space)
-          }}>Leave
+          }}
+          >Leave
         </PopupItem>
-        <PopupItem on:click={() => {
+        <PopupItem
+          on:click={() => {
             archivedSpaceUpdate(coreService, space, !space.archived)
-          }}>Archive
+          }}
+          >Archive
         </PopupItem>
       </PopupMenu>
     </div>
@@ -105,6 +111,6 @@
   }
 
   .optionsButton {
-    margin-left: .5em;
+    margin-left: 0.5em;
   }
 </style>

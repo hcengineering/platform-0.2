@@ -13,12 +13,12 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  export let width: string = '100%'
-  export let label: string = ''
-  export let value: string | undefined = ''
+  export let width = '100%'
+  export let label = ''
+  export let value = ''
   export let placeholder: string
   export let id: string | undefined = undefined
-  export let hoverState: boolean = false
+  export let hoverState = false
 
   let input: HTMLElement
 </script>
@@ -28,8 +28,7 @@
   class:editbox-label={label !== ''}
   class:editbox-hoverState={hoverState}
   style="width: {width}"
-  on:click={input.focus()}
->
+  on:click={input.focus()}>
   {#if label !== ''}
     <div class="wLabel">
       <div class="label">{label}</div>

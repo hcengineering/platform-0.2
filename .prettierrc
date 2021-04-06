@@ -1,12 +1,13 @@
 {
-  semi: false,
-  singleQuote: true,
-  spaceBeforeFunctionParen: true,
-  trailingComma: "none",
-  parenSpacing: true,
-  printWidth: 120,
-  tabWidth: 2,
-  useTabs: false,
-  quoteProps: "as-needed",
-  bracketSpacing: true
+  "svelteAllowShorthand": true,
+  "svelteBracketNewLine": false,
+  "svelteIndentScriptAndStyle": true,
+  "svelteSortOrder": "scripts-markup-options-styles",
+  "printWidth": 120,
+  "tabWidth": 2,
+  "useTabs": false,
+  "singleQuote": true,
+  "arrowParens": "always",
+  "trailingComma": "none",
+  "semi": false
 }

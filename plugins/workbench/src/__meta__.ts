@@ -17,7 +17,7 @@ import { Platform } from '@anticrm/platform'
 import workbench from '.'
 import { routeMeta } from '@anticrm/platform-ui'
 
-export default (platform: Platform) => {
+export default (platform: Platform): void => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const spritesUrl = require('../assets/icons.svg')
   platform.loadMetadata(workbench.icon, {

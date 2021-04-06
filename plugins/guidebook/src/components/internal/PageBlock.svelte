@@ -2,9 +2,9 @@
   import Prism from 'prismjs'
   import 'prism-svelte'
 
-  export let text: string = ''
-  export let code: string = ''
-  export let label: string = ''
+  export let text = ''
+  export let code = ''
+  export let label = ''
 
   $: highlighted = Prism.highlight(code, Prism.languages.svelte, 'svelte')
 </script>
@@ -157,26 +157,10 @@
       margin-top: 1em; /* Same as .prism’s padding-top */
 
       background: hsla(24, 20%, 50%, 0.08);
-      background: -moz-linear-gradient(
-        left,
-        hsla(24, 20%, 50%, 0.1) 70%,
-        hsla(24, 20%, 50%, 0)
-      );
-      background: -webkit-linear-gradient(
-        left,
-        hsla(24, 20%, 50%, 0.1) 70%,
-        hsla(24, 20%, 50%, 0)
-      );
-      background: -o-linear-gradient(
-        left,
-        hsla(24, 20%, 50%, 0.1) 70%,
-        hsla(24, 20%, 50%, 0)
-      );
-      background: linear-gradient(
-        left,
-        hsla(24, 20%, 50%, 0.1) 70%,
-        hsla(24, 20%, 50%, 0)
-      );
+      background: -moz-linear-gradient(left, hsla(24, 20%, 50%, 0.1) 70%, hsla(24, 20%, 50%, 0));
+      background: -webkit-linear-gradient(left, hsla(24, 20%, 50%, 0.1) 70%, hsla(24, 20%, 50%, 0));
+      background: -o-linear-gradient(left, hsla(24, 20%, 50%, 0.1) 70%, hsla(24, 20%, 50%, 0));
+      background: linear-gradient(left, hsla(24, 20%, 50%, 0.1) 70%, hsla(24, 20%, 50%, 0));
 
       pointer-events: none;
 
