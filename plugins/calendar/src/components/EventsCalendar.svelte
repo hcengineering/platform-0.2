@@ -115,8 +115,7 @@
         grid-row-start: ${eventCoordinatesMap.get(e._id).gridRowStart};
         grid-row-end: ${eventCoordinatesMap.get(e._id).gridRowEnd};
         margin-top: ${21 * (eventCoordinatesMap.get(e._id).displayLayer || 1)}px;
-      `}
-      >
+      `}>
         <div class="event">
           {e.summary}
         </div>

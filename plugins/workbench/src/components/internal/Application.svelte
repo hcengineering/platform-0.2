@@ -48,7 +48,7 @@
     presenters = docs
   })
 
-  function filterViewlets(model: Model, presenters: Viewlet[]): Viewlet[] {
+  function filterViewlets (model: Model, presenters: Viewlet[]): Viewlet[] {
     return presenters.filter((d) => {
       for (const cc of application?.classes) {
         if (model.is(cc, d.displayClass)) {
@@ -89,7 +89,7 @@
     })
   }
 
-  function getLabel(str: string): string {
+  function getLabel (str: string): string {
     if (str === 'Pages') return 'New page'
     if (str === 'Tasks') return 'New task'
     if (str === 'Vacancies') return 'Add candidate'

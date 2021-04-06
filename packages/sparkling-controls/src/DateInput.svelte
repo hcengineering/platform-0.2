@@ -29,8 +29,7 @@
     class:date-input-label={label !== ''}
     class:date-input-hoverState={hoverState}
     style="width: {width}"
-    slot="trigger"
-  >
+    slot="trigger">
     {#if label !== ''}
       <div class="wLabel">
         <div class="label">{label}</div>

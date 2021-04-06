@@ -67,8 +67,7 @@
               class:weekend={isWeekend(weekday(firstDayOfCurrentMonth, weekIndex, dayOfWeek))}
               class:today={areDatesEqual(todayDate, weekday(firstDayOfCurrentMonth, weekIndex, dayOfWeek))}
               class:selected={areDatesEqual(selectedDate, weekday(firstDayOfCurrentMonth, weekIndex, dayOfWeek))}
-              on:click={() => onSelect(weekday(firstDayOfCurrentMonth, weekIndex, dayOfWeek))}
-            >
+              on:click={() => onSelect(weekday(firstDayOfCurrentMonth, weekIndex, dayOfWeek))}>
               {weekday(firstDayOfCurrentMonth, weekIndex, dayOfWeek).getDate()}
             </div>
           </div>
