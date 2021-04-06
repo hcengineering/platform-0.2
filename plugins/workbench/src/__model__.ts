@@ -22,7 +22,7 @@ import { TApplication, TDoc } from '@anticrm/model/src/__model__'
 import ux from '@anticrm/presentation'
 import { AnyComponent, Asset } from '@anticrm/platform-ui'
 
-import _workbench, { Perspective, WorkbenchApplication } from '.'
+import _workbench, { ItemCreator, Perspective, WorkbenchApplication } from '.'
 
 const workbench = extendIds(_workbench, {
   component: {},
@@ -57,8 +57,16 @@ class TPerspective extends TDoc implements Perspective {
   @Prop() component!: AnyComponent
 }
 
+@Class$(workbench.class.ItemCreator, core.class.Doc, MODEL_DOMAIN)
+class TItemCreator extends TDoc implements ItemCreator {
+  @Prop() name!: IntlString
+  @Prop() class!: Ref<Class<VDoc>>
+  @Prop() app!: Ref<WorkbenchApplication>
+  @Prop() component?: AnyComponent
+}
+
 export function model (S: Builder): void {
-  S.add(TWorkbenchApplication, TPerspective)
+  S.add(TWorkbenchApplication, TPerspective, TItemCreator)
 
   S.mixin(core.class.Space, ux.mixin.Presenter, {
     presenter: workbench.component.SpacePresenter

@@ -22,18 +22,19 @@ limitations under the License.
   import contact from '@anticrm/contact'
   import personExtras from '@anticrm/person-extras'
   import { getCoreService } from '@anticrm/presentation'
-  import workbench from '@anticrm/workbench/src/__model__'
 
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
   import EditBox from '@anticrm/sparkling-controls/src/EditBox.svelte'
-  import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import ResumeEditor from '@anticrm/person-extras/src/components/ResumeEditor.svelte'
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
+  import SpaceBox from '@anticrm/platform-ui/src/components/SpaceBox.svelte'
 
   import type { WithCandidateProps } from '..'
   import candidate from '..'
 
-  export let space: Ref<Space>
+  export let spaces: Space[]
+
+  let space = spaces[0]
 
   const coreP = getCoreService()
   const modelP = coreP.then((c) => c.getModel())
@@ -42,7 +43,7 @@ limitations under the License.
   const personM: Person = {
     _id: generateId(),
     _class: contact.class.Person,
-    _space: space,
+    _space: space?._id as Ref<Space>,
     _createdBy: '' as StringProperty,
     _createdOn: Date.now() as DateProperty,
     name: ''
@@ -71,7 +72,7 @@ limitations under the License.
 
     const doc = {
       ...personM,
-      _space: space, // Just to get latest space
+      _space: space?._id,
       _createBy: core.getUserId()
     }
 
@@ -87,14 +88,11 @@ limitations under the License.
 </script>
 
 <div class="root">
-  <div class="header">
-    <div class="description">Add Candidate</div>
-    <div on:click={() => dispatch('close')}>
-      <Icon icon={workbench.icon.Close} button={true} />
-    </div>
-  </div>
   <ScrollView height="500px">
     <div class="form">
+      {#if spaces && spaces.length > 1}
+        <SpaceBox label="Vacancy" {spaces} bind:space />
+      {/if}
       <EditBox bind:value={personM.name} label="Name" placeholder="Name" />
       <EditBox bind:value={personM.email} label="Email" placeholder="vasya@email.com" />
       <EditBox bind:value={personM.phone} label="Phone" placeholder="+71234567890" />
@@ -113,18 +111,6 @@ limitations under the License.
 <style lang="scss">
   .root {
     min-width: 450px;
-    padding: 25px;
-  }
-
-  .header {
-    display: flex;
-    padding-bottom: 10px;
-  }
-
-  .description {
-    flex-grow: 1;
-    font-size: 18px;
-    font-weight: 500;
   }
 
   .form {

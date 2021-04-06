@@ -196,7 +196,7 @@ export function model (S: Builder): void {
 
   S.createDocument(workbench.class.WorkbenchApplication, {
     route: 'tasks',
-    label: 'Tasks' as StringProperty,
+    label: 'Tasks' as IntlString,
     icon: task.icon.Task,
     component: workbench.component.Application,
     classes: [task.class.Task],
@@ -210,6 +210,12 @@ export function model (S: Builder): void {
 
   S.mixin(task.class.Task, presentation.mixin.CreateForm, {
     component: task.component.CreateTask
+  })
+
+  S.createDocument(workbench.class.ItemCreator, {
+    app: task.application.Task,
+    class: task.class.Task,
+    name: 'Task' as IntlString
   })
 
   S.mixin(task.class.Task, chunter.mixin.ActivityInfo, {

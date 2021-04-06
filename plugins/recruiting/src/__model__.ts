@@ -62,6 +62,20 @@ export function model (S: Builder): void {
     component: recruiting.component.CandidateList
   })
 
+  S.createDocument(workbench.class.ItemCreator, {
+    app: recruiting.application.Vacancies,
+    class: recruiting.mixin.WithCandidateProps,
+    name: 'Candidate' as IntlString
+  })
+
+  // This is just a temporary example
+  S.createDocument(workbench.class.ItemCreator, {
+    app: recruiting.application.Vacancies,
+    class: recruiting.mixin.WithCandidateProps,
+    name: 'Candidate with custom component' as IntlString,
+    component: recruiting.component.NewCandidate
+  })
+
   S.mixin(recruiting.mixin.WithCandidateProps, presentation.mixin.CreateForm, {
     component: recruiting.component.NewCandidate
   })

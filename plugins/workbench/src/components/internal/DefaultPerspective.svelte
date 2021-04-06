@@ -272,6 +272,107 @@
   {/if}
 </div>
 
+<div class="workbench-perspective">
+  <nav>
+    <div class="app-icon">
+      {#each applications as app}
+        <LinkTo on:click={() => router.navigate({ app: app.route })}>
+          <div class="iconApp">
+            <Icon icon={app.icon} size="24" />
+          </div>
+        </LinkTo>
+      {/each}
+    </div>
+    <div class="remainder" />
+  </nav>
+  <div class="projects" class:mini={!hidden}>
+    <a
+      href="/"
+      style="position:absolute;top:1.5em;right:1.5em;"
+      on:click|preventDefault={() => {
+        hidden = !hidden
+      }}>
+      <Icon icon={workbench.icon.Resize} button="true" />
+    </a>
+    <div class="container" class:hidden={!hidden}>
+      <div class="caption-3">Applications</div>
+      {#each applications as app}
+        <div class="application-box">
+          <div class="app-selector">
+            <div class="nav-link" class:selected={app._id === application._id}>
+              <LinkTo on:click={() => router.navigate({ app: app.route, space: undefined })}>
+                <div class="labeled-icon">
+                  <Icon icon={app.icon} size="16" />
+                  <span> {app.label}</span>
+                </div>
+              </LinkTo>
+            </div>
+            {#if app._id === application._id && app.supportSpaces}
+              <PopupMenu>
+                <div class="popup" slot="trigger">
+                  <Icon icon={ui.icon.Add} button="true" />
+                </div>
+                <PopupItem
+                  on:click={() => {
+                    uiService.showModal(CreateSpace, { application: app })
+                  }}
+                  >Create
+                </PopupItem>
+                <PopupItem
+                  on:click={() => {
+                    uiService.showModal(BrowseSpace, { application: app })
+                  }}
+                  >Browse
+                </PopupItem>
+              </PopupMenu>
+            {/if}
+          </div>
+          <div class="content">
+            {#each appSpaces(spaces, app) as s (s._id)}
+              {#if !s.archived}
+                <LinkTo on:click={() => router.navigate({ app: app.route, space: s.spaceKey })}>
+                  <SpaceItem selected={space && s._id === space._id} space={s} />
+                </LinkTo>
+              {/if}
+            {/each}
+          </div>
+        </div>
+      {/each}
+    </div>
+  </div>
+
+  <div bind:this={prevDiv} class="main">
+    {#if space && application && application.component}
+      <MainComponent
+        is={application.component}
+        {application}
+        {space}
+        on:open={(e) => navigateDocument({ _class: e.detail._class, _id: e.detail._id })} />
+    {:else if application && application.rootComponent}
+      <MainComponent
+        is={application.rootComponent}
+        {application}
+        on:open={(e) => navigateDocument({ _class: e.detail._class, _id: e.detail._id })} />
+    {:else if application}
+      <MainComponent
+        is={workbench.component.ApplicationDashboard}
+        {application}
+        on:open={(e) => navigateDocument({ _class: e.detail._class, _id: e.detail._id })} />
+    {/if}
+  </div>
+  {#if details}
+    <Splitter {prevDiv} {nextDiv} minWidth="404" />
+    <aside bind:this={nextDiv}>
+      <ObjectForm
+        _class={details._class}
+        _objectId={details._id}
+        title="Title"
+        on:close={() => navigateDocument(undefined)}
+        on:noobject={() => (details = undefined)} />
+    </aside>
+  {/if}
+</div>
+
 <style lang="scss">
   .workbench-perspective {
     display: flex;

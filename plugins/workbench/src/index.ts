@@ -41,6 +41,13 @@ export interface WorkbenchApplication extends Application {
   spaceComponent?: AnyComponent // If defined will show component for space selection, instead of default one.
 }
 
+export interface ItemCreator extends Doc {
+  name: IntlString
+  class: Ref<Class<VDoc>>
+  app: Ref<WorkbenchApplication>
+  component?: AnyComponent
+}
+
 export interface WorkbenchService extends Service {
 }
 
@@ -78,7 +85,8 @@ export default plugin('workbench' as Plugin<WorkbenchService>, {
   },
   class: {
     Perspective: '' as Ref<Class<Perspective>>,
-    WorkbenchApplication: '' as Ref<Class<WorkbenchApplication>>
+    WorkbenchApplication: '' as Ref<Class<WorkbenchApplication>>,
+    ItemCreator: '' as Ref<Class<ItemCreator>>
   },
   perspective: {
     Default: '' as Ref<Perspective>
