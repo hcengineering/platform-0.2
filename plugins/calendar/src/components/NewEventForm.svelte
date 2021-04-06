@@ -39,22 +39,22 @@ limitations under the License.
     participants: []
   }
 
-  function getAllDayEventStart(date: Date) {
-    let eventStart = new Date(date.getTime())
+  function getAllDayEventStart (date: Date) {
+    const eventStart = new Date(date.getTime())
     eventStart.setHours(0, 0, 0, 0)
     return eventStart
   }
 
-  function getAllDayEventEnd(date: Date | undefined) {
+  function getAllDayEventEnd (date: Date | undefined) {
     if (!date) {
       return undefined
     }
-    let eventEnd = new Date(date.getTime())
+    const eventEnd = new Date(date.getTime())
     eventEnd.setHours(23, 59, 59, 999)
     return eventEnd
   }
 
-  async function save() {
+  async function save () {
     const core = await coreService
     const doc = {
       ...newEvent,

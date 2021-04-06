@@ -32,7 +32,7 @@
   export let todayDate: Date = new Date()
   export let currentDate: Date = selectedDate || todayDate
   export let firstDayOfCurrentMonth: Date = firstDay(currentDate, mondayStart)
-  export let displayedWeeksCount: number = 6
+  export let displayedWeeksCount = 6
 
   function onSelect (date: Date) {
     selectedDate = date
@@ -61,7 +61,7 @@
     {#each [...Array(displayedWeeksCount).keys()] as weekIndex}
       {#each [...Array(7).keys()] as dayOfWeek}
         <div style={`grid-column-start: ${dayOfWeek + 1}; grid-row-start: ${weekIndex + 1}`}>
-          <div style={`display: flex; width: 100%; height: ${cellHeight + 'px;' || '100%;'}`}>
+          <div style={`display: flex; width: 100%; height: ${cellHeight ? `${cellHeight}px;` : '100%;'}`}>
             <div
               class="cell"
               class:weekend={isWeekend(weekday(firstDayOfCurrentMonth, weekIndex, dayOfWeek))}

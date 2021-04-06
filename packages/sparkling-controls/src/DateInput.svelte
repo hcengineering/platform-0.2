@@ -16,11 +16,11 @@
   import PopupMenu from './menu/PopupMenu.svelte'
   import MonthCalendar from './calendar/MonthCalendar.svelte'
 
-  export let width: string = '100%'
-  export let label: string = ''
+  export let width = '100%'
+  export let label = ''
   export let value: Date | undefined = undefined
   export let placeholder: string
-  export let hoverState: boolean = false
+  export let hoverState = false
 </script>
 
 <PopupMenu width={220}>

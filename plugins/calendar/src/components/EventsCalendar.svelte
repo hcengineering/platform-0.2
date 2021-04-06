@@ -31,14 +31,14 @@
     displayLayer: number
   }
 
-  function getDate(date: Date | string) {
+  function getDate (date: Date | string) {
     if (typeof date === 'string') {
       return new Date(Date.parse(date as string))
     }
     return date
   }
 
-  function isDateInInterval(eventDate: Date | undefined, intervalStart: Date, intervalEnd: Date | undefined): boolean {
+  function isDateInInterval (eventDate: Date | undefined, intervalStart: Date, intervalEnd: Date | undefined): boolean {
     return (
       eventDate !== undefined &&
       eventDate.getTime() >= intervalStart.getTime() &&
@@ -48,7 +48,7 @@
 
   let events: CalendarEvent[] = []
   let visibleEvents: CalendarEvent[] = []
-  let eventCoordinatesMap = new Map<string, EventCoordinates>()
+  const eventCoordinatesMap = new Map<string, EventCoordinates>()
 
   let firstDayOfCurrentMonth: Date
   let displayedWeeksCount: number
@@ -63,14 +63,14 @@
     })
 
     eventCoordinatesMap.clear()
-    let lastDisplayedDate = new Date(firstDayOfCurrentMonth)
+    const lastDisplayedDate = new Date(firstDayOfCurrentMonth)
     lastDisplayedDate.setDate(lastDisplayedDate.getDate() + 7 * displayedWeeksCount)
     visibleEvents = events.filter(
       (value) =>
         isDateInInterval(getDate(value.startDate), firstDayOfCurrentMonth, lastDisplayedDate) ||
         isDateInInterval(value.endDate && getDate(value.endDate), firstDayOfCurrentMonth, lastDisplayedDate)
     )
-    let processedEvents: CalendarEvent[] = []
+    const processedEvents: CalendarEvent[] = []
     visibleEvents.forEach((event) => {
       const startDate = getDate(event.startDate)
       const endDate = event.endDate && getDate(event.endDate)
