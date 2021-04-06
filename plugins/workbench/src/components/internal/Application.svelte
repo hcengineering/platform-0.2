@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 -->
+
 <script type="ts">
   import type { ItemCreator, WorkbenchApplication } from '../..'
   import workbench from '../..'
@@ -27,7 +28,7 @@
   import { getUIService } from '@anticrm/platform-ui'
   import Component from '@anticrm/platform-ui/src/components/Component.svelte'
   import ActionBar from '@anticrm/platform-ui/src/components/ActionBar.svelte'
-  import type { Model } from '@anticrm/core'
+  import type { Class, Doc, Model, Ref } from '@anticrm/core'
   import CreateControl from './CreateControl.svelte'
 
   export let application: WorkbenchApplication
@@ -36,12 +37,20 @@
   const coreService = getCoreService()
   const uiService = getUIService()
 
+  let model: Model
+  coreService.then((cs) => {
+    model = cs.getModel()
+  })
+
   // Represent all possible presenters
   let presenters: Viewlet[] = []
   let creators: ItemCreator[] = []
 
   let viewletActions: Action[] = []
   let activeViewlet: Viewlet | undefined
+  let viewletProps: Record<string, any> = {}
+  let activeClasses: Ref<Class<Doc>>[] = []
+
   let creatorsQuery: Promise<QueryUpdater<ItemCreator>> | undefined
 
   const onCreatorClick = (creator: ItemCreator) => uiService.showModal(CreateForm, { creator, spaces: [space] })
@@ -54,9 +63,9 @@
     presenters = docs
   })
 
-  function filterViewlets (model: Model, presenters: Viewlet[]): Viewlet[] {
+  function filterViewlets (model: Model, presenters: Viewlet[], application: WorkbenchApplication): Viewlet[] {
     return presenters.filter((d) => {
-      for (const cc of application?.classes) {
+      for (const cc of application.classes) {
         if (model.is(cc, d.displayClass)) {
           return true
         }
@@ -65,12 +74,18 @@
     })
   }
 
-  function getViewletActions (
-    appInstance: WorkbenchApplication,
-    sp: Viewlet | undefined,
-    viewlets: Viewlet[]
-  ): Action[] {
-    return viewlets.map((p) => {
+  function findViewletClasses (model: Model, application: WorkbenchApplication, vielet: Viewlet): Ref<Class<Doc>>[] {
+    const result: Ref<Class<Doc>>[] = []
+    for (const cc of application?.classes) {
+      if (model.is(cc, vielet.displayClass)) {
+        result.push(cc)
+      }
+    }
+    return result
+  }
+
+  function getViewletActions (appInstance: WorkbenchApplication, sp: Viewlet | undefined, viewlets: Viewlet[]): Action[] {
+    return viewlets.map(p => {
       return {
         name: p.label,
         icon: p.icon,
@@ -82,17 +97,22 @@
     })
   }
 
-  $: {
-    // Update available presenters based on application
-    coreService.then((cs) => {
-      const model = cs.getModel()
+  // Update available presenters based on application
+  $: if (model) {
+    const viewlets = filterViewlets(model, presenters, application)
+    if (viewlets.length > 0 && !activeViewlet) {
+      activeViewlet = viewlets[0]
+    }
+    viewletActions = getViewletActions(application, activeViewlet, viewlets)
+  }
 
-      const viewlets = filterViewlets(model, presenters)
-      if (viewlets.length > 0 && !activeViewlet) {
-        activeViewlet = viewlets[0]
-      }
-      viewletActions = getViewletActions(application, activeViewlet, viewlets)
-    })
+  $: if (activeViewlet && model) {
+    activeClasses = findViewletClasses(model, application, activeViewlet)
+    if (activeViewlet.parameters) {
+      viewletProps = { ...activeViewlet.parameters, _class: activeClasses[0], space, editable: false }
+    } else {
+      viewletProps = { _class: activeClasses[0], space, editable: false }
+    }
   }
 </script>
 
@@ -109,11 +129,10 @@
       <ActionBar actions={viewletActions} />
     </div>
     <ScrollView height="100%" margin="2em">
-      {#if activeViewlet && activeViewlet.component}
-        <Component
-          is={activeViewlet.component}
-          props={{ _class: application.classes[0], space: space, editable: false }}
-          on:open />
+      {#if activeViewlet && activeViewlet.component && activeClasses.length > 0}
+        <Component is={activeViewlet.component}
+                   props={viewletProps}
+                   on:open />
       {/if}
     </ScrollView>
   {/if}

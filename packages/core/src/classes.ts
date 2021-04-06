@@ -105,8 +105,8 @@ export interface RefTo<T extends Doc> extends Type {
   to: Ref<Class<T>>
 }
 
-export interface EnumValue<T extends EnumKey> extends Type {
-  to: Ref<Enum<T>>
+export interface EnumOf<T extends EnumKey> extends Type {
+  of: Ref<Enum<T>>
 }
 
 export interface InstanceOf<T extends Emb> extends Type {
@@ -144,6 +144,9 @@ export const CORE_CLASS_ATTRIBUTE = 'class:core.Attribute' as Ref<Class<Attribut
 export const CORE_CLASS_TYPE = 'class:core.Type' as Ref<Class<Type>>
 
 export const CORE_CLASS_ARRAY_OF = 'class:core.ArrayOf' as Ref<Class<ArrayOf>>
+export const CORE_CLASS_REF_TO = 'class:core.RefTo' as Ref<Class<RefTo<Doc>>>
+export const CORE_CLASS_BAG_OF = 'class:core.BagOf' as Ref<Class<BagOf>>
 export const CORE_CLASS_INSTANCE_OF = 'class:core.InstanceOf' as Ref<Class<InstanceOf<Emb>>>
+export const CORE_CLASS_ENUM_OF = 'class:core.EnumOf' as Ref<Class<EnumOf<EnumKey>>>
 
 export const CORE_MIXIN_INDICES = 'mixin:core.Indices' as Ref<Mixin<Indices>>

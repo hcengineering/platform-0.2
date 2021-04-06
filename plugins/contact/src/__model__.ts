@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import core, { extendIds, Builder, Class$, Mixin$, Prop } from '@anticrm/model'
+import core, { extendIds, Builder, Class$, Mixin$, Prop, Primary } from '@anticrm/model'
 import { Class, Ref, Property } from '@anticrm/core'
 import { Space } from '@anticrm/domains'
 import _contact, { Contact, Person, User } from '.'
@@ -47,6 +47,7 @@ class TContact extends TVDoc implements Contact {
 @Class$(contact.class.Person, contact.class.Contact)
 @UX('Персональная информация' as IntlString)
 export class TPerson extends TContact implements Person {
+  @Primary()
   @Prop() @UX('Имя' as IntlString) name!: string
   @Prop() @UX('День рождения' as IntlString, { icon: contact.icon.Date }) birthDate?: Property<number, Date>
 }

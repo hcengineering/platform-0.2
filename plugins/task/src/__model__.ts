@@ -14,7 +14,7 @@
 //
 
 import core, {
-  ArrayOf$, Builder, Class$, Enum$, EnumValue$, extendIds, InstanceOf$, Literal, Mixin$, Primary, Prop, RefTo$,
+  ArrayOf$, Builder, Class$, Enum$, EnumOf$, extendIds, InstanceOf$, Literal, Mixin$, Primary, Prop, RefTo$,
   withMixin
 } from '@anticrm/model'
 import _task, {
@@ -89,19 +89,19 @@ export class TTask extends TCollab implements Task {
   @RefTo$(task.class.TaskLabel) labels!: Ref<TaskLabel>[]
 
   @UX(task.string.Task_status, { presenter: task.component.StatusPresenter })
-  @EnumValue$(task.enum.TaskStatus) status!: TaskStatus
+  @EnumOf$(task.enum.TaskStatus) status!: TaskStatus
 }
 
 @Mixin$(task.mixin.TypedTask, task.class.Task)
 class TTypeTask extends TTask implements TypedTask {
   @UX(task.string.Task_type)
-  @EnumValue$(task.enum.TaskType) type!: TaskType
+  @EnumOf$(task.enum.TaskType) type!: TaskType
 }
 
 @Mixin$(task.mixin.PrioritizedTask, task.class.Task)
 class TPrioritizedTask extends TTask implements PrioritizedTask {
   @UX(task.string.Task_priority)
-  @EnumValue$(task.enum.TaskPriority) priority!: TaskPriority
+  @EnumOf$(task.enum.TaskPriority) priority!: TaskPriority
 }
 
 @Mixin$(task.mixin.TimeManagedTask, task.class.Task)
@@ -198,7 +198,7 @@ export function model (S: Builder): void {
     route: 'tasks',
     label: 'Tasks' as IntlString,
     icon: task.icon.Task,
-    component: workbench.component.Application,
+    component: workbench.component.Application, // Use default workbench application for now.
     classes: [task.class.Task],
     supportSpaces: true,
     spaceTitle: 'Project'
@@ -218,6 +218,10 @@ export function model (S: Builder): void {
     name: 'Task' as IntlString
   })
 
+  S.mixin(task.class.Task, presentation.mixin.CardForm, {
+    component: task.component.CardForm
+  })
+
   S.mixin(task.class.Task, chunter.mixin.ActivityInfo, {
     component: task.component.TaskInfo
   })
@@ -225,7 +229,8 @@ export function model (S: Builder): void {
   S.createDocument(presentation.mixin.Viewlet, {
     displayClass: task.class.Task,
     label: 'Card' as IntlString,
-    component: task.component.TaskCardPresenter
+    component: presentation.component.CardPresenter,
+    parameters: { field: 'status' }
   })
 
   S.createDocument(core.class.Space, {

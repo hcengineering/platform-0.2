@@ -21,6 +21,7 @@
   import { liveQuery } from '../..'
   import { getEmptyModel, getPresentationService } from '../../utils'
   import Presenter from './presenters/Presenter.svelte'
+  import { CORE_CLASS_VDOC } from '@anticrm/domains'
 
   export let _class: Ref<Class<Doc>>
   export let space: Space
@@ -35,7 +36,7 @@
   $: {
     if (_class && _class !== modelClass) {
       getPresentationService()
-        .then((p) => p.getClassModel(_class, CORE_CLASS_DOC))
+        .then((p) => p.getClassModel(_class, CORE_CLASS_VDOC))
         .then((m) => {
           model = m
           modelClass = _class

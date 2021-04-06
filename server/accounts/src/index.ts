@@ -19,7 +19,9 @@ import { Request, Response } from '@anticrm/rpc'
 import { randomBytes, pbkdf2Sync } from 'crypto'
 import { Buffer } from 'buffer'
 import { encode } from 'jwt-simple'
-import secondFactor from 'node-2fa'
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const secondFactor = require('node-2fa')
 
 const server = '3.12.129.141'
 const port = '18080'
@@ -29,31 +31,31 @@ const WORKSPACE_COLLECTION = 'workspace'
 const ACCOUNT_COLLECTION = 'account'
 
 interface Account {
-    _id: ObjectID
-    email: string
-    hash: Binary
-    salt: Binary
-    workspaces: ObjectID[]
-    clientSecret: string
-    clientIds: string[]
+  _id: ObjectID
+  email: string
+  hash: Binary
+  salt: Binary
+  workspaces: ObjectID[]
+  clientSecret: string
+  clientIds: string[]
 }
 
 type AccountInfo = Omit<Account, 'hash' | 'salt'>
 
 export interface Workspace {
-    _id: ObjectID
-    workspace: string
-    organisation: string
-    accounts: ObjectID[]
+  _id: ObjectID
+  workspace: string
+  organisation: string
+  accounts: ObjectID[]
 }
 
 interface LoginInfo {
-    email: string
-    workspace: string
-    server: string
-    port: string
-    token: string
-    secondFactorEnabled: boolean
+  email: string
+  workspace: string
+  server: string
+  port: string
+  token: string
+  secondFactorEnabled: boolean
 }
 
 function hashWithSalt (password: string, salt: Buffer): Buffer {
@@ -118,7 +120,12 @@ async function updateAccount (db: Db, email: string, password: string, newPasswo
     hash = hashWithSalt(newPassword, account.salt.buffer)
   }
 
-  db.collection(ACCOUNT_COLLECTION).updateOne({ _id: account._id }, { $set: { hash: hash, clientSecret: clientSecret } })
+  db.collection(ACCOUNT_COLLECTION).updateOne({ _id: account._id }, {
+    $set: {
+      hash: hash,
+      clientSecret: clientSecret
+    }
+  })
 
   account = await getAccount(db, email)
 

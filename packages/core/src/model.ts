@@ -18,6 +18,7 @@ import {
   CORE_MIXIN_INDICES, Doc, Mixin, Obj, PropertyType, Ref, StringProperty, Type
 } from './classes'
 import { generateId, Storage, TxContext } from './storage'
+import presentation, { UXObject } from '@anticrm/presentation'
 
 export function mixinKey (mixin: Ref<Mixin<Obj>>, key: string): string {
   return key + '|' + mixin.replace('.', '~')
@@ -56,6 +57,13 @@ export function isValidQuery (query: AnyLayout | null): boolean {
   return query !== null && Object.keys(query).length > 0
 }
 
+export interface AttributeMatch {
+  name: string
+  attr: Attribute
+  clazz: Class<Obj>
+  key: string
+}
+
 /**
  * Model is a storage for Class descriptors and useful functions to match class instances to queries and apply values to them based on changes.
  */
@@ -78,7 +86,7 @@ export class Model implements Storage {
     return this.byClass.get(_class) ?? []
   }
 
-  protected attributeKey (clazz: Classifier, key: string): string {
+  attributeKey (clazz: Classifier, key: string): string {
     return clazz._kind === ClassifierKind.MIXIN ? mixinKey(clazz._id as Ref<Mixin<Doc>>, key) : key
   }
 
@@ -131,27 +139,29 @@ export class Model implements Storage {
     if (this.byClass) this.index(doc, false)
   }
 
-  get (id: Ref<Doc>): Doc {
+  get<T extends Doc> (id: Ref<T>): T {
     const obj = this.objects.get(id)
     if (!obj) {
       throw new Error('document not found ' + id)
     }
-    return obj
+    return obj as T
   }
 
   // U T I L I T Y
 
-  private _getAllAttributes (attributes: [string, Attribute][], _class: Ref<Class<Obj>>) {
+  private _getAllAttributes (attributes: AttributeMatch[], _class: Ref<Class<Obj>>) {
     const clazz = this.get(_class) as Class<Doc>
-    attributes.push(...Object.entries(clazz._attributes))
+    for (const kv of Object.entries(clazz._attributes)) {
+      attributes.push({ name: kv[0], attr: kv[1], clazz, key: this.attributeKey(clazz, kv[0]) })
+    }
 
     if (clazz._extends) {
       this._getAllAttributes(attributes, clazz._extends)
     }
   }
 
-  getAllAttributes (_class: Ref<Class<Obj>>): [string, Attribute][] {
-    const attributes: [string, Attribute][] = []
+  getAllAttributes (_class: Ref<Class<Obj>>): AttributeMatch[] {
+    const attributes: AttributeMatch[] = []
     this._getAllAttributes(attributes, _class)
     return attributes
   }
@@ -160,7 +170,7 @@ export class Model implements Storage {
     const primaryKey = mixinKey(CORE_MIXIN_INDICES, 'primary')
     let cls = _class as Ref<Class<Obj>> | undefined
     while (cls) {
-      const clazz = this.get(cls) as Class<Doc>
+      const clazz = this.get(cls)
       const primary = (clazz as any)[primaryKey]
       if (primary) {
         return primary
@@ -184,7 +194,7 @@ export class Model implements Storage {
   getClass (_class: Ref<Class<Doc>>): Ref<Class<Doc>> {
     let cls = _class
     while (cls) {
-      const clazz = this.get(cls) as Class<Doc>
+      const clazz = this.get(cls)
       if (clazz._kind === ClassifierKind.CLASS) return cls
       cls = clazz._extends as Ref<Class<Doc>>
     }
@@ -205,15 +215,16 @@ export class Model implements Storage {
     return doc
   }
 
-  public classAttribute (cls: Ref<Class<Obj>>, key: string): { attr: Attribute, clazz: Class<Obj>, key: string } {
+  public classAttribute (cls: Ref<Class<Obj>>, key: string): AttributeMatch {
     // TODO: use memdb class hierarchy
     let _class = cls as Ref<Class<Obj>> | undefined
     while (_class) {
-      const clazz = this.get(_class) as Class<Obj>
+      const clazz = this.get(_class)
       const attr = (clazz._attributes as any)[key]
       if (attr !== undefined) {
         const attrKey = this.attributeKey(clazz, key)
         return {
+          name: key,
           attr,
           clazz,
           key: attrKey
@@ -379,7 +390,7 @@ export class Model implements Storage {
   }
 
   mixin<E extends Doc, T extends E> (id: Ref<E>, clazz: Ref<Mixin<T>>, values: Omit<T, keyof E>): void {
-    this.mixinDocument(this.get(id) as E, clazz, values)
+    this.mixinDocument(this.get(id), clazz, values)
   }
 
   getClassHierarchy (cls: Ref<Class<Obj>>, top?: Ref<Class<Obj>>): Ref<Class<Obj>>[] {
@@ -387,7 +398,7 @@ export class Model implements Storage {
     let _class = cls as Ref<Class<Obj>> | undefined
     while (_class && _class !== top) {
       result.push(_class)
-      _class = (this.get(_class) as Class<Obj>)._extends
+      _class = this.get(_class)._extends
     }
     return result
   }
@@ -398,7 +409,7 @@ export class Model implements Storage {
       if (cls === a) {
         return true
       }
-      cls = (this.get(cls) as Class<Obj>)._extends
+      cls = this.get(cls)._extends
     }
     return false
   }
@@ -517,7 +528,7 @@ export class Model implements Storage {
   private getPrototype (mixin: Ref<Class<Obj>>): Record<string, unknown> {
     const proto = this.prototypes.get(mixin)
     if (!proto) {
-      const proto = this.createPrototype(this.get(mixin) as Class<Doc>)
+      const proto = this.createPrototype(this.get(mixin))
       this.prototypes.set(mixin, proto)
       return proto
     }
@@ -534,6 +545,9 @@ export class Model implements Storage {
     if (doc._class === mixin) {
       // If we already have a proper class specified.
       return doc as T
+    }
+    if (!this.isMixedIn(doc, mixin)) {
+      throw new Error(`Class ${doc._class} could not be cast to ${mixin}`)
     }
     const proxy = Object.create(this.getPrototype(mixin)) as Proxy & T
     proxy.__layout = (doc as unknown) as Record<string, unknown>
@@ -552,6 +566,12 @@ export class Model implements Storage {
 
   public isMixedIn (obj: Obj, _class: Ref<Mixin<Obj>>): boolean {
     return obj._mixins ? obj._mixins.includes(_class) : false
+  }
+
+  public asMixin<T extends Doc> (obj: Obj, _class: Ref<Mixin<T>>, action: (doc: T) => void) {
+    if (this.isMixedIn(obj, _class)) {
+      action(this.as(obj, _class))
+    }
   }
 
   // S T O R A G E
