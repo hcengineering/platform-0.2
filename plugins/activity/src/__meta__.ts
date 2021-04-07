@@ -14,13 +14,12 @@
 //
 
 import { Platform } from '@anticrm/platform'
-import chunter from '..'
+import activity from '..'
 
 export default (platform: Platform): void => {
   const spritesUrl = require('../assets/icons.svg') // eslint-disable-line
-  platform.loadMetadata(chunter.icon, {
-    Chunter: `${spritesUrl}'#chunter`,
-    ChatView: `${spritesUrl}#chatView`,
-    PagesView: `${spritesUrl}#pagesView`
+  platform.loadMetadata(activity.icon, {
+    Activity: `${spritesUrl}'#activity`,
+    ActivityView: `${spritesUrl}#activityView`
   })
 }

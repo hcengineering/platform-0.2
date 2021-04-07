@@ -13,23 +13,21 @@
 // limitations under the License.
 //
 
-import core, { extendIds, Builder, Class$, Mixin$, Prop, Primary } from '@anticrm/model'
-import { Class, Ref, Property } from '@anticrm/core'
+import core, { Builder, Class$, extendIds, Mixin$, Primary, Prop } from '@anticrm/model'
+import { Class, Property, Ref } from '@anticrm/core'
+
 import { Space } from '@anticrm/domains'
 import _contact, { Contact, Person, User } from '.'
 import { IntlString } from '@anticrm/platform-i18n'
 import { TVDoc } from '@anticrm/model/src/__model__'
 import { UX } from '@anticrm/presentation/src/__model__'
-import presentation from '@anticrm/presentation'
+import activity from '@anticrm/activity'
 
 const contact = extendIds(_contact, {
   application: {},
   class: {
     Contact: '' as Ref<Class<Contact>>
   },
-  // mixin: {
-  //   User: '' as Ref<Mixin<User>>
-  // }
   space: {
     Contact: '' as Ref<Space>
   }
@@ -38,36 +36,29 @@ const contact = extendIds(_contact, {
 export default contact
 
 @Class$(contact.class.Contact, core.class.VDoc, 'contact')
-@UX('Контактная информация' as IntlString)
+@UX('Contact Information' as IntlString)
 class TContact extends TVDoc implements Contact {
-  @Prop() @UX('Телефон' as IntlString, { icon: contact.icon.Phone }) phone?: string
-  @Prop() @UX('Электропочта' as IntlString, { icon: contact.icon.Email }) email?: string
+  @Prop() @UX('Phone' as IntlString, { icon: contact.icon.Phone }) phone?: string
+  @Prop() @UX('Email' as IntlString, { icon: contact.icon.Email }) email?: string
 }
 
 @Class$(contact.class.Person, contact.class.Contact)
-@UX('Персональная информация' as IntlString)
+@UX('Personal information' as IntlString)
 export class TPerson extends TContact implements Person {
   @Primary()
-  @Prop() @UX('Имя' as IntlString) name!: string
-
-  @Prop() @UX('День рождения' as IntlString, { icon: contact.icon.Date }) birthDate?: Property<number, Date>
+  @Prop() @UX('Name' as IntlString) name!: string
+  @Prop() @UX('Birthday' as IntlString, { icon: contact.icon.Date }) birthDate?: Property<number, Date>
 }
 
 @Mixin$(contact.mixin.User, contact.class.Person)
 export class TUser extends TPerson implements User {
-  @Prop() @UX('Аккаунт' as IntlString) account!: string
+  @Prop() @UX('Account' as IntlString) account!: string
 }
 
 export function model (S: Builder): void {
   S.add(TContact, TPerson, TUser)
 
-  S.mixin(contact.class.Person, presentation.mixin.DetailForm, {
+  S.mixin(contact.class.Person, activity.mixin.ActivityInfo, {
     component: contact.component.PersonInfo
   })
-
-  // S.createDocument(workbench.class.WorkbenchCreateItem, {
-  //   label: 'Контакт / Новый Пользователь' as StringProperty,
-  //   icon: contact.icon.Phone,
-  //   itemClass: contact.mixin.User as Ref<Class<VDoc>> // TODO: fix itemClass type
-  // })
 }

@@ -27,6 +27,7 @@ import { UX } from '@anticrm/presentation/src/__model__'
 import presentation from '@anticrm/presentation'
 import workbench from '@anticrm/workbench/src/__model__'
 import chunter, { TCollab } from '@anticrm/chunter/src/__model__'
+import activity from '@anticrm/activity'
 import { DateProperty, MODEL_DOMAIN, Ref, StringProperty } from '@anticrm/core'
 import { TEmb, TEnum, TVDoc } from '@anticrm/model/src/__model__'
 import contact from '@anticrm/contact/src/__model__'
@@ -222,7 +223,7 @@ export function model (S: Builder): void {
     component: task.component.CardForm
   })
 
-  S.mixin(task.class.Task, chunter.mixin.ActivityInfo, {
+  S.mixin(task.class.Task, activity.mixin.ActivityInfo, {
     component: task.component.TaskInfo
   })
 
