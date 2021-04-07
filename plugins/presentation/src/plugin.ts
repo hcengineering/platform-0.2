@@ -273,13 +273,14 @@ export default (platform: Platform, deps: { core: CoreService, i18n: I18n }): Pr
 
   function getComponentExtension (_class: Ref<Class<Obj>>, extension: Ref<Mixin<ComponentExtension<VDoc>>>): AnyComponent | undefined {
     const model = coreService.getModel()
-    while (_class) {
-      const clazz = model.get(_class) as Class<VDoc>
+    let itClass = _class
+    while (itClass) {
+      const clazz = model.get(itClass) as Class<VDoc>
       if (model.isMixedIn(clazz, extension)) {
         const properties = model.as(clazz, extension)
         return properties.component
       } else {
-        _class = clazz._extends as Ref<Class<Obj>>
+        itClass = clazz._extends as Ref<Class<Obj>>
       }
     }
     console.log('ERROR: detail form not mixed in: ', _class)

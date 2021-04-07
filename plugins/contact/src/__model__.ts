@@ -61,12 +61,8 @@ export class TUser extends TPerson implements User {
 export function model (S: Builder): void {
   S.add(TContact, TPerson, TUser)
 
-  S.mixin(contact.class.Person as Ref<Class<Person>>, presentation.mixin.DetailForm, {
-    component: contact.component.PersonProperties
-  })
-
-  S.mixin(contact.mixin.User, presentation.mixin.LookupForm, {
-    component: contact.component.UserLookup
+  S.mixin(contact.class.Person, presentation.mixin.DetailForm, {
+    component: contact.component.PersonInfo
   })
 
   // S.createDocument(workbench.class.WorkbenchCreateItem, {

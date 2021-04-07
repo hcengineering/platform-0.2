@@ -60,7 +60,8 @@ const contactPlugin = plugin('contact' as Plugin<ContactService>, {
   component: {
     PersonProperties: '' as AnyComponent,
     UserLookup: '' as AnyComponent,
-    LoginWidget: '' as AnyComponent
+    LoginWidget: '' as AnyComponent,
+    PersonInfo: '' as AnyComponent
   },
   mixin: {
     User: '' as Ref<Mixin<User>>

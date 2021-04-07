@@ -45,6 +45,7 @@
         avatar = a
       })
     presentationService.then((p) => {
+      console.log('get component extension for' + objectClass)
       info = p.getComponentExtension(objectClass, chunter.mixin.ActivityInfo)
     })
   }
@@ -56,8 +57,11 @@
     <b>{user ? user.name : ''}</b>
     <span>15:23</span>
     <div>
-      <!-- {JSON.stringify(tx)} -->
-      <Component is={info} props={{ tx }} />
+      {#if info}
+        <Component is={info} props={{ tx }} />
+      {:else}
+        No information
+      {/if}
     </div>
   </div>
 </div>

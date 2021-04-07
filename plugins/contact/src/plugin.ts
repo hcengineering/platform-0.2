@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Anticrm Platform Contributors.
+// Copyright © 2020-2021 Anticrm Platform Contributors.
 //
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
@@ -17,22 +17,12 @@ import { Platform } from '@anticrm/platform'
 import { StringProperty, Ref } from '@anticrm/core'
 import contact, { User, ContactService } from '.'
 
-// import PersonProperties from './components/PersonProperties.vue'
-// import UserLookup from './components/UserLookup.vue'
-// import LoginWidget from './components/LoginWidget.vue'
-
+import PersonInfo from './components/internal/PersonInfo.svelte'
 import core, { CoreService } from '@anticrm/platform-core'
 import { UIService, Asset } from '@anticrm/platform-ui'
 
-/*!
- * Anticrm Platform™ Contact Plugin
- * © 2020 Anticrm Platform Contributors. All Rights Reserved.
- * Licensed under the Eclipse Public License, Version 2.0
- */
 export default (platform: Platform, deps: { core: CoreService, ui: UIService }): Promise<ContactService> => {
-  // platform.setResource(contact.component.PersonProperties, PersonProperties)
-  // platform.setResource(contact.component.UserLookup, UserLookup)
-  // platform.setResource(contact.component.LoginWidget, LoginWidget)
+  platform.setResource(contact.component.PersonInfo, PersonInfo)
 
   const coreService = deps.core
 
