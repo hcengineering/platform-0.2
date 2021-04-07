@@ -29,6 +29,8 @@ import CheckboxEditor from './components/internal/presenters/value/CheckboxEdito
 import TablePresenter from './components/internal/presenters/class/TablePresenter.svelte'
 import RefPresenter from './components/internal/presenters/value/RefPresenter.svelte'
 import ArrayPresenter from './components/internal/presenters/value/ArrayPresenter.svelte'
+import VDocCardPresenter from './components/internal/presenters/VDocCardPresenter.svelte'
+import CardPresenter from './components/internal/presenters/CardPresenter.svelte'
 
 /*!
  * Anticrm Platform™ Presentation Core Plugin
@@ -48,18 +50,27 @@ export default (platform: Platform, deps: { core: CoreService, i18n: I18n }): Pr
 
   platform.setResource(ui.component.TablePresenter, TablePresenter)
   platform.setResource(ui.component.RefPresenter, RefPresenter)
+  platform.setResource(ui.component.VDocCardPresenter, VDocCardPresenter)
+  platform.setResource(ui.component.CardPresenter, CardPresenter)
 
   async function getGroupModel (_class: Ref<Class<Obj>>): Promise<GroupModel> {
     const model = coreService.getModel()
     const clazz = model.get(_class) as Class<Obj>
-    const ux = model.as(clazz, ui.mixin.UXObject)
+    if (model.isMixedIn(clazz, ui.mixin.UXObject)) {
+      const ux = model.as(clazz, ui.mixin.UXObject)
+      const label = await i18nService.translate(ux.label)
 
-    const label = await i18nService.translate(ux.label)
-
-    return {
-      _class,
-      label,
-      icon: ux.icon
+      return {
+        _class,
+        label,
+        icon: ux.icon
+      }
+    } else {
+      return {
+        _class,
+        label: _class as string,
+        icon: undefined
+      }
     }
   }
 

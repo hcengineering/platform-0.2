@@ -19,8 +19,8 @@ import task, { TaskService } from '.'
 import TaskProperties from './components/internal/TaskProperties.svelte'
 import TaskInfo from './components/internal/TaskInfo.svelte'
 import CreateForm from './components/internal/NewTaskForm.svelte'
-import TaskCardPresenter from './components/internal/TaskCardPresenter.svelte'
 import StatusPresenter from './components/internal/presenters/StatusPresenter.svelte'
+import CardForm from './components/internal/TaskCardForm.svelte'
 
 /*!
  * Anticrm Platform™ Task Plugin
@@ -31,8 +31,8 @@ export default (platform: Platform): Promise<TaskService> => {
   platform.setResource(task.component.TaskProperties, TaskProperties)
   platform.setResource(task.component.TaskInfo, TaskInfo)
   platform.setResource(task.component.CreateTask, CreateForm)
-  platform.setResource(task.component.TaskCardPresenter, TaskCardPresenter)
   platform.setResource(task.component.StatusPresenter, StatusPresenter)
+  platform.setResource(task.component.CardForm, CardForm)
 
   return Promise.resolve({})
 }

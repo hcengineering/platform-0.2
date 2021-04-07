@@ -56,6 +56,13 @@ export function isValidQuery (query: AnyLayout | null): boolean {
   return query !== null && Object.keys(query).length > 0
 }
 
+export interface AttributeMatch {
+  name: string
+  attr: Attribute
+  clazz: Class<Obj>
+  key: string
+}
+
 /**
  * Model is a storage for Class descriptors and useful functions to match class instances to queries and apply values to them based on changes.
  */
@@ -78,7 +85,7 @@ export class Model implements Storage {
     return this.byClass.get(_class) ?? []
   }
 
-  protected attributeKey (clazz: Classifier, key: string): string {
+  attributeKey (clazz: Classifier, key: string): string {
     return clazz._kind === ClassifierKind.MIXIN ? mixinKey(clazz._id as Ref<Mixin<Doc>>, key) : key
   }
 
@@ -131,27 +138,29 @@ export class Model implements Storage {
     if (this.byClass) this.index(doc, false)
   }
 
-  get (id: Ref<Doc>): Doc {
+  get<T extends Doc> (id: Ref<T>): T {
     const obj = this.objects.get(id)
     if (!obj) {
       throw new Error('document not found ' + id)
     }
-    return obj
+    return obj as T
   }
 
   // U T I L I T Y
 
-  private _getAllAttributes (attributes: [string, Attribute][], _class: Ref<Class<Obj>>) {
+  private _getAllAttributes (attributes: AttributeMatch[], _class: Ref<Class<Obj>>) {
     const clazz = this.get(_class) as Class<Doc>
-    attributes.push(...Object.entries(clazz._attributes))
+    for (const kv of Object.entries(clazz._attributes)) {
+      attributes.push({ name: kv[0], attr: kv[1], clazz, key: this.attributeKey(clazz, kv[0]) })
+    }
 
     if (clazz._extends) {
       this._getAllAttributes(attributes, clazz._extends)
     }
   }
 
-  getAllAttributes (_class: Ref<Class<Obj>>): [string, Attribute][] {
-    const attributes: [string, Attribute][] = []
+  getAllAttributes (_class: Ref<Class<Obj>>): AttributeMatch[] {
+    const attributes: AttributeMatch[] = []
     this._getAllAttributes(attributes, _class)
     return attributes
   }
@@ -160,7 +169,7 @@ export class Model implements Storage {
     const primaryKey = mixinKey(CORE_MIXIN_INDICES, 'primary')
     let cls = _class as Ref<Class<Obj>> | undefined
     while (cls) {
-      const clazz = this.get(cls) as Class<Doc>
+      const clazz = this.get(cls)
       const primary = (clazz as any)[primaryKey]
       if (primary) {
         return primary
@@ -181,12 +190,12 @@ export class Model implements Storage {
     throw new Error('no domain found for class: ' + id)
   }
 
-  getClass (_class: Ref<Class<Doc>>): Ref<Class<Doc>> {
+  getClass (_class: Ref<Class<Obj>>): Ref<Class<Obj>> {
     let cls = _class
     while (cls) {
-      const clazz = this.get(cls) as Class<Doc>
+      const clazz = this.get(cls)
       if (clazz._kind === ClassifierKind.CLASS) return cls
-      cls = clazz._extends as Ref<Class<Doc>>
+      cls = clazz._extends as Ref<Class<Obj>>
     }
     throw new Error('class not found in hierarchy: ' + _class)
   }
@@ -205,15 +214,16 @@ export class Model implements Storage {
     return doc
   }
 
-  public classAttribute (cls: Ref<Class<Obj>>, key: string): { attr: Attribute, clazz: Class<Obj>, key: string } {
+  public classAttribute (cls: Ref<Class<Obj>>, key: string): AttributeMatch {
     // TODO: use memdb class hierarchy
     let _class = cls as Ref<Class<Obj>> | undefined
     while (_class) {
-      const clazz = this.get(_class) as Class<Obj>
+      const clazz = this.get(_class)
       const attr = (clazz._attributes as any)[key]
       if (attr !== undefined) {
         const attrKey = this.attributeKey(clazz, key)
         return {
+          name: key,
           attr,
           clazz,
           key: attrKey
@@ -241,6 +251,13 @@ export class Model implements Storage {
     }
   }
 
+  getLayout (doc: Obj): AnyLayout {
+    if ((doc as any).__layout) {
+      return ((doc as unknown as Proxy).__layout) as AnyLayout
+    }
+    return (doc as unknown) as AnyLayout
+  }
+
   // from Builder
   assign (layout: AnyLayout, _class: Ref<Class<Obj>>, values: AnyLayout): AnyLayout {
     const l = layout
@@ -248,7 +265,7 @@ export class Model implements Storage {
 
     // Also assign a class to value if not specified
     if (!layout._class) {
-      layout._class = _class
+      layout._class = this.getClass(_class) // Be sure we use class, not a mixin.
     }
     for (const rKey in values) {
       if (rKey.startsWith('_')) {
@@ -305,12 +322,12 @@ export class Model implements Storage {
       // We need to find embedded object first
       const result = this.matchObject(doc._class, doc, query, false)
       if (result.result && result.match) {
-        this.assign((result.match as unknown) as AnyLayout, result.match._class, attributes)
+        this.assign(this.getLayout(result.match), result.match._class, attributes)
         return doc
       }
       throw new Error(`failed to match embedded object by query:${query}`)
     }
-    this.assign((doc as unknown) as AnyLayout, doc._class, attributes)
+    this.assign(this.getLayout(doc), doc._class, attributes)
     return doc
   }
 
@@ -366,7 +383,7 @@ export class Model implements Storage {
 
   public mixinDocument<E extends Obj, T extends Obj> (doc: E, clazz: Ref<Mixin<T>>, values: Partial<Omit<T, keyof E>>): void {
     Model.includeMixin(doc, clazz)
-    this.assign((doc as unknown) as AnyLayout, clazz as Ref<Class<Obj>>, (values as unknown) as AnyLayout)
+    this.assign(this.getLayout(doc), clazz as Ref<Class<Obj>>, (values as unknown) as AnyLayout)
   }
 
   public static includeMixin<E extends Obj, T extends Obj> (doc: E, clazz: Ref<Mixin<T>>): void {
@@ -379,7 +396,7 @@ export class Model implements Storage {
   }
 
   mixin<E extends Doc, T extends E> (id: Ref<E>, clazz: Ref<Mixin<T>>, values: Omit<T, keyof E>): void {
-    this.mixinDocument(this.get(id) as E, clazz, values)
+    this.mixinDocument(this.get(id), clazz, values)
   }
 
   getClassHierarchy (cls: Ref<Class<Obj>>, top?: Ref<Class<Obj>>): Ref<Class<Obj>>[] {
@@ -387,7 +404,7 @@ export class Model implements Storage {
     let _class = cls as Ref<Class<Obj>> | undefined
     while (_class && _class !== top) {
       result.push(_class)
-      _class = (this.get(_class) as Class<Obj>)._extends
+      _class = this.get(_class)._extends
     }
     return result
   }
@@ -398,7 +415,7 @@ export class Model implements Storage {
       if (cls === a) {
         return true
       }
-      cls = (this.get(cls) as Class<Obj>)._extends
+      cls = this.get(cls)._extends
     }
     return false
   }
@@ -517,7 +534,7 @@ export class Model implements Storage {
   private getPrototype (mixin: Ref<Class<Obj>>): Record<string, unknown> {
     const proto = this.prototypes.get(mixin)
     if (!proto) {
-      const proto = this.createPrototype(this.get(mixin) as Class<Doc>)
+      const proto = this.createPrototype(this.get(mixin))
       this.prototypes.set(mixin, proto)
       return proto
     }
@@ -534,6 +551,9 @@ export class Model implements Storage {
     if (doc._class === mixin) {
       // If we already have a proper class specified.
       return doc as T
+    }
+    if (!this.isMixedIn(doc, mixin)) {
+      throw new Error(`Class ${doc._class} could not be cast to ${mixin}`)
     }
     const proxy = Object.create(this.getPrototype(mixin)) as Proxy & T
     proxy.__layout = (doc as unknown) as Record<string, unknown>
@@ -552,6 +572,12 @@ export class Model implements Storage {
 
   public isMixedIn (obj: Obj, _class: Ref<Mixin<Obj>>): boolean {
     return obj._mixins ? obj._mixins.includes(_class) : false
+  }
+
+  public asMixin<T extends Doc> (obj: Obj, _class: Ref<Mixin<T>>, action: (doc: T) => void): void {
+    if (this.isMixedIn(obj, _class)) {
+      action(this.as(obj, _class))
+    }
   }
 
   // S T O R A G E

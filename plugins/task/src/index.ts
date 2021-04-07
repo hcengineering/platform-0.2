@@ -190,8 +190,8 @@ export default plugin('task' as Plugin<TaskService>, {}, {
     TaskProperties: '' as AnyComponent,
     CreateTask: '' as AnyComponent,
     TaskInfo: '' as AnyComponent,
-    TaskCardPresenter: '' as AnyComponent,
-    StatusPresenter: '' as AnyComponent
+    StatusPresenter: '' as AnyComponent,
+    CardForm: '' as AnyComponent
   },
   application: {
     Task: '' as Ref<WorkbenchApplication>

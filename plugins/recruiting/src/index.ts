@@ -10,7 +10,7 @@
 //
 // See the License for the specific language governing permissions and
 // limitations under the License.
-import { Class, Emb, Mixin, Ref } from '@anticrm/core'
+import { Class, Emb, Enum, Mixin, Ref } from '@anticrm/core'
 import core from '@anticrm/platform-core'
 import { Plugin, plugin, Service } from '@anticrm/platform'
 import { Asset, AnyComponent } from '@anticrm/platform-ui'
@@ -23,11 +23,25 @@ export interface Candidate extends Emb {
   salaryExpectation: number
 }
 
-export interface WithCandidateProps extends WithResume {
-  candidate: Candidate
+export enum CandidateState {
+  New = 'new', // Just added
+  InProgress = 'initial', // Some initial discussions are in progress
+  InterviewPending = 'interview', // Interview is pending to be complete
+  DecisionPending = 'decision', // Decision is pending
+  Rejected = 'rejected', // Candidate is rejected
+  Approved = 'approved', // Candidate is approved
+  OfferSended = 'offer', // We are waiting for candidate to accept/reject offer
+  Done = 'done' // Candidate is ok and accepted offer.
 }
 
-export interface RecruitingService extends Service {}
+export interface WithCandidateProps extends WithResume {
+  candidate: Candidate
+  state: CandidateState
+}
+
+export interface RecruitingService extends Service {
+}
+
 export default plugin(
   'recruiting' as Plugin<RecruitingService>,
   { core: core.id },
@@ -40,6 +54,9 @@ export default plugin(
     },
     mixin: {
       WithCandidateProps: '' as Ref<Mixin<WithCandidateProps>>
+    },
+    enum: {
+      State: '' as Ref<Enum<CandidateState>>
     },
     component: {
       CandidateList: '' as AnyComponent,

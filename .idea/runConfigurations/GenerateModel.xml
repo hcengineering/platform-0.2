@@ -1,0 +1,5 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="GenerateModel" type="NodeJSConfigurationType" application-parameters="upgrade-workspace workspace" node-parameters="--nolazy -r ts-node/register" path-to-js-file="src/index.ts" working-dir="$PROJECT_DIR$/dev/tool/">
+    <method v="2" />
+  </configuration>
+</component>
