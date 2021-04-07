@@ -2,6 +2,7 @@
 
 # Look for all chaged files.
 FILES=$(git diff --name-only origin/master... "*.svelte" | sed 's/ /\\ /g')
+[ -z "$FILES" ] && exit 0
 
 # Check only existing files.
 FILES=$(echo $FILES | xargs ls -d 2>/dev/null)
