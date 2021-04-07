@@ -36,7 +36,9 @@
   let statuses: Array<StatUses> = []
 
   getPresentationService().then((ps) => {
-    presenter = ps.getComponentExtension(_class, presentationPlugin.mixin.CardForm) || presentationPlugin.component.VDocCardPresenter
+    presenter =
+      ps.getComponentExtension(_class, presentationPlugin.mixin.CardForm) ||
+      presentationPlugin.component.VDocCardPresenter
   })
 
   function findAttr (model: Model, _class: Ref<Class<Doc>>, field: string | undefined): AttributeMatch {
@@ -79,7 +81,7 @@
               label: lit.label,
               color: lit.color as string,
               hidden: false,
-              defValue: newSt.length == 0,
+              defValue: newSt.length === 0,
               divTasks: HTMLElement
             })
           } else {
@@ -88,7 +90,7 @@
               label: st[1].label,
               color: '',
               hidden: false,
-              defValue: newSt.length == 0,
+              defValue: newSt.length === 0,
               divTasks: HTMLElement
             })
           }
@@ -105,7 +107,6 @@
   $: if (space) {
     tq = liveQuery(tq, _class, { _space: space._id }, (res) => {
       docs = res
-      console.log('DOCS', docs)
     })
   }
 
@@ -127,7 +128,6 @@
         }
         return -1
       })
-    console.log('DOCS for State', status, res)
     return res
   }
 
@@ -150,8 +150,9 @@
       if (dragIn != null && dragDoc && getFieldValue(dragDoc, fieldAttr.name) !== dragIn) {
         const dt = dragDoc
         coreService.then((cs) => {
-          cs.update(dt, null, { [fieldAttr.key]: dragIn as Property<any, any> })
+          cs.update(dt, null, { [fieldAttr.name]: dragIn as Property<any, any> })
         })
+        dragDoc = null
       }
       dragIn = null
     }
@@ -177,7 +178,6 @@
   function getFieldValue (doc: VDoc, name: string): any {
     return (doc as any)[name]
   }
-
 </script>
 
 <div class="cards-view">
@@ -205,23 +205,16 @@
 
       <div bind:this={stat.divTasks} class="status__tasks" class:hidden={stat.hidden}>
         {#if dragIn === stat.id && dragDoc && dragIn !== getFieldValue(dragDoc, fieldAttr.name)}
-          <Card
-            doc={dragDoc}
-            {presenter}
-            duplicate={true} />
-          <div class="separator"></div>
+          <Card doc={dragDoc} {presenter} duplicate={true} />
+          <div class="separator" />
         {/if}
         {#each docsFor(docs, stat.id, stat.defValue, fieldAttr) as doc (doc._id)}
-          <div class="separator"></div>
-          <Card
-            {doc}
-            {presenter}
-            on:drag={onDrag}
-            on:move={onMove} />
+          <div class="separator" />
+          <Card {doc} {presenter} on:drag={onDrag} on:move={onMove} />
         {/each}
       </div>
     </div>
-    <div class="status-separator"></div>
+    <div class="status-separator" />
   {/each}
 </div>
 

@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 -->
-
 <script type="ts">
   import type { ItemCreator, WorkbenchApplication } from '../..'
   import workbench from '../..'
@@ -84,8 +83,12 @@
     return result
   }
 
-  function getViewletActions (appInstance: WorkbenchApplication, sp: Viewlet | undefined, viewlets: Viewlet[]): Action[] {
-    return viewlets.map(p => {
+  function getViewletActions (
+    appInstance: WorkbenchApplication,
+    sp: Viewlet | undefined,
+    viewlets: Viewlet[]
+  ): Action[] {
+    return viewlets.map((p) => {
       return {
         name: p.label,
         icon: p.icon,
@@ -130,9 +133,7 @@
     </div>
     <ScrollView height="100%" margin="2em">
       {#if activeViewlet && activeViewlet.component && activeClasses.length > 0}
-        <Component is={activeViewlet.component}
-                   props={viewletProps}
-                   on:open />
+        <Component is={activeViewlet.component} props={viewletProps} on:open />
       {/if}
     </ScrollView>
   {/if}

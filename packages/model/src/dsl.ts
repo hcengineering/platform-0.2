@@ -248,7 +248,7 @@ export function withMixin<T extends Obj> (_class: Ref<Mixin<T>>, obj: Partial<Om
       classifier.postProcessing.push((model, cl) => {
         if (doc) {
           Model.includeMixin(doc, _class)
-          model.assign((doc as unknown) as AnyLayout, _class, (obj as unknown) as AnyLayout)
+          model.assign(model.getLayout(doc), _class, (obj as unknown) as AnyLayout)
         }
       })
     }

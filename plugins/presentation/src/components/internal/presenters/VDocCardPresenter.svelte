@@ -1,7 +1,7 @@
 <script lang="ts">
   import { CORE_MIXIN_SHORTID, VDoc } from '@anticrm/domains'
-  import presentation, { getCoreService, getPresentationService } from '@anticrm/presentation'
-  import { Class, CORE_CLASS_STRING, Doc, Model, Obj } from '@anticrm/core'
+  import presentation, { getCoreService } from '@anticrm/presentation'
+  import { Class, CORE_CLASS_STRING, Model, Obj } from '@anticrm/core'
   import { Asset } from '@anticrm/platform-ui'
   import Icon from '../../../../../platform-ui/src/components/Icon.svelte'
 
@@ -28,7 +28,7 @@
 
   function getCaption (model: Model, doc: VDoc): string {
     let result = ''
-    model.asMixin(doc, CORE_MIXIN_SHORTID, m => {
+    model.asMixin(doc, CORE_MIXIN_SHORTID, (m) => {
       result = m.shortId + ' - '
     })
     const primary = model.getPrimaryKey(doc._class)
@@ -39,7 +39,7 @@
   }
 
   function getDescription (model: Model, doc: VDoc): string[] {
-    let result = []
+    const result = []
     model
       .getAllAttributes(doc._class)
       .filter((m) => m.attr.type._class === CORE_CLASS_STRING)
@@ -59,7 +59,7 @@
 {#await init then ct}
   <div class="card-view">
     <div class="card-head">
-      <Icon icon={icon} />
+      <Icon {icon} />
       {#if title}
         <h5>{title}</h5>
       {/if}

@@ -15,7 +15,10 @@
 
 /* eslint-env jest */
 
-import { AnyLayout, Attribute, Class, CORE_CLASS_ATTRIBUTE, CORE_CLASS_CLASS, CORE_CLASS_DOC, CORE_CLASS_EMB, CORE_CLASS_OBJ, Doc, Mixin, Obj, Property, PropertyType, Ref, StringProperty } from '../classes'
+import {
+  AnyLayout, Attribute, Class, CORE_CLASS_ATTRIBUTE, CORE_CLASS_CLASS, CORE_CLASS_DOC, CORE_CLASS_EMB, CORE_CLASS_OBJ,
+  Doc, Mixin, Obj, Property, PropertyType, Ref, StringProperty
+} from '../classes'
 import { mixinFromKey, mixinKey, Model } from '../model'
 import { txContext } from '../storage'
 import { createSubtask, createTask, doc1, taskIds, data, Task, SubTask } from './tasks'
@@ -312,10 +315,10 @@ describe('Model utilities', () => {
       data.find((x: any) => x._id === id)?._attributes ?? {}
     )
 
-    expect(model.getAllAttributes(CORE_CLASS_DOC))
+    expect(model.getAllAttributes(CORE_CLASS_DOC).map(m => [m.name, m.attr]))
       .toEqual(getAttrs(CORE_CLASS_DOC))
 
-    expect(model.getAllAttributes(CORE_CLASS_ATTRIBUTE))
+    expect(model.getAllAttributes(CORE_CLASS_ATTRIBUTE).map(m => [m.name, m.attr]))
       .toEqual([
         getAttrs(CORE_CLASS_ATTRIBUTE),
         getAttrs(CORE_CLASS_EMB)
@@ -344,6 +347,7 @@ describe('Model mixin', () => {
       ...doc1,
       [mixinKey(mixin, 'shortId')]: shortId
     }
+    Model.includeMixin(target, mixin)
     const res = model.as({ ...target }, mixin)
 
     expect(res.__layout).toEqual(target)
@@ -363,6 +367,7 @@ describe('Model mixin', () => {
       ...doc1,
       [mixinKey(mixin, 'shortId')]: shortId
     }
+    Model.includeMixin(target, mixin)
     model.as({ ...target }, mixin)
     const res = model.as(target, mixin)
 
@@ -421,29 +426,29 @@ describe('Model assign tools', () => {
   model.loadModel(data)
 
   it('assigns class if missing', () => {
-    const res = model.assign({}, 'class' as Ref<Class<Obj>>, {})
+    const res = model.assign({}, taskIds.class.Task, {})
 
-    expect(res).toEqual({ _class: 'class' })
+    expect(res).toEqual({ _class: taskIds.class.Task })
   })
 
   it('doesn\'t change class if it exists', () => {
     const res = model.assign(
-      { _class: 'class' as Ref<Class<Obj>> },
-      'other_class' as Ref<Class<Obj>>,
+      { _class: taskIds.class.Task as Ref<Class<Obj>> },
+      taskIds.class.TaskComment as Ref<Class<Obj>>,
       {}
     )
 
-    expect(res).toEqual({ _class: 'class' })
+    expect(res).toEqual({ _class: taskIds.class.Task })
   })
 
   it('assigns own properties', () => {
     const res = model.assign(
       {},
-      'class' as Ref<Class<Obj>>,
+      taskIds.class.Task as Ref<Class<Obj>>,
       { _property: 42 as PropertyType }
     )
 
-    expect(res).toEqual({ _class: 'class', _property: 42 })
+    expect(res).toEqual({ _class: taskIds.class.Task, _property: 42 })
   })
 
   it('assigns mixin properties', () => {
@@ -451,23 +456,23 @@ describe('Model assign tools', () => {
     const mKey = mixinKey(mixin, 'shortId')
     const res = model.assign(
       {},
-      'class' as Ref<Class<Obj>>,
+      taskIds.class.Task as Ref<Class<Obj>>,
       { [mKey]: 42 as PropertyType }
     )
 
-    expect(res).toEqual({ _class: 'class', [mKey]: 42 })
+    expect(res).toEqual({ _class: taskIds.class.Task, [mKey]: 42 })
   })
 
   it('creates new doc', () => {
     const res = model.newDoc(
-      'class' as Ref<Class<Doc>>,
+      taskIds.class.Task as Ref<Class<Doc>>,
       'id' as Ref<Doc>,
       { _property: 42 as PropertyType }
     )
 
     expect(res).toEqual({
       _id: 'id',
-      _class: 'class',
+      _class: taskIds.class.Task,
       _property: 42
     })
   })

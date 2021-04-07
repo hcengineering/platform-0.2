@@ -15,13 +15,12 @@
 <script type="ts">
   import { createEventDispatcher } from 'svelte'
   import type { Class, Doc, Ref } from '@anticrm/core'
-  import { CORE_CLASS_DOC } from '@anticrm/core'
   import type { Space } from '@anticrm/domains'
+  import { CORE_CLASS_VDOC } from '@anticrm/domains'
   import type { AttrModel, ClassModel } from '../..'
   import { liveQuery } from '../..'
   import { getEmptyModel, getPresentationService } from '../../utils'
   import Presenter from './presenters/Presenter.svelte'
-  import { CORE_CLASS_VDOC } from '@anticrm/domains'
 
   export let _class: Ref<Class<Doc>>
   export let space: Space

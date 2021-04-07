@@ -158,7 +158,7 @@ export class ReferenceIndex implements DomainIndex {
 
   private async onUpdateTx (ctx: TxContext, update: UpdateTx): Promise<any> {
     const obj = await this.storage.findOne(update._objectClass, { _id: update._objectId }) as Doc
-    this.modelDb.updateDocument(obj, update._query || null, update._attributes)
+    this.modelDb.updateDocument(this.modelDb.as(obj, update._objectClass), update._query || null, update._attributes)
     if (!obj) {
       throw new Error('object not found')
     }

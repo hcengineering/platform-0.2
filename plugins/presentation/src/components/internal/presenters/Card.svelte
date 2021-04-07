@@ -70,27 +70,25 @@
 </script>
 
 {#if duplicate}
-  <div class="card-view" class:duplicate={duplicate}>
+  <div class="card-view" class:duplicate>
     <Component is={presenter} props={{ doc }} />
   </div>
 {:else}
   <div bind:this={dragSource} bind:clientWidth={originalWidth} bind:clientHeight={originalHeight}>
     <div
       class="card-view"
-      class:drag={drag}
+      class:drag
       use:pannable
       on:panstart={handlePanStart}
       on:panmove={handlePanMove}
       on:panend={handlePanEnd}
       style={calcStyle($coords, originalWidth, originalHeight)}>
-
       <Component is={presenter} props={{ doc }} />
     </div>
     {#if drag}
-      <div class="place-box" style={`width: ${beforeDragWidth}px; height: ${beforeDragHeight}px;`}></div>
+      <div class="place-box" style={`width: ${beforeDragWidth}px; height: ${beforeDragHeight}px;`} />
     {/if}
   </div>
-
 {/if}
 
 <style lang="scss">

@@ -18,7 +18,6 @@ import {
   CORE_MIXIN_INDICES, Doc, Mixin, Obj, PropertyType, Ref, StringProperty, Type
 } from './classes'
 import { generateId, Storage, TxContext } from './storage'
-import presentation, { UXObject } from '@anticrm/presentation'
 
 export function mixinKey (mixin: Ref<Mixin<Obj>>, key: string): string {
   return key + '|' + mixin.replace('.', '~')
@@ -191,12 +190,12 @@ export class Model implements Storage {
     throw new Error('no domain found for class: ' + id)
   }
 
-  getClass (_class: Ref<Class<Doc>>): Ref<Class<Doc>> {
+  getClass (_class: Ref<Class<Obj>>): Ref<Class<Obj>> {
     let cls = _class
     while (cls) {
       const clazz = this.get(cls)
       if (clazz._kind === ClassifierKind.CLASS) return cls
-      cls = clazz._extends as Ref<Class<Doc>>
+      cls = clazz._extends as Ref<Class<Obj>>
     }
     throw new Error('class not found in hierarchy: ' + _class)
   }
@@ -252,6 +251,13 @@ export class Model implements Storage {
     }
   }
 
+  getLayout (doc: Obj): AnyLayout {
+    if ((doc as any).__layout) {
+      return ((doc as unknown as Proxy).__layout) as AnyLayout
+    }
+    return (doc as unknown) as AnyLayout
+  }
+
   // from Builder
   assign (layout: AnyLayout, _class: Ref<Class<Obj>>, values: AnyLayout): AnyLayout {
     const l = layout
@@ -259,7 +265,7 @@ export class Model implements Storage {
 
     // Also assign a class to value if not specified
     if (!layout._class) {
-      layout._class = _class
+      layout._class = this.getClass(_class) // Be sure we use class, not a mixin.
     }
     for (const rKey in values) {
       if (rKey.startsWith('_')) {
@@ -316,12 +322,12 @@ export class Model implements Storage {
       // We need to find embedded object first
       const result = this.matchObject(doc._class, doc, query, false)
       if (result.result && result.match) {
-        this.assign((result.match as unknown) as AnyLayout, result.match._class, attributes)
+        this.assign(this.getLayout(result.match), result.match._class, attributes)
         return doc
       }
       throw new Error(`failed to match embedded object by query:${query}`)
     }
-    this.assign((doc as unknown) as AnyLayout, doc._class, attributes)
+    this.assign(this.getLayout(doc), doc._class, attributes)
     return doc
   }
 
@@ -377,7 +383,7 @@ export class Model implements Storage {
 
   public mixinDocument<E extends Obj, T extends Obj> (doc: E, clazz: Ref<Mixin<T>>, values: Partial<Omit<T, keyof E>>): void {
     Model.includeMixin(doc, clazz)
-    this.assign((doc as unknown) as AnyLayout, clazz as Ref<Class<Obj>>, (values as unknown) as AnyLayout)
+    this.assign(this.getLayout(doc), clazz as Ref<Class<Obj>>, (values as unknown) as AnyLayout)
   }
 
   public static includeMixin<E extends Obj, T extends Obj> (doc: E, clazz: Ref<Mixin<T>>): void {
@@ -568,7 +574,7 @@ export class Model implements Storage {
     return obj._mixins ? obj._mixins.includes(_class) : false
   }
 
-  public asMixin<T extends Doc> (obj: Obj, _class: Ref<Mixin<T>>, action: (doc: T) => void) {
+  public asMixin<T extends Doc> (obj: Obj, _class: Ref<Mixin<T>>, action: (doc: T) => void): void {
     if (this.isMixedIn(obj, _class)) {
       action(this.as(obj, _class))
     }

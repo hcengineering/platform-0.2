@@ -35,7 +35,6 @@
   </div>
 {/if}
 
-
 <style lang="scss">
   .card-view {
     max-width: 300px;
