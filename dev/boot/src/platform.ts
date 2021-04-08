@@ -32,6 +32,7 @@ import personExtras from '@anticrm/person-extras'
 import uiMeta from '@anticrm/platform-ui/src/__meta__/meta'
 import workbenchMeta from '@anticrm/workbench/src/__meta__'
 import chunterMeta from '@anticrm/chunter/src/__meta__'
+import recruitingMeta from '@anticrm/recruiting/src/__meta__'
 import taskMeta from '@anticrm/task/src/__meta__'
 import presentationMeta from '@anticrm/presentation/src/__meta__'
 import loginMeta from '@anticrm/login/src/__meta__'
@@ -66,6 +67,7 @@ uiMeta(platform)
 workbenchMeta(platform)
 chunterMeta(platform)
 // recruitmentMeta(platform)
+recruitingMeta(platform)
 taskMeta(platform)
 presentationMeta(platform)
 loginMeta(platform)
