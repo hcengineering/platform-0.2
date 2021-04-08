@@ -72,8 +72,8 @@ limitations under the License.
 <div class="root">
   <div class="form">
     {#if spaces && spaces.length > 1}
-    <SpaceBox label="Vacancy" {spaces} bind:space />
-  {/if}
+      <SpaceBox label="Vacancy" {spaces} bind:space />
+    {/if}
     <EditBox bind:value={newEvent.summary} label="Summary" placeholder="Summary" />
     <DateInput bind:value={newEvent.startDate} label="Start date" placeholder="Start date" />
     <DateInput bind:value={newEvent.endDate} label="End date" placeholder="End date" />
