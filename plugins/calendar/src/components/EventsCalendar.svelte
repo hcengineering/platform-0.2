@@ -14,7 +14,7 @@
 -->
 <script type="ts">
   import type { Space } from '@anticrm/domains'
-  import { createLiveQuery, updateLiveQuery } from '@anticrm/presentation'
+  import { liveQuery } from '@anticrm/presentation'
 
   import type { CalendarEvent } from '..'
   import calendar from '..'
@@ -53,15 +53,11 @@
   let firstDayOfCurrentMonth: Date
   let displayedWeeksCount: number
 
-  const query = createLiveQuery(calendar.class.CalendarEvent, { _space: space._id }, (docs) => {
+  $: query = liveQuery(query, calendar.class.CalendarEvent, { _space: space._id }, (docs) => {
     events = docs
   })
 
   $: {
-    updateLiveQuery(query, calendar.class.CalendarEvent, {
-      _space: space._id
-    })
-
     eventCoordinatesMap.clear()
     const lastDisplayedDate = new Date(firstDayOfCurrentMonth)
     lastDisplayedDate.setDate(lastDisplayedDate.getDate() + 7 * displayedWeeksCount)
