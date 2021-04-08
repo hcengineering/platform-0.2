@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-import core, { ArrayOf$, Builder, Class$, Enum$, EnumValue$, Literal, Primary, Prop, RefTo$ } from '@anticrm/model'
+import core, { ArrayOf$, Builder, Class$, Enum$, EnumOf$, Literal, Primary, Prop, RefTo$ } from '@anticrm/model'
 
 import calendar, {
   Calendar, CalendarEvent, RecurrenceProperty, RecurrenceType
@@ -26,6 +26,8 @@ import workbench from '@anticrm/workbench/src/__model__'
 import contact from '@anticrm/contact/src/__model__'
 import presentation from '@anticrm/presentation'
 
+export const DOMAIN_CALENDAR = 'calendar'
+
 @Enum$(calendar.enum.RecurrenceType)
 class TRecurrenceType extends TEnum<RecurrenceType> {
   @Literal(RecurrenceType) [RecurrenceType.Daily]!: any
@@ -36,7 +38,7 @@ class TRecurrenceType extends TEnum<RecurrenceType> {
 
 @Class$(calendar.class.RecurrenceProperty, core.class.Emb)
 export class TRecurrenceProperty extends TEmb implements RecurrenceProperty {
-    @EnumValue$(calendar.enum.RecurrenceType)
+    @EnumOf$(calendar.enum.RecurrenceType)
     type!: RecurrenceType
 
     @Prop(core.class.Number) interval!: number
@@ -57,7 +59,7 @@ export class TCalendar extends TVDoc implements Calendar {
     participants!: Ref<User>[]
 }
 
-@Class$(calendar.class.CalendarEvent, core.class.VDoc)
+@Class$(calendar.class.CalendarEvent, core.class.VDoc, DOMAIN_CALENDAR)
 @UX('Event' as IntlString)
 export class TCalendarEvent extends TVDoc implements CalendarEvent {
     @Primary()
@@ -65,11 +67,14 @@ export class TCalendarEvent extends TVDoc implements CalendarEvent {
     @UX('Summary' as IntlString)
     summary!: string
 
+    @UX('Participants' as IntlString)
     @ArrayOf$()
     @RefTo$(contact.mixin.User) participants!: Ref<User>[]
 
+    @UX('Start date' as IntlString)
     @Prop(core.class.Date) startDate!: Date
 
+    @UX('End date' as IntlString)
     @Prop(core.class.Date) endDate?: Date
 
     recurrence?: RecurrenceProperty
@@ -80,7 +85,7 @@ export function model (S: Builder): void {
 
   S.createDocument(workbench.class.WorkbenchApplication, {
     route: 'calendar',
-    label: 'Calendar' as string,
+    label: 'Calendar' as IntlString,
     component: workbench.component.Application,
     classes: [calendar.class.CalendarEvent],
     supportSpaces: true,
@@ -91,6 +96,12 @@ export function model (S: Builder): void {
     displayClass: calendar.class.CalendarEvent,
     label: 'Calendar' as IntlString,
     component: calendar.component.EventsCalendar
+  })
+
+  S.createDocument(workbench.class.ItemCreator, {
+    app: calendar.application.Calendar,
+    class: calendar.class.CalendarEvent,
+    name: 'Event' as IntlString
   })
 
   S.mixin(calendar.class.CalendarEvent, presentation.mixin.CreateForm, {

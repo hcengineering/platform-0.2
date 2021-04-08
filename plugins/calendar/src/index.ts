@@ -17,8 +17,9 @@ import { plugin, Plugin, Service } from '@anticrm/platform'
 import { Class, Ref, Enum, Emb } from '@anticrm/core'
 
 import { User } from '@anticrm/contact'
-import { Application, VDoc } from '@anticrm/domains'
+import { VDoc } from '@anticrm/domains'
 import { AnyComponent } from '@anticrm/platform-ui'
+import { WorkbenchApplication } from '@anticrm/workbench'
 
 export enum RecurrenceType {
     Daily,
@@ -72,6 +73,6 @@ export default plugin('Calendar' as Plugin<CalendarService>, {}, {
     EventsCalendar: '' as AnyComponent
   },
   application: {
-    Calendar: '' as Ref<Application>
+    Calendar: '' as Ref<WorkbenchApplication>
   }
 })

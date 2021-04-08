@@ -15,21 +15,22 @@ limitations under the License.
   import { generateId } from '@anticrm/core'
   import type { Space } from '@anticrm/domains'
   import { getCoreService } from '@anticrm/presentation'
-  import workbench from '@anticrm/workbench/src/__model__'
+  import SpaceBox from '@anticrm/platform-ui/src/components/SpaceBox.svelte'
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
   import EditBox from '@anticrm/sparkling-controls/src/EditBox.svelte'
   import DateInput from '@anticrm/sparkling-controls/src/DateInput.svelte'
-  import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import type { CalendarEvent } from '..'
   import calendar from '..'
 
-  export let space: Ref<Space>
+  export let spaces: Space[]
   const coreService = getCoreService()
   const dispatch = createEventDispatcher()
 
+  let space: Space | undefined = spaces[0]
+
   const newEvent: CalendarEvent = {
     _id: generateId(),
-    _space: space,
+    _space: space?._id as Ref<Space>,
     _class: calendar.class.CalendarEvent,
     _createdBy: '' as StringProperty,
     _createdOn: Date.now() as DateProperty,
@@ -60,7 +61,7 @@ limitations under the License.
       ...newEvent,
       startDate: getAllDayEventStart(newEvent.startDate),
       endDate: getAllDayEventEnd(newEvent.endDate),
-      _space: space, // Just to get latest space
+      _space: space?._id,
       _createBy: core.getUserId()
     }
     await core.create(calendar.class.CalendarEvent, doc)
@@ -69,13 +70,10 @@ limitations under the License.
 </script>
 
 <div class="root">
-  <div class="header">
-    <div class="description">Add Event</div>
-    <div on:click={() => dispatch('close')}>
-      <Icon icon={workbench.icon.Close} button={true} />
-    </div>
-  </div>
   <div class="form">
+    {#if spaces && spaces.length > 1}
+    <SpaceBox label="Vacancy" {spaces} bind:space />
+  {/if}
     <EditBox bind:value={newEvent.summary} label="Summary" placeholder="Summary" />
     <DateInput bind:value={newEvent.startDate} label="Start date" placeholder="Start date" />
     <DateInput bind:value={newEvent.endDate} label="End date" placeholder="End date" />
@@ -90,15 +88,6 @@ limitations under the License.
   .root {
     min-width: 450px;
     padding: 25px;
-  }
-  .header {
-    display: flex;
-    padding-bottom: 10px;
-  }
-  .description {
-    flex-grow: 1;
-    font-size: 18px;
-    font-weight: 500;
   }
   .form {
     display: grid;
