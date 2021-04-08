@@ -15,8 +15,8 @@
 <script type="ts">
   import { createEventDispatcher } from 'svelte'
   import type { Class, Doc, Ref } from '@anticrm/core'
-  import { CORE_CLASS_DOC } from '@anticrm/core'
   import type { Space } from '@anticrm/domains'
+  import { CORE_CLASS_VDOC } from '@anticrm/domains'
   import type { AttrModel, ClassModel } from '../..'
   import { liveQuery } from '../..'
   import { getEmptyModel, getPresentationService } from '../../utils'
@@ -35,7 +35,7 @@
   $: {
     if (_class && _class !== modelClass) {
       getPresentationService()
-        .then((p) => p.getClassModel(_class, CORE_CLASS_DOC))
+        .then((p) => p.getClassModel(_class, CORE_CLASS_VDOC))
         .then((m) => {
           model = m
           modelClass = _class

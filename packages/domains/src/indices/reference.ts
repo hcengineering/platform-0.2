@@ -53,8 +53,8 @@ export class ReferenceIndex implements DomainIndex {
 
     const keys = this.modelDb
       .getAllAttributes(_class)
-      .filter((attr) => attr[1].type._class === CORE_CLASS_STRING)
-      .map((attr) => attr[0])
+      .filter((m) => m.attr.type._class === CORE_CLASS_STRING)
+      .map((m) => m.key)
     this.textAttributes.set(_class, keys)
     return keys
   }
@@ -65,11 +65,11 @@ export class ReferenceIndex implements DomainIndex {
 
     const keys = this.modelDb
       .getAllAttributes(_class)
-      .filter((attr) => attr[1].type._class === CORE_CLASS_ARRAY_OF && (attr[1].type as ArrayOf).of._class === CORE_CLASS_INSTANCE_OF)
-      .map((attr) => {
+      .filter((m) => m.attr.type._class === CORE_CLASS_ARRAY_OF && (m.attr.type as ArrayOf).of._class === CORE_CLASS_INSTANCE_OF)
+      .map((m) => {
         return {
-          key: attr[0],
-          _class: ((attr[1].type as ArrayOf).of as InstanceOf<Emb>).of
+          key: m.key,
+          _class: ((m.attr.type as ArrayOf).of as InstanceOf<Emb>).of
         } as ClassKey
       })
     this.arrayAttributes.set(_class, keys)
@@ -158,7 +158,7 @@ export class ReferenceIndex implements DomainIndex {
 
   private async onUpdateTx (ctx: TxContext, update: UpdateTx): Promise<any> {
     const obj = await this.storage.findOne(update._objectClass, { _id: update._objectId }) as Doc
-    this.modelDb.updateDocument(obj, update._query || null, update._attributes)
+    this.modelDb.updateDocument(this.modelDb.as(obj, update._objectClass), update._query || null, update._attributes)
     if (!obj) {
       throw new Error('object not found')
     }

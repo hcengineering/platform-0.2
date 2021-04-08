@@ -13,22 +13,22 @@
 // limitations under the License.
 -->
 <script type="ts">
-  import type { WorkbenchApplication } from '../..'
+  import type { ItemCreator, WorkbenchApplication } from '../..'
   import workbench from '../..'
 
+  import type { QueryUpdater } from '@anticrm/platform-core'
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
-  import Button from '@anticrm/sparkling-controls/src/Button.svelte'
   import CreateForm from './CreateForm.svelte'
-  import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import IconEditBox from '@anticrm/platform-ui/src/components/IconEditBox.svelte'
   import type { Space } from '@anticrm/domains'
   import type { Viewlet } from '@anticrm/presentation'
-  import ui, { createLiveQuery, getCoreService } from '@anticrm/presentation'
+  import ui, { createLiveQuery, getCoreService, liveQuery } from '@anticrm/presentation'
   import type { Action } from '@anticrm/platform-ui'
   import { getUIService } from '@anticrm/platform-ui'
   import Component from '@anticrm/platform-ui/src/components/Component.svelte'
   import ActionBar from '@anticrm/platform-ui/src/components/ActionBar.svelte'
-  import type { Model } from '@anticrm/core'
+  import type { Class, Doc, Model, Ref } from '@anticrm/core'
+  import CreateControl from './CreateControl.svelte'
 
   export let application: WorkbenchApplication
   export let space: Space
@@ -36,27 +36,51 @@
   const coreService = getCoreService()
   const uiService = getUIService()
 
-  let addIcon: HTMLElement
+  let model: Model
+  coreService.then((cs) => {
+    model = cs.getModel()
+  })
 
   // Represent all possible presenters
   let presenters: Viewlet[] = []
+  let creators: ItemCreator[] = []
 
   let viewletActions: Action[] = []
   let activeViewlet: Viewlet | undefined
+  let viewletProps: Record<string, any> = {}
+  let activeClasses: Ref<Class<Doc>>[] = []
+
+  let creatorsQuery: Promise<QueryUpdater<ItemCreator>> | undefined
+
+  const onCreatorClick = (creator: ItemCreator) => uiService.showModal(CreateForm, { creator, spaces: [space] })
+
+  $: creatorsQuery = liveQuery(creatorsQuery, workbench.class.ItemCreator, { app: application._id }, (docs) => {
+    creators = docs
+  })
 
   createLiveQuery(ui.mixin.Viewlet, {}, (docs) => {
     presenters = docs
   })
 
-  function filterViewlets (model: Model, presenters: Viewlet[]): Viewlet[] {
+  function filterViewlets (model: Model, presenters: Viewlet[], application: WorkbenchApplication): Viewlet[] {
     return presenters.filter((d) => {
-      for (const cc of application?.classes) {
+      for (const cc of application.classes) {
         if (model.is(cc, d.displayClass)) {
           return true
         }
       }
       return false
     })
+  }
+
+  function findViewletClasses (model: Model, application: WorkbenchApplication, vielet: Viewlet): Ref<Class<Doc>>[] {
+    const result: Ref<Class<Doc>>[] = []
+    for (const cc of application?.classes) {
+      if (model.is(cc, vielet.displayClass)) {
+        result.push(cc)
+      }
+    }
+    return result
   }
 
   function getViewletActions (
@@ -76,58 +100,40 @@
     })
   }
 
-  $: {
-    // Update available presenters based on application
-    coreService.then((cs) => {
-      const model = cs.getModel()
-
-      const viewlets = filterViewlets(model, presenters)
-      if (viewlets.length > 0 && !activeViewlet) {
-        activeViewlet = viewlets[0]
-      }
-      viewletActions = getViewletActions(application, activeViewlet, viewlets)
-    })
+  // Update available presenters based on application
+  $: if (model) {
+    const viewlets = filterViewlets(model, presenters, application)
+    if (viewlets.length > 0 && !activeViewlet) {
+      activeViewlet = viewlets[0]
+    }
+    viewletActions = getViewletActions(application, activeViewlet, viewlets)
   }
 
-  function getLabel (str: string): string {
-    if (str === 'Pages') return 'New page'
-    if (str === 'Tasks') return 'New task'
-    if (str === 'Vacancies') return 'Add candidate'
-    if (str === 'Calendar') return 'Add event'
-    return 'Add'
+  $: if (activeViewlet && model) {
+    activeClasses = findViewletClasses(model, application, activeViewlet)
+    if (activeViewlet.parameters) {
+      viewletProps = { ...activeViewlet.parameters, _class: activeClasses[0], space, editable: false }
+    } else {
+      viewletProps = { _class: activeClasses[0], space, editable: false }
+    }
   }
 </script>
 
 <div class="workbench-browse">
   {#if application}
     <div class="captionContainer">
-      <span class="caption-1" style="padding-right:1em">{application.label}</span>&nbsp;
-      <div bind:this={addIcon}>
-        <Button
-          kind="transparent"
-          on:click={() => {
-            uiService.showModal(
-              CreateForm,
-              { _class: application ? application.classes[0] : undefined, space: space._id },
-              addIcon
-            )
-          }}>
-          <Icon icon={workbench.icon.Add} button="true" />
-          <span style="padding-left:.5em">{getLabel(application.label)}</span>
-        </Button>
+      <div class="captionLeftItems">
+        <span class="caption-1" style="padding-right:1em">{application.label}</span>&nbsp;
+        <CreateControl {creators} {onCreatorClick} />
       </div>
-      <div style="flex-grow:1" />
-      <IconEditBox icon={workbench.icon.Finder} placeholder="Поиск по {application.label}..." iconRight="true" />
+      <IconEditBox icon={workbench.icon.Finder} placeholder="Поиск по {application.label}..." iconRight={true} />
     </div>
     <div class="presentation">
       <ActionBar actions={viewletActions} />
     </div>
     <ScrollView height="100%" margin="2em">
-      {#if activeViewlet && activeViewlet.component}
-        <Component
-          is={activeViewlet.component}
-          props={{ _class: application.classes[0], space: space, editable: false }}
-          on:open />
+      {#if activeViewlet && activeViewlet.component && activeClasses.length > 0}
+        <Component is={activeViewlet.component} props={viewletProps} on:open />
       {/if}
     </ScrollView>
   {/if}
@@ -147,6 +153,11 @@
       border-bottom: 1px solid var(--theme-bg-accent-color);
       display: flex;
       justify-content: space-between;
+      align-items: center;
+    }
+
+    .captionLeftItems {
+      display: flex;
       align-items: center;
     }
 

@@ -16,9 +16,8 @@
   import type { Property, Ref } from '@anticrm/core'
   import { createEventDispatcher } from 'svelte'
   import { getCoreService } from '@anticrm/presentation'
-  import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import UserBox from '@anticrm/platform-ui/src/components/UserBox.svelte'
-  import workbench from '@anticrm/workbench'
+  import SpaceBox from '@anticrm/platform-ui/src/components/SpaceBox.svelte'
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
   import type { Space } from '@anticrm/domains'
@@ -30,8 +29,10 @@
 
   export let title: string
   let message = ''
-  export let space: Ref<Space>
+  export let spaces: Space[]
   let object = {} as any
+
+  let space: Space | undefined = spaces[0]
 
   const coreService = getCoreService()
   const dispatch = createEventDispatcher()
@@ -43,7 +44,7 @@
     const modelDb = cs.getModel()
     const newTask = modelDb.newDoc(task.class.Task, cs.generateId(), {
       title,
-      _space: space,
+      _space: space?._id,
       ...object,
       status: TaskStatus.Open,
       comments: [
@@ -57,7 +58,10 @@
     })
     try {
       const asShortId = modelDb.cast(newTask, CORE_MIXIN_SHORTID)
-      asShortId.shortId = await cs.genRefId(space)
+
+      if (space) {
+        asShortId.shortId = await cs.genRefId(space._id as Ref<Space>)
+      }
     } catch (e) {
       // Ignore
       console.log(e)
@@ -94,13 +98,16 @@
 </script>
 
 <div class="recruiting-view">
+  {#if spaces && spaces.length > 1}
+    <div class="spaceSelector">
+      <SpaceBox label="Project" {spaces} bind:space />
+    </div>
+  {/if}
+
   <div class="header">
     <div class="caption-1 caption">
       <EditBox id="create_task__input__name" bind:value={title} label="Name" placeholder="Name" />
     </div>
-    <a href="/" style="margin-left:1.5em" on:click|preventDefault={() => dispatch('close')}>
-      <Icon icon={workbench.icon.Close} button="true" />
-    </a>
   </div>
 
   <div class="content">
@@ -127,7 +134,6 @@
 
 <style lang="scss">
   .recruiting-view {
-    padding: 24px 32px 32px 32px;
     width: 40em;
     display: flex;
     flex-direction: column;
@@ -135,7 +141,7 @@
 
   .header {
     display: flex;
-    margin-bottom: 9px;
+    margin-bottom: 10px;
 
     .caption {
       flex-grow: 1;
@@ -147,5 +153,9 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     column-gap: 16px;
+  }
+
+  .spaceSelector {
+    padding-bottom: 10px;
   }
 </style>

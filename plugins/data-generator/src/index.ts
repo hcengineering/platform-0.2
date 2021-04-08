@@ -21,7 +21,7 @@ import _task from '@anticrm/task'
 // import _chunter from '@anticrm/chunter'
 import _contact from '@anticrm/contact'
 import { Ref } from '@anticrm/core'
-import { Application } from '@anticrm/domains'
+import { WorkbenchApplication } from '@anticrm/workbench'
 
 // P L U G I N
 
@@ -44,7 +44,7 @@ const dataGenPlugin = plugin(
       DataGenView: '' as AnyComponent
     },
     application: {
-      DataGen: '' as Ref<Application>
+      DataGen: '' as Ref<WorkbenchApplication>
     }
   }
 )

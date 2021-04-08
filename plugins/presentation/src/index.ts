@@ -82,6 +82,8 @@ export interface Viewlet extends Doc {
   label: IntlString
   icon?: Asset
   component: AnyComponent
+
+  parameters?: Record<string, any> // A set of parameter values for configure particular viewlet.
 }
 
 // U I  M O D E L
@@ -162,6 +164,7 @@ const presentationPlugin = plugin('presentation' as Plugin<PresentationService>,
     UXAttribute: '' as Ref<Mixin<UXAttribute>>,
     Presenter: '' as Ref<Mixin<Presenter<Type>>>,
     DetailForm: '' as Ref<Mixin<ComponentExtension<VDoc>>>,
+    CardForm: '' as Ref<Mixin<ComponentExtension<VDoc>>>,
 
     // Define a form to create a new instance of specified class.
     CreateForm: '' as Ref<Mixin<ComponentExtension<VDoc>>>,
@@ -176,7 +179,9 @@ const presentationPlugin = plugin('presentation' as Plugin<PresentationService>,
     CheckboxPresenter: '' as AnyComponent,
     RefPresenter: '' as AnyComponent,
     TablePresenter: '' as AnyComponent,
-    ArrayPresenter: '' as AnyComponent
+    ArrayPresenter: '' as AnyComponent,
+    VDocCardPresenter: '' as AnyComponent, // Some default card presenter
+    CardPresenter: '' as AnyComponent // Card presenter
   }
 })
 

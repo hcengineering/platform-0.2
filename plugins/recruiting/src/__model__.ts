@@ -10,8 +10,8 @@
 //
 // See the License for the specific language governing permissions and
 // limitations under the License.
-import core, { Builder, Class$, InstanceOf$, Mixin$, Prop } from '@anticrm/model'
-import { TEmb } from '@anticrm/model/src/__model__'
+import core, { Builder, Class$, Enum$, EnumOf$, InstanceOf$, Literal, Mixin$, Prop } from '@anticrm/model'
+import { TEmb, TEnum } from '@anticrm/model/src/__model__'
 import { IntlString } from '@anticrm/platform-i18n'
 import presentation from '@anticrm/presentation'
 import { UX } from '@anticrm/presentation/src/__model__'
@@ -19,7 +19,7 @@ import workbench from '@anticrm/workbench/src/__model__'
 import { TWithResume } from '@anticrm/person-extras/src/__model__'
 import personExtras from '@anticrm/person-extras'
 
-import recruiting, { Candidate, WithCandidateProps } from '.'
+import recruiting, { Candidate, CandidateState, WithCandidateProps } from '.'
 
 @UX('Candidate' as IntlString)
 @Class$(recruiting.class.Candidate, core.class.Emb)
@@ -37,15 +37,29 @@ export class TCandidate extends TEmb implements Candidate {
   salaryExpectation!: number
 }
 
+@Enum$(recruiting.enum.State)
+class TCandidateState extends TEnum<CandidateState> {
+  @Literal(CandidateState) [CandidateState.New]!: any
+  @Literal(CandidateState) [CandidateState.DecisionPending]!: any
+  @Literal(CandidateState) [CandidateState.OfferSended]!: any
+  @Literal(CandidateState) [CandidateState.InProgress]!: any
+  @Literal(CandidateState) [CandidateState.Approved]!: any
+  @Literal(CandidateState) [CandidateState.Done]!: any
+  @Literal(CandidateState) [CandidateState.Rejected]!: any
+  @Literal(CandidateState) [CandidateState.InterviewPending]!: any
+}
+
 @Mixin$(recruiting.mixin.WithCandidateProps, personExtras.mixin.WithResume)
 export class TWithCandidateProps extends TWithResume implements WithCandidateProps {
   @Prop()
   @InstanceOf$(recruiting.class.Candidate)
   candidate!: Candidate
+
+  @EnumOf$(recruiting.enum.State) state!: CandidateState
 }
 
 export function model (S: Builder): void {
-  S.add(TCandidate, TWithCandidateProps)
+  S.add(TCandidate, TWithCandidateProps, TCandidateState)
   S.createDocument(workbench.class.WorkbenchApplication, {
     route: 'vacancies',
     label: 'Vacancies' as IntlString,
@@ -60,6 +74,26 @@ export function model (S: Builder): void {
     displayClass: recruiting.mixin.WithCandidateProps,
     label: 'Card' as IntlString,
     component: recruiting.component.CandidateList
+  })
+
+  S.createDocument(presentation.mixin.Viewlet, {
+    displayClass: recruiting.mixin.WithCandidateProps,
+    label: 'State' as IntlString,
+    component: presentation.component.CardPresenter
+  })
+
+  S.createDocument(workbench.class.ItemCreator, {
+    app: recruiting.application.Vacancies,
+    class: recruiting.mixin.WithCandidateProps,
+    name: 'Candidate' as IntlString
+  })
+
+  // This is just a temporary example
+  S.createDocument(workbench.class.ItemCreator, {
+    app: recruiting.application.Vacancies,
+    class: recruiting.mixin.WithCandidateProps,
+    name: 'Candidate with custom component' as IntlString,
+    component: recruiting.component.NewCandidate
   })
 
   S.mixin(recruiting.mixin.WithCandidateProps, presentation.mixin.CreateForm, {

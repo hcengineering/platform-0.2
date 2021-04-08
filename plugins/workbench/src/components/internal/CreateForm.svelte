@@ -1,40 +1,36 @@
 <!--
-// Copyright © 2020 Anticrm Platform Contributors.
-//
-// Licensed under the Eclipse Public License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License. You may
-// obtain a copy of the License at https://www.eclipse.org/legal/epl-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//
-// See the License for the specific language governing permissions and
-// limitations under the License.
+Copyright © 2020, 2021 Anticrm Platform Contributors.
+
+Licensed under the Eclipse Public License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License. You may
+obtain a copy of the License at https://www.eclipse.org/legal/epl-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+
+See the License for the specific language governing permissions and
+limitations under the License.
 -->
 <script lang="ts">
-  import type { Class, Doc, Ref } from '@anticrm/core'
   import { createEventDispatcher } from 'svelte'
-  import type { AnyComponent } from '@anticrm/platform-ui'
-  import type { AttrModel, ClassModel } from '@anticrm/presentation'
-  import presentation, { getComponentExtension, getCoreService, getPresentationService } from '@anticrm/presentation'
-  import Properties from '@anticrm/presentation/src/components/internal/Properties.svelte'
-  import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
-  import workbench from '@anticrm/workbench'
-  import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.svelte'
-  import Button from '@anticrm/sparkling-controls/src/Button.svelte'
+
   import type { Space } from '@anticrm/domains'
   import { CORE_CLASS_VDOC } from '@anticrm/domains'
+  import type { AttrModel, ClassModel } from '@anticrm/presentation'
+  import presentation, { getComponentExtension, getPresentationService } from '@anticrm/presentation'
+  import type { AnyComponent } from '@anticrm/platform-ui'
+  import workbench, { ItemCreator } from '@anticrm/workbench'
+
+  import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import Component from '@anticrm/platform-ui/src/components/Component.svelte'
 
-  export let title = ''
-  export let _class: Ref<Class<Doc>>
-  export let space: Ref<Space>
-  let object = {} as any
+  import DefaultForm from './DefaultForm.svelte'
 
-  const coreService = getCoreService()
+  export let creator: ItemCreator
+  export let spaces: Space[]
 
-  let createFormComponent: AnyComponent | undefined
+  let createFormComponent: AnyComponent | undefined = creator.component
   const dispatch = createEventDispatcher()
 
   let model: ClassModel | undefined
@@ -42,28 +38,16 @@
 
   const presentationService = getPresentationService()
 
-  async function save () {
-    const doc = {
-      _class,
-      [primary?.key || 'name']: title,
-      _space: space,
-      ...object
-    }
-
-    object = {}
-
-    // absent VDoc fields will be autofilled
-    const cs = await coreService
-    await cs.create(_class, doc)
-    dispatch('close')
-  }
+  const onClose = () => dispatch('close')
 
   const init = Promise.all([
-    getComponentExtension(_class, presentation.mixin.CreateForm).then((ext) => {
-      createFormComponent = ext
-    }),
+    createFormComponent
+      ? Promise.resolve()
+      : getComponentExtension(creator.class, presentation.mixin.CreateForm).then((ext) => {
+        createFormComponent = ext
+      }),
     presentationService.then((ps) =>
-      ps.getClassModel(_class, CORE_CLASS_VDOC).then((m) => {
+      ps.getClassModel(creator.class, CORE_CLASS_VDOC).then((m) => {
         const mp = m.filterPrimary()
         model = mp.model
         primary = mp.primary
@@ -73,48 +57,55 @@
 </script>
 
 {#await init then _}
-  {#if createFormComponent}
-    <Component is={createFormComponent} props={{ space: space }} on:change on:close={() => dispatch('close')} />
-  {:else}
-    <div class="recruiting-view">
-      <div class="header">
-        <div class="caption-1 caption">
-          <InlineEdit bind:value={title} placeholder="Title" fullWidth="true" />
-        </div>
-        <a href="/" style="margin-left:1.5em" on:click|preventDefault={() => dispatch('close')}>
-          <Icon icon={workbench.icon.Close} button="true" />
-        </a>
+  <div class="root">
+    <div class="header">
+      <div class="title-container">
+        <div class="title">New {creator.name}</div>
       </div>
-
-      <Properties {model} bind:object />
-      <div class="buttons">
-        <Button kind="primary" on:click={save}>Принять</Button>
-        <Button on:click={() => dispatch('close')}>Отказаться</Button>
+      <div class="close" on:click={onClose}>
+        <Icon icon={workbench.icon.Close} button={true} />
       </div>
     </div>
-  {/if}
+    {#if createFormComponent}
+      <Component is={createFormComponent} props={{ spaces }} on:change on:close={onClose} />
+    {:else}
+      <DefaultForm {creator} {model} {primary} {spaces} on:close={onClose} />
+    {/if}
+  </div>
 {/await}
 
 <style lang="scss">
-  .recruiting-view {
-    padding: 24px 32px 32px 32px;
+  .root {
     display: flex;
     flex-direction: column;
+
+    padding: 24px 32px 32px 32px;
+    max-height: 80vh;
+  }
+
+  .close {
+    cursor: pointer;
   }
 
   .header {
     display: flex;
-    margin-bottom: 9px;
+    justify-content: space-between;
 
-    .caption {
-      flex-grow: 1;
-    }
+    padding-bottom: 10px;
   }
 
-  .buttons {
-    margin-top: 16px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    column-gap: 16px;
+  .title-container {
+    flex: 1;
+    min-width: 0;
+    max-width: 300px;
+  }
+
+  .title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    font-size: 18px;
+    font-weight: 500;
   }
 </style>

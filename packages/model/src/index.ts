@@ -13,9 +13,13 @@
 // limitations under the License.
 //
 
-import type { Emb, Enum, EnumLiteral } from '@anticrm/core'
+import type { Emb, Enum, EnumLiteral, EnumOf } from '@anticrm/core'
 import {
-  ArrayOf, Attribute, BagOf, Class, Classifier, CORE_CLASS_CLASS, CORE_CLASS_DOC, CORE_CLASS_EMB, CORE_CLASS_STRING,
+  ArrayOf, Attribute, BagOf, Class, Classifier, CORE_CLASS_ARRAY_OF, CORE_CLASS_BAG_OF, CORE_CLASS_CLASS,
+  CORE_CLASS_DOC, CORE_CLASS_EMB,
+  CORE_CLASS_ENUM_OF,
+  CORE_CLASS_INSTANCE_OF, CORE_CLASS_REF_TO,
+  CORE_CLASS_STRING, CORE_CLASS_TYPE,
   Doc, Indices, InstanceOf, Mixin, Obj, Ref, RefTo, Tx, Type
 } from '@anticrm/core'
 import type { CreateTx, DeleteTx, PushTx, Reference, Space, UpdateTx } from '@anticrm/domains'
@@ -44,15 +48,16 @@ const modelIds = identify('core' as AnyPlugin, {
     Enum: '' as Ref<Class<Enum<any>>>,
 
     // Data types
-    Type: '' as Ref<Class<Type>>,
+    Type: CORE_CLASS_TYPE as Ref<Class<Type>>,
     String: CORE_CLASS_STRING as Ref<Class<Type>>,
     Number: '' as Ref<Class<Type>>,
     Boolean: '' as Ref<Class<Type>>,
     Date: '' as Ref<Class<Type>>,
-    ArrayOf: '' as Ref<Class<ArrayOf>>,
-    RefTo: '' as Ref<Class<RefTo<Doc>>>,
-    BagOf: '' as Ref<Class<BagOf>>,
-    InstanceOf: '' as Ref<Class<InstanceOf<Emb>>>,
+    ArrayOf: CORE_CLASS_ARRAY_OF as Ref<Class<ArrayOf>>,
+    RefTo: CORE_CLASS_REF_TO as Ref<Class<RefTo<Doc>>>,
+    BagOf: CORE_CLASS_BAG_OF as Ref<Class<BagOf>>,
+    InstanceOf: CORE_CLASS_INSTANCE_OF as Ref<Class<InstanceOf<Emb>>>,
+    EnumOf: CORE_CLASS_ENUM_OF as Ref<Class<EnumOf<any>>>,
 
     Tx: '' as Ref<Class<Tx>>,
     CreateTx: CORE_CLASS_CREATE_TX as Ref<Class<CreateTx>>,

@@ -19,7 +19,7 @@ import 'reflect-metadata'
 import core from '.'
 import {
   AnyLayout, ArrayOf, Attribute, BagOf, Class, Classifier, ClassifierKind, Doc, Emb, Enum, EnumKey, EnumLiteral,
-  EnumLiterals, EnumValue, InstanceOf, Mixin, Model, Obj, Property, Ref, RefTo, StringProperty, Type
+  EnumLiterals, EnumOf, InstanceOf, Mixin, Model, Obj, Property, Ref, RefTo, StringProperty, Type
 } from '@anticrm/core'
 
 const classifierMetadataKey = Symbol('anticrm:classifier')
@@ -158,13 +158,13 @@ export function RefTo$ (to: Ref<Class<Doc>>) {
   }
 }
 
-export function EnumValue$ (to: Ref<Enum<any>>) {
+export function EnumOf$ (of: Ref<Enum<any>>) {
   return function (target: any, propertyKey: string): void {
     const attribute = getAttribute(target, propertyKey)
     const type = {
-      _class: core.class.RefTo,
-      to: to
-    } as unknown as EnumValue<any>
+      _class: core.class.EnumOf,
+      of
+    } as unknown as EnumOf<EnumKey>
     attribute.type = type
   }
 }
@@ -226,7 +226,17 @@ export function Literal (enumVal: any) {
     const attribute = getEnumLiteral(target, propertyKey)
     attribute._class = core.class.EnumLiteral
     attribute.label = enumVal[propertyKey]
-    attribute.ordinal = propertyKey
+    attribute.ordinal = enumVal[attribute.label]
+    if (!attribute.ordinal && !attribute.label) {
+      // This is string labeled enum
+      for (const e of Object.entries(enumVal)) {
+        if (e[1] === propertyKey) {
+          attribute.label = e[0]
+          break
+        }
+      }
+      attribute.ordinal = propertyKey
+    }
   }
 }
 
@@ -238,7 +248,7 @@ export function withMixin<T extends Obj> (_class: Ref<Mixin<T>>, obj: Partial<Om
       classifier.postProcessing.push((model, cl) => {
         if (doc) {
           Model.includeMixin(doc, _class)
-          model.assign((doc as unknown) as AnyLayout, _class, (obj as unknown) as AnyLayout)
+          model.assign(model.getLayout(doc), _class, (obj as unknown) as AnyLayout)
         }
       })
     }

@@ -24,7 +24,8 @@ import presentation, { ComponentExtension } from '@anticrm/presentation'
 
 import { TVDoc, TEmb, TMixin } from '@anticrm/model/src/__model__'
 import { Ref, Class, Property } from '@anticrm/core'
-import { Application, VDoc } from '@anticrm/domains'
+import { VDoc } from '@anticrm/domains'
+import { WorkbenchApplication } from '@anticrm/workbench'
 
 export enum ChunterDomain {
   Chunter = 'chunter'
@@ -32,10 +33,10 @@ export enum ChunterDomain {
 
 const chunter = extendIds(_chunter, {
   application: {
-    Chunter: '' as Ref<Application>,
-    Activity: '' as Ref<Application>,
-    Chat: '' as Ref<Application>,
-    Pages: '' as Ref<Application>
+    Chunter: '' as Ref<WorkbenchApplication>,
+    Activity: '' as Ref<WorkbenchApplication>,
+    Chat: '' as Ref<WorkbenchApplication>,
+    Pages: '' as Ref<WorkbenchApplication>
   },
   class: {
     Collab: '' as Ref<Class<Collab>>
@@ -123,6 +124,12 @@ export function model (S: Builder): void {
 
   S.mixin(chunter.class.Page, chunter.mixin.ActivityInfo, {
     component: chunter.component.PageInfo
+  })
+
+  S.createDocument(workbench.class.ItemCreator, {
+    app: chunter.application.Pages,
+    class: chunter.class.Page,
+    name: 'Page' as IntlString
   })
 
   S.mixin(core.class.Space, chunter.mixin.ActivityInfo, {

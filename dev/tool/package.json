@@ -22,6 +22,7 @@
     "create-user": "ts-node -T src/index.ts create-user",
     "upgrade-workspace": "ts-node -T src/index.ts upgrade-workspace",
     "lint": "eslint src",
+    "lint:fix": "eslint --fix src",
     "test": "echo 'no tests'"
   },
   "dependencies": {

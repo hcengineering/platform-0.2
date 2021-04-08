@@ -41,7 +41,7 @@
 
 <div class="array-container">
   {#if value && itemAttributes}
-    {#each value as item (item.message)}
+    {#each value as item ({ idx: value.indexOf(item), msg: item.message })}
       <div class="attributes-container">
         {#each itemAttributes as attr (attr.key)}
           {#if attr.presenter}

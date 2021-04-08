@@ -79,6 +79,12 @@ export class TCreateForm<T extends VDoc> extends TMixin<T> implements ComponentE
   component!: AnyComponent
 }
 
+@Mixin$(ui.mixin.CardForm, core.class.Mixin)
+export class TCardForm<T extends VDoc> extends TMixin<T> implements ComponentExtension<T> {
+  @Prop()
+  component!: AnyComponent
+}
+
 @Class$(ui.mixin.Viewlet, core.class.Doc, MODEL_DOMAIN)
 export class TViewlet extends TDoc implements Viewlet {
   @RefTo$(core.class.Class)
@@ -87,10 +93,12 @@ export class TViewlet extends TDoc implements Viewlet {
   @Prop() label!: IntlString
   @Prop() icon?: Asset
   @Prop() component!: AnyComponent
+
+  @Prop() parameters?: Record<string, any>
 }
 
 export function model (S: Builder): void {
-  S.add(TUXAttribute, TPresenter, TUXObject, TDetailForm, TLookupForm, TCreateForm, TViewlet)
+  S.add(TUXAttribute, TPresenter, TUXObject, TDetailForm, TLookupForm, TCreateForm, TViewlet, TCardForm)
 
   S.mixin(core.class.Type, ui.mixin.Presenter, {
     presenter: ui.component.StringPresenter
@@ -108,6 +116,10 @@ export function model (S: Builder): void {
     presenter: ui.component.CheckboxPresenter
   })
 
+  S.mixin(core.class.Date, ui.mixin.Presenter, {
+    presenter: ui.component.StringPresenter
+  })
+
   S.mixin(core.class.RefTo, ui.mixin.Presenter, {
     presenter: ui.component.RefPresenter
   })
@@ -116,8 +128,16 @@ export function model (S: Builder): void {
     presenter: ui.component.ArrayPresenter
   })
 
-  S.mixin(core.class.Date, ui.mixin.Presenter, {
+  S.mixin(core.class.EnumOf, ui.mixin.Presenter, {
     presenter: ui.component.StringPresenter
+  })
+
+  S.mixin(core.class.InstanceOf, ui.mixin.Presenter, {
+    presenter: ui.component.StringPresenter
+  })
+
+  S.mixin(core.class.VDoc, ui.mixin.CardForm, {
+    component: ui.component.VDocCardPresenter
   })
 
   S.createDocument(ui.mixin.Viewlet, {

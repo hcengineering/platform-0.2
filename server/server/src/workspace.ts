@@ -71,14 +71,13 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
         const filters = createPushArrayFilters(memdb, _class, query, attribute, attributes)
         return collection(_class).updateOne({ _id }, { $push: filters.updateOperation }, { arrayFilters: filters.arrayFilters })
       }
-      const value = {
-        ...attributes
-      }
       // We need to put attribute class as part of embedded object.
       const attr = memdb.classAttribute(_class, attribute)
       const attrClass = memdb.attributeClass(attr.attr.type)
+      let value: any = attributes
       if (attrClass !== null) {
-        value._class = attrClass // We need to have class for further operations to work well
+        value = memdb.assign({}, attrClass, attributes)
+        value._class = attrClass // Since we need a class in case of mixins.
       }
       return collection(_class).updateOne({ _id }, {
         $push: {
@@ -93,7 +92,9 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
         return collection(_class).updateOne({ _id }, { $set: filters.updateOperation },
           { arrayFilters: filters.arrayFilter })
       }
-      return collection(_class).updateOne({ _id }, { $set: attributes })
+      const value = memdb.assign({}, _class, attributes)
+      delete value._class // We should not override _class in any case
+      return collection(_class).updateOne({ _id }, { $set: value })
     },
 
     async remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, query: AnyLayout | null): Promise<any> {
