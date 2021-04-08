@@ -18,7 +18,9 @@ import { createContact, removeContact } from './user'
 import { initDatabase } from './init'
 import { MongoClient } from 'mongodb'
 
-import { createWorkspace, createUserAccount, assignWorkspace, getWorkspace, removeWorkspace, withTenant } from '@anticrm/accounts'
+import {
+  createWorkspace, createUserAccount, assignWorkspace, getWorkspace, removeWorkspace, withTenant, getUserAccount
+} from '@anticrm/accounts'
 
 const mongodbUri = process.env.MONGODB_URI || 'mongodb://localhost:27017'
 
@@ -29,6 +31,7 @@ function withDatabase (uri: string, f: (client: MongoClient) => Promise<any>) {
     f(client).then(() => client.close())
   })
 }
+
 program.version('0.0.1')
 
 // create-user john.appleseed@gmail.com --password 123 --workspace workspace --fullname "John Appleseed"
@@ -41,7 +44,9 @@ program
   .action((email, cmd) => {
     withDatabase(mongodbUri, async (client) => {
       const db = client.db('accounts')
-      const user = createUserAccount(db, email, cmd.password) // Create user accont inside accounts
+
+      // Create user account inside accounts
+      const user = await getUserAccount(db, email).then(user => !user ? createUserAccount(db, email, cmd.password) : Promise.resolve(user))
       const workspace = getWorkspace(db, cmd.workspace) // a workspace
 
       const assignDone = Promise.all([user, workspace]).then(() => {
