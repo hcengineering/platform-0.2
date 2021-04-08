@@ -47,6 +47,7 @@ class TContact extends TVDoc implements Contact {
 export class TPerson extends TContact implements Person {
   @Primary()
   @Prop() @UX('Name' as IntlString) name!: string
+
   @Prop() @UX('Birthday' as IntlString, { icon: contact.icon.Date }) birthDate?: Property<number, Date>
 }
 
