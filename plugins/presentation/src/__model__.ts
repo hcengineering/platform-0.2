@@ -116,6 +116,10 @@ export function model (S: Builder): void {
     presenter: ui.component.CheckboxPresenter
   })
 
+  S.mixin(core.class.Date, ui.mixin.Presenter, {
+    presenter: ui.component.StringPresenter
+  })
+
   S.mixin(core.class.RefTo, ui.mixin.Presenter, {
     presenter: ui.component.RefPresenter
   })

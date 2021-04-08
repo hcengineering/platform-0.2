@@ -25,6 +25,10 @@ export function firstDay (date: Date, mondayStart: boolean): Date {
   if (result.getTime() > firstDayOfMonth.getTime()) {
     result.setDate(result.getDate() - DAYS_IN_WEEK)
   }
+  result.setHours(0)
+  result.setMinutes(0)
+  result.setSeconds(0)
+  result.setMilliseconds(0)
   return result
 }
 

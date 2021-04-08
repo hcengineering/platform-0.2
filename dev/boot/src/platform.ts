@@ -28,6 +28,7 @@ import guidebook from '@anticrm/guidebook'
 import datagen from '@anticrm/data-generator'
 import recruiting from '@anticrm/recruiting'
 import personExtras from '@anticrm/person-extras'
+import calendar from '@anticrm/calendar'
 // import recruitment from '@anticrm/recruitment'
 import uiMeta from '@anticrm/platform-ui/src/__meta__/meta'
 import workbenchMeta from '@anticrm/workbench/src/__meta__'
@@ -59,6 +60,7 @@ platform.addLocation(chunter, () => import(/* webpackChunkName: "chunter" */ '@a
 platform.addLocation(guidebook, () => import(/* webpackChunkName: "guidebook" */ '@anticrm/guidebook/src/plugin'))
 platform.addLocation(recruiting, () => import(/* webpackChunkName: "recruiting" */ '@anticrm/recruiting/src/plugin'))
 platform.addLocation(personExtras, () => import(/* webpackChunkName: "person-extras" */ '@anticrm/person-extras/src/plugin'))
+platform.addLocation(calendar, () => import(/* webpackChunkName: "calendar" */ '@anticrm/calendar/src/plugin'))
 // platform.addLocation(recruitment, () => import(/* webpackChunkName: "recruitment" */ '@anticrm/recruitment/src/plugin'))
 
 platform.addLocation(datagen, () => import(/* webpackChunkName: "datagen" */ '@anticrm/data-generator/src/plugin'))

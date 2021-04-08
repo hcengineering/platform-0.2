@@ -27,11 +27,12 @@
 
   export let mondayStart = false
   export let weekFormat: 'narrow' | 'short' | 'long' | undefined = 'short'
-  export let selectedDate: Date | undefined
+  export let cellHeight: number | undefined = undefined
+  export let selectedDate: Date | undefined = undefined
   export let todayDate: Date = new Date()
-
-  let currentDate: Date = selectedDate || todayDate
-  let firstDayOfCurrentMonth: Date = firstDay(currentDate, mondayStart)
+  export let currentDate: Date = selectedDate || todayDate
+  export let firstDayOfCurrentMonth: Date = firstDay(currentDate, mondayStart)
+  export let displayedWeeksCount = 6
 
   function onSelect (date: Date) {
     selectedDate = date
@@ -57,18 +58,23 @@
     {/each}
   </div>
   <div class="days-of-month">
-    {#each [...Array(6).keys()] as weekIndex}
+    {#each [...Array(displayedWeeksCount).keys()] as weekIndex}
       {#each [...Array(7).keys()] as dayOfWeek}
-        <div
-          class="cell"
-          class:weekend={isWeekend(weekday(firstDayOfCurrentMonth, weekIndex, dayOfWeek))}
-          class:today={areDatesEqual(todayDate, weekday(firstDayOfCurrentMonth, weekIndex, dayOfWeek))}
-          class:selected={areDatesEqual(selectedDate, weekday(firstDayOfCurrentMonth, weekIndex, dayOfWeek))}
-          on:click={() => onSelect(weekday(firstDayOfCurrentMonth, weekIndex, dayOfWeek))}>
-          {weekday(firstDayOfCurrentMonth, weekIndex, dayOfWeek).getDate()}
+        <div style={`grid-column-start: ${dayOfWeek + 1}; grid-row-start: ${weekIndex + 1}`}>
+          <div style={`display: flex; width: 100%; height: ${cellHeight ? `${cellHeight}px;` : '100%;'}`}>
+            <div
+              class="cell"
+              class:weekend={isWeekend(weekday(firstDayOfCurrentMonth, weekIndex, dayOfWeek))}
+              class:today={areDatesEqual(todayDate, weekday(firstDayOfCurrentMonth, weekIndex, dayOfWeek))}
+              class:selected={areDatesEqual(selectedDate, weekday(firstDayOfCurrentMonth, weekIndex, dayOfWeek))}
+              on:click={() => onSelect(weekday(firstDayOfCurrentMonth, weekIndex, dayOfWeek))}>
+              {weekday(firstDayOfCurrentMonth, weekIndex, dayOfWeek).getDate()}
+            </div>
+          </div>
         </div>
       {/each}
     {/each}
+    <slot />
   </div>
 </div>
 
@@ -97,9 +103,6 @@
   .cell {
     height: 100%;
     width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
   }
   .cell:hover {
     border-radius: 3px;

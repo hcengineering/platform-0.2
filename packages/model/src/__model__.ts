@@ -45,6 +45,10 @@ class TNumberType extends TType implements Type {
 class TBooleanType extends TType implements Type {
 }
 
+@Class$(core.class.Date, core.class.Type, MODEL_DOMAIN)
+class TDateType extends TType implements Type {
+}
+
 ///
 
 @Class$(core.class.SpaceUser, core.class.Emb, SPACE_DOMAIN)
@@ -102,7 +106,7 @@ export class TTitle extends TDoc implements Title {
 export function model (S: Builder): void {
   S.add(TObj, TEmb, TDoc, TAttribute, TType, TRefTo, TInstanceOf, TEnumOf, TArrayOf, TClassifier, TClass, TMixin, TEnumLiteral, TEnum)
   S.add(TIndexesClass, TVShortID)
-  S.add(TStringType, TNumberType, TBooleanType)
+  S.add(TStringType, TNumberType, TBooleanType, TDateType)
   S.add(TVDoc, TReference, TTitle, TApplication)
   S.add(TTx, TCreateTx, TPushTx, TUpdateTx, TDeleteTx)
   S.add(TSpace, TSpaceUser)
