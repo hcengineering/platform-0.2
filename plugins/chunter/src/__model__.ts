@@ -13,19 +13,19 @@
 // limitations under the License.
 //
 
-import core, { Builder, Class$, Primary, Prop, ArrayOf$, InstanceOf$, extendIds, Mixin$ } from '@anticrm/model'
+import core, { ArrayOf$, Builder, Class$, extendIds, InstanceOf$, Primary, Prop } from '@anticrm/model'
 import { UX } from '@anticrm/presentation/src/__model__'
 
 import workbench from '@anticrm/workbench/src/__model__'
-import _chunter, { Message, Page, Comment, Collab } from '.'
+import _chunter, { Collab, Comment, Message, Page } from '.'
 
 import { IntlString } from '@anticrm/platform-i18n'
-import presentation, { ComponentExtension } from '@anticrm/presentation'
+import presentation from '@anticrm/presentation'
 
-import { TVDoc, TEmb, TMixin } from '@anticrm/model/src/__model__'
-import { Ref, Class, Property } from '@anticrm/core'
-import { VDoc } from '@anticrm/domains'
+import { TEmb, TVDoc } from '@anticrm/model/src/__model__'
+import { Class, Property, Ref } from '@anticrm/core'
 import { WorkbenchApplication } from '@anticrm/workbench'
+import activity from '@anticrm/activity'
 
 export enum ChunterDomain {
   Chunter = 'chunter'
@@ -34,7 +34,6 @@ export enum ChunterDomain {
 const chunter = extendIds(_chunter, {
   application: {
     Chunter: '' as Ref<WorkbenchApplication>,
-    Activity: '' as Ref<WorkbenchApplication>,
     Chat: '' as Ref<WorkbenchApplication>,
     Pages: '' as Ref<WorkbenchApplication>
   },
@@ -77,26 +76,12 @@ class TPage extends TMessage implements Page {
   @Prop() @UX('Title' as IntlString, { icon: chunter.icon.Chunter }) @Primary() title!: string
 }
 
-@Mixin$(chunter.mixin.ActivityInfo, core.class.Mixin)
-class TActivityInfo extends TMixin<VDoc> implements ComponentExtension<VDoc> {
-  @Prop() component!: any
-}
-
 export function model (S: Builder): void {
-  S.add(TCollab, TMessage, TComment, TPage, TActivityInfo)
+  S.add(TCollab, TMessage, TComment, TPage)
 
-  S.mixin(chunter.class.Message, chunter.mixin.ActivityInfo, {
+  S.mixin(chunter.class.Message, activity.mixin.ActivityInfo, {
     component: chunter.component.MessageInfo
   })
-
-  S.createDocument(workbench.class.WorkbenchApplication, {
-    route: 'activity',
-    label: 'Activity' as IntlString,
-    icon: chunter.icon.ActivityView,
-    rootComponent: chunter.component.ActivityView,
-    classes: [],
-    supportSpaces: false
-  }, chunter.application.Activity)
 
   S.createDocument(workbench.class.WorkbenchApplication, {
     route: 'chat',
@@ -122,7 +107,7 @@ export function model (S: Builder): void {
     component: chunter.component.PageProperties
   })
 
-  S.mixin(chunter.class.Page, chunter.mixin.ActivityInfo, {
+  S.mixin(chunter.class.Page, activity.mixin.ActivityInfo, {
     component: chunter.component.PageInfo
   })
 
@@ -130,10 +115,6 @@ export function model (S: Builder): void {
     app: chunter.application.Pages,
     class: chunter.class.Page,
     name: 'Page' as IntlString
-  })
-
-  S.mixin(core.class.Space, chunter.mixin.ActivityInfo, {
-    component: chunter.component.SpaceInfo
   })
 
   S.createDocument(core.class.Space, {

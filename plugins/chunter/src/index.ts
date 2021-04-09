@@ -14,13 +14,12 @@
 //
 
 import { plugin, Plugin, Service } from '@anticrm/platform'
-import { Asset, AnyComponent, getPlatform } from '@anticrm/platform-ui'
-import { DateProperty, StringProperty, Emb, Class, Ref, Mixin } from '@anticrm/core'
+import { AnyComponent, Asset, getPlatform } from '@anticrm/platform-ui'
+import { Class, DateProperty, Emb, Ref, StringProperty } from '@anticrm/core'
 import { VDoc } from '@anticrm/domains'
 import { MessageNode } from '@anticrm/text'
 
 import core from '@anticrm/platform-core'
-import { ComponentExtension } from '@anticrm/presentation'
 
 // P E R S I S T E N C E  M O D E L
 export interface Comment extends Emb {
@@ -52,7 +51,6 @@ const chunterPlugin = plugin(
   {
     icon: {
       Chunter: '' as Asset,
-      ActivityView: '' as Asset,
       ChatView: '' as Asset,
       PagesView: '' as Asset
     },
@@ -62,16 +60,12 @@ const chunterPlugin = plugin(
       Page: '' as Ref<Class<Page>>
     },
     component: {
-      ActivityView: '' as AnyComponent,
       ChatView: '' as AnyComponent,
 
       MessageInfo: '' as AnyComponent,
       SpaceInfo: '' as AnyComponent,
       PageProperties: '' as AnyComponent,
       PageInfo: '' as AnyComponent
-    },
-    mixin: {
-      ActivityInfo: '' as Ref<Mixin<ComponentExtension<VDoc>>>
     }
   }
 )

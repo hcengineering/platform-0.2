@@ -26,12 +26,15 @@ import { model as recruiting } from '@anticrm/recruiting/src/__model__'
 import { model as personExtras } from '@anticrm/person-extras/src/__model__'
 import { model as calendar } from '@anticrm/calendar/src/__model__'
 
+import { model as activity } from '@anticrm/activity/src/__model__'
+
 export const builder = new Builder()
 builder.load(modelModel)
 builder.load(presentation)
+builder.load(workbench)
+builder.load(activity)
 builder.load(contact)
 builder.load(personExtras)
-builder.load(workbench)
 builder.load(chunter)
 builder.load(task)
 builder.load(datagen)

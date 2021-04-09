@@ -41,10 +41,6 @@
       {/each}
     </div>
   </ScrollView>
-  <div>
-    <!-- <InputControl /> -->
-    <!-- <CreateForm _class={appInstance.classes[0]} title="Hello"/> -->
-  </div>
 </div>
 
 <style lang="scss">

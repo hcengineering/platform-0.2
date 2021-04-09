@@ -31,6 +31,7 @@ import { model as workbench } from '@anticrm/workbench/src/__model__'
 import { model as task } from '@anticrm/task/src/__model__'
 import { model as chunter } from '@anticrm/chunter/src/__model__'
 import { readResponse, serialize } from '@anticrm/rpc'
+import { model as activityPlugin } from '@anticrm/activity/src/__model__'
 // import recruitmentModel from '@anticrm/recruitment-model/src/model'
 
 // import taskStrings from '@anticrm/task-model/src/strings/ru'
@@ -40,8 +41,9 @@ import { readResponse, serialize } from '@anticrm/rpc'
 export const builder = new Builder()
 builder.load(model)
 builder.load(presentation)
-builder.load(contact)
 builder.load(workbench)
+builder.load(activityPlugin)
+builder.load(contact)
 builder.load(chunter)
 builder.load(task)
 // builder.load(recruitmentModel)

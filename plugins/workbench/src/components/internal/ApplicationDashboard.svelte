@@ -33,9 +33,11 @@
   let creators: ItemCreator[] = []
   let creatorsQuery: Promise<QueryUpdater<ItemCreator>> | undefined
 
-  $: creatorsQuery = liveQuery(creatorsQuery, workbench.class.ItemCreator, { app: application._id }, (docs) => {
-    creators = docs
-  })
+  $: if (application) {
+    creatorsQuery = liveQuery(creatorsQuery, workbench.class.ItemCreator, { app: application._id }, (docs) => {
+      creators = docs
+    })
+  }
 
   let spaces: Space[] = []
   let spacesQuery: Promise<QueryUpdater<Space>> | undefined
@@ -45,7 +47,7 @@
     userId = core.getUserId()
   })
 
-  $: if (userId) {
+  $: if (userId && application) {
     spacesQuery = liveQuery(spacesQuery, CORE_CLASS_SPACE, { application: application._id }, (docs) => {
       spaces = docs.filter((x) => x.users.some((x) => x.userId === userId))
     })

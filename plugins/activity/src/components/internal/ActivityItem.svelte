@@ -14,11 +14,11 @@
 -->
 <script lang="ts">
   import type { ObjectTx } from '@anticrm/domains'
-  import type { Tx } from '@anticrm/core'
+  import type { Ref, Tx } from '@anticrm/core'
   import type { AnyComponent, Asset } from '@anticrm/platform-ui'
   import type { User } from '@anticrm/contact'
   import { getContactService } from '@anticrm/contact'
-  import chunter from '../..'
+  import activity from '../..'
   import { getPresentationService } from '@anticrm/presentation'
 
   import Component from '@anticrm/platform-ui/src/components/Component.svelte'
@@ -40,12 +40,13 @@
         user = u
       })
     contactService
-      .then((c) => c.getAvatar(tx._id))
+      .then((c) => c.getAvatar((tx._id as unknown) as Ref<User>))
       .then((a) => {
         avatar = a
       })
     presentationService.then((p) => {
-      info = p.getComponentExtension(objectClass, chunter.mixin.ActivityInfo)
+      console.log('get component extension for' + objectClass)
+      info = p.getComponentExtension(objectClass, activity.mixin.ActivityInfo)
     })
   }
 </script>
@@ -56,8 +57,11 @@
     <b>{user ? user.name : ''}</b>
     <span>15:23</span>
     <div>
-      <!-- {JSON.stringify(tx)} -->
-      <Component is={info} props={{ tx }} />
+      {#if info}
+        <Component is={info} props={{ tx }} />
+      {:else}
+        No information
+      {/if}
     </div>
   </div>
 </div>
