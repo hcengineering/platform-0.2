@@ -18,8 +18,8 @@
   }
 
   function getDescription (task: Task): string {
-    if (task.comments?.length > 0) {
-      return task!.comments![0].message
+    if (task.comments && task.comments.length > 0) {
+      return task.comments[0].message
     }
     return ''
   }

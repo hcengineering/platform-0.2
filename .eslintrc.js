@@ -1,3 +1,26 @@
+const typescriptRules = {
+  '@typescript-eslint/no-empty-interface': 'off',
+  '@typescript-eslint/no-explicit-any': 'off',
+  '@typescript-eslint/no-useless-constructor': 'error',
+  '@typescript-eslint/prefer-readonly': 'error',
+  '@typescript-eslint/restrict-plus-operands': 'error',
+  '@typescript-eslint/require-await': 'error',
+  '@typescript-eslint/return-await': 'error',
+  '@typescript-eslint/type-annotation-spacing': ['error', {
+    'before': false,
+    'after': true,
+    'overrides': {
+      'arrow': {
+        'before': true,
+        'after': true
+      }
+    }
+  }],
+  '@typescript-eslint/no-unused-vars': ['error', { 'args': 'none' }],
+  '@typescript-eslint/no-unused-expressions': 'error',
+  '@typescript-eslint/no-misused-promises': ['error', { 'checksVoidReturn': false }]
+};
+
 module.exports = {
   env: {
     browser: true,
@@ -5,7 +28,6 @@ module.exports = {
     node: true
   },
   extends: [
-    'plugin:@typescript-eslint/recommended',
     'standard'
   ],
   globals: {
@@ -24,10 +46,17 @@ module.exports = {
   plugins: ['svelte3', '@typescript-eslint', 'import'],
   overrides: [
     {
+      files: ['**/*.ts'],
+      extends: ['plugin:@typescript-eslint/recommended'],
+      rules: typescriptRules
+    },
+    {
       files: ['**/*.svelte'],
       processor: 'svelte3/svelte3',
+      extends: ['plugin:@typescript-eslint/recommended'],
       // https://github.com/sveltejs/eslint-plugin-svelte3/blob/master/OTHER_PLUGINS.md#eslint-plugin-import
       rules: {
+        ...typescriptRules,
         'import/first': 'off',
         'import/no-duplicates': 'off',
         'import/no-mutable-exports': 'off',
@@ -42,27 +71,7 @@ module.exports = {
     'no-use-before-define': 'off',
     'require-await': 'off',
     'no-return-await': 'off',
-    '@typescript-eslint/no-empty-interface': 'off',
-    '@typescript-eslint/no-explicit-any': 'off',
-    '@typescript-eslint/no-useless-constructor': 'error',
-    '@typescript-eslint/prefer-readonly': ['error'],
-    '@typescript-eslint/restrict-plus-operands': 'error',
-    '@typescript-eslint/require-await': 'error',
-    '@typescript-eslint/return-await': 'error',
-    '@typescript-eslint/type-annotation-spacing': ['error', {
-      'before': false,
-      'after': true,
-      'overrides': {
-        'arrow': {
-          'before': true,
-          'after': true
-        }
-      }
-    }],
-    '@typescript-eslint/no-unused-vars': ['error', { 'args': 'none' }],
-    '@typescript-eslint/no-unused-expressions': 'error',
-    'prefer-arrow-callback': ['error', { 'allowUnboundThis': false }],
-    '@typescript-eslint/no-misused-promises': ['error', { 'checksVoidReturn': false }]
+    'prefer-arrow-callback': ['error', { 'allowUnboundThis': false }]
   },
   settings: {
     'svelte3/typescript': require('typescript'),

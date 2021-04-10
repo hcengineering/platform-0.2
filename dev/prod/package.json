@@ -1,6 +1,7 @@
 {
   "name": "prod",
   "version": "1.0.0",
+  "license": "EPL-2.0",
   "devDependencies": {
     "@babel/plugin-proposal-optional-chaining": "^7.11.0",
     "@typescript-eslint/eslint-plugin": "^4.9.0",
@@ -42,7 +43,7 @@
     "start": "cross-env NODE_ENV=production webpack-dev-server --content-base public",
     "test": "echo 'no tests'",
     "preformat-svelte": "prettier -w src/**/*.svelte",
-    "lint": "eslint src",
+    "lint": "eslint --max-warnings=0 src",
     "lint:fix": "yarn preformat-svelte && eslint --fix src"
   }
 }

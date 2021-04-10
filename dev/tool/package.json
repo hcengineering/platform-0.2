@@ -21,7 +21,7 @@
     "create-workspace": "ts-node -T src/index.ts create-workspace",
     "create-user": "ts-node -T src/index.ts create-user",
     "upgrade-workspace": "ts-node -T src/index.ts upgrade-workspace",
-    "lint": "eslint src",
+    "lint": "eslint --max-warnings=0 src",
     "lint:fix": "eslint --fix src",
     "test": "echo 'no tests'"
   },

@@ -7,7 +7,7 @@
     "start": "ts-node src/index.ts",
     "dev": "ts-node-dev src/index.ts",
     "shutdown": "ts-node src/serverctl.ts",
-    "lint": "eslint src",
+    "lint": "eslint --max-warnings=0 src",
     "lint:fix": "eslint --fix src"
   },
   "author": "Anticrm Platform Contributors",
