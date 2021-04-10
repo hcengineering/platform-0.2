@@ -95,5 +95,5 @@ yarn workspace @anticrm/tool upgrade-workspace workspace
 Create symlink to format and autofix changed files on commit:
 
 ```bash
-ln -s ../../git-hooks/pre-commit .git/hooks/pre-commit
+ln -s ../../scripts/hooks/pre-commit .git/hooks/pre-commit
 ```
