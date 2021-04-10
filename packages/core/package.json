@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc",
     "build:docs": "api-extractor run --local && copyfiles -u 1 ./_api-extractor-temp/doc-models/* ../../_api-extractor-temp/",
-    "lint": "eslint src",
+    "lint": "eslint --max-warnings=0 src",
     "lint:fix": "eslint --fix src",
     "test": "jest"
   },

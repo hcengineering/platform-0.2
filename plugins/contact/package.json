@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc",
     "test": "echo 'no tests'",
-    "lint": "eslint src",
+    "lint": "eslint --max-warnings=0 src",
     "lint:fix": "eslint --fix src"
   },
   "dependencies": {
