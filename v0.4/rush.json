@@ -367,6 +367,10 @@
     {
       "packageName": "@anticrm/plugin",
       "projectFolder": "platform/plugin"
+    },
+    {
+      "packageName": "prod",
+      "projectFolder": "dev/prod"
     }
     // {
     //   /**

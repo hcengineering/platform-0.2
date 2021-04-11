@@ -4,6 +4,7 @@ dependencies:
   '@babel/preset-typescript': 7.13.0_@babel+core@7.13.15
   '@microsoft/api-extractor': 7.13.4
   '@rush-temp/plugin': file:projects/plugin.tgz
+  '@rush-temp/prod': file:projects/prod.tgz
   '@rush-temp/status': file:projects/status.tgz
   '@types/jest': 26.0.22
   babel-jest: 26.6.3_@babel+core@7.13.15
@@ -6258,15 +6259,23 @@ packages:
       integrity: sha512-RFVbCpRirmmoTZRwCcacu9rPkMFCI1bfrtQK2Koni0mgtcj5q83UlXWPLTAbBwDLOJ79n9++oA59wOOhGDuekw==
       tarball: file:projects/plugin.tgz
     version: 0.0.0
+  file:projects/prod.tgz:
+    dev: false
+    name: '@rush-temp/prod'
+    resolution:
+      integrity: sha512-gGapjOstzz3Oo8j4gJVFfFPuxbQXH2DyOdIxgCWjb3J2hyJlqtYVxZBUGLdZ6kkhorOXC8KNQg4k703WQiHIag==
+      tarball: file:projects/prod.tgz
+    version: 0.0.0
   file:projects/status.tgz:
     dependencies:
       '@microsoft/api-extractor': 7.13.4
+      prettier: 2.2.1
       ts-standard: 10.0.0_typescript@4.2.4
       typescript: 4.2.4
     dev: false
     name: '@rush-temp/status'
     resolution:
-      integrity: sha512-hb2gCdP1GF/3sJQ8dTQD71FlS3wQwWEo6P6hWmf6wH8LFgOwz3gvxFlSCLsXddVQQD2+NgX8xpa3CFyfaszLpA==
+      integrity: sha512-xBCnWu1AIo/iSahhZo7Y+3W/3c3Bg93CPFO0QhYh5oj4AbUoB9+mlHoh+p0F+77mzss4ZHudS79Vx6k+g6RnpQ==
       tarball: file:projects/status.tgz
     version: 0.0.0
 registry: ''
@@ -6276,6 +6285,7 @@ specifiers:
   '@babel/preset-typescript': ~7.13.0
   '@microsoft/api-extractor': ~7.13.4
   '@rush-temp/plugin': file:./projects/plugin.tgz
+  '@rush-temp/prod': file:./projects/prod.tgz
   '@rush-temp/status': file:./projects/status.tgz
   '@types/jest': ~26.0.22
   babel-jest: ~26.6.3
