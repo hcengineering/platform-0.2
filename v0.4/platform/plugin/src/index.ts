@@ -18,7 +18,7 @@
  * @packageDocumentation
  */
 
-import { Status, Severity } from '@anticrm/foundation'
+import { Status, Severity } from '@anticrm/status'
 
 /**
  * Platform Resource Identifier (PRI)

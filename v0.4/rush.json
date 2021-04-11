@@ -363,6 +363,10 @@
     {
       "packageName": "@anticrm/status",
       "projectFolder": "platform/status"
+    },
+    {
+      "packageName": "@anticrm/plugin",
+      "projectFolder": "platform/plugin"
     }
     // {
     //   /**
