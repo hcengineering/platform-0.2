@@ -103,7 +103,7 @@
   // Update available presenters based on application
   $: if (model) {
     const viewlets = filterViewlets(model, presenters, application)
-    if (viewlets.length > 0 && !activeViewlet) {
+    if (viewlets.length > 0 && (!activeViewlet || viewlets.every((x) => x._id !== activeViewlet?._id))) {
       activeViewlet = viewlets[0]
     }
     viewletActions = getViewletActions(application, activeViewlet, viewlets)
