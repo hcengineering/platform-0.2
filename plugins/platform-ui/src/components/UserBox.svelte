@@ -67,7 +67,7 @@
       hoverState="true" />
     <div class="separator" />
     <div bind:this={comboItems} class="comboBox-drop__items">
-      <ScrollView width="100%" height="100%" accentColor="true">
+      <ScrollView width="100%" height="100%">
         {#each items as item (item.id)}
           <div
             class="comboBox-drop__item"

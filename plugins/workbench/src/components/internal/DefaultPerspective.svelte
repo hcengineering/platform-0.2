@@ -306,8 +306,6 @@
     .app-icon {
       margin: auto auto;
       width: 52px;
-      // border-bottom: solid 1px var(--theme-bg-accent-color);
-      // border-right: solid 1px var(--theme-bg-accent-color);
     }
 
     .iconApp {

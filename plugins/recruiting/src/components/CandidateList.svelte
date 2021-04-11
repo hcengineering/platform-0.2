@@ -56,11 +56,12 @@ limitations under the License.
 </ScrollView>
 
 <style lang="scss">
+  @import '~@anticrm/sparkling-theme/styles/_global.scss';
+
   .grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     grid-gap: 10px;
-
     padding: 15px;
   }
 
@@ -68,7 +69,15 @@ limitations under the License.
     padding: 20px 10px;
     border: 1px solid;
     border-radius: 5px;
-    border-color: var(--theme-bg-accent-color);
     cursor: pointer;
+  }
+  :global(.theme-dark) .candidate {
+    border-color: $theme-dark-bg-accent-color;
+  }
+  :global(.theme-grey) .candidate {
+    border-color: $theme-grey-bg-accent-color;
+  }
+  :global(.theme-light) .candidate {
+    border-color: $theme-light-bg-accent-color;
   }
 </style>

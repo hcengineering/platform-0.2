@@ -113,6 +113,8 @@
 </div>
 
 <style lang="scss">
+  @import '~@anticrm/sparkling-theme/styles/_global.scss';
+
   .taskContent {
     display: flex;
     flex-direction: column;
@@ -130,7 +132,7 @@
 
       .taskName {
         font-size: 14px;
-        color: var(--status-blue-color);
+        color: $theme-status-blue-color;
       }
     }
 
@@ -143,7 +145,6 @@
       .createdOn {
         font-size: 11px;
         font-weight: 500;
-        color: var(--theme-content-trans-color);
       }
     }
 
@@ -175,5 +176,14 @@
         }
       }
     }
+  }
+  :global(.theme-dark) .taskContent .created .createdOn {
+    color: $theme-dark-content-trans-color;
+  }
+  :global(.theme-grey) .taskContent .created .createdOn {
+    color: $theme-grey-content-trans-color;
+  }
+  :global(.theme-light) .taskContent .created .createdOn {
+    color: $theme-light-content-trans-color;
   }
 </style>

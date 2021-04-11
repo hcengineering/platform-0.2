@@ -105,8 +105,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--white-color);
-    background-color: var(--theme-doclink-color);
+    color: $theme-white-color;
     font-weight: 700;
     font-size: 11px;
     line-height: 11px;
@@ -115,6 +114,15 @@
     margin: 0;
     padding: 0 4px;
     border-radius: 8px;
+  }
+  :global(.theme-dark) .counter {
+    background-color: $theme-dark-doclink-color;
+  }
+  :global(.theme-grey) .counter {
+    background-color: $theme-grey-doclink-color;
+  }
+  :global(.theme-light) .counter {
+    background-color: $theme-light-doclink-color;
   }
 
   .optionsButton {
