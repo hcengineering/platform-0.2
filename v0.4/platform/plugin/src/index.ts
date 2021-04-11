@@ -98,7 +98,7 @@ type AnyModule = PluginModule<Service, PluginDependencies>
 
 export enum PluginStatus {
   STOPPED,
-  RUNNING,
+  RUNNING
 }
 
 export interface PluginInfo {
@@ -112,8 +112,7 @@ export const PlatformStatus = 'platform-status'
 // P L A T F O R M
 
 type ExtractType<T, X extends Record<string, Metadata<T>>> = {
-  [P in keyof X]:
-  X[P] extends Metadata<infer Z> ? Z : never
+  [P in keyof X]: X[P] extends Metadata<infer Z> ? Z : never
 }
 
 type EventListener = (event: string, data: any) => Promise<void>
@@ -123,7 +122,10 @@ export interface Platform {
   setMetadata: <T>(id: Metadata<T>, value: T) => void
   loadMetadata: <T, X extends Record<string, Metadata<T>>>(ids: X, resources: ExtractType<T, X>) => void
 
-  addLocation: <P extends Service, X extends PluginDependencies>(plugin: PluginDescriptor<P, X>, module: PluginModule<P, X>) => void
+  addLocation: <P extends Service, X extends PluginDependencies>(
+    plugin: PluginDescriptor<P, X>,
+    module: PluginModule<P, X>
+  ) => void
   resolveDependencies: (id: Plugin<any>, deps: PluginDependencies) => Promise<{ [key: string]: Service }>
   getPlugin: <T extends Service>(id: Plugin<T>) => Promise<T>
 
@@ -188,18 +190,21 @@ export function createPlatform (): Platform {
 
       resolving = new Promise((resolve, reject) => {
         const info = getResourceInfo(resource)
-        getPlugin(info.plugin).then(() => {
-          const value = resources.get(resource)
-          if (value === undefined) {
-            throw new Error('resource not loaded: ' + resource)
-          }
-          resolve(value)
-        }).catch(err => {
-          reject(err)
-        }).finally(() => {
-          // Clear resolving map
-          resolvingResources.delete(resource)
-        })
+        getPlugin(info.plugin)
+          .then(() => {
+            const value = resources.get(resource)
+            if (value === undefined) {
+              throw new Error('resource not loaded: ' + resource)
+            }
+            resolve(value)
+          })
+          .catch((err) => {
+            reject(err)
+          })
+          .finally(() => {
+            // Clear resolving map
+            resolvingResources.delete(resource)
+          })
       })
 
       resolvingResources.set(resource, resolving)
@@ -234,7 +239,7 @@ export function createPlatform (): Platform {
   function broadcastEvent (event: string, data: any): void {
     const listeners = eventListeners.get(event)
     if (listeners != null) {
-      listeners.forEach(listener => void listener(event, data)) // eslint-disable-line no-void
+      listeners.forEach((listener) => void listener(event, data)) // eslint-disable-line no-void
     }
   }
 
@@ -278,25 +283,27 @@ export function createPlatform (): Platform {
     throw new Error('no location provided for plugin: ' + id)
   }
 
-  function addLocation<P extends Service, X extends PluginDependencies>
-  (plugin: PluginDescriptor<P, X>, module: PluginModule<P, X>): void {
+  function addLocation<P extends Service, X extends PluginDependencies> (
+    plugin: PluginDescriptor<P, X>,
+    module: PluginModule<P, X>
+  ): void {
     locations.push([plugin, module as any])
   }
 
   async function getPlugin<T extends Service> (id: Plugin<T>): Promise<T> {
     const plugin = plugins.get(id)
     if (plugin !== undefined) {
-      return await plugin as T
+      return (await plugin) as T
     } else {
       const plugin = resolvePlugin(id)
       try {
         plugins.set(id, plugin)
-        await plugin as Promise<T>
+        ;(await plugin) as Promise<T>
       } catch (ex) {
         // remove plugin, and try on next attempt.
         plugins.delete(id)
       }
-      return await plugin as T
+      return (await plugin) as T
     }
   }
 
@@ -311,7 +318,10 @@ export function createPlatform (): Platform {
     return service
   }
 
-  async function resolveDependencies (parentId: Plugin<any>, deps: PluginDependencies): Promise<{ [key: string]: Service }> {
+  async function resolveDependencies (
+    parentId: Plugin<any>,
+    deps: PluginDependencies
+  ): Promise<{ [key: string]: Service }> {
     const result: { [key: string]: Service } = {}
     for (const key in deps) {
       const id = deps[key]
@@ -361,10 +371,14 @@ function transform<N extends Namespace> (plugin: AnyPlugin, namespaces: N, f: (i
 }
 
 export function identify<N extends Namespace> (pluginId: AnyPlugin, namespace: N): N {
-  return transform(pluginId, namespace, (id: string, value) => value === '' ? id : value)
+  return transform(pluginId, namespace, (id: string, value) => (value === '' ? id : value))
 }
 
-export function plugin<P extends Service, D extends PluginDependencies, N extends Namespace> (id: Plugin<P>, deps: D, namespace: N): PluginDescriptor<P, D> & N {
+export function plugin<P extends Service, D extends PluginDependencies, N extends Namespace> (
+  id: Plugin<P>,
+  deps: D,
+  namespace: N
+): PluginDescriptor<P, D> & N {
   return {
     id,
     deps,

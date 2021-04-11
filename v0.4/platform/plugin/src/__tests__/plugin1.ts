@@ -20,7 +20,7 @@ import { PluginDependencies } from '../index'
 
 plugin1State.parsed = true
 
-export default async (_platform: Platform, _deps: PluginDependencies): Promise<{id: typeof plugin1}> => {
+export default async (_platform: Platform, _deps: PluginDependencies): Promise<{ id: typeof plugin1 }> => {
   plugin1State.started = true
   return await Promise.resolve({
     id: plugin1

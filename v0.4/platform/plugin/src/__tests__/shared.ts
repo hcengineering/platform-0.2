@@ -36,10 +36,14 @@ export const plugin2State = {
 }
 
 export const plugin3 = 'plugin3' as Plugin<Service>
-export const descriptor3 = plugin(plugin3, {
-  plugin1,
-  plugin2
-}, {})
+export const descriptor3 = plugin(
+  plugin3,
+  {
+    plugin1,
+    plugin2
+  },
+  {}
+)
 
 export const plugin3State = {
   parsed: false,

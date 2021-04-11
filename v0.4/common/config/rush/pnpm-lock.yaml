@@ -8,6 +8,7 @@ dependencies:
   '@types/jest': 26.0.22
   babel-jest: 26.6.3_@babel+core@7.13.15
   jest: 26.6.3
+  prettier: 2.2.1
   ts-standard: 10.0.0_typescript@4.2.4
   typescript: 4.2.4
 lockfileVersion: 5.2
@@ -4906,6 +4907,13 @@ packages:
       node: '>= 0.8.0'
     resolution:
       integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==
+  /prettier/2.2.1:
+    dev: false
+    engines:
+      node: '>=10.13.0'
+    hasBin: true
+    resolution:
+      integrity: sha512-PqyhM2yCjg/oKkFPtTGUojv7gnZAoG80ttl45O6x2Ug/rMJw4wcc9k6aaf2hibP7BGVCCM33gZoGjyvt9mm16Q==
   /pretty-format/26.6.2:
     dependencies:
       '@jest/types': 26.6.2
@@ -6241,12 +6249,13 @@ packages:
       '@types/jest': 26.0.22
       babel-jest: 26.6.3_@babel+core@7.13.15
       jest: 26.6.3
+      prettier: 2.2.1
       ts-standard: 10.0.0_typescript@4.2.4
       typescript: 4.2.4
     dev: false
     name: '@rush-temp/plugin'
     resolution:
-      integrity: sha512-hfD+4q9xAyGBf2eT5ioNkV3vUcxf21ffnfUR5VI0CV0X2TUTaSmJBdyodHFS5RkMbEA6ydk3yF8aaM6jJVibEQ==
+      integrity: sha512-RFVbCpRirmmoTZRwCcacu9rPkMFCI1bfrtQK2Koni0mgtcj5q83UlXWPLTAbBwDLOJ79n9++oA59wOOhGDuekw==
       tarball: file:projects/plugin.tgz
     version: 0.0.0
   file:projects/status.tgz:
@@ -6271,5 +6280,6 @@ specifiers:
   '@types/jest': ~26.0.22
   babel-jest: ~26.6.3
   jest: ~26.6.3
+  prettier: ~2.2.1
   ts-standard: ~10.0.0
   typescript: ~4.2.4

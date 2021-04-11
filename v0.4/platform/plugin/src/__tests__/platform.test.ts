@@ -23,8 +23,7 @@ import { descriptor1, descriptor2, descriptor3, plugin1, plugin1State, plugin2St
 type AnyPlugin = Plugin<Service>
 
 type ExtractType<T, X extends Record<string, Metadata<T>>> = {
-  [P in keyof X]:
-  X[P] extends Metadata<infer Z> ? Z : never
+  [P in keyof X]: X[P] extends Metadata<infer Z> ? Z : never
 }
 
 describe('platform', () => {
@@ -61,13 +60,17 @@ describe('platform', () => {
   })
 
   it('should not resolve resource (no plugin location)', (done) => {
-    platform.getResource('resource:NotExists.Resource' as Resource<string>).then(res => { // eslint-disable-line
-      expect(true).toBe(false)
-      done()
-    }).catch(err => {
-      expect(err).toBeInstanceOf(Error)
-      done()
-    })
+    platform
+      .getResource('resource:NotExists.Resource' as Resource<string>)
+      .then((res) => {
+        // eslint-disable-line
+        expect(true).toBe(false)
+        done()
+      })
+      .catch((err) => {
+        expect(err).toBeInstanceOf(Error)
+        done()
+      })
   })
 
   it('should resolve resource', async () => {
@@ -79,7 +82,7 @@ describe('platform', () => {
     expect(resolved).toBeInstanceOf(Promise)
     // get again to check repeated getting
     resolved = platform.getResource('resource2:plugin2.Resource' as Resource<string>)
-    return await resolved.then(resource => {
+    return await resolved.then((resource) => {
       expect(resource).toBe('hello resource2:My.Resource')
       expect(plugin2State.parsed).toBe(true)
       expect(plugin2State.started).toBe(true)
@@ -89,27 +92,31 @@ describe('platform', () => {
   it('should resolve resource second time', async () => {
     const resolved = platform.getResource('resource2:plugin2.Resource' as Resource<string>)
     expect(resolved).toBeInstanceOf(Promise)
-    return await resolved.then(resource => {
+    return await resolved.then((resource) => {
       expect(resource).toBe('hello resource2:My.Resource')
     })
   })
 
   it('should fail to resolve wrong resource', (done) => {
     const wrongResource = 'resource_wrong:plugin2.Resource' as Resource<string>
-    platform.getResource(wrongResource).then(res => { // eslint-disable-line
-      expect(true).toBe(false)
-      done()
-    }).catch(err => {
-      expect(err).toBeInstanceOf(Error)
-      expect(err.message).toBe(`resource not loaded: ${wrongResource}`)
-      done()
-    })
+    platform
+      .getResource(wrongResource)
+      .then((res) => {
+        // eslint-disable-line
+        expect(true).toBe(false)
+        done()
+      })
+      .catch((err) => {
+        expect(err).toBeInstanceOf(Error)
+        expect(err.message).toBe(`resource not loaded: ${wrongResource}`)
+        done()
+      })
   })
 
   it('should inject dependencies', async () => {
     platform.addLocation(descriptor3, async () => await import('./plugin3'))
     const p3 = platform.getPlugin(plugin3)
-    return await p3.then(plugin => {
+    return await p3.then((plugin) => {
       const deps = (plugin as any).deps
       expect(deps.plugin1.id).toBe('plugin1')
       expect(deps.plugin2.id).toBe('plugin2')
@@ -117,7 +124,9 @@ describe('platform', () => {
   })
 
   it('should fail to get resource info', () => {
-    expect(() => getResourceInfo('bad resource definition' as Resource<string>)).toThrowError('invalid resource id format')
+    expect(() => getResourceInfo('bad resource definition' as Resource<string>)).toThrowError(
+      'invalid resource id format'
+    )
   })
 
   it('should peek resource', () => {
