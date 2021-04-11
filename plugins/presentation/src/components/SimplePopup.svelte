@@ -29,33 +29,59 @@
 </div>
 
 <style lang="scss">
+  @import "~@anticrm/sparkling-theme/styles/_global.scss";
+
   .simple-popup-view {
     display: flex;
     flex-direction: column;
     flex-flow: column nowrap;
     justify-content: space-evenly;
-    //height: 6em;
     .button {
-      font-size: 14px;
+      font-size: 15px;
       text-align: left;
       padding: 0.5em 1em;
-      background-color: var(--theme-bg-color);
       border: none;
       border-radius: 0;
       margin: 0;
-
-      &:hover {
-        background-color: var(--theme-bg-accent-color);
-      }
     }
-
     .separator {
-      font-size: 14px;
-      background-color: var(--theme-bg-dark-color);
-      //border-bottom: 1px solid var(--theme-bg-accent-color);
+      font-size: 15px;
       height: 1px;
       border-radius: 0;
       margin: 0px 1em;
+    }
+  }
+  :global(.theme-dark) .simple-popup-view {
+    .button {
+      background-color: $theme-dark-bg-color;
+      &:hover {
+        background-color: $theme-dark-bg-accent-color;
+      }
+    }
+    .separator {
+      background-color: $theme-dark-bg-dark-color;
+    }
+  }
+  :global(.theme-grey) .simple-popup-view {
+    .button {
+      background-color: $theme-grey-bg-color;
+      &:hover {
+        background-color: $theme-grey-bg-accent-color;
+      }
+    }
+    .separator {
+      background-color: $theme-grey-bg-dark-color;
+    }
+  }
+  :global(.theme-light) .simple-popup-view {
+    .button {
+      background-color: $theme-light-bg-color;
+      &:hover {
+        background-color: $theme-light-bg-accent-color;
+      }
+    }
+    .separator {
+      background-color: $theme-light-bg-dark-color;
     }
   }
 </style>

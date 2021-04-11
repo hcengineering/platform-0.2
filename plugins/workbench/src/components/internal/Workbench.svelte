@@ -81,7 +81,7 @@
   }
 
   main {
-    background-color: var(--theme-bg-color);
     width: 100%;
+    padding: 20px 20px 20px 0;
   }
 </style>

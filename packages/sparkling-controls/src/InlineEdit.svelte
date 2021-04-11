@@ -68,6 +68,8 @@
 </div>
 
 <style lang="scss">
+  @import "~@anticrm/sparkling-theme/styles/_global.scss";
+
   .inline-edit {
     min-width: 12em;
     display: inline-block;
@@ -82,12 +84,7 @@
   .control {
     display: inline-flex;
     box-sizing: border-box;
-
     border-radius: 4px;
-
-    &:focus-within {
-      box-shadow: 0px 0px 0px 1px var(--theme-bg-dark-color);
-    }
 
     .compute-width {
       position: absolute;
@@ -105,5 +102,14 @@
         outline: none;
       }
     }
+  }
+  :global(.theme-dark) .control:focus-within {
+    box-shadow: 0px 0px 0px 1px $theme-dark-bg-dark-color;
+  }
+  :global(.theme-grey) .control:focus-within {
+    box-shadow: 0px 0px 0px 1px $theme-grey-bg-dark-color;
+  }
+  :global(.theme-light) .control:focus-within {
+    box-shadow: 0px 0px 0px 1px $theme-light-bg-dark-color;
   }
 </style>

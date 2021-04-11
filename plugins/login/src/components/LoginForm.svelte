@@ -131,16 +131,25 @@
 {/await}
 
 <style lang="scss">
+  @import "~@anticrm/sparkling-theme/styles/_global.scss";
+
   .login-form-info {
     margin: 20vh auto auto;
     width: 30em;
     padding: 2em;
-    border: 1px solid var(--theme-bg-accent-color);
     border-radius: 1em;
-
     .actions {
       display: flex;
       margin-top: 1.5em;
     }
+  }
+  :global(.theme-dark) .login-form-info {
+    border: 1px solid $theme-dark-bg-accent-color;
+  }
+  :global(.theme-grey) .login-form-info {
+    border: 1px solid $theme-grey-bg-accent-color;
+  }
+  :global(.theme-light) .login-form-info {
+    border: 1px solid $theme-light-bg-accent-color;
   }
 </style>

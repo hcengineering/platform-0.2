@@ -48,6 +48,8 @@ limitations under the License.
 </div>
 
 <style lang="scss">
+  @import "~@anticrm/sparkling-theme/styles/_global.scss";
+
   .root {
     display: grid;
     grid-template-columns: auto;
@@ -56,7 +58,15 @@ limitations under the License.
     padding: 5px;
     border: 1px solid;
     border-radius: 5px;
-    border-color: var(--theme-bg-accent-color);
+  }
+  :global(.theme-dark) .root {
+    border-color: $theme-dark-bg-accent-color;
+  }
+  :global(.theme-grey) .root {
+    border-color: $theme-grey-bg-accent-color;
+  }
+  :global(.theme-light) .root {
+    border-color: $theme-light-bg-accent-color;
   }
 
   .add {

@@ -21,30 +21,49 @@
 </button>
 
 <style lang="scss">
+  @import "~@anticrm/sparkling-theme/styles/_global.scss";
+
   .button {
     display: inline-block;
-    border: 1px solid var(--theme-bg-dark-color);
     height: auto;
-    border-radius: 4px;
+    border: solid 1px transparent;
+    border-radius: 12px;
     padding: 8px 16px;
     cursor: pointer;
     user-select: none;
-
     font: inherit;
     font-weight: 500;
     font-size: 14px;
-
-    color: var(--theme-content-color);
-    background-color: var(--theme-bg-accent-color);
     transition: border-color 0.2s, color 0.2s, background-color 0.2s;
-
     &:focus {
       outline: none;
     }
+  }
+  :global(.theme-dark) .button {
+    color: $theme-dark-content-color;
+    background-color: $theme-dark-bg-accent-color;
+    border-color: $theme-dark-bg-accent-color;
     &:hover {
-      border-color: var(--theme-bg-dark-hover);
-      background-color: var(--theme-bg-accent-hover);
-      color: var(--theme-content-dark-color);
+      background-color: $theme-dark-bg-accent-hover;
+      color: $theme-dark-content-dark-color;
+    }
+  }
+  :global(.theme-grey) .button {
+    color: $theme-grey-content-color;
+    background-color: $theme-grey-bg-accent-color;
+    border-color: $theme-grey-bg-accent-color;
+    &:hover {
+      background-color: $theme-grey-bg-accent-hover;
+      color: $theme-grey-content-dark-color;
+    }
+  }
+  :global(.theme-light) .button {
+    color: $theme-light-content-color;
+    background-color: $theme-light-bg-accent-color;
+    border-color: $theme-light-bg-accent-color;
+    &:hover {
+      background-color: $theme-light-bg-accent-hover;
+      color: $theme-light-content-dark-color;
     }
   }
 
@@ -58,15 +77,34 @@
     padding: 0 4px;
   }
 
-  .primary {
-    background-color: var(--theme-content-color);
-    border-color: var(--theme-content-color);
-    color: var(--theme-bg-color);
-
+  :global(.theme-dark) .primary {
+    background-color: $theme-dark-content-color;
+    border-color: $theme-dark-content-color;
+    color: $theme-dark-bg-color;
     &:hover {
-      background-color: var(--theme-content-dark-color);
-      border-color: var(--theme-content-dark-color);
-      color: var(--theme-bg-color);
+      background-color: $theme-dark-content-dark-color;
+      border-color: $theme-dark-content-dark-color;
+      color: $theme-dark-bg-color;
+    }
+  }
+  :global(.theme-grey) .primary {
+    background-color: $theme-grey-content-color;
+    border-color: $theme-grey-content-color;
+    color: $theme-grey-bg-color;
+    &:hover {
+      background-color: $theme-grey-content-dark-color;
+      border-color: $theme-grey-content-dark-color;
+      color: $theme-grey-bg-color;
+    }
+  }
+  :global(.theme-dark) .primary {
+    background-color: $theme-dark-content-color;
+    border-color: $theme-dark-content-color;
+    color: $theme-dark-bg-color;
+    &:hover {
+      background-color: $theme-dark-content-dark-color;
+      border-color: $theme-dark-content-dark-color;
+      color: $theme-light-bg-color;
     }
   }
 
@@ -76,21 +114,38 @@
     cursor: pointer;
     user-select: none;
     font-weight: 500;
-    color: var(--theme-content-color);
-    background-color: transparent;
     align-items: center;
     justify-content: center;
     flex-wrap: nowrap;
     padding: 0;
     margin: 0;
-
     &:focus {
       outline: none;
     }
-
+  }
+  :global(.theme-dark) .transparent {
+    color: $theme-dark-content-color;
+    background-color: transparent;
     &:hover {
+      color: $theme-dark-caption-color;
       background-color: transparent;
-      color: var(--theme-caption-color);
     }
   }
+  :global(.theme-grey) .transparent {
+    color: $theme-grey-content-color;
+    background-color: transparent;
+    &:hover {
+      color: $theme-grey-caption-color;
+      background-color: transparent;
+    }
+  }
+  :global(.theme-light) .transparent {
+    color: $theme-light-content-color;
+    background-color: transparent;
+    &:hover {
+      color: $theme-light-caption-color;
+      background-color: transparent;
+    }
+  }
+
 </style>

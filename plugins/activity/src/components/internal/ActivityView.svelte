@@ -44,6 +44,8 @@
 </div>
 
 <style lang="scss">
+  @import "~@anticrm/sparkling-theme/styles/_global.scss";
+
   .activity {
     height: 100%;
     // background-color: red;
@@ -59,9 +61,17 @@
       width: 100%;
       height: 5em;
       padding: 2em;
-      border-bottom: 1px solid var(--theme-bg-accent-color);
       display: flex;
       align-items: center;
     }
+  }
+  :global(.theme-dark) .captionContainer {
+    border-bottom: 1px solid $theme-dark-bg-accent-color;
+  }
+  :global(.theme-grey) .captionContainer {
+    border-bottom: 1px solid $theme-grey-bg-accent-color;
+  }
+  :global(.theme-light) .captionContainer {
+    border-bottom: 1px solid $theme-light-bg-accent-color;
   }
 </style>
