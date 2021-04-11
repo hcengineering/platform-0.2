@@ -4,7 +4,7 @@
   export let prevDiv: HTMLElement
   export let nextDiv: HTMLElement
   export let size = 4
-  export let spacing = 4
+  export let spacing = 4 // eslint-disable-line
   export let margin = 20
   export let minWidth = 150
   export let devMode = false
