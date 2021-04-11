@@ -75,8 +75,8 @@ limitations under the License.
       <SpaceBox label="Vacancy" {spaces} bind:space />
     {/if}
     <EditBox bind:value={newEvent.summary} label="Summary" placeholder="Summary" />
-    <DateInput bind:value={newEvent.startDate} label="Start date" placeholder="Start date" />
-    <DateInput bind:value={newEvent.endDate} label="End date" placeholder="End date" />
+    <DateInput bind:value={newEvent.startDate} label="Start date" placeholder="Start date" relativeToParent={true} />
+    <DateInput bind:value={newEvent.endDate} label="End date" placeholder="End date" relativeToParent={true} />
   </div>
   <div class="footer">
     <Button kind="primary" on:click={save} width="100%">Принять</Button>

@@ -47,41 +47,13 @@
 <style lang="scss">
   .modal {
     position: fixed;
-    // top: 50%;
-    // left: 50%;
-    // transform: translate(-50%, -50%);
     z-index: 1001;
-
-    /*
-    border: 1px solid var(--theme-bg-color);
-    border-radius: 0.5em;
-    padding: 1em 1em;
-    background-color: var(--theme-bg-color);
-
-
-    box-shadow: 0 1px 1px rgba(0,0,0,0.12),
-              0 2px 2px rgba(0,0,0,0.12),
-              0 4px 4px rgba(0,0,0,0.12),
-              0 8px 8px rgba(0,0,0,0.12),
-              0 16px 16px rgba(0,0,0,0.12);
-    */
     background-color: var(--theme-bg-color);
     border: solid 1px var(--theme-bg-dark-color);
     border-radius: 4px;
     padding: 0px;
     box-shadow: 0px 6px 9px rgba(0, 0, 0, 0.1);
   }
-
-  /*  .top-arrow::after {
-    content: "";
-    position: absolute;
-    top: -10px;
-    left: 24px;
-    // margin-top: -5px;
-    border-width: 5px;
-    border-style: solid;
-    border-color: transparent transparent var(--theme-bg-accent-color) transparent;
-  } */
 
   .modal-overlay {
     z-index: 1000;
