@@ -22,6 +22,11 @@ import { descriptor1, descriptor2, descriptor3, plugin1, plugin1State, plugin2St
 
 type AnyPlugin = Plugin<Service>
 
+type ExtractType<T, X extends Record<string, Metadata<T>>> = {
+  [P in keyof X]:
+  X[P] extends Metadata<infer Z> ? Z : never
+}
+
 describe('platform', () => {
   const platform = createPlatform()
 
@@ -38,18 +43,18 @@ describe('platform', () => {
 
   it('should raise exception for unknown location', () => {
     const p1 = platform.getPlugin(plugin1)
-    expect(p1).rejects.toThrowError('plugin1')
+    expect(p1).rejects.toThrowError('plugin1') // eslint-disable-line @typescript-eslint/no-floating-promises
   })
 
-  it('should resolve plugin', () => {
-    platform.addLocation(descriptor1, () => import('./plugin1'))
+  it('should resolve plugin', async () => {
+    platform.addLocation(descriptor1, async () => await import('./plugin1'))
     expect(plugin1State.parsed).toBe(false)
     expect(plugin1State.started).toBe(false)
     const p1 = platform.getPlugin(plugin1)
     expect(p1).toBeInstanceOf(Promise)
     expect(plugin1State.parsed).toBe(false)
     expect(plugin1State.started).toBe(false)
-    return p1.then(plugin => { // eslint-disable-line @typescript-eslint/no-unused-vars
+    return await p1.then(() => {
       expect(plugin1State.parsed).toBe(true)
       expect(plugin1State.started).toBe(true)
     })
@@ -65,8 +70,8 @@ describe('platform', () => {
     })
   })
 
-  it('should resolve resource', () => {
-    platform.addLocation(descriptor2, () => import('./plugin2'))
+  it('should resolve resource', async () => {
+    platform.addLocation(descriptor2, async () => await import('./plugin2'))
     // platform.setResolver('resource2', plugin2)
     expect(plugin2State.parsed).toBe(false)
     expect(plugin2State.started).toBe(false)
@@ -74,17 +79,17 @@ describe('platform', () => {
     expect(resolved).toBeInstanceOf(Promise)
     // get again to check repeated getting
     resolved = platform.getResource('resource2:plugin2.Resource' as Resource<string>)
-    return resolved.then(resource => {
+    return await resolved.then(resource => {
       expect(resource).toBe('hello resource2:My.Resource')
       expect(plugin2State.parsed).toBe(true)
       expect(plugin2State.started).toBe(true)
     })
   })
 
-  it('should resolve resource second time', () => {
+  it('should resolve resource second time', async () => {
     const resolved = platform.getResource('resource2:plugin2.Resource' as Resource<string>)
     expect(resolved).toBeInstanceOf(Promise)
-    return resolved.then(resource => {
+    return await resolved.then(resource => {
       expect(resource).toBe('hello resource2:My.Resource')
     })
   })
@@ -101,10 +106,10 @@ describe('platform', () => {
     })
   })
 
-  it('should inject dependencies', () => {
-    platform.addLocation(descriptor3, () => import('./plugin3'))
+  it('should inject dependencies', async () => {
+    platform.addLocation(descriptor3, async () => await import('./plugin3'))
     const p3 = platform.getPlugin(plugin3)
-    return p3.then(plugin => {
+    return await p3.then(plugin => {
       const deps = (plugin as any).deps
       expect(deps.plugin1.id).toBe('plugin1')
       expect(deps.plugin2.id).toBe('plugin2')
@@ -152,9 +157,7 @@ describe('platform', () => {
       }
     })
 
-    expect(() => platform.loadMetadata(ids.meta, {
-      M1: false
-    })).toThrowError()
+    expect(() => platform.loadMetadata(ids.meta, {} as ExtractType<unknown, { M1: Metadata<boolean> }>)).toThrowError() // eslint-disable-line @typescript-eslint/consistent-type-assertions
   })
 
   it('should set metadata', () => {
@@ -172,11 +175,11 @@ describe('platform', () => {
     let listenerCalled = false
     const myEvent = 'MyEvent'
     const myData = 'test-data'
-    const myEventListener = function (event: string, data: any): Promise<void> {
+    const myEventListener = async function (event: string, data: any): Promise<void> {
       listenerCalled = true
       expect(event).toBe(myEvent)
       expect(data).toBe(myData)
-      return Promise.resolve()
+      return await Promise.resolve()
     }
 
     platform.addEventListener(myEvent, myEventListener)
@@ -199,28 +202,28 @@ describe('platform', () => {
         this.eventData = eventData
         this.isCalled = false
 
-        this.listener = (event: string, data: any): Promise<void> => {
+        this.listener = async (event: string, data: any): Promise<void> => {
           this.isCalled = true
           expect(event).toBe(this.eventName)
           expect(data).toBe(this.eventData)
-          return Promise.resolve()
+          return await Promise.resolve()
         }
       }
 
-      startListen () {
+      startListen (): void {
         platform.addEventListener(this.eventName, this.listener)
       }
 
-      stopListen () {
+      stopListen (): void {
         platform.removeEventListener(this.eventName, this.listener)
       }
 
-      checkCalled () {
+      checkCalled (): void {
         expect(this.isCalled).toBe(true)
         this.isCalled = false // reset flag for futher checks
       }
 
-      checkNotCalled () {
+      checkNotCalled (): void {
         expect(this.isCalled).toBe(false)
       }
     }
@@ -279,16 +282,16 @@ describe('platform', () => {
     secondListenerForEvent2.checkNotCalled()
   })
 
-  function testSetPlatformStatus (status: any, expectedSeverity: Severity, expectedMessage: string) {
+  function testSetPlatformStatus (status: any, expectedSeverity: Severity, expectedMessage: string): void {
     let listenerCalled = false
-    const listener = function (event: string, data: any): Promise<void> {
+    const listener = async function (event: string, data: any): Promise<void> {
       listenerCalled = true
       expect(event).toBe(PlatformStatus)
       expect(data).toBeInstanceOf(Status)
       expect(data.severity).toBe(expectedSeverity)
       expect(data.code).toBe(0)
       expect(data.message).toBe(expectedMessage)
-      return Promise.resolve()
+      return await Promise.resolve()
     }
 
     platform.addEventListener(PlatformStatus, listener)

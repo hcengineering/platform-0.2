@@ -20,10 +20,10 @@ import { PluginDependencies } from '../index'
 
 plugin2State.parsed = true
 
-export default (platform: Platform, _deps: PluginDependencies): Promise<{id: typeof plugin2}> => {
+export default async (platform: Platform, _deps: PluginDependencies): Promise<{id: typeof plugin2}> => {
   plugin2State.started = true
   platform.setResource('resource2:plugin2.Resource' as Resource<string>, 'hello resource2:My.Resource')
-  return Promise.resolve({
+  return await Promise.resolve({
     id: plugin2
   })
 }
