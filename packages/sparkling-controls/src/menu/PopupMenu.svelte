@@ -2,8 +2,9 @@
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
 
   export let kind = 'transparent'
-  export const width = 150
+  export let width = 150
   export let visible = 'hidden'
+  export let relativeToParent = false
 
   let thisPopup: HTMLElement
   let thisTrigger: HTMLElement
@@ -13,9 +14,12 @@
     const rectPopup = thisPopup.getBoundingClientRect()
     const rectTrigger = thisTrigger.getBoundingClientRect()
     const rectBody = document.body.getBoundingClientRect()
+    const offsetParentRect = relativeToParent ? thisTrigger.offsetParent?.getBoundingClientRect() : undefined
+    const leftParentOffset = offsetParentRect?.left || 0
+    const topParentOffset = offsetParentRect?.top || 0
     if (rectTrigger.left + rectPopup.width >= rectBody.width) thisPopup.style.right = '1em'
-    else thisPopup.style.left = `${rectTrigger.left}px`
-    thisPopup.style.top = `${rectTrigger.y + rectTrigger.height + 1}px`
+    else thisPopup.style.left = `${rectTrigger.left - leftParentOffset}px`
+    thisPopup.style.top = `${rectTrigger.y + rectTrigger.height - topParentOffset + 1}px`
 
     if (firstOpen) {
       firstOpen = false

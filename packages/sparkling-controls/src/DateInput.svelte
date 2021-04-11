@@ -21,9 +21,10 @@
   export let value: Date | undefined = undefined
   export let placeholder: string
   export let hoverState = false
+  export let relativeToParent = false
 </script>
 
-<PopupMenu width={220}>
+<PopupMenu width={220} {relativeToParent}>
   <div
     class="date-input"
     class:date-input-label={label !== ''}

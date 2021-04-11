@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Db } from 'mongodb'
+import { Db, DeleteWriteOpResultObject } from 'mongodb'
 import { Person } from '@anticrm/contact'
 import { builder } from '@anticrm/boot/src/boot'
 
@@ -40,6 +40,6 @@ export function createContact (db: Db, email: string, username: string): Promise
   return db.collection('contact').insertOne(user)
 }
 
-export function removeContact (db: Db, username: string) { // eslint-disable-line @typescript-eslint/no-unused-vars
+export function removeContact (db: Db, _username: string): Promise<DeleteWriteOpResultObject> {
   return db.collection('contact').deleteMany({ _mixins: contact.mixin.User })
 }
