@@ -1,6 +1,5 @@
 <script lang="ts">
   import { getContext } from 'svelte'
-  import { themes as _themes } from '@anticrm/sparkling-theme/src/themes'
   import PopupMenu from '@anticrm/sparkling-controls/src/menu/PopupMenu.svelte'
   import PopupItem from '@anticrm/sparkling-controls/src/menu/PopupItem.svelte'
 
