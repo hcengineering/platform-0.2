@@ -20,8 +20,8 @@
 
   let hoverMode = false
   const splitterStyle: string = horizontal
-    ? `margin: ${size}px ${margin}px; width: calc(100% - ${margin*2}px); height: ${size}px; min-height: ${size}px; cursor: row-resize;`
-    : `margin: ${margin}px ${size}px; height: calc(100% - ${margin*2}px); width: ${size}px; min-width: ${size}px; cursor: col-resize;`
+    ? `margin: ${size}px ${margin}px; width: calc(100% - ${margin * 2}px); height: ${size}px; min-height: ${size}px; cursor: row-resize;`
+    : `margin: ${margin}px ${size}px; height: calc(100% - ${margin * 2}px); width: ${size}px; min-width: ${size}px; cursor: col-resize;`
 
   function onMouseMove (event: MouseEvent): void {
     let dCoord: number

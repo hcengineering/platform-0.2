@@ -189,18 +189,10 @@
       {/each}
     </div>
     <div class="section">
-      <img class="ava" src="https://platform.exhale24.ru/images/photo-3.png"/>
+      <img class="ava" src="https://platform.exhale24.ru/images/photo-3.png" alt=""/>
     </div>
   </nav>
   <div class="projects" class:mini={!hidden}>
-    <!-- <a
-      href="/"
-      style="position:absolute;top:1.5em;right:1.5em;"
-      on:click|preventDefault={() => {
-        hidden = !hidden
-      }}>
-      <Icon icon={workbench.icon.Resize} button="true" />
-    </a> -->
     <div class="projects-head">
       <img src="https://platform.exhale24.ru/images/logo_persp.png" alt="Voltron Team"/>
       <span>Voltron Team</span>
