@@ -19,35 +19,6 @@
  */
 
 /**
- * Platform Resource Identifier (PRI)
- *
- * @remarks
- *
- * Almost anything in the Anticrm Platform is a `Resource`. Resources referenced by Platform Resource Identifier (PRI).
- *
- * TODO: understand Resource better. Is this just a `platform` thing or should be in `core` as well
- *
- * 'Resource' is simply any JavaScript object. There is a plugin exists, which 'resolve' PRI into actual object.
- * This is a difference from Metadata. Metadata object 'resolved' by Platform instance, so we may consider Metadata as
- * a Resource, provided by Platform itself. Because there is always a plugin, which resolve `Resource` resolution is
- * asynchronous process.
- *
- * `Resource` is a string of `kind:plugin.id` format. Since Metadata is a kind of Resource.
- * Metadata also can be resolved using resource API.
- *
- * @example
- * ```typescript
- *   `class:contact.Person` as Resource<Class<Person>> // database object with id === `class:contact.Person`
- *   `string:class.ClassLabel` as Resource<string> // translated string according to current language and i18n settings
- *   `asset:ui.Icons` as Resource<URL> // URL to SVG sprites
- *   `easyscript:2+2` as Resource<() => number> // function
- * ```
- *
- * @public
- */
-export type Resource<T> = string & { __resource: T }
-
-/**
  * Status severity
  * @public
  */
@@ -58,27 +29,14 @@ export enum Severity {
   ERROR
 }
 
-export enum PlatformStatusCodes {
-  AUTHENTICATON_OK = 101,
-  AUTHENTICATON_REQUIRED,
-  ACCOUNT_NOT_FOUND,
-  ACCOUNT_DUPLICATE,
-  INCORRECT_PASSWORD,
-  FORBIDDEN,
-  WORKSPACE_ALREADY_EXISTS,
-  WORKSPACE_NOT_FOUND,
-  CLIENT_VALIDATE_REQUIRED,
-  INCORRECT_SECOND_FACTOR_CODE
-}
-
 /**
  * Status of an operation
  * @public
  */
 export class Status {
-  severity: Severity
-  code: number
-  message: string
+  readonly severity: Severity
+  readonly code: number
+  readonly message: string
 
   constructor (severity: Severity, code: number, message: string) {
     this.severity = severity
