@@ -165,8 +165,6 @@
     router.setDefaults(routeDefaults())
   })
 
-  let hidden = true
-
   function appSpaces (spaces: Space[], app: WorkbenchApplication): Space[] {
     return spaces.filter((sp) => sp.application === app._id)
   }
@@ -192,13 +190,13 @@
       <img class="ava" src="https://platform.exhale24.ru/images/photo-3.png" alt=""/>
     </div>
   </nav>
-  <div class="projects" class:mini={!hidden}>
+  <div class="projects">
     <div class="projects-head">
       <img src="https://platform.exhale24.ru/images/logo_persp.png" alt="Voltron Team"/>
       <span>Voltron Team</span>
       <div class="arrowDown"/>
     </div>
-    <div class="container" class:hidden={!hidden}>
+    <div class="container">
       {#each applications as app}
         <div class="application-box">
           <div class="app-selector">
@@ -399,10 +397,6 @@
       margin: 0 8px;
       height: 100%;
       overflow-y: auto;
-    }
-
-    .hidden {
-      visibility: hidden;
     }
   }
   :global(.theme-dark) .projects-head {
