@@ -43,7 +43,7 @@
 </div>
 
 <style lang="scss">
-  @import "~@anticrm/sparkling-theme/styles/_global.scss";
+  @import '~@anticrm/sparkling-theme/styles/_global.scss';
 
   .message-item {
     display: flex;

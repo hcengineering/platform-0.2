@@ -44,7 +44,7 @@
 </PopupMenu>
 
 <style lang="scss">
-  @import "~@anticrm/sparkling-theme/styles/_global.scss";
+  @import '~@anticrm/sparkling-theme/styles/_global.scss';
 
   input {
     border: none;
@@ -56,9 +56,15 @@
       outline: none;
     }
   }
-  :global(.theme-dark) input { color: $theme-dark-content-color; }
-  :global(.theme-grey) input { color: $theme-grey-content-color; }
-  :global(.theme-light) input { color: $theme-light-content-color; }
+  :global(.theme-dark) input {
+    color: $theme-dark-content-color;
+  }
+  :global(.theme-grey) input {
+    color: $theme-grey-content-color;
+  }
+  :global(.theme-light) input {
+    color: $theme-light-content-color;
+  }
 
   .date-input {
     border-radius: 4px;
@@ -131,7 +137,13 @@
     margin: 2px 0 6px;
     align-self: flex-start;
   }
-  :global(.theme-dark) .label { color: $theme-dark-content-color; }
-  :global(.theme-grey) .label { color: $theme-grey-content-color; }
-  :global(.theme-light) .label { color: $theme-light-content-color; }
+  :global(.theme-dark) .label {
+    color: $theme-dark-content-color;
+  }
+  :global(.theme-grey) .label {
+    color: $theme-grey-content-color;
+  }
+  :global(.theme-light) .label {
+    color: $theme-light-content-color;
+  }
 </style>

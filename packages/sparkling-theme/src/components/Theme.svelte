@@ -23,7 +23,7 @@
 </slot>
 
 <style lang="scss" global>
-  @import "~@anticrm/sparkling-theme/styles/_global.scss";
+  @import '~@anticrm/sparkling-theme/styles/_global.scss';
 
   * {
     box-sizing: border-box;
@@ -41,8 +41,12 @@
     scrollbar-width: thin;
   }
 
-  ::-webkit-scrollbar { width: 8px; }
-  ::-webkit-scrollbar:horizontal { height: 8px; }
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  ::-webkit-scrollbar:horizontal {
+    height: 8px;
+  }
 
   :global(.theme-dark) ::-webkit-scrollbar-track {
     background-color: $theme-dark-bg-color;

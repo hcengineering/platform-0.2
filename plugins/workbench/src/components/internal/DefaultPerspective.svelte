@@ -173,28 +173,28 @@
 <div class="workbench-perspective">
   <nav>
     <div class="section">
-      <div class="status-online"></div>
+      <div class="status-online" />
     </div>
     <div class="app-icon">
       {#each applications as app}
         <div class="iconApp" class:selectedApp={app._id === application._id}>
           <div class="cropIcon">
-          <LinkTo on:click={() => router.navigate({ app: app.route })}>
-            <Icon icon={app.icon} size="32" />
-          </LinkTo>
+            <LinkTo on:click={() => router.navigate({ app: app.route })}>
+              <Icon icon={app.icon} size="32" />
+            </LinkTo>
           </div>
         </div>
       {/each}
     </div>
     <div class="section">
-      <img class="ava" src="https://platform.exhale24.ru/images/photo-3.png" alt=""/>
+      <img class="ava" src="https://platform.exhale24.ru/images/photo-3.png" alt="" />
     </div>
   </nav>
   <div class="projects">
     <div class="projects-head">
-      <img src="https://platform.exhale24.ru/images/logo_persp.png" alt="Voltron Team"/>
+      <img src="https://platform.exhale24.ru/images/logo_persp.png" alt="Voltron Team" />
       <span>Voltron Team</span>
-      <div class="arrowDown"/>
+      <div class="arrowDown" />
     </div>
     <div class="container">
       {#each applications as app}
@@ -242,7 +242,7 @@
         </div>
       {/each}
     </div>
-    <div class="separator"></div>
+    <div class="separator" />
     <Button><span class="btn-bottom">Add Teammates</span></Button>
   </div>
 
@@ -266,7 +266,7 @@
     {/if}
   </div>
   {#if details}
-    <Splitter {prevDiv} {nextDiv} minWidth="414"/>
+    <Splitter {prevDiv} {nextDiv} minWidth="414" />
     <aside bind:this={nextDiv}>
       <ObjectForm
         _class={details._class}
@@ -279,7 +279,7 @@
 </div>
 
 <style lang="scss">
-  @import "~@anticrm/sparkling-theme/styles/_global.scss";
+  @import '~@anticrm/sparkling-theme/styles/_global.scss';
 
   .workbench-perspective {
     display: flex;
@@ -444,15 +444,21 @@
     border-radius: 20px;
   }
 
-  :global(.theme-dark) .projects, :global(.theme-dark) .main, :global(.theme-dark) aside {
+  :global(.theme-dark) .projects,
+  :global(.theme-dark) .main,
+  :global(.theme-dark) aside {
     background-color: $theme-dark-bg-color;
     border: solid 1px $theme-dark-bg-accent-color;
   }
-  :global(.theme-grey) .projects, :global(.theme-grey) .main, :global(.theme-grey) aside {
+  :global(.theme-grey) .projects,
+  :global(.theme-grey) .main,
+  :global(.theme-grey) aside {
     background-color: $theme-grey-bg-color;
     border: solid 1px $theme-grey-bg-accent-color;
   }
-  :global(.theme-light) .projects, :global(.theme-light) .main, :global(.theme-light) aside {
+  :global(.theme-light) .projects,
+  :global(.theme-light) .main,
+  :global(.theme-light) aside {
     background-color: $theme-light-bg-color;
     border: solid 1px $theme-light-bg-accent-color;
   }

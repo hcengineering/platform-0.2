@@ -20,8 +20,12 @@
 
   let hoverMode = false
   const splitterStyle: string = horizontal
-    ? `margin: ${spacing}px ${margin}px; width: calc(100% - ${margin * 2}px); height: ${size}px; min-height: ${size}px; cursor: row-resize;`
-    : `margin: ${margin}px ${spacing}px; height: calc(100% - ${margin * 2}px); width: ${size}px; min-width: ${size}px; cursor: col-resize;`
+    ? `margin: ${spacing}px ${margin}px; width: calc(100% - ${
+        margin * 2
+      }px); height: ${size}px; min-height: ${size}px; cursor: row-resize;`
+    : `margin: ${margin}px ${spacing}px; height: calc(100% - ${
+        margin * 2
+      }px); width: ${size}px; min-width: ${size}px; cursor: col-resize;`
 
   function onMouseMove (event: MouseEvent): void {
     let dCoord: number
@@ -102,11 +106,10 @@
   class="splitter"
   class:splitter-statehover={hoverMode}
   style={splitterStyle}
-  on:mousedown={onMouseDown}>
-</div>
+  on:mousedown={onMouseDown} />
 
 <style lang="scss">
-  @import "~@anticrm/sparkling-theme/styles/_global.scss";
+  @import '~@anticrm/sparkling-theme/styles/_global.scss';
 
   .splitter {
     position: relative;
@@ -115,17 +118,20 @@
     background-color: transparent;
   }
   :global(.theme-dark) .splitter {
-    &:hover, &-statehover {
+    &:hover,
+    &-statehover {
       background-color: $theme-dark-bg-accent-color;
     }
   }
   :global(.theme-grey) .splitter {
-    &:hover, &-statehover {
+    &:hover,
+    &-statehover {
       background-color: $theme-grey-bg-accent-color;
     }
   }
   :global(.theme-light) .splitter {
-    &:hover, &-statehover {
+    &:hover,
+    &-statehover {
       background-color: $theme-light-bg-accent-color;
     }
   }

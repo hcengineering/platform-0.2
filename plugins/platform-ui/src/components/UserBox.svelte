@@ -55,11 +55,7 @@
 </script>
 
 <div bind:this={comboRoot} class="comboBox" class:selectedCombo={!comboHidden} on:click={handler}>
-  <UserInfo
-    url={items[selected].url}
-    title={items[selected].name}
-    subtitle="Новый исполнитель"
-    subtitleOnTop="true"/>
+  <UserInfo url={items[selected].url} title={items[selected].name} subtitle="Новый исполнитель" subtitleOnTop="true" />
   <div class="arrowDown" />
 
   <div bind:this={comboDrop} class="comboBox-drop">
@@ -79,7 +75,7 @@
             on:click={() => {
               selected = item.id
             }}>
-            <UserInfo url={item.url} title={item.name}/>
+            <UserInfo url={item.url} title={item.name} />
           </div>
         {/each}
       </ScrollView>
@@ -88,7 +84,7 @@
 </div>
 
 <style lang="scss">
-  @import "~@anticrm/sparkling-theme/styles/_global.scss";
+  @import '~@anticrm/sparkling-theme/styles/_global.scss';
 
   .comboBox {
     position: relative;
@@ -212,7 +208,8 @@
     width: 16px;
     height: 16px;
 
-    &::after, &::before {
+    &::after,
+    &::before {
       content: '';
       position: absolute;
       width: 1px;
@@ -228,13 +225,16 @@
       transform: translateY(-50%) rotate(-45deg);
     }
   }
-  :global(.theme-dark) .arrowDown::after, :global(.theme-dark) .arrowDown::before {
+  :global(.theme-dark) .arrowDown::after,
+  :global(.theme-dark) .arrowDown::before {
     background-color: $theme-dark-content-color;
   }
-  :global(.theme-grey) .arrowDown::after, :global(.theme-grey) .arrowDown::before {
+  :global(.theme-grey) .arrowDown::after,
+  :global(.theme-grey) .arrowDown::before {
     background-color: $theme-grey-content-color;
   }
-  :global(.theme-light) .arrowDown::after, :global(.theme-light) .arrowDown::before {
+  :global(.theme-light) .arrowDown::after,
+  :global(.theme-light) .arrowDown::before {
     background-color: $theme-light-content-color;
   }
 </style>

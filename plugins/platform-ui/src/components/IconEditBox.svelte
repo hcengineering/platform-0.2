@@ -53,7 +53,7 @@
 </div>
 
 <style lang="scss">
-  @import "~@anticrm/sparkling-theme/styles/_global.scss";
+  @import '~@anticrm/sparkling-theme/styles/_global.scss';
 
   input {
     border: none;
@@ -64,9 +64,15 @@
       outline: none;
     }
   }
-  :global(.theme-dark) input { color: $theme-dark-content-color; }
-  :global(.theme-grey) input { color: $theme-grey-content-color; }
-  :global(.theme-light) input { color: $theme-light-content-color; }
+  :global(.theme-dark) input {
+    color: $theme-dark-content-color;
+  }
+  :global(.theme-grey) input {
+    color: $theme-grey-content-color;
+  }
+  :global(.theme-light) input {
+    color: $theme-light-content-color;
+  }
 
   .editbox {
     border: solid 1px transparent;
@@ -145,9 +151,15 @@
     font-weight: 400;
     margin-bottom: 4px;
   }
-  :global(.theme-dark) .label { color: $theme-dark-content-color; }
-  :global(.theme-grey) .label { color: $theme-grey-content-color; }
-  :global(.theme-light) .label { color: $theme-light-content-color; }
+  :global(.theme-dark) .label {
+    color: $theme-dark-content-color;
+  }
+  :global(.theme-grey) .label {
+    color: $theme-grey-content-color;
+  }
+  :global(.theme-light) .label {
+    color: $theme-light-content-color;
+  }
 
   .separator {
     width: 7px;

@@ -106,7 +106,7 @@
 </Theme>
 
 <style lang="scss">
-  @import "~@anticrm/sparkling-theme/styles/_global.scss";
+  @import '~@anticrm/sparkling-theme/styles/_global.scss';
 
   $status-bar-height: 20px;
   $pictogram-size: 51px;

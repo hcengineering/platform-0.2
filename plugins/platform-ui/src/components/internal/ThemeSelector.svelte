@@ -8,11 +8,19 @@
 
 <PopupMenu>
   <div class="popup" slot="trigger">Themes</div>
-  <PopupItem on:click={() => { setTheme('theme-dark') }}>Dark</PopupItem>
-  <PopupItem on:click={() => { setTheme('theme-grey') }}>Grey</PopupItem>
-  <PopupItem on:click={() => { setTheme('theme-light') }}>Light</PopupItem>
+  <PopupItem
+    on:click={() => {
+      setTheme('theme-dark')
+    }}>Dark</PopupItem>
+  <PopupItem
+    on:click={() => {
+      setTheme('theme-grey')
+    }}>Grey</PopupItem>
+  <PopupItem
+    on:click={() => {
+      setTheme('theme-light')
+    }}>Light</PopupItem>
 </PopupMenu>
 
 <style>
-
 </style>

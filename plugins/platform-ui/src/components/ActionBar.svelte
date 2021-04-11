@@ -75,7 +75,7 @@
 </div>
 
 <style lang="scss">
-  @import "~@anticrm/sparkling-theme/styles/_global.scss";
+  @import '~@anticrm/sparkling-theme/styles/_global.scss';
 
   .actionBar-view {
     display: flex;
@@ -149,13 +149,16 @@
   .popup-separator {
     height: 1px;
   }
-  :global(.theme-dark) .toggleState, :global(.theme-dark) .popup-separator {
+  :global(.theme-dark) .toggleState,
+  :global(.theme-dark) .popup-separator {
     background-color: $theme-dark-bg-dark-color;
   }
-  :global(.theme-grey) .toggleState, :global(.theme-grey) .popup-separator {
+  :global(.theme-grey) .toggleState,
+  :global(.theme-grey) .popup-separator {
     background-color: $theme-grey-bg-dark-color;
   }
-  :global(.theme-light) .toggleState, :global(.theme-light) .popup-separator {
+  :global(.theme-light) .toggleState,
+  :global(.theme-light) .popup-separator {
     background-color: $theme-light-bg-dark-color;
   }
 

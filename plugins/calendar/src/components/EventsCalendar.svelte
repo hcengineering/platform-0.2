@@ -121,7 +121,7 @@
 </MonthCalendar>
 
 <style lang="scss">
-  @import "~@anticrm/sparkling-theme/styles/_global.scss";
+  @import '~@anticrm/sparkling-theme/styles/_global.scss';
 
   .event {
     height: 20px;

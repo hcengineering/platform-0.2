@@ -80,7 +80,7 @@
 </div>
 
 <style lang="scss">
-  @import "~@anticrm/sparkling-theme/styles/_global.scss";
+  @import '~@anticrm/sparkling-theme/styles/_global.scss';
 
   .comboBox {
     position: relative;
@@ -204,7 +204,8 @@
     width: 16px;
     height: 16px;
 
-    &::after, &::before {
+    &::after,
+    &::before {
       content: '';
       position: absolute;
       width: 1px;
@@ -220,13 +221,16 @@
       transform: translateY(-50%) rotate(-45deg);
     }
   }
-  :global(.theme-dark) .arrowDown::after, :global(.theme-dark) .arrowDown::before {
+  :global(.theme-dark) .arrowDown::after,
+  :global(.theme-dark) .arrowDown::before {
     background-color: $theme-dark-content-color;
   }
-  :global(.theme-grey) .arrowDown::after, :global(.theme-grey) .arrowDown::before {
+  :global(.theme-grey) .arrowDown::after,
+  :global(.theme-grey) .arrowDown::before {
     background-color: $theme-grey-content-color;
   }
-  :global(.theme-light) .arrowDown::after, :global(.theme-light) .arrowDown::before {
+  :global(.theme-light) .arrowDown::after,
+  :global(.theme-light) .arrowDown::before {
     background-color: $theme-light-content-color;
   }
 </style>
