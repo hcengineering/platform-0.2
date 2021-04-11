@@ -37,11 +37,9 @@
       <table>
         {#each model.getOwnAttributes(group._class) as attr (attr.key)}
           <tr>
-            <td>
+            <td class="cell-icon">
               {#if attr.icon}
-                <span style="fill: var(--theme-content-dark-color)">
-                  <Icon icon={attr.icon} size="24" />
-                </span>
+                <Icon icon={attr.icon} size="24" />
               {/if}
             </td>
             <td width="120px">
@@ -61,6 +59,8 @@
 
 <!-- { /if } -->
 <style lang="scss">
+  @import "~@anticrm/sparkling-theme/styles/_global.scss";
+
   .attributes {
     display: flex;
     flex-wrap: wrap;
@@ -72,8 +72,14 @@
     }
   }
 
-  .label {
-    color: var(--theme-content-dark-color);
+  :global(.theme-dark) .label, :global(.theme-dark) .cell-icon {
+    color: $theme-dark-content-dark-color;
+  }
+  :global(.theme-grey) .label, :global(.theme-grey) .cell-icon {
+    color: $theme-grey-content-dark-color;
+  }
+  :global(.theme-light) .label, :global(.theme-light) .cell-icon {
+    color: $theme-light-content-dark-color;
   }
 
   .edit {
