@@ -6,8 +6,6 @@
 <div class="status" style="background-color: {color};">{text}</div>
 
 <style lang="scss">
-  @import '~@anticrm/sparkling-theme/styles/_global.scss';
-
   .status {
     display: flex;
     align-items: center;
@@ -16,8 +14,8 @@
     line-height: 11px;
     font-weight: 500;
     padding: 0px 4px;
-    background-color: $theme-status-green-color;
+    background-color: var(--theme-status-green-color);
     border-radius: 2px;
-    color: $theme-white-color;
+    color: var(--theme-white-color);
   }
 </style>

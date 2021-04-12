@@ -23,7 +23,7 @@
 </slot>
 
 <style lang="scss" global>
-  @import '~@anticrm/sparkling-theme/styles/_vars.css';
+  @import '~@anticrm/sparkling-theme/styles/colors.scss';
 
   * {
     box-sizing: border-box;
