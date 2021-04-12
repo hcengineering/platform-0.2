@@ -51,7 +51,6 @@ class TCandidateState extends TEnum<CandidateState> {
 
 @Mixin$(recruiting.mixin.WithCandidateProps, personExtras.mixin.WithResume)
 export class TWithCandidateProps extends TWithResume implements WithCandidateProps {
-  @Prop()
   @InstanceOf$(recruiting.class.Candidate)
   candidate!: Candidate
 

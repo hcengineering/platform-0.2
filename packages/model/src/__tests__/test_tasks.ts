@@ -29,7 +29,9 @@ export class TTask extends TDoc implements Task {
 
   @Prop() rate!: number
 
-  @Prop() lists!: string[]
+  @ArrayOf$()
+  @Prop()
+  lists!: string[]
 
   @InstanceOf$(taskIds.class.Subtask) mainTask!: SubTask
 
@@ -72,7 +74,8 @@ export class TTaskComment extends TEmb implements TaskComment {
 }
 
 @Class$(taskIds.class.DerivedTask, taskIds.class.Task, MODEL_DOMAIN)
-export class TDerivedTask extends TTask {}
+export class TDerivedTask extends TTask {
+}
 
 export function model (S: Builder): void {
   S.add(TTask, TDerivedTask, TSubTask, TTaskComment)

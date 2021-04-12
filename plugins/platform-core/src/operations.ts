@@ -15,7 +15,8 @@
 
 import { AnyLayout, Class, Doc, generateId, Model, Ref, StringProperty, Tx } from '@anticrm/core'
 import { OperationProtocol } from '.'
-import { newCreateTx, newDeleteTx, newPushTx, newUpdateTx } from './tx'
+import { newCreateTx, newDeleteTx, newUpdateTx } from './tx'
+import { txBuilder, TxBuilder, TxOperation, TxOperationKind } from '@anticrm/domains'
 
 export function createOperations (model: Model, processTx: (tx: Tx) => Promise<any>, getUserId: () => StringProperty): OperationProtocol {
   function create<T extends Doc> (_class: Ref<Class<T>>, values: AnyLayout | Doc): Promise<T> {
@@ -28,28 +29,30 @@ export function createOperations (model: Model, processTx: (tx: Tx) => Promise<a
     return processTx(newCreateTx(doc, getUserId())).then(() => doc)
   }
 
-  function push<T extends Doc> (doc: Doc, query: AnyLayout | null, _attribute: StringProperty, element: AnyLayout | Doc): Promise<T> {
+  function updateWith<T extends Doc> (doc: T, builder: (s: TxBuilder<T>) => TxOperation | TxOperation[]): Promise<T> {
+    const b = txBuilder<T>(doc._class as Ref<Class<T>>)
+    const op = builder(b)
     return processTx(
-      newPushTx(doc._class, doc._id, query || undefined, _attribute, (element as unknown) as AnyLayout, getUserId())
+      newUpdateTx(doc._class, doc._id, (op instanceof Array) ? op : [op], getUserId())
     ).then(() => doc as T)
   }
 
-  function update<T extends Doc> (doc: T, query: AnyLayout | null, values: AnyLayout): Promise<T> {
+  function update<T extends Doc> (doc: T, value: Partial<Omit<T, keyof Doc>>): Promise<T> {
     return processTx(
-      newUpdateTx(doc._class, doc._id, query || undefined, values, getUserId())
+      newUpdateTx(doc._class, doc._id, [{ kind: TxOperationKind.Set, _attributes: value } as TxOperation], getUserId())
     ).then(() => doc as T)
   }
 
-  function remove<T extends Doc> (doc: T, query: AnyLayout | null): Promise<T> {
+  function remove<T extends Doc> (doc: T): Promise<T> {
     return processTx(
-      newDeleteTx(doc._class, doc._id, query || undefined, getUserId())
+      newDeleteTx(doc._class, doc._id, getUserId())
     ).then(() => doc as T)
   }
 
   return {
     create,
-    push,
     update,
+    updateWith,
     remove
   }
 }

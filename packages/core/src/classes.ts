@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-type PrimitiveType = number | string | boolean | undefined
+export type PrimitiveType = number | string | boolean | undefined
 
 export type Property<P extends PrimitiveType, T> = P & { __property: T }
 export type Ref<T extends Doc> = string & { __ref: T }
@@ -26,7 +26,6 @@ export interface Obj {
 }
 
 export interface Emb extends Obj {
-  __embedded: true
 }
 
 export interface Doc extends Obj {

@@ -13,7 +13,6 @@
 // limitations under the License.
 //
 
-import { Property, StringProperty } from '@anticrm/core'
 import { Space, SpaceUser } from '@anticrm/domains'
 import { CoreService } from '@anticrm/platform-core'
 
@@ -37,23 +36,23 @@ export function getSpaceName (space: Space, withTitle = true): string {
 
 // Join public space
 export function joinSpace (service: Promise<CoreService>, s: Space): void {
-  service.then(cs => cs.push(s, null, 'users' as StringProperty, {
-    userId: cs.getUserId() as StringProperty,
-    owner: false as Property<boolean, boolean>
-  }))
+  service.then(cs => cs.updateWith(s, (b) =>
+    b.users.push({
+      userId: cs.getUserId(),
+      owner: false
+    })
+  ))
 }
 
 // Leave public space
 export function leaveSpace (service: Promise<CoreService>, s: Space): void {
-  service.then(cs => cs.remove(s, {
-    users: {
-      userId: cs.getUserId() as StringProperty
-    }
-  }))
+  service.then(cs => cs.updateWith(s, (b) =>
+    b.users.match({ userId: cs.getUserId() }).pull())
+  )
 }
 
 export function archivedSpaceUpdate (service: Promise<CoreService>, s: Space, value: boolean): void {
-  service.then(cs => cs.update(s, null, {
-    archived: value as Property<boolean, boolean>
-  }))
+  service.then(cs => cs.updateWith(s, (b) =>
+    b.set({ archived: value }))
+  )
 }

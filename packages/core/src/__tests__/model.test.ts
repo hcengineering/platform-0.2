@@ -21,7 +21,8 @@ import {
 } from '../classes'
 import { mixinFromKey, mixinKey, Model } from '../model'
 import { txContext } from '../storage'
-import { createSubtask, createTask, doc1, taskIds, data, Task, SubTask } from './tasks'
+import { createSubtask, createTask, data, doc1, SubTask, Task, taskIds } from './tasks'
+import { ObjectSelector, TxOperation, TxOperationKind } from '@anticrm/domains'
 
 describe('matching', () => {
   const model = new Model('vdocs')
@@ -60,20 +61,20 @@ describe('matching', () => {
 
   it('apply string value', () => {
     const clone = model.createDocument(taskIds.class.Task, doc1)
-    model.updateDocument(clone, null, { name: 'changed' as StringProperty } as AnyLayout)
+    model.updateDocumentSet(clone, { name: 'changed' as StringProperty })
 
     expect(clone.name).toEqual('changed')
   })
   it('apply number value', () => {
     const clone = model.createDocument(taskIds.class.Task, doc1)
-    model.updateDocument(clone, null, { rate: 10 as Property<number, number> } as AnyLayout)
+    model.updateDocumentSet(clone, { rate: 10 as Property<number, number> })
 
     expect(clone.rate).toEqual(10)
   })
 
   it('apply array value', () => {
     const clone = model.createDocument(taskIds.class.Task, doc1)
-    model.updateDocument(clone, null, { lists: ['A' as StringProperty, 'B' as StringProperty] } as AnyLayout)
+    model.updateDocumentSet(clone, { lists: ['A' as StringProperty, 'B' as StringProperty] })
 
     expect(clone.lists).toEqual(['A', 'B'])
   })
@@ -81,7 +82,7 @@ describe('matching', () => {
   it('apply task value', () => {
     const clone = model.createDocument(taskIds.class.Task, doc1)
     clone.mainTask = undefined
-    model.updateDocument(clone, null, { mainTask: createSubtask('subtask4') } as AnyLayout)
+    model.updateDocumentSet(clone, { mainTask: createSubtask('subtask4') })
 
     expect(clone.mainTask).toBeDefined()
     expect((clone.mainTask as never as SubTask).name).toEqual('subtask4')
@@ -89,33 +90,43 @@ describe('matching', () => {
 
   it('push subtask value', () => {
     const clone = model.createDocument(taskIds.class.Task, doc1)
-    model.pushDocument(clone, null, 'tasks' as StringProperty, (createSubtask('subtask3', 34) as unknown) as AnyLayout)
+    model.updateDocumentPush(clone, 'tasks' as StringProperty, (createSubtask('subtask3', 34) as unknown) as AnyLayout)
 
     expect(clone.tasks?.length).toEqual(3)
   })
 
   it('push a new subtask value', () => {
     const clone = model.createDocument(taskIds.class.Task, doc1)
-    const cloneResult = model.updateDocument(clone, { tasks: { name: 'subtask1' as StringProperty } }, {
-      rate: 44 as Property<number, number>
-    })
+    const cloneResult = model.updateDocument(clone, [{
+      kind: TxOperationKind.Set,
+      _attributes: {
+        rate: 44 as Property<number, number>
+      },
+      selector: [{ key: 'tasks', pattern: { name: 'subtask1' } } as ObjectSelector]
+    } as TxOperation])
 
     expect(cloneResult.tasks?.[0].rate).toEqual(44)
   })
 
   it('push a new comment to subtask', () => {
     const clone = model.createDocument(taskIds.class.Task, doc1)
-    const cloneResult = model.pushDocument(clone, { tasks: { name: 'subtask1' as StringProperty } },
-      'comments' as StringProperty, {
+    const cloneResult = model.updateDocument(clone, [{
+      kind: TxOperationKind.Push,
+      selector: [{
+        key: 'tasks',
+        pattern: { name: 'subtask1' }
+      } as ObjectSelector, { key: 'comments' } as ObjectSelector],
+      _attributes: {
         message: 'my-msg' as StringProperty
-      })
+      }
+    } as TxOperation])
 
     expect(cloneResult.tasks?.[0].comments?.length).toEqual(1)
   })
 
   it('remove item from array', () => {
     const clone = model.createDocument(taskIds.class.Task, doc1)
-    const cloneResult = model.removeDocument(clone, { tasks: { name: 'subtask1' as StringProperty } })
+    const cloneResult = model.updateDocumentPull(clone, 'tasks', { name: 'subtask1' as StringProperty })
 
     expect(cloneResult.tasks?.length).toEqual(1)
     expect(cloneResult.tasks?.[0].name).toEqual('subtask2')
@@ -123,7 +134,7 @@ describe('matching', () => {
 
   it('remove item from instance', () => {
     const clone = model.createDocument(taskIds.class.Task, doc1)
-    const cloneResult = model.removeDocument(clone, { mainTask: {} })
+    const cloneResult = model.updateDocumentPull(clone, 'mainTask', {})
 
     expect(cloneResult.mainTask).toEqual(undefined)
   })
@@ -171,7 +182,7 @@ describe('matching', () => {
     // call to find() initialzes lazy loaded byClass model's attribute
     await model.find(taskIds.class.Task, { name: doc.name as StringProperty })
 
-    model.removeDocument(doc, null)
+    model.removeDocument(doc)
     const result = await model.find(taskIds.class.Task, { name: doc.name as StringProperty })
     expect(result.length).toEqual(0)
   })
@@ -221,7 +232,7 @@ describe('invalid cases', () => {
     const model = new Model('vdocs')
     model.loadModel(data)
 
-    expect(() => model.remove(txContext(), {} as Ref<Class<Doc>>, 'id' as Ref<Doc>, null)).toThrowError()
+    expect(() => model.remove(txContext(), {} as Ref<Class<Doc>>, 'id' as Ref<Doc>)).toThrowError()
   })
 
   it('throws on getting missing doc', () => {
@@ -241,12 +252,13 @@ describe('invalid cases', () => {
     )
 
     expect(
-      () => model.pushDocument(
+      () => model.updateDocument(
         doc,
-        { name: 'Not exist' as StringProperty },
-        'tasks' as StringProperty,
-        (createSubtask('subtask3', 34) as unknown) as AnyLayout
-      )
+        [{
+          kind: TxOperationKind.Set,
+          _attributes: (createSubtask('subtask3', 34) as unknown) as AnyLayout,
+          selector: [{ key: 'tasks', pattern: { name: 'Not exist' } } as ObjectSelector]
+        } as TxOperation])
     ).toThrowError()
   })
 
@@ -260,10 +272,9 @@ describe('invalid cases', () => {
     )
 
     expect(
-      () => model.pushDocument(
+      () => model.updateDocumentPush(
         doc,
-        null,
-        'Not exist' as StringProperty,
+        'Not exist',
         (createSubtask('subtask3', 34) as unknown) as AnyLayout
       )
     ).toThrowError()
@@ -528,8 +539,7 @@ describe('Model storage', () => {
       txContext(),
       '' as Ref<Class<Doc>>,
       doc._id,
-      null,
-      'tasks' as StringProperty,
+      'tasks',
       newSubtask as never as AnyLayout
     )
 
@@ -555,8 +565,7 @@ describe('Model storage', () => {
       txContext(),
       '' as Ref<Class<Doc>>,
       doc._id,
-      null,
-      { name: newName as PropertyType }
+      [{ kind: TxOperationKind.Set, _attributes: { name: newName as PropertyType } } as TxOperation]
     )
 
     const updatedDoc = model.get(doc._id) as Task
@@ -574,8 +583,7 @@ describe('Model storage', () => {
     await model.remove(
       txContext(),
       '' as Ref<Class<Doc>>,
-      doc._id,
-      null
+      doc._id
     )
 
     expect(() => model.get(doc._id)).toThrowError()

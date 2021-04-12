@@ -22,7 +22,7 @@ import { data, doc1, taskIds } from '@anticrm/core/src/__tests__/tasks'
 import { TitleIndex } from '../indices/title'
 import {
   CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_TITLE, CORE_CLASS_UPDATE_TX, CORE_MIXIN_SHORTID, CreateTx,
-  DeleteTx, UpdateTx
+  DeleteTx, TxOperation, TxOperationKind, UpdateTx
 } from '../index'
 
 const model = new Model('vdocs')
@@ -48,7 +48,10 @@ function newUTx (_class: Ref<Class<Doc>>, _id: Ref<Doc>, object: AnyLayout): Upd
     _user: 'system' as StringProperty,
     _objectId: _id,
     _objectClass: _class,
-    _attributes: object
+    operations: [{
+      kind: TxOperationKind.Set,
+      _attributes: object
+    } as TxOperation]
   }
 }
 
@@ -70,7 +73,7 @@ describe('title-index tests', () => {
 
     const index = new TitleIndex(model, memDb)
     const shortIdKey = mixinKey(CORE_MIXIN_SHORTID, 'shortId')
-    const titledDoc = { ...doc1, [shortIdKey]: 'TASK-1' }
+    const titledDoc = { ...doc1, [shortIdKey]: 'TASK-1', _mixins: [CORE_MIXIN_SHORTID] }
 
     await index.tx(txContext(), newCTx(taskIds.class.Task, doc1._id, (titledDoc as unknown) as AnyLayout))
 
@@ -83,7 +86,7 @@ describe('title-index tests', () => {
   it('verify title update', async () => {
     const memDb = new Model('test')
     memDb.loadModel(model.dump())
-    memDb.add(doc1)
+    memDb.add({ ...doc1 })
     memDb.add({
       _class: CORE_CLASS_TITLE,
       _id: 'primary:d1' as Ref<Doc>,
@@ -104,7 +107,8 @@ describe('title-index tests', () => {
 
     await index.tx(txContext(), newUTx(taskIds.class.Task, doc1._id, {
       name: 'new-name' as StringProperty,
-      [shortIdKey]: 'SPACE-2' as StringProperty
+      [shortIdKey]: 'SPACE-2' as StringProperty,
+      _mixins: [CORE_MIXIN_SHORTID]
     }))
 
     const titles = await memDb.find(CORE_CLASS_TITLE, {})
@@ -140,7 +144,7 @@ describe('title-index tests', () => {
   it('verify title delete', async () => {
     const memDb = new Model('test')
     memDb.loadModel(model.dump())
-    memDb.add(doc1)
+    memDb.add({ ...doc1 })
     memDb.add({
       _class: CORE_CLASS_TITLE,
       _id: 'primary:d1' as Ref<Doc>,

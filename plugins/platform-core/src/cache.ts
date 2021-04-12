@@ -13,19 +13,17 @@
 // limitations under the License.
 //
 
-import { CoreProtocol, TxContext, Storage, AnyLayout, Class, Doc, Ref, StringProperty } from '@anticrm/core'
+import { AnyLayout, Class, CoreProtocol, Doc, Ref, Storage, TxContext } from '@anticrm/core'
+import { TxOperation } from '@anticrm/domains'
 
 export class Cache implements Storage {
   async store (tx: TxContext, doc: Doc): Promise<void> {  // eslint-disable-line
   }
 
-  async push (tx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, _query: AnyLayout | null, attribute: StringProperty, attributes: AnyLayout): Promise<void> { // eslint-disable-line
+  async update (tx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, operations: TxOperation[]): Promise<void> { // eslint-disable-line
   }
 
-  async update (tx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, _query: AnyLayout | null, attributes: AnyLayout): Promise<void> { // eslint-disable-line
-  }
-
-  async remove (tx: TxContext, _class: Ref<Class<Doc>>, doc: Ref<Doc>, _query: AnyLayout | null): Promise<void> { // eslint-disable-line
+  async remove (tx: TxContext, _class: Ref<Class<Doc>>, doc: Ref<Doc>): Promise<void> { // eslint-disable-line
   }
 
   private readonly coreProtocol: CoreProtocol

@@ -1,5 +1,5 @@
 <script type="ts">
-  import type { Attribute, Class, Doc, Enum, EnumKey, EnumOf, Property, Ref } from '@anticrm/core'
+  import type { Attribute, Class, Doc, Enum, EnumKey, EnumOf, Ref } from '@anticrm/core'
   import { AttributeMatch, CORE_CLASS_ENUM_OF, Model } from '@anticrm/core'
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import workbench from '@anticrm/workbench'
@@ -150,7 +150,7 @@
       if (dragIn != null && dragDoc && getFieldValue(dragDoc, fieldAttr.name) !== dragIn) {
         const dt = dragDoc
         coreService.then((cs) => {
-          cs.update(dt, null, { [fieldAttr.name]: dragIn as Property<any, any> })
+          cs.update(dt, { [fieldAttr.name]: dragIn } as Partial<VDoc>)
         })
         dragDoc = null
       }

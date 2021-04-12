@@ -14,11 +14,11 @@
 //
 
 // T R A N S A C T I O N S
-import { BagOf$, Class$, InstanceOf$, Prop, RefTo$ } from '../dsl'
+import { ArrayOf$, BagOf$, Class$, InstanceOf$, Prop, RefTo$ } from '../dsl'
 import core from '../index'
-import { CreateTx, DeleteTx, PushTx, TX_DOMAIN, UpdateTx } from '@anticrm/domains'
-import { AnyLayout, Class, DateProperty, Doc, Ref, StringProperty, Tx } from '@anticrm/core'
-import { TDoc } from './core'
+import { CreateTx, DeleteTx, ObjectSelector, TX_DOMAIN, TxOperation, TxOperationKind, UpdateTx } from '@anticrm/domains'
+import { AnyLayout, Class, DateProperty, Doc, Property, Ref, StringProperty, Tx } from '@anticrm/core'
+import { TDoc, TEmb } from './core'
 
 @Class$(core.class.Tx, core.class.Doc, TX_DOMAIN)
 export class TTx extends TDoc implements Tx {
@@ -35,16 +35,23 @@ export class TCreateTx extends TTx implements CreateTx {
   @InstanceOf$(core.class.Emb) object!: AnyLayout
 }
 
-@Class$(core.class.PushTx, core.class.Tx, TX_DOMAIN)
-export class TPushTx extends TTx implements PushTx {
-  @RefTo$(core.class.Doc) _objectId!: Ref<Doc>
-  @RefTo$(core.class.Class) _objectClass!: Ref<Class<Doc>>
-  @Prop() _attribute!: StringProperty
+@Class$(core.class.ObjectSelector, core.class.Emb, TX_DOMAIN)
+export class TObjectSelector extends TEmb implements ObjectSelector {
+  @Prop() key!: string
+  @Prop() pattern?: AnyLayout | Property<any, any>
+}
 
+@Class$(core.class.TxOperation, core.class.Emb, TX_DOMAIN)
+export class TTxOperation extends TEmb implements TxOperation {
+  @Prop() kind!: TxOperationKind
+
+  @ArrayOf$()
+  @InstanceOf$(core.class.ObjectSelector)
+  selector?: ObjectSelector[]
+
+  // will determine an object or individual value to be updated.
   @BagOf$()
-  @InstanceOf$(core.class.Emb) _attributes!: AnyLayout
-
-  @Prop() _query!: AnyLayout
+  _attributes?: Property<any, any> | AnyLayout
 }
 
 @Class$(core.class.UpdateTx, core.class.Tx, TX_DOMAIN)
@@ -52,10 +59,8 @@ export class TUpdateTx extends TTx implements UpdateTx {
   @RefTo$(core.class.Doc) _objectId!: Ref<Doc>
   @RefTo$(core.class.Class) _objectClass!: Ref<Class<Doc>>
 
-  @BagOf$()
-  @InstanceOf$(core.class.Emb) _attributes!: AnyLayout
-
-  @Prop() _query!: AnyLayout
+  @ArrayOf$()
+  @InstanceOf$(core.class.TxOperation) operations!: TxOperation[]
 }
 
 @Class$(core.class.DeleteTx, core.class.Tx, TX_DOMAIN)

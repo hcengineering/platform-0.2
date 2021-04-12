@@ -22,8 +22,8 @@ limitations under the License.
   import UserInfo from '@anticrm/sparkling-controls/src/UserInfo.svelte'
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
 
-  import candidate from '..'
   import type { WithCandidateProps } from '..'
+  import candidate from '..'
 
   export let space: Space
 

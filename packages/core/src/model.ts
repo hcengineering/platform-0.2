@@ -13,9 +13,10 @@
 // limitations under the License.
 //
 
+import { ObjectSelector, TxOperation, TxOperationKind } from '@anticrm/domains'
 import {
   AnyLayout, ArrayOf, Attribute, Class, Classifier, ClassifierKind, CORE_CLASS_ARRAY_OF, CORE_CLASS_INSTANCE_OF,
-  CORE_MIXIN_INDICES, Doc, Mixin, Obj, PropertyType, Ref, StringProperty, Type
+  CORE_CLASS_OBJ, CORE_MIXIN_INDICES, Doc, Mixin, Obj, Property, PropertyType, Ref, Type
 } from './classes'
 import { generateId, Storage, TxContext } from './storage'
 
@@ -44,16 +45,8 @@ export interface FieldRef {
   key: string
 }
 
-export interface MatchResult {
-  // Define true if result is found
-  result: boolean
-  // Define a match value and operations.
-  match?: Obj
-  parentRef?: FieldRef
-}
-
-export function isValidQuery (query: AnyLayout | null): boolean {
-  return query !== null && Object.keys(query).length > 0
+export function isValidSelector (selector: ObjectSelector[]): boolean {
+  return selector.length > 0
 }
 
 export interface AttributeMatch {
@@ -251,6 +244,23 @@ export class Model implements Storage {
     }
   }
 
+  public flattenArrayValue (curValue: unknown, attrClass: Ref<Class<Doc>>, embedded: AnyLayout): Array<PropertyType> {
+    // Assign into  a proper classed values.
+    const objValue = this.flattenQuery(attrClass, embedded)
+    objValue._class = attrClass
+    // Take current array and push value into it.
+    if (curValue === null || curValue === undefined) {
+      // Just assign a new Array
+      return [{ $elemMatch: objValue }]
+    } else if (curValue instanceof Array) {
+      const curArray = curValue as Array<PropertyType>
+      curArray.push({ $elemMatch: objValue })
+      return curArray
+    } else {
+      throw new Error(`Invalid attribute type: ${curValue}`)
+    }
+  }
+
   getLayout (doc: Obj): AnyLayout {
     if ((doc as any).__layout) {
       return ((doc as unknown as Proxy).__layout) as AnyLayout
@@ -308,63 +318,70 @@ export class Model implements Storage {
         l[key] = r[rKey]
       }
     }
-    return layout
+    return l
   }
 
   /**
    * Perform update of document attributes
    * @param doc - document to update
    * @param query - define a embedded document query.
-   * @param attributes - new attribute values
+   * @param operations - new attribute values
    */
-  public updateDocument<T extends Doc> (doc: T, query: AnyLayout | null, attributes: AnyLayout): T {
-    if (isValidQuery(query)) {
+  public updateDocument<T extends Obj> (doc: T, operations: TxOperation[]): T {
+    for (const op of operations) {
       // We need to find embedded object first
-      const result = this.matchObject(doc._class, doc, query, false)
-      if (result.result && result.match) {
-        this.assign(this.getLayout(result.match), result.match._class, attributes)
-        return doc
-      }
-      throw new Error(`failed to match embedded object by query:${query}`)
-    }
-    this.assign(this.getLayout(doc), doc._class, attributes)
-    return doc
-  }
+      const match = this.matchSelector(doc._class, doc, op.selector)
+      if (match.match) {
+        switch (op.kind) {
+          case TxOperationKind.Set:
+            this.assign(this.getLayout(match.doc), match.doc._class, op._attributes)
+            break
+          case TxOperationKind.Push:
+            if (match.attrMatch) {
+              const { attr, key } = match.attrMatch
 
-  /**
-   * Perform push operation on document and put new embedded object into document.
-   * @param doc - document to update
-   * @param query - query
-   * @param attribute - attribute holding embedded, it could be InstanceOf or ArrayOf
-   * @param embedded - embedded object value
-   */
-  public pushDocument<T extends Doc> (doc: T, query: AnyLayout | null, attribute: StringProperty, embedded: AnyLayout): T {
-    let queryObject: Obj = doc
-    if (isValidQuery(query)) {
-      const result = this.matchObject(doc._class, doc, query, false)
-      if (result.result && result.match) {
-        queryObject = result.match
-      } else {
-        throw new Error(`failed to match embedded object by query:${query}`)
-      }
-    }
+              const l = (match.doc as unknown) as AnyLayout
+              switch (attr.type._class) {
+                case CORE_CLASS_ARRAY_OF: {
+                  const attrClass = this.attributeClass((attr.type as ArrayOf).of)
+                  if (attrClass === null) {
+                    throw new Error(`Invalid attribute type/class: ${attr.type}`)
+                  }
+                  l[key] = this.pushArrayValue(l[key], attrClass, op._attributes)
+                  break
+                }
 
-    const { attr, key } = this.classAttribute(queryObject._class, attribute)
+                default:
+                  throw new Error(`Invalid attribute type: ${attr.type}`)
+              }
+            }
+            break
+          case TxOperationKind.Pull:
+            if (match.attrMatch) {
+              const { attr, key } = match.attrMatch
 
-    const l = (queryObject as unknown) as AnyLayout
-    switch (attr.type._class) {
-      case CORE_CLASS_ARRAY_OF: {
-        const attrClass = this.attributeClass((attr.type as ArrayOf).of)
-        if (attrClass === null) {
-          throw new Error(`Invalid attribute type/class: ${attr.type}`)
+              const l = (match.parent as unknown) as AnyLayout
+
+              switch (attr.type._class) {
+                case CORE_CLASS_ARRAY_OF: {
+                  const parentArray = (l[key] as unknown) as Obj[]
+                  // We assume it will be found.
+                  parentArray.splice(parentArray.indexOf(match.value), 1)
+                  break
+                }
+                case CORE_CLASS_INSTANCE_OF: {
+                  delete (l as any)[key]
+                  break
+                }
+              }
+            }
+            break
         }
-        l[key] = this.pushArrayValue(l[key], attrClass, embedded)
-        return doc
+      } else {
+        throw new Error(`failed to object by query:${op.selector}`)
       }
-
-      default:
-        throw new Error(`Invalid attribute type: ${attr.type}`)
     }
+    return doc
   }
 
   generateId (): Ref<Doc> {
@@ -446,15 +463,85 @@ export class Model implements Storage {
    **
    * @param _class - a class query is designed for.
    * @param _query - a query object to convert to.
+   * @param flatten - use a flat key layout with dot notation.
+   *
+   * flatten queries are applicable only for mongoDB and not supported by model search operations.
    */
-  createQuery (_class: Ref<Class<Doc>>, _query: AnyLayout): AnyLayout {
-    const query = this.assign({}, _class, _query)
+  createQuery (_class: Ref<Class<Doc>>, _query: AnyLayout, flatten = false): AnyLayout {
+    let query = this.assign({}, _class, _query)
+
+    if (flatten) {
+      query = this.flattenQuery(_class, query)
+    }
+
     query._class = this.getClass(_class)
     if (query._class !== _class) {
       // We should also put a _mixin in list for query
       query._mixins = _class
     }
     return query
+  }
+
+  private flattenQuery (_class: Ref<Class<Obj>>, layout: AnyLayout): AnyLayout {
+    const l: AnyLayout = {}
+
+    // Also assign a class to value if not specified
+    for (const rKey in layout) {
+      if (rKey.startsWith('_')) {
+        l[rKey] = layout[rKey]
+      } else {
+        let match: AttributeMatch
+
+        if (rKey.indexOf('|') > 0) {
+          // So key is probable mixin, let's find a mixin class and try assign value.
+          const { mixin, key } = mixinFromKey(rKey)
+          match = this.classAttribute(mixin, key)
+        } else {
+          match = this.classAttribute(_class, rKey)
+        }
+
+        const {
+          attr,
+          key
+        } = match
+        // Check if we need to perform inner assign based on field value and type
+        switch (attr.type._class) {
+          case CORE_CLASS_ARRAY_OF: {
+            const attrClass = this.attributeClass((attr.type as ArrayOf).of)
+            if (attrClass) {
+              const rValue = layout[rKey]
+              if (rValue instanceof Array) {
+                let value: unknown[] = []
+                for (const rv of (rValue as Array<unknown>)) {
+                  value = this.flattenArrayValue(value, attrClass, rv as AnyLayout)
+                }
+                l[key] = { $all: value as Property<any, any> }
+                continue
+              } else if (rValue instanceof Object) {
+                // We should use $elemMatch.
+                l[key] = { $elemMatch: this.flattenQuery(attrClass, (rValue as unknown) as AnyLayout) }
+                continue
+              }
+            }
+            break
+          }
+          case CORE_CLASS_INSTANCE_OF: {
+            // Flatten any
+            const attrClass = ((attr.type as unknown) as Record<string, unknown>).of as Ref<Class<Doc>>
+            if (attrClass) {
+              for (const oo of Object.entries(this.flattenQuery(attrClass, (layout[rKey] as unknown) as AnyLayout))) {
+                l[key + '.' + oo[0]] = oo[1]
+              }
+              continue
+            }
+            break
+          }
+        }
+        // Just copy a value here.
+        l[key] = layout[rKey]
+      }
+    }
+    return l
   }
 
   // Q U E R Y
@@ -587,57 +674,72 @@ export class Model implements Storage {
     return Promise.resolve()
   }
 
-  push (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, query: AnyLayout | null, attribute: StringProperty, attributes: AnyLayout): Promise<void> { // eslint-disable-line
+  push (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: AnyLayout): Promise<void> { // eslint-disable-line
     const mdlObj = this.get(_id)
     if (!mdlObj) {
       return Promise.reject(new Error('No object found ' + (_id as string)))
     }
-    this.pushDocument(mdlObj, query, attribute, attributes)
+    this.updateDocument(mdlObj, [{
+      kind: TxOperationKind.Push,
+      _attributes: attributes,
+      selector: [{ key: attribute } as ObjectSelector]
+    } as TxOperation])
     return Promise.resolve()
   }
 
-  update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, query: AnyLayout | null, attributes: AnyLayout): Promise<void> { // eslint-disable-line
+  pull (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: AnyLayout): Promise<void> { // eslint-disable-line
     const mdlObj = this.get(_id)
     if (!mdlObj) {
       return Promise.reject(new Error('No object found ' + (_id as string)))
     }
-    this.updateDocument(mdlObj, query, attributes)
+    this.updateDocument(mdlObj, [{
+      kind: TxOperationKind.Pull,
+      _attributes: attributes,
+      selector: [{ key: attribute, pattern: attributes } as ObjectSelector]
+    } as TxOperation])
     return Promise.resolve()
   }
 
-  remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, query: AnyLayout | null): Promise<void> { // eslint-disable-line
+  updateDocumentSet<T extends Obj> (doc: T, _attributes: AnyLayout): T {
+    return this.updateDocument(doc, [{ kind: TxOperationKind.Set, _attributes } as TxOperation])
+  }
+
+  updateDocumentPush<T extends Obj> (doc: T, _attribute: string, _attributes: AnyLayout): T {
+    return this.updateDocument(doc, [
+      {
+        kind: TxOperationKind.Push,
+        _attributes,
+        selector: [{ key: _attribute } as ObjectSelector]
+      } as TxOperation])
+  }
+
+  updateDocumentPull<T extends Obj> (doc: T, _attribute: string, _attributes: AnyLayout): T {
+    return this.updateDocument(doc, [
+      {
+        kind: TxOperationKind.Pull,
+        selector: [{ key: _attribute, pattern: _attributes } as ObjectSelector]
+      } as TxOperation])
+  }
+
+  update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, operations: TxOperation[]): Promise<void> { // eslint-disable-line
     const mdlObj = this.get(_id)
     if (!mdlObj) {
       return Promise.reject(new Error('No object found ' + (_id as string)))
     }
-    this.removeDocument(mdlObj, query)
+    this.updateDocument(mdlObj, operations)
     return Promise.resolve()
   }
 
-  public removeDocument<T extends Doc> (doc: T, query: AnyLayout | null): T {
-    if (isValidQuery(query)) {
-      // This is operation against some embedded field.
-      const result = this.matchObject(doc._class, doc, query, false)
-      if (result.result && result.match && result.parentRef != null) {
-        // this is pull operation, so let's find item and remove it from array.
-        const parentObj = (result.parentRef.parent as unknown) as AnyLayout
-
-        switch (result.parentRef.field.type._class) {
-          case CORE_CLASS_ARRAY_OF: {
-            const parentArray = (parentObj[result.parentRef.key] as unknown) as Obj[]
-            // We assume it will be found.
-            parentArray.splice(parentArray.indexOf(result.match), 1)
-            break
-          }
-          case CORE_CLASS_INSTANCE_OF: {
-            delete (parentObj as any)[result.parentRef.key]
-            break
-          }
-        }
-      }
-      return doc
+  remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<void> { // eslint-disable-line
+    const mdlObj = this.get(_id)
+    if (!mdlObj) {
+      return Promise.reject(new Error('No object found ' + (_id as string)))
     }
+    this.removeDocument(mdlObj)
+    return Promise.resolve()
+  }
 
+  public removeDocument<T extends Doc> (doc: T): T {
     this.objects.delete(doc._id)
     if (this.byClass) {
       const objs = this.byClass.get(doc._class)?.filter((e) => e._id !== doc._id)
@@ -663,7 +765,7 @@ export class Model implements Storage {
       // Class doesn't match so return false.
       return false
     }
-    return this.matchObject(_class, doc, query, false).result
+    return this.matchObject(_class, doc, query, false)
   }
 
   /**
@@ -671,19 +773,65 @@ export class Model implements Storage {
    * {fullMatch} is used as true to match against array with passing objects, it will match for all values.
    * If used as false, it will find at least one match for object with array value.
    */
-  private matchObject (_class: Ref<Class<Doc>>, doc: Obj, query: AnyLayout | null, fullMatch = true): MatchResult {
+  private matchSelector (_class: Ref<Class<Obj>>, doc: Obj, selector: ObjectSelector[] | undefined): { match: boolean, value?: any, attrMatch?: AttributeMatch, doc: Obj, parent: Obj } {
     if ((doc as any).__layout) {
       // This is our proxy, we should unwrap it.
       doc = (doc as any).__layout
     }
-    const queryEntries = Object.entries(query || {})
+
+    if (selector && isValidSelector(selector)) {
+      let current = doc
+      let parent = doc
+      let currentClass = _class
+
+      for (let segmId = 0; segmId < selector.length; segmId++) {
+        const segm = selector[segmId]
+        if (!segm.key || segm.key === '') {
+          throw new Error('Object selector field should be specified')
+        }
+        const attr = this.classAttribute(currentClass, segm.key)
+
+        if (!segm.pattern) {
+          if (segmId === selector.length - 1) {
+            // Last one, we could omit check, since it will be for push operation.
+            return { match: true, attrMatch: attr, doc: current, parent }
+          }
+          throw new Error(`Pattern field for middle selector should be specified ${selector}`)
+        }
+        const attrClass = this.attributeClass(attr.attr.type)
+        const docValue = (current as any)[attr.key]
+        const res = this.matchValue(attrClass, docValue, segm.pattern, false)
+        if (!res) {
+          throw new Error('failed to match embedded object of value')
+        }
+        if (attrClass && this.is(attrClass, CORE_CLASS_OBJ)) {
+          parent = current
+          current = res.value as Obj
+          currentClass = attrClass
+        }
+        if (segmId === selector.length - 1) {
+          return { match: true, value: res.value, doc: current, attrMatch: attr, parent }
+        } else {
+          // If attribute class is based on doc.
+          if (attrClass && !this.is(attrClass, CORE_CLASS_OBJ)) {
+            throw new Error(`failed to match embedded object of value for class ${attrClass} of value ${current}`)
+          }
+        }
+      }
+    }
+    return { match: true, doc, parent: doc }
+  }
+
+  private matchObject (_class: Ref<Class<Obj>>, doc: Obj, query: AnyLayout, fullMatch = false): boolean {
+    if ((doc as any).__layout) {
+      // This is our proxy, we should unwrap it.
+      doc = (doc as any).__layout
+    }
+
+    const queryEntries = Object.entries(query)
     const docKeys = new Set(Object.keys(doc))
     let count = 0
 
-    let match: MatchResult = { // Assume initial match is document itself
-      result: false,
-      match: doc
-    }
     const l = (doc as unknown) as AnyLayout
     for (const [key, value] of queryEntries) {
       if (value === undefined) {
@@ -698,28 +846,14 @@ export class Model implements Storage {
       if (keyIn) {
         const docValue = l[attrKey]
         if (attr.attr !== undefined) {
-          const mResult = this.matchValue({
-            parent: doc,
-            field: attr.attr,
-            key: attr.key
-          } as FieldRef, docValue, value, fullMatch)
+          const mResult = this.matchValue(this.attributeClass(attr.attr.type), docValue, value, fullMatch)
           if (mResult.result) {
-            if (mResult.match) {
-              match = mResult
-            }
             count += 1
           }
         }
       }
     }
-    if (count !== queryEntries.length) {
-      return { result: false }
-    }
-    return {
-      result: true,
-      match: match.match,
-      parentRef: match.parentRef
-    }
+    return count === queryEntries.length
   }
 
   public attributeClass (type: Type): Ref<Class<Doc>> | null {
@@ -732,7 +866,7 @@ export class Model implements Storage {
     return null
   }
 
-  private matchValue (parentRef: FieldRef, docValue: unknown, value: unknown, fullMatch: boolean): MatchResult {
+  private matchValue (fieldClass: Ref<Class<Obj>> | null, docValue: unknown, value: unknown, fullMatch: boolean): { result: boolean, value?: any } {
     const objDocValue = Object(docValue)
     if (objDocValue !== docValue) {
       // Check if value is primitive, so we will just compare
@@ -743,11 +877,11 @@ export class Model implements Storage {
         if (regex as string) {
           const options = vObj.$options
           const reg = RegExp(regex as string, (options as string) || '')
-          return { result: reg.test(docValue as string) }
+          return { result: reg.test(docValue as string), value: docValue }
         }
       }
       if (docValue === value) {
-        return { result: true }
+        return { result: true, value }
       }
     } else {
       // We got two arrays, so let's compare them
@@ -755,44 +889,32 @@ export class Model implements Storage {
         if (docValue.length !== value.length && fullMatch) {
           return { result: false }
         }
-        let match: Obj | undefined
+        let matchValue: any
         for (let i = 0; i < docValue.length; i++) {
-          const val = this.matchValue(parentRef, docValue[i], value[i], fullMatch)
+          const val = this.matchValue(fieldClass, docValue[i], value[i], fullMatch)
           if (!val.result && fullMatch) {
             return { result: false }
           }
-          match = val.match
+          matchValue = val.value
         }
         // Return in case match is found
-        return {
-          result: true,
-          match,
-          parentRef: parentRef
-        }
+        return { result: true, value: matchValue }
       }
 
       // We had object, we need to compare inner object, but we need a class
       if (docValue instanceof Array) {
         // Match to find exact value present in array
         for (let i = 0; i < docValue.length; i++) {
-          const val = this.matchValue(parentRef, docValue[i], value, fullMatch)
+          const val = this.matchValue(fieldClass, docValue[i], value, fullMatch)
           if (val.result) {
-            return {
-              result: true,
-              match: val.match,
-              parentRef: parentRef
-            }
+            return { result: true, value: val.value }
           }
         }
       } else {
-        const fieldClass = this.attributeClass(parentRef.field.type)
-        if (fieldClass != null) {
-          const objResult = this.matchObject(fieldClass, docValue as Obj, (value as unknown) as AnyLayout)
-          if (objResult.result) {
-            if (!objResult.parentRef) {
-              objResult.parentRef = parentRef
-            }
-            return objResult
+        if (fieldClass) {
+          return {
+            result: this.matchObject(fieldClass, docValue as Obj, (value as unknown) as AnyLayout),
+            value: docValue
           }
         }
       }

@@ -43,7 +43,8 @@ export interface Task extends Doc {
   comments?: TaskComment[]
 }
 
-export interface DerivedTask extends Task {}
+export interface DerivedTask extends Task {
+}
 
 export const taskIds = {
   class: {
@@ -54,12 +55,12 @@ export const taskIds = {
   }
 }
 
-export function createSubtask (name: string, rate = 30): SubTask {
+export function createSubtask (name: string, rate = 30, comments: TaskComment[] | undefined = undefined): SubTask {
   return {
     name: name,
     rate: rate,
-    __embedded: true,
-    _class: taskIds.class.Subtask
+    _class: taskIds.class.Subtask,
+    comments: comments
   } as SubTask
 }
 

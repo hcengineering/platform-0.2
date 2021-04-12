@@ -13,10 +13,10 @@
 // limitations under the License.
 //
 
-import { Model, Storage, TxContext, DomainIndex, Tx } from '@anticrm/core'
+import { DomainIndex, Model, Storage, Tx, TxContext } from '@anticrm/core'
 import {
-  CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_PUSH_TX, CORE_CLASS_UPDATE_TX, CORE_CLASS_VDOC, CreateTx,
-  DeleteTx, PushTx, UpdateTx
+  CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_UPDATE_TX, CORE_CLASS_VDOC, CreateTx, DeleteTx, TxOperation,
+  TxOperationKind, UpdateTx
 } from '..'
 
 export class VDocIndex implements DomainIndex {
@@ -36,10 +36,8 @@ export class VDocIndex implements DomainIndex {
         return this.onCreate(ctx, tx as CreateTx)
       case CORE_CLASS_UPDATE_TX:
         return this.onUpdate(ctx, tx as UpdateTx)
-      case CORE_CLASS_PUSH_TX:
-        return this.onPush(ctx, tx as PushTx)
       case CORE_CLASS_DELETE_TX:
-        return this.onDelete(ctx, tx as PushTx)
+        return this.onDelete(ctx, tx as DeleteTx)
       default:
         console.log('not implemented tx', tx)
     }
@@ -58,24 +56,13 @@ export class VDocIndex implements DomainIndex {
 
     return Promise.all([
       this.storage.store(ctx, this.modelDb.newDoc(tx._objectClass, tx._objectId, tx.object)),
-      this.transient && this.transient.update(ctx, tx._objectClass, tx._objectId, null, {
-        _createdOn: tx._date,
-        _createdBy: tx._user
-      })
-    ])
-  }
-
-  onPush (ctx: TxContext, tx: PushTx): Promise<any> {
-    if (!this.modelDb.is(tx._objectClass, CORE_CLASS_VDOC)) {
-      return Promise.resolve()
-    }
-    // We need to perform two operations, this may cause performance.
-    return Promise.all([
-      this.storage.push(ctx, tx._objectClass, tx._objectId, null, tx._attribute, tx._attributes),
-      this.transient && this.transient.update(ctx, tx._objectClass, tx._objectId, null, {
-        _modifiedOn: tx._date,
-        _modifiedBy: tx._user
-      })
+      this.transient && this.transient.update(ctx, tx._objectClass, tx._objectId, [{
+        kind: TxOperationKind.Set,
+        _attributes: {
+          _createdOn: tx._date,
+          _createdBy: tx._user
+        }
+      } as TxOperation])
     ])
   }
 
@@ -83,19 +70,22 @@ export class VDocIndex implements DomainIndex {
     if (!this.modelDb.is(tx._objectClass, CORE_CLASS_VDOC)) {
       return Promise.resolve()
     }
+    const ops: TxOperation[] = [...tx.operations]
+    const op = {
+      kind: TxOperationKind.Set,
+      _attributes: {
+        _modifiedBy: tx._user,
+        _modifiedOn: tx._date
+      }
+    } as TxOperation
     // Be sure we update modification fields.
     if (this.transient) {
-      const vdoc = tx._attributes
-      vdoc._modifiedBy = tx._user
-      vdoc._modifiedOn = tx._date
+      ops.push(op)
     }
 
     return Promise.all([
-      this.storage.update(ctx, tx._objectClass, tx._objectId, null, tx._attributes),
-      this.transient && this.transient.update(ctx, tx._objectClass, tx._objectId, null, {
-        _modifiedOn: tx._date,
-        _modifiedBy: tx._user
-      })
+      this.storage.update(ctx, tx._objectClass, tx._objectId, ops),
+      this.transient && this.transient.update(ctx, tx._objectClass, tx._objectId, [op])
     ])
   }
 
@@ -103,6 +93,6 @@ export class VDocIndex implements DomainIndex {
     if (!this.modelDb.is(tx._objectClass, CORE_CLASS_VDOC)) {
       return Promise.resolve()
     }
-    return this.storage.remove(ctx, tx._objectClass, tx._objectId, tx._query || null)
+    return this.storage.remove(ctx, tx._objectClass, tx._objectId)
   }
 }
