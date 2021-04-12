@@ -15,6 +15,7 @@
 
 import { Metadata, Platform, Plugin, plugin, Resource, Service } from '@anticrm/plugin'
 import { getContext } from 'svelte'
+import { SvelteComponent } from 'svelte'
 
 export type URL = string
 export type Asset = Metadata<URL>
@@ -98,33 +99,33 @@ export interface ApplicationRouter<T> {
   navigate: (values: Partial<T>) => void
 }
 
-interface ComponentOptions<Props> {
-  target: HTMLElement
-  anchor?: HTMLElement
-  props?: Props
-  hydrate?: boolean
-  intro?: boolean
-}
+// interface ComponentOptions<Props> {
+//   target: HTMLElement
+//   anchor?: HTMLElement
+//   props?: Props
+//   hydrate?: boolean
+//   intro?: boolean
+// }
 
-export interface SvelteComponent<Props> {
-  new (options: ComponentOptions<Props>): any
+// export interface SvelteComponent<Props> {
+//   new (options: ComponentOptions<Props>): any
 
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  $set: (props: {}) => any
-  $on: (event: string, callback: (event: CustomEvent) => any) => any
-  $destroy: () => any
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  render: (props?: {}) => {
-    html: string
-    css: { code: string, map?: string }
-    head?: string
-  }
-}
+//   // eslint-disable-next-line @typescript-eslint/ban-types
+//   $set: (props: {}) => any
+//   $on: (event: string, callback: (event: CustomEvent) => any) => any
+//   $destroy: () => any
+//   // eslint-disable-next-line @typescript-eslint/ban-types
+//   render: (props?: {}) => {
+//     html: string
+//     css: { code: string, map?: string }
+//     head?: string
+//   }
+// }
 
-export type AnySvelteComponent = any // SvelteComponent<{}>
+export type AnySvelteComponent = typeof SvelteComponent
 
 export type Component<C extends AnySvelteComponent> = Resource<C>
-export type AnyComponent = Component<AnySvelteComponent>
+export type AnyComponent = Resource<AnySvelteComponent>
 
 export const CONTEXT_PLATFORM = 'platform'
 export const CONTEXT_PLATFORM_UI = 'platform-ui'

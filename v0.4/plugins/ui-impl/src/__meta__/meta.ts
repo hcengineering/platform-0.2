@@ -13,11 +13,11 @@
 // limitations under the License.
 //
 
-import { Platform } from '@anticrm/platform'
-import ui from '..'
+import { Platform } from '@anticrm/plugin'
+import ui from '@anticrm/plugin-ui'
 
 export default (platform: Platform): void => {
-  const spritesUrl = require('../../assets/icons.svg'); // eslint-disable-line
+  const spritesUrl = require('../../assets/icons.svg') as string // eslint-disable-line @typescript-eslint/no-var-requires
   platform.loadMetadata(ui.icon, {
     Default: `${spritesUrl}'#error`,
     Error: `${spritesUrl}#error`,

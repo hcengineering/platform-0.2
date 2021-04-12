@@ -23,17 +23,17 @@ import { deepEqual } from 'fast-equals'
  * Describe a browser URI location parsed to path, query and fragment.
  */
 export interface Location {
-  path: string[]; // A useful path value
-  query: Record<string, string | null>; // a value of query parameters, no duplication are supported
-  fragment: string; // a value of fragment
+  path: string[] // A useful path value
+  query: Record<string, string | null> // a value of query parameters, no duplication are supported
+  fragment: string // a value of fragment
 }
 
 /**
  * Define a useful route to applications.
  */
 export interface ApplicationRoute {
-  route: string;
-  component: AnyComponent;
+  route: string
+  component: AnyComponent
 }
 
 export function routeMeta (name: string): Metadata<ApplicationRoute> {
@@ -47,77 +47,77 @@ export interface ApplicationRouter<T> {
   /**
    * Return parent router if defined.
    */
-  parent(): ApplicationRouter<any> | undefined;
+  parent: () => ApplicationRouter<any> | undefined
 
   /**
    * Construct a child router based on current matched state
    * Internal child router is just one, and calling twice will replace existing.
    */
-  newRouter<P>(pattern: string): ApplicationRouter<P>;
+  newRouter: <P>(pattern: string) => ApplicationRouter<P>
 
   /**
    * Will check and match path for registered local routes, if no local routes are match will return false
    */
-  match(): boolean;
+  match: () => boolean
 
   /**
    * Return current matched set.
    */
-  properties(): T;
+  properties: () => T
 
   /**
    * Replace defaults passed with constructor, will call matcher function passed with constructor.
    * @param defaults - a new defaults
    */
-  setDefaults(defaults: T): void;
+  setDefaults: (defaults: T) => void
 
   /**
    * Replace a matcher function passed with constructor.
    * @param matcher
    */
-  subscribe(matcher: (match: T) => void): void;
+  subscribe: (matcher: (match: T) => void) => void
 
   // Construct a new navigate using combined query parameters
-  queries(vars: Partial<T>): Record<string, any> | undefined;
+  queries: (vars: Partial<T>) => Record<string, any> | undefined
   // Construct a current path with all applied variables
-  path(vars: Partial<T>): string[];
+  path: (vars: Partial<T>) => string[]
   // Construct a current fragment with app applied variables
-  fragment(vars: Partial<T>): string | undefined;
+  fragment: (vars: Partial<T>) => string | undefined
 
   /**
    * Construct a full new location based on values of T.
    * Other values will be taken from stored parent and child routers.
    * @param values
    */
-  location(values: Partial<T>): Location;
+  location: (values: Partial<T>) => Location
 
   /**
    * Use new constructed location value and platform UI to navigate.
    * @param values
    */
-  navigate(values: Partial<T>): void;
+  navigate: (values: Partial<T>) => void
 }
 
 export class Router<T> implements ApplicationRouter<T> {
-  private readonly pattern: string;
-  private segments: string[] = [];
-  private queryNames: string[] = [];
-  private fragmentName = '';
+  private readonly pattern: string
+  private segments: string[] = []
+  private queryNames: string[] = []
+  private fragmentName = ''
 
-  private readonly parentRouter: Router<any> | undefined;
-  private childRouter: Router<any> | undefined;
+  private readonly parentRouter: Router<any> | undefined
+  private childRouter: Router<any> | undefined
 
-  private rawLocation: Location | undefined; // current location
-  private childLocation: Location | undefined;
+  private rawLocation: Location | undefined // current location
+  private childLocation: Location | undefined
 
   // Currently matched variables
-  private variables: Record<string, any> = {};
-  private defaults: Record<string, any> | undefined = undefined;
-  private matcher?: (match: T) => void;
+  private variables: Record<string, any> = {}
+  private defaults: Record<string, any> | undefined = undefined
+  private matcher?: (match: T) => void
 
-  private matched = false;
+  private matched = false
 
-  private readonly doNavigate: ((newLoc: Location) => void) | undefined;
+  private readonly doNavigate: ((newLoc: Location) => void) | undefined
 
   constructor (
     pattern: string,
@@ -127,7 +127,7 @@ export class Router<T> implements ApplicationRouter<T> {
   ) {
     this.pattern = pattern
     this.parentRouter = parent
-    if (defaults) {
+    if (defaults != null) {
       this.defaults = defaults
     }
     this.parsePattern()
@@ -135,7 +135,7 @@ export class Router<T> implements ApplicationRouter<T> {
   }
 
   navigate (values: Partial<T>): void {
-    if (this.doNavigate) {
+    if (this.doNavigate != null) {
       this.doNavigate(this.location(values))
     }
   }
@@ -157,7 +157,7 @@ export class Router<T> implements ApplicationRouter<T> {
     const oldVars = this.variables
     this.matched = this.doMatch()
     this.chainUpdate()
-    if (this.matcher && (!deepEqual(oldVars, this.variables) || forceUpdate)) {
+    if ((this.matcher != null) && (!deepEqual(oldVars, this.variables) || forceUpdate)) {
       this.matcher(this.variables as T)
     }
   }
@@ -168,10 +168,10 @@ export class Router<T> implements ApplicationRouter<T> {
 
   doMatch (): boolean {
     // Use defaults as initial values.
-    this.variables = this.defaults ? { ...this.defaults } : {}
+    this.variables = (this.defaults != null) ? { ...this.defaults } : {}
 
     // Perform matching of current location with extraction of variables and constructing childLocation.
-    if (this.rawLocation) {
+    if (this.rawLocation != null) {
       this.childLocation = {} as Location
       const path = [...this.rawLocation.path]
       for (const s of this.segments) {
@@ -218,7 +218,7 @@ export class Router<T> implements ApplicationRouter<T> {
           delete this.childLocation.query[q]
         }
       }
-      if (this.childRouter) {
+      if (this.childRouter != null) {
         this.childRouter.update(this.childLocation)
       }
       return true
@@ -226,7 +226,7 @@ export class Router<T> implements ApplicationRouter<T> {
     return false
   }
 
-  newRouter<P> (pattern: string, defaults: P | undefined = undefined): Router<P> {
+  newRouter<P>(pattern: string, defaults: P | undefined = undefined): Router<P> {
     this.childRouter = new Router<P>(pattern, this, defaults, this.doNavigate)
     this.chainUpdate()
     return this.childRouter as Router<P>
@@ -238,7 +238,7 @@ export class Router<T> implements ApplicationRouter<T> {
 
   setDefaults (defaults: T): void {
     this.defaults = defaults
-    if (this.rawLocation) {
+    if (this.rawLocation != null) {
       this.update(this.rawLocation, true)
     }
   }
@@ -251,7 +251,7 @@ export class Router<T> implements ApplicationRouter<T> {
     return this.calcPath(vars, this.parents(), this.children())
   }
 
-  private calcPath (vars: Partial<T>, parents: Router<any>[], children: Router<any>[]): string[] {
+  private calcPath (vars: Partial<T>, parents: Array<Router<any>>, children: Array<Router<any>>): string[] {
     let variables = this.variables as T
     if (vars) {
       variables = { ...variables, ...vars }
@@ -266,7 +266,7 @@ export class Router<T> implements ApplicationRouter<T> {
   }
 
   currentPath (vars: T | undefined = undefined): string[] {
-    if (!vars) {
+    if (vars == null) {
       vars = this.variables as T
     }
     const ll = (vars as unknown) as Record<string, any>
@@ -288,8 +288,8 @@ export class Router<T> implements ApplicationRouter<T> {
 
   private calcQueries (
     vars: Partial<T>,
-    parents: Router<any>[],
-    children: Router<any>[]
+    parents: Array<Router<any>>,
+    children: Array<Router<any>>
   ): Record<string, string | null> {
     let variables = this.variables as T
     if (vars) {
@@ -311,7 +311,7 @@ export class Router<T> implements ApplicationRouter<T> {
     result: Record<string, string | null>,
     vars: T | undefined = undefined
   ): Record<string, string | null> | undefined {
-    if (!vars) {
+    if (vars == null) {
       vars = this.variables as T
     }
     const ll = (vars as unknown) as Record<string, any>
@@ -328,7 +328,7 @@ export class Router<T> implements ApplicationRouter<T> {
     return this.calcFragment(vars, this.parents(), this.children())
   }
 
-  private calcFragment (vars: Partial<T>, parents: Router<any>[], children: Router<any>[]): string {
+  private calcFragment (vars: Partial<T>, parents: Array<Router<any>>, children: Array<Router<any>>): string {
     let variables = this.variables as T
     if (vars) {
       variables = { ...variables, ...vars }
@@ -349,7 +349,7 @@ export class Router<T> implements ApplicationRouter<T> {
    * @private
    */
   currentFragment (vars: T | undefined = undefined): string | undefined {
-    if (!vars) {
+    if (vars == null) {
       vars = this.variables as T
     }
     const ll = (vars as unknown) as Record<string, any>
@@ -401,17 +401,17 @@ export class Router<T> implements ApplicationRouter<T> {
   }
 
   private chainUpdate (): void {
-    if (this.matched && this.childRouter && this.childLocation) {
+    if (this.matched && (this.childRouter != null) && (this.childLocation != null)) {
       this.childRouter.update(this.childLocation)
     }
   }
 
-  private parents (): Router<any>[] {
-    const result: Router<any>[] = []
+  private parents (): Array<Router<any>> {
+    const result: Array<Router<any>> = []
     let item = this.parentRouter
-    while (item) {
+    while (item != null) {
       result.push(item)
-      if (item.parentRouter) {
+      if (item.parentRouter != null) {
         item = item.parentRouter
       } else {
         break
@@ -420,12 +420,12 @@ export class Router<T> implements ApplicationRouter<T> {
     return result.reverse()
   }
 
-  private children (): Router<any>[] {
-    const result: Router<any>[] = []
+  private children (): Array<Router<any>> {
+    const result: Array<Router<any>> = []
     let item = this.childRouter
-    while (item) {
+    while (item != null) {
       result.push(item)
-      if (item.childRouter) {
+      if (item.childRouter != null) {
         item = item.childRouter
       } else {
         break

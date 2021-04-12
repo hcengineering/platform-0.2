@@ -17,9 +17,9 @@ import type { AnySvelteComponent } from '@anticrm/plugin-ui'
 import { writable } from 'svelte/store'
 
 interface CompAndProps {
-  is: AnySvelteComponent | undefined;
-  props: any;
-  element: HTMLElement | undefined;
+  is: AnySvelteComponent | undefined
+  props: any
+  element: HTMLElement | undefined
 }
 
 export const store = writable<CompAndProps>({

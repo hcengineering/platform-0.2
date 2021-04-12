@@ -27,18 +27,18 @@ import Spinner from './components/internal/Spinner.svelte'
 import Icon from './components/Icon.svelte'
 import { locationToUrl, parseLocation } from './location'
 import { Router } from './routes'
-import { getContext, onDestroy, setContext } from 'svelte'
+import { SvelteComponent, getContext, onDestroy, setContext } from 'svelte'
 
 /*!
  * Anticrm Platform™ UI Plugin
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */
-export default (platform: Platform): Promise<UIService> => {
+export default async (platform: Platform): Promise<UIService> => {
   platform.setResource(ui.component.Icon, Icon)
   platform.setResource(ui.component.Spinner, Spinner)
 
-  function createApp (target: HTMLElement) {
+  function createApp (target: HTMLElement): SvelteComponent {
     return new Root({ target, props: { platform, ui: uiService } })
   }
 
@@ -60,7 +60,7 @@ export default (platform: Platform): Promise<UIService> => {
     destroyFactory(unsubscribe)
   }
 
-  function navigate (newUrl: string) {
+  function navigate (newUrl: string): void {
     const curUrl = locationToUrl(windowLocation())
     if (curUrl === newUrl) {
       return
@@ -73,12 +73,12 @@ export default (platform: Platform): Promise<UIService> => {
     path: string[] | undefined,
     query: Record<string, string> | undefined,
     fragment: string | undefined
-  ) {
+  ): void {
     const newLocation = windowLocation()
-    if (path) {
+    if (path != null) {
       newLocation.path = path
     }
-    if (query) {
+    if (query != null) {
       // For query we do replace
       const currentQuery = newLocation.query || {}
       for (const kv of Object.entries(query)) {
@@ -91,11 +91,11 @@ export default (platform: Platform): Promise<UIService> => {
     navigate(locationToUrl(newLocation))
   }
 
-  function showModal (component: AnySvelteComponent, props: any, element?: HTMLElement) {
+  function showModal (component: AnySvelteComponent, props: any, element?: HTMLElement): void {
     store.set({ is: component, props, element: element })
   }
 
-  function closeModal () {
+  function closeModal (): void {
     store.set({ is: undefined, props: {}, element: undefined })
   }
 
@@ -106,8 +106,8 @@ export default (platform: Platform): Promise<UIService> => {
     matcher: (match: T) => void,
     defaults: T | undefined = undefined
   ): ApplicationRouter<T> {
-    const r = getContext(CONTEXT_ROUTE_VALUE) as Router<any>
-    const navigateOp = (loc: Location) => {
+    const r: Router<any> = getContext(CONTEXT_ROUTE_VALUE)
+    const navigateOp = (loc: Location): void => {
       navigate(locationToUrl(loc))
     }
     const result = r ? r.newRouter<T>(pattern, defaults) : new Router<T>(pattern, r, defaults, navigateOp)
@@ -128,15 +128,15 @@ export default (platform: Platform): Promise<UIService> => {
 
   let documentProvider: DocumentProvider | undefined
 
-  function open (doc: Document): Promise<void> {
-    if (documentProvider) {
-      return documentProvider.open(doc)
+  async function open (doc: Document): Promise<void> {
+    if (documentProvider != null) {
+      return await documentProvider.open(doc)
     }
-    return Promise.reject(new Error('Document provider is not registred'))
+    return await Promise.reject(new Error('Document provider is not registred'))
   }
 
   function selection (): Document | undefined {
-    if (documentProvider) {
+    if (documentProvider != null) {
       return documentProvider.selection()
     }
     return undefined
