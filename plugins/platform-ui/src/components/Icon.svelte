@@ -35,6 +35,8 @@
   else cl = 'icon'
 </script>
 
-<svg class="{cl} {fs}" style={color !== '' ? 'fill:' + color : ''}>
-  <use href={url} />
-</svg>
+<div style="width: {size}px; height: {size}px">
+  <svg class="{cl} {fs}" style={color !== '' ? 'fill:' + color : ''}>
+    <use href={url} />
+  </svg>
+</div>

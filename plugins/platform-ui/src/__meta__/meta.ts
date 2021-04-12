@@ -24,6 +24,10 @@ export default (platform: Platform): void => {
     Network: `${spritesUrl}#network`,
     Search: `${spritesUrl}#search`,
     Add: `${spritesUrl}#add`,
-    ArrowDown: `${spritesUrl}#arrowDown`
+    ArrowDown: `${spritesUrl}#arrowDown`,
+    Message: `${spritesUrl}#message`,
+    Phone: `${spritesUrl}#phone`,
+    Mail: `${spritesUrl}#mail`,
+    More: `${spritesUrl}#more`
   })
 }

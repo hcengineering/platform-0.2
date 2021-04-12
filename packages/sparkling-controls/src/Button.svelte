@@ -3,7 +3,7 @@
 
   // --- 'small', 'large' --- //
   export let size = ''
-  // --- 'primary', 'transparent' --- //
+  // --- 'primary', 'icon', 'transparent' --- //
   export let kind = ''
   // --- ex: '100px', '25%' --- //
   export let width = ''
@@ -105,6 +105,38 @@
       background-color: $theme-dark-content-dark-color;
       border-color: $theme-dark-content-dark-color;
       color: $theme-light-bg-color;
+    }
+  }
+
+  .icon {
+    padding: 14px 28px;
+    border-radius: 8px;
+  }
+  :global(.theme-dark) .icon {
+    color: $theme-dark-content-color;
+    background-color: $theme-dark-bg-accent-color;
+    border: solid 1px $theme-dark-bg-accent-color;
+    &:hover {
+      color: $theme-dark-caption-color;
+      border-color: $theme-dark-bg-dark-hover;
+    }
+  }
+  :global(.theme-grey) .icon {
+    color: $theme-grey-content-color;
+    background-color: $theme-grey-bg-accent-color;
+    border: solid 1px $theme-grey-bg-accent-color;
+    &:hover {
+      color: $theme-grey-caption-color;
+      border-color: $theme-grey-bg-dark-hover;
+    }
+  }
+  :global(.theme-light) .icon {
+    color: $theme-light-content-color;
+    background-color: $theme-light-bg-accent-color;
+    border: solid 1px $theme-light-bg-accent-color;
+    &:hover {
+      color: $theme-light-caption-color;
+      border-color: $theme-light-bg-dark-hover;
     }
   }
 

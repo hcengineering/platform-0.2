@@ -140,7 +140,11 @@ export default plugin(
       Network: '' as Asset,
       Search: '' as Asset,
       Add: '' as Asset,
-      ArrowDown: '' as Asset
+      ArrowDown: '' as Asset,
+      Message: '' as Asset,
+      Phone: '' as Asset,
+      Mail: '' as Asset,
+      More: '' as Asset
     },
     component: {
       Icon: '' as AnyComponent,

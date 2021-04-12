@@ -24,6 +24,9 @@
 
   import DateItem from './DateItem.svelte'
   import SplitView from '@anticrm/sparkling-controls/src/SplitView.svelte'
+  import Button from '@anticrm/sparkling-controls/src/Button.svelte'
+  import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
+  import ui from '@anticrm/platform-ui'
 
   const coreService = getCoreService()
   const chunterService = getChunterService()
@@ -75,6 +78,12 @@
         {/if}
       {/each}
       <DateItem dateItem={new Date()} />
+      <div style="height: 20px"/>
+      <Button kind="icon"><Icon icon={ui.icon.Message} size="32"/></Button>
+      <Button kind="icon"><Icon icon={ui.icon.Phone} size="32"/></Button>
+      <Button kind="icon"><Icon icon={ui.icon.Mail} size="32"/></Button>
+      <Button kind="icon"><Icon icon={ui.icon.More} size="32"/></Button>
+      <div style="height: 20px"/>
       <SplitView width="100%" height="200px" spacing="10" minWidth="50">
         <div slot="prevContent">
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Rem beatae necessitatibus, accusantium exercitationem
