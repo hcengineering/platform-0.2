@@ -23,8 +23,8 @@ import Root from './components/internal/Root.svelte'
 
 import { store } from './stores'
 
-import Spinner from './components/internal/Spinner.svelte'
-import Icon from './components/Icon.svelte'
+// import Spinner from './components/internal/Spinner.svelte'
+// import Icon from './components/Icon.svelte'
 import { locationToUrl, parseLocation } from './location'
 import { Router } from './routes'
 import { SvelteComponent, getContext, onDestroy, setContext } from 'svelte'
@@ -35,8 +35,8 @@ import { SvelteComponent, getContext, onDestroy, setContext } from 'svelte'
  * Licensed under the Eclipse Public License, Version 2.0
  */
 export default async (platform: Platform): Promise<UIService> => {
-  platform.setResource(ui.component.Icon, Icon)
-  platform.setResource(ui.component.Spinner, Spinner)
+  // platform.setResource(ui.component.Icon, Icon)
+  // platform.setResource(ui.component.Spinner, Spinner)
 
   function createApp (target: HTMLElement): SvelteComponent {
     return new Root({ target, props: { platform, ui: uiService } })

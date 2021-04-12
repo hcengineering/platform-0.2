@@ -1,8 +1,16 @@
 {
-	"include": ["src/**/*", "webpack.config.ts"],
-	"exclude": ["node_modules/*", "__sapper__/*", "public/*"],
+	"include": [
+		"src/**/*",
+		"webpack.config.ts"
+	],
+	"exclude": [
+		"node_modules/*",
+		"__sapper__/*",
+		"public/*"
+	],
 	"compilerOptions": {
 		"moduleResolution": "node",
+		"module": "commonjs",
 		"target": "es2017",
 		"importsNotUsedAsValues": "remove",
 		"isolatedModules": true,
@@ -11,7 +19,9 @@
 		"strict": false,
 		"baseUrl": ".",
 		"paths": {
-			"src/*": ["src/*"]
+			"src/*": [
+				"src/*"
+			]
 		},
 		"types": [
 			"svelte",

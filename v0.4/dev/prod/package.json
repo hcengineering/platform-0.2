@@ -40,7 +40,10 @@
     "webpack-dev-server": "^3.11.2"
   },
   "dependencies": {
-    "serve": "^11.3.2"
+    "serve": "^11.3.2",
+    "@anticrm/plugin": "~0.2.0",
+    "@anticrm/plugin-ui": "~0.2.0",
+    "@anticrm/plugin-ui-impl": "~0.2.0"
   },
   "browserslist": [
     "defaults"
