@@ -406,34 +406,29 @@
 </div>
 
 <style lang="scss">
+  @import '~@anticrm/sparkling-theme/styles/_global.scss';
+
   .presentation-reference-input-control {
     width: 100%;
-
-    background-color: var(--theme-bg-accent-color);
-    border: 1px solid var(--theme-bg-dark-color);
     border-radius: 4px;
     padding: 8px;
     box-sizing: border-box;
-
     .flex-column {
       display: flex;
       flex-direction: column;
       align-items: center;
     }
-
     .flex-row {
       display: flex;
       flex-direction: row;
       align-items: flex-end;
     }
-
     .edit-box-horizontal {
       width: 100%;
       height: 100%;
       margin-top: 7px;
       align-self: center;
     }
-
     .edit-box-vertical {
       width: 100%;
       height: 100%;
@@ -444,7 +439,6 @@
       reference {
         color: lightblue;
       }
-
       reference:not([id]) {
         color: grey;
       }
@@ -454,7 +448,27 @@
       width: 2px;
       height: 42px;
       margin: 0 8px;
-      background-color: var(--theme-bg-accent-color);
+    }
+  }
+  :global(.theme-dark) .presentation-reference-input-control {
+    background-color: $theme-dark-bg-accent-color;
+    border: 1px solid $theme-dark-bg-dark-color;
+    .tSeparator {
+      background-color: $theme-dark-bg-accent-color;
+    }
+  }
+  :global(.theme-grey) .presentation-reference-input-control {
+    background-color: $theme-grey-bg-accent-color;
+    border: 1px solid $theme-grey-bg-dark-color;
+    .tSeparator {
+      background-color: $theme-grey-bg-accent-color;
+    }
+  }
+  :global(.theme-light) .presentation-reference-input-control {
+    background-color: $theme-light-bg-accent-color;
+    border: 1px solid $theme-light-bg-dark-color;
+    .tSeparator {
+      background-color: $theme-light-bg-accent-color;
     }
   }
 </style>

@@ -63,9 +63,9 @@
 </script>
 
 <div class="presentation-completion-popup" style={popupStyle} bind:clientHeight bind:clientWidth on:blur>
-  <IconEditBox icon={presentation.icon.Finder} iconRight />
+  <IconEditBox icon={presentation.icon.Finder} iconRight width="100%" />
   <div class="separator" />
-  <ScrollView width="100%" height="100%" scrollPosition={selOffset} accentColor>
+  <ScrollView width="100%" height="100%" scrollPosition={selOffset}>
     <div bind:this={listElement}>
       {#each items as item (item.key)}
         <div
@@ -84,43 +84,30 @@
 </div>
 
 <style lang="scss">
+  @import '~@anticrm/sparkling-theme/styles/_global.scss';
+
   .presentation-completion-popup {
+    position: relative;
     display: flex;
     flex-direction: column;
-    background-color: var(--theme-bg-accent-color);
-    color: var(--theme-content-color);
-    position: relative;
-    border: 1px solid var(--theme-bg-dark-color);
     border-radius: 4px;
     height: 150px;
     width: 300px;
     padding: 1em;
-    box-shadow: var(--theme-shadow);
-
     .item {
-      font-size: 14px;
-      font-family: var(--theme-font-caption);
-      color: var(--theme-content-dark-color);
+      font-size: 15px;
       white-space: no-wrap;
       margin: 4px 0;
       padding: 8px;
       border-radius: 4px;
       cursor: pointer;
       transition: background-color 0.2s;
-
       &.selected {
-        // border-color: var(--theme-doclink-color);
-        background-color: var(--theme-bg-accent-hover);
         position: sticky;
       }
-
       &:focus {
         outline: none;
-        border-color: var(--theme-doclink-color);
-        box-shadow: inset 0px 0px 2px 0px var(--theme-doclink-color);
-        color: var(--theme-caption-color);
       }
-
       &:first-child {
         margin-top: 0;
       }
@@ -128,9 +115,59 @@
         margin-bottom: 0;
       }
     }
-
     .separator {
-      height: 4px;
+      height: 8px;
+    }
+  }
+  :global(.theme-dark) .presentation-completion-popup {
+    background-color: $theme-dark-bg-color;
+    color: $theme-dark-content-color;
+    border: 1px solid $theme-dark-bg-dark-color;
+    box-shadow: $theme-dark-shadow;
+    .item {
+      color: $theme-dark-content-dark-color;
+      &.selected {
+        background-color: $theme-dark-bg-accent-hover;
+      }
+      &:focus {
+        border-color: $theme-dark-doclink-color;
+        box-shadow: inset 0px 0px 2px 0px $theme-dark-doclink-color;
+        color: $theme-dark-caption-color;
+      }
+    }
+  }
+  :global(.theme-grey) .presentation-completion-popup {
+    background-color: $theme-grey-bg-accent-color;
+    color: $theme-grey-content-color;
+    border: 1px solid $theme-grey-bg-dark-color;
+    box-shadow: $theme-grey-shadow;
+    .item {
+      color: $theme-grey-content-dark-color;
+      &.selected {
+        background-color: $theme-grey-bg-accent-hover;
+      }
+      &:focus {
+        border-color: $theme-grey-doclink-color;
+        box-shadow: inset 0px 0px 2px 0px $theme-grey-doclink-color;
+        color: $theme-grey-caption-color;
+      }
+    }
+  }
+  :global(.theme-light) .presentation-completion-popup {
+    background-color: $theme-light-bg-accent-color;
+    color: $theme-light-content-color;
+    border: 1px solid $theme-light-bg-dark-color;
+    box-shadow: $theme-light-shadow;
+    .item {
+      color: $theme-light-content-dark-color;
+      &.selected {
+        background-color: $theme-light-bg-accent-hover;
+      }
+      &:focus {
+        border-color: $theme-light-doclink-color;
+        box-shadow: inset 0px 0px 2px 0px $theme-light-doclink-color;
+        color: $theme-light-caption-color;
+      }
     }
   }
 </style>

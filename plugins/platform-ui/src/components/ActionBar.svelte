@@ -75,6 +75,8 @@
 </div>
 
 <style lang="scss">
+  @import '~@anticrm/sparkling-theme/styles/_global.scss';
+
   .actionBar-view {
     display: flex;
     flex-direction: row;
@@ -85,9 +87,17 @@
     width: 100%;
     text-align: center;
     font-weight: 500;
-    background-color: var(--theme-bg-accent-color);
     border-radius: 4px;
-    color: var(--status-maroon-color);
+    color: $theme-status-maroon-color;
+  }
+  :global(.theme-dark) .error {
+    background-color: $theme-dark-bg-accent-color;
+  }
+  :global(.theme-grey) .error {
+    background-color: $theme-grey-bg-accent-color;
+  }
+  :global(.theme-light) .error {
+    background-color: $theme-light-bg-accent-color;
   }
 
   .actionButton {
@@ -95,7 +105,15 @@
     align-items: center;
     justify-content: center;
     padding: 0.25em;
-    color: var(--theme-content-dark-color);
+  }
+  :global(.theme-dark) .actionButton {
+    color: $theme-dark-content-dark-color;
+  }
+  :global(.theme-grey) .actionButton {
+    color: $theme-grey-content-dark-color;
+  }
+  :global(.theme-light) .actionButton {
+    color: $theme-light-content-dark-color;
   }
 
   .abLeft {
@@ -112,19 +130,36 @@
     border-radius: 0 4px 4px 0;
   }
 
-  .selected {
-    background-color: var(--theme-bg-accent-hover);
-    border-color: var(--theme-bg-dark-hover);
+  :global(.theme-dark) .selected {
+    background-color: $theme-dark-bg-accent-hover;
+    border-color: $theme-dark-bg-dark-hover;
+  }
+  :global(.theme-grey) .selected {
+    background-color: $theme-grey-bg-accent-hover;
+    border-color: $theme-grey-bg-dark-hover;
+  }
+  :global(.theme-light) .selected {
+    background-color: $theme-light-bg-accent-hover;
+    border-color: $theme-light-bg-dark-hover;
   }
 
   .toggleState {
-    background-color: var(--theme-bg-dark-color);
     font-weight: bold;
   }
-
   .popup-separator {
     height: 1px;
-    background-color: var(--theme-bg-dark-color);
+  }
+  :global(.theme-dark) .toggleState,
+  :global(.theme-dark) .popup-separator {
+    background-color: $theme-dark-bg-dark-color;
+  }
+  :global(.theme-grey) .toggleState,
+  :global(.theme-grey) .popup-separator {
+    background-color: $theme-grey-bg-dark-color;
+  }
+  :global(.theme-light) .toggleState,
+  :global(.theme-light) .popup-separator {
+    background-color: $theme-light-bg-dark-color;
   }
 
   .w100 {
@@ -148,10 +183,7 @@
       display: flex;
       flex-direction: column;
       flex-flow: column nowrap;
-      background-color: var(--theme-bg-accent-color);
-      border: solid 1px var(--theme-bg-dark-color);
       border-radius: 4px;
-      box-shadow: var(--theme-shadow);
       padding: 4px 8px;
       margin: 10px -0.25em 0 -0.25em;
       z-index: 100000;
@@ -161,15 +193,45 @@
         padding: 8px;
         width: 100%;
         text-align: left;
-        background-color: var(--theme-bg-accent-color);
         border-radius: 4px;
         border: none;
-        color: var(--theme-content-dark-color);
         cursor: pointer;
-
-        &:hover {
-          background-color: var(--theme-bg-accent-hover);
-        }
+      }
+    }
+  }
+  :global(.theme-dark) .popup-menu-view {
+    background-color: $theme-dark-bg-accent-color;
+    border: solid 1px $theme-dark-bg-dark-color;
+    box-shadow: $theme-dark-shadow;
+    .popup-item {
+      background-color: $theme-dark-bg-accent-color;
+      color: $theme-dark-content-dark-color;
+      &:hover {
+        background-color: $theme-dark-bg-accent-hover;
+      }
+    }
+  }
+  :global(.theme-grey) .popup-menu-view {
+    background-color: $theme-grey-bg-accent-color;
+    border: solid 1px $theme-grey-bg-dark-color;
+    box-shadow: $theme-grey-shadow;
+    .popup-item {
+      background-color: $theme-grey-bg-accent-color;
+      color: $theme-grey-content-dark-color;
+      &:hover {
+        background-color: $theme-grey-bg-accent-hover;
+      }
+    }
+  }
+  :global(.theme-light) .popup-menu-view {
+    background-color: $theme-light-bg-accent-color;
+    border: solid 1px $theme-light-bg-dark-color;
+    box-shadow: $theme-light-shadow;
+    .popup-item {
+      background-color: $theme-light-bg-accent-color;
+      color: $theme-light-content-dark-color;
+      &:hover {
+        background-color: $theme-light-bg-accent-hover;
       }
     }
   }

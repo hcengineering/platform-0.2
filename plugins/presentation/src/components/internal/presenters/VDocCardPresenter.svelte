@@ -76,11 +76,11 @@
 {/await}
 
 <style lang="scss">
+  @import '~@anticrm/sparkling-theme/styles/_global.scss';
+
   .card-view {
     max-width: 300px;
     margin: 12px;
-    background-color: var(--theme-bg-color);
-    border: 1px solid var(--theme-bg-color);
     border-radius: 4px;
     display: flex;
     flex-direction: column;
@@ -90,21 +90,39 @@
       display: flex;
       flex-direction: row;
       align-items: center;
-
       &__avatar {
         width: 32px;
         height: 32px;
         border-radius: 16px;
       }
-
       &__caption {
         padding-left: 8px;
-        color: var(--theme-doclink-color);
       }
     }
 
     .card-body {
       margin-top: 8px;
+    }
+  }
+  :global(.theme-dark) .card-view {
+    background-color: $theme-dark-bg-color;
+    border: 1px solid $theme-dark-bg-color;
+    .card-head__caption {
+      color: $theme-dark-doclink-color;
+    }
+  }
+  :global(.theme-grey) .card-view {
+    background-color: $theme-grey-bg-color;
+    border: 1px solid $theme-grey-bg-color;
+    .card-head__caption {
+      color: $theme-grey-doclink-color;
+    }
+  }
+  :global(.theme-light) .card-view {
+    background-color: $theme-light-bg-color;
+    border: 1px solid $theme-light-bg-color;
+    .card-head__caption {
+      color: $theme-light-doclink-color;
     }
   }
 </style>

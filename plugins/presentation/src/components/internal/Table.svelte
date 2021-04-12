@@ -77,6 +77,8 @@
 </div>
 
 <style lang="scss">
+  @import '~@anticrm/sparkling-theme/styles/_global.scss';
+
   .erp-table {
     display: table;
     border-collapse: collapse;
@@ -87,8 +89,6 @@
 
     .thead {
       display: table-header-group;
-      border-bottom: 1px solid var(--theme-bg-accent-color);
-      color: var(--theme-content-color);
       font-size: 11px;
       font-weight: 400;
     }
@@ -102,27 +102,56 @@
       display: table-row-group;
       font-size: 14px;
       font-weight: 400;
-      color: var(--theme-content-dark-color);
-
-      .tr {
-        background-color: var(--theme-bg-color);
-        // border-bottom: 1px solid var(--theme-bg-accent-color);
-
-        // &:hover {
-        //   background-color: var(--theme-content-color);
-        //   color: var(--theme-bg-color);
-        //   cursor: pointer;
-        // }
-
-        &:nth-child(odd) {
-          background-color: var(--theme-bg-accent-color);
-        }
-      }
     }
 
     .td {
       display: table-cell;
       padding: 12px 8px;
+    }
+  }
+  :global(.theme-dark) .erp-table {
+    .thead {
+      border-bottom: 1px solid $theme-dark-bg-accent-color;
+      color: $theme-dark-content-color;
+    }
+    .tbody {
+      color: $theme-dark-content-dark-color;
+      .tr {
+        background-color: $theme-dark-bg-color;
+        &:nth-child(odd) {
+          background-color: $theme-dark-bg-accent-color;
+        }
+      }
+    }
+  }
+  :global(.theme-grey) .erp-table {
+    .thead {
+      border-bottom: 1px solid $theme-grey-bg-accent-color;
+      color: $theme-grey-content-color;
+    }
+    .tbody {
+      color: $theme-grey-content-dark-color;
+      .tr {
+        background-color: $theme-grey-bg-color;
+        &:nth-child(odd) {
+          background-color: $theme-grey-bg-accent-color;
+        }
+      }
+    }
+  }
+  :global(.theme-light) .erp-table {
+    .thead {
+      border-bottom: 1px solid $theme-light-bg-accent-color;
+      color: $theme-light-content-color;
+    }
+    .tbody {
+      color: $theme-light-content-dark-color;
+      .tr {
+        background-color: $theme-light-bg-color;
+        &:nth-child(odd) {
+          background-color: $theme-light-bg-accent-color;
+        }
+      }
     }
   }
 </style>

@@ -5,7 +5,7 @@
   import { getContext } from 'svelte'
 
   export let icon: Asset | undefined
-  // --- prop 'size' in 'px': '16', '24', '32', '42' --- //
+  // --- prop 'size' in 'px': '12', '16', '24', '32', '42' --- //
   export let size = '16'
   export let button = false
   export let color = ''
@@ -16,6 +16,9 @@
 
   let fs, cl: string
   switch (size) {
+    case '12':
+      fs = 'icon-12'
+      break
     case '24':
       fs = 'icon-24'
       break
@@ -32,6 +35,8 @@
   else cl = 'icon'
 </script>
 
-<svg class="{cl} {fs}" style={color !== '' ? 'fill:' + color : ''}>
-  <use href={url} />
-</svg>
+<div style="width: {size}px; height: {size}px">
+  <svg class="{cl} {fs}" style={color !== '' ? 'fill:' + color : ''}>
+    <use href={url} />
+  </svg>
+</div>

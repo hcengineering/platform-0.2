@@ -74,6 +74,8 @@
 </div>
 
 <style lang="scss">
+  @import '~@anticrm/sparkling-theme/styles/_global.scss';
+
   #guidebook {
     display: flex;
     height: 100%;
@@ -85,42 +87,57 @@
     flex-shrink: 0;
     margin: 15px;
     min-width: 200px;
-    background-color: var(--theme-bg-color);
-    border-right: solid 1px var(--theme-bg-accent-color);
-
     display: flex;
     flex-direction: column;
-
     .app-icon {
       display: flex;
       align-items: stretch;
       min-height: 20px;
-
       .label {
         flex-grow: 1;
         align-self: center;
       }
-
       .icon-arrow {
         margin: 0 0 0 20px;
         width: 40px;
         height: 20px;
       }
-
-      &.current-app {
-        background-color: var(--theme-bg-color);
-      }
     }
-
     .remainder {
       flex-grow: 1;
+    }
+  }
+  :global(.theme-dark) nav {
+    background-color: $theme-dark-bg-color;
+    border-right: solid 1px $theme-dark-bg-accent-color;
+    .app-icon {
+      &.current-app {
+        background-color: $theme-dark-bg-color;
+      }
+    }
+  }
+  :global(.theme-grey) nav {
+    background-color: $theme-grey-bg-color;
+    border-right: solid 1px $theme-grey-bg-accent-color;
+    .app-icon {
+      &.current-app {
+        background-color: $theme-grey-bg-color;
+      }
+    }
+  }
+  :global(.theme-light) nav {
+    background-color: $theme-light-bg-color;
+    border-right: solid 1px $theme-light-bg-accent-color;
+    .app-icon {
+      &.current-app {
+        background-color: $theme-light-bg-color;
+      }
     }
   }
 
   .main {
     flex-grow: 1;
     min-width: 300px;
-    background-color: var(--theme-bg-color);
     display: flex;
     flex-direction: column;
     align-items: stretch;
@@ -128,5 +145,14 @@
     .content {
       overflow: auto;
     }
+  }
+  :global(.theme-dark) .main {
+    background-color: $theme-dark-bg-color;
+  }
+  :global(.theme-grey) .main {
+    background-color: $theme-grey-bg-color;
+  }
+  :global(.theme-light) .main {
+    background-color: $theme-light-bg-color;
   }
 </style>
