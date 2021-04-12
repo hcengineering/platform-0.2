@@ -21,9 +21,9 @@ import ui from '@anticrm/plugin-ui'
 
 import ErrorPage from './components/ErrorPage.svelte'
 
-const accountsUrl = process.env.APP_ACCOUNTS_URL
-const host = process.env.APP_WSHOST
-const port = process.env.APP_WSPORT
+// const accountsUrl = process.env.APP_ACCOUNTS_URL
+// const host = process.env.APP_WSHOST
+// const port = process.env.APP_WSPORT
 
 // platform.setMetadata(login.metadata.AccountsUrl, accountsUrl)
 // platform.setMetadata(core.metadata.WSHost, host)
@@ -41,5 +41,5 @@ async function boot (): Promise<void> {
 }
 
 boot().catch(err => {
-  new ErrorPage({ target: document.body, props: { error: err.message } }) // eslint-disable-line no-new
+  new ErrorPage({ target: document.body, props: { error: 'err.message' } }) // eslint-disable-line no-new
 })

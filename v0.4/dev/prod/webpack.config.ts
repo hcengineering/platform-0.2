@@ -19,7 +19,7 @@ const useBabelInDevelopment = false;
  * specify paths to SCSS or SASS files, and they will be compiled automatically.
  */
 const stylesheets = [
-	'./src/styles/index.scss'
+	// './src/styles/index.scss'
 ];
 
 /**

@@ -1,7 +1,6 @@
 dependencies:
   '@babel/plugin-transform-runtime': 7.13.15
   '@babel/preset-typescript': 7.13.0
-  '@babel/runtime': 7.13.10
   '@microsoft/api-extractor': 7.13.4
   '@rush-temp/plugin': file:projects/plugin.tgz_ts-node@9.1.1
   '@rush-temp/plugin-ui': file:projects/plugin-ui.tgz
@@ -17,7 +16,6 @@ dependencies:
   babel-jest: 26.6.3
   babel-loader: 8.2.2_webpack@5.31.2
   clean-webpack-plugin: 3.0.0_webpack@5.31.2
-  core-js: 3.10.1
   cross-env: 7.0.3
   css-loader: 5.2.1_webpack@5.31.2
   fast-equals: 2.0.1
@@ -36,6 +34,7 @@ dependencies:
   ts-loader: 8.1.0_webpack@5.31.2
   ts-node: 9.1.1
   ts-standard: 10.0.0
+  tsconfig-paths: 3.9.0
   webpack: 5.31.2_webpack-cli@4.6.0
   webpack-cli: 4.6.0_122c48df1bb4900de3c8d3856836cf3d
   webpack-dev-server: 3.11.2_webpack-cli@4.6.0+webpack@5.31.2
@@ -10493,10 +10492,12 @@ packages:
       '@babel/core': 7.13.15
       '@babel/preset-env': 7.13.15_@babel+core@7.13.15
       '@babel/preset-typescript': 7.13.0_@babel+core@7.13.15
+      '@babel/runtime': 7.13.10
       '@microsoft/api-extractor': 7.13.4
       '@types/jest': 26.0.22
       '@types/node': 14.14.37
       babel-jest: 26.6.3_@babel+core@7.13.15
+      core-js: 3.10.1
       fast-equals: 2.0.1
       jest: 26.6.3_ts-node@9.1.1
       prettier: 2.2.1
@@ -10509,7 +10510,7 @@ packages:
     peerDependencies:
       ts-node: '*'
     resolution:
-      integrity: sha512-qDPUMVJihz89gQ7IdIictgCeKm9r/uCUwU4L216zTGaf+58vQZ98EPg33RqBjAqcKnhLYStQLvM7igvO4kOe7Q==
+      integrity: sha512-KoL3NF5dtlBxI79Nh8owssn62H3XKwGtEoCgPE1vb9JxHYbeTswV0+TOAfVONSiHtcS6gX+2/Ng6QaZiYJPAZQ==
       tarball: file:projects/plugin-ui-impl.tgz
     version: 0.0.0
   file:projects/plugin-ui.tgz:
@@ -10575,6 +10576,7 @@ packages:
       svelte-preprocess: 4.7.0_c14a09b624e11ca3eaa9db430b53f206
       ts-loader: 8.1.0_typescript@4.2.4+webpack@5.31.2
       ts-node: 9.1.1_typescript@4.2.4
+      tsconfig-paths: 3.9.0
       typescript: 4.2.4
       webpack: 5.31.2_webpack-cli@4.6.0
       webpack-cli: 4.6.0_122c48df1bb4900de3c8d3856836cf3d
@@ -10582,7 +10584,7 @@ packages:
     dev: false
     name: '@rush-temp/prod'
     resolution:
-      integrity: sha512-ixHuAFijodncBIlyPL14Pccy/cmBVawfCZCP/e6EehlOP0v60btSUR816IIhzIq/bDyt7S3nV5WZ3gxE6PA/ow==
+      integrity: sha512-zCT+knNraQUoPivxaLQKWdaaTd0jgBbYbjLQAW1htcilROeUtHZicnP8oQguYGNkpoK+lzLfY7meD0isGpTGWw==
       tarball: file:projects/prod.tgz
     version: 0.0.0
   file:projects/status.tgz:
@@ -10601,7 +10603,6 @@ registry: ''
 specifiers:
   '@babel/plugin-transform-runtime': ^7.12.17
   '@babel/preset-typescript': ~7.13.0
-  '@babel/runtime': ^7.12.18
   '@microsoft/api-extractor': ~7.13.4
   '@rush-temp/plugin': file:./projects/plugin.tgz
   '@rush-temp/plugin-ui': file:./projects/plugin-ui.tgz
@@ -10617,7 +10618,6 @@ specifiers:
   babel-jest: ~26.6.3
   babel-loader: ^8.2.2
   clean-webpack-plugin: ^3.0.0
-  core-js: ^3.9.0
   cross-env: ^7.0.3
   css-loader: ^5.0.2
   fast-equals: ~2.0.1
@@ -10636,6 +10636,7 @@ specifiers:
   ts-loader: ^8.0.17
   ts-node: ^9.1.1
   ts-standard: ~10.0.0
+  tsconfig-paths: ~3.9.0
   webpack: ^5.23.0
   webpack-cli: ^4.5.0
   webpack-dev-server: ^3.11.2

@@ -10,8 +10,8 @@
 	],
 	"compilerOptions": {
 		"moduleResolution": "node",
-		"module": "commonjs",
 		"target": "es2017",
+		"module": "esnext",
 		"importsNotUsedAsValues": "remove",
 		"isolatedModules": true,
 		"esModuleInterop": true,

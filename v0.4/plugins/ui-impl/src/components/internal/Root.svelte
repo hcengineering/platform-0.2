@@ -1,19 +1,19 @@
 <script lang="ts">
-  import type { Metadata, Platform, Status } from '@anticrm/platform'
-  import { PlatformStatus, Severity } from '@anticrm/platform'
-  import type { ApplicationRoute, UIService } from '../..'
-  import { CONTEXT_PLATFORM, CONTEXT_PLATFORM_UI, routeMeta } from '../..'
+  import { Status, Severity } from '@anticrm/status'
+  import type { Metadata, Platform } from '@anticrm/plugin'
+  import type { ApplicationRoute, UIService } from '@anticrm/plugin-ui'
+  import { CONTEXT_PLATFORM, CONTEXT_PLATFORM_UI, routeMeta } from '@anticrm/plugin-ui'
   import { setContext } from 'svelte'
 
-  import Theme from '@anticrm/sparkling-theme/src/components/Theme.svelte'
-  import StatusComponent from './Status.svelte'
-  import Clock from './Clock.svelte'
-  import ThemeSelector from './ThemeSelector.svelte'
-  import Component from '../Component.svelte'
-  import Modal from './Modal.svelte'
-  import uiPlugin from '../../.'
-  import { PlatformStatusCodes } from '@anticrm/foundation'
-  import { newRouter } from '../../'
+  // import Theme from '@anticrm/sparkling-theme/src/components/Theme.svelte'
+  // import StatusComponent from './Status.svelte'
+  // import Clock from './Clock.svelte'
+  // import ThemeSelector from './ThemeSelector.svelte'
+  // import Component from '../Component.svelte'
+  // import Modal from './Modal.svelte'
+  
+  import uiPlugin from '@anticrm/plugin-ui'
+  import { newRouter } from '@anticrm/plugin-ui'
 
   export let platform: Platform
   export let ui: UIService
@@ -58,18 +58,20 @@
 
   const status: Status = { severity: Severity.OK, code: 0, message: '' }
 
-  platform.addEventListener(PlatformStatus, (_event, status) => {
-    if (status.severity === Severity.ERROR && status.code === PlatformStatusCodes.AUTHENTICATON_REQUIRED) {
-      authenticationRequired = true
-    } else if (status.severity === Severity.OK && status.code === PlatformStatusCodes.AUTHENTICATON_OK) {
-      authenticationRequired = false
-    }
+  platform.addEventListener('PlatformStatus', (_event, status) => {
+    // if (status.severity === Severity.ERROR && status.code === PlatformStatusCodes.AUTHENTICATON_REQUIRED) {
+    //   authenticationRequired = true
+    // } else if (status.severity === Severity.OK && status.code === PlatformStatusCodes.AUTHENTICATON_OK) {
+    //   authenticationRequired = false
+    // }
 
     return Promise.resolve()
   })
 </script>
 
-<Theme>
+<h1>It works!</h1>
+
+<!-- <Theme>
   <div id="ui-root">
     <div class="status-bar">
       <div class="container">
@@ -84,9 +86,9 @@
           <div class="widget">
             <ThemeSelector />
           </div>
-          <!-- <div v-for="widget in widgets" :key="widget" class="widget">
+          <div v-for="widget in widgets" :key="widget" class="widget">
             <widget :component="widget" />
-          </div> -->
+          </div>
         </div>
       </div>
     </div>
@@ -103,10 +105,10 @@
     </div>
   </div>
   <Modal />
-</Theme>
+</Theme> -->
 
 <style lang="scss">
-  @import '~@anticrm/sparkling-theme/styles/_global.scss';
+  // @import '~@anticrm/sparkling-theme/styles/_global.scss';
 
   $status-bar-height: 20px;
   $pictogram-size: 51px;
@@ -158,13 +160,13 @@
       height: calc(100vh - #{$status-bar-height});
     }
   }
-  :global(.theme-dark) .status-bar {
-    border-bottom: 1px solid $theme-dark-bg-color;
-  }
-  :global(.theme-grey) .status-bar {
-    border-bottom: 1px solid $theme-grey-bg-color;
-  }
-  :global(.theme-light) .status-bar {
-    border-bottom: 1px solid $theme-light-bg-color;
-  }
+  // :global(.theme-dark) .status-bar {
+  //   border-bottom: 1px solid $theme-dark-bg-color;
+  // }
+  // :global(.theme-grey) .status-bar {
+  //   border-bottom: 1px solid $theme-grey-bg-color;
+  // }
+  // :global(.theme-light) .status-bar {
+  //   border-bottom: 1px solid $theme-light-bg-color;
+  // }
 </style>

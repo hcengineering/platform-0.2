@@ -19,7 +19,9 @@ import ui, { ApplicationRouter, Document } from '@anticrm/plugin-ui'
 
 import { derived, Readable, writable } from 'svelte/store'
 
-import Root from './components/internal/Root.svelte'
+// import Root from './components/internal/Root.svelte'
+
+import Root from './components/internal/R.svelte'
 
 import { store } from './stores'
 
