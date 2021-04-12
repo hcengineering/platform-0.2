@@ -78,12 +78,12 @@
         {/if}
       {/each}
       <DateItem dateItem={new Date()} />
-      <div style="height: 20px"/>
-      <Button kind="icon"><Icon icon={ui.icon.Message} size="32"/></Button>
-      <Button kind="icon"><Icon icon={ui.icon.Phone} size="32"/></Button>
-      <Button kind="icon"><Icon icon={ui.icon.Mail} size="32"/></Button>
-      <Button kind="icon"><Icon icon={ui.icon.More} size="32"/></Button>
-      <div style="height: 20px"/>
+      <div style="height: 20px" />
+      <Button kind="icon"><Icon icon={ui.icon.Message} size="32" /></Button>
+      <Button kind="icon"><Icon icon={ui.icon.Phone} size="32" /></Button>
+      <Button kind="icon"><Icon icon={ui.icon.Mail} size="32" /></Button>
+      <Button kind="icon"><Icon icon={ui.icon.More} size="32" /></Button>
+      <div style="height: 20px" />
       <SplitView width="100%" height="200px" spacing="10" minWidth="50">
         <div slot="prevContent">
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Rem beatae necessitatibus, accusantium exercitationem
