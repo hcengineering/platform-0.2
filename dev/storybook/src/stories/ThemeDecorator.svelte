@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 -->
-
 <script>
   import Theme from '@anticrm/sparkling-theme/src/components/Theme.svelte'
 
