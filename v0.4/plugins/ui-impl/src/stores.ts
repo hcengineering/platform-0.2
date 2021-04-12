@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { AnySvelteComponent } from '.'
+import type { AnySvelteComponent } from '@anticrm/plugin-ui'
 import { writable } from 'svelte/store'
 
 interface CompAndProps {

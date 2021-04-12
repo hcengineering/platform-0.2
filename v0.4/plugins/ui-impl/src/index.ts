@@ -13,9 +13,9 @@
 // limitations under the License.
 //
 
-import type { Platform } from '@anticrm/platform'
-import type { AnySvelteComponent, DocumentProvider, Location, UIService } from '.'
-import ui, { ApplicationRouter, Document } from '.'
+import type { Platform } from '@anticrm/plugin'
+import type { AnySvelteComponent, DocumentProvider, Location, UIService } from '@anticrm/plugin-ui'
+import ui, { ApplicationRouter, Document } from '@anticrm/plugin-ui'
 
 import { derived, Readable, writable } from 'svelte/store'
 

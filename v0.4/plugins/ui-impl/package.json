@@ -24,5 +24,5 @@
     "@babel/preset-typescript": "~7.13.0",
     "prettier": "~2.2.1"
   },
-  "dependencies": {}
+  "dependencies": {"@anticrm/plugin":"~0.2.0","@anticrm/plugin-ui":"~0.2.0","svelte":"~3.37.0","fast-equals":"~2.0.1"}
 }
