@@ -106,6 +106,8 @@
 </Theme>
 
 <style lang="scss">
+  @import '~@anticrm/sparkling-theme/styles/_global.scss';
+
   $status-bar-height: 20px;
   $pictogram-size: 51px;
 
@@ -116,11 +118,8 @@
     height: 100vh;
 
     .status-bar {
-      background-color: var(--theme-bg-color);
-      color: var(--theme-content-color);
       height: $status-bar-height;
       line-height: $status-bar-height;
-      border-bottom: 1px solid var(--theme-bg-accent-color);
 
       .container {
         display: flex;
@@ -128,13 +127,8 @@
         .logo {
           width: $pictogram-size;
           text-align: center;
-          /*padding-left: 1em;*/
-          /*padding-right: 1em;*/
-
           font-size: 1.25em;
           font-weight: 700;
-
-          border-right: 1px solid var(--theme-bg-accent-color);
         }
 
         .status-messages {
@@ -146,15 +140,7 @@
           display: flex;
           flex-direction: row-reverse;
 
-          // .widget {
-          //   border-left: 1px solid var(--theme-bg-accent-color);
-          //   padding-right: 1em;
-          //   padding-left: 1em;
-          //   font-weight: 700;
-          // }
-
           .widget {
-            border-left: 1px solid var(--theme-bg-accent-color);
             padding-right: 1em;
             padding-left: 1em;
             font-weight: 700;
@@ -170,7 +156,15 @@
 
     .app {
       height: calc(100vh - #{$status-bar-height});
-      background-color: var(--theme-bg-color);
     }
+  }
+  :global(.theme-dark) .status-bar {
+    border-bottom: 1px solid $theme-dark-bg-color;
+  }
+  :global(.theme-grey) .status-bar {
+    border-bottom: 1px solid $theme-grey-bg-color;
+  }
+  :global(.theme-light) .status-bar {
+    border-bottom: 1px solid $theme-light-bg-color;
   }
 </style>

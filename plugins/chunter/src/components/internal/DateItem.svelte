@@ -43,6 +43,8 @@
 </div>
 
 <style lang="scss">
+  @import '~@anticrm/sparkling-theme/styles/_global.scss';
+
   .message-item {
     display: flex;
     padding-top: 2em;
@@ -52,7 +54,6 @@
       padding-top: 9px;
       width: 34px;
       height: 34px;
-      font-family: var(--theme-font-content);
       text-align: center;
       font-weight: 500;
       color: #32302e;
@@ -71,7 +72,7 @@
       }
     }
     .holy {
-      color: var(--status-maroon-color);
+      color: $theme-status-maroon-color;
     }
 
     .details {
@@ -80,7 +81,6 @@
       position: relative;
       font-size: 11px;
       font-weight: 500;
-      color: var(--theme-content-color);
       text-transform: uppercase;
       &::before {
         position: absolute;
@@ -89,9 +89,26 @@
         top: -3em;
         height: calc(100% + 4em);
         width: 1px;
-        background-color: var(--theme-bg-dark-color);
         z-index: 50;
       }
+    }
+  }
+  :global(.theme-dark) .details {
+    color: $theme-dark-content-color;
+    &::before {
+      background-color: $theme-dark-bg-dark-color;
+    }
+  }
+  :global(.theme-grey) .details {
+    color: $theme-grey-content-color;
+    &::before {
+      background-color: $theme-grey-bg-dark-color;
+    }
+  }
+  :global(.theme-light) .details {
+    color: $theme-light-content-color;
+    &::before {
+      background-color: $theme-light-bg-dark-color;
     }
   }
 </style>

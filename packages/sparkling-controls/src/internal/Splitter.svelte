@@ -3,12 +3,14 @@
 
   export let prevDiv: HTMLElement
   export let nextDiv: HTMLElement
+  export let size = 4
+  export let spacing = 4 // eslint-disable-line
+  export let margin = 20
   export let minWidth = 150
   export let devMode = false
   export let horizontal = false
 
   let splitterDiv: HTMLElement
-  let splitterIcon: HTMLElement
   let coverPrev: HTMLElement
   let coverNext: HTMLElement
 
@@ -18,8 +20,12 @@
 
   let hoverMode = false
   const splitterStyle: string = horizontal
-    ? 'width: 100%; height: 4px; min-height: 4px; cursor: row-resize;'
-    : 'height: 100%; width: 4px; min-width: 4px; cursor: col-resize;'
+    ? `margin: ${spacing}px ${margin}px; width: calc(100% - ${
+        margin * 2
+      }px); height: ${size}px; min-height: ${size}px; cursor: row-resize;`
+    : `margin: ${margin}px ${spacing}px; height: calc(100% - ${
+        margin * 2
+      }px); width: ${size}px; min-width: ${size}px; cursor: col-resize;`
 
   function onMouseMove (event: MouseEvent): void {
     let dCoord: number
@@ -100,60 +106,36 @@
   class="splitter"
   class:splitter-statehover={hoverMode}
   style={splitterStyle}
-  on:mousedown={onMouseDown}>
-  <div bind:this={splitterIcon} class="splitIcon" class:rotateSplit={horizontal} on:mousedown={onMouseDown} />
-</div>
+  on:mousedown={onMouseDown} />
 
 <style lang="scss">
+  @import '~@anticrm/sparkling-theme/styles/_global.scss';
+
   .splitter {
     position: relative;
     box-sizing: border-box;
-    background-color: var(--theme-bg-accent-color);
-
+    border-radius: 2px;
+    background-color: transparent;
+  }
+  :global(.theme-dark) .splitter {
     &:hover,
     &-statehover {
-      background-color: var(--theme-bg-accent-hover);
-
-      & > .splitIcon {
-        visibility: visible;
-        background-color: var(--theme-bg-accent-hover);
-      }
+      background-color: $theme-dark-bg-accent-color;
     }
   }
-  .splitIcon {
-    visibility: hidden;
-    position: absolute;
-    user-select: none;
-    top: 50%;
-    left: 50%;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background-color: var(--theme-bg-accent-color);
-    transform: translate(-50%, -50%);
-    z-index: 1005;
-
-    &.rotateSplit {
-      transform-origin: center center;
-      transform: translateY(-50%) rotate(90deg);
+  :global(.theme-grey) .splitter {
+    &:hover,
+    &-statehover {
+      background-color: $theme-grey-bg-accent-color;
     }
   }
-  .splitIcon::after,
-  .splitIcon::before {
-    content: '';
-    position: absolute;
-    width: 0px;
-    height: 0px;
-    border: 4px solid transparent;
+  :global(.theme-light) .splitter {
+    &:hover,
+    &-statehover {
+      background-color: $theme-light-bg-accent-color;
+    }
   }
-  .splitIcon::after {
-    border-left: 4px solid var(--theme-bg-dark-hover);
-    transform: translate(12px, 6px);
-  }
-  .splitIcon::before {
-    border-right: 4px solid var(--theme-bg-dark-hover);
-    transform: translate(0px, 6px);
-  }
+
   .cover {
     visibility: hidden;
     position: fixed;

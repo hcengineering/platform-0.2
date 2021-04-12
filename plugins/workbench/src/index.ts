@@ -64,7 +64,8 @@ export default plugin('workbench' as Plugin<WorkbenchService>, {
     Lock: '' as Asset,
     Sharp: '' as Asset,
     Burger: '' as Asset,
-    ArrowDown: '' as Asset
+    ArrowDown: '' as Asset,
+    ArrowRight: '' as Asset
   },
   component: {
     Workbench: '' as AnyComponent,

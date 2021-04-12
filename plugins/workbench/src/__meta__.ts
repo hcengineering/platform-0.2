@@ -29,7 +29,8 @@ export default (platform: Platform): void => {
     Lock: `${spritesUrl}#lock`,
     Sharp: `${spritesUrl}#sharp`,
     Burger: `${spritesUrl}#burger`,
-    ArrowDown: `${spritesUrl}#arrowDown`
+    ArrowDown: `${spritesUrl}#arrowDown`,
+    ArrowRight: `${spritesUrl}#arrowRight`
   })
 
   platform.setMetadata(routeMeta('workbench'), { route: 'workbench', component: workbench.component.Workbench })

@@ -68,23 +68,22 @@
 </form>
 
 <style lang="scss">
+  @import '~@anticrm/sparkling-theme/styles/_global.scss';
+
   form {
     margin: auto;
     margin-top: 20vh;
     width: 30em;
     padding: 2em;
-    border: 1px solid var(--theme-bg-accent-color);
     border-radius: 1em;
 
     .status {
       margin-top: 0.5em;
     }
-
     .field {
       .editbox {
         width: 100%;
       }
-
       margin: 1em 0;
     }
 
@@ -100,5 +99,14 @@
         }
       }
     }
+  }
+  :global(.theme-dark) form {
+    border: 1px solid $theme-dark-bg-accent-color;
+  }
+  :global(.theme-grey) form {
+    border: 1px solid $theme-grey-bg-accent-color;
+  }
+  :global(.theme-light) form {
+    border: 1px solid $theme-light-bg-accent-color;
   }
 </style>

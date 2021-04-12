@@ -23,6 +23,8 @@
 </div>
 
 <style lang="scss">
+  @import '~@anticrm/sparkling-theme/styles/_global.scss';
+
   .userInfo {
     display: flex;
     flex-direction: row;
@@ -31,21 +33,38 @@
   .avatar {
     width: 32px;
     height: 32px;
-    border: 1px solid var(--theme-content-trans-color);
+    border: 1px solid transparent;
     border-radius: 16px;
   }
+  :global(.theme-dark) .avatar {
+    border-color: $theme-dark-content-trans-color;
+  }
+  :global(.theme-grey) .avatar {
+    border-color: $theme-grey-content-trans-color;
+  }
+  :global(.theme-light) .avatar {
+    border-color: $theme-light-content-trans-color;
+  }
+
   .user {
     padding-left: 1em;
     font-size: 14px;
     font-weight: 500;
     line-height: 18px;
-    color: var(--theme-userlink-color);
-
     & > span {
       display: block;
       font-size: 11px;
       line-height: 14px;
-      color: var(--status-grey-color);
+      color: $theme-status-grey-color;
     }
+  }
+  :global(.theme-dark) .user {
+    color: $theme-dark-userlink-color;
+  }
+  :global(.theme-grey) .user {
+    color: $theme-grey-userlink-color;
+  }
+  :global(.theme-light) .user {
+    color: $theme-light-userlink-color;
   }
 </style>

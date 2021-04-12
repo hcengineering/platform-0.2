@@ -121,12 +121,22 @@
 </MonthCalendar>
 
 <style lang="scss">
+  @import '~@anticrm/sparkling-theme/styles/_global.scss';
+
   .event {
     height: 20px;
     width: 100%;
-    color: var(--theme-content-dark-color);
     background-color: #4396a2;
     text-align: center;
     border-radius: 3px;
+  }
+  :global(.theme-dark) .event {
+    color: $theme-dark-content-dark-color;
+  }
+  :global(.theme-grey) .event {
+    color: $theme-grey-content-dark-color;
+  }
+  :global(.theme-light) .event {
+    color: $theme-light-content-dark-color;
   }
 </style>

@@ -56,36 +56,43 @@
 </div>
 
 <style lang="scss">
+  @import '~@anticrm/sparkling-theme/styles/_global.scss';
+
   .item {
     box-sizing: border-box;
-    font-family: var(--theme-font-content);
-    font-weight: 500;
-    padding: 0.5em;
-    padding-top: calc(0.5em + 1px);
-    margin-bottom: 0.25em;
-    height: 2.5em;
-    color: var(--theme-content-color);
-    background-color: var(--theme-bg-color);
-    cursor: pointer;
-    border-radius: 4px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-
+    margin-bottom: 4px;
+    padding: 6px 16px 6px 24px;
+    height: 36px;
+    border-radius: 8px;
+    cursor: pointer;
     &.selected {
-      font-weight: 700;
-      color: var(--theme-content-dark-color);
-      background-color: var(--theme-bg-accent-color);
-
       &:hover {
         cursor: default;
-        color: var(--theme-content-dark-color);
-        background-color: var(--theme-bg-accent-color);
       }
     }
-
-    &:hover {
-      color: var(--theme-doclink-color);
+  }
+  :global(.theme-dark) .item {
+    color: $theme-dark-content-color;
+    &.selected {
+      color: $theme-dark-caption-color;
+      background-color: $theme-dark-selection-item;
+    }
+  }
+  :global(.theme-grey) .item {
+    color: $theme-grey-content-color;
+    &.selected {
+      color: $theme-grey-caption-color;
+      background-color: $theme-grey-selection-item;
+    }
+  }
+  :global(.theme-light) .item {
+    color: $theme-light-content-color;
+    &.selected {
+      color: $theme-light-caption-color;
+      background-color: $theme-light-selection-item;
     }
   }
 
@@ -98,8 +105,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--white-color);
-    background-color: var(--theme-doclink-color);
+    color: $theme-white-color;
     font-weight: 700;
     font-size: 11px;
     line-height: 11px;
@@ -108,6 +114,15 @@
     margin: 0;
     padding: 0 4px;
     border-radius: 8px;
+  }
+  :global(.theme-dark) .counter {
+    background-color: $theme-dark-doclink-color;
+  }
+  :global(.theme-grey) .counter {
+    background-color: $theme-grey-doclink-color;
+  }
+  :global(.theme-light) .counter {
+    background-color: $theme-light-doclink-color;
   }
 
   .optionsButton {
