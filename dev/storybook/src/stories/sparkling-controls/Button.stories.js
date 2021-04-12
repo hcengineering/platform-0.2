@@ -15,15 +15,6 @@ export default {
     label: { control: 'text' },
     onClick: { action: 'onClick' }
   },
-  parameters: {
-    backgrounds: {
-      values: [
-        { name: 'light', value: '#fff' },
-        { name: 'dark', value: '#1E1E1E' },
-        { name: 'biege', value: '#FDF1E6' }
-      ]
-    }
-  },
   decorators: [(storyFn) => {
     const story = storyFn()
 
