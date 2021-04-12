@@ -84,8 +84,6 @@
 </div>
 
 <style lang="scss">
-  @import '~@anticrm/sparkling-theme/styles/_global.scss';
-
   .presentation-completion-popup {
     position: relative;
     display: flex;
@@ -94,6 +92,10 @@
     height: 150px;
     width: 300px;
     padding: 1em;
+    background-color: var(--theme-bg-color);
+    color: var(--theme-content-color);
+    border: 1px solid var(--theme-bg-dark-color);
+    box-shadow: var(--theme-shadow);
     .item {
       font-size: 15px;
       white-space: no-wrap;
@@ -101,12 +103,17 @@
       padding: 8px;
       border-radius: 4px;
       cursor: pointer;
+      color: var(--theme-content-dark-color);
       transition: background-color 0.2s;
       &.selected {
         position: sticky;
+        background-color: var(--theme-bg-accent-hover);
       }
       &:focus {
         outline: none;
+        border-color: var(--theme-doclink-color);
+        box-shadow: inset 0px 0px 2px 0px var(--theme-doclink-color);
+        color: var(--theme-caption-color);
       }
       &:first-child {
         margin-top: 0;
@@ -117,57 +124,6 @@
     }
     .separator {
       height: 8px;
-    }
-  }
-  :global(.theme-dark) .presentation-completion-popup {
-    background-color: $theme-dark-bg-color;
-    color: $theme-dark-content-color;
-    border: 1px solid $theme-dark-bg-dark-color;
-    box-shadow: $theme-dark-shadow;
-    .item {
-      color: $theme-dark-content-dark-color;
-      &.selected {
-        background-color: $theme-dark-bg-accent-hover;
-      }
-      &:focus {
-        border-color: $theme-dark-doclink-color;
-        box-shadow: inset 0px 0px 2px 0px $theme-dark-doclink-color;
-        color: $theme-dark-caption-color;
-      }
-    }
-  }
-  :global(.theme-grey) .presentation-completion-popup {
-    background-color: $theme-grey-bg-accent-color;
-    color: $theme-grey-content-color;
-    border: 1px solid $theme-grey-bg-dark-color;
-    box-shadow: $theme-grey-shadow;
-    .item {
-      color: $theme-grey-content-dark-color;
-      &.selected {
-        background-color: $theme-grey-bg-accent-hover;
-      }
-      &:focus {
-        border-color: $theme-grey-doclink-color;
-        box-shadow: inset 0px 0px 2px 0px $theme-grey-doclink-color;
-        color: $theme-grey-caption-color;
-      }
-    }
-  }
-  :global(.theme-light) .presentation-completion-popup {
-    background-color: $theme-light-bg-accent-color;
-    color: $theme-light-content-color;
-    border: 1px solid $theme-light-bg-dark-color;
-    box-shadow: $theme-light-shadow;
-    .item {
-      color: $theme-light-content-dark-color;
-      &.selected {
-        background-color: $theme-light-bg-accent-hover;
-      }
-      &:focus {
-        border-color: $theme-light-doclink-color;
-        box-shadow: inset 0px 0px 2px 0px $theme-light-doclink-color;
-        color: $theme-light-caption-color;
-      }
     }
   }
 </style>

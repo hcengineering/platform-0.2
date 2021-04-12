@@ -106,8 +106,6 @@
 </Theme>
 
 <style lang="scss">
-  @import '~@anticrm/sparkling-theme/styles/_global.scss';
-
   $status-bar-height: 20px;
   $pictogram-size: 51px;
 
@@ -120,6 +118,7 @@
     .status-bar {
       height: $status-bar-height;
       line-height: $status-bar-height;
+      border-bottom: 1px solid var(--theme-bg-color);
 
       .container {
         display: flex;
@@ -157,14 +156,5 @@
     .app {
       height: calc(100vh - #{$status-bar-height});
     }
-  }
-  :global(.theme-dark) .status-bar {
-    border-bottom: 1px solid $theme-dark-bg-color;
-  }
-  :global(.theme-grey) .status-bar {
-    border-bottom: 1px solid $theme-grey-bg-color;
-  }
-  :global(.theme-light) .status-bar {
-    border-bottom: 1px solid $theme-light-bg-color;
   }
 </style>

@@ -92,72 +92,34 @@
 {/if}
 
 <style lang="scss">
-  @import '~@anticrm/sparkling-theme/styles/_global.scss';
-
   .card-view {
     max-width: 300px;
     border-radius: 4px;
     display: flex;
     flex-direction: column;
+    background-color: var(--theme-bg-color);
+    border: 1px solid var(--theme-bg-color);
     transition: border-color 0.3s ease-in, box-shadow 0.3s ease-in;
-  }
-  :global(.theme-dark) .card-view {
-    background-color: $theme-dark-bg-color;
-    border: 1px solid $theme-dark-bg-color;
-  }
-  :global(.theme-grey) .card-view {
-    background-color: $theme-grey-bg-color;
-    border: 1px solid $theme-grey-bg-color;
-  }
-  :global(.theme-light) .card-view {
-    background-color: $theme-light-bg-color;
-    border: 1px solid $theme-light-bg-color;
   }
 
   .place-box {
     position: relative;
     border: dashed 1px transparent;
     margin-bottom: 2px;
-  }
-  :global(.theme-dark) .place-box {
-    border-color: $theme-dark-bg-dark-color;
-  }
-  :global(.theme-grey) .place-box {
-    border-color: $theme-grey-bg-dark-color;
-  }
-  :global(.theme-light) .place-box {
-    border-color: $theme-light-bg-dark-color;
+    border-color: var(--theme-bg-dark-color);
   }
 
   .drag {
     position: fixed;
+    border-color: var(--theme-bg-dark-color);
+    box-shadow: var(--theme-shadow);
     z-index: 1000;
-  }
-  :global(.theme-dark) .drag {
-    border-color: $theme-dark-bg-dark-color;
-    box-shadow: $theme-dark-shadow;
-  }
-  :global(.theme-grey) .drag {
-    border-color: $theme-grey-bg-dark-color;
-    box-shadow: $theme-grey-shadow;
-  }
-  :global(.theme-light) .drag {
-    border-color: $theme-light-bg-dark-color;
-    box-shadow: $theme-light-shadow;
   }
 
   .duplicate {
     padding-top: 1em;
     opacity: 0.9;
+    border-color: var(--theme-bg-dark-color);
     z-index: 900;
-  }
-  :global(.theme-dark) .duplicate {
-    border-color: $theme-dark-bg-dark-color;
-  }
-  :global(.theme-grey) .duplicate {
-    border-color: $theme-grey-bg-dark-color;
-  }
-  :global(.theme-light) .duplicate {
-    border-color: $theme-light-bg-dark-color;
   }
 </style>

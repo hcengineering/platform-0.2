@@ -47,8 +47,6 @@
 </div>
 
 <style lang="scss">
-  @import '~@anticrm/sparkling-theme/styles/_global.scss';
-
   .chat-message-item {
     display: flex;
     margin-bottom: 1em;
@@ -58,14 +56,21 @@
       border-radius: 50%;
       width: 32px;
       height: 32px;
+      border: 1px solid var(--theme-bg-dark-color);
+      background-color: var(--theme-white-color);
+      box-shadow: 0 0 0 2px var(--theme-bg-color);
       z-index: 51;
     }
 
     .details {
       padding-left: 1em;
       position: relative;
+      & > b {
+        color: var(--theme-userlink-color);
+      }
       & > span {
         font-size: 11px;
+        color: var(--theme-content-trans-color);
       }
       &::before {
         position: absolute;
@@ -73,61 +78,8 @@
         left: -17px;
         height: calc(100% + 1em);
         width: 1px;
+        background-color: var(--theme-bg-dark-color);
         z-index: 50;
-      }
-    }
-  }
-  :global(.theme-dark) .chat-message-item {
-    .avatar {
-      border: 1px solid $theme-dark-bg-dark-color;
-      background-color: white;
-      box-shadow: 0 0 0 2px $theme-dark-bg-color;
-    }
-    .details {
-      & > b {
-        color: $theme-dark-userlink-color;
-      }
-      & > span {
-        color: $theme-dark-content-trans-color;
-      }
-      &::before {
-        background-color: $theme-dark-bg-dark-color;
-      }
-    }
-  }
-  :global(.theme-grey) .chat-message-item {
-    .avatar {
-      border: 1px solid $theme-grey-bg-dark-color;
-      background-color: white;
-      box-shadow: 0 0 0 2px $theme-grey-bg-color;
-    }
-    .details {
-      & > b {
-        color: $theme-grey-userlink-color;
-      }
-      & > span {
-        color: $theme-grey-content-trans-color;
-      }
-      &::before {
-        background-color: $theme-grey-bg-dark-color;
-      }
-    }
-  }
-  :global(.theme-light) .chat-message-item {
-    .avatar {
-      border: 1px solid $theme-light-bg-dark-color;
-      background-color: white;
-      box-shadow: 0 0 0 2px $theme-light-bg-color;
-    }
-    .details {
-      & > b {
-        color: $theme-light-userlink-color;
-      }
-      & > span {
-        color: $theme-light-content-trans-color;
-      }
-      &::before {
-        background-color: $theme-light-bg-dark-color;
       }
     }
   }

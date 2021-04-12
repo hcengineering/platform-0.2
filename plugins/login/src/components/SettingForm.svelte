@@ -160,8 +160,6 @@
 </form>
 
 <style lang="scss">
-  @import '~@anticrm/sparkling-theme/styles/_global.scss';
-
   img {
     display: block;
     margin-left: auto;
@@ -177,6 +175,7 @@
     width: 30em;
     padding: 1em;
     border-radius: 1em;
+    border: 1px solid var(--theme-bg-accent-color);
     .status {
       margin-top: 0.5em;
     }
@@ -186,14 +185,5 @@
       }
       margin: 1em 0;
     }
-  }
-  :global(.theme-dark) form {
-    border: 1px solid $theme-dark-bg-accent-color;
-  }
-  :global(.theme-grey) form {
-    border: 1px solid $theme-grey-bg-accent-color;
-  }
-  :global(.theme-light) form {
-    border: 1px solid $theme-light-bg-accent-color;
   }
 </style>

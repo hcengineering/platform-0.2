@@ -84,8 +84,6 @@
 </div>
 
 <style lang="scss">
-  @import '~@anticrm/sparkling-theme/styles/_global.scss';
-
   .comboBox {
     position: relative;
     border-radius: 12px;
@@ -94,6 +92,15 @@
     align-items: center;
     justify-content: space-between;
     cursor: pointer;
+    background-color: var(--theme-bg-accent-color);
+    border: solid 1px var(--theme-bg-dark-color);
+    &:hover {
+      background-color: var(--theme-bg-accent-hover);
+      border-color: var(--theme-bg-dark-hover);
+    }
+    &:hover .comboBox-drop {
+      box-shadow: var(--theme-shadow);
+    }
     &-drop {
       position: absolute;
       visibility: hidden;
@@ -102,6 +109,9 @@
       width: calc(100% - 2em);
       border-radius: 4px;
       padding: 1em;
+      background-color: var(--theme-bg-color);
+      border: solid 1px var(--theme-bg-dark-color);
+      box-shadow: var(--theme-shadow);
       z-index: 1000;
       &__items {
         height: 10em;
@@ -111,96 +121,22 @@
         margin: 0;
         padding: 0.5em;
         border-radius: 4px;
-      }
-    }
-  }
-  :global(.theme-dark) .comboBox {
-    background-color: $theme-dark-bg-accent-color;
-    border: solid 1px $theme-dark-bg-dark-color;
-    &:hover {
-      background-color: $theme-dark-bg-accent-hover;
-      border-color: $theme-dark-bg-dark-hover;
-    }
-    &:hover .comboBox-drop {
-      box-shadow: $theme-dark-shadow;
-    }
-    &-drop {
-      background-color: $theme-dark-bg-color;
-      border: solid 1px $theme-dark-bg-dark-color;
-      box-shadow: $theme-dark-shadow;
-      &__item:hover {
-        background-color: $theme-dark-bg-accent-hover;
-      }
-      .selected {
-        background-color: $theme-dark-bg-accent-hover;
         &:hover {
-          background-color: $theme-dark-bg-accent-hover;
+          background-color: var(--theme-bg-accent-hover);
         }
       }
-    }
-  }
-  :global(.theme-grey) .comboBox {
-    background-color: $theme-grey-bg-accent-color;
-    border: solid 1px $theme-grey-bg-dark-color;
-    &:hover {
-      background-color: $theme-grey-bg-accent-hover;
-      border-color: $theme-grey-bg-dark-hover;
-    }
-    &:hover .comboBox-drop {
-      box-shadow: $theme-grey-shadow;
-    }
-    &-drop {
-      background-color: $theme-grey-bg-color;
-      border: solid 1px $theme-grey-bg-dark-color;
-      box-shadow: $theme-grey-shadow;
-      &__item:hover {
-        background-color: $theme-grey-bg-accent-hover;
-      }
       .selected {
-        background-color: $theme-grey-bg-accent-hover;
+        background-color: var(--theme-bg-accent-hover);
         &:hover {
-          background-color: $theme-grey-bg-accent-hover;
-        }
-      }
-    }
-  }
-  :global(.theme-light) .comboBox {
-    background-color: $theme-light-bg-accent-color;
-    border: solid 1px $theme-light-bg-dark-color;
-    &:hover {
-      background-color: $theme-light-bg-accent-hover;
-      border-color: $theme-light-bg-dark-hover;
-    }
-    &:hover .comboBox-drop {
-      box-shadow: $theme-light-shadow;
-    }
-    &-drop {
-      background-color: $theme-light-bg-color;
-      border: solid 1px $theme-light-bg-dark-color;
-      box-shadow: $theme-light-shadow;
-      &__item:hover {
-        background-color: $theme-light-bg-accent-hover;
-      }
-      .selected {
-        background-color: $theme-light-bg-accent-hover;
-        &:hover {
-          background-color: $theme-light-bg-accent-hover;
+          background-color: var(--theme-bg-accent-hover);
         }
       }
     }
   }
 
-  :global(.theme-dark) .selectedCombo {
-    background-color: $theme-dark-bg-accent-hover;
-    border-color: $theme-dark-bg-dark-hover;
-  }
-  :global(.theme-grey) .selectedCombo {
-    background-color: $theme-grey-bg-accent-hover;
-    border-color: $theme-grey-bg-dark-hover;
-  }
-  :global(.theme-light) .selectedCombo {
-    background-color: $theme-light-bg-accent-hover;
-    border-color: $theme-light-bg-dark-hover;
+  .selectedCombo {
+    background-color: var(--theme-bg-accent-hover);
+    border-color: var(--theme-bg-dark-hover);
   }
 
   .arrowDown {
@@ -215,6 +151,7 @@
       width: 1px;
       height: 6px;
       top: 50%;
+      background-color: var(--theme-content-color);
     }
     &::after {
       left: calc(50% + 2px);
@@ -224,17 +161,5 @@
       left: calc(50% - 2px);
       transform: translateY(-50%) rotate(-45deg);
     }
-  }
-  :global(.theme-dark) .arrowDown::after,
-  :global(.theme-dark) .arrowDown::before {
-    background-color: $theme-dark-content-color;
-  }
-  :global(.theme-grey) .arrowDown::after,
-  :global(.theme-grey) .arrowDown::before {
-    background-color: $theme-grey-content-color;
-  }
-  :global(.theme-light) .arrowDown::after,
-  :global(.theme-light) .arrowDown::before {
-    background-color: $theme-light-content-color;
   }
 </style>
