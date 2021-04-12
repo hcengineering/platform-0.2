@@ -407,13 +407,6 @@
     color: $theme-light-caption-color;
   }
 
-  .mini {
-    box-sizing: border-box;
-    width: 60px;
-    min-width: 60px;
-    max-width: 60px;
-  }
-
   .arrowDown {
     position: relative;
     width: 8px;

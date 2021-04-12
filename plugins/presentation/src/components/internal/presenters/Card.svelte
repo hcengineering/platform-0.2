@@ -6,7 +6,7 @@
   import type { Task } from '@anticrm/task'
   import { Doc } from '@anticrm/core'
   import { AnyComponent } from '@anticrm/platform-ui'
-  import Component from '../../../../../platform-ui/src/components/Component.svelte'
+  import Component from '@anticrm/platform-ui/src/components/Component.svelte'
 
   export let doc: Doc
   export let duplicate = false
@@ -116,15 +116,17 @@
 
   .place-box {
     position: relative;
+    border: dashed 1px transparent;
+    margin-bottom: 2px;
   }
   :global(.theme-dark) .place-box {
-    border: 1px dashed $theme-dark-bg-dark-color;
+    border-color: $theme-dark-bg-dark-color;
   }
   :global(.theme-grey) .place-box {
-    border: 1px dashed $theme-grey-bg-dark-color;
+    border-color: $theme-grey-bg-dark-color;
   }
   :global(.theme-light) .place-box {
-    border: 1px dashed $theme-light-bg-dark-color;
+    border-color: $theme-light-bg-dark-color;
   }
 
   .drag {

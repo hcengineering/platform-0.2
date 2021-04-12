@@ -88,7 +88,7 @@
     text-align: center;
     font-weight: 500;
     border-radius: 4px;
-    color: var(--status-maroon-color);
+    color: $theme-status-maroon-color;
   }
   :global(.theme-dark) .error {
     background-color: $theme-dark-bg-accent-color;
