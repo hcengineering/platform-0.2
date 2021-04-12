@@ -16,24 +16,24 @@
 import { Metadata, Platform, Plugin, plugin, Resource, Service } from '@anticrm/plugin'
 import { getContext } from 'svelte'
 
-export type URL = string;
-export type Asset = Metadata<URL>;
+export type URL = string
+export type Asset = Metadata<URL>
 
 /**
  * Describe a browser URI location parsed to path, query and fragment.
  */
- export interface Location {
-  path: string[]; // A useful path value
-  query: Record<string, string | null>; // a value of query parameters, no duplication are supported
-  fragment: string; // a value of fragment
+export interface Location {
+  path: string[] // A useful path value
+  query: Record<string, string | null> // a value of query parameters, no duplication are supported
+  fragment: string // a value of fragment
 }
 
 /**
  * Define a useful route to applications.
  */
 export interface ApplicationRoute {
-  route: string;
-  component: AnyComponent;
+  route: string
+  component: AnyComponent
 }
 
 export function routeMeta (name: string): Metadata<ApplicationRoute> {
@@ -47,89 +47,89 @@ export interface ApplicationRouter<T> {
   /**
    * Return parent router if defined.
    */
-  parent(): ApplicationRouter<any> | undefined;
+  parent: () => ApplicationRouter<any> | undefined
 
   /**
    * Construct a child router based on current matched state
    * Internal child router is just one, and calling twice will replace existing.
    */
-  newRouter<P>(pattern: string): ApplicationRouter<P>;
+  newRouter: <P>(pattern: string) => ApplicationRouter<P>
 
   /**
    * Will check and match path for registered local routes, if no local routes are match will return false
    */
-  match(): boolean;
+  match: () => boolean
 
   /**
    * Return current matched set.
    */
-  properties(): T;
+  properties: () => T
 
   /**
    * Replace defaults passed with constructor, will call matcher function passed with constructor.
    * @param defaults - a new defaults
    */
-  setDefaults(defaults: T): void;
+  setDefaults: (defaults: T) => void
 
   /**
    * Replace a matcher function passed with constructor.
    * @param matcher
    */
-  subscribe(matcher: (match: T) => void): void;
+  subscribe: (matcher: (match: T) => void) => void
 
   // Construct a new navigate using combined query parameters
-  queries(vars: Partial<T>): Record<string, any> | undefined;
+  queries: (vars: Partial<T>) => Record<string, any> | undefined
   // Construct a current path with all applied variables
-  path(vars: Partial<T>): string[];
+  path: (vars: Partial<T>) => string[]
   // Construct a current fragment with app applied variables
-  fragment(vars: Partial<T>): string | undefined;
+  fragment: (vars: Partial<T>) => string | undefined
 
   /**
    * Construct a full new location based on values of T.
    * Other values will be taken from stored parent and child routers.
    * @param values
    */
-  location(values: Partial<T>): Location;
+  location: (values: Partial<T>) => Location
 
   /**
    * Use new constructed location value and platform UI to navigate.
    * @param values
    */
-  navigate(values: Partial<T>): void;
+  navigate: (values: Partial<T>) => void
 }
 
 interface ComponentOptions<Props> {
-  target: HTMLElement;
-  anchor?: HTMLElement;
-  props?: Props;
-  hydrate?: boolean;
-  intro?: boolean;
+  target: HTMLElement
+  anchor?: HTMLElement
+  props?: Props
+  hydrate?: boolean
+  intro?: boolean
 }
 
 export interface SvelteComponent<Props> {
-  new (options: ComponentOptions<Props>): any;
+  new (options: ComponentOptions<Props>): any
 
   // eslint-disable-next-line @typescript-eslint/ban-types
-  $set: (props: {}) => any;
-  $on: (event: string, callback: (event: CustomEvent) => any) => any;
-  $destroy: () => any;
+  $set: (props: {}) => any
+  $on: (event: string, callback: (event: CustomEvent) => any) => any
+  $destroy: () => any
   // eslint-disable-next-line @typescript-eslint/ban-types
   render: (props?: {}) => {
-    html: string;
-    css: { code: string; map?: string };
-    head?: string;
-  };
+    html: string
+    css: { code: string, map?: string }
+    head?: string
+  }
 }
 
-export type AnySvelteComponent = any; // SvelteComponent<{}>
+export type AnySvelteComponent = any // SvelteComponent<{}>
 
-export type Component<C extends AnySvelteComponent> = Resource<C>;
-export type AnyComponent = Component<AnySvelteComponent>;
+export type Component<C extends AnySvelteComponent> = Resource<C>
+export type AnyComponent = Component<AnySvelteComponent>
 
 export const CONTEXT_PLATFORM = 'platform'
 export const CONTEXT_PLATFORM_UI = 'platform-ui'
 
-export interface Document {}
+export interface Document {} // eslint-disable-line @typescript-eslint/no-empty-interface
 
 /**
  * Allow to control currently selected document.
@@ -138,16 +138,16 @@ export interface DocumentProvider {
   /**
    * Opening a document
    * */
-  open(doc: Document): Promise<void>;
+  open: (doc: Document) => Promise<void>
 
   /**
    * Return currently selected document, if one.
    */
-  selection(): Document | undefined;
+  selection: () => Document | undefined
 }
 
 export interface UIService extends Service, DocumentProvider {
-  createApp(root: HTMLElement): any;
+  createApp: (root: HTMLElement) => any
 
   /**
    * Ask UI service to subscribe for browser location changes.
@@ -155,7 +155,7 @@ export interface UIService extends Service, DocumentProvider {
    * @param listener - listener to be notified on location changes, will be triggered for first time on subscribe.
    * @param destroyFactory - a factory to register unsubscribe function to.
    */
-  subscribeLocation(listener: (location: Location) => void, destroyFactory: (op: () => void) => void): void;
+  subscribeLocation: (listener: (location: Location) => void, destroyFactory: (op: () => void) => void) => void
 
   /**
    * Will join a current location with a path, query values or fragment
@@ -163,17 +163,17 @@ export interface UIService extends Service, DocumentProvider {
    * @param query
    * @param fragment
    */
-  navigateJoin(
+  navigateJoin: (
     path: string[] | undefined,
     query: Record<string, string> | undefined,
     fragment: string | undefined
-  ): void;
+  ) => void
 
   /**
    * Navigate to new URL
    * @param newUrl
    */
-  navigate(newUrl: string): void;
+  navigate: (newUrl: string) => void
 
   /**
    * Construct a new router to perform operations in component.
@@ -181,26 +181,26 @@ export interface UIService extends Service, DocumentProvider {
    * @param matcher
    * @param defaults
    */
-  newRouter<T>(pattern: string, matcher: (match: T) => void, defaults: T | undefined): ApplicationRouter<T>;
+  newRouter: <T>(pattern: string, matcher: (match: T) => void, defaults: T | undefined) => ApplicationRouter<T>
 
-  showModal(component: AnySvelteComponent, props: any, element?: HTMLElement): void;
-  closeModal(): void;
+  showModal: (component: AnySvelteComponent, props: any, element?: HTMLElement) => void
+  closeModal: () => void
 
   /**
    * Register active document provider.
    * @param provider
    */
-  registerDocumentProvider(provider: DocumentProvider | undefined): void;
+  registerDocumentProvider: (provider: DocumentProvider | undefined) => void
 }
 
 /**
  * Useful interface to provide action operations.
  */
 export interface Action {
-  name: string; // A name to be displayed
-  icon?: Asset; // An optional icon to be displayed
-  action?: () => void; // Action to be performed on click
-  toggled?: boolean; // If passed action item will looks like it is toggled
+  name: string // A name to be displayed
+  icon?: Asset // An optional icon to be displayed
+  action?: () => void // Action to be performed on click
+  toggled?: boolean // If passed action item will looks like it is toggled
 }
 
 export default plugin(
@@ -237,11 +237,11 @@ export default plugin(
 // U T I L S
 
 export function getPlatform (): Platform {
-  return getContext(CONTEXT_PLATFORM) as Platform
+  return getContext(CONTEXT_PLATFORM)
 }
 
 export function getUIService (): UIService {
-  return getContext(CONTEXT_PLATFORM_UI) as UIService
+  return getContext(CONTEXT_PLATFORM_UI)
 }
 
 export function newRouter<T> (
