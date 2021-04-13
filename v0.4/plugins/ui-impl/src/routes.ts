@@ -157,7 +157,7 @@ export class Router<T> implements ApplicationRouter<T> {
     const oldVars = this.variables
     this.matched = this.doMatch()
     this.chainUpdate()
-    if ((this.matcher != null) && (!deepEqual(oldVars, this.variables) || forceUpdate)) {
+    if (this.matcher != null && (!deepEqual(oldVars, this.variables) || forceUpdate)) {
       this.matcher(this.variables as T)
     }
   }
@@ -168,7 +168,7 @@ export class Router<T> implements ApplicationRouter<T> {
 
   doMatch (): boolean {
     // Use defaults as initial values.
-    this.variables = (this.defaults != null) ? { ...this.defaults } : {}
+    this.variables = this.defaults != null ? { ...this.defaults } : {}
 
     // Perform matching of current location with extraction of variables and constructing childLocation.
     if (this.rawLocation != null) {
@@ -401,7 +401,7 @@ export class Router<T> implements ApplicationRouter<T> {
   }
 
   private chainUpdate (): void {
-    if (this.matched && (this.childRouter != null) && (this.childLocation != null)) {
+    if (this.matched && this.childRouter != null && this.childLocation != null) {
       this.childRouter.update(this.childLocation)
     }
   }
