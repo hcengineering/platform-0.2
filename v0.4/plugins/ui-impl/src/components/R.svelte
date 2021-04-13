@@ -24,9 +24,7 @@
 </script>
 
 <Theme>
-  <h1>Hello, world!</h1>
 </Theme>
-
 
 <style lang="scss">
 

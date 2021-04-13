@@ -33,8 +33,6 @@
   })
 </script>
 
-<h1>THIS IS THEME</h1>
-
 <slot>
   <!-- content will go here -->
 </slot>
