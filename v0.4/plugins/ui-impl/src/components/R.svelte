@@ -30,6 +30,6 @@
 
 <style lang="scss">
 
-h1 { font-size: 96px }
+// h1 { font-size: 96px }
 
 </style>

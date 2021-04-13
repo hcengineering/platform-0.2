@@ -18,12 +18,14 @@ dependencies:
   css-loader: 5.2.1_webpack@5.32.0
   dotenv-webpack: 7.0.2_webpack@5.32.0
   fast-equals: 2.0.1
+  file-loader: 6.2.0_webpack@5.32.0
   jest: 26.6.3
   mini-css-extract-plugin: 1.4.1_webpack@5.32.0
   postcss-loader: 5.2.0_webpack@5.32.0
   prettier: 2.2.1
   sass: 1.32.8
   sass-loader: 11.0.1_sass@1.32.8+webpack@5.32.0
+  style-loader: 2.0.0_webpack@5.32.0
   svelte: 3.37.0
   svelte-loader: 3.1.0_svelte@3.37.0
   svelte-preprocess: 4.7.0_c14a09b624e11ca3eaa9db430b53f206
@@ -3712,6 +3714,18 @@ packages:
       node: ^10.12.0 || >=12.0.0
     resolution:
       integrity: sha512-7Gps/XWymbLk2QLYK4NzpMOrYjMhdIxXuIvy2QBsLE6ljuodKvdkWs/cpyJJ3CVIVpH0Oi1Hvg1ovbMzLdFBBg==
+  /file-loader/6.2.0_webpack@5.32.0:
+    dependencies:
+      loader-utils: 2.0.0
+      schema-utils: 3.0.0
+      webpack: 5.32.0_webpack-cli@4.6.0
+    dev: false
+    engines:
+      node: '>= 10.13.0'
+    peerDependencies:
+      webpack: ^4.0.0 || ^5.0.0
+    resolution:
+      integrity: sha512-qo3glqyTa61Ytg4u73GultjHGjdRyig3tG6lPtyX/jOEJvHif9uB0/OCI2Kif6ctF3caQTW2G5gym21oAsI4pw==
   /file-uri-to-path/1.0.0:
     dev: false
     optional: true
@@ -7493,6 +7507,18 @@ packages:
       node: '>=8'
     resolution:
       integrity: sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig==
+  /style-loader/2.0.0_webpack@5.32.0:
+    dependencies:
+      loader-utils: 2.0.0
+      schema-utils: 3.0.0
+      webpack: 5.32.0_webpack-cli@4.6.0
+    dev: false
+    engines:
+      node: '>= 10.13.0'
+    peerDependencies:
+      webpack: ^4.0.0 || ^5.0.0
+    resolution:
+      integrity: sha512-Z0gYUJmzZ6ZdRUqpg1r8GsaFKypE+3xAzuFeMuoHgjc9KZv3wMyCRjQIWEbhoFSq7+7yoHXySDJyyWQaPajeiQ==
   /supports-color/5.5.0:
     dependencies:
       has-flag: 3.0.0
@@ -8615,7 +8641,9 @@ packages:
       cross-env: 7.0.3
       css-loader: 5.2.1_webpack@5.32.0
       dotenv-webpack: 7.0.2_webpack@5.32.0
+      file-loader: 6.2.0_webpack@5.32.0
       mini-css-extract-plugin: 1.4.1_webpack@5.32.0
+      style-loader: 2.0.0_webpack@5.32.0
       svelte: 3.37.0
       svelte-loader: 3.1.0_svelte@3.37.0
       ts-loader: 8.1.0_typescript@4.2.4+webpack@5.32.0
@@ -8628,7 +8656,7 @@ packages:
     peerDependencies:
       typescript: '*'
     resolution:
-      integrity: sha512-mfec9x3EclNl2ADtV4A/y9F9yXDVyXaqTjLD9GnNXaPOE6IcPFnZje23vsB9GmlBlJuuFbuM2EeBwkMvelnh+Q==
+      integrity: sha512-Y3bFCTgCPTP00ws0TCBn0rEBUs0oCqewX1IOWk6t/ioyiNspAlZSN6G4lQdjaXxh+09Ocy6umq2JkNKbUqAh4w==
       tarball: file:projects/prody.tgz
     version: 0.0.0
   file:projects/sparkling-theme.tgz_b31b4f216686bfdf247685a5352fcc97:
@@ -8688,12 +8716,14 @@ specifiers:
   css-loader: ~5.2.1
   dotenv-webpack: ~7.0.2
   fast-equals: ~2.0.1
+  file-loader: ~6.2.0
   jest: ~26.6.3
   mini-css-extract-plugin: ~1.4.1
   postcss-loader: ~5.2.0
   prettier: ~2.2.1
   sass: ~1.32.8
   sass-loader: ~11.0.1
+  style-loader: ~2.0.0
   svelte: ~3.37.0
   svelte-loader: ~3.1.0
   svelte-preprocess: ^4.6.9

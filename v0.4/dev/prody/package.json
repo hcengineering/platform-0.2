@@ -20,7 +20,9 @@
     "ts-loader": "~8.1.0",
     "svelte-loader": "~3.1.0",
     "css-loader": "~5.2.1",
-    "webpack-dev-server": "~3.11.2"
+    "webpack-dev-server": "~3.11.2",
+    "style-loader": "~2.0.0",
+    "file-loader": "~6.2.0"
   },
   "dependencies": {
     "@anticrm/plugin-ui": "~0.2.0",
