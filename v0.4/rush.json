@@ -385,8 +385,8 @@
       "projectFolder": "plugins/ui-impl"
     },
     {
-      "packageName": "prody",
-      "projectFolder": "dev/prody"
+      "packageName": "prod",
+      "projectFolder": "dev/prod"
     }
     // {
     //   "packageName": "prodx",
