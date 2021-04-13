@@ -25,7 +25,9 @@
     "prettier": "~2.2.1",
     "@types/node": "~14.14.37",
     "@babel/runtime": "~7.13.10",
-    "core-js": "~3.10.1"
+    "core-js": "~3.10.1",
+    "sass": "~1.32.8",
+    "svelte-loader": "~3.1.0"
   },
   "dependencies": {
     "@anticrm/plugin": "~0.2.0",

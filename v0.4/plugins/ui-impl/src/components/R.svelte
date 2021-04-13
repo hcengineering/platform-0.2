@@ -26,3 +26,10 @@
 <Theme>
   <h1>Hello, world!</h1>
 </Theme>
+
+
+<style lang="scss">
+
+h1 { font-size: 96px }
+
+</style>

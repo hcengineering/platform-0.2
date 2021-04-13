@@ -93,11 +93,11 @@ const config: any = {
 						preprocess: SveltePreprocess({
 							scss: true,
 							sass: true,
-							postcss: {
-								plugins: [
-									Autoprefixer
-								]
-							}
+							// postcss: {
+							// 	plugins: [
+							// 		Autoprefixer
+							// 	]
+							// }
 						})
 					}
 				}
@@ -120,16 +120,16 @@ const config: any = {
 						loader: MiniCssExtractPlugin.loader
 					},
 					'css-loader',
-					{
-						loader: 'postcss-loader',
-						options: {
-							postcssOptions: {
-								plugins: [
-									Autoprefixer
-								]
-							}
-						}
-					},
+					// {
+					// 	loader: 'postcss-loader',
+					// 	options: {
+					// 		postcssOptions: {
+					// 			plugins: [
+					// 				Autoprefixer
+					// 			]
+					// 		}
+					// 	}
+					// },
 					'sass-loader'
 				]
 			},

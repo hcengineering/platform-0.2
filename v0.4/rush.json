@@ -383,11 +383,11 @@
     {
       "packageName": "prod",
       "projectFolder": "dev/prod"
-    },
-    {
-      "packageName": "prodx",
-      "projectFolder": "dev/prodx"
     }
+    // {
+    //   "packageName": "prodx",
+    //   "projectFolder": "dev/prodx"
+    // }
     // {
     //   /**
     //    * The NPM package name of the project (must match package.json)
