@@ -13,4 +13,12 @@
 // limitations under the License.
 -->
 
-<h1>Hello, world!</h1>
+<script language="ts">
+
+import { Theme } from '@anticrm/sparkling-theme'
+
+</script>
+
+<Theme>
+  <h1>Hello, world!</h1>
+</Theme>

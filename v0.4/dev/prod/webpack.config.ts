@@ -150,6 +150,16 @@ const config: any = {
 				test: /\.ts$/,
 				use: 'ts-loader',
 				exclude: /node_modules/
+			},
+
+			// Rule: fonts
+			{
+				test: /\.(ttf|otf|woff|woff2)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+        use: [
+          {
+            loader: 'file-loader'
+          }
+        ]
 			}
 		]
 	},

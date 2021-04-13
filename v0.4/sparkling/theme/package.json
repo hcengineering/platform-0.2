@@ -16,9 +16,10 @@
     "ts-standard": "~10.0.0",
     "prettier": "~2.2.1",
     "sass": "~1.32.8",
-    "svelte-preprocess": "^4.6.9"
+    "svelte-preprocess": "^4.6.9",
+    "core-js": "~3.10.1",
+    "@babel/runtime": "~7.13.10",
+    "svelte-loader": "~3.1.0"
   },
-  "dependencies": {
-    "svelte": "~3.37.0"
-  }
+  "dependencies": {}
 }

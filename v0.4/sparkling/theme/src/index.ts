@@ -13,4 +13,4 @@
 // limitations under the License.
 //
 
-export const x = 42
+export { default as Theme } from './Theme.svelte'

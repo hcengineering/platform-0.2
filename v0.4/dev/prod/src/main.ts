@@ -20,6 +20,7 @@ import ui from '@anticrm/plugin-ui'
 // import login, { currentAccount } from '@anticrm/login'
 
 import ErrorPage from './components/ErrorPage.svelte'
+import App from './components/App.svelte'
 
 // const accountsUrl = process.env.APP_ACCOUNTS_URL
 // const host = process.env.APP_WSHOST
@@ -35,11 +36,13 @@ import ErrorPage from './components/ErrorPage.svelte'
 //   platform.setMetadata(core.metadata.Token, loginInfo.token)
 // }
 
-async function boot (): Promise<void> {
-  const uiService = await platform.getPlugin(ui.id)
-  uiService.createApp(document.body)
-}
+// async function boot (): Promise<void> {
+//   const uiService = await platform.getPlugin(ui.id)
+//   uiService.createApp(document.body)
+// }
 
-boot().catch(err => {
-  new ErrorPage({ target: document.body, props: { error: 'err.message' } }) // eslint-disable-line no-new
-})
+// boot().catch(err => {
+//   new App({ target: document.body, props: { error: 'err.message' } }) // eslint-disable-line no-new
+// })
+
+new App({ target: document.body, props: {} }) // eslint-disable-line no-new

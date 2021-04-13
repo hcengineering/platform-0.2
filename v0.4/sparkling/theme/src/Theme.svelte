@@ -18,18 +18,18 @@
 
   const current = 'theme-dark'
 
-  setContext('theme', {
-    setTheme: (name: string) => {
-      setRootColors(name)
-    }
-  })
-
   const setRootColors = (theme: string) => {
     document.body.setAttribute('class', theme)
   }
 
+  // setContext('theme', {
+  //   setTheme: (name: string) => {
+  //     setRootColors(name)
+  //   }
+  // })
+
   onMount(() => {
-    setRootColors(current)
+    // setRootColors(current)
   })
 </script>
 
@@ -85,8 +85,8 @@
     font-style: normal;
     font-weight: 400;
     src: local('IBM Plex Sans'), local('IBMPlexSans'),
-      url('~@anticrm/sparkling-theme/fonts/complete/woff2/IBMPlexSans-Regular.woff2') format('woff2'),
-      url('~@anticrm/sparkling-theme/fonts/complete/woff/IBMPlexSans-Regular.woff') format('woff');
+      url('../fonts/complete/woff2/IBMPlexSans-Regular.woff2') format('woff2'),
+      url('../fonts/complete/woff/IBMPlexSans-Regular.woff') format('woff');
   }
 
   @font-face {
@@ -94,8 +94,8 @@
     font-style: normal;
     font-weight: 500;
     src: local('IBM Plex Sans Medium'), local('IBMPlexSans-Medium'),
-      url('~@anticrm/sparkling-theme/fonts/complete/woff2/IBMPlexSans-Medium.woff2') format('woff2'),
-      url('~@anticrm/sparkling-theme/fonts/complete/woff/IBMPlexSans-Medium.woff') format('woff');
+      url('../fonts/complete/woff2/IBMPlexSans-Medium.woff2') format('woff2'),
+      url('../fonts/complete/woff/IBMPlexSans-Medium.woff') format('woff');
   }
 
   @font-face {
@@ -103,22 +103,22 @@
     font-style: normal;
     font-weight: 700;
     src: local('IBM Plex Sans Bold'), local('IBMPlexSans-Bold'),
-      url('~@anticrm/sparkling-theme/fonts/complete/woff2/IBMPlexSans-Bold.woff2') format('woff2'),
-      url('~@anticrm/sparkling-theme/fonts/complete/woff/IBMPlexSans-Bold.woff') format('woff');
+      url('../fonts/complete/woff2/IBMPlexSans-Bold.woff2') format('woff2'),
+      url('../fonts/complete/woff/IBMPlexSans-Bold.woff') format('woff');
   }
 
   @font-face {
     font-family: 'Raleway';
     font-style: normal;
     font-weight: 400;
-    src: local('Raleway'), url('~@anticrm/sparkling-theme/fonts/complete/otf/Raleway-Regular.otf');
+    src: local('Raleway'), url('../fonts/complete/otf/Raleway-Regular.otf');
   }
 
   @font-face {
     font-family: 'Raleway';
     font-style: normal;
     font-weight: 700;
-    src: local('Raleway Bold'), url('~@anticrm/sparkling-theme/fonts/complete/otf/Raleway-Bold.otf');
+    src: local('Raleway Bold'), url('../fonts/complete/otf/Raleway-Bold.otf');
   }
 
   .editbox {
