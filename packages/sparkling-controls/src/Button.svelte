@@ -21,8 +21,6 @@
 </button>
 
 <style lang="scss">
-  @import '~@anticrm/sparkling-theme/styles/_global.scss';
-
   .button {
     display: inline-block;
     height: auto;
@@ -34,36 +32,16 @@
     font: inherit;
     font-weight: 500;
     font-size: 14px;
+    color: var(--theme-content-color);
+    background-color: var(--theme-bg-accent-color);
+    border-color: var(--theme-bg-accent-color);
     transition: border-color 0.2s, color 0.2s, background-color 0.2s;
     &:focus {
       outline: none;
     }
-  }
-  :global(.theme-dark) .button {
-    color: $theme-dark-content-color;
-    background-color: $theme-dark-bg-accent-color;
-    border-color: $theme-dark-bg-accent-color;
     &:hover {
-      background-color: $theme-dark-bg-accent-hover;
-      color: $theme-dark-content-dark-color;
-    }
-  }
-  :global(.theme-grey) .button {
-    color: $theme-grey-content-color;
-    background-color: $theme-grey-bg-accent-color;
-    border-color: $theme-grey-bg-accent-color;
-    &:hover {
-      background-color: $theme-grey-bg-accent-hover;
-      color: $theme-grey-content-dark-color;
-    }
-  }
-  :global(.theme-light) .button {
-    color: $theme-light-content-color;
-    background-color: $theme-light-bg-accent-color;
-    border-color: $theme-light-bg-accent-color;
-    &:hover {
-      background-color: $theme-light-bg-accent-hover;
-      color: $theme-light-content-dark-color;
+      background-color: var(--theme-bg-accent-hover);
+      color: var(--theme-content-dark-color);
     }
   }
 
@@ -77,66 +55,26 @@
     padding: 0 4px;
   }
 
-  :global(.theme-dark) .primary {
-    background-color: $theme-dark-content-color;
-    border-color: $theme-dark-content-color;
-    color: $theme-dark-bg-color;
+  .primary {
+    background-color: var(--theme-content-color);
+    border-color: var(--theme-content-color);
+    color: var(--theme-bg-color);
     &:hover {
-      background-color: $theme-dark-content-dark-color;
-      border-color: $theme-dark-content-dark-color;
-      color: $theme-dark-bg-color;
-    }
-  }
-  :global(.theme-grey) .primary {
-    background-color: $theme-grey-content-color;
-    border-color: $theme-grey-content-color;
-    color: $theme-grey-bg-color;
-    &:hover {
-      background-color: $theme-grey-content-dark-color;
-      border-color: $theme-grey-content-dark-color;
-      color: $theme-grey-bg-color;
-    }
-  }
-  :global(.theme-dark) .primary {
-    background-color: $theme-dark-content-color;
-    border-color: $theme-dark-content-color;
-    color: $theme-dark-bg-color;
-    &:hover {
-      background-color: $theme-dark-content-dark-color;
-      border-color: $theme-dark-content-dark-color;
-      color: $theme-light-bg-color;
+      background-color: var(--theme-content-dark-color);
+      border-color: var(--theme-content-dark-color);
+      color: var(--theme-bg-color);
     }
   }
 
   .icon {
     padding: 14px 28px;
     border-radius: 8px;
-  }
-  :global(.theme-dark) .icon {
-    color: $theme-dark-content-color;
-    background-color: $theme-dark-bg-accent-color;
-    border: solid 1px $theme-dark-bg-accent-color;
+    color: var(--theme-content-color);
+    background-color: var(--theme-bg-accent-color);
+    border: solid 1px var(--theme-bg-accent-color);
     &:hover {
-      color: $theme-dark-caption-color;
-      border-color: $theme-dark-bg-dark-hover;
-    }
-  }
-  :global(.theme-grey) .icon {
-    color: $theme-grey-content-color;
-    background-color: $theme-grey-bg-accent-color;
-    border: solid 1px $theme-grey-bg-accent-color;
-    &:hover {
-      color: $theme-grey-caption-color;
-      border-color: $theme-grey-bg-dark-hover;
-    }
-  }
-  :global(.theme-light) .icon {
-    color: $theme-light-content-color;
-    background-color: $theme-light-bg-accent-color;
-    border: solid 1px $theme-light-bg-accent-color;
-    &:hover {
-      color: $theme-light-caption-color;
-      border-color: $theme-light-bg-dark-hover;
+      color: var(--theme-caption-color);
+      border-color: var(--theme-bg-dark-hover);
     }
   }
 
@@ -151,31 +89,13 @@
     flex-wrap: nowrap;
     padding: 0;
     margin: 0;
+    color: var(--theme-content-color);
+    background-color: transparent;
     &:focus {
       outline: none;
     }
-  }
-  :global(.theme-dark) .transparent {
-    color: $theme-dark-content-color;
-    background-color: transparent;
     &:hover {
-      color: $theme-dark-caption-color;
-      background-color: transparent;
-    }
-  }
-  :global(.theme-grey) .transparent {
-    color: $theme-grey-content-color;
-    background-color: transparent;
-    &:hover {
-      color: $theme-grey-caption-color;
-      background-color: transparent;
-    }
-  }
-  :global(.theme-light) .transparent {
-    color: $theme-light-content-color;
-    background-color: transparent;
-    &:hover {
-      color: $theme-light-caption-color;
+      color: var(--theme-caption-color);
       background-color: transparent;
     }
   }

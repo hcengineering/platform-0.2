@@ -11,8 +11,6 @@
 {/if}
 
 <style lang="scss">
-  @import '~@anticrm/sparkling-theme/styles/_global.scss';
-
   .popup-item-view {
     margin: 4px 0;
     padding: 8px;
@@ -21,39 +19,15 @@
     border: none;
     text-align: left;
     cursor: pointer;
-  }
-  :global(.theme-dark) .popup-item-view {
-    color: $theme-dark-content-color;
-    background-color: $theme-dark-bg-color;
+    color: var(--theme-content-color);
+    background-color: var(--theme-bg-color);
     &:hover {
-      background-color: $theme-dark-bg-accent-color;
-    }
-  }
-  :global(.theme-grey) .popup-item-view {
-    color: $theme-grey-content-color;
-    background-color: $theme-grey-bg-color;
-    &:hover {
-      background-color: $theme-grey-bg-accent-color;
-    }
-  }
-  :global(.theme-light) .popup-item-view {
-    color: $theme-light-content-color;
-    background-color: $theme-light-bg-color;
-    &:hover {
-      background-color: $theme-light-bg-accent-color;
+      background-color: var(--theme-bg-accent-color);
     }
   }
 
   .popup-separator {
     height: 1px;
-  }
-  :global(.theme-dark) .popup-separator {
-    background-color: $theme-dark-bg-accent-color;
-  }
-  :global(.theme-grey) .popup-separator {
-    background-color: $theme-grey-bg-accent-color;
-  }
-  :global(.theme-light) .popup-separator {
-    background-color: $theme-light-bg-accent-color;
+    background-color: var(--theme-bg-accent-color);
   }
 </style>

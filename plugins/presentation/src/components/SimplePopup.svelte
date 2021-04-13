@@ -29,8 +29,6 @@
 </div>
 
 <style lang="scss">
-  @import '~@anticrm/sparkling-theme/styles/_global.scss';
-
   .simple-popup-view {
     display: flex;
     flex-direction: column;
@@ -43,45 +41,17 @@
       border: none;
       border-radius: 0;
       margin: 0;
+      background-color: var(--theme-bg-color);
+      &:hover {
+        background-color: var(--theme-bg-accent-color);
+      }
     }
     .separator {
       font-size: 15px;
       height: 1px;
       border-radius: 0;
       margin: 0px 1em;
-    }
-  }
-  :global(.theme-dark) .simple-popup-view {
-    .button {
-      background-color: $theme-dark-bg-color;
-      &:hover {
-        background-color: $theme-dark-bg-accent-color;
-      }
-    }
-    .separator {
-      background-color: $theme-dark-bg-dark-color;
-    }
-  }
-  :global(.theme-grey) .simple-popup-view {
-    .button {
-      background-color: $theme-grey-bg-color;
-      &:hover {
-        background-color: $theme-grey-bg-accent-color;
-      }
-    }
-    .separator {
-      background-color: $theme-grey-bg-dark-color;
-    }
-  }
-  :global(.theme-light) .simple-popup-view {
-    .button {
-      background-color: $theme-light-bg-color;
-      &:hover {
-        background-color: $theme-light-bg-accent-color;
-      }
-    }
-    .separator {
-      background-color: $theme-light-bg-dark-color;
+      background-color: var(--theme-bg-dark-color);
     }
   }
 </style>

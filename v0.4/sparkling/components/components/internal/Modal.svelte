@@ -45,29 +45,15 @@
 {/if}
 
 <style lang="scss">
-  @import '~@anticrm/sparkling-theme/styles/_global.scss';
-
   .modal {
     position: fixed;
     z-index: 1001;
     border: solid 1px transparent;
     border-radius: 4px;
     padding: 0px;
-  }
-  :global(.theme-dark) .modal {
-    background-color: $theme-dark-bg-color;
-    border-color: $theme-dark-bg-accent-color;
-    box-shadow: $theme-dark-shadow;
-  }
-  :global(.theme-grey) .modal {
-    background-color: $theme-grey-bg-color;
-    border-color: $theme-grey-bg-accent-color;
-    box-shadow: $theme-grey-shadow;
-  }
-  :global(.theme-light) .modal {
-    background-color: $theme-light-bg-color;
-    border-color: $theme-light-bg-accent-color;
-    box-shadow: $theme-light-shadow;
+    background-color: var(--theme-bg-color);
+    border-color: var(--theme-bg-accent-color);
+    box-shadow: var(--theme-shadow);
   }
 
   .modal-overlay {
@@ -78,5 +64,6 @@
     left: 0;
     width: 100%;
     height: 100%;
+    backdrop-filter: blur(3px);
   }
 </style>

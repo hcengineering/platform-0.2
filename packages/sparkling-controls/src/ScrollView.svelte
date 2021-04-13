@@ -49,8 +49,6 @@
 </div>
 
 <style lang="scss">
-  @import '~@anticrm/sparkling-theme/styles/_global.scss';
-
   .scroll-view {
     position: relative;
 
@@ -61,13 +59,7 @@
       width: 100%;
     }
   }
-  :global(.theme-dark) .accent-color::-webkit-scrollbar-track {
-    background-color: $theme-dark-bg-accent-color;
-  }
-  :global(.theme-grey) .accent-color::-webkit-scrollbar-track {
-    background-color: $theme-grey-bg-accent-color;
-  }
-  :global(.theme-light) .accent-color::-webkit-scrollbar-track {
-    background-color: $theme-light-bg-accent-color;
+  .accent-color::-webkit-scrollbar-track {
+    background-color: var(--theme-bg-accent-color);
   }
 </style>

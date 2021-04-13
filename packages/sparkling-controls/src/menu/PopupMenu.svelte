@@ -55,8 +55,6 @@
 </div>
 
 <style lang="scss">
-  @import '~@anticrm/sparkling-theme/styles/_global.scss';
-
   .popup-menu-view {
     position: fixed;
     display: flex;
@@ -64,21 +62,9 @@
     flex-flow: column nowrap;
     border-radius: 4px;
     padding: 4px 8px;
+    background-color: var(--theme-bg-color);
+    border: solid 1px var(--theme-bg-accent-color);
+    box-shadow: var(--theme-shadow);
     z-index: 1000;
-  }
-  :global(.theme-dark) .popup-menu-view {
-    background-color: $theme-dark-bg-color;
-    border: solid 1px $theme-dark-bg-accent-color;
-    box-shadow: $theme-dark-shadow;
-  }
-  :global(.theme-grey) .popup-menu-view {
-    background-color: $theme-grey-bg-color;
-    border: solid 1px $theme-grey-bg-accent-color;
-    box-shadow: $theme-grey-shadow;
-  }
-  :global(.theme-light) .popup-menu-view {
-    background-color: $theme-light-bg-color;
-    border: solid 1px $theme-light-bg-accent-color;
-    box-shadow: $theme-light-shadow;
   }
 </style>

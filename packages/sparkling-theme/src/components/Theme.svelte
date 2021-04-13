@@ -23,21 +23,20 @@
 </slot>
 
 <style lang="scss" global>
-  @import '~@anticrm/sparkling-theme/styles/_global.scss';
+  @import '~@anticrm/sparkling-theme/styles/colors.scss';
 
   * {
     box-sizing: border-box;
-  }
-  :global(.theme-dark) * {
-    scrollbar-color: $theme-dark-bg-dark-color $theme-dark-bg-accent-color;
-    scrollbar-width: thin;
-  }
-  :global(.theme-grey) * {
-    scrollbar-color: $theme-grey-bg-dark-color $theme-grey-bg-accent-color;
-    scrollbar-width: thin;
-  }
-  :global(.theme-light) * {
-    scrollbar-color: $theme-light-bg-dark-color $theme-light-bg-accent-color;
+    --theme-white-color: #fff;
+    --theme-status-blue-color: #2d6ab9;
+    --theme-status-green-color: #4396a2;
+    --theme-status-grey-color: #78726d;
+    --theme-status-maroon-color: #b92d52;
+
+    --theme-font-content: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto;
+    --theme-font-caption: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto;
+
+    scrollbar-color: var(--theme-bg-dark-color) var(--theme-bg-accent-color);
     scrollbar-width: thin;
   }
 
@@ -47,59 +46,22 @@
   ::-webkit-scrollbar:horizontal {
     height: 8px;
   }
-
-  :global(.theme-dark) ::-webkit-scrollbar-track {
-    background-color: $theme-dark-bg-color;
+  ::-webkit-scrollbar-track {
+    background-color: va(--theme-bg-color);
   }
-  :global(.theme-grey) ::-webkit-scrollbar-track {
-    background-color: $theme-grey-bg-color;
-  }
-  :global(.theme-light) ::-webkit-scrollbar-track {
-    background-color: $theme-light-bg-color;
-  }
-  :global(.theme-dark) ::-webkit-scrollbar-thumb {
-    background: $theme-dark-bg-accent-color;
-    border: 1px solid $theme-dark-bg-dark-color;
+  ::-webkit-scrollbar-thumb {
+    background: var(--theme-bg-accent-color);
+    border: 1px solid var(--theme-bg-dark-color);
     border-radius: 2px;
   }
-  :global(.theme-grey) ::-webkit-scrollbar-thumb {
-    background: $theme-grey-bg-accent-color;
-    border: 1px solid $theme-grey-bg-dark-color;
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--theme-bg-dark-color);
+    border: 1px solid var(--theme-bg-dark-color);
     border-radius: 2px;
   }
-  :global(.theme-light) ::-webkit-scrollbar-thumb {
-    background: $theme-light-bg-accent-color;
-    border: 1px solid $theme-light-bg-dark-color;
-    border-radius: 2px;
-  }
-  :global(.theme-dark) ::-webkit-scrollbar-thumb:hover {
-    background: $theme-dark-bg-dark-color;
-    border: 1px solid $theme-dark-bg-dark-color;
-    border-radius: 2px;
-  }
-  :global(.theme-grey) ::-webkit-scrollbar-thumb:hover {
-    background: $theme-grey-bg-dark-color;
-    border: 1px solid $theme-grey-bg-dark-color;
-    border-radius: 2px;
-  }
-  :global(.theme-light) ::-webkit-scrollbar-thumb:hover {
-    background: $theme-light-bg-dark-color;
-    border: 1px solid $theme-light-bg-dark-color;
-    border-radius: 2px;
-  }
-  :global(.theme-dark) ::-webkit-scrollbar-corner {
-    background: $theme-dark-bg-accent-color;
-    border: 1px solid $theme-dark-bg-dark-color;
-    border-radius: 2px;
-  }
-  :global(.theme-grey) ::-webkit-scrollbar-corner {
-    background: $theme-grey-bg-accent-color;
-    border: 1px solid $theme-grey-bg-dark-color;
-    border-radius: 2px;
-  }
-  :global(.theme-light) ::-webkit-scrollbar-corner {
-    background: $theme-light-bg-accent-color;
-    border: 1px solid $theme-light-bg-dark-color;
+  ::-webkit-scrollbar-corner {
+    background: var(--theme-bg-accent-color);
+    border: 1px solid var(--theme-bg-dark-color);
     border-radius: 2px;
   }
 
@@ -147,59 +109,24 @@
   .editbox {
     border-radius: 4px;
     padding: 8px 16px;
-    box-sizing: border-box;
+    border: 1px solid var(--theme-bg-dark-color);
+    background-color: var(--theme-bg-accent-color);
+    color: var(--theme-content-color);
     transition: border-color 0.2s, color 0.2s, background-color 0.2s;
     &:focus-within {
       outline: none;
+      background-color: var(--theme-bg-accent-hover);
+      border-color: var(--theme-bg-dark-hover);
+      color: var(--theme-content-color);
     }
     &-label {
       height: 54px;
       padding: 6px 16px 4px;
     }
-  }
-  :global(.theme-dark) .editbox {
-    border: 1px solid $theme-dark-bg-dark-color;
-    background-color: $theme-dark-bg-accent-color;
-    color: $theme-dark-content-color;
-    &:focus-within {
-      background-color: $theme-dark-bg-accent-hover;
-      border-color: $theme-dark-bg-dark-hover;
-      color: $theme-dark-content-color;
-    }
     &-hoverState {
-      background-color: $theme-dark-bg-accent-hover;
-      border-color: $theme-dark-bg-dark-hover;
-      color: $theme-dark-content-color;
-    }
-  }
-  :global(.theme-grey) .editbox {
-    border: 1px solid $theme-grey-bg-dark-color;
-    background-color: $theme-grey-bg-accent-color;
-    color: $theme-grey-content-color;
-    &:focus-within {
-      background-color: $theme-grey-bg-accent-hover;
-      border-color: $theme-grey-bg-dark-hover;
-      color: $theme-grey-content-color;
-    }
-    &-hoverState {
-      background-color: $theme-grey-bg-accent-hover;
-      border-color: $theme-grey-bg-dark-hover;
-      color: $theme-grey-content-color;
-    }
-  }
-  :global(.theme-light) .editbox {
-    border: 1px solid $theme-light-bg-dark-color;
-    background-color: $theme-light-bg-accent-color;
-    color: $theme-light-content-color;
-    &:focus-within {
-      background-color: $theme-light-bg-accent-hover;
-      border-color: $theme-light-bg-dark-hover;
-      color: $theme-light-content-color;
-    }
-    &-hoverState {
-      background-color: $theme-light-bg-accent-hover;
-      border-color: $theme-light-bg-dark-hover;
-      color: $theme-light-content-color;
+      background-color: var(--theme-bg-accent-hover);
+      border-color: var(--theme-bg-dark-hover);
+      color: var(--theme-content-color);
     }
   }
 
@@ -214,10 +141,29 @@
     text-align: center;
     font: inherit;
     font-weight: 500;
+    border: 1px solid var(--theme-bg-dark-color);
+    color: var(--theme-content-color);
+    background-color: var(--theme-bg-accent-color);
     transition: border-color 0.2s, color 0.2s, background-color 0.2s;
 
     &:focus {
       outline: none;
+    }
+    &:hover {
+      border-color: var(--theme-bg-dark-hover);
+      background-color: var(--theme-bg-accent-hover);
+      color: var(--theme-content-dark-color);
+    }
+
+    &.primary {
+      background-color: var(--theme-content-color);
+      border-color: var(--theme-content-color);
+      color: var(--theme-bg-color);
+      &:hover {
+        background-color: var(--theme-content-dark-color);
+        border-color: var(--theme-content-dark-color);
+        color: var(--theme-bg-color);
+      }
     }
 
     &.large {
@@ -242,86 +188,12 @@
       flex-wrap: nowrap;
       padding: 0;
       margin: 0;
+      color: var(--theme-content-color);
       &:focus {
         outline: none;
       }
-    }
-  }
-  :global(.theme-dark) .button {
-    border: 1px solid $theme-dark-bg-dark-color;
-    color: $theme-dark-content-color;
-    background-color: $theme-dark-bg-accent-color;
-    &:hover {
-      border-color: $theme-dark-bg-dark-hover;
-      background-color: $theme-dark-bg-accent-hover;
-      color: $theme-dark-content-dark-color;
-    }
-    &.primary {
-      background-color: $theme-dark-content-color;
-      border-color: $theme-dark-content-color;
-      color: $theme-dark-bg-color;
-    }
-    &:hover.primary {
-      background-color: $theme-dark-content-dark-color;
-      border-color: $theme-dark-content-dark-color;
-      color: $theme-dark-bg-color;
-    }
-    &.transparent {
-      color: $theme-dark-content-color;
       &:hover {
-        color: $theme-dark-caption-color;
-      }
-    }
-  }
-  :global(.theme-grey) .button {
-    border: 1px solid $theme-grey-bg-dark-color;
-    color: $theme-grey-content-color;
-    background-color: $theme-grey-bg-accent-color;
-    &:hover {
-      border-color: $theme-grey-bg-dark-hover;
-      background-color: $theme-grey-bg-accent-hover;
-      color: $theme-grey-content-dark-color;
-    }
-    &.primary {
-      background-color: $theme-grey-content-color;
-      border-color: $theme-grey-content-color;
-      color: $theme-grey-bg-color;
-    }
-    &:hover.primary {
-      background-color: $theme-grey-content-dark-color;
-      border-color: $theme-grey-content-dark-color;
-      color: $theme-grey-bg-color;
-    }
-    &.transparent {
-      color: $theme-grey-content-color;
-      &:hover {
-        color: $theme-grey-caption-color;
-      }
-    }
-  }
-  :global(.theme-light) .button {
-    border: 1px solid $theme-light-bg-dark-color;
-    color: $theme-light-content-color;
-    background-color: $theme-light-bg-accent-color;
-    &:hover {
-      border-color: $theme-light-bg-dark-hover;
-      background-color: $theme-light-bg-accent-hover;
-      color: $theme-light-content-dark-color;
-    }
-    &.primary {
-      background-color: $theme-light-content-color;
-      border-color: $theme-light-content-color;
-      color: $theme-light-bg-color;
-    }
-    &:hover.primary {
-      background-color: $theme-light-content-dark-color;
-      border-color: $theme-light-content-dark-color;
-      color: $theme-light-bg-color;
-    }
-    &.transparent {
-      color: $theme-light-content-color;
-      &:hover {
-        color: $theme-light-caption-color;
+        color: var(--theme-caption-color);
       }
     }
   }
@@ -331,16 +203,8 @@
     text-decoration: none;
   }
   a:hover {
+    color: var(--theme-doclink-color);
     text-decoration: none;
-  }
-  :global(.theme-dark) a:hover {
-    color: $theme-dark-doclink-color;
-  }
-  :global(.theme-grey) a:hover {
-    color: $theme-grey-doclink-color;
-  }
-  :global(.theme-light) a:hover {
-    color: $theme-light-doclink-color;
   }
 
   .icon {
@@ -368,37 +232,15 @@
     height: 42px;
   }
 
-  :global(.theme-dark) .icon-button {
-    background-color: $theme-dark-bg-accent-color;
-    border: solid 1px $theme-dark-bg-dark-color;
+  .icon-button {
+    background-color: var(--theme-bg-accent-color);
+    border: solid 1px var(--theme-bg-dark-color);
     border-radius: 50%;
-    fill: $theme-dark-content-color;
+    fill: var(--theme-content-color);
     &:hover {
-      background-color: $theme-dark-bg-accent-hover;
-      border-color: $theme-dark-bg-dark-hover;
-      fill: $theme-dark-content-color;
-    }
-  }
-  :global(.theme-grey) .icon-button {
-    background-color: $theme-grey-bg-accent-color;
-    border: solid 1px $theme-grey-bg-dark-color;
-    border-radius: 50%;
-    fill: $theme-grey-content-color;
-    &:hover {
-      background-color: $theme-grey-bg-accent-hover;
-      border-color: $theme-grey-bg-dark-hover;
-      fill: $theme-grey-content-color;
-    }
-  }
-  :global(.theme-light) .icon-button {
-    background-color: $theme-light-bg-accent-color;
-    border: solid 1px $theme-light-bg-dark-color;
-    border-radius: 50%;
-    fill: $theme-light-content-color;
-    &:hover {
-      background-color: $theme-light-bg-accent-hover;
-      border-color: $theme-light-bg-dark-hover;
-      fill: $theme-light-content-color;
+      background-color: var(--theme-bg-accent-hover);
+      border-color: var(--theme-bg-dark-hover);
+      fill: var(--theme-content-color);
     }
   }
 
@@ -410,96 +252,48 @@
   }
 
   .caption-1 {
-    font-family: $font-caption;
+    font-family: var(--theme-font-caption);
     font-size: 18px;
     font-weight: 500;
-  }
-  :global(.theme-dark) .caption-1 {
-    color: $theme-dark-caption-color;
-  }
-  :global(.theme-grey) .caption-1 {
-    color: $theme-grey-caption-color;
-  }
-  :global(.theme-light) .caption-1 {
-    color: $theme-light-caption-color;
+    color: var(--theme-caption-color);
   }
 
   .caption-2 {
-    font-family: $font-caption;
+    font-family: var(--theme-font-caption);
     font-size: 24px;
     font-weight: 400;
-  }
-  :global(.theme-dark) .caption-2 {
-    color: $theme-dark-caption-color;
-  }
-  :global(.theme-grey) .caption-2 {
-    color: $theme-grey-caption-color;
-  }
-  :global(.theme-light) .caption-2 {
-    color: $theme-light-caption-color;
+    color: var(--theme-caption-color);
   }
 
   .caption-3 {
-    font-family: $font-caption;
+    font-family: var(--theme-font-caption);
     font-size: 1.25em;
     font-weight: 500;
     padding: 1em 0.5em;
-  }
-  :global(.theme-dark) .caption-3 {
-    color: $theme-dark-caption-color;
-  }
-  :global(.theme-grey) .caption-3 {
-    color: $theme-grey-caption-color;
-  }
-  :global(.theme-light) .caption-3 {
-    color: $theme-light-caption-color;
+    color: var(--theme-caption-color);
   }
 
   .caption-4 {
-    font-family: $font-caption;
+    font-family: var(--theme-font-caption);
     font-size: 10px;
     font-weight: 700;
     text-transform: uppercase;
-  }
-  :global(.theme-dark) .caption-4 {
-    color: $theme-dark-caption-color;
-  }
-  :global(.theme-grey) .caption-4 {
-    color: $theme-grey-caption-color;
-  }
-  :global(.theme-light) .caption-4 {
-    color: $theme-light-caption-color;
+    color: var(--theme-caption-color);
   }
 
   .caption-5 {
-    font-family: $font-caption;
+    font-family: var(--theme-font-caption);
     font-size: 10px;
     font-weight: 400;
     text-transform: uppercase;
-  }
-  :global(.theme-dark) .caption-5 {
-    color: $theme-dark-caption-color;
-  }
-  :global(.theme-grey) .caption-5 {
-    color: $theme-grey-caption-color;
-  }
-  :global(.theme-light) .caption-5 {
-    color: $theme-light-caption-color;
+    color: var(--theme-caption-color);
   }
 
   .caption-6 {
-    font-family: $font-caption;
+    font-family: var(--theme-font-caption);
     font-size: 9px;
     font-weight: 700;
-  }
-  :global(.theme-dark) .caption-6 {
-    color: $theme-dark-caption-color;
-  }
-  :global(.theme-grey) .caption-6 {
-    color: $theme-grey-caption-color;
-  }
-  :global(.theme-light) .caption-6 {
-    color: $theme-light-caption-color;
+    color: var(--theme-caption-color);
   }
 
   .text-small-uppercase {
@@ -507,14 +301,8 @@
     text-transform: uppercase;
   }
 
-  :global(.theme-dark) .content-dark {
-    color: $theme-dark-content-dark-color;
-  }
-  :global(.theme-grey) .content-dark {
-    color: $theme-grey-content-dark-color;
-  }
-  :global(.theme-light) .content-dark {
-    color: $theme-light-content-dark-color;
+  .content-dark {
+    color: var(--theme-content-dark-color);
   }
 
   .crm-table {
@@ -537,14 +325,8 @@
     .tbody {
       display: table-row-group;
 
-      :global(.theme-dark) .tr {
-        border-bottom: 1px solid $theme-dark-bg-accent-color;
-      }
-      :global(.theme-grey) .tr {
-        border-bottom: 1px solid $theme-grey-bg-accent-color;
-      }
-      :global(.theme-light) .tr {
-        border-bottom: 1px solid $theme-light-bg-accent-color;
+      .tr {
+        border-bottom: 1px solid var(--theme-bg-accent-color);
       }
     }
 
@@ -579,23 +361,14 @@
   }
 
   body {
-    font-family: $font-content;
+    font-family: var(--theme-font-content);
     font-size: 15px;
     font-weight: 400;
 
+    color: var(--theme-content-color);
+    background-color: var(--theme-bg-dark-color);
+
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-  }
-  body.theme-dark {
-    color: $theme-dark-content-color;
-    background-color: $theme-dark-bg-dark-color;
-  }
-  body.theme-grey {
-    color: $theme-grey-content-color;
-    background-color: $theme-grey-bg-dark-color;
-  }
-  body.theme-light {
-    color: $theme-light-content-color;
-    background-color: $theme-light-bg-dark-color;
   }
 </style>

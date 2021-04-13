@@ -122,6 +122,7 @@
     .status-bar {
       height: $status-bar-height;
       line-height: $status-bar-height;
+      border-bottom: 1px solid var(--theme-bg-color);
 
       .container {
         display: flex;

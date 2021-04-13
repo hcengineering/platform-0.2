@@ -79,8 +79,6 @@
 </div>
 
 <style lang="scss">
-  @import '~@anticrm/sparkling-theme/styles/_global.scss';
-
   .day-name,
   .selected-month-controller {
     display: flex;
@@ -91,32 +89,16 @@
     display: grid;
     grid-template-columns: repeat(7, 1fr);
   }
-  :global(.theme-dark) .weekend {
-    background-color: $theme-dark-bg-accent-color;
-  }
-  :global(.theme-grey) .weekend {
-    background-color: $theme-grey-bg-accent-color;
-  }
-  :global(.theme-light) .weekend {
-    background-color: $theme-light-bg-accent-color;
+  .weekend {
+    background-color: var(--theme-bg-accent-color);
   }
   .today {
     color: #a66600;
   }
   .selected {
     border-radius: 3px;
-  }
-  :global(.theme-dark) .selected {
-    color: $theme-dark-content-dark-color;
-    background-color: $theme-dark-bg-dark-color;
-  }
-  :global(.theme-grey) .selected {
-    color: $theme-grey-content-dark-color;
-    background-color: $theme-grey-bg-dark-color;
-  }
-  :global(.theme-light) .selected {
-    color: $theme-light-content-dark-color;
-    background-color: $theme-light-bg-dark-color;
+    color: var(--theme-content-dark-color);
+    background-color: var(--theme-bg-dark-color);
   }
   .cell {
     height: 100%;
@@ -124,31 +106,13 @@
   }
   .cell:hover {
     border-radius: 3px;
-  }
-  :global(.theme-dark) .cell:hover {
-    background-color: $theme-dark-bg-dark-hover;
-    color: $theme-dark-content-color;
-  }
-  :global(.theme-grey) .cell:hover {
-    background-color: $theme-grey-bg-dark-hover;
-    color: $theme-grey-content-color;
-  }
-  :global(.theme-light) .cell:hover {
-    background-color: $theme-light-bg-dark-hover;
-    color: $theme-light-content-color;
+    background-color: var(--theme-bg-dark-hover);
+    color: var(--theme-content-color);
   }
   .month-name {
     font-size: 14px;
     font-weight: bold;
     margin: 0 5px;
-  }
-  :global(.theme-dark) .month-name {
-    color: $theme-dark-content-dark-color;
-  }
-  :global(.theme-grey) .month-name {
-    color: $theme-grey-content-dark-color;
-  }
-  :global(.theme-light) .month-name {
-    color: $theme-light-content-dark-color;
+    color: var(--theme-content-dark-color);
   }
 </style>
