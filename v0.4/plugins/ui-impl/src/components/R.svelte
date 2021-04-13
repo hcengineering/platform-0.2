@@ -15,7 +15,11 @@
 
 <script language="ts">
 
-import { Theme } from '@anticrm/sparkling-theme'
+  import { onMount } from 'svelte'
+
+  import { Theme } from '@anticrm/sparkling-theme'
+
+  onMount(() => { console.log('mounted') })
 
 </script>
 

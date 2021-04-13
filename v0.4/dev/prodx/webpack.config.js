@@ -27,7 +27,7 @@ module.exports = {
   resolve: {
     symlinks: true,
     alias: {
-      svelte: path.resolve('../../node_modules', 'svelte')
+      svelte: path.resolve('./node_modules', 'svelte')
     },
     extensions: ['.mjs', '.js', '.svelte', '.ts'],
     mainFields: ['svelte', 'browser', 'module', 'main']

@@ -383,6 +383,10 @@
     {
       "packageName": "prod",
       "projectFolder": "dev/prod"
+    },
+    {
+      "packageName": "prodx",
+      "projectFolder": "dev/prodx"
     }
     // {
     //   /**

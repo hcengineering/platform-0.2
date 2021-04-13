@@ -22,14 +22,14 @@
     document.body.setAttribute('class', theme)
   }
 
-  // setContext('theme', {
-  //   setTheme: (name: string) => {
-  //     setRootColors(name)
-  //   }
-  // })
+  setContext('theme', {
+    setTheme: (name: string) => {
+      setRootColors(name)
+    }
+  })
 
   onMount(() => {
-    // setRootColors(current)
+    setRootColors(current)
   })
 </script>
 
