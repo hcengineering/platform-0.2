@@ -2,4 +2,4 @@
   export let error: string
 </script>
 
-<h1 class="s">Error {error}!</h1>
+<h1>Anticrm Platform Error: {error}!</h1>

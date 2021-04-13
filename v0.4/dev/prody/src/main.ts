@@ -14,13 +14,12 @@
 //
 
 import platform from './platform'
+import ui from '@anticrm/plugin-ui'
 
 // import core from '@anticrm/platform-core'
-import ui from '@anticrm/plugin-ui'
 // import login, { currentAccount } from '@anticrm/login'
 
 import ErrorPage from './components/ErrorPage.svelte'
-import App from './components/App.svelte'
 
 // const accountsUrl = process.env.APP_ACCOUNTS_URL
 // const host = process.env.APP_WSHOST
@@ -42,7 +41,5 @@ async function boot (): Promise<void> {
 }
 
 boot().catch(err => {
-  new ErrorPage({ target: document.body, props: { error: String(err) } }) // eslint-disable-line no-new
+  new ErrorPage({ target: document.body, props: { error: err.message } })
 })
-
-// new App({ target: document.body, props: {} }) // eslint-disable-line no-new

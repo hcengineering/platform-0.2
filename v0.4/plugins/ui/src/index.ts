@@ -148,7 +148,7 @@ export interface DocumentProvider {
 }
 
 export interface UIService extends Service, DocumentProvider {
-  createApp: (root: HTMLElement) => any
+  createApp: (target: HTMLElement) => SvelteComponent
 
   /**
    * Ask UI service to subscribe for browser location changes.

@@ -41,7 +41,7 @@ export default async (platform: Platform): Promise<UIService> => {
   // platform.setResource(ui.component.Spinner, Spinner)
 
   function createApp (target: HTMLElement): SvelteComponent {
-    return new Root({ target, props: { platform, ui: uiService } })
+    return new Root ({ target, props: { platform, ui: uiService } })
   }
 
   function windowLocation (): Location {
