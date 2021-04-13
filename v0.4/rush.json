@@ -369,6 +369,10 @@
       "projectFolder": "platform/plugin"
     },
     {
+      "packageName": "@anticrm/sparkling-theme",
+      "projectFolder": "sparkling/theme"
+    },
+    {
       "packageName": "@anticrm/plugin-ui",
       "projectFolder": "plugins/ui"
     },
