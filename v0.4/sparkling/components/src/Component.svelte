@@ -18,8 +18,8 @@
 
   import type { AnyComponent } from '@anticrm/platform-ui'
   import ui from '@anticrm/platform-ui'
-  import Spinner from './internal/Spinner.svelte'
-  import Icon from './Icon.svelte'
+  import Spinner from '../components/internal/Spinner.svelte'
+  import Icon from '../components/Icon.svelte'
 
   export let is: AnyComponent | undefined
   export let props: any

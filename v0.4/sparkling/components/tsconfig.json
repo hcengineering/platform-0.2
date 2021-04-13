@@ -1,14 +1,10 @@
 {
   "compilerOptions": {
-    "moduleResolution": "node",
     "target": "es6",
     "module": "esnext",
     "declaration": true,
     "outDir": "./lib",
-    "strict": true,
-    "lib": [
-      "es2018",
-      "dom"
-    ]
+    "rootDir": "./src",
+    "strict": true
   }
 }

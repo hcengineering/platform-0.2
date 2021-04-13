@@ -1,8 +1,8 @@
 <script lang="ts">
-  import type { Status } from '@anticrm/platform'
+  import type { Status } from '@anticrm/status'
 
-  import { Severity } from '@anticrm/platform'
-  import ui from '@anticrm/platform-ui'
+  import { Severity } from '@anticrm/status'
+  import ui from '@anticrm/plugin-ui'
 
   import Icon from '../Icon.svelte'
 

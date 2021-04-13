@@ -13,7 +13,7 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { store as modal } from '../../stores'
+  import { store as modal } from '../stores'
 
   function close () {
     modal.set({ is: undefined, props: {}, element: undefined })

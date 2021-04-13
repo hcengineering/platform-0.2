@@ -5,12 +5,12 @@
   import { CONTEXT_PLATFORM, CONTEXT_PLATFORM_UI, routeMeta } from '@anticrm/plugin-ui'
   import { setContext } from 'svelte'
 
-  // import Theme from '@anticrm/sparkling-theme/src/components/Theme.svelte'
-  // import StatusComponent from './Status.svelte'
-  // import Clock from './Clock.svelte'
-  // import ThemeSelector from './ThemeSelector.svelte'
-  // import Component from '../Component.svelte'
-  // import Modal from './Modal.svelte'
+  import Theme from '@anticrm/sparkling-theme/src/components/Theme.svelte'
+  import StatusComponent from './Status.svelte'
+  import Clock from './Clock.svelte'
+  import ThemeSelector from './ThemeSelector.svelte'
+  import Component from '../Component.svelte'
+  import Modal from './Modal.svelte'
   
   import uiPlugin from '@anticrm/plugin-ui'
   import { newRouter } from '@anticrm/plugin-ui'
@@ -71,7 +71,7 @@
 
 <h1>It works!</h1>
 
-<!-- <Theme>
+<Theme>
   <div id="ui-root">
     <div class="status-bar">
       <div class="container">
@@ -86,15 +86,16 @@
           <div class="widget">
             <ThemeSelector />
           </div>
-          <div v-for="widget in widgets" :key="widget" class="widget">
+          <!-- <div v-for="widget in widgets" :key="widget" class="widget">
             <widget :component="widget" />
-          </div>
+          </div> -->
         </div>
       </div>
     </div>
     <div class="app">
       {#if authenticationRequired}
-        <Component is={authApp.component} props={{}} />
+        <!-- <Component is={authApp.component} props={{}} /> -->
+        <h1>Auth</h1>
       {:else if currentApp}
         <Component is={currentApp.component} props={{}} />
       {:else}
@@ -105,11 +106,9 @@
     </div>
   </div>
   <Modal />
-</Theme> -->
+</Theme>
 
 <style lang="scss">
-  // @import '~@anticrm/sparkling-theme/styles/_global.scss';
-
   $status-bar-height: 20px;
   $pictogram-size: 51px;
 
@@ -161,13 +160,4 @@
       height: calc(100vh - #{$status-bar-height});
     }
   }
-  // :global(.theme-dark) .status-bar {
-  //   border-bottom: 1px solid $theme-dark-bg-color;
-  // }
-  // :global(.theme-grey) .status-bar {
-  //   border-bottom: 1px solid $theme-grey-bg-color;
-  // }
-  // :global(.theme-light) .status-bar {
-  //   border-bottom: 1px solid $theme-light-bg-color;
-  // }
 </style>
