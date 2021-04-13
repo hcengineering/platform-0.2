@@ -1,12 +1,12 @@
 <script lang="ts">
   import { getContext } from 'svelte'
-  import PopupMenu from '@anticrm/sparkling-controls/src/menu/PopupMenu.svelte'
-  import PopupItem from '@anticrm/sparkling-controls/src/menu/PopupItem.svelte'
+  // import PopupMenu from '@anticrm/sparkling-controls/src/menu/PopupMenu.svelte'
+  // import PopupItem from '@anticrm/sparkling-controls/src/menu/PopupItem.svelte'
 
   const { setTheme } = getContext('theme')
 </script>
 
-<PopupMenu>
+<!-- <PopupMenu>
   <div class="popup" slot="trigger">Themes</div>
   <PopupItem
     on:click={() => {
@@ -20,7 +20,6 @@
     on:click={() => {
       setTheme('theme-light')
     }}>Light</PopupItem>
-</PopupMenu>
+</PopupMenu> -->
 
-<style>
-</style>
+<div>selector</div>

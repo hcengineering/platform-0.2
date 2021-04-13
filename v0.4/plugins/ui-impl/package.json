@@ -36,6 +36,7 @@
     "fast-equals": "~2.0.1",
     "@anticrm/status": "~0.2.0",
     "@anticrm/sparkling-theme": "~0.2.0",
-    "svelte": "~3.37.0"
+    "svelte": "~3.37.0",
+    "@anticrm/sparkling-components": "~0.2.0"
   }
 }

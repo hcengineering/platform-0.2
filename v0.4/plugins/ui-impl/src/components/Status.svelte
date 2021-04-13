@@ -4,7 +4,7 @@
   import { Severity } from '@anticrm/status'
   import ui from '@anticrm/plugin-ui'
 
-  import Icon from '../Icon.svelte'
+  import { Icon } from '@anticrm/sparkling-components'
 
   export let status: Status
 </script>

@@ -13,20 +13,20 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import type { Platform } from '@anticrm/platform'
+  import type { Platform } from '@anticrm/plugin'
   import { getContext } from 'svelte'
 
-  import type { AnyComponent } from '@anticrm/platform-ui'
-  import ui from '@anticrm/platform-ui'
-  import Spinner from '../components/internal/Spinner.svelte'
-  import Icon from '../components/Icon.svelte'
+  import type { AnyComponent, AnySvelteComponent } from '@anticrm/plugin-ui'
+  import ui from '@anticrm/plugin-ui'
+  // import Spinner from '../components/internal/Spinner.svelte'
+  import Icon from './Icon.svelte'
 
   export let is: AnyComponent | undefined
   export let props: any
 
   const platform = getContext('platform') as Platform
-  let component: AnyComponent
-  const compUpdate = (e) => {
+  let component: AnySvelteComponent
+  const compUpdate = (e: AnySvelteComponent) => {
     if (component !== e) {
       component = e
     }
@@ -37,7 +37,7 @@
       platform
         .getResource(is)
         .then(compUpdate)
-        .then(() => resolve())
+        .then(resolve)
     }
   })
   $: {
@@ -48,7 +48,8 @@
 </script>
 
 {#await componentPromise}
-  <Spinner />
+  <!-- <Spinner /> -->
+  <h1>Spinner</h1>
 {:then ctor}
   <svelte:component this={component} {...props} on:change on:close on:open />
 {:catch err}

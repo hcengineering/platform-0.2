@@ -8,7 +8,8 @@ dependencies:
   '@rush-temp/plugin-ui': file:projects/plugin-ui.tgz
   '@rush-temp/plugin-ui-impl': file:projects/plugin-ui-impl.tgz
   '@rush-temp/prody': file:projects/prody.tgz_typescript@4.2.4
-  '@rush-temp/sparkling-theme': file:projects/sparkling-theme.tgz_b31b4f216686bfdf247685a5352fcc97
+  '@rush-temp/sparkling-components': file:projects/sparkling-components.tgz_ea5aaf1e0f924a96c7e8da0f110cd99c
+  '@rush-temp/sparkling-theme': file:projects/sparkling-theme.tgz_ea5aaf1e0f924a96c7e8da0f110cd99c
   '@rush-temp/status': file:projects/status.tgz
   '@types/jest': 26.0.22
   '@types/node': 14.14.37
@@ -21,14 +22,12 @@ dependencies:
   file-loader: 6.2.0_webpack@5.32.0
   jest: 26.6.3
   mini-css-extract-plugin: 1.4.1_webpack@5.32.0
-  postcss-loader: 5.2.0_webpack@5.32.0
   prettier: 2.2.1
   sass: 1.32.8
   sass-loader: 11.0.1_sass@1.32.8+webpack@5.32.0
   style-loader: 2.0.0_webpack@5.32.0
   svelte: 3.37.0
   svelte-loader: 3.1.0_svelte@3.37.0
-  svelte-preprocess: 4.7.0_c14a09b624e11ca3eaa9db430b53f206
   ts-loader: 8.1.0_typescript@4.2.4+webpack@5.32.0
   ts-standard: 10.0.0_typescript@4.2.4
   typescript: 4.2.4
@@ -1467,10 +1466,6 @@ packages:
     dev: false
     resolution:
       integrity: sha512-f5j5b/Gf71L+dbqxIpQ4Z2WlmI/mPJ0fOkGGmFgtb6sAu97EPczzbS3/tJKxmcYDj55OX6ssqwDAWOHIYDRDGA==
-  /@types/parse-json/4.0.0:
-    dev: false
-    resolution:
-      integrity: sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA==
   /@types/prettier/2.2.3:
     dev: false
     resolution:
@@ -2651,18 +2646,6 @@ packages:
     dev: false
     resolution:
       integrity: sha1-tf1UIgqivFq1eqtxQMlAdUUDwac=
-  /cosmiconfig/7.0.0:
-    dependencies:
-      '@types/parse-json': 4.0.0
-      import-fresh: 3.3.0
-      parse-json: 5.2.0
-      path-type: 4.0.0
-      yaml: 1.10.2
-    dev: false
-    engines:
-      node: '>=10'
-    resolution:
-      integrity: sha512-pondGvTuVYDk++upghXJabWzL6Kxu6f26ljFw64Swq9v6sQPUL3EUlVDV56diOjpCayKihL6hVe8exIACU4XcA==
   /cross-env/7.0.3:
     dependencies:
       cross-spawn: 7.0.3
@@ -6306,20 +6289,6 @@ packages:
       node: '>=0.10.0'
     resolution:
       integrity: sha1-AerA/jta9xoqbAL+q7jB/vfgDqs=
-  /postcss-loader/5.2.0_webpack@5.32.0:
-    dependencies:
-      cosmiconfig: 7.0.0
-      klona: 2.0.4
-      semver: 7.3.5
-      webpack: 5.32.0_webpack-cli@4.6.0
-    dev: false
-    engines:
-      node: '>= 10.13.0'
-    peerDependencies:
-      postcss: ^7.0.0 || ^8.0.1
-      webpack: ^5.0.0
-    resolution:
-      integrity: sha512-uSuCkENFeUaOYsKrXm0eNNgVIxc71z8RcckLMbVw473rGojFnrUeqEz6zBgXsH2q1EIzXnO/4pEz9RhALjlITA==
   /postcss-modules-extract-imports/3.0.0_postcss@8.2.10:
     dependencies:
       postcss: 8.2.10
@@ -8508,12 +8477,6 @@ packages:
     dev: false
     resolution:
       integrity: sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==
-  /yaml/1.10.2:
-    dev: false
-    engines:
-      node: '>= 6'
-    resolution:
-      integrity: sha512-r3vXyErRCYJ7wg28yvBY5VSoAF8ZvlcW9/BwUzEtUsjvX/DKs24dIkuwjtuprwJJHsbyUbLApepYTR1BN4uHrg==
   /yargs-parser/13.1.2:
     dependencies:
       camelcase: 5.3.1
@@ -8597,12 +8560,13 @@ packages:
       sass: 1.32.8
       svelte: 3.37.0
       svelte-loader: 3.1.0_svelte@3.37.0
+      svelte-preprocess: 4.7.0_c14a09b624e11ca3eaa9db430b53f206
       ts-standard: 10.0.0_typescript@4.2.4
       typescript: 4.2.4
     dev: false
     name: '@rush-temp/plugin-ui-impl'
     resolution:
-      integrity: sha512-ZRG8wK6tVD6RJlvCYp9dVOW8RHsM33WepIYZp2ertfyCCgwna5FCHtTTdzA/DtwbfUD38TM1ENJrwhhkUemiew==
+      integrity: sha512-WiT4fG0IrUDaamEUyK2z8GjtiVMd5Wf5yDBIiyF5N1R8ZoxEov7FFV6x+W09jWfSm0Am52hj3640PM2RvkGtwg==
       tarball: file:projects/plugin-ui-impl.tgz
     version: 0.0.0
   file:projects/plugin-ui.tgz:
@@ -8656,18 +8620,39 @@ packages:
     peerDependencies:
       typescript: '*'
     resolution:
-      integrity: sha512-Y3bFCTgCPTP00ws0TCBn0rEBUs0oCqewX1IOWk6t/ioyiNspAlZSN6G4lQdjaXxh+09Ocy6umq2JkNKbUqAh4w==
+      integrity: sha512-vQZs0UZ9RNhkBiGw2DE3ckEqrHXRf6/peQZ5pejlpCToB2CyTU5Fe08LBjhVTpOLMg22Cg5ekw0Xvu2Uivv/5g==
       tarball: file:projects/prody.tgz
     version: 0.0.0
-  file:projects/sparkling-theme.tgz_b31b4f216686bfdf247685a5352fcc97:
+  file:projects/sparkling-components.tgz_ea5aaf1e0f924a96c7e8da0f110cd99c:
     dependencies:
       '@babel/runtime': 7.13.10
       core-js: 3.10.1
-      css-loader: 5.2.1_webpack@5.32.0
-      postcss-loader: 5.2.0_webpack@5.32.0
       prettier: 2.2.1
       sass: 1.32.8
       sass-loader: 11.0.1_sass@1.32.8+webpack@5.32.0
+      svelte: 3.37.0
+      svelte-loader: 3.1.0_svelte@3.37.0
+      svelte-preprocess: 4.7.0_c14a09b624e11ca3eaa9db430b53f206
+      ts-standard: 10.0.0_typescript@4.2.4
+      typescript: 4.2.4
+    dev: false
+    id: file:projects/sparkling-components.tgz
+    name: '@rush-temp/sparkling-components'
+    peerDependencies:
+      '@babel/core': '*'
+      webpack: '*'
+    resolution:
+      integrity: sha512-Ggqnp3UI9TDkpzx6ruJuu99SrUME2f2fUY9rczieC8tudPYi7xlA5lK0X6rxojpYDR5+w4gM8z5d7r/3ZPRu7g==
+      tarball: file:projects/sparkling-components.tgz
+    version: 0.0.0
+  file:projects/sparkling-theme.tgz_ea5aaf1e0f924a96c7e8da0f110cd99c:
+    dependencies:
+      '@babel/runtime': 7.13.10
+      core-js: 3.10.1
+      prettier: 2.2.1
+      sass: 1.32.8
+      sass-loader: 11.0.1_sass@1.32.8+webpack@5.32.0
+      svelte: 3.37.0
       svelte-loader: 3.1.0_svelte@3.37.0
       svelte-preprocess: 4.7.0_c14a09b624e11ca3eaa9db430b53f206
       ts-standard: 10.0.0_typescript@4.2.4
@@ -8677,10 +8662,9 @@ packages:
     name: '@rush-temp/sparkling-theme'
     peerDependencies:
       '@babel/core': '*'
-      svelte: '*'
       webpack: '*'
     resolution:
-      integrity: sha512-uLQacielD9trXeGGKSHiJW5wFKZfgjbnDb5huuKCku4fsvY3G3N5ey/LAiLejMLRUFJmHbqKuUDi3LvDjSbSfA==
+      integrity: sha512-ePwZ6Ah+abdxQ4lTGhfzx2BvxV7m8tKVPYTZOcSvQDd3xYl4ohQPbqFicMtaStrzmfB37QdxV9Mqy2Q9pQ6Yog==
       tarball: file:projects/sparkling-theme.tgz
     version: 0.0.0
   file:projects/status.tgz:
@@ -8706,6 +8690,7 @@ specifiers:
   '@rush-temp/plugin-ui': file:./projects/plugin-ui.tgz
   '@rush-temp/plugin-ui-impl': file:./projects/plugin-ui-impl.tgz
   '@rush-temp/prody': file:./projects/prody.tgz
+  '@rush-temp/sparkling-components': file:./projects/sparkling-components.tgz
   '@rush-temp/sparkling-theme': file:./projects/sparkling-theme.tgz
   '@rush-temp/status': file:./projects/status.tgz
   '@types/jest': ~26.0.22
@@ -8719,14 +8704,12 @@ specifiers:
   file-loader: ~6.2.0
   jest: ~26.6.3
   mini-css-extract-plugin: ~1.4.1
-  postcss-loader: ~5.2.0
   prettier: ~2.2.1
   sass: ~1.32.8
   sass-loader: ~11.0.1
   style-loader: ~2.0.0
   svelte: ~3.37.0
   svelte-loader: ~3.1.0
-  svelte-preprocess: ^4.6.9
   ts-loader: ~8.1.0
   ts-standard: ~10.0.0
   typescript: ~4.2.4

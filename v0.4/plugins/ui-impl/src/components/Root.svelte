@@ -5,11 +5,12 @@
   import { CONTEXT_PLATFORM, CONTEXT_PLATFORM_UI, routeMeta } from '@anticrm/plugin-ui'
   import { setContext } from 'svelte'
 
-  import Theme from '@anticrm/sparkling-theme/src/components/Theme.svelte'
+  import { Theme } from '@anticrm/sparkling-theme'
+  import { Component } from '@anticrm/sparkling-components'
+
   import StatusComponent from './Status.svelte'
   import Clock from './Clock.svelte'
   import ThemeSelector from './ThemeSelector.svelte'
-  import Component from '../Component.svelte'
   import Modal from './Modal.svelte'
   
   import uiPlugin from '@anticrm/plugin-ui'
@@ -68,8 +69,6 @@
     return Promise.resolve()
   })
 </script>
-
-<h1>It works!</h1>
 
 <Theme>
   <div id="ui-root">
