@@ -7,7 +7,7 @@ dependencies:
   '@rush-temp/plugin': file:projects/plugin.tgz
   '@rush-temp/plugin-ui': file:projects/plugin-ui.tgz
   '@rush-temp/plugin-ui-impl': file:projects/plugin-ui-impl.tgz
-  '@rush-temp/prody': file:projects/prody.tgz_typescript@4.2.4
+  '@rush-temp/prod': file:projects/prod.tgz_typescript@4.2.4
   '@rush-temp/sparkling-components': file:projects/sparkling-components.tgz_ea5aaf1e0f924a96c7e8da0f110cd99c
   '@rush-temp/sparkling-theme': file:projects/sparkling-theme.tgz_ea5aaf1e0f924a96c7e8da0f110cd99c
   '@rush-temp/status': file:projects/status.tgz
@@ -8566,7 +8566,7 @@ packages:
     dev: false
     name: '@rush-temp/plugin-ui-impl'
     resolution:
-      integrity: sha512-WiT4fG0IrUDaamEUyK2z8GjtiVMd5Wf5yDBIiyF5N1R8ZoxEov7FFV6x+W09jWfSm0Am52hj3640PM2RvkGtwg==
+      integrity: sha512-IotyiKkBHsntXF8yLeufBwVnCUK/dXynpcaBjdwRu2HdWrGm8TZTY/YkWEYpNT6sLFxJUdrxRMJjq2fIu4nTnw==
       tarball: file:projects/plugin-ui-impl.tgz
     version: 0.0.0
   file:projects/plugin-ui.tgz:
@@ -8600,7 +8600,7 @@ packages:
       integrity: sha512-RFVbCpRirmmoTZRwCcacu9rPkMFCI1bfrtQK2Koni0mgtcj5q83UlXWPLTAbBwDLOJ79n9++oA59wOOhGDuekw==
       tarball: file:projects/plugin.tgz
     version: 0.0.0
-  file:projects/prody.tgz_typescript@4.2.4:
+  file:projects/prod.tgz_typescript@4.2.4:
     dependencies:
       cross-env: 7.0.3
       css-loader: 5.2.1_webpack@5.32.0
@@ -8615,13 +8615,13 @@ packages:
       webpack-cli: 4.6.0_9a1380ddfa33eb16777856b3c609d171
       webpack-dev-server: 3.11.2_webpack-cli@4.6.0+webpack@5.32.0
     dev: false
-    id: file:projects/prody.tgz
-    name: '@rush-temp/prody'
+    id: file:projects/prod.tgz
+    name: '@rush-temp/prod'
     peerDependencies:
       typescript: '*'
     resolution:
-      integrity: sha512-vQZs0UZ9RNhkBiGw2DE3ckEqrHXRf6/peQZ5pejlpCToB2CyTU5Fe08LBjhVTpOLMg22Cg5ekw0Xvu2Uivv/5g==
-      tarball: file:projects/prody.tgz
+      integrity: sha512-LKih4baes+gF+J/zKIxU6CczC0mpvgJTF6zv1gcvJC/rWdJhEmKlxrddpA0kuMMSaY4wD57rZqDJfZF7WzAuUQ==
+      tarball: file:projects/prod.tgz
     version: 0.0.0
   file:projects/sparkling-components.tgz_ea5aaf1e0f924a96c7e8da0f110cd99c:
     dependencies:
@@ -8642,7 +8642,7 @@ packages:
       '@babel/core': '*'
       webpack: '*'
     resolution:
-      integrity: sha512-Ggqnp3UI9TDkpzx6ruJuu99SrUME2f2fUY9rczieC8tudPYi7xlA5lK0X6rxojpYDR5+w4gM8z5d7r/3ZPRu7g==
+      integrity: sha512-USWgzP8jHfOYxyaY5vd391OV61w8LheXvJ4N86Q21lBCxZWaovOp9IxouhVATcVeCAVLyygjnkz1m0F5MBhVNg==
       tarball: file:projects/sparkling-components.tgz
     version: 0.0.0
   file:projects/sparkling-theme.tgz_ea5aaf1e0f924a96c7e8da0f110cd99c:
@@ -8689,7 +8689,7 @@ specifiers:
   '@rush-temp/plugin': file:./projects/plugin.tgz
   '@rush-temp/plugin-ui': file:./projects/plugin-ui.tgz
   '@rush-temp/plugin-ui-impl': file:./projects/plugin-ui-impl.tgz
-  '@rush-temp/prody': file:./projects/prody.tgz
+  '@rush-temp/prod': file:./projects/prod.tgz
   '@rush-temp/sparkling-components': file:./projects/sparkling-components.tgz
   '@rush-temp/sparkling-theme': file:./projects/sparkling-theme.tgz
   '@rush-temp/status': file:./projects/status.tgz
