@@ -21,7 +21,7 @@ import { derived, Readable, writable } from 'svelte/store'
 
 // import Root from './components/internal/Root.svelte'
 
-import Root from './components/internal/R.svelte'
+import Root from './components/R.svelte'
 
 import { store } from './stores'
 
