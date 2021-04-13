@@ -16,18 +16,16 @@
 /* eslint-env jest */
 
 import { Router } from '../routes'
-import { Space } from '@anticrm/domains'
-import { Class, Doc, Ref } from '@anticrm/core'
 import { locationToUrl } from '../location'
 
 interface MyProps {
-  spaceId: Ref<Space>
-  objId: Ref<Doc>
-  _class: Ref<Class<Doc>>
+  spaceId: string
+  objId: string
+  _class: string
 }
 
 interface ChildProps {
-  docId: Ref<Doc>
+  docId: string
   filter: string
 }
 
@@ -92,7 +90,7 @@ describe('routes', () => {
       fragment: ''
     })
     const nl1 = r1.location({ author: 'qwe' })
-    const nl2 = r2.location({ spaceId: 'zzz' as Ref<Space> })
+    const nl2 = r2.location({ spaceId: 'zzz' })
     const nl3 = r3.location({ filter: 'teta' })
     expect(locationToUrl(nl1)).toEqual('/author/qwe/workbench/sp1/browse/GEN-1?_class=qwe&filter=fff')
     expect(locationToUrl(nl2)).toEqual('/author/master/workbench/zzz/browse/GEN-1?_class=qwe&filter=fff')
