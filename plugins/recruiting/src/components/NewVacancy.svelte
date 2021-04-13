@@ -18,68 +18,44 @@ limitations under the License.
   import type { DateProperty, Ref, StringProperty } from '@anticrm/core'
   import { generateId } from '@anticrm/core'
   import type { Space } from '@anticrm/domains'
-  import type { Person } from '@anticrm/contact'
-  import contact from '@anticrm/contact'
-  import personExtras from '@anticrm/person-extras'
   import { getCoreService } from '@anticrm/presentation'
 
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
-  import EditBox from '@anticrm/sparkling-controls/src/EditBox.svelte'
-  import ResumeEditor from '@anticrm/person-extras/src/components/ResumeEditor.svelte'
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
-  import SpaceBox from '@anticrm/platform-ui/src/components/SpaceBox.svelte'
 
-  import type { WithCandidateProps } from '..'
+  import type { Vacancy } from '..'
   import recruiting from '..'
+  import VacancyEditor from './VacancyEditor.svelte'
 
   export let spaces: Space[]
 
-  let space = spaces[0]
-
   const coreP = getCoreService()
-  const modelP = coreP.then((c) => c.getModel())
+  let space: Space | undefined = spaces[0]
   const dispatch = createEventDispatcher()
 
-  const personM: Person = {
+  let vacancy: Vacancy = {
     _id: generateId(),
-    _class: contact.class.Person,
+    _class: recruiting.class.Vacancy,
     _space: space?._id as Ref<Space>,
     _createdBy: '' as StringProperty,
     _createdOn: Date.now() as DateProperty,
-    name: ''
-  }
-
-  const candidateM: WithCandidateProps['candidate'] = {
-    _class: recruiting.class.Candidate,
-    bio: '',
-    role: '',
-    salaryExpectation: 0
-  }
-
-  let resumeM: WithCandidateProps['resume'] = {
-    _class: personExtras.class.Resume,
-    skills: [],
-    hobbies: [],
-    experience: [],
-    profInterests: []
+    title: '',
+    description: '',
+    location: '',
+    responsibilities: [],
+    skills: []
   }
 
   async function save () {
     const core = await coreP
-    const model = await modelP
 
     const doc = {
-      ...personM,
+      ...vacancy,
       _space: space?._id,
       _createBy: core.getUserId()
     }
 
-    model.mixinDocument(doc, recruiting.mixin.WithCandidateProps, {
-      candidate: candidateM,
-      resume: resumeM
-    })
-
-    await core.create(contact.class.Person, doc)
+    await core.create(recruiting.class.Vacancy, doc)
 
     dispatch('close')
   }
@@ -87,18 +63,7 @@ limitations under the License.
 
 <div class="root">
   <ScrollView height="500px">
-    <div class="form">
-      {#if spaces && spaces.length > 1}
-        <SpaceBox label="Vacancy" {spaces} bind:space />
-      {/if}
-      <EditBox bind:value={personM.name} label="Name" placeholder="Name" />
-      <EditBox bind:value={personM.email} label="Email" placeholder="vasya@email.com" />
-      <EditBox bind:value={personM.phone} label="Phone" placeholder="+71234567890" />
-      <EditBox bind:value={candidateM.bio} label="Bio" />
-      <EditBox bind:value={candidateM.role} label="Role" placeholder="Повар" />
-      <EditBox bind:value={candidateM.salaryExpectation} label="Salary Expectation" placeholder="100500" />
-      <ResumeEditor bind:resume={resumeM} />
-    </div>
+    <VacancyEditor bind:vacancy {spaces} bind:space />
   </ScrollView>
   <div class="footer">
     <Button kind="primary" on:click={save} width="100%">Принять</Button>
@@ -109,12 +74,6 @@ limitations under the License.
 <style lang="scss">
   .root {
     min-width: 450px;
-  }
-
-  .form {
-    display: grid;
-    grid-template-columns: auto;
-    grid-gap: 10px;
   }
 
   .footer {
