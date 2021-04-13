@@ -172,8 +172,6 @@
 </div>
 
 <style lang="scss">
-  @import '~@anticrm/sparkling-theme/styles/_global.scss';
-
   .chat {
     height: 100%;
     display: flex;
@@ -190,19 +188,11 @@
       padding: 2em;
       display: flex;
       align-items: center;
+      border-bottom: 1px solid var(--theme-bg-accent-color);
     }
 
     .refContainer {
       margin: 0 2em 2em 2em;
     }
-  }
-  :global(.theme-dark) .captionContainer {
-    border-bottom: 1px solid $theme-dark-bg-accent-color;
-  }
-  :global(.theme-grey) .captionContainer {
-    border-bottom: 1px solid $theme-grey-bg-accent-color;
-  }
-  :global(.theme-light) .captionContainer {
-    border-bottom: 1px solid $theme-light-bg-accent-color;
   }
 </style>

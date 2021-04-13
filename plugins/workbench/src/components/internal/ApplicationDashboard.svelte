@@ -70,8 +70,6 @@
 </div>
 
 <style lang="scss">
-  @import '~@anticrm/sparkling-theme/styles/_global.scss';
-
   .workbench-browse {
     height: 100%;
     display: flex;
@@ -85,15 +83,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      border-bottom: 1px solid var(--theme-bg-accent-color);
     }
-  }
-  :global(.theme-dark) .captionContainer {
-    border-bottom: 1px solid $theme-dark-bg-accent-color;
-  }
-  :global(.theme-grey) .captionContainer {
-    border-bottom: 1px solid $theme-grey-bg-accent-color;
-  }
-  :global(.theme-light) .captionContainer {
-    border-bottom: 1px solid $theme-light-bg-accent-color;
   }
 </style>

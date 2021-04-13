@@ -279,8 +279,6 @@
 </div>
 
 <style lang="scss">
-  @import '~@anticrm/sparkling-theme/styles/_global.scss';
-
   .workbench-perspective {
     display: flex;
     height: 100%;
@@ -316,6 +314,7 @@
       height: 52px;
       border-radius: 8px;
       cursor: pointer;
+      color: var(--theme-content-trans-color);
     }
     .iconApp + .iconApp {
       margin-top: 16px;
@@ -331,41 +330,16 @@
       border-radius: 50%;
     }
   }
-  :global(.theme-dark) .iconApp {
-    color: $theme-dark-content-trans-color;
-  }
-  :global(.theme-grey) .iconApp {
-    color: $theme-grey-content-trans-color;
-  }
-  :global(.theme-light) .iconApp {
-    color: $theme-light-content-trans-color;
-  }
-  :global(.theme-dark) .selectedApp {
-    background-color: $theme-dark-bg-accent-color;
-    color: $theme-dark-caption-color;
-  }
-  :global(.theme-grey) .selectedApp {
-    background-color: $theme-grey-bg-accent-color;
-    color: $theme-grey-caption-color;
-  }
-  :global(.theme-light) .selectedApp {
-    background-color: $theme-light-bg-accent-color;
-    color: $theme-light-caption-color;
+  .selectedApp {
+    background-color: var(--theme-bg-accent-color);
+    color: var(--theme-caption-color);
   }
 
   .status-online {
     width: 8px;
     height: 8px;
     border-radius: 4px;
-  }
-  :global(.theme-dark) .status-online {
-    background-color: $theme-dark-status-online;
-  }
-  :global(.theme-grey) .status-online {
-    background-color: $theme-grey-status-online;
-  }
-  :global(.theme-light) .status-online {
-    background-color: $theme-light-status-online;
+    background-color: var(--theme-status-online);
   }
 
   .projects {
@@ -384,6 +358,7 @@
       align-items: center;
       height: 36px;
       margin: 4px 15px 44px 8px;
+      color: var(--theme-caption-color);
       & span {
         padding-left: 11px;
         flex-grow: 1;
@@ -397,30 +372,13 @@
       overflow-y: auto;
     }
   }
-  :global(.theme-dark) .projects-head {
-    color: $theme-dark-caption-color;
-  }
-  :global(.theme-grey) .projects-head {
-    color: $theme-grey-caption-color;
-  }
-  :global(.theme-light) .projects-head {
-    color: $theme-light-caption-color;
-  }
 
   .arrowDown {
     position: relative;
     width: 8px;
     height: 8px;
     border: solid 4px transparent;
-  }
-  :global(.theme-dark) .arrowDown {
-    border-top: solid 4px $theme-dark-caption-color;
-  }
-  :global(.theme-grey) .arrowDown {
-    border-top: solid 4px $theme-grey-caption-color;
-  }
-  :global(.theme-light) .arrowDown {
-    border-top: solid 4px $theme-light-caption-color;
+    border-top: solid 4px var(--theme-caption-color);
   }
 
   .main {
@@ -435,23 +393,11 @@
     border-radius: 20px;
   }
 
-  :global(.theme-dark) .projects,
-  :global(.theme-dark) .main,
-  :global(.theme-dark) aside {
-    background-color: $theme-dark-bg-color;
-    border: solid 1px $theme-dark-bg-accent-color;
-  }
-  :global(.theme-grey) .projects,
-  :global(.theme-grey) .main,
-  :global(.theme-grey) aside {
-    background-color: $theme-grey-bg-color;
-    border: solid 1px $theme-grey-bg-accent-color;
-  }
-  :global(.theme-light) .projects,
-  :global(.theme-light) .main,
-  :global(.theme-light) aside {
-    background-color: $theme-light-bg-color;
-    border: solid 1px $theme-light-bg-accent-color;
+  .projects,
+  .main,
+  aside {
+    background-color: var(--theme-bg-color);
+    border: solid 1px var(--theme-bg-accent-color);
   }
 
   .app-selector {
@@ -471,17 +417,9 @@
 
       span {
         margin-left: 14px;
+        color: var(--theme-caption-color);
       }
     }
-  }
-  :global(.theme-dark) .labeled-icon span {
-    color: $theme-dark-caption-color;
-  }
-  :global(.theme-grey) .labeled-icon span {
-    color: $theme-grey-caption-color;
-  }
-  :global(.theme-light) .labeled-icon span {
-    color: $theme-light-caption-color;
   }
 
   .application-box {
@@ -498,14 +436,6 @@
   .btn-bottom {
     font-size: 16px;
     font-weight: 500;
-  }
-  :global(.theme-dark) .btn-bottom {
-    color: $theme-dark-caption-color;
-  }
-  :global(.theme-grey) .btn-bottom {
-    color: $theme-grey-caption-color;
-  }
-  :global(.theme-light) .btn-bottom {
-    color: $theme-light-caption-color;
+    color: var(--theme-caption-color);
   }
 </style>

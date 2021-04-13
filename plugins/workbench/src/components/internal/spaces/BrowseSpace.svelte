@@ -98,8 +98,6 @@
 </div>
 
 <style lang="scss">
-  @import '~@anticrm/sparkling-theme/styles/_global.scss';
-
   .space-browse-view {
     width: 412px;
     padding: 24px;
@@ -113,6 +111,7 @@
       margin-top: 20px;
       margin-bottom: 4px;
       height: 1px;
+      background-color: var(--theme-bg-accent-hover);
     }
     .content {
       height: 100%;
@@ -124,13 +123,20 @@
         margin-top: 4px;
         padding: 8px 8px;
         border-radius: 4px;
+        color: var(--theme-content-color);
+        &:hover {
+          color: var(--theme-doclink-color);
+          background-color: var(--theme-bg-accent-hover);
+        }
         .info {
           flex-grow: 1;
           font-size: 11px;
+          color: var(--theme-content-color);
           .caption-2 {
             margin-bottom: 4px;
             font-size: 14px;
             font-weight: 500;
+            color: var(--theme-userlink-color);
           }
         }
         .actions {
@@ -140,66 +146,6 @@
         &:first-child {
           margin-top: 0px;
         }
-      }
-    }
-  }
-  :global(.theme-dark) .space-browse-view {
-    .separator {
-      background-color: $theme-dark-bg-accent-hover;
-    }
-    .content {
-      .space {
-        color: $theme-dark-content-color;
-        .info {
-          color: $theme-dark-content-color;
-          .caption-2 {
-            color: $theme-dark-userlink-color;
-          }
-        }
-      }
-      .space:hover {
-        color: $theme-dark-doclink-color;
-        background-color: $theme-dark-bg-accent-hover;
-      }
-    }
-  }
-  :global(.theme-grey) .space-browse-view {
-    .separator {
-      background-color: $theme-grey-bg-accent-hover;
-    }
-    .content {
-      .space {
-        color: $theme-grey-content-color;
-        .info {
-          color: $theme-grey-content-color;
-          .caption-2 {
-            color: $theme-grey-userlink-color;
-          }
-        }
-      }
-      .space:hover {
-        color: $theme-grey-doclink-color;
-        background-color: $theme-grey-bg-accent-hover;
-      }
-    }
-  }
-  :global(.theme-light) .space-browse-view {
-    .separator {
-      background-color: $theme-light-bg-accent-hover;
-    }
-    .content {
-      .space {
-        color: $theme-light-content-color;
-        .info {
-          color: $theme-light-content-color;
-          .caption-2 {
-            color: $theme-light-userlink-color;
-          }
-        }
-      }
-      .space:hover {
-        color: $theme-light-doclink-color;
-        background-color: $theme-light-bg-accent-hover;
       }
     }
   }

@@ -12,10 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 -->
-
 <script>
   import Theme from '@anticrm/sparkling-theme/src/components/Theme.svelte'
-  import ThemeSelector from '@anticrm/platform-ui/src/components/internal/ThemeSelector.svelte'
 
   export let child
   export let props = {}
@@ -23,9 +21,6 @@
 
 <Theme>
   <svelte:component this={child} {...props} />
-  <div style="position: absolute; right: 15px; top: 0px; width: 150px; border: 1px solid var(--theme-bg-dark-color); text-align: center">
-    <ThemeSelector />
-  </div>
 </Theme>
 
 <style global>

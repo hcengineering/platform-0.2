@@ -59,8 +59,6 @@
 
 <!-- { /if } -->
 <style lang="scss">
-  @import '~@anticrm/sparkling-theme/styles/_global.scss';
-
   .attributes {
     display: flex;
     flex-wrap: wrap;
@@ -72,17 +70,9 @@
     }
   }
 
-  :global(.theme-dark) .label,
-  :global(.theme-dark) .cell-icon {
-    color: $theme-dark-content-dark-color;
-  }
-  :global(.theme-grey) .label,
-  :global(.theme-grey) .cell-icon {
-    color: $theme-grey-content-dark-color;
-  }
-  :global(.theme-light) .label,
-  :global(.theme-light) .cell-icon {
-    color: $theme-light-content-dark-color;
+  .label,
+  .cell-icon {
+    color: var(--theme-content-dark-color);
   }
 
   .edit {

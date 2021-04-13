@@ -219,8 +219,6 @@
 </div>
 
 <style lang="scss">
-  @import '~@anticrm/sparkling-theme/styles/_global.scss';
-
   .cards-view {
     user-select: none;
     display: flex;
@@ -253,7 +251,7 @@
         border-radius: 4px;
         justify-content: center;
         align-items: center;
-        color: $theme-white-color;
+        color: var(--theme-white-color);
         outline: none;
         cursor: pointer;
       }

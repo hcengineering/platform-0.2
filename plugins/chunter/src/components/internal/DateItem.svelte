@@ -43,8 +43,6 @@
 </div>
 
 <style lang="scss">
-  @import '~@anticrm/sparkling-theme/styles/_global.scss';
-
   .message-item {
     display: flex;
     padding-top: 2em;
@@ -72,7 +70,7 @@
       }
     }
     .holy {
-      color: $theme-status-maroon-color;
+      color: var(--theme-status-maroon-color);
     }
 
     .details {
@@ -82,6 +80,7 @@
       font-size: 11px;
       font-weight: 500;
       text-transform: uppercase;
+      color: var(--theme-dark-content-color);
       &::before {
         position: absolute;
         content: '';
@@ -89,26 +88,9 @@
         top: -3em;
         height: calc(100% + 4em);
         width: 1px;
+        background-color: var(--theme-bg-dark-color);
         z-index: 50;
       }
-    }
-  }
-  :global(.theme-dark) .details {
-    color: $theme-dark-content-color;
-    &::before {
-      background-color: $theme-dark-bg-dark-color;
-    }
-  }
-  :global(.theme-grey) .details {
-    color: $theme-grey-content-color;
-    &::before {
-      background-color: $theme-grey-bg-dark-color;
-    }
-  }
-  :global(.theme-light) .details {
-    color: $theme-light-content-color;
-    &::before {
-      background-color: $theme-light-bg-dark-color;
     }
   }
 </style>

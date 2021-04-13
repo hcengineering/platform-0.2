@@ -109,30 +109,14 @@
   on:mousedown={onMouseDown} />
 
 <style lang="scss">
-  @import '~@anticrm/sparkling-theme/styles/_global.scss';
-
   .splitter {
     position: relative;
     box-sizing: border-box;
     border-radius: 2px;
     background-color: transparent;
-  }
-  :global(.theme-dark) .splitter {
     &:hover,
     &-statehover {
-      background-color: $theme-dark-bg-accent-color;
-    }
-  }
-  :global(.theme-grey) .splitter {
-    &:hover,
-    &-statehover {
-      background-color: $theme-grey-bg-accent-color;
-    }
-  }
-  :global(.theme-light) .splitter {
-    &:hover,
-    &-statehover {
-      background-color: $theme-light-bg-accent-color;
+      background-color: var(--theme-bg-accent-color);
     }
   }
 

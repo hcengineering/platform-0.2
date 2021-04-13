@@ -53,25 +53,15 @@
 </div>
 
 <style lang="scss">
-  @import '~@anticrm/sparkling-theme/styles/_global.scss';
-
   input {
     border: none;
     width: calc(100% - 2px);
     padding: 0;
     background-color: transparent;
+    color: var(--theme-content-color);
     &:focus {
       outline: none;
     }
-  }
-  :global(.theme-dark) input {
-    color: $theme-dark-content-color;
-  }
-  :global(.theme-grey) input {
-    color: $theme-grey-content-color;
-  }
-  :global(.theme-light) input {
-    color: $theme-light-content-color;
   }
 
   .editbox {
@@ -81,58 +71,24 @@
     box-sizing: border-box;
     font-size: 15px;
     font-weight: 400;
+    border-color: var(--theme-bg-accent-color);
+    background-color: var(--theme-bg-accent-color);
+    color: var(--theme-content-color);
     transition: border-color 0.2s, color 0.2s, background-color 0.2s;
     &:focus-within {
       outline: none;
+      background-color: var(--theme-bg-accent-hover);
+      border-color: var(--theme-bg-dark-hover);
+      color: var(--theme-content-color);
     }
     &-label {
       height: 54px;
       padding: 6px 16px 4px;
     }
-  }
-  :global(.theme-dark) .editbox {
-    border-color: $theme-dark-bg-accent-color;
-    background-color: $theme-dark-bg-accent-color;
-    color: $theme-dark-content-color;
-    &:focus-within {
-      background-color: $theme-dark-bg-accent-hover;
-      border-color: $theme-dark-bg-dark-hover;
-      color: $theme-dark-content-color;
-    }
     &-hoverState {
-      background-color: $theme-dark-bg-accent-hover;
-      border-color: $theme-dark-bg-dark-hover;
-      color: $theme-dark-content-color;
-    }
-  }
-  :global(.theme-grey) .editbox {
-    border-color: $theme-grey-bg-accent-color;
-    background-color: $theme-grey-bg-accent-color;
-    color: $theme-grey-content-color;
-    &:focus-within {
-      background-color: $theme-grey-bg-accent-hover;
-      border-color: $theme-grey-bg-dark-hover;
-      color: $theme-grey-content-color;
-    }
-    &-hoverState {
-      background-color: $theme-grey-bg-accent-hover;
-      border-color: $theme-grey-bg-dark-hover;
-      color: $theme-grey-content-color;
-    }
-  }
-  :global(.theme-light) .editbox {
-    border-color: $theme-light-bg-accent-color;
-    background-color: $theme-light-bg-accent-color;
-    color: $theme-light-content-color;
-    &:focus-within {
-      background-color: $theme-light-bg-accent-hover;
-      border-color: $theme-light-bg-dark-hover;
-      color: $theme-light-content-color;
-    }
-    &-hoverState {
-      background-color: $theme-light-bg-accent-hover;
-      border-color: $theme-light-bg-dark-hover;
-      color: $theme-light-content-color;
+      background-color: var(--theme-bg-accent-hover);
+      border-color: var(--theme-bg-dark-hover);
+      color: var(--theme-content-color);
     }
   }
 
@@ -150,15 +106,7 @@
     font-size: 11px;
     font-weight: 400;
     margin-bottom: 4px;
-  }
-  :global(.theme-dark) .label {
-    color: $theme-dark-content-color;
-  }
-  :global(.theme-grey) .label {
-    color: $theme-grey-content-color;
-  }
-  :global(.theme-light) .label {
-    color: $theme-light-content-color;
+    color: var(--theme-content-color);
   }
 
   .separator {

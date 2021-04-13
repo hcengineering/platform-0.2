@@ -406,13 +406,12 @@
 </div>
 
 <style lang="scss">
-  @import '~@anticrm/sparkling-theme/styles/_global.scss';
-
   .presentation-reference-input-control {
     width: 100%;
     border-radius: 4px;
     padding: 8px;
-    box-sizing: border-box;
+    background-color: var(--theme-bg-accent-color);
+    border: 1px solid var(--theme-bg-dark-color);
     .flex-column {
       display: flex;
       flex-direction: column;
@@ -448,27 +447,7 @@
       width: 2px;
       height: 42px;
       margin: 0 8px;
-    }
-  }
-  :global(.theme-dark) .presentation-reference-input-control {
-    background-color: $theme-dark-bg-accent-color;
-    border: 1px solid $theme-dark-bg-dark-color;
-    .tSeparator {
-      background-color: $theme-dark-bg-accent-color;
-    }
-  }
-  :global(.theme-grey) .presentation-reference-input-control {
-    background-color: $theme-grey-bg-accent-color;
-    border: 1px solid $theme-grey-bg-dark-color;
-    .tSeparator {
-      background-color: $theme-grey-bg-accent-color;
-    }
-  }
-  :global(.theme-light) .presentation-reference-input-control {
-    background-color: $theme-light-bg-accent-color;
-    border: 1px solid $theme-light-bg-dark-color;
-    .tSeparator {
-      background-color: $theme-light-bg-accent-color;
+      background-color: var(--theme-bg-accent-color);
     }
   }
 </style>
