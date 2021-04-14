@@ -13,23 +13,20 @@
 // limitations under the License.
 //
 
-import {
-  AnyLayout, Class, combineStorage, Doc, DocumentProtocol, isValidQuery, Model, MODEL_DOMAIN, Ref, Storage,
-  StringProperty, Tx,
-  TxContext, TxProcessor
-} from '@anticrm/core'
-import { Collection, MongoClient } from 'mongodb'
 import { withTenant } from '@anticrm/accounts'
-import { createPullArrayFilters, createPushArrayFilters, createSetArrayFilters } from './mongo_utils'
-
+import {
+  AnyLayout, Class, combineStorage, Doc, DocumentProtocol, Model, MODEL_DOMAIN, Ref, Storage, Tx, TxContext, TxProcessor
+} from '@anticrm/core'
+import { CORE_CLASS_SPACE, Space, TxOperation, TxOperationKind, VDoc } from '@anticrm/domains'
+import { PassthroughsIndex } from '@anticrm/domains/src/indices/filter'
 import { ModelIndex } from '@anticrm/domains/src/indices/model'
 import { ReferenceIndex } from '@anticrm/domains/src/indices/reference'
 import { TitleIndex } from '@anticrm/domains/src/indices/title'
-import { VDocIndex } from '@anticrm/domains/src/indices/vdoc'
 import { TxIndex } from '@anticrm/domains/src/indices/tx'
+import { VDocIndex } from '@anticrm/domains/src/indices/vdoc'
 import { ClientTxStorage } from '@anticrm/platform-core/src/clienttx'
-import { PassthroughsIndex } from '@anticrm/domains/src/indices/filter'
-import { CORE_CLASS_SPACE, Space, VDoc } from '@anticrm/domains'
+import { Collection, MongoClient, UpdateOneOptions, UpdateQuery } from 'mongodb'
+import { createPullArrayFilters, createPushArrayFilters, createSetArrayFilters } from './mongo_utils'
 
 export interface WorkspaceProtocol extends DocumentProtocol {
 
@@ -66,47 +63,65 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
       return collection(doc._class).insertOne(doc)
     },
 
-    async push (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, query: AnyLayout | null, attribute: StringProperty, attributes: AnyLayout): Promise<any> {
-      if (query && isValidQuery(query)) {
-        const filters = createPushArrayFilters(memdb, _class, query, attribute, attributes)
-        return collection(_class).updateOne({ _id }, { $push: filters.updateOperation }, { arrayFilters: filters.arrayFilters })
-      }
-      // We need to put attribute class as part of embedded object.
-      const attr = memdb.classAttribute(_class, attribute)
-      const attrClass = memdb.attributeClass(attr.attr.type)
-      let value: any = attributes
-      if (attrClass !== null) {
-        value = memdb.assign({}, attrClass, attributes)
-        value._class = attrClass // Since we need a class in case of mixins.
-      }
-      return collection(_class).updateOne({ _id }, {
-        $push: {
-          [attr.key]: value
-        }
-      })
-    },
+    async update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, operations: TxOperation[]): Promise<any> {
+      let setUpdateChain: any = {}
+      let pushUpdateChain: any = {}
+      let pullUpdateChain: any = {}
+      let unsetUpdateChain: any = {}
+      let index = 1
 
-    async update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, query: AnyLayout | null, attributes: AnyLayout): Promise<any> {
-      if (query && isValidQuery(query)) {
-        const filters = createSetArrayFilters(memdb, _class, query, attributes)
-        return collection(_class).updateOne({ _id }, { $set: filters.updateOperation },
-          { arrayFilters: filters.arrayFilter })
-      }
-      const value = memdb.assign({}, _class, attributes)
-      delete value._class // We should not override _class in any case
-      return collection(_class).updateOne({ _id }, { $set: value })
-    },
-
-    async remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, query: AnyLayout | null): Promise<any> {
-      if (query && isValidQuery(query)) {
-        // Operation over embedded child object, path to it should be matched by query object.
-        const filters = createPullArrayFilters(memdb, _class, query)
-        if (filters.isArrayAttr) {
-          return collection(_class).updateOne({ _id }, { $pull: filters.updateOperation }, { arrayFilters: filters.arrayFilters })
-        } else {
-          return collection(_class).updateOne({ _id }, { $unset: filters.updateOperation }, { arrayFilters: filters.arrayFilters })
+      const arrayFilters: AnyLayout[] = []
+      for (const op of operations) {
+        switch (op.kind) {
+          case TxOperationKind.Set: {
+            const filters = createSetArrayFilters(memdb, _class, op.selector, op._attributes, index)
+            setUpdateChain = { ...setUpdateChain, ...filters.updateOperation }
+            arrayFilters.push(...filters.arrayFilter)
+            index = filters.index
+            break
+          }
+          case TxOperationKind.Push: {
+            const filters = createPushArrayFilters(memdb, _class, op.selector, op._attributes, index)
+            pushUpdateChain = { ...pushUpdateChain, ...filters.updateOperation }
+            arrayFilters.push(...filters.arrayFilters)
+            break
+          }
+          case TxOperationKind.Pull: {
+            const filters = createPullArrayFilters(memdb, _class, op.selector, index)
+            if (filters.isArrayAttr) {
+              pullUpdateChain = { ...pullUpdateChain, ...filters.updateOperation }
+              arrayFilters.push(...filters.arrayFilters)
+            } else {
+              unsetUpdateChain = { ...unsetUpdateChain, ...filters.updateOperation }
+              arrayFilters.push(...filters.arrayFilters)
+            }
+            break
+          }
         }
       }
+
+      const updateOp: UpdateQuery<any> = {}
+      const opts: UpdateOneOptions = {}
+      if (Object.keys(setUpdateChain).length > 0) {
+        updateOp.$set = setUpdateChain
+      }
+      if (Object.keys(unsetUpdateChain).length > 0) {
+        updateOp.$unset = unsetUpdateChain
+      }
+      if (Object.keys(pushUpdateChain).length > 0) {
+        updateOp.$push = pushUpdateChain
+      }
+      if (Object.keys(pullUpdateChain).length > 0) {
+        updateOp.$pull = pullUpdateChain
+      }
+      if (arrayFilters.length > 0) {
+        opts.arrayFilters = arrayFilters
+      }
+
+      return collection(_class).updateOne({ _id }, updateOp, opts)
+    },
+
+    async remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<any> {
       return collection(_class).deleteOne({ _id })
     },
 
@@ -149,12 +164,12 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
 
     find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
       return collection(_class)
-        .find(memdb.createQuery(_class, query))
+        .find(memdb.createQuery(_class, query, true))
         .toArray()
     },
 
     async findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined> {
-      const result = await collection(_class).findOne(memdb.createQuery(_class, query))
+      const result = await collection(_class).findOne(memdb.createQuery(_class, query, true))
       if (result == null) {
         return undefined
       }

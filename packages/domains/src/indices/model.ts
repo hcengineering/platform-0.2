@@ -13,15 +13,8 @@
 // limitations under the License.
 //
 
-import { Model, MODEL_DOMAIN, AnyLayout, DomainIndex, Storage, Tx, TxContext } from '@anticrm/core'
-import {
-  CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_PUSH_TX,
-  CORE_CLASS_UPDATE_TX,
-  CreateTx,
-  DeleteTx,
-  PushTx,
-  UpdateTx
-} from '..'
+import { DomainIndex, Model, MODEL_DOMAIN, Storage, Tx, TxContext } from '@anticrm/core'
+import { CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_UPDATE_TX, CreateTx, DeleteTx, UpdateTx } from '..'
 
 /**
  * Perform model update and forward updates into chained storage if required.
@@ -50,21 +43,14 @@ export class ModelIndex implements DomainIndex {
         if (this.model.getDomain(updateTx._objectClass) !== MODEL_DOMAIN) {
           return
         }
-        return this.storage.update(ctx, updateTx._objectClass, updateTx._objectId, updateTx._query || null, updateTx._attributes)
-      }
-      case CORE_CLASS_PUSH_TX: {
-        const pushTx = tx as PushTx
-        if (this.model.getDomain(pushTx._objectClass) !== MODEL_DOMAIN) {
-          return
-        }
-        return this.storage.push(ctx, pushTx._objectClass, pushTx._objectId, pushTx._query || null, pushTx._attribute, pushTx._attributes)
+        return this.storage.update(ctx, updateTx._objectClass, updateTx._objectId, updateTx.operations)
       }
       case CORE_CLASS_DELETE_TX: {
         const deleteTx = tx as DeleteTx
         if (this.model.getDomain(deleteTx._objectClass) !== MODEL_DOMAIN) {
           return
         }
-        return this.storage.remove(ctx, deleteTx._objectClass, deleteTx._objectId, (deleteTx._query || null) as AnyLayout)
+        return this.storage.remove(ctx, deleteTx._objectClass, deleteTx._objectId)
       }
 
       default:

@@ -1,10 +1,8 @@
 import { Class, Doc, DomainIndex, Model, Ref, Storage, Tx, TxContext } from '@anticrm/core'
 import {
   CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX,
-  CORE_CLASS_PUSH_TX,
   CORE_CLASS_UPDATE_TX,
   CreateTx, DeleteTx,
-  PushTx,
   UpdateTx
 } from '../index'
 
@@ -28,10 +26,8 @@ export class PassthroughsIndex implements DomainIndex {
         return this.onCreate(ctx, tx as CreateTx)
       case CORE_CLASS_UPDATE_TX:
         return this.onUpdate(ctx, tx as UpdateTx)
-      case CORE_CLASS_PUSH_TX:
-        return this.onPush(ctx, tx as PushTx)
       case CORE_CLASS_DELETE_TX:
-        return this.onDelete(ctx, tx as PushTx)
+        return this.onDelete(ctx, tx as DeleteTx)
       default:
         console.log('not implemented tx', tx)
     }
@@ -44,24 +40,17 @@ export class PassthroughsIndex implements DomainIndex {
     return this.storage.store(ctx, this.modelDb.newDoc(create._objectClass, create._objectId, create.object))
   }
 
-  onPush (ctx: TxContext, tx: PushTx): Promise<any> {
-    if (!this.modelDb.is(tx._objectClass, this.matchClass)) {
-      return Promise.resolve()
-    }
-    return this.storage.push(ctx, tx._objectClass, tx._objectId, null, tx._attribute, tx._attributes)
-  }
-
   onDelete (ctx: TxContext, tx: DeleteTx): Promise<any> {
     if (!this.modelDb.is(tx._objectClass, this.matchClass)) {
       return Promise.resolve()
     }
-    return this.storage.remove(ctx, tx._objectClass, tx._objectId, tx._query || null)
+    return this.storage.remove(ctx, tx._objectClass, tx._objectId)
   }
 
   onUpdate (ctx: TxContext, tx: UpdateTx): Promise<any> {
     if (!this.modelDb.is(tx._objectClass, this.matchClass)) {
       return Promise.resolve()
     }
-    return this.storage.update(ctx, tx._objectClass, tx._objectId, null, tx._attributes)
+    return this.storage.update(ctx, tx._objectClass, tx._objectId, tx.operations)
   }
 }

@@ -13,10 +13,9 @@
 // limitations under the License.
 //
 
-import {
-  AnyLayout, Class, Doc, generateId, isValidQuery, Model, Ref, Storage, StringProperty, TxContext
-} from '@anticrm/core'
+import { AnyLayout, Class, Doc, generateId, Model, Ref, Storage, TxContext } from '@anticrm/core'
 import { QueryResult, Subscriber, Unsubscriber } from '.'
+import { TxOperation } from '@anticrm/domains'
 
 export interface Domain extends Storage {
   query<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): QueryResult<T>
@@ -89,29 +88,12 @@ export class QueriableStorage implements Domain {
     return false
   }
 
-  push (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, _query: AnyLayout | null, attribute: StringProperty, attributes: AnyLayout): Promise<void> {
-    return this.proxy.push(ctx, _class, _id, _query, attribute, attributes).then(() => {
-      for (const q of this.queries.values()) {
-        // Find doc, apply attribute and check if it is still matches, if not we need to perform request to server after transaction will be complete.
-        // Check if attribute are in query, so it could modify results.
-        if (this.updateMatchQuery(_id, q, (doc) => {
-          this.model.pushDocument(doc, _query, attribute, attributes)
-          return UpdateOp.None
-        })) {
-          continue
-        }
-        // so we potentially need to fetch new matched objects from server, so do so.
-        ctx.network.then(() => this.refresh(q))
-      }
-    })
-  }
-
-  update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, _query: AnyLayout | null, attributes: AnyLayout): Promise<void> {
-    return this.proxy.update(ctx, _class, _id, _query, attributes).then(() => {
+  update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, operations: TxOperation[]): Promise<void> {
+    return this.proxy.update(ctx, _class, _id, operations).then(() => {
       for (const q of this.queries.values()) {
         // Find doc, apply update of attributes and check if it is still matches, if not we need to perform request to server after transaction will be complete.
         if (this.updateMatchQuery(_id, q, (doc) => {
-          this.model.updateDocument(doc, _query, attributes)
+          this.model.updateDocument(doc, operations)
           return UpdateOp.None
         })) {
           continue
@@ -122,13 +104,13 @@ export class QueriableStorage implements Domain {
     })
   }
 
-  remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, _query: AnyLayout | null): Promise<void> {
-    return this.proxy.remove(ctx, _class, _id, _query).then(() => {
+  remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<void> {
+    return this.proxy.remove(ctx, _class, _id).then(() => {
       for (const q of this.queries.values()) {
         if (this.updateMatchQuery(_id, q, (doc) => {
-          this.model.removeDocument(doc, _query)
+          this.model.removeDocument(doc)
           // We should not remove object in case we modify embedded array
-          return isValidQuery(_query) ? UpdateOp.None : UpdateOp.Remove
+          return UpdateOp.Remove
         })) {
           continue
         }

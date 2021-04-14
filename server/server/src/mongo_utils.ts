@@ -14,9 +14,12 @@
 //
 
 import {
-  AnyLayout, ArrayOf, Class, CORE_CLASS_ARRAY_OF, CORE_CLASS_INSTANCE_OF, Doc, Emb, InstanceOf, Model, Obj, Ref,
+  AnyLayout, ArrayOf, AttributeMatch, Class, CORE_CLASS_ARRAY_OF, CORE_CLASS_INSTANCE_OF, Doc, Emb, InstanceOf,
+  isValidSelector, Model,
+  Obj, Property, Ref,
   StringProperty, Type
 } from '@anticrm/core'
+import { ObjectSelector } from '@anticrm/domains'
 
 // Some various mongo db utils.
 
@@ -28,83 +31,89 @@ function isInstanceOf (_type: Type): boolean {
   return _type._class === CORE_CLASS_INSTANCE_OF
 }
 
-function extractArrayFilter (model: Model, _class: Ref<Class<Doc>>, query: AnyLayout, isPull: boolean): {
+function extractArrayFilter (model: Model, _class: Ref<Class<Doc>>, selector: ObjectSelector[], isPull: boolean, index: number): {
   clazz: Ref<Class<Obj>>
   setFilter: string,
   arrayFilter: AnyLayout[],
   lastQuery?: AnyLayout
-  isArrayAttr?: boolean
+  isArrayAttr?: boolean,
+  index: number,
+  attribute?: AttributeMatch,
+  isPrimitive: boolean
 } {
-  let index = 0
-  let nextQuery: AnyLayout | null = query
   let setFilter = ''
   let noNextFilter = ''
   const arrayFilter: AnyLayout[] = []
   let isArrayAttr = false
+  let isPrimitive = false
 
   let clazz: Ref<Class<Obj>> = _class
-  while (nextQuery !== null) {
+  let lastAttribute: AttributeMatch | undefined
+  for (let segmId = 0; segmId < selector.length; segmId++) {
+    const segm = selector[segmId]
+    if (!segm.key || segm.key === '') {
+      throw new Error('Object selector field should be specified')
+    }
+    const attr = model.classAttribute(clazz, segm.key)
+    if (!attr) {
+      throw new Error('Object selector field is not found in class attributes')
+    }
+    lastAttribute = attr
     const filter: AnyLayout = {}
     const curI = index++
     const filterName = `f${curI}`
-    const nextFilterName = `f${curI + 1}`
-    const currentQuery = nextQuery
-    const curClass = clazz
-    nextQuery = null
 
-    if (isPull) {
-      // Check all attributes is not instance, array and extract it as final pull request argument
-      let isSimple = true
+    const _type = attr.attr.type
 
-      for (const key in currentQuery) {
-        const attr = model.classAttribute(curClass, key)
-        const _type = attr.attr.type
-        if ((isArrayOf(_type) && isInstanceOf((_type as ArrayOf).of)) || isInstanceOf(_type)) {
-          isSimple = false
-          break
-        }
-      }
-      if (isSimple) {
-        return {
-          clazz,
-          setFilter: noNextFilter,
-          arrayFilter,
-          lastQuery: currentQuery,
-          isArrayAttr
-        }
-      }
-    }
-    for (const key in currentQuery) {
-      const queryValue = currentQuery[key]
-      const attr = model.classAttribute(curClass, key)
-      const _type = attr.attr.type
-
+    if (segm.pattern) {
       if (isArrayOf(_type)) {
         // This is level change.
         if (isInstanceOf((_type as ArrayOf).of)) {
           // We moving to next query value.
-          nextQuery = (queryValue as unknown) as AnyLayout
           clazz = ((_type as ArrayOf).of as InstanceOf<Emb>).of
           noNextFilter = setFilter + (setFilter.length > 0 ? '.' : '') + attr.key
-          setFilter = `${noNextFilter}.$[${nextFilterName}]`
+          setFilter = `${noNextFilter}.$[${filterName}]`
           isArrayAttr = true
-          continue
+        } else {
+          isArrayAttr = true
+          noNextFilter = setFilter + (setFilter.length > 0 ? '.' : '') + attr.key
+          setFilter = `${noNextFilter}.$[${filterName}]`
+          isPrimitive = true
         }
-      }
-      if (isInstanceOf(_type)) {
+      } else if (isInstanceOf(_type)) {
         // This is level change.
         // We moving to next query value.
-        nextQuery = (queryValue as unknown) as AnyLayout
         clazz = (model.get((_type as InstanceOf<Emb>).of) as unknown) as Ref<Class<Obj>>
         noNextFilter = setFilter + (setFilter.length > 0 ? '.' : '') + attr.key
-        setFilter = `${noNextFilter}.$[${nextFilterName}]`
+        setFilter = `${noNextFilter}.$[${filterName}]`
         isArrayAttr = false
-        continue
+      } else {
+        throw new Error(`Object selector field type is unsupported ${_type} `)
       }
-      // This is variable marching
-      if (attr.key !== '_class') { // Ignore _class fields.
-        filter[`${filterName}.${attr.key}`] = queryValue
+    }
+    if (isPull && segmId === selector.length - 1) {
+      // In case of pull
+      return {
+        clazz,
+        setFilter: noNextFilter,
+        arrayFilter,
+        lastQuery: segm.pattern,
+        isArrayAttr,
+        index,
+        attribute: lastAttribute,
+        isPrimitive
       }
+    }
+    if (segm.pattern && typeof segm.pattern === 'object') {
+      for (const queryE of Object.entries(segm.pattern as AnyLayout)) {
+        const pAttr = model.classAttribute(clazz, queryE[0])
+        // This is variable marching
+        if (pAttr.key !== '_class') { // Ignore _class fields.
+          filter[`${filterName}.${pAttr.key}`] = queryE[1] as any
+        }
+      }
+    } else if (segm.pattern) {
+      filter[`${filterName}`] = segm.pattern
     }
     if (Object.keys(filter).length > 0) {
       arrayFilter.push(filter)
@@ -113,7 +122,11 @@ function extractArrayFilter (model: Model, _class: Ref<Class<Doc>>, query: AnyLa
   return {
     clazz,
     setFilter,
-    arrayFilter
+    arrayFilter,
+    isArrayAttr,
+    index,
+    attribute: lastAttribute,
+    isPrimitive
   }
 }
 
@@ -143,14 +156,21 @@ function extractArrayFilter (model: Model, _class: Ref<Class<Doc>>, query: AnyLa
 
  Function will create a pair of $set operation object and a applyFilters section.
  */
-export function createSetArrayFilters (model: Model, _class: Ref<Class<Doc>>, query: AnyLayout, values: AnyLayout): { updateOperation: AnyLayout, arrayFilter: AnyLayout[] } {
+export function createSetArrayFilters (model: Model, _class: Ref<Class<Doc>>, selector: ObjectSelector[] | undefined, values: AnyLayout, index: number): { updateOperation: AnyLayout, arrayFilter: AnyLayout[], index: number } {
+  if (!selector || selector.length === 0) {
+    // Object itself apply operation.
+    const value = model.assign({}, _class, values)
+    delete value._class // We should not override _class in any case
+    return { updateOperation: value, arrayFilter: [], index }
+  }
   const updateOperation: AnyLayout = {}
 
   const {
     clazz,
     setFilter,
-    arrayFilter
-  } = extractArrayFilter(model, _class, query, false)
+    arrayFilter,
+    index: resIndex
+  } = extractArrayFilter(model, _class, selector, false, index)
 
   // Validate fields agains clazz we found last one.
   for (const key in values) {
@@ -161,20 +181,33 @@ export function createSetArrayFilters (model: Model, _class: Ref<Class<Doc>>, qu
 
   return {
     updateOperation,
-    arrayFilter
+    arrayFilter,
+    index: resIndex
   }
 }
 
-export function createPushArrayFilters (model: Model, _class: Ref<Class<Doc>>, query: AnyLayout, attribute: StringProperty | null, values: AnyLayout): { updateOperation: AnyLayout, arrayFilters: AnyLayout[] } {
+export function createPushArrayFilters (model: Model, _class: Ref<Class<Doc>>, selector: ObjectSelector[] | undefined, values: AnyLayout, index: number): {
+  updateOperation: AnyLayout,
+  arrayFilters: AnyLayout[],
+  index: number
+} {
+  if (!selector || !isValidSelector(selector)) {
+    throw new Error('push requires a valid selector')
+  }
   const {
     clazz,
     setFilter,
-    arrayFilter
-  } = extractArrayFilter(model, _class, query, false)
+    arrayFilter,
+    index: resIndex,
+    attribute
+  } = extractArrayFilter(model, _class, selector, false, index)
 
   let op = setFilter
   if (attribute) {
-    op += '.' + (attribute as string)
+    if (op.length > 0) {
+      op += '.'
+    }
+    op += attribute.name
   }
 
   const updateOperation: AnyLayout = {
@@ -185,28 +218,45 @@ export function createPushArrayFilters (model: Model, _class: Ref<Class<Doc>>, q
   }
   return {
     updateOperation,
-    arrayFilters: arrayFilter
+    arrayFilters: arrayFilter,
+    index: resIndex
   }
 }
 
-export function createPullArrayFilters (model: Model, _class: Ref<Class<Doc>>, query: AnyLayout): { updateOperation: AnyLayout, arrayFilters: AnyLayout[], isArrayAttr?: boolean } {
+export function createPullArrayFilters (model: Model, _class: Ref<Class<Doc>>, selector: ObjectSelector[] | undefined, index: number): {
+  updateOperation: AnyLayout,
+  arrayFilters: AnyLayout[],
+  isArrayAttr?: boolean,
+  index: number
+} {
+  if (!selector || !isValidSelector(selector)) {
+    throw new Error('pull requires a valid selector')
+  }
   const {
     clazz,
     setFilter,
     arrayFilter,
     lastQuery,
-    isArrayAttr
-  } = extractArrayFilter(model, _class, query, true)
+    isArrayAttr,
+    index: resIndex,
+    isPrimitive
+  } = extractArrayFilter(model, _class, selector, true, index)
 
-  const updateOperation: AnyLayout = {
-    [setFilter]: {
-      _class: (clazz as unknown) as StringProperty,
-      ...lastQuery
+  let updateOperation: AnyLayout
+  if (!isPrimitive) {
+    updateOperation = {
+      [setFilter]: {
+        _class: (clazz as unknown) as StringProperty,
+        ...lastQuery
+      }
     }
+  } else {
+    updateOperation = { [setFilter]: lastQuery as Property<any, any> }
   }
   return {
     updateOperation,
     arrayFilters: arrayFilter,
-    isArrayAttr
+    isArrayAttr,
+    index: resIndex
   }
 }

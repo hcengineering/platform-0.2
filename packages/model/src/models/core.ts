@@ -27,7 +27,6 @@ export class TObj implements Obj {
 
 @Class$(core.class.Emb, core.class.Obj)
 export class TEmb extends TObj implements Emb {
-  __embedded!: true
 }
 
 @Class$(core.class.Doc, core.class.Obj)

@@ -13,20 +13,10 @@
 // limitations under the License.
 //
 
-import { Tx, AnyLayout, Class, Doc, Ref, StringProperty } from '@anticrm/core'
+import { AnyLayout, Class, Doc, Ref, StringProperty, Tx } from '@anticrm/core'
 import {
-  CreateTx,
-  DeleteTx,
-  PushTx,
-  Space,
-  SpaceUser,
-  UpdateTx,
-  CORE_CLASS_CREATE_TX,
-  CORE_CLASS_UPDATE_TX,
-  CORE_CLASS_DELETE_TX,
-  CORE_CLASS_PUSH_TX,
-  CORE_CLASS_SPACE,
-  CORE_CLASS_TITLE, CORE_CLASS_REFERENCE
+  CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_REFERENCE, CORE_CLASS_SPACE,
+  CORE_CLASS_TITLE, CORE_CLASS_UPDATE_TX, CreateTx, DeleteTx, Space, SpaceUser, UpdateTx
 } from '@anticrm/domains'
 import { Client } from './server'
 import { WorkspaceProtocol } from './workspace'
@@ -196,23 +186,6 @@ export async function processTx (ctx: SecurityContext, workspace: WorkspaceProto
       }
       return {
         allowed: isAcceptable(spaces, updateTx._objectClass, (obj as unknown) as AnyLayout),
-        sendSpace
-      }
-    }
-    case CORE_CLASS_PUSH_TX: {
-      const pushTx = tx as PushTx
-      const obj = await getObjectById(ctx, workspace, pushTx._objectClass, pushTx._objectId)
-      if (!obj) {
-        throw new Error(`Document for update ${pushTx._objectClass} ${pushTx._objectId} is not found'`)
-      }
-      let sendSpace: Space | null = null
-      if (!ownChange && pushTx._objectClass === CORE_CLASS_SPACE) {
-        // Check if SpaceUser is we, since operation is already applied, we could check with Space object itself.
-        const sp = (obj as unknown) as Space
-        sendSpace = checkUpdateSpaces(spaces, sp, sp._id, client.email)
-      }
-      return {
-        allowed: isAcceptable(spaces, pushTx._objectClass, (obj as unknown) as AnyLayout),
         sendSpace
       }
     }

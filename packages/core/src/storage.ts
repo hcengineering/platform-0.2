@@ -2,7 +2,7 @@
  * Operation direction, is it came from server or it is own operation.
  */
 import { AnyLayout, Class, DateProperty, Doc, Ref, StringProperty } from './classes'
-import { Space, VDoc } from '@anticrm/domains'
+import { Space, TxOperation, VDoc } from '@anticrm/domains'
 
 export enum TxContextSource {
   Client, // A pure client operation
@@ -35,9 +35,8 @@ export function txContext (source: TxContextSource = TxContextSource.Client, net
 
 export interface Storage {
   store (ctx: TxContext, doc: Doc): Promise<void>
-  push (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, query: AnyLayout | null, attribute: StringProperty, attributes: AnyLayout): Promise<void>
-  update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, query: AnyLayout | null, attributes: AnyLayout): Promise<void>
-  remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, query: AnyLayout | null): Promise<void>
+  update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, operations: TxOperation[]): Promise<void>
+  remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<void>
 
   find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]>
   findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined>
@@ -137,20 +136,16 @@ class CombineStorage implements Storage {
     return Promise.race(this.storages.map((s) => s.findOne(_class, query)))
   }
 
-  push (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, query: AnyLayout | null, attribute: StringProperty, attributes: AnyLayout): Promise<void> {
-    return Promise.all(this.storages.map((s) => s.push(ctx, _class, _id, query, attribute, attributes))).then()
-  }
-
-  remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, query: AnyLayout | null): Promise<void> {
-    return Promise.all(this.storages.map((s) => s.remove(ctx, _class, _id, query))).then()
+  remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<void> {
+    return Promise.all(this.storages.map((s) => s.remove(ctx, _class, _id))).then()
   }
 
   store (ctx: TxContext, doc: Doc): Promise<void> {
     return Promise.all(this.storages.map((s) => s.store(ctx, doc))).then()
   }
 
-  update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, query: AnyLayout | null, attributes: AnyLayout): Promise<void> {
-    return Promise.all(this.storages.map((s) => s.update(ctx, _class, _id, query, attributes))).then()
+  update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, operations: TxOperation[]): Promise<void> {
+    return Promise.all(this.storages.map((s) => s.update(ctx, _class, _id, operations))).then()
   }
 }
 
