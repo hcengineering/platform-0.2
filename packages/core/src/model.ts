@@ -774,11 +774,6 @@ export class Model implements Storage {
    * If used as false, it will find at least one match for object with array value.
    */
   private matchSelector (_class: Ref<Class<Obj>>, doc: Obj, selector: ObjectSelector[] | undefined): { match: boolean, value?: any, attrMatch?: AttributeMatch, doc: Obj, parent: Obj } {
-    if ((doc as any).__layout) {
-      // This is our proxy, we should unwrap it.
-      doc = (doc as any).__layout
-    }
-
     if (selector && isValidSelector(selector)) {
       let current = doc
       let parent = doc
@@ -799,7 +794,10 @@ export class Model implements Storage {
           throw new Error(`Pattern field for middle selector should be specified ${selector}`)
         }
         const attrClass = this.attributeClass(attr.attr.type)
-        const docValue = (current as any)[attr.key]
+
+        // If this is our proxy, we should unwrap it.
+        const cany = (current as any)
+        const docValue = (cany.__layout ? cany.__layout : cany)[attr.key]
         const res = this.matchValue(attrClass, docValue, segm.pattern, false)
         if (!res) {
           throw new Error('failed to match embedded object of value')
