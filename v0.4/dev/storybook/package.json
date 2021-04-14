@@ -13,7 +13,7 @@
   },
   "license": "MIT",
   "scripts": {
-    "start": "sirv public",
+    "build": "echo 'no build'",
     "test": "jest --watchAll",
     "storybook": "start-storybook -p 6006 -s public",
     "build-storybook": "build-storybook -s public"
