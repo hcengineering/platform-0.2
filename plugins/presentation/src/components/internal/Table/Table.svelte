@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 -->
-
 <script type="ts">
   import { AttrModel } from '../../../index'
   import { Class, Doc, Ref } from '@anticrm/core'
@@ -56,7 +55,7 @@
       page = _page
       pageIndex = _pageIndex
     },
-    setRows: _rows => (filteredRows = _rows)
+    setRows: (_rows) => (filteredRows = _rows)
   })
 
   function onPageChange (event) {
@@ -75,13 +74,8 @@
   }
 
   function onSort (event) {
-    event.detail.rows = sortString(
-      event.detail.rows,
-      event.detail.dir,
-      event.detail.key
-    )
+    event.detail.rows = sortString(event.detail.rows, event.detail.dir, event.detail.key)
   }
-
 </script>
 
 <div class="table-component">
@@ -92,26 +86,26 @@
 
   <table>
     <thead>
-    <tr>
-      {#each attributes as attr (attr.key)}
-        <th>
-          {attr.label}
-          <Sort key={attr.label} on:sort={onSort}/>
-        </th>
-      {/each}
-    </tr>
+      <tr>
+        {#each attributes as attr (attr.key)}
+          <th>
+            {attr.label}
+            <Sort key={attr.label} on:sort={onSort} />
+          </th>
+        {/each}
+      </tr>
     </thead>
     {#if visibleRows.length === 0}
       <tbody>
-      <tr>
-        <td class="center" colspan="100%">
-          <span>
-            {@html labels.empty}
-          </span>
-        </td>
-      </tr>
+        <tr>
+          <td class="center" colspan="100%">
+            <span>
+              {@html labels.empty}
+            </span>
+          </td>
+        </tr>
       </tbody>
-    {:else }
+    {:else}
       <tbody>
         {#each visibleRows as object (object._id)}
           <tr on:click={handleRowClick(object._id)}>
@@ -142,7 +136,6 @@
     </div>
   </slot>
 </div>
-
 
 <style lang="scss">
   .table-component {

@@ -30,15 +30,6 @@
   }
 </script>
 
-<style>
-    .sort {
-        right: 0;
-        cursor: pointer;
-        padding: 0 0.25em;
-        color: #999;
-    }
-</style>
-
 <span class="sort" on:click={onClick}>
   {#if dir === 'asc'}
     <span title={labels.asc.title}>
@@ -54,3 +45,12 @@
     </span>
   {/if}
 </span>
+
+<style>
+  .sort {
+    right: 0;
+    cursor: pointer;
+    padding: 0 0.25em;
+    color: #999;
+  }
+</style>

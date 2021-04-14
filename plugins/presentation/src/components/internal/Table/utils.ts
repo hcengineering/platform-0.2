@@ -1,8 +1,8 @@
-export function sortString (rows: any[], dir: string, key: string) {
+export function sortString (rows: any[], dir: string, key: string): any[] {
   return rows.sort((a, b) =>
     dir === 'asc'
-      ? ('' + a[key]).localeCompare(b[key])
-      : ('' + b[key]).localeCompare(a[key])
+      ? (a[key].toString()).localeCompare(b[key])
+      : (b[key].toString()).localeCompare(a[key])
   )
 }
 

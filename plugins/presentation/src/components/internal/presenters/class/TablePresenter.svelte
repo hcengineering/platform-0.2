@@ -1,6 +1,6 @@
 <script type="ts">
-  import Table from '../../Table.svelte'
-  import type { Class, Ref } from '@anticrm/core'
+  import Table from '../../Table/Table.svelte'
+  import type { Class, Doc, Ref } from '@anticrm/core'
   import type { Space, VDoc } from '@anticrm/domains'
   import { AttrModel, ClassModel, getEmptyModel, getPresentationService, liveQuery } from '../../../../index'
   import { CORE_CLASS_VDOC } from '@anticrm/domains'
@@ -34,4 +34,4 @@
   })
 </script>
 
-<Table {_class} on:open {editable} rows={objects} {attributes}/>
+<Table {_class} on:open {editable} rows={objects} {attributes} />

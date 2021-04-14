@@ -29,9 +29,7 @@
       if (detail.text.length === 0) {
         stateContext.setRows(state.rows)
       } else {
-        stateContext.setRows(
-          detail.rows.filter(r => detail.filter(r, detail.text, index))
-        )
+        stateContext.setRows(detail.rows.filter((r) => detail.filter(r, detail.text, index)))
       }
       stateContext.setPage(0, 0)
     } else {
@@ -40,34 +38,6 @@
   }
 </script>
 
-<style>
-    .control-container {
-        width: 100%;
-        height: 50px;
-        background: #333;
-        border-radius: 15px;
-        margin: 20px;
-        display: flex;
-        align-items: center;
-        padding: 10px 0;
-    }
-    .search {
-        width: 33.3%;
-        float: right;
-    }
-    .search input {
-        width: 100%;
-        border: 1px solid #eee;
-        border-radius: 3px;
-        padding: 5px 3px;
-    }
-
-    @media screen and (max-width: 767px) {
-        .search {
-            width: 100%;
-        }
-    }
-</style>
 <div class="control-container">
   <div class="search">
     <input
@@ -77,5 +47,33 @@
       bind:value={text}
       on:keydown={onSearch} />
   </div>
-
 </div>
+
+<style>
+  .control-container {
+    width: 100%;
+    height: 50px;
+    background: #333;
+    border-radius: 15px;
+    margin: 20px;
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+  }
+  .search {
+    width: 33.3%;
+    float: right;
+  }
+  .search input {
+    width: 100%;
+    border: 1px solid #eee;
+    border-radius: 3px;
+    padding: 5px 3px;
+  }
+
+  @media screen and (max-width: 767px) {
+    .search {
+      width: 100%;
+    }
+  }
+</style>
