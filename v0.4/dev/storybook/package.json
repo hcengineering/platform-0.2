@@ -32,11 +32,15 @@
     "svelte": "^3.31.2",
     "svelte-loader": "^2.13.6",
     "svelte-preprocess": "~4.7.0",
-    "@tsconfig/svelte": "~1.0.10"
+    "@tsconfig/svelte": "~1.0.10",
+    "css-loader": "~5.2.1",
+    "style-loader": "~2.0.0",
+    "sass-loader": "~10.1.1"
   },
   "dependencies": {
     "sirv-cli": "^1.0.0",
-    "@anticrm/sparkling-controls": "~0.2.0"
+    "@anticrm/sparkling-controls": "~0.2.0",
+    "@anticrm/sparkling-theme": "~0.2.0"
   },
   "jest": {
     "transform": {

@@ -38,7 +38,7 @@
 </slot>
 
 <style lang="scss" global>
-  @import '../styles/colors.scss';
+  // @import '../styles/colors.scss';
 
   * {
     box-sizing: border-box;

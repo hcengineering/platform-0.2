@@ -22,7 +22,10 @@ const prod = mode === 'production'
 
 module.exports = {
   entry: {
-    bundle: ['./src/main.ts']
+    bundle: [
+      '@anticrm/sparkling-theme/styles/colors.scss',
+      './src/main.ts'
+    ]
   },
   resolve: {
     symlinks: true,
@@ -78,17 +81,24 @@ module.exports = {
           // }
         }
       },
+
       {
         test: /\.css$/,
         use: [
-          /**
-           * MiniCssExtractPlugin doesn't support HMR.
-           * For developing, use 'style-loader' instead.
-           * */
           prod ? MiniCssExtractPlugin.loader : 'style-loader',
-          'css-loader'
+          'css-loader',
         ]
       },
+
+      {
+        test: /\.scss$/,
+        use: [
+          prod ? MiniCssExtractPlugin.loader : 'style-loader',
+          'css-loader',
+          'sass-loader',
+        ],
+      },
+
       {
         test: /\.(ttf|otf|eot|woff|woff2)$/,
         use: {
