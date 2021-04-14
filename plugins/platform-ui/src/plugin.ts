@@ -132,7 +132,14 @@ export default (platform: Platform): Promise<UIService> => {
     if (documentProvider) {
       return documentProvider.open(doc)
     }
-    return Promise.reject(new Error('Document provider is not registred'))
+    return Promise.reject(new Error('Document provider is not registered'))
+  }
+
+  function getHref (doc: Document): Promise<string> {
+    if (documentProvider) {
+      return documentProvider.getHref(doc)
+    }
+    return Promise.reject(new Error('Document provider is not registered'))
   }
 
   function selection (): Document | undefined {
@@ -156,6 +163,7 @@ export default (platform: Platform): Promise<UIService> => {
     closeModal,
 
     open,
+    getHref,
     selection,
     registerDocumentProvider
   } as UIService
