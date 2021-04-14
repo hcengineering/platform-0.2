@@ -21,7 +21,6 @@ export async function initDatabase (db: Db): Promise<any> {
   const domains = { ...Model } as { [key: string]: Doc[] }
   const ops = [] as Promise<any>[]
   for (const domain in domains) {
-    console.log('PROCESSING DOMAIN:', domain)
     const model = domains[domain]
     db.collection(domain, (err, coll) => {
       if (err) {

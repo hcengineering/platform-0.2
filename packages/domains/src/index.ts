@@ -13,14 +13,14 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Class, DateProperty, Doc, Emb, Mixin, Ref, StringProperty, Tx } from '@anticrm/core'
+import { AnyLayout, Class, DateProperty, Doc, Emb, Mixin, Property, Ref, StringProperty, Tx } from '@anticrm/core'
 
 // TXes
 
 export const CORE_CLASS_CREATE_TX = 'class:core.CreateTx' as Ref<Class<CreateTx>>
 export const CORE_CLASS_UPDATE_TX = 'class:core.UpdateTx' as Ref<Class<UpdateTx>>
+export const CORE_CLASS_TX_OPERATION = 'class:core.TxOperation' as Ref<Class<TxOperation>>
 export const CORE_CLASS_DELETE_TX = 'class:core.DeleteTx' as Ref<Class<DeleteTx>>
-export const CORE_CLASS_PUSH_TX = 'class:core.PushTx' as Ref<Class<PushTx>>
 
 export const TX_DOMAIN = 'tx'
 
@@ -29,23 +29,169 @@ export interface ObjectTx extends Tx {
   _objectClass: Ref<Class<Doc>>
 }
 
+/**
+ * Perform an object creation.
+ * In case _class is mixin, object of first parent Class will be stored into storage.
+ */
 export interface CreateTx extends ObjectTx {
   object: AnyLayout
 }
 
-export interface PushTx extends ObjectTx {
-  _attribute: StringProperty
-  _attributes: AnyLayout
-  _query?: AnyLayout
+/**
+ * An update transaction, operation kind.
+ */
+export enum TxOperationKind {
+  Set,
+  Push,
+  Pull
 }
 
+export interface ObjectSelector extends Emb {
+  key: string // A field key
+  pattern?: AnyLayout | Property<any, any> // A pattern to match inside array, may be missing for some operations.
+}
+
+/**
+ * Update operation inside update transaction, could contain changes to some of individual embedded attributes.
+ * And operations with arrays.
+ */
+export interface TxOperation extends Emb {
+  kind: TxOperationKind
+  /*
+   Embedded object/Array selector, will determine type of object passed as individual operations.
+
+   Selector is array of (Key, QueryObject) pairs, with last one could be omitted.
+   Key - is array or embedded object name field.
+   ObjectQuery - is object matching to ensure element in array.
+
+   Using selector it is possible to identify attribute/embedded object to perform update, push, pull operations on.
+   parentKey: {parentSelector}, arrayKey
+
+   If selector is not specified, only update operation is allowed and will be performed against object itself.
+   */
+  selector?: ObjectSelector[]
+
+  // will determine an object or individual value to be updated.
+  _attributes?: Property<any, any> | AnyLayout
+}
+
+/**
+ * Perform an object update operation.
+ * In case _class is mixin, object of first parent Class will be stored into storage.
+ */
 export interface UpdateTx extends ObjectTx {
-  _attributes: AnyLayout
-  _query?: AnyLayout
+  operations: TxOperation[]
 }
 
+/**
+ * Delete removed object fully from storage.
+ */
 export interface DeleteTx extends ObjectTx {
-  _query?: AnyLayout
+}
+
+interface TxOperationBuilder<T> {
+  match (values: Partial<T>): T & TxBuilder<T>
+  set (value: Partial<T>): TxOperation
+  build (): ObjectSelector[]
+  push (value: Partial<T>): TxOperation
+  pull (): TxOperation
+}
+
+export type ArrayElement<A> = A extends (infer T)[] ? T : A
+
+export type FieldBuilder<T> = {
+  [P in keyof T]-?: TxOperationBuilder<ArrayElement<T[P]>> & ArrayElement<T[P]>;
+}
+export type TxBuilder<T> = TxOperationBuilder<T> & FieldBuilder<T>
+
+class TxBuilderImpl<T> {
+  result: ObjectSelector[] = []
+  current: ObjectSelector = {} as ObjectSelector
+  factory: () => TxBuilder<any>
+
+  constructor (selector: ObjectSelector[], factory: () => TxBuilder<T>) {
+    this.result = [...selector]
+    this.factory = factory
+  }
+
+  match<Q extends Doc> (values: Partial<Q>): Q & TxBuilder<Q> {
+    this.current.pattern = (values as unknown) as AnyLayout
+    this.result.push(this.current)
+    this.current = {} as ObjectSelector
+    return (this.factory() as unknown) as Q & TxBuilder<Q>
+  }
+
+  build (): ObjectSelector[] | undefined {
+    if (this.current.key && this.current.key !== '') {
+      this.result.push(this.current)
+      this.current = {} as ObjectSelector
+    }
+    if (this.result.length > 0) {
+      return this.result
+    }
+  }
+
+  set (value: Partial<T>): TxOperation {
+    return {
+      kind: TxOperationKind.Set,
+      selector: this.build(),
+      _attributes: (value as unknown) as AnyLayout
+    } as TxOperation
+  }
+
+  push<Q extends Doc> (value: Partial<Q>): TxOperation {
+    return {
+      kind: TxOperationKind.Push,
+      selector: this.build(),
+      _attributes: (value as unknown) as AnyLayout
+    } as TxOperation
+  }
+
+  pull (): TxOperation {
+    return {
+      kind: TxOperationKind.Pull,
+      selector: this.build()
+    } as TxOperation
+  }
+
+  updateKey (property: string): void {
+    if (this.current.key === '') {
+      this.result.push(this.current)
+    }
+    this.current = {} as ObjectSelector
+    this.current.key = property as string
+  }
+}
+
+/**
+ * Construct TxOperation builder to create TxOperation to perform object update.
+ * @param clazz - an object class to build operation for.
+ */
+export function txBuilder<T extends Doc> (clazz: Ref<Class<T>>): TxBuilder<T> {
+  const ph: ProxyHandler<TxBuilderImpl<T>> = {
+    get (target, property, receiver) { // Trap for getting property values
+      switch (property) {
+        case 'match':
+          return target.match.bind(target)
+        case 'build':
+          return target.build.bind(target)
+        case 'set':
+          return target.set.bind(target)
+        case 'push':
+          return target.push.bind(target)
+        case 'pull':
+          return target.pull.bind(target)
+      }
+      const nb = new TxBuilderImpl<T>(target.result, () => np)
+      const np = new Proxy(nb, ph) as unknown as TxBuilder<T>
+      nb.updateKey(property as string)
+
+      return np
+    }
+  }
+  const nb = new TxBuilderImpl<T>([], () => np)
+  const np = new Proxy(nb, ph) as unknown as TxBuilder<T>
+  return np
 }
 
 // S P A C E

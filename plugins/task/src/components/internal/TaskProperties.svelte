@@ -59,7 +59,7 @@
             acts.push({
               name: act.action,
               action: () => {
-                coreService.then((cs) => cs.update(object, null, { status: statKey as NumberProperty }))
+                coreService.then((cs) => cs.update(object, { status: statKey as NumberProperty }))
               }
             })
           }
@@ -82,7 +82,7 @@
       label="Name"
       placeholder="Name"
       on:change={async () => {
-        (await coreService).update(object, null, { title: object.title })
+        await (await coreService).update(object, { title: object.title })
       }} />
   </div>
   <div class="taskStatusBar">

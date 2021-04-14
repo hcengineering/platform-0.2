@@ -90,7 +90,6 @@
         // Ignore
         console.log(e)
       }
-      console.log('NEW TASK', newTask)
 
       await cs.create(task.class.Task, newTask)
     }

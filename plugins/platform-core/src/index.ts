@@ -14,8 +14,9 @@
 //
 
 import { Metadata, Plugin, plugin, Service } from '@anticrm/platform'
-import { CoreProtocol, AnyLayout, Class, Doc, Ref, StringProperty } from '@anticrm/core'
+import { AnyLayout, Class, CoreProtocol, Doc, DocumentProtocol, Ref } from '@anticrm/core'
 import { ModelDb } from './modeldb'
+import { TxBuilder, TxOperation } from '@anticrm/domains'
 
 export type Subscriber<T> = (value: T[]) => void
 export type Unsubscriber = () => void
@@ -36,55 +37,38 @@ export interface QueryProtocol {
    * @param query - query
    */
   query<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): QueryResult<T>
-
-  /**
-   * Perform subscribe to query with some helper finalizer to use
-   * @param _class - a class to perform search against
-   * @param query - a query to match object.
-   * @param action - callback with list of results.
-   * @param regFinalizer - a factory to register unsubscribe for underline query.
-   * @return a function to re-query with a new parameters for same action.
-   */
-  // subscribe<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout, action: (docs: T[]) => void): Promise<QueryUpdater<T>>
 }
 
 /**
  * Define operations with object modifications.
- *
- * In case of query is not null, operation is performed over one of embedded objects, query should start with first array/instance
- * accessor and define a query to match embedded object, values will be applied to it as is.
- *
- * Only one embedded object or main object is possible to modify with one operation.
  */
 export interface OperationProtocol {
   /**
-   * Perform creation of new document.
+   * Perform creation of new document. Object ID will be automatically generated and assigned to object.
    */
   create<T extends Doc> (_class: Ref<Class<T>>, values: AnyLayout | Doc): Promise<T>
 
   /**
-   * Push new embedded element and return a link to it.
-   * If query is specified, will find attribute of embedded object.
+   * Perform update of document properties.
    */
-  push<T extends Doc> (doc: T, query: AnyLayout | null, attribute: StringProperty, element: AnyLayout | Doc): Promise<T>
+  update<T extends Doc> (doc: T, value: Partial<Omit<T, keyof Doc>>): Promise<T>
 
   /**
-   * Perform update of document/embedded document inside document.
+   * Perform update of document/embedded document properties using a builder pattern.
    *
-   * If query is specified, will find and update embedded object instead.
+   * It is possible to do a set, pull, push for different field values.
    *
+   * push and pull are applicable only for array attributes.
    */
-  update<T extends Doc> (doc: T, query: AnyLayout | null, values: AnyLayout): Promise<T>
+  updateWith<T extends Doc> (doc: T, builder: (s: TxBuilder<T>) => TxOperation | TxOperation[]): Promise<T>
 
   /**
-   * Perform remove of object or any embedded object value.
-   *
-   * If query is specified, will find and update embedded object instead.
+   * Perform remove of object.
    */
-  remove<T extends Doc> (doc: T, query: AnyLayout | null): Promise<T>
+  remove<T extends Doc> (doc: T): Promise<T>
 }
 
-export interface CoreService extends Service, CoreProtocol, QueryProtocol, OperationProtocol {
+export interface CoreService extends Service, CoreProtocol, QueryProtocol, DocumentProtocol, OperationProtocol {
   getModel (): ModelDb
 
   generateId (): Ref<Doc>

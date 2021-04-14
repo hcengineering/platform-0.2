@@ -50,7 +50,6 @@ limitations under the License.
   }
 
   const candidateM: WithCandidateProps['candidate'] = {
-    __embedded: true,
     _class: candidate.class.Candidate,
     bio: '',
     role: '',
@@ -58,7 +57,6 @@ limitations under the License.
   }
 
   let resumeM: WithCandidateProps['resume'] = {
-    __embedded: true,
     _class: personExtras.class.Resume,
     skills: [],
     hobbies: [],

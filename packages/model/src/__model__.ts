@@ -13,23 +13,20 @@
 // limitations under the License.
 //
 
-import core, { ArrayOf$, Builder, Class$, InstanceOf$, Mixin$, Primary, Prop, RefTo$ } from '.'
-
 import { Class, DateProperty, Doc, Emb, MODEL_DOMAIN, Ref, SPACE_DOMAIN, StringProperty, Type } from '@anticrm/core'
-
-import { Application, ShortID, Space, SpaceUser, Title, TITLE_DOMAIN, TitleSource, VDoc } from '@anticrm/domains'
-
+import { Application, ShortID, Space, SpaceUser, Title, TitleSource, TITLE_DOMAIN, VDoc } from '@anticrm/domains'
+import core, { ArrayOf$, Builder, Class$, InstanceOf$, Mixin$, Primary, Prop, RefTo$ } from '.'
 import {
   TArrayOf, TAttribute, TClass, TClassifier, TDoc, TEmb, TEnum, TEnumLiteral, TEnumOf, TIndexesClass, TInstanceOf,
   TMixin, TObj,
   TRefTo, TType
 } from './models/core'
-import { TCreateTx, TDeleteTx, TPushTx, TTx, TUpdateTx } from './models/tx'
 import { TReference } from './models/references'
+import { TCreateTx, TDeleteTx, TObjectSelector, TTx, TTxOperation, TUpdateTx } from './models/tx'
 
 export * from './models/core'
-export * from './models/tx'
 export * from './models/references'
+export * from './models/tx'
 
 // Primitive types
 
@@ -108,6 +105,6 @@ export function model (S: Builder): void {
   S.add(TIndexesClass, TVShortID)
   S.add(TStringType, TNumberType, TBooleanType, TDateType)
   S.add(TVDoc, TReference, TTitle, TApplication)
-  S.add(TTx, TCreateTx, TPushTx, TUpdateTx, TDeleteTx)
+  S.add(TTx, TCreateTx, TUpdateTx, TDeleteTx, TTxOperation, TObjectSelector)
   S.add(TSpace, TSpaceUser)
 }

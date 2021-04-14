@@ -139,7 +139,6 @@ export default async (platform: Platform): Promise<CoreService> => {
   }
 
   function processTx (tx: Tx): Promise<any> {
-    console.log('processTx', tx)
     const networkComplete = coreProtocol.tx(tx)
     return Promise.all([
       networkComplete,
