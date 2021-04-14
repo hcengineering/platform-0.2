@@ -25,14 +25,8 @@
 </script>
 
 <PopupMenu width={220} {relativeToParent}>
-  <div class="input-container" slot="trigger">
+  <div style={`width: ${width};`} slot="trigger">
     <EditBox value={value && value.toDateString()} {label} {placeholder} />
   </div>
   <MonthCalendar bind:selectedDate={value} />
 </PopupMenu>
-
-<style lang="scss">
-  .input-container {
-    width: 100%;
-  }
-</style>
