@@ -15,8 +15,8 @@
   "scripts": {
     "build": "echo 'no build'",
     "test": "jest --watchAll",
-    "storybook": "start-storybook -p 6006 -s public",
-    "build-storybook": "build-storybook -s public"
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
   },
   "devDependencies": {
     "@babel/core": "^7.12.10",
