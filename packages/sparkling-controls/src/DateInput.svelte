@@ -15,83 +15,24 @@
 <script lang="ts">
   import PopupMenu from './menu/PopupMenu.svelte'
   import MonthCalendar from './calendar/MonthCalendar.svelte'
+  import EditBox from '@anticrm/sparkling-controls/src/EditBox.svelte'
 
   export let width = '100%'
   export let label = ''
   export let value: Date | undefined = undefined
   export let placeholder: string
-  export let hoverState = false
   export let relativeToParent = false
 </script>
 
 <PopupMenu width={220} {relativeToParent}>
-  <div
-    class="date-input"
-    class:date-input-label={label !== ''}
-    class:date-input-hoverState={hoverState}
-    style="width: {width}"
-    slot="trigger">
-    {#if label !== ''}
-      <div class="wLabel">
-        <div class="label">{label}</div>
-        <input type="text" {placeholder} value={value && value.toDateString()} />
-      </div>
-    {:else}
-      <input type="text" {placeholder} value={value && value.toDateString()} />
-    {/if}
+  <div class="input-container" slot="trigger">
+    <EditBox value={value && value.toDateString()} {label} {placeholder} />
   </div>
   <MonthCalendar bind:selectedDate={value} />
 </PopupMenu>
 
 <style lang="scss">
-  input {
-    border: none;
-    width: calc(100% - 2px);
-    padding: 0;
-    background-color: transparent;
-    font: inherit;
-    color: var(--theme-content-color);
-    &:focus {
-      outline: none;
-    }
-  }
-
-  .date-input {
-    border-radius: 4px;
-    padding: 8px 16px;
-    box-sizing: border-box;
-    border: 1px solid var(--theme-bg-dark-color);
-    background-color: var(--theme-bg-accent-color);
-    color: var(--theme-content-color);
-    transition: border-color 0.2s, color 0.2s, background-color 0.2s;
-    &:focus-within {
-      outline: none;
-      background-color: var(--theme-bg-accent-hover);
-      border-color: var(--theme-bg-dark-hover);
-      color: var(--theme-content-color);
-    }
-    &-label {
-      height: 54px;
-      padding: 6px 16px 4px;
-    }
-    &-hoverState {
-      background-color: var(--theme-bg-accent-hover);
-      border-color: var(--theme-bg-dark-hover);
-      color: var(--theme-content-color);
-    }
-  }
-
-  .wLabel {
+  .input-container {
     width: 100%;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .label {
-    font-size: 11px;
-    font-weight: 400;
-    margin: 2px 0 6px;
-    align-self: flex-start;
-    color: var(--theme-content-color);
   }
 </style>
