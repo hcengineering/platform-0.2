@@ -373,6 +373,10 @@
       "projectFolder": "sparkling/theme"
     },
     {
+      "packageName": "@anticrm/sparkling-controls",
+      "projectFolder": "sparkling/controls"
+    },
+    {
       "packageName": "@anticrm/sparkling-components",
       "projectFolder": "sparkling/components"
     },

@@ -9,6 +9,7 @@ dependencies:
   '@rush-temp/plugin-ui-impl': file:projects/plugin-ui-impl.tgz
   '@rush-temp/prod': file:projects/prod.tgz_typescript@4.2.4
   '@rush-temp/sparkling-components': file:projects/sparkling-components.tgz_ea5aaf1e0f924a96c7e8da0f110cd99c
+  '@rush-temp/sparkling-controls': file:projects/sparkling-controls.tgz_ea5aaf1e0f924a96c7e8da0f110cd99c
   '@rush-temp/sparkling-theme': file:projects/sparkling-theme.tgz_ea5aaf1e0f924a96c7e8da0f110cd99c
   '@rush-temp/status': file:projects/status.tgz
   '@types/jest': 26.0.22
@@ -8645,6 +8646,28 @@ packages:
       integrity: sha512-USWgzP8jHfOYxyaY5vd391OV61w8LheXvJ4N86Q21lBCxZWaovOp9IxouhVATcVeCAVLyygjnkz1m0F5MBhVNg==
       tarball: file:projects/sparkling-components.tgz
     version: 0.0.0
+  file:projects/sparkling-controls.tgz_ea5aaf1e0f924a96c7e8da0f110cd99c:
+    dependencies:
+      '@babel/runtime': 7.13.10
+      core-js: 3.10.1
+      prettier: 2.2.1
+      sass: 1.32.8
+      sass-loader: 11.0.1_sass@1.32.8+webpack@5.32.0
+      svelte: 3.37.0
+      svelte-loader: 3.1.0_svelte@3.37.0
+      svelte-preprocess: 4.7.0_c14a09b624e11ca3eaa9db430b53f206
+      ts-standard: 10.0.0_typescript@4.2.4
+      typescript: 4.2.4
+    dev: false
+    id: file:projects/sparkling-controls.tgz
+    name: '@rush-temp/sparkling-controls'
+    peerDependencies:
+      '@babel/core': '*'
+      webpack: '*'
+    resolution:
+      integrity: sha512-3UhWj95FVDW+uL8+jVynWpUHFevDf+sQdGvxa7/hqOO6u4/PPTsUsoHRrx6VXiIgPcEbpbYqu3f8xUYZGICwIg==
+      tarball: file:projects/sparkling-controls.tgz
+    version: 0.0.0
   file:projects/sparkling-theme.tgz_ea5aaf1e0f924a96c7e8da0f110cd99c:
     dependencies:
       '@babel/runtime': 7.13.10
@@ -8691,6 +8714,7 @@ specifiers:
   '@rush-temp/plugin-ui-impl': file:./projects/plugin-ui-impl.tgz
   '@rush-temp/prod': file:./projects/prod.tgz
   '@rush-temp/sparkling-components': file:./projects/sparkling-components.tgz
+  '@rush-temp/sparkling-controls': file:./projects/sparkling-controls.tgz
   '@rush-temp/sparkling-theme': file:./projects/sparkling-theme.tgz
   '@rush-temp/status': file:./projects/status.tgz
   '@types/jest': ~26.0.22
