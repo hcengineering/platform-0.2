@@ -391,6 +391,10 @@
     {
       "packageName": "prod",
       "projectFolder": "dev/prod"
+    },
+    {
+      "packageName": "storybook",
+      "projectFolder": "dev/storybook"
     }
     // {
     //   "packageName": "prodx",
