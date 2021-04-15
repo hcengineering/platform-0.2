@@ -16,11 +16,11 @@
 import { createPlatform } from '@anticrm/plugin'
 
 import ui from '@anticrm/plugin-ui'
+import login from '@anticrm/plugin-login'
 // import core from '@anticrm/platform-core'
 // import i18n from '@anticrm/platform-i18n'
 // import activity from '@anticrm/activity'
 // import activityMeta from '@anticrm/activity/src/__meta__'
-// import login from '@anticrm/login'
 // import workbench from '@anticrm/workbench'
 // import presentation from '@anticrm/presentation'
 // import task from '@anticrm/task'
@@ -31,13 +31,14 @@ import ui from '@anticrm/plugin-ui'
 // import recruiting from '@anticrm/recruiting'
 // import personExtras from '@anticrm/person-extras'
 // import calendar from '@anticrm/calendar'
+
+import loginMeta from '@anticrm/plugin-login-impl/src/__meta__'
 // import uiMeta from '@anticrm/platform-ui/src/__meta__/meta'
 // import workbenchMeta from '@anticrm/workbench/src/__meta__'
 // import chunterMeta from '@anticrm/chunter/src/__meta__'
 // import recruitingMeta from '@anticrm/recruiting/src/__meta__'
 // import taskMeta from '@anticrm/task/src/__meta__'
 // import presentationMeta from '@anticrm/presentation/src/__meta__'
-// import loginMeta from '@anticrm/login/src/__meta__'
 // import dataGenMeta from '@anticrm/data-generator/src/__meta__'
 
 const platform = createPlatform()
@@ -64,6 +65,7 @@ platform.addLocation(ui, () => import(/* webpackChunkName: "plugin-ui" */ '@anti
 // platform.addLocation(datagen, () => import(/* webpackChunkName: "datagen" */ '@anticrm/data-generator/src/plugin'))
 
 // uiMeta(platform)
+loginMeta(platform)
 // workbenchMeta(platform)
 // activityMeta(platform)
 // chunterMeta(platform)
@@ -71,7 +73,6 @@ platform.addLocation(ui, () => import(/* webpackChunkName: "plugin-ui" */ '@anti
 // recruitingMeta(platform)
 // taskMeta(platform)
 // presentationMeta(platform)
-// loginMeta(platform)
 // contactMeta(platform)
 // dataGenMeta(platform)
 

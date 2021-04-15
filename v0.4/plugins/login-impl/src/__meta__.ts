@@ -13,10 +13,10 @@
 // limitations under the License.
 //
 
-import { Platform } from '@anticrm/platform'
-import login from './index'
-import { routeMeta } from '@anticrm/platform-ui'
+import { Platform } from '@anticrm/plugin'
+import login from '@anticrm/plugin-login'
+import { applicationShortcutKey } from '@anticrm/plugin-ui'
 
 export default (platform: Platform): void => {
-  platform.setMetadata(routeMeta('login'), { route: 'login', component: login.component.MainLoginForm })
+  platform.setMetadata(applicationShortcutKey('login'), login.component.LoginForm)
 }
