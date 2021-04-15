@@ -134,7 +134,14 @@ export default async (platform: Platform): Promise<UIService> => {
     if (documentProvider != null) {
       return await documentProvider.open(doc)
     }
-    return await Promise.reject(new Error('Document provider is not registred'))
+    return await Promise.reject(new Error('Document provider is not registered'))
+  }
+
+  async function getHref (doc: Document): Promise<string> {
+    if (documentProvider) {
+      return await documentProvider.getHref(doc)
+    }
+    return await Promise.reject(new Error('Document provider is not registered'))
   }
 
   function selection (): Document | undefined {
@@ -158,6 +165,7 @@ export default async (platform: Platform): Promise<UIService> => {
     closeModal,
 
     open,
+    getHref,
     selection,
     registerDocumentProvider
   } as UIService

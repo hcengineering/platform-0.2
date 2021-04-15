@@ -107,6 +107,12 @@ export interface DocumentProvider {
   open: (doc: Document) => Promise<void>
 
   /**
+   * Construct a href with a full URI pointing to required document.
+   * @param doc
+   */
+  getHref: (doc: Document) => Promise<string>
+
+  /**
    * Return currently selected document, if one.
    */
   selection: () => Document | undefined
