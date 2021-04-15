@@ -21,8 +21,8 @@ import uiPlugin, { UIService } from '@anticrm/plugin-ui'
 import login, { ACCOUNT_KEY, LoginInfo, LoginService } from '@anticrm/plugin-login'
 
 import LoginForm from './components/LoginForm.svelte'
-import SettingForm from './components/SettingForm.svelte'
-import MainLoginForm from './components/MainLoginForm.svelte'
+// import SettingForm from './components/SettingForm.svelte'
+// import MainLoginForm from './components/MainLoginForm.svelte'
 
 import FingerprintJS from '@fingerprintjs/fingerprintjs'
 
@@ -39,8 +39,8 @@ export default (platform: Platform, deps: { ui: UIService }): Promise<LoginServi
     throw new Status(Severity.ERROR, 0, 'no accounts server metadata provided.')
   }
   platform.setResource(login.component.LoginForm, LoginForm)
-  platform.setResource(login.component.MainLoginForm, MainLoginForm)
-  platform.setResource(login.component.SettingForm, SettingForm)
+  // platform.setResource(login.component.MainLoginForm, MainLoginForm)
+  // platform.setResource(login.component.SettingForm, SettingForm)
 
   // platform.setResource(login.component.SignupForm, SignupForm)
 

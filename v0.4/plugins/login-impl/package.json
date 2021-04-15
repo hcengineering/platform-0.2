@@ -28,6 +28,7 @@
     "@anticrm/plugin-ui": "~0.2.0",
     "@anticrm/plugin-login": "~0.2.0",
     "@fingerprintjs/fingerprintjs": "~3.1.0",
-    "@anticrm/rpc": "~0.2.0"
+    "@anticrm/rpc": "~0.2.0",
+    "@anticrm/sparkling-controls": "~0.2.0"
   }
 }

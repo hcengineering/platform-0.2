@@ -15,17 +15,17 @@
 
 import platform from './platform'
 import ui from '@anticrm/plugin-ui'
+import login from '@anticrm/plugin-login'
 
 // import core from '@anticrm/platform-core'
-// import login, { currentAccount } from '@anticrm/login'
 
 import ErrorPage from './components/ErrorPage.svelte'
 
-// const accountsUrl = process.env.APP_ACCOUNTS_URL
+const accountsUrl = process.env.APP_ACCOUNTS_URL
 // const host = process.env.APP_WSHOST
 // const port = process.env.APP_WSPORT
 
-// platform.setMetadata(login.metadata.AccountsUrl, accountsUrl)
+platform.setMetadata(login.metadata.AccountsUrl, accountsUrl)
 // platform.setMetadata(core.metadata.WSHost, host)
 // platform.setMetadata(core.metadata.WSPort, port)
 

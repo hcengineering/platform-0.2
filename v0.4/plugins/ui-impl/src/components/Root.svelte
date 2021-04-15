@@ -29,7 +29,8 @@
     ':application',
     (route) => {
       if (route.application) {
-        application = platform.getMetadata(applicationShortcutKey(route.application))
+        const shortcut = platform.getMetadata(applicationShortcutKey(route.application))
+        application = shortcut ?? route.application
       }
     },
     { application: null }

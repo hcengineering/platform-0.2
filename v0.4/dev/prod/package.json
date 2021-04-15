@@ -24,7 +24,8 @@
     "style-loader": "~2.0.0",
     "file-loader": "~6.2.0",
     "@anticrm/sparkling-theme": "~0.2.0",
-    "sass-loader": "~11.0.1"
+    "sass-loader": "~11.0.1",
+    "@types/node": "~14.14.40"
   },
   "dependencies": {
     "@anticrm/plugin-ui": "~0.2.0",
