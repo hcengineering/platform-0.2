@@ -19,7 +19,7 @@ import WebSocket, { Server } from 'ws'
 import { decode } from 'jwt-simple'
 import { ClientControl, createClientService } from './service'
 import { connectWorkspace, WorkspaceProtocol } from './workspace'
-import { AnyLayout, Class, Doc, DocumentProtocol, Ref, Tx } from '@anticrm/core'
+import { Class, Doc, DocumentProtocol, DocumentQuery, Ref, Tx } from '@anticrm/core'
 import {
   readRequest, Response, RPC_CALL_FIND, RPC_CALL_FINDONE, RPC_CALL_GEN_REF_ID, RPC_CALL_LOAD_DOMAIN, RPC_CALL_TX,
   RpcError,
@@ -136,10 +136,10 @@ export async function start (port: number, dbUri: string, host?: string): Promis
       try {
         switch (request.method) {
           case RPC_CALL_FINDONE:
-            response.result = await ss.findOne(request.params[0] as Ref<Class<Doc>>, request.params[1] as AnyLayout)
+            response.result = await ss.findOne(request.params[0] as Ref<Class<Doc>>, request.params[1] as DocumentQuery<Doc>)
             break
           case RPC_CALL_FIND:
-            response.result = await ss.find(request.params[0] as Ref<Class<Doc>>, request.params[1] as AnyLayout)
+            response.result = await ss.find(request.params[0] as Ref<Class<Doc>>, request.params[1] as DocumentQuery<Doc>)
             break
           case RPC_CALL_GEN_REF_ID:
             response.result = await ss.genRefId(request.params[0] as Ref<Space>)

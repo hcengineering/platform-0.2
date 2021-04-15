@@ -13,7 +13,7 @@
 // limitations under the License.
 -->
 <script type="ts">
-  import type { NumberProperty, Property, Ref, StringProperty } from '@anticrm/core'
+  import type { Ref } from '@anticrm/core'
   import type { Application, Space } from '@anticrm/domains'
   import { CORE_CLASS_SPACE, CORE_MIXIN_SHORTID } from '@anticrm/domains'
 
@@ -22,8 +22,7 @@
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
   import EditBox from '@anticrm/sparkling-controls/src/EditBox.svelte'
   import ComboBox from '@anticrm/platform-ui/src/components/ComboBox.svelte'
-  import task, { TaskStatus } from '@anticrm/task'
-  import type { Comment } from '@anticrm/chunter'
+  import task, { Task, TaskStatus } from '@anticrm/task'
   import chunter from '@anticrm/chunter'
   import type { Action } from '@anticrm/platform-ui'
 
@@ -33,7 +32,7 @@
   let taskSpace: Space | undefined
   let spaces: Space[] = []
 
-  $: lq = liveQuery(lq, CORE_CLASS_SPACE, {}, (docs) => {
+  $: lq = liveQuery<Space>(lq, CORE_CLASS_SPACE, {}, (docs) => {
     spaces = docs
   })
 
@@ -70,17 +69,17 @@
     const cs = await coreService
     for (let i = 0; i < taskCount; i++) {
       const modelDb = cs.getModel()
-      const newTask = modelDb.newDoc(task.class.Task, cs.generateId(), {
-        title: faker.commerce.productName() as StringProperty,
+      const newTask = modelDb.newDoc<Task>(task.class.Task, cs.generateId(), {
+        title: faker.commerce.productName(),
         _space: taskSpace._id,
-        status: randomEnum(TaskStatus) as NumberProperty,
+        status: randomEnum(TaskStatus),
         comments: [
           {
             message: faker.commerce.productDescription(),
             _class: chunter.class.Comment,
-            _createdOn: Date.now() as Property<number, Date>,
-            _createdBy: cs.getUserId() as Property<string, string>
-          } as Comment
+            _createdOn: Date.now(),
+            _createdBy: cs.getUserId()
+          }
         ]
       })
       try {
@@ -100,9 +99,9 @@
     if (!taskSpace) {
       return
     }
-    const tasks = await cs.find(task.class.Task, { _space: taskSpace._id })
+    const tasks = await cs.find<Task>(task.class.Task, { _space: taskSpace._id })
     for (const t of tasks) {
-      await cs.remove(t, null)
+      await cs.remove(t)
     }
   }
 

@@ -14,18 +14,18 @@
 //
 
 import { Metadata, Plugin, plugin, Service } from '@anticrm/platform'
-import { AnyLayout, Class, CoreProtocol, Doc, DocumentProtocol, Ref } from '@anticrm/core'
+import { Class, CoreProtocol, Doc, DocumentProtocol, DocumentQuery, Ref } from '@anticrm/core'
 import { ModelDb } from './modeldb'
 import { TxBuilder, TxOperation } from '@anticrm/domains'
 
 export type Subscriber<T> = (value: T[]) => void
-export type Unsubscriber = () => void
+export type Unsubscribe = () => void
 
 export interface QueryResult<T extends Doc> {
-  subscribe (run: Subscriber<T>): Unsubscriber
+  subscribe (run: Subscriber<T>): Unsubscribe
 }
 
-export type QueryUpdater<T extends Doc> = (_class: Ref<Class<T>>, query: AnyLayout) => void
+export type QueryUpdater<T extends Doc> = (_class: Ref<Class<T>>, query: DocumentQuery<T>) => void
 
 /**
  * Define operations with live queries.
@@ -36,7 +36,7 @@ export interface QueryProtocol {
    * @param _class - object class
    * @param query - query
    */
-  query<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): QueryResult<T>
+  query<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): QueryResult<T>
 }
 
 /**
@@ -46,7 +46,7 @@ export interface OperationProtocol {
   /**
    * Perform creation of new document. Object ID will be automatically generated and assigned to object.
    */
-  create<T extends Doc> (_class: Ref<Class<T>>, values: AnyLayout | Doc): Promise<T>
+  create<T extends Doc> (_class: Ref<Class<T>>, values: Partial<T>): Promise<T>
 
   /**
    * Perform update of document properties.

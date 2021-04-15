@@ -62,8 +62,8 @@ limitations under the License.
       startDate: getAllDayEventStart(newEvent.startDate),
       endDate: getAllDayEventEnd(newEvent.endDate),
       _space: space?._id,
-      _createBy: core.getUserId()
-    }
+      _createdBy: core.getUserId() as StringProperty
+    } as CalendarEvent
     await core.create(calendar.class.CalendarEvent, doc)
     dispatch('close')
   }

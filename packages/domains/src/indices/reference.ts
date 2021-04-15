@@ -125,12 +125,12 @@ export class ReferenceIndex implements DomainIndex {
     }
   }
 
-  private collect (_objectClass: Ref<Class<Doc>>, _objectId: Ref<Doc>, object: AnyLayout): Reference[] {
+  private collect (_objectClass: Ref<Class<Doc>>, _objectId: Ref<Doc>, object: any): Reference[] {
     const index = { value: 0 }
     const backlinks = this.references(_objectClass, _objectId, object, { pos: -1 }, index)
     const arrays = this.getArrayAttributes(_objectClass)
     for (const attr of arrays) {
-      const arr = (object as any)[attr.key]
+      const arr = object[attr.key]
       if (arr) {
         for (let i = 0; i < arr.length; i++) {
           backlinks.push(...this.references(_objectClass, _objectId, arr[i], {
@@ -166,9 +166,8 @@ export class ReferenceIndex implements DomainIndex {
       _sourceId: update._objectId,
       _sourceClass: update._objectClass
     })
-    const newRefs = this.collect(update._objectClass, update._objectId, (obj as unknown) as AnyLayout)
 
-    return this.diffApply(refs, newRefs, ctx)
+    return this.diffApply(refs, this.collect(update._objectClass, update._objectId, obj as any), ctx)
   }
 
   private diffApply (refs: Reference[], newRefs: Reference[], ctx: TxContext): Promise<void[][]> {
@@ -177,11 +176,11 @@ export class ReferenceIndex implements DomainIndex {
     const existing: Reference[] = []
 
     for (const ref of refs) {
-      const refData = Object.assign({}, ref)
+      const refData: any = Object.assign({}, ref)
       delete refData._id
 
       for (const newRef of newRefs) {
-        const newRefData = Object.assign({}, newRef)
+        const newRefData: any = Object.assign({}, newRef)
         delete newRefData._id
         if (JSON.stringify(refData) !== JSON.stringify(newRefData)) {
           // We had existing link, no op required for it.

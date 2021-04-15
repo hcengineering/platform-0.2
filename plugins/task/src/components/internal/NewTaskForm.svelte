@@ -22,9 +22,8 @@
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
   import type { Space } from '@anticrm/domains'
   import { CORE_MIXIN_SHORTID } from '@anticrm/domains'
-  import task, { TaskStatus } from '../../index'
+  import task, { Task, TaskStatus } from '../../index'
   import EditBox from '@anticrm/sparkling-controls/src/EditBox.svelte'
-  import type { Comment } from '@anticrm/chunter'
   import chunter, { getChunterService } from '@anticrm/chunter'
 
   export let title: string
@@ -42,7 +41,7 @@
   async function save () {
     const cs = await coreService
     const modelDb = cs.getModel()
-    const newTask = modelDb.newDoc(task.class.Task, cs.generateId(), {
+    const newTask = modelDb.newDoc<Task>(task.class.Task, cs.generateId(), {
       title,
       _space: space?._id,
       ...object,
@@ -53,7 +52,7 @@
           _class: chunter.class.Comment,
           _createdOn: Date.now() as Property<number, Date>,
           _createdBy: cs.getUserId() as Property<string, string>
-        } as Comment
+        }
       ]
     })
     try {

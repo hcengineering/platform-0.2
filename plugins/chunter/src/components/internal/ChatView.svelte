@@ -12,21 +12,22 @@
   // See the License for the specific language governing permissions and
   // limitations under the License.
 
-  import type { Property, StringProperty } from '@anticrm/core'
+  import type { Ref, StringProperty } from '@anticrm/core'
+  import { DateProperty } from '@anticrm/core'
   import type { Space } from '@anticrm/domains'
   import type { MessageNode } from '@anticrm/text'
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
-  import type { Message } from '../..'
+  import type { Comment, Message } from '../..'
   import chunter, { getChunterService } from '../..'
   import CommentComponent from './Comment.svelte'
   import { getCoreService, getUserId, liveQuery } from '@anticrm/presentation'
 
   import DateItem from './DateItem.svelte'
-  import SplitView from '@anticrm/sparkling-controls/src/SplitView.svelte'
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import ui from '@anticrm/platform-ui'
+  import type { QueryUpdater } from '@anticrm/platform-core'
 
   const coreService = getCoreService()
   const chunterService = getChunterService()
@@ -37,9 +38,11 @@
   let messages: Message[] = []
 
   const userId = getUserId()
+  let ms: Promise<QueryUpdater<Message>>
 
-  $: ms = liveQuery(ms, chunter.class.Message, { _space: space._id }, (docs) => {
+  $: ms = liveQuery<Message>(ms, chunter.class.Message, { _space: space._id as Ref<Space> }, (docs) => {
     messages = docs
+    console.log(messages)
   })
 
   $: spaceName = space ? '#' + space.name : ''
@@ -50,16 +53,16 @@
         const parsedMessage = chunterService.createMissedObjects(message)
 
         const comment = {
-          _createdOn: Date.now() as Property<number, Date>,
+          _createdOn: Date.now() as DateProperty,
           _createdBy: userId as StringProperty,
-          message: parsedMessage as StringProperty
-        }
+          message: parsedMessage
+        } as Comment
         // absent VDoc fields will be autofilled
         coreService.then((cs) =>
           cs.create(chunter.class.Message, {
-            _space: space._id,
+            _space: space._id as Ref<Space>,
             comments: [comment]
-          })
+          } as Message)
         )
       })
     }
@@ -79,91 +82,19 @@
       {/each}
       <DateItem dateItem={new Date()} />
       <div style="height: 20px" />
-      <Button kind="icon"><Icon icon={ui.icon.Message} size="32" /></Button>
-      <Button kind="icon"><Icon icon={ui.icon.Phone} size="32" /></Button>
-      <Button kind="icon"><Icon icon={ui.icon.Mail} size="32" /></Button>
-      <Button kind="icon"><Icon icon={ui.icon.More} size="32" /></Button>
+      <Button kind="icon">
+        <Icon icon={ui.icon.Message} size="32" />
+      </Button>
+      <Button kind="icon">
+        <Icon icon={ui.icon.Phone} size="32" />
+      </Button>
+      <Button kind="icon">
+        <Icon icon={ui.icon.Mail} size="32" />
+      </Button>
+      <Button kind="icon">
+        <Icon icon={ui.icon.More} size="32" />
+      </Button>
       <div style="height: 20px" />
-      <SplitView width="100%" height="200px" spacing="10" minWidth="50">
-        <div slot="prevContent">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Rem beatae necessitatibus, accusantium exercitationem
-          ipsa fugiat mollitia aperiam optio quae modi labore eos ipsum porro, placeat nisi commodi excepturi molestiae
-          consequatur. Earum doloremque rem quibusdam natus velit fugiat quos repellat, eius impedit similique veritatis
-          placeat ipsam esse tenetur ex mollitia numquam sequi reprehenderit beatae animi dicta. Rerum sint quo nihil
-          necessitatibus? Similique aperiam, magni hic quasi blanditiis reprehenderit. Dolore sequi deleniti, tenetur
-          voluptatibus itaque eum porro laborum quod tempora dolores voluptate rerum cumque blanditiis cupiditate sit
-          velit laboriosam molestiae, perferendis architecto! Quam vel porro fugit commodi ab quaerat facere obcaecati
-          voluptatum, iusto iure quisquam adipisci sapiente recusandae non perspiciatis voluptates sed id provident
-          assumenda culpa autem blanditiis quibusdam? Autem, accusamus reprehenderit! Saepe quidem repellendus labore
-          modi ullam eos tenetur quibusdam deleniti repellat nulla cumque deserunt fugit doloribus cum illum ratione
-          fugiat distinctio inventore explicabo numquam repudiandae natus, odit et voluptas? Nemo. Cumque eos asperiores
-          harum et, possimus, itaque quod doloribus repellat amet quasi aliquam cupiditate quis corrupti sequi tempora.
-          Velit quidem nemo quae? Cupiditate officia ad inventore nam, incidunt assumenda molestiae. Voluptates
-          reprehenderit repellat eligendi dignissimos ratione aliquid distinctio, dolorem eius alias laborum perferendis
-          nihil ipsam quisquam! Sunt id in neque doloribus. Commodi labore facere sapiente dicta voluptate eaque
-          necessitatibus animi. Molestias omnis quasi esse, vero rerum asperiores culpa distinctio commodi laudantium
-          error dicta ullam earum, eveniet magnam harum porro adipisci vitae, fuga odit. Ducimus ex vitae facilis
-          accusantium cupiditate corrupti? Enim labore sit corporis blanditiis aliquam nesciunt harum quas quae sapiente
-          non officiis asperiores, quo, quasi nam repellendus laborum commodi nisi iure fuga autem. Quaerat voluptate
-          sequi enim ut hic? Magnam saepe iusto voluptatibus nostrum quos eligendi suscipit minima iste, earum corrupti
-          officiis molestias enim recusandae at aspernatur repudiandae praesentium, eveniet amet odio illum deserunt
-          asperiores? Natus officia culpa et.
-        </div>
-        <div slot="nextContent">
-          <SplitView width="100%" height="200px" spacing="10" minWidth="50" horizontal>
-            <div slot="prevContent">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Rem beatae necessitatibus, accusantium
-              exercitationem ipsa fugiat mollitia aperiam optio quae modi labore eos ipsum porro, placeat nisi commodi
-              excepturi molestiae consequatur. Earum doloremque rem quibusdam natus velit fugiat quos repellat, eius
-              impedit similique veritatis placeat ipsam esse tenetur ex mollitia numquam sequi reprehenderit beatae
-              animi dicta. Rerum sint quo nihil necessitatibus? Similique aperiam, magni hic quasi blanditiis
-              reprehenderit. Dolore sequi deleniti, tenetur voluptatibus itaque eum porro laborum quod tempora dolores
-              voluptate rerum cumque blanditiis cupiditate sit velit laboriosam molestiae, perferendis architecto! Quam
-              vel porro fugit commodi ab quaerat facere obcaecati voluptatum, iusto iure quisquam adipisci sapiente
-              recusandae non perspiciatis voluptates sed id provident assumenda culpa autem blanditiis quibusdam? Autem,
-              accusamus reprehenderit! Saepe quidem repellendus labore modi ullam eos tenetur quibusdam deleniti
-              repellat nulla cumque deserunt fugit doloribus cum illum ratione fugiat distinctio inventore explicabo
-              numquam repudiandae natus, odit et voluptas? Nemo. Cumque eos asperiores harum et, possimus, itaque quod
-              doloribus repellat amet quasi aliquam cupiditate quis corrupti sequi tempora. Velit quidem nemo quae?
-              Cupiditate officia ad inventore nam, incidunt assumenda molestiae. Voluptates reprehenderit repellat
-              eligendi dignissimos ratione aliquid distinctio, dolorem eius alias laborum perferendis nihil ipsam
-              quisquam! Sunt id in neque doloribus. Commodi labore facere sapiente dicta voluptate eaque necessitatibus
-              animi. Molestias omnis quasi esse, vero rerum asperiores culpa distinctio commodi laudantium error dicta
-              ullam earum, eveniet magnam harum porro adipisci vitae, fuga odit. Ducimus ex vitae facilis accusantium
-              cupiditate corrupti? Enim labore sit corporis blanditiis aliquam nesciunt harum quas quae sapiente non
-              officiis asperiores, quo, quasi nam repellendus laborum commodi nisi iure fuga autem. Quaerat voluptate
-              sequi enim ut hic? Magnam saepe iusto voluptatibus nostrum quos eligendi suscipit minima iste, earum
-              corrupti officiis molestias enim recusandae at aspernatur repudiandae praesentium, eveniet amet odio illum
-              deserunt asperiores? Natus officia culpa et.
-            </div>
-            <div slot="nextContent">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Rem beatae necessitatibus, accusantium
-              exercitationem ipsa fugiat mollitia aperiam optio quae modi labore eos ipsum porro, placeat nisi commodi
-              excepturi molestiae consequatur. Earum doloremque rem quibusdam natus velit fugiat quos repellat, eius
-              impedit similique veritatis placeat ipsam esse tenetur ex mollitia numquam sequi reprehenderit beatae
-              animi dicta. Rerum sint quo nihil necessitatibus? Similique aperiam, magni hic quasi blanditiis
-              reprehenderit. Dolore sequi deleniti, tenetur voluptatibus itaque eum porro laborum quod tempora dolores
-              voluptate rerum cumque blanditiis cupiditate sit velit laboriosam molestiae, perferendis architecto! Quam
-              vel porro fugit commodi ab quaerat facere obcaecati voluptatum, iusto iure quisquam adipisci sapiente
-              recusandae non perspiciatis voluptates sed id provident assumenda culpa autem blanditiis quibusdam? Autem,
-              accusamus reprehenderit! Saepe quidem repellendus labore modi ullam eos tenetur quibusdam deleniti
-              repellat nulla cumque deserunt fugit doloribus cum illum ratione fugiat distinctio inventore explicabo
-              numquam repudiandae natus, odit et voluptas? Nemo. Cumque eos asperiores harum et, possimus, itaque quod
-              doloribus repellat amet quasi aliquam cupiditate quis corrupti sequi tempora. Velit quidem nemo quae?
-              Cupiditate officia ad inventore nam, incidunt assumenda molestiae. Voluptates reprehenderit repellat
-              eligendi dignissimos ratione aliquid distinctio, dolorem eius alias laborum perferendis nihil ipsam
-              quisquam! Sunt id in neque doloribus. Commodi labore facere sapiente dicta voluptate eaque necessitatibus
-              animi. Molestias omnis quasi esse, vero rerum asperiores culpa distinctio commodi laudantium error dicta
-              ullam earum, eveniet magnam harum porro adipisci vitae, fuga odit. Ducimus ex vitae facilis accusantium
-              cupiditate corrupti? Enim labore sit corporis blanditiis aliquam nesciunt harum quas quae sapiente non
-              officiis asperiores, quo, quasi nam repellendus laborum commodi nisi iure fuga autem. Quaerat voluptate
-              sequi enim ut hic? Magnam saepe iusto voluptatibus nostrum quos eligendi suscipit minima iste, earum
-              corrupti officiis molestias enim recusandae at aspernatur repudiandae praesentium, eveniet amet odio illum
-              deserunt asperiores? Natus officia culpa et.
-            </div>
-          </SplitView>
-        </div>
-      </SplitView>
     </div>
   </ScrollView>
   <div class="refContainer">

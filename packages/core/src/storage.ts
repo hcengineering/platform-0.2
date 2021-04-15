@@ -1,7 +1,7 @@
 /**
  * Operation direction, is it came from server or it is own operation.
  */
-import { AnyLayout, Class, DateProperty, Doc, Ref, StringProperty } from './classes'
+import { Class, DateProperty, Doc, Obj, Ref, StringProperty } from './classes'
 import { Space, TxOperation, VDoc } from '@anticrm/domains'
 
 export enum TxContextSource {
@@ -38,8 +38,8 @@ export interface Storage {
   update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, operations: TxOperation[]): Promise<void>
   remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<void>
 
-  find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]>
-  findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined>
+  find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T[]>
+  findOne<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined>
 }
 
 ///
@@ -56,11 +56,29 @@ export interface DomainIndex {
   tx (ctx: TxContext, tx: Tx): Promise<any>
 }
 
+export interface RegExpression {
+  $regex: string
+  $options?: string
+}
+
+export type ObjQueryType<T> = T extends Obj ? DocumentQuery<T> : T | RegExpression
+export type ArrayQueryType<A> = A extends (infer T)[] ? ObjQueryType<T> | ObjQueryType<T>[] : ObjQueryType<A>
+
+/**
+ * A possible query values to be used with Document access protocol.
+ *
+ * It allows to pass individual values with matched type to T. In case of Arrays it is possible o match
+ * entire array with partial fields or to match an element in array if object is specified as query.
+ */
+export type DocumentQuery<T> = {
+  [P in keyof T]?: ArrayQueryType<T[P]>
+}
+
 ///
 
 export interface DocumentProtocol {
-  find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]>
-  findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined>
+  find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T[]>
+  findOne<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined>
   loadDomain (domain: string): Promise<Doc[]>
 }
 
@@ -128,11 +146,11 @@ class CombineStorage implements Storage {
     this.storages = storages
   }
 
-  async find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
+  async find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T[]> {
     return (await Promise.all(this.storages.map((s) => s.find(_class, query)))).reduce((p, c) => p.concat(c))
   }
 
-  findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined> {
+  findOne<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined> {
     return Promise.race(this.storages.map((s) => s.findOne(_class, query)))
   }
 

@@ -20,9 +20,9 @@ import {
   Doc, Mixin, Obj, Property, PropertyType, Ref, StringProperty
 } from '../classes'
 import { mixinFromKey, mixinKey, Model } from '../model'
-import { txContext } from '../storage'
+import { DocumentQuery, generateId, txContext } from '../storage'
 import { createSubtask, createTask, data, doc1, SubTask, Task, taskIds } from './tasks'
-import { ObjectSelector, TxOperation, TxOperationKind } from '@anticrm/domains'
+import { ObjectSelector, Space, TxOperation, TxOperationKind } from '@anticrm/domains'
 
 describe('matching', () => {
   const model = new Model('vdocs')
@@ -60,27 +60,27 @@ describe('matching', () => {
   })
 
   it('apply string value', () => {
-    const clone = model.createDocument(taskIds.class.Task, doc1)
+    const clone = model.newDoc(taskIds.class.Task, doc1._id, doc1)
     model.updateDocumentSet(clone, { name: 'changed' as StringProperty })
 
     expect(clone.name).toEqual('changed')
   })
   it('apply number value', () => {
-    const clone = model.createDocument(taskIds.class.Task, doc1)
+    const clone = model.newDoc(taskIds.class.Task, doc1._id, doc1)
     model.updateDocumentSet(clone, { rate: 10 as Property<number, number> })
 
     expect(clone.rate).toEqual(10)
   })
 
   it('apply array value', () => {
-    const clone = model.createDocument(taskIds.class.Task, doc1)
+    const clone = model.newDoc(taskIds.class.Task, doc1._id, doc1)
     model.updateDocumentSet(clone, { lists: ['A' as StringProperty, 'B' as StringProperty] })
 
     expect(clone.lists).toEqual(['A', 'B'])
   })
 
   it('apply task value', () => {
-    const clone = model.createDocument(taskIds.class.Task, doc1)
+    const clone = model.newDoc(taskIds.class.Task, doc1._id, doc1)
     clone.mainTask = undefined
     model.updateDocumentSet(clone, { mainTask: createSubtask('subtask4') })
 
@@ -89,14 +89,14 @@ describe('matching', () => {
   })
 
   it('push subtask value', () => {
-    const clone = model.createDocument(taskIds.class.Task, doc1)
+    const clone = model.newDoc(taskIds.class.Task, doc1._id, doc1)
     model.updateDocumentPush(clone, 'tasks' as StringProperty, (createSubtask('subtask3', 34) as unknown) as AnyLayout)
 
     expect(clone.tasks?.length).toEqual(3)
   })
 
   it('push a new subtask value', () => {
-    const clone = model.createDocument(taskIds.class.Task, doc1)
+    const clone = model.newDoc(taskIds.class.Task, doc1._id, doc1)
     const cloneResult = model.updateDocument(clone, [{
       kind: TxOperationKind.Set,
       _attributes: {
@@ -109,7 +109,7 @@ describe('matching', () => {
   })
 
   it('push a new comment to subtask', () => {
-    const clone = model.createDocument(taskIds.class.Task, doc1)
+    const clone = model.newDoc(taskIds.class.Task, doc1._id, doc1)
     const cloneResult = model.updateDocument(clone, [{
       kind: TxOperationKind.Push,
       selector: [{
@@ -125,7 +125,7 @@ describe('matching', () => {
   })
 
   it('remove item from array', () => {
-    const clone = model.createDocument(taskIds.class.Task, doc1)
+    const clone = model.newDoc(taskIds.class.Task, doc1._id, doc1)
     const cloneResult = model.updateDocumentPull(clone, 'tasks', { name: 'subtask1' as StringProperty })
 
     expect(cloneResult.tasks?.length).toEqual(1)
@@ -133,7 +133,7 @@ describe('matching', () => {
   })
 
   it('remove item from instance', () => {
-    const clone = model.createDocument(taskIds.class.Task, doc1)
+    const clone = model.newDoc(taskIds.class.Task, doc1._id, doc1)
     const cloneResult = model.updateDocumentPull(clone, 'mainTask', {})
 
     expect(cloneResult.mainTask).toEqual(undefined)
@@ -143,10 +143,10 @@ describe('matching', () => {
     const model = new Model('vdocs')
     model.loadModel(data)
 
-    model.add(model.createDocument(taskIds.class.Task, createTask('t1', 10, 'test task1')))
-    model.add(model.createDocument(taskIds.class.Task, createTask('t2t', 11, 'test task2')))
+    model.add(model.newDoc(taskIds.class.Task, generateId(), createTask('t1', 10, 'test task1')))
+    model.add(model.newDoc(taskIds.class.Task, generateId(), createTask('t2t', 11, 'test task2')))
 
-    const result = await model.find(taskIds.class.Task, { name: { $regex: 't.*t' as StringProperty } })
+    const result = await model.find(taskIds.class.Task, { name: { $regex: 't.*t' } })
 
     expect(result.length).toEqual(1)
   })
@@ -155,10 +155,10 @@ describe('matching', () => {
     const model = new Model('vdocs')
     model.loadModel(data)
 
-    model.add(model.createDocument(taskIds.class.Task, createTask('t1', 10, 'test task1')))
-    model.add(model.createDocument(taskIds.class.Task, createTask('t2', 11, 'test task2')))
+    model.add(model.newDoc(taskIds.class.Task, generateId(), createTask('t1', 10, 'test task1')))
+    model.add(model.newDoc(taskIds.class.Task, generateId(), createTask('t2', 11, 'test task2')))
 
-    const result = await model.findOne(taskIds.class.Task, { name: { $regex: 't2' as StringProperty } })
+    const result = await model.findOne(taskIds.class.Task, { name: { $regex: 't2' } })
     expect(result).toBeDefined()
   })
 
@@ -166,9 +166,9 @@ describe('matching', () => {
     const model = new Model('vdocs')
     model.loadModel(data)
 
-    model.add(model.createDocument(taskIds.class.Task, createTask('t1', 10, 'test task1')))
+    model.add(model.newDoc(taskIds.class.Task, generateId(), createTask('t1', 10, 'test task1')))
 
-    const result = await model.findOne(taskIds.class.Task, { name: { $regex: 't3' as StringProperty } })
+    const result = await model.findOne(taskIds.class.Task, { name: { $regex: 't3' } })
     expect(result).toBeUndefined()
   })
 
@@ -176,7 +176,7 @@ describe('matching', () => {
     const model = new Model('vdocs')
     model.loadModel(data)
 
-    const doc = model.createDocument(taskIds.class.Task, doc1)
+    const doc = model.newDoc(taskIds.class.Task, doc1._id, doc1)
     model.add(doc)
 
     // call to find() initialzes lazy loaded byClass model's attribute
@@ -193,12 +193,10 @@ describe('invalid cases', () => {
     const model = new Model('vdocs')
     model.loadModel(data)
 
-    const doc = Object.assign(
-      model.createDocument(
-        taskIds.class.Task,
-        createTask('', 0, '')
-      ),
-      { _id: 'id' as Ref<Task> }
+    const doc = model.newDoc(
+      taskIds.class.Task,
+      'id' as Ref<Task>,
+      createTask('', 0, '')
     )
 
     model.add(doc)
@@ -209,12 +207,10 @@ describe('invalid cases', () => {
     const model = new Model('vdocs')
     model.loadModel(data)
 
-    const doc = Object.assign(
-      model.createDocument(
-        taskIds.class.Task,
-        createTask('', 0, '')
-      ),
-      { _id: 'id' as Ref<Task> }
+    const doc = model.newDoc(
+      taskIds.class.Task,
+      'id' as Ref<Task>,
+      createTask('', 0, '')
     )
 
     model.store(txContext(), doc)
@@ -246,8 +242,8 @@ describe('invalid cases', () => {
     const model = new Model('vdocs')
     model.loadModel(data)
 
-    const doc = model.createDocument(
-      taskIds.class.Task,
+    const doc = model.newDoc(taskIds.class.Task,
+      'id' as Ref<Task>,
       createTask('', 0, '')
     )
 
@@ -266,8 +262,8 @@ describe('invalid cases', () => {
     const model = new Model('vdocs')
     model.loadModel(data)
 
-    const doc = model.createDocument(
-      taskIds.class.Task,
+    const doc = model.newDoc(taskIds.class.Task,
+      'id' as Ref<Task>,
       createTask('', 0, '')
     )
 
@@ -319,20 +315,24 @@ describe('Model utilities', () => {
   model.loadModel(data)
 
   it('returns all attributes of class', () => {
-    expect(model.getAllAttributes(CORE_CLASS_EMB))
-      .toEqual([])
+    expect(model.getAllAttributes(CORE_CLASS_EMB).length)
+      .toEqual(1) // It should contain _class
 
     const getAttrs = (id: string) => Object.entries<Attribute>(
       data.find((x: any) => x._id === id)?._attributes ?? {}
     )
 
     expect(model.getAllAttributes(CORE_CLASS_DOC).map(m => [m.name, m.attr]))
-      .toEqual(getAttrs(CORE_CLASS_DOC))
+      .toEqual([
+        getAttrs(CORE_CLASS_DOC),
+        getAttrs(CORE_CLASS_OBJ)
+      ].reduce((r, x) => r.concat(x)))
 
     expect(model.getAllAttributes(CORE_CLASS_ATTRIBUTE).map(m => [m.name, m.attr]))
       .toEqual([
         getAttrs(CORE_CLASS_ATTRIBUTE),
-        getAttrs(CORE_CLASS_EMB)
+        getAttrs(CORE_CLASS_EMB),
+        getAttrs(CORE_CLASS_OBJ)
       ].reduce((r, x) => r.concat(x)))
   })
 
@@ -456,10 +456,10 @@ describe('Model assign tools', () => {
     const res = model.assign(
       {},
       taskIds.class.Task as Ref<Class<Obj>>,
-      { _property: 42 as PropertyType }
+      { rate: 42 as PropertyType }
     )
 
-    expect(res).toEqual({ _class: taskIds.class.Task, _property: 42 })
+    expect(res).toEqual({ _class: taskIds.class.Task, rate: 42 })
   })
 
   it('assigns mixin properties', () => {
@@ -476,15 +476,15 @@ describe('Model assign tools', () => {
 
   it('creates new doc', () => {
     const res = model.newDoc(
-      taskIds.class.Task as Ref<Class<Doc>>,
+      taskIds.class.Task,
       'id' as Ref<Doc>,
-      { _property: 42 as PropertyType }
+      { rate: 42 }
     )
 
     expect(res).toEqual({
       _id: 'id',
       _class: taskIds.class.Task,
-      _property: 42
+      rate: 42
     })
   })
 
@@ -525,7 +525,7 @@ describe('Model storage', () => {
     const model = new Model('vdocs')
     model.loadModel(data)
 
-    const doc = model.createDocument(taskIds.class.Task, doc1)
+    const doc = model.newDoc(taskIds.class.Task, doc1._id, doc1)
     model.add(doc)
 
     const existingSubtasks = [...doc.tasks ?? []]
@@ -540,7 +540,7 @@ describe('Model storage', () => {
       '' as Ref<Class<Doc>>,
       doc._id,
       'tasks',
-      newSubtask as never as AnyLayout
+      newSubtask as unknown as AnyLayout
     )
 
     const updatedDoc = model.get(doc._id) as Task
@@ -552,7 +552,7 @@ describe('Model storage', () => {
     const model = new Model('vdocs')
     model.loadModel(data)
 
-    const doc = model.createDocument(taskIds.class.Task, doc1)
+    const doc = model.newDoc(taskIds.class.Task, doc1._id, doc1)
     model.add(doc)
 
     const newName = 'your-space'
@@ -577,7 +577,7 @@ describe('Model storage', () => {
     const model = new Model('vdocs')
     model.loadModel(data)
 
-    const doc = model.createDocument(taskIds.class.Task, doc1)
+    const doc = model.newDoc(taskIds.class.Task, doc1._id, doc1)
     model.add(doc)
 
     await model.remove(
@@ -622,4 +622,16 @@ describe('mixin tools', () => {
     expect(mixinKey(specCharsMixin.mixin, specCharsMixin.key))
       .toEqual(specCharsKey)
   )
+
+  it('document query specification test', () => {
+    console.log('cool', {
+      name: 's1',
+      users: { userId: 'qwe' }
+    } as DocumentQuery<Space>)
+
+    console.log('cool', {
+      name: 's1',
+      users: [{ userId: 'qwe' }]
+    } as DocumentQuery<Space>)
+  })
 })

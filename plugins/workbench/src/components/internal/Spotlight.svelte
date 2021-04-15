@@ -13,7 +13,7 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import type { AnyLayout, StringProperty } from '@anticrm/core'
+  import type { DocumentQuery } from '@anticrm/core'
   import ui from '@anticrm/platform-ui'
 
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
@@ -24,11 +24,11 @@
   let query = ''
   let result: Title[] = []
 
-  function q (query: string): AnyLayout {
+  function q (query: string): DocumentQuery<Title> {
     return {
       title: {
-        $regex: (query + '.*') as StringProperty,
-        $options: 'i' as StringProperty
+        $regex: query + '.*',
+        $options: 'i'
       }
     }
   }

@@ -71,8 +71,8 @@ limitations under the License.
     const doc = {
       ...personM,
       _space: space?._id,
-      _createBy: core.getUserId()
-    }
+      _createdBy: core.getUserId()
+    } as Person
 
     model.mixinDocument(doc, recruiting.mixin.WithCandidateProps, {
       candidate: candidateM,
