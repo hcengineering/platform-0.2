@@ -4,8 +4,10 @@
   "license": "EPL-2.0",
   "scripts": {
     "build": "cross-env NODE_ENV=production webpack",
+    "analyze": "cross-env NODE_ENV=production webpack --json > stats.json",
+    "show": "webpack-bundle-analyzer stats.json",
     "dev": "webpack serve --content-base public",
-    "start": "cross-env NODE_ENV=production webpack-dev-server --content-base public",
+    "start": "cross-env NODE_ENV=production webpack serve --content-base public",
     "test": "echo 'no tests'",
     "preformat-svelte": "prettier -w src/**/*.svelte",
     "lint": "eslint --max-warnings=0 src",
@@ -25,7 +27,8 @@
     "file-loader": "~6.2.0",
     "@anticrm/sparkling-theme": "~0.2.0",
     "sass-loader": "~11.0.1",
-    "@types/node": "~14.14.40"
+    "@types/node": "~14.14.40",
+    "webpack-bundle-analyzer": "~4.4.1"
   },
   "dependencies": {
     "@anticrm/plugin-ui": "~0.2.0",
