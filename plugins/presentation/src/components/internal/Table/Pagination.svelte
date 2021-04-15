@@ -91,7 +91,7 @@
 
   button {
     background: #242429;
-      color: white;
+    color: white;
     border: 1px solid #ccc;
     padding: 5px 10px;
     margin-left: 3px;
