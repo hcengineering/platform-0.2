@@ -139,6 +139,7 @@ export const CORE_CLASS_CLASS = 'class:core.Class' as Ref<Class<Class<Obj>>>
 export const CORE_CLASS_ENUM = 'class:core.Enum' as Ref<Class<Enum<any>>>
 
 export const CORE_CLASS_STRING = 'class:core.String' as Ref<Class<Type>>
+export const CORE_CLASS_NUMBER = 'class:core.Number' as Ref<Class<Type>>
 export const CORE_CLASS_ATTRIBUTE = 'class:core.Attribute' as Ref<Class<Attribute>>
 export const CORE_CLASS_TYPE = 'class:core.Type' as Ref<Class<Type>>
 

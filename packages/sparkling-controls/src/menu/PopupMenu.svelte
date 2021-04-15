@@ -11,6 +11,10 @@
   let firstOpen = true
 
   function handler (event: MouseEvent): void {
+    if (!thisPopup || !thisTrigger) {
+      return
+    }
+
     const rectPopup = thisPopup.getBoundingClientRect()
     const rectTrigger = thisTrigger.getBoundingClientRect()
     const rectBody = document.body.getBoundingClientRect()

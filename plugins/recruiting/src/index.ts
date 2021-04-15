@@ -14,8 +14,9 @@ import { Class, Emb, Enum, Mixin, Ref } from '@anticrm/core'
 import core from '@anticrm/platform-core'
 import { Plugin, plugin, Service } from '@anticrm/platform'
 import { Asset, AnyComponent } from '@anticrm/platform-ui'
-import { WithResume } from '@anticrm/person-extras'
+import { Skill, WithResume } from '@anticrm/person-extras'
 import { WorkbenchApplication } from '@anticrm/workbench'
+import { VDoc } from '@anticrm/domains'
 
 export interface Candidate extends Emb {
   bio: string
@@ -37,6 +38,18 @@ export enum CandidateState {
 export interface WithCandidateProps extends WithResume {
   candidate: Candidate
   state: CandidateState
+  vacancy?: Ref<Vacancy>
+}
+
+export interface Vacancy extends VDoc {
+  title: string
+  location: string
+  description: string
+  responsibilities: string[]
+  skills: Skill[]
+  salary?: number
+  salaryMin?: number
+  salaryMax?: number
 }
 
 export interface RecruitingService extends Service {
@@ -50,7 +63,8 @@ export default plugin(
       Recruiting: '' as Asset
     },
     class: {
-      Candidate: '' as Ref<Class<Candidate>>
+      Candidate: '' as Ref<Class<Candidate>>,
+      Vacancy: '' as Ref<Class<Vacancy>>
     },
     mixin: {
       WithCandidateProps: '' as Ref<Mixin<WithCandidateProps>>
@@ -61,9 +75,13 @@ export default plugin(
     component: {
       CandidateList: '' as AnyComponent,
       NewCandidate: '' as AnyComponent,
-      Candidate: '' as AnyComponent
+      Candidate: '' as AnyComponent,
+      VacancyList: '' as AnyComponent,
+      NewVacancy: '' as AnyComponent,
+      Vacancy: '' as AnyComponent
     },
     application: {
+      Candidates: '' as Ref<WorkbenchApplication>,
       Vacancies: '' as Ref<WorkbenchApplication>
     }
   }
