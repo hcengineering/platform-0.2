@@ -15,7 +15,6 @@
 
 import { Severity, Status } from '@anticrm/status'
 import { Platform, PlatformStatus } from '@anticrm/plugin'
-// import platformIds from '@anticrm/platform-core'
 import { Request, Response, serialize, toStatus } from '@anticrm/rpc'
 
 import uiPlugin, { UIService } from '@anticrm/plugin-ui'

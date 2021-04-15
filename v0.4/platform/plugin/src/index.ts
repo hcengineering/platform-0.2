@@ -411,3 +411,8 @@ export function getResourceInfo (resource: Resource<any>): ResourceInfo {
     id
   }
 }
+
+// A U T H O R I Z A T I O N
+
+export const WHO_AM_I: Metadata<string> = 'platform.WhoAmI' as Metadata<string>
+export const TOKEN: Metadata<string> = 'platform.Token' as Metadata<string>
