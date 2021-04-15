@@ -32,77 +32,77 @@ export interface ApplicationRouter<T> {
   /**
    * Return parent router if defined.
    */
-  parent(): ApplicationRouter<any> | undefined;
+  parent (): ApplicationRouter<any> | undefined;
 
   /**
    * Construct a child router based on current matched state
    * Internal child router is just one, and calling twice will replace existing.
    */
-  newRouter<P>(pattern: string): ApplicationRouter<P>;
+  newRouter<P> (pattern: string): ApplicationRouter<P>;
 
   /**
    * Will check and match path for registered local routes, if no local routes are match will return false
    */
-  match(): boolean;
+  match (): boolean;
 
   /**
    * Return current matched set.
    */
-  properties(): T;
+  properties (): T;
 
   /**
    * Replace defaults passed with constructor, will call matcher function passed with constructor.
    * @param defaults - a new defaults
    */
-  setDefaults(defaults: T): void;
+  setDefaults (defaults: T): void;
 
   /**
    * Replace a matcher function passed with constructor.
    * @param matcher
    */
-  subscribe(matcher: (match: T) => void): void;
+  subscribe (matcher: (match: T) => void): void;
 
   // Construct a new navigate using combined query parameters
-  queries(vars: Partial<T>): Record<string, any> | undefined;
+  queries (vars: Partial<T>): Record<string, any> | undefined;
   // Construct a current path with all applied variables
-  path(vars: Partial<T>): string[];
+  path (vars: Partial<T>): string[];
   // Construct a current fragment with app applied variables
-  fragment(vars: Partial<T>): string | undefined;
+  fragment (vars: Partial<T>): string | undefined;
 
   /**
    * Construct a full new location based on values of T.
    * Other values will be taken from stored parent and child routers.
    * @param values
    */
-  location(values: Partial<T>): Location;
+  location (values: Partial<T>): Location;
 
   /**
    * Use new constructed location value and platform UI to navigate.
    * @param values
    */
-  navigate(values: Partial<T>): void;
+  navigate (values: Partial<T>): void;
 }
 
 export class Router<T> implements ApplicationRouter<T> {
-  private readonly pattern: string;
-  private segments: string[] = [];
-  private queryNames: string[] = [];
-  private fragmentName = '';
+  private readonly pattern: string
+  private segments: string[] = []
+  private queryNames: string[] = []
+  private fragmentName = ''
 
-  private readonly parentRouter: Router<any> | undefined;
-  private childRouter: Router<any> | undefined;
+  private readonly parentRouter: Router<any> | undefined
+  private childRouter: Router<any> | undefined
 
-  private rawLocation: Location | undefined; // current location
-  private childLocation: Location | undefined;
+  private rawLocation: Location | undefined // current location
+  private childLocation: Location | undefined
 
   // Currently matched variables
-  private variables: Record<string, any> = {};
-  private defaults: Record<string, any> | undefined = undefined;
-  private matcher?: (match: T) => void;
+  private variables: Record<string, any> = {}
+  private defaults: Record<string, any> | undefined = undefined
+  private matcher?: (match: T) => void
 
-  private matched = false;
+  private matched = false
 
-  private readonly doNavigate: ((newLoc: Location) => void) | undefined;
+  private readonly doNavigate: ((newLoc: Location) => void) | undefined
 
   constructor (
     pattern: string,

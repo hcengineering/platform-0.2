@@ -18,6 +18,7 @@
   import { getUIService } from '@anticrm/platform-ui'
 
   export let message: MessageNode
+  let hrefVal = 'javascript:void(0)'
 
   const uiService = getUIService()
 
@@ -40,6 +41,8 @@
   }
 
   $: style = computedStyle(message.marks || [])
+
+  $: uiService.getHref({ _class: style.reference._class, _id: style.reference._id }).then((ref) => (hrefVal = ref))
 
   function computedStyle (marks: MessageMark[]): Style {
     const result = new Style()
@@ -81,8 +84,8 @@
     {#if style.reference.state}
       <!-- TODO: Add a proper click handler here-->
       <a
-        href="/"
-        on:click={() => {
+        href={hrefVal}
+        on:click|preventDefault={() => {
           uiService.open({ _class: style.reference._class, _id: style.reference._id })
         }}>
         {message.text || ''}
