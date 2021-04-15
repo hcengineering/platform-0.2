@@ -2,9 +2,11 @@ dependencies:
   '@babel/preset-env': 7.13.15
   '@babel/preset-typescript': 7.13.0
   '@babel/runtime': 7.13.10
+  '@fingerprintjs/fingerprintjs': 3.1.0
   '@microsoft/api-extractor': 7.13.5
   '@rush-temp/plugin': file:projects/plugin.tgz
   '@rush-temp/plugin-login': file:projects/plugin-login.tgz
+  '@rush-temp/plugin-login-impl': file:projects/plugin-login-impl.tgz
   '@rush-temp/plugin-ui': file:projects/plugin-ui.tgz
   '@rush-temp/plugin-ui-impl': file:projects/plugin-ui-impl.tgz
   '@rush-temp/prod': file:projects/prod.tgz_sass@1.32.8+typescript@4.2.4
@@ -2110,6 +2112,12 @@ packages:
       node: ^10.12.0 || >=12.0.0
     resolution:
       integrity: sha512-2ZPCc+uNbjV5ERJr+aKSPRwZgKd2z11x0EgLvb1PURmUrn9QNRXFqje0Ldq454PfAVyaJYyrDvvIKSFP4NnBog==
+  /@fingerprintjs/fingerprintjs/3.1.0:
+    dependencies:
+      tslib: 2.2.0
+    dev: false
+    resolution:
+      integrity: sha512-dz4ADMWK1EN4RhZvoqXmT2kq3dmcb1JpI6t+28YzIjX8Y8Y8ugrnT6yNc9GSnJiyW6VLPojXNv5Z2jvqixpHAw==
   /@istanbuljs/load-nyc-config/1.1.0:
     dependencies:
       camelcase: 5.3.1
@@ -15623,6 +15631,20 @@ packages:
     dev: false
     resolution:
       integrity: sha512-V50KMwwzqJV0NpZIZFwfOD5/lyny3WlSzRiXgA0G7VUnRlqttta1L6UQIHzd6EuBY/cHGfwTIck7w1yH6Q5zUw==
+  file:projects/plugin-login-impl.tgz:
+    dependencies:
+      '@fingerprintjs/fingerprintjs': 3.1.0
+      '@microsoft/api-extractor': 7.13.5
+      prettier: 2.2.1
+      svelte: 3.37.0
+      ts-standard: 10.0.0_typescript@4.2.4
+      typescript: 4.2.4
+    dev: false
+    name: '@rush-temp/plugin-login-impl'
+    resolution:
+      integrity: sha512-D0pIxB+yT7tkCmONtnL1fKnRxQqgA4Q/GS9G1YrP2dPFBVzzYVWdyBhY7zdOJZdR2Iovl2rQXVnnwWIK/EPi/A==
+      tarball: file:projects/plugin-login-impl.tgz
+    version: 0.0.0
   file:projects/plugin-login.tgz:
     dependencies:
       '@microsoft/api-extractor': 7.13.5
@@ -15632,7 +15654,7 @@ packages:
     dev: false
     name: '@rush-temp/plugin-login'
     resolution:
-      integrity: sha512-AZADae/sZO62ULNvpZ/q+4J8KaYPA/95cm1ef5r04ZSBKsvgUOCoKSMasFQBZHta/Qr+3WdcOPfjUOmuNYuXaA==
+      integrity: sha512-yKhMe7j/EWkn1X1xHbobC1xzqFkCPvwWAkDmr4l6Ltr2U5ndPydiGFw0t9rAtlPPAAKFLdLuHCssm9EAnsl+PQ==
       tarball: file:projects/plugin-login.tgz
     version: 0.0.0
   file:projects/plugin-ui-impl.tgz:
@@ -15829,9 +15851,11 @@ specifiers:
   '@babel/preset-env': ~7.13.15
   '@babel/preset-typescript': ~7.13.0
   '@babel/runtime': ~7.13.10
+  '@fingerprintjs/fingerprintjs': ~3.1.0
   '@microsoft/api-extractor': ~7.13.4
   '@rush-temp/plugin': file:./projects/plugin.tgz
   '@rush-temp/plugin-login': file:./projects/plugin-login.tgz
+  '@rush-temp/plugin-login-impl': file:./projects/plugin-login-impl.tgz
   '@rush-temp/plugin-ui': file:./projects/plugin-ui.tgz
   '@rush-temp/plugin-ui-impl': file:./projects/plugin-ui-impl.tgz
   '@rush-temp/prod': file:./projects/prod.tgz

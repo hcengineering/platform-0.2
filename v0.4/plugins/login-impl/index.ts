@@ -13,18 +13,19 @@
 // limitations under the License.
 //
 
-import { Platform, PlatformStatus, Severity, Status } from '@anticrm/platform'
-import platformIds from '@anticrm/platform-core'
+import { Severity, Status } from '@anticrm/status'
+import { Platform, PlatformStatus } from '@anticrm/plugin'
+// import platformIds from '@anticrm/platform-core'
 import { Request, Response, serialize, toStatus } from '@anticrm/rpc'
 
-import uiPlugin, { UIService } from '@anticrm/platform-ui'
+import uiPlugin, { UIService } from '@anticrm/plugin-ui'
 
-import login, { ACCOUNT_KEY, LoginInfo, LoginService } from '.'
+import login, { ACCOUNT_KEY, LoginInfo, LoginService } from '@anticrm/plugin-login'
 
 import LoginForm from './components/LoginForm.svelte'
 import SettingForm from './components/SettingForm.svelte'
 import MainLoginForm from './components/MainLoginForm.svelte'
-import { PlatformStatusCodes } from '@anticrm/foundation'
+// import { PlatformStatusCodes } from '@anticrm/foundation'
 import FingerprintJS from '@fingerprintjs/fingerprintjs'
 
 /*!
