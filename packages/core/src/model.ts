@@ -172,6 +172,21 @@ export class Model implements Storage {
     return null
   }
 
+  /**
+   * Get an array of all mixins and their values
+   * @param layout - any object
+   * */
+  getAllMixins (layout: AnyLayout): { mixin: Ref<Mixin<Obj>>, key: string, value: any }[] {
+    const mixins = []
+    for (const prop in layout) {
+      if (prop.indexOf('|') > 0) {
+        // probably mixin
+        mixins.push({ ...mixinFromKey(prop), value: layout[prop] })
+      }
+    }
+    return mixins
+  }
+
   // D O M A I N
 
   getDomain (id: Ref<Class<Doc>>): string {
