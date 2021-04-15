@@ -19,31 +19,28 @@ limitations under the License.
   import type { Space } from '@anticrm/domains'
   import { liveQuery } from '@anticrm/presentation'
 
-  import UserInfo from '@anticrm/sparkling-controls/src/UserInfo.svelte'
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
 
-  import type { WithCandidateProps } from '..'
   import recruiting from '..'
+  import type { Vacancy } from '..'
 
   export let space: Space
 
   const dispatch = createEventDispatcher()
 
-  let candidates: WithCandidateProps[] = []
-  let lq: Promise<QueryUpdater<WithCandidateProps>>
+  let vacancies: Vacancy[] = []
+  let lq: Promise<QueryUpdater<Vacancy>>
 
-  $: lq = liveQuery(lq, recruiting.mixin.WithCandidateProps, { _space: space._id }, (docs) => {
-    candidates = docs
+  $: lq = liveQuery(lq, recruiting.class.Vacancy, { _space: space._id }, (docs) => {
+    vacancies = docs
   })
 </script>
 
 <ScrollView width="100%" height="100%">
   <div class="grid">
-    {#each candidates as c}
-      <div
-        class="candidate"
-        on:click={() => dispatch('open', { _id: c._id, _class: recruiting.mixin.WithCandidateProps })}>
-        <UserInfo url={`https://robohash.org/${c.name}.png?set=set3`} title={c.name} subtitle={c.candidate.role} />
+    {#each vacancies as v}
+      <div class="vacancy" on:click={() => dispatch('open', { _id: v._id, _class: recruiting.class.Vacancy })}>
+        {v.title}
       </div>
     {/each}
   </div>
@@ -57,11 +54,13 @@ limitations under the License.
     padding: 15px;
   }
 
-  .candidate {
+  .vacancy {
     padding: 20px 10px;
     border: 1px solid;
     border-radius: 5px;
     cursor: pointer;
     border-color: var(--theme-bg-accent-color);
+
+    font-weight: 500;
   }
 </style>

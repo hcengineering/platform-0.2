@@ -272,6 +272,7 @@
         _class={details._class}
         _objectId={details._id}
         title="Title"
+        on:open={(e) => navigateDocument({ _class: e.detail._class, _id: e.detail._id })}
         on:close={() => navigateDocument(undefined)}
         on:noobject={() => (details = undefined)} />
     </aside>
