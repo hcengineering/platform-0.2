@@ -73,9 +73,9 @@
   </li>
 </ul>
 
-<style>
+<style lang="scss">
   .active {
-    background-color: rgb(150, 150, 235);
+    background-color: var(--theme-bg-accent-color);
     color: white;
   }
 
@@ -90,7 +90,8 @@
   }
 
   button {
-    background: #ffffcc;
+    background: #242429;
+      color: white;
     border: 1px solid #ccc;
     padding: 5px 10px;
     margin-left: 3px;

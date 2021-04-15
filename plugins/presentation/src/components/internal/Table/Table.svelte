@@ -144,7 +144,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    min-width: 700px;
+    min-width: 1180px;
   }
 
   .center {
@@ -156,7 +156,6 @@
     //border-collapse: collapse;
     width: 100%;
     border-spacing: 0;
-    background: #004b1c;
     border-radius: 15px;
 
     tr {

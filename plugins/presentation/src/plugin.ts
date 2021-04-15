@@ -21,7 +21,7 @@ import { CoreService } from '@anticrm/platform-core'
 import { AnyComponent, Asset } from '@anticrm/platform-ui'
 import { I18n } from '@anticrm/platform-i18n'
 
-import ObjectBrowser from './components/internal/ObjectBrowser.svelte'
+// import ObjectBrowser from './components/internal/ObjectBrowser.svelte'
 import Properties from './components/internal/Properties.svelte'
 
 import StringEditor from './components/internal/presenters/value/StringEditor.svelte'
@@ -42,7 +42,7 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
   const coreService = deps.core
   const i18nService = deps.i18n
 
-  platform.setResource(ui.component.ObjectBrowser, ObjectBrowser)
+  // platform.setResource(ui.component.ObjectBrowser, ObjectBrowser)
   platform.setResource(ui.component.Properties, Properties)
 
   platform.setResource(ui.component.StringPresenter, StringEditor)

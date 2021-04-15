@@ -49,26 +49,40 @@
   </div>
 </div>
 
-<style>
+<style lang="scss">
   .control-container {
     width: 100%;
     height: 50px;
-    background: #333;
+    background: var(--theme-bg-accent-color);
     border-radius: 15px;
     margin: 20px;
     display: flex;
     align-items: center;
-    padding: 10px 0;
+    padding: 10px;
   }
   .search {
     width: 33.3%;
-    float: right;
-  }
-  .search input {
-    width: 100%;
-    border: 1px solid #eee;
-    border-radius: 3px;
-    padding: 5px 3px;
+    // float: right;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    max-width: 300px;
+    border-radius: 12px;
+    box-sizing: border-box;
+    font-size: 15px;
+    font-weight: 400;
+
+    input {
+      width: 100%;
+      border: none;
+      padding: 5px 3px;
+      background-color: transparent;
+      color: var(--theme-content-color);
+      &:focus {
+        outline: none;
+      }
+    }
   }
 
   @media screen and (max-width: 767px) {
