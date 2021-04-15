@@ -1,10 +1,14 @@
 {
   "compilerOptions": {
+    "moduleResolution": "node",
     "target": "es6",
-    "module": "commonjs",
+    "module": "esnext",
     "declaration": true,
     "outDir": "./lib",
-    "rootDir": "./src",
-    "strict": true
+    "strict": true,
+    "lib": [
+      "es2018",
+      "dom"
+    ]
   }
 }
