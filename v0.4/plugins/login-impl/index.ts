@@ -14,17 +14,16 @@
 //
 
 import { Severity, Status } from '@anticrm/status'
-import { Platform, PlatformStatus } from '@anticrm/plugin'
+import { Platform, PlatformStatus, WHO_AM_I, TOKEN, AuthStatusCodes } from '@anticrm/plugin'
 import { Request, Response, serialize, toStatus } from '@anticrm/rpc'
 
 import uiPlugin, { UIService } from '@anticrm/plugin-ui'
-
 import login, { ACCOUNT_KEY, LoginInfo, LoginService } from '@anticrm/plugin-login'
 
 import LoginForm from './components/LoginForm.svelte'
 import SettingForm from './components/SettingForm.svelte'
 import MainLoginForm from './components/MainLoginForm.svelte'
-// import { PlatformStatusCodes } from '@anticrm/foundation'
+
 import FingerprintJS from '@fingerprintjs/fingerprintjs'
 
 /*!
@@ -48,8 +47,8 @@ export default (platform: Platform, deps: { ui: UIService }): Promise<LoginServi
   function setLoginInfo (loginInfo: LoginInfo) {
     localStorage.setItem(ACCOUNT_KEY, JSON.stringify(loginInfo))
 
-    platform.setMetadata(platformIds.metadata.WhoAmI, loginInfo.email)
-    platform.setMetadata(platformIds.metadata.Token, loginInfo.token)
+    platform.setMetadata(WHO_AM_I, loginInfo.email)
+    platform.setMetadata(TOKEN, loginInfo.token)
 
     // TODO: It should be updated from here, but not working now.
     // platform.setMetadata(platformIds.metadata.WSHost, loginInfo.server)
@@ -59,8 +58,8 @@ export default (platform: Platform, deps: { ui: UIService }): Promise<LoginServi
   function clearLoginInfo () {
     localStorage.removeItem(ACCOUNT_KEY)
 
-    platform.setMetadata(platformIds.metadata.WhoAmI, undefined)
-    platform.setMetadata(platformIds.metadata.Token, undefined)
+    platform.setMetadata(WHO_AM_I, undefined)
+    platform.setMetadata(TOKEN, undefined)
   }
 
   function getLoginInfo (): Promise<LoginInfo | undefined> {
@@ -70,7 +69,7 @@ export default (platform: Platform, deps: { ui: UIService }): Promise<LoginServi
     }
     const loginInfo = JSON.parse(account) as LoginInfo
 
-    const token = platform.getMetadata(platformIds.metadata.Token)
+    const token = platform.getMetadata(TOKEN)
     if (!token) {
       return Promise.resolve(undefined)
     }
@@ -150,7 +149,7 @@ export default (platform: Platform, deps: { ui: UIService }): Promise<LoginServi
       if (result.result) {
         setLoginInfo(result.result)
 
-        platform.broadcastEvent(PlatformStatus, new Status(Severity.OK, PlatformStatusCodes.AUTHENTICATON_OK, ''))
+        platform.broadcastEvent(PlatformStatus, new Status(Severity.OK, AuthStatusCodes.AUTHENTICATON_OK, ''))
         console.log('do navigate')
         await navigateApp()
       }
@@ -161,7 +160,7 @@ export default (platform: Platform, deps: { ui: UIService }): Promise<LoginServi
   }
 
   function doLogout (): Promise<void> {
-    const token = platform.getMetadata(platformIds.metadata.Token)
+    const token = platform.getMetadata(TOKEN)
     if (token) {
       clearLoginInfo()
     }

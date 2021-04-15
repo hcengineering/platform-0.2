@@ -10,6 +10,7 @@ dependencies:
   '@rush-temp/plugin-ui': file:projects/plugin-ui.tgz
   '@rush-temp/plugin-ui-impl': file:projects/plugin-ui-impl.tgz
   '@rush-temp/prod': file:projects/prod.tgz_sass@1.32.8+typescript@4.2.4
+  '@rush-temp/rpc': file:projects/rpc.tgz
   '@rush-temp/sparkling-components': file:projects/sparkling-components.tgz_webpack@5.32.0
   '@rush-temp/sparkling-controls': file:projects/sparkling-controls.tgz_webpack@5.32.0
   '@rush-temp/sparkling-theme': file:projects/sparkling-theme.tgz_webpack@5.32.0
@@ -15739,6 +15740,18 @@ packages:
       integrity: sha512-HATjKuDAYW/jizd3XQLMOT/hxHKgF2+qbjzYvl3YZGa/7ilvprekEBHuzoHaeBs9miUrzvRZiKwg/yF96acPiw==
       tarball: file:projects/prod.tgz
     version: 0.0.0
+  file:projects/rpc.tgz:
+    dependencies:
+      '@microsoft/api-extractor': 7.13.5
+      prettier: 2.2.1
+      ts-standard: 10.0.0_typescript@4.2.4
+      typescript: 4.2.4
+    dev: false
+    name: '@rush-temp/rpc'
+    resolution:
+      integrity: sha512-e/bcZUUNQivpI62MUweshs4ONgGcu0BgNVFEn+Gv+p3s8FbsxFZjxV0zZa0PT35e+vCHDeCd9hEAuWtmG9cP6g==
+      tarball: file:projects/rpc.tgz
+    version: 0.0.0
   file:projects/sparkling-components.tgz_webpack@5.32.0:
     dependencies:
       '@babel/runtime': 7.13.10
@@ -15859,6 +15872,7 @@ specifiers:
   '@rush-temp/plugin-ui': file:./projects/plugin-ui.tgz
   '@rush-temp/plugin-ui-impl': file:./projects/plugin-ui-impl.tgz
   '@rush-temp/prod': file:./projects/prod.tgz
+  '@rush-temp/rpc': file:./projects/rpc.tgz
   '@rush-temp/sparkling-components': file:./projects/sparkling-components.tgz
   '@rush-temp/sparkling-controls': file:./projects/sparkling-controls.tgz
   '@rush-temp/sparkling-theme': file:./projects/sparkling-theme.tgz

@@ -416,3 +416,8 @@ export function getResourceInfo (resource: Resource<any>): ResourceInfo {
 
 export const WHO_AM_I: Metadata<string> = 'platform.WhoAmI' as Metadata<string>
 export const TOKEN: Metadata<string> = 'platform.Token' as Metadata<string>
+
+export enum AuthStatusCodes {
+  AUTHENTICATON_OK,
+  CLIENT_VALIDATE_REQUIRED
+}

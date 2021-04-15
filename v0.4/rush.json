@@ -369,6 +369,10 @@
       "projectFolder": "platform/plugin"
     },
     {
+      "packageName": "@anticrm/rpc",
+      "projectFolder": "platform/rpc"
+    },
+    {
       "packageName": "@anticrm/sparkling-theme",
       "projectFolder": "sparkling/theme"
     },

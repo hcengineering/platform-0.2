@@ -13,17 +13,18 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import type { Platform } from '@anticrm/platform'
-  import { Severity, Status } from '@anticrm/platform'
+  import type { Platform } from '@anticrm/plugin'
+  import { AuthStatusCodes } from '@anticrm/plugin'
+  import { Severity, Status } from '@anticrm/status'
   import { getContext, onDestroy } from 'svelte'
-  import type { LoginService } from '..'
-  import login from '..'
+  import type { LoginService } from '@anticrm/plugin-login'
+  import login from '@anticrm/plugin-login'
   import Form from './Form.svelte'
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
-  import type { ApplicationRoute, ApplicationRouter } from '@anticrm/platform-ui'
-  import { PlatformStatusCodes } from '@anticrm/foundation'
+  import type { ApplicationRouter } from '@anticrm/plugin-ui'
+  // import { PlatformStatusCodes } from '@anticrm/foundation'
 
-  export let router: ApplicationRouter<ApplicationRoute>
+  // export let router: ApplicationRouter<ApplicationRoute>
   const object = { username: '', password: '', workspace: '', secondFactorCode: '' }
   let status: Status
 
@@ -39,7 +40,7 @@
     { name: 'workspace', i18n: 'Workspace' }
   ]
 
-  let fields
+  let fields: { [key: string]: any }
   $: fields = needSecondFactor ? baseFields.concat({ name: 'secondFactorCode', i18n: 'Confirm code' }) : baseFields
 
   const platform = getContext('platform') as Platform
@@ -55,7 +56,7 @@
       object.secondFactorCode
     )
 
-    if (status.code === PlatformStatusCodes.CLIENT_VALIDATE_REQUIRED) {
+    if (status.code === AuthStatusCodes.CLIENT_VALIDATE_REQUIRED) {
       needSecondFactor = true
     }
   }
@@ -98,7 +99,7 @@
   }
 
   function navigateSetting (): void {
-    router.navigate({ route: 'setting' })
+    // router.navigate({ route: 'setting' })
   }
 </script>
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Status, Severity } from '@anticrm/platform'
+  import { Status, Severity } from '@anticrm/status'
 
   interface Field {
     name: string
