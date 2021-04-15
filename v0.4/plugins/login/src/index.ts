@@ -15,8 +15,9 @@
 
 // P L U G I N
 
-import { Metadata, plugin, Plugin, Service, Status } from '@anticrm/platform'
-import ui, { AnyComponent } from '@anticrm/platform-ui'
+import type { Status } from '@anticrm/status'
+import { Metadata, plugin, Plugin, Service } from '@anticrm/plugin'
+import ui, { AnyComponent } from '@anticrm/plugin-ui'
 
 export interface LoginInfo {
   email: string

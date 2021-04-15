@@ -389,6 +389,10 @@
       "projectFolder": "plugins/ui-impl"
     },
     {
+      "packageName": "@anticrm/plugin-login",
+      "projectFolder": "plugins/login"
+    },
+    {
       "packageName": "prod",
       "projectFolder": "dev/prod"
     },

@@ -1,8 +1,8 @@
 <script lang="ts">
   import { Status, Severity } from '@anticrm/status'
-  import type { Metadata, Platform } from '@anticrm/plugin'
-  import type { ApplicationRoute, UIService } from '@anticrm/plugin-ui'
-  import { CONTEXT_PLATFORM, CONTEXT_PLATFORM_UI, routeMeta } from '@anticrm/plugin-ui'
+  import type { Platform } from '@anticrm/plugin'
+  import type { AnyComponent, UIService } from '@anticrm/plugin-ui'
+  import uiPlugin, { CONTEXT_PLATFORM, CONTEXT_PLATFORM_UI, applicationShortcutKey } from '@anticrm/plugin-ui'
   import { setContext } from 'svelte'
 
   import { Theme } from '@anticrm/sparkling-theme'
@@ -13,48 +13,26 @@
   import ThemeSelector from './ThemeSelector.svelte'
   import Modal from './Modal.svelte'
   
-  import uiPlugin from '@anticrm/plugin-ui'
-  import { newRouter } from '@anticrm/plugin-ui'
-
   export let platform: Platform
   export let ui: UIService
 
   setContext(CONTEXT_PLATFORM, platform)
   setContext(CONTEXT_PLATFORM_UI, ui)
 
-  const defaultApp = platform.getMetadata(uiPlugin.metadata.DefaultApplication) || ''
-  const authMeta = platform.getMetadata(uiPlugin.metadata.LoginApplication) || ''
-  const authApp = platform.getMetadata(routeMeta(authMeta))
+  let application: AnyComponent | undefined
 
-  let authenticationRequired = false
-
-  let currentApp: ApplicationRoute | undefined
-  let currentAppErr: string | undefined
-
-  interface ApplicationInfo {
-    application: string
+  interface RootRouteParams {
+    application: AnyComponent | null
   }
 
-  newRouter<ApplicationInfo>(
+  ui.newRouter<RootRouteParams>(
     ':application',
     (route) => {
-      let appRoute: Metadata<ApplicationRoute> = routeMeta(defaultApp)
-      if (route.application && route.application.length > 0 && route.application !== '#default') {
-        appRoute = routeMeta(route.application)
-      }
-      if (appRoute) {
-        const routeAppComponent = platform.getMetadata(appRoute)
-        if (routeAppComponent) {
-          currentAppErr = undefined
-          currentApp = routeAppComponent
-          return
-        }
-      }
-      if (!currentApp) {
-        currentAppErr = `There is no application route defined for ${appRoute}`
+      if (route.application) {
+        application = platform.getMetadata(applicationShortcutKey(route.application))
       }
     },
-    { application: '#default' }
+    { application: null }
   )
 
   const status: Status = { severity: Severity.OK, code: 0, message: '' }
@@ -85,21 +63,15 @@
           <div class="widget">
             <ThemeSelector />
           </div>
-          <!-- <div v-for="widget in widgets" :key="widget" class="widget">
-            <widget :component="widget" />
-          </div> -->
         </div>
       </div>
     </div>
     <div class="app">
-      {#if authenticationRequired}
-        <!-- <Component is={authApp.component} props={{}} /> -->
-        <h1>Auth</h1>
-      {:else if currentApp}
-        <Component is={currentApp.component} props={{}} />
+      {#if application}
+        <Component is={application} props={{}} />
       {:else}
         <div class="caption-1 error">
-          Could not find application: "{currentAppErr}"
+          Application not found: {application}
         </div>
       {/if}
     </div>

@@ -4,14 +4,15 @@ dependencies:
   '@babel/runtime': 7.13.10
   '@microsoft/api-extractor': 7.13.5
   '@rush-temp/plugin': file:projects/plugin.tgz
+  '@rush-temp/plugin-login': file:projects/plugin-login.tgz
   '@rush-temp/plugin-ui': file:projects/plugin-ui.tgz
   '@rush-temp/plugin-ui-impl': file:projects/plugin-ui-impl.tgz
-  '@rush-temp/prod': file:projects/prod.tgz_typescript@4.2.4
+  '@rush-temp/prod': file:projects/prod.tgz_sass@1.32.8+typescript@4.2.4
   '@rush-temp/sparkling-components': file:projects/sparkling-components.tgz_webpack@5.32.0
   '@rush-temp/sparkling-controls': file:projects/sparkling-controls.tgz_webpack@5.32.0
   '@rush-temp/sparkling-theme': file:projects/sparkling-theme.tgz_webpack@5.32.0
   '@rush-temp/status': file:projects/status.tgz
-  '@rush-temp/storybook': file:projects/storybook.tgz_8278c85092e9d84c4cd33dd119169a88
+  '@rush-temp/storybook': file:projects/storybook.tgz_c820b234ab09c3b6dddf16c9f6592305
   '@storybook/addon-actions': 6.2.8
   '@storybook/addon-essentials': 6.2.8_85efc8b83d746830adeb5932c865be75
   '@storybook/addon-links': 6.2.8
@@ -2461,64 +2462,6 @@ packages:
       react-dom: 15.x || 16.x || 16.4.0-alpha.0911da3
     resolution:
       integrity: sha512-+mtn9wjlB9NN2CNnnC/BRYtwdKBfSyyasPYraNAyvaV1occr/5NnB4CVzjEZipNHwYebQwcndGUmpFzxAUoqSA==
-  /@rollup/plugin-commonjs/16.0.0_rollup@2.45.2:
-    dependencies:
-      '@rollup/pluginutils': 3.1.0_rollup@2.45.2
-      commondir: 1.0.1
-      estree-walker: 2.0.2
-      glob: 7.1.6
-      is-reference: 1.2.1
-      magic-string: 0.25.7
-      resolve: 1.20.0
-      rollup: 2.45.2
-    dev: false
-    engines:
-      node: '>= 8.0.0'
-    peerDependencies:
-      rollup: ^2.30.0
-    resolution:
-      integrity: sha512-LuNyypCP3msCGVQJ7ki8PqYdpjfEkE/xtFa5DqlF+7IBD0JsfMZ87C58heSwIMint58sAUZbt3ITqOmdQv/dXw==
-  /@rollup/plugin-node-resolve/10.0.0_rollup@2.45.2:
-    dependencies:
-      '@rollup/pluginutils': 3.1.0_rollup@2.45.2
-      '@types/resolve': 1.17.1
-      builtin-modules: 3.2.0
-      deepmerge: 4.2.2
-      is-module: 1.0.0
-      resolve: 1.20.0
-      rollup: 2.45.2
-    dev: false
-    engines:
-      node: '>= 10.0.0'
-    peerDependencies:
-      rollup: ^1.20.0||^2.0.0
-    resolution:
-      integrity: sha512-sNijGta8fqzwA1VwUEtTvWCx2E7qC70NMsDh4ZG13byAXYigBNZMxALhKUSycBks5gupJdq0lFrKumFrRZ8H3A==
-  /@rollup/pluginutils/3.1.0_rollup@2.45.2:
-    dependencies:
-      '@types/estree': 0.0.39
-      estree-walker: 1.0.1
-      picomatch: 2.2.3
-      rollup: 2.45.2
-    dev: false
-    engines:
-      node: '>= 8.0.0'
-    peerDependencies:
-      rollup: ^1.20.0||^2.0.0
-    resolution:
-      integrity: sha512-GksZ6pr6TpIjHm8h9lSQ8pi8BE9VeubNT0OMJ3B5uZJ8pz73NPiqOtCog/x2/QzM1ENChPKxMDhiQuRHsqc+lg==
-  /@rollup/pluginutils/4.1.0_rollup@2.45.2:
-    dependencies:
-      estree-walker: 2.0.2
-      picomatch: 2.2.3
-      rollup: 2.45.2
-    dev: false
-    engines:
-      node: '>= 8.0.0'
-    peerDependencies:
-      rollup: ^1.20.0||^2.0.0
-    resolution:
-      integrity: sha512-TrBhfJkFxA+ER+ew2U2/fHbebhLT/l/2pRk0hfj9KusXUuRXd2v0R58AfaZK9VXDQ4TogOSEmICVrQAA3zFnHQ==
   /@rushstack/node-core-library/3.36.2:
     dependencies:
       '@types/node': 10.17.13
@@ -4185,10 +4128,6 @@ packages:
     dev: false
     resolution:
       integrity: sha512-SdAAXZNvWfhtf3X3y1cbbCZhP3xyPh7mfTvzV6CgfWc/ZhiHpyr9bVroe2/RCHIf7gczaNcprhaBLsx0CCJHQA==
-  /@types/estree/0.0.39:
-    dev: false
-    resolution:
-      integrity: sha512-EYNwp3bU+98cpU4lAWYYL7Zz+2gryWH1qbdDTidVd6hkiR6weksdbMadyXKXNPEkQFhXM+hVO9ZygomHXp+AIw==
   /@types/estree/0.0.46:
     dev: false
     resolution:
@@ -4352,12 +4291,6 @@ packages:
     dev: false
     resolution:
       integrity: sha512-wYOUxIgs2HZZ0ACNiIayItyluADNbONl7kt8lkLjVK8IitMH5QMyAh75Fwhmo37r1m7L2JaFj03sIfxBVDvRAg==
-  /@types/resolve/1.17.1:
-    dependencies:
-      '@types/node': 14.14.37
-    dev: false
-    resolution:
-      integrity: sha512-yy7HuzQhj0dhGpD8RLXSZWEkLsV9ibvxvi6EiJ3bkqLAO1RGo0WbkWQiwpRlSFymTJRz0d3k5LM3kkx8ArDbLw==
   /@types/sass/1.16.0:
     dependencies:
       '@types/node': 14.14.37
@@ -5822,12 +5755,6 @@ packages:
     dev: false
     resolution:
       integrity: sha512-xq+q3SRMOxGivLhBNaUdC64hDTQwejJ+H0T/NB1XMtTVEwNTrfFF3gAxiyW0Bu/xWEGhjVKgUcMhCrUy2+uCWg==
-  /builtin-modules/3.2.0:
-    dev: false
-    engines:
-      node: '>=6'
-    resolution:
-      integrity: sha512-lGzLKcioL90C7wMczpkY0n/oART3MbBa8R9OFGE1rJxoVI86u4WAGfEk8Wjv10eKSyTHVGkSo3bvBylCEtk7LA==
   /builtin-status-codes/3.0.0:
     dev: false
     resolution:
@@ -7758,18 +7685,6 @@ packages:
       node: '>=4.0'
     resolution:
       integrity: sha512-BxbNGGNm0RyRYvUdHpIwv9IWzeM9XClbOxwoATuFdOE7ZE6wHL+HQ5T8hoPM+zHvmKzzsEqhgy0GrQ5X13afiQ==
-  /estree-walker/0.6.1:
-    dev: false
-    resolution:
-      integrity: sha512-SqmZANLWS0mnatqbSfRP5g8OXZC12Fgg1IwNtLsyHDzJizORW4khDfjPqJZsemPWBB2uqykUah5YpQ6epsqC/w==
-  /estree-walker/1.0.1:
-    dev: false
-    resolution:
-      integrity: sha512-1fMXF3YP4pZZVozF8j/ZLfvnR8NSIljt56UhbZ5PeeDmmGHpgpdwQt7ITlGvYaQukCvuBRMLEiKiYC+oeIg4cg==
-  /estree-walker/2.0.2:
-    dev: false
-    resolution:
-      integrity: sha512-Rfkk/Mp/DL7JVje3u18FxFujQlTNR2q6QfMSMB7AvCBx91NGj/ba3kCfza0f6dVDbw7YlRf/nDrn7pQrCCyQ/w==
   /esutils/2.0.3:
     dev: false
     engines:
@@ -9551,10 +9466,6 @@ packages:
     dev: false
     resolution:
       integrity: sha512-cOZFQQozTha1f4MxLFzlgKYPTyj26picdZTx82hbc/Xf4K/tZOOXSCkMvU4pKioRXGDLJRn0GM7Upe7kR721yg==
-  /is-module/1.0.0:
-    dev: false
-    resolution:
-      integrity: sha1-Mlj7afeMFNW4FdZkM2tM/7ZEFZE=
   /is-negative-zero/2.0.1:
     dev: false
     engines:
@@ -9631,12 +9542,6 @@ packages:
     dev: false
     resolution:
       integrity: sha512-bCYeRA2rVibKZd+s2625gGnGF/t7DSqDs4dP7CrLA1m7jKWz6pps0LpYLJN8Q64HtmPKJ1hrN3nzPNKFEKOUiQ==
-  /is-reference/1.2.1:
-    dependencies:
-      '@types/estree': 0.0.46
-    dev: false
-    resolution:
-      integrity: sha512-U82MsXXiFIrjCK4otLT+o2NA2Cd2g5MLoOVXUZjIOhLurrRxpEXzI8O0KZHr3IjLvlAH1kTPYSuqer5T9ZVBKQ==
   /is-regex/1.1.2:
     dependencies:
       call-bind: 1.0.2
@@ -10506,22 +10411,6 @@ packages:
     dev: false
     resolution:
       integrity: sha1-HADHQ7QzzQpOgHWPe2SldEDZ/wA=
-  /livereload-js/3.3.2:
-    dev: false
-    resolution:
-      integrity: sha512-w677WnINxFkuixAoUEXOStewzLYGI76XVag+0JWMMEyjJQKs0ibWZMxkTlB96Lm3EjZ7IeOxVziBEbtxVQqQZA==
-  /livereload/0.9.3:
-    dependencies:
-      chokidar: 3.5.1
-      livereload-js: 3.3.2
-      opts: 2.0.2
-      ws: 7.4.4
-    dev: false
-    engines:
-      node: '>=8.0.0'
-    hasBin: true
-    resolution:
-      integrity: sha512-q7Z71n3i4X0R9xthAryBdNGVGAO2R5X+/xXpmKeuPMrteg+W2U8VusTKV3YiJbXZwKsOlFlHe+go6uSNjfxrZw==
   /load-json-file/2.0.0:
     dependencies:
       graceful-fs: 4.2.6
@@ -10694,12 +10583,6 @@ packages:
     hasBin: true
     resolution:
       integrity: sha1-wNjq82BZ9wV5bh40SBHPTEmNOiY=
-  /magic-string/0.25.7:
-    dependencies:
-      sourcemap-codec: 1.4.8
-    dev: false
-    resolution:
-      integrity: sha512-4CrMT5DOHTDk4HYDlzmwu4FVCcIYI8gauveasrdCu2IKIFOJ3f0v/8MDGJCDL9oD2ppz/Av1b0Nj345H9M+XIA==
   /make-dir/2.1.0:
     dependencies:
       pify: 4.0.1
@@ -11510,10 +11393,6 @@ packages:
       node: '>= 0.8.0'
     resolution:
       integrity: sha512-74RlY5FCnhq4jRxVUPKDaRwrVNXMqsGsiW6AJw4XK8hmtm10wC0ypZBLw5IIp85NZMr91+qd1RvvENwg7jjRFw==
-  /opts/2.0.2:
-    dev: false
-    resolution:
-      integrity: sha512-k41FwbcLnlgnFh69f4qdUfvDQ+5vaSDnVPFI/y5XuhKRq97EnVVneO9F1ESVCdiVu4fCS2L8usX3mU331hB7pg==
   /original/1.0.2:
     dependencies:
       url-parse: 1.5.1
@@ -13008,10 +12887,6 @@ packages:
     dev: false
     resolution:
       integrity: sha512-NKN5kMDylKuldxYLSUfrbo5Tuzh4hd+2E8NPPX02mZtn1VuREQToYe/ZdlJy+J3uCpfaiGF05e7B8W0iXbQHmg==
-  /require-relative/0.8.7:
-    dev: false
-    resolution:
-      integrity: sha1-eZlTn8ngR6N5KPoZb44VY9q9Nt4=
   /requires-port/1.0.0:
     dev: false
     resolution:
@@ -13122,75 +12997,6 @@ packages:
     dev: false
     resolution:
       integrity: sha512-ii4iagi25WusVoiC4B4lq7pbXfAp3D9v5CwfkY33vffw2+pkDjY1D8GaN7spsxvCSx8dkPqOZCEZyfxcmJG2IA==
-  /rollup-plugin-copy-assets/2.0.3_rollup@2.45.2:
-    dependencies:
-      fs-extra: 7.0.1
-      rollup: 2.45.2
-    dev: false
-    peerDependencies:
-      rollup: '>=1.1.2'
-    resolution:
-      integrity: sha512-ETShhQGb9SoiwcNrvb3BhUNSGR89Jao0+XxxfzzLW1YsUzx8+rMO4z9oqWWmo6OHUmfNQRvqRj0cAyPkS9lN9w==
-  /rollup-plugin-css-only/3.1.0_rollup@2.45.2:
-    dependencies:
-      '@rollup/pluginutils': 4.1.0_rollup@2.45.2
-      rollup: 2.45.2
-    dev: false
-    engines:
-      node: '>=10.12.0'
-    peerDependencies:
-      rollup: 1 || 2
-    resolution:
-      integrity: sha512-TYMOE5uoD76vpj+RTkQLzC9cQtbnJNktHPB507FzRWBVaofg7KhIqq1kGbcVOadARSozWF883Ho9KpSPKH8gqA==
-  /rollup-plugin-livereload/2.0.0:
-    dependencies:
-      livereload: 0.9.3
-    dev: false
-    engines:
-      node: '>=8.3'
-    resolution:
-      integrity: sha512-oC/8NqumGYuphkqrfszOHUUIwzKsaHBICw6QRwT5uD07gvePTS+HW+GFwu6f9K8W02CUuTvtIM9AWJrbj4wE1A==
-  /rollup-plugin-svelte/7.1.0_rollup@2.45.2+svelte@3.37.0:
-    dependencies:
-      require-relative: 0.8.7
-      rollup: 2.45.2
-      rollup-pluginutils: 2.8.2
-      svelte: 3.37.0
-    dev: false
-    engines:
-      node: '>=10'
-    peerDependencies:
-      rollup: '>=2.0.0'
-      svelte: '>=3.5.0'
-    resolution:
-      integrity: sha512-vopCUq3G+25sKjwF5VilIbiY6KCuMNHP1PFvx2Vr3REBNMDllKHFZN2B9jwwC+MqNc3UPKkjXnceLPEjTjXGXg==
-  /rollup-plugin-terser/7.0.2_rollup@2.45.2:
-    dependencies:
-      '@babel/code-frame': 7.12.13
-      jest-worker: 26.6.2
-      rollup: 2.45.2
-      serialize-javascript: 4.0.0
-      terser: 5.6.1
-    dev: false
-    peerDependencies:
-      rollup: ^2.0.0
-    resolution:
-      integrity: sha512-w3iIaU4OxcF52UUXiZNsNeuXIMDvFrr+ZXK6bFZ0Q60qyVfq4uLptoS4bbq3paG3x216eQllFZX7zt6TIImguQ==
-  /rollup-pluginutils/2.8.2:
-    dependencies:
-      estree-walker: 0.6.1
-    dev: false
-    resolution:
-      integrity: sha512-EEp9NhnUkwY8aif6bxgovPHMoMoNr2FulJziTndpt5H9RdwC47GSGuII9XxpSdzVGM0GWrNPHV6ie1LTNJPaLQ==
-  /rollup/2.45.2:
-    dev: false
-    engines:
-      node: '>=10.0.0'
-    hasBin: true
-    optionalDependencies:
-      fsevents: 2.3.2
-    resolution:
-      integrity: sha512-kRRU7wXzFHUzBIv0GfoFFIN3m9oteY4uAsKllIpQDId5cfnkWF2J130l+27dzDju0E6MScKiV0ZM5Bw8m4blYQ==
   /rsvp/4.8.5:
     dev: false
     engines:
@@ -13743,10 +13549,6 @@ packages:
       node: '>= 8'
     resolution:
       integrity: sha512-CkCj6giN3S+n9qrYiBTX5gystlENnRW5jZeNLHpe6aue+SrHcG5VYwujhW9s4dY31mEGsxBDrHR6oI69fTXsaQ==
-  /sourcemap-codec/1.4.8:
-    dev: false
-    resolution:
-      integrity: sha512-9NykojV5Uih4lgo5So5dtw+f0JgJX30KCNI8gwhz2J9A15wD0Ml6tjHKwf6fTSa6fAdVBdZeNOs9eJ71qCk8vA==
   /space-separated-tokens/1.1.5:
     dev: false
     resolution:
@@ -15821,6 +15623,18 @@ packages:
     dev: false
     resolution:
       integrity: sha512-V50KMwwzqJV0NpZIZFwfOD5/lyny3WlSzRiXgA0G7VUnRlqttta1L6UQIHzd6EuBY/cHGfwTIck7w1yH6Q5zUw==
+  file:projects/plugin-login.tgz:
+    dependencies:
+      '@microsoft/api-extractor': 7.13.5
+      prettier: 2.2.1
+      ts-standard: 10.0.0_typescript@4.2.4
+      typescript: 4.2.4
+    dev: false
+    name: '@rush-temp/plugin-login'
+    resolution:
+      integrity: sha512-AZADae/sZO62ULNvpZ/q+4J8KaYPA/95cm1ef5r04ZSBKsvgUOCoKSMasFQBZHta/Qr+3WdcOPfjUOmuNYuXaA==
+      tarball: file:projects/plugin-login.tgz
+    version: 0.0.0
   file:projects/plugin-ui-impl.tgz:
     dependencies:
       '@babel/core': 7.13.15
@@ -15878,13 +15692,14 @@ packages:
       integrity: sha512-RFVbCpRirmmoTZRwCcacu9rPkMFCI1bfrtQK2Koni0mgtcj5q83UlXWPLTAbBwDLOJ79n9++oA59wOOhGDuekw==
       tarball: file:projects/plugin.tgz
     version: 0.0.0
-  file:projects/prod.tgz_typescript@4.2.4:
+  file:projects/prod.tgz_sass@1.32.8+typescript@4.2.4:
     dependencies:
       cross-env: 7.0.3
       css-loader: 5.2.1_webpack@5.32.0
       dotenv-webpack: 7.0.2_webpack@5.32.0
       file-loader: 6.2.0_webpack@5.32.0
       mini-css-extract-plugin: 1.4.1_webpack@5.32.0
+      sass-loader: 11.0.1_sass@1.32.8+webpack@5.32.0
       style-loader: 2.0.0_webpack@5.32.0
       svelte: 3.37.0
       svelte-loader: 3.1.0_svelte@3.37.0
@@ -15896,9 +15711,10 @@ packages:
     id: file:projects/prod.tgz
     name: '@rush-temp/prod'
     peerDependencies:
+      sass: '*'
       typescript: '*'
     resolution:
-      integrity: sha512-LKih4baes+gF+J/zKIxU6CczC0mpvgJTF6zv1gcvJC/rWdJhEmKlxrddpA0kuMMSaY4wD57rZqDJfZF7WzAuUQ==
+      integrity: sha512-HATjKuDAYW/jizd3XQLMOT/hxHKgF2+qbjzYvl3YZGa/7ilvprekEBHuzoHaeBs9miUrzvRZiKwg/yF96acPiw==
       tarball: file:projects/prod.tgz
     version: 0.0.0
   file:projects/sparkling-components.tgz_webpack@5.32.0:
@@ -15976,11 +15792,9 @@ packages:
       integrity: sha512-xBCnWu1AIo/iSahhZo7Y+3W/3c3Bg93CPFO0QhYh5oj4AbUoB9+mlHoh+p0F+77mzss4ZHudS79Vx6k+g6RnpQ==
       tarball: file:projects/status.tgz
     version: 0.0.0
-  file:projects/storybook.tgz_8278c85092e9d84c4cd33dd119169a88:
+  file:projects/storybook.tgz_c820b234ab09c3b6dddf16c9f6592305:
     dependencies:
       '@babel/core': 7.13.15
-      '@rollup/plugin-commonjs': 16.0.0_rollup@2.45.2
-      '@rollup/plugin-node-resolve': 10.0.0_rollup@2.45.2
       '@storybook/addon-actions': 6.2.8
       '@storybook/addon-essentials': 6.2.8_e4a81a1dd79ea5f877870dc22eb321f3
       '@storybook/addon-links': 6.2.8
@@ -15992,13 +15806,6 @@ packages:
       css-loader: 5.2.1_webpack@5.32.0
       jest: 26.6.3
       jest-transform-svelte: 2.1.1_svelte@3.37.0
-      rollup: 2.45.2
-      rollup-plugin-copy-assets: 2.0.3_rollup@2.45.2
-      rollup-plugin-css-only: 3.1.0_rollup@2.45.2
-      rollup-plugin-livereload: 2.0.0
-      rollup-plugin-svelte: 7.1.0_rollup@2.45.2+svelte@3.37.0
-      rollup-plugin-terser: 7.0.2_rollup@2.45.2
-      sass: 1.32.8
       sass-loader: 10.1.1_sass@1.32.8+webpack@5.32.0
       sirv-cli: 1.0.11
       style-loader: 2.0.0_webpack@5.32.0
@@ -16009,11 +15816,12 @@ packages:
     id: file:projects/storybook.tgz
     name: '@rush-temp/storybook'
     peerDependencies:
+      sass: '*'
       typescript: '*'
       webpack: '*'
       webpack-cli: '*'
     resolution:
-      integrity: sha512-2xon52nNvXuui7USD29SrPUTJDp3WDAxk+qv8ANC9s/go+yyM9ibn+g0OuSJT9ECflS4crLzn5y6ryvXCg9nCw==
+      integrity: sha512-Zv1ll50YaLDIejQ6L6ZjETbMM9jRZ9ewzqKSIwmBwsjvAooO/neZoBoFYkryrjkUmN0nkxyaqHcpGgJtRIh0QA==
       tarball: file:projects/storybook.tgz
     version: 0.0.0
 registry: ''
@@ -16023,6 +15831,7 @@ specifiers:
   '@babel/runtime': ~7.13.10
   '@microsoft/api-extractor': ~7.13.4
   '@rush-temp/plugin': file:./projects/plugin.tgz
+  '@rush-temp/plugin-login': file:./projects/plugin-login.tgz
   '@rush-temp/plugin-ui': file:./projects/plugin-ui.tgz
   '@rush-temp/plugin-ui-impl': file:./projects/plugin-ui-impl.tgz
   '@rush-temp/prod': file:./projects/prod.tgz

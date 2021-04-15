@@ -13,90 +13,10 @@
 // limitations under the License.
 //
 
-import { AnyComponent } from '@anticrm/plugin-ui'
+import { ApplicationRouter, Location } from '@anticrm/plugin-ui'
 import { parseHash, parsePath, parseQuery } from './location'
-import { Metadata } from '@anticrm/plugin'
 
 import { deepEqual } from 'fast-equals'
-
-/**
- * Describe a browser URI location parsed to path, query and fragment.
- */
-export interface Location {
-  path: string[] // A useful path value
-  query: Record<string, string | null> // a value of query parameters, no duplication are supported
-  fragment: string // a value of fragment
-}
-
-/**
- * Define a useful route to applications.
- */
-export interface ApplicationRoute {
-  route: string
-  component: AnyComponent
-}
-
-export function routeMeta (name: string): Metadata<ApplicationRoute> {
-  return ('routes:' + name) as Metadata<ApplicationRoute>
-}
-
-/**
- * Could be registered to provide platform a way to decide about routes from Root component.
- */
-export interface ApplicationRouter<T> {
-  /**
-   * Return parent router if defined.
-   */
-  parent: () => ApplicationRouter<any> | undefined
-
-  /**
-   * Construct a child router based on current matched state
-   * Internal child router is just one, and calling twice will replace existing.
-   */
-  newRouter: <P>(pattern: string) => ApplicationRouter<P>
-
-  /**
-   * Will check and match path for registered local routes, if no local routes are match will return false
-   */
-  match: () => boolean
-
-  /**
-   * Return current matched set.
-   */
-  properties: () => T
-
-  /**
-   * Replace defaults passed with constructor, will call matcher function passed with constructor.
-   * @param defaults - a new defaults
-   */
-  setDefaults: (defaults: T) => void
-
-  /**
-   * Replace a matcher function passed with constructor.
-   * @param matcher
-   */
-  subscribe: (matcher: (match: T) => void) => void
-
-  // Construct a new navigate using combined query parameters
-  queries: (vars: Partial<T>) => Record<string, any> | undefined
-  // Construct a current path with all applied variables
-  path: (vars: Partial<T>) => string[]
-  // Construct a current fragment with app applied variables
-  fragment: (vars: Partial<T>) => string | undefined
-
-  /**
-   * Construct a full new location based on values of T.
-   * Other values will be taken from stored parent and child routers.
-   * @param values
-   */
-  location: (values: Partial<T>) => Location
-
-  /**
-   * Use new constructed location value and platform UI to navigate.
-   * @param values
-   */
-  navigate: (values: Partial<T>) => void
-}
 
 export class Router<T> implements ApplicationRouter<T> {
   private readonly pattern: string
@@ -190,7 +110,7 @@ export class Router<T> implements ApplicationRouter<T> {
           for (const s of this.segments) {
             if (s.startsWith(':')) {
               const varName = s.substring(1)
-              if (!this.variables[varName]) {
+              if (this.variables[varName] === undefined) {
                 // No variable for path segment
                 throw new Error(
                   `Could not match variable:${varName} in ${this.pattern} should be specified in defaults or URI`

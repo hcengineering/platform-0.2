@@ -30,18 +30,6 @@ export interface Location {
 }
 
 /**
- * Define a useful route to applications.
- */
-export interface ApplicationRoute {
-  route: string
-  component: AnyComponent
-}
-
-export function routeMeta (name: string): Metadata<ApplicationRoute> {
-  return ('routes:' + name) as Metadata<ApplicationRoute>
-}
-
-/**
  * Could be registered to provide platform a way to decide about routes from Root component.
  */
 export interface ApplicationRouter<T> {
@@ -98,29 +86,6 @@ export interface ApplicationRouter<T> {
    */
   navigate: (values: Partial<T>) => void
 }
-
-// interface ComponentOptions<Props> {
-//   target: HTMLElement
-//   anchor?: HTMLElement
-//   props?: Props
-//   hydrate?: boolean
-//   intro?: boolean
-// }
-
-// export interface SvelteComponent<Props> {
-//   new (options: ComponentOptions<Props>): any
-
-//   // eslint-disable-next-line @typescript-eslint/ban-types
-//   $set: (props: {}) => any
-//   $on: (event: string, callback: (event: CustomEvent) => any) => any
-//   $destroy: () => any
-//   // eslint-disable-next-line @typescript-eslint/ban-types
-//   render: (props?: {}) => {
-//     html: string
-//     css: { code: string, map?: string }
-//     head?: string
-//   }
-// }
 
 export type AnySvelteComponent = typeof SvelteComponent
 
@@ -245,10 +210,8 @@ export function getUIService (): UIService {
   return getContext(CONTEXT_PLATFORM_UI)
 }
 
-export function newRouter<T> (
-  pattern: string,
-  matcher: (match: T) => void,
-  defaults: T | undefined = undefined
-): ApplicationRouter<T> {
-  return getUIService().newRouter(pattern, matcher, defaults)
+// R O U T E R  M E T A D A T A  K E Y S
+
+export function applicationShortcutKey(shortcut: string): Metadata<AnyComponent> {
+  return ('shortcut:ui.' + shortcut) as Metadata<AnyComponent>
 }
