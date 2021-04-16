@@ -59,7 +59,8 @@ export class TitleIndex implements DomainIndex {
   }
 
   async onCreate (ctx: TxContext, create: CreateTx): Promise<any> {
-    const obj = this.modelDb.newDoc(create._objectClass, create._objectId, create.object)
+    const obj = this.modelDb.createDocument(create._objectClass, create.object)
+    obj._id = create._objectId
     await this.updateShortIdRef(ctx, obj)
 
     const primary = this.getPrimary(create._objectClass)

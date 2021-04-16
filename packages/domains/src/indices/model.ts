@@ -35,7 +35,8 @@ export class ModelIndex implements DomainIndex {
         if (this.model.getDomain(createTx._objectClass) !== MODEL_DOMAIN) {
           return
         }
-        const newDoc = this.model.newDoc(createTx._objectClass, createTx._objectId, createTx.object)
+        const newDoc = this.model.createDocument(createTx._objectClass, createTx.object)
+        newDoc._id = createTx._objectId
         return this.storage.store(ctx, newDoc)
       }
       case CORE_CLASS_UPDATE_TX: {

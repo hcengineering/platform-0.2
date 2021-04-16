@@ -18,7 +18,7 @@ import { Resource } from '@anticrm/platform'
 import { loadClassifier } from './dsl'
 import { CombineObjects, KeysByType } from 'simplytyped'
 import {
-  AllAttributes, Attribute, Class, ClassifierKind, Doc, EClass, Emb, generateId, Mixin, Model, MODEL_DOMAIN, Obj, Ref,
+  AllAttributes, Attribute, Class, ClassifierKind, Doc, EClass, Emb, Mixin, Model, MODEL_DOMAIN, Obj, Ref,
   StringProperty
 } from '@anticrm/core'
 import core from '.'
@@ -101,7 +101,10 @@ class Builder {
   }
 
   createDocument<M extends Doc> (_class: Ref<Class<M>>, values: Partial<M>, _id?: Ref<Doc>): M {
-    const doc = this.memdb.newDoc<M>(_class, _id ?? generateId(), values)
+    const doc = this.memdb.createDocument<M>(_class, values)
+    if (_id) {
+      doc._id = _id
+    }
     if (_class === core.class.Class as Ref<Class<Doc>> || _class === core.class.Mixin as Ref<Class<Doc>>) {
       this.memdb.add(doc)
       console.log('add `model` ' + doc._id)

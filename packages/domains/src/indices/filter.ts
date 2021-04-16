@@ -37,7 +37,9 @@ export class PassthroughsIndex implements DomainIndex {
     if (!this.modelDb.is(create._objectClass, this.matchClass)) {
       return Promise.resolve()
     }
-    return this.storage.store(ctx, this.modelDb.newDoc(create._objectClass, create._objectId, create.object))
+    const obj = this.modelDb.createDocument(create._objectClass, create.object)
+    obj._id = create._objectId
+    return this.storage.store(ctx, obj)
   }
 
   onDelete (ctx: TxContext, tx: DeleteTx): Promise<any> {

@@ -44,7 +44,8 @@ export interface QueryProtocol {
  */
 export interface OperationProtocol {
   /**
-   * Perform creation of new document. Object ID will be automatically generated and assigned to object.
+   * Perform creation of new document and store it into storage.
+   * Object ID will be automatically generated and assigned to object.
    */
   create<T extends Doc> (_class: Ref<Class<T>>, values: Partial<T>): Promise<T>
 

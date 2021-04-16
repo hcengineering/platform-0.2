@@ -16,7 +16,7 @@
 import { DomainIndex, Model, Storage, Tx, TxContext } from '@anticrm/core'
 import {
   CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_UPDATE_TX, CORE_CLASS_VDOC, CreateTx, DeleteTx, TxOperation,
-  TxOperationKind, UpdateTx
+  TxOperationKind, UpdateTx, VDoc
 } from '..'
 
 export class VDocIndex implements DomainIndex {
@@ -47,15 +47,17 @@ export class VDocIndex implements DomainIndex {
     if (!this.modelDb.is(tx._objectClass, CORE_CLASS_VDOC)) {
       return Promise.resolve()
     }
+    const doc = this.modelDb.createDocument(tx._objectClass, tx.object)
+    doc._id = tx._objectId
     // we need to update vdoc properties.
     if (this.transient) {
-      const vdoc = tx.object
+      const vdoc = doc as VDoc
       vdoc._createdBy = tx._user
       vdoc._createdOn = tx._date
     }
 
     return Promise.all([
-      this.storage.store(ctx, this.modelDb.newDoc(tx._objectClass, tx._objectId, tx.object)),
+      this.storage.store(ctx, doc),
       this.transient && this.transient.update(ctx, tx._objectClass, tx._objectId, [{
         kind: TxOperationKind.Set,
         _attributes: {

@@ -198,12 +198,11 @@ export class Model implements Storage {
   /**
    * Construct a new proper document with all desired fields.
    * @param _class
-   * @param _id
    * @param layout
    */
-  public newDoc<T extends Doc> (_class: Ref<Class<T>>, _id: Ref<Doc>, layout: Partial<T>): T {
+  public createDocument<T extends Doc> (_class: Ref<Class<T>>, layout: Partial<T>): T {
     const doc = this.assign({}, _class, layout as unknown as AnyLayout)
-    doc._id = _id
+    doc._id = generateId()
     return doc as unknown as T
   }
 

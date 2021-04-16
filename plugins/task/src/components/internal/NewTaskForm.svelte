@@ -41,7 +41,7 @@
   async function save () {
     const cs = await coreService
     const modelDb = cs.getModel()
-    const newTask = modelDb.newDoc<Task>(task.class.Task, cs.generateId(), {
+    const newTask: Task = {
       title,
       _space: space?._id,
       ...object,
@@ -49,12 +49,11 @@
       comments: [
         {
           message: message,
-          _class: chunter.class.Comment,
           _createdOn: Date.now() as Property<number, Date>,
           _createdBy: cs.getUserId() as Property<string, string>
         }
       ]
-    })
+    }
     try {
       const asShortId = modelDb.cast(newTask, CORE_MIXIN_SHORTID)
 

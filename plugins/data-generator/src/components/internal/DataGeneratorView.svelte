@@ -69,7 +69,7 @@
     const cs = await coreService
     for (let i = 0; i < taskCount; i++) {
       const modelDb = cs.getModel()
-      const newTask = modelDb.newDoc<Task>(task.class.Task, cs.generateId(), {
+      const newTask = modelDb.createDocument<Task>(task.class.Task, {
         title: faker.commerce.productName(),
         _space: taskSpace._id,
         status: randomEnum(TaskStatus),
