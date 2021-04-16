@@ -30,7 +30,7 @@ limitations under the License.
   let lq: Promise<QueryUpdater<WithCandidateProps>>
   let candidates: WithCandidateProps[] = []
 
-  $: lq = liveQuery(
+  $: lq = liveQuery<WithCandidateProps>(
     lq,
     recruiting.mixin.WithCandidateProps,
     {

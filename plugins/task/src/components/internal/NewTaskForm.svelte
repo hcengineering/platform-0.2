@@ -24,7 +24,7 @@
   import { CORE_MIXIN_SHORTID } from '@anticrm/domains'
   import task, { Task, TaskStatus } from '../../index'
   import EditBox from '@anticrm/sparkling-controls/src/EditBox.svelte'
-  import chunter, { getChunterService } from '@anticrm/chunter'
+  import { getChunterService } from '@anticrm/chunter'
 
   export let title: string
   let message = ''

@@ -27,7 +27,7 @@
   let presenter: AnyComponent
 
   const coreService = getCoreService()
-  $: lq = liveQuery(lq, (attribute.type as RefTo<Doc>).to, { _id: value }, (docs) => {
+  $: lq = liveQuery<Doc>(lq, (attribute.type as RefTo<Doc>).to, { _id: value }, (docs) => {
     if (docs.length > 0) {
       doc = docs[0]
     } else {
