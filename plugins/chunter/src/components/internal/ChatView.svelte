@@ -42,7 +42,6 @@
 
   $: ms = liveQuery<Message>(ms, chunter.class.Message, { _space: space._id as Ref<Space> }, (docs) => {
     messages = docs
-    console.log(messages)
   })
 
   $: spaceName = space ? '#' + space.name : ''

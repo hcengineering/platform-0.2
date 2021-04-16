@@ -624,14 +624,16 @@ describe('mixin tools', () => {
   )
 
   it('document query specification test', () => {
-    console.log('cool', {
+    const q1: DocumentQuery<Space> = {
       name: 's1',
       users: { userId: 'qwe' }
-    } as DocumentQuery<Space>)
+    }
 
-    console.log('cool', {
+    const q2: DocumentQuery<Space> = {
       name: 's1',
       users: [{ userId: 'qwe' }]
-    } as DocumentQuery<Space>)
+    }
+    expect(q1).toBeDefined()
+    expect(q2).toBeDefined()
   })
 })
