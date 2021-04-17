@@ -7,7 +7,7 @@ export default {
   argTypes: {
     label: { control: 'text' },
     primary: { control: 'boolean' },
-    fullWidth: { control: 'boolean' },
+    width: { control: 'text' },
     onClick: { action: 'onClick' },
   },
 };
@@ -25,21 +25,27 @@ Secondary.args = {
   label: 'Button'
 };
 
+export const SecondaryWidth300px = Template.bind({});
+SecondaryWidth300px.args = {
+  label: 'Button',
+  width: '300px'
+};
+
 export const Primary = Template.bind({});
 Primary.args = {
-  ...Secondary.args,
+  label: 'Button',
   primary: true
 };
 
 export const FullWidth = Template.bind({});
 FullWidth.args = {
-  ...Secondary.args,
-  fullWidth: true
+  label: 'Button',
+  width: '100%'
 };
 
 export const FullWidthAndPrimary = Template.bind({});
 FullWidthAndPrimary.args = {
-  ...Secondary.args,
+  label: 'Button',
   primary: true,
-  fullWidth: true
+  width: '100%'
 };
