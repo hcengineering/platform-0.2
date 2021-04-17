@@ -164,13 +164,27 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
     // C O R E  P R O T O C O L
 
     find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T[]> {
+      const { query: finalQuery, classes } = memdb.createQuery(_class, query, true)
+
+      if (classes.length > 1) {
+        // Replace _class query to find all suitable instances.
+        (finalQuery as any)._class = { $in: classes }
+      }
+
       return collection(_class)
-        .find(memdb.createQuery(_class, query, true))
+        .find(finalQuery)
         .toArray()
     },
 
     async findOne<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined> {
-      const result = await collection(_class).findOne(memdb.createQuery(_class, query, true))
+      const { query: finalQuery, classes } = memdb.createQuery(_class, query, true)
+
+      if (classes.length > 0) {
+        // Replace _class query to find all suitable instances.
+        (query as any)._class = { $in: [classes] }
+      }
+
+      const result = await collection(_class).findOne(finalQuery)
       if (result == null) {
         return undefined
       }

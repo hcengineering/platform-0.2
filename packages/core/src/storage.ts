@@ -43,7 +43,6 @@ export interface Storage {
 }
 
 ///
-
 /**
  * Transaction operation being processed.
  */

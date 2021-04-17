@@ -65,7 +65,7 @@
       </Button>
     </div>
     <div class="separator" />
-    <ScrollView height="165px">
+    <ScrollView height="100%">
       {#each spaces as s (s._id)}
         <div class="space" on:mouseover={() => (hoverSpace = s._id)}>
           <div class="info">
@@ -99,7 +99,6 @@
 
 <style lang="scss">
   .space-browse-view {
-    width: 412px;
     padding: 24px;
     position: relative;
     .header {
@@ -114,7 +113,9 @@
       background-color: var(--theme-bg-accent-hover);
     }
     .content {
-      height: 100%;
+      width: 600px;
+      height: 500px;
+      //height: 100%;
       display: flex;
       flex-direction: column;
       .space {

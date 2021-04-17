@@ -17,6 +17,9 @@ import { AnyLayout, Class, DateProperty, Doc, Emb, Mixin, Property, Ref, StringP
 
 // TXes
 
+export const CORE_CLASS_TX = 'class:core.Tx' as Ref<Class<Tx>>
+export const CORE_CLASS_OBJECT_TX = 'class:core.ObjectTx' as Ref<Class<ObjectTx>>
+export const CORE_CLASS_OBJECTTX_DETAILS = 'class:core.ObjectTxDetails' as Ref<Class<ObjectTxDetails>>
 export const CORE_CLASS_CREATE_TX = 'class:core.CreateTx' as Ref<Class<CreateTx>>
 export const CORE_CLASS_UPDATE_TX = 'class:core.UpdateTx' as Ref<Class<UpdateTx>>
 export const CORE_CLASS_TX_OPERATION = 'class:core.TxOperation' as Ref<Class<TxOperation>>
@@ -24,9 +27,18 @@ export const CORE_CLASS_DELETE_TX = 'class:core.DeleteTx' as Ref<Class<DeleteTx>
 
 export const TX_DOMAIN = 'tx'
 
+export interface ObjectTxDetails extends Emb {
+  name?: string
+  id?: string
+  description?: string
+}
+
 export interface ObjectTx extends Tx {
   _objectId: Ref<Doc>
   _objectClass: Ref<Class<Doc>>
+  _objectSpace?: Ref<Space> // For some system wide operations, space may be missing
+
+  _txDetails?: ObjectTxDetails
 }
 
 /**

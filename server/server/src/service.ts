@@ -15,10 +15,12 @@
 
 import { WorkspaceProtocol } from './workspace'
 
-import { filterQuery, getUserSpaces, isAcceptable, processTx as processSpaceTx, SecurityContext } from './spaces'
+import {
+  filterQuery, getUserSpaces, isAcceptable, processTx as processSpaceTx, SecurityContext, UserInfo
+} from './spaces'
 import { Broadcaster, Client, ClientService, ClientSocket } from './server'
 import { AnyLayout, Class, Doc, DocumentQuery, generateId, Ref, Tx, txContext, TxContextSource } from '@anticrm/core'
-import { CORE_CLASS_CREATE_TX, CORE_CLASS_SPACE, Space, SpaceUser } from '@anticrm/domains'
+import { CORE_CLASS_CREATE_TX, CORE_CLASS_SPACE, Space } from '@anticrm/domains'
 import { Response, serialize } from '@anticrm/rpc'
 
 export interface ClientControl {
@@ -36,7 +38,7 @@ let clientIndex = 0
 export async function createClientService (workspaceProtocol: Promise<WorkspaceProtocol>, client: ClientSocket & Client, broadcaster: Broadcaster): Promise<ClientService> {
   const workspace = await workspaceProtocol
 
-  const userSpaces: Map<string, SpaceUser> = await getUserSpaces(workspace, client.email)
+  const userSpaces: Map<string, UserInfo> = await getUserSpaces(workspace, client.email)
 
   const clientId = `${generateId()} ${(clientIndex++)}`
 
@@ -69,7 +71,7 @@ export async function createClientService (workspaceProtocol: Promise<WorkspaceP
     },
     async loadDomain (domain: string): Promise<Doc[]> {
       const docs = await workspace.loadDomain(domain)
-      return docs.filter((d) => isAcceptable(userSpaces, d._class, d), false)
+      return docs.filter((d) => isAcceptable(userSpaces, d))
     },
 
     // Handle sending from client.

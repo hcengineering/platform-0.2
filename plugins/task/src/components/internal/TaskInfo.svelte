@@ -15,14 +15,20 @@
 <script lang="ts">
   import type { Tx } from '@anticrm/core'
   import type { CreateTx } from '@anticrm/domains'
-  import { CORE_CLASS_CREATE_TX } from '@anticrm/domains'
+  import { CORE_CLASS_CREATE_TX, CORE_CLASS_UPDATE_TX, ObjectTx } from '@anticrm/domains'
   import type { Task } from '../..'
+  import { getTransactionObjectDetails } from '@anticrm/activity/src/details'
 
   export let tx: Tx
 
   function taskTitle () {
-    return (((tx as CreateTx).object as unknown) as Task).title
+    if (tx._class === CORE_CLASS_CREATE_TX) {
+      return (((tx as CreateTx).object as unknown) as Task).title
+    } else {
+      return getTransactionObjectDetails(tx as ObjectTx)
+    }
   }
 </script>
 
 {#if tx._class === CORE_CLASS_CREATE_TX}Создал задачу <b>{taskTitle()}</b>{/if}
+{#if tx._class === CORE_CLASS_UPDATE_TX}Обновил задачу <b>{taskTitle()}</b>{/if}

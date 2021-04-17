@@ -15,7 +15,9 @@
 
 import { ObjectSelector, TxOperation, TxOperationKind } from '@anticrm/domains'
 import {
-  AnyLayout, ArrayOf, Attribute, Class, Classifier, ClassifierKind, CORE_CLASS_ARRAY_OF, CORE_CLASS_INSTANCE_OF,
+  AnyLayout, ArrayOf, Attribute, Class, Classifier, ClassifierKind, CORE_CLASS_ARRAY_OF, CORE_CLASS_CLASS,
+  CORE_CLASS_INSTANCE_OF,
+  CORE_CLASS_MIXIN,
   CORE_CLASS_OBJ, CORE_MIXIN_INDICES, Doc, Mixin, Obj, Property, PropertyType, Ref, Type
 } from './classes'
 import { DocumentQuery, DocumentValue, generateId, Storage, TxContext } from './storage'
@@ -56,7 +58,9 @@ export interface AttributeMatch {
 export class Model implements Storage {
   private readonly domain: string
   private readonly objects = new Map<Ref<Doc>, Doc>()
+
   private byClass: Map<Ref<Class<Doc>>, Doc[]> | null = null
+  private byExtends: Map<Ref<Class<Obj>>, Class<Obj>[]> | null = null
 
   constructor (domain: string) {
     this.domain = domain
@@ -66,10 +70,20 @@ export class Model implements Storage {
     if (!this.byClass) {
       this.byClass = new Map<Ref<Class<Doc>>, Doc[]>()
       for (const doc of this.objects.values()) {
-        this.index(doc)
+        this.indexInstances(doc)
       }
     }
     return this.byClass.get(_class) ?? []
+  }
+
+  protected extendsOfClass (_class: Ref<Class<Obj>>): Class<Obj>[] {
+    if (!this.byExtends) {
+      this.byExtends = new Map<Ref<Class<Obj>>, Class<Obj>[]>()
+      for (const doc of this.objects.values()) {
+        this.indexExtends(doc)
+      }
+    }
+    return this.byExtends.get(_class) ?? []
   }
 
   attributeKey (clazz: Classifier, key: string): string {
@@ -93,13 +107,14 @@ export class Model implements Storage {
     return result
   }
 
-  private index (doc: Doc, add = true) {
+  private indexInstances (doc: Doc, add = true) {
     if (this.byClass === null) {
-      throw new Error('index not created')
+      throw new Error('indexInstances not created')
     }
     const byClass = this.byClass
     const hierarchy = this.getClassHierarchy(doc._class)
-    hierarchy.forEach(_class => {
+
+    for (const _class of hierarchy) {
       const cls = _class as Ref<Class<Doc>>
       const list = byClass.get(cls)
       if (list) {
@@ -112,17 +127,43 @@ export class Model implements Storage {
       } else {
         byClass.set(cls, [doc])
       }
-    })
+    }
+  }
+
+  private indexExtends (doc: Doc, add = true) {
+    if (this.byExtends === null) {
+      throw new Error('indexInstances not created')
+    }
+    const byExtends = this.byExtends
+    if (this.is(doc._class, CORE_CLASS_CLASS)) {
+      //  This is class, let's also check its' hierarchy
+      const hierarchy = this.getClassHierarchy(doc._id as Ref<Class<Obj>>)
+      for (const cls of hierarchy) {
+        const list = byExtends.get(cls)
+        if (list) {
+          if (add) {
+            list.push(doc as Class<Obj>)
+          } else {
+            // Replace without our document
+            byExtends.set(cls, list.filter((dd) => dd._id !== doc._id))
+          }
+        } else {
+          byExtends.set(cls, [doc as Class<Obj>])
+        }
+      }
+    }
   }
 
   add (doc: Doc): void {
     this.set(doc)
-    if (this.byClass) this.index(doc)
+    if (this.byClass) this.indexInstances(doc)
+    if (this.byExtends) this.indexExtends(doc)
   }
 
   del (id: Ref<Doc>): void {
     const doc = this.unset(id)
-    if (this.byClass) this.index(doc, false)
+    if (this.byClass) this.indexInstances(doc, false)
+    if (this.byExtends) this.indexExtends(doc, false)
   }
 
   get<T extends Doc> (id: Ref<T>): T {
@@ -274,6 +315,10 @@ export class Model implements Storage {
     for (const rKey in values) {
       // TODO: Will be removed with fix to #398
       if (rKey.startsWith('_')) {
+        if (rKey === '_class') {
+          // Ignore _class, it is handled separatly
+          continue
+        }
         l[rKey] = r[rKey]
         continue
       }
@@ -322,7 +367,6 @@ export class Model implements Storage {
    * Perform update of document attributes
    * @param doc - document to update
    * @param operations - define a set of operations to update for document.
-   * @param operations - new attribute values
    */
   public updateDocument<T extends Obj> (doc: T, operations: TxOperation[]): T {
     for (const op of operations) {
@@ -391,11 +435,16 @@ export class Model implements Storage {
   }
 
   public static includeMixin<E extends Obj, T extends Obj> (doc: E, clazz: Ref<Mixin<T>>): void {
+    this.includeMixinAny(doc, clazz as Ref<Mixin<Obj>>)
+  }
+
+  private static includeMixinAny (doc: any, clazz: Ref<Mixin<Obj>>): void {
     if (!doc._mixins) {
       doc._mixins = []
     }
-    if (doc._mixins.indexOf(clazz) === -1) {
-      doc._mixins.push(clazz)
+    const mixins = (doc._mixins as Ref<Mixin<Obj>>[])
+    if (mixins.indexOf(clazz) === -1) {
+      mixins.push(clazz)
     }
   }
 
@@ -454,19 +503,38 @@ export class Model implements Storage {
    *
    * flatten queries are applicable only for mongoDB and not supported by model search operations.
    */
-  createQuery<T extends Doc> (_class: Ref<Class<T>>, _query: DocumentQuery<T>, flatten = false): AnyLayout {
+  createQuery<T extends Doc> (_class: Ref<Class<T>>, _query: DocumentQuery<T>, flatten = false): { query: DocumentQuery<T>, classes: Ref<Class<Obj>>[] } {
     let query = this.assign({}, _class, _query as AnyLayout)
 
     if (flatten) {
       query = this.flattenQuery(_class, query)
     }
 
-    query._class = this.getClass(_class)
-    if (query._class !== _class) {
-      // We should also put a _mixin in list for query
-      query._mixins = _class
+    const cl = this.getClass(_class)
+    query._class = cl
+    const classes: Ref<Class<Obj>>[] = []
+
+    const byClass = this.extendsOfClass(query._class as Ref<Class<Doc>>)
+    const byClassNotMixin = byClass.filter((cl) => !this.is(cl._id as Ref<Class<Obj>>, CORE_CLASS_MIXIN)).map(p => p._id as Ref<Class<Obj>>)
+    if (byClassNotMixin.length > 0) {
+      // We need find for all classes extending our own.
+      classes.push(...byClassNotMixin)
     }
-    return query
+
+    // We should add mixin to list of mixins
+    if (this.is(_class, CORE_CLASS_MIXIN)) {
+      // We should also put a _mixin in list for query
+      Model.includeMixinAny(query, _class)
+
+      const byClass = this.extendsOfClass(_class).filter((cl) => this.is(cl._class, CORE_CLASS_MIXIN))
+      if (byClass.length > 0) {
+        for (const cl of byClass) {
+          // We should also put a _mixin in list for query
+          Model.includeMixinAny(query, cl._id as Ref<Mixin<Obj>>)
+        }
+      }
+    }
+    return { query: query as DocumentQuery<T>, classes }
   }
 
   private flattenQuery (_class: Ref<Class<Obj>>, layout: AnyLayout): AnyLayout {
@@ -534,10 +602,10 @@ export class Model implements Storage {
   // Q U E R Y
 
   findSync<T extends Doc> (clazz: Ref<Class<Doc>>, query: DocumentQuery<T>, limit = -1): T[] {
-    const realQuery = this.createQuery(clazz, query)
+    const { query: realQuery } = this.createQuery(clazz, query)
     const byClass = this.objectsOfClass(realQuery._class as Ref<Class<Doc>>)
 
-    return this.findAll(byClass, clazz, realQuery, limit) as T[]
+    return this.findAll(byClass, clazz, realQuery as unknown as AnyLayout, limit) as T[]
   }
 
   find<T extends Doc> (clazz: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T[]> {
@@ -624,6 +692,12 @@ export class Model implements Storage {
   public as<T extends Obj> (doc: Obj, mixin: Ref<Mixin<T>>): T {
     if (doc._class === mixin) {
       // If we already have a proper class specified.
+      return doc as T
+    }
+
+    const mixinClass = this.get(mixin)
+    if (mixinClass._class !== CORE_CLASS_MIXIN) {
+      // Not a mixin class,
       return doc as T
     }
     if (!this.isMixedIn(doc, mixin)) {

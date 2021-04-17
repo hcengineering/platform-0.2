@@ -16,12 +16,17 @@
 import type { Emb, Enum, EnumLiteral, EnumOf } from '@anticrm/core'
 import {
   ArrayOf, Attribute, BagOf, Class, Classifier, CORE_CLASS_ARRAY_OF, CORE_CLASS_BAG_OF, CORE_CLASS_CLASS,
-  CORE_CLASS_DOC, CORE_CLASS_EMB, CORE_CLASS_ENUM_OF, CORE_CLASS_INSTANCE_OF, CORE_CLASS_REF_TO, CORE_CLASS_STRING,
+  CORE_CLASS_DOC, CORE_CLASS_EMB, CORE_CLASS_ENUM_OF, CORE_CLASS_INSTANCE_OF, CORE_CLASS_MIXIN, CORE_CLASS_REF_TO,
+  CORE_CLASS_STRING,
   CORE_CLASS_TYPE, Doc, Indices, InstanceOf, Mixin, Obj, Ref, RefTo, Tx, Type
 } from '@anticrm/core'
-import type { CreateTx, DeleteTx, ObjectSelector, Reference, Space, TxOperation, UpdateTx } from '@anticrm/domains'
+import type {
+  CreateTx, DeleteTx, ObjectSelector, ObjectTx, ObjectTxDetails, Reference, Space, TxOperation, UpdateTx
+} from '@anticrm/domains'
 import {
-  Application, CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_SPACE, CORE_CLASS_TX_OPERATION,
+  Application, CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_OBJECT_TX, CORE_CLASS_OBJECTTX_DETAILS,
+  CORE_CLASS_SPACE,
+  CORE_CLASS_TX_OPERATION,
   CORE_CLASS_UPDATE_TX, CORE_MIXIN_SHORTID,
   ShortID, SpaceUser, Title, VDoc
 } from '@anticrm/domains'
@@ -40,7 +45,7 @@ const modelIds = identify('core' as AnyPlugin, {
 
     Attribute: '' as Ref<Class<Attribute>>,
     Class: CORE_CLASS_CLASS as Ref<Class<Class<Obj>>>,
-    Mixin: '' as Ref<Class<Mixin<Obj>>>,
+    Mixin: CORE_CLASS_MIXIN as Ref<Class<Mixin<Obj>>>,
 
     EnumLiteral: '' as Ref<Class<EnumLiteral>>,
     Enum: '' as Ref<Class<Enum<any>>>,
@@ -58,6 +63,8 @@ const modelIds = identify('core' as AnyPlugin, {
     EnumOf: CORE_CLASS_ENUM_OF as Ref<Class<EnumOf<any>>>,
 
     Tx: '' as Ref<Class<Tx>>,
+    ObjectTx: CORE_CLASS_OBJECT_TX as Ref<Class<ObjectTx>>,
+    ObjectTxDetails: CORE_CLASS_OBJECTTX_DETAILS as Ref<Class<ObjectTxDetails>>,
     CreateTx: CORE_CLASS_CREATE_TX as Ref<Class<CreateTx>>,
     UpdateTx: CORE_CLASS_UPDATE_TX as Ref<Class<UpdateTx>>,
     ObjectSelector: '' as Ref<Class<ObjectSelector>>,

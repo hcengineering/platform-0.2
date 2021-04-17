@@ -10,7 +10,9 @@
 //
 // See the License for the specific language governing permissions and
 // limitations under the License.
-import core, { ArrayOf$, Builder, Class$, Enum$, EnumOf$, InstanceOf$, Literal, Mixin$, Prop, RefTo$ } from '@anticrm/model'
+import core, {
+  ArrayOf$, Builder, Class$, Enum$, EnumOf$, InstanceOf$, Literal, Mixin$, Primary, Prop, RefTo$
+} from '@anticrm/model'
 import { TEmb, TEnum, TVDoc } from '@anticrm/model/src/__model__'
 import { IntlString } from '@anticrm/platform-i18n'
 import presentation from '@anticrm/presentation'
@@ -43,6 +45,7 @@ export class TCandidate extends TEmb implements Candidate {
 @UX('Vacancy' as IntlString)
 @Class$(recruiting.class.Vacancy, core.class.VDoc, VacanciesDomain)
 export class TVacancy extends TVDoc implements Vacancy {
+  @Primary()
   @Prop(CORE_CLASS_STRING)
   title!: string
 
