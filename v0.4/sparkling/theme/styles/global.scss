@@ -13,5 +13,16 @@
 // limitations under the License.
 //
 
-@import "./_colors.scss"
+@import "./_colors.scss";
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap');
 
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Lato', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  background-color: var(--theme-bg-color);
+}

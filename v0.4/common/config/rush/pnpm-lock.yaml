@@ -37,6 +37,7 @@ dependencies:
   prettier: 2.2.1
   sass: 1.32.8
   sirv-cli: 1.0.11
+  storybook-addon-themes: 6.1.0
   style-loader: 2.0.0_webpack@5.32.0
   ts-loader: 8.1.0_typescript@4.2.4+webpack@5.32.0
   ts-standard: 10.0.0_typescript@4.2.4
@@ -10157,7 +10158,7 @@ packages:
       integrity: sha512-WKJob0P/Em2csiVthsI68p6aGKTIcsfjH9Gsx1f0A3Italz43e3ho0geSAVsmj09RWOELP1AZ/DXyJgOgDKxXQ==
   /jest-worker/26.6.2:
     dependencies:
-      '@types/node': 14.14.37
+      '@types/node': 14.14.40
       merge-stream: 2.0.0
       supports-color: 7.2.0
     dev: false
@@ -13729,6 +13730,55 @@ packages:
     dev: false
     resolution:
       integrity: sha512-7t+/wpKLanLzSnQPX8WAcuLCCeuSHoWdQuh9SB3xD0kNOM38DNf+0Oa+wmvxmYueRzkmh6IcdKFtvTa+ecgPDw==
+  /storybook-addon-themes/6.1.0:
+    dependencies:
+      '@storybook/addons': 6.2.8
+      '@storybook/api': 6.2.8
+      '@storybook/components': 6.2.8
+      '@storybook/core-events': 6.2.8
+      '@storybook/theming': 6.2.8
+      core-js: 3.10.1
+      global: 4.4.0
+      memoizerific: 1.11.3
+    dev: false
+    peerDependencies:
+      react: '*'
+      svelte: '*'
+      vue: '*'
+    peerDependenciesMeta:
+      react:
+        optional: true
+      svelte:
+        optional: true
+      vue:
+        optional: true
+    resolution:
+      integrity: sha512-ZT8aNgrwFVNEOmOPBLNS0WBacjvMFo/bZ83P8MmsJ3Ewqt0AbmPioghTZccARUn/EQ+LrDxyh2D0QgmLaKo07Q==
+  /storybook-addon-themes/6.1.0_svelte@3.37.0:
+    dependencies:
+      '@storybook/addons': 6.2.8
+      '@storybook/api': 6.2.8
+      '@storybook/components': 6.2.8
+      '@storybook/core-events': 6.2.8
+      '@storybook/theming': 6.2.8
+      core-js: 3.10.1
+      global: 4.4.0
+      memoizerific: 1.11.3
+      svelte: 3.37.0
+    dev: false
+    peerDependencies:
+      react: '*'
+      svelte: '*'
+      vue: '*'
+    peerDependenciesMeta:
+      react:
+        optional: true
+      svelte:
+        optional: true
+      vue:
+        optional: true
+    resolution:
+      integrity: sha512-ZT8aNgrwFVNEOmOPBLNS0WBacjvMFo/bZ83P8MmsJ3Ewqt0AbmPioghTZccARUn/EQ+LrDxyh2D0QgmLaKo07Q==
   /stream-browserify/2.0.2:
     dependencies:
       inherits: 2.0.4
@@ -15889,6 +15939,7 @@ packages:
       jest-transform-svelte: 2.1.1_svelte@3.37.0
       sass-loader: 10.1.1_sass@1.32.8+webpack@5.32.0
       sirv-cli: 1.0.11
+      storybook-addon-themes: 6.1.0_svelte@3.37.0
       style-loader: 2.0.0_webpack@5.32.0
       svelte: 3.37.0
       svelte-loader: 2.13.6_svelte@3.37.0
@@ -15902,7 +15953,7 @@ packages:
       webpack: '*'
       webpack-cli: '*'
     resolution:
-      integrity: sha512-Zv1ll50YaLDIejQ6L6ZjETbMM9jRZ9ewzqKSIwmBwsjvAooO/neZoBoFYkryrjkUmN0nkxyaqHcpGgJtRIh0QA==
+      integrity: sha512-d+ha08MAh2n8DiUaI3GYN2DpkTzu+yipJDmCFmG5aWDJvpTX9ys+iCp32xpMWhcZQGS1JPY8ZzuylvzTMUFs2Q==
       tarball: file:projects/storybook.tgz
     version: 0.0.0
 registry: ''
@@ -15945,6 +15996,7 @@ specifiers:
   prettier: ~2.2.1
   sass: ~1.32.8
   sirv-cli: ^1.0.0
+  storybook-addon-themes: ^6.1.0
   style-loader: ~2.0.0
   ts-loader: ~8.1.0
   ts-standard: ~10.0.0
