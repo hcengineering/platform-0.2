@@ -13,7 +13,7 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import type { Ref } from '@anticrm/core'
+  import type { DocumentValue, Ref } from '@anticrm/core'
   import { CORE_CLASS_DOC } from '@anticrm/core'
   import { createEventDispatcher } from 'svelte'
   import type { AttrModel, ClassModel } from '@anticrm/presentation'
@@ -51,8 +51,8 @@
           owner: true
         }
       ]
-    } as Space
-    await cs.create(CORE_CLASS_SPACE, space)
+    } as DocumentValue<Space>
+    await cs.create<Space>(CORE_CLASS_SPACE, space)
     dispatch('close')
   }
 

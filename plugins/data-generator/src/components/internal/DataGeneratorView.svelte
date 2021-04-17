@@ -13,7 +13,7 @@
 // limitations under the License.
 -->
 <script type="ts">
-  import type { Ref } from '@anticrm/core'
+  import type { DateProperty, DocumentValue, Ref, StringProperty } from '@anticrm/core'
   import type { Application, Space } from '@anticrm/domains'
   import { CORE_CLASS_SPACE, CORE_MIXIN_SHORTID } from '@anticrm/domains'
 
@@ -23,7 +23,6 @@
   import EditBox from '@anticrm/sparkling-controls/src/EditBox.svelte'
   import ComboBox from '@anticrm/platform-ui/src/components/ComboBox.svelte'
   import task, { Task, TaskStatus } from '@anticrm/task'
-  import chunter from '@anticrm/chunter'
   import type { Action } from '@anticrm/platform-ui'
 
   import faker from 'faker'
@@ -70,18 +69,20 @@
     for (let i = 0; i < taskCount; i++) {
       const modelDb = cs.getModel()
       const newTask = modelDb.createDocument<Task>(task.class.Task, {
-        title: faker.commerce.productName(),
-        _space: taskSpace._id,
+        title: (faker as any).commerce.productName() as StringProperty,
+        _space: taskSpace._id as Ref<Space>,
         status: randomEnum(TaskStatus),
+        _createdOn: Date.now() as DateProperty,
+        _createdBy: cs.getUserId() as StringProperty,
         comments: [
           {
-            message: faker.commerce.productDescription(),
-            _class: chunter.class.Comment,
-            _createdOn: Date.now(),
-            _createdBy: cs.getUserId()
+            message: (faker as any).commerce.productDescription() as string,
+            _createdOn: Date.now() as DateProperty,
+            _createdBy: cs.getUserId() as StringProperty
           }
         ]
-      })
+      } as DocumentValue<Task>)
+
       try {
         const asShortId = modelDb.cast(newTask, CORE_MIXIN_SHORTID)
         asShortId.shortId = await cs.genRefId(taskSpace._id as Ref<Space>)
@@ -99,7 +100,7 @@
     if (!taskSpace) {
       return
     }
-    const tasks = await cs.find<Task>(task.class.Task, { _space: taskSpace._id })
+    const tasks = await cs.find<Task>(task.class.Task, { _space: taskSpace._id as Ref<Space> })
     for (const t of tasks) {
       await cs.remove(t)
     }

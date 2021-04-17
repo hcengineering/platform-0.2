@@ -47,8 +47,7 @@ export class VDocIndex implements DomainIndex {
     if (!this.modelDb.is(tx._objectClass, CORE_CLASS_VDOC)) {
       return Promise.resolve()
     }
-    const doc = this.modelDb.createDocument(tx._objectClass, tx.object)
-    doc._id = tx._objectId
+    const doc = this.modelDb.createDocument(tx._objectClass, tx.object, tx._objectId)
     // we need to update vdoc properties.
     if (this.transient) {
       const vdoc = doc as VDoc

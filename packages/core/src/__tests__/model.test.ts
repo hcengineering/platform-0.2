@@ -20,7 +20,7 @@ import {
   Doc, Mixin, Obj, Property, PropertyType, Ref, StringProperty
 } from '../classes'
 import { mixinFromKey, mixinKey, Model } from '../model'
-import { DocumentQuery, txContext } from '../storage'
+import { DocumentQuery, DocumentValue, txContext } from '../storage'
 import { createSubtask, createTask, data, doc1, SubTask, Task, taskIds } from './tasks'
 import { ObjectSelector, Space, TxOperation, TxOperationKind } from '@anticrm/domains'
 
@@ -461,10 +461,13 @@ describe('Model assign tools', () => {
   })
 
   it('creates new doc', () => {
-    const res = model.createDocument(taskIds.class.Task, { rate: 42 })
+    const res = model.createDocument(taskIds.class.Task, { name: '', description: '', lists: [], rate: 42 })
 
     expect(res).toEqual({
       _id: res._id,
+      description: '',
+      lists: [],
+      name: '',
       _class: taskIds.class.Task,
       rate: 42
     })
@@ -615,7 +618,16 @@ describe('mixin tools', () => {
       name: 's1',
       users: [{ userId: 'qwe' }]
     }
+    const t1: DocumentValue<Task> = {
+      description: '',
+      lists: [],
+      name: '',
+      tasks: [
+        { name: '' }
+      ]
+    }
     expect(q1).toBeDefined()
     expect(q2).toBeDefined()
+    expect(t1).toBeDefined()
   })
 })

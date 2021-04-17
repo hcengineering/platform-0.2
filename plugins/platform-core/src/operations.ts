@@ -13,13 +13,13 @@
 // limitations under the License.
 //
 
-import { Class, Doc, Model, Ref, StringProperty, Tx } from '@anticrm/core'
+import { Class, Doc, DocumentValue, Model, Ref, StringProperty, Tx } from '@anticrm/core'
 import { OperationProtocol } from '.'
 import { newCreateTx, newDeleteTx, newUpdateTx } from './tx'
 import { txBuilder, TxBuilder, TxOperation, TxOperationKind } from '@anticrm/domains'
 
 export function createOperations (model: Model, processTx: (tx: Tx) => Promise<any>, getUserId: () => StringProperty): OperationProtocol {
-  async function create<T extends Doc> (_class: Ref<Class<T>>, values: Partial<T>): Promise<T> {
+  async function create<T extends Doc> (_class: Ref<Class<T>>, values: DocumentValue<T>): Promise<T> {
     const clazz = model.get(_class)
     if (clazz === undefined) {
       return Promise.reject(new Error('Class ' + _class + ' not found'))

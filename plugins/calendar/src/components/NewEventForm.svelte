@@ -11,7 +11,7 @@ limitations under the License.
 -->
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
-  import type { DateProperty, Ref, StringProperty } from '@anticrm/core'
+  import type { DateProperty, DocumentValue, Ref, StringProperty } from '@anticrm/core'
   import { generateId } from '@anticrm/core'
   import type { Space } from '@anticrm/domains'
   import { getCoreService } from '@anticrm/presentation'
@@ -63,8 +63,8 @@ limitations under the License.
       endDate: getAllDayEventEnd(newEvent.endDate),
       _space: space?._id,
       _createdBy: core.getUserId() as StringProperty
-    } as CalendarEvent
-    await core.create(calendar.class.CalendarEvent, doc)
+    } as DocumentValue<CalendarEvent>
+    await core.create<CalendarEvent>(calendar.class.CalendarEvent, doc)
     dispatch('close')
   }
 </script>
@@ -89,11 +89,13 @@ limitations under the License.
     min-width: 450px;
     padding: 25px;
   }
+
   .form {
     display: grid;
     grid-template-columns: auto;
     grid-gap: 10px;
   }
+
   .footer {
     display: grid;
     grid-template-columns: repeat(2, auto);

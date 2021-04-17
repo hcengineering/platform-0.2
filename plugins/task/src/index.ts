@@ -114,10 +114,10 @@ export interface Task extends Collab {
   assignee?: Ref<User>[]
 
   // A participants
-  participants: Ref<User>[]
+  participants?: Ref<User>[]
 
   // A set of labels
-  labels: Ref<TaskLabel>[]
+  labels?: Ref<TaskLabel>[]
 
   // A list of watch users, they will be notified about task status changes according.
   // watchers: Ref<User>[]

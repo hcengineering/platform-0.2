@@ -18,7 +18,7 @@ import {
   AnyLayout, ArrayOf, Attribute, Class, Classifier, ClassifierKind, CORE_CLASS_ARRAY_OF, CORE_CLASS_INSTANCE_OF,
   CORE_CLASS_OBJ, CORE_MIXIN_INDICES, Doc, Mixin, Obj, Property, PropertyType, Ref, Type
 } from './classes'
-import { DocumentQuery, generateId, Storage, TxContext } from './storage'
+import { DocumentQuery, DocumentValue, generateId, Storage, TxContext } from './storage'
 
 export function mixinKey (mixin: Ref<Mixin<Obj>>, key: string): string {
   return key + '|' + mixin.replace('.', '~')
@@ -37,12 +37,6 @@ export const SPACE_DOMAIN = 'space'
 
 interface Proxy {
   __layout: Record<string, unknown>
-}
-
-export interface FieldRef {
-  parent: Obj
-  field: Attribute
-  key: string
 }
 
 export function isValidSelector (selector: ObjectSelector[]): boolean {
@@ -198,12 +192,13 @@ export class Model implements Storage {
   /**
    * Construct a new proper document with all desired fields.
    * @param _class
-   * @param layout
+   * @param values
+   * @param _id - optional id, if not sepecified will be automatically generated.
    */
-  public createDocument<T extends Doc> (_class: Ref<Class<T>>, layout: Partial<T>): T {
-    const doc = this.assign({}, _class, layout as unknown as AnyLayout)
-    doc._id = generateId()
-    return doc as unknown as T
+  createDocument<T extends Doc> (_class: Ref<Class<T>>, values: DocumentValue<T>, _id?: Ref<T>): T {
+    const doc = this.assign({}, _class, (values as unknown) as AnyLayout)
+    doc._id = _id ?? this.generateId()
+    return (doc as unknown) as T
   }
 
   public classAttribute (cls: Ref<Class<Obj>>, key: string): AttributeMatch {
@@ -326,7 +321,7 @@ export class Model implements Storage {
   /**
    * Perform update of document attributes
    * @param doc - document to update
-   * @param query - define a embedded document query.
+   * @param operations - define a set of operations to update for document.
    * @param operations - new attribute values
    */
   public updateDocument<T extends Obj> (doc: T, operations: TxOperation[]): T {

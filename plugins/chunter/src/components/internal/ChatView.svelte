@@ -12,13 +12,13 @@
   // See the License for the specific language governing permissions and
   // limitations under the License.
 
-  import type { Ref, StringProperty } from '@anticrm/core'
+  import type { DocumentValue, Ref, StringProperty } from '@anticrm/core'
   import { DateProperty } from '@anticrm/core'
   import type { Space } from '@anticrm/domains'
   import type { MessageNode } from '@anticrm/text'
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
-  import type { Comment, Message } from '../..'
+  import type { Message } from '../..'
   import chunter, { getChunterService } from '../..'
   import CommentComponent from './Comment.svelte'
   import { getCoreService, getUserId, liveQuery } from '@anticrm/presentation'
@@ -55,13 +55,14 @@
           _createdOn: Date.now() as DateProperty,
           _createdBy: userId as StringProperty,
           message: parsedMessage
-        } as Comment
+        }
+
         // absent VDoc fields will be autofilled
         coreService.then((cs) =>
-          cs.create(chunter.class.Message, {
+          cs.create<Message>(chunter.class.Message, {
             _space: space._id as Ref<Space>,
             comments: [comment]
-          } as Message)
+          } as DocumentValue<Message>)
         )
       })
     }

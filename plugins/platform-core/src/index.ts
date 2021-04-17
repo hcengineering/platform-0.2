@@ -14,7 +14,7 @@
 //
 
 import { Metadata, Plugin, plugin, Service } from '@anticrm/platform'
-import { Class, CoreProtocol, Doc, DocumentProtocol, DocumentQuery, Ref } from '@anticrm/core'
+import { Class, CoreProtocol, Doc, DocumentProtocol, DocumentQuery, DocumentValue, Ref } from '@anticrm/core'
 import { ModelDb } from './modeldb'
 import { TxBuilder, TxOperation } from '@anticrm/domains'
 
@@ -47,7 +47,7 @@ export interface OperationProtocol {
    * Perform creation of new document and store it into storage.
    * Object ID will be automatically generated and assigned to object.
    */
-  create<T extends Doc> (_class: Ref<Class<T>>, values: Partial<T>): Promise<T>
+  create<T extends Doc> (_class: Ref<Class<T>>, values: DocumentValue<T>): Promise<T>
 
   /**
    * Perform update of document properties.

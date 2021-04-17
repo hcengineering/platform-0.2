@@ -1,7 +1,7 @@
 /**
  * Operation direction, is it came from server or it is own operation.
  */
-import { Class, DateProperty, Doc, Obj, Ref, StringProperty } from './classes'
+import { Class, DateProperty, Doc, Emb, Obj, Ref, StringProperty } from './classes'
 import { Space, TxOperation, VDoc } from '@anticrm/domains'
 
 export enum TxContextSource {
@@ -73,6 +73,14 @@ export type ArrayQueryType<A> = A extends (infer T)[] ? ObjQueryType<T> | ObjQue
 export type DocumentQuery<T> = {
   [P in keyof T]?: ArrayQueryType<T[P]>
 }
+
+// A possible values for document during creation.
+export type TWithoutEmbArray<A> = A extends (infer T)[] ? DocumentValue<T>[]: DocumentValue<A>
+
+export type DocumentValueRaw<T> = {
+  [P in keyof T]: TWithoutEmbArray<T[P]>
+}
+export type DocumentValue<T> = T extends Doc ? DocumentValueRaw<Omit<T, keyof Doc>> : never | T extends Emb ? DocumentValueRaw<Omit<T, keyof Emb>>: never | T extends Obj ? T : T
 
 ///
 
