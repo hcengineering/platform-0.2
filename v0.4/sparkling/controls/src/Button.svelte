@@ -12,42 +12,52 @@
 </script>
 
 <button class="button" class:primary={primary} style="{fullWidth ? 'width: 100%' : ''}" on:click={onClick}>
-  <slot />{label}
+  <span><slot />{label}</span>
 </button>
 
 <style lang="scss">
   .button {
-    display: inline-block;	
-    padding: 0 25px;
+    display: flex;
     height: 56px;
-    font-size: 14px;
-    font-weight: 400;
-    color: #fff;
-    background-color: rgb(255 255 255 / 3%);
-    border: 1px solid rgb(255 255 255 / 3%);
+    padding: 0;
+    border: none;
+    overflow: hidden;
+
+    background-color: var(--theme-bg-accent-color);
     border-radius: 10px;
     outline: none;
     cursor: pointer;
-    &:hover {
-      background-color: rgb(255 255 255 / 6%);
-      border: 1px solid rgb(255 255 255 / 8%);
-    }
-    &:active {
-      background-color: rgb(255 255 255 / 9%);
-      border: 1px solid rgb(255 255 255 / 12%);
+    backdrop-filter: blur(12px);
+
+    span {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 25px;
+      width: 100%;
+      height: 100%;
+
+      font-size: 14px;
+      line-height: 17px;
+      font-style: normal;
+      font-weight: normal;
+
+      color: var(--theme-caption-color);
+      border: 1px solid var(--theme-border-accent-color);
+      border-radius: 10px;
+      text-shadow: var(--theme-text-shadow);
+      &:hover {
+        background-color: var(--theme-bg-accent-hover);
+        border: 1px solid var(--theme-border-accent-hover);
+      }
+      &:active {
+        background-color: var(--theme-bg-accent-active);
+        border: 1px solid var(--theme-border-accent-active);
+      }
     }
   }
 
   .primary {
-    background-color: #5143A8;
-    border-color: rgb(255 255 255 / 10%);
-    &:hover {
-      background-color: #5143A8;
-      border-color: rgb(255 255 255 / 10%);
-    }
-    &:active {
-      background-color: #5143A8;
-      border-color: rgb(255 255 255 / 10%);
-    }
+    background-color: var(--theme-primary-color);
   }
 </style>

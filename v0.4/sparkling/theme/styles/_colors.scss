@@ -1,10 +1,15 @@
 /* Dark Theme */
 .theme-dark {
+  --theme-primary-color: #5143A8;
   --theme-bg-color: #18181e;
   --theme-bg-dark-color: #111117;
   --theme-bg-dark-hover: #111117;
-  --theme-bg-accent-color: rgba(255, 255, 255, 0.05);
-  --theme-bg-accent-hover: rgba(255, 255, 255, 0.05);
+  --theme-bg-accent-color: rgba(255, 255, 255, .03);
+  --theme-bg-accent-hover: rgba(255, 255, 255, .06);
+  --theme-bg-accent-active: rgba(255, 255, 255, .09);
+  --theme-border-accent-color: rgba(255, 255, 255, .03);
+  --theme-border-accent-hover: rgba(255, 255, 255, .08);
+  --theme-border-accent-active: rgba(255, 255, 255, .012);
   --theme-selection-item: rgba(148, 144, 170, 0.13);
 
   --theme-caption-color: #fff;
@@ -19,6 +24,7 @@
   --theme-doclink-hover: #2d6ab9;
   --theme-status-online: #6cd871;
   --theme-shadow: 0px 4px 8px rgba(15, 15, 15, 0.5);
+  --theme-text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.25);
 }
 
 /* Grey Theme */
