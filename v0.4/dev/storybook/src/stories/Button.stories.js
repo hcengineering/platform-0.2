@@ -1,4 +1,3 @@
-
 import { Button } from '@anticrm/sparkling-controls';
 
 export default {
