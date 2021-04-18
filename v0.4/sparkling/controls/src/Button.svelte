@@ -1,102 +1,60 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
 
-  // --- 'small', 'large' --- //
-  export let size = ''
-  // --- 'primary', 'icon', 'transparent' --- //
-  export let kind = ''
-  // --- ex: '100px', '25%' --- //
-  export let width = ''
-
-  export let label = ''
+  export let label: string
+  export let primary: boolean = false
+  export let width: string
 
   const dispatch = createEventDispatcher()
-  function onClick (event) {
+  function onClick (event: MouseEvent) {
     dispatch('click', event)
   }
 </script>
 
-<button type="button" class="button {size} {kind}" style={width !== '' ? 'width:' + width : ''} on:click={onClick}>
-  <slot />{label}
+<button class="button" class:primary={primary} style="{width ? 'width: ' + width : ''}" on:click={onClick}>
+  <div>{label}</div>
 </button>
 
 <style lang="scss">
   .button {
-    display: inline-block;
-    height: auto;
-    border: solid 1px transparent;
-    border-radius: 12px;
-    padding: 8px 16px;
-    cursor: pointer;
-    user-select: none;
-    font: inherit;
-    font-weight: 500;
-    font-size: 14px;
-    color: var(--theme-content-color);
+    height: 56px;
+    padding: 0;
+    border: none;
+    overflow: hidden;
     background-color: var(--theme-bg-accent-color);
-    border-color: var(--theme-bg-accent-color);
-    transition: border-color 0.2s, color 0.2s, background-color 0.2s;
-    &:focus {
-      outline: none;
-    }
-    &:hover {
-      background-color: var(--theme-bg-accent-hover);
-      color: var(--theme-content-dark-color);
-    }
-  }
+    border-radius: 10px;
+    outline: none;
+    cursor: pointer;
+    backdrop-filter: blur(12px);
 
-  .large {
-    height: auto;
-    padding: 16px 32px;
-  }
+    div {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 25px;
+      width: 100%;
+      height: 100%;
 
-  .small {
-    height: auto;
-    padding: 0 4px;
+      font-size: 14px;
+      line-height: 17px;
+      font-weight: 400;
+
+      color: var(--theme-caption-color);
+      border: 1px solid var(--theme-border-accent-color);
+      border-radius: 10px;
+      text-shadow: var(--theme-text-shadow);
+      &:hover {
+        background-color: var(--theme-bg-accent-hover);
+        border: 1px solid var(--theme-border-accent-hover);
+      }
+      &:active {
+        background-color: var(--theme-bg-accent-active);
+        border: 1px solid var(--theme-border-accent-active);
+      }
+    }
   }
 
   .primary {
-    background-color: var(--theme-content-color);
-    border-color: var(--theme-content-color);
-    color: var(--theme-bg-color);
-    &:hover {
-      background-color: var(--theme-content-dark-color);
-      border-color: var(--theme-content-dark-color);
-      color: var(--theme-bg-color);
-    }
-  }
-
-  .icon {
-    padding: 14px 28px;
-    border-radius: 8px;
-    color: var(--theme-content-color);
-    background-color: var(--theme-bg-accent-color);
-    border: solid 1px var(--theme-bg-accent-color);
-    &:hover {
-      color: var(--theme-caption-color);
-      border-color: var(--theme-bg-dark-hover);
-    }
-  }
-
-  .transparent {
-    display: flex;
-    border: none;
-    cursor: pointer;
-    user-select: none;
-    font-weight: 500;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: nowrap;
-    padding: 0;
-    margin: 0;
-    color: var(--theme-content-color);
-    background-color: transparent;
-    &:focus {
-      outline: none;
-    }
-    &:hover {
-      color: var(--theme-caption-color);
-      background-color: transparent;
-    }
+    background-color: var(--theme-primary-color);
   }
 </style>

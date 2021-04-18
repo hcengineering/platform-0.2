@@ -1,16 +1,12 @@
-
 import { Button } from '@anticrm/sparkling-controls';
 
 export default {
-  title: 'Example/Button',
+  title: 'Controls/Button',
   component: Button,
   argTypes: {
     label: { control: 'text' },
     primary: { control: 'boolean' },
-    backgroundColor: { control: 'color' },
-    size: {
-      control: { type: 'select', options: ['small', 'medium', 'large'] },
-    },
+    width: { control: 'text' },
     onClick: { action: 'onClick' },
   },
 };
@@ -23,25 +19,32 @@ const Template = ({ onClick, ...args }) => ({
   },
 });
 
-export const Primary = Template.bind({});
-Primary.args = {
-  primary: true,
-  label: 'Button',
-};
-
 export const Secondary = Template.bind({});
 Secondary.args = {
-  label: 'Button',
+  label: 'Button'
 };
 
-export const Large = Template.bind({});
-Large.args = {
-  size: 'large',
+export const SecondaryWidth300px = Template.bind({});
+SecondaryWidth300px.args = {
   label: 'Button',
+  width: '300px'
 };
 
-export const Small = Template.bind({});
-Small.args = {
-  size: 'small',
+export const Primary = Template.bind({});
+Primary.args = {
   label: 'Button',
+  primary: true
+};
+
+export const FullWidth = Template.bind({});
+FullWidth.args = {
+  label: 'Button',
+  width: '100%'
+};
+
+export const FullWidthAndPrimary = Template.bind({});
+FullWidthAndPrimary.args = {
+  label: 'Button',
+  primary: true,
+  width: '100%'
 };
