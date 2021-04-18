@@ -20,7 +20,7 @@ import { Request, Response, serialize, toStatus } from '@anticrm/rpc'
 import uiPlugin, { UIService } from '@anticrm/plugin-ui'
 import login, { ACCOUNT_KEY, LoginInfo, LoginService } from '@anticrm/plugin-login'
 
-import LoginForm from './components/LoginForm.svelte'
+import LoginForm from './components/LoginApp.svelte'
 // import SettingForm from './components/SettingForm.svelte'
 // import MainLoginForm from './components/MainLoginForm.svelte'
 
