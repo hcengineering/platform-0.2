@@ -36,14 +36,8 @@ Primary.args = {
   primary: true
 };
 
-export const FullWidth = Template.bind({});
-FullWidth.args = {
-  label: 'Button',
-  width: '100%'
-};
-
-export const FullWidthAndPrimary = Template.bind({});
-FullWidthAndPrimary.args = {
+export const PrimaryFullWidth = Template.bind({});
+PrimaryFullWidth.args = {
   label: 'Button',
   primary: true,
   width: '100%'
