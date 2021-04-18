@@ -17,19 +17,13 @@
   import { liveQuery } from '@anticrm/presentation'
 
   import type { CalendarEvent } from '..'
+  import type { EventCoordinates } from './EventCoordinates'
+  import EventPresenter from './EventPresenter.svelte'
   import calendar from '..'
 
   import MonthCalendar from '@anticrm/sparkling-controls/src/calendar/MonthCalendar.svelte'
 
   export let space: Space
-
-  interface EventCoordinates {
-    gridColumnStart: number
-    gridColumnEnd: number
-    gridRowStart: number
-    gridRowEnd: number
-    displayLayer: number
-  }
 
   function getDate (date: Date | string) {
     if (typeof date === 'string') {
@@ -95,38 +89,10 @@
   }
 </script>
 
-<!--TODO 
-  1. Display events that do not fit in one week
-  2. Display user name
-  3. Support events delete
-  4. Display popup for events with displayLayer > 5
--->
 <MonthCalendar mondayStart={true} cellHeight={125} bind:firstDayOfCurrentMonth bind:displayedWeeksCount>
   {#each visibleEvents as e}
     {#if eventCoordinatesMap.has(e._id) && eventCoordinatesMap.get(e._id).displayLayer <= 5}
-      <div
-        style={`
-        grid-column-start: ${eventCoordinatesMap.get(e._id).gridColumnStart}; 
-        grid-column-end: ${eventCoordinatesMap.get(e._id).gridColumnEnd};
-        grid-row-start: ${eventCoordinatesMap.get(e._id).gridRowStart};
-        grid-row-end: ${eventCoordinatesMap.get(e._id).gridRowEnd};
-        margin-top: ${21 * (eventCoordinatesMap.get(e._id).displayLayer || 1)}px;
-      `}>
-        <div class="event">
-          {e.summary}
-        </div>
-      </div>
+      <EventPresenter event={e} coordinates={eventCoordinatesMap.get(e._id)} />
     {/if}
   {/each}
 </MonthCalendar>
-
-<style lang="scss">
-  .event {
-    height: 20px;
-    width: 100%;
-    background-color: #4396a2;
-    text-align: center;
-    border-radius: 3px;
-    color: var(--theme-content-dark-color);
-  }
-</style>

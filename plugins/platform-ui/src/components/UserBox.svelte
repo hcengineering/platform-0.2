@@ -6,6 +6,7 @@
 
   export let items: unknown[]
   export let selected = 0
+  export let title = 'Новый исполнитель'
 
   let comboHidden = true
   let comboRoot: HTMLElement
@@ -55,7 +56,7 @@
 </script>
 
 <div bind:this={comboRoot} class="comboBox" class:selectedCombo={!comboHidden} on:click={handler}>
-  <UserInfo url={items[selected].url} title={items[selected].name} subtitle="Новый исполнитель" subtitleOnTop="true" />
+  <UserInfo url={items[selected].url} title={items[selected].name} subtitle={title} subtitleOnTop="true" />
   <div class="arrowDown" />
 
   <div bind:this={comboDrop} class="comboBox-drop">
