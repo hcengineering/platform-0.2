@@ -77,7 +77,7 @@ limitations under the License.
       startDate: getAllDayEventStart(newEvent.startDate),
       endDate: getAllDayEventEnd(newEvent.endDate),
       _space: space?._id,
-      _createBy: core.getUserId(),
+      _createdBy: core.getUserId(),
       participants: [core.getUserId() as Ref<User>]
     }
     await core.create(calendar.class.CalendarEvent, doc)
@@ -91,7 +91,7 @@ limitations under the License.
       <SpaceBox label="Vacancy" {spaces} bind:space />
     {/if}
     <EditBox bind:value={newEvent.summary} label="Summary" placeholder="Summary" />
-    <UserBox bind:selected={selectedUserIndex} items={getUsers()} title="Participant" } />
+    <UserBox bind:selected={selectedUserIndex} items={getUsers()} title="Participant" />
     <DateInput bind:value={newEvent.startDate} label="Start date" placeholder="Start date" relativeToParent={true} />
     <DateInput bind:value={newEvent.endDate} label="End date" placeholder="End date" relativeToParent={true} />
   </div>
