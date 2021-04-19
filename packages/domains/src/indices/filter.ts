@@ -1,9 +1,6 @@
 import { Class, Doc, DomainIndex, Model, Ref, Storage, Tx, TxContext } from '@anticrm/core'
 import {
-  CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX,
-  CORE_CLASS_UPDATE_TX,
-  CreateTx, DeleteTx,
-  UpdateTx
+  CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_UPDATE_TX, CreateTx, DeleteTx, UpdateTx
 } from '../index'
 
 /**
@@ -37,7 +34,7 @@ export class PassthroughsIndex implements DomainIndex {
     if (!this.modelDb.is(create._objectClass, this.matchClass)) {
       return Promise.resolve()
     }
-    return this.storage.store(ctx, this.modelDb.newDoc(create._objectClass, create._objectId, create.object))
+    return this.storage.store(ctx, this.modelDb.createDocument(create._objectClass, create.object, create._objectId))
   }
 
   onDelete (ctx: TxContext, tx: DeleteTx): Promise<any> {

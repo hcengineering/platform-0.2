@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { DomainIndex, Storage, TxContext, Tx } from '@anticrm/core'
+import { DomainIndex, Storage, Tx, TxContext } from '@anticrm/core'
 
 export class TxIndex implements DomainIndex {
   private readonly storage: Storage

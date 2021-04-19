@@ -14,18 +14,21 @@
 -->
 <script type="ts">
   import type { Tx } from '@anticrm/core'
+  import type { CreateTx } from '@anticrm/domains'
   import { CORE_CLASS_CREATE_TX } from '@anticrm/domains'
 
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
   import ActivityItem from './ActivityItem.svelte'
-  import { createLiveQuery } from '@anticrm/presentation'
+  import { liveQuery } from '@anticrm/presentation'
+  import type { QueryUpdater } from '@anticrm/platform-core'
 
   // export let application: Ref<WorkbenchApplication>
   // export let space: Space
 
   let objects: Tx[] = []
 
-  createLiveQuery(CORE_CLASS_CREATE_TX, {}, (docs) => {
+  let lq: Promise<QueryUpdater<CreateTx>>
+  $: lq = liveQuery<CreateTx>(lq, CORE_CLASS_CREATE_TX, {}, (docs) => {
     objects = docs
   })
 </script>

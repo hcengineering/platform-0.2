@@ -13,19 +13,18 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import type { Property, Ref } from '@anticrm/core'
+  import type { DateProperty, DocumentValue, Ref, StringProperty } from '@anticrm/core'
   import { createEventDispatcher } from 'svelte'
   import { getCoreService } from '@anticrm/presentation'
   import UserBox from '@anticrm/platform-ui/src/components/UserBox.svelte'
   import SpaceBox from '@anticrm/platform-ui/src/components/SpaceBox.svelte'
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
-  import type { Space } from '@anticrm/domains'
+  import type { ShortID, Space } from '@anticrm/domains'
   import { CORE_MIXIN_SHORTID } from '@anticrm/domains'
-  import task, { TaskStatus } from '../../index'
+  import task, { Task, TaskStatus } from '../../index'
   import EditBox from '@anticrm/sparkling-controls/src/EditBox.svelte'
-  import type { Comment } from '@anticrm/chunter'
-  import chunter, { getChunterService } from '@anticrm/chunter'
+  import { getChunterService } from '@anticrm/chunter'
 
   export let title: string
   let message = ''
@@ -42,34 +41,31 @@
   async function save () {
     const cs = await coreService
     const modelDb = cs.getModel()
-    const newTask = modelDb.newDoc(task.class.Task, cs.generateId(), {
-      title,
-      _space: space?._id,
+    const newTask = {
+      title: title as StringProperty,
+      _space: space?._id as Ref<Space>,
       ...object,
       status: TaskStatus.Open,
+      _createdOn: Date.now() as DateProperty,
+      _createdBy: cs.getUserId() as StringProperty,
       comments: [
         {
           message: message,
-          _class: chunter.class.Comment,
-          _createdOn: Date.now() as Property<number, Date>,
-          _createdBy: cs.getUserId() as Property<string, string>
-        } as Comment
+          _createdOn: Date.now() as DateProperty,
+          _createdBy: cs.getUserId() as StringProperty
+        }
       ]
-    })
-    try {
-      const asShortId = modelDb.cast(newTask, CORE_MIXIN_SHORTID)
+    } as DocumentValue<Task>
 
-      if (space) {
-        asShortId.shortId = await cs.genRefId(space._id as Ref<Space>)
-      }
-    } catch (e) {
-      // Ignore
-      console.log(e)
-    }
+    const taskId = await cs.genRefId(space?._id as Ref<Space>)
+    // TODO: We need to figure ouy a better way to specify mixin values with object creation.
+    modelDb.mixinDocument<Task, ShortID>(newTask as Task, CORE_MIXIN_SHORTID, {
+      shortId: taskId as string
+    })
 
     object = {}
     // absent VDoc fields will be autofilled
-    await cs.create(task.class.Task, newTask)
+    await cs.create<Task>(task.class.Task, newTask)
     dispatch('close')
   }
 

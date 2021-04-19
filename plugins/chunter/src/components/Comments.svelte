@@ -26,7 +26,7 @@
 
   let references: Reference[] = []
 
-  $: refS = liveQuery(refS, CORE_CLASS_REFERENCE, { _targetId: object._id }, (docs) => {
+  $: refS = liveQuery<Reference>(refS, CORE_CLASS_REFERENCE, { _targetId: object._id }, (docs) => {
     references = docs
   })
 

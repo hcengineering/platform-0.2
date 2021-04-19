@@ -25,7 +25,7 @@ import { QueriableStorage } from './queries'
 
 import { Cache } from './cache'
 import {
-  AnyLayout, Class, CoreProtocol, Doc, generateId as genId, MODEL_DOMAIN, Ref, StringProperty, Tx, txContext,
+  Class, CoreProtocol, Doc, DocumentQuery, generateId as genId, MODEL_DOMAIN, Ref, StringProperty, Tx, txContext,
   TxContextSource, TxProcessor
 } from '@anticrm/core'
 import { CORE_CLASS_REFERENCE, CORE_CLASS_SPACE, CORE_CLASS_TITLE, Space, TITLE_DOMAIN, VDoc } from '@anticrm/domains'
@@ -48,11 +48,11 @@ export default async (platform: Platform): Promise<CoreService> => {
   const model = new ModelDb()
 
   const coreProtocol: CoreProtocol = {
-    async find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
+    async find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T[]> {
       const result = (await rpc.request(RPC_CALL_FIND, _class, query)) as T[]
       return result.map((it) => model.as(it, _class))
     },
-    async findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined> {
+    async findOne<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined> {
       const result = (await rpc.request(RPC_CALL_FINDONE, _class, query)) as (T | undefined)
       if (result) {
         return model.as(result, _class)
@@ -107,7 +107,7 @@ export default async (platform: Platform): Promise<CoreService> => {
     }
   })
 
-  function find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
+  function find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T[]> {
     const domainName = model.getDomain(_class)
     const domain = domains.get(domainName)
     if (domain) {
@@ -116,7 +116,7 @@ export default async (platform: Platform): Promise<CoreService> => {
     return cache.find(_class, query)
   }
 
-  function findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined> {
+  function findOne<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined> {
     const domainName = model.getDomain(_class)
     const domain = domains.get(domainName)
     if (domain) {
@@ -125,7 +125,7 @@ export default async (platform: Platform): Promise<CoreService> => {
     return cache.findOne(_class, query)
   }
 
-  function query<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): QueryResult<T> {
+  function query<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): QueryResult<T> {
     const domainName = model.getDomain(_class)
     const domain = domains.get(domainName)
     if (domain) {

@@ -17,7 +17,7 @@ import { WorkspaceProtocol } from './workspace'
 
 import { filterQuery, getUserSpaces, isAcceptable, processTx as processSpaceTx, SecurityContext } from './spaces'
 import { Broadcaster, Client, ClientService, ClientSocket } from './server'
-import { AnyLayout, Class, Doc, generateId, Ref, Tx, txContext, TxContextSource } from '@anticrm/core'
+import { AnyLayout, Class, Doc, DocumentQuery, generateId, Ref, Tx, txContext, TxContextSource } from '@anticrm/core'
 import { CORE_CLASS_CREATE_TX, CORE_CLASS_SPACE, Space, SpaceUser } from '@anticrm/domains'
 import { Response, serialize } from '@anticrm/rpc'
 
@@ -43,33 +43,33 @@ export async function createClientService (workspaceProtocol: Promise<WorkspaceP
   const clientControl: ClientService = {
     getId: () => clientId,
     // C O R E  P R O T O C O L
-    async find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
+    async find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T[]> {
       const {
         valid,
         filteredQuery
       } = filterQuery(userSpaces, _class, query)
       if (valid) {
         try {
-          return await workspace.find(_class, filteredQuery)
+          return await workspace.find(_class, filteredQuery as DocumentQuery<T>)
         } catch (err) {
           console.log(err)
         }
       }
-      return Promise.reject(new Error('Invalid space are spefified'))
+      return Promise.reject(new Error('Invalid space are specified'))
     },
-    async findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined> {
+    async findOne<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined> {
       const {
         valid,
         filteredQuery
       } = filterQuery(userSpaces, _class, query)
       if (valid) {
-        return workspace.findOne(_class, filteredQuery)
+        return workspace.findOne(_class, filteredQuery as DocumentQuery<T>)
       }
       return Promise.reject(new Error('Invalid space are spefified'))
     },
     async loadDomain (domain: string): Promise<Doc[]> {
       const docs = await workspace.loadDomain(domain)
-      return docs.filter((d) => isAcceptable(userSpaces, d._class, (d as unknown) as AnyLayout), false)
+      return docs.filter((d) => isAcceptable(userSpaces, d._class, d), false)
     },
 
     // Handle sending from client.

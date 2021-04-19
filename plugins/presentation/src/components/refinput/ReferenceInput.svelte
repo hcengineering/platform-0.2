@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { AnyLayout, StringProperty } from '@anticrm/core'
+  import type { DocumentQuery } from '@anticrm/core'
   import type { MessageNode } from '@anticrm/text'
   import { newMessageDocument } from '@anticrm/text'
   import { getCoreService, liveQuery } from '../../utils'
@@ -78,11 +78,11 @@
 
   let titleSearch: Promise<QueryUpdater<Title>>
 
-  function query (prefix: string): AnyLayout {
+  function query (prefix: string): DocumentQuery<Title> {
     return {
       title: {
-        $regex: (prefix + '.*') as StringProperty,
-        $options: 'i' as StringProperty
+        $regex: prefix + '.*',
+        $options: 'i'
       }
     }
   }
@@ -110,8 +110,8 @@
   }
 
   async function findTitle (title: string): Promise<ItemRefefence[]> {
-    const docs = await (await coreService).find(CORE_CLASS_TITLE, {
-      title: title as StringProperty
+    const docs = await (await coreService).find<Title>(CORE_CLASS_TITLE, {
+      title: title
     })
 
     for (const value of docs) {
@@ -412,22 +412,26 @@
     padding: 8px;
     background-color: var(--theme-bg-accent-color);
     border: 1px solid var(--theme-bg-dark-color);
+
     .flex-column {
       display: flex;
       flex-direction: column;
       align-items: center;
     }
+
     .flex-row {
       display: flex;
       flex-direction: row;
       align-items: flex-end;
     }
+
     .edit-box-horizontal {
       width: 100%;
       height: 100%;
       margin-top: 7px;
       align-self: center;
     }
+
     .edit-box-vertical {
       width: 100%;
       height: 100%;
@@ -438,6 +442,7 @@
       reference {
         color: lightblue;
       }
+
       reference:not([id]) {
         color: grey;
       }

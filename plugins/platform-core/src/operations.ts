@@ -13,20 +13,21 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Class, Doc, generateId, Model, Ref, StringProperty, Tx } from '@anticrm/core'
+import { Class, Doc, DocumentValue, Model, Ref, StringProperty, Tx } from '@anticrm/core'
 import { OperationProtocol } from '.'
 import { newCreateTx, newDeleteTx, newUpdateTx } from './tx'
 import { txBuilder, TxBuilder, TxOperation, TxOperationKind } from '@anticrm/domains'
 
 export function createOperations (model: Model, processTx: (tx: Tx) => Promise<any>, getUserId: () => StringProperty): OperationProtocol {
-  function create<T extends Doc> (_class: Ref<Class<T>>, values: AnyLayout | Doc): Promise<T> {
+  async function create<T extends Doc> (_class: Ref<Class<T>>, values: DocumentValue<T>): Promise<T> {
     const clazz = model.get(_class)
     if (clazz === undefined) {
       return Promise.reject(new Error('Class ' + _class + ' not found'))
     }
 
-    const doc = model.newDoc(_class, generateId(), (values as unknown) as AnyLayout)
-    return processTx(newCreateTx(doc, getUserId())).then(() => doc)
+    const doc = model.createDocument<T>(_class, values)
+    await processTx(newCreateTx(doc, getUserId()))
+    return doc
   }
 
   function updateWith<T extends Doc> (doc: T, builder: (s: TxBuilder<T>) => TxOperation | TxOperation[]): Promise<T> {

@@ -20,6 +20,8 @@
   import calendar from '..'
 
   import MonthCalendar from '@anticrm/sparkling-controls/src/calendar/MonthCalendar.svelte'
+  import { QueryUpdater } from '@anticrm/platform-core'
+  import { Ref } from '@anticrm/core'
 
   export let space: Space
 
@@ -53,9 +55,16 @@
   let firstDayOfCurrentMonth: Date
   let displayedWeeksCount: number
 
-  $: query = liveQuery(query, calendar.class.CalendarEvent, { _space: space._id }, (docs) => {
-    events = docs
-  })
+  let query: Promise<QueryUpdater<CalendarEvent>>
+
+  $: query = liveQuery<CalendarEvent>(
+    query,
+    calendar.class.CalendarEvent,
+    { _space: space._id as Ref<Space> },
+    (docs) => {
+      events = docs
+    }
+  )
 
   $: {
     eventCoordinatesMap.clear()
@@ -95,7 +104,7 @@
   }
 </script>
 
-<!--TODO 
+<!--TODO
   1. Display events that do not fit in one week
   2. Display user name
   3. Support events delete
@@ -106,7 +115,7 @@
     {#if eventCoordinatesMap.has(e._id) && eventCoordinatesMap.get(e._id).displayLayer <= 5}
       <div
         style={`
-        grid-column-start: ${eventCoordinatesMap.get(e._id).gridColumnStart}; 
+        grid-column-start: ${eventCoordinatesMap.get(e._id).gridColumnStart};
         grid-column-end: ${eventCoordinatesMap.get(e._id).gridColumnEnd};
         grid-row-start: ${eventCoordinatesMap.get(e._id).gridRowStart};
         grid-row-end: ${eventCoordinatesMap.get(e._id).gridRowEnd};

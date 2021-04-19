@@ -23,6 +23,7 @@ limitations under the License.
 
   import recruiting from '..'
   import type { Vacancy } from '..'
+  import { Ref } from '@anticrm/core'
 
   export let space: Space
 
@@ -31,7 +32,7 @@ limitations under the License.
   let vacancies: Vacancy[] = []
   let lq: Promise<QueryUpdater<Vacancy>>
 
-  $: lq = liveQuery(lq, recruiting.class.Vacancy, { _space: space._id }, (docs) => {
+  $: lq = liveQuery<Vacancy>(lq, recruiting.class.Vacancy, { _space: space._id as Ref<Space> }, (docs) => {
     vacancies = docs
   })
 </script>

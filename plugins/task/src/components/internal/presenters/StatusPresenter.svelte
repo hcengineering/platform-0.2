@@ -32,7 +32,7 @@
   let model: Model
 
   getCoreService().then(async (cs) => {
-    statusType = await cs.findOne(CORE_CLASS_ENUM, { _id: task.enum.TaskStatus })
+    statusType = await cs.findOne<Enum<TaskStatus>>(CORE_CLASS_ENUM, { _id: task.enum.TaskStatus })
     model = cs.getModel()
   })
 
