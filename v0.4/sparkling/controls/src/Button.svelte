@@ -25,6 +25,7 @@
     border-radius: 10px;
     outline: none;
     cursor: pointer;
+    font-family: inherit;
     backdrop-filter: blur(12px);
 
     div {
@@ -42,7 +43,6 @@
       color: var(--theme-caption-color);
       border: 1px solid var(--theme-border-accent-color);
       border-radius: 10px;
-      text-shadow: var(--theme-text-shadow);
       &:hover {
         background-color: var(--theme-bg-accent-hover);
         border: 1px solid var(--theme-border-accent-hover);

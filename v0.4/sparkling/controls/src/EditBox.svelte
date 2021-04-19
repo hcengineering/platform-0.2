@@ -2,55 +2,64 @@
   export let label: string
   export let width: string
   export let value: string
-  export let placeholder: string
-  export let password: boolean = false
-  export let id: string | undefined = undefined
-  let input: HTMLElement
+  export let password: boolean
+  export let id: string | undefined
 </script>
 
-<div class="editbox" style="{width ? 'width: ' + width : ''}" on:click={() => input.focus()}>
+<div class="editbox" style="{width ? 'width: ' + width : ''}">
+  {#if password}
+    <input type="password" class="{label ? '' : 'nolabel'}" {id} bind:value placeholder=" "/>
+  {:else}
+    <input type="text" class="{label ? '' : 'nolabel'}" {id} bind:value placeholder=" "/>
+  {/if}
   {#if label}
     <div class="label">{label}</div>
-  {/if}
-  {#if password}
-    <input type="password" bind:this={input} {id} bind:value {placeholder}/>
-  {:else}
-    <input type="text" bind:this={input} {id} bind:value {placeholder}/>
   {/if}
 </div>
 
 <style lang="scss">
   .editbox {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    position: relative;
+    font-family: inherit;
     height: 56px;
-    padding: 10px 20px;
     background-color: var(--theme-bg-accent-color);
     border: 1px solid var(--theme-border-accent-color);
     border-radius: 10px;
     backdrop-filter: blur(12px);
-
     &:focus-within {
       background-color: var(--theme-bg-accent-hover);
       border-color: var(--theme-border-accent-hover);
     }
-    .label {
-      font-size: 12px;
-      line-height: 14px;
-      color: var(--theme-caption-color);
-      text-shadow: var(--theme-text-shadow);
-      opacity: .3;
-    }
     input {
+      width: 100%;
+      height: 56px;
+      padding: 14px 20px 0px;
+      color: var(--theme-caption-color);
       background-color: transparent;
+      outline: none;
       border: none;
-      padding: 0;
+      border-radius: 10px;
       font-size: 14px;
       line-height: 17px;
+    }
+    .nolabel {
+      padding-top: 0;
+    }
+
+    .label {
+      position: absolute;
+      top: 18px;
+      left: 20px;
+      font-size: 14px;
       color: var(--theme-caption-color);
-      outline: none;
-      text-shadow: var(--theme-text-shadow);
+      pointer-events: none;
+      opacity: .3;
+      transition: all 200ms;
+    }
+    input:focus + .label,
+    input:not(:placeholder-shown) + .label {
+      top: 10px;
+      font-size: 12px; 
     }
   }
 </style>
