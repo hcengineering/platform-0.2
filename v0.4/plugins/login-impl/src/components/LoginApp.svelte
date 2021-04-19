@@ -99,6 +99,7 @@
         display: flex;
         flex-direction: column;
         justify-content: center;
+        overflow: auto;
         flex-grow: 1;
 
         .form {
