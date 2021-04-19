@@ -70,7 +70,8 @@ export default plugin('Calendar' as Plugin<CalendarService>, {}, {
   },
   component: {
     NewEventForm: '' as AnyComponent,
-    EventsCalendar: '' as AnyComponent
+    EventsCalendar: '' as AnyComponent,
+    EventPresenter: '' as AnyComponent
   },
   application: {
     Calendar: '' as Ref<WorkbenchApplication>

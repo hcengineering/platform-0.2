@@ -22,7 +22,7 @@
   let rowIndex = 0
 
   $: {
-    if (!coordinates || coordinates.gridRowStart === coordinates.gridColumnEnd) {
+    if (!coordinates || coordinates.gridRowStart === coordinates.gridRowEnd) {
       eventIntervals = coordinates ? [coordinates] : []
     } else {
       eventIntervals = []

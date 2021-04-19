@@ -13,8 +13,13 @@
 // limitations under the License.
 -->
 <script type="ts">
+  import { getContext } from 'svelte'
+
+  import type { Platform } from '@anticrm/platform'
   import type { Space } from '@anticrm/domains'
-  import { liveQuery } from '@anticrm/presentation'
+  import type { Class, Doc, Ref, Type } from '@anticrm/core'
+  import ui, { liveQuery, getCoreService } from '@anticrm/presentation'
+  import { AnyComponent } from '@anticrm/platform-ui'
 
   import type { CalendarEvent } from '..'
   import type { EventCoordinates } from './EventCoordinates'
@@ -22,7 +27,10 @@
   import calendar from '..'
 
   import MonthCalendar from '@anticrm/sparkling-controls/src/calendar/MonthCalendar.svelte'
+  import Spinner from '@anticrm/platform-ui/src/components/internal/Spinner.svelte'
+  import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
 
+  export let _class: Ref<Class<Doc>>
   export let space: Space
 
   function getDate (date: Date | string) {
@@ -40,12 +48,34 @@
     )
   }
 
+  const coreService = getCoreService()
+
   let events: CalendarEvent[] = []
   let visibleEvents: CalendarEvent[] = []
   const eventCoordinatesMap = new Map<string, EventCoordinates>()
 
   let firstDayOfCurrentMonth: Date
   let displayedWeeksCount: number
+
+  let presenter: AnyComponent
+
+  const platform = getContext('platform') as Platform
+
+  $: component = presenter ? platform.getResource(presenter) : null
+
+  $: {
+    coreService.then((cs) => {
+      const model = cs.getModel()
+      const typeClass = model.get(_class) as Class<Type>
+      if (!model.isMixedIn(typeClass, ui.mixin.Presenter)) {
+        console.log(new Error(`no presenter for type '${_class}'`))
+        // Use string presenter
+        presenter = calendar.component.EventPresenter
+      } else {
+        presenter = model.as(typeClass, ui.mixin.Presenter).presenter
+      }
+    })
+  }
 
   $: query = liveQuery(query, calendar.class.CalendarEvent, { _space: space._id }, (docs) => {
     events = docs
@@ -92,7 +122,17 @@
 <MonthCalendar mondayStart={true} cellHeight={125} bind:firstDayOfCurrentMonth bind:displayedWeeksCount>
   {#each visibleEvents as e}
     {#if eventCoordinatesMap.has(e._id) && eventCoordinatesMap.get(e._id).displayLayer <= 5}
-      <EventPresenter event={e} coordinates={eventCoordinatesMap.get(e._id)} />
+      {#if component}
+        {#await component}
+          <Spinner />
+        {:then ctor}
+          <svelte:component this={ctor} event={e} coordinates={eventCoordinatesMap.get(e._id)} />
+        {:catch err}
+          <Icon icon={ui.icon.Error} size="32" />
+        {/await}
+      {:else}
+        <EventPresenter event={e} coordinates={eventCoordinatesMap.get(e._id)} />
+      {/if}
     {/if}
   {/each}
 </MonthCalendar>
