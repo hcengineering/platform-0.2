@@ -111,7 +111,7 @@
   </div>
 
   <div class="content">
-    <UserBox items={users} />
+    <UserBox items={users} title="Assignee" />
     <div class="separator" />
     <ReferenceInput
       stylesEnabled={false}

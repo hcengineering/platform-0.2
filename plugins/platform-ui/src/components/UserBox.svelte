@@ -6,7 +6,7 @@
 
   export let items: unknown[]
   export let selected = 0
-  export let title = 'Новый исполнитель'
+  export let title: string
 
   let comboHidden = true
   let comboRoot: HTMLElement
