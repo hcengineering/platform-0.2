@@ -1,12 +1,17 @@
-<script context="module" lang="ts">
-  export interface PaginationState {}
-
-  export interface OnPageChangeEvent {
-    originalEvent: CustomEvent
-    page: number
-    pageIndex: number
-  }
-</script>
+<!--
+// Copyright © 2020 Anticrm Platform Contributors.
+//
+// Licensed under the Eclipse Public License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License. You may
+// obtain a copy of the License at https://www.eclipse.org/legal/epl-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//
+// See the License for the specific language governing permissions and
+// limitations under the License.
+-->
 
 <script lang="ts">
   import { createEventDispatcher, getContext } from 'svelte'
@@ -76,23 +81,21 @@
 <style lang="scss">
   .active {
     background-color: var(--theme-bg-accent-color);
-    color: white;
+    color: var(--content-color);
   }
 
   ul {
+    display: flex;
     flex: 1;
-    float: right;
+    justify-content: center;
+    align-items: center;
     list-style: none;
   }
 
-  li {
-    float: left;
-  }
-
   button {
-    background: #242429;
+    background: var(--theme-bg-accent-color);
     color: white;
-    border: 1px solid #ccc;
+    border: 1px solid var(--theme-caption-color);;
     padding: 5px 10px;
     margin-left: 3px;
     float: left;

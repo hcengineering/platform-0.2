@@ -13,8 +13,8 @@
 // limitations under the License.
 -->
 <script type="ts">
-  import { AttrModel } from '../../../index'
-  import { Class, Doc, Ref } from '@anticrm/core'
+  import type { AttrModel } from '../../../index'
+  import type { Class, Doc, Ref } from '@anticrm/core'
   import { createEventDispatcher, setContext } from 'svelte'
   import TableControls from './TableControls.svelte'
   import Pagination from './Pagination.svelte'
@@ -125,16 +125,12 @@
   </table>
 
   <!--pagination-->
-  <slot name="bottom">
-    <div class="slot-bottom">
-      <svelte:component
-        this={Pagination}
-        {page}
-        {pageSize}
-        count={filteredRows.length - 1}
-        on:pageChange={onPageChange} />
-    </div>
-  </slot>
+  <Pagination
+      {page}
+      {pageSize}
+      count={filteredRows.length - 1}
+      on:pageChange={onPageChange}
+  />
 </div>
 
 <style lang="scss">
@@ -153,7 +149,6 @@
   }
 
   table {
-    //border-collapse: collapse;
     width: 100%;
     border-spacing: 0;
     border-radius: 15px;
@@ -180,13 +175,6 @@
 
       tr {
         background-color: var(--theme-bg-color);
-        // border-bottom: 1px solid var(--theme-bg-accent-color);
-
-        // &:hover {
-        //   background-color: var(--theme-content-color);
-        //   color: var(--theme-bg-color);
-        //   cursor: pointer;
-        // }
 
         &:nth-child(odd) {
           background-color: var(--theme-bg-accent-color);
