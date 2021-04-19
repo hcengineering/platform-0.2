@@ -54,7 +54,7 @@
 </script>
 
 {#if items.length}
-  <ComboBox {label} {items} bind:selected>
+  <ComboBox {label} {items} {editable} bind:selected>
     <div slot="title">
       {items[selected].comboValue}
     </div>
