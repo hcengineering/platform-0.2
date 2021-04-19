@@ -14,9 +14,9 @@
 //
 
 import { Platform } from '@anticrm/platform'
-import { Attribute, Class, Mixin, Obj, Ref, Type } from '@anticrm/core'
+import { Attribute, Class, Doc, Mixin, Obj, Ref, Type } from '@anticrm/core'
 import { VDoc } from '@anticrm/domains'
-import ui, { AttrModel, ClassModel, ComponentExtension, GroupModel, PresentationService } from '.'
+import ui, { AttrModel, ClassModel, ComponentExtension, GroupModel, MixinGroupModel, PresentationService } from '.'
 import { CoreService } from '@anticrm/platform-core'
 import { AnyComponent, Asset } from '@anticrm/platform-ui'
 import { I18n } from '@anticrm/platform-i18n'
@@ -31,6 +31,7 @@ import RefPresenter from './components/internal/presenters/value/RefPresenter.sv
 import ArrayPresenter from './components/internal/presenters/value/ArrayPresenter.svelte'
 import VDocCardPresenter from './components/internal/presenters/VDocCardPresenter.svelte'
 import CardPresenter from './components/internal/presenters/CardPresenter.svelte'
+import EnumPresenter from './components/internal/presenters/value/EnumPresenter.svelte'
 
 /*!
  * Anticrm Platform™ Presentation Core Plugin
@@ -45,6 +46,7 @@ export default (platform: Platform, deps: { core: CoreService, i18n: I18n }): Pr
   platform.setResource(ui.component.Properties, Properties)
 
   platform.setResource(ui.component.StringPresenter, StringEditor)
+  platform.setResource(ui.component.EnumPresenter, EnumPresenter)
   platform.setResource(ui.component.CheckboxPresenter, CheckboxEditor)
   platform.setResource(ui.component.ArrayPresenter, ArrayPresenter)
 
@@ -69,6 +71,29 @@ export default (platform: Platform, deps: { core: CoreService, i18n: I18n }): Pr
       return {
         _class,
         label: _class as string,
+        icon: undefined
+      }
+    }
+  }
+
+  async function getMixinGroupModel (_class: Ref<Class<Obj>>, _mixin: Ref<Mixin<Doc>>): Promise<MixinGroupModel> {
+    const model = coreService.getModel()
+    const mixin = model.get(_mixin) as Class<Obj>
+    if (model.isMixedIn(mixin, ui.mixin.UXObject)) {
+      const ux = model.as(mixin, ui.mixin.UXObject)
+      const label = await i18nService.translate(ux.label)
+
+      return {
+        _mixin,
+        _class,
+        label,
+        icon: ux.icon
+      }
+    } else {
+      return {
+        _mixin,
+        _class,
+        label: _mixin as string,
         icon: undefined
       }
     }
@@ -156,6 +181,8 @@ export default (platform: Platform, deps: { core: CoreService, i18n: I18n }): Pr
 
     abstract getOwnAttributes (_class: Ref<Class<Obj>>): AttrModel[]
 
+    abstract getMixins(_class: Ref<Class<Obj>>): MixinGroupModel[]
+
     abstract getAttributes (): AttrModel[]
 
     abstract getGroup (_class: Ref<Class<Obj>>): GroupModel | undefined
@@ -168,11 +195,13 @@ export default (platform: Platform, deps: { core: CoreService, i18n: I18n }): Pr
   class TClassModel extends ClassModelBase {
     private readonly attributes: AttrModel[]
     private readonly groups: GroupModel[]
+    private readonly mixins: MixinGroupModel[]
 
-    constructor (groups: GroupModel[], attributes: AttrModel[]) {
+    constructor (groups: GroupModel[], attributes: AttrModel[], mixins: MixinGroupModel[]) {
       super()
       this.attributes = attributes
       this.groups = groups
+      this.mixins = mixins
     }
 
     getAttributes (): AttrModel[] {
@@ -181,6 +210,10 @@ export default (platform: Platform, deps: { core: CoreService, i18n: I18n }): Pr
 
     getOwnAttributes (_class: Ref<Class<Obj>>): AttrModel[] {
       return this.attributes.filter(attr => attr._class === _class)
+    }
+
+    getMixins (_class: Ref<Class<Obj>>): MixinGroupModel[] {
+      return this.mixins.filter(_mixin => _mixin._class === _class)
     }
 
     getAttribute (key: string, _class?: Ref<Class<Obj>>): AttrModel | undefined {
@@ -245,6 +278,10 @@ export default (platform: Platform, deps: { core: CoreService, i18n: I18n }): Pr
       return result.filter(attr => !this.filter[attr.key])
     }
 
+    getMixins (_class: Ref<Class<Obj>>): MixinGroupModel[] {
+      return this.next.getMixins(_class)
+    }
+
     getAttributes (): AttrModel[] {
       const result = this.next.getAttributes()
       return result.filter(attr => !this.filter[attr.key])
@@ -264,11 +301,13 @@ export default (platform: Platform, deps: { core: CoreService, i18n: I18n }): Pr
     const hierarchy = model.getClassHierarchy(_class, top)
     const groupModels = hierarchy.map(_class => getGroupModel(_class as Ref<Class<Obj>>))
     const attrModels = hierarchy.map(_class => getOwnAttrModel(_class))
+    const mixinModels = model.getClassMixins(_class).map(_mixin => getMixinGroupModel(_class as Ref<Class<Obj>>, _mixin as Ref<Mixin<Doc>>))
 
     const groups = await Promise.all(groupModels)
+    const mixins = await Promise.all(mixinModels)
     const attributes = await Promise.all(attrModels).then(result => result.reduce((acc, val) => acc.concat(val), []))
 
-    return new TClassModel(groups, attributes)
+    return new TClassModel(groups, attributes, mixins)
   }
 
   function getComponentExtension (_class: Ref<Class<Obj>>, extension: Ref<Mixin<ComponentExtension<VDoc>>>): AnyComponent | undefined {

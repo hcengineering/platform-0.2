@@ -18,7 +18,7 @@ import { Platform } from '@anticrm/platform'
 import { getContext, onDestroy } from 'svelte'
 import core, { CoreService, QueryUpdater, Unsubscriber } from '@anticrm/platform-core'
 import { AnyComponent, CONTEXT_PLATFORM } from '@anticrm/platform-ui'
-import presentationPlugin, { AttrModel, ClassModel, ComponentExtension, GroupModel, PresentationService } from '.'
+import presentationPlugin, { AttrModel, ClassModel, ComponentExtension, GroupModel, MixinGroupModel, PresentationService } from '.'
 import { IntlString } from '@anticrm/platform-i18n'
 import { VDoc } from '@anticrm/domains'
 
@@ -123,6 +123,9 @@ export function getEmptyModel (): ClassModel {
       return []
     }, // eslint-disable-line
     getAttributes (): AttrModel[] {
+      return []
+    },
+    getMixins (): MixinGroupModel[] {
       return []
     },
     getAttribute (key: string, _class?: Ref<Class<Obj>>): AttrModel | undefined {

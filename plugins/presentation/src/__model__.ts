@@ -129,7 +129,7 @@ export function model (S: Builder): void {
   })
 
   S.mixin(core.class.EnumOf, ui.mixin.Presenter, {
-    presenter: ui.component.StringPresenter
+    presenter: ui.component.EnumPresenter
   })
 
   S.mixin(core.class.InstanceOf, ui.mixin.Presenter, {

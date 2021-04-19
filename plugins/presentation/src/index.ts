@@ -106,12 +106,18 @@ export interface GroupModel extends UIModel {
   _class: Ref<Class<Obj>>
 }
 
+export interface MixinGroupModel extends GroupModel {
+  _mixin: Ref<Mixin<Obj>>
+}
+
 export interface ClassModel {
   getGroups (): GroupModel[]
 
   getGroup (_class: Ref<Class<Obj>>): GroupModel | undefined
 
   getOwnAttributes (_class: Ref<Class<Obj>>): AttrModel[] // TODO: why do we have this here, but not within Group?
+
+  getMixins (_class: Ref<Class<Obj>>): MixinGroupModel[]
 
   getAttributes (): AttrModel[]
 
@@ -176,6 +182,7 @@ const presentationPlugin = plugin('presentation' as Plugin<PresentationService>,
     Properties: '' as AnyComponent,
     NumberPresenter: '' as AnyComponent,
     StringPresenter: '' as AnyComponent,
+    EnumPresenter: '' as AnyComponent,
     CheckboxPresenter: '' as AnyComponent,
     RefPresenter: '' as AnyComponent,
     TablePresenter: '' as AnyComponent,

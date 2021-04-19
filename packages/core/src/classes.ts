@@ -148,4 +148,5 @@ export const CORE_CLASS_BAG_OF = 'class:core.BagOf' as Ref<Class<BagOf>>
 export const CORE_CLASS_INSTANCE_OF = 'class:core.InstanceOf' as Ref<Class<InstanceOf<Emb>>>
 export const CORE_CLASS_ENUM_OF = 'class:core.EnumOf' as Ref<Class<EnumOf<EnumKey>>>
 
+export const CORE_CLASS_MIXIN = 'class:core.Mixin' as Ref<Mixin<Obj>>
 export const CORE_MIXIN_INDICES = 'mixin:core.Indices' as Ref<Mixin<Indices>>

@@ -16,6 +16,7 @@
 import { ObjectSelector, TxOperation, TxOperationKind } from '@anticrm/domains'
 import {
   AnyLayout, ArrayOf, Attribute, Class, Classifier, ClassifierKind, CORE_CLASS_ARRAY_OF, CORE_CLASS_INSTANCE_OF,
+  CORE_CLASS_MIXIN,
   CORE_CLASS_OBJ, CORE_MIXIN_INDICES, Doc, Mixin, Obj, Property, PropertyType, Ref, Type
 } from './classes'
 import { generateId, Storage, TxContext } from './storage'
@@ -422,6 +423,18 @@ export class Model implements Storage {
     while (_class && _class !== top) {
       result.push(_class)
       _class = this.get(_class)._extends
+    }
+    return result
+  }
+
+  getClassMixins (cls: Ref<Class<Obj>>): Ref<Mixin<Doc>>[] {
+    const result = [] as Ref<Mixin<Doc>>[]
+    for (const doc of this.objects.values()) {
+      if (doc._class === CORE_CLASS_MIXIN) {
+        if ((doc as Mixin<Obj>)._extends === cls) {
+          result.push(doc._id as Ref<Mixin<Doc>>)
+        }
+      }
     }
     return result
   }

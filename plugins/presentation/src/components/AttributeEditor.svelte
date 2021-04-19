@@ -19,6 +19,7 @@
 
   export let value: unknown
   export let attribute: AttrModel
+  export let editable = true
   export let maxWidth = 300
 
   let component: Promise<any>
@@ -28,7 +29,7 @@
 </script>
 
 {#await component then ctor}
-  <svelte:component this={ctor} {attribute} {maxWidth} bind:value />
+  <svelte:component this={ctor} {attribute} {editable} {maxWidth} bind:value />
 {:catch err}
   <Icon icon={ui.icon.Error} size="32" /> {err}
 {/await}

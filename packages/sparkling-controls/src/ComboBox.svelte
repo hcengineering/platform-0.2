@@ -32,7 +32,8 @@
     let pathRoot = false
     let pathDrop = false
     let pathItems = false
-    event.path.find((el) => {
+    const path = event.path || (event.composedPath && event.composedPath())
+    path.find((el) => {
       if (el.className === comboRoot.className) pathRoot = true
       if (el.className === comboDrop.className) pathDrop = true
       if (el.className === comboItems.className) pathItems = true
