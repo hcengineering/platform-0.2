@@ -63,11 +63,8 @@
   }
 
   function onSearch (event) {
-    // console.log(event)
     dispatch('search', event.detail)
   }
-
-  $: console.log(visibleRows)
 
   const handleRowClick = (_id: any) => () => {
     dispatch('open', { _id, _class })

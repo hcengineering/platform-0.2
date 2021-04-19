@@ -59,7 +59,7 @@
       title={labels.placeholder}
       placeholder={labels.placeholder}
       bind:value={text}
-      on:keydown={onSearch} />
+      on:input={onSearch} />
   </div>
 </div>
 
@@ -76,7 +76,6 @@
   }
   .search {
     width: 33.3%;
-    // float: right;
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
