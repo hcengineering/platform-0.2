@@ -13,7 +13,7 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import type { Property, StringProperty } from '@anticrm/core'
+  import type { DocumentValue, Ref } from '@anticrm/core'
   import { CORE_CLASS_DOC } from '@anticrm/core'
   import { createEventDispatcher } from 'svelte'
   import type { AttrModel, ClassModel } from '@anticrm/presentation'
@@ -24,7 +24,7 @@
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import type { WorkbenchApplication } from '@anticrm/workbench'
   import workbench from '@anticrm/workbench'
-  import { CORE_CLASS_SPACE } from '@anticrm/domains'
+  import { Application, CORE_CLASS_SPACE, Space } from '@anticrm/domains'
 
   export let application: WorkbenchApplication
 
@@ -40,19 +40,19 @@
   async function save () {
     const cs = await coreService
     const space = {
-      name: title as StringProperty,
-      description: description as StringProperty,
-      application: application._id,
-      isPublic: !makePrivate as Property<boolean, boolean>,
-      spaceKey: spaceKey as StringProperty,
+      name: title,
+      description: description,
+      application: application._id as Ref<Application>,
+      isPublic: !makePrivate,
+      spaceKey: spaceKey,
       users: [
         {
-          userId: cs.getUserId() as StringProperty,
-          owner: true as Property<boolean, boolean>
+          userId: cs.getUserId(),
+          owner: true
         }
       ]
-    }
-    await cs.create(CORE_CLASS_SPACE, space)
+    } as DocumentValue<Space>
+    await cs.create<Space>(CORE_CLASS_SPACE, space)
     dispatch('close')
   }
 

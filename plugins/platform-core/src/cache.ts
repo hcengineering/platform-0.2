@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Class, CoreProtocol, Doc, Ref, Storage, TxContext } from '@anticrm/core'
+import { Class, CoreProtocol, Doc, DocumentQuery, Ref, Storage, TxContext } from '@anticrm/core'
 import { TxOperation } from '@anticrm/domains'
 
 export class Cache implements Storage {
@@ -32,11 +32,11 @@ export class Cache implements Storage {
     this.coreProtocol = coreProtocol
   }
 
-  find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
+  find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T[]> {
     return this.coreProtocol.find(_class, query) as Promise<T[]>
   }
 
-  findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined> {
+  findOne<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined> {
     return this.coreProtocol.findOne(_class, query) as Promise<T | undefined>
   }
 }

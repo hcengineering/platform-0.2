@@ -17,7 +17,7 @@
 
 import { ServerSuite } from './serversuite'
 
-import { AnyLayout, BooleanProperty, StringProperty, Tx, txContext } from '@anticrm/core'
+import { BooleanProperty, StringProperty, Tx, txContext } from '@anticrm/core'
 import { createSetArrayFilters } from '../mongo_utils'
 
 import { createSubtask, Task, TaskComment, taskIds as task } from '@anticrm/core/src/__tests__/tasks'
@@ -117,7 +117,7 @@ describe('mongo operations', () => {
 
     const ops = createOperations(await ws.getModel(), processTx, () => 'qwe' as StringProperty)
 
-    const d1 = await ops.create(task.class.Task, (doc1 as unknown) as AnyLayout)
+    const d1 = await ops.create(task.class.Task, doc1)
     const d2 = await ops.updateWith(d1, (s) =>
       s.tasks.match({ name: 'subtask1' }).comments.match({ _id: '#0' }).set({
         author: 'Dart',
@@ -184,7 +184,7 @@ describe('mongo operations', () => {
     const processTx = (tx: Tx) => ws.tx(txContext(), tx)
     const ops = createOperations(await ws.getModel(), processTx, () => 'qwe' as StringProperty)
 
-    const d1 = await ops.create(task.class.Task, (doc1 as unknown) as AnyLayout)
+    const d1 = await ops.create(task.class.Task, doc1)
     const d2 = await ops.updateWith(d1, (s) =>
       s.tasks.match({ name: 'subtask1' }).comments.push({ _id: '#2', message: 'qwe-comment' }))
 
@@ -216,7 +216,7 @@ describe('mongo operations', () => {
     const processTx = (tx: Tx) => ws.tx(txContext(), tx)
     const ops = createOperations(await ws.getModel(), processTx, () => 'qwe' as StringProperty)
 
-    const d1 = await ops.create(task.class.Task, (doc1 as unknown) as AnyLayout)
+    const d1 = await ops.create(task.class.Task, doc1)
 
     const d2 = await ops.updateWith(d1, (s) =>
       s.tasks.match({ name: 'subtask2' }).pull()
@@ -276,8 +276,8 @@ describe('mongo operations', () => {
     const processTx = (tx: Tx) => ws.tx(txContext(), tx)
     const ops = createOperations(await ws.getModel(), processTx, () => 'qwe' as StringProperty)
 
-    await ops.create(task.class.Task, (doc1 as unknown) as AnyLayout)
-    await ops.create(task.class.Task, (doc2 as unknown) as AnyLayout)
+    await ops.create(task.class.Task, doc1)
+    await ops.create(task.class.Task, doc2)
 
     let result = await ws.find(task.class.Task, { tasks: { name: 'subtask1-2' as StringProperty } })
     expect(result.length).toEqual(1)

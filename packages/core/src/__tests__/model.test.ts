@@ -20,9 +20,9 @@ import {
   Doc, Mixin, Obj, Property, PropertyType, Ref, StringProperty
 } from '../classes'
 import { mixinFromKey, mixinKey, Model } from '../model'
-import { txContext } from '../storage'
+import { DocumentQuery, DocumentValue, txContext } from '../storage'
 import { createSubtask, createTask, data, doc1, SubTask, Task, taskIds } from './tasks'
-import { ObjectSelector, TxOperation, TxOperationKind } from '@anticrm/domains'
+import { ObjectSelector, Space, TxOperation, TxOperationKind } from '@anticrm/domains'
 
 describe('matching', () => {
   const model = new Model('vdocs')
@@ -146,7 +146,7 @@ describe('matching', () => {
     model.add(model.createDocument(taskIds.class.Task, createTask('t1', 10, 'test task1')))
     model.add(model.createDocument(taskIds.class.Task, createTask('t2t', 11, 'test task2')))
 
-    const result = await model.find(taskIds.class.Task, { name: { $regex: 't.*t' as StringProperty } })
+    const result = await model.find(taskIds.class.Task, { name: { $regex: 't.*t' } })
 
     expect(result.length).toEqual(1)
   })
@@ -158,7 +158,7 @@ describe('matching', () => {
     model.add(model.createDocument(taskIds.class.Task, createTask('t1', 10, 'test task1')))
     model.add(model.createDocument(taskIds.class.Task, createTask('t2', 11, 'test task2')))
 
-    const result = await model.findOne(taskIds.class.Task, { name: { $regex: 't2' as StringProperty } })
+    const result = await model.findOne(taskIds.class.Task, { name: { $regex: 't2' } })
     expect(result).toBeDefined()
   })
 
@@ -168,7 +168,7 @@ describe('matching', () => {
 
     model.add(model.createDocument(taskIds.class.Task, createTask('t1', 10, 'test task1')))
 
-    const result = await model.findOne(taskIds.class.Task, { name: { $regex: 't3' as StringProperty } })
+    const result = await model.findOne(taskIds.class.Task, { name: { $regex: 't3' } })
     expect(result).toBeUndefined()
   })
 
@@ -193,13 +193,7 @@ describe('invalid cases', () => {
     const model = new Model('vdocs')
     model.loadModel(data)
 
-    const doc = Object.assign(
-      model.createDocument(
-        taskIds.class.Task,
-        createTask('', 0, '')
-      ),
-      { _id: 'id' as Ref<Task> }
-    )
+    const doc = model.createDocument(taskIds.class.Task, createTask('', 0, ''))
 
     model.add(doc)
     expect(() => model.add(doc)).toThrowError()
@@ -209,13 +203,7 @@ describe('invalid cases', () => {
     const model = new Model('vdocs')
     model.loadModel(data)
 
-    const doc = Object.assign(
-      model.createDocument(
-        taskIds.class.Task,
-        createTask('', 0, '')
-      ),
-      { _id: 'id' as Ref<Task> }
-    )
+    const doc = model.createDocument(taskIds.class.Task, createTask('', 0, ''))
 
     model.store(txContext(), doc)
     expect(model.store(txContext(), doc)).rejects.toThrowError()
@@ -246,10 +234,7 @@ describe('invalid cases', () => {
     const model = new Model('vdocs')
     model.loadModel(data)
 
-    const doc = model.createDocument(
-      taskIds.class.Task,
-      createTask('', 0, '')
-    )
+    const doc = model.createDocument(taskIds.class.Task, createTask('', 0, ''))
 
     expect(
       () => model.updateDocument(
@@ -266,10 +251,7 @@ describe('invalid cases', () => {
     const model = new Model('vdocs')
     model.loadModel(data)
 
-    const doc = model.createDocument(
-      taskIds.class.Task,
-      createTask('', 0, '')
-    )
+    const doc = model.createDocument(taskIds.class.Task, createTask('', 0, ''))
 
     expect(
       () => model.updateDocumentPush(
@@ -319,20 +301,24 @@ describe('Model utilities', () => {
   model.loadModel(data)
 
   it('returns all attributes of class', () => {
-    expect(model.getAllAttributes(CORE_CLASS_EMB))
-      .toEqual([])
+    expect(model.getAllAttributes(CORE_CLASS_EMB).length)
+      .toEqual(1) // It should contain _class
 
     const getAttrs = (id: string) => Object.entries<Attribute>(
       data.find((x: any) => x._id === id)?._attributes ?? {}
     )
 
     expect(model.getAllAttributes(CORE_CLASS_DOC).map(m => [m.name, m.attr]))
-      .toEqual(getAttrs(CORE_CLASS_DOC))
+      .toEqual([
+        getAttrs(CORE_CLASS_DOC),
+        getAttrs(CORE_CLASS_OBJ)
+      ].reduce((r, x) => r.concat(x)))
 
     expect(model.getAllAttributes(CORE_CLASS_ATTRIBUTE).map(m => [m.name, m.attr]))
       .toEqual([
         getAttrs(CORE_CLASS_ATTRIBUTE),
-        getAttrs(CORE_CLASS_EMB)
+        getAttrs(CORE_CLASS_EMB),
+        getAttrs(CORE_CLASS_OBJ)
       ].reduce((r, x) => r.concat(x)))
   })
 
@@ -456,10 +442,10 @@ describe('Model assign tools', () => {
     const res = model.assign(
       {},
       taskIds.class.Task as Ref<Class<Obj>>,
-      { _property: 42 as PropertyType }
+      { rate: 42 as PropertyType }
     )
 
-    expect(res).toEqual({ _class: taskIds.class.Task, _property: 42 })
+    expect(res).toEqual({ _class: taskIds.class.Task, rate: 42 })
   })
 
   it('assigns mixin properties', () => {
@@ -475,16 +461,15 @@ describe('Model assign tools', () => {
   })
 
   it('creates new doc', () => {
-    const res = model.newDoc(
-      taskIds.class.Task as Ref<Class<Doc>>,
-      'id' as Ref<Doc>,
-      { _property: 42 as PropertyType }
-    )
+    const res = model.createDocument(taskIds.class.Task, { name: '', description: '', lists: [], rate: 42 })
 
     expect(res).toEqual({
-      _id: 'id',
+      _id: res._id,
+      description: '',
+      lists: [],
+      name: '',
       _class: taskIds.class.Task,
-      _property: 42
+      rate: 42
     })
   })
 
@@ -540,7 +525,7 @@ describe('Model storage', () => {
       '' as Ref<Class<Doc>>,
       doc._id,
       'tasks',
-      newSubtask as never as AnyLayout
+      newSubtask as unknown as AnyLayout
     )
 
     const updatedDoc = model.get(doc._id) as Task
@@ -622,4 +607,27 @@ describe('mixin tools', () => {
     expect(mixinKey(specCharsMixin.mixin, specCharsMixin.key))
       .toEqual(specCharsKey)
   )
+
+  it('document query specification test', () => {
+    const q1: DocumentQuery<Space> = {
+      name: 's1',
+      users: { userId: 'qwe' }
+    }
+
+    const q2: DocumentQuery<Space> = {
+      name: 's1',
+      users: [{ userId: 'qwe' }]
+    }
+    const t1: DocumentValue<Task> = {
+      description: '',
+      lists: [],
+      name: '',
+      tasks: [
+        { name: '' }
+      ]
+    }
+    expect(q1).toBeDefined()
+    expect(q2).toBeDefined()
+    expect(t1).toBeDefined()
+  })
 })

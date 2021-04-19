@@ -33,19 +33,18 @@
   let secondFactorInitEnabled = false
   let secondFactorEnabled = false
   let secondFactorCurrentEnabled = false
-  let newSecret:
-    | {
-        secret: string
-        uri: string
-        qr: string
-      }
-    | false
+  type SV = {
+    secret: string
+    uri: string
+    qr: string
+  }
+  let newSecret: SV | false
   let src: string
 
   $: secondFactorCurrentEnabled = secondFactorEnabled && !secondFactorInitEnabled
   $: newSecret = secondFactorCurrentEnabled && twofactor.generateSecret({ name: 'Anticrm' } as Options)
-  $: src = newSecret.qr
-  $: object.clientSecret = newSecret.secret
+  $: src = (newSecret as SV).qr
+  $: object.clientSecret = (newSecret as SV).secret
 
   const secondFactorCheck = loginService.then((ls) => {
     ls.getLoginInfo().then((li) => {
@@ -55,7 +54,8 @@
   })
 
   function navigateLoginForm (): Promise<void> {
-    return Promise.resolve(router.navigate({ route: '' }))
+    router.navigate({ route: '' })
+    return Promise.resolve()
   }
 
   let description: string
@@ -176,13 +176,16 @@
     padding: 1em;
     border-radius: 1em;
     border: 1px solid var(--theme-bg-accent-color);
+
     .status {
       margin-top: 0.5em;
     }
+
     .field {
       .editbox {
         width: 100%;
       }
+
       margin: 1em 0;
     }
   }

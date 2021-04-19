@@ -15,7 +15,8 @@
 
 import { withTenant } from '@anticrm/accounts'
 import {
-  AnyLayout, Class, combineStorage, Doc, DocumentProtocol, Model, MODEL_DOMAIN, Ref, Storage, Tx, TxContext, TxProcessor
+  AnyLayout, Class, combineStorage, Doc, DocumentProtocol, DocumentQuery, Model, MODEL_DOMAIN, Ref, Storage, Tx,
+  TxContext, TxProcessor
 } from '@anticrm/core'
 import { CORE_CLASS_SPACE, Space, TxOperation, TxOperationKind, VDoc } from '@anticrm/domains'
 import { PassthroughsIndex } from '@anticrm/domains/src/indices/filter'
@@ -125,19 +126,19 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
       return collection(_class).deleteOne({ _id })
     },
 
-    async find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
+    async find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T[]> {
       return collection(_class)
         .find({
-          ...memdb.assign({}, _class, query),
+          ...memdb.assign({}, _class, query as AnyLayout),
           _class: memdb.getClass(_class)
         })
         .toArray()
     },
 
-    async findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined> {
+    async findOne<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined> {
       const res = await collection(_class)
         .findOne({
-          ...memdb.assign({}, _class, query),
+          ...memdb.assign({}, _class, query as AnyLayout),
           _class: memdb.getClass(_class)
         })
       if (res === null) {
@@ -162,13 +163,13 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
   const clientControl = {
     // C O R E  P R O T O C O L
 
-    find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
+    find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T[]> {
       return collection(_class)
         .find(memdb.createQuery(_class, query, true))
         .toArray()
     },
 
-    async findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined> {
+    async findOne<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined> {
       const result = await collection(_class).findOne(memdb.createQuery(_class, query, true))
       if (result == null) {
         return undefined
