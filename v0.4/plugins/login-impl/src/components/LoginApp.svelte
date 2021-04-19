@@ -12,27 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 -->
+
 <script lang="ts">
   import { Button, EditBox } from '@anticrm/sparkling-controls'
 </script>
 
 <div class="container">
+  <div class="bg-noise opacity-2"/>
+  <div class="bg-cover"/>
   <div class="reg-panel">
+    <div class="back-panel-dark"/>
+    <div class="back-panel-light"><div class="bg-noise opacity-3"/></div>
     <div class="form-container">
       <div class="form">
-        <div class="title">Sign up to Platform</div>
+        <div class="title">Sign up</div>
         <div class="form-row wCol">
           <div class="form-col"><EditBox label="First Name"/></div>
           <div class="form-col"><EditBox label="Last Name"/></div>
         </div>
         <div class="form-row"><EditBox label="E-mail"/></div>
-        <div class="form-row"><EditBox label="Password"/></div>
+        <div class="form-row"><EditBox label="Password" password/></div>
+        <div class="form-row"><EditBox label="Repeat password" password/></div>
         <div class="send"><Button label="Sign Up" primary width="100%"/></div>
       </div>
-      <div class="back-panel-dark"/>
-      <div class="back-panel-light"/>
     </div>
-    <div class="reg-footer">Already have an account?</div>
+    <div class="reg-footer"><span>Already have an account?</span> <a href="/login">Sign In</a></div>
   </div>
   <div class="intro">
     <div class="content">
@@ -46,6 +50,20 @@
 </div>
 
 <style lang="scss">
+  @mixin bg-fullsize {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+  }
+
+  @mixin bg-layer($bg, $opacity) {
+    @include bg-fullsize;
+    background: $bg;
+    opacity: $opacity;
+  }
+
   .container {
     position: relative;
     display: flex;
@@ -53,24 +71,29 @@
     height: 100%;
     padding: 20px;
     font-family: inherit;
-    &:after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: url("http://platform.exhale24.ru/img/back.png");
-      opacity: 0.02;
+    background-color: #111117;
+
+    .bg-cover {
+      @include bg-layer(linear-gradient(112.79deg, #AEA4CC 2.31%, rgba(196, 150, 191, 0) 98.9%), 0.05);
+      z-index: 5;
     }
 
     .reg-panel {
       position: relative;
       display: flex;
       flex-direction: column;
+      overflow: hidden;
+      margin-right: 20px;
       width: 668px;
       padding: 60px 80px;
       border-radius: 20px;
+
+      .back-panel-light {
+        @include bg-layer(linear-gradient(158.74deg, rgba(205, 166, 255, 0.12) 5.62%, rgba(255, 255, 255, 0) 97.09%), 0.3);
+      }
+      .back-panel-dark {
+        @include bg-layer(#1D1D23, 0.5);
+      }
 
       .form-container {
         display: flex;
@@ -87,14 +110,13 @@
 
           .title {
             margin-bottom: 56px;
-            height: 56px;
             font-weight: 600;
             font-size: 24px;
             line-height: 29px;
             color: #FFFFFF;
           }
           .form-row {
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             &.wCol {
               display: flex;
               flex-direction: row;
@@ -102,13 +124,24 @@
             }
             .form-col {
               flex-grow: 1;
-              &:last-child {
-                margin-left: 12px;
+              &:first-child {
+                margin-right: 12px;
+              }
+            }
+            @media (max-width: 865px) {
+              &.wCol {
+                flex-direction: column;
+              }
+              .form-col {
+                &:first-child {
+                  margin-right: 0px;
+                  margin-bottom: 20px;
+                }
               }
             }
           }
           .send {
-            margin-top: 32px;
+            margin-top: 36px;
           }
         }
       }
@@ -117,48 +150,16 @@
         line-height: 16px;
         color: #FFFFFF;
         z-index: 99;
-      }
-
-      .back-panel-light {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        border-radius: 20px;
-        background: #CDA6FF;
-        opacity: 0.02;
-        &:after {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          border-radius: 20px;
-          background: url("http://platform.exhale24.ru/img/back.png");
-          opacity: 0.02;
+        span {
+          opacity: 0.3;
         }
-      }
-      .back-panel-dark {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        border-radius: 20px;
-        background: #1D1D23;
-        opacity: 0.5;
-        &:before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          border-radius: 20px;
-          background: linear-gradient(158.74deg, rgba(205, 166, 255, 0.12) 5.62%, rgba(255, 255, 255, 0) 97.09%);
-          opacity: 0.03;
+        a {
+          color: #fff;
+          opacity: 0.8;
+          text-decoration: none;
+          :hover {
+            opacity: 1;
+          }
         }
       }
     }
@@ -167,6 +168,7 @@
       display: flex;
       flex-direction: column;
       flex-grow: 1;
+      overflow: hidden;
 
       .content {
         display: flex;
