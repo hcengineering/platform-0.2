@@ -50,15 +50,20 @@
   let viewletProps: Record<string, any> = {}
   let activeClasses: Ref<Class<Doc>>[] = []
 
-  let creatorsQuery: Promise<QueryUpdater<ItemCreator>> | undefined
+  let creatorsQuery: Promise<QueryUpdater<ItemCreator>>
 
   const onCreatorClick = (creator: ItemCreator) => uiService.showModal(CreateForm, { creator, spaces: [space] })
 
-  $: creatorsQuery = liveQuery(creatorsQuery, workbench.class.ItemCreator, { app: application._id }, (docs) => {
-    creators = docs
-  })
+  $: creatorsQuery = liveQuery<ItemCreator>(
+    creatorsQuery,
+    workbench.class.ItemCreator,
+    { app: application._id as Ref<WorkbenchApplication> },
+    (docs) => {
+      creators = docs
+    }
+  )
 
-  createLiveQuery(ui.mixin.Viewlet, {}, (docs) => {
+  createLiveQuery<Viewlet>(ui.mixin.Viewlet, {}, (docs) => {
     presenters = docs
   })
 

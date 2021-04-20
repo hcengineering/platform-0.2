@@ -18,8 +18,8 @@ import { Resource } from '@anticrm/platform'
 import { loadClassifier } from './dsl'
 import { CombineObjects, KeysByType } from 'simplytyped'
 import {
-  AllAttributes, Attribute, Class, ClassifierKind, Doc, EClass, Emb, Mixin, Model, MODEL_DOMAIN, Obj, Ref,
-  StringProperty
+  AllAttributes, Attribute, Class, ClassifierKind, Doc, DocumentValue, EClass, Emb, EMixin, Mixin, Model, MODEL_DOMAIN,
+  Obj, Ref, StringProperty
 } from '@anticrm/core'
 import core from '.'
 
@@ -100,8 +100,8 @@ class Builder {
     return { _class: core.class.Attribute, type } as unknown as Attribute
   }
 
-  createDocument<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Doc>, _id?: Ref<M>): M {
-    const doc = this.memdb.createDocument(_class, values, _id)
+  createDocument<M extends Doc> (_class: Ref<Class<M>>, values: DocumentValue<M>, _id?: Ref<M>): M {
+    const doc = this.memdb.createDocument<M>(_class, values, _id)
     if (_class === core.class.Class as Ref<Class<Doc>> || _class === core.class.Mixin as Ref<Class<Doc>>) {
       this.memdb.add(doc)
       console.log('add `model` ' + doc._id)
@@ -117,7 +117,7 @@ class Builder {
   }
 
   createClass<T extends E, E extends Obj> (_id: Ref<Class<T>>, _extends: Ref<Class<E>>, _attributes: AllAttributes<T, E>, _domain?: string, _native?: Resource<any>): EClass<T, E> {
-    const _eclass: EClass<T, E> = {
+    const _eclass = {
       _id,
       _class: core.class.Class,
       _extends,
@@ -125,14 +125,14 @@ class Builder {
       _native: (_native as string) as StringProperty,
       _attributes,
       _kind: ClassifierKind.CLASS
-    }
+    } as unknown as DocumentValue<EClass<T, E>>
     return this.createDocument(core.class.Class as Ref<Class<EClass<T, E>>>,
       _eclass,
       _id as Ref<EClass<T, E>>)
   }
 
   createMixin<T extends E, E extends Doc> (_id: Ref<Mixin<T>>, _extends: Ref<Class<E>>, _attributes: AllAttributes<T, E>, _domain?: string, _native?: Resource<any>): EClass<T, E> {
-    const _eclass: EClass<T, E> = {
+    const _eclass = {
       _id,
       _class: core.class.Mixin,
       _extends,
@@ -140,10 +140,10 @@ class Builder {
       _domain: _domain as StringProperty,
       _native: (_native as string) as StringProperty,
       _kind: ClassifierKind.MIXIN
-    }
+    } as unknown as DocumentValue<EMixin<T, E>>
     return this.createDocument(core.class.Mixin as Ref<Class<EClass<T, E>>>,
       _eclass,
-      _id as Ref<EClass<T, E>>)
+      _id as Ref<EMixin<T, E>>)
   }
 }
 

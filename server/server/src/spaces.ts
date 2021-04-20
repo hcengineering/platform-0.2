@@ -13,10 +13,10 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Class, Doc, Ref, StringProperty, Tx } from '@anticrm/core'
+import { Class, Doc, DocumentQuery, Ref, StringProperty, Tx } from '@anticrm/core'
 import {
-  CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_REFERENCE, CORE_CLASS_SPACE,
-  CORE_CLASS_TITLE, CORE_CLASS_UPDATE_TX, CreateTx, DeleteTx, Space, SpaceUser, UpdateTx
+  CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_REFERENCE, CORE_CLASS_SPACE, CORE_CLASS_TITLE,
+  CORE_CLASS_UPDATE_TX, CreateTx, DeleteTx, Space, SpaceUser, UpdateTx
 } from '@anticrm/domains'
 import { Client } from './server'
 import { WorkspaceProtocol } from './workspace'
@@ -39,7 +39,7 @@ function getSpaceKey (_class: Ref<Class<Doc>>): string {
  * Filters the given query to satisfy current user account rights.
  * The result query can be used to request objects the user has access to from the storage.
  */
-export function filterQuery (spaces: Map<string, SpaceUser>, _class: Ref<Class<Doc>>, query: AnyLayout): { valid: boolean, filteredQuery: AnyLayout } {
+export function filterQuery (spaces: Map<string, SpaceUser>, _class: Ref<Class<Doc>>, query: DocumentQuery<any>): { valid: boolean, filteredQuery: DocumentQuery<any> } {
   if (_class === CORE_CLASS_TITLE || _class === CORE_CLASS_REFERENCE) {
     // Allow to proceed with title and references
     return {
@@ -80,12 +80,12 @@ export function filterQuery (spaces: Map<string, SpaceUser>, _class: Ref<Class<D
 /**
  * Check for object are in user spaces and return true if so
  */
-export function isAcceptable (spaces: Map<string, SpaceUser>, _class: Ref<Class<Doc>>, doc: AnyLayout): boolean {
+export function isAcceptable (spaces: Map<string, SpaceUser>, _class: Ref<Class<Doc>>, doc: unknown): boolean {
   if (!doc) {
     return false
   }
   const spaceKey = getSpaceKey(_class)
-  const spaceId = doc[spaceKey] as Ref<Space>
+  const spaceId = (doc as any)[spaceKey] as Ref<Space>
 
   if (spaceId) {
     return spaces.has(spaceId)
@@ -185,7 +185,7 @@ export async function processTx (ctx: SecurityContext, workspace: WorkspaceProto
         sendSpace = checkUpdateSpaces(spaces, (obj as unknown) as Space, updateTx._objectId, client.email)
       }
       return {
-        allowed: isAcceptable(spaces, updateTx._objectClass, (obj as unknown) as AnyLayout),
+        allowed: isAcceptable(spaces, updateTx._objectClass, obj),
         sendSpace
       }
     }
@@ -202,7 +202,7 @@ export async function processTx (ctx: SecurityContext, workspace: WorkspaceProto
         sendSpace = checkUpdateSpaces(spaces, sp, sp._id, client.email)
       }
       return {
-        allowed: isAcceptable(spaces, delTx._class, (obj as unknown) as AnyLayout),
+        allowed: isAcceptable(spaces, delTx._class, obj),
         sendSpace
       }
     }

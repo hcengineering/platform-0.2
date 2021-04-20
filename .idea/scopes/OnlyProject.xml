@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="OnlyProject" pattern="file[platform]:*/*/src//*" />
+</component>

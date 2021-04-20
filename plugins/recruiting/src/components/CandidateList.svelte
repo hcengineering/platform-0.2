@@ -24,6 +24,7 @@ limitations under the License.
 
   import type { WithCandidateProps } from '..'
   import recruiting from '..'
+  import { Ref } from '@anticrm/core'
 
   export let space: Space
 
@@ -32,9 +33,14 @@ limitations under the License.
   let candidates: WithCandidateProps[] = []
   let lq: Promise<QueryUpdater<WithCandidateProps>>
 
-  $: lq = liveQuery(lq, recruiting.mixin.WithCandidateProps, { _space: space._id }, (docs) => {
-    candidates = docs
-  })
+  $: lq = liveQuery<WithCandidateProps>(
+    lq,
+    recruiting.mixin.WithCandidateProps,
+    { _space: space._id as Ref<Space> },
+    (docs) => {
+      candidates = docs
+    }
+  )
 </script>
 
 <ScrollView width="100%" height="100%">

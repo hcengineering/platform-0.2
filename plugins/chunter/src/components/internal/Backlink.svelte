@@ -18,13 +18,15 @@
 
   import CommentComponent from './Comment.svelte'
   import { liveQuery } from '@anticrm/presentation'
+  import { QueryUpdater } from '@anticrm/platform-core'
+  import type { Class, Ref } from '@anticrm/core'
 
   export let backlink: Reference
 
   let message: Message
-
-  $: qs = liveQuery(qs, backlink._sourceClass, { _id: backlink._sourceId }, (docs) => {
-    message = docs[0] as Message
+  let qs: Promise<QueryUpdater<Message>>
+  $: qs = liveQuery<Message>(qs, backlink._sourceClass as Ref<Class<Message>>, { _id: backlink._sourceId }, (docs) => {
+    message = docs[0]
   })
 </script>
 

@@ -17,7 +17,7 @@
 
   import type { Platform } from '@anticrm/platform'
   import type { Space } from '@anticrm/domains'
-  import type { Class, Doc, Ref, Type } from '@anticrm/core'
+  import type { Class, Doc, Ref } from '@anticrm/core'
   import ui, { liveQuery, getCoreService } from '@anticrm/presentation'
   import { AnyComponent } from '@anticrm/platform-ui'
 
@@ -29,6 +29,7 @@
   import MonthCalendar from '@anticrm/sparkling-controls/src/calendar/MonthCalendar.svelte'
   import Spinner from '@anticrm/platform-ui/src/components/internal/Spinner.svelte'
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
+  import { QueryUpdater } from '@anticrm/platform-core'
 
   export let _class: Ref<Class<Doc>>
   export let space: Space
@@ -66,7 +67,7 @@
   $: {
     coreService.then((cs) => {
       const model = cs.getModel()
-      const typeClass = model.get(_class) as Class<Type>
+      const typeClass = model.get(_class) as Class<Doc>
       if (!model.isMixedIn(typeClass, ui.mixin.Presenter)) {
         console.log(new Error(`no presenter for type '${_class}'`))
         // Use string presenter
@@ -77,9 +78,16 @@
     })
   }
 
-  $: query = liveQuery(query, calendar.class.CalendarEvent, { _space: space._id }, (docs) => {
-    events = docs
-  })
+  let query: Promise<QueryUpdater<CalendarEvent>>
+
+  $: query = liveQuery<CalendarEvent>(
+    query,
+    calendar.class.CalendarEvent,
+    { _space: space._id as Ref<Space> },
+    (docs) => {
+      events = docs
+    }
+  )
 
   $: {
     eventCoordinatesMap.clear()

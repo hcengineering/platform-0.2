@@ -13,10 +13,10 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Class, Doc, Mixin, Obj, Ref, StringProperty, Type } from '@anticrm/core'
+import { Class, Doc, DocumentQuery, Mixin, Obj, Ref, StringProperty, Type } from '@anticrm/core'
 import { Platform } from '@anticrm/platform'
 import { getContext, onDestroy } from 'svelte'
-import core, { CoreService, QueryUpdater, Unsubscriber } from '@anticrm/platform-core'
+import core, { CoreService, QueryUpdater, Unsubscribe } from '@anticrm/platform-core'
 import { AnyComponent, CONTEXT_PLATFORM } from '@anticrm/platform-ui'
 import presentationPlugin, { AttrModel, ClassModel, ComponentExtension, GroupModel, PresentationService } from '.'
 import { IntlString } from '@anticrm/platform-i18n'
@@ -50,18 +50,18 @@ export function getUserId (): string {
  * @param action - callback with list of results.
  * @return a function to re-query with a new parameters for same action.
  */
-export async function createLiveQuery<T extends Doc> (_class: Ref<Class<T>>, _query: AnyLayout,
+export async function createLiveQuery<T extends Doc> (_class: Ref<Class<T>>, _query: DocumentQuery<T>,
   action: (docs: T[]) => void): Promise<QueryUpdater<T>> {
-  let oldQuery: AnyLayout
+  let oldQuery: DocumentQuery<T>
   let oldClass: Ref<Class<T>>
-  let unsubscribe: Unsubscriber
+  let unsubscribe: Unsubscribe
   onDestroy(() => {
     if (unsubscribe) {
       unsubscribe()
     }
   })
   const coreService = await getCoreService()
-  const result = (newClass: Ref<Class<T>>, newQuery: AnyLayout) => {
+  const result = (newClass: Ref<Class<T>>, newQuery: DocumentQuery<T>) => {
     if (deepEqual(oldQuery, newQuery) && oldClass === newClass) {
       return
     }
@@ -84,7 +84,7 @@ export async function createLiveQuery<T extends Doc> (_class: Ref<Class<T>>, _qu
 /**
  * Perform updating of query, waiting for promise and perform update operation.
  */
-export function updateLiveQuery<T extends Doc> (qu: Promise<QueryUpdater<T>>, _class: Ref<Class<T>>, query: AnyLayout): void {
+export function updateLiveQuery<T extends Doc> (qu: Promise<QueryUpdater<T>>, _class: Ref<Class<T>>, query: DocumentQuery<T>): void {
   qu.then((q) => q(_class, query))
 }
 
@@ -102,7 +102,7 @@ export function updateLiveQuery<T extends Doc> (qu: Promise<QueryUpdater<T>>, _c
 export function liveQuery<T extends Doc> (
   liveQuery: Promise<QueryUpdater<T>> | undefined,
   _class: Ref<Class<T>>,
-  _query: AnyLayout,
+  _query: DocumentQuery<T>,
   action: (docs: T[]) => void): Promise<QueryUpdater<T>> {
   if (liveQuery) {
     updateLiveQuery(liveQuery as Promise<QueryUpdater<T>>, _class, _query)

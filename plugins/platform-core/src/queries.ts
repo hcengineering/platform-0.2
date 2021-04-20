@@ -13,20 +13,20 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Class, Doc, generateId, Model, Ref, Storage, TxContext } from '@anticrm/core'
-import { QueryResult, Subscriber, Unsubscriber } from '.'
+import { Class, Doc, DocumentQuery, generateId, Model, Ref, Storage, TxContext } from '@anticrm/core'
+import { QueryResult, Subscriber, Unsubscribe } from '.'
 import { TxOperation } from '@anticrm/domains'
 
 export interface Domain extends Storage {
-  query<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): QueryResult<T>
+  query<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): QueryResult<T>
 }
 
 interface Query<T extends Doc> {
   _id: Ref<Doc>
   _class: Ref<Class<T>>
-  query: AnyLayout
+  query: DocumentQuery<T>
   subscriber: Subscriber<T>
-  unsubscriber?: Unsubscriber
+  unsubscriber?: Unsubscribe
 
   // A ordered results with some additional flags.
   results: T[]
@@ -120,16 +120,16 @@ export class QueriableStorage implements Domain {
     })
   }
 
-  find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
+  find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T[]> {
     return this.proxy.find(_class, query)
   }
 
-  findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined> {
+  findOne<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined> {
     return this.proxy.findOne(_class, query)
   }
 
   // TODO: move to platform core
-  query<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): QueryResult<T> {
+  query<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): QueryResult<T> {
     return {
       subscribe: (subscriber: Subscriber<T>) => {
         const q: Query<Doc> = {

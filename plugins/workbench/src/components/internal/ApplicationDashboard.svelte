@@ -24,6 +24,7 @@
   import CreateControl from './CreateControl.svelte'
   import CreateForm from './CreateForm.svelte'
   import { CORE_CLASS_SPACE, Space } from '@anticrm/domains'
+  import { Ref } from '@anticrm/core'
 
   export let application: WorkbenchApplication
 
@@ -31,16 +32,21 @@
   const uiService = getUIService()
 
   let creators: ItemCreator[] = []
-  let creatorsQuery: Promise<QueryUpdater<ItemCreator>> | undefined
+  let creatorsQuery: Promise<QueryUpdater<ItemCreator>>
 
   $: if (application) {
-    creatorsQuery = liveQuery(creatorsQuery, workbench.class.ItemCreator, { app: application._id }, (docs) => {
-      creators = docs
-    })
+    creatorsQuery = liveQuery<ItemCreator>(
+      creatorsQuery,
+      workbench.class.ItemCreator,
+      { app: application._id as Ref<WorkbenchApplication> },
+      (docs) => {
+        creators = docs
+      }
+    )
   }
 
   let spaces: Space[] = []
-  let spacesQuery: Promise<QueryUpdater<Space>> | undefined
+  let spacesQuery: Promise<QueryUpdater<Space>>
   let userId: string | undefined
 
   coreP.then((core) => {
@@ -48,7 +54,7 @@
   })
 
   $: if (userId && application) {
-    spacesQuery = liveQuery(spacesQuery, CORE_CLASS_SPACE, { application: application._id }, (docs) => {
+    spacesQuery = liveQuery<Space>(spacesQuery, CORE_CLASS_SPACE, { application: application._id }, (docs) => {
       spaces = docs.filter((x) => x.users.some((x) => x.userId === userId))
     })
   }
