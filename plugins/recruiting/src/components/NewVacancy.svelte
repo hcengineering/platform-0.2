@@ -19,6 +19,9 @@ limitations under the License.
   import { generateId } from '@anticrm/core'
   import type { Space } from '@anticrm/domains'
   import { getCoreService } from '@anticrm/presentation'
+  import type { WorkbenchApplication } from '@anticrm/workbench'
+  import type { FSM } from '@anticrm/fsm'
+  import fsmPlugin from '@anticrm/fsm'
 
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
@@ -28,10 +31,13 @@ limitations under the License.
   import VacancyEditor from './VacancyEditor.svelte'
 
   export let spaces: Space[]
+  export let application: WorkbenchApplication
 
   const coreP = getCoreService()
   let space: Space | undefined = spaces[0]
   const dispatch = createEventDispatcher()
+
+  export let fsmRef: Ref<FSM> | undefined
 
   let vacancy: Vacancy = {
     _id: generateId(),
@@ -48,12 +54,19 @@ limitations under the License.
 
   async function save () {
     const core = await coreP
+    const model = core.getModel()
 
     const doc = {
       ...vacancy,
       _space: space?._id as Ref<Space>,
       _createdBy: core.getUserId() as StringProperty
     } as DocumentValue<Vacancy>
+
+    if (fsmRef) {
+      model.mixinDocument(doc as Vacancy, fsmPlugin.mixin.WithFSM, {
+        fsm: fsmRef
+      })
+    }
 
     await core.create<Vacancy>(recruiting.class.Vacancy, doc)
 
@@ -63,7 +76,7 @@ limitations under the License.
 
 <div class="root">
   <ScrollView height="500px">
-    <VacancyEditor bind:vacancy {spaces} bind:space />
+    <VacancyEditor bind:vacancy {spaces} {application} bind:fsmRef bind:space />
   </ScrollView>
   <div class="footer">
     <Button kind="primary" on:click={save} width="100%">Принять</Button>
