@@ -13,14 +13,14 @@
 // limitations under the License.
 //
 
-import { ObjectSelector, TxOperation, TxOperationKind } from '@anticrm/domains'
+import { CORE_CLASS_OBJECT_SELECTOR, CORE_CLASS_TX_OPERATION, ObjectSelector, TxOperation, TxOperationKind } from '@anticrm/domains'
 import {
   AnyLayout, ArrayOf, Attribute, Class, Classifier, ClassifierKind, CORE_CLASS_ARRAY_OF, CORE_CLASS_CLASS,
   CORE_CLASS_INSTANCE_OF,
   CORE_CLASS_MIXIN,
   CORE_CLASS_OBJ, CORE_MIXIN_INDICES, Doc, Mixin, Obj, Property, PropertyType, Ref, Type
 } from './classes'
-import { DocumentQuery, DocumentValue, generateId, Storage, TxContext } from './storage'
+import { DocumentQuery, DocumentValue, generateId, RegExpression, Storage, TxContext } from './storage'
 
 export function mixinKey (mixin: Ref<Mixin<Obj>>, key: string): string {
   return key + '|' + mixin.replace('.', '~')
@@ -59,15 +59,15 @@ export class Model implements Storage {
   private readonly domain: string
   private readonly objects = new Map<Ref<Doc>, Doc>()
 
-  private byClass: Map<Ref<Class<Doc>>, Doc[]> | null = null
-  private byExtends: Map<Ref<Class<Obj>>, Class<Obj>[]> | null = null
+  private byClass: Map<Ref<Class<Doc>>, Doc[]> | undefined = undefined
+  private byExtends: Map<Ref<Class<Obj>>, Array<Class<Obj>>> | undefined = undefined
 
   constructor (domain: string) {
     this.domain = domain
   }
 
   protected objectsOfClass (_class: Ref<Class<Doc>>): Doc[] {
-    if (!this.byClass) {
+    if (this.byClass === undefined) {
       this.byClass = new Map<Ref<Class<Doc>>, Doc[]>()
       for (const doc of this.objects.values()) {
         this.indexInstances(doc)
@@ -76,9 +76,9 @@ export class Model implements Storage {
     return this.byClass.get(_class) ?? []
   }
 
-  protected extendsOfClass (_class: Ref<Class<Obj>>): Class<Obj>[] {
-    if (!this.byExtends) {
-      this.byExtends = new Map<Ref<Class<Obj>>, Class<Obj>[]>()
+  protected extendsOfClass (_class: Ref<Class<Obj>>): Array<Class<Obj>> {
+    if (this.byExtends === undefined) {
+      this.byExtends = new Map<Ref<Class<Obj>>, Array<Class<Obj>>>()
       for (const doc of this.objects.values()) {
         this.indexExtends(doc)
       }
@@ -90,9 +90,9 @@ export class Model implements Storage {
     return clazz._kind === ClassifierKind.MIXIN ? mixinKey(clazz._id as Ref<Mixin<Doc>>, key) : key
   }
 
-  private set (doc: Doc) {
+  private set (doc: Doc): void {
     const id = doc._id
-    if (this.objects.get(id)) {
+    if (this.objects.get(id) !== undefined) {
       throw new Error('document added already ' + id)
     }
     this.objects.set(id, doc)
@@ -100,15 +100,15 @@ export class Model implements Storage {
 
   private unset (id: Ref<Doc>): Doc {
     const result = this.objects.get(id)
-    if (!result) {
+    if (result === undefined) {
       throw new Error('document is not found ' + id)
     }
     this.objects.delete(id)
     return result
   }
 
-  private indexInstances (doc: Doc, add = true) {
-    if (this.byClass === null) {
+  private indexInstances (doc: Doc, add = true): void {
+    if (this.byClass === undefined) {
       throw new Error('indexInstances not created')
     }
     const byClass = this.byClass
@@ -117,7 +117,7 @@ export class Model implements Storage {
     for (const _class of hierarchy) {
       const cls = _class as Ref<Class<Doc>>
       const list = byClass.get(cls)
-      if (list) {
+      if (list !== undefined) {
         if (add) {
           list.push(doc)
         } else {
@@ -130,8 +130,8 @@ export class Model implements Storage {
     }
   }
 
-  private indexExtends (doc: Doc, add = true) {
-    if (this.byExtends === null) {
+  private indexExtends (doc: Doc, add = true): void {
+    if (this.byExtends === undefined) {
       throw new Error('indexInstances not created')
     }
     const byExtends = this.byExtends
@@ -140,7 +140,7 @@ export class Model implements Storage {
       const hierarchy = this.getClassHierarchy(doc._id as Ref<Class<Obj>>)
       for (const cls of hierarchy) {
         const list = byExtends.get(cls)
-        if (list) {
+        if (list !== undefined) {
           if (add) {
             list.push(doc as Class<Obj>)
           } else {
@@ -156,19 +156,19 @@ export class Model implements Storage {
 
   add (doc: Doc): void {
     this.set(doc)
-    if (this.byClass) this.indexInstances(doc)
-    if (this.byExtends) this.indexExtends(doc)
+    if (this.byClass !== undefined) this.indexInstances(doc)
+    if (this.byExtends !== undefined) this.indexExtends(doc)
   }
 
   del (id: Ref<Doc>): void {
     const doc = this.unset(id)
-    if (this.byClass) this.indexInstances(doc, false)
-    if (this.byExtends) this.indexExtends(doc, false)
+    if (this.byClass !== undefined) this.indexInstances(doc, false)
+    if (this.byExtends !== undefined) this.indexExtends(doc, false)
   }
 
   get<T extends Doc> (id: Ref<T>): T {
     const obj = this.objects.get(id)
-    if (!obj) {
+    if (obj === undefined) {
       throw new Error('document not found ' + id)
     }
     return obj as T
@@ -176,13 +176,13 @@ export class Model implements Storage {
 
   // U T I L I T Y
 
-  private _getAllAttributes (attributes: AttributeMatch[], _class: Ref<Class<Obj>>) {
+  private _getAllAttributes (attributes: AttributeMatch[], _class: Ref<Class<Obj>>): void {
     const clazz = this.get(_class) as Class<Doc>
     for (const kv of Object.entries(clazz._attributes)) {
       attributes.push({ name: kv[0], attr: kv[1], clazz, key: this.attributeKey(clazz, kv[0]) })
     }
 
-    if (clazz._extends) {
+    if (clazz._extends !== undefined) {
       this._getAllAttributes(attributes, clazz._extends)
     }
   }
@@ -193,34 +193,34 @@ export class Model implements Storage {
     return attributes
   }
 
-  getPrimaryKey (_class: Ref<Class<Obj>>): string | null {
+  getPrimaryKey (_class: Ref<Class<Obj>>): string | undefined {
     const primaryKey = mixinKey(CORE_MIXIN_INDICES, 'primary')
     let cls = _class as Ref<Class<Obj>> | undefined
-    while (cls) {
+    while (cls !== undefined) {
       const clazz = this.get(cls)
       const primary = (clazz as any)[primaryKey]
-      if (primary) {
+      if (primary !== undefined) {
         return primary
       }
       cls = clazz._extends
     }
-    return null
+    return undefined
   }
 
   // D O M A I N
 
   getDomain (id: Ref<Class<Doc>>): string {
     let clazz = this.objects.get(id) as Class<Doc> | undefined
-    while (clazz) {
-      if (clazz._domain) return clazz._domain as string
-      clazz = clazz._extends ? (this.objects.get(clazz._extends) as Class<Doc>) : undefined
+    while (clazz !== undefined) {
+      if (clazz._domain !== undefined) return clazz._domain as string
+      clazz = (clazz._extends !== undefined) ? (this.objects.get(clazz._extends) as Class<Doc>) : undefined
     }
     throw new Error('no domain found for class: ' + id)
   }
 
   getClass (_class: Ref<Class<Obj>>): Ref<Class<Obj>> {
     let cls = _class
-    while (cls) {
+    while (cls !== undefined) {
       const clazz = this.get(cls)
       if (clazz._kind === ClassifierKind.CLASS) return cls
       cls = clazz._extends as Ref<Class<Obj>>
@@ -238,14 +238,14 @@ export class Model implements Storage {
    */
   createDocument<T extends Doc> (_class: Ref<Class<T>>, values: DocumentValue<T>, _id?: Ref<T>): T {
     const doc = this.assign({}, _class, (values as unknown) as AnyLayout)
-    doc._id = _id ?? this.generateId()
+    doc._id = _id ?? generateId()
     return (doc as unknown) as T
   }
 
   public classAttribute (cls: Ref<Class<Obj>>, key: string): AttributeMatch {
     // TODO: use memdb class hierarchy
     let _class = cls as Ref<Class<Obj>> | undefined
-    while (_class) {
+    while (_class !== undefined) {
       const clazz = this.get(_class)
       const attr = (clazz._attributes as any)[key]
       if (attr !== undefined) {
@@ -262,7 +262,7 @@ export class Model implements Storage {
     throw new Error(`attribute not found: ${key} in ${cls}`)
   }
 
-  public pushArrayValue (curValue: unknown, attrClass: Ref<Class<Doc>>, embedded: AnyLayout): Array<PropertyType> {
+  public pushArrayValue (curValue: unknown, attrClass: Ref<Class<Doc>>, embedded: AnyLayout): PropertyType[] {
     // Assign into  a proper classed values.
     const objValue = this.assign({}, attrClass, embedded)
     objValue._class = attrClass
@@ -271,15 +271,15 @@ export class Model implements Storage {
       // Just assign a new Array
       return [objValue]
     } else if (curValue instanceof Array) {
-      const curArray = curValue as Array<PropertyType>
+      const curArray = curValue as PropertyType[]
       curArray.push(objValue)
       return curArray
     } else {
-      throw new Error(`Invalid attribute type: ${curValue}`)
+      throw new Error(`Invalid attribute type: ${String(curValue)}`)
     }
   }
 
-  public flattenArrayValue (curValue: unknown, attrClass: Ref<Class<Doc>>, embedded: AnyLayout): Array<PropertyType> {
+  public flattenArrayValue (curValue: unknown, attrClass: Ref<Class<Doc>>, embedded: AnyLayout): PropertyType[] {
     // Assign into  a proper classed values.
     const objValue = this.flattenQuery(attrClass, embedded)
     objValue._class = attrClass
@@ -288,16 +288,16 @@ export class Model implements Storage {
       // Just assign a new Array
       return [{ $elemMatch: objValue }]
     } else if (curValue instanceof Array) {
-      const curArray = curValue as Array<PropertyType>
+      const curArray = curValue as PropertyType[]
       curArray.push({ $elemMatch: objValue })
       return curArray
     } else {
-      throw new Error(`Invalid attribute type: ${curValue}`)
+      throw new Error(`Invalid attribute type: ${String(curValue)}`)
     }
   }
 
   getLayout (doc: Obj): AnyLayout {
-    if ((doc as any).__layout) {
+    if ((doc as any).__layout !== undefined) {
       return ((doc as unknown as Proxy).__layout) as AnyLayout
     }
     return (doc as unknown) as AnyLayout
@@ -309,7 +309,7 @@ export class Model implements Storage {
     const r = values
 
     // Also assign a class to value if not specified
-    if (!layout._class) {
+    if (layout._class === undefined) {
       layout._class = this.getClass(_class) // Be sure we use class, not a mixin.
     }
     for (const rKey in values) {
@@ -335,11 +335,11 @@ export class Model implements Storage {
         switch (attr.type._class) {
           case CORE_CLASS_ARRAY_OF: {
             const attrClass = this.attributeClass((attr.type as ArrayOf).of)
-            if (attrClass) {
+            if (attrClass !== undefined) {
               const rValue = r[rKey]
               if (rValue instanceof Array) {
                 let value: unknown[] = []
-                for (const rv of (rValue as Array<unknown>)) {
+                for (const rv of (rValue as unknown[])) {
                   value = this.pushArrayValue(value, attrClass, rv as AnyLayout)
                 }
                 l[key] = (value as unknown) as AnyLayout
@@ -350,7 +350,7 @@ export class Model implements Storage {
           }
           case CORE_CLASS_INSTANCE_OF: {
             const attrClass = ((attr.type as unknown) as Record<string, unknown>).of as Ref<Class<Doc>>
-            if (attrClass) {
+            if (attrClass !== undefined) {
               l[key] = this.assign({}, attrClass, r[rKey] as AnyLayout)
               continue
             }
@@ -378,27 +378,27 @@ export class Model implements Storage {
             this.assign(this.getLayout(match.doc), match.doc._class, op._attributes)
             break
           case TxOperationKind.Push:
-            if (match.attrMatch) {
+            if (match.attrMatch !== undefined) {
               const { attr, key } = match.attrMatch
 
               const l = (match.doc as unknown) as AnyLayout
               switch (attr.type._class) {
                 case CORE_CLASS_ARRAY_OF: {
                   const attrClass = this.attributeClass((attr.type as ArrayOf).of)
-                  if (attrClass === null) {
-                    throw new Error(`Invalid attribute type/class: ${attr.type}`)
+                  if (attrClass === undefined) {
+                    throw new Error(`Invalid attribute type/class: ${String(attr.type)}`)
                   }
                   l[key] = this.pushArrayValue(l[key], attrClass, op._attributes)
                   break
                 }
 
                 default:
-                  throw new Error(`Invalid attribute type: ${attr.type}`)
+                  throw new Error(`Invalid attribute type: ${String(attr.type)}`)
               }
             }
             break
           case TxOperationKind.Pull:
-            if (match.attrMatch) {
+            if (match.attrMatch !== undefined) {
               const { attr, key } = match.attrMatch
 
               const l = (match.parent as unknown) as AnyLayout
@@ -411,7 +411,7 @@ export class Model implements Storage {
                   break
                 }
                 case CORE_CLASS_INSTANCE_OF: {
-                  delete (l as any)[key]
+                  delete (l as any)[key] // eslint-disable-line @typescript-eslint/no-dynamic-delete
                   break
                 }
               }
@@ -419,14 +419,10 @@ export class Model implements Storage {
             break
         }
       } else {
-        throw new Error(`failed to object by query:${op.selector}`)
+        throw new Error(`failed to object by query:${JSON.stringify(op.selector)}`)
       }
     }
     return doc
-  }
-
-  generateId (): Ref<Doc> {
-    return generateId() as Ref<Doc>
   }
 
   public mixinDocument<E extends Obj, T extends Obj> (doc: E, clazz: Ref<Mixin<T>>, values: Partial<Omit<T, keyof E>>): void {
@@ -439,10 +435,10 @@ export class Model implements Storage {
   }
 
   private static includeMixinAny (doc: any, clazz: Ref<Mixin<Obj>>): void {
-    if (!doc._mixins) {
+    if (doc._mixins === undefined) {
       doc._mixins = []
     }
-    const mixins = (doc._mixins as Ref<Mixin<Obj>>[])
+    const mixins = (doc._mixins as Array<Ref<Mixin<Obj>>>)
     if (mixins.indexOf(clazz) === -1) {
       mixins.push(clazz)
     }
@@ -452,10 +448,10 @@ export class Model implements Storage {
     this.mixinDocument(this.get(id), clazz, values)
   }
 
-  getClassHierarchy (cls: Ref<Class<Obj>>, top?: Ref<Class<Obj>>): Ref<Class<Obj>>[] {
-    const result = [] as Ref<Class<Obj>>[]
+  getClassHierarchy (cls: Ref<Class<Obj>>, top?: Ref<Class<Obj>>): Array<Ref<Class<Obj>>> {
+    const result: Array<Ref<Class<Obj>>> = []
     let _class = cls as Ref<Class<Obj>> | undefined
-    while (_class && _class !== top) {
+    while ((_class !== undefined) && _class !== top) {
       result.push(_class)
       _class = this.get(_class)._extends
     }
@@ -463,8 +459,8 @@ export class Model implements Storage {
   }
 
   is (_class: Ref<Class<Obj>>, a: Ref<Class<Obj>>): boolean {
-    let cls = _class as Ref<Class<Obj>> | undefined
-    while (cls) {
+    let cls: Ref<Class<Obj>> | undefined = _class
+    while (cls !== undefined) {
       if (cls === a) {
         return true
       }
@@ -474,7 +470,7 @@ export class Model implements Storage {
   }
 
   dump (): Doc[] {
-    const result = []
+    const result: Doc[] = []
     for (const doc of this.objects.values()) {
       result.push(doc)
     }
@@ -485,7 +481,8 @@ export class Model implements Storage {
     if (this.domain !== domain) {
       throw new Error('domain does not match')
     }
-    return Promise.resolve(this.dump())
+    const docs = await Promise.resolve(this.dump())
+    return docs
   }
 
   loadModel (model: Doc[]): void {
@@ -503,7 +500,7 @@ export class Model implements Storage {
    *
    * flatten queries are applicable only for mongoDB and not supported by model search operations.
    */
-  createQuery<T extends Doc> (_class: Ref<Class<T>>, _query: DocumentQuery<T>, flatten = false): { query: DocumentQuery<T>, classes: Ref<Class<Obj>>[] } {
+  createQuery<T extends Doc> (_class: Ref<Class<T>>, _query: DocumentQuery<T>, flatten = false): { query: DocumentQuery<T>, classes: Array<Ref<Class<Obj>>> } {
     let query = this.assign({}, _class, _query as AnyLayout)
 
     if (flatten) {
@@ -512,7 +509,7 @@ export class Model implements Storage {
 
     const cl = this.getClass(_class)
     query._class = cl
-    const classes: Ref<Class<Obj>>[] = []
+    const classes: Array<Ref<Class<Obj>>> = []
 
     const byClass = this.extendsOfClass(query._class as Ref<Class<Doc>>)
     const byClassNotMixin = byClass.filter((cl) => !this.is(cl._id as Ref<Class<Obj>>, CORE_CLASS_MIXIN)).map(p => p._id as Ref<Class<Obj>>)
@@ -564,11 +561,11 @@ export class Model implements Storage {
       switch (attr.type._class) {
         case CORE_CLASS_ARRAY_OF: {
           const attrClass = this.attributeClass((attr.type as ArrayOf).of)
-          if (attrClass) {
+          if (attrClass !== undefined) {
             const rValue = layout[rKey]
             if (rValue instanceof Array) {
               let value: unknown[] = []
-              for (const rv of (rValue as Array<unknown>)) {
+              for (const rv of (rValue as unknown[])) {
                 value = this.flattenArrayValue(value, attrClass, rv as AnyLayout)
               }
               l[key] = { $all: value as Property<any, any> }
@@ -584,7 +581,7 @@ export class Model implements Storage {
         case CORE_CLASS_INSTANCE_OF: {
           // Flatten any
           const attrClass = ((attr.type as unknown) as Record<string, unknown>).of as Ref<Class<Doc>>
-          if (attrClass) {
+          if (attrClass !== undefined) {
             for (const oo of Object.entries(this.flattenQuery(attrClass, (layout[rKey] as unknown) as AnyLayout))) {
               l[key + '.' + oo[0]] = oo[1]
             }
@@ -608,13 +605,14 @@ export class Model implements Storage {
     return this.findAll(byClass, clazz, realQuery as unknown as AnyLayout, limit) as T[]
   }
 
-  find<T extends Doc> (clazz: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T[]> {
-    return Promise.resolve(this.findSync(clazz, query))
+  async find<T extends Doc> (clazz: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T[]> {
+    const docs = await Promise.resolve(this.findSync(clazz, query))
+    return docs
   }
 
-  findOne<T extends Doc> (clazz: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined> {
-    const result = this.findSync(clazz, query, 1)
-    return Promise.resolve(result.length === 0 ? undefined : result[0])
+  async findOne<T extends Doc> (clazz: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined> {
+    const result = await Promise.resolve(this.findSync(clazz, query, 1))
+    return result.length === 0 ? undefined : result[0]
   }
 
   /**
@@ -649,7 +647,7 @@ export class Model implements Storage {
 
   private createPrototype (classifier: Class<Obj>): Record<string, unknown> {
     const attributes = classifier._attributes as { [key: string]: Attribute }
-    const descriptors = {} as PropertyDescriptorMap
+    const descriptors: PropertyDescriptorMap = {}
     for (const key in attributes) {
       const attributeKey = this.attributeKey(classifier, key)
       descriptors[key] = {
@@ -669,13 +667,13 @@ export class Model implements Storage {
       }
     }
 
-    const proto = Object.create(classifier._extends ? this.getPrototype(classifier._extends) : Object.prototype)
+    const proto = Object.create((classifier._extends !== undefined) ? this.getPrototype(classifier._extends) : Object.prototype)
     return Object.defineProperties(proto, descriptors)
   }
 
   private getPrototype (mixin: Ref<Class<Obj>>): Record<string, unknown> {
     const proto = this.prototypes.get(mixin)
-    if (!proto) {
+    if (proto === undefined) {
       const proto = this.createPrototype(this.get(mixin))
       this.prototypes.set(mixin, proto)
       return proto
@@ -719,7 +717,7 @@ export class Model implements Storage {
   }
 
   public isMixedIn (obj: Obj, _class: Ref<Mixin<Obj>>): boolean {
-    return obj._mixins ? obj._mixins.includes(_class) : false
+    return (obj._mixins !== undefined) ? obj._mixins.includes(_class) : false
   }
 
   public asMixin<T extends Doc> (obj: Obj, _class: Ref<Mixin<T>>, action: (doc: T) => void): void {
@@ -731,80 +729,66 @@ export class Model implements Storage {
   // S T O R A G E
 
   async store (ctx: TxContext, doc: Doc): Promise<void> {
-    this.add(doc)
-    return Promise.resolve()
+    await Promise.resolve(this.add(doc))
   }
 
-  push (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: AnyLayout): Promise<void> { // eslint-disable-line
-    const mdlObj = this.get(_id)
-    if (!mdlObj) {
-      return Promise.reject(new Error('No object found ' + (_id as string)))
-    }
-    this.updateDocument(mdlObj, [{
+  push<T extends Doc> (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: DocumentValue<T>): void {
+    const txOp: TxOperation = {
+      _class: CORE_CLASS_TX_OPERATION,
       kind: TxOperationKind.Push,
       _attributes: attributes,
-      selector: [{ key: attribute } as ObjectSelector]
-    } as TxOperation])
-    return Promise.resolve()
+      selector: [{ _class: CORE_CLASS_OBJECT_SELECTOR, key: attribute }]
+    }
+    this.updateDocument(this.get(_id), [txOp])
   }
 
-  pull (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: AnyLayout): Promise<void> { // eslint-disable-line
-    const mdlObj = this.get(_id)
-    if (!mdlObj) {
-      return Promise.reject(new Error('No object found ' + (_id as string)))
-    }
-    this.updateDocument(mdlObj, [{
+  pull<T extends Doc> (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: DocumentValue<T>): void {
+    const txOp: TxOperation = {
+      _class: CORE_CLASS_TX_OPERATION,
       kind: TxOperationKind.Pull,
       _attributes: attributes,
-      selector: [{ key: attribute, pattern: attributes } as ObjectSelector]
-    } as TxOperation])
-    return Promise.resolve()
+      selector: [{ _class: CORE_CLASS_OBJECT_SELECTOR, key: attribute, pattern: attributes }]
+    }
+    this.updateDocument(this.get(_id), [txOp])
   }
 
   updateDocumentSet<T extends Obj> (doc: T, _attributes: AnyLayout): T {
-    return this.updateDocument(doc, [{ kind: TxOperationKind.Set, _attributes } as TxOperation])
+    const txOp: TxOperation = { _class: CORE_CLASS_TX_OPERATION, kind: TxOperationKind.Set, _attributes }
+    return this.updateDocument(doc, [txOp])
   }
 
   updateDocumentPush<T extends Obj> (doc: T, _attribute: string, _attributes: AnyLayout): T {
-    return this.updateDocument(doc, [
-      {
-        kind: TxOperationKind.Push,
-        _attributes,
-        selector: [{ key: _attribute } as ObjectSelector]
-      } as TxOperation])
+    const txOp: TxOperation = {
+      _class: CORE_CLASS_TX_OPERATION,
+      kind: TxOperationKind.Push,
+      _attributes,
+      selector: [{ _class: CORE_CLASS_OBJECT_SELECTOR, key: _attribute }]
+    }
+    return this.updateDocument(doc, [txOp])
   }
 
   updateDocumentPull<T extends Obj> (doc: T, _attribute: string, _attributes: AnyLayout): T {
-    return this.updateDocument(doc, [
-      {
-        kind: TxOperationKind.Pull,
-        selector: [{ key: _attribute, pattern: _attributes } as ObjectSelector]
-      } as TxOperation])
+    const txOp: TxOperation = {
+      _class: CORE_CLASS_TX_OPERATION,
+      kind: TxOperationKind.Pull,
+      selector: [{ _class: CORE_CLASS_OBJECT_SELECTOR, key: _attribute, pattern: _attributes }]
+    }
+    return this.updateDocument(doc, [txOp])
   }
 
-  update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, operations: TxOperation[]): Promise<void> { // eslint-disable-line
-    const mdlObj = this.get(_id)
-    if (!mdlObj) {
-      return Promise.reject(new Error('No object found ' + (_id as string)))
-    }
-    this.updateDocument(mdlObj, operations)
-    return Promise.resolve()
+  async update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, operations: TxOperation[]): Promise<void> {
+    await Promise.resolve(this.updateDocument(this.get(_id), operations))
   }
 
-  remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<void> { // eslint-disable-line
-    const mdlObj = this.get(_id)
-    if (!mdlObj) {
-      return Promise.reject(new Error('No object found ' + (_id as string)))
-    }
-    this.removeDocument(mdlObj)
-    return Promise.resolve()
+  async remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<void> {
+    await Promise.resolve(this.removeDocument(this.get(_id)))
   }
 
   public removeDocument<T extends Doc> (doc: T): T {
     this.objects.delete(doc._id)
-    if (this.byClass) {
+    if (this.byClass !== undefined) {
       const objs = this.byClass.get(doc._class)?.filter((e) => e._id !== doc._id)
-      if (objs) {
+      if (objs !== undefined) {
         this.byClass.set(doc._class, objs)
       } else {
         // No items of class, so lets' remove it
@@ -834,36 +818,36 @@ export class Model implements Storage {
    * {fullMatch} is used as true to match against array with passing objects, it will match for all values.
    * If used as false, it will find at least one match for object with array value.
    */
-  private matchSelector (_class: Ref<Class<Obj>>, doc: Obj, selector: ObjectSelector[] | undefined): { match: boolean, value?: any, attrMatch?: AttributeMatch, doc: Obj, parent: Obj } {
-    if (selector && isValidSelector(selector)) {
+  private matchSelector (_class: Ref<Class<Obj>>, doc: Obj, selector?: ObjectSelector[]): { match: boolean, value?: any, attrMatch?: AttributeMatch, doc: Obj, parent: Obj } {
+    if ((selector !== undefined) && isValidSelector(selector)) {
       let current = doc
       let parent = doc
       let currentClass = _class
 
       for (let segmId = 0; segmId < selector.length; segmId++) {
         const segm = selector[segmId]
-        if (!segm.key || segm.key === '') {
+        if (segm.key === '') {
           throw new Error('Object selector field should be specified')
         }
         const attr = this.classAttribute(currentClass, segm.key)
 
-        if (!segm.pattern) {
+        if (segm.pattern === undefined) {
           if (segmId === selector.length - 1) {
             // Last one, we could omit check, since it will be for push operation.
             return { match: true, attrMatch: attr, doc: current, parent }
           }
-          throw new Error(`Pattern field for middle selector should be specified ${selector}`)
+          throw new Error(`Pattern field for middle selector should be specified ${String(selector)}`)
         }
         const attrClass = this.attributeClass(attr.attr.type)
 
         // If this is our proxy, we should unwrap it.
         const cany = (current as any)
-        const docValue = (cany.__layout ? cany.__layout : cany)[attr.key]
+        const docValue = (cany.__layout !== undefined ? cany.__layout : cany)[attr.key]
         const res = this.matchValue(attrClass, docValue, segm.pattern, false)
-        if (!res) {
+        if (res === undefined) {
           throw new Error('failed to match embedded object of value')
         }
-        if (attrClass && this.is(attrClass, CORE_CLASS_OBJ)) {
+        if ((attrClass !== undefined) && this.is(attrClass, CORE_CLASS_OBJ)) {
           parent = current
           current = res.value as Obj
           currentClass = attrClass
@@ -872,8 +856,8 @@ export class Model implements Storage {
           return { match: true, value: res.value, doc: current, attrMatch: attr, parent }
         } else {
           // If attribute class is based on doc.
-          if (attrClass && !this.is(attrClass, CORE_CLASS_OBJ)) {
-            throw new Error(`failed to match embedded object of value for class ${attrClass} of value ${current}`)
+          if ((attrClass !== undefined) && !this.is(attrClass, CORE_CLASS_OBJ)) {
+            throw new Error(`failed to match embedded object of value for class ${attrClass} of value ${String(current)}`)
           }
         }
       }
@@ -882,7 +866,7 @@ export class Model implements Storage {
   }
 
   private matchObject<T extends Obj> (_class: Ref<Class<T>>, doc: T, query: DocumentQuery<T>, fullMatch = false): boolean {
-    if ((doc as any).__layout) {
+    if ((doc as any).__layout !== undefined) {
       // This is our proxy, we should unwrap it.
       doc = (doc as any).__layout
     }
@@ -915,27 +899,27 @@ export class Model implements Storage {
     return count === queryEntries.length
   }
 
-  public attributeClass (type: Type): Ref<Class<Doc>> | null {
+  public attributeClass (type: Type): Ref<Class<Doc>> | undefined {
     switch (type._class) {
       case CORE_CLASS_ARRAY_OF:
         return this.attributeClass((type as ArrayOf).of)
       case CORE_CLASS_INSTANCE_OF:
         return ((type as unknown) as Record<string, unknown>).of as Ref<Class<Doc>>
     }
-    return null
+    return undefined
   }
 
-  private matchValue<T extends Obj> (fieldClass: Ref<Class<T>> | null, docValue: unknown, value: unknown, fullMatch: boolean): { result: boolean, value?: any } {
+  private matchValue<T extends Obj> (fieldClass: Ref<Class<T>> | undefined, docValue: unknown, value: unknown, fullMatch: boolean): { result: boolean, value?: any } {
     const objDocValue = Object(docValue)
     if (objDocValue !== docValue) {
       // Check if value is primitive, so we will just compare
       if (value instanceof Object) {
         // Check for mongo line matching instructions.
-        const vObj = value as Record<string, unknown>
+        const vObj = value as RegExpression
         const regex = vObj.$regex
-        if (regex as string) {
+        if (regex !== undefined) {
           const options = vObj.$options
-          const reg = RegExp(regex as string, (options as string) || '')
+          const reg = RegExp(regex, options)
           return { result: reg.test(docValue as string), value: docValue }
         }
       }
@@ -970,9 +954,9 @@ export class Model implements Storage {
           }
         }
       } else {
-        if (fieldClass) {
+        if (fieldClass !== undefined) {
           return {
-            result: this.matchObject(fieldClass, docValue as Obj, (value as unknown) as AnyLayout),
+            result: this.matchObject(fieldClass, docValue as Obj, (value) as AnyLayout),
             value: docValue
           }
         }

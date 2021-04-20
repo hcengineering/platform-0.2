@@ -19,6 +19,7 @@ import { AnyLayout, Class, DateProperty, Doc, Emb, Mixin, Property, Ref, StringP
 
 export const CORE_CLASS_TX = 'class:core.Tx' as Ref<Class<Tx>>
 export const CORE_CLASS_OBJECT_TX = 'class:core.ObjectTx' as Ref<Class<ObjectTx>>
+export const CORE_CLASS_OBJECT_SELECTOR = 'class:core.ObjectSelector' as Ref<Class<ObjectSelector>>
 export const CORE_CLASS_OBJECTTX_DETAILS = 'class:core.ObjectTxDetails' as Ref<Class<ObjectTxDetails>>
 export const CORE_CLASS_CREATE_TX = 'class:core.CreateTx' as Ref<Class<CreateTx>>
 export const CORE_CLASS_UPDATE_TX = 'class:core.UpdateTx' as Ref<Class<UpdateTx>>

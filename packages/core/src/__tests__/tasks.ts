@@ -61,7 +61,7 @@ export function createSubtask (name: string, rate = 30, comments: TaskComment[] 
     rate: rate,
     _class: taskIds.class.Subtask,
     comments: comments
-  } as SubTask
+  }
 }
 
 /**
@@ -70,13 +70,13 @@ export function createSubtask (name: string, rate = 30, comments: TaskComment[] 
  */
 export function createTask (name: string, rate: number, description: string): Task {
   return {
-    _id: generateId() as Ref<Doc>,
+    _id: generateId(),
     _class: taskIds.class.Task,
     name,
     description,
     lists: [name],
     rate
-  } as Task
+  }
 }
 
 export const doc1 = {
@@ -91,4 +91,4 @@ export const doc1 = {
     createSubtask('subtask1', 31),
     createSubtask('subtask2', 33)
   ]
-} as Task
+}

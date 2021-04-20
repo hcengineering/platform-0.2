@@ -24,7 +24,8 @@ import type {
   CreateTx, DeleteTx, ObjectSelector, ObjectTx, ObjectTxDetails, Reference, Space, TxOperation, UpdateTx
 } from '@anticrm/domains'
 import {
-  Application, CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_OBJECT_TX, CORE_CLASS_OBJECTTX_DETAILS,
+  Application, CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_OBJECT_SELECTOR, CORE_CLASS_OBJECT_TX,
+  CORE_CLASS_OBJECTTX_DETAILS,
   CORE_CLASS_SPACE,
   CORE_CLASS_TX_OPERATION,
   CORE_CLASS_UPDATE_TX, CORE_MIXIN_SHORTID,
@@ -67,7 +68,7 @@ const modelIds = identify('core' as AnyPlugin, {
     ObjectTxDetails: CORE_CLASS_OBJECTTX_DETAILS as Ref<Class<ObjectTxDetails>>,
     CreateTx: CORE_CLASS_CREATE_TX as Ref<Class<CreateTx>>,
     UpdateTx: CORE_CLASS_UPDATE_TX as Ref<Class<UpdateTx>>,
-    ObjectSelector: '' as Ref<Class<ObjectSelector>>,
+    ObjectSelector: CORE_CLASS_OBJECT_SELECTOR as Ref<Class<ObjectSelector>>,
     TxOperation: CORE_CLASS_TX_OPERATION as Ref<Class<TxOperation>>,
     DeleteTx: CORE_CLASS_DELETE_TX as Ref<Class<DeleteTx>>,
 

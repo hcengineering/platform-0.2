@@ -18,9 +18,21 @@
     "editor.defaultFormatter": "dbaeumer.vscode-eslint"
   },
   "eslint.format.enable": true,
-  "editor.formatOnSave": true,
+  "editor.formatOnSave": false,
   "eslint.alwaysShowStatus": true,
   "eslint.packageManager": "yarn",
-  "eslint.probe": ["javascript", "typescript", "svelte"],
-  "eslint.validate": ["javascript", "typescript", "svelte"]
+  "eslint.probe": [
+    "javascript",
+    "typescript",
+    "svelte"
+  ],
+  "eslint.validate": [
+    "javascript",
+    "typescript",
+    "svelte"
+  ],
+  "javascript.validate.enable": false,
+  "typescript.validate.enable": false,
+  "standard.engine": "ts-standard",
+  "standard.enable": true
 }
