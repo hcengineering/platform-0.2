@@ -22,7 +22,7 @@ import { accountsDb, createUserAccount, getUserAccount, withTenant } from '@anti
 
 import { Builder } from '@anticrm/model'
 
-import { CORE_CLASS_CLASS, Doc } from '@anticrm/core'
+import { Doc } from '@anticrm/core'
 
 import { model } from '@anticrm/model/src/__model__'
 import { model as presentation } from '@anticrm/presentation/src/__model__'
@@ -32,6 +32,7 @@ import { model as task } from '@anticrm/task/src/__model__'
 import { model as chunter } from '@anticrm/chunter/src/__model__'
 import { readResponse, serialize } from '@anticrm/rpc'
 import { model as activityPlugin } from '@anticrm/activity/src/__model__'
+import { CORE_CLASS_SPACE } from '@anticrm/domains'
 // import recruitmentModel from '@anticrm/recruitment-model/src/model'
 
 // import taskStrings from '@anticrm/task-model/src/strings/ru'
@@ -158,7 +159,7 @@ describe('server', () => {
     conn.send(serialize({
       method: 'find',
       params: [
-        CORE_CLASS_CLASS,
+        CORE_CLASS_SPACE,
         {}
       ]
     }))

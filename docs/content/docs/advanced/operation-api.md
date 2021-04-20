@@ -20,8 +20,8 @@ At first we need to know how to obtain an object or set of object within a platf
 
 ```typescript
 export interface DocumentProtocol {
-  find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]>
-  findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined>
+  find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T[]>
+  findOne<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined>
   loadDomain (domain: string): Promise<Doc[]>
 }
 ```
@@ -70,7 +70,7 @@ cs.find(task.mixin.VersionedTask, { version: { version: "1.0.0" } })
 
 ```typescript
 export interface OperationProtocol {
-	create<T extends Doc> (_class: Ref<Class<T>>, values: AnyLayout | Doc): Promise<T>
+	create<T extends Doc> (_class: Ref<Class<T>>, values: Partial<Doc>): Promise<T>
   update<T extends Doc> (doc: T, value: Partial<Omit<T, keyof Doc>>): Promise<T>
   updateWith<T extends Doc> (doc: T, builder: (s: TxBuilder<T>) => TxOperation | TxOperation[]): Promise<T>
   remove<T extends Doc> (doc: T): Promise<T>

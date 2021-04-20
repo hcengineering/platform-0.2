@@ -15,7 +15,7 @@ limitations under the License.
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
 
-  import type { DateProperty, Ref, StringProperty } from '@anticrm/core'
+  import type { DateProperty, DocumentValue, Ref, StringProperty } from '@anticrm/core'
   import { generateId } from '@anticrm/core'
   import type { Space } from '@anticrm/domains'
   import type { Person } from '@anticrm/contact'
@@ -71,15 +71,15 @@ limitations under the License.
     const doc = {
       ...personM,
       _space: space?._id,
-      _createBy: core.getUserId()
-    }
+      _createdBy: core.getUserId()
+    } as DocumentValue<Person>
 
-    model.mixinDocument(doc, recruiting.mixin.WithCandidateProps, {
+    model.mixinDocument(doc as Person, recruiting.mixin.WithCandidateProps, {
       candidate: candidateM,
       resume: resumeM
     })
 
-    await core.create(contact.class.Person, doc)
+    await core.create<Person>(contact.class.Person, doc)
 
     dispatch('close')
   }

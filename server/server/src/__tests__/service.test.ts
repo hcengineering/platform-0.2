@@ -83,7 +83,8 @@ describe('service', () => {
       'test@client1' as StringProperty
     ))
 
-    const spaces = await c1.find(CORE_CLASS_SPACE, { isPublic: true as Property<boolean, boolean> })
+    const spaces = await c1.find<Space>(CORE_CLASS_SPACE, { isPublic: true })
+
     expect(spaces.length).toEqual(4)
     await clients[1].wait()
 
@@ -156,7 +157,10 @@ describe('service', () => {
       {
         _class: CORE_CLASS_SPACE,
         name: 'shared-space',
-        users: [{ userId: 'test@client1', owner: true } as unknown as SpaceUser, { userId: 'test@client2', owner: false } as unknown as SpaceUser],
+        users: [{ userId: 'test@client1', owner: true } as unknown as SpaceUser, {
+          userId: 'test@client2',
+          owner: false
+        } as unknown as SpaceUser],
         isPublic: false
       } as unknown as Space,
       'test@client1' as StringProperty

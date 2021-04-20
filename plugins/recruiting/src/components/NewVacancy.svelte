@@ -15,7 +15,7 @@ limitations under the License.
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
 
-  import type { DateProperty, Ref, StringProperty } from '@anticrm/core'
+  import type { DateProperty, DocumentValue, Ref, StringProperty } from '@anticrm/core'
   import { generateId } from '@anticrm/core'
   import type { Space } from '@anticrm/domains'
   import { getCoreService } from '@anticrm/presentation'
@@ -51,11 +51,11 @@ limitations under the License.
 
     const doc = {
       ...vacancy,
-      _space: space?._id,
-      _createBy: core.getUserId()
-    }
+      _space: space?._id as Ref<Space>,
+      _createdBy: core.getUserId() as StringProperty
+    } as DocumentValue<Vacancy>
 
-    await core.create(recruiting.class.Vacancy, doc)
+    await core.create<Vacancy>(recruiting.class.Vacancy, doc)
 
     dispatch('close')
   }

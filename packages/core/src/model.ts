@@ -19,7 +19,7 @@ import {
   CORE_CLASS_MIXIN,
   CORE_CLASS_OBJ, CORE_MIXIN_INDICES, Doc, Mixin, Obj, Property, PropertyType, Ref, Type
 } from './classes'
-import { generateId, Storage, TxContext } from './storage'
+import { DocumentQuery, DocumentValue, generateId, Storage, TxContext } from './storage'
 
 export function mixinKey (mixin: Ref<Mixin<Obj>>, key: string): string {
   return key + '|' + mixin.replace('.', '~')
@@ -38,12 +38,6 @@ export const SPACE_DOMAIN = 'space'
 
 interface Proxy {
   __layout: Record<string, unknown>
-}
-
-export interface FieldRef {
-  parent: Obj
-  field: Attribute
-  key: string
 }
 
 export function isValidSelector (selector: ObjectSelector[]): boolean {
@@ -199,13 +193,13 @@ export class Model implements Storage {
   /**
    * Construct a new proper document with all desired fields.
    * @param _class
-   * @param _id
-   * @param layout
+   * @param values
+   * @param _id - optional id, if not sepecified will be automatically generated.
    */
-  public newDoc<T extends Doc> (_class: Ref<Class<T>>, _id: Ref<Doc>, layout: AnyLayout): T {
-    const doc = (this.assign({}, _class, layout) as unknown) as T
-    doc._id = _id
-    return doc
+  createDocument<T extends Doc> (_class: Ref<Class<T>>, values: DocumentValue<T>, _id?: Ref<T>): T {
+    const doc = this.assign({}, _class, (values as unknown) as AnyLayout)
+    doc._id = _id ?? this.generateId()
+    return (doc as unknown) as T
   }
 
   public classAttribute (cls: Ref<Class<Obj>>, key: string): AttributeMatch {
@@ -225,7 +219,7 @@ export class Model implements Storage {
       }
       _class = clazz._extends
     }
-    throw new Error('attribute not found: ' + key)
+    throw new Error(`attribute not found: ${key} in ${cls}`)
   }
 
   public pushArrayValue (curValue: unknown, attrClass: Ref<Class<Doc>>, embedded: AnyLayout): Array<PropertyType> {
@@ -279,10 +273,13 @@ export class Model implements Storage {
       layout._class = this.getClass(_class) // Be sure we use class, not a mixin.
     }
     for (const rKey in values) {
+      // TODO: Will be removed with fix to #398
       if (rKey.startsWith('_')) {
         l[rKey] = r[rKey]
-      } else if (rKey.indexOf('|') > 0) {
-        // So key is probable mixin, let's find a mixin class and try assign value.
+        continue
+      }
+      if (rKey.indexOf('|') > 0) {
+        // So key is probable mixin, this is required to create objects with mixins defined already.
         const { mixin, key } = mixinFromKey(rKey)
         this.assign(layout, mixin, { [key]: r[rKey] })
       } else {
@@ -325,7 +322,7 @@ export class Model implements Storage {
   /**
    * Perform update of document attributes
    * @param doc - document to update
-   * @param query - define a embedded document query.
+   * @param operations - define a set of operations to update for document.
    * @param operations - new attribute values
    */
   public updateDocument<T extends Obj> (doc: T, operations: TxOperation[]): T {
@@ -387,16 +384,6 @@ export class Model implements Storage {
 
   generateId (): Ref<Doc> {
     return generateId() as Ref<Doc>
-  }
-
-  createDocument<M extends Doc> (_class: Ref<Class<M>>, values: Omit<M, keyof Doc>, _id?: Ref<M>): M {
-    const layout = {
-      _class,
-      _id: _id ?? this.generateId()
-    }
-    this.assign(layout, _class, (values as unknown) as AnyLayout)
-    // this.add(layout)
-    return (layout as unknown) as M
   }
 
   public mixinDocument<E extends Obj, T extends Obj> (doc: E, clazz: Ref<Mixin<T>>, values: Partial<Omit<T, keyof E>>): void {
@@ -480,8 +467,8 @@ export class Model implements Storage {
    *
    * flatten queries are applicable only for mongoDB and not supported by model search operations.
    */
-  createQuery (_class: Ref<Class<Doc>>, _query: AnyLayout, flatten = false): AnyLayout {
-    let query = this.assign({}, _class, _query)
+  createQuery<T extends Doc> (_class: Ref<Class<T>>, _query: DocumentQuery<T>, flatten = false): AnyLayout {
+    let query = this.assign({}, _class, _query as AnyLayout)
 
     if (flatten) {
       query = this.flattenQuery(_class, query)
@@ -500,79 +487,79 @@ export class Model implements Storage {
 
     // Also assign a class to value if not specified
     for (const rKey in layout) {
+      let match: AttributeMatch
+      // TODO: Will be removed with fix to #398
       if (rKey.startsWith('_')) {
         l[rKey] = layout[rKey]
+        continue
+      }
+      if (rKey.indexOf('|') > 0) {
+        // So key is probable mixin, let's find a mixin class and try assign value.
+        const { mixin, key } = mixinFromKey(rKey)
+        match = this.classAttribute(mixin, key)
       } else {
-        let match: AttributeMatch
+        match = this.classAttribute(_class, rKey)
+      }
 
-        if (rKey.indexOf('|') > 0) {
-          // So key is probable mixin, let's find a mixin class and try assign value.
-          const { mixin, key } = mixinFromKey(rKey)
-          match = this.classAttribute(mixin, key)
-        } else {
-          match = this.classAttribute(_class, rKey)
-        }
-
-        const {
-          attr,
-          key
-        } = match
-        // Check if we need to perform inner assign based on field value and type
-        switch (attr.type._class) {
-          case CORE_CLASS_ARRAY_OF: {
-            const attrClass = this.attributeClass((attr.type as ArrayOf).of)
-            if (attrClass) {
-              const rValue = layout[rKey]
-              if (rValue instanceof Array) {
-                let value: unknown[] = []
-                for (const rv of (rValue as Array<unknown>)) {
-                  value = this.flattenArrayValue(value, attrClass, rv as AnyLayout)
-                }
-                l[key] = { $all: value as Property<any, any> }
-                continue
-              } else if (rValue instanceof Object) {
-                // We should use $elemMatch.
-                l[key] = { $elemMatch: this.flattenQuery(attrClass, (rValue as unknown) as AnyLayout) }
-                continue
+      const {
+        attr,
+        key
+      } = match
+      // Check if we need to perform inner assign based on field value and type
+      switch (attr.type._class) {
+        case CORE_CLASS_ARRAY_OF: {
+          const attrClass = this.attributeClass((attr.type as ArrayOf).of)
+          if (attrClass) {
+            const rValue = layout[rKey]
+            if (rValue instanceof Array) {
+              let value: unknown[] = []
+              for (const rv of (rValue as Array<unknown>)) {
+                value = this.flattenArrayValue(value, attrClass, rv as AnyLayout)
               }
-            }
-            break
-          }
-          case CORE_CLASS_INSTANCE_OF: {
-            // Flatten any
-            const attrClass = ((attr.type as unknown) as Record<string, unknown>).of as Ref<Class<Doc>>
-            if (attrClass) {
-              for (const oo of Object.entries(this.flattenQuery(attrClass, (layout[rKey] as unknown) as AnyLayout))) {
-                l[key + '.' + oo[0]] = oo[1]
-              }
+              l[key] = { $all: value as Property<any, any> }
+              continue
+            } else if (rValue instanceof Object) {
+              // We should use $elemMatch.
+              l[key] = { $elemMatch: this.flattenQuery(attrClass, (rValue as unknown) as AnyLayout) }
               continue
             }
-            break
           }
+          break
         }
-        // Just copy a value here.
-        l[key] = layout[rKey]
+        case CORE_CLASS_INSTANCE_OF: {
+          // Flatten any
+          const attrClass = ((attr.type as unknown) as Record<string, unknown>).of as Ref<Class<Doc>>
+          if (attrClass) {
+            for (const oo of Object.entries(this.flattenQuery(attrClass, (layout[rKey] as unknown) as AnyLayout))) {
+              l[key + '.' + oo[0]] = oo[1]
+            }
+            continue
+          }
+          break
+        }
       }
+      // Just copy a value here.
+      l[key] = layout[rKey]
     }
     return l
   }
 
   // Q U E R Y
 
-  findSync (clazz: Ref<Class<Doc>>, query: AnyLayout, limit = -1): Doc[] {
+  findSync<T extends Doc> (clazz: Ref<Class<Doc>>, query: DocumentQuery<T>, limit = -1): T[] {
     const realQuery = this.createQuery(clazz, query)
     const byClass = this.objectsOfClass(realQuery._class as Ref<Class<Doc>>)
 
-    return this.findAll(byClass, clazz, realQuery, limit)
+    return this.findAll(byClass, clazz, realQuery, limit) as T[]
   }
 
-  find<T extends Doc> (clazz: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
-    return Promise.resolve((this.findSync(clazz, query)) as T[])
+  find<T extends Doc> (clazz: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T[]> {
+    return Promise.resolve(this.findSync(clazz, query))
   }
 
-  findOne<T extends Doc> (clazz: Ref<Class<Doc>>, query: AnyLayout): Promise<T | undefined> {
+  findOne<T extends Doc> (clazz: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined> {
     const result = this.findSync(clazz, query, 1)
-    return Promise.resolve(result.length === 0 ? undefined : result[0] as T)
+    return Promise.resolve(result.length === 0 ? undefined : result[0])
   }
 
   /**
@@ -773,7 +760,7 @@ export class Model implements Storage {
    * @param doc  document to match against.
    * @param query query to check.
    */
-  matchQuery (_class: Ref<Class<Doc>>, doc: Doc, query: AnyLayout): boolean {
+  matchQuery<T extends Doc> (_class: Ref<Class<T>>, doc: Doc, query: DocumentQuery<T>): boolean {
     if (!this.is(_class, doc._class)) {
       // Class doesn't match so return false.
       return false
@@ -833,7 +820,7 @@ export class Model implements Storage {
     return { match: true, doc, parent: doc }
   }
 
-  private matchObject (_class: Ref<Class<Obj>>, doc: Obj, query: AnyLayout, fullMatch = false): boolean {
+  private matchObject<T extends Obj> (_class: Ref<Class<T>>, doc: T, query: DocumentQuery<T>, fullMatch = false): boolean {
     if ((doc as any).__layout) {
       // This is our proxy, we should unwrap it.
       doc = (doc as any).__layout
@@ -877,7 +864,7 @@ export class Model implements Storage {
     return null
   }
 
-  private matchValue (fieldClass: Ref<Class<Obj>> | null, docValue: unknown, value: unknown, fullMatch: boolean): { result: boolean, value?: any } {
+  private matchValue<T extends Obj> (fieldClass: Ref<Class<T>> | null, docValue: unknown, value: unknown, fullMatch: boolean): { result: boolean, value?: any } {
     const objDocValue = Object(docValue)
     if (objDocValue !== docValue) {
       // Check if value is primitive, so we will just compare

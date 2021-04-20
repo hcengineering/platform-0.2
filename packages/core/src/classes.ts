@@ -26,6 +26,7 @@ export interface Obj {
 }
 
 export interface Emb extends Obj {
+  _class: Ref<Class<Emb>>
 }
 
 export interface Doc extends Obj {
@@ -34,7 +35,7 @@ export interface Doc extends Obj {
 }
 
 export type PropertyType = Property<PrimitiveType, any>
-  | { __ref: Doc }
+  | Ref<Doc>
   | Emb
   | PropertyType[]
   | { [key: string]: PropertyType }
