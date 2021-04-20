@@ -20,11 +20,11 @@ export class PassthroughsIndex implements DomainIndex {
   async tx (ctx: TxContext, tx: Tx): Promise<any> {
     switch (tx._class) {
       case CORE_CLASS_CREATE_TX:
-        return this.onCreate(ctx, tx as CreateTx)
+        return await this.onCreate(ctx, tx as CreateTx)
       case CORE_CLASS_UPDATE_TX:
-        return this.onUpdate(ctx, tx as UpdateTx)
+        return await this.onUpdate(ctx, tx as UpdateTx)
       case CORE_CLASS_DELETE_TX:
-        return this.onDelete(ctx, tx as DeleteTx)
+        return await this.onDelete(ctx, tx as DeleteTx)
       default:
         console.log('not implemented tx', tx)
     }
@@ -32,22 +32,22 @@ export class PassthroughsIndex implements DomainIndex {
 
   async onCreate (ctx: TxContext, create: CreateTx): Promise<any> {
     if (!this.modelDb.is(create._objectClass, this.matchClass)) {
-      return Promise.resolve()
+      return await Promise.resolve()
     }
-    return this.storage.store(ctx, this.modelDb.createDocument(create._objectClass, create.object, create._objectId))
+    return await this.storage.store(ctx, this.modelDb.createDocument(create._objectClass, create.object, create._objectId))
   }
 
-  onDelete (ctx: TxContext, tx: DeleteTx): Promise<any> {
+  async onDelete (ctx: TxContext, tx: DeleteTx): Promise<any> {
     if (!this.modelDb.is(tx._objectClass, this.matchClass)) {
-      return Promise.resolve()
+      return await Promise.resolve()
     }
-    return this.storage.remove(ctx, tx._objectClass, tx._objectId)
+    return await this.storage.remove(ctx, tx._objectClass, tx._objectId)
   }
 
-  onUpdate (ctx: TxContext, tx: UpdateTx): Promise<any> {
+  async onUpdate (ctx: TxContext, tx: UpdateTx): Promise<any> {
     if (!this.modelDb.is(tx._objectClass, this.matchClass)) {
-      return Promise.resolve()
+      return await Promise.resolve()
     }
-    return this.storage.update(ctx, tx._objectClass, tx._objectId, tx.operations)
+    return await this.storage.update(ctx, tx._objectClass, tx._objectId, tx.operations)
   }
 }
