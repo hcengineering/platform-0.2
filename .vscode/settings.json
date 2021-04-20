@@ -21,6 +21,16 @@
   "editor.formatOnSave": true,
   "eslint.alwaysShowStatus": true,
   "eslint.packageManager": "yarn",
-  "eslint.probe": ["javascript", "typescript", "svelte"],
-  "eslint.validate": ["javascript", "typescript", "svelte"]
+  "eslint.probe": [
+    "javascript",
+    "typescript",
+    "svelte"
+  ],
+  "eslint.validate": [
+    "javascript",
+    "typescript",
+    "svelte"
+  ],
+  "javascript.validate.enable": false,
+  "standard.engine": "ts-standard"
 }
