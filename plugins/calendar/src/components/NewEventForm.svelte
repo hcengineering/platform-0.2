@@ -19,6 +19,8 @@ limitations under the License.
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
   import EditBox from '@anticrm/sparkling-controls/src/EditBox.svelte'
   import DateInput from '@anticrm/sparkling-controls/src/DateInput.svelte'
+  import UserBox from '@anticrm/platform-ui/src/components/UserBox.svelte'
+  import type { User } from '@anticrm/contact'
   import type { CalendarEvent } from '..'
   import calendar from '..'
 
@@ -27,6 +29,7 @@ limitations under the License.
   const dispatch = createEventDispatcher()
 
   let space: Space | undefined = spaces[0]
+  let selectedUserIndex = 0
 
   const newEvent: CalendarEvent = {
     _id: generateId(),
@@ -55,6 +58,18 @@ limitations under the License.
     return eventEnd
   }
 
+  function getUsers () {
+    if (!space || !space.users) {
+      return []
+    }
+    return space.users.map((user, index) => {
+      return {
+        id: index,
+        name: user.userId
+      }
+    })
+  }
+
   async function save () {
     const core = await coreService
     const doc = {
@@ -62,7 +77,8 @@ limitations under the License.
       startDate: getAllDayEventStart(newEvent.startDate),
       endDate: getAllDayEventEnd(newEvent.endDate),
       _space: space?._id,
-      _createdBy: core.getUserId() as StringProperty
+      _createdBy: core.getUserId() as StringProperty,
+      participants: [core.getUserId() as Ref<User>]
     } as DocumentValue<CalendarEvent>
     await core.create<CalendarEvent>(calendar.class.CalendarEvent, doc)
     dispatch('close')
@@ -75,6 +91,7 @@ limitations under the License.
       <SpaceBox label="Vacancy" {spaces} bind:space />
     {/if}
     <EditBox bind:value={newEvent.summary} label="Summary" placeholder="Summary" />
+    <UserBox bind:selected={selectedUserIndex} items={getUsers()} title="Participant" />
     <DateInput bind:value={newEvent.startDate} label="Start date" placeholder="Start date" relativeToParent={true} />
     <DateInput bind:value={newEvent.endDate} label="End date" placeholder="End date" relativeToParent={true} />
   </div>
