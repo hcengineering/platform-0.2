@@ -13,9 +13,10 @@
 // limitations under the License.
 //
 
-import { DomainIndex, Model, Storage, Tx, TxContext } from '@anticrm/core'
+import { DomainIndex, Model, Ref, Storage, Tx, TxContext } from '@anticrm/core'
 import {
-  CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_UPDATE_TX, CORE_CLASS_VDOC, CreateTx, DeleteTx, TxOperation,
+  CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_UPDATE_TX, CORE_CLASS_VDOC, CreateTx, DeleteTx, Space,
+  TxOperation,
   TxOperationKind, UpdateTx, VDoc
 } from '..'
 
@@ -54,7 +55,13 @@ export class VDocIndex implements DomainIndex {
       vdoc._createdBy = tx._user
       vdoc._createdOn = tx._date
     }
-
+    if (this.modelDb.is(doc._class, CORE_CLASS_VDOC)) {
+      const _space = tx._objectSpace as Ref<Space>
+      if (!_space) {
+        return Promise.reject(new Error('VDoc instances should have _space attribute specified'))
+      }
+      (doc as VDoc)._space = _space
+    }
     return Promise.all([
       this.storage.store(ctx, doc),
       this.transient && this.transient.update(ctx, tx._objectClass, tx._objectId, [{

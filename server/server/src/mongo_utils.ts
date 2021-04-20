@@ -65,32 +65,36 @@ function extractArrayFilter (model: Model, _class: Ref<Class<Doc>>, selector: Ob
 
     const _type = attr.attr.type
 
-    if (segm.pattern) {
-      if (isArrayOf(_type)) {
-        // This is level change.
-        if (isInstanceOf((_type as ArrayOf).of)) {
-          // We moving to next query value.
-          clazz = ((_type as ArrayOf).of as InstanceOf<Emb>).of
-          noNextFilter = setFilter + (setFilter.length > 0 ? '.' : '') + attr.key
-          setFilter = `${noNextFilter}.$[${filterName}]`
-          isArrayAttr = true
-        } else {
-          isArrayAttr = true
-          noNextFilter = setFilter + (setFilter.length > 0 ? '.' : '') + attr.key
-          setFilter = `${noNextFilter}.$[${filterName}]`
-          isPrimitive = true
-        }
-      } else if (isInstanceOf(_type)) {
-        // This is level change.
+    if (isArrayOf(_type)) {
+      // This is level change.
+      isArrayAttr = true
+      if (isInstanceOf((_type as ArrayOf).of)) {
         // We moving to next query value.
-        clazz = (model.get((_type as InstanceOf<Emb>).of) as unknown) as Ref<Class<Obj>>
+        clazz = ((_type as ArrayOf).of as InstanceOf<Emb>).of
+        if (segm.pattern) {
+          noNextFilter = setFilter + (setFilter.length > 0 ? '.' : '') + attr.key
+          setFilter = `${noNextFilter}.$[${filterName}]`
+        }
+      } else {
+        if (segm.pattern) {
+          noNextFilter = setFilter + (setFilter.length > 0 ? '.' : '') + attr.key
+          setFilter = `${noNextFilter}.$[${filterName}]`
+        }
+        isPrimitive = true
+      }
+    } else if (isInstanceOf(_type)) {
+      // This is level change.
+      // We moving to next query value.
+      clazz = (model.get((_type as InstanceOf<Emb>).of) as unknown) as Ref<Class<Obj>>
+      if (segm.pattern) {
         noNextFilter = setFilter + (setFilter.length > 0 ? '.' : '') + attr.key
         setFilter = `${noNextFilter}.$[${filterName}]`
-        isArrayAttr = false
-      } else {
-        throw new Error(`Object selector field type is unsupported ${_type} `)
       }
+      isArrayAttr = false
+    } else {
+      throw new Error(`Object selector field type is unsupported ${_type} `)
     }
+
     if (isPull && segmId === selector.length - 1) {
       // In case of pull
       return {

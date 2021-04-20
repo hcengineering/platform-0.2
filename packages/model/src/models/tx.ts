@@ -16,7 +16,10 @@
 // T R A N S A C T I O N S
 import { ArrayOf$, BagOf$, Class$, InstanceOf$, Prop, RefTo$ } from '../dsl'
 import core from '../index'
-import { CreateTx, DeleteTx, ObjectSelector, TX_DOMAIN, TxOperation, TxOperationKind, UpdateTx } from '@anticrm/domains'
+import {
+  CreateTx, DeleteTx, ObjectSelector, ObjectTx, ObjectTxDetails, Space, TX_DOMAIN, TxOperation, TxOperationKind,
+  UpdateTx
+} from '@anticrm/domains'
 import { AnyLayout, Class, DateProperty, Doc, Property, Ref, StringProperty, Tx } from '@anticrm/core'
 import { TDoc, TEmb } from './core'
 
@@ -26,13 +29,26 @@ export class TTx extends TDoc implements Tx {
   @Prop() _user!: StringProperty
 }
 
-@Class$(core.class.CreateTx, core.class.Tx, TX_DOMAIN)
-export class TCreateTx extends TTx implements CreateTx {
+@Class$(core.class.ObjectTxDetails, core.class.Emb, TX_DOMAIN)
+export class TObjectTxDetails extends TEmb implements ObjectTxDetails {
+  @Prop() name?: string
+  @Prop() id?: string
+  @Prop() description?: string
+}
+
+@Class$(core.class.ObjectTx, core.class.Doc, TX_DOMAIN)
+export class TObjectTx extends TTx implements ObjectTx {
   @RefTo$(core.class.Doc) _objectId!: Ref<Doc>
   @RefTo$(core.class.Class) _objectClass!: Ref<Class<Doc>>
+  @RefTo$(core.class.Space) _objectSpace!: Ref<Space>
 
+  @InstanceOf$(core.class.ObjectTxDetails) _txDetails!: ObjectTxDetails
+}
+
+@Class$(core.class.CreateTx, core.class.Tx, TX_DOMAIN)
+export class TCreateTx extends TObjectTx implements CreateTx {
   @BagOf$()
-  @InstanceOf$(core.class.Emb) object!: AnyLayout
+  @Prop() object!: AnyLayout
 }
 
 @Class$(core.class.ObjectSelector, core.class.Emb, TX_DOMAIN)
@@ -55,18 +71,11 @@ export class TTxOperation extends TEmb implements TxOperation {
 }
 
 @Class$(core.class.UpdateTx, core.class.Tx, TX_DOMAIN)
-export class TUpdateTx extends TTx implements UpdateTx {
-  @RefTo$(core.class.Doc) _objectId!: Ref<Doc>
-  @RefTo$(core.class.Class) _objectClass!: Ref<Class<Doc>>
-
+export class TUpdateTx extends TObjectTx implements UpdateTx {
   @ArrayOf$()
   @InstanceOf$(core.class.TxOperation) operations!: TxOperation[]
 }
 
 @Class$(core.class.DeleteTx, core.class.Tx, TX_DOMAIN)
-export class TDeleteTx extends TTx implements DeleteTx {
-  @RefTo$(core.class.Doc) _objectId!: Ref<Doc>
-  @RefTo$(core.class.Class) _objectClass!: Ref<Class<Doc>>
-
-  @Prop() _query!: AnyLayout
+export class TDeleteTx extends TObjectTx implements DeleteTx {
 }
