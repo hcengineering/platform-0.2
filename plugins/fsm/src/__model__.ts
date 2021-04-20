@@ -18,12 +18,12 @@ import { TDoc } from '@anticrm/model/src/__model__'
 import { UX } from '@anticrm/presentation/src/__model__'
 import { IntlString } from '@anticrm/platform-i18n'
 
-import fsm, { FSM, Transition, State, WithFSM, WithState } from '.'
+import fsmPlugin, { FSM, Transition, State, WithFSM, WithState } from '.'
 
 const FSMDomain = 'fsm'
 
 @UX('FSM' as IntlString)
-@Class$(fsm.class.FSM, core.class.Doc, FSMDomain)
+@Class$(fsmPlugin.class.FSM, core.class.Doc, FSMDomain)
 export class TFSM extends TDoc implements FSM {
   @UX('Name' as IntlString)
   @Prop(CORE_CLASS_STRING)
@@ -34,7 +34,7 @@ export class TFSM extends TDoc implements FSM {
 
   @UX('Name' as IntlString)
   @ArrayOf$()
-  @RefTo$(fsm.class.Transition)
+  @RefTo$(fsmPlugin.class.Transition)
   transitions!: Ref<Transition>[]
 
   @UX('TargetClasses' as IntlString)
@@ -44,43 +44,119 @@ export class TFSM extends TDoc implements FSM {
 }
 
 @UX('Transition' as IntlString)
-@Class$(fsm.class.Transition, core.class.Doc, FSMDomain)
+@Class$(fsmPlugin.class.Transition, core.class.Doc, FSMDomain)
 export class TTransition extends TDoc implements Transition {
   @UX('From' as IntlString)
-  @RefTo$(fsm.class.State)
+  @RefTo$(fsmPlugin.class.State)
   from!: Ref<State>
 
   @UX('From' as IntlString)
-  @RefTo$(fsm.class.State)
+  @RefTo$(fsmPlugin.class.State)
   to!: Ref<State>
 }
 
 @UX('State' as IntlString)
-@Class$(fsm.class.State, core.class.Doc, FSMDomain)
+@Class$(fsmPlugin.class.State, core.class.Doc, FSMDomain)
 export class TState extends TDoc implements State {
   @UX('Name' as IntlString)
   @Prop(CORE_CLASS_STRING)
   name!: string
 }
 
-@Mixin$(fsm.mixin.WithFSM, core.class.Doc)
+@Mixin$(fsmPlugin.mixin.WithFSM, core.class.Doc)
 export class TWithFSM extends TDoc implements WithFSM {
   @UX('FSM' as IntlString)
-  @RefTo$(fsm.class.FSM)
+  @RefTo$(fsmPlugin.class.FSM)
   fsm!: Ref<FSM>
 }
 
-@Mixin$(fsm.mixin.WithState, core.class.Doc)
+@Mixin$(fsmPlugin.mixin.WithState, core.class.Doc)
 export class TWithState extends TDoc implements WithState {
   @UX('FSM' as IntlString)
-  @RefTo$(fsm.mixin.WithFSM)
+  @RefTo$(fsmPlugin.mixin.WithFSM)
   fsm!: Ref<WithFSM>
 
   @UX('State' as IntlString)
-  @RefTo$(fsm.class.State)
+  @RefTo$(fsmPlugin.class.State)
   state!: Ref<State>
 }
 
 export function model (S: Builder): void {
   S.add(TTransition, TState, TFSM, TWithFSM, TWithState)
 }
+
+type PureState = Omit<State, keyof Doc>
+class FSMBuilder {
+  private readonly name: string
+  private readonly appID: Ref<Application>
+  private readonly classes: Ref<Class<Doc>>[]
+  private readonly states = new Map<string, PureState>()
+  private readonly transitions: [string, string][] = []
+
+  constructor (name: string, appID: Ref<Application>, classes: Ref<Class<Doc>>[]) {
+    this.name = name
+    this.appID = appID
+    this.classes = classes
+  }
+
+  private getState (a: PureState) {
+    if (!this.states.has(a.name)) {
+      this.states.set(a.name, a)
+    }
+
+    return this.states.get(a.name)
+  }
+
+  transition (a: PureState, b: PureState) {
+    const existingA = this.getState(a)
+    const existingB = this.getState(b)
+
+    if (!existingA || !existingB) {
+      return this
+    }
+
+    this.transitions.push([existingA.name, existingB.name])
+
+    return this
+  }
+
+  build (S: Builder) {
+    const stateIDs = new Map<string, Ref<State>>()
+
+    this.states.forEach((state) => {
+      const doc = S.createDocument(fsmPlugin.class.State, state)
+
+      stateIDs.set(state.name, doc._id as Ref<State>)
+    })
+
+    const transitions: Ref<Transition>[] = []
+
+    this.transitions.forEach(([fromName, toName]) => {
+      const from = stateIDs.get(fromName)
+      const to = stateIDs.get(toName)
+
+      if (!from || !to) {
+        return
+      }
+
+      const transition = S.createDocument(fsmPlugin.class.Transition, { from, to })
+
+      transitions.push(transition._id as Ref<Transition>)
+    })
+
+    const fsm = S.createDocument(fsmPlugin.class.FSM, {
+      name: this.name,
+      application: this.appID,
+      classes: this.classes,
+      transitions
+    })
+
+    return fsm
+  }
+}
+
+export const fsm = (
+  name: string,
+  appID: Ref<Application>,
+  classes: Ref<Class<Doc>>[]
+): FSMBuilder => new FSMBuilder(name, appID, classes)

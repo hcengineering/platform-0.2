@@ -10,9 +10,9 @@
 //
 // See the License for the specific language governing permissions and
 // limitations under the License.
-import core, {
-  ArrayOf$, Builder, Class$, Enum$, EnumOf$, InstanceOf$, Literal, Mixin$, Primary, Prop, RefTo$
-} from '@anticrm/model'
+
+import { CORE_CLASS_NUMBER, CORE_CLASS_STRING, Ref } from '@anticrm/core'
+import core, { ArrayOf$, Builder, Class$, Enum$, EnumOf$, InstanceOf$, Literal, Mixin$, Prop, RefTo$, Primary } from '@anticrm/model'
 import { TEmb, TEnum, TVDoc } from '@anticrm/model/src/__model__'
 import { IntlString } from '@anticrm/platform-i18n'
 import presentation from '@anticrm/presentation'
@@ -20,9 +20,9 @@ import { UX } from '@anticrm/presentation/src/__model__'
 import workbench from '@anticrm/workbench/src/__model__'
 import { TWithResume } from '@anticrm/person-extras/src/__model__'
 import personExtras, { Skill } from '@anticrm/person-extras'
+import { fsm } from '@anticrm/fsm/src/__model__'
 
 import recruiting, { Candidate, CandidateState, Vacancy, WithCandidateProps } from '.'
-import { CORE_CLASS_NUMBER, CORE_CLASS_STRING, Ref } from '@anticrm/core'
 
 const VacanciesDomain = 'vacancies'
 
@@ -192,4 +192,27 @@ function createVacanciesAppModel (S: Builder): void {
   S.mixin(recruiting.class.Vacancy, presentation.mixin.DetailForm, {
     component: recruiting.component.Vacancy
   })
+
+  const states = {
+    rejected: { name: 'Rejected' },
+    applied: { name: 'Applied' },
+    hrInterview: { name: 'HR interview' },
+    testTask: { name: 'Test Task' },
+    techInterview: { name: 'Technical interview' },
+    offer: { name: 'Offer' },
+    contract: { name: 'Contract signing' }
+  }
+
+  fsm('Default developer vacancy', recruiting.application.Vacancies, [recruiting.mixin.WithCandidateProps])
+    .transition(states.applied, states.hrInterview)
+    .transition(states.hrInterview, states.testTask)
+    .transition(states.testTask, states.techInterview)
+    .transition(states.techInterview, states.offer)
+    .transition(states.offer, states.contract)
+    .transition(states.applied, states.rejected)
+    .transition(states.hrInterview, states.rejected)
+    .transition(states.testTask, states.rejected)
+    .transition(states.techInterview, states.rejected)
+    .transition(states.offer, states.rejected)
+    .build(S)
 }

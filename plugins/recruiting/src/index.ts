@@ -14,9 +14,10 @@ import { Class, Emb, Enum, Mixin, Ref } from '@anticrm/core'
 import core from '@anticrm/platform-core'
 import { Plugin, plugin, Service } from '@anticrm/platform'
 import { Asset, AnyComponent } from '@anticrm/platform-ui'
-import { Skill, WithResume } from '@anticrm/person-extras'
+import personExtras, { Skill, WithResume } from '@anticrm/person-extras'
 import { WorkbenchApplication } from '@anticrm/workbench'
 import { VDoc } from '@anticrm/domains'
+import fsm from '@anticrm/fsm'
 
 export interface Candidate extends Emb {
   bio: string
@@ -57,7 +58,11 @@ export interface RecruitingService extends Service {
 
 export default plugin(
   'recruiting' as Plugin<RecruitingService>,
-  { core: core.id },
+  {
+    core: core.id,
+    personExtras: personExtras.id,
+    fsm: fsm.id
+  },
   {
     icon: {
       Recruiting: '' as Asset
