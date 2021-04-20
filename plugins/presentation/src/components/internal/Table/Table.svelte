@@ -12,14 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 -->
-<script type="ts">
+<script lang="ts">
   import type { AttrModel } from '../../../index'
   import type { Class, Doc, Ref } from '@anticrm/core'
   import { createEventDispatcher, setContext } from 'svelte'
   import TableControls from './TableControls.svelte'
   import Pagination from './Pagination.svelte'
   import Sort from './Sort.svelte'
-  import { sortString } from './utils'
   import Presenter from '../presenters/Presenter.svelte'
 
   const dispatch = createEventDispatcher()
@@ -71,7 +70,7 @@
   }
 
   function onSort (event) {
-    event.detail.rows = sortString(event.detail.rows, event.detail.dir, event.detail.key)
+    // TODO: implement sorting feature within core service
   }
 </script>
 
@@ -86,8 +85,10 @@
       <tr>
         {#each attributes as attr (attr.key)}
           <th>
-            {attr.label}
-            <Sort key={attr.label} on:sort={onSort} />
+            <div class="head">
+              {attr.label}
+              <Sort key={attr.label} on:sort={onSort} />
+            </div>
           </th>
         {/each}
       </tr>
@@ -122,12 +123,7 @@
   </table>
 
   <!--pagination-->
-  <Pagination
-      {page}
-      {pageSize}
-      count={filteredRows.length - 1}
-      on:pageChange={onPageChange}
-  />
+  <Pagination {page} {pageSize} count={filteredRows.length - 1} on:pageChange={onPageChange} />
 </div>
 
 <style lang="scss">
@@ -137,7 +133,6 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    min-width: 1180px;
   }
 
   .center {
@@ -163,6 +158,12 @@
 
     th {
       padding: 12px 8px;
+    }
+
+    .head {
+      display: flex;
+      flex-flow: nowrap;
+      min-width: 70px;
     }
 
     tbody {

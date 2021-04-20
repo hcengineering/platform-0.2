@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 -->
-
 <script lang="ts">
   import { createEventDispatcher, getContext } from 'svelte'
   const dispatch = createEventDispatcher()
@@ -33,7 +32,7 @@
   $: pageCount = Math.floor(count / pageSize)
 
   function onChange (event: CustomEvent, toPage: number) {
-    const detail: OnPageChangeEvent = {
+    const detail = {
       originalEvent: event,
       page: toPage,
       pageIndex: toPage * pageSize
@@ -95,7 +94,7 @@
   button {
     background: var(--theme-bg-accent-color);
     color: white;
-    border: 1px solid var(--theme-caption-color);;
+    border: 1px solid var(--theme-caption-color);
     padding: 5px 10px;
     margin-left: 3px;
     float: left;

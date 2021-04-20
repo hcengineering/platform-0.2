@@ -12,18 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 -->
-
-<script>
+<script lang="ts">
   import { createEventDispatcher, getContext } from 'svelte'
   const dispatch = createEventDispatcher()
   const stateContext = getContext('table-state')
 
-  export let dir = 'none'
+  enum SortOrder {
+    UNSORTED = 'Unsorted',
+    ASC = 'Ascending',
+    DESC = 'Descending'
+  }
+
+  export let dir = SortOrder.UNSORTED
   export let key
-  export let labels = {
-    asc: { title: 'Ascending', html: '&#8638;' },
-    desc: { title: 'Desceding', html: '&#8595;' },
-    unsorted: { title: 'Unsorted', html: '&#10607;' }
+
+  const labels = {
+    [SortOrder.ASC]: { title: 'Ascending', html: '&#8638;' }, // title gonna be intl value
+    [SortOrder.DESC]: { title: 'Descending', html: '&#8595;' },
+    [SortOrder.UNSORTED]: { title: 'Unsorted', html: '&#10607;' }
   }
 
   function onClick (event) {
@@ -32,7 +38,7 @@
     const detail = {
       originalEvent: event,
       key,
-      dir: dir !== 'desc' ? 'desc' : 'asc',
+      dir: dir !== SortOrder.DESC ? SortOrder.DESC : SortOrder.ASC,
       rows: state.filteredRows
     }
 
@@ -46,17 +52,17 @@
 </script>
 
 <span class="sort" on:click={onClick}>
-  {#if dir === 'asc'}
-    <span title={labels.asc.title}>
-      {@html labels.asc.html}
+  {#if dir === SortOrder.ASC}
+    <span title={labels[SortOrder.ASC].title}>
+      {@html labels[SortOrder.ASC].html}
     </span>
-  {:else if dir === 'desc'}
-    <span title={labels.desc.title}>
-      {@html labels.desc.html}
+  {:else if dir === SortOrder.DESC}
+    <span title={labels[SortOrder.DESC].title}>
+      {@html labels[SortOrder.DESC].html}
     </span>
   {:else}
-    <span title={labels.unsorted.title}>
-      {@html labels.unsorted.html}
+    <span title={labels[SortOrder.UNSORTED].title}>
+      {@html labels[SortOrder.UNSORTED].html}
     </span>
   {/if}
 </span>
