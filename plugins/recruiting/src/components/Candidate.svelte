@@ -13,27 +13,67 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <script lang="ts">
-  import type { Person } from '@anticrm/contact'
+  import { createEventDispatcher } from 'svelte'
 
-  import { liveQuery } from '@anticrm/presentation'
-
+  import { Doc, Ref } from '@anticrm/core'
+  import { getCoreService, liveQuery } from '@anticrm/presentation'
   import UserInfo from '@anticrm/sparkling-controls/src/UserInfo.svelte'
   import ResumeProps from '@anticrm/person-extras/src/components/ResumeProps.svelte'
+  import PopupMenu from '@anticrm/sparkling-controls/src/menu/PopupMenu.svelte'
+  import PopupItem from '@anticrm/sparkling-controls/src/menu/PopupItem.svelte'
+  import Button from '@anticrm/sparkling-controls/src/Button.svelte'
+  import type { Person } from '@anticrm/contact'
 
-  import type { WithCandidateProps } from '..'
-  import candidatePlugin from '..'
+  import { CandidateState, Vacancy, WithCandidateProps } from '..'
+  import recruiting from '..'
 
-  export let object: WithCandidateProps
-  let person: Person | undefined
-  let candidate: WithCandidateProps['candidate'] | undefined
-  let resume: WithCandidateProps['resume'] | undefined
+  const dispatch = createEventDispatcher()
+  const coreP = getCoreService()
 
-  $: lq = liveQuery(lq, candidatePlugin.mixin.WithCandidateProps, { _id: object._id }, (docs) => {
-    person = docs[0]
-    const candidateMixin = docs[0]
-    candidate = candidateMixin?.candidate
-    resume = candidateMixin?.resume
+  export let object: WithCandidateProps | undefined
+  let person: Person | undefined = object
+  let candidate: WithCandidateProps['candidate'] | undefined = object?.candidate
+  let resume: WithCandidateProps['resume'] | undefined = object?.resume
+  let vacancies: Vacancy[] = []
+  let vacancy: Vacancy | undefined
+
+  liveQuery(undefined, recruiting.class.Vacancy, {}, (docs) => {
+    vacancies = docs
   })
+
+  $: vacancy = vacancies.find((x) => x._id === object?.vacancy)
+
+  $: {
+    person = object
+    candidate = object?.candidate
+    resume = object?.resume
+  }
+
+  async function unassign () {
+    if (!object || !candidate) {
+      return
+    }
+
+    const core = await coreP
+
+    core.update(object, {
+      vacancy: undefined,
+      state: CandidateState.New
+    })
+  }
+
+  async function assign (vacancyRef: Ref<Doc>) {
+    if (!object || !candidate) {
+      return
+    }
+
+    const core = await coreP
+
+    core.update(object, {
+      vacancy: vacancyRef as Ref<Vacancy>,
+      state: CandidateState.New
+    })
+  }
 </script>
 
 <div class="root">
@@ -61,6 +101,36 @@ limitations under the License.
     <div>
       Expected salary: {candidate.salaryExpectation}
     </div>
+    <div class="assignment">
+      <div class="assignment-content">
+        {#if vacancy}
+          <div>
+            Candidate is assigned to
+            <div class="vacancy">
+              <Button
+                on:click={() => {
+                  dispatch('open', { _id: vacancy && vacancy._id, _class: recruiting.class.Vacancy })
+                }}
+                label={vacancy.title}
+                kind="transparent" />
+            </div>
+          </div>
+          <Button label="Unassign" on:click={unassign} kind="transparent" />
+        {:else}
+          <div>Candidate is not assigned to any vacancy</div>
+          {#if vacancies.length > 0}
+            <PopupMenu>
+              <div class="assign-control" slot="trigger">Assign...</div>
+              {#each vacancies as v}
+                <PopupItem on:click={() => assign(v._id)}>
+                  {v.title}
+                </PopupItem>
+              {/each}
+            </PopupMenu>
+          {/if}
+        {/if}
+      </div>
+    </div>
   {/if}
   {#if resume}
     <ResumeProps {resume} />
@@ -72,5 +142,15 @@ limitations under the License.
     display: grid;
     grid-template-columns: auto;
     grid-gap: 10px;
+  }
+
+  .vacancy {
+    display: inline-block;
+  }
+
+  .assignment-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 </style>

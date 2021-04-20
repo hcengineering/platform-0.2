@@ -53,7 +53,7 @@
         currentAppErr = `There is no application route defined for ${appRoute}`
       }
     },
-    { application: '#default' }
+    { application: platform.getMetadata(routeMeta(defaultApp))?.route || '#default' }
   )
 
   const status: Status = { severity: Severity.OK, code: 0, message: '' }

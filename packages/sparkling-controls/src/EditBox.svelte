@@ -16,7 +16,7 @@
   export let width = '100%'
   export let label = ''
   export let value = ''
-  export let placeholder: string
+  export let placeholder = ''
   export let id: string | undefined = undefined
   export let hoverState = false
 

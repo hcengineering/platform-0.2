@@ -52,7 +52,8 @@ export type AnyComponent = Component<AnySvelteComponent>;
 export const CONTEXT_PLATFORM = 'platform'
 export const CONTEXT_PLATFORM_UI = 'platform-ui'
 
-export interface Document {}
+export interface Document {
+}
 
 /**
  * Allow to control currently selected document.
@@ -61,16 +62,22 @@ export interface DocumentProvider {
   /**
    * Opening a document
    * */
-  open(doc: Document): Promise<void>;
+  open (doc: Document): Promise<void>;
+
+  /**
+   * Construct a href with a full URI pointing to required document.
+   * @param doc
+   */
+  getHref (doc: Document): Promise<string>
 
   /**
    * Return currently selected document, if one.
    */
-  selection(): Document | undefined;
+  selection (): Document | undefined;
 }
 
 export interface UIService extends Service, DocumentProvider {
-  createApp(root: HTMLElement): any;
+  createApp (root: HTMLElement): any;
 
   /**
    * Ask UI service to subscribe for browser location changes.
@@ -78,7 +85,7 @@ export interface UIService extends Service, DocumentProvider {
    * @param listener - listener to be notified on location changes, will be triggered for first time on subscribe.
    * @param destroyFactory - a factory to register unsubscribe function to.
    */
-  subscribeLocation(listener: (location: Location) => void, destroyFactory: (op: () => void) => void): void;
+  subscribeLocation (listener: (location: Location) => void, destroyFactory: (op: () => void) => void): void;
 
   /**
    * Will join a current location with a path, query values or fragment
@@ -86,7 +93,7 @@ export interface UIService extends Service, DocumentProvider {
    * @param query
    * @param fragment
    */
-  navigateJoin(
+  navigateJoin (
     path: string[] | undefined,
     query: Record<string, string> | undefined,
     fragment: string | undefined
@@ -96,7 +103,7 @@ export interface UIService extends Service, DocumentProvider {
    * Navigate to new URL
    * @param newUrl
    */
-  navigate(newUrl: string): void;
+  navigate (newUrl: string): void;
 
   /**
    * Construct a new router to perform operations in component.
@@ -104,16 +111,16 @@ export interface UIService extends Service, DocumentProvider {
    * @param matcher
    * @param defaults
    */
-  newRouter<T>(pattern: string, matcher: (match: T) => void, defaults: T | undefined): ApplicationRouter<T>;
+  newRouter<T> (pattern: string, matcher: (match: T) => void, defaults: T | undefined): ApplicationRouter<T>;
 
-  showModal(component: AnySvelteComponent, props: any, element?: HTMLElement): void;
-  closeModal(): void;
+  showModal (component: AnySvelteComponent, props: any, element?: HTMLElement): void;
+  closeModal (): void;
 
   /**
    * Register active document provider.
    * @param provider
    */
-  registerDocumentProvider(provider: DocumentProvider | undefined): void;
+  registerDocumentProvider (provider: DocumentProvider | undefined): void;
 }
 
 /**

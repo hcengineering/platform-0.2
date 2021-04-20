@@ -38,6 +38,7 @@
   import LinkTo from '@anticrm/platform-ui/src/components/LinkTo.svelte'
   import Splitter from '@anticrm/sparkling-controls/src/internal/Splitter.svelte'
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
+  import { locationToUrl } from '@anticrm/platform-ui/src/location'
 
   let prevDiv: HTMLElement
   let nextDiv: HTMLElement
@@ -144,11 +145,32 @@
     }
   }
 
+  async function getHref (doc?: CoreDocument): Promise<string> {
+    if (!doc) {
+      return locationToUrl(documentRouter.location({ doc: undefined }))
+    }
+    // Find if object has a shortId.
+    const title = await (await coreService).findOne<Title>(CORE_CLASS_TITLE, {
+      _objectId: doc._id,
+      _objectClass: doc._class,
+      source: TitleSource.ShortId as Property<TitleSource, number>
+    })
+
+    if (title && title.title) {
+      // Navigate using shortId
+      return locationToUrl(documentRouter.location({ doc: `${title.title}` }))
+    } else {
+      // There is not short Id, we should navigate using a full _class and objectId.
+      return locationToUrl(documentRouter.location({ doc: `${doc._class}:${doc._id}` }))
+    }
+  }
+
   uiService.registerDocumentProvider({
     open: navigateDocument,
     selection (): CoreDocument | undefined {
       return details
-    }
+    },
+    getHref: getHref
   })
 
   onDestroy(() => {
@@ -272,6 +294,7 @@
         _class={details._class}
         _objectId={details._id}
         title="Title"
+        on:open={(e) => navigateDocument({ _class: e.detail._class, _id: e.detail._id })}
         on:close={() => navigateDocument(undefined)}
         on:noobject={() => (details = undefined)} />
     </aside>
@@ -316,9 +339,11 @@
       cursor: pointer;
       color: var(--theme-content-trans-color);
     }
+
     .iconApp + .iconApp {
       margin-top: 16px;
     }
+
     .cropIcon {
       width: 32px;
       height: 32px;
@@ -330,6 +355,7 @@
       border-radius: 50%;
     }
   }
+
   .selectedApp {
     background-color: var(--theme-bg-accent-color);
     color: var(--theme-caption-color);
@@ -359,6 +385,7 @@
       height: 36px;
       margin: 4px 15px 44px 8px;
       color: var(--theme-caption-color);
+
       & span {
         padding-left: 11px;
         flex-grow: 1;
@@ -433,6 +460,7 @@
   .separator {
     height: 20px;
   }
+
   .btn-bottom {
     font-size: 16px;
     font-weight: 500;

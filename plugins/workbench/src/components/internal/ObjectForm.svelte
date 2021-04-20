@@ -61,7 +61,7 @@
     <div class="content">
       <ScrollView height="100%" width="100%">
         <div class="component-content">
-          <Component is={component} props={{ _class, object }} />
+          <Component is={component} props={{ _class, object }} on:open />
         </div>
       </ScrollView>
     </div>
