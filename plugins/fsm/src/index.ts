@@ -11,7 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Class, Doc, Mixin, Ref } from '@anticrm/core'
+import { Class, Doc, Mixin, Ref, Emb } from '@anticrm/core'
 import core from '@anticrm/platform-core'
 import { Plugin, plugin, Service } from '@anticrm/platform'
 import { Application } from '@anticrm/domains'
@@ -19,13 +19,15 @@ import { Application } from '@anticrm/domains'
 export interface FSM extends Doc {
   name: string
   application: Ref<Application>
-  transitions: Ref<Transition>[]
+  transitions: Transition[]
   classes: Ref<Class<Doc>>[]
 }
 
-export interface Transition extends Doc {
+export interface Transition extends Emb {
   from: Ref<State>
   to: Ref<State>
+
+  // Actual action usage TBD
   // action: Ref<Action>
 }
 
@@ -34,7 +36,9 @@ export interface WithFSM extends Doc {
 }
 
 export interface WithState extends Doc {
-  fsm: Ref<WithFSM>
+  // Undefined FSM means doc is not part of FSM
+  // Probably we need to be able to unmixin
+  fsm?: Ref<WithFSM>
   state: Ref<State>
 }
 

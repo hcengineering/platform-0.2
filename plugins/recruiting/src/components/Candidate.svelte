@@ -15,16 +15,20 @@ limitations under the License.
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
 
-  import { Doc, Ref } from '@anticrm/core'
+  import { Ref } from '@anticrm/core'
   import { getCoreService, liveQuery } from '@anticrm/presentation'
+  import fsmPlugin, { WithFSM } from '@anticrm/fsm'
+  import { sortStates } from '@anticrm/fsm/src/utils'
+
   import UserInfo from '@anticrm/sparkling-controls/src/UserInfo.svelte'
   import ResumeProps from '@anticrm/person-extras/src/components/ResumeProps.svelte'
   import PopupMenu from '@anticrm/sparkling-controls/src/menu/PopupMenu.svelte'
   import PopupItem from '@anticrm/sparkling-controls/src/menu/PopupItem.svelte'
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
   import type { Person } from '@anticrm/contact'
+  import contactPlugin from '@anticrm/contact'
 
-  import { CandidateState, Vacancy, WithCandidateProps } from '..'
+  import { Vacancy, WithCandidateProps } from '..'
   import recruiting from '..'
 
   const dispatch = createEventDispatcher()
@@ -55,23 +59,51 @@ limitations under the License.
     }
 
     const core = await coreP
+    const model = core.getModel()
+
+    model.mixinDocument(object, fsmPlugin.mixin.WithState, {
+      fsm: undefined
+    })
 
     core.update(object, {
-      vacancy: undefined,
-      state: CandidateState.New
+      vacancy: undefined
     })
   }
 
-  async function assign (vacancyRef: Ref<Doc>) {
+  async function assign (vacancyRef: Ref<Vacancy>) {
     if (!object || !candidate) {
       return
     }
 
     const core = await coreP
+    const model = core.getModel()
+    const vacancy = await core.findOne(recruiting.class.Vacancy, { _id: vacancyRef })
+    const baseDoc = await core.findOne(contactPlugin.class.Person, { _id: object._id })
+
+    if (!vacancy || !baseDoc) {
+      return
+    }
+
+    const isFSMVacancy = model.isMixedIn(vacancy, fsmPlugin.mixin.WithFSM)
+
+    if (isFSMVacancy) {
+      const fsmID = model.as(vacancy, fsmPlugin.mixin.WithFSM).fsm
+      const fsm = await core.findOne(fsmPlugin.class.FSM, { _id: fsmID })
+
+      const initialState = fsm && sortStates(fsm)[0]
+
+      if (initialState) {
+        model.mixinDocument(baseDoc, fsmPlugin.mixin.WithState, {
+          fsm: vacancy._id as Ref<WithFSM>,
+          state: initialState
+        })
+
+        core.update(baseDoc, baseDoc)
+      }
+    }
 
     core.update(object, {
-      vacancy: vacancyRef as Ref<Vacancy>,
-      state: CandidateState.New
+      vacancy: vacancyRef
     })
   }
 </script>

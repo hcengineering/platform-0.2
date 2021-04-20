@@ -11,10 +11,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import core, { ArrayOf$, Builder, Class$, Mixin$, Prop, RefTo$ } from '@anticrm/model'
+import core, { ArrayOf$, Builder, Class$, Mixin$, Prop, RefTo$, InstanceOf$ } from '@anticrm/model'
 import { CORE_CLASS_STRING, Ref, Class, Doc } from '@anticrm/core'
 import { Application } from '@anticrm/domains'
-import { TDoc } from '@anticrm/model/src/__model__'
+import { TDoc, TEmb } from '@anticrm/model/src/__model__'
 import { UX } from '@anticrm/presentation/src/__model__'
 import { IntlString } from '@anticrm/platform-i18n'
 
@@ -34,8 +34,8 @@ export class TFSM extends TDoc implements FSM {
 
   @UX('Name' as IntlString)
   @ArrayOf$()
-  @RefTo$(fsmPlugin.class.Transition)
-  transitions!: Ref<Transition>[]
+  @InstanceOf$(fsmPlugin.class.Transition)
+  transitions!: Transition[]
 
   @UX('TargetClasses' as IntlString)
   @ArrayOf$()
@@ -44,8 +44,8 @@ export class TFSM extends TDoc implements FSM {
 }
 
 @UX('Transition' as IntlString)
-@Class$(fsmPlugin.class.Transition, core.class.Doc, FSMDomain)
-export class TTransition extends TDoc implements Transition {
+@Class$(fsmPlugin.class.Transition, core.class.Emb, FSMDomain)
+export class TTransition extends TEmb implements Transition {
   @UX('From' as IntlString)
   @RefTo$(fsmPlugin.class.State)
   from!: Ref<State>
@@ -129,26 +129,22 @@ class FSMBuilder {
       stateIDs.set(state.name, doc._id as Ref<State>)
     })
 
-    const transitions: Ref<Transition>[] = []
-
-    this.transitions.forEach(([fromName, toName]) => {
-      const from = stateIDs.get(fromName)
-      const to = stateIDs.get(toName)
-
-      if (!from || !to) {
-        return
-      }
-
-      const transition = S.createDocument(fsmPlugin.class.Transition, { from, to })
-
-      transitions.push(transition._id as Ref<Transition>)
-    })
-
     const fsm = S.createDocument(fsmPlugin.class.FSM, {
       name: this.name,
       application: this.appID,
       classes: this.classes,
-      transitions
+      transitions: this.transitions
+        .map(([fromName, toName]) => {
+          const from = stateIDs.get(fromName)
+          const to = stateIDs.get(toName)
+
+          if (!from || !to) {
+            return undefined
+          }
+
+          return { from, to } as Transition
+        })
+        .filter((x): x is Transition => !!x)
     })
 
     return fsm

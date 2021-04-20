@@ -12,8 +12,8 @@
 // limitations under the License.
 
 import { CORE_CLASS_NUMBER, CORE_CLASS_STRING, Ref } from '@anticrm/core'
-import core, { ArrayOf$, Builder, Class$, Enum$, EnumOf$, InstanceOf$, Literal, Mixin$, Prop, RefTo$, Primary } from '@anticrm/model'
-import { TEmb, TEnum, TVDoc } from '@anticrm/model/src/__model__'
+import core, { ArrayOf$, Builder, Class$, InstanceOf$, Mixin$, Prop, RefTo$, Primary } from '@anticrm/model'
+import { TEmb, TVDoc } from '@anticrm/model/src/__model__'
 import { IntlString } from '@anticrm/platform-i18n'
 import presentation from '@anticrm/presentation'
 import { UX } from '@anticrm/presentation/src/__model__'
@@ -22,7 +22,7 @@ import { TWithResume } from '@anticrm/person-extras/src/__model__'
 import personExtras, { Skill } from '@anticrm/person-extras'
 import { fsm } from '@anticrm/fsm/src/__model__'
 
-import recruiting, { Candidate, CandidateState, Vacancy, WithCandidateProps } from '.'
+import recruiting, { Candidate, Vacancy, WithCandidateProps } from '.'
 
 const VacanciesDomain = 'vacancies'
 
@@ -73,24 +73,10 @@ export class TVacancy extends TVDoc implements Vacancy {
   salaryMax?: number
 }
 
-@Enum$(recruiting.enum.State)
-class TCandidateState extends TEnum<CandidateState> {
-  @Literal(CandidateState) [CandidateState.New]!: any
-  @Literal(CandidateState) [CandidateState.DecisionPending]!: any
-  @Literal(CandidateState) [CandidateState.OfferSended]!: any
-  @Literal(CandidateState) [CandidateState.InProgress]!: any
-  @Literal(CandidateState) [CandidateState.Approved]!: any
-  @Literal(CandidateState) [CandidateState.Done]!: any
-  @Literal(CandidateState) [CandidateState.Rejected]!: any
-  @Literal(CandidateState) [CandidateState.InterviewPending]!: any
-}
-
 @Mixin$(recruiting.mixin.WithCandidateProps, personExtras.mixin.WithResume)
 export class TWithCandidateProps extends TWithResume implements WithCandidateProps {
   @InstanceOf$(recruiting.class.Candidate)
   candidate!: Candidate
-
-  @EnumOf$(recruiting.enum.State) state!: CandidateState
 
   @UX('Vacancy' as IntlString)
   @RefTo$(recruiting.class.Vacancy)
@@ -103,7 +89,7 @@ export function model (S: Builder): void {
 }
 
 function createCandidatesAppModel (S: Builder): void {
-  S.add(TCandidate, TWithCandidateProps, TCandidateState)
+  S.add(TCandidate, TWithCandidateProps)
   S.createDocument(workbench.class.WorkbenchApplication, {
     route: 'candidates',
     label: 'Candidates' as IntlString,
@@ -113,16 +99,6 @@ function createCandidatesAppModel (S: Builder): void {
     spaceTitle: 'Candidate Pool',
     supportSpaces: true
   }, recruiting.application.Candidates)
-
-  S.createDocument(core.class.Space, {
-    name: 'Candidates',
-    description: '',
-    application: recruiting.application.Candidates,
-    isPublic: true,
-    archived: false,
-    spaceKey: 'CANDIDATES',
-    users: []
-  })
 
   S.createDocument(workbench.class.ItemCreator, {
     app: recruiting.application.Candidates,
@@ -134,12 +110,6 @@ function createCandidatesAppModel (S: Builder): void {
     displayClass: recruiting.mixin.WithCandidateProps,
     label: 'Card' as IntlString,
     component: recruiting.component.CandidateList
-  })
-
-  S.createDocument(presentation.mixin.Viewlet, {
-    displayClass: recruiting.mixin.WithCandidateProps,
-    label: 'State' as IntlString,
-    component: presentation.component.CardPresenter
   })
 
   S.mixin(recruiting.mixin.WithCandidateProps, presentation.mixin.CreateForm, {
@@ -162,16 +132,6 @@ function createVacanciesAppModel (S: Builder): void {
     spaceTitle: 'Company',
     supportSpaces: true
   }, recruiting.application.Vacancies)
-
-  S.createDocument(core.class.Space, {
-    name: 'My company', // TODO: Name should be at least workspace org
-    description: '',
-    application: recruiting.application.Vacancies,
-    isPublic: true,
-    archived: false,
-    spaceKey: 'VAC_DEFAULT',
-    users: []
-  })
 
   S.createDocument(workbench.class.ItemCreator, {
     app: recruiting.application.Vacancies,
