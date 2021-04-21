@@ -302,7 +302,7 @@ export default (platform: Platform, deps: { core: CoreService, i18n: I18n }): Pr
     const groupModels = hierarchy.map(_class => getGroupModel(_class as Ref<Class<Obj>>))
     const attrModels = hierarchy.map(_class => getOwnAttrModel(_class))
     const mixinModels = model.getClassMixins(_class).map(_mixin => getMixinGroupModel(_class as Ref<Class<Obj>>, _mixin as Ref<Mixin<Doc>>))
-    const mixinAttrModels = model.getClassMixins(_class).map(_mixin => getOwnAttrModel(_mixin as Ref<Class<Obj>))
+    const mixinAttrModels = model.getClassMixins(_class).map(_mixin => getOwnAttrModel(_mixin as Ref<Class<Obj>>))
 
     const groups = await Promise.all(groupModels)
     const mixins = await Promise.all(mixinModels)
