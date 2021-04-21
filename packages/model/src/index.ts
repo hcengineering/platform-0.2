@@ -20,20 +20,17 @@ import {
   CORE_CLASS_STRING,
   CORE_CLASS_TYPE, Doc, Indices, InstanceOf, Mixin, Obj, Ref, RefTo, Tx, Type
 } from '@anticrm/core'
-import type {
-  CreateTx, DeleteTx, ObjectSelector, ObjectTx, ObjectTxDetails, Reference, Space, TxOperation, UpdateTx
-} from '@anticrm/domains'
 import {
-  Application, CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_OBJECT_SELECTOR, CORE_CLASS_OBJECT_TX,
-  CORE_CLASS_OBJECTTX_DETAILS,
+  Application, CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX,
+  CORE_CLASS_OBJECTTX_DETAILS, CORE_CLASS_OBJECT_SELECTOR, CORE_CLASS_OBJECT_TX,
   CORE_CLASS_SPACE,
-  CORE_CLASS_TX_OPERATION,
+  CORE_CLASS_SPACE_USER, CORE_CLASS_TX_OPERATION,
   CORE_CLASS_UPDATE_TX, CORE_MIXIN_SHORTID,
-  ShortID, SpaceUser, Title, VDoc
+  CreateTx, DeleteTx, ObjectSelector, ObjectTx, ObjectTxDetails, Reference, ShortID,
+  Space, SpaceUser, Title,
+  TxOperation, UpdateTx, VDoc
 } from '@anticrm/domains'
-
 import { AnyPlugin, identify } from '@anticrm/platform'
-
 import Builder from './builder'
 
 const modelIds = identify('core' as AnyPlugin, {
@@ -77,7 +74,7 @@ const modelIds = identify('core' as AnyPlugin, {
     VDoc: '' as Ref<Class<VDoc>>,
 
     Space: CORE_CLASS_SPACE as Ref<Class<Space>>,
-    SpaceUser: '' as Ref<Class<SpaceUser>>,
+    SpaceUser: CORE_CLASS_SPACE_USER as Ref<Class<SpaceUser>>,
 
     Reference: '' as Ref<Class<Reference>>,
 
@@ -90,7 +87,6 @@ const modelIds = identify('core' as AnyPlugin, {
 })
 export default modelIds
 
-export { Builder }
-
-export * from './utils'
 export * from './dsl'
+export * from './utils'
+export { Builder }

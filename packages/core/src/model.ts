@@ -732,7 +732,7 @@ export class Model implements Storage {
     await Promise.resolve(this.add(doc))
   }
 
-  push<T extends Doc> (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: DocumentValue<T>): void {
+  push<T extends Obj> (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: DocumentValue<T>): void {
     const txOp: TxOperation = {
       _class: CORE_CLASS_TX_OPERATION,
       kind: TxOperationKind.Push,
@@ -742,7 +742,7 @@ export class Model implements Storage {
     this.updateDocument(this.get(_id), [txOp])
   }
 
-  pull<T extends Doc> (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: DocumentValue<T>): void {
+  pull<T extends Obj> (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: DocumentValue<T>): void {
     const txOp: TxOperation = {
       _class: CORE_CLASS_TX_OPERATION,
       kind: TxOperationKind.Pull,
@@ -752,28 +752,28 @@ export class Model implements Storage {
     this.updateDocument(this.get(_id), [txOp])
   }
 
-  updateDocumentSet<T extends Obj> (doc: T, _attributes: AnyLayout): T {
-    const txOp: TxOperation = { _class: CORE_CLASS_TX_OPERATION, kind: TxOperationKind.Set, _attributes }
+  updateDocumentSet<T extends Obj> (doc: T, _attributes: Partial<DocumentValue<T>>): T {
+    const txOp: TxOperation = { _class: CORE_CLASS_TX_OPERATION, kind: TxOperationKind.Set, _attributes: _attributes as unknown as AnyLayout }
     return this.updateDocument(doc, [txOp])
   }
 
-  updateDocumentPush<T extends Obj> (doc: T, _attribute: string, _attributes: AnyLayout): T {
+  updateDocumentPush<P extends Doc, T extends Obj> (doc: P, _attribute: string, _attributes: DocumentValue<T>): P {
     const txOp: TxOperation = {
       _class: CORE_CLASS_TX_OPERATION,
       kind: TxOperationKind.Push,
-      _attributes,
+      _attributes: _attributes as unknown as AnyLayout,
       selector: [{ _class: CORE_CLASS_OBJECT_SELECTOR, key: _attribute }]
     }
-    return this.updateDocument(doc, [txOp])
+    return this.updateDocument<P>(doc, [txOp])
   }
 
-  updateDocumentPull<T extends Obj> (doc: T, _attribute: string, _attributes: AnyLayout): T {
+  updateDocumentPull<P extends Doc, T extends Obj> (doc: P, _attribute: string, _attributes: DocumentQuery<T>): P {
     const txOp: TxOperation = {
       _class: CORE_CLASS_TX_OPERATION,
       kind: TxOperationKind.Pull,
-      selector: [{ _class: CORE_CLASS_OBJECT_SELECTOR, key: _attribute, pattern: _attributes }]
+      selector: [{ _class: CORE_CLASS_OBJECT_SELECTOR, key: _attribute, pattern: _attributes as unknown as AnyLayout }]
     }
-    return this.updateDocument(doc, [txOp])
+    return this.updateDocument<P>(doc, [txOp])
   }
 
   async update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, operations: TxOperation[]): Promise<void> {

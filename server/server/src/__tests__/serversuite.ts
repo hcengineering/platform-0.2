@@ -47,7 +47,7 @@ builder.load(taskPlugin)
 const Model = builder.dumpAll()
 
 class PipeClientSocket implements ClientSocket {
-  responses: Request<any>[] = []
+  responses: Array<Request<any>> = []
   email: string
   workspace: string
 
@@ -64,12 +64,12 @@ class PipeClientSocket implements ClientSocket {
 export interface ClientInfo {
   client: ClientService
   socket: PipeClientSocket
-  ops: Promise<void>[]
+  ops: Array<Promise<void>>
   errors: Error[]
-  wait (): void
+  wait: () => void
 }
 
-export function createContact (db: Db, email: string, username: string): Promise<any> {
+export async function createContact (db: Db, email: string, username: string): Promise<any> {
   const id = generateId() as Ref<Person>
   const user = builder.createDocument(
     contact.class.Person,
@@ -86,11 +86,11 @@ export function createContact (db: Db, email: string, username: string): Promise
     account: email
   })
 
-  return db.collection('contact').insertOne(user)
+  await db.collection('contact').insertOne(user)
 }
 
 export class ServerSuite {
-  mongodbUri: string = process.env.MONGODB_URI || 'mongodb://localhost:27017'
+  mongodbUri: string = process.env.MONGODB_URI ?? 'mongodb://localhost:27017'
   server!: ServerProtocol
   wsName: string
   dbClient!: MongoClient
@@ -107,15 +107,16 @@ export class ServerSuite {
     await this.reInitDB()
 
     const ws = await getWorkspace(accounts, this.wsName)
-    if (!ws) {
+    if (ws === undefined) {
       await createWorkspace(accounts, this.wsName, 'test organization')
     }
 
     this.server = await start(0, this.mongodbUri, 'localhost')
   }
 
-  public getWorkspace (wsName: string): Promise<WorkspaceProtocol> {
-    return this.server.getWorkspace(wsName)
+  public async getWorkspace (wsName: string): Promise<WorkspaceProtocol> {
+    const protocol = await this.server.getWorkspace(wsName)
+    return protocol
   }
 
   public async reInitDB (): Promise<void> {
@@ -127,13 +128,13 @@ export class ServerSuite {
     await this.initDatabase(db)
   }
 
-  initDatabase (db: Db): Promise<any> {
-    const domains = { ...Model } as { [key: string]: Doc[] }
-    const ops = [] as Promise<any>[]
+  async initDatabase (db: Db): Promise<any> {
+    const domains: { [key: string]: Doc[] } = { ...Model }
+    const ops = [] as Array<Promise<any>>
     for (const domain in domains) {
       const model = domains[domain]
       db.collection(domain, (err, coll) => {
-        if (err) {
+        if (err !== undefined) {
           console.log(err)
         }
         ops.push(coll.deleteMany({}).then(() => model.length > 0 ? coll.insertMany(model) : null))
@@ -162,10 +163,11 @@ export class ServerSuite {
             }))
           } else {
             // console.log('notify self about completeness without response')
-            client.ops.push(client.client.send({}, {
+            const resp: Response<any> = {
               id: response.id,
               error: response.error
-            } as Response<any>).catch((e) => {
+            }
+            client.ops.push(client.client.send({}, resp).catch((e) => {
               client.errors.push(e)
             }))
           }

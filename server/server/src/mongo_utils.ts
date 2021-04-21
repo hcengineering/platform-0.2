@@ -30,17 +30,18 @@ function isArrayOf (_type: Type): boolean {
 function isInstanceOf (_type: Type): boolean {
   return _type._class === CORE_CLASS_INSTANCE_OF
 }
-
-function extractArrayFilter (model: Model, _class: Ref<Class<Doc>>, selector: ObjectSelector[], isPull: boolean, index: number): {
+export interface ArrayFilterResult {
   clazz: Ref<Class<Obj>>
-  setFilter: string,
-  arrayFilter: AnyLayout[],
+  setFilter: string
+  arrayFilter: AnyLayout[]
   lastQuery?: AnyLayout
-  isArrayAttr?: boolean,
-  index: number,
-  attribute?: AttributeMatch,
+  isArrayAttr: boolean
+  index: number
+  attribute?: AttributeMatch
   isPrimitive: boolean
-} {
+}
+
+function extractArrayFilter (model: Model, _class: Ref<Class<Doc>>, selector: ObjectSelector[], isPull: boolean, index: number): ArrayFilterResult {
   let setFilter = ''
   let noNextFilter = ''
   const arrayFilter: AnyLayout[] = []
@@ -51,11 +52,11 @@ function extractArrayFilter (model: Model, _class: Ref<Class<Doc>>, selector: Ob
   let lastAttribute: AttributeMatch | undefined
   for (let segmId = 0; segmId < selector.length; segmId++) {
     const segm = selector[segmId]
-    if (!segm.key || segm.key === '') {
+    if (segm.key === '') {
       throw new Error('Object selector field should be specified')
     }
     const attr = model.classAttribute(clazz, segm.key)
-    if (!attr) {
+    if (attr === undefined) {
       throw new Error('Object selector field is not found in class attributes')
     }
     lastAttribute = attr
@@ -65,34 +66,25 @@ function extractArrayFilter (model: Model, _class: Ref<Class<Doc>>, selector: Ob
 
     const _type = attr.attr.type
 
-    if (isArrayOf(_type)) {
+    isArrayAttr = isArrayOf(_type)
+    if (isArrayAttr) {
       // This is level change.
-      isArrayAttr = true
       if (isInstanceOf((_type as ArrayOf).of)) {
         // We moving to next query value.
         clazz = ((_type as ArrayOf).of as InstanceOf<Emb>).of
-        if (segm.pattern) {
-          noNextFilter = setFilter + (setFilter.length > 0 ? '.' : '') + attr.key
-          setFilter = `${noNextFilter}.$[${filterName}]`
-        }
       } else {
-        if (segm.pattern) {
-          noNextFilter = setFilter + (setFilter.length > 0 ? '.' : '') + attr.key
-          setFilter = `${noNextFilter}.$[${filterName}]`
-        }
         isPrimitive = true
       }
     } else if (isInstanceOf(_type)) {
       // This is level change.
       // We moving to next query value.
-      clazz = (model.get((_type as InstanceOf<Emb>).of) as unknown) as Ref<Class<Obj>>
-      if (segm.pattern) {
-        noNextFilter = setFilter + (setFilter.length > 0 ? '.' : '') + attr.key
-        setFilter = `${noNextFilter}.$[${filterName}]`
-      }
-      isArrayAttr = false
+      clazz = (_type as InstanceOf<Emb>).of
     } else {
-      throw new Error(`Object selector field type is unsupported ${_type} `)
+      throw new Error(`Object selector field type is unsupported ${String(_type)} `)
+    }
+    if (segm.pattern !== undefined) {
+      noNextFilter = setFilter + (setFilter.length > 0 ? '.' : '') + attr.key
+      setFilter = `${noNextFilter}.$[${filterName}]`
     }
 
     if (isPull && segmId === selector.length - 1) {
@@ -108,7 +100,7 @@ function extractArrayFilter (model: Model, _class: Ref<Class<Doc>>, selector: Ob
         isPrimitive
       }
     }
-    if (segm.pattern && typeof segm.pattern === 'object') {
+    if (segm.pattern !== undefined && typeof segm.pattern === 'object') {
       for (const queryE of Object.entries(segm.pattern as AnyLayout)) {
         const pAttr = model.classAttribute(clazz, queryE[0])
         // This is variable marching
@@ -116,7 +108,7 @@ function extractArrayFilter (model: Model, _class: Ref<Class<Doc>>, selector: Ob
           filter[`${filterName}.${pAttr.key}`] = queryE[1] as any
         }
       }
-    } else if (segm.pattern) {
+    } else if (segm.pattern !== undefined) {
       filter[`${filterName}`] = segm.pattern
     }
     if (Object.keys(filter).length > 0) {
@@ -161,7 +153,7 @@ function extractArrayFilter (model: Model, _class: Ref<Class<Doc>>, selector: Ob
  Function will create a pair of $set operation object and a applyFilters section.
  */
 export function createSetArrayFilters (model: Model, _class: Ref<Class<Doc>>, selector: ObjectSelector[] | undefined, values: AnyLayout, index: number): { updateOperation: AnyLayout, arrayFilter: AnyLayout[], index: number } {
-  if (!selector || selector.length === 0) {
+  if ((selector === undefined) || selector.length === 0) {
     // Object itself apply operation.
     const value = model.assign({}, _class, values)
     delete value._class // We should not override _class in any case
@@ -191,11 +183,11 @@ export function createSetArrayFilters (model: Model, _class: Ref<Class<Doc>>, se
 }
 
 export function createPushArrayFilters (model: Model, _class: Ref<Class<Doc>>, selector: ObjectSelector[] | undefined, values: AnyLayout, index: number): {
-  updateOperation: AnyLayout,
-  arrayFilters: AnyLayout[],
+  updateOperation: AnyLayout
+  arrayFilters: AnyLayout[]
   index: number
 } {
-  if (!selector || !isValidSelector(selector)) {
+  if ((selector === undefined) || !isValidSelector(selector)) {
     throw new Error('push requires a valid selector')
   }
   const {
@@ -207,7 +199,7 @@ export function createPushArrayFilters (model: Model, _class: Ref<Class<Doc>>, s
   } = extractArrayFilter(model, _class, selector, false, index)
 
   let op = setFilter
-  if (attribute) {
+  if (attribute !== undefined) {
     if (op.length > 0) {
       op += '.'
     }
@@ -228,12 +220,12 @@ export function createPushArrayFilters (model: Model, _class: Ref<Class<Doc>>, s
 }
 
 export function createPullArrayFilters (model: Model, _class: Ref<Class<Doc>>, selector: ObjectSelector[] | undefined, index: number): {
-  updateOperation: AnyLayout,
-  arrayFilters: AnyLayout[],
-  isArrayAttr?: boolean,
+  updateOperation: AnyLayout
+  arrayFilters: AnyLayout[]
+  isArrayAttr: boolean
   index: number
 } {
-  if (!selector || !isValidSelector(selector)) {
+  if ((selector === undefined) || !isValidSelector(selector)) {
     throw new Error('pull requires a valid selector')
   }
   const {

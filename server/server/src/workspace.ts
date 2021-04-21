@@ -27,17 +27,18 @@ import { TxIndex } from '@anticrm/domains/src/indices/tx'
 import { VDocIndex } from '@anticrm/domains/src/indices/vdoc'
 import { ClientTxStorage } from '@anticrm/platform-core/src/clienttx'
 import { Collection, MongoClient, UpdateOneOptions, UpdateQuery } from 'mongodb'
+import type { FindAndModifyWriteOpResultObject } from 'mongodb'
 import { createPullArrayFilters, createPushArrayFilters, createSetArrayFilters } from './mongo_utils'
 
 export interface WorkspaceProtocol extends DocumentProtocol {
 
-  tx (txContext: TxContext, tx: Tx): Promise<any>
+  tx: (txContext: TxContext, tx: Tx) => Promise<any>
 
-  genRefId (_space: Ref<Space>): Promise<Ref<Doc>>
+  genRefId: (_space: Ref<Space>) => Promise<Ref<Doc>>
 
-  close (): Promise<void>
+  close: () => Promise<void>
 
-  getModel (): Promise<Model>
+  getModel: () => Promise<Model>
 }
 
 export async function connectWorkspace (uri: string, workspace: string): Promise<WorkspaceProtocol> {
@@ -60,8 +61,8 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
   }
 
   const mongoStorage: Storage = {
-    store (ctx: TxContext, doc: Doc): Promise<any> {
-      return collection(doc._class).insertOne(doc)
+    async store (ctx: TxContext, doc: Doc): Promise<any> {
+      await collection(doc._class).insertOne(doc)
     },
 
     async update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, operations: TxOperation[]): Promise<any> {
@@ -119,15 +120,15 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
         opts.arrayFilters = arrayFilters
       }
 
-      return collection(_class).updateOne({ _id }, updateOp, opts)
+      return await collection(_class).updateOne({ _id }, updateOp, opts)
     },
 
     async remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<any> {
-      return collection(_class).deleteOne({ _id })
+      return await collection(_class).deleteOne({ _id })
     },
 
     async find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T[]> {
-      return collection(_class)
+      return await collection(_class)
         .find({
           ...memdb.assign({}, _class, query as AnyLayout),
           _class: memdb.getClass(_class)
@@ -141,9 +142,6 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
           ...memdb.assign({}, _class, query as AnyLayout),
           _class: memdb.getClass(_class)
         })
-      if (res === null) {
-        return undefined
-      }
       return res
     }
   }
@@ -160,10 +158,10 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
     new ModelIndex(memdb, combineStorage(memdb, mongoStorage))
   ])
 
-  const clientControl = {
+  const clientControl: WorkspaceProtocol = {
     // C O R E  P R O T O C O L
 
-    find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T[]> {
+    async find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T[]> {
       const { query: finalQuery, classes } = memdb.createQuery(_class, query, true)
 
       if (classes.length > 1) {
@@ -171,9 +169,8 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
         (finalQuery as any)._class = { $in: classes }
       }
 
-      return collection(_class)
-        .find(finalQuery)
-        .toArray()
+      const result = await collection(_class).find<T>(finalQuery).toArray()
+      return result
     },
 
     async findOne<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined> {
@@ -184,7 +181,7 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
         (query as any)._class = { $in: [classes] }
       }
 
-      const result = await collection(_class).findOne(finalQuery)
+      const result = await collection(_class).findOne<T>(finalQuery)
       if (result == null) {
         return undefined
       }
@@ -192,41 +189,45 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
     },
 
     async tx (txContext: TxContext, tx: Tx): Promise<any> {
-      return txProcessor.process(txContext, tx)
+      return await txProcessor.process(txContext, tx)
     },
 
     async loadDomain (domain: string): Promise<Doc[]> {
       if (domain === MODEL_DOMAIN) return memdb.dump()
       console.log('domain:', domain)
-      return db.collection(domain).find({}).toArray()
+      return await db.collection(domain).find<Doc>({}).toArray()
     },
 
     async genRefId (_space: Ref<Space>): Promise<Ref<Doc>> {
       const space = await clientControl.findOne(CORE_CLASS_SPACE, { _id: _space })
-      if (!space) {
-        return Promise.reject(new Error('Space with id ' + _space + ' is not found'))
+      if (space === undefined) {
+        return await Promise.reject(new Error('Space with id ' + _space + ' is not found'))
       }
 
-      function getValue () {
-        return workspaceSystem.findOneAndUpdate(
+      const getValue = async (): Promise<FindAndModifyWriteOpResultObject<any>> => {
+        const res = await workspaceSystem.findOneAndUpdate(
           { _space },
           { $inc: { value: 1 } },
           { upsert: true }
         )
+        return res
       }
 
       let res = await getValue()
-      if (!res.value) {
+      if (res.value === undefined) {
         res = await getValue()
       }
-      return (`${space.spaceKey}-${res.value.value}`) as Ref<VDoc>
+      return (`${space.spaceKey}-${String(res.value.value)}`) as Ref<VDoc>
     },
 
-    close (): Promise<void> {
-      return client.close()
+    async close (): Promise<void> {
+      await client.close()
     },
 
-    getModel: () => Promise.resolve(memdb)
+    getModel: async (): Promise<Model> => {
+      await Promise.resolve(memdb)
+      return memdb
+    }
   }
 
   return clientControl
