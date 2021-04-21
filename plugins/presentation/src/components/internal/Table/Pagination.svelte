@@ -80,7 +80,8 @@
 <style lang="scss">
   .active {
     background-color: var(--theme-bg-accent-color);
-    color: var(--content-color);
+    border: 1px solid var(--theme-caption-color);
+    color: var(--content-accent-color);
   }
 
   ul {
@@ -92,9 +93,9 @@
   }
 
   button {
-    background: var(--theme-bg-accent-color);
-    color: white;
-    border: 1px solid var(--theme-caption-color);
+    background: var(--theme-bg-color);
+    color: var(--content-color);
+    border: 1px solid var(--theme-content-dark-color);
     padding: 5px 10px;
     margin-left: 3px;
     float: left;
