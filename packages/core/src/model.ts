@@ -463,7 +463,7 @@ export class Model implements Storage {
   }
 
   getClassMixins (cls: Ref<Class<Obj>>): Ref<Doc>[] {
-    return this.extendsOfClass(cls).filter(_class => _class._class === CORE_CLASS_MIXIN).map(_class => _class._id)
+    return this.extendsOfClass(cls).filter(_class => _class._class === CORE_CLASS_MIXIN && _class._id !== cls).map(_class => _class._id)
   }
 
   is (_class: Ref<Class<Obj>>, a: Ref<Class<Obj>>): boolean {
