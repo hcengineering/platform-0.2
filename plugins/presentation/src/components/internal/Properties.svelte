@@ -56,27 +56,27 @@
       </table>
     </div>
     <div class="group">
-    {#each model.getMixins(group._class) as _mixin (_mixin)}
-      <div class="caption-4" style="cursor:pointer" on:click="{(e) => toggleVisible(e)}">{_mixin.label}</div>
-      <table style="display:none">
-        {#each model.getOwnAttributes(_mixin._mixin) as attr (attr.key)}
-          <tr>
-            <td class="cell-icon">
-              {#if attr.icon}
-                <Icon icon={attr.icon} size="24" />
-              {/if}
-            </td>
-            <td width="120px">
-              <div class="label">{attr.label}</div>
-            </td>
-            <td>
-              <div class="edit">
-                <AttributeEditor attribute={attr} bind:value={object[attr.key]} />
-              </div>
-            </td>
-          </tr>
-        {/each}
-      </table>
+      {#each model.getMixins(group._class) as _mixin (_mixin)}
+        <div class="caption-4" style="cursor:pointer" on:click={(e) => toggleVisible(e)}>{_mixin.label}</div>
+        <table style="display:none">
+          {#each model.getOwnAttributes(_mixin._mixin) as attr (attr.key)}
+            <tr>
+              <td class="cell-icon">
+                {#if attr.icon}
+                  <Icon icon={attr.icon} size="24" />
+                {/if}
+              </td>
+              <td width="120px">
+                <div class="label">{attr.label}</div>
+              </td>
+              <td>
+                <div class="edit">
+                  <AttributeEditor attribute={attr} bind:value={object[attr.key]} />
+                </div>
+              </td>
+            </tr>
+          {/each}
+        </table>
       {/each}
     </div>
   {/each}
