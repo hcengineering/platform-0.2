@@ -16,7 +16,6 @@
   import ComboBox from '@anticrm/sparkling-controls/src/ComboBox.svelte'
   import type { AttrModel } from '@anticrm/presentation'
   import { Enum, EnumKey, EnumOf } from '@anticrm/core'
-  import { CORE_CLASS_ENUM } from '@anticrm/core'
   import { getCoreService } from '@anticrm/presentation'
 
   export let value: any
