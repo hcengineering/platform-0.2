@@ -28,9 +28,8 @@
   let items: Array<any> = []
   const label = attribute.label
 
-  getCoreService().then(async (cs) => {
-    const enumType = attribute.type as EnumOf<EnumKey>
-    _enum = await cs.findOne(CORE_CLASS_ENUM, { _id: enumType.of })
+  getCoreService().then(cs => {
+    _enum = cs.getModel().get((attribute.type as EnumOf<EnumKey>).of)
     if (_enum) {
       for (const key in _enum._literals) {
         items.push({

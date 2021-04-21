@@ -462,16 +462,8 @@ export class Model implements Storage {
     return result
   }
 
-  getClassMixins (cls: Ref<Class<Obj>>): Ref<Mixin<Doc>>[] {
-    const result = [] as Ref<Mixin<Doc>>[]
-    for (const doc of this.objects.values()) {
-      if (doc._class === CORE_CLASS_MIXIN) {
-        if ((doc as Mixin<Obj>)._extends === cls) {
-          result.push(doc._id as Ref<Mixin<Doc>>)
-        }
-      }
-    }
-    return result
+  getClassMixins (cls: Ref<Class<Obj>>): Ref<Doc>[] {
+    return this.extendsOfClass(cls).filter(_class => _class._class === CORE_CLASS_MIXIN).map(_class => _class._id)
   }
 
   is (_class: Ref<Class<Obj>>, a: Ref<Class<Obj>>): boolean {
