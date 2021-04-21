@@ -57,27 +57,19 @@
     setRows: (_rows) => (filteredRows = _rows)
   })
 
-  function onPageChange (event) {
-    dispatch('pageChange', event.detail)
-  }
-
-  function onSearch (event) {
-    dispatch('search', event.detail)
-  }
-
   const handleRowClick = (_id: any) => () => {
     dispatch('open', { _id, _class })
   }
 
   function onSort (event) {
-    // TODO: implement sorting feature within core service
+    // TODO: implement sorting feature with the core service
   }
 </script>
 
 <div class="table-component">
   <!-- control panel-->
   <slot name="controls">
-    <svelte:component this={TableControls} on:search={onSearch} />
+    <svelte:component this={TableControls} />
   </slot>
 
   <table>
@@ -123,7 +115,7 @@
   </table>
 
   <!--pagination-->
-  <Pagination {page} {pageSize} count={filteredRows.length - 1} on:pageChange={onPageChange} />
+  <Pagination {page} {pageSize} count={filteredRows.length - 1} />
 </div>
 
 <style lang="scss">
