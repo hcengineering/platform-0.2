@@ -107,4 +107,8 @@ export function model (S: Builder): void {
   S.mixin(calendar.class.CalendarEvent, presentation.mixin.CreateForm, {
     component: calendar.component.NewEventForm
   })
+
+  S.mixin(calendar.class.CalendarEvent, presentation.mixin.Presenter, {
+    presenter: calendar.component.EventPresenter
+  })
 }

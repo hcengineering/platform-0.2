@@ -17,6 +17,7 @@ import type { Platform } from '@anticrm/platform'
 import calendar, { CalendarService } from '.'
 import NewEventForm from './components/NewEventForm.svelte'
 import EventsCalendar from './components/EventsCalendar.svelte'
+import EventPresenter from './components/EventPresenter.svelte'
 
 /*!
  * Anticrm Platform™ Calendar Plugin
@@ -26,5 +27,6 @@ import EventsCalendar from './components/EventsCalendar.svelte'
 export default (platform: Platform): Promise<CalendarService> => {
   platform.setResource(calendar.component.NewEventForm, NewEventForm)
   platform.setResource(calendar.component.EventsCalendar, EventsCalendar)
+  platform.setResource(calendar.component.EventPresenter, EventPresenter)
   return Promise.resolve({})
 }

@@ -22,7 +22,9 @@ import {
   TRefTo, TType
 } from './models/core'
 import { TReference } from './models/references'
-import { TCreateTx, TDeleteTx, TObjectSelector, TTx, TTxOperation, TUpdateTx } from './models/tx'
+import {
+  TCreateTx, TDeleteTx, TObjectSelector, TObjectTx, TObjectTxDetails, TTx, TTxOperation, TUpdateTx
+} from './models/tx'
 
 export * from './models/core'
 export * from './models/references'
@@ -105,6 +107,6 @@ export function model (S: Builder): void {
   S.add(TIndexesClass, TVShortID)
   S.add(TStringType, TNumberType, TBooleanType, TDateType)
   S.add(TVDoc, TReference, TTitle, TApplication)
-  S.add(TTx, TCreateTx, TUpdateTx, TDeleteTx, TTxOperation, TObjectSelector)
+  S.add(TTx, TCreateTx, TUpdateTx, TDeleteTx, TTxOperation, TObjectSelector, TObjectTx, TObjectTxDetails)
   S.add(TSpace, TSpaceUser)
 }

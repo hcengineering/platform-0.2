@@ -137,6 +137,7 @@ export const CORE_CLASS_OBJ = 'class:core.Obj' as Ref<Class<Obj>>
 export const CORE_CLASS_DOC = 'class:core.Doc' as Ref<Class<Doc>>
 export const CORE_CLASS_EMB = 'class:core.Emb' as Ref<Class<Emb>>
 export const CORE_CLASS_CLASS = 'class:core.Class' as Ref<Class<Class<Obj>>>
+export const CORE_CLASS_MIXIN = 'class:core.Mixin' as Ref<Class<Mixin<Obj>>>
 export const CORE_CLASS_ENUM = 'class:core.Enum' as Ref<Class<Enum<any>>>
 
 export const CORE_CLASS_STRING = 'class:core.String' as Ref<Class<Type>>
