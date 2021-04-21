@@ -24,9 +24,9 @@ limitations under the License.
 
   import EditBox from '@anticrm/sparkling-controls/src/EditBox.svelte'
   import SpaceBox from '@anticrm/platform-ui/src/components/SpaceBox.svelte'
+  import ComboBox from '@anticrm/sparkling-controls/src/ComboBox.svelte'
 
   import type { Vacancy } from '..'
-  import ComboBox from '../../../../packages/sparkling-controls/src/ComboBox.svelte'
 
   const coreP = getCoreService()
   const modelP = coreP.then((c) => c.getModel())
@@ -42,8 +42,10 @@ limitations under the License.
   export let space: Space | undefined
   export let fsmRef: Ref<FSM> | undefined
 
+  let selectedFSM = 0
+
   let fsms: FSM[] = []
-  let fsmItems: { id: Ref<FSM>; comboValue: string }[] = []
+  let fsmItems: { id: number; comboValue: string; ref: Ref<FSM> }[] = []
   let lq: Promise<QueryUpdater<FSM>>
 
   $: lq = liveQuery(lq, fsmPlugin.class.FSM, { application: application._id }, (docs) => {
@@ -58,7 +60,8 @@ limitations under the License.
     }
   }
 
-  $: fsmItems = fsms.map((x) => ({ id: x._id as Ref<FSM>, comboValue: x.name }))
+  $: fsmItems = fsms.map((x, i) => ({ id: i, comboValue: x.name, ref: x._id as Ref<FSM> }))
+  $: fsmRef = fsmItems[selectedFSM]?.ref ?? fsmRef
 </script>
 
 <div class="form">
@@ -70,7 +73,7 @@ limitations under the License.
   <EditBox bind:value={vacancy.location} label="Location" placeholder="Russia, Novosibirsk" />
   <EditBox bind:value={vacancy.salary} label="Salary" />
   {#if fsmItems && fsmItems.length > 1}
-    <ComboBox items={fsmItems} selected={fsmRef} label="Flow" />
+    <ComboBox items={fsmItems} bind:selected={selectedFSM} label="Flow" />
   {/if}
 </div>
 

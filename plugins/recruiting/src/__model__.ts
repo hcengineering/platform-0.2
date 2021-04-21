@@ -175,4 +175,12 @@ function createVacanciesAppModel (S: Builder): void {
     .transition(states.techInterview, states.rejected)
     .transition(states.offer, states.rejected)
     .build(S)
+
+  fsm('Another default vacancy', recruiting.application.Vacancies, [recruiting.mixin.WithCandidateProps])
+    .transition(states.applied, states.techInterview)
+    .transition(states.techInterview, states.offer)
+    .transition(states.applied, states.rejected)
+    .transition(states.techInterview, states.rejected)
+    .transition(states.offer, states.rejected)
+    .build(S)
 }
