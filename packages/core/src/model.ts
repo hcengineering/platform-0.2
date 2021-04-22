@@ -439,7 +439,7 @@ export class Model implements Storage {
       doc._mixins = []
     }
     const mixins = (doc._mixins as Array<Ref<Mixin<Obj>>>)
-    if (mixins.indexOf(clazz) === -1) {
+    if (!mixins.includes(clazz)) {
       mixins.push(clazz)
     }
   }
@@ -481,8 +481,7 @@ export class Model implements Storage {
     if (this.domain !== domain) {
       throw new Error('domain does not match')
     }
-    const docs = await Promise.resolve(this.dump())
-    return docs
+    return await Promise.resolve(this.dump())
   }
 
   loadModel (model: Doc[]): void {
@@ -606,8 +605,7 @@ export class Model implements Storage {
   }
 
   async find<T extends Doc> (clazz: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T[]> {
-    const docs = await Promise.resolve(this.findSync(clazz, query))
-    return docs
+    return await Promise.resolve(this.findSync(clazz, query))
   }
 
   async findOne<T extends Doc> (clazz: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined> {

@@ -17,7 +17,7 @@ import { Class, Doc, DocumentValue, Model, Ref, StringProperty, Tx } from '@anti
 import { OperationProtocol } from '.'
 import { newCreateTx, newDeleteTx, newUpdateTx } from './tx'
 import {
-  CORE_CLASS_OBJECTTX_DETAILS, CORE_CLASS_SPACE, CORE_CLASS_VDOC, CORE_MIXIN_SHORTID, ObjectTx, ObjectTxDetails, Space,
+  CORE_CLASS_OBJECTTX_DETAILS, CORE_CLASS_SPACE, CORE_CLASS_TX_OPERATION, CORE_CLASS_VDOC, CORE_MIXIN_SHORTID, ObjectTx, ObjectTxDetails, Space,
   txBuilder, TxBuilder, TxOperation, TxOperationKind, UpdateTx
 } from '@anticrm/domains'
 
@@ -33,13 +33,13 @@ export function createOperations (model: Model, processTx: (tx: Tx) => Promise<a
   async function create<T extends Doc> (_class: Ref<Class<T>>, values: DocumentValue<T>): Promise<T> {
     const clazz = model.get(_class)
     if (clazz === undefined) {
-      return Promise.reject(new Error('Class ' + _class + ' not found'))
+      return await Promise.reject(new Error('Class ' + _class + ' not found'))
     }
 
     const doc = model.createDocument(_class, values)
 
     const { _objectSpace, spaceIsRequired } = getSpace(model, doc)
-    if (!_objectSpace && spaceIsRequired) {
+    if ((_objectSpace == null) && spaceIsRequired) {
       throw new Error('Every VDoc based object should contain _space property')
     }
     const tx = newCreateTx(doc, getUserId(), _objectSpace)
@@ -49,21 +49,20 @@ export function createOperations (model: Model, processTx: (tx: Tx) => Promise<a
     return doc
   }
 
-  function updateWith<T extends Doc> (doc: T, builder: (s: TxBuilder<T>) => TxOperation | TxOperation[]): Promise<T> {
+  async function updateWith<T extends Doc> (doc: T, builder: (s: TxBuilder<T>) => TxOperation | TxOperation[]): Promise<T> {
     const b = txBuilder<T>(doc._class as Ref<Class<T>>)
     const op = builder(b)
 
     const { _objectSpace, spaceIsRequired } = getSpace(model, doc)
-    if (!_objectSpace && spaceIsRequired) {
+    if ((_objectSpace == null) && spaceIsRequired) {
       throw new Error('Every VDoc based object should contain _space property')
     }
 
     const tx: UpdateTx = newUpdateTx(doc._class, doc._id, (op instanceof Array) ? op : [op], getUserId(), _objectSpace)
 
     fillUpdateDetails(doc, tx)
-    return processTx(
-      tx
-    ).then(() => doc as T)
+    await processTx(tx)
+    return doc
   }
 
   function fillUpdateDetails<T extends Doc> (doc: T, tx: ObjectTx): void {
@@ -72,9 +71,9 @@ export function createOperations (model: Model, processTx: (tx: Tx) => Promise<a
 
     // Fill primary field
     const primary = model.getPrimaryKey(doc._class)
-    if (primary) {
+    if (primary !== undefined) {
       const title = (doc as any)[primary]
-      if (title) {
+      if (title !== undefined) {
         details.name = title
       }
     }
@@ -88,31 +87,35 @@ export function createOperations (model: Model, processTx: (tx: Tx) => Promise<a
     }
   }
 
-  function update<T extends Doc> (doc: T, value: Partial<Omit<T, keyof Doc>>): Promise<T> {
+  async function update<T extends Doc> (doc: T, value: Partial<Omit<T, keyof Doc>>): Promise<T> {
     const { _objectSpace, spaceIsRequired } = getSpace(model, doc)
-    if (!_objectSpace && spaceIsRequired) {
+    if ((_objectSpace == null) && spaceIsRequired) {
       throw new Error('Every VDoc based object should contain _space property')
     }
 
-    const tx = newUpdateTx(doc._class, doc._id, [{
+    const txOp: TxOperation = {
+      _class: CORE_CLASS_TX_OPERATION,
       kind: TxOperationKind.Set,
       _attributes: value
-    } as TxOperation], getUserId(), _objectSpace)
+    }
+    const tx = newUpdateTx(doc._class, doc._id, [txOp], getUserId(), _objectSpace)
 
     fillUpdateDetails(doc, tx)
 
-    return processTx(tx).then(() => doc as T)
+    await processTx(tx)
+    return doc
   }
 
-  function remove<T extends Doc> (doc: T): Promise<T> {
+  async function remove<T extends Doc> (doc: T): Promise<T> {
     const { _objectSpace, spaceIsRequired } = getSpace(model, doc)
-    if (!_objectSpace && spaceIsRequired) {
+    if ((_objectSpace == null) && spaceIsRequired) {
       throw new Error('Every VDoc based object should contain _space property')
     }
 
     const tx = newDeleteTx(doc._class, doc._id, getUserId(), _objectSpace)
     fillUpdateDetails(doc, tx)
-    return processTx(tx).then(() => doc as T)
+    await processTx(tx)
+    return doc
   }
 
   return {
