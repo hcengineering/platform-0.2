@@ -1,15 +1,39 @@
+//
+// Copyright © 2021 Anticrm Platform Contributors.
+// 
+// Licensed under the Eclipse Public License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License. You may
+// obtain a copy of the License at https://www.eclipse.org/legal/epl-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// 
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
 /* Dark Theme */
 .theme-dark {
-  --theme-primary-color: #5143A8;
   --theme-bg-color: #18181e;
   --theme-bg-dark-color: #111117;
   --theme-bg-dark-hover: #111117;
   --theme-bg-accent-color: rgba(255, 255, 255, .03);
   --theme-bg-accent-hover: rgba(255, 255, 255, .06);
   --theme-bg-accent-active: rgba(255, 255, 255, .09);
+  --theme-bg-focused-color: rgba(255, 255, 255, .1);
   --theme-border-accent-color: rgba(255, 255, 255, .03);
   --theme-border-accent-hover: rgba(255, 255, 255, .08);
-  --theme-border-accent-active: rgba(255, 255, 255, .012);
+  --theme-border-accent-active: rgba(255, 255, 255, .12);
+  --theme-border-focused-color: rgba(255, 255, 255, .4);
+  --theme-primary-color: #4474F6;
+  --theme-primary-hover: #2A5FF6;
+  --theme-primary-focus: #194CD7;
+  --theme-primary-disable: #5771B9;
+  --theme-primary-outline: rgba(87, 132, 255, .3);
+  --theme-primary-border: rgba(255, 255, 255, .09);
+  --theme-error-color: #EE7A7A;
+  --theme-error-border: rgba(244, 130, 130, 0.3);
   --theme-selection-item: rgba(148, 144, 170, 0.13);
 
   --theme-caption-color: #fff;
