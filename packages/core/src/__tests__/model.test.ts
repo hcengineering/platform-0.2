@@ -213,6 +213,7 @@ describe('invalid cases', () => {
     await model.store(txContext(), doc)
     try {
       await model.store(txContext(), doc)
+      expect(model).toBeUndefined()
     } catch (err) {
       expect(err.message).toEqual('document added already ' + doc._id)
     }
