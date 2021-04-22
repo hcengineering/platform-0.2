@@ -23,10 +23,10 @@ import {
 } from '..'
 
 import {
-  MessageMarkType, MessageNode, parseMessage, ReferenceMark, traverseMarks, traverseMessage
+  MessageMarkType, parseMessage, ReferenceMark, traverseMarks, traverseMessage
 } from '@anticrm/text'
 
-type ClassKey = { key: string, _class: Ref<Class<Emb>> }
+interface ClassKey { key: string, _class: Ref<Class<Emb>> }
 
 /**
  * I N D E X
@@ -49,7 +49,7 @@ export class ReferenceIndex implements DomainIndex {
 
   private getTextAttributes (_class: Ref<Class<Obj>>): string[] {
     const cached = this.textAttributes.get(_class)
-    if (cached) return cached
+    if (cached != null) return cached
 
     const keys = this.modelDb
       .getAllAttributes(_class)
@@ -61,7 +61,7 @@ export class ReferenceIndex implements DomainIndex {
 
   private getArrayAttributes (_class: Ref<Class<Obj>>): ClassKey[] {
     const cached = this.arrayAttributes.get(_class)
-    if (cached) return cached
+    if (cached != null) return cached
 
     const keys = this.modelDb
       .getAllAttributes(_class)
@@ -70,16 +70,16 @@ export class ReferenceIndex implements DomainIndex {
         return {
           key: m.key,
           _class: ((m.attr.type as ArrayOf).of as InstanceOf<Emb>).of
-        } as ClassKey
+        }
       })
     this.arrayAttributes.set(_class, keys)
     return keys
   }
 
-  private referencesFromMessage (_class: Ref<Class<Doc>>, _id: Ref<Doc> | undefined, message: string, props: Record<string, unknown>, index: { value: number }): Reference[] {
+  private referencesFromMessage (_class: Ref<Class<Doc>>, _id: Ref<Doc>, message: string, props: Record<string, unknown>, index: { value: number }): Reference[] {
     const result: Reference[] = []
     const refMatcher = new Set()
-    traverseMessage(parseMessage(message) as MessageNode, (el) => {
+    traverseMessage(parseMessage(message), (el) => {
       traverseMarks(el, (m) => {
         if (m.type === MessageMarkType.reference) {
           const rm = m as ReferenceMark
@@ -103,7 +103,7 @@ export class ReferenceIndex implements DomainIndex {
     return result
   }
 
-  private references (_class: Ref<Class<Doc>>, _id: Ref<Doc> | undefined, obj: AnyLayout, props: Record<string, unknown>, index: { value: number }): Reference[] {
+  private references (_class: Ref<Class<Doc>>, _id: Ref<Doc>, obj: AnyLayout, props: Record<string, unknown>, index: { value: number }): Reference[] {
     const attributes = this.getTextAttributes(_class)
     const backlinks = []
     for (const attr of attributes) {
@@ -115,11 +115,11 @@ export class ReferenceIndex implements DomainIndex {
   async tx (ctx: TxContext, tx: Tx): Promise<any> {
     switch (tx._class) {
       case CORE_CLASS_CREATE_TX:
-        return this.onCreate(ctx, tx as CreateTx)
+        return await this.onCreate(ctx, tx as CreateTx)
       case CORE_CLASS_UPDATE_TX:
-        return this.onUpdateTx(ctx, tx as UpdateTx)
+        return await this.onUpdateTx(ctx, tx as UpdateTx)
       case CORE_CLASS_DELETE_TX:
-        return this.onDeleteTx(ctx, tx as DeleteTx)
+        return await this.onDeleteTx(ctx, tx as DeleteTx)
       default:
         console.log('not implemented text tx', tx)
     }
@@ -131,7 +131,7 @@ export class ReferenceIndex implements DomainIndex {
     const arrays = this.getArrayAttributes(_objectClass)
     for (const attr of arrays) {
       const arr = object[attr.key]
-      if (arr) {
+      if (arr !== undefined) {
         for (let i = 0; i < arr.length; i++) {
           backlinks.push(...this.references(_objectClass, _objectId, arr[i], {
             pos: i,
@@ -149,15 +149,15 @@ export class ReferenceIndex implements DomainIndex {
     if (refereces.length === 0) {
       return
     }
-    return Promise.all(refereces.map((d) => {
-      return this.storage.store(ctx, d)
+    return await Promise.all(refereces.map(async (d) => {
+      await this.storage.store(ctx, d)
     }))
   }
 
   private async onUpdateTx (ctx: TxContext, update: UpdateTx): Promise<any> {
     const obj = await this.storage.findOne(update._objectClass, { _id: update._objectId }) as Doc
     this.modelDb.updateDocument(this.modelDb.as(obj, update._objectClass), update.operations)
-    if (!obj) {
+    if (obj === undefined) {
       throw new Error('object not found')
     }
 
@@ -167,10 +167,10 @@ export class ReferenceIndex implements DomainIndex {
       _sourceClass: update._objectClass
     })
 
-    return this.diffApply(refs, this.collect(update._objectClass, update._objectId, obj as any), ctx)
+    return await this.diffApply(refs, this.collect(update._objectClass, update._objectId, obj as any), ctx)
   }
 
-  private diffApply (refs: Reference[], newRefs: Reference[], ctx: TxContext): Promise<void[][]> {
+  private async diffApply (refs: Reference[], newRefs: Reference[], ctx: TxContext): Promise<void> {
     // Do diff from old refs to remove only missing.
     const deletes: Reference[] = []
     const existing: Reference[] = []
@@ -192,13 +192,13 @@ export class ReferenceIndex implements DomainIndex {
       }
     }
     const additions = newRefs.filter(e => existing.indexOf(e) === -1)
-    const stored = Promise.all(additions.map((d) => {
-      return this.storage.store(ctx, d)
+    const stored = Promise.all(additions.map(async (d) => {
+      await this.storage.store(ctx, d)
     }))
-    const deleted = Promise.all(deletes.map((d) => {
-      return this.storage.remove(ctx, d._class, d._id)
+    const deleted = Promise.all(deletes.map(async (d) => {
+      await this.storage.remove(ctx, d._class, d._id)
     }))
-    return Promise.all([stored, deleted])
+    await Promise.all([stored, deleted])
   }
 
   private async onDeleteTx (ctx: TxContext, deleteTx: DeleteTx): Promise<any> {
@@ -208,6 +208,6 @@ export class ReferenceIndex implements DomainIndex {
       _sourceClass: deleteTx._objectClass
     })
 
-    return this.diffApply(refs, [], ctx)
+    return await this.diffApply(refs, [], ctx)
   }
 }

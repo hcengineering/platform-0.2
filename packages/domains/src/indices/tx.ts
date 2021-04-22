@@ -22,7 +22,7 @@ export class TxIndex implements DomainIndex {
     this.storage = storage
   }
 
-  tx (ctx: TxContext, tx: Tx): Promise<any> {
-    return this.storage.store(ctx, tx)
+  async tx (ctx: TxContext, tx: Tx): Promise<any> {
+    await this.storage.store(ctx, tx)
   }
 }
