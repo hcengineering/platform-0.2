@@ -23,7 +23,7 @@ import Router from 'koa-router'
 import bodyParser from 'koa-bodyparser'
 import cors from '@koa/cors'
 
-const dbUri = process.env.MONGODB_URI || 'mongodb://localhost:27017'
+const dbUri = process.env.MONGODB_URI ?? 'mongodb://localhost:27017'
 let client: MongoClient
 
 const app = new Koa()
@@ -32,7 +32,7 @@ const router = new Router()
 router.post('rpc', '/rpc', async (ctx) => {
   const request = ctx.request.body
   const method = (methods as { [key: string]: (db: Db, request: Request<any>) => Response<any> })[request.method]
-  if (!request.method) {
+  if (request.method === undefined) {
     const response: Response<void> = {
       id: request.id,
       error: {
@@ -44,7 +44,7 @@ router.post('rpc', '/rpc', async (ctx) => {
     ctx.body = serialize(response)
   }
 
-  if (!client) {
+  if (client === undefined) {
     client = await MongoClient.connect(dbUri, { useUnifiedTopology: true })
   }
   const db = accountsDb(client)

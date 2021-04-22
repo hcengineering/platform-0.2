@@ -49,23 +49,23 @@ export default async (platform: Platform): Promise<CoreService> => {
 
   const coreProtocol: CoreProtocol = {
     async find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T[]> {
-      const result = (await rpc.request(RPC_CALL_FIND, _class, query)) as T[]
+      const result = (await rpc.request<T[]>(RPC_CALL_FIND, _class, query))
       return result.map((it) => model.as(it, _class))
     },
     async findOne<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined> {
-      const result = (await rpc.request(RPC_CALL_FINDONE, _class, query)) as (T | undefined)
-      if (result) {
+      const result = (await rpc.request<T>(RPC_CALL_FINDONE, _class, query))
+      if (result != null) {
         return model.as(result, _class)
       }
       return result
     },
-    tx (tx: Tx): Promise<any> {
-      return rpc.request(RPC_CALL_TX, tx)
+    async tx (tx: Tx): Promise<any> {
+      await rpc.request(RPC_CALL_TX, tx)
     },
-    loadDomain (domain: string): Promise<Doc[]> {
+    loadDomain (domain: string): Promise<Doc[]> { // eslint-disable-line @typescript-eslint/promise-function-async
       return rpc.request(RPC_CALL_LOAD_DOMAIN, domain)
     },
-    genRefId (_space: Ref<Space>) {
+    genRefId (_space: Ref<Space>): Promise<Ref<VDoc>> { // eslint-disable-line @typescript-eslint/promise-function-async
       return rpc.request(RPC_CALL_GEN_REF_ID, _space)
     }
   }
@@ -96,68 +96,56 @@ export default async (platform: Platform): Promise<CoreService> => {
   ])
 
   // add listener to process data updates from backend for data transactions.
-  rpc.addEventListener(EventType.Transaction, result => {
-    txProcessor.process(txContext(TxContextSource.Server), result as Tx)
+  rpc.addEventListener(EventType.Transaction, async (result) => {
+    await txProcessor.process(txContext(TxContextSource.Server), result as Tx)
   })
 
   // Add a client transaction event listener
-  rpc.addEventListener(EventType.TransientTransaction, txs => {
+  rpc.addEventListener(EventType.TransientTransaction, async (txs) => {
     for (const tx of (txs as Tx[])) {
-      txProcessor.process(txContext(TxContextSource.ServerTransient), tx)
+      await txProcessor.process(txContext(TxContextSource.ServerTransient), tx)
     }
   })
 
-  function find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T[]> {
-    const domainName = model.getDomain(_class)
-    const domain = domains.get(domainName)
-    if (domain) {
-      return domain.find(_class, query)
-    }
-    return cache.find(_class, query)
+  async function find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T[]> {
+    const domain = domains.get(model.getDomain(_class))
+    return await (domain ?? qCache).find(_class, query)
   }
 
-  function findOne<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined> {
-    const domainName = model.getDomain(_class)
-    const domain = domains.get(domainName)
-    if (domain) {
-      return domain.findOne(_class, query)
-    }
-    return cache.findOne(_class, query)
+  async function findOne<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined> {
+    const domain = domains.get(model.getDomain(_class))
+    return await (domain ?? qCache).findOne(_class, query)
   }
 
   function query<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): QueryResult<T> {
-    const domainName = model.getDomain(_class)
-    const domain = domains.get(domainName)
-    if (domain) {
-      return domain.query(_class, query)
-    }
-    return qCache.query(_class, query)
+    const domain = domains.get(model.getDomain(_class))
+    return (domain ?? qCache).query(_class, query)
   }
 
-  function generateId () {
-    return genId() as Ref<Doc>
+  function generateId (): Ref<Doc> {
+    return genId()
   }
 
-  function processTx (tx: Tx): Promise<any> {
+  async function processTx (tx: Tx): Promise<any> {
     const networkComplete = coreProtocol.tx(tx)
-    return Promise.all([
+    await Promise.all([
       networkComplete,
       txProcessor.process(txContext(TxContextSource.Client, networkComplete), tx)
     ])
   }
 
-  function getUserId () {
+  function getUserId (): StringProperty | undefined {
     return platform.getMetadata(core.metadata.WhoAmI) as StringProperty
   }
 
   const ops = createOperations(model, processTx, getUserId)
 
-  function loadDomain (domain: string): Promise<Doc[]> {
-    return coreProtocol.loadDomain(domain)
+  async function loadDomain (domain: string): Promise<Doc[]> {
+    return await coreProtocol.loadDomain(domain)
   }
 
-  function genRefId (_space: Ref<Space>): Promise<Ref<VDoc>> {
-    return coreProtocol.genRefId(_space)
+  async function genRefId (_space: Ref<Space>): Promise<Ref<VDoc>> {
+    return await coreProtocol.genRefId(_space)
   }
 
   return {
@@ -171,5 +159,5 @@ export default async (platform: Platform): Promise<CoreService> => {
     tx: processTx,
     getUserId,
     genRefId
-  } as CoreService
+  }
 }

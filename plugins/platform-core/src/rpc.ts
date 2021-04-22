@@ -26,8 +26,8 @@ export enum EventType {
 }
 
 export interface RpcService {
-  request<R> (method: string, ...params: any[]): Promise<R>
-  addEventListener (type: EventType, listener: EventListener): void
+  request: <R>(method: string, ...params: any[]) => Promise<R>
+  addEventListener: (type: EventType, listener: EventListener) => void
 }
 
 export default (platform: Platform): RpcService => {
@@ -39,13 +39,13 @@ export default (platform: Platform): RpcService => {
   const requests = new Map<ReqId, PromiseInfo>()
   let lastId = 0
 
-  async function createWebsocket () {
-    const host = platform.getMetadata(core.metadata.WSHost)
-    const port = platform.getMetadata(core.metadata.WSPort)
+  function createWebsocket (): Promise<WebSocket> { // eslint-disable-line @typescript-eslint/promise-function-async
+    const host = platform.getMetadata(core.metadata.WSHost) ?? 'localhost'
+    const port = platform.getMetadata(core.metadata.WSPort) ?? 3000
 
     const token = platform.getMetadata(core.metadata.Token)
 
-    if (!token) {
+    if (token === undefined) {
       platform.broadcastEvent(PlatformStatus, new Status(Severity.ERROR, PlatformStatusCodes.AUTHENTICATON_REQUIRED, 'Authentication is required'))
       return Promise.reject(new Error('authentication required'))
     }
@@ -67,16 +67,16 @@ export default (platform: Platform): RpcService => {
 
       ws.onmessage = (ev: MessageEvent) => {
         const response = readResponse(ev.data)
-        if (!response.id) {
-          if (response.result) {
-            for (const listener of (listeners.get(EventType.Transaction) || [])) {
+        if (response.id === undefined) {
+          if (response.result !== undefined) {
+            for (const listener of (listeners.get(EventType.Transaction) ?? [])) {
               listener(response.result)
             }
           }
         } else {
           const promise = requests.get(response.id)
-          if (promise) {
-            if (response.error) {
+          if (promise != null) {
+            if (response.error != null) {
               promise.reject(response.error)
             } else {
               promise.resolve(response.result)
@@ -86,8 +86,8 @@ export default (platform: Platform): RpcService => {
             throw new Error('unknown rpc id')
           }
         }
-        if (response.clientTx && response.clientTx.length > 0) {
-          for (const listener of (listeners.get(EventType.TransientTransaction) || [])) {
+        if ((response.clientTx != null) && response.clientTx.length > 0) {
+          for (const listener of (listeners.get(EventType.TransientTransaction) ?? [])) {
             listener(response.clientTx)
           }
         }
@@ -95,29 +95,29 @@ export default (platform: Platform): RpcService => {
     })
   }
 
-  let websocket: WebSocket | null = null
+  let websocket: WebSocket | undefined
 
-  async function getWebSocket () {
-    if (websocket === null || websocket.readyState === WebSocket.CLOSED || websocket.readyState === WebSocket.CLOSING) {
+  async function getWebSocket (): Promise<WebSocket> {
+    if (websocket === undefined || websocket.readyState === WebSocket.CLOSED || websocket.readyState === WebSocket.CLOSING) {
       websocket = await createWebsocket()
     }
     return websocket
   }
 
   async function request<R> (method: string, ...params: any[]): Promise<R> {
-    return new Promise<any>((resolve, reject) => {
+    return await new Promise<any>((resolve, reject) => {
       const id = ++lastId
       requests.set(id, {
         resolve,
         reject
       })
-      getWebSocket().then(ws => {
+      getWebSocket().then((ws: WebSocket) => {
         ws.send(serialize({
           id,
           method,
           params
         }))
-      }).catch(err => {
+      }).catch((err: any) => {
         reject(err)
       })
     })
@@ -129,7 +129,7 @@ export default (platform: Platform): RpcService => {
     request,
     addEventListener (type: EventType, listener: EventListener) {
       let val = listeners.get(type)
-      if (!val) {
+      if (val === undefined) {
         val = []
         listeners.set(type, val)
       }

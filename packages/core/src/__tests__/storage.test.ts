@@ -24,14 +24,12 @@ describe('storage', () => {
       const idxs = [
         {
           tx: jest.fn(async (_ctx: TxContext, _tx: Tx): Promise<number> => {
-            const doc = await Promise.resolve(1)
-            return doc
+            return await Promise.resolve(1)
           })
         },
         {
           tx: jest.fn(async (_ctx: TxContext, _tx: Tx): Promise<number> => {
-            const doc = await Promise.resolve(2)
-            return doc
+            return await Promise.resolve(2)
           })
         }
       ]

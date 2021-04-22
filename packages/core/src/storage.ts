@@ -83,8 +83,6 @@ export type DocumentValueRaw<T> = {
 }
 export type DocumentValue<T> = T extends Doc ? DocumentValueRaw<Omit<T, keyof Doc>> : never | T extends Emb ? DocumentValueRaw<Omit<T, keyof Emb>>: never | T extends Obj ? T : T
 
-///
-
 export interface DocumentProtocol {
   find: <T extends Doc>(_class: Ref<Class<T>>, query: DocumentQuery<T>) => Promise<T[]>
   findOne: <T extends Doc>(_class: Ref<Class<T>>, query: DocumentQuery<T>) => Promise<T | undefined>
@@ -158,19 +156,13 @@ class CombineStorage implements Storage {
   }
 
   async find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T[]> {
-    const docs = (await Promise.all(this.storages.map(async (s) => {
-      const doc = await s.find(_class, query)
-      return doc
-    }))).reduce((p, c) => p.concat(c))
-    return docs
+    return (await Promise.all(this.storages.map(async (s) => await s.find(_class, query)))).reduce((p, c) => p.concat(c))
   }
 
   async findOne<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined> {
-    const doc = await Promise.race(this.storages.map(async (s) => {
-      const doc = await s.findOne(_class, query)
-      return doc
+    return await Promise.race(this.storages.map(async (s) => {
+      return await s.findOne(_class, query)
     }))
-    return doc
   }
 
   async remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<void> {
