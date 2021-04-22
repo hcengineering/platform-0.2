@@ -49,6 +49,10 @@
     border: 1px solid var(--theme-border-accent-color);
     border-radius: 12px;
     backdrop-filter: blur(12px);
+    &:focus-within {
+      background-color: var(--theme-bg-focused-color);
+      border-color: var(--theme-border-focused-color);
+    }
     input {
       height: 52px;
       padding: 14px 20px 0px;
@@ -82,6 +86,9 @@
   }
   .error {
     border: 1px solid var(--theme-error-border);
+    &:focus-within {
+      border-color: var(--theme-error-color);
+    }
   }
   .error-label {
     position: absolute;

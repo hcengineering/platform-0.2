@@ -21,10 +21,16 @@
   --theme-bg-accent-color: rgba(255, 255, 255, .03);
   --theme-bg-accent-hover: rgba(255, 255, 255, .06);
   --theme-bg-accent-active: rgba(255, 255, 255, .09);
+  --theme-bg-focused-color: rgba(255, 255, 255, .1);
   --theme-border-accent-color: rgba(255, 255, 255, .03);
   --theme-border-accent-hover: rgba(255, 255, 255, .08);
   --theme-border-accent-active: rgba(255, 255, 255, .12);
-  --theme-primary-color: #4B38BD;
+  --theme-border-focused-color: rgba(255, 255, 255, .4);
+  --theme-primary-color: #4474F6;
+  --theme-primary-hover: #2A5FF6;
+  --theme-primary-focus: #194CD7;
+  --theme-primary-disable: #5771B9;
+  --theme-primary-outline: rgba(87, 132, 255, .3);
   --theme-primary-border: rgba(255, 255, 255, .09);
   --theme-error-color: #EE7A7A;
   --theme-error-border: rgba(244, 130, 130, 0.3);
