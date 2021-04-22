@@ -221,6 +221,7 @@ export interface SpaceUser extends Emb {
 }
 
 export const CORE_CLASS_SPACE = 'class:core.Space' as Ref<Class<Space>>
+export const CORE_CLASS_SPACE_USER = 'class:core.SpaceUser' as Ref<Class<SpaceUser>>
 
 /**
  * Define an application descriptor.

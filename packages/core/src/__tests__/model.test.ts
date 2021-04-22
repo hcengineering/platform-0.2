@@ -90,7 +90,7 @@ describe('matching', () => {
 
   it('push subtask value', () => {
     const clone = model.createDocument(taskIds.class.Task, doc1)
-    model.updateDocumentPush(clone, 'tasks' as StringProperty, (createSubtask('subtask3', 34) as unknown) as AnyLayout)
+    model.updateDocumentPush<Task, SubTask>(clone, 'tasks' as StringProperty, createSubtask('subtask3', 34))
 
     expect(clone.tasks?.length).toEqual(3)
   })
@@ -131,7 +131,7 @@ describe('matching', () => {
 
   it('remove item from array', () => {
     const clone = model.createDocument(taskIds.class.Task, doc1)
-    const cloneResult = model.updateDocumentPull(clone, 'tasks', { name: 'subtask1' as StringProperty })
+    const cloneResult = model.updateDocumentPull<Task, SubTask>(clone, 'tasks', { name: 'subtask1' })
 
     expect(cloneResult.tasks?.length).toEqual(1)
     expect(cloneResult.tasks?.[0].name).toEqual('subtask2')
@@ -139,7 +139,7 @@ describe('matching', () => {
 
   it('remove item from instance', () => {
     const clone = model.createDocument(taskIds.class.Task, doc1)
-    const cloneResult = model.updateDocumentPull(clone, 'mainTask', {})
+    const cloneResult = model.updateDocumentPull<Task, SubTask>(clone, 'mainTask', {})
 
     expect(cloneResult.mainTask).toEqual(undefined)
   })
@@ -248,7 +248,7 @@ describe('invalid cases', () => {
     const model = new Model('vdocs')
     model.loadModel(data)
 
-    const doc = model.createDocument(taskIds.class.Task, createTask('', 0, ''))
+    const doc = model.createDocument<Task>(taskIds.class.Task, createTask('', 0, ''))
 
     const txOp: TxOperation = {
       _class: CORE_CLASS_TX_OPERATION,
@@ -267,13 +267,13 @@ describe('invalid cases', () => {
     const model = new Model('vdocs')
     model.loadModel(data)
 
-    const doc = model.createDocument(taskIds.class.Task, createTask('', 0, ''))
+    const doc = model.createDocument<Task>(taskIds.class.Task, createTask('', 0, ''))
 
     expect(
-      () => model.updateDocumentPush(
+      () => model.updateDocumentPush<Task, SubTask>(
         doc,
         'Not exist',
-        (createSubtask('subtask3', 34) as unknown) as AnyLayout
+        createSubtask('subtask3', 34)
       )
     ).toThrowError()
   })
@@ -540,15 +540,15 @@ describe('Model storage', () => {
     const newSubtask = createSubtask('subtask3', 34)
     const expectedDoc = {
       ...doc,
-      tasks: [...existingSubtasks, newSubtask]
+      tasks: [...existingSubtasks, { ...newSubtask, _class: taskIds.class.Subtask }]
     }
 
-    await model.push(
+    await model.push<SubTask>(
       txContext(),
       '' as Ref<Class<Doc>>,
       doc._id,
       'tasks',
-      newSubtask as unknown as AnyLayout
+      newSubtask
     )
 
     const updatedDoc = model.get(doc._id) as Task

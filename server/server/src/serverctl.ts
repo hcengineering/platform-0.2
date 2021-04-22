@@ -18,11 +18,11 @@ import WebSocket from 'ws'
 import { encode } from 'jwt-simple'
 import { serialize } from '@anticrm/rpc'
 
-const ctlpassword = process.env.CTL_PASSWORD || '123pass'
+const ctlpassword = process.env.CTL_PASSWORD ?? '123pass'
 
 const port = '18080'
 
-function connect () {
+function connect (): WebSocket {
   const client: Client = {
     workspace: 'latest-model',
     email: 'john'

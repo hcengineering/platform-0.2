@@ -15,15 +15,12 @@
 //
 /* eslint-env jest */
 
-import { ServerSuite } from './serversuite'
-
-import { BooleanProperty, StringProperty, Tx, txContext } from '@anticrm/core'
-import { createSetArrayFilters } from '../mongo_utils'
-
-import { createSubtask, Task, TaskComment, taskIds as task } from '@anticrm/core/src/__tests__/tasks'
-
+import { BooleanProperty, DocumentValue, StringProperty, Tx, txContext } from '@anticrm/core'
+import { createSubtask, Task, taskIds as task } from '@anticrm/core/src/__tests__/tasks'
+import { CORE_CLASS_OBJECT_SELECTOR, CORE_CLASS_SPACE } from '@anticrm/domains'
 import { createOperations } from '@anticrm/platform-core/src/operations'
-import { CORE_CLASS_SPACE, ObjectSelector } from '@anticrm/domains'
+import { createSetArrayFilters } from '../mongo_utils'
+import { ServerSuite } from './serversuite'
 
 describe('mongo operations', () => {
   const wsName = 'test-service-mongo'
@@ -46,9 +43,10 @@ describe('mongo operations', () => {
 
     const f1 = createSetArrayFilters(model, CORE_CLASS_SPACE,
       [{
+        _class: CORE_CLASS_OBJECT_SELECTOR,
         key: 'users',
         pattern: { userId: 'qwe.com' }
-      } as ObjectSelector],
+      }],
       { owner: true as BooleanProperty }, 1)
 
     expect(f1).toEqual({
@@ -70,12 +68,14 @@ describe('mongo operations', () => {
 
     const f1 = createSetArrayFilters(model, task.class.Task,
       [{
+        _class: CORE_CLASS_OBJECT_SELECTOR,
         key: 'tasks',
         pattern: { name: 'subtask1' }
-      } as ObjectSelector, {
+      }, {
+        _class: CORE_CLASS_OBJECT_SELECTOR,
         key: 'comments',
         pattern: { _id: '#0' }
-      } as ObjectSelector], { author: 'Dart' as StringProperty },
+      }], { author: 'Dart' as StringProperty },
       1
     )
 
@@ -97,7 +97,8 @@ describe('mongo operations', () => {
   it('check $set depth2', async () => {
     const ws = await server.getWorkspace(wsName)
 
-    const doc1 = {
+    const doc1: DocumentValue<Task> = {
+      description: '',
       name: 'my-space',
       lists: ['val1', 'val2'],
       rate: 20,
@@ -106,18 +107,23 @@ describe('mongo operations', () => {
         createSubtask('subtask1', 31),
         createSubtask('subtask2', 33)
       ]
-    } as Task
+    }
 
     doc1.tasks![0].comments = [{
       _id: '#0',
+      author: '',
+      date: new Date(),
+      oldVersion: [],
       message: 'qwe'
-    } as TaskComment]
+    }]
 
-    const processTx = (tx: Tx) => ws.tx(txContext(), tx)
+    const processTx = async (tx: Tx): Promise<void> => {
+      await ws.tx(txContext(), tx)
+    }
 
     const ops = createOperations(await ws.getModel(), processTx, () => 'qwe' as StringProperty)
 
-    const d1 = await ops.create(task.class.Task, doc1)
+    const d1 = await ops.create<Task>(task.class.Task, doc1)
     const d2 = await ops.updateWith(d1, (s) =>
       s.tasks.match({ name: 'subtask1' }).comments.match({ _id: '#0' }).set({
         author: 'Dart',
@@ -138,12 +144,14 @@ describe('mongo operations', () => {
 
     const f1 = createSetArrayFilters(model, task.class.Task, [
       {
+        _class: CORE_CLASS_OBJECT_SELECTOR,
         key: 'tasks',
         pattern: { name: 'subtask1' }
-      } as ObjectSelector, {
+      }, {
+        _class: CORE_CLASS_OBJECT_SELECTOR,
         key: 'comments',
         pattern: { _id: '#0' as StringProperty }
-      } as ObjectSelector
+      }
     ], { author: 'Dart' as StringProperty }, 1)
 
     expect(f1).toEqual({
@@ -165,8 +173,9 @@ describe('mongo operations', () => {
   it('check $push with depth', async () => {
     const ws = await server.getWorkspace(wsName)
 
-    const doc1 = {
+    const doc1: DocumentValue<Task> = {
       name: 'my-space',
+      description: '',
       lists: ['val1', 'val2'],
       rate: 20,
       mainTask: createSubtask('main-subtask', 30),
@@ -174,17 +183,22 @@ describe('mongo operations', () => {
         createSubtask('subtask1', 31),
         createSubtask('subtask2', 33)
       ]
-    } as Task
+    }
 
     doc1.tasks![0].comments = [{
       _id: '#1',
-      message: 'qwe'
-    } as TaskComment]
+      message: 'qwe',
+      author: '',
+      date: new Date(),
+      oldVersion: []
+    }]
 
-    const processTx = (tx: Tx) => ws.tx(txContext(), tx)
+    const processTx = async (tx: Tx): Promise<void> => {
+      await ws.tx(txContext(), tx)
+    }
     const ops = createOperations(await ws.getModel(), processTx, () => 'qwe' as StringProperty)
 
-    const d1 = await ops.create(task.class.Task, doc1)
+    const d1 = await ops.create<Task>(task.class.Task, doc1)
     const d2 = await ops.updateWith(d1, (s) =>
       s.tasks.match({ name: 'subtask1' }).comments.push({ _id: '#2', message: 'qwe-comment' }))
 
@@ -199,24 +213,27 @@ describe('mongo operations', () => {
   it('check $pull with depth', async () => {
     const ws = await server.getWorkspace(wsName)
 
-    const doc1 = {
+    const doc1: DocumentValue<Task> = {
       name: 'my-space',
+      description: '',
       lists: ['val1', 'val2'],
       rate: 20,
       mainTask: createSubtask('main-subtask', 30),
       tasks: [
-        createSubtask('subtask1', 31, [{ _id: '#1', message: 'qwe' } as TaskComment, {
-          _id: '#2',
-          message: 'qwe2'
-        } as TaskComment]),
+        createSubtask('subtask1', 31, [
+          { _id: '#1', message: 'qwe', author: '', date: new Date(), oldVersion: [] },
+          { _id: '#2', message: 'qwe2', author: '', date: new Date(), oldVersion: [] }]
+        ),
         createSubtask('subtask2', 33)
       ]
-    } as Task
+    }
 
-    const processTx = (tx: Tx) => ws.tx(txContext(), tx)
+    const processTx = async (tx: Tx): Promise<void> => {
+      await ws.tx(txContext(), tx)
+    }
     const ops = createOperations(await ws.getModel(), processTx, () => 'qwe' as StringProperty)
 
-    const d1 = await ops.create(task.class.Task, doc1)
+    const d1 = await ops.create<Task>(task.class.Task, doc1)
 
     const d2 = await ops.updateWith(d1, (s) =>
       s.tasks.match({ name: 'subtask2' }).pull()
@@ -248,32 +265,31 @@ describe('mongo operations', () => {
   it('find embedded in depth', async () => {
     const ws = await server.getWorkspace(wsName)
 
-    const doc1 = {
+    const doc1: DocumentValue<Task> = {
       name: 'task1',
       lists: ['val1'],
+      description: '',
       rate: 20,
       tasks: [
-        createSubtask('subtask1', 31, [{ _id: '#1', message: 'qwe' } as TaskComment, {
-          _id: '#2',
-          message: 'qwe2'
-        } as TaskComment]),
+        createSubtask('subtask1', 31, [
+          { _id: '#1', message: 'qwe', author: '', date: new Date(), oldVersion: [] }, { _id: '#2', message: 'qwe2', author: '', date: new Date(), oldVersion: [] }]),
         createSubtask('subtask2', 33)
       ]
-    } as Task
-    const doc2 = {
+    }
+    const doc2: DocumentValue<Task> = {
       name: 'task2',
       lists: ['val2'],
+      description: '',
       rate: 20,
       tasks: [
-        createSubtask('subtask1-2', 31, [{ _id: '#1', message: 'qwe' } as TaskComment, {
-          _id: '#2',
-          message: 'qwe2'
-        } as TaskComment]),
+        createSubtask('subtask1-2', 31, [{ _id: '#1', message: 'qwe', author: '', date: new Date(), oldVersion: [] }, { _id: '#2', message: 'qwe2', author: '', date: new Date(), oldVersion: [] }]),
         createSubtask('subtask2-2', 33)
       ]
-    } as Task
+    }
 
-    const processTx = (tx: Tx) => ws.tx(txContext(), tx)
+    const processTx = async (tx: Tx): Promise<void> => {
+      await ws.tx(txContext(), tx)
+    }
     const ops = createOperations(await ws.getModel(), processTx, () => 'qwe' as StringProperty)
 
     await ops.create(task.class.Task, doc1)

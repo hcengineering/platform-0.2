@@ -52,24 +52,24 @@ builder.load(task)
 const Model = builder.dumpAll()
 
 describe('server', () => {
-  const mongodbUri = process.env.MONGODB_URI || 'mongodb://localhost:27017'
+  const mongodbUri = process.env.MONGODB_URI ?? 'mongodb://localhost:27017'
 
   let conn: WebSocket
   let server: ServerProtocol
 
-  function initDatabase (db: Db): Promise<any> {
-    const domains = { ...Model } as { [key: string]: Doc[] }
-    const ops = [] as Promise<any>[]
+  async function initDatabase (db: Db): Promise<any> {
+    const domains: { [key: string]: Doc[] } = { ...Model }
+    const ops: Array<Promise<any>> = []
     for (const domain in domains) {
       const model = domains[domain]
       db.collection(domain, (err, coll) => {
-        if (err) {
+        if (err !== undefined) {
           console.log(err)
         }
         ops.push(coll.deleteMany({}).then(() => model.length > 0 ? coll.insertMany(model) : null))
       })
     }
-    return Promise.all(ops)
+    await Promise.all(ops)
   }
 
   const client: Client = {
@@ -101,7 +101,7 @@ describe('server', () => {
   })
 
   async function connect (): Promise<WebSocket> {
-    return new Promise((resolve, reject) => {
+    return await new Promise((resolve, reject) => {
       conn = new WebSocket('ws://localhost:3337/' + token)
       conn.on('open', () => {
         resolve(conn)
@@ -117,7 +117,7 @@ describe('server', () => {
   })
 
   afterEach(() => {
-    if (conn && conn.readyState) {
+    if (conn !== undefined && conn.readyState !== WebSocket.CLOSED) {
       conn.close()
     }
   })
