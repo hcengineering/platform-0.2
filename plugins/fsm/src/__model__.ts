@@ -20,10 +20,8 @@ import { IntlString } from '@anticrm/platform-i18n'
 
 import fsmPlugin, { FSM, Transition, State, WithFSM, WithState } from '.'
 
-const FSMDomain = 'fsm'
-
 @UX('FSM' as IntlString)
-@Class$(fsmPlugin.class.FSM, core.class.Doc, FSMDomain)
+@Class$(fsmPlugin.class.FSM, core.class.Doc)
 export class TFSM extends TDoc implements FSM {
   @UX('Name' as IntlString)
   @Prop(CORE_CLASS_STRING)
@@ -44,7 +42,7 @@ export class TFSM extends TDoc implements FSM {
 }
 
 @UX('Transition' as IntlString)
-@Class$(fsmPlugin.class.Transition, core.class.Emb, FSMDomain)
+@Class$(fsmPlugin.class.Transition, core.class.Emb)
 export class TTransition extends TEmb implements Transition {
   @UX('From' as IntlString)
   @RefTo$(fsmPlugin.class.State)
@@ -56,7 +54,7 @@ export class TTransition extends TEmb implements Transition {
 }
 
 @UX('State' as IntlString)
-@Class$(fsmPlugin.class.State, core.class.Doc, FSMDomain)
+@Class$(fsmPlugin.class.State, core.class.Doc)
 export class TState extends TDoc implements State {
   @UX('Name' as IntlString)
   @Prop(CORE_CLASS_STRING)
