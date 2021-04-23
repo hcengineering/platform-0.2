@@ -30,7 +30,7 @@ platform.setMetadata(core.metadata.WSHost, host)
 platform.setMetadata(core.metadata.WSPort, port)
 
 const loginInfo = currentAccount()
-if (loginInfo) {
+if (loginInfo != null) {
   platform.setMetadata(core.metadata.WhoAmI, loginInfo.email)
   platform.setMetadata(core.metadata.Token, loginInfo.token)
 }
@@ -40,6 +40,6 @@ async function boot (): Promise<void> {
   uiService.createApp(document.body)
 }
 
-boot().catch(err => {
+boot().catch(err => { // eslint-disable-line
   new ErrorPage({ target: document.body, props: { error: err.message } }) // eslint-disable-line no-new
 })

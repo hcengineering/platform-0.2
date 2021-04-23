@@ -84,12 +84,12 @@ export async function start (port: number, dbUri: string, host?: string): Promis
     broadcast (from: ClientService, response: Response<any>, ctx: SecurityContext): void {
       // console.log(`broadcasting to ${connections.size} connections`)
       for (const client of connections.values()) {
-        client.then((cl) => {
+        client.then((cl) => { // eslint-disable-line
           if (cl.getId() !== from.getId()) {
             // console.log(`broadcasting to ${client.email}`, response)
-            cl.send(ctx, response).then(() => 0, () => 0)
+            cl.send(ctx, response) // eslint-disable-line
           }
-        }, () => 0)
+        })
       }
     }
   }
@@ -163,7 +163,7 @@ export async function start (port: number, dbUri: string, host?: string): Promis
       ws.send(serialize(response))
     }
     ws.on('message', (msg: string): void => {
-      handleMessage(msg).then(() => 0, () => 0)
+      handleMessage(msg) // eslint-disable-line
     })
   })
 

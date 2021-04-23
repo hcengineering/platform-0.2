@@ -61,7 +61,9 @@ limitations under the License.
   <SpaceBox {spaces} bind:space />
 {/if}
 
-<Properties {model} bind:object />
+{#if model}
+  <Properties {model} bind:object />
+{/if}
 
 <div class="buttons">
   <Button kind="primary" on:click={onSave}>Принять</Button>

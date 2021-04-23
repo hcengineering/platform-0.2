@@ -11,7 +11,7 @@
   export let label = ''
 
   const dispatch = createEventDispatcher()
-  function onClick (event) {
+  function onClick (event: any) {
     dispatch('click', event)
   }
 </script>

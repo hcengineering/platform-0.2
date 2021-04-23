@@ -8,17 +8,17 @@ import { deepEqual } from 'fast-equals'
  * Describe a browser URI location parsed to path, query and fragment.
  */
 export interface Location {
-  path: string[]; // A useful path value
-  query: Record<string, string | null>; // a value of query parameters, no duplication are supported
-  fragment: string; // a value of fragment
+  path: string[] // A useful path value
+  query: Record<string, string | null> // a value of query parameters, no duplication are supported
+  fragment: string // a value of fragment
 }
 
 /**
  * Define a useful route to applications.
  */
 export interface ApplicationRoute {
-  route: string;
-  component: AnyComponent;
+  route: string
+  component: AnyComponent
 }
 
 export function routeMeta (name: string): Metadata<ApplicationRoute> {
@@ -32,62 +32,62 @@ export interface ApplicationRouter<T> {
   /**
    * Return parent router if defined.
    */
-  parent (): ApplicationRouter<any> | undefined;
+  parent: () => ApplicationRouter<any> | undefined
 
   /**
    * Construct a child router based on current matched state
    * Internal child router is just one, and calling twice will replace existing.
    */
-  newRouter<P> (pattern: string): ApplicationRouter<P>;
+  newRouter: <P>(pattern: string) => ApplicationRouter<P>
 
   /**
    * Will check and match path for registered local routes, if no local routes are match will return false
    */
-  match (): boolean;
+  match: () => boolean
 
   /**
    * Return current matched set.
    */
-  properties (): T;
+  properties: () => T
 
   /**
    * Replace defaults passed with constructor, will call matcher function passed with constructor.
    * @param defaults - a new defaults
    */
-  setDefaults (defaults: T): void;
+  setDefaults: (defaults: T) => void
 
   /**
    * Replace a matcher function passed with constructor.
    * @param matcher
    */
-  subscribe (matcher: (match: T) => void): void;
+  subscribe: (matcher: (match: T) => void) => void
 
   // Construct a new navigate using combined query parameters
-  queries (vars: Partial<T>): Record<string, any> | undefined;
+  queries: (vars: Partial<T>) => Record<string, any> | undefined
   // Construct a current path with all applied variables
-  path (vars: Partial<T>): string[];
+  path: (vars: Partial<T>) => string[]
   // Construct a current fragment with app applied variables
-  fragment (vars: Partial<T>): string | undefined;
+  fragment: (vars: Partial<T>) => string | undefined
 
   /**
    * Construct a full new location based on values of T.
    * Other values will be taken from stored parent and child routers.
    * @param values
    */
-  location (values: Partial<T>): Location;
+  location: (values: Partial<T>) => Location
 
   /**
    * Use new constructed location value and platform UI to navigate.
    * @param values
    */
-  navigate (values: Partial<T>): void;
+  navigate: (values: Partial<T>) => void
 }
 
 export class Router<T> implements ApplicationRouter<T> {
   private readonly pattern: string
   private segments: string[] = []
   private queryNames: string[] = []
-  private fragmentName = ''
+  private fragmentName: string = ''
 
   private readonly parentRouter: Router<any> | undefined
   private childRouter: Router<any> | undefined
@@ -112,7 +112,7 @@ export class Router<T> implements ApplicationRouter<T> {
   ) {
     this.pattern = pattern
     this.parentRouter = parent
-    if (defaults) {
+    if (defaults != null) {
       this.defaults = defaults
     }
     this.parsePattern()
@@ -120,14 +120,14 @@ export class Router<T> implements ApplicationRouter<T> {
   }
 
   navigate (values: Partial<T>): void {
-    if (this.doNavigate) {
+    if (this.doNavigate != null) {
       this.doNavigate(this.location(values))
     }
   }
 
   public subscribe (matcher: (match: T) => void): void {
     this.matcher = matcher
-    if (this.matched && this.matcher) {
+    if (this.matched && this.matcher !== undefined) {
       this.matcher(this.variables as T)
     }
   }
@@ -142,7 +142,7 @@ export class Router<T> implements ApplicationRouter<T> {
     const oldVars = this.variables
     this.matched = this.doMatch()
     this.chainUpdate()
-    if (this.matcher && (!deepEqual(oldVars, this.variables) || forceUpdate)) {
+    if (this.matcher != null && (!deepEqual(oldVars, this.variables) || forceUpdate)) {
       this.matcher(this.variables as T)
     }
   }
@@ -153,11 +153,11 @@ export class Router<T> implements ApplicationRouter<T> {
 
   doMatch (): boolean {
     // Use defaults as initial values.
-    this.variables = this.defaults ? { ...this.defaults } : {}
+    this.variables = this.defaults != null ? { ...this.defaults } : {}
 
     // Perform matching of current location with extraction of variables and constructing childLocation.
-    if (this.rawLocation) {
-      this.childLocation = {} as Location
+    if (this.rawLocation != null) {
+      this.childLocation = { path: [], query: {}, fragment: '' }
       const path = [...this.rawLocation.path]
       for (const s of this.segments) {
         if (path.length > 0) {
@@ -175,7 +175,7 @@ export class Router<T> implements ApplicationRouter<T> {
           for (const s of this.segments) {
             if (s.startsWith(':')) {
               const varName = s.substring(1)
-              if (!this.variables[varName]) {
+              if (this.variables[varName] === undefined) {
                 // No variable for path segment
                 throw new Error(
                   `Could not match variable:${varName} in ${this.pattern} should be specified in defaults or URI`
@@ -189,21 +189,28 @@ export class Router<T> implements ApplicationRouter<T> {
         }
       }
       this.childLocation.path = path
-      if (this.fragmentName) {
-        this.variables[this.fragmentName] = this.rawLocation.fragment || null
+
+      // Update fragment
+      if (this.fragmentName !== undefined) {
+        this.variables[this.fragmentName] = this.rawLocation.fragment
       } else {
         this.childLocation.fragment = this.rawLocation.fragment
       }
-      this.childLocation.query = { ...this.rawLocation.query }
-      // move all queries, they could be optional
+      this.childLocation.query = { }
+
+      // Update Query
       for (const q of this.queryNames) {
         const v = this.rawLocation.query[q]
-        if (v) {
+        if (v !== undefined) {
           this.variables[q] = v
-          delete this.childLocation.query[q]
         }
       }
-      if (this.childRouter) {
+      for (const q of Object.entries(this.rawLocation.query)) {
+        if (!this.queryNames.includes(q[0])) {
+          this.childLocation.query[q[0]] = q[1]
+        }
+      }
+      if (this.childRouter != null) {
         this.childRouter.update(this.childLocation)
       }
       return true
@@ -211,7 +218,7 @@ export class Router<T> implements ApplicationRouter<T> {
     return false
   }
 
-  newRouter<P> (pattern: string, defaults: P | undefined = undefined): Router<P> {
+  newRouter<P>(pattern: string, defaults: P | undefined = undefined): Router<P> {
     this.childRouter = new Router<P>(pattern, this, defaults, this.doNavigate)
     this.chainUpdate()
     return this.childRouter as Router<P>
@@ -223,7 +230,7 @@ export class Router<T> implements ApplicationRouter<T> {
 
   setDefaults (defaults: T): void {
     this.defaults = defaults
-    if (this.rawLocation) {
+    if (this.rawLocation != null) {
       this.update(this.rawLocation, true)
     }
   }
@@ -236,13 +243,11 @@ export class Router<T> implements ApplicationRouter<T> {
     return this.calcPath(vars, this.parents(), this.children())
   }
 
-  private calcPath (vars: Partial<T>, parents: Router<any>[], children: Router<any>[]): string[] {
+  private calcPath (vars: Partial<T>, parents: Array<Router<any>>, children: Array<Router<any>>): string[] {
     let variables = this.variables as T
-    if (vars) {
-      variables = { ...variables, ...vars }
-    }
+    variables = { ...variables, ...vars }
     const path: string[][] = []
-    const toPath = (p: Router<any>) => p.currentPath()
+    const toPath = (p: Router<any>): string[] => p.currentPath()
 
     path.push(...parents.map(toPath))
     path.push(this.currentPath(variables))
@@ -251,7 +256,7 @@ export class Router<T> implements ApplicationRouter<T> {
   }
 
   currentPath (vars: T | undefined = undefined): string[] {
-    if (!vars) {
+    if (vars == null) {
       vars = this.variables as T
     }
     const ll = (vars as unknown) as Record<string, any>
@@ -267,20 +272,14 @@ export class Router<T> implements ApplicationRouter<T> {
     return result
   }
 
-  queries (vars: Partial<T>): Record<string, string | null> | undefined {
+  queries (vars: Partial<T>): Record<string, string | undefined> | undefined {
     return this.calcQueries(vars, this.parents(), this.children())
   }
 
-  private calcQueries (
-    vars: Partial<T>,
-    parents: Router<any>[],
-    children: Router<any>[]
-  ): Record<string, string | null> {
+  private calcQueries (vars: Partial<T>, parents: Array<Router<any>>, children: Array<Router<any>>): Record<string, string> {
     let variables = this.variables as T
-    if (vars) {
-      variables = { ...variables, ...vars }
-    }
-    const result: Record<string, string | null> = {}
+    variables = { ...variables, ...vars }
+    const result: Record<string, string> = {}
     parents.map((p) => p.currentQueries(result))
     this.currentQueries(result, variables)
     children.map((p) => p.currentQueries(result))
@@ -292,17 +291,14 @@ export class Router<T> implements ApplicationRouter<T> {
    * @param result
    * @private
    */
-  currentQueries (
-    result: Record<string, string | null>,
-    vars: T | undefined = undefined
-  ): Record<string, string | null> | undefined {
-    if (!vars) {
+  currentQueries (result: Record<string, string>, vars: T | undefined = undefined): Record<string, string> | undefined {
+    if (vars == null) {
       vars = this.variables as T
     }
     const ll = (vars as unknown) as Record<string, any>
     for (const qName of this.queryNames) {
       const val = ll[qName]
-      if (val) {
+      if (val !== undefined) {
         result[qName] = val
       }
     }
@@ -313,18 +309,31 @@ export class Router<T> implements ApplicationRouter<T> {
     return this.calcFragment(vars, this.parents(), this.children())
   }
 
-  private calcFragment (vars: Partial<T>, parents: Router<any>[], children: Router<any>[]): string {
+  /**
+   * Will return last one defined fragment.
+   */
+  private calcFragment (vars: Partial<T>, parents: Array<Router<any>>, children: Array<Router<any>>): string {
     let variables = this.variables as T
-    if (vars) {
-      variables = { ...variables, ...vars }
+    variables = { ...variables, ...vars }
+    // Check all children in reverse order
+    for (const r of children.reverse()) {
+      const ff = r.currentFragment()
+      if (ff !== undefined) {
+        return ff
+      }
     }
-    let path: string[] = []
-    path.push(...parents.map((p) => p.currentFragment() || ''))
-    path.push(this.currentFragment(variables) || '')
-    path.push(...children.map((p) => p.currentFragment() || ''))
-    path = path.filter((p) => p && p.length > 0)
-    if (path.length > 0) {
-      return path[path.length - 1]
+
+    const curFragment = this.currentFragment(variables)
+    if (curFragment !== undefined) {
+      return curFragment
+    }
+
+    // Check all parents
+    for (const r of parents.reverse()) {
+      const ff = r.currentFragment()
+      if (ff !== undefined) {
+        return ff
+      }
     }
     return ''
   }
@@ -334,13 +343,13 @@ export class Router<T> implements ApplicationRouter<T> {
    * @private
    */
   currentFragment (vars: T | undefined = undefined): string | undefined {
-    if (!vars) {
+    if (vars == null) {
       vars = this.variables as T
     }
     const ll = (vars as unknown) as Record<string, any>
-    if (this.fragmentName && this.fragmentName !== '') {
+    if (this.fragmentName !== '') {
       const val = ll[this.fragmentName]
-      if (val) {
+      if (val !== undefined) {
         return val
       }
     }
@@ -357,7 +366,7 @@ export class Router<T> implements ApplicationRouter<T> {
     }
   }
 
-  private parsePattern () {
+  private parsePattern (): void {
     // Parse pattern for faster matching
     this.segments = parsePath(this.pattern)
     // Extract query from last path segment.
@@ -386,17 +395,17 @@ export class Router<T> implements ApplicationRouter<T> {
   }
 
   private chainUpdate (): void {
-    if (this.matched && this.childRouter && this.childLocation) {
+    if (this.matched && this.childRouter != null && this.childLocation != null) {
       this.childRouter.update(this.childLocation)
     }
   }
 
-  private parents (): Router<any>[] {
-    const result: Router<any>[] = []
+  private parents (): Array<Router<any>> {
+    const result: Array<Router<any>> = []
     let item = this.parentRouter
-    while (item) {
+    while (item != null) {
       result.push(item)
-      if (item.parentRouter) {
+      if (item.parentRouter != null) {
         item = item.parentRouter
       } else {
         break
@@ -405,12 +414,12 @@ export class Router<T> implements ApplicationRouter<T> {
     return result.reverse()
   }
 
-  private children (): Router<any>[] {
-    const result: Router<any>[] = []
+  private children (): Array<Router<any>> {
+    const result: Array<Router<any>> = []
     let item = this.childRouter
-    while (item) {
+    while (item != null) {
       result.push(item)
-      if (item.childRouter) {
+      if (item.childRouter != null) {
         item = item.childRouter
       } else {
         break

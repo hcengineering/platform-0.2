@@ -22,7 +22,7 @@ import NewVacancy from './components/NewVacancy.svelte'
 
 import recruiting, { RecruitingService } from '.'
 
-export default (platform: Platform): Promise<RecruitingService> => {
+export default async (platform: Platform): Promise<RecruitingService> => {
   platform.setResource(recruiting.component.CandidateList, CandidateList)
   platform.setResource(recruiting.component.NewCandidate, NewCandidate)
   platform.setResource(recruiting.component.Candidate, Candidate)
@@ -31,5 +31,5 @@ export default (platform: Platform): Promise<RecruitingService> => {
   platform.setResource(recruiting.component.NewVacancy, NewVacancy)
   platform.setResource(recruiting.component.Vacancy, Vacancy)
 
-  return Promise.resolve({})
+  return {}
 }

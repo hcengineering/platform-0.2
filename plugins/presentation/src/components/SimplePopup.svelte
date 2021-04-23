@@ -15,7 +15,7 @@
 // Component define a simple popup menu with a set of actions.
 -->
 <script lang="ts">
-  export let items: unknown[]
+  export let items: any[]
 </script>
 
 <div class="simple-popup-view">

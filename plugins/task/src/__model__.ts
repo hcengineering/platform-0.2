@@ -79,15 +79,15 @@ export class TTask extends TCollab implements Task {
 
   @UX(task.string.Task_assignee)
   @ArrayOf$()
-  @RefTo$(contact.mixin.User) assignee!: Ref<User>[]
+  @RefTo$(contact.mixin.User) assignee!: Array<Ref<User>>
 
   @UX(task.string.Task_participants)
   @ArrayOf$()
-  @RefTo$(contact.mixin.User) participants!: Ref<User>[]
+  @RefTo$(contact.mixin.User) participants!: Array<Ref<User>>
 
   @UX(task.string.Task_labels)
   @ArrayOf$()
-  @RefTo$(task.class.TaskLabel) labels!: Ref<TaskLabel>[]
+  @RefTo$(task.class.TaskLabel) labels!: Array<Ref<TaskLabel>>
 
   @UX(task.string.Task_status, { presenter: task.component.StatusPresenter })
   @EnumOf$(task.enum.TaskStatus) status!: TaskStatus

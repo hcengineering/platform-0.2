@@ -102,7 +102,7 @@ export function model (S: Builder): void {
   createVacanciesAppModel(S)
 }
 
-function createCandidatesAppModel (S: Builder) {
+function createCandidatesAppModel (S: Builder): void {
   S.add(TCandidate, TWithCandidateProps, TCandidateState)
   S.createDocument(workbench.class.WorkbenchApplication, {
     route: 'candidates',
@@ -151,7 +151,7 @@ function createCandidatesAppModel (S: Builder) {
   })
 }
 
-function createVacanciesAppModel (S: Builder) {
+function createVacanciesAppModel (S: Builder): void {
   S.add(TVacancy)
   S.createDocument(workbench.class.WorkbenchApplication, {
     route: 'vacancies',

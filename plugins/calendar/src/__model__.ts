@@ -38,46 +38,46 @@ class TRecurrenceType extends TEnum<RecurrenceType> {
 
 @Class$(calendar.class.RecurrenceProperty, core.class.Emb)
 export class TRecurrenceProperty extends TEmb implements RecurrenceProperty {
-    @EnumOf$(calendar.enum.RecurrenceType)
-    type!: RecurrenceType
+  @EnumOf$(calendar.enum.RecurrenceType)
+  type!: RecurrenceType
 
-    @Prop(core.class.Number) interval!: number
-    startDate!: Date
-    endDate?: Date
+  @Prop(core.class.Number) interval!: number
+  startDate!: Date
+  endDate?: Date
 }
 
 @Class$(calendar.class.Calendar, core.class.VDoc)
 @UX('Calendar' as IntlString)
 export class TCalendar extends TVDoc implements Calendar {
-    @Primary()
-    @Prop()
-    @UX('Name' as IntlString)
-    name!: string
+  @Primary()
+  @Prop()
+  @UX('Name' as IntlString)
+  name!: string
 
-    @ArrayOf$()
-    @RefTo$(contact.mixin.User)
-    participants!: Ref<User>[]
+  @ArrayOf$()
+  @RefTo$(contact.mixin.User)
+  participants!: Array<Ref<User>>
 }
 
 @Class$(calendar.class.CalendarEvent, core.class.VDoc, DOMAIN_CALENDAR)
 @UX('Event' as IntlString)
 export class TCalendarEvent extends TVDoc implements CalendarEvent {
-    @Primary()
-    @Prop()
-    @UX('Summary' as IntlString)
-    summary!: string
+  @Primary()
+  @Prop()
+  @UX('Summary' as IntlString)
+  summary!: string
 
-    @UX('Participants' as IntlString)
-    @ArrayOf$()
-    @RefTo$(contact.mixin.User) participants!: Ref<User>[]
+  @UX('Participants' as IntlString)
+  @ArrayOf$()
+  @RefTo$(contact.mixin.User) participants!: Array<Ref<User>>
 
-    @UX('Start date' as IntlString)
-    @Prop(core.class.Date) startDate!: Date
+  @UX('Start date' as IntlString)
+  @Prop(core.class.Date) startDate!: Date
 
-    @UX('End date' as IntlString)
-    @Prop(core.class.Date) endDate?: Date
+  @UX('End date' as IntlString)
+  @Prop(core.class.Date) endDate?: Date
 
-    recurrence?: RecurrenceProperty
+  recurrence?: RecurrenceProperty
 }
 
 export function model (S: Builder): void {

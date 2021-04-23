@@ -20,6 +20,7 @@
   import type { Title } from '@anticrm/domains'
   import { CORE_CLASS_TITLE } from '@anticrm/domains'
   import { liveQuery } from '@anticrm/presentation'
+  import { QueryUpdater } from '@anticrm/platform-core'
 
   let query = ''
   let result: Title[] = []
@@ -32,7 +33,7 @@
       }
     }
   }
-
+  let lq: Promise<QueryUpdater<Title>>
   $: lq = liveQuery(lq, CORE_CLASS_TITLE, q(query), (docs) => {
     result = docs
   })

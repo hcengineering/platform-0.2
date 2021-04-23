@@ -20,9 +20,18 @@
     "@types/koa-router": "^7.4.1",
     "@types/koa__cors": "^3.0.1",
     "@types/mongodb": "^3.5.20",
+    "@typescript-eslint/eslint-plugin": "^4.22.0",
+    "@typescript-eslint/parser": "^4.22.0",
     "babel-jest": "^26.0.1",
+    "eslint": "^7.24.0",
+    "eslint-config-standard": "^16.0.2",
+    "eslint-config-standard-with-typescript": "^20.0.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^5.1.0",
+    "eslint-plugin-standard": "^5.0.0",
     "jest": "^26.0.1",
-    "typescript": "^3.9.5"
+    "typescript": "^4.2.4"
   },
   "dependencies": {
     "@koa/cors": "^3.1.0",

@@ -34,7 +34,7 @@ export class TEmb extends TObj implements Emb {
 export class TDoc extends TObj implements Doc {
   _class!: Ref<Class<Doc>> // A field to match type, attribute is defined in TObj
   @Prop() _id!: Ref<Doc>
-  @Prop() _mixins?: Ref<Mixin<Doc>>[]
+  @Prop() _mixins?: Array<Ref<Mixin<Doc>>>
 }
 
 @Class$(core.class.Attribute, core.class.Emb, MODEL_DOMAIN)

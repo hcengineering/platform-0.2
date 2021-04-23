@@ -26,7 +26,7 @@ import core from '.'
 type MethodType = (...args: any[]) => any
 
 export type OptionalMethods<T extends Record<string, unknown>> = CombineObjects<Omit<T, KeysByType<T, MethodType>>,
-  Partial<Pick<T, KeysByType<T, MethodType>>>>
+Partial<Pick<T, KeysByType<T, MethodType>>>>
 
 class Builder {
   private readonly memdb: Model
@@ -47,7 +47,7 @@ class Builder {
   }
 
   dumpAll (): { [key: string]: Doc[] } {
-    const result = {} as { [key: string]: Doc[] }
+    const result: { [key: string]: Doc[] } = {}
     for (const e of this.domains) {
       result[e[0]] = e[1].dump()
     }
@@ -57,7 +57,7 @@ class Builder {
 
   getDomain (domain: string): Model {
     const memdb = this.domains.get(domain)
-    if (!memdb) {
+    if (memdb === undefined) {
       const memdb = new Model(domain)
       this.domains.set(domain, memdb)
       return memdb
@@ -65,7 +65,7 @@ class Builder {
     return memdb
   }
 
-  add (...classes: { new (): Obj }[]): void {
+  add (...classes: Array<new () => Obj>): void {
     for (const ctor of classes) {
       const classifier = loadClassifier(ctor.prototype)
       this.memdb.add(classifier.doc)
@@ -91,12 +91,8 @@ class Builder {
     this.memdb.mixinDocument(doc, clazz, values)
   }
 
-  newInstance<M extends Emb> (_class: Ref<Class<M>>, values: OptionalMethods<Omit<M, keyof Emb>>): M {
-    return { _class: _class as Ref<Class<Obj>>, ...values } as M
-  }
-
   attr<M extends Emb> (_class: Ref<Class<M>>, values: OptionalMethods<Omit<M, keyof Emb>>): Attribute {
-    const type = { _class: _class as Ref<Class<Obj>>, ...values } as M
+    const type = { _class: _class as Ref<Class<Obj>>, ...values }
     return { _class: core.class.Attribute, type } as unknown as Attribute
   }
 
@@ -107,13 +103,13 @@ class Builder {
       console.log('add `model` ' + doc._id)
     } else {
       const domain = this.memdb.getDomain(_class)
-      if (!domain) {
+      if (domain === undefined) {
         throw new Error('domain not found for class: ' + _class)
       }
       console.log(`add '${domain}' ` + doc._id)
       this.getDomain(domain).add(doc)
     }
-    return doc as M
+    return doc
   }
 
   createClass<T extends E, E extends Obj> (_id: Ref<Class<T>>, _extends: Ref<Class<E>>, _attributes: AllAttributes<T, E>, _domain?: string, _native?: Resource<any>): EClass<T, E> {

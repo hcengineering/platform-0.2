@@ -42,7 +42,7 @@
   let component: AnyComponent
   $: {
     getComponentExtension(_class, presentation.mixin.DetailForm).then((ext) => {
-      if (component !== ext) {
+      if (ext !== undefined && component !== ext) {
         component = ext
       }
     })
@@ -57,7 +57,7 @@
         on:click|preventDefault={() => {
           dispatch('close')
         }}>
-        <Icon icon={workbench.icon.Close} button="true" />
+        <Icon icon={workbench.icon.Close} button={true} />
       </a>
     </div>
     <div class="content">

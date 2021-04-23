@@ -19,7 +19,7 @@ import { routeMeta } from '@anticrm/platform-ui'
 
 export default (platform: Platform): void => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const spritesUrl = require('../assets/icons.svg')
+  const spritesUrl: string = require('../assets/icons.svg')
   platform.loadMetadata(workbench.icon, {
     DefaultPerspective: `${spritesUrl}#perspective`,
     Add: `${spritesUrl}#add`,

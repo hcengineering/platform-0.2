@@ -42,7 +42,7 @@ class TWorkbenchApplication extends TApplication implements WorkbenchApplication
   @Prop() icon?: Asset
   @Prop() rootComponent?: AnyComponent
   @Prop() component!: AnyComponent
-  @Prop() classes!: Ref<Class<VDoc>>[]
+  @Prop() classes!: Array<Ref<Class<VDoc>>>
 
   @Prop() supportSpaces!: boolean
   @Prop() spaceTitle?: string

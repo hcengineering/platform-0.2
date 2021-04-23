@@ -111,7 +111,7 @@ export default (platform: Platform): RpcService => {
         resolve,
         reject
       })
-      getWebSocket().then((ws: WebSocket) => {
+      getWebSocket().then((ws: WebSocket) => { // eslint-disable-line
         ws.send(serialize({
           id,
           method,

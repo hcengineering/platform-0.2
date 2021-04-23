@@ -24,7 +24,7 @@ import login, { ACCOUNT_KEY, LoginInfo, LoginService } from '.'
 import LoginForm from './components/LoginForm.svelte'
 import SettingForm from './components/SettingForm.svelte'
 import MainLoginForm from './components/MainLoginForm.svelte'
-import { PlatformStatusCodes } from '@anticrm/foundation'
+import { PlatformError, PlatformStatusCodes } from '@anticrm/foundation'
 import FingerprintJS from '@fingerprintjs/fingerprintjs'
 
 /*!
@@ -32,12 +32,12 @@ import FingerprintJS from '@fingerprintjs/fingerprintjs'
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */
-export default (platform: Platform, deps: { ui: UIService }): Promise<LoginService> => {
+export default async (platform: Platform, deps: { ui: UIService }): Promise<LoginService> => {
   const uiService = deps.ui
 
   const accountsUrl = platform.getMetadata(login.metadata.AccountsUrl)
-  if (!accountsUrl) {
-    throw new Status(Severity.ERROR, 0, 'no accounts server metadata provided.')
+  if (accountsUrl === undefined) {
+    throw new PlatformError(new Status(Severity.ERROR, 0, 'no accounts server metadata provided.'))
   }
   platform.setResource(login.component.LoginForm, LoginForm)
   platform.setResource(login.component.MainLoginForm, MainLoginForm)
@@ -45,58 +45,54 @@ export default (platform: Platform, deps: { ui: UIService }): Promise<LoginServi
 
   // platform.setResource(login.component.SignupForm, SignupForm)
 
-  function setLoginInfo (loginInfo: LoginInfo) {
+  function setLoginInfo (loginInfo: LoginInfo): void {
     localStorage.setItem(ACCOUNT_KEY, JSON.stringify(loginInfo))
 
     platform.setMetadata(platformIds.metadata.WhoAmI, loginInfo.email)
     platform.setMetadata(platformIds.metadata.Token, loginInfo.token)
-
-    // TODO: It should be updated from here, but not working now.
-    // platform.setMetadata(platformIds.metadata.WSHost, loginInfo.server)
-    // platform.setMetadata(platformIds.metadata.WSPort, loginInfo.port)
   }
 
-  function clearLoginInfo () {
+  function clearLoginInfo (): void {
     localStorage.removeItem(ACCOUNT_KEY)
 
     platform.setMetadata(platformIds.metadata.WhoAmI, undefined)
     platform.setMetadata(platformIds.metadata.Token, undefined)
   }
 
-  function getLoginInfo (): Promise<LoginInfo | undefined> {
+  async function getLoginInfo (): Promise<LoginInfo | undefined> {
     const account = localStorage.getItem(ACCOUNT_KEY)
-    if (!account) {
-      return Promise.resolve(undefined)
+    if (account === null) {
+      return undefined
     }
     const loginInfo = JSON.parse(account) as LoginInfo
 
     const token = platform.getMetadata(platformIds.metadata.Token)
-    if (!token) {
-      return Promise.resolve(undefined)
+    if (token === undefined) {
+      return undefined
     }
     // Do some operation to check if token is expired or not.
-    return Promise.resolve(loginInfo)
+    return loginInfo
   }
 
-  function navigateApp (): Promise<void> {
+  async function navigateApp (): Promise<void> {
     const defaultApp = platform.getMetadata(uiPlugin.metadata.DefaultApplication)
-    if (defaultApp) {
+    if (defaultApp !== undefined) {
       uiService.navigateJoin([defaultApp], undefined, undefined)
     }
-    return Promise.resolve()
   }
 
-  function navigateLoginForm (): Promise<void> {
+  async function navigateLoginForm (): Promise<void> {
     const loginApp = platform.getMetadata(uiPlugin.metadata.LoginApplication)
-    if (loginApp) {
+    if (loginApp !== undefined) {
       uiService.navigateJoin([loginApp], undefined, undefined)
     }
-    return Promise.resolve()
   }
 
   async function saveSetting (password: string, newPassword: string, secondFactorEnabled: boolean, clientSecret: string, secondFactorCode: string): Promise<Status> {
     const loginInfo = await getLoginInfo()
-    if (!loginInfo) return new Status(Severity.ERROR, 0, 'Необходимо авторизоваться')
+    if (loginInfo === undefined) {
+      return new Status(Severity.ERROR, 0, 'Необходимо авторизоваться')
+    }
     const request: Request<[string, string, string, boolean, string, string]> = {
       method: 'updateAccount',
       params: [loginInfo.email, password, newPassword, secondFactorEnabled, clientSecret, secondFactorCode]
@@ -112,10 +108,10 @@ export default (platform: Platform, deps: { ui: UIService }): Promise<LoginServi
         body: serialize(request)
       })
       const result = (await response.json()) as Response<any>
-      if (result.error?.message) {
+      if (result.error?.message !== undefined) {
         return toStatus(result)
       }
-      if (result.result) {
+      if (result.result !== undefined) {
         setLoginInfo(result.result)
       }
       return new Status(Severity.OK, 0, '')
@@ -144,10 +140,10 @@ export default (platform: Platform, deps: { ui: UIService }): Promise<LoginServi
         body: serialize(request)
       })
       const result = (await response.json()) as Response<any>
-      if (result.error?.message) {
+      if (result.error?.message !== undefined) {
         return toStatus(result)
       }
-      if (result.result) {
+      if (result.result !== undefined) {
         setLoginInfo(result.result)
 
         platform.broadcastEvent(PlatformStatus, new Status(Severity.OK, PlatformStatusCodes.AUTHENTICATON_OK, ''))
@@ -160,20 +156,19 @@ export default (platform: Platform, deps: { ui: UIService }): Promise<LoginServi
     }
   }
 
-  function doLogout (): Promise<void> {
+  async function doLogout (): Promise<void> {
     const token = platform.getMetadata(platformIds.metadata.Token)
-    if (token) {
+    if (token !== undefined) {
       clearLoginInfo()
     }
-    return Promise.resolve()
   }
 
-  return Promise.resolve({
+  return {
     doLogin,
     doLogout,
     getLoginInfo,
     navigateApp,
     navigateLoginForm,
     saveSetting
-  })
+  }
 }

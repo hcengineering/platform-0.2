@@ -17,7 +17,7 @@ import { Platform } from '@anticrm/platform'
 import datagen from '..'
 
 export default (platform: Platform): void => {
-  const spritesUrl = require('../assets/icons.svg') // eslint-disable-line
+  const spritesUrl: string = require('../assets/icons.svg') // eslint-disable-line
   platform.loadMetadata(datagen.icon, {
     DataGen: `${spritesUrl}'#datagen`
   })

@@ -28,7 +28,7 @@ export type ClassifierPostProcessing<T extends Doc> = (model: Model, classifier:
 
 export interface ClassifierDefinition<T extends Doc> {
   doc: T
-  postProcessing: ClassifierPostProcessing<T>[]
+  postProcessing: Array<ClassifierPostProcessing<T>>
 }
 
 export function loadClassifier<T extends Doc> (target: any): ClassifierDefinition<T> {
@@ -37,7 +37,7 @@ export function loadClassifier<T extends Doc> (target: any): ClassifierDefinitio
 
 function getClassifier<T extends Doc> (target: any, factory: () => Partial<T>): ClassifierDefinition<T> {
   let classifier = loadClassifier<T>(target)
-  if (!classifier) {
+  if (classifier === undefined) {
     classifier = {
       doc: factory() as T,
       postProcessing: []
@@ -59,7 +59,7 @@ export function getClass (target: any): ClassifierDefinition<Class<Obj>> {
 
 export function isKindOf (target: any, kind: ClassifierKind): boolean {
   const classifier = Reflect.getOwnMetadata(classifierMetadataKey, target) as ClassifierDefinition<Classifier>
-  return classifier && classifier.doc._kind === kind
+  return classifier !== undefined && classifier.doc._kind === kind
 }
 
 export function getEnum (target: any): ClassifierDefinition<Enum<any>> {
@@ -75,7 +75,7 @@ export function getEnum (target: any): ClassifierDefinition<Enum<any>> {
 export function getAttribute (target: any, propertyKey: string): Attribute {
   const classifier = getClass(target).doc
   let attribute = (classifier._attributes as any)[propertyKey] as Attribute
-  if (!attribute) {
+  if (attribute === undefined) {
     attribute = {
       _class: core.class.Attribute
     } as unknown as Attribute
@@ -87,7 +87,7 @@ export function getAttribute (target: any, propertyKey: string): Attribute {
 export function getEnumLiteral (target: any, propertyKey: string): EnumLiteral {
   const enumValue = getEnum(target).doc
   let literal = (enumValue._literals as any)[propertyKey] as EnumLiteral
-  if (!literal) {
+  if (literal === undefined) {
     literal = {
       _class: core.class.EnumLiteral
     } as unknown as EnumLiteral
@@ -106,7 +106,7 @@ export function loadClassifierChild (target: any, propertyKey: string): Emb | un
 }
 
 export function Class$<E extends Obj, T extends E> (id: Ref<Class<T>>, _extends: Ref<Class<E>>, domain?: string) {
-  return function classDecorator<C extends { new (): T }> (constructor: C): void {
+  return function classDecorator<C extends new () => T> (constructor: C): void {
     const classifier = getClass(constructor.prototype).doc
     classifier._id = id
     classifier._class = core.class.Class
@@ -114,14 +114,14 @@ export function Class$<E extends Obj, T extends E> (id: Ref<Class<T>>, _extends:
     if (id !== _extends) {
       classifier._extends = _extends
     }
-    if (domain) {
+    if (domain !== undefined) {
       (classifier as Class<T>)._domain = domain as Property<string, string>
     }
   }
 }
 
 export function Mixin$<E extends Obj, T extends E> (id: Ref<Mixin<T>>, _extends: Ref<Class<E>>) {
-  return function classDecorator<C extends { new (): T }> (constructor: C): void {
+  return function classDecorator<C extends new () => T> (constructor: C): void {
     const classifier = getClass(constructor.prototype).doc
     classifier._id = id
     classifier._class = core.class.Mixin
@@ -131,7 +131,7 @@ export function Mixin$<E extends Obj, T extends E> (id: Ref<Mixin<T>>, _extends:
 }
 
 export function Enum$<T extends EnumLiterals<E, EnumLiteral>, E extends EnumKey> (id: Ref<Enum<E>>) {
-  return function classDecorator<C extends { new (): T }> (constructor: C): void {
+  return function classDecorator<C extends new () => T> (constructor: C): void {
     const classifier = getEnum(constructor.prototype).doc
     classifier._id = id
   }
@@ -172,7 +172,7 @@ export function EnumOf$ (of: Ref<Enum<any>>) {
 export function BagOf$ () {
   return function (target: any, propertyKey: string): void {
     const attribute = getAttribute(target, propertyKey)
-    const type = attribute.type || { _class: core.class.Type } as unknown as Type
+    const type = attribute.type ?? { _class: core.class.Type } as unknown as Type
     const arr = {
       _class: core.class.BagOf,
       of: type
@@ -188,7 +188,7 @@ export function BagOf$ () {
 export function ArrayOf$ () {
   return function (target: any, propertyKey: string): void {
     const attribute = getAttribute(target, propertyKey)
-    const type = attribute.type || { _class: core.class.Type } as unknown as Type
+    const type = attribute.type ?? { _class: core.class.Type } as unknown as Type
     const arr = {
       _class: core.class.ArrayOf,
       of: type
@@ -227,7 +227,7 @@ export function Literal (enumVal: any) {
     attribute._class = core.class.EnumLiteral
     attribute.label = enumVal[propertyKey]
     attribute.ordinal = enumVal[attribute.label]
-    if (!attribute.ordinal && !attribute.label) {
+    if (attribute.ordinal === undefined && attribute.label === undefined) {
       // This is string labeled enum
       for (const e of Object.entries(enumVal)) {
         if (e[1] === propertyKey) {
@@ -243,13 +243,11 @@ export function Literal (enumVal: any) {
 export function withMixin<T extends Obj> (_class: Ref<Mixin<T>>, obj: Partial<Omit<T, keyof Obj>>) {
   return function (target: any, propertyKey: string): void {
     const doc = loadClassifierChild(target, propertyKey)
-    if (doc) {
+    if (doc !== undefined) {
       const classifier = loadClassifier<Doc>(target)
       classifier.postProcessing.push((model, cl) => {
-        if (doc) {
-          Model.includeMixin(doc, _class)
-          model.assign(model.getLayout(doc), _class, (obj as unknown) as AnyLayout)
-        }
+        Model.includeMixin(doc, _class)
+        model.assign(model.getLayout(doc), _class, (obj as unknown) as AnyLayout)
       })
     }
   }

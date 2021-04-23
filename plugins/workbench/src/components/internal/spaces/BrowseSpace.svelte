@@ -27,12 +27,13 @@
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
 
   import CreateSpace from './CreateSpace.svelte'
+  import { CoreService } from '@anticrm/platform-core'
 
   export let application: WorkbenchApplication
 
   const dispatch = createEventDispatcher()
 
-  const coreService = getCoreService()
+  const coreService: Promise<CoreService> = getCoreService()
   const uiService = getUIService()
 
   let spaces: Space[] = []
@@ -43,13 +44,17 @@
   createLiveQuery(CORE_CLASS_SPACE, {}, (docs) => {
     spaces = docs
   })
+  function isOwner (s: Space, currentUser: string): boolean {
+    const u = getCurrentUserSpace(curentUser, s)
+    return u !== undefined && u.owner
+  }
 </script>
 
 <div class="space-browse-view">
   <div class="header">
     <div class="caption-1">Навигатор пространств</div>
     <a href="/" on:click|preventDefault={() => dispatch('close')}>
-      <Icon icon={workbench.icon.Close} button="true" />
+      <Icon icon={workbench.icon.Close} button={true} />
     </a>
   </div>
 
@@ -60,7 +65,7 @@
         on:click={() => {
           uiService.showModal(CreateSpace, { application })
         }}>
-        <Icon icon={workbench.icon.Add} button="true" />
+        <Icon icon={workbench.icon.Add} button={true} />
         <span style="padding-left:.5em">Новое пространство</span>
       </Button>
     </div>
@@ -79,7 +84,7 @@
           <div class="actions">
             {#if hoverSpace === s._id}
               {#if getCurrentUserSpace(curentUser, s)}
-                {#if s.isPublic || !getCurrentUserSpace(curentUser, s).owner}
+                {#if s.isPublic || !isOwner(s, curentUser)}
                   <Button width="100px" on:click={() => leaveSpace(coreService, s)}>Leave</Button>
                 {:else}
                   <Button width="100px" on:click={() => archivedSpaceUpdate(coreService, s, !s.archived)}>

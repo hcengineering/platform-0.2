@@ -167,7 +167,7 @@ export function UX (label: IntlString, options: Partial<UXOptions> = {}): any {
 
     const attr = loadClassifierChild(target, propertyKey)
     classifier.postProcessing.push((model, cl) => {
-      if (attr) {
+      if (attr !== undefined) {
         model.mixinDocument(attr, ui.mixin.UXAttribute, {
           ...options,
           label,
@@ -177,7 +177,7 @@ export function UX (label: IntlString, options: Partial<UXOptions> = {}): any {
     })
   }
 
-  function uxClass<C extends { new (): Doc }> (constructor: C) {
+  function uxClass<C extends { new (): Doc }> (constructor: C): void { //eslint-disable-line
     const classifier = getClass(constructor.prototype)
     classifier.postProcessing.push((model, cl) => {
       model.mixinDocument(cl, ui.mixin.UXObject, {
@@ -190,7 +190,7 @@ export function UX (label: IntlString, options: Partial<UXOptions> = {}): any {
   return function (this: unknown, ...args: unknown[]): unknown {
     switch (args.length) {
       case 1:
-        return uxClass.apply(this, args as [{ new (): Doc }])
+        return uxClass.apply(this, args as [{ new (): Doc }]) //eslint-disable-line
       case 2:
       case 3:
         return uxProp.apply(this, args as [any, string])

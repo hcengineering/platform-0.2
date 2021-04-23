@@ -1,5 +1,5 @@
 <script type="ts">
-  import Prism from 'prismjs'
+  const Prism = require('prismjs') // eslint--disable-line
   import 'prism-svelte'
 
   export let text = ''

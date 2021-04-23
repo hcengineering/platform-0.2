@@ -11,7 +11,7 @@
   export let color = ''
 
   const platform = getContext('platform') as Platform
-  let url
+  let url: string | undefined
   $: url = platform.getMetadata(icon || ui.icon.Default) || 'https://anticrm.org/logo.svg'
 
   let fs, cl: string

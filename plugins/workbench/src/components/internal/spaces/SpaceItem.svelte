@@ -37,7 +37,7 @@
           }}
           >Add user
         </PopupItem>
-        <PopupItem separator="true" />
+        <PopupItem separator={true} />
         <PopupItem
           on:click={() => {
             leaveSpace(coreService, space)

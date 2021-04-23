@@ -13,9 +13,9 @@ export interface Position {
 }
 
 export interface CompletionPopupActions {
-  handleUp (): void
-  handleDown (): void
-  handleSubmit (): void
+  handleUp: () => void
+  handleDown: () => void
+  handleSubmit: () => void
 }
 
 export function getFirst (items: CompletionItem[]): CompletionItem {

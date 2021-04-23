@@ -95,6 +95,7 @@
   ): Action[] {
     return viewlets.map((p) => {
       return {
+        id: p._id,
         name: p.label,
         icon: p.icon,
         toggleState: p._id === sp?._id,
@@ -131,7 +132,11 @@
         <span class="caption-1" style="padding-right:1em">{application.label}</span>&nbsp;
         <CreateControl {creators} {onCreatorClick} />
       </div>
-      <IconEditBox icon={workbench.icon.Finder} placeholder="Поиск по {application.label}..." iconRight={true} />
+      <IconEditBox
+        icon={workbench.icon.Finder}
+        placeholder="Поиск по {application.label}..."
+        iconRight={true}
+        value="" />
     </div>
     <div class="presentation">
       <ActionBar actions={viewletActions} />

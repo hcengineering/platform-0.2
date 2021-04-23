@@ -14,7 +14,7 @@
 //
 
 export interface Theme {
-  name: string,
+  name: string
   colors: {
     ['bg-color']: string
     ['bg-dark-color']: string

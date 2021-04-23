@@ -17,7 +17,7 @@ import { mergeWith } from 'lodash'
 import { identify, Plugin, PluginDescriptor, Service, Resource } from '@anticrm/platform'
 
 type IntlString = Resource<string> & { __intl_string: true } // eslint-disable-line
-type PluginIds = { [key: string]: { [key: string]: any } }
+interface PluginIds { [key: string]: { [key: string]: any } }
 
 export function mergeIds<A extends PluginIds, B extends PluginIds> (a: A, b: B): A & B {
   return mergeWith({}, a, b, (value) => {
@@ -44,14 +44,14 @@ export function extendIds<P extends Service, X extends PluginDependencies, D ext
 
 // S T R I N G S
 
-type StringIds = { [key: string]: IntlString }
+interface StringIds { [key: string]: IntlString }
 type AsStrings<T> = { [P in keyof T]: string }
 
 export function verifyTranslation<T extends StringIds> (ids: T, translations: AsStrings<T>): { [key: string]: string } {
-  const result = {} as Record<string, string>
+  const result: Record<string, string> = {}
   for (const key in ids) {
     const translated = translations[key]
-    if (translated) {
+    if (translated !== undefined) {
       const id = ids[key]
       result[id] = translated
     } else { throw new Error(`no translation for ${key}`) }
