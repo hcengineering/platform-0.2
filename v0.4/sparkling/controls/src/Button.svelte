@@ -40,9 +40,6 @@
 </button>
 
 <style lang="scss">
-  .container {
-    position: relative;
-  }
   .button {
     display: flex;
     align-items: center;
