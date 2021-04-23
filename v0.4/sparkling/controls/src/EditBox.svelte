@@ -50,8 +50,8 @@
     border-radius: 12px;
     backdrop-filter: blur(12px);
     &:focus-within {
-      background-color: var(--theme-bg-focused-color);
-      border-color: var(--theme-border-focused-color);
+      background-color: var(--theme-bg-accent-hover);
+      border-color: var(--theme-border-accent-hover);
     }
     input {
       height: 52px;

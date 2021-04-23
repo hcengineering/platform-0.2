@@ -14,71 +14,107 @@
 -->
 
 <script lang="ts">
+  import Spinner from './Spinner.svelte'
   import { createEventDispatcher } from 'svelte'
 
-  export let label: string
+  export let label: string = ''
   export let primary: boolean = false
+  export let disabled: boolean = false
+  export let loading: boolean = false
   export let width: string
 
   const dispatch = createEventDispatcher()
   function onClick (event: MouseEvent) {
     dispatch('click', event)
   }
+
+  if (loading) disabled = true
 </script>
 
-<button class="button" class:primary={primary} style="{width ? 'width: ' + width : ''}" on:click={onClick}>
-  <div>{label}</div>
+<button class="button" class:primary={primary} class:loading={loading} {disabled}
+        style="{width ? 'width: ' + width : ''}" on:click={onClick}>
+  {#if loading}
+    <div class="spinner"><Spinner/></div>
+  {/if}
+  {label}
 </button>
 
 <style lang="scss">
+  .container {
+    position: relative;
+  }
   .button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     height: 48px;
-    padding: 0;
-    border: none;
-    overflow: hidden;
-    background-color: var(--theme-bg-accent-color);
-    border-radius: 10px;
+    padding: 0 25px;
+    color: var(--theme-caption-color);
+    background-color: var(--theme-button-bg-enabled);
+    border: 1px solid var(--theme-button-border-enabled);
+    border-radius: 12px;
     outline: none;
     cursor: pointer;
     font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
     backdrop-filter: blur(12px);
-
-    div {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0 25px;
-      width: 100%;
-      height: 100%;
-
-      font-size: 14px;
-      font-weight: 600;
-
-      color: var(--theme-caption-color);
-      border: 1px solid var(--theme-border-accent-color);
-      border-radius: 10px;
-      &:hover {
-        background-color: var(--theme-bg-accent-hover);
-        border: 1px solid var(--theme-border-accent-hover);
-      }
-      &:active {
-        background-color: var(--theme-bg-accent-active);
-        border: 1px solid var(--theme-border-accent-active);
-      }
+    &:hover {
+      background-color: var(--theme-button-bg-hovered);
+      border-color: var(--theme-button-border-hovered);
+    }
+    &:focus {
+      background-color: var(--theme-button-bg-focused);
+      border-color: var(--theme-button-border-focused);
+    }
+    &:active {
+      background-color: var(--theme-button-bg-pressed);
+      border-color: var(--theme-button-border-pressed);
+    }
+    &:disabled {
+      background-color: var(--theme-button-bg-disabled);
+      border-color: var(--theme-button-border-disabled);
+      color: rgb(var(--theme-caption-color) / 40%);
+      cursor: not-allowed;
     }
   }
 
-  .primary div {
-    background-color: var(--theme-primary-color);
-    border: 1px solid var(--theme-primary-border);
-    opacity: 1;
+  .primary {
+    background-color: var(--theme-primary-enabled);
+    border-color: var(--theme-primary-border);
     &:hover {
-      background-color: var(--theme-primary-color);
-      border: 1px solid var(--theme-primary-border);
-      opacity: 0.9;
+      background-color: var(--theme-primary-hovered);
+      border-color: var(--theme-primary-border);
+    }
+    &:focus {
+      background-color: var(--theme-primary-focused);
+      border-color: var(--theme-primary-border);
+      box-shadow: 0 0 0 2px var(--theme-primary-outline);
     }
     &:active {
-      opacity: 0.8;
+      background-color: var(--theme-primary-pressed);
+      border-color: var(--theme-primary-border);
+      box-shadow: none;
     }
+    &:disabled {
+      background-color: var(--theme-primary-disabled);
+      border-color: var(--theme-primary-border);
+      color: rgb(var(--theme-caption-color) / 60%);
+      cursor: not-allowed;
+    }
+  }
+
+  .loading {
+    background-color: var(--theme-primary-enabled);
+    color: var(--theme-caption-color);
+    &:disabled {
+      background-color: var(--theme-primary-enabled);
+      color: var(--theme-caption-color);
+      cursor: not-allowed;
+    }
+  }
+
+  .spinner {
+    margin: 0 10px;
   }
 </style>
