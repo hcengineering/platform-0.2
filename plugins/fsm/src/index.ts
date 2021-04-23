@@ -15,6 +15,8 @@ import { Class, Doc, Mixin, Ref, Emb } from '@anticrm/core'
 import core from '@anticrm/platform-core'
 import { Plugin, plugin, Service } from '@anticrm/platform'
 import { Application } from '@anticrm/domains'
+import { ComponentExtension } from '@anticrm/presentation'
+import { AnyComponent } from '@anticrm/platform-ui'
 
 export interface FSM extends Doc {
   name: string
@@ -59,7 +61,12 @@ export default plugin(
     },
     mixin: {
       WithFSM: '' as Ref<Mixin<WithFSM>>,
-      WithState: '' as Ref<Mixin<WithState>>
+      WithState: '' as Ref<Mixin<WithState>>,
+      CardForm: '' as Ref<Mixin<ComponentExtension<VDoc>>>
+    },
+    component: {
+      BoardPresenter: '' as AnyComponent,
+      VDocCardPresenter: '' as AnyComponent
     }
   }
 )

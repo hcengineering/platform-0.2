@@ -81,6 +81,10 @@ export class TWithState extends TDoc implements WithState {
 
 export function model (S: Builder): void {
   S.add(TTransition, TState, TFSM, TWithFSM, TWithState)
+
+  S.mixin(core.class.VDoc, fsmPlugin.mixin.CardForm, {
+    component: fsmPlugin.component.VDocCardPresenter
+  })
 }
 
 type PureState = Omit<State, keyof Doc>

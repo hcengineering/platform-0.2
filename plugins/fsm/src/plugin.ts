@@ -11,8 +11,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { FSMService } from '.'
+import { Platform } from '@anticrm/platform'
 
-export default (): Promise<FSMService> => {
+import BoardPresenter from './presenters/board/BoardPresenter.svelte'
+import VDocCardPresenter from './presenters/board/VDocCardPresenter.svelte'
+import type { FSMService } from '.'
+import fsm from '.'
+
+export default (platform: Platform): Promise<FSMService> => {
+  platform.setResource(fsm.component.BoardPresenter, BoardPresenter)
+  platform.setResouce(fsm.component.VDocCardPresenter, VDocCardPresenter)
+
   return Promise.resolve({})
 }
