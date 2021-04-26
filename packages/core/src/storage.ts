@@ -27,19 +27,21 @@ export interface TxContext {
  * Return a complete TxContext
  */
 export function txContext (source: TxContextSource = TxContextSource.Client, network: Promise<void> = Promise.resolve()): TxContext {
-  return {
+  const doc: TxContext = {
     network,
-    source
-  } as TxContext
+    source,
+    clientTx: []
+  }
+  return doc
 }
 
 export interface Storage {
-  store (ctx: TxContext, doc: Doc): Promise<void>
-  update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, operations: TxOperation[]): Promise<void>
-  remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<void>
+  store: (ctx: TxContext, doc: Doc) => Promise<void>
+  update: (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, operations: TxOperation[]) => Promise<void>
+  remove: (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>) => Promise<void>
 
-  find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T[]>
-  findOne<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined>
+  find: <T extends Doc>(_class: Ref<Class<T>>, query: DocumentQuery<T>) => Promise<T[]>
+  findOne: <T extends Doc>(_class: Ref<Class<T>>, query: DocumentQuery<T>) => Promise<T | undefined>
 }
 
 ///
@@ -52,7 +54,7 @@ export interface Tx extends Doc {
 }
 
 export interface DomainIndex {
-  tx (ctx: TxContext, tx: Tx): Promise<any>
+  tx: (ctx: TxContext, tx: Tx) => Promise<any>
 }
 
 export interface RegExpression {
@@ -61,7 +63,7 @@ export interface RegExpression {
 }
 
 export type ObjQueryType<T> = T extends Obj ? DocumentQuery<T> : T | RegExpression
-export type ArrayQueryType<A> = A extends (infer T)[] ? ObjQueryType<T> | ObjQueryType<T>[] : ObjQueryType<A>
+export type ArrayQueryType<A> = A extends Array<infer T> ? ObjQueryType<T> | Array<ObjQueryType<T>> : ObjQueryType<A>
 
 /**
  * A possible query values to be used with Document access protocol.
@@ -74,19 +76,17 @@ export type DocumentQuery<T> = {
 }
 
 // A possible values for document during creation.
-export type TWithoutEmbArray<A> = A extends (infer T)[] ? DocumentValue<T>[]: DocumentValue<A>
+export type TWithoutEmbArray<A> = A extends Array<infer T> ? Array<DocumentValue<T>>: DocumentValue<A>
 
 export type DocumentValueRaw<T> = {
   [P in keyof T]: TWithoutEmbArray<T[P]>
 }
 export type DocumentValue<T> = T extends Doc ? DocumentValueRaw<Omit<T, keyof Doc>> : never | T extends Emb ? DocumentValueRaw<Omit<T, keyof Emb>>: never | T extends Obj ? T : T
 
-///
-
 export interface DocumentProtocol {
-  find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T[]>
-  findOne<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined>
-  loadDomain (domain: string): Promise<Doc[]>
+  find: <T extends Doc>(_class: Ref<Class<T>>, query: DocumentQuery<T>) => Promise<T[]>
+  findOne: <T extends Doc>(_class: Ref<Class<T>>, query: DocumentQuery<T>) => Promise<T | undefined>
+  loadDomain: (domain: string) => Promise<Doc[]>
 }
 
 export interface CoreProtocol extends DocumentProtocol {
@@ -94,14 +94,14 @@ export interface CoreProtocol extends DocumentProtocol {
    * Process a transaction on server
    * @param tx
    */
-  tx (tx: Tx): Promise<any>
+  tx: (tx: Tx) => Promise<any>
 
   /**
    * Generate a sequence, short object reference.
    * @param _space
    * @return a generated reference Id,
    */
-  genRefId (_space: Ref<Space>): Promise<Ref<VDoc>>
+  genRefId: (_space: Ref<Space>) => Promise<Ref<VDoc>>
 }
 
 export class TxProcessor {
@@ -111,8 +111,10 @@ export class TxProcessor {
     this.indices = indices
   }
 
-  process (ctx: TxContext, tx: Tx): Promise<any> {
-    return Promise.all(this.indices.map(index => index.tx(ctx, tx)))
+  async process (ctx: TxContext, tx: Tx): Promise<any> {
+    await Promise.all(this.indices.map(async index => {
+      await index.tx(ctx, tx)
+    }))
   }
 }
 
@@ -154,23 +156,27 @@ class CombineStorage implements Storage {
   }
 
   async find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T[]> {
-    return (await Promise.all(this.storages.map((s) => s.find(_class, query)))).reduce((p, c) => p.concat(c))
+    return (await Promise.all(this.storages.map(async (s) => await s.find(_class, query)))).reduce((p, c) => p.concat(c))
   }
 
-  findOne<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined> {
-    return Promise.race(this.storages.map((s) => s.findOne(_class, query)))
+  async findOne<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined> {
+    return await Promise.race(this.storages.map(async (s) => {
+      return await s.findOne(_class, query)
+    }))
   }
 
-  remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<void> {
-    return Promise.all(this.storages.map((s) => s.remove(ctx, _class, _id))).then()
+  async remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<void> {
+    await Promise.all(this.storages.map(async (s) => {
+      await s.remove(ctx, _class, _id)
+    }))
   }
 
-  store (ctx: TxContext, doc: Doc): Promise<void> {
-    return Promise.all(this.storages.map((s) => s.store(ctx, doc))).then()
+  async store (ctx: TxContext, doc: Doc): Promise<void> {
+    await Promise.all(this.storages.map(async (s) => { await s.store(ctx, doc) }))
   }
 
-  update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, operations: TxOperation[]): Promise<void> {
-    return Promise.all(this.storages.map((s) => s.update(ctx, _class, _id, operations))).then()
+  async update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, operations: TxOperation[]): Promise<void> {
+    await Promise.all(this.storages.map(async (s) => { await s.update(ctx, _class, _id, operations) }))
   }
 }
 

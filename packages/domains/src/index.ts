@@ -19,6 +19,7 @@ import { AnyLayout, Class, DateProperty, Doc, Emb, Mixin, Property, Ref, StringP
 
 export const CORE_CLASS_TX = 'class:core.Tx' as Ref<Class<Tx>>
 export const CORE_CLASS_OBJECT_TX = 'class:core.ObjectTx' as Ref<Class<ObjectTx>>
+export const CORE_CLASS_OBJECT_SELECTOR = 'class:core.ObjectSelector' as Ref<Class<ObjectSelector>>
 export const CORE_CLASS_OBJECTTX_DETAILS = 'class:core.ObjectTxDetails' as Ref<Class<ObjectTxDetails>>
 export const CORE_CLASS_CREATE_TX = 'class:core.CreateTx' as Ref<Class<CreateTx>>
 export const CORE_CLASS_UPDATE_TX = 'class:core.UpdateTx' as Ref<Class<UpdateTx>>
@@ -102,14 +103,14 @@ export interface DeleteTx extends ObjectTx {
 }
 
 interface TxOperationBuilder<T> {
-  match (values: Partial<T>): T & TxBuilder<T>
-  set (value: Partial<T>): TxOperation
-  build (): ObjectSelector[]
-  push (value: Partial<T>): TxOperation
-  pull (): TxOperation
+  match: (values: Partial<T>) => T & TxBuilder<T>
+  set: (value: Partial<T>) => TxOperation
+  build: () => ObjectSelector[]
+  push: (value: Partial<T>) => TxOperation
+  pull: () => TxOperation
 }
 
-export type ArrayElement<A> = A extends (infer T)[] ? T : A
+export type ArrayElement<A> = A extends Array<infer T> ? T : A
 
 export type FieldBuilder<T> = {
   [P in keyof T]-?: TxOperationBuilder<ArrayElement<T[P]>> & ArrayElement<T[P]>;
@@ -118,7 +119,7 @@ export type TxBuilder<T> = TxOperationBuilder<T> & FieldBuilder<T>
 
 class TxBuilderImpl<T> {
   result: ObjectSelector[] = []
-  current: ObjectSelector = {} as ObjectSelector
+  current: ObjectSelector = { _class: CORE_CLASS_OBJECT_SELECTOR, key: '' }
   factory: () => TxBuilder<any>
 
   constructor (selector: ObjectSelector[], factory: () => TxBuilder<T>) {
@@ -129,14 +130,14 @@ class TxBuilderImpl<T> {
   match<Q extends Doc> (values: Partial<Q>): Q & TxBuilder<Q> {
     this.current.pattern = (values as unknown) as AnyLayout
     this.result.push(this.current)
-    this.current = {} as ObjectSelector
+    this.current = { _class: CORE_CLASS_OBJECT_SELECTOR, key: '' }
     return (this.factory() as unknown) as Q & TxBuilder<Q>
   }
 
   build (): ObjectSelector[] | undefined {
-    if (this.current.key && this.current.key !== '') {
+    if (this.current.key !== '') {
       this.result.push(this.current)
-      this.current = {} as ObjectSelector
+      this.current = { _class: CORE_CLASS_OBJECT_SELECTOR, key: '' }
     }
     if (this.result.length > 0) {
       return this.result
@@ -145,33 +146,36 @@ class TxBuilderImpl<T> {
 
   set (value: Partial<T>): TxOperation {
     return {
+      _class: CORE_CLASS_TX_OPERATION,
       kind: TxOperationKind.Set,
       selector: this.build(),
       _attributes: (value as unknown) as AnyLayout
-    } as TxOperation
+    }
   }
 
   push<Q extends Doc> (value: Partial<Q>): TxOperation {
     return {
+      _class: CORE_CLASS_TX_OPERATION,
       kind: TxOperationKind.Push,
       selector: this.build(),
       _attributes: (value as unknown) as AnyLayout
-    } as TxOperation
+    }
   }
 
   pull (): TxOperation {
     return {
+      _class: CORE_CLASS_TX_OPERATION,
       kind: TxOperationKind.Pull,
       selector: this.build()
-    } as TxOperation
+    }
   }
 
   updateKey (property: string): void {
-    if (this.current.key === '') {
+    if (this.current.key !== '') {
       this.result.push(this.current)
     }
-    this.current = {} as ObjectSelector
-    this.current.key = property as string
+    this.current = { _class: CORE_CLASS_OBJECT_SELECTOR, key: '' }
+    this.current.key = property
   }
 }
 
@@ -217,6 +221,7 @@ export interface SpaceUser extends Emb {
 }
 
 export const CORE_CLASS_SPACE = 'class:core.Space' as Ref<Class<Space>>
+export const CORE_CLASS_SPACE_USER = 'class:core.SpaceUser' as Ref<Class<SpaceUser>>
 
 /**
  * Define an application descriptor.

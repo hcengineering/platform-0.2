@@ -17,7 +17,7 @@
 
 import { Model } from '@anticrm/core'
 import { data, taskIds } from '@anticrm/core/src/__tests__/tasks'
-import { txBuilder, TxOperationKind } from '../index'
+import { CORE_CLASS_OBJECT_SELECTOR, txBuilder, TxOperationKind, CORE_CLASS_TX_OPERATION } from '../index'
 
 describe('core tests', () => {
   const model = new Model('vdocs')
@@ -27,6 +27,7 @@ describe('core tests', () => {
     const s = txBuilder(taskIds.class.Task)
 
     expect(s.tasks?.match({ name: 'qwe' }).build()).toEqual([{
+      _class: 'class:core.ObjectSelector',
       key: 'tasks',
       pattern: { name: 'qwe' }
     }])
@@ -36,10 +37,12 @@ describe('core tests', () => {
 
     expect(s.tasks?.match({ name: 'qwe' }).comments?.build()).toEqual([
       {
+        _class: CORE_CLASS_OBJECT_SELECTOR,
         key: 'tasks',
         pattern: { name: 'qwe' }
       },
       {
+        _class: CORE_CLASS_OBJECT_SELECTOR,
         key: 'comments'
       }])
   })
@@ -47,14 +50,17 @@ describe('core tests', () => {
     const s = txBuilder(taskIds.class.Task)
 
     expect(s.tasks?.match({ name: 'qwe' }).comments?.set({ message: 'comment msg' })).toEqual({
+      _class: CORE_CLASS_TX_OPERATION,
       kind: TxOperationKind.Set,
       _attributes: {
         message: 'comment msg'
       },
       selector: [{
+        _class: CORE_CLASS_OBJECT_SELECTOR,
         key: 'tasks',
         pattern: { name: 'qwe' }
       }, {
+        _class: CORE_CLASS_OBJECT_SELECTOR,
         key: 'comments'
       }]
     })
@@ -63,23 +69,28 @@ describe('core tests', () => {
     const s = txBuilder(taskIds.class.Task)
 
     expect(s.tasks?.match({ name: 'qwe' }).comments?.set({ message: 'comment msg' })).toEqual({
+      _class: CORE_CLASS_TX_OPERATION,
       kind: TxOperationKind.Set,
       _attributes: {
         message: 'comment msg'
       },
       selector: [{
+        _class: CORE_CLASS_OBJECT_SELECTOR,
         key: 'tasks',
         pattern: { name: 'qwe' }
       }, {
+        _class: CORE_CLASS_OBJECT_SELECTOR,
         key: 'comments'
       }]
     })
     expect(s.comments?.match({ message: 'qwe' }).set({ message: 'comment msg' })).toEqual({
+      _class: CORE_CLASS_TX_OPERATION,
       kind: TxOperationKind.Set,
       _attributes: {
         message: 'comment msg'
       },
       selector: [{
+        _class: CORE_CLASS_OBJECT_SELECTOR,
         key: 'comments',
         pattern: { message: 'qwe' }
       }]
@@ -90,6 +101,7 @@ describe('core tests', () => {
     const s = txBuilder(taskIds.class.Task)
     const fieldName = 'description'
     expect(s.set({ [fieldName]: 'someValue' })).toEqual({
+      _class: CORE_CLASS_TX_OPERATION,
       kind: TxOperationKind.Set,
       _attributes: {
         description: 'someValue'

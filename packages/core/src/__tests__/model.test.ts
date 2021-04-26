@@ -22,7 +22,7 @@ import {
 import { mixinFromKey, mixinKey, Model } from '../model'
 import { DocumentQuery, DocumentValue, txContext } from '../storage'
 import { createSubtask, createTask, data, doc1, SubTask, Task, taskIds } from './tasks'
-import { ObjectSelector, Space, TxOperation, TxOperationKind } from '@anticrm/domains'
+import { CORE_CLASS_OBJECT_SELECTOR, CORE_CLASS_TX_OPERATION, Space, TxOperation, TxOperationKind } from '@anticrm/domains'
 
 describe('matching', () => {
   const model = new Model('vdocs')
@@ -90,43 +90,48 @@ describe('matching', () => {
 
   it('push subtask value', () => {
     const clone = model.createDocument(taskIds.class.Task, doc1)
-    model.updateDocumentPush(clone, 'tasks' as StringProperty, (createSubtask('subtask3', 34) as unknown) as AnyLayout)
+    model.updateDocumentPush<Task, SubTask>(clone, 'tasks' as StringProperty, createSubtask('subtask3', 34))
 
     expect(clone.tasks?.length).toEqual(3)
   })
 
   it('push a new subtask value', () => {
     const clone = model.createDocument(taskIds.class.Task, doc1)
-    const cloneResult = model.updateDocument(clone, [{
+    const txOp: TxOperation = {
+      _class: CORE_CLASS_TX_OPERATION,
       kind: TxOperationKind.Set,
       _attributes: {
         rate: 44 as Property<number, number>
       },
-      selector: [{ key: 'tasks', pattern: { name: 'subtask1' } } as ObjectSelector]
-    } as TxOperation])
+      selector: [{ _class: CORE_CLASS_OBJECT_SELECTOR, key: 'tasks', pattern: { name: 'subtask1' } }]
+    }
+    const cloneResult = model.updateDocument(clone, [txOp])
 
     expect(cloneResult.tasks?.[0].rate).toEqual(44)
   })
 
   it('push a new comment to subtask', () => {
     const clone = model.createDocument(taskIds.class.Task, doc1)
-    const cloneResult = model.updateDocument(clone, [{
+    const txOp: TxOperation = {
+      _class: CORE_CLASS_TX_OPERATION,
       kind: TxOperationKind.Push,
       selector: [{
+        _class: CORE_CLASS_OBJECT_SELECTOR,
         key: 'tasks',
         pattern: { name: 'subtask1' }
-      } as ObjectSelector, { key: 'comments' } as ObjectSelector],
+      }, { _class: CORE_CLASS_OBJECT_SELECTOR, key: 'comments' }],
       _attributes: {
         message: 'my-msg' as StringProperty
       }
-    } as TxOperation])
+    }
+    const cloneResult = model.updateDocument(clone, [txOp])
 
     expect(cloneResult.tasks?.[0].comments?.length).toEqual(1)
   })
 
   it('remove item from array', () => {
     const clone = model.createDocument(taskIds.class.Task, doc1)
-    const cloneResult = model.updateDocumentPull(clone, 'tasks', { name: 'subtask1' as StringProperty })
+    const cloneResult = model.updateDocumentPull<Task, SubTask>(clone, 'tasks', { name: 'subtask1' })
 
     expect(cloneResult.tasks?.length).toEqual(1)
     expect(cloneResult.tasks?.[0].name).toEqual('subtask2')
@@ -134,7 +139,7 @@ describe('matching', () => {
 
   it('remove item from instance', () => {
     const clone = model.createDocument(taskIds.class.Task, doc1)
-    const cloneResult = model.updateDocumentPull(clone, 'mainTask', {})
+    const cloneResult = model.updateDocumentPull<Task, SubTask>(clone, 'mainTask', {})
 
     expect(cloneResult.mainTask).toEqual(undefined)
   })
@@ -199,14 +204,19 @@ describe('invalid cases', () => {
     expect(() => model.add(doc)).toThrowError()
   })
 
-  it('rejects on storing existing doc', () => {
+  it('rejects on storing existing doc', async () => {
     const model = new Model('vdocs')
     model.loadModel(data)
 
     const doc = model.createDocument(taskIds.class.Task, createTask('', 0, ''))
 
-    model.store(txContext(), doc)
-    expect(model.store(txContext(), doc)).rejects.toThrowError()
+    await model.store(txContext(), doc)
+    try {
+      await model.store(txContext(), doc)
+      expect(model).toBeUndefined()
+    } catch (err) {
+      expect(err.message).toEqual('document added already ' + doc._id)
+    }
   })
 
   it('throws on deleting missing doc', () => {
@@ -216,11 +226,16 @@ describe('invalid cases', () => {
     expect(() => model.del('id' as Ref<Doc>)).toThrowError()
   })
 
-  it('rejects on removing missing doc', () => {
+  it('rejects on removing missing doc', async () => {
     const model = new Model('vdocs')
     model.loadModel(data)
 
-    expect(() => model.remove(txContext(), {} as Ref<Class<Doc>>, 'id' as Ref<Doc>)).toThrowError()
+    try {
+      await model.remove(txContext(), '' as Ref<Class<Doc>>, 'id' as Ref<Doc>)
+      expect(model).toBeUndefined()
+    } catch (err) {
+      expect(err.message).toEqual('document not found id')
+    }
   })
 
   it('throws on getting missing doc', () => {
@@ -234,16 +249,18 @@ describe('invalid cases', () => {
     const model = new Model('vdocs')
     model.loadModel(data)
 
-    const doc = model.createDocument(taskIds.class.Task, createTask('', 0, ''))
+    const doc = model.createDocument<Task>(taskIds.class.Task, createTask('', 0, ''))
 
+    const txOp: TxOperation = {
+      _class: CORE_CLASS_TX_OPERATION,
+      kind: TxOperationKind.Set,
+      _attributes: (createSubtask('subtask3', 34) as unknown) as AnyLayout,
+      selector: [{ _class: CORE_CLASS_OBJECT_SELECTOR, key: 'tasks', pattern: { name: 'Not exist' } }]
+    }
     expect(
       () => model.updateDocument(
         doc,
-        [{
-          kind: TxOperationKind.Set,
-          _attributes: (createSubtask('subtask3', 34) as unknown) as AnyLayout,
-          selector: [{ key: 'tasks', pattern: { name: 'Not exist' } } as ObjectSelector]
-        } as TxOperation])
+        [txOp])
     ).toThrowError()
   })
 
@@ -251,20 +268,27 @@ describe('invalid cases', () => {
     const model = new Model('vdocs')
     model.loadModel(data)
 
-    const doc = model.createDocument(taskIds.class.Task, createTask('', 0, ''))
+    const doc = model.createDocument<Task>(taskIds.class.Task, createTask('', 0, ''))
 
     expect(
-      () => model.updateDocumentPush(
+      () => model.updateDocumentPush<Task, SubTask>(
         doc,
         'Not exist',
-        (createSubtask('subtask3', 34) as unknown) as AnyLayout
+        createSubtask('subtask3', 34)
       )
     ).toThrowError()
   })
 
-  it('throws on loading non-matching domain', () =>
-    expect(new Model('vdocs').loadDomain('vdocs2')).rejects.toThrowError()
-  )
+  it('throws on loading non-matching domain', async () => {
+    const mdl = new Model('vdocs')
+    const p = mdl.loadDomain('vdocs2')
+    try {
+      await p
+      expect(p).toBeUndefined()
+    } catch (err) {
+      expect(err.message).toEqual('domain does not match')
+    }
+  })
 })
 
 describe('Model domain', () => {
@@ -304,7 +328,7 @@ describe('Model utilities', () => {
     expect(model.getAllAttributes(CORE_CLASS_EMB).length)
       .toEqual(1) // It should contain _class
 
-    const getAttrs = (id: string) => Object.entries<Attribute>(
+    const getAttrs = (id: string): any => Object.entries<Attribute>(
       data.find((x: any) => x._id === id)?._attributes ?? {}
     )
 
@@ -324,7 +348,7 @@ describe('Model utilities', () => {
 
   it('returns primary key of class', () => {
     expect(model.getPrimaryKey(CORE_CLASS_EMB))
-      .toBeNull()
+      .toBeUndefined()
     expect(model.getPrimaryKey('core.class.TaskObj' as Ref<Class<Doc>>))
       .toEqual('name')
     expect(model.getPrimaryKey('core.class.DerivedTaskObj' as Ref<Class<Doc>>))
@@ -517,15 +541,15 @@ describe('Model storage', () => {
     const newSubtask = createSubtask('subtask3', 34)
     const expectedDoc = {
       ...doc,
-      tasks: [...existingSubtasks, newSubtask]
+      tasks: [...existingSubtasks, { ...newSubtask, _class: taskIds.class.Subtask }]
     }
 
-    await model.push(
+    await model.push<SubTask>(
       txContext(),
       '' as Ref<Class<Doc>>,
       doc._id,
       'tasks',
-      newSubtask as unknown as AnyLayout
+      newSubtask
     )
 
     const updatedDoc = model.get(doc._id) as Task
@@ -546,11 +570,12 @@ describe('Model storage', () => {
       name: newName
     }
 
+    const txOp: TxOperation = { _class: CORE_CLASS_TX_OPERATION, kind: TxOperationKind.Set, _attributes: { name: newName as PropertyType } }
     await model.update(
       txContext(),
       '' as Ref<Class<Doc>>,
       doc._id,
-      [{ kind: TxOperationKind.Set, _attributes: { name: newName as PropertyType } } as TxOperation]
+      [txOp]
     )
 
     const updatedDoc = model.get(doc._id) as Task

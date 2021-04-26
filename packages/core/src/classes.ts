@@ -17,12 +17,10 @@ export type PrimitiveType = number | string | boolean | undefined
 
 export type Property<P extends PrimitiveType, T> = P & { __property: T }
 export type Ref<T extends Doc> = string & { __ref: T }
-// type MethodType = (...args: any[]) => any
-// export type Method<T extends MethodType> = T & { __method: T }
 
 export interface Obj {
   _class: Ref<Class<Obj>>
-  _mixins?: Ref<Mixin<Obj>>[]
+  _mixins?: Array<Ref<Mixin<Obj>>>
 }
 
 export interface Emb extends Obj {
@@ -35,10 +33,10 @@ export interface Doc extends Obj {
 }
 
 export type PropertyType = Property<PrimitiveType, any>
-  | Ref<Doc>
-  | Emb
-  | PropertyType[]
-  | { [key: string]: PropertyType }
+| Ref<Doc>
+| Emb
+| PropertyType[]
+| { [key: string]: PropertyType }
 
 export type StringProperty = Property<string, string>
 export type BooleanProperty = Property<boolean, boolean>

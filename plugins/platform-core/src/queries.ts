@@ -18,7 +18,7 @@ import { QueryResult, Subscriber, Unsubscribe } from '.'
 import { TxOperation } from '@anticrm/domains'
 
 export interface Domain extends Storage {
-  query<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): QueryResult<T>
+  query: <T extends Doc>(_class: Ref<Class<T>>, query: DocumentQuery<T>) => QueryResult<T>
 }
 
 interface Query<T extends Doc> {
@@ -49,23 +49,23 @@ export class QueriableStorage implements Domain {
     this.updateResults = updateResults
   }
 
-  private refresh<T extends Doc> (query: Query<T>) {
-    this.find(query._class, query.query).then(result => {
-      query.results = result
-      query.subscriber(result)
-    })
+  private async refresh<T extends Doc> (query: Query<T>): Promise<void> {
+    const result = await this.find(query._class, query.query)
+
+    query.results = result
+    query.subscriber(result)
   }
 
   async store (ctx: TxContext, doc: Doc): Promise<void> {
-    await this.proxy.store(ctx, doc).then(() => {
-      for (const q of this.queries.values()) {
-        if (this.model.matchQuery(q._class, doc, q.query)) {
-          // If document is matched, assume we add it to end of list. But it's order could be changed after transaction will be complete.
-          q.results.push(this.model.as(doc, q._class))
-          q.subscriber(q.results)
-        }
+    await this.proxy.store(ctx, doc)
+
+    for (const q of this.queries.values()) {
+      if (this.model.matchQuery(q._class, doc, q.query)) {
+        // If document is matched, assume we add it to end of list. But it's order could be changed after transaction will be complete.
+        q.results.push(this.model.as(doc, q._class))
+        q.subscriber(q.results)
       }
-    })
+    }
   }
 
   updateMatchQuery (_id: Ref<Doc>, q: Query<Doc>, apply: (doc: Doc) => UpdateOp): boolean {
@@ -88,44 +88,47 @@ export class QueriableStorage implements Domain {
     return false
   }
 
-  update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, operations: TxOperation[]): Promise<void> {
-    return this.proxy.update(ctx, _class, _id, operations).then(() => {
-      for (const q of this.queries.values()) {
-        // Find doc, apply update of attributes and check if it is still matches, if not we need to perform request to server after transaction will be complete.
-        if (this.updateMatchQuery(_id, q, (doc) => {
-          this.model.updateDocument(doc, operations)
-          return UpdateOp.None
-        })) {
-          continue
-        }
-        // so we potentially need to fetch new matched objects from server, so do so.
-        ctx.network.then(() => this.refresh(q))
+  async update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, operations: TxOperation[]): Promise<void> {
+    await this.proxy.update(ctx, _class, _id, operations)
+
+    for (const q of this.queries.values()) {
+      // Find doc, apply update of attributes and check if it is still matches, if not we need to perform request to server after transaction will be complete.
+      if (this.updateMatchQuery(_id, q, (doc) => {
+        this.model.updateDocument(doc, operations)
+        return UpdateOp.None
+      })) {
+        continue
       }
-    })
-  }
+      if (q._class === _class) {
+        // so we potentially need to fetch new matched objects from server, so do so if class are matching ours.
 
-  remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<void> {
-    return this.proxy.remove(ctx, _class, _id).then(() => {
-      for (const q of this.queries.values()) {
-        if (this.updateMatchQuery(_id, q, (doc) => {
-          this.model.removeDocument(doc)
-          // We should not remove object in case we modify embedded array
-          return UpdateOp.Remove
-        })) {
-          continue
-        }
-        // so we potentially need to fetch new matched objects from server, so do so.
-        ctx.network.then(() => this.refresh(q))
+        // TODO: Check if operations in update could have influence on object and ignore.
+        await ctx.network
+        await this.refresh(q)
       }
-    })
+    }
   }
 
-  find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T[]> {
-    return this.proxy.find(_class, query)
+  async remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<void> {
+    await this.proxy.remove(ctx, _class, _id)
+
+    for (const q of this.queries.values()) {
+      if (this.updateMatchQuery(_id, q, (doc) => {
+        this.model.removeDocument(doc)
+        // We should not remove object in case we modify embedded array
+        return UpdateOp.Remove
+      })) {
+        continue
+      }
+    }
   }
 
-  findOne<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined> {
-    return this.proxy.findOne(_class, query)
+  async find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T[]> {
+    return await this.proxy.find<T>(_class, query)
+  }
+
+  async findOne<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined> {
+    return await this.proxy.findOne<T>(_class, query)
   }
 
   // TODO: move to platform core
@@ -143,7 +146,7 @@ export class QueriableStorage implements Domain {
           this.queries.delete(q._id)
         }
         this.queries.set(q._id, q)
-        this.refresh(q)
+        this.refresh(q).then(() => 0, () => 0)
         return q.unsubscriber
       }
     }

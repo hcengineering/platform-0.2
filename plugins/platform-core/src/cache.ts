@@ -32,11 +32,11 @@ export class Cache implements Storage {
     this.coreProtocol = coreProtocol
   }
 
-  find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T[]> {
-    return this.coreProtocol.find(_class, query) as Promise<T[]>
+  async find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T[]> {
+    return await this.coreProtocol.find<T>(_class, query)
   }
 
-  findOne<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined> {
-    return this.coreProtocol.findOne(_class, query) as Promise<T | undefined>
+  async findOne<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined> {
+    return await this.coreProtocol.findOne<T>(_class, query)
   }
 }

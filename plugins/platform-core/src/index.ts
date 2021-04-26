@@ -22,7 +22,7 @@ export type Subscriber<T> = (value: T[]) => void
 export type Unsubscribe = () => void
 
 export interface QueryResult<T extends Doc> {
-  subscribe (run: Subscriber<T>): Unsubscribe
+  subscribe: (run: Subscriber<T>) => Unsubscribe
 }
 
 export type QueryUpdater<T extends Doc> = (_class: Ref<Class<T>>, query: DocumentQuery<T>) => void
@@ -36,7 +36,7 @@ export interface QueryProtocol {
    * @param _class - object class
    * @param query - query
    */
-  query<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): QueryResult<T>
+  query: <T extends Doc>(_class: Ref<Class<T>>, query: DocumentQuery<T>) => QueryResult<T>
 }
 
 /**
@@ -47,12 +47,12 @@ export interface OperationProtocol {
    * Perform creation of new document and store it into storage.
    * Object ID will be automatically generated and assigned to object.
    */
-  create<T extends Doc> (_class: Ref<Class<T>>, values: DocumentValue<T>): Promise<T>
+  create: <T extends Doc>(_class: Ref<Class<T>>, values: DocumentValue<T>) => Promise<T>
 
   /**
    * Perform update of document properties.
    */
-  update<T extends Doc> (doc: T, value: Partial<Omit<T, keyof Doc>>): Promise<T>
+  update: <T extends Doc>(doc: T, value: Partial<Omit<T, keyof Doc>>) => Promise<T>
 
   /**
    * Perform update of document/embedded document properties using a builder pattern.
@@ -61,20 +61,20 @@ export interface OperationProtocol {
    *
    * push and pull are applicable only for array attributes.
    */
-  updateWith<T extends Doc> (doc: T, builder: (s: TxBuilder<T>) => TxOperation | TxOperation[]): Promise<T>
+  updateWith: <T extends Doc>(doc: T, builder: (s: TxBuilder<T>) => TxOperation | TxOperation[]) => Promise<T>
 
   /**
    * Perform remove of object.
    */
-  remove<T extends Doc> (doc: T): Promise<T>
+  remove: <T extends Doc>(doc: T) => Promise<T>
 }
 
 export interface CoreService extends Service, CoreProtocol, QueryProtocol, DocumentProtocol, OperationProtocol {
-  getModel (): ModelDb
+  getModel: () => ModelDb
 
-  generateId (): Ref<Doc>
+  generateId: () => Ref<Doc>
 
-  getUserId (): string
+  getUserId: () => string
 }
 
 export default plugin(

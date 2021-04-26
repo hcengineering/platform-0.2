@@ -14,33 +14,30 @@ export class ClientTxStorage implements Storage {
     this.delegateStorage = delegateStorage
   }
 
-  private addTx (ctx: TxContext, tx: Tx) {
-    if (!ctx.clientTx) {
-      ctx.clientTx = []
-    }
+  private addTx (ctx: TxContext, tx: Tx): void {
     ctx.clientTx.push(tx)
   }
 
-  store (ctx: TxContext, doc: Doc): Promise<void> {
+  async store (ctx: TxContext, doc: Doc): Promise<void> {
     this.addTx(ctx, newCreateTx(doc, systemUser))
-    return this.delegateStorage.store(ctx, doc)
+    await this.delegateStorage.store(ctx, doc)
   }
 
-  update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, operations: TxOperation[]): Promise<void> {
+  async update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, operations: TxOperation[]): Promise<void> {
     this.addTx(ctx, newUpdateTx(_class, _id, operations, systemUser))
-    return this.delegateStorage.update(ctx, _class, _id, operations)
+    await this.delegateStorage.update(ctx, _class, _id, operations)
   }
 
-  remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<void> {
+  async remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<void> {
     this.addTx(ctx, newDeleteTx(_class, _id, systemUser))
-    return this.delegateStorage.remove(ctx, _class, _id)
+    await this.delegateStorage.remove(ctx, _class, _id)
   }
 
-  find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T[]> {
-    return this.delegateStorage.find(_class, query)
+  async find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T[]> {
+    return await this.delegateStorage.find(_class, query)
   }
 
-  findOne<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined> {
-    return this.delegateStorage.findOne(_class, query)
+  async findOne<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined> {
+    return await this.delegateStorage.findOne(_class, query)
   }
 }

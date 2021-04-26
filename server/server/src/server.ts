@@ -34,25 +34,25 @@ export interface Client {
 }
 
 export interface ClientSocket {
-  send (response: string): void
+  send: (response: string) => void
 }
 
 export interface ClientTxProtocol {
-  tx (tx: Tx): Promise<{ clientTx: Tx[] }>
+  tx: (tx: Tx) => Promise<{ clientTx: Tx[] }>
 
-  genRefId (_space: Ref<Space>): Promise<Ref<Doc>>
+  genRefId: (_space: Ref<Space>) => Promise<Ref<Doc>>
 }
 
 export type ClientService = ClientControl & DocumentProtocol & ClientTxProtocol
 export type ClientServiceUnregister = () => void
 
 export interface Broadcaster {
-  broadcast (from: ClientService, response: Response<Tx>, ctx: SecurityContext): void
+  broadcast: (from: ClientService, response: Response<Tx>, ctx: SecurityContext) => void
 }
 
 export interface ServerProtocol {
-  shutdown (): Promise<void>
-  getWorkspace (wsName: string): Promise<WorkspaceProtocol>
+  shutdown: () => Promise<void>
+  getWorkspace: (wsName: string) => Promise<WorkspaceProtocol>
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -62,7 +62,7 @@ function isClientExpired (client: Client): boolean {
 
 export async function start (port: number, dbUri: string, host?: string): Promise<ServerProtocol> {
   console.log(`starting server on port ${port}...`)
-  console.log(`host: ${host}`)
+  console.log(`host: ${host ?? 'localhost'}`)
 
   const server = createServer()
   const wss = new Server({ noServer: true })
@@ -84,27 +84,28 @@ export async function start (port: number, dbUri: string, host?: string): Promis
     broadcast (from: ClientService, response: Response<any>, ctx: SecurityContext): void {
       // console.log(`broadcasting to ${connections.size} connections`)
       for (const client of connections.values()) {
-        client.then(client => {
-          if (client.getId() !== from.getId()) {
+        client.then((cl) => {
+          if (cl.getId() !== from.getId()) {
             // console.log(`broadcasting to ${client.email}`, response)
-            client.send(ctx, response)
+            cl.send(ctx, response).then(() => 0, () => 0)
           }
-        })
+        }, () => 0)
       }
     }
   }
 
-  function createClient (workspace: Promise<WorkspaceProtocol>, ws: ClientSocket & Client): Promise<ClientService> {
-    return createClientService(workspace, ws, broadcaster)
+  async function createClient (workspace: Promise<WorkspaceProtocol>, ws: ClientSocket & Client): Promise<ClientService> {
+    const client = await createClientService(workspace, ws, broadcaster)
+    return client
   }
 
   async function getWorkspace (wsName: string): Promise<WorkspaceProtocol> {
     let workspace = workspaces.get(wsName)
-    if (!workspace) {
+    if (workspace === undefined) {
       workspace = connectWorkspace(dbUri, wsName)
       workspaces.set(wsName, workspace)
     }
-    return workspace
+    return await workspace
   }
 
   wss.on('connection', (ws: WebSocket, request: any, client: Client) => {
@@ -123,12 +124,13 @@ export async function start (port: number, dbUri: string, host?: string): Promis
       unreg()
     })
 
-    ws.on('message', async (msg: string) => {
+    const handleMessage = async (msg: string): Promise<void> => {
       const request = readRequest(msg)
-      const ss = (await service)
+      const ss = await service
 
       if (isClientExpired(client)) {
-        ws.send(serialize({ id: request.id, error: { code: 0, message: 'token is expired' } as RpcError }))
+        const err: RpcError = { code: 0, message: 'token is expired' }
+        ws.send(serialize({ id: request.id, error: err }))
         return
       }
 
@@ -159,29 +161,32 @@ export async function start (port: number, dbUri: string, host?: string): Promis
         console.log(`Error occurred during processing websocket message '${request.method}': `, error)
       }
       ws.send(serialize(response))
+    }
+    ws.on('message', (msg: string): void => {
+      handleMessage(msg).then(() => 0, () => 0)
     })
   })
 
-  function auth (request: IncomingMessage, done: (err: Error | null, client: Client | null) => void) {
+  function auth (request: IncomingMessage, done: (err: Error | undefined, client: Client | undefined) => void): void {
     const token = request.url?.substring(1) // remove leading '/'
-    if (!token) {
-      done(new Error('no authorization token'), null)
+    if (token === undefined) {
+      done(new Error('no authorization token'), undefined)
     } else {
       try {
         const payload = decode(token, 'secret', false)
-        done(null, payload)
+        done(undefined, payload)
       } catch (err) {
-        done(err, null)
+        done(err, undefined)
       }
     }
   }
 
   server.on('upgrade', (request: IncomingMessage, socket, head: Buffer) => {
-    auth(request, (err: Error | null, client: Client | null) => {
-      if (err != null) {
+    auth(request, (err: Error | undefined, client: Client | undefined) => {
+      if (err !== undefined) {
         console.log(err)
       }
-      if (!client) {
+      if (client === undefined) {
         socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n')
         socket.destroy()
         return
@@ -196,23 +201,23 @@ export async function start (port: number, dbUri: string, host?: string): Promis
 
   return new Promise((resolve) => {
     const httpServer = server.listen(port, host, () => {
-      console.log('server started.')
-      resolve({
+      const serverProtocol: ServerProtocol = {
         getWorkspace,
         shutdown: async () => {
           console.log('Shutting down server:', httpServer.address())
 
           for (const ws of workspaces.values()) {
-            (await ws).close()
+            await (await ws).close()
           }
 
           for (const conn of connections.values()) {
-            (await conn).close()
+            await (await conn).close()
           }
           console.log('stop server itself')
           httpServer.close()
         }
-      } as ServerProtocol)
+      }
+      resolve(serverProtocol)
     })
   })
 }
