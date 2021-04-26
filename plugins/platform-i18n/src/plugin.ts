@@ -22,39 +22,39 @@ import { IntlMessageFormat, PrimitiveType } from 'intl-messageformat'
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */
-export default (platform: Platform): Promise<I18n> => {
+export default async (platform: Platform): Promise<I18n> => {
   const strings: Map<IntlString, string> = new Map()
   const imfCache: Map<IntlString, IntlMessageFormat> = new Map()
 
-  function loadStrings (translations: { [key: string]: string }) {
+  function loadStrings (translations: { [key: string]: string }): void {
     for (const key in translations) {
       strings.set(key as IntlString, translations[key])
     }
   }
 
-  function translate (string: IntlString, params?: Record<string, PrimitiveType> | undefined): Promise<string> {
+  async function translate (string: IntlString, params?: Record<string, PrimitiveType> | undefined): Promise<string> {
     const translation = strings.get(string)
-    if (!translation) {
-      return Promise.resolve(string)
+    if (translation === undefined) {
+      return string
     }
-    if (params) {
+    if (params !== undefined) {
       let imf = imfCache.get(string)
-      if (!imf) {
+      if (imf === undefined) {
         imf = new IntlMessageFormat(translation, 'ru-RU')
         imfCache.set(string, imf)
       }
-      return Promise.resolve(imf.format(params) as string)
+      return imf.format(params) as string
     }
-    return Promise.resolve(translation)
+    return translation
   }
 
   const meta = platform.getMetadata(i18n.metadata.Strings)
-  if (meta) {
+  if (meta !== undefined) {
     loadStrings(meta)
   }
 
-  return Promise.resolve({
+  return {
     loadStrings,
     translate
-  })
+  }
 }

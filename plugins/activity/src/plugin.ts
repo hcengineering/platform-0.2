@@ -20,11 +20,9 @@ import activity, { ActivityService } from '.'
 import ActivityView from './components/internal/ActivityView.svelte'
 import SpaceInfo from './components/internal/SpaceInfo.svelte'
 
-export default (platform: Platform, deps: { core: CoreService }): Promise<ActivityService> => { // eslint-disable-line @typescript-eslint/no-unused-vars
+export default async (platform: Platform, deps: { core: CoreService }): Promise<ActivityService> => { // eslint-disable-line @typescript-eslint/no-unused-vars
   platform.setResource(activity.component.ActivityView, ActivityView)
   platform.setResource(activity.component.SpaceInfo, SpaceInfo)
 
-  const service = {}
-
-  return Promise.resolve(service)
+  return {}
 }

@@ -54,7 +54,7 @@ jobs:
       - name: Run lint
         run: |
           yarn install
-          yarn workspaces run lint
+          yarn lint
 
   formatting:
     runs-on: ubuntu-latest

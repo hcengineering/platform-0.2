@@ -21,8 +21,8 @@
   setContext(CONTEXT_PLATFORM, platform)
   setContext(CONTEXT_PLATFORM_UI, ui)
 
-  const defaultApp = platform.getMetadata(uiPlugin.metadata.DefaultApplication) || ''
-  const authMeta = platform.getMetadata(uiPlugin.metadata.LoginApplication) || ''
+  const defaultApp = platform.getMetadata(uiPlugin.metadata.DefaultApplication) ?? ''
+  const authMeta = platform.getMetadata(uiPlugin.metadata.LoginApplication) ?? ''
   const authApp = platform.getMetadata(routeMeta(authMeta))
 
   let authenticationRequired = false
@@ -91,7 +91,7 @@
       </div>
     </div>
     <div class="app">
-      {#if authenticationRequired}
+      {#if authenticationRequired && authApp}
         <Component is={authApp.component} props={{}} />
       {:else if currentApp}
         <Component is={currentApp.component} props={{}} />

@@ -93,7 +93,7 @@
   <div class="header">
     <div class="caption-1">Create {makePrivate ? 'private ' : ''} {application.spaceTitle}</div>
     <a href="/" on:click|preventDefault={() => dispatch('close')}>
-      <Icon icon={workbench.icon.Close} button="true" />
+      <Icon icon={workbench.icon.Close} button={true} />
     </a>
   </div>
 

@@ -18,8 +18,8 @@
   import type { Platform } from '@anticrm/platform'
   import type { Space } from '@anticrm/domains'
   import type { Class, Doc, Ref } from '@anticrm/core'
-  import ui, { liveQuery, getCoreService } from '@anticrm/presentation'
-  import { AnyComponent } from '@anticrm/platform-ui'
+  import presentation, { liveQuery, getCoreService } from '@anticrm/presentation'
+  import ui, { AnyComponent } from '@anticrm/platform-ui'
 
   import type { CalendarEvent } from '..'
   import type { EventCoordinates } from './EventCoordinates'
@@ -68,26 +68,21 @@
     coreService.then((cs) => {
       const model = cs.getModel()
       const typeClass = model.get(_class) as Class<Doc>
-      if (!model.isMixedIn(typeClass, ui.mixin.Presenter)) {
+      if (!model.isMixedIn(typeClass, presentation.mixin.Presenter)) {
         console.log(new Error(`no presenter for type '${_class}'`))
         // Use string presenter
         presenter = calendar.component.EventPresenter
       } else {
-        presenter = model.as(typeClass, ui.mixin.Presenter).presenter
+        presenter = model.as(typeClass, presentation.mixin.Presenter).presenter
       }
     })
   }
 
   let query: Promise<QueryUpdater<CalendarEvent>>
 
-  $: query = liveQuery<CalendarEvent>(
-    query,
-    calendar.class.CalendarEvent,
-    { _space: space._id as Ref<Space> },
-    (docs) => {
-      events = docs
-    }
-  )
+  $: query = liveQuery<CalendarEvent>(query, calendar.class.CalendarEvent, { _space: space._id }, (docs) => {
+    events = docs
+  })
 
   $: {
     eventCoordinatesMap.clear()
@@ -125,11 +120,14 @@
       processedEvents.push(event)
     })
   }
+  function getEventCoordinate (id: string): number {
+    return eventCoordinatesMap.get(id)!.displayLayer
+  }
 </script>
 
 <MonthCalendar mondayStart={true} cellHeight={125} bind:firstDayOfCurrentMonth bind:displayedWeeksCount>
   {#each visibleEvents as e}
-    {#if eventCoordinatesMap.has(e._id) && eventCoordinatesMap.get(e._id).displayLayer <= 5}
+    {#if eventCoordinatesMap.has(e._id) && getEventCoordinate(e._id) <= 5}
       {#if component}
         {#await component}
           <Spinner />

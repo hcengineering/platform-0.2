@@ -24,9 +24,9 @@ import EventPresenter from './components/EventPresenter.svelte'
  * © 2021 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */
-export default (platform: Platform): Promise<CalendarService> => {
+export default async (platform: Platform): Promise<CalendarService> => {
   platform.setResource(calendar.component.NewEventForm, NewEventForm)
   platform.setResource(calendar.component.EventsCalendar, EventsCalendar)
   platform.setResource(calendar.component.EventPresenter, EventPresenter)
-  return Promise.resolve({})
+  return {}
 }

@@ -1,5 +1,5 @@
 <script lang="ts">
-  export const separator = false
+  export let separator = false
 </script>
 
 {#if !separator}

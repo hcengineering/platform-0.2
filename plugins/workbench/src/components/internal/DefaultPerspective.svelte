@@ -58,7 +58,7 @@
 
   interface WorkbenchRouteInfo {
     space: string // A ref of space name
-    app: Ref<WorkbenchApplication>
+    app: string
   }
 
   function routeDefaults (): WorkbenchRouteInfo {
@@ -89,9 +89,10 @@
 
   const documentRouter = newRouter<DocumentMatcher>('?doc', async (match) => {
     // Parse browse and convert it to _class and objectId
+    const service = await getCoreService()
     if (match.doc) {
       // Check find a title
-      const title = await (await coreService).findOne<Title>(CORE_CLASS_TITLE, {
+      const title = await service.findOne<Title>(CORE_CLASS_TITLE, {
         title: match.doc as StringProperty,
         source: TitleSource.ShortId as Property<TitleSource, number>
       })
@@ -107,7 +108,7 @@
 
           // Try find a class to be sure it is available.
           try {
-            (await coreService).getModel().getClass(_class as Ref<Class<Doc>>)
+            service.getModel().getClass(_class as Ref<Class<Doc>>)
           } catch (ex) {
             console.error(ex)
             details = undefined
@@ -166,11 +167,11 @@
   }
 
   uiService.registerDocumentProvider({
-    open: navigateDocument,
+    open: (doc) => navigateDocument(doc as CoreDocument),
     selection (): CoreDocument | undefined {
       return details
     },
-    getHref: getHref
+    getHref: (doc) => getHref(doc as CoreDocument)
   })
 
   onDestroy(() => {
@@ -233,7 +234,7 @@
             {#if app._id === application._id && app.supportSpaces}
               <PopupMenu>
                 <div class="popup" slot="trigger">
-                  <Icon icon={ui.icon.Add} button="true" />
+                  <Icon icon={ui.icon.Add} button={true} />
                 </div>
                 <PopupItem
                   on:click={() => {
@@ -279,21 +280,22 @@
       <MainComponent
         is={application.rootComponent}
         {application}
+        {space}
         on:open={(e) => navigateDocument({ _class: e.detail._class, _id: e.detail._id })} />
     {:else}
       <MainComponent
         is={workbench.component.ApplicationDashboard}
         {application}
+        {space}
         on:open={(e) => navigateDocument({ _class: e.detail._class, _id: e.detail._id })} />
     {/if}
   </div>
   {#if details}
-    <Splitter {prevDiv} {nextDiv} minWidth="414" />
+    <Splitter {prevDiv} {nextDiv} minWidth={414} />
     <aside bind:this={nextDiv}>
       <ObjectForm
         _class={details._class}
         _objectId={details._id}
-        title="Title"
         on:open={(e) => navigateDocument({ _class: e.detail._class, _id: e.detail._id })}
         on:close={() => navigateDocument(undefined)}
         on:noobject={() => (details = undefined)} />

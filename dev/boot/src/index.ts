@@ -28,7 +28,7 @@ export function dumpToFile (): void {
   const fs = require('fs') // eslint-disable-line @typescript-eslint/no-var-requires
 
   fs.writeFile(path.join(__dirname, '/../../prod/src/model.json'), modelJson, 'utf8', (err: Error) => {
-    if (err) {
+    if (err !== undefined) {
       console.log('An error occured while writing JSON Object to File.')
       return console.log(err)
     }
@@ -36,7 +36,7 @@ export function dumpToFile (): void {
   })
 
   fs.writeFile(path.join(__dirname, '/../../prod/src/strings.json'), stringsJson, 'utf8', (err: Error) => {
-    if (err) {
+    if (err !== undefined) {
       console.log('An error occured while writing JSON Object to File.')
       return console.log(err)
     }
@@ -44,30 +44,32 @@ export function dumpToFile (): void {
   })
 }
 
-function initDatabase (uri: string, tenant: string) {
-  const domains = { ...Model } as { [key: string]: Doc[] }
+function initDatabase (uri: string, tenant: string): void {
+  const domains: { [key: string]: Doc[] } = { ...Model }
   MongoClient.connect(uri, { useUnifiedTopology: true }, (err, client) => {
-    if (err) {
-      console.error(`An error occurred while connecting to database ${uri}: ${err}`)
+    if (err !== undefined) {
+      console.error(`An error occurred while connecting to database ${uri}: ${String(err)}`)
       throw err
     }
     const db = client.db(tenant)
-    const ops = [] as Promise<any>[]
+    const ops = [] as Array<Promise<any>>
     for (const domain in domains) {
       const model = domains[domain]
       db.collection(domain, (err, coll) => {
-        if (err) {
-          console.error(`An error occurred while calling db.collection for database ${uri}: ${err}`)
+        if (err !== undefined) {
+          console.error(`An error occurred while calling db.collection for database ${uri}: ${String(err)}`)
           throw err
         }
         ops.push(coll.deleteMany({}).then(() => model.length > 0 ? coll.insertMany(model) : null))
       })
     }
-    Promise.all(ops).then(() => client.close())
+    Promise.all(ops).then(async () => { // eslint-disable-line
+      await client.close()
+    })
   })
 }
 
-const mongodbUri = process.env.MONGODB_URI || 'mongodb://localhost:27017'
+const mongodbUri = process.env.MONGODB_URI ?? 'mongodb://localhost:27017'
 console.log('uploading new model to MongoDB ...' + mongodbUri.substring(25))
 initDatabase(mongodbUri, 'latest-model')
 // dumpToFile()

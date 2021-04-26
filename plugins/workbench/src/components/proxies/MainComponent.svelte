@@ -29,26 +29,30 @@
   export let space: Space | undefined
 
   const platform = getContext('platform') as Platform
+
   let component: AnyComponent
-  const compUpdate = (e) => {
-    if (component !== e) {
-      component = e
-    }
-    return e
+
+  function getComponent (is: AnyComponent | undefined): Promise<AnyComponent> {
+    return new Promise((resolve, reject) => {
+      if (is) {
+        platform.getResource(is).then(
+          (comp) => {
+            if (component !== comp) {
+              component = comp
+            }
+            return resolve(comp)
+          },
+          (error) => {
+            reject(error)
+          }
+        )
+      } else {
+        reject(new Error('no component found'))
+      }
+    })
   }
-  let componentPromise = new Promise((resolve) => {
-    if (is) {
-      platform
-        .getResource(is)
-        .then(compUpdate)
-        .then(() => resolve())
-    }
-  })
-  $: {
-    if (is) {
-      componentPromise = platform.getResource(is).then(compUpdate)
-    }
-  }
+  let componentPromise: Promise<AnyComponent>
+  $: componentPromise = getComponent(is)
 </script>
 
 {#await componentPromise}

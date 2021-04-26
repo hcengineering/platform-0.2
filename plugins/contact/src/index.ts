@@ -38,11 +38,9 @@ export interface User extends Person {
 // P L U G I N
 
 export interface ContactService extends Service {
-  getUser (account: string): Promise<User>
-
-  getAvatar (user: Ref<User>): Asset
-
-  getMyName (): Promise<string>
+  getUser: (account: string) => Promise<User>
+  getAvatar: (user: Ref<User>) => Asset
+  getMyName: () => Promise<string>
 }
 
 const contactPlugin = plugin('contact' as Plugin<ContactService>, {
@@ -69,6 +67,6 @@ const contactPlugin = plugin('contact' as Plugin<ContactService>, {
 })
 export default contactPlugin
 
-export function getContactService (): Promise<ContactService> {
-  return getPlatform().getPlugin(contactPlugin.id)
+export async function getContactService (): Promise<ContactService> {
+  return await getPlatform().getPlugin(contactPlugin.id)
 }

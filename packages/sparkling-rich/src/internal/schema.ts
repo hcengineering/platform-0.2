@@ -7,18 +7,18 @@ const hrDOM = ['hr'] as [string]
 const preDOM = ['pre', ['code', 0]] as [string, [string, number]]
 const brDOM = ['br'] as [string]
 
-type ImgAttrs = {
+interface ImgAttrs {
   src: string | null
   title: string | null
   alt: string | null
 }
 
-type HrefAttrs = {
+interface HrefAttrs {
   href: string | null
   title: string | null
 }
 
-type RefAttrs = {
+interface RefAttrs {
   id: string | null
   class: string | null
 }

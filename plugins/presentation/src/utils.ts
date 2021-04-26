@@ -13,8 +13,7 @@
 // limitations under the License.
 //
 
-import { Class, Doc, DocumentQuery, Mixin, Obj, Ref, StringProperty, Type } from '@anticrm/core'
-import { Platform } from '@anticrm/platform'
+import { Class, CORE_CLASS_TYPE, Doc, DocumentQuery, Mixin, Obj, Ref, StringProperty } from '@anticrm/core'
 import { getContext, onDestroy } from 'svelte'
 import core, { CoreService, QueryUpdater, Unsubscribe } from '@anticrm/platform-core'
 import { AnyComponent, CONTEXT_PLATFORM } from '@anticrm/platform-ui'
@@ -23,23 +22,24 @@ import { IntlString } from '@anticrm/platform-i18n'
 import { VDoc } from '@anticrm/domains'
 
 import { deepEqual } from 'fast-equals'
+import { Platform } from '@anticrm/platform'
 
-export function getCoreService (): Promise<CoreService> {
-  const platform = getContext(CONTEXT_PLATFORM) as Platform
-  return platform.getPlugin(core.id)
+export async function getCoreService (): Promise<CoreService> {
+  const platform = getContext<Platform>(CONTEXT_PLATFORM)
+  return await platform.getPlugin(core.id)
 }
 
-export function getPresentationService (): Promise<PresentationService> {
-  const platform = getContext(CONTEXT_PLATFORM) as Platform
-  return platform.getPlugin(presentationPlugin.id)
+export async function getPresentationService (): Promise<PresentationService> {
+  const platform = getContext<Platform>(CONTEXT_PLATFORM)
+  return await platform.getPlugin(presentationPlugin.id)
 }
 
-export function getComponentExtension (_class: Ref<Class<Obj>>, extension: Ref<Mixin<ComponentExtension<VDoc>>>): Promise<AnyComponent | undefined> {
-  return getPresentationService().then(service => service.getComponentExtension(_class, extension))
+export async function getComponentExtension (_class: Ref<Class<Obj>>, extension: Ref<Mixin<ComponentExtension<VDoc>>>): Promise<AnyComponent | undefined> {
+  return await getPresentationService().then(service => service.getComponentExtension(_class, extension))
 }
 
 export function getUserId (): string {
-  const platform = getContext(CONTEXT_PLATFORM) as Platform
+  const platform = getContext<Platform>(CONTEXT_PLATFORM)
   return platform.getMetadata(core.metadata.WhoAmI) as StringProperty
 }
 
@@ -54,18 +54,18 @@ export async function createLiveQuery<T extends Doc> (_class: Ref<Class<T>>, _qu
   action: (docs: T[]) => void): Promise<QueryUpdater<T>> {
   let oldQuery: DocumentQuery<T>
   let oldClass: Ref<Class<T>>
-  let unsubscribe: Unsubscribe
+  let unsubscribe: Unsubscribe | undefined
   onDestroy(() => {
-    if (unsubscribe) {
+    if (unsubscribe !== undefined) {
       unsubscribe()
     }
   })
   const coreService = await getCoreService()
-  const result = (newClass: Ref<Class<T>>, newQuery: DocumentQuery<T>) => {
+  const result = (newClass: Ref<Class<T>>, newQuery: DocumentQuery<T>): void => {
     if (deepEqual(oldQuery, newQuery) && oldClass === newClass) {
       return
     }
-    if (unsubscribe) {
+    if (unsubscribe !== undefined) {
       unsubscribe()
     }
     oldQuery = newQuery
@@ -82,13 +82,6 @@ export async function createLiveQuery<T extends Doc> (_class: Ref<Class<T>>, _qu
 }
 
 /**
- * Perform updating of query, waiting for promise and perform update operation.
- */
-export function updateLiveQuery<T extends Doc> (qu: Promise<QueryUpdater<T>>, _class: Ref<Class<T>>, query: DocumentQuery<T>): void {
-  qu.then((q) => q(_class, query))
-}
-
-/**
  * Construct and register a live query.
  *
  * Usage:
@@ -99,16 +92,13 @@ export function updateLiveQuery<T extends Doc> (qu: Promise<QueryUpdater<T>>, _c
  * @param _query
  * @param action
  */
-export function liveQuery<T extends Doc> (
-  liveQuery: Promise<QueryUpdater<T>> | undefined,
-  _class: Ref<Class<T>>,
-  _query: DocumentQuery<T>,
-  action: (docs: T[]) => void): Promise<QueryUpdater<T>> {
-  if (liveQuery) {
-    updateLiveQuery(liveQuery as Promise<QueryUpdater<T>>, _class, _query)
-    return liveQuery
+export async function liveQuery<T extends Doc> (liveQuery: Promise<QueryUpdater<T>> | undefined, _class: Ref<Class<T>>, _query: DocumentQuery<T>, action: (docs: T[]) => void): Promise<QueryUpdater<T>> {
+  if (liveQuery !== undefined) {
+    const lq = (await liveQuery)
+    lq(_class, _query)
+    return lq
   }
-  return createLiveQuery(_class, _query, action)
+  return await createLiveQuery(_class, _query, action)
 }
 
 export function getEmptyModel (): ClassModel {
@@ -147,7 +137,7 @@ export function getEmptyAttribute (_class: Ref<Class<Obj>>): AttrModel {
     label: 'Несуществующий аттрибут' as IntlString,
     placeholder: '' as IntlString,
     presenter: 'component:ui.StringPresenter' as AnyComponent,
-    type: {} as Type,
+    type: { _class: CORE_CLASS_TYPE },
     primary: false
   }
 }

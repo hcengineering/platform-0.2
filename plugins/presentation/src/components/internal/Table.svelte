@@ -15,14 +15,15 @@
 <script type="ts">
   import { createEventDispatcher } from 'svelte'
   import type { Class, Doc, Ref } from '@anticrm/core'
-  import type { Space } from '@anticrm/domains'
+  import type { Space, VDoc } from '@anticrm/domains'
   import { CORE_CLASS_VDOC } from '@anticrm/domains'
   import type { AttrModel, ClassModel } from '../..'
   import { liveQuery } from '../..'
   import { getEmptyModel, getPresentationService } from '../../utils'
   import Presenter from './presenters/Presenter.svelte'
+  import { QueryUpdater } from '@anticrm/platform-core'
 
-  export let _class: Ref<Class<Doc>>
+  export let _class: Ref<Class<VDoc>>
   export let space: Space
   export let editable = true
 
@@ -44,11 +45,14 @@
     }
   }
 
-  let objects: any[] = []
-
-  $: lq = liveQuery(lq, _class, { _space: space._id }, (docs) => {
+  let objects: VDoc[] = []
+  let lq: Promise<QueryUpdater<VDoc>>
+  $: lq = liveQuery<VDoc>(lq, _class, { _space: space._id as Ref<Space> }, (docs) => {
     objects = docs
   })
+  function attrValue (doc: VDoc, key: string): any {
+    return (doc as any)[key]
+  }
 </script>
 
 <div class="erp-table">
@@ -65,9 +69,9 @@
         {#each attributes as attr (attr.key)}
           <div class="td">
             {#if attr.presenter}
-              <Presenter is={attr.presenter} value={object[attr.key]} attribute={attr} {editable} />
+              <Presenter is={attr.presenter} value={attrValue(object, attr.key)} attribute={attr} {editable} />
             {:else}
-              <span>{object[attr.key] || ''}</span>
+              <span>{attrValue(object, attr.key) || ''}</span>
             {/if}
           </div>
         {/each}

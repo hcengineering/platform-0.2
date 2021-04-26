@@ -107,21 +107,14 @@ export interface GroupModel extends UIModel {
 }
 
 export interface ClassModel {
-  getGroups (): GroupModel[]
-
-  getGroup (_class: Ref<Class<Obj>>): GroupModel | undefined
-
-  getOwnAttributes (_class: Ref<Class<Obj>>): AttrModel[] // TODO: why do we have this here, but not within Group?
-
-  getAttributes (): AttrModel[]
-
-  getAttribute (key: string, _class?: Ref<Class<Obj>>): AttrModel | undefined
-
-  filterAttributes (keys: string[]): ClassModel
-
-  getPrimary (): AttrModel | undefined
-
-  filterPrimary (): { model: ClassModel, primary: AttrModel | undefined }
+  getGroups: () => GroupModel[]
+  getGroup: (_class: Ref<Class<Obj>>) => GroupModel | undefined
+  getOwnAttributes: (_class: Ref<Class<Obj>>) => AttrModel[] // TODO: why do we have this here, but not within Group?
+  getAttributes: () => AttrModel[]
+  getAttribute: (key: string, _class?: Ref<Class<Obj>>) => AttrModel | undefined
+  filterAttributes: (keys: string[]) => ClassModel
+  getPrimary: () => AttrModel | undefined
+  filterPrimary: () => { model: ClassModel, primary: AttrModel | undefined }
 }
 
 export interface CoreDocument extends Document {
@@ -132,12 +125,12 @@ export interface CoreDocument extends Document {
 // S E R V I C E
 
 export interface PresentationService extends Service {
-  getClassModel (_class: Ref<Class<Obj>>, top?: Ref<Class<Obj>>): Promise<ClassModel>
+  getClassModel: (_class: Ref<Class<Obj>>, top?: Ref<Class<Obj>>) => Promise<ClassModel>
 
   /**
    * Return a component extension registered for specified class, return undefined if not specified.
    */
-  getComponentExtension (_class: Ref<Class<Obj>>, extension: Ref<Mixin<ComponentExtension<VDoc>>>): AnyComponent | undefined
+  getComponentExtension: (_class: Ref<Class<Obj>>, extension: Ref<Mixin<ComponentExtension<VDoc>>>) => AnyComponent | undefined
 }
 
 const presentationPlugin = plugin('presentation' as Plugin<PresentationService>, {

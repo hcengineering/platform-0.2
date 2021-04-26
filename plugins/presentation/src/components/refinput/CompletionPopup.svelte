@@ -37,7 +37,7 @@
     `
 
     const cs = items.find((e) => e.key === selection.key)
-    if (cs == null) {
+    if (cs === undefined) {
       // Filtering caused selection to be wrong, select first
       selection = getFirst(items)
     }

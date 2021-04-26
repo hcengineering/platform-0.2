@@ -42,7 +42,7 @@ export interface Page extends Collab {
 // P L U G I N
 
 export interface ChunterService extends Service {
-  createMissedObjects (doc: MessageNode): string
+  createMissedObjects: (doc: MessageNode) => string
 }
 
 const chunterPlugin = plugin(
@@ -72,6 +72,6 @@ const chunterPlugin = plugin(
 
 export default chunterPlugin
 
-export function getChunterService (): Promise<ChunterService> {
-  return getPlatform().getPlugin(chunterPlugin.id)
+export async function getChunterService (): Promise<ChunterService> {
+  return await getPlatform().getPlugin(chunterPlugin.id)
 }

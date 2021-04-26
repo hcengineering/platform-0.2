@@ -1,22 +1,10 @@
 import { ObjectTx } from '@anticrm/domains'
 
-export function getTransactionObjectDetails (tx: ObjectTx): string | null {
-  const details = (tx as ObjectTx)._txDetails
-  if (!details) {
-    return null
-  }
-  let result = ''
-  if (details.id) {
-    result += details.id
-  }
-  if (details.name) {
-    if (result.length > 0) {
-      result += ' - '
-    }
-    result += details.name
-  }
-  if (result.length === 0) {
-    return null
-  }
-  return result
+export function getTransactionObjectDetails (tx: ObjectTx): string | undefined {
+  const details = tx._txDetails
+  const res = [details?.id, details?.name]
+    .filter((x): x is string => x !== undefined && x !== '')
+    .join(' - ')
+
+  return res === '' ? undefined : res
 }

@@ -21,13 +21,13 @@ import { CoreService } from '@anticrm/platform-core'
  * @param currentUser - a current user id
  * @param space  - a space to check.
  */
-export function getCurrentUserSpace (currentUser: string, space: Space): SpaceUser | null {
+export function getCurrentUserSpace (currentUser: string, space: Space): SpaceUser | undefined {
   for (const u of space.users) {
     if (u.userId === currentUser) {
       return u
     }
   }
-  return null
+  return undefined
 }
 
 export function getSpaceName (space: Space, withTitle = true): string {
@@ -35,24 +35,25 @@ export function getSpaceName (space: Space, withTitle = true): string {
 }
 
 // Join public space
-export function joinSpace (service: Promise<CoreService>, s: Space): void {
-  service.then(cs => cs.updateWith(s, (b) =>
+export async function joinSpace (service: Promise<CoreService>, s: Space): Promise<void> {
+  const cs = await service
+  await cs.updateWith(s, (b) =>
     b.users.push({
       userId: cs.getUserId(),
       owner: false
     })
-  ))
+  )
 }
 
 // Leave public space
-export function leaveSpace (service: Promise<CoreService>, s: Space): void {
-  service.then(cs => cs.updateWith(s, (b) =>
+export async function leaveSpace (service: Promise<CoreService>, s: Space): Promise<void> {
+  const cs = await service
+  await cs.updateWith(s, (b) =>
     b.users.match({ userId: cs.getUserId() }).pull())
-  )
 }
 
-export function archivedSpaceUpdate (service: Promise<CoreService>, s: Space, value: boolean): void {
-  service.then(cs => cs.updateWith(s, (b) =>
+export async function archivedSpaceUpdate (service: Promise<CoreService>, s: Space, value: boolean): Promise<void> {
+  const cs = await service
+  await cs.updateWith(s, (b) =>
     b.set({ archived: value }))
-  )
 }

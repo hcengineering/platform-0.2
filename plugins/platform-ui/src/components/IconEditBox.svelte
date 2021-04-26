@@ -33,7 +33,7 @@
   class:editbox-label={label !== ''}
   class:editbox-hoverState={hoverState}
   style="width: {width}"
-  on:click={input.focus()}>
+  on:click={() => input.focus()}>
   {#if !iconRight && typeof icon !== 'undefined'}
     <Icon {icon} />
     <div class="separator" />

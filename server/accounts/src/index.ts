@@ -77,7 +77,7 @@ async function createAccount (db: Db, email: string, password: string): Promise<
   const hash = hashWithSalt(password, salt)
 
   const account = await getAccount(db, email)
-  if (account != null) {
+  if (account !== null) {
     throw new PlatformError(new Status(Severity.ERROR, PlatformStatusCodes.ACCOUNT_DUPLICATE, 'Account already exists.'))
   }
 
@@ -100,27 +100,27 @@ async function createAccount (db: Db, email: string, password: string): Promise<
 async function updateAccount (db: Db, email: string, password: string, newPassword: string, secondFactorEnabled: boolean, clientSecret: string, secondFactorCode: string): Promise<AccountInfo> {
   let account = await getAccount(db, email)
 
-  if (!account) {
+  if (account === null) {
     throw new PlatformError(new Status(Severity.ERROR, PlatformStatusCodes.ACCOUNT_NOT_FOUND, 'Account not found.'))
   }
   if (!verifyPassword(password, account.hash.buffer, account.salt.buffer)) {
     throw new PlatformError(new Status(Severity.ERROR, PlatformStatusCodes.INCORRECT_PASSWORD, 'Incorrect password.'))
   }
 
-  if (clientSecret) {
-    if (!secondFactor.verifyToken(clientSecret, secondFactorCode)) {
+  if (clientSecret) { // eslint-disable-line
+    if (!secondFactor.verifyToken(clientSecret, secondFactorCode)) { // eslint-disable-line
       throw new PlatformError(new Status(Severity.ERROR, PlatformStatusCodes.INCORRECT_SECOND_FACTOR_CODE, 'Incorrect second factor code.'))
     }
   }
 
-  if (secondFactorEnabled && !clientSecret) clientSecret = account.clientSecret
+  if (secondFactorEnabled && !clientSecret) clientSecret = account.clientSecret // eslint-disable-line
 
   let hash = hashWithSalt(password, account.salt.buffer)
-  if (newPassword) {
+  if (newPassword) { // eslint-disable-line
     hash = hashWithSalt(newPassword, account.salt.buffer)
   }
 
-  db.collection(ACCOUNT_COLLECTION).updateOne({ _id: account._id }, {
+  await db.collection(ACCOUNT_COLLECTION).updateOne({ _id: account._id }, {
     $set: {
       hash: hash,
       clientSecret: clientSecret
@@ -129,16 +129,16 @@ async function updateAccount (db: Db, email: string, password: string, newPasswo
 
   account = await getAccount(db, email)
 
-  if (!account) {
+  if (account === null) {
     throw new PlatformError(new Status(Severity.ERROR, PlatformStatusCodes.ACCOUNT_NOT_FOUND, 'Account not found.'))
   }
   return toAccountInfo(account)
 }
 
-async function pushClientId (db: Db, email: string, clientId: string) {
+async function pushClientId (db: Db, email: string, clientId: string): Promise<void> {
   const account = await getAccount(db, email)
 
-  if (!account) {
+  if (account === null) {
     throw new PlatformError(new Status(Severity.ERROR, PlatformStatusCodes.ACCOUNT_NOT_FOUND, 'Account not found.'))
   }
 
@@ -146,39 +146,39 @@ async function pushClientId (db: Db, email: string, clientId: string) {
     if (id === clientId) return
   }
 
-  db.collection(ACCOUNT_COLLECTION).updateOne({ _id: account._id }, { $push: { clientIds: clientId } })
+  await db.collection(ACCOUNT_COLLECTION).updateOne({ _id: account._id }, { $push: { clientIds: clientId } })
 }
 
 // getWorkspaceInfo - return a workspace information promise
-export async function getWorkspace (db: Db, workspace: string): Promise<Workspace> {
-  return db.collection(WORKSPACE_COLLECTION).findOne({
+export async function getWorkspace (db: Db, workspace: string): Promise<Workspace | null> {
+  return await db.collection(WORKSPACE_COLLECTION).findOne<Workspace>({
     workspace
-  }) as Promise<Workspace>
+  })
 }
 
 export async function getAccount (db: Db, email: string): Promise<Account | null> {
-  return db.collection(ACCOUNT_COLLECTION).findOne<Account>({ email })
+  return await db.collection(ACCOUNT_COLLECTION).findOne<Account>({ email })
 }
 
 async function getAccountInfo (db: Db, email: string, password: string, clientId: string, secondFactorCode: string): Promise<AccountInfo> {
   const account = await getAccount(db, email)
-  if (!account) {
+  if (account === null) {
     throw new PlatformError(new Status(Severity.ERROR, PlatformStatusCodes.ACCOUNT_NOT_FOUND, 'Account not found.'))
   }
   if (!verifyPassword(password, account.hash.buffer, account.salt.buffer)) {
     throw new PlatformError(new Status(Severity.ERROR, PlatformStatusCodes.INCORRECT_PASSWORD, 'Incorrect password.'))
   }
 
-  if (account.clientSecret) {
-    if (secondFactorCode) {
-      if (!secondFactor.verifyToken(account.clientSecret, secondFactorCode)) {
+  if (account.clientSecret) { // eslint-disable-line
+    if (secondFactorCode) { // eslint-disable-line
+      if (!secondFactor.verifyToken(account.clientSecret, secondFactorCode)) { // eslint-disable-line
         throw new PlatformError(new Status(Severity.ERROR, PlatformStatusCodes.INCORRECT_SECOND_FACTOR_CODE, 'Incorrect second factor code.'))
       }
       await pushClientId(db, email, clientId)
       return toAccountInfo(account)
     }
 
-    if (!clientId) {
+    if (!clientId) { // eslint-disable-line
       throw new PlatformError(new Status(Severity.WARNING, PlatformStatusCodes.CLIENT_VALIDATE_REQUIRED, 'Unknown client'))
     }
 
@@ -196,7 +196,7 @@ async function login (db: Db, email: string, password: string, workspace: string
   const accountInfo = await getAccountInfo(db, email, password, clientId, secondFactorCode)
   const workspaceInfo = await getWorkspace(db, workspace)
 
-  if (workspaceInfo) {
+  if (workspaceInfo !== null) {
     const workspaces = accountInfo.workspaces
 
     for (const w of workspaces) {
@@ -219,11 +219,11 @@ async function login (db: Db, email: string, password: string, workspace: string
 
 export async function createWorkspace (db: Db, workspace: string, organisation: string): Promise<string> {
   // Ensure workspace is not exists yet.
-  if ((await getWorkspace(db, workspace)) != null) {
+  if ((await getWorkspace(db, workspace)) !== null) {
     throw new PlatformError(new Status(Severity.ERROR, PlatformStatusCodes.WORKSPACE_ALREADY_EXISTS, 'Workspace already exists and could not be created.'))
   }
   // Create a new workspace record
-  return db
+  return await db
     .collection(WORKSPACE_COLLECTION)
     .insertOne({
       workspace,
@@ -232,14 +232,14 @@ export async function createWorkspace (db: Db, workspace: string, organisation: 
     .then((e) => e.insertedId)
 }
 
-async function getWorkspaceAndAccount (db: Db, email: string, workspace: string): Promise<{ accountId: ObjectID; workspaceId: ObjectID }> {
+async function getWorkspaceAndAccount (db: Db, email: string, workspace: string): Promise<{ accountId: ObjectID, workspaceId: ObjectID }> {
   const wsPromise = await getWorkspace(db, workspace)
-  if (wsPromise == null) {
+  if (wsPromise === null) {
     throw new PlatformError(new Status(Severity.ERROR, PlatformStatusCodes.WORKSPACE_NOT_FOUND, `Workspace ${workspace} not found`))
   }
   const workspaceId = wsPromise._id
   const account = await getAccount(db, email)
-  if (account == null) {
+  if (account === null) {
     throw new PlatformError(new Status(Severity.ERROR, PlatformStatusCodes.ACCOUNT_NOT_FOUND, 'Account not found.'))
   }
   const accountId = account?._id
@@ -271,7 +271,7 @@ export async function createUserAccount (db: Db, email: string, password: string
 
 export async function getUserAccount (db: Db, email: string): Promise<ObjectID | null> {
   const account = await getAccount(db, email)
-  if (account != null) {
+  if (account !== null) {
     return account._id
   }
   return null
@@ -287,11 +287,11 @@ export function accountsDb (client: MongoClient): Db {
 
 function wrap (f: (db: Db, ...args: any[]) => Promise<any>) {
   return async function (db: Db, request: Request<any[]>): Promise<Response<any>> {
-    return f(db, ...request.params)
+    return await f(db, ...request.params)
       .then((result) => ({ id: request.id, result }))
       .catch((err) => {
         if (err instanceof PlatformError) {
-          const pe = err as PlatformError
+          const pe = err
           return { id: request.id, error: { code: pe.status.code, message: pe.status.message } }
         } else {
           return { id: request.id, error: { code: 0, message: err.message } }

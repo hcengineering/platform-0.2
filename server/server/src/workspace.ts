@@ -169,7 +169,9 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
         (finalQuery as any)._class = { $in: classes }
       }
 
-      const result = await collection(_class).find<T>(finalQuery).toArray()
+      const cursor = collection(_class).find<T>(finalQuery)
+
+      const result = await cursor.toArray()
       return result
     },
 
@@ -189,6 +191,7 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
     },
 
     async tx (txContext: TxContext, tx: Tx): Promise<any> {
+      console.log('processing tx:', JSON.stringify(tx))
       return await txProcessor.process(txContext, tx)
     },
 
@@ -225,8 +228,7 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
     },
 
     getModel: async (): Promise<Model> => {
-      await Promise.resolve(memdb)
-      return memdb
+      return await Promise.resolve(memdb)
     }
   }
 

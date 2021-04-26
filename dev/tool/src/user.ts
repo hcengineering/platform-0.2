@@ -21,7 +21,7 @@ import contact from '@anticrm/contact/src/__model__'
 import { Ref, Property, generateId } from '@anticrm/core'
 import { Space } from '@anticrm/domains'
 
-export function createContact (db: Db, email: string, username: string): Promise<any> {
+export async function createContact (db: Db, email: string, username: string): Promise<any> {
   const id = generateId() as Ref<Person>
   const user = builder.createDocument(
     contact.class.Person,
@@ -37,9 +37,9 @@ export function createContact (db: Db, email: string, username: string): Promise
   builder.mixinDocument(user, contact.mixin.User, {
     account: email
   })
-  return db.collection('contact').insertOne(user)
+  return await db.collection('contact').insertOne(user)
 }
 
-export function removeContact (db: Db, _username: string): Promise<DeleteWriteOpResultObject> {
-  return db.collection('contact').deleteMany({ _mixins: contact.mixin.User })
+export async function removeContact (db: Db, _username: string): Promise<DeleteWriteOpResultObject> {
+  return await db.collection('contact').deleteMany({ _mixins: contact.mixin.User })
 }

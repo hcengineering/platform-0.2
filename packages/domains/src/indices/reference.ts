@@ -22,6 +22,8 @@ import {
   UpdateTx
 } from '..'
 
+import { deepEqual } from 'fast-equals'
+
 import {
   MessageMarkType, parseMessage, ReferenceMark, traverseMarks, traverseMessage
 } from '@anticrm/text'
@@ -49,7 +51,7 @@ export class ReferenceIndex implements DomainIndex {
 
   private getTextAttributes (_class: Ref<Class<Obj>>): string[] {
     const cached = this.textAttributes.get(_class)
-    if (cached != null) return cached
+    if (cached !== undefined) return cached
 
     const keys = this.modelDb
       .getAllAttributes(_class)
@@ -61,7 +63,7 @@ export class ReferenceIndex implements DomainIndex {
 
   private getArrayAttributes (_class: Ref<Class<Obj>>): ClassKey[] {
     const cached = this.arrayAttributes.get(_class)
-    if (cached != null) return cached
+    if (cached !== undefined) return cached
 
     const keys = this.modelDb
       .getAllAttributes(_class)
@@ -182,7 +184,7 @@ export class ReferenceIndex implements DomainIndex {
       for (const newRef of newRefs) {
         const newRefData: any = Object.assign({}, newRef)
         delete newRefData._id
-        if (JSON.stringify(refData) !== JSON.stringify(newRefData)) {
+        if (!deepEqual(refData, newRefData)) {
           // We had existing link, no op required for it.
           existing.push(newRef)
           break
@@ -191,7 +193,7 @@ export class ReferenceIndex implements DomainIndex {
         deletes.push(ref)
       }
     }
-    const additions = newRefs.filter(e => existing.indexOf(e) === -1)
+    const additions = newRefs.filter(e => !existing.includes(e))
     const stored = Promise.all(additions.map(async (d) => {
       await this.storage.store(ctx, d)
     }))

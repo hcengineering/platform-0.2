@@ -15,7 +15,7 @@ export const pageIndex: Map<string, GuideBookPage> = new Map()
 // Components
 // ****************************************************************
 
-function addPage (page: GuideBookPage) {
+function addPage (page: GuideBookPage): void {
   pages.push(page)
   pageIndex.set(page.id, page)
 }
@@ -25,11 +25,11 @@ addPage({
   label: 'Toolbar',
   level: 0,
   component: ToolbarPage
-} as GuideBookPage)
+})
 // addPage({ id: 'buttons', label: 'Styles', level: 1, component: ButtonsPage } as GuideBookPage)
 addPage({
   id: 'ref.input',
   label: 'Reference input',
   level: 0,
   component: RefInputPage
-} as GuideBookPage)
+})

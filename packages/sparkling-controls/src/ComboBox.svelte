@@ -28,11 +28,11 @@
     window.removeEventListener('click', toggleCombo)
   }
 
-  function toggleCombo (event: MouseEvent): void {
+  function toggleCombo (event: any): void {
     let pathRoot = false
     let pathDrop = false
     let pathItems = false
-    event.path.find((el) => {
+    event.path.find((el: any) => {
       if (el.className === comboRoot.className) pathRoot = true
       if (el.className === comboDrop.className) pathDrop = true
       if (el.className === comboItems.className) pathItems = true
@@ -63,7 +63,7 @@
 
   <div bind:this={comboDrop} class="comboBox-drop">
     <div bind:this={comboItems} class="comboBox-drop__items">
-      <ScrollView width="100%" height="100%" accentColor="true">
+      <ScrollView width="100%" height="100%">
         {#each items as item (item.id)}
           <div
             class="comboBox-drop__item"

@@ -147,7 +147,7 @@
     if (value.detail.dragged) {
       dragId = (value.detail.doc as any)[fieldAttr.name]
     } else {
-      if (dragIn != null && dragDoc && getFieldValue(dragDoc, fieldAttr.name) !== dragIn) {
+      if (dragIn !== null && dragDoc && getFieldValue(dragDoc, fieldAttr.name) !== dragIn) {
         const dt = dragDoc
         coreService.then((cs) => {
           cs.update(dt, { [fieldAttr.name]: dragIn } as Partial<VDoc>)

@@ -419,7 +419,7 @@ export class Model implements Storage {
             break
         }
       } else {
-        throw new Error(`failed to object by query:${JSON.stringify(op.selector)}`)
+        throw new Error(`failed to object by query:${String(op.selector)}`)
       }
     }
     return doc

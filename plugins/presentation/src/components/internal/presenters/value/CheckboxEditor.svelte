@@ -25,4 +25,4 @@
     attribute && (attribute.type._class === CORE_CLASS_ARRAY_OF || attribute.type._class === CORE_CLASS_INSTANCE_OF)
 </script>
 
-<CheckBox bind:checked={value} placeholder={attribute.placeholder} {editable} />
+<CheckBox bind:checked={value} label={attribute.placeholder} {editable} />

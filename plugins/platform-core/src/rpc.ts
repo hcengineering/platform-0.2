@@ -75,8 +75,8 @@ export default (platform: Platform): RpcService => {
           }
         } else {
           const promise = requests.get(response.id)
-          if (promise != null) {
-            if (response.error != null) {
+          if (promise !== undefined) {
+            if (response.error !== undefined) {
               promise.reject(response.error)
             } else {
               promise.resolve(response.result)
@@ -86,7 +86,7 @@ export default (platform: Platform): RpcService => {
             throw new Error('unknown rpc id')
           }
         }
-        if ((response.clientTx != null) && response.clientTx.length > 0) {
+        if ((response.clientTx !== undefined) && response.clientTx.length > 0) {
           for (const listener of (listeners.get(EventType.TransientTransaction) ?? [])) {
             listener(response.clientTx)
           }
@@ -111,7 +111,7 @@ export default (platform: Platform): RpcService => {
         resolve,
         reject
       })
-      getWebSocket().then((ws: WebSocket) => {
+      getWebSocket().then((ws: WebSocket) => { // eslint-disable-line
         ws.send(serialize({
           id,
           method,

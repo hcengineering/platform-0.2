@@ -68,11 +68,11 @@ limitations under the License.
     const core = await coreP
     const model = await modelP
 
-    const doc = {
+    const doc: DocumentValue<Person> = {
       ...personM,
-      _space: space?._id,
-      _createdBy: core.getUserId()
-    } as DocumentValue<Person>
+      _space: space?._id as Ref<Space>,
+      _createdBy: core.getUserId() as StringProperty
+    }
 
     model.mixinDocument(doc as Person, recruiting.mixin.WithCandidateProps, {
       candidate: candidateM,

@@ -36,8 +36,7 @@ export type Metadata<T> = Resource<T> & { __metadata: true }
 // P L U G I N S
 
 /** Base interface for a plugin service. */
-export interface Service {
-}
+export interface Service {} // eslint-disable-line
 
 /** Plugin identifier. */
 export type Plugin<S extends Service> = Resource<S>
@@ -79,7 +78,7 @@ export enum PluginStatus {
 
 export interface PluginInfo {
   id: AnyPlugin
-  version: string,
+  version: string
   status: PluginStatus
 }
 
@@ -95,23 +94,23 @@ type ExtractType<T, X extends Record<string, Metadata<T>>> = {
 type EventListener = (event: string, data: any) => Promise<void>
 
 export interface Platform {
-  getMetadata<T> (id: Metadata<T>): T | undefined
-  setMetadata<T> (id: Metadata<T>, value: T): void
-  loadMetadata<T, X extends Record<string, Metadata<T>>> (ids: X, resources: ExtractType<T, X>): void
+  getMetadata: <T>(id: Metadata<T>) => T | undefined
+  setMetadata: <T>(id: Metadata<T>, value: T) => void
+  loadMetadata: <T, X extends Record<string, Metadata<T>>>(ids: X, resources: ExtractType<T, X>) => void
 
-  addLocation<P extends Service, X extends PluginDependencies> (plugin: PluginDescriptor<P, X>, module: PluginModule<P, X>): void
-  resolveDependencies (id: Plugin<any>, deps: PluginDependencies): Promise<{ [key: string]: Service }>
-  getPlugin<T extends Service> (id: Plugin<T>): Promise<T>
+  addLocation: <P extends Service, X extends PluginDependencies>(plugin: PluginDescriptor<P, X>, module: PluginModule<P, X>) => void
+  resolveDependencies: (id: Plugin<any>, deps: PluginDependencies) => Promise<{ [key: string]: Service }>
+  getPlugin: <T extends Service>(id: Plugin<T>) => Promise<T>
 
-  getResource<T> (resource: Resource<T>): Promise<T>
-  setResource<T> (resource: Resource<T>, value: T): void
-  peekResource<T> (resource: Resource<T>): T | undefined
+  getResource: <T>(resource: Resource<T>) => Promise<T>
+  setResource: <T>(resource: Resource<T>, value: T) => void
+  peekResource: <T>(resource: Resource<T>) => T | undefined
 
-  addEventListener (event: string, listener: EventListener): void
-  removeEventListener (event: string, listener: EventListener): void
-  broadcastEvent (event: string, data: any): void
+  addEventListener: (event: string, listener: EventListener) => void
+  removeEventListener: (event: string, listener: EventListener) => void
+  broadcastEvent: (event: string, data: any) => void
 
-  setPlatformStatus (status: Status): void
+  setPlatformStatus: (status: Status) => void
 }
 
 /*!
@@ -136,8 +135,8 @@ export function createPlatform (): Platform {
     for (const key in ids) {
       const id = ids[key]
       const resource = metadata[key]
-      if (!resource) {
-        throw new Error(`no metadata provided, key: ${key}, id: ${id}`)
+      if (!resource) { // eslint-disable-line
+        throw new Error(`no metadata provided, key: ${key}, id: ${JSON.stringify(id)}`)
       }
       resources.set(id, resource)
     }
@@ -154,25 +153,29 @@ export function createPlatform (): Platform {
 
   async function getResource<T> (resource: Resource<T>): Promise<T> {
     const resolved = resources.get(resource)
-    if (resolved) {
+    if (resolved !== undefined) {
       return resolved
     } else {
       let resolving = resolvingResources.get(resource)
-      if (resolving) {
-        return resolving
+      if (resolving !== undefined) {
+        return await resolving
       }
 
       resolving = new Promise((resolve, reject) => {
         const info = getResourceInfo(resource)
-        getPlugin(info.plugin).then(() => {
+
+        const handlePlugin = async (): Promise<void> => {
+          await getPlugin(info.plugin).catch((reason) => {
+            reject(new Error('plugin not loaded: ' + resource))
+          })
           const value = resources.get(resource)
-          if (!value) {
-            throw new Error('resource not loaded: ' + resource)
+          if (value === undefined) {
+            reject(new Error('resource not loaded: ' + resource))
+          } else {
+            resolve(value)
           }
-          resolve(value)
-        }).catch(err => {
-          reject(err)
-        }).finally(() => {
+        }
+        handlePlugin().finally(() => { //eslint-disable-line
           // Clear resolving map
           resolvingResources.delete(resource)
         })
@@ -191,39 +194,39 @@ export function createPlatform (): Platform {
 
   const eventListeners = new Map<string, EventListener[]>()
 
-  function addEventListener (event: string, listener: EventListener) {
+  function addEventListener (event: string, listener: EventListener): void {
     const listeners = eventListeners.get(event)
-    if (listeners) {
+    if (listeners !== undefined) {
       listeners.push(listener)
     } else {
       eventListeners.set(event, [listener])
     }
   }
 
-  function removeEventListener (event: string, listener: EventListener) {
+  function removeEventListener (event: string, listener: EventListener): void {
     const listeners = eventListeners.get(event)
-    if (listeners) {
+    if (listeners !== undefined) {
       listeners.splice(listeners.indexOf(listener), 1)
     }
   }
 
   function broadcastEvent (event: string, data: any): void {
     const listeners = eventListeners.get(event)
-    if (listeners) {
-      listeners.forEach(listener => listener(event, data))
-    }
+    listeners?.forEach((l) => {
+        l(event, data) // eslint-disable-line
+    })
   }
 
-  function setPlatformStatus (status: Status | Error | string | unknown) {
+  function setPlatformStatus (status: Status | Error | string | unknown): void {
     if (typeof status === 'string') {
       broadcastEvent(PlatformStatus, new Status(Severity.INFO, 0, status))
     } else if (status instanceof Error) {
-      const err = status as Error
+      const err = status
       broadcastEvent(PlatformStatus, new Status(Severity.ERROR, 0, err.message))
     } else if (status instanceof Status) {
       broadcastEvent(PlatformStatus, status)
     } else {
-      broadcastEvent(PlatformStatus, new Status(Severity.WARNING, 0, `Unknown status: ${status}`))
+      broadcastEvent(PlatformStatus, new Status(Severity.WARNING, 0, `Unknown status: ${String(status)}`))
     }
   }
 
@@ -242,7 +245,7 @@ export function createPlatform (): Platform {
   // P L U G I N S
 
   const plugins = new Map<AnyPlugin, Promise<Service>>()
-  const locations = [] as [AnyDescriptor, AnyModule][]
+  const locations = [] as Array<[AnyDescriptor, AnyModule]>
   const running = new Map<AnyPlugin, Service>()
 
   function getLocation (id: AnyPlugin): [AnyDescriptor, AnyModule] {
@@ -255,24 +258,24 @@ export function createPlatform (): Platform {
   }
 
   function addLocation<P extends Service, X extends PluginDependencies>
-  (plugin: PluginDescriptor<P, X>, module: PluginModule<P, X>) {
+  (plugin: PluginDescriptor<P, X>, module: PluginModule<P, X>): void {
     locations.push([plugin, module as any])
   }
 
   async function getPlugin<T extends Service> (id: Plugin<T>): Promise<T> {
     const plugin = plugins.get(id)
-    if (plugin) {
-      return plugin as Promise<T>
+    if (plugin !== undefined) {
+      return await (plugin as Promise<T>)
     } else {
       const plugin = resolvePlugin(id)
       try {
         plugins.set(id, plugin)
-        await plugin as Promise<T>
+        await (plugin as Promise<T>)
       } catch (ex) {
         // remove plugin, and try on next attempt.
         plugins.delete(id)
       }
-      return plugin as Promise<T>
+      return await (plugin as Promise<T>)
     }
   }
 
@@ -288,7 +291,7 @@ export function createPlatform (): Platform {
   }
 
   async function resolveDependencies (parentId: Plugin<any>, deps: PluginDependencies): Promise<{ [key: string]: Service }> {
-    const result = {} as { [key: string]: Service }
+    const result: { [key: string]: Service } = {}
     for (const key in deps) {
       const id = deps[key]
       result[key] = await getPlugin(id)
@@ -314,7 +317,7 @@ export function createPlatform (): Platform {
     broadcastEvent,
 
     setPlatformStatus
-  } as Platform
+  }
 
   return platform
 }
@@ -324,10 +327,10 @@ export function createPlatform (): Platform {
 type Namespace = Record<string, Record<string, any>>
 
 function transform<N extends Namespace> (plugin: AnyPlugin, namespaces: N, f: (id: string, value: any) => any): N {
-  const result = {} as Namespace
+  const result: Namespace = {}
   for (const namespace in namespaces) {
     const extensions = namespaces[namespace]
-    const transformed = {} as Record<string, any>
+    const transformed: Record<string, any> = {}
     for (const key in extensions) {
       transformed[key] = f(namespace + ':' + plugin + '.' + key, extensions[key])
     }
