@@ -89,7 +89,7 @@
 
   const documentRouter = newRouter<DocumentMatcher>('?doc', async (match) => {
     // Parse browse and convert it to _class and objectId
-    const service = await getCoreService()
+    const service = await coreService
     if (match.doc) {
       // Check find a title
       const title = await service.findOne<Title>(CORE_CLASS_TITLE, {
