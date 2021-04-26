@@ -47,7 +47,7 @@ program
 
       // Create user account inside accounts
       const userAccount = await getUserAccount(db, email)
-      if (userAccount == null) {
+      if (userAccount === null) {
         await createUserAccount(db, email, cmd.password)
       }
       await getWorkspace(db, cmd.workspace) // a workspace

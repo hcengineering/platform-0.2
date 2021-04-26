@@ -52,7 +52,7 @@
     let completionWord = ''
     let completionEnd = ''
 
-    if (sel.$from.nodeBefore != null) {
+    if (sel.$from.nodeBefore !== null) {
       let val = sel.$from.nodeBefore.textContent
       let p = -1
       for (p = val.length - 1; p >= 0; p--) {
@@ -71,7 +71,7 @@
       }
       completionWord = val
     }
-    if (sel.$from.nodeAfter != null) {
+    if (sel.$from.nodeAfter !== null) {
       completionEnd = sel.$from.nodeAfter.textContent
     }
     return {
@@ -103,8 +103,8 @@
     // Check types
     const marks = view.state.storedMarks || view.state.selection.$from.marks()
 
-    const isBold = schema.marks.strong.isInSet(marks) != null
-    const isItalic = schema.marks.em.isInSet(marks) != null
+    const isBold = schema.marks.strong.isInSet(marks) !== null
+    const isItalic = schema.marks.em.isInSet(marks) !== null
     isEmpty = checkEmpty(innerDOMValue)
     const evt = {
       isEmpty: isEmpty,
@@ -158,11 +158,11 @@
       let newState = view.state.apply(transaction)
 
       // Check and update triggers to update content.
-      if (transformInjections != null) {
+      if (transformInjections !== null) {
         const tr: Promise<Transaction | null> = transformInjections(newState)
-        if (tr != null) {
+        if (tr !== null) {
           tr.then((res) => {
-            if (res != null) {
+            if (res !== null) {
               newState = newState.apply(res)
               view.updateState(newState)
 

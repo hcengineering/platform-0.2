@@ -51,7 +51,7 @@ export class ReferenceIndex implements DomainIndex {
 
   private getTextAttributes (_class: Ref<Class<Obj>>): string[] {
     const cached = this.textAttributes.get(_class)
-    if (cached != null) return cached
+    if (cached !== undefined) return cached
 
     const keys = this.modelDb
       .getAllAttributes(_class)
@@ -63,7 +63,7 @@ export class ReferenceIndex implements DomainIndex {
 
   private getArrayAttributes (_class: Ref<Class<Obj>>): ClassKey[] {
     const cached = this.arrayAttributes.get(_class)
-    if (cached != null) return cached
+    if (cached !== undefined) return cached
 
     const keys = this.modelDb
       .getAllAttributes(_class)

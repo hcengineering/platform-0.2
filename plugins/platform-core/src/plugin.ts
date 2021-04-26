@@ -53,7 +53,7 @@ export default async (platform: Platform): Promise<CoreService> => {
     },
     async findOne<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined> {
       const result = (await rpc.request<T>(RPC_CALL_FINDONE, _class, query))
-      if (result != null) {
+      if (result !== undefined) {
         return model.as(result, _class)
       }
       return result

@@ -80,7 +80,7 @@ export interface IState {
 
 export function traverseMessage (node: MessageNode, f: (el: MessageNode) => void): void {
   f(node)
-  if (node.content !== undefined && node.content !== null) {
+  if (node.content !== undefined && node.content !== undefined) {
     for (const c of node.content) {
       traverseMessage(c, f)
     }
@@ -88,7 +88,7 @@ export function traverseMessage (node: MessageNode, f: (el: MessageNode) => void
 }
 
 export function traverseMarks (node: MessageNode, f: (el: MessageMark) => void): void {
-  if (node.marks !== undefined && node.marks !== null) {
+  if (node.marks !== undefined && node.marks !== undefined) {
     for (const c of node.marks) {
       f(c)
     }
@@ -452,7 +452,7 @@ class State implements IState {
       if (size > 1) {
         let delimMin = this.delim
         const trim = /\s+$/.exec(delimMin)
-        if (trim != null) delimMin = delimMin.slice(0, delimMin.length - trim[0].length)
+        if (trim !== null) delimMin = delimMin.slice(0, delimMin.length - trim[0].length)
         for (let i = 1; i < size; i++) this.out += delimMin + '\n'
       }
       this.closed = false
@@ -535,9 +535,6 @@ class State implements IState {
     let trailing = ''
     const progress = (node: MessageNode | undefined, index: number): void => {
       let marks: MessageMark[] = node?.marks ?? []
-      if (marks == null) {
-        marks = []
-      }
 
       if (node !== undefined && node.type === MessageNodeType.hard_break) {
         marks = marks.filter((m: MessageMark) => {
@@ -562,7 +559,7 @@ class State implements IState {
         return info?.expelEnclosingWhitespace
       }) && node.text !== undefined) {
         const ex = /^(\s*)(.*?)(\s*)$/m.exec(node.text)
-        if (ex != null) {
+        if (ex !== null) {
           const [_, lead, inner, trail] = ex // eslint-disable-line
           leading += lead
           trailing = trail
@@ -659,7 +656,7 @@ class State implements IState {
     } else if (this.inTightList) this.flushClose(1)
 
     const isTight: boolean =
-      node.attrs != null &&
+      node.attrs !== undefined &&
       (typeof node.attrs.tight !== 'undefined'
         ? node.attrs.tight
         : this.options.tightLists)

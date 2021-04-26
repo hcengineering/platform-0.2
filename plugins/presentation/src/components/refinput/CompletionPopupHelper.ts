@@ -23,9 +23,9 @@ export function getFirst (items: CompletionItem[]): CompletionItem {
 }
 
 export function calcOffset (element: HTMLElement): number {
-  if (element != null) {
+  if (element !== null) {
     const pp = element.parentElement
-    return pp != null ? pp.offsetTop : -1
+    return pp !== null ? pp.offsetTop : -1
   }
   return -1
 }

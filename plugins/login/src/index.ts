@@ -31,7 +31,7 @@ export const ACCOUNT_KEY = 'anticrm-account'
 
 export function currentAccount (): LoginInfo | null {
   const account = localStorage.getItem(ACCOUNT_KEY)
-  return (account != null) ? JSON.parse(account) as LoginInfo : null
+  return (account !== null) ? JSON.parse(account) as LoginInfo : null
 }
 
 export interface LoginService extends Service {

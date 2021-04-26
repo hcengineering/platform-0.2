@@ -30,7 +30,7 @@ platform.setMetadata(core.metadata.WSHost, host)
 platform.setMetadata(core.metadata.WSPort, port)
 
 const loginInfo = currentAccount()
-if (loginInfo != null) {
+if (loginInfo !== null) {
   platform.setMetadata(core.metadata.WhoAmI, loginInfo.email)
   platform.setMetadata(core.metadata.Token, loginInfo.token)
 }

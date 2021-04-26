@@ -77,7 +77,7 @@ async function createAccount (db: Db, email: string, password: string): Promise<
   const hash = hashWithSalt(password, salt)
 
   const account = await getAccount(db, email)
-  if (account != null) {
+  if (account !== null) {
     throw new PlatformError(new Status(Severity.ERROR, PlatformStatusCodes.ACCOUNT_DUPLICATE, 'Account already exists.'))
   }
 
@@ -100,7 +100,7 @@ async function createAccount (db: Db, email: string, password: string): Promise<
 async function updateAccount (db: Db, email: string, password: string, newPassword: string, secondFactorEnabled: boolean, clientSecret: string, secondFactorCode: string): Promise<AccountInfo> {
   let account = await getAccount(db, email)
 
-  if (account == null) {
+  if (account === null) {
     throw new PlatformError(new Status(Severity.ERROR, PlatformStatusCodes.ACCOUNT_NOT_FOUND, 'Account not found.'))
   }
   if (!verifyPassword(password, account.hash.buffer, account.salt.buffer)) {
@@ -129,7 +129,7 @@ async function updateAccount (db: Db, email: string, password: string, newPasswo
 
   account = await getAccount(db, email)
 
-  if (account == null) {
+  if (account === null) {
     throw new PlatformError(new Status(Severity.ERROR, PlatformStatusCodes.ACCOUNT_NOT_FOUND, 'Account not found.'))
   }
   return toAccountInfo(account)
@@ -138,7 +138,7 @@ async function updateAccount (db: Db, email: string, password: string, newPasswo
 async function pushClientId (db: Db, email: string, clientId: string): Promise<void> {
   const account = await getAccount(db, email)
 
-  if (account == null) {
+  if (account === null) {
     throw new PlatformError(new Status(Severity.ERROR, PlatformStatusCodes.ACCOUNT_NOT_FOUND, 'Account not found.'))
   }
 
@@ -162,7 +162,7 @@ export async function getAccount (db: Db, email: string): Promise<Account | null
 
 async function getAccountInfo (db: Db, email: string, password: string, clientId: string, secondFactorCode: string): Promise<AccountInfo> {
   const account = await getAccount(db, email)
-  if (account == null) {
+  if (account === null) {
     throw new PlatformError(new Status(Severity.ERROR, PlatformStatusCodes.ACCOUNT_NOT_FOUND, 'Account not found.'))
   }
   if (!verifyPassword(password, account.hash.buffer, account.salt.buffer)) {
@@ -196,7 +196,7 @@ async function login (db: Db, email: string, password: string, workspace: string
   const accountInfo = await getAccountInfo(db, email, password, clientId, secondFactorCode)
   const workspaceInfo = await getWorkspace(db, workspace)
 
-  if (workspaceInfo != null) {
+  if (workspaceInfo !== null) {
     const workspaces = accountInfo.workspaces
 
     for (const w of workspaces) {
@@ -219,7 +219,7 @@ async function login (db: Db, email: string, password: string, workspace: string
 
 export async function createWorkspace (db: Db, workspace: string, organisation: string): Promise<string> {
   // Ensure workspace is not exists yet.
-  if ((await getWorkspace(db, workspace)) != null) {
+  if ((await getWorkspace(db, workspace)) !== null) {
     throw new PlatformError(new Status(Severity.ERROR, PlatformStatusCodes.WORKSPACE_ALREADY_EXISTS, 'Workspace already exists and could not be created.'))
   }
   // Create a new workspace record
@@ -234,12 +234,12 @@ export async function createWorkspace (db: Db, workspace: string, organisation: 
 
 async function getWorkspaceAndAccount (db: Db, email: string, workspace: string): Promise<{ accountId: ObjectID, workspaceId: ObjectID }> {
   const wsPromise = await getWorkspace(db, workspace)
-  if (wsPromise == null) {
+  if (wsPromise === null) {
     throw new PlatformError(new Status(Severity.ERROR, PlatformStatusCodes.WORKSPACE_NOT_FOUND, `Workspace ${workspace} not found`))
   }
   const workspaceId = wsPromise._id
   const account = await getAccount(db, email)
-  if (account == null) {
+  if (account === null) {
     throw new PlatformError(new Status(Severity.ERROR, PlatformStatusCodes.ACCOUNT_NOT_FOUND, 'Account not found.'))
   }
   const accountId = account?._id
@@ -271,7 +271,7 @@ export async function createUserAccount (db: Db, email: string, password: string
 
 export async function getUserAccount (db: Db, email: string): Promise<ObjectID | null> {
   const account = await getAccount(db, email)
-  if (account != null) {
+  if (account !== null) {
     return account._id
   }
   return null

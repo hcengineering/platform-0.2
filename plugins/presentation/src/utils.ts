@@ -93,7 +93,7 @@ export async function createLiveQuery<T extends Doc> (_class: Ref<Class<T>>, _qu
  * @param action
  */
 export async function liveQuery<T extends Doc> (liveQuery: Promise<QueryUpdater<T>> | undefined, _class: Ref<Class<T>>, _query: DocumentQuery<T>, action: (docs: T[]) => void): Promise<QueryUpdater<T>> {
-  if (liveQuery != null) {
+  if (liveQuery !== undefined) {
     const lq = (await liveQuery)
     lq(_class, _query)
     return lq
