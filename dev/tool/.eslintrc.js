@@ -1,1 +1,5 @@
-../../.eslintrc-global.js
+module.exports = {
+  extends: [
+    '../../.eslintrc.js'
+  ]
+}

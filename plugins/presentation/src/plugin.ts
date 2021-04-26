@@ -91,11 +91,11 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
         const uxAttribute = model.as(attribute, ui.mixin.UXAttribute)
 
         const label = await i18nService.translate(uxAttribute.label)
-        const placeholder = (uxAttribute.placeholder != null) ? await i18nService.translate(uxAttribute.placeholder) : label
+        const placeholder = (uxAttribute.placeholder !== undefined) ? await i18nService.translate(uxAttribute.placeholder) : label
         const icon: Asset | undefined = uxAttribute.icon
 
         let presenter: AnyComponent = ui.component.StringPresenter // Use string presenter as default one
-        if (uxAttribute.presenter != null) {
+        if (uxAttribute.presenter !== undefined) {
           presenter = uxAttribute.presenter
         } else {
           // get presenter
@@ -178,7 +178,7 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
     }
 
     getAttribute (key: string, _class?: Ref<Class<Obj>>): AttrModel | undefined {
-      return this.attributes.find(attr => attr.key === key && ((_class != null) ? _class === attr._class : true))
+      return this.attributes.find(attr => attr.key === key && ((_class !== undefined) ? _class === attr._class : true))
     }
 
     getGroups (): GroupModel[] {

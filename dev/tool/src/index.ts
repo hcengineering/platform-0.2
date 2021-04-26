@@ -46,14 +46,14 @@ program
       const db = client.db('accounts')
 
       // Create user account inside accounts
-      const user = await getUserAccount(db, email).then(user => user == null ? await createUserAccount(db, email, cmd.password) : Promise.resolve(user))
-      const workspace = getWorkspace(db, cmd.workspace) // a workspace
+      const userAccount = await getUserAccount(db, email)
+      if (userAccount == null) {
+        await createUserAccount(db, email, cmd.password)
+      }
+      await getWorkspace(db, cmd.workspace) // a workspace
+      await assignWorkspace(db, email, cmd.workspace)
 
-      const assignDone = Promise.all([user, workspace]).then(() => {
-        return await assignWorkspace(db, email, cmd.workspace)
-      })
-      const contactDone = createContact(withTenant(client, cmd.workspace), email, cmd.fullname)
-      await Promise.all([contactDone, assignDone])
+      await createContact(withTenant(client, cmd.workspace), email, cmd.fullname)
     })
   })
 
@@ -65,10 +65,8 @@ program
   .action(async (email, cmd) => {
     return await withDatabase(mongodbUri, async (client) => {
       const db = client.db('accounts')
-      return await Promise.all([
-        removeContact(withTenant(client, cmd.workspace), email), // Create contact
-        removeWorkspace(db, email, cmd.workspace) //
-      ])
+      await removeContact(withTenant(client, cmd.workspace), email)
+      await removeWorkspace(db, email, cmd.workspace)
     })
   })
 
@@ -80,11 +78,9 @@ program
   .action(async (workspace, cmd) => {
     return await withDatabase(mongodbUri, (client) => {
       const accounts = client.db('accounts')
-      const workspaceId = createWorkspace(accounts, workspace, cmd.organization)
+      await createWorkspace(accounts, workspace, cmd.organization)
 
-      const tenant = withTenant(client, workspace)
-      const databaseDone = initDatabase(tenant)
-      await Promise.all([workspaceId, databaseDone])
+      await initDatabase(withTenant(client, workspace))
     })
   })
 
@@ -93,8 +89,7 @@ program
   .description('upgrade workspace')
   .action(async (workspace, cmd) => { // eslint-disable-line @typescript-eslint/no-unused-vars
     return await withDatabase(mongodbUri, async (client) => {
-      const tenant = withTenant(client, workspace)
-      return await initDatabase(tenant)
+      await initDatabase(withTenant(client, workspace))
     })
   })
 

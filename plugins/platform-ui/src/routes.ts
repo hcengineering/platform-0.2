@@ -112,7 +112,7 @@ export class Router<T> implements ApplicationRouter<T> {
   ) {
     this.pattern = pattern
     this.parentRouter = parent
-    if (defaults != null) {
+    if (defaults !== undefined) {
       this.defaults = defaults
     }
     this.parsePattern()
@@ -120,7 +120,7 @@ export class Router<T> implements ApplicationRouter<T> {
   }
 
   navigate (values: Partial<T>): void {
-    if (this.doNavigate != null) {
+    if (this.doNavigate !== undefined) {
       this.doNavigate(this.location(values))
     }
   }
@@ -142,7 +142,7 @@ export class Router<T> implements ApplicationRouter<T> {
     const oldVars = this.variables
     this.matched = this.doMatch()
     this.chainUpdate()
-    if (this.matcher != null && (!deepEqual(oldVars, this.variables) || forceUpdate)) {
+    if (this.matcher !== undefined && (!deepEqual(oldVars, this.variables) || forceUpdate)) {
       this.matcher(this.variables as T)
     }
   }
@@ -153,10 +153,10 @@ export class Router<T> implements ApplicationRouter<T> {
 
   doMatch (): boolean {
     // Use defaults as initial values.
-    this.variables = this.defaults != null ? { ...this.defaults } : {}
+    this.variables = this.defaults !== undefined ? { ...this.defaults } : {}
 
     // Perform matching of current location with extraction of variables and constructing childLocation.
-    if (this.rawLocation != null) {
+    if (this.rawLocation !== undefined) {
       this.childLocation = { path: [], query: {}, fragment: '' }
       const path = [...this.rawLocation.path]
       for (const s of this.segments) {
@@ -210,7 +210,7 @@ export class Router<T> implements ApplicationRouter<T> {
           this.childLocation.query[q[0]] = q[1]
         }
       }
-      if (this.childRouter != null) {
+      if (this.childRouter !== undefined) {
         this.childRouter.update(this.childLocation)
       }
       return true
@@ -230,7 +230,7 @@ export class Router<T> implements ApplicationRouter<T> {
 
   setDefaults (defaults: T): void {
     this.defaults = defaults
-    if (this.rawLocation != null) {
+    if (this.rawLocation !== undefined) {
       this.update(this.rawLocation, true)
     }
   }
@@ -256,7 +256,7 @@ export class Router<T> implements ApplicationRouter<T> {
   }
 
   currentPath (vars: T | undefined = undefined): string[] {
-    if (vars == null) {
+    if (vars === undefined) {
       vars = this.variables as T
     }
     const ll = (vars as unknown) as Record<string, any>
@@ -292,7 +292,7 @@ export class Router<T> implements ApplicationRouter<T> {
    * @private
    */
   currentQueries (result: Record<string, string>, vars: T | undefined = undefined): Record<string, string> | undefined {
-    if (vars == null) {
+    if (vars === undefined) {
       vars = this.variables as T
     }
     const ll = (vars as unknown) as Record<string, any>
@@ -316,7 +316,7 @@ export class Router<T> implements ApplicationRouter<T> {
     let variables = this.variables as T
     variables = { ...variables, ...vars }
     // Check all children in reverse order
-    for (const r of children.reverse()) {
+    for (const r of [...children].reverse()) {
       const ff = r.currentFragment()
       if (ff !== undefined) {
         return ff
@@ -329,7 +329,7 @@ export class Router<T> implements ApplicationRouter<T> {
     }
 
     // Check all parents
-    for (const r of parents.reverse()) {
+    for (const r of [...parents].reverse()) {
       const ff = r.currentFragment()
       if (ff !== undefined) {
         return ff
@@ -343,7 +343,7 @@ export class Router<T> implements ApplicationRouter<T> {
    * @private
    */
   currentFragment (vars: T | undefined = undefined): string | undefined {
-    if (vars == null) {
+    if (vars === undefined) {
       vars = this.variables as T
     }
     const ll = (vars as unknown) as Record<string, any>
@@ -395,7 +395,7 @@ export class Router<T> implements ApplicationRouter<T> {
   }
 
   private chainUpdate (): void {
-    if (this.matched && this.childRouter != null && this.childLocation != null) {
+    if (this.matched && this.childRouter !== undefined && this.childLocation !== undefined) {
       this.childRouter.update(this.childLocation)
     }
   }
@@ -403,9 +403,9 @@ export class Router<T> implements ApplicationRouter<T> {
   private parents (): Array<Router<any>> {
     const result: Array<Router<any>> = []
     let item = this.parentRouter
-    while (item != null) {
+    while (item !== undefined) {
       result.push(item)
-      if (item.parentRouter != null) {
+      if (item.parentRouter !== undefined) {
         item = item.parentRouter
       } else {
         break
@@ -417,9 +417,9 @@ export class Router<T> implements ApplicationRouter<T> {
   private children (): Array<Router<any>> {
     const result: Array<Router<any>> = []
     let item = this.childRouter
-    while (item != null) {
+    while (item !== undefined) {
       result.push(item)
-      if (item.childRouter != null) {
+      if (item.childRouter !== undefined) {
         item = item.childRouter
       } else {
         break
