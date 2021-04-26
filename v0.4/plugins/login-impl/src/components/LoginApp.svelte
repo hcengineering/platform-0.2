@@ -108,6 +108,7 @@
         flex-direction: column;
         justify-content: center;
         height: 100%;
+        z-index: 100;
 
         .title {
           font-weight: 600;
@@ -128,7 +129,6 @@
           justify-content: space-between;
           height: 414px;
           overflow: auto;
-          z-index: 100;
 
           .form-row {
             margin-bottom: 20px;
