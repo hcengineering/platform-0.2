@@ -14,7 +14,8 @@
 -->
 
 <script lang="ts">
-  import { Button, EditBox } from '@anticrm/sparkling-controls'
+  import { Button, EditBox, Status } from '@anticrm/sparkling-controls'
+  let fname: string = ''
 </script>
 
 <div class="container">
@@ -24,10 +25,16 @@
     <div class="back-panel-dark"/>
     <div class="back-panel-light"><div class="bg-noise opacity-3"/></div>
     <div class="form-container">
+      <div class="separator-footer"/>
+      <div class="title">Sign up</div>
+      <div class="status">
+        {#if fname == 'error'}
+          <Status severity="ERROR" message="Error" width="100%"/>
+        {/if}
+      </div>
       <div class="form">
-        <div class="title">Sign up</div>
         <div class="form-row wCol">
-          <div class="form-col"><EditBox label="First Name"/></div>
+          <div class="form-col"><EditBox label="First Name" bind:value={fname}/></div>
           <div class="form-col"><EditBox label="Last Name"/></div>
         </div>
         <div class="form-row"><EditBox label="E-mail"/></div>
@@ -35,8 +42,9 @@
         <div class="form-row"><EditBox label="Repeat password" password/></div>
         <div class="send"><Button label="Sign Up" primary width="100%"/></div>
       </div>
+      <div class="separator-footer"/>
+      <div class="reg-footer"><span>Already have an account?</span> <a href="/login">Sign In</a></div>
     </div>
-    <div class="reg-footer"><span>Already have an account?</span> <a href="/login">Sign In</a></div>
   </div>
   <div class="intro">
     <div class="content">
@@ -85,7 +93,7 @@
       overflow: hidden;
       margin-right: 20px;
       width: 668px;
-      padding: 60px 80px;
+      padding: 0px 80px;
       border-radius: 20px;
 
       .back-panel-light {
@@ -99,23 +107,29 @@
         display: flex;
         flex-direction: column;
         justify-content: center;
-        overflow: auto;
-        flex-grow: 1;
+        height: 100%;
 
+        .title {
+          font-weight: 600;
+          font-size: 24px;
+          line-height: 29px;
+          color: #FFFFFF;
+
+        }
+        .status {
+          min-height: 120px;
+          max-height: 120px;
+          padding-top: 20px;
+        }
+        
         .form {
           display: flex;
           flex-direction: column;
           justify-content: space-between;
           height: 414px;
+          overflow: auto;
           z-index: 100;
 
-          .title {
-            margin-bottom: 56px;
-            font-weight: 600;
-            font-size: 24px;
-            line-height: 29px;
-            color: #FFFFFF;
-          }
           .form-row {
             margin-bottom: 20px;
             &.wCol {
@@ -145,21 +159,26 @@
             margin-top: 36px;
           }
         }
-      }
-      .reg-footer {
-        font-size: 13px;
-        line-height: 16px;
-        color: #FFFFFF;
-        z-index: 99;
-        span {
-          opacity: 0.3;
+        .separator-footer {
+          min-height: 60px;
+          flex-grow: 1;
         }
-        a {
-          color: #fff;
-          opacity: 0.8;
-          text-decoration: none;
-          :hover {
-            opacity: 1;
+        .reg-footer {
+          margin-bottom: 80px;
+          font-size: 13px;
+          line-height: 16px;
+          color: #FFFFFF;
+          z-index: 99;
+          span {
+            opacity: 0.3;
+          }
+          a {
+            color: #fff;
+            opacity: 0.8;
+            text-decoration: none;
+            :hover {
+              opacity: 1;
+            }
           }
         }
       }
