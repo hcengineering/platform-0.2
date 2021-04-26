@@ -22,7 +22,7 @@
   export let attribute: AttrModel
   export let editable = true
 
-  let selected = 0
+  let selected: number | undefined
   let _enum: Enum<EnumKey> | undefined
   let items: Array<any> = []
   const label = attribute.label
@@ -45,7 +45,7 @@
   })
 
   $: {
-    if (_enum && items.length) {
+    if (_enum && items.length && selected) {
       value = _enum._literals[items[selected].id]
     }
   }
@@ -54,7 +54,7 @@
 {#if items.length}
   <ComboBox {label} {items} {editable} bind:selected>
     <div slot="title">
-      {items[selected].comboValue}
+      {selected ? items[selected].comboValue : ''}
     </div>
   </ComboBox>
 {/if}

@@ -219,14 +219,23 @@ export function model (S: Builder): void {
     component: task.component.TaskProperties
   })
 
-  S.mixin(task.class.Task, presentation.mixin.CreateForm, {
-    component: task.component.CreateTask
-  })
+  // shutdown for example
+  // S.mixin(task.class.Task, presentation.mixin.CreateForm, {
+  //   component: task.component.CreateTask
+  // })
 
   S.createDocument(workbench.class.ItemCreator, {
     app: task.application.Task,
     class: task.class.Task,
-    name: 'Task' as IntlString
+    name: 'Task' as IntlString,
+    component: task.component.CreateTask
+  })
+
+  // This is just a example
+  S.createDocument(workbench.class.ItemCreator, {
+    app: task.application.Task,
+    class: task.class.Task,
+    name: 'Task with default createForm' as IntlString
   })
 
   S.mixin(task.class.Task, presentation.mixin.CardForm, {

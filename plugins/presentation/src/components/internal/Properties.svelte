@@ -13,10 +13,11 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { ClassModel } from '../..'
+  import { ClassModel, getCoreService } from '../..'
   import AttributeEditor from '../AttributeEditor.svelte'
 
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
+  import { Ref, Mixin, Obj } from '@anticrm/core'
 
   export let model: ClassModel
   export let object: any
@@ -28,6 +29,40 @@
     } else {
       table.style.display = 'none'
     }
+  }
+
+  const mixins = model.getMixins().map(_mixin => {
+    const mixin = {
+      _class: _mixin._mixin
+    } as any
+
+    // filling current object attributes and values
+    const attributes = model.getOwnAttributes(_mixin._mixin).map(_attr => _attr.key)
+    attributes.forEach(_attr => {
+      for (const key in object) {
+        if (key.includes(_attr) && key.includes(_mixin._mixin.replace('.', '~'))) {
+          mixin[_attr] = object[key]
+        }
+      }
+    })
+
+    return mixin
+  })
+
+  function updateMixin (mixin: any) {
+    getCoreService()
+      .then((cs) => cs.getModel())
+      .then((cm) => {
+        cm.mixinDocument(object, mixin._class, mixin)
+      })
+  }
+
+  function getMixinLabel (mixin: Ref<Mixin<Obj>>) {
+    return model.getMixin(mixin)?.label || mixin
+  }
+
+  $: {
+    mixins.filter(_mixin => Object.keys(_mixin).length > 1).forEach(_mixin => updateMixin(_mixin))
   }
 </script>
 
@@ -55,31 +90,31 @@
         {/each}
       </table>
     </div>
-    <div class="group">
-      {#each model.getMixins(group._class) as _mixin (_mixin)}
-        <div class="caption-4" style="cursor:pointer" on:click={(e) => toggleVisible(e)}>{_mixin.label}</div>
-        <table style="display:none">
-          {#each model.getOwnAttributes(_mixin._mixin) as attr (attr.key)}
-            <tr>
-              <td class="cell-icon">
-                {#if attr.icon}
-                  <Icon icon={attr.icon} size="24" />
-                {/if}
-              </td>
-              <td width="120px">
-                <div class="label">{attr.label}</div>
-              </td>
-              <td>
-                <div class="edit">
-                  <AttributeEditor attribute={attr} bind:value={object[attr.key]} />
-                </div>
-              </td>
-            </tr>
-          {/each}
-        </table>
-      {/each}
-    </div>
   {/each}
+  <div class="group">
+    {#each mixins as _mixin (_mixin._class)}
+      <div class="caption-4" style="cursor:pointer" on:click={(e) => toggleVisible(e)}>{getMixinLabel(_mixin._class)}</div>
+      <table style="display:none">
+        {#each model.getOwnAttributes(_mixin._class) as attr (attr.key)}
+          <tr>
+            <td class="cell-icon">
+              {#if attr.icon}
+                <Icon icon={attr.icon} size="24" />
+              {/if}
+            </td>
+            <td width="120px">
+              <div class="label">{attr.label}</div>
+            </td>
+            <td>
+              <div class="edit">
+                <AttributeEditor attribute={attr} bind:value={_mixin[attr.key]} /> <!-- Trouble here, svelte redraws this block when mixins array changed, string editor lost focus and EnumPresenter go to infinity loop -->
+              </div>
+            </td>
+          </tr>
+        {/each}
+      </table>
+    {/each}
+  </div>
 </div>
 
 <style lang="scss">

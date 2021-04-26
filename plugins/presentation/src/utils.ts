@@ -128,6 +128,9 @@ export function getEmptyModel (): ClassModel {
     getMixins (): MixinGroupModel[] {
       return []
     },
+    getMixin (_mixin: Ref<Mixin<Obj>>): MixinGroupModel | undefined {
+      return undefined
+    },
     getAttribute (key: string, _class?: Ref<Class<Obj>>): AttrModel | undefined {
       return undefined
     }, // eslint-disable-line

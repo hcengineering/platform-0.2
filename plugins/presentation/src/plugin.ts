@@ -181,7 +181,9 @@ export default (platform: Platform, deps: { core: CoreService, i18n: I18n }): Pr
 
     abstract getOwnAttributes (_class: Ref<Class<Obj>>): AttrModel[]
 
-    abstract getMixins(_class: Ref<Class<Obj>>): MixinGroupModel[]
+    abstract getMixins(): MixinGroupModel[]
+
+    abstract getMixin (_mixin: Ref<Mixin<Obj>>): MixinGroupModel | undefined
 
     abstract getAttributes (): AttrModel[]
 
@@ -212,8 +214,12 @@ export default (platform: Platform, deps: { core: CoreService, i18n: I18n }): Pr
       return this.attributes.filter(attr => attr._class === _class)
     }
 
-    getMixins (_class: Ref<Class<Obj>>): MixinGroupModel[] {
-      return this.mixins.filter(_mixin => _mixin._class === _class)
+    getMixins (): MixinGroupModel[] {
+      return this.mixins
+    }
+
+    getMixin (_mixin: Ref<Mixin<Obj>>): MixinGroupModel | undefined {
+      return this.mixins.find(mixin => mixin._mixin === _mixin)
     }
 
     getAttribute (key: string, _class?: Ref<Class<Obj>>): AttrModel | undefined {
@@ -278,8 +284,12 @@ export default (platform: Platform, deps: { core: CoreService, i18n: I18n }): Pr
       return result.filter(attr => !this.filter[attr.key])
     }
 
-    getMixins (_class: Ref<Class<Obj>>): MixinGroupModel[] {
-      return this.next.getMixins(_class)
+    getMixins (): MixinGroupModel[] {
+      return this.next.getMixins()
+    }
+
+    getMixin (_mixin: Ref<Mixin<Obj>>): MixinGroupModel | undefined {
+      return this.next.getMixin(_mixin)
     }
 
     getAttributes (): AttrModel[] {

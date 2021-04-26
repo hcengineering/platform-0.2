@@ -117,7 +117,9 @@ export interface ClassModel {
 
   getOwnAttributes (_class: Ref<Class<Obj>>): AttrModel[] // TODO: why do we have this here, but not within Group?
 
-  getMixins (_class: Ref<Class<Obj>>): MixinGroupModel[]
+  getMixins (): MixinGroupModel[]
+
+  getMixin (_mixin: Ref<Mixin<Obj>>): MixinGroupModel | undefined
 
   getAttributes (): AttrModel[]
 
