@@ -172,7 +172,6 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
       const cursor = collection(_class).find<T>(finalQuery)
 
       const result = await cursor.toArray()
-      console.log('FINF:', result)
       return result
     },
 

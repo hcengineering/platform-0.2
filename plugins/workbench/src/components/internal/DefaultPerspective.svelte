@@ -89,9 +89,10 @@
 
   const documentRouter = newRouter<DocumentMatcher>('?doc', async (match) => {
     // Parse browse and convert it to _class and objectId
+    const service = await getCoreService()
     if (match.doc) {
       // Check find a title
-      const title = await (await coreService).findOne<Title>(CORE_CLASS_TITLE, {
+      const title = await service.findOne<Title>(CORE_CLASS_TITLE, {
         title: match.doc as StringProperty,
         source: TitleSource.ShortId as Property<TitleSource, number>
       })
@@ -107,7 +108,7 @@
 
           // Try find a class to be sure it is available.
           try {
-            ;(await coreService).getModel().getClass(_class as Ref<Class<Doc>>)
+            service.getModel().getClass(_class as Ref<Class<Doc>>)
           } catch (ex) {
             console.error(ex)
             details = undefined
