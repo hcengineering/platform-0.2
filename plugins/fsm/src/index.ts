@@ -14,7 +14,7 @@
 import { Class, Doc, Mixin, Ref, Emb } from '@anticrm/core'
 import core from '@anticrm/platform-core'
 import { Plugin, plugin, Service } from '@anticrm/platform'
-import { Application } from '@anticrm/domains'
+import { Application, VDoc } from '@anticrm/domains'
 import { ComponentExtension } from '@anticrm/presentation'
 import { AnyComponent } from '@anticrm/platform-ui'
 

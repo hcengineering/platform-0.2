@@ -12,16 +12,16 @@
 // limitations under the License.
 
 import core, { ArrayOf$, Builder, Class$, Mixin$, Prop, RefTo$, InstanceOf$ } from '@anticrm/model'
-import { CORE_CLASS_STRING, Ref, Class, Doc } from '@anticrm/core'
+import { CORE_CLASS_STRING, Ref, Class, Doc, MODEL_DOMAIN } from '@anticrm/core'
 import { Application } from '@anticrm/domains'
-import { TDoc, TEmb } from '@anticrm/model/src/__model__'
+import { TDoc, TEmb, TMixin } from '@anticrm/model/src/__model__'
 import { UX } from '@anticrm/presentation/src/__model__'
 import { IntlString } from '@anticrm/platform-i18n'
 
 import fsmPlugin, { FSM, Transition, State, WithFSM, WithState } from '.'
 
 @UX('FSM' as IntlString)
-@Class$(fsmPlugin.class.FSM, core.class.Doc)
+@Class$(fsmPlugin.class.FSM, core.class.Doc, MODEL_DOMAIN)
 export class TFSM extends TDoc implements FSM {
   @UX('Name' as IntlString)
   @Prop(CORE_CLASS_STRING)
@@ -54,7 +54,7 @@ export class TTransition extends TEmb implements Transition {
 }
 
 @UX('State' as IntlString)
-@Class$(fsmPlugin.class.State, core.class.Doc)
+@Class$(fsmPlugin.class.State, core.class.Doc, MODEL_DOMAIN)
 export class TState extends TDoc implements State {
   @UX('Name' as IntlString)
   @Prop(CORE_CLASS_STRING)
@@ -79,8 +79,14 @@ export class TWithState extends TDoc implements WithState {
   state!: Ref<State>
 }
 
+@Mixin$(fsmPlugin.mixin.CardForm, core.class.Mixin)
+export class TCardForm<T extends VDoc> extends TMixin<T> implements ComponentExtension<T> {
+  @Prop()
+  component!: AnyComponent
+}
+
 export function model (S: Builder): void {
-  S.add(TTransition, TState, TFSM, TWithFSM, TWithState)
+  S.add(TTransition, TState, TFSM, TWithFSM, TWithState, TCardForm)
 
   S.mixin(core.class.VDoc, fsmPlugin.mixin.CardForm, {
     component: fsmPlugin.component.VDocCardPresenter
@@ -109,7 +115,7 @@ class FSMBuilder {
     return this.states.get(a.name)
   }
 
-  transition (a: PureState, b: PureState) {
+  private _transition (a: PureState, b: PureState) {
     const existingA = this.getState(a)
     const existingB = this.getState(b)
 
@@ -118,6 +124,14 @@ class FSMBuilder {
     }
 
     this.transitions.push([existingA.name, existingB.name])
+
+    return this
+  }
+
+  // TODO: in future PureState will become {state: PureState, action: any}
+  transition (a: PureState, b: PureState | PureState[]) {
+    (Array.isArray(b) ? b : [b])
+      .forEach(x => this._transition(a, x))
 
     return this
   }
@@ -136,7 +150,7 @@ class FSMBuilder {
       application: this.appID,
       classes: this.classes,
       transitions: this.transitions
-        .map(([fromName, toName]) => {
+        .map(([fromName, toName]): Transition | undefined => {
           const from = stateIDs.get(fromName)
           const to = stateIDs.get(toName)
 
@@ -144,7 +158,7 @@ class FSMBuilder {
             return undefined
           }
 
-          return { from, to } as Transition
+          return { from, to }
         })
         .filter((x): x is Transition => !!x)
     })

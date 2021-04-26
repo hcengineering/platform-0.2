@@ -20,7 +20,7 @@ import fsm from '.'
 
 export default (platform: Platform): Promise<FSMService> => {
   platform.setResource(fsm.component.BoardPresenter, BoardPresenter)
-  platform.setResouce(fsm.component.VDocCardPresenter, VDocCardPresenter)
+  platform.setResource(fsm.component.VDocCardPresenter, VDocCardPresenter)
 
   return Promise.resolve({})
 }
