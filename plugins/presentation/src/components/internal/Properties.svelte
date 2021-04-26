@@ -31,14 +31,14 @@
     }
   }
 
-  const mixins = model.getMixins().map(_mixin => {
+  const mixins = model.getMixins().map((_mixin) => {
     const mixin = {
       _class: _mixin._mixin
     } as any
 
     // filling current object attributes and values
-    const attributes = model.getOwnAttributes(_mixin._mixin).map(_attr => _attr.key)
-    attributes.forEach(_attr => {
+    const attributes = model.getOwnAttributes(_mixin._mixin).map((_attr) => _attr.key)
+    attributes.forEach((_attr) => {
       for (const key in object) {
         if (key.includes(_attr) && key.includes(_mixin._mixin.replace('.', '~'))) {
           mixin[_attr] = object[key]
@@ -61,8 +61,10 @@
     return model.getMixin(mixin)?.label || mixin
   }
 
+  const changedMixins = mixins.slice()
+
   $: {
-    mixins.filter(_mixin => Object.keys(_mixin).length > 1).forEach(_mixin => updateMixin(_mixin))
+    changedMixins.filter((_mixin) => Object.keys(_mixin).length > 1).forEach((_mixin) => updateMixin(_mixin))
   }
 </script>
 
@@ -92,8 +94,10 @@
     </div>
   {/each}
   <div class="group">
-    {#each mixins as _mixin (_mixin._class)}
-      <div class="caption-4" style="cursor:pointer" on:click={(e) => toggleVisible(e)}>{getMixinLabel(_mixin._class)}</div>
+    {#each mixins as _mixin, i (_mixin._class)}
+      <div class="caption-4" style="cursor:pointer" on:click={(e) => toggleVisible(e)}>
+        {getMixinLabel(_mixin._class)}
+      </div>
       <table style="display:none">
         {#each model.getOwnAttributes(_mixin._class) as attr (attr.key)}
           <tr>
@@ -107,7 +111,7 @@
             </td>
             <td>
               <div class="edit">
-                <AttributeEditor attribute={attr} bind:value={_mixin[attr.key]} /> <!-- Trouble here, svelte redraws this block when mixins array changed, string editor lost focus and EnumPresenter go to infinity loop -->
+                <AttributeEditor attribute={attr} bind:value={changedMixins[i][attr.key]} />
               </div>
             </td>
           </tr>

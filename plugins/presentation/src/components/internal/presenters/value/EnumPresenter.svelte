@@ -17,6 +17,7 @@
   import type { AttrModel } from '@anticrm/presentation'
   import { Enum, EnumKey, EnumOf } from '@anticrm/core'
   import { getCoreService } from '@anticrm/presentation'
+  import { deepEqual } from 'fast-equals'
 
   export let value: any
   export let attribute: AttrModel
@@ -36,7 +37,7 @@
           comboValue: _enum._literals[key].label
         })
 
-        if (value === _enum._literals[key]) {
+        if (deepEqual(value, _enum._literals[key])) {
           selected = items.findIndex((p) => p.id === key)
         }
       }
