@@ -19,7 +19,7 @@ import WebSocket, { Server } from 'ws'
 import { decode } from 'jwt-simple'
 import { ClientControl, createClientService } from './service'
 import { connectWorkspace, WorkspaceProtocol } from './workspace'
-import { Class, Doc, DocumentProtocol, DocumentQuery, Ref, Tx } from '@anticrm/core'
+import { Class, Doc, DocumentProtocol, DocumentQuery, FindOptions, Ref, Tx } from '@anticrm/core'
 import {
   readRequest, Response, RPC_CALL_FIND, RPC_CALL_FINDONE, RPC_CALL_GEN_REF_ID, RPC_CALL_LOAD_DOMAIN, RPC_CALL_TX,
   RpcError,
@@ -95,8 +95,7 @@ export async function start (port: number, dbUri: string, host?: string): Promis
   }
 
   async function createClient (workspace: Promise<WorkspaceProtocol>, ws: ClientSocket & Client): Promise<ClientService> {
-    const client = await createClientService(workspace, ws, broadcaster)
-    return client
+    return await createClientService(workspace, ws, broadcaster)
   }
 
   async function getWorkspace (wsName: string): Promise<WorkspaceProtocol> {
@@ -140,9 +139,21 @@ export async function start (port: number, dbUri: string, host?: string): Promis
           case RPC_CALL_FINDONE:
             response.result = await ss.findOne(request.params[0] as Ref<Class<Doc>>, request.params[1] as DocumentQuery<Doc>)
             break
-          case RPC_CALL_FIND:
-            response.result = await ss.find(request.params[0] as Ref<Class<Doc>>, request.params[1] as DocumentQuery<Doc>)
+          case RPC_CALL_FIND: {
+            const findOptions = ((request.params[2] !== null && request.params[2] !== undefined) ? request.params[2] : {}) as FindOptions<Doc>
+            response.result = {}
+            findOptions.countCallback = (skip, limit, count) => {
+              response.result.skip = skip
+              response.result.limit = limit
+              response.result.count = count
+            }
+            response.result.values = await ss.find(
+              request.params[0] as Ref<Class<Doc>>,
+              request.params[1] as DocumentQuery<Doc>,
+              findOptions // Convert to undefined.
+            )
             break
+          }
           case RPC_CALL_GEN_REF_ID:
             response.result = await ss.genRefId(request.params[0] as Ref<Space>)
             break

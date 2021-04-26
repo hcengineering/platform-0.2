@@ -20,7 +20,7 @@ import {
   CORE_CLASS_MIXIN,
   CORE_CLASS_OBJ, CORE_MIXIN_INDICES, Doc, Mixin, Obj, Property, PropertyType, Ref, Type
 } from './classes'
-import { DocumentQuery, DocumentValue, generateId, RegExpression, Storage, TxContext } from './storage'
+import { DocumentQuery, DocumentValue, FindOptions, generateId, RegExpression, Storage, TxContext } from './storage'
 
 export function mixinKey (mixin: Ref<Mixin<Obj>>, key: string): string {
   return key + '|' + mixin.replace('.', '~')
@@ -597,19 +597,25 @@ export class Model implements Storage {
 
   // Q U E R Y
 
-  findSync<T extends Doc> (clazz: Ref<Class<Doc>>, query: DocumentQuery<T>, limit = -1): T[] {
+  findSync<T extends Doc> (clazz: Ref<Class<Doc>>, query: DocumentQuery<T>, options?: FindOptions<T>): T[] {
     const { query: realQuery } = this.createQuery(clazz, query)
     const byClass = this.objectsOfClass(realQuery._class as Ref<Class<Doc>>)
 
-    return this.findAll(byClass, clazz, realQuery as unknown as AnyLayout, limit) as T[]
+    return this.findAll(byClass, clazz, realQuery as unknown as AnyLayout, options) as T[]
   }
 
-  async find<T extends Doc> (clazz: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T[]> {
-    return await Promise.resolve(this.findSync(clazz, query))
+  async find<T extends Doc> (clazz: Ref<Class<T>>, query: DocumentQuery<T>, options?: FindOptions<T>): Promise<T[]> {
+    const result = this.findSync(clazz, query, options)
+
+    if (options?.countCallback !== undefined) {
+      options.countCallback(options?.skip ?? 0, options?.limit ?? 0, result.length)
+    }
+
+    return await Promise.resolve(result)
   }
 
   async findOne<T extends Doc> (clazz: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined> {
-    const result = await Promise.resolve(this.findSync(clazz, query, 1))
+    const result = await Promise.resolve(this.findSync(clazz, query, { limit: 1 }))
     return result.length === 0 ? undefined : result[0]
   }
 
@@ -620,19 +626,33 @@ export class Model implements Storage {
    * @param query  - to match
    * @param limit - a number of items to find, pass value <= 0 to find all
    */
-  protected findAll (docs: Doc[], _class: Ref<Class<Doc>>, query: AnyLayout, limit = -1): Doc[] {
+  protected findAll (docs: Doc[], _class: Ref<Class<Doc>>, query: AnyLayout, options?: FindOptions<any>): Doc[] {
     const result: Doc[] = []
     const clazz = this.getClass(_class)
+    let skip = 0
+    let limit = 0
+
+    if (options?.skip !== undefined) {
+      skip = options.skip
+    }
+    if (options?.limit !== undefined) {
+      limit = options.limit
+    }
+
     for (const doc of docs) {
       if (this.matchQuery(_class, doc, query)) {
         if (clazz === _class) {
           // Push original document.
-          result.push(doc)
+          if (skip > 0) {
+            skip--
+          } else {
+            result.push(doc)
+          }
         } else {
           // In case of mixin we need to cast
           result.push(this.as(doc, _class as Ref<Mixin<Doc>>))
         }
-        if (limit > 0 && result.length > limit) {
+        if (limit > 0 && result.length >= limit) {
           return result
         }
       }

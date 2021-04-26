@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Class, Doc, DocumentQuery, generateId, Model, Ref, Storage, TxContext } from '@anticrm/core'
+import { Class, Doc, DocumentQuery, FindOptions, generateId, Model, Ref, Storage, TxContext } from '@anticrm/core'
 import { QueryResult, Subscriber, Unsubscribe } from '.'
 import { TxOperation } from '@anticrm/domains'
 
@@ -30,6 +30,8 @@ interface Query<T extends Doc> {
 
   // A ordered results with some additional flags.
   results: T[]
+
+  options?: FindOptions<T>
 }
 
 enum UpdateOp {
@@ -50,7 +52,7 @@ export class QueriableStorage implements Domain {
   }
 
   private async refresh<T extends Doc> (query: Query<T>): Promise<void> {
-    const result = await this.find(query._class, query.query)
+    const result = await this.find(query._class, query.query, query.options)
 
     query.results = result
     query.subscriber(result)
@@ -123,8 +125,8 @@ export class QueriableStorage implements Domain {
     }
   }
 
-  async find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T[]> {
-    return await this.proxy.find<T>(_class, query)
+  async find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>, options?: FindOptions<T>): Promise<T[]> {
+    return await this.proxy.find<T>(_class, query, options)
   }
 
   async findOne<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined> {
@@ -132,7 +134,7 @@ export class QueriableStorage implements Domain {
   }
 
   // TODO: move to platform core
-  query<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): QueryResult<T> {
+  query<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>, options?: FindOptions<T>): QueryResult<T> {
     return {
       subscribe: (subscriber: Subscriber<T>) => {
         const q: Query<Doc> = {
@@ -140,7 +142,8 @@ export class QueriableStorage implements Domain {
           _class,
           query,
           subscriber: subscriber as Subscriber<Doc>,
-          results: []
+          results: [],
+          options
         }
         q.unsubscriber = () => {
           this.queries.delete(q._id)

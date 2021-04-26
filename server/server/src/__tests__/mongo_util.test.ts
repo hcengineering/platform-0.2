@@ -303,4 +303,49 @@ describe('mongo operations', () => {
     expect(result.length).toEqual(1)
     expect(result[0].name).toEqual('task2')
   })
+
+  it('check limit', async () => {
+    const ws = await server.getWorkspace(wsName)
+
+    const processTx = async (tx: Tx): Promise<void> => {
+      await ws.tx(txContext(), tx)
+    }
+    const ops = createOperations(await ws.getModel(), processTx, () => 'qwe' as StringProperty)
+
+    for (let i = 0; i < 50; i++) {
+      const doc1: DocumentValue<Task> = {
+        name: `my-task-${i}`,
+        description: `${i * i}`,
+        lists: [`${i}`],
+        rate: 20 + i,
+        tasks: []
+      }
+      await ops.create<Task>(task.class.Task, doc1)
+    }
+
+    const r = await ws.find(task.class.Task, {}, { limit: 10 })
+    expect(r.length).toEqual(10)
+  })
+  it('check skip', async () => {
+    const ws = await server.getWorkspace(wsName)
+
+    const processTx = async (tx: Tx): Promise<void> => {
+      await ws.tx(txContext(), tx)
+    }
+    const ops = createOperations(await ws.getModel(), processTx, () => 'qwe' as StringProperty)
+
+    for (let i = 0; i < 50; i++) {
+      const doc1: DocumentValue<Task> = {
+        name: `my-task-${i}`,
+        description: `${i * i}`,
+        lists: [`${i}`],
+        rate: 20 + i,
+        tasks: []
+      }
+      await ops.create<Task>(task.class.Task, doc1)
+    }
+
+    const r = await ws.find(task.class.Task, {}, { skip: 10 })
+    expect(r.length).toEqual(40)
+  })
 })

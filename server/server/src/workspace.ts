@@ -15,7 +15,7 @@
 
 import { withTenant } from '@anticrm/accounts'
 import {
-  AnyLayout, Class, combineStorage, Doc, DocumentProtocol, DocumentQuery, Model, MODEL_DOMAIN, Ref, Storage, Tx,
+  AnyLayout, Class, combineStorage, Doc, DocumentProtocol, DocumentQuery, FindOptions, Model, MODEL_DOMAIN, Ref, Storage, Tx,
   TxContext, TxProcessor
 } from '@anticrm/core'
 import { CORE_CLASS_SPACE, Space, TxOperation, TxOperationKind, VDoc } from '@anticrm/domains'
@@ -26,7 +26,7 @@ import { TitleIndex } from '@anticrm/domains/src/indices/title'
 import { TxIndex } from '@anticrm/domains/src/indices/tx'
 import { VDocIndex } from '@anticrm/domains/src/indices/vdoc'
 import { ClientTxStorage } from '@anticrm/platform-core/src/clienttx'
-import { Collection, MongoClient, UpdateOneOptions, UpdateQuery } from 'mongodb'
+import { Collection, MongoClient, SortOptionObject, UpdateOneOptions, UpdateQuery } from 'mongodb'
 import type { FindAndModifyWriteOpResultObject } from 'mongodb'
 import { createPullArrayFilters, createPushArrayFilters, createSetArrayFilters } from './mongo_utils'
 
@@ -127,22 +127,82 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
       return await collection(_class).deleteOne({ _id })
     },
 
-    async find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T[]> {
-      return await collection(_class)
-        .find({
-          ...memdb.assign({}, _class, query as AnyLayout),
-          _class: memdb.getClass(_class)
-        })
-        .toArray()
+    async find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>, options?: FindOptions<T>): Promise<T[]> {
+      const { query: finalQuery, classes } = memdb.createQuery(_class, query, true)
+
+      if (classes.length > 1) {
+        // Replace _class query to find all suitable instances.
+        (finalQuery as any)._class = { $in: classes }
+      }
+
+      // We should use aggregation and return a number of elements if we had limit or skip specified.
+      if (options?.limit !== undefined || options?.skip !== undefined) {
+        const resultQuery: any = [
+          { $match: finalQuery },
+          { $skip: options.skip ?? 0 }
+        ]
+        if (options?.limit !== undefined) {
+          resultQuery.push({ $limit: options.limit ?? 0 })
+        }
+        if (options?.sort !== undefined) {
+          resultQuery.push({ $sort: options.sort ?? {} })
+        }
+        const resultValue = collection(_class).aggregate<any>([{
+          $facet: {
+            results: resultQuery,
+            totalCount: [
+              { $match: finalQuery },
+              {
+                $group: {
+                  _id: null,
+                  count: { $sum: 1 }
+                }
+              }
+            ]
+          }
+        }])
+        const resValue = (await resultValue.toArray())[0]
+
+        // Notify callback about counts.
+        if (options?.countCallback !== undefined) {
+          if (resValue.totalCount.length > 0) {
+            options.countCallback(options.skip ?? 0, options.limit ?? 0, resValue.totalCount[0].count)
+          } else {
+            options.countCallback(options.skip ?? 0, options.limit ?? 0, 0)
+          }
+        }
+
+        return resValue.results
+      }
+
+      // Use standalone without limit and skip.
+      let cursor = collection(_class).find(finalQuery)
+
+      if (options?.sort !== undefined) {
+        cursor = cursor.sort(options.sort as SortOptionObject<Doc>)
+      }
+
+      const values = await cursor.toArray()
+      // Notify callback about counts.
+      if (options?.countCallback !== undefined) {
+        options.countCallback(0, 0, values.length)
+      }
+      return values
     },
 
     async findOne<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined> {
-      const res = await collection(_class)
-        .findOne({
-          ...memdb.assign({}, _class, query as AnyLayout),
-          _class: memdb.getClass(_class)
-        })
-      return res
+      const { query: finalQuery, classes } = memdb.createQuery(_class, query, true)
+
+      if (classes.length > 0) {
+        // Replace _class query to find all suitable instances.
+        (query as any)._class = { $in: [classes] }
+      }
+
+      const result = await collection(_class).findOne<T>(finalQuery)
+      if (result === null) {
+        return undefined
+      }
+      return result
     }
   }
 
@@ -161,44 +221,17 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
   const clientControl: WorkspaceProtocol = {
     // C O R E  P R O T O C O L
 
-    async find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T[]> {
-      const { query: finalQuery, classes } = memdb.createQuery(_class, query, true)
-
-      if (classes.length > 1) {
-        // Replace _class query to find all suitable instances.
-        (finalQuery as any)._class = { $in: classes }
-      }
-
-      const cursor = collection(_class).find<T>(finalQuery)
-
-      const result = await cursor.toArray()
-      return result
-    },
-
-    async findOne<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined> {
-      const { query: finalQuery, classes } = memdb.createQuery(_class, query, true)
-
-      if (classes.length > 0) {
-        // Replace _class query to find all suitable instances.
-        (query as any)._class = { $in: [classes] }
-      }
-
-      const result = await collection(_class).findOne<T>(finalQuery)
-      if (result == null) {
-        return undefined
-      }
-      return result
-    },
+    find: mongoStorage.find,
+    findOne: mongoStorage.findOne,
 
     async tx (txContext: TxContext, tx: Tx): Promise<any> {
-      console.log('processing tx:', JSON.stringify(tx))
       return await txProcessor.process(txContext, tx)
     },
 
     async loadDomain (domain: string): Promise<Doc[]> {
       if (domain === MODEL_DOMAIN) return memdb.dump()
       console.log('domain:', domain)
-      return await db.collection(domain).find<Doc>({}).toArray()
+      return await db.collection(domain).find({}).toArray()
     },
 
     async genRefId (_space: Ref<Space>): Promise<Ref<Doc>> {

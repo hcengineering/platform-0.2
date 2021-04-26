@@ -24,7 +24,7 @@ import { QueriableStorage } from './queries'
 
 import { Cache } from './cache'
 import {
-  Class, CoreProtocol, Doc, DocumentQuery, generateId as genId, MODEL_DOMAIN, Ref, StringProperty, Tx, txContext,
+  Class, CoreProtocol, Doc, DocumentQuery, FindOptions, generateId as genId, MODEL_DOMAIN, Ref, StringProperty, Tx, txContext,
   TxContextSource, TxProcessor
 } from '@anticrm/core'
 import { CORE_CLASS_REFERENCE, CORE_CLASS_SPACE, CORE_CLASS_TITLE, Space, TITLE_DOMAIN, VDoc } from '@anticrm/domains'
@@ -34,7 +34,7 @@ import { createOperations } from './operations'
 import { ModelIndex } from '@anticrm/domains/src/indices/model'
 import { VDocIndex } from '@anticrm/domains/src/indices/vdoc'
 import { TxIndex } from '@anticrm/domains/src/indices/tx'
-import { RPC_CALL_FIND, RPC_CALL_FINDONE, RPC_CALL_GEN_REF_ID, RPC_CALL_LOAD_DOMAIN, RPC_CALL_TX } from '@anticrm/rpc'
+import { RPC_CALL_FIND, RPC_CALL_FINDONE, RPC_CALL_GEN_REF_ID, RPC_CALL_LOAD_DOMAIN, RPC_CALL_TX, FindResponse } from '@anticrm/rpc'
 import { PassthroughsIndex } from '@anticrm/domains/src/indices/filter'
 
 /*!
@@ -47,9 +47,12 @@ export default async (platform: Platform): Promise<CoreService> => {
   const model = new ModelDb()
 
   const coreProtocol: CoreProtocol = {
-    async find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T[]> {
-      const result = (await rpc.request<T[]>(RPC_CALL_FIND, _class, query))
-      return result.map((it) => model.as(it, _class))
+    async find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>, options?: FindOptions<T>): Promise<T[]> {
+      const rpcResult = (await rpc.request<FindResponse<T>>(RPC_CALL_FIND, _class, query, options !== undefined ? options : null /* we send null since use JSON */))
+      if (options?.countCallback !== undefined) {
+        options.countCallback(rpcResult.skip, rpcResult.limit, rpcResult.count)
+      }
+      return rpcResult.values.map((it) => model.as(it, _class))
     },
     async findOne<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined> {
       const result = (await rpc.request<T>(RPC_CALL_FINDONE, _class, query))
@@ -109,9 +112,9 @@ export default async (platform: Platform): Promise<CoreService> => {
     processTransactions(txs as Tx[]) // eslint-disable-line
   })
 
-  async function find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T[]> {
+  async function find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>, options?: FindOptions<T>): Promise<T[]> {
     const domain = domains.get(model.getDomain(_class))
-    return await (domain ?? qCache).find(_class, query)
+    return await (domain ?? qCache).find(_class, query, options)
   }
 
   async function findOne<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined> {
@@ -119,9 +122,9 @@ export default async (platform: Platform): Promise<CoreService> => {
     return await (domain ?? qCache).findOne(_class, query)
   }
 
-  function query<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): QueryResult<T> {
+  function query<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>, options?: FindOptions<T>): QueryResult<T> {
     const domain = domains.get(model.getDomain(_class))
-    return (domain ?? qCache).query(_class, query)
+    return (domain ?? qCache).query(_class, query, options)
   }
 
   function generateId (): Ref<Doc> {

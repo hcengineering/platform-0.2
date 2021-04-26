@@ -655,4 +655,30 @@ describe('mixin tools', () => {
     expect(q2).toBeDefined()
     expect(t1).toBeDefined()
   })
+
+  it('find limit check', async () => {
+    const model = new Model('vdocs')
+    model.loadModel(data)
+
+    model.add(model.createDocument(taskIds.class.Task, createTask('t1', 10, 'test task1')))
+    model.add(model.createDocument(taskIds.class.Task, createTask('t2', 11, 'test task2')))
+    model.add(model.createDocument(taskIds.class.Task, createTask('t3', 12, 'test task3')))
+
+    const result = await model.find(taskIds.class.Task, { }, { limit: 1 })
+    expect(result).toBeDefined()
+    expect(result.length).toEqual(1)
+  })
+
+  it('find limit check-skip', async () => {
+    const model = new Model('vdocs')
+    model.loadModel(data)
+
+    model.add(model.createDocument(taskIds.class.Task, createTask('t1', 10, 'test task1')))
+    model.add(model.createDocument(taskIds.class.Task, createTask('t2', 11, 'test task2')))
+    model.add(model.createDocument(taskIds.class.Task, createTask('t3', 12, 'test task3')))
+
+    const result = await model.find(taskIds.class.Task, { }, { skip: 1 })
+    expect(result).toBeDefined()
+    expect(result.length).toEqual(2)
+  })
 })

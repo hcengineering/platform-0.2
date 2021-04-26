@@ -33,6 +33,11 @@
   let modelClass: Ref<Class<Doc>>
   let attributes: AttrModel[] = []
 
+  let offset = 0
+  let total = 0
+  let pos = 0
+  const limit = 100
+
   $: {
     if (_class && _class !== modelClass) {
       getPresentationService()
@@ -47,14 +52,48 @@
 
   let objects: VDoc[] = []
   let lq: Promise<QueryUpdater<VDoc>>
-  $: lq = liveQuery<VDoc>(lq, _class, { _space: space._id as Ref<Space> }, (docs) => {
-    objects = docs
-  })
+  $: lq = liveQuery<VDoc>(
+    lq,
+    _class,
+    { _space: space._id as Ref<Space> },
+    (docs) => {
+      objects = docs
+    },
+    {
+      limit,
+      skip: pos,
+      countCallback: (skip, limit, count) => {
+        offset = skip
+        total = count
+      }
+    }
+  )
   function attrValue (doc: VDoc, key: string): any {
     return (doc as any)[key]
   }
 </script>
 
+{#if total > 0}
+  Items {offset + 1} to {Math.min(total, offset + limit)} of {total}
+  {#if pos + limit < total}
+    <div
+      on:click={() => {
+        pos = pos + limit
+      }}>
+      Next
+    </div>
+  {/if}
+  {#if pos > 0}
+    <div
+      on:click={() => {
+        pos = pos - limit
+      }}>
+      Previous
+    </div>
+  {/if}
+{:else}
+  No Items
+{/if}
 <div class="erp-table">
   <div class="thead">
     <div class="tr">
