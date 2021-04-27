@@ -85,7 +85,7 @@
     }
     &:focus {
       background-color: var(--theme-primary-focused);
-      border-color: var(--theme-primary-border);
+      border-color: var(--theme-primary-focused-border);
       box-shadow: 0 0 0 2px var(--theme-primary-outline);
     }
     &:active {

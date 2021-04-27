@@ -55,6 +55,7 @@
     }
     input {
       height: 52px;
+      margin: 0;
       padding: 14px 20px 0px;
       color: var(--theme-caption-color);
       background-color: transparent;
