@@ -40,7 +40,7 @@ limitations under the License.
     }
   })
 
-  function getCaption(model: Model, doc: VDoc): string {
+  function getCaption (model: Model, doc: VDoc): string {
     let result = ''
     model.asMixin(doc, CORE_MIXIN_SHORTID, (m) => {
       result = m.shortId + ' - '
@@ -52,7 +52,7 @@ limitations under the License.
     return result
   }
 
-  function getDescription(model: Model, doc: VDoc): string[] {
+  function getDescription (model: Model, doc: VDoc): string[] {
     const result: any[] = []
     model
       .getAllAttributes(doc._class)

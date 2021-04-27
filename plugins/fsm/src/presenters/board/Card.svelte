@@ -54,7 +54,7 @@ limitations under the License.
     }
   )
 
-  function handlePanStart(event: PanStartEvent) {
+  function handlePanStart (event: PanStartEvent) {
     coords.stiffness = coords.damping = 1
     drag = true
 
@@ -66,7 +66,7 @@ limitations under the License.
     dispatch('drag', { doc, dragged: true, event })
   }
 
-  function handlePanMove(event: PanMoveEvent) {
+  function handlePanMove (event: PanMoveEvent) {
     coords.update(() => ({
       x: ($coords.x as number) + event.detail.dx,
       y: ($coords.y as number) + event.detail.dy
@@ -74,7 +74,7 @@ limitations under the License.
     dispatch('move', { doc, dragged: true, coords: $coords, event: event })
   }
 
-  function handlePanEnd(event: PanEndEvent) {
+  function handlePanEnd (event: PanEndEvent) {
     coords.stiffness = 0.4
     coords.damping = 0.8
     coords.set({ x: 0, y: 0 })
@@ -83,7 +83,7 @@ limitations under the License.
     dispatch('move', { doc, dragged: false, coords: $coords, event: event } as CardDragEvent<Doc>)
   }
 
-  function calcStyle(coords: Pos, width: number, height: number): string {
+  function calcStyle (coords: Pos, width: number, height: number): string {
     return `width: ${drag ? width.toString() + 'px' : 'inherit'};
             height: ${drag ? height.toString() + 'px' : 'inherit'};
             transform:

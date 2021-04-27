@@ -32,9 +32,9 @@ limitations under the License.
   export let target: WithFSM
 
   let cs: CoreService | undefined
-  let fsmServiceP = getFSMService()
+  const fsmServiceP = getFSMService()
 
-  async function init() {
+  async function init () {
     cs = await getCoreService()
   }
 
@@ -47,7 +47,7 @@ limitations under the License.
     divTasks: any
   }
 
-  let fsm = writable<FSM | undefined>(undefined)
+  const fsm = writable<FSM | undefined>(undefined)
   let fsmQuery: Promise<QueryUpdater<FSM>> | undefined
 
   $: fsmQuery = liveQuery(
@@ -114,7 +114,7 @@ limitations under the License.
 
   let dragDoc: VDoc | null = null
 
-  function docsFor(vdocs: VDoc[], status: any): VDoc[] {
+  function docsFor (vdocs: VDoc[], status: any): VDoc[] {
     if (!cs) {
       return []
     }
@@ -142,13 +142,13 @@ limitations under the License.
     return res
   }
 
-  function changeStat(sid: any): void {
+  function changeStat (sid: any): void {
     hiddenStatuses.has(sid) ? hiddenStatuses.delete(sid) : hiddenStatuses.add(sid)
 
     hiddenStatuses = hiddenStatuses
   }
 
-  function onDrag(value: CustomEvent<CardDragEvent<VDoc>>): void {
+  function onDrag (value: CustomEvent<CardDragEvent<VDoc>>): void {
     if (!cs) {
       return
     }
@@ -173,14 +173,14 @@ limitations under the License.
     }
   }
 
-  function onMove(value: unknown): void {
+  function onMove (value: unknown): void {
     const event = value.detail.event
     if (dragIn !== whereInStatus(event.detail.x)) {
       dragIn = whereInStatus(event.detail.x)
     }
   }
 
-  function whereInStatus(coordX: number): any | null {
+  function whereInStatus (coordX: number): any | null {
     for (const el of $statusesS) {
       const obj = el.divTasks.getBoundingClientRect()
       if (coordX >= obj.left && coordX <= obj.right) {
@@ -190,7 +190,7 @@ limitations under the License.
     return null
   }
 
-  function getState(doc: VDoc): any {
+  function getState (doc: VDoc): any {
     if (!cs) {
       return
     }
