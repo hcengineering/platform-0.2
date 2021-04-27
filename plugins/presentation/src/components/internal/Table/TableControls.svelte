@@ -14,11 +14,10 @@
 -->
 <script lang="ts">
   import { createEventDispatcher, getContext } from 'svelte'
-  import { filter } from './utils'
+  import { stringFilter } from './utils'
   const dispatch = createEventDispatcher()
   const stateContext = getContext('table-state')
 
-  export let index = -1
   export let text = ''
 
   export let labels = {
@@ -29,25 +28,16 @@
     const state = stateContext.getState()
     const detail = {
       originalEvent: event,
-      filter,
-      index,
+      stringFilter,
       text,
-      page: state.page,
-      pageIndex: state.pageIndex,
-      pageSize: state.pageSize,
       rows: state.filteredRows
     }
     dispatch('search', detail)
 
-    if (detail.preventDefault !== true) {
-      if (detail.text.length === 0) {
-        stateContext.setRows(state.rows)
-      } else {
-        stateContext.setRows(detail.rows.filter((r) => detail.filter(r, detail.text, index)))
-      }
-      stateContext.setPage(0, 0)
+    if (detail.text.length === 0) {
+      stateContext.setRows(state.rows)
     } else {
-      stateContext.setRows(detail.rows)
+      stateContext.setRows(detail.rows.filter((r) => detail.stringFilter(r, detail.text)))
     }
   }
 </script>
@@ -66,9 +56,11 @@
 <style lang="scss">
   .control-container {
     width: 100%;
-    height: 50px;
+    height: 64px;
     background: var(--theme-bg-accent-color);
-    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.03); //there no such color in theme
+    box-sizing: border-box;
+    border-radius: 12px;
     margin: 20px;
     display: flex;
     align-items: center;

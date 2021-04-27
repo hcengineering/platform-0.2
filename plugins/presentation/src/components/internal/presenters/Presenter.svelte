@@ -27,18 +27,29 @@
   export let attribute: AttrModel
   export let editable = true
   export let maxWidth = 300
+  export let maxHeight = 72
 
   let component: Promise<any>
 
   const platform = getContext('platform') as Platform
   $: component = is ? platform.getResource(is) : null
+
+  const styles = {
+    'max-width': `${maxWidth}px`,
+    'max-height': `${maxHeight}px`,
+    overflow: 'hidden'
+  }
+
+  $: cssVarStyles = Object.entries(styles)
+    .map(([key, value]) => `${key}:${value}`)
+    .join(';')
 </script>
 
 {#if component}
   {#await component}
     <Spinner />
   {:then ctor}
-    <div style={`max-width: ${maxWidth}px`}>
+    <div style={cssVarStyles}>
       <svelte:component this={ctor} {attribute} {value} {editable} on:change />
     </div>
   {:catch err}

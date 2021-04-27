@@ -14,25 +14,21 @@
 -->
 <script lang="ts">
   import type { AttrModel } from '../../../index'
-  import type { Class, Doc, Ref } from '@anticrm/core'
+  import type { Class, Ref } from '@anticrm/core'
   import { createEventDispatcher, setContext } from 'svelte'
   import TableControls from './TableControls.svelte'
-  import Pagination from './Pagination.svelte'
   import Sort from './Sort.svelte'
   import Presenter from '../presenters/Presenter.svelte'
+  import { VDoc } from '@anticrm/domains'
 
   const dispatch = createEventDispatcher()
 
   export let attributes: AttrModel[] = []
   export let rows: any[] = []
-  export let _class: Ref<Class<Doc>>
+  export let _class: Ref<Class<VDoc>>
   export let editable = false
 
-  export let page = 0
-  // the shown page index
-  export let pageIndex = 0
-  // rows amount at the page
-  export const pageSize = 10
+  export const pageSize = 30
   export let labels = {
     empty: 'No records available'
   }
@@ -40,20 +36,14 @@
   // all rows after searching
   $: filteredRows = rows
   // filtered rows at the page
-  $: visibleRows = filteredRows.slice(pageIndex, pageIndex + pageSize)
+  $: visibleRows = filteredRows.slice(0, pageSize)
 
   setContext('table-state', {
     getState: () => ({
-      page,
-      pageIndex,
       pageSize,
       rows,
       filteredRows
     }),
-    setPage: (_page, _pageIndex) => {
-      page = _page
-      pageIndex = _pageIndex
-    },
     setRows: (_rows) => (filteredRows = _rows)
   })
 
@@ -64,12 +54,15 @@
   function onSort (event) {
     // TODO: implement sorting feature with the core service
   }
+
+  function onSearch (event) {}
+
 </script>
 
 <div class="table-component">
   <!-- control panel-->
   <slot name="controls">
-    <svelte:component this={TableControls} />
+    <svelte:component this={TableControls} on:search={onSearch}/>
   </slot>
 
   <table>
@@ -102,7 +95,12 @@
             {#each attributes as attr (attr.key)}
               <td>
                 {#if attr.presenter}
-                  <Presenter is={attr.presenter} value={object[attr.key]} attribute={attr} {editable} />
+                  <Presenter
+                    is={attr.presenter}
+                    value={object[attr.key]}
+                    attribute={attr}
+                    maxWidth={350}
+                    {editable} />
                 {:else}
                   <span>{object[attr.key] || ''}</span>
                 {/if}
@@ -114,8 +112,6 @@
     {/if}
   </table>
 
-  <!--pagination-->
-  <Pagination {page} {pageSize} count={filteredRows.length - 1} />
 </div>
 
 <style lang="scss">
@@ -134,12 +130,11 @@
 
   table {
     width: 100%;
-    border-spacing: 0;
+    margin-left: 12px;
+    border-collapse: collapse;
+    border-spacing: 0.5rem;
     border-radius: 15px;
 
-    tr {
-      margin: 0 20px;
-    }
 
     thead {
       border-bottom: 1px solid var(--theme-bg-accent-color);
@@ -165,15 +160,12 @@
 
       tr {
         background-color: var(--theme-bg-color);
+        border-bottom: 1px solid var(--theme-bg-accent-color);
 
-        &:nth-child(odd) {
-          background-color: var(--theme-bg-accent-color);
+        &:last-child {
+          border-bottom: none;
         }
       }
-    }
-
-    td {
-      padding: 12px 8px;
     }
   }
 </style>
