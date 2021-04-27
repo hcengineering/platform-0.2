@@ -20,6 +20,7 @@
   },
   "scripts": {
     "build": "tsc",
+    "build:docs": "echo 'no docs yet'",
     "dump": "ts-node -T src/index.ts",
     "lint": "eslint --max-warnings=0 src",
     "lint:fix": "eslint --fix src",

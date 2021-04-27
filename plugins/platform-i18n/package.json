@@ -6,6 +6,7 @@
   "license": "EPL-2.0",
   "scripts": {
     "build": "tsc",
+    "build:docs": "echo 'no docs yet'",
     "test": "echo 'no tests'",
     "lint": "eslint --max-warnings=0 src",
     "lint:fix": "eslint --fix src"

@@ -97,3 +97,8 @@ Create symlink to format and autofix changed files on commit:
 ```bash
 ln -s ../../scripts/hooks/pre-commit .git/hooks/pre-commit
 ```
+
+
+## Generate documenation
+
+yarn install && yarn build && yarn build:docs && cd docs && npm install && npm run build
