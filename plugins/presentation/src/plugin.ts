@@ -178,7 +178,7 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
     abstract getAttribute (key: string, _class?: Ref<Class<Obj>>): AttrModel | undefined
     abstract getGroups (): GroupModel[]
     abstract getOwnAttributes (_class: Ref<Class<Obj>>): AttrModel[]
-    abstract getMixins(): MixinGroupModel[]
+    abstract getMixins (): MixinGroupModel[]
     abstract getMixin (_mixin: Ref<Mixin<Obj>>): MixinGroupModel | undefined
     abstract getAttributes (): AttrModel[]
     abstract getGroup (_class: Ref<Class<Obj>>): GroupModel | undefined
@@ -308,13 +308,17 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
     const attrModels = hierarchy.map(async (_class) => {
       return await getOwnAttrModel(_class)
     })
-    const mixinModels = model.getClassMixins(_class).map(_mixin => getMixinGroupModel(_class as Ref<Class<Obj>>, _mixin as Ref<Mixin<Doc>>))
-    const mixinAttrModels = model.getClassMixins(_class).map(_mixin => getOwnAttrModel(_mixin as Ref<Class<Obj>>))
+    const mixinModels = model.getClassMixins(_class).map(async (_mixin) => {
+      return await getMixinGroupModel(_class, _mixin as Ref<Mixin<Doc>>)
+    })
+    const mixinAttrModels = model.getClassMixins(_class).map(async (_mixin) => {
+      return await getOwnAttrModel(_mixin)
+    })
 
     const groups = await Promise.all(groupModels)
     const mixins = await Promise.all(mixinModels)
     let attributes = await Promise.all(attrModels).then(result => result.reduce((acc, val) => acc.concat(val), []))
-    attributes = attributes.concat(await Promise.all(mixinAttrModels).then(result => result.length ? result.reduce((acc, val) => acc.concat(val), []) : []))
+    attributes = attributes.concat(await Promise.all(mixinAttrModels).then(result => result.length > 0 ? result.reduce((acc, val) => acc.concat(val), []) : []))
 
     return new TClassModel(groups, attributes, mixins)
   }

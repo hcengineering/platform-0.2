@@ -111,25 +111,25 @@ export interface MixinGroupModel extends GroupModel {
 }
 
 export interface ClassModel {
-  getGroups (): GroupModel[]
+  getGroups: () => GroupModel[]
 
-  getGroup (_class: Ref<Class<Obj>>): GroupModel | undefined
+  getGroup: (_class: Ref<Class<Obj>>) => GroupModel | undefined
 
-  getOwnAttributes (_class: Ref<Class<Obj>>): AttrModel[] // TODO: why do we have this here, but not within Group?
+  getOwnAttributes: (_class: Ref<Class<Obj>>) => AttrModel[] // TODO: why do we have this here, but not within Group?
 
-  getMixins (): MixinGroupModel[]
+  getMixins: () => MixinGroupModel[]
 
-  getMixin (_mixin: Ref<Mixin<Obj>>): MixinGroupModel | undefined
+  getMixin: (_mixin: Ref<Mixin<Obj>>) => MixinGroupModel | undefined
 
-  getAttributes (): AttrModel[]
+  getAttributes: () => AttrModel[]
 
-  getAttribute (key: string, _class?: Ref<Class<Obj>>): AttrModel | undefined
+  getAttribute: (key: string, _class?: Ref<Class<Obj>>) => AttrModel | undefined
 
-  filterAttributes (keys: string[]): ClassModel
+  filterAttributes: (keys: string[]) => ClassModel
 
-  getPrimary (): AttrModel | undefined
+  getPrimary: () => AttrModel | undefined
 
-  filterPrimary (): { model: ClassModel, primary: AttrModel | undefined }
+  filterPrimary: () => { model: ClassModel, primary: AttrModel | undefined }
 }
 
 export interface CoreDocument extends Document {
