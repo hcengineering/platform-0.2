@@ -6,6 +6,7 @@
   "license": "EPL-2.0",
   "scripts": {
     "build": "tsc",
+    "build:docs": "echo 'no docs yet'",
     "test": "echo 'no tests'",
     "preformat-svelte": "prettier -w **/*.svelte",
     "lint": "eslint --max-warnings=0 src",

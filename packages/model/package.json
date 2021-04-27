@@ -14,17 +14,17 @@
   },
   "dependencies": {
     "@anticrm/platform": "^0.2.0",
-    "lodash": "^4.17.20",
+    "lodash": "^4.17.21",
     "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.13.14",
     "@babel/preset-typescript": "^7.13.0",
-    "@microsoft/api-extractor": "^7.13.0",
-    "@types/lodash": "^4.14.161",
+    "@microsoft/api-extractor": "^7.14.0",
+    "@types/lodash": "^4.14.168",
     "@typescript-eslint/eslint-plugin": "^4.22.0",
     "@typescript-eslint/parser": "^4.22.0",
-    "eslint": "^7.24.0",
+    "eslint": "^7.25.0",
     "eslint-config-standard": "^16.0.2",
     "eslint-config-standard-with-typescript": "^20.0.0",
     "eslint-plugin-import": "^2.22.1",
@@ -32,7 +32,7 @@
     "eslint-plugin-promise": "^5.1.0",
     "eslint-plugin-standard": "^5.0.0",
     "simplytyped": "^3.3.0",
-    "ts-jest": "^26.4.4",
+    "ts-jest": "^26.5.5",
     "ts-node": "^9.1.1",
     "typescript": "^4.2.4"
   }

@@ -16,7 +16,7 @@
     "@babel/eslint-parser": "^7.13.14",
     "@babel/preset-env": "^7.12.11",
     "@babel/preset-typescript": "^7.13.0",
-    "@microsoft/api-extractor": "^7.13.0",
+    "@microsoft/api-extractor": "^7.14.0",
     "@types/jest": "^26.0.20",
     "@typescript-eslint/eslint-plugin": "^4.22.0",
     "@typescript-eslint/parser": "^4.22.0",

@@ -14,7 +14,7 @@
   "devDependencies": {
     "@babel/eslint-parser": "^7.13.14",
     "@babel/preset-typescript": "^7.13.0",
-    "@microsoft/api-extractor": "^7.13.0",
+    "@microsoft/api-extractor": "^7.14.0",
     "@types/jest": "^26.0.16",
     "@types/markdown-it": "^10.0.2",
     "@typescript-eslint/eslint-plugin": "^4.22.0",
