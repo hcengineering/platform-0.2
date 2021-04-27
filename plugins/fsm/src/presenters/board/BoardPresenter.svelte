@@ -26,13 +26,13 @@ limitations under the License.
   import Card from './Card.svelte'
   import type { CardDragEvent } from './cardHelper'
 
-  import { sortStates } from '../../utils'
-  import type { FSM, State, WithFSM, WithState } from '../..'
+  import { FSM, FSMService, getFSMService, State, WithFSM } from '../..'
   import fsmPlugin from '../..'
 
   export let target: WithFSM
 
   let cs: CoreService | undefined
+  let fsmServiceP = getFSMService()
 
   async function init() {
     cs = await getCoreService()
@@ -86,22 +86,29 @@ limitations under the License.
         return
       }
 
-      Promise.all(sortStates($fsm).map((_id) => cs?.findOne(fsmPlugin.class.State, { _id }))).then((states) => {
-        console.log('huh')
-        set(
-          states
-            .filter((x): x is State => !!x)
-            .map(
-              (state, idx) =>
-                ({
-                  id: state._id,
-                  label: state.name,
-                  defValue: idx === 0,
-                  divTasks: HTMLDocument
-                } as Status)
-            )
-        )
-      })
+      fsmServiceP
+        .then((fsmService) => fsmService.getStates($fsm))
+        .then((xs) => {
+          console.log(xs)
+          return xs
+        })
+        .then((xs) => Promise.all(xs.map((_id) => cs?.findOne(fsmPlugin.class.State, { _id }))))
+        .then((xs) => xs.filter((x): x is State => x !== undefined))
+        .then((states) => {
+          set(
+            states
+              .filter((x): x is State => !!x)
+              .map(
+                (state, idx) =>
+                  ({
+                    id: state._id,
+                    label: state.name,
+                    defValue: idx === 0,
+                    divTasks: HTMLDocument
+                  } as Status)
+              )
+          )
+        })
     },
     [] as Status[]
   )

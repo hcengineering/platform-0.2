@@ -11,7 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import core, { ArrayOf$, Builder, Class$, Mixin$, Prop, RefTo$, InstanceOf$ } from '@anticrm/model'
+import core, { ArrayOf$, Builder, Class$, Mixin$, Prop, RefTo$ } from '@anticrm/model'
 import { CORE_CLASS_STRING, Ref, Class, Doc, MODEL_DOMAIN } from '@anticrm/core'
 import { Application } from '@anticrm/domains'
 import { TDoc, TEmb, TMixin } from '@anticrm/model/src/__model__'
@@ -32,8 +32,8 @@ export class TFSM extends TDoc implements FSM {
 
   @UX('Name' as IntlString)
   @ArrayOf$()
-  @InstanceOf$(fsmPlugin.class.Transition)
-  transitions!: Transition[]
+  @RefTo$(fsmPlugin.class.Transition)
+  transitions!: Array<Ref<Transition>>
 
   @UX('TargetClasses' as IntlString)
   @ArrayOf$()
@@ -42,7 +42,7 @@ export class TFSM extends TDoc implements FSM {
 }
 
 @UX('Transition' as IntlString)
-@Class$(fsmPlugin.class.Transition, core.class.Emb)
+@Class$(fsmPlugin.class.Transition, core.class.Doc, MODEL_DOMAIN)
 export class TTransition extends TEmb implements Transition {
   @UX('From' as IntlString)
   @RefTo$(fsmPlugin.class.State)
@@ -145,22 +145,29 @@ class FSMBuilder {
       stateIDs.set(state.name, doc._id as Ref<State>)
     })
 
+    const transitions: Array<Ref<Transition>> = []
+
+    this.transitions.forEach(([fromName, toName]) => {
+      const from = stateIDs.get(fromName)
+      const to = stateIDs.get(toName)
+
+      if ((from == null) || (to == null)) {
+        return
+      }
+
+      const doc = S.createDocument(fsmPlugin.class.Transition, {
+        from,
+        to
+      })
+
+      transitions.push(doc._id)
+    })
+
     const fsm = S.createDocument(fsmPlugin.class.FSM, {
       name: this.name,
       application: this.appID,
       classes: this.classes,
-      transitions: this.transitions
-        .map(([fromName, toName]): Transition | undefined => {
-          const from = stateIDs.get(fromName)
-          const to = stateIDs.get(toName)
-
-          if ((from == null) || (to == null)) {
-            return undefined
-          }
-
-          return { from, to }
-        })
-        .filter((x): x is Transition => !(x == null))
+      transitions
     })
 
     return fsm

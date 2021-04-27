@@ -17,8 +17,7 @@ limitations under the License.
 
   import { Ref } from '@anticrm/core'
   import { getCoreService, liveQuery } from '@anticrm/presentation'
-  import fsmPlugin, { WithFSM } from '@anticrm/fsm'
-  import { sortStates } from '@anticrm/fsm/src/utils'
+  import fsmPlugin, { getFSMService, WithFSM } from '@anticrm/fsm'
 
   import UserInfo from '@anticrm/sparkling-controls/src/UserInfo.svelte'
   import ResumeProps from '@anticrm/person-extras/src/components/ResumeProps.svelte'
@@ -33,6 +32,7 @@ limitations under the License.
 
   const dispatch = createEventDispatcher()
   const coreP = getCoreService()
+  const fsmServiceP = getFSMService()
 
   export let object: WithCandidateProps | undefined
   let person: Person | undefined = object
@@ -53,7 +53,7 @@ limitations under the License.
     resume = object?.resume
   }
 
-  async function unassign () {
+  async function unassign() {
     if (!object || !candidate) {
       return
     }
@@ -70,7 +70,7 @@ limitations under the License.
     })
   }
 
-  async function assign (vacancyRef: Ref<Vacancy>) {
+  async function assign(vacancyRef: Ref<Vacancy>) {
     if (!object || !candidate) {
       return
     }
@@ -89,8 +89,9 @@ limitations under the License.
     if (isFSMVacancy) {
       const fsmID = model.as(vacancy, fsmPlugin.mixin.WithFSM).fsm
       const fsm = await core.findOne(fsmPlugin.class.FSM, { _id: fsmID })
+      const fsmService = await fsmServiceP
 
-      const initialState = fsm && sortStates(fsm)[0]
+      const initialState = fsm && (await fsmService.getStates(fsm))[0]
 
       if (initialState) {
         model.mixinDocument(baseDoc, fsmPlugin.mixin.WithState, {

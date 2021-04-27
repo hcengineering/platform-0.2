@@ -11,21 +11,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Class, Doc, Mixin, Ref, Emb } from '@anticrm/core'
+import { Class, Doc, Mixin, Ref } from '@anticrm/core'
 import core from '@anticrm/platform-core'
 import { Plugin, plugin, Service } from '@anticrm/platform'
 import { Application, VDoc } from '@anticrm/domains'
 import { ComponentExtension } from '@anticrm/presentation'
-import { AnyComponent } from '@anticrm/platform-ui'
+import { AnyComponent, getPlatform } from '@anticrm/platform-ui'
 
 export interface FSM extends Doc {
   name: string
   application: Ref<Application>
-  transitions: Transition[]
+  transitions: Array<Ref<Transition>>
   classes: Array<Ref<Class<VDoc>>>
 }
 
-export interface Transition extends Emb {
+export interface Transition extends Doc {
   from: Ref<State>
   to: Ref<State>
 
@@ -48,9 +48,11 @@ export interface State extends Doc {
   name: string
 }
 
-export interface FSMService extends Service {}
+export interface FSMService extends Service {
+  getStates: (fsm: FSM) => Promise<Array<Ref<State>>>
+}
 
-export default plugin(
+const fsmPlugin = plugin(
   'fsm' as Plugin<FSMService>,
   { core: core.id },
   {
@@ -70,3 +72,8 @@ export default plugin(
     }
   }
 )
+
+export default fsmPlugin
+
+export const getFSMService = async (): Promise<FSMService> =>
+  await getPlatform().getPlugin(fsmPlugin.id)
