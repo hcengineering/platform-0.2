@@ -312,7 +312,7 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
       return await getMixinGroupModel(_class, _mixin as Ref<Mixin<Doc>>)
     })
     const mixinAttrModels = model.getClassMixins(_class).map(async (_mixin) => {
-      return await getOwnAttrModel(_mixin)
+      return await getOwnAttrModel(_mixin as Ref<Class<Obj>>)
     })
 
     const groups = await Promise.all(groupModels)
