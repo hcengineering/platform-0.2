@@ -18,9 +18,9 @@ import VDocCardPresenter from './presenters/board/VDocCardPresenter.svelte'
 import type { FSMService } from '.'
 import fsm from '.'
 
-export default (platform: Platform): Promise<FSMService> => {
+export default async (platform: Platform): Promise<FSMService> => {
   platform.setResource(fsm.component.BoardPresenter, BoardPresenter)
   platform.setResource(fsm.component.VDocCardPresenter, VDocCardPresenter)
 
-  return Promise.resolve({})
+  return await Promise.resolve({})
 }

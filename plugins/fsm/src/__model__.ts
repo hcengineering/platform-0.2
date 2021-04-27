@@ -107,7 +107,7 @@ class FSMBuilder {
     this.classes = classes
   }
 
-  private getState (a: PureState) {
+  private getState (a: PureState): PureState | undefeined {
     if (!this.states.has(a.name)) {
       this.states.set(a.name, a)
     }
@@ -115,7 +115,7 @@ class FSMBuilder {
     return this.states.get(a.name)
   }
 
-  private _transition (a: PureState, b: PureState) {
+  private _transition (a: PureState, b: PureState): FSMBuilder {
     const existingA = this.getState(a)
     const existingB = this.getState(b)
 
@@ -129,14 +129,14 @@ class FSMBuilder {
   }
 
   // TODO: in future PureState will become {state: PureState, action: any}
-  transition (a: PureState, b: PureState | PureState[]) {
+  transition (a: PureState, b: PureState | PureState[]): FSMBuilder {
     (Array.isArray(b) ? b : [b])
       .forEach(x => this._transition(a, x))
 
     return this
   }
 
-  build (S: Builder) {
+  build (S: Builder): FSM {
     const stateIDs = new Map<string, Ref<State>>()
 
     this.states.forEach((state) => {

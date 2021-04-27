@@ -19,7 +19,7 @@ import type { FSM, State } from '.'
 // what to do with cycles because in general case FSM is not DAG
 // This implementation is just a placeholder to get states the same order
 // they are defined
-export const sortStates = (fsm: FSM): Ref<State>[] => {
+export const sortStates = (fsm: FSM): Array<Ref<State>> => {
   return [
     ...new Set<Ref<State>>(
       fsm.transitions.map(({ from, to }) => [from, to])
