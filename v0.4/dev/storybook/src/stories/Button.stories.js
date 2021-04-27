@@ -6,6 +6,8 @@ export default {
   argTypes: {
     label: { control: 'text' },
     primary: { control: 'boolean' },
+    disabled: { control: 'boolean' },
+    loading: { control: 'boolean' },
     width: { control: 'text' },
     onClick: { action: 'onClick' },
   },
@@ -41,4 +43,15 @@ PrimaryFullWidth.args = {
   label: 'Button',
   primary: true,
   width: '100%'
+};
+
+export const Disabled = Template.bind({});
+Disabled.args = {
+  label: 'Disabled',
+  disabled: true
+};
+
+export const Loading = Template.bind({});
+Loading.args = {
+  loading: true
 };
