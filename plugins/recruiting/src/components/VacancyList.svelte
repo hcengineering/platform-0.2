@@ -13,38 +13,69 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte'
+  import { onDestroy } from 'svelte'
 
+  import { Ref } from '@anticrm/core'
   import { QueryUpdater } from '@anticrm/platform-core'
   import type { Space } from '@anticrm/domains'
   import { liveQuery } from '@anticrm/presentation'
+  import { newRouter } from '@anticrm/platform-ui'
 
+  import Button from '@anticrm/sparkling-controls/src/Button.svelte'
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
+
+  import VacancyC from './Vacancy.svelte'
 
   import recruiting from '..'
   import type { Vacancy } from '..'
-  import { Ref } from '@anticrm/core'
 
   export let space: Space
 
-  const dispatch = createEventDispatcher()
+  let vacancy: string | undefined
+
+  const router = newRouter<{ vacancy?: string }>('?vacancy', (match) => {
+    vacancy = match.vacancy
+  })
+
+  const onOpen = (vacancy: string) => {
+    router.navigate({ vacancy })
+  }
+  const onReturn = () => router.navigate({ vacancy: undefined })
+
+  onDestroy(onReturn)
 
   let vacancies: Vacancy[] = []
+  let object: Vacancy | undefined
   let lq: Promise<QueryUpdater<Vacancy>>
 
   $: lq = liveQuery<Vacancy>(lq, recruiting.class.Vacancy, { _space: space._id as Ref<Space> }, (docs) => {
     vacancies = docs
   })
+
+  $: if (vacancy) {
+    object = vacancies.find((x) => x._id === vacancy)
+  } else {
+    object = undefined
+  }
 </script>
 
 <ScrollView width="100%" height="100%">
-  <div class="grid">
-    {#each vacancies as v}
-      <div class="vacancy" on:click={() => dispatch('open', { _id: v._id, _class: recruiting.class.Vacancy })}>
-        {v.title}
+  {#if vacancy === undefined}
+    <div class="grid">
+      {#each vacancies as v (v._id)}
+        <div class="vacancy" on:click={() => onOpen(v._id)}>
+          {v.title}
+        </div>
+      {/each}
+    </div>
+  {:else}
+    <div class="details">
+      <VacancyC {object} />
+      <div class="back">
+        <Button label="Back" on:click={onReturn} />
       </div>
-    {/each}
-  </div>
+    </div>
+  {/if}
 </ScrollView>
 
 <style lang="scss">
@@ -63,5 +94,17 @@ limitations under the License.
     border-color: var(--theme-bg-accent-color);
 
     font-weight: 500;
+  }
+
+  .details {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  .back {
+    position: absolute;
+    right: 0;
+    top: 0;
   }
 </style>

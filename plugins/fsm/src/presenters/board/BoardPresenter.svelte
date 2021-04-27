@@ -1,6 +1,22 @@
+<!--
+Copyright © 2020, 2021 Anticrm Platform Contributors.
+
+Licensed under the Eclipse Public License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License. You may
+obtain a copy of the License at https://www.eclipse.org/legal/epl-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
 <script type="ts">
-  import type { Ref } from '@anticrm/core'
-  import type { VDoc } from '@anticrm/domains'
+  import { writable, derived } from 'svelte/store'
+
+  import { mixinKey } from '@anticrm/core'
+  import { VDoc } from '@anticrm/domains'
   import { CoreService, QueryUpdater } from '@anticrm/platform-core'
   import workbench from '@anticrm/workbench'
   import { getCoreService, liveQuery } from '@anticrm/presentation'
@@ -18,7 +34,7 @@
 
   let cs: CoreService | undefined
 
-  async function init () {
+  async function init() {
     cs = await getCoreService()
   }
 
@@ -27,29 +43,11 @@
   interface Status {
     id: any
     label: string
-    hidden: boolean
     defValue: boolean
     divTasks: any
   }
 
-  let statuses: Array<Status> = []
-
-  let items: VDoc[] = []
-  let itemsQuery: Promise<QueryUpdater<WithState>> | undefined
-
-  $: itemsQuery = liveQuery(
-    itemsQuery,
-    fsmPlugin.mixin.WithState,
-    {
-      fsm: target._id as Ref<WithFSM>
-    },
-    (docs) => {
-      console.log('docs:', docs)
-      items = docs.map((x) => (x as any).__layout)
-    }
-  )
-
-  let fsm: FSM | undefined
+  let fsm = writable<FSM | undefined>(undefined)
   let fsmQuery: Promise<QueryUpdater<FSM>> | undefined
 
   $: fsmQuery = liveQuery(
@@ -59,30 +57,60 @@
       _id: target.fsm
     },
     (docs) => {
-      fsm = docs[0]
+      fsm.set(docs[0])
     }
   )
 
-  $: if (fsm) {
-    Promise.all(sortStates(fsm).map((_id) => cs?.findOne(fsmPlugin.class.State, { _id }))).then((states) =>
-      states
-        .filter((x): x is State => !!x)
-        .map(
-          (state, idx) =>
-            ({
-              id: state._id,
-              label: state.name,
-              hidden: false,
-              defValue: idx === 0,
-              divTasks: HTMLDocument
-            } as Status)
-        )
+  let items: VDoc[] = []
+  let itemsQuery: Promise<QueryUpdater<VDoc>> | undefined
+
+  $: if ($fsm && cs) {
+    itemsQuery = liveQuery(
+      itemsQuery,
+      $fsm.classes[0],
+      {
+        _mixins: fsmPlugin.mixin.WithState
+      },
+      (docs) => {
+        const model = cs!.getModel()
+
+        items = docs.filter((x) => model.as(x, fsmPlugin.mixin.WithState).fsm === target._id)
+      }
     )
   }
 
+  const statusesS = derived(
+    fsm,
+    ($fsm, set) => {
+      if (!$fsm) {
+        return
+      }
+
+      Promise.all(sortStates($fsm).map((_id) => cs?.findOne(fsmPlugin.class.State, { _id }))).then((states) => {
+        console.log('huh')
+        set(
+          states
+            .filter((x): x is State => !!x)
+            .map(
+              (state, idx) =>
+                ({
+                  id: state._id,
+                  label: state.name,
+                  defValue: idx === 0,
+                  divTasks: HTMLDocument
+                } as Status)
+            )
+        )
+      })
+    },
+    [] as Status[]
+  )
+
+  let hiddenStatuses = new Set<string>()
+
   let dragDoc: VDoc | null = null
 
-  function docsFor (vdocs: VDoc[], status: any): VDoc[] {
+  function docsFor(vdocs: VDoc[], status: any): VDoc[] {
     if (!cs) {
       return []
     }
@@ -110,16 +138,13 @@
     return res
   }
 
-  function changeStat (sid: any): void {
-    statuses = statuses.map((s) => {
-      if (s.id === sid) {
-        s.hidden = !s.hidden
-      }
-      return s
-    })
+  function changeStat(sid: any): void {
+    hiddenStatuses.has(sid) ? hiddenStatuses.delete(sid) : hiddenStatuses.add(sid)
+
+    hiddenStatuses = hiddenStatuses
   }
 
-  function onDrag (value: CustomEvent<CardDragEvent<VDoc>>): void {
+  function onDrag(value: CustomEvent<CardDragEvent<VDoc>>): void {
     if (!cs) {
       return
     }
@@ -129,12 +154,14 @@
     }
 
     if (value.detail.doc && !value.detail.dragged) {
-      const docState = getState(dragDoc)
+      const docState = getState(value.detail.doc)
 
       if (dragIn != null && dragDoc && docState !== dragIn) {
-        const docWithState = cs.getModel().as(dragDoc, fsmPlugin.mixin.WithState)
-
-        cs.update(docWithState, { state: docState })
+        cs.updateWith(dragDoc, (b) =>
+          b.set({
+            [mixinKey(fsmPlugin.mixin.WithState, 'state')]: dragIn
+          })
+        )
 
         dragDoc = null
       }
@@ -142,15 +169,15 @@
     }
   }
 
-  function onMove (value: unknown): void {
+  function onMove(value: unknown): void {
     const event = value.detail.event
     if (dragIn !== whereInStatus(event.detail.x)) {
       dragIn = whereInStatus(event.detail.x)
     }
   }
 
-  function whereInStatus (coordX: number): any | null {
-    for (const el of statuses) {
+  function whereInStatus(coordX: number): any | null {
+    for (const el of $statusesS) {
       const obj = el.divTasks.getBoundingClientRect()
       if (coordX >= obj.left && coordX <= obj.right) {
         return el.id
@@ -159,13 +186,18 @@
     return null
   }
 
-  function getState (doc: VDoc): any {
+  function getState(doc: VDoc): any {
     if (!cs) {
       return
     }
 
     return cs.getModel().as(doc, fsmPlugin.mixin.WithState).state
   }
+
+  // For some reason `each` performs `statusesS.set(...)`, with is not applicable
+  // to Readable. Need to investigate further what is happening.
+  let statuses: typeof $statusesS = []
+  $: statuses = $statusesS
 </script>
 
 {#await init()}
@@ -173,8 +205,8 @@
 {:then}
   <div class="cards-view">
     {#each statuses as stat (stat.id)}
-      <div class="cards-status" class:thin={stat.hidden}>
-        {#if stat.hidden}
+      <div class="cards-status" class:thin={hiddenStatuses.has(stat.id)}>
+        {#if hiddenStatuses.has(stat.id)}
           <a
             href="/"
             class="resizer"
@@ -184,17 +216,17 @@
             <Icon icon={workbench.icon.Resize} button={true} />
           </a>
         {/if}
-        <div class="status__label" class:sl-mini={stat.hidden}>
+        <div class="status__label" class:sl-mini={hiddenStatuses.has(stat.id)}>
           <button
             class="status__button"
-            class:rotated={stat.hidden}
+            class:rotated={hiddenStatuses.has(stat.id)}
             style="background-color: black"
             on:click={() => {
               changeStat(stat.id)
             }}>{stat.label}</button>
         </div>
 
-        <div bind:this={stat.divTasks} class="status__tasks" class:hidden={stat.hidden}>
+        <div bind:this={stat.divTasks} class="status__tasks" class:hidden={hiddenStatuses.has(stat.id)}>
           {#if dragIn === stat.id && dragDoc && dragIn !== getState(dragDoc)}
             <Card doc={dragDoc} duplicate={true} />
             <div class="separator" />

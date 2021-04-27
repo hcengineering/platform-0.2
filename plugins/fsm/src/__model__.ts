@@ -38,7 +38,7 @@ export class TFSM extends TDoc implements FSM {
   @UX('TargetClasses' as IntlString)
   @ArrayOf$()
   @RefTo$(core.class.Class)
-  classes!: Ref<Class<Doc>>[]
+  classes!: Array<Ref<Class<VDoc>>>
 }
 
 @UX('Transition' as IntlString)
@@ -97,11 +97,11 @@ type PureState = Omit<State, keyof Doc>
 class FSMBuilder {
   private readonly name: string
   private readonly appID: Ref<Application>
-  private readonly classes: Ref<Class<Doc>>[]
+  private readonly classes: Array<Ref<Class<Doc>>>
   private readonly states = new Map<string, PureState>()
-  private readonly transitions: [string, string][] = []
+  private readonly transitions: Array<[string, string]> = []
 
-  constructor (name: string, appID: Ref<Application>, classes: Ref<Class<Doc>>[]) {
+  constructor (name: string, appID: Ref<Application>, classes: Array<Ref<Class<Doc>>>) {
     this.name = name
     this.appID = appID
     this.classes = classes
@@ -119,7 +119,7 @@ class FSMBuilder {
     const existingA = this.getState(a)
     const existingB = this.getState(b)
 
-    if (!existingA || !existingB) {
+    if ((existingA == null) || (existingB == null)) {
       return this
     }
 
@@ -154,13 +154,13 @@ class FSMBuilder {
           const from = stateIDs.get(fromName)
           const to = stateIDs.get(toName)
 
-          if (!from || !to) {
+          if ((from == null) || (to == null)) {
             return undefined
           }
 
           return { from, to }
         })
-        .filter((x): x is Transition => !!x)
+        .filter((x): x is Transition => !(x == null))
     })
 
     return fsm
@@ -170,5 +170,5 @@ class FSMBuilder {
 export const fsm = (
   name: string,
   appID: Ref<Application>,
-  classes: Ref<Class<Doc>>[]
+  classes: Array<Ref<Class<Doc>>>
 ): FSMBuilder => new FSMBuilder(name, appID, classes)

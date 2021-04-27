@@ -22,7 +22,7 @@ export interface FSM extends Doc {
   name: string
   application: Ref<Application>
   transitions: Transition[]
-  classes: Ref<Class<Doc>>[]
+  classes: Array<Ref<Class<VDoc>>>
 }
 
 export interface Transition extends Emb {

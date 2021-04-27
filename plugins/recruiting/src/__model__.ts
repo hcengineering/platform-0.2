@@ -21,6 +21,7 @@ import workbench from '@anticrm/workbench/src/__model__'
 import { TWithResume } from '@anticrm/person-extras/src/__model__'
 import personExtras, { Skill } from '@anticrm/person-extras'
 import { fsm } from '@anticrm/fsm/src/__model__'
+import contact from '@anticrm/contact'
 
 import recruiting, { Candidate, Vacancy, WithCandidateProps } from '.'
 
@@ -163,7 +164,7 @@ function createVacanciesAppModel (S: Builder): void {
     contract: { name: 'Contract signing' }
   }
 
-  fsm('Default developer vacancy', recruiting.application.Vacancies, [recruiting.mixin.WithCandidateProps])
+  fsm('Default developer vacancy', recruiting.application.Vacancies, [contact.class.Person])
     .transition(states.applied, [states.hrInterview, states.rejected])
     .transition(states.hrInterview, [states.testTask, states.rejected])
     .transition(states.testTask, [states.techInterview, states.rejected])
@@ -172,7 +173,7 @@ function createVacanciesAppModel (S: Builder): void {
     .transition(states.offer, states.rejected)
     .build(S)
 
-  fsm('Another default vacancy', recruiting.application.Vacancies, [recruiting.mixin.WithCandidateProps])
+  fsm('Another default vacancy', recruiting.application.Vacancies, [contact.class.Person])
     .transition(states.applied, [states.techInterview, states.rejected])
     .transition(states.techInterview, [states.offer, states.rejected])
     .transition(states.offer, states.rejected)

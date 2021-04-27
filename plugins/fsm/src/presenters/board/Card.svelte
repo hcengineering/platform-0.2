@@ -1,3 +1,17 @@
+<!--
+Copyright © 2020, 2021 Anticrm Platform Contributors.
+
+Licensed under the Eclipse Public License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License. You may
+obtain a copy of the License at https://www.eclipse.org/legal/epl-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
   import { spring } from 'svelte/motion'
@@ -40,7 +54,7 @@
     }
   )
 
-  function handlePanStart (event: PanStartEvent) {
+  function handlePanStart(event: PanStartEvent) {
     coords.stiffness = coords.damping = 1
     drag = true
 
@@ -52,7 +66,7 @@
     dispatch('drag', { doc, dragged: true, event })
   }
 
-  function handlePanMove (event: PanMoveEvent) {
+  function handlePanMove(event: PanMoveEvent) {
     coords.update(() => ({
       x: ($coords.x as number) + event.detail.dx,
       y: ($coords.y as number) + event.detail.dy
@@ -60,7 +74,7 @@
     dispatch('move', { doc, dragged: true, coords: $coords, event: event })
   }
 
-  function handlePanEnd (event: PanEndEvent) {
+  function handlePanEnd(event: PanEndEvent) {
     coords.stiffness = 0.4
     coords.damping = 0.8
     coords.set({ x: 0, y: 0 })
@@ -69,7 +83,7 @@
     dispatch('move', { doc, dragged: false, coords: $coords, event: event } as CardDragEvent<Doc>)
   }
 
-  function calcStyle (coords: Pos, width: number, height: number): string {
+  function calcStyle(coords: Pos, width: number, height: number): string {
     return `width: ${drag ? width.toString() + 'px' : 'inherit'};
             height: ${drag ? height.toString() + 'px' : 'inherit'};
             transform:
