@@ -33,7 +33,7 @@ limitations under the License.
 
   const newEvent: CalendarEvent = {
     _id: generateId(),
-    _space: space?._id as Ref<Space>,
+    _space: space?._id,
     _class: calendar.class.CalendarEvent,
     _createdBy: '' as StringProperty,
     _createdOn: Date.now() as DateProperty,
@@ -72,14 +72,14 @@ limitations under the License.
 
   async function save () {
     const core = await coreService
-    const doc = {
+    const doc: DocumentValue<CalendarEvent> = {
       ...newEvent,
       startDate: getAllDayEventStart(newEvent.startDate),
       endDate: getAllDayEventEnd(newEvent.endDate),
-      _space: space?._id,
+      _space: (space?._id ?? '') as Ref<Space>,
       _createdBy: core.getUserId() as StringProperty,
       participants: [core.getUserId() as Ref<User>]
-    } as DocumentValue<CalendarEvent>
+    }
     await core.create<CalendarEvent>(calendar.class.CalendarEvent, doc)
     dispatch('close')
   }

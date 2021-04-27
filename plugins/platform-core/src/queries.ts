@@ -146,7 +146,8 @@ export class QueriableStorage implements Domain {
           this.queries.delete(q._id)
         }
         this.queries.set(q._id, q)
-        this.refresh(q).then(() => 0, () => 0)
+
+        this.refresh(q) // eslint-disable-line
         return q.unsubscriber
       }
     }

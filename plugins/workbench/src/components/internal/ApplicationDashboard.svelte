@@ -70,7 +70,11 @@
         <CreateControl {creators} {onCreatorClick} />
       {/if}
       <div style="flex-grow:1" />
-      <IconEditBox icon={workbench.icon.Finder} placeholder="Поиск по {application.label}..." iconRight={true} />
+      <IconEditBox
+        icon={workbench.icon.Finder}
+        placeholder="Поиск по {application.label}..."
+        iconRight={true}
+        value="" />
     </div>
   {/if}
 </div>

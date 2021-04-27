@@ -43,7 +43,7 @@
     on:message={handler}
     stylesEnabled=true/>`}>
   <div class="preview-pane">
-    <ReferenceInput on:message={(e) => add(e.detail)} stylesEnabled="true" />
+    <ReferenceInput on:message={(e) => add(e.detail)} stylesEnabled={true} />
   </div>
   <div class="message-panel">
     {@html message}
@@ -57,7 +57,7 @@
     on:message={handler}
     stylesEnabled=true/>`}>
   <div class="preview-pane">
-    <ReferenceInput lines={20} on:message={(e) => add(e.detail)} stylesEnabled="true" />
+    <ReferenceInput lines={20} on:message={(e) => add(e.detail)} stylesEnabled={true} />
   </div>
   <div class="message-panel">
     {@html message}

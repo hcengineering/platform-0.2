@@ -34,7 +34,7 @@ export interface WorkbenchApplication extends Application {
   icon?: Asset
   rootComponent?: AnyComponent // A component to be shown if application itself is selected.
   component?: AnyComponent // A component to be shown in generic application.
-  classes: Ref<Class<VDoc>>[]
+  classes: Array<Ref<Class<VDoc>>>
 
   supportSpaces: boolean // If set to true, application will support spaces.
   spaceTitle?: string // A title for show spaces as
@@ -54,7 +54,7 @@ export interface ItemCreator extends Doc {
  * A space filtering mechanism, it should be mixed to application with
  */
 export interface SpaceFilter {
-  filter (spaces: Space[], application: WorkbenchApplication): Space[]
+  filter: (spaces: Space[], application: WorkbenchApplication) => Space[]
 }
 
 export interface WorkbenchService extends Service {

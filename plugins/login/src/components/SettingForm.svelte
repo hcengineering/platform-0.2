@@ -19,7 +19,7 @@
   import login from '..'
   import CheckBox from '@anticrm/sparkling-controls/src/CheckBox.svelte'
   import type { ApplicationRoute, ApplicationRouter } from '@anticrm/platform-ui'
-  import twofactor from 'node-2fa'
+  const twofactor = require('node-2fa') // eslint-disable-line
   import type { Options } from 'node-2fa/dist/interfaces'
 
   export let router: ApplicationRouter<ApplicationRoute>

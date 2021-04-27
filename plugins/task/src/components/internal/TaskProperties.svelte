@@ -57,6 +57,7 @@
           const act = model.as(s[1], task.mixin.TaskStatusAction)
           if (act) {
             acts.push({
+              id: s[0],
               name: act.action,
               action: () => {
                 coreService.then((cs) => cs.update(object, { status: statKey as NumberProperty }))
@@ -74,12 +75,9 @@
 </script>
 
 <div class="taskContent">
-  <div class="caption caption-1">
+  <div id="create_task__input__name" class="caption caption-1">
     <InlineEdit
-      id="create_task__input__name"
       bind:value={object.title}
-      width="100%"
-      label="Name"
       placeholder="Name"
       on:change={async () => {
         await (await coreService).update(object, { title: object.title })
@@ -100,7 +98,7 @@
   <UserInfo url="https://platform.exhale24.ru/images/photo-2.png" title="Андрей Платов" subtitle="Исполнитель" />
 
   {#if statusActions.length > 0}
-    <ActionBar onTop="2" actions={statusActions} />
+    <ActionBar onTop={2} actions={statusActions} />
   {/if}
 
   <div class="description">

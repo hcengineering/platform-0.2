@@ -39,7 +39,7 @@ export function createOperations (model: Model, processTx: (tx: Tx) => Promise<a
     const doc = model.createDocument(_class, values)
 
     const { _objectSpace, spaceIsRequired } = getSpace(model, doc)
-    if ((_objectSpace == null) && spaceIsRequired) {
+    if ((_objectSpace === undefined) && spaceIsRequired) {
       throw new Error('Every VDoc based object should contain _space property')
     }
     const tx = newCreateTx(doc, getUserId(), _objectSpace)
@@ -54,7 +54,7 @@ export function createOperations (model: Model, processTx: (tx: Tx) => Promise<a
     const op = builder(b)
 
     const { _objectSpace, spaceIsRequired } = getSpace(model, doc)
-    if ((_objectSpace == null) && spaceIsRequired) {
+    if ((_objectSpace === undefined) && spaceIsRequired) {
       throw new Error('Every VDoc based object should contain _space property')
     }
 
@@ -89,7 +89,7 @@ export function createOperations (model: Model, processTx: (tx: Tx) => Promise<a
 
   async function update<T extends Doc> (doc: T, value: Partial<Omit<T, keyof Doc>>): Promise<T> {
     const { _objectSpace, spaceIsRequired } = getSpace(model, doc)
-    if ((_objectSpace == null) && spaceIsRequired) {
+    if ((_objectSpace === undefined) && spaceIsRequired) {
       throw new Error('Every VDoc based object should contain _space property')
     }
 
@@ -108,7 +108,7 @@ export function createOperations (model: Model, processTx: (tx: Tx) => Promise<a
 
   async function remove<T extends Doc> (doc: T): Promise<T> {
     const { _objectSpace, spaceIsRequired } = getSpace(model, doc)
-    if ((_objectSpace == null) && spaceIsRequired) {
+    if ((_objectSpace === null) && spaceIsRequired) {
       throw new Error('Every VDoc based object should contain _space property')
     }
 

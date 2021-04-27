@@ -18,12 +18,12 @@ import { Model } from '@anticrm/boot/src/boot'
 import { Doc } from '@anticrm/core'
 
 export async function initDatabase (db: Db): Promise<any> {
-  const domains = { ...Model } as { [key: string]: Doc[] }
-  const ops = [] as Promise<any>[]
+  const domains: { [key: string]: Doc[] } = { ...Model }
+  const ops: Array<Promise<any>> = []
   for (const domain in domains) {
     const model = domains[domain]
     db.collection(domain, (err, coll) => {
-      if (err) {
+      if (err !== undefined) {
         console.log(err)
       }
       ops.push(coll.deleteMany({}).then(() => model.length > 0 ? coll.insertMany(model) : null))

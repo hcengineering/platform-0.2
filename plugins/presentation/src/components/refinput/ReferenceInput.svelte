@@ -152,7 +152,7 @@
 
   function handlePopupSelected (value: CompletionItem) {
     let extra = 0
-    if (styleState.completionEnd != null && styleState.completionEnd.endsWith(']]')) {
+    if (styleState.completionEnd !== null && styleState.completionEnd.endsWith(']]')) {
       extra = styleState.completionEnd.length
     }
     const vv = value as ExtendedCompletionItem
@@ -210,7 +210,7 @@
     const promises: Promise<void>[] = []
 
     state.doc.descendants((node, pos) => {
-      if (node.isText && node.text != null) {
+      if (node.isText && node.text !== null) {
         let prev = {
           id: '',
           class: ''
@@ -258,7 +258,7 @@
                     operations.push(
                       (tr: Transaction | null): Transaction => {
                         const mark = schema.marks.reference.create(items[0])
-                        return (tr == null ? state.tr : tr).addMark(cpos + ci, cpos + cend, mark)
+                        return (tr === null ? state.tr : tr).addMark(cpos + ci, cpos + cend, mark)
                       }
                     )
                   } else if (items.length === 0) {
@@ -269,7 +269,7 @@
                             id: null,
                             class: 'Page'
                           })
-                          return (tr == null ? state.tr : tr).addMark(cpos + ci, cpos + cend, mark)
+                          return (tr === null ? state.tr : tr).addMark(cpos + ci, cpos + cend, mark)
                         }
                       )
                     }
@@ -289,7 +289,7 @@
       let tr: Transaction | null = null
       for (let i = 0; i < operations.length; i++) {
         const t = operations[i]
-        if (t != null) {
+        if (t !== null) {
           tr = t(tr)
         }
       }

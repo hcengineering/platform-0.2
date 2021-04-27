@@ -26,11 +26,9 @@ import { UIService } from '@anticrm/platform-ui'
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */
-export default (
-  platform: Platform,
-  deps: { core: CoreService; ui: UIService } // eslint-disable-line @typescript-eslint/no-unused-vars
+export default async (platform: Platform, deps: { core: CoreService, ui: UIService }
 ): Promise<GuidebookService> => {
   platform.setResource(guidebook.component.GuideBook, Guidebook)
 
-  return Promise.resolve({})
+  return {}
 }

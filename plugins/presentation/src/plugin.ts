@@ -38,7 +38,7 @@ import EnumPresenter from './components/internal/presenters/value/EnumPresenter.
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */
-export default (platform: Platform, deps: { core: CoreService, i18n: I18n }): Promise<PresentationService> => {
+export default async (platform: Platform, deps: { core: CoreService, i18n: I18n }): Promise<PresentationService> => {
   const coreService = deps.core
   const i18nService = deps.i18n
 
@@ -57,7 +57,7 @@ export default (platform: Platform, deps: { core: CoreService, i18n: I18n }): Pr
 
   async function getGroupModel (_class: Ref<Class<Obj>>): Promise<GroupModel> {
     const model = coreService.getModel()
-    const clazz = model.get(_class) as Class<Obj>
+    const clazz = model.get(_class)
     if (model.isMixedIn(clazz, ui.mixin.UXObject)) {
       const ux = model.as(clazz, ui.mixin.UXObject)
       const label = await i18nService.translate(ux.label)
@@ -102,7 +102,7 @@ export default (platform: Platform, deps: { core: CoreService, i18n: I18n }): Pr
   async function getOwnAttrModel (_class: Ref<Class<Obj>>): Promise<AttrModel[]> {
     const result = [] as AttrModel[]
     const model = coreService.getModel()
-    const clazz = model.get(_class) as Class<Obj>
+    const clazz = model.get(_class)
 
     // if (uxObject) {
     const attributes = clazz._attributes as { [key: string]: Attribute }
@@ -116,11 +116,11 @@ export default (platform: Platform, deps: { core: CoreService, i18n: I18n }): Pr
         const uxAttribute = model.as(attribute, ui.mixin.UXAttribute)
 
         const label = await i18nService.translate(uxAttribute.label)
-        const placeholder = uxAttribute.placeholder ? await i18nService.translate(uxAttribute.placeholder) : label
+        const placeholder = (uxAttribute.placeholder !== undefined) ? await i18nService.translate(uxAttribute.placeholder) : label
         const icon: Asset | undefined = uxAttribute.icon
 
         let presenter: AnyComponent = ui.component.StringPresenter // Use string presenter as default one
-        if (uxAttribute.presenter) {
+        if (uxAttribute.presenter !== undefined) {
           presenter = uxAttribute.presenter
         } else {
           // get presenter
@@ -168,29 +168,21 @@ export default (platform: Platform, deps: { core: CoreService, i18n: I18n }): Pr
 
   abstract class ClassModelBase implements ClassModel {
     filterAttributes (keys: string[]): ClassModel {
-      const filter = {} as { [key: string]: Record<string, unknown> }
+      const filter = new Set<string>()
       keys.forEach(key => {
-        filter[key] = {}
+        filter.add(key)
       })
       return new AttributeFilter(this, filter)
     }
 
     abstract getAttribute (key: string, _class?: Ref<Class<Obj>>): AttrModel | undefined
-
     abstract getGroups (): GroupModel[]
-
     abstract getOwnAttributes (_class: Ref<Class<Obj>>): AttrModel[]
-
     abstract getMixins(): MixinGroupModel[]
-
     abstract getMixin (_mixin: Ref<Mixin<Obj>>): MixinGroupModel | undefined
-
     abstract getAttributes (): AttrModel[]
-
     abstract getGroup (_class: Ref<Class<Obj>>): GroupModel | undefined
-
     abstract getPrimary (): AttrModel | undefined
-
     abstract filterPrimary (): { model: ClassModel, primary: AttrModel | undefined }
   }
 
@@ -223,7 +215,7 @@ export default (platform: Platform, deps: { core: CoreService, i18n: I18n }): Pr
     }
 
     getAttribute (key: string, _class?: Ref<Class<Obj>>): AttrModel | undefined {
-      return this.attributes.find(attr => attr.key === key && (_class ? _class === attr._class : true))
+      return this.attributes.find(attr => attr.key === key && ((_class !== undefined) ? _class === attr._class : true))
     }
 
     getGroups (): GroupModel[] {
@@ -256,9 +248,9 @@ export default (platform: Platform, deps: { core: CoreService, i18n: I18n }): Pr
 
   class AttributeFilter extends ClassModelBase {
     private readonly next: ClassModel
-    private readonly filter: { [key: string]: Record<string, unknown> }
+    private readonly filter: Set<string>
 
-    constructor (next: ClassModel, filter: { [key: string]: Record<string, unknown> }) {
+    constructor (next: ClassModel, filter: Set<string>) {
       super()
       this.next = next
       this.filter = filter
@@ -266,8 +258,8 @@ export default (platform: Platform, deps: { core: CoreService, i18n: I18n }): Pr
 
     getAttribute (key: string, _class?: Ref<Class<Obj>>): AttrModel | undefined {
       const result = this.next.getAttribute(key, _class)
-      if (result) {
-        return this.filter[result.key] ? undefined : result
+      if (result !== undefined) {
+        return this.filter.has(result.key) ? undefined : result
       }
     }
 
@@ -281,7 +273,7 @@ export default (platform: Platform, deps: { core: CoreService, i18n: I18n }): Pr
 
     getOwnAttributes (_class: Ref<Class<Obj>>): AttrModel[] {
       const result = this.next.getOwnAttributes(_class)
-      return result.filter(attr => !this.filter[attr.key])
+      return result.filter(attr => !this.filter.has(attr.key))
     }
 
     getMixins (): MixinGroupModel[] {
@@ -294,7 +286,7 @@ export default (platform: Platform, deps: { core: CoreService, i18n: I18n }): Pr
 
     getAttributes (): AttrModel[] {
       const result = this.next.getAttributes()
-      return result.filter(attr => !this.filter[attr.key])
+      return result.filter(attr => !this.filter.has(attr.key))
     }
 
     getPrimary (): AttrModel | undefined {
@@ -309,8 +301,13 @@ export default (platform: Platform, deps: { core: CoreService, i18n: I18n }): Pr
   async function getClassModel (_class: Ref<Class<Obj>>, top?: Ref<Class<Obj>>): Promise<ClassModel> {
     const model = coreService.getModel()
     const hierarchy = model.getClassHierarchy(_class, top)
-    const groupModels = hierarchy.map(_class => getGroupModel(_class as Ref<Class<Obj>>))
-    const attrModels = hierarchy.map(_class => getOwnAttrModel(_class))
+
+    const groupModels = hierarchy.map(async (_class) => {
+      return await getGroupModel(_class)
+    })
+    const attrModels = hierarchy.map(async (_class) => {
+      return await getOwnAttrModel(_class)
+    })
     const mixinModels = model.getClassMixins(_class).map(_mixin => getMixinGroupModel(_class as Ref<Class<Obj>>, _mixin as Ref<Mixin<Doc>>))
     const mixinAttrModels = model.getClassMixins(_class).map(_mixin => getOwnAttrModel(_mixin as Ref<Class<Obj>>))
 
@@ -324,8 +321,8 @@ export default (platform: Platform, deps: { core: CoreService, i18n: I18n }): Pr
 
   function getComponentExtension (_class: Ref<Class<Obj>>, extension: Ref<Mixin<ComponentExtension<VDoc>>>): AnyComponent | undefined {
     const model = coreService.getModel()
-    let itClass = _class
-    while (itClass) {
+    let itClass: Ref<Class<Obj>> | undefined = _class
+    while (itClass !== undefined) {
       const clazz = model.get(itClass) as Class<VDoc>
       if (model.isMixedIn(clazz, extension)) {
         const properties = model.as(clazz, extension)

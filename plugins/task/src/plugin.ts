@@ -27,12 +27,12 @@ import CardForm from './components/internal/TaskCardForm.svelte'
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */
-export default (platform: Platform): Promise<TaskService> => {
+export default async (platform: Platform): Promise<TaskService> => {
   platform.setResource(task.component.TaskProperties, TaskProperties)
   platform.setResource(task.component.TaskInfo, TaskInfo)
   platform.setResource(task.component.CreateTask, CreateForm)
   platform.setResource(task.component.StatusPresenter, StatusPresenter)
   platform.setResource(task.component.CardForm, CardForm)
 
-  return Promise.resolve({})
+  return {}
 }

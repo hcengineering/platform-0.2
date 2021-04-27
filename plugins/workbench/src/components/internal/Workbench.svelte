@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Perspective, WorkbenchApplication } from '../..'
+  import type { Perspective } from '../..'
   // Copyright © 2020 Anticrm Platform Contributors.
   //
   // Licensed under the Eclipse Public License, Version 2.0 (the "License");
@@ -19,7 +19,6 @@
   import Spotlight from './Spotlight.svelte'
   import type { AnyComponent } from '@anticrm/platform-ui'
   import { getUIService, newRouter } from '@anticrm/platform-ui'
-  import type { Ref } from '@anticrm/core'
   import { QueryUpdater } from '@anticrm/platform-core'
 
   const uiService = getUIService()
@@ -29,13 +28,8 @@
 
   let activePerspective: string
 
-  export interface PerspectiveReference {
+  interface PerspectiveReference {
     perspective: string
-  }
-
-  export interface WorkbenchRouterReference {
-    space: string // A ref of space name
-    app: Ref<WorkbenchApplication>
   }
 
   const router = newRouter<PerspectiveReference>(

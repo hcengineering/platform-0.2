@@ -13,16 +13,15 @@
 // limitations under the License.
 //
 
-import { Platform } from '..'
+import { Platform, PluginDependencies } from '..'
 
 import { plugin1, plugin1State } from './shared'
-import { PluginDependencies } from '../index'
 
 plugin1State.parsed = true
 
-export default (_platform: Platform, _deps: PluginDependencies): Promise<{id: typeof plugin1}> => {
+export default async (_platform: Platform, _deps: PluginDependencies): Promise<{id: typeof plugin1}> => {
   plugin1State.started = true
-  return Promise.resolve({
+  return {
     id: plugin1
-  })
+  }
 }

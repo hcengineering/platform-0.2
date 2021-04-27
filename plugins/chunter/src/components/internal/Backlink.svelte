@@ -28,8 +28,12 @@
   $: qs = liveQuery<Message>(qs, backlink._sourceClass as Ref<Class<Message>>, { _id: backlink._sourceId }, (docs) => {
     message = docs[0]
   })
+
+  function getPos (backling: Reference): number {
+    return (backlink._sourceProps?.pos as number) ?? 0
+  }
 </script>
 
-{#if message && message.comments && message.comments.length > backlink._sourceProps.pos}
-  <CommentComponent message={message.comments[backlink._sourceProps.pos]} />
+{#if backlink && backlink._sourceProps && message && message.comments && message.comments.length > getPos(backlink)}
+  <CommentComponent message={message.comments[getPos(backlink)]} />
 {/if}

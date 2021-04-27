@@ -50,7 +50,7 @@ export class VDocIndex implements DomainIndex {
     }
     const doc = this.modelDb.createDocument(tx._objectClass, tx.object, tx._objectId)
     // we need to update vdoc properties.
-    if (this.transient != null) {
+    if (this.transient !== undefined) {
       const vdoc = doc as VDoc
       vdoc._createdBy = tx._user
       vdoc._createdOn = tx._date
@@ -91,7 +91,7 @@ export class VDocIndex implements DomainIndex {
       }
     }
     // Be sure we update modification fields.
-    if (this.transient != null) {
+    if (this.transient !== undefined) {
       ops.push(op)
     }
 

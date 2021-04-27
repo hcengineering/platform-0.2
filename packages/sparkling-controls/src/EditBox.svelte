@@ -15,7 +15,7 @@
 <script lang="ts">
   export let width = '100%'
   export let label = ''
-  export let value = ''
+  export let value: string | number = ''
   export let placeholder = ''
   export let id: string | undefined = undefined
   export let hoverState = false
@@ -28,7 +28,7 @@
   class:editbox-label={label !== ''}
   class:editbox-hoverState={hoverState}
   style="width: {width}"
-  on:click={input.focus()}>
+  on:click={() => input.focus()}>
   {#if label !== ''}
     <div class="wLabel">
       <div class="label">{label}</div>

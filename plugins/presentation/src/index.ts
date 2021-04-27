@@ -140,12 +140,12 @@ export interface CoreDocument extends Document {
 // S E R V I C E
 
 export interface PresentationService extends Service {
-  getClassModel (_class: Ref<Class<Obj>>, top?: Ref<Class<Obj>>): Promise<ClassModel>
+  getClassModel: (_class: Ref<Class<Obj>>, top?: Ref<Class<Obj>>) => Promise<ClassModel>
 
   /**
    * Return a component extension registered for specified class, return undefined if not specified.
    */
-  getComponentExtension (_class: Ref<Class<Obj>>, extension: Ref<Mixin<ComponentExtension<VDoc>>>): AnyComponent | undefined
+  getComponentExtension: (_class: Ref<Class<Obj>>, extension: Ref<Mixin<ComponentExtension<VDoc>>>) => AnyComponent | undefined
 }
 
 const presentationPlugin = plugin('presentation' as Plugin<PresentationService>, {

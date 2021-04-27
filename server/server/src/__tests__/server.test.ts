@@ -91,7 +91,7 @@ describe('server', () => {
     // Create user and put session inside
 
     const accounts = accountsDb(dbClient)
-    if (await getUserAccount(accounts, client.email) == null) {
+    if (await getUserAccount(accounts, client.email) === null) {
       await createUserAccount(accounts, client.email, 'pass')
     }
 

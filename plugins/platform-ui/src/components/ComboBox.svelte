@@ -4,7 +4,7 @@
   import { onDestroy } from 'svelte'
 
   export let items: Action[]
-  export let selected = 0
+  export let selected: string
 
   let comboHidden = true
   let comboRoot: HTMLElement
@@ -30,8 +30,8 @@
     let pathRoot = false
     let pathDrop = false
     let pathItems = false
-    const path = event.path || (event.composedPath && event.composedPath())
-    path.find((el) => {
+    const path: EventTarget[] = (event as any).path !== undefined ? event.composedPath && event.composedPath() : []
+    path.find((el: any) => {
       if (el.className === comboRoot.className) pathRoot = true
       if (el.className === comboDrop.className) pathDrop = true
       if (el.className === comboItems.className) pathItems = true
@@ -63,7 +63,7 @@
 
   <div bind:this={comboDrop} class="comboBox-drop">
     <div bind:this={comboItems} class="comboBox-drop__items">
-      <ScrollView width="100%" height="100%" accentColor="true">
+      <ScrollView width="100%" height="100%">
         {#each items as item}
           <div
             class="comboBox-drop__item"
@@ -71,7 +71,7 @@
             on:click={() => {
               selected = item.id
             }}>
-            <div on:click={() => item.action()}>{item.name}</div>
+            <div on:click={() => (item.action !== undefined ? item.action() : 0)}>{item.name}</div>
           </div>
         {/each}
       </ScrollView>

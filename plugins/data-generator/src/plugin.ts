@@ -19,8 +19,8 @@ import datagen, { DataGenService } from '.'
 
 import DataGeneneratorView from './components/internal/DataGeneratorView.svelte'
 
-export default (platform: Platform, deps: { core: CoreService }): Promise<DataGenService> => { // eslint-disable-line @typescript-eslint/no-unused-vars
+export default async (platform: Platform, deps: { core: CoreService }): Promise<DataGenService> => {
   platform.setResource(datagen.component.DataGenView, DataGeneneratorView)
 
-  return Promise.resolve({})
+  return {}
 }

@@ -16,9 +16,8 @@
 import { Platform } from '@anticrm/platform'
 import { ModelDb } from './modeldb'
 
-import core from './index'
+import core, { CoreService, QueryResult } from './index'
 
-import { CoreService, QueryResult } from '.'
 import rpcService, { EventType } from './rpc'
 
 import { QueriableStorage } from './queries'
@@ -54,7 +53,7 @@ export default async (platform: Platform): Promise<CoreService> => {
     },
     async findOne<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined> {
       const result = (await rpc.request<T>(RPC_CALL_FINDONE, _class, query))
-      if (result != null) {
+      if (result !== undefined) {
         return model.as(result, _class)
       }
       return result
@@ -96,15 +95,18 @@ export default async (platform: Platform): Promise<CoreService> => {
   ])
 
   // add listener to process data updates from backend for data transactions.
-  rpc.addEventListener(EventType.Transaction, async (result) => {
-    await txProcessor.process(txContext(TxContextSource.Server), result as Tx)
+  rpc.addEventListener(EventType.Transaction, (result): void => {
+    txProcessor.process(txContext(TxContextSource.Server), result as Tx) // eslint-disable-line
   })
 
-  // Add a client transaction event listener
-  rpc.addEventListener(EventType.TransientTransaction, async (txs) => {
-    for (const tx of (txs as Tx[])) {
+  async function processTransactions (txs: Tx[]): Promise<void> {
+    for (const tx of txs) {
       await txProcessor.process(txContext(TxContextSource.ServerTransient), tx)
     }
+  }
+  // Add a client transaction event listener
+  rpc.addEventListener(EventType.TransientTransaction, (txs: unknown): void => {
+    processTransactions(txs as Tx[]) // eslint-disable-line
   })
 
   async function find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T[]> {
@@ -134,7 +136,7 @@ export default async (platform: Platform): Promise<CoreService> => {
     ])
   }
 
-  function getUserId (): StringProperty | undefined {
+  function getUserId (): StringProperty {
     return platform.getMetadata(core.metadata.WhoAmI) as StringProperty
   }
 

@@ -22,14 +22,14 @@ import {
   createWorkspace, createUserAccount, assignWorkspace, getWorkspace, removeWorkspace, withTenant, getUserAccount
 } from '@anticrm/accounts'
 
-const mongodbUri = process.env.MONGODB_URI || 'mongodb://localhost:27017'
+const mongodbUri = process.env.MONGODB_URI ?? 'mongodb://localhost:27017'
 
-function withDatabase (uri: string, f: (client: MongoClient) => Promise<any>) {
+async function withDatabase (uri: string, f: (client: MongoClient) => Promise<any>): Promise<void> {
   console.log(`connecting to database '${uri}'...`)
 
-  return MongoClient.connect(uri, { useUnifiedTopology: true }).then((client) => {
-    f(client).then(() => client.close())
-  })
+  const client = await MongoClient.connect(uri, { useUnifiedTopology: true })
+  await f(client)
+  await client.close()
 }
 
 program.version('0.0.1')
@@ -41,19 +41,19 @@ program
   .requiredOption('-p, --password <password>', 'user password')
   .requiredOption('-f, --fullname <fullname>', 'full user name')
   .requiredOption('-w, --workspace <workspace>', 'workspace')
-  .action((email, cmd) => {
-    withDatabase(mongodbUri, async (client) => {
+  .action(async (email, cmd) => {
+    return await withDatabase(mongodbUri, async (client) => {
       const db = client.db('accounts')
 
       // Create user account inside accounts
-      const user = await getUserAccount(db, email).then(user => !user ? createUserAccount(db, email, cmd.password) : Promise.resolve(user))
-      const workspace = getWorkspace(db, cmd.workspace) // a workspace
+      const userAccount = await getUserAccount(db, email)
+      if (userAccount === null) {
+        await createUserAccount(db, email, cmd.password)
+      }
+      await getWorkspace(db, cmd.workspace) // a workspace
+      await assignWorkspace(db, email, cmd.workspace)
 
-      const assignDone = Promise.all([user, workspace]).then(() => {
-        return assignWorkspace(db, email, cmd.workspace)
-      })
-      const contactDone = createContact(withTenant(client, cmd.workspace), email, cmd.fullname)
-      return Promise.all([contactDone, assignDone])
+      await createContact(withTenant(client, cmd.workspace), email, cmd.fullname)
     })
   })
 
@@ -62,13 +62,11 @@ program
   .command('remove-user [email]')
   .description('remove user and corresponding account in master database')
   .requiredOption('-w, --workspace <workspace>', 'workspace')
-  .action((email, cmd) => {
-    withDatabase(mongodbUri, async (client) => {
+  .action(async (email, cmd) => {
+    return await withDatabase(mongodbUri, async (client) => {
       const db = client.db('accounts')
-      return Promise.all([
-        removeContact(withTenant(client, cmd.workspace), email), // Create contact
-        removeWorkspace(db, email, cmd.workspace) //
-      ])
+      await removeContact(withTenant(client, cmd.workspace), email)
+      await removeWorkspace(db, email, cmd.workspace)
     })
   })
 
@@ -77,24 +75,21 @@ program
   .command('create-workspace <name>')
   .description('create workspace')
   .requiredOption('-o, --organization <organization>', 'organization name')
-  .action((workspace, cmd) => {
-    withDatabase(mongodbUri, (client) => {
+  .action(async (workspace, cmd) => {
+    return await withDatabase(mongodbUri, async (client) => {
       const accounts = client.db('accounts')
-      const workspaceId = createWorkspace(accounts, workspace, cmd.organization)
+      await createWorkspace(accounts, workspace, cmd.organization)
 
-      const tenant = withTenant(client, workspace)
-      const databaseDone = initDatabase(tenant)
-      return Promise.all([workspaceId, databaseDone])
+      await initDatabase(withTenant(client, workspace))
     })
   })
 
 program
   .command('upgrade-workspace <workspace>')
   .description('upgrade workspace')
-  .action((workspace, cmd) => { // eslint-disable-line @typescript-eslint/no-unused-vars
-    withDatabase(mongodbUri, async (client) => {
-      const tenant = withTenant(client, workspace)
-      return initDatabase(tenant)
+  .action(async (workspace, cmd) => { // eslint-disable-line @typescript-eslint/no-unused-vars
+    return await withDatabase(mongodbUri, async (client) => {
+      await initDatabase(withTenant(client, workspace))
     })
   })
 

@@ -13,9 +13,9 @@ export interface Position {
 }
 
 export interface CompletionPopupActions {
-  handleUp (): void
-  handleDown (): void
-  handleSubmit (): void
+  handleUp: () => void
+  handleDown: () => void
+  handleSubmit: () => void
 }
 
 export function getFirst (items: CompletionItem[]): CompletionItem {
@@ -23,9 +23,9 @@ export function getFirst (items: CompletionItem[]): CompletionItem {
 }
 
 export function calcOffset (element: HTMLElement): number {
-  if (element != null) {
+  if (element !== null) {
     const pp = element.parentElement
-    return pp != null ? pp.offsetTop : -1
+    return pp !== null ? pp.offsetTop : -1
   }
   return -1
 }
