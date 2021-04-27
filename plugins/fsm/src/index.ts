@@ -37,6 +37,14 @@ export interface WithFSM extends Doc {
   fsm: Ref<FSM>
 }
 
+// TODO: replace with class represents "Card",
+// that would refer to fsm, target object and have
+// state, like:
+// {
+//    fsm: Ref<WithFSM>
+//    target: Ref<VDoc>
+//    state: Ref<State>
+// }
 export interface WithState extends Doc {
   // Undefined FSM means doc is not part of FSM
   // Probably we need to be able to unmixin
