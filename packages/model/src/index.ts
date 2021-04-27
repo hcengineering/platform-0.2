@@ -13,12 +13,18 @@
 // limitations under the License.
 //
 
-import type { Enum, EnumLiteral, EnumOf } from '@anticrm/core'
 import {
-  Attribute, Class, Classifier, CORE_CLASS_ARRAY_OF, CORE_CLASS_BAG_OF, CORE_CLASS_CLASS,
-  CORE_CLASS_DOC, CORE_CLASS_EMB, CORE_CLASS_ENUM_OF, CORE_CLASS_INSTANCE_OF, CORE_CLASS_MIXIN, CORE_CLASS_REF_TO,
+  ArrayOf, Attribute,
+  BagOf, Class, Classifier,
+  CORE_CLASS_ARRAY_OF, CORE_CLASS_BAG_OF, CORE_CLASS_CLASS,
+  CORE_CLASS_DOC, CORE_CLASS_EMB, CORE_CLASS_ENUM_OF, CORE_CLASS_INSTANCE_OF,
+  CORE_CLASS_MIXIN, CORE_CLASS_REF_TO,
   CORE_CLASS_STRING,
-  CORE_CLASS_TYPE, Indices, Mixin, Obj, Ref, Tx, Type
+  CORE_CLASS_TYPE, Doc, Emb, Enum,
+  EnumKey, EnumLiteral, EnumOf, Indices,
+  InstanceOf, Mixin,
+  Obj, Ref, RefTo,
+  Type, Tx
 } from '@anticrm/core'
 import {
   Application, CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX,
@@ -26,9 +32,8 @@ import {
   CORE_CLASS_SPACE,
   CORE_CLASS_SPACE_USER, CORE_CLASS_TX_OPERATION,
   CORE_CLASS_UPDATE_TX, CORE_MIXIN_SHORTID,
-  Reference,
-  Title,
-  VDoc
+  CreateTx, DeleteTx, ObjectSelector, ObjectTx, ObjectTxDetails, ShortID, Space, SpaceUser, TxOperation,
+  UpdateTx, VDoc, Title, Reference
 } from '@anticrm/domains'
 import { AnyPlugin, identify } from '@anticrm/platform'
 import Builder from './builder'
@@ -36,45 +41,45 @@ import Builder from './builder'
 const modelIds = identify('core' as AnyPlugin, {
   class: {
     Obj: '' as Ref<Class<Obj>>,
-    Emb: CORE_CLASS_EMB,
-    Doc: CORE_CLASS_DOC,
+    Emb: CORE_CLASS_EMB as Ref<Class<Emb>>, //eslint-disable-line
+    Doc: CORE_CLASS_DOC as Ref<Class<Doc>>, // eslint-disable-line
 
     Classifier: '' as Ref<Class<Classifier>>,
 
     Attribute: '' as Ref<Class<Attribute>>,
-    Class: CORE_CLASS_CLASS,
-    Mixin: CORE_CLASS_MIXIN,
+    Class: CORE_CLASS_CLASS as Ref<Class<Class<Obj>>>, // eslint-disable-line
+    Mixin: CORE_CLASS_MIXIN as Ref<Class<Mixin<Obj>>>, // eslint-disable-line
 
     EnumLiteral: '' as Ref<Class<EnumLiteral>>,
     Enum: '' as Ref<Class<Enum<any>>>,
 
     // Data types
-    Type: CORE_CLASS_TYPE,
-    String: CORE_CLASS_STRING,
+    Type: CORE_CLASS_TYPE as Ref<Class<Type>>, // eslint-disable-line
+    String: CORE_CLASS_STRING as Ref<Class<Type>>, //eslint-disable-line
     Number: '' as Ref<Class<Type>>,
     Boolean: '' as Ref<Class<Type>>,
     Date: '' as Ref<Class<Type>>,
-    ArrayOf: CORE_CLASS_ARRAY_OF,
-    RefTo: CORE_CLASS_REF_TO,
-    BagOf: CORE_CLASS_BAG_OF,
-    InstanceOf: CORE_CLASS_INSTANCE_OF,
-    EnumOf: CORE_CLASS_ENUM_OF as Ref<Class<EnumOf<any>>>,
+    ArrayOf: CORE_CLASS_ARRAY_OF as Ref<Class<ArrayOf>>, // eslint-disable-line
+    RefTo: CORE_CLASS_REF_TO as Ref<Class<RefTo<Doc>>>, // eslint-disable-line
+    BagOf: CORE_CLASS_BAG_OF as Ref<Class<BagOf>>,  // eslint-disable-line
+    InstanceOf: CORE_CLASS_INSTANCE_OF as Ref<Class<InstanceOf<Emb>>>, // eslint-disable-line
+    EnumOf: CORE_CLASS_ENUM_OF as Ref<Class<EnumOf<EnumKey>>>, // eslint-disable-line
 
     Tx: '' as Ref<Class<Tx>>,
-    ObjectTx: CORE_CLASS_OBJECT_TX,
-    ObjectTxDetails: CORE_CLASS_OBJECTTX_DETAILS,
-    CreateTx: CORE_CLASS_CREATE_TX,
-    UpdateTx: CORE_CLASS_UPDATE_TX,
-    ObjectSelector: CORE_CLASS_OBJECT_SELECTOR,
-    TxOperation: CORE_CLASS_TX_OPERATION,
-    DeleteTx: CORE_CLASS_DELETE_TX,
+    ObjectTx: CORE_CLASS_OBJECT_TX as Ref<Class<ObjectTx>>, // eslint-disable-line
+    ObjectTxDetails: CORE_CLASS_OBJECTTX_DETAILS as Ref<Class<ObjectTxDetails>>, // eslint-disable-line
+    CreateTx: CORE_CLASS_CREATE_TX as Ref<Class<CreateTx>>, // eslint-disable-line
+    UpdateTx: CORE_CLASS_UPDATE_TX as Ref<Class<UpdateTx>>, // eslint-disable-line
+    ObjectSelector: CORE_CLASS_OBJECT_SELECTOR as Ref<Class<ObjectSelector>>, // eslint-disable-line
+    TxOperation: CORE_CLASS_TX_OPERATION as Ref<Class<TxOperation>>, // eslint-disable-line
+    DeleteTx: CORE_CLASS_DELETE_TX as Ref<Class<DeleteTx>>, // eslint-disable-line
 
     Title: '' as Ref<Class<Title>>,
 
     VDoc: '' as Ref<Class<VDoc>>,
 
-    Space: CORE_CLASS_SPACE,
-    SpaceUser: CORE_CLASS_SPACE_USER,
+    Space: CORE_CLASS_SPACE as Ref<Class<Space>>, // eslint-disable-line
+    SpaceUser: CORE_CLASS_SPACE_USER as Ref<Class<SpaceUser>>, // eslint-disable-line
 
     Reference: '' as Ref<Class<Reference>>,
 
@@ -82,7 +87,7 @@ const modelIds = identify('core' as AnyPlugin, {
   },
   mixin: {
     Indices: '' as Ref<Mixin<Indices>>,
-    ShortID: CORE_MIXIN_SHORTID
+    ShortID: CORE_MIXIN_SHORTID as Ref<Mixin<ShortID>>, // eslint-disable-line
   }
 })
 export default modelIds

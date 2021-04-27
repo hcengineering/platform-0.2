@@ -4,6 +4,7 @@
   "main": "src/index.ts",
   "scripts": {
     "build": "tsc --build",
+    "build:docs": "echo 'no docs yet'",
     "test": "jest",
     "token": "ts-node src/token.ts",
     "lint": "eslint --max-warnings=0 src",

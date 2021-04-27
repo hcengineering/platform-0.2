@@ -24,7 +24,9 @@
     "upgrade-workspace": "ts-node -T src/index.ts upgrade-workspace",
     "lint": "eslint --max-warnings=0 src",
     "lint:fix": "eslint --fix src",
-    "test": "echo 'no tests'"
+    "test": "echo 'no tests'",
+    "build": "tsc",
+    "build:docs": "echo 'no docs yet'"
   },
   "dependencies": {
     "commander": "^6.1.0",

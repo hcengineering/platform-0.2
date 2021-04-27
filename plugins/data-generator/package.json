@@ -7,6 +7,7 @@
   "scripts": {
     "build": "tsc",
     "test": "echo 'no tests'",
+    "build:docs": "echo 'no docs yet'",
     "preformat-svelte": "prettier -w **/*.svelte",
     "lint": "eslint --max-warnings=0 src",
     "lint:fix": "yarn preformat-svelte && eslint --fix src"
