@@ -26,8 +26,8 @@ limitations under the License.
   import Card from './Card.svelte'
   import type { CardDragEvent } from './cardHelper'
 
-  import { FSM, FSMService, getFSMService, State, WithFSM } from '../..'
-  import fsmPlugin from '../..'
+  import type { FSM, State, WithFSM } from '../..'
+  import fsmPlugin, { getFSMService } from '../..'
 
   export let target: WithFSM
 
@@ -65,6 +65,7 @@ limitations under the License.
   let itemsQuery: Promise<QueryUpdater<VDoc>> | undefined
 
   $: if ($fsm && cs) {
+    // Eventually should manage query per target class
     itemsQuery = liveQuery(
       itemsQuery,
       $fsm.classes[0],
@@ -88,10 +89,6 @@ limitations under the License.
 
       fsmServiceP
         .then((fsmService) => fsmService.getStates($fsm))
-        .then((xs) => {
-          console.log(xs)
-          return xs
-        })
         .then((xs) => Promise.all(xs.map((_id) => cs?.findOne(fsmPlugin.class.State, { _id }))))
         .then((xs) => xs.filter((x): x is State => x !== undefined))
         .then((states) => {

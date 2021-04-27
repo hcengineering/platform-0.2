@@ -53,7 +53,7 @@ limitations under the License.
     resume = object?.resume
   }
 
-  async function unassign() {
+  async function unassign () {
     if (!object || !candidate) {
       return
     }
@@ -70,7 +70,7 @@ limitations under the License.
     })
   }
 
-  async function assign(vacancyRef: Ref<Vacancy>) {
+  async function assign (vacancyRef: Ref<Vacancy>) {
     if (!object || !candidate) {
       return
     }
