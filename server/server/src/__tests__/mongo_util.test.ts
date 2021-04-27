@@ -15,7 +15,7 @@
 //
 /* eslint-env jest */
 
-import { BooleanProperty, DocumentValue, StringProperty, Tx, txContext } from '@anticrm/core'
+import { BooleanProperty, DocumentValue, generateId, SortingOrder, StringProperty, Tx, txContext } from '@anticrm/core'
 import { createSubtask, Task, taskIds as task } from '@anticrm/core/src/__tests__/tasks'
 import { CORE_CLASS_OBJECT_SELECTOR, CORE_CLASS_SPACE } from '@anticrm/domains'
 import { createOperations } from '@anticrm/platform-core/src/operations'
@@ -347,5 +347,52 @@ describe('mongo operations', () => {
 
     const r = await ws.find(task.class.Task, {}, { skip: 10 })
     expect(r.length).toEqual(40)
+  })
+
+  it('check sorting', async () => {
+    const ws = await server.getWorkspace(wsName)
+
+    const processTx = async (tx: Tx): Promise<void> => {
+      await ws.tx(txContext(), tx)
+    }
+    const ops = createOperations(await ws.getModel(), processTx, () => 'qwe' as StringProperty)
+
+    for (let i = 0; i < 50; i++) {
+      const doc1: DocumentValue<Task> = {
+        name: `my-task-${10 - i % 5}`,
+        description: `${10000 - i * i}`,
+        comments: [{ _id: `#${i}`, author: generateId(), date: new Date(), oldVersion: [], message: `${i}` }],
+        lists: [`${i}`],
+        rate: 20 + i,
+        tasks: []
+      }
+      await ops.create<Task>(task.class.Task, doc1)
+    }
+
+    let r = await ws.find(task.class.Task, {}, {
+      sort: { name: SortingOrder.Ascending, comments: { message: SortingOrder.Descending } }
+    })
+    let names = r.map(v => v.name).filter(function (item, pos, self) {
+      return self.indexOf(item) === pos
+    })
+    expect(names).toEqual([10, 6, 7, 8, 9].map(v => `my-task-${v}`))
+    let messages = r.map(v => v.comments?.[0].message).filter(function (item, pos, self) {
+      return self.indexOf(item) === pos
+    })
+    expect(messages).toEqual(['5', '45', '40', '35', '30', '25', '20', '15', '10', '0', '9', '49', '44', '4', '39', '34', '29', '24', '19', '14', '8', '48', '43', '38', '33', '3', '28', '23', '18', '13', '7', '47', '42', '37', '32', '27', '22', '2', '17', '12', '6', '46', '41', '36', '31', '26', '21', '16', '11', '1'])
+
+    // Do search order reverse
+
+    r = await ws.find(task.class.Task, {}, {
+      sort: { comments: { message: SortingOrder.Descending }, name: SortingOrder.Ascending }
+    })
+    names = r.map(v => v.name).filter(function (item, pos, self) {
+      return self.indexOf(item) === pos
+    })
+    expect(names).toEqual([6, 7, 8, 9, 10].map(v => `my-task-${v}`))
+    messages = r.map(v => v.comments?.[0].message).filter(function (item, pos, self) {
+      return self.indexOf(item) === pos
+    })
+    expect(messages).toEqual(['9', '8', '7', '6', '5', '49', '48', '47', '46', '45', '44', '43', '42', '41', '40', '4', '39', '38', '37', '36', '35', '34', '33', '32', '31', '30', '3', '29', '28', '27', '26', '25', '24', '23', '22', '21', '20', '2', '19', '18', '17', '16', '15', '14', '13', '12', '11', '10', '1', '0'])
   })
 })

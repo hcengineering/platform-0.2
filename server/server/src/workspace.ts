@@ -145,7 +145,9 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
           resultQuery.push({ $limit: options.limit ?? 0 })
         }
         if (options?.sort !== undefined) {
-          resultQuery.push({ $sort: options.sort ?? {} })
+          let sortOptions: AnyLayout = (options.sort ?? {}) as unknown as AnyLayout
+          sortOptions = memdb.flattenQuery(_class, sortOptions, false)
+          resultQuery.push({ $sort: sortOptions })
         }
         const resultValue = collection(_class).aggregate<any>([{
           $facet: {
@@ -179,7 +181,9 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
       let cursor = collection(_class).find(finalQuery)
 
       if (options?.sort !== undefined) {
-        cursor = cursor.sort(options.sort as SortOptionObject<Doc>)
+        let sortOptions: AnyLayout = (options.sort ?? {}) as unknown as AnyLayout
+        sortOptions = memdb.flattenQuery(_class, sortOptions, false)
+        cursor = cursor.sort(sortOptions as SortOptionObject<Doc>)
       }
 
       const values = await cursor.toArray()

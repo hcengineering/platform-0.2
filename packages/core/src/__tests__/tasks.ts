@@ -43,6 +43,10 @@ export interface Task extends Doc {
   comments?: TaskComment[]
 }
 
+export interface TaskWithSecond extends Task {
+  secondTask: SubTask | null
+}
+
 export interface DerivedTask extends Task {
 }
 

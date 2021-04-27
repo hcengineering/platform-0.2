@@ -533,7 +533,14 @@ export class Model implements Storage {
     return { query: query as DocumentQuery<T>, classes }
   }
 
-  private flattenQuery (_class: Ref<Class<Obj>>, layout: AnyLayout): AnyLayout {
+  /**
+   *  Convert a layout into 'dot' notation form if applicable.
+   * @param _class - an query or sort options.
+   * @param layout - input layout.
+   * @param useOperators - will allow to use $elemMatch and $all in case of query.
+   * @returns  - an layout with replacement of embedded documents into 'dot' notation.
+   */
+  public flattenQuery (_class: Ref<Class<Obj>>, layout: AnyLayout, useOperators = true): AnyLayout {
     const l: AnyLayout = {}
 
     // Also assign a class to value if not specified
@@ -567,11 +574,21 @@ export class Model implements Storage {
               for (const rv of (rValue as unknown[])) {
                 value = this.flattenArrayValue(value, attrClass, rv as AnyLayout)
               }
+              if (!useOperators) {
+                throw new Error('operators are required to match with array')
+              }
               l[key] = { $all: value as Property<any, any> }
               continue
             } else if (rValue instanceof Object) {
-              // We should use $elemMatch.
-              l[key] = { $elemMatch: this.flattenQuery(attrClass, (rValue as unknown) as AnyLayout) }
+              const q = this.flattenQuery(attrClass, (rValue as unknown) as AnyLayout)
+              if (useOperators) {
+                // We should use $elemMatch.
+                l[key] = { $elemMatch: q }
+              } else {
+                for (const oo of Object.entries(q)) {
+                  l[key + '.' + oo[0]] = oo[1]
+                }
+              }
               continue
             }
           }
