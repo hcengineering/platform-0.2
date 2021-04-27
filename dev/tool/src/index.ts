@@ -76,7 +76,7 @@ program
   .description('create workspace')
   .requiredOption('-o, --organization <organization>', 'organization name')
   .action(async (workspace, cmd) => {
-    return await withDatabase(mongodbUri, (client) => {
+    return await withDatabase(mongodbUri, async (client) => {
       const accounts = client.db('accounts')
       await createWorkspace(accounts, workspace, cmd.organization)
 
