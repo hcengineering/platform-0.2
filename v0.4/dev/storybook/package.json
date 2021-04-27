@@ -16,7 +16,8 @@
     "build": "echo 'no build'",
     "test": "jest --watchAll",
     "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "build-storybook": "build-storybook",
+    "upload": "aws s3 sync storybook-static s3://anticrm-storybook --delete --acl public-read"
   },
   "devDependencies": {
     "@babel/core": "^7.12.10",
