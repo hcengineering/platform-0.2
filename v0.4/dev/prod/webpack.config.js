@@ -130,13 +130,13 @@ module.exports = {
           },
           {
             loader: 'svgo-loader',
-            options: {
-              plugins: [
-                { removeHiddenElems: { displayNone: false } },
-                { cleanupIDs: false },
-                { removeTitle: true }
-              ]
-            }
+            // options: {
+            //   plugins: [
+            //     { removeHiddenElems: { displayNone: false } },
+            //     { cleanupIDs: false },
+            //     { removeTitle: true }
+            //   ]
+            // }
           }
         ]
       }

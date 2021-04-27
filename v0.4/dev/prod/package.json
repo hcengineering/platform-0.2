@@ -28,7 +28,8 @@
     "@anticrm/sparkling-theme": "~0.2.0",
     "sass-loader": "~11.0.1",
     "@types/node": "~14.14.40",
-    "webpack-bundle-analyzer": "~4.4.1"
+    "webpack-bundle-analyzer": "~4.4.1",
+    "svgo-loader": "~3.0.0"
   },
   "dependencies": {
     "@anticrm/plugin-ui": "~0.2.0",

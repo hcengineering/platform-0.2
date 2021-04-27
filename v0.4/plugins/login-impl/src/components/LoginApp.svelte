@@ -201,7 +201,7 @@
           &:after {
             position: absolute;
             content: "";
-            background: center url("http://platform.exhale24.ru/img/p.svg");
+            background: center url("../../img/p.svg");
             transform: translate(-50%, -50%);
             width: 63px;
             height: 79px;
