@@ -4,6 +4,7 @@ dependencies:
   '@babel/runtime': 7.13.10
   '@fingerprintjs/fingerprintjs': 3.1.0
   '@microsoft/api-extractor': 7.13.5
+  '@rush-temp/account': file:projects/account.tgz
   '@rush-temp/plugin': file:projects/plugin.tgz
   '@rush-temp/plugin-login': file:projects/plugin-login.tgz
   '@rush-temp/plugin-login-impl': file:projects/plugin-login-impl.tgz
@@ -15795,6 +15796,18 @@ packages:
     dev: false
     resolution:
       integrity: sha512-V50KMwwzqJV0NpZIZFwfOD5/lyny3WlSzRiXgA0G7VUnRlqttta1L6UQIHzd6EuBY/cHGfwTIck7w1yH6Q5zUw==
+  file:projects/account.tgz:
+    dependencies:
+      '@microsoft/api-extractor': 7.13.5
+      prettier: 2.2.1
+      ts-standard: 10.0.0_typescript@4.2.4
+      typescript: 4.2.4
+    dev: false
+    name: '@rush-temp/account'
+    resolution:
+      integrity: sha512-xO1MsO50NM5H24VIYq55y/8YwUKviMnM4s9gPHoOHdBiWFkUhfVzfdsxFDwcmZTK5G+EUNNQhnOg1d0nNCftkw==
+      tarball: file:projects/account.tgz
+    version: 0.0.0
   file:projects/plugin-login-impl.tgz:
     dependencies:
       '@fingerprintjs/fingerprintjs': 3.1.0
@@ -16036,6 +16049,7 @@ specifiers:
   '@babel/runtime': ~7.13.10
   '@fingerprintjs/fingerprintjs': ~3.1.0
   '@microsoft/api-extractor': ~7.13.4
+  '@rush-temp/account': file:./projects/account.tgz
   '@rush-temp/plugin': file:./projects/plugin.tgz
   '@rush-temp/plugin-login': file:./projects/plugin-login.tgz
   '@rush-temp/plugin-login-impl': file:./projects/plugin-login-impl.tgz

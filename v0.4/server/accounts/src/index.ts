@@ -14,7 +14,7 @@
 //
 
 import { Binary, Db, MongoClient, ObjectID } from 'mongodb'
-import { PlatformStatusCodes, PlatformError, Status, Severity } from '@anticrm/foundation'
+import { PlatformError, Status, Severity } from '@anticrm/status'
 import { Request, Response } from '@anticrm/rpc'
 import { randomBytes, pbkdf2Sync } from 'crypto'
 import { Buffer } from 'buffer'

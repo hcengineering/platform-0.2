@@ -401,6 +401,10 @@
       "projectFolder": "plugins/login-impl"
     },
     {
+      "packageName": "@anticrm/account",
+      "projectFolder": "platform/account"
+    },
+    {
       "packageName": "prod",
       "projectFolder": "dev/prod"
     },
