@@ -94,7 +94,7 @@
       overflow: hidden;
       margin-right: 20px;
       width: 668px;
-      padding: 80px 75px;
+      padding: 20px 15px;
       border-radius: 20px;
 
       .back-panel-light {
@@ -109,7 +109,7 @@
         flex-direction: column;
         justify-content: space-between;
         overflow: auto;
-        padding: 0 5px;
+        padding: 60px 65px;
         height: 100%;
         z-index: 100;
 
@@ -148,6 +148,8 @@
                 flex-direction: column;
               }
               .form-col {
+                flex-grow: 0;
+                flex-basis: 48px;
                 &:first-child {
                   margin-right: 0px;
                   margin-bottom: 20px;
