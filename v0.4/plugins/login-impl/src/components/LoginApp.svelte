@@ -16,6 +16,7 @@
 <script lang="ts">
   import { Button, EditBox, Status } from '@anticrm/sparkling-controls'
   let fname: string = ''
+  let lname: string = ''
 </script>
 
 <div class="container">
@@ -29,13 +30,13 @@
       <div class="title">Sign up</div>
       <div class="status">
         {#if fname == 'error'}
-          <Status severity="ERROR" message="Error" width="100%"/>
+          <Status severity="ERROR" message="Error: {lname}" width="100%"/>
         {/if}
       </div>
       <div class="form">
         <div class="form-row wCol">
           <div class="form-col"><EditBox label="First Name" bind:value={fname}/></div>
-          <div class="form-col"><EditBox label="Last Name"/></div>
+          <div class="form-col"><EditBox label="Last Name" bind:value={lname}/></div>
         </div>
         <div class="form-row"><EditBox label="E-mail"/></div>
         <div class="form-row"><EditBox label="Password" password/></div>
@@ -93,7 +94,7 @@
       overflow: hidden;
       margin-right: 20px;
       width: 668px;
-      padding: 0px 80px;
+      padding: 80px 75px;
       border-radius: 20px;
 
       .back-panel-light {
@@ -106,7 +107,9 @@
       .form-container {
         display: flex;
         flex-direction: column;
-        justify-content: center;
+        justify-content: space-between;
+        overflow: auto;
+        padding: 0 5px;
         height: 100%;
         z-index: 100;
 
@@ -115,7 +118,6 @@
           font-size: 24px;
           line-height: 29px;
           color: #FFFFFF;
-
         }
         .status {
           min-height: 120px;
@@ -127,8 +129,6 @@
           display: flex;
           flex-direction: column;
           justify-content: space-between;
-          height: 414px;
-          overflow: auto;
 
           .form-row {
             margin-bottom: 20px;
@@ -160,15 +160,13 @@
           }
         }
         .separator-footer {
-          min-height: 60px;
           flex-grow: 1;
         }
         .reg-footer {
-          margin-bottom: 80px;
+          margin-top: 56px;
           font-size: 13px;
           line-height: 16px;
           color: #FFFFFF;
-          z-index: 99;
           span {
             opacity: 0.3;
           }
