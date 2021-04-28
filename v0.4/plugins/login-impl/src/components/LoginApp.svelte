@@ -70,8 +70,6 @@
       overflow: hidden;
       margin-right: 20px;
       width: 668px;
-      min-width: 320px;
-      min-height: 300px;
       padding: 20px 15px;
       border-radius: 20px;
 
