@@ -15,7 +15,9 @@
 
 <div class="reg-panel">
   <div class="back-panel-dark"/>
-  <div class="back-panel-light"><div class="bg-noise opacity-3"/></div>
+  <div class="back-panel-light">
+    <div class="bg-noise opacity-3"/>
+  </div>
   <slot/>
 </div>
 

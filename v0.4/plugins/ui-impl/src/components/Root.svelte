@@ -97,12 +97,12 @@
 
     .bg-cover {
       @include bg-layer(linear-gradient(112.79deg, #AEA4CC 2.31%, rgba(196, 150, 191, 0) 98.9%), 0.05);
+      z-index: -1;
     }
 
     .status-bar {
       height: $status-bar-height;
       line-height: $status-bar-height;
-      z-index: 1;
 
       .container {
         display: flex;
