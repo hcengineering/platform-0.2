@@ -8,6 +8,6 @@
 
 @mixin bg-layer($color, $opacity) {
   @include bg-fullsize;
-  background-color: $color;
+  background: $color;
   opacity: $opacity;
 }
