@@ -65,7 +65,7 @@ function toAccountInfo (account: Account): AccountInfo {
   return result
 }
 
-async function createAccount (db: Db, email: string, password: string): Promise<AccountInfo> {
+function createAccount (db: Db, email: string, password: string): Promise<AccountInfo> {
   const salt = randomBytes(32)
   const hash = hashWithSalt(password, salt)
 
@@ -74,37 +74,42 @@ async function createAccount (db: Db, email: string, password: string): Promise<
   //   throw new PlatformError(new Status(Severity.ERROR, AccountStatusCode.ACCOUNT_DUPLICATE, 'Account already exists.'))
   // }
 
-  return await db
+  console.log('we are here')
+
+  return db
     .collection(ACCOUNT_COLLECTION)
     .insertOne({
       email,
       hash,
       salt,
-      workspaces: [],
-      clientIds: []
+      workspaces: []
     })
     .then((result) => ({
       _id: result.insertedId,
       email,
       workspaces: [],
-      clientIds: [],
-      clientSecret: ''
     }))
 }
 
-export async function createWorkspace (db: Db, workspace: string, organisation: string): Promise<string> {
+export function createWorkspace (db: Db, workspace: string, organisation: string): Promise<string> {
   // Ensure workspace is not exists yet.
   // if ((await getWorkspace(db, workspace)) != null) {
   //   throw new PlatformError(new Status(Severity.ERROR, PlatformStatusCodes.WORKSPACE_ALREADY_EXISTS, 'Workspace already exists and could not be created.'))
   // }
   // Create a new workspace record
-  return await db
+
+  return db
     .collection(WORKSPACE_COLLECTION)
     .insertOne({
       workspace,
       organisation
     })
     .then((e) => e.insertedId)
+    .catch((err) => {
+      throw err.code === 11000 ? 
+        new PlatformError(new Status(Severity.ERROR, AccountStatusCode.DUPLICATE_WORKSPACE, 'Workspace already exists')) :
+        new PlatformError(new Status(Severity.ERROR, AccountStatusCode.DATABASE_ERROR, err.message))
+    })
 }
 
 // async function updateAccount (db: Db, email: string, password: string, newPassword: string): Promise<AccountInfo> {

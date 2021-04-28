@@ -26,11 +26,12 @@ describe('server', () => {
   const dbUri = process.env.MONGODB_URI || 'mongodb://localhost:27017'
   let conn: MongoClient
   let db: Db
-  let workspace: string = 'ws-' + randomBytes(8).toString('hex')
+  let workspaceId: string
 
   beforeAll(async () => {
     conn = await MongoClient.connect(dbUri, { useUnifiedTopology: true })
     db = conn.db(DB_NAME)
+    await db.dropDatabase()
     await db.collection('account').createIndex({ email: 1 }, { unique: true })
     await db.collection('workspace').createIndex({ workspace: 1 }, { unique: true })
   })
@@ -50,12 +51,26 @@ describe('server', () => {
   it('should create workspace', async () => {
     const request: Request<[string, string]> = {
       method: 'createWorkspace',
-      params: [workspace, 'ООО Рога и Копыта']
+      params: ['workspace', 'ООО Рога и Копыта']
     }
 
     const result = await methods.createWorkspace(db, request)
-    expect(result.result).toBeDefined()
-    workspace = result.result as string
+    if (result.result !== undefined) {
+      workspaceId = result.result
+    } else {
+      expect(result.result).toBeDefined()
+    }
+  })
+
+  it('should not create duplicate workspace', async () => {
+    const request: Request<[string, string]> = {
+      method: 'createWorkspace',
+      params: ['workspace', 'ООО Рога и Копыта']
+    }
+
+    const result = await methods.createWorkspace(db, request)
+    expect(result.error).toBeDefined()
+    console.log(result.error)
   })
 
   // it('should create account', async () => {
