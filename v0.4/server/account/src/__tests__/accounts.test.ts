@@ -17,8 +17,8 @@
 
 import { MongoClient, Db } from 'mongodb'
 import { Request } from '@anticrm/rpc'
-import { getAccount, getWorkspace, methods } from '..'
-import { randomBytes } from 'crypto'
+import { AccountStatusCode } from '@anticrm/account'
+import { methods } from '..'
 
 const DB_NAME = 'test_accounts'
 
@@ -26,7 +26,6 @@ describe('server', () => {
   const dbUri = process.env.MONGODB_URI || 'mongodb://localhost:27017'
   let conn: MongoClient
   let db: Db
-  let workspaceId: string
 
   beforeAll(async () => {
     conn = await MongoClient.connect(dbUri, { useUnifiedTopology: true })
@@ -40,14 +39,6 @@ describe('server', () => {
     await conn.close()
   })
 
-  beforeEach(async () => {
-    // const olddb = conn.db(DB_NAME)
-    // await olddb.dropDatabase()
-    // db = conn.db(DB_NAME)
-    // await db.collection('account').createIndex({ email: 1 }, { unique: true })
-    // await db.collection('workspace').createIndex({ workspace: 1 }, { unique: true })
-  })
-
   it('should create workspace', async () => {
     const request: Request<[string, string]> = {
       method: 'createWorkspace',
@@ -55,11 +46,7 @@ describe('server', () => {
     }
 
     const result = await methods.createWorkspace(db, request)
-    if (result.result !== undefined) {
-      workspaceId = result.result
-    } else {
-      expect(result.result).toBeDefined()
-    }
+    expect(result.result).toBeDefined()
   })
 
   it('should not create duplicate workspace', async () => {
@@ -92,83 +79,58 @@ describe('server', () => {
     expect(result.error).toBeDefined()
   })
 
-  // it('should login', async () => {
-  //   await methods.createAccount(db, {
-  //     method: 'createAccount',
-  //     params: ['andrey', '123']
-  //   })
-  //   await methods.createWorkspace(db, {
-  //     method: 'createWorkspace',
-  //     params: [workspace, 'ООО Рога и Копыта']
-  //   })
-  //   await methods.assignWorkspace(db, {
-  //     method: 'assignWorkspace',
-  //     params: ['andrey', workspace]
-  //   })
+  it('should add workspace', async () => {
+    const request: Request<[string, string]> = {
+      method: 'addWorkspace',
+      params: ['andrey2', 'workspace']
+    }
 
-  //   const request: any = {
-  //     method: 'login',
-  //     params: ['andrey', '123', workspace]
-  //   }
+    const result = await methods.addWorkspace(db, request)
+    expect(result.error).toBeUndefined()
+  })
 
-  //   const result = await methods.login(db, request)
-  //   expect(result.result).toBeDefined()
-  // })
+  it('should login', async () => {
+    const request: Request<[string, string, string]>= {
+      method: 'login',
+      params: ['andrey2', '123', 'workspace']
+    }
 
-  // it('should not login, wrong password', async () => {
-  //   const request: any = {
-  //     method: 'login',
-  //     params: ['andrey', '123555', workspace]
-  //   }
+    const result = await methods.login(db, request)
+    expect(result.result).toBeDefined()
+    expect(result.result?.email).toBe('andrey2')
+  })
 
-  //   const result = await methods.login(db, request)
-  //   expect(result.error).toBeDefined()
-  // })
+  it('should not login, wrong password', async () => {
+    const request: Request<[string, string, string]>= {
+      method: 'login',
+      params: ['andrey2', '1234', 'workspace']
+    }
 
-  // it('should not login, unknown user', async () => {
-  //   const request: any = {
-  //     method: 'login',
-  //     params: ['andrey1', '123555', workspace]
-  //   }
+    const result = await methods.login(db, request)
+    expect(result.error).toBeDefined()
+    expect(result.error?.code).toBe(AccountStatusCode.INCORRECT_PASSWORD)
+  })
 
-  //   const result = await methods.login(db, request)
-  //   expect(result.error).toBeDefined()
-  // })
+  it('should not login, unknown user', async () => {
+    const request: Request<[string, string, string]>= {
+      method: 'login',
+      params: ['andrey22', '1234', 'workspace']
+    }
 
-  // it('should not login, wrong workspace', async () => {
-  //   const request: any = {
-  //     method: 'login',
-  //     params: ['andrey', '123', 'non-existent-workspace']
-  //   }
+    const result = await methods.login(db, request)
+    expect(result.error).toBeDefined()
+    expect(result.error?.code).toBe(AccountStatusCode.ACCOUNT_NOT_FOUND)
+  })
 
-  //   const result = await methods.login(db, request)
-  //   expect(result.error).toBeDefined()
-  // })
+  it('should not login, wrong workspace', async () => {
+    const request: Request<[string, string, string]>= {
+      method: 'login',
+      params: ['andrey2', '123', 'non-existent-workspace']
+    }
 
-  // it('do remove workspace', async () => {
-  //   await methods.createAccount(db, {
-  //     method: 'createAccount',
-  //     params: ['andrey', '123']
-  //   })
-  //   await methods.createWorkspace(db, {
-  //     method: 'createWorkspace',
-  //     params: [workspace, 'ООО Рога и Копыта']
-  //   })
-  //   await methods.assignWorkspace(db, {
-  //     method: 'assignWorkspace',
-  //     params: ['andrey', workspace]
-  //   })
-
-  //   // Check we had one
-  //   expect((await getAccount(db, 'andrey'))?.workspaces.length).toEqual(1)
-  //   expect((await getWorkspace(db, workspace))?.accounts.length).toEqual(1)
-
-  //   await methods.removeWorkspace(db, {
-  //     method: 'removeWorkspace',
-  //     params: ['andrey', workspace]
-  //   })
-  //   expect((await getAccount(db, 'andrey'))?.workspaces.length).toEqual(0)
-  //   expect((await getWorkspace(db, workspace))?.accounts.length).toEqual(0)
-  // })
+    const result = await methods.login(db, request)
+    expect(result.error).toBeDefined()
+    expect(result.error?.code).toBe(AccountStatusCode.WORKSPACE_NOT_FOUND)
+  })
 
 })
