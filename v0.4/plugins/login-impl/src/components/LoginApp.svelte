@@ -14,15 +14,13 @@
 -->
 
 <script lang="ts">
-  import { Button, EditBox, Status } from '@anticrm/sparkling-controls'
+  import { Button, EditBox, Status, Panel } from '@anticrm/sparkling-controls'
   let fname: string = ''
   let lname: string = ''
 </script>
 
 <div class="container">
-  <div class="reg-panel">
-    <div class="back-panel-dark"/>
-    <div class="back-panel-light"><div class="bg-noise opacity-3"/></div>
+  <Panel>
     <div class="form-container">
       <div class="separator-footer"/>
       <div class="title">Sign up</div>
@@ -42,7 +40,7 @@
       <div class="separator-footer"/>
       <div class="reg-footer"><span>Already have an account?</span> <a href="/login">Sign In</a></div>
     </div>
-  </div>
+  </Panel>
   <div class="intro">
     <div class="content">
       <div class="logo"> </div>
@@ -55,89 +53,70 @@
 </div>
 
 <style lang="scss">
-  @import "@anticrm/sparkling-theme/styles/mixins.scss";
-
   .container {
     display: flex;
     flex-direction: row;
     height: 100%;
     padding: 20px;
 
-    .reg-panel {
-      position: relative;
-      overflow: hidden;
-      margin-right: 20px;
-      width: 668px;
-      padding: 20px 15px;
-      border-radius: 20px;
 
-      .back-panel-light {
-        @include bg-layer(linear-gradient(158.74deg, rgba(205, 166, 255, 0.12) 5.62%, rgba(255, 255, 255, 0) 97.09%), 0.3);
-        z-index: -1;
+    .form-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: auto;
+      padding: 60px 65px;
+      height: 100%;
+
+      .title {
+        font-weight: 600;
+        font-size: 24px;
+        line-height: 29px;
+        color: #FFFFFF;
       }
-      .back-panel-dark {
-        @include bg-layer(#1D1D23, 0.5);
-        z-index: -1;
+      .status {
+        min-height: 120px;
+        max-height: 120px;
+        padding-top: 20px;
       }
+      
+      .form {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        column-gap: 12px;
+        row-gap: 24px;
 
-      .form-container {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        overflow: auto;
-        padding: 60px 65px;
-        height: 100%;
-
-        .title {
-          font-weight: 600;
-          font-size: 24px;
-          line-height: 29px;
-          color: #FFFFFF;
+        .form-row {
+          grid-column-start: 1;
+          grid-column-end: 3;
         }
-        .status {
-          min-height: 120px;
-          max-height: 120px;
-          padding-top: 20px;
-        }
-        
-        .form {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          column-gap: 12px;
-          row-gap: 24px;
-
-          .form-row {
+        @media (max-width: 985px) {
+          .form-col {
             grid-column-start: 1;
             grid-column-end: 3;
           }
-          @media (max-width: 985px) {
-            .form-col {
-              grid-column-start: 1;
-              grid-column-end: 3;
-            }
-          }
-          .send {
-            margin-top: 36px;
-          }
         }
-        .separator-footer {
-          flex-grow: 1;
+        .send {
+          margin-top: 36px;
         }
-        .reg-footer {
-          margin-top: 56px;
-          font-size: 13px;
-          line-height: 16px;
-          color: #FFFFFF;
-          span {
-            opacity: 0.3;
-          }
-          a {
-            color: #fff;
-            opacity: 0.8;
-            text-decoration: none;
-            :hover {
-              opacity: 1;
-            }
+      }
+      .separator-footer {
+        flex-grow: 1;
+      }
+      .reg-footer {
+        margin-top: 56px;
+        font-size: 13px;
+        line-height: 16px;
+        color: #FFFFFF;
+        span {
+          opacity: 0.3;
+        }
+        a {
+          color: #fff;
+          opacity: 0.8;
+          text-decoration: none;
+          :hover {
+            opacity: 1;
           }
         }
       }

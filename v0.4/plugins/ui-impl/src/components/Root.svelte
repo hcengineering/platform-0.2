@@ -102,6 +102,7 @@
     .status-bar {
       height: $status-bar-height;
       line-height: $status-bar-height;
+      z-index: 1;
 
       .container {
         display: flex;
