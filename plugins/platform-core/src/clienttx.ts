@@ -1,4 +1,4 @@
-import { Class, Doc, DocumentQuery, Ref, Storage, StringProperty, Tx, TxContext } from '@anticrm/core'
+import { Class, Doc, DocumentQuery, FindOptions, Ref, Storage, StringProperty, Tx, TxContext } from '@anticrm/core'
 import { newCreateTx, newDeleteTx, newUpdateTx } from './tx'
 import { TxOperation } from '@anticrm/domains'
 
@@ -33,8 +33,8 @@ export class ClientTxStorage implements Storage {
     await this.delegateStorage.remove(ctx, _class, _id)
   }
 
-  async find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T[]> {
-    return await this.delegateStorage.find(_class, query)
+  async find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>, options?: FindOptions<T>): Promise<T[]> {
+    return await this.delegateStorage.find(_class, query, options)
   }
 
   async findOne<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined> {

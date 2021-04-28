@@ -70,3 +70,10 @@ export const RPC_CALL_FINDONE = 'findOne'
 export const RPC_CALL_LOAD_DOMAIN = 'loadDomain'
 export const RPC_CALL_TX = 'tx'
 export const RPC_CALL_GEN_REF_ID = 'genRefId'
+
+export interface FindResponse<T> {
+  values: T[]
+  skip: number
+  limit: number
+  count: number
+}

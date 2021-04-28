@@ -21,7 +21,7 @@ import {
 } from '../classes'
 import { mixinFromKey, mixinKey, Model } from '../model'
 import { DocumentQuery, DocumentValue, txContext } from '../storage'
-import { createSubtask, createTask, data, doc1, SubTask, Task, taskIds } from './tasks'
+import { createSubtask, createTask, data, doc1, SubTask, Task, taskIds, TaskWithSecond } from './tasks'
 import { CORE_CLASS_OBJECT_SELECTOR, CORE_CLASS_TX_OPERATION, Space, TxOperation, TxOperationKind } from '@anticrm/domains'
 
 describe('matching', () => {
@@ -654,5 +654,54 @@ describe('mixin tools', () => {
     expect(q1).toBeDefined()
     expect(q2).toBeDefined()
     expect(t1).toBeDefined()
+  })
+
+  it('find limit check', async () => {
+    const model = new Model('vdocs')
+    model.loadModel(data)
+
+    model.add(model.createDocument(taskIds.class.Task, createTask('t1', 10, 'test task1')))
+    model.add(model.createDocument(taskIds.class.Task, createTask('t2', 11, 'test task2')))
+    model.add(model.createDocument(taskIds.class.Task, createTask('t3', 12, 'test task3')))
+
+    const result = await model.find(taskIds.class.Task, { }, { limit: 1 })
+    expect(result).toBeDefined()
+    expect(result.length).toEqual(1)
+  })
+
+  it('find limit check-skip', async () => {
+    const model = new Model('vdocs')
+    model.loadModel(data)
+
+    model.add(model.createDocument(taskIds.class.Task, createTask('t1', 10, 'test task1')))
+    model.add(model.createDocument(taskIds.class.Task, createTask('t2', 11, 'test task2')))
+    model.add(model.createDocument(taskIds.class.Task, createTask('t3', 12, 'test task3')))
+
+    const result = await model.find(taskIds.class.Task, { }, { skip: 1 })
+    expect(result).toBeDefined()
+    expect(result.length).toEqual(2)
+  })
+
+  it('null vs undefined testing', async () => {
+    const model = new Model('vdocs')
+    model.loadModel(data)
+
+    const t: TaskWithSecond = { _class: taskIds.class.Task, name: '', description: '', lists: [], _id: 'qwe' as Ref<Doc>, secondTask: null }
+
+    expect(t.mainTask).not.toEqual(null)
+    expect(t.mainTask).toEqual(undefined)
+
+    expect(undefined == null).toBeTruthy()
+    expect(undefined === null).toBeFalsy()
+    expect(null === undefined).toBeFalsy() // eslint-disable-line
+    expect(null == undefined).toBeTruthy() // eslint-disable-line
+
+    expect(t.mainTask == null).toBeTruthy()
+    expect(t.mainTask === null).toBeFalsy()
+    expect(t.mainTask == undefined).toBeTruthy() // eslint-disable-line
+
+    expect(t.secondTask === undefined).toBeFalsy()
+    expect(t.secondTask === null).toBeTruthy()
+    expect(t.secondTask == null).toBeTruthy()
   })
 })

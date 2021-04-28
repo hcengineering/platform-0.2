@@ -153,7 +153,8 @@ describe('server', () => {
   it('should send query', (done) => {
     conn.on('message', (msg: string) => {
       const resp = readResponse(msg)
-      expect(resp.result instanceof Array).toBeTruthy()
+      expect(resp.result instanceof Object).toBeTruthy()
+      expect((resp.result as any).values instanceof Array).toBeTruthy()
       done()
     })
     conn.send(serialize({

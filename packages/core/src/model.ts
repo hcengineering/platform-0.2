@@ -20,7 +20,7 @@ import {
   CORE_CLASS_MIXIN,
   CORE_CLASS_OBJ, CORE_MIXIN_INDICES, Doc, Mixin, Obj, Property, PropertyType, Ref, Type
 } from './classes'
-import { DocumentQuery, DocumentValue, generateId, RegExpression, Storage, TxContext } from './storage'
+import { DocumentQuery, DocumentValue, FindOptions, generateId, RegExpression, Storage, TxContext } from './storage'
 
 export function mixinKey (mixin: Ref<Mixin<Obj>>, key: string): string {
   return key + '|' + mixin.replace('.', '~')
@@ -533,7 +533,14 @@ export class Model implements Storage {
     return { query: query as DocumentQuery<T>, classes }
   }
 
-  private flattenQuery (_class: Ref<Class<Obj>>, layout: AnyLayout): AnyLayout {
+  /**
+   *  Convert a layout into 'dot' notation form if applicable.
+   * @param _class - an query or sort options.
+   * @param layout - input layout.
+   * @param useOperators - will allow to use $elemMatch and $all in case of query.
+   * @returns  - an layout with replacement of embedded documents into 'dot' notation.
+   */
+  public flattenQuery (_class: Ref<Class<Obj>>, layout: AnyLayout, useOperators = true): AnyLayout {
     const l: AnyLayout = {}
 
     // Also assign a class to value if not specified
@@ -567,11 +574,21 @@ export class Model implements Storage {
               for (const rv of (rValue as unknown[])) {
                 value = this.flattenArrayValue(value, attrClass, rv as AnyLayout)
               }
+              if (!useOperators) {
+                throw new Error('operators are required to match with array')
+              }
               l[key] = { $all: value as Property<any, any> }
               continue
             } else if (rValue instanceof Object) {
-              // We should use $elemMatch.
-              l[key] = { $elemMatch: this.flattenQuery(attrClass, (rValue as unknown) as AnyLayout) }
+              const q = this.flattenQuery(attrClass, (rValue as unknown) as AnyLayout)
+              if (useOperators) {
+                // We should use $elemMatch.
+                l[key] = { $elemMatch: q }
+              } else {
+                for (const oo of Object.entries(q)) {
+                  l[key + '.' + oo[0]] = oo[1]
+                }
+              }
               continue
             }
           }
@@ -597,19 +614,25 @@ export class Model implements Storage {
 
   // Q U E R Y
 
-  findSync<T extends Doc> (clazz: Ref<Class<Doc>>, query: DocumentQuery<T>, limit = -1): T[] {
+  findSync<T extends Doc> (clazz: Ref<Class<Doc>>, query: DocumentQuery<T>, options?: FindOptions<T>): T[] {
     const { query: realQuery } = this.createQuery(clazz, query)
     const byClass = this.objectsOfClass(realQuery._class as Ref<Class<Doc>>)
 
-    return this.findAll(byClass, clazz, realQuery as unknown as AnyLayout, limit) as T[]
+    return this.findAll(byClass, clazz, realQuery as unknown as AnyLayout, options) as T[]
   }
 
-  async find<T extends Doc> (clazz: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T[]> {
-    return await Promise.resolve(this.findSync(clazz, query))
+  async find<T extends Doc> (clazz: Ref<Class<T>>, query: DocumentQuery<T>, options?: FindOptions<T>): Promise<T[]> {
+    const result = this.findSync(clazz, query, options)
+
+    if (options?.countCallback !== undefined) {
+      options.countCallback(options?.skip ?? 0, options?.limit ?? 0, result.length)
+    }
+
+    return await Promise.resolve(result)
   }
 
   async findOne<T extends Doc> (clazz: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined> {
-    const result = await Promise.resolve(this.findSync(clazz, query, 1))
+    const result = await Promise.resolve(this.findSync(clazz, query, { limit: 1 }))
     return result.length === 0 ? undefined : result[0]
   }
 
@@ -620,19 +643,33 @@ export class Model implements Storage {
    * @param query  - to match
    * @param limit - a number of items to find, pass value <= 0 to find all
    */
-  protected findAll (docs: Doc[], _class: Ref<Class<Doc>>, query: AnyLayout, limit = -1): Doc[] {
+  protected findAll (docs: Doc[], _class: Ref<Class<Doc>>, query: AnyLayout, options?: FindOptions<any>): Doc[] {
     const result: Doc[] = []
     const clazz = this.getClass(_class)
+    let skip = 0
+    let limit = 0
+
+    if (options?.skip !== undefined) {
+      skip = options.skip
+    }
+    if (options?.limit !== undefined) {
+      limit = options.limit
+    }
+
     for (const doc of docs) {
       if (this.matchQuery(_class, doc, query)) {
         if (clazz === _class) {
           // Push original document.
-          result.push(doc)
+          if (skip > 0) {
+            skip--
+          } else {
+            result.push(doc)
+          }
         } else {
           // In case of mixin we need to cast
           result.push(this.as(doc, _class as Ref<Mixin<Doc>>))
         }
-        if (limit > 0 && result.length > limit) {
+        if (limit > 0 && result.length >= limit) {
           return result
         }
       }
@@ -809,6 +846,31 @@ export class Model implements Storage {
       return false
     }
     return this.matchObject(_class, doc, query, false)
+  }
+
+  /**
+   * Method will check if passed values of object are matched in query.
+   * @param object - partial object values.
+   * @param query - a query.
+   */
+  isPartialMatched<T extends Doc> (_class: Ref<Class<Doc>>, object: AnyLayout, query: DocumentQuery<T>): boolean {
+    const stripQuery: AnyLayout = {}
+    const oKeys = new Set<string>(Object.keys(object))
+
+    // Make a part of query with values in object.
+    let keys = 0
+    for (const oe of Object.entries(query)) {
+      if (oKeys.has(oe[0])) {
+        stripQuery[oe[0]] = oe[1]
+        keys++
+      }
+    }
+    if (keys === 0) {
+      // Not keys to compare, so operation is not fit into our query in any case
+      return false
+    }
+
+    return this.matchObject<any>(_class, object, stripQuery)
   }
 
   /**
