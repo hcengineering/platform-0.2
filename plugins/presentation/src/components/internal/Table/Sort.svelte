@@ -17,9 +17,13 @@
   const dispatch = createEventDispatcher()
   const stateContext = getContext('table-state')
 
+  // eslint-disable-next-line no-unused-vars
   enum SortOrder {
+    // eslint-disable-next-line no-unused-vars
     UNSORTED = 'Unsorted',
+    // eslint-disable-next-line no-unused-vars
     ASC = 'Ascending',
+    // eslint-disable-next-line no-unused-vars
     DESC = 'Descending'
   }
 
@@ -27,7 +31,7 @@
   export let key
 
   const labels = {
-    [SortOrder.ASC]: { title: 'Ascending', html: '&#8638;' }, // title gonna be intl value
+    [SortOrder.ASC]: { title: 'Ascending', html: '&#8638;' }, // title is gonna be intl value
     [SortOrder.DESC]: { title: 'Descending', html: '&#8595;' },
     [SortOrder.UNSORTED]: { title: 'Unsorted', html: '&#10607;' }
   }

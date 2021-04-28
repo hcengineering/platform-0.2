@@ -56,13 +56,12 @@
   }
 
   function onSearch (event) {}
-
 </script>
 
 <div class="table-component">
   <!-- control panel-->
   <slot name="controls">
-    <svelte:component this={TableControls} on:search={onSearch}/>
+    <TableControls on:search={onSearch} />
   </slot>
 
   <table>
@@ -95,12 +94,7 @@
             {#each attributes as attr (attr.key)}
               <td>
                 {#if attr.presenter}
-                  <Presenter
-                    is={attr.presenter}
-                    value={object[attr.key]}
-                    attribute={attr}
-                    maxWidth={350}
-                    {editable} />
+                  <Presenter is={attr.presenter} value={object[attr.key]} attribute={attr} maxWidth={350} {editable} />
                 {:else}
                   <span>{object[attr.key] || ''}</span>
                 {/if}
@@ -111,7 +105,6 @@
       </tbody>
     {/if}
   </table>
-
 </div>
 
 <style lang="scss">
@@ -134,7 +127,6 @@
     border-collapse: collapse;
     border-spacing: 0.5rem;
     border-radius: 15px;
-
 
     thead {
       border-bottom: 1px solid var(--theme-bg-accent-color);
