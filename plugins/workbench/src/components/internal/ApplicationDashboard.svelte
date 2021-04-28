@@ -59,7 +59,7 @@
     })
   }
 
-  const onCreatorClick = (creator: ItemCreator) => uiService.showModal(CreateForm, { creator, spaces })
+  const onCreatorClick = (creator: ItemCreator) => uiService.showModal(CreateForm, { application, creator, spaces })
 </script>
 
 <div class="workbench-browse">

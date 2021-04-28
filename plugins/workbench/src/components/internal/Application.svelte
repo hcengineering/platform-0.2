@@ -52,7 +52,8 @@
 
   let creatorsQuery: Promise<QueryUpdater<ItemCreator>>
 
-  const onCreatorClick = (creator: ItemCreator) => uiService.showModal(CreateForm, { creator, spaces: [space] })
+  const onCreatorClick = (creator: ItemCreator) =>
+    uiService.showModal(CreateForm, { application, creator, spaces: [space] })
 
   $: creatorsQuery = liveQuery<ItemCreator>(
     creatorsQuery,

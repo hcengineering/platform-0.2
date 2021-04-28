@@ -2,7 +2,7 @@
   import ScrollView from './ScrollView.svelte'
 
   export let items: Array<any> = []
-  export let selected = 0
+  export let selected: any
   export let label = 'Значение'
   export let width = ''
 

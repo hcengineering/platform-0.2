@@ -13,16 +13,55 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <script lang="ts">
+  import { Ref } from '@anticrm/core'
   import type { Space } from '@anticrm/domains'
+  import type { ModelDb } from '@anticrm/platform-core/src/modeldb'
+  import { QueryUpdater } from '@anticrm/platform-core'
+  import { getCoreService, liveQuery } from '@anticrm/presentation'
+  import type { FSM } from '@anticrm/fsm'
+  import fsmPlugin from '@anticrm/fsm'
+  import type { WorkbenchApplication } from '@anticrm/workbench'
 
   import EditBox from '@anticrm/sparkling-controls/src/EditBox.svelte'
   import SpaceBox from '@anticrm/platform-ui/src/components/SpaceBox.svelte'
+  import ComboBox from '@anticrm/sparkling-controls/src/ComboBox.svelte'
 
   import type { Vacancy } from '..'
 
+  const coreP = getCoreService()
+  const modelP = coreP.then((c) => c.getModel())
+  let model: ModelDb | undefined
+
+  modelP.then((m) => {
+    model = m
+  })
+
+  export let application: WorkbenchApplication
   export let vacancy: Vacancy
   export let spaces: Space[]
   export let space: Space | undefined
+  export let fsmRef: Ref<FSM> | undefined
+
+  let selectedFSM = 0
+
+  let fsms: FSM[] = []
+  let fsmItems: { id: number; comboValue: string; ref: Ref<FSM> }[] = []
+  let lq: Promise<QueryUpdater<FSM>>
+
+  $: lq = liveQuery(lq, fsmPlugin.class.FSM, { application: application._id }, (docs) => {
+    fsms = docs
+  })
+
+  $: if (!fsmRef && model) {
+    if (!model.isMixedIn(vacancy, fsmPlugin.mixin.WithFSM)) {
+      fsmRef = fsms[0]?._id as Ref<FSM> | undefined
+    } else {
+      fsmRef = model.as(vacancy, fsmPlugin.mixin.WithFSM).fsm
+    }
+  }
+
+  $: fsmItems = fsms.map((x, i) => ({ id: i, comboValue: x.name, ref: x._id as Ref<FSM> }))
+  $: fsmRef = fsmItems[selectedFSM]?.ref ?? fsmRef
 </script>
 
 <div class="form">
@@ -33,6 +72,9 @@ limitations under the License.
   <EditBox bind:value={vacancy.description} label="Description" />
   <EditBox bind:value={vacancy.location} label="Location" placeholder="Russia, Novosibirsk" />
   <EditBox bind:value={vacancy.salary} label="Salary" />
+  {#if fsmItems && fsmItems.length > 1}
+    <ComboBox items={fsmItems} bind:selected={selectedFSM} label="Flow" />
+  {/if}
 </div>
 
 <style lang="scss">
