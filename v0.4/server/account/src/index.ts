@@ -106,9 +106,10 @@ export function createWorkspace (db: Db, workspace: string, organisation: string
     })
     .then((e) => e.insertedId)
     .catch((err) => {
-      throw err.code === 11000 ? 
-        new PlatformError(new Status(Severity.ERROR, AccountStatusCode.DUPLICATE_WORKSPACE, 'Workspace already exists')) :
-        new PlatformError(new Status(Severity.ERROR, AccountStatusCode.DATABASE_ERROR, err.message))
+      const status = err.code === 11000 ?
+        new Status(Severity.ERROR, AccountStatusCode.DUPLICATE_WORKSPACE, 'Workspace already exists') :
+        new Status(Severity.ERROR, AccountStatusCode.DATABASE_ERROR, err.message)
+      throw new PlatformError(status)
     })
 }
 

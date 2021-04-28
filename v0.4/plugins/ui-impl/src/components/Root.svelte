@@ -93,8 +93,6 @@
     display: flex;
     flex-direction: column;
 
-    min-width: 800px;
-    min-height: 600px;
     height: 100vh;
 
     .bg-cover {
@@ -104,7 +102,6 @@
     .status-bar {
       height: $status-bar-height;
       line-height: $status-bar-height;
-      z-index: 3;
 
       .container {
         display: flex;
@@ -141,7 +138,8 @@
 
     .app {
       height: calc(100vh - #{$status-bar-height});
-      z-index: 5;
+      min-width: 1200px;
+      min-height: 800px;
     }
   }
 </style>
