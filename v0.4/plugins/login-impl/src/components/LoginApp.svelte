@@ -32,14 +32,12 @@
         {/if}
       </div>
       <div class="form">
-        <div class="form-row wCol">
-          <div class="form-col"><EditBox label="First Name" bind:value={fname}/></div>
-          <div class="form-col"><EditBox label="Last Name" bind:value={lname}/></div>
-        </div>
+        <div class="form-col"><EditBox label="First Name" bind:value={fname}/></div>
+        <div class="form-col"><EditBox label="Last Name" bind:value={lname}/></div>
         <div class="form-row"><EditBox label="E-mail"/></div>
         <div class="form-row"><EditBox label="Password" password/></div>
         <div class="form-row"><EditBox label="Repeat password" password/></div>
-        <div class="send"><Button label="Sign Up" primary width="100%"/></div>
+        <div class="form-row send"><Button label="Sign Up" primary width="100%"/></div>
       </div>
       <div class="separator-footer"/>
       <div class="reg-footer"><span>Already have an account?</span> <a href="/login">Sign In</a></div>
@@ -103,37 +101,19 @@
         }
         
         .form {
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          column-gap: 12px;
+          row-gap: 24px;
 
           .form-row {
-            margin-bottom: 20px;
-            &.wCol {
-              display: flex;
-              flex-direction: row;
-              flex-wrap: nowrap;
-              height: 50px;
-            }
+            grid-column-start: 1;
+            grid-column-end: 3;
+          }
+          @media (max-width: 985px) {
             .form-col {
-              flex-grow: 1;
-              height: 50px;
-              &:first-child {
-                margin-right: 12px;
-              }
-            }
-            @media (max-width: 985px) {
-              &.wCol {
-                flex-direction: column;
-                height: 120px;
-              }
-              .form-col {
-                flex-grow: 0;
-                &:first-child {
-                  margin-right: 0px;
-                  margin-bottom: 20px;
-                }
-              }
+              grid-column-start: 1;
+              grid-column-end: 3;
             }
           }
           .send {
