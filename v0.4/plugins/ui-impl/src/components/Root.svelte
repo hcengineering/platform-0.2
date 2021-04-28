@@ -92,8 +92,9 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    background-color: var(--theme-bg-dark-color);
 
+    min-width: 800px;
+    min-height: 600px;
     height: 100vh;
 
     .bg-cover {
