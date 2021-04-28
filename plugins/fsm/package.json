@@ -6,6 +6,7 @@
   "license": "EPL-2.0",
   "scripts": {
     "build": "tsc",
+    "build:docs": "echo 'no docs yet'",
     "test": "echo 'no tests'",
     "preformat-svelte": "prettier -w **/*.svelte",
     "lint": "eslint --max-warnings=0 src",
@@ -33,9 +34,9 @@
     "eslint-plugin-promise": "^5.1.0",
     "eslint-plugin-standard": "^5.0.0",
     "eslint-plugin-svelte3": "^3.1.2",
-    "svelte-preprocess": "^4.7.2",
     "prettier": "^2.2.1",
     "prettier-plugin-svelte": "^2.2.0",
+    "svelte-preprocess": "^4.7.2",
     "typescript": "^4.2.4"
   }
 }

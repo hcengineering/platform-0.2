@@ -13,12 +13,14 @@
 
 import core, { ArrayOf$, Builder, Class$, Mixin$, Prop, RefTo$ } from '@anticrm/model'
 import { CORE_CLASS_STRING, Ref, Class, Doc, MODEL_DOMAIN } from '@anticrm/core'
-import { Application } from '@anticrm/domains'
-import { TDoc, TEmb, TMixin } from '@anticrm/model/src/__model__'
+import { Application, VDoc } from '@anticrm/domains'
+import { TDoc, TMixin } from '@anticrm/model/src/__model__'
 import { UX } from '@anticrm/presentation/src/__model__'
 import { IntlString } from '@anticrm/platform-i18n'
 
 import fsmPlugin, { FSM, Transition, State, WithFSM, WithState } from '.'
+import { ComponentExtension } from '@anticrm/presentation'
+import { AnyComponent } from '@anticrm/platform-ui'
 
 @UX('FSM' as IntlString)
 @Class$(fsmPlugin.class.FSM, core.class.Doc, MODEL_DOMAIN)
@@ -43,7 +45,7 @@ export class TFSM extends TDoc implements FSM {
 
 @UX('Transition' as IntlString)
 @Class$(fsmPlugin.class.Transition, core.class.Doc, MODEL_DOMAIN)
-export class TTransition extends TEmb implements Transition {
+export class TTransition extends TDoc implements Transition {
   @UX('From' as IntlString)
   @RefTo$(fsmPlugin.class.State)
   from!: Ref<State>
@@ -97,17 +99,17 @@ type PureState = Omit<State, keyof Doc>
 class FSMBuilder {
   private readonly name: string
   private readonly appID: Ref<Application>
-  private readonly classes: Array<Ref<Class<Doc>>>
+  private readonly classes: Array<Ref<Class<VDoc>>>
   private readonly states = new Map<string, PureState>()
   private readonly transitions: Array<[string, string]> = []
 
-  constructor (name: string, appID: Ref<Application>, classes: Array<Ref<Class<Doc>>>) {
+  constructor (name: string, appID: Ref<Application>, classes: Array<Ref<Class<VDoc>>>) {
     this.name = name
     this.appID = appID
     this.classes = classes
   }
 
-  private getState (a: PureState): PureState | undefeined {
+  private getState (a: PureState): PureState | undefined {
     if (!this.states.has(a.name)) {
       this.states.set(a.name, a)
     }
@@ -160,7 +162,7 @@ class FSMBuilder {
         to
       })
 
-      transitions.push(doc._id)
+      transitions.push(doc._id as Ref<Transition>)
     })
 
     const fsm = S.createDocument(fsmPlugin.class.FSM, {
@@ -177,5 +179,5 @@ class FSMBuilder {
 export const fsm = (
   name: string,
   appID: Ref<Application>,
-  classes: Array<Ref<Class<Doc>>>
+  classes: Array<Ref<Class<VDoc>>>
 ): FSMBuilder => new FSMBuilder(name, appID, classes)
