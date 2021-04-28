@@ -86,12 +86,14 @@ function getAccount (db: Db, email: string): Promise<Account> {
     })
 }
 
-async function getAccountInfo (db: Db, email: string, password: string): Promise<AccountInfo> {
-  const account = await getAccount(db, email)
-  if (!verifyPassword(password, account.hash.buffer, account.salt.buffer)) {
-    throw new PlatformError(new Status(Severity.ERROR, AccountStatusCode.INCORRECT_PASSWORD, 'Incorrect password.'))
-  }
-  return toAccountInfo(account)
+function getAccountInfo (db: Db, email: string, password: string): Promise<AccountInfo> {
+  return getAccount(db, email)
+    .then((account) => {
+      if (!verifyPassword(password, account.hash.buffer, account.salt.buffer)) {
+        throw new PlatformError(new Status(Severity.ERROR, AccountStatusCode.INCORRECT_PASSWORD, 'Incorrect password.'))
+      }
+      return toAccountInfo(account)    
+    })
 }
 
 function createAccount (db: Db, email: string, password: string): Promise<AccountInfo> {
@@ -230,8 +232,8 @@ function login (db: Db, email: string, password: string, workspace: string): Pro
 // }
 
 function wrap<P extends any[], R> (f: (db: Db, ...args: P) => Promise<R>) {
-  return async function (db: Db, request: Request<P>): Promise<Response<R>> {
-    return await f(db, ...request.params)
+  return function (db: Db, request: Request<P>): Promise<Response<R>> {
+    return f(db, ...request.params)
       .then((result) => ({ id: request.id, result }))
       .catch((err) => {
         if (err instanceof PlatformError) {
