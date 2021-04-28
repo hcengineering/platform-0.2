@@ -30,7 +30,5 @@
     "javascript",
     "typescript",
     "svelte"
-  ],
-  "javascript.validate.enable": false,
-  "typescript.validate.enable": false
+  ]
 }
