@@ -68,7 +68,7 @@
     .nolabel {
       padding-top: 0;
     }
-
+    
     .label {
       position: absolute;
       top: 18px;

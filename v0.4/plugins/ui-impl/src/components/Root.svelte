@@ -51,6 +51,8 @@
 
 <Theme>
   <div id="ui-root">
+    <div class="bg-noise opacity-2"/>
+    <div class="bg-cover"/>
     <div class="status-bar">
       <div class="container">
         <div class="logo">&#x24C5;</div>
@@ -81,19 +83,27 @@
 </Theme>
 
 <style lang="scss">
+  @import "@anticrm/sparkling-theme/styles/mixins.scss";
+
   $status-bar-height: 20px;
   $pictogram-size: 51px;
 
   #ui-root {
+    position: relative;
     display: flex;
     flex-direction: column;
+    background-color: var(--theme-bg-dark-color);
 
     height: 100vh;
+
+    .bg-cover {
+      @include bg-layer(linear-gradient(112.79deg, #AEA4CC 2.31%, rgba(196, 150, 191, 0) 98.9%), 0.05);
+    }
 
     .status-bar {
       height: $status-bar-height;
       line-height: $status-bar-height;
-      border-bottom: 1px solid var(--theme-bg-color);
+      z-index: 3;
 
       .container {
         display: flex;
@@ -130,6 +140,7 @@
 
     .app {
       height: calc(100vh - #{$status-bar-height});
+      z-index: 5;
     }
   }
 </style>

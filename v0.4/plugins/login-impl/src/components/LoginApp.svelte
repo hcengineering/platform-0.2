@@ -20,8 +20,6 @@
 </script>
 
 <div class="container">
-  <div class="bg-noise opacity-2"/>
-  <div class="bg-cover"/>
   <div class="reg-panel">
     <div class="back-panel-dark"/>
     <div class="back-panel-light"><div class="bg-noise opacity-3"/></div>
@@ -59,38 +57,16 @@
 </div>
 
 <style lang="scss">
-  @mixin bg-fullsize {
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    width: 100%;
-    height: 100%;
-  }
-
-  @mixin bg-layer($bg, $opacity) {
-    @include bg-fullsize;
-    background: $bg;
-    opacity: $opacity;
-  }
+  @import "@anticrm/sparkling-theme/styles/mixins.scss";
 
   .container {
-    position: relative;
     display: flex;
     flex-direction: row;
     height: 100%;
     padding: 20px;
-    font-family: inherit;
-    background-color: #111117;
-
-    .bg-cover {
-      @include bg-layer(linear-gradient(112.79deg, #AEA4CC 2.31%, rgba(196, 150, 191, 0) 98.9%), 0.05);
-      z-index: 5;
-    }
 
     .reg-panel {
       position: relative;
-      display: flex;
-      flex-direction: column;
       overflow: hidden;
       margin-right: 20px;
       width: 668px;
@@ -99,9 +75,11 @@
 
       .back-panel-light {
         @include bg-layer(linear-gradient(158.74deg, rgba(205, 166, 255, 0.12) 5.62%, rgba(255, 255, 255, 0) 97.09%), 0.3);
+        z-index: -1;
       }
       .back-panel-dark {
         @include bg-layer(#1D1D23, 0.5);
+        z-index: -1;
       }
 
       .form-container {
@@ -111,7 +89,6 @@
         overflow: auto;
         padding: 60px 65px;
         height: 100%;
-        z-index: 100;
 
         .title {
           font-weight: 600;
@@ -136,20 +113,22 @@
               display: flex;
               flex-direction: row;
               flex-wrap: nowrap;
+              height: 50px;
             }
             .form-col {
               flex-grow: 1;
+              height: 50px;
               &:first-child {
                 margin-right: 12px;
               }
             }
-            @media (max-width: 865px) {
+            @media (max-width: 985px) {
               &.wCol {
                 flex-direction: column;
+                height: 120px;
               }
               .form-col {
                 flex-grow: 0;
-                flex-basis: 48px;
                 &:first-child {
                   margin-right: 0px;
                   margin-bottom: 20px;
@@ -189,6 +168,7 @@
       flex-direction: column;
       flex-grow: 1;
       overflow: hidden;
+      min-width: 320px;
 
       .content {
         display: flex;
@@ -201,7 +181,7 @@
           &:after {
             position: absolute;
             content: "";
-            background: center url("../../img/p.svg");
+            background: center url("../../img/logo.svg");
             transform: translate(-50%, -50%);
             width: 63px;
             height: 79px;
