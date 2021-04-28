@@ -1,5 +1,5 @@
 {
-  "name": "@anticrm/accounts",
+  "name": "@anticrm/server-account",
   "version": "0.2.0",
   "main": "lib/index.js",
   "author": "Anticrm Platform Contributors",
@@ -25,5 +25,11 @@
     "prettier": "~2.2.1",
     "@types/mongodb": "~3.6.12"
   },
-  "dependencies": {"mongodb":"~3.6.6","@anticrm/status":"~0.2.0","@anticrm/rpc":"~0.2.0","jwt-simple":"~0.5.6"}
+  "dependencies": {
+    "mongodb": "~3.6.6",
+    "@anticrm/status": "~0.2.0",
+    "@anticrm/rpc": "~0.2.0",
+    "jwt-simple": "~0.5.6",
+    "@anticrm/account": "~0.2.0"
+  }
 }

@@ -14,5 +14,7 @@
 //
 
 export enum AccountStatusCode {
-
+  ACCOUNT_DUPLICATE,
+  ACCOUNT_NOT_FOUND,
+  INCORRECT_PASSWORD
 }
