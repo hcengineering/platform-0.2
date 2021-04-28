@@ -16,7 +16,7 @@
 import { program } from 'commander'
 import { createContact, removeContact } from './user'
 import { initDatabase } from './init'
-import { MongoClient } from 'mongodb'
+import { MongoClient, Db } from 'mongodb'
 
 import {
   createWorkspace, createUserAccount, assignWorkspace, getWorkspace, removeWorkspace, withTenant, getUserAccount
@@ -43,7 +43,7 @@ program
   .requiredOption('-w, --workspace <workspace>', 'workspace')
   .action(async (email, cmd) => {
     return await withDatabase(mongodbUri, async (client) => {
-      const db = client.db('accounts')
+      const db: Db = client.db('accounts')
 
       // Create user account inside accounts
       const userAccount = await getUserAccount(db, email)

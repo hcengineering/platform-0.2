@@ -15,7 +15,7 @@
 
 import { Class, Doc, DocumentQuery, FindOptions, generateId, Model, Ref, Storage, TxContext } from '@anticrm/core'
 import { QueryResult, Subscriber, Unsubscribe } from '.'
-import { TxOperation } from '@anticrm/domains'
+import { TxOperation, TxOperationKind } from '@anticrm/domains'
 
 export interface Domain extends Storage {
   query: <T extends Doc>(_class: Ref<Class<T>>, query: DocumentQuery<T>) => QueryResult<T>
@@ -32,11 +32,6 @@ interface Query<T extends Doc> {
   results: T[]
 
   options?: FindOptions<T>
-}
-
-enum UpdateOp {
-  None,
-  Remove
 }
 
 export class QueriableStorage implements Domain {
@@ -64,30 +59,26 @@ export class QueriableStorage implements Domain {
     for (const q of this.queries.values()) {
       if (this.model.matchQuery(q._class, doc, q.query)) {
         // If document is matched, assume we add it to end of list. But it's order could be changed after transaction will be complete.
-        q.results.push(this.model.as(doc, q._class))
-        q.subscriber(q.results)
-      }
-    }
-  }
 
-  updateMatchQuery (_id: Ref<Doc>, q: Query<Doc>, apply: (doc: Doc) => UpdateOp): boolean {
-    let pos = 0
-    for (const r of q.results) {
-      if (r._id === _id) {
-        let updateOp = UpdateOp.None
-        if (this.updateResults) {
-          updateOp = apply(r)
+        let shouldAdd = true
+        if (q.options !== undefined) {
+          const limit = q.options?.limit ?? 0
+          if (limit > 0 && q.results.length >= limit) {
+            shouldAdd = false // We had limit no need to add object to list
+          }
         }
-        if (!this.model.matchQuery(q._class, r, q.query) || updateOp === UpdateOp.Remove) {
-          // Document is not matched anymore, we need to remove it.
-          q.results.splice(pos, 1)
+        if (shouldAdd) {
+          q.results.push(this.model.as(doc, q._class))
         }
-        q.subscriber(q.results)
-        return true
+        if (q.options?.sort !== undefined && Object.keys(q.options.sort).length > 0) {
+          // We had sorting defined, we need to refresh query on server.
+          await ctx.network
+          await this.refresh(q)
+        } else {
+          q.subscriber(q.results)
+        }
       }
-      pos++
     }
-    return false
   }
 
   async update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, operations: TxOperation[]): Promise<void> {
@@ -95,18 +86,41 @@ export class QueriableStorage implements Domain {
 
     for (const q of this.queries.values()) {
       // Find doc, apply update of attributes and check if it is still matches, if not we need to perform request to server after transaction will be complete.
-      if (this.updateMatchQuery(_id, q, (doc) => {
-        this.model.updateDocument(doc, operations)
-        return UpdateOp.None
-      })) {
-        continue
-      }
-      if (q._class === _class) {
-        // so we potentially need to fetch new matched objects from server, so do so if class are matching ours.
 
-        // TODO: Check if operations in update could have influence on object and ignore.
-        await ctx.network
-        await this.refresh(q)
+      let needRefresh = true
+
+      // go over documents and check if modification will move object to not matched state.
+      let pos = 0
+      for (const r of q.results) {
+        if (r._id === _id) {
+          if (this.updateResults) {
+            this.model.updateDocument(r, operations)
+          }
+          if (!this.model.matchQuery(q._class, r, q.query)) {
+          // Document is not matched anymore, we need to remove it.
+            q.results.splice(pos, 1)
+          }
+          q.subscriber(q.results)
+          needRefresh = false
+          break
+        }
+        pos++
+      }
+      if (needRefresh && this.model.is(_class, q._class)) {
+        // so we potentially need to fetch new matched objects from server, so do so if class are matching ours.
+        for (const op of operations) {
+          if (op.kind === TxOperationKind.Set) {
+            if (!this.model.isPartialMatched(_class, op._attributes, q.query)) {
+              // We do not match with values updated, so no update is required.
+              needRefresh = false
+            }
+          }
+        }
+
+        if (needRefresh) {
+          await ctx.network
+          await this.refresh(q)
+        }
       }
     }
   }
@@ -115,12 +129,15 @@ export class QueriableStorage implements Domain {
     await this.proxy.remove(ctx, _class, _id)
 
     for (const q of this.queries.values()) {
-      if (this.updateMatchQuery(_id, q, (doc) => {
-        this.model.removeDocument(doc)
-        // We should not remove object in case we modify embedded array
-        return UpdateOp.Remove
-      })) {
-        continue
+      // Check if we had object, remove it.
+      let pos = 0
+      for (const r of q.results) {
+        if (r._id === _id) {
+          q.results.splice(pos, 1)
+          q.subscriber(q.results)
+          break
+        }
+        pos++
       }
     }
   }

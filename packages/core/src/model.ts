@@ -849,6 +849,31 @@ export class Model implements Storage {
   }
 
   /**
+   * Method will check if passed values of object are matched in query.
+   * @param object - partial object values.
+   * @param query - a query.
+   */
+  isPartialMatched<T extends Doc> (_class: Ref<Class<Doc>>, object: AnyLayout, query: DocumentQuery<T>): boolean {
+    const stripQuery: AnyLayout = {}
+    const oKeys = new Set<string>(Object.keys(object))
+
+    // Make a part of query with values in object.
+    let keys = 0
+    for (const oe of Object.entries(query)) {
+      if (oKeys.has(oe[0])) {
+        stripQuery[oe[0]] = oe[1]
+        keys++
+      }
+    }
+    if (keys === 0) {
+      // Not keys to compare, so operation is not fit into our query in any case
+      return false
+    }
+
+    return this.matchObject<any>(_class, object, stripQuery)
+  }
+
+  /**
    * Perform matching of document with query.
    * {fullMatch} is used as true to match against array with passing objects, it will match for all values.
    * If used as false, it will find at least one match for object with array value.

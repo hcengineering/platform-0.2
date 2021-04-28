@@ -5,10 +5,10 @@
   "author": "Anticrm Platform Contributors",
   "license": "EPL-2.0",
   "devDependencies": {
-    "@types/mongodb": "^3.5.20",
+    "@types/mongodb": "^3.6.12",
     "@typescript-eslint/eslint-plugin": "^4.22.0",
     "@typescript-eslint/parser": "^4.22.0",
-    "eslint": "^7.24.0",
+    "eslint": "^7.25.0",
     "eslint-config-standard": "^16.0.2",
     "eslint-config-standard-with-typescript": "^20.0.0",
     "eslint-plugin-import": "^2.22.1",
@@ -29,7 +29,7 @@
     "build:docs": "echo 'no docs yet'"
   },
   "dependencies": {
-    "commander": "^6.1.0",
+    "commander": "^7.2.0",
     "mongodb": "^3.6.6"
   }
 }
