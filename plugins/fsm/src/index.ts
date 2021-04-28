@@ -18,14 +18,14 @@ import { Application, VDoc } from '@anticrm/domains'
 import { ComponentExtension } from '@anticrm/presentation'
 import { AnyComponent, getPlatform } from '@anticrm/platform-ui'
 
-export interface FSM extends Doc {
+export interface FSM extends VDoc {
   name: string
   application: Ref<Application>
   transitions: Array<Ref<Transition>>
   classes: Array<Ref<Class<VDoc>>>
 }
 
-export interface Transition extends Doc {
+export interface Transition extends VDoc {
   from: Ref<State>
   to: Ref<State>
 
@@ -52,7 +52,7 @@ export interface WithState extends Doc {
   state: Ref<State>
 }
 
-export interface State extends Doc {
+export interface State extends VDoc {
   name: string
 }
 

@@ -11,20 +11,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import core, { ArrayOf$, Builder, Class$, Mixin$, Prop, RefTo$ } from '@anticrm/model'
-import { CORE_CLASS_STRING, Ref, Class, Doc, MODEL_DOMAIN } from '@anticrm/core'
-import { Application, VDoc } from '@anticrm/domains'
-import { TDoc, TMixin } from '@anticrm/model/src/__model__'
+import core, { ArrayOf$, Builder, Class$, extendIds, Mixin$, Prop, RefTo$ } from '@anticrm/model'
+import { CORE_CLASS_STRING, Ref, Class, MODEL_DOMAIN, DateProperty, StringProperty } from '@anticrm/core'
+import { Application, Space, VDoc } from '@anticrm/domains'
+import { TDoc, TMixin, TVDoc } from '@anticrm/model/src/__model__'
 import { UX } from '@anticrm/presentation/src/__model__'
 import { IntlString } from '@anticrm/platform-i18n'
 
-import fsmPlugin, { FSM, Transition, State, WithFSM, WithState } from '.'
+import _fsmPlugin, { FSM, Transition, State, WithFSM, WithState } from '.'
 import { ComponentExtension } from '@anticrm/presentation'
 import { AnyComponent } from '@anticrm/platform-ui'
+import { WorkbenchApplication } from '@anticrm/workbench'
+
+const fsmPlugin = extendIds(_fsmPlugin, {
+  space: {
+    Common: '' as Ref<Space>
+  }
+})
 
 @UX('FSM' as IntlString)
 @Class$(fsmPlugin.class.FSM, core.class.Doc, MODEL_DOMAIN)
-export class TFSM extends TDoc implements FSM {
+export class TFSM extends TVDoc implements FSM {
   @UX('Name' as IntlString)
   @Prop(CORE_CLASS_STRING)
   name!: string
@@ -45,7 +52,7 @@ export class TFSM extends TDoc implements FSM {
 
 @UX('Transition' as IntlString)
 @Class$(fsmPlugin.class.Transition, core.class.Doc, MODEL_DOMAIN)
-export class TTransition extends TDoc implements Transition {
+export class TTransition extends TVDoc implements Transition {
   @UX('From' as IntlString)
   @RefTo$(fsmPlugin.class.State)
   from!: Ref<State>
@@ -57,7 +64,7 @@ export class TTransition extends TDoc implements Transition {
 
 @UX('State' as IntlString)
 @Class$(fsmPlugin.class.State, core.class.Doc, MODEL_DOMAIN)
-export class TState extends TDoc implements State {
+export class TState extends TVDoc implements State {
   @UX('Name' as IntlString)
   @Prop(CORE_CLASS_STRING)
   name!: string
@@ -93,9 +100,19 @@ export function model (S: Builder): void {
   S.mixin(core.class.VDoc, fsmPlugin.mixin.CardForm, {
     component: fsmPlugin.component.VDocCardPresenter
   })
+
+  S.createDocument(core.class.Space, {
+    name: 'FSM',
+    description: '',
+    application: '' as Ref<WorkbenchApplication>,
+    archived: false,
+    isPublic: true,
+    spaceKey: 'FSM_COMMON',
+    users: []
+  }, fsmPlugin.space.Common)
 }
 
-type PureState = Omit<State, keyof Doc>
+type PureState = Omit<State, keyof VDoc>
 class FSMBuilder {
   private readonly name: string
   private readonly appID: Ref<Application>
@@ -139,10 +156,19 @@ class FSMBuilder {
   }
 
   build (S: Builder): FSM {
+    const vProps = {
+      _space: fsmPlugin.space.Common,
+      _createdBy: '' as StringProperty,
+      _createdOn: Date.now() as DateProperty
+    }
+
     const stateIDs = new Map<string, Ref<State>>()
 
     this.states.forEach((state) => {
-      const doc = S.createDocument(fsmPlugin.class.State, state)
+      const doc = S.createDocument(fsmPlugin.class.State, {
+        ...state,
+        ...vProps
+      })
 
       stateIDs.set(state.name, doc._id as Ref<State>)
     })
@@ -159,7 +185,8 @@ class FSMBuilder {
 
       const doc = S.createDocument(fsmPlugin.class.Transition, {
         from,
-        to
+        to,
+        ...vProps
       })
 
       transitions.push(doc._id as Ref<Transition>)
@@ -169,7 +196,8 @@ class FSMBuilder {
       name: this.name,
       application: this.appID,
       classes: this.classes,
-      transitions
+      transitions,
+      ...vProps
     })
 
     return fsm
