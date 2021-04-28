@@ -16,4 +16,5 @@
 export enum AccountStatusCode {
   DATABASE_ERROR,
   DUPLICATE_WORKSPACE,
+  DUPLICATE_ACCOUNT,
 }

@@ -70,33 +70,27 @@ describe('server', () => {
 
     const result = await methods.createWorkspace(db, request)
     expect(result.error).toBeDefined()
-    console.log(result.error)
   })
 
-  // it('should create account', async () => {
-  //   const request: any = {
-  //     method: 'createAccount',
-  //     params: ['andrey2', '123']
-  //   }
+  it('should create account', async () => {
+    const request: Request<[string, string]> = {
+      method: 'createAccount',
+      params: ['andrey2', '123']
+    }
 
-  //   const result = await methods.createAccount(db, request)
-  //   expect(result.result).toBeDefined()
-  // })
+    const result = await methods.createAccount(db, request)
+    expect(result.result).toBeDefined()
+  })
 
-  // it('should not create, duplicate account', async () => {
-  //   await methods.createAccount(db, {
-  //     method: 'createAccount',
-  //     params: ['andrey', '123']
-  //   })
+  it('should not create duplicate account', async () => {
+    const request: Request<[string, string]> = {
+      method: 'createAccount',
+      params: ['andrey2', '123']
+    }
 
-  //   const request: any = {
-  //     method: 'createAccount',
-  //     params: ['andrey', '123']
-  //   }
-
-  //   const result = await methods.createAccount(db, request)
-  //   expect(result.error).toBeDefined()
-  // })
+    const result = await methods.createAccount(db, request)
+    expect(result.error).toBeDefined()
+  })
 
   // it('should login', async () => {
   //   await methods.createAccount(db, {

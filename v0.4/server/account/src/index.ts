@@ -65,52 +65,64 @@ function toAccountInfo (account: Account): AccountInfo {
   return result
 }
 
+function getWorkspace (db: Db, workspace: string): Promise<Workspace | null> {
+  return db.collection(WORKSPACE_COLLECTION).findOne<Workspace>({ workspace })
+}
+
+function getAccount (db: Db, email: string): Promise<Account | null> {
+  return db.collection(ACCOUNT_COLLECTION).findOne<Account>({ email })
+}
+
 function createAccount (db: Db, email: string, password: string): Promise<AccountInfo> {
   const salt = randomBytes(32)
   const hash = hashWithSalt(password, salt)
 
-  // const account = await getAccount(db, email)
-  // if (account != null) {
-  //   throw new PlatformError(new Status(Severity.ERROR, AccountStatusCode.ACCOUNT_DUPLICATE, 'Account already exists.'))
-  // }
-
-  console.log('we are here')
-
   return db
     .collection(ACCOUNT_COLLECTION)
-    .insertOne({
-      email,
-      hash,
-      salt,
-      workspaces: []
+    .insertOne({ email, hash, salt, workspaces: [] })
+    .then((result) => ({ _id: result.insertedId, email, workspaces: [] }))
+    .catch((err) => {
+      const status = err.code === 11000 ?
+        new Status(Severity.ERROR, AccountStatusCode.DUPLICATE_ACCOUNT, 'Account already exists') :
+        new Status(Severity.ERROR, AccountStatusCode.DATABASE_ERROR, err.message)
+      throw new PlatformError(status)
     })
-    .then((result) => ({
-      _id: result.insertedId,
-      email,
-      workspaces: [],
-    }))
 }
 
-export function createWorkspace (db: Db, workspace: string, organisation: string): Promise<string> {
-  // Ensure workspace is not exists yet.
-  // if ((await getWorkspace(db, workspace)) != null) {
-  //   throw new PlatformError(new Status(Severity.ERROR, PlatformStatusCodes.WORKSPACE_ALREADY_EXISTS, 'Workspace already exists and could not be created.'))
-  // }
-  // Create a new workspace record
-
+function createWorkspace (db: Db, workspace: string, organisation: string): Promise<string> {
   return db
     .collection(WORKSPACE_COLLECTION)
-    .insertOne({
-      workspace,
-      organisation
-    })
-    .then((e) => e.insertedId)
+    .insertOne({ workspace, organisation })
+    .then((result) => result.insertedId)
     .catch((err) => {
       const status = err.code === 11000 ?
         new Status(Severity.ERROR, AccountStatusCode.DUPLICATE_WORKSPACE, 'Workspace already exists') :
         new Status(Severity.ERROR, AccountStatusCode.DATABASE_ERROR, err.message)
       throw new PlatformError(status)
     })
+}
+
+async function getWorkspaceAndAccount (db: Db, email: string, workspace: string): Promise<{ accountId: ObjectID; workspaceId: ObjectID }> {
+  const wsPromise = await getWorkspace(db, workspace)
+  if (wsPromise == null) {
+    throw new PlatformError(new Status(Severity.ERROR, PlatformStatusCodes.WORKSPACE_NOT_FOUND, `Workspace ${workspace} not found`))
+  }
+  const workspaceId = wsPromise._id
+  const account = await getAccount(db, email)
+  if (account == null) {
+    throw new PlatformError(new Status(Severity.ERROR, PlatformStatusCodes.ACCOUNT_NOT_FOUND, 'Account not found.'))
+  }
+  const accountId = account?._id
+  return { accountId, workspaceId }
+}
+
+export async function assignWorkspace (db: Db, email: string, workspace: string): Promise<void> {
+  const { workspaceId, accountId } = await getWorkspaceAndAccount(db, email, workspace)
+  // Add account into workspace.
+  await db.collection(WORKSPACE_COLLECTION).updateOne({ _id: workspaceId }, { $push: { accounts: accountId } })
+
+  // Add workspace to account
+  await db.collection(ACCOUNT_COLLECTION).updateOne({ _id: accountId }, { $push: { workspaces: workspaceId } })
 }
 
 // async function updateAccount (db: Db, email: string, password: string, newPassword: string): Promise<AccountInfo> {
@@ -156,17 +168,6 @@ export function createWorkspace (db: Db, workspace: string, organisation: string
 
 //   db.collection(ACCOUNT_COLLECTION).updateOne({ _id: account._id }, { $push: { clientIds: clientId } })
 // }
-
-// getWorkspaceInfo - return a workspace information promise
-export async function getWorkspace (db: Db, workspace: string): Promise<Workspace> {
-  return await db.collection(WORKSPACE_COLLECTION).findOne({
-    workspace
-  })
-}
-
-export async function getAccount (db: Db, email: string): Promise<Account | null> {
-  return await db.collection(ACCOUNT_COLLECTION).findOne<Account>({ email })
-}
 
 // async function getAccountInfo (db: Db, email: string, password: string, clientId: string, secondFactorCode: string): Promise<AccountInfo> {
 //   const account = await getAccount(db, email)
@@ -225,28 +226,19 @@ export async function getAccount (db: Db, email: string): Promise<Account | null
 //   throw new PlatformError(new Status(Severity.ERROR, PlatformStatusCodes.FORBIDDEN, 'Forbidden.'))
 // }
 
-// async function getWorkspaceAndAccount (db: Db, email: string, workspace: string): Promise<{ accountId: ObjectID; workspaceId: ObjectID }> {
-//   const wsPromise = await getWorkspace(db, workspace)
-//   if (wsPromise == null) {
-//     throw new PlatformError(new Status(Severity.ERROR, PlatformStatusCodes.WORKSPACE_NOT_FOUND, `Workspace ${workspace} not found`))
-//   }
-//   const workspaceId = wsPromise._id
-//   const account = await getAccount(db, email)
-//   if (account == null) {
-//     throw new PlatformError(new Status(Severity.ERROR, PlatformStatusCodes.ACCOUNT_NOT_FOUND, 'Account not found.'))
-//   }
-//   const accountId = account?._id
-//   return { accountId, workspaceId }
-// }
-
-// export async function assignWorkspace (db: Db, email: string, workspace: string): Promise<void> {
-//   const { workspaceId, accountId } = await getWorkspaceAndAccount(db, email, workspace)
-//   // Add account into workspace.
-//   await db.collection(WORKSPACE_COLLECTION).updateOne({ _id: workspaceId }, { $push: { accounts: accountId } })
-
-//   // Add workspace to account
-//   await db.collection(ACCOUNT_COLLECTION).updateOne({ _id: accountId }, { $push: { workspaces: workspaceId } })
-// }
+async function getWorkspaceAndAccount (db: Db, email: string, workspace: string): Promise<{ accountId: ObjectID; workspaceId: ObjectID }> {
+  const wsPromise = await getWorkspace(db, workspace)
+  if (wsPromise == null) {
+    throw new PlatformError(new Status(Severity.ERROR, PlatformStatusCodes.WORKSPACE_NOT_FOUND, `Workspace ${workspace} not found`))
+  }
+  const workspaceId = wsPromise._id
+  const account = await getAccount(db, email)
+  if (account == null) {
+    throw new PlatformError(new Status(Severity.ERROR, PlatformStatusCodes.ACCOUNT_NOT_FOUND, 'Account not found.'))
+  }
+  const accountId = account?._id
+  return { accountId, workspaceId }
+}
 
 // export async function removeWorkspace (db: Db, email: string, workspace: string): Promise<void> {
 //   const { workspaceId, accountId } = await getWorkspaceAndAccount(db, email, workspace)
