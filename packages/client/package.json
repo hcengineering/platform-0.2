@@ -1,23 +1,26 @@
 {
-  "name": "@anticrm/platform-core",
+  "name": "@anticrm/client",
   "version": "0.2.0",
   "main": "src/index.ts",
-  "author": "Anticrm Platform Contributors (https://github.com/anticrm)",
+  "author": "Anticrm Platform Contributors",
   "license": "EPL-2.0",
   "scripts": {
     "build": "tsc",
-    "build:docs": "echo 'no docs yet'",
+    "build:docs": "api-extractor run --local && copyfiles -u 1 ./_api-extractor-temp/doc-models/* ../../_api-extractor-temp/",
+    "test": "echo 'no tests'",
     "lint": "eslint --max-warnings=0 src",
-    "lint:fix": "eslint --fix src",
-    "test": "echo 'no tests'"
+    "lint:fix": "eslint --fix src"
   },
   "devDependencies": {
-    "@babel/eslint-parser": "^7.13.14",
-    "@babel/preset-typescript": "^7.12.0",
+    "@babel/core": "^7.12.10",
+    "@babel/preset-env": "^7.12.11",
+    "@babel/preset-typescript": "^7.12.7",
     "@microsoft/api-extractor": "^7.14.0",
-    "@types/jest": "^26.0.16",
+    "@types/jest": "^26.0.20",
     "@typescript-eslint/eslint-plugin": "^4.22.0",
     "@typescript-eslint/parser": "^4.22.0",
+    "babel-jest": "^26.6.3",
+    "copyfiles": "^2.4.1",
     "eslint": "^7.24.0",
     "eslint-config-standard": "^16.0.2",
     "eslint-config-standard-with-typescript": "^20.0.0",
@@ -25,12 +28,12 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^5.1.0",
     "eslint-plugin-standard": "^5.0.0",
-    "jest": "^26.0.1",
-    "ts-jest": "^26.4.4",
+    "jest": "^26.6.3",
     "typescript": "^4.2.4"
   },
   "dependencies": {
-    "@anticrm/platform": "0.2.0",
-    "@anticrm/client": "0.2.0"
+    "@anticrm/platform": "^0.2.0",
+    "@anticrm/rpc": "^0.2.0",
+    "@anticrm/foundation": "^0.2.0"
   }
 }

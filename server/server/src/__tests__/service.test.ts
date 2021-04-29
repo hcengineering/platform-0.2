@@ -17,7 +17,7 @@
 import { ServerSuite } from './serversuite'
 import chunter, { Page } from '@anticrm/chunter'
 
-import { newCreateTx } from '@anticrm/platform-core/src/tx'
+import { newCreateTx } from '@anticrm/client/src/tx'
 import { Property, Ref, StringProperty } from '@anticrm/core'
 import { CORE_CLASS_SPACE, Space, SpaceUser } from '@anticrm/domains'
 
