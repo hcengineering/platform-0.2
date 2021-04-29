@@ -24,9 +24,9 @@
 
 <div class="editbox{error ? ' error' : ''}" style="{width ? 'width: ' + width : ''}">
   {#if password}
-    <input type="password" class="{label ? '' : 'nolabel'}" {id} bind:value placeholder=" "/>
+    <input type="password" class:nolabel={!label} {id} bind:value on:keyup placeholder=" "/>
   {:else}
-    <input type="text" class="{label ? '' : 'nolabel'}" {id} bind:value placeholder=" "/>
+    <input type="text" class:nolabel={!label} {id} bind:value on:keyup placeholder=" "/>
   {/if}
   {#if label}
     <div class="label">{label}</div>

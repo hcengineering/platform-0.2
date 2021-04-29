@@ -31,12 +31,11 @@
   }
 
   export let caption: string
-  export let status = new Status(Severity.OK, 0, '')
   export let fields: Field[]
   export let actions: Action[]
   export let object: any
 
-  $: description = status.message
+  let status = new Status(Severity.OK, 0, '')
 
   function validate () {
     for (const field of fields) {
@@ -49,33 +48,35 @@
     }
     status = new Status(Severity.OK, 0, '')
   }
+  validate()
+
 </script>
 
-  <form class="form-container">
-    <div class="grow-separator"/>
-    <div class="title">{caption}</div>
-    <div class="status">
-        <StatusControl severity="ERROR" message="Error: " width="100%"/>
-    </div>
-    <div class="form">
+<form class="form-container">
+  <div class="grow-separator"/>
+  <div class="title">{caption}</div>
+  <div class="status">
+    <StatusControl {status} width="100%"/>
+  </div>
+  <div class="form">
 
-      {#each fields as field (field.name)}
-      <div class={field.short ? 'form-col' : 'form-row'}>
-        <EditBox label={field.i18n} password={field.password} bind:value={object[field.name]} on:keyup={validate}/>
-      </div>
-      {/each}
-  
-      <!-- <div class="form-col"><EditBox label="First Name" bind:value={fname}/></div>
-      <div class="form-col"><EditBox label="Last Name" bind:value={lname}/></div>
-      <div class="form-row"><EditBox label="E-mail"/></div>
-      <div class="form-row"><EditBox label="Password" password/></div>
-      <div class="form-row"><EditBox label="Repeat password" password/></div>
-      <div class="form-row send"><Button label="Sign Up" primary width="100%"/></div> -->
-
+    {#each fields as field (field.name)}
+    <div class={field.short ? 'form-col' : 'form-row'}>
+      <EditBox label={field.i18n} password={field.password} bind:value={object[field.name]} on:keyup={validate}/>
     </div>
-    <div class="grow-separator"/>
-    <div class="footer"><span>Already have an account?</span> <a href="/login">Sign In</a></div>
-  </form>
+    {/each}
+
+    <!-- <div class="form-col"><EditBox label="First Name" bind:value={fname}/></div>
+    <div class="form-col"><EditBox label="Last Name" bind:value={lname}/></div>
+    <div class="form-row"><EditBox label="E-mail"/></div>
+    <div class="form-row"><EditBox label="Password" password/></div>
+    <div class="form-row"><EditBox label="Repeat password" password/></div>
+    <div class="form-row send"><Button label="Sign Up" primary width="100%"/></div> -->
+
+  </div>
+  <div class="grow-separator"/>
+  <div class="footer"><span>Already have an account?</span> <a href="/login">Sign In</a></div>
+</form>
 
   <!-- <div class="actions">
     {#each actions as action, i}
