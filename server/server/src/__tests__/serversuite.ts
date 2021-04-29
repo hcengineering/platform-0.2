@@ -13,27 +13,23 @@
 // limitations under the License.
 //
 
-import { Broadcaster, ClientService, ClientSocket, ServerProtocol, start } from '../server'
-import { Db, MongoClient } from 'mongodb'
-import { createWorkspace, getWorkspace, withTenant } from '@anticrm/accounts'
-
-import { Builder } from '@anticrm/model'
-
-import { model } from '@anticrm/model/src/__model__'
-import { model as presentationPlugin } from '@anticrm/presentation/src/__model__'
-import contact, { model as contactPlugin } from '@anticrm/contact/src/__model__'
-import { model as workbenchPlugin } from '@anticrm/workbench/src/__model__'
-import { model as chunterPlugin } from '@anticrm/chunter/src/__model__'
+import { assignWorkspace, createAccount, createWorkspace, getAccount, getWorkspace, login, withTenant } from '@anticrm/accounts'
 import { model as activityPlugin } from '@anticrm/activity/src/__model__'
+import { model as chunterPlugin } from '@anticrm/chunter/src/__model__'
+import { ClientService, newClient } from '@anticrm/client'
 import { Person } from '@anticrm/contact'
-import { createClientService } from '../service'
-import { WorkspaceProtocol } from '../workspace'
+import contact, { model as contactPlugin } from '@anticrm/contact/src/__model__'
 import { Doc, generateId, Property, Ref } from '@anticrm/core'
-import { Response, readRequest, Request } from '@anticrm/rpc'
 import { Space } from '@anticrm/domains'
-
+import { Builder } from '@anticrm/model'
+import { model } from '@anticrm/model/src/__model__'
 // Import a special tasks model package for generoc testing.
 import { model as taskPlugin } from '@anticrm/model/src/__tests__/test_tasks'
+import { model as presentationPlugin } from '@anticrm/presentation/src/__model__'
+import { model as workbenchPlugin } from '@anticrm/workbench/src/__model__'
+import { Db, MongoClient } from 'mongodb'
+import { ServerProtocol, start } from '../server'
+import { WorkspaceProtocol } from '../workspace'
 
 export const builder = new Builder()
 builder.load(model)
@@ -46,24 +42,8 @@ builder.load(taskPlugin)
 
 const Model = builder.dumpAll()
 
-class PipeClientSocket implements ClientSocket {
-  responses: Array<Request<any>> = []
-  email: string
-  workspace: string
-
-  constructor (email: string, workspace: string) {
-    this.email = email
-    this.workspace = workspace
-  }
-
-  send (response: string): void {
-    this.responses.push(readRequest(response))
-  }
-}
-
 export interface ClientInfo {
   client: ClientService
-  socket: PipeClientSocket
   ops: Array<Promise<void>>
   errors: Error[]
   wait: () => void
@@ -94,6 +74,8 @@ export class ServerSuite {
   server!: ServerProtocol
   wsName: string
   dbClient!: MongoClient
+  accounts!: Db
+  finalizers: Array<() => void> = []
 
   constructor (wsName: string) {
     this.wsName = wsName
@@ -102,13 +84,13 @@ export class ServerSuite {
   public async start (): Promise<void> {
     this.dbClient = await MongoClient.connect(this.mongodbUri, { useUnifiedTopology: true })
 
-    const accounts = this.dbClient.db('accounts')
+    this.accounts = this.dbClient.db('accounts-' + this.wsName)
 
     await this.reInitDB()
 
-    const ws = await getWorkspace(accounts, this.wsName)
-    if (ws === undefined) {
-      await createWorkspace(accounts, this.wsName, 'test organization')
+    const ws = await getWorkspace(this.accounts, this.wsName)
+    if (ws === null) {
+      await createWorkspace(this.accounts, this.wsName, 'test organization')
     }
 
     this.server = await start(0, this.mongodbUri, 'localhost')
@@ -120,6 +102,10 @@ export class ServerSuite {
   }
 
   public async reInitDB (): Promise<void> {
+    for (const c of this.finalizers) {
+      c()
+    }
+    this.finalizers = []
     const db = withTenant(this.dbClient, this.wsName)
     for (const c of await db.collections()) {
       await db.dropCollection(c.collectionName)
@@ -144,6 +130,9 @@ export class ServerSuite {
   }
 
   async shutdown (): Promise<void> {
+    for (const c of this.finalizers) {
+      c()
+    }
     await this.dbClient.close()
     await this.server.shutdown()
     console.log('All stopped')
@@ -151,35 +140,20 @@ export class ServerSuite {
 
   async newClients (n: number, ws: Promise<WorkspaceProtocol>): Promise<ClientInfo[]> {
     const clients: ClientInfo[] = []
-
-    const broadcast: Broadcaster = {
-      broadcast: (from, response) => {
-        // console.log(`broadcasting to ${clients.length} connections`)
-        for (const client of clients) {
-          if (client.client !== from) {
-            // console.log(`broadcasting to ${client.client.email}`, response)
-            client.ops.push(client.client.send({}, response).catch((e) => {
-              client.errors.push(e)
-            }))
-          } else {
-            // console.log('notify self about completeness without response')
-            const resp: Response<any> = {
-              id: response.id,
-              error: response.error
-            }
-            client.ops.push(client.client.send({}, resp).catch((e) => {
-              client.errors.push(e)
-            }))
-          }
-        }
-      }
-    }
+    const addr = this.server.address()
     for (let i = 0; i < n; i++) {
-      const socket = new PipeClientSocket(`test@client${i + 1}`, this.wsName)
-      const client = await createClientService(ws, socket, broadcast)
+      const email = `test@client${i + 1}`
+      const a = await getAccount(this.accounts, email)
+      if (a === null) {
+        await createAccount(this.accounts, email, 'qwe')
+      }
+      await assignWorkspace(this.accounts, email, this.wsName)
+      const loginInfo = await login(this.accounts, email, 'qwe', this.wsName, email, '')
+
+      const client = await newClient(loginInfo.token, email, addr.address, addr.port)
+
       const info = {
         client,
-        socket,
         ops: [],
         errors: [],
         wait: async () => {
@@ -194,6 +168,9 @@ export class ServerSuite {
         }
       }
       clients.push(info)
+      this.finalizers.push(() => {
+        client.close()
+      })
     }
     return clients
   }

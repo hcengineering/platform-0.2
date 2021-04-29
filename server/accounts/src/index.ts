@@ -72,7 +72,7 @@ function toAccountInfo (account: Account): AccountInfo {
   return result
 }
 
-async function createAccount (db: Db, email: string, password: string): Promise<AccountInfo> {
+export async function createAccount (db: Db, email: string, password: string): Promise<AccountInfo> {
   const salt = randomBytes(32)
   const hash = hashWithSalt(password, salt)
 
@@ -192,7 +192,7 @@ async function getAccountInfo (db: Db, email: string, password: string, clientId
   return toAccountInfo(account)
 }
 
-async function login (db: Db, email: string, password: string, workspace: string, clientId: string, secondFactorCode: string): Promise<LoginInfo> {
+export async function login (db: Db, email: string, password: string, workspace: string, clientId: string, secondFactorCode: string): Promise<LoginInfo> {
   const accountInfo = await getAccountInfo(db, email, password, clientId, secondFactorCode)
   const workspaceInfo = await getWorkspace(db, workspace)
 

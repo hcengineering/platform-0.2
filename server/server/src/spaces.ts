@@ -182,12 +182,14 @@ export async function processTx (ctx: SecurityContext, workspace: WorkspaceProto
         const sendSpace = checkUpdateSpaces(spaces, s, client.email)
 
         // It is not yet created, so Space object doesn't have _id specified.
-        if (!spaces.has(createTx._objectId)) {
-          return Promise.reject(new Error('Space doesn\'t contain owner. Operation is not allowed'))
-        }
-        return {
-          allowed: true,
-          sendSpace
+        if (ownChange) {
+          if (!spaces.has(createTx._objectId)) {
+            return Promise.reject(new Error('Space doesn\'t contain owner. Operation is not allowed'))
+          }
+          return {
+            allowed: true,
+            sendSpace
+          }
         }
       }
       return {
