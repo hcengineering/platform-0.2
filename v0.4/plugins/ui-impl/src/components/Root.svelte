@@ -10,6 +10,8 @@
 
   import StatusComponent from './Status.svelte'
   import Clock from './Clock.svelte'
+  import Mute from './icons/Mute.svelte'
+  import WiFi from './icons/WiFi.svelte'
   import ThemeSelector from './ThemeSelector.svelte'
   import Modal from './Modal.svelte'
   
@@ -55,7 +57,6 @@
     <div class="bg-cover"/>
     <div class="status-bar">
       <div class="container">
-        <div class="logo">&#x24C5;</div>
         <div class="status-messages">
           <StatusComponent {status} />
         </div>
@@ -64,7 +65,10 @@
             <Clock />
           </div>
           <div class="widget">
-            <ThemeSelector />
+            <Mute/>
+          </div>
+          <div class="widget">
+            <WiFi/>
           </div>
         </div>
       </div>
@@ -86,7 +90,6 @@
   @import "@anticrm/sparkling-theme/styles/mixins.scss";
 
   $status-bar-height: 56px;
-  $pictogram-size: 51px;
 
   #ui-root {
     position: relative;
@@ -101,18 +104,12 @@
     }
 
     .status-bar {
-      height: $status-bar-height;
+      min-height: $status-bar-height;
 
       .container {
         display: flex;
         align-items: center;
-
-        .logo {
-          width: $pictogram-size;
-          text-align: center;
-          font-size: 1.25em;
-          font-weight: 700;
-        }
+        height: 100%;
 
         .status-messages {
           flex-grow: 1;
@@ -128,6 +125,14 @@
             margin: 0 40px 0 24px;
             font-weight: 500;
             color: var(--theme-caption-color);
+            opacity: 0.3;
+          }
+          .widget {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
             opacity: 0.3;
           }
         }
