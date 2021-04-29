@@ -102,10 +102,10 @@
 
     .status-bar {
       height: $status-bar-height;
-      line-height: $status-bar-height;
 
       .container {
         display: flex;
+        align-items: center;
 
         .logo {
           width: $pictogram-size;
@@ -121,11 +121,11 @@
 
         .widgets {
           display: flex;
+          align-items: center;
           flex-direction: row-reverse;
 
           .clock {
             margin: 0 40px 0 24px;
-            font-family: inherit;
             font-weight: 500;
             color: var(--theme-caption-color);
             opacity: 0.3;
