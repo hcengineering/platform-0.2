@@ -54,7 +54,6 @@
 }
 
 * {
-  --theme-font-content: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto;
   box-sizing: border-box;
   scrollbar-color: var(--theme-bg-dark-color) var(--theme-bg-accent-color);
   scrollbar-width: thin;
@@ -86,7 +85,7 @@
 }
 
 body {
-  font-family: var(--theme-font-content);
+  font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto;
   font-size: 14px;
   font-weight: 400;
   color: var(--theme-content-color);

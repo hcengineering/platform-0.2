@@ -22,4 +22,21 @@
     }}>Light</PopupItem>
 </PopupMenu> -->
 
-<div>selector</div>
+<div class="container">
+  <img class="icons" src="../../img/wi-fi.svg" alt="Wi-Fi">
+  <img class="icons" src="../../img/mute.svg" alt="Mute">
+</div>
+
+<style lang="scss">
+  .container {
+    display: flex;
+    align-items: center;
+    height: 100%;
+
+    .icons {
+      margin: 8px;
+      width: 24px;
+      height: 24px;
+    }
+  }
+</style>

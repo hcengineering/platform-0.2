@@ -60,7 +60,7 @@
           <StatusComponent {status} />
         </div>
         <div class="widgets">
-          <div class="widget">
+          <div class="clock">
             <Clock />
           </div>
           <div class="widget">
@@ -85,7 +85,7 @@
 <style lang="scss">
   @import "@anticrm/sparkling-theme/styles/mixins.scss";
 
-  $status-bar-height: 20px;
+  $status-bar-height: 56px;
   $pictogram-size: 51px;
 
   #ui-root {
@@ -123,10 +123,12 @@
           display: flex;
           flex-direction: row-reverse;
 
-          .widget {
-            padding-right: 1em;
-            padding-left: 1em;
-            font-weight: 700;
+          .clock {
+            margin: 0 40px 0 24px;
+            font-family: inherit;
+            font-weight: 500;
+            color: var(--theme-caption-color);
+            opacity: 0.3;
           }
         }
       }

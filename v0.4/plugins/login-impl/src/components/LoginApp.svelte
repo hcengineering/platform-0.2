@@ -64,7 +64,7 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      overflow: auto;
+      overflow: hidden;
       padding: 60px 65px;
       height: 100%;
 
