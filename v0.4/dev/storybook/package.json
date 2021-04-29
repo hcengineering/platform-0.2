@@ -41,6 +41,7 @@
   },
   "dependencies": {
     "sirv-cli": "^1.0.0",
+    "@anticrm/status": "~0.2.0",
     "@anticrm/sparkling-controls": "~0.2.0",
     "@anticrm/sparkling-theme": "~0.2.0"
   },

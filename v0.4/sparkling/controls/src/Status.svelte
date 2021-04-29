@@ -14,18 +14,18 @@
 -->
 
 <script lang="ts">
-  // import { Status, Severity } from '@anticrm/status'
+  import type { Status } from '@anticrm/status'
+  import { Severity } from '@anticrm/status'
 
-  export let severity: string
-  export let message: string
+  export let status: Status
   export let width: string
   let color: string
 
-  color = severity === 'ERROR' ? 'var(--theme-error-color)' : 'var(--theme-caption-color)'
+  color = status.severity === Severity.ERROR ? 'var(--theme-error-color)' : 'var(--theme-caption-color)'
 </script>
 
-{#if severity}
-<div class="message-container" class:error={severity === 'ERROR'} style="{width ? 'width: ' + width : ''}">
+{#if status.severity}
+<div class="message-container" class:error={status.severity === Severity.ERROR} style="{width ? 'width: ' + width : ''}">
   <div class="icon">
     <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="none">
       <g opacity="0.6">
@@ -35,7 +35,7 @@
     </svg>
   </div>
   <div class="message">
-    {message}
+    {status.message}
   </div>
 </div>
 {/if}
