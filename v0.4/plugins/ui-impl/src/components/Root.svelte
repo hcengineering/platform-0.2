@@ -65,10 +65,10 @@
             <Clock />
           </div>
           <div class="widget">
-            <Mute/>
+            <Mute size={16}/>
           </div>
           <div class="widget">
-            <WiFi/>
+            <WiFi size={16}/>
           </div>
         </div>
       </div>
@@ -89,7 +89,7 @@
 <style lang="scss">
   @import "@anticrm/sparkling-theme/styles/mixins.scss";
 
-  $status-bar-height: 56px;
+  $status-bar-height: 32px;
 
   #ui-root {
     position: relative;
@@ -124,6 +124,7 @@
           .clock {
             margin: 0 40px 0 24px;
             font-weight: 500;
+            font-size: 12px;
             color: var(--theme-caption-color);
             opacity: 0.3;
           }
@@ -131,8 +132,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 40px;
-            height: 40px;
+            width: 32px;
+            height: 32px;
             opacity: 0.3;
           }
         }

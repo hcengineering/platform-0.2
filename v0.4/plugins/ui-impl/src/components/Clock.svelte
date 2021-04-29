@@ -4,14 +4,18 @@
   let hours = ''
   let minutes = ''
   let delimiter = false
-  const interval = setInterval(() => {
+
+  function updateTime() {
     const date = new Date()
     const h = date.getHours()
     hours = h < 10 ? `0${h}` : h.toString()
     const m = date.getMinutes()
     minutes = m < 10 ? `0${m}` : m.toString()
     delimiter = !delimiter
-  }, 500)
+  }
+
+  const interval = setInterval(updateTime, 500)
+  updateTime()
 
   onDestroy(() => clearInterval(interval))
 </script>
