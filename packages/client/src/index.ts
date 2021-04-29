@@ -33,6 +33,8 @@ export { QueryProtocol, QueryResult, QueryUpdater, Unsubscribe } from './queries
 export interface ClientService extends Service, CoreProtocol, QueryProtocol, DocumentProtocol, OperationProtocol {
   getModel: () => Model
   generateId: () => Ref<Doc>
+
+  close: () => void
 }
 
 /**
@@ -117,7 +119,8 @@ export async function newClient (token: string, userId: string, host = 'localhos
     ...createOperations(model, processTx, userId),
     generateId: genId,
     tx: processTx,
-    genRefId: coreProtocol.genRefId
+    genRefId: coreProtocol.genRefId,
+    close: () => rawClient.close()
   }
   return service
 }

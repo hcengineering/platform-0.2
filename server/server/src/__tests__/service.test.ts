@@ -45,6 +45,7 @@ describe('service', () => {
   })
 
   it('should not allow to create private space without owner', async () => {
+    jest.setTimeout(500000)
     const ws = server.getWorkspace(wsName)
     const { client } = (await server.newClients(1, ws))[0]
 

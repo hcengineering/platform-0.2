@@ -1,6 +1,7 @@
 import { Class, CoreProtocol, Doc, DocumentQuery, FindOptions, Model, Ref, Tx } from '@anticrm/core'
 import { Space, VDoc } from '@anticrm/domains'
 import { FindResponse, readResponse, ReqId, RPC_CALL_FIND, RPC_CALL_FINDONE, RPC_CALL_GEN_REF_ID, RPC_CALL_LOAD_DOMAIN, RPC_CALL_TX, serialize } from '@anticrm/rpc'
+const WebSocket = require('ws') // eslint-disable-line
 
 export type EventListener = (event: unknown) => void
 
@@ -16,6 +17,7 @@ interface PromiseInfo {
 export interface RawClient {
   request: <R>(method: string, ...params: any[]) => Promise<R>
   addEventListener: (type: EventType, listener: EventListener) => void
+  close: () => void
 }
 
 export function newRawClient (token: string, host: string, port: number): RawClient {
@@ -107,9 +109,16 @@ export function newRawClient (token: string, host: string, port: number): RawCli
     }
     val.push(listener)
   }
+
+  function close (): void {
+    if (websocket !== undefined) {
+      websocket.close()
+    }
+  }
   const rawClient: RawClient = {
     request,
-    addEventListener
+    addEventListener,
+    close
   }
   return rawClient
 }
@@ -131,7 +140,8 @@ export function newCoreProtocol (client: RawClient, model: Model): CoreProtocol 
       return result
     },
     async tx (tx: Tx): Promise<any> {
-      await client.request(RPC_CALL_TX, tx)
+      const result = await client.request(RPC_CALL_TX, tx)
+      return result
     },
     loadDomain (domain: string): Promise<Doc[]> { // eslint-disable-line @typescript-eslint/promise-function-async
       return client.request(RPC_CALL_LOAD_DOMAIN, domain)

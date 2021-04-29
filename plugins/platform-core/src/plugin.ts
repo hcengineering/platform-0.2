@@ -14,7 +14,6 @@
 //
 
 import { newClient } from '@anticrm/client'
-import { StringProperty } from '@anticrm/core'
 import { PlatformStatusCodes } from '@anticrm/foundation'
 import { Platform, PlatformStatus, Severity, Status } from '@anticrm/platform'
 import core, { CoreService } from './index'
