@@ -14,9 +14,14 @@
 -->
 
 <script lang="ts">
-  import { Button, EditBox, Status, Panel } from '@anticrm/sparkling-controls'
+  import type { Status } from '@anticrm/status'
+  import { Severity } from '@anticrm/status'
+  import { Button, EditBox, StatusComponent, Panel } from '@anticrm/sparkling-controls'
+
   let fname: string = ''
   let lname: string = ''
+  let status: Status
+  $: status = { severity: Severity.ERROR, code: 0, message: `Error: ${lname}` }
 </script>
 
 <div class="container">
@@ -26,7 +31,7 @@
       <div class="title">Sign up</div>
       <div class="status">
         {#if fname == 'error'}
-          <Status severity="ERROR" message="Error: {lname}" width="100%"/>
+          <StatusComponent {status} width="100%"/>
         {/if}
       </div>
       <div class="form">
