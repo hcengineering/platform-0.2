@@ -1,6 +1,7 @@
 <script lang="ts">
   import { getContext } from 'svelte'
-  import { Mute, WiFi } from './icons'
+  import Mute from './icons/Mute.svelte'
+  import WiFi from './icons/WiFi.svelte'
 
   const { setTheme } = getContext('theme')
 </script>
