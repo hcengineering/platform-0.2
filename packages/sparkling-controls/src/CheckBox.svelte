@@ -4,9 +4,16 @@
   export let editable = true
   export let fullWidth = true
   export let label = ''
+  export let onToggle: ((checked: boolean) => void) | undefined = undefined
 
   function toggleState () {
     if (editable) {
+      if (onToggle) {
+        onToggle(checked)
+
+        return
+      }
+
       checked = !checked
     }
   }

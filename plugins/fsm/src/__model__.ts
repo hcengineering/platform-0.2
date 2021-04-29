@@ -11,26 +11,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import core, { ArrayOf$, Builder, Class$, extendIds, Mixin$, Prop, RefTo$ } from '@anticrm/model'
-import { CORE_CLASS_STRING, Ref, Class, MODEL_DOMAIN, DateProperty, StringProperty } from '@anticrm/core'
-import { Application, Space, VDoc } from '@anticrm/domains'
+import core, { ArrayOf$, Builder, Class$, Mixin$, Prop, RefTo$ } from '@anticrm/model'
+import { CORE_CLASS_STRING, Ref, Class, DateProperty, StringProperty, CORE_CLASS_BOOLEAN } from '@anticrm/core'
+import { Application, VDoc } from '@anticrm/domains'
 import { TDoc, TMixin, TVDoc } from '@anticrm/model/src/__model__'
 import { UX } from '@anticrm/presentation/src/__model__'
 import { IntlString } from '@anticrm/platform-i18n'
-
-import _fsmPlugin, { FSM, Transition, State, WithFSM, WithState } from '.'
 import { ComponentExtension } from '@anticrm/presentation'
 import { AnyComponent } from '@anticrm/platform-ui'
 import { WorkbenchApplication } from '@anticrm/workbench'
 
-const fsmPlugin = extendIds(_fsmPlugin, {
-  space: {
-    Common: '' as Ref<Space>
-  }
-})
+import fsmPlugin, { FSM, Transition, State, WithFSM, WithState } from '.'
+
+const fsmDomain = 'fsm'
 
 @UX('FSM' as IntlString)
-@Class$(fsmPlugin.class.FSM, core.class.Doc, MODEL_DOMAIN)
+@Class$(fsmPlugin.class.FSM, core.class.VDoc, fsmDomain)
 export class TFSM extends TVDoc implements FSM {
   @UX('Name' as IntlString)
   @Prop(CORE_CLASS_STRING)
@@ -39,19 +35,17 @@ export class TFSM extends TVDoc implements FSM {
   @RefTo$(core.class.Application)
   application!: Ref<Application>
 
-  @UX('Name' as IntlString)
-  @ArrayOf$()
-  @RefTo$(fsmPlugin.class.Transition)
-  transitions!: Array<Ref<Transition>>
-
   @UX('TargetClasses' as IntlString)
   @ArrayOf$()
   @RefTo$(core.class.Class)
   classes!: Array<Ref<Class<VDoc>>>
+
+  @Prop(CORE_CLASS_BOOLEAN)
+  isTemplate!: boolean
 }
 
 @UX('Transition' as IntlString)
-@Class$(fsmPlugin.class.Transition, core.class.Doc, MODEL_DOMAIN)
+@Class$(fsmPlugin.class.Transition, core.class.VDoc, fsmDomain)
 export class TTransition extends TVDoc implements Transition {
   @UX('From' as IntlString)
   @RefTo$(fsmPlugin.class.State)
@@ -60,14 +54,20 @@ export class TTransition extends TVDoc implements Transition {
   @UX('From' as IntlString)
   @RefTo$(fsmPlugin.class.State)
   to!: Ref<State>
+
+  @RefTo$(fsmPlugin.class.FSM)
+  fsm!: Ref<FSM>
 }
 
 @UX('State' as IntlString)
-@Class$(fsmPlugin.class.State, core.class.Doc, MODEL_DOMAIN)
+@Class$(fsmPlugin.class.State, core.class.VDoc, fsmDomain)
 export class TState extends TVDoc implements State {
   @UX('Name' as IntlString)
   @Prop(CORE_CLASS_STRING)
   name!: string
+
+  @RefTo$(fsmPlugin.class.FSM)
+  fsm!: Ref<FSM>
 }
 
 @Mixin$(fsmPlugin.mixin.WithFSM, core.class.Doc)
@@ -112,7 +112,7 @@ export function model (S: Builder): void {
   }, fsmPlugin.space.Common)
 }
 
-type PureState = Omit<State, keyof VDoc>
+type PureState = Omit<State, keyof VDoc | 'fsm'>
 class FSMBuilder {
   private readonly name: string
   private readonly appID: Ref<Application>
@@ -162,11 +162,20 @@ class FSMBuilder {
       _createdOn: Date.now() as DateProperty
     }
 
+    const fsm = S.createDocument(fsmPlugin.class.FSM, {
+      name: this.name,
+      application: this.appID,
+      classes: this.classes,
+      isTemplate: true,
+      ...vProps
+    })
+
     const stateIDs = new Map<string, Ref<State>>()
 
     this.states.forEach((state) => {
       const doc = S.createDocument(fsmPlugin.class.State, {
         ...state,
+        fsm: fsm._id as Ref<FSM>,
         ...vProps
       })
 
@@ -186,18 +195,11 @@ class FSMBuilder {
       const doc = S.createDocument(fsmPlugin.class.Transition, {
         from,
         to,
+        fsm: fsm._id as Ref<FSM>,
         ...vProps
       })
 
       transitions.push(doc._id as Ref<Transition>)
-    })
-
-    const fsm = S.createDocument(fsmPlugin.class.FSM, {
-      name: this.name,
-      application: this.appID,
-      classes: this.classes,
-      transitions,
-      ...vProps
     })
 
     return fsm
