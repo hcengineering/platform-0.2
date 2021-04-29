@@ -26,10 +26,16 @@ Secondary.args = {
   label: 'Button'
 };
 
-export const SecondaryWidth300px = Template.bind({});
-SecondaryWidth300px.args = {
+export const Secondary300px = Template.bind({});
+Secondary300px.args = {
   label: 'Button',
   width: '300px'
+};
+
+export const SecondaryDisabled = Template.bind({});
+SecondaryDisabled.args = {
+  label: 'Button',
+  disabled: true
 };
 
 export const Primary = Template.bind({});
@@ -45,13 +51,7 @@ PrimaryFullWidth.args = {
   width: '100%'
 };
 
-export const Disabled = Template.bind({});
-Disabled.args = {
-  label: 'Disabled',
-  disabled: true
-};
-
-export const Loading = Template.bind({});
-Loading.args = {
+export const PrimaryLoading = Template.bind({});
+PrimaryLoading.args = {
   loading: true
 };
