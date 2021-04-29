@@ -3,6 +3,10 @@
   // import PopupMenu from '@anticrm/sparkling-controls/src/menu/PopupMenu.svelte'
   // import PopupItem from '@anticrm/sparkling-controls/src/menu/PopupItem.svelte'
 
+  import wifi from '../../img/wi-fi.svg'
+  import mute from '../../img/mute.svg'
+
+
   const { setTheme } = getContext('theme')
 </script>
 
@@ -23,8 +27,8 @@
 </PopupMenu> -->
 
 <div class="container">
-  <img class="icons" src="../../img/wi-fi.svg" alt="Wi-Fi">
-  <img class="icons" src="../../img/mute.svg" alt="Mute">
+  <img class="icons" src={wifi} alt="Wi-Fi">
+  <img class="icons" src={mute} alt="Mute">
 </div>
 
 <style lang="scss">
