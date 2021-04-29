@@ -1,0 +1,214 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Exported by architect/package@6.2.0 on 2021-04-29T10:06:38.322Z
+Resources:
+  HTTP:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: $default
+      DefinitionBody:
+        openapi: 3.0.1
+        info:
+          title:
+            Ref: AWS::StackName
+        paths:
+          /{proxy+}:
+            get:
+              x-amazon-apigateway-integration:
+                payloadFormatVersion: '2.0'
+                type: aws_proxy
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetCatchallHTTPLambda.Arn}/invocations
+                connectionType: INTERNET
+          /rpc:
+            get:
+              x-amazon-apigateway-integration:
+                payloadFormatVersion: '2.0'
+                type: aws_proxy
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetRpcHTTPLambda.Arn}/invocations
+                connectionType: INTERNET
+          /_static/{proxy+}:
+            get:
+              x-amazon-apigateway-integration:
+                payloadFormatVersion: '1.0'
+                type: http_proxy
+                httpMethod: GET
+                uri:
+                  Fn::Sub:
+                  - http://${bukkit}.s3.${AWS::Region}.amazonaws.com/{proxy}
+                  - bukkit:
+                      Ref: StaticBucket
+                connectionType: INTERNET
+                timeoutInMillis: 30000
+  GetCatchallHTTPLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      CodeUri: s3://front-cfn-deployments-66a46/67970ba3e1b32358b47025a5aeb10ab6
+      Runtime: nodejs12.x
+      MemorySize: 1152
+      Timeout: 5
+      Environment:
+        Variables:
+          ARC_APP_NAME: front
+          ARC_CLOUDFORMATION:
+            Ref: AWS::StackName
+          ARC_ENV: staging
+          ARC_HTTP: aws_proxy
+          ARC_ROLE:
+            Ref: Role
+          NODE_ENV: staging
+          SESSION_TABLE_NAME: jwe
+          ARC_STATIC_BUCKET:
+            Ref: StaticBucket
+          MONGODB_URI: mongodb+srv://ci:ci@cluster0.twepq.mongodb.net/master?retryWrites=true&w=majority
+      Role:
+        Fn::Sub:
+        - arn:aws:iam::${AWS::AccountId}:role/${roleName}
+        - roleName:
+            Ref: Role
+      Events:
+        GetCatchallHTTPEvent:
+          Type: HttpApi
+          Properties:
+            Path: /{proxy+}
+            Method: GET
+            ApiId:
+              Ref: HTTP
+  GetRpcHTTPLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      CodeUri: s3://front-cfn-deployments-66a46/f36adf0920b0e350e5cbaa0ee38af0a1
+      Runtime: nodejs12.x
+      MemorySize: 1152
+      Timeout: 5
+      Environment:
+        Variables:
+          ARC_APP_NAME: front
+          ARC_CLOUDFORMATION:
+            Ref: AWS::StackName
+          ARC_ENV: staging
+          ARC_HTTP: aws_proxy
+          ARC_ROLE:
+            Ref: Role
+          NODE_ENV: staging
+          SESSION_TABLE_NAME: jwe
+          ARC_STATIC_BUCKET:
+            Ref: StaticBucket
+          MONGODB_URI: mongodb+srv://ci:ci@cluster0.twepq.mongodb.net/master?retryWrites=true&w=majority
+      Role:
+        Fn::Sub:
+        - arn:aws:iam::${AWS::AccountId}:role/${roleName}
+        - roleName:
+            Ref: Role
+      Events:
+        GetRpcHTTPEvent:
+          Type: HttpApi
+          Properties:
+            Path: /rpc
+            Method: GET
+            ApiId:
+              Ref: HTTP
+  StaticBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      AccessControl: PublicRead
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: 404.html
+  Role:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: lambda.amazonaws.com
+          Action: sts:AssumeRole
+      Policies:
+      - PolicyName: ArcGlobalPolicy
+        PolicyDocument:
+          Statement:
+          - Effect: Allow
+            Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+            - logs:DescribeLogStreams
+            Resource: arn:aws:logs:*:*:*
+      - PolicyName: ArcStaticBucketPolicy
+        PolicyDocument:
+          Statement:
+          - Effect: Allow
+            Action:
+            - s3:GetObject
+            - s3:PutObject
+            - s3:PutObjectAcl
+            - s3:DeleteObject
+            Resource:
+            - Fn::Sub:
+              - arn:aws:s3:::${bukkit}
+              - bukkit:
+                  Ref: StaticBucket
+            - Fn::Sub:
+              - arn:aws:s3:::${bukkit}/*
+              - bukkit:
+                  Ref: StaticBucket
+  StaticBucketParam:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Type: String
+      Name:
+        Fn::Sub:
+        - /${AWS::StackName}/static/${key}
+        - key: bucket
+      Value:
+        Ref: StaticBucket
+  StaticFingerprintParam:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Type: String
+      Name:
+        Fn::Sub:
+        - /${AWS::StackName}/static/${key}
+        - key: fingerprint
+      Value: 'false'
+  ParameterStorePolicy:
+    Type: AWS::IAM::Policy
+    DependsOn: Role
+    Properties:
+      PolicyName: ArcParameterStorePolicy
+      PolicyDocument:
+        Statement:
+        - Effect: Allow
+          Action: ssm:GetParametersByPath
+          Resource:
+            Fn::Sub:
+            - arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}
+            - {}
+      Roles:
+      - Ref: Role
+Outputs:
+  API:
+    Description: API Gateway (HTTP)
+    Value:
+      Fn::Sub:
+      - https://${ApiId}.execute-api.${AWS::Region}.amazonaws.com
+      - ApiId:
+          Ref: HTTP
+  ApiId:
+    Description: API ID (ApiId)
+    Value:
+      Ref: HTTP
+  BucketURL:
+    Description: Bucket URL
+    Value:
+      Fn::Sub:
+      - http://${bukkit}.s3-website-${AWS::Region}.amazonaws.com
+      - bukkit:
+          Ref: StaticBucket

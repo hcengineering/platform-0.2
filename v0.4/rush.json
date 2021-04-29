@@ -409,6 +409,10 @@
       "projectFolder": "server/account"
     },
     {
+      "packageName": "@anticrm/server-front",
+      "projectFolder": "server/front"
+    },
+    {
       "packageName": "prod",
       "projectFolder": "dev/prod"
     },

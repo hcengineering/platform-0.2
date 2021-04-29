@@ -1,0 +1,14 @@
+{
+  "name": "@anticrm/server-front",
+  "version": "0.0.1",
+  "description": "A fresh new Architect project!",
+  "scripts": {
+    "start": "arc sandbox"
+  },
+  "devDependencies": {
+    "@architect/architect": "^8.5.9"
+  },
+  "dependencies": {
+    "mongodb": "^3.6.6"
+  }
+}
