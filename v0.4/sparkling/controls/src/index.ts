@@ -15,5 +15,5 @@
 
 export { default as Button } from './Button.svelte'
 export { default as EditBox } from './EditBox.svelte'
-export { default as Status } from './Status.svelte'
+export { default as StatusComponent } from './Status.svelte'
 export { default as Panel } from './Panel.svelte'

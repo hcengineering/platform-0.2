@@ -27,20 +27,20 @@ Labeled.args = {
   label: 'Placeholder'
 };
 
-export const LabeledWidth300px = Template.bind({});
-LabeledWidth300px.args = {
+export const Labeled300px = Template.bind({});
+Labeled300px.args = {
   label: 'Placeholder',
   width: '300px'
 };
 
-export const Error = Template.bind({});
-Error.args = {
+export const LabeledError = Template.bind({});
+LabeledError.args = {
   label: 'Placeholder',
   error: 'Error text goes here'
 };
 
-export const PasswordWithPlaceholder = Template.bind({});
-PasswordWithPlaceholder.args = {
+export const LabeledPassword = Template.bind({});
+LabeledPassword.args = {
   password: true,
   label: 'Enter your password'
 };
