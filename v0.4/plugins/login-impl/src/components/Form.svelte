@@ -51,10 +51,8 @@
   }
 </script>
 
-<form>
-
-  <div class="form-container">
-    <div class="separator-footer"/>
+  <form class="form-container">
+    <div class="grow-separator"/>
     <div class="title">{caption}</div>
     <div class="status">
         <StatusControl severity="ERROR" message="Error: " width="100%"/>
@@ -75,79 +73,78 @@
       <div class="form-row send"><Button label="Sign Up" primary width="100%"/></div> -->
 
     </div>
-    <div class="separator-footer"/>
-    <div class="reg-footer"><span>Already have an account?</span> <a href="/login">Sign In</a></div>
-  </div>
+    <div class="grow-separator"/>
+    <div class="footer"><span>Already have an account?</span> <a href="/login">Sign In</a></div>
+  </form>
 
   <!-- <div class="actions">
     {#each actions as action, i}
       <button class="button" class:separator={i !== 0} on:click|preventDefault={action.func}> {action.i18n} </button>
     {/each}
   </div> -->
-</form>
 
 <style lang="scss">
 
-.form-container {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      overflow: hidden;
-      padding: 60px 65px;
-      height: 100%;
+  .form-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+    height: 100%;
+    padding: 80px 80px;
 
-      .title {
-        font-weight: 600;
-        font-size: 24px;
-        line-height: 29px;
-        color: #FFFFFF;
-      }
-      .status {
-        min-height: 120px;
-        max-height: 120px;
-        padding-top: 20px;
-      }
-      
-      .form {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        column-gap: 12px;
-        row-gap: 24px;
+    .title {
+      font-weight: 600;
+      font-size: 24px;
+      line-height: 29px;
+      color: #FFFFFF;
+    }
+    .status {
+      min-height: 120px;
+      max-height: 120px;
+      padding-top: 20px;
+    }
+    
+    .form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      column-gap: 12px;
+      row-gap: 24px;
 
-        .form-row {
+      .form-row {
+        grid-column-start: 1;
+        grid-column-end: 3;
+      }
+      @media (max-width: 985px) {
+        .form-col {
           grid-column-start: 1;
           grid-column-end: 3;
         }
-        @media (max-width: 985px) {
-          .form-col {
-            grid-column-start: 1;
-            grid-column-end: 3;
-          }
-        }
-        .send {
-          margin-top: 36px;
-        }
       }
-      .separator-footer {
-        flex-grow: 1;
+      .send {
+        margin-top: 36px;
       }
-      .reg-footer {
-        margin-top: 56px;
-        font-size: 13px;
-        line-height: 16px;
-        color: #FFFFFF;
-        span {
-          opacity: 0.3;
-        }
-        a {
-          color: #fff;
-          opacity: 0.8;
-          text-decoration: none;
-          :hover {
-            opacity: 1;
-          }
+    }
+    .grow-separator {
+      flex-grow: 1;
+    }
+    .footer {
+      margin-top: 56px;
+      font-size: 13px;
+      line-height: 16px;
+      color: #FFFFFF;
+      span {
+        opacity: 0.3;
+      }
+      a {
+        color: #fff;
+        opacity: 0.8;
+        text-decoration: none;
+        :hover {
+          opacity: 1;
         }
       }
     }
+  }
 
 </style>
