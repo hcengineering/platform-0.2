@@ -1,10 +1,9 @@
 
-let mongo = require('mongodb')
-let MongoClient = mongo.MongoClient
+import { MongoClient } from 'mongodb'
 
-let client
+let client: MongoClient | undefined
 
-exports.handler = async function http (req, context) {
+export async function handler (req: any, context: any) {
 
   // See https://www.mongodb.com/blog/post/serverless-development-with-nodejs-aws-lambda-mongodb-atlas
   // context.callbackWaitsForEmptyEventLoop = false
