@@ -51,3 +51,6 @@ export const plugin3State = {
   dep1: '',
   dep2: ''
 }
+
+export const badplugin = 'badplugin' as Plugin<Service>
+export const descriptorBad = plugin(badplugin, {}, {})

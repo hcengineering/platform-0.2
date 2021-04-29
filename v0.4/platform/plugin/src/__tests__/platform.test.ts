@@ -18,7 +18,7 @@
 import { Severity, Status } from '@anticrm/status'
 import { createPlatform, getResourceInfo, identify, Metadata, PlatformStatus, Plugin, Resource, Service } from '..'
 
-import { descriptor1, descriptor2, descriptor3, plugin1, plugin1State, plugin2State, plugin3 } from './shared'
+import { descriptor1, descriptor2, descriptor3, plugin1, plugin1State, plugin2State, plugin3, descriptorBad, badplugin } from './shared'
 
 type AnyPlugin = Plugin<Service>
 
@@ -109,6 +109,23 @@ describe('platform', () => {
       .catch((err) => {
         expect(err).toBeInstanceOf(Error)
         expect(err.message).toBe(`resource not loaded: ${wrongResource}`)
+        done()
+      })
+  })
+
+  it('should fail to load bad plugin', (done) => {
+    platform.addLocation(descriptorBad, async () => await import('./badplugin'))
+    const wrongResource = 'resource_wrong:badplugin.Resource' as Resource<string>
+    platform
+      .getResource(wrongResource)
+      .then((res) => {
+        // eslint-disable-line
+        expect(true).toBe(false)
+        done()
+      })
+      .catch((err) => {
+        expect(err).toBeInstanceOf(Error)
+        expect(err.message).toBe(`I\'m bad plugin!`)
         done()
       })
   })

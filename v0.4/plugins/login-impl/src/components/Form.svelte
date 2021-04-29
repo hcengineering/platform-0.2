@@ -15,12 +15,14 @@
 
 <script lang="ts">
   import { Status, Severity } from '@anticrm/status'
+  import { Status as StatusControl, EditBox } from '@anticrm/sparkling-controls'
 
   interface Field {
     name: string
     i18n: string
     password?: boolean
     optional?: boolean
+    short?: boolean
   }
 
   interface Action {
@@ -50,68 +52,102 @@
 </script>
 
 <form>
-  <div class="caption-2">{caption}</div>
-  <div class="status">{description}</div>
 
-  {#each fields as field (field.name)}
-    <div class="field">
-      {#if field.password}
-        <input
-          class="editbox"
-          name={field.name}
-          placeholder={field.i18n}
-          type="password"
-          bind:value={object[field.name]}
-          on:keyup={validate} />
-      {:else}
-        <input
-          class="editbox"
-          name={field.name}
-          placeholder={field.i18n}
-          type="text"
-          bind:value={object[field.name]}
-          on:keyup={validate} />
-      {/if}
+  <div class="form-container">
+    <div class="separator-footer"/>
+    <div class="title">{caption}</div>
+    <div class="status">
+        <StatusControl severity="ERROR" message="Error: " width="100%"/>
     </div>
-  {/each}
+    <div class="form">
 
-  <div class="actions">
+      {#each fields as field (field.name)}
+      <div class={field.short ? 'form-col' : 'form-row'}>
+        <EditBox label={field.i18n} password={field.password} bind:value={object[field.name]} on:keyup={validate}/>
+      </div>
+      {/each}
+  
+      <!-- <div class="form-col"><EditBox label="First Name" bind:value={fname}/></div>
+      <div class="form-col"><EditBox label="Last Name" bind:value={lname}/></div>
+      <div class="form-row"><EditBox label="E-mail"/></div>
+      <div class="form-row"><EditBox label="Password" password/></div>
+      <div class="form-row"><EditBox label="Repeat password" password/></div>
+      <div class="form-row send"><Button label="Sign Up" primary width="100%"/></div> -->
+
+    </div>
+    <div class="separator-footer"/>
+    <div class="reg-footer"><span>Already have an account?</span> <a href="/login">Sign In</a></div>
+  </div>
+
+  <!-- <div class="actions">
     {#each actions as action, i}
       <button class="button" class:separator={i !== 0} on:click|preventDefault={action.func}> {action.i18n} </button>
     {/each}
-  </div>
+  </div> -->
 </form>
 
 <style lang="scss">
-  form {
-    margin: auto;
-    margin-top: 20vh;
-    width: 30em;
-    padding: 2em;
-    border-radius: 1em;
-    border: 1px solid var(--theme-bg-accent-color);
 
-    .status {
-      margin-top: 0.5em;
-    }
-    .field {
-      .editbox {
-        width: 100%;
-      }
-      margin: 1em 0;
-    }
-
-    .actions {
+.form-container {
       display: flex;
-      margin-top: 1.5em;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      padding: 60px 65px;
+      height: 100%;
 
-      .button {
-        flex: 1;
+      .title {
+        font-weight: 600;
+        font-size: 24px;
+        line-height: 29px;
+        color: #FFFFFF;
+      }
+      .status {
+        min-height: 120px;
+        max-height: 120px;
+        padding-top: 20px;
+      }
+      
+      .form {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        column-gap: 12px;
+        row-gap: 24px;
 
-        &.separator {
-          margin-left: 1em;
+        .form-row {
+          grid-column-start: 1;
+          grid-column-end: 3;
+        }
+        @media (max-width: 985px) {
+          .form-col {
+            grid-column-start: 1;
+            grid-column-end: 3;
+          }
+        }
+        .send {
+          margin-top: 36px;
+        }
+      }
+      .separator-footer {
+        flex-grow: 1;
+      }
+      .reg-footer {
+        margin-top: 56px;
+        font-size: 13px;
+        line-height: 16px;
+        color: #FFFFFF;
+        span {
+          opacity: 0.3;
+        }
+        a {
+          color: #fff;
+          opacity: 0.8;
+          text-decoration: none;
+          :hover {
+            opacity: 1;
+          }
         }
       }
     }
-  }
+
 </style>
