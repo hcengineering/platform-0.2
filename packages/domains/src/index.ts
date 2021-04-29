@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Class, DateProperty, Doc, Emb, Mixin, Property, Ref, StringProperty, Tx } from '@anticrm/core'
+import { AnyLayout, Class, DateProperty, Doc, Emb, Mixin, Obj, Property, Ref, StringProperty, Tx } from '@anticrm/core'
 
 // TXes
 
@@ -110,10 +110,13 @@ interface TxOperationBuilder<T> {
   pull: () => TxOperation
 }
 
-export type ArrayElement<A> = A extends Array<infer T> ? T : A
+export type TxBuilderArrayOf<A> = A extends Array<infer T> ? TxBuilderOrOpBuilderOf<T> : never
+
+export type TxBuilderOrOpBuilderOf<A> = A extends Obj ? TxBuilder<A>: TxOperationBuilder<A>
+export type TxBuilderOf<A> = A extends Obj ? TxBuilder<A>: never
 
 export type FieldBuilder<T> = {
-  [P in keyof T]-?: TxOperationBuilder<ArrayElement<T[P]>> & ArrayElement<T[P]>;
+  [P in keyof T]-?: TxBuilderArrayOf<T[P]> | TxBuilderOf<T[P]>;
 }
 export type TxBuilder<T> = TxOperationBuilder<T> & FieldBuilder<T>
 
