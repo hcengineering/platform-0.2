@@ -1,39 +1,48 @@
 
-import { MongoClient } from 'mongodb'
+import { MongoClient, Db } from 'mongodb'
+import type { HttpRequest, HttpResponse } from '@architect/functions'
+import type { Context } from 'aws-lambda'
+
+import { Request, Response, serialize, fromStatus } from '@anticrm/rpc'
+import { methods } from '@anticrm/server-account'
+import { Status, Severity, PlatformError } from '@anticrm/status'
 
 let client: MongoClient | undefined
 
-export async function handler (req: any, context: any) {
+function httpResponse(statusCode: number, resp: Response<any>): HttpResponse {
+  return {
+    statusCode,
+    headers: {
+      'content-type': 'application/json; charset=utf8'
+    },
+    body: serialize(resp)
+  }
+}
+
+export async function handler (req: HttpRequest, context: Context): Promise<HttpResponse | undefined> {
 
   // See https://www.mongodb.com/blog/post/serverless-development-with-nodejs-aws-lambda-mongodb-atlas
-  // context.callbackWaitsForEmptyEventLoop = false
+  context.callbackWaitsForEmptyEventLoop = false
+
   try {
+
+    const request = req.body
+    const method = (methods as { [key: string]: (db: Db, request: Request<any>) => Response<any> })[request.method]
+    if (method === undefined) {
+      throw new PlatformError(new Status(Severity.ERROR, 0, 'unknown method'))
+    }
+
     if (client === undefined) {
       const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/master'
-      console.log('connecting to ' + uri)
       client = await MongoClient.connect(uri, { useUnifiedTopology: true })
-    } else {
-      console.log('reusing connection')
     }
     
-    return {
-      statusCode: 200,
-      headers: {
-        'cache-control': 'no-cache, no-store, must-revalidate, max-age=0, s-maxage=0',
-        'content-type': 'text/html; charset=utf8'
-      },
-      body: `hey there! `
-    }      
+    const result = await method(client.db(), request)
+    return httpResponse(200, result)
+
   } catch (err) {
-    return {
-      statusCode: 200,
-      headers: {
-        'cache-control': 'no-cache, no-store, must-revalidate, max-age=0, s-maxage=0',
-        'content-type': 'text/html; charset=utf8'
-      },
-      body: String(err)
-    }  
+    const status = err instanceof PlatformError ? err.status : new Status(Severity.ERROR, -1, err.message)
+    return httpResponse(200, fromStatus(status))
   }
-  
   
 }

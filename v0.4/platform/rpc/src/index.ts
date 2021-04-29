@@ -43,9 +43,6 @@ export interface Response<R> {
   result?: R
   id?: ReqId
   error?: RpcError
-
-  // A list of transactions to make client state be equal to server state in case of live queries of derived data
-  // clientTx?: Tx[]
 }
 
 export function serialize (object: Request<any> | Response<any>): string {
@@ -64,8 +61,9 @@ export function toStatus (response: Response<any>): Status {
   return new Status(Severity.ERROR, response.error?.code as number, response.error?.message as string)
 }
 
-// export const RPC_CALL_FIND = 'find'
-// export const RPC_CALL_FINDONE = 'findOne'
-// export const RPC_CALL_LOAD_DOMAIN = 'loadDomain'
-// export const RPC_CALL_TX = 'tx'
-// export const RPC_CALL_GEN_REF_ID = 'genRefId'
+export function fromStatus (status: Status, id?: ReqId): Response<any> {
+  return { 
+    id,
+    error: { code: status.code, message: status.message }
+  }
+}
