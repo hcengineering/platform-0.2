@@ -14,11 +14,31 @@
 //
 
 import { Class, Doc, DocumentQuery, FindOptions, generateId, Model, Ref, Storage, TxContext } from '@anticrm/core'
-import { QueryResult, Subscriber, Unsubscribe } from '.'
 import { TxOperation, TxOperationKind } from '@anticrm/domains'
 
 export interface Domain extends Storage {
   query: <T extends Doc>(_class: Ref<Class<T>>, query: DocumentQuery<T>) => QueryResult<T>
+}
+
+export type Subscriber<T> = (value: T[]) => void
+export type Unsubscribe = () => void
+
+export interface QueryResult<T extends Doc> {
+  subscribe: (run: Subscriber<T>) => Unsubscribe
+}
+
+export type QueryUpdater<T extends Doc> = (_class: Ref<Class<T>>, query: DocumentQuery<T>, options?: FindOptions<T>) => void
+
+/**
+ * Define operations with live queries.
+ */
+export interface QueryProtocol {
+  /**
+   * Perform query construction, it will be possible to subscribe to query results.
+   * @param _class - object class
+   * @param query - query
+   */
+  query: <T extends Doc>(_class: Ref<Class<T>>, query: DocumentQuery<T>, options?: FindOptions<T>) => QueryResult<T>
 }
 
 interface Query<T extends Doc> {

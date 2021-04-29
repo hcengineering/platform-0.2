@@ -1,22 +1,6 @@
-//
-// Copyright © 2020 Anticrm Platform Contributors.
-//
-// Licensed under the Eclipse Public License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License. You may
-// obtain a copy of the License at https://www.eclipse.org/legal/epl-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
-
-import { Platform, PlatformStatus, Severity, Status } from '@anticrm/platform'
-import { readResponse, ReqId, serialize } from '@anticrm/rpc'
-import core from '.'
-import { PlatformStatusCodes } from '@anticrm/foundation'
+import { Class, CoreProtocol, Doc, DocumentQuery, FindOptions, Model, Ref, Tx } from '@anticrm/core'
+import { Space, VDoc } from '@anticrm/domains'
+import { FindResponse, readResponse, ReqId, RPC_CALL_FIND, RPC_CALL_FINDONE, RPC_CALL_GEN_REF_ID, RPC_CALL_LOAD_DOMAIN, RPC_CALL_TX, serialize } from '@anticrm/rpc'
 
 export type EventListener = (event: unknown) => void
 
@@ -25,30 +9,20 @@ export enum EventType {
   TransientTransaction // A transient transaction with derived data modification.
 }
 
-export interface RpcService {
+interface PromiseInfo {
+  resolve: (value?: any) => void
+  reject: (error: any) => void
+}
+export interface RawClient {
   request: <R>(method: string, ...params: any[]) => Promise<R>
   addEventListener: (type: EventType, listener: EventListener) => void
 }
 
-export default (platform: Platform): RpcService => {
-  interface PromiseInfo {
-    resolve: (value?: any) => void
-    reject: (error: any) => void
-  }
-
+export function newRawClient (token: string, host: string, port: number): RawClient {
   const requests = new Map<ReqId, PromiseInfo>()
   let lastId = 0
 
   function createWebsocket (): Promise<WebSocket> { // eslint-disable-line @typescript-eslint/promise-function-async
-    const host = platform.getMetadata(core.metadata.WSHost) ?? 'localhost'
-    const port = platform.getMetadata(core.metadata.WSPort) ?? 3000
-
-    const token = platform.getMetadata(core.metadata.Token)
-
-    if (token === undefined) {
-      platform.broadcastEvent(PlatformStatus, new Status(Severity.ERROR, PlatformStatusCodes.AUTHENTICATON_REQUIRED, 'Authentication is required'))
-      return Promise.reject(new Error('authentication required'))
-    }
     return new Promise<WebSocket>((resolve) => {
       // Let's sure token is valid one
       const ws = new WebSocket(`ws://${host}:${port}/${token}`)
@@ -111,7 +85,7 @@ export default (platform: Platform): RpcService => {
         resolve,
         reject
       })
-      getWebSocket().then((ws: WebSocket) => { // eslint-disable-line
+        getWebSocket().then((ws: WebSocket) => { // eslint-disable-line
         ws.send(serialize({
           id,
           method,
@@ -125,15 +99,45 @@ export default (platform: Platform): RpcService => {
 
   const listeners: Map<EventType, EventListener[]> = new Map()
 
-  return {
+  function addEventListener (type: EventType, listener: EventListener): void {
+    let val = listeners.get(type)
+    if (val === undefined) {
+      val = []
+      listeners.set(type, val)
+    }
+    val.push(listener)
+  }
+  const rawClient: RawClient = {
     request,
-    addEventListener (type: EventType, listener: EventListener) {
-      let val = listeners.get(type)
-      if (val === undefined) {
-        val = []
-        listeners.set(type, val)
+    addEventListener
+  }
+  return rawClient
+}
+
+export function newCoreProtocol (client: RawClient, model: Model): CoreProtocol {
+  return {
+    async find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>, options?: FindOptions<T>): Promise<T[]> {
+      const rpcResult = (await client.request<FindResponse<T>>(RPC_CALL_FIND, _class, query, options !== undefined ? options : null /* we send null since use JSON */))
+      if (options?.countCallback !== undefined) {
+        options.countCallback(rpcResult.skip, rpcResult.limit, rpcResult.count)
       }
-      val.push(listener)
+      return rpcResult.values.map((it) => model.as(it, _class))
+    },
+    async findOne<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined> {
+      const result = (await client.request<T>(RPC_CALL_FINDONE, _class, query))
+      if (result !== undefined) {
+        return model.as(result, _class)
+      }
+      return result
+    },
+    async tx (tx: Tx): Promise<any> {
+      await client.request(RPC_CALL_TX, tx)
+    },
+    loadDomain (domain: string): Promise<Doc[]> { // eslint-disable-line @typescript-eslint/promise-function-async
+      return client.request(RPC_CALL_LOAD_DOMAIN, domain)
+    },
+    genRefId (_space: Ref<Space>): Promise<Ref<VDoc>> { // eslint-disable-line @typescript-eslint/promise-function-async
+      return client.request(RPC_CALL_GEN_REF_ID, _space)
     }
   }
 }

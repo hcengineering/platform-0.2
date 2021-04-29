@@ -15,7 +15,8 @@
 
 import { Class, CORE_CLASS_TYPE, Doc, DocumentQuery, FindOptions, Mixin, Obj, Ref, StringProperty } from '@anticrm/core'
 import { getContext, onDestroy } from 'svelte'
-import core, { CoreService, QueryUpdater, Unsubscribe } from '@anticrm/platform-core'
+import core, { CoreService } from '@anticrm/platform-core'
+import { QueryUpdater, Unsubscribe } from '@anticrm/client'
 import { AnyComponent, CONTEXT_PLATFORM } from '@anticrm/platform-ui'
 import presentationPlugin, { AttrModel, ClassModel, ComponentExtension, GroupModel, PresentationService } from '.'
 import { IntlString } from '@anticrm/platform-i18n'
