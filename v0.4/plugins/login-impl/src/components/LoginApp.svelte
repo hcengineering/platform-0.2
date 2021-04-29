@@ -14,14 +14,17 @@
 -->
 
 <script lang="ts">
-  import { Panel } from '@anticrm/sparkling-controls'
   import LoginForm from './LoginForm.svelte'
 </script>
 
 <div class="container">
-  <Panel>
+  <div class="panel">
+    <div class="back-panel-dark"/>
+    <div class="back-panel-light">
+      <div class="bg-noise opacity-3"/>
+    </div>
     <LoginForm/>
-  </Panel>
+  </div>
   <div class="intro">
     <div class="content">
       <div class="logo"> </div>
@@ -34,11 +37,31 @@
 </div>
 
 <style lang="scss">
+  @import "@anticrm/sparkling-theme/styles/mixins.scss";
+
   .container {
     display: flex;
     flex-direction: row;
     height: 100%;
     padding: 20px;
+
+    .panel {
+      position: relative;
+      overflow: hidden;
+      margin-right: 20px;
+      width: 668px;
+      height: 100%;
+      border-radius: 20px;
+
+      .back-panel-light {
+        @include bg-layer(linear-gradient(158.74deg, rgba(205, 166, 255, 0.12) 5.62%, rgba(255, 255, 255, 0) 97.09%), 0.3);
+        z-index: -1;
+      }
+      .back-panel-dark {
+        @include bg-layer(#1D1D23, 0.5);
+        z-index: -1;
+      }
+    }
 
     .intro {
       display: flex;
