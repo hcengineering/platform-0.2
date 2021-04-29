@@ -19,8 +19,11 @@ import 'reflect-metadata'
 import core from '.'
 import {
   AnyLayout, ArrayOf, Attribute, BagOf, Class, Classifier, ClassifierKind, Doc, Emb, Enum, EnumKey, EnumLiteral,
-  EnumLiterals, EnumOf, InstanceOf, Mixin, Model, Obj, Property, Ref, RefTo, StringProperty, Type
+  EnumLiterals, EnumOf, InstanceOf, Mixin, Model, MODEL_DOMAIN, Obj, Property, Ref, RefTo, StringProperty, Type
 } from '@anticrm/core'
+import { CORE_CLASS_VDOC } from '@anticrm/domains'
+
+const classIdentities = new Map<Ref<Class<Obj>>, Class<Obj>>()
 
 const classifierMetadataKey = Symbol('anticrm:classifier')
 
@@ -105,16 +108,43 @@ export function loadClassifierChild (target: any, propertyKey: string): Emb | un
   return undefined
 }
 
+function findParentClassifier (_class: Class<Obj>, parent: Ref<Class<Obj>>): Class<Obj> | undefined {
+  let cl = classIdentities.get(_class._extends as Ref<Class<Obj>>)
+  while (cl !== undefined) {
+    if (cl._id === parent) {
+      return cl
+    }
+    if (cl._extends !== undefined) {
+      cl = classIdentities.get(cl._extends)
+    } else {
+      break
+    }
+  }
+}
+
 export function Class$<E extends Obj, T extends E> (id: Ref<Class<T>>, _extends: Ref<Class<E>>, domain?: string) {
   return function classDecorator<C extends new () => T> (constructor: C): void {
     const classifier = getClass(constructor.prototype).doc
     classifier._id = id
     classifier._class = core.class.Class
     classifier._kind = ClassifierKind.CLASS
+
+    // Store to be a able to perform some checks.
+    classIdentities.set(classifier._id as Ref<Class<Doc>>, classifier)
+
     if (id !== _extends) {
       classifier._extends = _extends
     }
     if (domain !== undefined) {
+      // Do not allow VDoc's to be in Model domain.
+      if (domain === MODEL_DOMAIN) {
+        const vdoc = findParentClassifier(classifier, CORE_CLASS_VDOC)
+        if (vdoc !== undefined) {
+          throw new Error(`Classifier ${id} is extends ${CORE_CLASS_VDOC} and define ${domain} as domain` +
+          '\nVDoc documents should be defined for own domains, not model domain.')
+        }
+      }
+
       (classifier as Class<T>)._domain = domain as Property<string, string>
     }
   }

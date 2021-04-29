@@ -13,15 +13,13 @@
 // limitations under the License.
 //
 
-import { Resource } from '@anticrm/platform'
-
-import { loadClassifier } from './dsl'
-import { CombineObjects, KeysByType } from 'simplytyped'
 import {
-  AllAttributes, Attribute, Class, ClassifierKind, Doc, DocumentValue, EClass, Emb, EMixin, Mixin, Model, MODEL_DOMAIN,
-  Obj, Ref, StringProperty
+  Class, Doc, DocumentValue, Mixin, Model, MODEL_DOMAIN,
+  Obj, Ref
 } from '@anticrm/core'
+import { CombineObjects, KeysByType } from 'simplytyped'
 import core from '.'
+import { loadClassifier } from './dsl'
 
 type MethodType = (...args: any[]) => any
 
@@ -51,7 +49,6 @@ class Builder {
     for (const e of this.domains) {
       result[e[0]] = e[1].dump()
     }
-    // result[CoreDomain.Model] = this.memdb.dump()
     return result
   }
 
@@ -91,11 +88,6 @@ class Builder {
     this.memdb.mixinDocument(doc, clazz, values)
   }
 
-  attr<M extends Emb> (_class: Ref<Class<M>>, values: OptionalMethods<Omit<M, keyof Emb>>): Attribute {
-    const type = { _class: _class as Ref<Class<Obj>>, ...values }
-    return { _class: core.class.Attribute, type } as unknown as Attribute
-  }
-
   createDocument<M extends Doc> (_class: Ref<Class<M>>, values: DocumentValue<M>, _id?: Ref<M>): M {
     const doc = this.memdb.createDocument<M>(_class, values, _id)
     if (_class === core.class.Class as Ref<Class<Doc>> || _class === core.class.Mixin as Ref<Class<Doc>>) {
@@ -110,36 +102,6 @@ class Builder {
       this.getDomain(domain).add(doc)
     }
     return doc
-  }
-
-  createClass<T extends E, E extends Obj> (_id: Ref<Class<T>>, _extends: Ref<Class<E>>, _attributes: AllAttributes<T, E>, _domain?: string, _native?: Resource<any>): EClass<T, E> {
-    const _eclass = {
-      _id,
-      _class: core.class.Class,
-      _extends,
-      _domain: _domain as StringProperty,
-      _native: (_native as string) as StringProperty,
-      _attributes,
-      _kind: ClassifierKind.CLASS
-    } as unknown as DocumentValue<EClass<T, E>>
-    return this.createDocument(core.class.Class as Ref<Class<EClass<T, E>>>,
-      _eclass,
-      _id as Ref<EClass<T, E>>)
-  }
-
-  createMixin<T extends E, E extends Doc> (_id: Ref<Mixin<T>>, _extends: Ref<Class<E>>, _attributes: AllAttributes<T, E>, _domain?: string, _native?: Resource<any>): EClass<T, E> {
-    const _eclass = {
-      _id,
-      _class: core.class.Mixin,
-      _extends,
-      _attributes,
-      _domain: _domain as StringProperty,
-      _native: (_native as string) as StringProperty,
-      _kind: ClassifierKind.MIXIN
-    } as unknown as DocumentValue<EMixin<T, E>>
-    return this.createDocument(core.class.Mixin as Ref<Class<EClass<T, E>>>,
-      _eclass,
-      _id as Ref<EMixin<T, E>>)
   }
 }
 
