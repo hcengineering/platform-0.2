@@ -15,28 +15,12 @@
 
 <script lang="ts">
   import { Panel } from '@anticrm/sparkling-controls'
-  import Form from './Form.svelte'
-
-  const fields = [
-    { name: 'username', i18n: 'Username' },
-    {
-      name: 'password',
-      i18n: 'Password',
-      password: true
-    },
-    { name: 'workspace', i18n: 'Workspace' }
-  ]
-
-  let object = {
-    workspace: '',
-    username: '',
-    password: '',
-  }
+  import LoginForm from './LoginForm.svelte'
 </script>
 
 <div class="container">
   <Panel>
-    <Form caption="Sign Up" {fields} {object}/>
+    <LoginForm/>
   </Panel>
   <div class="intro">
     <div class="content">
