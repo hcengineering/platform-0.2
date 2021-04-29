@@ -1,4 +1,4 @@
-<!--
+//
 // Copyright © 2020 Anticrm Platform Contributors.
 // 
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
@@ -11,26 +11,16 @@
 // 
 // See the License for the specific language governing permissions and
 // limitations under the License.
--->
+//
 
-<script lang="ts">
-  import Form from './Form.svelte'
-
-  const fields = [
-    { name: 'username', i18n: 'Email' },
-    {
-      name: 'password',
-      i18n: 'Password',
-      password: true
-    },
-    { name: 'workspace', i18n: 'Workspace' }
-  ]
-
-  let object = {
-    workspace: '',
-    username: '',
-    password: '',
-  }
-</script>
-
-<Form caption="Log In" {fields} {object}/>
+import ErrorComponent from './ErrorComponent.svelte'
+export default class errorBoundary extends ErrorComponent {
+	 constructor(config) {
+		 var error = null
+		 config.props.$$slots.default = config.props.$$slots.default.map(x => (...args) => { try { return x(...args) } catch (e) { error = e }})
+		 super(config)
+		 if (error) {
+			 this.$set({error: error})
+		 }
+	 }
+}

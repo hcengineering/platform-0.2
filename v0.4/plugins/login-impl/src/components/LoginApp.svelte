@@ -14,37 +14,13 @@
 -->
 
 <script lang="ts">
-  import type { Status } from '@anticrm/status'
-  import { Severity } from '@anticrm/status'
-  import { Button, EditBox, StatusComponent, Panel } from '@anticrm/sparkling-controls'
-
-  let fname: string = ''
-  let lname: string = ''
-  let status: Status
-  $: status = { severity: Severity.ERROR, code: 0, message: `Error: ${lname}` }
+  import { Panel } from '@anticrm/sparkling-controls'
+  import LoginForm from './LoginForm.svelte'
 </script>
 
 <div class="container">
   <Panel>
-    <div class="form-container">
-      <div class="separator-footer"/>
-      <div class="title">Sign up</div>
-      <div class="status">
-        {#if fname == 'error'}
-          <StatusComponent {status} width="100%"/>
-        {/if}
-      </div>
-      <div class="form">
-        <div class="form-col"><EditBox label="First Name" bind:value={fname}/></div>
-        <div class="form-col"><EditBox label="Last Name" bind:value={lname}/></div>
-        <div class="form-row"><EditBox label="E-mail"/></div>
-        <div class="form-row"><EditBox label="Password" password/></div>
-        <div class="form-row"><EditBox label="Repeat password" password/></div>
-        <div class="form-row send"><Button label="Sign Up" primary width="100%"/></div>
-      </div>
-      <div class="separator-footer"/>
-      <div class="reg-footer"><span>Already have an account?</span> <a href="/login">Sign In</a></div>
-    </div>
+    <LoginForm/>
   </Panel>
   <div class="intro">
     <div class="content">
@@ -63,69 +39,6 @@
     flex-direction: row;
     height: 100%;
     padding: 20px;
-
-
-    .form-container {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      overflow: hidden;
-      padding: 60px 65px;
-      height: 100%;
-
-      .title {
-        font-weight: 600;
-        font-size: 24px;
-        line-height: 29px;
-        color: #FFFFFF;
-      }
-      .status {
-        min-height: 120px;
-        max-height: 120px;
-        padding-top: 20px;
-      }
-      
-      .form {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        column-gap: 12px;
-        row-gap: 24px;
-
-        .form-row {
-          grid-column-start: 1;
-          grid-column-end: 3;
-        }
-        @media (max-width: 985px) {
-          .form-col {
-            grid-column-start: 1;
-            grid-column-end: 3;
-          }
-        }
-        .send {
-          margin-top: 36px;
-        }
-      }
-      .separator-footer {
-        flex-grow: 1;
-      }
-      .reg-footer {
-        margin-top: 56px;
-        font-size: 13px;
-        line-height: 16px;
-        color: #FFFFFF;
-        span {
-          opacity: 0.3;
-        }
-        a {
-          color: #fff;
-          opacity: 0.8;
-          text-decoration: none;
-          :hover {
-            opacity: 1;
-          }
-        }
-      }
-    }
 
     .intro {
       display: flex;

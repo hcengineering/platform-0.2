@@ -20,38 +20,22 @@
   import ui from '@anticrm/plugin-ui'
   // import Spinner from '../components/internal/Spinner.svelte'
   import Icon from './Icon.svelte'
+  import ErrorBoundary from './internal/ErrorBoundary'
 
-  export let is: AnyComponent | undefined
+  export let is: AnyComponent
   export let props: any
 
   const platform = getContext('platform') as Platform
-  let component: AnySvelteComponent
-  const compUpdate = (e: AnySvelteComponent) => {
-    if (component !== e) {
-      component = e
-    }
-    return e
-  }
-  let componentPromise = new Promise((resolve) => {
-    if (is) {
-      platform
-        .getResource(is)
-        .then(compUpdate)
-        .then(resolve)
-    }
-  })
-  $: {
-    if (is) {
-      componentPromise = platform.getResource(is).then(compUpdate)
-    }
-  }
+  $: component = platform.getResource(is)
 </script>
 
-{#await componentPromise}
+{#await component}
   <!-- <Spinner /> -->
   <h1>Spinner</h1>
-{:then ctor}
-  <svelte:component this={component} {...props} on:change on:close on:open />
+{:then Ctor}
+  <ErrorBoundary>
+    <Ctor {...props} on:change on:close on:open />
+  </ErrorBoundary>
 {:catch err}
   ERROR: {console.log(err, JSON.stringify(component))}
   {props}

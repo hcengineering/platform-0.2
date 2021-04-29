@@ -13,24 +13,26 @@
 // limitations under the License.
 -->
 
-<script lang="ts">
-  import Form from './Form.svelte'
-
-  const fields = [
-    { name: 'username', i18n: 'Email' },
-    {
-      name: 'password',
-      i18n: 'Password',
-      password: true
-    },
-    { name: 'workspace', i18n: 'Workspace' }
-  ]
-
-  let object = {
-    workspace: '',
-    username: '',
-    password: '',
-  }
-</script>
-
-<Form caption="Log In" {fields} {object}/>
+<script>
+  export let error
+  </script>
+  <style>
+    .error {
+      border: 1px solid red;
+    
+    }
+    .trace {
+      font-family: monospace;
+    }
+  </style>
+  <slot>
+    {#if error}
+    <div class="error">
+      <b>{error.message}</b>
+      <pre class="trace">
+        {error.stack}
+      </pre>
+    </div>
+    {/if}
+    
+  </slot>
