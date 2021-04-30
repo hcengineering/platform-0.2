@@ -48,7 +48,8 @@ limitations under the License.
   let fsmItems: { id: number; comboValue: string; ref: Ref<FSM> }[] = []
   let lq: Promise<QueryUpdater<FSM>>
 
-  $: lq = liveQuery(lq, fsmPlugin.class.FSM, { application: application._id }, (docs) => {
+  // TODO: fsm selector has to be adjusted as soon as we allow user to edit vacancy
+  $: lq = liveQuery(lq, fsmPlugin.class.FSM, { application: application._id, isTemplate: true }, (docs) => {
     fsms = docs
   })
 

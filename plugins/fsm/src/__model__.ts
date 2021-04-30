@@ -12,19 +12,22 @@
 // limitations under the License.
 
 import core, { ArrayOf$, Builder, Class$, Mixin$, Prop, RefTo$ } from '@anticrm/model'
-import { CORE_CLASS_STRING, Ref, Class, Doc, MODEL_DOMAIN } from '@anticrm/core'
+import { CORE_CLASS_STRING, Ref, Class, DateProperty, StringProperty, CORE_CLASS_BOOLEAN } from '@anticrm/core'
 import { Application, VDoc } from '@anticrm/domains'
-import { TDoc, TMixin } from '@anticrm/model/src/__model__'
+import { TDoc, TMixin, TVDoc } from '@anticrm/model/src/__model__'
 import { UX } from '@anticrm/presentation/src/__model__'
 import { IntlString } from '@anticrm/platform-i18n'
-
-import fsmPlugin, { FSM, Transition, State, WithFSM, WithState } from '.'
 import { ComponentExtension } from '@anticrm/presentation'
 import { AnyComponent } from '@anticrm/platform-ui'
+import { WorkbenchApplication } from '@anticrm/workbench'
+
+import fsmPlugin, { FSM, Transition, State, WithFSM, WithState } from '.'
+
+const fsmDomain = 'fsm'
 
 @UX('FSM' as IntlString)
-@Class$(fsmPlugin.class.FSM, core.class.Doc, MODEL_DOMAIN)
-export class TFSM extends TDoc implements FSM {
+@Class$(fsmPlugin.class.FSM, core.class.VDoc, fsmDomain)
+export class TFSM extends TVDoc implements FSM {
   @UX('Name' as IntlString)
   @Prop(CORE_CLASS_STRING)
   name!: string
@@ -32,20 +35,18 @@ export class TFSM extends TDoc implements FSM {
   @RefTo$(core.class.Application)
   application!: Ref<Application>
 
-  @UX('Name' as IntlString)
-  @ArrayOf$()
-  @RefTo$(fsmPlugin.class.Transition)
-  transitions!: Array<Ref<Transition>>
-
   @UX('TargetClasses' as IntlString)
   @ArrayOf$()
   @RefTo$(core.class.Class)
   classes!: Array<Ref<Class<VDoc>>>
+
+  @Prop(CORE_CLASS_BOOLEAN)
+  isTemplate!: boolean
 }
 
 @UX('Transition' as IntlString)
-@Class$(fsmPlugin.class.Transition, core.class.Doc, MODEL_DOMAIN)
-export class TTransition extends TDoc implements Transition {
+@Class$(fsmPlugin.class.Transition, core.class.VDoc, fsmDomain)
+export class TTransition extends TVDoc implements Transition {
   @UX('From' as IntlString)
   @RefTo$(fsmPlugin.class.State)
   from!: Ref<State>
@@ -53,14 +54,20 @@ export class TTransition extends TDoc implements Transition {
   @UX('From' as IntlString)
   @RefTo$(fsmPlugin.class.State)
   to!: Ref<State>
+
+  @RefTo$(fsmPlugin.class.FSM)
+  fsm!: Ref<FSM>
 }
 
 @UX('State' as IntlString)
-@Class$(fsmPlugin.class.State, core.class.Doc, MODEL_DOMAIN)
-export class TState extends TDoc implements State {
+@Class$(fsmPlugin.class.State, core.class.VDoc, fsmDomain)
+export class TState extends TVDoc implements State {
   @UX('Name' as IntlString)
   @Prop(CORE_CLASS_STRING)
   name!: string
+
+  @RefTo$(fsmPlugin.class.FSM)
+  fsm!: Ref<FSM>
 }
 
 @Mixin$(fsmPlugin.mixin.WithFSM, core.class.Doc)
@@ -93,9 +100,19 @@ export function model (S: Builder): void {
   S.mixin(core.class.VDoc, fsmPlugin.mixin.CardForm, {
     component: fsmPlugin.component.VDocCardPresenter
   })
+
+  S.createDocument(core.class.Space, {
+    name: 'FSM',
+    description: '',
+    application: '' as Ref<WorkbenchApplication>,
+    archived: false,
+    isPublic: true,
+    spaceKey: 'FSM_COMMON',
+    users: []
+  }, fsmPlugin.space.Common)
 }
 
-type PureState = Omit<State, keyof Doc>
+type PureState = Omit<State, keyof VDoc | 'fsm'>
 class FSMBuilder {
   private readonly name: string
   private readonly appID: Ref<Application>
@@ -139,10 +156,28 @@ class FSMBuilder {
   }
 
   build (S: Builder): FSM {
+    const vProps = {
+      _space: fsmPlugin.space.Common,
+      _createdBy: '' as StringProperty,
+      _createdOn: Date.now() as DateProperty
+    }
+
+    const fsm = S.createDocument(fsmPlugin.class.FSM, {
+      name: this.name,
+      application: this.appID,
+      classes: this.classes,
+      isTemplate: true,
+      ...vProps
+    })
+
     const stateIDs = new Map<string, Ref<State>>()
 
     this.states.forEach((state) => {
-      const doc = S.createDocument(fsmPlugin.class.State, state)
+      const doc = S.createDocument(fsmPlugin.class.State, {
+        ...state,
+        fsm: fsm._id as Ref<FSM>,
+        ...vProps
+      })
 
       stateIDs.set(state.name, doc._id as Ref<State>)
     })
@@ -159,17 +194,12 @@ class FSMBuilder {
 
       const doc = S.createDocument(fsmPlugin.class.Transition, {
         from,
-        to
+        to,
+        fsm: fsm._id as Ref<FSM>,
+        ...vProps
       })
 
       transitions.push(doc._id as Ref<Transition>)
-    })
-
-    const fsm = S.createDocument(fsmPlugin.class.FSM, {
-      name: this.name,
-      application: this.appID,
-      classes: this.classes,
-      transitions
     })
 
     return fsm
