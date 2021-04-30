@@ -27,12 +27,14 @@ import { model as personExtras } from '@anticrm/person-extras/src/__model__'
 import { model as calendar } from '@anticrm/calendar/src/__model__'
 
 import { model as activity } from '@anticrm/activity/src/__model__'
+import { model as dashboard } from '@anticrm/dashboard/src/__model__'
 
 export const builder = new Builder()
 builder.load(modelModel)
 builder.load(presentation)
 builder.load(workbench)
 builder.load(activity)
+builder.load(dashboard)
 builder.load(contact)
 builder.load(personExtras)
 builder.load(chunter)

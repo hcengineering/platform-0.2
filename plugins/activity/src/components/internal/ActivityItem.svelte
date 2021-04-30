@@ -31,6 +31,7 @@
   let user: User
   let avatar: Asset
   let info: AnyComponent
+  console.log('tx',contactService.then((c)=> c.getAvatar({__ref:{account:'john.appleseed@gmail.com'}})))
 
   $: {
     const objectClass = (tx as ObjectTx)._objectClass
@@ -45,7 +46,7 @@
         avatar = a
       })
     presentationService.then((p) => {
-      console.log('get component extension for' + objectClass)
+      // console.log('get component extension for' + objectClass)
       info = p.getComponentExtension(objectClass, activity.mixin.ActivityInfo)
     })
   }

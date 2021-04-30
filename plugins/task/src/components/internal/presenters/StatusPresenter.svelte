@@ -35,7 +35,8 @@
     statusType = await cs.findOne(CORE_CLASS_ENUM, { _id: task.enum.TaskStatus })
     model = cs.getModel()
   })
-
+  // .then(()=>{console.log('MODEL',model)})
+  
   $: if (statusType) {
     const status = statusType._literals[value]
 

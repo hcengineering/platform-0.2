@@ -45,7 +45,6 @@
   }
 
   let objects: any[] = []
-
   $: lq = liveQuery(lq, _class, { _space: space._id }, (docs) => {
     objects = docs
   })

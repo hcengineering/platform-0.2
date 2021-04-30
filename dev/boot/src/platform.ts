@@ -19,6 +19,7 @@ import ui from '@anticrm/platform-ui'
 import core from '@anticrm/platform-core'
 import i18n from '@anticrm/platform-i18n'
 import activity from '@anticrm/activity'
+import dashboard from '@anticrm/dashboard'
 import activityMeta from '@anticrm/activity/src/__meta__'
 import login from '@anticrm/login'
 import workbench from '@anticrm/workbench'
@@ -60,6 +61,7 @@ platform.addLocation(recruiting, () => import(/* webpackChunkName: "recruiting" 
 platform.addLocation(personExtras, () => import(/* webpackChunkName: "person-extras" */ '@anticrm/person-extras/src/plugin'))
 platform.addLocation(calendar, () => import(/* webpackChunkName: "calendar" */ '@anticrm/calendar/src/plugin'))
 platform.addLocation(activity, () => import(/* webpackChunkName: "activity" */ '@anticrm/activity/src/plugin'))
+platform.addLocation(dashboard, () => import(/* webpackChunkName: "dashboard" */ '@anticrm/dashboard/src/plugin'))
 
 platform.addLocation(datagen, () => import(/* webpackChunkName: "datagen" */ '@anticrm/data-generator/src/plugin'))
 

@@ -78,6 +78,7 @@ export async function createLiveQuery<T extends Doc> (_class: Ref<Class<T>>, _qu
   } catch (ex) {
     console.error(ex)
   }
+  console.log('result', Promise.resolve(result));
   return Promise.resolve(result)
 }
 
