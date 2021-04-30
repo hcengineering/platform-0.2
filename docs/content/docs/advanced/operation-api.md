@@ -20,7 +20,7 @@ At first we need to know how to obtain an object or set of object within a platf
 
 ```typescript
 export interface DocumentProtocol {
-  find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T[]>
+  find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>, options?: FindOptions<T>): Promise<T[]>
   findOne<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined>
   loadDomain (domain: string): Promise<Doc[]>
 }

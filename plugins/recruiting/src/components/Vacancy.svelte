@@ -13,20 +13,21 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte'
-
   import { Ref } from '@anticrm/core'
   import { QueryUpdater } from '@anticrm/platform-core'
   import { getCoreService, liveQuery } from '@anticrm/presentation'
-  import UserInfo from '@anticrm/sparkling-controls/src/UserInfo.svelte'
+  import type { WithFSM } from '@anticrm/fsm'
+  import fsm from '@anticrm/fsm'
+
+  import BoardPresenter from '@anticrm/fsm/src/presenters/board/BoardPresenter.svelte'
 
   import type { Vacancy, WithCandidateProps } from '..'
   import recruiting from '..'
 
-  const dispatch = createEventDispatcher()
-
   const coreP = getCoreService()
+
   export let object: Vacancy | undefined
+
   let lq: Promise<QueryUpdater<WithCandidateProps>>
   let candidates: WithCandidateProps[] = []
 
@@ -43,6 +44,17 @@ limitations under the License.
           candidates = docs.map((x) => m.as(x, recruiting.mixin.WithCandidateProps))
         })
   )
+
+  let withFSMTarget: WithFSM | undefined
+  $: if (object) {
+    coreP
+      .then((s) => s.getModel())
+      .then((m) => {
+        if (object) {
+          withFSMTarget = m.as(object, fsm.mixin.WithFSM)
+        }
+      })
+  }
 </script>
 
 <div class="root">
@@ -58,26 +70,9 @@ limitations under the License.
     <div>
       Salary: {object.salary}
     </div>
-    {#if candidates.length > 0}
-      <div class="candidates">
-        <div class="candidates-title">Candidates</div>
-        <div class="candidates-list">
-          {#each candidates as candidate}
-            <div
-              class="candidate"
-              on:click={() => {
-                dispatch('open', {
-                  _id: candidate._id,
-                  _class: recruiting.mixin.WithCandidateProps
-                })
-              }}>
-              <UserInfo
-                url={`https://robohash.org/${candidate.name}.png?set=set3`}
-                title={candidate.name}
-                subtitle={candidate.candidate.role} />
-            </div>
-          {/each}
-        </div>
+    {#if withFSMTarget !== undefined && candidates.length > 0}
+      <div class="board">
+        <BoardPresenter target={withFSMTarget} />
       </div>
     {/if}
   {/if}

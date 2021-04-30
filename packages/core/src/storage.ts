@@ -40,7 +40,7 @@ export interface Storage {
   update: (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, operations: TxOperation[]) => Promise<void>
   remove: (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>) => Promise<void>
 
-  find: <T extends Doc>(_class: Ref<Class<T>>, query: DocumentQuery<T>) => Promise<T[]>
+  find: <T extends Doc>(_class: Ref<Class<T>>, query: DocumentQuery<T>, options?: FindOptions<T>) => Promise<T[]>
   findOne: <T extends Doc>(_class: Ref<Class<T>>, query: DocumentQuery<T>) => Promise<T | undefined>
 }
 
@@ -83,8 +83,49 @@ export type DocumentValueRaw<T> = {
 }
 export type DocumentValue<T> = T extends Doc ? DocumentValueRaw<Omit<T, keyof Doc>> : never | T extends Emb ? DocumentValueRaw<Omit<T, keyof Emb>>: never | T extends Obj ? T : T
 
+// Sorting structure
+export enum SortingOrder {
+  Ascending = 1,
+  Descending = -1
+}
+
+export type TSortingWithoutEmbArray<A> = A extends Array<infer T> ? DocumentSorting<T>: DocumentSorting<A>
+
+export type DocumentSortingValueRaw<T> = {
+  [P in keyof T]?: TSortingWithoutEmbArray<T[P]>
+}
+export type DocumentSorting<T> = T extends Obj ? DocumentSortingValueRaw<T> : SortingOrder
+
+/**
+ * Some options used to perform find opertion.
+ */
+
+export interface FindOptions<T> {
+  /**
+   * If set will limit a number of objects.
+   * A limit value of 0 is equivalent to setting no limit.
+  */
+  limit?: number | undefined
+
+  /**
+   * Specify how many items we should skip in results.
+   */
+  skip?: number | undefined
+
+  /**
+   * Define a sorting, with a required order. All embedded object sortings are also available.
+   * Please not order of passed fields will determine field ordering priority.
+   */
+  sort?: DocumentSorting<T> | undefined
+
+  /**
+   * A function to be notified about current query skip, limit and total.
+   */
+  countCallback?: (skip: number, limit: number, total: number) => void
+}
+
 export interface DocumentProtocol {
-  find: <T extends Doc>(_class: Ref<Class<T>>, query: DocumentQuery<T>) => Promise<T[]>
+  find: <T extends Doc>(_class: Ref<Class<T>>, query: DocumentQuery<T>, options?: FindOptions<T>) => Promise<T[]>
   findOne: <T extends Doc>(_class: Ref<Class<T>>, query: DocumentQuery<T>) => Promise<T | undefined>
   loadDomain: (domain: string) => Promise<Doc[]>
 }
@@ -155,8 +196,8 @@ class CombineStorage implements Storage {
     this.storages = storages
   }
 
-  async find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T[]> {
-    return (await Promise.all(this.storages.map(async (s) => await s.find(_class, query)))).reduce((p, c) => p.concat(c))
+  async find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>, options?: FindOptions<T>): Promise<T[]> {
+    return (await Promise.all(this.storages.map(async (s) => await s.find(_class, query, options)))).reduce((p, c) => p.concat(c))
   }
 
   async findOne<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined> {

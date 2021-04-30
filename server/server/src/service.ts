@@ -19,7 +19,7 @@ import {
   filterQuery, getUserSpaces, isAcceptable, processTx as processSpaceTx, SecurityContext, UserInfo
 } from './spaces'
 import { Broadcaster, Client, ClientService, ClientSocket } from './server'
-import { AnyLayout, Class, Doc, DocumentQuery, generateId, Ref, Tx, txContext, TxContextSource } from '@anticrm/core'
+import { AnyLayout, Class, Doc, DocumentQuery, FindOptions, generateId, Ref, Tx, txContext, TxContextSource } from '@anticrm/core'
 import { CORE_CLASS_CREATE_TX, CORE_CLASS_SPACE, Space } from '@anticrm/domains'
 import { Response, serialize } from '@anticrm/rpc'
 
@@ -45,14 +45,14 @@ export async function createClientService (workspaceProtocol: Promise<WorkspaceP
   const clientControl: ClientService = {
     getId: () => clientId,
     // C O R E  P R O T O C O L
-    async find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T[]> {
+    async find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>, options?: FindOptions<T>): Promise<T[]> {
       const {
         valid,
         filteredQuery
       } = filterQuery(userSpaces, _class, query)
       if (valid) {
         try {
-          return await workspace.find(_class, filteredQuery as DocumentQuery<T>)
+          return await workspace.find(_class, filteredQuery as DocumentQuery<T>, options)
         } catch (err) {
           console.log(err)
         }

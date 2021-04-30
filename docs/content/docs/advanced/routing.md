@@ -148,9 +148,9 @@ interface MyRouteParameters {
   sorting: string
   order: string
 }
-const router = newRouter()<MyRouteParameters>('{filter}/{objId}?{sorting}&{order}', (match)=> {
+const router = newRouter<MyRouteParameters>('{filter}/{objId}?{sorting}&{order}', (match) => {
 	// match will be interface MyRouteParameters with
-}, {order: '#none', sorting:'ABC', filter="all-issues", objId:'#none'})
+}, {order: '#none', sorting:'ABC', filter: "all-issues", objId:'#none'})
 
 ````
 

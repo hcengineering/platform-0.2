@@ -45,7 +45,7 @@ limitations under the License.
 
 <ScrollView width="100%" height="100%">
   <div class="grid">
-    {#each candidates as c}
+    {#each candidates as c (c._id)}
       <div
         class="candidate"
         on:click={() => dispatch('open', { _id: c._id, _class: recruiting.mixin.WithCandidateProps })}>

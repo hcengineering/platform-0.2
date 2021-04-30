@@ -14,7 +14,7 @@
 //
 
 import { Metadata, Plugin, plugin, Service } from '@anticrm/platform'
-import { Class, CoreProtocol, Doc, DocumentProtocol, DocumentQuery, DocumentValue, Ref } from '@anticrm/core'
+import { Class, CoreProtocol, Doc, DocumentProtocol, DocumentQuery, DocumentValue, FindOptions, Ref } from '@anticrm/core'
 import { ModelDb } from './modeldb'
 import { TxBuilder, TxOperation } from '@anticrm/domains'
 
@@ -25,7 +25,7 @@ export interface QueryResult<T extends Doc> {
   subscribe: (run: Subscriber<T>) => Unsubscribe
 }
 
-export type QueryUpdater<T extends Doc> = (_class: Ref<Class<T>>, query: DocumentQuery<T>) => void
+export type QueryUpdater<T extends Doc> = (_class: Ref<Class<T>>, query: DocumentQuery<T>, options?: FindOptions<T>) => void
 
 /**
  * Define operations with live queries.
@@ -36,7 +36,7 @@ export interface QueryProtocol {
    * @param _class - object class
    * @param query - query
    */
-  query: <T extends Doc>(_class: Ref<Class<T>>, query: DocumentQuery<T>) => QueryResult<T>
+  query: <T extends Doc>(_class: Ref<Class<T>>, query: DocumentQuery<T>, options?: FindOptions<T>) => QueryResult<T>
 }
 
 /**

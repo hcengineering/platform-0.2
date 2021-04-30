@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Class, CORE_CLASS_TYPE, Doc, DocumentQuery, Mixin, Obj, Ref, StringProperty } from '@anticrm/core'
+import { Class, CORE_CLASS_TYPE, Doc, DocumentQuery, FindOptions, Mixin, Obj, Ref, StringProperty } from '@anticrm/core'
 import { getContext, onDestroy } from 'svelte'
 import core, { CoreService, QueryUpdater, Unsubscribe } from '@anticrm/platform-core'
 import { AnyComponent, CONTEXT_PLATFORM } from '@anticrm/platform-ui'
@@ -51,9 +51,10 @@ export function getUserId (): string {
  * @return a function to re-query with a new parameters for same action.
  */
 export async function createLiveQuery<T extends Doc> (_class: Ref<Class<T>>, _query: DocumentQuery<T>,
-  action: (docs: T[]) => void): Promise<QueryUpdater<T>> {
+  action: (docs: T[]) => void, options?: FindOptions<T>): Promise<QueryUpdater<T>> {
   let oldQuery: DocumentQuery<T>
   let oldClass: Ref<Class<T>>
+  let oldOptions: FindOptions<T> | undefined
   let unsubscribe: Unsubscribe | undefined
   onDestroy(() => {
     if (unsubscribe !== undefined) {
@@ -61,8 +62,8 @@ export async function createLiveQuery<T extends Doc> (_class: Ref<Class<T>>, _qu
     }
   })
   const coreService = await getCoreService()
-  const result = (newClass: Ref<Class<T>>, newQuery: DocumentQuery<T>): void => {
-    if (deepEqual(oldQuery, newQuery) && oldClass === newClass) {
+  const result = (newClass: Ref<Class<T>>, newQuery: DocumentQuery<T>, options?: FindOptions<T>): void => {
+    if (deepEqual(oldQuery, newQuery) && oldClass === newClass && deepEqual(oldOptions, options)) {
       return
     }
     if (unsubscribe !== undefined) {
@@ -70,11 +71,12 @@ export async function createLiveQuery<T extends Doc> (_class: Ref<Class<T>>, _qu
     }
     oldQuery = newQuery
     oldClass = newClass
-    const q = coreService.query(newClass, newQuery)
+    oldOptions = options
+    const q = coreService.query(newClass, newQuery, options)
     unsubscribe = q.subscribe(action)
   }
   try {
-    result(_class, _query)
+    result(_class, _query, options)
   } catch (ex) {
     console.error(ex)
   }
@@ -92,13 +94,13 @@ export async function createLiveQuery<T extends Doc> (_class: Ref<Class<T>>, _qu
  * @param _query
  * @param action
  */
-export async function liveQuery<T extends Doc> (liveQuery: Promise<QueryUpdater<T>> | undefined, _class: Ref<Class<T>>, _query: DocumentQuery<T>, action: (docs: T[]) => void): Promise<QueryUpdater<T>> {
+export async function liveQuery<T extends Doc> (liveQuery: Promise<QueryUpdater<T>> | undefined, _class: Ref<Class<T>>, _query: DocumentQuery<T>, action: (docs: T[]) => void, options?: FindOptions<T>): Promise<QueryUpdater<T>> {
   if (liveQuery !== undefined) {
     const lq = (await liveQuery)
-    lq(_class, _query)
+    lq(_class, _query, options)
     return lq
   }
-  return await createLiveQuery(_class, _query, action)
+  return await createLiveQuery(_class, _query, action, options)
 }
 
 export function getEmptyModel (): ClassModel {
