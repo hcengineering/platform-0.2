@@ -19,9 +19,6 @@
 
   export let status: Status
   export let width: string
-  let color: string
-
-  color = status.severity === Severity.ERROR ? 'var(--theme-error-color)' : 'var(--theme-caption-color)'
 </script>
 
 {#if status.severity}
@@ -29,8 +26,8 @@
   <div class="icon">
     <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="none">
       <g opacity="0.6">
-        <circle cx="8" cy="8" r="7.5" stroke="{color}"/>
-        <path d="M7.9992 12.06C8.4192 12.06 8.7672 11.724 8.7672 11.292C8.7672 10.86 8.4192 10.524 7.9992 10.524C7.5792 10.524 7.2312 10.86 7.2312 11.292C7.2312 11.724 7.5792 12.06 7.9992 12.06ZM7.6272 9.57598H8.3952L8.5632 3.41998H7.4592L7.6272 9.57598Z" fill="{color}"/>
+        <circle class="stroke" cx="8" cy="8" r="7.5"/>
+        <path class="fill" d="M7.9992 12.06C8.4192 12.06 8.7672 11.724 8.7672 11.292C8.7672 10.86 8.4192 10.524 7.9992 10.524C7.5792 10.524 7.2312 10.86 7.2312 11.292C7.2312 11.724 7.5792 12.06 7.9992 12.06ZM7.6272 9.57598H8.3952L8.5632 3.41998H7.4592L7.6272 9.57598Z"/>
       </g>
     </svg>
   </div>
@@ -54,6 +51,12 @@
       width: 16px;
       height: 16px;
       margin-right: 12px;
+      .stroke {
+        stroke: var(--theme-caption-color);
+      }
+      .fill {
+        fill: var(--theme-caption-color);
+      }
     }
     .message {
       font-family: inherit;
@@ -66,5 +69,11 @@
     color: var(--theme-error-color);
     background-color: var(--theme-button-bg-error);
     border-color: var(--theme-error-message-border);
+    .icon .stroke {
+      stroke: var(--theme-error-color);
+    }
+    .icon .fill {
+      fill: var(--theme-error-color);
+    }
   }
 </style>
