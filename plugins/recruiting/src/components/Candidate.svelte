@@ -15,7 +15,7 @@ limitations under the License.
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
 
-  import { Ref } from '@anticrm/core'
+  import { Doc, mixinKey, Ref } from '@anticrm/core'
   import { getCoreService, liveQuery } from '@anticrm/presentation'
   import fsmPlugin, { getFSMService, WithFSM } from '@anticrm/fsm'
 
@@ -59,18 +59,16 @@ limitations under the License.
     }
 
     const core = await coreP
-    const model = core.getModel()
 
-    model.mixinDocument(object, fsmPlugin.mixin.WithState, {
-      fsm: undefined
-    })
-
-    core.update(object, {
-      vacancy: undefined
-    })
+    core.updateWith(object, (b) =>
+      b.set({
+        vacancy: '' as Ref<Vacancy>,
+        [mixinKey(fsmPlugin.mixin.WithFSM, 'fsm')]: ''
+      })
+    )
   }
 
-  async function assign (vacancyRef: Ref<Vacancy>) {
+  async function assign (vacancyRef: Ref<Doc>) {
     if (!object || !candidate) {
       return
     }
@@ -96,7 +94,7 @@ limitations under the License.
       if (initialState) {
         model.mixinDocument(baseDoc, fsmPlugin.mixin.WithState, {
           fsm: vacancy._id as Ref<WithFSM>,
-          state: initialState
+          state: initialState._id
         })
 
         core.update(baseDoc, baseDoc)
@@ -104,7 +102,7 @@ limitations under the License.
     }
 
     core.update(object, {
-      vacancy: vacancyRef
+      vacancy: vacancyRef as Ref<Vacancy>
     })
   }
 </script>

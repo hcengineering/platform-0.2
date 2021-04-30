@@ -14,20 +14,21 @@
 import { Class, Doc, Mixin, Ref } from '@anticrm/core'
 import core from '@anticrm/platform-core'
 import { Plugin, plugin, Service } from '@anticrm/platform'
-import { Application, VDoc } from '@anticrm/domains'
+import { Application, Space, VDoc } from '@anticrm/domains'
 import { ComponentExtension } from '@anticrm/presentation'
 import { AnyComponent, getPlatform } from '@anticrm/platform-ui'
 
-export interface FSM extends Doc {
+export interface FSM extends VDoc {
   name: string
   application: Ref<Application>
-  transitions: Array<Ref<Transition>>
   classes: Array<Ref<Class<VDoc>>>
+  isTemplate: boolean
 }
 
-export interface Transition extends Doc {
+export interface Transition extends VDoc {
   from: Ref<State>
   to: Ref<State>
+  fsm: Ref<FSM>
 
   // Actual action usage TBD
   // action: Ref<Action>
@@ -52,12 +53,17 @@ export interface WithState extends Doc {
   state: Ref<State>
 }
 
-export interface State extends Doc {
+export interface State extends VDoc {
   name: string
+  fsm: Ref<FSM>
 }
 
 export interface FSMService extends Service {
-  getStates: (fsm: FSM) => Promise<Array<Ref<State>>>
+  getStates: (fsm: FSM) => Promise<State[]>
+  getTransitions: (fsm: FSM) => Promise<Transition[]>
+
+  updateFSM: (fsm: FSM, transitions: Transition[], states: State[]) => Promise<void>
+  duplicateFSM: (fsm: Ref<FSM>) => Promise<FSM | undefined>
 }
 
 const fsmPlugin = plugin(
@@ -77,6 +83,9 @@ const fsmPlugin = plugin(
     component: {
       BoardPresenter: '' as AnyComponent,
       VDocCardPresenter: '' as AnyComponent
+    },
+    space: {
+      Common: 'space:fsm.Common' as Ref<Space>
     }
   }
 )

@@ -13,26 +13,27 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <script type="ts">
-  import { writable, derived } from 'svelte/store'
-
-  import { mixinKey } from '@anticrm/core'
+  import { mixinKey, Ref } from '@anticrm/core'
   import { VDoc } from '@anticrm/domains'
   import { CoreService, QueryUpdater } from '@anticrm/platform-core'
+  import { getUIService } from '@anticrm/platform-ui'
   import workbench from '@anticrm/workbench'
   import { getCoreService, liveQuery } from '@anticrm/presentation'
 
+  import Button from '@anticrm/sparkling-controls/src/Button.svelte'
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
 
+  import EditModal from './EditModal.svelte'
   import Card from './Card.svelte'
   import type { CardDragEvent } from './cardHelper'
 
   import type { FSM, State, WithFSM } from '../..'
-  import fsmPlugin, { getFSMService } from '../..'
+  import fsmPlugin from '../..'
 
   export let target: WithFSM
 
   let cs: CoreService | undefined
-  const fsmServiceP = getFSMService()
+  const uiService = getUIService()
 
   async function init () {
     cs = await getCoreService()
@@ -47,7 +48,7 @@ limitations under the License.
     divTasks: any
   }
 
-  const fsm = writable<FSM | undefined>(undefined)
+  let fsm: FSM | undefined
   let fsmQuery: Promise<QueryUpdater<FSM>> | undefined
 
   $: fsmQuery = liveQuery(
@@ -57,18 +58,17 @@ limitations under the License.
       _id: target.fsm
     },
     (docs) => {
-      fsm.set(docs[0])
+      fsm = docs[0]
     }
   )
 
   let items: VDoc[] = []
   let itemsQuery: Promise<QueryUpdater<VDoc>> | undefined
 
-  $: if ($fsm && cs) {
-    // Eventually should manage query per target class
+  $: if (fsm && cs) {
     itemsQuery = liveQuery(
       itemsQuery,
-      $fsm.classes[0],
+      fsm.classes[0],
       {
         _mixins: fsmPlugin.mixin.WithState
       },
@@ -80,37 +80,32 @@ limitations under the License.
     )
   }
 
-  const statusesS = derived(
-    fsm,
-    ($fsm, set) => {
-      if (!$fsm) {
-        return
-      }
-
-      fsmServiceP
-        .then((fsmService) => fsmService.getStates($fsm))
-        .then((xs) => Promise.all(xs.map((_id) => cs?.findOne(fsmPlugin.class.State, { _id }))))
-        .then((xs) => xs.filter((x): x is State => x !== undefined))
-        .then((states) => {
-          set(
-            states
-              .filter((x): x is State => !!x)
-              .map(
-                (state, idx) =>
-                  ({
-                    id: state._id,
-                    label: state.name,
-                    defValue: idx === 0,
-                    divTasks: HTMLDocument
-                  } as Status)
-              )
-          )
-        })
-    },
-    [] as Status[]
-  )
-
+  let statuses: Status[] = []
   let hiddenStatuses = new Set<string>()
+  let statesQuery: Promise<QueryUpdater<State>> | undefined
+
+  $: if (fsm && cs) {
+    statesQuery = liveQuery(
+      statesQuery,
+      fsmPlugin.class.State,
+      {
+        fsm: fsm._id as Ref<FSM>
+      },
+      (docs) => {
+        statuses = docs
+          .filter((x): x is State => !!x)
+          .map(
+            (state, idx) =>
+              ({
+                id: state._id,
+                label: state.name,
+                defValue: idx === 0,
+                divTasks: HTMLDocument
+              } as Status)
+          )
+      }
+    )
+  }
 
   let dragDoc: VDoc | null = null
 
@@ -181,7 +176,7 @@ limitations under the License.
   }
 
   function whereInStatus (coordX: number): any | null {
-    for (const el of $statusesS) {
+    for (const el of statuses) {
       const obj = el.divTasks.getBoundingClientRect()
       if (coordX >= obj.left && coordX <= obj.right) {
         return el.id
@@ -197,16 +192,14 @@ limitations under the License.
 
     return cs.getModel().as(doc, fsmPlugin.mixin.WithState).state
   }
-
-  // For some reason `each` performs `statusesS.set(...)`, with is not applicable
-  // to Readable. Need to investigate further what is happening.
-  let statuses: typeof $statusesS = []
-  $: statuses = $statusesS
 </script>
 
-{#await init()}
-  <div />
-{:then}
+{#await init() then _}
+  <Button
+    label="Edit"
+    on:click={() => {
+      uiService.showModal(EditModal, { fsm })
+    }} />
   <div class="cards-view">
     {#each statuses as stat (stat.id)}
       <div class="cards-status" class:thin={hiddenStatuses.has(stat.id)}>

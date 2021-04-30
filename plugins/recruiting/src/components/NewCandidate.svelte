@@ -29,7 +29,7 @@ limitations under the License.
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
   import SpaceBox from '@anticrm/platform-ui/src/components/SpaceBox.svelte'
 
-  import type { WithCandidateProps } from '..'
+  import type { WithCandidateProps, Vacancy } from '..'
   import recruiting from '..'
 
   export let spaces: Space[]
@@ -76,7 +76,8 @@ limitations under the License.
 
     model.mixinDocument(doc as Person, recruiting.mixin.WithCandidateProps, {
       candidate: candidateM,
-      resume: resumeM
+      resume: resumeM,
+      vacancy: '' as Ref<Vacancy>
     })
 
     await core.create<Person>(contact.class.Person, doc)
