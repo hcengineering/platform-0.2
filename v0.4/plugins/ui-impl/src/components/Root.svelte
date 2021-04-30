@@ -53,8 +53,6 @@
 
 <Theme>
   <div id="ui-root">
-    <div class="bg-noise opacity-2"/>
-    <div class="bg-cover"/>
     <div class="status-bar">
       <div class="container">
         <div class="status-messages">
@@ -87,8 +85,6 @@
 </Theme>
 
 <style lang="scss">
-  @import "@anticrm/sparkling-theme/styles/mixins.scss";
-
   $status-bar-height: 32px;
 
   #ui-root {
@@ -97,11 +93,6 @@
     flex-direction: column;
 
     height: 100vh;
-
-    .bg-cover {
-      @include bg-layer(linear-gradient(112.79deg, #AEA4CC 2.31%, rgba(196, 150, 191, 0) 98.9%), 0.05);
-      z-index: -1;
-    }
 
     .status-bar {
       min-height: $status-bar-height;

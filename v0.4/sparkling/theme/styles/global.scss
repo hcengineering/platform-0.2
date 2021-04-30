@@ -14,7 +14,6 @@
 //
 
 @import "./_colors.scss";
-@import "./mixins.scss";
 
 @font-face {
   font-family: 'IBM Plex Sans';
@@ -55,7 +54,7 @@
 
 * {
   box-sizing: border-box;
-  scrollbar-color: var(--theme-bg-dark-color) var(--theme-bg-accent-color);
+  scrollbar-color: var(--theme-menu-color) var(--theme-bg-accent-color);
   scrollbar-width: thin;
 }
 
@@ -70,17 +69,17 @@
 }
 ::-webkit-scrollbar-thumb {
   background: var(--theme-bg-accent-color);
-  border: 1px solid var(--theme-bg-dark-color);
+  border: 1px solid var(--theme-menu-color);
   border-radius: 2px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--theme-bg-dark-color);
-  border: 1px solid var(--theme-bg-dark-color);
+  background: var(--theme-menu-color);
+  border: 1px solid var(--theme-menu-color);
   border-radius: 2px;
 }
 ::-webkit-scrollbar-corner {
   background: var(--theme-bg-accent-color);
-  border: 1px solid var(--theme-bg-dark-color);
+  border: 1px solid var(--theme-menu-color);
   border-radius: 2px;
 }
 
@@ -89,16 +88,5 @@ body {
   font-size: 14px;
   font-weight: 400;
   color: var(--theme-content-color);
-  background-color: var(--theme-bg-color);
-}
-
-.bg-noise {
-  @include bg-fullsize;
-  background: url('../img/noise.png');
-}
-.opacity-2 {
-  opacity: 0.02;
-}
-.opacity-3 {
-  opacity: 0.03;
+  background-color: var(--theme-menu-color);
 }

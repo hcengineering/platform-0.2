@@ -39,11 +39,20 @@
 <style lang="scss">
   @import "@anticrm/sparkling-theme/styles/mixins.scss";
 
+  .bg-noise {
+    @include bg-fullsize;
+    background: url('../../img/noise.png');
+    z-index: -1;
+  }
+  .opacity-3 {
+    opacity: 0.03;
+  }
+
   .container {
     display: flex;
     flex-direction: row;
     height: 100%;
-    padding: 20px;
+    padding: 0px 20px 20px 20px;
 
     .panel {
       position: relative;
