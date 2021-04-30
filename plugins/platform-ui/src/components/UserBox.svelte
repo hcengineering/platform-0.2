@@ -6,6 +6,7 @@
 
   export let items: unknown[]
   export let selected = 0
+  export let title: string
 
   let comboHidden = true
   let comboRoot: HTMLElement
@@ -55,12 +56,7 @@
 </script>
 
 <div bind:this={comboRoot} class="comboBox" class:selectedCombo={!comboHidden} on:click={handler}>
-  <UserInfo
-    url={items[selected].url}
-    title={items[selected].name}
-    subtitle="Новый исполнитель"
-    subtitleOnTop="true"
-    userColor="var(--theme-content-dark-color)" />
+  <UserInfo url={items[selected].url} title={items[selected].name} subtitle={title} subtitleOnTop="true" />
   <div class="arrowDown" />
 
   <div bind:this={comboDrop} class="comboBox-drop">
@@ -72,7 +68,7 @@
       hoverState="true" />
     <div class="separator" />
     <div bind:this={comboItems} class="comboBox-drop__items">
-      <ScrollView width="100%" height="100%" accentColor="true">
+      <ScrollView width="100%" height="100%">
         {#each items as item (item.id)}
           <div
             class="comboBox-drop__item"
@@ -80,7 +76,7 @@
             on:click={() => {
               selected = item.id
             }}>
-            <UserInfo url={item.url} title={item.name} userColor="var(--theme-content-dark-color)" />
+            <UserInfo url={item.url} title={item.name} />
           </div>
         {/each}
       </ScrollView>
@@ -91,62 +87,50 @@
 <style lang="scss">
   .comboBox {
     position: relative;
-    background-color: var(--theme-bg-accent-color);
-    border: solid 1px var(--theme-bg-dark-color);
-    border-radius: 4px;
+    border-radius: 12px;
     padding: 0.5em 1em 0.5em 0.5em;
     display: flex;
     align-items: center;
     justify-content: space-between;
     cursor: pointer;
-
+    background-color: var(--theme-bg-accent-color);
+    border: solid 1px var(--theme-bg-dark-color);
     &:hover {
       background-color: var(--theme-bg-accent-hover);
       border-color: var(--theme-bg-dark-hover);
     }
-
     &:hover .comboBox-drop {
       box-shadow: var(--theme-shadow);
     }
-
     &-drop {
       position: absolute;
       visibility: hidden;
       display: flex;
       flex-direction: column;
       width: calc(100% - 2em);
-      background-color: var(--theme-bg-accent-color);
-      border: solid 1px var(--theme-bg-dark-color);
       border-radius: 4px;
       padding: 1em;
-      z-index: 1000;
+      background-color: var(--theme-bg-color);
+      border: solid 1px var(--theme-bg-dark-color);
       box-shadow: var(--theme-shadow);
-
+      z-index: 1000;
       &__items {
         height: 10em;
         padding-right: 1px;
       }
-
       &__item {
         margin: 0;
         padding: 0.5em;
         border-radius: 4px;
-
         &:hover {
           background-color: var(--theme-bg-accent-hover);
         }
       }
-
       .selected {
         background-color: var(--theme-bg-accent-hover);
-
         &:hover {
           background-color: var(--theme-bg-accent-hover);
         }
-      }
-
-      .separator {
-        height: 0.5em;
       }
     }
   }
@@ -161,26 +145,22 @@
     width: 16px;
     height: 16px;
 
-    &::after {
-      content: '';
-      position: absolute;
-      width: 1px;
-      height: 6px;
-      left: calc(50% + 2px);
-      top: 50%;
-      transform: translateY(-50%) rotate(45deg);
-      background-color: var(--theme-content-color);
-    }
-
+    &::after,
     &::before {
       content: '';
       position: absolute;
       width: 1px;
       height: 6px;
-      left: calc(50% - 2px);
       top: 50%;
-      transform: translateY(-50%) rotate(-45deg);
       background-color: var(--theme-content-color);
+    }
+    &::after {
+      left: calc(50% + 2px);
+      transform: translateY(-50%) rotate(45deg);
+    }
+    &::before {
+      left: calc(50% - 2px);
+      transform: translateY(-50%) rotate(-45deg);
     }
   }
 </style>

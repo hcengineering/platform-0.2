@@ -79,24 +79,22 @@
   .card-view {
     max-width: 300px;
     margin: 12px;
-    background-color: var(--theme-bg-color);
-    border: 1px solid var(--theme-bg-color);
     border-radius: 4px;
     display: flex;
     flex-direction: column;
+    background-color: var(--theme-bg-color);
+    border: 1px solid var(--theme-bg-color);
     transition: border-color 0.3s ease-in, box-shadow 0.3s ease-in;
 
     .card-head {
       display: flex;
       flex-direction: row;
       align-items: center;
-
       &__avatar {
         width: 32px;
         height: 32px;
         border-radius: 16px;
       }
-
       &__caption {
         padding-left: 8px;
         color: var(--theme-doclink-color);

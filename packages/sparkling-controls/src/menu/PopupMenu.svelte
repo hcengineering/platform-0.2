@@ -11,6 +11,10 @@
   let firstOpen = true
 
   function handler (event: MouseEvent): void {
+    if (!thisPopup || !thisTrigger) {
+      return
+    }
+
     const rectPopup = thisPopup.getBoundingClientRect()
     const rectTrigger = thisTrigger.getBoundingClientRect()
     const rectBody = document.body.getBoundingClientRect()
@@ -60,10 +64,10 @@
     display: flex;
     flex-direction: column;
     flex-flow: column nowrap;
-    background-color: var(--theme-bg-accent-color);
-    border: solid 1px var(--theme-bg-dark-color);
     border-radius: 4px;
     padding: 4px 8px;
+    background-color: var(--theme-bg-color);
+    border: solid 1px var(--theme-bg-accent-color);
     box-shadow: var(--theme-shadow);
     z-index: 1000;
   }

@@ -1,12 +1,13 @@
 <script type="ts">
-  import Prism from 'prismjs'
+  const Prism = require('prismjs') // eslint--disable-line
   import 'prism-svelte'
 
   export let text = ''
   export let code = ''
   export let label = ''
 
-  $: highlighted = Prism.highlight(code, Prism.languages.svelte, 'svelte')
+  let highlighted: string
+  $: highlighted = (Prism as any).highlight(code, Prism.languages.svelte, 'svelte')
 </script>
 
 <h3>{label}</h3>
@@ -136,6 +137,7 @@
     .token.bold {
       font-weight: bold;
     }
+
     .token.italic {
       font-style: italic;
     }
@@ -153,7 +155,7 @@
       position: absolute;
       left: 0;
       right: 0;
-      padding: inherit 0;
+      padding: inherit;
       margin-top: 1em; /* Same as .prism’s padding-top */
 
       background: hsla(24, 20%, 50%, 0.08);
@@ -191,6 +193,7 @@
       top: auto;
       bottom: 0.4em;
     }
+
     pre.line-numbers {
       position: relative;
       padding-left: 3.8em;
@@ -230,9 +233,11 @@
       padding-right: 0.8em;
       text-align: right;
     }
+
     pre[class*='language-'] {
       position: relative;
     }
+
     pre[class*='language-'][data-language]::before {
       content: attr(data-language);
       color: black;
@@ -247,6 +252,7 @@
       text-shadow: none;
     }
   }
+
   .page-block {
     display: flex;
     flex-direction: row;
@@ -258,18 +264,21 @@
       height: 100%;
       flex: 1;
     }
+
     .preview {
       background-color: hsl(210, 25%, 20%);
       border-radius: 8px;
       margin: 10px;
       flex: 2;
     }
+
     .my-code {
       background-color: hsl(210, 25%, 10%);
       border-radius: 8px;
       color: black;
       flex: 1;
     }
+
     .language-svelte {
       height: 100%;
     }

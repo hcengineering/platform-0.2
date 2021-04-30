@@ -37,11 +37,9 @@
       <table>
         {#each model.getOwnAttributes(group._class) as attr (attr.key)}
           <tr>
-            <td>
+            <td class="cell-icon">
               {#if attr.icon}
-                <span style="fill: var(--theme-content-dark-color)">
-                  <Icon icon={attr.icon} size="24" />
-                </span>
+                <Icon icon={attr.icon} size="24" />
               {/if}
             </td>
             <td width="120px">
@@ -72,7 +70,8 @@
     }
   }
 
-  .label {
+  .label,
+  .cell-icon {
     color: var(--theme-content-dark-color);
   }
 

@@ -20,6 +20,7 @@ import core from '@anticrm/platform-core'
 import i18n from '@anticrm/platform-i18n'
 import activity from '@anticrm/activity'
 import dashboard from '@anticrm/dashboard'
+import fsm from '@anticrm/fsm'
 import activityMeta from '@anticrm/activity/src/__meta__'
 import login from '@anticrm/login'
 import workbench from '@anticrm/workbench'
@@ -46,24 +47,25 @@ const platform = createPlatform()
 platform.setMetadata(ui.metadata.LoginApplication, 'login')
 platform.setMetadata(ui.metadata.DefaultApplication, 'workbench')
 
-platform.addLocation(ui, () => import(/* webpackChunkName: "platform-ui" */ '@anticrm/platform-ui/src/plugin'))
-platform.addLocation(core, () => import(/* webpackChunkName: "platform-core" */ '@anticrm/platform-core/src/plugin'))
-platform.addLocation(i18n, () => import(/* webpackChunkName: "platform-i18n" */ '@anticrm/platform-i18n/src/plugin'))
-platform.addLocation(login, () => import(/* webpackChunkName: "login" */ '@anticrm/login/src/plugin'))
-platform.addLocation(presentation, () => import(/* webpackChunkName: "presentation" */ '@anticrm/presentation/src/plugin'))
-platform.addLocation(workbench, () => import(/* webpackChunkName: "workbench" */ '@anticrm/workbench/src/plugin'))
-platform.addLocation(task, () => import(/* webpackChunkName: "task" */ '@anticrm/task/src/plugin'))
-platform.addLocation(task, () => import(/* webpackChunkName: "task" */ '@anticrm/task/src/plugin'))
-platform.addLocation(contact, () => import(/* webpackChunkName: "contact" */ '@anticrm/contact/src/plugin'))
-platform.addLocation(chunter, () => import(/* webpackChunkName: "chunter" */ '@anticrm/chunter/src/plugin'))
-platform.addLocation(guidebook, () => import(/* webpackChunkName: "guidebook" */ '@anticrm/guidebook/src/plugin'))
-platform.addLocation(recruiting, () => import(/* webpackChunkName: "recruiting" */ '@anticrm/recruiting/src/plugin'))
-platform.addLocation(personExtras, () => import(/* webpackChunkName: "person-extras" */ '@anticrm/person-extras/src/plugin'))
-platform.addLocation(calendar, () => import(/* webpackChunkName: "calendar" */ '@anticrm/calendar/src/plugin'))
-platform.addLocation(activity, () => import(/* webpackChunkName: "activity" */ '@anticrm/activity/src/plugin'))
+platform.addLocation(ui, () => import(/* webpackChunkName: "platform-ui" */ '@anticrm/platform-ui/src/plugin')) // eslint-disable-line
+platform.addLocation(core, () => import(/* webpackChunkName: "platform-core" */ '@anticrm/platform-core/src/plugin')) // eslint-disable-line
+platform.addLocation(i18n, () => import(/* webpackChunkName: "platform-i18n" */ '@anticrm/platform-i18n/src/plugin')) // eslint-disable-line
+platform.addLocation(login, () => import(/* webpackChunkName: "login" */ '@anticrm/login/src/plugin')) // eslint-disable-line
+platform.addLocation(presentation, () => import(/* webpackChunkName: "presentation" */ '@anticrm/presentation/src/plugin')) // eslint-disable-line
+platform.addLocation(workbench, () => import(/* webpackChunkName: "workbench" */ '@anticrm/workbench/src/plugin')) // eslint-disable-line
+platform.addLocation(task, () => import(/* webpackChunkName: "task" */ '@anticrm/task/src/plugin')) // eslint-disable-line
+platform.addLocation(task, () => import(/* webpackChunkName: "task" */ '@anticrm/task/src/plugin')) // eslint-disable-line
+platform.addLocation(contact, () => import(/* webpackChunkName: "contact" */ '@anticrm/contact/src/plugin')) // eslint-disable-line
+platform.addLocation(chunter, () => import(/* webpackChunkName: "chunter" */ '@anticrm/chunter/src/plugin')) // eslint-disable-line
+platform.addLocation(guidebook, () => import(/* webpackChunkName: "guidebook" */ '@anticrm/guidebook/src/plugin')) // eslint-disable-line
+platform.addLocation(recruiting, () => import(/* webpackChunkName: "recruiting" */ '@anticrm/recruiting/src/plugin')) // eslint-disable-line
+platform.addLocation(personExtras, () => import(/* webpackChunkName: "person-extras" */ '@anticrm/person-extras/src/plugin')) // eslint-disable-line
+platform.addLocation(calendar, () => import(/* webpackChunkName: "calendar" */ '@anticrm/calendar/src/plugin')) // eslint-disable-line
+platform.addLocation(activity, () => import(/* webpackChunkName: "activity" */ '@anticrm/activity/src/plugin')) // eslint-disable-line
+platform.addLocation(fsm, () => import(/* webpackChunkName: "fsm" */ '@anticrm/fsm/src/plugin')) // eslint-disable-line
 platform.addLocation(dashboard, () => import(/* webpackChunkName: "dashboard" */ '@anticrm/dashboard/src/plugin'))
 
-platform.addLocation(datagen, () => import(/* webpackChunkName: "datagen" */ '@anticrm/data-generator/src/plugin'))
+platform.addLocation(datagen, () => import(/* webpackChunkName: "datagen" */ '@anticrm/data-generator/src/plugin')) // eslint-disable-line
 
 uiMeta(platform)
 workbenchMeta(platform)

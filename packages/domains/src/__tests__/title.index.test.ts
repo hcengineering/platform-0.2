@@ -21,8 +21,8 @@ import {
 import { data, doc1, taskIds } from '@anticrm/core/src/__tests__/tasks'
 import { TitleIndex } from '../indices/title'
 import {
-  CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_TITLE, CORE_CLASS_UPDATE_TX, CORE_MIXIN_SHORTID, CreateTx,
-  DeleteTx, UpdateTx
+  CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_OBJECT_TX, CORE_CLASS_TITLE, CORE_CLASS_UPDATE_TX, CORE_MIXIN_SHORTID, CreateTx,
+  DeleteTx, Title, TitleSource, TxOperationKind, UpdateTx
 } from '../index'
 
 const model = new Model('vdocs')
@@ -31,7 +31,7 @@ model.loadModel(data)
 function newCTx (_class: Ref<Class<Doc>>, _id: Ref<Doc>, object: AnyLayout): CreateTx {
   return {
     _class: CORE_CLASS_CREATE_TX,
-    _id: generateId() as Ref<Doc>,
+    _id: generateId(),
     _date: Date.now() as Property<number, Date>,
     _user: 'system' as StringProperty,
     _objectId: _id,
@@ -43,19 +43,23 @@ function newCTx (_class: Ref<Class<Doc>>, _id: Ref<Doc>, object: AnyLayout): Cre
 function newUTx (_class: Ref<Class<Doc>>, _id: Ref<Doc>, object: AnyLayout): UpdateTx {
   return {
     _class: CORE_CLASS_UPDATE_TX,
-    _id: generateId() as Ref<Doc>,
+    _id: generateId(),
     _date: Date.now() as Property<number, Date>,
     _user: 'system' as StringProperty,
     _objectId: _id,
     _objectClass: _class,
-    _attributes: object
+    operations: [{
+      _class: CORE_CLASS_OBJECT_TX,
+      kind: TxOperationKind.Set,
+      _attributes: object
+    }]
   }
 }
 
 function newDTx (_class: Ref<Class<Doc>>, _id: Ref<Doc>): DeleteTx {
   return {
     _class: CORE_CLASS_DELETE_TX,
-    _id: generateId() as Ref<Doc>,
+    _id: generateId(),
     _date: Date.now() as Property<number, Date>,
     _user: 'system' as StringProperty,
     _objectId: _id,
@@ -70,7 +74,7 @@ describe('title-index tests', () => {
 
     const index = new TitleIndex(model, memDb)
     const shortIdKey = mixinKey(CORE_MIXIN_SHORTID, 'shortId')
-    const titledDoc = { ...doc1, [shortIdKey]: 'TASK-1' }
+    const titledDoc = { ...doc1, [shortIdKey]: 'TASK-1', _mixins: [CORE_MIXIN_SHORTID] }
 
     await index.tx(txContext(), newCTx(taskIds.class.Task, doc1._id, (titledDoc as unknown) as AnyLayout))
 
@@ -83,53 +87,62 @@ describe('title-index tests', () => {
   it('verify title update', async () => {
     const memDb = new Model('test')
     memDb.loadModel(model.dump())
-    memDb.add(doc1)
-    memDb.add({
+    memDb.add({ ...doc1 })
+    const td1: Title = {
       _class: CORE_CLASS_TITLE,
       _id: 'primary:d1' as Ref<Doc>,
       _objectClass: taskIds.class.Task,
-      _objectId: 'd1',
-      title: 'my-space'
-    } as Doc)
-    memDb.add({
+      _objectId: 'd1' as Ref<Doc>,
+      title: 'my-space',
+      source: TitleSource.Title
+    }
+    const td2: Title = {
       _class: CORE_CLASS_TITLE,
       _id: '602d5a5a3e1cca343b3e9be8' as Ref<Doc>,
       _objectClass: taskIds.class.Task,
-      _objectId: 'd1',
-      title: 'TASK-1'
-    } as Doc)
+      _objectId: 'd1' as Ref<Doc>,
+      title: 'TASK-1',
+      source: TitleSource.Title
+    }
+    memDb.add(td1)
+    memDb.add(td2)
     const index = new TitleIndex(model, memDb)
 
     const shortIdKey = mixinKey(CORE_MIXIN_SHORTID, 'shortId')
 
     await index.tx(txContext(), newUTx(taskIds.class.Task, doc1._id, {
       name: 'new-name' as StringProperty,
-      [shortIdKey]: 'SPACE-2' as StringProperty
+      [shortIdKey]: 'SPACE-2' as StringProperty,
+      _mixins: [CORE_MIXIN_SHORTID]
     }))
 
     const titles = await memDb.find(CORE_CLASS_TITLE, {})
     expect(titles.length).toEqual(3)
-    const named = titles.map(t => t.title).sort()
-    expect(named).toEqual(['SPACE-2', 'TASK-1', 'new-name'])
+    const named = titles.map(t => t.title).sort((a, b) => String(a).localeCompare(String(b)))
+    expect(named).toEqual(['new-name', 'SPACE-2', 'TASK-1'])
   })
   it('verify other update', async () => {
     const memDb = new Model('test')
     memDb.loadModel(model.dump())
     memDb.add(doc1)
-    memDb.add({
+    const ts1: Title = {
       _class: CORE_CLASS_TITLE,
       _id: 'primary:d1' as Ref<Doc>,
       _objectClass: taskIds.class.Task,
-      _objectId: 'd1',
-      title: 'my-space'
-    } as Doc)
-    memDb.add({
+      _objectId: 'd1' as Ref<Doc>,
+      title: 'my-space',
+      source: TitleSource.Title
+    }
+    const ts2: Title = {
       _class: CORE_CLASS_TITLE,
       _id: '602d5a5a3e1cca343b3e9be8' as Ref<Doc>,
       _objectClass: taskIds.class.Task,
-      _objectId: 'd1',
-      title: 'TASK-1'
-    } as Doc)
+      _objectId: 'd1' as Ref<Doc>,
+      title: 'TASK-1',
+      source: TitleSource.Title
+    }
+    memDb.add(ts1)
+    memDb.add(ts2)
     const index = new TitleIndex(model, memDb)
     await index.tx(txContext(), newUTx(taskIds.class.Task, doc1._id, {}))
 
@@ -140,21 +153,25 @@ describe('title-index tests', () => {
   it('verify title delete', async () => {
     const memDb = new Model('test')
     memDb.loadModel(model.dump())
-    memDb.add(doc1)
-    memDb.add({
+    memDb.add({ ...doc1 })
+    const ts1: Title = {
       _class: CORE_CLASS_TITLE,
       _id: 'primary:d1' as Ref<Doc>,
       _objectClass: taskIds.class.Task,
-      _objectId: 'd1',
-      title: 'my-space'
-    } as Doc)
-    memDb.add({
+      _objectId: 'd1' as Ref<Doc>,
+      title: 'my-space',
+      source: TitleSource.Title
+    }
+    const ts2: Title = {
       _class: CORE_CLASS_TITLE,
       _id: '602d5a5a3e1cca343b3e9be8' as Ref<Doc>,
       _objectClass: taskIds.class.Task,
-      _objectId: 'd1',
-      title: 'TASK-1'
-    } as Doc)
+      _objectId: 'd1' as Ref<Doc>,
+      title: 'TASK-1',
+      source: TitleSource.Title
+    }
+    memDb.add(ts1)
+    memDb.add(ts2)
     const index = new TitleIndex(model, memDb)
     await index.tx(txContext(), newDTx(taskIds.class.Task, doc1._id))
 

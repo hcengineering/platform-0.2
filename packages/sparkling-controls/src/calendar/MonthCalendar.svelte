@@ -110,9 +110,9 @@
     color: var(--theme-content-color);
   }
   .month-name {
-    color: var(--theme-content-dark-color);
     font-size: 14px;
     font-weight: bold;
     margin: 0 5px;
+    color: var(--theme-content-dark-color);
   }
 </style>

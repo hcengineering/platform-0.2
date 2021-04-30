@@ -37,17 +37,20 @@
         })
     }
   }
+  function getValue (obj: any, key: string): any {
+    return obj[key] || ''
+  }
 </script>
 
 <div class="array-container">
   {#if value && itemAttributes}
-    {#each value as item ({ idx: value.indexOf(item), msg: item.message })}
+    {#each value as item ({ idx: value.indexOf(item), msg: item })}
       <div class="attributes-container">
         {#each itemAttributes as attr (attr.key)}
           {#if attr.presenter}
-            <Presenter is={attr.presenter} {editable} value={item[attr.key] || ''} attribute={attr} />
+            <Presenter is={attr.presenter} {editable} value={getValue(item, attr.key)} attribute={attr} />
           {:else}
-            <span>{item[attr.key] || ''}</span>
+            <span>{getValue(item, attr.key)}</span>
           {/if}
         {/each}
       </div>

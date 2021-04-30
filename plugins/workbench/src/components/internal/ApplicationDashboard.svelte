@@ -24,6 +24,7 @@
   import CreateControl from './CreateControl.svelte'
   import CreateForm from './CreateForm.svelte'
   import { CORE_CLASS_SPACE, Space } from '@anticrm/domains'
+  import { Ref } from '@anticrm/core'
 
   export let application: WorkbenchApplication
 
@@ -31,16 +32,21 @@
   const uiService = getUIService()
 
   let creators: ItemCreator[] = []
-  let creatorsQuery: Promise<QueryUpdater<ItemCreator>> | undefined
+  let creatorsQuery: Promise<QueryUpdater<ItemCreator>>
 
   $: if (application) {
-    creatorsQuery = liveQuery(creatorsQuery, workbench.class.ItemCreator, { app: application._id }, (docs) => {
-      creators = docs
-    })
+    creatorsQuery = liveQuery<ItemCreator>(
+      creatorsQuery,
+      workbench.class.ItemCreator,
+      { app: application._id as Ref<WorkbenchApplication> },
+      (docs) => {
+        creators = docs
+      }
+    )
   }
 
   let spaces: Space[] = []
-  let spacesQuery: Promise<QueryUpdater<Space>> | undefined
+  let spacesQuery: Promise<QueryUpdater<Space>>
   let userId: string | undefined
 
   coreP.then((core) => {
@@ -48,12 +54,12 @@
   })
 
   $: if (userId && application) {
-    spacesQuery = liveQuery(spacesQuery, CORE_CLASS_SPACE, { application: application._id }, (docs) => {
+    spacesQuery = liveQuery<Space>(spacesQuery, CORE_CLASS_SPACE, { application: application._id }, (docs) => {
       spaces = docs.filter((x) => x.users.some((x) => x.userId === userId))
     })
   }
 
-  const onCreatorClick = (creator: ItemCreator) => uiService.showModal(CreateForm, { creator, spaces })
+  const onCreatorClick = (creator: ItemCreator) => uiService.showModal(CreateForm, { application, creator, spaces })
 </script>
 
 <div class="workbench-browse">
@@ -64,7 +70,11 @@
         <CreateControl {creators} {onCreatorClick} />
       {/if}
       <div style="flex-grow:1" />
-      <IconEditBox icon={workbench.icon.Finder} placeholder="Поиск по {application.label}..." iconRight={true} />
+      <IconEditBox
+        icon={workbench.icon.Finder}
+        placeholder="Поиск по {application.label}..."
+        iconRight={true}
+        value="" />
     </div>
   {/if}
 </div>
@@ -80,10 +90,10 @@
       width: 100%;
       height: 5em;
       padding: 2em;
-      border-bottom: 1px solid var(--theme-bg-accent-color);
       display: flex;
       justify-content: space-between;
       align-items: center;
+      border-bottom: 1px solid var(--theme-bg-accent-color);
     }
   }
 </style>

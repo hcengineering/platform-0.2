@@ -82,17 +82,16 @@
   .control {
     display: inline-flex;
     box-sizing: border-box;
-
     border-radius: 4px;
-
-    &:focus-within {
-      box-shadow: 0px 0px 0px 1px var(--theme-bg-dark-color);
-    }
 
     .compute-width {
       position: absolute;
       white-space: nowrap;
       visibility: hidden;
+    }
+
+    &:focus-within {
+      box-shadow: 0px 0px 0px 1px var(--theme-bg-dark-color);
     }
 
     input {

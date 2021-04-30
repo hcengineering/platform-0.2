@@ -19,6 +19,7 @@ import { model as modelModel } from '@anticrm/model/src/__model__'
 import { model as presentation } from '@anticrm/presentation/src/__model__'
 import { model as contact } from '@anticrm/contact/src/__model__'
 import { model as workbench } from '@anticrm/workbench/src/__model__'
+import { model as fsm } from '@anticrm/fsm/src/__model__'
 import { model as task } from '@anticrm/task/src/__model__'
 import { model as chunter } from '@anticrm/chunter/src/__model__'
 import { model as datagen } from '@anticrm/data-generator/src/__model__'
@@ -35,6 +36,7 @@ builder.load(presentation)
 builder.load(workbench)
 builder.load(activity)
 builder.load(dashboard)
+builder.load(fsm)
 builder.load(contact)
 builder.load(personExtras)
 builder.load(chunter)

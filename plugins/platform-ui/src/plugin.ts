@@ -34,11 +34,11 @@ import { getContext, onDestroy, setContext } from 'svelte'
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */
-export default (platform: Platform): Promise<UIService> => {
+export default async (platform: Platform): Promise<UIService> => {
   platform.setResource(ui.component.Icon, Icon)
   platform.setResource(ui.component.Spinner, Spinner)
 
-  function createApp (target: HTMLElement) {
+  function createApp (target: HTMLElement): Root {
     return new Root({ target, props: { platform, ui: uiService } })
   }
 
@@ -60,7 +60,7 @@ export default (platform: Platform): Promise<UIService> => {
     destroyFactory(unsubscribe)
   }
 
-  function navigate (newUrl: string) {
+  function navigate (newUrl: string): void {
     const curUrl = locationToUrl(windowLocation())
     if (curUrl === newUrl) {
       return
@@ -69,33 +69,29 @@ export default (platform: Platform): Promise<UIService> => {
     locationWritable.set(windowLocation())
   }
 
-  function navigateJoin (
-    path: string[] | undefined,
-    query: Record<string, string> | undefined,
-    fragment: string | undefined
-  ) {
+  function navigateJoin (path: string[] | undefined, query: Record<string, string> | undefined, fragment: string | undefined): void {
     const newLocation = windowLocation()
-    if (path) {
+    if (path !== undefined) {
       newLocation.path = path
     }
-    if (query) {
+    if (query !== undefined) {
       // For query we do replace
-      const currentQuery = newLocation.query || {}
+      const currentQuery = newLocation.query ?? {}
       for (const kv of Object.entries(query)) {
         currentQuery[kv[0]] = kv[1]
       }
     }
-    if (fragment) {
+    if (fragment !== undefined) {
       newLocation.fragment = fragment
     }
     navigate(locationToUrl(newLocation))
   }
 
-  function showModal (component: AnySvelteComponent, props: any, element?: HTMLElement) {
+  function showModal (component: AnySvelteComponent, props: any, element?: HTMLElement): void {
     store.set({ is: component, props, element: element })
   }
 
-  function closeModal () {
+  function closeModal (): void {
     store.set({ is: undefined, props: {}, element: undefined })
   }
 
@@ -106,19 +102,18 @@ export default (platform: Platform): Promise<UIService> => {
     matcher: (match: T) => void,
     defaults: T | undefined = undefined
   ): ApplicationRouter<T> {
-    const r = getContext(CONTEXT_ROUTE_VALUE) as Router<any>
-    const navigateOp = (loc: Location) => {
+    const r = getContext<Router<T>>(CONTEXT_ROUTE_VALUE)
+    const navigateOp = (loc: Location): void => {
       navigate(locationToUrl(loc))
     }
-    const result = r ? r.newRouter<T>(pattern, defaults) : new Router<T>(pattern, r, defaults, navigateOp)
+    const result = r !== undefined ? r.newRouter<T>(pattern, defaults) : new Router<T>(pattern, r, defaults, navigateOp)
     result.subscribe(matcher)
-    if (!r) {
+    if (r === undefined) {
       // No parent, we need to subscribe for location changes.
       uiService.subscribeLocation((loc) => {
         result.update(loc)
       }, onDestroy)
-    }
-    if (r) {
+    } else {
       // We need to remove child router from parent, if component is destroyed
       onDestroy(() => r.clearChildRouter())
     }
@@ -128,15 +123,22 @@ export default (platform: Platform): Promise<UIService> => {
 
   let documentProvider: DocumentProvider | undefined
 
-  function open (doc: Document): Promise<void> {
-    if (documentProvider) {
-      return documentProvider.open(doc)
+  async function open (doc: Document): Promise<void> {
+    if (documentProvider !== undefined) {
+      return await documentProvider.open(doc)
     }
-    return Promise.reject(new Error('Document provider is not registred'))
+    throw new Error('Document provider is not registered')
+  }
+
+  async function getHref (doc: Document): Promise<string> {
+    if (documentProvider !== undefined) {
+      return await documentProvider.getHref(doc)
+    }
+    throw new Error('Document provider is not registered')
   }
 
   function selection (): Document | undefined {
-    if (documentProvider) {
+    if (documentProvider !== undefined) {
       return documentProvider.selection()
     }
     return undefined
@@ -146,7 +148,7 @@ export default (platform: Platform): Promise<UIService> => {
     documentProvider = provider
   }
 
-  const uiService = {
+  const uiService: UIService = {
     createApp,
     subscribeLocation,
     navigateJoin,
@@ -156,9 +158,10 @@ export default (platform: Platform): Promise<UIService> => {
     closeModal,
 
     open,
+    getHref,
     selection,
     registerDocumentProvider
-  } as UIService
+  }
 
-  return Promise.resolve(uiService)
+  return uiService
 }

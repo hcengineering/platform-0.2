@@ -13,13 +13,13 @@
 // limitations under the License.
 //
 
-import { plugin, Plugin, Service } from '@anticrm/platform'
+import { Metadata, plugin, Plugin, Service } from '@anticrm/platform'
 
 import core from '@anticrm/platform-core'
 import ui, { AnyComponent, Asset } from '@anticrm/platform-ui'
 import { IntlString } from '@anticrm/platform-i18n'
 import { Class, Doc, Ref } from '@anticrm/core'
-import { Application, VDoc } from '@anticrm/domains'
+import { Application, Space, VDoc } from '@anticrm/domains'
 
 export interface Perspective extends Doc {
   name: string // A uniq short name
@@ -34,11 +34,13 @@ export interface WorkbenchApplication extends Application {
   icon?: Asset
   rootComponent?: AnyComponent // A component to be shown if application itself is selected.
   component?: AnyComponent // A component to be shown in generic application.
-  classes: Ref<Class<VDoc>>[]
+  classes: Array<Ref<Class<VDoc>>>
 
   supportSpaces: boolean // If set to true, application will support spaces.
   spaceTitle?: string // A title for show spaces as
   spaceComponent?: AnyComponent // If defined will show component for space selection, instead of default one.
+
+  spaceFilter?: Metadata<SpaceFilter> // An override for spaces list.
 }
 
 export interface ItemCreator extends Doc {
@@ -46,6 +48,13 @@ export interface ItemCreator extends Doc {
   class: Ref<Class<VDoc>>
   app: Ref<WorkbenchApplication>
   component?: AnyComponent
+}
+
+/**
+ * A space filtering mechanism, it should be mixed to application with
+ */
+export interface SpaceFilter {
+  filter: (spaces: Space[], application: WorkbenchApplication) => Space[]
 }
 
 export interface WorkbenchService extends Service {
@@ -64,7 +73,8 @@ export default plugin('workbench' as Plugin<WorkbenchService>, {
     Lock: '' as Asset,
     Sharp: '' as Asset,
     Burger: '' as Asset,
-    ArrowDown: '' as Asset
+    ArrowDown: '' as Asset,
+    ArrowRight: '' as Asset
   },
   component: {
     Workbench: '' as AnyComponent,

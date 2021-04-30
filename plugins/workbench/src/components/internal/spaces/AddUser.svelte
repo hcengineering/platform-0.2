@@ -13,7 +13,6 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import type { Property, StringProperty } from '@anticrm/core'
   import { createEventDispatcher } from 'svelte'
 
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
@@ -32,12 +31,12 @@
   const dispatch = createEventDispatcher()
 
   async function save () {
-    const cs = await coreService
-    await cs.push(space, null, 'users' as StringProperty, {
-      userId: userName as StringProperty,
-      owner: isOwner as Property<boolean, boolean>
-    })
-
+    await (await coreService).updateWith(space, (s) =>
+      s.users.push({
+        userId: userName,
+        owner: isOwner
+      })
+    )
     dispatch('close')
   }
 </script>
@@ -46,7 +45,7 @@
   <div class="header">
     <div class="caption-1">Add user to {space.name}</div>
     <a href="/" on:click|preventDefault={() => dispatch('close')}>
-      <Icon icon={workbench.icon.Close} button="true" />
+      <Icon icon={workbench.icon.Close} button={true} />
     </a>
   </div>
 

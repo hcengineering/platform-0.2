@@ -14,7 +14,7 @@
 //
 
 import { Class, Doc, Emb, Ref } from '../classes'
-import { generateId } from '../storage'
+import { DocumentValue } from '../storage'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 export const data = require('./model.json')
@@ -43,7 +43,12 @@ export interface Task extends Doc {
   comments?: TaskComment[]
 }
 
-export interface DerivedTask extends Task {}
+export interface TaskWithSecond extends Task {
+  secondTask: SubTask | null
+}
+
+export interface DerivedTask extends Task {
+}
 
 export const taskIds = {
   class: {
@@ -54,28 +59,25 @@ export const taskIds = {
   }
 }
 
-export function createSubtask (name: string, rate = 30): SubTask {
+export function createSubtask (name: string, rate = 30, comments?: Array<DocumentValue<TaskComment>>): DocumentValue<SubTask> {
   return {
     name: name,
     rate: rate,
-    __embedded: true,
-    _class: taskIds.class.Subtask
-  } as SubTask
+    comments: comments
+  }
 }
 
 /**
  * Create a random task with name specified
  * @param name
  */
-export function createTask (name: string, rate: number, description: string): Task {
+export function createTask (name: string, rate: number, description: string): DocumentValue<Task> {
   return {
-    _id: generateId() as Ref<Doc>,
-    _class: taskIds.class.Task,
     name,
     description,
     lists: [name],
     rate
-  } as Task
+  }
 }
 
 export const doc1 = {
@@ -90,4 +92,4 @@ export const doc1 = {
     createSubtask('subtask1', 31),
     createSubtask('subtask2', 33)
   ]
-} as Task
+}

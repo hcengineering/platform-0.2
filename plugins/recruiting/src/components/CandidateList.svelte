@@ -15,40 +15,40 @@ limitations under the License.
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
 
+  import { QueryUpdater } from '@anticrm/platform-core'
   import type { Space } from '@anticrm/domains'
-  import contact from '@anticrm/contact/src/__model__'
-  import { getCoreService, liveQuery } from '@anticrm/presentation'
+  import { liveQuery } from '@anticrm/presentation'
 
   import UserInfo from '@anticrm/sparkling-controls/src/UserInfo.svelte'
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
 
-  import candidate from '..'
   import type { WithCandidateProps } from '..'
+  import recruiting from '..'
+  import { Ref } from '@anticrm/core'
 
   export let space: Space
 
-  const core = getCoreService()
-  const model = core.then((s) => s.getModel())
   const dispatch = createEventDispatcher()
 
   let candidates: WithCandidateProps[] = []
+  let lq: Promise<QueryUpdater<WithCandidateProps>>
 
-  $: lq = liveQuery(
+  $: lq = liveQuery<WithCandidateProps>(
     lq,
-    contact.class.Person,
-    { _mixins: candidate.mixin.WithCandidateProps, _space: space._id },
+    recruiting.mixin.WithCandidateProps,
+    { _space: space._id as Ref<Space> },
     (docs) => {
-      model.then((m) => docs.map((x) => m.as(x, candidate.mixin.WithCandidateProps))).then((xs) => (candidates = xs))
+      candidates = docs
     }
   )
 </script>
 
 <ScrollView width="100%" height="100%">
   <div class="grid">
-    {#each candidates as c}
+    {#each candidates as c (c._id)}
       <div
         class="candidate"
-        on:click={() => dispatch('open', { _id: c._id, _class: candidate.mixin.WithCandidateProps })}>
+        on:click={() => dispatch('open', { _id: c._id, _class: recruiting.mixin.WithCandidateProps })}>
         <UserInfo url={`https://robohash.org/${c.name}.png?set=set3`} title={c.name} subtitle={c.candidate.role} />
       </div>
     {/each}
@@ -60,7 +60,6 @@ limitations under the License.
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     grid-gap: 10px;
-
     padding: 15px;
   }
 
@@ -68,7 +67,7 @@ limitations under the License.
     padding: 20px 10px;
     border: 1px solid;
     border-radius: 5px;
-    border-color: var(--theme-bg-accent-color);
     cursor: pointer;
+    border-color: var(--theme-bg-accent-color);
   }
 </style>

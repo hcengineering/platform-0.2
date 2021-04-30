@@ -22,6 +22,7 @@
   import { getPresentationService } from '@anticrm/presentation'
 
   import Component from '@anticrm/platform-ui/src/components/Component.svelte'
+  import GenericInfo from './GenericInfo.svelte'
 
   export let tx: Tx
 
@@ -46,7 +47,6 @@
         avatar = a
       })
     presentationService.then((p) => {
-      // console.log('get component extension for' + objectClass)
       info = p.getComponentExtension(objectClass, activity.mixin.ActivityInfo)
     })
   }
@@ -56,12 +56,12 @@
   <img class="avatar" src={avatar} alt="avatar" />
   <div class="details">
     <b>{user ? user.name : ''}</b>
-    <span>15:23</span>
+    <span>{new Date(tx._date).toDateString()}</span>
     <div>
       {#if info}
         <Component is={info} props={{ tx }} />
       {:else}
-        No information
+        <GenericInfo {tx} />
       {/if}
     </div>
   </div>
@@ -74,11 +74,11 @@
 
     .avatar {
       object-fit: cover;
-      border: 1px solid var(--theme-bg-dark-color);
-      box-shadow: 0 0 0 2px var(--theme-bg-color);
       border-radius: 50%;
       width: 32px;
       height: 32px;
+      border: 1px solid var(--theme-bg-dark-color);
+      box-shadow: 0 0 0 2px var(--theme-bg-color);
       z-index: 51;
     }
 

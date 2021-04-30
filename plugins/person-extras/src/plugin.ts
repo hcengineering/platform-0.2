@@ -17,7 +17,6 @@ import { Platform } from '@anticrm/platform'
 
 import { PersonExtrasService } from '.'
 
-export default (
-  _platform: Platform
-): Promise<PersonExtrasService> =>
-  Promise.resolve({})
+export default async (_platform: Platform): Promise<PersonExtrasService> => {
+  return {}
+}

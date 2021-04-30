@@ -37,7 +37,7 @@
           }}
           >Add user
         </PopupItem>
-        <PopupItem separator="true" />
+        <PopupItem separator={true} />
         <PopupItem
           on:click={() => {
             leaveSpace(coreService, space)
@@ -58,34 +58,21 @@
 <style lang="scss">
   .item {
     box-sizing: border-box;
-    font-family: var(--theme-font-content);
-    font-weight: 500;
-    padding: 0.5em;
-    padding-top: calc(0.5em + 1px);
-    margin-bottom: 0.25em;
-    height: 2.5em;
-    color: var(--theme-content-color);
-    background-color: var(--theme-bg-color);
-    cursor: pointer;
-    border-radius: 4px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-
+    margin-bottom: 4px;
+    padding: 6px 16px 6px 24px;
+    height: 36px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: var(--theme-content-color);
     &.selected {
-      font-weight: 700;
-      color: var(--theme-content-dark-color);
-      background-color: var(--theme-bg-accent-color);
-
+      color: var(--theme-caption-color);
+      background-color: var(--theme-selection-item);
       &:hover {
         cursor: default;
-        color: var(--theme-content-dark-color);
-        background-color: var(--theme-bg-accent-color);
       }
-    }
-
-    &:hover {
-      color: var(--theme-doclink-color);
     }
   }
 
@@ -98,8 +85,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--white-color);
-    background-color: var(--theme-doclink-color);
+    color: var(--theme-white-color);
     font-weight: 700;
     font-size: 11px;
     line-height: 11px;
@@ -108,6 +94,7 @@
     margin: 0;
     padding: 0 4px;
     border-radius: 8px;
+    background-color: var(--theme-doclink-color);
   }
 
   .optionsButton {

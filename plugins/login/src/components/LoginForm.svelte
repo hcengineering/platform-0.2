@@ -135,9 +135,8 @@
     margin: 20vh auto auto;
     width: 30em;
     padding: 2em;
-    border: 1px solid var(--theme-bg-accent-color);
     border-radius: 1em;
-
+    border: 1px solid var(--theme-bg-accent-color);
     .actions {
       display: flex;
       margin-top: 1.5em;

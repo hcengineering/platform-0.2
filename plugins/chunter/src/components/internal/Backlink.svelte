@@ -18,16 +18,22 @@
 
   import CommentComponent from './Comment.svelte'
   import { liveQuery } from '@anticrm/presentation'
+  import { QueryUpdater } from '@anticrm/platform-core'
+  import type { Class, Ref } from '@anticrm/core'
 
   export let backlink: Reference
 
   let message: Message
-
-  $: qs = liveQuery(qs, backlink._sourceClass, { _id: backlink._sourceId }, (docs) => {
-    message = docs[0] as Message
+  let qs: Promise<QueryUpdater<Message>>
+  $: qs = liveQuery<Message>(qs, backlink._sourceClass as Ref<Class<Message>>, { _id: backlink._sourceId }, (docs) => {
+    message = docs[0]
   })
+
+  function getPos (backling: Reference): number {
+    return (backlink._sourceProps?.pos as number) ?? 0
+  }
 </script>
 
-{#if message && message.comments && message.comments.length > backlink._sourceProps.pos}
-  <CommentComponent message={message.comments[backlink._sourceProps.pos]} />
+{#if backlink && backlink._sourceProps && message && message.comments && message.comments.length > getPos(backlink)}
+  <CommentComponent message={message.comments[getPos(backlink)]} />
 {/if}

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { AnyLayout, StringProperty } from '@anticrm/core'
+  import type { DocumentQuery } from '@anticrm/core'
   import type { MessageNode } from '@anticrm/text'
   import { newMessageDocument } from '@anticrm/text'
   import { getCoreService, liveQuery } from '../../utils'
@@ -78,11 +78,11 @@
 
   let titleSearch: Promise<QueryUpdater<Title>>
 
-  function query (prefix: string): AnyLayout {
+  function query (prefix: string): DocumentQuery<Title> {
     return {
       title: {
-        $regex: (prefix + '.*') as StringProperty,
-        $options: 'i' as StringProperty
+        $regex: prefix + '.*',
+        $options: 'i'
       }
     }
   }
@@ -110,8 +110,8 @@
   }
 
   async function findTitle (title: string): Promise<ItemRefefence[]> {
-    const docs = await (await coreService).find(CORE_CLASS_TITLE, {
-      title: title as StringProperty
+    const docs = await (await coreService).find<Title>(CORE_CLASS_TITLE, {
+      title: title
     })
 
     for (const value of docs) {
@@ -152,7 +152,7 @@
 
   function handlePopupSelected (value: CompletionItem) {
     let extra = 0
-    if (styleState.completionEnd != null && styleState.completionEnd.endsWith(']]')) {
+    if (styleState.completionEnd !== null && styleState.completionEnd.endsWith(']]')) {
       extra = styleState.completionEnd.length
     }
     const vv = value as ExtendedCompletionItem
@@ -210,7 +210,7 @@
     const promises: Promise<void>[] = []
 
     state.doc.descendants((node, pos) => {
-      if (node.isText && node.text != null) {
+      if (node.isText && node.text !== null) {
         let prev = {
           id: '',
           class: ''
@@ -258,7 +258,7 @@
                     operations.push(
                       (tr: Transaction | null): Transaction => {
                         const mark = schema.marks.reference.create(items[0])
-                        return (tr == null ? state.tr : tr).addMark(cpos + ci, cpos + cend, mark)
+                        return (tr === null ? state.tr : tr).addMark(cpos + ci, cpos + cend, mark)
                       }
                     )
                   } else if (items.length === 0) {
@@ -269,7 +269,7 @@
                             id: null,
                             class: 'Page'
                           })
-                          return (tr == null ? state.tr : tr).addMark(cpos + ci, cpos + cend, mark)
+                          return (tr === null ? state.tr : tr).addMark(cpos + ci, cpos + cend, mark)
                         }
                       )
                     }
@@ -289,7 +289,7 @@
       let tr: Transaction | null = null
       for (let i = 0; i < operations.length; i++) {
         const t = operations[i]
-        if (t != null) {
+        if (t !== null) {
           tr = t(tr)
         }
       }
@@ -408,12 +408,10 @@
 <style lang="scss">
   .presentation-reference-input-control {
     width: 100%;
-
-    background-color: var(--theme-bg-accent-color);
-    border: 1px solid var(--theme-bg-dark-color);
     border-radius: 4px;
     padding: 8px;
-    box-sizing: border-box;
+    background-color: var(--theme-bg-accent-color);
+    border: 1px solid var(--theme-bg-dark-color);
 
     .flex-column {
       display: flex;

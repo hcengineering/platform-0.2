@@ -22,19 +22,19 @@ import {
 
 @Class$(core.class.Obj, core.class.Obj)
 export class TObj implements Obj {
-  _class!: Ref<Class<Obj>>
+  @RefTo$(core.class.Class) _class!: Ref<Class<Obj>>
 }
 
 @Class$(core.class.Emb, core.class.Obj)
 export class TEmb extends TObj implements Emb {
-  __embedded!: true
+  _class!: Ref<Class<Emb>> // A field to match type, attribute is defined in TObj
 }
 
 @Class$(core.class.Doc, core.class.Obj)
 export class TDoc extends TObj implements Doc {
-  @RefTo$(core.class.Class) _class!: Ref<Class<Doc>>
+  _class!: Ref<Class<Doc>> // A field to match type, attribute is defined in TObj
   @Prop() _id!: Ref<Doc>
-  @Prop() _mixins?: Ref<Mixin<Doc>>[]
+  @Prop() _mixins?: Array<Ref<Mixin<Doc>>>
 }
 
 @Class$(core.class.Attribute, core.class.Emb, MODEL_DOMAIN)

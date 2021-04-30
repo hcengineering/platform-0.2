@@ -15,7 +15,7 @@
 // Component define a simple popup menu with a set of actions.
 -->
 <script lang="ts">
-  export let items: unknown[]
+  export let items: any[]
 </script>
 
 <div class="simple-popup-view">
@@ -34,28 +34,24 @@
     flex-direction: column;
     flex-flow: column nowrap;
     justify-content: space-evenly;
-    //height: 6em;
     .button {
-      font-size: 14px;
+      font-size: 15px;
       text-align: left;
       padding: 0.5em 1em;
-      background-color: var(--theme-bg-color);
       border: none;
       border-radius: 0;
       margin: 0;
-
+      background-color: var(--theme-bg-color);
       &:hover {
         background-color: var(--theme-bg-accent-color);
       }
     }
-
     .separator {
-      font-size: 14px;
-      background-color: var(--theme-bg-dark-color);
-      //border-bottom: 1px solid var(--theme-bg-accent-color);
+      font-size: 15px;
       height: 1px;
       border-radius: 0;
       margin: 0px 1em;
+      background-color: var(--theme-bg-dark-color);
     }
   }
 </style>

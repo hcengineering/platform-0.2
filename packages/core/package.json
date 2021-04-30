@@ -12,21 +12,23 @@
     "test": "jest"
   },
   "devDependencies": {
-    "@babel/preset-typescript": "^7.12.0",
-    "@microsoft/api-extractor": "^7.13.0",
+    "@babel/eslint-parser": "^7.13.14",
+    "@babel/preset-typescript": "^7.13.0",
+    "@microsoft/api-extractor": "^7.14.0",
     "@types/jest": "^26.0.16",
     "@types/markdown-it": "^10.0.2",
-    "@typescript-eslint/eslint-plugin": "^4.9.0",
-    "@typescript-eslint/parser": "^4.9.0",
-    "eslint": "^7.14.0",
+    "@typescript-eslint/eslint-plugin": "^4.22.0",
+    "@typescript-eslint/parser": "^4.22.0",
+    "eslint": "^7.24.0",
     "eslint-config-standard": "^16.0.2",
+    "eslint-config-standard-with-typescript": "^20.0.0",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-promise": "^5.1.0",
     "eslint-plugin-standard": "^5.0.0",
     "jest": "^26.0.1",
     "ts-jest": "^26.4.4",
-    "typescript": "^3.9.4"
+    "typescript": "^4.2.4"
   },
   "dependencies": {
     "@anticrm/platform": "0.2.0",

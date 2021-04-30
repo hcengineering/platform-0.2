@@ -1,5 +1,5 @@
 <script lang="ts">
-  export const separator = false
+  export let separator = false
 </script>
 
 {#if !separator}
@@ -14,19 +14,20 @@
   .popup-item-view {
     margin: 4px 0;
     padding: 8px;
-    background-color: var(--theme-bg-accent-color);
+    font-weight: 400;
     border-radius: 4px;
     border: none;
     text-align: left;
-    color: var(--theme-content-dark-color);
     cursor: pointer;
-
+    color: var(--theme-content-color);
+    background-color: var(--theme-bg-color);
     &:hover {
-      background-color: var(--theme-bg-accent-hover);
+      background-color: var(--theme-bg-accent-color);
     }
   }
+
   .popup-separator {
     height: 1px;
-    background-color: var(--theme-bg-dark-color);
+    background-color: var(--theme-bg-accent-color);
   }
 </style>

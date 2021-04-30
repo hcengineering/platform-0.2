@@ -2,15 +2,15 @@ import { Location as PlatformLocation } from './index'
 
 export function locationToUrl (location: PlatformLocation): string {
   let result = '/'
-  if (location.path) {
+  if (location.path !== undefined) {
     result += location.path.map((p) => encodeURIComponent(p)).join('/')
   }
-  if (location.query) {
+  if (location.query !== undefined) {
     const queryValue = Object.entries(location.query)
       .map((e) => {
-        if (e[1]) {
+        if (e[1] !== undefined) {
           // Had value
-          return e[0] + '=' + e[1]
+          return String(e[0]) + '=' + String(e[1])
         } else {
           return e[0]
         }
@@ -20,7 +20,7 @@ export function locationToUrl (location: PlatformLocation): string {
       result += '?' + queryValue
     }
   }
-  if (location.fragment && location.fragment.length > 0) {
+  if (location.fragment !== undefined && location.fragment.length > 0) {
     result += '#' + location.fragment
   }
 

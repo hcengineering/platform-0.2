@@ -1,0 +1,68 @@
+/* Dark Theme */
+.theme-dark {
+  --theme-bg-color: #18181e;
+  --theme-bg-dark-color: #111117;
+  --theme-bg-dark-hover: #111117;
+  --theme-bg-accent-color: rgba(255, 255, 255, 0.05);
+  --theme-bg-accent-hover: rgba(255, 255, 255, 0.05);
+  --theme-selection-item: rgba(148, 144, 170, 0.13);
+
+  --theme-caption-color: #fff;
+  --theme-content-accent-color: rgba(255, 255, 255, 0.8);
+  --theme-content-color: rgba(255, 255, 255, 0.6);
+  --theme-content-dark-color: rgba(255, 255, 255, 0.4);
+  --theme-content-trans-color: rgba(255, 255, 255, 0.3);
+
+  --theme-userlink-color: #b92d52;
+  --theme-userlink-hover: #b92d52;
+  --theme-doclink-color: #2d6ab9;
+  --theme-doclink-hover: #2d6ab9;
+  --theme-status-online: #6cd871;
+  --theme-shadow: 0px 4px 8px rgba(15, 15, 15, 0.5);
+}
+
+/* Grey Theme */
+.theme-grey {
+  --theme-bg-color: #393844;
+  --theme-bg-dark-color: #2c2b35;
+  --theme-bg-dark-hover: #2c2b35;
+  --theme-bg-accent-color: rgba(255, 255, 255, 0.05);
+  --theme-bg-accent-hover: rgba(255, 255, 255, 0.05);
+  --theme-selection-item: rgba(148, 144, 170, 0.13);
+
+  --theme-caption-color: #fff;
+  --theme-content-accent-color: rgba(255, 255, 255, 0.8);
+  --theme-content-color: rgba(255, 255, 255, 0.6);
+  --theme-content-dark-color: rgba(255, 255, 255, 0.4);
+  --theme-content-trans-color: rgba(255, 255, 255, 0.3);
+
+  --theme-userlink-color: #b92d52;
+  --theme-userlink-hover: #b92d52;
+  --theme-doclink-color: #2d6ab9;
+  --theme-doclink-hover: #2d6ab9;
+  --theme-status-online: #6cd871;
+  --theme-shadow: 0px 4px 8px rgba(15, 15, 15, 0.5);
+}
+
+/* Light Theme */
+.theme-light {
+  --theme-bg-color: #fff;
+  --theme-bg-dark-color: #e7e7e7;
+  --theme-bg-dark-hover: #e7e7e7;
+  --theme-bg-accent-color: rgba(0, 0, 0, 0.05);
+  --theme-bg-accent-hover: rgba(0, 0, 0, 0.05);
+  --theme-selection-item: rgba(148, 144, 170, 0.13);
+
+  --theme-caption-color: #272121;
+  --theme-content-accent-color: rgba(39, 33, 33, 0.8);
+  --theme-content-color: rgba(39, 33, 33, 0.6);
+  --theme-content-dark-color: rgba(39, 33, 33, 0.4);
+  --theme-content-trans-color: rgba(39, 33, 33, 0.3);
+
+  --theme-userlink-color: #b92d52;
+  --theme-userlink-hover: #b92d52;
+  --theme-doclink-color: #2d6ab9;
+  --theme-doclink-hover: #2d6ab9;
+  --theme-status-online: #4ebc53;
+  --theme-shadow: 0px 4px 8px rgba(155, 155, 155, 0.5);
+}

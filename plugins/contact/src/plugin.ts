@@ -14,30 +14,34 @@
 //
 
 import { Platform } from '@anticrm/platform'
-import { StringProperty, Ref } from '@anticrm/core'
+import { Ref } from '@anticrm/core'
 import contact, { User, ContactService } from '.'
 
 import PersonInfo from './components/internal/PersonInfo.svelte'
 import core, { CoreService } from '@anticrm/platform-core'
 import { UIService, Asset } from '@anticrm/platform-ui'
 
-export default (platform: Platform, deps: { core: CoreService, ui: UIService }): Promise<ContactService> => {
+export default async (platform: Platform, deps: { core: CoreService, ui: UIService }): Promise<ContactService> => {
   platform.setResource(contact.component.PersonInfo, PersonInfo)
 
   const coreService = deps.core
 
   // const uiService = deps.ui
 
-  function getUser (account: string): Promise<User> {
-    return coreService.findOne(contact.mixin.User, { account: account as StringProperty }) as Promise<User>
+  async function getUser (account: string): Promise<User> {
+    const user = await coreService.findOne<User>(contact.mixin.User, { account: account })
+    if (user === undefined) {
+      throw new Error('Failed to find user')
+    }
+    return user
   }
 
   async function getMyName (): Promise<string> {
     const whoAmI = platform.getMetadata(core.metadata.WhoAmI)
-    if (!whoAmI) {
+    if (whoAmI === undefined) {
       return 'Nobody'
     }
-    return getUser(whoAmI).then(user => user?.name)
+    return await getUser(whoAmI).then(user => user?.name)
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -46,16 +50,11 @@ export default (platform: Platform, deps: { core: CoreService, ui: UIService }):
     return require('../assets/ava2x48.jpg') as Asset
   }
 
-  // uiService.addWidget(contact.component.LoginWidget)
-
   const service = {
     getUser,
     getMyName,
     getAvatar
   }
 
-  // deps.ui.getApp()
-  //   .provide(ContactServiceInjectionKey, service)
-
-  return Promise.resolve(service)
+  return service
 }

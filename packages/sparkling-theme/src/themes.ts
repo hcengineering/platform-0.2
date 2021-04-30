@@ -14,7 +14,7 @@
 //
 
 export interface Theme {
-  name: string,
+  name: string
   colors: {
     ['bg-color']: string
     ['bg-dark-color']: string
@@ -36,7 +36,7 @@ export interface Theme {
 
 export const themes: Theme[] = [
   {
-    name: 'light',
+    name: 'theme-light',
     colors: {
       'bg-color': '#fff',
       'bg-dark-color': '#E0E0E0',
@@ -56,7 +56,7 @@ export const themes: Theme[] = [
     }
   },
   {
-    name: 'dark',
+    name: 'theme-dark',
     colors: {
       'bg-color': '#1E1E1E',
       'bg-dark-color': '#4D4D4D',
@@ -76,7 +76,7 @@ export const themes: Theme[] = [
     }
   },
   {
-    name: 'biege',
+    name: 'theme-grey',
     colors: {
       'bg-color': '#FDF1E6',
       'bg-dark-color': '#CAC1B8',

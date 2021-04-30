@@ -53,28 +53,25 @@
 
     .avatar {
       object-fit: cover;
-      border: 1px solid var(--theme-bg-dark-color);
-      background-color: white;
-      box-shadow: 0 0 0 2px var(--theme-bg-color);
       border-radius: 50%;
       width: 32px;
       height: 32px;
+      border: 1px solid var(--theme-bg-dark-color);
+      background-color: var(--theme-white-color);
+      box-shadow: 0 0 0 2px var(--theme-bg-color);
       z-index: 51;
     }
 
     .details {
       padding-left: 1em;
       position: relative;
-
       & > b {
         color: var(--theme-userlink-color);
       }
-
       & > span {
         font-size: 11px;
         color: var(--theme-content-trans-color);
       }
-
       &::before {
         position: absolute;
         content: '';

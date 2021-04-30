@@ -15,7 +15,7 @@ limitations under the License.
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
 
-  import type { DateProperty, Ref, StringProperty } from '@anticrm/core'
+  import type { DateProperty, DocumentValue, Ref, StringProperty } from '@anticrm/core'
   import { generateId } from '@anticrm/core'
   import type { Space } from '@anticrm/domains'
   import type { Person } from '@anticrm/contact'
@@ -30,7 +30,7 @@ limitations under the License.
   import SpaceBox from '@anticrm/platform-ui/src/components/SpaceBox.svelte'
 
   import type { WithCandidateProps } from '..'
-  import candidate from '..'
+  import recruiting from '..'
 
   export let spaces: Space[]
 
@@ -50,15 +50,13 @@ limitations under the License.
   }
 
   const candidateM: WithCandidateProps['candidate'] = {
-    __embedded: true,
-    _class: candidate.class.Candidate,
+    _class: recruiting.class.Candidate,
     bio: '',
     role: '',
     salaryExpectation: 0
   }
 
   let resumeM: WithCandidateProps['resume'] = {
-    __embedded: true,
     _class: personExtras.class.Resume,
     skills: [],
     hobbies: [],
@@ -70,18 +68,18 @@ limitations under the License.
     const core = await coreP
     const model = await modelP
 
-    const doc = {
+    const doc: DocumentValue<Person> = {
       ...personM,
-      _space: space?._id,
-      _createBy: core.getUserId()
+      _space: space?._id as Ref<Space>,
+      _createdBy: core.getUserId() as StringProperty
     }
 
-    model.mixinDocument(doc, candidate.mixin.WithCandidateProps, {
+    model.mixinDocument(doc as Person, recruiting.mixin.WithCandidateProps, {
       candidate: candidateM,
       resume: resumeM
     })
 
-    await core.create(contact.class.Person, doc)
+    await core.create<Person>(contact.class.Person, doc)
 
     dispatch('close')
   }

@@ -1,5 +1,5 @@
 <script type="ts">
-  import type { Attribute, Class, Doc, Enum, EnumKey, EnumOf, Property, Ref } from '@anticrm/core'
+  import type { Class, Doc, Enum, EnumKey, EnumOf, Ref } from '@anticrm/core'
   import { AttributeMatch, CORE_CLASS_ENUM_OF, Model } from '@anticrm/core'
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import workbench from '@anticrm/workbench'
@@ -10,6 +10,7 @@
   import Card from './Card.svelte'
   import type { AnyComponent } from '@anticrm/platform-ui'
   import type { CardDragEvent } from './cardHelper'
+  import { QueryUpdater } from '@anticrm/platform-core'
 
   export let _class: Ref<Class<VDoc>>
   export let space: Space
@@ -31,6 +32,8 @@
     hidden: boolean
     defValue: boolean
     divTasks: any
+
+    updatePromise?: Promise<QueryUpdater<any>>
   }
 
   let statuses: Array<StatUses> = []
@@ -66,16 +69,16 @@
       const model = cs.getModel()
 
       const attr = findAttr(model, _class, field)
-      let enumFieldClass: Enum<EnumKey>
+      let enumFieldClass: Enum<EnumKey> | undefined
       if (attr) {
         enumFieldClass = model.get((attr.attr.type as EnumOf<EnumKey>).of)
         fieldAttr = attr
       }
-      if (enumFieldClass) {
+      if (enumFieldClass !== undefined) {
         const newSt: StatUses[] = []
         for (const st of Object.entries(enumFieldClass._literals)) {
-          if (model.isMixedIn(st[1] as Attribute, ui.mixin.UXAttribute)) {
-            const lit = model.as<UXAttribute>(st[1] as Attribute, ui.mixin.UXAttribute)
+          if (model.isMixedIn(st[1], ui.mixin.UXAttribute)) {
+            const lit = model.as<UXAttribute>(st[1], ui.mixin.UXAttribute)
             newSt.push({
               id: st[1].ordinal,
               label: lit.label,
@@ -100,34 +103,36 @@
     })
   }
 
-  let docs: VDoc[] = []
   let dragDoc: VDoc | null = null
+  const docs: Record<any, VDoc[]> = {}
 
-  let tq
   $: if (space) {
-    tq = liveQuery(tq, _class, { _space: space._id }, (res) => {
-      docs = res
-    })
+    for (const u of statuses) {
+      u.updatePromise = liveQuery<any>(
+        u.updatePromise,
+        _class,
+        { _space: space._id as Ref<Space>, [fieldAttr.name]: u.id },
+        (res) => {
+          docs[u.id] = res
+        },
+        { limit: 25 }
+      )
+    }
   }
 
-  function docsFor (tasks: VDoc[], status: any, defValue: boolean, fieldAttr: AttributeMatch): VDoc[] {
-    const res = tasks
-      .filter((t) => {
-        const fv = getFieldValue(t, fieldAttr.name)
-        return fv === status || (defValue && !fv)
-      })
-      .sort((a, b) => {
-        if (a._modifiedOn !== undefined && b._modifiedOn !== undefined) {
-          return (b._modifiedOn as number) - (a._modifiedOn as number)
-        }
-        if (a._modifiedOn === undefined && b._modifiedOn === undefined) {
-          return 0
-        }
-        if (a._modifiedOn === undefined) {
-          return 1
-        }
-        return -1
-      })
+  function docsFor (docs: Record<any, VDoc[]>, status: any, defValue: boolean, fieldAttr: AttributeMatch): VDoc[] {
+    const res = (docs[status] ?? []).sort((a, b) => {
+      if (a._modifiedOn !== undefined && b._modifiedOn !== undefined) {
+        return (b._modifiedOn as number) - (a._modifiedOn as number)
+      }
+      if (a._modifiedOn === undefined && b._modifiedOn === undefined) {
+        return 0
+      }
+      if (a._modifiedOn === undefined) {
+        return 1
+      }
+      return -1
+    })
     return res
   }
 
@@ -147,10 +152,10 @@
     if (value.detail.dragged) {
       dragId = (value.detail.doc as any)[fieldAttr.name]
     } else {
-      if (dragIn != null && dragDoc && getFieldValue(dragDoc, fieldAttr.name) !== dragIn) {
+      if (dragIn !== null && dragDoc && getFieldValue(dragDoc, fieldAttr.name) !== dragIn) {
         const dt = dragDoc
         coreService.then((cs) => {
-          cs.update(dt, null, { [fieldAttr.name]: dragIn as Property<any, any> })
+          cs.update(dt, { [fieldAttr.name]: dragIn } as Partial<VDoc>)
         })
         dragDoc = null
       }
@@ -158,7 +163,7 @@
     }
   }
 
-  function onMove (value: unknown): void {
+  function onMove (value: any): void {
     const event = value.detail.event
     if (dragIn !== whereInStatus(event.detail.x)) {
       dragIn = whereInStatus(event.detail.x)
@@ -251,7 +256,7 @@
         border-radius: 4px;
         justify-content: center;
         align-items: center;
-        color: var(--white-color);
+        color: var(--theme-white-color);
         outline: none;
         cursor: pointer;
       }

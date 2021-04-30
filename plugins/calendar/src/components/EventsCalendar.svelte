@@ -13,23 +13,26 @@
 // limitations under the License.
 -->
 <script type="ts">
+  import { getContext } from 'svelte'
+
+  import type { Platform } from '@anticrm/platform'
   import type { Space } from '@anticrm/domains'
-  import { liveQuery } from '@anticrm/presentation'
+  import type { Class, Doc, Ref } from '@anticrm/core'
+  import presentation, { liveQuery, getCoreService } from '@anticrm/presentation'
+  import ui, { AnyComponent } from '@anticrm/platform-ui'
 
   import type { CalendarEvent } from '..'
+  import type { EventCoordinates } from './EventCoordinates'
+  import EventPresenter from './EventPresenter.svelte'
   import calendar from '..'
 
   import MonthCalendar from '@anticrm/sparkling-controls/src/calendar/MonthCalendar.svelte'
+  import Spinner from '@anticrm/platform-ui/src/components/internal/Spinner.svelte'
+  import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
+  import { QueryUpdater } from '@anticrm/platform-core'
 
+  export let _class: Ref<Class<Doc>>
   export let space: Space
-
-  interface EventCoordinates {
-    gridColumnStart: number
-    gridColumnEnd: number
-    gridRowStart: number
-    gridRowEnd: number
-    displayLayer: number
-  }
 
   function getDate (date: Date | string) {
     if (typeof date === 'string') {
@@ -46,6 +49,8 @@
     )
   }
 
+  const coreService = getCoreService()
+
   let events: CalendarEvent[] = []
   let visibleEvents: CalendarEvent[] = []
   const eventCoordinatesMap = new Map<string, EventCoordinates>()
@@ -53,7 +58,29 @@
   let firstDayOfCurrentMonth: Date
   let displayedWeeksCount: number
 
-  $: query = liveQuery(query, calendar.class.CalendarEvent, { _space: space._id }, (docs) => {
+  let presenter: AnyComponent
+
+  const platform = getContext('platform') as Platform
+
+  $: component = presenter ? platform.getResource(presenter) : null
+
+  $: {
+    coreService.then((cs) => {
+      const model = cs.getModel()
+      const typeClass = model.get(_class) as Class<Doc>
+      if (!model.isMixedIn(typeClass, presentation.mixin.Presenter)) {
+        console.log(new Error(`no presenter for type '${_class}'`))
+        // Use string presenter
+        presenter = calendar.component.EventPresenter
+      } else {
+        presenter = model.as(typeClass, presentation.mixin.Presenter).presenter
+      }
+    })
+  }
+
+  let query: Promise<QueryUpdater<CalendarEvent>>
+
+  $: query = liveQuery<CalendarEvent>(query, calendar.class.CalendarEvent, { _space: space._id }, (docs) => {
     events = docs
   })
 
@@ -93,40 +120,25 @@
       processedEvents.push(event)
     })
   }
+  function getEventCoordinate (id: string): number {
+    return eventCoordinatesMap.get(id)!.displayLayer
+  }
 </script>
 
-<!--TODO 
-  1. Display events that do not fit in one week
-  2. Display user name
-  3. Support events delete
-  4. Display popup for events with displayLayer > 5
--->
 <MonthCalendar mondayStart={true} cellHeight={125} bind:firstDayOfCurrentMonth bind:displayedWeeksCount>
   {#each visibleEvents as e}
-    {#if eventCoordinatesMap.has(e._id) && eventCoordinatesMap.get(e._id).displayLayer <= 5}
-      <div
-        style={`
-        grid-column-start: ${eventCoordinatesMap.get(e._id).gridColumnStart}; 
-        grid-column-end: ${eventCoordinatesMap.get(e._id).gridColumnEnd};
-        grid-row-start: ${eventCoordinatesMap.get(e._id).gridRowStart};
-        grid-row-end: ${eventCoordinatesMap.get(e._id).gridRowEnd};
-        margin-top: ${21 * (eventCoordinatesMap.get(e._id).displayLayer || 1)}px;
-      `}>
-        <div class="event">
-          {e.summary}
-        </div>
-      </div>
+    {#if eventCoordinatesMap.has(e._id) && getEventCoordinate(e._id) <= 5}
+      {#if component}
+        {#await component}
+          <Spinner />
+        {:then ctor}
+          <svelte:component this={ctor} event={e} coordinates={eventCoordinatesMap.get(e._id)} />
+        {:catch err}
+          <Icon icon={ui.icon.Error} size="32" />
+        {/await}
+      {:else}
+        <EventPresenter event={e} coordinates={eventCoordinatesMap.get(e._id)} />
+      {/if}
     {/if}
   {/each}
 </MonthCalendar>
-
-<style lang="scss">
-  .event {
-    height: 20px;
-    width: 100%;
-    color: var(--theme-content-dark-color);
-    background-color: #4396a2;
-    text-align: center;
-    border-radius: 3px;
-  }
-</style>

@@ -1,6 +1,6 @@
 <script lang="ts">
-  export const text = ''
-  export const color = ''
+  export let text = ''
+  export let color = ''
 </script>
 
 <div class="status" style="background-color: {color};">{text}</div>
@@ -14,8 +14,8 @@
     line-height: 11px;
     font-weight: 500;
     padding: 0px 4px;
-    background-color: var(--status-green-color);
+    background-color: var(--theme-status-green-color);
     border-radius: 2px;
-    color: var(--white-color);
+    color: var(--theme-white-color);
   }
 </style>

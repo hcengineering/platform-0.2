@@ -6,7 +6,7 @@
   import type { Task } from '@anticrm/task'
   import { Doc } from '@anticrm/core'
   import { AnyComponent } from '@anticrm/platform-ui'
-  import Component from '../../../../../platform-ui/src/components/Component.svelte'
+  import Component from '@anticrm/platform-ui/src/components/Component.svelte'
 
   export let doc: Doc
   export let duplicate = false
@@ -94,30 +94,32 @@
 <style lang="scss">
   .card-view {
     max-width: 300px;
-    background-color: var(--theme-bg-color);
-    border: 1px solid var(--theme-bg-color);
     border-radius: 4px;
     display: flex;
     flex-direction: column;
+    background-color: var(--theme-bg-color);
+    border: 1px solid var(--theme-bg-color);
     transition: border-color 0.3s ease-in, box-shadow 0.3s ease-in;
   }
 
   .place-box {
     position: relative;
-    border: 1px dashed var(--theme-bg-dark-color);
+    border: dashed 1px transparent;
+    margin-bottom: 2px;
+    border-color: var(--theme-bg-dark-color);
   }
 
   .drag {
+    position: fixed;
     border-color: var(--theme-bg-dark-color);
     box-shadow: var(--theme-shadow);
-    position: fixed;
     z-index: 1000;
   }
 
   .duplicate {
     padding-top: 1em;
-    border-color: var(--theme-bg-dark-color);
     opacity: 0.9;
+    border-color: var(--theme-bg-dark-color);
     z-index: 900;
   }
 </style>

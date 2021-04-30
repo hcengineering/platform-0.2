@@ -11,7 +11,7 @@ limitations under the License.
 -->
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
-  import type { DateProperty, Ref, StringProperty } from '@anticrm/core'
+  import type { DateProperty, DocumentValue, Ref, StringProperty } from '@anticrm/core'
   import { generateId } from '@anticrm/core'
   import type { Space } from '@anticrm/domains'
   import { getCoreService } from '@anticrm/presentation'
@@ -19,6 +19,8 @@ limitations under the License.
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
   import EditBox from '@anticrm/sparkling-controls/src/EditBox.svelte'
   import DateInput from '@anticrm/sparkling-controls/src/DateInput.svelte'
+  import UserBox from '@anticrm/platform-ui/src/components/UserBox.svelte'
+  import type { User } from '@anticrm/contact'
   import type { CalendarEvent } from '..'
   import calendar from '..'
 
@@ -27,10 +29,11 @@ limitations under the License.
   const dispatch = createEventDispatcher()
 
   let space: Space | undefined = spaces[0]
+  let selectedUserIndex = 0
 
   const newEvent: CalendarEvent = {
     _id: generateId(),
-    _space: space?._id as Ref<Space>,
+    _space: space?._id,
     _class: calendar.class.CalendarEvent,
     _createdBy: '' as StringProperty,
     _createdOn: Date.now() as DateProperty,
@@ -55,16 +58,29 @@ limitations under the License.
     return eventEnd
   }
 
+  function getUsers () {
+    if (!space || !space.users) {
+      return []
+    }
+    return space.users.map((user, index) => {
+      return {
+        id: index,
+        name: user.userId
+      }
+    })
+  }
+
   async function save () {
     const core = await coreService
-    const doc = {
+    const doc: DocumentValue<CalendarEvent> = {
       ...newEvent,
       startDate: getAllDayEventStart(newEvent.startDate),
       endDate: getAllDayEventEnd(newEvent.endDate),
-      _space: space?._id,
-      _createBy: core.getUserId()
+      _space: (space?._id ?? '') as Ref<Space>,
+      _createdBy: core.getUserId() as StringProperty,
+      participants: [core.getUserId() as Ref<User>]
     }
-    await core.create(calendar.class.CalendarEvent, doc)
+    await core.create<CalendarEvent>(calendar.class.CalendarEvent, doc)
     dispatch('close')
   }
 </script>
@@ -75,6 +91,7 @@ limitations under the License.
       <SpaceBox label="Vacancy" {spaces} bind:space />
     {/if}
     <EditBox bind:value={newEvent.summary} label="Summary" placeholder="Summary" />
+    <UserBox bind:selected={selectedUserIndex} items={getUsers()} title="Participant" />
     <DateInput bind:value={newEvent.startDate} label="Start date" placeholder="Start date" relativeToParent={true} />
     <DateInput bind:value={newEvent.endDate} label="End date" placeholder="End date" relativeToParent={true} />
   </div>
@@ -89,11 +106,13 @@ limitations under the License.
     min-width: 450px;
     padding: 25px;
   }
+
   .form {
     display: grid;
     grid-template-columns: auto;
     grid-gap: 10px;
   }
+
   .footer {
     display: grid;
     grid-template-columns: repeat(2, auto);

@@ -22,38 +22,38 @@ import { AnyComponent } from '@anticrm/platform-ui'
 import { WorkbenchApplication } from '@anticrm/workbench'
 
 export enum RecurrenceType {
-    Daily,
-    Weekly,
-    Monthly,
-    Yearly
+  Daily,
+  Weekly,
+  Monthly,
+  Yearly
 }
 
 export interface RecurrenceProperty extends Emb {
-    type: RecurrenceType
-    interval: number
-    startDate: Date
-    endDate?: Date
+  type: RecurrenceType
+  interval: number
+  startDate: Date
+  endDate?: Date
 }
 
 export interface Calendar extends VDoc {
-    name: string
+  name: string
 
-    participants: Ref<User>[]
+  participants: Array<Ref<User>>
 }
 
 /*
  * Define a calendar event object.
  */
 export interface CalendarEvent extends VDoc {
-    summary: string
+  summary: string
 
-    participants: Ref<User>[]
+  participants: Array<Ref<User>>
 
-    startDate: Date
+  startDate: Date
 
-    endDate?: Date
+  endDate?: Date
 
-    recurrence?: RecurrenceProperty
+  recurrence?: RecurrenceProperty
 }
 
 export interface CalendarService extends Service {
@@ -70,7 +70,8 @@ export default plugin('Calendar' as Plugin<CalendarService>, {}, {
   },
   component: {
     NewEventForm: '' as AnyComponent,
-    EventsCalendar: '' as AnyComponent
+    EventsCalendar: '' as AnyComponent,
+    EventPresenter: '' as AnyComponent
   },
   application: {
     Calendar: '' as Ref<WorkbenchApplication>

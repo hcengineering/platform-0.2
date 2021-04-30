@@ -52,7 +52,6 @@
       padding-top: 9px;
       width: 34px;
       height: 34px;
-      font-family: var(--theme-font-content);
       text-align: center;
       font-weight: 500;
       color: #32302e;
@@ -71,7 +70,7 @@
       }
     }
     .holy {
-      color: var(--status-maroon-color);
+      color: var(--theme-status-maroon-color);
     }
 
     .details {
@@ -80,8 +79,8 @@
       position: relative;
       font-size: 11px;
       font-weight: 500;
-      color: var(--theme-content-color);
       text-transform: uppercase;
+      color: var(--theme-dark-content-color);
       &::before {
         position: absolute;
         content: '';

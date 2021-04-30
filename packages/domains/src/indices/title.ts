@@ -13,12 +13,10 @@
 // limitations under the License.
 //
 
+import { Class, Doc, DomainIndex, generateId, Model, Ref, Storage, Tx, TxContext } from '@anticrm/core'
 import {
-  AnyLayout, Class, Doc, DomainIndex, generateId, mixinKey, Model, Ref, Storage, Tx, TxContext
-} from '@anticrm/core'
-import {
-  CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_PUSH_TX, CORE_CLASS_TITLE, CORE_CLASS_UPDATE_TX,
-  CORE_MIXIN_SHORTID, CreateTx, DeleteTx, Title, TitleSource, UpdateTx
+  CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_TITLE, CORE_CLASS_TX_OPERATION, CORE_CLASS_UPDATE_TX, CORE_MIXIN_SHORTID, CreateTx,
+  DeleteTx, Title, TitleSource, TxOperationKind, UpdateTx
 } from '..'
 
 const NULL = '<null>'
@@ -33,41 +31,37 @@ export class TitleIndex implements DomainIndex {
     this.storage = storage
   }
 
-  private getPrimary (_class: Ref<Class<Doc>>): string | null {
+  private getPrimary (_class: Ref<Class<Doc>>): string | undefined {
     const cached = this.primaries.get(_class)
-    if (cached) return cached === NULL ? null : cached
+    if (cached !== undefined) return cached === NULL ? undefined : cached
 
     const primary = this.modelDb.getPrimaryKey(_class)
-    if (primary) {
-      console.log(`primary code for class ${_class}: ${primary}`)
+    if (primary !== undefined) {
       this.primaries.set(_class, primary)
       return primary
     }
     this.primaries.set(_class, NULL)
-    return null
+    return undefined
   }
 
   async tx (ctx: TxContext, tx: Tx): Promise<any> {
     switch (tx._class) {
       case CORE_CLASS_CREATE_TX:
-        return this.onCreate(ctx, tx as CreateTx)
+        return await this.onCreate(ctx, tx as CreateTx)
       case CORE_CLASS_UPDATE_TX:
-        return this.onUpdate(ctx, tx as UpdateTx)
-      case CORE_CLASS_PUSH_TX:
-        // primary is not an array, so no opeation is required.
-        return Promise.resolve()
+        return await this.onUpdate(ctx, tx as UpdateTx)
       case CORE_CLASS_DELETE_TX:
-        return this.onDelete(ctx, tx as DeleteTx)
+        return await this.onDelete(ctx, tx as DeleteTx)
       default:
         console.log('not implemented title tx', tx)
     }
   }
 
   async onCreate (ctx: TxContext, create: CreateTx): Promise<any> {
-    await this.updateShortIdRef(ctx, create._objectClass, create._objectId, create.object)
+    await this.updateShortIdRef(ctx, this.modelDb.createDocument(create._objectClass, create.object, create._objectId))
 
     const primary = this.getPrimary(create._objectClass)
-    if (!primary) {
+    if (primary === undefined) {
       return
     }
 
@@ -82,23 +76,22 @@ export class TitleIndex implements DomainIndex {
       title
     }
 
-    return this.storage.store(ctx, doc)
+    return await this.storage.store(ctx, doc)
   }
 
   private getPrimaryID (_id: Ref<Doc>): Ref<Doc> {
     return ('primary:' + _id) as Ref<Doc>
   }
 
-  private async updateShortIdRef (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, object: AnyLayout): Promise<void> {
-    const shortIdKey = mixinKey(CORE_MIXIN_SHORTID, 'shortId')
-    const keys = Object.keys(object as any || {})
-    if (keys.indexOf(shortIdKey) === -1) {
-      return
+  private async updateShortIdRef (ctx: TxContext, obj: Doc): Promise<void> {
+    if (!this.modelDb.isMixedIn(obj, CORE_MIXIN_SHORTID)) {
+      return await Promise.resolve()
     }
-    const shortId = (object as any)[shortIdKey] || undefined
-    if (shortId) {
+    const object = this.modelDb.as(obj, CORE_MIXIN_SHORTID)
+    const shortId = object.shortId
+    if (shortId !== undefined) {
       // Find short Ids, and if we already had one do not create duplicate
-      const docs = await this.storage.find(CORE_CLASS_TITLE, { _objectId: _id, _objectClass: _class })
+      const docs = await this.storage.find(CORE_CLASS_TITLE, { _objectId: obj._id, _objectClass: obj._class })
       for (const d of docs) {
         if (d.title === shortId) {
           // Duplicate found, do not create a new one.
@@ -108,8 +101,8 @@ export class TitleIndex implements DomainIndex {
       const doc: Title = {
         _class: CORE_CLASS_TITLE,
         _id: generateId() as Ref<Title>,
-        _objectClass: _class,
-        _objectId: _id,
+        _objectClass: obj._class,
+        _objectId: obj._id,
         title: shortId,
         source: TitleSource.ShortId
       }
@@ -118,23 +111,25 @@ export class TitleIndex implements DomainIndex {
   }
 
   async onUpdate (ctx: TxContext, update: UpdateTx): Promise<any> {
-    await this.updateShortIdRef(ctx, update._objectClass, update._objectId, update._attributes)
-
     const primary = this.getPrimary(update._objectClass)
-    if (!primary) {
+    if (primary === undefined) {
       return
     }
 
-    let updated = false
-    for (const key in update._attributes) {
-      if (key === primary) {
-        updated = true
-        break
-      }
-    }
-    if (updated) {
+    const obj = await this.storage.findOne(update._objectClass, { _id: update._objectId }) as Doc
+
+    const previousPrimary = (obj as any)[primary]
+    this.modelDb.updateDocument(this.modelDb.as(obj, update._objectClass), update.operations)
+    await this.updateShortIdRef(ctx, obj)
+    const newPrimary = (obj as any)[primary]
+
+    if (previousPrimary !== primary) {
       // Update a current primary title Title object, since it is address by _objectId
-      return this.storage.update(ctx, CORE_CLASS_TITLE, this.getPrimaryID(update._objectId), null, { title: update._attributes[primary] })
+      return await this.storage.update(ctx, CORE_CLASS_TITLE, this.getPrimaryID(update._objectId), [{
+        _class: CORE_CLASS_TX_OPERATION,
+        kind: TxOperationKind.Set,
+        _attributes: { title: newPrimary }
+      }])
     }
   }
 
@@ -144,6 +139,6 @@ export class TitleIndex implements DomainIndex {
       _objectId: deleteTx._objectId,
       _objectClass: deleteTx._objectClass
     })
-    return Promise.all(docs.map(d => this.storage.remove(ctx, CORE_CLASS_TITLE, d._id, null)))
+    return await Promise.all(docs.map(async d => { await this.storage.remove(ctx, CORE_CLASS_TITLE, d._id) }))
   }
 }

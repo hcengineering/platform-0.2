@@ -27,12 +27,13 @@
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
 
   import CreateSpace from './CreateSpace.svelte'
+  import { CoreService } from '@anticrm/platform-core'
 
   export let application: WorkbenchApplication
 
   const dispatch = createEventDispatcher()
 
-  const coreService = getCoreService()
+  const coreService: Promise<CoreService> = getCoreService()
   const uiService = getUIService()
 
   let spaces: Space[] = []
@@ -43,13 +44,17 @@
   createLiveQuery(CORE_CLASS_SPACE, {}, (docs) => {
     spaces = docs
   })
+  function isOwner (s: Space, currentUser: string): boolean {
+    const u = getCurrentUserSpace(curentUser, s)
+    return u !== undefined && u.owner
+  }
 </script>
 
 <div class="space-browse-view">
   <div class="header">
     <div class="caption-1">Навигатор пространств</div>
     <a href="/" on:click|preventDefault={() => dispatch('close')}>
-      <Icon icon={workbench.icon.Close} button="true" />
+      <Icon icon={workbench.icon.Close} button={true} />
     </a>
   </div>
 
@@ -60,12 +65,12 @@
         on:click={() => {
           uiService.showModal(CreateSpace, { application })
         }}>
-        <Icon icon={workbench.icon.Add} button="true" />
+        <Icon icon={workbench.icon.Add} button={true} />
         <span style="padding-left:.5em">Новое пространство</span>
       </Button>
     </div>
     <div class="separator" />
-    <ScrollView height="165px">
+    <ScrollView height="100%">
       {#each spaces as s (s._id)}
         <div class="space" on:mouseover={() => (hoverSpace = s._id)}>
           <div class="info">
@@ -79,7 +84,7 @@
           <div class="actions">
             {#if hoverSpace === s._id}
               {#if getCurrentUserSpace(curentUser, s)}
-                {#if s.isPublic || !getCurrentUserSpace(curentUser, s).owner}
+                {#if s.isPublic || !isOwner(s, curentUser)}
                   <Button width="100px" on:click={() => leaveSpace(coreService, s)}>Leave</Button>
                 {:else}
                   <Button width="100px" on:click={() => archivedSpaceUpdate(coreService, s, !s.archived)}>
@@ -99,29 +104,25 @@
 
 <style lang="scss">
   .space-browse-view {
-    width: 412px;
     padding: 24px;
     position: relative;
-
     .header {
       display: flex;
       justify-content: space-between;
       margin-bottom: 20px;
     }
-
     .separator {
       margin-top: 20px;
       margin-bottom: 4px;
       height: 1px;
       background-color: var(--theme-bg-accent-hover);
     }
-
     .content {
-      // width: 100%;
-      height: 100%;
+      width: 600px;
+      height: 500px;
+      //height: 100%;
       display: flex;
       flex-direction: column;
-
       .space {
         display: flex;
         flex-direction: row;
@@ -129,12 +130,14 @@
         padding: 8px 8px;
         border-radius: 4px;
         color: var(--theme-content-color);
-
+        &:hover {
+          color: var(--theme-doclink-color);
+          background-color: var(--theme-bg-accent-hover);
+        }
         .info {
           flex-grow: 1;
           font-size: 11px;
           color: var(--theme-content-color);
-
           .caption-2 {
             margin-bottom: 4px;
             font-size: 14px;
@@ -142,20 +145,13 @@
             color: var(--theme-userlink-color);
           }
         }
-
         .actions {
           display: flex;
           align-items: center;
         }
-
         &:first-child {
           margin-top: 0px;
         }
-      }
-
-      .space:hover {
-        color: var(--theme-doclink-color);
-        background-color: var(--theme-bg-accent-hover);
       }
     }
   }

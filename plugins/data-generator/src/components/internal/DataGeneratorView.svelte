@@ -13,7 +13,7 @@
 // limitations under the License.
 -->
 <script type="ts">
-  import type { NumberProperty, Property, Ref, StringProperty } from '@anticrm/core'
+  import type { DateProperty, DocumentValue, Ref, StringProperty } from '@anticrm/core'
   import type { Application, Space } from '@anticrm/domains'
   import { CORE_CLASS_SPACE, CORE_MIXIN_SHORTID } from '@anticrm/domains'
 
@@ -22,9 +22,7 @@
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
   import EditBox from '@anticrm/sparkling-controls/src/EditBox.svelte'
   import ComboBox from '@anticrm/platform-ui/src/components/ComboBox.svelte'
-  import task, { TaskStatus } from '@anticrm/task'
-  import type { Comment } from '@anticrm/chunter'
-  import chunter from '@anticrm/chunter'
+  import task, { Task, TaskStatus } from '@anticrm/task'
   import type { Action } from '@anticrm/platform-ui'
 
   import faker from 'faker'
@@ -33,7 +31,7 @@
   let taskSpace: Space | undefined
   let spaces: Space[] = []
 
-  $: lq = liveQuery(lq, CORE_CLASS_SPACE, {}, (docs) => {
+  $: lq = liveQuery<Space>(lq, CORE_CLASS_SPACE, {}, (docs) => {
     spaces = docs
   })
 
@@ -70,19 +68,21 @@
     const cs = await coreService
     for (let i = 0; i < taskCount; i++) {
       const modelDb = cs.getModel()
-      const newTask = modelDb.newDoc(task.class.Task, cs.generateId(), {
-        title: faker.commerce.productName() as StringProperty,
-        _space: taskSpace._id,
-        status: randomEnum(TaskStatus) as NumberProperty,
+      const newTask = modelDb.createDocument<Task>(task.class.Task, {
+        title: (faker as any).commerce.productName() as StringProperty,
+        _space: taskSpace._id as Ref<Space>,
+        status: randomEnum(TaskStatus),
+        _createdOn: Date.now() as DateProperty,
+        _createdBy: cs.getUserId() as StringProperty,
         comments: [
           {
-            message: faker.commerce.productDescription(),
-            _class: chunter.class.Comment,
-            _createdOn: Date.now() as Property<number, Date>,
-            _createdBy: cs.getUserId() as Property<string, string>
-          } as Comment
+            message: (faker as any).commerce.productDescription() as string,
+            _createdOn: Date.now() as DateProperty,
+            _createdBy: cs.getUserId() as StringProperty
+          }
         ]
-      })
+      } as DocumentValue<Task>)
+
       try {
         const asShortId = modelDb.cast(newTask, CORE_MIXIN_SHORTID)
         asShortId.shortId = await cs.genRefId(taskSpace._id as Ref<Space>)
@@ -90,7 +90,6 @@
         // Ignore
         console.log(e)
       }
-      console.log('NEW TASK', newTask)
 
       await cs.create(task.class.Task, newTask)
     }
@@ -101,9 +100,9 @@
     if (!taskSpace) {
       return
     }
-    const tasks = await cs.find(task.class.Task, { _space: taskSpace._id })
+    const tasks = await cs.find<Task>(task.class.Task, { _space: taskSpace._id as Ref<Space> })
     for (const t of tasks) {
-      await cs.remove(t, null)
+      await cs.remove(t)
     }
   }
 
@@ -166,9 +165,9 @@
       width: 100%;
       height: 5em;
       padding: 2em;
-      border-bottom: 1px solid var(--theme-bg-accent-color);
       display: flex;
       align-items: center;
+      border-bottom: 1px solid var(--theme-bg-accent-color);
     }
   }
 </style>

@@ -21,8 +21,8 @@
   setContext(CONTEXT_PLATFORM, platform)
   setContext(CONTEXT_PLATFORM_UI, ui)
 
-  const defaultApp = platform.getMetadata(uiPlugin.metadata.DefaultApplication) || ''
-  const authMeta = platform.getMetadata(uiPlugin.metadata.LoginApplication) || ''
+  const defaultApp = platform.getMetadata(uiPlugin.metadata.DefaultApplication) ?? ''
+  const authMeta = platform.getMetadata(uiPlugin.metadata.LoginApplication) ?? ''
   const authApp = platform.getMetadata(routeMeta(authMeta))
 
   let authenticationRequired = false
@@ -53,7 +53,7 @@
         currentAppErr = `There is no application route defined for ${appRoute}`
       }
     },
-    { application: '#default' }
+    { application: platform.getMetadata(routeMeta(defaultApp))?.route || '#default' }
   )
 
   const status: Status = { severity: Severity.OK, code: 0, message: '' }
@@ -91,7 +91,7 @@
       </div>
     </div>
     <div class="app">
-      {#if authenticationRequired}
+      {#if authenticationRequired && authApp}
         <Component is={authApp.component} props={{}} />
       {:else if currentApp}
         <Component is={currentApp.component} props={{}} />
@@ -116,11 +116,9 @@
     height: 100vh;
 
     .status-bar {
-      background-color: var(--theme-bg-color);
-      color: var(--theme-content-color);
       height: $status-bar-height;
       line-height: $status-bar-height;
-      border-bottom: 1px solid var(--theme-bg-accent-color);
+      border-bottom: 1px solid var(--theme-bg-color);
 
       .container {
         display: flex;
@@ -128,13 +126,8 @@
         .logo {
           width: $pictogram-size;
           text-align: center;
-          /*padding-left: 1em;*/
-          /*padding-right: 1em;*/
-
           font-size: 1.25em;
           font-weight: 700;
-
-          border-right: 1px solid var(--theme-bg-accent-color);
         }
 
         .status-messages {
@@ -146,15 +139,7 @@
           display: flex;
           flex-direction: row-reverse;
 
-          // .widget {
-          //   border-left: 1px solid var(--theme-bg-accent-color);
-          //   padding-right: 1em;
-          //   padding-left: 1em;
-          //   font-weight: 700;
-          // }
-
           .widget {
-            border-left: 1px solid var(--theme-bg-accent-color);
             padding-right: 1em;
             padding-left: 1em;
             font-weight: 700;
@@ -170,7 +155,6 @@
 
     .app {
       height: calc(100vh - #{$status-bar-height});
-      background-color: var(--theme-bg-color);
     }
   }
 </style>

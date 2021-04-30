@@ -49,6 +49,6 @@ const activityPlugin = plugin(
 
 export default activityPlugin
 
-export function getChunterService (): Promise<ActivityService> {
-  return getPlatform().getPlugin(activityPlugin.id)
+export async function getChunterService (): Promise<ActivityService> {
+  return await getPlatform().getPlugin(activityPlugin.id)
 }

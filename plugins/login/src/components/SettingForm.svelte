@@ -19,7 +19,7 @@
   import login from '..'
   import CheckBox from '@anticrm/sparkling-controls/src/CheckBox.svelte'
   import type { ApplicationRoute, ApplicationRouter } from '@anticrm/platform-ui'
-  import twofactor from 'node-2fa'
+  const twofactor = require('node-2fa') // eslint-disable-line
   import type { Options } from 'node-2fa/dist/interfaces'
 
   export let router: ApplicationRouter<ApplicationRoute>
@@ -33,19 +33,18 @@
   let secondFactorInitEnabled = false
   let secondFactorEnabled = false
   let secondFactorCurrentEnabled = false
-  let newSecret:
-    | {
-        secret: string
-        uri: string
-        qr: string
-      }
-    | false
+  type SV = {
+    secret: string
+    uri: string
+    qr: string
+  }
+  let newSecret: SV | false
   let src: string
 
   $: secondFactorCurrentEnabled = secondFactorEnabled && !secondFactorInitEnabled
   $: newSecret = secondFactorCurrentEnabled && twofactor.generateSecret({ name: 'Anticrm' } as Options)
-  $: src = newSecret.qr
-  $: object.clientSecret = newSecret.secret
+  $: src = (newSecret as SV).qr
+  $: object.clientSecret = (newSecret as SV).secret
 
   const secondFactorCheck = loginService.then((ls) => {
     ls.getLoginInfo().then((li) => {
@@ -55,7 +54,8 @@
   })
 
   function navigateLoginForm (): Promise<void> {
-    return Promise.resolve(router.navigate({ route: '' }))
+    router.navigate({ route: '' })
+    return Promise.resolve()
   }
 
   let description: string
@@ -174,8 +174,8 @@
     margin-top: 3vh;
     width: 30em;
     padding: 1em;
-    border: 1px solid var(--theme-bg-accent-color);
     border-radius: 1em;
+    border: 1px solid var(--theme-bg-accent-color);
 
     .status {
       margin-top: 0.5em;

@@ -15,8 +15,8 @@
 <script lang="ts">
   export let width = '100%'
   export let label = ''
-  export let value = ''
-  export let placeholder: string
+  export let value: string | number = ''
+  export let placeholder = ''
   export let id: string | undefined = undefined
   export let hoverState = false
 
@@ -28,7 +28,7 @@
   class:editbox-label={label !== ''}
   class:editbox-hoverState={hoverState}
   style="width: {width}"
-  on:click={input.focus()}>
+  on:click={() => input.focus()}>
   {#if label !== ''}
     <div class="wLabel">
       <div class="label">{label}</div>
@@ -44,36 +44,35 @@
     border: none;
     width: calc(100% - 2px);
     padding: 0;
-    color: var(--theme-content-color);
     background-color: transparent;
     font: inherit;
-
+    color: var(--theme-content-color);
     &:focus {
       outline: none;
     }
   }
 
   .editbox {
-    border: 1px solid var(--theme-bg-dark-color);
-    border-radius: 4px;
+    border: solid 1px transparent;
+    border-radius: 12px;
     padding: 8px 16px;
-    background-color: var(--theme-bg-accent-color);
     box-sizing: border-box;
+    font-size: 15px;
+    font-weight: 400;
+    border-color: var(--theme-bg-accent-color);
+    background-color: var(--theme-bg-accent-color);
     color: var(--theme-content-color);
     transition: border-color 0.2s, color 0.2s, background-color 0.2s;
-
     &:focus-within {
       outline: none;
       background-color: var(--theme-bg-accent-hover);
       border-color: var(--theme-bg-dark-hover);
       color: var(--theme-content-color);
     }
-
     &-label {
       height: 54px;
       padding: 6px 16px 4px;
     }
-
     &-hoverState {
       background-color: var(--theme-bg-accent-hover);
       border-color: var(--theme-bg-dark-hover);
@@ -85,12 +84,13 @@
     width: 100%;
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
   }
 
   .label {
-    color: var(--theme-content-color);
     font-size: 11px;
     font-weight: 400;
     margin: 2px 0 6px;
+    color: var(--theme-content-color);
   }
 </style>

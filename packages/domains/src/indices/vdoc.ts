@@ -13,10 +13,11 @@
 // limitations under the License.
 //
 
-import { Model, Storage, TxContext, DomainIndex, Tx } from '@anticrm/core'
+import { DomainIndex, Model, Ref, Storage, Tx, TxContext } from '@anticrm/core'
 import {
-  CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_PUSH_TX, CORE_CLASS_UPDATE_TX, CORE_CLASS_VDOC, CreateTx,
-  DeleteTx, PushTx, UpdateTx
+  CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_TX_OPERATION, CORE_CLASS_UPDATE_TX, CORE_CLASS_VDOC, CreateTx, DeleteTx, Space,
+  TxOperation,
+  TxOperationKind, UpdateTx, VDoc
 } from '..'
 
 export class VDocIndex implements DomainIndex {
@@ -33,13 +34,11 @@ export class VDocIndex implements DomainIndex {
   async tx (ctx: TxContext, tx: Tx): Promise<any> {
     switch (tx._class) {
       case CORE_CLASS_CREATE_TX:
-        return this.onCreate(ctx, tx as CreateTx)
+        return await this.onCreate(ctx, tx as CreateTx)
       case CORE_CLASS_UPDATE_TX:
-        return this.onUpdate(ctx, tx as UpdateTx)
-      case CORE_CLASS_PUSH_TX:
-        return this.onPush(ctx, tx as PushTx)
+        return await this.onUpdate(ctx, tx as UpdateTx)
       case CORE_CLASS_DELETE_TX:
-        return this.onDelete(ctx, tx as PushTx)
+        return await this.onDelete(ctx, tx as DeleteTx)
       default:
         console.log('not implemented tx', tx)
     }
@@ -47,62 +46,65 @@ export class VDocIndex implements DomainIndex {
 
   async onCreate (ctx: TxContext, tx: CreateTx): Promise<any> {
     if (!this.modelDb.is(tx._objectClass, CORE_CLASS_VDOC)) {
-      return Promise.resolve()
+      return await Promise.resolve()
     }
+    const doc = this.modelDb.createDocument(tx._objectClass, tx.object, tx._objectId)
     // we need to update vdoc properties.
-    if (this.transient) {
-      const vdoc = tx.object
+    if (this.transient !== undefined) {
+      const vdoc = doc as VDoc
       vdoc._createdBy = tx._user
       vdoc._createdOn = tx._date
     }
-
-    return Promise.all([
-      this.storage.store(ctx, this.modelDb.newDoc(tx._objectClass, tx._objectId, tx.object)),
-      this.transient && this.transient.update(ctx, tx._objectClass, tx._objectId, null, {
+    if (this.modelDb.is(doc._class, CORE_CLASS_VDOC)) {
+      const _space = tx._objectSpace as Ref<Space>
+      if (_space === undefined) {
+        return await Promise.reject(new Error('VDoc instances should have _space attribute specified'))
+      }
+      (doc as VDoc)._space = _space
+    }
+    const txOp = {
+      _class: CORE_CLASS_TX_OPERATION,
+      kind: TxOperationKind.Set,
+      _attributes: {
         _createdOn: tx._date,
         _createdBy: tx._user
-      })
-    ])
-  }
-
-  onPush (ctx: TxContext, tx: PushTx): Promise<any> {
-    if (!this.modelDb.is(tx._objectClass, CORE_CLASS_VDOC)) {
-      return Promise.resolve()
+      }
     }
-    // We need to perform two operations, this may cause performance.
-    return Promise.all([
-      this.storage.push(ctx, tx._objectClass, tx._objectId, null, tx._attribute, tx._attributes),
-      this.transient && this.transient.update(ctx, tx._objectClass, tx._objectId, null, {
-        _modifiedOn: tx._date,
-        _modifiedBy: tx._user
-      })
+
+    return await Promise.all([
+      this.storage.store(ctx, doc),
+      this.transient?.update(ctx, tx._objectClass, tx._objectId, [txOp]) ?? Promise.resolve()
     ])
   }
 
-  onUpdate (ctx: TxContext, tx: UpdateTx): Promise<any> {
+  async onUpdate (ctx: TxContext, tx: UpdateTx): Promise<any> {
     if (!this.modelDb.is(tx._objectClass, CORE_CLASS_VDOC)) {
-      return Promise.resolve()
+      return await Promise.resolve()
+    }
+    const ops: TxOperation[] = [...tx.operations]
+    const op = {
+      _class: CORE_CLASS_TX_OPERATION,
+      kind: TxOperationKind.Set,
+      _attributes: {
+        _modifiedBy: tx._user,
+        _modifiedOn: tx._date
+      }
     }
     // Be sure we update modification fields.
-    if (this.transient) {
-      const vdoc = tx._attributes
-      vdoc._modifiedBy = tx._user
-      vdoc._modifiedOn = tx._date
+    if (this.transient !== undefined) {
+      ops.push(op)
     }
 
-    return Promise.all([
-      this.storage.update(ctx, tx._objectClass, tx._objectId, null, tx._attributes),
-      this.transient && this.transient.update(ctx, tx._objectClass, tx._objectId, null, {
-        _modifiedOn: tx._date,
-        _modifiedBy: tx._user
-      })
+    await Promise.all([
+      this.storage.update(ctx, tx._objectClass, tx._objectId, ops),
+      this.transient?.update(ctx, tx._objectClass, tx._objectId, [op]) ?? Promise.resolve()
     ])
   }
 
-  onDelete (ctx: TxContext, tx: DeleteTx): Promise<any> {
+  async onDelete (ctx: TxContext, tx: DeleteTx): Promise<any> {
     if (!this.modelDb.is(tx._objectClass, CORE_CLASS_VDOC)) {
-      return Promise.resolve()
+      return await Promise.resolve()
     }
-    return this.storage.remove(ctx, tx._objectClass, tx._objectId, tx._query || null)
+    await this.storage.remove(ctx, tx._objectClass, tx._objectId)
   }
 }

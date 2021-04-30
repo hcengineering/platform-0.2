@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Perspective, WorkbenchApplication } from '../..'
+  import type { Perspective } from '../..'
   // Copyright © 2020 Anticrm Platform Contributors.
   //
   // Licensed under the Eclipse Public License, Version 2.0 (the "License");
@@ -13,13 +13,13 @@
   // See the License for the specific language governing permissions and
   // limitations under the License.
   import workbench from '../..'
-  import { createLiveQuery } from '@anticrm/presentation'
+  import { liveQuery } from '@anticrm/presentation'
 
   import Component from '@anticrm/platform-ui/src/components/Component.svelte'
   import Spotlight from './Spotlight.svelte'
   import type { AnyComponent } from '@anticrm/platform-ui'
   import { getUIService, newRouter } from '@anticrm/platform-ui'
-  import type { Ref } from '@anticrm/core'
+  import { QueryUpdater } from '@anticrm/platform-core'
 
   const uiService = getUIService()
 
@@ -28,13 +28,8 @@
 
   let activePerspective: string
 
-  export interface PerspectiveReference {
+  interface PerspectiveReference {
     perspective: string
-  }
-
-  export interface WorkbenchRouterReference {
-    space: string // A ref of space name
-    app: Ref<WorkbenchApplication>
   }
 
   const router = newRouter<PerspectiveReference>(
@@ -50,7 +45,8 @@
     { perspective: '#none' }
   )
 
-  createLiveQuery(workbench.class.Perspective, {}, (p) => {
+  let plq: Promise<QueryUpdater<Perspective>>
+  $: plq = liveQuery<Perspective>(plq, workbench.class.Perspective, {}, (p) => {
     perspectives = p
     if (perspectives.length > 0) {
       router.setDefaults({ perspective: perspectives[0].name })
@@ -81,7 +77,7 @@
   }
 
   main {
-    background-color: var(--theme-bg-color);
     width: 100%;
+    padding: 20px 20px 20px 0;
   }
 </style>

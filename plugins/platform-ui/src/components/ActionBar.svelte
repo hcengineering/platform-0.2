@@ -85,9 +85,9 @@
     width: 100%;
     text-align: center;
     font-weight: 500;
-    background-color: var(--theme-bg-accent-color);
     border-radius: 4px;
-    color: var(--status-maroon-color);
+    color: var(--theme-status-maroon-color);
+    background-color: var(--theme-bg-accent-color);
   }
 
   .actionButton {
@@ -118,10 +118,9 @@
   }
 
   .toggleState {
-    background-color: var(--theme-bg-dark-color);
     font-weight: bold;
+    background-color: var(--theme-bg-dark-color);
   }
-
   .popup-separator {
     height: 1px;
     background-color: var(--theme-bg-dark-color);
@@ -148,12 +147,12 @@
       display: flex;
       flex-direction: column;
       flex-flow: column nowrap;
-      background-color: var(--theme-bg-accent-color);
-      border: solid 1px var(--theme-bg-dark-color);
       border-radius: 4px;
-      box-shadow: var(--theme-shadow);
       padding: 4px 8px;
       margin: 10px -0.25em 0 -0.25em;
+      background-color: var(--theme-bg-accent-color);
+      border: solid 1px var(--theme-bg-dark-color);
+      box-shadow: var(--theme-shadow);
       z-index: 100000;
 
       .popup-item {
@@ -161,12 +160,11 @@
         padding: 8px;
         width: 100%;
         text-align: left;
-        background-color: var(--theme-bg-accent-color);
         border-radius: 4px;
         border: none;
-        color: var(--theme-content-dark-color);
         cursor: pointer;
-
+        background-color: var(--theme-bg-accent-color);
+        color: var(--theme-content-dark-color);
         &:hover {
           background-color: var(--theme-bg-accent-hover);
         }

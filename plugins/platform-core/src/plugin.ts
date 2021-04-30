@@ -16,16 +16,15 @@
 import { Platform } from '@anticrm/platform'
 import { ModelDb } from './modeldb'
 
-import core from './index'
+import core, { CoreService, QueryResult } from './index'
 
-import { CoreService, QueryResult } from '.'
 import rpcService, { EventType } from './rpc'
 
 import { QueriableStorage } from './queries'
 
 import { Cache } from './cache'
 import {
-  AnyLayout, Class, CoreProtocol, Doc, generateId as genId, MODEL_DOMAIN, Ref, StringProperty, Tx, txContext,
+  Class, CoreProtocol, Doc, DocumentQuery, FindOptions, generateId as genId, MODEL_DOMAIN, Ref, StringProperty, Tx, txContext,
   TxContextSource, TxProcessor
 } from '@anticrm/core'
 import { CORE_CLASS_REFERENCE, CORE_CLASS_SPACE, CORE_CLASS_TITLE, Space, TITLE_DOMAIN, VDoc } from '@anticrm/domains'
@@ -35,7 +34,7 @@ import { createOperations } from './operations'
 import { ModelIndex } from '@anticrm/domains/src/indices/model'
 import { VDocIndex } from '@anticrm/domains/src/indices/vdoc'
 import { TxIndex } from '@anticrm/domains/src/indices/tx'
-import { RPC_CALL_FIND, RPC_CALL_FINDONE, RPC_CALL_GEN_REF_ID, RPC_CALL_LOAD_DOMAIN, RPC_CALL_TX } from '@anticrm/rpc'
+import { RPC_CALL_FIND, RPC_CALL_FINDONE, RPC_CALL_GEN_REF_ID, RPC_CALL_LOAD_DOMAIN, RPC_CALL_TX, FindResponse } from '@anticrm/rpc'
 import { PassthroughsIndex } from '@anticrm/domains/src/indices/filter'
 
 /*!
@@ -48,24 +47,27 @@ export default async (platform: Platform): Promise<CoreService> => {
   const model = new ModelDb()
 
   const coreProtocol: CoreProtocol = {
-    async find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
-      const result = (await rpc.request(RPC_CALL_FIND, _class, query)) as T[]
-      return result.map((it) => model.as(it, _class))
+    async find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>, options?: FindOptions<T>): Promise<T[]> {
+      const rpcResult = (await rpc.request<FindResponse<T>>(RPC_CALL_FIND, _class, query, options !== undefined ? options : null /* we send null since use JSON */))
+      if (options?.countCallback !== undefined) {
+        options.countCallback(rpcResult.skip, rpcResult.limit, rpcResult.count)
+      }
+      return rpcResult.values.map((it) => model.as(it, _class))
     },
-    async findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined> {
-      const result = (await rpc.request(RPC_CALL_FINDONE, _class, query)) as (T | undefined)
-      if (result) {
+    async findOne<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined> {
+      const result = (await rpc.request<T>(RPC_CALL_FINDONE, _class, query))
+      if (result !== undefined) {
         return model.as(result, _class)
       }
       return result
     },
-    tx (tx: Tx): Promise<any> {
-      return rpc.request(RPC_CALL_TX, tx)
+    async tx (tx: Tx): Promise<any> {
+      await rpc.request(RPC_CALL_TX, tx)
     },
-    loadDomain (domain: string): Promise<Doc[]> {
+    loadDomain (domain: string): Promise<Doc[]> { // eslint-disable-line @typescript-eslint/promise-function-async
       return rpc.request(RPC_CALL_LOAD_DOMAIN, domain)
     },
-    genRefId (_space: Ref<Space>) {
+    genRefId (_space: Ref<Space>): Promise<Ref<VDoc>> { // eslint-disable-line @typescript-eslint/promise-function-async
       return rpc.request(RPC_CALL_GEN_REF_ID, _space)
     }
   }
@@ -96,69 +98,59 @@ export default async (platform: Platform): Promise<CoreService> => {
   ])
 
   // add listener to process data updates from backend for data transactions.
-  rpc.addEventListener(EventType.Transaction, result => {
-    txProcessor.process(txContext(TxContextSource.Server), result as Tx)
+  rpc.addEventListener(EventType.Transaction, (result): void => {
+    txProcessor.process(txContext(TxContextSource.Server), result as Tx) // eslint-disable-line
   })
 
+  async function processTransactions (txs: Tx[]): Promise<void> {
+    for (const tx of txs) {
+      await txProcessor.process(txContext(TxContextSource.ServerTransient), tx)
+    }
+  }
   // Add a client transaction event listener
-  rpc.addEventListener(EventType.TransientTransaction, txs => {
-    for (const tx of (txs as Tx[])) {
-      txProcessor.process(txContext(TxContextSource.ServerTransient), tx)
-    }
+  rpc.addEventListener(EventType.TransientTransaction, (txs: unknown): void => {
+    processTransactions(txs as Tx[]) // eslint-disable-line
   })
 
-  function find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
-    const domainName = model.getDomain(_class)
-    const domain = domains.get(domainName)
-    if (domain) {
-      return domain.find(_class, query)
-    }
-    return cache.find(_class, query)
+  async function find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>, options?: FindOptions<T>): Promise<T[]> {
+    const domain = domains.get(model.getDomain(_class))
+    return await (domain ?? qCache).find(_class, query, options)
   }
 
-  function findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined> {
-    const domainName = model.getDomain(_class)
-    const domain = domains.get(domainName)
-    if (domain) {
-      return domain.findOne(_class, query)
-    }
-    return cache.findOne(_class, query)
+  async function findOne<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined> {
+    const domain = domains.get(model.getDomain(_class))
+    return await (domain ?? qCache).findOne(_class, query)
   }
 
-  function query<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): QueryResult<T> {
-    const domainName = model.getDomain(_class)
-    const domain = domains.get(domainName)
-    if (domain) {
-      return domain.query(_class, query)
-    }
-    return qCache.query(_class, query)
+  function query<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>, options?: FindOptions<T>): QueryResult<T> {
+    const domain = domains.get(model.getDomain(_class))
+    return (domain ?? qCache).query(_class, query, options)
   }
 
-  function generateId () {
-    return genId() as Ref<Doc>
+  function generateId (): Ref<Doc> {
+    return genId()
   }
 
-  function processTx (tx: Tx): Promise<any> {
-    console.log('processTx', tx)
+  async function processTx (tx: Tx): Promise<any> {
     const networkComplete = coreProtocol.tx(tx)
-    return Promise.all([
+    await Promise.all([
       networkComplete,
       txProcessor.process(txContext(TxContextSource.Client, networkComplete), tx)
     ])
   }
 
-  function getUserId () {
+  function getUserId (): StringProperty {
     return platform.getMetadata(core.metadata.WhoAmI) as StringProperty
   }
 
   const ops = createOperations(model, processTx, getUserId)
 
-  function loadDomain (domain: string): Promise<Doc[]> {
-    return coreProtocol.loadDomain(domain)
+  async function loadDomain (domain: string): Promise<Doc[]> {
+    return await coreProtocol.loadDomain(domain)
   }
 
-  function genRefId (_space: Ref<Space>): Promise<Ref<VDoc>> {
-    return coreProtocol.genRefId(_space)
+  async function genRefId (_space: Ref<Space>): Promise<Ref<VDoc>> {
+    return await coreProtocol.genRefId(_space)
   }
 
   return {
@@ -172,5 +164,5 @@ export default async (platform: Platform): Promise<CoreService> => {
     tx: processTx,
     getUserId,
     genRefId
-  } as CoreService
+  }
 }

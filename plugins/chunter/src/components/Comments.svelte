@@ -12,7 +12,6 @@
   // See the License for the specific language governing permissions and
   // limitations under the License.
 
-  import type { Property, StringProperty } from '@anticrm/core'
   import type { Collab } from '../index'
   import chunter, { getChunterService } from '../index'
 
@@ -27,21 +26,22 @@
 
   let references: Reference[] = []
 
-  $: refS = liveQuery(refS, CORE_CLASS_REFERENCE, { _targetId: object._id }, (docs) => {
+  $: refS = liveQuery<Reference>(refS, CORE_CLASS_REFERENCE, { _targetId: object._id }, (docs) => {
     references = docs
   })
 
   const chunterService = getChunterService()
   const coreService = getCoreService()
+
   async function createComment (message: any): Promise<void> {
     const parsedMessage = (await chunterService).createMissedObjects(message)
     const comment = {
       _class: chunter.class.Comment,
-      _createdOn: Date.now() as Property<number, Date>,
-      _createdBy: (await coreService).getUserId() as Property<string, string>,
-      message: parsedMessage as StringProperty
-    }
-    await (await coreService).push(object, null, 'comments' as StringProperty, comment)
+      _createdOn: Date.now(),
+      _createdBy: (await coreService).getUserId(),
+      message: parsedMessage
+    } as Comment
+    await (await coreService).updateWith(object, (s) => s.comments.push(comment))
   }
 </script>
 

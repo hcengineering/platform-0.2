@@ -8,7 +8,9 @@
 </script>
 
 <div class="userInfo">
-  <img class="avatar" src={url} alt="" />
+  {#if url}
+    <img class="avatar" src={url} alt="" />
+  {/if}
   <div class="user" style={userColor !== '' ? 'color:' + userColor : ''}>
     {#if !subtitleOnTop}
       {title}
@@ -31,21 +33,22 @@
   .avatar {
     width: 32px;
     height: 32px;
-    border: 1px solid var(--theme-content-trans-color);
+    border: 1px solid transparent;
     border-radius: 16px;
+    border-color: var(--theme-content-trans-color);
   }
+
   .user {
     padding-left: 1em;
     font-size: 14px;
     font-weight: 500;
     line-height: 18px;
     color: var(--theme-userlink-color);
-
     & > span {
       display: block;
       font-size: 11px;
       line-height: 14px;
-      color: var(--status-grey-color);
+      color: var(--theme-status-grey-color);
     }
   }
 </style>

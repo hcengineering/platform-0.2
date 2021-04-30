@@ -18,7 +18,7 @@ import { ServerSuite } from './serversuite'
 import chunter, { Page } from '@anticrm/chunter'
 
 import { newCreateTx } from '@anticrm/platform-core/src/tx'
-import { Property, StringProperty } from '@anticrm/core'
+import { Property, Ref, StringProperty } from '@anticrm/core'
 import { CORE_CLASS_SPACE, Space, SpaceUser } from '@anticrm/domains'
 
 describe('service', () => {
@@ -77,30 +77,31 @@ describe('service', () => {
       {
         _class: CORE_CLASS_SPACE,
         name: 'public-space',
-        users: [],
+        users: [{ userId: 'test@client2' }],
         isPublic: true
       } as unknown as Space,
       'test@client1' as StringProperty
     ))
 
-    const spaces = await c1.find(CORE_CLASS_SPACE, { isPublic: true as Property<boolean, boolean> })
+    const spaces = await c1.find<Space>(CORE_CLASS_SPACE, { isPublic: true })
+
     expect(spaces.length).toEqual(4)
     await clients[1].wait()
 
     await c1.tx(newCreateTx(
       {
         _class: chunter.class.Page,
-        title: 'public-space Page',
-        _space: spaces[0]._id
+        title: 'public-space Page'
       } as unknown as Page,
-      'test@client1' as StringProperty
+      'test@client1' as StringProperty,
+      spaces[0]._id as Ref<Space>
     ))
 
     let pages = await c1.find(chunter.class.Page, {})
-    expect(pages.length).toEqual(1)
+    expect(pages.length).toEqual(0)
 
     pages = await c2.find(chunter.class.Page, {})
-    expect(pages.length).toEqual(1) // Both c1 and c2 see page
+    expect(pages.length).toEqual(1) // Only client 2 see a public page.
   })
 
   it('check private space', async () => {
@@ -127,10 +128,10 @@ describe('service', () => {
     await c1.tx(newCreateTx(
       {
         _class: chunter.class.Page,
-        title: 'private-space Page',
-        _space: spaces[0]._id
+        title: 'private-space Page'
       } as unknown as Page,
-      'test@client1' as StringProperty
+      'test@client1' as StringProperty,
+      spaces[0]._id as Ref<Space>
     ))
     let pages = await c1.find(chunter.class.Page, {})
     expect(pages.length).toEqual(1)
@@ -156,7 +157,10 @@ describe('service', () => {
       {
         _class: CORE_CLASS_SPACE,
         name: 'shared-space',
-        users: [{ userId: 'test@client1', owner: true } as unknown as SpaceUser, { userId: 'test@client2', owner: false } as unknown as SpaceUser],
+        users: [{ userId: 'test@client1', owner: true } as unknown as SpaceUser, {
+          userId: 'test@client2',
+          owner: false
+        } as unknown as SpaceUser],
         isPublic: false
       } as unknown as Space,
       'test@client1' as StringProperty
@@ -167,10 +171,10 @@ describe('service', () => {
     await c1.tx(newCreateTx(
       {
         _class: chunter.class.Page,
-        title: 'shared-space Page',
-        _space: spaces[0]._id
+        title: 'shared-space Page'
       } as unknown as Page,
-      'test@client1' as StringProperty
+      'test@client1' as StringProperty,
+      spaces[0]._id as Ref<Space>
     ))
 
     // Wait for all to be processed for c2

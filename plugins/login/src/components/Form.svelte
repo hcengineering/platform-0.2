@@ -73,18 +73,16 @@
     margin-top: 20vh;
     width: 30em;
     padding: 2em;
-    border: 1px solid var(--theme-bg-accent-color);
     border-radius: 1em;
+    border: 1px solid var(--theme-bg-accent-color);
 
     .status {
       margin-top: 0.5em;
     }
-
     .field {
       .editbox {
         width: 100%;
       }
-
       margin: 1em 0;
     }
 

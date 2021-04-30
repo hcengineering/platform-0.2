@@ -5,26 +5,28 @@
   "author": "Andrey Platov <andrey.v.platov@gmail.com>",
   "license": "EPL-2.0",
   "devDependencies": {
-    "@types/mongodb": "^3.5.20",
-    "ts-node": "^8.10.1",
-    "typescript": "~3.9.4",
-    "@typescript-eslint/eslint-plugin": "^4.9.0",
-    "@typescript-eslint/parser": "^4.9.0",
-    "eslint": "^7.14.0",
+    "@types/mongodb": "^3.6.12",
+    "@typescript-eslint/eslint-plugin": "^4.22.0",
+    "@typescript-eslint/parser": "^4.22.0",
+    "eslint": "^7.25.0",
     "eslint-config-standard": "^16.0.2",
+    "eslint-config-standard-with-typescript": "^20.0.0",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-standard": "^5.0.0"
+    "eslint-plugin-promise": "^5.1.0",
+    "eslint-plugin-standard": "^5.0.0",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.2.4"
   },
   "scripts": {
     "build": "tsc",
+    "build:docs": "echo 'no docs yet'",
     "dump": "ts-node -T src/index.ts",
     "lint": "eslint --max-warnings=0 src",
     "lint:fix": "eslint --fix src",
     "test": "echo 'no tests'"
   },
   "dependencies": {
-    "mongodb": "^3.5.8"
+    "mongodb": "^3.6.6"
   }
 }

@@ -50,15 +50,21 @@
   let viewletProps: Record<string, any> = {}
   let activeClasses: Ref<Class<Doc>>[] = []
 
-  let creatorsQuery: Promise<QueryUpdater<ItemCreator>> | undefined
+  let creatorsQuery: Promise<QueryUpdater<ItemCreator>>
 
-  const onCreatorClick = (creator: ItemCreator) => uiService.showModal(CreateForm, { creator, spaces: [space] })
+  const onCreatorClick = (creator: ItemCreator) =>
+    uiService.showModal(CreateForm, { application, creator, spaces: [space] })
 
-  $: creatorsQuery = liveQuery(creatorsQuery, workbench.class.ItemCreator, { app: application._id }, (docs) => {
-    creators = docs
-  })
+  $: creatorsQuery = liveQuery<ItemCreator>(
+    creatorsQuery,
+    workbench.class.ItemCreator,
+    { app: application._id as Ref<WorkbenchApplication> },
+    (docs) => {
+      creators = docs
+    }
+  )
 
-  createLiveQuery(ui.mixin.Viewlet, {}, (docs) => {
+  createLiveQuery<Viewlet>(ui.mixin.Viewlet, {}, (docs) => {
     presenters = docs
   })
 
@@ -90,6 +96,7 @@
   ): Action[] {
     return viewlets.map((p) => {
       return {
+        id: p._id,
         name: p.label,
         icon: p.icon,
         toggleState: p._id === sp?._id,
@@ -103,7 +110,7 @@
   // Update available presenters based on application
   $: if (model) {
     const viewlets = filterViewlets(model, presenters, application)
-    if (viewlets.length > 0 && !activeViewlet) {
+    if (viewlets.length > 0 && (!activeViewlet || viewlets.every((x) => x._id !== activeViewlet?._id))) {
       activeViewlet = viewlets[0]
     }
     viewletActions = getViewletActions(application, activeViewlet, viewlets)
@@ -126,7 +133,11 @@
         <span class="caption-1" style="padding-right:1em">{application.label}</span>&nbsp;
         <CreateControl {creators} {onCreatorClick} />
       </div>
-      <IconEditBox icon={workbench.icon.Finder} placeholder="Поиск по {application.label}..." iconRight={true} />
+      <IconEditBox
+        icon={workbench.icon.Finder}
+        placeholder="Поиск по {application.label}..."
+        iconRight={true}
+        value="" />
     </div>
     <div class="presentation">
       <ActionBar actions={viewletActions} />
@@ -150,10 +161,10 @@
       width: 100%;
       height: 5em;
       padding: 2em;
-      border-bottom: 1px solid var(--theme-bg-accent-color);
       display: flex;
       justify-content: space-between;
       align-items: center;
+      border-bottom: 1px solid var(--theme-bg-accent-color);
     }
 
     .captionLeftItems {

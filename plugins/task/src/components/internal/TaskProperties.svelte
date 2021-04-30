@@ -37,7 +37,7 @@
 
   coreService.then(async (cs) => {
     model = cs.getModel()
-    statusType = await cs.findOne(CORE_CLASS_ENUM, { _id: task.enum.TaskStatus })
+    statusType = await cs.findOne<Enum<TaskStatus>>(CORE_CLASS_ENUM, { _id: task.enum.TaskStatus })
   })
   // .then(()=>{console.log('MODEL',model)})
 
@@ -58,9 +58,10 @@
           const act = model.as(s[1], task.mixin.TaskStatusAction)
           if (act) {
             acts.push({
+              id: s[0],
               name: act.action,
               action: () => {
-                coreService.then((cs) => cs.update(object, null, { status: statKey as NumberProperty }))
+                coreService.then((cs) => cs.update(object, { status: statKey as NumberProperty }))
               }
             })
           }
@@ -75,15 +76,12 @@
 </script>
 
 <div class="taskContent">
-  <div class="caption caption-1">
+  <div id="create_task__input__name" class="caption caption-1">
     <InlineEdit
-      id="create_task__input__name"
       bind:value={object.title}
-      width="100%"
-      label="Name"
       placeholder="Name"
       on:change={async () => {
-        (await coreService).update(object, null, { title: object.title })
+        await (await coreService).update(object, { title: object.title })
       }} />
   </div>
   <div class="taskStatusBar">
@@ -101,7 +99,7 @@
   <UserInfo url="https://platform.exhale24.ru/images/photo-2.png" title="Андрей Платов" subtitle="Исполнитель" />
 
   {#if statusActions.length > 0}
-    <ActionBar onTop="2" actions={statusActions} />
+    <ActionBar onTop={2} actions={statusActions} />
   {/if}
 
   <div class="description">
@@ -131,7 +129,7 @@
 
       .taskName {
         font-size: 14px;
-        color: var(--status-blue-color);
+        color: var(--theme-status-blue-color);
       }
     }
 

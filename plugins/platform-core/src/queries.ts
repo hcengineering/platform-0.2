@@ -13,29 +13,25 @@
 // limitations under the License.
 //
 
-import {
-  AnyLayout, Class, Doc, generateId, isValidQuery, Model, Ref, Storage, StringProperty, TxContext
-} from '@anticrm/core'
-import { QueryResult, Subscriber, Unsubscriber } from '.'
+import { Class, Doc, DocumentQuery, FindOptions, generateId, Model, Ref, Storage, TxContext } from '@anticrm/core'
+import { QueryResult, Subscriber, Unsubscribe } from '.'
+import { TxOperation, TxOperationKind } from '@anticrm/domains'
 
 export interface Domain extends Storage {
-  query<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): QueryResult<T>
+  query: <T extends Doc>(_class: Ref<Class<T>>, query: DocumentQuery<T>) => QueryResult<T>
 }
 
 interface Query<T extends Doc> {
   _id: Ref<Doc>
   _class: Ref<Class<T>>
-  query: AnyLayout
+  query: DocumentQuery<T>
   subscriber: Subscriber<T>
-  unsubscriber?: Unsubscriber
+  unsubscriber?: Unsubscribe
 
   // A ordered results with some additional flags.
   results: T[]
-}
 
-enum UpdateOp {
-  None,
-  Remove
+  options?: FindOptions<T>
 }
 
 export class QueriableStorage implements Domain {
@@ -50,104 +46,112 @@ export class QueriableStorage implements Domain {
     this.updateResults = updateResults
   }
 
-  private refresh<T extends Doc> (query: Query<T>) {
-    this.find(query._class, query.query).then(result => {
-      query.results = result
-      query.subscriber(result)
-    })
+  private async refresh<T extends Doc> (query: Query<T>): Promise<void> {
+    const result = await this.find(query._class, query.query, query.options)
+
+    query.results = result
+    query.subscriber(result)
   }
 
   async store (ctx: TxContext, doc: Doc): Promise<void> {
-    await this.proxy.store(ctx, doc).then(() => {
-      for (const q of this.queries.values()) {
-        if (this.model.matchQuery(q._class, doc, q.query)) {
-          // If document is matched, assume we add it to end of list. But it's order could be changed after transaction will be complete.
+    await this.proxy.store(ctx, doc)
+
+    for (const q of this.queries.values()) {
+      if (this.model.matchQuery(q._class, doc, q.query)) {
+        // If document is matched, assume we add it to end of list. But it's order could be changed after transaction will be complete.
+
+        let shouldAdd = true
+        if (q.options !== undefined) {
+          const limit = q.options?.limit ?? 0
+          if (limit > 0 && q.results.length >= limit) {
+            shouldAdd = false // We had limit no need to add object to list
+          }
+        }
+        if (shouldAdd) {
           q.results.push(this.model.as(doc, q._class))
+        }
+        if (q.options?.sort !== undefined && Object.keys(q.options.sort).length > 0) {
+          // We had sorting defined, we need to refresh query on server.
+          await ctx.network
+          await this.refresh(q)
+        } else {
           q.subscriber(q.results)
         }
       }
-    })
-  }
-
-  updateMatchQuery (_id: Ref<Doc>, q: Query<Doc>, apply: (doc: Doc) => UpdateOp): boolean {
-    let pos = 0
-    for (const r of q.results) {
-      if (r._id === _id) {
-        let updateOp = UpdateOp.None
-        if (this.updateResults) {
-          updateOp = apply(r)
-        }
-        if (!this.model.matchQuery(q._class, r, q.query) || updateOp === UpdateOp.Remove) {
-          // Document is not matched anymore, we need to remove it.
-          q.results.splice(pos, 1)
-        }
-        q.subscriber(q.results)
-        return true
-      }
-      pos++
     }
-    return false
   }
 
-  push (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, _query: AnyLayout | null, attribute: StringProperty, attributes: AnyLayout): Promise<void> {
-    return this.proxy.push(ctx, _class, _id, _query, attribute, attributes).then(() => {
-      for (const q of this.queries.values()) {
-        // Find doc, apply attribute and check if it is still matches, if not we need to perform request to server after transaction will be complete.
-        // Check if attribute are in query, so it could modify results.
-        if (this.updateMatchQuery(_id, q, (doc) => {
-          this.model.pushDocument(doc, _query, attribute, attributes)
-          return UpdateOp.None
-        })) {
-          continue
+  async update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, operations: TxOperation[]): Promise<void> {
+    await this.proxy.update(ctx, _class, _id, operations)
+
+    for (const q of this.queries.values()) {
+      // Find doc, apply update of attributes and check if it is still matches, if not we need to perform request to server after transaction will be complete.
+
+      let needRefresh = true
+
+      // go over documents and check if modification will move object to not matched state.
+      let pos = 0
+      for (const r of q.results) {
+        if (r._id === _id) {
+          if (this.updateResults) {
+            this.model.updateDocument(r, operations)
+          }
+          if (!this.model.matchQuery(q._class, r, q.query)) {
+          // Document is not matched anymore, we need to remove it.
+            q.results.splice(pos, 1)
+          }
+          q.subscriber(q.results)
+          needRefresh = false
+          break
         }
-        // so we potentially need to fetch new matched objects from server, so do so.
-        ctx.network.then(() => this.refresh(q))
+        pos++
       }
-    })
-  }
-
-  update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, _query: AnyLayout | null, attributes: AnyLayout): Promise<void> {
-    return this.proxy.update(ctx, _class, _id, _query, attributes).then(() => {
-      for (const q of this.queries.values()) {
-        // Find doc, apply update of attributes and check if it is still matches, if not we need to perform request to server after transaction will be complete.
-        if (this.updateMatchQuery(_id, q, (doc) => {
-          this.model.updateDocument(doc, _query, attributes)
-          return UpdateOp.None
-        })) {
-          continue
+      if (needRefresh && this.model.is(_class, q._class)) {
+        // so we potentially need to fetch new matched objects from server, so do so if class are matching ours.
+        for (const op of operations) {
+          if (op.kind === TxOperationKind.Set) {
+            if (!this.model.isPartialMatched(_class, op._attributes, q.query)) {
+              // We do not match with values updated, so no update is required.
+              needRefresh = false
+            }
+          }
         }
-        // so we potentially need to fetch new matched objects from server, so do so.
-        ctx.network.then(() => this.refresh(q))
-      }
-    })
-  }
 
-  remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, _query: AnyLayout | null): Promise<void> {
-    return this.proxy.remove(ctx, _class, _id, _query).then(() => {
-      for (const q of this.queries.values()) {
-        if (this.updateMatchQuery(_id, q, (doc) => {
-          this.model.removeDocument(doc, _query)
-          // We should not remove object in case we modify embedded array
-          return isValidQuery(_query) ? UpdateOp.None : UpdateOp.Remove
-        })) {
-          continue
+        if (needRefresh) {
+          await ctx.network
+          await this.refresh(q)
         }
-        // so we potentially need to fetch new matched objects from server, so do so.
-        ctx.network.then(() => this.refresh(q))
       }
-    })
+    }
   }
 
-  find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
-    return this.proxy.find(_class, query)
+  async remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<void> {
+    await this.proxy.remove(ctx, _class, _id)
+
+    for (const q of this.queries.values()) {
+      // Check if we had object, remove it.
+      let pos = 0
+      for (const r of q.results) {
+        if (r._id === _id) {
+          q.results.splice(pos, 1)
+          q.subscriber(q.results)
+          break
+        }
+        pos++
+      }
+    }
   }
 
-  findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined> {
-    return this.proxy.findOne(_class, query)
+  async find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>, options?: FindOptions<T>): Promise<T[]> {
+    return await this.proxy.find<T>(_class, query, options)
+  }
+
+  async findOne<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined> {
+    return await this.proxy.findOne<T>(_class, query)
   }
 
   // TODO: move to platform core
-  query<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): QueryResult<T> {
+  query<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>, options?: FindOptions<T>): QueryResult<T> {
     return {
       subscribe: (subscriber: Subscriber<T>) => {
         const q: Query<Doc> = {
@@ -155,13 +159,15 @@ export class QueriableStorage implements Domain {
           _class,
           query,
           subscriber: subscriber as Subscriber<Doc>,
-          results: []
+          results: [],
+          options
         }
         q.unsubscriber = () => {
           this.queries.delete(q._id)
         }
         this.queries.set(q._id, q)
-        this.refresh(q)
+
+        this.refresh(q) // eslint-disable-line
         return q.unsubscriber
       }
     }

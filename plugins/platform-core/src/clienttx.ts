@@ -1,5 +1,6 @@
-import { AnyLayout, Class, Doc, Ref, Storage, StringProperty, Tx, TxContext } from '@anticrm/core'
-import { newCreateTx, newDeleteTx, newPushTx, newUpdateTx } from './tx'
+import { Class, Doc, DocumentQuery, FindOptions, Ref, Storage, StringProperty, Tx, TxContext } from '@anticrm/core'
+import { newCreateTx, newDeleteTx, newUpdateTx } from './tx'
+import { TxOperation } from '@anticrm/domains'
 
 const systemUser = 'system' as StringProperty
 
@@ -13,38 +14,30 @@ export class ClientTxStorage implements Storage {
     this.delegateStorage = delegateStorage
   }
 
-  private addTx (ctx: TxContext, tx: Tx) {
-    if (!ctx.clientTx) {
-      ctx.clientTx = []
-    }
+  private addTx (ctx: TxContext, tx: Tx): void {
     ctx.clientTx.push(tx)
   }
 
-  store (ctx: TxContext, doc: Doc): Promise<void> {
+  async store (ctx: TxContext, doc: Doc): Promise<void> {
     this.addTx(ctx, newCreateTx(doc, systemUser))
-    return this.delegateStorage.store(ctx, doc)
+    await this.delegateStorage.store(ctx, doc)
   }
 
-  push (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, query: AnyLayout | null, attribute: StringProperty, attributes: AnyLayout): Promise<void> {
-    this.addTx(ctx, newPushTx(_class, _id, query || undefined, attribute, attributes, systemUser))
-    return this.delegateStorage.push(ctx, _class, _id, query, attribute, attributes)
+  async update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, operations: TxOperation[]): Promise<void> {
+    this.addTx(ctx, newUpdateTx(_class, _id, operations, systemUser))
+    await this.delegateStorage.update(ctx, _class, _id, operations)
   }
 
-  update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, query: AnyLayout | null, attributes: AnyLayout): Promise<void> {
-    this.addTx(ctx, newUpdateTx(_class, _id, query || undefined, attributes, systemUser))
-    return this.delegateStorage.update(ctx, _class, _id, query, attributes)
+  async remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<void> {
+    this.addTx(ctx, newDeleteTx(_class, _id, systemUser))
+    await this.delegateStorage.remove(ctx, _class, _id)
   }
 
-  remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, query: AnyLayout | null): Promise<void> {
-    this.addTx(ctx, newDeleteTx(_class, _id, query || undefined, systemUser))
-    return this.delegateStorage.remove(ctx, _class, _id, query)
+  async find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>, options?: FindOptions<T>): Promise<T[]> {
+    return await this.delegateStorage.find(_class, query, options)
   }
 
-  find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
-    return this.delegateStorage.find(_class, query)
-  }
-
-  findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined> {
-    return this.delegateStorage.findOne(_class, query)
+  async findOne<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined> {
+    return await this.delegateStorage.findOne(_class, query)
   }
 }

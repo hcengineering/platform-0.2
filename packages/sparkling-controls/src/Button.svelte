@@ -3,7 +3,7 @@
 
   // --- 'small', 'large' --- //
   export let size = ''
-  // --- 'primary', 'transparent' --- //
+  // --- 'primary', 'icon', 'transparent' --- //
   export let kind = ''
   // --- ex: '100px', '25%' --- //
   export let width = ''
@@ -11,7 +11,7 @@
   export let label = ''
 
   const dispatch = createEventDispatcher()
-  function onClick (event) {
+  function onClick (event: any) {
     dispatch('click', event)
   }
 </script>
@@ -23,26 +23,23 @@
 <style lang="scss">
   .button {
     display: inline-block;
-    border: 1px solid var(--theme-bg-dark-color);
     height: auto;
-    border-radius: 4px;
+    border: solid 1px transparent;
+    border-radius: 12px;
     padding: 8px 16px;
     cursor: pointer;
     user-select: none;
-
     font: inherit;
     font-weight: 500;
     font-size: 14px;
-
     color: var(--theme-content-color);
     background-color: var(--theme-bg-accent-color);
+    border-color: var(--theme-bg-accent-color);
     transition: border-color 0.2s, color 0.2s, background-color 0.2s;
-
     &:focus {
       outline: none;
     }
     &:hover {
-      border-color: var(--theme-bg-dark-hover);
       background-color: var(--theme-bg-accent-hover);
       color: var(--theme-content-dark-color);
     }
@@ -62,11 +59,22 @@
     background-color: var(--theme-content-color);
     border-color: var(--theme-content-color);
     color: var(--theme-bg-color);
-
     &:hover {
       background-color: var(--theme-content-dark-color);
       border-color: var(--theme-content-dark-color);
       color: var(--theme-bg-color);
+    }
+  }
+
+  .icon {
+    padding: 14px 28px;
+    border-radius: 8px;
+    color: var(--theme-content-color);
+    background-color: var(--theme-bg-accent-color);
+    border: solid 1px var(--theme-bg-accent-color);
+    &:hover {
+      color: var(--theme-caption-color);
+      border-color: var(--theme-bg-dark-hover);
     }
   }
 
@@ -76,21 +84,19 @@
     cursor: pointer;
     user-select: none;
     font-weight: 500;
-    color: var(--theme-content-color);
-    background-color: transparent;
     align-items: center;
     justify-content: center;
     flex-wrap: nowrap;
     padding: 0;
     margin: 0;
-
+    color: var(--theme-content-color);
+    background-color: transparent;
     &:focus {
       outline: none;
     }
-
     &:hover {
-      background-color: transparent;
       color: var(--theme-caption-color);
+      background-color: transparent;
     }
   }
 </style>

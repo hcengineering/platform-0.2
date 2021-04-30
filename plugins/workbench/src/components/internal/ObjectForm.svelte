@@ -14,12 +14,13 @@
   import type { Class, Doc, Ref } from '@anticrm/core'
   import type { AnyComponent } from '@anticrm/platform-ui'
   import Component from '@anticrm/platform-ui/src/components/Component.svelte'
-  import presentation, { createLiveQuery, getComponentExtension, updateLiveQuery } from '@anticrm/presentation'
+  import presentation, { getComponentExtension, liveQuery } from '@anticrm/presentation'
   import { createEventDispatcher } from 'svelte'
 
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import workbench from '../..'
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
+  import { QueryUpdater } from '@anticrm/platform-core'
 
   export let _class: Ref<Class<Doc>>
   export let _objectId: Ref<Doc>
@@ -28,19 +29,20 @@
 
   const dispatch = createEventDispatcher()
 
-  const queryUpdate = createLiveQuery(_class, { _id: _objectId }, (docs) => {
+  let queryUpdate: Promise<QueryUpdater<Doc>>
+
+  $: queryUpdate = liveQuery<Doc>(queryUpdate, _class, { _id: _objectId }, (docs) => {
     object = docs.length > 0 ? docs[0] : undefined
     if (!object) {
+      console.log(`NO objects found based on ${_class} ${_objectId}`)
       dispatch('noobject')
     }
   })
 
   let component: AnyComponent
   $: {
-    updateLiveQuery(queryUpdate, _class, { _id: _objectId })
-
     getComponentExtension(_class, presentation.mixin.DetailForm).then((ext) => {
-      if (component !== ext) {
+      if (ext !== undefined && component !== ext) {
         component = ext
       }
     })
@@ -55,13 +57,13 @@
         on:click|preventDefault={() => {
           dispatch('close')
         }}>
-        <Icon icon={workbench.icon.Close} button="true" />
+        <Icon icon={workbench.icon.Close} button={true} />
       </a>
     </div>
     <div class="content">
       <ScrollView height="100%" width="100%">
         <div class="component-content">
-          <Component is={component} props={{ _class, object }} />
+          <Component is={component} props={{ _class, object }} on:open />
         </div>
       </ScrollView>
     </div>

@@ -1,29 +1,16 @@
 <script lang="ts">
   import { setContext, onMount } from 'svelte'
-  import { writable } from 'svelte/store'
-  import { themes as _themes } from '../themes'
-  import type { Theme } from '../themes'
 
-  export let themes = [..._themes]
-  const getTheme = (name: string): Theme => themes.find((h) => h.name === name) as Theme
-  const current = getTheme('dark')
-  const ThemeStore = writable(current)
+  const current = 'theme-dark'
 
   setContext('theme', {
-    theme: ThemeStore,
     setTheme: (name: string) => {
-      const theme = getTheme(name)
-      setRootColors(theme)
-      ThemeStore.update(() => theme)
+      setRootColors(name)
     }
   })
 
-  const setRootColors = (theme: Theme) => {
-    for (const [prop, color] of Object.entries(theme.colors)) {
-      const varString = `--theme-${prop}`
-      document.documentElement.style.setProperty(varString, color)
-    }
-    document.documentElement.style.setProperty('--theme-name', theme.name)
+  const setRootColors = (theme: string) => {
+    document.body.setAttribute('class', theme)
   }
 
   onMount(() => {
@@ -36,12 +23,18 @@
 </slot>
 
 <style lang="scss" global>
+  @import '~@anticrm/sparkling-theme/styles/colors.scss';
+
   * {
-    --white-color: #fff;
-    --status-blue-color: #2d6ab9;
-    --status-green-color: #4396a2;
-    --status-grey-color: #78726d;
-    --status-maroon-color: #b92d52;
+    box-sizing: border-box;
+    --theme-white-color: #fff;
+    --theme-status-blue-color: #2d6ab9;
+    --theme-status-green-color: #4396a2;
+    --theme-status-grey-color: #78726d;
+    --theme-status-maroon-color: #b92d52;
+
+    --theme-font-content: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto;
+    --theme-font-caption: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto;
 
     scrollbar-color: var(--theme-bg-dark-color) var(--theme-bg-accent-color);
     scrollbar-width: thin;
@@ -54,7 +47,7 @@
     height: 8px;
   }
   ::-webkit-scrollbar-track {
-    background-color: var(--theme-bg-color);
+    background-color: va(--theme-bg-color);
   }
   ::-webkit-scrollbar-thumb {
     background: var(--theme-bg-accent-color);
@@ -114,14 +107,12 @@
   }
 
   .editbox {
-    border: 1px solid var(--theme-bg-dark-color);
     border-radius: 4px;
     padding: 8px 16px;
+    border: 1px solid var(--theme-bg-dark-color);
     background-color: var(--theme-bg-accent-color);
-    box-sizing: border-box;
     color: var(--theme-content-color);
     transition: border-color 0.2s, color 0.2s, background-color 0.2s;
-
     &:focus-within {
       outline: none;
       background-color: var(--theme-bg-accent-hover);
@@ -142,23 +133,37 @@
   .button {
     display: inline-block;
     height: 32px;
-    border: 1px solid var(--theme-bg-dark-color);
     border-radius: 4px;
     padding: 0.5em 1.33em 0.5em;
     box-sizing: border-box;
     cursor: pointer;
     user-select: none;
     text-align: center;
-
     font: inherit;
     font-weight: 500;
-
+    border: 1px solid var(--theme-bg-dark-color);
     color: var(--theme-content-color);
     background-color: var(--theme-bg-accent-color);
     transition: border-color 0.2s, color 0.2s, background-color 0.2s;
 
     &:focus {
       outline: none;
+    }
+    &:hover {
+      border-color: var(--theme-bg-dark-hover);
+      background-color: var(--theme-bg-accent-hover);
+      color: var(--theme-content-dark-color);
+    }
+
+    &.primary {
+      background-color: var(--theme-content-color);
+      border-color: var(--theme-content-color);
+      color: var(--theme-bg-color);
+      &:hover {
+        background-color: var(--theme-content-dark-color);
+        border-color: var(--theme-content-dark-color);
+        color: var(--theme-bg-color);
+      }
     }
 
     &.large {
@@ -171,42 +176,22 @@
       padding: 0 0.6em 0;
     }
 
-    &:hover {
-      border-color: var(--theme-bg-dark-hover);
-      background-color: var(--theme-bg-accent-hover);
-      color: var(--theme-content-dark-color);
-    }
-
-    &.primary {
-      background-color: var(--theme-content-color);
-      border-color: var(--theme-content-color);
-      color: var(--theme-bg-color);
-    }
-
-    &:hover.primary {
-      background-color: var(--theme-content-dark-color);
-      border-color: var(--theme-content-dark-color);
-      color: var(--theme-bg-color);
-    }
-
     &.transparent {
       display: flex;
       border: none;
       cursor: pointer;
       user-select: none;
       font-weight: 500;
-      color: var(--theme-content-color);
       background-color: transparent;
       align-items: center;
       justify-content: center;
       flex-wrap: nowrap;
       padding: 0;
       margin: 0;
-
+      color: var(--theme-content-color);
       &:focus {
         outline: none;
       }
-
       &:hover {
         color: var(--theme-caption-color);
       }
@@ -226,6 +211,10 @@
     fill: currentColor;
     position: relative;
   }
+  .icon-12 {
+    height: 12px;
+    width: 12px;
+  }
   .icon-16 {
     height: 16px;
     width: 16px;
@@ -242,12 +231,12 @@
     width: 42px;
     height: 42px;
   }
+
   .icon-button {
     background-color: var(--theme-bg-accent-color);
     border: solid 1px var(--theme-bg-dark-color);
     border-radius: 50%;
     fill: var(--theme-content-color);
-
     &:hover {
       background-color: var(--theme-bg-accent-hover);
       border-color: var(--theme-bg-dark-hover);
@@ -264,53 +253,47 @@
 
   .caption-1 {
     font-family: var(--theme-font-caption);
-    color: var(--theme-caption-color);
-    // font-family: "Montserrat";
-    // font-family: "Open Sans";
     font-size: 18px;
     font-weight: 500;
+    color: var(--theme-caption-color);
   }
 
   .caption-2 {
     font-family: var(--theme-font-caption);
-    color: var(--theme-caption-color);
-    // font-family: "Montserrat";
-    // font-family: "Open Sans";
     font-size: 24px;
     font-weight: 400;
+    color: var(--theme-caption-color);
   }
 
   .caption-3 {
     font-family: var(--theme-font-caption);
-    color: var(--theme-caption-color);
-    // font-family: "Montserrat";
-    // font-family: "Open Sans";
     font-size: 1.25em;
     font-weight: 500;
     padding: 1em 0.5em;
+    color: var(--theme-caption-color);
   }
 
   .caption-4 {
-    font-family: 'IBM Plex Sans';
-    color: var(--theme-caption-color);
+    font-family: var(--theme-font-caption);
     font-size: 10px;
     font-weight: 700;
     text-transform: uppercase;
+    color: var(--theme-caption-color);
   }
 
   .caption-5 {
-    font-family: 'IBM Plex Sans';
-    color: var(--theme-caption-color);
+    font-family: var(--theme-font-caption);
     font-size: 10px;
     font-weight: 400;
     text-transform: uppercase;
+    color: var(--theme-caption-color);
   }
 
   .caption-6 {
-    font-family: 'IBM Plex Sans';
-    color: var(--theme-caption-color);
+    font-family: var(--theme-font-caption);
     font-size: 9px;
     font-weight: 700;
+    color: var(--theme-caption-color);
   }
 
   .text-small-uppercase {
@@ -378,11 +361,12 @@
   }
 
   body {
-    color: var(--theme-content-color);
-
     font-family: var(--theme-font-content);
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 400;
+
+    color: var(--theme-content-color);
+    background-color: var(--theme-bg-dark-color);
 
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;

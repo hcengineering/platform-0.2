@@ -33,7 +33,7 @@
   class:editbox-label={label !== ''}
   class:editbox-hoverState={hoverState}
   style="width: {width}"
-  on:click={input.focus()}>
+  on:click={() => input.focus()}>
   {#if !iconRight && typeof icon !== 'undefined'}
     <Icon {icon} />
     <div class="separator" />
@@ -57,24 +57,24 @@
     border: none;
     width: calc(100% - 2px);
     padding: 0;
-    color: var(--theme-content-color);
     background-color: transparent;
-    font: inherit;
-
+    color: var(--theme-content-color);
     &:focus {
       outline: none;
     }
   }
 
   .editbox {
-    border: 1px solid var(--theme-bg-dark-color);
-    border-radius: 4px;
+    border: solid 1px transparent;
+    border-radius: 12px;
     padding: 8px 16px;
-    background-color: var(--theme-bg-accent-color);
     box-sizing: border-box;
+    font-size: 15px;
+    font-weight: 400;
+    border-color: var(--theme-bg-accent-color);
+    background-color: var(--theme-bg-accent-color);
     color: var(--theme-content-color);
     transition: border-color 0.2s, color 0.2s, background-color 0.2s;
-
     &:focus-within {
       outline: none;
       background-color: var(--theme-bg-accent-hover);
@@ -103,25 +103,13 @@
     flex-direction: column;
   }
   .label {
-    color: var(--theme-content-color);
     font-size: 11px;
     font-weight: 400;
     margin-bottom: 4px;
+    color: var(--theme-content-color);
   }
+
   .separator {
     width: 7px;
-  }
-
-  input {
-    border: none;
-    width: 100%;
-    margin-left: -2px;
-    color: var(--theme-content-dark-color);
-    background-color: transparent;
-    font: inherit;
-
-    &:focus {
-      outline: none;
-    }
   }
 </style>

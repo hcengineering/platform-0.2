@@ -20,13 +20,15 @@ limitations under the License.
   import type { AttrModel, ClassModel } from '@anticrm/presentation'
   import presentation, { getComponentExtension, getPresentationService } from '@anticrm/presentation'
   import type { AnyComponent } from '@anticrm/platform-ui'
-  import workbench, { ItemCreator } from '@anticrm/workbench'
+  import type { ItemCreator, WorkbenchApplication } from '@anticrm/workbench'
+  import workbench from '@anticrm/workbench'
 
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import Component from '@anticrm/platform-ui/src/components/Component.svelte'
 
   import DefaultForm from './DefaultForm.svelte'
 
+  export let application: WorkbenchApplication
   export let creator: ItemCreator
   export let spaces: Space[]
 
@@ -67,7 +69,7 @@ limitations under the License.
       </div>
     </div>
     {#if createFormComponent}
-      <Component is={createFormComponent} props={{ spaces }} on:change on:close={onClose} />
+      <Component is={createFormComponent} props={{ spaces, application }} on:change on:close={onClose} />
     {:else}
       <DefaultForm {creator} {model} {primary} {spaces} on:close={onClose} />
     {/if}

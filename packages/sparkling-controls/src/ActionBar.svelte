@@ -86,21 +86,19 @@
   .button {
     display: inline-block;
     height: 32px;
-    border: 1px solid var(--theme-bg-dark-color);
+    border: 1px solid transparent;
     border-radius: 4px;
     padding: 0.5em 1.33em 0.5em;
     box-sizing: border-box;
     cursor: pointer;
     user-select: none;
     text-align: center;
-
     font: inherit;
     font-weight: 500;
-
+    transition: border-color 0.2s, color 0.2s, background-color 0.2s;
+    border-color: var(--theme-bg-dark-color);
     color: var(--theme-content-color);
     background-color: var(--theme-bg-accent-color);
-    transition: border-color 0.2s, color 0.2s, background-color 0.2s;
-
     &:focus {
       outline: none;
     }
@@ -115,9 +113,9 @@
     width: 100%;
     text-align: center;
     font-weight: 500;
-    background-color: var(--theme-bg-accent-color);
     border-radius: 4px;
-    color: var(--status-maroon-color);
+    color: var(--theme-status-maroon-color);
+    background-color: var(--theme-bg-accent-color);
   }
 
   .actionButton {
@@ -148,8 +146,8 @@
   }
 
   .toggleState {
-    background-color: var(--theme-bg-dark-color);
     font-weight: bold;
+    background-color: var(--theme-bg-dark-color);
   }
 
   .popup-separator {
@@ -178,24 +176,24 @@
       display: flex;
       flex-direction: column;
       flex-flow: column nowrap;
-      background-color: var(--theme-bg-accent-color);
-      border: solid 1px var(--theme-bg-dark-color);
+      border: solid 1px transparent;
       border-radius: 4px;
       margin: 10px -0.25em 0 -0.25em;
       padding: 4px 8px;
+      background-color: var(--theme-bg-accent-color);
+      border-color: var(--theme-bg-dark-color);
       box-shadow: var(--theme-shadow);
       z-index: 1000;
 
       .popup-item {
         margin: 4px 0;
         padding: 8px;
-        background-color: var(--theme-bg-accent-color);
         border-radius: 4px;
         border: none;
         text-align: left;
+        background-color: var(--theme-bg-accent-color);
         color: var(--theme-content-dark-color);
         cursor: pointer;
-
         &:hover {
           background-color: var(--theme-bg-accent-hover);
         }
@@ -208,25 +206,22 @@
     width: 16px;
     height: 16px;
 
-    &::after {
-      content: '';
-      position: absolute;
-      width: 1px;
-      height: 6px;
-      left: calc(50% + 2px);
-      top: 50%;
-      transform: translateY(-50%) rotate(45deg);
-      background-color: var(--theme-content-color);
-    }
+    &::after,
     &::before {
       content: '';
       position: absolute;
       width: 1px;
       height: 6px;
-      left: calc(50% - 2px);
       top: 50%;
-      transform: translateY(-50%) rotate(-45deg);
       background-color: var(--theme-content-color);
+    }
+    &::after {
+      left: calc(50% + 2px);
+      transform: translateY(-50%) rotate(45deg);
+    }
+    &::before {
+      left: calc(50% - 2px);
+      transform: translateY(-50%) rotate(-45deg);
     }
   }
 

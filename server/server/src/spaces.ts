@@ -13,43 +13,49 @@
 // limitations under the License.
 //
 
-import { Tx, AnyLayout, Class, Doc, Ref, StringProperty } from '@anticrm/core'
+import { Class, Doc, DocumentQuery, Ref, StringProperty, Tx } from '@anticrm/core'
 import {
-  CreateTx,
-  DeleteTx,
-  PushTx,
-  Space,
-  SpaceUser,
-  UpdateTx,
-  CORE_CLASS_CREATE_TX,
-  CORE_CLASS_UPDATE_TX,
-  CORE_CLASS_DELETE_TX,
-  CORE_CLASS_PUSH_TX,
-  CORE_CLASS_SPACE,
-  CORE_CLASS_TITLE, CORE_CLASS_REFERENCE
+  CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_OBJECT_TX, CORE_CLASS_REFERENCE, CORE_CLASS_SPACE,
+  CORE_CLASS_SPACE_USER,
+  CORE_CLASS_TITLE, CORE_CLASS_TX, CORE_CLASS_UPDATE_TX, CreateTx, DeleteTx, Space, SpaceUser, UpdateTx
 } from '@anticrm/domains'
 import { Client } from './server'
 import { WorkspaceProtocol } from './workspace'
 
 export interface SpaceCheckResult {
-  allowed: boolean,
-  sendSpace: Space | null
+  allowed: boolean
+  sendSpace: Space | undefined
 }
 
 export interface SecurityContext {
   docs?: Doc[] // A list of touched documents.
 }
 
+export interface UserInfo extends SpaceUser {
+  joined: boolean
+}
+
 function getSpaceKey (_class: Ref<Class<Doc>>): string {
   // for Space objects use _id to filter available ones
-  return _class === CORE_CLASS_SPACE ? '_id' : '_space'
+  switch (_class) {
+    case CORE_CLASS_SPACE:
+      return '_id'
+    case CORE_CLASS_TX:
+    case CORE_CLASS_OBJECT_TX:
+    case CORE_CLASS_CREATE_TX:
+    case CORE_CLASS_UPDATE_TX:
+    case CORE_CLASS_DELETE_TX:
+      return '_objectSpace'
+    default:
+      return '_space'
+  }
 }
 
 /**
  * Filters the given query to satisfy current user account rights.
  * The result query can be used to request objects the user has access to from the storage.
  */
-export function filterQuery (spaces: Map<string, SpaceUser>, _class: Ref<Class<Doc>>, query: AnyLayout): { valid: boolean, filteredQuery: AnyLayout } {
+export function filterQuery (spaces: Map<string, UserInfo>, _class: Ref<Class<Doc>>, query: DocumentQuery<any>): { valid: boolean, filteredQuery: DocumentQuery<any> } {
   if (_class === CORE_CLASS_TITLE || _class === CORE_CLASS_REFERENCE) {
     // Allow to proceed with title and references
     return {
@@ -74,8 +80,11 @@ export function filterQuery (spaces: Map<string, SpaceUser>, _class: Ref<Class<D
   } else {
     // no space filter provided, use all spaces available to the user
     const userSpaces: StringProperty[] = []
-    for (const k of spaces.keys()) {
-      userSpaces.push(k as StringProperty)
+    for (const k of spaces.entries()) {
+      // Skip non joined spaces if query is not for SPACE
+      if (k[1].joined || _class === CORE_CLASS_SPACE) {
+        userSpaces.push(k[0] as StringProperty)
+      }
     }
     userSpaces.push(null as unknown as StringProperty)
     query[spaceKey] = { $in: userSpaces }
@@ -90,14 +99,14 @@ export function filterQuery (spaces: Map<string, SpaceUser>, _class: Ref<Class<D
 /**
  * Check for object are in user spaces and return true if so
  */
-export function isAcceptable (spaces: Map<string, SpaceUser>, _class: Ref<Class<Doc>>, doc: AnyLayout): boolean {
-  if (!doc) {
+export function isAcceptable (spaces: Map<string, UserInfo>, doc?: Doc): boolean {
+  if (doc === undefined) {
     return false
   }
-  const spaceKey = getSpaceKey(_class)
-  const spaceId = doc[spaceKey] as Ref<Space>
+  const spaceKey = getSpaceKey(doc._class)
+  const spaceId = (doc as any)[spaceKey] as Ref<Space>
 
-  if (spaceId) {
+  if (spaceId !== undefined) {
     return spaces.has(spaceId)
   }
   return true
@@ -106,40 +115,42 @@ export function isAcceptable (spaces: Map<string, SpaceUser>, _class: Ref<Class<
 /**
  * Check and update current user set of spaces, and return information if spaceId is added to list of user spaces.
  */
-function checkUpdateSpaces (spaces: Map<string, SpaceUser>, s: Space, spaceId: string, email: string): Space | null {
-  const users = s.users || []
+function checkUpdateSpaces (spaces: Map<string, UserInfo>, s: Space, email: string): Space | undefined {
+  const users = s.users ?? []
   let us = users.find(u => u.userId === email)
-  if (s.isPublic && !us) {
+  const joined = us !== undefined
+  if (s.isPublic && (us === undefined)) {
     // Add in any case for public space
-    us = ({
+    us = {
+      _class: CORE_CLASS_SPACE_USER,
       userId: email,
       owner: false
-    } as SpaceUser)
+    }
   }
-  if (us) {
+  if (us !== undefined) {
     // Add space to us since it is now accessible
-    spaces.set(spaceId, us)
+    spaces.set(s._id, { ...us, joined })
     return s
   }
   // Check if spaces had this space, we need to remove it
-  if (spaces.has(spaceId)) {
-    spaces.delete(spaceId)
+  if (spaces.has(s._id)) {
+    spaces.delete(s._id)
     return s
   }
-  return null
+  return undefined
 }
 
-async function getObjectById (ctx: SecurityContext, workspace: WorkspaceProtocol, _class: Ref<Class<Doc>>, id: Ref<Doc>): Promise<Doc | undefined> {
-  if (ctx.docs) {
+async function getSpaceById (ctx: SecurityContext, workspace: WorkspaceProtocol, id: Ref<Space>): Promise<Space | undefined> {
+  if (ctx.docs !== undefined) {
     for (const d of ctx.docs) {
       if (d._id === id) {
-        return Promise.resolve(d)
+        return await Promise.resolve(d as Space)
       }
     }
   }
-  const result = await workspace.findOne(_class, { _id: id })
-  if (result) {
-    if (!ctx.docs) {
+  const result = await workspace.findOne<Space>(CORE_CLASS_SPACE, { _id: id })
+  if (result !== undefined) {
+    if (ctx.docs === undefined) {
       ctx.docs = []
     }
     ctx.docs.push(result)
@@ -151,22 +162,24 @@ async function getObjectById (ctx: SecurityContext, workspace: WorkspaceProtocol
  * Process transaction and update userSpaces in case of proper space operation.
  * Return true if operation is allowed by user.
  */
-export async function processTx (ctx: SecurityContext, workspace: WorkspaceProtocol, spaces: Map<string, SpaceUser>, tx: Tx, client: Client, ownChange: boolean): Promise<SpaceCheckResult> {
+export async function processTx (ctx: SecurityContext, workspace: WorkspaceProtocol, spaces: Map<string, UserInfo>, tx: Tx, client: Client, ownChange: boolean): Promise<SpaceCheckResult> {
+  const model = await workspace.getModel()
+
   switch (tx._class) {
     case CORE_CLASS_CREATE_TX: {
       const createTx = tx as CreateTx
       if (createTx._objectClass === CORE_CLASS_SPACE) {
         // Creation of a new space, we need to mark user as owner if this information is missing
-        const s = (createTx.object as unknown) as Space
+        const s = model.createDocument<Space>(createTx._objectClass as Ref<Class<Space>>, (createTx.object as unknown) as Space, createTx._objectId as Ref<Space>)
         if (ownChange) {
-          const users = s.users || []
+          const users = s.users ?? []
           const us = users.find(u => u.userId === client.email)
-          if (!s.isPublic && (!us || !us.owner)) {
+          if (!s.isPublic && ((us === undefined) || !us.owner)) {
             // Do not allow space with us not owner.
             return Promise.reject(new Error('Space doesn\'t contain owner. Operation is not allowed'))
           }
         }
-        const sendSpace = checkUpdateSpaces(spaces, s, createTx._objectId, client.email)
+        const sendSpace = checkUpdateSpaces(spaces, s, client.email)
 
         // It is not yet created, so Space object doesn't have _id specified.
         if (!spaces.has(createTx._objectId)) {
@@ -178,59 +191,31 @@ export async function processTx (ctx: SecurityContext, workspace: WorkspaceProto
         }
       }
       return {
-        allowed: isAcceptable(spaces, createTx._objectClass, createTx.object),
-        sendSpace: null
+        allowed: createTx._objectSpace !== undefined && spaces.has(createTx._objectSpace), // We do not allow to create objects without spaces now.
+        sendSpace: undefined
       }
     }
     case CORE_CLASS_UPDATE_TX: {
       const updateTx = tx as UpdateTx
-      const obj = await getObjectById(ctx, workspace, updateTx._objectClass, updateTx._objectId)
-
-      if (!obj) {
-        throw new Error(`Document for update ${updateTx._objectClass} ${updateTx._objectId} is not found'`)
-      }
+      let sendSpace: Space | undefined
       // Check if space, we need update out list
-      let sendSpace: Space | null = null
-      if (!ownChange && updateTx._objectClass === CORE_CLASS_SPACE) {
-        sendSpace = checkUpdateSpaces(spaces, (obj as unknown) as Space, updateTx._objectId, client.email)
+      if (updateTx._objectClass === CORE_CLASS_SPACE) {
+        let obj = await getSpaceById(ctx, workspace, updateTx._objectId as Ref<Space>)
+        if (obj !== undefined) {
+          obj = model.updateDocument<Space>(obj, updateTx.operations)
+          sendSpace = await checkUpdateSpaces(spaces, obj, client.email)
+        }
       }
       return {
-        allowed: isAcceptable(spaces, updateTx._objectClass, (obj as unknown) as AnyLayout),
-        sendSpace
-      }
-    }
-    case CORE_CLASS_PUSH_TX: {
-      const pushTx = tx as PushTx
-      const obj = await getObjectById(ctx, workspace, pushTx._objectClass, pushTx._objectId)
-      if (!obj) {
-        throw new Error(`Document for update ${pushTx._objectClass} ${pushTx._objectId} is not found'`)
-      }
-      let sendSpace: Space | null = null
-      if (!ownChange && pushTx._objectClass === CORE_CLASS_SPACE) {
-        // Check if SpaceUser is we, since operation is already applied, we could check with Space object itself.
-        const sp = (obj as unknown) as Space
-        sendSpace = checkUpdateSpaces(spaces, sp, sp._id, client.email)
-      }
-      return {
-        allowed: isAcceptable(spaces, pushTx._objectClass, (obj as unknown) as AnyLayout),
+        allowed: updateTx._objectSpace !== undefined && spaces.has(updateTx._objectSpace),
         sendSpace
       }
     }
     case CORE_CLASS_DELETE_TX: {
       const delTx = tx as DeleteTx
-      const obj = await getObjectById(ctx, workspace, delTx._objectClass, delTx._objectId)
-      if (!obj) {
-        throw new Error(`Document for delete ${delTx._objectClass} ${delTx._objectId} is not found'`)
-      }
-      let sendSpace: Space | null = null
-      if (!ownChange && delTx._objectClass === CORE_CLASS_SPACE) {
-        // Check if SpaceUser is we, since operation is already applied, we could check with Space object itself.
-        const sp = (obj as unknown) as Space
-        sendSpace = checkUpdateSpaces(spaces, sp, sp._id, client.email)
-      }
       return {
-        allowed: isAcceptable(spaces, delTx._class, (obj as unknown) as AnyLayout),
-        sendSpace
+        allowed: delTx._objectSpace !== undefined && spaces.has(delTx._objectSpace),
+        sendSpace: undefined
       }
     }
     default:
@@ -238,20 +223,25 @@ export async function processTx (ctx: SecurityContext, workspace: WorkspaceProto
   }
 }
 
-export async function getUserSpaces (workspace: WorkspaceProtocol, email: string): Promise<Map<string, SpaceUser>> {
-  const userSpaces = new Map<string, SpaceUser>()
+export async function getUserSpaces (workspace: WorkspaceProtocol, email: string): Promise<Map<string, UserInfo>> {
+  const userSpaces = new Map<string, UserInfo>()
   const allSpaces = await workspace.find(CORE_CLASS_SPACE, {})
   for (const s of allSpaces) {
     let us = s.users.find(u => u.userId === email)
+    const joined = us !== undefined
+
     if (s.isPublic) {
       // Add in any case for public space
-      us = us || ({
-        userId: email,
-        owner: false
-      } as SpaceUser)
+      if (us === undefined) {
+        us = {
+          _class: CORE_CLASS_SPACE_USER,
+          userId: email,
+          owner: false
+        }
+      }
     }
-    if (us) {
-      userSpaces.set(s._id, us)
+    if (us !== undefined) {
+      userSpaces.set(s._id, { ...us, joined })
     }
   }
   return userSpaces

@@ -48,11 +48,12 @@
   .modal {
     position: fixed;
     z-index: 1001;
-    background-color: var(--theme-bg-color);
-    border: solid 1px var(--theme-bg-dark-color);
+    border: solid 1px transparent;
     border-radius: 4px;
     padding: 0px;
-    box-shadow: 0px 6px 9px rgba(0, 0, 0, 0.1);
+    background-color: var(--theme-bg-color);
+    border-color: var(--theme-bg-accent-color);
+    box-shadow: var(--theme-shadow);
   }
 
   .modal-overlay {
@@ -63,5 +64,6 @@
     left: 0;
     width: 100%;
     height: 100%;
+    backdrop-filter: blur(3px);
   }
 </style>

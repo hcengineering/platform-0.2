@@ -29,20 +29,16 @@
     &:focus {
       outline: none;
       border-color: var(--theme-doclink-color);
-      box-shadow: inset 0px 0px 2px 0px var(--theme--theme-doclink-color);
+      box-shadow: inset 0px 0px 2px 0px var(--theme-doclink-color);
     }
     &.selected {
-      background-color: var(--theme-bg-dark-color);
       font-weight: bold;
-      // background-color: darken(--theme-doclink-color, 10%);
+      background-color: var(--theme-bg-dark-color);
     }
-
     &:hover:enabled {
       color: var(--theme-caption-color);
       border-color: var(--theme-doclink-color);
-      // color: $highlight-color;
       background-color: var(--theme-bg-dark-color);
-      // background-color: darken($highlight-color, 30%);
     }
   }
 </style>

@@ -13,19 +13,17 @@
 // limitations under the License.
 //
 
-import { CoreProtocol, TxContext, Storage, AnyLayout, Class, Doc, Ref, StringProperty } from '@anticrm/core'
+import { Class, CoreProtocol, Doc, DocumentQuery, FindOptions, Ref, Storage, TxContext } from '@anticrm/core'
+import { TxOperation } from '@anticrm/domains'
 
 export class Cache implements Storage {
   async store (tx: TxContext, doc: Doc): Promise<void> {  // eslint-disable-line
   }
 
-  async push (tx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, _query: AnyLayout | null, attribute: StringProperty, attributes: AnyLayout): Promise<void> { // eslint-disable-line
+  async update (tx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, operations: TxOperation[]): Promise<void> { // eslint-disable-line
   }
 
-  async update (tx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, _query: AnyLayout | null, attributes: AnyLayout): Promise<void> { // eslint-disable-line
-  }
-
-  async remove (tx: TxContext, _class: Ref<Class<Doc>>, doc: Ref<Doc>, _query: AnyLayout | null): Promise<void> { // eslint-disable-line
+  async remove (tx: TxContext, _class: Ref<Class<Doc>>, doc: Ref<Doc>): Promise<void> { // eslint-disable-line
   }
 
   private readonly coreProtocol: CoreProtocol
@@ -34,11 +32,11 @@ export class Cache implements Storage {
     this.coreProtocol = coreProtocol
   }
 
-  find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
-    return this.coreProtocol.find(_class, query) as Promise<T[]>
+  async find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>, options?: FindOptions<T>): Promise<T[]> {
+    return await this.coreProtocol.find<T>(_class, query, options)
   }
 
-  findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined> {
-    return this.coreProtocol.findOne(_class, query) as Promise<T | undefined>
+  async findOne<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined> {
+    return await this.coreProtocol.findOne<T>(_class, query)
   }
 }

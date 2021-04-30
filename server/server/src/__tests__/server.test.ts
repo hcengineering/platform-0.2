@@ -22,7 +22,7 @@ import { accountsDb, createUserAccount, getUserAccount, withTenant } from '@anti
 
 import { Builder } from '@anticrm/model'
 
-import { CORE_CLASS_CLASS, Doc } from '@anticrm/core'
+import { Doc } from '@anticrm/core'
 
 import { model } from '@anticrm/model/src/__model__'
 import { model as presentation } from '@anticrm/presentation/src/__model__'
@@ -32,6 +32,7 @@ import { model as task } from '@anticrm/task/src/__model__'
 import { model as chunter } from '@anticrm/chunter/src/__model__'
 import { readResponse, serialize } from '@anticrm/rpc'
 import { model as activityPlugin } from '@anticrm/activity/src/__model__'
+import { CORE_CLASS_SPACE } from '@anticrm/domains'
 // import recruitmentModel from '@anticrm/recruitment-model/src/model'
 
 // import taskStrings from '@anticrm/task-model/src/strings/ru'
@@ -51,24 +52,24 @@ builder.load(task)
 const Model = builder.dumpAll()
 
 describe('server', () => {
-  const mongodbUri = process.env.MONGODB_URI || 'mongodb://localhost:27017'
+  const mongodbUri = process.env.MONGODB_URI ?? 'mongodb://localhost:27017'
 
   let conn: WebSocket
   let server: ServerProtocol
 
-  function initDatabase (db: Db): Promise<any> {
-    const domains = { ...Model } as { [key: string]: Doc[] }
-    const ops = [] as Promise<any>[]
+  async function initDatabase (db: Db): Promise<any> {
+    const domains: { [key: string]: Doc[] } = { ...Model }
+    const ops: Array<Promise<any>> = []
     for (const domain in domains) {
       const model = domains[domain]
       db.collection(domain, (err, coll) => {
-        if (err) {
+        if (err !== undefined) {
           console.log(err)
         }
         ops.push(coll.deleteMany({}).then(() => model.length > 0 ? coll.insertMany(model) : null))
       })
     }
-    return Promise.all(ops)
+    await Promise.all(ops)
   }
 
   const client: Client = {
@@ -90,7 +91,7 @@ describe('server', () => {
     // Create user and put session inside
 
     const accounts = accountsDb(dbClient)
-    if (await getUserAccount(accounts, client.email) == null) {
+    if (await getUserAccount(accounts, client.email) === null) {
       await createUserAccount(accounts, client.email, 'pass')
     }
 
@@ -100,7 +101,7 @@ describe('server', () => {
   })
 
   async function connect (): Promise<WebSocket> {
-    return new Promise((resolve, reject) => {
+    return await new Promise((resolve, reject) => {
       conn = new WebSocket('ws://localhost:3337/' + token)
       conn.on('open', () => {
         resolve(conn)
@@ -116,7 +117,7 @@ describe('server', () => {
   })
 
   afterEach(() => {
-    if (conn && conn.readyState) {
+    if (conn !== undefined && conn.readyState !== WebSocket.CLOSED) {
       conn.close()
     }
   })
@@ -152,13 +153,14 @@ describe('server', () => {
   it('should send query', (done) => {
     conn.on('message', (msg: string) => {
       const resp = readResponse(msg)
-      expect(resp.result instanceof Array).toBeTruthy()
+      expect(resp.result instanceof Object).toBeTruthy()
+      expect((resp.result as any).values instanceof Array).toBeTruthy()
       done()
     })
     conn.send(serialize({
       method: 'find',
       params: [
-        CORE_CLASS_CLASS,
+        CORE_CLASS_SPACE,
         {}
       ]
     }))

@@ -19,7 +19,7 @@ import { routeMeta } from '@anticrm/platform-ui'
 
 export default (platform: Platform): void => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const spritesUrl = require('../assets/icons.svg')
+  const spritesUrl: string = require('../assets/icons.svg')
   platform.loadMetadata(workbench.icon, {
     DefaultPerspective: `${spritesUrl}#perspective`,
     Add: `${spritesUrl}#add`,
@@ -29,7 +29,8 @@ export default (platform: Platform): void => {
     Lock: `${spritesUrl}#lock`,
     Sharp: `${spritesUrl}#sharp`,
     Burger: `${spritesUrl}#burger`,
-    ArrowDown: `${spritesUrl}#arrowDown`
+    ArrowDown: `${spritesUrl}#arrowDown`,
+    ArrowRight: `${spritesUrl}#arrowRight`
   })
 
   platform.setMetadata(routeMeta('workbench'), { route: 'workbench', component: workbench.component.Workbench })

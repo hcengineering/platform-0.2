@@ -1,9 +1,9 @@
 <script type="ts">
   import Table from '../../Table.svelte'
-  import type { Class, Doc, Ref } from '@anticrm/core'
-  import type { Space } from '@anticrm/domains'
+  import type { Class, Ref } from '@anticrm/core'
+  import type { Space, VDoc } from '@anticrm/domains'
 
-  export let _class: Ref<Class<Doc>>
+  export let _class: Ref<Class<VDoc>>
   export let space: Space
   export let editable = false
 </script>

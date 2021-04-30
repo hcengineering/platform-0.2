@@ -79,15 +79,15 @@ export class TTask extends TCollab implements Task {
 
   @UX(task.string.Task_assignee)
   @ArrayOf$()
-  @RefTo$(contact.mixin.User) assignee!: Ref<User>[]
+  @RefTo$(contact.mixin.User) assignee!: Array<Ref<User>>
 
   @UX(task.string.Task_participants)
   @ArrayOf$()
-  @RefTo$(contact.mixin.User) participants!: Ref<User>[]
+  @RefTo$(contact.mixin.User) participants!: Array<Ref<User>>
 
   @UX(task.string.Task_labels)
   @ArrayOf$()
-  @RefTo$(task.class.TaskLabel) labels!: Ref<TaskLabel>[]
+  @RefTo$(task.class.TaskLabel) labels!: Array<Ref<TaskLabel>>
 
   @UX(task.string.Task_status, { presenter: task.component.StatusPresenter })
   @EnumOf$(task.enum.TaskStatus) status!: TaskStatus
@@ -134,6 +134,16 @@ class TVersionedTask extends TTask implements VersionedTask {
 class TTaskStatusAction extends TEmb implements TaskStatusAction {
   @Prop() action!: string // A action title, to perform switch to this state.
   @Prop() description?: string // A description could be used to show
+}
+
+@Mixin$(task.class.WorkLog, core.class.Emb)
+class TWorklog extends TEmb implements WorkLog {
+  // A user spend time
+  @RefTo$(contact.mixin.User) reporter!: Ref<User>
+
+  // A time spend on task on day and how many is spend.
+  @Prop() date!: DateProperty
+  @Prop() spendTime!: TaskTimeDuration
 }
 
 @Enum$(task.enum.TaskStatus)
@@ -193,7 +203,7 @@ class TTaskTypeEnum extends TEnum<TaskType> {
 
 export function model (S: Builder): void {
   S.add(TTask, TTaskLabel, TTaskLink, TTaskStatusAction, TTaskStatusEnum, TTaskPriorityEnum, TTaskTypeEnum)
-  S.add(TTypeTask, TPrioritizedTask, TVersionedTask, TTimeManagedTask)
+  S.add(TTypeTask, TPrioritizedTask, TVersionedTask, TTimeManagedTask, TWorklog)
 
   S.createDocument(workbench.class.WorkbenchApplication, {
     route: 'tasks',

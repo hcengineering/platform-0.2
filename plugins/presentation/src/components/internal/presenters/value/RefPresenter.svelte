@@ -13,11 +13,12 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import type { Class, Doc, Ref, RefTo, Type } from '@anticrm/core'
+  import type { Class, Doc, Ref, RefTo } from '@anticrm/core'
   import type { AttrModel } from '@anticrm/presentation'
   import ui, { getCoreService, liveQuery } from '@anticrm/presentation'
   import type { AnyComponent } from '@anticrm/platform-ui'
   import Presenter from '../Presenter.svelte'
+  import { QueryUpdater } from '@anticrm/platform-core'
 
   export let value: Ref<Doc>
   export let attribute: AttrModel
@@ -27,7 +28,8 @@
   let presenter: AnyComponent
 
   const coreService = getCoreService()
-  $: lq = liveQuery(lq, (attribute.type as RefTo<Doc>).to, { _id: value }, (docs) => {
+  let lq: Promise<QueryUpdater<Doc>>
+  $: lq = liveQuery<Doc>(lq, (attribute.type as RefTo<Doc>).to, { _id: value }, (docs) => {
     if (docs.length > 0) {
       doc = docs[0]
     } else {
@@ -39,7 +41,7 @@
     coreService.then((cs) => {
       const model = cs.getModel()
       const objClass = (attribute.type as RefTo<Doc>).to
-      const typeClass = model.get(objClass) as Class<Type>
+      const typeClass = model.get<Class<Doc>>(objClass as Ref<Class<Doc>>)
       if (!model.isMixedIn(typeClass, ui.mixin.Presenter)) {
         console.log(new Error(`no presenter for type '${objClass}'`))
         // Use string presenter
