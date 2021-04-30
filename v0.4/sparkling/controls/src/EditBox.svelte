@@ -17,8 +17,8 @@
   export let label: string
   export let width: string
   export let value: string
-  export let error: string
-  export let password: boolean
+  export let error: string | undefined
+  export let password: boolean | undefined
   export let id: string | undefined
 </script>
 
