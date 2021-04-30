@@ -47,6 +47,6 @@ export async function doLogin (platform: Platform, username: string, password: s
     }
     return [status, result.result]
   } catch (err) {
-    return [new Status(Severity.ERROR, 0, 'Не могу соедениться с сервером.'), undefined]
+    return [new Status(Severity.ERROR, 0, err.message), undefined]
   }
 }

@@ -31,11 +31,10 @@
   }
 
   export let caption: string
+  export let status: Status
   export let fields: Field[]
   export let action: Action
   export let object: any
-
-  let status = new Status(Severity.OK, 0, '')
 
   function validate () {
     for (const field of fields) {

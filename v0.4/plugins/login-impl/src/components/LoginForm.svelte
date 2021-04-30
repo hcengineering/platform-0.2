@@ -15,6 +15,7 @@
 
 <script lang="ts">
   import { getContext } from 'svelte'
+  import { Status, Severity } from '@anticrm/status'
   import { Platform } from '@anticrm/plugin'
 
   import Form from './Form.svelte'
@@ -38,13 +39,20 @@
     password: '',
   }
 
+  let status = new Status(Severity.OK, 0, '')
+
   const action = { 
     i18n: 'Login',
     func: async () => { 
-      // const [loginStatus, result] = await doLogin(platform, object.username, object.password, object.workspace)
-      console.log('loging in...') 
+      status = new Status(Severity.INFO, 0, 'Соединяюсь с сервером...')
+
+      const [loginStatus, result] = await doLogin(platform, object.username, object.password, object.workspace)
+
       return new Promise<void>((resolve, reject) => {
-        setTimeout(() => { resolve() }, 1000)
+        setTimeout(() => { 
+          status = loginStatus
+          resolve() 
+        }, 1000)
       })
     }
   }
@@ -52,4 +60,4 @@
 
 </script>
 
-<Form caption="Log In" {fields} {object} {action}/>
+<Form caption="Log In" {status} {fields} {object} {action}/>
