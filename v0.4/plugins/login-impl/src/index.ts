@@ -123,42 +123,6 @@ export default (platform: Platform, deps: { ui: UIService }): Promise<LoginServi
     }
   }
 
-  async function doLogin (username: string, password: string, workspace: string, secondFactorCode: string): Promise<Status> {
-    const fp = await FingerprintJS.load()
-    const result = await fp.get()
-    const clientId = result.visitorId
-
-    const request: Request<[string, string, string, string, string]> = {
-      method: 'login',
-      params: [username, password, workspace, clientId, secondFactorCode]
-    }
-
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const response = await fetch(accountsUrl!, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json;charset=utf-8'
-        },
-        body: serialize(request)
-      })
-      const result = (await response.json()) as Response<any>
-      if (result.error?.message) {
-        return toStatus(result)
-      }
-      if (result.result) {
-        setLoginInfo(result.result)
-
-        platform.broadcastEvent(PlatformStatus, new Status(Severity.OK, AuthStatusCodes.AUTHENTICATON_OK, ''))
-        console.log('do navigate')
-        await navigateApp()
-      }
-      return new Status(Severity.OK, 0, '')
-    } catch (err) {
-      return new Status(Severity.ERROR, 0, 'Не могу соедениться с сервером.')
-    }
-  }
-
   function doLogout (): Promise<void> {
     const token = platform.getMetadata(TOKEN)
     if (token) {
@@ -168,7 +132,6 @@ export default (platform: Platform, deps: { ui: UIService }): Promise<LoginServi
   }
 
   return Promise.resolve({
-    doLogin,
     doLogout,
     getLoginInfo,
     navigateApp,

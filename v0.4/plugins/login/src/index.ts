@@ -36,10 +36,7 @@ export function currentAccount (): LoginInfo | null {
 }
 
 export interface LoginService extends Service {
-  /**
-   * Perform a login operation to required workspace with user credentials.
-   */
-  doLogin (username: string, password: string, workspace: string, secondFactorCode: string): Promise<Status>
+  // doLogin (username: string, password: string, workspace: string, secondFactorCode: string): Promise<Status>
 
   /**
    * Check and auto return login information if available.

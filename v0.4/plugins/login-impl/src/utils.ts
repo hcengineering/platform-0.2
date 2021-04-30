@@ -13,3 +13,40 @@
 // limitations under the License.
 //
 
+import { Status, Severity } from '@anticrm/status'
+import { Platform } from '@anticrm/plugin'
+import { Request, Response, serialize, toStatus } from '@anticrm/rpc'
+
+import login from '@anticrm/plugin-login'
+
+/**
+ * Perform a login operation to required workspace with user credentials.
+ */
+export async function doLogin (platform: Platform, username: string, password: string, workspace: string): Promise<[Status, any]> {
+
+  const accountsUrl = platform.getMetadata(login.metadata.AccountsUrl)
+
+  const request: Request<[string, string, string]> = {
+    method: 'login',
+    params: [username, password, workspace]
+  }
+
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const response = await fetch(accountsUrl!, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json;charset=utf-8'
+      },
+      body: serialize(request)
+    })
+    const result = (await response.json()) as Response<any>
+    const status = toStatus(result)
+    if (status.severity === Severity.OK) {
+
+    }
+    return [status, result.result]
+  } catch (err) {
+    return [new Status(Severity.ERROR, 0, 'Не могу соедениться с сервером.'), undefined]
+  }
+}
