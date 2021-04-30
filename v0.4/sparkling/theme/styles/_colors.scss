@@ -16,8 +16,10 @@
 /* Dark Theme */
 .theme-dark {
   --theme-bg-color: #18181e;
-  --theme-bg-dark-color: #111117;
-  --theme-bg-dark-hover: #111117;
+  --theme-bg-selection: #282830;
+  --theme-menu-color: #111117;
+  --theme-menu-selection: #1D1D23;
+
   --theme-bg-accent-color: rgba(255, 255, 255, .03);
   --theme-bg-accent-hover: rgba(255, 255, 255, .1);
   --theme-border-accent-color: rgba(255, 255, 255, .03);
@@ -66,8 +68,10 @@
 /* Grey Theme */
 .theme-grey {
   --theme-bg-color: #393844;
-  --theme-bg-dark-color: #2c2b35;
-  --theme-bg-dark-hover: #2c2b35;
+  --theme-bg-selection: #454351;
+  --theme-menu-color: #2C2B35;
+  --theme-menu-selection: #37363F;
+
   --theme-bg-accent-color: rgba(255, 255, 255, 0.05);
   --theme-bg-accent-hover: rgba(255, 255, 255, 0.05);
   --theme-selection-item: rgba(148, 144, 170, 0.13);
@@ -88,9 +92,11 @@
 
 /* Light Theme */
 .theme-light {
-  --theme-bg-color: #fff;
-  --theme-bg-dark-color: #e7e7e7;
-  --theme-bg-dark-hover: #e7e7e7;
+  --theme-bg-color: #FFFFFF;
+  --theme-bg-selection: #F1F1F4;
+  --theme-menu-color: #E7E7E7;
+  --theme-menu-selection: #DBDBDB;
+
   --theme-bg-accent-color: rgba(0, 0, 0, 0.05);
   --theme-bg-accent-hover: rgba(0, 0, 0, 0.05);
   --theme-selection-item: rgba(148, 144, 170, 0.13);
