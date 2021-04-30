@@ -26,6 +26,16 @@
     { name: 'workspace', i18n: 'Workspace' }
   ]
 
+  const action = { 
+    i18n: 'Login',
+    func: async () => { 
+      console.log('loging in...') 
+      return new Promise<void>((resolve, reject) => {
+        setTimeout(() => { resolve() }, 1000)
+      })
+    }
+  }
+
   let object = {
     workspace: '',
     username: '',
@@ -33,4 +43,4 @@
   }
 </script>
 
-<Form caption="Log In" {fields} {object}/>
+<Form caption="Log In" {fields} {object} {action}/>

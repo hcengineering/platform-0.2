@@ -15,7 +15,6 @@
 
 <script lang="ts">
   import Spinner from './Spinner.svelte'
-  import { createEventDispatcher } from 'svelte'
 
   export let label: string = ''
   export let primary: boolean = false
@@ -23,20 +22,15 @@
   export let loading: boolean = false
   export let width: string
 
-  const dispatch = createEventDispatcher()
-  function onClick (event: MouseEvent) {
-    dispatch('click', event)
-  }
-
-  if (loading) disabled = true
 </script>
 
-<button class="button" class:primary={primary} class:loading={loading} {disabled}
-        style="{width ? 'width: ' + width : ''}" on:click={onClick}>
+<button class="button" class:primary={primary} disabled={disabled || loading}
+        style="{width ? 'width: ' + width : ''}" on:click>
   {#if loading}
-    <div class="spinner"><Spinner/></div>
+    <Spinner/>
+  {:else}
+    {label}
   {/if}
-  {label}
 </button>
 
 <style lang="scss">
@@ -101,17 +95,4 @@
     }
   }
 
-  .loading {
-    background-color: var(--theme-primary-enabled);
-    color: var(--theme-caption-color);
-    &:disabled {
-      background-color: var(--theme-primary-enabled);
-      color: var(--theme-caption-color);
-      cursor: not-allowed;
-    }
-  }
-
-  .spinner {
-    margin: 0 10px;
-  }
 </style>

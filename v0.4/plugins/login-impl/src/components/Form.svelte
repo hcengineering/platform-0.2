@@ -15,7 +15,7 @@
 
 <script lang="ts">
   import { Status, Severity } from '@anticrm/status'
-  import { Status as StatusControl, EditBox } from '@anticrm/sparkling-controls'
+  import { Status as StatusControl, EditBox, Button } from '@anticrm/sparkling-controls'
 
   interface Field {
     name: string
@@ -32,7 +32,7 @@
 
   export let caption: string
   export let fields: Field[]
-  export let actions: Action[]
+  export let action: Action
   export let object: any
 
   let status = new Status(Severity.OK, 0, '')
@@ -50,6 +50,13 @@
   }
   validate()
 
+  let inAction = false
+
+  function performAction(action: Action) {
+    inAction = true
+    action.func().finally(() => {inAction = false})
+  }
+
 </script>
 
 <form class="form-container">
@@ -66,16 +73,19 @@
     </div>
     {/each}
 
+    <div class="form-row send">
+      <Button label={action.i18n} primary width="100%" loading={inAction} disabled={status.severity !== Severity.OK} on:click={() => {performAction(action)}}/>
+    </div>
+
     <!-- <div class="form-col"><EditBox label="First Name" bind:value={fname}/></div>
     <div class="form-col"><EditBox label="Last Name" bind:value={lname}/></div>
     <div class="form-row"><EditBox label="E-mail"/></div>
     <div class="form-row"><EditBox label="Password" password/></div>
-    <div class="form-row"><EditBox label="Repeat password" password/></div>
-    <div class="form-row send"><Button label="Sign Up" primary width="100%"/></div> -->
+    <div class="form-row"><EditBox label="Repeat password" password/></div> -->
 
   </div>
   <div class="grow-separator"/>
-  <div class="footer"><span>Already have an account?</span> <a href="/login">Sign In</a></div>
+  <div class="footer"><span>Do not have an account?</span> <a href="/login">Sign Up</a></div>
 </form>
 
   <!-- <div class="actions">
