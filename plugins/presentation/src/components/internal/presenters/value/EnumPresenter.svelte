@@ -14,6 +14,7 @@
 -->
 <script type="ts">
   import ComboBox from '@anticrm/sparkling-controls/src/ComboBox.svelte'
+  import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.svelte'
   import type { AttrModel } from '@anticrm/presentation'
   import { Enum, EnumKey, EnumOf } from '@anticrm/core'
   import { getCoreService } from '@anticrm/presentation'
@@ -50,12 +51,18 @@
       value = _enum._literals[items[selected].id]
     }
   }
+
+  $: textValue = selected ? items[selected].comboValue : ''
 </script>
 
 {#if items.length}
-  <ComboBox {label} {items} {editable} bind:selected>
-    <div slot="title">
-      {selected ? items[selected].comboValue : ''}
-    </div>
-  </ComboBox>
+  {#if editable}
+    <ComboBox {label} {items} bind:selected>
+      <div slot="title">
+        {textValue}
+      </div>
+    </ComboBox>
+  {:else}
+    <InlineEdit bind:value={textValue} placeholder={label} {editable} />
+  {/if}
 {/if}

@@ -5,7 +5,6 @@
   export let selected: number | undefined
   export let label = 'Значение'
   export let width = ''
-  export let editable = true
 
   const widthStr: string = width !== '' ? `width: ${width}` : ''
 
@@ -42,7 +41,7 @@
       return false
     })
     if (pathRoot && !pathDrop) {
-      if (comboHidden && editable) {
+      if (comboHidden) {
         showCombo()
       } else {
         hideCombo()
