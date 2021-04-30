@@ -68,7 +68,9 @@
       }
       statusActions = acts
       coreService.then((cs) => {
-        taskShortId = cs.getModel().as(object, CORE_MIXIN_SHORTID)
+        cs.getModel().asMixin(object, CORE_MIXIN_SHORTID, (value) => {
+          taskShortId = value
+        })
       })
     }
   }
