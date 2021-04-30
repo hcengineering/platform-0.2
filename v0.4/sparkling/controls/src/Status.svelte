@@ -19,18 +19,15 @@
 
   export let status: Status
   export let width: string
-  let color: string
-
-  color = status.severity === Severity.ERROR ? 'var(--theme-error-color)' : 'var(--theme-caption-color)'
 </script>
 
 {#if status.severity}
 <div class="message-container" class:error={status.severity === Severity.ERROR} style="{width ? 'width: ' + width : ''}">
   <div class="icon">
-    <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="none">
+    <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
       <g opacity="0.6">
-        <circle cx="8" cy="8" r="7.5" stroke="{color}"/>
-        <path d="M7.9992 12.06C8.4192 12.06 8.7672 11.724 8.7672 11.292C8.7672 10.86 8.4192 10.524 7.9992 10.524C7.5792 10.524 7.2312 10.86 7.2312 11.292C7.2312 11.724 7.5792 12.06 7.9992 12.06ZM7.6272 9.57598H8.3952L8.5632 3.41998H7.4592L7.6272 9.57598Z" fill="{color}"/>
+        <path d="M8,16c-4.4,0-8-3.6-8-8s3.6-8,8-8s8,3.6,8,8S12.4,16,8,16z M8,1C4.1,1,1,4.1,1,8c0,3.9,3.1,7,7,7c3.9,0,7-3.1,7-7 C15,4.1,11.9,1,8,1z"/>
+        <path d="M8,12.1c0.4,0,0.8-0.3,0.8-0.8S8.4,10.5,8,10.5s-0.8,0.3-0.8,0.8S7.6,12.1,8,12.1z M7.6,9.6h0.8l0.2-6.2H7.5 L7.6,9.6z"/>
       </g>
     </svg>
   </div>
@@ -47,6 +44,7 @@
     align-items: center;
     padding: 12px 16px;
     color: var(--theme-content-color);
+    fill: var(--theme-caption-color);
     background-color: var(--theme-bg-accent-color);
     border: 1px solid var(--theme-border-accent-color);
     border-radius: 8px;
@@ -64,6 +62,7 @@
 
   .error {
     color: var(--theme-error-color);
+    fill: var(--theme-error-color);
     background-color: var(--theme-button-bg-error);
     border-color: var(--theme-error-message-border);
   }
