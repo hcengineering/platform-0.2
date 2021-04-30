@@ -138,7 +138,7 @@
   }
 
   .hidden {
-    display: none
+    display: none;
   }
 
   .label,
