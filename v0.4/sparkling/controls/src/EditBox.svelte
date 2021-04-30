@@ -14,9 +14,9 @@
 -->
 
 <script lang="ts">
-  export let label: string
-  export let width: string
-  export let value: string
+  export let label: string | undefined
+  export let width: string | undefined
+  export let value: string | undefined
   export let error: string | undefined
   export let password: boolean | undefined
   export let id: string | undefined

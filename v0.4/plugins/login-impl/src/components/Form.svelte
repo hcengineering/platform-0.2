@@ -68,12 +68,14 @@
 
     {#each fields as field (field.name)}
     <div class={field.short ? 'form-col' : 'form-row'}>
-      <EditBox label={field.i18n} password={field.password} bind:value={object[field.name]} on:keyup={validate}/>
+      <EditBox label={field.i18n} password={field.password} bind:value={object[field.name]} on:keyup={validate} on:focus={validate}/>
     </div>
     {/each}
 
     <div class="form-row send">
-      <Button label={action.i18n} primary width="100%" loading={inAction} disabled={status.severity !== Severity.OK} on:click={() => {performAction(action)}}/>
+      <Button label={action.i18n} primary width="100%" loading={inAction} 
+        disabled={status.severity !== Severity.OK && status.severity !== Severity.ERROR} 
+        on:click={() => {performAction(action)}}/>
     </div>
 
     <!-- <div class="form-col"><EditBox label="First Name" bind:value={fname}/></div>
