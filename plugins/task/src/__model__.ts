@@ -13,26 +13,26 @@
 // limitations under the License.
 //
 
+import activity from '@anticrm/activity'
+import chunter, { TCollab } from '@anticrm/chunter/src/__model__'
+import { User } from '@anticrm/contact'
+import contact from '@anticrm/contact/src/__model__'
+import { DateProperty, Ref, StringProperty } from '@anticrm/core'
 import core, {
   ArrayOf$, Builder, Class$, Enum$, EnumOf$, extendIds, InstanceOf$, Literal, Mixin$, Primary, Prop, RefTo$,
   withMixin
 } from '@anticrm/model'
+import { TEmb, TEnum, TVDoc } from '@anticrm/model/src/__model__'
+import { Metadata } from '@anticrm/platform'
+import { IntlString } from '@anticrm/platform-i18n'
+import { Asset } from '@anticrm/platform-ui'
+import presentation from '@anticrm/presentation'
+import { UX } from '@anticrm/presentation/src/__model__'
+import workbench from '@anticrm/workbench/src/__model__'
 import _task, {
   PrioritizedTask, Task, TaskLabel, TaskLink, TaskLinkType, TaskPriority, TaskStatus, TaskStatusAction,
   TaskTimeDuration, TaskType, TimeManagedTask, TypedTask, VersionedTask, WorkLog
 } from '.'
-import { IntlString } from '@anticrm/platform-i18n'
-import { User } from '@anticrm/contact'
-import { UX } from '@anticrm/presentation/src/__model__'
-import presentation from '@anticrm/presentation'
-import workbench from '@anticrm/workbench/src/__model__'
-import chunter, { TCollab } from '@anticrm/chunter/src/__model__'
-import activity from '@anticrm/activity'
-import { DateProperty, MODEL_DOMAIN, Ref, StringProperty } from '@anticrm/core'
-import { TEmb, TEnum, TVDoc } from '@anticrm/model/src/__model__'
-import contact from '@anticrm/contact/src/__model__'
-import { Asset } from '@anticrm/platform-ui'
-import { Metadata } from '@anticrm/platform'
 
 export const DOMAIN_TASK = 'task'
 
@@ -54,7 +54,7 @@ const task = extendIds(_task, {
   }
 })
 
-@Class$(task.class.TaskLabel, core.class.VDoc, MODEL_DOMAIN)
+@Class$(task.class.TaskLabel, core.class.VDoc, DOMAIN_TASK)
 export class TTaskLabel extends TVDoc implements TaskLabel {
   @Prop() title!: string
   @Prop() color!: Asset
