@@ -17,5 +17,13 @@
     "server/*",
     "dev/*"
   ],
-  "version": "0.0.0"
+  "version": "0.0.0",
+  "dependencies": {
+    "chart.js": "^3.2.0",
+    "form-data": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^14.14.41",
+    "chartjs": "^0.3.24"
+  }
 }

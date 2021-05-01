@@ -32,6 +32,7 @@
   let user: User
   let avatar: Asset
   let info: AnyComponent
+  console.log('tx',contactService.then((c)=> c.getAvatar({__ref:{account:'john.appleseed@gmail.com'}})))
 
   $: {
     const objectClass = (tx as ObjectTx)._objectClass

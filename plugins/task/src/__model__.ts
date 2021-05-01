@@ -214,7 +214,6 @@ export function model (S: Builder): void {
     supportSpaces: true,
     spaceTitle: 'Project'
   }, task.application.Task)
-
   S.mixin(task.class.Task, presentation.mixin.DetailForm, {
     component: task.component.TaskProperties
   })

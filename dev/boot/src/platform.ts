@@ -19,6 +19,7 @@ import ui from '@anticrm/platform-ui'
 import core from '@anticrm/platform-core'
 import i18n from '@anticrm/platform-i18n'
 import activity from '@anticrm/activity'
+import dashboard from '@anticrm/dashboard'
 import fsm from '@anticrm/fsm'
 import activityMeta from '@anticrm/activity/src/__meta__'
 import login from '@anticrm/login'
@@ -62,6 +63,7 @@ platform.addLocation(personExtras, () => import(/* webpackChunkName: "person-ext
 platform.addLocation(calendar, () => import(/* webpackChunkName: "calendar" */ '@anticrm/calendar/src/plugin')) // eslint-disable-line
 platform.addLocation(activity, () => import(/* webpackChunkName: "activity" */ '@anticrm/activity/src/plugin')) // eslint-disable-line
 platform.addLocation(fsm, () => import(/* webpackChunkName: "fsm" */ '@anticrm/fsm/src/plugin')) // eslint-disable-line
+platform.addLocation(dashboard, () => import(/* webpackChunkName: "dashboard" */ '@anticrm/dashboard/src/plugin'))
 
 platform.addLocation(datagen, () => import(/* webpackChunkName: "datagen" */ '@anticrm/data-generator/src/plugin')) // eslint-disable-line
 

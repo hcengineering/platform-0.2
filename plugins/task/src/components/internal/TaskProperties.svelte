@@ -39,6 +39,7 @@
     model = cs.getModel()
     statusType = await cs.findOne<Enum<TaskStatus>>(CORE_CLASS_ENUM, { _id: task.enum.TaskStatus })
   })
+  // .then(()=>{console.log('MODEL',model)})
 
   let statusActions: Action[] = []
   let taskShortId: ShortID
