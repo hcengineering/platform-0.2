@@ -45,7 +45,7 @@
   const action = { 
     i18n: 'Log In',
     func: async () => { 
-      status = new Status(Severity.INFO, 0, 'Соединяюсь с сервером...')
+      status = new Status(Severity.INFO, 0, 'Connecting to server...')
 
       const [loginStatus, result] = await doLogin(platform, object.username, object.password, object.workspace)
 

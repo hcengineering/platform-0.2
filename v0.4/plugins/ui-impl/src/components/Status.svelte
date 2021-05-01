@@ -9,9 +9,9 @@
   export let status: Status
 </script>
 
-<span>
-  {#if status.severity === Severity.ERROR}
+<span style="font-size: 11px">
+  <!-- {#if status.severity === Severity.ERROR}
     <Icon icon={ui.icon.Error} color="#C21F39" />
-  {/if}
-  {status.message}
+  {/if} -->
+  {@html status.message}
 </span>

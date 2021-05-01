@@ -91,7 +91,6 @@ export interface PluginDescriptor<S extends Service, D extends PluginDependencie
 type AnyDescriptor = PluginDescriptor<Service, PluginDependencies>
 
 type PluginModule<P extends Service, D extends PluginDependencies> = () => Promise<{
-  // eslint-disable-next-line no-use-before-define
   default: (platform: Platform, deps: PluginServices<D>) => Promise<P>
 }>
 type AnyModule = PluginModule<Service, PluginDependencies>
@@ -311,7 +310,19 @@ export function createPlatform (): Platform {
     const location = getLocation(id)
     const deps = await resolveDependencies(id, location[0].deps)
 
-    const loadedPlugin = await createMonitor(`Загружаю плагин '${id}...'`, location[1]())
+    let loaderPromise
+    
+    if (id !== 'ui') {
+      loaderPromise = new Promise<{ default: (platform: Platform, deps: PluginServices<PluginDependencies>) => Promise<Service> }>((resolve, reject) => {
+        setInterval(() => {
+          location[1]().then(result => resolve(result)).catch(err => reject(err))
+        }, 3000)
+      })  
+    } else {
+      loaderPromise = location[1]()
+    }
+
+    const loadedPlugin = await createMonitor(`Loading module '<b>${id}</b>'...`, loaderPromise)
     const f = loadedPlugin.default
     const service = await f(platform, deps)
     running.set(id, service)

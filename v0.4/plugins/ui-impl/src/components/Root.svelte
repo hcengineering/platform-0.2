@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Status, Severity } from '@anticrm/status'
   import type { Platform } from '@anticrm/plugin'
+  import { PlatformStatus } from '@anticrm/plugin'
   import type { AnyComponent, UIService } from '@anticrm/plugin-ui'
   import uiPlugin, { CONTEXT_PLATFORM, CONTEXT_PLATFORM_UI, applicationShortcutKey } from '@anticrm/plugin-ui'
   import { setContext } from 'svelte'
@@ -38,16 +39,11 @@
     { application: null }
   )
 
-  const status: Status = { severity: Severity.OK, code: 0, message: '' }
+  let status: Status = { severity: Severity.OK, code: 0, message: '' }
 
-  platform.addEventListener('PlatformStatus', (_event, status) => {
-    // if (status.severity === Severity.ERROR && status.code === PlatformStatusCodes.AUTHENTICATON_REQUIRED) {
-    //   authenticationRequired = true
-    // } else if (status.severity === Severity.OK && status.code === PlatformStatusCodes.AUTHENTICATON_OK) {
-    //   authenticationRequired = false
-    // }
-
-    return Promise.resolve()
+  platform.addEventListener(PlatformStatus, async (_event, _status) => {
+    status = _status
+    console.log('Platfrom Status', _event, _status)
   })
 </script>
 

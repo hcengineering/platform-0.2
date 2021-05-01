@@ -44,7 +44,7 @@
       const v = object[field.name]
       const f = field
       if (!f.optional && (!v || v === '')) {
-        status = new Status(Severity.INFO, 0, `Поле '${field.i18n}' обязательно к заполнению.`)
+        status = new Status(Severity.INFO, 0, `Please fill '${field.i18n}' field.`)
         return
       }
     }

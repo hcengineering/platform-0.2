@@ -15,10 +15,11 @@
 <script lang="ts">
   import type { Platform } from '@anticrm/plugin'
   import { getContext } from 'svelte'
-
-  import type { AnyComponent, AnySvelteComponent } from '@anticrm/plugin-ui'
+  import type { AnyComponent } from '@anticrm/plugin-ui'
   import ui from '@anticrm/plugin-ui'
-  // import Spinner from '../components/internal/Spinner.svelte'
+  
+  import { Spinner } from '@anticrm/sparkling-controls'
+  
   import Icon from './Icon.svelte'
   import ErrorBoundary from './internal/ErrorBoundary'
 
@@ -30,8 +31,7 @@
 </script>
 
 {#await component}
-  <!-- <Spinner /> -->
-  <h1>Spinner</h1>
+  <div class="spinner-container"><div class="inner"><Spinner /></div></div>
 {:then Ctor}
   <ErrorBoundary>
     <Ctor {...props} on:change on:close on:open />
@@ -42,3 +42,16 @@
   {err}
   <Icon icon={ui.icon.Error} size="32" />
 {/await}
+
+<style lang="scss">
+
+.spinner-container {
+  display: flex;
+  height: 100%;
+}
+
+.spinner-container .inner {
+  margin: auto
+}
+
+</style>
