@@ -34,6 +34,9 @@
   export let status: Status
   export let fields: Field[]
   export let action: Action
+  export let bottomCaption: string
+  export let bottomActionLabel: string
+  export let bottomActionFunc: () => void
   export let object: any
 
   function validate () {
@@ -86,7 +89,10 @@
 
   </div>
   <div class="grow-separator"/>
-  <div class="footer"><span>Do not have an account?</span> <a href="/login">Sign Up</a></div>
+  <div class="footer">
+    <span>{bottomCaption}</span>
+    <a href="." on:click|preventDefault={bottomActionFunc}>{bottomActionLabel}</a>
+  </div>
 </form>
 
   <!-- <div class="actions">

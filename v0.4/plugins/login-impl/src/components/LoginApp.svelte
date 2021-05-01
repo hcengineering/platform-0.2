@@ -15,6 +15,9 @@
 
 <script lang="ts">
   import LoginForm from './LoginForm.svelte'
+  import SignupForm from './SignupForm.svelte'
+
+  let page = 'login'
 </script>
 
 <div class="container">
@@ -23,7 +26,11 @@
     <div class="back-panel-light">
       <div class="bg-noise opacity-3"/>
     </div>
-    <LoginForm/>
+    {#if page === 'login'}
+      <LoginForm on:switch={(event) => page = event.detail}/>
+    {:else if page === 'signup'}
+      <SignupForm on:switch={(event) => page = event.detail}/>
+    {/if}
   </div>
   <div class="intro">
     <div class="content">

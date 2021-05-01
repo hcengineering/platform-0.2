@@ -25,25 +25,27 @@
   const dispatch = createEventDispatcher()
 
   const fields = [
+    { name: 'first', i18n: 'First name', short: true },
+    { name: 'last', i18n: 'Last name', short: true },
     { name: 'username', i18n: 'Email' },
-    {
-      name: 'password',
-      i18n: 'Password',
-      password: true
-    },
-    { name: 'workspace', i18n: 'Workspace' }
+    { name: 'workspace', i18n: 'Workspace' },
+    { name: 'password', i18n: 'Password', password: true },
+    { name: 'password2', i18n: 'Repeat password', password: true },
   ]
 
   const object = {
+    first: '',
+    last: '',
     workspace: '',
     username: '',
     password: '',
+    password2: '',
   }
 
   let status = new Status(Severity.OK, 0, '')
 
   const action = { 
-    i18n: 'Log In',
+    i18n: 'Sign Up',
     func: async () => { 
       status = new Status(Severity.INFO, 0, 'Соединяюсь с сервером...')
 
@@ -61,8 +63,8 @@
 
 </script>
 
-<Form caption="Log In" {status} {fields} {object} {action}
-  bottomCaption="Do not have an account?"
-  bottomActionLabel="Sign Up"
-  bottomActionFunc={() => { dispatch('switch', 'signup') }}
+<Form caption="Sign Up" {status} {fields} {object} {action}
+  bottomCaption="Already have an account?"
+  bottomActionLabel="Log In"
+  bottomActionFunc={() => { dispatch('switch', 'login') }}
 />
