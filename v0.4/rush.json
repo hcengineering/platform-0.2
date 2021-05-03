@@ -365,8 +365,8 @@
       "projectFolder": "platform/status"
     },
     {
-      "packageName": "@anticrm/plugin",
-      "projectFolder": "platform/plugin"
+      "packageName": "@anticrm/platform",
+      "projectFolder": "platform/platform"
     },
     {
       "packageName": "@anticrm/rpc",

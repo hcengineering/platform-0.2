@@ -1,5 +1,5 @@
 {
-  "name": "@anticrm/plugin",
+  "name": "@anticrm/platform",
   "version": "0.2.0",
   "main": "lib/index.js",
   "author": "Anticrm Platform Contributors",

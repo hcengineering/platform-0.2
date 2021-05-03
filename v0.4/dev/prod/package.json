@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "@anticrm/plugin-ui": "~0.2.0",
-    "@anticrm/plugin": "~0.2.0",
+    "@anticrm/platform": "~0.2.0",
     "@anticrm/plugin-ui-impl": "~0.2.0",
     "svelte": "~3.37.0",
     "@anticrm/plugin-login": "~0.2.0",

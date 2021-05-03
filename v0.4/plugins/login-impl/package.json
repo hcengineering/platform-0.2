@@ -22,7 +22,7 @@
     "svelte-preprocess": "~4.7.0"
   },
   "dependencies": {
-    "@anticrm/plugin": "~0.2.0",
+    "@anticrm/platform": "~0.2.0",
     "svelte": "~3.37.0",
     "@anticrm/status": "~0.2.0",
     "@anticrm/plugin-ui": "~0.2.0",

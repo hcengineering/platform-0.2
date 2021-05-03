@@ -19,7 +19,7 @@
     "prettier": "~2.2.1"
   },
   "dependencies": {
-    "@anticrm/plugin": "~0.2.0",
+    "@anticrm/platform": "~0.2.0",
     "svelte": "~3.37.0"
   }
 }
