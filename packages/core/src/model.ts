@@ -881,15 +881,7 @@ export class Model implements Storage {
    */
   public isSortHasEffect<T extends Doc>(_attributes: AnyLayout, sort: DocumentSorting<T>): boolean {
     const oKeys = new Set<string>(Object.keys(_attributes))
-
-    // Make a part of query with values in object.
-    let keys = 0
-    for (const oe of Object.entries(sort)) {
-      if (oKeys.has(oe[0])) {
-        keys++
-      }
-    }
-    return keys > 0
+    return Object.keys(sort).some(x => oKeys.has(x))
   }
 
   /**

@@ -236,11 +236,13 @@ export async function start (port: number, dbUri: string, host?: string): Promis
             return { address: ad.address, port: ad.port }
           }
           if (addr !== null && typeof addr === 'string') {
-            const pos = addr.indexOf(':')
-            if (pos !== -1) {
-              const phost = addr.substring(0, pos)
-              const pport = parseInt(addr.substring(pos + 1))
-              return { address: phost, port: pport }
+            const addrSegm = addr.split(':')
+            if (addrSegm.length === 2) {
+              const phost = addrSegm[0]
+              const pport = parseInt(addrSegm[1])
+              if (!isNaN(pport)) {
+                return { address: phost, port: pport }
+              }
             }
             console.error('Invalid address returned:', addr)
           }

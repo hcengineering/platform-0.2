@@ -89,7 +89,7 @@ export function newRawClient (token: string, host: string, port: number): RawCli
         resolve,
         reject
       })
-        getWebSocket().then((ws: WebSocket) => { // eslint-disable-line
+      getWebSocket().then((ws: WebSocket) => {
         ws.send(serialize({
           id,
           method,
