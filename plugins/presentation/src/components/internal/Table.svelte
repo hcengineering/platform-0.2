@@ -40,7 +40,7 @@
 
   let coreModel: Model
 
-  getCoreService().then(cs => {
+  getCoreService().then((cs) => {
     coreModel = cs.getModel()
   })
 
