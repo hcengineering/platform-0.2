@@ -53,31 +53,23 @@ type AnyPluginModule = PluginModule<Service, PluginDependencies>
 type PluginLoader<P extends Service, D extends PluginDependencies> = () => Promise<PluginModule<P, D>>
 type AnyPluginLoader = PluginLoader<Service, PluginDependencies>
 
-const plugins = new Map<AnyPlugin, Promise<Service>>()
+const services = new Map<AnyPlugin, Service>()
 const locations = [] as Array<[AnyDescriptor, AnyPluginLoader]>
 const running = new Map<AnyPlugin, Service>()
 
 export function addLocation<P extends Service, X extends PluginDependencies> (
   plugin: PluginDescriptor<P, X>,
-  module: PluginModule<P, X>
+  module: PluginLoader<P, X>
 ): void {
-  locations.push([plugin, module as any])
+  locations.push([plugin, module as unknown as AnyPluginLoader])
 }
 
-export async function getPlugin<T extends Service> (id: Plugin<T>): Promise<T> {
-  const plugin = plugins.get(id)
-  if (plugin !== undefined) {
-    return (await plugin) as T
+export function getPlugin<T extends Service> (id: Plugin<T>): Promise<T> {
+  const service = services.get(id)
+  if (service !== undefined) {
+    return Promise.resolve(service as T)
   } else {
-    const plugin = resolvePlugin(id)
-    try {
-      plugins.set(id, plugin)
-      ;(await plugin) as Promise<T>
-    } catch (ex) {
-      // remove plugin, and try on next attempt.
-      plugins.delete(id)
-    }
-    return (await plugin) as T
+    return loadPlugin(id).then(service => { services.set(id, service); return service as T })
   }
 }
 
@@ -90,33 +82,34 @@ function getLocation (id: AnyPlugin): [AnyDescriptor, AnyPluginLoader] {
   throw new Error('no location provided for plugin: ' + id)
 }
 
-async function resolveDependencies (
-  parentId: Plugin<any>,
+// TODO: resolve in parallel
+function resolveDependencies (
   deps: PluginDependencies
 ): Promise<{ [key: string]: Service }> {
+  const plugins = []
   const result: { [key: string]: Service } = {}
   for (const key in deps) {
     const id = deps[key]
-    result[key] = await getPlugin(id)
+    plugins.push(getPlugin(id).then(service => { result[key] = service }))
   }
-  return result
+  return Promise.all(plugins).then(() => result)
 }
 
-async function resolvePlugin<T extends Service> (id: Plugin<T>): Promise<Service> {
+async function loadPlugin<T extends Service> (id: Plugin<T>): Promise<Service> {
   const location = getLocation(id)
-  const deps = await resolveDependencies(id, location[0].deps)
+  const deps = await resolveDependencies(location[0].deps)
 
   let loaderPromise
   
-  if (id !== 'ui') {
-    loaderPromise = new Promise<AnyPluginModule>((resolve, reject) => {
-      setInterval(() => {
-        location[1]().then(result => resolve(result)).catch(err => reject(err))
-      }, 3000)
-    })  
-  } else {
+  // if (id !== 'ui') {
+  //   loaderPromise = new Promise<AnyPluginModule>((resolve, reject) => {
+  //     setInterval(() => {
+  //       location[1]().then(result => resolve(result)).catch(err => reject(err))
+  //     }, 3000)
+  //   })  
+  // } else {
     loaderPromise = location[1]()
-  }
+  // }
 
   const status = new Status(Severity.INFO, 0, `Loading module '<b>${id}</b>'...`)
   const loadedPlugin = await monitor(status, loaderPromise)

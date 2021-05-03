@@ -13,17 +13,17 @@
 // limitations under the License.
 //
 
-import { Platform, Resource } from '..'
+import { Resource, setResource } from '../resource'
 
 import { plugin2, plugin2State } from './shared'
 import { PluginDependencies } from '../index'
 
 plugin2State.parsed = true
 
-export default async (platform: Platform, _deps: PluginDependencies): Promise<{ id: typeof plugin2 }> => {
+export default async (_deps: PluginDependencies): Promise<{ id: typeof plugin2 }> => {
   plugin2State.started = true
-  platform.setResource('resource2:plugin2.Resource' as Resource<string>, 'hello resource2:My.Resource')
-  return await Promise.resolve({
+  setResource('resource2:plugin2.Resource' as Resource<string>, 'hello resource2:My.Resource')
+  return {
     id: plugin2
-  })
+  }
 }

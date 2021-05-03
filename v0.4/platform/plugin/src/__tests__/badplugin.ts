@@ -14,8 +14,8 @@
 //
 
 
-import { Service } from '..'
+import { Service } from '../plugin'
 
 export default async (): Promise<Service> => {
-  throw new Error('I\'m bad plugin!')
+  throw new Error('Bad plugin!')
 }

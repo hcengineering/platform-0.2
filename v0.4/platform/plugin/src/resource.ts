@@ -78,34 +78,25 @@ export function peekResource<T> (resource: Resource<T>): T | undefined {
   return resources.get(resource)
 }
 
-export async function getResource<T> (resource: Resource<T>): Promise<T> {
+export function getResource<T> (resource: Resource<T>): Promise<T> {
   const resolved = resources.get(resource)
   if (resolved !== undefined) {
-    return resolved
+    return Promise.resolve(resolved)
   } else {
     let resolving = resolvingResources.get(resource)
-    if (resolving != null) {
-      return await resolving
+    if (resolving !== undefined) {
+      return resolving
     }
 
-    resolving = new Promise((resolve, reject) => {
-      const info = getResourceInfo(resource)
-      getPlugin(info.plugin)
-        .then(() => {
-          const value = resources.get(resource)
-          if (value === undefined) {
-            throw new Error('resource not loaded: ' + resource)
-          }
-          resolve(value)
-        })
-        .catch((err) => {
-          reject(err)
-        })
-        .finally(() => {
-          // Clear resolving map
-          resolvingResources.delete(resource)
-        })
-    })
+    const info = getResourceInfo(resource)
+    resolving = getPlugin(info.plugin)
+      .then(() => {
+        const value = resources.get(resource)
+        if (value === undefined) {
+          throw new Error('resource not loaded: ' + resource)
+        }
+        return value 
+      }).finally(() => { resolvingResources.delete(resource) })
 
     resolvingResources.set(resource, resolving)
     return resolving

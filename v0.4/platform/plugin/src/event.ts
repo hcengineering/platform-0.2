@@ -22,7 +22,7 @@ const eventListeners = new Map<string, EventListener[]>()
 
 export function addEventListener (event: string, listener: EventListener): void {
   const listeners = eventListeners.get(event)
-  if (listeners != null) {
+  if (listeners !== undefined) {
     listeners.push(listener)
   } else {
     eventListeners.set(event, [listener])
@@ -31,14 +31,14 @@ export function addEventListener (event: string, listener: EventListener): void 
 
 export function removeEventListener (event: string, listener: EventListener): void {
   const listeners = eventListeners.get(event)
-  if (listeners != null) {
+  if (listeners !== undefined) {
     listeners.splice(listeners.indexOf(listener), 1)
   }
 }
 
 export function broadcastEvent (event: string, data: any): void {
   const listeners = eventListeners.get(event)
-  if (listeners != null) {
+  if (listeners !== undefined) {
     listeners.forEach((listener) => void listener(event, data)) // eslint-disable-line no-void
   }
 }
