@@ -27,7 +27,6 @@ import { Platform, PlatformStatus, Severity, Status } from '@anticrm/platform'
 import { Cache } from './cache'
 import core, { CoreService, QueryResult } from './index'
 import { QueriableStorage } from './queries'
-
 /*!
  * Anticrm Platform™ Core Plugin
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
@@ -46,7 +45,7 @@ export default async (platform: Platform): Promise<CoreService> => {
     return await Promise.reject(new Error('authentication required'))
   }
 
-  const rpc = await newClient(token, host, parseInt(sPort))
+  const rpc = await newClient(() => new WebSocket(`ws://${host}:${parseInt(sPort)}/${token}`))
   const model = new Model(MODEL_DOMAIN)
 
   const coreProtocol: CoreProtocol = {

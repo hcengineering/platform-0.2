@@ -30,6 +30,7 @@ import { model as workbenchPlugin } from '@anticrm/workbench/src/__model__'
 import { Db, MongoClient } from 'mongodb'
 import { ServerProtocol, start } from '../server'
 import { WorkspaceProtocol } from '../workspace'
+import WebSocket from 'ws' // eslint-disable-line
 
 export const builder = new Builder()
 builder.load(model)
@@ -150,7 +151,7 @@ export class ServerSuite {
       await assignWorkspace(this.accounts, email, this.wsName)
       const loginInfo = await login(this.accounts, email, 'qwe', this.wsName, email, '')
 
-      const client = await newClient(loginInfo.token, addr.address, addr.port)
+      const client = await newClient(() => new WebSocket(`ws://${addr.address}:${addr.port}/${loginInfo.token}`))
 
       const info = {
         client,

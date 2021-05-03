@@ -25,13 +25,10 @@ export interface ClientService extends CoreProtocol, DocumentProtocol {
 }
 
 /**
- * @param token - A valid token to acces server
- * @param host  - a server host
- * @param port  - a server port
- * @returns
+ * Construct a A generic Platform client.
  */
-export async function newClient (token: string, host = 'localhost', port = 18080): Promise<ClientService> {
-  const rawClient = rpcService(token, host, port)
+export async function newClient (factory: () => any/* WebSocket */): Promise<ClientService> {
+  const rawClient = rpcService(factory)
 
   const coreProtocol: CoreProtocol = newCoreProtocol(rawClient)
 

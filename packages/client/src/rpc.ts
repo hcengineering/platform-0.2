@@ -15,7 +15,7 @@ export interface RpcService {
   close: () => void
 }
 
-export default (token: string, host: string, port: number): RpcService => {
+export default (socketFactory: () => any/* WebSocket */): RpcService => {
   interface PromiseInfo {
     resolve: (value?: any) => void
     reject: (error: any) => void
@@ -23,11 +23,10 @@ export default (token: string, host: string, port: number): RpcService => {
   const requests = new Map<ReqId, PromiseInfo>()
   let lastId = 0
 
-  function createWebsocket (): Promise<WebSocket> { // eslint-disable-line @typescript-eslint/promise-function-async
-    return new Promise<WebSocket>((resolve) => {
+  function createWebsocket (): Promise<any> { // eslint-disable-line @typescript-eslint/promise-function-async
+    return new Promise<any>((resolve) => {
       // Let's sure token is valid one
-      const WebSocket = (typeof window !== 'undefined' ? window.WebSocket : require('ws'))
-      const ws = new WebSocket(`ws://${host}:${port}/${token}`)
+      const ws = socketFactory()
 
       ws.onopen = () => {
         resolve(ws)
@@ -72,11 +71,10 @@ export default (token: string, host: string, port: number): RpcService => {
     })
   }
 
-  let websocket: WebSocket | undefined
+  let websocket: any | undefined
 
-  async function getWebSocket (): Promise<WebSocket> {
-    const WebSocket = (typeof window !== 'undefined' ? window.WebSocket : require('ws'))
-    if (websocket === undefined || (websocket.readyState === WebSocket.CLOSED || websocket.readyState === WebSocket.CLOSING)) {
+  async function getWebSocket (): Promise<any> {
+    if (websocket === undefined || (websocket.readyState === websocket.CLOSED || websocket.readyState === websocket.CLOSING)) {
       websocket = await createWebsocket()
     }
     return websocket
@@ -89,7 +87,7 @@ export default (token: string, host: string, port: number): RpcService => {
         resolve,
         reject
       })
-      getWebSocket().then((ws: WebSocket) => {
+      getWebSocket().then((ws: any) => {
         ws.send(serialize({
           id,
           method,
