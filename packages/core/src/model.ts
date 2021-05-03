@@ -879,7 +879,7 @@ export class Model implements Storage {
    * @param sort
    * @returns
    */
-  isSortHasEffect<T extends Doc>(_attributes: AnyLayout, sort: DocumentSorting<T>): boolean {
+  public isSortHasEffect<T extends Doc>(_attributes: AnyLayout, sort: DocumentSorting<T>): boolean {
     const oKeys = new Set<string>(Object.keys(_attributes))
 
     // Make a part of query with values in object.

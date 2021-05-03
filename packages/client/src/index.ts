@@ -14,7 +14,7 @@
 //
 
 import { Class, CoreProtocol, Doc, DocumentProtocol, DocumentQuery, FindOptions, generateId as genId, Model, MODEL_DOMAIN, Ref, Tx, txContext, TxContextSource, TxProcessor } from '@anticrm/core'
-import { CORE_CLASS_REFERENCE, CORE_CLASS_SPACE, CORE_CLASS_TITLE, TITLE_DOMAIN } from '@anticrm/domains'
+import { CORE_CLASS_REFERENCE, CORE_CLASS_SPACE, CORE_CLASS_TITLE, OperationProtocol, QueryProtocol, QueryResult, TITLE_DOMAIN } from '@anticrm/domains'
 import { PassthroughsIndex } from '@anticrm/domains/src/indices/filter'
 import { ModelIndex } from '@anticrm/domains/src/indices/model'
 import { TxIndex } from '@anticrm/domains/src/indices/tx'
@@ -22,13 +22,11 @@ import { VDocIndex } from '@anticrm/domains/src/indices/vdoc'
 import { Service } from '@anticrm/platform'
 import { Cache } from './cache'
 import { ModelDb } from './modeldb'
-import { createOperations, OperationProtocol } from './operations'
-import { QueriableStorage, QueryProtocol, QueryResult } from './queries'
 import { EventType, newCoreProtocol, newRawClient } from './rpc'
+import { QueriableStorage } from '@anticrm/domains/src/queries'
+import { createOperations } from '@anticrm/domains/src/tx/operations'
 
 export * from '@anticrm/rpc'
-export { OperationProtocol } from './operations'
-export { QueryProtocol, QueryResult, QueryUpdater, Unsubscribe } from './queries'
 
 export interface ClientService extends Service, CoreProtocol, QueryProtocol, DocumentProtocol, OperationProtocol {
   getModel: () => Model

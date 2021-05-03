@@ -27,7 +27,7 @@
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import ui from '@anticrm/platform-ui'
-  import type { QueryUpdater } from '@anticrm/platform-core'
+  import type { QueryUpdater } from '@anticrm/presentation'
 
   const coreService = getCoreService()
   const chunterService = getChunterService()

@@ -56,7 +56,7 @@ async function prepare (): Promise<{ model: Model, storage: QueriableStorage, do
 }
 
 async function doQuery (storage: QueriableStorage, query: DocumentQuery<Task>, op: (docs: Task[]) => void, options?: FindOptions<Task>): Promise<void> {
-  const result = storage.query(taskIds.class.Task, query, options)
+  const result = storage.query<Task>(taskIds.class.Task, query, options)
   const p1: Promise<Task[]> = new Promise(resolve => {
     result.subscribe((docs) => {
       resolve(docs)

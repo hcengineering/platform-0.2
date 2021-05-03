@@ -18,7 +18,7 @@
 
   import CommentComponent from './Comment.svelte'
   import { liveQuery } from '@anticrm/presentation'
-  import { QueryUpdater } from '@anticrm/platform-core'
+  import type { QueryUpdater } from '@anticrm/presentation'
   import type { Class, Ref } from '@anticrm/core'
 
   export let backlink: Reference

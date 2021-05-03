@@ -15,7 +15,8 @@ limitations under the License.
 <script type="ts">
   import { mixinKey, Ref } from '@anticrm/core'
   import { VDoc } from '@anticrm/domains'
-  import { CoreService, QueryUpdater } from '@anticrm/platform-core'
+  import { CoreService } from '@anticrm/platform-core'
+  import type { QueryUpdater } from '@anticrm/presentation'
   import { getUIService } from '@anticrm/platform-ui'
   import workbench from '@anticrm/workbench'
   import { getCoreService, liveQuery } from '@anticrm/presentation'

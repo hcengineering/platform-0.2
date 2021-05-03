@@ -14,32 +14,7 @@
 //
 
 import { Class, Doc, DocumentQuery, FindOptions, generateId, Model, Ref, Storage, TxContext } from '@anticrm/core'
-import { TxOperation, TxOperationKind } from '@anticrm/domains'
-
-export interface Domain extends Storage {
-  query: <T extends Doc>(_class: Ref<Class<T>>, query: DocumentQuery<T>) => QueryResult<T>
-}
-
-export type Subscriber<T> = (value: T[]) => void
-export type Unsubscribe = () => void
-
-export interface QueryResult<T extends Doc> {
-  subscribe: (run: Subscriber<T>) => Unsubscribe
-}
-
-export type QueryUpdater<T extends Doc> = (_class: Ref<Class<T>>, query: DocumentQuery<T>, options?: FindOptions<T>) => void
-
-/**
- * Define operations with live queries.
- */
-export interface QueryProtocol {
-  /**
-   * Perform query construction, it will be possible to subscribe to query results.
-   * @param _class - object class
-   * @param query - query
-   */
-  query: <T extends Doc>(_class: Ref<Class<T>>, query: DocumentQuery<T>, options?: FindOptions<T>) => QueryResult<T>
-}
+import { QueryProtocol, QueryResult, Subscriber, TxOperation, TxOperationKind, Unsubscribe } from '.'
 
 interface Query<T extends Doc> {
   _id: Ref<Doc>
@@ -55,7 +30,7 @@ interface Query<T extends Doc> {
   options?: FindOptions<T>
 }
 
-export class QueriableStorage implements Domain {
+export class QueriableStorage implements QueryProtocol, Storage {
   private readonly proxy: Storage
   private readonly queries: Map<string, Query<Doc>> = new Map()
   private readonly model: Model

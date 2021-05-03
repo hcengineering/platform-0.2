@@ -20,7 +20,7 @@
   import type { Title } from '@anticrm/domains'
   import { CORE_CLASS_TITLE } from '@anticrm/domains'
   import { liveQuery } from '@anticrm/presentation'
-  import { QueryUpdater } from '@anticrm/platform-core'
+  import type { QueryUpdater } from '@anticrm/presentation'
 
   let query = ''
   let result: Title[] = []

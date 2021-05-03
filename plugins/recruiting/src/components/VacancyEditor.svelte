@@ -13,10 +13,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <script lang="ts">
-  import { Ref } from '@anticrm/core'
+  import { Model, Ref } from '@anticrm/core'
   import type { Space } from '@anticrm/domains'
-  import type { ModelDb } from '@anticrm/platform-core/src/modeldb'
-  import { QueryUpdater } from '@anticrm/platform-core'
+  import type { QueryUpdater } from '@anticrm/presentation'
   import { getCoreService, liveQuery } from '@anticrm/presentation'
   import type { FSM } from '@anticrm/fsm'
   import fsmPlugin from '@anticrm/fsm'
@@ -30,7 +29,7 @@ limitations under the License.
 
   const coreP = getCoreService()
   const modelP = coreP.then((c) => c.getModel())
-  let model: ModelDb | undefined
+  let model: Model | undefined
 
   modelP.then((m) => {
     model = m

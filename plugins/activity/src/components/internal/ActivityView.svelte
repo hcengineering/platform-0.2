@@ -19,7 +19,7 @@
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
   import ActivityItem from './ActivityItem.svelte'
   import { liveQuery } from '@anticrm/presentation'
-  import { QueryUpdater } from '@anticrm/platform-core'
+  import type { QueryUpdater } from '@anticrm/presentation'
 
   // export let application: Ref<WorkbenchApplication>
   // export let space: Space

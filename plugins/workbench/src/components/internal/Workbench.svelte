@@ -19,7 +19,7 @@
   import Spotlight from './Spotlight.svelte'
   import type { AnyComponent } from '@anticrm/platform-ui'
   import { getUIService, newRouter } from '@anticrm/platform-ui'
-  import { QueryUpdater } from '@anticrm/platform-core'
+  import type { QueryUpdater } from '@anticrm/presentation'
 
   const uiService = getUIService()
 

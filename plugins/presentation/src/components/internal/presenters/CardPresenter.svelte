@@ -10,7 +10,7 @@
   import Card from './Card.svelte'
   import type { AnyComponent } from '@anticrm/platform-ui'
   import type { CardDragEvent } from './cardHelper'
-  import { QueryUpdater } from '@anticrm/platform-core'
+  import type { QueryUpdater } from '@anticrm/presentation'
 
   export let _class: Ref<Class<VDoc>>
   export let space: Space

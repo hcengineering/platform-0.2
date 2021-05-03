@@ -18,7 +18,7 @@
 import { BooleanProperty, DocumentValue, generateId, SortingOrder, StringProperty, Tx, txContext } from '@anticrm/core'
 import { createSubtask, Task, taskIds as task } from '@anticrm/core/src/__tests__/tasks'
 import { CORE_CLASS_OBJECT_SELECTOR, CORE_CLASS_SPACE } from '@anticrm/domains'
-import { createOperations } from '@anticrm/client/src/operations'
+import { createOperations } from '@anticrm/domains/src/tx/operations'
 import { createSetArrayFilters } from '../mongo_utils'
 import { ServerSuite } from './serversuite'
 

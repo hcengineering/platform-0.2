@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Class, DateProperty, Doc, Emb, Mixin, Obj, Property, Ref, StringProperty, Tx } from '@anticrm/core'
+import { AnyLayout, Class, DateProperty, Doc, DocumentQuery, DocumentValue, Emb, FindOptions, Mixin, Obj, Property, Ref, StringProperty, Tx } from '@anticrm/core'
 
 // TXes
 
@@ -213,6 +213,36 @@ export function txBuilder<T extends Doc> (clazz: Ref<Class<T>>): TxBuilder<T> {
   return np
 }
 
+/**
+ * Define operations with object modifications.
+ */
+export interface OperationProtocol {
+  /**
+   * Perform creation of new document and store it into storage.
+   * Object ID will be automatically generated and assigned to object.
+   */
+  create: <T extends Doc>(_class: Ref<Class<T>>, values: DocumentValue<T>) => Promise<T>
+
+  /**
+   * Perform update of document properties.
+   */
+  update: <T extends Doc>(doc: T, value: Partial<Omit<T, keyof Doc>>) => Promise<T>
+
+  /**
+   * Perform update of document/embedded document properties using a builder pattern.
+   *
+   * It is possible to do a set, pull, push for different field values.
+   *
+   * push and pull are applicable only for array attributes.
+   */
+  updateWith: <T extends Doc>(doc: T, builder: (s: TxBuilder<T>) => TxOperation | TxOperation[]) => Promise<T>
+
+  /**
+   * Perform remove of object.
+   */
+  remove: <T extends Doc>(doc: T) => Promise<T>
+}
+
 // S P A C E
 
 /**
@@ -314,4 +344,23 @@ export interface Title extends Doc {
   _objectId: Ref<Doc>
   title: string | number
   source: TitleSource
+}
+
+// Queries
+export type Subscriber<T> = (value: T[]) => void
+export type Unsubscribe = () => void
+
+export interface QueryResult<T extends Doc> {
+  subscribe: (run: Subscriber<T>) => Unsubscribe
+}
+/**
+ * Define operations with live queries.
+ */
+export interface QueryProtocol {
+  /**
+   * Perform query construction, it will be possible to subscribe to query results.
+   * @param _class - object class
+   * @param query - query
+   */
+  query: <T extends Doc>(_class: Ref<Class<T>>, query: DocumentQuery<T>, options?: FindOptions<T>) => QueryResult<T>
 }

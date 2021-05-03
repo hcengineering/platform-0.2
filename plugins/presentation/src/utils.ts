@@ -16,11 +16,10 @@
 import { Class, CORE_CLASS_TYPE, Doc, DocumentQuery, FindOptions, Mixin, Obj, Ref, StringProperty } from '@anticrm/core'
 import { getContext, onDestroy } from 'svelte'
 import core, { CoreService } from '@anticrm/platform-core'
-import { QueryUpdater, Unsubscribe } from '@anticrm/client'
+import { VDoc, Unsubscribe } from '@anticrm/domains'
 import { AnyComponent, CONTEXT_PLATFORM } from '@anticrm/platform-ui'
 import presentationPlugin, { AttrModel, ClassModel, ComponentExtension, GroupModel, PresentationService } from '.'
 import { IntlString } from '@anticrm/platform-i18n'
-import { VDoc } from '@anticrm/domains'
 
 import { deepEqual } from 'fast-equals'
 import { Platform } from '@anticrm/platform'
@@ -43,6 +42,8 @@ export function getUserId (): string {
   const platform = getContext<Platform>(CONTEXT_PLATFORM)
   return platform.getMetadata(core.metadata.WhoAmI) as StringProperty
 }
+
+export type QueryUpdater<T extends Doc> = (_class: Ref<Class<T>>, query: DocumentQuery<T>, options?: FindOptions<T>) => void
 
 /**
  * Perform subscribe to query with some helper finalizer to use

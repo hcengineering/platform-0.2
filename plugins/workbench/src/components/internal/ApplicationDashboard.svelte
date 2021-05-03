@@ -15,7 +15,7 @@
 <script type="ts">
   import type { ItemCreator, WorkbenchApplication } from '../..'
   import workbench from '../..'
-  import type { QueryUpdater } from '@anticrm/platform-core'
+  import type { QueryUpdater } from '@anticrm/presentation'
   import { getCoreService, liveQuery } from '@anticrm/presentation'
   import { getUIService } from '@anticrm/platform-ui'
 

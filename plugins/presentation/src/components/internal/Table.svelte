@@ -18,10 +18,9 @@
   import type { Space, VDoc } from '@anticrm/domains'
   import { CORE_CLASS_VDOC } from '@anticrm/domains'
   import type { AttrModel, ClassModel } from '../..'
-  import { liveQuery } from '../..'
-  import { getEmptyModel, getPresentationService } from '../../utils'
+  import { getEmptyModel, getPresentationService, liveQuery } from '../../utils'
   import Presenter from './presenters/Presenter.svelte'
-  import { QueryUpdater } from '@anticrm/platform-core'
+  import type { QueryUpdater } from '@anticrm/presentation'
 
   export let _class: Ref<Class<VDoc>>
   export let space: Space

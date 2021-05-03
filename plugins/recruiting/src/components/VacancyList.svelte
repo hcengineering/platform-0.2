@@ -16,7 +16,7 @@ limitations under the License.
   import { onDestroy } from 'svelte'
 
   import { Ref } from '@anticrm/core'
-  import { QueryUpdater } from '@anticrm/platform-core'
+  import type { QueryUpdater } from '@anticrm/presentation'
   import type { Space } from '@anticrm/domains'
   import { liveQuery } from '@anticrm/presentation'
   import { newRouter } from '@anticrm/platform-ui'
