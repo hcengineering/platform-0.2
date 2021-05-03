@@ -1,10 +1,10 @@
 <script lang="ts">
   import type { Status } from '@anticrm/status'
 
-  import { Severity } from '@anticrm/status'
-  import ui from '@anticrm/plugin-ui'
+  // import { Severity } from '@anticrm/status'
+  // import ui from '@anticrm/plugin-ui'
 
-  import { Icon } from '@anticrm/sparkling-components'
+  // import { Icon } from '@anticrm/sparkling-components'
 
   export let status: Status
 </script>

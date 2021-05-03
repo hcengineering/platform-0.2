@@ -13,19 +13,22 @@
 // limitations under the License.
 //
 
-import platform from './platform'
-import ui from '@anticrm/plugin-ui'
+import { setMetadata } from '@anticrm/platform'
+import { createApp } from '@anticrm/ui'
 import login from '@anticrm/plugin-login'
 
-// import core from '@anticrm/platform-core'
+import { configurePlatform } from './platform'
 
 import ErrorPage from './components/ErrorPage.svelte'
+
+configurePlatform()
 
 const accountsUrl = process.env.APP_ACCOUNTS_URL
 // const host = process.env.APP_WSHOST
 // const port = process.env.APP_WSPORT
 
-platform.setMetadata(login.metadata.AccountsUrl, accountsUrl)
+setMetadata(login.metadata.AccountsUrl, accountsUrl)
+
 // platform.setMetadata(core.metadata.WSHost, host)
 // platform.setMetadata(core.metadata.WSPort, port)
 
@@ -35,11 +38,12 @@ platform.setMetadata(login.metadata.AccountsUrl, accountsUrl)
 //   platform.setMetadata(core.metadata.Token, loginInfo.token)
 // }
 
-async function boot (): Promise<void> {
-  const uiService = await platform.getPlugin(ui.id)
-  uiService.createApp(document.body)
-}
+// async function boot (): Promise<void> {
+//   uiService.createApp(document.body)
+// }
 
-boot().catch(err => {
-  new ErrorPage({ target: document.body, props: { error: err.message } })
-})
+// boot().catch(err => {
+//   new ErrorPage({ target: document.body, props: { error: err.message } })
+// })
+
+createApp(document.body)

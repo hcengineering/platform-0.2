@@ -5,6 +5,10 @@
     "declaration": true,
     "outDir": "./lib",
     "rootDir": "./src",
-    "strict": true
+    "strict": true,
+    "lib": [
+      "es2018",
+      "dom"
+    ]
   }
 }

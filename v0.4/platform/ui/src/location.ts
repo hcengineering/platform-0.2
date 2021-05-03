@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Location as PlatformLocation } from '@anticrm/plugin-ui'
+import { Location as PlatformLocation } from './types'
 
 export function locationToUrl (location: PlatformLocation): string {
   let result = '/'

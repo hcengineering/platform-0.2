@@ -14,7 +14,7 @@
 //
 
 import { Status, Severity } from '@anticrm/status'
-import { Platform } from '@anticrm/plugin'
+import { getMetadata } from '@anticrm/platform'
 import { Request, Response, serialize, toStatus } from '@anticrm/rpc'
 
 import login from '@anticrm/plugin-login'
@@ -22,9 +22,9 @@ import login from '@anticrm/plugin-login'
 /**
  * Perform a login operation to required workspace with user credentials.
  */
-export async function doLogin (platform: Platform, username: string, password: string, workspace: string): Promise<[Status, any]> {
+export async function doLogin (username: string, password: string, workspace: string): Promise<[Status, any]> {
 
-  const accountsUrl = platform.getMetadata(login.metadata.AccountsUrl)
+  const accountsUrl = getMetadata(login.metadata.AccountsUrl)
 
   const request: Request<[string, string, string]> = {
     method: 'login',

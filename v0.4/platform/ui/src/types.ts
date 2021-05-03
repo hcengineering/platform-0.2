@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Metadata, Platform, Plugin, plugin, Resource, Service } from '@anticrm/plugin'
+import { Metadata, Plugin, plugin, Resource, Service } from '@anticrm/platform'
 import { getContext } from 'svelte'
 import { SvelteComponent } from 'svelte'
 
@@ -200,18 +200,3 @@ export default plugin(
   }
 )
 
-// U T I L S
-
-export function getPlatform (): Platform {
-  return getContext(CONTEXT_PLATFORM)
-}
-
-export function getUIService (): UIService {
-  return getContext(CONTEXT_PLATFORM_UI)
-}
-
-// R O U T E R  M E T A D A T A  K E Y S
-
-export function applicationShortcutKey(shortcut: string): Metadata<AnyComponent> {
-  return ('shortcut:ui.' + shortcut) as Metadata<AnyComponent>
-}

@@ -13,21 +13,18 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import type { Platform } from '@anticrm/plugin'
-  import { getContext } from 'svelte'
-  import type { AnyComponent } from '@anticrm/plugin-ui'
-  import ui from '@anticrm/plugin-ui'
+  import { getResource } from '@anticrm/platform'
+  import type { AnyComponent } from '../types'
   
   import { Spinner } from '@anticrm/sparkling-controls'
   
-  import Icon from './Icon.svelte'
+  // import Icon from './Icon.svelte'
   import ErrorBoundary from './internal/ErrorBoundary'
 
   export let is: AnyComponent
   export let props: any
 
-  const platform = getContext('platform') as Platform
-  $: component = platform.getResource(is)
+  $: component = getResource(is)
 </script>
 
 {#await component}
@@ -40,7 +37,7 @@
   ERROR: {console.log(err, JSON.stringify(component))}
   {props}
   {err}
-  <Icon icon={ui.icon.Error} size="32" />
+  <!-- <Icon icon={ui.icon.Error} size="32" /> -->
 {/await}
 
 <style lang="scss">

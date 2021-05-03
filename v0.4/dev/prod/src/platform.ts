@@ -13,9 +13,8 @@
 // limitations under the License.
 //
 
-import { createPlatform } from '@anticrm/plugin'
+import { addLocation } from '@anticrm/platform'
 
-import ui from '@anticrm/plugin-ui'
 import login from '@anticrm/plugin-login'
 // import core from '@anticrm/platform-core'
 // import i18n from '@anticrm/platform-i18n'
@@ -41,13 +40,12 @@ import loginMeta from '@anticrm/plugin-login-impl/src/__meta__'
 // import presentationMeta from '@anticrm/presentation/src/__meta__'
 // import dataGenMeta from '@anticrm/data-generator/src/__meta__'
 
-const platform = createPlatform()
+export function configurePlatform() {
 
 // platform.setMetadata(ui.metadata.LoginApplication, 'login')
 // platform.setMetadata(ui.metadata.DefaultApplication, 'workbench')
 
-platform.addLocation(ui, () => import(/* webpackChunkName: "ui" */ '@anticrm/plugin-ui-impl'))
-platform.addLocation(login, () => import(/* webpackChunkName: "login" */ '@anticrm/plugin-login-impl'))
+  addLocation(login, () => import(/* webpackChunkName: "login" */ '@anticrm/plugin-login-impl'))
 // platform.addLocation(core, () => import(/* webpackChunkName: "platform-core" */ '@anticrm/platform-core/src/plugin'))
 // platform.addLocation(i18n, () => import(/* webpackChunkName: "platform-i18n" */ '@anticrm/platform-i18n/src/plugin'))
 // platform.addLocation(presentation, () => import(/* webpackChunkName: "presentation" */ '@anticrm/presentation/src/plugin'))
@@ -65,7 +63,7 @@ platform.addLocation(login, () => import(/* webpackChunkName: "login" */ '@antic
 // platform.addLocation(datagen, () => import(/* webpackChunkName: "datagen" */ '@anticrm/data-generator/src/plugin'))
 
 // uiMeta(platform)
-loginMeta(platform)
+  loginMeta()
 // workbenchMeta(platform)
 // activityMeta(platform)
 // chunterMeta(platform)
@@ -76,4 +74,4 @@ loginMeta(platform)
 // contactMeta(platform)
 // dataGenMeta(platform)
 
-export default platform
+}

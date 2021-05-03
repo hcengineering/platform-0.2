@@ -16,12 +16,10 @@
 <script lang="ts">
   import { getContext, createEventDispatcher } from 'svelte'
   import { Status, Severity } from '@anticrm/status'
-  import { Platform } from '@anticrm/plugin'
 
   import Form from './Form.svelte'
   import { doLogin } from '../utils'
 
-  const platform = getContext('platform') as Platform
   const dispatch = createEventDispatcher()
 
   const fields = [
@@ -47,7 +45,7 @@
     func: async () => { 
       status = new Status(Severity.INFO, 0, 'Connecting to server...')
 
-      const [loginStatus, result] = await doLogin(platform, object.username, object.password, object.workspace)
+      const [loginStatus, result] = await doLogin(object.username, object.password, object.workspace)
 
       return new Promise<void>((resolve, reject) => {
         setTimeout(() => { 

@@ -14,31 +14,27 @@
 //
 
 import { Severity, Status } from '@anticrm/status'
-import { Platform, PlatformStatus, WHO_AM_I, TOKEN, AuthStatusCodes } from '@anticrm/plugin'
+import { WHO_AM_I, TOKEN, getMetadata, setResource, setMetadata } from '@anticrm/platform'
 import { Request, Response, serialize, toStatus } from '@anticrm/rpc'
 
-import uiPlugin, { UIService } from '@anticrm/plugin-ui'
 import login, { ACCOUNT_KEY, LoginInfo, LoginService } from '@anticrm/plugin-login'
 
 import LoginForm from './components/LoginApp.svelte'
 // import SettingForm from './components/SettingForm.svelte'
 // import MainLoginForm from './components/MainLoginForm.svelte'
 
-import FingerprintJS from '@fingerprintjs/fingerprintjs'
-
 /*!
  * Anticrm Platform™ Login Plugin
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.
  * Licensed under the Eclipse Public License, Version 2.0
  */
-export default (platform: Platform, deps: { ui: UIService }): Promise<LoginService> => {
-  const uiService = deps.ui
+export default (): Promise<LoginService> => {
 
-  const accountsUrl = platform.getMetadata(login.metadata.AccountsUrl)
+  const accountsUrl = getMetadata(login.metadata.AccountsUrl)
   if (!accountsUrl) {
     throw new Status(Severity.ERROR, 0, 'no accounts server metadata provided.')
   }
-  platform.setResource(login.component.LoginForm, LoginForm)
+  setResource(login.component.LoginForm, LoginForm)
   // platform.setResource(login.component.MainLoginForm, MainLoginForm)
   // platform.setResource(login.component.SettingForm, SettingForm)
 
@@ -47,8 +43,8 @@ export default (platform: Platform, deps: { ui: UIService }): Promise<LoginServi
   function setLoginInfo (loginInfo: LoginInfo) {
     localStorage.setItem(ACCOUNT_KEY, JSON.stringify(loginInfo))
 
-    platform.setMetadata(WHO_AM_I, loginInfo.email)
-    platform.setMetadata(TOKEN, loginInfo.token)
+    setMetadata(WHO_AM_I, loginInfo.email)
+    setMetadata(TOKEN, loginInfo.token)
 
     // TODO: It should be updated from here, but not working now.
     // platform.setMetadata(platformIds.metadata.WSHost, loginInfo.server)
@@ -58,8 +54,8 @@ export default (platform: Platform, deps: { ui: UIService }): Promise<LoginServi
   function clearLoginInfo () {
     localStorage.removeItem(ACCOUNT_KEY)
 
-    platform.setMetadata(WHO_AM_I, undefined)
-    platform.setMetadata(TOKEN, undefined)
+    setMetadata(WHO_AM_I, undefined)
+    setMetadata(TOKEN, undefined)
   }
 
   function getLoginInfo (): Promise<LoginInfo | undefined> {
@@ -69,7 +65,7 @@ export default (platform: Platform, deps: { ui: UIService }): Promise<LoginServi
     }
     const loginInfo = JSON.parse(account) as LoginInfo
 
-    const token = platform.getMetadata(TOKEN)
+    const token = getMetadata(TOKEN)
     if (!token) {
       return Promise.resolve(undefined)
     }
@@ -78,18 +74,18 @@ export default (platform: Platform, deps: { ui: UIService }): Promise<LoginServi
   }
 
   function navigateApp (): Promise<void> {
-    const defaultApp = platform.getMetadata(uiPlugin.metadata.DefaultApplication)
-    if (defaultApp) {
-      uiService.navigateJoin([defaultApp], undefined, undefined)
-    }
+    // const defaultApp = getMetadata(uiPlugin.metadata.DefaultApplication)
+    // if (defaultApp) {
+    //   uiService.navigateJoin([defaultApp], undefined, undefined)
+    // }
     return Promise.resolve()
   }
 
   function navigateLoginForm (): Promise<void> {
-    const loginApp = platform.getMetadata(uiPlugin.metadata.LoginApplication)
-    if (loginApp) {
-      uiService.navigateJoin([loginApp], undefined, undefined)
-    }
+    // const loginApp = platform.getMetadata(uiPlugin.metadata.LoginApplication)
+    // if (loginApp) {
+    //   uiService.navigateJoin([loginApp], undefined, undefined)
+    // }
     return Promise.resolve()
   }
 
@@ -124,7 +120,7 @@ export default (platform: Platform, deps: { ui: UIService }): Promise<LoginServi
   }
 
   function doLogout (): Promise<void> {
-    const token = platform.getMetadata(TOKEN)
+    const token = getMetadata(TOKEN)
     if (token) {
       clearLoginInfo()
     }

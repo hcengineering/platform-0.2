@@ -16,8 +16,8 @@
 // P L U G I N
 
 import type { Status } from '@anticrm/status'
-import { Metadata, plugin, Plugin, Service } from '@anticrm/plugin'
-import ui, { AnyComponent } from '@anticrm/plugin-ui'
+import { Metadata, plugin, Plugin, Service } from '@anticrm/platform'
+import type { AnyComponent } from '@anticrm/ui'
 
 export interface LoginInfo {
   email: string
@@ -64,7 +64,7 @@ export interface LoginService extends Service {
   doLogout (): Promise<void>
 }
 
-const login = plugin('login' as Plugin<LoginService>, { ui: ui.id }, {
+const login = plugin('login' as Plugin<LoginService>, {}, {
   component: {
     LoginForm: '' as AnyComponent,
     SettingForm: '' as AnyComponent,

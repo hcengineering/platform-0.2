@@ -26,7 +26,7 @@
   "dependencies": {
     "svelte": "~3.37.0",
     "@anticrm/platform": "~0.2.0",
-    "@anticrm/plugin-ui": "~0.2.0",
+    "@anticrm/ui": "~0.2.0",
     "@anticrm/sparkling-controls": "~0.2.0"
   }
 }

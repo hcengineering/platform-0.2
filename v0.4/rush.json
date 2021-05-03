@@ -365,12 +365,20 @@
       "projectFolder": "platform/status"
     },
     {
+      "packageName": "@anticrm/account",
+      "projectFolder": "platform/account"
+    },
+    {
       "packageName": "@anticrm/platform",
       "projectFolder": "platform/platform"
     },
     {
       "packageName": "@anticrm/rpc",
       "projectFolder": "platform/rpc"
+    },
+    {
+      "packageName": "@anticrm/ui",
+      "projectFolder": "platform/ui"
     },
     {
       "packageName": "@anticrm/sparkling-theme",
@@ -380,18 +388,10 @@
       "packageName": "@anticrm/sparkling-controls",
       "projectFolder": "sparkling/controls"
     },
-    {
-      "packageName": "@anticrm/sparkling-components",
-      "projectFolder": "sparkling/components"
-    },
-    {
-      "packageName": "@anticrm/plugin-ui",
-      "projectFolder": "plugins/ui"
-    },
-    {
-      "packageName": "@anticrm/plugin-ui-impl",
-      "projectFolder": "plugins/ui-impl"
-    },
+    // {
+    //   "packageName": "@anticrm/sparkling-components",
+    //   "projectFolder": "sparkling/components"
+    // },
     {
       "packageName": "@anticrm/plugin-login",
       "projectFolder": "plugins/login"
@@ -400,26 +400,22 @@
       "packageName": "@anticrm/plugin-login-impl",
       "projectFolder": "plugins/login-impl"
     },
-    {
-      "packageName": "@anticrm/account",
-      "projectFolder": "platform/account"
-    },
-    {
-      "packageName": "@anticrm/server-account",
-      "projectFolder": "server/account"
-    },
-    {
-      "packageName": "@anticrm/server-front",
-      "projectFolder": "server/front"
-    },
+    // {
+    //   "packageName": "@anticrm/server-account",
+    //   "projectFolder": "server/account"
+    // },
+    // {
+    //   "packageName": "@anticrm/server-front",
+    //   "projectFolder": "server/front"
+    // },
     {
       "packageName": "prod",
       "projectFolder": "dev/prod"
     },
-    {
-      "packageName": "storybook",
-      "projectFolder": "dev/storybook"
-    }
+    // {
+    //   "packageName": "storybook",
+    //   "projectFolder": "dev/storybook"
+    // }
     // {
     //   "packageName": "prodx",
     //   "projectFolder": "dev/prodx"

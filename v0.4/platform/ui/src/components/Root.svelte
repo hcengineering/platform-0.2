@@ -1,38 +1,31 @@
 <script lang="ts">
   import { Status, Severity } from '@anticrm/status'
-  import type { Platform } from '@anticrm/plugin'
-  import { PlatformStatus } from '@anticrm/plugin'
-  import type { AnyComponent, UIService } from '@anticrm/plugin-ui'
-  import uiPlugin, { CONTEXT_PLATFORM, CONTEXT_PLATFORM_UI, applicationShortcutKey } from '@anticrm/plugin-ui'
-  import { setContext } from 'svelte'
+  import { PlatformStatus, getMetadata, addEventListener } from '@anticrm/platform'
+  import type { AnyComponent, UIService } from '../types'
+  import { applicationShortcutKey } from '../utils'
+  import { newRouter } from '../routes'
 
   import { Theme } from '@anticrm/sparkling-theme'
-  import { Component } from '@anticrm/sparkling-components'
+  import Component from './Component.svelte'
 
   import StatusComponent from './Status.svelte'
   import Clock from './Clock.svelte'
   import Mute from './icons/Mute.svelte'
   import WiFi from './icons/WiFi.svelte'
-  import ThemeSelector from './ThemeSelector.svelte'
   import Modal from './Modal.svelte'
+  // import ThemeSelector from './ThemeSelector.svelte'
   
-  export let platform: Platform
-  export let ui: UIService
-
-  setContext(CONTEXT_PLATFORM, platform)
-  setContext(CONTEXT_PLATFORM_UI, ui)
-
   let application: AnyComponent | undefined
 
   interface RootRouteParams {
     application: AnyComponent | null
   }
 
-  ui.newRouter<RootRouteParams>(
+  newRouter<RootRouteParams>(
     ':application',
     (route) => {
       if (route.application) {
-        const shortcut = platform.getMetadata(applicationShortcutKey(route.application))
+        const shortcut = getMetadata(applicationShortcutKey(route.application))
         application = shortcut ?? route.application
       }
     },
@@ -41,7 +34,7 @@
 
   let status: Status = { severity: Severity.OK, code: 0, message: '' }
 
-  platform.addEventListener(PlatformStatus, async (_event, _status) => {
+  addEventListener(PlatformStatus, async (_event, _status) => {
     status = _status
     console.log('Platfrom Status', _event, _status)
   })
