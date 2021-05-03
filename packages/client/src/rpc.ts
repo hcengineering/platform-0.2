@@ -26,13 +26,8 @@ export function newRawClient (token: string, host: string, port: number): RawCli
   function createWebsocket (): Promise<WebSocket> { // eslint-disable-line @typescript-eslint/promise-function-async
     return new Promise<WebSocket>((resolve) => {
       // Let's sure token is valid one
-      let ws: WebSocket
-      if (typeof window === 'undefined') {
-        const WebSocket = require('ws') // eslint-disable-line
-        ws = new WebSocket(`ws://${host}:${port}/${token}`)
-      } else {
-        ws = new WebSocket(`ws://${host}:${port}/${token}`)
-      }
+      const WebSocket = (typeof window !== 'undefined' ? window.WebSocket : require('ws'))
+      const ws = new WebSocket(`ws://${host}:${port}/${token}`)
 
       ws.onopen = () => {
         resolve(ws)
@@ -80,14 +75,8 @@ export function newRawClient (token: string, host: string, port: number): RawCli
   let websocket: WebSocket | undefined
 
   async function getWebSocket (): Promise<WebSocket> {
-    let need = false
-    if (typeof window === 'undefined') {
-      const WebSocket = require('ws') // eslint-disable-line
-      need = websocket !== undefined && (websocket.readyState === WebSocket.CLOSED || websocket.readyState === WebSocket.CLOSING)
-    } else {
-      need = websocket !== undefined && (websocket.readyState === WebSocket.CLOSED || websocket.readyState === WebSocket.CLOSING)
-    }
-    if (websocket === undefined || need) {
+    const WebSocket = (typeof window !== 'undefined' ? window.WebSocket : require('ws'))
+    if (websocket === undefined || (websocket.readyState === WebSocket.CLOSED || websocket.readyState === WebSocket.CLOSING)) {
       websocket = await createWebsocket()
     }
     return websocket
