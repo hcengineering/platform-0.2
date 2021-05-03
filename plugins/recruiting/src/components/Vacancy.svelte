@@ -14,7 +14,7 @@ limitations under the License.
 -->
 <script lang="ts">
   import { Ref } from '@anticrm/core'
-  import type { QueryUpdater } from '@anticrm/presentation'
+  import { QueryUpdater } from '@anticrm/platform-core'
   import { getCoreService, liveQuery } from '@anticrm/presentation'
   import type { WithFSM } from '@anticrm/fsm'
   import fsm from '@anticrm/fsm'

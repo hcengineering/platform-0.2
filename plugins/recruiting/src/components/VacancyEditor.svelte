@@ -15,7 +15,7 @@ limitations under the License.
 <script lang="ts">
   import { Model, Ref } from '@anticrm/core'
   import type { Space } from '@anticrm/domains'
-  import type { QueryUpdater } from '@anticrm/presentation'
+  import type { QueryUpdater } from '@anticrm/paltform-core'
   import { getCoreService, liveQuery } from '@anticrm/presentation'
   import type { FSM } from '@anticrm/fsm'
   import fsmPlugin from '@anticrm/fsm'

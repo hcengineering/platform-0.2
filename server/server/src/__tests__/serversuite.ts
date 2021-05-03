@@ -150,7 +150,7 @@ export class ServerSuite {
       await assignWorkspace(this.accounts, email, this.wsName)
       const loginInfo = await login(this.accounts, email, 'qwe', this.wsName, email, '')
 
-      const client = await newClient(loginInfo.token, email, addr.address, addr.port)
+      const client = await newClient(loginInfo.token, addr.address, addr.port)
 
       const info = {
         client,

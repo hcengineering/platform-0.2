@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Class, DateProperty, Doc, DocumentQuery, DocumentValue, Emb, FindOptions, Mixin, Obj, Property, Ref, StringProperty, Tx } from '@anticrm/core'
+import { AnyLayout, Class, DateProperty, Doc, DocumentValue, Emb, Mixin, Obj, Property, Ref, StringProperty, Tx } from '@anticrm/core'
 
 // TXes
 
@@ -344,23 +344,4 @@ export interface Title extends Doc {
   _objectId: Ref<Doc>
   title: string | number
   source: TitleSource
-}
-
-// Queries
-export type Subscriber<T> = (value: T[]) => void
-export type Unsubscribe = () => void
-
-export interface QueryResult<T extends Doc> {
-  subscribe: (run: Subscriber<T>) => Unsubscribe
-}
-/**
- * Define operations with live queries.
- */
-export interface QueryProtocol {
-  /**
-   * Perform query construction, it will be possible to subscribe to query results.
-   * @param _class - object class
-   * @param query - query
-   */
-  query: <T extends Doc>(_class: Ref<Class<T>>, query: DocumentQuery<T>, options?: FindOptions<T>) => QueryResult<T>
 }

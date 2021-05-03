@@ -9,7 +9,7 @@
     "build:docs": "echo 'no docs yet'",
     "lint": "eslint --max-warnings=0 src",
     "lint:fix": "eslint --fix src",
-    "test": "echo 'no tests'"
+    "test": "jest src"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.13.14",

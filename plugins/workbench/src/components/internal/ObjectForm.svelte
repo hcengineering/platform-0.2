@@ -20,7 +20,7 @@
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import workbench from '../..'
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
-  import type { QueryUpdater } from '@anticrm/presentation'
+  import { QueryUpdater } from '@anticrm/platform-core'
 
   export let _class: Ref<Class<Doc>>
   export let _objectId: Ref<Doc>

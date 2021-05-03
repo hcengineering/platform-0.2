@@ -1,4 +1,4 @@
-import { Class, CoreProtocol, Doc, DocumentQuery, FindOptions, Model, Ref, Tx } from '@anticrm/core'
+import { Class, CoreProtocol, Doc, DocumentQuery, FindOptions, Ref, Tx } from '@anticrm/core'
 import { Space, VDoc } from '@anticrm/domains'
 import { FindResponse, readResponse, ReqId, RPC_CALL_FIND, RPC_CALL_FINDONE, RPC_CALL_GEN_REF_ID, RPC_CALL_LOAD_DOMAIN, RPC_CALL_TX, serialize } from '@anticrm/rpc'
 
@@ -9,17 +9,17 @@ export enum EventType {
   TransientTransaction // A transient transaction with derived data modification.
 }
 
-interface PromiseInfo {
-  resolve: (value?: any) => void
-  reject: (error: any) => void
-}
-export interface RawClient {
+export interface RpcService {
   request: <R>(method: string, ...params: any[]) => Promise<R>
   addEventListener: (type: EventType, listener: EventListener) => void
   close: () => void
 }
 
-export function newRawClient (token: string, host: string, port: number): RawClient {
+export default (token: string, host: string, port: number): RpcService => {
+  interface PromiseInfo {
+    resolve: (value?: any) => void
+    reject: (error: any) => void
+  }
   const requests = new Map<ReqId, PromiseInfo>()
   let lastId = 0
 
@@ -117,28 +117,24 @@ export function newRawClient (token: string, host: string, port: number): RawCli
       websocket.close()
     }
   }
-  const rawClient: RawClient = {
+  return {
     request,
     addEventListener,
     close
   }
-  return rawClient
 }
 
-export function newCoreProtocol (client: RawClient, model: Model): CoreProtocol {
+export function newCoreProtocol (client: RpcService): CoreProtocol {
   return {
     async find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>, options?: FindOptions<T>): Promise<T[]> {
       const rpcResult = (await client.request<FindResponse<T>>(RPC_CALL_FIND, _class, query, options !== undefined ? options : null /* we send null since use JSON */))
       if (options?.countCallback !== undefined) {
         options.countCallback(rpcResult.skip, rpcResult.limit, rpcResult.count)
       }
-      return rpcResult.values.map((it) => model.as(it, _class))
+      return rpcResult.values
     },
     async findOne<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined> {
       const result = (await client.request<T>(RPC_CALL_FINDONE, _class, query))
-      if (result !== undefined) {
-        return model.as(result, _class)
-      }
       return result
     },
     async tx (tx: Tx): Promise<any> {

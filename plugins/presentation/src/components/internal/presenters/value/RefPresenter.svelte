@@ -18,7 +18,7 @@
   import ui, { getCoreService, liveQuery } from '@anticrm/presentation'
   import type { AnyComponent } from '@anticrm/platform-ui'
   import Presenter from '../Presenter.svelte'
-  import type { QueryUpdater } from '@anticrm/presentation'
+  import { QueryUpdater } from '@anticrm/platform-core'
 
   export let value: Ref<Doc>
   export let attribute: AttrModel

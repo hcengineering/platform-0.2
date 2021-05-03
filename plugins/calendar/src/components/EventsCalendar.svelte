@@ -29,7 +29,7 @@
   import MonthCalendar from '@anticrm/sparkling-controls/src/calendar/MonthCalendar.svelte'
   import Spinner from '@anticrm/platform-ui/src/components/internal/Spinner.svelte'
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
-  import type { QueryUpdater } from '@anticrm/presentation'
+  import { QueryUpdater } from '@anticrm/platform-core'
 
   export let _class: Ref<Class<Doc>>
   export let space: Space

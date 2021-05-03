@@ -14,7 +14,8 @@
 //
 
 import { Class, Doc, DocumentQuery, FindOptions, generateId, Model, Ref, Storage, TxContext } from '@anticrm/core'
-import { QueryProtocol, QueryResult, Subscriber, TxOperation, TxOperationKind, Unsubscribe } from '.'
+import { TxOperation, TxOperationKind } from '@anticrm/domains'
+import { QueryProtocol, QueryResult, Subscriber, Unsubscribe } from '.'
 
 interface Query<T extends Doc> {
   _id: Ref<Doc>

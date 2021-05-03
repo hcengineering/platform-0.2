@@ -15,7 +15,7 @@ limitations under the License.
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
 
-  import type { QueryUpdater } from '@anticrm/presentation'
+  import { QueryUpdater } from '@anticrm/platform-core'
   import type { Space } from '@anticrm/domains'
   import { liveQuery } from '@anticrm/presentation'
 

@@ -4,7 +4,7 @@
   import { newMessageDocument } from '@anticrm/text'
   import { getCoreService, liveQuery } from '../../utils'
 
-  import type { QueryUpdater } from '@anticrm/presentation'
+  import type { QueryUpdater } from '@anticrm/platform-core'
 
   import Toolbar from '@anticrm/sparkling-controls/src/toolbar/Toolbar.svelte'
   import ToolbarButton from '@anticrm/sparkling-controls/src/toolbar/Button.svelte'
