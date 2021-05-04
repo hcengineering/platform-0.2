@@ -30,19 +30,56 @@ export enum Severity {
 }
 
 /**
+ * Component that created status object
+ * @public
+ */
+export type Component = string & { __component: true }
+
+/**
  * Status of an operation
  * @public
  */
 export class Status {
   readonly severity: Severity
+  readonly component: Component
   readonly code: number
-  readonly message: string
+  readonly params: any
 
-  constructor (severity: Severity, code: number, message: string) {
+  constructor (severity: Severity, component: Component, code: number, params?: any) {
     this.severity = severity
+    this.component = component
     this.code = code
-    this.message = message
+    this.params = params
   }
+}
+
+/**
+ * Platform component Id
+ * @public
+ */
+export const Platform = 'platform' as Component
+
+/**
+ * Platfrom Status Code
+ * @public
+ */
+export enum PlatformStatusCode {
+  OK,
+  UNKNOWN_ERROR
+}
+
+/**
+ * OK Status
+ * @public
+ */
+export const OK = new Status(Severity.OK, Platform, PlatformStatusCode.OK)
+
+/** 
+ * Creates unknown error status
+ * @public
+ */
+export function unknownError (err: Error): Status {
+  return new Status(Severity.ERROR, Platform, PlatformStatusCode.UNKNOWN_ERROR, { message: err.message })
 }
 
 /**
@@ -53,7 +90,7 @@ export class PlatformError extends Error {
   readonly status: Status
 
   constructor (status: Status) {
-    super(status.message)
+    super(`${status.severity} in '${status.component}' code: ${status.code}`)
     this.status = status
   }
 }
