@@ -13,8 +13,7 @@
 // limitations under the License.
 //
 
-import { newClient } from '@anticrm/client'
-import { EventType } from '@anticrm/client/src/rpc'
+import { EventType, newClient } from '@anticrm/client'
 import { Class, CoreProtocol, Doc, DocumentQuery, FindOptions, Model, MODEL_DOMAIN, Ref, Tx, txContext, TxContextSource, TxProcessor } from '@anticrm/core'
 import { CORE_CLASS_REFERENCE, CORE_CLASS_SPACE, CORE_CLASS_TITLE, Space, TITLE_DOMAIN, VDoc } from '@anticrm/domains'
 import { PassthroughsIndex } from '@anticrm/domains/src/indices/filter'
@@ -45,7 +44,7 @@ export default async (platform: Platform): Promise<CoreService> => {
     return await Promise.reject(new Error('authentication required'))
   }
 
-  const rpc = await newClient(() => new WebSocket(`ws://${host}:${parseInt(sPort)}/${token}`))
+  const rpc = await newClient(token, host, parseInt(sPort))
   const model = new Model(MODEL_DOMAIN)
 
   const coreProtocol: CoreProtocol = {

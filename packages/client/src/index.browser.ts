@@ -14,8 +14,7 @@
 //
 
 import { CoreProtocol, generateId as genId } from '@anticrm/core'
-import WebSocket from 'ws'
-import { ClientService, EventListener, EventType, RpcClient } from './common'
+import { ClientService, EventType, RpcClient, EventListener } from './common'
 import rpcService, { newCoreProtocol } from './rpc'
 
 export { EventListener, EventType, ClientService }

@@ -1,13 +1,22 @@
+//
+// Copyright © 2021 Anticrm Platform Contributors.
+//
+// Licensed under the Eclipse Public License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License. You may
+// obtain a copy of the License at https://www.eclipse.org/legal/epl-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
 import { Class, CoreProtocol, Doc, DocumentQuery, FindOptions, Ref, Tx } from '@anticrm/core'
 import { Space, VDoc } from '@anticrm/domains'
 import { FindResponse, readResponse, ReqId, RPC_CALL_FIND, RPC_CALL_FINDONE, RPC_CALL_GEN_REF_ID, RPC_CALL_LOAD_DOMAIN, RPC_CALL_TX, serialize } from '@anticrm/rpc'
-
-export type EventListener = (event: unknown) => void
-
-export enum EventType {
-  Transaction, // A normal transaction with data modification
-  TransientTransaction // A transient transaction with derived data modification.
-}
+import { EventListener, EventType, MessageEvent, RpcClient } from './common'
 
 export interface RpcService {
   request: <R>(method: string, ...params: any[]) => Promise<R>
@@ -15,7 +24,7 @@ export interface RpcService {
   close: () => void
 }
 
-export default (socketFactory: () => any/* WebSocket */): RpcService => {
+export default (newRpcClient: () => RpcClient): RpcService => {
   interface PromiseInfo {
     resolve: (value?: any) => void
     reject: (error: any) => void
@@ -23,26 +32,26 @@ export default (socketFactory: () => any/* WebSocket */): RpcService => {
   const requests = new Map<ReqId, PromiseInfo>()
   let lastId = 0
 
-  function createWebsocket (): Promise<any> { // eslint-disable-line @typescript-eslint/promise-function-async
-    return new Promise<any>((resolve) => {
+  function createClient (): Promise<RpcClient> { // eslint-disable-line @typescript-eslint/promise-function-async
+    return new Promise<RpcClient>((resolve) => {
       // Let's sure token is valid one
-      const ws = socketFactory()
+      const ws: RpcClient = newRpcClient()
 
-      ws.onopen = () => {
+      ws.onOpen(() => {
         resolve(ws)
-      }
+      })
 
-      ws.onerror = (ev: Event) => {
+      ws.onError((ev) => {
         console.log('websocket error: ', ev)
         // reject all pending requests
         for (const info of requests.values()) {
           info.reject(ev)
         }
         requests.clear()
-      }
+      })
 
-      ws.onmessage = (ev: MessageEvent) => {
-        const response = readResponse(ev.data)
+      ws.onMessage((event: MessageEvent) => {
+        const response = readResponse(event.data)
         if (response.id === undefined) {
           if (response.result !== undefined) {
             for (const listener of (listeners.get(EventType.Transaction) ?? [])) {
@@ -67,15 +76,15 @@ export default (socketFactory: () => any/* WebSocket */): RpcService => {
             listener(response.clientTx)
           }
         }
-      }
+      })
     })
   }
 
-  let websocket: any | undefined
+  let websocket: RpcClient | undefined
 
-  async function getWebSocket (): Promise<any> {
-    if (websocket === undefined || (websocket.readyState === websocket.CLOSED || websocket.readyState === websocket.CLOSING)) {
-      websocket = await createWebsocket()
+  async function getWebSocket (): Promise<RpcClient> {
+    if (websocket === undefined || (websocket.isdone())) {
+      websocket = await createClient()
     }
     return websocket
   }
@@ -87,7 +96,7 @@ export default (socketFactory: () => any/* WebSocket */): RpcService => {
         resolve,
         reject
       })
-      getWebSocket().then((ws: any) => {
+      getWebSocket().then((ws: RpcClient) => {
         ws.send(serialize({
           id,
           method,
