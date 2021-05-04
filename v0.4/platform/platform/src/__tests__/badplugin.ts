@@ -13,7 +13,6 @@
 // limitations under the License.
 //
 
-
 import { Service } from '../plugin'
 
 export default async (): Promise<Service> => {

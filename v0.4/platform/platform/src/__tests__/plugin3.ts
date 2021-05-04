@@ -19,12 +19,7 @@ import { plugin3State, TestPlugin } from './shared'
 
 plugin3State.parsed = true
 
-export default async (
-  deps: {
-    plugin1: TestPlugin
-    plugin2: Service
-  }
-): Promise<{ deps: typeof deps }> => {
+export default async (deps: { plugin1: TestPlugin, plugin2: Service }): Promise<{ deps: typeof deps }> => {
   plugin3State.started = true
   return {
     deps

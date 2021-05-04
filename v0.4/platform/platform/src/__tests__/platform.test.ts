@@ -15,7 +15,7 @@
 
 /* eslint-env jest */
 
-import { Status, Severity, Component } from '@anticrm/status'
+import { Status, Severity } from '@anticrm/status'
 
 import { Metadata, getMetadata, loadMetadata, setMetadata } from '../metadata'
 import { Plugin, Service, identify, getPlugin, addLocation } from '../plugin'
@@ -23,10 +23,16 @@ import { Resource, getResource, getResourceInfo, peekResource, setResource } fro
 import { addEventListener, removeEventListener, broadcastEvent, setPlatformStatus, monitor } from '../event'
 import { OK, unknownError } from '../status'
 
-import { plugin1, plugin1State, descriptor1 } from './shared'
-import { plugin2, plugin2State, descriptor2 } from './shared'
-import { plugin3, plugin3State, descriptor3 } from './shared'
-import { descriptorBad } from './shared'
+import {
+  plugin1,
+  plugin1State,
+  descriptor1,
+  plugin2State,
+  descriptor2,
+  plugin3,
+  descriptor3,
+  descriptorBad
+} from './shared'
 
 type AnyPlugin = Plugin<Service>
 
@@ -34,10 +40,7 @@ type ExtractType<T, X extends Record<string, Metadata<T>>> = {
   [P in keyof X]: X[P] extends Metadata<infer Z> ? Z : never
 }
 
-const TestComponent = 'platform-test' as Component
-
 describe('platform', () => {
-
   it('should identify resources', () => {
     const ids = identify('test' as AnyPlugin, {
       resource: {
@@ -55,7 +58,7 @@ describe('platform', () => {
   })
 
   it('should resolve plugin', async () => {
-    addLocation(descriptor1, () => import('./plugin1'))
+    addLocation(descriptor1, async () => await import('./plugin1'))
     expect(plugin1State.parsed).toBe(false)
     expect(plugin1State.started).toBe(false)
     const p1 = getPlugin(plugin1)
@@ -69,14 +72,14 @@ describe('platform', () => {
 
   it('should not resolve resource (no plugin location)', () => {
     const res = getResource('resource:NotExists.Resource' as Resource<string>)
-    expect(res).rejects.toThrowError('no location provided')
+    expect(res).rejects.toThrowError('no location provided') // eslint-disable-line @typescript-eslint/no-floating-promises
   })
 
   it('should resolve resource', async () => {
     addLocation(descriptor2, async () => await import('./plugin2'))
     expect(plugin2State.parsed).toBe(false)
     expect(plugin2State.started).toBe(false)
-    let resolved = getResource('resource2:plugin2.Resource' as Resource<string>)
+    const resolved = getResource('resource2:plugin2.Resource' as Resource<string>)
     expect(resolved).toBeInstanceOf(Promise)
     // get again to check repeated getting
     const resource = await getResource('resource2:plugin2.Resource' as Resource<string>)
@@ -95,18 +98,18 @@ describe('platform', () => {
   it('should fail to resolve wrong resource', () => {
     const wrongResource = 'resource_wrong:plugin2.Resource' as Resource<string>
     const res = getResource(wrongResource)
-    expect(res).rejects.toThrowError('resource not loaded')
+    expect(res).rejects.toThrowError('resource not loaded') // eslint-disable-line @typescript-eslint/no-floating-promises
   })
 
   it('should fail to load bad plugin', () => {
-    addLocation(descriptorBad, () => import('./badplugin'))
+    addLocation(descriptorBad, async () => await import('./badplugin'))
     const wrongResource = 'resource_wrong:badplugin.Resource' as Resource<string>
     const res = getResource(wrongResource)
-    expect(res).rejects.toThrowError('Bad plugin')
+    expect(res).rejects.toThrowError('Bad plugin') // eslint-disable-line @typescript-eslint/no-floating-promises
   })
 
   it('should inject dependencies', async () => {
-    addLocation(descriptor3, () => import('./plugin3'))
+    addLocation(descriptor3, async () => await import('./plugin3'))
     const plugin = await getPlugin(plugin3)
     const deps = (plugin as any).deps
     expect(deps.plugin1.id).toBe('plugin1')
@@ -311,7 +314,7 @@ describe('platform', () => {
   })
 
   it('should throw monitor error', () => {
-    expect(monitor(OK, Promise.reject(new Error('dummy')))).rejects.toThrowError('dummy')
+    expect(monitor(OK, Promise.reject(new Error('dummy')))).rejects.toThrowError('dummy') // eslint-disable-line @typescript-eslint/no-floating-promises
   })
 
   it('should remove listener inexistent type of the event', () => {
@@ -323,5 +326,4 @@ describe('platform', () => {
     expect(status.severity).toBe(Severity.ERROR)
     expect(status.params.message).toBe('something')
   })
-
 })
