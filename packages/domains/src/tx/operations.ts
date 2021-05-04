@@ -13,13 +13,12 @@
 // limitations under the License.
 //
 
-import { Class, Doc, DocumentValue, Model, Ref, StringProperty, Tx } from '@anticrm/core'
-import { OperationProtocol } from '.'
-import { newCreateTx, newDeleteTx, newUpdateTx } from './tx'
+import { Class, Doc, DocumentValue, Model, Ref, Tx } from '@anticrm/core'
 import {
-  CORE_CLASS_OBJECTTX_DETAILS, CORE_CLASS_SPACE, CORE_CLASS_TX_OPERATION, CORE_CLASS_VDOC, CORE_MIXIN_SHORTID, ObjectTx, ObjectTxDetails, Space,
+  CORE_CLASS_OBJECTTX_DETAILS, CORE_CLASS_SPACE, CORE_CLASS_TX_OPERATION, CORE_CLASS_VDOC, CORE_MIXIN_SHORTID, ObjectTx, ObjectTxDetails, OperationProtocol, Space,
   txBuilder, TxBuilder, TxOperation, TxOperationKind, UpdateTx
 } from '@anticrm/domains'
+import { newCreateTx, newDeleteTx, newUpdateTx } from './tx'
 
 function getSpace (model: Model, doc: Doc): { _objectSpace: Ref<Space> | undefined, spaceIsRequired: boolean } {
   if (model.is(doc._class, CORE_CLASS_SPACE)) {
@@ -29,7 +28,7 @@ function getSpace (model: Model, doc: Doc): { _objectSpace: Ref<Space> | undefin
   return { _objectSpace: isVDoc ? (doc as any)._space as Ref<Space> : undefined, spaceIsRequired: isVDoc }
 }
 
-export function createOperations (model: Model, processTx: (tx: Tx) => Promise<any>, getUserId: () => StringProperty): OperationProtocol {
+export function createOperations (model: Model, processTx: (tx: Tx) => Promise<any>, userId: string): OperationProtocol {
   async function create<T extends Doc> (_class: Ref<Class<T>>, values: DocumentValue<T>): Promise<T> {
     const clazz = model.get(_class)
     if (clazz === undefined) {
@@ -42,7 +41,7 @@ export function createOperations (model: Model, processTx: (tx: Tx) => Promise<a
     if ((_objectSpace === undefined) && spaceIsRequired) {
       throw new Error('Every VDoc based object should contain _space property')
     }
-    const tx = newCreateTx(doc, getUserId(), _objectSpace)
+    const tx = newCreateTx(doc, userId, _objectSpace)
     fillUpdateDetails(doc, tx)
 
     await processTx(tx)
@@ -58,7 +57,7 @@ export function createOperations (model: Model, processTx: (tx: Tx) => Promise<a
       throw new Error('Every VDoc based object should contain _space property')
     }
 
-    const tx: UpdateTx = newUpdateTx(doc._class, doc._id, (op instanceof Array) ? op : [op], getUserId(), _objectSpace)
+    const tx: UpdateTx = newUpdateTx(doc._class, doc._id, (op instanceof Array) ? op : [op], userId, _objectSpace)
 
     fillUpdateDetails(doc, tx)
     await processTx(tx)
@@ -98,7 +97,7 @@ export function createOperations (model: Model, processTx: (tx: Tx) => Promise<a
       kind: TxOperationKind.Set,
       _attributes: value
     }
-    const tx = newUpdateTx(doc._class, doc._id, [txOp], getUserId(), _objectSpace)
+    const tx = newUpdateTx(doc._class, doc._id, [txOp], userId, _objectSpace)
 
     fillUpdateDetails(doc, tx)
 
@@ -112,7 +111,7 @@ export function createOperations (model: Model, processTx: (tx: Tx) => Promise<a
       throw new Error('Every VDoc based object should contain _space property')
     }
 
-    const tx = newDeleteTx(doc._class, doc._id, getUserId(), _objectSpace)
+    const tx = newDeleteTx(doc._class, doc._id, userId, _objectSpace)
     fillUpdateDetails(doc, tx)
     await processTx(tx)
     return doc

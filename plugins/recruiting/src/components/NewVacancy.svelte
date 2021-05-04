@@ -20,7 +20,7 @@ limitations under the License.
   import type { Space } from '@anticrm/domains'
   import { getCoreService } from '@anticrm/presentation'
   import type { WorkbenchApplication } from '@anticrm/workbench'
-  import type { FSM } from '@anticrm/fsm'
+  import { FSM, getFSMService } from '@anticrm/fsm'
   import fsmPlugin from '@anticrm/fsm'
 
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
@@ -34,6 +34,7 @@ limitations under the License.
   export let application: WorkbenchApplication
 
   const coreP = getCoreService()
+  const fsmServiceP = getFSMService()
   let space: Space | undefined = spaces[0]
   const dispatch = createEventDispatcher()
 
@@ -63,9 +64,13 @@ limitations under the License.
     } as DocumentValue<Vacancy>
 
     if (fsmRef) {
-      model.mixinDocument(doc as Vacancy, fsmPlugin.mixin.WithFSM, {
-        fsm: fsmRef
-      })
+      const newFSM = await fsmServiceP.then((service) => service.duplicateFSM(fsmRef))
+
+      if (newFSM) {
+        model.mixinDocument(doc as Vacancy, fsmPlugin.mixin.WithFSM, {
+          fsm: newFSM._id as Ref<FSM>
+        })
+      }
     }
 
     await core.create<Vacancy>(recruiting.class.Vacancy, doc)

@@ -20,7 +20,7 @@ import {
   CORE_CLASS_MIXIN,
   CORE_CLASS_OBJ, CORE_MIXIN_INDICES, Doc, Mixin, Obj, Property, PropertyType, Ref, Type
 } from './classes'
-import { DocumentQuery, DocumentValue, FindOptions, generateId, RegExpression, Storage, TxContext } from './storage'
+import { DocumentQuery, DocumentSorting, DocumentValue, FindOptions, generateId, RegExpression, Storage, TxContext } from './storage'
 
 export function mixinKey (mixin: Ref<Mixin<Obj>>, key: string): string {
   return key + '|' + mixin.replace('.', '~')
@@ -879,12 +879,12 @@ export class Model implements Storage {
 
   /**
    * Method will check if passed values of object are matched in query.
-   * @param object - partial object values.
+   * @param _attributes - partial object values of operation.
    * @param query - a query.
    */
-  isPartialMatched<T extends Doc> (_class: Ref<Class<Doc>>, object: AnyLayout, query: DocumentQuery<T>): boolean {
+  isPartialMatched<T extends Doc> (_class: Ref<Class<Doc>>, _attributes: AnyLayout, query: DocumentQuery<T>): boolean {
     const stripQuery: AnyLayout = {}
-    const oKeys = new Set<string>(Object.keys(object))
+    const oKeys = new Set<string>(Object.keys(_attributes))
 
     // Make a part of query with values in object.
     let keys = 0
@@ -899,7 +899,18 @@ export class Model implements Storage {
       return false
     }
 
-    return this.matchObject<any>(_class, object, stripQuery)
+    return this.matchObject<any>(_class, _attributes, stripQuery)
+  }
+
+  /**
+   * Check if operation to modify attribute has effect on sorting creteria
+   * @param _attributes
+   * @param sort
+   * @returns
+   */
+  public isSortHasEffect<T extends Doc>(_attributes: AnyLayout, sort: DocumentSorting<T>): boolean {
+    const oKeys = new Set<string>(Object.keys(_attributes))
+    return Object.keys(sort).some(x => oKeys.has(x))
   }
 
   /**

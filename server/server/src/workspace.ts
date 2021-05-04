@@ -25,7 +25,7 @@ import { ReferenceIndex } from '@anticrm/domains/src/indices/reference'
 import { TitleIndex } from '@anticrm/domains/src/indices/title'
 import { TxIndex } from '@anticrm/domains/src/indices/tx'
 import { VDocIndex } from '@anticrm/domains/src/indices/vdoc'
-import { ClientTxStorage } from '@anticrm/platform-core/src/clienttx'
+import { ClientTxStorage } from '@anticrm/domains/src/tx/clienttx'
 import { Collection, MongoClient, SortOptionObject, UpdateOneOptions, UpdateQuery } from 'mongodb'
 import type { FindAndModifyWriteOpResultObject } from 'mongodb'
 import { createPullArrayFilters, createPushArrayFilters, createSetArrayFilters } from './mongo_utils'
@@ -254,7 +254,7 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
       }
 
       let res = await getValue()
-      if (res.value === undefined) {
+      if (res.value == null) {
         res = await getValue()
       }
       return (`${space.spaceKey}-${String(res.value.value)}`) as Ref<VDoc>

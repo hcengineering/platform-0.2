@@ -1,11 +1,12 @@
 {
   "compilerOptions": {
     "target": "esnext",
-    "module": "esnext",
+    "module": "commonjs",
+    "declaration": true,
     "outDir": "./lib",
     "rootDir": "./src",
     "strict": true,
-    "moduleResolution": "node",
+    "esModuleInterop": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true
   }
