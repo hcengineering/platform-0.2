@@ -17,7 +17,7 @@ import { Class, DateProperty, Doc, Emb, MODEL_DOMAIN, Ref, SPACE_DOMAIN, StringP
 import { Application, ShortID, Space, SpaceUser, Title, TitleSource, TITLE_DOMAIN, VDoc } from '@anticrm/domains'
 import core, { ArrayOf$, Builder, Class$, InstanceOf$, Mixin$, Primary, Prop, RefTo$ } from '.'
 import {
-  TArrayOf, TAttribute, TClass, TClassifier, TDoc, TEmb, TEnum, TEnumLiteral, TEnumOf, TIndexesClass, TInstanceOf,
+  TArrayOf, TAttribute, TBagOf, TClass, TClassifier, TDoc, TEmb, TEnum, TEnumLiteral, TEnumOf, TIndexesClass, TInstanceOf,
   TMixin, TObj,
   TRefTo, TType
 } from './models/core'
@@ -103,7 +103,7 @@ export class TTitle extends TDoc implements Title {
 }
 
 export function model (S: Builder): void {
-  S.add(TObj, TEmb, TDoc, TAttribute, TType, TRefTo, TInstanceOf, TEnumOf, TArrayOf, TClassifier, TClass, TMixin, TEnumLiteral, TEnum)
+  S.add(TObj, TEmb, TDoc, TAttribute, TType, TRefTo, TInstanceOf, TEnumOf, TArrayOf, TBagOf, TClassifier, TClass, TMixin, TEnumLiteral, TEnum)
   S.add(TIndexesClass, TVShortID)
   S.add(TStringType, TNumberType, TBooleanType, TDateType)
   S.add(TVDoc, TReference, TTitle, TApplication)

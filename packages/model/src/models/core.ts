@@ -16,7 +16,7 @@
 import { BagOf$, Class$, InstanceOf$, Mixin$, Prop, RefTo$ } from '../dsl'
 import core from '../index'
 import {
-  AllAttributes, ArrayOf, Attribute, Class, Classifier, ClassifierKind, Doc, Emb, Enum, EnumKey, EnumLiteral,
+  AllAttributes, ArrayOf, Attribute, BagOf, Class, Classifier, ClassifierKind, Doc, Emb, Enum, EnumKey, EnumLiteral,
   EnumLiterals, EnumOf, Indices, InstanceOf, Mixin, MODEL_DOMAIN, Obj, PropertyType, Ref, RefTo, StringProperty, Type
 } from '@anticrm/core'
 
@@ -100,6 +100,11 @@ export class TEnumOf extends TType implements EnumOf<EnumKey> {
 
 @Class$(core.class.ArrayOf, core.class.Type, MODEL_DOMAIN)
 export class TArrayOf extends TType implements ArrayOf {
+  @Prop() of!: Type
+}
+
+@Class$(core.class.BagOf, core.class.Type, MODEL_DOMAIN)
+export class TBagOf extends TType implements BagOf {
   @Prop() of!: Type
 }
 

@@ -132,6 +132,10 @@ export function model (S: Builder): void {
     presenter: ui.component.StringPresenter
   })
 
+  S.mixin(core.class.BagOf, ui.mixin.Presenter, {
+    presenter: ui.component.StringPresenter
+  })
+
   S.mixin(core.class.InstanceOf, ui.mixin.Presenter, {
     presenter: ui.component.StringPresenter
   })
