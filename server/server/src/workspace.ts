@@ -254,7 +254,7 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
       }
 
       let res = await getValue()
-      if (res.value === undefined) {
+      if (res.value == null) {
         res = await getValue()
       }
       return (`${space.spaceKey}-${String(res.value.value)}`) as Ref<VDoc>
