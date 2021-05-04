@@ -35,7 +35,7 @@ limitations under the License.
     lq,
     recruiting.mixin.WithCandidateProps,
     {
-      vacancy: object?._id as Ref<Vacancy>
+      appliedFor: object?._id as Ref<Vacancy>
     },
     (docs) =>
       coreP

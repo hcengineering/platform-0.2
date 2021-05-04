@@ -15,9 +15,10 @@ limitations under the License.
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
 
-  import { Doc, mixinKey, Ref } from '@anticrm/core'
+  import { Doc, Ref } from '@anticrm/core'
+  import { VDoc } from '@anticrm/domains'
   import { getCoreService, liveQuery } from '@anticrm/presentation'
-  import fsmPlugin, { getFSMService, WithFSM } from '@anticrm/fsm'
+  import fsmPlugin, { getFSMService } from '@anticrm/fsm'
 
   import UserInfo from '@anticrm/sparkling-controls/src/UserInfo.svelte'
   import ResumeProps from '@anticrm/person-extras/src/components/ResumeProps.svelte'
@@ -39,13 +40,19 @@ limitations under the License.
   let candidate: WithCandidateProps['candidate'] | undefined = object?.candidate
   let resume: WithCandidateProps['resume'] | undefined = object?.resume
   let vacancies: Vacancy[] = []
-  let vacancy: Vacancy | undefined
 
   liveQuery(undefined, recruiting.class.Vacancy, {}, (docs) => {
     vacancies = docs
   })
 
-  $: vacancy = vacancies.find((x) => x._id === object?.vacancy)
+  let appliedVacancies: Vacancy[] = []
+  let availableVacancies: Vacancy[] = []
+  $: if (object) {
+    const targetRefs = new Set(object.appliedFor)
+
+    appliedVacancies = vacancies.filter((x) => targetRefs.has(x._id as Ref<Vacancy>))
+    availableVacancies = vacancies.filter((x) => !targetRefs.has(x._id as Ref<Vacancy>))
+  }
 
   $: {
     person = object
@@ -53,19 +60,20 @@ limitations under the License.
     resume = object?.resume
   }
 
-  async function unassign () {
+  async function unassign (vacancy: Vacancy) {
     if (!object || !candidate) {
       return
     }
 
     const core = await coreP
+    const fsmService = await fsmServiceP
 
-    core.updateWith(object, (b) =>
-      b.set({
-        vacancy: '' as Ref<Vacancy>,
-        [mixinKey(fsmPlugin.mixin.WithFSM, 'fsm')]: ''
-      })
-    )
+    const vacancyWithFSM = core.getModel().as(vacancy, fsmPlugin.mixin.WithFSM)
+    fsmService.removeStateItem(object._id as Ref<VDoc>, vacancyWithFSM)
+
+    core.update(object, {
+      appliedFor: object.appliedFor.filter((x) => x !== vacancy._id)
+    })
   }
 
   async function assign (vacancyRef: Ref<Doc>) {
@@ -85,24 +93,14 @@ limitations under the License.
     const isFSMVacancy = model.isMixedIn(vacancy, fsmPlugin.mixin.WithFSM)
 
     if (isFSMVacancy) {
-      const fsmID = model.as(vacancy, fsmPlugin.mixin.WithFSM).fsm
-      const fsm = await core.findOne(fsmPlugin.class.FSM, { _id: fsmID })
       const fsmService = await fsmServiceP
 
-      const initialState = fsm && (await fsmService.getStates(fsm))[0]
-
-      if (initialState) {
-        model.mixinDocument(baseDoc, fsmPlugin.mixin.WithState, {
-          fsm: vacancy._id as Ref<WithFSM>,
-          state: initialState._id
-        })
-
-        core.update(baseDoc, baseDoc)
-      }
+      const withFSM = model.as(vacancy, fsmPlugin.mixin.WithFSM)
+      fsmService.addStateItem(withFSM, object._id as Ref<VDoc>, contactPlugin.class.Person)
     }
 
-    core.update(object, {
-      vacancy: vacancyRef as Ref<Vacancy>
+    await core.update(object, {
+      appliedFor: [...object.appliedFor, vacancy._id as Ref<Vacancy>]
     })
   }
 </script>
@@ -134,31 +132,33 @@ limitations under the License.
     </div>
     <div class="assignment">
       <div class="assignment-content">
-        {#if vacancy}
+        {#if appliedVacancies.length > 0}
           <div>
-            Candidate is assigned to
-            <div class="vacancy">
-              <Button
-                on:click={() => {
-                  dispatch('open', { _id: vacancy && vacancy._id, _class: recruiting.class.Vacancy })
-                }}
-                label={vacancy.title}
-                kind="transparent" />
-            </div>
+            <div class="application-label">Candidate is applied for:</div>
+            {#each appliedVacancies as vacancy}
+              <div class="vacancy">
+                <Button
+                  on:click={() => {
+                    dispatch('open', { _id: vacancy && vacancy._id, _class: recruiting.class.Vacancy })
+                  }}
+                  label={vacancy.title}
+                  kind="transparent" />
+                <Button label="Unassign" on:click={() => unassign(vacancy)} kind="transparent" />
+              </div>
+            {/each}
           </div>
-          <Button label="Unassign" on:click={unassign} kind="transparent" />
         {:else}
-          <div>Candidate is not assigned to any vacancy</div>
-          {#if vacancies.length > 0}
-            <PopupMenu>
-              <div class="assign-control" slot="trigger">Assign...</div>
-              {#each vacancies as v}
-                <PopupItem on:click={() => assign(v._id)}>
-                  {v.title}
-                </PopupItem>
-              {/each}
-            </PopupMenu>
-          {/if}
+          <div class="application-label">Candidate is not assigned to any vacancy</div>
+        {/if}
+        {#if availableVacancies.length > 0}
+          <PopupMenu>
+            <div class="assign-control" slot="trigger">Assign...</div>
+            {#each availableVacancies as v}
+              <PopupItem on:click={() => assign(v._id)}>
+                {v.title}
+              </PopupItem>
+            {/each}
+          </PopupMenu>
         {/if}
       </div>
     </div>
@@ -175,11 +175,12 @@ limitations under the License.
     grid-gap: 10px;
   }
 
-  .vacancy {
-    display: inline-block;
+  .assignment {
+    display: grid;
+    grid-template-columns: auto;
+    grid-gap: 10px;
   }
-
-  .assignment-content {
+  .vacancy {
     display: flex;
     justify-content: space-between;
     align-items: center;

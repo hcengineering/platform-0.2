@@ -11,7 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import core, { ArrayOf$, Builder, Class$, Mixin$, Prop, RefTo$ } from '@anticrm/model'
+import core, { Builder, Class$, Mixin$, Prop, RefTo$ } from '@anticrm/model'
 import { CORE_CLASS_STRING, Ref, Class, DateProperty, StringProperty, CORE_CLASS_BOOLEAN } from '@anticrm/core'
 import { Application, VDoc } from '@anticrm/domains'
 import { TDoc, TMixin, TVDoc } from '@anticrm/model/src/__model__'
@@ -21,7 +21,7 @@ import { ComponentExtension } from '@anticrm/presentation'
 import { AnyComponent } from '@anticrm/platform-ui'
 import { WorkbenchApplication } from '@anticrm/workbench'
 
-import fsmPlugin, { FSM, Transition, State, WithFSM, WithState } from '.'
+import fsmPlugin, { FSM, Transition, State, WithFSM, FSMItem } from '.'
 
 const fsmDomain = 'fsm'
 
@@ -34,11 +34,6 @@ export class TFSM extends TVDoc implements FSM {
 
   @RefTo$(core.class.Application)
   application!: Ref<Application>
-
-  @UX('TargetClasses' as IntlString)
-  @ArrayOf$()
-  @RefTo$(core.class.Class)
-  classes!: Array<Ref<Class<VDoc>>>
 
   @Prop(CORE_CLASS_BOOLEAN)
   isTemplate!: boolean
@@ -70,22 +65,26 @@ export class TState extends TVDoc implements State {
   fsm!: Ref<FSM>
 }
 
+@Class$(fsmPlugin.class.FSMItem, core.class.VDoc, fsmDomain)
+export class TFSMItem extends TVDoc implements FSMItem {
+  @RefTo$(fsmPlugin.mixin.WithFSM)
+  fsm!: Ref<FSM>
+
+  @RefTo$(fsmPlugin.class.State)
+  state!: Ref<State>
+
+  @RefTo$(core.class.VDoc)
+  item!: Ref<VDoc>
+
+  @RefTo$(core.class.Class)
+  clazz!: Ref<Class<VDoc>>
+}
+
 @Mixin$(fsmPlugin.mixin.WithFSM, core.class.Doc)
 export class TWithFSM extends TDoc implements WithFSM {
   @UX('FSM' as IntlString)
   @RefTo$(fsmPlugin.class.FSM)
   fsm!: Ref<FSM>
-}
-
-@Mixin$(fsmPlugin.mixin.WithState, core.class.Doc)
-export class TWithState extends TDoc implements WithState {
-  @UX('FSM' as IntlString)
-  @RefTo$(fsmPlugin.mixin.WithFSM)
-  fsm!: Ref<WithFSM>
-
-  @UX('State' as IntlString)
-  @RefTo$(fsmPlugin.class.State)
-  state!: Ref<State>
 }
 
 @Mixin$(fsmPlugin.mixin.CardForm, core.class.Mixin)
@@ -95,7 +94,7 @@ export class TCardForm<T extends VDoc> extends TMixin<T> implements ComponentExt
 }
 
 export function model (S: Builder): void {
-  S.add(TTransition, TState, TFSM, TWithFSM, TWithState, TCardForm)
+  S.add(TTransition, TState, TFSM, TWithFSM, TFSMItem, TCardForm)
 
   S.mixin(core.class.VDoc, fsmPlugin.mixin.CardForm, {
     component: fsmPlugin.component.VDocCardPresenter
@@ -116,14 +115,12 @@ type PureState = Omit<State, keyof VDoc | 'fsm'>
 class FSMBuilder {
   private readonly name: string
   private readonly appID: Ref<Application>
-  private readonly classes: Array<Ref<Class<VDoc>>>
   private readonly states = new Map<string, PureState>()
   private readonly transitions: Array<[string, string]> = []
 
-  constructor (name: string, appID: Ref<Application>, classes: Array<Ref<Class<VDoc>>>) {
+  constructor (name: string, appID: Ref<Application>) {
     this.name = name
     this.appID = appID
-    this.classes = classes
   }
 
   private getState (a: PureState): PureState | undefined {
@@ -165,7 +162,6 @@ class FSMBuilder {
     const fsm = S.createDocument(fsmPlugin.class.FSM, {
       name: this.name,
       application: this.appID,
-      classes: this.classes,
       isTemplate: true,
       ...vProps
     })
@@ -206,8 +202,7 @@ class FSMBuilder {
   }
 }
 
-export const fsm = (
+export const templateFSM = (
   name: string,
-  appID: Ref<Application>,
-  classes: Array<Ref<Class<VDoc>>>
-): FSMBuilder => new FSMBuilder(name, appID, classes)
+  appID: Ref<Application>
+): FSMBuilder => new FSMBuilder(name, appID)

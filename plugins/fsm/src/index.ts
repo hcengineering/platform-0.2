@@ -21,7 +21,6 @@ import { AnyComponent, getPlatform } from '@anticrm/platform-ui'
 export interface FSM extends VDoc {
   name: string
   application: Ref<Application>
-  classes: Array<Ref<Class<VDoc>>>
   isTemplate: boolean
 }
 
@@ -38,19 +37,11 @@ export interface WithFSM extends Doc {
   fsm: Ref<FSM>
 }
 
-// TODO: replace with class represents "Card",
-// that would refer to fsm, target object and have
-// state, like:
-// {
-//    fsm: Ref<WithFSM>
-//    target: Ref<VDoc>
-//    state: Ref<State>
-// }
-export interface WithState extends Doc {
-  // Undefined FSM means doc is not part of FSM
-  // Probably we need to be able to unmixin
-  fsm?: Ref<WithFSM>
+export interface FSMItem extends VDoc {
+  fsm: Ref<FSM>
   state: Ref<State>
+  item: Ref<VDoc>
+  clazz: Ref<Class<VDoc>>
 }
 
 export interface State extends VDoc {
@@ -62,7 +53,9 @@ export interface FSMService extends Service {
   getStates: (fsm: FSM) => Promise<State[]>
   getTransitions: (fsm: FSM) => Promise<Transition[]>
 
-  updateFSM: (fsm: FSM, transitions: Transition[], states: State[]) => Promise<void>
+  removeStateItem: (item: Ref<VDoc>, fsmOwner: WithFSM) => Promise<void>
+  addStateItem: (fsmOwner: WithFSM, item: Ref<VDoc>, clazz: Ref<Class<VDoc>>) => Promise<FSMItem | undefined>
+
   duplicateFSM: (fsm: Ref<FSM>) => Promise<FSM | undefined>
 }
 
@@ -73,11 +66,11 @@ const fsmPlugin = plugin(
     class: {
       FSM: '' as Ref<Class<FSM>>,
       Transition: '' as Ref<Class<Transition>>,
-      State: '' as Ref<Class<State>>
+      State: '' as Ref<Class<State>>,
+      FSMItem: '' as Ref<Class<FSMItem>>
     },
     mixin: {
       WithFSM: '' as Ref<Mixin<WithFSM>>,
-      WithState: '' as Ref<Mixin<WithState>>,
       CardForm: '' as Ref<Mixin<ComponentExtension<VDoc>>>
     },
     component: {

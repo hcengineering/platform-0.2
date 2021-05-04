@@ -14,96 +14,161 @@ limitations under the License.
 -->
 <script lang="ts">
   import groupBy from 'lodash/groupBy'
-  import { DateProperty, Doc, generateId, Ref, StringProperty } from '@anticrm/core'
+
+  import { DateProperty, Doc, Ref, StringProperty } from '@anticrm/core'
+  import type { CoreService, QueryUpdater } from '@anticrm/platform-core'
   import type { Space } from '@anticrm/domains'
+  import { getCoreService, liveQuery } from '@anticrm/presentation'
 
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
   import EditBox from '@anticrm/sparkling-controls/src/EditBox.svelte'
   import CheckBox from '@anticrm/sparkling-controls/src/CheckBox.svelte'
 
-  import type { FSM, Transition, State } from '..'
-  import fsmPlugin, { getFSMService } from '..'
+  import type { FSM, Transition, State, FSMItem } from '..'
+  import fsmPlugin from '..'
 
   export let fsm: FSM
-  export let transitions: Array<Transition> = []
-  export let states: Map<Ref<Doc>, State> = new Map()
 
-  let exisitingTransitions: Array<Transition> = []
+  let transitions: Array<Transition> = []
+  let states: Array<State> = []
+
+  let transitionsQ: Promise<QueryUpdater<Transition>> | undefined
+  let statesQ: Promise<QueryUpdater<State>> | undefined
+
+  $: transitionsQ = liveQuery(
+    transitionsQ,
+    fsmPlugin.class.Transition,
+    {
+      fsm: fsm._id as Ref<FSM>
+    },
+    (docs) => {
+      transitions = docs
+    }
+  )
+
+  $: statesQ = liveQuery(
+    statesQ,
+    fsmPlugin.class.State,
+    {
+      fsm: fsm._id as Ref<FSM>
+    },
+    (docs) => {
+      states = docs
+    }
+  )
+
+  let fsmItems: FSMItem[] = []
+  let fsmItemsQ: Promise<QueryUpdater<FSMItem>> | undefined
+
+  $: fsmItemsQ = liveQuery(
+    fsmItemsQ,
+    fsmPlugin.class.FSMItem,
+    {
+      fsm: fsm._id as Ref<FSM>
+    },
+    (docs) => {
+      fsmItems = docs
+    }
+  )
 
   let transitionsMap: { [key: string]: Array<Transition> } = {}
-  let statesArray: Array<State> = []
+  let usedStates = new Set<Ref<Doc>>()
 
   $: transitionsMap = groupBy(transitions, (x) => x.from)
-  $: statesArray = [...states.values()]
+  $: usedStates = new Set(
+    transitions
+      .map((x) => [x.from, x.to])
+      .flat()
+      .concat(fsmItems.map((x) => x.state))
+  )
 
-  async function init () {
-    const fsmService = await getFSMService()
-
-    exisitingTransitions = await fsmService.getTransitions(fsm)
-    transitions = exisitingTransitions
-    states = await fsmService.getStates(fsm).then((xs) => new Map(xs.map((x) => [x._id, x])))
-  }
-
+  let cs: CoreService
   const vProps = {
     _createdBy: '' as StringProperty,
-    _createdOn: 0 as DateProperty,
-    _space: '' as Ref<Space>
+    _space: fsmPlugin.space.Common as Ref<Space>
+  }
+
+  async function init () {
+    cs = await getCoreService()
+    vProps._createdBy = cs.getUserId() as StringProperty
   }
 
   const onAddState = () => {
-    const id = generateId()
-
-    states.set(id, {
-      _id: id,
-      _class: fsmPlugin.class.State,
+    cs.create(fsmPlugin.class.State, {
       ...vProps,
-      name: '',
+      _createdOn: Date.now() as DateProperty,
+      name: 'New state',
       fsm: fsm._id as Ref<FSM>
     })
-    states = states
   }
 
-  const onRemoveState = (id: Ref<Doc>) => {
-    transitions = transitions.filter(({ from, to }) => [from, to].every((x) => x !== id))
-    states.delete(id)
-    states = states
+  const onRemoveState = (state: State) => {
+    cs.remove(state)
   }
 
   const onToggleTransition = (from: Ref<Doc>, to: Ref<Doc>) => {
     const isEq = ({ from: _from, to: _to }: Transition) => from === _from && to === _to
-    const idx = transitions.findIndex(isEq)
+    const transition = transitions.find(isEq)
 
-    if (idx < 0) {
-      transitions.push(
-        exisitingTransitions.find(isEq) ?? {
-          _id: generateId(),
-          _class: fsmPlugin.class.Transition,
-          ...vProps,
-          from: from as Ref<State>,
-          to: to as Ref<State>,
-          fsm: fsm._id as Ref<FSM>
-        }
-      )
+    if (!transition) {
+      cs.create(fsmPlugin.class.Transition, {
+        ...vProps,
+        _createdOn: Date.now() as DateProperty,
+        fsm: fsm._id as Ref<FSM>,
+        from: from as Ref<State>,
+        to: to as Ref<State>
+      })
     } else {
-      transitions.splice(idx, 1)
+      cs.remove(transition)
     }
+  }
 
-    transitions = transitions
+  let renameStateID: Ref<Doc> | undefined
+  let renameStateName: string = ''
+
+  const onStateInputFocus = (id: Ref<Doc>, name: string) => {
+    renameStateID = id
+    renameStateName = name
+  }
+
+  const onStateNameInput = (e: any) => {
+    if (e.key === 'Enter') {
+      const state = states.find((x) => renameStateID === x._id)
+
+      if (!state) {
+        return
+      }
+
+      cs.update(state, {
+        name: renameStateName
+      })
+
+      renameStateID = undefined
+      renameStateName = ''
+    }
   }
 </script>
 
 {#await init() then _}
   <div class="root">
-    {#each statesArray as state (state._id)}
+    {#each states as state (state._id)}
       <div class="state">
         <div class="state-header">
           <div class="state-name">
-            <EditBox bind:value={state.name} label="State name" />
+            {#if state._id === renameStateID}
+              <EditBox bind:value={renameStateName} on:keypress={onStateNameInput} label="State name" />
+            {:else}
+              <div class="readonly-name" on:click={() => onStateInputFocus(state._id, state.name)}>
+                {state.name}
+              </div>
+            {/if}
           </div>
-          <Button label="Remove" on:click={() => onRemoveState(state._id)} />
+          {#if !usedStates.has(state._id)}
+            <Button label="Remove" on:click={() => onRemoveState(state)} />
+          {/if}
         </div>
         <div class="state-transitions">
-          {#each statesArray.filter((x) => x._id !== state._id) as tstate}
+          {#each states.filter((x) => x._id !== state._id) as tstate}
             <div class="state-transition">
               <CheckBox
                 checked={transitionsMap[state._id] && transitionsMap[state._id].some((x) => x.to === tstate._id)}
@@ -144,6 +209,12 @@ limitations under the License.
 
   .state-name {
     padding-right: 20px;
+  }
+
+  .readonly-name {
+    font-weight: 500;
+
+    cursor: pointer;
   }
 
   .state-transitions {
