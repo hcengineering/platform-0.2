@@ -522,7 +522,8 @@ export class Model implements Storage {
     }
 
     // We should add mixin to list of mixins
-    if (this.is(_class, CORE_CLASS_MIXIN)) {
+    const clazz = this.get(_class)
+    if (clazz._class === CORE_CLASS_MIXIN) {
       // We should also put a _mixin in list for query
       Model.includeMixinAny(query, _class)
 
@@ -899,7 +900,9 @@ export class Model implements Storage {
       return false
     }
 
-    return this.matchObject<any>(_class, _attributes, stripQuery)
+    // we need a proper class persistence object for mixins to match properly
+    const attrValue = this.assign({}, _class, _attributes)
+    return this.matchObject<any>(_class, attrValue, stripQuery)
   }
 
   /**
