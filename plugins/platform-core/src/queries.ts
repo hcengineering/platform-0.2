@@ -54,7 +54,6 @@ export class QueriableStorage implements QueryProtocol, Storage {
       }
     }
     const result = await this.find(query._class, query.query, findOptions)
-
     query.results = result
     query.subscriber(result)
   }
@@ -125,7 +124,12 @@ export class QueriableStorage implements QueryProtocol, Storage {
       let needServerRefresh = false
       // Perform document update.
       if (doc != null && this.updateResults) {
-        this.model.updateDocument(doc, operations)
+        // We have mixin update operations, let's apply as mixin
+        if (this.model.isMixedIn(doc, _class)) {
+          this.model.updateDocument(this.model.as(doc, _class), operations)
+        } else {
+          this.model.updateDocument(doc, operations)
+        }
 
         // If Document is not matched anymore, we need to remove it.
         if (!this.model.matchQuery(q._class, doc, q.query)) {
