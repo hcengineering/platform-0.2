@@ -15,6 +15,7 @@
 
 import { Status, Severity} from '@anticrm/status'
 import { monitor } from './event'
+import { Platform, CODE_LOADING_PLUGIN } from './status'
 
 /** Base interface for a plugin or platform service. */
 export interface Service {} // eslint-disable-line @typescript-eslint/no-empty-interface
@@ -111,7 +112,7 @@ async function loadPlugin<T extends Service> (id: Plugin<T>): Promise<Service> {
     loaderPromise = location[1]()
   // }
 
-  const status = new Status(Severity.INFO, 0, `Loading module '<b>${id}</b>'...`)
+  const status = new Status(Severity.INFO, Platform, CODE_LOADING_PLUGIN, {plugin: id})
   const loadedPlugin = await monitor(status, loaderPromise)
   const f = loadedPlugin.default
   const service = await f(deps)

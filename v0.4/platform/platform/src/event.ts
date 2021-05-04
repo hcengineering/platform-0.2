@@ -13,10 +13,11 @@
 // limitations under the License.
 //
 
-import { Status, Severity } from '@anticrm/status'
+import { Status } from '@anticrm/status'
+import { unknownError, OK } from './status'
 
 type EventListener = (event: string, data: any) => Promise<void>
-export const PlatformStatus = 'platform-status'
+const PlatformEvent = 'platform-event'
 
 const eventListeners = new Map<string, EventListener[]>()
 
@@ -43,16 +44,11 @@ export function broadcastEvent (event: string, data: any): void {
   }
 }
 
-export function setPlatformStatus (status: Status | Error | string | unknown): void {
-  if (typeof status === 'string') {
-    broadcastEvent(PlatformStatus, new Status(Severity.INFO, 0, status))
-  } else if (status instanceof Error) {
-    const err = status
-    broadcastEvent(PlatformStatus, new Status(Severity.ERROR, 0, err.message))
-  } else if (status instanceof Status) {
-    broadcastEvent(PlatformStatus, status)
+export function setPlatformStatus (status: Status | Error): void {
+  if (status instanceof Error) {
+    broadcastEvent(PlatformEvent, unknownError)
   } else {
-    broadcastEvent(PlatformStatus, new Status(Severity.WARNING, 0, `Unknown status: ${String(status)}`))
+    broadcastEvent(PlatformEvent, status)
   }
 }
 
@@ -60,7 +56,7 @@ export async function monitor<T> (status: Status, promise: Promise<T>): Promise<
   setPlatformStatus(status)
   try {
     const result = await promise
-    setPlatformStatus(new Status(Severity.OK, 0, ''))
+    setPlatformStatus(OK)
     return result
   } catch (err) {
     setPlatformStatus(err)

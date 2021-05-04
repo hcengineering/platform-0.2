@@ -15,12 +15,13 @@
 
 /* eslint-env jest */
 
-import { Status, Severity } from '@anticrm/status'
+import { Status, Severity, Component } from '@anticrm/status'
 
 import { Metadata, getMetadata, loadMetadata, setMetadata } from '../metadata'
 import { Plugin, Service, identify, getPlugin, addLocation } from '../plugin'
 import { Resource, getResource, getResourceInfo, peekResource, setResource } from '../resource'
-import { addEventListener, removeEventListener, broadcastEvent, PlatformStatus, setPlatformStatus, monitor } from '../event'
+import { addEventListener, removeEventListener, broadcastEvent, setPlatformStatus, monitor } from '../event'
+import { OK, unknownError } from '../status'
 
 import { plugin1, plugin1State, descriptor1 } from './shared'
 import { plugin2, plugin2State, descriptor2 } from './shared'
@@ -32,6 +33,8 @@ type AnyPlugin = Plugin<Service>
 type ExtractType<T, X extends Record<string, Metadata<T>>> = {
   [P in keyof X]: X[P] extends Metadata<infer Z> ? Z : never
 }
+
+const TestComponent = 'platform-test' as Component
 
 describe('platform', () => {
 
@@ -278,48 +281,47 @@ describe('platform', () => {
     secondListenerForEvent2.checkNotCalled()
   })
 
-  function testSetPlatformStatus (status: any, expectedSeverity: Severity, expectedMessage: string): void {
+  const PlatformEvent = 'platform-event'
+
+  function testSetPlatformStatus (status: Status | Error, expectedSeverity: Severity): void {
     let listenerCalled = false
     const listener = async function (event: string, data: any): Promise<void> {
       listenerCalled = true
-      expect(event).toBe(PlatformStatus)
+      expect(event).toBe(PlatformEvent)
       expect(data).toBeInstanceOf(Status)
       expect(data.severity).toBe(expectedSeverity)
-      expect(data.code).toBe(0)
-      expect(data.message).toBe(expectedMessage)
-      return await Promise.resolve()
+      console.log(data)
+      // expect(data.message).toBe(expectedMessage)
     }
 
-    addEventListener(PlatformStatus, listener)
+    addEventListener(PlatformEvent, listener)
     setPlatformStatus(status)
     expect(listenerCalled).toBeTruthy()
 
     // remove listener to avoid calls from other tests
-    removeEventListener(PlatformStatus, listener)
+    removeEventListener(PlatformEvent, listener)
   }
 
-  it('should set string platform status', () => {
-    testSetPlatformStatus('custom string', Severity.INFO, 'custom string')
-  })
-
   it('should set error platform status', () => {
-    testSetPlatformStatus(new Error('baga'), Severity.ERROR, 'baga')
+    testSetPlatformStatus(new Error('baga'), Severity.ERROR)
   })
 
   it('should set custom platform status', () => {
-    testSetPlatformStatus(new Status(Severity.OK, 0, 'custom message'), Severity.OK, 'custom message')
-  })
-
-  it('should set unknown platform status', () => {
-    testSetPlatformStatus({ x: 'y' }, Severity.WARNING, 'Unknown status: [object Object]')
+    testSetPlatformStatus(OK, Severity.OK)
   })
 
   it('should throw monitor error', () => {
-    expect(monitor(new Status(Severity.OK, 0, ''), Promise.reject(new Error('dummy')))).rejects.toThrowError('dummy')
+    expect(monitor(OK, Promise.reject(new Error('dummy')))).rejects.toThrowError('dummy')
   })
 
   it('should remove listener inexistent type of the event', () => {
     removeEventListener('xxx', {} as any)
+  })
+
+  it('should create unknown error', () => {
+    const status = unknownError(new Error('something'))
+    expect(status.severity).toBe(Severity.ERROR)
+    expect(status.params.message).toBe('something')
   })
 
 })

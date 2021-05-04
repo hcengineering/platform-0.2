@@ -34,18 +34,19 @@ export enum Severity {
  * @public
  */
 export type Component = string & { __component: true }
+export type StatusCode<P extends Record<string, any> = {}> = number & { __params: P}
 
 /**
  * Status of an operation
  * @public
  */
-export class Status {
+export class Status<P = {}> {
   readonly severity: Severity
   readonly component: Component
-  readonly code: number
-  readonly params: any
+  readonly code: StatusCode<P>
+  readonly params: P
 
-  constructor (severity: Severity, component: Component, code: number, params?: any) {
+  constructor (severity: Severity, component: Component, code: StatusCode<P>, params: P) {
     this.severity = severity
     this.component = component
     this.code = code
@@ -54,42 +55,13 @@ export class Status {
 }
 
 /**
- * Platform component Id
- * @public
- */
-export const Platform = 'platform' as Component
-
-/**
- * Platfrom Status Code
- * @public
- */
-export enum PlatformStatusCode {
-  OK,
-  UNKNOWN_ERROR
-}
-
-/**
- * OK Status
- * @public
- */
-export const OK = new Status(Severity.OK, Platform, PlatformStatusCode.OK)
-
-/** 
- * Creates unknown error status
- * @public
- */
-export function unknownError (err: Error): Status {
-  return new Status(Severity.ERROR, Platform, PlatformStatusCode.UNKNOWN_ERROR, { message: err.message })
-}
-
-/**
  * Error object wrapping `Status`
  * @public
  */
-export class PlatformError extends Error {
-  readonly status: Status
+export class PlatformError<P extends Record<string, any>> extends Error {
+  readonly status: Status<P>
 
-  constructor (status: Status) {
+  constructor (status: Status<P>) {
     super(`${status.severity} in '${status.component}' code: ${status.code}`)
     this.status = status
   }
