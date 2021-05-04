@@ -68,7 +68,7 @@ export class TState extends TVDoc implements State {
 @Class$(fsmPlugin.class.FSMItem, core.class.VDoc, fsmDomain)
 export class TFSMItem extends TVDoc implements FSMItem {
   @RefTo$(fsmPlugin.mixin.WithFSM)
-  fsm!: Ref<WithFSM>
+  fsm!: Ref<FSM>
 
   @RefTo$(fsmPlugin.class.State)
   state!: Ref<State>

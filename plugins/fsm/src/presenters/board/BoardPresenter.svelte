@@ -70,7 +70,7 @@ limitations under the License.
       itemsQuery,
       fsmPlugin.class.FSMItem,
       {
-        fsm: target._id as Ref<WithFSM>
+        fsm: fsm._id as Ref<FSM>
       },
       (docs) => {
         items = docs

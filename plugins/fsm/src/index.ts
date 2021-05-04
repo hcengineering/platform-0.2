@@ -38,7 +38,7 @@ export interface WithFSM extends Doc {
 }
 
 export interface FSMItem extends VDoc {
-  fsm: Ref<WithFSM>
+  fsm: Ref<FSM>
   state: Ref<State>
   item: Ref<VDoc>
   clazz: Ref<Class<VDoc>>
@@ -53,10 +53,9 @@ export interface FSMService extends Service {
   getStates: (fsm: FSM) => Promise<State[]>
   getTransitions: (fsm: FSM) => Promise<Transition[]>
 
-  removeStateItem: (item: Ref<VDoc>, fsmOwner: Ref<WithFSM>) => Promise<void>
+  removeStateItem: (item: Ref<VDoc>, fsmOwner: WithFSM) => Promise<void>
   addStateItem: (fsmOwner: WithFSM, item: Ref<VDoc>, clazz: Ref<Class<VDoc>>) => Promise<FSMItem | undefined>
 
-  updateFSM: (fsm: FSM, transitions: Transition[], states: State[]) => Promise<void>
   duplicateFSM: (fsm: Ref<FSM>) => Promise<FSM | undefined>
 }
 

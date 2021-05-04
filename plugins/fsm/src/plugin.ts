@@ -11,9 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { deepEqual } from 'fast-equals'
-
-import { Class, DateProperty, Doc, Ref, StringProperty } from '@anticrm/core'
+import { Class, DateProperty, Ref, StringProperty } from '@anticrm/core'
 import type { Platform } from '@anticrm/platform'
 import type { CoreService } from '@anticrm/platform-core'
 
@@ -55,57 +53,20 @@ export default async (platform: Platform, deps: {core: CoreService}): Promise<FS
         _space: fsmPlugin.space.Common,
         clazz,
         item,
-        fsm: fsmOwner._id as Ref<WithFSM>,
+        fsm: fsm._id as Ref<FSM>,
         state: targetState._id as Ref<State>
       })
     },
-    removeStateItem: async (item: Ref<VDoc>, fsmOwner: Ref<WithFSM>) => {
-      const docs = await deps.core.find(fsmPlugin.class.FSMItem, { item, fsm: fsmOwner })
+    removeStateItem: async (item: Ref<VDoc>, fsmOwner: WithFSM) => {
+      const fsm = await deps.core.findOne(fsmPlugin.class.FSM, { _id: fsmOwner.fsm })
+
+      if (fsm === undefined) {
+        return
+      }
+
+      const docs = await deps.core.find(fsmPlugin.class.FSMItem, { item, fsm: fsm._id as Ref<FSM> })
 
       await Promise.all(docs.map(deps.core.remove.bind(deps.core)))
-    },
-    updateFSM: async (fsm: FSM, transitions: Transition[], states: State[]) => {
-      const existingTransitions = await getTransitions(fsm)
-      const existingStates = await getStates(fsm)
-
-      const statesDiff = diff(existingStates, states)
-
-      const newStateMap = new Map<Ref<State>, Ref<State>>()
-
-      await Promise.all(statesDiff.removed.map(deps.core.remove.bind(deps.core)))
-      await Promise
-        .all(statesDiff.added.map(async (x) => [
-          x._id,
-          await deps.core.create(
-            fsmPlugin.class.State,
-            {
-              _createdOn: Date.now() as DateProperty,
-              _createdBy: deps.core.getUserId() as StringProperty,
-              _space: fsmPlugin.space.Common,
-              name: x.name,
-              fsm: fsm._id as Ref<FSM>
-            }
-          )
-        ] as [Ref<State>, State]))
-        .then(xs => xs.forEach(([initID, doc]) => newStateMap.set(initID, doc._id as Ref<State>)))
-      await Promise.all(statesDiff.modified.map(async (x) => await deps.core.update(x, x)))
-
-      const transitionsDiff = diff(existingTransitions, transitions)
-
-      await Promise.all(transitionsDiff.removed.map(deps.core.remove.bind(deps.core)))
-      await Promise.all(transitionsDiff.added
-        .map(async t => await deps.core.create(
-          fsmPlugin.class.Transition,
-          {
-            _createdOn: Date.now() as DateProperty,
-            _createdBy: deps.core.getUserId() as StringProperty,
-            _space: fsmPlugin.space.Common,
-            from: newStateMap.get(t.from) ?? t.from,
-            to: newStateMap.get(t.to) ?? t.to,
-            fsm: fsm._id as Ref<FSM>
-          }
-        ))
-      )
     },
     duplicateFSM: async (fsmRef: Ref<FSM>) => {
       const fsm = await deps.core.findOne(fsmPlugin.class.FSM, { _id: fsmRef })
@@ -157,25 +118,4 @@ export default async (platform: Platform, deps: {core: CoreService}): Promise<FS
       return newFSM
     }
   }
-}
-
-const diff = <T extends Doc>(a: T[], b: T[]): {
-  added: T[]
-  removed: T[]
-  modified: T[]
-} => {
-  const aIdxs = new Set(a.map(x => x._id))
-  const bIdxs = new Set(b.map(x => x._id))
-
-  const added = b.filter(x => !aIdxs.has(x._id))
-  const removed = a.filter(x => !bIdxs.has(x._id))
-  const modified = b
-    .filter(x => aIdxs.has(x._id))
-    .filter(x => {
-      const aItem = a.find(y => x._id === y._id)
-
-      return aItem !== undefined && !deepEqual(aItem, x)
-    })
-
-  return { added, removed, modified }
 }

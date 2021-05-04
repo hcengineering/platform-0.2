@@ -60,7 +60,7 @@ limitations under the License.
     resume = object?.resume
   }
 
-  async function unassign (vacancyID: Ref<Doc>) {
+  async function unassign (vacancy: Vacancy) {
     if (!object || !candidate) {
       return
     }
@@ -68,10 +68,11 @@ limitations under the License.
     const core = await coreP
     const fsmService = await fsmServiceP
 
-    fsmService.removeStateItem(object._id as Ref<VDoc>, vacancyID as Ref<WithFSM>)
+    const vacancyWithFSM = core.getModel().as(vacancy, fsmPlugin.mixin.WithFSM)
+    fsmService.removeStateItem(object._id as Ref<VDoc>, vacancyWithFSM)
 
     core.update(object, {
-      appliedFor: object.appliedFor.filter((x) => x !== vacancyID)
+      appliedFor: object.appliedFor.filter((x) => x !== vacancy._id)
     })
   }
 
@@ -142,7 +143,7 @@ limitations under the License.
                   }}
                   label={vacancy.title}
                   kind="transparent" />
-                <Button label="Unassign" on:click={() => unassign(vacancy._id)} kind="transparent" />
+                <Button label="Unassign" on:click={() => unassign(vacancy)} kind="transparent" />
               </div>
             {/each}
           </div>

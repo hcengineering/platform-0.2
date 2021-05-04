@@ -32,10 +32,10 @@
   {#if label !== ''}
     <div class="wLabel">
       <div class="label">{label}</div>
-      <input bind:this={input} {id} type="text" bind:value {placeholder} on:input on:focus on:change />
+      <input bind:this={input} {id} type="text" bind:value {placeholder} on:input on:focus on:keypress on:change />
     </div>
   {:else}
-    <input bind:this={input} {id} type="text" bind:value {placeholder} on:input on:focus on:change />
+    <input bind:this={input} {id} type="text" bind:value {placeholder} on:input on:focus on:keypress on:change />
   {/if}
 </div>
 

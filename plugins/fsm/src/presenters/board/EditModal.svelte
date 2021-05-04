@@ -15,62 +15,35 @@ limitations under the License.
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
 
-  import type { Ref, Doc } from '@anticrm/core'
   import workbench from '@anticrm/workbench'
 
-  import Button from '@anticrm/sparkling-controls/src/Button.svelte'
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
 
   import FsmEditor from '../FSMEditor.svelte'
 
-  import type { FSM, FSMService, State, Transition } from '../..'
-  import { getFSMService } from '../..'
+  import type { FSM } from '../..'
 
   const dispatch = createEventDispatcher()
 
   export let fsm: FSM
 
-  let transitions: Transition[] = []
-  let states: Map<Ref<Doc>, State> = new Map()
-
-  let fsmService: FSMService | undefined
-
   const onClose = () => dispatch('close')
-
-  const init = async () => {
-    fsmService = await getFSMService()
-  }
-
-  const onSave = async () => {
-    if (!fsmService) {
-      return
-    }
-
-    await fsmService.updateFSM(fsm, transitions, [...states.values()])
-    dispatch('close')
-  }
 </script>
 
-{#await init() then _}
-  <div class="root">
-    <div class="header">
-      <div class="title-container">
-        <div class="title">Update FSM</div>
-      </div>
-      <div class="close" on:click={onClose}>
-        <Icon icon={workbench.icon.Close} button={true} />
-      </div>
+<div class="root">
+  <div class="header">
+    <div class="title-container">
+      <div class="title">Update FSM</div>
     </div>
-    <ScrollView width="100%" height="450px">
-      <FsmEditor {fsm} bind:transitions bind:states />
-    </ScrollView>
-    <div class="footer">
-      <Button kind="primary" on:click={onSave} width="100%">Save</Button>
-      <Button on:click={() => dispatch('close')} width="100%">Cancel</Button>
+    <div class="close" on:click={onClose}>
+      <Icon icon={workbench.icon.Close} button={true} />
     </div>
   </div>
-{/await}
+  <ScrollView width="100%" height="450px">
+    <FsmEditor {fsm} />
+  </ScrollView>
+</div>
 
 <style lang="scss">
   .root {
@@ -107,14 +80,5 @@ limitations under the License.
 
     font-size: 18px;
     font-weight: 500;
-  }
-
-  .footer {
-    display: grid;
-    grid-template-columns: repeat(2, auto);
-    grid-gap: 10px;
-
-    width: 100%;
-    padding-top: 10px;
   }
 </style>
