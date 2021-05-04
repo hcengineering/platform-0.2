@@ -13,30 +13,16 @@
 // limitations under the License.
 //
 
-import type { AnyComponent, AnySvelteComponent, DocumentProvider, Location, UIService } from './types'
-import ui, { ApplicationRouter, Document } from './types'
-
-import { derived, Readable, writable } from 'svelte/store'
+import { SvelteComponent } from 'svelte'
 
 export type { AnyComponent } from './types'
 export { applicationShortcutKey } from './utils'
 
 import Root from './components/Root.svelte'
 
-import { store } from './stores'
-
-// import Spinner from './components/internal/Spinner.svelte'
-// import Icon from './components/Icon.svelte'
-import { locationToUrl, parseLocation } from './location'
-import { SvelteComponent, getContext, onDestroy, setContext } from 'svelte'
-
-// platform.setResource(ui.component.Icon, Icon)
-// platform.setResource(ui.component.Spinner, Spinner)
-
 export function createApp (target: HTMLElement): SvelteComponent {
   return new Root ({ target })
 }
-
 
 // function showModal (component: AnySvelteComponent, props: any, element?: HTMLElement): void {
 //   store.set({ is: component, props, element: element })
