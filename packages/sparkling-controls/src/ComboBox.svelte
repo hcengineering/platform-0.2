@@ -58,7 +58,7 @@
 <div bind:this={comboRoot} class="comboBox" class:selectedCombo={!comboHidden} style={widthStr} on:click={handler}>
   <div class="selectedItem">
     <div class="selectedItem__label">{label}</div>
-    <div class="selectedItem__value">{selected ? items[selected].comboValue : ''}</div>
+    <div class="selectedItem__value">{selected !== undefined ? items[selected].comboValue : ''}</div>
   </div>
   <div class="arrowDown" />
 
