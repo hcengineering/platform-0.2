@@ -28,7 +28,7 @@
 </script>
 
 {#await component then ctor}
-  <svelte:component this={ctor} {attribute} {maxWidth} bind:value />
+  <svelte:component this={ctor} {attribute} editable={true} {maxWidth} bind:value />
 {:catch err}
   <Icon icon={ui.icon.Error} size="32" /> {err}
 {/await}

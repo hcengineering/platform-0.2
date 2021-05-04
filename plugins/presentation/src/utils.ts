@@ -21,7 +21,7 @@ import { IntlString } from '@anticrm/platform-i18n'
 import { AnyComponent, CONTEXT_PLATFORM } from '@anticrm/platform-ui'
 import { deepEqual } from 'fast-equals'
 import { getContext, onDestroy } from 'svelte'
-import presentationPlugin, { AttrModel, ClassModel, ComponentExtension, GroupModel, PresentationService } from '.'
+import presentationPlugin, { AttrModel, ClassModel, ComponentExtension, GroupModel, MixinGroupModel, PresentationService } from '.'
 
 export async function getCoreService (): Promise<CoreService> {
   const platform = getContext<Platform>(CONTEXT_PLATFORM)
@@ -115,6 +115,12 @@ export function getEmptyModel (): ClassModel {
     }, // eslint-disable-line
     getAttributes (): AttrModel[] {
       return []
+    },
+    getMixins (): MixinGroupModel[] {
+      return []
+    },
+    getMixin (_mixin: Ref<Mixin<Obj>>): MixinGroupModel | undefined {
+      return undefined
     },
     getAttribute (key: string, _class?: Ref<Class<Obj>>): AttrModel | undefined {
       return undefined

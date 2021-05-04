@@ -13,6 +13,7 @@
 // limitations under the License.
 -->
 <script lang="ts">
+  const pointerWidth = 3
   export let maxWidth = 300
   export let value: string
   export let placeholder: string
@@ -30,7 +31,9 @@
     if (typeof value === 'string') {
       compute.innerHTML = value.replace(/ /g, '&nbsp;')
     }
-    const width = compute.clientWidth > maxWidth ? maxWidth : compute.clientWidth
+    const computeWidth = editable ? compute.clientWidth + pointerWidth : compute.clientWidth
+
+    const width = computeWidth > maxWidth ? maxWidth : computeWidth
     if (fullWidth) {
       input.style.width = '100%'
     } else {

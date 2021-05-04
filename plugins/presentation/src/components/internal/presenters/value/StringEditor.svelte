@@ -19,7 +19,7 @@
 
   export let value: string
   export let attribute: AttrModel
-  export let editable: boolean
+  export let editable = true
 
   // Do not allow edit of arrays and instances by this string presenter.
   let readOnlyField = false

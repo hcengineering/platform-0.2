@@ -458,6 +458,10 @@ export class Model implements Storage {
     return result
   }
 
+  getClassMixins (cls: Ref<Class<Obj>>): Array<Ref<Doc>> {
+    return this.extendsOfClass(cls).filter(_class => _class._class === CORE_CLASS_MIXIN && _class._id !== cls).map(_class => _class._id)
+  }
+
   is (_class: Ref<Class<Obj>>, a: Ref<Class<Obj>>): boolean {
     let cls: Ref<Class<Obj>> | undefined = _class
     while (cls !== undefined) {
@@ -716,6 +720,31 @@ export class Model implements Storage {
     return proto
   }
 
+  private getProperties (mixin: Ref<Class<Obj>>): PropertyDescriptorMap {
+    const model = this.get(mixin)
+    const attributes = model._attributes as { [key: string]: Attribute }
+    const descriptors: PropertyDescriptorMap = {}
+    for (const key in attributes) {
+      const attributeKey = this.attributeKey(model, key)
+      descriptors[key] = {
+        get (this: Proxy) {
+          return this.__layout[attributeKey]
+        },
+        set (this: Proxy, value: any) {
+          this.__layout[attributeKey] = value
+        }
+      }
+    }
+
+    // Override _class to return a mixin value.
+    descriptors._class = {
+      value: model._id,
+      writable: false
+    }
+
+    return descriptors
+  }
+
   /**
    * Cast to some mixin, if mixin is not present in class list it will not be added.
    * isMixedIn should be used to ensure if mixin is on place, before modifications.
@@ -736,7 +765,7 @@ export class Model implements Storage {
     if (!this.isMixedIn(doc, mixin)) {
       throw new Error(`Class ${doc._class} could not be cast to ${mixin}`)
     }
-    const proxy = Object.create(this.getPrototype(mixin)) as Proxy & T
+    const proxy = Object.create(this.getPrototype(mixin), this.getProperties(mixin)) as Proxy & T
     proxy.__layout = (doc as unknown) as Record<string, unknown>
     return proxy
   }

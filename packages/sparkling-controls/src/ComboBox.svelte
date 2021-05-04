@@ -2,7 +2,7 @@
   import ScrollView from './ScrollView.svelte'
 
   export let items: Array<any> = []
-  export let selected: any
+  export let selected: number | undefined
   export let label = 'Значение'
   export let width = ''
 
@@ -32,7 +32,8 @@
     let pathRoot = false
     let pathDrop = false
     let pathItems = false
-    event.path.find((el: any) => {
+    const path = event.path || (event.composedPath && event.composedPath())
+    path.find((el) => {
       if (el.className === comboRoot.className) pathRoot = true
       if (el.className === comboDrop.className) pathDrop = true
       if (el.className === comboItems.className) pathItems = true
@@ -57,7 +58,7 @@
 <div bind:this={comboRoot} class="comboBox" class:selectedCombo={!comboHidden} style={widthStr} on:click={handler}>
   <div class="selectedItem">
     <div class="selectedItem__label">{label}</div>
-    <div class="selectedItem__value">{items[selected].comboValue}</div>
+    <div class="selectedItem__value">{selected ? items[selected].comboValue : ''}</div>
   </div>
   <div class="arrowDown" />
 

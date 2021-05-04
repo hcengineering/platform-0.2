@@ -14,12 +14,12 @@
 -->
 <script type="ts">
   import { createEventDispatcher } from 'svelte'
-  import type { Class, Doc, Ref } from '@anticrm/core'
+  import { Class, CORE_CLASS_MIXIN, Doc, Model, Ref } from '@anticrm/core'
   import type { Space, VDoc } from '@anticrm/domains'
   import { CORE_CLASS_VDOC } from '@anticrm/domains'
   import type { AttrModel, ClassModel } from '../..'
   import { liveQuery } from '../..'
-  import { getEmptyModel, getPresentationService } from '../../utils'
+  import { getCoreService, getEmptyModel, getPresentationService } from '../../utils'
   import Presenter from './presenters/Presenter.svelte'
   import { QueryUpdater } from '@anticrm/platform-core'
 
@@ -37,6 +37,12 @@
   let total = 0
   let pos = 0
   const limit = 100
+
+  let coreModel: Model
+
+  getCoreService().then((cs) => {
+    coreModel = cs.getModel()
+  })
 
   $: {
     if (_class && _class !== modelClass) {
@@ -68,8 +74,19 @@
       }
     }
   )
-  function attrValue (doc: VDoc, key: string): any {
-    return (doc as any)[key]
+  function attrValue (doc: VDoc, key: AttrModel): any {
+    if (doc._class !== key._class) {
+      const mixinClass = coreModel.get(key._class)
+      if (mixinClass._class === CORE_CLASS_MIXIN) {
+        // Is a mixin
+        // Check if key class is mixin
+        if (coreModel.isMixedIn(doc, key._class)) {
+          const mdl = coreModel.as(doc, key._class)
+          return (mdl as any)[key.key]
+        }
+      }
+    }
+    return (doc as any)[key.key]
   }
 </script>
 
@@ -108,9 +125,9 @@
         {#each attributes as attr (attr.key)}
           <div class="td">
             {#if attr.presenter}
-              <Presenter is={attr.presenter} value={attrValue(object, attr.key)} attribute={attr} {editable} />
+              <Presenter is={attr.presenter} value={attrValue(object, attr)} attribute={attr} {editable} />
             {:else}
-              <span>{attrValue(object, attr.key) || ''}</span>
+              <span>{attrValue(object, attr) || ''}</span>
             {/if}
           </div>
         {/each}
