@@ -20,8 +20,7 @@ import { UX } from '@anticrm/presentation/src/__model__'
 import workbench from '@anticrm/workbench/src/__model__'
 import { TWithResume } from '@anticrm/person-extras/src/__model__'
 import personExtras, { Skill } from '@anticrm/person-extras'
-import { fsm } from '@anticrm/fsm/src/__model__'
-import contact from '@anticrm/contact'
+import { templateFSM } from '@anticrm/fsm/src/__model__'
 
 import recruiting, { Candidate, Vacancy, WithCandidateProps } from '.'
 
@@ -79,9 +78,10 @@ export class TWithCandidateProps extends TWithResume implements WithCandidatePro
   @InstanceOf$(recruiting.class.Candidate)
   candidate!: Candidate
 
-  @UX('Vacancy' as IntlString)
+  @UX('AppliedFor' as IntlString)
+  @ArrayOf$()
   @RefTo$(recruiting.class.Vacancy)
-  vacancy!: Ref<Vacancy>
+  appliedFor!: Array<Ref<Vacancy>>
 }
 
 export function model (S: Builder): void {
@@ -164,7 +164,7 @@ function createVacanciesAppModel (S: Builder): void {
     contract: { name: 'Contract signing' }
   }
 
-  fsm('Default developer vacancy', recruiting.application.Vacancies, [contact.class.Person])
+  templateFSM('Default developer vacancy', recruiting.application.Vacancies)
     .transition(states.applied, [states.hrInterview, states.rejected])
     .transition(states.hrInterview, [states.testTask, states.rejected])
     .transition(states.testTask, [states.techInterview, states.rejected])
@@ -173,7 +173,7 @@ function createVacanciesAppModel (S: Builder): void {
     .transition(states.offer, states.rejected)
     .build(S)
 
-  fsm('Another default vacancy', recruiting.application.Vacancies, [contact.class.Person])
+  templateFSM('Another default vacancy', recruiting.application.Vacancies)
     .transition(states.applied, [states.techInterview, states.rejected])
     .transition(states.techInterview, [states.offer, states.rejected])
     .transition(states.offer, states.rejected)

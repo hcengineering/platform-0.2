@@ -17,18 +17,22 @@ limitations under the License.
   import { spring } from 'svelte/motion'
 
   import { Doc } from '@anticrm/core'
+  import { QueryUpdater } from '@anticrm/platform-core'
+  import { VDoc } from '@anticrm/domains'
   import { AnyComponent } from '@anticrm/platform-ui'
-  import presentationPlugin, { getPresentationService } from '@anticrm/presentation'
+  import presentationPlugin, { getPresentationService, liveQuery } from '@anticrm/presentation'
 
   import Component from '@anticrm/platform-ui/src/components/Component.svelte'
 
   import type { CardDragEvent, PanEndEvent, PanMoveEvent, PanStartEvent, Pos } from './cardHelper'
   import { pannable } from './cardHelper'
 
-  export let doc: Doc
+  import type { FSMItem } from '../..'
+
+  export let doc: FSMItem
   export let duplicate = false
 
-  let presenter: AnyComponent
+  let presenter: AnyComponent | undefined
   let dragSource: HTMLElement
   let drag = false
 
@@ -38,10 +42,19 @@ limitations under the License.
   let beforeDragHeight = 0
   let sourceY = 0
 
-  getPresentationService().then((ps) => {
-    presenter =
-      ps.getComponentExtension(doc._class, presentationPlugin.mixin.CardForm) ||
-      presentationPlugin.component.VDocCardPresenter
+  const presentationP = getPresentationService()
+
+  let refDoc: VDoc | undefined
+  let lq: Promise<QueryUpdater<VDoc>> | undefined
+
+  $: lq = liveQuery(lq, doc.clazz, { _id: doc.item }, (docs) => {
+    refDoc = docs[0]
+
+    presentationP.then((ps) => {
+      presenter =
+        ps.getComponentExtension(doc._class, presentationPlugin.mixin.CardForm) ||
+        presentationPlugin.component.VDocCardPresenter
+    })
   })
 
   const dispatch = createEventDispatcher()
@@ -92,26 +105,28 @@ limitations under the License.
   }
 </script>
 
-{#if duplicate}
-  <div class="card-view" class:duplicate>
-    <Component is={presenter} props={{ doc }} />
-  </div>
-{:else}
-  <div bind:this={dragSource} bind:clientWidth={originalWidth} bind:clientHeight={originalHeight}>
-    <div
-      class="card-view"
-      class:drag
-      use:pannable
-      on:panstart={handlePanStart}
-      on:panmove={handlePanMove}
-      on:panend={handlePanEnd}
-      style={calcStyle($coords, originalWidth, originalHeight)}>
-      <Component is={presenter} props={{ doc }} />
+{#if presenter !== undefined}
+  {#if duplicate}
+    <div class="card-view" class:duplicate>
+      <Component is={presenter} props={{ doc: refDoc }} />
     </div>
-    {#if drag}
-      <div class="place-box" style={`width: ${beforeDragWidth}px; height: ${beforeDragHeight}px;`} />
-    {/if}
-  </div>
+  {:else}
+    <div bind:this={dragSource} bind:clientWidth={originalWidth} bind:clientHeight={originalHeight}>
+      <div
+        class="card-view"
+        class:drag
+        use:pannable
+        on:panstart={handlePanStart}
+        on:panmove={handlePanMove}
+        on:panend={handlePanEnd}
+        style={calcStyle($coords, originalWidth, originalHeight)}>
+        <Component is={presenter} props={{ doc: refDoc }} />
+      </div>
+      {#if drag}
+        <div class="place-box" style={`width: ${beforeDragWidth}px; height: ${beforeDragHeight}px;`} />
+      {/if}
+    </div>
+  {/if}
 {/if}
 
 <style lang="scss">

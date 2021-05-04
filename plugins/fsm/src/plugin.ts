@@ -13,15 +13,16 @@
 
 import { deepEqual } from 'fast-equals'
 
-import { DateProperty, Doc, Ref, StringProperty } from '@anticrm/core'
+import { Class, DateProperty, Doc, Ref, StringProperty } from '@anticrm/core'
 import type { Platform } from '@anticrm/platform'
 import type { CoreService } from '@anticrm/platform-core'
 
 import BoardPresenter from './presenters/board/BoardPresenter.svelte'
 import VDocCardPresenter from './presenters/board/VDocCardPresenter.svelte'
 
-import type { FSM, FSMService, State, Transition } from '.'
+import type { FSM, FSMService, State, Transition, WithFSM } from '.'
 import fsmPlugin from '.'
+import { VDoc } from '@anticrm/domains'
 
 export default async (platform: Platform, deps: {core: CoreService}): Promise<FSMService> => {
   platform.setResource(fsmPlugin.component.BoardPresenter, BoardPresenter)
@@ -37,6 +38,32 @@ export default async (platform: Platform, deps: {core: CoreService}): Promise<FS
   return {
     getStates,
     getTransitions,
+    addStateItem: async (fsmOwner: WithFSM, item: Ref<VDoc>, clazz: Ref<Class<VDoc>>) => {
+      // TODO: we need to make sure that new FSMItem is only referring to specific item
+      const fsm = await deps.core.findOne(fsmPlugin.class.FSM, { _id: fsmOwner.fsm })
+
+      if (fsm === undefined) {
+        return
+      }
+
+      const states = await getStates(fsm)
+      const targetState = states[0]
+
+      return await deps.core.create(fsmPlugin.class.FSMItem, {
+        _createdBy: deps.core.getUserId() as StringProperty,
+        _createdOn: Date.now() as DateProperty,
+        _space: fsmPlugin.space.Common,
+        clazz,
+        item,
+        fsm: fsmOwner._id as Ref<WithFSM>,
+        state: targetState._id as Ref<State>
+      })
+    },
+    removeStateItem: async (item: Ref<VDoc>, fsmOwner: Ref<WithFSM>) => {
+      const docs = await deps.core.find(fsmPlugin.class.FSMItem, { item, fsm: fsmOwner })
+
+      await Promise.all(docs.map(deps.core.remove.bind(deps.core)))
+    },
     updateFSM: async (fsm: FSM, transitions: Transition[], states: State[]) => {
       const existingTransitions = await getTransitions(fsm)
       const existingStates = await getStates(fsm)

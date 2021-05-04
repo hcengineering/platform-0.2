@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <script type="ts">
-  import { mixinKey, Ref } from '@anticrm/core'
+  import { Ref } from '@anticrm/core'
   import { VDoc } from '@anticrm/domains'
   import { CoreService, QueryUpdater } from '@anticrm/platform-core'
   import { getUIService } from '@anticrm/platform-ui'
@@ -27,7 +27,7 @@ limitations under the License.
   import Card from './Card.svelte'
   import type { CardDragEvent } from './cardHelper'
 
-  import type { FSM, State, WithFSM } from '../..'
+  import type { FSM, FSMItem, State, WithFSM } from '../..'
   import fsmPlugin from '../..'
 
   export let target: WithFSM
@@ -62,20 +62,18 @@ limitations under the License.
     }
   )
 
-  let items: VDoc[] = []
-  let itemsQuery: Promise<QueryUpdater<VDoc>> | undefined
+  let items: FSMItem[] = []
+  let itemsQuery: Promise<QueryUpdater<FSMItem>> | undefined
 
   $: if (fsm && cs) {
     itemsQuery = liveQuery(
       itemsQuery,
-      fsm.classes[0],
+      fsmPlugin.class.FSMItem,
       {
-        _mixins: fsmPlugin.mixin.WithState
+        fsm: target._id as Ref<WithFSM>
       },
       (docs) => {
-        const model = cs!.getModel()
-
-        items = docs.filter((x) => model.as(x, fsmPlugin.mixin.WithState).fsm === target._id)
+        items = docs
       }
     )
   }
@@ -107,21 +105,15 @@ limitations under the License.
     )
   }
 
-  let dragDoc: VDoc | null = null
+  let dragDoc: FSMItem | undefined
 
-  function docsFor (vdocs: VDoc[], status: any): VDoc[] {
+  function docsFor (vdocs: FSMItem[], status: any): VDoc[] {
     if (!cs) {
       return []
     }
 
-    const model = cs.getModel()
-
     const res = vdocs
-      .filter((d) => {
-        const itemWithState = model.as(d, fsmPlugin.mixin.WithState)
-
-        return itemWithState.state === status
-      })
+      .filter((d) => d.state === status)
       .sort((a, b) => {
         if (a._modifiedOn !== undefined && b._modifiedOn !== undefined) {
           return (b._modifiedOn as number) - (a._modifiedOn as number)
@@ -143,7 +135,7 @@ limitations under the License.
     hiddenStatuses = hiddenStatuses
   }
 
-  function onDrag (value: CustomEvent<CardDragEvent<VDoc>>): void {
+  function onDrag (value: CustomEvent<CardDragEvent<FSMItem>>): void {
     if (!cs) {
       return
     }
@@ -153,16 +145,12 @@ limitations under the License.
     }
 
     if (value.detail.doc && !value.detail.dragged) {
-      const docState = getState(value.detail.doc)
+      if (dragIn != null && dragDoc && dragDoc.state !== dragIn) {
+        cs.update(dragDoc, {
+          state: dragIn
+        })
 
-      if (dragIn != null && dragDoc && docState !== dragIn) {
-        cs.updateWith(dragDoc, (b) =>
-          b.set({
-            [mixinKey(fsmPlugin.mixin.WithState, 'state')]: dragIn
-          })
-        )
-
-        dragDoc = null
+        dragDoc = undefined
       }
       dragIn = null
     }
@@ -183,14 +171,6 @@ limitations under the License.
       }
     }
     return null
-  }
-
-  function getState (doc: VDoc): any {
-    if (!cs) {
-      return
-    }
-
-    return cs.getModel().as(doc, fsmPlugin.mixin.WithState).state
   }
 </script>
 
@@ -224,7 +204,7 @@ limitations under the License.
         </div>
 
         <div bind:this={stat.divTasks} class="status__tasks" class:hidden={hiddenStatuses.has(stat.id)}>
-          {#if dragIn === stat.id && dragDoc && dragIn !== getState(dragDoc)}
+          {#if dragIn === stat.id && dragDoc && dragIn !== dragDoc.state}
             <Card doc={dragDoc} duplicate={true} />
             <div class="separator" />
           {/if}

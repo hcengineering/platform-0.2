@@ -27,7 +27,7 @@ export interface Candidate extends Emb {
 
 export interface WithCandidateProps extends WithResume {
   candidate: Candidate
-  vacancy: Ref<Vacancy>
+  appliedFor: Array<Ref<Vacancy>>
 }
 
 export interface Vacancy extends VDoc {
