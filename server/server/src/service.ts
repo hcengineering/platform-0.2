@@ -141,7 +141,8 @@ export async function createClientService (workspaceProtocol: Promise<WorkspaceP
 
     async close (): Promise<void> {
       await workspace.close()
-    }
+    },
+    workspaceId: client.workspace
   }
 
   return clientControl

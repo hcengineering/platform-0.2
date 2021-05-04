@@ -41,6 +41,8 @@ export interface ClientTxProtocol {
   tx: (tx: Tx) => Promise<{ clientTx: Tx[] }>
 
   genRefId: (_space: Ref<Space>) => Promise<Ref<Doc>>
+
+  workspaceId: string
 }
 
 export type ClientService = ClientControl & DocumentProtocol & ClientTxProtocol
@@ -70,20 +72,60 @@ export async function start (port: number, dbUri: string, host?: string): Promis
   const workspaces = new Map<string, Promise<WorkspaceProtocol>>()
 
   let clientCounter = 0
-  const connections = new Map<string, Promise<ClientService>>()
+  const connections = new Map<string, Map<string, Promise<ClientService>>>()
 
-  function registerClient (service: Promise<ClientService>): ClientServiceUnregister {
+  function getWorkspaceConnections (workspaceId: string): Map<string, Promise<ClientService>> {
+    let workspaceConnections = connections.get(workspaceId)
+    if (workspaceConnections === undefined) {
+      workspaceConnections = new Map<string, Promise<ClientService>>()
+      connections.set(workspaceId, workspaceConnections)
+    }
+    return workspaceConnections
+  }
+
+  async function getWorkspace (wsName: string): Promise<WorkspaceProtocol> {
+    let workspace = workspaces.get(wsName)
+    if (workspace === undefined) {
+      workspace = connectWorkspace(dbUri, wsName)
+      workspaces.set(wsName, workspace)
+    }
+    return await workspace
+  }
+  async function closeWorkspace (wsName: string): Promise<void> {
+    const workspace = workspaces.get(wsName)
+    if (workspace === undefined) {
+      return
+    }
+    console.log('Closing workspace state, since there is no clients.')
+    workspaces.delete(wsName)
+
+    await (await workspace).close()
+  }
+
+  function registerClient (workspaceId: string, service: Promise<ClientService>): ClientServiceUnregister {
     const id = `c${clientCounter++}`
-    connections.set(id, service)
-    return () => {
-      connections.delete(id)
+
+    const workspaceConnections = getWorkspaceConnections(workspaceId)
+    workspaceConnections.set(id, service)
+    console.log('Register new Client:', id)
+    return async () => {
+      workspaceConnections.delete(id)
+      if (workspaceConnections.size === 0) {
+        // We do not have clients, close workspace.
+        await closeWorkspace(workspaceId)
+      }
     }
   }
 
   const broadcaster: Broadcaster = {
     broadcast (from: ClientService, response: Response<any>, ctx: SecurityContext): void {
       // console.log(`broadcasting to ${connections.size} connections`)
-      for (const client of connections.values()) {
+      const clientConnections = connections.get(from.workspaceId)
+      if (clientConnections === undefined) {
+        console.error('There is no such workspace defined', from.workspaceId)
+        return
+      }
+      for (const client of clientConnections.values()) {
         client.then((cl) => { // eslint-disable-line
           if (cl.getId() !== from.getId()) {
             // console.log(`broadcasting to ${client.email}`, response)
@@ -98,15 +140,6 @@ export async function start (port: number, dbUri: string, host?: string): Promis
     return await createClientService(workspace, ws, broadcaster)
   }
 
-  async function getWorkspace (wsName: string): Promise<WorkspaceProtocol> {
-    let workspace = workspaces.get(wsName)
-    if (workspace === undefined) {
-      workspace = connectWorkspace(dbUri, wsName)
-      workspaces.set(wsName, workspace)
-    }
-    return await workspace
-  }
-
   wss.on('connection', (ws: WebSocket, request: any, client: Client) => {
     console.log('connect:', client)
     const workspace = getWorkspace(client.workspace)
@@ -118,7 +151,7 @@ export async function start (port: number, dbUri: string, host?: string): Promis
       }
     })
 
-    const unreg = registerClient(service)
+    const unreg = registerClient(client.workspace, service)
     ws.on('close', () => {
       unreg()
     })
@@ -221,8 +254,10 @@ export async function start (port: number, dbUri: string, host?: string): Promis
             await (await ws).close()
           }
 
-          for (const conn of connections.values()) {
-            await (await conn).close()
+          for (const wsConnections of connections.values()) {
+            for (const conn of wsConnections.values()) {
+              await (await conn).close()
+            }
           }
           console.log('stop server itself')
           httpServer.close()
