@@ -32,7 +32,7 @@
     </svg>
   </div>
   <div class="message">
-    {status.message}
+    status.message
   </div>
 </div>
 {/if}
