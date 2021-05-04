@@ -13,9 +13,9 @@
 // limitations under the License.
 //
 
-import { Status, Severity } from '@anticrm/status'
-import { getMetadata } from '@anticrm/platform'
-import { Request, Response, serialize, toStatus } from '@anticrm/rpc'
+import { Status } from '@anticrm/status'
+import { getMetadata, OK, unknownError } from '@anticrm/platform'
+import { Request, Response, serialize } from '@anticrm/rpc'
 
 import login from '@anticrm/plugin-login'
 
@@ -32,7 +32,6 @@ export async function doLogin (username: string, password: string, workspace: st
   }
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const response = await fetch(accountsUrl!, {
       method: 'POST',
       headers: {
@@ -40,13 +39,10 @@ export async function doLogin (username: string, password: string, workspace: st
       },
       body: serialize(request)
     })
-    const result = (await response.json()) as Response<any>
-    const status = toStatus(result)
-    if (status.severity === Severity.OK) {
-
-    }
+    const result: Response<any> = await response.json()
+    const status = result.error ?? OK
     return [status, result.result]
   } catch (err) {
-    return [new Status(Severity.ERROR, 0, err.message), undefined]
+    return [unknownError(err), undefined]
   }
 }

@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Status } from '@anticrm/status'
+  import { Severity } from '@anticrm/status'
 
   // import { Severity } from '@anticrm/status'
   // import ui from '@anticrm/plugin-ui'
@@ -13,5 +14,7 @@
   <!-- {#if status.severity === Severity.ERROR}
     <Icon icon={ui.icon.Error} color="#C21F39" />
   {/if} -->
-  {@html status.message}
+  {#if status.severity !== Severity.OK}
+    {@html status.params}
+  {/if}
 </span>

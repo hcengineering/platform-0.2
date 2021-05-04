@@ -18,6 +18,7 @@ import { SvelteComponent } from 'svelte'
 import Root from './components/Root.svelte'
 
 export type { AnyComponent } from './types'
+export { applicationShortcutKey } from './utils'
 
 export function createApp (target: HTMLElement): SvelteComponent {
   return new Root({ target })
