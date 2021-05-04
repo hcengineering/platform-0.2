@@ -27,8 +27,6 @@ limitations under the License.
   const dispatch = createEventDispatcher()
 
   export let fsm: FSM
-
-  const onClose = () => dispatch('close')
 </script>
 
 <div class="root">
@@ -36,7 +34,7 @@ limitations under the License.
     <div class="title-container">
       <div class="title">Update FSM</div>
     </div>
-    <div class="close" on:click={onClose}>
+    <div class="close" on:click={() => dispatch('close')}>
       <Icon icon={workbench.icon.Close} button={true} />
     </div>
   </div>

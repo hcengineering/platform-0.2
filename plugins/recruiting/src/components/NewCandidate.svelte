@@ -29,7 +29,7 @@ limitations under the License.
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
   import SpaceBox from '@anticrm/platform-ui/src/components/SpaceBox.svelte'
 
-  import type { WithCandidateProps, Vacancy } from '..'
+  import type { WithCandidateProps } from '..'
   import recruiting from '..'
 
   export let spaces: Space[]

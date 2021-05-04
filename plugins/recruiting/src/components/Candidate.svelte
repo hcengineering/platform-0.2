@@ -18,7 +18,7 @@ limitations under the License.
   import { Doc, Ref } from '@anticrm/core'
   import { VDoc } from '@anticrm/domains'
   import { getCoreService, liveQuery } from '@anticrm/presentation'
-  import fsmPlugin, { getFSMService, WithFSM } from '@anticrm/fsm'
+  import fsmPlugin, { getFSMService } from '@anticrm/fsm'
 
   import UserInfo from '@anticrm/sparkling-controls/src/UserInfo.svelte'
   import ResumeProps from '@anticrm/person-extras/src/components/ResumeProps.svelte'
