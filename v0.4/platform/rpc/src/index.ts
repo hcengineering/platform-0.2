@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Status, Severity } from '@anticrm/status'
+import { Status } from '@anticrm/status'
 
 export type ReqId = string | number
 
@@ -28,12 +28,6 @@ export class Request<P extends any[]> {
   }
 }
 
-export interface RpcError {
-  code: number
-  message?: string
-  data?: any
-}
-
 /**
  * Response object define a server response on transaction request.
  *
@@ -42,7 +36,7 @@ export interface RpcError {
 export interface Response<R> {
   result?: R
   id?: ReqId
-  error?: RpcError
+  error?: Status
 }
 
 export function serialize (object: Request<any> | Response<any>): string {
@@ -57,13 +51,6 @@ export function readRequest<P extends any[]> (request: string): Request<P> {
   return JSON.parse(request)
 }
 
-export function toStatus (response: Response<any>): Status {
-  return new Status(Severity.ERROR, response.error?.code as number, response.error?.message as string)
-}
-
 export function fromStatus (status: Status, id?: ReqId): Response<any> {
-  return { 
-    id,
-    error: { code: status.code, message: status.message }
-  }
+  return { id, error: status }
 }
