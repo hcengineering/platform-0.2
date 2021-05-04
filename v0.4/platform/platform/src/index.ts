@@ -14,6 +14,7 @@
 //
 
 export * from './metadata'
+export * from './status'
 export * from './event'
 export * from './plugin'
 export * from './resource'

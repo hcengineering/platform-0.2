@@ -17,7 +17,7 @@ import { Status } from '@anticrm/status'
 import { unknownError, OK } from './status'
 
 type EventListener = (event: string, data: any) => Promise<void>
-const PlatformEvent = 'platform-event'
+export const PlatformEvent = 'platform-event'
 
 const eventListeners = new Map<string, EventListener[]>()
 

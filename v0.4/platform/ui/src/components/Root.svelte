@@ -1,9 +1,8 @@
 <script lang="ts">
-  import { Status, Severity } from '@anticrm/status'
-  import { PlatformStatus, getMetadata, addEventListener } from '@anticrm/platform'
+  import { PlatformEvent, getMetadata, addEventListener, OK } from '@anticrm/platform'
   import type { AnyComponent, UIService } from '../types'
   import { applicationShortcutKey } from '../utils'
-  import { newRouter } from '../routes'
+  import { newRouter } from '../utils'
 
   import { Theme } from '@anticrm/sparkling-theme'
   import Component from './Component.svelte'
@@ -32,11 +31,10 @@
     { application: null }
   )
 
-  let status: Status = { severity: Severity.OK, code: 0, message: '' }
+  let status = OK
 
-  addEventListener(PlatformStatus, async (_event, _status) => {
+  addEventListener(PlatformEvent, async (_event, _status) => {
     status = _status
-    console.log('Platfrom Status', _event, _status)
   })
 </script>
 

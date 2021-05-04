@@ -20,7 +20,7 @@ import { Status, Severity } from '@anticrm/status'
 import { Metadata, getMetadata, loadMetadata, setMetadata } from '../metadata'
 import { Plugin, Service, identify, getPlugin, addLocation } from '../plugin'
 import { Resource, getResource, getResourceInfo, peekResource, setResource } from '../resource'
-import { addEventListener, removeEventListener, broadcastEvent, setPlatformStatus, monitor } from '../event'
+import { addEventListener, removeEventListener, broadcastEvent, setPlatformStatus, monitor, PlatformEvent } from '../event'
 import { OK, unknownError } from '../status'
 
 import {
@@ -283,8 +283,6 @@ describe('platform', () => {
     firstListenerForEvent2.checkNotCalled()
     secondListenerForEvent2.checkNotCalled()
   })
-
-  const PlatformEvent = 'platform-event'
 
   function testSetPlatformStatus (status: Status | Error, expectedSeverity: Severity): void {
     let listenerCalled = false
