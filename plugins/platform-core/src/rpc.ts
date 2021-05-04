@@ -14,8 +14,8 @@
 //
 
 import { CoreProtocol, generateId as genId } from '@anticrm/core'
-import { ClientService, EventType, RpcClient, EventListener } from './common'
-import rpcService, { newCoreProtocol } from './rpc'
+import { ClientService, EventType, RpcClient, EventListener } from '@anticrm/client/src/common'
+import rpcService, { newCoreProtocol } from '@anticrm/client/src/rpc'
 
 export { EventListener, EventType, ClientService }
 

@@ -13,7 +13,6 @@
 // limitations under the License.
 //
 
-import { EventType, newClient } from '@anticrm/client'
 import { Class, CoreProtocol, Doc, DocumentQuery, FindOptions, Model, MODEL_DOMAIN, Ref, Tx, txContext, TxContextSource, TxProcessor } from '@anticrm/core'
 import { CORE_CLASS_REFERENCE, CORE_CLASS_SPACE, CORE_CLASS_TITLE, Space, TITLE_DOMAIN, VDoc } from '@anticrm/domains'
 import { PassthroughsIndex } from '@anticrm/domains/src/indices/filter'
@@ -26,6 +25,7 @@ import { Platform, PlatformStatus, Severity, Status } from '@anticrm/platform'
 import { Cache } from './cache'
 import core, { CoreService, QueryResult } from './index'
 import { QueriableStorage } from './queries'
+import { EventType, newClient } from './rpc'
 /*!
  * Anticrm Platform™ Core Plugin
  * © 2020 Anticrm Platform Contributors. All Rights Reserved.

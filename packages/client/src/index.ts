@@ -15,10 +15,10 @@
 
 import { CoreProtocol, generateId as genId } from '@anticrm/core'
 import WebSocket from 'ws'
-import { ClientService, EventListener, EventType, RpcClient } from './common'
+import { ClientService, RpcClient } from './common'
 import rpcService, { newCoreProtocol } from './rpc'
 
-export { EventListener, EventType, ClientService }
+export * from './common'
 
 /**
  * Construct a A generic Platform client.
