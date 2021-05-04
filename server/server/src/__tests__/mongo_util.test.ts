@@ -18,7 +18,7 @@
 import { BooleanProperty, DocumentValue, generateId, SortingOrder, StringProperty, Tx, txContext } from '@anticrm/core'
 import { createSubtask, Task, taskIds as task } from '@anticrm/core/src/__tests__/tasks'
 import { CORE_CLASS_OBJECT_SELECTOR, CORE_CLASS_SPACE } from '@anticrm/domains'
-import { createOperations } from '@anticrm/platform-core/src/operations'
+import { createOperations } from '@anticrm/domains/src/tx/operations'
 import { createSetArrayFilters } from '../mongo_utils'
 import { ServerSuite } from './serversuite'
 
@@ -121,7 +121,7 @@ describe('mongo operations', () => {
       await ws.tx(txContext(), tx)
     }
 
-    const ops = createOperations(await ws.getModel(), processTx, () => 'qwe' as StringProperty)
+    const ops = createOperations(await ws.getModel(), processTx, 'qwe')
 
     const d1 = await ops.create<Task>(task.class.Task, doc1)
     const d2 = await ops.updateWith(d1, (s) =>
@@ -196,7 +196,7 @@ describe('mongo operations', () => {
     const processTx = async (tx: Tx): Promise<void> => {
       await ws.tx(txContext(), tx)
     }
-    const ops = createOperations(await ws.getModel(), processTx, () => 'qwe' as StringProperty)
+    const ops = createOperations(await ws.getModel(), processTx, 'qwe')
 
     const d1 = await ops.create<Task>(task.class.Task, doc1)
     const d2 = await ops.updateWith(d1, (s) =>
@@ -231,7 +231,7 @@ describe('mongo operations', () => {
     const processTx = async (tx: Tx): Promise<void> => {
       await ws.tx(txContext(), tx)
     }
-    const ops = createOperations(await ws.getModel(), processTx, () => 'qwe' as StringProperty)
+    const ops = createOperations(await ws.getModel(), processTx, 'qwe')
 
     const d1 = await ops.create<Task>(task.class.Task, doc1)
 
@@ -290,7 +290,7 @@ describe('mongo operations', () => {
     const processTx = async (tx: Tx): Promise<void> => {
       await ws.tx(txContext(), tx)
     }
-    const ops = createOperations(await ws.getModel(), processTx, () => 'qwe' as StringProperty)
+    const ops = createOperations(await ws.getModel(), processTx, 'qwe')
 
     await ops.create(task.class.Task, doc1)
     await ops.create(task.class.Task, doc2)
@@ -310,7 +310,7 @@ describe('mongo operations', () => {
     const processTx = async (tx: Tx): Promise<void> => {
       await ws.tx(txContext(), tx)
     }
-    const ops = createOperations(await ws.getModel(), processTx, () => 'qwe' as StringProperty)
+    const ops = createOperations(await ws.getModel(), processTx, 'qwe')
 
     for (let i = 0; i < 50; i++) {
       const doc1: DocumentValue<Task> = {
@@ -332,7 +332,7 @@ describe('mongo operations', () => {
     const processTx = async (tx: Tx): Promise<void> => {
       await ws.tx(txContext(), tx)
     }
-    const ops = createOperations(await ws.getModel(), processTx, () => 'qwe' as StringProperty)
+    const ops = createOperations(await ws.getModel(), processTx, 'qwe')
 
     for (let i = 0; i < 50; i++) {
       const doc1: DocumentValue<Task> = {
@@ -355,7 +355,7 @@ describe('mongo operations', () => {
     const processTx = async (tx: Tx): Promise<void> => {
       await ws.tx(txContext(), tx)
     }
-    const ops = createOperations(await ws.getModel(), processTx, () => 'qwe' as StringProperty)
+    const ops = createOperations(await ws.getModel(), processTx, 'qwe')
 
     for (let i = 0; i < 50; i++) {
       const doc1: DocumentValue<Task> = {

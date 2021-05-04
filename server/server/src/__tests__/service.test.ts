@@ -17,7 +17,7 @@
 import { ServerSuite } from './serversuite'
 import chunter, { Page } from '@anticrm/chunter'
 
-import { newCreateTx } from '@anticrm/platform-core/src/tx'
+import { newCreateTx } from '@anticrm/domains/src/tx/tx'
 import { Property, Ref, StringProperty } from '@anticrm/core'
 import { CORE_CLASS_SPACE, Space, SpaceUser } from '@anticrm/domains'
 
@@ -45,6 +45,7 @@ describe('service', () => {
   })
 
   it('should not allow to create private space without owner', async () => {
+    jest.setTimeout(500000)
     const ws = server.getWorkspace(wsName)
     const { client } = (await server.newClients(1, ws))[0]
 

@@ -14,7 +14,7 @@
 //
 
 import { createServer, IncomingMessage } from 'http'
-import WebSocket, { Server } from 'ws'
+import WebSocket, { AddressInfo, Server } from 'ws'
 
 import { decode } from 'jwt-simple'
 import { ClientControl, createClientService } from './service'
@@ -53,6 +53,7 @@ export interface Broadcaster {
 export interface ServerProtocol {
   shutdown: () => Promise<void>
   getWorkspace: (wsName: string) => Promise<WorkspaceProtocol>
+  address: () => {address: string, port: number}
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -168,7 +169,8 @@ export async function start (port: number, dbUri: string, host?: string): Promis
             break
         }
       } catch (error) {
-        response.error = error?.toString()
+        const err: RpcError = { code: 404, message: error?.message }
+        response.error = err
         console.log(`Error occurred during processing websocket message '${request.method}': `, error)
       }
       ws.send(serialize(response))
@@ -226,6 +228,26 @@ export async function start (port: number, dbUri: string, host?: string): Promis
           }
           console.log('stop server itself')
           httpServer.close()
+        },
+        address: () => {
+          const addr = httpServer.address()
+          if (addr !== null && typeof addr !== 'string') {
+            const ad = (addr as AddressInfo)
+            return { address: ad.address, port: ad.port }
+          }
+          if (addr !== null && typeof addr === 'string') {
+            const addrSegm = addr.split(':')
+            if (addrSegm.length === 2) {
+              const phost = addrSegm[0]
+              const pport = parseInt(addrSegm[1])
+              if (!isNaN(pport)) {
+                return { address: phost, port: pport }
+              }
+            }
+            console.error('Invalid address returned:', addr)
+          }
+
+          return { address: host ?? 'locahost', port: port }
         }
       }
       resolve(serverProtocol)

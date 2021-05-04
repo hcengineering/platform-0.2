@@ -13,20 +13,17 @@
 // limitations under the License.
 //
 
-import { Metadata, Plugin, plugin, Service } from '@anticrm/platform'
-import { Class, CoreProtocol, Doc, DocumentProtocol, DocumentQuery, DocumentValue, FindOptions, Ref } from '@anticrm/core'
-import { ModelDb } from './modeldb'
-import { TxBuilder, TxOperation } from '@anticrm/domains'
+import { Class, CoreProtocol, Doc, DocumentProtocol, DocumentQuery, FindOptions, Model, Ref } from '@anticrm/core'
+import { OperationProtocol } from '@anticrm/domains'
+import { Metadata, Plugin, plugin } from '@anticrm/platform'
 
+// Queries
 export type Subscriber<T> = (value: T[]) => void
 export type Unsubscribe = () => void
 
 export interface QueryResult<T extends Doc> {
   subscribe: (run: Subscriber<T>) => Unsubscribe
 }
-
-export type QueryUpdater<T extends Doc> = (_class: Ref<Class<T>>, query: DocumentQuery<T>, options?: FindOptions<T>) => void
-
 /**
  * Define operations with live queries.
  */
@@ -39,38 +36,10 @@ export interface QueryProtocol {
   query: <T extends Doc>(_class: Ref<Class<T>>, query: DocumentQuery<T>, options?: FindOptions<T>) => QueryResult<T>
 }
 
-/**
- * Define operations with object modifications.
- */
-export interface OperationProtocol {
-  /**
-   * Perform creation of new document and store it into storage.
-   * Object ID will be automatically generated and assigned to object.
-   */
-  create: <T extends Doc>(_class: Ref<Class<T>>, values: DocumentValue<T>) => Promise<T>
+export type QueryUpdater<T extends Doc> = (_class: Ref<Class<T>>, query: DocumentQuery<T>, options?: FindOptions<T>) => void
 
-  /**
-   * Perform update of document properties.
-   */
-  update: <T extends Doc>(doc: T, value: Partial<Omit<T, keyof Doc>>) => Promise<T>
-
-  /**
-   * Perform update of document/embedded document properties using a builder pattern.
-   *
-   * It is possible to do a set, pull, push for different field values.
-   *
-   * push and pull are applicable only for array attributes.
-   */
-  updateWith: <T extends Doc>(doc: T, builder: (s: TxBuilder<T>) => TxOperation | TxOperation[]) => Promise<T>
-
-  /**
-   * Perform remove of object.
-   */
-  remove: <T extends Doc>(doc: T) => Promise<T>
-}
-
-export interface CoreService extends Service, CoreProtocol, QueryProtocol, DocumentProtocol, OperationProtocol {
-  getModel: () => ModelDb
+export interface CoreService extends CoreProtocol, DocumentProtocol, QueryProtocol, OperationProtocol {
+  getModel: () => Model
 
   generateId: () => Ref<Doc>
 

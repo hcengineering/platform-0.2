@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Class, DateProperty, Doc, Emb, Mixin, Property, Ref, StringProperty, Tx } from '@anticrm/core'
+import { AnyLayout, Class, DateProperty, Doc, DocumentValue, Emb, Mixin, Obj, Property, Ref, StringProperty, Tx } from '@anticrm/core'
 
 // TXes
 
@@ -110,10 +110,13 @@ interface TxOperationBuilder<T> {
   pull: () => TxOperation
 }
 
-export type ArrayElement<A> = A extends Array<infer T> ? T : A
+export type TxBuilderArrayOf<A> = A extends Array<infer T> ? TxBuilderOrOpBuilderOf<T> : never
+
+export type TxBuilderOrOpBuilderOf<A> = A extends Obj ? TxBuilder<A>: TxOperationBuilder<A>
+export type TxBuilderOf<A> = A extends Obj ? TxBuilder<A>: never
 
 export type FieldBuilder<T> = {
-  [P in keyof T]-?: TxOperationBuilder<ArrayElement<T[P]>> & ArrayElement<T[P]>;
+  [P in keyof T]-?: TxBuilderArrayOf<T[P]> | TxBuilderOf<T[P]>;
 }
 export type TxBuilder<T> = TxOperationBuilder<T> & FieldBuilder<T>
 
@@ -208,6 +211,36 @@ export function txBuilder<T extends Doc> (clazz: Ref<Class<T>>): TxBuilder<T> {
   const nb = new TxBuilderImpl<T>([], () => np)
   const np = new Proxy(nb, ph) as unknown as TxBuilder<T>
   return np
+}
+
+/**
+ * Define operations with object modifications.
+ */
+export interface OperationProtocol {
+  /**
+   * Perform creation of new document and store it into storage.
+   * Object ID will be automatically generated and assigned to object.
+   */
+  create: <T extends Doc>(_class: Ref<Class<T>>, values: DocumentValue<T>) => Promise<T>
+
+  /**
+   * Perform update of document properties.
+   */
+  update: <T extends Doc>(doc: T, value: Partial<Omit<T, keyof Doc>>) => Promise<T>
+
+  /**
+   * Perform update of document/embedded document properties using a builder pattern.
+   *
+   * It is possible to do a set, pull, push for different field values.
+   *
+   * push and pull are applicable only for array attributes.
+   */
+  updateWith: <T extends Doc>(doc: T, builder: (s: TxBuilder<T>) => TxOperation | TxOperation[]) => Promise<T>
+
+  /**
+   * Perform remove of object.
+   */
+  remove: <T extends Doc>(doc: T) => Promise<T>
 }
 
 // S P A C E

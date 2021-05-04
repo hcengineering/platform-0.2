@@ -14,15 +14,14 @@
 //
 
 import { Class, CORE_CLASS_TYPE, Doc, DocumentQuery, FindOptions, Mixin, Obj, Ref, StringProperty } from '@anticrm/core'
-import { getContext, onDestroy } from 'svelte'
-import core, { CoreService, QueryUpdater, Unsubscribe } from '@anticrm/platform-core'
-import { AnyComponent, CONTEXT_PLATFORM } from '@anticrm/platform-ui'
-import presentationPlugin, { AttrModel, ClassModel, ComponentExtension, GroupModel, PresentationService } from '.'
-import { IntlString } from '@anticrm/platform-i18n'
 import { VDoc } from '@anticrm/domains'
-
-import { deepEqual } from 'fast-equals'
 import { Platform } from '@anticrm/platform'
+import core, { CoreService, Unsubscribe, QueryUpdater } from '@anticrm/platform-core'
+import { IntlString } from '@anticrm/platform-i18n'
+import { AnyComponent, CONTEXT_PLATFORM } from '@anticrm/platform-ui'
+import { deepEqual } from 'fast-equals'
+import { getContext, onDestroy } from 'svelte'
+import presentationPlugin, { AttrModel, ClassModel, ComponentExtension, GroupModel, PresentationService } from '.'
 
 export async function getCoreService (): Promise<CoreService> {
   const platform = getContext<Platform>(CONTEXT_PLATFORM)
