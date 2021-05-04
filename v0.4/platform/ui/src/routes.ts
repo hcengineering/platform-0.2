@@ -358,4 +358,3 @@ export class Router<T> implements ApplicationRouter<T> {
     this.childRouter = undefined
   }
 }
-
