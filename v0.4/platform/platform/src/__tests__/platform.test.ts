@@ -20,7 +20,14 @@ import { Status, Severity } from '@anticrm/status'
 import { Metadata, getMetadata, loadMetadata, setMetadata } from '../metadata'
 import { Plugin, Service, identify, getPlugin, addLocation } from '../plugin'
 import { Resource, getResource, getResourceInfo, peekResource, setResource } from '../resource'
-import { addEventListener, removeEventListener, broadcastEvent, setPlatformStatus, monitor, PlatformEvent } from '../event'
+import {
+  addEventListener,
+  removeEventListener,
+  broadcastEvent,
+  setPlatformStatus,
+  monitor,
+  PlatformEvent
+} from '../event'
 import { OK, unknownError } from '../status'
 
 import {
@@ -52,9 +59,9 @@ describe('platform', () => {
     expect(ids.resource.FixedId).toBe('my-id')
   })
 
-  it('should raise exception for unknown location', () => {
+  it('should raise exception for unknown location', async () => {
     const p1 = getPlugin(plugin1)
-    return expect(p1).rejects.toThrowError('plugin1')
+    return await expect(p1).rejects.toThrowError('plugin1')
   })
 
   it('should resolve plugin', async () => {
@@ -70,9 +77,9 @@ describe('platform', () => {
     expect(plugin1State.started).toBe(true)
   })
 
-  it('should not resolve resource (no plugin location)', () => {
+  it('should not resolve resource (no plugin location)', async () => {
     const res = getResource('resource:NotExists.Resource' as Resource<string>)
-    return expect(res).rejects.toThrowError('no location provided')
+    return await expect(res).rejects.toThrowError('no location provided')
   })
 
   it('should resolve resource', async () => {
@@ -95,17 +102,17 @@ describe('platform', () => {
     expect(resource).toBe('hello resource2:My.Resource')
   })
 
-  it('should fail to resolve wrong resource', () => {
+  it('should fail to resolve wrong resource', async () => {
     const wrongResource = 'resource_wrong:plugin2.Resource' as Resource<string>
     const res = getResource(wrongResource)
-    return expect(res).rejects.toThrowError('resource not loaded') 
+    return await expect(res).rejects.toThrowError('resource not loaded')
   })
 
-  it('should fail to load bad plugin', () => {
+  it('should fail to load bad plugin', async () => {
     addLocation(descriptorBad, async () => await import('./badplugin'))
     const wrongResource = 'resource_wrong:badplugin.Resource' as Resource<string>
     const res = getResource(wrongResource)
-    return expect(res).rejects.toThrowError('Bad plugin') 
+    return await expect(res).rejects.toThrowError('Bad plugin')
   })
 
   it('should inject dependencies', async () => {
@@ -173,7 +180,7 @@ describe('platform', () => {
     expect(getMetadata(m2)).toBe('again')
   })
 
-  it('should call event listener', () => {
+  it('should call event listener', async () => {
     let listenerCalled = false
     const myEvent = 'MyEvent'
     const myData = 'test-data'
@@ -185,14 +192,14 @@ describe('platform', () => {
     }
 
     addEventListener(myEvent, myEventListener)
-    broadcastEvent(myEvent, myData)
+    await broadcastEvent(myEvent, myData)
     expect(listenerCalled).toBe(true)
 
     // remove listener to avoid calls from other tests
     removeEventListener(myEvent, myEventListener)
   })
 
-  it('should call many event listeners', () => {
+  it('should call many event listeners', async () => {
     class TestEventListener {
       readonly eventName: string
       readonly eventData: string
@@ -245,19 +252,19 @@ describe('platform', () => {
     firstListenerForEvent2.startListen()
     secondListenerForEvent2.startListen()
 
-    broadcastEvent(event1, data1)
+    await broadcastEvent(event1, data1)
     firstListenerForEvent1.checkCalled()
     secondListenerForEvent1.checkCalled()
     firstListenerForEvent2.checkNotCalled()
     secondListenerForEvent2.checkNotCalled()
 
-    broadcastEvent(event2, data2)
+    await broadcastEvent(event2, data2)
     firstListenerForEvent1.checkNotCalled()
     secondListenerForEvent1.checkNotCalled()
     firstListenerForEvent2.checkCalled()
     secondListenerForEvent2.checkCalled()
 
-    broadcastEvent('ArbitraryEvent', 'anydata')
+    await broadcastEvent('ArbitraryEvent', 'anydata')
     firstListenerForEvent1.checkNotCalled()
     secondListenerForEvent1.checkNotCalled()
     firstListenerForEvent2.checkNotCalled()
@@ -265,7 +272,7 @@ describe('platform', () => {
 
     secondListenerForEvent1.stopListen()
 
-    broadcastEvent(event1, data1)
+    await broadcastEvent(event1, data1)
     firstListenerForEvent1.checkCalled()
     secondListenerForEvent1.checkNotCalled()
     firstListenerForEvent2.checkNotCalled()
@@ -275,8 +282,8 @@ describe('platform', () => {
     firstListenerForEvent2.stopListen()
     secondListenerForEvent2.stopListen()
 
-    broadcastEvent(event1, data1)
-    broadcastEvent(event2, data2)
+    await broadcastEvent(event1, data1)
+    await broadcastEvent(event2, data2)
 
     firstListenerForEvent1.checkNotCalled()
     secondListenerForEvent1.checkNotCalled()
@@ -301,16 +308,16 @@ describe('platform', () => {
     removeEventListener(PlatformEvent, listener)
   }
 
-  it('should set error platform status', () => {
-    return testSetPlatformStatus(new Error('baga'), Severity.ERROR)
+  it('should set error platform status', async () => {
+    return await testSetPlatformStatus(new Error('baga'), Severity.ERROR)
   })
 
-  it('should set custom platform status', () => {
-    return testSetPlatformStatus(OK, Severity.OK)
+  it('should set custom platform status', async () => {
+    return await testSetPlatformStatus(OK, Severity.OK)
   })
 
-  it('should throw monitor error', () => {
-    return expect(monitor(OK, Promise.reject(new Error('dummy')))).rejects.toThrowError('dummy') // eslint-disable-line @typescript-eslint/no-floating-promises
+  it('should throw monitor error', async () => {
+    return await expect(monitor(OK, Promise.reject(new Error('dummy')))).rejects.toThrowError('dummy') // eslint-disable-line @typescript-eslint/no-floating-promises
   })
 
   it('should remove listener inexistent type of the event', () => {
