@@ -1,0 +1,36 @@
+{
+  "name": "@anticrm/model-browser",
+  "version": "0.2.0",
+  "main": "src/index.ts",
+  "author": "Anticrm Platform Contributors (https://github.com/anticrm)",
+  "license": "EPL-2.0",
+  "scripts": {
+    "build": "tsc",
+    "build:docs": "echo 'no docs yet'",
+    "test": "echo 'no tests'",
+    "preformat-svelte": "prettier -w **/*.svelte",
+    "lint": "eslint --max-warnings=0 src",
+    "lint:fix": "yarn preformat-svelte && eslint --fix src"
+  },
+  "dependencies": {
+    "@anticrm/platform": "^0.2.0",
+    "@anticrm/platform-core": "^0.2.0",
+    "@anticrm/presentation": "^0.2.0"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^4.22.0",
+    "@typescript-eslint/parser": "^4.22.0",
+    "eslint": "^7.24.0",
+    "eslint-config-standard": "^16.0.2",
+    "eslint-config-standard-with-typescript": "^20.0.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^5.1.0",
+    "eslint-plugin-standard": "^5.0.0",
+    "eslint-plugin-svelte3": "^3.1.2",
+    "prettier": "^2.2.1",
+    "prettier-plugin-svelte": "^2.2.0",
+    "svelte-preprocess": "^4.7.2",
+    "typescript": "^4.2.4"
+  }
+}

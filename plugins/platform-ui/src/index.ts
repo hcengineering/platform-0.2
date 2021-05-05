@@ -120,7 +120,7 @@ export interface UIService extends Service, DocumentProvider {
    * Register active document provider.
    * @param provider
    */
-  registerDocumentProvider: (provider: DocumentProvider) => void
+  registerDocumentProvider: (provider: DocumentProvider | undefined) => void
 }
 
 /**

@@ -144,7 +144,7 @@ export default async (platform: Platform): Promise<UIService> => {
     return undefined
   }
 
-  function registerDocumentProvider (provider: DocumentProvider): void {
+  function registerDocumentProvider (provider: DocumentProvider | undefined): void {
     documentProvider = provider
   }
 

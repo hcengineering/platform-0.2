@@ -32,6 +32,9 @@ import datagen from '@anticrm/data-generator'
 import recruiting from '@anticrm/recruiting'
 import personExtras from '@anticrm/person-extras'
 import calendar from '@anticrm/calendar'
+import modelBrowser from '@anticrm/model-browser'
+
+// Metadata
 import uiMeta from '@anticrm/platform-ui/src/__meta__/meta'
 import workbenchMeta from '@anticrm/workbench/src/__meta__'
 import chunterMeta from '@anticrm/chunter/src/__meta__'
@@ -40,6 +43,8 @@ import taskMeta from '@anticrm/task/src/__meta__'
 import presentationMeta from '@anticrm/presentation/src/__meta__'
 import loginMeta from '@anticrm/login/src/__meta__'
 import dataGenMeta from '@anticrm/data-generator/src/__meta__'
+
+import modelBrowserMeta from '@anticrm/model-browser/src/__meta__'
 
 const platform = createPlatform()
 
@@ -65,6 +70,8 @@ platform.addLocation(fsm, () => import(/* webpackChunkName: "fsm" */ '@anticrm/f
 
 platform.addLocation(datagen, () => import(/* webpackChunkName: "datagen" */ '@anticrm/data-generator/src/plugin')) // eslint-disable-line
 
+platform.addLocation(modelBrowser, () => import(/* webpackChunkName: "mb" */ '@anticrm/model-browser/src/plugin')) // eslint-disable-line
+
 uiMeta(platform)
 workbenchMeta(platform)
 activityMeta(platform)
@@ -76,5 +83,7 @@ presentationMeta(platform)
 loginMeta(platform)
 // contactMeta(platform)
 dataGenMeta(platform)
+
+modelBrowserMeta(platform)
 
 export default platform
