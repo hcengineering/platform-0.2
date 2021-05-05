@@ -17,7 +17,12 @@ import type { IntlString } from './i18n'
 import { addStringsLoader } from './i18n'
 import { Platform, defineCode } from './status'
 
-addStringsLoader(Platform, async (lang) => await import(`./lang/${lang}.json`))
+addStringsLoader(Platform, async (lang: string) => {
+  switch (lang) {
+    case 'en': return await import(`./lang/en.json`) as any
+  }
+  throw new Error('unsupported language')
+})
 
 export default defineCode(Platform, {
   loadingPlugin: '' as IntlString<{ plugin: string }>
