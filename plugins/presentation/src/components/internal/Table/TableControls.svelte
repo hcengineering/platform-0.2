@@ -47,24 +47,27 @@
     {#if total > 0}
       <button
         disabled={pos === 0}
-        on:click={() => {pos = pos - limit}}>
+        on:click={() => {
+          pos = pos - limit
+        }}>
         {'<'}
       </button>
-      <button disabled={pos + limit >= total} on:click={() => {pos = pos + limit}}>
+      <button
+        disabled={pos + limit >= total}
+        on:click={() => {
+          pos = pos + limit
+        }}>
         {'>'}
       </button>
 
       <span>
         Items {offset + 1} to {Math.min(total, offset + limit)} of {total}
       </span>
-
     {:else}
       No Items
     {/if}
   </div>
 </div>
-
-
 
 <style lang="scss">
   .control-container {
@@ -118,11 +121,10 @@
       border-radius: 8px;
       background: var(--theme-bg-accent-color);
       color: var(--theme-content-color);
-
     }
 
     button:disabled {
-      background: var(--theme-bg-color);;
+      background: var(--theme-bg-color);
     }
 
     span {

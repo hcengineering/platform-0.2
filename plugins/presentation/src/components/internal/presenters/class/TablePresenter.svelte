@@ -78,7 +78,7 @@
   }
 
   function onSearch ({ detail }) {
-    // TODO: implement multisearch tool
+    // TODO: implement search in chosen attributes
   }
 </script>
 
