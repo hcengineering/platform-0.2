@@ -13,60 +13,45 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { createEventDispatcher, getContext } from 'svelte'
+  import { createEventDispatcher } from 'svelte'
+  import { SortingOrder } from '@anticrm/core'
+
   const dispatch = createEventDispatcher()
-  const stateContext = getContext('table-state')
 
-  // eslint-disable-next-line no-unused-vars
-  enum SortOrder {
-    // eslint-disable-next-line no-unused-vars
-    UNSORTED = 'Unsorted',
-    // eslint-disable-next-line no-unused-vars
-    ASC = 'Ascending',
-    // eslint-disable-next-line no-unused-vars
-    DESC = 'Descending'
-  }
-
-  export let dir = SortOrder.UNSORTED
+  export let order: SortingOrder | undefined
   export let key
 
-  const labels = {
-    [SortOrder.ASC]: { title: 'Ascending', html: '&#8638;' }, // title is gonna be intl value
-    [SortOrder.DESC]: { title: 'Descending', html: '&#8595;' },
-    [SortOrder.UNSORTED]: { title: 'Unsorted', html: '&#10607;' }
-  }
-
-  function onClick (event) {
-    const state = stateContext.getState()
-
-    const detail = {
-      originalEvent: event,
-      key,
-      dir: dir !== SortOrder.DESC ? SortOrder.DESC : SortOrder.ASC,
-      rows: state.filteredRows
+  function onClick () {
+    switch (order) {
+      case undefined:
+        order = SortingOrder.Ascending
+        break
+      case SortingOrder.Ascending:
+        order = SortingOrder.Descending
+        break
+      case SortingOrder.Descending:
+        order = undefined
+        break
     }
 
-    dispatch('sort', detail)
-
-    if (detail.preventDefault !== true) {
-      dir = detail.dir
-    }
-    stateContext.setRows(detail.rows)
+    dispatch('sort', { key, order })
   }
 </script>
 
 <span class="sort" on:click={onClick}>
-  {#if dir === SortOrder.ASC}
-    <span title={labels[SortOrder.ASC].title}>
-      {@html labels[SortOrder.ASC].html}
-    </span>
-  {:else if dir === SortOrder.DESC}
-    <span title={labels[SortOrder.DESC].title}>
-      {@html labels[SortOrder.DESC].html}
-    </span>
+  {#if order}
+    {#if order === SortingOrder.Ascending}
+      <span title={'Ascending'}>
+        {@html '&#8638;'}
+      </span>
+    {:else if order === SortingOrder.Descending}
+      <span title={'Descending'}>
+        {@html '&#8595;'}
+      </span>
+    {/if}
   {:else}
-    <span title={labels[SortOrder.UNSORTED].title}>
-      {@html labels[SortOrder.UNSORTED].html}
+    <span title={'Unsorted'}>
+      {@html '&#10607;'}
     </span>
   {/if}
 </span>

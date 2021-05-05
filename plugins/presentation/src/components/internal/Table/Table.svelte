@@ -15,11 +15,12 @@
 <script lang="ts">
   import type { AttrModel } from '../../../index'
   import type { Class, Ref } from '@anticrm/core'
-  import { createEventDispatcher, setContext } from 'svelte'
-  import TableControls from './TableControls.svelte'
+  import { createEventDispatcher } from 'svelte'
   import Sort from './Sort.svelte'
   import Presenter from '../presenters/Presenter.svelte'
   import { VDoc } from '@anticrm/domains'
+  import { CORE_CLASS_MIXIN, Model } from '@anticrm/core'
+  import { getCoreService } from '../../../index'
 
   const dispatch = createEventDispatcher()
 
@@ -28,84 +29,75 @@
   export let _class: Ref<Class<VDoc>>
   export let editable = false
 
-  export const pageSize = 30
-  export let labels = {
-    empty: 'No records available'
-  }
-
-  // all rows after searching
-  $: filteredRows = rows
-  // filtered rows at the page
-  $: visibleRows = filteredRows.slice(0, pageSize)
-
-  setContext('table-state', {
-    getState: () => ({
-      pageSize,
-      rows,
-      filteredRows
-    }),
-    setRows: (_rows) => (filteredRows = _rows)
+  let coreModel: Model
+  getCoreService().then((cs) => {
+    coreModel = cs.getModel()
   })
 
-  const handleRowClick = (_id: any) => () => {
+  const handleRowClick = (_id: Ref<VDoc>) => () => {
     dispatch('open', { _id, _class })
   }
 
-  function onSort (event) {
-    // TODO: implement sorting feature with the core service
+  function attrValue (doc: VDoc, key: AttrModel): any {
+    if (doc._class !== key._class) {
+      const mixinClass = coreModel.get(key._class)
+      if (mixinClass._class === CORE_CLASS_MIXIN) {
+        // Is a mixin
+        // Check if key class is mixin
+        if (coreModel.isMixedIn(doc, key._class)) {
+          const mdl = coreModel.as(doc, key._class)
+          return (mdl as any)[key.key]
+        }
+      }
+    }
+    return (doc as any)[key.key]
   }
-
-  function onSearch (event) {}
 </script>
 
-<div class="table-component">
-  <!-- control panel-->
-  <slot name="controls">
-    <TableControls on:search={onSearch} />
-  </slot>
-
-  <table>
-    <thead>
+<table>
+  <thead>
+    <tr>
+      {#each attributes as attr (attr.key)}
+        <th>
+          <div class="head">
+            {attr.label}
+            <Sort key={attr.key} on:sort />
+          </div>
+        </th>
+      {/each}
+    </tr>
+  </thead>
+  {#if rows.length === 0}
+    <tbody>
       <tr>
-        {#each attributes as attr (attr.key)}
-          <th>
-            <div class="head">
-              {attr.label}
-              <Sort key={attr.label} on:sort={onSort} />
-            </div>
-          </th>
-        {/each}
+        <td class="center" colspan="100%">
+          <span> No records available </span>
+        </td>
       </tr>
-    </thead>
-    {#if visibleRows.length === 0}
-      <tbody>
-        <tr>
-          <td class="center" colspan="100%">
-            <span>
-              {@html labels.empty}
-            </span>
-          </td>
+    </tbody>
+  {:else}
+    <tbody>
+      {#each rows as object (object._id)}
+        <tr on:click={handleRowClick(object._id)}>
+          {#each attributes as attr (attr.key)}
+            <td>
+              {#if attr.presenter}
+                <Presenter
+                  is={attr.presenter}
+                  value={attrValue(object, attr)}
+                  attribute={attr}
+                  maxWidth={350}
+                  {editable} />
+              {:else}
+                <span>{attrValue(object, attr) || ''}</span>
+              {/if}
+            </td>
+          {/each}
         </tr>
-      </tbody>
-    {:else}
-      <tbody>
-        {#each visibleRows as object (object._id)}
-          <tr on:click={handleRowClick(object._id)}>
-            {#each attributes as attr (attr.key)}
-              <td>
-                {#if attr.presenter}
-                  <Presenter is={attr.presenter} value={object[attr.key]} attribute={attr} maxWidth={350} {editable} />
-                {:else}
-                  <span>{object[attr.key] || ''}</span>
-                {/if}
-              </td>
-            {/each}
-          </tr>
-        {/each}
-      </tbody>
-    {/if}
-  </table>
-</div>
+      {/each}
+    </tbody>
+  {/if}
+</table>
 
 <style lang="scss">
   .table-component {

@@ -13,10 +13,14 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { createEventDispatcher, getContext } from 'svelte'
-  import { stringFilter } from './utils'
+  import { createEventDispatcher } from 'svelte'
+
   const dispatch = createEventDispatcher()
-  const stateContext = getContext('table-state')
+
+  export let offset = 0
+  export let total = 0
+  export let pos = 0
+  const limit = 100
 
   export let text = ''
 
@@ -24,21 +28,8 @@
     placeholder: 'Search'
   }
 
-  function onSearch (event) {
-    const state = stateContext.getState()
-    const detail = {
-      originalEvent: event,
-      stringFilter,
-      text,
-      rows: state.filteredRows
-    }
-    dispatch('search', detail)
-
-    if (detail.text.length === 0) {
-      stateContext.setRows(state.rows)
-    } else {
-      stateContext.setRows(detail.rows.filter((r) => detail.stringFilter(r, detail.text)))
-    }
+  function onSearch () {
+    dispatch('search', { text })
   }
 </script>
 
@@ -52,6 +43,28 @@
       on:input={onSearch} />
   </div>
 </div>
+
+{#if total > 0}
+  Items {offset + 1} to {Math.min(total, offset + limit)} of {total}
+  {#if pos + limit < total}
+    <div
+      on:click={() => {
+        pos = pos + limit
+      }}>
+      Next
+    </div>
+  {/if}
+  {#if pos > 0}
+    <div
+      on:click={() => {
+        pos = pos - limit
+      }}>
+      Previous
+    </div>
+  {/if}
+{:else}
+  No Items
+{/if}
 
 <style lang="scss">
   .control-container {
