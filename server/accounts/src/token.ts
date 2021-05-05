@@ -16,7 +16,13 @@
 import { encode } from 'jwt-simple'
 
 const secret = 'secret'
-const email = 'demo@user.com'
-const workspace = 'latest-model'
 
-console.log('token', encode({ email, workspace }, secret))
+/**
+ * Generate a working token to contact a server from client.
+ * @param email - user email.
+ * @param workspace - a user workspace.
+ * @returns
+ */
+export function generateToken (email: string, workspace: string): string {
+  return encode({ email, workspace }, secret)
+}

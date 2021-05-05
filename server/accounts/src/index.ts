@@ -13,19 +13,18 @@
 // limitations under the License.
 //
 
-import { Binary, Db, MongoClient, ObjectID } from 'mongodb'
-import { PlatformStatusCodes, PlatformError, Status, Severity } from '@anticrm/foundation'
+import { PlatformError, PlatformStatusCodes, Severity, Status } from '@anticrm/foundation'
 import { Request, Response } from '@anticrm/rpc'
-import { randomBytes, pbkdf2Sync } from 'crypto'
 import { Buffer } from 'buffer'
-import { encode } from 'jwt-simple'
+import { pbkdf2Sync, randomBytes } from 'crypto'
+import { Binary, Db, MongoClient, ObjectID } from 'mongodb'
+import { generateToken } from './token'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const secondFactor = require('node-2fa')
 
 const server = '3.12.129.141'
 const port = '18080'
-const secret = 'secret'
 
 const WORKSPACE_COLLECTION = 'workspace'
 const ACCOUNT_COLLECTION = 'account'
@@ -205,7 +204,7 @@ export async function login (db: Db, email: string, password: string, workspace:
           workspace,
           server,
           port,
-          token: encode({ email, workspace }, secret),
+          token: generateToken(email, workspace),
           email,
           secondFactorEnabled: accountInfo.clientSecret?.length > 0
         }
