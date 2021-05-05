@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Anticrm Platform Contributors.
+// Copyright © 2020, 2021 Anticrm Platform Contributors.
 // 
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
@@ -78,7 +78,6 @@ export async function translate<P extends Record<string, any>>(message: IntlStri
       cache.set(message, translation)
       throw new PlatformError(translation)
     }
-    // console.log('translation: ', translation)
     const compiled = new IntlMessageFormat(translation ?? message, locale)
     cache.set(message, compiled)
     return compiled.format(params)

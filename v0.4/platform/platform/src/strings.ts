@@ -14,8 +14,10 @@
 //
 
 import type { IntlString } from './i18n'
-import { defineStrings } from './i18n'
+import { defineStrings, addStringsLoader } from './i18n'
 import { Platform } from './status'
+
+addStringsLoader(Platform, (lang) => import(`./lang/${lang}.json`))
 
 export default defineStrings(Platform, {
   loadingPlugin: '' as IntlString<{plugin: string}>

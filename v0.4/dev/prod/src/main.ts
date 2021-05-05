@@ -13,14 +13,13 @@
 // limitations under the License.
 //
 
-import { setMetadata, loadStrings } from '@anticrm/platform'
+import { setMetadata } from '@anticrm/platform'
 import { createApp } from '@anticrm/ui'
 import login from '@anticrm/plugin-login'
 
 import { configurePlatform } from './platform'
 
 configurePlatform()
-loadStrings('en')
 
 const accountsUrl = process.env.APP_ACCOUNTS_URL
 // const host = process.env.APP_WSHOST
