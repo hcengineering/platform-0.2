@@ -18,9 +18,9 @@
   import { translate } from '@anticrm/platform'
 
   export let label: IntlString
-  export let params: Record<string, any> | undefined
+  export let params: Record<string, any> = {}
 
-  $: translation = translate(label, params ?? {})
+  $: translation = translate(label, params)
 </script>
 
 {#await translation}
