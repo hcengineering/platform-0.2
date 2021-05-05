@@ -1,20 +1,21 @@
 //
 // Copyright © 2020 Anticrm Platform Contributors.
-// 
+//
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
 // obtain a copy of the License at https://www.eclipse.org/legal/epl-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// 
+//
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
 
-import { Status, Severity} from '@anticrm/status'
+import { Status, Severity } from '@anticrm/status'
 import { monitor } from './event'
+import { Platform, CODE_LOADING_PLUGIN } from './status'
 
 /** Base interface for a plugin or platform service. */
 export interface Service {} // eslint-disable-line @typescript-eslint/no-empty-interface
@@ -45,10 +46,10 @@ export interface PluginDescriptor<S extends Service, D extends PluginDependencie
 }
 type AnyDescriptor = PluginDescriptor<Service, PluginDependencies>
 
-type PluginModule<P extends Service, D extends PluginDependencies> = {
+interface PluginModule<P extends Service, D extends PluginDependencies> {
   default: (deps: PluginServices<D>) => Promise<P>
 }
-type AnyPluginModule = PluginModule<Service, PluginDependencies>
+// type AnyPluginModule = PluginModule<Service, PluginDependencies>
 
 type PluginLoader<P extends Service, D extends PluginDependencies> = () => Promise<PluginModule<P, D>>
 type AnyPluginLoader = PluginLoader<Service, PluginDependencies>
@@ -61,15 +62,18 @@ export function addLocation<P extends Service, X extends PluginDependencies> (
   plugin: PluginDescriptor<P, X>,
   module: PluginLoader<P, X>
 ): void {
-  locations.push([plugin, module as unknown as AnyPluginLoader])
+  locations.push([plugin, (module as unknown) as AnyPluginLoader])
 }
 
-export function getPlugin<T extends Service> (id: Plugin<T>): Promise<T> {
+export async function getPlugin<T extends Service> (id: Plugin<T>): Promise<T> {
   const service = services.get(id)
   if (service !== undefined) {
-    return Promise.resolve(service as T)
+    return service as T
   } else {
-    return loadPlugin(id).then(service => { services.set(id, service); return service as T })
+    return await loadPlugin(id).then((service) => {
+      services.set(id, service)
+      return service as T
+    })
   }
 }
 
@@ -83,14 +87,16 @@ function getLocation (id: AnyPlugin): [AnyDescriptor, AnyPluginLoader] {
 }
 
 // TODO: resolve in parallel
-function resolveDependencies (
-  deps: PluginDependencies
-): Promise<{ [key: string]: Service }> {
+async function resolveDependencies (deps: PluginDependencies): Promise<{ [key: string]: Service }> {
   const plugins = []
   const result: { [key: string]: Service } = {}
   for (const key in deps) {
     const id = deps[key]
-    plugins.push(getPlugin(id).then(service => { result[key] = service }))
+    plugins.push(
+      getPlugin(id).then((service) => {
+        result[key] = service
+      })
+    )
   }
   return Promise.all(plugins).then(() => result)
 }
@@ -99,19 +105,19 @@ async function loadPlugin<T extends Service> (id: Plugin<T>): Promise<Service> {
   const location = getLocation(id)
   const deps = await resolveDependencies(location[0].deps)
 
-  let loaderPromise
-  
+  const loaderPromise = location[1]()
+
   // if (id !== 'ui') {
   //   loaderPromise = new Promise<AnyPluginModule>((resolve, reject) => {
   //     setInterval(() => {
   //       location[1]().then(result => resolve(result)).catch(err => reject(err))
   //     }, 3000)
-  //   })  
+  //   })
   // } else {
-    loaderPromise = location[1]()
+  // loaderPromise = location[1]()
   // }
 
-  const status = new Status(Severity.INFO, 0, `Loading module '<b>${id}</b>'...`)
+  const status = new Status(Severity.INFO, Platform, CODE_LOADING_PLUGIN, { plugin: id })
   const loadedPlugin = await monitor(status, loaderPromise)
   const f = loadedPlugin.default
   const service = await f(deps)

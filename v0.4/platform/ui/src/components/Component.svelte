@@ -47,8 +47,21 @@
   height: 100%;
 }
 
+@keyframes makeVisible {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 .spinner-container .inner {
-  margin: auto
+  margin: auto;
+  opacity: 0;
+  animation-name: makeVisible;
+  animation-duration: 0.25s;
+  animation-delay: 0.1s;
 }
 
 </style>

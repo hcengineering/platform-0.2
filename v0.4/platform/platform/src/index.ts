@@ -14,7 +14,10 @@
 //
 
 export * from './metadata'
+export * from './status'
 export * from './event'
 export * from './plugin'
 export * from './resource'
 export * from './auth'
+export * from './i18n'
+export { default as Strings } from './strings'

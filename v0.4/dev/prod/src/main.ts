@@ -19,8 +19,6 @@ import login from '@anticrm/plugin-login'
 
 import { configurePlatform } from './platform'
 
-import ErrorPage from './components/ErrorPage.svelte'
-
 configurePlatform()
 
 const accountsUrl = process.env.APP_ACCOUNTS_URL

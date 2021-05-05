@@ -14,8 +14,7 @@
 //
 
 import { Metadata, Plugin, plugin, Resource, Service } from '@anticrm/platform'
-import { getContext } from 'svelte'
-import { SvelteComponent } from 'svelte'
+import { getContext, SvelteComponent } from 'svelte'
 
 export type URL = string
 export type Asset = Metadata<URL>
@@ -199,4 +198,3 @@ export default plugin(
     }
   }
 )
-

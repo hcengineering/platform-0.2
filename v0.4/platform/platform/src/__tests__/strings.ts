@@ -13,8 +13,14 @@
 // limitations under the License.
 //
 
-import { Service } from '../plugin'
+import { Component } from '@anticrm/status'
 
-export default async (): Promise<Service> => {
-  throw new Error('Bad plugin!')
-}
+import type { IntlString } from '../i18n'
+import { defineStrings } from '../i18n'
+
+export const TestComponent = 'test-strings' as Component
+
+export default defineStrings(TestComponent, {
+  loadingPlugin: '' as IntlString<{ plugin: string }>,
+  predefinedID: 'predefinedId' as IntlString
+})

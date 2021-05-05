@@ -23,25 +23,34 @@
  * @public
  */
 export enum Severity {
-  OK,
-  INFO,
-  WARNING,
-  ERROR
+  OK = 'OK',
+  INFO = 'INFO',
+  WARNING = 'WARNING',
+  ERROR = 'ERROR',
 }
+
+/**
+ * Component that created status object
+ * @public
+ */
+export type Component = string & { __component: true }
+export type StatusCode<P extends Record<string, any> = {}> = number & { __params: P}
 
 /**
  * Status of an operation
  * @public
  */
-export class Status {
+export class Status<P = {}> {
   readonly severity: Severity
-  readonly code: number
-  readonly message: string
+  readonly component: Component
+  readonly code: StatusCode<P>
+  readonly params: P
 
-  constructor (severity: Severity, code: number, message: string) {
+  constructor (severity: Severity, component: Component, code: StatusCode<P>, params: P) {
     this.severity = severity
+    this.component = component
     this.code = code
-    this.message = message
+    this.params = params
   }
 }
 
@@ -49,11 +58,11 @@ export class Status {
  * Error object wrapping `Status`
  * @public
  */
-export class PlatformError extends Error {
-  readonly status: Status
+export class PlatformError<P extends Record<string, any>> extends Error {
+  readonly status: Status<P>
 
-  constructor (status: Status) {
-    super(status.message)
+  constructor (status: Status<P>) {
+    super(`${status.severity} in '${status.component}' code: ${status.code}`)
     this.status = status
   }
 }

@@ -10,7 +10,9 @@
     "test": "jest",
     "lint": "ts-standard src",
     "lint:fix": "ts-standard --fix src",
-    "format": "prettier --write 'src/**/*.{ts*,js*,yml}' && ts-standard --fix src"
+    "format": "prettier --write 'src/**/*.{ts*,js*,yml}' && ts-standard --fix src",
+    "extract": "formatjs extract 'src/**/*.{ts,tsx}' --out-file lang/en.json",
+    "compile": "formatjs compile lang/en.json --ast --out-file compiled-lang/en.json"
   },
   "devDependencies": {
     "typescript": "~4.2.4",
@@ -22,9 +24,11 @@
     "@babel/core": "~7.13.15",
     "@babel/preset-env": "~7.13.15",
     "@babel/preset-typescript": "~7.13.0",
-    "prettier": "~2.2.1"
+    "prettier": "~2.2.1",
+    "@formatjs/cli": "~4.2.11"
   },
   "dependencies": {
-    "@anticrm/status": "~0.2.0"
+    "@anticrm/status": "~0.2.0",
+    "intl-messageformat": "~9.6.12"
   }
 }

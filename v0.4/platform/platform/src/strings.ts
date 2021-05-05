@@ -13,8 +13,12 @@
 // limitations under the License.
 //
 
-import { Service } from '../plugin'
+import type { IntlString } from './i18n'
+import { defineStrings, addStringsLoader } from './i18n'
+import { Platform } from './status'
 
-export default async (): Promise<Service> => {
-  throw new Error('Bad plugin!')
-}
+addStringsLoader(Platform, async (lang) => await import(`./lang/${lang}.json`))
+
+export default defineStrings(Platform, {
+  loadingPlugin: '' as IntlString<{ plugin: string }>
+})

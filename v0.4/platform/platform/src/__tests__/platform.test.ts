@@ -20,12 +20,26 @@ import { Status, Severity } from '@anticrm/status'
 import { Metadata, getMetadata, loadMetadata, setMetadata } from '../metadata'
 import { Plugin, Service, identify, getPlugin, addLocation } from '../plugin'
 import { Resource, getResource, getResourceInfo, peekResource, setResource } from '../resource'
-import { addEventListener, removeEventListener, broadcastEvent, PlatformStatus, setPlatformStatus, monitor } from '../event'
+import {
+  addEventListener,
+  removeEventListener,
+  broadcastEvent,
+  setPlatformStatus,
+  monitor,
+  PlatformEvent
+} from '../event'
+import { OK, unknownError } from '../status'
 
-import { plugin1, plugin1State, descriptor1 } from './shared'
-import { plugin2, plugin2State, descriptor2 } from './shared'
-import { plugin3, plugin3State, descriptor3 } from './shared'
-import { descriptorBad } from './shared'
+import {
+  plugin1,
+  plugin1State,
+  descriptor1,
+  plugin2State,
+  descriptor2,
+  plugin3,
+  descriptor3,
+  descriptorBad
+} from './shared'
 
 type AnyPlugin = Plugin<Service>
 
@@ -34,7 +48,6 @@ type ExtractType<T, X extends Record<string, Metadata<T>>> = {
 }
 
 describe('platform', () => {
-
   it('should identify resources', () => {
     const ids = identify('test' as AnyPlugin, {
       resource: {
@@ -46,13 +59,13 @@ describe('platform', () => {
     expect(ids.resource.FixedId).toBe('my-id')
   })
 
-  it('should raise exception for unknown location', () => {
+  it('should raise exception for unknown location', async () => {
     const p1 = getPlugin(plugin1)
-    expect(p1).rejects.toThrowError('plugin1') // eslint-disable-line @typescript-eslint/no-floating-promises
+    return await expect(p1).rejects.toThrowError('plugin1')
   })
 
   it('should resolve plugin', async () => {
-    addLocation(descriptor1, () => import('./plugin1'))
+    addLocation(descriptor1, async () => await import('./plugin1'))
     expect(plugin1State.parsed).toBe(false)
     expect(plugin1State.started).toBe(false)
     const p1 = getPlugin(plugin1)
@@ -64,16 +77,16 @@ describe('platform', () => {
     expect(plugin1State.started).toBe(true)
   })
 
-  it('should not resolve resource (no plugin location)', () => {
+  it('should not resolve resource (no plugin location)', async () => {
     const res = getResource('resource:NotExists.Resource' as Resource<string>)
-    expect(res).rejects.toThrowError('no location provided')
+    return await expect(res).rejects.toThrowError('no location provided')
   })
 
   it('should resolve resource', async () => {
     addLocation(descriptor2, async () => await import('./plugin2'))
     expect(plugin2State.parsed).toBe(false)
     expect(plugin2State.started).toBe(false)
-    let resolved = getResource('resource2:plugin2.Resource' as Resource<string>)
+    const resolved = getResource('resource2:plugin2.Resource' as Resource<string>)
     expect(resolved).toBeInstanceOf(Promise)
     // get again to check repeated getting
     const resource = await getResource('resource2:plugin2.Resource' as Resource<string>)
@@ -89,21 +102,21 @@ describe('platform', () => {
     expect(resource).toBe('hello resource2:My.Resource')
   })
 
-  it('should fail to resolve wrong resource', () => {
+  it('should fail to resolve wrong resource', async () => {
     const wrongResource = 'resource_wrong:plugin2.Resource' as Resource<string>
     const res = getResource(wrongResource)
-    expect(res).rejects.toThrowError('resource not loaded')
+    return await expect(res).rejects.toThrowError('resource not loaded')
   })
 
-  it('should fail to load bad plugin', () => {
-    addLocation(descriptorBad, () => import('./badplugin'))
+  it('should fail to load bad plugin', async () => {
+    addLocation(descriptorBad, async () => await import('./badplugin'))
     const wrongResource = 'resource_wrong:badplugin.Resource' as Resource<string>
     const res = getResource(wrongResource)
-    expect(res).rejects.toThrowError('Bad plugin')
+    return await expect(res).rejects.toThrowError('Bad plugin')
   })
 
   it('should inject dependencies', async () => {
-    addLocation(descriptor3, () => import('./plugin3'))
+    addLocation(descriptor3, async () => await import('./plugin3'))
     const plugin = await getPlugin(plugin3)
     const deps = (plugin as any).deps
     expect(deps.plugin1.id).toBe('plugin1')
@@ -167,7 +180,7 @@ describe('platform', () => {
     expect(getMetadata(m2)).toBe('again')
   })
 
-  it('should call event listener', () => {
+  it('should call event listener', async () => {
     let listenerCalled = false
     const myEvent = 'MyEvent'
     const myData = 'test-data'
@@ -179,14 +192,14 @@ describe('platform', () => {
     }
 
     addEventListener(myEvent, myEventListener)
-    broadcastEvent(myEvent, myData)
+    await broadcastEvent(myEvent, myData)
     expect(listenerCalled).toBe(true)
 
     // remove listener to avoid calls from other tests
     removeEventListener(myEvent, myEventListener)
   })
 
-  it('should call many event listeners', () => {
+  it('should call many event listeners', async () => {
     class TestEventListener {
       readonly eventName: string
       readonly eventData: string
@@ -239,19 +252,19 @@ describe('platform', () => {
     firstListenerForEvent2.startListen()
     secondListenerForEvent2.startListen()
 
-    broadcastEvent(event1, data1)
+    await broadcastEvent(event1, data1)
     firstListenerForEvent1.checkCalled()
     secondListenerForEvent1.checkCalled()
     firstListenerForEvent2.checkNotCalled()
     secondListenerForEvent2.checkNotCalled()
 
-    broadcastEvent(event2, data2)
+    await broadcastEvent(event2, data2)
     firstListenerForEvent1.checkNotCalled()
     secondListenerForEvent1.checkNotCalled()
     firstListenerForEvent2.checkCalled()
     secondListenerForEvent2.checkCalled()
 
-    broadcastEvent('ArbitraryEvent', 'anydata')
+    await broadcastEvent('ArbitraryEvent', 'anydata')
     firstListenerForEvent1.checkNotCalled()
     secondListenerForEvent1.checkNotCalled()
     firstListenerForEvent2.checkNotCalled()
@@ -259,7 +272,7 @@ describe('platform', () => {
 
     secondListenerForEvent1.stopListen()
 
-    broadcastEvent(event1, data1)
+    await broadcastEvent(event1, data1)
     firstListenerForEvent1.checkCalled()
     secondListenerForEvent1.checkNotCalled()
     firstListenerForEvent2.checkNotCalled()
@@ -269,8 +282,8 @@ describe('platform', () => {
     firstListenerForEvent2.stopListen()
     secondListenerForEvent2.stopListen()
 
-    broadcastEvent(event1, data1)
-    broadcastEvent(event2, data2)
+    await broadcastEvent(event1, data1)
+    await broadcastEvent(event2, data2)
 
     firstListenerForEvent1.checkNotCalled()
     secondListenerForEvent1.checkNotCalled()
@@ -278,48 +291,42 @@ describe('platform', () => {
     secondListenerForEvent2.checkNotCalled()
   })
 
-  function testSetPlatformStatus (status: any, expectedSeverity: Severity, expectedMessage: string): void {
+  async function testSetPlatformStatus (status: Status | Error, expectedSeverity: Severity): Promise<void> {
     let listenerCalled = false
     const listener = async function (event: string, data: any): Promise<void> {
       listenerCalled = true
-      expect(event).toBe(PlatformStatus)
+      expect(event).toBe(PlatformEvent)
       expect(data).toBeInstanceOf(Status)
       expect(data.severity).toBe(expectedSeverity)
-      expect(data.code).toBe(0)
-      expect(data.message).toBe(expectedMessage)
-      return await Promise.resolve()
     }
 
-    addEventListener(PlatformStatus, listener)
-    setPlatformStatus(status)
+    addEventListener(PlatformEvent, listener)
+    await setPlatformStatus(status)
     expect(listenerCalled).toBeTruthy()
 
     // remove listener to avoid calls from other tests
-    removeEventListener(PlatformStatus, listener)
+    removeEventListener(PlatformEvent, listener)
   }
 
-  it('should set string platform status', () => {
-    testSetPlatformStatus('custom string', Severity.INFO, 'custom string')
+  it('should set error platform status', async () => {
+    return await testSetPlatformStatus(new Error('baga'), Severity.ERROR)
   })
 
-  it('should set error platform status', () => {
-    testSetPlatformStatus(new Error('baga'), Severity.ERROR, 'baga')
+  it('should set custom platform status', async () => {
+    return await testSetPlatformStatus(OK, Severity.OK)
   })
 
-  it('should set custom platform status', () => {
-    testSetPlatformStatus(new Status(Severity.OK, 0, 'custom message'), Severity.OK, 'custom message')
-  })
-
-  it('should set unknown platform status', () => {
-    testSetPlatformStatus({ x: 'y' }, Severity.WARNING, 'Unknown status: [object Object]')
-  })
-
-  it('should throw monitor error', () => {
-    expect(monitor(new Status(Severity.OK, 0, ''), Promise.reject(new Error('dummy')))).rejects.toThrowError('dummy')
+  it('should throw monitor error', async () => {
+    return await expect(monitor(OK, Promise.reject(new Error('dummy')))).rejects.toThrowError('dummy') // eslint-disable-line @typescript-eslint/no-floating-promises
   })
 
   it('should remove listener inexistent type of the event', () => {
     removeEventListener('xxx', {} as any)
   })
 
+  it('should create unknown error', () => {
+    const status = unknownError(new Error('something'))
+    expect(status.severity).toBe(Severity.ERROR)
+    expect(status.params.message).toBe('something')
+  })
 })

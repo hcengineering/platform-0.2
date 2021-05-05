@@ -38,30 +38,30 @@ export function currentAccount (): LoginInfo | null {
 export interface LoginService extends Service {
   // doLogin (username: string, password: string, workspace: string, secondFactorCode: string): Promise<Status>
 
-  /**
-   * Check and auto return login information if available.
-   */
-  getLoginInfo (): Promise<LoginInfo | undefined>
+  // /**
+  //  * Check and auto return login information if available.
+  //  */
+  // getLoginInfo (): Promise<LoginInfo | undefined>
 
-  /**
-   * Do navigate to default application if defined.
-   */
-  navigateApp (): void
+  // /**
+  //  * Do navigate to default application if defined.
+  //  */
+  // navigateApp (): void
 
-  /**
-  * Do navigate to login form
-  */
-  navigateLoginForm (): void
+  // /**
+  // * Do navigate to login form
+  // */
+  // navigateLoginForm (): void
 
-  /**
-  * Save profile settings
-  */
-  saveSetting (password: string, newPassword: string, secondFactorEnabled: boolean, clientSecret: string, secondFactorCode: string): Promise<Status>
+  // /**
+  // * Save profile settings
+  // */
+  // saveSetting (password: string, newPassword: string, secondFactorEnabled: boolean, clientSecret: string, secondFactorCode: string): Promise<Status>
 
-  /**
-   * Do logout from current logged in account
-   */
-  doLogout (): Promise<void>
+  // /**
+  //  * Do logout from current logged in account
+  //  */
+  // doLogout (): Promise<void>
 }
 
 const login = plugin('login' as Plugin<LoginService>, {}, {
