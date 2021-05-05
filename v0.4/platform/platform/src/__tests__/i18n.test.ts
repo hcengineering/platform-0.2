@@ -40,7 +40,7 @@ describe('i18n', () => {
 
   it('should return status when no loader', async () => {
     const translated = translate('component.id' as IntlString, {})
-    return await expect(translated).rejects.toThrowError("ERROR in 'platform' code: 3")
+    return await expect(translated).rejects.toThrowError("ERROR: platform.NoLoaderForStrings")
   })
 
   it('should return status when bad loader', async () => {
@@ -48,11 +48,11 @@ describe('i18n', () => {
       throw new Error('bad loader')
     })
     const translated = translate('error-loader.id' as IntlString, {})
-    return expect(translated).rejects.toThrowError("ERROR in 'platform' code: 1")
+    return expect(translated).rejects.toThrowError("ERROR: platform.UnknownError")
   })
 
   it('should cache error', async () => {
     const translated = translate('error-loader.id' as IntlString, {})
-    return await expect(translated).rejects.toThrowError("ERROR in 'platform' code: 1")
+    return await expect(translated).rejects.toThrowError("ERROR: platform.UnknownError")
   })
 })

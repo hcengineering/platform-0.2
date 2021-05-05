@@ -64,7 +64,9 @@ export interface LoginService extends Service {
   // doLogout (): Promise<void>
 }
 
-const login = plugin('login' as Plugin<LoginService>, {}, {
+export const PluginLogin = 'login' as Plugin<LoginService>
+
+export default plugin(PluginLogin, {}, {
   component: {
     LoginForm: '' as AnyComponent,
     SettingForm: '' as AnyComponent,
@@ -75,5 +77,3 @@ const login = plugin('login' as Plugin<LoginService>, {}, {
     AccountsUrl: '' as Metadata<string>
   }
 })
-
-export default login

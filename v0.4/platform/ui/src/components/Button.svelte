@@ -14,9 +14,11 @@
 -->
 
 <script lang="ts">
+  import type { IntlString } from '@anticrm/platform'
   import Spinner from './Spinner.svelte'
+  import Label from './Label.svelte'
 
-  export let label: string = ''
+  export let label: IntlString
   export let primary: boolean = false
   export let disabled: boolean = false
   export let loading: boolean = false
@@ -29,7 +31,7 @@
   {#if loading}
     <Spinner/>
   {:else}
-    {label}
+    <Label label={label}/>
   {/if}
 </button>
 

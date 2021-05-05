@@ -14,7 +14,10 @@
 -->
 
 <script lang="ts">
-  export let label: string | undefined
+  import type { IntlString } from '@anticrm/platform'
+  import Label from './Label.svelte'
+
+  export let label: IntlString | undefined
   export let width: string | undefined
   export let value: string | undefined
   export let error: string | undefined
@@ -29,7 +32,7 @@
     <input type="text" class:nolabel={!label} {id} bind:value on:keyup placeholder=" "/>
   {/if}
   {#if label}
-    <div class="label">{label}</div>
+    <div class="label"><Label label={label}/></div>
   {/if}
   {#if error}
     <div class="error-label">{error}</div>

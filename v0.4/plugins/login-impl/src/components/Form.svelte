@@ -14,41 +14,45 @@
 -->
 
 <script lang="ts">
+  import { EditBox, Label, Button, StatusControl } from '@anticrm/ui'
   import { Status, Severity } from '@anticrm/status'
-  import { Status as StatusControl, EditBox, Button } from '@anticrm/sparkling-controls'
+  import type { IntlString } from '@anticrm/platform'
+  import { OK, translate } from '@anticrm/platform'
+
+  import { Code } from '../utils'
 
   interface Field {
     name: string
-    i18n: string
+    i18n: IntlString
     password?: boolean
     optional?: boolean
     short?: boolean
   }
 
   interface Action {
-    i18n: string
+    i18n: IntlString
     func: () => Promise<void>
   }
 
-  export let caption: string
+  export let caption: IntlString
   export let status: Status
   export let fields: Field[]
   export let action: Action
-  export let bottomCaption: string
-  export let bottomActionLabel: string
+  export let bottomCaption: IntlString
+  export let bottomActionLabel: IntlString
   export let bottomActionFunc: () => void
   export let object: any
 
-  function validate () {
+  async function validate () {
     for (const field of fields) {
       const v = object[field.name]
       const f = field
       if (!f.optional && (!v || v === '')) {
-        status = new Status(Severity.INFO, 0, `Please fill '${field.i18n}' field.`)
+        status = new Status(Severity.INFO, Code.RequiredField, {field: await translate(field.i18n, {})})
         return
       }
     }
-    status = new Status(Severity.OK, 0, '')
+    status = OK
   }
   validate()
 
@@ -63,7 +67,7 @@
 
 <form class="form-container">
   <div class="grow-separator"/>
-  <div class="title">{caption}</div>
+  <div class="title"><Label label={caption}/></div>
   <div class="status">
     <StatusControl {status} width="100%"/>
   </div>
@@ -90,8 +94,8 @@
   </div>
   <div class="grow-separator"/>
   <div class="footer">
-    <span>{bottomCaption}</span>
-    <a href="." on:click|preventDefault={bottomActionFunc}>{bottomActionLabel}</a>
+    <span><Label label={bottomCaption}/></span>
+    <a href="." on:click|preventDefault={bottomActionFunc}><Label label={bottomActionLabel}/></a>
   </div>
 </form>
 

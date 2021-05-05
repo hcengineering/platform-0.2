@@ -13,12 +13,12 @@
 // limitations under the License.
 //
 
-import { Component, PlatformError, Status, Severity } from '@anticrm/status'
-import { Platform, CODE_NO_LOADER_FOR_STRINGS, unknownError } from './status'
+import { Component, PlatformError, Status, Severity, ParameterizedId } from '@anticrm/status'
+import { unknownError, Code } from './status'
 
 import { IntlMessageFormat } from 'intl-messageformat'
 
-export type IntlString<T extends Record<string, any> = {}> = string & { __intl_string: T }
+export type IntlString<T extends Record<string, any> = {}> = ParameterizedId<T>
 type Loader = (locale: string) => Promise<Record<string, IntlString>>
 
 const locale = 'en'
@@ -27,22 +27,13 @@ const loaders = new Map<Component, Loader>()
 const translations = new Map<Component, Record<string, IntlString> | Status>()
 const cache = new Map<IntlString, IntlMessageFormat | Status>()
 
-export function defineStrings<T extends Record<string, IntlString>> (component: Component, strings: T): T {
-  const transformed: Record<string, string> = {}
-  for (const key in strings) {
-    const id = strings[key]
-    transformed[key] = component + '.' + (id === '' ? (key as string) : (id as string))
-  }
-  return transformed as T
-}
-
 export function addStringsLoader (component: Component, loader: Loader): void {
   loaders.set(component, loader)
 }
 
 async function loadTranslationsForComponent (component: Component): Promise<Record<string, IntlString> | Status> {
   const loader = loaders.get(component)
-  if (loader === undefined) return new Status(Severity.ERROR, Platform, CODE_NO_LOADER_FOR_STRINGS, { component })
+  if (loader === undefined) return new Status(Severity.ERROR, Code.NoLoaderForStrings, { component })
   try {
     return await loader(locale)
   } catch (err) {
@@ -68,14 +59,14 @@ export async function translate<P extends Record<string, any>> (message: IntlStr
   const compiled = cache.get(message)
   if (compiled !== undefined) {
     if (compiled instanceof Status) {
-      throw new PlatformError(compiled)
+      return message
     }
     return compiled.format(params)
   } else {
     const translation = await getTranslation(message)
     if (translation instanceof Status) {
       cache.set(message, translation)
-      throw new PlatformError(translation)
+      return message
     }
     const compiled = new IntlMessageFormat(translation ?? message, locale)
     cache.set(message, compiled)

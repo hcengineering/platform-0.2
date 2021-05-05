@@ -31,7 +31,7 @@ import login from '@anticrm/plugin-login'
 // import personExtras from '@anticrm/person-extras'
 // import calendar from '@anticrm/calendar'
 
-import loginMeta from '@anticrm/plugin-login-impl/src/__meta__'
+import '@anticrm/plugin-login-impl/src/__meta__'
 // import uiMeta from '@anticrm/platform-ui/src/__meta__/meta'
 // import workbenchMeta from '@anticrm/workbench/src/__meta__'
 // import chunterMeta from '@anticrm/chunter/src/__meta__'
@@ -63,7 +63,7 @@ export function configurePlatform() {
 // platform.addLocation(datagen, () => import(/* webpackChunkName: "datagen" */ '@anticrm/data-generator/src/plugin'))
 
 // uiMeta(platform)
-  loginMeta()
+  // loginMeta()
 // workbenchMeta(platform)
 // activityMeta(platform)
 // chunterMeta(platform)

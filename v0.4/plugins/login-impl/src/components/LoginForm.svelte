@@ -14,22 +14,23 @@
 -->
 
 <script lang="ts">
-  import { getContext, createEventDispatcher } from 'svelte'
+  import { createEventDispatcher } from 'svelte'
   import { Status, Severity } from '@anticrm/status'
+  import { OK } from '@anticrm/platform'
 
   import Form from './Form.svelte'
-  import { doLogin } from '../utils'
+  import { Code, doLogin } from '../utils'
 
   const dispatch = createEventDispatcher()
 
   const fields = [
-    { name: 'username', i18n: 'Email' },
+    { name: 'username', i18n: Code.Email },
     {
       name: 'password',
-      i18n: 'Password',
+      i18n: Code.Password,
       password: true
     },
-    { name: 'workspace', i18n: 'Workspace' }
+    { name: 'workspace', i18n: Code.Workspace }
   ]
 
   const object = {
@@ -38,12 +39,12 @@
     password: '',
   }
 
-  let status = new Status(Severity.OK, 0, '')
+  let status = OK
 
   const action = { 
-    i18n: 'Log In',
+    i18n: Code.LogIn,
     func: async () => { 
-      status = new Status(Severity.INFO, 0, 'Connecting to server...')
+      status = new Status(Severity.INFO, Code.ConnectingToServer, {})
 
       const [loginStatus, result] = await doLogin(object.username, object.password, object.workspace)
 
@@ -59,8 +60,8 @@
 
 </script>
 
-<Form caption="Log In" {status} {fields} {object} {action}
-  bottomCaption="Do not have an account?"
-  bottomActionLabel="Sign Up"
+<Form caption={Code.LogIn} {status} {fields} {object} {action}
+  bottomCaption={Code.DoNotHaveAnAccount}
+  bottomActionLabel={Code.SignUp}
   bottomActionFunc={() => { dispatch('switch', 'signup') }}
 />

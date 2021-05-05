@@ -16,6 +16,7 @@
 <script lang="ts">
   import type { Status } from '@anticrm/status'
   import { Severity } from '@anticrm/status'
+  import Label from './Label.svelte'
 
   export let status: Status
   export let width: string
@@ -32,7 +33,7 @@
     </svg>
   </div>
   <div class="message">
-    status.message
+    <Label label={status.code} params={status.params}/>
   </div>
 </div>
 {/if}

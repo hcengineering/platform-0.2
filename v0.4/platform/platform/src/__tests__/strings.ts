@@ -16,11 +16,11 @@
 import { Component } from '@anticrm/status'
 
 import type { IntlString } from '../i18n'
-import { defineStrings } from '../i18n'
+import { defineCode } from '../status'
 
 export const TestComponent = 'test-strings' as Component
 
-export default defineStrings(TestComponent, {
+export default defineCode(TestComponent, {
   loadingPlugin: '' as IntlString<{ plugin: string }>,
   predefinedID: 'predefinedId' as IntlString
 })

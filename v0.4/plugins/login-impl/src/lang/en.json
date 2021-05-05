@@ -1,0 +1,7 @@
+{
+  "LogIn": "Log In",
+  "Password": "Password",
+  "Email": "Email",
+  "Workspace": "Workspace",
+  "RequiredField": "Please fill `{field}` field."
+}

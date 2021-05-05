@@ -13,11 +13,22 @@
 // limitations under the License.
 //
 
-import { Status } from '@anticrm/status'
-import { getMetadata, OK, unknownError } from '@anticrm/platform'
+import { Status, StatusCode } from '@anticrm/status'
+import { getMetadata, OK, unknownError, defineCode, IntlString } from '@anticrm/platform'
 import { Request, Response, serialize } from '@anticrm/rpc'
 
-import login from '@anticrm/plugin-login'
+import login, { PluginLogin } from '@anticrm/plugin-login'
+
+export const Code = defineCode(PluginLogin, {
+  RequiredField: '' as StatusCode<{field: string}>,
+  Email: '' as IntlString,
+  Password: '' as IntlString,
+  Workspace: '' as IntlString,
+  ConnectingToServer: '' as IntlString,
+  LogIn: '' as IntlString,
+  SignUp: '' as IntlString,
+  DoNotHaveAnAccount: '' as IntlString
+})
 
 /**
  * Perform a login operation to required workspace with user credentials.

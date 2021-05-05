@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 -->
+
 <script lang="ts">
   import { getResource } from '@anticrm/platform'
   import type { AnyComponent } from '../types'
-  
-  import { Spinner } from '@anticrm/sparkling-controls'
-  
+    
   // import Icon from './Icon.svelte'
+  import Spinner from './Spinner.svelte'
   import ErrorBoundary from './internal/ErrorBoundary'
 
   export let is: AnyComponent

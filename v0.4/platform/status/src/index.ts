@@ -34,7 +34,8 @@ export enum Severity {
  * @public
  */
 export type Component = string & { __component: true }
-export type StatusCode<P extends Record<string, any> = {}> = number & { __params: P}
+export type ParameterizedId<P extends Record<string, any> = {}> = string & { __params: P}
+export type StatusCode<P extends Record<string, any> = {}> = ParameterizedId<P>
 
 /**
  * Status of an operation
@@ -42,13 +43,11 @@ export type StatusCode<P extends Record<string, any> = {}> = number & { __params
  */
 export class Status<P = {}> {
   readonly severity: Severity
-  readonly component: Component
   readonly code: StatusCode<P>
   readonly params: P
 
-  constructor (severity: Severity, component: Component, code: StatusCode<P>, params: P) {
+  constructor (severity: Severity, code: StatusCode<P>, params: P) {
     this.severity = severity
-    this.component = component
     this.code = code
     this.params = params
   }
@@ -62,7 +61,7 @@ export class PlatformError<P extends Record<string, any>> extends Error {
   readonly status: Status<P>
 
   constructor (status: Status<P>) {
-    super(`${status.severity} in '${status.component}' code: ${status.code}`)
+    super(`${status.severity}: ${status.code}`)
     this.status = status
   }
 }

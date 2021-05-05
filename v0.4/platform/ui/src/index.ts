@@ -20,6 +20,11 @@ import Root from './components/internal/Root.svelte'
 export type { AnyComponent } from './types'
 export { applicationShortcutKey } from './utils'
 
+export { default as EditBox } from './components/EditBox.svelte'
+export { default as Label } from './components/Label.svelte'
+export { default as Button } from './components/Button.svelte'
+export { default as StatusControl } from './components/StatusControl.svelte'
+
 export function createApp (target: HTMLElement): SvelteComponent {
   return new Root({ target })
 }
