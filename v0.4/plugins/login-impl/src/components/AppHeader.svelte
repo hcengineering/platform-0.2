@@ -14,7 +14,7 @@
 -->
 
 <script lang="ts">
-  import { EditBox } from '@anticrm/sparkling-controls'
+  import { EditBox } from '@anticrm/ui'
   import MoreH from './icons/MoreH.svelte'
   import Add from './icons/Add.svelte'
 
