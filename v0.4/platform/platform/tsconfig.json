@@ -6,9 +6,11 @@
     "outDir": "./lib",
     "rootDir": "./src",
     "strict": true,
+    "resolveJsonModule": true,
     "lib": [
-      "es2018",
-      "dom"
+      "es2020",
+      "dom",
+      "esnext.intl"
     ]
   }
 }

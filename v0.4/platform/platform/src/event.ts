@@ -37,18 +37,19 @@ export function removeEventListener (event: string, listener: EventListener): vo
   }
 }
 
-export function broadcastEvent (event: string, data: any): void {
+export async function broadcastEvent (event: string, data: any): Promise<void> {
   const listeners = eventListeners.get(event)
   if (listeners !== undefined) {
-    listeners.forEach((listener) => void listener(event, data)) // eslint-disable-line no-void
+    const promises = listeners.map((listener) => listener(event, data))
+    return Promise.all(promises) as unknown as Promise<void>
   }
 }
 
-export function setPlatformStatus (status: Status | Error): void {
+export function setPlatformStatus (status: Status | Error): Promise<void> {
   if (status instanceof Error) {
-    broadcastEvent(PlatformEvent, unknownError)
+    return broadcastEvent(PlatformEvent, unknownError(status))
   } else {
-    broadcastEvent(PlatformEvent, status)
+    return broadcastEvent(PlatformEvent, status)
   }
 }
 

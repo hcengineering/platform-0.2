@@ -23,10 +23,10 @@
  * @public
  */
 export enum Severity {
-  OK,
-  INFO,
-  WARNING,
-  ERROR
+  OK = 'OK',
+  INFO = 'INFO',
+  WARNING = 'WARNING',
+  ERROR = 'ERROR',
 }
 
 /**

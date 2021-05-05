@@ -54,7 +54,7 @@ describe('platform', () => {
 
   it('should raise exception for unknown location', () => {
     const p1 = getPlugin(plugin1)
-    expect(p1).rejects.toThrowError('plugin1') // eslint-disable-line @typescript-eslint/no-floating-promises
+    return expect(p1).rejects.toThrowError('plugin1')
   })
 
   it('should resolve plugin', async () => {
@@ -72,7 +72,7 @@ describe('platform', () => {
 
   it('should not resolve resource (no plugin location)', () => {
     const res = getResource('resource:NotExists.Resource' as Resource<string>)
-    expect(res).rejects.toThrowError('no location provided') // eslint-disable-line @typescript-eslint/no-floating-promises
+    return expect(res).rejects.toThrowError('no location provided')
   })
 
   it('should resolve resource', async () => {
@@ -98,14 +98,14 @@ describe('platform', () => {
   it('should fail to resolve wrong resource', () => {
     const wrongResource = 'resource_wrong:plugin2.Resource' as Resource<string>
     const res = getResource(wrongResource)
-    expect(res).rejects.toThrowError('resource not loaded') // eslint-disable-line @typescript-eslint/no-floating-promises
+    return expect(res).rejects.toThrowError('resource not loaded') 
   })
 
   it('should fail to load bad plugin', () => {
     addLocation(descriptorBad, async () => await import('./badplugin'))
     const wrongResource = 'resource_wrong:badplugin.Resource' as Resource<string>
     const res = getResource(wrongResource)
-    expect(res).rejects.toThrowError('Bad plugin') // eslint-disable-line @typescript-eslint/no-floating-promises
+    return expect(res).rejects.toThrowError('Bad plugin') 
   })
 
   it('should inject dependencies', async () => {
@@ -284,19 +284,17 @@ describe('platform', () => {
     secondListenerForEvent2.checkNotCalled()
   })
 
-  function testSetPlatformStatus (status: Status | Error, expectedSeverity: Severity): void {
+  async function testSetPlatformStatus (status: Status | Error, expectedSeverity: Severity): Promise<void> {
     let listenerCalled = false
     const listener = async function (event: string, data: any): Promise<void> {
       listenerCalled = true
       expect(event).toBe(PlatformEvent)
       expect(data).toBeInstanceOf(Status)
       expect(data.severity).toBe(expectedSeverity)
-      console.log(data)
-      // expect(data.message).toBe(expectedMessage)
     }
 
     addEventListener(PlatformEvent, listener)
-    setPlatformStatus(status)
+    await setPlatformStatus(status)
     expect(listenerCalled).toBeTruthy()
 
     // remove listener to avoid calls from other tests
@@ -304,15 +302,15 @@ describe('platform', () => {
   }
 
   it('should set error platform status', () => {
-    testSetPlatformStatus(new Error('baga'), Severity.ERROR)
+    return testSetPlatformStatus(new Error('baga'), Severity.ERROR)
   })
 
   it('should set custom platform status', () => {
-    testSetPlatformStatus(OK, Severity.OK)
+    return testSetPlatformStatus(OK, Severity.OK)
   })
 
   it('should throw monitor error', () => {
-    expect(monitor(OK, Promise.reject(new Error('dummy')))).rejects.toThrowError('dummy') // eslint-disable-line @typescript-eslint/no-floating-promises
+    return expect(monitor(OK, Promise.reject(new Error('dummy')))).rejects.toThrowError('dummy') // eslint-disable-line @typescript-eslint/no-floating-promises
   })
 
   it('should remove listener inexistent type of the event', () => {

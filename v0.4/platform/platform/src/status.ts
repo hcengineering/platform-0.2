@@ -25,6 +25,7 @@ export const Platform = 'platform' as Component
 export const CODE_OK = 0 as StatusCode
 export const CODE_UNKNOWN_ERROR = 1 as StatusCode<{ message: string }>
 export const CODE_LOADING_PLUGIN = 2 as StatusCode<{ plugin: string }>
+export const CODE_NO_LOADER_FOR_STRINGS = 3 as StatusCode<{component: Component}>
 
 /**
  * OK Status
