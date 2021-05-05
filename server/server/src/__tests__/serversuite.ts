@@ -81,6 +81,10 @@ export class ServerSuite {
     this.wsName = wsName
   }
 
+  public address (): {address: string, port: number} {
+    return this.server.address()
+  }
+
   public async start (): Promise<void> {
     this.dbClient = await MongoClient.connect(this.mongodbUri, { useUnifiedTopology: true })
 
