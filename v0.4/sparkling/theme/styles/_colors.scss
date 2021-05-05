@@ -13,12 +13,29 @@
 // limitations under the License.
 //
 
+/* Common Colors */
+* {
+  --activity-status-active: #34DB80;
+  --activity-status-dnd: #D95757;
+  --activity-status-busy: #FCC500;
+  --activity-status-away: #9099A2;
+
+  --primary-color-purple-01: #4B38BD;
+  --primary-color-purple-02: #6552DB;
+  --primary-color-purple-03: #9D92C4;
+  --primary-color-orange-01: #CC4726;
+  --primary-color-orange-02: #F47758;
+  --primary-color-skyblue: #93CAF3;
+  --primary-color-pink: #FA8DA1;
+}
+
 /* Dark Theme */
 .theme-dark {
   --theme-bg-color: #18181e;
   --theme-bg-selection: #282830;
   --theme-menu-color: #111117;
   --theme-menu-selection: #1D1D23;
+  --theme-menu-divider: rgba(255, 255, 255, .05);
 
   --theme-bg-accent-color: rgba(255, 255, 255, .03);
   --theme-bg-accent-hover: rgba(255, 255, 255, .1);
@@ -71,6 +88,7 @@
   --theme-bg-selection: #454351;
   --theme-menu-color: #2C2B35;
   --theme-menu-selection: #37363F;
+  --theme-menu-divider: rgba(255, 255, 255, .05);
 
   --theme-bg-accent-color: rgba(255, 255, 255, 0.05);
   --theme-bg-accent-hover: rgba(255, 255, 255, 0.05);
@@ -96,6 +114,7 @@
   --theme-bg-selection: #F1F1F4;
   --theme-menu-color: #E7E7E7;
   --theme-menu-selection: #DBDBDB;
+  --theme-menu-divider: rgba(0, 0, 0, .08);
 
   --theme-bg-accent-color: rgba(0, 0, 0, 0.05);
   --theme-bg-accent-hover: rgba(0, 0, 0, 0.05);

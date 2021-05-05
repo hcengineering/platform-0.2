@@ -85,6 +85,7 @@
 
     .status-bar {
       min-height: $status-bar-height;
+      min-width: 1200px;
 
       .container {
         display: flex;
