@@ -1,11 +1,11 @@
 <script lang="ts">
   import { PlatformEvent, getMetadata, addEventListener, OK } from '@anticrm/platform'
-  import type { AnyComponent, UIService } from '../types'
-  import { applicationShortcutKey } from '../utils'
-  import { newRouter } from '../utils'
+  import type { AnyComponent } from '../../types'
+  import { applicationShortcutKey } from '../../utils'
+  import { newRouter } from '../../utils'
 
   import { Theme } from '@anticrm/sparkling-theme'
-  import Component from './Component.svelte'
+  import Component from '../Component.svelte'
 
   import StatusComponent from './Status.svelte'
   import Clock from './Clock.svelte'
