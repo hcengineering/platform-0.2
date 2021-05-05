@@ -14,7 +14,7 @@
 //
 
 import { Class, CoreProtocol, Doc, DocumentQuery, FindOptions, Model, MODEL_DOMAIN, Ref, Tx, txContext, TxContextSource, TxProcessor } from '@anticrm/core'
-import { CORE_CLASS_REFERENCE, CORE_CLASS_SPACE, CORE_CLASS_TITLE, Space, TITLE_DOMAIN, VDoc } from '@anticrm/domains'
+import { CORE_CLASS_REFERENCE, CORE_CLASS_TITLE, Space, TITLE_DOMAIN, VDoc } from '@anticrm/domains'
 import { PassthroughsIndex } from '@anticrm/domains/src/indices/filter'
 import { ModelIndex } from '@anticrm/domains/src/indices/model'
 import { TxIndex } from '@anticrm/domains/src/indices/tx'
@@ -70,7 +70,7 @@ export default async (platform: Platform): Promise<CoreService> => {
   const modelDomain = await coreProtocol.loadDomain(MODEL_DOMAIN)
   model.loadModel(modelDomain)
 
-  const qModel = new QueriableStorage(model, model)
+  const qModel = new QueriableStorage(model, cache, true)
   const qTitles = new QueriableStorage(model, cache)
   const qCache = new QueriableStorage(model, cache, true)
 
@@ -83,7 +83,6 @@ export default async (platform: Platform): Promise<CoreService> => {
     new VDocIndex(model, qCache),
     new PassthroughsIndex(model, qTitles, CORE_CLASS_TITLE), // Just for live queries.
     new PassthroughsIndex(model, qCache, CORE_CLASS_REFERENCE), // Construct a pass index to update references
-    new PassthroughsIndex(model, qCache, CORE_CLASS_SPACE), // Construct a pass index to update references
     new ModelIndex(model, qModel)
   ])
 
