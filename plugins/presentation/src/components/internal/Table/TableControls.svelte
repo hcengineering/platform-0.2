@@ -42,29 +42,29 @@
       bind:value={text}
       on:input={onSearch} />
   </div>
+
+  <div class="pagination">
+    {#if total > 0}
+      <button
+        disabled={pos === 0}
+        on:click={() => {pos = pos - limit}}>
+        {'<'}
+      </button>
+      <button disabled={pos + limit >= total} on:click={() => {pos = pos + limit}}>
+        {'>'}
+      </button>
+
+      <span>
+        Items {offset + 1} to {Math.min(total, offset + limit)} of {total}
+      </span>
+
+    {:else}
+      No Items
+    {/if}
+  </div>
 </div>
 
-{#if total > 0}
-  Items {offset + 1} to {Math.min(total, offset + limit)} of {total}
-  {#if pos + limit < total}
-    <div
-      on:click={() => {
-        pos = pos + limit
-      }}>
-      Next
-    </div>
-  {/if}
-  {#if pos > 0}
-    <div
-      on:click={() => {
-        pos = pos - limit
-      }}>
-      Previous
-    </div>
-  {/if}
-{:else}
-  No Items
-{/if}
+
 
 <style lang="scss">
   .control-container {
@@ -100,6 +100,33 @@
       &:focus {
         outline: none;
       }
+    }
+  }
+  .pagination {
+    width: 300px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: baseline;
+
+    button {
+      height: 32px;
+      width: 32px;
+      margin: 5px;
+      border: 1px solid rgba(0, 0, 0, 0.03);
+      border-radius: 8px;
+      background: var(--theme-bg-accent-color);
+      color: var(--theme-content-color);
+
+    }
+
+    button:disabled {
+      background: var(--theme-bg-color);;
+    }
+
+    span {
+      margin-left: 15px;
     }
   }
 
