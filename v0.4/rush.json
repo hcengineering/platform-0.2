@@ -381,6 +381,10 @@
       "projectFolder": "platform/core"
     },
     {
+      "packageName": "@anticrm/domains",
+      "projectFolder": "platform/domains"
+    },
+    {
       "packageName": "@anticrm/ui",
       "projectFolder": "platform/ui"
     },
@@ -392,10 +396,6 @@
       "packageName": "@anticrm/sparkling-controls",
       "projectFolder": "sparkling/controls"
     },
-    // {
-    //   "packageName": "@anticrm/sparkling-components",
-    //   "projectFolder": "sparkling/components"
-    // },
     {
       "packageName": "@anticrm/plugin-login",
       "projectFolder": "plugins/login"
