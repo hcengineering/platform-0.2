@@ -264,20 +264,14 @@ function secureWrap<P extends any[], R> (f: (db: Db, ...args: P) => Promise<R>) 
 
 export const methods = {
   login: wrap(login),
-  // getAccountInfo: wrap(getAccountInfo),
   createAccount: wrap(createAccount),
   createWorkspace: wrap(createWorkspace),
   addWorkspace: wrap(addWorkspace),
-  // removeWorkspace: wrap(removeWorkspace),
-  // updateAccount: wrap(updateAccount)
 }
 
 export const secureMethods = {
   login: secureWrap(login),
-  // getAccountInfo: secureWrap(getAccountInfo),
   createAccount: secureWrap(createAccount),
   createWorkspace: secureWrap(createWorkspace),
   addWorkspace: secureWrap(addWorkspace),
-  // removeWorkspace: secureWrap(removeWorkspace),
-  // updateAccount: secureWrap(updateAccount)
 }
