@@ -13,18 +13,17 @@
 // limitations under the License.
 -->
 <script type="ts">
-  import { createEventDispatcher } from 'svelte'
-  import { Class, CORE_CLASS_MIXIN, Doc, Model, Ref } from '@anticrm/core'
-  import type { Space, VDoc } from '@anticrm/domains'
+  import { Class, CORE_CLASS_MIXIN, Doc, DocumentQuery, Model, Ref } from '@anticrm/core'
   import { CORE_CLASS_VDOC } from '@anticrm/domains'
+  import { QueryUpdater } from '@anticrm/platform-core'
+  import { createEventDispatcher } from 'svelte'
   import type { AttrModel, ClassModel } from '../..'
   import { liveQuery } from '../..'
   import { getCoreService, getEmptyModel, getPresentationService } from '../../utils'
   import Presenter from './presenters/Presenter.svelte'
-  import { QueryUpdater } from '@anticrm/platform-core'
 
-  export let _class: Ref<Class<VDoc>>
-  export let space: Space
+  export let _class: Ref<Class<Doc>>
+  export let query: DocumentQuery<Doc>
   export let editable = true
 
   const dispatch = createEventDispatcher()
@@ -56,12 +55,12 @@
     }
   }
 
-  let objects: VDoc[] = []
-  let lq: Promise<QueryUpdater<VDoc>>
-  $: lq = liveQuery<VDoc>(
+  let objects: Doc[] = []
+  let lq: Promise<QueryUpdater<Doc>>
+  $: lq = liveQuery<Doc>(
     lq,
     _class,
-    { _space: space._id as Ref<Space> },
+    query,
     (docs) => {
       objects = docs
     },
@@ -74,7 +73,7 @@
       }
     }
   )
-  function attrValue (doc: VDoc, key: AttrModel): any {
+  function attrValue (doc: Doc, key: AttrModel): any {
     if (doc._class !== key._class) {
       const mixinClass = coreModel.get(key._class)
       if (mixinClass._class === CORE_CLASS_MIXIN) {
@@ -114,7 +113,7 @@
 <div class="erp-table">
   <div class="thead">
     <div class="tr">
-      {#each attributes as attr (attr.key)}
+      {#each attributes as attr ({ _class: attr._class, key: attr.key })}
         <div class="th">{attr.label}</div>
       {/each}
     </div>
@@ -122,7 +121,7 @@
   <div class="tbody">
     {#each objects as object (object._id)}
       <div class="tr" on:click={() => dispatch('open', { _id: object._id, _class: _class })}>
-        {#each attributes as attr (attr.key)}
+        {#each attributes as attr ({ _class: attr._class, key: attr.key })}
           <div class="td">
             {#if attr.presenter}
               <Presenter is={attr.presenter} value={attrValue(object, attr)} attribute={attr} {editable} />
