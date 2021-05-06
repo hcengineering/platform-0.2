@@ -32,6 +32,7 @@ import ArrayPresenter from './components/internal/presenters/value/ArrayPresente
 import VDocCardPresenter from './components/internal/presenters/VDocCardPresenter.svelte'
 import CardPresenter from './components/internal/presenters/CardPresenter.svelte'
 import EnumPresenter from './components/internal/presenters/value/EnumPresenter.svelte'
+import BagOfPresenter from './components/internal/presenters/value/BagOfPresenter.svelte'
 
 /*!
  * Anticrm Platform™ Presentation Core Plugin
@@ -49,6 +50,7 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
   platform.setResource(ui.component.EnumPresenter, EnumPresenter)
   platform.setResource(ui.component.CheckboxPresenter, CheckboxEditor)
   platform.setResource(ui.component.ArrayPresenter, ArrayPresenter)
+  platform.setResource(ui.component.BagOfPresenter, BagOfPresenter)
 
   platform.setResource(ui.component.TablePresenter, TablePresenter)
   platform.setResource(ui.component.RefPresenter, RefPresenter)

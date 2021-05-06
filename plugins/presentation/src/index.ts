@@ -189,6 +189,7 @@ const presentationPlugin = plugin('presentation' as Plugin<PresentationService>,
     RefPresenter: '' as AnyComponent,
     TablePresenter: '' as AnyComponent,
     ArrayPresenter: '' as AnyComponent,
+    BagOfPresenter: '' as AnyComponent,
     VDocCardPresenter: '' as AnyComponent, // Some default card presenter
     CardPresenter: '' as AnyComponent // Card presenter
   }
