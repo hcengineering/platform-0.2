@@ -13,8 +13,9 @@
 // limitations under the License.
 //
 
-import { Component, PlatformError, Status, Severity, ParameterizedId } from '@anticrm/status'
+import { Component, Status, Severity, ParameterizedId } from '@anticrm/status'
 import { unknownError, Code } from './status'
+import { setPlatformStatus } from './event'
 
 import { IntlMessageFormat } from 'intl-messageformat'
 
@@ -33,11 +34,17 @@ export function addStringsLoader (component: Component, loader: Loader): void {
 
 async function loadTranslationsForComponent (component: Component): Promise<Record<string, IntlString> | Status> {
   const loader = loaders.get(component)
-  if (loader === undefined) return new Status(Severity.ERROR, Code.NoLoaderForStrings, { component })
+  if (loader === undefined) {
+    const status = new Status(Severity.ERROR, Code.NoLoaderForStrings, { component })
+    setPlatformStatus(status)
+    return status
+  }
   try {
     return await loader(locale)
   } catch (err) {
-    return unknownError(err)
+    const status = unknownError(err)
+    setPlatformStatus(status)
+    return status
   }
 }
 
@@ -52,7 +59,7 @@ async function getTranslation (message: IntlString): Promise<IntlString | Status
   if (messages instanceof Status) {
     return messages
   }
-  return messages[id]
+  return messages[id] ?? message
 }
 
 export async function translate<P extends Record<string, any>> (message: IntlString<P>, params: P): Promise<string> {
