@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { CORE_CLASS_OBJECT_SELECTOR, CORE_CLASS_TX_OPERATION, ObjectSelector, TxOperation, TxOperationKind } from '@anticrm/domains'
+// import { CORE_CLASS_OBJECT_SELECTOR, CORE_CLASS_TX_OPERATION, ObjectSelector, TxOperation, TxOperationKind } from '@anticrm/domains'
 import {
   AnyLayout, ArrayOf, Attribute, Class, Classifier, ClassifierKind, CORE_CLASS_ARRAY_OF, CORE_CLASS_CLASS,
   CORE_CLASS_INSTANCE_OF,
@@ -40,10 +40,6 @@ interface Proxy {
   __layout: Record<string, unknown>
 }
 
-export function isValidSelector (selector: ObjectSelector[]): boolean {
-  return selector.length > 0
-}
-
 export interface AttributeMatch {
   name: string
   attr: Attribute
@@ -54,7 +50,7 @@ export interface AttributeMatch {
 /**
  * Model is a storage for Class descriptors and useful functions to match class instances to queries and apply values to them based on changes.
  */
-export class Model implements Storage {
+export class Model {
   private readonly domain: string
   private readonly objects = new Map<Ref<Doc>, Doc>()
 
@@ -362,68 +358,6 @@ export class Model implements Storage {
     return l
   }
 
-  /**
-   * Perform update of document attributes
-   * @param doc - document to update
-   * @param operations - define a set of operations to update for document.
-   */
-  public updateDocument<T extends Obj> (doc: T, operations: TxOperation[]): T {
-    for (const op of operations) {
-      // We need to find embedded object first
-      const match = this.matchSelector(doc._class, doc, op.selector)
-      if (match.match) {
-        switch (op.kind) {
-          case TxOperationKind.Set:
-            this.assign(this.getLayout(match.doc), match.doc._class, op._attributes)
-            break
-          case TxOperationKind.Push:
-            if (match.attrMatch !== undefined) {
-              const { attr, key } = match.attrMatch
-
-              const l = (match.doc as unknown) as AnyLayout
-              switch (attr.type._class) {
-                case CORE_CLASS_ARRAY_OF: {
-                  const attrClass = this.attributeClass((attr.type as ArrayOf).of)
-                  if (attrClass === undefined) {
-                    throw new Error(`Invalid attribute type/class: ${String(attr.type)}`)
-                  }
-                  l[key] = this.pushArrayValue(l[key], attrClass, op._attributes)
-                  break
-                }
-
-                default:
-                  throw new Error(`Invalid attribute type: ${String(attr.type)}`)
-              }
-            }
-            break
-          case TxOperationKind.Pull:
-            if (match.attrMatch !== undefined) {
-              const { attr, key } = match.attrMatch
-
-              const l = (match.parent as unknown) as AnyLayout
-
-              switch (attr.type._class) {
-                case CORE_CLASS_ARRAY_OF: {
-                  const parentArray = (l[key] as unknown) as Obj[]
-                  // We assume it will be found.
-                  parentArray.splice(parentArray.indexOf(match.value), 1)
-                  break
-                }
-                case CORE_CLASS_INSTANCE_OF: {
-                  delete (l as any)[key] // eslint-disable-line @typescript-eslint/no-dynamic-delete
-                  break
-                }
-              }
-            }
-            break
-        }
-      } else {
-        throw new Error(`failed to object by query:${String(op.selector)}`)
-      }
-    }
-    return doc
-  }
-
   public mixinDocument<E extends Obj, T extends Obj> (doc: E, clazz: Ref<Mixin<T>>, values: Partial<Omit<T, keyof E>>): void {
     Model.includeMixin(doc, clazz)
     this.assign(this.getLayout(doc), clazz as Ref<Class<Obj>>, (values as unknown) as AnyLayout)
@@ -618,26 +552,11 @@ export class Model implements Storage {
 
   // Q U E R Y
 
-  findSync<T extends Doc> (clazz: Ref<Class<Doc>>, query: DocumentQuery<T>, options?: FindOptions<T>): T[] {
+  find<T extends Doc> (clazz: Ref<Class<Doc>>, query: DocumentQuery<T>, options?: FindOptions<T>): T[] {
     const { query: realQuery } = this.createQuery(clazz, query)
     const byClass = this.objectsOfClass(realQuery._class as Ref<Class<Doc>>)
 
     return this.findAll(byClass, clazz, realQuery as unknown as AnyLayout, options) as T[]
-  }
-
-  async find<T extends Doc> (clazz: Ref<Class<T>>, query: DocumentQuery<T>, options?: FindOptions<T>): Promise<T[]> {
-    const result = this.findSync(clazz, query, options)
-
-    if (options?.countCallback !== undefined) {
-      options.countCallback(options?.skip ?? 0, options?.limit ?? 0, result.length)
-    }
-
-    return await Promise.resolve(result)
-  }
-
-  async findOne<T extends Doc> (clazz: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined> {
-    const result = await Promise.resolve(this.findSync(clazz, query, { limit: 1 }))
-    return result.length === 0 ? undefined : result[0]
   }
 
   /**
@@ -792,76 +711,6 @@ export class Model implements Storage {
 
   // S T O R A G E
 
-  async store (ctx: TxContext, doc: Doc): Promise<void> {
-    await Promise.resolve(this.add(doc))
-  }
-
-  push<T extends Obj> (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: DocumentValue<T>): void {
-    const txOp: TxOperation = {
-      _class: CORE_CLASS_TX_OPERATION,
-      kind: TxOperationKind.Push,
-      _attributes: attributes,
-      selector: [{ _class: CORE_CLASS_OBJECT_SELECTOR, key: attribute }]
-    }
-    this.updateDocument(this.get(_id), [txOp])
-  }
-
-  pull<T extends Obj> (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, attribute: string, attributes: DocumentValue<T>): void {
-    const txOp: TxOperation = {
-      _class: CORE_CLASS_TX_OPERATION,
-      kind: TxOperationKind.Pull,
-      _attributes: attributes,
-      selector: [{ _class: CORE_CLASS_OBJECT_SELECTOR, key: attribute, pattern: attributes }]
-    }
-    this.updateDocument(this.get(_id), [txOp])
-  }
-
-  updateDocumentSet<T extends Obj> (doc: T, _attributes: Partial<DocumentValue<T>>): T {
-    const txOp: TxOperation = { _class: CORE_CLASS_TX_OPERATION, kind: TxOperationKind.Set, _attributes: _attributes as unknown as AnyLayout }
-    return this.updateDocument(doc, [txOp])
-  }
-
-  updateDocumentPush<P extends Doc, T extends Obj> (doc: P, _attribute: string, _attributes: DocumentValue<T>): P {
-    const txOp: TxOperation = {
-      _class: CORE_CLASS_TX_OPERATION,
-      kind: TxOperationKind.Push,
-      _attributes: _attributes as unknown as AnyLayout,
-      selector: [{ _class: CORE_CLASS_OBJECT_SELECTOR, key: _attribute }]
-    }
-    return this.updateDocument<P>(doc, [txOp])
-  }
-
-  updateDocumentPull<P extends Doc, T extends Obj> (doc: P, _attribute: string, _attributes: DocumentQuery<T>): P {
-    const txOp: TxOperation = {
-      _class: CORE_CLASS_TX_OPERATION,
-      kind: TxOperationKind.Pull,
-      selector: [{ _class: CORE_CLASS_OBJECT_SELECTOR, key: _attribute, pattern: _attributes as unknown as AnyLayout }]
-    }
-    return this.updateDocument<P>(doc, [txOp])
-  }
-
-  async update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, operations: TxOperation[]): Promise<void> {
-    await Promise.resolve(this.updateDocument(this.get(_id), operations))
-  }
-
-  async remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<void> {
-    await Promise.resolve(this.removeDocument(this.get(_id)))
-  }
-
-  public removeDocument<T extends Doc> (doc: T): T {
-    this.objects.delete(doc._id)
-    if (this.byClass !== undefined) {
-      const objs = this.byClass.get(doc._class)?.filter((e) => e._id !== doc._id)
-      if (objs !== undefined) {
-        this.byClass.set(doc._class, objs)
-      } else {
-        // No items of class, so lets' remove it
-        this.byClass.delete(doc._class)
-      }
-    }
-    return doc
-  }
-
   // Q U E R Y  P R O C E S S I N G
   /**
    * Matches query with document
@@ -915,58 +764,6 @@ export class Model implements Storage {
     return Object.keys(sort).some(x => oKeys.has(x))
   }
 
-  /**
-   * Perform matching of document with query.
-   * {fullMatch} is used as true to match against array with passing objects, it will match for all values.
-   * If used as false, it will find at least one match for object with array value.
-   */
-  private matchSelector (_class: Ref<Class<Obj>>, doc: Obj, selector?: ObjectSelector[]): { match: boolean, value?: any, attrMatch?: AttributeMatch, doc: Obj, parent: Obj } {
-    if ((selector !== undefined) && isValidSelector(selector)) {
-      let current = doc
-      let parent = doc
-      let currentClass = _class
-
-      for (let segmId = 0; segmId < selector.length; segmId++) {
-        const segm = selector[segmId]
-        if (segm.key === '') {
-          throw new Error('Object selector field should be specified')
-        }
-        const attr = this.classAttribute(currentClass, segm.key)
-
-        if (segm.pattern === undefined) {
-          if (segmId === selector.length - 1) {
-            // Last one, we could omit check, since it will be for push operation.
-            return { match: true, attrMatch: attr, doc: current, parent }
-          }
-          throw new Error(`Pattern field for middle selector should be specified ${String(selector)}`)
-        }
-        const attrClass = this.attributeClass(attr.attr.type)
-
-        // If this is our proxy, we should unwrap it.
-        const cany = (current as any)
-        const docValue = (cany.__layout !== undefined ? cany.__layout : cany)[attr.key]
-        const res = this.matchValue(attrClass, docValue, segm.pattern, false)
-        if (res === undefined) {
-          throw new Error('failed to match embedded object of value')
-        }
-        if ((attrClass !== undefined) && this.is(attrClass, CORE_CLASS_OBJ)) {
-          parent = current
-          current = res.value as Obj
-          currentClass = attrClass
-        }
-        if (segmId === selector.length - 1) {
-          return { match: true, value: res.value, doc: current, attrMatch: attr, parent }
-        } else {
-          // If attribute class is based on doc.
-          if ((attrClass !== undefined) && !this.is(attrClass, CORE_CLASS_OBJ)) {
-            throw new Error(`failed to match embedded object of value for class ${attrClass} of value ${String(current)}`)
-          }
-        }
-      }
-    }
-    return { match: true, doc, parent: doc }
-  }
-
   private matchObject<T extends Obj> (_class: Ref<Class<T>>, doc: T, query: DocumentQuery<T>, fullMatch = false): boolean {
     if ((doc as any).__layout !== undefined) {
       // This is our proxy, we should unwrap it.
@@ -1011,7 +808,7 @@ export class Model implements Storage {
     return undefined
   }
 
-  private matchValue<T extends Obj> (fieldClass: Ref<Class<T>> | undefined, docValue: unknown, value: unknown, fullMatch: boolean): { result: boolean, value?: any } {
+  public matchValue<T extends Obj> (fieldClass: Ref<Class<T>> | undefined, docValue: unknown, value: unknown, fullMatch: boolean): { result: boolean, value?: any } {
     const objDocValue = Object(docValue)
     if (objDocValue !== docValue) {
       // Check if value is primitive, so we will just compare
