@@ -15,9 +15,13 @@
 
 /* eslint-env jest */
 
-import { Model } from '@anticrm/core'
-import { data, taskIds } from '@anticrm/core/src/__tests__/tasks'
-import { CORE_CLASS_OBJECT_SELECTOR, txBuilder, TxOperationKind, CORE_CLASS_TX_OPERATION } from '../index'
+import { AnyLayout, Class, Doc, DocumentQuery, DocumentValue, Model, Property, PropertyType, Ref, StringProperty, txContext } from '@anticrm/core'
+import { createSubtask, createTask, data, doc1, SubTask, Task, taskIds } from '@anticrm/core/src/__tests__/tasks'
+import { CORE_CLASS_OBJECT_SELECTOR, CORE_CLASS_TX_OPERATION, ObjectTx, Space, txBuilder, TxOperation, TxOperationKind } from '../index'
+import { ModelStorage } from '../model_storage'
+import { updateDocument } from '../tx/modeltx'
+import { create } from '../tx/operations'
+import { push, updateDocumentPull, updateDocumentPush, updateDocumentSet } from './model_test_utils'
 
 describe('core tests', () => {
   const model = new Model('vdocs')
@@ -107,5 +111,223 @@ describe('core tests', () => {
         description: 'someValue'
       }
     })
+  })
+  it('apply string value', () => {
+    const clone = model.createDocument(taskIds.class.Task, doc1)
+    updateDocumentSet(model, clone, { name: 'changed' as StringProperty })
+
+    expect(clone.name).toEqual('changed')
+  })
+  it('apply number value', () => {
+    const clone = model.createDocument(taskIds.class.Task, doc1)
+    updateDocumentSet(model, clone, { rate: 10 as Property<number, number> })
+
+    expect(clone.rate).toEqual(10)
+  })
+
+  it('apply array value', () => {
+    const clone = model.createDocument(taskIds.class.Task, doc1)
+    updateDocumentSet(model, clone, { lists: ['A' as StringProperty, 'B' as StringProperty] })
+
+    expect(clone.lists).toEqual(['A', 'B'])
+  })
+
+  it('apply task value', () => {
+    const clone = model.createDocument(taskIds.class.Task, doc1)
+    clone.mainTask = undefined
+    updateDocumentSet(model, clone, { mainTask: createSubtask('subtask4') })
+
+    expect(clone.mainTask).toBeDefined()
+    expect((clone.mainTask as never as SubTask).name).toEqual('subtask4')
+  })
+
+  it('push subtask value', () => {
+    const clone = model.createDocument(taskIds.class.Task, doc1)
+    updateDocumentPush<Task, SubTask>(model, clone, 'tasks' as StringProperty, createSubtask('subtask3', 34))
+
+    expect(clone.tasks?.length).toEqual(3)
+  })
+
+  it('push a new subtask value', () => {
+    const clone = model.createDocument(taskIds.class.Task, doc1)
+    const txOp: TxOperation = {
+      _class: CORE_CLASS_TX_OPERATION,
+      kind: TxOperationKind.Set,
+      _attributes: {
+        rate: 44 as Property<number, number>
+      },
+      selector: [{ _class: CORE_CLASS_OBJECT_SELECTOR, key: 'tasks', pattern: { name: 'subtask1' } }]
+    }
+    const cloneResult = updateDocument(model, clone, [txOp])
+
+    expect(cloneResult.tasks?.[0].rate).toEqual(44)
+  })
+
+  it('push a new comment to subtask', () => {
+    const clone = model.createDocument(taskIds.class.Task, doc1)
+    const txOp: TxOperation = {
+      _class: CORE_CLASS_TX_OPERATION,
+      kind: TxOperationKind.Push,
+      selector: [{
+        _class: CORE_CLASS_OBJECT_SELECTOR,
+        key: 'tasks',
+        pattern: { name: 'subtask1' }
+      }, { _class: CORE_CLASS_OBJECT_SELECTOR, key: 'comments' }],
+      _attributes: {
+        message: 'my-msg' as StringProperty
+      }
+    }
+    const cloneResult = updateDocument(model, clone, [txOp])
+
+    expect(cloneResult.tasks?.[0].comments?.length).toEqual(1)
+  })
+
+  it('remove item from array', () => {
+    const clone = model.createDocument(taskIds.class.Task, doc1)
+    const cloneResult = updateDocumentPull<Task, SubTask>(model, clone, 'tasks', { name: 'subtask1' })
+
+    expect(cloneResult.tasks?.length).toEqual(1)
+    expect(cloneResult.tasks?.[0].name).toEqual('subtask2')
+  })
+
+  it('remove item from instance', () => {
+    const clone = model.createDocument(taskIds.class.Task, doc1)
+    const cloneResult = updateDocumentPull<Task, SubTask>(model, clone, 'mainTask', {})
+
+    expect(cloneResult.mainTask).toEqual(undefined)
+  })
+
+  it('rejects on storing existing doc', async () => {
+    const model = new Model('vdocs')
+    const modelStore = new ModelStorage(model)
+    model.loadModel(data)
+
+    const doc = model.createDocument(taskIds.class.Task, createTask('', 0, ''))
+
+    const tx = create(model, 'vasya', doc._class, doc) as ObjectTx
+    await modelStore.tx(txContext(), tx)
+    try {
+      await modelStore.tx(txContext(), tx)
+      expect(model).toBeUndefined()
+    } catch (err) {
+      expect(err.message).toEqual('document added already ' + tx._objectId)
+    }
+  })
+
+  it('rejects on removing missing doc', async () => {
+    const model = new Model('vdocs')
+    model.loadModel(data)
+
+    try {
+      model.del('id' as Ref<Doc>)
+      expect(model).toBeUndefined()
+    } catch (err) {
+      expect(err.message).toEqual('document is not found id')
+    }
+  })
+  it('throws on pushing to missing object', () => {
+    const model = new Model('vdocs')
+    model.loadModel(data)
+
+    const doc = model.createDocument<Task>(taskIds.class.Task, createTask('', 0, ''))
+
+    const txOp: TxOperation = {
+      _class: CORE_CLASS_TX_OPERATION,
+      kind: TxOperationKind.Set,
+      _attributes: (createSubtask('subtask3', 34) as unknown) as AnyLayout,
+      selector: [{ _class: CORE_CLASS_OBJECT_SELECTOR, key: 'tasks', pattern: { name: 'Not exist' } }]
+    }
+    expect(
+      () => updateDocument(model,
+        doc,
+        [txOp])
+    ).toThrowError()
+  })
+
+  it('throws on pushing to missing attribute', () => {
+    const model = new Model('vdocs')
+    model.loadModel(data)
+
+    const doc = model.createDocument<Task>(taskIds.class.Task, createTask('', 0, ''))
+
+    expect(
+      () => updateDocumentPush<Task, SubTask>(model,
+        doc,
+        'Not exist',
+        createSubtask('subtask3', 34)
+      )
+    ).toThrowError()
+  })
+
+  it('document query specification test', () => {
+    const q1: DocumentQuery<Space> = {
+      name: 's1',
+      users: { userId: 'qwe' }
+    }
+
+    const q2: DocumentQuery<Space> = {
+      name: 's1',
+      users: [{ userId: 'qwe' }]
+    }
+    const t1: DocumentValue<Task> = {
+      description: '',
+      lists: [],
+      name: '',
+      tasks: [
+        { name: '' }
+      ]
+    }
+    expect(q1).toBeDefined()
+    expect(q2).toBeDefined()
+    expect(t1).toBeDefined()
+  })
+})
+
+describe('Model storage', () => {
+  it('pushes attributes', async () => {
+    const model = new Model('vdocs')
+    model.loadModel(data)
+
+    const doc = model.createDocument(taskIds.class.Task, doc1)
+    model.add(doc)
+
+    const existingSubtasks = [...doc.tasks ?? []]
+    const newSubtask = createSubtask('subtask3', 34)
+    const expectedDoc = {
+      ...doc,
+      tasks: [...existingSubtasks, { ...newSubtask, _class: taskIds.class.Subtask }]
+    }
+
+    push<SubTask>(model,
+      '' as Ref<Class<Doc>>,
+      doc._id,
+      'tasks',
+      newSubtask
+    )
+
+    const updatedDoc = model.get(doc._id) as Task
+
+    expect(updatedDoc).toEqual(expectedDoc)
+  })
+
+  it('updates doc', async () => {
+    const model = new Model('vdocs')
+    model.loadModel(data)
+
+    const doc = model.createDocument(taskIds.class.Task, doc1)
+    model.add(doc)
+
+    const newName = 'your-space'
+    const expectedDoc = {
+      ...doc,
+      name: newName
+    }
+
+    const txOp: TxOperation = { _class: CORE_CLASS_TX_OPERATION, kind: TxOperationKind.Set, _attributes: { name: newName as PropertyType } }
+    updateDocument(model, model.get(doc._id), [txOp])
+
+    const updatedDoc = model.get(doc._id) as Task
+
+    expect(updatedDoc).toEqual(expectedDoc)
   })
 })

@@ -221,12 +221,12 @@ export interface OperationProtocol {
    * Perform creation of new document and store it into storage.
    * Object ID will be automatically generated and assigned to object.
    */
-  create: <T extends Doc>(_class: Ref<Class<T>>, values: DocumentValue<T>) => Promise<T>
+  create: <T extends Doc>(_class: Ref<Class<T>>, values: DocumentValue<T>) => Promise<void>
 
   /**
    * Perform update of document properties.
    */
-  update: <T extends Doc>(doc: T, value: Partial<Omit<T, keyof Doc>>) => Promise<T>
+  update: <T extends Doc>(doc: T, value: Partial<Omit<T, keyof Doc>>) => Promise<void>
 
   /**
    * Perform update of document/embedded document properties using a builder pattern.
@@ -235,12 +235,12 @@ export interface OperationProtocol {
    *
    * push and pull are applicable only for array attributes.
    */
-  updateWith: <T extends Doc>(doc: T, builder: (s: TxBuilder<T>) => TxOperation | TxOperation[]) => Promise<T>
+  updateWith: <T extends Doc>(doc: T, builder: (s: TxBuilder<T>) => TxOperation | TxOperation[]) => Promise<void>
 
   /**
    * Perform remove of object.
    */
-  remove: <T extends Doc>(doc: T) => Promise<T>
+  remove: <T extends Doc>(doc: T) => Promise<void>
 }
 
 // S P A C E

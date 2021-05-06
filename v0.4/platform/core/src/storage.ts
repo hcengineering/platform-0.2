@@ -2,7 +2,6 @@
  * Operation direction, is it came from server or it is own operation.
  */
 import { Class, DateProperty, Doc, Emb, Obj, Ref, StringProperty } from './classes'
-import { Space, TxOperation, VDoc } from '@anticrm/domains'
 
 export enum TxContextSource {
   Client, // A pure client operation
@@ -35,11 +34,11 @@ export function txContext (source: TxContextSource = TxContextSource.Client, net
   return doc
 }
 
-export interface Storage {
-  store: (ctx: TxContext, doc: Doc) => Promise<void>
-  update: (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, operations: TxOperation[]) => Promise<void>
-  remove: (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>) => Promise<void>
+export interface DomainIndex {
+  tx: (ctx: TxContext, tx: Tx) => Promise<any>
+}
 
+export interface Storage extends DomainIndex {
   find: <T extends Doc>(_class: Ref<Class<T>>, query: DocumentQuery<T>, options?: FindOptions<T>) => Promise<T[]>
   findOne: <T extends Doc>(_class: Ref<Class<T>>, query: DocumentQuery<T>) => Promise<T | undefined>
 }
@@ -51,10 +50,6 @@ export interface Storage {
 export interface Tx extends Doc {
   _date: DateProperty
   _user: StringProperty
-}
-
-export interface DomainIndex {
-  tx: (ctx: TxContext, tx: Tx) => Promise<any>
 }
 
 export interface RegExpression {
@@ -139,10 +134,10 @@ export interface CoreProtocol extends DocumentProtocol {
 
   /**
    * Generate a sequence, short object reference.
-   * @param _space
+   * @param domain - string domain identifier.
    * @return a generated reference Id,
    */
-  genRefId: (_space: Ref<Space>) => Promise<Ref<VDoc>>
+  genRefId: (domain: string) => Promise<Ref<Doc>>
 }
 
 export class TxProcessor {
@@ -206,18 +201,8 @@ class CombineStorage implements Storage {
     }))
   }
 
-  async remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<void> {
-    await Promise.all(this.storages.map(async (s) => {
-      await s.remove(ctx, _class, _id)
-    }))
-  }
-
-  async store (ctx: TxContext, doc: Doc): Promise<void> {
-    await Promise.all(this.storages.map(async (s) => { await s.store(ctx, doc) }))
-  }
-
-  async update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, operations: TxOperation[]): Promise<void> {
-    await Promise.all(this.storages.map(async (s) => { await s.update(ctx, _class, _id, operations) }))
+  async tx (ctx: TxContext, tx: Tx): Promise<void> {
+    await Promise.all(this.storages.map(async (s) => { await s.tx(ctx, tx) }))
   }
 }
 

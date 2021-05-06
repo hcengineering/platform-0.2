@@ -18,15 +18,15 @@ import {
   InstanceOf, Model, Obj, Ref, Storage, Tx, TxContext
 } from '@anticrm/core'
 import {
+  MessageMarkType, parseMessage, ReferenceMark, traverseMarks, traverseMessage
+} from '@anticrm/text'
+import { deepEqual } from 'fast-equals'
+import {
   CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_REFERENCE, CORE_CLASS_UPDATE_TX, CreateTx, DeleteTx, Reference,
   UpdateTx
 } from '..'
-
-import { deepEqual } from 'fast-equals'
-
-import {
-  MessageMarkType, parseMessage, ReferenceMark, traverseMarks, traverseMessage
-} from '@anticrm/text'
+import { updateDocument } from '../tx/modeltx'
+import { create, remove } from '../tx/operations'
 
 interface ClassKey { key: string, _class: Ref<Class<Emb>> }
 
@@ -146,19 +146,19 @@ export class ReferenceIndex implements DomainIndex {
     return backlinks
   }
 
-  private async onCreate (ctx: TxContext, create: CreateTx): Promise<any> {
-    const refereces = this.collect(create._objectClass, create._objectId, create.object)
+  private async onCreate (ctx: TxContext, tx: CreateTx): Promise<any> {
+    const refereces = this.collect(tx._objectClass, tx._objectId, tx.object)
     if (refereces.length === 0) {
       return
     }
     return await Promise.all(refereces.map(async (d) => {
-      await this.storage.store(ctx, d)
+      await this.storage.tx(ctx, create<Reference>(this.modelDb, '', d._class as Ref<Class<Reference>>, d))
     }))
   }
 
   private async onUpdateTx (ctx: TxContext, update: UpdateTx): Promise<any> {
     const obj = await this.storage.findOne(update._objectClass, { _id: update._objectId }) as Doc
-    this.modelDb.updateDocument(this.modelDb.as(obj, update._objectClass), update.operations)
+    updateDocument(this.modelDb, this.modelDb.as(obj, update._objectClass), update.operations)
     if (obj === undefined) {
       throw new Error('object not found')
     }
@@ -195,10 +195,10 @@ export class ReferenceIndex implements DomainIndex {
     }
     const additions = newRefs.filter(e => !existing.includes(e))
     const stored = Promise.all(additions.map(async (d) => {
-      await this.storage.store(ctx, d)
+      await this.storage.tx(ctx, create<Reference>(this.modelDb, '', d._class as Ref<Class<Reference>>, d))
     }))
     const deleted = Promise.all(deletes.map(async (d) => {
-      await this.storage.remove(ctx, d._class, d._id)
+      await this.storage.tx(ctx, remove<Reference>(this.modelDb, '', d))
     }))
     await Promise.all([stored, deleted])
   }

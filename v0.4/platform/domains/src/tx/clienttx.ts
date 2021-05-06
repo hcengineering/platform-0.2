@@ -1,6 +1,4 @@
 import { Class, Doc, DocumentQuery, FindOptions, Ref, Storage, StringProperty, Tx, TxContext } from '@anticrm/core'
-import { newCreateTx, newDeleteTx, newUpdateTx } from './tx'
-import { TxOperation } from '@anticrm/domains'
 
 const systemUser = 'system' as StringProperty
 
@@ -18,19 +16,10 @@ export class ClientTxStorage implements Storage {
     ctx.clientTx.push(tx)
   }
 
-  async store (ctx: TxContext, doc: Doc): Promise<void> {
-    this.addTx(ctx, newCreateTx(doc, systemUser))
-    await this.delegateStorage.store(ctx, doc)
-  }
-
-  async update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, operations: TxOperation[]): Promise<void> {
-    this.addTx(ctx, newUpdateTx(_class, _id, operations, systemUser))
-    await this.delegateStorage.update(ctx, _class, _id, operations)
-  }
-
-  async remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<void> {
-    this.addTx(ctx, newDeleteTx(_class, _id, systemUser))
-    await this.delegateStorage.remove(ctx, _class, _id)
+  async tx (ctx: TxContext, tx: Tx): Promise<void> {
+    tx._user = systemUser
+    this.addTx(ctx, tx)
+    await this.delegateStorage.tx(ctx, tx)
   }
 
   async find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>, options?: FindOptions<T>): Promise<T[]> {
