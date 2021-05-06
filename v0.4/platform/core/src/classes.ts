@@ -17,15 +17,14 @@ export type PrimitiveType = number | string | boolean | undefined
 
 export type Property<P extends PrimitiveType, T> = P & { __property: T }
 export type Ref<T extends Doc> = string & { __ref: T }
-// type MethodType = (...args: any[]) => any
-// export type Method<T extends MethodType> = T & { __method: T }
 
 export interface Obj {
   _class: Ref<Class<Obj>>
-  _mixins?: Ref<Mixin<Obj>>[]
+  _mixins?: Array<Ref<Mixin<Obj>>>
 }
 
 export interface Emb extends Obj {
+  _class: Ref<Class<Emb>>
 }
 
 export interface Doc extends Obj {
@@ -34,10 +33,10 @@ export interface Doc extends Obj {
 }
 
 export type PropertyType = Property<PrimitiveType, any>
-  | { __ref: Doc }
-  | Emb
-  | PropertyType[]
-  | { [key: string]: PropertyType }
+| Ref<Doc>
+| Emb
+| PropertyType[]
+| { [key: string]: PropertyType }
 
 export type StringProperty = Property<string, string>
 export type BooleanProperty = Property<boolean, boolean>
@@ -136,9 +135,12 @@ export const CORE_CLASS_OBJ = 'class:core.Obj' as Ref<Class<Obj>>
 export const CORE_CLASS_DOC = 'class:core.Doc' as Ref<Class<Doc>>
 export const CORE_CLASS_EMB = 'class:core.Emb' as Ref<Class<Emb>>
 export const CORE_CLASS_CLASS = 'class:core.Class' as Ref<Class<Class<Obj>>>
+export const CORE_CLASS_MIXIN = 'class:core.Mixin' as Ref<Class<Mixin<Obj>>>
 export const CORE_CLASS_ENUM = 'class:core.Enum' as Ref<Class<Enum<any>>>
 
 export const CORE_CLASS_STRING = 'class:core.String' as Ref<Class<Type>>
+export const CORE_CLASS_NUMBER = 'class:core.Number' as Ref<Class<Type>>
+export const CORE_CLASS_BOOLEAN = 'class:core.Boolean' as Ref<Class<Type>>
 export const CORE_CLASS_ATTRIBUTE = 'class:core.Attribute' as Ref<Class<Attribute>>
 export const CORE_CLASS_TYPE = 'class:core.Type' as Ref<Class<Type>>
 

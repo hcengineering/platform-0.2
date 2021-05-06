@@ -22,8 +22,16 @@ describe('storage', () => {
   describe('TxProcessor', () => {
     it('processes properly', async () => {
       const idxs = [
-        { tx: jest.fn((_ctx: TxContext, _tx: Tx) => Promise.resolve(1)) },
-        { tx: jest.fn((_ctx: TxContext, _tx: Tx) => Promise.resolve(2)) }
+        {
+          tx: jest.fn(async (_ctx: TxContext, _tx: Tx): Promise<number> => {
+            return await Promise.resolve(1)
+          })
+        },
+        {
+          tx: jest.fn(async (_ctx: TxContext, _tx: Tx): Promise<number> => {
+            return await Promise.resolve(2)
+          })
+        }
       ]
       const ctx = txContext()
       const tx = {
@@ -33,14 +41,12 @@ describe('storage', () => {
         _user: Object.assign('user', { __property: 'user' })
       }
 
-      const res = await new TxProcessor(idxs).process(ctx, tx)
+      await new TxProcessor(idxs).process(ctx, tx)
 
       idxs.forEach(idx => {
         expect(idx.tx).toBeCalledTimes(1)
         expect(idx.tx).toBeCalledWith(ctx, tx)
       })
-
-      expect(res).toEqual([1, 2])
     })
   })
 })
