@@ -365,10 +365,6 @@
       "projectFolder": "platform/status"
     },
     {
-      "packageName": "@anticrm/account",
-      "projectFolder": "platform/account"
-    },
-    {
       "packageName": "@anticrm/platform",
       "projectFolder": "platform/platform"
     },
