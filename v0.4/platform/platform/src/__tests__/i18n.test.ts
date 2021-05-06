@@ -13,10 +13,12 @@
 // limitations under the License.
 //
 
-import { Component } from '@anticrm/status'
+import { Component, Severity, Status } from '@anticrm/status'
 
 import { addStringsLoader, IntlString, translate } from '../i18n'
 import strings, { TestComponent } from './strings'
+import { Code } from '../status'
+import { PlatformEvent, addEventListener } from '../event'
 
 describe('i18n', () => {
   it('should translate string', async () => {
@@ -38,21 +40,47 @@ describe('i18n', () => {
     expect(translated).toBe('Loading plugin <b>xxx</b>...')
   })
 
-  it('should return status when no loader', async () => {
-    const translated = translate('component.id' as IntlString, {})
-    return await expect(translated).rejects.toThrowError("ERROR: platform.NoLoaderForStrings")
+  it('should emmit status when no loader', async () => {
+    const component = 'component'
+    const message = `${component}.id`
+
+    const checkStatus = new Status(Severity.ERROR, Code.NoLoaderForStrings, { component })
+    const eventListener = async (event: string, data: any): Promise<void> => {
+      await expect(data).toEqual(checkStatus)
+    }
+    addEventListener(PlatformEvent, eventListener)
+    await translate(message as IntlString, {})
   })
 
-  it('should return status when bad loader', async () => {
+  it('should emmit status when bad loader', async () => {
+    const errorMessage = 'bad loader'
     addStringsLoader('error-loader' as Component, (locale: string) => {
-      throw new Error('bad loader')
+      throw new Error(errorMessage)
     })
-    const translated = translate('error-loader.id' as IntlString, {})
-    return expect(translated).rejects.toThrowError("ERROR: platform.UnknownError")
+    const component = 'error-loader'
+    const message = `${component}.id`
+
+    const checkStatus = new Status(Severity.ERROR, Code.UnknownError, { message: errorMessage })
+    const eventListener = async (event: string, data: any): Promise<void> => {
+      await expect(data).toEqual(checkStatus)
+    }
+    addEventListener(PlatformEvent, eventListener)
+    await translate(message as IntlString, {})
   })
 
   it('should cache error', async () => {
-    const translated = translate('error-loader.id' as IntlString, {})
-    return await expect(translated).rejects.toThrowError("ERROR: platform.UnknownError")
+    const component = 'error-loader'
+    const message = `${component}.id`
+    let status: Status | undefined
+    const eventListener = async (event: string, data: any): Promise<void> => {
+      if (status === undefined) {
+        status = data
+        return
+      }
+      await expect(data).toBe(status)
+    }
+    addEventListener(PlatformEvent, eventListener)
+    await translate(message as IntlString, {})
+    await translate(message as IntlString, {})
   })
 })
