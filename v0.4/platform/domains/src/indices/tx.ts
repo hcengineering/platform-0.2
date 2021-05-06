@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { DomainIndex, Storage, TxContext, Tx } from '@anticrm/core'
+import { DomainIndex, Storage, Tx, TxContext } from '@anticrm/core'
 
 export class TxIndex implements DomainIndex {
   private readonly storage: Storage
@@ -22,7 +22,7 @@ export class TxIndex implements DomainIndex {
     this.storage = storage
   }
 
-  tx (ctx: TxContext, tx: Tx): Promise<any> {
-    return this.storage.store(ctx, tx)
+  async tx (ctx: TxContext, tx: Tx): Promise<any> {
+    await this.storage.store(ctx, tx)
   }
 }
