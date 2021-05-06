@@ -29,7 +29,6 @@
     "mongodb": "~3.6.6",
     "@anticrm/status": "~0.2.0",
     "@anticrm/rpc": "~0.2.0",
-    "jwt-simple": "~0.5.6",
-    "@anticrm/account": "~0.2.0"
+    "jwt-simple": "~0.5.6"
   }
 }

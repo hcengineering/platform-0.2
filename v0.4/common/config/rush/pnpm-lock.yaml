@@ -1,7 +1,7 @@
 dependencies:
+  '@anticrm/account': 0.2.0
   '@babel/eslint-parser': 7.13.14_eslint@7.24.0
   '@babel/runtime': 7.13.10
-  '@rush-temp/account': file:projects/account.tgz_@typescript-eslint+parser@4.22.0
   '@rush-temp/core': file:projects/core.tgz
   '@rush-temp/domains': file:projects/domains.tgz
   '@rush-temp/platform': file:projects/platform.tgz_@typescript-eslint+parser@4.22.0
@@ -53,6 +53,16 @@ dependencies:
   webpack-dev-server: 3.11.2_webpack-cli@4.6.0+webpack@5.32.0
 lockfileVersion: 5.2
 packages:
+  /@anticrm/account/0.2.0:
+    dependencies:
+      '@anticrm/status': 0.2.0
+    dev: false
+    resolution:
+      integrity: sha512-+wYcW4P/2jirqTtaXi51c1jN1nL2ZoXeHWNP5PBwxMN5+SPDR+S++E38oZ6CAaWDNdJT3zqdq/can03qnwemDw==
+  /@anticrm/status/0.2.0:
+    dev: false
+    resolution:
+      integrity: sha512-gMTDUos+r/MkE4v6siXm4ylUOII4VI8I39d+xaQ6maUInlsLpbBOV8qpZ5bZ4gIplzqhh4ICLvwLjArjd2MSsg==
   /@babel/code-frame/7.12.11:
     dependencies:
       '@babel/highlight': 7.13.10
@@ -10410,21 +10420,6 @@ packages:
       commander: 2.20.3
     resolution:
       integrity: sha512-DUOKC/IhbkdLKKiV89gw9DUauTV8U/8yJl1sjf6MtDmzevLKOF2duNJ495S3MFVjqZarr+qNGCPbkg4mu4PpLw==
-  file:projects/account.tgz_@typescript-eslint+parser@4.22.0:
-    dependencies:
-      '@microsoft/api-extractor': 7.13.5
-      prettier: 2.2.1
-      ts-standard: 10.0.0_982c0164c2c03b5f966b085495de6301
-      typescript: 4.2.4
-    dev: false
-    id: file:projects/account.tgz
-    name: '@rush-temp/account'
-    peerDependencies:
-      '@typescript-eslint/parser': '*'
-    resolution:
-      integrity: sha512-xO1MsO50NM5H24VIYq55y/8YwUKviMnM4s9gPHoOHdBiWFkUhfVzfdsxFDwcmZTK5G+EUNNQhnOg1d0nNCftkw==
-      tarball: file:projects/account.tgz
-    version: 0.0.0
   file:projects/core.tgz:
     dependencies:
       '@babel/eslint-parser': 7.13.14_eslint@7.24.0
@@ -10583,6 +10578,7 @@ packages:
     version: 0.0.0
   file:projects/server-account.tgz_@typescript-eslint+parser@4.22.0:
     dependencies:
+      '@anticrm/account': 0.2.0
       '@babel/core': 7.13.15
       '@babel/preset-env': 7.13.15_@babel+core@7.13.15
       '@babel/preset-typescript': 7.13.0_@babel+core@7.13.15
@@ -10602,7 +10598,7 @@ packages:
     peerDependencies:
       '@typescript-eslint/parser': '*'
     resolution:
-      integrity: sha512-3HR12L5z+Jxg3gYtQQXjZUxVMkF4M43/Nk3mlsTv6M3p62yPGNBch/j9lj9TMEkBzZP4DZKDusnzN6Q3PnArSg==
+      integrity: sha512-qs/515oKEZcN1eJ0GdwlG1TC+RWu73rxWN+qXXYaf3PlQj4lD6uTWmBqdpr72KVn3in5d8w8IZW0+UZsdbR9Rw==
       tarball: file:projects/server-account.tgz
     version: 0.0.0
   file:projects/sparkling-controls.tgz_9d8bd6a515df5f388c5e4532b97e083a:
@@ -10730,9 +10726,9 @@ packages:
     version: 0.0.0
 registry: ''
 specifiers:
+  '@anticrm/account': ~0.2.0
   '@babel/eslint-parser': ^7.13.14
   '@babel/runtime': ~7.13.10
-  '@rush-temp/account': file:./projects/account.tgz
   '@rush-temp/core': file:./projects/core.tgz
   '@rush-temp/domains': file:./projects/domains.tgz
   '@rush-temp/platform': file:./projects/platform.tgz
