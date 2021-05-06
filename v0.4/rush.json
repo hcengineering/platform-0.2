@@ -385,6 +385,10 @@
       "projectFolder": "platform/domains"
     },
     {
+      "packageName": "@anticrm/text",
+      "projectFolder": "platform/text"
+    },
+    {
       "packageName": "@anticrm/ui",
       "projectFolder": "platform/ui"
     },
