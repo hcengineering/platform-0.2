@@ -15,9 +15,9 @@
 
 <script lang="ts">
   import { EditBox, Label, Button, StatusControl } from '@anticrm/ui'
-  import { Status, Severity } from '@anticrm/status'
+  import { OK, Status, Severity } from '@anticrm/status'
   import type { IntlString } from '@anticrm/platform'
-  import { OK, translate } from '@anticrm/platform'
+  import { translate } from '@anticrm/platform'
 
   import { Code } from '../utils'
 

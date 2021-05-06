@@ -15,8 +15,7 @@
 
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
-  import { Status, Severity } from '@anticrm/status'
-  import { OK } from '@anticrm/platform'
+  import { OK, Status, Severity } from '@anticrm/status'
 
   import Form from './Form.svelte'
   import { Code, doLogin } from '../utils'

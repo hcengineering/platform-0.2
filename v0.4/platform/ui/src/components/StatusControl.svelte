@@ -22,6 +22,7 @@
   export let width: string
 </script>
 
+{JSON.stringify(status)}
 {#if status.severity !== Severity.OK}
 <div class="message-container" class:error={status.severity === Severity.ERROR} style="{width ? 'width: ' + width : ''}">
   <div class="icon">
