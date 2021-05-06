@@ -408,10 +408,10 @@
       "packageName": "@anticrm/plugin-login-impl",
       "projectFolder": "plugins/login-impl"
     },
-    // {
-    //   "packageName": "@anticrm/server-account",
-    //   "projectFolder": "server/account"
-    // },
+    {
+      "packageName": "@anticrm/server-account",
+      "projectFolder": "server/account"
+    },
     // {
     //   "packageName": "@anticrm/server-front",
     //   "projectFolder": "server/front"

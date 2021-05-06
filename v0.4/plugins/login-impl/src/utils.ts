@@ -13,8 +13,8 @@
 // limitations under the License.
 //
 
-import { Status, StatusCode, identify } from '@anticrm/status'
-import { getMetadata, OK, unknownError, IntlString } from '@anticrm/platform'
+import { Status, StatusCode, identify, OK, unknownError } from '@anticrm/status'
+import { getMetadata, IntlString } from '@anticrm/platform'
 import { Request, Response, serialize } from '@anticrm/rpc'
 
 import login, { PluginLogin } from '@anticrm/plugin-login'

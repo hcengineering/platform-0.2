@@ -14,7 +14,7 @@
 //
 
 import type { Component, StatusCode } from '@anticrm/status'
-import { Status, Severity, identify, PlatformError } from '@anticrm/status'
+import { identify } from '@anticrm/status'
 
 /**
  * Platform component Id
@@ -23,23 +23,6 @@ import { Status, Severity, identify, PlatformError } from '@anticrm/status'
 export const Platform = 'platform' as Component
 
 export const Code = identify(Platform, {
-  OK: '' as StatusCode,
-  UnknownError: '' as StatusCode<{ message: string }>,
   LoadingPlugin: '' as StatusCode<{ plugin: string }>,
   NoLoaderForStrings: '' as StatusCode<{ component: Component }>
-}) 
-
-/**
- * OK Status
- * @public
- */
-export const OK = new Status(Severity.OK, Code.OK, {})
-
-/**
- * Creates unknown error status
- * @public
- */
-export function unknownError (err: Error): Status<{ message: string }> {
-  return (err instanceof PlatformError) ? err.status : 
-    new Status(Severity.ERROR, Code.UnknownError, { message: err.message })
-}
+})

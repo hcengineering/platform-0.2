@@ -17,8 +17,7 @@
 
 import { MongoClient, Db } from 'mongodb'
 import { Request } from '@anticrm/rpc'
-import { AccountStatusCode } from '@anticrm/account'
-import { methods } from '..'
+import { methods, Code } from '..'
 
 const DB_NAME = 'test_accounts'
 
@@ -108,7 +107,7 @@ describe('server', () => {
 
     const result = await methods.login(db, request)
     expect(result.error).toBeDefined()
-    expect(result.error?.code).toBe(AccountStatusCode.INCORRECT_PASSWORD)
+    expect(result.error?.code).toBe(Code.IncorrectPassword)
   })
 
   it('should not login, unknown user', async () => {
@@ -119,7 +118,7 @@ describe('server', () => {
 
     const result = await methods.login(db, request)
     expect(result.error).toBeDefined()
-    expect(result.error?.code).toBe(AccountStatusCode.ACCOUNT_NOT_FOUND)
+    expect(result.error?.code).toBe(Code.AccountNotFound)
   })
 
   it('should not login, wrong workspace', async () => {
@@ -130,7 +129,7 @@ describe('server', () => {
 
     const result = await methods.login(db, request)
     expect(result.error).toBeDefined()
-    expect(result.error?.code).toBe(AccountStatusCode.WORKSPACE_NOT_FOUND)
+    expect(result.error?.code).toBe(Code.WorkspaceNotFound)
   })
 
 })

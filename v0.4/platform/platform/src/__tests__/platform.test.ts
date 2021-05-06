@@ -15,7 +15,7 @@
 
 /* eslint-env jest */
 
-import { Status, Severity, identify } from '@anticrm/status'
+import { Status, Severity, identify, OK, unknownError } from '@anticrm/status'
 
 import { Metadata, getMetadata, loadMetadata, setMetadata } from '../metadata'
 import { Plugin, Service, getPlugin, addLocation } from '../plugin'
@@ -28,7 +28,6 @@ import {
   monitor,
   PlatformEvent
 } from '../event'
-import { OK, unknownError } from '../status'
 
 import {
   plugin1,
@@ -325,7 +324,7 @@ describe('platform', () => {
   })
 
   it('should create unknown error', () => {
-    const status = unknownError(new Error('something'))
+    const status = unknownError(new Error('something')) as Status<{message: string}>
     expect(status.severity).toBe(Severity.ERROR)
     expect(status.params.message).toBe('something')
   })

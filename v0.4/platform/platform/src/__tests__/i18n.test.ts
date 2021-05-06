@@ -13,10 +13,10 @@
 // limitations under the License.
 //
 
-import { Component, Severity, Status, identify } from '@anticrm/status'
+import { Component, Severity, Status, identify, Code as StatusCode } from '@anticrm/status'
+import { Code as PlatformCode } from '../status'
 
 import { addStringsLoader, IntlString, translate } from '../i18n'
-import { Code } from '../status'
 import { PlatformEvent, addEventListener } from '../event'
 
 const TestComponent = 'test-strings' as Component
@@ -47,7 +47,7 @@ describe('i18n', () => {
     const component = 'component'
     const message = `${component}.id`
 
-    const checkStatus = new Status(Severity.ERROR, Code.NoLoaderForStrings, { component })
+    const checkStatus = new Status(Severity.ERROR, PlatformCode.NoLoaderForStrings, { component })
     const eventListener = async (event: string, data: any): Promise<void> => {
       await expect(data).toEqual(checkStatus)
     }
@@ -63,7 +63,7 @@ describe('i18n', () => {
     const component = 'error-loader'
     const message = `${component}.id`
 
-    const checkStatus = new Status(Severity.ERROR, Code.UnknownError, { message: errorMessage })
+    const checkStatus = new Status(Severity.ERROR, StatusCode.UnknownError, { message: errorMessage })
     const eventListener = async (event: string, data: any): Promise<void> => {
       await expect(data).toEqual(checkStatus)
     }

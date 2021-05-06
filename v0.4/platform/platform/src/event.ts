@@ -13,8 +13,7 @@
 // limitations under the License.
 //
 
-import { Status } from '@anticrm/status'
-import { unknownError, OK } from './status'
+import { Status, unknownError, OK } from '@anticrm/status'
 
 type EventListener = (event: string, data: any) => Promise<void>
 export const PlatformEvent = 'platform-event'

@@ -13,9 +13,8 @@
 // limitations under the License.
 //
 
-import { Binary, Db, MongoClient, ObjectID } from 'mongodb'
-import { PlatformError, Status, Severity } from '@anticrm/status'
-import { AccountStatusCode } from '@anticrm/account'
+import { Binary, Db, ObjectID } from 'mongodb'
+import { PlatformError, Status, Severity, identify, Component, StatusCode, unknownError, Code as SharedCode } from '@anticrm/status'
 import { Request, Response } from '@anticrm/rpc'
 import { randomBytes, pbkdf2Sync } from 'crypto'
 import { Buffer } from 'buffer'
@@ -53,6 +52,16 @@ interface LoginInfo {
   token: string
 }
 
+const Account = 'account' as Component
+export const Code = identify(Account, {
+  WorkspaceNotFound: '' as StatusCode<{workspace: string}>,
+  AccountNotFound: '' as StatusCode<{email: string}>,
+  IncorrectPassword: '' as StatusCode<{}>,
+  DuplicateAccount: '' as StatusCode<{email: string}>,
+  DuplicateWorkspace: '' as StatusCode<{workspace: string}>,
+  WorkspaceNotAccessible: '' as StatusCode<{workspace: string, email: string}>
+})
+
 function hashWithSalt (password: string, salt: Buffer): Buffer {
   return pbkdf2Sync(password, salt, 1000, 32, 'sha256')
 }
@@ -69,10 +78,10 @@ function toAccountInfo (account: Account): AccountInfo {
 function getWorkspace (db: Db, workspace: string): Promise<Workspace> {
   return db
     .collection(WORKSPACE_COLLECTION).findOne<Workspace>({ workspace })
-    .then(workspace => {
-      if (workspace === null)
-       throw new PlatformError(new Status(Severity.ERROR, AccountStatusCode.WORKSPACE_NOT_FOUND, 'Workspace not found.'))
-      return workspace
+    .then(result => {
+      if (result === null)
+       throw new PlatformError(new Status(Severity.ERROR, Code.WorkspaceNotFound, {workspace}))
+      return result
     })
 }
 
@@ -81,7 +90,7 @@ function getAccount (db: Db, email: string): Promise<Account> {
     .collection(ACCOUNT_COLLECTION).findOne<Account>({ email })
     .then(account => {
       if (account === null)
-       throw new PlatformError(new Status(Severity.ERROR, AccountStatusCode.ACCOUNT_NOT_FOUND, 'Account not found.'))
+       throw new PlatformError(new Status(Severity.ERROR, Code.AccountNotFound, {email}))
       return account
     })
 }
@@ -90,7 +99,7 @@ function getAccountInfo (db: Db, email: string, password: string): Promise<Accou
   return getAccount(db, email)
     .then((account) => {
       if (!verifyPassword(password, account.hash.buffer, account.salt.buffer)) {
-        throw new PlatformError(new Status(Severity.ERROR, AccountStatusCode.INCORRECT_PASSWORD, 'Incorrect password.'))
+        throw new PlatformError(new Status(Severity.ERROR, Code.IncorrectPassword, {}))
       }
       return toAccountInfo(account)    
     })
@@ -106,8 +115,7 @@ function createAccount (db: Db, email: string, password: string): Promise<Accoun
     .then((result) => ({ _id: result.insertedId, email, workspaces: [] }))
     .catch((err) => {
       const status = err.code === 11000 ?
-        new Status(Severity.ERROR, AccountStatusCode.DUPLICATE_ACCOUNT, 'Account already exists') :
-        new Status(Severity.ERROR, AccountStatusCode.DATABASE_ERROR, err.message)
+        new Status(Severity.ERROR, Code.DuplicateAccount, {email}) : unknownError(err)
       throw new PlatformError(status)
     })
 }
@@ -119,8 +127,7 @@ function createWorkspace (db: Db, workspace: string, organisation: string): Prom
     .then((result) => result.insertedId)
     .catch((err) => {
       const status = err.code === 11000 ?
-        new Status(Severity.ERROR, AccountStatusCode.DUPLICATE_WORKSPACE, 'Workspace already exists') :
-        new Status(Severity.ERROR, AccountStatusCode.DATABASE_ERROR, err.message)
+        new Status(Severity.ERROR, Code.DuplicateWorkspace, {workspace}) : unknownError(err)
       throw new PlatformError(status)
     })
 }
@@ -152,7 +159,7 @@ function login (db: Db, email: string, password: string, workspace: string): Pro
         return result
       }
     }
-    throw new PlatformError(new Status(Severity.ERROR, AccountStatusCode.WORKSPACE_NOT_ACCESSIBLE, 'Workspace not accessible'))
+    throw new PlatformError(new Status(Severity.ERROR, Code.WorkspaceNotAccessible, {workspace, email}))
   })
 }
 
@@ -236,11 +243,20 @@ function wrap<P extends any[], R> (f: (db: Db, ...args: P) => Promise<R>) {
     return f(db, ...request.params)
       .then((result) => ({ id: request.id, result }))
       .catch((err) => {
+        return { id: request.id, error: unknownError(err) }
+      })
+  }
+}
+
+function secureWrap<P extends any[], R> (f: (db: Db, ...args: P) => Promise<R>) {
+  return function (db: Db, request: Request<P>): Promise<Response<R>> {
+    return f(db, ...request.params)
+      .then((result) => ({ id: request.id, result }))
+      .catch((err) => {
         if (err instanceof PlatformError) {
-          const pe = err
-          return { id: request.id, error: { code: pe.status.code, message: pe.status.message } }
+          return { id: request.id, error: new Status(Severity.ERROR, SharedCode.Unauthorized, {})}
         } else {
-          return { id: request.id, error: { code: 0, message: err.message } }
+          return { id: request.id, error: new Status(Severity.ERROR, SharedCode.UnknownError, {message: ''}) }
         }
       })
   }
@@ -254,4 +270,14 @@ export const methods = {
   addWorkspace: wrap(addWorkspace),
   // removeWorkspace: wrap(removeWorkspace),
   // updateAccount: wrap(updateAccount)
+}
+
+export const secureMethods = {
+  login: secureWrap(login),
+  // getAccountInfo: secureWrap(getAccountInfo),
+  createAccount: secureWrap(createAccount),
+  createWorkspace: secureWrap(createWorkspace),
+  addWorkspace: secureWrap(addWorkspace),
+  // removeWorkspace: secureWrap(removeWorkspace),
+  // updateAccount: secureWrap(updateAccount)
 }

@@ -13,13 +13,13 @@
 // limitations under the License.
 //
 
-import { Component, Status, Severity, ParameterizedId } from '@anticrm/status'
-import { unknownError, Code } from './status'
+import { Component, Status, Severity, unknownError } from '@anticrm/status'
+import { Code } from './status'
 import { setPlatformStatus } from './event'
 
 import { IntlMessageFormat } from 'intl-messageformat'
 
-export type IntlString<T extends Record<string, any> = {}> = ParameterizedId<T>
+export type IntlString<T extends Record<string, any> = {}> = string & { __intl_string: T }
 type Loader = (locale: string) => Promise<Record<string, IntlString>>
 
 const locale = 'en'
