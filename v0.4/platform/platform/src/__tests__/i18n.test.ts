@@ -40,7 +40,7 @@ describe('i18n', () => {
     expect(translated).toBe('Loading plugin <b>xxx</b>...')
   })
 
-  it('should emmit status when no loader', async () => {
+  it('should emit status when no loader', async () => {
     const component = 'component'
     const message = `${component}.id`
 
@@ -52,7 +52,7 @@ describe('i18n', () => {
     await translate(message as IntlString, {})
   })
 
-  it('should emmit status when bad loader', async () => {
+  it('should emit status when bad loader', async () => {
     const errorMessage = 'bad loader'
     addStringsLoader('error-loader' as Component, (locale: string) => {
       throw new Error(errorMessage)
@@ -66,6 +66,21 @@ describe('i18n', () => {
     }
     addEventListener(PlatformEvent, eventListener)
     await translate(message as IntlString, {})
+  })
+
+  it('should return id when no loader', async () => {
+    const message = 'component.id'
+    const translated = await translate(message as IntlString, {})
+    return expect(translated).toBe(message)
+  })
+
+  it('should return id when bad loader', async () => {
+    addStringsLoader('error-loader' as Component, (locale: string) => {
+      throw new Error('bad loader')
+    })
+    const message = 'component.id'
+    const translated = await translate(message as IntlString, {})
+    return expect(translated).toBe(message)
   })
 
   it('should cache error', async () => {
