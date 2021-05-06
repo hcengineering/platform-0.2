@@ -35,22 +35,21 @@ export class ModelIndex implements DomainIndex {
         if (this.model.getDomain(createTx._objectClass) !== MODEL_DOMAIN) {
           return
         }
-        const newDoc = this.model.newDoc(createTx._objectClass, createTx._objectId, createTx.object)
-        return this.storage.store(ctx, newDoc)
+        return await this.storage.store(ctx, this.model.createDocument(createTx._objectClass, createTx.object, createTx._objectId))
       }
       case CORE_CLASS_UPDATE_TX: {
         const updateTx = tx as UpdateTx
         if (this.model.getDomain(updateTx._objectClass) !== MODEL_DOMAIN) {
           return
         }
-        return this.storage.update(ctx, updateTx._objectClass, updateTx._objectId, updateTx.operations)
+        return await this.storage.update(ctx, updateTx._objectClass, updateTx._objectId, updateTx.operations)
       }
       case CORE_CLASS_DELETE_TX: {
         const deleteTx = tx as DeleteTx
         if (this.model.getDomain(deleteTx._objectClass) !== MODEL_DOMAIN) {
           return
         }
-        return this.storage.remove(ctx, deleteTx._objectClass, deleteTx._objectId)
+        return await this.storage.remove(ctx, deleteTx._objectClass, deleteTx._objectId)
       }
 
       default:

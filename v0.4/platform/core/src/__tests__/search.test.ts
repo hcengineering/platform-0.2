@@ -1,5 +1,5 @@
 //
-// Copyright © 2020, 2021 Anticrm Platform Contributors.
+// Copyright © 2021 Anticrm Platform Contributors.
 //
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
@@ -13,16 +13,19 @@
 // limitations under the License.
 //
 
-import { DomainIndex, Storage, Tx, TxContext } from '@anticrm/core'
+import { FindOptions, SortingOrder } from '../storage'
+import { Task } from './tasks'
 
-export class TxIndex implements DomainIndex {
-  private readonly storage: Storage
+/* eslint-env jest */
 
-  constructor (storage: Storage) {
-    this.storage = storage
-  }
+describe('search', () => {
+  describe('Search Options', () => {
+    it('search order', async () => {
+      let options: FindOptions<Task> = { sort: { _id: SortingOrder.Ascending, name: SortingOrder.Descending } }
+      console.log(JSON.stringify(options))
 
-  async tx (ctx: TxContext, tx: Tx): Promise<any> {
-    await this.storage.store(ctx, tx)
-  }
-}
+      options = { sort: { name: SortingOrder.Descending, _id: SortingOrder.Ascending } }
+      console.log(JSON.stringify(options))
+    })
+  })
+})

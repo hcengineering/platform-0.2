@@ -13,10 +13,14 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Class, DateProperty, Doc, Emb, Mixin, Property, Ref, StringProperty, Tx } from '@anticrm/core'
+import { AnyLayout, Class, DateProperty, Doc, DocumentValue, Emb, Mixin, Obj, Property, Ref, StringProperty, Tx } from '@anticrm/core'
 
 // TXes
 
+export const CORE_CLASS_TX = 'class:core.Tx' as Ref<Class<Tx>>
+export const CORE_CLASS_OBJECT_TX = 'class:core.ObjectTx' as Ref<Class<ObjectTx>>
+export const CORE_CLASS_OBJECT_SELECTOR = 'class:core.ObjectSelector' as Ref<Class<ObjectSelector>>
+export const CORE_CLASS_OBJECTTX_DETAILS = 'class:core.ObjectTxDetails' as Ref<Class<ObjectTxDetails>>
 export const CORE_CLASS_CREATE_TX = 'class:core.CreateTx' as Ref<Class<CreateTx>>
 export const CORE_CLASS_UPDATE_TX = 'class:core.UpdateTx' as Ref<Class<UpdateTx>>
 export const CORE_CLASS_TX_OPERATION = 'class:core.TxOperation' as Ref<Class<TxOperation>>
@@ -24,9 +28,18 @@ export const CORE_CLASS_DELETE_TX = 'class:core.DeleteTx' as Ref<Class<DeleteTx>
 
 export const TX_DOMAIN = 'tx'
 
+export interface ObjectTxDetails extends Emb {
+  name?: string
+  id?: string
+  description?: string
+}
+
 export interface ObjectTx extends Tx {
   _objectId: Ref<Doc>
   _objectClass: Ref<Class<Doc>>
+  _objectSpace?: Ref<Space> // For some system wide operations, space may be missing
+
+  _txDetails?: ObjectTxDetails
 }
 
 /**
@@ -90,23 +103,26 @@ export interface DeleteTx extends ObjectTx {
 }
 
 interface TxOperationBuilder<T> {
-  match (values: Partial<T>): T & TxBuilder<T>
-  set (value: Partial<T>): TxOperation
-  build (): ObjectSelector[]
-  push (value: Partial<T>): TxOperation
-  pull (): TxOperation
+  match: (values: Partial<T>) => T & TxBuilder<T>
+  set: (value: Partial<T>) => TxOperation
+  build: () => ObjectSelector[]
+  push: (value: Partial<T>) => TxOperation
+  pull: () => TxOperation
 }
 
-export type ArrayElement<A> = A extends (infer T)[] ? T : A
+export type TxBuilderArrayOf<A> = A extends Array<infer T> ? TxBuilderOrOpBuilderOf<T> : never
+
+export type TxBuilderOrOpBuilderOf<A> = A extends Obj ? TxBuilder<A>: TxOperationBuilder<A>
+export type TxBuilderOf<A> = A extends Obj ? TxBuilder<A>: never
 
 export type FieldBuilder<T> = {
-  [P in keyof T]-?: TxOperationBuilder<ArrayElement<T[P]>> & ArrayElement<T[P]>;
+  [P in keyof T]-?: TxBuilderArrayOf<T[P]> | TxBuilderOf<T[P]>;
 }
 export type TxBuilder<T> = TxOperationBuilder<T> & FieldBuilder<T>
 
 class TxBuilderImpl<T> {
   result: ObjectSelector[] = []
-  current: ObjectSelector = {} as ObjectSelector
+  current: ObjectSelector = { _class: CORE_CLASS_OBJECT_SELECTOR, key: '' }
   factory: () => TxBuilder<any>
 
   constructor (selector: ObjectSelector[], factory: () => TxBuilder<T>) {
@@ -117,14 +133,14 @@ class TxBuilderImpl<T> {
   match<Q extends Doc> (values: Partial<Q>): Q & TxBuilder<Q> {
     this.current.pattern = (values as unknown) as AnyLayout
     this.result.push(this.current)
-    this.current = {} as ObjectSelector
+    this.current = { _class: CORE_CLASS_OBJECT_SELECTOR, key: '' }
     return (this.factory() as unknown) as Q & TxBuilder<Q>
   }
 
   build (): ObjectSelector[] | undefined {
-    if (this.current.key && this.current.key !== '') {
+    if (this.current.key !== '') {
       this.result.push(this.current)
-      this.current = {} as ObjectSelector
+      this.current = { _class: CORE_CLASS_OBJECT_SELECTOR, key: '' }
     }
     if (this.result.length > 0) {
       return this.result
@@ -133,33 +149,36 @@ class TxBuilderImpl<T> {
 
   set (value: Partial<T>): TxOperation {
     return {
+      _class: CORE_CLASS_TX_OPERATION,
       kind: TxOperationKind.Set,
       selector: this.build(),
       _attributes: (value as unknown) as AnyLayout
-    } as TxOperation
+    }
   }
 
   push<Q extends Doc> (value: Partial<Q>): TxOperation {
     return {
+      _class: CORE_CLASS_TX_OPERATION,
       kind: TxOperationKind.Push,
       selector: this.build(),
       _attributes: (value as unknown) as AnyLayout
-    } as TxOperation
+    }
   }
 
   pull (): TxOperation {
     return {
+      _class: CORE_CLASS_TX_OPERATION,
       kind: TxOperationKind.Pull,
       selector: this.build()
-    } as TxOperation
+    }
   }
 
   updateKey (property: string): void {
-    if (this.current.key === '') {
+    if (this.current.key !== '') {
       this.result.push(this.current)
     }
-    this.current = {} as ObjectSelector
-    this.current.key = property as string
+    this.current = { _class: CORE_CLASS_OBJECT_SELECTOR, key: '' }
+    this.current.key = property
   }
 }
 
@@ -194,6 +213,36 @@ export function txBuilder<T extends Doc> (clazz: Ref<Class<T>>): TxBuilder<T> {
   return np
 }
 
+/**
+ * Define operations with object modifications.
+ */
+export interface OperationProtocol {
+  /**
+   * Perform creation of new document and store it into storage.
+   * Object ID will be automatically generated and assigned to object.
+   */
+  create: <T extends Doc>(_class: Ref<Class<T>>, values: DocumentValue<T>) => Promise<T>
+
+  /**
+   * Perform update of document properties.
+   */
+  update: <T extends Doc>(doc: T, value: Partial<Omit<T, keyof Doc>>) => Promise<T>
+
+  /**
+   * Perform update of document/embedded document properties using a builder pattern.
+   *
+   * It is possible to do a set, pull, push for different field values.
+   *
+   * push and pull are applicable only for array attributes.
+   */
+  updateWith: <T extends Doc>(doc: T, builder: (s: TxBuilder<T>) => TxOperation | TxOperation[]) => Promise<T>
+
+  /**
+   * Perform remove of object.
+   */
+  remove: <T extends Doc>(doc: T) => Promise<T>
+}
+
 // S P A C E
 
 /**
@@ -205,6 +254,7 @@ export interface SpaceUser extends Emb {
 }
 
 export const CORE_CLASS_SPACE = 'class:core.Space' as Ref<Class<Space>>
+export const CORE_CLASS_SPACE_USER = 'class:core.SpaceUser' as Ref<Class<SpaceUser>>
 
 /**
  * Define an application descriptor.

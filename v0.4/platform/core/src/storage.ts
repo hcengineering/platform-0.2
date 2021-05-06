@@ -1,7 +1,7 @@
 /**
  * Operation direction, is it came from server or it is own operation.
  */
-import { AnyLayout, Class, DateProperty, Doc, Ref, StringProperty } from './classes'
+import { Class, DateProperty, Doc, Emb, Obj, Ref, StringProperty } from './classes'
 import { Space, TxOperation, VDoc } from '@anticrm/domains'
 
 export enum TxContextSource {
@@ -27,23 +27,24 @@ export interface TxContext {
  * Return a complete TxContext
  */
 export function txContext (source: TxContextSource = TxContextSource.Client, network: Promise<void> = Promise.resolve()): TxContext {
-  return {
+  const doc: TxContext = {
     network,
-    source
-  } as TxContext
+    source,
+    clientTx: []
+  }
+  return doc
 }
 
 export interface Storage {
-  store (ctx: TxContext, doc: Doc): Promise<void>
-  update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, operations: TxOperation[]): Promise<void>
-  remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<void>
+  store: (ctx: TxContext, doc: Doc) => Promise<void>
+  update: (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, operations: TxOperation[]) => Promise<void>
+  remove: (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>) => Promise<void>
 
-  find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]>
-  findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined>
+  find: <T extends Doc>(_class: Ref<Class<T>>, query: DocumentQuery<T>, options?: FindOptions<T>) => Promise<T[]>
+  findOne: <T extends Doc>(_class: Ref<Class<T>>, query: DocumentQuery<T>) => Promise<T | undefined>
 }
 
 ///
-
 /**
  * Transaction operation being processed.
  */
@@ -53,15 +54,80 @@ export interface Tx extends Doc {
 }
 
 export interface DomainIndex {
-  tx (ctx: TxContext, tx: Tx): Promise<any>
+  tx: (ctx: TxContext, tx: Tx) => Promise<any>
 }
 
-///
+export interface RegExpression {
+  $regex: string
+  $options?: string
+}
+
+export type ObjQueryType<T> = T extends Obj ? DocumentQuery<T> : T | RegExpression
+export type ArrayQueryType<A> = A extends Array<infer T> ? ObjQueryType<T> | Array<ObjQueryType<T>> : ObjQueryType<A>
+
+/**
+ * A possible query values to be used with Document access protocol.
+ *
+ * It allows to pass individual values with matched type to T. In case of Arrays it is possible o match
+ * entire array with partial fields or to match an element in array if object is specified as query.
+ */
+export type DocumentQuery<T> = {
+  [P in keyof T]?: ArrayQueryType<T[P]>
+}
+
+// A possible values for document during creation.
+export type TWithoutEmbArray<A> = A extends Array<infer T> ? Array<DocumentValue<T>>: DocumentValue<A>
+
+export type DocumentValueRaw<T> = {
+  [P in keyof T]: TWithoutEmbArray<T[P]>
+}
+export type DocumentValue<T> = T extends Doc ? DocumentValueRaw<Omit<T, keyof Doc>> : never | T extends Emb ? DocumentValueRaw<Omit<T, keyof Emb>>: never | T extends Obj ? T : T
+
+// Sorting structure
+export enum SortingOrder {
+  Ascending = 1,
+  Descending = -1
+}
+
+export type TSortingWithoutEmbArray<A> = A extends Array<infer T> ? DocumentSorting<T>: DocumentSorting<A>
+
+export type DocumentSortingValueRaw<T> = {
+  [P in keyof T]?: TSortingWithoutEmbArray<T[P]>
+}
+export type DocumentSorting<T> = T extends Obj ? DocumentSortingValueRaw<T> : SortingOrder
+
+/**
+ * Some options used to perform find opertion.
+ */
+
+export interface FindOptions<T> {
+  /**
+   * If set will limit a number of objects.
+   * A limit value of 0 is equivalent to setting no limit.
+  */
+  limit?: number | undefined
+
+  /**
+   * Specify how many items we should skip in results.
+   */
+  skip?: number | undefined
+
+  /**
+   * Define a sorting, with a required order. All embedded object sortings are also available.
+   * Please not order of passed fields will determine field ordering priority.
+   */
+  sort?: DocumentSorting<T> | undefined
+
+  /**
+   * A function to be notified about current query skip, limit and total.
+   */
+  countCallback?: (skip: number, limit: number, total: number) => void
+}
 
 export interface DocumentProtocol {
-  find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]>
-  findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined>
-  loadDomain (domain: string): Promise<Doc[]>
+  find: <T extends Doc>(_class: Ref<Class<T>>, query: DocumentQuery<T>, options?: FindOptions<T>) => Promise<T[]>
+  findOne: <T extends Doc>(_class: Ref<Class<T>>, query: DocumentQuery<T>) => Promise<T | undefined>
+  loadDomain: (domain: string) => Promise<Doc[]>
 }
 
 export interface CoreProtocol extends DocumentProtocol {
@@ -69,14 +135,14 @@ export interface CoreProtocol extends DocumentProtocol {
    * Process a transaction on server
    * @param tx
    */
-  tx (tx: Tx): Promise<any>
+  tx: (tx: Tx) => Promise<any>
 
   /**
    * Generate a sequence, short object reference.
    * @param _space
    * @return a generated reference Id,
    */
-  genRefId (_space: Ref<Space>): Promise<Ref<VDoc>>
+  genRefId: (_space: Ref<Space>) => Promise<Ref<VDoc>>
 }
 
 export class TxProcessor {
@@ -86,8 +152,10 @@ export class TxProcessor {
     this.indices = indices
   }
 
-  process (ctx: TxContext, tx: Tx): Promise<any> {
-    return Promise.all(this.indices.map(index => index.tx(ctx, tx)))
+  async process (ctx: TxContext, tx: Tx): Promise<any> {
+    await Promise.all(this.indices.map(async index => {
+      await index.tx(ctx, tx)
+    }))
   }
 }
 
@@ -128,24 +196,28 @@ class CombineStorage implements Storage {
     this.storages = storages
   }
 
-  async find<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T[]> {
-    return (await Promise.all(this.storages.map((s) => s.find(_class, query)))).reduce((p, c) => p.concat(c))
+  async find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>, options?: FindOptions<T>): Promise<T[]> {
+    return (await Promise.all(this.storages.map(async (s) => await s.find(_class, query, options)))).reduce((p, c) => p.concat(c))
   }
 
-  findOne<T extends Doc> (_class: Ref<Class<T>>, query: AnyLayout): Promise<T | undefined> {
-    return Promise.race(this.storages.map((s) => s.findOne(_class, query)))
+  async findOne<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined> {
+    return await Promise.race(this.storages.map(async (s) => {
+      return await s.findOne(_class, query)
+    }))
   }
 
-  remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<void> {
-    return Promise.all(this.storages.map((s) => s.remove(ctx, _class, _id))).then()
+  async remove (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>): Promise<void> {
+    await Promise.all(this.storages.map(async (s) => {
+      await s.remove(ctx, _class, _id)
+    }))
   }
 
-  store (ctx: TxContext, doc: Doc): Promise<void> {
-    return Promise.all(this.storages.map((s) => s.store(ctx, doc))).then()
+  async store (ctx: TxContext, doc: Doc): Promise<void> {
+    await Promise.all(this.storages.map(async (s) => { await s.store(ctx, doc) }))
   }
 
-  update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, operations: TxOperation[]): Promise<void> {
-    return Promise.all(this.storages.map((s) => s.update(ctx, _class, _id, operations))).then()
+  async update (ctx: TxContext, _class: Ref<Class<Doc>>, _id: Ref<Doc>, operations: TxOperation[]): Promise<void> {
+    await Promise.all(this.storages.map(async (s) => { await s.update(ctx, _class, _id, operations) }))
   }
 }
 
