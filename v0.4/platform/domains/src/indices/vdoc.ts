@@ -16,9 +16,9 @@
 import { DomainIndex, Model, Ref, Storage, Tx, TxContext } from '@anticrm/core'
 import {
   CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_TX_OPERATION, CORE_CLASS_UPDATE_TX, CORE_CLASS_VDOC, CreateTx, DeleteTx, Space,
-  TxOperation,
-  TxOperationKind, UpdateTx, VDoc
+  TxOperationKind, UpdateTx
 } from '..'
+import { newUpdateTx } from '../tx/tx'
 
 export class VDocIndex implements DomainIndex {
   private readonly transient: Storage | undefined
@@ -48,21 +48,21 @@ export class VDocIndex implements DomainIndex {
     if (!this.modelDb.is(tx._objectClass, CORE_CLASS_VDOC)) {
       return await Promise.resolve()
     }
-    const doc = this.modelDb.createDocument(tx._objectClass, tx.object, tx._objectId)
+    const createTx: CreateTx = { ...tx, object: { ...tx.object } } // Make a copy + modify modification
+
     // we need to update vdoc properties.
     if (this.transient !== undefined) {
-      const vdoc = doc as VDoc
-      vdoc._createdBy = tx._user
-      vdoc._createdOn = tx._date
+      createTx.object._createdBy = tx._user
+      createTx.object._createdOn = tx._date
     }
-    if (this.modelDb.is(doc._class, CORE_CLASS_VDOC)) {
+    if (this.modelDb.is(tx._objectClass, CORE_CLASS_VDOC)) {
       const _space = tx._objectSpace as Ref<Space>
       if (_space === undefined) {
         return await Promise.reject(new Error('VDoc instances should have _space attribute specified'))
       }
-      (doc as VDoc)._space = _space
+      createTx.object._space = _space
     }
-    const txOp = {
+    const updateOP = {
       _class: CORE_CLASS_TX_OPERATION,
       kind: TxOperationKind.Set,
       _attributes: {
@@ -71,9 +71,9 @@ export class VDocIndex implements DomainIndex {
       }
     }
 
-    return await Promise.all([
-      this.storage.store(ctx, doc),
-      this.transient?.update(ctx, tx._objectClass, tx._objectId, [txOp]) ?? Promise.resolve()
+    await Promise.all([
+      this.storage.tx(ctx, createTx),
+      this.transient?.tx(ctx, newUpdateTx(tx._objectClass, tx._objectId, [updateOP], '')) ?? Promise.resolve()
     ])
   }
 
@@ -81,8 +81,7 @@ export class VDocIndex implements DomainIndex {
     if (!this.modelDb.is(tx._objectClass, CORE_CLASS_VDOC)) {
       return await Promise.resolve()
     }
-    const ops: TxOperation[] = [...tx.operations]
-    const op = {
+    const updateOp = {
       _class: CORE_CLASS_TX_OPERATION,
       kind: TxOperationKind.Set,
       _attributes: {
@@ -90,14 +89,11 @@ export class VDocIndex implements DomainIndex {
         _modifiedOn: tx._date
       }
     }
-    // Be sure we update modification fields.
-    if (this.transient !== undefined) {
-      ops.push(op)
-    }
+    const newTx: UpdateTx = { ...tx, operations: [...tx.operations, updateOp] } // Make a copy + modify modification
 
     await Promise.all([
-      this.storage.update(ctx, tx._objectClass, tx._objectId, ops),
-      this.transient?.update(ctx, tx._objectClass, tx._objectId, [op]) ?? Promise.resolve()
+      this.storage.tx(ctx, newTx),
+      this.transient?.tx(ctx, newUpdateTx(tx._objectClass, tx._objectId, [updateOp], tx._user)) ?? Promise.resolve()
     ])
   }
 
@@ -105,6 +101,6 @@ export class VDocIndex implements DomainIndex {
     if (!this.modelDb.is(tx._objectClass, CORE_CLASS_VDOC)) {
       return await Promise.resolve()
     }
-    await this.storage.remove(ctx, tx._objectClass, tx._objectId)
+    await this.storage.tx(ctx, tx)
   }
 }

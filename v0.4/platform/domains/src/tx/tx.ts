@@ -17,7 +17,7 @@ import { AnyLayout, Class, DateProperty, Doc, generateId, Property, Ref, StringP
 import {
   CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_UPDATE_TX, CreateTx, DeleteTx, Space,
   TxOperation, UpdateTx
-} from '@anticrm/domains'
+} from '../'
 
 export function newCreateTx<T extends Doc> (doc: T, _user: string, _objectSpace?: Ref<Space>): CreateTx {
   const {

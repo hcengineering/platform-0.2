@@ -38,7 +38,7 @@ export interface DomainIndex {
   tx: (ctx: TxContext, tx: Tx) => Promise<any>
 }
 
-export interface Storage extends DomainIndex {  
+export interface Storage extends DomainIndex {
   find: <T extends Doc>(_class: Ref<Class<T>>, query: DocumentQuery<T>, options?: FindOptions<T>) => Promise<T[]>
   findOne: <T extends Doc>(_class: Ref<Class<T>>, query: DocumentQuery<T>) => Promise<T | undefined>
 }

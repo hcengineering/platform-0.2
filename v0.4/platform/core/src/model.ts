@@ -13,14 +13,13 @@
 // limitations under the License.
 //
 
-// import { CORE_CLASS_OBJECT_SELECTOR, CORE_CLASS_TX_OPERATION, ObjectSelector, TxOperation, TxOperationKind } from '@anticrm/domains'
 import {
   AnyLayout, ArrayOf, Attribute, Class, Classifier, ClassifierKind, CORE_CLASS_ARRAY_OF, CORE_CLASS_CLASS,
   CORE_CLASS_INSTANCE_OF,
   CORE_CLASS_MIXIN,
-  CORE_CLASS_OBJ, CORE_MIXIN_INDICES, Doc, Mixin, Obj, Property, PropertyType, Ref, Type
+  CORE_MIXIN_INDICES, Doc, Mixin, Obj, Property, PropertyType, Ref, Type
 } from './classes'
-import { DocumentQuery, DocumentSorting, DocumentValue, FindOptions, generateId, RegExpression, Storage, TxContext } from './storage'
+import { DocumentQuery, DocumentSorting, DocumentValue, FindOptions, generateId, RegExpression } from './storage'
 
 export function mixinKey (mixin: Ref<Mixin<Obj>>, key: string): string {
   return key + '|' + mixin.replace('.', '~')
@@ -88,7 +87,7 @@ export class Model {
   private set (doc: Doc): void {
     const id = doc._id
     if (this.objects.get(id) !== undefined) {
-      throw new Error('document added already ' + id)
+      throw new Error(`document added already ${id}`)
     }
     this.objects.set(id, doc)
   }

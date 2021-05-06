@@ -5,6 +5,11 @@
     "declaration": true,
     "outDir": "./lib",
     "rootDir": "./src",
-    "strict": true
+    "strict": true,
+    "lib": [
+      "es2020",
+      "dom",
+      "esnext.intl"
+    ]
   }
 }

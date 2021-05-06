@@ -18,6 +18,9 @@ import {
   CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_TITLE, CORE_CLASS_TX_OPERATION, CORE_CLASS_UPDATE_TX, CORE_MIXIN_SHORTID, CreateTx,
   DeleteTx, Title, TitleSource, TxOperationKind, UpdateTx
 } from '..'
+import { updateDocument } from '../tx/modeltx'
+import { create } from '../tx/operations'
+import { newUpdateTx, newDeleteTx } from '../tx/tx'
 
 const NULL = '<null>'
 
@@ -57,26 +60,26 @@ export class TitleIndex implements DomainIndex {
     }
   }
 
-  async onCreate (ctx: TxContext, create: CreateTx): Promise<any> {
-    await this.updateShortIdRef(ctx, this.modelDb.createDocument(create._objectClass, create.object, create._objectId))
+  async onCreate (ctx: TxContext, tx: CreateTx): Promise<any> {
+    await this.updateShortIdRef(ctx, this.modelDb.createDocument(tx._objectClass, tx.object, tx._objectId))
 
-    const primary = this.getPrimary(create._objectClass)
+    const primary = this.getPrimary(tx._objectClass)
     if (primary === undefined) {
       return
     }
 
-    const title = (create.object as any)[primary] as string
+    const title = (tx.object as any)[primary] as string
 
     const doc: Title = {
       _class: CORE_CLASS_TITLE,
-      _id: this.getPrimaryID(create._objectId), // Use same object Id, so we will be able to update it in case of title change.
-      _objectClass: create._objectClass,
-      _objectId: create._objectId,
+      _id: this.getPrimaryID(tx._objectId), // Use same object Id, so we will be able to update it in case of title change.
+      _objectClass: tx._objectClass,
+      _objectId: tx._objectId,
       source: TitleSource.Title,
       title
     }
 
-    return await this.storage.store(ctx, doc)
+    return await this.storage.tx(ctx, create<Title>(this.modelDb, '', CORE_CLASS_TITLE, doc))
   }
 
   private getPrimaryID (_id: Ref<Doc>): Ref<Doc> {
@@ -106,30 +109,30 @@ export class TitleIndex implements DomainIndex {
         title: shortId,
         source: TitleSource.ShortId
       }
-      await this.storage.store(ctx, doc)
+      await this.storage.tx(ctx, create<Title>(this.modelDb, '', CORE_CLASS_TITLE, doc))
     }
   }
 
-  async onUpdate (ctx: TxContext, update: UpdateTx): Promise<any> {
-    const primary = this.getPrimary(update._objectClass)
+  async onUpdate (ctx: TxContext, tx: UpdateTx): Promise<any> {
+    const primary = this.getPrimary(tx._objectClass)
     if (primary === undefined) {
       return
     }
 
-    const obj = await this.storage.findOne(update._objectClass, { _id: update._objectId }) as Doc
+    const obj = await this.storage.findOne(tx._objectClass, { _id: tx._objectId }) as Doc
 
     const previousPrimary = (obj as any)[primary]
-    this.modelDb.updateDocument(this.modelDb.as(obj, update._objectClass), update.operations)
+    updateDocument(this.modelDb, this.modelDb.as(obj, tx._objectClass), tx.operations)
     await this.updateShortIdRef(ctx, obj)
     const newPrimary = (obj as any)[primary]
 
     if (previousPrimary !== primary) {
       // Update a current primary title Title object, since it is address by _objectId
-      return await this.storage.update(ctx, CORE_CLASS_TITLE, this.getPrimaryID(update._objectId), [{
+      await this.storage.tx(ctx, newUpdateTx(CORE_CLASS_TITLE, this.getPrimaryID(tx._objectId), [{
         _class: CORE_CLASS_TX_OPERATION,
         kind: TxOperationKind.Set,
         _attributes: { title: newPrimary }
-      }])
+      }], ''))
     }
   }
 
@@ -139,6 +142,8 @@ export class TitleIndex implements DomainIndex {
       _objectId: deleteTx._objectId,
       _objectClass: deleteTx._objectClass
     })
-    return await Promise.all(docs.map(async d => { await this.storage.remove(ctx, CORE_CLASS_TITLE, d._id) }))
+    await Promise.all(docs.map(async d => {
+      await this.storage.tx(ctx, newDeleteTx(CORE_CLASS_TITLE, d._id, ''))
+    }))
   }
 }
