@@ -13,13 +13,13 @@
 // limitations under the License.
 //
 
-import { Status, StatusCode } from '@anticrm/status'
-import { getMetadata, OK, unknownError, defineCode, IntlString } from '@anticrm/platform'
+import { Status, StatusCode, identify } from '@anticrm/status'
+import { getMetadata, OK, unknownError, IntlString } from '@anticrm/platform'
 import { Request, Response, serialize } from '@anticrm/rpc'
 
 import login, { PluginLogin } from '@anticrm/plugin-login'
 
-export const Code = defineCode(PluginLogin, {
+export const Code = identify(PluginLogin, {
   RequiredField: '' as StatusCode<{field: string}>,
   Email: '' as IntlString,
   Password: '' as IntlString,

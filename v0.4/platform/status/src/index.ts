@@ -69,7 +69,7 @@ export class PlatformError<P extends Record<string, any>> extends Error {
 // I D E N T I T Y
 
 type Value = string | Record<string, string>
-type Namespace = Record<string, Value>
+export type Namespace = Record<string, Value>
 
 function transform (prefix: string, namespace: Namespace): Namespace {
   const result: Namespace = {}

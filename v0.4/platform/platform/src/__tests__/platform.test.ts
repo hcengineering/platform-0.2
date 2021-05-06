@@ -15,10 +15,10 @@
 
 /* eslint-env jest */
 
-import { Status, Severity } from '@anticrm/status'
+import { Status, Severity, identify } from '@anticrm/status'
 
 import { Metadata, getMetadata, loadMetadata, setMetadata } from '../metadata'
-import { Plugin, Service, identify, getPlugin, addLocation } from '../plugin'
+import { Plugin, Service, getPlugin, addLocation } from '../plugin'
 import { Resource, getResource, getResourceInfo, peekResource, setResource } from '../resource'
 import {
   addEventListener,
