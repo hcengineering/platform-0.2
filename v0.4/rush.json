@@ -377,6 +377,10 @@
       "projectFolder": "platform/rpc"
     },
     {
+      "packageName": "@anticrm/core",
+      "projectFolder": "platform/core"
+    },
+    {
       "packageName": "@anticrm/ui",
       "projectFolder": "platform/ui"
     },
