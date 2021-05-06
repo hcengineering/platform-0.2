@@ -65,3 +65,22 @@ export class PlatformError<P extends Record<string, any>> extends Error {
     this.status = status
   }
 }
+
+// I D E N T I T Y
+
+type Value = string | Record<string, string>
+type Namespace = Record<string, Value>
+
+function transform (prefix: string, namespace: Namespace): Namespace {
+  const result: Namespace = {}
+  for (const key in namespace) {
+    const value = namespace[key]
+    result[key] = (typeof value === 'string') ? prefix + '.' + key : 
+      transform(key + ':' + prefix, value as Namespace) as Value
+  }
+  return result
+}
+
+export function identify<N extends Namespace> (component: Component, namespace: N): N {
+  return transform(component, namespace) as N
+}

@@ -13,17 +13,8 @@
 // limitations under the License.
 //
 
-import type { Component, StatusCode, ParameterizedId } from '@anticrm/status'
-import { Status, Severity } from '@anticrm/status'
-
-export function defineCode<T extends Record<string, ParameterizedId>> (component: Component, code: T): T {
-  const transformed: Record<string, string> = {}
-  for (const key in code) {
-    const id = code[key]
-    transformed[key] = component + '.' + (id === '' ? (key as string) : (id as string))
-  }
-  return transformed as T
-}
+import type { Component, StatusCode } from '@anticrm/status'
+import { Status, Severity, identify, PlatformError } from '@anticrm/status'
 
 /**
  * Platform component Id
@@ -31,7 +22,7 @@ export function defineCode<T extends Record<string, ParameterizedId>> (component
  */
 export const Platform = 'platform' as Component
 
-export const Code = defineCode(Platform, {
+export const Code = identify(Platform, {
   OK: '' as StatusCode,
   UnknownError: '' as StatusCode<{ message: string }>,
   LoadingPlugin: '' as StatusCode<{ plugin: string }>,
@@ -49,5 +40,6 @@ export const OK = new Status(Severity.OK, Code.OK, {})
  * @public
  */
 export function unknownError (err: Error): Status<{ message: string }> {
-  return new Status(Severity.ERROR, Code.UnknownError, { message: err.message })
+  return (err instanceof PlatformError) ? err.status : 
+    new Status(Severity.ERROR, Code.UnknownError, { message: err.message })
 }

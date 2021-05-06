@@ -13,20 +13,23 @@
 // limitations under the License.
 //
 
-import { Component, Severity, Status } from '@anticrm/status'
+import { Component, Severity, Status, identify } from '@anticrm/status'
 
 import { addStringsLoader, IntlString, translate } from '../i18n'
-import strings, { TestComponent } from './strings'
 import { Code } from '../status'
 import { PlatformEvent, addEventListener } from '../event'
+
+const TestComponent = 'test-strings' as Component
+
+const strings =  identify(TestComponent, {
+  loadingPlugin: '' as IntlString<{ plugin: string }>,
+})
 
 describe('i18n', () => {
   it('should translate string', async () => {
     addStringsLoader(TestComponent, async (locale: string) => await import(`./lang/${locale}.json`))
     const translated = await translate(strings.loadingPlugin, { plugin: 'xxx' })
     expect(translated).toBe('Loading plugin <b>xxx</b>...')
-    const translated2 = await translate(strings.predefinedID, {})
-    expect(translated2).toBe('some string')
   })
 
   it('should return id when no translation found', async () => {

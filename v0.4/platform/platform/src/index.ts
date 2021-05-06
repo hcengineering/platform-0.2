@@ -20,4 +20,13 @@ export * from './plugin'
 export * from './resource'
 export * from './auth'
 export * from './i18n'
-export { default as Strings } from './strings'
+
+import { addStringsLoader } from './i18n'
+import { Platform } from './status'
+
+addStringsLoader(Platform, async (lang: string) => {
+  switch (lang) {
+    case 'en': return await import(`./lang/en.json`) as any
+  }
+  throw new Error('unsupported language')
+})
