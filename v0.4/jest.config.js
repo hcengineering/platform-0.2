@@ -7,7 +7,7 @@ module.exports = {
   testEnvironment: 'node',
   roots: [
     '<rootDir>/plugins',
-    '<rootDir>/packages',
+    '<rootDir>/platform',
     '<rootDir>/server'
   ],
   testMatch: ['**/?(*.)+(spec|test).[jt]s?(x)']
