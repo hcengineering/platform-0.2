@@ -19,15 +19,14 @@ import {
   TxContext, TxProcessor
 } from '@anticrm/core'
 import { CORE_CLASS_SPACE, Space, TxOperation, TxOperationKind, VDoc } from '@anticrm/domains'
-import { PassthroughsIndex } from '@anticrm/domains/src/indices/filter'
 import { ModelIndex } from '@anticrm/domains/src/indices/model'
 import { ReferenceIndex } from '@anticrm/domains/src/indices/reference'
 import { TitleIndex } from '@anticrm/domains/src/indices/title'
 import { TxIndex } from '@anticrm/domains/src/indices/tx'
 import { VDocIndex } from '@anticrm/domains/src/indices/vdoc'
 import { ClientTxStorage } from '@anticrm/domains/src/tx/clienttx'
-import { Collection, MongoClient, SortOptionObject, UpdateOneOptions, UpdateQuery } from 'mongodb'
 import type { FindAndModifyWriteOpResultObject } from 'mongodb'
+import { Collection, MongoClient, SortOptionObject, UpdateOneOptions, UpdateQuery } from 'mongodb'
 import { createPullArrayFilters, createPushArrayFilters, createSetArrayFilters } from './mongo_utils'
 
 export interface WorkspaceProtocol extends DocumentProtocol {
@@ -218,7 +217,6 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
     new VDocIndex(memdb, mongoStorage, clientTxMongo),
     new TitleIndex(memdb, clientTxMongo),
     new ReferenceIndex(memdb, clientTxMongo),
-    new PassthroughsIndex(memdb, mongoStorage, CORE_CLASS_SPACE),
     new ModelIndex(memdb, combineStorage(memdb, mongoStorage))
   ])
 

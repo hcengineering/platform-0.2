@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Class, DateProperty, Doc, Emb, MODEL_DOMAIN, Ref, SPACE_DOMAIN, StringProperty, Type } from '@anticrm/core'
+import { Class, DateProperty, Doc, Emb, MODEL_DOMAIN, Ref, StringProperty, Type } from '@anticrm/core'
 import { Application, ShortID, Space, SpaceUser, Title, TitleSource, TITLE_DOMAIN, VDoc } from '@anticrm/domains'
 import core, { ArrayOf$, Builder, Class$, InstanceOf$, Mixin$, Primary, Prop, RefTo$ } from '.'
 import {
@@ -50,13 +50,13 @@ class TDateType extends TType implements Type {
 
 ///
 
-@Class$(core.class.SpaceUser, core.class.Emb, SPACE_DOMAIN)
+@Class$(core.class.SpaceUser, core.class.Emb, MODEL_DOMAIN)
 export class TSpaceUser extends TEmb implements SpaceUser {
   @Prop() userId!: string
   @Prop() owner!: boolean
 }
 
-@Class$(core.class.Space, core.class.Doc, SPACE_DOMAIN)
+@Class$(core.class.Space, core.class.Doc, MODEL_DOMAIN)
 export class TSpace extends TDoc implements Space {
   @Primary()
   @Prop() name!: string
