@@ -101,7 +101,7 @@
         details = { _class: title._objectClass, _id: title._objectId }
       } else {
         // try extract class name from doc and find objectId.
-        const pos = match.doc.lastIndexOf(':')
+        const pos = match.doc.lastIndexOf('|')
         if (pos !== -1) {
           const _class = match.doc.substring(0, pos)
           const _objectId = match.doc.substring(pos + 1)
@@ -142,7 +142,7 @@
       documentRouter.navigate({ doc: `${title.title}` })
     } else {
       // There is not short Id, we should navigate using a full _class and objectId.
-      documentRouter.navigate({ doc: `${doc._class}:${doc._id}` })
+      documentRouter.navigate({ doc: `${doc._class}|${doc._id}` })
     }
   }
 

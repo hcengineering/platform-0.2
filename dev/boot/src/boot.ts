@@ -29,6 +29,8 @@ import { model as calendar } from '@anticrm/calendar/src/__model__'
 
 import { model as activity } from '@anticrm/activity/src/__model__'
 
+import { model as modelBrowser } from '@anticrm/model-browser/src/__model__'
+
 export const builder = new Builder()
 builder.load(modelModel)
 builder.load(presentation)
@@ -42,6 +44,7 @@ builder.load(task)
 builder.load(datagen)
 builder.load(recruiting)
 builder.load(calendar)
+builder.load(modelBrowser)
 
 export const Model = builder.dumpAll()
 export const Strings = {
