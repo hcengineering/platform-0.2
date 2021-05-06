@@ -13,38 +13,48 @@
 // limitations under the License.
 -->
 <script lang="ts">
+  import { Mixin, Doc, Ref, Obj, Model } from '@anticrm/core'
+  import { CoreService } from '@anticrm/platform-core'
+  import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
   import { ClassModel, getCoreService } from '../..'
   import AttributeEditor from '../AttributeEditor.svelte'
 
-  import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
-  import { Ref, Mixin, Obj } from '@anticrm/core'
-
   export let model: ClassModel
-  export let object: any
+  export let object: Doc
+  export let anyObject: any
+  let objectId: Ref<Doc>
+  $: {
+    objectId = object._id as Ref<Doc>
+    anyObject = object
+  }
+
+  let coreService: CoreService
+  let coreModel: Model
+
+  getCoreService().then((cs) => {
+    coreService = cs
+    coreModel = coreService.getModel()
+  })
 
   function toggleVisible (event: MouseEvent) {
     const table = (event.target as HTMLElement).nextElementSibling as HTMLElement
     table.classList.toggle('hidden')
   }
 
-  async function getMixins (): Promise<any[]> {
-    return await getCoreService()
-      .then((cs) => cs.getModel())
-      .then((cm) => {
-        return model.getMixins().map((_mixin) => {
-          const mixin = {
-            _class: _mixin._mixin
-          } as any
+  function getMixins (model: ClassModel, object: Doc): any[] {
+    return model.getMixins().map((_mixin) => {
+      const mixin = {
+        _class: _mixin._mixin
+      } as any
 
-          if (cm.isMixedIn(object, mixin._class)) {
-            return cm.as(object, _mixin._mixin)
-          } else {
-            return {
-              _class: _mixin._mixin
-            } as any
-          }
-        })
-      })
+      if (coreModel.isMixedIn(object, mixin._class)) {
+        return coreModel.as(object, _mixin._mixin)
+      } else {
+        return {
+          _class: _mixin._mixin
+        } as any
+      }
+    })
   }
 
   function updateMixin (mixin: any) {
@@ -61,43 +71,41 @@
 
   let changedMixins: any[] = []
 
-  $: getMixins().then((mixins) => {
-    changedMixins = mixins
-  })
+  $: if (coreModel !== undefined) changedMixins = getMixins(model, object)
 
   $: {
     changedMixins.filter((_mixin) => Object.keys(_mixin).length > 1).forEach((_mixin) => updateMixin(_mixin))
   }
 </script>
 
-<div class="attributes">
-  {#each model.getGroups() as group (group._class)}
+{#if model && coreModel}
+  <div class="attributes">
+    {#each model.getGroups() as group (group._class)}
+      <div class="group">
+        <div class="caption-4">{group.label}</div>
+        <table>
+          {#each model.getOwnAttributes(group._class) as attr (attr.key)}
+            <tr>
+              <td class="cell-icon">
+                {#if attr.icon}
+                  <Icon icon={attr.icon} size="24" />
+                {/if}
+              </td>
+              <td width="120px">
+                <div class="label">{attr.label}</div>
+              </td>
+              <td>
+                <div class="edit">
+                  <AttributeEditor attribute={attr} bind:value={anyObject[attr.key]} />
+                </div>
+              </td>
+            </tr>
+          {/each}
+        </table>
+      </div>
+    {/each}
     <div class="group">
-      <div class="caption-4">{group.label}</div>
-      <table>
-        {#each model.getOwnAttributes(group._class) as attr (attr.key)}
-          <tr>
-            <td class="cell-icon">
-              {#if attr.icon}
-                <Icon icon={attr.icon} size="24" />
-              {/if}
-            </td>
-            <td width="120px">
-              <div class="label">{attr.label}</div>
-            </td>
-            <td>
-              <div class="edit">
-                <AttributeEditor attribute={attr} bind:value={object[attr.key]} />
-              </div>
-            </td>
-          </tr>
-        {/each}
-      </table>
-    </div>
-  {/each}
-  <div class="group">
-    {#await getMixins() then mixins}
-      {#each mixins as _mixin, i (_mixin._class)}
+      {#each getMixins(model, object) as _mixin, i (_mixin._class)}
         <div class="caption-4" style="cursor:pointer" on:click={(e) => toggleVisible(e)}>
           {getMixinLabel(_mixin._class)}
         </div>
@@ -121,9 +129,9 @@
           {/each}
         </table>
       {/each}
-    {/await}
+    </div>
   </div>
-</div>
+{/if}
 
 <style lang="scss">
   .attributes {
