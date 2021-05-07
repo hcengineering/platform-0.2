@@ -43,13 +43,14 @@ describe('i18n', () => {
     expect(translated).toBe('Loading plugin <b>xxx</b>...')
   })
 
-  it('should emit status and return id when no loader', async () => {
+  it('should emit status and return id when no loader', async (done) => {
     const component = 'component-for-no-loader'
     const message = `${component}.id`
 
     const checkStatus = new Status(Severity.ERROR, PlatformCode.NoLoaderForStrings, { component })
     const eventListener = async (event: string, data: any): Promise<void> => {
       await expect(data).toEqual(checkStatus)
+      done()
     }
     addEventListener(PlatformEvent, eventListener)
     const translated = await translate(message as IntlString, {})
@@ -57,7 +58,7 @@ describe('i18n', () => {
     removeEventListener(PlatformEvent, eventListener)
   })
 
-  it('should emit status and return id when bad loader', async () => {
+  it('should emit status and return id when bad loader', async (done) => {
     const component = 'component-for-bad-loader'
     const message = `${component}.id`
     const errorMessage = 'bad loader'
@@ -68,6 +69,7 @@ describe('i18n', () => {
     const checkStatus = new Status(Severity.ERROR, StatusCode.UnknownError, { message: errorMessage })
     const eventListener = async (event: string, data: any): Promise<void> => {
       await expect(data).toEqual(checkStatus)
+      done()
     }
     addEventListener(PlatformEvent, eventListener)
     const translated = await translate(message as IntlString, {})
@@ -75,21 +77,29 @@ describe('i18n', () => {
     removeEventListener(PlatformEvent, eventListener)
   })
 
-  it('should cache error', async () => {
+  it('should cache error', async (done) => {
     const component = 'component'
     const message = `${component}.id`
     let status: Status | undefined
     const eventListener = async (event: string, data: any): Promise<void> => {
       if (status === undefined) {
         status = data
+        done()
         return
       }
-      await expect(data).toBe(status)
+
+      try {
+        expect(data).toBe(status)
+        done()
+      } catch (e) {
+        done(e)
+      }
     }
+
     addEventListener(PlatformEvent, eventListener)
-    const translated1 = await translate(message as IntlString, {})
-    const translated2 = await translate(message as IntlString, {})
-    expect(translated1).toBe(translated2)
+    const t1 = await translate(message as IntlString, {})
+    const t2 = await translate(message as IntlString, {})
+    expect(t1).toBe(t2)
     removeEventListener(PlatformEvent, eventListener)
   })
 })
