@@ -15,7 +15,6 @@
 
 export type PrimitiveType = number | string | boolean | undefined
 
-export type Property<P extends PrimitiveType, T> = P & { __property: T }
 export type Ref<T extends Doc> = string & { __ref: T }
 
 export interface Obj {
@@ -32,16 +31,7 @@ export interface Doc extends Obj {
   _id: Ref<Doc>
 }
 
-export type PropertyType = Property<PrimitiveType, any>
-| Ref<Doc>
-| Emb
-| PropertyType[]
-| { [key: string]: PropertyType }
-
-export type StringProperty = Property<string, string>
-export type BooleanProperty = Property<boolean, boolean>
-export type DateProperty = Property<number, Date>
-export type NumberProperty = Property<number, number>
+export type PropertyType = PrimitiveType| Ref<Doc> | Emb | PropertyType[] | { [key: string]: PropertyType }
 
 // An attribute type with some defined mixins inside.
 export interface Type extends Emb {
@@ -71,14 +61,14 @@ export interface EMixin<T extends E, E extends Obj> extends EClass<T, E> {
 export type Mixin<T extends Obj> = EMixin<T, Obj>
 
 export interface EDomainClassifier {
-  _domain?: StringProperty
+  _domain?: string
 }
 
 export interface EClass<T extends E, E extends Obj> extends Classifier, EDomainClassifier {
   _attributes: AllAttributes<T, E>
   _extends?: Ref<Class<E>>
 
-  _native?: StringProperty
+  _native?: string
 }
 
 export type Class<T extends Obj> = EClass<T, Obj>
@@ -122,7 +112,7 @@ export interface ArrayOf extends Type {
 ///
 
 export interface Indices extends Mixin<Doc> {
-  primary: StringProperty
+  primary: string
 }
 
 export interface AnyLayout {

@@ -1,7 +1,7 @@
 /**
  * Operation direction, is it came from server or it is own operation.
  */
-import { Class, DateProperty, Doc, Emb, Obj, Ref, StringProperty } from './classes'
+import { Class, Doc, Emb, Obj, Ref } from './classes'
 
 export enum TxContextSource {
   Client, // A pure client operation
@@ -48,8 +48,8 @@ export interface Storage extends DomainIndex {
  * Transaction operation being processed.
  */
 export interface Tx extends Doc {
-  _date: DateProperty
-  _user: StringProperty
+  _date: number
+  _user: string
 }
 
 export interface RegExpression {

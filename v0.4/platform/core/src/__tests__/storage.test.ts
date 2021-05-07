@@ -37,8 +37,8 @@ describe('storage', () => {
       const tx = {
         _id: 'tx' as Ref<Class<Doc>>,
         _class: CORE_CLASS_DOC,
-        _date: Object.assign(0, { __property: new Date(0) }),
-        _user: Object.assign('user', { __property: 'user' })
+        _date: Date.now(),
+        _user: 'user'
       }
 
       await new TxProcessor(idxs).process(ctx, tx)

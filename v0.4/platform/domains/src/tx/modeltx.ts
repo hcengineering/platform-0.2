@@ -12,7 +12,9 @@ export function updateDocument<T extends Obj> (model: Model, doc: T, operations:
     if (match.match) {
       switch (op.kind) {
         case TxOperationKind.Set:
-          model.assign(model.getLayout(match.doc), match.doc._class, op._attributes)
+          if (op._attributes !== undefined) {
+            model.assign(model.getLayout(match.doc), match.doc._class, op._attributes)
+          }
           break
         case TxOperationKind.Push:
           if (match.attrMatch !== undefined) {
@@ -25,7 +27,11 @@ export function updateDocument<T extends Obj> (model: Model, doc: T, operations:
                 if (attrClass === undefined) {
                   throw new Error(`Invalid attribute type/class: ${String(attr.type)}`)
                 }
-                l[key] = model.pushArrayValue(l[key], attrClass, op._attributes)
+                if (op._attributes !== undefined) {
+                  l[key] = model.pushArrayValue(l[key], attrClass, op._attributes)
+                } else {
+                  throw new Error(`Empty _attributes specified: ${String(attr.type)}`)
+                }
                 break
               }
 
