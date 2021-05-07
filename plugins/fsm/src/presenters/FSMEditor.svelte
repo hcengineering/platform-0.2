@@ -15,7 +15,7 @@ limitations under the License.
 <script lang="ts">
   import groupBy from 'lodash/groupBy'
 
-  import { DateProperty, Doc, Ref, StringProperty } from '@anticrm/core'
+  import type { DateProperty, Doc, Ref, StringProperty } from '@anticrm/core'
   import type { CoreService, QueryUpdater } from '@anticrm/platform-core'
   import type { Space } from '@anticrm/domains'
   import { getCoreService, liveQuery } from '@anticrm/presentation'

@@ -13,37 +13,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <script lang="ts">
-  import { Ref } from '@anticrm/core'
-  import { QueryUpdater } from '@anticrm/platform-core'
-  import { getCoreService, liveQuery } from '@anticrm/presentation'
+  import { getCoreService } from '@anticrm/presentation'
   import type { WithFSM } from '@anticrm/fsm'
   import fsm from '@anticrm/fsm'
 
   import BoardPresenter from '@anticrm/fsm/src/presenters/board/BoardPresenter.svelte'
 
-  import type { Vacancy, WithCandidateProps } from '..'
-  import recruiting from '..'
+  import type { Vacancy } from '..'
 
   const coreP = getCoreService()
 
   export let object: Vacancy | undefined
-
-  let lq: Promise<QueryUpdater<WithCandidateProps>>
-  let candidates: WithCandidateProps[] = []
-
-  $: lq = liveQuery<WithCandidateProps>(
-    lq,
-    recruiting.mixin.WithCandidateProps,
-    {
-      appliedFor: object?._id as Ref<Vacancy>
-    },
-    (docs) =>
-      coreP
-        .then((s) => s.getModel())
-        .then((m) => {
-          candidates = docs.map((x) => m.as(x, recruiting.mixin.WithCandidateProps))
-        })
-  )
 
   let withFSMTarget: WithFSM | undefined
   $: if (object) {
@@ -61,7 +41,7 @@ limitations under the License.
   {#if object}
     <div class="header">
       <div class="title">
-        {object.title}
+        {object.name}
       </div>
       <div class="description">
         {object.description}
@@ -70,7 +50,7 @@ limitations under the License.
     <div>
       Salary: {object.salary}
     </div>
-    {#if withFSMTarget !== undefined && candidates.length > 0}
+    {#if withFSMTarget !== undefined}
       <div class="board">
         <BoardPresenter target={withFSMTarget} />
       </div>

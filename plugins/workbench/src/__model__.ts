@@ -47,6 +47,8 @@ class TWorkbenchApplication extends TApplication implements WorkbenchApplication
   @Prop() supportSpaces!: boolean
   @Prop() spaceTitle?: string
   @Prop() spaceComponent?: AnyComponent
+  @Prop() spaceCreator?: AnyComponent
+  @Prop() spaceClass?: Ref<Class<Space>>
 }
 
 @Class$(workbench.class.Perspective, core.class.Doc, MODEL_DOMAIN)

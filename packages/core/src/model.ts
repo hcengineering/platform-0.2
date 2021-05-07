@@ -871,7 +871,7 @@ export class Model implements Storage {
    * @param query query to check.
    */
   matchQuery<T extends Doc> (_class: Ref<Class<T>>, doc: Doc, query: DocumentQuery<T>): boolean {
-    if (!this.is(_class, doc._class)) {
+    if (!this.is(_class, doc._class) && !this.is(doc._class, _class)) {
       // Class doesn't match so return false.
       return false
     }

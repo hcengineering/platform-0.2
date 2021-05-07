@@ -17,9 +17,9 @@ limitations under the License.
   import { spring } from 'svelte/motion'
 
   import { Doc } from '@anticrm/core'
-  import { QueryUpdater } from '@anticrm/platform-core'
-  import { VDoc } from '@anticrm/domains'
-  import { AnyComponent } from '@anticrm/platform-ui'
+  import type { QueryUpdater } from '@anticrm/platform-core'
+  import type { VDoc } from '@anticrm/domains'
+  import type { AnyComponent } from '@anticrm/platform-ui'
   import presentationPlugin, { getPresentationService, liveQuery } from '@anticrm/presentation'
 
   import Component from '@anticrm/platform-ui/src/components/Component.svelte'

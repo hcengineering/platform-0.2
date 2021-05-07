@@ -39,6 +39,8 @@ export interface WorkbenchApplication extends Application {
   supportSpaces: boolean // If set to true, application will support spaces.
   spaceTitle?: string // A title for show spaces as
   spaceComponent?: AnyComponent // If defined will show component for space selection, instead of default one.
+  spaceCreator?: AnyComponent
+  spaceClass?: Ref<Class<Space>>
 
   spaceFilter?: Metadata<SpaceFilter> // An override for spaces list.
 }

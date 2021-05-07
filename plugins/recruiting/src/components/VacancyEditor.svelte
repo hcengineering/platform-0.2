@@ -14,16 +14,15 @@ limitations under the License.
 -->
 <script lang="ts">
   import { Model, Ref } from '@anticrm/core'
-  import type { Space } from '@anticrm/domains'
-  import type { QueryUpdater } from '@anticrm/paltform-core'
+  import type { QueryUpdater } from '@anticrm/platform-core'
   import { getCoreService, liveQuery } from '@anticrm/presentation'
   import type { FSM } from '@anticrm/fsm'
   import fsmPlugin from '@anticrm/fsm'
   import type { WorkbenchApplication } from '@anticrm/workbench'
 
   import EditBox from '@anticrm/sparkling-controls/src/EditBox.svelte'
-  import SpaceBox from '@anticrm/platform-ui/src/components/SpaceBox.svelte'
   import ComboBox from '@anticrm/sparkling-controls/src/ComboBox.svelte'
+  import SpaceEditor from '@anticrm/workbench/src/components/internal/spaces/SpaceEditor.svelte'
 
   import type { Vacancy } from '..'
 
@@ -37,9 +36,8 @@ limitations under the License.
 
   export let application: WorkbenchApplication
   export let vacancy: Vacancy
-  export let spaces: Space[]
-  export let space: Space | undefined
   export let fsmRef: Ref<FSM> | undefined
+  export let makePrivate: boolean
 
   let selectedFSM = 0
 
@@ -65,11 +63,7 @@ limitations under the License.
 </script>
 
 <div class="form">
-  {#if spaces && spaces.length > 1}
-    <SpaceBox label="Vacancy" {spaces} bind:space />
-  {/if}
-  <EditBox bind:value={vacancy.title} label="Title" />
-  <EditBox bind:value={vacancy.description} label="Description" />
+  <SpaceEditor bind:space={vacancy} bind:makePrivate {application} />
   <EditBox bind:value={vacancy.location} label="Location" placeholder="Russia, Novosibirsk" />
   <EditBox bind:value={vacancy.salary} label="Salary" />
   {#if fsmItems && fsmItems.length > 1}

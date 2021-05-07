@@ -38,9 +38,10 @@ export interface WithFSM extends Doc {
 }
 
 export interface FSMItem extends VDoc {
-  fsm: Ref<FSM>
+  fsm: Ref<WithFSM>
   state: Ref<State>
   item: Ref<VDoc>
+  // Class of item, probably has to be renamed
   clazz: Ref<Class<VDoc>>
 }
 

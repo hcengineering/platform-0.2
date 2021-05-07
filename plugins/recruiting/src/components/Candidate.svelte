@@ -18,7 +18,7 @@ limitations under the License.
   import { Doc, Ref } from '@anticrm/core'
   import { VDoc } from '@anticrm/domains'
   import { getCoreService, liveQuery } from '@anticrm/presentation'
-  import fsmPlugin, { getFSMService } from '@anticrm/fsm'
+  import fsmPlugin, { FSMItem, getFSMService, WithFSM } from '@anticrm/fsm'
 
   import UserInfo from '@anticrm/sparkling-controls/src/UserInfo.svelte'
   import ResumeProps from '@anticrm/person-extras/src/components/ResumeProps.svelte'
@@ -28,8 +28,9 @@ limitations under the License.
   import type { Person } from '@anticrm/contact'
   import contactPlugin from '@anticrm/contact'
 
-  import { Vacancy, WithCandidateProps } from '..'
+  import type { Vacancy, WithCandidateProps } from '..'
   import recruiting from '..'
+  import { QueryUpdater } from '@anticrm/platform-core'
 
   const dispatch = createEventDispatcher()
   const coreP = getCoreService()
@@ -45,13 +46,29 @@ limitations under the License.
     vacancies = docs
   })
 
+  let applicantItems: FSMItem[] | undefined
+  let applicantItemsQ: Promise<QueryUpdater<FSMItem>> | undefined
+
+  $: if (object) {
+    applicantItemsQ = liveQuery(
+      applicantItemsQ,
+      fsmPlugin.class.FSMItem,
+      {
+        item: object._id as Ref<VDoc>
+      },
+      (docs) => {
+        applicantItems = docs
+      }
+    )
+  }
+
   let appliedVacancies: Vacancy[] = []
   let availableVacancies: Vacancy[] = []
-  $: if (object) {
-    const targetRefs = new Set(object.appliedFor)
+  $: if (object && applicantItems) {
+    const targetRefs = new Set(applicantItems.map((x) => x.fsm))
 
-    appliedVacancies = vacancies.filter((x) => targetRefs.has(x._id as Ref<Vacancy>))
-    availableVacancies = vacancies.filter((x) => !targetRefs.has(x._id as Ref<Vacancy>))
+    appliedVacancies = vacancies.filter((x) => targetRefs.has(x._id as Ref<WithFSM>))
+    availableVacancies = vacancies.filter((x) => !targetRefs.has(x._id as Ref<WithFSM>))
   }
 
   $: {
@@ -70,10 +87,6 @@ limitations under the License.
 
     const vacancyWithFSM = core.getModel().as(vacancy, fsmPlugin.mixin.WithFSM)
     fsmService.removeStateItem(object._id as Ref<VDoc>, vacancyWithFSM)
-
-    core.update(object, {
-      appliedFor: object.appliedFor.filter((x) => x !== vacancy._id)
-    })
   }
 
   async function assign (vacancyRef: Ref<Doc>) {
@@ -90,18 +103,14 @@ limitations under the License.
       return
     }
 
-    const isFSMVacancy = model.isMixedIn(vacancy, fsmPlugin.mixin.WithFSM)
-
-    if (isFSMVacancy) {
-      const fsmService = await fsmServiceP
-
-      const withFSM = model.as(vacancy, fsmPlugin.mixin.WithFSM)
-      fsmService.addStateItem(withFSM, object._id as Ref<VDoc>, contactPlugin.class.Person)
+    if (!model.isMixedIn(vacancy, fsmPlugin.mixin.WithFSM)) {
+      return
     }
 
-    await core.update(object, {
-      appliedFor: [...object.appliedFor, vacancy._id as Ref<Vacancy>]
-    })
+    const fsmService = await fsmServiceP
+
+    const withFSM = model.as(vacancy, fsmPlugin.mixin.WithFSM)
+    fsmService.addStateItem(withFSM, object._id as Ref<VDoc>, contactPlugin.class.Person)
   }
 </script>
 
@@ -141,7 +150,7 @@ limitations under the License.
                   on:click={() => {
                     dispatch('open', { _id: vacancy && vacancy._id, _class: recruiting.class.Vacancy })
                   }}
-                  label={vacancy.title}
+                  label={vacancy.name}
                   kind="transparent" />
                 <Button label="Unassign" on:click={() => unassign(vacancy)} kind="transparent" />
               </div>
@@ -155,7 +164,7 @@ limitations under the License.
             <div class="assign-control" slot="trigger">Assign...</div>
             {#each availableVacancies as v}
               <PopupItem on:click={() => assign(v._id)}>
-                {v.title}
+                {v.name}
               </PopupItem>
             {/each}
           </PopupMenu>

@@ -11,9 +11,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { CORE_CLASS_NUMBER, CORE_CLASS_STRING, Ref } from '@anticrm/core'
-import core, { ArrayOf$, Builder, Class$, InstanceOf$, Mixin$, Prop, RefTo$, Primary } from '@anticrm/model'
-import { TEmb, TVDoc } from '@anticrm/model/src/__model__'
+import { CORE_CLASS_NUMBER, CORE_CLASS_STRING } from '@anticrm/core'
+import core, { ArrayOf$, Builder, Class$, InstanceOf$, Mixin$, Prop } from '@anticrm/model'
+import { TEmb, TSpace } from '@anticrm/model/src/__model__'
 import { IntlString } from '@anticrm/platform-i18n'
 import presentation from '@anticrm/presentation'
 import { UX } from '@anticrm/presentation/src/__model__'
@@ -23,8 +23,7 @@ import personExtras, { Skill } from '@anticrm/person-extras'
 import { templateFSM } from '@anticrm/fsm/src/__model__'
 
 import recruiting, { Candidate, Vacancy, WithCandidateProps } from '.'
-
-const VacanciesDomain = 'vacancies'
+import fsmPlugin from '@anticrm/fsm'
 
 @UX('Candidate' as IntlString)
 @Class$(recruiting.class.Candidate, core.class.Emb)
@@ -43,11 +42,10 @@ export class TCandidate extends TEmb implements Candidate {
 }
 
 @UX('Vacancy' as IntlString)
-@Class$(recruiting.class.Vacancy, core.class.VDoc, VacanciesDomain)
-export class TVacancy extends TVDoc implements Vacancy {
-  @Primary()
+@Class$(recruiting.class.Vacancy, core.class.Space)
+export class TVacancy extends TSpace implements Vacancy {
   @Prop(CORE_CLASS_STRING)
-  title!: string
+  company!: string
 
   @Prop(CORE_CLASS_STRING)
   description!: string
@@ -77,11 +75,6 @@ export class TVacancy extends TVDoc implements Vacancy {
 export class TWithCandidateProps extends TWithResume implements WithCandidateProps {
   @InstanceOf$(recruiting.class.Candidate)
   candidate!: Candidate
-
-  @UX('AppliedFor' as IntlString)
-  @ArrayOf$()
-  @RefTo$(recruiting.class.Vacancy)
-  appliedFor!: Array<Ref<Vacancy>>
 }
 
 export function model (S: Builder): void {
@@ -129,29 +122,17 @@ function createVacanciesAppModel (S: Builder): void {
     label: 'Vacancies' as IntlString,
     icon: recruiting.icon.Recruiting,
     component: workbench.component.Application,
-    classes: [recruiting.class.Vacancy],
-    spaceTitle: 'Company',
+    classes: [fsmPlugin.class.FSMItem],
+    spaceCreator: recruiting.component.NewVacancy,
+    spaceClass: recruiting.class.Vacancy,
+    spaceTitle: 'Vacancy',
     supportSpaces: true
   }, recruiting.application.Vacancies)
 
-  S.createDocument(workbench.class.ItemCreator, {
-    app: recruiting.application.Vacancies,
-    class: recruiting.class.Vacancy,
-    name: 'Vacancy' as IntlString
-  })
-
   S.createDocument(presentation.mixin.Viewlet, {
-    displayClass: recruiting.class.Vacancy,
-    label: 'Card' as IntlString,
-    component: recruiting.component.VacancyList
-  })
-
-  S.mixin(recruiting.class.Vacancy, presentation.mixin.CreateForm, {
-    component: recruiting.component.NewVacancy
-  })
-
-  S.mixin(recruiting.class.Vacancy, presentation.mixin.DetailForm, {
-    component: recruiting.component.Vacancy
+    displayClass: fsmPlugin.class.FSMItem,
+    label: 'Board' as IntlString,
+    component: fsmPlugin.component.BoardPresenter
   })
 
   const states = {

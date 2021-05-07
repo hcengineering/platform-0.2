@@ -15,9 +15,8 @@ limitations under the License.
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
 
-  import type { DateProperty, DocumentValue, Ref, StringProperty } from '@anticrm/core'
+  import type { Ref } from '@anticrm/core'
   import { generateId } from '@anticrm/core'
-  import type { Space } from '@anticrm/domains'
   import { getCoreService } from '@anticrm/presentation'
   import type { WorkbenchApplication } from '@anticrm/workbench'
   import { FSM, getFSMService } from '@anticrm/fsm'
@@ -30,12 +29,11 @@ limitations under the License.
   import recruiting from '..'
   import VacancyEditor from './VacancyEditor.svelte'
 
-  export let spaces: Space[]
   export let application: WorkbenchApplication
+  export let makePrivate: boolean
 
   const coreP = getCoreService()
   const fsmServiceP = getFSMService()
-  let space: Space | undefined = spaces[0]
   const dispatch = createEventDispatcher()
 
   export let fsmRef: Ref<FSM> | undefined
@@ -43,11 +41,13 @@ limitations under the License.
   let vacancy: Vacancy = {
     _id: generateId(),
     _class: recruiting.class.Vacancy,
-    _space: space?._id as Ref<Space>,
-    _createdBy: '' as StringProperty,
-    _createdOn: Date.now() as DateProperty,
-    title: '',
+    name: '',
     description: '',
+    archived: false,
+    isPublic: true,
+    application: recruiting.application.Vacancies,
+    spaceKey: '',
+    users: [],
     location: '',
     responsibilities: [],
     skills: []
@@ -56,18 +56,22 @@ limitations under the License.
   async function save () {
     const core = await coreP
     const model = core.getModel()
-
     const doc = {
       ...vacancy,
-      _space: space?._id as Ref<Space>,
-      _createdBy: core.getUserId() as StringProperty
-    } as DocumentValue<Vacancy>
+      users: [
+        {
+          userId: core.getUserId(),
+          owner: true
+        }
+      ]
+    }
 
     if (fsmRef) {
-      const newFSM = await fsmServiceP.then((service) => service.duplicateFSM(fsmRef))
+      const actualFSMRef = fsmRef
+      const newFSM = await fsmServiceP.then((service) => service.duplicateFSM(actualFSMRef))
 
       if (newFSM) {
-        model.mixinDocument(doc as Vacancy, fsmPlugin.mixin.WithFSM, {
+        model.mixinDocument(doc, fsmPlugin.mixin.WithFSM, {
           fsm: newFSM._id as Ref<FSM>
         })
       }
@@ -81,7 +85,7 @@ limitations under the License.
 
 <div class="root">
   <ScrollView height="500px">
-    <VacancyEditor bind:vacancy {spaces} {application} bind:fsmRef bind:space />
+    <VacancyEditor bind:vacancy {application} bind:makePrivate bind:fsmRef />
   </ScrollView>
   <div class="footer">
     <Button kind="primary" on:click={save} width="100%">Принять</Button>

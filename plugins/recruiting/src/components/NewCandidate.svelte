@@ -76,8 +76,7 @@ limitations under the License.
 
     model.mixinDocument(doc as Person, recruiting.mixin.WithCandidateProps, {
       candidate: candidateM,
-      resume: resumeM,
-      appliedFor: []
+      resume: resumeM
     })
 
     await core.create<Person>(contact.class.Person, doc)

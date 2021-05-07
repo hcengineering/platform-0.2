@@ -16,7 +16,7 @@ import { Plugin, plugin, Service } from '@anticrm/platform'
 import { Asset, AnyComponent } from '@anticrm/platform-ui'
 import personExtras, { Skill, WithResume } from '@anticrm/person-extras'
 import { WorkbenchApplication } from '@anticrm/workbench'
-import { VDoc } from '@anticrm/domains'
+import type { Space } from '@anticrm/domains'
 import fsm from '@anticrm/fsm'
 
 export interface Candidate extends Emb {
@@ -27,13 +27,12 @@ export interface Candidate extends Emb {
 
 export interface WithCandidateProps extends WithResume {
   candidate: Candidate
-  appliedFor: Array<Ref<Vacancy>>
 }
 
-export interface Vacancy extends VDoc {
-  title: string
-  location: string
+export interface Vacancy extends Space {
+  company?: string
   description: string
+  location: string
   responsibilities: string[]
   skills: Skill[]
   salary?: number

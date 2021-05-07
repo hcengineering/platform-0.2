@@ -13,10 +13,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <script lang="ts">
-  import { CORE_MIXIN_SHORTID, VDoc } from '@anticrm/domains'
+  import type { VDoc } from '@anticrm/domains'
+  import { CORE_MIXIN_SHORTID } from '@anticrm/domains'
   import presentation, { getCoreService } from '@anticrm/presentation'
-  import { Class, CORE_CLASS_STRING, Model, Obj } from '@anticrm/core'
-  import { Asset } from '@anticrm/platform-ui'
+  import type { Class, Model, Obj } from '@anticrm/core'
+  import { CORE_CLASS_STRING } from '@anticrm/core'
+  import type { Asset } from '@anticrm/platform-ui'
   import Icon from '@anticrm/platform-ui/src/components/Icon.svelte'
 
   export let doc: VDoc

@@ -168,7 +168,7 @@ export async function processTx (ctx: SecurityContext, workspace: WorkspaceProto
   switch (tx._class) {
     case CORE_CLASS_CREATE_TX: {
       const createTx = tx as CreateTx
-      if (createTx._objectClass === CORE_CLASS_SPACE) {
+      if (model.is(createTx._objectClass, CORE_CLASS_SPACE)) {
         // Creation of a new space, we need to mark user as owner if this information is missing
         const s = model.createDocument<Space>(createTx._objectClass as Ref<Class<Space>>, (createTx.object as unknown) as Space, createTx._objectId as Ref<Space>)
         if (ownChange) {

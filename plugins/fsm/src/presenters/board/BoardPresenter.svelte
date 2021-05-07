@@ -13,9 +13,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <script type="ts">
-  import { Ref } from '@anticrm/core'
-  import { VDoc } from '@anticrm/domains'
-  import { CoreService, QueryUpdater } from '@anticrm/platform-core'
+  import type { Ref } from '@anticrm/core'
+  import type { Space } from '@anticrm/domains'
+  import type { CoreService, QueryUpdater } from '@anticrm/platform-core'
   import { getUIService } from '@anticrm/platform-ui'
   import workbench from '@anticrm/workbench'
   import { getCoreService, liveQuery } from '@anticrm/presentation'
@@ -30,13 +30,25 @@ limitations under the License.
   import type { FSM, FSMItem, State, WithFSM } from '../..'
   import fsmPlugin from '../..'
 
-  export let target: WithFSM
+  export let space: Space | undefined
+  // Target should be used if WithFSM is mixed in anything except space
+  export let target: WithFSM | undefined
+
+  let actualTarget: WithFSM | undefined
 
   let cs: CoreService | undefined
   const uiService = getUIService()
 
   async function init () {
     cs = await getCoreService()
+  }
+
+  $: if (cs && (space || target)) {
+    if (space !== undefined) {
+      actualTarget = cs.getModel().as(space, fsmPlugin.mixin.WithFSM)
+    } else if (target !== undefined) {
+      actualTarget = target
+    }
   }
 
   let dragIn: any | null = null
@@ -51,26 +63,28 @@ limitations under the License.
   let fsm: FSM | undefined
   let fsmQuery: Promise<QueryUpdater<FSM>> | undefined
 
-  $: fsmQuery = liveQuery(
-    fsmQuery,
-    fsmPlugin.class.FSM,
-    {
-      _id: target.fsm
-    },
-    (docs) => {
-      fsm = docs[0]
-    }
-  )
+  $: if (actualTarget !== undefined) {
+    fsmQuery = liveQuery(
+      fsmQuery,
+      fsmPlugin.class.FSM,
+      {
+        _id: actualTarget.fsm
+      },
+      (docs) => {
+        fsm = docs[0]
+      }
+    )
+  }
 
   let items: FSMItem[] = []
   let itemsQuery: Promise<QueryUpdater<FSMItem>> | undefined
 
-  $: if (fsm && cs) {
+  $: if (actualTarget) {
     itemsQuery = liveQuery(
       itemsQuery,
       fsmPlugin.class.FSMItem,
       {
-        fsm: fsm._id as Ref<FSM>
+        fsm: actualTarget._id as Ref<WithFSM>
       },
       (docs) => {
         items = docs
@@ -82,7 +96,7 @@ limitations under the License.
   let hiddenStatuses = new Set<string>()
   let statesQuery: Promise<QueryUpdater<State>> | undefined
 
-  $: if (fsm && cs) {
+  $: if (fsm) {
     statesQuery = liveQuery(
       statesQuery,
       fsmPlugin.class.State,
@@ -107,12 +121,12 @@ limitations under the License.
 
   let dragDoc: FSMItem | undefined
 
-  function docsFor (vdocs: FSMItem[], status: any): VDoc[] {
+  function docsFor (vdocs: FSMItem[], status: any): FSMItem[] {
     if (!cs) {
       return []
     }
 
-    const res = vdocs
+    return vdocs
       .filter((d) => d.state === status)
       .sort((a, b) => {
         if (a._modifiedOn !== undefined && b._modifiedOn !== undefined) {
@@ -126,7 +140,6 @@ limitations under the License.
         }
         return -1
       })
-    return res
   }
 
   function changeStat (sid: any): void {

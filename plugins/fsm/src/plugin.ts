@@ -13,6 +13,7 @@
 
 import { Class, DateProperty, Ref, StringProperty } from '@anticrm/core'
 import type { Platform } from '@anticrm/platform'
+import type { Space, VDoc } from '@anticrm/domains'
 import type { CoreService } from '@anticrm/platform-core'
 
 import BoardPresenter from './presenters/board/BoardPresenter.svelte'
@@ -20,7 +21,6 @@ import VDocCardPresenter from './presenters/board/VDocCardPresenter.svelte'
 
 import type { FSM, FSMService, State, Transition, WithFSM } from '.'
 import fsmPlugin from '.'
-import { VDoc } from '@anticrm/domains'
 
 export default async (platform: Platform, deps: {core: CoreService}): Promise<FSMService> => {
   platform.setResource(fsmPlugin.component.BoardPresenter, BoardPresenter)
@@ -33,12 +33,16 @@ export default async (platform: Platform, deps: {core: CoreService}): Promise<FS
     await deps.core.find(fsmPlugin.class.Transition, { fsm: fsm._id as Ref<FSM> })
       .then(xs => xs.filter((x): x is Transition => x !== undefined))
 
+  const getTargetFSM = async (fsmOwner: WithFSM): Promise<FSM | undefined> => {
+    return await deps.core.findOne(fsmPlugin.class.FSM, { _id: fsmOwner.fsm })
+  }
+
   return {
     getStates,
     getTransitions,
-    addStateItem: async (fsmOwner: WithFSM, item: Ref<VDoc>, clazz: Ref<Class<VDoc>>) => {
+    addStateItem: async (fsmOwner: WithFSM, item: Ref<VDoc>, clazz: Ref<Class<VDoc>>, space?: Ref<Space>) => {
       // TODO: we need to make sure that new FSMItem is only referring to specific item
-      const fsm = await deps.core.findOne(fsmPlugin.class.FSM, { _id: fsmOwner.fsm })
+      const fsm = await getTargetFSM(fsmOwner)
 
       if (fsm === undefined) {
         return
@@ -50,21 +54,15 @@ export default async (platform: Platform, deps: {core: CoreService}): Promise<FS
       return await deps.core.create(fsmPlugin.class.FSMItem, {
         _createdBy: deps.core.getUserId() as StringProperty,
         _createdOn: Date.now() as DateProperty,
-        _space: fsmPlugin.space.Common,
+        _space: space ?? fsmOwner._id as Ref<Space>,
         clazz,
         item,
-        fsm: fsm._id as Ref<FSM>,
+        fsm: fsmOwner._id as Ref<WithFSM>,
         state: targetState._id as Ref<State>
       })
     },
     removeStateItem: async (item: Ref<VDoc>, fsmOwner: WithFSM) => {
-      const fsm = await deps.core.findOne(fsmPlugin.class.FSM, { _id: fsmOwner.fsm })
-
-      if (fsm === undefined) {
-        return
-      }
-
-      const docs = await deps.core.find(fsmPlugin.class.FSMItem, { item, fsm: fsm._id as Ref<FSM> })
+      const docs = await deps.core.find(fsmPlugin.class.FSMItem, { item, fsm: fsmOwner._id as Ref<WithFSM> })
 
       await Promise.all(docs.map(deps.core.remove.bind(deps.core)))
     },
