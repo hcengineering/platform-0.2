@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Class, DateProperty, Doc, generateId, Property, Ref, StringProperty } from '@anticrm/core'
+import { AnyLayout, Class, Doc, generateId, Ref } from '@anticrm/core'
 import {
   CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_UPDATE_TX, CreateTx, DeleteTx, Space,
   TxOperation, UpdateTx
@@ -33,35 +33,35 @@ export function newCreateTx<T extends Doc> (doc: T, _user: string, _objectSpace?
     _class: CORE_CLASS_CREATE_TX,
     _id: generateId(),
     _objectSpace,
-    _date: Date.now() as DateProperty,
-    _user: _user as StringProperty,
+    _date: Date.now(),
+    _user,
     _objectId: _id ?? generateId(),
     _objectClass: _class,
     object: (objValue as unknown) as AnyLayout
   }
 }
 
-export function newUpdateTx (_class: Ref<Class<Doc>>, _id: Ref<Doc>, operations: TxOperation[], _user: string, _objectSpace?: Ref<Space>): UpdateTx {
+export function newUpdateTx (_objectClass: Ref<Class<Doc>>, _objectId: Ref<Doc>, operations: TxOperation[], _user: string, _objectSpace?: Ref<Space>): UpdateTx {
   return {
     _class: CORE_CLASS_UPDATE_TX,
     _id: generateId(),
-    _objectId: _id,
-    _objectClass: _class,
+    _objectId,
+    _objectClass,
     _objectSpace,
-    _date: Date.now() as Property<number, Date>,
-    _user: _user as StringProperty,
+    _date: Date.now(),
+    _user,
     operations
   }
 }
 
-export function newDeleteTx (_class: Ref<Class<Doc>>, _id: Ref<Doc>, _user: string, _objectSpace?: Ref<Space>): DeleteTx {
+export function newDeleteTx (_objectClass: Ref<Class<Doc>>, _objectId: Ref<Doc>, _user: string, _objectSpace?: Ref<Space>): DeleteTx {
   return {
     _class: CORE_CLASS_DELETE_TX,
     _id: generateId(),
-    _objectId: _id,
-    _objectClass: _class,
+    _objectId,
+    _objectClass,
     _objectSpace,
-    _date: Date.now() as Property<number, Date>,
-    _user: _user as StringProperty
+    _date: Date.now(),
+    _user
   }
 }

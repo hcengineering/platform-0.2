@@ -15,9 +15,17 @@
 
 /* eslint-env jest */
 
-import { AnyLayout, Class, Doc, DocumentQuery, DocumentValue, Model, Property, PropertyType, Ref, StringProperty, txContext } from '@anticrm/core'
+import { AnyLayout, Class, Doc, DocumentQuery, DocumentValue, Model, PropertyType, Ref, txContext } from '@anticrm/core'
 import { createSubtask, createTask, data, doc1, SubTask, Task, taskIds } from '@anticrm/core/src/__tests__/tasks'
-import { CORE_CLASS_OBJECT_SELECTOR, CORE_CLASS_TX_OPERATION, ObjectTx, Space, txBuilder, TxOperation, TxOperationKind } from '../index'
+import {
+  CORE_CLASS_OBJECT_SELECTOR,
+  CORE_CLASS_TX_OPERATION,
+  ObjectTx,
+  Space,
+  txBuilder,
+  TxOperation,
+  TxOperationKind
+} from '../index'
 import { ModelStorage } from '../model_storage'
 import { updateDocument } from '../tx/modeltx'
 import { create } from '../tx/operations'
@@ -30,11 +38,13 @@ describe('core tests', () => {
   it('create object selector ', () => {
     const s = txBuilder(taskIds.class.Task)
 
-    expect(s.tasks?.match({ name: 'qwe' }).build()).toEqual([{
-      _class: 'class:core.ObjectSelector',
-      key: 'tasks',
-      pattern: { name: 'qwe' }
-    }])
+    expect(s.tasks?.match({ name: 'qwe' }).build()).toEqual([
+      {
+        _class: 'class:core.ObjectSelector',
+        key: 'tasks',
+        pattern: { name: 'qwe' }
+      }
+    ])
   })
   it('create multiple object selector ', () => {
     const s = txBuilder(taskIds.class.Task)
@@ -48,7 +58,8 @@ describe('core tests', () => {
       {
         _class: CORE_CLASS_OBJECT_SELECTOR,
         key: 'comments'
-      }])
+      }
+    ])
   })
   it('create object set operation ', () => {
     const s = txBuilder(taskIds.class.Task)
@@ -59,14 +70,17 @@ describe('core tests', () => {
       _attributes: {
         message: 'comment msg'
       },
-      selector: [{
-        _class: CORE_CLASS_OBJECT_SELECTOR,
-        key: 'tasks',
-        pattern: { name: 'qwe' }
-      }, {
-        _class: CORE_CLASS_OBJECT_SELECTOR,
-        key: 'comments'
-      }]
+      selector: [
+        {
+          _class: CORE_CLASS_OBJECT_SELECTOR,
+          key: 'tasks',
+          pattern: { name: 'qwe' }
+        },
+        {
+          _class: CORE_CLASS_OBJECT_SELECTOR,
+          key: 'comments'
+        }
+      ]
     })
   })
   it('create multiple operations ', () => {
@@ -78,14 +92,17 @@ describe('core tests', () => {
       _attributes: {
         message: 'comment msg'
       },
-      selector: [{
-        _class: CORE_CLASS_OBJECT_SELECTOR,
-        key: 'tasks',
-        pattern: { name: 'qwe' }
-      }, {
-        _class: CORE_CLASS_OBJECT_SELECTOR,
-        key: 'comments'
-      }]
+      selector: [
+        {
+          _class: CORE_CLASS_OBJECT_SELECTOR,
+          key: 'tasks',
+          pattern: { name: 'qwe' }
+        },
+        {
+          _class: CORE_CLASS_OBJECT_SELECTOR,
+          key: 'comments'
+        }
+      ]
     })
     expect(s.comments?.match({ message: 'qwe' }).set({ message: 'comment msg' })).toEqual({
       _class: CORE_CLASS_TX_OPERATION,
@@ -93,11 +110,13 @@ describe('core tests', () => {
       _attributes: {
         message: 'comment msg'
       },
-      selector: [{
-        _class: CORE_CLASS_OBJECT_SELECTOR,
-        key: 'comments',
-        pattern: { message: 'qwe' }
-      }]
+      selector: [
+        {
+          _class: CORE_CLASS_OBJECT_SELECTOR,
+          key: 'comments',
+          pattern: { message: 'qwe' }
+        }
+      ]
     })
   })
 
@@ -114,20 +133,20 @@ describe('core tests', () => {
   })
   it('apply string value', () => {
     const clone = model.createDocument(taskIds.class.Task, doc1)
-    updateDocumentSet(model, clone, { name: 'changed' as StringProperty })
+    updateDocumentSet(model, clone, { name: 'changed' })
 
     expect(clone.name).toEqual('changed')
   })
   it('apply number value', () => {
     const clone = model.createDocument(taskIds.class.Task, doc1)
-    updateDocumentSet(model, clone, { rate: 10 as Property<number, number> })
+    updateDocumentSet(model, clone, { rate: 10 })
 
     expect(clone.rate).toEqual(10)
   })
 
   it('apply array value', () => {
     const clone = model.createDocument(taskIds.class.Task, doc1)
-    updateDocumentSet(model, clone, { lists: ['A' as StringProperty, 'B' as StringProperty] })
+    updateDocumentSet(model, clone, { lists: ['A', 'B'] })
 
     expect(clone.lists).toEqual(['A', 'B'])
   })
@@ -138,12 +157,12 @@ describe('core tests', () => {
     updateDocumentSet(model, clone, { mainTask: createSubtask('subtask4') })
 
     expect(clone.mainTask).toBeDefined()
-    expect((clone.mainTask as never as SubTask).name).toEqual('subtask4')
+    expect(((clone.mainTask as never) as SubTask).name).toEqual('subtask4')
   })
 
   it('push subtask value', () => {
     const clone = model.createDocument(taskIds.class.Task, doc1)
-    updateDocumentPush<Task, SubTask>(model, clone, 'tasks' as StringProperty, createSubtask('subtask3', 34))
+    updateDocumentPush<Task, SubTask>(model, clone, 'tasks', createSubtask('subtask3', 34))
 
     expect(clone.tasks?.length).toEqual(3)
   })
@@ -154,7 +173,7 @@ describe('core tests', () => {
       _class: CORE_CLASS_TX_OPERATION,
       kind: TxOperationKind.Set,
       _attributes: {
-        rate: 44 as Property<number, number>
+        rate: 44
       },
       selector: [{ _class: CORE_CLASS_OBJECT_SELECTOR, key: 'tasks', pattern: { name: 'subtask1' } }]
     }
@@ -168,13 +187,16 @@ describe('core tests', () => {
     const txOp: TxOperation = {
       _class: CORE_CLASS_TX_OPERATION,
       kind: TxOperationKind.Push,
-      selector: [{
-        _class: CORE_CLASS_OBJECT_SELECTOR,
-        key: 'tasks',
-        pattern: { name: 'subtask1' }
-      }, { _class: CORE_CLASS_OBJECT_SELECTOR, key: 'comments' }],
+      selector: [
+        {
+          _class: CORE_CLASS_OBJECT_SELECTOR,
+          key: 'tasks',
+          pattern: { name: 'subtask1' }
+        },
+        { _class: CORE_CLASS_OBJECT_SELECTOR, key: 'comments' }
+      ],
       _attributes: {
-        message: 'my-msg' as StringProperty
+        message: 'my-msg'
       }
     }
     const cloneResult = updateDocument(model, clone, [txOp])
@@ -237,11 +259,7 @@ describe('core tests', () => {
       _attributes: (createSubtask('subtask3', 34) as unknown) as AnyLayout,
       selector: [{ _class: CORE_CLASS_OBJECT_SELECTOR, key: 'tasks', pattern: { name: 'Not exist' } }]
     }
-    expect(
-      () => updateDocument(model,
-        doc,
-        [txOp])
-    ).toThrowError()
+    expect(() => updateDocument(model, doc, [txOp])).toThrowError()
   })
 
   it('throws on pushing to missing attribute', () => {
@@ -250,12 +268,8 @@ describe('core tests', () => {
 
     const doc = model.createDocument<Task>(taskIds.class.Task, createTask('', 0, ''))
 
-    expect(
-      () => updateDocumentPush<Task, SubTask>(model,
-        doc,
-        'Not exist',
-        createSubtask('subtask3', 34)
-      )
+    expect(() =>
+      updateDocumentPush<Task, SubTask>(model, doc, 'Not exist', createSubtask('subtask3', 34))
     ).toThrowError()
   })
 
@@ -273,9 +287,7 @@ describe('core tests', () => {
       description: '',
       lists: [],
       name: '',
-      tasks: [
-        { name: '' }
-      ]
+      tasks: [{ name: '' }]
     }
     expect(q1).toBeDefined()
     expect(q2).toBeDefined()
@@ -291,19 +303,14 @@ describe('Model storage', () => {
     const doc = model.createDocument(taskIds.class.Task, doc1)
     model.add(doc)
 
-    const existingSubtasks = [...doc.tasks ?? []]
+    const existingSubtasks = [...(doc.tasks ?? [])]
     const newSubtask = createSubtask('subtask3', 34)
     const expectedDoc = {
       ...doc,
       tasks: [...existingSubtasks, { ...newSubtask, _class: taskIds.class.Subtask }]
     }
 
-    push<SubTask>(model,
-      '' as Ref<Class<Doc>>,
-      doc._id,
-      'tasks',
-      newSubtask
-    )
+    push<SubTask>(model, '' as Ref<Class<Doc>>, doc._id, 'tasks', newSubtask)
 
     const updatedDoc = model.get(doc._id) as Task
 
@@ -323,7 +330,11 @@ describe('Model storage', () => {
       name: newName
     }
 
-    const txOp: TxOperation = { _class: CORE_CLASS_TX_OPERATION, kind: TxOperationKind.Set, _attributes: { name: newName as PropertyType } }
+    const txOp: TxOperation = {
+      _class: CORE_CLASS_TX_OPERATION,
+      kind: TxOperationKind.Set,
+      _attributes: { name: newName as PropertyType }
+    }
     updateDocument(model, model.get(doc._id), [txOp])
 
     const updatedDoc = model.get(doc._id) as Task

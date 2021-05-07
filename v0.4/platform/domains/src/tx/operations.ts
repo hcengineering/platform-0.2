@@ -69,7 +69,7 @@ export function updateWith<T extends Doc> (model: Model, userId: string, doc: T,
 /**
  * Construct update transaction
  */
-export function update<T extends Doc> (model: Model, userId: string, doc: T, value: Partial<Omit<T, keyof Doc>>): Tx {
+export function update<T extends Doc> (model: Model, userId: string, doc: T, value: DocumentValue<T>): Tx {
   const { _objectSpace, spaceIsRequired } = getSpace(model, doc)
   if ((_objectSpace === undefined) && spaceIsRequired) {
     throw new Error('Every VDoc based object should contain _space property')
@@ -127,7 +127,7 @@ export function createOperations (model: Model, processTx: (tx: Tx) => Promise<a
     create: async<T extends Doc>(_class: Ref<Class<T>>, values: DocumentValue<T>): Promise<void> => {
       await processTx(create<T>(model, userId, _class, values))
     },
-    update: async <T extends Doc> (doc: T, value: Partial<Omit<T, keyof Doc>>): Promise<void> => {
+    update: async <T extends Doc> (doc: T, value: Partial<DocumentValue<T>>): Promise<void> => {
       await processTx(update(model, userId, doc, value))
     },
     updateWith: async <T extends Doc> (doc: T, builder: (s: TxBuilder<T>) => TxOperation | TxOperation[]): Promise<void> => {

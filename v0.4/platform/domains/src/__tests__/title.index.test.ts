@@ -15,15 +15,13 @@
 
 /* eslint-env jest */
 
-import {
-  AnyLayout, Class, Doc, generateId, mixinKey, Model, Property, Ref, StringProperty, txContext
-} from '@anticrm/core'
+import { AnyLayout, Class, Doc, generateId, mixinKey, Model, Ref, txContext } from '@anticrm/core'
 import { data, doc1, taskIds } from '@anticrm/core/src/__tests__/tasks'
-import { TitleIndex } from '../indices/title'
 import {
   CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_OBJECT_TX, CORE_CLASS_TITLE, CORE_CLASS_UPDATE_TX, CORE_MIXIN_SHORTID, CreateTx,
   DeleteTx, Title, TitleSource, TxOperationKind, UpdateTx
 } from '../index'
+import { TitleIndex } from '../indices/title'
 import { ModelStorage } from '../model_storage'
 
 const model = new Model('vdocs')
@@ -33,8 +31,8 @@ function newCTx (_class: Ref<Class<Doc>>, _id: Ref<Doc>, object: AnyLayout): Cre
   return {
     _class: CORE_CLASS_CREATE_TX,
     _id: generateId(),
-    _date: Date.now() as Property<number, Date>,
-    _user: 'system' as StringProperty,
+    _date: Date.now(),
+    _user: 'system',
     _objectId: _id,
     _objectClass: _class,
     object: object
@@ -45,15 +43,17 @@ function newUTx (_class: Ref<Class<Doc>>, _id: Ref<Doc>, object: AnyLayout): Upd
   return {
     _class: CORE_CLASS_UPDATE_TX,
     _id: generateId(),
-    _date: Date.now() as Property<number, Date>,
-    _user: 'system' as StringProperty,
+    _date: Date.now(),
+    _user: 'system',
     _objectId: _id,
     _objectClass: _class,
-    operations: [{
-      _class: CORE_CLASS_OBJECT_TX,
-      kind: TxOperationKind.Set,
-      _attributes: object
-    }]
+    operations: [
+      {
+        _class: CORE_CLASS_OBJECT_TX,
+        kind: TxOperationKind.Set,
+        _attributes: object
+      }
+    ]
   }
 }
 
@@ -61,8 +61,8 @@ function newDTx (_class: Ref<Class<Doc>>, _id: Ref<Doc>): DeleteTx {
   return {
     _class: CORE_CLASS_DELETE_TX,
     _id: generateId(),
-    _date: Date.now() as Property<number, Date>,
-    _user: 'system' as StringProperty,
+    _date: Date.now(),
+    _user: 'system',
     _objectId: _id,
     _objectClass: _class
   }
@@ -113,15 +113,18 @@ describe('title-index tests', () => {
 
     const shortIdKey = mixinKey(CORE_MIXIN_SHORTID, 'shortId')
 
-    await index.tx(txContext(), newUTx(taskIds.class.Task, doc1._id, {
-      name: 'new-name' as StringProperty,
-      [shortIdKey]: 'SPACE-2' as StringProperty,
-      _mixins: [CORE_MIXIN_SHORTID]
-    }))
+    await index.tx(
+      txContext(),
+      newUTx(taskIds.class.Task, doc1._id, {
+        name: 'new-name',
+        [shortIdKey]: 'SPACE-2',
+        _mixins: [CORE_MIXIN_SHORTID]
+      })
+    )
 
     const titles = await memDb.find<Title>(CORE_CLASS_TITLE, {})
     expect(titles.length).toEqual(3)
-    const named = titles.map(t => t.title).sort((a, b) => String(a).localeCompare(String(b)))
+    const named = titles.map((t) => t.title).sort((a, b) => String(a).localeCompare(String(b)))
     expect(named).toEqual(['new-name', 'SPACE-2', 'TASK-1'])
   })
   it('verify other update', async () => {

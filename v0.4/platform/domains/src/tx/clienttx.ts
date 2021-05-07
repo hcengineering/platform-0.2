@@ -1,6 +1,6 @@
-import { Class, Doc, DocumentQuery, FindOptions, Ref, Storage, StringProperty, Tx, TxContext } from '@anticrm/core'
+import { Class, Doc, DocumentQuery, FindOptions, Ref, Storage, Tx, TxContext } from '@anticrm/core'
 
-const systemUser = 'system' as StringProperty
+const systemUser = 'system'
 
 /**
  * A storage to create a client transactions into txContext and pass execution to delegate

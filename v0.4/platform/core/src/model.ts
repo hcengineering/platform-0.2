@@ -14,10 +14,8 @@
 //
 
 import {
-  AnyLayout, ArrayOf, Attribute, Class, Classifier, ClassifierKind, CORE_CLASS_ARRAY_OF, CORE_CLASS_CLASS,
-  CORE_CLASS_INSTANCE_OF,
-  CORE_CLASS_MIXIN,
-  CORE_MIXIN_INDICES, Doc, Mixin, Obj, Property, PropertyType, Ref, Type
+  AnyLayout, ArrayOf, Attribute, Class, Classifier, ClassifierKind, CORE_CLASS_ARRAY_OF, CORE_CLASS_CLASS, CORE_CLASS_INSTANCE_OF, CORE_CLASS_MIXIN, CORE_MIXIN_INDICES,
+  Doc, Mixin, Obj, PropertyType, Ref, Type
 } from './classes'
 import { DocumentQuery, DocumentSorting, DocumentValue, FindOptions, generateId, RegExpression } from './storage'
 
@@ -160,7 +158,7 @@ export class Model {
     if (this.byExtends !== undefined) this.indexExtends(doc, false)
   }
 
-  get<T extends Doc> (id: Ref<T>): T {
+  get<T extends Doc>(id: Ref<T>): T {
     const obj = this.objects.get(id)
     if (obj === undefined) {
       throw new Error('document not found ' + id)
@@ -206,7 +204,7 @@ export class Model {
   getDomain (id: Ref<Class<Doc>>): string {
     let clazz = this.objects.get(id) as Class<Doc> | undefined
     while (clazz !== undefined) {
-      if (clazz._domain !== undefined) return clazz._domain as string
+      if (clazz._domain !== undefined) return clazz._domain
       clazz = (clazz._extends !== undefined) ? (this.objects.get(clazz._extends) as Class<Doc>) : undefined
     }
     throw new Error('no domain found for class: ' + id)
@@ -230,7 +228,7 @@ export class Model {
    * @param values
    * @param _id - optional id, if not sepecified will be automatically generated.
    */
-  createDocument<T extends Doc> (_class: Ref<Class<T>>, values: DocumentValue<T>, _id?: Ref<T>): T {
+  createDocument<T extends Doc>(_class: Ref<Class<T>>, values: DocumentValue<T>, _id?: Ref<T>): T {
     const doc = this.assign({}, _class, (values as unknown) as AnyLayout)
     doc._id = _id ?? generateId()
     return (doc as unknown) as T
@@ -321,10 +319,7 @@ export class Model {
         const { mixin, key } = mixinFromKey(rKey)
         this.assign(layout, mixin, { [key]: r[rKey] })
       } else {
-        const {
-          attr,
-          key
-        } = this.classAttribute(_class, rKey)
+        const { attr, key } = this.classAttribute(_class, rKey)
         // Check if we need to perform inner assign based on field value and type
         switch (attr.type._class) {
           case CORE_CLASS_ARRAY_OF: {
@@ -357,12 +352,12 @@ export class Model {
     return l
   }
 
-  public mixinDocument<E extends Obj, T extends Obj> (doc: E, clazz: Ref<Mixin<T>>, values: Partial<Omit<T, keyof E>>): void {
+  public mixinDocument<E extends Obj, T extends Obj>(doc: E, clazz: Ref<Mixin<T>>, values: Partial<Omit<T, keyof E>>): void {
     Model.includeMixin(doc, clazz)
     this.assign(this.getLayout(doc), clazz as Ref<Class<Obj>>, (values as unknown) as AnyLayout)
   }
 
-  public static includeMixin<E extends Obj, T extends Obj> (doc: E, clazz: Ref<Mixin<T>>): void {
+  public static includeMixin<E extends Obj, T extends Obj>(doc: E, clazz: Ref<Mixin<T>>): void {
     this.includeMixinAny(doc, clazz as Ref<Mixin<Obj>>)
   }
 
@@ -376,7 +371,7 @@ export class Model {
     }
   }
 
-  mixin<E extends Doc, T extends E> (id: Ref<E>, clazz: Ref<Mixin<T>>, values: Omit<T, keyof E>): void {
+  mixin<E extends Doc, T extends E>(id: Ref<E>, clazz: Ref<Mixin<T>>, values: Omit<T, keyof E>): void {
     this.mixinDocument(this.get(id), clazz, values)
   }
 
@@ -435,7 +430,7 @@ export class Model {
    *
    * flatten queries are applicable only for mongoDB and not supported by model search operations.
    */
-  createQuery<T extends Doc> (_class: Ref<Class<T>>, _query: DocumentQuery<T>, flatten = false): { query: DocumentQuery<T>, classes: Array<Ref<Class<Obj>>> } {
+  createQuery<T extends Doc>(_class: Ref<Class<T>>, _query: DocumentQuery<T>, flatten = false): { query: DocumentQuery<T>, classes: Array<Ref<Class<Obj>>> } {
     let query = this.assign({}, _class, _query as AnyLayout)
 
     if (flatten) {
@@ -496,10 +491,7 @@ export class Model {
         match = this.classAttribute(_class, rKey)
       }
 
-      const {
-        attr,
-        key
-      } = match
+      const { attr, key } = match
       // Check if we need to perform inner assign based on field value and type
       switch (attr.type._class) {
         case CORE_CLASS_ARRAY_OF: {
@@ -514,7 +506,7 @@ export class Model {
               if (!useOperators) {
                 throw new Error('operators are required to match with array')
               }
-              l[key] = { $all: value as Property<any, any> }
+              l[key] = { $all: value as PropertyType }
               continue
             } else if (rValue instanceof Object) {
               const q = this.flattenQuery(attrClass, (rValue as unknown) as AnyLayout)
@@ -551,7 +543,7 @@ export class Model {
 
   // Q U E R Y
 
-  find<T extends Doc> (clazz: Ref<Class<Doc>>, query: DocumentQuery<T>, options?: FindOptions<T>): T[] {
+  find<T extends Doc>(clazz: Ref<Class<Doc>>, query: DocumentQuery<T>, options?: FindOptions<T>): T[] {
     const { query: realQuery } = this.createQuery(clazz, query)
     const byClass = this.objectsOfClass(realQuery._class as Ref<Class<Doc>>)
 
@@ -669,7 +661,7 @@ export class Model {
    * @param doc - incoming document
    * @param mixin - a mixin class
    */
-  public as<T extends Obj> (doc: Obj, mixin: Ref<Mixin<T>>): T {
+  public as<T extends Obj>(doc: Obj, mixin: Ref<Mixin<T>>): T {
     if (doc._class === mixin) {
       // If we already have a proper class specified.
       return doc as T
@@ -693,7 +685,7 @@ export class Model {
    * @param doc
    * @param mixin
    */
-  public cast<T extends Doc> (doc: Doc, mixin: Ref<Mixin<T>>): T {
+  public cast<T extends Doc>(doc: Doc, mixin: Ref<Mixin<T>>): T {
     Model.includeMixin(doc, mixin)
     return this.as(doc, mixin)
   }
@@ -702,7 +694,7 @@ export class Model {
     return (obj._mixins !== undefined) ? obj._mixins.includes(_class) : false
   }
 
-  public asMixin<T extends Doc> (obj: Obj, _class: Ref<Mixin<T>>, action: (doc: T) => void): void {
+  public asMixin<T extends Doc>(obj: Obj, _class: Ref<Mixin<T>>, action: (doc: T) => void): void {
     if (this.isMixedIn(obj, _class)) {
       action(this.as(obj, _class))
     }
@@ -717,7 +709,7 @@ export class Model {
    * @param doc  document to match against.
    * @param query query to check.
    */
-  matchQuery<T extends Doc> (_class: Ref<Class<T>>, doc: Doc, query: DocumentQuery<T>): boolean {
+  matchQuery<T extends Doc>(_class: Ref<Class<T>>, doc: Doc, query: DocumentQuery<T>): boolean {
     if (!this.is(_class, doc._class)) {
       // Class doesn't match so return false.
       return false
@@ -730,7 +722,7 @@ export class Model {
    * @param _attributes - partial object values of operation.
    * @param query - a query.
    */
-  isPartialMatched<T extends Doc> (_class: Ref<Class<Doc>>, _attributes: AnyLayout, query: DocumentQuery<T>): boolean {
+  isPartialMatched<T extends Doc>(_class: Ref<Class<Doc>>, _attributes: AnyLayout, query: DocumentQuery<T>): boolean {
     const stripQuery: AnyLayout = {}
     const oKeys = new Set<string>(Object.keys(_attributes))
 
@@ -763,7 +755,7 @@ export class Model {
     return Object.keys(sort).some(x => oKeys.has(x))
   }
 
-  private matchObject<T extends Obj> (_class: Ref<Class<T>>, doc: T, query: DocumentQuery<T>, fullMatch = false): boolean {
+  private matchObject<T extends Obj>(_class: Ref<Class<T>>, doc: T, query: DocumentQuery<T>, fullMatch = false): boolean {
     if ((doc as any).__layout !== undefined) {
       // This is our proxy, we should unwrap it.
       doc = (doc as any).__layout
@@ -807,7 +799,7 @@ export class Model {
     return undefined
   }
 
-  public matchValue<T extends Obj> (fieldClass: Ref<Class<T>> | undefined, docValue: unknown, value: unknown, fullMatch: boolean): { result: boolean, value?: any } {
+  public matchValue<T extends Obj>(fieldClass: Ref<Class<T>> | undefined, docValue: unknown, value: unknown, fullMatch: boolean): { result: boolean, value?: any } {
     const objDocValue = Object(docValue)
     if (objDocValue !== docValue) {
       // Check if value is primitive, so we will just compare
@@ -854,7 +846,7 @@ export class Model {
       } else {
         if (fieldClass !== undefined) {
           return {
-            result: this.matchObject(fieldClass, docValue as Obj, (value) as AnyLayout),
+            result: this.matchObject(fieldClass, docValue as Obj, value as AnyLayout),
             value: docValue
           }
         }

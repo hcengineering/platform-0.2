@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Class, DateProperty, Doc, DocumentValue, Emb, Mixin, Obj, Property, Ref, StringProperty, Tx } from '@anticrm/core'
+import { AnyLayout, Class, Doc, DocumentValue, Emb, Mixin, Obj, PrimitiveType, Ref, Tx } from '@anticrm/core'
 
 // TXes
 
@@ -61,7 +61,7 @@ export enum TxOperationKind {
 
 export interface ObjectSelector extends Emb {
   key: string // A field key
-  pattern?: AnyLayout | Property<any, any> // A pattern to match inside array, may be missing for some operations.
+  pattern?: AnyLayout | PrimitiveType // A pattern to match inside array, may be missing for some operations.
 }
 
 /**
@@ -85,7 +85,7 @@ export interface TxOperation extends Emb {
   selector?: ObjectSelector[]
 
   // will determine an object or individual value to be updated.
-  _attributes?: Property<any, any> | AnyLayout
+  _attributes?: AnyLayout
 }
 
 /**
@@ -226,7 +226,7 @@ export interface OperationProtocol {
   /**
    * Perform update of document properties.
    */
-  update: <T extends Doc>(doc: T, value: Partial<Omit<T, keyof Doc>>) => Promise<void>
+  update: <T extends Doc>(doc: T, value: Partial<DocumentValue<T>>) => Promise<void>
 
   /**
    * Perform update of document/embedded document properties using a builder pattern.
@@ -288,10 +288,10 @@ export const CORE_CLASS_VDOC = 'class:core.VDoc' as Ref<Class<VDoc>>
 
 export interface VDoc extends Doc {
   _space: Ref<Space>
-  _createdOn: DateProperty
-  _createdBy: StringProperty
-  _modifiedOn?: DateProperty
-  _modifiedBy?: StringProperty
+  _createdOn: number
+  _createdBy: string
+  _modifiedOn?: number
+  _modifiedBy?: string
 }
 
 // R E F E R E N C E S

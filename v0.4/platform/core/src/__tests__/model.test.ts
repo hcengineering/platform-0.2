@@ -17,7 +17,7 @@
 
 import {
   Attribute, Class, CORE_CLASS_ATTRIBUTE, CORE_CLASS_CLASS, CORE_CLASS_DOC, CORE_CLASS_EMB, CORE_CLASS_OBJ,
-  Doc, Mixin, Obj, Property, PropertyType, Ref, StringProperty
+  Doc, Mixin, Obj, PropertyType, Ref
 } from '../classes'
 import { mixinFromKey, mixinKey, Model } from '../model'
 import { createTask, data, doc1, Task, taskIds, TaskWithSecond } from './tasks'
@@ -27,17 +27,17 @@ describe('matching', () => {
   model.loadModel(data)
 
   it('match object value', () => {
-    expect(model.matchQuery(taskIds.class.Task, doc1, { name: 'my-space' as StringProperty })).toEqual(true)
+    expect(model.matchQuery(taskIds.class.Task, doc1, { name: 'my-space' })).toEqual(true)
   })
   it('match list value', () => {
-    expect(model.matchQuery(taskIds.class.Task, doc1, { lists: ['val1' as StringProperty, 'val2' as StringProperty] })).toEqual(true)
+    expect(model.matchQuery(taskIds.class.Task, doc1, { lists: ['val1', 'val2'] })).toEqual(true)
   })
 
   it('match embedded value', () => {
     expect(
       model.matchQuery(taskIds.class.Task, doc1, {
         mainTask: {
-          name: 'main-subtask' as StringProperty
+          name: 'main-subtask'
         }
       })
     ).toEqual(true)
@@ -47,10 +47,10 @@ describe('matching', () => {
       model.matchQuery(taskIds.class.Task, doc1, {
         tasks: [
           {
-            name: 'subtask1' as StringProperty
+            name: 'subtask1'
           },
           {
-            rate: 33 as Property<number, number>
+            rate: 33
           }
         ]
       })
@@ -98,10 +98,10 @@ describe('matching', () => {
     model.add(doc)
 
     // call to find() initialzes lazy loaded byClass model's attribute
-    await model.find<Task>(taskIds.class.Task, { name: doc.name as StringProperty })
+    await model.find<Task>(taskIds.class.Task, { name: doc.name })
 
     model.del(doc._id)
-    const result = await model.find<Task>(taskIds.class.Task, { name: doc.name as StringProperty })
+    const result = await model.find<Task>(taskIds.class.Task, { name: doc.name })
     expect(result.length).toEqual(0)
   })
 })
