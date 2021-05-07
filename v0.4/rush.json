@@ -405,6 +405,14 @@
       "projectFolder": "plugins/login-impl"
     },
     {
+      "packageName": "@anticrm/plugin-workbench",
+      "projectFolder": "plugins/workbench"
+    },
+    {
+      "packageName": "@anticrm/plugin-workbench-impl",
+      "projectFolder": "plugins/workbench-impl"
+    },
+    {
       "packageName": "@anticrm/server-account",
       "projectFolder": "server/account"
     },

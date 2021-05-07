@@ -1,5 +1,4 @@
 dependencies:
-  '@anticrm/account': 0.2.0
   '@babel/eslint-parser': 7.13.14_eslint@7.24.0
   '@babel/runtime': 7.13.10
   '@rush-temp/core': file:projects/core.tgz
@@ -7,6 +6,8 @@ dependencies:
   '@rush-temp/platform': file:projects/platform.tgz_@typescript-eslint+parser@4.22.0
   '@rush-temp/plugin-login': file:projects/plugin-login.tgz_@typescript-eslint+parser@4.22.0
   '@rush-temp/plugin-login-impl': file:projects/plugin-login-impl.tgz_@typescript-eslint+parser@4.22.0
+  '@rush-temp/plugin-workbench': file:projects/plugin-workbench.tgz_@typescript-eslint+parser@4.22.0
+  '@rush-temp/plugin-workbench-impl': file:projects/plugin-workbench-impl.tgz_@typescript-eslint+parser@4.22.0
   '@rush-temp/prod': file:projects/prod.tgz_sass@1.32.8
   '@rush-temp/rpc': file:projects/rpc.tgz_@typescript-eslint+parser@4.22.0
   '@rush-temp/server-account': file:projects/server-account.tgz_@typescript-eslint+parser@4.22.0
@@ -10534,6 +10535,40 @@ packages:
       integrity: sha512-u2nf4MUN/X0YyqtncW2zzusSxbOIRrpK5R2AdnRW9j/lM/1YGy5a2Cn3IUSU1Mp4q7UD83yRYcoHXWeW3U2tZg==
       tarball: file:projects/plugin-login.tgz
     version: 0.0.0
+  file:projects/plugin-workbench-impl.tgz_@typescript-eslint+parser@4.22.0:
+    dependencies:
+      '@microsoft/api-extractor': 7.13.5
+      prettier: 2.2.1
+      sass: 1.32.8
+      svelte: 3.37.0
+      svelte-loader: 3.1.0_svelte@3.37.0
+      svelte-preprocess: 4.7.0_755c64f2becf501be7ee6738a692cc1e
+      ts-standard: 10.0.0_982c0164c2c03b5f966b085495de6301
+      typescript: 4.2.4
+    dev: false
+    id: file:projects/plugin-workbench-impl.tgz
+    name: '@rush-temp/plugin-workbench-impl'
+    peerDependencies:
+      '@typescript-eslint/parser': '*'
+    resolution:
+      integrity: sha512-2czhMJ68jixF1kt13mwVfdBMdF2lyEkooZf5yqnbUeHX2bUzianB88mxRIyIIiTRoIEZNBn+kA43AeYMHnV7Aw==
+      tarball: file:projects/plugin-workbench-impl.tgz
+    version: 0.0.0
+  file:projects/plugin-workbench.tgz_@typescript-eslint+parser@4.22.0:
+    dependencies:
+      '@microsoft/api-extractor': 7.13.5
+      prettier: 2.2.1
+      ts-standard: 10.0.0_982c0164c2c03b5f966b085495de6301
+      typescript: 4.2.4
+    dev: false
+    id: file:projects/plugin-workbench.tgz
+    name: '@rush-temp/plugin-workbench'
+    peerDependencies:
+      '@typescript-eslint/parser': '*'
+    resolution:
+      integrity: sha512-khoP9IeRcye2lKuPFQqaLW2nfjABBbefy+kcJw1C2SMw3fjO2Py5L/PlRQNifMeozCsgM3RTDbzc27pok56YYg==
+      tarball: file:projects/plugin-workbench.tgz
+    version: 0.0.0
   file:projects/prod.tgz_sass@1.32.8:
     dependencies:
       '@types/node': 14.14.40
@@ -10598,7 +10633,7 @@ packages:
     peerDependencies:
       '@typescript-eslint/parser': '*'
     resolution:
-      integrity: sha512-qs/515oKEZcN1eJ0GdwlG1TC+RWu73rxWN+qXXYaf3PlQj4lD6uTWmBqdpr72KVn3in5d8w8IZW0+UZsdbR9Rw==
+      integrity: sha512-/f9Kls0svjk4Ob9/kuCBGd6w6kGQqz1Wh892bT+hsT5bvqm2sgfKZxFMFrdvOpzaT0MzQ60kj1Rv6KKQlv84/A==
       tarball: file:projects/server-account.tgz
     version: 0.0.0
   file:projects/sparkling-controls.tgz_9d8bd6a515df5f388c5e4532b97e083a:
@@ -10726,7 +10761,6 @@ packages:
     version: 0.0.0
 registry: ''
 specifiers:
-  '@anticrm/account': ~0.2.0
   '@babel/eslint-parser': ^7.13.14
   '@babel/runtime': ~7.13.10
   '@rush-temp/core': file:./projects/core.tgz
@@ -10734,6 +10768,8 @@ specifiers:
   '@rush-temp/platform': file:./projects/platform.tgz
   '@rush-temp/plugin-login': file:./projects/plugin-login.tgz
   '@rush-temp/plugin-login-impl': file:./projects/plugin-login-impl.tgz
+  '@rush-temp/plugin-workbench': file:./projects/plugin-workbench.tgz
+  '@rush-temp/plugin-workbench-impl': file:./projects/plugin-workbench-impl.tgz
   '@rush-temp/prod': file:./projects/prod.tgz
   '@rush-temp/rpc': file:./projects/rpc.tgz
   '@rush-temp/server-account': file:./projects/server-account.tgz
