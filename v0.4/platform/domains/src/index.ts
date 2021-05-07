@@ -345,3 +345,5 @@ export interface Title extends Doc {
   title: string | number
   source: TitleSource
 }
+
+export * from './index'

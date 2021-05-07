@@ -197,15 +197,6 @@ describe('Model utilities', () => {
         getAttrs(CORE_CLASS_OBJ)
       ].reduce((r, x) => r.concat(x)))
   })
-
-  it('returns primary key of class', () => {
-    expect(model.getPrimaryKey(CORE_CLASS_EMB))
-      .toBeUndefined()
-    expect(model.getPrimaryKey('core.class.TaskObj' as Ref<Class<Doc>>))
-      .toEqual('name')
-    expect(model.getPrimaryKey('core.class.DerivedTaskObj' as Ref<Class<Doc>>))
-      .toEqual('name')
-  })
 })
 
 describe('Model mixin', () => {

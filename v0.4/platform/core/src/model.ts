@@ -14,10 +14,11 @@
 //
 
 import {
-  AnyLayout, ArrayOf, Attribute, Class, Classifier, ClassifierKind, CORE_CLASS_ARRAY_OF, CORE_CLASS_CLASS, CORE_CLASS_INSTANCE_OF, CORE_CLASS_MIXIN, CORE_MIXIN_INDICES,
+  AnyLayout, ArrayOf, Attribute, Class, Classifier, ClassifierKind, CORE_CLASS_ARRAY_OF, CORE_CLASS_CLASS, CORE_CLASS_INSTANCE_OF, CORE_CLASS_MIXIN,
   Doc, Mixin, Obj, PropertyType, Ref, Type
 } from './classes'
-import { DocumentQuery, DocumentSorting, DocumentValue, FindOptions, generateId, RegExpression } from './storage'
+import { generateId } from './ids'
+import { DocumentQuery, DocumentSorting, DocumentValue, FindOptions, RegExpression } from './storage'
 
 export function mixinKey (mixin: Ref<Mixin<Obj>>, key: string): string {
   return key + '|' + mixin.replace('.', '~')
@@ -183,20 +184,6 @@ export class Model {
     const attributes: AttributeMatch[] = []
     this._getAllAttributes(attributes, _class)
     return attributes
-  }
-
-  getPrimaryKey (_class: Ref<Class<Obj>>): string | undefined {
-    const primaryKey = mixinKey(CORE_MIXIN_INDICES, 'primary')
-    let cls = _class as Ref<Class<Obj>> | undefined
-    while (cls !== undefined) {
-      const clazz = this.get(cls)
-      const primary = (clazz as any)[primaryKey]
-      if (primary !== undefined) {
-        return primary
-      }
-      cls = clazz._extends
-    }
-    return undefined
   }
 
   // D O M A I N
@@ -430,6 +417,7 @@ export class Model {
    *
    * flatten queries are applicable only for mongoDB and not supported by model search operations.
    */
+  /* toMongoQuery */
   createQuery<T extends Doc>(_class: Ref<Class<T>>, _query: DocumentQuery<T>, flatten = false): { query: DocumentQuery<T>, classes: Array<Ref<Class<Obj>>> } {
     let query = this.assign({}, _class, _query as AnyLayout)
 
