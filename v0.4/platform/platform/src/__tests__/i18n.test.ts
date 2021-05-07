@@ -13,11 +13,11 @@
 // limitations under the License.
 //
 
-import { Component, Severity, Status, identify, Code as StatusCode } from '@anticrm/status'
+import { Code as StatusCode, Component, identify, Severity, Status } from '@anticrm/status'
 import { Code as PlatformCode } from '../status'
 
 import { addStringsLoader, IntlString, translate } from '../i18n'
-import { PlatformEvent, addEventListener, removeEventListener } from '../event'
+import { addEventListener, PlatformEvent, removeEventListener } from '../event'
 
 const TestComponent = 'test-strings' as Component
 
@@ -58,13 +58,14 @@ describe('i18n', () => {
   })
 
   it('should emit status and return id when bad loader', async () => {
-    addStringsLoader('error-loader' as Component, (locale: string) => {
-      throw new Error('bad loader')
-    })
     const component = 'component-for-bad-loader'
     const message = `${component}.id`
+    const errorMessage = 'bad loader'
+    addStringsLoader(component as Component, (locale: string) => {
+      throw new Error(errorMessage)
+    })
 
-    const checkStatus = new Status(Severity.ERROR, PlatformCode.NoLoaderForStrings, { component })
+    const checkStatus = new Status(Severity.ERROR, StatusCode.UnknownError, { message: errorMessage })
     const eventListener = async (event: string, data: any): Promise<void> => {
       await expect(data).toEqual(checkStatus)
     }
