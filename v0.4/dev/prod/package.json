@@ -37,6 +37,8 @@
     "@anticrm/ui": "~0.2.0",
     "svelte": "~3.37.0",
     "@anticrm/plugin-login": "~0.2.0",
-    "@anticrm/plugin-login-impl": "~0.2.0"
+    "@anticrm/plugin-login-impl": "~0.2.0",
+    "@anticrm/plugin-workbench": "~0.2.0",
+    "@anticrm/plugin-workbench-impl": "~0.2.0"
   }
 }

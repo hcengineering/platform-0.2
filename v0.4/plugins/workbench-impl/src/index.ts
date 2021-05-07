@@ -13,9 +13,11 @@
 // limitations under the License.
 //
 
-import { WorkbenchService } from '@anticrm/plugin-workbench'
+import { setResource } from '@anticrm/platform'
+import type { WorkbenchService } from '@anticrm/plugin-workbench'
 
-// import LoginForm from './components/LoginApp.svelte'
+import Workbench from './components/Workbench.svelte'
+import workbench from './plugin'
 
 /*!
  * Anticrm Platform™ Login Plugin
@@ -24,7 +26,7 @@ import { WorkbenchService } from '@anticrm/plugin-workbench'
  */
 export default async (): Promise<WorkbenchService> => {
 
-  // setResource(login.component.LoginForm, LoginForm)
+  setResource(workbench.component.WorkbenchApp, Workbench)
 
   return {}
 }

@@ -17,6 +17,8 @@ import { Component, Status, Severity, identify, Namespace } from '@anticrm/statu
 import { monitor } from './event'
 import { Code } from './status'
 
+import { mergeWith } from 'lodash-es'
+
 /** Base interface for a plugin or platform service. */
 export interface Service {} // eslint-disable-line @typescript-eslint/no-empty-interface
 
@@ -135,4 +137,12 @@ export function plugin<P extends Service, D extends PluginDependencies, N extend
     deps,
     ...identify(id, namespace)
   }
+}
+
+export function mergeIds<P extends Service, X extends PluginDependencies, D extends PluginDescriptor<P, X>, N extends Namespace> (a: D, b: N): D & N {
+  return mergeWith({}, a, identify(a.id, b), (value) => {
+    if (typeof value === 'string') {
+      throw new Error('attempting to overwrite ' + value)
+    }
+  })
 }

@@ -14,14 +14,21 @@
 //
 
 import type { Plugin, Service } from '@anticrm/platform'
-import { plugin } from '@anticrm/platform'
+import { plugin, setMetadata } from '@anticrm/platform'
+import type { AnyComponent } from '@anticrm/ui'
+import { applicationShortcutKey } from '@anticrm/ui'
  
-// P L U G I N
-
 export interface WorkbenchService extends Service {
 }
 
 export const PluginWorkbench = 'workbench' as Plugin<WorkbenchService>
 
-export default plugin(PluginWorkbench, {}, {
+const workbench = plugin(PluginWorkbench, {}, {
+  component: {
+    WorkbenchApp: '' as AnyComponent
+  }
 })
+
+setMetadata(applicationShortcutKey('workbench'), workbench.component.WorkbenchApp)
+
+export default workbench

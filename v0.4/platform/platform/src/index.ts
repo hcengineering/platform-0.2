@@ -18,7 +18,6 @@ export * from './status'
 export * from './event'
 export * from './plugin'
 export * from './resource'
-export * from './auth'
 export * from './i18n'
 
 import { addStringsLoader } from './i18n'

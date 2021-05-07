@@ -16,6 +16,7 @@ dependencies:
   '@rush-temp/status': file:projects/status.tgz_@typescript-eslint+parser@4.22.0
   '@rush-temp/text': file:projects/text.tgz
   '@rush-temp/ui': file:projects/ui.tgz_@typescript-eslint+parser@4.22.0
+  '@types/lodash-es': 4.17.4
   '@types/mongodb': 3.6.12
   '@types/punycode': 2.1.0
   '@typescript-eslint/eslint-plugin': 4.22.0_4077c1c463d60a0d86d9adeca56638cd
@@ -35,6 +36,7 @@ dependencies:
   file-loader: 6.2.0_webpack@5.32.0
   intl-messageformat: 9.6.12
   jwt-simple: 0.5.6
+  lodash-es: 4.17.21
   markdown-it: 12.0.6
   mini-css-extract-plugin: 1.4.1_webpack@5.32.0
   mongodb: 3.6.6
@@ -2460,6 +2462,16 @@ packages:
     dev: false
     resolution:
       integrity: sha512-pQv3Sygwxxh6jYQzXaiyWDAHevJqWtqDUv6t11Sa9CPGiXny66II7Pl6PR8QO5OVysD6HYOkHMeBgIjLnk9SkQ==
+  /@types/lodash-es/4.17.4:
+    dependencies:
+      '@types/lodash': 4.14.168
+    dev: false
+    resolution:
+      integrity: sha512-BBz79DCJbD2CVYZH67MBeHZRX++HF+5p8Mo5MzjZi64Wac39S3diedJYHZtScbRVf4DjZyN6LzA0SB0zy+HSSQ==
+  /@types/lodash/4.14.168:
+    dev: false
+    resolution:
+      integrity: sha512-oVfRvqHV/V6D1yifJbVRU3TMp8OT6o6BG+U9MkwuJ3U8/CsDHvalRpsxBqivn71ztOFZBTfJMvETbqHiaNSj7Q==
   /@types/markdown-it/10.0.3:
     dependencies:
       '@types/highlight.js': 9.12.4
@@ -6934,6 +6946,10 @@ packages:
       node: '>=8'
     resolution:
       integrity: sha512-t7hw9pI+WvuwNJXwk5zVHpyhIqzg2qTlklJOf0mVxGSbe3Fp2VieZcduNYjaLDoy6p9uGpQEGWG87WpMKlNq8g==
+  /lodash-es/4.17.21:
+    dev: false
+    resolution:
+      integrity: sha512-mKnC+QJ9pWVzv+C4/U3rRsHapFfHvQFoFB92e52xeyGMcX6/OlIl78je1u8vePzYZSkkogMPJ2yjxxsb89cxyw==
   /lodash.clonedeep/4.5.0:
     dev: false
     resolution:
@@ -10486,9 +10502,11 @@ packages:
       '@babel/preset-typescript': 7.13.0_@babel+core@7.13.15
       '@microsoft/api-extractor': 7.13.5
       '@types/jest': 26.0.23
+      '@types/lodash-es': 4.17.4
       babel-jest: 26.6.3_@babel+core@7.13.15
       intl-messageformat: 9.6.12
       jest: 26.6.3
+      lodash-es: 4.17.21
       prettier: 2.2.1
       ts-standard: 10.0.0_982c0164c2c03b5f966b085495de6301
       typescript: 4.2.4
@@ -10498,7 +10516,7 @@ packages:
     peerDependencies:
       '@typescript-eslint/parser': '*'
     resolution:
-      integrity: sha512-gktOeGTuXB5IYmN/4wwIFRVTkB2DLItJtLqUX2EubxZuacePxHE6W3Egsb0SctGFvJ+jh8zvnmLKWUWSw1Fr7Q==
+      integrity: sha512-633XbjvH2LKoBX2TcSWzyNlx0e5uRxTG50R3YOLusA8a9AVC7ChQ3cMAsVk2bBPe0gakaUSCVG4Df/zET3mnZQ==
       tarball: file:projects/platform.tgz
     version: 0.0.0
   file:projects/plugin-login-impl.tgz_@typescript-eslint+parser@4.22.0:
@@ -10778,6 +10796,7 @@ specifiers:
   '@rush-temp/status': file:./projects/status.tgz
   '@rush-temp/text': file:./projects/text.tgz
   '@rush-temp/ui': file:./projects/ui.tgz
+  '@types/lodash-es': ~4.17.4
   '@types/mongodb': ~3.6.12
   '@types/punycode': ~2.1.0
   '@typescript-eslint/eslint-plugin': ^4.22.0
@@ -10797,6 +10816,7 @@ specifiers:
   file-loader: ~6.2.0
   intl-messageformat: ~9.6.12
   jwt-simple: ~0.5.6
+  lodash-es: ~4.17.21
   markdown-it: ~12.0.6
   mini-css-extract-plugin: ~1.4.1
   mongodb: ~3.6.6

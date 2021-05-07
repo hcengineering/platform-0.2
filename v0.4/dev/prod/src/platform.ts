@@ -16,11 +16,11 @@
 import { addLocation } from '@anticrm/platform'
 
 import login from '@anticrm/plugin-login'
+import workbench from '@anticrm/plugin-workbench'
 // import core from '@anticrm/platform-core'
 // import i18n from '@anticrm/platform-i18n'
 // import activity from '@anticrm/activity'
 // import activityMeta from '@anticrm/activity/src/__meta__'
-// import workbench from '@anticrm/workbench'
 // import presentation from '@anticrm/presentation'
 // import task from '@anticrm/task'
 // import contact from '@anticrm/contact'
@@ -46,10 +46,10 @@ export function configurePlatform() {
 // platform.setMetadata(ui.metadata.DefaultApplication, 'workbench')
 
   addLocation(login, () => import(/* webpackChunkName: "login" */ '@anticrm/plugin-login-impl'))
+  addLocation(workbench, () => import(/* webpackChunkName: "workbench" */ '@anticrm/plugin-workbench-impl'))
 // platform.addLocation(core, () => import(/* webpackChunkName: "platform-core" */ '@anticrm/platform-core/src/plugin'))
 // platform.addLocation(i18n, () => import(/* webpackChunkName: "platform-i18n" */ '@anticrm/platform-i18n/src/plugin'))
 // platform.addLocation(presentation, () => import(/* webpackChunkName: "presentation" */ '@anticrm/presentation/src/plugin'))
-// platform.addLocation(workbench, () => import(/* webpackChunkName: "workbench" */ '@anticrm/workbench/src/plugin'))
 // platform.addLocation(task, () => import(/* webpackChunkName: "task" */ '@anticrm/task/src/plugin'))
 // platform.addLocation(task, () => import(/* webpackChunkName: "task" */ '@anticrm/task/src/plugin'))
 // platform.addLocation(contact, () => import(/* webpackChunkName: "contact" */ '@anticrm/contact/src/plugin'))
