@@ -65,9 +65,7 @@ export default plugin(
       CandidateList: '' as AnyComponent,
       NewCandidate: '' as AnyComponent,
       Candidate: '' as AnyComponent,
-      VacancyList: '' as AnyComponent,
-      NewVacancy: '' as AnyComponent,
-      Vacancy: '' as AnyComponent
+      NewVacancy: '' as AnyComponent
     },
     application: {
       Candidates: '' as Ref<WorkbenchApplication>,

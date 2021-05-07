@@ -16,8 +16,6 @@ import Candidate from './components/Candidate.svelte'
 import CandidateList from './components/CandidateList.svelte'
 import NewCandidate from './components/NewCandidate.svelte'
 
-import Vacancy from './components/Vacancy.svelte'
-import VacancyList from './components/VacancyList.svelte'
 import NewVacancy from './components/NewVacancy.svelte'
 
 import recruiting, { RecruitingService } from '.'
@@ -27,9 +25,7 @@ export default async (platform: Platform): Promise<RecruitingService> => {
   platform.setResource(recruiting.component.NewCandidate, NewCandidate)
   platform.setResource(recruiting.component.Candidate, Candidate)
 
-  platform.setResource(recruiting.component.VacancyList, VacancyList)
   platform.setResource(recruiting.component.NewVacancy, NewVacancy)
-  platform.setResource(recruiting.component.Vacancy, Vacancy)
 
   return {}
 }
