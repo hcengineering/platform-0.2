@@ -1,6 +1,6 @@
 {
   "name": "@anticrm/rpc",
-  "version": "0.2.0",
+  "version": "0.4.0",
   "main": "lib/index.js",
   "author": "Anticrm Platform Contributors",
   "license": "EPL-2.0",
@@ -13,10 +13,10 @@
     "format": "prettier --write 'src/**/*.{ts*,js*,yml}' && ts-standard --fix src"
   },
   "devDependencies": {
-    "typescript": "~4.2.4",
     "@microsoft/api-extractor": "~7.13.4",
+    "prettier": "~2.2.1",
     "ts-standard": "~10.0.0",
-    "prettier": "~2.2.1"
+    "typescript": "~4.2.4"
   },
   "dependencies": {
     "@anticrm/status": "~0.2.0"
