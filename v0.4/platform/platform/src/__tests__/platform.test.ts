@@ -47,16 +47,6 @@ type ExtractType<T, X extends Record<string, Metadata<T>>> = {
 }
 
 describe('platform', () => {
-  it('should identify resources', () => {
-    const ids = identify('test' as AnyPlugin, {
-      resource: {
-        MyString: '' as Metadata<string>,
-        FixedId: 'my-id' as Metadata<string>
-      }
-    })
-    expect(ids.resource.MyString).toBe('resource:test.MyString')
-    expect(ids.resource.FixedId).toBe('my-id')
-  })
 
   it('should raise exception for unknown location', async () => {
     const p1 = getPlugin(plugin1)
