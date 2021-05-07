@@ -17,7 +17,7 @@ import { Component, Severity, Status, identify, Code as StatusCode } from '@anti
 import { Code as PlatformCode } from '../status'
 
 import { addStringsLoader, IntlString, translate } from '../i18n'
-import { PlatformEvent, addEventListener } from '../event'
+import { PlatformEvent, addEventListener, removeEventListener } from '../event'
 
 const TestComponent = 'test-strings' as Component
 
@@ -43,8 +43,8 @@ describe('i18n', () => {
     expect(translated).toBe('Loading plugin <b>xxx</b>...')
   })
 
-  it('should emit status when no loader', async () => {
-    const component = 'component'
+  it('should emit status and return id when no loader', async () => {
+    const component = 'component-for-no-loader'
     const message = `${component}.id`
 
     const checkStatus = new Status(Severity.ERROR, PlatformCode.NoLoaderForStrings, { component })
@@ -52,42 +52,30 @@ describe('i18n', () => {
       await expect(data).toEqual(checkStatus)
     }
     addEventListener(PlatformEvent, eventListener)
-    await translate(message as IntlString, {})
+    const translated = await translate(message as IntlString, {})
+    expect(translated).toBe(message)
+    removeEventListener(PlatformEvent, eventListener)
   })
 
-  it('should emit status when bad loader', async () => {
-    const errorMessage = 'bad loader'
+  it('should emit status and return id when bad loader', async () => {
     addStringsLoader('error-loader' as Component, (locale: string) => {
-      throw new Error(errorMessage)
+      throw new Error('bad loader')
     })
-    const component = 'error-loader'
+    const component = 'component-for-bad-loader'
     const message = `${component}.id`
 
-    const checkStatus = new Status(Severity.ERROR, StatusCode.UnknownError, { message: errorMessage })
+    const checkStatus = new Status(Severity.ERROR, PlatformCode.NoLoaderForStrings, { component })
     const eventListener = async (event: string, data: any): Promise<void> => {
       await expect(data).toEqual(checkStatus)
     }
     addEventListener(PlatformEvent, eventListener)
-    await translate(message as IntlString, {})
-  })
-
-  it('should return id when no loader', async () => {
-    const message = 'component.id'
     const translated = await translate(message as IntlString, {})
-    return expect(translated).toBe(message)
-  })
-
-  it('should return id when bad loader', async () => {
-    addStringsLoader('error-loader' as Component, (locale: string) => {
-      throw new Error('bad loader')
-    })
-    const message = 'component.id'
-    const translated = await translate(message as IntlString, {})
-    return expect(translated).toBe(message)
+    expect(translated).toBe(message)
+    removeEventListener(PlatformEvent, eventListener)
   })
 
   it('should cache error', async () => {
-    const component = 'error-loader'
+    const component = 'component'
     const message = `${component}.id`
     let status: Status | undefined
     const eventListener = async (event: string, data: any): Promise<void> => {
@@ -98,7 +86,9 @@ describe('i18n', () => {
       await expect(data).toBe(status)
     }
     addEventListener(PlatformEvent, eventListener)
-    await translate(message as IntlString, {})
-    await translate(message as IntlString, {})
+    const translated1 = await translate(message as IntlString, {})
+    const translated2 = await translate(message as IntlString, {})
+    expect(translated1).toBe(translated2)
+    removeEventListener(PlatformEvent, eventListener)
   })
 })
