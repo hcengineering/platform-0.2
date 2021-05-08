@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Status } from '@anticrm/status'
+import { Status, StatusCode, identify, Component, PlatformError, Severity } from '@anticrm/status'
 
 export type ReqId = string | number
 
@@ -48,9 +48,19 @@ export function readResponse<D> (response: string): Response<D> {
 }
 
 export function readRequest<P extends any[]> (request: string): Request<P> {
-  return JSON.parse(request)
+  const result: Request<P> = JSON.parse(request)
+  if (typeof result.method !== 'string')
+    throw new PlatformError(new Status(Severity.ERROR, Code.BadRequest, {}))
+  return result
 }
 
 export function fromStatus (status: Status, id?: ReqId): Response<any> {
   return { id, error: status }
 }
+
+export const Code = identify('rpc' as Component, {
+  Unauthorized: '' as StatusCode,
+  Forbidden: '' as StatusCode,
+  BadRequest: '' as StatusCode,
+  UnknownMethod: '' as StatusCode<{method: string}>
+})

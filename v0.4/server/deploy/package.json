@@ -1,0 +1,18 @@
+{
+    "name": "deploy",
+    "devDependencies": {
+        "@types/mime": "^2.0.3",
+        "@types/mongodb": "^3.6.12",
+        "@types/node": "^10.0.0"
+    },
+    "dependencies": {
+        "@anticrm/rpc": "^0.4.4",
+        "@anticrm/server-account": "^0.4.3",
+        "@anticrm/status": "^0.4.1",
+        "@pulumi/aws": "^4.2.0",
+        "@pulumi/awsx": "^0.30.0",
+        "@pulumi/pulumi": "^3.0.0",
+        "mime": "^2.5.2",
+        "mongodb": "^3.6.6"
+    }
+}

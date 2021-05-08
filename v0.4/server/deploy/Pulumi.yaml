@@ -1,0 +1,3 @@
+name: deploy
+runtime: nodejs
+description: Anticrm Deployment

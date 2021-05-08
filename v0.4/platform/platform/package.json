@@ -1,6 +1,6 @@
 {
   "name": "@anticrm/platform",
-  "version": "0.2.0",
+  "version": "0.4.0",
   "main": "lib/index.js",
   "author": "Anticrm Platform Contributors",
   "license": "EPL-2.0",
@@ -23,11 +23,11 @@
     "@babel/preset-env": "~7.13.15",
     "@babel/preset-typescript": "~7.13.0",
     "prettier": "~2.2.1",
-    "@types/lodash-es": "~4.17.4"
+    "@types/lodash-es": "^4.17.4"
   },
   "dependencies": {
-    "@anticrm/status": "~0.2.0",
-    "intl-messageformat": "~9.6.12",
-    "lodash-es": "~4.17.21"
+    "@anticrm/status": "~0.4.0",
+    "intl-messageformat": "^9.6.12",
+    "lodash-es": "^4.17.21"
   }
 }

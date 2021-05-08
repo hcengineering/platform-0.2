@@ -1,6 +1,6 @@
 {
   "name": "@anticrm/plugin-workbench-impl",
-  "version": "0.2.0",
+  "version": "0.4.0",
   "main": "src/index.ts",
   "author": "Anticrm Platform Contributors",
   "license": "EPL-2.0",
@@ -22,10 +22,10 @@
     "svelte-preprocess": "~4.7.0"
   },
   "dependencies": {
-    "@anticrm/platform": "~0.2.0",
-    "svelte": "~3.37.0",
-    "@anticrm/status": "~0.2.0",
-    "@anticrm/ui": "~0.2.0",
-    "@anticrm/plugin-workbench": "~0.2.0"
+    "@anticrm/platform": "~0.4.0",
+    "svelte": "^3.37.0",
+    "@anticrm/status": "~0.4.0",
+    "@anticrm/ui": "~0.4.0",
+    "@anticrm/plugin-workbench": "~0.4.0"
   }
 }

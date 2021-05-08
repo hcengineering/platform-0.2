@@ -88,9 +88,7 @@ export function identify<N extends Namespace> (component: Component, namespace: 
 
 export const Code = identify('status' as Component, {
   OK: '' as StatusCode,
-  UnknownError: '' as StatusCode<{message: string}>,
-  Unauthorized: '' as StatusCode,
-  Forbidden: '' as StatusCode
+  UnknownError: '' as StatusCode<{message: string}>
 })
 
 /**

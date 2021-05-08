@@ -1,4 +1,6 @@
 dependencies:
+  '@anticrm/rpc': 0.2.0
+  '@anticrm/status': 0.2.0
   '@babel/eslint-parser': 7.13.14_eslint@7.24.0
   '@babel/runtime': 7.13.10
   '@rush-temp/core': file:projects/core.tgz
@@ -62,6 +64,12 @@ packages:
     dev: false
     resolution:
       integrity: sha512-+wYcW4P/2jirqTtaXi51c1jN1nL2ZoXeHWNP5PBwxMN5+SPDR+S++E38oZ6CAaWDNdJT3zqdq/can03qnwemDw==
+  /@anticrm/rpc/0.2.0:
+    dependencies:
+      '@anticrm/status': 0.2.0
+    dev: false
+    resolution:
+      integrity: sha512-x9iv0KmcnW+xH779m9t5ak3aOrHG+L/fLgf6wdsS0UQIidsC202fktsoZapTWiVCaYZM7VDOqBaFJpzI1G42mg==
   /@anticrm/status/0.2.0:
     dev: false
     resolution:
@@ -10497,6 +10505,7 @@ packages:
     version: 0.0.0
   file:projects/platform.tgz_@typescript-eslint+parser@4.22.0:
     dependencies:
+      '@anticrm/status': 0.2.0
       '@babel/core': 7.13.15
       '@babel/preset-env': 7.13.15_@babel+core@7.13.15
       '@babel/preset-typescript': 7.13.0_@babel+core@7.13.15
@@ -10516,11 +10525,13 @@ packages:
     peerDependencies:
       '@typescript-eslint/parser': '*'
     resolution:
-      integrity: sha512-633XbjvH2LKoBX2TcSWzyNlx0e5uRxTG50R3YOLusA8a9AVC7ChQ3cMAsVk2bBPe0gakaUSCVG4Df/zET3mnZQ==
+      integrity: sha512-XXAj0CypyyRVx6lZuoeCuHzj1mIvp8QsbYcN+NLeLiP1Q1iliIhkVY5C7HGMCwCl0TBXQ7rWL5/2UuuBrcgdBw==
       tarball: file:projects/platform.tgz
     version: 0.0.0
   file:projects/plugin-login-impl.tgz_@typescript-eslint+parser@4.22.0:
     dependencies:
+      '@anticrm/rpc': 0.2.0
+      '@anticrm/status': 0.2.0
       '@microsoft/api-extractor': 7.13.5
       prettier: 2.2.1
       sass: 1.32.8
@@ -10535,11 +10546,12 @@ packages:
     peerDependencies:
       '@typescript-eslint/parser': '*'
     resolution:
-      integrity: sha512-iG0ZxDdosVrPwlUuOXW8HojnUb1gr8ObH4s49iKDp8sdvclvMEo+rU8efg6kH1fHm8lQyNzXtTxPty1gHiPrAg==
+      integrity: sha512-5RFbRVyRQ4FHPqoDOiDjkkCKzHZD27A0WTmXoCaSxbnGHsO1N+2GSY0e4FGJe6CLYVgA2V/xJb08JLWAJRFsZg==
       tarball: file:projects/plugin-login-impl.tgz
     version: 0.0.0
   file:projects/plugin-login.tgz_@typescript-eslint+parser@4.22.0:
     dependencies:
+      '@anticrm/status': 0.2.0
       '@microsoft/api-extractor': 7.13.5
       prettier: 2.2.1
       ts-standard: 10.0.0_982c0164c2c03b5f966b085495de6301
@@ -10550,11 +10562,12 @@ packages:
     peerDependencies:
       '@typescript-eslint/parser': '*'
     resolution:
-      integrity: sha512-u2nf4MUN/X0YyqtncW2zzusSxbOIRrpK5R2AdnRW9j/lM/1YGy5a2Cn3IUSU1Mp4q7UD83yRYcoHXWeW3U2tZg==
+      integrity: sha512-bAMgngNU5wotFEFqFLa0iYrmDbbQKlqQwXlN+LG+AbJtmtfAUvczvPpjNMygv+VKR4qVHvu6TkeRMl8PuCxa1A==
       tarball: file:projects/plugin-login.tgz
     version: 0.0.0
   file:projects/plugin-workbench-impl.tgz_@typescript-eslint+parser@4.22.0:
     dependencies:
+      '@anticrm/status': 0.2.0
       '@microsoft/api-extractor': 7.13.5
       prettier: 2.2.1
       sass: 1.32.8
@@ -10569,11 +10582,12 @@ packages:
     peerDependencies:
       '@typescript-eslint/parser': '*'
     resolution:
-      integrity: sha512-2czhMJ68jixF1kt13mwVfdBMdF2lyEkooZf5yqnbUeHX2bUzianB88mxRIyIIiTRoIEZNBn+kA43AeYMHnV7Aw==
+      integrity: sha512-+r357koFlhnyp0R7wV9hMoLkyZMDlI+xpzugwTtxkhE80ALBUZWobKI6v5xcX2vbiWrfNe0RaayjfcXUNPR8pA==
       tarball: file:projects/plugin-workbench-impl.tgz
     version: 0.0.0
   file:projects/plugin-workbench.tgz_@typescript-eslint+parser@4.22.0:
     dependencies:
+      '@anticrm/status': 0.2.0
       '@microsoft/api-extractor': 7.13.5
       prettier: 2.2.1
       ts-standard: 10.0.0_982c0164c2c03b5f966b085495de6301
@@ -10584,7 +10598,7 @@ packages:
     peerDependencies:
       '@typescript-eslint/parser': '*'
     resolution:
-      integrity: sha512-khoP9IeRcye2lKuPFQqaLW2nfjABBbefy+kcJw1C2SMw3fjO2Py5L/PlRQNifMeozCsgM3RTDbzc27pok56YYg==
+      integrity: sha512-XYy2fBSz+pxkplHNLp8qhmgfBMq7ch6ECBuJIahJPYGvBgE1Zerz2ZOz5S8m4m4p4AUtBRVSLrveQCw/DA3PYw==
       tarball: file:projects/plugin-workbench.tgz
     version: 0.0.0
   file:projects/prod.tgz_sass@1.32.8:
@@ -10611,11 +10625,12 @@ packages:
     peerDependencies:
       sass: '*'
     resolution:
-      integrity: sha512-Ho0iAuWsIgd//CRq5cWTCH2TmP3ysSiUr4AyMv6a3X23r/5GOz+W8ZqPLMATfJqcA8xnhl0fA4YDMwyLSE6ZeQ==
+      integrity: sha512-YVtfTiG49M64ab5cuzP8tK4CJ+woW3bwCfX9Z0swBej9ZGm3tsK5cNe0e7vuLLc/xpHwCOaAaU1TfIEdwiteEw==
       tarball: file:projects/prod.tgz
     version: 0.0.0
   file:projects/rpc.tgz_@typescript-eslint+parser@4.22.0:
     dependencies:
+      '@anticrm/status': 0.2.0
       '@microsoft/api-extractor': 7.13.5
       prettier: 2.2.1
       ts-standard: 10.0.0_982c0164c2c03b5f966b085495de6301
@@ -10626,12 +10641,14 @@ packages:
     peerDependencies:
       '@typescript-eslint/parser': '*'
     resolution:
-      integrity: sha512-5i570mFNu6mOGhbACy4l0dKEYaPTcZhuw//4RnMgcfM1/13kWokHTcGxjqt9l72nI9yG8BPeVQ1xH9eCWl2GHQ==
+      integrity: sha512-KGFvyFNMKD9t8TMuK1/a8MO+ujOUisDrBmUj6e4UbSroPoUQuozXL5JSdE9BZBpsPqUgxMaJP+Cp7UBxAKXWUw==
       tarball: file:projects/rpc.tgz
     version: 0.0.0
   file:projects/server-account.tgz_@typescript-eslint+parser@4.22.0:
     dependencies:
       '@anticrm/account': 0.2.0
+      '@anticrm/rpc': 0.2.0
+      '@anticrm/status': 0.2.0
       '@babel/core': 7.13.15
       '@babel/preset-env': 7.13.15_@babel+core@7.13.15
       '@babel/preset-typescript': 7.13.0_@babel+core@7.13.15
@@ -10651,11 +10668,12 @@ packages:
     peerDependencies:
       '@typescript-eslint/parser': '*'
     resolution:
-      integrity: sha512-/f9Kls0svjk4Ob9/kuCBGd6w6kGQqz1Wh892bT+hsT5bvqm2sgfKZxFMFrdvOpzaT0MzQ60kj1Rv6KKQlv84/A==
+      integrity: sha512-q64AGlVgkAD0j/jLUH8hj//v5DrDdd56c1XykzKmih9Tra7gwvlE5+v4AhcQ1IS3621xJcpjpNk9VE0UWlo0QQ==
       tarball: file:projects/server-account.tgz
     version: 0.0.0
   file:projects/sparkling-controls.tgz_9d8bd6a515df5f388c5e4532b97e083a:
     dependencies:
+      '@anticrm/status': 0.2.0
       '@babel/runtime': 7.13.10
       core-js: 3.10.1
       prettier: 2.2.1
@@ -10673,7 +10691,7 @@ packages:
       '@typescript-eslint/parser': '*'
       webpack: '*'
     resolution:
-      integrity: sha512-cUdHwc5JpymmYVkw5yge4m/rNrrYXLunxhI2TuTT5bGeEZ87Sh7VnxdKWckYNOSLyrN3nycXq9RVD70GK9qeYQ==
+      integrity: sha512-Wm+wAN+RE976PUXtLty8q9LMiQ4ZdM+otIx89ra5UgrSiuTgJx1idmT3Y5L1Sf0hDp9uK9a3af/IXgVUSt9TJQ==
       tarball: file:projects/sparkling-controls.tgz
     version: 0.0.0
   file:projects/sparkling-theme.tgz_9d8bd6a515df5f388c5e4532b97e083a:
@@ -10750,6 +10768,7 @@ packages:
     version: 0.0.0
   file:projects/ui.tgz_@typescript-eslint+parser@4.22.0:
     dependencies:
+      '@anticrm/status': 0.2.0
       '@babel/core': 7.13.15
       '@babel/preset-env': 7.13.15_@babel+core@7.13.15
       '@babel/preset-typescript': 7.13.0_@babel+core@7.13.15
@@ -10774,11 +10793,13 @@ packages:
     peerDependencies:
       '@typescript-eslint/parser': '*'
     resolution:
-      integrity: sha512-Lo3+WI/OrRct/svOUzsk0a5Ewx+Qn0VcqmHA+2iQ+eop1YKcv6AKU0zfpPiQHLj4TRELPOHQ9SfTgY7D4GLnJQ==
+      integrity: sha512-4RxdCyHAF5+CmxQPN22JfQG7tJPd5xxW34aKl3L8fCy3zIvp38IL1ZWCKrIlgrokP7nXLY9Q9y3sVpwrgTGmzQ==
       tarball: file:projects/ui.tgz
     version: 0.0.0
 registry: ''
 specifiers:
+  '@anticrm/rpc': ~0.2.0
+  '@anticrm/status': ~0.2.0
   '@babel/eslint-parser': ^7.13.14
   '@babel/runtime': ~7.13.10
   '@rush-temp/core': file:./projects/core.tgz

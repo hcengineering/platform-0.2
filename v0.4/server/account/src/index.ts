@@ -14,8 +14,8 @@
 //
 
 import { Binary, Db, ObjectID } from 'mongodb'
-import { PlatformError, Status, Severity, identify, Component, StatusCode, unknownError, Code as SharedCode } from '@anticrm/status'
-import { Request, Response } from '@anticrm/rpc'
+import { PlatformError, Status, Severity, identify, Component, StatusCode, unknownError, Code as CommonCode } from '@anticrm/status'
+import { Request, Response, Code as RpcCode } from '@anticrm/rpc'
 import { randomBytes, pbkdf2Sync } from 'crypto'
 import { Buffer } from 'buffer'
 import { encode } from 'jwt-simple'
@@ -254,9 +254,9 @@ function secureWrap<P extends any[], R> (f: (db: Db, ...args: P) => Promise<R>) 
       .then((result) => ({ id: request.id, result }))
       .catch((err) => {
         if (err instanceof PlatformError) {
-          return { id: request.id, error: new Status(Severity.ERROR, SharedCode.Unauthorized, {})}
+          return { id: request.id, error: new Status(Severity.ERROR, RpcCode.Unauthorized, {})}
         } else {
-          return { id: request.id, error: new Status(Severity.ERROR, SharedCode.UnknownError, {message: ''}) }
+          return { id: request.id, error: new Status(Severity.ERROR, CommonCode.UnknownError, {message: ''}) }
         }
       })
   }

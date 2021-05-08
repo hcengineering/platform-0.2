@@ -1,6 +1,6 @@
 {
   "name": "@anticrm/plugin-workbench",
-  "version": "0.2.0",
+  "version": "0.4.0",
   "main": "lib/index.js",
   "author": "Anticrm Platform Contributors",
   "license": "EPL-2.0",
@@ -19,8 +19,8 @@
     "prettier": "~2.2.1"
   },
   "dependencies": {
-    "@anticrm/platform": "~0.2.0",
-    "@anticrm/ui": "~0.2.0",
-    "@anticrm/status": "~0.2.0"
+    "@anticrm/platform": "~0.4.0",
+    "@anticrm/ui": "~0.4.0",
+    "@anticrm/status": "~0.4.0"
   }
 }
