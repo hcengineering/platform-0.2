@@ -1,0 +1,17 @@
+{
+  "name": "@anticrm/platform",
+  "entries": [
+    {
+      "version": "0.4.1",
+      "tag": "@anticrm/platform_v0.4.1",
+      "date": "Sun, 09 May 2021 09:23:09 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "switch from `lodash-es` to `lodash`, tweak `i18n`"
+          }
+        ]
+      }
+    }
+  ]
+}

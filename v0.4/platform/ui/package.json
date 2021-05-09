@@ -31,7 +31,7 @@
     "svelte-preprocess": "~4.7.0"
   },
   "dependencies": {
-    "@anticrm/platform": "~0.4.0",
+    "@anticrm/platform": "~0.4.1",
     "fast-equals": "~2.0.1",
     "@anticrm/status": "~0.4.0",
     "@anticrm/sparkling-theme": "~0.4.0",
