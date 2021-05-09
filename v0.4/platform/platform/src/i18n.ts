@@ -48,7 +48,7 @@ async function loadTranslationsForComponent (component: Component): Promise<Reco
   }
 }
 
-async function getTranslation (message: IntlString): Promise<IntlString | Status | undefined> {
+async function getTranslation (message: IntlString): Promise<IntlString | Status> {
   const [comp, id] = message.split('.')
   const component = comp as Component
   let messages = translations.get(component)
@@ -75,7 +75,7 @@ export async function translate<P extends Record<string, any>> (message: IntlStr
       cache.set(message, translation)
       return message
     }
-    const compiled = new IntlMessageFormat(translation ?? message, locale)
+    const compiled = new IntlMessageFormat(translation, locale)
     cache.set(message, compiled)
     return compiled.format(params)
   }

@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@anticrm/platform",
+      "comment": "switch from `lodash-es` to `lodash`, tweak `i18n`",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@anticrm/platform",
+  "email": "andrey.v.platov@gmail.com"
+}
