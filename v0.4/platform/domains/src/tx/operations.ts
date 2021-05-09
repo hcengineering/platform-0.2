@@ -18,6 +18,7 @@ import {
   CORE_CLASS_OBJECTTX_DETAILS, CORE_CLASS_SPACE, CORE_CLASS_TX_OPERATION, CORE_CLASS_VDOC, CORE_MIXIN_SHORTID, ObjectTx, ObjectTxDetails, OperationProtocol, Space,
   txBuilder, TxBuilder, TxOperation, TxOperationKind, UpdateTx
 } from '../'
+import { getPrimaryKey } from '../primary'
 import { newCreateTx, newDeleteTx, newUpdateTx } from './tx'
 
 function getSpace (model: Model, doc: Doc): { _objectSpace: Ref<Space> | undefined, spaceIsRequired: boolean } {
@@ -105,7 +106,7 @@ function fillUpdateDetails<T extends Doc> (model: Model, doc: T, tx: ObjectTx): 
   const details: ObjectTxDetails = { _class: CORE_CLASS_OBJECTTX_DETAILS }
 
   // Fill primary field
-  const primary = model.getPrimaryKey(doc._class)
+  const primary = getPrimaryKey(model, doc._class)
   if (primary !== undefined) {
     const title = (doc as any)[primary]
     if (title !== undefined) {

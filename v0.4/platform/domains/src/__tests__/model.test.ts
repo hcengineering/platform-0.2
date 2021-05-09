@@ -15,7 +15,7 @@
 
 /* eslint-env jest */
 
-import { AnyLayout, Class, Doc, DocumentQuery, DocumentValue, Model, PropertyType, Ref, txContext } from '@anticrm/core'
+import { AnyLayout, Class, CORE_CLASS_EMB, Doc, DocumentQuery, DocumentValue, Model, PropertyType, Ref, txContext } from '@anticrm/core'
 import { createSubtask, createTask, data, doc1, SubTask, Task, taskIds } from '@anticrm/core/src/__tests__/tasks'
 import {
   CORE_CLASS_OBJECT_SELECTOR,
@@ -27,6 +27,7 @@ import {
   TxOperationKind
 } from '../index'
 import { ModelStorage } from '../model_storage'
+import { getPrimaryKey } from '../primary'
 import { updateDocument } from '../tx/modeltx'
 import { create } from '../tx/operations'
 import { push, updateDocumentPull, updateDocumentPush, updateDocumentSet } from './model_test_utils'
@@ -82,6 +83,15 @@ describe('core tests', () => {
         }
       ]
     })
+  })
+
+  it('returns primary key of class', () => {
+    expect(getPrimaryKey(model, CORE_CLASS_EMB))
+      .toBeUndefined()
+    expect(getPrimaryKey(model, 'core.class.TaskObj' as Ref<Class<Doc>>))
+      .toEqual('name')
+    expect(getPrimaryKey(model, 'core.class.DerivedTaskObj' as Ref<Class<Doc>>))
+      .toEqual('name')
   })
   it('create multiple operations ', () => {
     const s = txBuilder(taskIds.class.Task)

@@ -21,6 +21,7 @@ import {
 import { updateDocument } from '../tx/modeltx'
 import { create } from '../tx/operations'
 import { newUpdateTx, newDeleteTx } from '../tx/tx'
+import { getPrimaryKey } from '../primary'
 
 const NULL = '<null>'
 
@@ -38,7 +39,7 @@ export class TitleIndex implements DomainIndex {
     const cached = this.primaries.get(_class)
     if (cached !== undefined) return cached === NULL ? undefined : cached
 
-    const primary = this.modelDb.getPrimaryKey(_class)
+    const primary = getPrimaryKey(this.modelDb, _class)
     if (primary !== undefined) {
       this.primaries.set(_class, primary)
       return primary
