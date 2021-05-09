@@ -16,24 +16,25 @@
 import { BagOf$, Class$, InstanceOf$, Mixin$, Prop, RefTo$ } from '../dsl'
 import core from '../index'
 import {
-  AllAttributes, ArrayOf, Attribute, Class, Classifier, ClassifierKind, Doc, Emb, Enum, EnumKey, EnumLiteral,
-  EnumLiterals, EnumOf, Indices, InstanceOf, Mixin, MODEL_DOMAIN, Obj, PropertyType, Ref, RefTo, StringProperty, Type
+  AllAttributes, ArrayOf, Attribute, BagOf, Class, Classifier, ClassifierKind, Doc, Emb, Enum, EnumKey, EnumLiteral,
+  EnumLiterals, EnumOf, Indices, InstanceOf, Mixin, MODEL_DOMAIN, Obj, PropertyType, Ref, RefTo, Type
 } from '@anticrm/core'
 
 @Class$(core.class.Obj, core.class.Obj)
 export class TObj implements Obj {
-  _class!: Ref<Class<Obj>>
+  @RefTo$(core.class.Class) _class!: Ref<Class<Obj>>
 }
 
 @Class$(core.class.Emb, core.class.Obj)
 export class TEmb extends TObj implements Emb {
+  _class!: Ref<Class<Emb>> // A field to match type, attribute is defined in TObj
 }
 
 @Class$(core.class.Doc, core.class.Obj)
 export class TDoc extends TObj implements Doc {
-  @RefTo$(core.class.Class) _class!: Ref<Class<Doc>>
+  _class!: Ref<Class<Doc>> // A field to match type, attribute is defined in TObj
   @Prop() _id!: Ref<Doc>
-  @Prop() _mixins?: Ref<Mixin<Doc>>[]
+  @Prop() _mixins?: Array<Ref<Mixin<Doc>>>
 }
 
 @Class$(core.class.Attribute, core.class.Emb, MODEL_DOMAIN)
@@ -58,8 +59,8 @@ export class TClass<T extends Obj> extends TClassifier implements Class<T> {
 
   @RefTo$(core.class.Class) _extends?: Ref<Class<Doc>>
 
-  @Prop() _native?: StringProperty
-  @Prop() _domain?: StringProperty
+  @Prop() _native?: string
+  @Prop() _domain?: string
 }
 
 @Class$(core.class.Mixin, core.class.Class, MODEL_DOMAIN)
@@ -102,7 +103,12 @@ export class TArrayOf extends TType implements ArrayOf {
   @Prop() of!: Type
 }
 
+@Class$(core.class.BagOf, core.class.Type, MODEL_DOMAIN)
+export class TBagOf extends TType implements BagOf {
+  @Prop() of!: Type
+}
+
 @Mixin$(core.mixin.Indices, core.class.Mixin)
 export class TIndexesClass<T extends Doc> extends TMixin<T> implements Indices {
-  @Prop() primary!: StringProperty
+  @Prop() primary!: string
 }

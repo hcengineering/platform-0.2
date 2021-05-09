@@ -102,25 +102,18 @@ export function remove<T extends Doc> (model: Model, userId: string, doc: T): Tx
 }
 
 function fillUpdateDetails<T extends Doc> (model: Model, doc: T, tx: ObjectTx): void {
-  // Extract some details
-  const details: ObjectTxDetails = { _class: CORE_CLASS_OBJECTTX_DETAILS }
-
   // Fill primary field
   const primary = getPrimaryKey(model, doc._class)
   if (primary !== undefined) {
     const title = (doc as any)[primary]
     if (title !== undefined) {
-      details.name = title
+      model.cast<ObjectTxDetails>(doc, CORE_CLASS_OBJECTTX_DETAILS).name = title
     }
   }
   // Fill short Id.
   model.asMixin(doc, CORE_MIXIN_SHORTID, (id) => {
-    details.id = id.shortId
+    model.cast<ObjectTxDetails>(doc, CORE_CLASS_OBJECTTX_DETAILS).id = id.shortId
   })
-
-  if (Object.keys(details).length > 0) {
-    tx._txDetails = details
-  }
 }
 
 export function createOperations (model: Model, processTx: (tx: Tx) => Promise<any>, userId: string): OperationProtocol {

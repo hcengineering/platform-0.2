@@ -21,7 +21,7 @@ const builder = new Builder()
 fullModel(builder)
 
 writeFile('../core/src/__tests__/model.json', JSON.stringify(builder.dump()), (err: Error | null) => {
-  if (err) {
+  if (err !== null) {
     return console.log(err)
   }
   console.log('model saved')

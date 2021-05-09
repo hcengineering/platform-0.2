@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Class, Doc, Emb, Ref } from '../classes'
+import { Class, Doc, Emb, Mixin, Ref } from '../classes'
 import { DocumentValue } from '../storage'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -43,6 +43,13 @@ export interface Task extends Doc {
   comments?: TaskComment[]
 }
 
+export interface TaskMixin extends Task {
+  textValue: string
+  listValue: string[]
+  embValue: TaskComment
+  embValueList: TaskComment[]
+}
+
 export interface TaskWithSecond extends Task {
   secondTask: SubTask | null
 }
@@ -56,6 +63,9 @@ export const taskIds = {
     Subtask: 'core.class.SubTask' as Ref<Class<SubTask>>,
     TaskComment: 'core.class.TaskComment' as Ref<Class<TaskComment>>,
     DerivedTask: 'core.class.DerivedTaskObj' as Ref<Class<DerivedTask>>
+  },
+  mixin: {
+    TaskMixin: 'core.mixin.TaskMixin' as Ref<Mixin<TaskMixin>>
   }
 }
 

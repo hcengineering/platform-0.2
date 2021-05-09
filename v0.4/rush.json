@@ -425,6 +425,10 @@
       "packageName": "prod",
       "projectFolder": "dev/prod"
     },
+    {
+      "packageName": "@anticrm/model",
+      "projectFolder": "platform/model"
+    }
     // {
     //   "packageName": "storybook",
     //   "projectFolder": "dev/storybook"
