@@ -14,31 +14,47 @@
 //
 
 // T R A N S A C T I O N S
-import { ArrayOf$, BagOf$, Class$, InstanceOf$, Prop, RefTo$ } from '../dsl'
+import { ArrayOf$, BagOf$, Class$, InstanceOf$, Mixin$, Prop, RefTo$ } from '../dsl'
 import core from '../index'
-import { CreateTx, DeleteTx, ObjectSelector, TX_DOMAIN, TxOperation, TxOperationKind, UpdateTx } from '@anticrm/domains'
-import { AnyLayout, Class, DateProperty, Doc, Property, Ref, StringProperty, Tx } from '@anticrm/core'
+import {
+  CreateTx, DeleteTx, ObjectSelector, ObjectTx, ObjectTxDetails, Space, TX_DOMAIN, TxOperation, TxOperationKind,
+  UpdateTx
+} from '@anticrm/domains'
+import { AnyLayout, Class, Doc, PrimitiveType, Ref, Tx } from '@anticrm/core'
 import { TDoc, TEmb } from './core'
 
 @Class$(core.class.Tx, core.class.Doc, TX_DOMAIN)
 export class TTx extends TDoc implements Tx {
-  @Prop() _date!: DateProperty
-  @Prop() _user!: StringProperty
+  @Prop() _date!: number
+  @Prop() _user!: string
+}
+
+@Class$(core.class.ObjectTx, core.class.Doc, TX_DOMAIN)
+export class TObjectTx extends TTx implements ObjectTx {
+  @RefTo$(core.class.Doc) _objectId!: Ref<Doc>
+  @RefTo$(core.class.Class) _objectClass!: Ref<Class<Doc>>
+  @RefTo$(core.class.Space) _objectSpace!: Ref<Space>
+
+  @InstanceOf$(core.class.ObjectTxDetails) _txDetails!: ObjectTxDetails
 }
 
 @Class$(core.class.CreateTx, core.class.Tx, TX_DOMAIN)
-export class TCreateTx extends TTx implements CreateTx {
-  @RefTo$(core.class.Doc) _objectId!: Ref<Doc>
-  @RefTo$(core.class.Class) _objectClass!: Ref<Class<Doc>>
-
+export class TCreateTx extends TObjectTx implements CreateTx {
   @BagOf$()
-  @InstanceOf$(core.class.Emb) object!: AnyLayout
+  @Prop() object!: AnyLayout
+}
+
+@Mixin$(core.mixin.ObjectTxDetails, core.class.ObjectTx)
+export class TObjectTxDetails extends TObjectTx implements ObjectTxDetails {
+  @Prop() name?: string
+  @Prop() id?: string
+  @Prop() description?: string
 }
 
 @Class$(core.class.ObjectSelector, core.class.Emb, TX_DOMAIN)
 export class TObjectSelector extends TEmb implements ObjectSelector {
   @Prop() key!: string
-  @Prop() pattern?: AnyLayout | Property<any, any>
+  @Prop() pattern?: AnyLayout | PrimitiveType
 }
 
 @Class$(core.class.TxOperation, core.class.Emb, TX_DOMAIN)
@@ -51,22 +67,15 @@ export class TTxOperation extends TEmb implements TxOperation {
 
   // will determine an object or individual value to be updated.
   @BagOf$()
-  _attributes?: Property<any, any> | AnyLayout
+  _attributes?: AnyLayout
 }
 
 @Class$(core.class.UpdateTx, core.class.Tx, TX_DOMAIN)
-export class TUpdateTx extends TTx implements UpdateTx {
-  @RefTo$(core.class.Doc) _objectId!: Ref<Doc>
-  @RefTo$(core.class.Class) _objectClass!: Ref<Class<Doc>>
-
+export class TUpdateTx extends TObjectTx implements UpdateTx {
   @ArrayOf$()
   @InstanceOf$(core.class.TxOperation) operations!: TxOperation[]
 }
 
 @Class$(core.class.DeleteTx, core.class.Tx, TX_DOMAIN)
-export class TDeleteTx extends TTx implements DeleteTx {
-  @RefTo$(core.class.Doc) _objectId!: Ref<Doc>
-  @RefTo$(core.class.Class) _objectClass!: Ref<Class<Doc>>
-
-  @Prop() _query!: AnyLayout
+export class TDeleteTx extends TObjectTx implements DeleteTx {
 }

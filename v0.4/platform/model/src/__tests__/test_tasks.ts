@@ -13,12 +13,11 @@
 // limitations under the License.
 //
 
-import core, { ArrayOf$, Builder, Class$, InstanceOf$, Primary, Prop } from '..'
 import { MODEL_DOMAIN } from '@anticrm/core'
-import {
-  TAttribute, TClass, TClassifier, TDoc, TEmb, TIndexesClass, TMixin, TObj, TTitle, TType, TVDoc, TVShortID
-} from '../__model__'
-import { SubTask, Task, TaskComment, taskIds } from '@anticrm/core/src/__tests__/tasks'
+import { SubTask, Task, TaskComment, taskIds, TaskMixin } from '@anticrm/core/src/__tests__/tasks'
+import core, { ArrayOf$, Builder, Class$, InstanceOf$, Primary, Prop } from '..'
+import { Mixin$ } from '../dsl'
+import { TDoc, TEmb, model as globalModel } from '../__model__'
 
 @Class$(taskIds.class.Task, core.class.Doc, MODEL_DOMAIN)
 export class TTask extends TDoc implements Task {
@@ -54,6 +53,17 @@ export class TSubTask extends TEmb implements SubTask {
   comments?: TaskComment[]
 }
 
+@Mixin$(taskIds.mixin.TaskMixin, taskIds.class.Task)
+export class TTaskMixin extends TTask implements TaskMixin {
+  @Prop() textValue!: string
+  @ArrayOf$() listValue!: string[]
+
+  @InstanceOf$(taskIds.class.Subtask) embValue!: TaskComment
+
+  @ArrayOf$()
+  @InstanceOf$(taskIds.class.Subtask) embValueList!: TaskComment[]
+}
+
 @Class$(taskIds.class.TaskComment, core.class.Emb, MODEL_DOMAIN)
 export class TTaskComment extends TEmb implements TaskComment {
   @Prop()
@@ -78,10 +88,10 @@ export class TDerivedTask extends TTask {
 }
 
 export function model (S: Builder): void {
-  S.add(TTask, TDerivedTask, TSubTask, TTaskComment)
+  S.add(TTask, TDerivedTask, TSubTask, TTaskComment, TTaskMixin)
 }
 
 export function fullModel (S: Builder): void {
-  S.add(TObj, TEmb, TDoc, TVDoc, TClassifier, TClass, TAttribute, TType, TMixin, TTitle, TVShortID, TIndexesClass)
+  globalModel(S)
   model(S)
 }
