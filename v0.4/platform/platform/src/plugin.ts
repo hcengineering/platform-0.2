@@ -17,7 +17,7 @@ import { Component, Status, Severity, identify, Namespace } from '@anticrm/statu
 import { monitor } from './event'
 import { Code } from './status'
 
-import { mergeWith } from 'lodash-es'
+import mergeWith from 'lodash/mergeWith'
 
 /** Base interface for a plugin or platform service. */
 export interface Service {} // eslint-disable-line @typescript-eslint/no-empty-interface

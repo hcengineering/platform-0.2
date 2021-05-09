@@ -366,7 +366,8 @@
     },
     {
       "packageName": "@anticrm/platform",
-      "projectFolder": "platform/platform"
+      "projectFolder": "platform/platform",
+      "shouldPublish": true
     },
     {
       "packageName": "@anticrm/rpc",

@@ -18,7 +18,6 @@ dependencies:
   '@rush-temp/text': file:projects/text.tgz_ts-node@9.1.1
   '@rush-temp/ui': file:projects/ui.tgz_6a150cea3e356ecb9f49d2cbc8bd3b95
   '@types/lodash': 4.14.168
-  '@types/lodash-es': 4.17.4
   '@types/mongodb': 3.6.12
   '@types/punycode': 2.1.0
   '@typescript-eslint/eslint-plugin': 4.22.0_@typescript-eslint+parser@4.22.0
@@ -38,7 +37,6 @@ dependencies:
   intl-messageformat: 9.6.12
   jwt-simple: 0.5.6
   lodash: 4.17.21
-  lodash-es: 4.17.21
   markdown-it: 12.0.6
   mini-css-extract-plugin: 1.4.1_webpack@5.32.0
   mongodb: 3.6.6
@@ -10936,7 +10934,7 @@ packages:
     dev: false
     name: '@rush-temp/model'
     resolution:
-      integrity: sha512-QcvCvzysd5AA82h2QoeY6T6VoV2yNsNgf8/vrPF09oRmjW4ZNwqxKgIsJQVCRyZOKkBZcDPpJ2HpBXpiFoM8PQ==
+      integrity: sha512-3dKD3WPX6OORA0HLLtSnaZ5iYhl9nTJagPFLc3qsnqGORpg+towA4YDFPTwol+sE5NG32nYy8Pj18EVTujuVXw==
       tarball: file:projects/model.tgz
     version: 0.0.0
   file:projects/platform.tgz_6a150cea3e356ecb9f49d2cbc8bd3b95:
@@ -10946,10 +10944,12 @@ packages:
       '@babel/preset-typescript': 7.13.0_@babel+core@7.13.15
       '@microsoft/api-extractor': 7.13.5
       '@types/jest': 26.0.23
+      '@types/lodash': 4.14.168
       '@types/lodash-es': 4.17.4
       babel-jest: 26.6.3_@babel+core@7.13.15
       intl-messageformat: 9.6.12
       jest: 26.6.3_ts-node@9.1.1
+      lodash: 4.17.21
       lodash-es: 4.17.21
       prettier: 2.2.1
       ts-standard: 10.0.0_982c0164c2c03b5f966b085495de6301
@@ -10961,7 +10961,7 @@ packages:
       '@typescript-eslint/parser': '*'
       ts-node: '*'
     resolution:
-      integrity: sha512-gmTTVJg9ZEMI+RqIkQP0sLsp+AdVwbEBUBLYv8xcLVlZhxTNK4jcm/3JzpDBVwhTkVySaoi6aiIxdqsxllNjEQ==
+      integrity: sha512-cdjDFml9IAWvKXW09hB05+Fzp/tuetSRzRjyjo5hWbb4bXYu1vGLrhQGt4XD7SIjIs9yId2itUNbeaOYA+jOSw==
       tarball: file:projects/platform.tgz
     version: 0.0.0
   file:projects/plugin-login-impl.tgz_@typescript-eslint+parser@4.22.0:
@@ -10982,7 +10982,7 @@ packages:
     peerDependencies:
       '@typescript-eslint/parser': '*'
     resolution:
-      integrity: sha512-k6YschyEyPTS1RKaOTWP+WVIILs+h7VX4p1zMi75BWnLBVyMlLGHu4fyUuyRTQyjTjksJPpJ7TOBTCC6reLzoA==
+      integrity: sha512-Bkag2lC90V8NJoUQEGtMKMXZe80e26dNcveqgL8AcpvCJJGrZUou+KgqcxS15YI1Od2p5ai6CBBLk51qDsU8RA==
       tarball: file:projects/plugin-login-impl.tgz
     version: 0.0.0
   file:projects/plugin-login.tgz_@typescript-eslint+parser@4.22.0:
@@ -10998,7 +10998,7 @@ packages:
     peerDependencies:
       '@typescript-eslint/parser': '*'
     resolution:
-      integrity: sha512-E2rCAxG8ohH3TwJOqv6nlG/PaMXWegHkZ9W9xVOEvOwmdo34ZNhcmyz1NSi2/I8y86Hbaqctcn2EOZbdikLcXg==
+      integrity: sha512-1snkoHpD3hfxlohAJht7BkSsdTz336PWcYeyzu8GSfc3vofQqzpXYsseWQyBzcrwyuZq9dUZxLsQzTNw9oG4OQ==
       tarball: file:projects/plugin-login.tgz
     version: 0.0.0
   file:projects/plugin-workbench-impl.tgz_@typescript-eslint+parser@4.22.0:
@@ -11018,7 +11018,7 @@ packages:
     peerDependencies:
       '@typescript-eslint/parser': '*'
     resolution:
-      integrity: sha512-uQlJoehJ6EOotYoHibpDaQ1xa4B5vY5yDk63Knf7Nm+tBm1SR2pcnnnzCcbvzciaY+JJrKFtINwvJr7NoYzuAg==
+      integrity: sha512-tLpF0TQYuX5Tppufrall7zkShgVE4+lDzyCZHFDPSoB7VbJBaN+x/m9PoLm7KvtRLPTQsBGj++LEhH3HHkR5fg==
       tarball: file:projects/plugin-workbench-impl.tgz
     version: 0.0.0
   file:projects/plugin-workbench.tgz_@typescript-eslint+parser@4.22.0:
@@ -11034,7 +11034,7 @@ packages:
     peerDependencies:
       '@typescript-eslint/parser': '*'
     resolution:
-      integrity: sha512-jkJ1RvxxzJOiopNAUVDfvGiL0MBNGEhX8tl/aiknlGxhPUGYhn4ZmXrVPUsTDuDCegS9vQwl6JybMaRWGisgHA==
+      integrity: sha512-9vTS8FuniJ/yfcASD+StuPjHfgU7Ve/JJ3UcrrVMUoj4RZsKOWpxLEgCbw1ZUez5H64GZi4ilwiEF3LoLuF/lw==
       tarball: file:projects/plugin-workbench.tgz
     version: 0.0.0
   file:projects/prod.tgz_sass@1.32.8:
@@ -11061,7 +11061,7 @@ packages:
     peerDependencies:
       sass: '*'
     resolution:
-      integrity: sha512-1a5s7czX+0DHdPbXgBO/YyjIxW3q7+O7Fo8C9E3QVOFO47OHF9/A31u6bcN2/JntGSSPMJeqoHDjo0ZYBdR6bg==
+      integrity: sha512-6Unauqqb7hj4/HoHc3E/rdQFvHNetpTstIgQ1JcZTroq28FfnucF79ZxHJEJaCPu3ATsVQKmFcMlZFm9Tyd+Xg==
       tarball: file:projects/prod.tgz
     version: 0.0.0
   file:projects/rpc.tgz_@typescript-eslint+parser@4.22.0:
@@ -11231,7 +11231,7 @@ packages:
       '@typescript-eslint/parser': '*'
       ts-node: '*'
     resolution:
-      integrity: sha512-PIK4jYbd+LiKh6L3dhX36ebbc3i8n3yBhHOXvuGwKQSTYoO3Epj4QjHLNkdBcpzYO3+JvD7Jn5HxM1a6Z/qzcg==
+      integrity: sha512-srJsP+UzrCXhNCOyGIfAX4PiJfx2wlvaS0AjVCkVuUohZ7/1dNaFyqrlABbbI1abp+EwHFJ/OBTb5/WFdD0Xdg==
       tarball: file:projects/ui.tgz
     version: 0.0.0
 registry: ''
@@ -11255,7 +11255,6 @@ specifiers:
   '@rush-temp/text': file:./projects/text.tgz
   '@rush-temp/ui': file:./projects/ui.tgz
   '@types/lodash': ^4.14.168
-  '@types/lodash-es': ^4.17.4
   '@types/mongodb': ~3.6.12
   '@types/punycode': ~2.1.0
   '@typescript-eslint/eslint-plugin': ^4.22.0
@@ -11275,7 +11274,6 @@ specifiers:
   intl-messageformat: ^9.6.12
   jwt-simple: ~0.5.6
   lodash: ^4.17.21
-  lodash-es: ^4.17.21
   markdown-it: ~12.0.6
   mini-css-extract-plugin: ~1.4.1
   mongodb: ~3.6.6
