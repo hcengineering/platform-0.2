@@ -13,8 +13,7 @@
 // limitations under the License.
 //
 
-/* eslint-env jest */
-
+import { describe, expect, it } from '@jest/globals'
 import {
   Attribute, Class, CORE_CLASS_ATTRIBUTE, CORE_CLASS_CLASS, CORE_CLASS_DOC, CORE_CLASS_EMB, CORE_CLASS_OBJ,
   Doc, Mixin, Obj, PropertyType, Ref
@@ -69,27 +68,6 @@ describe('matching', () => {
     expect(result.length).toEqual(1)
   })
 
-  it('find one happy path', async () => {
-    const model = new Model('vdocs')
-    model.loadModel(data)
-
-    model.add(model.createDocument(taskIds.class.Task, createTask('t1', 10, 'test task1')))
-    model.add(model.createDocument(taskIds.class.Task, createTask('t2', 11, 'test task2')))
-
-    const result = await model.find<Task>(taskIds.class.Task, { name: { $regex: 't2' } })
-    expect(result).toBeDefined()
-  })
-
-  it('find one not found', async () => {
-    const model = new Model('vdocs')
-    model.loadModel(data)
-
-    model.add(model.createDocument(taskIds.class.Task, createTask('t1', 10, 'test task1')))
-
-    const result = await model.find<Task>(taskIds.class.Task, { name: { $regex: 't3' } })
-    expect(result.length).toEqual(0)
-  })
-
   it('remove document without "query" argument', async () => {
     const model = new Model('vdocs')
     model.loadModel(data)
@@ -136,7 +114,7 @@ describe('invalid cases', () => {
     const p = mdl.loadDomain('vdocs2')
     try {
       await p
-      expect(p).toBeUndefined()
+      expect(p).toBeUndefined() // eslint-disable-line
     } catch (err) {
       expect(err.message).toEqual('domain does not match')
     }
@@ -385,51 +363,27 @@ describe('mixin tools', () => {
     key: 'prefix'
   }
 
-  it('builds mixin without special chars', () =>
-    expect(mixinFromKey(noSpecCharsKey))
-      .toEqual(noSpecCharsMixin)
+  it('builds mixin without special chars', () => {
+    expect(mixinFromKey(noSpecCharsKey)).toEqual(noSpecCharsMixin)
+  }
   )
 
-  it('builds mixin with special chars', () =>
-    expect(mixinFromKey(specCharsKey))
-      .toEqual(specCharsMixin)
+  it('builds mixin with special chars', () => {
+    expect(mixinFromKey(specCharsKey)).toEqual(specCharsMixin)
+  }
   )
 
-  it('builds key from mixin without special chars', () =>
+  it('builds key from mixin without special chars', () => {
     expect(mixinKey(noSpecCharsMixin.mixin, noSpecCharsMixin.key))
       .toEqual(`|${noSpecCharsKey}`)
+  }
   )
 
-  it('builds key from mixin with special chars', () =>
+  it('builds key from mixin with special chars', () => {
     expect(mixinKey(specCharsMixin.mixin, specCharsMixin.key))
       .toEqual(specCharsKey)
+  }
   )
-
-  it('find limit check', async () => {
-    const model = new Model('vdocs')
-    model.loadModel(data)
-
-    model.add(model.createDocument(taskIds.class.Task, createTask('t1', 10, 'test task1')))
-    model.add(model.createDocument(taskIds.class.Task, createTask('t2', 11, 'test task2')))
-    model.add(model.createDocument(taskIds.class.Task, createTask('t3', 12, 'test task3')))
-
-    const result = await model.find(taskIds.class.Task, { }, { limit: 1 })
-    expect(result).toBeDefined()
-    expect(result.length).toEqual(1)
-  })
-
-  it('find limit check-skip', async () => {
-    const model = new Model('vdocs')
-    model.loadModel(data)
-
-    model.add(model.createDocument(taskIds.class.Task, createTask('t1', 10, 'test task1')))
-    model.add(model.createDocument(taskIds.class.Task, createTask('t2', 11, 'test task2')))
-    model.add(model.createDocument(taskIds.class.Task, createTask('t3', 12, 'test task3')))
-
-    const result = await model.find(taskIds.class.Task, { }, { skip: 1 })
-    expect(result).toBeDefined()
-    expect(result.length).toEqual(2)
-  })
 
   it('null vs undefined testing', async () => {
     const model = new Model('vdocs')

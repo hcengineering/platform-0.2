@@ -44,10 +44,10 @@ export interface Task extends Doc {
 }
 
 export interface TaskMixin extends Task {
-  textValue: string
-  listValue: string[]
-  embValue: TaskComment
-  embValueList: TaskComment[]
+  textValue?: string
+  listValue?: string[]
+  embValue?: TaskComment
+  embValueList?: TaskComment[]
 }
 
 export interface TaskWithSecond extends Task {
