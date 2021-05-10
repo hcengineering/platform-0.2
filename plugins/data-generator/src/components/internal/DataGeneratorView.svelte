@@ -14,15 +14,17 @@
 -->
 <script type="ts">
   import type { DateProperty, DocumentValue, Ref, StringProperty } from '@anticrm/core'
-  import type { Application, Space } from '@anticrm/domains'
+  import type { Application, Space, VDoc } from '@anticrm/domains'
   import { CORE_CLASS_SPACE, CORE_MIXIN_SHORTID } from '@anticrm/domains'
+  import { QueryUpdater } from '@anticrm/platform-core'
+  import fsmPlugin, { getFSMService, State, WithFSM } from '@anticrm/fsm'
 
   import ScrollView from '@anticrm/sparkling-controls/src/ScrollView.svelte'
   import { getCoreService, liveQuery } from '@anticrm/presentation'
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
   import EditBox from '@anticrm/sparkling-controls/src/EditBox.svelte'
   import ComboBox from '@anticrm/platform-ui/src/components/ComboBox.svelte'
-  import task, { Task, TaskStatus } from '@anticrm/task'
+  import task, { Task } from '@anticrm/task'
   import type { Action } from '@anticrm/platform-ui'
 
   import faker from 'faker'
@@ -31,9 +33,18 @@
   let taskSpace: Space | undefined
   let spaces: Space[] = []
 
-  $: lq = liveQuery<Space>(lq, CORE_CLASS_SPACE, {}, (docs) => {
-    spaces = docs
-  })
+  let spacesQ: Promise<QueryUpdater<Space>> | undefined
+
+  $: spacesQ = liveQuery<Space>(
+    spacesQ,
+    CORE_CLASS_SPACE,
+    {
+      application: task.application.Task
+    },
+    (docs) => {
+      spaces = docs
+    }
+  )
 
   function filterSpaces (spaces: Space[], app: Ref<Application>): Space[] {
     return spaces.filter((sp) => sp.application === app)
@@ -52,26 +63,19 @@
   }
 
   const coreService = getCoreService()
-
-  function randomEnum<T> (anEnum: T): T[keyof T] {
-    const enumValues = (Object.keys(anEnum)
-      .map((n) => Number.parseInt(n))
-      .filter((n) => !Number.isNaN(n)) as unknown) as T[keyof T][]
-    const randomIndex = Math.floor(Math.random() * enumValues.length)
-    return enumValues[randomIndex]
-  }
+  const fsmService = getFSMService()
 
   async function generateTasks () {
     if (!taskSpace) {
       return
     }
+
     const cs = await coreService
     for (let i = 0; i < taskCount; i++) {
       const modelDb = cs.getModel()
       const newTask = modelDb.createDocument<Task>(task.class.Task, {
         title: (faker as any).commerce.productName() as StringProperty,
         _space: taskSpace._id as Ref<Space>,
-        status: randomEnum(TaskStatus),
         _createdOn: Date.now() as DateProperty,
         _createdBy: cs.getUserId() as StringProperty,
         comments: [
@@ -91,28 +95,40 @@
         console.log(e)
       }
 
-      await cs.create(task.class.Task, newTask)
+      const doc = await cs.create(task.class.Task, newTask)
+      const projectWithFSM = modelDb.as(taskSpace, fsmPlugin.mixin.WithFSM)
+      const fsm = await fsmService
+      const states = (await fsm.getStates(projectWithFSM.fsm)).map((x) => x._id as Ref<State>)
+
+      fsm.addStateItem(projectWithFSM, {
+        _class: task.class.TaskFSMItem,
+        obj: {
+          clazz: task.class.Task,
+          item: doc._id as Ref<VDoc>,
+          state: states[Math.floor(Math.random() * states.length)]
+        }
+      })
     }
   }
 
   async function removeTasks () {
-    const cs = await coreService
     if (!taskSpace) {
       return
     }
-    const tasks = await cs.find<Task>(task.class.Task, { _space: taskSpace._id as Ref<Space> })
-    for (const t of tasks) {
-      await cs.remove(t)
-    }
+
+    const cs = await coreService
+    const modelDb = cs.getModel()
+    const projectWithFSM = modelDb.as(taskSpace, fsmPlugin.mixin.WithFSM)
+
+    const fsmItems = await cs.find(task.class.TaskFSMItem, { fsm: projectWithFSM._id as Ref<WithFSM> })
+    const taskItems = await cs.find(task.class.Task, { _space: taskSpace._id as Ref<Space> })
+
+    await Promise.all(fsmItems.map(cs.remove.bind(cs)))
+    await Promise.all(taskItems.map(cs.remove.bind(cs)))
   }
 
-  $: {
-    if (!taskSpace) {
-      const sps = filterSpaces(spaces, task.application.Task)
-      if (sps && sps.length > 0) {
-        taskSpace = sps[0]
-      }
-    }
+  $: if (!taskSpace && spaces.length > 0) {
+    taskSpace = spaces[0]
   }
 </script>
 

@@ -15,6 +15,7 @@
   "dependencies": {
     "@anticrm/chunter": "^0.2.0",
     "@anticrm/contact": "^0.2.0",
+    "@anticrm/fsm": "^0.2.0",
     "@anticrm/platform": "^0.2.0",
     "@anticrm/presentation": "^0.2.0",
     "@anticrm/task": "^0.2.0",

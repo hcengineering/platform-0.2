@@ -26,11 +26,11 @@ export default async (platform: Platform, deps: {core: CoreService}): Promise<FS
   platform.setResource(fsmPlugin.component.BoardPresenter, BoardPresenter)
   platform.setResource(fsmPlugin.component.VDocCardPresenter, VDocCardPresenter)
 
-  const getStates = async (fsm: FSM): Promise<State[]> =>
-    await deps.core.find(fsmPlugin.class.State, { fsm: fsm._id as Ref<FSM> })
+  const getStates = async (fsm: Ref<FSM>): Promise<State[]> =>
+    await deps.core.find(fsmPlugin.class.State, { fsm })
 
-  const getTransitions = async (fsm: FSM): Promise<Transition[]> =>
-    await deps.core.find(fsmPlugin.class.Transition, { fsm: fsm._id as Ref<FSM> })
+  const getTransitions = async (fsm: Ref<FSM>): Promise<Transition[]> =>
+    await deps.core.find(fsmPlugin.class.Transition, { fsm })
       .then(xs => xs.filter((x): x is Transition => x !== undefined))
 
   const getTargetFSM = async (fsmOwner: WithFSM): Promise<FSM | undefined> => {
@@ -55,7 +55,7 @@ export default async (platform: Platform, deps: {core: CoreService}): Promise<FS
         return
       }
 
-      const state = item.obj.state ?? (await getStates(fsm))[0]._id as Ref<State>
+      const state = item.obj.state ?? (await getStates(fsm._id as Ref<FSM>))[0]._id as Ref<State>
 
       return await deps.core.create(item._class ?? fsmPlugin.class.FSMItem, {
         _createdBy: deps.core.getUserId() as StringProperty,
@@ -78,8 +78,8 @@ export default async (platform: Platform, deps: {core: CoreService}): Promise<FS
         return undefined
       }
 
-      const transitions = await getTransitions(fsm)
-      const states = await getStates(fsm)
+      const transitions = await getTransitions(fsm._id as Ref<FSM>)
+      const states = await getStates(fsm._id as Ref<FSM>)
 
       const newFSM = await deps.core.create(
         fsmPlugin.class.FSM,

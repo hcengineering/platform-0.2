@@ -52,8 +52,8 @@ export interface State extends VDoc {
 }
 
 export interface FSMService extends Service {
-  getStates: (fsm: FSM) => Promise<State[]>
-  getTransitions: (fsm: FSM) => Promise<Transition[]>
+  getStates: (fsm: Ref<FSM>) => Promise<State[]>
+  getTransitions: (fsm: Ref<FSM>) => Promise<Transition[]>
 
   removeStateItem: (item: Ref<VDoc>, fsmOwner: WithFSM) => Promise<void>
   addStateItem: <T extends FSMItem>(
