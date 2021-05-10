@@ -17,7 +17,7 @@
   import { Severity, Status } from '@anticrm/platform'
   import { getContext } from 'svelte'
   import login from '..'
-  import CheckBox from '@anticrm/sparkling-controls/src/CheckBox.svelte'
+  import { CheckBox } from '@anticrm/ui'
   import type { ApplicationRoute, ApplicationRouter } from '@anticrm/platform-ui'
   import twofactor from 'node-2fa'
   import type { Options } from 'node-2fa/dist/interfaces'
