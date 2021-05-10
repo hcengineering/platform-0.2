@@ -13,5 +13,15 @@
 // limitations under the License.
 //
 
-export * from './query'
-export * from './storage'
+// V D O C
+
+import { Doc, Ref } from '@anticrm/core'
+import { Space } from './space'
+
+export interface VDoc extends Doc {
+  _space: Ref<Space>
+  _createdOn: number
+  _createdBy: string
+  _modifiedOn?: number
+  _modifiedBy?: string
+}

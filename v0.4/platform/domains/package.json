@@ -31,7 +31,8 @@
     "@types/node": "~15.0.2"
   },
   "dependencies": {
-    "@anticrm/core": "0.2.0",
+    "@anticrm/core": "^0.2.0",
+    "@anticrm/status": "^0.4.1",
     "fast-equals": "^2.0.0",
     "@anticrm/text": "^0.2.0"
   }

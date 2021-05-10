@@ -79,10 +79,10 @@ export type DocumentValueRaw<T> = {
 type DocPartial<T> = Omit<T, keyof Doc> & Partial<Doc>
 type EmbPartial<T> = Omit<T, keyof Emb> & Partial<Emb>
 
-export type DocumentValue<T> = 
-  T extends Doc ? DocumentValueRaw<DocPartial<T>> : never | 
+export type DocumentValue<T> =
+  T extends Doc ? DocumentValueRaw<DocPartial<T>> : never |
   T extends Emb ? DocumentValueRaw<EmbPartial<T>>: never |
-  T extends Obj ? T : T
+    T extends Obj ? T : T
 
 // Sorting structure
 export enum SortingOrder {

@@ -1,5 +1,5 @@
 import { AnyLayout, Class, Doc, DocumentQuery, FindOptions, Model, Ref, Storage, Tx, TxContext } from '@anticrm/core'
-import { CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_UPDATE_TX, CORE_CLASS_VDOC, CreateTx, DeleteTx, TxOperationKind, UpdateTx, VDoc } from '@anticrm/domains'
+import domains, { CreateTx, DeleteTx, TxOperationKind, UpdateTx, VDoc } from '@anticrm/domains'
 import { Collection, Db, FilterQuery, SortOptionObject, UpdateOneOptions, UpdateQuery } from 'mongodb'
 import { createPullArrayFilters, createPushArrayFilters, createSetArrayFilters, flattenQuery, toMongoQuery } from './query'
 
@@ -19,13 +19,13 @@ export class MongoStorage implements Storage {
 
   async tx (ctx: TxContext, tx: Tx): Promise<any> {
     switch (tx._class) {
-      case CORE_CLASS_CREATE_TX: {
+      case domains.class.CreateTx: {
         return await this.store(ctx, tx as CreateTx)
       }
-      case CORE_CLASS_UPDATE_TX: {
+      case domains.class.UpdateTx: {
         return await this.update(ctx, tx as UpdateTx)
       }
-      case CORE_CLASS_DELETE_TX: {
+      case domains.class.DeleteTx: {
         return await this.remove(ctx, tx as DeleteTx)
       }
 
@@ -36,7 +36,7 @@ export class MongoStorage implements Storage {
 
   async store (ctx: TxContext, tx: CreateTx): Promise<any> {
     const doc = this.model.createDocument(tx._objectClass, tx.object, tx._objectId)
-    if (this.model.is(tx._objectClass, CORE_CLASS_VDOC)) {
+    if (this.model.is(tx._objectClass, domains.class.VDoc)) {
       if (tx._objectSpace === undefined) {
         throw new Error('vdoc space should be specified')
       }

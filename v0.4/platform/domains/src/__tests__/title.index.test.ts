@@ -17,19 +17,18 @@
 
 import { AnyLayout, Class, Doc, generateId, mixinKey, Model, Ref, txContext } from '@anticrm/core'
 import { data, doc1, taskIds } from '@anticrm/core/src/__tests__/tasks'
-import {
-  CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_OBJECT_TX, CORE_CLASS_TITLE, CORE_CLASS_UPDATE_TX, CORE_MIXIN_SHORTID, CreateTx,
-  DeleteTx, Title, TitleSource, TxOperationKind, UpdateTx
-} from '../index'
+import domains from '..'
 import { TitleIndex } from '../indices/title'
 import { ModelStorage } from '../model_storage'
+import { Title, TitleSource } from '../title'
+import { CreateTx, DeleteTx, TxOperationKind, UpdateTx } from '../tx'
 
 const model = new Model('vdocs')
 model.loadModel(data)
 
 function newCTx (_class: Ref<Class<Doc>>, _id: Ref<Doc>, object: AnyLayout): CreateTx {
   return {
-    _class: CORE_CLASS_CREATE_TX,
+    _class: domains.class.CreateTx,
     _id: generateId(),
     _date: Date.now(),
     _user: 'system',
@@ -41,7 +40,7 @@ function newCTx (_class: Ref<Class<Doc>>, _id: Ref<Doc>, object: AnyLayout): Cre
 
 function newUTx (_class: Ref<Class<Doc>>, _id: Ref<Doc>, object: AnyLayout): UpdateTx {
   return {
-    _class: CORE_CLASS_UPDATE_TX,
+    _class: domains.class.UpdateTx,
     _id: generateId(),
     _date: Date.now(),
     _user: 'system',
@@ -49,7 +48,7 @@ function newUTx (_class: Ref<Class<Doc>>, _id: Ref<Doc>, object: AnyLayout): Upd
     _objectClass: _class,
     operations: [
       {
-        _class: CORE_CLASS_OBJECT_TX,
+        _class: domains.class.ObjectTx,
         kind: TxOperationKind.Set,
         _attributes: object
       }
@@ -59,7 +58,7 @@ function newUTx (_class: Ref<Class<Doc>>, _id: Ref<Doc>, object: AnyLayout): Upd
 
 function newDTx (_class: Ref<Class<Doc>>, _id: Ref<Doc>): DeleteTx {
   return {
-    _class: CORE_CLASS_DELETE_TX,
+    _class: domains.class.DeleteTx,
     _id: generateId(),
     _date: Date.now(),
     _user: 'system',
@@ -75,12 +74,12 @@ describe('title-index tests', () => {
     memDb.loadModel(model.dump())
 
     const index = new TitleIndex(model, memDbStorage)
-    const shortIdKey = mixinKey(CORE_MIXIN_SHORTID, 'shortId')
-    const titledDoc = { ...doc1, [shortIdKey]: 'TASK-1', _mixins: [CORE_MIXIN_SHORTID] }
+    const shortIdKey = mixinKey(domains.mixin.ShortID, 'shortId')
+    const titledDoc = { ...doc1, [shortIdKey]: 'TASK-1', _mixins: [domains.mixin.ShortID] }
 
     await index.tx(txContext(), newCTx(taskIds.class.Task, doc1._id, (titledDoc as unknown) as AnyLayout))
 
-    const titles = await memDb.find<Title>(CORE_CLASS_TITLE, {})
+    const titles = await memDb.find<Title>(domains.class.Title, {})
     expect(titles.length).toEqual(2)
     expect(titles[0].title).toEqual('TASK-1')
     expect(titles[1].title).toEqual('my-space')
@@ -92,7 +91,7 @@ describe('title-index tests', () => {
     memDb.loadModel(model.dump())
     memDb.add({ ...doc1 })
     const td1: Title = {
-      _class: CORE_CLASS_TITLE,
+      _class: domains.class.Title,
       _id: 'primary:d1' as Ref<Doc>,
       _objectClass: taskIds.class.Task,
       _objectId: 'd1' as Ref<Doc>,
@@ -100,7 +99,7 @@ describe('title-index tests', () => {
       source: TitleSource.Title
     }
     const td2: Title = {
-      _class: CORE_CLASS_TITLE,
+      _class: domains.class.Title,
       _id: '602d5a5a3e1cca343b3e9be8' as Ref<Doc>,
       _objectClass: taskIds.class.Task,
       _objectId: 'd1' as Ref<Doc>,
@@ -111,18 +110,18 @@ describe('title-index tests', () => {
     memDb.add(td2)
     const index = new TitleIndex(model, memDbStorage)
 
-    const shortIdKey = mixinKey(CORE_MIXIN_SHORTID, 'shortId')
+    const shortIdKey = mixinKey(domains.mixin.ShortID, 'shortId')
 
     await index.tx(
       txContext(),
       newUTx(taskIds.class.Task, doc1._id, {
         name: 'new-name',
         [shortIdKey]: 'SPACE-2',
-        _mixins: [CORE_MIXIN_SHORTID]
+        _mixins: [domains.mixin.ShortID]
       })
     )
 
-    const titles = await memDb.find<Title>(CORE_CLASS_TITLE, {})
+    const titles = await memDb.find<Title>(domains.class.Title, {})
     expect(titles.length).toEqual(3)
     const named = titles.map((t) => t.title).sort((a, b) => String(a).localeCompare(String(b)))
     expect(named).toEqual(['new-name', 'SPACE-2', 'TASK-1'])
@@ -133,7 +132,7 @@ describe('title-index tests', () => {
     memDb.loadModel(model.dump())
     memDb.add(doc1)
     const ts1: Title = {
-      _class: CORE_CLASS_TITLE,
+      _class: domains.class.Title,
       _id: 'primary:d1' as Ref<Doc>,
       _objectClass: taskIds.class.Task,
       _objectId: 'd1' as Ref<Doc>,
@@ -141,7 +140,7 @@ describe('title-index tests', () => {
       source: TitleSource.Title
     }
     const ts2: Title = {
-      _class: CORE_CLASS_TITLE,
+      _class: domains.class.Title,
       _id: '602d5a5a3e1cca343b3e9be8' as Ref<Doc>,
       _objectClass: taskIds.class.Task,
       _objectId: 'd1' as Ref<Doc>,
@@ -153,7 +152,7 @@ describe('title-index tests', () => {
     const index = new TitleIndex(model, memDbStorage)
     await index.tx(txContext(), newUTx(taskIds.class.Task, doc1._id, {}))
 
-    const titles = await memDb.find(CORE_CLASS_TITLE, {})
+    const titles = await memDb.find(domains.class.Title, {})
     expect(titles.length).toEqual(2)
   })
 
@@ -163,7 +162,7 @@ describe('title-index tests', () => {
     memDb.loadModel(model.dump())
     memDb.add({ ...doc1 })
     const ts1: Title = {
-      _class: CORE_CLASS_TITLE,
+      _class: domains.class.Title,
       _id: 'primary:d1' as Ref<Doc>,
       _objectClass: taskIds.class.Task,
       _objectId: 'd1' as Ref<Doc>,
@@ -171,7 +170,7 @@ describe('title-index tests', () => {
       source: TitleSource.Title
     }
     const ts2: Title = {
-      _class: CORE_CLASS_TITLE,
+      _class: domains.class.Title,
       _id: '602d5a5a3e1cca343b3e9be8' as Ref<Doc>,
       _objectClass: taskIds.class.Task,
       _objectId: 'd1' as Ref<Doc>,
@@ -183,7 +182,7 @@ describe('title-index tests', () => {
     const index = new TitleIndex(model, memDbStorage)
     await index.tx(txContext(), newDTx(taskIds.class.Task, doc1._id))
 
-    const titles = await memDb.find(CORE_CLASS_TITLE, {})
+    const titles = await memDb.find(domains.class.Title, {})
     expect(titles.length).toEqual(0)
   })
 })
