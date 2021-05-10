@@ -13,5 +13,19 @@
 // limitations under the License.
 //
 
-export * from './query'
-export * from './storage'
+import { Class, mixinKey, Model, Obj, Ref } from '@anticrm/core'
+import domains from '.'
+
+export function getPrimaryKey (model: Model, _class: Ref<Class<Obj>>): string | undefined {
+  const primaryKey = mixinKey(domains.mixin.Indices, 'primary')
+  let cls = _class as Ref<Class<Obj>> | undefined
+  while (cls !== undefined) {
+    const clazz = model.get(cls)
+    const primary = (clazz as any)[primaryKey]
+    if (primary !== undefined) {
+      return primary
+    }
+    cls = clazz._extends
+  }
+  return undefined
+}

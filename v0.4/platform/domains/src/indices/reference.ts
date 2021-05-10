@@ -21,12 +21,9 @@ import {
   MessageMarkType, parseMessage, ReferenceMark, traverseMarks, traverseMessage
 } from '@anticrm/text'
 import { deepEqual } from 'fast-equals'
-import {
-  CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_REFERENCE, CORE_CLASS_UPDATE_TX, CreateTx, DeleteTx, Reference,
-  UpdateTx
-} from '..'
-import { updateDocument } from '../tx/modeltx'
-import { create, remove } from '../tx/operations'
+import domains from '..'
+import { Reference } from '../references'
+import { create, CreateTx, DeleteTx, remove, updateDocument, UpdateTx } from '../tx'
 
 interface ClassKey { key: string, _class: Ref<Class<Emb>> }
 
@@ -90,7 +87,7 @@ export class ReferenceIndex implements DomainIndex {
             refMatcher.add(key)
             index.value++
             result.push({
-              _class: CORE_CLASS_REFERENCE,
+              _class: domains.class.Reference,
               _id: `${_id}${index.value}` as Ref<Doc>, // Generate a sequence id based on source object id.
               _targetId: rm.attrs.id as Ref<Doc>,
               _targetClass: rm.attrs.class as Ref<Class<Doc>>,
@@ -116,11 +113,11 @@ export class ReferenceIndex implements DomainIndex {
 
   async tx (ctx: TxContext, tx: Tx): Promise<any> {
     switch (tx._class) {
-      case CORE_CLASS_CREATE_TX:
+      case domains.class.CreateTx:
         return await this.onCreate(ctx, tx as CreateTx)
-      case CORE_CLASS_UPDATE_TX:
+      case domains.class.UpdateTx:
         return await this.onUpdateTx(ctx, tx as UpdateTx)
-      case CORE_CLASS_DELETE_TX:
+      case domains.class.DeleteTx:
         return await this.onDeleteTx(ctx, tx as DeleteTx)
       default:
         console.log('not implemented text tx', tx)
@@ -164,7 +161,7 @@ export class ReferenceIndex implements DomainIndex {
     }
 
     // Find current refs for this object
-    const refs = await this.storage.find(CORE_CLASS_REFERENCE, {
+    const refs = await this.storage.find<Reference>(domains.class.Reference, {
       _sourceId: update._objectId,
       _sourceClass: update._objectClass
     })
@@ -205,7 +202,7 @@ export class ReferenceIndex implements DomainIndex {
 
   private async onDeleteTx (ctx: TxContext, deleteTx: DeleteTx): Promise<any> {
     // Find current refs for this object to clean all of them.
-    const refs = await this.storage.find(CORE_CLASS_REFERENCE, {
+    const refs = await this.storage.find<Reference>(domains.class.Reference, {
       _sourceId: deleteTx._objectId,
       _sourceClass: deleteTx._objectClass
     })

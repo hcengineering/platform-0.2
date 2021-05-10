@@ -14,14 +14,13 @@
 //
 
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-import 'reflect-metadata'
-
-import core from '.'
 import {
   AnyLayout, ArrayOf, Attribute, BagOf, Class, Classifier, ClassifierKind, Doc, Emb, Enum, EnumKey, EnumLiteral,
   EnumLiterals, EnumOf, InstanceOf, Mixin, Model, MODEL_DOMAIN, Obj, Ref, RefTo, Type
 } from '@anticrm/core'
-import { CORE_CLASS_VDOC } from '@anticrm/domains'
+import domains from '@anticrm/domains'
+import 'reflect-metadata'
+import core from '.'
 
 const classIdentities = new Map<Ref<Class<Obj>>, Class<Obj>>()
 
@@ -138,9 +137,9 @@ export function Class$<E extends Obj, T extends E> (id: Ref<Class<T>>, _extends:
     if (domain !== undefined) {
       // Do not allow VDoc's to be in Model domain.
       if (domain === MODEL_DOMAIN) {
-        const vdoc = findParentClassifier(classifier, CORE_CLASS_VDOC)
+        const vdoc = findParentClassifier(classifier, domains.class.VDoc)
         if (vdoc !== undefined) {
-          throw new Error(`Classifier ${id} is extends ${CORE_CLASS_VDOC} and define ${domain} as domain` +
+          throw new Error(`Classifier ${id} is extends ${domains.class.VDoc} and define ${domain} as domain` +
           '\nVDoc documents should be defined for own domains, not model domain.')
         }
       }

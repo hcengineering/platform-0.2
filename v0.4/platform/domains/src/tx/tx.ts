@@ -14,10 +14,7 @@
 //
 
 import { AnyLayout, Class, Doc, generateId, Ref } from '@anticrm/core'
-import {
-  CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_UPDATE_TX, CreateTx, DeleteTx, Space,
-  TxOperation, UpdateTx
-} from '../'
+import domains, { CreateTx, DeleteTx, Space, TxOperation, UpdateTx } from '../'
 
 export function newCreateTx<T extends Doc> (doc: T, _user: string, _objectSpace?: Ref<Space>): CreateTx {
   const {
@@ -30,7 +27,7 @@ export function newCreateTx<T extends Doc> (doc: T, _user: string, _objectSpace?
   delete (objValue as any)._space
 
   return {
-    _class: CORE_CLASS_CREATE_TX,
+    _class: domains.class.CreateTx,
     _id: generateId(),
     _objectSpace,
     _date: Date.now(),
@@ -43,7 +40,7 @@ export function newCreateTx<T extends Doc> (doc: T, _user: string, _objectSpace?
 
 export function newUpdateTx (_objectClass: Ref<Class<Doc>>, _objectId: Ref<Doc>, operations: TxOperation[], _user: string, _objectSpace?: Ref<Space>): UpdateTx {
   return {
-    _class: CORE_CLASS_UPDATE_TX,
+    _class: domains.class.UpdateTx,
     _id: generateId(),
     _objectId,
     _objectClass,
@@ -56,7 +53,7 @@ export function newUpdateTx (_objectClass: Ref<Class<Doc>>, _objectId: Ref<Doc>,
 
 export function newDeleteTx (_objectClass: Ref<Class<Doc>>, _objectId: Ref<Doc>, _user: string, _objectSpace?: Ref<Space>): DeleteTx {
   return {
-    _class: CORE_CLASS_DELETE_TX,
+    _class: domains.class.DeleteTx,
     _id: generateId(),
     _objectId,
     _objectClass,

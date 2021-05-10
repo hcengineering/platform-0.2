@@ -13,5 +13,21 @@
 // limitations under the License.
 //
 
-export * from './query'
-export * from './storage'
+import { Class, Doc, Ref } from '@anticrm/core'
+
+// T I T L E
+export const TITLE_DOMAIN = 'title'
+
+/**
+ * Define a title source, ShortId titles will be used to reference documents with short form.
+ */
+export enum TitleSource {
+  Title, ShortId
+}
+
+export interface Title extends Doc {
+  _objectClass: Ref<Class<Doc>>
+  _objectId: Ref<Doc>
+  title: string | number
+  source: TitleSource
+}

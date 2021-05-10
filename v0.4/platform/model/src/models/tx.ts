@@ -14,13 +14,10 @@
 //
 
 // T R A N S A C T I O N S
+import { AnyLayout, Class, Doc, PrimitiveType, Ref, Tx } from '@anticrm/core'
+import { CreateTx, DeleteTx, ObjectSelector, ObjectTx, ObjectTxDetails, Space, TxOperation, TxOperationKind, TX_DOMAIN, UpdateTx } from '@anticrm/domains'
 import { ArrayOf$, BagOf$, Class$, InstanceOf$, Mixin$, Prop, RefTo$ } from '../dsl'
 import core from '../index'
-import {
-  CreateTx, DeleteTx, ObjectSelector, ObjectTx, ObjectTxDetails, Space, TX_DOMAIN, TxOperation, TxOperationKind,
-  UpdateTx
-} from '@anticrm/domains'
-import { AnyLayout, Class, Doc, PrimitiveType, Ref, Tx } from '@anticrm/core'
 import { TDoc, TEmb } from './core'
 
 @Class$(core.class.Tx, core.class.Doc, TX_DOMAIN)
@@ -34,8 +31,6 @@ export class TObjectTx extends TTx implements ObjectTx {
   @RefTo$(core.class.Doc) _objectId!: Ref<Doc>
   @RefTo$(core.class.Class) _objectClass!: Ref<Class<Doc>>
   @RefTo$(core.class.Space) _objectSpace!: Ref<Space>
-
-  @InstanceOf$(core.class.ObjectTxDetails) _txDetails!: ObjectTxDetails
 }
 
 @Class$(core.class.CreateTx, core.class.Tx, TX_DOMAIN)

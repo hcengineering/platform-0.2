@@ -14,11 +14,9 @@
 //
 
 import { DomainIndex, Model, Ref, Storage, Tx, TxContext } from '@anticrm/core'
-import {
-  CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX, CORE_CLASS_TX_OPERATION, CORE_CLASS_UPDATE_TX, CORE_CLASS_VDOC, CreateTx, DeleteTx, Space,
-  TxOperationKind, UpdateTx
-} from '..'
-import { newUpdateTx } from '../tx/tx'
+import { Space } from '../space'
+import { CreateTx, DeleteTx, newUpdateTx, TxOperationKind, UpdateTx } from '../tx'
+import domains from '../'
 
 export class VDocIndex implements DomainIndex {
   private readonly transient: Storage | undefined
@@ -33,11 +31,11 @@ export class VDocIndex implements DomainIndex {
 
   async tx (ctx: TxContext, tx: Tx): Promise<any> {
     switch (tx._class) {
-      case CORE_CLASS_CREATE_TX:
+      case domains.class.CreateTx:
         return await this.onCreate(ctx, tx as CreateTx)
-      case CORE_CLASS_UPDATE_TX:
+      case domains.class.UpdateTx:
         return await this.onUpdate(ctx, tx as UpdateTx)
-      case CORE_CLASS_DELETE_TX:
+      case domains.class.DeleteTx:
         return await this.onDelete(ctx, tx as DeleteTx)
       default:
         console.log('not implemented tx', tx)
@@ -45,7 +43,7 @@ export class VDocIndex implements DomainIndex {
   }
 
   async onCreate (ctx: TxContext, tx: CreateTx): Promise<any> {
-    if (!this.modelDb.is(tx._objectClass, CORE_CLASS_VDOC)) {
+    if (!this.modelDb.is(tx._objectClass, domains.class.VDoc)) {
       return await Promise.resolve()
     }
     const createTx: CreateTx = { ...tx, object: { ...tx.object } } // Make a copy + modify modification
@@ -55,7 +53,7 @@ export class VDocIndex implements DomainIndex {
       createTx.object._createdBy = tx._user
       createTx.object._createdOn = tx._date
     }
-    if (this.modelDb.is(tx._objectClass, CORE_CLASS_VDOC)) {
+    if (this.modelDb.is(tx._objectClass, domains.class.VDoc)) {
       const _space = tx._objectSpace as Ref<Space>
       if (_space === undefined) {
         return await Promise.reject(new Error('VDoc instances should have _space attribute specified'))
@@ -63,7 +61,7 @@ export class VDocIndex implements DomainIndex {
       createTx.object._space = _space
     }
     const updateOP = {
-      _class: CORE_CLASS_TX_OPERATION,
+      _class: domains.class.TxOperation,
       kind: TxOperationKind.Set,
       _attributes: {
         _createdOn: tx._date,
@@ -78,11 +76,11 @@ export class VDocIndex implements DomainIndex {
   }
 
   async onUpdate (ctx: TxContext, tx: UpdateTx): Promise<any> {
-    if (!this.modelDb.is(tx._objectClass, CORE_CLASS_VDOC)) {
+    if (!this.modelDb.is(tx._objectClass, domains.class.VDoc)) {
       return await Promise.resolve()
     }
     const updateOp = {
-      _class: CORE_CLASS_TX_OPERATION,
+      _class: domains.class.TxOperation,
       kind: TxOperationKind.Set,
       _attributes: {
         _modifiedBy: tx._user,
@@ -98,7 +96,7 @@ export class VDocIndex implements DomainIndex {
   }
 
   async onDelete (ctx: TxContext, tx: DeleteTx): Promise<any> {
-    if (!this.modelDb.is(tx._objectClass, CORE_CLASS_VDOC)) {
+    if (!this.modelDb.is(tx._objectClass, domains.class.VDoc)) {
       return await Promise.resolve()
     }
     await this.storage.tx(ctx, tx)

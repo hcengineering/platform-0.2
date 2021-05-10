@@ -17,7 +17,7 @@
 
 import { DocumentValue, generateId, Model, SortingOrder, txContext } from '@anticrm/core'
 import { createSubtask, data, Task, taskIds as task } from '@anticrm/core/src/__tests__/tasks'
-import { CORE_CLASS_OBJECT_SELECTOR, CORE_CLASS_SPACE, CreateTx } from '@anticrm/domains'
+import domains from '@anticrm/domains'
 import { create, updateWith } from '@anticrm/domains/src/tx/operations'
 import { Db, MongoClient, UpdateWriteOpResult } from 'mongodb'
 import { createSetArrayFilters } from '../query'
@@ -53,9 +53,9 @@ describe('mongo operations', () => {
   })
 
   it('check $set field', async () => {
-    const f1 = createSetArrayFilters(model, CORE_CLASS_SPACE,
+    const f1 = createSetArrayFilters(model, domains.class.Space,
       [{
-        _class: CORE_CLASS_OBJECT_SELECTOR,
+        _class: domains.class.ObjectSelector,
         key: 'users',
         pattern: { userId: 'qwe.com' }
       }],
@@ -77,11 +77,11 @@ describe('mongo operations', () => {
   it('check $set depth2-verify', async () => {
     const f1 = createSetArrayFilters(model, task.class.Task,
       [{
-        _class: CORE_CLASS_OBJECT_SELECTOR,
+        _class: domains.class.ObjectSelector,
         key: 'tasks',
         pattern: { name: 'subtask1' }
       }, {
-        _class: CORE_CLASS_OBJECT_SELECTOR,
+        _class: domains.class.ObjectSelector,
         key: 'comments',
         pattern: { _id: '#0' }
       }], { author: 'Dart' },
@@ -103,7 +103,7 @@ describe('mongo operations', () => {
       ]
     })
   })
-  it('check $set depth2', async () => {    
+  it('check $set depth2', async () => {
     const doc1: DocumentValue<Task> = {
       description: '',
       name: 'my-space',
@@ -127,7 +127,7 @@ describe('mongo operations', () => {
     const mongoStorage = new MongoStorage(model, db)
 
     const doc = model.createDocument<Task>(task.class.Task, doc1)
-    await mongoStorage.tx(txContext(), create<Task>(model, 'user1', task.class.Task, doc) as CreateTx)
+    await mongoStorage.tx(txContext(), create<Task>(model, 'user1', task.class.Task, doc))
     const d2: UpdateWriteOpResult = await mongoStorage.tx(txContext(), updateWith<Task>(model, 'user1', doc, (s) =>
       s.tasks.match({ name: 'subtask1' }).comments.match({ _id: '#0' }).set({
         author: 'Dart',
@@ -145,11 +145,11 @@ describe('mongo operations', () => {
   it('check $set depth2-verify', async () => {
     const f1 = createSetArrayFilters(model, task.class.Task, [
       {
-        _class: CORE_CLASS_OBJECT_SELECTOR,
+        _class: domains.class.ObjectSelector,
         key: 'tasks',
         pattern: { name: 'subtask1' }
       }, {
-        _class: CORE_CLASS_OBJECT_SELECTOR,
+        _class: domains.class.ObjectSelector,
         key: 'comments',
         pattern: { _id: '#0' }
       }

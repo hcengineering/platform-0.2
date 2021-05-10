@@ -14,18 +14,17 @@
 //
 
 import { Class, Doc, DocumentValue, Model, Ref, Tx } from '@anticrm/core'
-import {
-  CORE_CLASS_OBJECTTX_DETAILS, CORE_CLASS_SPACE, CORE_CLASS_TX_OPERATION, CORE_CLASS_VDOC, CORE_MIXIN_SHORTID, CreateTx, ObjectTx, ObjectTxDetails, OperationProtocol, Space,
-  txBuilder, TxBuilder, TxOperation, TxOperationKind, UpdateTx
-} from '../'
-import { getPrimaryKey } from '../primary'
+import domains from '..'
+import { getPrimaryKey } from '../primary_utils'
+import { Space } from '../space'
+import { CreateTx, ObjectTx, ObjectTxDetails, txBuilder, TxBuilder, TxOperation, TxOperationKind, UpdateTx } from './'
 import { newCreateTx, newDeleteTx, newUpdateTx } from './tx'
 
 function getSpace (model: Model, doc: Doc): { _objectSpace: Ref<Space> | undefined, spaceIsRequired: boolean } {
-  if (model.is(doc._class, CORE_CLASS_SPACE)) {
+  if (model.is(doc._class, domains.class.Space)) {
     return { _objectSpace: doc._id as Ref<Space>, spaceIsRequired: true }
   }
-  const isVDoc = model.is(doc._class, CORE_CLASS_VDOC)
+  const isVDoc = model.is(doc._class, domains.class.VDoc)
   return { _objectSpace: isVDoc ? (doc as any)._space as Ref<Space> : undefined, spaceIsRequired: isVDoc }
 }
 
@@ -77,7 +76,7 @@ export function update<T extends Doc> (model: Model, userId: string, doc: T, val
   }
 
   const txOp: TxOperation = {
-    _class: CORE_CLASS_TX_OPERATION,
+    _class: domains.class.TxOperation,
     kind: TxOperationKind.Set,
     _attributes: value
   }
@@ -107,28 +106,11 @@ function fillUpdateDetails<T extends Doc> (model: Model, doc: T, tx: ObjectTx): 
   if (primary !== undefined) {
     const title = (doc as any)[primary]
     if (title !== undefined) {
-      model.cast<ObjectTxDetails>(doc, CORE_CLASS_OBJECTTX_DETAILS).name = title
+      model.cast<ObjectTxDetails>(doc, domains.mixin.ObjectTxDetails).name = title
     }
   }
   // Fill short Id.
-  model.asMixin(doc, CORE_MIXIN_SHORTID, (id) => {
-    model.cast<ObjectTxDetails>(doc, CORE_CLASS_OBJECTTX_DETAILS).id = id.shortId
+  model.asMixin(doc, domains.mixin.ShortID, (id) => {
+    model.cast<ObjectTxDetails>(doc, domains.mixin.ObjectTxDetails).id = id.shortId
   })
-}
-
-export function createOperations (model: Model, processTx: (tx: Tx) => Promise<any>, userId: string): OperationProtocol {
-  return {
-    create: async<T extends Doc>(_class: Ref<Class<T>>, values: DocumentValue<T>): Promise<void> => {
-      await processTx(create<T>(model, userId, _class, values))
-    },
-    update: async <T extends Doc> (doc: T, value: Partial<DocumentValue<T>>): Promise<void> => {
-      await processTx(update(model, userId, doc, value))
-    },
-    updateWith: async <T extends Doc> (doc: T, builder: (s: TxBuilder<T>) => TxOperation | TxOperation[]): Promise<void> => {
-      await processTx(updateWith(model, userId, doc, builder))
-    },
-    remove: async <T extends Doc> (doc: T): Promise<void> => {
-      await processTx(remove(model, userId, doc))
-    }
-  }
 }

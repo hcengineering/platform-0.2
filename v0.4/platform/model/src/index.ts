@@ -26,12 +26,8 @@ import {
   Obj, Ref, RefTo,
   Type, Tx
 } from '@anticrm/core'
-import {
-  Application, CORE_CLASS_CREATE_TX, CORE_CLASS_DELETE_TX,
-  CORE_CLASS_OBJECTTX_DETAILS, CORE_CLASS_OBJECT_SELECTOR, CORE_CLASS_OBJECT_TX,
-  CORE_CLASS_SPACE,
-  CORE_CLASS_SPACE_USER, CORE_CLASS_TX_OPERATION,
-  CORE_CLASS_UPDATE_TX, CORE_MIXIN_SHORTID,
+import domains, {
+  Application,
   CreateTx, DeleteTx, ObjectSelector, ObjectTx, ObjectTxDetails, ShortID, Space, SpaceUser, TxOperation,
   UpdateTx, VDoc, Title, Reference, Indices
 } from '@anticrm/domains'
@@ -66,20 +62,19 @@ const modelIds = identify('core' as Component, {
     EnumOf: CORE_CLASS_ENUM_OF as Ref<Class<EnumOf<EnumKey>>>, // eslint-disable-line
 
     Tx: '' as Ref<Class<Tx>>,
-    ObjectTx: CORE_CLASS_OBJECT_TX as Ref<Class<ObjectTx>>, // eslint-disable-line
-    ObjectTxDetails: CORE_CLASS_OBJECTTX_DETAILS as Ref<Class<ObjectTxDetails>>, // eslint-disable-line
-    CreateTx: CORE_CLASS_CREATE_TX as Ref<Class<CreateTx>>, // eslint-disable-line
-    UpdateTx: CORE_CLASS_UPDATE_TX as Ref<Class<UpdateTx>>, // eslint-disable-line
-    ObjectSelector: CORE_CLASS_OBJECT_SELECTOR as Ref<Class<ObjectSelector>>, // eslint-disable-line
-    TxOperation: CORE_CLASS_TX_OPERATION as Ref<Class<TxOperation>>, // eslint-disable-line
-    DeleteTx: CORE_CLASS_DELETE_TX as Ref<Class<DeleteTx>>, // eslint-disable-line
+    ObjectTx: domains.class.ObjectTx as Ref<Class<ObjectTx>>, // eslint-disable-line    
+    CreateTx: domains.class.CreateTx as Ref<Class<CreateTx>>, // eslint-disable-line
+    UpdateTx: domains.class.UpdateTx as Ref<Class<UpdateTx>>, // eslint-disable-line
+    ObjectSelector: domains.class.ObjectSelector as Ref<Class<ObjectSelector>>, // eslint-disable-line
+    TxOperation: domains.class.TxOperation as Ref<Class<TxOperation>>, // eslint-disable-line
+    DeleteTx: domains.class.DeleteTx as Ref<Class<DeleteTx>>, // eslint-disable-line
 
     Title: '' as Ref<Class<Title>>,
 
     VDoc: '' as Ref<Class<VDoc>>,
 
-    Space: CORE_CLASS_SPACE as Ref<Class<Space>>, // eslint-disable-line
-    SpaceUser: CORE_CLASS_SPACE_USER as Ref<Class<SpaceUser>>, // eslint-disable-line
+    Space: domains.class.Space as Ref<Class<Space>>, // eslint-disable-line
+    SpaceUser: domains.class.SpaceUser as Ref<Class<SpaceUser>>, // eslint-disable-line
 
     Reference: '' as Ref<Class<Reference>>,
 
@@ -87,8 +82,8 @@ const modelIds = identify('core' as Component, {
   },
   mixin: {
     Indices: '' as Ref<Mixin<Indices>>,
-    ObjectTxDetails: '' as Ref<Mixin<ObjectTxDetails>>,
-    ShortID: CORE_MIXIN_SHORTID as Ref<Mixin<ShortID>>, // eslint-disable-line
+    ShortID: domains.mixin.ShortID as Ref<Mixin<ShortID>>, // eslint-disable-line
+    ObjectTxDetails: domains.mixin.ObjectTxDetails as Ref<Class<ObjectTxDetails>>, // eslint-disable-line
   }
 })
 export default modelIds
