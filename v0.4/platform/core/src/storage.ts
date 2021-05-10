@@ -76,13 +76,16 @@ export type TWithoutEmbArray<A> = A extends Array<infer T> ? Array<DocumentValue
 export type DocumentValueRaw<T> = {
   [P in keyof T]: TWithoutEmbArray<T[P]>
 }
-type DocPartial<T> = Omit<T, keyof Doc> & Partial<Doc>
-type EmbPartial<T> = Omit<T, keyof Emb> & Partial<Emb>
 
+type OmitPartial<T, P> = Omit<T, keyof P> & Partial<P>
+
+/**
+ * A values of T with some parts made partial, like _class, _id.
+ */
 export type DocumentValue<T> =
-  T extends Doc ? DocumentValueRaw<DocPartial<T>> : never |
-  T extends Emb ? DocumentValueRaw<EmbPartial<T>>: never |
-    T extends Obj ? T : T
+  T extends Doc ? DocumentValueRaw<OmitPartial<T, Doc>> :
+    T extends Emb ? DocumentValueRaw<OmitPartial<T, Emb>>:
+      T extends Obj ? DocumentValueRaw<OmitPartial<T, Obj>> : T
 
 // Sorting structure
 export enum SortingOrder {
