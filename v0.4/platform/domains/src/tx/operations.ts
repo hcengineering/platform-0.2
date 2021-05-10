@@ -15,7 +15,7 @@
 
 import { Class, Doc, DocumentValue, Model, Ref, Tx } from '@anticrm/core'
 import {
-  CORE_CLASS_OBJECTTX_DETAILS, CORE_CLASS_SPACE, CORE_CLASS_TX_OPERATION, CORE_CLASS_VDOC, CORE_MIXIN_SHORTID, ObjectTx, ObjectTxDetails, OperationProtocol, Space,
+  CORE_CLASS_OBJECTTX_DETAILS, CORE_CLASS_SPACE, CORE_CLASS_TX_OPERATION, CORE_CLASS_VDOC, CORE_MIXIN_SHORTID, CreateTx, ObjectTx, ObjectTxDetails, OperationProtocol, Space,
   txBuilder, TxBuilder, TxOperation, TxOperationKind, UpdateTx
 } from '../'
 import { getPrimaryKey } from '../primary'
@@ -32,13 +32,13 @@ function getSpace (model: Model, doc: Doc): { _objectSpace: Ref<Space> | undefin
 /**
  * Construct object create transaction.
  */
-export function create<T extends Doc> (model: Model, userId: string, _class: Ref<Class<T>>, values: DocumentValue<T>): Tx {
+export function create<T extends Doc> (model: Model, userId: string, _class: Ref<Class<T>>, values: DocumentValue<T>): CreateTx {
   const clazz = model.get(_class)
   if (clazz === undefined) {
     throw new Error('Class ' + _class + ' not found')
   }
 
-  const doc = model.createDocument(_class, values)
+  const doc = model.createDocument(_class, values, values._id)
 
   const { _objectSpace, spaceIsRequired } = getSpace(model, doc)
   if ((_objectSpace === undefined) && spaceIsRequired) {

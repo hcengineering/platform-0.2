@@ -1,0 +1,38 @@
+{
+  "name": "@anticrm/storage-mongo",
+  "version": "0.2.0",
+  "description": "A Storage for mongo DB",
+  "main": "src/index.ts",
+  "author": "Anticrm Platform Contributors (https://github.com/anticrm)",
+  "license": "EPL-2.0",
+  "scripts": {
+    "build": "tsc",
+    "build:docs": "api-extractor run --local && copyfiles -u 1 ./_api-extractor-temp/doc-models/* ../../_api-extractor-temp/",
+    "lint": "eslint --max-warnings=0 src",
+    "lint:fix": "eslint --fix src",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@microsoft/api-extractor": "^7.14.0",
+    "@types/jest": "~26.0.23",
+    "@typescript-eslint/eslint-plugin": "^4.22.0",
+    "@typescript-eslint/parser": "^4.22.0",
+    "eslint": "^7.24.0",
+    "eslint-config-standard": "^16.0.2",
+    "eslint-config-standard-with-typescript": "^20.0.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^5.1.0",
+    "jest": "^26.0.1",
+    "ts-jest": "^26.4.4",
+    "typescript": "^4.2.4",
+    "@types/node": "~15.0.2",
+    "@jest/globals": "~26.6.2",
+    "@types/mongodb": "^3.6.12"
+  },
+  "dependencies": {
+    "mongodb": "^3.6.6",
+    "@anticrm/core": "^0.2.0",
+    "@anticrm/domains": "^0.2.0"
+  }
+}

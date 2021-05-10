@@ -378,6 +378,10 @@
       "projectFolder": "platform/core"
     },
     {
+      "packageName": "@anticrm/storage-mongo",
+      "projectFolder": "platform/storage-mongo"
+    },
+    {
       "packageName": "@anticrm/domains",
       "projectFolder": "platform/domains"
     },
