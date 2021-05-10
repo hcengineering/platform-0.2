@@ -193,7 +193,7 @@ export function model (S: Builder): void {
     name: 'Task with default createForm' as IntlString
   })
 
-  S.mixin(task.class.Task, presentation.mixin.CardForm, {
+  S.mixin(task.class.Task, fsmPlugin.mixin.CardForm, {
     component: task.component.CardForm
   })
 

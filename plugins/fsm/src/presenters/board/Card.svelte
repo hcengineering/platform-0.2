@@ -20,7 +20,7 @@ limitations under the License.
   import type { QueryUpdater } from '@anticrm/platform-core'
   import type { VDoc } from '@anticrm/domains'
   import type { AnyComponent } from '@anticrm/platform-ui'
-  import presentationPlugin, { getPresentationService, liveQuery } from '@anticrm/presentation'
+  import { getPresentationService, liveQuery } from '@anticrm/presentation'
 
   import Component from '@anticrm/platform-ui/src/components/Component.svelte'
 
@@ -28,6 +28,7 @@ limitations under the License.
   import { pannable } from './cardHelper'
 
   import type { FSMItem } from '../..'
+  import fsmPlugin from '../..'
 
   export let doc: FSMItem
   export let duplicate = false
@@ -49,13 +50,16 @@ limitations under the License.
 
   $: lq = liveQuery(lq, doc.clazz, { _id: doc.item }, (docs) => {
     refDoc = docs[0]
-
-    presentationP.then((ps) => {
-      presenter =
-        ps.getComponentExtension(doc._class, presentationPlugin.mixin.CardForm) ||
-        presentationPlugin.component.VDocCardPresenter
-    })
   })
+
+  $: if (refDoc) {
+    presentationP.then((ps) => {
+      if (refDoc) {
+        presenter =
+          ps.getComponentExtension(refDoc._class, fsmPlugin.mixin.CardForm) || fsmPlugin.component.VDocCardPresenter
+      }
+    })
+  }
 
   const dispatch = createEventDispatcher()
 

@@ -188,9 +188,7 @@ const presentationPlugin = plugin('presentation' as Plugin<PresentationService>,
     CheckboxPresenter: '' as AnyComponent,
     RefPresenter: '' as AnyComponent,
     TablePresenter: '' as AnyComponent,
-    ArrayPresenter: '' as AnyComponent,
-    VDocCardPresenter: '' as AnyComponent, // Some default card presenter
-    CardPresenter: '' as AnyComponent // Card presenter
+    ArrayPresenter: '' as AnyComponent
   }
 })
 

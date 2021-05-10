@@ -29,8 +29,6 @@ import CheckboxEditor from './components/internal/presenters/value/CheckboxEdito
 import TablePresenter from './components/internal/presenters/class/TablePresenter.svelte'
 import RefPresenter from './components/internal/presenters/value/RefPresenter.svelte'
 import ArrayPresenter from './components/internal/presenters/value/ArrayPresenter.svelte'
-import VDocCardPresenter from './components/internal/presenters/VDocCardPresenter.svelte'
-import CardPresenter from './components/internal/presenters/CardPresenter.svelte'
 import EnumPresenter from './components/internal/presenters/value/EnumPresenter.svelte'
 
 /*!
@@ -52,8 +50,6 @@ export default async (platform: Platform, deps: { core: CoreService, i18n: I18n 
 
   platform.setResource(ui.component.TablePresenter, TablePresenter)
   platform.setResource(ui.component.RefPresenter, RefPresenter)
-  platform.setResource(ui.component.VDocCardPresenter, VDocCardPresenter)
-  platform.setResource(ui.component.CardPresenter, CardPresenter)
 
   async function getGroupModel (_class: Ref<Class<Obj>>): Promise<GroupModel> {
     const model = coreService.getModel()
