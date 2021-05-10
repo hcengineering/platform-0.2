@@ -348,3 +348,4 @@ export interface Title extends Doc {
 }
 
 export * from './primary'
+export * from './tx/modeltx'
