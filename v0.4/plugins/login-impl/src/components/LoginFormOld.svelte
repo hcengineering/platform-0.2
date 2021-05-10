@@ -20,7 +20,7 @@
   import type { LoginService } from '@anticrm/plugin-login'
   import login from '@anticrm/plugin-login'
   import Form from './Form.svelte'
-  import { Button } from '@anticrm/sparkling-controls'
+  import { Button } from '@anticrm/ui'
   import type { ApplicationRouter } from '@anticrm/plugin-ui'
   // import { PlatformStatusCodes } from '@anticrm/foundation'
 

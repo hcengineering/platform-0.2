@@ -3,7 +3,6 @@ dependencies:
   '@babel/runtime': 7.13.10
   '@jest/globals': 26.6.2
   '@rush-temp/core': file:projects/core.tgz_ts-node@9.1.1
-  '@rush-temp/core-mongo': file:projects/core-mongo.tgz_ts-node@9.1.1
   '@rush-temp/domains': file:projects/domains.tgz_ts-node@9.1.1
   '@rush-temp/model': file:projects/model.tgz
   '@rush-temp/platform': file:projects/platform.tgz_6a150cea3e356ecb9f49d2cbc8bd3b95
@@ -14,12 +13,12 @@ dependencies:
   '@rush-temp/prod': file:projects/prod.tgz_sass@1.32.8
   '@rush-temp/rpc': file:projects/rpc.tgz_@typescript-eslint+parser@4.22.0
   '@rush-temp/server-account': file:projects/server-account.tgz_6a150cea3e356ecb9f49d2cbc8bd3b95
-  '@rush-temp/sparkling-controls': file:projects/sparkling-controls.tgz_9d8bd6a515df5f388c5e4532b97e083a
   '@rush-temp/sparkling-theme': file:projects/sparkling-theme.tgz_9d8bd6a515df5f388c5e4532b97e083a
   '@rush-temp/status': file:projects/status.tgz_6a150cea3e356ecb9f49d2cbc8bd3b95
   '@rush-temp/text': file:projects/text.tgz_ts-node@9.1.1
   '@rush-temp/ui': file:projects/ui.tgz_6a150cea3e356ecb9f49d2cbc8bd3b95
   '@types/lodash': 4.14.168
+  '@types/mongodb': 3.6.12
   '@types/punycode': 2.1.0
   '@typescript-eslint/eslint-plugin': 4.22.0_@typescript-eslint+parser@4.22.0
   '@typescript-eslint/parser': 4.22.0
@@ -40,6 +39,7 @@ dependencies:
   lodash: 4.17.21
   markdown-it: 12.0.6
   mini-css-extract-plugin: 1.4.1_webpack@5.32.0
+  mongodb: 3.6.6
   prettier: 2.2.1
   reflect-metadata: 0.1.13
   sass: 1.32.8
@@ -10851,34 +10851,6 @@ packages:
       commander: 2.20.3
     resolution:
       integrity: sha512-DUOKC/IhbkdLKKiV89gw9DUauTV8U/8yJl1sjf6MtDmzevLKOF2duNJ495S3MFVjqZarr+qNGCPbkg4mu4PpLw==
-  file:projects/core-mongo.tgz_ts-node@9.1.1:
-    dependencies:
-      '@jest/globals': 26.6.2
-      '@microsoft/api-extractor': 7.15.1
-      '@types/jest': 26.0.23
-      '@types/mongodb': 3.6.12
-      '@types/node': 15.0.2
-      '@typescript-eslint/eslint-plugin': 4.22.0_d80b53217345f120a8ed26af05eed18b
-      '@typescript-eslint/parser': 4.22.0_eslint@7.26.0+typescript@4.2.4
-      eslint: 7.26.0
-      eslint-config-standard: 16.0.2_61607de6243cb180ff47de604508b5ce
-      eslint-config-standard-with-typescript: 20.0.0_9fe81157bbbed76473c2f4cb3bb705dd
-      eslint-plugin-import: 2.22.1_eslint@7.26.0
-      eslint-plugin-node: 11.1.0_eslint@7.26.0
-      eslint-plugin-promise: 5.1.0_eslint@7.26.0
-      jest: 26.6.3_ts-node@9.1.1
-      mongodb: 3.6.6
-      ts-jest: 26.5.6_jest@26.6.3+typescript@4.2.4
-      typescript: 4.2.4
-    dev: false
-    id: file:projects/core-mongo.tgz
-    name: '@rush-temp/core-mongo'
-    peerDependencies:
-      ts-node: '*'
-    resolution:
-      integrity: sha512-R9qZKh6jhKtcUtiSffxLX1VXzgJN7EWxtOJVvQJH532w2naBvhCcwAwmtysDvkz7l5AFpABtcCZJqavquYGOIA==
-      tarball: file:projects/core-mongo.tgz
-    version: 0.0.0
   file:projects/core.tgz_ts-node@9.1.1:
     dependencies:
       '@babel/eslint-parser': 7.13.14_eslint@7.26.0
@@ -11011,7 +10983,7 @@ packages:
     peerDependencies:
       '@typescript-eslint/parser': '*'
     resolution:
-      integrity: sha512-Bkag2lC90V8NJoUQEGtMKMXZe80e26dNcveqgL8AcpvCJJGrZUou+KgqcxS15YI1Od2p5ai6CBBLk51qDsU8RA==
+      integrity: sha512-eJgLXPpPGTJcf4IX0fSamuZV0lLSSY0hPk1RBkMbvUd40QyEsEdVJJ5+UPQLM8FgiMRZg9zle8H69Rd10JEczQ==
       tarball: file:projects/plugin-login-impl.tgz
     version: 0.0.0
   file:projects/plugin-login.tgz_@typescript-eslint+parser@4.22.0:
@@ -11134,29 +11106,6 @@ packages:
       integrity: sha512-2UucNl90AlqddZsBtRZj561qN2tM+lHvKVDLYB7PbLnI1rY3pAVsPz4FFaa5NfqswQo1gsjua4kKh00SmphzQA==
       tarball: file:projects/server-account.tgz
     version: 0.0.0
-  file:projects/sparkling-controls.tgz_9d8bd6a515df5f388c5e4532b97e083a:
-    dependencies:
-      '@anticrm/status': 0.2.0
-      '@babel/runtime': 7.13.10
-      core-js: 3.10.1
-      prettier: 2.2.1
-      sass: 1.32.8
-      sass-loader: 11.0.1_sass@1.32.8+webpack@5.32.0
-      svelte: 3.37.0
-      svelte-loader: 3.1.0_svelte@3.37.0
-      svelte-preprocess: 4.7.0_755c64f2becf501be7ee6738a692cc1e
-      ts-standard: 10.0.0_982c0164c2c03b5f966b085495de6301
-      typescript: 4.2.4
-    dev: false
-    id: file:projects/sparkling-controls.tgz
-    name: '@rush-temp/sparkling-controls'
-    peerDependencies:
-      '@typescript-eslint/parser': '*'
-      webpack: '*'
-    resolution:
-      integrity: sha512-8KZIIqIUMHMThfYHCqkpQ4jaDtrj0Q6RZJLGTpiEgvqy/qkcapZ7nFokP2kVfPCyoCbzEKxoMOOnPBVEZlZvJA==
-      tarball: file:projects/sparkling-controls.tgz
-    version: 0.0.0
   file:projects/sparkling-theme.tgz_9d8bd6a515df5f388c5e4532b97e083a:
     dependencies:
       '@babel/runtime': 7.13.10
@@ -11260,7 +11209,7 @@ packages:
       '@typescript-eslint/parser': '*'
       ts-node: '*'
     resolution:
-      integrity: sha512-srJsP+UzrCXhNCOyGIfAX4PiJfx2wlvaS0AjVCkVuUohZ7/1dNaFyqrlABbbI1abp+EwHFJ/OBTb5/WFdD0Xdg==
+      integrity: sha512-icYjw/im5PHaciMWxXc+yxs8bgBaVCMXSZLalXeejuU1Yt4lUWAmiwhrK2J6U7KX4jaCZcAs/hRXK/oOqbzlew==
       tarball: file:projects/ui.tgz
     version: 0.0.0
 registry: ''
@@ -11269,7 +11218,6 @@ specifiers:
   '@babel/runtime': ~7.13.10
   '@jest/globals': ~26.6.2
   '@rush-temp/core': file:./projects/core.tgz
-  '@rush-temp/core-mongo': file:./projects/core-mongo.tgz
   '@rush-temp/domains': file:./projects/domains.tgz
   '@rush-temp/model': file:./projects/model.tgz
   '@rush-temp/platform': file:./projects/platform.tgz
@@ -11280,12 +11228,12 @@ specifiers:
   '@rush-temp/prod': file:./projects/prod.tgz
   '@rush-temp/rpc': file:./projects/rpc.tgz
   '@rush-temp/server-account': file:./projects/server-account.tgz
-  '@rush-temp/sparkling-controls': file:./projects/sparkling-controls.tgz
   '@rush-temp/sparkling-theme': file:./projects/sparkling-theme.tgz
   '@rush-temp/status': file:./projects/status.tgz
   '@rush-temp/text': file:./projects/text.tgz
   '@rush-temp/ui': file:./projects/ui.tgz
   '@types/lodash': ^4.14.168
+  '@types/mongodb': ~3.6.12
   '@types/punycode': ~2.1.0
   '@typescript-eslint/eslint-plugin': ^4.22.0
   '@typescript-eslint/parser': ^4.22.0
@@ -11306,6 +11254,7 @@ specifiers:
   lodash: ^4.17.21
   markdown-it: ~12.0.6
   mini-css-extract-plugin: ~1.4.1
+  mongodb: ~3.6.6
   prettier: ~2.2.1
   reflect-metadata: ^0.1.13
   sass: ~1.32.8

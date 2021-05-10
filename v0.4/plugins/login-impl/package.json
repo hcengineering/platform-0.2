@@ -27,7 +27,6 @@
     "@anticrm/status": "~0.4.0",
     "@anticrm/ui": "~0.4.0",
     "@anticrm/plugin-login": "~0.4.0",
-    "@anticrm/rpc": "~0.4.0",
-    "@anticrm/sparkling-controls": "~0.4.0"
+    "@anticrm/rpc": "~0.4.0"
   }
 }

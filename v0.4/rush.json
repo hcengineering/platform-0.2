@@ -391,11 +391,7 @@
     },
     {
       "packageName": "@anticrm/sparkling-theme",
-      "projectFolder": "sparkling/theme"
-    },
-    {
-      "packageName": "@anticrm/sparkling-controls",
-      "projectFolder": "sparkling/controls"
+      "projectFolder": "platform/theme"
     },
     {
       "packageName": "@anticrm/plugin-login",
