@@ -347,4 +347,4 @@ export interface Title extends Doc {
   source: TitleSource
 }
 
-export * from './index'
+export * from './primary'

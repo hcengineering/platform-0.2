@@ -17,8 +17,9 @@ import { BagOf$, Class$, InstanceOf$, Mixin$, Prop, RefTo$ } from '../dsl'
 import core from '../index'
 import {
   AllAttributes, ArrayOf, Attribute, BagOf, Class, Classifier, ClassifierKind, Doc, Emb, Enum, EnumKey, EnumLiteral,
-  EnumLiterals, EnumOf, Indices, InstanceOf, Mixin, MODEL_DOMAIN, Obj, PropertyType, Ref, RefTo, Type
+  EnumLiterals, EnumOf, InstanceOf, Mixin, MODEL_DOMAIN, Obj, PropertyType, Ref, RefTo, Type
 } from '@anticrm/core'
+import { Indices } from '@anticrm/domains'
 
 @Class$(core.class.Obj, core.class.Obj)
 export class TObj implements Obj {

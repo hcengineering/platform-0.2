@@ -21,7 +21,7 @@ import {
   CORE_CLASS_MIXIN, CORE_CLASS_REF_TO,
   CORE_CLASS_STRING,
   CORE_CLASS_TYPE, Doc, Emb, Enum,
-  EnumKey, EnumLiteral, EnumOf, Indices,
+  EnumKey, EnumLiteral, EnumOf,
   InstanceOf, Mixin,
   Obj, Ref, RefTo,
   Type, Tx
@@ -33,7 +33,7 @@ import {
   CORE_CLASS_SPACE_USER, CORE_CLASS_TX_OPERATION,
   CORE_CLASS_UPDATE_TX, CORE_MIXIN_SHORTID,
   CreateTx, DeleteTx, ObjectSelector, ObjectTx, ObjectTxDetails, ShortID, Space, SpaceUser, TxOperation,
-  UpdateTx, VDoc, Title, Reference
+  UpdateTx, VDoc, Title, Reference, Indices
 } from '@anticrm/domains'
 import { Component, identify } from '@anticrm/status'
 import Builder from './builder'
