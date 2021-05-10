@@ -110,7 +110,12 @@ limitations under the License.
     const fsmService = await fsmServiceP
 
     const withFSM = model.as(vacancy, fsmPlugin.mixin.WithFSM)
-    fsmService.addStateItem(withFSM, object._id as Ref<VDoc>, contactPlugin.class.Person)
+    fsmService.addStateItem(withFSM, {
+      obj: {
+        item: object._id as Ref<VDoc>,
+        clazz: contactPlugin.class.Person
+      }
+    })
   }
 </script>
 

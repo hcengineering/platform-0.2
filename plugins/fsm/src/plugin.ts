@@ -19,7 +19,7 @@ import type { CoreService } from '@anticrm/platform-core'
 import BoardPresenter from './presenters/board/BoardPresenter.svelte'
 import VDocCardPresenter from './presenters/board/VDocCardPresenter.svelte'
 
-import type { FSM, FSMService, State, Transition, WithFSM } from '.'
+import type { FSM, FSMItem, FSMService, State, Transition, WithFSM } from '.'
 import fsmPlugin from '.'
 
 export default async (platform: Platform, deps: {core: CoreService}): Promise<FSMService> => {
@@ -40,7 +40,14 @@ export default async (platform: Platform, deps: {core: CoreService}): Promise<FS
   return {
     getStates,
     getTransitions,
-    addStateItem: async (fsmOwner: WithFSM, item: Ref<VDoc>, clazz: Ref<Class<VDoc>>, space?: Ref<Space>) => {
+    addStateItem: async <T extends FSMItem>(
+      fsmOwner: WithFSM,
+      item: {
+        _class?: Ref<Class<T>>
+        obj: Omit<T, keyof VDoc | 'state' | 'fsm'> & {state?: Ref<State>}
+      },
+      space?: Ref<Space>
+    ) => {
       // TODO: we need to make sure that new FSMItem is only referring to specific item
       const fsm = await getTargetFSM(fsmOwner)
 
@@ -48,17 +55,15 @@ export default async (platform: Platform, deps: {core: CoreService}): Promise<FS
         return
       }
 
-      const states = await getStates(fsm)
-      const targetState = states[0]
+      const state = item.obj.state ?? (await getStates(fsm))[0]._id as Ref<State>
 
-      return await deps.core.create(fsmPlugin.class.FSMItem, {
+      return await deps.core.create(item._class ?? fsmPlugin.class.FSMItem, {
         _createdBy: deps.core.getUserId() as StringProperty,
         _createdOn: Date.now() as DateProperty,
         _space: space ?? fsmOwner._id as Ref<Space>,
-        clazz,
-        item,
+        ...item.obj,
         fsm: fsmOwner._id as Ref<WithFSM>,
-        state: targetState._id as Ref<State>
+        state
       })
     },
     removeStateItem: async (item: Ref<VDoc>, fsmOwner: WithFSM) => {

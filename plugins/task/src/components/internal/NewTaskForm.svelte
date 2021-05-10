@@ -1,5 +1,5 @@
 <!--
-// Copyright © 2020 Anticrm Platform Contributors.
+// Copyright © 2020, 2021 Anticrm Platform Contributors.
 //
 // Licensed under the Eclipse Public License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License. You may
@@ -13,18 +13,22 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import type { DateProperty, DocumentValue, Ref, StringProperty } from '@anticrm/core'
   import { createEventDispatcher } from 'svelte'
+
+  import type { DateProperty, DocumentValue, Ref, StringProperty } from '@anticrm/core'
   import { getCoreService } from '@anticrm/presentation'
+  import type { ShortID, Space, VDoc } from '@anticrm/domains'
+  import { CORE_MIXIN_SHORTID } from '@anticrm/domains'
+  import { getChunterService } from '@anticrm/chunter'
+  import fsmPlugin, { getFSMService } from '@anticrm/fsm'
+
+  import Button from '@anticrm/sparkling-controls/src/Button.svelte'
+  import EditBox from '@anticrm/sparkling-controls/src/EditBox.svelte'
   import UserBox from '@anticrm/platform-ui/src/components/UserBox.svelte'
   import SpaceBox from '@anticrm/platform-ui/src/components/SpaceBox.svelte'
   import ReferenceInput from '@anticrm/presentation/src/components/refinput/ReferenceInput.svelte'
-  import Button from '@anticrm/sparkling-controls/src/Button.svelte'
-  import type { ShortID, Space } from '@anticrm/domains'
-  import { CORE_MIXIN_SHORTID } from '@anticrm/domains'
-  import task, { Task, TaskStatus } from '../../index'
-  import EditBox from '@anticrm/sparkling-controls/src/EditBox.svelte'
-  import { getChunterService } from '@anticrm/chunter'
+
+  import task, { Task } from '../../index'
 
   export let title: string
   let message = ''
@@ -34,18 +38,22 @@
   let space: Space | undefined = spaces[0]
 
   const coreService = getCoreService()
+  const fsmService = getFSMService()
   const dispatch = createEventDispatcher()
 
   const chunterService = getChunterService()
 
   async function save () {
+    if (!space) {
+      return
+    }
+
     const cs = await coreService
     const modelDb = cs.getModel()
     const newTask = {
       title: title as StringProperty,
       _space: space?._id as Ref<Space>,
       ...object,
-      status: TaskStatus.Open,
       _createdOn: Date.now() as DateProperty,
       _createdBy: cs.getUserId() as StringProperty,
       comments: [
@@ -57,7 +65,7 @@
       ]
     } as DocumentValue<Task>
 
-    const taskId = await cs.genRefId(space?._id as Ref<Space>)
+    const taskId = await cs.genRefId(space._id as Ref<Space>)
     // TODO: We need to figure ouy a better way to specify mixin values with object creation.
     modelDb.mixinDocument<Task, ShortID>(newTask as Task, CORE_MIXIN_SHORTID, {
       shortId: taskId as string
@@ -65,7 +73,18 @@
 
     object = {}
     // absent VDoc fields will be autofilled
-    await cs.create<Task>(task.class.Task, newTask)
+    const doc = await cs.create<Task>(task.class.Task, newTask)
+
+    const projectWithFSM = modelDb.as(space, fsmPlugin.mixin.WithFSM)
+
+    const fsm = await fsmService
+    fsm.addStateItem(projectWithFSM, {
+      _class: task.class.TaskFSMItem,
+      obj: {
+        clazz: task.class.Task,
+        item: doc._id as Ref<VDoc>
+      }
+    })
     dispatch('close')
   }
 

@@ -14,32 +14,31 @@ limitations under the License.
 -->
 <script lang="ts">
   import { Ref } from '@anticrm/core'
+  import type { QueryUpdater } from '@anticrm/platform-core'
+  import { liveQuery } from '@anticrm/presentation'
   import type { FSM } from '@anticrm/fsm'
+  import fsmPlugin from '@anticrm/fsm'
   import type { WorkbenchApplication } from '@anticrm/workbench'
 
-  import EditBox from '@anticrm/sparkling-controls/src/EditBox.svelte'
-  import SpaceEditor from '@anticrm/workbench/src/components/internal/spaces/SpaceEditor.svelte'
-  import FSMRefEditor from '@anticrm/fsm/src/presenters/FSMRefEditor.svelte'
-
-  import type { Vacancy } from '..'
+  import ComboBox from '@anticrm/sparkling-controls/src/ComboBox.svelte'
 
   export let application: WorkbenchApplication
-  export let vacancy: Vacancy
   export let fsmRef: Ref<FSM> | undefined
-  export let makePrivate: boolean
+
+  let selectedFSM = 0
+
+  let fsms: FSM[] = []
+  let fsmItems: { id: number; comboValue: string; ref: Ref<FSM> }[] = []
+  let lq: Promise<QueryUpdater<FSM>>
+
+  $: lq = liveQuery(lq, fsmPlugin.class.FSM, { application: application._id, isTemplate: true }, (docs) => {
+    fsms = docs
+  })
+
+  $: fsmItems = fsms.map((x, i) => ({ id: i, comboValue: x.name, ref: x._id as Ref<FSM> }))
+  $: fsmRef = fsmItems[selectedFSM]?.ref ?? fsmRef
 </script>
 
-<div class="form">
-  <SpaceEditor bind:space={vacancy} bind:makePrivate {application} />
-  <EditBox bind:value={vacancy.location} label="Location" placeholder="Russia, Novosibirsk" />
-  <EditBox bind:value={vacancy.salary} label="Salary" />
-  <FSMRefEditor {application} bind:fsmRef />
-</div>
-
-<style lang="scss">
-  .form {
-    display: grid;
-    grid-template-columns: auto;
-    grid-gap: 10px;
-  }
-</style>
+{#if fsmItems && fsmItems.length > 1}
+  <ComboBox items={fsmItems} bind:selected={selectedFSM} label="Flow" />
+{/if}

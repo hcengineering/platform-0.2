@@ -15,20 +15,15 @@
 
 import { plugin, Plugin, Service } from '@anticrm/platform'
 import { Class, DateProperty, Emb, Enum, Mixin, Ref, StringProperty } from '@anticrm/core'
-import type { VDoc } from '@anticrm/domains'
+import type { Space, VDoc } from '@anticrm/domains'
 import { WorkbenchApplication } from '@anticrm/workbench'
 
 import { User } from '@anticrm/contact'
 import { AnyComponent, Asset } from '@anticrm/platform-ui'
 import { Collab } from '@anticrm/chunter'
+import { FSMItem } from '@anticrm/fsm'
 
-export enum TaskStatus {
-  Open,
-  Closed,
-  InProgress,
-  UnderReview,
-  Resolved
-}
+export interface TaskFSMItem extends FSMItem {}
 
 export enum TaskType {
   Task,
@@ -41,11 +36,6 @@ export enum TaskPriority {
   High,
   Medium,
   Low
-}
-
-export interface TaskStatusAction extends Emb {
-  action: string // A action title, to perform switch to this state.
-  description?: string // A description could be used to show
 }
 
 /**
@@ -107,9 +97,6 @@ export interface TaskLabel extends VDoc {
 export interface Task extends Collab {
   title: StringProperty
 
-  // Define a status field
-  status: TaskStatus
-
   // A current assignee user
   assignee?: Array<Ref<User>>
 
@@ -159,6 +146,8 @@ export interface VersionedTask extends Task {
   affectsVersion: string[]
 }
 
+export interface Project extends Space {}
+
 export interface TaskService extends Service {
 }
 
@@ -169,12 +158,13 @@ export default plugin('task' as Plugin<TaskService>, {}, {
   },
   class: {
     Task: '' as Ref<Class<Task>>,
+    TaskFSMItem: '' as Ref<Class<TaskFSMItem>>,
     TaskLink: '' as Ref<Class<TaskLink>>,
     WorkLog: '' as Ref<Class<WorkLog>>,
-    TaskLabel: '' as Ref<Class<TaskLabel>>
+    TaskLabel: '' as Ref<Class<TaskLabel>>,
+    Project: '' as Ref<Class<Project>>
   },
   enum: {
-    TaskStatus: '' as Ref<Enum<TaskStatus>>,
     TaskPriority: '' as Ref<Enum<TaskPriority>>,
     TaskType: '' as Ref<Enum<TaskType>>
   },
@@ -182,16 +172,14 @@ export default plugin('task' as Plugin<TaskService>, {}, {
     TypedTask: '' as Ref<Mixin<TypedTask>>,
     PrioritizedTask: '' as Ref<Mixin<PrioritizedTask>>,
     VersionedTask: '' as Ref<Mixin<VersionedTask>>,
-    TimeManagedTask: '' as Ref<Mixin<TimeManagedTask>>,
-
-    TaskStatusAction: '' as Ref<Mixin<TaskStatusAction>>
+    TimeManagedTask: '' as Ref<Mixin<TimeManagedTask>>
   },
   component: {
     TaskProperties: '' as AnyComponent,
     CreateTask: '' as AnyComponent,
     TaskInfo: '' as AnyComponent,
-    StatusPresenter: '' as AnyComponent,
-    CardForm: '' as AnyComponent
+    CardForm: '' as AnyComponent,
+    CreateProject: '' as AnyComponent
   },
   application: {
     Task: '' as Ref<WorkbenchApplication>

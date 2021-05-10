@@ -199,7 +199,7 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
 
       if (classes.length > 0) {
         // Replace _class query to find all suitable instances.
-        (query as any)._class = { $in: [classes] }
+        (finalQuery as any)._class = { $in: classes }
       }
 
       const result = await collection(_class).findOne<T>(finalQuery)

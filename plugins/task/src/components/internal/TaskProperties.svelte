@@ -1,116 +1,161 @@
+<!--
+Copyright © 2020, 2021 Anticrm Platform Contributors.
+
+Licensed under the Eclipse Public License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License. You may
+obtain a copy of the License at https://www.eclipse.org/legal/epl-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
 <script type="ts">
-  import type { Enum, Model, NumberProperty } from '@anticrm/core'
-  // Copyright © 2020 Anticrm Platform Contributors.
-  //
-  // Licensed under the Eclipse Public License, Version 2.0 (the "License");
-  // you may not use this file except in compliance with the License. You may
-  // obtain a copy of the License at https://www.eclipse.org/legal/epl-2.0
-  //
-  // Unless required by applicable law or agreed to in writing, software
-  // distributed under the License is distributed on an "AS IS" BASIS,
-  // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  //
-  // See the License for the specific language governing permissions and
-  // limitations under the License.
-  import { CORE_CLASS_ENUM } from '@anticrm/core'
-  import type { Task } from '../..'
-  import task, { TaskStatus } from '../..'
-  import UserInfo from '@anticrm/sparkling-controls/src/UserInfo.svelte'
-  import StatusLabel from './StatusLabel.svelte'
-  import ActionBar from '@anticrm/platform-ui/src/components/ActionBar.svelte'
+  import type { Ref } from '@anticrm/core'
+  import type { ShortID, VDoc } from '@anticrm/domains'
+  import { CORE_MIXIN_SHORTID } from '@anticrm/domains'
+  import { getCoreService, liveQuery } from '@anticrm/presentation'
+  import { QueryUpdater } from '@anticrm/platform-core'
   import type { Action } from '@anticrm/platform-ui'
+  import fsmPlugin, { State, WithFSM } from '@anticrm/fsm'
+
+  import UserInfo from '@anticrm/sparkling-controls/src/UserInfo.svelte'
+  import ActionBar from '@anticrm/platform-ui/src/components/ActionBar.svelte'
   import Comments from '@anticrm/chunter/src/components/Comments.svelte'
   import InlineEdit from '@anticrm/sparkling-controls/src/InlineEdit.svelte'
-  import type { ShortID } from '@anticrm/domains'
-  import { CORE_MIXIN_SHORTID } from '@anticrm/domains'
-  import ux, { getCoreService } from '@anticrm/presentation'
+  import StateLabel from '@anticrm/fsm/src/presenters/StateLabel.svelte'
 
-  export let object: Task
+  import type { Project, Task, TaskFSMItem } from '../..'
+  import taskPlugin from '../..'
+
+  export let object: TaskFSMItem
 
   const coreService = getCoreService()
-  let model: Model
 
-  let statusType: Enum<TaskStatus> | undefined
-  let status: TaskStatus = TaskStatus.Open
+  let fsmOwner: WithFSM
+  let fsmOwnerQ: Promise<QueryUpdater<Project>> | undefined
 
-  const statusColors: Map<TaskStatus, string> = new Map()
+  $: fsmOwnerQ = liveQuery(
+    fsmOwnerQ,
+    taskPlugin.class.Project,
+    {
+      _id: (object.fsm as never) as Ref<Project>
+    },
+    async (docs) => {
+      const doc = docs[0]
 
-  coreService.then(async (cs) => {
-    model = cs.getModel()
-    statusType = await cs.findOne<Enum<TaskStatus>>(CORE_CLASS_ENUM, { _id: task.enum.TaskStatus })
-  })
+      if (!doc) {
+        return
+      }
+
+      const model = (await coreService).getModel()
+
+      fsmOwner = model.as(doc, fsmPlugin.mixin.WithFSM)
+    }
+  )
+
+  let task: Task | undefined
+  let taskQ: Promise<QueryUpdater<VDoc>> | undefined
+
+  $: taskQ = liveQuery(
+    taskQ,
+    object.clazz,
+    {
+      _id: object.item
+    },
+    async (docs) => {
+      task = docs[0] as Task
+
+      ;(await coreService).getModel().asMixin(object, CORE_MIXIN_SHORTID, (value) => {
+        taskShortId = value
+      })
+    }
+  )
+
+  let states: State[] = []
+  let statesQ: Promise<QueryUpdater<State>> | undefined
+
+  $: if (fsmOwner) {
+    statesQ = liveQuery(
+      statesQ,
+      fsmPlugin.class.State,
+      {
+        fsm: fsmOwner.fsm
+      },
+      (docs) => {
+        states = docs
+      }
+    )
+  }
 
   let statusActions: Action[] = []
   let taskShortId: ShortID
+  let state: State | undefined
+
+  $: state = states.find((x) => object.state === x._id)
 
   $: {
-    if (statusType) {
-      const acts: Action[] = []
-      for (const s of Object.entries(statusType._literals)) {
-        const statKey = parseInt(s[0]) as TaskStatus
-        if (object && object.status === statKey) {
-          status = statKey
-        }
-        if (object && object.status !== statKey) {
-          const lit = model.as(s[1], ux.mixin.UXAttribute)
-          statusColors.set(statKey, lit.color as string)
-          const act = model.as(s[1], task.mixin.TaskStatusAction)
-          if (act) {
-            acts.push({
-              id: s[0],
-              name: act.action,
-              action: () => {
-                coreService.then((cs) => cs.update(object, { status: statKey as NumberProperty }))
-              }
-            })
-          }
-        }
+    statusActions = states.map((state) => ({
+      id: state._id,
+      name: state.name,
+      action: () => {
+        coreService.then((cs) => cs.update(object, { state: state._id as Ref<State> }))
       }
-      statusActions = acts
-      coreService.then((cs) => {
-        cs.getModel().asMixin(object, CORE_MIXIN_SHORTID, (value) => {
-          taskShortId = value
-        })
+    }))
+
+    coreService.then((cs) => {
+      cs.getModel().asMixin(object, CORE_MIXIN_SHORTID, (value) => {
+        taskShortId = value
       })
-    }
+    })
   }
 </script>
 
-<div class="taskContent">
-  <div id="create_task__input__name" class="caption caption-1">
-    <InlineEdit
-      bind:value={object.title}
-      placeholder="Name"
-      on:change={async () => {
-        await (await coreService).update(object, { title: object.title })
-      }} />
-  </div>
-  <div class="taskStatusBar">
-    <div class="taskName">
-      {#if taskShortId}
-        {taskShortId.shortId}
+{#if task}
+  <div class="taskContent">
+    <div id="create_task__input__name" class="caption caption-1">
+      <InlineEdit
+        bind:value={task.title}
+        placeholder="Name"
+        on:change={async () => {
+          if (task === undefined) {
+            return
+          }
+
+          await (await coreService).update(task, { title: task.title })
+        }} />
+    </div>
+    <div class="taskStatusBar">
+      <div class="taskName">
+        {#if taskShortId}
+          {taskShortId.shortId}
+        {/if}
+      </div>
+      {#if state}
+        <StateLabel {state} />
       {/if}
     </div>
-    <StatusLabel text={TaskStatus[status]} color={statusColors.get(status)} />
-  </div>
-  <div class="created">
-    <UserInfo url="https://platform.exhale24.ru/images/photo-1.png" title="Александр Алексеенко" />
-    <div class="createdOn">30.11.20, 15:30</div>
-  </div>
-  <UserInfo url="https://platform.exhale24.ru/images/photo-2.png" title="Андрей Платов" subtitle="Исполнитель" />
+    <div class="created">
+      <UserInfo url="https://platform.exhale24.ru/images/photo-1.png" title="Александр Алексеенко" />
+      <div class="createdOn">30.11.20, 15:30</div>
+    </div>
+    <UserInfo url="https://platform.exhale24.ru/images/photo-2.png" title="Андрей Платов" subtitle="Исполнитель" />
 
-  {#if statusActions.length > 0}
-    <ActionBar onTop={2} actions={statusActions} />
-  {/if}
+    {#if statusActions.length > 0}
+      <ActionBar onTop={2} actions={statusActions} />
+    {/if}
 
-  <div class="description">
-    <Comments {object} />
-    <ul class="files">
-      <li><a href="/">interfaceRpcErrors.docx</a></li>
-      <li><a href="/">interfaceRpcErrors..docx</a></li>
-    </ul>
+    <div class="description">
+      <Comments {object} />
+      <ul class="files">
+        <li><a href="/">interfaceRpcErrors.docx</a></li>
+        <li><a href="/">interfaceRpcErrors..docx</a></li>
+      </ul>
+    </div>
   </div>
-</div>
+{/if}
 
 <style lang="scss">
   .taskContent {

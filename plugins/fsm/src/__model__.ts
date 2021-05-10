@@ -63,6 +63,9 @@ export class TState extends TVDoc implements State {
 
   @RefTo$(fsmPlugin.class.FSM)
   fsm!: Ref<FSM>
+
+  @Prop(core.class.String)
+  color!: string
 }
 
 @Class$(fsmPlugin.class.FSMItem, core.class.VDoc, fsmDomain)
@@ -111,7 +114,10 @@ export function model (S: Builder): void {
   }, fsmPlugin.space.Common)
 }
 
-type PureState = Omit<State, keyof VDoc | 'fsm'>
+type PureState = Omit<State, keyof VDoc | 'fsm' | 'color'> & {
+  color?: string
+}
+
 class FSMBuilder {
   private readonly name: string
   private readonly appID: Ref<Application>
@@ -152,6 +158,17 @@ class FSMBuilder {
     return this
   }
 
+  private readonly genColor = (function * defaultColors () {
+    while (true) {
+      yield * [
+        'var(--theme-status-green-color)',
+        'var(--theme-status-grey-color)',
+        'var(--theme-status-maroon-color)',
+        'var(--theme-status-blue-color)'
+      ]
+    }
+  })()
+
   build (S: Builder): FSM {
     const vProps = {
       _space: fsmPlugin.space.Common,
@@ -169,8 +186,10 @@ class FSMBuilder {
     const stateIDs = new Map<string, Ref<State>>()
 
     this.states.forEach((state) => {
+      const color = state.color ?? this.genColor.next().value
       const doc = S.createDocument(fsmPlugin.class.State, {
         ...state,
+        color,
         fsm: fsm._id as Ref<FSM>,
         ...vProps
       })

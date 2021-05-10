@@ -19,18 +19,19 @@ import { User } from '@anticrm/contact'
 import contact from '@anticrm/contact/src/__model__'
 import { DateProperty, Ref, StringProperty } from '@anticrm/core'
 import core, {
-  ArrayOf$, Builder, Class$, Enum$, EnumOf$, extendIds, InstanceOf$, Literal, Mixin$, Primary, Prop, RefTo$,
-  withMixin
+  ArrayOf$, Builder, Class$, Enum$, EnumOf$, extendIds, InstanceOf$, Literal, Mixin$, Primary, Prop, RefTo$
 } from '@anticrm/model'
-import { TEmb, TEnum, TVDoc } from '@anticrm/model/src/__model__'
-import { Metadata } from '@anticrm/platform'
+import { TEmb, TEnum, TSpace, TVDoc } from '@anticrm/model/src/__model__'
 import { IntlString } from '@anticrm/platform-i18n'
 import { Asset } from '@anticrm/platform-ui'
 import presentation from '@anticrm/presentation'
 import { UX } from '@anticrm/presentation/src/__model__'
 import workbench from '@anticrm/workbench/src/__model__'
+import fsmPlugin from '@anticrm/fsm'
+import { templateFSM, TFSMItem } from '@anticrm/fsm/src/__model__'
+
 import _task, {
-  PrioritizedTask, Task, TaskLabel, TaskLink, TaskLinkType, TaskPriority, TaskStatus, TaskStatusAction,
+  PrioritizedTask, Project, Task, TaskFSMItem, TaskLabel, TaskLink, TaskLinkType, TaskPriority,
   TaskTimeDuration, TaskType, TimeManagedTask, TypedTask, VersionedTask, WorkLog
 } from '.'
 
@@ -53,6 +54,12 @@ const task = extendIds(_task, {
     Task_affectsVersion: '' as IntlString
   }
 })
+
+@Class$(task.class.Project, core.class.Space)
+export class TProject extends TSpace implements Project {}
+
+@Class$(task.class.TaskFSMItem, fsmPlugin.class.FSMItem)
+export class TTaskFSMItem extends TFSMItem implements TaskFSMItem {}
 
 @Class$(task.class.TaskLabel, core.class.VDoc, DOMAIN_TASK)
 export class TTaskLabel extends TVDoc implements TaskLabel {
@@ -88,9 +95,6 @@ export class TTask extends TCollab implements Task {
   @UX(task.string.Task_labels)
   @ArrayOf$()
   @RefTo$(task.class.TaskLabel) labels!: Array<Ref<TaskLabel>>
-
-  @UX(task.string.Task_status, { presenter: task.component.StatusPresenter })
-  @EnumOf$(task.enum.TaskStatus) status!: TaskStatus
 }
 
 @Mixin$(task.mixin.TypedTask, task.class.Task)
@@ -130,12 +134,6 @@ class TVersionedTask extends TTask implements VersionedTask {
   @ArrayOf$() affectsVersion!: string[]
 }
 
-@Mixin$(task.mixin.TaskStatusAction, core.class.Emb)
-class TTaskStatusAction extends TEmb implements TaskStatusAction {
-  @Prop() action!: string // A action title, to perform switch to this state.
-  @Prop() description?: string // A description could be used to show
-}
-
 @Mixin$(task.class.WorkLog, core.class.Emb)
 class TWorklog extends TEmb implements WorkLog {
   // A user spend time
@@ -144,46 +142,6 @@ class TWorklog extends TEmb implements WorkLog {
   // A time spend on task on day and how many is spend.
   @Prop() date!: DateProperty
   @Prop() spendTime!: TaskTimeDuration
-}
-
-@Enum$(task.enum.TaskStatus)
-class TTaskStatusEnum extends TEnum<TaskStatus> {
-  @UX('Open' as IntlString, {
-    color: 'var(--status-green-color)' as Metadata<string>
-  })
-  @withMixin(task.mixin.TaskStatusAction, {
-    action: 'Open',
-    description: 'Task is ready to be started'
-  })
-  @Literal(TaskStatus) [TaskStatus.Open]!: any
-
-  @UX('Close' as IntlString, { color: 'var(--status-grey-color)' as Metadata<string> })
-  @withMixin(task.mixin.TaskStatusAction, {
-    action: 'Close',
-    description: 'Task is complete and verified'
-  })
-  @Literal(TaskStatus) [TaskStatus.Closed]!: any
-
-  @UX('InProgress' as IntlString, { color: 'var(--status-green-color)' as Metadata<string> })
-  @withMixin(task.mixin.TaskStatusAction, {
-    action: 'Start progress',
-    description: 'Work on task are started'
-  })
-  @Literal(TaskStatus) [TaskStatus.InProgress]!: any
-
-  @UX('UnderReview' as IntlString, { color: 'var(--status-orange-color)' as Metadata<string> })
-  @withMixin(task.mixin.TaskStatusAction, {
-    action: 'Begin review',
-    description: 'Task is being reviewed'
-  })
-  @Literal(TaskStatus) [TaskStatus.UnderReview]!: any
-
-  @UX('Resolved' as IntlString, { color: 'var(--status-orange-color)' as Metadata<string> })
-  @withMixin(task.mixin.TaskStatusAction, {
-    action: 'Resolve',
-    description: 'Work on task are complete, but verification are required'
-  })
-  @Literal(TaskStatus) [TaskStatus.Resolved]!: any
 }
 
 @Enum$(task.enum.TaskPriority)
@@ -202,7 +160,7 @@ class TTaskTypeEnum extends TEnum<TaskType> {
 }
 
 export function model (S: Builder): void {
-  S.add(TTask, TTaskLabel, TTaskLink, TTaskStatusAction, TTaskStatusEnum, TTaskPriorityEnum, TTaskTypeEnum)
+  S.add(TTaskFSMItem, TTask, TTaskLabel, TTaskLink, TTaskPriorityEnum, TTaskTypeEnum, TProject)
   S.add(TTypeTask, TPrioritizedTask, TVersionedTask, TTimeManagedTask, TWorklog)
 
   S.createDocument(workbench.class.WorkbenchApplication, {
@@ -210,12 +168,14 @@ export function model (S: Builder): void {
     label: 'Tasks' as IntlString,
     icon: task.icon.Task,
     component: workbench.component.Application, // Use default workbench application for now.
-    classes: [task.class.Task],
+    classes: [task.class.TaskFSMItem],
     supportSpaces: true,
+    spaceClass: task.class.Project,
+    spaceCreator: task.component.CreateProject,
     spaceTitle: 'Project'
   }, task.application.Task)
 
-  S.mixin(task.class.Task, presentation.mixin.DetailForm, {
+  S.mixin(task.class.TaskFSMItem, presentation.mixin.DetailForm, {
     component: task.component.TaskProperties
   })
 
@@ -243,18 +203,24 @@ export function model (S: Builder): void {
 
   S.createDocument(presentation.mixin.Viewlet, {
     displayClass: task.class.Task,
-    label: 'Card' as IntlString,
-    component: presentation.component.CardPresenter,
-    parameters: { field: 'status' }
+    label: 'Board' as IntlString,
+    component: fsmPlugin.component.BoardPresenter
   })
 
-  S.createDocument(core.class.Space, {
-    name: 'My Project',
-    description: 'General test project',
-    application: task.application.Task,
-    isPublic: true, // Available for all
-    archived: false,
-    spaceKey: 'TSK',
-    users: []
-  })
+  const states = {
+    open: { name: 'Open' },
+    reopen: { name: 'Reopen' },
+    close: { name: 'Close' },
+    inProgress: { name: 'In progress' },
+    underReview: { name: 'Under review' },
+    resolved: { name: 'Resolved' }
+  }
+
+  templateFSM('Default kanban', task.application.Task)
+    .transition(states.open, [states.close, states.inProgress])
+    .transition(states.reopen, [states.close, states.inProgress])
+    .transition(states.inProgress, [states.close, states.underReview])
+    .transition(states.underReview, [states.close, states.resolved])
+    .transition(states.close, states.reopen)
+    .build(S)
 }

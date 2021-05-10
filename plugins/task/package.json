@@ -14,7 +14,8 @@
   },
   "dependencies": {
     "@anticrm/platform": "^0.2.0",
-    "@anticrm/presentation": "^0.2.0"
+    "@anticrm/presentation": "^0.2.0",
+    "@anticrm/fsm": "^0.2.0"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^4.22.0",
