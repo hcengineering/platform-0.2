@@ -13,10 +13,10 @@
 // limitations under the License.
 //
 
+import { describe, expect, it } from '@jest/globals'
+import { Model } from '../model'
 import { FindOptions, SortingOrder } from '../storage'
-import { Task } from './tasks'
-
-/* eslint-env jest */
+import { createTask, data, Task, taskIds, TaskMixin } from './tasks'
 
 describe('search', () => {
   describe('Search Options', () => {
@@ -27,5 +27,68 @@ describe('search', () => {
       options = { sort: { name: SortingOrder.Descending, _id: SortingOrder.Ascending } }
       console.log(JSON.stringify(options))
     })
+
+    it('find one happy path', async () => {
+      const model = new Model('vdocs')
+      model.loadModel(data)
+
+      model.add(model.createDocument(taskIds.class.Task, createTask('t1', 10, 'test task1')))
+      model.add(model.createDocument(taskIds.class.Task, createTask('t2', 11, 'test task2')))
+
+      const result = await model.find<Task>(taskIds.class.Task, { name: { $regex: 't2' } })
+      expect(result).toBeDefined()
+    })
+
+    it('find one not found', async () => {
+      const model = new Model('vdocs')
+      model.loadModel(data)
+
+      model.add(model.createDocument(taskIds.class.Task, createTask('t1', 10, 'test task1')))
+
+      const result = await model.find<Task>(taskIds.class.Task, { name: { $regex: 't3' } })
+      expect(result.length).toEqual(0)
+    })
+
+    it('check mixin search in model', () => {
+      const m = new Model('model')
+      m.loadModel(data)
+
+      const t1m: TaskMixin = m.createDocument(taskIds.mixin.TaskMixin, {
+        name: 'qwe',
+        description: '',
+        lists: [],
+        textValue: 'mixedValue'
+      })
+
+      m.add(t1m)
+
+      const result = m.find<TaskMixin>(taskIds.mixin.TaskMixin, { textValue: 'mixedValue' })
+      expect(result.length).toEqual(1)
+    })
+  })
+  it('find limit check', async () => {
+    const model = new Model('vdocs')
+    model.loadModel(data)
+
+    model.add(model.createDocument(taskIds.class.Task, createTask('t1', 10, 'test task1')))
+    model.add(model.createDocument(taskIds.class.Task, createTask('t2', 11, 'test task2')))
+    model.add(model.createDocument(taskIds.class.Task, createTask('t3', 12, 'test task3')))
+
+    const result = await model.find(taskIds.class.Task, { }, { limit: 1 })
+    expect(result).toBeDefined()
+    expect(result.length).toEqual(1)
+  })
+
+  it('find limit check-skip', async () => {
+    const model = new Model('vdocs')
+    model.loadModel(data)
+
+    model.add(model.createDocument(taskIds.class.Task, createTask('t1', 10, 'test task1')))
+    model.add(model.createDocument(taskIds.class.Task, createTask('t2', 11, 'test task2')))
+    model.add(model.createDocument(taskIds.class.Task, createTask('t3', 12, 'test task3')))
+
+    const result = await model.find(taskIds.class.Task, { }, { skip: 1 })
+    expect(result).toBeDefined()
+    expect(result.length).toEqual(2)
   })
 })

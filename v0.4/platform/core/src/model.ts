@@ -69,7 +69,7 @@ export class Model {
     return this.byClass.get(_class) ?? []
   }
 
-  protected extendsOfClass (_class: Ref<Class<Obj>>): Array<Class<Obj>> {
+  public extendsOfClass (_class: Ref<Class<Obj>>): Array<Class<Obj>> {
     if (this.byExtends === undefined) {
       this.byExtends = new Map<Ref<Class<Obj>>, Array<Class<Obj>>>()
       for (const doc of this.objects.values()) {
@@ -216,9 +216,14 @@ export class Model {
    * @param _id - optional id, if not sepecified will be automatically generated.
    */
   createDocument<T extends Doc>(_class: Ref<Class<T>>, values: DocumentValue<T>, _id?: Ref<T>): T {
-    const doc = this.assign({}, _class, (values as unknown) as AnyLayout)
+    const doc = this.assign({}, _class, (values as unknown) as AnyLayout) as unknown as T
     doc._id = _id ?? generateId()
-    return (doc as unknown) as T
+    const cl = this.get(_class)
+    if (cl._kind === ClassifierKind.MIXIN) {
+      // For mixins we need to update _mixin field
+      Model.includeMixin(doc, _class)
+    }
+    return doc
   }
 
   public classAttribute (cls: Ref<Class<Obj>>, key: string): AttributeMatch {
@@ -252,23 +257,6 @@ export class Model {
     } else if (curValue instanceof Array) {
       const curArray = curValue as PropertyType[]
       curArray.push(objValue)
-      return curArray
-    } else {
-      throw new Error(`Invalid attribute type: ${String(curValue)}`)
-    }
-  }
-
-  public flattenArrayValue (curValue: unknown, attrClass: Ref<Class<Doc>>, embedded: AnyLayout): PropertyType[] {
-    // Assign into  a proper classed values.
-    const objValue = this.flattenQuery(attrClass, embedded)
-    objValue._class = attrClass
-    // Take current array and push value into it.
-    if (curValue === null || curValue === undefined) {
-      // Just assign a new Array
-      return [{ $elemMatch: objValue }]
-    } else if (curValue instanceof Array) {
-      const curArray = curValue as PropertyType[]
-      curArray.push({ $elemMatch: objValue })
       return curArray
     } else {
       throw new Error(`Invalid attribute type: ${String(curValue)}`)
@@ -348,7 +336,7 @@ export class Model {
     this.includeMixinAny(doc, clazz as Ref<Mixin<Obj>>)
   }
 
-  private static includeMixinAny (doc: any, clazz: Ref<Mixin<Obj>>): void {
+  public static includeMixinAny (doc: any, clazz: Ref<Mixin<Obj>>): void {
     if (doc._mixins === undefined) {
       doc._mixins = []
     }
@@ -408,134 +396,13 @@ export class Model {
     }
   }
 
-  /**
-   * Creates a query with filled class and mixin information properly set.
-   **
-   * @param _class - a class query is designed for.
-   * @param _query - a query object to convert to.
-   * @param flatten - use a flat key layout with dot notation.
-   *
-   * flatten queries are applicable only for mongoDB and not supported by model search operations.
-   */
-  /* toMongoQuery */
-  createQuery<T extends Doc>(_class: Ref<Class<T>>, _query: DocumentQuery<T>, flatten = false): { query: DocumentQuery<T>, classes: Array<Ref<Class<Obj>>> } {
-    let query = this.assign({}, _class, _query as AnyLayout)
-
-    if (flatten) {
-      query = this.flattenQuery(_class, query)
-    }
-
-    const cl = this.getClass(_class)
-    query._class = cl
-    const classes: Array<Ref<Class<Obj>>> = []
-
-    const byClass = this.extendsOfClass(query._class as Ref<Class<Doc>>)
-    const byClassNotMixin = byClass.filter((cl) => !this.is(cl._id as Ref<Class<Obj>>, CORE_CLASS_MIXIN)).map(p => p._id as Ref<Class<Obj>>)
-    if (byClassNotMixin.length > 0) {
-      // We need find for all classes extending our own.
-      classes.push(...byClassNotMixin)
-    }
-
-    // We should add mixin to list of mixins
-    const clazz = this.get(_class)
-    if (clazz._class === CORE_CLASS_MIXIN) {
-      // We should also put a _mixin in list for query
-      Model.includeMixinAny(query, _class)
-
-      const byClass = this.extendsOfClass(_class).filter((cl) => this.is(cl._class, CORE_CLASS_MIXIN))
-      if (byClass.length > 0) {
-        for (const cl of byClass) {
-          // We should also put a _mixin in list for query
-          Model.includeMixinAny(query, cl._id as Ref<Mixin<Obj>>)
-        }
-      }
-    }
-    return { query: query as DocumentQuery<T>, classes }
-  }
-
-  /**
-   *  Convert a layout into 'dot' notation form if applicable.
-   * @param _class - an query or sort options.
-   * @param layout - input layout.
-   * @param useOperators - will allow to use $elemMatch and $all in case of query.
-   * @returns  - an layout with replacement of embedded documents into 'dot' notation.
-   */
-  public flattenQuery (_class: Ref<Class<Obj>>, layout: AnyLayout, useOperators = true): AnyLayout {
-    const l: AnyLayout = {}
-
-    // Also assign a class to value if not specified
-    for (const rKey in layout) {
-      let match: AttributeMatch
-      // TODO: Will be removed with fix to #398
-      if (rKey.startsWith('_')) {
-        l[rKey] = layout[rKey]
-        continue
-      }
-      if (rKey.indexOf('|') > 0) {
-        // So key is probable mixin, let's find a mixin class and try assign value.
-        const { mixin, key } = mixinFromKey(rKey)
-        match = this.classAttribute(mixin, key)
-      } else {
-        match = this.classAttribute(_class, rKey)
-      }
-
-      const { attr, key } = match
-      // Check if we need to perform inner assign based on field value and type
-      switch (attr.type._class) {
-        case CORE_CLASS_ARRAY_OF: {
-          const attrClass = this.attributeClass((attr.type as ArrayOf).of)
-          if (attrClass !== undefined) {
-            const rValue = layout[rKey]
-            if (rValue instanceof Array) {
-              let value: unknown[] = []
-              for (const rv of (rValue as unknown[])) {
-                value = this.flattenArrayValue(value, attrClass, rv as AnyLayout)
-              }
-              if (!useOperators) {
-                throw new Error('operators are required to match with array')
-              }
-              l[key] = { $all: value as PropertyType }
-              continue
-            } else if (rValue instanceof Object) {
-              const q = this.flattenQuery(attrClass, (rValue as unknown) as AnyLayout)
-              if (useOperators) {
-                // We should use $elemMatch.
-                l[key] = { $elemMatch: q }
-              } else {
-                for (const oo of Object.entries(q)) {
-                  l[key + '.' + oo[0]] = oo[1]
-                }
-              }
-              continue
-            }
-          }
-          break
-        }
-        case CORE_CLASS_INSTANCE_OF: {
-          // Flatten any
-          const attrClass = ((attr.type as unknown) as Record<string, unknown>).of as Ref<Class<Doc>>
-          if (attrClass !== undefined) {
-            for (const oo of Object.entries(this.flattenQuery(attrClass, (layout[rKey] as unknown) as AnyLayout))) {
-              l[key + '.' + oo[0]] = oo[1]
-            }
-            continue
-          }
-          break
-        }
-      }
-      // Just copy a value here.
-      l[key] = layout[rKey]
-    }
-    return l
-  }
-
   // Q U E R Y
 
-  find<T extends Doc>(clazz: Ref<Class<Doc>>, query: DocumentQuery<T>, options?: FindOptions<T>): T[] {
-    const { query: realQuery } = this.createQuery(clazz, query)
-    const byClass = this.objectsOfClass(realQuery._class as Ref<Class<Doc>>)
+  find<T extends Doc>(_class: Ref<Class<Doc>>, query: DocumentQuery<T>, options?: FindOptions<T>): T[] {
+    const cl = this.getClass(_class)
+    const byClass = this.objectsOfClass(cl as Ref<Class<Doc>>)
 
-    return this.findAll(byClass, clazz, realQuery as unknown as AnyLayout, options) as T[]
+    return this.findAll(byClass, _class, query as AnyLayout, options) as T[]
   }
 
   /**
@@ -545,7 +412,7 @@ export class Model {
    * @param query  - to match
    * @param limit - a number of items to find, pass value <= 0 to find all
    */
-  protected findAll (docs: Doc[], _class: Ref<Class<Doc>>, query: AnyLayout, options?: FindOptions<any>): Doc[] {
+  protected findAll (docs: Doc[], _class: Ref<Class<Obj>>, query: AnyLayout, options?: FindOptions<any>): Doc[] {
     const result: Doc[] = []
     const clazz = this.getClass(_class)
     let skip = 0
@@ -697,7 +564,7 @@ export class Model {
    * @param doc  document to match against.
    * @param query query to check.
    */
-  matchQuery<T extends Doc>(_class: Ref<Class<T>>, doc: Doc, query: DocumentQuery<T>): boolean {
+  matchQuery<T extends Obj>(_class: Ref<Class<T>>, doc: Obj, query: DocumentQuery<T>): boolean {
     if (!this.is(_class, doc._class)) {
       // Class doesn't match so return false.
       return false

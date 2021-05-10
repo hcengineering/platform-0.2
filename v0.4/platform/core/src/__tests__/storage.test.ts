@@ -13,10 +13,9 @@
 // limitations under the License.
 //
 
+import { describe, expect, it, jest } from '@jest/globals'
 import { Class, CORE_CLASS_DOC, Doc, Ref } from '../classes'
 import { Tx, TxContext, txContext, TxProcessor } from '../storage'
-
-/* eslint-env jest */
 
 describe('storage', () => {
   describe('TxProcessor', () => {
