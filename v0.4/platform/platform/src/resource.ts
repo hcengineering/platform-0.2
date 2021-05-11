@@ -14,35 +14,9 @@
 //
 
 import { Plugin, Service, getPlugin } from './plugin'
+import type { Resource } from '@anticrm/status'
 
-/**
- * Platform Resource Identifier (PRI)
- *
- * @remarks
- *
- * Almost anything in the Anticrm Platform is a `Resource`. Resources referenced by Platform Resource Identifier (PRI).
- *
- * TODO: understand Resource better. Is this just a `platform` thing or should be in `core` as well
- *
- * 'Resource' is simply any JavaScript object. There is a plugin exists, which 'resolve' PRI into actual object.
- * This is a difference from Metadata. Metadata object 'resolved' by Platform instance, so we may consider Metadata as
- * a Resource, provided by Platform itself. Because there is always a plugin, which resolve `Resource` resolution is
- * asynchronous process.
- *
- * `Resource` is a string of `kind:plugin.id` format. Since Metadata is a kind of Resource.
- * Metadata also can be resolved using resource API.
- *
- * @example
- * ```typescript
- *   `class:contact.Person` as Resource<Class<Person>> // database object with id === `class:contact.Person`
- *   `string:class.ClassLabel` as Resource<string> // translated string according to current language and i18n settings
- *   `asset:ui.Icons` as Resource<URL> // URL to SVG sprites
- *   `easyscript:2+2` as Resource<() => number> // function
- * ```
- *
- * @public
- */
-export type Resource<T> = string & { __resource: T }
+export type { Resource }
 
 // R E S O U R C E  I N F O
 

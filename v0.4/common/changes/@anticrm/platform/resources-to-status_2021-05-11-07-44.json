@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@anticrm/platform",
+      "comment": "`Resource` and `Metadata` now defined in `status` (`foundation`)",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@anticrm/platform",
+  "email": "andrey.v.platov@gmail.com"
+}
