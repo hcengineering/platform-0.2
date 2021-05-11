@@ -1,6 +1,6 @@
 {
   "name": "@anticrm/status",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "main": "lib/index.js",
   "author": "Anticrm Platform Contributors",
   "license": "EPL-2.0",

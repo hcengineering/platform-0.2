@@ -1,0 +1,17 @@
+{
+  "name": "@anticrm/status",
+  "entries": [
+    {
+      "version": "0.4.2",
+      "tag": "@anticrm/status_v0.4.2",
+      "date": "Tue, 11 May 2021 19:46:24 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "`Resource` and `Metadata` now defined in `status` (`foundation`)"
+          }
+        ]
+      }
+    }
+  ]
+}

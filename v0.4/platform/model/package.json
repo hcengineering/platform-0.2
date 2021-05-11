@@ -15,7 +15,7 @@
   "dependencies": {
     "@anticrm/core": "0.2.0",
     "@anticrm/domains": "0.2.0",
-    "@anticrm/status": "0.4.1",
+    "@anticrm/status": "0.4.2",
     "lodash": "^4.17.21",
     "reflect-metadata": "^0.1.13"
   },

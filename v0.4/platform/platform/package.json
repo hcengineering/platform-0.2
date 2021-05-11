@@ -1,6 +1,6 @@
 {
   "name": "@anticrm/platform",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "main": "lib/index.js",
   "author": "Anticrm Platform Contributors",
   "license": "EPL-2.0",
@@ -26,7 +26,7 @@
     "@types/lodash": "^4.14.168"
   },
   "dependencies": {
-    "@anticrm/status": "~0.4.0",
+    "@anticrm/status": "~0.4.2",
     "intl-messageformat": "^9.6.12",
     "lodash": "^4.17.21"
   }

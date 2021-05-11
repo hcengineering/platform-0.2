@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "@anticrm/rpc": "~0.4.0",
-    "@anticrm/status": "~0.4.0",
+    "@anticrm/status": "~0.4.2",
     "jwt-simple": "~0.5.6",
     "mongodb": "~3.6.6"
   }
