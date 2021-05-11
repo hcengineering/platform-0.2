@@ -362,7 +362,8 @@
   "projects": [
     {
       "packageName": "@anticrm/status",
-      "projectFolder": "platform/status"
+      "projectFolder": "platform/status",
+      "shouldPublish": true
     },
     {
       "packageName": "@anticrm/platform",
@@ -391,7 +392,8 @@
     },
     {
       "packageName": "@anticrm/ui",
-      "projectFolder": "platform/ui"
+      "projectFolder": "platform/ui",
+      "shouldPublish": true
     },
     {
       "packageName": "@anticrm/sparkling-theme",

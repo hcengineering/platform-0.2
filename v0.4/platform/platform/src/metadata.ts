@@ -13,14 +13,9 @@
 // limitations under the License.
 //
 
-/**
- * Platform Metadata Identifier (PMI).
- *
- * 'Metadata' is simply any JavaScript object, which is used to configure platform, e.g. IP addresses.
- * Another example of metadata is an asset URL. The logic behind providing asset URLs as metadata is
- * we know URL at compile time only and URLs vary depending on deployment options.
- */
-export type Metadata<T> = string & { __metadata: T }
+import type { Metadata } from '@anticrm/status'
+
+export type { Metadata }
 
 type ExtractType<T, X extends Record<string, Metadata<T>>> = {
   [P in keyof X]: X[P] extends Metadata<infer Z> ? Z : never

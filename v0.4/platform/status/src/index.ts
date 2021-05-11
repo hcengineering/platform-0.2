@@ -105,3 +105,50 @@ export function unknownError (err: Error): Status {
   return (err instanceof PlatformError) ? err.status : 
     new Status(Severity.ERROR, Code.UnknownError, { message: err.message })
 }
+
+// R E S O U R C E S
+
+export type IntlString<T extends Record<string, any> = {}> = string & { __intl_string: T }
+
+/**
+ * Platform Metadata Identifier (PMI).
+ *
+ * 'Metadata' is simply any JavaScript object, which is used to configure platform, e.g. IP addresses.
+ * Another example of metadata is an asset URL. The logic behind providing asset URLs as metadata is
+ * we know URL at compile time only and URLs vary depending on deployment options.
+ */
+ export type Metadata<T> = string & { __metadata: T }
+
+ /**
+ * Platform Resource Identifier (PRI)
+ *
+ * @remarks
+ *
+ * Almost anything in the Anticrm Platform is a `Resource`. Resources referenced by Platform Resource Identifier (PRI).
+ *
+ * TODO: understand Resource better. Is this just a `platform` thing or should be in `core` as well
+ *
+ * 'Resource' is simply any JavaScript object. There is a plugin exists, which 'resolve' PRI into actual object.
+ * This is a difference from Metadata. Metadata object 'resolved' by Platform instance, so we may consider Metadata as
+ * a Resource, provided by Platform itself. Because there is always a plugin, which resolve `Resource` resolution is
+ * asynchronous process.
+ *
+ * `Resource` is a string of `kind:plugin.id` format. Since Metadata is a kind of Resource.
+ * Metadata also can be resolved using resource API.
+ *
+ * @example
+ * ```typescript
+ *   `class:contact.Person` as Resource<Class<Person>> // database object with id === `class:contact.Person`
+ *   `string:class.ClassLabel` as Resource<string> // translated string according to current language and i18n settings
+ *   `asset:ui.Icons` as Resource<URL> // URL to SVG sprites
+ *   `easyscript:2+2` as Resource<() => number> // function
+ * ```
+ *
+ * @public
+ */
+export type Resource<T> = string & { __resource: T }
+
+// U I 
+
+type URL = string
+export type Asset = Metadata<URL>

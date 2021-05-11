@@ -14,12 +14,14 @@
 //
 
 import { Component, Status, Severity, unknownError } from '@anticrm/status'
+import type { IntlString } from '@anticrm/status'
 import { Code } from './status'
 import { setPlatformStatus } from './event'
 
 import { IntlMessageFormat } from 'intl-messageformat'
 
-export type IntlString<T extends Record<string, any> = {}> = string & { __intl_string: T }
+export type { IntlString }
+
 type Loader = (locale: string) => Promise<Record<string, IntlString>>
 
 const locale = 'en'

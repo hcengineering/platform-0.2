@@ -15,9 +15,9 @@
 
 import { Metadata, Plugin, plugin, Resource, Service } from '@anticrm/platform'
 import { getContext, SvelteComponent } from 'svelte'
+import type { Asset } from '@anticrm/status'
 
-export type URL = string
-export type Asset = Metadata<URL>
+export type { Asset }
 
 /**
  * Describe a browser URI location parsed to path, query and fragment.
