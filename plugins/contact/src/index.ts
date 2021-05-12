@@ -23,6 +23,7 @@ import core from '@anticrm/platform-core'
 export interface Contact extends VDoc {
   phone?: string
   email?: string
+  telegramUserName?: string
 }
 
 export interface Person extends Contact {
@@ -50,7 +51,8 @@ const contactPlugin = plugin('contact' as Plugin<ContactService>, {
   icon: {
     Date: '' as Asset,
     Phone: '' as Asset,
-    Email: '' as Asset
+    Email: '' as Asset,
+    Telegram: '' as Asset
   },
   class: {
     Person: '' as Ref<Class<Person>>

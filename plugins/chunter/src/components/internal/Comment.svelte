@@ -21,7 +21,8 @@
 
   export let message: Comment
 
-  let username: string
+  let username: string = message._createdBy
+
   const timestamp: string = new Date(message._createdOn).toLocaleString()
   let avatar: Promise<Asset>
 

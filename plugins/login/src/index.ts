@@ -25,6 +25,7 @@ export interface LoginInfo {
   port: string
   token: string
   secondFactorEnabled: boolean
+  telegramToken: string
 }
 
 export const ACCOUNT_KEY = 'anticrm-account'
