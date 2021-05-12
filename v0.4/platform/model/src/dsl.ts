@@ -187,6 +187,47 @@ export function RefTo$ (to: Ref<Class<Doc>>) {
   }
 }
 
+export function generatePropDecorator<T extends Type = Type> (cls: Ref<Class<T>>, payload?: Partial<T>, overrideAttributeType = true) {
+  return function (target: any, propertyKey: string): void {
+    const attribute = getAttribute(target, propertyKey)
+    const attributeType = attribute.type
+    let type: T
+    if (attributeType !== undefined && !overrideAttributeType) {
+      type = {
+        _class: cls,
+        of: attributeType
+      } as unknown as T
+    } else {
+      type = {
+        _class: cls,
+        ...payload
+      } as unknown as T
+    }
+    attribute.type = type
+  }
+}
+
+export function Prop2<T extends Type> (type?: Ref<Class<T>>, def?: Partial<T>): (target: any, propertyKey: string) => void {
+  if (def === undefined) {
+    return generatePropDecorator(type ?? core.class.Type)
+  }
+  switch (type as unknown) {
+    case core.class.RefTo:
+      return generatePropDecorator<RefTo<Doc>>(core.class.RefTo, { to: (def as Partial<RefTo<Doc>>).to })
+    case core.class.BagOf:
+      return generatePropDecorator<BagOf>(core.class.BagOf, { of: (def as Partial<BagOf>).of ?? { _class: core.class.Type } }, false)
+    case core.class.ArrayOf:
+      return generatePropDecorator<ArrayOf>(core.class.ArrayOf, { of: (def as Partial<ArrayOf>).of ?? { _class: core.class.Type } }, false)
+    case core.class.EnumOf:
+      return generatePropDecorator<EnumOf<EnumKey>>(core.class.EnumOf, { of: (def as Partial<EnumOf<EnumKey>>).of })
+    case core.class.InstanceOf:
+      return generatePropDecorator<InstanceOf<Emb>>(core.class.InstanceOf, { of: (def as Partial<InstanceOf<Emb>>).of })
+    case core.class.Type:
+    default:
+      return generatePropDecorator(type ?? core.class.Type)
+  }
+}
+
 export function EnumOf$ (of: Ref<Enum<any>>) {
   return function (target: any, propertyKey: string): void {
     const attribute = getAttribute(target, propertyKey)
