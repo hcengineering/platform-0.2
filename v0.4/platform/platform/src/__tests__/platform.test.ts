@@ -18,7 +18,7 @@
 import { Status, Severity, identify, OK, unknownError } from '@anticrm/status'
 
 import { Metadata, getMetadata, loadMetadata, setMetadata } from '../metadata'
-import { Plugin, Service, getPlugin, addLocation } from '../plugin'
+import { Plugin, Service, getPlugin, addLocation, mergeIds } from '../plugin'
 import { Resource, getResource, getResourceInfo, peekResource, setResource } from '../resource'
 import {
   addEventListener,
@@ -37,7 +37,7 @@ import {
   descriptor2,
   plugin3,
   descriptor3,
-  descriptorBad
+  descriptorBad, descriptor4
 } from './shared'
 
 type AnyPlugin = Plugin<Service>
@@ -47,7 +47,6 @@ type ExtractType<T, X extends Record<string, Metadata<T>>> = {
 }
 
 describe('platform', () => {
-
   it('should raise exception for unknown location', async () => {
     const p1 = getPlugin(plugin1)
     return await expect(p1).rejects.toThrowError('plugin1')
@@ -317,5 +316,22 @@ describe('platform', () => {
     const status = unknownError(new Error('something')) as Status<{message: string}>
     expect(status.severity).toBe(Severity.ERROR)
     expect(status.params.message).toBe('something')
+  })
+
+  it('should merge ids', () => {
+    const space = 'anotherSpace'
+    const res1 = mergeIds(descriptor4, { [space]: 'another' })
+    const res2 = mergeIds(descriptor3, { })
+    expect(res1).toEqual({ [space]: `${descriptor4.id}.${space}`, ...descriptor4 })
+    expect(res2).toEqual(descriptor3)
+  })
+
+  it('should throw error when merging same', () => {
+    const space = 'nameSpace'
+    try {
+      mergeIds(descriptor4, { [space]: 'same' })
+    } catch (e) {
+      expect(e).toEqual(new Error(`attempting to overwrite plugin4.${space}`))
+    }
   })
 })
