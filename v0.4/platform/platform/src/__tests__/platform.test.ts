@@ -328,10 +328,8 @@ describe('platform', () => {
 
   it('should throw error when merging same', () => {
     const space = 'nameSpace'
-    try {
-      mergeIds(descriptor4, { [space]: 'same' })
-    } catch (e) {
-      expect(e).toEqual(new Error(`attempting to overwrite plugin4.${space}`))
-    }
+    expect(descriptor4[space]).toBeDefined()
+    expect(() => mergeIds(descriptor4, { [space]: 'same' }))
+      .toThrowError(new Error(`attempting to overwrite ${descriptor4.id}.${space}`))
   })
 })
