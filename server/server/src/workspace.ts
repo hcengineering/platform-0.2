@@ -20,7 +20,6 @@ import {
 } from '@anticrm/core'
 import { CORE_CLASS_SPACE, Space, TxOperation, TxOperationKind, VDoc } from '@anticrm/domains'
 import { ModelIndex } from '@anticrm/domains/src/indices/model'
-import { MessengerIndex } from '@anticrm/domains/src/indices/messenger'
 import { ReferenceIndex } from '@anticrm/domains/src/indices/reference'
 import { TitleIndex } from '@anticrm/domains/src/indices/title'
 import { TxIndex } from '@anticrm/domains/src/indices/tx'
@@ -218,8 +217,7 @@ export async function connectWorkspace (uri: string, workspace: string): Promise
     new VDocIndex(memdb, mongoStorage, clientTxMongo),
     new TitleIndex(memdb, clientTxMongo),
     new ReferenceIndex(memdb, clientTxMongo),
-    new ModelIndex(memdb, combineStorage(memdb, mongoStorage)),
-    new MessengerIndex(clientTxMongo)
+    new ModelIndex(memdb, combineStorage(memdb, mongoStorage))
   ])
 
   const clientControl: WorkspaceProtocol = {

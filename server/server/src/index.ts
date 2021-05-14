@@ -13,14 +13,39 @@
 // limitations under the License.
 //
 
+// import { TelegramIntegrator } from './integrators/telegramIntegrator'
 import { start } from './server'
 
 const mongodbUri = process.env.MONGODB_URI ?? 'mongodb://localhost:27017'
 
 console.log('mongodb uri: ...' + mongodbUri.substring(25))
 
+// for demo uncomment it, push your data, and input apiId, ApiHash in environment
+// statTelegramDemo() // eslint-disable-line
+
 start(18080, mongodbUri).then(() => { // eslint-disable-line
   console.log('Server started')
 }, (err) => {
   console.error('Server is failed to start', err)
 })
+
+// async function statTelegramDemo (): Promise<void> {
+//   const platfromUserName = 'john.appleseed@gmail.com'
+//   const phoneNumber = '+77771234567'
+//   let token: string | undefined
+
+//   // token = 'YOUR_SAVED_TOKEN'
+//   const client = new TelegramIntegrator(platfromUserName, token)
+//   if (token === undefined) {
+//     const hash = await client.sendAuthCode(phoneNumber)
+//     const code = '12345' // run in debug and change code to actually here
+//     token = await client.signIn(phoneNumber, code, hash)
+//     if (token === undefined) { // use second factor
+//       token = await client.signInWithPassword(phoneNumber, code, 'YOUR_SECOND_FACTOR_PASSWORD')
+//     }
+//     console.log('save this token for next time')
+//     console.log(token)
+//   } else {
+//     await client.start()
+//   }
+// }

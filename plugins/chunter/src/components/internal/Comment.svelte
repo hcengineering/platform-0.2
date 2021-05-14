@@ -21,7 +21,7 @@
 
   export let message: Comment
 
-  let username: string = message._createdBy
+  let username: string
 
   const timestamp: string = new Date(message._createdOn).toLocaleString()
   let avatar: Promise<Asset>
@@ -30,6 +30,8 @@
     return service.getUser(message._createdBy).then((user) => {
       username = user.name
       return service.getAvatar(user._id as Ref<User>)
+    }).catch(() => {
+      username = message._createdBy
     })
   })
 </script>
