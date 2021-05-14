@@ -23,11 +23,11 @@ export async function initDatabase (db: Db): Promise<any> {
   for (const domain in domains) {
     const model = domains[domain]
     db.collection(domain, (err, coll) => {
-      if (err !== undefined) {
+      if (err != null) {
         console.log(err)
       }
       ops.push(coll.deleteMany({}).then(() => model.length > 0 ? coll.insertMany(model) : null))
     })
   }
-  return Promise.all(ops)
+  await Promise.all(ops)
 }
