@@ -32,8 +32,8 @@ const TELEGRAM_MESSAGE_SPACE_PREFIX = 'TELEGRAM_'
 const TELEGRAM_CHAT_MESSAGE_SPACE_PREFIX = 'TELEGRAM_CHAT'
 
 const credentials = {
-  apiId: parseInt(process.env.TELEGRAM_API_ID ?? '5032962'),
-  apiHash: process.env.TELEGRAM_API_HASH ?? 'd72399f4fcd2cc2a6ad3b86dfabb32e9'
+  apiId: parseInt(process.env.TELEGRAM_API_ID ?? ''),
+  apiHash: process.env.TELEGRAM_API_HASH ?? ''
 }
 
 const serverConfig = {
