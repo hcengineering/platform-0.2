@@ -117,8 +117,6 @@ export class TelegramIntegrator {
     this.integrator.addEventHandler(async (event: NewMessageEvent) => await this.eventHandler(event), new NewMessage({}))
     // eslint-disable-next-line no-void
     this.platformClient.addEventListener(EventType.Transaction, (event: unknown) => void this.platformEventHandler(event))
-    await this.platformClient.generateId()
-    console.log('telegram client started')
   }
 
   async logOut (): Promise<void> {
