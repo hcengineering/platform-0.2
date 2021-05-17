@@ -13,13 +13,12 @@
 // limitations under the License.
 //
 
+import core, { Class, Doc, Ref } from '@anticrm/core'
+import domains, { Reference, REFERENCE_DOMAIN } from '@anticrm/domains'
 import { Class$, Prop } from '../dsl'
-import core from '../index'
-import { Reference, REFERENCE_DOMAIN } from '@anticrm/domains'
 import { TDoc } from './core'
-import { Class, Doc, Ref } from '@anticrm/core'
 
-@Class$(core.class.Reference, core.class.Doc, REFERENCE_DOMAIN)
+@Class$(domains.class.Reference, core.class.Doc, REFERENCE_DOMAIN)
 export class TReference extends TDoc implements Reference {
   @Prop() _sourceId?: Ref<Doc>
   @Prop() _sourceClass!: Ref<Class<Doc>>

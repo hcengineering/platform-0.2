@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { AnyLayout, ArrayOf, AttributeMatch, Class, CORE_CLASS_ARRAY_OF, CORE_CLASS_INSTANCE_OF, CORE_CLASS_OBJ, Model, Obj, Ref } from '@anticrm/core'
+import core, { AnyLayout, ArrayOf, AttributeMatch, Class, Model, Obj, Ref } from '@anticrm/core'
 import { ObjectSelector, TxOperation, TxOperationKind } from '../tx'
 /**
  * Perform update of document attributes
@@ -37,7 +37,7 @@ export function updateDocument<T extends Obj> (model: Model, doc: T, operations:
 
             const l = (match.doc as unknown) as AnyLayout
             switch (attr.type._class) {
-              case CORE_CLASS_ARRAY_OF: {
+              case core.class.ArrayOf: {
                 const attrClass = model.attributeClass((attr.type as ArrayOf).of)
                 if (attrClass === undefined) {
                   throw new Error(`Invalid attribute type/class: ${String(attr.type)}`)
@@ -62,13 +62,13 @@ export function updateDocument<T extends Obj> (model: Model, doc: T, operations:
             const l = (match.parent as unknown) as AnyLayout
 
             switch (attr.type._class) {
-              case CORE_CLASS_ARRAY_OF: {
+              case core.class.ArrayOf: {
                 const parentArray = (l[key] as unknown) as Obj[]
                 // We assume it will be found.
                 parentArray.splice(parentArray.indexOf(match.value), 1)
                 break
               }
-              case CORE_CLASS_INSTANCE_OF: {
+              case core.class.InstanceOf: {
                 delete (l as any)[key] // eslint-disable-line @typescript-eslint/no-dynamic-delete
                 break
               }
@@ -121,7 +121,7 @@ export function matchSelector (model: Model, _class: Ref<Class<Obj>>, doc: Obj, 
       if (res === undefined) {
         throw new Error('failed to match embedded object of value')
       }
-      if ((attrClass !== undefined) && model.is(attrClass, CORE_CLASS_OBJ)) {
+      if ((attrClass !== undefined) && model.is(attrClass, core.class.Obj)) {
         parent = current
         current = res.value as Obj
         currentClass = attrClass
@@ -130,7 +130,7 @@ export function matchSelector (model: Model, _class: Ref<Class<Obj>>, doc: Obj, 
         return { match: true, value: res.value, doc: current, attrMatch: attr, parent }
       } else {
         // If attribute class is based on doc.
-        if ((attrClass !== undefined) && !model.is(attrClass, CORE_CLASS_OBJ)) {
+        if ((attrClass !== undefined) && !model.is(attrClass, core.class.Obj)) {
           throw new Error(`failed to match embedded object of value for class ${attrClass} of value ${String(current)}`)
         }
       }

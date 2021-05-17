@@ -14,13 +14,12 @@
 //
 
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-import {
+import core, {
   AnyLayout, ArrayOf, Attribute, BagOf, Class, Classifier, ClassifierKind, Doc, Emb, Enum, EnumKey, EnumLiteral,
   EnumLiterals, EnumOf, InstanceOf, Mixin, Model, MODEL_DOMAIN, Obj, Ref, RefTo, Type
 } from '@anticrm/core'
 import domains from '@anticrm/domains'
 import 'reflect-metadata'
-import core from '.'
 
 const classIdentities = new Map<Ref<Class<Obj>>, Class<Obj>>()
 
@@ -242,7 +241,7 @@ export function Primary () {
     const classifier = getClass(target)
 
     classifier.postProcessing.push((model, cl) => {
-      model.mixinDocument(cl, core.mixin.Indices, { primary: propertyKey })
+      model.mixinDocument(cl, domains.mixin.Indices, { primary: propertyKey })
     })
   }
 }

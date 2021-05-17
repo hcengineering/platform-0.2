@@ -14,7 +14,8 @@
 //
 
 import { describe, expect, it, jest } from '@jest/globals'
-import { Class, CORE_CLASS_DOC, Doc, Ref } from '../classes'
+import core from '..'
+import { Class, Doc, Ref } from '../classes'
 import { Tx, TxContext, txContext, TxProcessor } from '../storage'
 
 describe('storage', () => {
@@ -35,7 +36,7 @@ describe('storage', () => {
       const ctx = txContext()
       const tx = {
         _id: 'tx' as Ref<Class<Doc>>,
-        _class: CORE_CLASS_DOC,
+        _class: core.class.Doc,
         _date: Date.now(),
         _user: 'user'
       }

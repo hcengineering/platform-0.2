@@ -13,11 +13,11 @@
 // limitations under the License.
 //
 
-import { MODEL_DOMAIN } from '@anticrm/core'
+import core, { MODEL_DOMAIN } from '@anticrm/core'
 import { SubTask, Task, TaskComment, taskIds, TaskMixin } from '@anticrm/core/src/__tests__/tasks'
-import core, { ArrayOf$, Builder, Class$, InstanceOf$, Primary, Prop } from '..'
+import { ArrayOf$, Builder, Class$, InstanceOf$, Primary, Prop } from '..'
 import { Mixin$ } from '../dsl'
-import { TDoc, TEmb, model as globalModel } from '../__model__'
+import { model as globalModel, TDoc, TEmb } from '../__model__'
 
 @Class$(taskIds.class.Task, core.class.Doc, MODEL_DOMAIN)
 export class TTask extends TDoc implements Task {

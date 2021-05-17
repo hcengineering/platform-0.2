@@ -114,24 +114,3 @@ export interface ArrayOf extends Type {
 export interface AnyLayout {
   [key: string]: PropertyType
 }
-
-///
-
-export const CORE_CLASS_OBJ = 'class:core.Obj' as Ref<Class<Obj>>
-export const CORE_CLASS_DOC = 'class:core.Doc' as Ref<Class<Doc>>
-export const CORE_CLASS_EMB = 'class:core.Emb' as Ref<Class<Emb>>
-export const CORE_CLASS_CLASS = 'class:core.Class' as Ref<Class<Class<Obj>>>
-export const CORE_CLASS_MIXIN = 'class:core.Mixin' as Ref<Class<Mixin<Obj>>>
-export const CORE_CLASS_ENUM = 'class:core.Enum' as Ref<Class<Enum<any>>>
-
-export const CORE_CLASS_STRING = 'class:core.String' as Ref<Class<Type>>
-export const CORE_CLASS_NUMBER = 'class:core.Number' as Ref<Class<Type>>
-export const CORE_CLASS_BOOLEAN = 'class:core.Boolean' as Ref<Class<Type>>
-export const CORE_CLASS_ATTRIBUTE = 'class:core.Attribute' as Ref<Class<Attribute>>
-export const CORE_CLASS_TYPE = 'class:core.Type' as Ref<Class<Type>>
-
-export const CORE_CLASS_ARRAY_OF = 'class:core.ArrayOf' as Ref<Class<ArrayOf>>
-export const CORE_CLASS_REF_TO = 'class:core.RefTo' as Ref<Class<RefTo<Doc>>>
-export const CORE_CLASS_BAG_OF = 'class:core.BagOf' as Ref<Class<BagOf>>
-export const CORE_CLASS_INSTANCE_OF = 'class:core.InstanceOf' as Ref<Class<InstanceOf<Emb>>>
-export const CORE_CLASS_ENUM_OF = 'class:core.EnumOf' as Ref<Class<EnumOf<EnumKey>>>

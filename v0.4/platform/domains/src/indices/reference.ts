@@ -13,8 +13,8 @@
 // limitations under the License.
 //
 
-import {
-  AnyLayout, ArrayOf, Class, CORE_CLASS_ARRAY_OF, CORE_CLASS_INSTANCE_OF, CORE_CLASS_STRING, Doc, DomainIndex, Emb,
+import core, {
+  AnyLayout, ArrayOf, Class, Doc, DomainIndex, Emb,
   InstanceOf, Model, Obj, Ref, Storage, Tx, TxContext
 } from '@anticrm/core'
 import {
@@ -52,7 +52,7 @@ export class ReferenceIndex implements DomainIndex {
 
     const keys = this.modelDb
       .getAllAttributes(_class)
-      .filter((m) => m.attr.type._class === CORE_CLASS_STRING)
+      .filter((m) => m.attr.type._class === core.class.String)
       .map((m) => m.key)
     this.textAttributes.set(_class, keys)
     return keys
@@ -64,7 +64,7 @@ export class ReferenceIndex implements DomainIndex {
 
     const keys = this.modelDb
       .getAllAttributes(_class)
-      .filter((m) => m.attr.type._class === CORE_CLASS_ARRAY_OF && (m.attr.type as ArrayOf).of._class === CORE_CLASS_INSTANCE_OF)
+      .filter((m) => m.attr.type._class === core.class.ArrayOf && (m.attr.type as ArrayOf).of._class === core.class.InstanceOf)
       .map((m) => {
         return {
           key: m.key,

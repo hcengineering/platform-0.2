@@ -14,8 +14,9 @@
 //
 
 import { describe, expect, it } from '@jest/globals'
+import core from '..'
 import {
-  Attribute, Class, CORE_CLASS_ATTRIBUTE, CORE_CLASS_CLASS, CORE_CLASS_DOC, CORE_CLASS_EMB, CORE_CLASS_OBJ,
+  Attribute, Class,
   Doc, Mixin, Obj, PropertyType, Ref
 } from '../classes'
 import { mixinFromKey, mixinKey, Model } from '../model'
@@ -126,20 +127,20 @@ describe('Model domain', () => {
   model.loadModel(data)
 
   it('returns domains', () => {
-    expect(model.getDomain(CORE_CLASS_CLASS))
+    expect(model.getDomain(core.class.Class))
       .toEqual('model')
     expect(model.getDomain('class:core.Title' as Ref<Class<Doc>>))
       .toEqual('title')
   })
 
   it('throws if domain does not exist', () => {
-    expect(() => model.getDomain(CORE_CLASS_DOC))
+    expect(() => model.getDomain(core.class.Doc))
       .toThrowError()
   })
 
   it('returns classes', () => {
-    expect(model.getClass(CORE_CLASS_CLASS))
-      .toEqual(CORE_CLASS_CLASS.toString())
+    expect(model.getClass(core.class.Class))
+      .toEqual(core.class.Class.toString())
     expect(model.getClass('mixin:core.ShortID' as Ref<Class<Doc>>))
       .toBe('class:core.VDoc')
   })
@@ -155,24 +156,24 @@ describe('Model utilities', () => {
   model.loadModel(data)
 
   it('returns all attributes of class', () => {
-    expect(model.getAllAttributes(CORE_CLASS_EMB).length)
+    expect(model.getAllAttributes(core.class.Emb).length)
       .toEqual(1) // It should contain _class
 
     const getAttrs = (id: string): any => Object.entries<Attribute>(
       data.find((x: any) => x._id === id)?._attributes ?? {}
     )
 
-    expect(model.getAllAttributes(CORE_CLASS_DOC).map(m => [m.name, m.attr]))
+    expect(model.getAllAttributes(core.class.Doc).map(m => [m.name, m.attr]))
       .toEqual([
-        getAttrs(CORE_CLASS_DOC),
-        getAttrs(CORE_CLASS_OBJ)
+        getAttrs(core.class.Doc),
+        getAttrs(core.class.Obj)
       ].reduce((r, x) => r.concat(x)))
 
-    expect(model.getAllAttributes(CORE_CLASS_ATTRIBUTE).map(m => [m.name, m.attr]))
+    expect(model.getAllAttributes(core.class.Attribute).map(m => [m.name, m.attr]))
       .toEqual([
-        getAttrs(CORE_CLASS_ATTRIBUTE),
-        getAttrs(CORE_CLASS_EMB),
-        getAttrs(CORE_CLASS_OBJ)
+        getAttrs(core.class.Attribute),
+        getAttrs(core.class.Emb),
+        getAttrs(core.class.Obj)
       ].reduce((r, x) => r.concat(x)))
   })
 })
@@ -320,18 +321,18 @@ describe('Model assign tools', () => {
 
   it('compares classes', () => {
     expect(model.is(
-      CORE_CLASS_DOC,
-      CORE_CLASS_DOC
+      core.class.Doc,
+      core.class.Doc
     )).toEqual(true)
 
     expect(model.is(
-      CORE_CLASS_DOC,
-      CORE_CLASS_OBJ
+      core.class.Doc,
+      core.class.Obj
     )).toEqual(true)
 
     expect(model.is(
-      CORE_CLASS_OBJ,
-      CORE_CLASS_DOC
+      core.class.Obj,
+      core.class.Doc
     )).toEqual(false)
   })
 

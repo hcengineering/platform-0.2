@@ -13,13 +13,12 @@
 // limitations under the License.
 //
 
-import { BagOf$, Class$, InstanceOf$, Mixin$, Prop, RefTo$ } from '../dsl'
-import core from '../index'
-import {
+import core, {
   AllAttributes, ArrayOf, Attribute, BagOf, Class, Classifier, ClassifierKind, Doc, Emb, Enum, EnumKey, EnumLiteral,
   EnumLiterals, EnumOf, InstanceOf, Mixin, MODEL_DOMAIN, Obj, PropertyType, Ref, RefTo, Type
 } from '@anticrm/core'
-import { Indices } from '@anticrm/domains'
+import domains, { Indices } from '@anticrm/domains'
+import { BagOf$, Class$, InstanceOf$, Mixin$, Prop, RefTo$ } from '../dsl'
 
 @Class$(core.class.Obj, core.class.Obj)
 export class TObj implements Obj {
@@ -109,7 +108,7 @@ export class TBagOf extends TType implements BagOf {
   @Prop() of!: Type
 }
 
-@Mixin$(core.mixin.Indices, core.class.Mixin)
+@Mixin$(domains.mixin.Indices, core.class.Mixin)
 export class TIndexesClass<T extends Doc> extends TMixin<T> implements Indices {
   @Prop() primary!: string
 }

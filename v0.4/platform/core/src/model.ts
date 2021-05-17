@@ -13,8 +13,9 @@
 // limitations under the License.
 //
 
+import core from '..'
 import {
-  AnyLayout, ArrayOf, Attribute, Class, Classifier, ClassifierKind, CORE_CLASS_ARRAY_OF, CORE_CLASS_CLASS, CORE_CLASS_INSTANCE_OF, CORE_CLASS_MIXIN,
+  AnyLayout, ArrayOf, Attribute, Class, Classifier, ClassifierKind,
   Doc, Mixin, Obj, PropertyType, Ref, Type
 } from './classes'
 import { generateId } from './ids'
@@ -128,7 +129,7 @@ export class Model {
       throw new Error('indexInstances not created')
     }
     const byExtends = this.byExtends
-    if (this.is(doc._class, CORE_CLASS_CLASS)) {
+    if (this.is(doc._class, core.class.Class)) {
       //  This is class, let's also check its' hierarchy
       const hierarchy = this.getClassHierarchy(doc._id as Ref<Class<Obj>>)
       for (const cls of hierarchy) {
@@ -297,7 +298,7 @@ export class Model {
         const { attr, key } = this.classAttribute(_class, rKey)
         // Check if we need to perform inner assign based on field value and type
         switch (attr.type._class) {
-          case CORE_CLASS_ARRAY_OF: {
+          case core.class.ArrayOf: {
             const attrClass = this.attributeClass((attr.type as ArrayOf).of)
             if (attrClass !== undefined) {
               const rValue = r[rKey]
@@ -312,7 +313,7 @@ export class Model {
             }
             break
           }
-          case CORE_CLASS_INSTANCE_OF: {
+          case core.class.InstanceOf: {
             const attrClass = ((attr.type as unknown) as Record<string, unknown>).of as Ref<Class<Doc>>
             if (attrClass !== undefined) {
               l[key] = this.assign({}, attrClass, r[rKey] as AnyLayout)
@@ -361,7 +362,7 @@ export class Model {
   }
 
   getClassMixins (cls: Ref<Class<Obj>>): Array<Ref<Doc>> {
-    return this.extendsOfClass(cls).filter(_class => _class._class === CORE_CLASS_MIXIN && _class._id !== cls).map(_class => _class._id)
+    return this.extendsOfClass(cls).filter(_class => _class._class === core.class.Mixin && _class._id !== cls).map(_class => _class._id)
   }
 
   is (_class: Ref<Class<Obj>>, a: Ref<Class<Obj>>): boolean {
@@ -523,7 +524,7 @@ export class Model {
     }
 
     const mixinClass = this.get(mixin)
-    if (mixinClass._class !== CORE_CLASS_MIXIN) {
+    if (mixinClass._class !== core.class.Mixin) {
       // Not a mixin class,
       return doc as T
     }
@@ -646,9 +647,9 @@ export class Model {
 
   public attributeClass (type: Type): Ref<Class<Doc>> | undefined {
     switch (type._class) {
-      case CORE_CLASS_ARRAY_OF:
+      case core.class.ArrayOf:
         return this.attributeClass((type as ArrayOf).of)
-      case CORE_CLASS_INSTANCE_OF:
+      case core.class.InstanceOf:
         return ((type as unknown) as Record<string, unknown>).of as Ref<Class<Doc>>
     }
     return undefined

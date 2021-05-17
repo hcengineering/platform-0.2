@@ -17,13 +17,14 @@ import { Class, Mixin, Ref, Tx } from '@anticrm/core'
 import { Component, identify } from '@anticrm/status'
 import { Indices } from './primary'
 import { Reference, ShortID } from './references'
-import { Space, SpaceUser } from './space'
+import { Application, Space, SpaceUser } from './space'
 import { Title } from './title'
 import { CreateTx, DeleteTx, ObjectSelector, ObjectTx, ObjectTxDetails, TxOperation, UpdateTx } from './tx'
 import { VDoc } from './vdoc'
 
 export default identify('core' as Component, {
   class: {
+    Application: '' as Ref<Class<Application>>,
     Reference: '' as Ref<Class<Reference>>,
     Space: '' as Ref<Class<Space>>,
     SpaceUser: '' as Ref<Class<SpaceUser>>,

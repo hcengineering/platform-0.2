@@ -13,7 +13,38 @@
 // limitations under the License.
 //
 
+import { Component, identify } from '../../domains/node_modules/@anticrm/status/lib'
+import { ArrayOf, Attribute, BagOf, Class, Classifier, Doc, Emb, Enum, EnumKey, EnumLiteral, EnumOf, InstanceOf, Mixin, Obj, Ref, RefTo, Type } from './classes'
+import { Tx } from './storage'
+
 export * from './classes'
+export * from './ids'
 export * from './model'
 export * from './storage'
-export * from './ids'
+
+export default identify('core' as Component, {
+  class: {
+    Obj: '' as Ref<Class<Obj>>,
+    Doc: '' as Ref<Class<Doc>>,
+    Emb: '' as Ref<Class<Emb>>,
+    Class: '' as Ref<Class<Class<Obj>>>,
+    Classifier: '' as Ref<Class<Classifier>>,
+    Attribute: '' as Ref<Class<Attribute>>,
+    Mixin: '' as Ref<Class<Mixin<Obj>>>,
+    Enum: '' as Ref<Class<Enum<EnumKey>>>,
+    EnumLiteral: '' as Ref<Class<EnumLiteral>>,
+
+    String: '' as Ref<Class<Type>>,
+    Number: '' as Ref<Class<Type>>,
+    Boolean: '' as Ref<Class<Type>>,
+    Date: '' as Ref<Class<Type>>,
+    Type: '' as Ref<Class<Type>>,
+    RefTo: '' as Ref<Class<RefTo<Doc>>>,
+    EnumOf: '' as Ref<Class<EnumOf<EnumKey>>>,
+    BagOf: '' as Ref<Class<BagOf>>,
+    InstanceOf: '' as Ref<Class<InstanceOf<Emb>>>,
+    ArrayOf: '' as Ref<Class<ArrayOf>>,
+
+    Tx: '' as Ref<Class<Tx>>
+  }
+})

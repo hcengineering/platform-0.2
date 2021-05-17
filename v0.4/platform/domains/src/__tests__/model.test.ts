@@ -15,14 +15,14 @@
 
 /* eslint-env jest */
 
-import { AnyLayout, Class, CORE_CLASS_EMB, Doc, DocumentQuery, DocumentValue, Model, PropertyType, Ref, txContext } from '@anticrm/core'
+import core, { AnyLayout, Class, Doc, DocumentQuery, DocumentValue, Model, PropertyType, Ref, txContext } from '@anticrm/core'
 import { createSubtask, createTask, data, doc1, SubTask, Task, taskIds } from '@anticrm/core/src/__tests__/tasks'
+import domains from '..'
 import { ModelStorage } from '../model_storage'
 import { getPrimaryKey } from '../primary_utils'
 import { Space } from '../space'
 import { create, ObjectTx, txBuilder, TxOperation, TxOperationKind, updateDocument } from '../tx'
 import { push, updateDocumentPull, updateDocumentPush, updateDocumentSet } from './model_test_utils'
-import domains from '..'
 
 describe('core tests', () => {
   const model = new Model('vdocs')
@@ -78,7 +78,7 @@ describe('core tests', () => {
   })
 
   it('returns primary key of class', () => {
-    expect(getPrimaryKey(model, CORE_CLASS_EMB))
+    expect(getPrimaryKey(model, core.class.Emb))
       .toBeUndefined()
     expect(getPrimaryKey(model, 'core.class.TaskObj' as Ref<Class<Doc>>))
       .toEqual('name')

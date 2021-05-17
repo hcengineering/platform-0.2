@@ -1,5 +1,5 @@
-import {
-  AnyLayout, ArrayOf, AttributeMatch, Class, CORE_CLASS_ARRAY_OF, CORE_CLASS_INSTANCE_OF, CORE_CLASS_MIXIN,
+import core, {
+  AnyLayout, ArrayOf, AttributeMatch, Class,
   Doc, DocumentQuery, Emb, InstanceOf, Mixin, mixinFromKey, Model, Obj, PropertyType, Ref, Type
 } from '@anticrm/core'
 import { isValidSelector, ObjectSelector } from '@anticrm/domains'
@@ -26,7 +26,7 @@ export function toMongoQuery<T extends Doc> (model: Model, _class: Ref<Class<T>>
   const classes: Array<Ref<Class<Obj>>> = []
 
   const byClass = model.extendsOfClass(query._class)
-  const byClassNotMixin = byClass.filter((cl) => !model.is(cl._id as Ref<Class<Obj>>, CORE_CLASS_MIXIN)).map(p => p._id as Ref<Class<Obj>>)
+  const byClassNotMixin = byClass.filter((cl) => !model.is(cl._id as Ref<Class<Obj>>, core.class.Mixin)).map(p => p._id as Ref<Class<Obj>>)
   if (byClassNotMixin.length > 0) {
     // We need find for all classes extending our own.
     classes.push(...byClassNotMixin)
@@ -39,11 +39,11 @@ export function toMongoQuery<T extends Doc> (model: Model, _class: Ref<Class<T>>
 
   // We should add mixin to list of mixins
   const clazz = model.get(_class)
-  if (clazz._class === CORE_CLASS_MIXIN) {
+  if (clazz._class === core.class.Mixin) {
     // We should also put a _mixin in list for query
     Model.includeMixinAny(query, _class)
 
-    const byClass = model.extendsOfClass(_class).filter((cl) => model.is(cl._class, CORE_CLASS_MIXIN))
+    const byClass = model.extendsOfClass(_class).filter((cl) => model.is(cl._class, core.class.Mixin))
     if (byClass.length > 0) {
       for (const cl of byClass) {
         // We should also put a _mixin in list for query
@@ -83,7 +83,7 @@ export function flattenQuery (model: Model, _class: Ref<Class<Obj>>, layout: Any
     const { attr, key } = match
     // Check if we need to perform inner assign based on field value and type
     switch (attr.type._class) {
-      case CORE_CLASS_ARRAY_OF: {
+      case core.class.ArrayOf: {
         const attrClass = model.attributeClass((attr.type as ArrayOf).of)
         if (attrClass !== undefined) {
           const rValue = layout[rKey]
@@ -112,7 +112,7 @@ export function flattenQuery (model: Model, _class: Ref<Class<Obj>>, layout: Any
         }
         break
       }
-      case CORE_CLASS_INSTANCE_OF: {
+      case core.class.InstanceOf: {
         // Flatten any
         const attrClass = ((attr.type as unknown) as Record<string, unknown>).of as Ref<Class<Doc>>
         if (attrClass !== undefined) {
@@ -148,11 +148,11 @@ function flattenArrayValue (model: Model, curValue: unknown, attrClass: Ref<Clas
 // Some various mongo db utils.
 
 function isArrayOf (_type: Type): boolean {
-  return _type._class === CORE_CLASS_ARRAY_OF
+  return _type._class === core.class.ArrayOf
 }
 
 function isInstanceOf (_type: Type): boolean {
-  return _type._class === CORE_CLASS_INSTANCE_OF
+  return _type._class === core.class.InstanceOf
 }
 export interface ArrayFilterResult {
   clazz: Ref<Class<Obj>>
