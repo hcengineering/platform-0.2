@@ -13,10 +13,7 @@
 // limitations under the License.
 //
 
-import core, {
-  Class, Doc, DocumentValue, Mixin, Model, MODEL_DOMAIN,
-  Obj, Ref
-} from '@anticrm/core'
+import core, { Class, Doc, DocumentValue, Mixin, Model, MODEL_DOMAIN, Obj, Ref } from '@anticrm/core'
 import { CombineObjects, KeysByType } from 'simplytyped'
 import { loadClassifier } from './dsl'
 

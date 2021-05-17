@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Class, Doc, Emb, PrimitiveType, Ref, Tx } from '@anticrm/core'
+import { AnyLayout, Class, Doc, Emb, Ref, Tx } from '@anticrm/core'
 import { Space } from '../space'
 
 // TXes
@@ -39,45 +39,7 @@ export interface ObjectTxDetails extends ObjectTx {
  * In case _class is mixin, object of first parent Class will be stored into storage.
  */
 export interface CreateTx extends ObjectTx {
-  object: AnyLayout
-}
-
-/**
- * An update transaction, operation kind.
- */
-export enum TxOperationKind {
-  Set,
-  Push,
-  Pull
-}
-
-export interface ObjectSelector extends Emb {
-  key: string // A field key
-  pattern?: AnyLayout | PrimitiveType // A pattern to match inside array, may be missing for some operations.
-}
-
-/**
- * Update operation inside update transaction, could contain changes to some of individual embedded attributes.
- * And operations with arrays.
- */
-export interface TxOperation extends Emb {
-  kind: TxOperationKind
-  /*
-   Embedded object/Array selector, will determine type of object passed as individual operations.
-
-   Selector is array of (Key, QueryObject) pairs, with last one could be omitted.
-   Key - is array or embedded object name field.
-   ObjectQuery - is object matching to ensure element in array.
-
-   Using selector it is possible to identify attribute/embedded object to perform update, push, pull operations on.
-   parentKey: {parentSelector}, arrayKey
-
-   If selector is not specified, only update operation is allowed and will be performed against object itself.
-   */
-  selector?: ObjectSelector[]
-
-  // will determine an object or individual value to be updated.
-  _attributes?: AnyLayout
+  attributes: AnyLayout
 }
 
 /**
@@ -85,7 +47,34 @@ export interface TxOperation extends Emb {
  * In case _class is mixin, object of first parent Class will be stored into storage.
  */
 export interface UpdateTx extends ObjectTx {
-  operations: TxOperation[]
+  attributes: AnyLayout
+}
+
+export interface ItemTx extends ObjectTx {
+  _itemId: Ref<Emb>
+  _itemClass: Ref<Class<Doc>> // It is required, since we could perform operation over collection item as mixin.
+
+  _collection: string
+}
+
+/**
+ * Add particular item into collection.
+ */
+export interface AddItemTx extends ItemTx {
+  attributes: AnyLayout
+}
+
+/**
+ * Update item based on query.
+ */
+export interface UpdateItemTx extends ItemTx {
+  attributes: AnyLayout
+}
+
+/**
+ * Remove item
+ */
+export interface RemoveItemTx extends ItemTx {
 }
 
 /**
@@ -94,8 +83,6 @@ export interface UpdateTx extends ObjectTx {
 export interface DeleteTx extends ObjectTx {
 }
 
-export * from './builder'
+export * from '@anticrm/core/src/colletionid'
 export * from './clienttx'
-export * from './modeltx'
 export * from './operations'
-export * from './tx'

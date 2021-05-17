@@ -53,10 +53,9 @@ describe('search', () => {
       const m = new Model('model')
       m.loadModel(data)
 
-      const t1m: TaskMixin = m.createDocument(taskIds.mixin.TaskMixin, {
+      const t1m: TaskMixin = m.createDocument<TaskMixin>(taskIds.mixin.TaskMixin, {
         name: 'qwe',
         description: '',
-        lists: [],
         textValue: 'mixedValue'
       })
 

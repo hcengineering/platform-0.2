@@ -13,11 +13,8 @@
 // limitations under the License.
 //
 
-import core from '..'
-import {
-  AnyLayout, ArrayOf, Attribute, Class, Classifier, ClassifierKind,
-  Doc, Mixin, Obj, PropertyType, Ref, Type
-} from './classes'
+import core from '.'
+import { AnyLayout, Attribute, Class, Classifier, ClassifierKind, CollectionOf, Doc, Emb, Mixin, Obj, PropertyType, Ref } from './classes'
 import { generateId } from './ids'
 import { DocumentQuery, DocumentSorting, DocumentValue, FindOptions, RegExpression } from './storage'
 
@@ -40,11 +37,12 @@ interface Proxy {
 }
 
 export interface AttributeMatch {
-  name: string
   attr: Attribute
   clazz: Class<Obj>
   key: string
 }
+
+interface DescriptivePrototype { prototype: Record<string, unknown>, descriptors: PropertyDescriptorMap }
 
 /**
  * Model is a storage for Class descriptors and useful functions to match class instances to queries and apply values to them based on changes.
@@ -172,8 +170,8 @@ export class Model {
 
   private _getAllAttributes (attributes: AttributeMatch[], _class: Ref<Class<Obj>>): void {
     const clazz = this.get(_class) as Class<Doc>
-    for (const kv of Object.entries(clazz._attributes)) {
-      attributes.push({ name: kv[0], attr: kv[1], clazz, key: this.attributeKey(clazz, kv[0]) })
+    for (const attr of clazz._attributes.items ?? []) {
+      attributes.push({ attr, clazz, key: this.attributeKey(clazz, attr._id) })
     }
 
     if (clazz._extends !== undefined) {
@@ -232,11 +230,10 @@ export class Model {
     let _class = cls as Ref<Class<Obj>> | undefined
     while (_class !== undefined) {
       const clazz = this.get(_class)
-      const attr = (clazz._attributes as any)[key]
+      const attr = clazz._attributes.items?.find(a => a._id === key)
       if (attr !== undefined) {
         const attrKey = this.attributeKey(clazz, key)
         return {
-          name: key,
           attr,
           clazz,
           key: attrKey
@@ -247,7 +244,7 @@ export class Model {
     throw new Error(`attribute not found: ${key} in ${cls}`)
   }
 
-  public pushArrayValue (curValue: unknown, attrClass: Ref<Class<Doc>>, embedded: AnyLayout): PropertyType[] {
+  public pushArrayValue (curValue: unknown, attrClass: Ref<Class<Obj>>, embedded: AnyLayout): PropertyType[] {
     // Assign into  a proper classed values.
     const objValue = this.assign({}, attrClass, embedded)
     objValue._class = attrClass
@@ -271,6 +268,15 @@ export class Model {
     return (doc as unknown) as AnyLayout
   }
 
+  public update<T extends Obj>(doc: Doc, _class: Ref<Class<T>>, values: DocumentValue<T>): void {
+    const cl = this.get(_class)
+    if (cl._kind === ClassifierKind.MIXIN) {
+      // We need to include mixin if it is no pressent.
+      Model.includeMixin(doc, _class)
+    }
+    this.assign(this.getLayout(doc), _class, values as unknown as AnyLayout)
+  }
+
   // from Builder
   assign (layout: AnyLayout, _class: Ref<Class<Obj>>, values: AnyLayout): AnyLayout {
     const l = layout
@@ -281,15 +287,6 @@ export class Model {
       layout._class = this.getClass(_class) // Be sure we use class, not a mixin.
     }
     for (const rKey in values) {
-      // TODO: Will be removed with fix to #398
-      if (rKey.startsWith('_')) {
-        if (rKey === '_class') {
-          // Ignore _class, it is handled separatly
-          continue
-        }
-        l[rKey] = r[rKey]
-        continue
-      }
       if (rKey.indexOf('|') > 0) {
         // So key is probable mixin, this is required to create objects with mixins defined already.
         const { mixin, key } = mixinFromKey(rKey)
@@ -297,9 +294,10 @@ export class Model {
       } else {
         const { attr, key } = this.classAttribute(_class, rKey)
         // Check if we need to perform inner assign based on field value and type
+
         switch (attr.type._class) {
-          case core.class.ArrayOf: {
-            const attrClass = this.attributeClass((attr.type as ArrayOf).of)
+          case core.class.CollectionOf: {
+            const attrClass = (attr.type as CollectionOf<Emb>).of
             if (attrClass !== undefined) {
               const rValue = r[rKey]
               if (rValue instanceof Array) {
@@ -313,16 +311,11 @@ export class Model {
             }
             break
           }
-          case core.class.InstanceOf: {
-            const attrClass = ((attr.type as unknown) as Record<string, unknown>).of as Ref<Class<Doc>>
-            if (attrClass !== undefined) {
-              l[key] = this.assign({}, attrClass, r[rKey] as AnyLayout)
-              continue
-            }
-            break
-          }
         }
-        l[key] = r[rKey]
+        const v = r[rKey]
+        if (v !== undefined) {
+          l[key] = v
+        }
       }
     }
     return l
@@ -403,7 +396,7 @@ export class Model {
     const cl = this.getClass(_class)
     const byClass = this.objectsOfClass(cl as Ref<Class<Doc>>)
 
-    return this.findAll(byClass, _class, query as AnyLayout, options) as T[]
+    return this.findAll(byClass, _class, query as AnyLayout, options).map(p => this.asProxy<T>(p, _class))
   }
 
   /**
@@ -448,14 +441,14 @@ export class Model {
   }
 
   // M I X I N S
-  private readonly prototypes = new Map<Ref<Class<Obj>>, Record<string, unknown>>()
+  private readonly prototypes = new Map<Ref<Class<Obj>>, DescriptivePrototype>()
 
-  private createPrototype (classifier: Class<Obj>): Record<string, unknown> {
-    const attributes = classifier._attributes as { [key: string]: Attribute }
+  private createPrototype (classifier: Class<Obj>): DescriptivePrototype {
+    const attributes = classifier._attributes.items ?? []
     const descriptors: PropertyDescriptorMap = {}
-    for (const key in attributes) {
-      const attributeKey = this.attributeKey(classifier, key)
-      descriptors[key] = {
+    for (const attr of attributes) {
+      const attributeKey = this.attributeKey(classifier, attr._id)
+      descriptors[attr._id] = {
         get (this: Proxy) {
           return this.__layout[attributeKey]
         },
@@ -472,11 +465,11 @@ export class Model {
       }
     }
 
-    const proto = Object.create((classifier._extends !== undefined) ? this.getPrototype(classifier._extends) : Object.prototype)
-    return Object.defineProperties(proto, descriptors)
+    const proto = Object.create((classifier._extends !== undefined) ? this.getPrototype(classifier._extends).prototype : Object.prototype)
+    return { prototype: Object.defineProperties(proto, descriptors), descriptors }
   }
 
-  private getPrototype (mixin: Ref<Class<Obj>>): Record<string, unknown> {
+  private getPrototype (mixin: Ref<Class<Obj>>): DescriptivePrototype {
     const proto = this.prototypes.get(mixin)
     if (proto === undefined) {
       const proto = this.createPrototype(this.get(mixin))
@@ -486,52 +479,30 @@ export class Model {
     return proto
   }
 
-  private getProperties (mixin: Ref<Class<Obj>>): PropertyDescriptorMap {
-    const model = this.get(mixin)
-    const attributes = model._attributes as { [key: string]: Attribute }
-    const descriptors: PropertyDescriptorMap = {}
-    for (const key in attributes) {
-      const attributeKey = this.attributeKey(model, key)
-      descriptors[key] = {
-        get (this: Proxy) {
-          return this.__layout[attributeKey]
-        },
-        set (this: Proxy, value: any) {
-          this.__layout[attributeKey] = value
-        }
-      }
-    }
-
-    // Override _class to return a mixin value.
-    descriptors._class = {
-      value: model._id,
-      writable: false
-    }
-
-    return descriptors
-  }
-
   /**
-   * Cast to some mixin, if mixin is not present in class list it will not be added.
+   * Cast to class or mixin, if mixin is not present in class list it will not be added.
    * isMixedIn should be used to ensure if mixin is on place, before modifications.
    * @param doc - incoming document
    * @param mixin - a mixin class
    */
-  public as<T extends Obj>(doc: Obj, mixin: Ref<Mixin<T>>): T {
-    if (doc._class === mixin) {
+  public as<T extends Obj>(doc: Obj, _class: Ref<Class<T>>): T {
+    if (doc._class === _class && (doc as any).__layout !== undefined) {
       // If we already have a proper class specified.
       return doc as T
     }
 
-    const mixinClass = this.get(mixin)
-    if (mixinClass._class !== core.class.Mixin) {
-      // Not a mixin class,
-      return doc as T
+    const clazz = this.get(_class)
+    if (clazz._class === core.class.Mixin) {
+      if (!this.isMixedIn(doc, _class)) {
+        throw new Error(`Class ${doc._class} could not be cast to ${_class}`)
+      }
     }
-    if (!this.isMixedIn(doc, mixin)) {
-      throw new Error(`Class ${doc._class} could not be cast to ${mixin}`)
-    }
-    const proxy = Object.create(this.getPrototype(mixin), this.getProperties(mixin)) as Proxy & T
+    return this.asProxy<T>(doc, _class)
+  }
+
+  private asProxy<T extends Obj> (doc: Obj, _class: Ref<Class<T>>): T {
+    const proto = this.getPrototype(_class)
+    const proxy = Object.create(proto.prototype, proto.descriptors) as Proxy & T
     proxy.__layout = (doc as unknown) as Record<string, unknown>
     return proxy
   }
@@ -565,7 +536,7 @@ export class Model {
    * @param doc  document to match against.
    * @param query query to check.
    */
-  matchQuery<T extends Obj>(_class: Ref<Class<T>>, doc: Obj, query: DocumentQuery<T>): boolean {
+  matchQuery (_class: Ref<Class<Obj>>, doc: Obj, query: DocumentQuery<any>): boolean {
     if (!this.is(_class, doc._class)) {
       // Class doesn't match so return false.
       return false
@@ -635,7 +606,7 @@ export class Model {
       if (keyIn) {
         const docValue = l[attrKey]
         if (attr.attr !== undefined) {
-          const mResult = this.matchValue(this.attributeClass(attr.attr.type), docValue, value, fullMatch)
+          const mResult = this.matchValue(docValue, value)
           if (mResult.result) {
             count += 1
           }
@@ -645,17 +616,7 @@ export class Model {
     return count === queryEntries.length
   }
 
-  public attributeClass (type: Type): Ref<Class<Doc>> | undefined {
-    switch (type._class) {
-      case core.class.ArrayOf:
-        return this.attributeClass((type as ArrayOf).of)
-      case core.class.InstanceOf:
-        return ((type as unknown) as Record<string, unknown>).of as Ref<Class<Doc>>
-    }
-    return undefined
-  }
-
-  public matchValue<T extends Obj>(fieldClass: Ref<Class<T>> | undefined, docValue: unknown, value: unknown, fullMatch: boolean): { result: boolean, value?: any } {
+  public matchValue (docValue: unknown, value: unknown): { result: boolean, value?: any } {
     const objDocValue = Object(docValue)
     if (objDocValue !== docValue) {
       // Check if value is primitive, so we will just compare
@@ -675,37 +636,19 @@ export class Model {
     } else {
       // We got two arrays, so let's compare them
       if (docValue instanceof Array && value instanceof Array) {
-        if (docValue.length !== value.length && fullMatch) {
+        if (docValue.length !== value.length) {
           return { result: false }
         }
         let matchValue: any
         for (let i = 0; i < docValue.length; i++) {
-          const val = this.matchValue(fieldClass, docValue[i], value[i], fullMatch)
-          if (!val.result && fullMatch) {
-            return { result: false }
+          const val = this.matchValue(docValue[i], value[i])
+          if (!val.result) {
+            continue
           }
           matchValue = val.value
         }
         // Return in case match is found
         return { result: true, value: matchValue }
-      }
-
-      // We had object, we need to compare inner object, but we need a class
-      if (docValue instanceof Array) {
-        // Match to find exact value present in array
-        for (let i = 0; i < docValue.length; i++) {
-          const val = this.matchValue(fieldClass, docValue[i], value, fullMatch)
-          if (val.result) {
-            return { result: true, value: val.value }
-          }
-        }
-      } else {
-        if (fieldClass !== undefined) {
-          return {
-            result: this.matchObject(fieldClass, docValue as Obj, value as AnyLayout),
-            value: docValue
-          }
-        }
       }
     }
     return { result: false }

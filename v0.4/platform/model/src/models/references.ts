@@ -13,18 +13,24 @@
 // limitations under the License.
 //
 
-import core, { Class, Doc, Ref } from '@anticrm/core'
+import { Class$, Prop, RefTo$ } from '../dsl'
 import domains, { Reference, REFERENCE_DOMAIN } from '@anticrm/domains'
-import { Class$, Prop } from '../dsl'
+import core, { Class, Doc, Emb, Obj, Ref } from '@anticrm/core'
+
 import { TDoc } from './core'
 
 @Class$(domains.class.Reference, core.class.Doc, REFERENCE_DOMAIN)
 export class TReference extends TDoc implements Reference {
-  @Prop() _sourceId?: Ref<Doc>
-  @Prop() _sourceClass!: Ref<Class<Doc>>
-  @Prop() _sourceProps?: Record<string, unknown>
+  @RefTo$(core.class.Doc) _sourceId!: Ref<Doc>
+  @RefTo$(core.class.Class) _sourceClass!: Ref<Class<Doc>>
 
-  @Prop() _targetId?: Ref<Doc>
-  @Prop() _targetClass!: Ref<Class<Doc>>
-  @Prop() _targetProps?: Record<string, unknown>
+  @RefTo$(core.class.Emb) _itemId?: Ref<Emb>
+  @RefTo$(core.class.Class) _itemClass?: Ref<Class<Emb>>
+  @Prop() _collection?: string
+
+  @Prop() _sourceField!: string
+  @Prop() _sourceIndex!: number
+
+  @RefTo$(core.class.Doc) _targetId?: Ref<Obj>
+  @RefTo$(core.class.Class) _targetClass!: Ref<Class<Obj>>
 }

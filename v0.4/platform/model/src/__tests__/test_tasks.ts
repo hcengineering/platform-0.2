@@ -13,10 +13,10 @@
 // limitations under the License.
 //
 
-import core, { MODEL_DOMAIN } from '@anticrm/core'
-import { SubTask, Task, TaskComment, taskIds, TaskMixin } from '@anticrm/core/src/__tests__/tasks'
-import { ArrayOf$, Builder, Class$, InstanceOf$, Primary, Prop } from '..'
-import { Mixin$ } from '../dsl'
+import core, { Collection, MODEL_DOMAIN } from '@anticrm/core'
+import { Task, TaskComment, taskIds, TaskMixin } from '@anticrm/core/src/__tests__/tasks'
+import { Builder, Class$, Prop } from '..'
+import { CollectionOf$, Mixin$, Primary } from '../dsl'
 import { model as globalModel, TDoc, TEmb } from '../__model__'
 
 @Class$(taskIds.class.Task, core.class.Doc, MODEL_DOMAIN)
@@ -28,47 +28,17 @@ export class TTask extends TDoc implements Task {
 
   @Prop() rate!: number
 
-  @ArrayOf$()
-  @Prop()
-  lists!: string[]
-
-  @InstanceOf$(taskIds.class.Subtask) mainTask!: SubTask
-
-  @ArrayOf$()
-  @InstanceOf$(taskIds.class.Subtask)
-  tasks?: SubTask[]
-
-  @ArrayOf$()
-  @InstanceOf$(taskIds.class.TaskComment)
-  comments?: TaskComment[]
-}
-
-@Class$(taskIds.class.Subtask, core.class.Emb, MODEL_DOMAIN)
-export class TSubTask extends TEmb implements SubTask {
-  @Prop() name!: string
-  @Prop() rate!: number
-
-  @ArrayOf$()
-  @InstanceOf$(taskIds.class.TaskComment)
-  comments?: TaskComment[]
+  @CollectionOf$(taskIds.class.TaskComment)
+  comments?: Collection<TaskComment>
 }
 
 @Mixin$(taskIds.mixin.TaskMixin, taskIds.class.Task)
 export class TTaskMixin extends TTask implements TaskMixin {
   @Prop() textValue!: string
-  @ArrayOf$() listValue!: string[]
-
-  @InstanceOf$(taskIds.class.Subtask) embValue!: TaskComment
-
-  @ArrayOf$()
-  @InstanceOf$(taskIds.class.Subtask) embValueList!: TaskComment[]
 }
 
 @Class$(taskIds.class.TaskComment, core.class.Emb, MODEL_DOMAIN)
 export class TTaskComment extends TEmb implements TaskComment {
-  @Prop()
-  _id!: string
-
   @Prop()
   message!: string
 
@@ -77,18 +47,10 @@ export class TTaskComment extends TEmb implements TaskComment {
 
   @Prop()
   date!: Date
-
-  @ArrayOf$()
-  @InstanceOf$(taskIds.class.TaskComment)
-  oldVersion!: TaskComment[]
-}
-
-@Class$(taskIds.class.DerivedTask, taskIds.class.Task, MODEL_DOMAIN)
-export class TDerivedTask extends TTask {
 }
 
 export function model (S: Builder): void {
-  S.add(TTask, TDerivedTask, TSubTask, TTaskComment, TTaskMixin)
+  S.add(TTask, TTaskComment, TTaskMixin)
 }
 
 export function fullModel (S: Builder): void {

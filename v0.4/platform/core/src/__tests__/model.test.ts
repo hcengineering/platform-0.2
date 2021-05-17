@@ -15,10 +15,7 @@
 
 import { describe, expect, it } from '@jest/globals'
 import core from '..'
-import {
-  Attribute, Class,
-  Doc, Mixin, Obj, PropertyType, Ref
-} from '../classes'
+import { Class, Doc, Mixin, Obj, Ref } from '../classes'
 import { mixinFromKey, mixinKey, Model } from '../model'
 import { createTask, data, doc1, Task, taskIds, TaskWithSecond } from './tasks'
 
@@ -28,33 +25,6 @@ describe('matching', () => {
 
   it('match object value', () => {
     expect(model.matchQuery(taskIds.class.Task, doc1, { name: 'my-space' })).toEqual(true)
-  })
-  it('match list value', () => {
-    expect(model.matchQuery(taskIds.class.Task, doc1, { lists: ['val1', 'val2'] })).toEqual(true)
-  })
-
-  it('match embedded value', () => {
-    expect(
-      model.matchQuery(taskIds.class.Task, doc1, {
-        mainTask: {
-          name: 'main-subtask'
-        }
-      })
-    ).toEqual(true)
-  })
-  it('match embedded list value', () => {
-    expect(
-      model.matchQuery(taskIds.class.Task, doc1, {
-        tasks: [
-          {
-            name: 'subtask1'
-          },
-          {
-            rate: 33
-          }
-        ]
-      })
-    ).toEqual(true)
   })
 
   it('match regex value', async () => {
@@ -129,20 +99,13 @@ describe('Model domain', () => {
   it('returns domains', () => {
     expect(model.getDomain(core.class.Class))
       .toEqual('model')
-    expect(model.getDomain('class:core.Title' as Ref<Class<Doc>>))
-      .toEqual('title')
+    // expect(model.getDomain('class:core.Title' as Ref<Class<Doc>>))
+    //   .toEqual('title')
   })
 
   it('throws if domain does not exist', () => {
     expect(() => model.getDomain(core.class.Doc))
       .toThrowError()
-  })
-
-  it('returns classes', () => {
-    expect(model.getClass(core.class.Class))
-      .toEqual(core.class.Class.toString())
-    expect(model.getClass('mixin:core.ShortID' as Ref<Class<Doc>>))
-      .toBe('class:core.VDoc')
   })
 
   it('throws if class cannot be found', () => {
@@ -157,197 +120,23 @@ describe('Model utilities', () => {
 
   it('returns all attributes of class', () => {
     expect(model.getAllAttributes(core.class.Emb).length)
-      .toEqual(1) // It should contain _class
+      .toEqual(2) // It should contain _class
 
-    const getAttrs = (id: string): any => Object.entries<Attribute>(
-      data.find((x: any) => x._id === id)?._attributes ?? {}
-    )
+    const getAttrs = (id: string): any =>
+      data.find((x: any) => x._id === id)?._attributes.items ?? []
 
-    expect(model.getAllAttributes(core.class.Doc).map(m => [m.name, m.attr]))
+    expect(model.getAllAttributes(core.class.Doc).map(m => m.attr))
       .toEqual([
         getAttrs(core.class.Doc),
         getAttrs(core.class.Obj)
-      ].reduce((r, x) => r.concat(x)))
+      ].reduce((r, x) => r.concat(...x)))
 
-    expect(model.getAllAttributes(core.class.Attribute).map(m => [m.name, m.attr]))
+    expect(model.getAllAttributes(core.class.Attribute).map(m => m.attr))
       .toEqual([
         getAttrs(core.class.Attribute),
         getAttrs(core.class.Emb),
         getAttrs(core.class.Obj)
-      ].reduce((r, x) => r.concat(x)))
-  })
-})
-
-describe('Model mixin', () => {
-  const mixin = 'mixin:core.ShortID' as Ref<Mixin<any>>
-
-  it('creates new proto with \'as\' method', () => {
-    const model = new Model('vdocs')
-    model.loadModel(data)
-
-    const shortId = 'short-id'
-    const target = {
-      ...doc1,
-      [mixinKey(mixin, 'shortId')]: shortId
-    }
-    Model.includeMixin(target, mixin)
-    const res = model.as({ ...target }, mixin)
-
-    expect(res.__layout).toEqual(target)
-    expect(res.shortId).toEqual(shortId)
-
-    res.shortId = 'another-short-id'
-
-    expect(res.shortId).toBe('another-short-id')
-  })
-
-  it('reuses proto with \'as\' method', () => {
-    const model = new Model('vdocs')
-    model.loadModel(data)
-
-    const shortId = 'short-id'
-    const target = {
-      ...doc1,
-      [mixinKey(mixin, 'shortId')]: shortId
-    }
-    Model.includeMixin(target, mixin)
-    model.as({ ...target }, mixin)
-    const res = model.as(target, mixin)
-
-    expect(res.__layout).toEqual(target)
-    expect(res.shortId).toEqual(shortId)
-
-    res.shortId = 'another-short-id'
-
-    expect(res.shortId).toBe('another-short-id')
-  })
-
-  it('casts doc', () => {
-    const model = new Model('vdocs')
-    model.loadModel(data)
-
-    const shortId = 'short-id'
-    const target = {
-      ...doc1,
-      [mixinKey(mixin, 'shortId')]: shortId
-    }
-    const res = model.cast({ ...target }, mixin)
-
-    const expectedLayout = {
-      ...target,
-      _mixins: [mixin]
-    }
-
-    expect(res.__layout).toEqual(expectedLayout)
-    expect(res.shortId).toEqual(shortId)
-
-    res.shortId = 'another-short-id'
-
-    expect(res.shortId).toBe('another-short-id')
-  })
-
-  it('checks if mixin list includes target', () => {
-    const model = new Model('vdocs')
-    model.loadModel(data)
-
-    const withMixin = {
-      ...doc1,
-      _mixins: [mixin]
-    }
-
-    expect(model.isMixedIn(doc1, mixin as Ref<Mixin<Doc>>))
-      .toEqual(false)
-    expect(model.isMixedIn(withMixin, mixin as Ref<Mixin<Doc>>))
-      .toEqual(true)
-    expect(model.isMixedIn(withMixin, 'mixin:missing.one' as Ref<Mixin<Doc>>))
-      .toEqual(false)
-  })
-})
-
-describe('Model assign tools', () => {
-  const model = new Model('vdocs')
-  model.loadModel(data)
-
-  it('assigns class if missing', () => {
-    const res = model.assign({}, taskIds.class.Task, {})
-
-    expect(res).toEqual({ _class: taskIds.class.Task })
-  })
-
-  it('doesn\'t change class if it exists', () => {
-    const res = model.assign(
-      { _class: taskIds.class.Task as Ref<Class<Obj>> },
-      taskIds.class.TaskComment as Ref<Class<Obj>>,
-      {}
-    )
-
-    expect(res).toEqual({ _class: taskIds.class.Task })
-  })
-
-  it('assigns own properties', () => {
-    const res = model.assign(
-      {},
-      taskIds.class.Task as Ref<Class<Obj>>,
-      { rate: 42 as PropertyType }
-    )
-
-    expect(res).toEqual({ _class: taskIds.class.Task, rate: 42 })
-  })
-
-  it('assigns mixin properties', () => {
-    const mixin = 'mixin:core.ShortID' as Ref<Mixin<any>>
-    const mKey = mixinKey(mixin, 'shortId')
-    const res = model.assign(
-      {},
-      taskIds.class.Task as Ref<Class<Obj>>,
-      { [mKey]: 42 as PropertyType }
-    )
-
-    expect(res).toEqual({ _class: taskIds.class.Task, [mKey]: 42 })
-  })
-
-  it('creates new doc', () => {
-    const res = model.createDocument(taskIds.class.Task, { name: '', description: '', lists: [], rate: 42 })
-
-    expect(res).toEqual({
-      _id: res._id,
-      description: '',
-      lists: [],
-      name: '',
-      _class: taskIds.class.Task,
-      rate: 42
-    })
-  })
-
-  it('compares classes', () => {
-    expect(model.is(
-      core.class.Doc,
-      core.class.Doc
-    )).toEqual(true)
-
-    expect(model.is(
-      core.class.Doc,
-      core.class.Obj
-    )).toEqual(true)
-
-    expect(model.is(
-      core.class.Obj,
-      core.class.Doc
-    )).toEqual(false)
-  })
-
-  it('dumps properly', () => {
-    const dump = model.dump()
-
-    expect(dump.length).toEqual(data.length)
-    expect(dump).toEqual(expect.arrayContaining(data))
-  })
-
-  it('loads domain properly', async () => {
-    const dump = await model.loadDomain('vdocs')
-
-    expect(dump.length).toEqual(data.length)
-    expect(dump).toEqual(expect.arrayContaining(data))
+      ].reduce((r, x) => r.concat(...x)))
   })
 })
 
@@ -390,19 +179,12 @@ describe('mixin tools', () => {
     const model = new Model('vdocs')
     model.loadModel(data)
 
-    const t: TaskWithSecond = { _class: taskIds.class.Task, name: '', description: '', lists: [], _id: 'qwe' as Ref<Doc>, secondTask: null }
-
-    expect(t.mainTask).not.toEqual(null)
-    expect(t.mainTask).toEqual(undefined)
+    const t: TaskWithSecond = { _class: taskIds.class.Task, name: '', description: '', _id: 'qwe' as Ref<Doc>, secondTask: null }
 
     expect(undefined == null).toBeTruthy()
     expect(undefined === null).toBeFalsy()
     expect(null === undefined).toBeFalsy() // eslint-disable-line
     expect(null == undefined).toBeTruthy() // eslint-disable-line
-
-    expect(t.mainTask == null).toBeTruthy()
-    expect(t.mainTask === null).toBeFalsy()
-    expect(t.mainTask == undefined).toBeTruthy() // eslint-disable-line
 
     expect(t.secondTask === undefined).toBeFalsy()
     expect(t.secondTask === null).toBeTruthy()

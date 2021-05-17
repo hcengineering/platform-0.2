@@ -14,10 +14,10 @@
 //
 
 // T R A N S A C T I O N S
-import core, { AnyLayout, Class, Doc, PrimitiveType, Ref, Tx } from '@anticrm/core'
-import domains, { CreateTx, DeleteTx, ObjectSelector, ObjectTx, ObjectTxDetails, Space, TxOperation, TxOperationKind, TX_DOMAIN, UpdateTx } from '@anticrm/domains'
-import { ArrayOf$, BagOf$, Class$, InstanceOf$, Mixin$, Prop, RefTo$ } from '../dsl'
-import { TDoc, TEmb } from './core'
+import domains, { AddItemTx, ItemTx, TX_DOMAIN, ObjectTx, CreateTx, DeleteTx, UpdateTx, Space, RemoveItemTx, UpdateItemTx } from '@anticrm/domains'
+import core, { AnyLayout, Class, Doc, Emb, Ref, Tx } from '@anticrm/core'
+import { Class$, Prop, RefTo$ } from '../dsl'
+import { TDoc } from './core'
 
 @Class$(core.class.Tx, core.class.Doc, TX_DOMAIN)
 export class TTx extends TDoc implements Tx {
@@ -34,42 +34,38 @@ export class TObjectTx extends TTx implements ObjectTx {
 
 @Class$(domains.class.CreateTx, core.class.Tx, TX_DOMAIN)
 export class TCreateTx extends TObjectTx implements CreateTx {
-  @BagOf$()
-  @Prop() object!: AnyLayout
-}
-
-@Mixin$(domains.mixin.ObjectTxDetails, domains.class.ObjectTx)
-export class TObjectTxDetails extends TObjectTx implements ObjectTxDetails {
-  @Prop() name?: string
-  @Prop() id?: string
-  @Prop() description?: string
-}
-
-@Class$(domains.class.ObjectSelector, core.class.Emb, TX_DOMAIN)
-export class TObjectSelector extends TEmb implements ObjectSelector {
-  @Prop() key!: string
-  @Prop() pattern?: AnyLayout | PrimitiveType
-}
-
-@Class$(domains.class.TxOperation, core.class.Emb, TX_DOMAIN)
-export class TTxOperation extends TEmb implements TxOperation {
-  @Prop() kind!: TxOperationKind
-
-  @ArrayOf$()
-  @InstanceOf$(domains.class.ObjectSelector)
-  selector?: ObjectSelector[]
-
-  // will determine an object or individual value to be updated.
-  @BagOf$()
-  _attributes?: AnyLayout
+  @Prop() attributes!: AnyLayout
 }
 
 @Class$(domains.class.UpdateTx, core.class.Tx, TX_DOMAIN)
 export class TUpdateTx extends TObjectTx implements UpdateTx {
-  @ArrayOf$()
-  @InstanceOf$(domains.class.TxOperation) operations!: TxOperation[]
+  @Prop() attributes!: AnyLayout
 }
 
 @Class$(domains.class.DeleteTx, core.class.Tx, TX_DOMAIN)
 export class TDeleteTx extends TObjectTx implements DeleteTx {
+}
+
+// Collections
+
+@Class$(domains.class.ItemTx, domains.class.ObjectTx, TX_DOMAIN)
+export class TItemTx extends TObjectTx implements ItemTx {
+  @RefTo$(core.class.Emb) _itemId!: Ref<Emb>
+  @RefTo$(core.class.Class) _itemClass!: Ref<Class<Doc>>
+
+  @Prop() _collection!: string
+}
+
+@Class$(domains.class.AddItemTx, domains.class.ItemTx, TX_DOMAIN)
+export class TAddItemTx extends TItemTx implements AddItemTx {
+  @Prop() attributes!: AnyLayout
+}
+
+@Class$(domains.class.UpdateItemTx, domains.class.ItemTx, TX_DOMAIN)
+export class TUpdateItemTx extends TItemTx implements UpdateItemTx {
+  @Prop() attributes!: AnyLayout
+}
+
+@Class$(domains.class.RemoveItemTx, domains.class.ItemTx, TX_DOMAIN)
+export class TRemoveItemTx extends TItemTx implements RemoveItemTx {
 }

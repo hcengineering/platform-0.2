@@ -13,18 +13,16 @@
 // limitations under the License.
 //
 
-import core, { Class, Doc, Emb, MODEL_DOMAIN, Ref, Type } from '@anticrm/core'
-import domains, { Application, ShortID, Space, SpaceUser, Title, TitleSource, TITLE_DOMAIN, VDoc } from '@anticrm/domains'
-import { ArrayOf$, Builder, Class$, InstanceOf$, Mixin$, Primary, Prop, RefTo$ } from '.'
+import core, { Class, Doc, MODEL_DOMAIN, Ref, Type } from '@anticrm/core'
+import domains, { Application, Indices, ShortID, Space, SpaceUser, Title, TitleSource, TITLE_DOMAIN, VDoc, CollectionReference } from '@anticrm/domains'
+import { Builder, Class$, Mixin$, Primary, Prop, RefTo$ } from '.'
 import {
-  TArrayOf, TAttribute, TBagOf, TClass, TClassifier, TDoc, TEmb, TEnum, TEnumLiteral, TEnumOf, TIndexesClass, TInstanceOf,
+  TAttribute, TClass, TClassifier, TCollectionOf, TDoc, TEmb, TEnum, TEnumLiteral, TEnumOf,
   TMixin, TObj,
   TRefTo, TType
 } from './models/core'
 import { TReference } from './models/references'
-import {
-  TCreateTx, TDeleteTx, TObjectSelector, TObjectTx, TObjectTxDetails, TTx, TTxOperation, TUpdateTx
-} from './models/tx'
+import { TAddItemTx, TCreateTx, TDeleteTx, TItemTx, TObjectTx, TRemoveItemTx, TTx, TUpdateItemTx, TUpdateTx } from './models/tx'
 
 export * from './models/core'
 export * from './models/references'
@@ -64,12 +62,12 @@ export class TSpace extends TDoc implements Space {
   @Prop() description!: string
 
   @RefTo$(domains.class.Application) application!: Ref<Application>
-  @InstanceOf$(core.class.Emb) applicationSettings?: Emb
+
+  @Prop() applicationSettings?: any
 
   @Prop() spaceKey!: string
 
-  @ArrayOf$()
-  @InstanceOf$(domains.class.SpaceUser) users!: SpaceUser[]
+  @Prop() users!: SpaceUser[]
 
   @Prop(core.class.Boolean) isPublic!: boolean
 
@@ -102,11 +100,24 @@ export class TTitle extends TDoc implements Title {
   @Prop() source!: TitleSource
 }
 
+@Mixin$(domains.mixin.Indices, core.class.Mixin)
+export class TIndexesClass<T extends Doc> extends TMixin<T> implements Indices {
+  @Prop() primary!: string
+}
+
+@Mixin$(domains.mixin.CollectionReference, core.class.Emb)
+export class TCollectionReference extends TEmb implements CollectionReference {
+  @RefTo$(core.class.Doc) _parentId!: Ref<Doc>
+  @RefTo$(core.class.Class) _parentClass!: Ref<Class<Doc>>
+  @Prop() _collection!: string
+  @RefTo$(domains.class.Space) _parentSpace!: Ref<Space>
+}
+
 export function model (S: Builder): void {
-  S.add(TObj, TEmb, TDoc, TAttribute, TType, TRefTo, TInstanceOf, TEnumOf, TArrayOf, TBagOf, TClassifier, TClass, TMixin, TEnumLiteral, TEnum)
+  S.add(TObj, TEmb, TDoc, TAttribute, TType, TRefTo, TEnumOf, TCollectionOf, TCollectionReference, TClassifier, TClass, TMixin, TEnumLiteral, TEnum)
   S.add(TIndexesClass, TVShortID)
   S.add(TStringType, TNumberType, TBooleanType, TDateType)
   S.add(TVDoc, TReference, TTitle, TApplication)
-  S.add(TTx, TCreateTx, TUpdateTx, TDeleteTx, TTxOperation, TObjectSelector, TObjectTx, TObjectTxDetails)
+  S.add(TTx, TCreateTx, TUpdateTx, TDeleteTx, TObjectTx, TAddItemTx, TUpdateItemTx, TRemoveItemTx, TItemTx)
   S.add(TSpace, TSpaceUser)
 }

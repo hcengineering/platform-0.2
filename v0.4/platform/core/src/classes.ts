@@ -18,32 +18,40 @@ export type PrimitiveType = number | string | boolean | undefined
 export type Ref<T extends Doc> = string & { __ref: T }
 
 export interface Obj {
+  _id: Ref<Obj>
   _class: Ref<Class<Obj>>
   _mixins?: Array<Ref<Mixin<Obj>>>
 }
 
 export interface Emb extends Obj {
+  _id: Ref<Emb>
   _class: Ref<Class<Emb>>
 }
 
 export interface Doc extends Obj {
-  _class: Ref<Class<Doc>>
   _id: Ref<Doc>
+  _class: Ref<Class<Doc>>
+}
+
+// Collections
+
+/**
+ * Interface to define a collection of embedded objects associated with object.
+ */
+export interface Collection<T> {
+  items?: T[]
 }
 
 export type PropertyType = PrimitiveType| Ref<Doc> | Emb | PropertyType[] | { [key: string]: PropertyType }
 
 // An attribute type with some defined mixins inside.
-export interface Type extends Emb {
+export interface Type extends Obj {
   _default?: PropertyType
 }
 
 export interface Attribute extends Emb {
   type: Type
 }
-
-export type Attributes<T extends E, E extends Obj> = Record<Exclude<keyof T, keyof E>, Attribute>
-export type AllAttributes<T extends E, E extends Obj> = Required<Attributes<T, E>> & Partial<Attributes<E, Obj>>
 
 export enum ClassifierKind {
   CLASS,
@@ -55,37 +63,32 @@ export interface Classifier extends Doc {
   _kind: ClassifierKind
 }
 
-export interface EMixin<T extends E, E extends Obj> extends EClass<T, E> {
+export interface EMixin<T extends Obj> extends EClass<T> {
 }
 
-export type Mixin<T extends Obj> = EMixin<T, Obj>
+export type Mixin<T extends Obj> = EMixin<T>
 
 export interface EDomainClassifier {
   _domain?: string
 }
 
-export interface EClass<T extends E, E extends Obj> extends Classifier, EDomainClassifier {
-  _attributes: AllAttributes<T, E>
+export interface EClass<E extends Obj> extends Classifier, EDomainClassifier {
+  _attributes: Collection<Attribute>
   _extends?: Ref<Class<E>>
 
   _native?: string
 }
 
-export type Class<T extends Obj> = EClass<T, Obj>
+export type Class<T extends Obj> = EClass<T>
 
 export interface EnumLiteral extends Emb {
   label: string
   ordinal: string | number
 }
 
-export type EnumKey = string | number | symbol
-export type EnumLiterals<T extends EnumKey, E extends EnumLiteral> = { [Q in T]: E }
-
-export interface EEnum<T extends EnumKey, E extends EnumLiteral> extends Classifier {
-  _literals: EnumLiterals<T, E>
+export interface Enum extends Classifier {
+  _literals: Collection<EnumLiteral>
 }
-
-export type Enum<T extends EnumKey> = EEnum<T, EnumLiteral>
 
 // T Y P E S
 
@@ -93,20 +96,12 @@ export interface RefTo<T extends Doc> extends Type {
   to: Ref<Class<T>>
 }
 
-export interface EnumOf<T extends EnumKey> extends Type {
-  of: Ref<Enum<T>>
+export interface EnumOf extends Type {
+  of: Ref<Enum>
 }
 
-export interface InstanceOf<T extends Emb> extends Type {
+export interface CollectionOf<T extends Emb> extends Type {
   of: Ref<Class<T>>
-}
-
-export interface BagOf extends Type {
-  of: Type
-}
-
-export interface ArrayOf extends Type {
-  of: Type
 }
 
 ///

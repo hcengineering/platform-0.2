@@ -13,13 +13,14 @@
 // limitations under the License.
 //
 
-import { Class, Mixin, Ref, Tx } from '@anticrm/core'
+import { Class, Mixin, Ref } from '@anticrm/core'
 import { Component, identify } from '@anticrm/status'
+import { CollectionReference } from './collection'
 import { Indices } from './primary'
 import { Reference, ShortID } from './references'
 import { Application, Space, SpaceUser } from './space'
 import { Title } from './title'
-import { CreateTx, DeleteTx, ObjectSelector, ObjectTx, ObjectTxDetails, TxOperation, UpdateTx } from './tx'
+import { AddItemTx, CreateTx, DeleteTx, ItemTx, ObjectTx, RemoveItemTx, UpdateItemTx, UpdateTx } from './tx'
 import { VDoc } from './vdoc'
 
 export default identify('core' as Component, {
@@ -31,28 +32,31 @@ export default identify('core' as Component, {
     Title: '' as Ref<Class<Title>>,
     VDoc: '' as Ref<Class<VDoc>>,
 
-    Tx: '' as Ref<Class<Tx>>,
     ObjectTx: '' as Ref<Class<ObjectTx>>,
-    ObjectSelector: '' as Ref<Class<ObjectSelector>>,
+    ItemTx: '' as Ref<Class<ItemTx>>,
 
     CreateTx: '' as Ref<Class<CreateTx>>,
     UpdateTx: '' as Ref<Class<UpdateTx>>,
-    TxOperation: '' as Ref<Class<TxOperation>>,
-    DeleteTx: '' as Ref<Class<DeleteTx>>
+    DeleteTx: '' as Ref<Class<DeleteTx>>,
+
+    AddItemTx: '' as Ref<Class<AddItemTx>>,
+    UpdateItemTx: '' as Ref<Class<UpdateItemTx>>,
+    RemoveItemTx: '' as Ref<Class<RemoveItemTx>>
   },
   mixin: {
     Indices: '' as Ref<Mixin<Indices>>,
     ShortID: '' as Ref<Mixin<ShortID>>,
-
-    ObjectTxDetails: '' as Ref<Mixin<ObjectTxDetails>>
+    CollectionReference: '' as Ref<Mixin<CollectionReference>>
   }
 })
 
 export * from './model_storage'
+export * from './tx'
 export * from './primary'
 export * from './primary_utils'
 export * from './references'
 export * from './space'
 export * from './title'
-export * from './tx'
 export * from './vdoc'
+export * from './tx_utils'
+export * from './collection'

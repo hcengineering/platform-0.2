@@ -15,8 +15,8 @@
 
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import core, {
-  AnyLayout, ArrayOf, Attribute, BagOf, Class, Classifier, ClassifierKind, Doc, Emb, Enum, EnumKey, EnumLiteral,
-  EnumLiterals, EnumOf, InstanceOf, Mixin, Model, MODEL_DOMAIN, Obj, Ref, RefTo, Type
+  AnyLayout, Attribute, Class, Classifier, ClassifierKind, CollectionOf, Doc, Emb, Enum, EnumLiteral,
+  EnumOf, Mixin, Model, MODEL_DOMAIN, Obj, Ref, RefTo, Type
 } from '@anticrm/core'
 import domains from '@anticrm/domains'
 import 'reflect-metadata'
@@ -51,7 +51,7 @@ function getClassifier<T extends Doc> (target: any, factory: () => Partial<T>): 
 export function getClass (target: any): ClassifierDefinition<Class<Obj>> {
   return getClassifier<Class<Obj>>(target, () => {
     return {
-      _attributes: {},
+      _attributes: { items: [] }, // Internal persistence is array
       _class: core.class.Class,
       _kind: ClassifierKind.CLASS
     }
@@ -63,10 +63,10 @@ export function isKindOf (target: any, kind: ClassifierKind): boolean {
   return classifier !== undefined && classifier.doc._kind === kind
 }
 
-export function getEnum (target: any): ClassifierDefinition<Enum<any>> {
-  return getClassifier<Enum<any>>(target, () => {
+export function getEnum (target: any): ClassifierDefinition<Enum> {
+  return getClassifier<Enum>(target, () => {
     return {
-      _literals: {},
+      _literals: { items: [] },
       _class: core.class.Enum,
       _kind: ClassifierKind.ENUM
     }
@@ -75,24 +75,27 @@ export function getEnum (target: any): ClassifierDefinition<Enum<any>> {
 
 export function getAttribute (target: any, propertyKey: string): Attribute {
   const classifier = getClass(target).doc
-  let attribute = (classifier._attributes as any)[propertyKey] as Attribute
+  let attribute = classifier._attributes?.items?.find(p => p._id === propertyKey)
   if (attribute === undefined) {
     attribute = {
+      _id: propertyKey,
       _class: core.class.Attribute
     } as unknown as Attribute
-    (classifier._attributes as any)[propertyKey] = attribute
+    classifier._attributes.items?.push(attribute)
   }
   return attribute
 }
 
 export function getEnumLiteral (target: any, propertyKey: string): EnumLiteral {
   const enumValue = getEnum(target).doc
-  let literal = (enumValue._literals as any)[propertyKey] as EnumLiteral
+  let literal = enumValue._literals?.items?.find(p => p._id === propertyKey)
   if (literal === undefined) {
     literal = {
+      _id: propertyKey,
+      label: propertyKey,
       _class: core.class.EnumLiteral
     } as unknown as EnumLiteral
-    (enumValue._literals as any)[propertyKey] = literal
+    enumValue._literals.items?.push(literal)
   }
   return literal
 }
@@ -158,7 +161,7 @@ export function Mixin$<E extends Obj, T extends E> (id: Ref<Mixin<T>>, _extends:
   }
 }
 
-export function Enum$<T extends EnumLiterals<E, EnumLiteral>, E extends EnumKey> (id: Ref<Enum<E>>) {
+export function Enum$<T extends Enum> (id: Ref<Enum>) {
   return function classDecorator<C extends new () => T> (constructor: C): void {
     const classifier = getEnum(constructor.prototype).doc
     classifier._id = id
@@ -179,6 +182,7 @@ export function RefTo$ (to: Ref<Class<Doc>>) {
   return function (target: any, propertyKey: string): void {
     const attribute = getAttribute(target, propertyKey)
     const type = {
+      _id: propertyKey as Ref<Obj>,
       _class: core.class.RefTo,
       to: to
     } as unknown as RefTo<Doc>
@@ -186,26 +190,15 @@ export function RefTo$ (to: Ref<Class<Doc>>) {
   }
 }
 
-export function EnumOf$ (of: Ref<Enum<any>>) {
+export function EnumOf$ (of: Ref<Enum>) {
   return function (target: any, propertyKey: string): void {
     const attribute = getAttribute(target, propertyKey)
     const type = {
+      _id: propertyKey as Ref<Obj>,
       _class: core.class.EnumOf,
       of
-    } as unknown as EnumOf<EnumKey>
+    } as unknown as EnumOf
     attribute.type = type
-  }
-}
-
-export function BagOf$ () {
-  return function (target: any, propertyKey: string): void {
-    const attribute = getAttribute(target, propertyKey)
-    const type = attribute.type ?? { _class: core.class.Type } as unknown as Type
-    const arr = {
-      _class: core.class.BagOf,
-      of: type
-    } as unknown as BagOf
-    attribute.type = arr
   }
 }
 
@@ -213,25 +206,14 @@ export function BagOf$ () {
  * Mark attribute as collection, if attribute already had type,
  * it will be wrapped inside.
  */
-export function ArrayOf$ () {
+export function CollectionOf$<T extends Emb> (of: Ref<Class<T>>) {
   return function (target: any, propertyKey: string): void {
     const attribute = getAttribute(target, propertyKey)
-    const type = attribute.type ?? { _class: core.class.Type } as unknown as Type
-    const arr = {
-      _class: core.class.ArrayOf,
-      of: type
-    } as unknown as ArrayOf
-    attribute.type = arr
-  }
-}
-
-export function InstanceOf$<T extends Emb> (of: Ref<Class<T>>) {
-  return function (target: any, propertyKey: string): void {
-    const attribute = getAttribute(target, propertyKey)
-    const arr = {
-      _class: core.class.InstanceOf,
+    const arr: CollectionOf<T> = {
+      _id: propertyKey as Ref<Obj>,
+      _class: core.class.CollectionOf,
       of
-    } as unknown as InstanceOf<T>
+    }
     attribute.type = arr
   }
 }
