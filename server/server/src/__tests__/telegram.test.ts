@@ -22,6 +22,7 @@ describe('service', () => {
   })
 
   it('signIn', async () => {
+    if (process.env.TELEGRAM_API_ID === undefined) return
     // Hardcode input parameters
     const phone = '+9996621111'
     const confirmCode = '222222'
@@ -36,6 +37,8 @@ describe('service', () => {
   })
 
   it('multiple login', async () => {
+    if (process.env.TELEGRAM_API_ID === undefined) return
+
     // Hardcode input parameters
     const phoneVasya = '+9996623333'
     const confirmCodeVasya = '222222'
