@@ -2,10 +2,13 @@ dependencies:
   '@babel/eslint-parser': 7.13.14
   '@babel/runtime': 7.13.10
   '@jest/globals': 26.6.2
+  '@rush-temp/client': file:projects/client.tgz_ts-node@9.1.1
   '@rush-temp/core': file:projects/core.tgz_ts-node@9.1.1
   '@rush-temp/domains': file:projects/domains.tgz_ts-node@9.1.1
   '@rush-temp/model': file:projects/model.tgz
   '@rush-temp/platform': file:projects/platform.tgz_6a150cea3e356ecb9f49d2cbc8bd3b95
+  '@rush-temp/platform-core': file:projects/platform-core.tgz_ts-node@9.1.1
+  '@rush-temp/platform-core-impl': file:projects/platform-core-impl.tgz_ts-node@9.1.1
   '@rush-temp/plugin-login': file:projects/plugin-login.tgz_@typescript-eslint+parser@4.22.0
   '@rush-temp/plugin-login-impl': file:projects/plugin-login-impl.tgz_@typescript-eslint+parser@4.22.0
   '@rush-temp/plugin-workbench': file:projects/plugin-workbench.tgz_@typescript-eslint+parser@4.22.0
@@ -45,7 +48,8 @@ dependencies:
   sass-loader: 11.0.1_sass@1.32.8+webpack@5.32.0
   simplytyped: 3.3.0
   style-loader: 2.0.0_webpack@5.32.0
-  svelte-loader: 3.1.0
+  svelte: 3.38.2
+  svelte-loader: 3.1.0_svelte@3.38.2
   svgo-loader: 3.0.0
   ts-loader: 8.1.0_webpack@5.32.0
   ts-node: 9.1.1
@@ -2046,7 +2050,7 @@ packages:
   /@jest/console/26.6.2:
     dependencies:
       '@jest/types': 26.6.2
-      '@types/node': 15.0.2
+      '@types/node': 15.3.0
       chalk: 4.1.1
       jest-message-util: 26.6.2
       jest-util: 26.6.2
@@ -2063,7 +2067,7 @@ packages:
       '@jest/test-result': 26.6.2
       '@jest/transform': 26.6.2
       '@jest/types': 26.6.2
-      '@types/node': 15.0.2
+      '@types/node': 15.3.0
       ansi-escapes: 4.3.2
       chalk: 4.1.1
       exit: 0.1.2
@@ -2421,7 +2425,7 @@ packages:
       integrity: sha512-Vs0hm0vPahPMYi9tDjtP66llufgO3ST16WXaSTtDGEl9cewAl3AibmxWw6TINOqHPT9z0uABKAYjT9jNSg4npw==
   /@types/bson/4.0.3:
     dependencies:
-      '@types/node': 15.0.2
+      '@types/node': 15.3.0
     dev: false
     resolution:
       integrity: sha512-mVRvYnTOZJz3ccpxhr3wgxVmSeiYinW+zlzQz3SXWaJmD1DuL05Jeq7nKw3SnbKmbleW5qrLG5vdyWe/A9sXhw==
@@ -2452,7 +2456,7 @@ packages:
       integrity: sha512-SEYeGAIQIQX8NN6LDKprLjbrd5dARM5EXsd8GI/A5l0apYI1fGMWgPHSe4ZKL4eozlAyI+doUE9XbYS4xCkQ1w==
   /@types/graceful-fs/4.1.5:
     dependencies:
-      '@types/node': 15.0.2
+      '@types/node': 15.3.0
     dev: false
     resolution:
       integrity: sha512-anKkLmZZ+xm4p8JWBf4hElkM4XR+EZeA2M9BAkkTldmcyDY4mbdIJnRghDJH3Ov5ooY7/UAoENtmdMSkaAd7Cw==
@@ -2533,7 +2537,7 @@ packages:
   /@types/mongodb/3.6.12:
     dependencies:
       '@types/bson': 4.0.3
-      '@types/node': 15.0.2
+      '@types/node': 15.3.0
     dev: false
     resolution:
       integrity: sha512-49aEzQD5VdHPxyd5dRyQdqEveAg9LanwrH8RQipnMuulwzKmODXIZRp0umtxi1eBUfEusRkoy8AVOMr+kVuFog==
@@ -2549,6 +2553,10 @@ packages:
     dev: false
     resolution:
       integrity: sha512-p68+a+KoxpoB47015IeYZYRrdqMUcpbK8re/zpFB8Ld46LHC1lPEbp3EXgkEhAYEcPvjJF6ZO+869SQ0aH1dcA==
+  /@types/node/15.3.0:
+    dev: false
+    resolution:
+      integrity: sha512-8/bnjSZD86ZfpBsDlCIkNXIvm+h6wi9g7IqL+kmFkQ+Wvu3JrasgLElfiPgoo8V8vVfnEi0QVS12gbl94h9YsQ==
   /@types/normalize-package-data/2.4.0:
     dev: false
     resolution:
@@ -2567,7 +2575,7 @@ packages:
       integrity: sha512-PG5aLpW6PJOeV2fHRslP4IOMWn+G+Uq8CfnyJ+PDS8ndCbU+soO+fB3NKCKo0p/Jh2Y4aPaiQZsrOXFdzpcA6g==
   /@types/sass/1.16.0:
     dependencies:
-      '@types/node': 15.0.2
+      '@types/node': 15.3.0
     dev: false
     resolution:
       integrity: sha512-2XZovu4NwcqmtZtsBR5XYLw18T8cBCnU2USFHTnYLLHz9fkhnoEMoDsqShJIOFsFhn5aJHjweiUUdTrDGujegA==
@@ -6666,7 +6674,7 @@ packages:
       '@jest/environment': 26.6.2
       '@jest/fake-timers': 26.6.2
       '@jest/types': 26.6.2
-      '@types/node': 15.0.2
+      '@types/node': 15.3.0
       jest-mock: 26.6.2
       jest-util: 26.6.2
       jsdom: 16.5.3
@@ -6680,7 +6688,7 @@ packages:
       '@jest/environment': 26.6.2
       '@jest/fake-timers': 26.6.2
       '@jest/types': 26.6.2
-      '@types/node': 15.0.2
+      '@types/node': 15.3.0
       jest-mock: 26.6.2
       jest-util: 26.6.2
     dev: false
@@ -6698,7 +6706,7 @@ packages:
     dependencies:
       '@jest/types': 26.6.2
       '@types/graceful-fs': 4.1.5
-      '@types/node': 15.0.2
+      '@types/node': 15.3.0
       anymatch: 3.1.2
       fb-watchman: 2.0.1
       graceful-fs: 4.2.6
@@ -6723,7 +6731,7 @@ packages:
       '@jest/source-map': 26.6.2
       '@jest/test-result': 26.6.2
       '@jest/types': 26.6.2
-      '@types/node': 15.0.2
+      '@types/node': 15.3.0
       chalk: 4.1.1
       co: 4.6.0
       expect: 26.6.2
@@ -6838,7 +6846,7 @@ packages:
       '@jest/environment': 26.6.2
       '@jest/test-result': 26.6.2
       '@jest/types': 26.6.2
-      '@types/node': 15.0.2
+      '@types/node': 15.3.0
       chalk: 4.1.1
       emittery: 0.7.2
       exit: 0.1.2
@@ -6900,7 +6908,7 @@ packages:
       integrity: sha512-lrzyR3N8sacTAMeonbqpnSka1dHNux2uk0qqDXVkMv2c/A3wYnvQ4EXuI013Y6+gSKSCxdaczvf4HF0mVXHRdw==
   /jest-serializer/26.6.2:
     dependencies:
-      '@types/node': 15.0.2
+      '@types/node': 15.3.0
       graceful-fs: 4.2.6
     dev: false
     engines:
@@ -6960,7 +6968,7 @@ packages:
     dependencies:
       '@jest/test-result': 26.6.2
       '@jest/types': 26.6.2
-      '@types/node': 15.0.2
+      '@types/node': 15.3.0
       ansi-escapes: 4.3.2
       chalk: 4.1.1
       jest-util: 26.6.2
@@ -9541,20 +9549,6 @@ packages:
     dev: false
     resolution:
       integrity: sha1-fRh9tcbNu9ZNdaMvkbiZi94yc8M=
-  /svelte-hmr/0.12.9:
-    dev: false
-    peerDependencies:
-      svelte: '>=3.19.0'
-    resolution:
-      integrity: sha512-SGE7Odznj4dqZtUVIWcoPCvZ9gHImxVIIjrz+O3DDSi0j4OaSLim6MRF4UdhlBKeW3glSRc+tXNSKYvM5x+Dyw==
-  /svelte-hmr/0.12.9_svelte@3.37.0:
-    dependencies:
-      svelte: 3.37.0
-    dev: false
-    peerDependencies:
-      svelte: '>=3.19.0'
-    resolution:
-      integrity: sha512-SGE7Odznj4dqZtUVIWcoPCvZ9gHImxVIIjrz+O3DDSi0j4OaSLim6MRF4UdhlBKeW3glSRc+tXNSKYvM5x+Dyw==
   /svelte-hmr/0.12.9_svelte@3.38.2:
     dependencies:
       svelte: 3.38.2
@@ -9563,27 +9557,6 @@ packages:
       svelte: '>=3.19.0'
     resolution:
       integrity: sha512-SGE7Odznj4dqZtUVIWcoPCvZ9gHImxVIIjrz+O3DDSi0j4OaSLim6MRF4UdhlBKeW3glSRc+tXNSKYvM5x+Dyw==
-  /svelte-loader/3.1.0:
-    dependencies:
-      loader-utils: 2.0.0
-      svelte-dev-helper: 1.1.9
-      svelte-hmr: 0.12.9
-    dev: false
-    peerDependencies:
-      svelte: '>3.0.0'
-    resolution:
-      integrity: sha512-KOst7tLtYPDXl3q7W1d3kezPapDyNZ/WJZypgKfqplTYS1ia/zdsgJBMnWrOQfec+8W9pInOngsJ8CUF9ejDDA==
-  /svelte-loader/3.1.0_svelte@3.37.0:
-    dependencies:
-      loader-utils: 2.0.0
-      svelte: 3.37.0
-      svelte-dev-helper: 1.1.9
-      svelte-hmr: 0.12.9_svelte@3.37.0
-    dev: false
-    peerDependencies:
-      svelte: '>3.0.0'
-    resolution:
-      integrity: sha512-KOst7tLtYPDXl3q7W1d3kezPapDyNZ/WJZypgKfqplTYS1ia/zdsgJBMnWrOQfec+8W9pInOngsJ8CUF9ejDDA==
   /svelte-loader/3.1.0_svelte@3.38.2:
     dependencies:
       loader-utils: 2.0.0
@@ -9655,57 +9628,6 @@ packages:
       sass: 1.32.8
       strip-indent: 3.0.0
       svelte: 3.38.2
-      typescript: 4.2.4
-    dev: false
-    engines:
-      node: '>= 9.11.2'
-    peerDependencies:
-      '@babel/core': ^7.10.2
-      coffeescript: ^2.5.1
-      less: ^3.11.3
-      node-sass: '*'
-      postcss: ^7 || ^8
-      postcss-load-config: ^2.1.0 || ^3.0.0
-      pug: ^3.0.0
-      sass: ^1.26.8
-      stylus: ^0.54.7
-      sugarss: ^2.0.0
-      svelte: ^3.23.0
-      typescript: ^3.9.5 || ^4.0.0
-    peerDependenciesMeta:
-      '@babel/core':
-        optional: true
-      coffeescript:
-        optional: true
-      less:
-        optional: true
-      node-sass:
-        optional: true
-      postcss:
-        optional: true
-      postcss-load-config:
-        optional: true
-      pug:
-        optional: true
-      sass:
-        optional: true
-      stylus:
-        optional: true
-      sugarss:
-        optional: true
-      typescript:
-        optional: true
-    requiresBuild: true
-    resolution:
-      integrity: sha512-iNrY4YGqi0LD2e6oT9YbdSzOKntxk8gmzfqso1z/lUJOZh4o6fyIqkirmiZ8/dDJFqtIE1spVgDFWgkfhLEYlw==
-  /svelte-preprocess/4.7.0_755c64f2becf501be7ee6738a692cc1e:
-    dependencies:
-      '@types/pug': 2.0.4
-      '@types/sass': 1.16.0
-      detect-indent: 6.0.0
-      sass: 1.32.8
-      strip-indent: 3.0.0
-      svelte: 3.37.0
       typescript: 4.2.4
     dev: false
     engines:
@@ -10926,6 +10848,33 @@ packages:
       commander: 2.20.3
     resolution:
       integrity: sha512-DUOKC/IhbkdLKKiV89gw9DUauTV8U/8yJl1sjf6MtDmzevLKOF2duNJ495S3MFVjqZarr+qNGCPbkg4mu4PpLw==
+  file:projects/client.tgz_ts-node@9.1.1:
+    dependencies:
+      '@babel/eslint-parser': 7.13.14_eslint@7.26.0
+      '@babel/preset-typescript': 7.13.0
+      '@microsoft/api-extractor': 7.15.1
+      '@types/jest': 26.0.23
+      '@typescript-eslint/eslint-plugin': 4.22.0_d80b53217345f120a8ed26af05eed18b
+      '@typescript-eslint/parser': 4.22.0_eslint@7.26.0+typescript@4.2.4
+      eslint: 7.26.0
+      eslint-config-standard: 16.0.2_61607de6243cb180ff47de604508b5ce
+      eslint-config-standard-with-typescript: 20.0.0_9fe81157bbbed76473c2f4cb3bb705dd
+      eslint-plugin-import: 2.22.1_eslint@7.26.0
+      eslint-plugin-node: 11.1.0_eslint@7.26.0
+      eslint-plugin-promise: 5.1.0_eslint@7.26.0
+      eslint-plugin-standard: 5.0.0_eslint@7.26.0
+      jest: 26.6.3_ts-node@9.1.1
+      ts-jest: 26.5.6_jest@26.6.3+typescript@4.2.4
+      typescript: 4.2.4
+    dev: false
+    id: file:projects/client.tgz
+    name: '@rush-temp/client'
+    peerDependencies:
+      ts-node: '*'
+    resolution:
+      integrity: sha512-7TLta7Z00RsGDpMpz3qC+ef1fJA3wmwUkXDm17+DqGf1w7lCxUhhFcnfnFA72BD8AXHlhjxfVISHUdC1sUDWOA==
+      tarball: file:projects/client.tgz
+    version: 0.0.0
   file:projects/core.tgz_ts-node@9.1.1:
     dependencies:
       '@babel/eslint-parser': 7.13.14_eslint@7.26.0
@@ -10982,7 +10931,7 @@ packages:
     peerDependencies:
       ts-node: '*'
     resolution:
-      integrity: sha512-CNAM4cTPYUb2bKQP/RGKG1IeBTuO3+QewyIlxBc0U/898Id1ZcgrmuKJt/nfUaeQmAak0teWQFt3CJ9ITO2q9g==
+      integrity: sha512-S26zdOu2zEUzSoebsooYpxqeWd47fPfb/VdB5Jx/nzhGAWoBBLj6Nv4HWqv0fzv0oa1L6/ebW3943RKbw0HxHw==
       tarball: file:projects/domains.tgz
     version: 0.0.0
   file:projects/model.tgz:
@@ -11010,8 +10959,63 @@ packages:
     dev: false
     name: '@rush-temp/model'
     resolution:
-      integrity: sha512-3dKD3WPX6OORA0HLLtSnaZ5iYhl9nTJagPFLc3qsnqGORpg+towA4YDFPTwol+sE5NG32nYy8Pj18EVTujuVXw==
+      integrity: sha512-xZBSxnh8bLcjzosFsySQtjgJ72JaA0zkhESkqoY/Ka05tOSA+esT6SPsTgPMiXuYP82Z1DbejV5FA7/1vZiMcA==
       tarball: file:projects/model.tgz
+    version: 0.0.0
+  file:projects/platform-core-impl.tgz_ts-node@9.1.1:
+    dependencies:
+      '@babel/eslint-parser': 7.13.14_eslint@7.26.0
+      '@babel/preset-typescript': 7.13.0
+      '@microsoft/api-extractor': 7.15.1
+      '@types/jest': 26.0.23
+      '@types/node': 15.3.0
+      '@typescript-eslint/eslint-plugin': 4.22.0_d80b53217345f120a8ed26af05eed18b
+      '@typescript-eslint/parser': 4.22.0_eslint@7.26.0+typescript@4.2.4
+      eslint: 7.26.0
+      eslint-config-standard: 16.0.2_61607de6243cb180ff47de604508b5ce
+      eslint-config-standard-with-typescript: 20.0.0_9fe81157bbbed76473c2f4cb3bb705dd
+      eslint-plugin-import: 2.22.1_eslint@7.26.0
+      eslint-plugin-node: 11.1.0_eslint@7.26.0
+      eslint-plugin-promise: 5.1.0_eslint@7.26.0
+      eslint-plugin-standard: 5.0.0_eslint@7.26.0
+      jest: 26.6.3_ts-node@9.1.1
+      ts-jest: 26.5.6_jest@26.6.3+typescript@4.2.4
+      typescript: 4.2.4
+    dev: false
+    id: file:projects/platform-core-impl.tgz
+    name: '@rush-temp/platform-core-impl'
+    peerDependencies:
+      ts-node: '*'
+    resolution:
+      integrity: sha512-mfvrtz8v6CWWfLO+tTsq6sAaEGeYK2qMEB/SpR0KPAFdtrx9KyD32bwqKwwagKq4J9KzOuSvDLQmq6mrbx1USA==
+      tarball: file:projects/platform-core-impl.tgz
+    version: 0.0.0
+  file:projects/platform-core.tgz_ts-node@9.1.1:
+    dependencies:
+      '@babel/eslint-parser': 7.13.14_eslint@7.26.0
+      '@babel/preset-typescript': 7.13.0
+      '@microsoft/api-extractor': 7.15.1
+      '@types/jest': 26.0.23
+      '@typescript-eslint/eslint-plugin': 4.22.0_d80b53217345f120a8ed26af05eed18b
+      '@typescript-eslint/parser': 4.22.0_eslint@7.26.0+typescript@4.2.4
+      eslint: 7.26.0
+      eslint-config-standard: 16.0.2_61607de6243cb180ff47de604508b5ce
+      eslint-config-standard-with-typescript: 20.0.0_9fe81157bbbed76473c2f4cb3bb705dd
+      eslint-plugin-import: 2.22.1_eslint@7.26.0
+      eslint-plugin-node: 11.1.0_eslint@7.26.0
+      eslint-plugin-promise: 5.1.0_eslint@7.26.0
+      eslint-plugin-standard: 5.0.0_eslint@7.26.0
+      jest: 26.6.3_ts-node@9.1.1
+      ts-jest: 26.5.6_jest@26.6.3+typescript@4.2.4
+      typescript: 4.2.4
+    dev: false
+    id: file:projects/platform-core.tgz
+    name: '@rush-temp/platform-core'
+    peerDependencies:
+      ts-node: '*'
+    resolution:
+      integrity: sha512-m6HrdZSWAXh+00o3V/xUSRoMU/ulOB5Y3x61UissWmRut66ivGW9TPV2f+0JSe3L57pscf1PhdfjNhTyZw06zA==
+      tarball: file:projects/platform-core.tgz
     version: 0.0.0
   file:projects/platform.tgz_6a150cea3e356ecb9f49d2cbc8bd3b95:
     dependencies:
@@ -11037,7 +11041,7 @@ packages:
       '@typescript-eslint/parser': '*'
       ts-node: '*'
     resolution:
-      integrity: sha512-cdjDFml9IAWvKXW09hB05+Fzp/tuetSRzRjyjo5hWbb4bXYu1vGLrhQGt4XD7SIjIs9yId2itUNbeaOYA+jOSw==
+      integrity: sha512-+rNoetBMCHU6Kjkcp3+WBPvXxEVrmHc3hMURdg4SpAPfGOB3pI94MNX7grpE1+S/yEaUu1vMgvlq27YhF8qi1A==
       tarball: file:projects/platform.tgz
     version: 0.0.0
   file:projects/plugin-login-impl.tgz_@typescript-eslint+parser@4.22.0:
@@ -11047,9 +11051,9 @@ packages:
       '@microsoft/api-extractor': 7.13.5
       prettier: 2.2.1
       sass: 1.32.8
-      svelte: 3.37.0
-      svelte-loader: 3.1.0_svelte@3.37.0
-      svelte-preprocess: 4.7.0_755c64f2becf501be7ee6738a692cc1e
+      svelte: 3.38.2
+      svelte-loader: 3.1.0_svelte@3.38.2
+      svelte-preprocess: 4.7.0_1db119eebc53bae9e70b18dfdde1067d
       ts-standard: 10.0.0_982c0164c2c03b5f966b085495de6301
       typescript: 4.2.4
     dev: false
@@ -11058,7 +11062,7 @@ packages:
     peerDependencies:
       '@typescript-eslint/parser': '*'
     resolution:
-      integrity: sha512-eJgLXPpPGTJcf4IX0fSamuZV0lLSSY0hPk1RBkMbvUd40QyEsEdVJJ5+UPQLM8FgiMRZg9zle8H69Rd10JEczQ==
+      integrity: sha512-IWiiSqSg85b2gmuBYn9gFUIRNmTyKxWmocvvULGMcel2oYDu9Bczw2nsdwpbi2IW1ZN5qttg3CVl6puWcvgi3A==
       tarball: file:projects/plugin-login-impl.tgz
     version: 0.0.0
   file:projects/plugin-login.tgz_@typescript-eslint+parser@4.22.0:
@@ -11074,7 +11078,7 @@ packages:
     peerDependencies:
       '@typescript-eslint/parser': '*'
     resolution:
-      integrity: sha512-1snkoHpD3hfxlohAJht7BkSsdTz336PWcYeyzu8GSfc3vofQqzpXYsseWQyBzcrwyuZq9dUZxLsQzTNw9oG4OQ==
+      integrity: sha512-LiD3/l8bzCzr/Vfh8d1UthKwyB2Q6ZZiXbDOlGlBMugEEhiwWSIg5P1eqleY2jYyehNaxAHUMs7u03NBXLo3iw==
       tarball: file:projects/plugin-login.tgz
     version: 0.0.0
   file:projects/plugin-workbench-impl.tgz_@typescript-eslint+parser@4.22.0:
@@ -11094,7 +11098,7 @@ packages:
     peerDependencies:
       '@typescript-eslint/parser': '*'
     resolution:
-      integrity: sha512-tLpF0TQYuX5Tppufrall7zkShgVE4+lDzyCZHFDPSoB7VbJBaN+x/m9PoLm7KvtRLPTQsBGj++LEhH3HHkR5fg==
+      integrity: sha512-Q8A2VIdsVou/Z2k8cPOIgf6MmdMUK3x3NN8cEW6pRbdzJuHjo11tIGmZh+ir+R8NXYqgfBcRGoprcYg/zm8ewQ==
       tarball: file:projects/plugin-workbench-impl.tgz
     version: 0.0.0
   file:projects/plugin-workbench.tgz_@typescript-eslint+parser@4.22.0:
@@ -11110,7 +11114,7 @@ packages:
     peerDependencies:
       '@typescript-eslint/parser': '*'
     resolution:
-      integrity: sha512-9vTS8FuniJ/yfcASD+StuPjHfgU7Ve/JJ3UcrrVMUoj4RZsKOWpxLEgCbw1ZUez5H64GZi4ilwiEF3LoLuF/lw==
+      integrity: sha512-pH9+uEik0/wXZKjcRRiFwHyf7KyoUGUVle2dgdHAy7Uw5NquH5cN062HAQkcLZyXrECih5VhaVkRcFjl3SW0tw==
       tarball: file:projects/plugin-workbench.tgz
     version: 0.0.0
   file:projects/prod.tgz_sass@1.32.8:
@@ -11123,8 +11127,8 @@ packages:
       mini-css-extract-plugin: 1.4.1_webpack@5.32.0
       sass-loader: 11.0.1_sass@1.32.8+webpack@5.32.0
       style-loader: 2.0.0_webpack@5.32.0
-      svelte: 3.37.0
-      svelte-loader: 3.1.0_svelte@3.37.0
+      svelte: 3.38.2
+      svelte-loader: 3.1.0_svelte@3.38.2
       svgo-loader: 3.0.0
       ts-loader: 8.1.0_webpack@5.32.0
       webpack: 5.32.0_webpack-cli@4.6.0
@@ -11137,7 +11141,7 @@ packages:
     peerDependencies:
       sass: '*'
     resolution:
-      integrity: sha512-6Unauqqb7hj4/HoHc3E/rdQFvHNetpTstIgQ1JcZTroq28FfnucF79ZxHJEJaCPu3ATsVQKmFcMlZFm9Tyd+Xg==
+      integrity: sha512-jVpbqNOlyBxRgpwypyYDSP7SFprAptmXRgo8zchHriMME1T30dcNbevIG0BcUfBb+7dt1h21wl1rlEG6FpybMg==
       tarball: file:projects/prod.tgz
     version: 0.0.0
   file:projects/rpc.tgz_@typescript-eslint+parser@4.22.0:
@@ -11153,7 +11157,7 @@ packages:
     peerDependencies:
       '@typescript-eslint/parser': '*'
     resolution:
-      integrity: sha512-WIl6GrtuSWmkH6IW865X65fIrRdP+ihx86SmjGgJ75U2NDDxQSD5nOvUGr16KbVHCZh6YWj+hr5PCtZry/7YBQ==
+      integrity: sha512-0hnbzhy8r1qz4xWGDspVPr75jMS94tbX7owNob8p/4cstv+hjuVL2u2UqhD4hXo5xSB1kpTWVB+SVmrDIj5NlA==
       tarball: file:projects/rpc.tgz
     version: 0.0.0
   file:projects/server-account.tgz_6a150cea3e356ecb9f49d2cbc8bd3b95:
@@ -11178,7 +11182,7 @@ packages:
       '@typescript-eslint/parser': '*'
       ts-node: '*'
     resolution:
-      integrity: sha512-2UucNl90AlqddZsBtRZj561qN2tM+lHvKVDLYB7PbLnI1rY3pAVsPz4FFaa5NfqswQo1gsjua4kKh00SmphzQA==
+      integrity: sha512-mItEx80F7S/a6XWxjcnjPRIxXtzgb+0KYD3n4oyxCBaeQmXkSGHTLCL3SjVpEQVk1DKJ+GVe47lP6TRS+KH16g==
       tarball: file:projects/server-account.tgz
     version: 0.0.0
   file:projects/sparkling-theme.tgz_9d8bd6a515df5f388c5e4532b97e083a:
@@ -11222,7 +11226,7 @@ packages:
       '@typescript-eslint/parser': '*'
       ts-node: '*'
     resolution:
-      integrity: sha512-Ex4xui5HuobOhA2kRXH1J3LtQNiWr08rICLjMa6MCc2MqxUTCiKswRnNXRIQb1Pl9RrwnimYKO2OSKFh/Dm6Tw==
+      integrity: sha512-FJODxkhjRJ13Su+amTkWIvabGjppevZPMqukf/TJAhWCLiCqURfELBsnrHxX2ykmcledd/UHI+p4wcEXvZ/Gng==
       tarball: file:projects/status.tgz
     version: 0.0.0
   file:projects/storage-mongo.tgz_ts-node@9.1.1:
@@ -11313,7 +11317,7 @@ packages:
       '@typescript-eslint/parser': '*'
       ts-node: '*'
     resolution:
-      integrity: sha512-icYjw/im5PHaciMWxXc+yxs8bgBaVCMXSZLalXeejuU1Yt4lUWAmiwhrK2J6U7KX4jaCZcAs/hRXK/oOqbzlew==
+      integrity: sha512-SU8JfuV68mi/7PQbMcdbM3edf0meUM+f4P+q3NlXPMFGKoZ5dNUsnKHpHrYOTEDX7b4d/0SXhLCZxwi+fb0t7w==
       tarball: file:projects/ui.tgz
     version: 0.0.0
 registry: ''
@@ -11321,10 +11325,13 @@ specifiers:
   '@babel/eslint-parser': ^7.13.14
   '@babel/runtime': ~7.13.10
   '@jest/globals': ~26.6.2
+  '@rush-temp/client': file:./projects/client.tgz
   '@rush-temp/core': file:./projects/core.tgz
   '@rush-temp/domains': file:./projects/domains.tgz
   '@rush-temp/model': file:./projects/model.tgz
   '@rush-temp/platform': file:./projects/platform.tgz
+  '@rush-temp/platform-core': file:./projects/platform-core.tgz
+  '@rush-temp/platform-core-impl': file:./projects/platform-core-impl.tgz
   '@rush-temp/plugin-login': file:./projects/plugin-login.tgz
   '@rush-temp/plugin-login-impl': file:./projects/plugin-login-impl.tgz
   '@rush-temp/plugin-workbench': file:./projects/plugin-workbench.tgz
@@ -11364,6 +11371,7 @@ specifiers:
   sass-loader: ~11.0.1
   simplytyped: ^3.3.0
   style-loader: ~2.0.0
+  svelte: ^3.37.0
   svelte-loader: ~3.1.0
   svgo-loader: ~3.0.0
   ts-loader: ~8.1.0
