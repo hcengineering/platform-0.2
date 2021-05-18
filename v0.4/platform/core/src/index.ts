@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Component, identify } from '../../domains/node_modules/@anticrm/status/lib'
+import { Component, identify } from '@anticrm/status'
 import { Attribute, Class, Classifier, CollectionOf, Doc, Emb, Enum, EnumLiteral, EnumOf, Mixin, Obj, Ref, RefTo, Type } from './classes'
 import { Tx } from './storage'
 
