@@ -28,13 +28,16 @@ if [ -n "$FILES" ]; then
   done
   for value in "${changed_roots[@]}"; do
     echo -e "\033[0;34mProcessing \033[0;31m${value}\033[0m"
-    pushd $value 
+    exec 3>&1
+    exec 1> >(paste /dev/null -)
+    pushd $value > /dev/null
     $@
     retVal=$?
     if [ $retVal -ne 0 ]; then
       echo "Error"
       exit 1
     fi
-    popd
+    popd > /dev/null
+    exec 1>&3 3>&-  
   done
 fi
