@@ -419,6 +419,18 @@
       "packageName": "@anticrm/server-account",
       "projectFolder": "server/account"
     },
+    {
+      "packageName": "@anticrm/client",
+      "projectFolder": "plugins/client"
+    },
+    {
+      "packageName": "@anticrm/platform-core",
+      "projectFolder": "plugins/platform-core"
+    },
+    {
+      "packageName": "@anticrm/platform-core-impl",
+      "projectFolder": "plugins/platform-core-impl"
+    },
     // {
     //   "packageName": "@anticrm/server-front",
     //   "projectFolder": "server/front"

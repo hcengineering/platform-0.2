@@ -71,7 +71,7 @@ export class ModelStorage implements Storage, TxOperations {
   }
 
   async onCreateTx (ctx: TxContext, tx: CreateTx): Promise<any> {
-    return this.model.add(this.model.createDocument(tx._objectClass, tx.attributes, tx._objectId))
+    this.model.add(this.model.createDocument(tx._objectClass, tx.attributes, tx._objectId))
   }
 
   async onUpdateTx (ctx: TxContext, tx: UpdateTx): Promise<any> {
@@ -80,7 +80,7 @@ export class ModelStorage implements Storage, TxOperations {
   }
 
   async onDeleteTx (ctx: TxContext, tx: DeleteTx): Promise<any> {
-    return this.model.del(tx._objectId)
+    this.model.del(tx._objectId)
   }
 
   async onAddItemTx (ctx: TxContext, tx: AddItemTx): Promise<any> {
@@ -117,6 +117,6 @@ export class ModelStorage implements Storage, TxOperations {
   }
 
   async tx (ctx: TxContext, tx: Tx): Promise<any> {
-    await processTransactions(ctx, tx, this)
+    return await processTransactions(ctx, tx, this)
   }
 }
