@@ -13,28 +13,28 @@
 // limitations under the License.
 //
 
-import { BagOf$, Class$, InstanceOf$, Mixin$, Prop, RefTo$ } from '../dsl'
-import core from '../index'
-import {
-  AllAttributes, ArrayOf, Attribute, BagOf, Class, Classifier, ClassifierKind, Doc, Emb, Enum, EnumKey, EnumLiteral,
-  EnumLiterals, EnumOf, InstanceOf, Mixin, MODEL_DOMAIN, Obj, PropertyType, Ref, RefTo, Type
+import core, {
+  Attribute, Class, Classifier, ClassifierKind, Collection, CollectionOf, Doc, Emb, Enum, EnumLiteral,
+  EnumOf, Mixin, MODEL_DOMAIN, Obj, PropertyType, Ref, RefTo, Type
 } from '@anticrm/core'
-import { Indices } from '@anticrm/domains'
+import { Class$, CollectionOf$, Prop, RefTo$ } from '../dsl'
 
 @Class$(core.class.Obj, core.class.Obj)
 export class TObj implements Obj {
+  @Prop() _id!: Ref<Obj>
   @RefTo$(core.class.Class) _class!: Ref<Class<Obj>>
 }
 
 @Class$(core.class.Emb, core.class.Obj)
 export class TEmb extends TObj implements Emb {
+  _id!: Ref<Emb>
   _class!: Ref<Class<Emb>> // A field to match type, attribute is defined in TObj
 }
 
 @Class$(core.class.Doc, core.class.Obj)
 export class TDoc extends TObj implements Doc {
+  _id!: Ref<Doc>
   _class!: Ref<Class<Doc>> // A field to match type, attribute is defined in TObj
-  @Prop() _id!: Ref<Doc>
   @Prop() _mixins?: Array<Ref<Mixin<Doc>>>
 }
 
@@ -55,8 +55,7 @@ export class TClassifier extends TDoc implements Classifier {
 
 @Class$(core.class.Class, core.class.Classifier, MODEL_DOMAIN)
 export class TClass<T extends Obj> extends TClassifier implements Class<T> {
-  @BagOf$()
-  @InstanceOf$(core.class.Attribute) _attributes!: AllAttributes<T, Obj>
+  @CollectionOf$(core.class.Attribute) _attributes!: Collection<Attribute>
 
   @RefTo$(core.class.Class) _extends?: Ref<Class<Doc>>
 
@@ -66,10 +65,6 @@ export class TClass<T extends Obj> extends TClassifier implements Class<T> {
 
 @Class$(core.class.Mixin, core.class.Class, MODEL_DOMAIN)
 export class TMixin<T extends Obj> extends TClass<T> implements Mixin<T> {
-  @BagOf$()
-  @InstanceOf$(core.class.Attribute) _attributes!: AllAttributes<T, Obj>
-
-  @RefTo$(core.class.Class) _extends?: Ref<Class<Doc>>
 }
 
 @Class$(core.class.EnumLiteral, core.class.Emb, MODEL_DOMAIN)
@@ -79,9 +74,8 @@ export class TEnumLiteral extends TEmb implements EnumLiteral {
 }
 
 @Class$(core.class.Enum, core.class.Classifier, MODEL_DOMAIN)
-export class TEnum<T extends EnumKey> extends TClassifier implements Enum<T> {
-  @BagOf$()
-  @InstanceOf$(core.class.EnumLiteral) _literals!: EnumLiterals<T, EnumLiteral>
+export class TEnum extends TClassifier implements Enum {
+  @CollectionOf$(core.class.Attribute) _literals!: Collection<EnumLiteral>
 }
 
 @Class$(core.class.RefTo, core.class.Type, MODEL_DOMAIN)
@@ -89,27 +83,12 @@ export class TRefTo extends TType implements RefTo<Doc> {
   @Prop() to!: Ref<Class<Doc>>
 }
 
-@Class$(core.class.InstanceOf, core.class.Type, MODEL_DOMAIN)
-export class TInstanceOf extends TType implements InstanceOf<Emb> {
-  @Prop() of!: Ref<Class<Emb>>
-}
-
 @Class$(core.class.EnumOf, core.class.Type, MODEL_DOMAIN)
-export class TEnumOf extends TType implements EnumOf<EnumKey> {
-  @Prop() of!: Ref<Enum<EnumKey>>
+export class TEnumOf extends TType implements EnumOf {
+  @Prop() of!: Ref<Enum>
 }
 
-@Class$(core.class.ArrayOf, core.class.Type, MODEL_DOMAIN)
-export class TArrayOf extends TType implements ArrayOf {
-  @Prop() of!: Type
-}
-
-@Class$(core.class.BagOf, core.class.Type, MODEL_DOMAIN)
-export class TBagOf extends TType implements BagOf {
-  @Prop() of!: Type
-}
-
-@Mixin$(core.mixin.Indices, core.class.Mixin)
-export class TIndexesClass<T extends Doc> extends TMixin<T> implements Indices {
-  @Prop() primary!: string
+@Class$(core.class.CollectionOf, core.class.Type, MODEL_DOMAIN)
+export class TCollectionOf extends TType implements CollectionOf<Emb> {
+  @Prop() of!: Ref<Class<Emb>>
 }

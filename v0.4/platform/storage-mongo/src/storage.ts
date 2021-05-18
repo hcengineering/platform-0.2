@@ -1,9 +1,9 @@
-import { AnyLayout, Class, Doc, DocumentQuery, FindOptions, Model, Ref, Storage, Tx, TxContext } from '@anticrm/core'
-import domains, { CreateTx, DeleteTx, TxOperationKind, UpdateTx, VDoc } from '@anticrm/domains'
-import { Collection, Db, FilterQuery, SortOptionObject, UpdateOneOptions, UpdateQuery } from 'mongodb'
-import { createPullArrayFilters, createPushArrayFilters, createSetArrayFilters, flattenQuery, toMongoQuery } from './query'
+import { AnyLayout, Class, CollectionOf, Doc, DocumentQuery, Emb, FindOptions, Model, Obj, Ref, Storage, Tx, TxContext } from '@anticrm/core'
+import domains, { AddItemTx, CollectionId, collectionId, CollectionReference, CreateTx, DeleteTx, ItemTx, processTransactions, RemoveItemTx, TxOperations, UpdateItemTx, UpdateTx, VDoc } from '@anticrm/domains'
+import { Collection, Db, FilterQuery, SortOptionObject } from 'mongodb'
+import { toMongoQuery } from './query'
 
-export class MongoStorage implements Storage {
+export class MongoStorage implements Storage, TxOperations {
   readonly model: Model
   readonly db: Db
 
@@ -18,97 +18,32 @@ export class MongoStorage implements Storage {
   }
 
   async tx (ctx: TxContext, tx: Tx): Promise<any> {
-    switch (tx._class) {
-      case domains.class.CreateTx: {
-        return await this.store(ctx, tx as CreateTx)
-      }
-      case domains.class.UpdateTx: {
-        return await this.update(ctx, tx as UpdateTx)
-      }
-      case domains.class.DeleteTx: {
-        return await this.remove(ctx, tx as DeleteTx)
-      }
-
-      default:
-        console.log('not implemented model tx', tx)
-    }
+    return await processTransactions(ctx, tx, this)
   }
 
-  async store (ctx: TxContext, tx: CreateTx): Promise<any> {
-    const doc = this.model.createDocument(tx._objectClass, tx.object, tx._objectId)
+  async onCreateTx (ctx: TxContext, tx: CreateTx): Promise<any> {
+    const doc = this.model.createDocument(tx._objectClass, tx.attributes, tx._objectId)
     if (this.model.is(tx._objectClass, domains.class.VDoc)) {
       if (tx._objectSpace === undefined) {
         throw new Error('vdoc space should be specified')
       }
       (doc as VDoc)._space = tx._objectSpace
     }
-    await this.collection(doc._class).insertOne(doc)
+    await this.collection(tx._objectClass).insertOne(doc)
   }
 
-  async update (ctx: TxContext, tx: UpdateTx): Promise<any> {
-    let setUpdateChain: any = {}
-    let pushUpdateChain: any = {}
-    let pullUpdateChain: any = {}
-    let unsetUpdateChain: any = {}
-    let index = 1
-
-    const arrayFilters: AnyLayout[] = []
-    for (const op of tx.operations) {
-      switch (op.kind) {
-        case TxOperationKind.Set: {
-          const filters = createSetArrayFilters(this.model, tx._objectClass, op.selector, op._attributes ?? {}, index)
-          setUpdateChain = { ...setUpdateChain, ...filters.updateOperation }
-          arrayFilters.push(...filters.arrayFilter)
-          index = filters.index
-          break
-        }
-        case TxOperationKind.Push: {
-          const filters = createPushArrayFilters(this.model, tx._objectClass, op.selector, op._attributes ?? {}, index)
-          pushUpdateChain = { ...pushUpdateChain, ...filters.updateOperation }
-          arrayFilters.push(...filters.arrayFilters)
-          break
-        }
-        case TxOperationKind.Pull: {
-          const filters = createPullArrayFilters(this.model, tx._objectClass, op.selector, index)
-          if (filters.isArrayAttr) {
-            pullUpdateChain = { ...pullUpdateChain, ...filters.updateOperation }
-            arrayFilters.push(...filters.arrayFilters)
-          } else {
-            unsetUpdateChain = { ...unsetUpdateChain, ...filters.updateOperation }
-            arrayFilters.push(...filters.arrayFilters)
-          }
-          break
-        }
-      }
-    }
-
-    const updateOp: UpdateQuery<any> = {}
-    const opts: UpdateOneOptions = {}
-    if (Object.keys(setUpdateChain).length > 0) {
-      updateOp.$set = setUpdateChain
-    }
-    if (Object.keys(unsetUpdateChain).length > 0) {
-      updateOp.$unset = unsetUpdateChain
-    }
-    if (Object.keys(pushUpdateChain).length > 0) {
-      updateOp.$push = pushUpdateChain
-    }
-    if (Object.keys(pullUpdateChain).length > 0) {
-      updateOp.$pull = pullUpdateChain
-    }
-    if (arrayFilters.length > 0) {
-      opts.arrayFilters = arrayFilters
-    }
-
+  async onUpdateTx (ctx: TxContext, tx: UpdateTx): Promise<any> {
     const filter: FilterQuery<Doc> = { _id: tx._objectId }
     if (tx._objectSpace !== undefined) {
       filter._space = tx._objectSpace
     }
-    console.log('update', filter, updateOp, opts)
-    return await this.collection(tx._objectClass).updateOne(filter, updateOp, opts)
+
+    const assignValue = this.model.assign({}, tx._objectClass, tx.attributes)
+    delete (assignValue._class)
+    return await this.collection(tx._objectClass).updateOne(filter, { $set: assignValue })
   }
 
-  async remove (ctx: TxContext, tx: DeleteTx): Promise<any> {
+  async onDeleteTx (ctx: TxContext, tx: DeleteTx): Promise<any> {
     const filter: FilterQuery<Doc> = { _id: tx._objectId }
     if (tx._objectSpace !== undefined) {
       filter._space = tx._objectSpace
@@ -116,9 +51,49 @@ export class MongoStorage implements Storage {
     return await this.collection(tx._objectClass).deleteOne(filter)
   }
 
-  async find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>, options?: FindOptions<T>): Promise<T[]> {
-    const mongoQuery = toMongoQuery(this.model, _class, query, true)
+  async onAddItemTx (ctx: TxContext, tx: AddItemTx): Promise<any> {
+    const doc = this.model.createDocument<Emb>(tx._itemClass, tx.attributes, tx._itemId)
 
+    // we need to assign parent information.
+    this.model.update<CollectionReference>(doc, domains.mixin.CollectionReference, {
+      _parentClass: tx._objectClass,
+      _parentId: tx._objectId,
+      _collection: tx._collection,
+      _parentSpace: tx._objectSpace
+    })
+
+    // doc._parentId
+    await this.collection(tx._objectClass).insertOne(doc)
+  }
+
+  createFilter (tx: ItemTx): FilterQuery<Emb> {
+    const filter: FilterQuery<Emb> = this.model.assign({}, domains.mixin.CollectionReference, {
+      _parentId: tx._objectId,
+      _parentClass: tx._objectClass,
+      _collection: tx._collection,
+      _id: tx._itemId,
+      _class: tx._itemClass
+    })
+
+    if (tx._objectSpace !== undefined) {
+      this.model.assign(filter, domains.mixin.CollectionReference, {
+        _parentSpace: tx._objectSpace
+      })
+    }
+    return filter
+  }
+
+  async onUpdateItemTx (ctx: TxContext, tx: UpdateItemTx): Promise<any> {
+    const assignValue = this.model.assign({}, tx._itemClass, tx.attributes)
+    delete (assignValue._class)
+    return await this.collection(tx._objectClass).updateOne(this.createFilter(tx), { $set: assignValue })
+  }
+
+  async onRemoveItemTx (ctx: TxContext, tx: RemoveItemTx): Promise<any> {
+    return await this.collection(tx._objectClass).deleteOne(this.createFilter(tx))
+  }
+
+  async findMongo<T extends Obj>(_class: Ref<Class<Doc>>, mongoQuery: FilterQuery<T>, options?: FindOptions<T>): Promise<T[]> {
     // We should use aggregation and return a number of elements if we had limit or skip specified.
     if (options?.limit !== undefined || options?.skip !== undefined) {
       const resultQuery: any = [
@@ -129,8 +104,7 @@ export class MongoStorage implements Storage {
         resultQuery.push({ $limit: options.limit ?? 0 })
       }
       if (options?.sort !== undefined) {
-        let sortOptions: AnyLayout = (options.sort ?? {}) as unknown as AnyLayout
-        sortOptions = flattenQuery(this.model, _class, sortOptions, false)
+        const sortOptions: AnyLayout = (options.sort ?? {}) as unknown as AnyLayout
         resultQuery.push({ $sort: sortOptions })
       }
       const resultValue = this.collection(_class).aggregate<any>([{
@@ -165,8 +139,7 @@ export class MongoStorage implements Storage {
     let cursor = this.collection(_class).find(mongoQuery)
 
     if (options?.sort !== undefined) {
-      let sortOptions: AnyLayout = (options.sort ?? {}) as unknown as AnyLayout
-      sortOptions = flattenQuery(this.model, _class, sortOptions, false)
+      const sortOptions: AnyLayout = (options.sort ?? {}) as unknown as AnyLayout
       cursor = cursor.sort(sortOptions as SortOptionObject<Doc>)
     }
 
@@ -178,13 +151,36 @@ export class MongoStorage implements Storage {
     return values
   }
 
+  async find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>, options?: FindOptions<T>): Promise<T[]> {
+    const mongoQuery = toMongoQuery(this.model, _class, query)
+    return await this.findMongo(_class, mongoQuery, options)
+  }
+
   async findOne<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined> {
-    const mongoQuery = toMongoQuery(this.model, _class, query, true)
+    const mongoQuery = toMongoQuery(this.model, _class, query)
 
     const result = await this.collection(_class).findOne<T>(mongoQuery)
     if (result === null) {
       return undefined
     }
     return result
+  }
+
+  async findIn <T extends Doc, C extends Emb>(_class: Ref<Class<T>>, _id: Ref<Doc>, _collectionIdB: CollectionId<T>, _itemClass: Ref<Class<C>>, query: DocumentQuery<C>, options?: FindOptions<C>): Promise<C[]> {
+    const _collectionId = _collectionIdB(collectionId<T>())
+
+    const attr = this.model.classAttribute(_class, _collectionId)
+    const attrClass = (attr.attr.type as CollectionOf<Emb>).of
+
+    if (attrClass === undefined) {
+      throw new Error('attribute class is not defined')
+    }
+    if (!this.model.is(_itemClass, attrClass)) {
+      throw new Error(`incompatible item class specified ${_itemClass} ${attrClass}`)
+    }
+
+    const equery = toMongoQuery(this.model, _itemClass, query)
+
+    return await this.findMongo<C>(_class/** mongo collection uses */, equery, options)
   }
 }

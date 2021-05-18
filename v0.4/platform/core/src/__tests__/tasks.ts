@@ -13,67 +13,40 @@
 // limitations under the License.
 //
 
-import { Class, Doc, Emb, Mixin, Ref } from '../classes'
+import { Class, Collection, Doc, Emb, Mixin, Ref } from '../classes'
 import { DocumentValue } from '../storage'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 export const data = require('./model.json')
 
 export interface TaskComment extends Emb {
-  _id: string
   message: string
   author: string
   date: Date
-  oldVersion: TaskComment[]
-}
-
-export interface SubTask extends Emb {
-  name: string
-  rate?: number
-  comments?: TaskComment[]
 }
 
 export interface Task extends Doc {
   name: string
   description: string
-  lists: string[]
-  tasks?: SubTask[]
-  mainTask?: SubTask
   rate?: number
-  comments?: TaskComment[]
+  comments?: Collection<TaskComment>
 }
 
 export interface TaskMixin extends Task {
   textValue?: string
-  listValue?: string[]
-  embValue?: TaskComment
-  embValueList?: TaskComment[]
 }
 
 export interface TaskWithSecond extends Task {
-  secondTask: SubTask | null
-}
-
-export interface DerivedTask extends Task {
+  secondTask: string | null
 }
 
 export const taskIds = {
   class: {
     Task: 'core.class.TaskObj' as Ref<Class<Task>>,
-    Subtask: 'core.class.SubTask' as Ref<Class<SubTask>>,
-    TaskComment: 'core.class.TaskComment' as Ref<Class<TaskComment>>,
-    DerivedTask: 'core.class.DerivedTaskObj' as Ref<Class<DerivedTask>>
+    TaskComment: 'core.class.TaskComment' as Ref<Class<TaskComment>>
   },
   mixin: {
     TaskMixin: 'core.mixin.TaskMixin' as Ref<Mixin<TaskMixin>>
-  }
-}
-
-export function createSubtask (name: string, rate = 30, comments?: Array<DocumentValue<TaskComment>>): DocumentValue<SubTask> {
-  return {
-    name: name,
-    rate: rate,
-    comments: comments
   }
 }
 
@@ -85,21 +58,14 @@ export function createTask (name: string, rate: number, description: string): Do
   return {
     name,
     description,
-    lists: [name],
     rate
   }
 }
 
-export const doc1 = {
+export const doc1: Task = {
   _id: 'd1' as Ref<Doc>,
   _class: taskIds.class.Task,
   name: 'my-space',
   description: 'some-value',
-  lists: ['val1', 'val2'],
-  rate: 20,
-  mainTask: createSubtask('main-subtask', 30),
-  tasks: [
-    createSubtask('subtask1', 31),
-    createSubtask('subtask2', 33)
-  ]
+  rate: 20
 }

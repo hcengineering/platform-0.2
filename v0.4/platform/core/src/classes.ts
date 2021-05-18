@@ -18,32 +18,40 @@ export type PrimitiveType = number | string | boolean | undefined
 export type Ref<T extends Doc> = string & { __ref: T }
 
 export interface Obj {
+  _id: Ref<Obj>
   _class: Ref<Class<Obj>>
   _mixins?: Array<Ref<Mixin<Obj>>>
 }
 
 export interface Emb extends Obj {
+  _id: Ref<Emb>
   _class: Ref<Class<Emb>>
 }
 
 export interface Doc extends Obj {
-  _class: Ref<Class<Doc>>
   _id: Ref<Doc>
+  _class: Ref<Class<Doc>>
+}
+
+// Collections
+
+/**
+ * Interface to define a collection of embedded objects associated with object.
+ */
+export interface Collection<T> {
+  items?: T[]
 }
 
 export type PropertyType = PrimitiveType| Ref<Doc> | Emb | PropertyType[] | { [key: string]: PropertyType }
 
 // An attribute type with some defined mixins inside.
-export interface Type extends Emb {
+export interface Type extends Obj {
   _default?: PropertyType
 }
 
 export interface Attribute extends Emb {
   type: Type
 }
-
-export type Attributes<T extends E, E extends Obj> = Record<Exclude<keyof T, keyof E>, Attribute>
-export type AllAttributes<T extends E, E extends Obj> = Required<Attributes<T, E>> & Partial<Attributes<E, Obj>>
 
 export enum ClassifierKind {
   CLASS,
@@ -55,37 +63,32 @@ export interface Classifier extends Doc {
   _kind: ClassifierKind
 }
 
-export interface EMixin<T extends E, E extends Obj> extends EClass<T, E> {
+export interface EMixin<T extends Obj> extends EClass<T> {
 }
 
-export type Mixin<T extends Obj> = EMixin<T, Obj>
+export type Mixin<T extends Obj> = EMixin<T>
 
 export interface EDomainClassifier {
   _domain?: string
 }
 
-export interface EClass<T extends E, E extends Obj> extends Classifier, EDomainClassifier {
-  _attributes: AllAttributes<T, E>
+export interface EClass<E extends Obj> extends Classifier, EDomainClassifier {
+  _attributes: Collection<Attribute>
   _extends?: Ref<Class<E>>
 
   _native?: string
 }
 
-export type Class<T extends Obj> = EClass<T, Obj>
+export type Class<T extends Obj> = EClass<T>
 
 export interface EnumLiteral extends Emb {
   label: string
   ordinal: string | number
 }
 
-export type EnumKey = string | number | symbol
-export type EnumLiterals<T extends EnumKey, E extends EnumLiteral> = { [Q in T]: E }
-
-export interface EEnum<T extends EnumKey, E extends EnumLiteral> extends Classifier {
-  _literals: EnumLiterals<T, E>
+export interface Enum extends Classifier {
+  _literals: Collection<EnumLiteral>
 }
-
-export type Enum<T extends EnumKey> = EEnum<T, EnumLiteral>
 
 // T Y P E S
 
@@ -93,20 +96,12 @@ export interface RefTo<T extends Doc> extends Type {
   to: Ref<Class<T>>
 }
 
-export interface EnumOf<T extends EnumKey> extends Type {
-  of: Ref<Enum<T>>
+export interface EnumOf extends Type {
+  of: Ref<Enum>
 }
 
-export interface InstanceOf<T extends Emb> extends Type {
+export interface CollectionOf<T extends Emb> extends Type {
   of: Ref<Class<T>>
-}
-
-export interface BagOf extends Type {
-  of: Type
-}
-
-export interface ArrayOf extends Type {
-  of: Type
 }
 
 ///
@@ -114,24 +109,3 @@ export interface ArrayOf extends Type {
 export interface AnyLayout {
   [key: string]: PropertyType
 }
-
-///
-
-export const CORE_CLASS_OBJ = 'class:core.Obj' as Ref<Class<Obj>>
-export const CORE_CLASS_DOC = 'class:core.Doc' as Ref<Class<Doc>>
-export const CORE_CLASS_EMB = 'class:core.Emb' as Ref<Class<Emb>>
-export const CORE_CLASS_CLASS = 'class:core.Class' as Ref<Class<Class<Obj>>>
-export const CORE_CLASS_MIXIN = 'class:core.Mixin' as Ref<Class<Mixin<Obj>>>
-export const CORE_CLASS_ENUM = 'class:core.Enum' as Ref<Class<Enum<any>>>
-
-export const CORE_CLASS_STRING = 'class:core.String' as Ref<Class<Type>>
-export const CORE_CLASS_NUMBER = 'class:core.Number' as Ref<Class<Type>>
-export const CORE_CLASS_BOOLEAN = 'class:core.Boolean' as Ref<Class<Type>>
-export const CORE_CLASS_ATTRIBUTE = 'class:core.Attribute' as Ref<Class<Attribute>>
-export const CORE_CLASS_TYPE = 'class:core.Type' as Ref<Class<Type>>
-
-export const CORE_CLASS_ARRAY_OF = 'class:core.ArrayOf' as Ref<Class<ArrayOf>>
-export const CORE_CLASS_REF_TO = 'class:core.RefTo' as Ref<Class<RefTo<Doc>>>
-export const CORE_CLASS_BAG_OF = 'class:core.BagOf' as Ref<Class<BagOf>>
-export const CORE_CLASS_INSTANCE_OF = 'class:core.InstanceOf' as Ref<Class<InstanceOf<Emb>>>
-export const CORE_CLASS_ENUM_OF = 'class:core.EnumOf' as Ref<Class<EnumOf<EnumKey>>>

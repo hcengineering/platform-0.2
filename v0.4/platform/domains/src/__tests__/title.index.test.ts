@@ -15,57 +15,17 @@
 
 /* eslint-env jest */
 
-import { AnyLayout, Class, Doc, generateId, mixinKey, Model, Ref, txContext } from '@anticrm/core'
-import { data, doc1, taskIds } from '@anticrm/core/src/__tests__/tasks'
+import { Doc, mixinKey, Model, Ref, txContext } from '@anticrm/core'
+import { data, doc1, Task, taskIds } from '@anticrm/core/src/__tests__/tasks'
 import domains from '..'
 import { TitleIndex } from '../indices/title'
 import { ModelStorage } from '../model_storage'
+import { Space } from '../space'
 import { Title, TitleSource } from '../title'
-import { CreateTx, DeleteTx, TxOperationKind, UpdateTx } from '../tx'
+import { create, remove, update } from '../tx'
 
 const model = new Model('vdocs')
 model.loadModel(data)
-
-function newCTx (_class: Ref<Class<Doc>>, _id: Ref<Doc>, object: AnyLayout): CreateTx {
-  return {
-    _class: domains.class.CreateTx,
-    _id: generateId(),
-    _date: Date.now(),
-    _user: 'system',
-    _objectId: _id,
-    _objectClass: _class,
-    object: object
-  }
-}
-
-function newUTx (_class: Ref<Class<Doc>>, _id: Ref<Doc>, object: AnyLayout): UpdateTx {
-  return {
-    _class: domains.class.UpdateTx,
-    _id: generateId(),
-    _date: Date.now(),
-    _user: 'system',
-    _objectId: _id,
-    _objectClass: _class,
-    operations: [
-      {
-        _class: domains.class.ObjectTx,
-        kind: TxOperationKind.Set,
-        _attributes: object
-      }
-    ]
-  }
-}
-
-function newDTx (_class: Ref<Class<Doc>>, _id: Ref<Doc>): DeleteTx {
-  return {
-    _class: domains.class.DeleteTx,
-    _id: generateId(),
-    _date: Date.now(),
-    _user: 'system',
-    _objectId: _id,
-    _objectClass: _class
-  }
-}
 
 describe('title-index tests', () => {
   it('verify title create', async () => {
@@ -77,7 +37,7 @@ describe('title-index tests', () => {
     const shortIdKey = mixinKey(domains.mixin.ShortID, 'shortId')
     const titledDoc = { ...doc1, [shortIdKey]: 'TASK-1', _mixins: [domains.mixin.ShortID] }
 
-    await index.tx(txContext(), newCTx(taskIds.class.Task, doc1._id, (titledDoc as unknown) as AnyLayout))
+    await index.tx(txContext(), create(taskIds.class.Task, titledDoc, titledDoc._id))
 
     const titles = await memDb.find<Title>(domains.class.Title, {})
     expect(titles.length).toEqual(2)
@@ -114,7 +74,7 @@ describe('title-index tests', () => {
 
     await index.tx(
       txContext(),
-      newUTx(taskIds.class.Task, doc1._id, {
+      update<Task>(taskIds.class.Task, doc1._id, {
         name: 'new-name',
         [shortIdKey]: 'SPACE-2',
         _mixins: [domains.mixin.ShortID]
@@ -150,7 +110,7 @@ describe('title-index tests', () => {
     memDb.add(ts1)
     memDb.add(ts2)
     const index = new TitleIndex(model, memDbStorage)
-    await index.tx(txContext(), newUTx(taskIds.class.Task, doc1._id, {}))
+    await index.tx(txContext(), update<Task>(taskIds.class.Task, doc1._id, {}))
 
     const titles = await memDb.find(domains.class.Title, {})
     expect(titles.length).toEqual(2)
@@ -180,7 +140,7 @@ describe('title-index tests', () => {
     memDb.add(ts1)
     memDb.add(ts2)
     const index = new TitleIndex(model, memDbStorage)
-    await index.tx(txContext(), newDTx(taskIds.class.Task, doc1._id))
+    await index.tx(txContext(), remove(taskIds.class.Task, doc1._id, '-' as Ref<Space>))
 
     const titles = await memDb.find(domains.class.Title, {})
     expect(titles.length).toEqual(0)

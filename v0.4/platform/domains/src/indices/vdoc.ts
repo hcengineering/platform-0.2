@@ -15,8 +15,10 @@
 
 import { DomainIndex, Model, Ref, Storage, Tx, TxContext } from '@anticrm/core'
 import { Space } from '../space'
-import { CreateTx, DeleteTx, newUpdateTx, TxOperationKind, UpdateTx } from '../tx'
+import { AddItemTx, CreateTx, DeleteTx, ItemTx, RemoveItemTx, update, UpdateItemTx, UpdateTx } from '../tx'
 import domains from '../'
+import { processTransactions } from '../tx_utils'
+import { VDoc } from '../vdoc'
 
 export class VDocIndex implements DomainIndex {
   private readonly transient: Storage | undefined
@@ -30,72 +32,79 @@ export class VDocIndex implements DomainIndex {
   }
 
   async tx (ctx: TxContext, tx: Tx): Promise<any> {
-    switch (tx._class) {
-      case domains.class.CreateTx:
-        return await this.onCreate(ctx, tx as CreateTx)
-      case domains.class.UpdateTx:
-        return await this.onUpdate(ctx, tx as UpdateTx)
-      case domains.class.DeleteTx:
-        return await this.onDelete(ctx, tx as DeleteTx)
-      default:
-        console.log('not implemented tx', tx)
-    }
+    await processTransactions(ctx, tx, this)
   }
 
-  async onCreate (ctx: TxContext, tx: CreateTx): Promise<any> {
+  async onCreateTx (ctx: TxContext, tx: CreateTx): Promise<any> {
     if (!this.modelDb.is(tx._objectClass, domains.class.VDoc)) {
       return await Promise.resolve()
     }
-    const createTx: CreateTx = { ...tx, object: { ...tx.object } } // Make a copy + modify modification
+    const createTx: CreateTx = { ...tx, attributes: { ...tx.attributes } } // Make a copy + modify modification
 
     // we need to update vdoc properties.
-    if (this.transient !== undefined) {
-      createTx.object._createdBy = tx._user
-      createTx.object._createdOn = tx._date
-    }
+    createTx.attributes._createdBy = tx._user
+    createTx.attributes._createdOn = tx._date
     if (this.modelDb.is(tx._objectClass, domains.class.VDoc)) {
       const _space = tx._objectSpace as Ref<Space>
       if (_space === undefined) {
         return await Promise.reject(new Error('VDoc instances should have _space attribute specified'))
       }
-      createTx.object._space = _space
-    }
-    const updateOP = {
-      _class: domains.class.TxOperation,
-      kind: TxOperationKind.Set,
-      _attributes: {
-        _createdOn: tx._date,
-        _createdBy: tx._user
-      }
+      createTx.attributes._space = _space
     }
 
     await Promise.all([
       this.storage.tx(ctx, createTx),
-      this.transient?.tx(ctx, newUpdateTx(tx._objectClass, tx._objectId, [updateOP], '')) ?? Promise.resolve()
+      this.transient?.tx(ctx, update<VDoc>(tx._objectClass, tx._objectId, {
+        _createdOn: tx._date,
+        _createdBy: tx._user
+      })) ?? Promise.resolve()
     ])
   }
 
-  async onUpdate (ctx: TxContext, tx: UpdateTx): Promise<any> {
+  async onUpdateTx (ctx: TxContext, tx: UpdateTx): Promise<any> {
     if (!this.modelDb.is(tx._objectClass, domains.class.VDoc)) {
       return await Promise.resolve()
     }
-    const updateOp = {
-      _class: domains.class.TxOperation,
-      kind: TxOperationKind.Set,
-      _attributes: {
-        _modifiedBy: tx._user,
-        _modifiedOn: tx._date
-      }
-    }
-    const newTx: UpdateTx = { ...tx, operations: [...tx.operations, updateOp] } // Make a copy + modify modification
+
+    const newTx: UpdateTx = { ...tx, attributes: { ...tx.attributes } } // Make a copy + modify modification
+    newTx.attributes._createdBy = tx._user
+    newTx.attributes._createdOn = tx._date
 
     await Promise.all([
       this.storage.tx(ctx, newTx),
-      this.transient?.tx(ctx, newUpdateTx(tx._objectClass, tx._objectId, [updateOp], tx._user)) ?? Promise.resolve()
+      this.transient?.tx(ctx, update<VDoc>(tx._objectClass, tx._objectId, {
+        _createdOn: tx._date,
+        _createdBy: tx._user
+      })) ?? Promise.resolve()
     ])
   }
 
-  async onDelete (ctx: TxContext, tx: DeleteTx): Promise<any> {
+  async onAddItemTx (ctx: TxContext, tx: AddItemTx): Promise<any> {
+    await this.onItemTx(ctx, tx)
+  }
+
+  async onUpdateItemTx (ctx: TxContext, tx: UpdateItemTx): Promise<any> {
+    await this.onItemTx(ctx, tx)
+  }
+
+  async onRemoveItemTx (ctx: TxContext, tx: RemoveItemTx): Promise<any> {
+    await this.onItemTx(ctx, tx)
+  }
+
+  async onItemTx (ctx: TxContext, tx: ItemTx): Promise<any> {
+    await this.storage.tx(ctx, tx)
+
+    const utx = update<VDoc>(tx._objectClass, tx._objectId, {
+      _createdOn: tx._date,
+      _createdBy: tx._user
+    })
+    await Promise.all([
+      this.storage.tx(ctx, utx),
+      this.transient?.tx(ctx, utx) ?? Promise.resolve()
+    ])
+  }
+
+  async onDeleteTx (ctx: TxContext, tx: DeleteTx): Promise<any> {
     if (!this.modelDb.is(tx._objectClass, domains.class.VDoc)) {
       return await Promise.resolve()
     }

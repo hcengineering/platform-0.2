@@ -2,6 +2,7 @@
  * Operation direction, is it came from server or it is own operation.
  */
 import { Class, Doc, Emb, Obj, Ref } from './classes'
+import { CollectionId } from './colletionid'
 
 export enum TxContextSource {
   Client, // A pure client operation
@@ -38,9 +39,36 @@ export interface DomainIndex {
   tx: (ctx: TxContext, tx: Tx) => Promise<any>
 }
 
-export interface Storage extends DomainIndex {
+export interface DocumentProtocol {
+  /**
+   * Search documents.
+   */
   find: <T extends Doc>(_class: Ref<Class<T>>, query: DocumentQuery<T>, options?: FindOptions<T>) => Promise<T[]>
+  /**
+   * Search collections in documents.
+   */
+  findIn: <T extends Doc, C extends Emb>(
+    _class: Ref<Class<T>>, _id: Ref<Doc>, _collection: CollectionId<T>,
+    _itemClass: Ref<Class<C>>, query: DocumentQuery<C>,
+    options?: FindOptions<C>) => Promise<C[]>
+
+  /**
+   * Find one item.
+   */
   findOne: <T extends Doc>(_class: Ref<Class<T>>, query: DocumentQuery<T>) => Promise<T | undefined>
+}
+
+export interface DomainProtocol {
+  /**
+   * Load a bunch of document with domain.
+   */
+  loadDomain: (domain: string) => Promise<Doc[]>
+}
+
+/**
+ * Define a storage with read/write access.
+ */
+export interface Storage extends DomainIndex, DocumentProtocol {
 }
 
 ///
@@ -57,8 +85,8 @@ export interface RegExpression {
   $options?: string
 }
 
-export type ObjQueryType<T> = T extends Obj ? DocumentQuery<T> : T | RegExpression
-export type ArrayQueryType<A> = A extends Array<infer T> ? ObjQueryType<T> | Array<ObjQueryType<T>> : ObjQueryType<A>
+export type ObjQueryType<T> = T extends Obj ? never : T | RegExpression
+export type ArrayQueryType<A> = A extends any[] ? A : ObjQueryType<A>
 
 /**
  * A possible query values to be used with Document access protocol.
@@ -71,7 +99,7 @@ export type DocumentQuery<T> = {
 }
 
 // A possible values for document during creation.
-export type TWithoutEmbArray<A> = A extends Array<infer T> ? Array<DocumentValue<T>>: DocumentValue<A>
+export type TWithoutEmbArray<A> = A extends any[] ? A: A
 
 export type DocumentValueRaw<T> = {
   [P in keyof T]: TWithoutEmbArray<T[P]>
@@ -79,13 +107,12 @@ export type DocumentValueRaw<T> = {
 
 type OmitPartial<T, P> = Omit<T, keyof P> & Partial<P>
 
+type OmitObj<T, E extends Obj> = T extends E ? DocumentValueRaw<OmitPartial<T, E>> : never
 /**
  * A values of T with some parts made partial, like _class, _id.
  */
 export type DocumentValue<T> =
-  T extends Doc ? DocumentValueRaw<OmitPartial<T, Doc>> :
-    T extends Emb ? DocumentValueRaw<OmitPartial<T, Emb>>:
-      T extends Obj ? DocumentValueRaw<OmitPartial<T, Obj>> : T
+  OmitObj<T, Emb> | OmitObj<T, Doc> | OmitObj<T, Obj> | T
 
 // Sorting structure
 export enum SortingOrder {
@@ -93,7 +120,7 @@ export enum SortingOrder {
   Descending = -1
 }
 
-export type TSortingWithoutEmbArray<A> = A extends Array<infer T> ? DocumentSorting<T>: DocumentSorting<A>
+export type TSortingWithoutEmbArray<A> = A extends any[] ? never: DocumentSorting<A>
 
 export type DocumentSortingValueRaw<T> = {
   [P in keyof T]?: TSortingWithoutEmbArray<T[P]>
@@ -127,12 +154,7 @@ export interface FindOptions<T> {
    */
   countCallback?: (skip: number, limit: number, total: number) => void
 }
-
-export interface DocumentProtocol {
-  find: <T extends Doc>(_class: Ref<Class<T>>, query: DocumentQuery<T>, options?: FindOptions<T>) => Promise<T[]>
-  findOne: <T extends Doc>(_class: Ref<Class<T>>, query: DocumentQuery<T>) => Promise<T | undefined>
-  loadDomain: (domain: string) => Promise<Doc[]>
-}
+// ************************************************************************************************************************************************************************************************
 
 export interface CoreProtocol extends DocumentProtocol {
   /**
@@ -175,6 +197,10 @@ class CombineStorage implements Storage {
 
   async find<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>, options?: FindOptions<T>): Promise<T[]> {
     return (await Promise.all(this.storages.map(async (s) => await s.find(_class, query, options)))).reduce((p, c) => p.concat(c))
+  }
+
+  async findIn <T extends Doc, C extends Emb>(_class: Ref<Class<T>>, _id: Ref<Doc>, _collection: CollectionId<T>, _itemClass: Ref<Class<C>>, query: DocumentQuery<C>, options?: FindOptions<C>): Promise<C[]> {
+    return (await Promise.all(this.storages.map(async (s) => await s.findIn(_class, _id, _collection, _itemClass, query, options)))).reduce((p, c) => p.concat(c))
   }
 
   async findOne<T extends Doc> (_class: Ref<Class<T>>, query: DocumentQuery<T>): Promise<T | undefined> {

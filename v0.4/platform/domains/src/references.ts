@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Class, Doc, Ref } from '@anticrm/core'
+import { Class, Doc, Emb, Obj, Ref } from '@anticrm/core'
 import { VDoc } from './vdoc'
 
 // R E F E R E N C E S
@@ -26,13 +26,18 @@ export const REFERENCE_DOMAIN = 'references'
  * target - define a target object with class and properties.
  */
 export interface Reference extends Doc {
-  _sourceId?: Ref<Doc>
-  _sourceClass: Ref<Class<Doc>>
-  _sourceProps?: Record<string, unknown>
+  _sourceId: Ref<Doc> // Source Object identifier, if from Item
+  _sourceClass: Ref<Class<Doc>> //
 
-  _targetId?: Ref<Doc>
-  _targetClass: Ref<Class<Doc>>
-  _targetProps?: Record<string, unknown>
+  _itemId?: Ref<Emb> // If specified reference from collection item of object `source`.
+  _itemClass?: Ref<Class<Emb>> // Source field class
+  _collection?: string // A collection name
+
+  _sourceField: string // A field we have reference from
+  _sourceIndex: number // Index inside a field, if multiple references.
+
+  _targetId?: Ref<Obj> // We could reference both documents and embedded ones.
+  _targetClass: Ref<Class<Obj>>
 }
 
 /**

@@ -13,19 +13,16 @@
 // limitations under the License.
 //
 
-import {
-  AnyLayout, ArrayOf, Class, CORE_CLASS_ARRAY_OF, CORE_CLASS_INSTANCE_OF, CORE_CLASS_STRING, Doc, DomainIndex, Emb,
-  InstanceOf, Model, Obj, Ref, Storage, Tx, TxContext
-} from '@anticrm/core'
+import core, { AnyLayout, Class, Doc, DomainIndex, Emb, Model, Obj, Ref, Storage, Tx, TxContext } from '@anticrm/core'
 import {
   MessageMarkType, parseMessage, ReferenceMark, traverseMarks, traverseMessage
 } from '@anticrm/text'
 import { deepEqual } from 'fast-equals'
 import domains from '..'
 import { Reference } from '../references'
-import { create, CreateTx, DeleteTx, remove, updateDocument, UpdateTx } from '../tx'
-
-interface ClassKey { key: string, _class: Ref<Class<Emb>> }
+import { Space } from '../space'
+import { AddItemTx, create, CreateTx, DeleteTx, remove, UpdateItemTx, UpdateTx, RemoveItemTx } from '../tx'
+import { processTransactions } from '../tx_utils'
 
 /**
  * I N D E X
@@ -39,7 +36,6 @@ export class ReferenceIndex implements DomainIndex {
   private readonly modelDb: Model
   private readonly storage: Storage
   private readonly textAttributes = new Map<Ref<Class<Obj>>, string[]>()
-  private readonly arrayAttributes = new Map<Ref<Class<Obj>>, ClassKey[]>()
 
   constructor (modelDb: Model, storage: Storage) {
     this.modelDb = modelDb
@@ -52,32 +48,23 @@ export class ReferenceIndex implements DomainIndex {
 
     const keys = this.modelDb
       .getAllAttributes(_class)
-      .filter((m) => m.attr.type._class === CORE_CLASS_STRING)
+      .filter((m) => m.attr.type._class === core.class.String)
       .map((m) => m.key)
     this.textAttributes.set(_class, keys)
     return keys
   }
 
-  private getArrayAttributes (_class: Ref<Class<Obj>>): ClassKey[] {
-    const cached = this.arrayAttributes.get(_class)
-    if (cached !== undefined) return cached
-
-    const keys = this.modelDb
-      .getAllAttributes(_class)
-      .filter((m) => m.attr.type._class === CORE_CLASS_ARRAY_OF && (m.attr.type as ArrayOf).of._class === CORE_CLASS_INSTANCE_OF)
-      .map((m) => {
-        return {
-          key: m.key,
-          _class: ((m.attr.type as ArrayOf).of as InstanceOf<Emb>).of
-        }
-      })
-    this.arrayAttributes.set(_class, keys)
-    return keys
-  }
-
-  private referencesFromMessage (_class: Ref<Class<Doc>>, _id: Ref<Doc>, message: string, props: Record<string, unknown>, index: { value: number }): Reference[] {
+  private referencesFromMessage (
+    _class: Ref<Class<Doc>>,
+    _id: Ref<Doc>,
+    _itemClass: Ref<Class<Emb>>| undefined,
+    _itemId: Ref<Emb> | undefined,
+    _collection: string | undefined,
+    field: string,
+    message: string): Reference[] {
     const result: Reference[] = []
     const refMatcher = new Set()
+    let index = 0
     traverseMessage(parseMessage(message), (el) => {
       traverseMarks(el, (m) => {
         if (m.type === MessageMarkType.reference) {
@@ -85,16 +72,24 @@ export class ReferenceIndex implements DomainIndex {
           const key = rm.attrs.id + rm.attrs.class
           if (!refMatcher.has(key)) {
             refMatcher.add(key)
-            index.value++
-            result.push({
+            index++
+            const ref: Reference = {
               _class: domains.class.Reference,
-              _id: `${_id}${index.value}` as Ref<Doc>, // Generate a sequence id based on source object id.
+              _id: `${_id}-${field}-${_itemId ?? ''}-${index}` as Ref<Doc>, // Generate a sequence id based on source object id.
+
               _targetId: rm.attrs.id as Ref<Doc>,
               _targetClass: rm.attrs.class as Ref<Class<Doc>>,
+
               _sourceId: _id,
               _sourceClass: _class,
-              _sourceProps: props
-            })
+              _sourceField: field,
+              _sourceIndex: index,
+
+              _itemClass,
+              _itemId,
+              _collection
+            }
+            result.push(ref)
           }
         }
       })
@@ -102,74 +97,108 @@ export class ReferenceIndex implements DomainIndex {
     return result
   }
 
-  private references (_class: Ref<Class<Doc>>, _id: Ref<Doc>, obj: AnyLayout, props: Record<string, unknown>, index: { value: number }): Reference[] {
-    const attributes = this.getTextAttributes(_class)
+  private references (_class: Ref<Class<Doc>>, _id: Ref<Doc>,
+    _itemClass: Ref<Class<Emb>> | undefined, _itemId: Ref<Emb> | undefined,
+    _collectionId: string | undefined, obj: AnyLayout): Reference[] {
+    const attributes = this.getTextAttributes(_itemClass === undefined ? _class : _itemClass)
     const backlinks = []
     for (const attr of attributes) {
-      backlinks.push(...this.referencesFromMessage(_class, _id, (obj as any)[attr], props, index))
+      backlinks.push(...this.referencesFromMessage(_class, _id, _itemClass, _itemId, _collectionId, attr, (obj as any)[attr]))
     }
     return backlinks
   }
 
   async tx (ctx: TxContext, tx: Tx): Promise<any> {
-    switch (tx._class) {
-      case domains.class.CreateTx:
-        return await this.onCreate(ctx, tx as CreateTx)
-      case domains.class.UpdateTx:
-        return await this.onUpdateTx(ctx, tx as UpdateTx)
-      case domains.class.DeleteTx:
-        return await this.onDeleteTx(ctx, tx as DeleteTx)
-      default:
-        console.log('not implemented text tx', tx)
-    }
+    await processTransactions(ctx, tx, this)
   }
 
-  private collect (_objectClass: Ref<Class<Doc>>, _objectId: Ref<Doc>, object: any): Reference[] {
-    const index = { value: 0 }
-    const backlinks = this.references(_objectClass, _objectId, object, { pos: -1 }, index)
-    const arrays = this.getArrayAttributes(_objectClass)
-    for (const attr of arrays) {
-      const arr = object[attr.key]
-      if (arr !== undefined) {
-        for (let i = 0; i < arr.length; i++) {
-          backlinks.push(...this.references(_objectClass, _objectId, arr[i], {
-            pos: i,
-            key: attr.key,
-            attrClass: attr._class
-          }, index))
-        }
-      }
-    }
-    return backlinks
-  }
-
-  private async onCreate (ctx: TxContext, tx: CreateTx): Promise<any> {
-    const refereces = this.collect(tx._objectClass, tx._objectId, tx.object)
+  async onCreateTx (ctx: TxContext, tx: CreateTx): Promise<any> {
+    const refereces = this.references(tx._objectClass, tx._objectId, undefined, undefined, undefined, tx.attributes)
     if (refereces.length === 0) {
       return
     }
     return await Promise.all(refereces.map(async (d) => {
-      await this.storage.tx(ctx, create<Reference>(this.modelDb, '', d._class as Ref<Class<Reference>>, d))
+      await this.storage.tx(ctx, create<Reference>(d._class as Ref<Class<Reference>>, d, d._id))
     }))
   }
 
-  private async onUpdateTx (ctx: TxContext, update: UpdateTx): Promise<any> {
-    const obj = await this.storage.findOne(update._objectClass, { _id: update._objectId }) as Doc
-    updateDocument(this.modelDb, this.modelDb.as(obj, update._objectClass), update.operations)
-    if (obj === undefined) {
-      throw new Error('object not found')
+  async onAddItemTx (ctx: TxContext, tx: AddItemTx): Promise<any> {
+    const refereces = this.references(tx._itemClass, tx._objectId, tx._itemClass, tx._itemId, tx._collection, tx.attributes)
+    if (refereces.length === 0) {
+      return
     }
-
-    // Find current refs for this object
-    const refs = await this.storage.find<Reference>(domains.class.Reference, {
-      _sourceId: update._objectId,
-      _sourceClass: update._objectClass
-    })
-
-    return await this.diffApply(refs, this.collect(update._objectClass, update._objectId, obj as any), ctx)
+    return await Promise.all(refereces.map(async (d) => {
+      await this.storage.tx(ctx, create<Reference>(d._class as Ref<Class<Reference>>, d, d._id))
+    }))
   }
 
-  private async diffApply (refs: Reference[], newRefs: Reference[], ctx: TxContext): Promise<void> {
+  async onUpdateTx (ctx: TxContext, update: UpdateTx): Promise<any> {
+    // Find current refs for this object
+    const refs = (await this.storage.find<Reference>(domains.class.Reference, {
+      _sourceId: update._objectId,
+      _sourceClass: update._objectClass // TODO: Allow to find with some fields not defined.
+    })).filter(m => m._itemClass === undefined) // We only need object references.
+
+    const attributes = this.getTextAttributes(update._objectClass)
+    let newRefs = [...refs]
+    for (const attr of attributes) {
+      const value = update.attributes[attr] as string
+      if (value !== undefined) {
+        newRefs = newRefs.filter(r => r._sourceField !== attr) // Remove all previous values.
+        newRefs.push(...this.referencesFromMessage(update._objectClass, update._objectId, undefined, undefined, undefined, attr, value))
+      }
+    }
+
+    return await this.diffApply(ctx, refs, newRefs, update._objectSpace)
+  }
+
+  async onUpdateItemTx (ctx: TxContext, update: UpdateItemTx): Promise<any> {
+    // Find current refs for this object
+    const refs = (await this.storage.find<Reference>(domains.class.Reference, {
+      _sourceId: update._objectId,
+      _sourceClass: update._objectClass,
+      _itemClass: update._itemClass,
+      _itemId: update._itemId,
+      _collection: update._collection
+    }))
+
+    const attributes = this.getTextAttributes(update._itemClass)
+    let newRefs = [...refs]
+    for (const attr of attributes) {
+      const value = update.attributes[attr] as string
+      if (value !== undefined) {
+        newRefs = newRefs.filter(r => r._sourceField !== attr) // Remove all previous values.
+        newRefs.push(...this.referencesFromMessage(update._objectClass, update._objectId, update._itemClass, update._itemId, update._collection, attr, value))
+      }
+    }
+
+    return await this.diffApply(ctx, refs, newRefs, update._objectSpace)
+  }
+
+  async onDeleteTx (ctx: TxContext, deleteTx: DeleteTx): Promise<any> {
+    // Find current refs for this object to clean all of them. It will also delete all refs from collections.
+    const refs = await this.storage.find<Reference>(domains.class.Reference, {
+      _sourceId: deleteTx._objectId,
+      _sourceClass: deleteTx._objectClass
+    })
+
+    return await this.diffApply(ctx, refs, [])
+  }
+
+  async onRemoveItemTx (ctx: TxContext, tx: RemoveItemTx): Promise<any> {
+    // Find current refs for this object to clean all of them. It will also delete all refs from collections.
+    const refs = await this.storage.find<Reference>(domains.class.Reference, {
+      _sourceId: tx._objectId,
+      _sourceClass: tx._objectClass,
+      _itemClass: tx._itemClass,
+      _itemId: tx._itemId,
+      _collection: tx._collection
+    })
+
+    return await this.diffApply(ctx, refs, [])
+  }
+
+  private async diffApply (ctx: TxContext, refs: Reference[], newRefs: Reference[], _objectSpace?: Ref<Space>): Promise<void> {
     // Do diff from old refs to remove only missing.
     const deletes: Reference[] = []
     const existing: Reference[] = []
@@ -192,21 +221,11 @@ export class ReferenceIndex implements DomainIndex {
     }
     const additions = newRefs.filter(e => !existing.includes(e))
     const stored = Promise.all(additions.map(async (d) => {
-      await this.storage.tx(ctx, create<Reference>(this.modelDb, '', d._class as Ref<Class<Reference>>, d))
+      await this.storage.tx(ctx, create<Reference>(d._class as Ref<Class<Reference>>, d, d._id, _objectSpace))
     }))
     const deleted = Promise.all(deletes.map(async (d) => {
-      await this.storage.tx(ctx, remove<Reference>(this.modelDb, '', d))
+      await this.storage.tx(ctx, remove(d._class, d._id, _objectSpace))
     }))
     await Promise.all([stored, deleted])
-  }
-
-  private async onDeleteTx (ctx: TxContext, deleteTx: DeleteTx): Promise<any> {
-    // Find current refs for this object to clean all of them.
-    const refs = await this.storage.find<Reference>(domains.class.Reference, {
-      _sourceId: deleteTx._objectId,
-      _sourceClass: deleteTx._objectClass
-    })
-
-    return await this.diffApply(refs, [], ctx)
   }
 }

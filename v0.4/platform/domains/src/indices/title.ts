@@ -13,12 +13,11 @@
 // limitations under the License.
 //
 
-import { Class, Doc, DomainIndex, generateId, Model, Ref, Storage, Tx, TxContext } from '@anticrm/core'
+import { Class, Doc, DocumentValue, DomainIndex, Model, Ref, Storage, Tx, TxContext } from '@anticrm/core'
 import domains from '..'
 import { getPrimaryKey } from '../primary_utils'
 import { Title, TitleSource } from '../title'
-import { create, CreateTx, DeleteTx, newDeleteTx, newUpdateTx, TxOperationKind, updateDocument, UpdateTx } from '../tx'
-import { VDoc } from '../vdoc'
+import { create, CreateTx, DeleteTx, remove, update, UpdateTx } from '../tx'
 
 const NULL = '<null>'
 
@@ -53,61 +52,67 @@ export class TitleIndex implements DomainIndex {
         return await this.onUpdate(ctx, tx as UpdateTx)
       case domains.class.DeleteTx:
         return await this.onDelete(ctx, tx as DeleteTx)
+      case domains.class.AddItemTx:
+        break // No support required
+      case domains.class.UpdateItemTx:
+        break // No support required
+      case domains.class.RemoveItemTx:
+        break // No support required
       default:
         console.log('not implemented title tx', tx)
     }
   }
 
   async onCreate (ctx: TxContext, tx: CreateTx): Promise<any> {
-    await this.updateShortIdRef(ctx, this.modelDb.createDocument(tx._objectClass, tx.object, tx._objectId))
+    await this.updateShortIdRef(ctx, tx)
 
     const primary = this.getPrimary(tx._objectClass)
     if (primary === undefined) {
       return
     }
 
-    const title = (tx.object as any)[primary] as string
+    const rawValue = this.modelDb.assign({}, tx._objectClass, tx.attributes)
+    const attr = this.modelDb.classAttribute(tx._objectClass, primary)
+    const title = (rawValue as any)[attr.key] as string
 
-    const doc: Title = {
+    const _id = this.getPrimaryID(tx._objectId)
+    // Use same object Id, so we will be able to update it in case of title change.
+    const doc: DocumentValue<Title> = {
       _class: domains.class.Title,
-      _id: this.getPrimaryID(tx._objectId), // Use same object Id, so we will be able to update it in case of title change.
       _objectClass: tx._objectClass,
       _objectId: tx._objectId,
       source: TitleSource.Title,
       title
     }
 
-    return await this.storage.tx(ctx, create<Title>(this.modelDb, '', domains.class.Title, doc))
+    return await this.storage.tx(ctx, create<Title>(domains.class.Title, doc, _id))
   }
 
   private getPrimaryID (_id: Ref<Doc>): Ref<Doc> {
     return ('primary:' + _id) as Ref<Doc>
   }
 
-  private async updateShortIdRef (ctx: TxContext, obj: Doc): Promise<void> {
-    if (!this.modelDb.isMixedIn(obj, domains.mixin.ShortID)) {
-      return await Promise.resolve()
-    }
-    const object = this.modelDb.as(obj, domains.mixin.ShortID)
-    const shortId = object.shortId
-    if (shortId !== undefined) {
-      // Find short Ids, and if we already had one do not create duplicate
-      const docs = await this.storage.find<Title>(domains.class.Title, { _objectId: obj._id, _objectClass: obj._class })
-      for (const d of docs) {
-        if (d.title === shortId) {
-          // Duplicate found, do not create a new one.
-          return
+  private async updateShortIdRef (ctx: TxContext, tx: CreateTx | UpdateTx): Promise<void> {
+    const rawValue = this.modelDb.assign({}, tx._objectClass, tx.attributes)
+    const attr = this.modelDb.classAttribute(domains.mixin.ShortID, 'shortId')
+
+    const newShortId = (rawValue as any)[attr.key] as string
+
+    if (newShortId !== undefined) {
+      const _id = ('sid-' + tx._objectId) as Ref<Doc>
+      const existingTitle = await this.storage.findOne<Title>(domains.class.Title, { _id, source: TitleSource.ShortId, _objectClass: tx._objectClass, _objectId: tx._objectId })
+      if (existingTitle !== undefined) {
+        // If short id already exists, just update it.
+        await this.storage.tx(ctx, update<Title>(domains.class.Title, _id, { title: newShortId }))
+      } else {
+        const doc: DocumentValue<Title> = {
+          _objectClass: tx._objectClass,
+          _objectId: tx._objectId,
+          title: newShortId,
+          source: TitleSource.ShortId
         }
+        await this.storage.tx(ctx, create<Title>(domains.class.Title, doc, _id))
       }
-      const doc: Title = {
-        _class: domains.class.Title,
-        _id: generateId() as Ref<Title>,
-        _objectClass: obj._class,
-        _objectId: obj._id,
-        title: shortId,
-        source: TitleSource.ShortId
-      }
-      await this.storage.tx(ctx, create<Title>(this.modelDb, (obj as VDoc)._createdBy ?? '', domains.class.Title, doc))
     }
   }
 
@@ -117,20 +122,17 @@ export class TitleIndex implements DomainIndex {
       return
     }
 
-    const obj = await this.storage.findOne(tx._objectClass, { _id: tx._objectId }) as Doc
+    await this.updateShortIdRef(ctx, tx)
 
-    const previousPrimary = (obj as any)[primary]
-    updateDocument(this.modelDb, this.modelDb.as(obj, tx._objectClass), tx.operations)
-    await this.updateShortIdRef(ctx, obj)
-    const newPrimary = (obj as any)[primary]
+    const rawValue = this.modelDb.assign({}, tx._objectClass, tx.attributes)
+    const attr = this.modelDb.classAttribute(tx._objectClass, primary)
+    const newPrimary = (rawValue as any)[attr.key] as string
 
-    if (previousPrimary !== primary) {
+    if (newPrimary !== undefined) {
+      const titleTx = update<Title>(domains.class.Title, this.getPrimaryID(tx._objectId), { title: newPrimary })
+      titleTx._user = tx._user
       // Update a current primary title Title object, since it is address by _objectId
-      await this.storage.tx(ctx, newUpdateTx(domains.class.Title, this.getPrimaryID(tx._objectId), [{
-        _class: domains.class.TxOperation,
-        kind: TxOperationKind.Set,
-        _attributes: { title: newPrimary }
-      }], tx._user))
+      await this.storage.tx(ctx, titleTx)
     }
   }
 
@@ -141,7 +143,7 @@ export class TitleIndex implements DomainIndex {
       _objectClass: deleteTx._objectClass
     })
     await Promise.all(docs.map(async d => {
-      await this.storage.tx(ctx, newDeleteTx(domains.class.Title, d._id, deleteTx._user))
+      await this.storage.tx(ctx, remove(domains.class.Title, d._id, deleteTx._objectSpace))
     }))
   }
 }

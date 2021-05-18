@@ -35,6 +35,9 @@ export class PassthroughsIndex implements DomainIndex {
       case domains.class.CreateTx:
       case domains.class.UpdateTx:
       case domains.class.DeleteTx:
+      case domains.class.AddItemTx:
+      case domains.class.UpdateItemTx:
+      case domains.class.RemoveItemTx:
         if (!this.modelDb.is((tx as ObjectTx)._objectClass, this.matchClass)) {
           return await Promise.resolve()
         }

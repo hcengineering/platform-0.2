@@ -13,104 +13,164 @@
 // limitations under the License.
 //
 
-import { Class, Doc, DocumentValue, Model, Ref, Tx } from '@anticrm/core'
-import domains from '..'
-import { getPrimaryKey } from '../primary_utils'
+import { AnyLayout, Class, Doc, DocumentValue, Emb, generateId, Obj, Ref, Tx } from '@anticrm/core'
+import { CollectionId } from '@anticrm/core/src/colletionid'
+import { AddItemTx, collectionId, CreateTx, DeleteTx, RemoveItemTx, UpdateItemTx, UpdateTx } from '.'
+import core from '..'
 import { Space } from '../space'
-import { CreateTx, ObjectTx, ObjectTxDetails, txBuilder, TxBuilder, TxOperation, TxOperationKind, UpdateTx } from './'
-import { newCreateTx, newDeleteTx, newUpdateTx } from './tx'
 
-function getSpace (model: Model, doc: Doc): { _objectSpace: Ref<Space> | undefined, spaceIsRequired: boolean } {
-  if (model.is(doc._class, domains.class.Space)) {
-    return { _objectSpace: doc._id as Ref<Space>, spaceIsRequired: true }
-  }
-  const isVDoc = model.is(doc._class, domains.class.VDoc)
-  return { _objectSpace: isVDoc ? (doc as any)._space as Ref<Space> : undefined, spaceIsRequired: isVDoc }
-}
+const EMPTY_USER = '#no_user'
 
 /**
  * Construct object create transaction.
  */
-export function create<T extends Doc> (model: Model, userId: string, _class: Ref<Class<T>>, values: DocumentValue<T>): CreateTx {
-  const clazz = model.get(_class)
-  if (clazz === undefined) {
-    throw new Error('Class ' + _class + ' not found')
+export function create<T extends Doc> (_class: Ref<Class<T>>, attributes: DocumentValue<T>, _id?: Ref<Obj>, _objectSpace?: Ref<Space>): CreateTx {
+  // Make a copy.
+  const { ...objValue } = attributes
+
+  // remove _space field if defined
+  delete (objValue as any)._class
+  delete (objValue as any)._space
+  delete (objValue as any)._id
+
+  const tx: CreateTx = {
+    _class: core.class.CreateTx,
+    _id: generateId(),
+    _objectSpace,
+    _date: Date.now(),
+    _user: EMPTY_USER,
+    _objectId: _id ?? generateId(),
+    _objectClass: _class,
+    attributes: objValue as unknown as AnyLayout
   }
-
-  const doc = model.createDocument(_class, values, values._id)
-
-  const { _objectSpace, spaceIsRequired } = getSpace(model, doc)
-  if ((_objectSpace === undefined) && spaceIsRequired) {
-    throw new Error('Every VDoc based object should contain _space property')
-  }
-  const tx = newCreateTx(doc, userId, _objectSpace)
-  fillUpdateDetails(model, doc, tx)
-  return tx
-}
-
-/**
- * Construct object update transaction.
- */
-export function updateWith<T extends Doc> (model: Model, userId: string, doc: T, builder: (s: TxBuilder<T>) => TxOperation | TxOperation[]): Tx {
-  const b = txBuilder<T>(doc._class as Ref<Class<T>>)
-  const op = builder(b)
-
-  const { _objectSpace, spaceIsRequired } = getSpace(model, doc)
-  if ((_objectSpace === undefined) && spaceIsRequired) {
-    throw new Error('Every VDoc based object should contain _space property')
-  }
-
-  const tx: UpdateTx = newUpdateTx(doc._class, doc._id, (op instanceof Array) ? op : [op], userId, _objectSpace)
-
-  fillUpdateDetails(model, doc, tx)
   return tx
 }
 
 /**
  * Construct update transaction
  */
-export function update<T extends Doc> (model: Model, userId: string, doc: T, value: DocumentValue<T>): Tx {
-  const { _objectSpace, spaceIsRequired } = getSpace(model, doc)
-  if ((_objectSpace === undefined) && spaceIsRequired) {
-    throw new Error('Every VDoc based object should contain _space property')
+export function update<T extends Doc> (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attributes: Partial<T>, _objectSpace?: Ref<Space>): Tx {
+  const tx: UpdateTx = {
+    _class: core.class.UpdateTx,
+    _id: generateId(),
+    _objectId: _id,
+    _objectClass: _class,
+    _objectSpace,
+    _date: Date.now(),
+    _user: EMPTY_USER,
+    attributes: attributes as unknown as AnyLayout
   }
-
-  const txOp: TxOperation = {
-    _class: domains.class.TxOperation,
-    kind: TxOperationKind.Set,
-    _attributes: value
-  }
-  const tx = newUpdateTx(doc._class, doc._id, [txOp], userId, _objectSpace)
-
-  fillUpdateDetails(model, doc, tx)
   return tx
 }
 
 /**
  * Construct delete transaction
  */
-export function remove<T extends Doc> (model: Model, userId: string, doc: T): Tx {
-  const { _objectSpace, spaceIsRequired } = getSpace(model, doc)
-  if ((_objectSpace === null) && spaceIsRequired) {
-    throw new Error('Every VDoc based object should contain _space property')
+export function remove (_class: Ref<Class<Doc>>, _id: Ref<Doc>, _objectSpace?: Ref<Space>): Tx {
+  const tx: DeleteTx = {
+    _class: core.class.DeleteTx,
+    _id: generateId(),
+    _objectId: _id,
+    _objectClass: _class,
+    _objectSpace,
+    _date: Date.now(),
+    _user: EMPTY_USER
   }
-
-  const tx = newDeleteTx(doc._class, doc._id, userId, _objectSpace)
-  fillUpdateDetails(model, doc, tx)
   return tx
 }
 
-function fillUpdateDetails<T extends Doc> (model: Model, doc: T, tx: ObjectTx): void {
-  // Fill primary field
-  const primary = getPrimaryKey(model, doc._class)
-  if (primary !== undefined) {
-    const title = (doc as any)[primary]
-    if (title !== undefined) {
-      model.cast<ObjectTxDetails>(doc, domains.mixin.ObjectTxDetails).name = title
-    }
+// ******************************************************************************************************
+// C O L L E C T I O N S
+// ******************************************************************************************************
+
+/**
+ * Create a new item in collection.
+ */
+export function addItem<T extends Doc, C extends Emb> (
+  _objectClass: Ref<Class<T>>,
+  _objectId: Ref<Doc>,
+  _objectSpace: Ref<Space>,
+  _itemClass: Ref<Class<C>>,
+  selector: CollectionId<T>, // <- collection selector builder
+  value: DocumentValue<C>,
+  _itemId?: Ref<C>
+): AddItemTx {
+  const fieldId = selector(collectionId<T>())
+
+  const tx: AddItemTx = {
+    _class: core.class.AddItemTx,
+    _id: generateId(), // Transaction ID
+    _objectId,
+    _objectClass,
+    _objectSpace,
+    _user: EMPTY_USER,
+    _date: Date.now(),
+
+    _itemClass,
+    _itemId: _itemId ?? generateId(),
+    _collection: fieldId,
+    attributes: value as unknown as AnyLayout
   }
-  // Fill short Id.
-  model.asMixin(doc, domains.mixin.ShortID, (id) => {
-    model.cast<ObjectTxDetails>(doc, domains.mixin.ObjectTxDetails).id = id.shortId
-  })
+  return tx
+}
+
+/**
+ * Update item in collection.
+*/
+export function updateItem<T extends Doc, C extends Emb> (
+  _objectClass: Ref<Class<T>>,
+  _objectId: Ref<Doc>,
+  _objectSpace: Ref<Space>,
+  _itemClass: Ref<Class<C>>,
+  selector: CollectionId<T>, // <- collection selector builder
+
+  _itemId: Ref<C>,
+  value: Partial<C>
+): UpdateItemTx {
+  const fieldId = selector(collectionId<T>())
+
+  const tx: UpdateItemTx = {
+    _class: core.class.UpdateItemTx,
+    _id: generateId(), // Transaction Id
+    _objectId,
+    _objectClass,
+    _objectSpace,
+    _user: EMPTY_USER,
+    _date: Date.now(),
+
+    _itemClass,
+    _itemId,
+    _collection: fieldId,
+    attributes: value as unknown as AnyLayout
+  }
+  return tx
+}
+
+/**
+ * Remove item from collection.
+ */
+export function removeItem<T extends Doc, C extends Emb> (
+  _objectClass: Ref<Class<T>>,
+  _objectId: Ref<Doc>,
+  _objectSpace: Ref<Space>,
+  _itemClass: Ref<Class<C>>,
+  selector: CollectionId<T>, // <- collection selector builder
+  _itemId: Ref<C>
+): RemoveItemTx {
+  const fieldId = selector(collectionId<T>())
+
+  const tx: RemoveItemTx = {
+    _class: core.class.RemoveItemTx,
+    _id: generateId(),
+    _objectId,
+    _objectClass,
+    _objectSpace,
+    _user: EMPTY_USER,
+    _date: Date.now(),
+
+    _itemClass,
+    _itemId,
+    _collection: fieldId
+  }
+  return tx
 }

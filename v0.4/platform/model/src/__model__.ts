@@ -13,18 +13,16 @@
 // limitations under the License.
 //
 
-import { Class, Doc, Emb, MODEL_DOMAIN, Ref, Type } from '@anticrm/core'
-import { Application, ShortID, Space, SpaceUser, Title, TitleSource, TITLE_DOMAIN, VDoc } from '@anticrm/domains'
-import core, { ArrayOf$, Builder, Class$, InstanceOf$, Mixin$, Primary, Prop, RefTo$ } from '.'
+import core, { Class, Doc, MODEL_DOMAIN, Ref, Type } from '@anticrm/core'
+import domains, { Application, Indices, ShortID, Space, SpaceUser, Title, TitleSource, TITLE_DOMAIN, VDoc, CollectionReference } from '@anticrm/domains'
+import { Builder, Class$, Mixin$, Primary, Prop, RefTo$ } from '.'
 import {
-  TArrayOf, TAttribute, TBagOf, TClass, TClassifier, TDoc, TEmb, TEnum, TEnumLiteral, TEnumOf, TIndexesClass, TInstanceOf,
+  TAttribute, TClass, TClassifier, TCollectionOf, TDoc, TEmb, TEnum, TEnumLiteral, TEnumOf,
   TMixin, TObj,
   TRefTo, TType
 } from './models/core'
 import { TReference } from './models/references'
-import {
-  TCreateTx, TDeleteTx, TObjectSelector, TObjectTx, TObjectTxDetails, TTx, TTxOperation, TUpdateTx
-} from './models/tx'
+import { TAddItemTx, TCreateTx, TDeleteTx, TItemTx, TObjectTx, TRemoveItemTx, TTx, TUpdateItemTx, TUpdateTx } from './models/tx'
 
 export * from './models/core'
 export * from './models/references'
@@ -50,51 +48,51 @@ class TDateType extends TType implements Type {
 
 ///
 
-@Class$(core.class.SpaceUser, core.class.Emb, MODEL_DOMAIN)
+@Class$(domains.class.SpaceUser, core.class.Emb, MODEL_DOMAIN)
 export class TSpaceUser extends TEmb implements SpaceUser {
   @Prop() userId!: string
   @Prop() owner!: boolean
 }
 
-@Class$(core.class.Space, core.class.Doc, MODEL_DOMAIN)
+@Class$(domains.class.Space, core.class.Doc, MODEL_DOMAIN)
 export class TSpace extends TDoc implements Space {
   @Primary()
   @Prop() name!: string
 
   @Prop() description!: string
 
-  @RefTo$(core.class.Application) application!: Ref<Application>
-  @InstanceOf$(core.class.Emb) applicationSettings?: Emb
+  @RefTo$(domains.class.Application) application!: Ref<Application>
+
+  @Prop() applicationSettings?: any
 
   @Prop() spaceKey!: string
 
-  @ArrayOf$()
-  @InstanceOf$(core.class.SpaceUser) users!: SpaceUser[]
+  @Prop() users!: SpaceUser[]
 
   @Prop(core.class.Boolean) isPublic!: boolean
 
   @Prop(core.class.Boolean) archived!: boolean
 }
 
-@Class$(core.class.VDoc, core.class.Doc, MODEL_DOMAIN)
+@Class$(domains.class.VDoc, core.class.Doc, MODEL_DOMAIN)
 export class TVDoc extends TDoc implements VDoc {
-  @RefTo$(core.class.Space) _space!: Ref<Space>
+  @RefTo$(domains.class.Space) _space!: Ref<Space>
   @Prop() _createdOn!: number
   @Prop() _createdBy!: string
   @Prop() _modifiedOn?: number
   @Prop() _modifiedBy?: string
 }
 
-@Mixin$(core.mixin.ShortID, core.class.VDoc)
+@Mixin$(domains.mixin.ShortID, domains.class.VDoc)
 export class TVShortID extends TVDoc implements ShortID {
   @Prop() shortId!: string
 }
 
-@Class$(core.class.Application, core.class.Doc, MODEL_DOMAIN)
+@Class$(domains.class.Application, core.class.Doc, MODEL_DOMAIN)
 export class TApplication extends TDoc implements Application {
 }
 
-@Class$(core.class.Title, core.class.Doc, TITLE_DOMAIN)
+@Class$(domains.class.Title, core.class.Doc, TITLE_DOMAIN)
 export class TTitle extends TDoc implements Title {
   @RefTo$(core.class.Class) _objectClass!: Ref<Class<Doc>>
   @RefTo$(core.class.Doc) _objectId!: Ref<Doc>
@@ -102,11 +100,24 @@ export class TTitle extends TDoc implements Title {
   @Prop() source!: TitleSource
 }
 
+@Mixin$(domains.mixin.Indices, core.class.Mixin)
+export class TIndexesClass<T extends Doc> extends TMixin<T> implements Indices {
+  @Prop() primary!: string
+}
+
+@Mixin$(domains.mixin.CollectionReference, core.class.Emb)
+export class TCollectionReference extends TEmb implements CollectionReference {
+  @RefTo$(core.class.Doc) _parentId!: Ref<Doc>
+  @RefTo$(core.class.Class) _parentClass!: Ref<Class<Doc>>
+  @Prop() _collection!: string
+  @RefTo$(domains.class.Space) _parentSpace!: Ref<Space>
+}
+
 export function model (S: Builder): void {
-  S.add(TObj, TEmb, TDoc, TAttribute, TType, TRefTo, TInstanceOf, TEnumOf, TArrayOf, TBagOf, TClassifier, TClass, TMixin, TEnumLiteral, TEnum)
+  S.add(TObj, TEmb, TDoc, TAttribute, TType, TRefTo, TEnumOf, TCollectionOf, TCollectionReference, TClassifier, TClass, TMixin, TEnumLiteral, TEnum)
   S.add(TIndexesClass, TVShortID)
   S.add(TStringType, TNumberType, TBooleanType, TDateType)
   S.add(TVDoc, TReference, TTitle, TApplication)
-  S.add(TTx, TCreateTx, TUpdateTx, TDeleteTx, TTxOperation, TObjectSelector, TObjectTx, TObjectTxDetails)
+  S.add(TTx, TCreateTx, TUpdateTx, TDeleteTx, TObjectTx, TAddItemTx, TUpdateItemTx, TRemoveItemTx, TItemTx)
   S.add(TSpace, TSpaceUser)
 }
