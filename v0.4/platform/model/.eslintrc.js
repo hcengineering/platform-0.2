@@ -1,5 +1,1 @@
-module.exports = {
-  extends: [
-    '../../.eslintrc.js'
-  ]
-}
+../../.eslintrc.js.template

@@ -42,7 +42,7 @@ export interface Collection<T> {
   items?: T[]
 }
 
-export type PropertyType = PrimitiveType| Ref<Doc> | Emb | PropertyType[] | { [key: string]: PropertyType }
+export type PropertyType = PrimitiveType | Ref<Doc> | Emb | PropertyType[] | { [key: string]: PropertyType }
 
 // An attribute type with some defined mixins inside.
 export interface Type extends Obj {
