@@ -3,5 +3,10 @@ for i in $roots
 do
 pushd ${i}
 $@
+retVal=$?
+if [ $retVal -ne 0 ]; then
+  echo "Error"
+  exit 1
+fi
 popd
 done

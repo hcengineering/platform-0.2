@@ -30,6 +30,11 @@ if [ -n "$FILES" ]; then
     echo -e "\033[0;34mProcessing \033[0;31m${value}\033[0m"
     pushd $value 
     $@
+    retVal=$?
+    if [ $retVal -ne 0 ]; then
+      echo "Error"
+      exit 1
+    fi
     popd
   done
 fi
