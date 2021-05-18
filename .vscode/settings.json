@@ -20,7 +20,22 @@
   "eslint.format.enable": true,
   "editor.formatOnSave": true,
   "eslint.alwaysShowStatus": true,
-  "eslint.packageManager": "yarn",
-  "eslint.probe": ["javascript", "typescript", "svelte"],
-  "eslint.validate": ["javascript", "typescript", "svelte"]
+  "eslint.probe": [
+    "javascript",
+    "typescript",
+    "svelte"
+  ],
+  "eslint.validate": [
+    "javascript",
+    "typescript",
+    "svelte"
+  ],
+  "eslint.runtime": "npm",
+  "eslint.packageManager": "pnpm",
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/bower_components": true,
+    "**/*.code-search": true,
+    "**/lib/**": true
+  }
 }
