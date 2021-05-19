@@ -53,6 +53,10 @@ export default (newRpcClient: () => RpcClient): RpcService => {
       ws.onMessage((event: MessageEvent) => {
         const response = readResponse(event.data)
         if (response.id === undefined) {
+          if (response.webrtc !== undefined) {
+            (listeners.get(EventType.WebRTC) ?? [])
+              .forEach(l => l(response.webrtc))
+          }
           if (response.result !== undefined) {
             for (const listener of (listeners.get(EventType.Transaction) ?? [])) {
               listener(response.result)

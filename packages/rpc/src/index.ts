@@ -15,6 +15,7 @@
 
 import { Status, Severity } from '@anticrm/foundation'
 import { Tx } from '@anticrm/core'
+import { OutgoingMsg } from '@anticrm/webrtc'
 
 export type ReqId = string | number
 
@@ -47,6 +48,9 @@ export interface Response<R> {
 
   // A list of transactions to make client state be equal to server state in case of live queries of derived data
   clientTx?: Tx[]
+
+  // Webrtc msg, probably we need to introduce new kind of message
+  webrtc?: OutgoingMsg
 }
 
 export function serialize (object: Request<any> | Response<any>): string {
@@ -70,6 +74,7 @@ export const RPC_CALL_FINDONE = 'findOne'
 export const RPC_CALL_LOAD_DOMAIN = 'loadDomain'
 export const RPC_CALL_TX = 'tx'
 export const RPC_CALL_GEN_REF_ID = 'genRefId'
+export const RPC_CALL_WEBRTC = 'webrtc'
 
 export interface FindResponse<T> {
   values: T[]

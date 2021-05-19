@@ -21,6 +21,8 @@ import { newCreateTx } from '@anticrm/domains/src/tx/tx'
 import { Property, Ref, StringProperty } from '@anticrm/core'
 import { CORE_CLASS_SPACE, Space, SpaceUser } from '@anticrm/domains'
 
+jest.mock('../webrtc')
+
 describe('service', () => {
   const wsName = 'test-service'
   const server = new ServerSuite(wsName)

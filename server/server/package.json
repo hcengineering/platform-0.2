@@ -20,6 +20,7 @@
     "@microsoft/api-extractor": "^7.14.0",
     "@types/jest": "^26.0.22",
     "@types/jwt-simple": "^0.5.33",
+    "@types/kurento-client": "^6.14.4",
     "@types/mongodb": "^3.6.12",
     "@types/ws": "^7.4.1",
     "@typescript-eslint/eslint-plugin": "^4.22.0",
@@ -40,7 +41,9 @@
   "dependencies": {
     "@anticrm/platform": "^0.1.8",
     "jwt-simple": "^0.5.6",
+    "kurento-client": "^6.16.0",
     "mongodb": "^3.6.6",
+    "p-queue": "6.6.2",
     "ws": "^7.4.5"
   }
 }

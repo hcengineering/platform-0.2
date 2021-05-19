@@ -23,10 +23,13 @@ import { Class, Doc, DocumentProtocol, DocumentQuery, FindOptions, Ref, Tx } fro
 import {
   readRequest, Response, RPC_CALL_FIND, RPC_CALL_FINDONE, RPC_CALL_GEN_REF_ID, RPC_CALL_LOAD_DOMAIN, RPC_CALL_TX,
   RpcError,
-  serialize
+  serialize,
+  RPC_CALL_WEBRTC
 } from '@anticrm/rpc'
 import { Space } from '@anticrm/domains'
+import { OutgoingMsg } from '@anticrm/webrtc'
 import { SecurityContext } from './spaces'
+import WebRTC from './webrtc'
 
 export interface Client {
   email: string
@@ -69,6 +72,7 @@ export async function start (port: number, dbUri: string, host?: string): Promis
 
   const server = createServer()
   const wss = new Server({ noServer: true })
+  const webRTC = new WebRTC()
 
   const workspaces = new Map<string, Promise<WorkspaceProtocol>>()
 
@@ -144,17 +148,24 @@ export async function start (port: number, dbUri: string, host?: string): Promis
   wss.on('connection', (ws: WebSocket, request: any, client: Client) => {
     console.log('connect:', client)
     const workspace = getWorkspace(client.workspace)
-
+    const send = (msg: any): void => ws.send(msg)
     const service = createClient(workspace, {
       ...client,
-      send: (response) => {
-        ws.send(response)
-      }
+      send
     })
 
+    const webRTCClient = webRTC.onNewClient(
+      client,
+      (webrtc: OutgoingMsg) => send(serialize({
+        webrtc
+      })),
+      workspace
+    )
     const unreg = registerClient(client.workspace, service)
     ws.on('close', () => {
       unreg()
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      webRTCClient.onClose()
     })
 
     const handleMessage = async (msg: string): Promise<void> => {
@@ -199,6 +210,9 @@ export async function start (port: number, dbUri: string, host?: string): Promis
           }
           case RPC_CALL_LOAD_DOMAIN:
             response.result = await ss.loadDomain(request.params[0] as string)
+            break
+          case RPC_CALL_WEBRTC:
+            response.result = await webRTCClient.onWSMsg(request.params[0])
             break
         }
       } catch (error) {

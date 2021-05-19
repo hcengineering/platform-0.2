@@ -33,6 +33,9 @@ import { model as chunter } from '@anticrm/chunter/src/__model__'
 import { readResponse, serialize } from '@anticrm/rpc'
 import { model as activityPlugin } from '@anticrm/activity/src/__model__'
 import { CORE_CLASS_SPACE } from '@anticrm/domains'
+
+jest.mock('../webrtc')
+
 // import recruitmentModel from '@anticrm/recruitment-model/src/model'
 
 // import taskStrings from '@anticrm/task-model/src/strings/ru'

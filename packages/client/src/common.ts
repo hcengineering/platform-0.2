@@ -19,7 +19,8 @@ export type EventListener = (event: unknown) => void
 
 export enum EventType {
   Transaction, // A normal transaction with data modification
-  TransientTransaction // A transient transaction with derived data modification.
+  TransientTransaction, // A transient transaction with derived data modification.
+  WebRTC // WebRTC related message
 }
 
 export interface ClientService extends CoreProtocol, DocumentProtocol {

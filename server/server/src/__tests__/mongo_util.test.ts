@@ -22,6 +22,8 @@ import { createOperations } from '@anticrm/domains/src/tx/operations'
 import { createSetArrayFilters } from '../mongo_utils'
 import { ServerSuite } from './serversuite'
 
+jest.mock('../webrtc')
+
 describe('mongo operations', () => {
   const wsName = 'test-service-mongo'
   const server = new ServerSuite(wsName)
