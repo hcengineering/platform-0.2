@@ -16,7 +16,7 @@
 /* eslint-env jest */
 
 import { Doc, DocumentValue, Model, Ref, SortingOrder, txContext } from '@anticrm/core'
-import { createTask, data, Task, TaskComment, taskIds as task, taskIds } from '@anticrm/core/src/__tests__/tasks'
+import { createTask, data, Task, TaskComment, taskIds as task, taskIds } from '@anticrm/domains/src/__tests__/domains_tasks'
 import { Space, addItem, create, removeItem, updateItem, update } from '@anticrm/domains'
 
 import { Db, MongoClient } from 'mongodb'

@@ -17,7 +17,7 @@ import core, {
   Attribute, Class, Classifier, ClassifierKind, Collection, CollectionOf, Doc, Emb, Enum, EnumLiteral,
   EnumOf, InstanceOf, Mixin, MODEL_DOMAIN, Obj, PropertyType, Ref, RefTo, Type
 } from '@anticrm/core'
-import { Class$, CollectionOf$, InstanceOf$, Prop, RefTo$ } from '../dsl'
+import { Class$, CollectionOf$, InstanceOf$, Prop, RefTo$ } from '@anticrm/model'
 
 @Class$(core.class.Obj, core.class.Obj)
 export class TObj implements Obj {
@@ -40,6 +40,7 @@ export class TDoc extends TObj implements Doc {
 
 @Class$(core.class.Attribute, core.class.Emb, MODEL_DOMAIN)
 export class TAttribute extends TEmb implements Attribute {
+  @Prop() name!: string
   @InstanceOf$(core.class.Type) type!: Type
 }
 

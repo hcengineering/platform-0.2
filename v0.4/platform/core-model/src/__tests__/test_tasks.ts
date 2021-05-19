@@ -15,13 +15,12 @@
 
 import core, { Collection, MODEL_DOMAIN } from '@anticrm/core'
 import { Task, TaskComment, TaskEstimate, taskIds, TaskMixin } from '@anticrm/core/src/__tests__/tasks'
-import { Builder, Class$, Prop } from '..'
-import { CollectionOf$, InstanceOf$, Mixin$, Primary } from '../dsl'
-import { model as globalModel, TDoc, TEmb } from '../__model__'
+import { Builder, Class$, CollectionOf$, InstanceOf$, Mixin$, Prop } from '@anticrm/model'
+import { TDoc, TEmb } from '..'
 
 @Class$(taskIds.class.Task, core.class.Doc, MODEL_DOMAIN)
 export class TTask extends TDoc implements Task {
-  @Primary()
+  // @Primary()
   @Prop() name!: string
 
   @Prop() description!: string
@@ -59,9 +58,4 @@ export class TTaskEstimate extends TEmb implements TaskEstimate {
 
 export function model (S: Builder): void {
   S.add(TTask, TTaskComment, TTaskMixin, TTaskEstimate)
-}
-
-export function fullModel (S: Builder): void {
-  globalModel(S)
-  model(S)
 }

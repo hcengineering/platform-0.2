@@ -13,11 +13,10 @@
 // limitations under the License.
 //
 
-import { Class$, Prop, RefTo$ } from '../dsl'
-import domains, { Reference, REFERENCE_DOMAIN } from '@anticrm/domains'
 import core, { Class, Doc, Emb, Obj, Ref } from '@anticrm/core'
-
-import { TDoc } from './core'
+import { TDoc } from '@anticrm/core-model'
+import domains, { Reference, REFERENCE_DOMAIN } from '@anticrm/domains'
+import { Class$, Prop, RefTo$ } from '@anticrm/model'
 
 @Class$(domains.class.Reference, core.class.Doc, REFERENCE_DOMAIN)
 export class TReference extends TDoc implements Reference {

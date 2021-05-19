@@ -16,10 +16,10 @@
 /* eslint-env jest */
 
 import core, { Class, Doc, Model, Ref, txContext } from '@anticrm/core'
-import { createTask, data, taskIds } from '@anticrm/core/src/__tests__/tasks'
 import { ModelStorage } from '../model_storage'
 import { getPrimaryKey } from '../primary_utils'
 import { create, ObjectTx } from '../tx'
+import { createTask, data, taskIds } from './domains_tasks'
 
 describe('core tests', () => {
   const model = new Model('vdocs')

@@ -3,25 +3,28 @@ dependencies:
   '@babel/eslint-parser': 7.13.14_@babel+core@7.14.0
   '@babel/preset-env': 7.14.1_@babel+core@7.14.0
   '@jest/globals': 26.6.2
-  '@rush-temp/client': file:projects/client.tgz_@babel+core@7.14.0+ts-node@9.1.1
-  '@rush-temp/core': file:projects/core.tgz_@babel+core@7.14.0+ts-node@9.1.1
-  '@rush-temp/domains': file:projects/domains.tgz_@babel+core@7.14.0+ts-node@9.1.1
+  '@rush-temp/client': file:projects/client.tgz_@babel+core@7.14.0
+  '@rush-temp/core': file:projects/core.tgz_@babel+core@7.14.0
+  '@rush-temp/core-model': file:projects/core-model.tgz_@babel+core@7.14.0
+  '@rush-temp/domains': file:projects/domains.tgz_@babel+core@7.14.0
+  '@rush-temp/domains-model': file:projects/domains-model.tgz_@babel+core@7.14.0
+  '@rush-temp/gen-model': file:projects/gen-model.tgz
   '@rush-temp/model': file:projects/model.tgz_@babel+core@7.14.0
-  '@rush-temp/platform': file:projects/platform.tgz_ts-node@9.1.1
-  '@rush-temp/platform-core': file:projects/platform-core.tgz_@babel+core@7.14.0+ts-node@9.1.1
-  '@rush-temp/platform-core-impl': file:projects/platform-core-impl.tgz_@babel+core@7.14.0+ts-node@9.1.1
+  '@rush-temp/platform': file:projects/platform.tgz
+  '@rush-temp/platform-core': file:projects/platform-core.tgz_@babel+core@7.14.0
+  '@rush-temp/platform-core-impl': file:projects/platform-core-impl.tgz
   '@rush-temp/plugin-login': file:projects/plugin-login.tgz
   '@rush-temp/plugin-login-impl': file:projects/plugin-login-impl.tgz_@babel+core@7.14.0
   '@rush-temp/plugin-workbench': file:projects/plugin-workbench.tgz
   '@rush-temp/plugin-workbench-impl': file:projects/plugin-workbench-impl.tgz_@babel+core@7.14.0
   '@rush-temp/prod': file:projects/prod.tgz_sass@1.32.8
   '@rush-temp/rpc': file:projects/rpc.tgz
-  '@rush-temp/server-account': file:projects/server-account.tgz_ts-node@9.1.1
+  '@rush-temp/server-account': file:projects/server-account.tgz
   '@rush-temp/sparkling-theme': file:projects/sparkling-theme.tgz_f8c92461c918a269317011c983816550
-  '@rush-temp/status': file:projects/status.tgz_ts-node@9.1.1
-  '@rush-temp/storage-mongo': file:projects/storage-mongo.tgz_ts-node@9.1.1
-  '@rush-temp/text': file:projects/text.tgz_ts-node@9.1.1
-  '@rush-temp/ui': file:projects/ui.tgz_@babel+core@7.14.0+ts-node@9.1.1
+  '@rush-temp/status': file:projects/status.tgz
+  '@rush-temp/storage-mongo': file:projects/storage-mongo.tgz
+  '@rush-temp/text': file:projects/text.tgz
+  '@rush-temp/ui': file:projects/ui.tgz_@babel+core@7.14.0
   '@types/lodash': 4.14.168
   '@types/punycode': 2.1.0
   '@typescript-eslint/eslint-plugin': 4.22.0_@typescript-eslint+parser@4.22.0
@@ -36,7 +39,6 @@ dependencies:
   eslint-plugin-import: 2.22.1
   eslint-plugin-node: 11.1.0
   eslint-plugin-promise: 5.1.0
-  eslint-plugin-svelte3: 3.2.0_svelte@3.38.2
   file-loader: 6.2.0_webpack@5.32.0
   intl-messageformat: 9.6.12
   jwt-simple: 0.5.6
@@ -53,7 +55,6 @@ dependencies:
   svelte-loader: 3.1.0_svelte@3.38.2
   svgo-loader: 3.0.0
   ts-loader: 8.1.0_webpack@5.32.0
-  ts-node: 9.1.1
   webpack: 5.32.0_webpack-cli@4.6.0
   webpack-bundle-analyzer: 4.4.1
   webpack-cli: 4.6.0_a0f22aab4fc1dc89a0e5aa58db7db04b
@@ -1214,6 +1215,41 @@ packages:
       node: '>= 10.14.2'
     resolution:
       integrity: sha512-IY1R2i2aLsLr7Id3S6p2BA82GNWryt4oSvEXLAKc+L2zdi89dSkE8xC1C+0kpATG4JhBJREnQOH7/zmccM2B0g==
+  /@jest/core/26.6.3:
+    dependencies:
+      '@jest/console': 26.6.2
+      '@jest/reporters': 26.6.2
+      '@jest/test-result': 26.6.2
+      '@jest/transform': 26.6.2
+      '@jest/types': 26.6.2
+      '@types/node': 15.3.0
+      ansi-escapes: 4.3.2
+      chalk: 4.1.1
+      exit: 0.1.2
+      graceful-fs: 4.2.6
+      jest-changed-files: 26.6.2
+      jest-config: 26.6.3
+      jest-haste-map: 26.6.2
+      jest-message-util: 26.6.2
+      jest-regex-util: 26.0.0
+      jest-resolve: 26.6.2
+      jest-resolve-dependencies: 26.6.3
+      jest-runner: 26.6.3
+      jest-runtime: 26.6.3
+      jest-snapshot: 26.6.2
+      jest-util: 26.6.2
+      jest-validate: 26.6.2
+      jest-watcher: 26.6.2
+      micromatch: 4.0.4
+      p-each-series: 2.2.0
+      rimraf: 3.0.2
+      slash: 3.0.0
+      strip-ansi: 6.0.0
+    dev: false
+    engines:
+      node: '>= 10.14.2'
+    resolution:
+      integrity: sha512-xvV1kKbhfUqFVuZ8Cyo+JPpipAHHAV3kcDBftiduK8EICXmTFddryy3P7NfZt8Pv37rA9nEJBKCCkglCPt/Xjw==
   /@jest/core/26.6.3_ts-node@9.1.1:
     dependencies:
       '@jest/console': 26.6.2
@@ -1339,6 +1375,18 @@ packages:
       node: '>= 10.14.2'
     resolution:
       integrity: sha512-5O7H5c/7YlojphYNrK02LlDIV2GNPYisKwHm2QTKjNZeEzezCbwYs9swJySv2UfPMyZ0VdsmMv7jIlD/IKYQpQ==
+  /@jest/test-sequencer/26.6.3:
+    dependencies:
+      '@jest/test-result': 26.6.2
+      graceful-fs: 4.2.6
+      jest-haste-map: 26.6.2
+      jest-runner: 26.6.3
+      jest-runtime: 26.6.3
+    dev: false
+    engines:
+      node: '>= 10.14.2'
+    resolution:
+      integrity: sha512-YHlVIjP5nfEyjlrSr8t/YdNfU/1XEt7c5b4OxcXCjyRhjzLYu/rO69/WHPuYcbCWkz8kAeZVZp2N2+IOLLEPGw==
   /@jest/test-sequencer/26.6.3_ts-node@9.1.1:
     dependencies:
       '@jest/test-result': 26.6.2
@@ -3815,29 +3863,9 @@ packages:
       eslint: ^7.0.0
     resolution:
       integrity: sha512-NGmI6BH5L12pl7ScQHbg7tvtk4wPxxj8yPHH47NvSmMtFneC077PSeY3huFj06ZWZvtbfxSPt3RuOQD5XcR4ng==
-  /eslint-plugin-standard/5.0.0_eslint@7.26.0:
-    dependencies:
-      eslint: 7.26.0
-    deprecated: 'standard 16.0.0 and eslint-config-standard 16.0.0 no longer require the eslint-plugin-standard package. You can remove it from your dependencies with ''npm rm eslint-plugin-standard''. More info here: https://github.com/standard/standard/issues/1316'
-    dev: false
-    peerDependencies:
-      eslint: '>=5.0.0'
-    resolution:
-      integrity: sha512-eSIXPc9wBM4BrniMzJRBm2uoVuXz2EPa+NXPk2+itrVt+r5SbKFERx/IgrK/HmfjddyKVz2f+j+7gBRvu19xLg==
   /eslint-plugin-svelte3/3.2.0_eslint@7.26.0+svelte@3.38.2:
     dependencies:
       eslint: 7.26.0
-      svelte: 3.38.2
-    dev: false
-    engines:
-      node: '>=10'
-    peerDependencies:
-      eslint: '>=6.0.0'
-      svelte: ^3.2.0
-    resolution:
-      integrity: sha512-qdWB1QN21dEozsJFdR8XlEhMnsS6aKHjsXWuNmchYwxoet5I6QdCr1Xcq62++IzRBMCNCeH4waXqSOAdqrZzgA==
-  /eslint-plugin-svelte3/3.2.0_svelte@3.38.2:
-    dependencies:
       svelte: 3.38.2
     dev: false
     engines:
@@ -5290,6 +5318,27 @@ packages:
       node: '>= 10.14.2'
     resolution:
       integrity: sha512-fDS7szLcY9sCtIip8Fjry9oGf3I2ht/QT21bAHm5Dmf0mD4X3ReNUf17y+bO6fR8WgbIZTlbyG1ak/53cbRzKQ==
+  /jest-cli/26.6.3:
+    dependencies:
+      '@jest/core': 26.6.3
+      '@jest/test-result': 26.6.2
+      '@jest/types': 26.6.2
+      chalk: 4.1.1
+      exit: 0.1.2
+      graceful-fs: 4.2.6
+      import-local: 3.0.2
+      is-ci: 2.0.0
+      jest-config: 26.6.3
+      jest-util: 26.6.2
+      jest-validate: 26.6.2
+      prompts: 2.4.1
+      yargs: 15.4.1
+    dev: false
+    engines:
+      node: '>= 10.14.2'
+    hasBin: true
+    resolution:
+      integrity: sha512-GF9noBSa9t08pSyl3CY4frMrqp+aQXFGFkf5hEPbh/pIUFYWMK6ZLTfbmadxJVcJrdRoChlWQsA2VkJcDFK8hg==
   /jest-cli/26.6.3_ts-node@9.1.1:
     dependencies:
       '@jest/core': 26.6.3_ts-node@9.1.1
@@ -5313,6 +5362,36 @@ packages:
       ts-node: '*'
     resolution:
       integrity: sha512-GF9noBSa9t08pSyl3CY4frMrqp+aQXFGFkf5hEPbh/pIUFYWMK6ZLTfbmadxJVcJrdRoChlWQsA2VkJcDFK8hg==
+  /jest-config/26.6.3:
+    dependencies:
+      '@babel/core': 7.14.0
+      '@jest/test-sequencer': 26.6.3
+      '@jest/types': 26.6.2
+      babel-jest: 26.6.3_@babel+core@7.14.0
+      chalk: 4.1.1
+      deepmerge: 4.2.2
+      glob: 7.1.6
+      graceful-fs: 4.2.6
+      jest-environment-jsdom: 26.6.2
+      jest-environment-node: 26.6.2
+      jest-get-type: 26.3.0
+      jest-jasmine2: 26.6.3
+      jest-regex-util: 26.0.0
+      jest-resolve: 26.6.2
+      jest-util: 26.6.2
+      jest-validate: 26.6.2
+      micromatch: 4.0.4
+      pretty-format: 26.6.2
+    dev: false
+    engines:
+      node: '>= 10.14.2'
+    peerDependencies:
+      ts-node: '>=9.0.0'
+    peerDependenciesMeta:
+      ts-node:
+        optional: true
+    resolution:
+      integrity: sha512-t5qdIj/bCj2j7NFVHb2nFB4aUdfucDn3JRKgrZnplb8nieAirAzRSHP8uDEd+qV6ygzg9Pz4YG7UTJf94LPSyg==
   /jest-config/26.6.3_ts-node@9.1.1:
     dependencies:
       '@babel/core': 7.14.0
@@ -5333,7 +5412,7 @@ packages:
       jest-validate: 26.6.2
       micromatch: 4.0.4
       pretty-format: 26.6.2
-      ts-node: 9.1.1
+      ts-node: 9.1.1_typescript@4.2.4
     dev: false
     engines:
       node: '>= 10.14.2'
@@ -5430,6 +5509,31 @@ packages:
       fsevents: 2.3.2
     resolution:
       integrity: sha512-easWIJXIw71B2RdR8kgqpjQrbMRWQBgiBwXYEhtGUTaX+doCjBheluShdDMeR8IMfJiTqH4+zfhtg29apJf/8w==
+  /jest-jasmine2/26.6.3:
+    dependencies:
+      '@babel/traverse': 7.14.0
+      '@jest/environment': 26.6.2
+      '@jest/source-map': 26.6.2
+      '@jest/test-result': 26.6.2
+      '@jest/types': 26.6.2
+      '@types/node': 15.3.0
+      chalk: 4.1.1
+      co: 4.6.0
+      expect: 26.6.2
+      is-generator-fn: 2.1.0
+      jest-each: 26.6.2
+      jest-matcher-utils: 26.6.2
+      jest-message-util: 26.6.2
+      jest-runtime: 26.6.3
+      jest-snapshot: 26.6.2
+      jest-util: 26.6.2
+      pretty-format: 26.6.2
+      throat: 5.0.0
+    dev: false
+    engines:
+      node: '>= 10.14.2'
+    resolution:
+      integrity: sha512-kPKUrQtc8aYwBV7CqBg5pu+tmYXlvFlSFYn18ev4gPFtrRzB15N2gW/Roew3187q2w2eHuu0MU9TJz6w0/nPEg==
   /jest-jasmine2/26.6.3_ts-node@9.1.1:
     dependencies:
       '@babel/traverse': 7.14.0
@@ -5546,6 +5650,33 @@ packages:
       node: '>= 10.14.2'
     resolution:
       integrity: sha512-sOxsZOq25mT1wRsfHcbtkInS+Ek7Q8jCHUB0ZUTP0tc/c41QHriU/NunqMfCUWsL4H3MHpvQD4QR9kSYhS7UvQ==
+  /jest-runner/26.6.3:
+    dependencies:
+      '@jest/console': 26.6.2
+      '@jest/environment': 26.6.2
+      '@jest/test-result': 26.6.2
+      '@jest/types': 26.6.2
+      '@types/node': 15.3.0
+      chalk: 4.1.1
+      emittery: 0.7.2
+      exit: 0.1.2
+      graceful-fs: 4.2.6
+      jest-config: 26.6.3
+      jest-docblock: 26.0.0
+      jest-haste-map: 26.6.2
+      jest-leak-detector: 26.6.2
+      jest-message-util: 26.6.2
+      jest-resolve: 26.6.2
+      jest-runtime: 26.6.3
+      jest-util: 26.6.2
+      jest-worker: 26.6.2
+      source-map-support: 0.5.19
+      throat: 5.0.0
+    dev: false
+    engines:
+      node: '>= 10.14.2'
+    resolution:
+      integrity: sha512-atgKpRHnaA2OvByG/HpGA4g6CSPS/1LK0jK3gATJAoptC1ojltpmVlYC3TYgdmGp+GLuhzpH30Gvs36szSL2JQ==
   /jest-runner/26.6.3_ts-node@9.1.1:
     dependencies:
       '@jest/console': 26.6.2
@@ -5575,6 +5706,41 @@ packages:
       ts-node: '*'
     resolution:
       integrity: sha512-atgKpRHnaA2OvByG/HpGA4g6CSPS/1LK0jK3gATJAoptC1ojltpmVlYC3TYgdmGp+GLuhzpH30Gvs36szSL2JQ==
+  /jest-runtime/26.6.3:
+    dependencies:
+      '@jest/console': 26.6.2
+      '@jest/environment': 26.6.2
+      '@jest/fake-timers': 26.6.2
+      '@jest/globals': 26.6.2
+      '@jest/source-map': 26.6.2
+      '@jest/test-result': 26.6.2
+      '@jest/transform': 26.6.2
+      '@jest/types': 26.6.2
+      '@types/yargs': 15.0.13
+      chalk: 4.1.1
+      cjs-module-lexer: 0.6.0
+      collect-v8-coverage: 1.0.1
+      exit: 0.1.2
+      glob: 7.1.6
+      graceful-fs: 4.2.6
+      jest-config: 26.6.3
+      jest-haste-map: 26.6.2
+      jest-message-util: 26.6.2
+      jest-mock: 26.6.2
+      jest-regex-util: 26.0.0
+      jest-resolve: 26.6.2
+      jest-snapshot: 26.6.2
+      jest-util: 26.6.2
+      jest-validate: 26.6.2
+      slash: 3.0.0
+      strip-bom: 4.0.0
+      yargs: 15.4.1
+    dev: false
+    engines:
+      node: '>= 10.14.2'
+    hasBin: true
+    resolution:
+      integrity: sha512-lrzyR3N8sacTAMeonbqpnSka1dHNux2uk0qqDXVkMv2c/A3wYnvQ4EXuI013Y6+gSKSCxdaczvf4HF0mVXHRdw==
   /jest-runtime/26.6.3_ts-node@9.1.1:
     dependencies:
       '@jest/console': 26.6.2
@@ -5694,6 +5860,17 @@ packages:
       node: '>= 10.13.0'
     resolution:
       integrity: sha512-KWYVV1c4i+jbMpaBC+U++4Va0cp8OisU185o73T1vo99hqi7w8tSJfUXYswwqqrjzwxa6KpRK54WhPvwf5w6PQ==
+  /jest/26.6.3:
+    dependencies:
+      '@jest/core': 26.6.3
+      import-local: 3.0.2
+      jest-cli: 26.6.3
+    dev: false
+    engines:
+      node: '>= 10.14.2'
+    hasBin: true
+    resolution:
+      integrity: sha512-lGS5PXGAzR4RF7V5+XObhqz2KZIDUA1yD0DG6pBVmy10eh0ZIXQImRuzocsI/N2XZ1GrLFwTS27In2i2jlpq1Q==
   /jest/26.6.3_ts-node@9.1.1:
     dependencies:
       '@jest/core': 26.6.3_ts-node@9.1.1
@@ -8423,7 +8600,7 @@ packages:
       bs-logger: 0.2.6
       buffer-from: 1.1.1
       fast-json-stable-stringify: 2.1.0
-      jest: 26.6.3_ts-node@9.1.1
+      jest: 26.6.3
       jest-util: 26.6.2
       json5: 2.2.0
       lodash: 4.17.21
@@ -8479,22 +8656,6 @@ packages:
       webpack: '*'
     resolution:
       integrity: sha512-YiQipGGAFj2zBfqLhp28yUvPP9jUGqHxRzrGYuc82Z2wM27YIHbElXiaZDc93c3x0mz4zvBmS6q/DgExpdj37A==
-  /ts-node/9.1.1:
-    dependencies:
-      arg: 4.1.3
-      create-require: 1.1.1
-      diff: 4.0.2
-      make-error: 1.3.6
-      source-map-support: 0.5.19
-      yn: 3.1.1
-    dev: false
-    engines:
-      node: '>=10.0.0'
-    hasBin: true
-    peerDependencies:
-      typescript: '>=2.7'
-    resolution:
-      integrity: sha512-hPlt7ZACERQGf03M253ytLY3dHbGNGrAq9qIHWUY9XHYl1z7wYngSr3OQ5xmui8o2AaxsONxIzjafLUiWBo1Fg==
   /ts-node/9.1.1_typescript@4.2.4:
     dependencies:
       arg: 4.1.3
@@ -9312,7 +9473,7 @@ packages:
       commander: 2.20.3
     resolution:
       integrity: sha512-DUOKC/IhbkdLKKiV89gw9DUauTV8U/8yJl1sjf6MtDmzevLKOF2duNJ495S3MFVjqZarr+qNGCPbkg4mu4PpLw==
-  file:projects/client.tgz_@babel+core@7.14.0+ts-node@9.1.1:
+  file:projects/client.tgz_@babel+core@7.14.0:
     dependencies:
       '@babel/eslint-parser': 7.13.14_@babel+core@7.14.0+eslint@7.26.0
       '@babel/preset-typescript': 7.13.0_@babel+core@7.14.0
@@ -9326,7 +9487,7 @@ packages:
       eslint-plugin-import: 2.22.1_eslint@7.26.0
       eslint-plugin-node: 11.1.0_eslint@7.26.0
       eslint-plugin-promise: 5.1.0_eslint@7.26.0
-      jest: 26.6.3_ts-node@9.1.1
+      jest: 26.6.3
       ts-jest: 26.5.6_jest@26.6.3+typescript@4.2.4
       typescript: 4.2.4
     dev: false
@@ -9334,12 +9495,11 @@ packages:
     name: '@rush-temp/client'
     peerDependencies:
       '@babel/core': '*'
-      ts-node: '*'
     resolution:
       integrity: sha512-nHihyPfUrgrayUfP4JP7cUjzgVmhDK5fa40nteOVWM0noTC+PBa7n6vpi4wuqBeHAClTYsvFDATXuIJ2ZJj34A==
       tarball: file:projects/client.tgz
     version: 0.0.0
-  file:projects/core.tgz_@babel+core@7.14.0+ts-node@9.1.1:
+  file:projects/core-model.tgz_@babel+core@7.14.0:
     dependencies:
       '@babel/eslint-parser': 7.13.14_@babel+core@7.14.0+eslint@7.26.0
       '@babel/preset-typescript': 7.13.0_@babel+core@7.14.0
@@ -9355,7 +9515,35 @@ packages:
       eslint-plugin-import: 2.22.1_eslint@7.26.0
       eslint-plugin-node: 11.1.0_eslint@7.26.0
       eslint-plugin-promise: 5.1.0_eslint@7.26.0
-      jest: 26.6.3_ts-node@9.1.1
+      jest: 26.6.3
+      ts-jest: 26.5.6_jest@26.6.3+typescript@4.2.4
+      typescript: 4.2.4
+    dev: false
+    id: file:projects/core-model.tgz
+    name: '@rush-temp/core-model'
+    peerDependencies:
+      '@babel/core': '*'
+    resolution:
+      integrity: sha512-T6JX07WF8EoNmPYiCLCE25/s2xZbjv30uEZvo8ozJAheyQnnlu70U89vYZGSAb+XtxI3B5LtS29scoi2Y5vCmw==
+      tarball: file:projects/core-model.tgz
+    version: 0.0.0
+  file:projects/core.tgz_@babel+core@7.14.0:
+    dependencies:
+      '@babel/eslint-parser': 7.13.14_@babel+core@7.14.0+eslint@7.26.0
+      '@babel/preset-typescript': 7.13.0_@babel+core@7.14.0
+      '@jest/globals': 26.6.2
+      '@microsoft/api-extractor': 7.15.1
+      '@types/jest': 26.0.23
+      '@types/node': 15.0.2
+      '@typescript-eslint/eslint-plugin': 4.22.0_d80b53217345f120a8ed26af05eed18b
+      '@typescript-eslint/parser': 4.22.0_eslint@7.26.0+typescript@4.2.4
+      eslint: 7.26.0
+      eslint-config-standard: 16.0.2_61607de6243cb180ff47de604508b5ce
+      eslint-config-standard-with-typescript: 20.0.0_9fe81157bbbed76473c2f4cb3bb705dd
+      eslint-plugin-import: 2.22.1_eslint@7.26.0
+      eslint-plugin-node: 11.1.0_eslint@7.26.0
+      eslint-plugin-promise: 5.1.0_eslint@7.26.0
+      jest: 26.6.3
       ts-jest: 26.5.6_jest@26.6.3+typescript@4.2.4
       typescript: 4.2.4
     dev: false
@@ -9363,12 +9551,40 @@ packages:
     name: '@rush-temp/core'
     peerDependencies:
       '@babel/core': '*'
-      ts-node: '*'
     resolution:
       integrity: sha512-K2OAwLFvRxboBd5TZCNCQkAEkonKk3kNgnphku7oTpwTf2CbHVIs7dDGge0FVgENWnYUOXR1y0JimQcbHK5qaA==
       tarball: file:projects/core.tgz
     version: 0.0.0
-  file:projects/domains.tgz_@babel+core@7.14.0+ts-node@9.1.1:
+  file:projects/domains-model.tgz_@babel+core@7.14.0:
+    dependencies:
+      '@babel/eslint-parser': 7.13.14_@babel+core@7.14.0+eslint@7.26.0
+      '@babel/preset-typescript': 7.13.0_@babel+core@7.14.0
+      '@microsoft/api-extractor': 7.15.1
+      '@types/jest': 26.0.23
+      '@types/markdown-it': 10.0.3
+      '@types/node': 15.0.2
+      '@typescript-eslint/eslint-plugin': 4.22.0_d80b53217345f120a8ed26af05eed18b
+      '@typescript-eslint/parser': 4.22.0_eslint@7.26.0+typescript@4.2.4
+      eslint: 7.26.0
+      eslint-config-standard: 16.0.2_61607de6243cb180ff47de604508b5ce
+      eslint-config-standard-with-typescript: 20.0.0_9fe81157bbbed76473c2f4cb3bb705dd
+      eslint-plugin-import: 2.22.1_eslint@7.26.0
+      eslint-plugin-node: 11.1.0_eslint@7.26.0
+      eslint-plugin-promise: 5.1.0_eslint@7.26.0
+      jest: 26.6.3_ts-node@9.1.1
+      ts-jest: 26.5.6_jest@26.6.3+typescript@4.2.4
+      ts-node: 9.1.1_typescript@4.2.4
+      typescript: 4.2.4
+    dev: false
+    id: file:projects/domains-model.tgz
+    name: '@rush-temp/domains-model'
+    peerDependencies:
+      '@babel/core': '*'
+    resolution:
+      integrity: sha512-OVuk8qMqBqiU1CJg4yr0u6eB5KWjZCGGDhaGkw8P6/lNznsMXZCU60x1PYtrNUZxtEhirzEdhfYycUd8lcjGtg==
+      tarball: file:projects/domains-model.tgz
+    version: 0.0.0
+  file:projects/domains.tgz_@babel+core@7.14.0:
     dependencies:
       '@babel/eslint-parser': 7.13.14_@babel+core@7.14.0+eslint@7.26.0
       '@babel/preset-typescript': 7.13.0_@babel+core@7.14.0
@@ -9385,7 +9601,7 @@ packages:
       eslint-plugin-node: 11.1.0_eslint@7.26.0
       eslint-plugin-promise: 5.1.0_eslint@7.26.0
       fast-equals: 2.0.1
-      jest: 26.6.3_ts-node@9.1.1
+      jest: 26.6.3
       ts-jest: 26.5.6_jest@26.6.3+typescript@4.2.4
       typescript: 4.2.4
     dev: false
@@ -9393,10 +9609,31 @@ packages:
     name: '@rush-temp/domains'
     peerDependencies:
       '@babel/core': '*'
-      ts-node: '*'
     resolution:
       integrity: sha512-S26zdOu2zEUzSoebsooYpxqeWd47fPfb/VdB5Jx/nzhGAWoBBLj6Nv4HWqv0fzv0oa1L6/ebW3943RKbw0HxHw==
       tarball: file:projects/domains.tgz
+    version: 0.0.0
+  file:projects/gen-model.tgz:
+    dependencies:
+      '@microsoft/api-extractor': 7.15.1
+      '@types/jest': 26.0.23
+      '@types/node': 15.3.0
+      '@typescript-eslint/eslint-plugin': 4.22.0_d80b53217345f120a8ed26af05eed18b
+      '@typescript-eslint/parser': 4.22.0_eslint@7.26.0+typescript@4.2.4
+      eslint: 7.26.0
+      eslint-config-standard: 16.0.2_61607de6243cb180ff47de604508b5ce
+      eslint-config-standard-with-typescript: 20.0.0_9fe81157bbbed76473c2f4cb3bb705dd
+      eslint-plugin-import: 2.22.1_eslint@7.26.0
+      eslint-plugin-node: 11.1.0_eslint@7.26.0
+      eslint-plugin-promise: 5.1.0_eslint@7.26.0
+      jest: 26.6.3
+      ts-jest: 26.5.6_jest@26.6.3+typescript@4.2.4
+      typescript: 4.2.4
+    dev: false
+    name: '@rush-temp/gen-model'
+    resolution:
+      integrity: sha512-YYzbpKkZyKQFdBpcxQt0ifCGasqd9M94ajBFxvegGPpQJ1k6uY77GfEHkstC5A0JXvNxAKRiUOv9GpR+nDaqbQ==
+      tarball: file:projects/gen-model.tgz
     version: 0.0.0
   file:projects/model.tgz_@babel+core@7.14.0:
     dependencies:
@@ -9425,13 +9662,11 @@ packages:
     peerDependencies:
       '@babel/core': '*'
     resolution:
-      integrity: sha512-xZBSxnh8bLcjzosFsySQtjgJ72JaA0zkhESkqoY/Ka05tOSA+esT6SPsTgPMiXuYP82Z1DbejV5FA7/1vZiMcA==
+      integrity: sha512-HWRh7iu8P+qUQ20wCapigkQQC+jq8M1M0X5VITs2UTth2CFfsplnx03EBKlXrJZo3we3uFliHurOc00TS5bVTg==
       tarball: file:projects/model.tgz
     version: 0.0.0
-  file:projects/platform-core-impl.tgz_@babel+core@7.14.0+ts-node@9.1.1:
+  file:projects/platform-core-impl.tgz:
     dependencies:
-      '@babel/eslint-parser': 7.13.14_@babel+core@7.14.0+eslint@7.26.0
-      '@babel/preset-typescript': 7.13.0_@babel+core@7.14.0
       '@microsoft/api-extractor': 7.15.1
       '@types/jest': 26.0.23
       '@types/node': 15.3.0
@@ -9443,20 +9678,16 @@ packages:
       eslint-plugin-import: 2.22.1_eslint@7.26.0
       eslint-plugin-node: 11.1.0_eslint@7.26.0
       eslint-plugin-promise: 5.1.0_eslint@7.26.0
-      jest: 26.6.3_ts-node@9.1.1
+      jest: 26.6.3
       ts-jest: 26.5.6_jest@26.6.3+typescript@4.2.4
       typescript: 4.2.4
     dev: false
-    id: file:projects/platform-core-impl.tgz
     name: '@rush-temp/platform-core-impl'
-    peerDependencies:
-      '@babel/core': '*'
-      ts-node: '*'
     resolution:
-      integrity: sha512-yT2gjLyNRpxu15HkvEfbU5IqFQB4L2aaAj511I3RGQk7lmQ+Qs5/n84y2VGVNoii013lfzil3iy2wQqxbf9YtA==
+      integrity: sha512-C540F9Q1qG4qoVFPS+tAa7uW66Bj4qRf7aaFjPbexcIUI6SX/2Y17gXiNr9PPz7uxjSSACupzJwglGWp9DxJ1A==
       tarball: file:projects/platform-core-impl.tgz
     version: 0.0.0
-  file:projects/platform-core.tgz_@babel+core@7.14.0+ts-node@9.1.1:
+  file:projects/platform-core.tgz_@babel+core@7.14.0:
     dependencies:
       '@babel/eslint-parser': 7.13.14_@babel+core@7.14.0+eslint@7.26.0
       '@babel/preset-typescript': 7.13.0_@babel+core@7.14.0
@@ -9470,7 +9701,7 @@ packages:
       eslint-plugin-import: 2.22.1_eslint@7.26.0
       eslint-plugin-node: 11.1.0_eslint@7.26.0
       eslint-plugin-promise: 5.1.0_eslint@7.26.0
-      jest: 26.6.3_ts-node@9.1.1
+      jest: 26.6.3
       ts-jest: 26.5.6_jest@26.6.3+typescript@4.2.4
       typescript: 4.2.4
     dev: false
@@ -9478,12 +9709,11 @@ packages:
     name: '@rush-temp/platform-core'
     peerDependencies:
       '@babel/core': '*'
-      ts-node: '*'
     resolution:
       integrity: sha512-qBliKXMn0teqfhIW5JNn4tZgCSzRu/bqu8521Cy6kIxvmRlC/oPYIZooEVQQJIt9f4bOxaHsSDNdAx1iPoR3ZQ==
       tarball: file:projects/platform-core.tgz
     version: 0.0.0
-  file:projects/platform.tgz_ts-node@9.1.1:
+  file:projects/platform.tgz:
     dependencies:
       '@microsoft/api-extractor': 7.13.5
       '@types/jest': 26.0.23
@@ -9497,15 +9727,12 @@ packages:
       eslint-plugin-node: 11.1.0_eslint@7.26.0
       eslint-plugin-promise: 5.1.0_eslint@7.26.0
       intl-messageformat: 9.6.12
-      jest: 26.6.3_ts-node@9.1.1
+      jest: 26.6.3
       lodash: 4.17.21
       ts-jest: 26.5.6_jest@26.6.3+typescript@4.2.4
       typescript: 4.2.4
     dev: false
-    id: file:projects/platform.tgz
     name: '@rush-temp/platform'
-    peerDependencies:
-      ts-node: '*'
     resolution:
       integrity: sha512-XvSKcnfFzy0qBKP4GzZmoitPwScoaF8ASB2B1kY4WskrrAVIuwzsdEwm1oBRMUtL78Ehze0xi5eVrpNeu2zR8Q==
       tarball: file:projects/platform.tgz
@@ -9533,7 +9760,7 @@ packages:
     peerDependencies:
       '@babel/core': '*'
     resolution:
-      integrity: sha512-T9y84yCrqptvOiheM6NdI4eL7Igt4e6pdVTDLvYyzRJ3gczprL9mXzF/iMsmpVenX1gl26+S0oKaDZ0FgagTYA==
+      integrity: sha512-ZsUq0hBevaNKnlq9XJcZnHGBp02N1+PxH/bTri74cxHduo5hSuqlvALIFTWeWexzZCoquuewzBUD8v5NDLnSMg==
       tarball: file:projects/plugin-login-impl.tgz
     version: 0.0.0
   file:projects/plugin-login.tgz:
@@ -9644,7 +9871,7 @@ packages:
       integrity: sha512-gwMC4l2Dv3C4arBTPsDmmtuC2RuxU3QV3210yRfdCvUJD6Pkv+JFAUp9lsTgXq34vBm1VbvJ2w8ynhgkN1xAkQ==
       tarball: file:projects/rpc.tgz
     version: 0.0.0
-  file:projects/server-account.tgz_ts-node@9.1.1:
+  file:projects/server-account.tgz:
     dependencies:
       '@microsoft/api-extractor': 7.13.5
       '@types/jest': 26.0.23
@@ -9657,16 +9884,13 @@ packages:
       eslint-plugin-import: 2.22.1_eslint@7.26.0
       eslint-plugin-node: 11.1.0_eslint@7.26.0
       eslint-plugin-promise: 5.1.0_eslint@7.26.0
-      jest: 26.6.3_ts-node@9.1.1
+      jest: 26.6.3
       jwt-simple: 0.5.6
       mongodb: 3.6.6
       ts-jest: 26.5.6_jest@26.6.3+typescript@4.2.4
       typescript: 4.2.4
     dev: false
-    id: file:projects/server-account.tgz
     name: '@rush-temp/server-account'
-    peerDependencies:
-      ts-node: '*'
     resolution:
       integrity: sha512-zxfxmLYAxHrpKndTy40OdSJIOUttsDH1/Bs54OxW5dy29c1lsOZ+iwOpv98taOp/bbqFmtd/yro3EjReXaY18g==
       tarball: file:projects/server-account.tgz
@@ -9699,7 +9923,7 @@ packages:
       integrity: sha512-iQG8a5Ou4/wFqtLDpxSfSpshtAmFIbNhJFdtKHZq6V+aWaiQgTCj3GhYlowvJgZAJ6tY/X+OsNRSmPmeqEk+0Q==
       tarball: file:projects/sparkling-theme.tgz
     version: 0.0.0
-  file:projects/status.tgz_ts-node@9.1.1:
+  file:projects/status.tgz:
     dependencies:
       '@microsoft/api-extractor': 7.13.5
       '@types/jest': 26.0.23
@@ -9711,19 +9935,16 @@ packages:
       eslint-plugin-import: 2.22.1_eslint@7.26.0
       eslint-plugin-node: 11.1.0_eslint@7.26.0
       eslint-plugin-promise: 5.1.0_eslint@7.26.0
-      jest: 26.6.3_ts-node@9.1.1
+      jest: 26.6.3
       ts-jest: 26.5.6_jest@26.6.3+typescript@4.2.4
       typescript: 4.2.4
     dev: false
-    id: file:projects/status.tgz
     name: '@rush-temp/status'
-    peerDependencies:
-      ts-node: '*'
     resolution:
       integrity: sha512-zuyzEK5TmnKwKSMxDa0SPbzqNNaAWipnXj23JXSyO5stTvKfDjIKCZ2Gbh4DQEOcxFHxev7Yznd/ZjDLBRyB5g==
       tarball: file:projects/status.tgz
     version: 0.0.0
-  file:projects/storage-mongo.tgz_ts-node@9.1.1:
+  file:projects/storage-mongo.tgz:
     dependencies:
       '@jest/globals': 26.6.2
       '@microsoft/api-extractor': 7.15.1
@@ -9738,20 +9959,17 @@ packages:
       eslint-plugin-import: 2.22.1_eslint@7.26.0
       eslint-plugin-node: 11.1.0_eslint@7.26.0
       eslint-plugin-promise: 5.1.0_eslint@7.26.0
-      jest: 26.6.3_ts-node@9.1.1
+      jest: 26.6.3
       mongodb: 3.6.6
       ts-jest: 26.5.6_jest@26.6.3+typescript@4.2.4
       typescript: 4.2.4
     dev: false
-    id: file:projects/storage-mongo.tgz
     name: '@rush-temp/storage-mongo'
-    peerDependencies:
-      ts-node: '*'
     resolution:
       integrity: sha512-6o3SPSxZ6F6fJz7bKZGzdqk8KXN9/Z50Z3jBmOShsyZhKGADwOvRyC3v3G4nkDFYedQGB8G0pPxclXVg2MXiGw==
       tarball: file:projects/storage-mongo.tgz
     version: 0.0.0
-  file:projects/text.tgz_ts-node@9.1.1:
+  file:projects/text.tgz:
     dependencies:
       '@babel/core': 7.14.0
       '@babel/preset-env': 7.14.1_@babel+core@7.14.0
@@ -9771,20 +9989,16 @@ packages:
       eslint-plugin-import: 2.22.1_eslint@7.26.0
       eslint-plugin-node: 11.1.0_eslint@7.26.0
       eslint-plugin-promise: 5.1.0_eslint@7.26.0
-      eslint-plugin-standard: 5.0.0_eslint@7.26.0
-      jest: 26.6.3_ts-node@9.1.1
+      jest: 26.6.3
       markdown-it: 12.0.6
       typescript: 4.2.4
     dev: false
-    id: file:projects/text.tgz
     name: '@rush-temp/text'
-    peerDependencies:
-      ts-node: '*'
     resolution:
       integrity: sha512-QuOXlKrqcRBz+oMoXNZP/nbut3NelAqYlvSikqHiEh29x7RtcHw32VNvjfXCxfuX2pL1vrPp7/Esj1qAZPUzdw==
       tarball: file:projects/text.tgz
     version: 0.0.0
-  file:projects/ui.tgz_@babel+core@7.14.0+ts-node@9.1.1:
+  file:projects/ui.tgz_@babel+core@7.14.0:
     dependencies:
       '@microsoft/api-extractor': 7.13.5
       '@types/jest': 26.0.23
@@ -9801,7 +10015,7 @@ packages:
       eslint-plugin-promise: 5.1.0_eslint@7.26.0
       eslint-plugin-svelte3: 3.2.0_eslint@7.26.0+svelte@3.38.2
       fast-equals: 2.0.1
-      jest: 26.6.3_ts-node@9.1.1
+      jest: 26.6.3
       sass: 1.32.8
       svelte: 3.38.2
       svelte-loader: 3.1.0_svelte@3.38.2
@@ -9813,7 +10027,6 @@ packages:
     name: '@rush-temp/ui'
     peerDependencies:
       '@babel/core': '*'
-      ts-node: '*'
     resolution:
       integrity: sha512-khfD8AThK5ywy6DC4ECE2lj16QLG7KL2DcagvtL/0R4cZgjipkhms2/BCpXWJMdElw/gVMRoU0Oo+BRXV3CgoQ==
       tarball: file:projects/ui.tgz
@@ -9826,7 +10039,10 @@ specifiers:
   '@jest/globals': ~26.6.2
   '@rush-temp/client': file:./projects/client.tgz
   '@rush-temp/core': file:./projects/core.tgz
+  '@rush-temp/core-model': file:./projects/core-model.tgz
   '@rush-temp/domains': file:./projects/domains.tgz
+  '@rush-temp/domains-model': file:./projects/domains-model.tgz
+  '@rush-temp/gen-model': file:./projects/gen-model.tgz
   '@rush-temp/model': file:./projects/model.tgz
   '@rush-temp/platform': file:./projects/platform.tgz
   '@rush-temp/platform-core': file:./projects/platform-core.tgz
@@ -9857,7 +10073,6 @@ specifiers:
   eslint-plugin-import: ^2.22.1
   eslint-plugin-node: ^11.1.0
   eslint-plugin-promise: ^5.1.0
-  eslint-plugin-svelte3: ^3.1.2
   file-loader: ~6.2.0
   intl-messageformat: ^9.6.12
   jwt-simple: ~0.5.6
@@ -9874,7 +10089,6 @@ specifiers:
   svelte-loader: ~3.1.0
   svgo-loader: ~3.0.0
   ts-loader: ~8.1.0
-  ts-node: ^9.1.1
   webpack: ~5.32.0
   webpack-bundle-analyzer: ~4.4.1
   webpack-cli: ~4.6.0

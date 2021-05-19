@@ -161,7 +161,7 @@ export class Model {
   get<T extends Doc>(id: Ref<T>): T {
     const obj = this.objects.get(id)
     if (obj === undefined) {
-      throw new Error('document not found ' + id)
+      throw new Error(`document not found ${id}`)
     }
     return obj as T
   }
@@ -171,7 +171,7 @@ export class Model {
   private _getAllAttributes (attributes: AttributeMatch[], _class: Ref<Class<Obj>>): void {
     const clazz = this.get(_class) as Class<Doc>
     for (const attr of clazz._attributes.items ?? []) {
-      attributes.push({ attr, clazz, key: this.attributeKey(clazz, attr._id) })
+      attributes.push({ attr, clazz, key: this.attributeKey(clazz, attr.name) })
     }
 
     if (clazz._extends !== undefined) {
@@ -230,7 +230,7 @@ export class Model {
     let _class = cls as Ref<Class<Obj>> | undefined
     while (_class !== undefined) {
       const clazz = this.get(_class)
-      const attr = clazz._attributes.items?.find(a => a._id === key)
+      const attr = clazz._attributes.items?.find(a => a.name === key)
       if (attr !== undefined) {
         const attrKey = this.attributeKey(clazz, key)
         return {
@@ -331,7 +331,7 @@ export class Model {
     return l
   }
 
-  public mixinDocument<E extends Obj, T extends Obj>(doc: E, clazz: Ref<Mixin<T>>, values: Partial<Omit<T, keyof E>>): void {
+  public mixinDocument<E extends Obj, T extends Obj>(doc: E, clazz: Ref<Mixin<T>>, values: DocumentValue<T>): void {
     Model.includeMixin(doc, clazz)
     this.assign(this.getLayout(doc), clazz as Ref<Class<Obj>>, (values as unknown) as AnyLayout)
   }
@@ -350,7 +350,7 @@ export class Model {
     }
   }
 
-  mixin<E extends Doc, T extends E>(id: Ref<E>, clazz: Ref<Mixin<T>>, values: Omit<T, keyof E>): void {
+  mixin<E extends Doc, T extends E>(id: Ref<E>, clazz: Ref<Mixin<T>>, values: DocumentValue<T>): void {
     this.mixinDocument(this.get(id), clazz, values)
   }
 
@@ -457,8 +457,8 @@ export class Model {
     const attributes = classifier._attributes.items ?? []
     const descriptors: PropertyDescriptorMap = {}
     for (const attr of attributes) {
-      const attributeKey = this.attributeKey(classifier, attr._id)
-      descriptors[attr._id] = {
+      const attributeKey = this.attributeKey(classifier, attr.name)
+      descriptors[attr.name] = {
         get (this: Proxy) {
           return this.__layout[attributeKey]
         },

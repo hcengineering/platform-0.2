@@ -14,10 +14,10 @@
 //
 
 // T R A N S A C T I O N S
-import domains, { AddItemTx, ItemTx, TX_DOMAIN, ObjectTx, CreateTx, DeleteTx, UpdateTx, Space, RemoveItemTx, UpdateItemTx } from '@anticrm/domains'
 import core, { AnyLayout, Class, Doc, Emb, Ref, Tx } from '@anticrm/core'
-import { Class$, Prop, RefTo$ } from '../dsl'
-import { TDoc } from './core'
+import { TDoc } from '@anticrm/core-model'
+import domains, { AddItemTx, CreateTx, DeleteTx, ItemTx, ObjectTx, RemoveItemTx, Space, TX_DOMAIN, UpdateItemTx, UpdateTx } from '@anticrm/domains'
+import { Class$, Prop, RefTo$ } from '@anticrm/model'
 
 @Class$(core.class.Tx, core.class.Doc, TX_DOMAIN)
 export class TTx extends TDoc implements Tx {

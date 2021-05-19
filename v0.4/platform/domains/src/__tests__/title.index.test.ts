@@ -16,13 +16,13 @@
 /* eslint-env jest */
 
 import { Doc, mixinKey, Model, Ref, txContext } from '@anticrm/core'
-import { data, doc1, Task, taskIds } from '@anticrm/core/src/__tests__/tasks'
 import domains from '..'
 import { TitleIndex } from '../indices/title'
 import { ModelStorage } from '../model_storage'
 import { Space } from '../space'
 import { Title, TitleSource } from '../title'
 import { create, remove, update } from '../tx'
+import { data, doc1, Task, taskIds } from './domains_tasks'
 
 const model = new Model('vdocs')
 model.loadModel(data)
