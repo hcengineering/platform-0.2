@@ -13,11 +13,19 @@
 // limitations under the License.
 //
 
-import { Doc } from '@anticrm/core'
+import { Builder } from '@anticrm/model'
+import { model as tasksModel } from './test_tasks'
+import { writeFile } from 'fs'
 
-/**
- * Indices
- */
-export interface Indices extends Doc {
-  primary: string
-}
+import { model as coreModel } from '..'
+
+const builder = new Builder()
+coreModel(builder)
+tasksModel(builder)
+
+writeFile('../core/src/__tests__/model.json', JSON.stringify(builder.dump(), undefined, 2), (err: Error | null) => {
+  if (err !== null) {
+    return console.log(err)
+  }
+  console.log('model saved')
+})

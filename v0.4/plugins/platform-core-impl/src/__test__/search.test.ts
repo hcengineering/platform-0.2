@@ -14,7 +14,7 @@
 //
 
 import { Doc, DocumentQuery, FindOptions, Model, SortingOrder, txContext } from '@anticrm/core'
-import { createTask, data, Task, taskIds } from '@anticrm/core/src/__tests__/tasks'
+import { createTask, data, Task, taskIds } from '@anticrm/domains/src/__tests__/domains_tasks'
 import { create, ModelStorage, remove, update } from '@anticrm/domains'
 import { QueriableStorage } from '../queries'
 

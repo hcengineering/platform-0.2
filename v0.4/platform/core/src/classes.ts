@@ -50,6 +50,7 @@ export interface Type extends Emb {
 }
 
 export interface Attribute extends Emb {
+  name: string
   type: Type
 }
 

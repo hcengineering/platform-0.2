@@ -16,9 +16,8 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import core, {
   AnyLayout, Attribute, Class, Classifier, ClassifierKind, CollectionOf, Doc, Emb, Enum, EnumLiteral,
-  EnumOf, InstanceOf, Mixin, Model, MODEL_DOMAIN, Obj, Ref, RefTo, Type
+  EnumOf, InstanceOf, Mixin, Model, Obj, Ref, RefTo, Type
 } from '@anticrm/core'
-import domains from '@anticrm/domains'
 import 'reflect-metadata'
 
 const classIdentities = new Map<Ref<Class<Obj>>, Class<Obj>>()
@@ -74,20 +73,28 @@ export function getEnum (target: any): ClassifierDefinition<Enum> {
 }
 
 export function getAttribute (target: any, propertyKey: string): Attribute {
-  const classifier = getClass(target).doc
+  const cl = getClass(target)
+  const classifier = cl.doc
   let attribute = classifier._attributes?.items?.find(p => p._id === propertyKey)
   if (attribute === undefined) {
     attribute = {
       _id: propertyKey,
+      name: propertyKey,
       _class: core.class.Attribute
     } as unknown as Attribute
     classifier._attributes.items?.push(attribute)
+    cl.postProcessing.push((model, cl) => {
+      if (attribute !== undefined) {
+        attribute._id = ((cl._id as string) + '.' + propertyKey) as Ref<Doc>
+      }
+    })
   }
   return attribute
 }
 
 export function getEnumLiteral (target: any, propertyKey: string): EnumLiteral {
-  const enumValue = getEnum(target).doc
+  const en = getEnum(target)
+  const enumValue = en.doc
   let literal = enumValue._literals?.items?.find(p => p._id === propertyKey)
   if (literal === undefined) {
     literal = {
@@ -96,6 +103,11 @@ export function getEnumLiteral (target: any, propertyKey: string): EnumLiteral {
       _class: core.class.EnumLiteral
     } as unknown as EnumLiteral
     enumValue._literals.items?.push(literal)
+    en.postProcessing.push((model, cl) => {
+      if (literal !== undefined) {
+        literal._id = ((cl._id as string) + '.' + propertyKey) as Ref<Doc>
+      }
+    })
   }
   return literal
 }
@@ -109,7 +121,7 @@ export function loadClassifierChild (target: any, propertyKey: string): Emb | un
   return undefined
 }
 
-function findParentClassifier (_class: Class<Obj>, parent: Ref<Class<Obj>>): Class<Obj> | undefined {
+export function findParentClassifier (_class: Class<Obj>, parent: Ref<Class<Obj>>): Class<Obj> | undefined {
   let cl = classIdentities.get(_class._extends as Ref<Class<Obj>>)
   while (cl !== undefined) {
     if (cl._id === parent) {
@@ -138,13 +150,13 @@ export function Class$<E extends Obj, T extends E> (id: Ref<Class<T>>, _extends:
     }
     if (domain !== undefined) {
       // Do not allow VDoc's to be in Model domain.
-      if (domain === MODEL_DOMAIN) {
-        const vdoc = findParentClassifier(classifier, domains.class.VDoc)
-        if (vdoc !== undefined) {
-          throw new Error(`Classifier ${id} is extends ${domains.class.VDoc} and define ${domain} as domain` +
-          '\nVDoc documents should be defined for own domains, not model domain.')
-        }
-      }
+      // if (domain === MODEL_DOMAIN) {
+      //   const vdoc = findParentClassifier(classifier, domains.class.VDoc)
+      //   if (vdoc !== undefined) {
+      //     throw new Error(`Classifier ${id} is extends ${domains.class.VDoc} and define ${domain} as domain` +
+      //     '\nVDoc documents should be defined for own domains, not model domain.')
+      //   }
+      // }
 
       (classifier as Class<T>)._domain = domain
     }
@@ -227,16 +239,6 @@ export function CollectionOf$<T extends Emb> (of: Ref<Class<T>>) {
       of
     }
     attribute.type = arr
-  }
-}
-
-export function Primary () {
-  return function (target: any, propertyKey: string): void {
-    const classifier = getClass(target)
-
-    classifier.postProcessing.push((model, cl) => {
-      model.mixinDocument(cl, domains.mixin.Indices, { primary: propertyKey })
-    })
   }
 }
 

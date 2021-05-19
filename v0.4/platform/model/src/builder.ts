@@ -76,11 +76,11 @@ class Builder {
 
   ///
 
-  mixin<T extends E, E extends Doc> (id: Ref<E>, clazz: Ref<Mixin<T>>, values: Omit<T, keyof E>): void {
+  mixin<T extends E, E extends Doc> (id: Ref<E>, clazz: Ref<Mixin<T>>, values: DocumentValue<T>): void {
     this.memdb.mixin(id, clazz, values)
   }
 
-  mixinDocument<T extends E, E extends Doc> (doc: E, clazz: Ref<Mixin<T>>, values: Omit<T, keyof E>): void {
+  mixinDocument<T extends E, E extends Doc> (doc: E, clazz: Ref<Mixin<T>>, values: DocumentValue<T>): void {
     this.memdb.mixinDocument(doc, clazz, values)
   }
 

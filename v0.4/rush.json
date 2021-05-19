@@ -379,12 +379,20 @@
       "projectFolder": "platform/core"
     },
     {
+      "packageName": "@anticrm/core-model",
+      "projectFolder": "platform/core-model"
+    },
+    {
       "packageName": "@anticrm/storage-mongo",
       "projectFolder": "platform/storage-mongo"
     },
     {
       "packageName": "@anticrm/domains",
       "projectFolder": "platform/domains"
+    },
+    {
+      "packageName": "@anticrm/domains-model",
+      "projectFolder": "platform/domains-model"
     },
     {
       "packageName": "@anticrm/text",

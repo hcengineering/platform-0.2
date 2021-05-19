@@ -16,10 +16,10 @@
 /* eslint-env jest */
 
 import { Emb, Model, Ref, txContext } from '@anticrm/core'
-import { createTask, data, Task, TaskComment, taskIds } from '@anticrm/core/src/__tests__/tasks'
 import { ModelStorage } from '../model_storage'
 import { Space } from '../space'
 import { addItem, removeItem, updateItem } from '../tx'
+import { createTask, data, Task, TaskComment, taskIds } from './domains_tasks'
 
 describe('core tests', () => {
   it('find in test', async () => {
