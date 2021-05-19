@@ -85,8 +85,8 @@ export interface RegExpression {
   $options?: string
 }
 
-export type ObjQueryType<T> = T extends Obj ? never : T | RegExpression
-export type ArrayQueryType<A> = A extends any[] ? A : ObjQueryType<A>
+export type ObjQueryType<T> = T extends Emb ? DocumentQuery<T> : T | RegExpression
+export type ArrayQueryType<A> = A extends any[] ? never : ObjQueryType<A>
 
 /**
  * A possible query values to be used with Document access protocol.
@@ -99,9 +99,10 @@ export type DocumentQuery<T> = {
 }
 
 // A possible values for document during creation.
-export type TWithoutEmbArray<A> = A extends any[] ? A: A
 
-export type DocumentValueRaw<T> = {
+type TWithoutEmbArray<A> = A extends any[] ? never: OmitObj<A, Emb> | A
+
+type DocumentValueRaw<T> = {
   [P in keyof T]: TWithoutEmbArray<T[P]>
 }
 
@@ -113,6 +114,14 @@ type OmitObj<T, E extends Obj> = T extends E ? DocumentValueRaw<OmitPartial<T, E
  */
 export type DocumentValue<T> =
   OmitObj<T, Emb> | OmitObj<T, Doc> | OmitObj<T, Obj> | T
+
+// Partial with partial embedded objects
+type TPartialWithoutEmbArray<A> = A extends any[] ? never: Partial<A>
+
+type EmbPartial<T extends Obj> = T extends Obj ? {
+  [P in keyof T]?: TPartialWithoutEmbArray<T[P]>
+} : never
+export type PartialDocumentValue<T extends Obj> = EmbPartial<T> | Partial<T>
 
 // Sorting structure
 export enum SortingOrder {

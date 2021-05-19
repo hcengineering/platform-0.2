@@ -16,7 +16,7 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import core, {
   AnyLayout, Attribute, Class, Classifier, ClassifierKind, CollectionOf, Doc, Emb, Enum, EnumLiteral,
-  EnumOf, Mixin, Model, MODEL_DOMAIN, Obj, Ref, RefTo, Type
+  EnumOf, InstanceOf, Mixin, Model, MODEL_DOMAIN, Obj, Ref, RefTo, Type
 } from '@anticrm/core'
 import domains from '@anticrm/domains'
 import 'reflect-metadata'
@@ -198,6 +198,18 @@ export function EnumOf$ (of: Ref<Enum>) {
       _class: core.class.EnumOf,
       of
     } as unknown as EnumOf
+    attribute.type = type
+  }
+}
+
+export function InstanceOf$<T extends Emb> (of: Ref<Class<T>>) {
+  return function (target: any, propertyKey: string): void {
+    const attribute = getAttribute(target, propertyKey)
+    const type = {
+      _id: propertyKey as Ref<Obj>,
+      _class: core.class.InstanceOf,
+      of
+    } as unknown as InstanceOf<Emb>
     attribute.type = type
   }
 }

@@ -13,11 +13,13 @@
 // limitations under the License.
 //
 
-import core, { Class, Doc, MODEL_DOMAIN, Ref, Type } from '@anticrm/core'
+import core, { Class, Collection, Doc, MODEL_DOMAIN, Ref, Type } from '@anticrm/core'
 import domains, { Application, Indices, ShortID, Space, SpaceUser, Title, TitleSource, TITLE_DOMAIN, VDoc, CollectionReference } from '@anticrm/domains'
 import { Builder, Class$, Mixin$, Primary, Prop, RefTo$ } from '.'
+import { CollectionOf$ } from './dsl'
 import {
   TAttribute, TClass, TClassifier, TCollectionOf, TDoc, TEmb, TEnum, TEnumLiteral, TEnumOf,
+  TInstanceOf,
   TMixin, TObj,
   TRefTo, TType
 } from './models/core'
@@ -67,7 +69,7 @@ export class TSpace extends TDoc implements Space {
 
   @Prop() spaceKey!: string
 
-  @Prop() users!: SpaceUser[]
+  @CollectionOf$(domains.class.SpaceUser) users!: Collection<SpaceUser>
 
   @Prop(core.class.Boolean) isPublic!: boolean
 
@@ -114,7 +116,7 @@ export class TCollectionReference extends TEmb implements CollectionReference {
 }
 
 export function model (S: Builder): void {
-  S.add(TObj, TEmb, TDoc, TAttribute, TType, TRefTo, TEnumOf, TCollectionOf, TCollectionReference, TClassifier, TClass, TMixin, TEnumLiteral, TEnum)
+  S.add(TObj, TEmb, TDoc, TAttribute, TType, TRefTo, TInstanceOf, TEnumOf, TCollectionOf, TCollectionReference, TClassifier, TClass, TMixin, TEnumLiteral, TEnum)
   S.add(TIndexesClass, TVShortID)
   S.add(TStringType, TNumberType, TBooleanType, TDateType)
   S.add(TVDoc, TReference, TTitle, TApplication)

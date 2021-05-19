@@ -14,7 +14,7 @@
 //
 
 import { Component, identify } from '@anticrm/status'
-import { Attribute, Class, Classifier, CollectionOf, Doc, Emb, Enum, EnumLiteral, EnumOf, Mixin, Obj, Ref, RefTo, Type } from './classes'
+import { Attribute, Class, Classifier, CollectionOf, Doc, Emb, Enum, EnumLiteral, EnumOf, InstanceOf, Mixin, Obj, Ref, RefTo, Type } from './classes'
 import { Tx } from './storage'
 
 export * from './classes'
@@ -40,6 +40,7 @@ export default identify('core' as Component, {
     Date: '' as Ref<Class<Type>>,
     Type: '' as Ref<Class<Type>>,
     RefTo: '' as Ref<Class<RefTo<Doc>>>,
+    InstanceOf: '' as Ref<Class<InstanceOf<Emb>>>,
     CollectionOf: '' as Ref<Class<CollectionOf<Emb>>>,
     EnumOf: '' as Ref<Class<EnumOf>>,
 
