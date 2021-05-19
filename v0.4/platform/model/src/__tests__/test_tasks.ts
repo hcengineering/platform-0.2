@@ -14,9 +14,9 @@
 //
 
 import core, { Collection, MODEL_DOMAIN } from '@anticrm/core'
-import { Task, TaskComment, taskIds, TaskMixin } from '@anticrm/core/src/__tests__/tasks'
+import { Task, TaskComment, TaskEstimate, taskIds, TaskMixin } from '@anticrm/core/src/__tests__/tasks'
 import { Builder, Class$, Prop } from '..'
-import { CollectionOf$, Mixin$, Primary } from '../dsl'
+import { CollectionOf$, InstanceOf$, Mixin$, Primary } from '../dsl'
 import { model as globalModel, TDoc, TEmb } from '../__model__'
 
 @Class$(taskIds.class.Task, core.class.Doc, MODEL_DOMAIN)
@@ -30,6 +30,8 @@ export class TTask extends TDoc implements Task {
 
   @CollectionOf$(taskIds.class.TaskComment)
   comments?: Collection<TaskComment>
+
+  @InstanceOf$(taskIds.class.TaskEstimate) eta!: TaskEstimate
 }
 
 @Mixin$(taskIds.mixin.TaskMixin, taskIds.class.Task)
@@ -49,8 +51,14 @@ export class TTaskComment extends TEmb implements TaskComment {
   date!: Date
 }
 
+@Class$(taskIds.class.TaskEstimate, core.class.Emb, MODEL_DOMAIN)
+export class TTaskEstimate extends TEmb implements TaskEstimate {
+  @Prop() rom!: number // in hours
+  @Prop() eta!: number // in hours
+}
+
 export function model (S: Builder): void {
-  S.add(TTask, TTaskComment, TTaskMixin)
+  S.add(TTask, TTaskComment, TTaskMixin, TTaskEstimate)
 }
 
 export function fullModel (S: Builder): void {

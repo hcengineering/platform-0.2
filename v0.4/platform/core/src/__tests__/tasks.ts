@@ -30,6 +30,15 @@ export interface Task extends Doc {
   description: string
   rate?: number
   comments?: Collection<TaskComment>
+  eta?: TaskEstimate
+}
+
+/**
+ * Define ROM and Estimated Time to arrival
+ */
+export interface TaskEstimate extends Emb {
+  rom: number // in hours
+  eta: number // in hours
 }
 
 export interface TaskMixin extends Task {
@@ -43,6 +52,7 @@ export interface TaskWithSecond extends Task {
 export const taskIds = {
   class: {
     Task: 'core.class.TaskObj' as Ref<Class<Task>>,
+    TaskEstimate: 'core.class.TaskEstimate' as Ref<Class<TaskEstimate>>,
     TaskComment: 'core.class.TaskComment' as Ref<Class<TaskComment>>
   },
   mixin: {

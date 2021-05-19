@@ -15,9 +15,9 @@
 //
 /* eslint-env jest */
 
-import { DocumentValue, Model, Ref, SortingOrder, txContext } from '@anticrm/core'
+import { Doc, DocumentValue, Model, Ref, SortingOrder, txContext } from '@anticrm/core'
 import { createTask, data, Task, TaskComment, taskIds as task, taskIds } from '@anticrm/core/src/__tests__/tasks'
-import { Space, addItem, create, removeItem, updateItem } from '@anticrm/domains'
+import { Space, addItem, create, removeItem, updateItem, update } from '@anticrm/domains'
 
 import { Db, MongoClient } from 'mongodb'
 import { MongoStorage } from '../storage'
@@ -174,6 +174,48 @@ describe('mongo operations', () => {
     expect(result).toBeDefined()
     expect(result.length).toEqual(2)
     expect(result[0]._class).toEqual(taskIds.class.TaskComment)
+  })
+
+  it('find by emb value', async () => {
+    const mongoStorage = new MongoStorage(model, db)
+
+    for (let i = 0; i < 50; i++) {
+      const doc1: DocumentValue<Task> = {
+        name: `my-task-${i}`,
+        description: `${i * i}`,
+        rate: 20 + i,
+        eta: {
+          eta: 10 + i,
+          rom: i % 5
+        }
+      }
+      await mongoStorage.tx(txContext(), create<Task>(task.class.Task, doc1))
+    }
+
+    const r = await mongoStorage.find(task.class.Task, { eta: { rom: 2 } }, { limit: 10 })
+    expect(r.length).toEqual(10)
+    expect(r.map(t => t.eta?.rom).filter(e => e === 2).length).toEqual(10)
+  })
+  it('update emb value', async () => {
+    const mongoStorage = new MongoStorage(model, db)
+
+    const doc1: DocumentValue<Task> = {
+      name: 'my-task-0',
+      description: 'Hello 0',
+      rate: 20,
+      eta: {
+        eta: 10,
+        rom: 2
+      }
+    }
+
+    const _id = 'd1' as Ref<Doc>
+    await mongoStorage.tx(txContext(), create<Task>(task.class.Task, doc1, _id))
+
+    await mongoStorage.tx(txContext(), update<Task>(task.class.Task, _id, { eta: { rom: 3 } }))
+
+    const r = await mongoStorage.findOne(task.class.Task, { _id })
+    expect(r?.eta?.rom).toEqual(3)
   })
 })
 async function createTasks (storage: MongoStorage, t1: Task): Promise<void> {

@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Doc, Emb, Ref } from '@anticrm/core'
+import { Collection, Doc, Emb, Ref } from '@anticrm/core'
 
 // S P A C E
 
@@ -40,7 +40,7 @@ export interface Space extends Doc {
 
   spaceKey: string // A space shortId prefix.
 
-  users: SpaceUser[] // A list of included user accounts, not all may be active.
+  users: Collection<SpaceUser> // A list of included user accounts, not all may be active.
   isPublic: boolean // If specified, a users are interpreted as include list.
   archived: boolean // If specified, channel is marked as archived, only owner could archive space
 }

@@ -42,10 +42,10 @@ export interface Collection<T> {
   items?: T[]
 }
 
-export type PropertyType = PrimitiveType | Ref<Doc> | Emb | PropertyType[] | { [key: string]: PropertyType }
+export type PropertyType = PrimitiveType | Ref<Doc> | Emb
 
-// An attribute type with some defined mixins inside.
-export interface Type extends Obj {
+// An attribute type.
+export interface Type extends Emb {
   _default?: PropertyType
 }
 
@@ -63,10 +63,7 @@ export interface Classifier extends Doc {
   _kind: ClassifierKind
 }
 
-export interface EMixin<T extends Obj> extends EClass<T> {
-}
-
-export type Mixin<T extends Obj> = EMixin<T>
+export type Mixin<T extends Obj> = EClass<T>
 
 export interface EDomainClassifier {
   _domain?: string
@@ -96,6 +93,10 @@ export interface RefTo<T extends Doc> extends Type {
   to: Ref<Class<T>>
 }
 
+export interface InstanceOf<T extends Emb> extends Type {
+  of: Ref<Class<T>>
+}
+
 export interface EnumOf extends Type {
   of: Ref<Enum>
 }
@@ -106,6 +107,7 @@ export interface CollectionOf<T extends Emb> extends Type {
 
 ///
 
+type AnyPropertyType = PrimitiveType | Ref<Doc> | Emb | { [key: string]: AnyPropertyType }
 export interface AnyLayout {
-  [key: string]: PropertyType
+  [key: string]: AnyPropertyType
 }

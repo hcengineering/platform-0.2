@@ -190,4 +190,26 @@ describe('mixin tools', () => {
     expect(t.secondTask === null).toBeTruthy()
     expect(t.secondTask == null).toBeTruthy()
   })
+
+  it('find embedded object', async () => {
+    const model = new Model('vdocs')
+    model.loadModel(data)
+
+    model.add(model.createDocument<Task>(taskIds.class.Task, {
+      name: 't1',
+      description: 'test tasl1',
+      rate: 10,
+      eta: {
+        eta: 10,
+        rom: 20
+      }
+    }))
+    model.add(model.createDocument<Task>(taskIds.class.Task, createTask('t2t', 11, 'test task2')))
+
+    const result = await model.find<Task>(taskIds.class.Task, { eta: { eta: 10 } })
+    expect(result.length).toEqual(1)
+
+    const result2 = await model.find<Task>(taskIds.class.Task, { eta: { eta: 11 } })
+    expect(result2.length).toEqual(0)
+  })
 })

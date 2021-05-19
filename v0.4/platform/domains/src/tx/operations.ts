@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Class, Doc, DocumentValue, Emb, generateId, Obj, Ref, Tx } from '@anticrm/core'
+import { AnyLayout, Class, Doc, DocumentValue, PartialDocumentValue, Emb, generateId, Obj, Ref, Tx } from '@anticrm/core'
 import { CollectionId } from '@anticrm/core/src/colletionid'
 import { AddItemTx, collectionId, CreateTx, DeleteTx, RemoveItemTx, UpdateItemTx, UpdateTx } from '.'
 import core from '..'
@@ -49,7 +49,7 @@ export function create<T extends Doc> (_class: Ref<Class<T>>, attributes: Docume
 /**
  * Construct update transaction
  */
-export function update<T extends Doc> (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attributes: Partial<T>, _objectSpace?: Ref<Space>): Tx {
+export function update<T extends Doc> (_class: Ref<Class<Doc>>, _id: Ref<Doc>, attributes: PartialDocumentValue<T>, _objectSpace?: Ref<Space>): Tx {
   const tx: UpdateTx = {
     _class: core.class.UpdateTx,
     _id: generateId(),
@@ -125,7 +125,7 @@ export function updateItem<T extends Doc, C extends Emb> (
   selector: CollectionId<T>, // <- collection selector builder
 
   _itemId: Ref<C>,
-  value: Partial<C>
+  value: PartialDocumentValue<C>
 ): UpdateItemTx {
   const fieldId = selector(collectionId<T>())
 

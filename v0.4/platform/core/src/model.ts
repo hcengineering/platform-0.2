@@ -14,7 +14,7 @@
 //
 
 import core from '.'
-import { AnyLayout, Attribute, Class, Classifier, ClassifierKind, CollectionOf, Doc, Emb, Mixin, Obj, PropertyType, Ref } from './classes'
+import { AnyLayout, Attribute, Class, Classifier, ClassifierKind, CollectionOf, Doc, Emb, InstanceOf, Mixin, Obj, Ref } from './classes'
 import { generateId } from './ids'
 import { DocumentQuery, DocumentSorting, DocumentValue, FindOptions, RegExpression } from './storage'
 
@@ -244,7 +244,7 @@ export class Model {
     throw new Error(`attribute not found: ${key} in ${cls}`)
   }
 
-  public pushArrayValue (curValue: unknown, attrClass: Ref<Class<Obj>>, embedded: AnyLayout): PropertyType[] {
+  public pushArrayValue (curValue: unknown, attrClass: Ref<Class<Obj>>, embedded: AnyLayout): AnyLayout[] {
     // Assign into  a proper classed values.
     const objValue = this.assign({}, attrClass, embedded)
     objValue._class = attrClass
@@ -253,7 +253,7 @@ export class Model {
       // Just assign a new Array
       return [objValue]
     } else if (curValue instanceof Array) {
-      const curArray = curValue as PropertyType[]
+      const curArray = curValue as AnyLayout[]
       curArray.push(objValue)
       return curArray
     } else {
@@ -307,6 +307,16 @@ export class Model {
                 }
                 l[key] = (value as unknown) as AnyLayout
                 continue
+              }
+            }
+            break
+          }
+          case core.class.InstanceOf: {
+            const attrClass = (attr.type as InstanceOf<Emb>).of
+            if (attrClass !== undefined) {
+              const rValue = r[rKey]
+              if (rValue !== undefined) {
+                l[key] = this.assign({}, attrClass, rValue as AnyLayout)
               }
             }
             break
@@ -541,7 +551,7 @@ export class Model {
       // Class doesn't match so return false.
       return false
     }
-    return this.matchObject(_class, doc, query, false)
+    return this.matchObject(_class, doc, query)
   }
 
   /**
@@ -582,7 +592,7 @@ export class Model {
     return Object.keys(sort).some(x => oKeys.has(x))
   }
 
-  private matchObject<T extends Obj>(_class: Ref<Class<T>>, doc: T, query: DocumentQuery<T>, fullMatch = false): boolean {
+  private matchObject<T extends Obj>(_class: Ref<Class<T>>, doc: T, query: DocumentQuery<T>): boolean {
     if ((doc as any).__layout !== undefined) {
       // This is our proxy, we should unwrap it.
       doc = (doc as any).__layout
@@ -606,9 +616,26 @@ export class Model {
       if (keyIn) {
         const docValue = l[attrKey]
         if (attr.attr !== undefined) {
-          const mResult = this.matchValue(docValue, value)
-          if (mResult.result) {
-            count += 1
+          switch (attr.attr.type._class) {
+            case core.class.CollectionOf: {
+              throw new Error('Please use findIn to search for embedded collection objects')
+            }
+            case core.class.InstanceOf: {
+              const attrClass = (attr.attr.type as InstanceOf<Emb>).of
+              if (attrClass !== undefined) {
+                if (this.matchObject(attrClass, docValue as Emb, value)) {
+                  count += 1
+                }
+                continue
+              }
+              break
+            }
+            default: {
+              const mResult = this.matchValue(docValue, value)
+              if (mResult.result) {
+                count += 1
+              }
+            }
           }
         }
       }
