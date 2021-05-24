@@ -31,7 +31,8 @@ export async function newClient (token: string, host: string, port: number): Pro
     ...coreProtocol,
     generateId: genId,
     close: () => rawClient.close(),
-    addEventListener: rawClient.addEventListener
+    addEventListener: rawClient.addEventListener,
+    request: rawClient.request
   }
   return service
 }

@@ -27,6 +27,7 @@ export interface ClientService extends CoreProtocol, DocumentProtocol {
   generateId: () => Ref<Doc>
   addEventListener: (type: EventType, listener: EventListener) => void
   close: () => void
+  request: <R>(method: string, ...params: any[]) => Promise<R>
 }
 
 export interface RpcClient {

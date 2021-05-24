@@ -152,6 +152,7 @@ export default async (platform: Platform): Promise<CoreService> => {
     generateId,
     tx: processTx,
     getUserId,
-    genRefId
+    genRefId,
+    rpc
   }
 }

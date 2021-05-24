@@ -17,6 +17,8 @@ import { Class, CoreProtocol, Doc, DocumentProtocol, DocumentQuery, FindOptions,
 import { OperationProtocol } from '@anticrm/domains'
 import { Metadata, Plugin, plugin } from '@anticrm/platform'
 
+import { ClientService } from './rpc'
+
 // Queries
 export type Subscriber<T> = (value: T[]) => void
 export type Unsubscribe = () => void
@@ -44,6 +46,8 @@ export interface CoreService extends CoreProtocol, DocumentProtocol, QueryProtoc
   generateId: () => Ref<Doc>
 
   getUserId: () => string
+
+  rpc: ClientService
 }
 
 export default plugin(

@@ -26,6 +26,7 @@ import { model as datagen } from '@anticrm/data-generator/src/__model__'
 import { model as recruiting } from '@anticrm/recruiting/src/__model__'
 import { model as personExtras } from '@anticrm/person-extras/src/__model__'
 import { model as calendar } from '@anticrm/calendar/src/__model__'
+import { model as meeting } from '@anticrm/meeting/src/__model__'
 
 import { model as activity } from '@anticrm/activity/src/__model__'
 
@@ -42,6 +43,7 @@ builder.load(task)
 builder.load(datagen)
 builder.load(recruiting)
 builder.load(calendar)
+builder.load(meeting)
 
 export const Model = builder.dumpAll()
 export const Strings = {
