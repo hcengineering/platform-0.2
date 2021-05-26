@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Class, Enum, Mixin, Ref } from '@anticrm/core'
+import { Class, Doc, Enum, Mixin, Ref } from '@anticrm/core'
 import { Component, identify } from '@anticrm/status'
 import { CollectionReference } from './collection'
 import { Indices } from './primary'
@@ -21,6 +21,7 @@ import { Reference, ShortID } from './references'
 import { Application, Space, SpaceUser } from './space'
 import { Title, TitleSource } from './title'
 import { AddItemTx, CreateTx, DeleteTx, ItemTx, ObjectTx, RemoveItemTx, UpdateItemTx, UpdateTx } from './tx'
+import { UXAttribute, UXObject } from './ux'
 import { VDoc } from './vdoc'
 
 export default identify('core' as Component, {
@@ -46,7 +47,10 @@ export default identify('core' as Component, {
   mixin: {
     Indices: '' as Ref<Mixin<Indices>>,
     ShortID: '' as Ref<Mixin<ShortID>>,
-    CollectionReference: '' as Ref<Mixin<CollectionReference>>
+    CollectionReference: '' as Ref<Mixin<CollectionReference>>,
+
+    UXObject: '' as Ref<Mixin<UXObject<Doc>>>,
+    UXAttribute: '' as Ref< Mixin<UXAttribute>>
   },
   enum: {
     TitleSource: '' as Ref<Enum<TitleSource>>
@@ -63,3 +67,4 @@ export * from './title'
 export * from './vdoc'
 export * from './tx_utils'
 export * from './collection'
+export * from './ux'

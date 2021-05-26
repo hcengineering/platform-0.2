@@ -13,8 +13,9 @@
 // limitations under the License.
 //
 
-import core from '.'
-import { AnyLayout, Attribute, Class, Classifier, ClassifierKind, CollectionOf, Doc, Emb, InstanceOf, Mixin, Obj, Ref } from './classes'
+import core, { collectionId } from '.'
+import { AnyLayout, Attribute, Class, Classifier, ClassifierKind, Collection, CollectionOf, Doc, Emb, InstanceOf, Mixin, Obj, Ref } from './classes'
+import { CollectionId } from './colletionid'
 import { generateId } from './ids'
 import { DocumentQuery, DocumentSorting, DocumentValue, DocumentValueOmit, FindOptions, RegExpression } from './storage'
 
@@ -352,6 +353,17 @@ export class Model {
 
   mixin<E extends Doc, T extends E>(id: Ref<E>, clazz: Ref<Mixin<T>>, values: DocumentValueOmit<T, E>): void {
     this.mixinDocument(this.get(id), clazz, values)
+  }
+
+  mixinEmb<T extends Doc, E extends C, C extends Emb> (id: Ref<T>, cid: Ref<C>, collection: CollectionId<T>, clazz: Ref<Mixin<E>>, values: DocumentValueOmit<E, C>): void {
+    const doc = this.get(id)
+    const fieldId = collection(collectionId<T>())
+    const collectionField = (doc as any)[fieldId] as Collection<E>
+    const item = collectionField.items?.find(item => item._id === cid)
+    if (item === undefined) {
+      throw new Error(`failed to find embedded item with id: ${cid}`)
+    }
+    this.mixinDocument(item, clazz, values)
   }
 
   getClassHierarchy (cls: Ref<Class<Obj>>, top?: Ref<Class<Obj>>): Array<Ref<Class<Obj>>> {

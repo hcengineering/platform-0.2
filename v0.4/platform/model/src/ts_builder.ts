@@ -28,7 +28,7 @@ const opt: ts.CompilerOptions = {
 }
 
 export interface Collector {
-  buildClass: (_kind: ClassifierKind, nodeId: string, _id: Ref<Class<Obj>>, _base: Class<Obj>, collectedIds: { [key: string]: Ref<Doc>}) => Class<Obj>
+  buildClass: (_kind: ClassifierKind, nodeId: string, _id: Ref<Class<Obj>>, _base: Partial<Class<Obj>>, collectedIds: { [key: string]: Ref<Doc>}) => Class<Obj>
   buildEnum: (nodeId: string, _id: Ref<Class<Obj>>) => Enum<any>
   sourceId: (key: string) => string // resource source id for a local object name
 }
@@ -331,7 +331,7 @@ export function collectModel (_fileName: string): Collector {
       _class: core.class.Type
     }
   }
-  function buildClass <T extends Obj> (_kind: ClassifierKind, nodeId: string, _id: Ref<Class<T>>, _base: Class<Obj>, collectedIds: { [key: string]: Ref<Doc>}): Class<Obj> {
+  function buildClass <T extends Obj> (_kind: ClassifierKind, nodeId: string, _id: Ref<Class<T>>, _base: Partial<Class<Obj>>, collectedIds: { [key: string]: Ref<Doc>}): Class<Obj> {
     const cl: Class<Obj> = {
       ..._base,
       _class: _kind === ClassifierKind.CLASS ? core.class.Class : core.class.Mixin,
@@ -351,18 +351,10 @@ export function collectModel (_fileName: string): Collector {
       throw new Error('failed to find node for ' + _id)
     }
 
-    const module = node.getSourceFile()
-    const mImports = moduleImports[module.fileName] ?? processModuleItems(module)
-    const moduleLocals = processModuleExports(module).module
-
-    // We need to obtain parent class and check for method overrides.
-    // Process members
-    if (ts.isInterfaceDeclaration(node)) {
-      const members: ts.TypeElement[] = []
-      members.push(...node.members)
-
-      const existingAttributes: {[key: string]: string } = {}
-
+    function processHeritageClause (node: ts.InterfaceDeclaration, existingAttributes: { [key: string]: string }, members: ts.TypeElement[]): void {
+      const module = node.getSourceFile()
+      const mImports = moduleImports[module.fileName] ?? processModuleItems(module)
+      const moduleLocals = processModuleExports(module).module
       if (node.heritageClauses !== undefined) {
         for (const hclause of node.heritageClauses) {
           for (const hct of hclause.types) {
@@ -377,7 +369,7 @@ export function collectModel (_fileName: string): Collector {
                 const intNode = localRef.node
                 if (ts.isInterfaceDeclaration(intNode)) {
                   if (realId !== undefined) {
-                  // We have a base class definition.
+                    // We have a base class definition.
                     if (cl._extends === undefined) { // Specify a base class
                       cl._extends = realId as Ref<Class<Obj>>
                     }
@@ -390,8 +382,11 @@ export function collectModel (_fileName: string): Collector {
                         }
                       }
                     }
+                    // We should collect all parent attributes
+                    processHeritageClause(intNode, existingAttributes, [])
                   } else {
-                  // Nope just interface definition, we should aggregate members.
+                    processHeritageClause(intNode, {}, members)
+                    // Nope just interface definition, we should aggregate members.
                     members.push(...intNode.members)
                   }
                 }
@@ -400,6 +395,17 @@ export function collectModel (_fileName: string): Collector {
           }
         }
       }
+    }
+
+    // We need to obtain parent class and check for method overrides.
+    // Process members
+    if (ts.isInterfaceDeclaration(node)) {
+      const members: ts.TypeElement[] = []
+      members.push(...node.members)
+
+      const existingAttributes: {[key: string]: string } = {}
+
+      processHeritageClause(node, existingAttributes, members)
 
       for (const m of members) {
         if (m.name !== undefined) {

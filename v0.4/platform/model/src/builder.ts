@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import core, { Class, ClassifierKind, Doc, DocumentValue, DocumentValueOmit, Enum, Mixin, Model, MODEL_DOMAIN, Obj, Ref } from '@anticrm/core'
+import core, { Class, ClassifierKind, CollectionId, Doc, DocumentValue, DocumentValueOmit, Emb, Enum, Mixin, Model, MODEL_DOMAIN, Obj, Ref } from '@anticrm/core'
 import { CombineObjects, KeysByType } from 'simplytyped'
 import { collectModel, Collector } from './ts_builder'
 
@@ -43,8 +43,6 @@ class Builder {
 
   private readonly collectors: {[key: string]: Collector} = {}
 
-  private readonly postprocessing: Array<(model: Model) => void> = []
-
   constructor (memdb?: Model) {
     this.memdb = memdb ?? new Model(MODEL_DOMAIN)
     this.domains.set(MODEL_DOMAIN, this.memdb)
@@ -71,10 +69,6 @@ class Builder {
     }
   }
 
-  addPostProcess (op: (model: Model) => void): void {
-    this.postprocessing.push(op)
-  }
-
   private buildClassifier <T extends Obj, X extends Record<string, Ref<Class<T>>>>(_kind: ClassifierKind, _fileName: string, ids: X, classes: ExtractClass<T, X>, _domain?: string): void {
     const collector = this.collectors[_fileName] ?? collectModel(_fileName)
     this.collectors[_fileName] = collector
@@ -91,7 +85,10 @@ class Builder {
     for (const key in ids) {
       const id = ids[key]
       const cc = classes[key]
-      const cl = collector.buildClass(_kind, key, id as unknown as Ref<Class<Obj>>, cc._extends, cc._domain ?? _domain, this.collectedIds)
+      if (cc._domain === undefined) {
+        cc._domain = _domain
+      }
+      const cl = collector.buildClass(_kind, key, id as unknown as Ref<Class<Obj>>, cc, this.collectedIds)
       this.memdb.add(cl)
     }
   }
@@ -101,9 +98,6 @@ class Builder {
   }
 
   dump (): Doc[] {
-    for (const op of this.postprocessing) {
-      op(this.memdb)
-    }
     return this.memdb.dump()
   }
 
@@ -130,8 +124,8 @@ class Builder {
     this.memdb.mixin(id, clazz, values)
   }
 
-  mixinDocument<T extends E, E extends Doc> (doc: E, clazz: Ref<Mixin<T>>, values: DocumentValueOmit<T, E>): void {
-    this.memdb.mixinDocument(doc, clazz, values)
+  mixinEmb<T extends Doc, E extends C, C extends Emb> (id: Ref<T>, cid: Ref<C>, collection: CollectionId<T>, clazz: Ref<Mixin<E>>, values: DocumentValueOmit<E, C>): void {
+    this.memdb.mixinEmb(id, cid, collection, clazz, values)
   }
 
   createDocument<M extends Doc> (_class: Ref<Class<M>>, values: DocumentValue<M>, _id?: Ref<M>): M {

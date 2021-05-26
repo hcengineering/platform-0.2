@@ -27,9 +27,9 @@
     "_kind": 2
   },
   {
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.Obj",
-    "_domain": "model",
     "_attributes": {
       "items": [
         {
@@ -54,10 +54,10 @@
     "_kind": 0
   },
   {
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.Doc",
     "_extends": "class:core.Obj",
-    "_domain": "model",
     "_attributes": {
       "items": [
         {
@@ -74,10 +74,10 @@
     "_kind": 0
   },
   {
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.Emb",
     "_extends": "class:core.Obj",
-    "_domain": "model",
     "_attributes": {
       "items": [
         {
@@ -94,10 +94,10 @@
     "_kind": 0
   },
   {
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.Class",
     "_extends": "class:core.Classifier",
-    "_domain": "model",
     "_attributes": {
       "items": [
         {
@@ -139,10 +139,10 @@
     "_kind": 0
   },
   {
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.Classifier",
     "_extends": "class:core.Doc",
-    "_domain": "model",
     "_attributes": {
       "items": [
         {
@@ -159,10 +159,10 @@
     "_kind": 0
   },
   {
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.Attribute",
     "_extends": "class:core.Emb",
-    "_domain": "model",
     "_attributes": {
       "items": [
         {
@@ -187,20 +187,20 @@
     "_kind": 0
   },
   {
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.Mixin",
     "_extends": "class:core.Class",
-    "_domain": "model",
     "_attributes": {
       "items": []
     },
     "_kind": 0
   },
   {
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.Enum",
     "_extends": "class:core.Classifier",
-    "_domain": "model",
     "_attributes": {
       "items": [
         {
@@ -217,10 +217,10 @@
     "_kind": 0
   },
   {
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.EnumLiteral",
     "_extends": "class:core.Emb",
-    "_domain": "model",
     "_attributes": {
       "items": [
         {
@@ -244,10 +244,10 @@
     "_kind": 0
   },
   {
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.Type",
     "_extends": "class:core.Obj",
-    "_domain": "model",
     "_attributes": {
       "items": [
         {
@@ -263,60 +263,60 @@
     "_kind": 0
   },
   {
+    "_extends": "class:core.Type",
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.String",
-    "_extends": "class:core.Type",
-    "_domain": "model",
     "_attributes": {
       "items": []
     },
     "_kind": 0
   },
   {
+    "_extends": "class:core.Type",
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.Number",
-    "_extends": "class:core.Type",
-    "_domain": "model",
     "_attributes": {
       "items": []
     },
     "_kind": 0
   },
   {
+    "_extends": "class:core.Type",
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.Any",
-    "_extends": "class:core.Type",
-    "_domain": "model",
     "_attributes": {
       "items": []
     },
     "_kind": 0
   },
   {
+    "_extends": "class:core.Type",
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.Boolean",
-    "_extends": "class:core.Type",
-    "_domain": "model",
     "_attributes": {
       "items": []
     },
     "_kind": 0
   },
   {
+    "_extends": "class:core.Type",
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.Date",
-    "_extends": "class:core.Type",
-    "_domain": "model",
     "_attributes": {
       "items": []
     },
     "_kind": 0
   },
   {
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.RefTo",
     "_extends": "class:core.Type",
-    "_domain": "model",
     "_attributes": {
       "items": [
         {
@@ -333,10 +333,10 @@
     "_kind": 0
   },
   {
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.InstanceOf",
     "_extends": "class:core.Type",
-    "_domain": "model",
     "_attributes": {
       "items": [
         {
@@ -353,10 +353,10 @@
     "_kind": 0
   },
   {
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.CollectionOf",
     "_extends": "class:core.Type",
-    "_domain": "model",
     "_attributes": {
       "items": [
         {
@@ -373,10 +373,10 @@
     "_kind": 0
   },
   {
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.EnumOf",
     "_extends": "class:core.Type",
-    "_domain": "model",
     "_attributes": {
       "items": [
         {
@@ -393,10 +393,10 @@
     "_kind": 0
   },
   {
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.Tx",
     "_extends": "class:core.Doc",
-    "_domain": "model",
     "_attributes": {
       "items": [
         {

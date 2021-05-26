@@ -15,7 +15,7 @@
 
 /* eslint-env jest */
 
-import core, { Class, Doc, Model, Ref, txContext } from '@anticrm/core'
+import core, { Doc, Model, Ref, txContext } from '@anticrm/core'
 import { ModelStorage } from '../model_storage'
 import { getPrimaryKey } from '../primary_utils'
 import { create, ObjectTx } from '../tx'

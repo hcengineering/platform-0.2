@@ -27,9 +27,9 @@
     "_kind": 2
   },
   {
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.Obj",
-    "_domain": "model",
     "_attributes": {
       "items": [
         {
@@ -54,10 +54,10 @@
     "_kind": 0
   },
   {
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.Doc",
     "_extends": "class:core.Obj",
-    "_domain": "model",
     "_attributes": {
       "items": [
         {
@@ -74,10 +74,10 @@
     "_kind": 0
   },
   {
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.Emb",
     "_extends": "class:core.Obj",
-    "_domain": "model",
     "_attributes": {
       "items": [
         {
@@ -94,10 +94,10 @@
     "_kind": 0
   },
   {
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.Class",
     "_extends": "class:core.Classifier",
-    "_domain": "model",
     "_attributes": {
       "items": [
         {
@@ -139,10 +139,10 @@
     "_kind": 0
   },
   {
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.Classifier",
     "_extends": "class:core.Doc",
-    "_domain": "model",
     "_attributes": {
       "items": [
         {
@@ -159,10 +159,10 @@
     "_kind": 0
   },
   {
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.Attribute",
     "_extends": "class:core.Emb",
-    "_domain": "model",
     "_attributes": {
       "items": [
         {
@@ -187,20 +187,20 @@
     "_kind": 0
   },
   {
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.Mixin",
     "_extends": "class:core.Class",
-    "_domain": "model",
     "_attributes": {
       "items": []
     },
     "_kind": 0
   },
   {
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.Enum",
     "_extends": "class:core.Classifier",
-    "_domain": "model",
     "_attributes": {
       "items": [
         {
@@ -217,10 +217,10 @@
     "_kind": 0
   },
   {
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.EnumLiteral",
     "_extends": "class:core.Emb",
-    "_domain": "model",
     "_attributes": {
       "items": [
         {
@@ -244,10 +244,10 @@
     "_kind": 0
   },
   {
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.Type",
     "_extends": "class:core.Obj",
-    "_domain": "model",
     "_attributes": {
       "items": [
         {
@@ -263,60 +263,60 @@
     "_kind": 0
   },
   {
+    "_extends": "class:core.Type",
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.String",
-    "_extends": "class:core.Type",
-    "_domain": "model",
     "_attributes": {
       "items": []
     },
     "_kind": 0
   },
   {
+    "_extends": "class:core.Type",
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.Number",
-    "_extends": "class:core.Type",
-    "_domain": "model",
     "_attributes": {
       "items": []
     },
     "_kind": 0
   },
   {
+    "_extends": "class:core.Type",
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.Any",
-    "_extends": "class:core.Type",
-    "_domain": "model",
     "_attributes": {
       "items": []
     },
     "_kind": 0
   },
   {
+    "_extends": "class:core.Type",
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.Boolean",
-    "_extends": "class:core.Type",
-    "_domain": "model",
     "_attributes": {
       "items": []
     },
     "_kind": 0
   },
   {
+    "_extends": "class:core.Type",
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.Date",
-    "_extends": "class:core.Type",
-    "_domain": "model",
     "_attributes": {
       "items": []
     },
     "_kind": 0
   },
   {
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.RefTo",
     "_extends": "class:core.Type",
-    "_domain": "model",
     "_attributes": {
       "items": [
         {
@@ -333,10 +333,10 @@
     "_kind": 0
   },
   {
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.InstanceOf",
     "_extends": "class:core.Type",
-    "_domain": "model",
     "_attributes": {
       "items": [
         {
@@ -353,10 +353,10 @@
     "_kind": 0
   },
   {
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.CollectionOf",
     "_extends": "class:core.Type",
-    "_domain": "model",
     "_attributes": {
       "items": [
         {
@@ -373,10 +373,10 @@
     "_kind": 0
   },
   {
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.EnumOf",
     "_extends": "class:core.Type",
-    "_domain": "model",
     "_attributes": {
       "items": [
         {
@@ -393,10 +393,10 @@
     "_kind": 0
   },
   {
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.Tx",
     "_extends": "class:core.Doc",
-    "_domain": "model",
     "_attributes": {
       "items": [
         {
@@ -441,20 +441,20 @@
     "_kind": 2
   },
   {
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.Application",
     "_extends": "class:core.Doc",
-    "_domain": "model",
     "_attributes": {
       "items": []
     },
     "_kind": 0
   },
   {
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.Reference",
     "_extends": "class:core.Doc",
-    "_domain": "model",
     "_attributes": {
       "items": [
         {
@@ -540,10 +540,10 @@
     "_kind": 0
   },
   {
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.Space",
     "_extends": "class:core.Doc",
-    "_domain": "model",
     "_attributes": {
       "items": [
         {
@@ -618,10 +618,10 @@
     "_kind": 0
   },
   {
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.SpaceUser",
     "_extends": "class:core.Emb",
-    "_domain": "model",
     "_attributes": {
       "items": [
         {
@@ -645,10 +645,10 @@
     "_kind": 0
   },
   {
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.Title",
     "_extends": "class:core.Doc",
-    "_domain": "model",
     "_attributes": {
       "items": [
         {
@@ -691,10 +691,10 @@
     "_kind": 0
   },
   {
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.VDoc",
     "_extends": "class:core.Doc",
-    "_domain": "model",
     "_attributes": {
       "items": [
         {
@@ -743,10 +743,10 @@
     "_kind": 0
   },
   {
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.ObjectTx",
     "_extends": "class:core.Tx",
-    "_domain": "model",
     "_attributes": {
       "items": [
         {
@@ -781,10 +781,10 @@
     "_kind": 0
   },
   {
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.ItemTx",
     "_extends": "class:core.ObjectTx",
-    "_domain": "model",
     "_attributes": {
       "items": [
         {
@@ -818,10 +818,10 @@
     "_kind": 0
   },
   {
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.CreateTx",
     "_extends": "class:core.ObjectTx",
-    "_domain": "model",
     "_attributes": {
       "items": [
         {
@@ -837,10 +837,10 @@
     "_kind": 0
   },
   {
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.UpdateTx",
     "_extends": "class:core.ObjectTx",
-    "_domain": "model",
     "_attributes": {
       "items": [
         {
@@ -856,20 +856,20 @@
     "_kind": 0
   },
   {
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.DeleteTx",
     "_extends": "class:core.ObjectTx",
-    "_domain": "model",
     "_attributes": {
       "items": []
     },
     "_kind": 0
   },
   {
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.AddItemTx",
     "_extends": "class:core.ItemTx",
-    "_domain": "model",
     "_attributes": {
       "items": [
         {
@@ -885,10 +885,10 @@
     "_kind": 0
   },
   {
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.UpdateItemTx",
     "_extends": "class:core.ItemTx",
-    "_domain": "model",
     "_attributes": {
       "items": [
         {
@@ -904,10 +904,10 @@
     "_kind": 0
   },
   {
+    "_domain": "model",
     "_class": "class:core.Class",
     "_id": "class:core.RemoveItemTx",
     "_extends": "class:core.ItemTx",
-    "_domain": "model",
     "_attributes": {
       "items": []
     },
@@ -988,6 +988,114 @@
           "type": {
             "_class": "class:core.RefTo",
             "to": "class:core.Space"
+          }
+        }
+      ]
+    },
+    "_kind": 1
+  },
+  {
+    "_class": "class:core.Mixin",
+    "_id": "mixin:core.UXObject",
+    "_extends": "class:core.Class",
+    "_attributes": {
+      "items": [
+        {
+          "name": "label",
+          "_id": "mixin:core.UXObject.label",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.Type"
+          }
+        },
+        {
+          "name": "icon",
+          "_id": "mixin:core.UXObject.icon",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.Type"
+          }
+        },
+        {
+          "name": "placeholder",
+          "_id": "mixin:core.UXObject.placeholder",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.Type"
+          }
+        },
+        {
+          "name": "presenter",
+          "_id": "mixin:core.UXObject.presenter",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.Type"
+          }
+        },
+        {
+          "name": "color",
+          "_id": "mixin:core.UXObject.color",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.Type"
+          }
+        }
+      ]
+    },
+    "_kind": 1
+  },
+  {
+    "_class": "class:core.Mixin",
+    "_id": "mixin:core.UXAttribute",
+    "_extends": "class:core.Attribute",
+    "_attributes": {
+      "items": [
+        {
+          "name": "visible",
+          "_id": "mixin:core.UXAttribute.visible",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.Boolean"
+          }
+        },
+        {
+          "name": "label",
+          "_id": "mixin:core.UXAttribute.label",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.Type"
+          }
+        },
+        {
+          "name": "icon",
+          "_id": "mixin:core.UXAttribute.icon",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.Type"
+          }
+        },
+        {
+          "name": "placeholder",
+          "_id": "mixin:core.UXAttribute.placeholder",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.Type"
+          }
+        },
+        {
+          "name": "presenter",
+          "_id": "mixin:core.UXAttribute.presenter",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.Type"
+          }
+        },
+        {
+          "name": "color",
+          "_id": "mixin:core.UXAttribute.color",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.Type"
           }
         }
       ]
