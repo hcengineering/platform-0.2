@@ -28,7 +28,7 @@ const opt: ts.CompilerOptions = {
 }
 
 export interface Collector {
-  buildClass: (_kind: ClassifierKind, nodeId: string, _id: Ref<Class<Obj>>, _extends: Ref<Class<Obj>> | undefined, _domain: string | undefined, collectedIds: { [key: string]: Ref<Doc>}) => Class<Obj>
+  buildClass: (_kind: ClassifierKind, nodeId: string, _id: Ref<Class<Obj>>, _base: Class<Obj>, collectedIds: { [key: string]: Ref<Doc>}) => Class<Obj>
   buildEnum: (nodeId: string, _id: Ref<Class<Obj>>) => Enum<any>
   sourceId: (key: string) => string // resource source id for a local object name
 }
@@ -331,13 +331,13 @@ export function collectModel (_fileName: string): Collector {
       _class: core.class.Type
     }
   }
-  function buildClass <T extends Obj> (_kind: ClassifierKind, nodeId: string, _id: Ref<Class<T>>, _extends: Ref<Class<Obj>> | undefined, _domain: string | undefined, collectedIds: { [key: string]: Ref<Doc>}): Class<Obj> {
+  function buildClass <T extends Obj> (_kind: ClassifierKind, nodeId: string, _id: Ref<Class<T>>, _base: Class<Obj>, collectedIds: { [key: string]: Ref<Doc>}): Class<Obj> {
     const cl: Class<Obj> = {
+      ..._base,
       _class: _kind === ClassifierKind.CLASS ? core.class.Class : core.class.Mixin,
       _id,
-      _extends: _id === _extends ? undefined : _extends,
-      _domain,
-      _attributes: { items: [] },
+      _extends: _id === _base._extends ? undefined : _base._extends,
+      _attributes: _base._attributes ?? { items: [] },
       _kind
     }
 
