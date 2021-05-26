@@ -439,6 +439,10 @@
       "packageName": "@anticrm/platform-core-impl",
       "projectFolder": "plugins/platform-core-impl"
     },
+    {
+      "packageName": "@anticrm/gen-model",
+      "projectFolder": "dev/gen-model"
+    },
     // {
     //   "packageName": "@anticrm/server-front",
     //   "projectFolder": "server/front"

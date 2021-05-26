@@ -13,35 +13,39 @@
 // limitations under the License.
 //
 
-import core, { MODEL_DOMAIN, Type } from '@anticrm/core'
-import { Builder, Class$ } from '@anticrm/model'
-import {
-  TAttribute, TClass, TClassifier, TCollectionOf, TDoc, TEmb, TEnum, TEnumLiteral, TEnumOf,
-  TInstanceOf,
-  TMixin, TObj,
-  TRefTo, TType
-} from './classes'
-export * from './classes'
-
-// Primitive types
-
-@Class$(core.class.String, core.class.Type, MODEL_DOMAIN)
-class TStringType extends TType implements Type {
-}
-
-@Class$(core.class.Number, core.class.Type, MODEL_DOMAIN)
-class TNumberType extends TType implements Type {
-}
-
-@Class$(core.class.Boolean, core.class.Type, MODEL_DOMAIN)
-class TBooleanType extends TType implements Type {
-}
-
-@Class$(core.class.Date, core.class.Type, MODEL_DOMAIN)
-class TDateType extends TType implements Type {
-}
+import core, {
+  Attribute, Class, Classifier, Doc, Emb, Enum, EnumLiteral, Mixin, Obj,
+  CollectionOf, EnumOf, InstanceOf, RefTo,
+  Tx, Type, ClassifierKind, MODEL_DOMAIN
+} from '@anticrm/core'
+import { Builder } from '@anticrm/model'
 
 export function model (S: Builder): void {
-  S.add(TObj, TEmb, TDoc, TAttribute, TType, TRefTo, TInstanceOf, TEnumOf, TCollectionOf, TClassifier, TClass, TMixin, TEnumLiteral, TEnum)
-  S.add(TStringType, TNumberType, TBooleanType, TDateType)
+  S.loadEnum(__filename, core.enum, {
+    ClassifierKind: {} as Enum<ClassifierKind>, // eslint-disable-line
+  })
+  S.loadClass(__filename, core.class, {
+    Obj: { } as Class<Obj>, // eslint-disable-line
+    Emb: { } as Class<Emb>, // eslint-disable-line
+    Doc: { } as Class<Doc>, // eslint-disable-line
+    Attribute: { } as Class<Attribute>, // eslint-disable-line
+    Classifier: { } as Class<Classifier>, // eslint-disable-line
+    Class: { } as Class<Class<any>>, // eslint-disable-line
+    Mixin: { } as Class<Mixin<any>>, // eslint-disable-line
+    Enum: { } as Class<Enum<any>>, // eslint-disable-line
+    EnumLiteral: { } as Class<EnumLiteral>, // eslint-disable-line
+
+    Type: { } as Class<Type>, // eslint-disable-line
+    String: { _extends: core.class.Type } as Class<Type>, // eslint-disable-line
+    Number: { _extends: core.class.Type } as Class<Type>, // eslint-disable-line
+    Boolean: { _extends: core.class.Type } as Class<Type>, // eslint-disable-line
+    Any: { _extends: core.class.Type } as Class<Type>, // eslint-disable-line
+    Date: { _extends: core.class.Type } as Class<Type>, // eslint-disable-line
+    RefTo: { } as Class<RefTo<Doc>>, // eslint-disable-line
+    InstanceOf: { } as Class<InstanceOf<Emb>>, // eslint-disable-line
+    CollectionOf: { } as Class<CollectionOf<Emb>>, // eslint-disable-line
+    EnumOf: { } as Class<EnumOf>, // eslint-disable-line
+
+    Tx: { } as Class<Tx> // eslint-disable-line
+  }, MODEL_DOMAIN)
 }

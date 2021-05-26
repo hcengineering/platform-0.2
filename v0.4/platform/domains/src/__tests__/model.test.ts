@@ -28,7 +28,7 @@ describe('core tests', () => {
   it('returns primary key of class', () => {
     expect(getPrimaryKey(model, core.class.Emb))
       .toBeUndefined()
-    expect(getPrimaryKey(model, 'core.class.TaskObj' as Ref<Class<Doc>>))
+    expect(getPrimaryKey(model, taskIds.class.Task))
       .toEqual('name')
   })
 

@@ -13,49 +13,22 @@
 // limitations under the License.
 //
 
-import core, { Collection, MODEL_DOMAIN } from '@anticrm/core'
-import { Task, TaskComment, TaskEstimate, taskIds, TaskMixin } from '@anticrm/core/src/__tests__/tasks'
-import { Builder, Class$, CollectionOf$, InstanceOf$, Mixin$, Prop } from '@anticrm/model'
-import { TDoc, TEmb } from '..'
-
-@Class$(taskIds.class.Task, core.class.Doc, MODEL_DOMAIN)
-export class TTask extends TDoc implements Task {
-  // @Primary()
-  @Prop() name!: string
-
-  @Prop() description!: string
-
-  @Prop() rate!: number
-
-  @CollectionOf$(taskIds.class.TaskComment)
-  comments?: Collection<TaskComment>
-
-  @InstanceOf$(taskIds.class.TaskEstimate) eta!: TaskEstimate
-}
-
-@Mixin$(taskIds.mixin.TaskMixin, taskIds.class.Task)
-export class TTaskMixin extends TTask implements TaskMixin {
-  @Prop() textValue!: string
-}
-
-@Class$(taskIds.class.TaskComment, core.class.Emb, MODEL_DOMAIN)
-export class TTaskComment extends TEmb implements TaskComment {
-  @Prop()
-  message!: string
-
-  @Prop()
-  author!: string
-
-  @Prop()
-  date!: Date
-}
-
-@Class$(taskIds.class.TaskEstimate, core.class.Emb, MODEL_DOMAIN)
-export class TTaskEstimate extends TEmb implements TaskEstimate {
-  @Prop() rom!: number // in hours
-  @Prop() eta!: number // in hours
-}
+import { Class, Enum, Mixin } from '@anticrm/core'
+import { Task, TaskComment, TaskEstimate, taskIds, TaskMixin, TaskReproduce, TaskStatus } from '@anticrm/core/src/__tests__/tasks'
+import { Builder } from '@anticrm/model'
 
 export function model (S: Builder): void {
-  S.add(TTask, TTaskComment, TTaskMixin, TTaskEstimate)
+  S.loadEnum(__filename, taskIds.enum, {
+    TaskReproduce: {} as Enum<TaskReproduce>, // eslint-disable-line
+    TaskStatus: {} as Enum<TaskStatus> // eslint-disable-line
+  })
+  S.loadClass(__filename, taskIds.class, {
+    Task: {} as Class<Task>, // eslint-disable-line
+    TaskComment: {} as Class<TaskComment>, // eslint-disable-line
+    TaskEstimate: {} as Class<TaskEstimate> // eslint-disable-line
+  })
+
+  S.loadMixin(__filename, taskIds.mixin, {
+    TaskMixin: {} as Mixin<TaskMixin> // eslint-disable-line
+  })
 }

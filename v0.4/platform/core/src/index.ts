@@ -14,15 +14,20 @@
 //
 
 import { Component, identify } from '@anticrm/status'
-import { Attribute, Class, Classifier, CollectionOf, Doc, Emb, Enum, EnumLiteral, EnumOf, InstanceOf, Mixin, Obj, Ref, RefTo, Type } from './classes'
+import { Attribute, Class, Classifier, ClassifierKind, CollectionOf, Doc, Emb, Enum, EnumLiteral, EnumOf, InstanceOf, Mixin, Obj, Ref, RefTo, Type } from './classes'
 import { Tx } from './storage'
 
 export * from './classes'
 export * from './ids'
 export * from './model'
 export * from './storage'
+export * from './colletionid'
+export * from './fieldid'
 
 export default identify('core' as Component, {
+  enum: {
+    ClassifierKind: '' as Ref<Enum<ClassifierKind>>
+  },
   class: {
     Obj: '' as Ref<Class<Obj>>,
     Doc: '' as Ref<Class<Doc>>,
@@ -31,14 +36,15 @@ export default identify('core' as Component, {
     Classifier: '' as Ref<Class<Classifier>>,
     Attribute: '' as Ref<Class<Attribute>>,
     Mixin: '' as Ref<Class<Mixin<Obj>>>,
-    Enum: '' as Ref<Class<Enum>>,
+    Enum: '' as Ref<Class<Enum<any>>>,
     EnumLiteral: '' as Ref<Class<EnumLiteral>>,
 
+    Type: '' as Ref<Class<Type>>,
     String: '' as Ref<Class<Type>>,
     Number: '' as Ref<Class<Type>>,
+    Any: '' as Ref<Class<Type>>,
     Boolean: '' as Ref<Class<Type>>,
     Date: '' as Ref<Class<Type>>,
-    Type: '' as Ref<Class<Type>>,
     RefTo: '' as Ref<Class<RefTo<Doc>>>,
     InstanceOf: '' as Ref<Class<InstanceOf<Emb>>>,
     CollectionOf: '' as Ref<Class<CollectionOf<Emb>>>,

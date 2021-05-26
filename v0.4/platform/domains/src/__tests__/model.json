@@ -1,46 +1,49 @@
 [
   {
+    "_class": "class:core.Enum",
+    "_id": "enum:core.ClassifierKind",
+    "_literals": {
+      "items": [
+        {
+          "label": "CLASS",
+          "ordinal": 0,
+          "_id": "enum:core.ClassifierKind.CLASS",
+          "_class": "class:core.EnumLiteral"
+        },
+        {
+          "label": "MIXIN",
+          "ordinal": 1,
+          "_id": "enum:core.ClassifierKind.MIXIN",
+          "_class": "class:core.EnumLiteral"
+        },
+        {
+          "label": "ENUM",
+          "ordinal": 2,
+          "_id": "enum:core.ClassifierKind.ENUM",
+          "_class": "class:core.EnumLiteral"
+        }
+      ]
+    },
+    "_kind": 2
+  },
+  {
+    "_class": "class:core.Class",
+    "_id": "class:core.Obj",
+    "_domain": "model",
     "_attributes": {
       "items": [
         {
-          "_id": "class:core.Obj._id",
-          "name": "_id",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_class": "class:core.Type"
-          }
-        },
-        {
-          "_id": "class:core.Obj._class",
           "name": "_class",
+          "_id": "class:core.Obj._class",
           "_class": "class:core.Attribute",
           "type": {
-            "_id": "_class",
             "_class": "class:core.RefTo",
             "to": "class:core.Class"
           }
-        }
-      ]
-    },
-    "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "class:core.Obj"
-  },
-  {
-    "_attributes": {
-      "items": []
-    },
-    "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "class:core.Emb",
-    "_extends": "class:core.Obj"
-  },
-  {
-    "_attributes": {
-      "items": [
+        },
         {
-          "_id": "class:core.Doc._mixins",
           "name": "_mixins",
+          "_id": "class:core.Obj._mixins",
           "_class": "class:core.Attribute",
           "type": {
             "_class": "class:core.Type"
@@ -48,46 +51,189 @@
         }
       ]
     },
-    "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "class:core.Doc",
-    "_extends": "class:core.Obj"
+    "_kind": 0
   },
   {
+    "_class": "class:core.Class",
+    "_id": "class:core.Doc",
+    "_extends": "class:core.Obj",
+    "_domain": "model",
     "_attributes": {
       "items": [
         {
-          "_id": "class:core.Attribute.name",
-          "name": "name",
+          "name": "_id",
+          "_id": "class:core.Doc._id",
           "_class": "class:core.Attribute",
           "type": {
-            "_class": "class:core.Type"
+            "_class": "class:core.RefTo",
+            "to": "class:core.Doc"
+          }
+        }
+      ]
+    },
+    "_kind": 0
+  },
+  {
+    "_class": "class:core.Class",
+    "_id": "class:core.Emb",
+    "_extends": "class:core.Obj",
+    "_domain": "model",
+    "_attributes": {
+      "items": [
+        {
+          "name": "_id",
+          "_id": "class:core.Emb._id",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.RefTo",
+            "to": "class:core.Emb"
+          }
+        }
+      ]
+    },
+    "_kind": 0
+  },
+  {
+    "_class": "class:core.Class",
+    "_id": "class:core.Class",
+    "_extends": "class:core.Classifier",
+    "_domain": "model",
+    "_attributes": {
+      "items": [
+        {
+          "name": "_attributes",
+          "_id": "class:core.Class._attributes",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.CollectionOf",
+            "of": "class:core.Attribute"
           }
         },
         {
-          "_id": "class:core.Attribute.type",
-          "name": "type",
+          "name": "_extends",
+          "_id": "class:core.Class._extends",
           "_class": "class:core.Attribute",
           "type": {
-            "_id": "type",
+            "_class": "class:core.RefTo",
+            "to": "class:core.Class"
+          }
+        },
+        {
+          "name": "_native",
+          "_id": "class:core.Class._native",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.String"
+          }
+        },
+        {
+          "name": "_domain",
+          "_id": "class:core.Class._domain",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.String"
+          }
+        }
+      ]
+    },
+    "_kind": 0
+  },
+  {
+    "_class": "class:core.Class",
+    "_id": "class:core.Classifier",
+    "_extends": "class:core.Doc",
+    "_domain": "model",
+    "_attributes": {
+      "items": [
+        {
+          "name": "_kind",
+          "_id": "class:core.Classifier._kind",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.EnumOf",
+            "of": "enum:core.ClassifierKind"
+          }
+        }
+      ]
+    },
+    "_kind": 0
+  },
+  {
+    "_class": "class:core.Class",
+    "_id": "class:core.Attribute",
+    "_extends": "class:core.Emb",
+    "_domain": "model",
+    "_attributes": {
+      "items": [
+        {
+          "name": "name",
+          "_id": "class:core.Attribute.name",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.String"
+          }
+        },
+        {
+          "name": "type",
+          "_id": "class:core.Attribute.type",
+          "_class": "class:core.Attribute",
+          "type": {
             "_class": "class:core.InstanceOf",
             "of": "class:core.Type"
           }
         }
       ]
     },
-    "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "class:core.Attribute",
-    "_extends": "class:core.Emb",
-    "_domain": "model"
+    "_kind": 0
   },
   {
+    "_class": "class:core.Class",
+    "_id": "class:core.Mixin",
+    "_extends": "class:core.Class",
+    "_domain": "model",
+    "_attributes": {
+      "items": []
+    },
+    "_kind": 0
+  },
+  {
+    "_class": "class:core.Class",
+    "_id": "class:core.Enum",
+    "_extends": "class:core.Classifier",
+    "_domain": "model",
     "_attributes": {
       "items": [
         {
-          "_id": "class:core.Type._default",
-          "name": "_default",
+          "name": "_literals",
+          "_id": "class:core.Enum._literals",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.CollectionOf",
+            "of": "class:core.EnumLiteral"
+          }
+        }
+      ]
+    },
+    "_kind": 0
+  },
+  {
+    "_class": "class:core.Class",
+    "_id": "class:core.EnumLiteral",
+    "_extends": "class:core.Emb",
+    "_domain": "model",
+    "_attributes": {
+      "items": [
+        {
+          "name": "label",
+          "_id": "class:core.EnumLiteral.label",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.String"
+          }
+        },
+        {
+          "name": "ordinal",
+          "_id": "class:core.EnumLiteral.ordinal",
           "_class": "class:core.Attribute",
           "type": {
             "_class": "class:core.Type"
@@ -95,808 +241,373 @@
         }
       ]
     },
-    "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "class:core.Type",
-    "_extends": "class:core.Emb",
-    "_domain": "model"
+    "_kind": 0
   },
   {
+    "_class": "class:core.Class",
+    "_id": "class:core.Type",
+    "_extends": "class:core.Obj",
+    "_domain": "model",
     "_attributes": {
       "items": [
         {
-          "_id": "class:core.RefTo.to",
-          "name": "to",
+          "name": "_default",
+          "_id": "class:core.Type._default",
           "_class": "class:core.Attribute",
           "type": {
-            "_id": "to",
-            "_class": "class:core.RefTo",
-            "to": "class:core.Class"
+            "_class": "class:core.Type"
           }
         }
       ]
     },
+    "_kind": 0
+  },
+  {
     "_class": "class:core.Class",
-    "_kind": 0,
+    "_id": "class:core.String",
+    "_extends": "class:core.Type",
+    "_domain": "model",
+    "_attributes": {
+      "items": []
+    },
+    "_kind": 0
+  },
+  {
+    "_class": "class:core.Class",
+    "_id": "class:core.Number",
+    "_extends": "class:core.Type",
+    "_domain": "model",
+    "_attributes": {
+      "items": []
+    },
+    "_kind": 0
+  },
+  {
+    "_class": "class:core.Class",
+    "_id": "class:core.Any",
+    "_extends": "class:core.Type",
+    "_domain": "model",
+    "_attributes": {
+      "items": []
+    },
+    "_kind": 0
+  },
+  {
+    "_class": "class:core.Class",
+    "_id": "class:core.Boolean",
+    "_extends": "class:core.Type",
+    "_domain": "model",
+    "_attributes": {
+      "items": []
+    },
+    "_kind": 0
+  },
+  {
+    "_class": "class:core.Class",
+    "_id": "class:core.Date",
+    "_extends": "class:core.Type",
+    "_domain": "model",
+    "_attributes": {
+      "items": []
+    },
+    "_kind": 0
+  },
+  {
+    "_class": "class:core.Class",
     "_id": "class:core.RefTo",
     "_extends": "class:core.Type",
-    "_domain": "model"
-  },
-  {
+    "_domain": "model",
     "_attributes": {
       "items": [
         {
-          "_id": "class:core.InstanceOf.of",
-          "name": "of",
+          "name": "to",
+          "_id": "class:core.RefTo.to",
           "_class": "class:core.Attribute",
           "type": {
-            "_id": "of",
             "_class": "class:core.RefTo",
             "to": "class:core.Class"
           }
         }
       ]
     },
-    "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "class:core.InstanceOf",
-    "_extends": "class:core.Type",
-    "_domain": "model"
+    "_kind": 0
   },
   {
+    "_class": "class:core.Class",
+    "_id": "class:core.InstanceOf",
+    "_extends": "class:core.Type",
+    "_domain": "model",
     "_attributes": {
       "items": [
         {
-          "_id": "class:core.EnumOf.of",
           "name": "of",
+          "_id": "class:core.InstanceOf.of",
           "_class": "class:core.Attribute",
           "type": {
-            "_id": "of",
+            "_class": "class:core.RefTo",
+            "to": "class:core.Class"
+          }
+        }
+      ]
+    },
+    "_kind": 0
+  },
+  {
+    "_class": "class:core.Class",
+    "_id": "class:core.CollectionOf",
+    "_extends": "class:core.Type",
+    "_domain": "model",
+    "_attributes": {
+      "items": [
+        {
+          "name": "of",
+          "_id": "class:core.CollectionOf.of",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.RefTo",
+            "to": "class:core.Class"
+          }
+        }
+      ]
+    },
+    "_kind": 0
+  },
+  {
+    "_class": "class:core.Class",
+    "_id": "class:core.EnumOf",
+    "_extends": "class:core.Type",
+    "_domain": "model",
+    "_attributes": {
+      "items": [
+        {
+          "name": "of",
+          "_id": "class:core.EnumOf.of",
+          "_class": "class:core.Attribute",
+          "type": {
             "_class": "class:core.RefTo",
             "to": "class:core.Enum"
           }
         }
       ]
     },
-    "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "class:core.EnumOf",
-    "_extends": "class:core.Type",
-    "_domain": "model"
+    "_kind": 0
   },
   {
-    "_attributes": {
-      "items": [
-        {
-          "_id": "class:core.CollectionOf.of",
-          "name": "of",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_id": "of",
-            "_class": "class:core.RefTo",
-            "to": "class:core.Class"
-          }
-        }
-      ]
-    },
     "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "class:core.CollectionOf",
-    "_extends": "class:core.Type",
-    "_domain": "model"
-  },
-  {
-    "_attributes": {
-      "items": [
-        {
-          "_id": "class:core.Classifier._kind",
-          "name": "_kind",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_class": "class:core.Type"
-          }
-        }
-      ]
-    },
-    "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "class:core.Classifier",
-    "_extends": "class:core.Doc",
-    "_domain": "model"
-  },
-  {
-    "_attributes": {
-      "items": [
-        {
-          "_id": "class:core.Class._attributes",
-          "name": "_attributes",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_id": "_attributes",
-            "_class": "class:core.CollectionOf",
-            "of": "class:core.Attribute"
-          }
-        },
-        {
-          "_id": "class:core.Class._extends",
-          "name": "_extends",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_id": "_extends",
-            "_class": "class:core.RefTo",
-            "to": "class:core.Class"
-          }
-        },
-        {
-          "_id": "class:core.Class._native",
-          "name": "_native",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_class": "class:core.Type"
-          }
-        },
-        {
-          "_id": "class:core.Class._domain",
-          "name": "_domain",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_class": "class:core.Type"
-          }
-        }
-      ]
-    },
-    "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "class:core.Class",
-    "_extends": "class:core.Classifier",
-    "_domain": "model"
-  },
-  {
-    "_attributes": {
-      "items": []
-    },
-    "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "class:core.Mixin",
-    "_extends": "class:core.Class",
-    "_domain": "model"
-  },
-  {
-    "_attributes": {
-      "items": [
-        {
-          "_id": "class:core.EnumLiteral.ordinal",
-          "name": "ordinal",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_class": "class:core.Type"
-          }
-        },
-        {
-          "_id": "class:core.EnumLiteral.label",
-          "name": "label",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_class": "class:core.Type"
-          }
-        }
-      ]
-    },
-    "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "class:core.EnumLiteral",
-    "_extends": "class:core.Emb",
-    "_domain": "model"
-  },
-  {
-    "_attributes": {
-      "items": [
-        {
-          "_id": "class:core.Enum._literals",
-          "name": "_literals",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_id": "_literals",
-            "_class": "class:core.CollectionOf",
-            "of": "class:core.Attribute"
-          }
-        }
-      ]
-    },
-    "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "class:core.Enum",
-    "_extends": "class:core.Classifier",
-    "_domain": "model"
-  },
-  {
-    "_attributes": {
-      "items": []
-    },
-    "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "class:core.String",
-    "_extends": "class:core.Type",
-    "_domain": "model"
-  },
-  {
-    "_attributes": {
-      "items": []
-    },
-    "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "class:core.Number",
-    "_extends": "class:core.Type",
-    "_domain": "model"
-  },
-  {
-    "_attributes": {
-      "items": []
-    },
-    "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "class:core.Boolean",
-    "_extends": "class:core.Type",
-    "_domain": "model"
-  },
-  {
-    "_attributes": {
-      "items": []
-    },
-    "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "class:core.Date",
-    "_extends": "class:core.Type",
-    "_domain": "model"
-  },
-  {
-    "_attributes": {
-      "items": [
-        {
-          "_id": "class:core.Reference._sourceId",
-          "name": "_sourceId",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_id": "_sourceId",
-            "_class": "class:core.RefTo",
-            "to": "class:core.Doc"
-          }
-        },
-        {
-          "_id": "class:core.Reference._sourceClass",
-          "name": "_sourceClass",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_id": "_sourceClass",
-            "_class": "class:core.RefTo",
-            "to": "class:core.Class"
-          }
-        },
-        {
-          "_id": "class:core.Reference._itemId",
-          "name": "_itemId",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_id": "_itemId",
-            "_class": "class:core.RefTo",
-            "to": "class:core.Emb"
-          }
-        },
-        {
-          "_id": "class:core.Reference._itemClass",
-          "name": "_itemClass",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_id": "_itemClass",
-            "_class": "class:core.RefTo",
-            "to": "class:core.Class"
-          }
-        },
-        {
-          "_id": "class:core.Reference._collection",
-          "name": "_collection",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_class": "class:core.Type"
-          }
-        },
-        {
-          "_id": "class:core.Reference._sourceField",
-          "name": "_sourceField",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_class": "class:core.Type"
-          }
-        },
-        {
-          "_id": "class:core.Reference._sourceIndex",
-          "name": "_sourceIndex",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_class": "class:core.Type"
-          }
-        },
-        {
-          "_id": "class:core.Reference._targetId",
-          "name": "_targetId",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_id": "_targetId",
-            "_class": "class:core.RefTo",
-            "to": "class:core.Doc"
-          }
-        },
-        {
-          "_id": "class:core.Reference._targetClass",
-          "name": "_targetClass",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_id": "_targetClass",
-            "_class": "class:core.RefTo",
-            "to": "class:core.Class"
-          }
-        }
-      ]
-    },
-    "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "class:core.Reference",
-    "_extends": "class:core.Doc",
-    "_domain": "references"
-  },
-  {
-    "_attributes": {
-      "items": [
-        {
-          "_id": "class:core.Title._objectClass",
-          "name": "_objectClass",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_id": "_objectClass",
-            "_class": "class:core.RefTo",
-            "to": "class:core.Class"
-          }
-        },
-        {
-          "_id": "class:core.Title._objectId",
-          "name": "_objectId",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_id": "_objectId",
-            "_class": "class:core.RefTo",
-            "to": "class:core.Doc"
-          }
-        },
-        {
-          "_id": "class:core.Title.title",
-          "name": "title",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_class": "class:core.Type"
-          }
-        },
-        {
-          "_id": "class:core.Title.source",
-          "name": "source",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_class": "class:core.Type"
-          }
-        }
-      ]
-    },
-    "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "class:core.Title",
-    "_extends": "class:core.Doc",
-    "_domain": "title"
-  },
-  {
-    "_attributes": {
-      "items": [
-        {
-          "_id": "class:core.Tx._date",
-          "name": "_date",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_class": "class:core.Type"
-          }
-        },
-        {
-          "_id": "class:core.Tx._user",
-          "name": "_user",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_class": "class:core.Type"
-          }
-        }
-      ]
-    },
-    "_class": "class:core.Class",
-    "_kind": 0,
     "_id": "class:core.Tx",
     "_extends": "class:core.Doc",
-    "_domain": "tx"
-  },
-  {
+    "_domain": "model",
     "_attributes": {
       "items": [
         {
-          "_id": "class:core.CreateTx.attributes",
-          "name": "attributes",
+          "name": "_date",
+          "_id": "class:core.Tx._date",
           "_class": "class:core.Attribute",
           "type": {
-            "_class": "class:core.Type"
+            "_class": "class:core.Number"
+          }
+        },
+        {
+          "name": "_user",
+          "_id": "class:core.Tx._user",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.String"
           }
         }
       ]
     },
-    "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "class:core.CreateTx",
-    "_extends": "class:core.Tx",
-    "_domain": "tx"
+    "_kind": 0
   },
   {
-    "_attributes": {
+    "_class": "class:core.Enum",
+    "_id": "enum:core.TitleSource",
+    "_literals": {
       "items": [
         {
-          "_id": "class:core.UpdateTx.attributes",
-          "name": "attributes",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_class": "class:core.Type"
-          }
+          "label": "Title",
+          "ordinal": 0,
+          "_id": "enum:core.TitleSource.Title",
+          "_class": "class:core.EnumLiteral"
+        },
+        {
+          "label": "ShortId",
+          "ordinal": 1,
+          "_id": "enum:core.TitleSource.ShortId",
+          "_class": "class:core.EnumLiteral"
         }
       ]
     },
-    "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "class:core.UpdateTx",
-    "_extends": "class:core.Tx",
-    "_domain": "tx"
+    "_kind": 2
   },
   {
+    "_class": "class:core.Class",
+    "_id": "class:core.Application",
+    "_extends": "class:core.Doc",
+    "_domain": "model",
     "_attributes": {
       "items": []
     },
-    "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "class:core.DeleteTx",
-    "_extends": "class:core.Tx",
-    "_domain": "tx"
+    "_kind": 0
   },
   {
+    "_class": "class:core.Class",
+    "_id": "class:core.Reference",
+    "_extends": "class:core.Doc",
+    "_domain": "model",
     "_attributes": {
       "items": [
         {
-          "_id": "class:core.ObjectTx._objectId",
-          "name": "_objectId",
+          "name": "_sourceId",
+          "_id": "class:core.Reference._sourceId",
           "_class": "class:core.Attribute",
           "type": {
-            "_id": "_objectId",
             "_class": "class:core.RefTo",
             "to": "class:core.Doc"
           }
         },
         {
-          "_id": "class:core.ObjectTx._objectClass",
-          "name": "_objectClass",
+          "name": "_sourceClass",
+          "_id": "class:core.Reference._sourceClass",
           "_class": "class:core.Attribute",
           "type": {
-            "_id": "_objectClass",
             "_class": "class:core.RefTo",
             "to": "class:core.Class"
           }
         },
         {
-          "_id": "class:core.ObjectTx._objectSpace",
-          "name": "_objectSpace",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_id": "_objectSpace",
-            "_class": "class:core.RefTo",
-            "to": "class:core.Space"
-          }
-        }
-      ]
-    },
-    "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "class:core.ObjectTx",
-    "_extends": "class:core.Doc",
-    "_domain": "tx"
-  },
-  {
-    "_attributes": {
-      "items": [
-        {
-          "_id": "class:core.AddItemTx.attributes",
-          "name": "attributes",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_class": "class:core.Type"
-          }
-        }
-      ]
-    },
-    "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "class:core.AddItemTx",
-    "_extends": "class:core.ItemTx",
-    "_domain": "tx"
-  },
-  {
-    "_attributes": {
-      "items": [
-        {
-          "_id": "class:core.UpdateItemTx.attributes",
-          "name": "attributes",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_class": "class:core.Type"
-          }
-        }
-      ]
-    },
-    "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "class:core.UpdateItemTx",
-    "_extends": "class:core.ItemTx",
-    "_domain": "tx"
-  },
-  {
-    "_attributes": {
-      "items": []
-    },
-    "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "class:core.RemoveItemTx",
-    "_extends": "class:core.ItemTx",
-    "_domain": "tx"
-  },
-  {
-    "_attributes": {
-      "items": [
-        {
-          "_id": "class:core.ItemTx._itemId",
           "name": "_itemId",
+          "_id": "class:core.Reference._itemId",
           "_class": "class:core.Attribute",
           "type": {
-            "_id": "_itemId",
             "_class": "class:core.RefTo",
             "to": "class:core.Emb"
           }
         },
         {
-          "_id": "class:core.ItemTx._itemClass",
           "name": "_itemClass",
+          "_id": "class:core.Reference._itemClass",
           "_class": "class:core.Attribute",
           "type": {
-            "_id": "_itemClass",
             "_class": "class:core.RefTo",
             "to": "class:core.Class"
           }
         },
         {
-          "_id": "class:core.ItemTx._collection",
           "name": "_collection",
+          "_id": "class:core.Reference._collection",
           "_class": "class:core.Attribute",
           "type": {
-            "_class": "class:core.Type"
+            "_class": "class:core.String"
           }
-        }
-      ]
-    },
-    "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "class:core.ItemTx",
-    "_extends": "class:core.ObjectTx",
-    "_domain": "tx"
-  },
-  {
-    "_attributes": {
-      "items": [
+        },
         {
-          "_id": "mixin:core.Indices.primary",
-          "name": "primary",
+          "name": "_sourceField",
+          "_id": "class:core.Reference._sourceField",
           "_class": "class:core.Attribute",
           "type": {
-            "_class": "class:core.Type"
+            "_class": "class:core.String"
           }
-        }
-      ]
-    },
-    "_class": "class:core.Mixin",
-    "_kind": 1,
-    "_id": "mixin:core.Indices",
-    "_extends": "class:core.Doc"
-  },
-  {
-    "_attributes": {
-      "items": [
+        },
         {
-          "_id": "mixin:core.CollectionReference._parentId",
-          "name": "_parentId",
+          "name": "_sourceIndex",
+          "_id": "class:core.Reference._sourceIndex",
           "_class": "class:core.Attribute",
           "type": {
-            "_id": "_parentId",
+            "_class": "class:core.Number"
+          }
+        },
+        {
+          "name": "_targetId",
+          "_id": "class:core.Reference._targetId",
+          "_class": "class:core.Attribute",
+          "type": {
             "_class": "class:core.RefTo",
             "to": "class:core.Doc"
           }
         },
         {
-          "_id": "mixin:core.CollectionReference._parentClass",
-          "name": "_parentClass",
+          "name": "_targetClass",
+          "_id": "class:core.Reference._targetClass",
           "_class": "class:core.Attribute",
           "type": {
-            "_id": "_parentClass",
             "_class": "class:core.RefTo",
             "to": "class:core.Class"
           }
-        },
-        {
-          "_id": "mixin:core.CollectionReference._collection",
-          "name": "_collection",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_class": "class:core.Type"
-          }
-        },
-        {
-          "_id": "mixin:core.CollectionReference._parentSpace",
-          "name": "_parentSpace",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_id": "_parentSpace",
-            "_class": "class:core.RefTo",
-            "to": "class:core.Space"
-          }
         }
       ]
     },
-    "_class": "class:core.Mixin",
-    "_kind": 1,
-    "_id": "mixin:core.CollectionReference",
-    "_extends": "class:core.Emb"
+    "_kind": 0
   },
   {
-    "_attributes": {
-      "items": [
-        {
-          "_id": "mixin:core.ShortID.shortId",
-          "name": "shortId",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_class": "class:core.Type"
-          }
-        }
-      ]
-    },
-    "_class": "class:core.Mixin",
-    "_kind": 1,
-    "_id": "mixin:core.ShortID",
-    "_extends": "class:core.VDoc"
-  },
-  {
-    "_attributes": {
-      "items": [
-        {
-          "_id": "class:core.VDoc._space",
-          "name": "_space",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_id": "_space",
-            "_class": "class:core.RefTo",
-            "to": "class:core.Space"
-          }
-        },
-        {
-          "_id": "class:core.VDoc._createdOn",
-          "name": "_createdOn",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_class": "class:core.Type"
-          }
-        },
-        {
-          "_id": "class:core.VDoc._createdBy",
-          "name": "_createdBy",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_class": "class:core.Type"
-          }
-        },
-        {
-          "_id": "class:core.VDoc._modifiedOn",
-          "name": "_modifiedOn",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_class": "class:core.Type"
-          }
-        },
-        {
-          "_id": "class:core.VDoc._modifiedBy",
-          "name": "_modifiedBy",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_class": "class:core.Type"
-          }
-        }
-      ]
-    },
     "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "class:core.VDoc",
+    "_id": "class:core.Space",
     "_extends": "class:core.Doc",
-    "_domain": "model"
-  },
-  {
+    "_domain": "model",
     "_attributes": {
       "items": [
         {
-          "_id": "class:core.Space.name",
           "name": "name",
+          "_id": "class:core.Space.name",
           "_class": "class:core.Attribute",
           "type": {
-            "_class": "class:core.Type"
+            "_class": "class:core.String"
           }
         },
         {
-          "_id": "class:core.Space.description",
           "name": "description",
+          "_id": "class:core.Space.description",
           "_class": "class:core.Attribute",
           "type": {
-            "_class": "class:core.Type"
+            "_class": "class:core.String"
           }
         },
         {
-          "_id": "class:core.Space.application",
           "name": "application",
+          "_id": "class:core.Space.application",
           "_class": "class:core.Attribute",
           "type": {
-            "_id": "application",
             "_class": "class:core.RefTo",
             "to": "class:core.Application"
           }
         },
         {
-          "_id": "class:core.Space.applicationSettings",
           "name": "applicationSettings",
+          "_id": "class:core.Space.applicationSettings",
           "_class": "class:core.Attribute",
           "type": {
-            "_class": "class:core.Type"
+            "_class": "class:core.InstanceOf",
+            "of": "class:core.Emb"
           }
         },
         {
-          "_id": "class:core.Space.spaceKey",
           "name": "spaceKey",
+          "_id": "class:core.Space.spaceKey",
           "_class": "class:core.Attribute",
           "type": {
-            "_class": "class:core.Type"
+            "_class": "class:core.String"
           }
         },
         {
-          "_id": "class:core.Space.users",
           "name": "users",
+          "_id": "class:core.Space.users",
           "_class": "class:core.Attribute",
           "type": {
-            "_id": "users",
             "_class": "class:core.CollectionOf",
             "of": "class:core.SpaceUser"
           }
         },
         {
-          "_id": "class:core.Space.isPublic",
           "name": "isPublic",
+          "_id": "class:core.Space.isPublic",
           "_class": "class:core.Attribute",
           "type": {
             "_class": "class:core.Boolean"
           }
         },
         {
-          "_id": "class:core.Space.archived",
           "name": "archived",
+          "_id": "class:core.Space.archived",
           "_class": "class:core.Attribute",
           "type": {
             "_class": "class:core.Boolean"
@@ -904,169 +615,570 @@
         }
       ]
     },
-    "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "class:core.Space",
-    "_extends": "class:core.Doc",
-    "_domain": "model",
-    "_mixins": [
-      "mixin:core.Indices"
-    ],
-    "primary|mixin:core~Indices": "name"
+    "_kind": 0
   },
   {
-    "_attributes": {
-      "items": [
-        {
-          "_id": "class:core.SpaceUser.userId",
-          "name": "userId",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_class": "class:core.Type"
-          }
-        },
-        {
-          "_id": "class:core.SpaceUser.owner",
-          "name": "owner",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_class": "class:core.Type"
-          }
-        }
-      ]
-    },
     "_class": "class:core.Class",
-    "_kind": 0,
     "_id": "class:core.SpaceUser",
     "_extends": "class:core.Emb",
-    "_domain": "model"
-  },
-  {
+    "_domain": "model",
     "_attributes": {
       "items": [
         {
-          "_id": "core.class.TaskObj.name",
-          "name": "name",
+          "name": "userId",
+          "_id": "class:core.SpaceUser.userId",
           "_class": "class:core.Attribute",
           "type": {
-            "_class": "class:core.Type"
+            "_class": "class:core.String"
           }
         },
         {
-          "_id": "core.class.TaskObj.description",
-          "name": "description",
+          "name": "owner",
+          "_id": "class:core.SpaceUser.owner",
           "_class": "class:core.Attribute",
           "type": {
-            "_class": "class:core.Type"
-          }
-        },
-        {
-          "_id": "core.class.TaskObj.rate",
-          "name": "rate",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_class": "class:core.Type"
-          }
-        },
-        {
-          "_id": "core.class.TaskObj.comments",
-          "name": "comments",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_id": "comments",
-            "_class": "class:core.CollectionOf",
-            "of": "core.class.TaskComment"
-          }
-        },
-        {
-          "_id": "core.class.TaskObj.eta",
-          "name": "eta",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_id": "eta",
-            "_class": "class:core.InstanceOf",
-            "of": "core.class.TaskEstimate"
+            "_class": "class:core.Boolean"
           }
         }
       ]
     },
+    "_kind": 0
+  },
+  {
     "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "core.class.TaskObj",
+    "_id": "class:core.Title",
     "_extends": "class:core.Doc",
     "_domain": "model",
+    "_attributes": {
+      "items": [
+        {
+          "name": "_objectClass",
+          "_id": "class:core.Title._objectClass",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.RefTo",
+            "to": "class:core.Class"
+          }
+        },
+        {
+          "name": "_objectId",
+          "_id": "class:core.Title._objectId",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.RefTo",
+            "to": "class:core.Doc"
+          }
+        },
+        {
+          "name": "title",
+          "_id": "class:core.Title.title",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.Type"
+          }
+        },
+        {
+          "name": "source",
+          "_id": "class:core.Title.source",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.EnumOf",
+            "of": "enum:core.TitleSource"
+          }
+        }
+      ]
+    },
+    "_kind": 0
+  },
+  {
+    "_class": "class:core.Class",
+    "_id": "class:core.VDoc",
+    "_extends": "class:core.Doc",
+    "_domain": "model",
+    "_attributes": {
+      "items": [
+        {
+          "name": "_space",
+          "_id": "class:core.VDoc._space",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.RefTo",
+            "to": "class:core.Space"
+          }
+        },
+        {
+          "name": "_createdOn",
+          "_id": "class:core.VDoc._createdOn",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.Number"
+          }
+        },
+        {
+          "name": "_createdBy",
+          "_id": "class:core.VDoc._createdBy",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.String"
+          }
+        },
+        {
+          "name": "_modifiedOn",
+          "_id": "class:core.VDoc._modifiedOn",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.Number"
+          }
+        },
+        {
+          "name": "_modifiedBy",
+          "_id": "class:core.VDoc._modifiedBy",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.String"
+          }
+        }
+      ]
+    },
+    "_kind": 0
+  },
+  {
+    "_class": "class:core.Class",
+    "_id": "class:core.ObjectTx",
+    "_extends": "class:core.Tx",
+    "_domain": "model",
+    "_attributes": {
+      "items": [
+        {
+          "name": "_objectId",
+          "_id": "class:core.ObjectTx._objectId",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.RefTo",
+            "to": "class:core.Doc"
+          }
+        },
+        {
+          "name": "_objectClass",
+          "_id": "class:core.ObjectTx._objectClass",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.RefTo",
+            "to": "class:core.Class"
+          }
+        },
+        {
+          "name": "_objectSpace",
+          "_id": "class:core.ObjectTx._objectSpace",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.RefTo",
+            "to": "class:core.Space"
+          }
+        }
+      ]
+    },
+    "_kind": 0
+  },
+  {
+    "_class": "class:core.Class",
+    "_id": "class:core.ItemTx",
+    "_extends": "class:core.ObjectTx",
+    "_domain": "model",
+    "_attributes": {
+      "items": [
+        {
+          "name": "_itemId",
+          "_id": "class:core.ItemTx._itemId",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.RefTo",
+            "to": "class:core.Emb"
+          }
+        },
+        {
+          "name": "_itemClass",
+          "_id": "class:core.ItemTx._itemClass",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.RefTo",
+            "to": "class:core.Class"
+          }
+        },
+        {
+          "name": "_collection",
+          "_id": "class:core.ItemTx._collection",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.String"
+          }
+        }
+      ]
+    },
+    "_kind": 0
+  },
+  {
+    "_class": "class:core.Class",
+    "_id": "class:core.CreateTx",
+    "_extends": "class:core.ObjectTx",
+    "_domain": "model",
+    "_attributes": {
+      "items": [
+        {
+          "name": "attributes",
+          "_id": "class:core.CreateTx.attributes",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.Type"
+          }
+        }
+      ]
+    },
+    "_kind": 0
+  },
+  {
+    "_class": "class:core.Class",
+    "_id": "class:core.UpdateTx",
+    "_extends": "class:core.ObjectTx",
+    "_domain": "model",
+    "_attributes": {
+      "items": [
+        {
+          "name": "attributes",
+          "_id": "class:core.UpdateTx.attributes",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.Type"
+          }
+        }
+      ]
+    },
+    "_kind": 0
+  },
+  {
+    "_class": "class:core.Class",
+    "_id": "class:core.DeleteTx",
+    "_extends": "class:core.ObjectTx",
+    "_domain": "model",
+    "_attributes": {
+      "items": []
+    },
+    "_kind": 0
+  },
+  {
+    "_class": "class:core.Class",
+    "_id": "class:core.AddItemTx",
+    "_extends": "class:core.ItemTx",
+    "_domain": "model",
+    "_attributes": {
+      "items": [
+        {
+          "name": "attributes",
+          "_id": "class:core.AddItemTx.attributes",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.Type"
+          }
+        }
+      ]
+    },
+    "_kind": 0
+  },
+  {
+    "_class": "class:core.Class",
+    "_id": "class:core.UpdateItemTx",
+    "_extends": "class:core.ItemTx",
+    "_domain": "model",
+    "_attributes": {
+      "items": [
+        {
+          "name": "attributes",
+          "_id": "class:core.UpdateItemTx.attributes",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.Type"
+          }
+        }
+      ]
+    },
+    "_kind": 0
+  },
+  {
+    "_class": "class:core.Class",
+    "_id": "class:core.RemoveItemTx",
+    "_extends": "class:core.ItemTx",
+    "_domain": "model",
+    "_attributes": {
+      "items": []
+    },
+    "_kind": 0
+  },
+  {
+    "_class": "class:core.Mixin",
+    "_id": "mixin:core.Indices",
+    "_extends": "class:core.Class",
+    "_attributes": {
+      "items": [
+        {
+          "name": "primary",
+          "_id": "mixin:core.Indices.primary",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.String"
+          }
+        }
+      ]
+    },
+    "_kind": 1
+  },
+  {
+    "_class": "class:core.Mixin",
+    "_id": "mixin:core.ShortID",
+    "_extends": "class:core.VDoc",
+    "_attributes": {
+      "items": [
+        {
+          "name": "shortId",
+          "_id": "mixin:core.ShortID.shortId",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.String"
+          }
+        }
+      ]
+    },
+    "_kind": 1
+  },
+  {
+    "_class": "class:core.Mixin",
+    "_id": "mixin:core.CollectionReference",
+    "_extends": "class:core.Emb",
+    "_attributes": {
+      "items": [
+        {
+          "name": "_parentId",
+          "_id": "mixin:core.CollectionReference._parentId",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.RefTo",
+            "to": "class:core.Doc"
+          }
+        },
+        {
+          "name": "_parentClass",
+          "_id": "mixin:core.CollectionReference._parentClass",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.RefTo",
+            "to": "class:core.Class"
+          }
+        },
+        {
+          "name": "_collection",
+          "_id": "mixin:core.CollectionReference._collection",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.String"
+          }
+        },
+        {
+          "name": "_parentSpace",
+          "_id": "mixin:core.CollectionReference._parentSpace",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.RefTo",
+            "to": "class:core.Space"
+          }
+        }
+      ]
+    },
+    "_kind": 1
+  },
+  {
+    "_class": "class:core.Enum",
+    "_id": "enum:core.TaskStatus",
+    "_literals": {
+      "items": [
+        {
+          "label": "Open",
+          "ordinal": 0,
+          "_id": "enum:core.TaskStatus.Open",
+          "_class": "class:core.EnumLiteral"
+        },
+        {
+          "label": "Close",
+          "ordinal": 1,
+          "_id": "enum:core.TaskStatus.Close",
+          "_class": "class:core.EnumLiteral"
+        },
+        {
+          "label": "Resolved",
+          "ordinal": 100,
+          "_id": "enum:core.TaskStatus.Resolved",
+          "_class": "class:core.EnumLiteral"
+        },
+        {
+          "label": "InProgress",
+          "ordinal": 101,
+          "_id": "enum:core.TaskStatus.InProgress",
+          "_class": "class:core.EnumLiteral"
+        }
+      ]
+    },
+    "_kind": 2
+  },
+  {
+    "_class": "class:core.Enum",
+    "_id": "enum:core.TaskReproduce",
+    "_literals": {
+      "items": [
+        {
+          "label": "Always",
+          "ordinal": "always",
+          "_id": "enum:core.TaskReproduce.Always",
+          "_class": "class:core.EnumLiteral"
+        },
+        {
+          "label": "Rare",
+          "ordinal": "rare",
+          "_id": "enum:core.TaskReproduce.Rare",
+          "_class": "class:core.EnumLiteral"
+        },
+        {
+          "label": "Sometimes",
+          "ordinal": "sometimes",
+          "_id": "enum:core.TaskReproduce.Sometimes",
+          "_class": "class:core.EnumLiteral"
+        }
+      ]
+    },
+    "_kind": 2
+  },
+  {
+    "_class": "class:core.Class",
+    "_id": "class:core.Task",
+    "_extends": "class:core.Doc",
+    "_attributes": {
+      "items": [
+        {
+          "name": "name",
+          "_id": "class:core.Task.name",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.String"
+          }
+        },
+        {
+          "name": "description",
+          "_id": "class:core.Task.description",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.String"
+          }
+        },
+        {
+          "name": "rate",
+          "_id": "class:core.Task.rate",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.Number"
+          }
+        },
+        {
+          "name": "comments",
+          "_id": "class:core.Task.comments",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.CollectionOf",
+            "of": "class:core.TaskComment"
+          }
+        },
+        {
+          "name": "eta",
+          "_id": "class:core.Task.eta",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.InstanceOf",
+            "of": "class:core.TaskEstimate"
+          }
+        },
+        {
+          "name": "status",
+          "_id": "class:core.Task.status",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.EnumOf",
+            "of": "enum:core.TaskStatus"
+          }
+        },
+        {
+          "name": "reproduce",
+          "_id": "class:core.Task.reproduce",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.EnumOf",
+            "of": "enum:core.TaskReproduce"
+          }
+        }
+      ]
+    },
+    "_kind": 0,
     "_mixins": [
       "mixin:core.Indices"
     ],
     "primary|mixin:core~Indices": "name"
   },
   {
-    "_attributes": {
-      "items": [
-        {
-          "_id": "core.class.TaskComment.message",
-          "name": "message",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_class": "class:core.Type"
-          }
-        },
-        {
-          "_id": "core.class.TaskComment.author",
-          "name": "author",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_class": "class:core.Type"
-          }
-        },
-        {
-          "_id": "core.class.TaskComment.date",
-          "name": "date",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_class": "class:core.Type"
-          }
-        }
-      ]
-    },
     "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "core.class.TaskComment",
-    "_extends": "class:core.Emb",
-    "_domain": "model"
-  },
-  {
+    "_id": "class:core.TaskEstimate",
+    "_extends": "class:core.Obj",
     "_attributes": {
       "items": [
         {
-          "_id": "core.mixin.TaskMixin.textValue",
-          "name": "textValue",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_class": "class:core.Type"
-          }
-        }
-      ]
-    },
-    "_class": "class:core.Mixin",
-    "_kind": 1,
-    "_id": "core.mixin.TaskMixin",
-    "_extends": "core.class.TaskObj"
-  },
-  {
-    "_attributes": {
-      "items": [
-        {
-          "_id": "core.class.TaskEstimate.rom",
           "name": "rom",
+          "_id": "class:core.TaskEstimate.rom",
           "_class": "class:core.Attribute",
           "type": {
-            "_class": "class:core.Type"
+            "_class": "class:core.Number"
           }
         },
         {
-          "_id": "core.class.TaskEstimate.eta",
           "name": "eta",
+          "_id": "class:core.TaskEstimate.eta",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.Number"
+          }
+        }
+      ]
+    },
+    "_kind": 0
+  },
+  {
+    "_class": "class:core.Class",
+    "_id": "class:core.TaskComment",
+    "_extends": "class:core.Emb",
+    "_attributes": {
+      "items": [
+        {
+          "name": "message",
+          "_id": "class:core.TaskComment.message",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.String"
+          }
+        },
+        {
+          "name": "author",
+          "_id": "class:core.TaskComment.author",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.String"
+          }
+        },
+        {
+          "name": "date",
+          "_id": "class:core.TaskComment.date",
           "_class": "class:core.Attribute",
           "type": {
             "_class": "class:core.Type"
@@ -1074,10 +1186,24 @@
         }
       ]
     },
-    "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "core.class.TaskEstimate",
-    "_extends": "class:core.Emb",
-    "_domain": "model"
+    "_kind": 0
+  },
+  {
+    "_class": "class:core.Mixin",
+    "_id": "mixin:core.TaskMixin",
+    "_extends": "class:core.Task",
+    "_attributes": {
+      "items": [
+        {
+          "name": "textValue",
+          "_id": "mixin:core.TaskMixin.textValue",
+          "_class": "class:core.Attribute",
+          "type": {
+            "_class": "class:core.String"
+          }
+        }
+      ]
+    },
+    "_kind": 1
   }
 ]

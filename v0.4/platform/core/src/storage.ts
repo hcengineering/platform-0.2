@@ -85,7 +85,7 @@ export interface RegExpression {
   $options?: string
 }
 
-export type ObjQueryType<T> = T extends Emb ? DocumentQuery<T> : T | RegExpression
+export type ObjQueryType<T> = T extends Obj ? DocumentQuery<T> : T | RegExpression
 export type ArrayQueryType<A> = A extends any[] ? never : ObjQueryType<A>
 
 /**
@@ -100,7 +100,7 @@ export type DocumentQuery<T> = {
 
 // A possible values for document during creation.
 
-type TWithoutEmbArray<A> = A extends any[] ? never: OmitObj<A, Emb> | A
+type TWithoutEmbArray<A> = A extends any[] ? never: OmitObj<A, Obj> | A
 
 type DocumentValueRaw<T> = {
   [P in keyof T]: TWithoutEmbArray<T[P]>
@@ -114,6 +114,9 @@ type OmitObj<T, E extends Obj> = T extends E ? DocumentValueRaw<OmitPartial<T, E
  */
 export type DocumentValue<T> =
   OmitObj<T, Emb> | OmitObj<T, Doc> | OmitObj<T, Obj> | T
+
+export type DocumentValueOmit<T, P extends Obj> =
+  OmitObj<T, P> | T
 
 // Partial with partial embedded objects
 type TPartialWithoutEmbArray<A> = A extends any[] ? never: Partial<A>

@@ -18,7 +18,6 @@ export type PrimitiveType = number | string | boolean | undefined
 export type Ref<T extends Doc> = string & { __ref: T }
 
 export interface Obj {
-  _id: Ref<Obj>
   _class: Ref<Class<Obj>>
   _mixins?: Array<Ref<Mixin<Obj>>>
 }
@@ -45,7 +44,7 @@ export interface Collection<T> {
 export type PropertyType = PrimitiveType | Ref<Doc> | Emb
 
 // An attribute type.
-export interface Type extends Emb {
+export interface Type extends Obj {
   _default?: PropertyType
 }
 
@@ -64,46 +63,53 @@ export interface Classifier extends Doc {
   _kind: ClassifierKind
 }
 
-export type Mixin<T extends Obj> = EClass<T>
+export interface Mixin<T extends Obj> extends Class<T> {}
 
 export interface EDomainClassifier {
   _domain?: string
 }
 
-export interface EClass<E extends Obj> extends Classifier, EDomainClassifier {
+export interface Class<E extends Obj> extends Classifier, EDomainClassifier {
   _attributes: Collection<Attribute>
   _extends?: Ref<Class<E>>
 
   _native?: string
 }
 
-export type Class<T extends Obj> = EClass<T>
-
 export interface EnumLiteral extends Emb {
   label: string
   ordinal: string | number
 }
 
-export interface Enum extends Classifier {
+// T is required to preserve proper imports.
+export interface Enum<T> extends Classifier { // eslint-disable-line
   _literals: Collection<EnumLiteral>
 }
 
 // T Y P E S
 
+export interface DataType extends Type {
+  of: Ref<Class<Type>>
+}
+
 export interface RefTo<T extends Doc> extends Type {
   to: Ref<Class<T>>
 }
 
-export interface InstanceOf<T extends Emb> extends Type {
+export interface InstanceOf<T extends Obj> extends Type {
   of: Ref<Class<T>>
 }
 
 export interface EnumOf extends Type {
-  of: Ref<Enum>
+  of: Ref<Enum<any>>
 }
 
 export interface CollectionOf<T extends Emb> extends Type {
   of: Ref<Class<T>>
+}
+
+export interface String extends Type {
+
 }
 
 ///

@@ -99,13 +99,11 @@ describe('Model domain', () => {
   it('returns domains', () => {
     expect(model.getDomain(core.class.Class))
       .toEqual('model')
-    // expect(model.getDomain('class:core.Title' as Ref<Class<Doc>>))
-    //   .toEqual('title')
   })
 
   it('throws if domain does not exist', () => {
-    expect(() => model.getDomain(core.class.Doc))
-      .toThrowError()
+    expect(model.getDomain(core.class.Doc))
+      .toEqual('model')
   })
 
   it('throws if class cannot be found', () => {
@@ -120,7 +118,7 @@ describe('Model utilities', () => {
 
   it('returns all attributes of class', () => {
     expect(model.getAllAttributes(core.class.Emb).length)
-      .toEqual(2) // It should contain _class
+      .toEqual(3) // It should contain _class
 
     const getAttrs = (id: string): any =>
       data.find((x: any) => x._id === id)?._attributes.items ?? []

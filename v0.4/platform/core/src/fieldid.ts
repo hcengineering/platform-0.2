@@ -13,13 +13,22 @@
 // limitations under the License.
 //
 
-import { model as taskModel } from '@anticrm/core-model/src/__tests__/test_tasks'
-import { taskIds } from '@anticrm/core/src/__tests__/tasks'
-import { Builder } from '@anticrm/model'
-import { primary } from '..'
+import { Obj } from './classes'
 
-export function model (S: Builder): void {
-  taskModel(S)
-  // Mark name field as primary one.
-  primary(S, taskIds.class.Task, (S) => S.name)
+export type FieldBuilder<T> = {
+  [P in keyof T]-?: string
+}
+export type FieldId<T> = (s: FieldBuilder<T>) => string
+
+/**
+ * Construct helper object to specify a field name with respect to type fields.
+ * @param clazz - an object class to build operation for.
+ */
+export function fieldId<T extends Obj> (): FieldBuilder<T> {
+  const ph: ProxyHandler<any> = {
+    get (target, property) { // Trap for getting property values
+      return property
+    }
+  }
+  return new Proxy({}, ph) as FieldBuilder<T>
 }

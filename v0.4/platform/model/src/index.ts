@@ -15,5 +15,4 @@
 
 import Builder from './builder'
 
-export * from './dsl'
 export { Builder }

@@ -49,7 +49,7 @@ export type QueryUpdater<T extends Doc> = (_class: Ref<Class<T>>, query: Documen
 export interface CoreService extends CoreProtocol, DocumentProtocol, QueryProtocol, DomainProtocol {
   getModel: () => Model
 
-  generateId: () => Ref<Obj>
+  generateId: () => Ref<Doc>
 
   getUserId: () => string
 }

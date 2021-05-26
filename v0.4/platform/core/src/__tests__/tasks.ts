@@ -13,7 +13,8 @@
 // limitations under the License.
 //
 
-import { Class, Collection, Doc, Emb, Mixin, Ref } from '../classes'
+import { Component, identify } from '@anticrm/status'
+import { Class, Collection, Doc, Emb, Enum, Mixin, Obj, Ref } from '../classes'
 import { DocumentValue } from '../storage'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -25,18 +26,33 @@ export interface TaskComment extends Emb {
   date: Date
 }
 
+export enum TaskStatus {
+  Open,
+  Close,
+  Resolved = 100,
+  InProgress
+}
+
+export enum TaskReproduce {
+  Always='always',
+  Rare='rare',
+  Sometimes='sometimes'
+}
+
 export interface Task extends Doc {
   name: string
   description: string
   rate?: number
   comments?: Collection<TaskComment>
   eta?: TaskEstimate
+  status?: TaskStatus
+  reproduce?: TaskReproduce
 }
 
 /**
  * Define ROM and Estimated Time to arrival
  */
-export interface TaskEstimate extends Emb {
+export interface TaskEstimate extends Obj {
   rom: number // in hours
   eta: number // in hours
 }
@@ -49,16 +65,20 @@ export interface TaskWithSecond extends Task {
   secondTask: string | null
 }
 
-export const taskIds = {
+export const taskIds = identify('core' as Component, {
   class: {
-    Task: 'core.class.TaskObj' as Ref<Class<Task>>,
-    TaskEstimate: 'core.class.TaskEstimate' as Ref<Class<TaskEstimate>>,
-    TaskComment: 'core.class.TaskComment' as Ref<Class<TaskComment>>
+    Task: '' as Ref<Class<Task>>,
+    TaskEstimate: '' as Ref<Class<TaskEstimate>>,
+    TaskComment: '' as Ref<Class<TaskComment>>
   },
   mixin: {
-    TaskMixin: 'core.mixin.TaskMixin' as Ref<Mixin<TaskMixin>>
+    TaskMixin: '' as Ref<Mixin<TaskMixin>>
+  },
+  enum: {
+    TaskStatus: '' as Ref<Enum<TaskStatus>>,
+    TaskReproduce: '' as Ref<Enum<TaskReproduce>>
   }
-}
+})
 
 /**
  * Create a random task with name specified

@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { AnyLayout, Class, Doc, DocumentValue, PartialDocumentValue, Emb, generateId, Obj, Ref, Tx } from '@anticrm/core'
+import { AnyLayout, Class, Doc, DocumentValue, PartialDocumentValue, Emb, generateId, Ref, Tx } from '@anticrm/core'
 import { CollectionId } from '@anticrm/core/src/colletionid'
 import { AddItemTx, collectionId, CreateTx, DeleteTx, RemoveItemTx, UpdateItemTx, UpdateTx } from '.'
 import core from '..'
@@ -24,7 +24,7 @@ const EMPTY_USER = '#no_user'
 /**
  * Construct object create transaction.
  */
-export function create<T extends Doc> (_class: Ref<Class<T>>, attributes: DocumentValue<T>, _id?: Ref<Obj>, _objectSpace?: Ref<Space>): CreateTx {
+export function create<T extends Doc> (_class: Ref<Class<T>>, attributes: DocumentValue<T>, _id?: Ref<Doc>, _objectSpace?: Ref<Space>): CreateTx {
   // Make a copy.
   const { ...objValue } = attributes
 

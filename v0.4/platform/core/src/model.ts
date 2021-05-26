@@ -16,7 +16,7 @@
 import core from '.'
 import { AnyLayout, Attribute, Class, Classifier, ClassifierKind, CollectionOf, Doc, Emb, InstanceOf, Mixin, Obj, Ref } from './classes'
 import { generateId } from './ids'
-import { DocumentQuery, DocumentSorting, DocumentValue, FindOptions, RegExpression } from './storage'
+import { DocumentQuery, DocumentSorting, DocumentValue, DocumentValueOmit, FindOptions, RegExpression } from './storage'
 
 export function mixinKey (mixin: Ref<Mixin<Obj>>, key: string): string {
   return key + '|' + mixin.replace('.', '~')
@@ -331,7 +331,7 @@ export class Model {
     return l
   }
 
-  public mixinDocument<E extends Obj, T extends Obj>(doc: E, clazz: Ref<Mixin<T>>, values: DocumentValue<T>): void {
+  public mixinDocument<E extends Obj, T extends Obj>(doc: E, clazz: Ref<Mixin<T>>, values: DocumentValueOmit<T, E>): void {
     Model.includeMixin(doc, clazz)
     this.assign(this.getLayout(doc), clazz as Ref<Class<Obj>>, (values as unknown) as AnyLayout)
   }
@@ -350,7 +350,7 @@ export class Model {
     }
   }
 
-  mixin<E extends Doc, T extends E>(id: Ref<E>, clazz: Ref<Mixin<T>>, values: DocumentValue<T>): void {
+  mixin<E extends Doc, T extends E>(id: Ref<E>, clazz: Ref<Mixin<T>>, values: DocumentValueOmit<T, E>): void {
     this.mixinDocument(this.get(id), clazz, values)
   }
 

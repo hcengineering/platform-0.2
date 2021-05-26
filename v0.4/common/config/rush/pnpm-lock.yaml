@@ -5,11 +5,11 @@ dependencies:
   '@jest/globals': 26.6.2
   '@rush-temp/client': file:projects/client.tgz_@babel+core@7.14.0
   '@rush-temp/core': file:projects/core.tgz_@babel+core@7.14.0
-  '@rush-temp/core-model': file:projects/core-model.tgz_@babel+core@7.14.0
+  '@rush-temp/core-model': file:projects/core-model.tgz
   '@rush-temp/domains': file:projects/domains.tgz_@babel+core@7.14.0
-  '@rush-temp/domains-model': file:projects/domains-model.tgz_@babel+core@7.14.0
+  '@rush-temp/domains-model': file:projects/domains-model.tgz
   '@rush-temp/gen-model': file:projects/gen-model.tgz
-  '@rush-temp/model': file:projects/model.tgz_@babel+core@7.14.0
+  '@rush-temp/model': file:projects/model.tgz
   '@rush-temp/platform': file:projects/platform.tgz
   '@rush-temp/platform-core': file:projects/platform-core.tgz_@babel+core@7.14.0
   '@rush-temp/platform-core-impl': file:projects/platform-core-impl.tgz
@@ -45,6 +45,7 @@ dependencies:
   lodash: 4.17.21
   markdown-it: 12.0.6
   mini-css-extract-plugin: 1.4.1_webpack@5.32.0
+  node: 14.16.1
   prettier: 2.2.1
   reflect-metadata: 0.1.13
   sass: 1.32.8
@@ -1291,7 +1292,7 @@ packages:
     dependencies:
       '@jest/fake-timers': 26.6.2
       '@jest/types': 26.6.2
-      '@types/node': 15.0.2
+      '@types/node': 15.3.0
       jest-mock: 26.6.2
     dev: false
     engines:
@@ -1302,7 +1303,7 @@ packages:
     dependencies:
       '@jest/types': 26.6.2
       '@sinonjs/fake-timers': 6.0.1
-      '@types/node': 15.0.2
+      '@types/node': 15.3.0
       jest-message-util: 26.6.2
       jest-mock: 26.6.2
       jest-util: 26.6.2
@@ -1427,7 +1428,7 @@ packages:
     dependencies:
       '@types/istanbul-lib-coverage': 2.0.3
       '@types/istanbul-reports': 3.0.0
-      '@types/node': 15.0.2
+      '@types/node': 15.3.0
       '@types/yargs': 15.0.13
       chalk: 4.1.1
     dev: false
@@ -5600,7 +5601,7 @@ packages:
   /jest-mock/26.6.2:
     dependencies:
       '@jest/types': 26.6.2
-      '@types/node': 15.0.2
+      '@types/node': 15.3.0
     dev: false
     engines:
       node: '>= 10.14.2'
@@ -5813,7 +5814,7 @@ packages:
   /jest-util/26.6.2:
     dependencies:
       '@jest/types': 26.6.2
-      '@types/node': 15.0.2
+      '@types/node': 15.3.0
       chalk: 4.1.1
       graceful-fs: 4.2.6
       is-ci: 2.0.0
@@ -5852,7 +5853,7 @@ packages:
       integrity: sha512-WKJob0P/Em2csiVthsI68p6aGKTIcsfjH9Gsx1f0A3Italz43e3ho0geSAVsmj09RWOELP1AZ/DXyJgOgDKxXQ==
   /jest-worker/26.6.2:
     dependencies:
-      '@types/node': 15.0.2
+      '@types/node': 15.3.0
       merge-stream: 2.0.0
       supports-color: 7.2.0
     dev: false
@@ -6531,6 +6532,10 @@ packages:
     dev: false
     resolution:
       integrity: sha512-1nh45deeb5olNY7eX82BkPO7SSxR5SSYJiPTrTdFUVYwAl8CKMA5N9PjTYkHiRjisVcxcQ1HXdLhx2qxxJzLNQ==
+  /node-bin-setup/1.0.6:
+    dev: false
+    resolution:
+      integrity: sha512-uPIxXNis1CRbv1DwqAxkgBk5NFV3s7cMN/Gf556jSw6jBvV7ca4F9lRL/8cALcZecRibeqU+5dFYqFFmzv5a0Q==
   /node-forge/0.10.0:
     dev: false
     engines:
@@ -6563,6 +6568,16 @@ packages:
     dev: false
     resolution:
       integrity: sha512-zR6HoT6LrLCRBwukmrVbHv0EpEQjksO6GmFcZQQuCAy139BEsoVKPYnf3jongYW83fAa1torLGYwxxky/p28sg==
+  /node/14.16.1:
+    dependencies:
+      node-bin-setup: 1.0.6
+    dev: false
+    engines:
+      npm: '>=5.0.0'
+    hasBin: true
+    requiresBuild: true
+    resolution:
+      integrity: sha512-SFe89UaWbT8XM3GHrbohdCyZtxAJZt2FYt6orZP9Dyig2EuEV+S8k5cNoDJbokVbXyYLoUv1kHEg60MaYsepVg==
   /noms/0.0.0:
     dependencies:
       inherits: 2.0.4
@@ -8618,28 +8633,6 @@ packages:
       typescript: '>=3.8 <5.0'
     resolution:
       integrity: sha512-rua+rCP8DxpA8b4DQD/6X2HQS8Zy/xzViVYfEs2OQu68tkCuKLV0Md8pmX55+W24uRIyAsf/BajRfxOs+R2MKA==
-  /ts-jest/26.5.6_typescript@4.2.4:
-    dependencies:
-      bs-logger: 0.2.6
-      buffer-from: 1.1.1
-      fast-json-stable-stringify: 2.1.0
-      jest-util: 26.6.2
-      json5: 2.2.0
-      lodash: 4.17.21
-      make-error: 1.3.6
-      mkdirp: 1.0.4
-      semver: 7.3.5
-      typescript: 4.2.4
-      yargs-parser: 20.2.7
-    dev: false
-    engines:
-      node: '>= 10'
-    hasBin: true
-    peerDependencies:
-      jest: '>=26 <27'
-      typescript: '>=3.8 <5.0'
-    resolution:
-      integrity: sha512-rua+rCP8DxpA8b4DQD/6X2HQS8Zy/xzViVYfEs2OQu68tkCuKLV0Md8pmX55+W24uRIyAsf/BajRfxOs+R2MKA==
   /ts-loader/8.1.0_webpack@5.32.0:
     dependencies:
       chalk: 4.1.1
@@ -9499,13 +9492,8 @@ packages:
       integrity: sha512-nHihyPfUrgrayUfP4JP7cUjzgVmhDK5fa40nteOVWM0noTC+PBa7n6vpi4wuqBeHAClTYsvFDATXuIJ2ZJj34A==
       tarball: file:projects/client.tgz
     version: 0.0.0
-  file:projects/core-model.tgz_@babel+core@7.14.0:
+  file:projects/core-model.tgz:
     dependencies:
-      '@babel/eslint-parser': 7.13.14_@babel+core@7.14.0+eslint@7.26.0
-      '@babel/preset-typescript': 7.13.0_@babel+core@7.14.0
-      '@jest/globals': 26.6.2
-      '@microsoft/api-extractor': 7.15.1
-      '@types/jest': 26.0.23
       '@types/node': 15.0.2
       '@typescript-eslint/eslint-plugin': 4.22.0_d80b53217345f120a8ed26af05eed18b
       '@typescript-eslint/parser': 4.22.0_eslint@7.26.0+typescript@4.2.4
@@ -9515,16 +9503,11 @@ packages:
       eslint-plugin-import: 2.22.1_eslint@7.26.0
       eslint-plugin-node: 11.1.0_eslint@7.26.0
       eslint-plugin-promise: 5.1.0_eslint@7.26.0
-      jest: 26.6.3
-      ts-jest: 26.5.6_jest@26.6.3+typescript@4.2.4
       typescript: 4.2.4
     dev: false
-    id: file:projects/core-model.tgz
     name: '@rush-temp/core-model'
-    peerDependencies:
-      '@babel/core': '*'
     resolution:
-      integrity: sha512-T6JX07WF8EoNmPYiCLCE25/s2xZbjv30uEZvo8ozJAheyQnnlu70U89vYZGSAb+XtxI3B5LtS29scoi2Y5vCmw==
+      integrity: sha512-a5ukuvbqeqrggnoz7U9U/6wMPQ4MUFFYjtmuUtNogFD5hhuKunRqxyRRuv4zZEBZTW3WTQePo6p9gjZhb5SmRA==
       tarball: file:projects/core-model.tgz
     version: 0.0.0
   file:projects/core.tgz_@babel+core@7.14.0:
@@ -9555,13 +9538,8 @@ packages:
       integrity: sha512-K2OAwLFvRxboBd5TZCNCQkAEkonKk3kNgnphku7oTpwTf2CbHVIs7dDGge0FVgENWnYUOXR1y0JimQcbHK5qaA==
       tarball: file:projects/core.tgz
     version: 0.0.0
-  file:projects/domains-model.tgz_@babel+core@7.14.0:
+  file:projects/domains-model.tgz:
     dependencies:
-      '@babel/eslint-parser': 7.13.14_@babel+core@7.14.0+eslint@7.26.0
-      '@babel/preset-typescript': 7.13.0_@babel+core@7.14.0
-      '@microsoft/api-extractor': 7.15.1
-      '@types/jest': 26.0.23
-      '@types/markdown-it': 10.0.3
       '@types/node': 15.0.2
       '@typescript-eslint/eslint-plugin': 4.22.0_d80b53217345f120a8ed26af05eed18b
       '@typescript-eslint/parser': 4.22.0_eslint@7.26.0+typescript@4.2.4
@@ -9571,17 +9549,12 @@ packages:
       eslint-plugin-import: 2.22.1_eslint@7.26.0
       eslint-plugin-node: 11.1.0_eslint@7.26.0
       eslint-plugin-promise: 5.1.0_eslint@7.26.0
-      jest: 26.6.3_ts-node@9.1.1
-      ts-jest: 26.5.6_jest@26.6.3+typescript@4.2.4
       ts-node: 9.1.1_typescript@4.2.4
       typescript: 4.2.4
     dev: false
-    id: file:projects/domains-model.tgz
     name: '@rush-temp/domains-model'
-    peerDependencies:
-      '@babel/core': '*'
     resolution:
-      integrity: sha512-OVuk8qMqBqiU1CJg4yr0u6eB5KWjZCGGDhaGkw8P6/lNznsMXZCU60x1PYtrNUZxtEhirzEdhfYycUd8lcjGtg==
+      integrity: sha512-iyw3mlMNksgUIur+rBEyr8UeXOOReHIOg1O0zR3DbL62c1KrPf4J5pd0WKeo1qtej8Cr3xP5x8GtHu8Lg+mGSA==
       tarball: file:projects/domains-model.tgz
     version: 0.0.0
   file:projects/domains.tgz_@babel+core@7.14.0:
@@ -9626,21 +9599,20 @@ packages:
       eslint-plugin-import: 2.22.1_eslint@7.26.0
       eslint-plugin-node: 11.1.0_eslint@7.26.0
       eslint-plugin-promise: 5.1.0_eslint@7.26.0
-      jest: 26.6.3
+      jest: 26.6.3_ts-node@9.1.1
+      node: 14.16.1
       ts-jest: 26.5.6_jest@26.6.3+typescript@4.2.4
+      ts-node: 9.1.1_typescript@4.2.4
       typescript: 4.2.4
     dev: false
     name: '@rush-temp/gen-model'
     resolution:
-      integrity: sha512-YYzbpKkZyKQFdBpcxQt0ifCGasqd9M94ajBFxvegGPpQJ1k6uY77GfEHkstC5A0JXvNxAKRiUOv9GpR+nDaqbQ==
+      integrity: sha512-RxJo3mMspYXU8e3tHzMNsJbB7jn1C348Bw5h/Y4EhPO9Mzf1n7OPk9VMuYkVtVkaNKys5UBuLSxJfel9z7kS/w==
       tarball: file:projects/gen-model.tgz
     version: 0.0.0
-  file:projects/model.tgz_@babel+core@7.14.0:
+  file:projects/model.tgz:
     dependencies:
-      '@babel/eslint-parser': 7.13.14_@babel+core@7.14.0+eslint@7.26.0
-      '@babel/preset-typescript': 7.13.0_@babel+core@7.14.0
       '@microsoft/api-extractor': 7.15.1
-      '@types/lodash': 4.14.168
       '@types/node': 15.0.2
       '@typescript-eslint/eslint-plugin': 4.22.0_d80b53217345f120a8ed26af05eed18b
       '@typescript-eslint/parser': 4.22.0_eslint@7.26.0+typescript@4.2.4
@@ -9653,16 +9625,12 @@ packages:
       lodash: 4.17.21
       reflect-metadata: 0.1.13
       simplytyped: 3.3.0_typescript@4.2.4
-      ts-jest: 26.5.6_typescript@4.2.4
       ts-node: 9.1.1_typescript@4.2.4
       typescript: 4.2.4
     dev: false
-    id: file:projects/model.tgz
     name: '@rush-temp/model'
-    peerDependencies:
-      '@babel/core': '*'
     resolution:
-      integrity: sha512-HWRh7iu8P+qUQ20wCapigkQQC+jq8M1M0X5VITs2UTth2CFfsplnx03EBKlXrJZo3we3uFliHurOc00TS5bVTg==
+      integrity: sha512-//N5KiyoaMm6JhgeIzC/SzvMgI3CJjZBjKQ1gIX6NQYc3jOEhufbNGtzoOKtVHGKArTV8QKPR4628XWub65Mwg==
       tarball: file:projects/model.tgz
     version: 0.0.0
   file:projects/platform-core-impl.tgz:
@@ -10079,6 +10047,7 @@ specifiers:
   lodash: ^4.17.21
   markdown-it: ~12.0.6
   mini-css-extract-plugin: ~1.4.1
+  node: ^14.16.0
   prettier: ~2.2.1
   reflect-metadata: ^0.1.13
   sass: ~1.32.8

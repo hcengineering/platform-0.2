@@ -1,6 +1,6 @@
 ///
 
-import { Obj, Ref } from './classes'
+import { Doc, Emb, Ref } from './classes'
 
 function toHex (value: number, chars: number): string {
   const result = value.toString(16)
@@ -23,10 +23,10 @@ function count (): string {
   return toHex(val, 6)
 }
 
-export function generateId<T extends Obj> (): Ref<T> {
+export function generateId<T extends Doc | Emb> (): Ref<T> {
   return timestamp() + random + count() as Ref<T>
 }
 
-export function noId<T extends Obj> (): Ref<T> {
+export function noId<T extends Doc | Emb> (): Ref<T> {
   return '' as Ref<T>
 }

@@ -13,23 +13,87 @@
 // limitations under the License.
 //
 
-import core, { Class, Doc, DocumentValue, Mixin, Model, MODEL_DOMAIN, Obj, Ref } from '@anticrm/core'
+import core, { Class, ClassifierKind, Doc, DocumentValue, DocumentValueOmit, Enum, Mixin, Model, MODEL_DOMAIN, Obj, Ref } from '@anticrm/core'
 import { CombineObjects, KeysByType } from 'simplytyped'
-import { loadClassifier } from './dsl'
+import { collectModel, Collector } from './ts_builder'
 
 type MethodType = (...args: any[]) => any
 
 export type OptionalMethods<T extends Record<string, unknown>> = CombineObjects<Omit<T, KeysByType<T, MethodType>>,
 Partial<Pick<T, KeysByType<T, MethodType>>>>
 
+export type ExtractClass<T extends Obj, X extends Record<string, Ref<Class<T>>>> = {
+  [P in keyof X]: X[P] extends Ref<Class<T>> ? Partial<Class<T>> : never
+}
+
+export type ExtractMixin<T extends Obj, X extends Record<string, Ref<Mixin<T>>>> = {
+  [P in keyof X]: X[P] extends Ref<Mixin<T>> ? Partial<Mixin<T>> : never
+}
+
+export type ExtractEnum<T, X extends Record<string, Ref<Enum<T>>>> = {
+  [P in keyof X]: X[P] extends Ref<Enum<T>> ? Partial<Enum<T>> : never
+}
+
 class Builder {
   private readonly memdb: Model
 
   private readonly domains = new Map<string, Model>()
 
+  private readonly collectedIds: { [key: string]: Ref<Doc>} = {} // Contains a map of source ids to plugin reference Ids.
+
+  private readonly collectors: {[key: string]: Collector} = {}
+
+  private readonly postprocessing: Array<(model: Model) => void> = []
+
   constructor (memdb?: Model) {
     this.memdb = memdb ?? new Model(MODEL_DOMAIN)
     this.domains.set(MODEL_DOMAIN, this.memdb)
+  }
+
+  loadClass <T extends Obj, X extends Record<string, Ref<Class<T>>>>(_fileName: string, ids: X, classes: ExtractClass<T, X>, _domain?: string): void {
+    this.buildClassifier<T, X>(ClassifierKind.CLASS, _fileName, ids, classes, _domain)
+  }
+
+  loadMixin <T extends Obj, X extends Record<string, Ref<Mixin<T>>>>(_fileName: string, ids: X, classes: ExtractMixin<T, X>): void {
+    this.buildClassifier<T, X>(ClassifierKind.MIXIN, _fileName, ids, classes)
+  }
+
+  loadEnum <T, X extends Record<string, Ref<Enum<T>>>>(_fileName: string, ids: X, _classes: ExtractEnum<T, X>): void {
+    const collector = this.collectors[_fileName] ?? collectModel(_fileName)
+    this.collectors[_fileName] = collector
+
+    for (const key in ids) {
+      const id = ids[key]
+      const sourceId = collector.sourceId(key)
+      this.collectedIds[sourceId] = id as Ref<Enum<any>>
+      const cl = collector.buildEnum(key, id as unknown as Ref<Class<Obj>>)
+      this.memdb.add(cl)
+    }
+  }
+
+  addPostProcess (op: (model: Model) => void): void {
+    this.postprocessing.push(op)
+  }
+
+  private buildClassifier <T extends Obj, X extends Record<string, Ref<Class<T>>>>(_kind: ClassifierKind, _fileName: string, ids: X, classes: ExtractClass<T, X>, _domain?: string): void {
+    const collector = this.collectors[_fileName] ?? collectModel(_fileName)
+    this.collectors[_fileName] = collector
+
+    for (const key in ids) {
+      const cc = classes[key]
+      if (cc._extends === undefined) {
+        const id = ids[key]
+        const sourceId = collector.sourceId(key)
+        this.collectedIds[sourceId] = id as Ref<Class<Obj>>
+      }
+    }
+
+    for (const key in ids) {
+      const id = ids[key]
+      const cc = classes[key]
+      const cl = collector.buildClass(_kind, key, id as unknown as Ref<Class<Obj>>, cc._extends, cc._domain ?? _domain, this.collectedIds)
+      this.memdb.add(cl)
+    }
   }
 
   load (model: (builder: Builder) => void): void {
@@ -37,6 +101,9 @@ class Builder {
   }
 
   dump (): Doc[] {
+    for (const op of this.postprocessing) {
+      op(this.memdb)
+    }
     return this.memdb.dump()
   }
 
@@ -57,30 +124,13 @@ class Builder {
     }
     return memdb
   }
-
-  add (...classes: Array<new () => Obj>): void {
-    for (const ctor of classes) {
-      const classifier = loadClassifier(ctor.prototype)
-      this.memdb.add(classifier.doc)
-    }
-    for (const ctor of classes) {
-      const classifier = loadClassifier(ctor.prototype)
-      if (classifier.postProcessing.length > 0) {
-        for (const op of classifier.postProcessing) {
-          // We use modelDB to find core stuff.
-          op(this.memdb, classifier.doc)
-        }
-      }
-    }
-  }
-
   ///
 
-  mixin<T extends E, E extends Doc> (id: Ref<E>, clazz: Ref<Mixin<T>>, values: DocumentValue<T>): void {
+  mixin<T extends E, E extends Doc> (id: Ref<E>, clazz: Ref<Mixin<T>>, values: DocumentValueOmit<T, E>): void {
     this.memdb.mixin(id, clazz, values)
   }
 
-  mixinDocument<T extends E, E extends Doc> (doc: E, clazz: Ref<Mixin<T>>, values: DocumentValue<T>): void {
+  mixinDocument<T extends E, E extends Doc> (doc: E, clazz: Ref<Mixin<T>>, values: DocumentValueOmit<T, E>): void {
     this.memdb.mixinDocument(doc, clazz, values)
   }
 
