@@ -21,7 +21,8 @@
     "@anticrm/rpc": "^0.2.0",
     "@anticrm/sparkling-controls": "^0.2.0",
     "@anticrm/webrtc": "^0.2.0",
-    "@anticrm/workbench": "^0.2.0"
+    "@anticrm/workbench": "^0.2.0",
+    "lodash": "^4.17.21"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^4.22.0",

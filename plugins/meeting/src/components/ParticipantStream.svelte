@@ -28,9 +28,6 @@ limitations under the License.
 
 <style lang="scss">
   .video {
-    position: absolute;
-    left: 0;
-    top: 0;
     border-radius: 20px;
     border: 1px solid var(--theme-bg-accent-color);
     width: 100%;

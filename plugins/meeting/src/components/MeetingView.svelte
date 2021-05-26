@@ -21,6 +21,7 @@ limitations under the License.
   import Button from '@anticrm/sparkling-controls/src/Button.svelte'
 
   import ParticipantStream from './ParticipantStream.svelte'
+  import { initGridStore, makeGridSizeStore } from './grid.layout'
 
   import { getMeetingService, MeetingService, Participant } from '..'
 
@@ -32,6 +33,19 @@ limitations under the License.
   let user: Readable<Participant>
   let participants: Readable<Participant[]>
   let isJoined: Readable<boolean>
+  let container: Element
+
+  let { amount, size, containerSize: cSize } = initGridStore()
+  $: if (container && participants) {
+    const s = makeGridSizeStore(container, $participants.length + 1)
+    amount = s.amount
+    size = s.size
+    cSize = s.containerSize
+  }
+
+  $: if ($participants) {
+    amount.set($participants.length + 1)
+  }
 
   async function init () {
     meetingService = await meetingServiceP
@@ -64,16 +78,19 @@ limitations under the License.
       track.enabled = !isMuted
     })
   }
+
+  let videoStyle = ''
+  $: videoStyle = `width: ${$size.width}px; height: ${$size.height}px`
 </script>
 
 {#await init() then _}
-  <div class="root">
-    <div class="videos">
-      <div class="video">
+  <div class="root" bind:this={container}>
+    <div class="videos" style={`width: ${$cSize.width}px`}>
+      <div class="video" style={videoStyle}>
         <ParticipantStream participant={$user} isLocal={true} />
       </div>
       {#each $participants as participant (participant.internalID)}
-        <div class="video">
+        <div class="video" style={videoStyle}>
           <ParticipantStream {participant} />
         </div>
       {/each}
@@ -99,7 +116,8 @@ limitations under the License.
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    padding: 0px 20px;
+    overflow: auto;
+    padding: 20px;
   }
 
   .controls {
@@ -116,17 +134,15 @@ limitations under the License.
   }
 
   .videos {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    grid-gap: 20px;
+    position: absolute;
     width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
   }
 
   .video {
-    min-height: 150px;
-    min-width: 300px;
-    position: relative;
-    width: 100%;
-    padding-top: 75%;
+    flex: none;
   }
 </style>
