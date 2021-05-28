@@ -13,9 +13,9 @@
 // limitations under the License.
 //
 
-import { DomainIndex, Storage, Tx, TxContext } from '@anticrm/core'
+import { TransactionProtocol, Storage, Tx, TxContext } from '@anticrm/core'
 
-export class TxIndex implements DomainIndex {
+export class TxIndex implements TransactionProtocol {
   private readonly storage: Storage
 
   constructor (storage: Storage) {

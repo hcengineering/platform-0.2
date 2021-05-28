@@ -13,14 +13,14 @@
 // limitations under the License.
 //
 
-import { DomainIndex, Model, Ref, Storage, Tx, TxContext } from '@anticrm/core'
+import { TransactionProtocol, Model, Ref, Storage, Tx, TxContext } from '@anticrm/core'
 import { Space } from '../space'
 import { AddItemTx, CreateTx, DeleteTx, ItemTx, RemoveItemTx, update, UpdateItemTx, UpdateTx } from '../tx'
 import domains from '../'
 import { processTransactions } from '../tx_utils'
 import { VDoc } from '../vdoc'
 
-export class VDocIndex implements DomainIndex {
+export class VDocIndex implements TransactionProtocol {
   private readonly transient: Storage | undefined
   private readonly modelDb: Model
   private readonly storage: Storage

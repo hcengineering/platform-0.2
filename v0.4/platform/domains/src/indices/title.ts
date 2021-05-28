@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Class, Doc, DocumentValue, DomainIndex, Model, Ref, Storage, Tx, TxContext } from '@anticrm/core'
+import { Class, Doc, DocumentValue, TransactionProtocol, Model, Ref, Storage, Tx, TxContext } from '@anticrm/core'
 import domains from '..'
 import { getPrimaryKey } from '../primary_utils'
 import { Title, TitleSource } from '../title'
@@ -21,7 +21,7 @@ import { create, CreateTx, DeleteTx, remove, update, UpdateTx } from '../tx'
 
 const NULL = '<null>'
 
-export class TitleIndex implements DomainIndex {
+export class TitleIndex implements TransactionProtocol {
   private readonly modelDb: Model
   private readonly storage: Storage
   private readonly primaries = new Map<Ref<Class<Doc>>, string>()

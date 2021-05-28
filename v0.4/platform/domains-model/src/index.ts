@@ -1,4 +1,4 @@
-import { Attribute, Class, Doc, DocumentValueOmit, Enum, fieldId, FieldId, Mixin, MODEL_DOMAIN, Obj, Ref } from '@anticrm/core'
+import core, { Attribute, Class, Doc, DocumentValueOmit, Enum, fieldId, FieldId, Mixin, MODEL_DOMAIN, Obj, Ref } from '@anticrm/core'
 import domains, {
   AddItemTx, Application, CollectionReference, CreateTx, DeleteTx, Indices, ItemTx, ObjectTx, Reference, RemoveItemTx,
   ShortID, Space, SpaceUser, Title, TitleSource, UpdateItemTx, UpdateTx, UXAttribute, UXObject, VDoc
@@ -9,21 +9,21 @@ import { Builder } from '@anticrm/model'
  * Mark some field as as primary to be indexed.
  */
 export function primary<T extends Obj> (S: Builder, _id: Ref<Class<T>>, propertyKey: FieldId<T>): void {
-  S.mixin(_id, domains.mixin.Indices, { primary: propertyKey(fieldId<T>()) })
+  S.mixin(_id, core.class.Class, domains.mixin.Indices, { primary: propertyKey(fieldId<T>()) })
 }
 
 /**
  * Apply an UX mixin to Class attribute.
  */
 export function uxAttribute< T extends Doc> (S: Builder, _id: Ref<Class<T>>, _aid: Ref<Attribute>, values: DocumentValueOmit<UXAttribute, Attribute>): void {
-  S.mixinEmb(_id, _aid, (ss) => ss._attributes, domains.mixin.UXAttribute, values)
+  S.mixinEmb(_id, core.class.Attribute, (ss) => ss._attributes, _aid, domains.mixin.UXAttribute, values)
 }
 
 /**
  * Apply an UX mixin to class.
  */
 export function uxClass< T extends Doc> (S: Builder, _id: Ref<Class<T>>, values: DocumentValueOmit<UXObject<T>, Class<T>>): void {
-  S.mixin(_id, domains.mixin.UXAttribute, values)
+  S.mixin(_id, core.class.Class, domains.mixin.UXAttribute, values)
 }
 
 export function model (S: Builder): void {

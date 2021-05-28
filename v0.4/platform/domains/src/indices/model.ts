@@ -13,14 +13,14 @@
 // limitations under the License.
 //
 
-import { DomainIndex, Model, MODEL_DOMAIN, Storage, Tx, TxContext } from '@anticrm/core'
+import { TransactionProtocol, Model, MODEL_DOMAIN, Storage, Tx, TxContext } from '@anticrm/core'
 import domains, { ObjectTx } from '..'
 import { ItemTx } from '../tx'
 
 /**
  * Perform model update and forward updates into chained storage if required.
  */
-export class ModelIndex implements DomainIndex {
+export class ModelIndex implements TransactionProtocol {
   private readonly storage: Storage
   private readonly model: Model
 
