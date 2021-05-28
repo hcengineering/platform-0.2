@@ -13,6 +13,5 @@
 // limitations under the License.
 //
 
-import Builder from './builder'
-
-export { Builder }
+export { Builder } from './builder'
+export { createModelBuilder, ModelBuilder } from './model_builder'

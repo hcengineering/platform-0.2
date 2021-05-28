@@ -13,8 +13,11 @@
 // limitations under the License.
 //
 
-import core, { Class, ClassifierKind, CollectionId, Doc, DocumentValue, DocumentValueOmit, Emb, Enum, Mixin, Model, MODEL_DOMAIN, Obj, Ref } from '@anticrm/core'
+import core, {
+  Attribute, Class, ClassifierKind, CollectionId, Doc, DocumentValue, DocumentValueOmit, Emb, Enum, EnumLiteral, Mixin, Obj, Ref
+} from '@anticrm/core'
 import { CombineObjects, KeysByType } from 'simplytyped'
+import { ModelBuilder } from './model_builder'
 import { collectModel, Collector } from './ts_builder'
 
 type MethodType = (...args: any[]) => any
@@ -34,18 +37,14 @@ export type ExtractEnum<T, X extends Record<string, Ref<Enum<T>>>> = {
   [P in keyof X]: X[P] extends Ref<Enum<T>> ? Partial<Enum<T>> : never
 }
 
-class Builder {
-  private readonly memdb: Model
-
-  private readonly domains = new Map<string, Model>()
-
+export class Builder {
   private readonly collectedIds: { [key: string]: Ref<Doc>} = {} // Contains a map of source ids to plugin reference Ids.
-
   private readonly collectors: {[key: string]: Collector} = {}
 
-  constructor (memdb?: Model) {
-    this.memdb = memdb ?? new Model(MODEL_DOMAIN)
-    this.domains.set(MODEL_DOMAIN, this.memdb)
+  builder: ModelBuilder
+
+  constructor (modelBuilder: ModelBuilder) {
+    this.builder = modelBuilder
   }
 
   loadClass <T extends Obj, X extends Record<string, Ref<Class<T>>>>(_fileName: string, ids: X, classes: ExtractClass<T, X>, _domain?: string): void {
@@ -64,8 +63,12 @@ class Builder {
       const id = ids[key]
       const sourceId = collector.sourceId(key)
       this.collectedIds[sourceId] = id as Ref<Enum<any>>
-      const cl = collector.buildEnum(key, id as unknown as Ref<Class<Obj>>)
-      this.memdb.add(cl)
+      const _objectId = id as unknown as Ref<Class<Obj>>
+      const { _literals, _class, _id, ..._value } = collector.buildEnum(key, _objectId)
+      this.builder.addDoc<Enum<any>>(_class, _value, _id as Ref<Enum<any>>)
+      for (const literal of _literals.items ?? []) {
+        this.builder.addEmb<Enum<any>, EnumLiteral>(_class, _id as Ref<Enum<any>>, (ci) => ci._literals, core.class.EnumLiteral, literal)
+      }
     }
   }
 
@@ -88,8 +91,12 @@ class Builder {
       if (cc._domain === undefined) {
         cc._domain = _domain
       }
-      const cl = collector.buildClass(_kind, key, id as unknown as Ref<Class<Obj>>, cc, this.collectedIds)
-      this.memdb.add(cl)
+      const _objectId = id as unknown as Ref<Class<Obj>>
+      const { _id, _class, _attributes, ..._value } = collector.buildClass(_kind, key, _objectId, cc, this.collectedIds)
+      this.builder.addDoc<Class<Obj>>(_class, _value, _id as Ref<Class<Obj>>)
+      for (const attribute of _attributes.items ?? []) {
+        this.builder.addEmb<Class<Obj>, Attribute>(_class, _id as Ref<Class<Obj>>, (ci) => ci._attributes, core.class.Attribute, attribute)
+      }
     }
   }
 
@@ -97,52 +104,15 @@ class Builder {
     model(this)
   }
 
-  dump (): Doc[] {
-    return this.memdb.dump()
+  mixin<E extends Doc, T extends Obj> (_objectId: Ref<E>, _objectClass: Ref<Class<E>>, _mixinClass: Ref<Mixin<T>>, _value: DocumentValueOmit<T, E>): void {
+    this.builder.mixin(_objectClass, _objectId, _mixinClass, _value)
   }
 
-  dumpAll (): { [key: string]: Doc[] } {
-    const result: { [key: string]: Doc[] } = {}
-    for (const e of this.domains) {
-      result[e[0]] = e[1].dump()
-    }
-    return result
+  mixinEmb<E extends Doc, T extends Obj, C extends Emb> (_objectId: Ref<E>, _objectClass: Ref<Class<E>>, _collectionId: CollectionId<E>, _id: Ref<C>, _mixinClass: Ref<Mixin<T>>, _value: DocumentValueOmit<T, C>): void {
+    this.builder.mixinEmb(_objectClass, _objectId, _collectionId, _id, _mixinClass, _value)
   }
 
-  getDomain (domain: string): Model {
-    const memdb = this.domains.get(domain)
-    if (memdb === undefined) {
-      const memdb = new Model(domain)
-      this.domains.set(domain, memdb)
-      return memdb
-    }
-    return memdb
-  }
-  ///
-
-  mixin<T extends E, E extends Doc> (id: Ref<E>, clazz: Ref<Mixin<T>>, values: DocumentValueOmit<T, E>): void {
-    this.memdb.mixin(id, clazz, values)
-  }
-
-  mixinEmb<T extends Doc, E extends C, C extends Emb> (id: Ref<T>, cid: Ref<C>, collection: CollectionId<T>, clazz: Ref<Mixin<E>>, values: DocumentValueOmit<E, C>): void {
-    this.memdb.mixinEmb(id, cid, collection, clazz, values)
-  }
-
-  createDocument<M extends Doc> (_class: Ref<Class<M>>, values: DocumentValue<M>, _id?: Ref<M>): M {
-    const doc = this.memdb.createDocument<M>(_class, values, _id)
-    if (_class === core.class.Class as Ref<Class<Doc>> || _class === core.class.Mixin as Ref<Class<Doc>>) {
-      this.memdb.add(doc)
-      console.log('add `model` ' + doc._id)
-    } else {
-      const domain = this.memdb.getDomain(_class)
-      if (domain === undefined) {
-        throw new Error('domain not found for class: ' + _class)
-      }
-      console.log(`add '${domain}' ` + doc._id)
-      this.getDomain(domain).add(doc)
-    }
-    return doc
+  createDocument<M extends Doc> (_class: Ref<Class<M>>, _value: DocumentValue<M>, _id?: Ref<M>): void {
+    this.builder.addDoc(_class, _value, _id)
   }
 }
-
-export default Builder

@@ -13,19 +13,21 @@
 // limitations under the License.
 //
 
-import { Builder } from '@anticrm/model'
+import { Builder, createModelBuilder } from '@anticrm/model'
 import { model as taskModel } from './test_tasks'
 import { writeFile } from 'fs'
 
 import { model as coreModel } from '@anticrm/core-model'
 import { model as domainsModel } from '..'
+import { Model } from '@anticrm/core'
 
-const builder = new Builder()
+const model = new Model('model')
+const builder = new Builder(createModelBuilder(model))
 coreModel(builder)
 domainsModel(builder)
 taskModel(builder)
 
-writeFile('../domains/src/__tests__/model.json', JSON.stringify(builder.dump(), undefined, 2), (err: Error | null) => {
+writeFile('../domains/src/__tests__/model.json', JSON.stringify(model.dump(), undefined, 2), (err: Error | null) => {
   if (err !== null) {
     return console.log(err)
   }

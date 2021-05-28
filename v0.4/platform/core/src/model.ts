@@ -363,7 +363,7 @@ export class Model {
     return l
   }
 
-  public mixinDocument<E extends Obj, T extends Obj>(doc: E, clazz: Ref<Mixin<T>>, values: DocumentValue<E>): void {
+  public mixinDocument<E extends Doc, T extends Obj>(doc: E, clazz: Ref<Mixin<T>>, values: DocumentValueOmit<T, E>): void {
     Model.includeMixin(doc, clazz)
     this.assign(this.getLayout(doc), clazz as Ref<Class<Obj>>, (values as unknown) as AnyLayout)
   }
@@ -382,7 +382,7 @@ export class Model {
     }
   }
 
-  public mixin<E extends Doc, T extends E>(_objectId: Ref<E>, _mixinClass: Ref<Mixin<T>>, _value: DocumentValue<E>): void {
+  public mixin<E extends Doc, T extends Obj>(_objectId: Ref<E>, _mixinClass: Ref<Mixin<T>>, _value: DocumentValueOmit<T, E>): void {
     this.mixinDocument(this.get(_objectId), _mixinClass, _value)
   }
 

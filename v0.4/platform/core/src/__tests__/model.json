@@ -187,9 +187,6 @@
     "_kind": 0
   },
   {
-    "_attributes": {
-      "items": {}
-    },
     "_class": "class:core.Class",
     "_domain": "model",
     "_extends": "class:core.Class",
@@ -263,9 +260,6 @@
     "_kind": 0
   },
   {
-    "_attributes": {
-      "items": {}
-    },
     "_class": "class:core.Class",
     "_domain": "model",
     "_extends": "class:core.Type",
@@ -273,9 +267,6 @@
     "_kind": 0
   },
   {
-    "_attributes": {
-      "items": {}
-    },
     "_class": "class:core.Class",
     "_domain": "model",
     "_extends": "class:core.Type",
@@ -283,9 +274,6 @@
     "_kind": 0
   },
   {
-    "_attributes": {
-      "items": {}
-    },
     "_class": "class:core.Class",
     "_domain": "model",
     "_extends": "class:core.Type",
@@ -293,9 +281,6 @@
     "_kind": 0
   },
   {
-    "_attributes": {
-      "items": {}
-    },
     "_class": "class:core.Class",
     "_domain": "model",
     "_extends": "class:core.Type",
@@ -303,9 +288,6 @@
     "_kind": 0
   },
   {
-    "_attributes": {
-      "items": {}
-    },
     "_class": "class:core.Class",
     "_domain": "model",
     "_extends": "class:core.Type",
