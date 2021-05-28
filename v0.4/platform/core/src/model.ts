@@ -159,12 +159,31 @@ export class Model {
     if (this.byExtends !== undefined) this.indexExtends(doc, false)
   }
 
+  _get<T extends Doc>(id: Ref<T>): T | undefined {
+    return this.objects.get(id) as T
+  }
+
   get<T extends Doc>(id: Ref<T>): T {
-    const obj = this.objects.get(id)
+    const obj = this._get(id)
     if (obj === undefined) {
       throw new Error(`document not found ${id}`)
     }
-    return obj as T
+    return obj
+  }
+
+  _getEmb<T extends Doc, E extends Emb>(_objectId: Ref<T>, _collectionId: CollectionId<T>, _id: Ref<E>): E | undefined {
+    const doc = this.get(_objectId)
+    const fieldId = _collectionId(collectionId<T>())
+    const collectionField = (doc as any)[fieldId] as Collection<E>
+    return collectionField.items?.find(item => item._id === _id)
+  }
+
+  getEmb<T extends Doc, E extends Emb>(_objectId: Ref<T>, _collectionId: CollectionId<T>, _id: Ref<E>): E {
+    const item = this._getEmb(_objectId, _collectionId, _id)
+    if (item === undefined) {
+      throw new Error(`failed to find embedded item with id: ${_id}`)
+    }
+    return item
   }
 
   // U T I L I T Y
@@ -278,6 +297,18 @@ export class Model {
     this.assign(this.getLayout(doc), _class, values as unknown as AnyLayout)
   }
 
+  public addEmb<T extends Doc, E extends Emb>(_objectId: Ref<T>, _collectionId: CollectionId<T>, _value: E): void {
+    const doc = this.get(_objectId)
+    const fieldId = _collectionId(collectionId<T>())
+    const anyDoc = doc as any
+    let collectionField = anyDoc[fieldId] as Collection<E>
+    if (collectionField === undefined) {
+      collectionField = { items: [] }
+      anyDoc[fieldId] = collectionField
+    }
+    collectionField.items?.push(_value)
+  }
+
   // from Builder
   assign (layout: AnyLayout, _class: Ref<Class<Obj>>, values: AnyLayout): AnyLayout {
     const l = layout
@@ -332,7 +363,7 @@ export class Model {
     return l
   }
 
-  public mixinDocument<E extends Obj, T extends Obj>(doc: E, clazz: Ref<Mixin<T>>, values: DocumentValueOmit<T, E>): void {
+  public mixinDocument<E extends Obj, T extends Obj>(doc: E, clazz: Ref<Mixin<T>>, values: DocumentValue<E>): void {
     Model.includeMixin(doc, clazz)
     this.assign(this.getLayout(doc), clazz as Ref<Class<Obj>>, (values as unknown) as AnyLayout)
   }
@@ -351,19 +382,8 @@ export class Model {
     }
   }
 
-  mixin<E extends Doc, T extends E>(id: Ref<E>, clazz: Ref<Mixin<T>>, values: DocumentValueOmit<T, E>): void {
-    this.mixinDocument(this.get(id), clazz, values)
-  }
-
-  mixinEmb<T extends Doc, E extends C, C extends Emb> (id: Ref<T>, cid: Ref<C>, collection: CollectionId<T>, clazz: Ref<Mixin<E>>, values: DocumentValueOmit<E, C>): void {
-    const doc = this.get(id)
-    const fieldId = collection(collectionId<T>())
-    const collectionField = (doc as any)[fieldId] as Collection<E>
-    const item = collectionField.items?.find(item => item._id === cid)
-    if (item === undefined) {
-      throw new Error(`failed to find embedded item with id: ${cid}`)
-    }
-    this.mixinDocument(item, clazz, values)
+  public mixin<E extends Doc, T extends E>(_objectId: Ref<E>, _mixinClass: Ref<Mixin<T>>, _value: DocumentValue<E>): void {
+    this.mixinDocument(this.get(_objectId), _mixinClass, _value)
   }
 
   getClassHierarchy (cls: Ref<Class<Obj>>, top?: Ref<Class<Obj>>): Array<Ref<Class<Obj>>> {
@@ -391,10 +411,31 @@ export class Model {
     return false
   }
 
+  private sortCopyObject (obj: any): any {
+    if (typeof obj !== 'object') {
+      if (obj instanceof Array) {
+        const result = []
+        for (const o of (obj)) {
+          result.push(this.sortCopyObject(o))
+        }
+        return result
+      }
+      return obj
+    }
+    const temp: any = {}
+    const keys = []
+    for (const key in obj) { keys.push(key) }
+    keys.sort()
+    for (const k of keys) {
+      temp[k] = this.sortCopyObject(obj[k])
+    }
+    return temp
+  }
+
   dump (): Doc[] {
     const result: Doc[] = []
     for (const doc of this.objects.values()) {
-      result.push(doc)
+      result.push(this.sortCopyObject(doc))
     }
     return result
   }
