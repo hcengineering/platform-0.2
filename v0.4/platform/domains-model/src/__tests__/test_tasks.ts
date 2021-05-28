@@ -13,14 +13,13 @@
 // limitations under the License.
 //
 
-import { Builder, getClass } from '@anticrm/model'
-import { TTask, model as taskModel } from '@anticrm/core-model/src/__tests__/test_tasks'
-import domains from '@anticrm/domains'
+import { model as taskModel } from '@anticrm/core-model/src/__tests__/test_tasks'
+import { taskIds } from '@anticrm/core/src/__tests__/tasks'
+import { Builder } from '@anticrm/model'
+import { primary } from '..'
 
 export function model (S: Builder): void {
-  const tclass = getClass(TTask.prototype)
-  tclass.postProcessing.push((model, classifier) => {
-    model.mixinDocument(classifier, domains.mixin.Indices, { primary: 'name' })
-  })
   taskModel(S)
+  // Mark name field as primary one.
+  primary(S, taskIds.class.Task, (S) => S.name)
 }

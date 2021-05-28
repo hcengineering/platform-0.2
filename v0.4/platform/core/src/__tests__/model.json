@@ -1,47 +1,47 @@
 [
   {
+    "_class": "class:core.Enum",
+    "_id": "enum:core.ClassifierKind",
+    "_kind": 2,
+    "_literals": {
+      "items": [
+        {
+          "_class": "class:core.EnumLiteral",
+          "_id": "enum:core.ClassifierKind.CLASS",
+          "label": "CLASS",
+          "ordinal": 0
+        },
+        {
+          "_class": "class:core.EnumLiteral",
+          "_id": "enum:core.ClassifierKind.MIXIN",
+          "label": "MIXIN",
+          "ordinal": 1
+        },
+        {
+          "_class": "class:core.EnumLiteral",
+          "_id": "enum:core.ClassifierKind.ENUM",
+          "label": "ENUM",
+          "ordinal": 2
+        }
+      ]
+    }
+  },
+  {
     "_attributes": {
       "items": [
         {
-          "_id": "class:core.Obj._id",
-          "name": "_id",
           "_class": "class:core.Attribute",
-          "type": {
-            "_class": "class:core.Type"
-          }
-        },
-        {
           "_id": "class:core.Obj._class",
           "name": "_class",
-          "_class": "class:core.Attribute",
           "type": {
-            "_id": "_class",
             "_class": "class:core.RefTo",
             "to": "class:core.Class"
           }
-        }
-      ]
-    },
-    "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "class:core.Obj"
-  },
-  {
-    "_attributes": {
-      "items": []
-    },
-    "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "class:core.Emb",
-    "_extends": "class:core.Obj"
-  },
-  {
-    "_attributes": {
-      "items": [
+        },
         {
-          "_id": "class:core.Doc._mixins",
-          "name": "_mixins",
           "_class": "class:core.Attribute",
+          "_id": "class:core.Obj._mixins",
+          "name": "_mixins",
           "type": {
             "_class": "class:core.Type"
           }
@@ -49,27 +49,131 @@
       ]
     },
     "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "class:core.Doc",
-    "_extends": "class:core.Obj"
+    "_domain": "model",
+    "_id": "class:core.Obj",
+    "_kind": 0
   },
   {
     "_attributes": {
       "items": [
         {
-          "_id": "class:core.Attribute.name",
-          "name": "name",
           "_class": "class:core.Attribute",
+          "_id": "class:core.Doc._id",
+          "name": "_id",
           "type": {
-            "_class": "class:core.Type"
+            "_class": "class:core.RefTo",
+            "to": "class:core.Doc"
+          }
+        }
+      ]
+    },
+    "_class": "class:core.Class",
+    "_domain": "model",
+    "_extends": "class:core.Obj",
+    "_id": "class:core.Doc",
+    "_kind": 0
+  },
+  {
+    "_attributes": {
+      "items": [
+        {
+          "_class": "class:core.Attribute",
+          "_id": "class:core.Emb._id",
+          "name": "_id",
+          "type": {
+            "_class": "class:core.RefTo",
+            "to": "class:core.Emb"
+          }
+        }
+      ]
+    },
+    "_class": "class:core.Class",
+    "_domain": "model",
+    "_extends": "class:core.Obj",
+    "_id": "class:core.Emb",
+    "_kind": 0
+  },
+  {
+    "_attributes": {
+      "items": [
+        {
+          "_class": "class:core.Attribute",
+          "_id": "class:core.Class._attributes",
+          "name": "_attributes",
+          "type": {
+            "_class": "class:core.CollectionOf",
+            "of": "class:core.Attribute"
           }
         },
         {
+          "_class": "class:core.Attribute",
+          "_id": "class:core.Class._extends",
+          "name": "_extends",
+          "type": {
+            "_class": "class:core.RefTo",
+            "to": "class:core.Class"
+          }
+        },
+        {
+          "_class": "class:core.Attribute",
+          "_id": "class:core.Class._native",
+          "name": "_native",
+          "type": {
+            "_class": "class:core.String"
+          }
+        },
+        {
+          "_class": "class:core.Attribute",
+          "_id": "class:core.Class._domain",
+          "name": "_domain",
+          "type": {
+            "_class": "class:core.String"
+          }
+        }
+      ]
+    },
+    "_class": "class:core.Class",
+    "_domain": "model",
+    "_extends": "class:core.Classifier",
+    "_id": "class:core.Class",
+    "_kind": 0
+  },
+  {
+    "_attributes": {
+      "items": [
+        {
+          "_class": "class:core.Attribute",
+          "_id": "class:core.Classifier._kind",
+          "name": "_kind",
+          "type": {
+            "_class": "class:core.EnumOf",
+            "of": "enum:core.ClassifierKind"
+          }
+        }
+      ]
+    },
+    "_class": "class:core.Class",
+    "_domain": "model",
+    "_extends": "class:core.Doc",
+    "_id": "class:core.Classifier",
+    "_kind": 0
+  },
+  {
+    "_attributes": {
+      "items": [
+        {
+          "_class": "class:core.Attribute",
+          "_id": "class:core.Attribute.name",
+          "name": "name",
+          "type": {
+            "_class": "class:core.String"
+          }
+        },
+        {
+          "_class": "class:core.Attribute",
           "_id": "class:core.Attribute.type",
           "name": "type",
-          "_class": "class:core.Attribute",
           "type": {
-            "_id": "type",
             "_class": "class:core.InstanceOf",
             "of": "class:core.Type"
           }
@@ -77,18 +181,56 @@
       ]
     },
     "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "class:core.Attribute",
+    "_domain": "model",
     "_extends": "class:core.Emb",
-    "_domain": "model"
+    "_id": "class:core.Attribute",
+    "_kind": 0
+  },
+  {
+    "_attributes": {
+      "items": []
+    },
+    "_class": "class:core.Class",
+    "_domain": "model",
+    "_extends": "class:core.Class",
+    "_id": "class:core.Mixin",
+    "_kind": 0
   },
   {
     "_attributes": {
       "items": [
         {
-          "_id": "class:core.Type._default",
-          "name": "_default",
           "_class": "class:core.Attribute",
+          "_id": "class:core.Enum._literals",
+          "name": "_literals",
+          "type": {
+            "_class": "class:core.CollectionOf",
+            "of": "class:core.EnumLiteral"
+          }
+        }
+      ]
+    },
+    "_class": "class:core.Class",
+    "_domain": "model",
+    "_extends": "class:core.Classifier",
+    "_id": "class:core.Enum",
+    "_kind": 0
+  },
+  {
+    "_attributes": {
+      "items": [
+        {
+          "_class": "class:core.Attribute",
+          "_id": "class:core.EnumLiteral.label",
+          "name": "label",
+          "type": {
+            "_class": "class:core.String"
+          }
+        },
+        {
+          "_class": "class:core.Attribute",
+          "_id": "class:core.EnumLiteral.ordinal",
+          "name": "ordinal",
           "type": {
             "_class": "class:core.Type"
           }
@@ -96,20 +238,88 @@
       ]
     },
     "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "class:core.Type",
+    "_domain": "model",
     "_extends": "class:core.Emb",
-    "_domain": "model"
+    "_id": "class:core.EnumLiteral",
+    "_kind": 0
   },
   {
     "_attributes": {
       "items": [
         {
+          "_class": "class:core.Attribute",
+          "_id": "class:core.Type._default",
+          "name": "_default",
+          "type": {
+            "_class": "class:core.Type"
+          }
+        }
+      ]
+    },
+    "_class": "class:core.Class",
+    "_domain": "model",
+    "_extends": "class:core.Obj",
+    "_id": "class:core.Type",
+    "_kind": 0
+  },
+  {
+    "_attributes": {
+      "items": []
+    },
+    "_class": "class:core.Class",
+    "_domain": "model",
+    "_extends": "class:core.Type",
+    "_id": "class:core.String",
+    "_kind": 0
+  },
+  {
+    "_attributes": {
+      "items": []
+    },
+    "_class": "class:core.Class",
+    "_domain": "model",
+    "_extends": "class:core.Type",
+    "_id": "class:core.Number",
+    "_kind": 0
+  },
+  {
+    "_attributes": {
+      "items": []
+    },
+    "_class": "class:core.Class",
+    "_domain": "model",
+    "_extends": "class:core.Type",
+    "_id": "class:core.Any",
+    "_kind": 0
+  },
+  {
+    "_attributes": {
+      "items": []
+    },
+    "_class": "class:core.Class",
+    "_domain": "model",
+    "_extends": "class:core.Type",
+    "_id": "class:core.Boolean",
+    "_kind": 0
+  },
+  {
+    "_attributes": {
+      "items": []
+    },
+    "_class": "class:core.Class",
+    "_domain": "model",
+    "_extends": "class:core.Type",
+    "_id": "class:core.Date",
+    "_kind": 0
+  },
+  {
+    "_attributes": {
+      "items": [
+        {
+          "_class": "class:core.Attribute",
           "_id": "class:core.RefTo.to",
           "name": "to",
-          "_class": "class:core.Attribute",
           "type": {
-            "_id": "to",
             "_class": "class:core.RefTo",
             "to": "class:core.Class"
           }
@@ -117,20 +327,19 @@
       ]
     },
     "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "class:core.RefTo",
+    "_domain": "model",
     "_extends": "class:core.Type",
-    "_domain": "model"
+    "_id": "class:core.RefTo",
+    "_kind": 0
   },
   {
     "_attributes": {
       "items": [
         {
+          "_class": "class:core.Attribute",
           "_id": "class:core.InstanceOf.of",
           "name": "of",
-          "_class": "class:core.Attribute",
           "type": {
-            "_id": "of",
             "_class": "class:core.RefTo",
             "to": "class:core.Class"
           }
@@ -138,20 +347,39 @@
       ]
     },
     "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "class:core.InstanceOf",
+    "_domain": "model",
     "_extends": "class:core.Type",
-    "_domain": "model"
+    "_id": "class:core.InstanceOf",
+    "_kind": 0
   },
   {
     "_attributes": {
       "items": [
         {
+          "_class": "class:core.Attribute",
+          "_id": "class:core.CollectionOf.of",
+          "name": "of",
+          "type": {
+            "_class": "class:core.RefTo",
+            "to": "class:core.Class"
+          }
+        }
+      ]
+    },
+    "_class": "class:core.Class",
+    "_domain": "model",
+    "_extends": "class:core.Type",
+    "_id": "class:core.CollectionOf",
+    "_kind": 0
+  },
+  {
+    "_attributes": {
+      "items": [
+        {
+          "_class": "class:core.Attribute",
           "_id": "class:core.EnumOf.of",
           "name": "of",
-          "_class": "class:core.Attribute",
           "type": {
-            "_id": "of",
             "_class": "class:core.RefTo",
             "to": "class:core.Enum"
           }
@@ -159,274 +387,217 @@
       ]
     },
     "_class": "class:core.Class",
-    "_kind": 0,
+    "_domain": "model",
+    "_extends": "class:core.Type",
     "_id": "class:core.EnumOf",
-    "_extends": "class:core.Type",
-    "_domain": "model"
+    "_kind": 0
   },
   {
     "_attributes": {
       "items": [
         {
-          "_id": "class:core.CollectionOf.of",
-          "name": "of",
           "_class": "class:core.Attribute",
+          "_id": "class:core.Tx._date",
+          "name": "_date",
           "type": {
-            "_id": "of",
-            "_class": "class:core.RefTo",
-            "to": "class:core.Class"
+            "_class": "class:core.Number"
           }
-        }
-      ]
-    },
-    "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "class:core.CollectionOf",
-    "_extends": "class:core.Type",
-    "_domain": "model"
-  },
-  {
-    "_attributes": {
-      "items": [
+        },
         {
-          "_id": "class:core.Classifier._kind",
-          "name": "_kind",
           "_class": "class:core.Attribute",
+          "_id": "class:core.Tx._user",
+          "name": "_user",
           "type": {
-            "_class": "class:core.Type"
+            "_class": "class:core.String"
           }
         }
       ]
     },
     "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "class:core.Classifier",
+    "_domain": "model",
     "_extends": "class:core.Doc",
-    "_domain": "model"
+    "_id": "class:core.Tx",
+    "_kind": 0
   },
   {
-    "_attributes": {
+    "_class": "class:core.Enum",
+    "_id": "enum:core.TaskStatus",
+    "_kind": 2,
+    "_literals": {
       "items": [
         {
-          "_id": "class:core.Class._attributes",
-          "name": "_attributes",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_id": "_attributes",
-            "_class": "class:core.CollectionOf",
-            "of": "class:core.Attribute"
-          }
+          "_class": "class:core.EnumLiteral",
+          "_id": "enum:core.TaskStatus.Open",
+          "label": "Open",
+          "ordinal": 0
         },
         {
-          "_id": "class:core.Class._extends",
-          "name": "_extends",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_id": "_extends",
-            "_class": "class:core.RefTo",
-            "to": "class:core.Class"
-          }
+          "_class": "class:core.EnumLiteral",
+          "_id": "enum:core.TaskStatus.Close",
+          "label": "Close",
+          "ordinal": 1
         },
         {
-          "_id": "class:core.Class._native",
-          "name": "_native",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_class": "class:core.Type"
-          }
+          "_class": "class:core.EnumLiteral",
+          "_id": "enum:core.TaskStatus.Resolved",
+          "label": "Resolved",
+          "ordinal": 100
         },
         {
-          "_id": "class:core.Class._domain",
-          "name": "_domain",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_class": "class:core.Type"
-          }
+          "_class": "class:core.EnumLiteral",
+          "_id": "enum:core.TaskStatus.InProgress",
+          "label": "InProgress",
+          "ordinal": 101
         }
       ]
-    },
-    "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "class:core.Class",
-    "_extends": "class:core.Classifier",
-    "_domain": "model"
+    }
   },
   {
-    "_attributes": {
-      "items": []
-    },
-    "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "class:core.Mixin",
-    "_extends": "class:core.Class",
-    "_domain": "model"
-  },
-  {
-    "_attributes": {
+    "_class": "class:core.Enum",
+    "_id": "enum:core.TaskReproduce",
+    "_kind": 2,
+    "_literals": {
       "items": [
         {
-          "_id": "class:core.EnumLiteral.ordinal",
-          "name": "ordinal",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_class": "class:core.Type"
-          }
+          "_class": "class:core.EnumLiteral",
+          "_id": "enum:core.TaskReproduce.Always",
+          "label": "Always",
+          "ordinal": "always"
         },
         {
-          "_id": "class:core.EnumLiteral.label",
-          "name": "label",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_class": "class:core.Type"
-          }
+          "_class": "class:core.EnumLiteral",
+          "_id": "enum:core.TaskReproduce.Rare",
+          "label": "Rare",
+          "ordinal": "rare"
+        },
+        {
+          "_class": "class:core.EnumLiteral",
+          "_id": "enum:core.TaskReproduce.Sometimes",
+          "label": "Sometimes",
+          "ordinal": "sometimes"
         }
       ]
-    },
-    "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "class:core.EnumLiteral",
-    "_extends": "class:core.Emb",
-    "_domain": "model"
+    }
   },
   {
     "_attributes": {
       "items": [
         {
-          "_id": "class:core.Enum._literals",
-          "name": "_literals",
           "_class": "class:core.Attribute",
-          "type": {
-            "_id": "_literals",
-            "_class": "class:core.CollectionOf",
-            "of": "class:core.Attribute"
-          }
-        }
-      ]
-    },
-    "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "class:core.Enum",
-    "_extends": "class:core.Classifier",
-    "_domain": "model"
-  },
-  {
-    "_attributes": {
-      "items": []
-    },
-    "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "class:core.String",
-    "_extends": "class:core.Type",
-    "_domain": "model"
-  },
-  {
-    "_attributes": {
-      "items": []
-    },
-    "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "class:core.Number",
-    "_extends": "class:core.Type",
-    "_domain": "model"
-  },
-  {
-    "_attributes": {
-      "items": []
-    },
-    "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "class:core.Boolean",
-    "_extends": "class:core.Type",
-    "_domain": "model"
-  },
-  {
-    "_attributes": {
-      "items": []
-    },
-    "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "class:core.Date",
-    "_extends": "class:core.Type",
-    "_domain": "model"
-  },
-  {
-    "_attributes": {
-      "items": [
-        {
-          "_id": "core.class.TaskObj.name",
+          "_id": "class:core.Task.name",
           "name": "name",
-          "_class": "class:core.Attribute",
           "type": {
-            "_class": "class:core.Type"
+            "_class": "class:core.String"
           }
         },
         {
-          "_id": "core.class.TaskObj.description",
+          "_class": "class:core.Attribute",
+          "_id": "class:core.Task.description",
           "name": "description",
-          "_class": "class:core.Attribute",
           "type": {
-            "_class": "class:core.Type"
+            "_class": "class:core.String"
           }
         },
         {
-          "_id": "core.class.TaskObj.rate",
+          "_class": "class:core.Attribute",
+          "_id": "class:core.Task.rate",
           "name": "rate",
-          "_class": "class:core.Attribute",
           "type": {
-            "_class": "class:core.Type"
+            "_class": "class:core.Number"
           }
         },
         {
-          "_id": "core.class.TaskObj.comments",
+          "_class": "class:core.Attribute",
+          "_id": "class:core.Task.comments",
           "name": "comments",
-          "_class": "class:core.Attribute",
           "type": {
-            "_id": "comments",
             "_class": "class:core.CollectionOf",
-            "of": "core.class.TaskComment"
+            "of": "class:core.TaskComment"
           }
         },
         {
-          "_id": "core.class.TaskObj.eta",
+          "_class": "class:core.Attribute",
+          "_id": "class:core.Task.eta",
           "name": "eta",
-          "_class": "class:core.Attribute",
           "type": {
-            "_id": "eta",
             "_class": "class:core.InstanceOf",
-            "of": "core.class.TaskEstimate"
+            "of": "class:core.TaskEstimate"
+          }
+        },
+        {
+          "_class": "class:core.Attribute",
+          "_id": "class:core.Task.status",
+          "name": "status",
+          "type": {
+            "_class": "class:core.EnumOf",
+            "of": "enum:core.TaskStatus"
+          }
+        },
+        {
+          "_class": "class:core.Attribute",
+          "_id": "class:core.Task.reproduce",
+          "name": "reproduce",
+          "type": {
+            "_class": "class:core.EnumOf",
+            "of": "enum:core.TaskReproduce"
           }
         }
       ]
     },
     "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "core.class.TaskObj",
     "_extends": "class:core.Doc",
-    "_domain": "model"
+    "_id": "class:core.Task",
+    "_kind": 0
   },
   {
     "_attributes": {
       "items": [
         {
-          "_id": "core.class.TaskComment.message",
+          "_class": "class:core.Attribute",
+          "_id": "class:core.TaskEstimate.rom",
+          "name": "rom",
+          "type": {
+            "_class": "class:core.Number"
+          }
+        },
+        {
+          "_class": "class:core.Attribute",
+          "_id": "class:core.TaskEstimate.eta",
+          "name": "eta",
+          "type": {
+            "_class": "class:core.Number"
+          }
+        }
+      ]
+    },
+    "_class": "class:core.Class",
+    "_extends": "class:core.Obj",
+    "_id": "class:core.TaskEstimate",
+    "_kind": 0
+  },
+  {
+    "_attributes": {
+      "items": [
+        {
+          "_class": "class:core.Attribute",
+          "_id": "class:core.TaskComment.message",
           "name": "message",
-          "_class": "class:core.Attribute",
           "type": {
-            "_class": "class:core.Type"
+            "_class": "class:core.String"
           }
         },
         {
-          "_id": "core.class.TaskComment.author",
+          "_class": "class:core.Attribute",
+          "_id": "class:core.TaskComment.author",
           "name": "author",
-          "_class": "class:core.Attribute",
           "type": {
-            "_class": "class:core.Type"
+            "_class": "class:core.String"
           }
         },
         {
-          "_id": "core.class.TaskComment.date",
-          "name": "date",
           "_class": "class:core.Attribute",
+          "_id": "class:core.TaskComment.date",
+          "name": "date",
           "type": {
             "_class": "class:core.Type"
           }
@@ -434,54 +605,26 @@
       ]
     },
     "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "core.class.TaskComment",
     "_extends": "class:core.Emb",
-    "_domain": "model"
+    "_id": "class:core.TaskComment",
+    "_kind": 0
   },
   {
     "_attributes": {
       "items": [
         {
-          "_id": "core.mixin.TaskMixin.textValue",
-          "name": "textValue",
           "_class": "class:core.Attribute",
+          "_id": "mixin:core.TaskMixin.textValue",
+          "name": "textValue",
           "type": {
-            "_class": "class:core.Type"
+            "_class": "class:core.String"
           }
         }
       ]
     },
     "_class": "class:core.Mixin",
-    "_kind": 1,
-    "_id": "core.mixin.TaskMixin",
-    "_extends": "core.class.TaskObj"
-  },
-  {
-    "_attributes": {
-      "items": [
-        {
-          "_id": "core.class.TaskEstimate.rom",
-          "name": "rom",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_class": "class:core.Type"
-          }
-        },
-        {
-          "_id": "core.class.TaskEstimate.eta",
-          "name": "eta",
-          "_class": "class:core.Attribute",
-          "type": {
-            "_class": "class:core.Type"
-          }
-        }
-      ]
-    },
-    "_class": "class:core.Class",
-    "_kind": 0,
-    "_id": "core.class.TaskEstimate",
-    "_extends": "class:core.Emb",
-    "_domain": "model"
+    "_extends": "class:core.Task",
+    "_id": "mixin:core.TaskMixin",
+    "_kind": 1
   }
 ]

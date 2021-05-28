@@ -1,88 +1,58 @@
-import core, { Class, Collection, Doc, MODEL_DOMAIN, Ref } from '@anticrm/core'
-import { TDoc, TEmb } from '@anticrm/core-model'
-import domains, { Application, CollectionReference, Indices, ShortID, Space, SpaceUser, Title, TitleSource, TITLE_DOMAIN, VDoc } from '@anticrm/domains'
-import { Builder, Class$, CollectionOf$, getClass, Mixin$, Prop, RefTo$ } from '@anticrm/model'
-import { TReference } from './references'
-import { TAddItemTx, TCreateTx, TDeleteTx, TItemTx, TObjectTx, TRemoveItemTx, TTx, TUpdateItemTx, TUpdateTx } from './tx'
+import core, { Attribute, Class, Doc, DocumentValueOmit, Enum, fieldId, FieldId, Mixin, MODEL_DOMAIN, Obj, Ref } from '@anticrm/core'
+import domains, {
+  AddItemTx, Application, CollectionReference, CreateTx, DeleteTx, Indices, ItemTx, ObjectTx, Reference, RemoveItemTx,
+  ShortID, Space, SpaceUser, Title, TitleSource, UpdateItemTx, UpdateTx, UXAttribute, UXObject, VDoc
+} from '@anticrm/domains'
+import { Builder } from '@anticrm/model'
 
-export function Primary () {
-  return function (target: any, propertyKey: string): void {
-    const classifier = getClass(target)
-
-    classifier.postProcessing.push((model, cl) => {
-      model.mixinDocument(cl, domains.mixin.Indices, { primary: propertyKey })
-    })
-  }
+/**
+ * Mark some field as as primary to be indexed.
+ */
+export function primary<T extends Obj> (S: Builder, _id: Ref<Class<T>>, propertyKey: FieldId<T>): void {
+  S.mixin(_id, core.class.Class, domains.mixin.Indices, { primary: propertyKey(fieldId<T>()) })
 }
 
-@Class$(domains.class.SpaceUser, core.class.Emb, MODEL_DOMAIN)
-export class TSpaceUser extends TEmb implements SpaceUser {
-  @Prop() userId!: string
-  @Prop() owner!: boolean
+/**
+ * Apply an UX mixin to Class attribute.
+ */
+export function uxAttribute< T extends Doc> (S: Builder, _id: Ref<Class<T>>, _aid: Ref<Attribute>, values: DocumentValueOmit<UXAttribute, Attribute>): void {
+  S.mixinEmb(_id, core.class.Attribute, (ss) => ss._attributes, _aid, domains.mixin.UXAttribute, values)
 }
 
-@Class$(domains.class.Space, core.class.Doc, MODEL_DOMAIN)
-export class TSpace extends TDoc implements Space {
-  @Primary()
-  @Prop() name!: string
-
-  @Prop() description!: string
-
-  @RefTo$(domains.class.Application) application!: Ref<Application>
-
-  @Prop() applicationSettings?: any
-
-  @Prop() spaceKey!: string
-
-  @CollectionOf$(domains.class.SpaceUser) users!: Collection<SpaceUser>
-
-  @Prop(core.class.Boolean) isPublic!: boolean
-
-  @Prop(core.class.Boolean) archived!: boolean
-}
-
-@Class$(domains.class.VDoc, core.class.Doc, MODEL_DOMAIN)
-export class TVDoc extends TDoc implements VDoc {
-  @RefTo$(domains.class.Space) _space!: Ref<Space>
-  @Prop() _createdOn!: number
-  @Prop() _createdBy!: string
-  @Prop() _modifiedOn?: number
-  @Prop() _modifiedBy?: string
-}
-
-@Mixin$(domains.mixin.ShortID, domains.class.VDoc)
-export class TVShortID extends TVDoc implements ShortID {
-  @Prop() shortId!: string
-}
-@Class$(domains.class.Application, core.class.Doc, MODEL_DOMAIN)
-export class TApplication extends TDoc implements Application {
-}
-
-@Class$(domains.class.Title, core.class.Doc, TITLE_DOMAIN)
-export class TTitle extends TDoc implements Title {
-  @RefTo$(core.class.Class) _objectClass!: Ref<Class<Doc>>
-  @RefTo$(core.class.Doc) _objectId!: Ref<Doc>
-  @Prop() title!: string | number
-  @Prop() source!: TitleSource
-}
-
-@Mixin$(domains.mixin.Indices, core.class.Doc)
-export class TIndexesClass extends TDoc implements Indices {
-  @Prop() primary!: string
-}
-
-///
-@Mixin$(domains.mixin.CollectionReference, core.class.Emb)
-export class TCollectionReference extends TEmb implements CollectionReference {
-  @RefTo$(core.class.Doc) _parentId!: Ref<Doc>
-  @RefTo$(core.class.Class) _parentClass!: Ref<Class<Doc>>
-  @Prop() _collection!: string
-  @RefTo$(domains.class.Space) _parentSpace!: Ref<Space>
+/**
+ * Apply an UX mixin to class.
+ */
+export function uxClass< T extends Doc> (S: Builder, _id: Ref<Class<T>>, values: DocumentValueOmit<UXObject<T>, Class<T>>): void {
+  S.mixin(_id, core.class.Class, domains.mixin.UXAttribute, values)
 }
 
 export function model (S: Builder): void {
-  S.add(TReference, TTitle)
-  S.add(TTx, TCreateTx, TUpdateTx, TDeleteTx, TObjectTx, TAddItemTx, TUpdateItemTx, TRemoveItemTx, TItemTx)
-  S.add(TIndexesClass, TCollectionReference, TVShortID, TVDoc)
-  S.add(TSpace, TSpaceUser)
+  S.loadEnum(__filename, domains.enum, {
+    TitleSource: { } as Enum<TitleSource>, // eslint-disable-line
+  })
+  S.loadClass(__filename, domains.class, {
+    AddItemTx: { } as Class<AddItemTx>, // eslint-disable-line
+    Application: { } as Class<Application>, // eslint-disable-line
+    CreateTx: { } as Class<CreateTx>, // eslint-disable-line
+    DeleteTx: { } as Class<DeleteTx>, // eslint-disable-line
+    ItemTx: { } as Class<ItemTx>, // eslint-disable-line
+    ObjectTx: { } as Class<ObjectTx>, // eslint-disable-line
+    Reference: { } as Class<Reference>, // eslint-disable-line
+    RemoveItemTx: { } as Class<RemoveItemTx>, // eslint-disable-line
+    Space: { } as Class<Space>, // eslint-disable-line
+    SpaceUser: { } as Class<SpaceUser>, // eslint-disable-line
+    Title: { } as Class<Title>, // eslint-disable-line
+    UpdateItemTx: { } as Class<UpdateItemTx>, // eslint-disable-line
+    UpdateTx: { } as Class<UpdateTx>, // eslint-disable-line
+    VDoc: { } as Class<VDoc>, // eslint-disable-line
+  }, MODEL_DOMAIN)
+
+  S.loadMixin(__filename, domains.mixin, {
+    CollectionReference: { } as Mixin<CollectionReference>, // eslint-disable-line
+    Indices: { } as Mixin<Indices>, // eslint-disable-line
+    ShortID: { } as Mixin<ShortID>, // eslint-disable-line
+
+    UXAttribute: { } as Class<UXAttribute>, // eslint-disable-line
+    UXObject: { } as Class<UXObject<Doc>> // eslint-disable-line
+  })
 }

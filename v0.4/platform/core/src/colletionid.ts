@@ -17,10 +17,10 @@ import { Collection, Obj } from './classes'
 
 type TxCollectionOf<A> = A extends Collection<any> ? string : never
 
-export type FieldBuilder<T> = {
+export type CollectionBuilder<T> = {
   [P in keyof T]-?: TxCollectionOf<T[P]>
 }
-export type TxCollectionId<T> = FieldBuilder<T>
+export type TxCollectionId<T> = CollectionBuilder<T>
 
 export type CollectionId<T> = (s: TxCollectionId<T>) => string
 

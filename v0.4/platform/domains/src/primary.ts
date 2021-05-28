@@ -13,11 +13,11 @@
 // limitations under the License.
 //
 
-import { Doc } from '@anticrm/core'
+import { Class, Doc } from '@anticrm/core'
 
 /**
  * Indices
  */
-export interface Indices extends Doc {
+export interface Indices extends Class<Doc> {
   primary: string
 }

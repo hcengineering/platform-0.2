@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import core, { AnyLayout, Class, Doc, DomainIndex, Emb, Model, Obj, Ref, Storage, Tx, TxContext } from '@anticrm/core'
+import core, { AnyLayout, Class, Doc, TransactionProtocol, Emb, Model, Obj, Ref, Storage, Tx, TxContext } from '@anticrm/core'
 import {
   MessageMarkType, parseMessage, ReferenceMark, traverseMarks, traverseMessage
 } from '@anticrm/text'
@@ -32,7 +32,7 @@ import { processTransactions } from '../tx_utils'
  * Example:
  * Hello [Zaz](ref://chunter.Page#600eb7121900e6e361085f20)
  */
-export class ReferenceIndex implements DomainIndex {
+export class ReferenceIndex implements TransactionProtocol {
   private readonly modelDb: Model
   private readonly storage: Storage
   private readonly textAttributes = new Map<Ref<Class<Obj>>, string[]>()

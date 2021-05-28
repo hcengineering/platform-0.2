@@ -1,7 +1,7 @@
 /**
  * Operation direction, is it came from server or it is own operation.
  */
-import { Class, Doc, Emb, Obj, Ref } from './classes'
+import { Class, Collection, Doc, Emb, Obj, Ref } from './classes'
 import { CollectionId } from './colletionid'
 
 export enum TxContextSource {
@@ -35,7 +35,7 @@ export function txContext (source: TxContextSource = TxContextSource.Client, net
   return doc
 }
 
-export interface DomainIndex {
+export interface TransactionProtocol {
   tx: (ctx: TxContext, tx: Tx) => Promise<any>
 }
 
@@ -68,7 +68,7 @@ export interface DomainProtocol {
 /**
  * Define a storage with read/write access.
  */
-export interface Storage extends DomainIndex, DocumentProtocol {
+export interface Storage extends TransactionProtocol, DocumentProtocol {
 }
 
 ///
@@ -85,7 +85,7 @@ export interface RegExpression {
   $options?: string
 }
 
-export type ObjQueryType<T> = T extends Emb ? DocumentQuery<T> : T | RegExpression
+export type ObjQueryType<T> = T extends Obj ? DocumentQuery<T> : T | RegExpression
 export type ArrayQueryType<A> = A extends any[] ? never : ObjQueryType<A>
 
 /**
@@ -100,10 +100,12 @@ export type DocumentQuery<T> = {
 
 // A possible values for document during creation.
 
-type TWithoutEmbArray<A> = A extends any[] ? never: OmitObj<A, Emb> | A
+type NoCollection<T> = { [K in keyof T]: T[K] extends Collection<any> ? never : T[K] extends any[] ? never : K }[keyof T]
+
+export type OmitCA<T> = Pick<T, NoCollection<T>>
 
 type DocumentValueRaw<T> = {
-  [P in keyof T]: TWithoutEmbArray<T[P]>
+  [P in keyof T]: OmitObj<T[P], Obj> | T[P]
 }
 
 type OmitPartial<T, P> = Omit<T, keyof P> & Partial<P>
@@ -112,8 +114,9 @@ type OmitObj<T, E extends Obj> = T extends E ? DocumentValueRaw<OmitPartial<T, E
 /**
  * A values of T with some parts made partial, like _class, _id.
  */
-export type DocumentValue<T> =
-  OmitObj<T, Emb> | OmitObj<T, Doc> | OmitObj<T, Obj> | T
+export type DocumentValue<T> = OmitCA<OmitObj<T, Emb> | OmitObj<T, Doc> | OmitObj<T, Obj>>
+
+export type DocumentValueOmit<T, P extends Obj> = OmitCA<OmitObj<T, P>>
 
 // Partial with partial embedded objects
 type TPartialWithoutEmbArray<A> = A extends any[] ? never: Partial<A>
@@ -181,9 +184,9 @@ export interface CoreProtocol extends DocumentProtocol {
 }
 
 export class TxProcessor {
-  private readonly indices: DomainIndex[]
+  private readonly indices: TransactionProtocol[]
 
-  constructor (indices: DomainIndex[]) {
+  constructor (indices: TransactionProtocol[]) {
     this.indices = indices
   }
 

@@ -13,7 +13,5 @@
 // limitations under the License.
 //
 
-import Builder from './builder'
-
-export * from './dsl'
-export { Builder }
+export { Builder } from './builder'
+export { createModelBuilder, ModelBuilder } from './model_builder'

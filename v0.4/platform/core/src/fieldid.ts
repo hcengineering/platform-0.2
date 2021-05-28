@@ -13,16 +13,22 @@
 // limitations under the License.
 //
 
-import { TransactionProtocol, Storage, Tx, TxContext } from '@anticrm/core'
+import { Obj } from './classes'
 
-export class TxIndex implements TransactionProtocol {
-  private readonly storage: Storage
+export type FieldBuilder<T> = {
+  [P in keyof T]-?: string
+}
+export type FieldId<T> = (s: FieldBuilder<T>) => string
 
-  constructor (storage: Storage) {
-    this.storage = storage
+/**
+ * Construct helper object to specify a field name with respect to type fields.
+ * @param clazz - an object class to build operation for.
+ */
+export function fieldId<T extends Obj> (): FieldBuilder<T> {
+  const ph: ProxyHandler<any> = {
+    get (target, property) { // Trap for getting property values
+      return property
+    }
   }
-
-  async tx (ctx: TxContext, tx: Tx): Promise<any> {
-    await this.storage.tx(ctx, tx)
-  }
+  return new Proxy({}, ph) as FieldBuilder<T>
 }

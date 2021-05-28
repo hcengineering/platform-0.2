@@ -15,7 +15,7 @@
 
 /* eslint-env jest */
 
-import core, { Class, Doc, Model, Ref, txContext } from '@anticrm/core'
+import core, { Doc, Model, Ref, txContext } from '@anticrm/core'
 import { ModelStorage } from '../model_storage'
 import { getPrimaryKey } from '../primary_utils'
 import { create, ObjectTx } from '../tx'
@@ -28,7 +28,7 @@ describe('core tests', () => {
   it('returns primary key of class', () => {
     expect(getPrimaryKey(model, core.class.Emb))
       .toBeUndefined()
-    expect(getPrimaryKey(model, 'core.class.TaskObj' as Ref<Class<Doc>>))
+    expect(getPrimaryKey(model, taskIds.class.Task))
       .toEqual('name')
   })
 

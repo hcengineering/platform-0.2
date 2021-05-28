@@ -89,7 +89,7 @@ export class ModelStorage implements Storage, TxOperations {
     const value = this.model.createDocument(tx._itemClass, tx.attributes, tx._itemId)
     let cl: Collection<Emb> = (obj as any)[attr.key]
     if (cl === undefined) {
-      const newCl = { items: [] }
+      const newCl = { items: [] as Emb[] }
       cl = newCl as Collection<Emb>
       (obj as any)[attr.key] = cl
     }

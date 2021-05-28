@@ -64,7 +64,7 @@ export class PlatformError<P extends Record<string, any>> extends Error {
     this.status = status
   }
 }
- 
+
 // I D E N T I T Y
 
 type Value = string | Record<string, string>
@@ -74,8 +74,9 @@ function transform (prefix: string, namespace: Namespace): Namespace {
   const result: Namespace = {}
   for (const key in namespace) {
     const value = namespace[key]
-    result[key] = (typeof value === 'string') ? prefix + '.' + key : 
-      transform(key + ':' + prefix, value as Namespace) as Value
+    result[key] = (typeof value === 'string')
+      ? prefix + '.' + key
+      : transform(key + ':' + prefix, value as Namespace) as Value
   }
   return result
 }
@@ -97,13 +98,14 @@ export const Code = identify('status' as Component, {
  */
 export const OK = new Status(Severity.OK, Code.OK, {})
 
- /**
+/**
   * Creates unknown error status
   * @public
   */
 export function unknownError (err: Error): Status {
-  return (err instanceof PlatformError) ? err.status : 
-    new Status(Severity.ERROR, Code.UnknownError, { message: err.message })
+  return (err instanceof PlatformError)
+    ? err.status
+    : new Status(Severity.ERROR, Code.UnknownError, { message: err.message })
 }
 
 // R E S O U R C E S
@@ -117,9 +119,9 @@ export type IntlString<T extends Record<string, any> = {}> = string & { __intl_s
  * Another example of metadata is an asset URL. The logic behind providing asset URLs as metadata is
  * we know URL at compile time only and URLs vary depending on deployment options.
  */
- export type Metadata<T> = string & { __metadata: T }
+export type Metadata<T> = string & { __metadata: T }
 
- /**
+/**
  * Platform Resource Identifier (PRI)
  *
  * @remarks
@@ -148,7 +150,11 @@ export type IntlString<T extends Record<string, any> = {}> = string & { __intl_s
  */
 export type Resource<T> = string & { __resource: T }
 
-// U I 
+// U I
 
 type URL = string
 export type Asset = Metadata<URL>
+
+export type AnySvelteComponent = any // SvelteComponent<{}>
+export type UIComponent<C extends AnySvelteComponent> = Resource<C>
+export type AnyComponent = UIComponent<AnySvelteComponent>

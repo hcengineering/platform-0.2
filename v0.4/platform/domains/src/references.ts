@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { Class, Doc, Emb, Obj, Ref } from '@anticrm/core'
+import { Class, Doc, Emb, Ref } from '@anticrm/core'
 import { VDoc } from './vdoc'
 
 // R E F E R E N C E S
@@ -36,8 +36,8 @@ export interface Reference extends Doc {
   _sourceField: string // A field we have reference from
   _sourceIndex: number // Index inside a field, if multiple references.
 
-  _targetId?: Ref<Obj> // We could reference both documents and embedded ones.
-  _targetClass: Ref<Class<Obj>>
+  _targetId?: Ref<Doc> // We could reference both documents and embedded ones.
+  _targetClass: Ref<Class<Doc>>
 }
 
 /**

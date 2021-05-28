@@ -13,13 +13,13 @@
 // limitations under the License.
 //
 
-import { Class, Doc, DomainIndex, Model, Ref, Storage, Tx, TxContext } from '@anticrm/core'
+import { Class, Doc, TransactionProtocol, Model, Ref, Storage, Tx, TxContext } from '@anticrm/core'
 import domains from '..'
 import { ObjectTx } from '../tx'
 /**
  * Index to pass through a specified class to storage.
  */
-export class PassthroughsIndex implements DomainIndex {
+export class PassthroughsIndex implements TransactionProtocol {
   protected readonly modelDb: Model
   protected readonly storage: Storage
   private readonly matchClass: Ref<Class<Doc>>
