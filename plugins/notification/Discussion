@@ -1,0 +1,22 @@
+Necessary to develop a system new events notifier.
+Should be possible to subscribe to notify about a specific object, or a space
+Necessary to handle events that occur when the user is offline and online.
+Necessary to provide for the correct showing of notifications in case  of a user connected from several clients at the same time (for example, left the work PC on, with an open platform, and during work did not read all current notifications, and join from the home PC, then the user must see all notifications)
+Based on the above criteria, I consider it necessary to implement a mechanism for working with notifications on the server side.
+I suggest creating a NotificationIndex and after creating / updating the object, check the subscribers of the object and the space of the object and create notifications for them
+
+Notification {
+    _userId: StringProperty,
+    _createdOn: DateProperty,
+    _class: Ref<Class<Doc>>,
+    _objectSpace: Ref<Space>,
+    _objectId: Ref<Doc>
+}
+
+To store subscribers, I propose to supplement the SpaceUser interface with the "enableNotification: boolean" field and the VDoc interface with the "notificationList: string[]" field containing the userId of the subscribers
+
+In case of notification will be read, the notification object must be delete. I propose to implement the read control on the server side when the notification object gets into the find / findone result,
+but this will require: 
+1. break livequery if the current browser tab is inactive (at the moment, information is updated even when another browser tab is active or it is minimized, which creates a extra load on the user's PC)
+2. Use of virtualization mechanisms. 
+As alternative way we can manually mark as read, but I think this is a bad option. 
