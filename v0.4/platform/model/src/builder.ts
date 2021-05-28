@@ -65,7 +65,8 @@ export class Builder {
       this.collectedIds[sourceId] = id as Ref<Enum<any>>
       const _objectId = id as unknown as Ref<Class<Obj>>
       const { _literals, _class, _id, ..._value } = collector.buildEnum(key, _objectId)
-      this.builder.addDoc<Enum<any>>(_class, _value, _id as Ref<Enum<any>>)
+      const _evalue = { ..._value, _literals: { items: [] as EnumLiteral[] } }
+      this.builder.addDoc<Enum<any>>(_class, _evalue, _id as Ref<Enum<any>>)
       for (const literal of _literals.items ?? []) {
         this.builder.addEmb<Enum<any>, EnumLiteral>(_class, _id as Ref<Enum<any>>, (ci) => ci._literals, core.class.EnumLiteral, literal)
       }
@@ -93,7 +94,8 @@ export class Builder {
       }
       const _objectId = id as unknown as Ref<Class<Obj>>
       const { _id, _class, _attributes, ..._value } = collector.buildClass(_kind, key, _objectId, cc, this.collectedIds)
-      this.builder.addDoc<Class<Obj>>(_class, _value, _id as Ref<Class<Obj>>)
+      const _evalue = { ..._value, _attributes: { items: [] as Attribute[] } }
+      this.builder.addDoc<Class<Obj>>(_class, _evalue, _id as Ref<Class<Obj>>)
       for (const attribute of _attributes.items ?? []) {
         this.builder.addEmb<Class<Obj>, Attribute>(_class, _id as Ref<Class<Obj>>, (ci) => ci._attributes, core.class.Attribute, attribute)
       }

@@ -413,14 +413,14 @@ export class Model {
 
   private sortCopyObject (obj: any): any {
     if (typeof obj !== 'object') {
-      if (obj instanceof Array) {
-        const result = []
-        for (const o of (obj)) {
-          result.push(this.sortCopyObject(o))
-        }
-        return result
-      }
       return obj
+    }
+    if (obj instanceof Array) {
+      const result = []
+      for (const o of obj) {
+        result.push(this.sortCopyObject(o))
+      }
+      return result
     }
     const temp: any = {}
     const keys = []

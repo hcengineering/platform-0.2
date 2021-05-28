@@ -4,32 +4,32 @@
     "_id": "enum:core.ClassifierKind",
     "_kind": 2,
     "_literals": {
-      "items": {
-        "0": {
+      "items": [
+        {
           "_class": "class:core.EnumLiteral",
           "_id": "enum:core.ClassifierKind.CLASS",
           "label": "CLASS",
           "ordinal": 0
         },
-        "1": {
+        {
           "_class": "class:core.EnumLiteral",
           "_id": "enum:core.ClassifierKind.MIXIN",
           "label": "MIXIN",
           "ordinal": 1
         },
-        "2": {
+        {
           "_class": "class:core.EnumLiteral",
           "_id": "enum:core.ClassifierKind.ENUM",
           "label": "ENUM",
           "ordinal": 2
         }
-      }
+      ]
     }
   },
   {
     "_attributes": {
-      "items": {
-        "0": {
+      "items": [
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.Obj._class",
           "name": "_class",
@@ -38,7 +38,7 @@
             "to": "class:core.Class"
           }
         },
-        "1": {
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.Obj._mixins",
           "name": "_mixins",
@@ -46,7 +46,7 @@
             "_class": "class:core.Type"
           }
         }
-      }
+      ]
     },
     "_class": "class:core.Class",
     "_domain": "model",
@@ -55,8 +55,8 @@
   },
   {
     "_attributes": {
-      "items": {
-        "0": {
+      "items": [
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.Doc._id",
           "name": "_id",
@@ -65,7 +65,7 @@
             "to": "class:core.Doc"
           }
         }
-      }
+      ]
     },
     "_class": "class:core.Class",
     "_domain": "model",
@@ -75,8 +75,8 @@
   },
   {
     "_attributes": {
-      "items": {
-        "0": {
+      "items": [
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.Emb._id",
           "name": "_id",
@@ -85,7 +85,7 @@
             "to": "class:core.Emb"
           }
         }
-      }
+      ]
     },
     "_class": "class:core.Class",
     "_domain": "model",
@@ -95,8 +95,8 @@
   },
   {
     "_attributes": {
-      "items": {
-        "0": {
+      "items": [
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.Class._attributes",
           "name": "_attributes",
@@ -105,7 +105,7 @@
             "of": "class:core.Attribute"
           }
         },
-        "1": {
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.Class._extends",
           "name": "_extends",
@@ -114,7 +114,7 @@
             "to": "class:core.Class"
           }
         },
-        "2": {
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.Class._native",
           "name": "_native",
@@ -122,7 +122,7 @@
             "_class": "class:core.String"
           }
         },
-        "3": {
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.Class._domain",
           "name": "_domain",
@@ -130,7 +130,7 @@
             "_class": "class:core.String"
           }
         }
-      }
+      ]
     },
     "_class": "class:core.Class",
     "_domain": "model",
@@ -140,8 +140,8 @@
   },
   {
     "_attributes": {
-      "items": {
-        "0": {
+      "items": [
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.Classifier._kind",
           "name": "_kind",
@@ -150,7 +150,7 @@
             "of": "enum:core.ClassifierKind"
           }
         }
-      }
+      ]
     },
     "_class": "class:core.Class",
     "_domain": "model",
@@ -160,8 +160,8 @@
   },
   {
     "_attributes": {
-      "items": {
-        "0": {
+      "items": [
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.Attribute.name",
           "name": "name",
@@ -169,7 +169,7 @@
             "_class": "class:core.String"
           }
         },
-        "1": {
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.Attribute.type",
           "name": "type",
@@ -178,7 +178,7 @@
             "of": "class:core.Type"
           }
         }
-      }
+      ]
     },
     "_class": "class:core.Class",
     "_domain": "model",
@@ -187,6 +187,9 @@
     "_kind": 0
   },
   {
+    "_attributes": {
+      "items": []
+    },
     "_class": "class:core.Class",
     "_domain": "model",
     "_extends": "class:core.Class",
@@ -195,8 +198,8 @@
   },
   {
     "_attributes": {
-      "items": {
-        "0": {
+      "items": [
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.Enum._literals",
           "name": "_literals",
@@ -205,7 +208,7 @@
             "of": "class:core.EnumLiteral"
           }
         }
-      }
+      ]
     },
     "_class": "class:core.Class",
     "_domain": "model",
@@ -215,8 +218,8 @@
   },
   {
     "_attributes": {
-      "items": {
-        "0": {
+      "items": [
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.EnumLiteral.label",
           "name": "label",
@@ -224,7 +227,7 @@
             "_class": "class:core.String"
           }
         },
-        "1": {
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.EnumLiteral.ordinal",
           "name": "ordinal",
@@ -232,7 +235,7 @@
             "_class": "class:core.Type"
           }
         }
-      }
+      ]
     },
     "_class": "class:core.Class",
     "_domain": "model",
@@ -242,8 +245,8 @@
   },
   {
     "_attributes": {
-      "items": {
-        "0": {
+      "items": [
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.Type._default",
           "name": "_default",
@@ -251,7 +254,7 @@
             "_class": "class:core.Type"
           }
         }
-      }
+      ]
     },
     "_class": "class:core.Class",
     "_domain": "model",
@@ -260,6 +263,9 @@
     "_kind": 0
   },
   {
+    "_attributes": {
+      "items": []
+    },
     "_class": "class:core.Class",
     "_domain": "model",
     "_extends": "class:core.Type",
@@ -267,6 +273,9 @@
     "_kind": 0
   },
   {
+    "_attributes": {
+      "items": []
+    },
     "_class": "class:core.Class",
     "_domain": "model",
     "_extends": "class:core.Type",
@@ -274,6 +283,9 @@
     "_kind": 0
   },
   {
+    "_attributes": {
+      "items": []
+    },
     "_class": "class:core.Class",
     "_domain": "model",
     "_extends": "class:core.Type",
@@ -281,6 +293,9 @@
     "_kind": 0
   },
   {
+    "_attributes": {
+      "items": []
+    },
     "_class": "class:core.Class",
     "_domain": "model",
     "_extends": "class:core.Type",
@@ -288,6 +303,9 @@
     "_kind": 0
   },
   {
+    "_attributes": {
+      "items": []
+    },
     "_class": "class:core.Class",
     "_domain": "model",
     "_extends": "class:core.Type",
@@ -296,8 +314,8 @@
   },
   {
     "_attributes": {
-      "items": {
-        "0": {
+      "items": [
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.RefTo.to",
           "name": "to",
@@ -306,7 +324,7 @@
             "to": "class:core.Class"
           }
         }
-      }
+      ]
     },
     "_class": "class:core.Class",
     "_domain": "model",
@@ -316,8 +334,8 @@
   },
   {
     "_attributes": {
-      "items": {
-        "0": {
+      "items": [
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.InstanceOf.of",
           "name": "of",
@@ -326,7 +344,7 @@
             "to": "class:core.Class"
           }
         }
-      }
+      ]
     },
     "_class": "class:core.Class",
     "_domain": "model",
@@ -336,8 +354,8 @@
   },
   {
     "_attributes": {
-      "items": {
-        "0": {
+      "items": [
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.CollectionOf.of",
           "name": "of",
@@ -346,7 +364,7 @@
             "to": "class:core.Class"
           }
         }
-      }
+      ]
     },
     "_class": "class:core.Class",
     "_domain": "model",
@@ -356,8 +374,8 @@
   },
   {
     "_attributes": {
-      "items": {
-        "0": {
+      "items": [
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.EnumOf.of",
           "name": "of",
@@ -366,7 +384,7 @@
             "to": "class:core.Enum"
           }
         }
-      }
+      ]
     },
     "_class": "class:core.Class",
     "_domain": "model",
@@ -376,8 +394,8 @@
   },
   {
     "_attributes": {
-      "items": {
-        "0": {
+      "items": [
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.Tx._date",
           "name": "_date",
@@ -385,7 +403,7 @@
             "_class": "class:core.Number"
           }
         },
-        "1": {
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.Tx._user",
           "name": "_user",
@@ -393,7 +411,7 @@
             "_class": "class:core.String"
           }
         }
-      }
+      ]
     },
     "_class": "class:core.Class",
     "_domain": "model",
@@ -406,23 +424,26 @@
     "_id": "enum:core.TitleSource",
     "_kind": 2,
     "_literals": {
-      "items": {
-        "0": {
+      "items": [
+        {
           "_class": "class:core.EnumLiteral",
           "_id": "enum:core.TitleSource.Title",
           "label": "Title",
           "ordinal": 0
         },
-        "1": {
+        {
           "_class": "class:core.EnumLiteral",
           "_id": "enum:core.TitleSource.ShortId",
           "label": "ShortId",
           "ordinal": 1
         }
-      }
+      ]
     }
   },
   {
+    "_attributes": {
+      "items": []
+    },
     "_class": "class:core.Class",
     "_domain": "model",
     "_extends": "class:core.Doc",
@@ -431,8 +452,8 @@
   },
   {
     "_attributes": {
-      "items": {
-        "0": {
+      "items": [
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.Reference._sourceId",
           "name": "_sourceId",
@@ -441,7 +462,7 @@
             "to": "class:core.Doc"
           }
         },
-        "1": {
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.Reference._sourceClass",
           "name": "_sourceClass",
@@ -450,7 +471,7 @@
             "to": "class:core.Class"
           }
         },
-        "2": {
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.Reference._itemId",
           "name": "_itemId",
@@ -459,7 +480,7 @@
             "to": "class:core.Emb"
           }
         },
-        "3": {
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.Reference._itemClass",
           "name": "_itemClass",
@@ -468,7 +489,7 @@
             "to": "class:core.Class"
           }
         },
-        "4": {
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.Reference._collection",
           "name": "_collection",
@@ -476,7 +497,7 @@
             "_class": "class:core.String"
           }
         },
-        "5": {
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.Reference._sourceField",
           "name": "_sourceField",
@@ -484,7 +505,7 @@
             "_class": "class:core.String"
           }
         },
-        "6": {
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.Reference._sourceIndex",
           "name": "_sourceIndex",
@@ -492,7 +513,7 @@
             "_class": "class:core.Number"
           }
         },
-        "7": {
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.Reference._targetId",
           "name": "_targetId",
@@ -501,7 +522,7 @@
             "to": "class:core.Doc"
           }
         },
-        "8": {
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.Reference._targetClass",
           "name": "_targetClass",
@@ -510,7 +531,7 @@
             "to": "class:core.Class"
           }
         }
-      }
+      ]
     },
     "_class": "class:core.Class",
     "_domain": "model",
@@ -520,8 +541,8 @@
   },
   {
     "_attributes": {
-      "items": {
-        "0": {
+      "items": [
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.Space.name",
           "name": "name",
@@ -529,7 +550,7 @@
             "_class": "class:core.String"
           }
         },
-        "1": {
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.Space.description",
           "name": "description",
@@ -537,7 +558,7 @@
             "_class": "class:core.String"
           }
         },
-        "2": {
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.Space.application",
           "name": "application",
@@ -546,7 +567,7 @@
             "to": "class:core.Application"
           }
         },
-        "3": {
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.Space.applicationSettings",
           "name": "applicationSettings",
@@ -555,7 +576,7 @@
             "of": "class:core.Emb"
           }
         },
-        "4": {
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.Space.spaceKey",
           "name": "spaceKey",
@@ -563,7 +584,7 @@
             "_class": "class:core.String"
           }
         },
-        "5": {
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.Space.users",
           "name": "users",
@@ -572,7 +593,7 @@
             "of": "class:core.SpaceUser"
           }
         },
-        "6": {
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.Space.isPublic",
           "name": "isPublic",
@@ -580,7 +601,7 @@
             "_class": "class:core.Boolean"
           }
         },
-        "7": {
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.Space.archived",
           "name": "archived",
@@ -588,7 +609,7 @@
             "_class": "class:core.Boolean"
           }
         }
-      }
+      ]
     },
     "_class": "class:core.Class",
     "_domain": "model",
@@ -598,8 +619,8 @@
   },
   {
     "_attributes": {
-      "items": {
-        "0": {
+      "items": [
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.SpaceUser.userId",
           "name": "userId",
@@ -607,7 +628,7 @@
             "_class": "class:core.String"
           }
         },
-        "1": {
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.SpaceUser.owner",
           "name": "owner",
@@ -615,7 +636,7 @@
             "_class": "class:core.Boolean"
           }
         }
-      }
+      ]
     },
     "_class": "class:core.Class",
     "_domain": "model",
@@ -625,8 +646,8 @@
   },
   {
     "_attributes": {
-      "items": {
-        "0": {
+      "items": [
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.Title._objectClass",
           "name": "_objectClass",
@@ -635,7 +656,7 @@
             "to": "class:core.Class"
           }
         },
-        "1": {
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.Title._objectId",
           "name": "_objectId",
@@ -644,7 +665,7 @@
             "to": "class:core.Doc"
           }
         },
-        "2": {
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.Title.title",
           "name": "title",
@@ -652,7 +673,7 @@
             "_class": "class:core.Type"
           }
         },
-        "3": {
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.Title.source",
           "name": "source",
@@ -661,7 +682,7 @@
             "of": "enum:core.TitleSource"
           }
         }
-      }
+      ]
     },
     "_class": "class:core.Class",
     "_domain": "model",
@@ -671,8 +692,8 @@
   },
   {
     "_attributes": {
-      "items": {
-        "0": {
+      "items": [
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.VDoc._space",
           "name": "_space",
@@ -681,7 +702,7 @@
             "to": "class:core.Space"
           }
         },
-        "1": {
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.VDoc._createdOn",
           "name": "_createdOn",
@@ -689,7 +710,7 @@
             "_class": "class:core.Number"
           }
         },
-        "2": {
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.VDoc._createdBy",
           "name": "_createdBy",
@@ -697,7 +718,7 @@
             "_class": "class:core.String"
           }
         },
-        "3": {
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.VDoc._modifiedOn",
           "name": "_modifiedOn",
@@ -705,7 +726,7 @@
             "_class": "class:core.Number"
           }
         },
-        "4": {
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.VDoc._modifiedBy",
           "name": "_modifiedBy",
@@ -713,7 +734,7 @@
             "_class": "class:core.String"
           }
         }
-      }
+      ]
     },
     "_class": "class:core.Class",
     "_domain": "model",
@@ -723,8 +744,8 @@
   },
   {
     "_attributes": {
-      "items": {
-        "0": {
+      "items": [
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.ObjectTx._objectId",
           "name": "_objectId",
@@ -733,7 +754,7 @@
             "to": "class:core.Doc"
           }
         },
-        "1": {
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.ObjectTx._objectClass",
           "name": "_objectClass",
@@ -742,7 +763,7 @@
             "to": "class:core.Class"
           }
         },
-        "2": {
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.ObjectTx._objectSpace",
           "name": "_objectSpace",
@@ -751,7 +772,7 @@
             "to": "class:core.Space"
           }
         }
-      }
+      ]
     },
     "_class": "class:core.Class",
     "_domain": "model",
@@ -761,8 +782,8 @@
   },
   {
     "_attributes": {
-      "items": {
-        "0": {
+      "items": [
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.ItemTx._itemId",
           "name": "_itemId",
@@ -771,7 +792,7 @@
             "to": "class:core.Emb"
           }
         },
-        "1": {
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.ItemTx._itemClass",
           "name": "_itemClass",
@@ -780,7 +801,7 @@
             "to": "class:core.Class"
           }
         },
-        "2": {
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.ItemTx._collection",
           "name": "_collection",
@@ -788,7 +809,7 @@
             "_class": "class:core.String"
           }
         }
-      }
+      ]
     },
     "_class": "class:core.Class",
     "_domain": "model",
@@ -798,8 +819,8 @@
   },
   {
     "_attributes": {
-      "items": {
-        "0": {
+      "items": [
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.CreateTx.attributes",
           "name": "attributes",
@@ -807,7 +828,7 @@
             "_class": "class:core.Type"
           }
         }
-      }
+      ]
     },
     "_class": "class:core.Class",
     "_domain": "model",
@@ -817,8 +838,8 @@
   },
   {
     "_attributes": {
-      "items": {
-        "0": {
+      "items": [
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.UpdateTx.attributes",
           "name": "attributes",
@@ -826,7 +847,7 @@
             "_class": "class:core.Type"
           }
         }
-      }
+      ]
     },
     "_class": "class:core.Class",
     "_domain": "model",
@@ -835,6 +856,9 @@
     "_kind": 0
   },
   {
+    "_attributes": {
+      "items": []
+    },
     "_class": "class:core.Class",
     "_domain": "model",
     "_extends": "class:core.ObjectTx",
@@ -843,8 +867,8 @@
   },
   {
     "_attributes": {
-      "items": {
-        "0": {
+      "items": [
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.AddItemTx.attributes",
           "name": "attributes",
@@ -852,7 +876,7 @@
             "_class": "class:core.Type"
           }
         }
-      }
+      ]
     },
     "_class": "class:core.Class",
     "_domain": "model",
@@ -862,8 +886,8 @@
   },
   {
     "_attributes": {
-      "items": {
-        "0": {
+      "items": [
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.UpdateItemTx.attributes",
           "name": "attributes",
@@ -871,7 +895,7 @@
             "_class": "class:core.Type"
           }
         }
-      }
+      ]
     },
     "_class": "class:core.Class",
     "_domain": "model",
@@ -880,6 +904,9 @@
     "_kind": 0
   },
   {
+    "_attributes": {
+      "items": []
+    },
     "_class": "class:core.Class",
     "_domain": "model",
     "_extends": "class:core.ItemTx",
@@ -888,8 +915,8 @@
   },
   {
     "_attributes": {
-      "items": {
-        "0": {
+      "items": [
+        {
           "_class": "class:core.Attribute",
           "_id": "mixin:core.Indices.primary",
           "name": "primary",
@@ -897,7 +924,7 @@
             "_class": "class:core.String"
           }
         }
-      }
+      ]
     },
     "_class": "class:core.Mixin",
     "_extends": "class:core.Class",
@@ -906,8 +933,8 @@
   },
   {
     "_attributes": {
-      "items": {
-        "0": {
+      "items": [
+        {
           "_class": "class:core.Attribute",
           "_id": "mixin:core.ShortID.shortId",
           "name": "shortId",
@@ -915,7 +942,7 @@
             "_class": "class:core.String"
           }
         }
-      }
+      ]
     },
     "_class": "class:core.Mixin",
     "_extends": "class:core.VDoc",
@@ -924,8 +951,8 @@
   },
   {
     "_attributes": {
-      "items": {
-        "0": {
+      "items": [
+        {
           "_class": "class:core.Attribute",
           "_id": "mixin:core.CollectionReference._parentId",
           "name": "_parentId",
@@ -934,7 +961,7 @@
             "to": "class:core.Doc"
           }
         },
-        "1": {
+        {
           "_class": "class:core.Attribute",
           "_id": "mixin:core.CollectionReference._parentClass",
           "name": "_parentClass",
@@ -943,7 +970,7 @@
             "to": "class:core.Class"
           }
         },
-        "2": {
+        {
           "_class": "class:core.Attribute",
           "_id": "mixin:core.CollectionReference._collection",
           "name": "_collection",
@@ -951,7 +978,7 @@
             "_class": "class:core.String"
           }
         },
-        "3": {
+        {
           "_class": "class:core.Attribute",
           "_id": "mixin:core.CollectionReference._parentSpace",
           "name": "_parentSpace",
@@ -960,7 +987,7 @@
             "to": "class:core.Space"
           }
         }
-      }
+      ]
     },
     "_class": "class:core.Mixin",
     "_extends": "class:core.Emb",
@@ -969,8 +996,8 @@
   },
   {
     "_attributes": {
-      "items": {
-        "0": {
+      "items": [
+        {
           "_class": "class:core.Attribute",
           "_id": "mixin:core.UXObject.label",
           "name": "label",
@@ -978,7 +1005,7 @@
             "_class": "class:core.Type"
           }
         },
-        "1": {
+        {
           "_class": "class:core.Attribute",
           "_id": "mixin:core.UXObject.icon",
           "name": "icon",
@@ -986,7 +1013,7 @@
             "_class": "class:core.Type"
           }
         },
-        "2": {
+        {
           "_class": "class:core.Attribute",
           "_id": "mixin:core.UXObject.placeholder",
           "name": "placeholder",
@@ -994,7 +1021,7 @@
             "_class": "class:core.Type"
           }
         },
-        "3": {
+        {
           "_class": "class:core.Attribute",
           "_id": "mixin:core.UXObject.presenter",
           "name": "presenter",
@@ -1002,7 +1029,7 @@
             "_class": "class:core.Type"
           }
         },
-        "4": {
+        {
           "_class": "class:core.Attribute",
           "_id": "mixin:core.UXObject.color",
           "name": "color",
@@ -1010,7 +1037,7 @@
             "_class": "class:core.Type"
           }
         }
-      }
+      ]
     },
     "_class": "class:core.Mixin",
     "_extends": "class:core.Class",
@@ -1019,8 +1046,8 @@
   },
   {
     "_attributes": {
-      "items": {
-        "0": {
+      "items": [
+        {
           "_class": "class:core.Attribute",
           "_id": "mixin:core.UXAttribute.visible",
           "name": "visible",
@@ -1028,7 +1055,7 @@
             "_class": "class:core.Boolean"
           }
         },
-        "1": {
+        {
           "_class": "class:core.Attribute",
           "_id": "mixin:core.UXAttribute.label",
           "name": "label",
@@ -1036,7 +1063,7 @@
             "_class": "class:core.Type"
           }
         },
-        "2": {
+        {
           "_class": "class:core.Attribute",
           "_id": "mixin:core.UXAttribute.icon",
           "name": "icon",
@@ -1044,7 +1071,7 @@
             "_class": "class:core.Type"
           }
         },
-        "3": {
+        {
           "_class": "class:core.Attribute",
           "_id": "mixin:core.UXAttribute.placeholder",
           "name": "placeholder",
@@ -1052,7 +1079,7 @@
             "_class": "class:core.Type"
           }
         },
-        "4": {
+        {
           "_class": "class:core.Attribute",
           "_id": "mixin:core.UXAttribute.presenter",
           "name": "presenter",
@@ -1060,7 +1087,7 @@
             "_class": "class:core.Type"
           }
         },
-        "5": {
+        {
           "_class": "class:core.Attribute",
           "_id": "mixin:core.UXAttribute.color",
           "name": "color",
@@ -1068,7 +1095,7 @@
             "_class": "class:core.Type"
           }
         }
-      }
+      ]
     },
     "_class": "class:core.Mixin",
     "_extends": "class:core.Attribute",
@@ -1080,32 +1107,32 @@
     "_id": "enum:core.TaskStatus",
     "_kind": 2,
     "_literals": {
-      "items": {
-        "0": {
+      "items": [
+        {
           "_class": "class:core.EnumLiteral",
           "_id": "enum:core.TaskStatus.Open",
           "label": "Open",
           "ordinal": 0
         },
-        "1": {
+        {
           "_class": "class:core.EnumLiteral",
           "_id": "enum:core.TaskStatus.Close",
           "label": "Close",
           "ordinal": 1
         },
-        "2": {
+        {
           "_class": "class:core.EnumLiteral",
           "_id": "enum:core.TaskStatus.Resolved",
           "label": "Resolved",
           "ordinal": 100
         },
-        "3": {
+        {
           "_class": "class:core.EnumLiteral",
           "_id": "enum:core.TaskStatus.InProgress",
           "label": "InProgress",
           "ordinal": 101
         }
-      }
+      ]
     }
   },
   {
@@ -1113,32 +1140,32 @@
     "_id": "enum:core.TaskReproduce",
     "_kind": 2,
     "_literals": {
-      "items": {
-        "0": {
+      "items": [
+        {
           "_class": "class:core.EnumLiteral",
           "_id": "enum:core.TaskReproduce.Always",
           "label": "Always",
           "ordinal": "always"
         },
-        "1": {
+        {
           "_class": "class:core.EnumLiteral",
           "_id": "enum:core.TaskReproduce.Rare",
           "label": "Rare",
           "ordinal": "rare"
         },
-        "2": {
+        {
           "_class": "class:core.EnumLiteral",
           "_id": "enum:core.TaskReproduce.Sometimes",
           "label": "Sometimes",
           "ordinal": "sometimes"
         }
-      }
+      ]
     }
   },
   {
     "_attributes": {
-      "items": {
-        "0": {
+      "items": [
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.Task.name",
           "name": "name",
@@ -1146,7 +1173,7 @@
             "_class": "class:core.String"
           }
         },
-        "1": {
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.Task.description",
           "name": "description",
@@ -1154,7 +1181,7 @@
             "_class": "class:core.String"
           }
         },
-        "2": {
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.Task.rate",
           "name": "rate",
@@ -1162,7 +1189,7 @@
             "_class": "class:core.Number"
           }
         },
-        "3": {
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.Task.comments",
           "name": "comments",
@@ -1171,7 +1198,7 @@
             "of": "class:core.TaskComment"
           }
         },
-        "4": {
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.Task.eta",
           "name": "eta",
@@ -1180,7 +1207,7 @@
             "of": "class:core.TaskEstimate"
           }
         },
-        "5": {
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.Task.status",
           "name": "status",
@@ -1189,7 +1216,7 @@
             "of": "enum:core.TaskStatus"
           }
         },
-        "6": {
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.Task.reproduce",
           "name": "reproduce",
@@ -1198,21 +1225,21 @@
             "of": "enum:core.TaskReproduce"
           }
         }
-      }
+      ]
     },
     "_class": "class:core.Class",
     "_extends": "class:core.Doc",
     "_id": "class:core.Task",
     "_kind": 0,
-    "_mixins": {
-      "0": "mixin:core.Indices"
-    },
+    "_mixins": [
+      "mixin:core.Indices"
+    ],
     "primary|mixin:core~Indices": "name"
   },
   {
     "_attributes": {
-      "items": {
-        "0": {
+      "items": [
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.TaskEstimate.rom",
           "name": "rom",
@@ -1220,7 +1247,7 @@
             "_class": "class:core.Number"
           }
         },
-        "1": {
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.TaskEstimate.eta",
           "name": "eta",
@@ -1228,7 +1255,7 @@
             "_class": "class:core.Number"
           }
         }
-      }
+      ]
     },
     "_class": "class:core.Class",
     "_extends": "class:core.Obj",
@@ -1237,8 +1264,8 @@
   },
   {
     "_attributes": {
-      "items": {
-        "0": {
+      "items": [
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.TaskComment.message",
           "name": "message",
@@ -1246,7 +1273,7 @@
             "_class": "class:core.String"
           }
         },
-        "1": {
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.TaskComment.author",
           "name": "author",
@@ -1254,7 +1281,7 @@
             "_class": "class:core.String"
           }
         },
-        "2": {
+        {
           "_class": "class:core.Attribute",
           "_id": "class:core.TaskComment.date",
           "name": "date",
@@ -1262,7 +1289,7 @@
             "_class": "class:core.Type"
           }
         }
-      }
+      ]
     },
     "_class": "class:core.Class",
     "_extends": "class:core.Emb",
@@ -1271,8 +1298,8 @@
   },
   {
     "_attributes": {
-      "items": {
-        "0": {
+      "items": [
+        {
           "_class": "class:core.Attribute",
           "_id": "mixin:core.TaskMixin.textValue",
           "name": "textValue",
@@ -1280,7 +1307,7 @@
             "_class": "class:core.String"
           }
         }
-      }
+      ]
     },
     "_class": "class:core.Mixin",
     "_extends": "class:core.Task",
