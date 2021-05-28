@@ -42,8 +42,6 @@
 
   $: style = computedStyle(message.marks || [])
 
-  $: uiService.getHref({ _class: style.reference._class, _id: style.reference._id }).then((ref) => (hrefVal = ref))
-
   function computedStyle (marks: MessageMark[]): Style {
     const result = new Style()
     for (const mark of marks) {
@@ -60,6 +58,11 @@
           result.reference._id = rm.attrs.id || ''
           result.reference._class = rm.attrs.class
           result.reference.resolved = result.reference._id !== ''
+          if (result.reference.resolved) {
+            uiService
+              .getHref({ _class: result.reference._class, _id: result.reference._id })
+              .then((ref) => (hrefVal = ref))
+          }
           break
         }
       }
