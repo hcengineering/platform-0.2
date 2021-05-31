@@ -9,11 +9,16 @@ export const enum MsgType {
   ICECandidate = 'ice-candidate',
   TransmitVideo = 'transmit-video',
   TransmitVideoResp = 'transmit-video-resp',
-  CancelVideoTransmission = 'cancel-video-transmission'
+  CancelVideoTransmission = 'cancel-video-transmission',
+  InitScreenSharing = 'init-screen-sharing',
+  StopScreenSharing = 'stop-screen-sharing',
+  ScreenSharingStarted = 'screen-sharing-started',
+  ScreenSharingFinished = 'screen-sharing-finished',
 }
 
+type InternalID = string
 export interface Participant {
-  internalID: string
+  internalID: InternalID
   id: string
 }
 
@@ -40,28 +45,47 @@ export interface JoinRespMsg {
   type: MsgType.JoinResp
   participants: Participant[]
   me: Participant
+  screen?: InternalID
 }
 
 export interface TransmitVideoMsg {
   type: MsgType.TransmitVideo
-  from: string
+  from: InternalID
   sdp: string
+  screen?: boolean
 }
 
 export interface TransmitVideoRespMsg {
   type: MsgType.TransmitVideoResp
-  from: string
+  from: InternalID
   sdp: string
 }
 
-export interface CancelVideoTransmission {
+export interface CancelVideoTransmissionMsg {
   type: MsgType.CancelVideoTransmission
-  from: string
+  from: InternalID
+}
+
+export interface InitScreenSharingMsg {
+  type: MsgType.InitScreenSharing
+}
+
+export interface StopScreenSharingMsg {
+  type: MsgType.StopScreenSharing
+}
+
+export interface ScreenSharingStartedMsg {
+  type: MsgType.ScreenSharingStarted
+  owner: InternalID
+}
+
+export interface ScreenSharingFinishedMsg {
+  type: MsgType.ScreenSharingFinished
 }
 
 export interface ICECandidateMsg {
   type: MsgType.ICECandidate
-  participant: string
+  participant: InternalID
   candidate: IceCandidate
 }
 
@@ -69,13 +93,17 @@ export type IncomingMsg =
   | JoinMsg
   | LeaveMsg
   | TransmitVideoMsg
-  | CancelVideoTransmission
+  | CancelVideoTransmissionMsg
   | ICECandidateMsg
+  | InitScreenSharingMsg
+  | StopScreenSharingMsg
 export type OutgoingMsg =
   | ICECandidateMsg
   | TransmitVideoRespMsg
   | ParticipantJoinedMsg
   | ParticipantLeftMsg
   | JoinRespMsg
+  | ScreenSharingStartedMsg
+  | ScreenSharingFinishedMsg
 
 export type WebRTCMsg = IncomingMsg | OutgoingMsg

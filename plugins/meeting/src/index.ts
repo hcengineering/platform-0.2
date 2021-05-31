@@ -27,14 +27,22 @@ export interface Participant {
   isMediaReady: boolean
 }
 
+export interface ScreenParticipant extends Participant {
+  owner: string
+  isRunning: boolean
+}
+
 export interface MeetingService extends Service {
   room: {
     participants: Readable<Participant[]>
     user: Readable<Participant>
+    screen: Readable<ScreenParticipant>
     isJoined: Readable<boolean>
   }
   join: (room: string) => Promise<void>
   leave: () => Promise<void>
+  shareScreen: () => void
+  finishSharing: () => void
 }
 
 const meetingPlugin = plugin(

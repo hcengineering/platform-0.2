@@ -16,7 +16,9 @@ limitations under the License.
   import type { Participant } from '..'
 
   export let participant: Participant
-  export let isLocal: boolean = false
+  export let isLocal = false
+  export let full = false
+
   let videoContainer: HTMLVideoElement
 
   $: if (videoContainer) {
@@ -24,7 +26,7 @@ limitations under the License.
   }
 </script>
 
-<video class="video" autoplay muted={isLocal} controls={false} bind:this={videoContainer} />
+<video class="video" class:mVideoFull={full} autoplay muted={isLocal} controls={false} bind:this={videoContainer} />
 
 <style lang="scss">
   .video {
@@ -33,5 +35,11 @@ limitations under the License.
     width: 100%;
     height: 100%;
     object-fit: cover;
+
+    &.mVideoFull {
+      object-fit: contain;
+      border-radius: unset;
+      border: unset;
+    }
   }
 </style>

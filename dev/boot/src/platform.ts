@@ -41,6 +41,7 @@ import taskMeta from '@anticrm/task/src/__meta__'
 import presentationMeta from '@anticrm/presentation/src/__meta__'
 import loginMeta from '@anticrm/login/src/__meta__'
 import dataGenMeta from '@anticrm/data-generator/src/__meta__'
+import meetingMeta from '@anticrm/meeting/src/__meta__'
 
 const platform = createPlatform()
 
@@ -53,7 +54,6 @@ platform.addLocation(i18n, () => import(/* webpackChunkName: "platform-i18n" */ 
 platform.addLocation(login, () => import(/* webpackChunkName: "login" */ '@anticrm/login/src/plugin')) // eslint-disable-line
 platform.addLocation(presentation, () => import(/* webpackChunkName: "presentation" */ '@anticrm/presentation/src/plugin')) // eslint-disable-line
 platform.addLocation(workbench, () => import(/* webpackChunkName: "workbench" */ '@anticrm/workbench/src/plugin')) // eslint-disable-line
-platform.addLocation(task, () => import(/* webpackChunkName: "task" */ '@anticrm/task/src/plugin')) // eslint-disable-line
 platform.addLocation(task, () => import(/* webpackChunkName: "task" */ '@anticrm/task/src/plugin')) // eslint-disable-line
 platform.addLocation(contact, () => import(/* webpackChunkName: "contact" */ '@anticrm/contact/src/plugin')) // eslint-disable-line
 platform.addLocation(chunter, () => import(/* webpackChunkName: "chunter" */ '@anticrm/chunter/src/plugin')) // eslint-disable-line
@@ -78,5 +78,6 @@ presentationMeta(platform)
 loginMeta(platform)
 // contactMeta(platform)
 dataGenMeta(platform)
+meetingMeta(platform)
 
 export default platform

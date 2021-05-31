@@ -16,11 +16,11 @@ import { readable, writable } from 'svelte/store'
 import { Platform } from '@anticrm/platform'
 import { CoreService } from '@anticrm/platform-core'
 import { RPC_CALL_WEBRTC } from '@anticrm/rpc'
-import { ICECandidateMsg, MsgType, OutgoingMsg, Participant as RawParticipant, ParticipantJoinedMsg, ParticipantLeftMsg, JoinRespMsg, TransmitVideoRespMsg } from '@anticrm/webrtc'
+import { ICECandidateMsg, MsgType, OutgoingMsg, Participant as RawParticipant, ParticipantJoinedMsg, ParticipantLeftMsg, JoinRespMsg, TransmitVideoRespMsg, ScreenSharingStartedMsg } from '@anticrm/webrtc'
 import { EventType } from '@anticrm/client/src/common'
 
 import MeetingView from './components/MeetingView.svelte'
-import meeting, { MeetingService, Participant } from '.'
+import meeting, { MeetingService, Participant, ScreenParticipant } from '.'
 
 type Listener<T extends OutgoingMsg> = (msg: T) => Promise<void>
 const webRTCPub = new class {
@@ -60,6 +60,26 @@ const leftPub = new class {
   }
 }()
 
+const screenctl = new class {
+  private readonly listeners = new Map<string, Array<() => (void | Promise<void>)>>()
+
+  onCmd (cmd: string): void {
+    // eslint-disable-next-line no-void
+    (this.listeners.get(cmd) ?? []).forEach(l => { void l() })
+  }
+
+  sub (cmd: string, listener: () => (void | Promise<void>)): () => void {
+    const existing = this.listeners.get(cmd) ?? []
+    existing.push(listener)
+
+    this.listeners.set(cmd, existing)
+
+    return () => {
+      this.listeners.set(cmd, (this.listeners.get(cmd) ?? []).filter(l => l !== listener))
+    }
+  }
+}()
+
 export default async (platform: Platform, { core }: {core: CoreService}): Promise<MeetingService> => {
   platform.setResource(meeting.component.MeetingView, MeetingView)
 
@@ -70,6 +90,7 @@ export default async (platform: Platform, { core }: {core: CoreService}): Promis
   })
 
   const setupPeer = async (participant: Participant, remote = true): Promise<void> => {
+    console.log('setup', participant, remote)
     participant.peer.addEventListener('connectionstatechange', () => {
       console.log('connectionstate', participant.id, participant.peer.connectionState)
     })
@@ -78,6 +99,7 @@ export default async (platform: Platform, { core }: {core: CoreService}): Promis
       participant.peer.addTransceiver('audio', { direction: 'recvonly' })
       participant.peer.addTransceiver('video', { direction: 'recvonly' })
       participant.peer.addEventListener('track', (event) => {
+        console.log(event.track)
         participant.media.addTrack(event.track)
       })
     } else {
@@ -121,6 +143,12 @@ export default async (platform: Platform, { core }: {core: CoreService}): Promis
     }),
     media: new MediaStream(),
     isMediaReady
+  })
+
+  const makeScreenParticipant = (raw: RawParticipant): ScreenParticipant => ({
+    ...makeParticipant(raw, false),
+    owner: '',
+    isRunning: false
   })
 
   let hasLeft = true
@@ -214,12 +242,10 @@ export default async (platform: Platform, { core }: {core: CoreService}): Promis
     }
   })
 
-  const initMe = makeParticipant({
+  const user = readable(makeParticipant({
     id: '',
     internalID: ''
-  }, false)
-
-  const me = readable(initMe, set => {
+  }, false), set => {
     let actual = makeParticipant({
       id: '',
       internalID: ''
@@ -262,9 +288,7 @@ export default async (platform: Platform, { core }: {core: CoreService}): Promis
           peer: new RTCPeerConnection({
             iceServers: [
               { urls: ['stun:stun.l.google.com:19302'] }
-            ],
-            iceTransportPolicy: 'all',
-            iceCandidatePoolSize: 2
+            ]
           })
         }))
 
@@ -307,6 +331,168 @@ export default async (platform: Platform, { core }: {core: CoreService}): Promis
 
   const isJoined = writable(false)
 
+  const screen = readable(makeScreenParticipant({
+    id: '',
+    internalID: ''
+  }), set => {
+    let actual = makeScreenParticipant({
+      id: '',
+      internalID: ''
+    })
+    const update = (updater: (x: ScreenParticipant) => ScreenParticipant): void => {
+      actual = updater(actual)
+      set(actual)
+    }
+
+    const unsubs: Array<() => void> = []
+
+    let luser: Participant
+    unsubs.push(
+      user.subscribe(x => {
+        luser = x
+      })
+    )
+
+    unsubs.push(
+      webRTCPub.sub(MsgType.JoinResp, async (msg: JoinRespMsg) => {
+        if (hasLeft || msg.screen === undefined) {
+          return
+        }
+
+        update((cur) => ({
+          ...cur,
+          internalID: msg.screen ?? '',
+          owner: msg.screen?.slice(0, -7) ?? '',
+          peer: new RTCPeerConnection({
+            iceServers: [
+              { urls: ['stun:stun.l.google.com:19302'] }
+            ]
+          }),
+          isMediaReady: true
+        }))
+
+        await setupPeer(actual)
+      })
+    )
+
+    unsubs.push(
+      screenctl.sub('shareScreen', async () => {
+        // Invalid case, for now only one screen sharing session is allowed
+        if (actual.isMediaReady || actual.isRunning) {
+          return
+        }
+
+        // https://github.com/microsoft/TypeScript/issues/33232
+        // @ts-expect-error
+        const media = await navigator.mediaDevices.getDisplayMedia({
+          audio: false,
+          video: {
+            frameRate: { ideal: 30 }
+          }
+        }) as MediaStream
+
+        media.getTracks()[0]?.addEventListener('ended', () => {
+          screenctl.onCmd('stopSharing')
+        })
+
+        update((x) => ({ ...x, media, isMediaReady: true }))
+
+        await webRTCPub.onMsg(
+          await rpc.request(RPC_CALL_WEBRTC, {
+            type: MsgType.InitScreenSharing
+          })
+        )
+      })
+    )
+
+    unsubs.push(
+      webRTCPub.sub(MsgType.ScreenSharingStarted, async (msg: ScreenSharingStartedMsg) => {
+        if (hasLeft) {
+          return
+        }
+
+        const internalID = msg.owner + '-screen'
+
+        update((cur) => ({
+          ...cur,
+          internalID,
+          owner: msg.owner,
+          peer: new RTCPeerConnection({
+            iceServers: [
+              { urls: ['stun:stun.l.google.com:19302'] }
+            ]
+          }),
+          isMediaReady: true
+        }))
+
+        await setupPeer(actual, msg.owner !== luser.internalID)
+      })
+    )
+
+    unsubs.push(
+      screenctl.sub('stopSharing', async () => {
+        actual.media.getTracks()
+          .forEach(track => {
+            track.stop()
+            actual.media.removeTrack(track)
+          })
+
+        await webRTCPub.onMsg(
+          await rpc.request(RPC_CALL_WEBRTC, {
+            type: MsgType.StopScreenSharing
+          })
+        )
+      })
+    )
+
+    unsubs.push(
+      webRTCPub.sub(MsgType.ICECandidate, async (msg: ICECandidateMsg) => {
+        const { candidate, participant: internalID } = msg
+        if (actual.internalID !== internalID) {
+          return
+        }
+
+        await actual.peer.addIceCandidate(candidate)
+      })
+    )
+
+    unsubs.push(
+      webRTCPub.sub(MsgType.TransmitVideoResp, async (msg: TransmitVideoRespMsg) => {
+        const { from, sdp } = msg
+        if (actual.internalID !== from) {
+          return
+        }
+
+        await actual.peer.setRemoteDescription({ type: 'answer', sdp })
+      })
+    )
+
+    unsubs.push(
+      webRTCPub.sub(MsgType.ScreenSharingFinished, async () => {
+        if (hasLeft) {
+          return
+        }
+
+        actual.peer.close()
+
+        update(() => makeScreenParticipant({
+          id: '',
+          internalID: ''
+        }))
+      })
+    )
+
+    return () => {
+      unsubs.forEach(fn => fn())
+      actual.peer.close()
+      actual.media.getTracks()
+        .forEach(track => {
+          track.stop()
+          actual.media.removeTrack(track)
+        })
+    }
+  })
+
   return {
     join: async (room: string) => {
       const curHasLeft = hasLeft
@@ -334,9 +520,16 @@ export default async (platform: Platform, { core }: {core: CoreService}): Promis
         leftPub.onLeft()
       }
     },
+    shareScreen: () => {
+      screenctl.onCmd('shareScreen')
+    },
+    finishSharing: () => {
+      screenctl.onCmd('stopSharing')
+    },
     room: {
       participants,
-      user: me,
+      user,
+      screen,
       isJoined
     }
   }

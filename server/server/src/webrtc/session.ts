@@ -90,8 +90,8 @@ export class Session {
 
   private async createEndpoint (sender: string): Promise<WebRtcEndpoint> {
     const endpoint = await this.pipeline.create('WebRtcEndpoint')
-    await endpoint.setMaxVideoRecvBandwidth(2000)
-    await endpoint.setMaxVideoSendBandwidth(2000)
+    await endpoint.setMaxVideoRecvBandwidth(5000)
+    await endpoint.setMaxVideoSendBandwidth(5000)
     endpoint.on('IceCandidateFound', (event) => {
       this.send({
         type: MsgType.ICECandidate,

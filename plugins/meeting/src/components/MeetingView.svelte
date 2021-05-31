@@ -23,7 +23,7 @@ limitations under the License.
   import ParticipantStream from './ParticipantStream.svelte'
   import { initGridStore, makeGridSizeStore } from './grid.layout'
 
-  import { getMeetingService, MeetingService, Participant } from '..'
+  import { getMeetingService, MeetingService, Participant, ScreenParticipant } from '..'
 
   export let space: Space
 
@@ -31,6 +31,7 @@ limitations under the License.
   let meetingService: MeetingService
 
   let user: Readable<Participant>
+  let screen: Readable<ScreenParticipant>
   let participants: Readable<Participant[]>
   let isJoined: Readable<boolean>
   let container: Element
@@ -44,14 +45,20 @@ limitations under the License.
   }
 
   $: if ($participants) {
-    amount.set($participants.length + 1)
+    amount.set($participants.length + 1 + ($screen.isMediaReady ? 1 : 0))
   }
 
   async function init () {
     meetingService = await meetingServiceP
     user = meetingService.room.user
     participants = meetingService.room.participants
+    screen = meetingService.room.screen
     isJoined = meetingService.room.isJoined
+  }
+
+  let isScreenShared = false
+  $: if ($screen) {
+    isScreenShared = $screen.isMediaReady
   }
 
   async function join () {
@@ -61,6 +68,14 @@ limitations under the License.
 
   function leave () {
     meetingService?.leave()
+  }
+
+  function shareScreen () {
+    meetingService?.shareScreen()
+  }
+
+  function stopSharing () {
+    meetingService?.finishSharing()
   }
 
   onDestroy(leave)
@@ -79,18 +94,30 @@ limitations under the License.
     })
   }
 
+  function requestFullscreen () {
+    container?.requestFullscreen()
+  }
+
   let videoStyle = ''
-  $: videoStyle = `width: ${$size.width}px; height: ${$size.height}px`
+  $: videoStyle = isScreenShared ? '' : `width: ${$size.width}px; height: ${$size.height}px`
+
+  let videosStyle = ''
+  $: videosStyle = isScreenShared ? '' : `width: ${$cSize.width}px`
 </script>
 
 {#await init() then _}
   <div class="root" bind:this={container}>
-    <div class="videos" style={`width: ${$cSize.width}px`}>
-      <div class="video" style={videoStyle}>
+    {#if isScreenShared}
+      <div class="video" class:mVideoFull={isScreenShared}>
+        <ParticipantStream participant={$screen} full={true} />
+      </div>
+    {/if}
+    <div class="videos" class:mVideosCompact={isScreenShared} style={videosStyle}>
+      <div class="video" class:mVideoCompact={isScreenShared} style={videoStyle}>
         <ParticipantStream participant={$user} isLocal={true} />
       </div>
       {#each $participants as participant (participant.internalID)}
-        <div class="video" style={videoStyle}>
+        <div class="video" class:mVideoCompact={isScreenShared} style={videoStyle}>
           <ParticipantStream {participant} />
         </div>
       {/each}
@@ -102,8 +129,14 @@ limitations under the License.
         {/if}
       {:else}
         <Button on:click={leave} label="Leave" />
+        {#if !isScreenShared}
+          <Button on:click={shareScreen} label="Share screen" />
+        {:else if $screen.owner === $user.internalID}
+          <Button on:click={stopSharing} label="Stop sharing" />
+        {/if}
       {/if}
       <Button on:click={toggleMute} label={isMuted ? 'Unmute' : 'Mute'} />
+      <Button on:click={requestFullscreen} label="Fullscreen" />
     </div>
   </div>
 {/await}
@@ -118,6 +151,10 @@ limitations under the License.
     flex-direction: column;
     overflow: auto;
     padding: 20px;
+
+    &:fullscreen {
+      padding: 0;
+    }
   }
 
   .controls {
@@ -140,9 +177,30 @@ limitations under the License.
     flex-wrap: wrap;
     align-items: center;
     justify-content: center;
+
+    &.mVideosCompact {
+      width: 100px;
+      right: 0;
+      top: 0;
+      margin: 20px 20px;
+      padding: 5px;
+      border: 1px solid var(--theme-bg-accent-color);
+      border-radius: 20px;
+    }
   }
 
   .video {
     flex: none;
+
+    &.mVideoFull {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    &.mVideoCompact {
+      width: 100%;
+    }
   }
 </style>
