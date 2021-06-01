@@ -7,6 +7,8 @@
     "strict": true,
     "esModuleInterop": true,
     "sourceMap": true,
-    "experimentalDecorators": true
-  }
+    "experimentalDecorators": true,
+    "skipLibCheck": true
+  },
+  "exclude": ["node_modules"]
 }

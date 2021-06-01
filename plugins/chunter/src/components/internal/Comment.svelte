@@ -22,14 +22,20 @@
   export let message: Comment
 
   let username: string
+
   const timestamp: string = new Date(message._createdOn).toLocaleString()
   let avatar: Promise<Asset>
 
   $: avatar = getContactService().then((service) => {
-    return service.getUser(message._createdBy).then((user) => {
-      username = user.name
-      return service.getAvatar(user._id as Ref<User>)
-    })
+    return service
+      .getUser(message._createdBy)
+      .then((user) => {
+        username = user.name
+        return service.getAvatar(user._id as Ref<User>)
+      })
+      .catch(() => {
+        username = message._createdBy
+      })
   })
 </script>
 

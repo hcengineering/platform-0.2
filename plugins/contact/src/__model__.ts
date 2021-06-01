@@ -40,6 +40,7 @@ export default contact
 class TContact extends TVDoc implements Contact {
   @Prop() @UX('Phone' as IntlString, { icon: contact.icon.Phone }) phone?: string
   @Prop() @UX('Email' as IntlString, { icon: contact.icon.Email }) email?: string
+  @Prop() @UX('Telegram username' as IntlString, { icon: contact.icon.Telegram }) telegramUserName?: string
 }
 
 @Class$(contact.class.Person, contact.class.Contact)

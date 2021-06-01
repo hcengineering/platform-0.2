@@ -37,6 +37,7 @@ interface Account {
   workspaces: ObjectID[]
   clientSecret: string
   clientIds: string[]
+  telegramToken: string
 }
 
 type AccountInfo = Omit<Account, 'hash' | 'salt'>
@@ -92,7 +93,8 @@ export async function createAccount (db: Db, email: string, password: string): P
     email,
     workspaces: [],
     clientIds: [],
-    clientSecret: ''
+    clientSecret: '',
+    telegramToken: ''
   }
 }
 
