@@ -13,6 +13,9 @@
 // limitations under the License.
 //
 
+import { addStringsLoader } from './i18n'
+import { Platform } from './status'
+
 export * from './metadata'
 export * from './status'
 export * from './event'
@@ -20,12 +23,9 @@ export * from './plugin'
 export * from './resource'
 export * from './i18n'
 
-import { addStringsLoader } from './i18n'
-import { Platform } from './status'
-
 addStringsLoader(Platform, async (lang: string) => {
   switch (lang) {
-    case 'en': return await import(`./lang/en.json`) as any
+    case 'en': return await import('./lang/en.json') as any
   }
   throw new Error('unsupported language')
 })

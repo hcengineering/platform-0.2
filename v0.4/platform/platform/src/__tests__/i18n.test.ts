@@ -21,8 +21,8 @@ import { addEventListener, PlatformEvent, removeEventListener } from '../event'
 
 const TestComponent = 'test-strings' as Component
 
-const strings =  identify(TestComponent, {
-  loadingPlugin: '' as IntlString<{ plugin: string }>,
+const strings = identify(TestComponent, {
+  loadingPlugin: '' as IntlString<{ plugin: string }>
 })
 
 describe('i18n', () => {

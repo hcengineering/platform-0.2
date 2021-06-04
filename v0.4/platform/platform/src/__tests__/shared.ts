@@ -45,6 +45,9 @@ export const descriptor3 = plugin(
   {}
 )
 
+export const plugin4 = 'plugin4' as Plugin<Service>
+export const descriptor4 = plugin(plugin4, {}, { nameSpace: 'any' })
+
 export const plugin3State = {
   parsed: false,
   started: false,
