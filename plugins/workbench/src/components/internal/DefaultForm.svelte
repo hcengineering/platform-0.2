@@ -40,9 +40,11 @@ limitations under the License.
   async function onSave () {
     const doc = {
       _class: creator.class,
-      [primary?.key || 'name']: title,
       _space: space?._id,
       ...object
+    }
+    if (primary !== undefined) {
+      doc[primary.key] = title
     }
 
     object = {}
@@ -53,15 +55,17 @@ limitations under the License.
   }
 </script>
 
-<div class="caption">
-  <InlineEdit bind:value={title} placeholder="Title" fullWidth={true} />
-</div>
+{#if primary !== undefined}
+  <div class="caption">
+    <InlineEdit bind:value={title} placeholder="Title" fullWidth={true} />
+  </div>
+{/if}
 
-{#if spaces && spaces.length > 1}
+{#if spaces !== undefined && spaces.length > 1}
   <SpaceBox {spaces} bind:space />
 {/if}
 
-{#if model}
+{#if model !== undefined}
   <Properties {model} bind:object />
 {/if}
 
