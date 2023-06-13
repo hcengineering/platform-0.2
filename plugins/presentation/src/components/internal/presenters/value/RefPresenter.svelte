@@ -13,47 +13,11 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import type { Class, Doc, Ref, RefTo } from '@anticrm/core'
-  import type { AttrModel } from '@anticrm/presentation'
-  import ui, { getCoreService, liveQuery } from '@anticrm/presentation'
-  import type { AnyComponent } from '@anticrm/platform-ui'
-  import Presenter from '../Presenter.svelte'
-  import { QueryUpdater } from '@anticrm/platform-core'
+  import type { Doc, Ref } from '@anticrm/core'
 
   export let value: Ref<Doc>
-  export let attribute: AttrModel
-  export let editable: boolean
-
-  let doc: Doc | undefined
-  let presenter: AnyComponent
-
-  const coreService = getCoreService()
-  let lq: Promise<QueryUpdater<Doc>>
-  $: lq = liveQuery<Doc>(lq, (attribute.type as RefTo<Doc>).to, { _id: value }, (docs) => {
-    if (docs.length > 0) {
-      doc = docs[0]
-    } else {
-      doc = undefined
-    }
-  })
-
-  $: {
-    coreService.then((cs) => {
-      const model = cs.getModel()
-      const objClass = (attribute.type as RefTo<Doc>).to
-      const typeClass = model.get<Class<Doc>>(objClass as Ref<Class<Doc>>)
-      if (!model.isMixedIn(typeClass, ui.mixin.Presenter)) {
-        console.log(new Error(`no presenter for type '${objClass}'`))
-        // Use string presenter
-      } else {
-        presenter = model.as(typeClass, ui.mixin.Presenter).presenter
-      }
-    })
-  }
+  // export let attribute: AttrModel
+  // export let editable: boolean
 </script>
 
-{#if doc && presenter}
-  <Presenter is={presenter} value={doc} {attribute} {editable} />
-{:else}
-  {value}
-{/if}
+{value}
