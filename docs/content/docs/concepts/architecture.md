@@ -5,7 +5,7 @@ menuPosition: 1
 
 # The Platform
 
-Antierp Platform built around a few simple concepts:
+Anticrm Platform built around a few simple concepts:
 
 * `Platform Object` -- a piece of information, typically persisted by the platform in a database. May refer another platform object and `Resource`s
 * `Resource` -- something we can't persist in the database (e.g. JavaScript function, or "mailing service"), but want to refer from a `Platform Object`.
